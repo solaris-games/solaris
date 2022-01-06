@@ -2,11 +2,12 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class GameCreateValidationService {
     
-    constructor(playerService, starService, carrierService, specialistService) {
+    constructor(playerService, starService, carrierService, specialistService, gameTypeService) {
         this.playerService = playerService;
         this.starService = starService;
         this.carrierService = carrierService;
         this.specialistService = specialistService;
+        this.gameTypeService = gameTypeService;
     }
 
     // Note: The reason why this isn't in a unit test is because custom galaxies
@@ -82,6 +83,10 @@ module.exports = class GameCreateValidationService {
         // Assert that there are the correct number of home stars.
         if (game.galaxy.stars.filter(s => s.homeStar).length !== game.settings.general.playerLimit) {
             throw new ValidationError(`The galaxy must have a total of ${game.settings.general.playerLimit} capital stars.`);
+        }
+        
+        if (this.gameTypeService.isKingOfTheHillMode(game) && !this.starService.getKingOfTheHillStar(game)) {
+            throw new ValidationError(`A center star must be present in king of the hill mode.`);
         }
 
         for (let star of game.galaxy.stars) {

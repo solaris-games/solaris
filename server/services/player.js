@@ -465,7 +465,7 @@ module.exports = class PlayerService extends EventEmitter {
         let totalStars = playerStars.length;
         let totalHomeStars = this.calculateTotalHomeStars(playerStars);
 
-        // In BR mode, the player star count is based on living stars only.
+        // In BR mode, the player star count is based on living stars only. - TODO: Why?
         if (game.settings.general.mode === 'battleRoyale') {
             totalStars = playerStars.filter(s => !this.starService.isDeadStar(s)).length;
         }
@@ -846,6 +846,16 @@ module.exports = class PlayerService extends EventEmitter {
         }
         
         return query;
+    }
+
+    getKingOfTheHillPlayer(game) {
+        const star = this.starService.getKingOfTheHillStar(game);
+
+        if (!star.ownedByPlayerId) {
+            return null;
+        }
+
+        return this.getById(game, star.ownedByPlayerId);
     }
 
 }

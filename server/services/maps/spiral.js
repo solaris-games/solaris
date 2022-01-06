@@ -2,12 +2,13 @@ const simplexNoise = require('simplex-noise');
 
 module.exports = class SpiralMapService {
 
-    constructor(randomService, starService, starDistanceService, distanceService, resourceService) {
+    constructor(randomService, starService, starDistanceService, distanceService, resourceService, gameTypeService) {
         this.randomService = randomService;
         this.starService = starService;
         this.starDistanceService = starDistanceService;
         this.distanceService = distanceService;
         this.resourceService = resourceService;
+        this.gameTypeService = gameTypeService;
     }
 
     generateLocations(game, count, resourceDistribution) {
@@ -38,6 +39,10 @@ module.exports = class SpiralMapService {
 
     generateSpiral(locationCount, branchCount) {
         const locations = [];
+
+        if (this.gameTypeService.isKingOfTheHillMode(game)) {
+            locations.push(this.starDistanceService.getGalacticCenter());
+        }
 
         let BRANCHES = branchCount;
         let COPIES = 2;

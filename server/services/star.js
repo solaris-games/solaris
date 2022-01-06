@@ -726,4 +726,11 @@ module.exports = class StarService extends EventEmitter {
             })
             .filter(x => x.carriersInOrbit.length);
     }
+
+    getKingOfTheHillStar(game) {
+        const center = this.starDistanceService.getGalacticCenter();
+
+        return game.galaxy.stars.find(s => s.location.x === center.x && s.location.y === center.y);
+    }
+
 }

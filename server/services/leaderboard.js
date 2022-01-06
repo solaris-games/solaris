@@ -523,7 +523,15 @@ module.exports = class LeaderboardService {
     getLeaderboardRankings(game, sortingKey) {
         let SORTERS = LeaderboardService.LOCALSORTERS;
 
+        let kingOfTheHillPlayer = null;
+
+        if (this.gameTypeService.isKingOfTheHillMode(game)) {
+            kingOfTheHillPlayer = this.playerService.getKingOfTheHillPlayer(game);
+        }
+
         let playerStats = game.galaxy.players.map(p => {
+            p.isKingOfTheHill = kingOfTheHillPlayer != null && p._id.equals(kingOfTheHillPlayer._id);
+
             return {
                 player: p,
                 stats: p.stats ? p.stats : this.playerService.getStats(game, p) //This makes sure that when the function is called with a hidden galaxy (what a player sees) it will use the already generated stats.
@@ -547,6 +555,11 @@ module.exports = class LeaderboardService {
             if (isHomeStarVictory) {
                 if (a.stats.totalHomeStars > b.stats.totalHomeStars) return -1;
                 if (a.stats.totalHomeStars < b.stats.totalHomeStars) return 1;
+            }
+
+            if (game.settings.general.mode === 'kingOfTheHill' && a.isKingOfTheHill !== b.isKingOfTheHill) {
+                if (a.isKingOfTheHill) return -1;
+                if (b.isKingOfTheHill) return 1;
             }
 
             // Sort by total stars descending
@@ -708,9 +721,15 @@ module.exports = class LeaderboardService {
     }
 
     getGameWinner(game) {
+        let isKingOfTheHillMode = this.gameTypeService.isKingOfTheHillMode(game);
+
         let isAllUndefeatedPlayersReadyToQuit = this.gameService.isAllUndefeatedPlayersReadyToQuit(game);
 
         if (isAllUndefeatedPlayersReadyToQuit) {
+            if (isKingOfTheHillMode) {
+                return this.playerService.getKingOfTheHillPlayer(game) || this.getFirstPlacePlayer(game);
+            }
+
             return this.getFirstPlacePlayer(game);
         }
 
@@ -720,6 +739,10 @@ module.exports = class LeaderboardService {
             if (starWinner) {
                 return starWinner;
             }
+        }
+
+        if (isKingOfTheHillMode && game.state.ticksToEnd != null && game.state.ticksToEnd <= 0) {
+            return this.playerService.getKingOfTheHillPlayer(game) || this.getFirstPlacePlayer(game);
         }
 
         let lastManStanding = this.getLastManStanding(game);
@@ -740,7 +763,7 @@ module.exports = class LeaderboardService {
 
         // If conquest and home star percentage then use the totalHomeStars as the sort
         // All other cases use totalStars
-        let totalStarsKey = game.settings.general.mode === 'conquest'
+        let totalStarsKey = this.gameTypeService.isConquestMode(game)
             && game.settings.conquest.victoryCondition === 'homeStarPercentage' ? 'totalHomeStars' : 'totalStars';
 
         let starWinners = leaderboard

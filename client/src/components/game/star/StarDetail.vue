@@ -15,6 +15,7 @@
         <p class="mb-2" v-if="star.ownedByPlayerId == null">This star has not been claimed by any faction. Send a carrier here to claim it for yourself.</p>
         <p class="mb-2 text-danger" v-if="isDeadStar">This is a dead star, infrastructure cannot be built here.</p>
         <p class="mb-2 text-danger" v-if="star.targeted">This star has been targeted for destruction.</p>
+        <p class="mb-2 text-danger" v-if="star.isKingOfTheHillStar">Capture and hold this star to win.</p>
 
         <div v-if="star.isNebula">
           <hr/>

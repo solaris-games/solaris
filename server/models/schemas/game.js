@@ -28,10 +28,11 @@ const schema = new Schema({
 				'special_orbital',
 				'special_battleRoyale',
 				'special_homeStar',
-				'special_anonymous'
+				'special_anonymous',
+				'special_kingOfTheHill'
 			], default: 'custom' },
 			mode: { type: Types.String, required: true, enum: [
-				'conquest', 'battleRoyale'
+				'conquest', 'battleRoyale', 'kingOfTheHill'
 			], default: 'conquest' },
 			featured: { type: Types.Boolean, required: false, default: false },
 			password: { type: Types.String, required: false },
@@ -75,6 +76,9 @@ const schema = new Schema({
 		conquest: {
 			victoryCondition: { type: Types.String, required: true, enum: ['starPercentage', 'homeStarPercentage'], default: 'starPercentage' },
 			victoryPercentage: { type: Types.Number, required: true, enum: [25, 33, 50, 66, 75, 90, 100], default: 50 },
+		},
+		kingOfTheHill: {
+			productionCycles: { type: Types.Number, required: false, min: 1, max: 25, default: 10 }
 		},
 		orbitalMechanics: {
 			enabled: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
@@ -153,6 +157,7 @@ const schema = new Schema({
 		startDate: { type: Types.Date, required: false }, // Dates are in UTC
 		endDate: { type: Types.Date, required: false },
 		lastTickDate: { type: Types.Date, required: false },
+		ticksToEnd: { type: Types.Number, required: false, default: null },
 		stars: { type: Types.Number, required: true },
 		starsForVictory: { type: Types.Number, required: true },
 		players: { type: Types.Number, required: true, default: 0 },

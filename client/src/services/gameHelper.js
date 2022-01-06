@@ -508,6 +508,10 @@ class GameHelper {
     return game.settings.general.mode === 'conquest' && game.settings.conquest.victoryCondition === 'homeStarPercentage'
   }
 
+  isKingOfTheHillMode (game) {
+    return game.settings.general.mode === 'kingOfTheHill'
+  }
+
   isTutorialGame (game) {
     return game.settings.general.type === 'tutorial'
   }
@@ -599,6 +603,11 @@ class GameHelper {
         if (this.isConquestHomeStars(game)) {
             if (a.stats.totalHomeStars > b.stats.totalHomeStars) return -1;
             if (a.stats.totalHomeStars < b.stats.totalHomeStars) return 1;
+        }
+
+        if (this.isKingOfTheHillMode(game) && a.isKingOfTheHill !== b.isKingOfTheHill) {
+          if (a.isKingOfTheHill) return -1;
+          if (b.isKingOfTheHill) return 1;
         }
 
         // Sort by total stars descending
@@ -1030,6 +1039,7 @@ class GameHelper {
       'special_battleRoyale': 'Battle Royale',
       'special_homeStar': 'Capital Stars',
       'special_anonymous': 'Anonymous',
+      'special_kingOfTheHill': 'King Of The Hill'
     }[game.settings.general.type]
   }
 

@@ -8,6 +8,10 @@
           {
              "value":"battleRoyale",
              "text":"Battle Royale"
+          },
+          {
+             "value":"kingOfTheHill",
+             "text":"King Of The Hill"
           }
        ],
        "playerLimit":[

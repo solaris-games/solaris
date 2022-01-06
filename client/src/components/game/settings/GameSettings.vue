@@ -5,7 +5,7 @@
       <table class="table table-striped table-hover">
         <tbody>
           <tr>
-            <td>Mode <help-tooltip tooltip="The game mode Conquest is victory by stars and Battle Royale is last man standing in a constantly shrinking galaxy"/></td>
+            <td>Mode <help-tooltip tooltip="The game mode Conquest is victory by stars, Battle Royale is last man standing in a constantly shrinking galaxy and King of the Hill is a fight for a key star"/></td>
             <td class="text-right">{{ getFriendlyText(game.settings.general.mode) }}</td>
           </tr>
           <tr v-if="game.settings.general.mode === 'conquest'">
@@ -15,6 +15,10 @@
           <tr v-if="game.settings.general.mode === 'conquest'">
             <td>Stars For Victory <help-tooltip tooltip="How many stars are needed for a player to win the game"/></td>
             <td class="text-right">{{ game.settings.conquest.victoryPercentage }}%</td>
+          </tr>
+          <tr v-if="game.settings.general.mode === 'kingOfTheHill'">
+            <td>Countdown Cycles <help-tooltip tooltip="How long the countdown is to the end of the game in production cycles when the center star is captured"/></td>
+            <td class="text-right">{{ game.settings.kingOfTheHill.productionCycles }}</td>
           </tr>
           <tr>
             <td>Players <help-tooltip tooltip="Total number of player slots"/></td>

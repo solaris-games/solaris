@@ -182,7 +182,8 @@ module.exports = class GameListService {
                     'special_orbital',
                     'special_battleRoyale',
                     'special_homeStar',
-                    'special_anonymous'
+                    'special_anonymous',
+                    'special_kingOfTheHill'
                 ]
             },
             'state.startDate': { $eq: null }

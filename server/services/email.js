@@ -242,6 +242,9 @@ module.exports = class EmailService {
             case 'battleRoyale':
                 winConditionText = 'Winner will be the <span style="color:#3498DB;">last man standing</span>.';
                 break;
+            case 'kingOfTheHill':
+                winConditionText = 'Winner will be the player who <span style="color:#3498DB;">captures and holds</span> the center star.';
+                break;
         }
 
         for (let player of undefeatedPlayers) {

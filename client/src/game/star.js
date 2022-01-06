@@ -46,6 +46,7 @@ class Star extends EventEmitter {
     this.graphics_star = new PIXI.Graphics()
     this.graphics_targeted = new PIXI.Graphics()
     this.graphics_selected = new PIXI.Graphics()
+    this.graphics_kingOfTheHill = new PIXI.Graphics()
 
     this.container.addChild(this.graphics_star)
     this.container.addChild(this.graphics_shape_part)
@@ -54,6 +55,7 @@ class Star extends EventEmitter {
     this.container.addChild(this.graphics_shape_full_warp)
     this.container.addChild(this.graphics_targeted)
     this.container.addChild(this.graphics_selected)
+    this.container.addChild(this.graphics_kingOfTheHill)
 
     this.fixedContainer.addChild(this.graphics_scanningRange)
     this.fixedContainer.addChild(this.graphics_hyperspaceRange)
@@ -132,6 +134,7 @@ class Star extends EventEmitter {
     // If a star is revealed or a star becomes masked then we want to  the entire
     // star to be re-drawn.
 
+    this.drawKingOfTheHillCircle()
     this.drawWormHole()
     this.drawNebula()
     this.drawAsteroidField()
@@ -697,6 +700,16 @@ class Star extends EventEmitter {
       this.graphics_selected.lineStyle(0.5, 0xFFFFFF)
       this.graphics_selected.alpha = 0.3
       this.graphics_selected.drawCircle(0, 0, 20)
+    }
+  }
+
+  drawKingOfTheHillCircle () {
+    this.graphics_kingOfTheHill.clear()
+
+    if (this.data.isKingOfTheHillStar) {
+      this.graphics_kingOfTheHill.lineStyle(0.5, 0xFFFFFF)
+      this.graphics_kingOfTheHill.alpha = 0.5
+      this.graphics_kingOfTheHill.drawCircle(0, 0, 20)
     }
   }
   

@@ -113,6 +113,9 @@ module.exports = class GameTickService extends EventEmitter {
             this._orbitGalaxy(game);
             logTime('Orbital mechanics');
 
+            this._kingOfTheHillCheck(game);
+            logTime('King of the hill check');
+
             let hasWinner = await this._gameWinCheck(game, gameUsers);
             logTime('Game win check');
 
@@ -660,6 +663,25 @@ module.exports = class GameTickService extends EventEmitter {
 
             for (let carrier of game.galaxy.carriers) {
                 this.waypointService.cullWaypointsByHyperspaceRange(game, carrier);
+            }
+        }
+    }
+
+    _kingOfTheHillCheck(game) {
+        if (!this.gameTypeService.isKingOfTheHillMode(game)) {
+            return;
+        }
+
+        // If we are already in the countdown, decrease the counter.
+        // Otherwise, try to start the countdown.
+        // Note this only applies to king of the hill.
+        if (game.state.ticksToEnd != null) {
+            game.state.ticksToEnd--;
+        } else {
+            const kingOfTheHillPlayer = this.playerService.getKingOfTheHillPlayer(game);
+
+            if (kingOfTheHillPlayer) {
+                game.state.ticksToEnd = game.settings.kingOfTheHill.productionCycles * game.settings.galaxy.productionTicks;
             }
         }
     }

@@ -156,9 +156,21 @@ module.exports = class GameGalaxyService {
     }
 
     _setPlayerStats(doc) {
+        const isKingOfTheHillMode = this.gameTypeService.isKingOfTheHillMode(doc);
+
+        let kingOfTheHillPlayer = null;
+
+        if (isKingOfTheHillMode) {
+            kingOfTheHillPlayer = this.playerService.getKingOfTheHillPlayer(doc);
+        }
+
         // Get all of the player's statistics.
         doc.galaxy.players.forEach(p => {
             p.stats = this.playerService.getStats(doc, p);
+
+            if (isKingOfTheHillMode) {
+                p.isKingOfTheHill = kingOfTheHillPlayer != null && kingOfTheHillPlayer._id.equals(p._id);
+            }
         });
     }
 
@@ -168,6 +180,13 @@ module.exports = class GameGalaxyService {
         // OR if its "start only" and the game has not yet started.
         const isDarkStart = this.gameTypeService.isDarkStart(doc);
         const isDarkMode = this.gameTypeService.isDarkMode(doc);
+        const isKingOfTheHillMode = this.gameTypeService.isKingOfTheHillMode(doc);
+
+        let kingOfTheHillStar = null;
+
+        if (isKingOfTheHillMode) {
+            kingOfTheHillStar = this.starService.getKingOfTheHillStar(doc);
+        }
 
         // If its a dark galaxy start then return no stars.
         if (isDarkMode || (isDarkStart && !doc.state.startDate)) {
@@ -176,7 +195,7 @@ module.exports = class GameGalaxyService {
 
         doc.galaxy.stars = doc.galaxy.stars
         .map(s => {
-            return {
+            let star = {
                 _id: s._id,
                 name: s.name,
                 ownedByPlayerId: s.ownedByPlayerId,
@@ -186,7 +205,13 @@ module.exports = class GameGalaxyService {
                 isAsteroidField: false,
                 isBlackHole: false,
                 wormHoleToStarId: null
+            };
+
+            if (isKingOfTheHillMode) {
+                star.isKingOfTheHillStar = kingOfTheHillStar != null && kingOfTheHillStar._id.equals(s._id);;
             }
+
+            return star;
         });
     }
 
@@ -195,6 +220,13 @@ module.exports = class GameGalaxyService {
         const isDarkStart = this.gameTypeService.isDarkStart(doc);
         const isDarkMode = this.gameTypeService.isDarkMode(doc);
         const isOrbital = this.gameTypeService.isOrbitalMode(doc);
+        const isKingOfTheHillMode = this.gameTypeService.isKingOfTheHillMode(doc);
+
+        let kingOfTheHillStar = null;
+
+        if (isKingOfTheHillMode) {
+            kingOfTheHillStar = this.starService.getKingOfTheHillStar(doc);
+        }
 
         // If dark start and game hasn't started yet OR is dark mode, then filter out
         // any stars the player cannot see in scanning range.
@@ -237,6 +269,10 @@ module.exports = class GameGalaxyService {
                     s.infrastructure.economy = null;
                     s.infrastructure.industry = null;
                     s.infrastructure.science = null;
+                }
+
+                if (isKingOfTheHillMode) {
+                    s.isKingOfTheHillStar = kingOfTheHillStar != null && kingOfTheHillStar._id.equals(s._id);
                 }
 
                 // Ignore stars the player owns, they will always be visible.
@@ -286,7 +322,8 @@ module.exports = class GameGalaxyService {
                         isNebula: false, // Hide nebula outside of scanning range
                         isAsteroidField: false, // Hide asteroid fields outside of scanning range
                         isBlackHole: false, // Hide outside of scanning range
-                        wormHoleToStarId: s.wormHoleToStarId
+                        wormHoleToStarId: s.wormHoleToStarId,
+                        isKingOfTheHillStar: s.isKingOfTheHillStar
                     }
                 };
             });
@@ -462,6 +499,7 @@ module.exports = class GameGalaxyService {
                 guild: playerGuild,
                 hasDuplicateIP: p.hasDuplicateIP,
                 hasFilledAfkSlot: p.hasFilledAfkSlot,
+                isKingOfTheHill: p.isKingOfTheHill,
                 diplomacy
             };
         });

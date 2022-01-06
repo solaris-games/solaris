@@ -1,13 +1,15 @@
 const RNG = require('random-seed');
+const ValidationError = require('../../errors/validation');
 
 module.exports = class CircularBalancedMapService {
 
-    constructor(randomService, starService, starDistanceService, distanceService, resourceService) {
+    constructor(randomService, starService, starDistanceService, distanceService, resourceService, gameTypeService) {
         this.randomService = randomService;
         this.starService = starService;
         this.starDistanceService = starDistanceService;
         this.distanceService = distanceService;
         this.resourceService = resourceService;
+        this.gameTypeService =gameTypeService;
     }
 
     _generateStarPositionInSector(currentRadius, rng, playerCount) {
@@ -42,6 +44,10 @@ module.exports = class CircularBalancedMapService {
     }
 
     generateLocations(game, starCount, resourceDistribution, playerCount) {
+        if (this.gameTypeService.isKingOfTheHillMode(game)) {
+            throw new ValidationError(`King of the hill is not supported in circular balanced maps.`);
+        }
+
         const locations = [];
         let seed = ( Math.random()*(10**8) ).toFixed(0);
         const rng = RNG.create(seed); //TODO get seed from player
