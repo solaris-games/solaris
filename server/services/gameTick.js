@@ -672,17 +672,8 @@ module.exports = class GameTickService extends EventEmitter {
             return;
         }
 
-        // If we are already in the countdown, decrease the counter.
-        // Otherwise, try to start the countdown.
-        // Note this only applies to king of the hill.
-        if (game.state.ticksToEnd != null) {
-            game.state.ticksToEnd--;
-        } else {
-            const kingOfTheHillPlayer = this.playerService.getKingOfTheHillPlayer(game);
-
-            if (kingOfTheHillPlayer) {
-                game.state.ticksToEnd = game.settings.kingOfTheHill.productionCycles * game.settings.galaxy.productionTicks;
-            }
+        if (this.gameStateService.isCountingDownToEnd(game) || this.playerService.getKingOfTheHillPlayer(game)) {
+            this.gameStateService.countdownToEnd(game);
         }
     }
 

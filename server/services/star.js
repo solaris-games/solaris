@@ -4,7 +4,7 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class StarService extends EventEmitter {
 
-    constructor(gameRepo, randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService, diplomacyService, gameTypeService) {
+    constructor(gameRepo, randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService, diplomacyService, gameTypeService, gameStateService) {
         super();
 
         this.gameRepo = gameRepo;
@@ -17,6 +17,7 @@ module.exports = class StarService extends EventEmitter {
         this.userService = userService;
         this.diplomacyService = diplomacyService;
         this.gameTypeService = gameTypeService;
+        this.gameStateService = gameStateService;
     }
 
     generateUnownedStar(name, location, naturalResources) {
@@ -667,6 +668,11 @@ module.exports = class StarService extends EventEmitter {
                     newStarUser.achievements.combat.homeStars.captured++;
                 }
             }
+        }
+
+        if (this.gameTypeService.isKingOfTheHillMode(game) && 
+            this.gameStateService.isCountingDownToEndInLastCycle(game)) {
+            this.gameStateService.setCountdownToEndToOneCycle(game);
         }
 
         return {
