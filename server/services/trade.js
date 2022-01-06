@@ -382,10 +382,12 @@ module.exports = class TradeService extends EventEmitter {
                     'playerCreditsSpecialistsReceived',
                     'playerRenownReceived',
                     'playerTechnologyReceived',
+                    'playerGiftReceived',
                     'playerCreditsSent',
                     'playerCreditsSpecialistsSent',
                     'playerRenownSent',
-                    'playerTechnologySent'
+                    'playerTechnologySent',
+                    'playerGiftSent'
                 ]
             },
             $or: [

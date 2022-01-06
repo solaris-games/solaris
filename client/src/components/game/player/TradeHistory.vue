@@ -34,6 +34,10 @@
                         <i class="mr-1 fas" :class="{'fa-arrow-right text-danger': event.data.toPlayerId, 'fa-arrow-left text-success': event.data.fromPlayerId}"></i>
                         <span>Level {{event.data.technology.level}} <span class="text-warning">{{getTechnologyFriendlyName(event.data.technology.name)}}</span></span>.
                     </p>
+                    <p v-if="event.data.carrierShips" class="mb-1">
+                        <i class="mr-1 fas" :class="{'fa-arrow-right text-danger': event.data.toPlayerId, 'fa-arrow-left text-success': event.data.fromPlayerId}"></i>
+                        <span>{{event.data.carrierShips}} <span class="text-warning">ships</span>.</span>
+                    </p>
                 </div>
                 <div class="col-auto">
                     <p class="mt-0 mb-0">

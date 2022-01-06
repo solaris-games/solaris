@@ -125,6 +125,8 @@ export default {
           'playerCreditsSent',
           'playerCreditsSpecialistsReceived',
           'playerCreditsSpecialistsSent',
+          'playerGiftReceived',
+          'playerGiftSent',
           'playerDebtSettled',
           'playerDebtForgiven'
         ],
