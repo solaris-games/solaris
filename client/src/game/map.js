@@ -57,12 +57,12 @@ class Map extends EventEmitter {
 
     this.container.addChild(this.backgroundContainer)
     this.container.addChild(this.territoryContainer)
+    this.container.addChild(this.wormHoleContainer)
     this.container.addChild(this.pathManager.container)
     this.container.addChild(this.rulerPointContainer)
     this.container.addChild(this.waypointContainer)
     this.container.addChild(this.chunksContainer)
     this.container.addChild(this.orbitalContainer)
-    this.container.addChild(this.wormHoleContainer)
     this.container.addChild(this.starContainer)
     this.container.addChild(this.carrierContainer)
     this.container.addChild(this.highlightLocationsContainer)
