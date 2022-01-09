@@ -167,7 +167,7 @@ class Star extends EventEmitter {
         this.graphics_star = new PIXI.Graphics()
         this.graphics_star.beginFill(0x000000)
 
-        if (this.data.ownedByPlayerId) { // Ensures that unowned black holes are easily visible.
+        if (!this.data.ownedByPlayerId) { // Ensures that unowned black holes are easily visible.
           this.graphics_star.lineStyle(0.3, 0xFFFFFF)
         }
 
