@@ -14,7 +14,6 @@ class TextureService {
     STAR_NEBULA_TEXTURES = []
     STAR_ASTEROID_FIELD_TEXTURES = []
     STAR_WORMHOLE_TEXTURES = []
-    NEBULA_TEXTURES = []
     SPECIALIST_TEXTURES = {}
     PLAYER_SYMBOLS = {}
     STAR_SYMBOLS = {}
@@ -63,12 +62,6 @@ class TextureService {
       this.DEFAULT_FONT_BOLD_BITMAP.pageTextures[1].baseTexture.mipmap = 0
 
       this.STAR_TEXTURE = new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/stars/star.png')))
-
-      // NEBULAS
-      this.NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/neb1.png'))))
-      this.NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/neb2.png'))))
-      this.NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/neb3.png'))))
-      this.NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/neb4.png'))))
 
       // STARLESS NEBULAS
       this.STARLESS_NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/neb0-starless.png'))))

@@ -5,3 +5,11 @@ db.games.updateMany({
         'settings.orbitalMechanics.orbitOrigin': 1
     }
 });
+
+db.users.updateMany({
+    'gameSettings.map.background.backgroundStars': { $ne: null }
+}, {
+    $unset: {
+        'gameSettings.map.background.backgroundStars': 1
+    }
+});
