@@ -48,7 +48,7 @@
         </select>
       </div>
 
-      <div class="form-group">
+      <div class="form-group" v-if="settings.general.mode === 'kingOfTheHill'">
         <label for="kingOfTheHillProductionCycles" class="col-form-label">Countdown Cycles (<span class="text-warning">{{settings.kingOfTheHill.productionCycles}} production cycles</span>) <help-tooltip tooltip="How long the countdown is to the end of the game in production cycles when the center star is captured"/></label>
         <div class="col">
           <input type="range" min="1" max="25" step="1" class="form-range w-100" id="kingOfTheHillproductionCycles" v-model="settings.kingOfTheHill.productionCycles" :disabled="isCreatingGame">
