@@ -332,16 +332,6 @@
              "value":25,
              "text":"Very Fast"
           }
-       ],
-       "orbitOrigin":[
-          {
-             "value":"galacticCenter",
-             "text":"Galactic Center"
-          },
-          {
-             "value":"galacticCenterOfMass",
-             "text":"Galactic Center of Mass"
-          }
        ]
     },
     "player":{

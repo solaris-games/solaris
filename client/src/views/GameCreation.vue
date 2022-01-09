@@ -375,15 +375,6 @@
         </select>
       </div>
 
-      <div class="form-group" v-if="settings.orbitalMechanics.enabled === 'enabled'">
-        <label for="orbitOrigin" class="col-form-label">Orbit Origin <help-tooltip tooltip="Determines the central point of which to orbit stars and carriers"/></label>
-        <select class="form-control" id="orbitOrigin" v-model="settings.orbitalMechanics.orbitOrigin" :disabled="isCreatingGame">
-          <option v-for="opt in options.orbitalMechanics.orbitOrigin" v-bind:key="opt.value" v-bind:value="opt.value">
-            {{ opt.text }}
-          </option>
-        </select>
-      </div>
-
       <view-subtitle title="Player Settings"/>
 
       <div class="form-group">

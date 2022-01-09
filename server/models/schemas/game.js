@@ -82,8 +82,7 @@ const schema = new Schema({
 		},
 		orbitalMechanics: {
 			enabled: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
-			orbitSpeed: { type: Types.Number, required: false, enum: [2.5, 5, 10, 25], default: 5 },
-			orbitOrigin: { type: Types.String, required: false, enum: ['galacticCenter', 'galacticCenterOfMass'], default: 'galacticCenter' }
+			orbitSpeed: { type: Types.Number, required: false, enum: [2.5, 5, 10, 25], default: 5 }
 		},
         player: {
 			startingStars: { type: Types.Number, required: true, min: 1, max: 10, default: 6 },

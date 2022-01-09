@@ -46,8 +46,7 @@
   },
   "orbitalMechanics": {
     "enabled": "disabled",
-    "orbitSpeed": 5,
-    "orbitOrigin": "galacticCenter"
+    "orbitSpeed": 5
   },
   "player": {
     "startingStars": 3,

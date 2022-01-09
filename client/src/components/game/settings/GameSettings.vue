@@ -194,10 +194,6 @@
             <td>Orbit Speed <help-tooltip tooltip="Determines how fast stars and carriers orbit"/></td>
             <td class="text-right">{{ game.settings.orbitalMechanics.orbitSpeed }}</td>
           </tr>
-          <tr v-if="game.settings.orbitalMechanics.enabled === 'enabled'">
-            <td>Orbit Origin <help-tooltip tooltip="Determines the central point of which to orbit stars and carriers"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.orbitalMechanics.orbitOrigin) }}</td>
-          </tr>
         </tbody>
       </table>
     </div>

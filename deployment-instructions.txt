@@ -1,13 +1,7 @@
-db.gamehistories.find({
-    'stars.naturalResources': {$type: 'int'}
-}).forEach(function(history) {
-    for (let star of history.stars) {
-        star.naturalResources.economy = star.naturalResources;
-        star.naturalResources.industry = star.naturalResources;
-        star.naturalResources.science = star.naturalResources;
-        
-        delete star.naturalResources;
+db.games.updateMany({
+    'settings.orbitalMechanics.orbitOrigin': { $ne: null }
+}, {
+    $unset: {
+        'settings.orbitalMechanics.orbitOrigin': 1
     }
-
-    db.gamehistories.save(history);
 });
