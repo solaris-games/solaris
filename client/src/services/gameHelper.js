@@ -199,6 +199,10 @@ class GameHelper {
       return 'Unknown'
     }
 
+    if (this.isGameFinished(game)) {
+      return 'N/A'
+    }
+
     let t = this.getCountdownTime(game, date)
 
     return this.getDateToString(t, largestUnitOnly)
