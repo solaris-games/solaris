@@ -478,7 +478,7 @@ module.exports = class LeaderboardService {
         specialists: 'player.research.specialists.level'
     }
 
-    constructor(userRepo, userService, playerService, guildUserService, ratingService, gameService, gameTypeService) {
+    constructor(userRepo, userService, playerService, guildUserService, ratingService, gameService, gameTypeService, gameStateService) {
         this.userRepo = userRepo;
         this.userService = userService;
         this.playerService = playerService;
@@ -486,6 +486,7 @@ module.exports = class LeaderboardService {
         this.ratingService = ratingService;
         this.gameService = gameService;
         this.gameTypeService = gameTypeService;
+        this.gameStateService = gameStateService;
     }
 
     async getLeaderboard(limit, sortingKey, skip = 0) {
@@ -741,7 +742,7 @@ module.exports = class LeaderboardService {
             }
         }
 
-        if (isKingOfTheHillMode && game.state.ticksToEnd != null && game.state.ticksToEnd <= 0) {
+        if (isKingOfTheHillMode && this.gameStateService.isCountingDownToEnd(game) && this.gameStateService.hasReachedCountdownEnd(game)) {
             return this.playerService.getKingOfTheHillPlayer(game) || this.getFirstPlacePlayer(game);
         }
 
