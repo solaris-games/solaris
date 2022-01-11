@@ -1,13 +1,12 @@
-const ValidationError = require("../../errors/validation");
-
 module.exports = class CircularMapService {
 
-    constructor(randomService, starService, starDistanceService, distanceService, resourceService) {
+    constructor(randomService, starService, starDistanceService, distanceService, resourceService, gameTypeService) {
         this.randomService = randomService;
         this.starService = starService;
         this.starDistanceService = starDistanceService;
         this.distanceService = distanceService;
         this.resourceService = resourceService;
+        this.gameTypeService = gameTypeService;
     }
 
     generateLocations(game, starCount, resourceDistribution) {
@@ -20,6 +19,10 @@ module.exports = class CircularMapService {
         // 1+ --> there will be an extremely increasing amount of stars in the middle with an increasingly low amount of stars in the outerranges 
         const maxRadius = (starCount/(Math.PI*starDensity))**0.5;
         const locations = [];
+
+        if (this.gameTypeService.isKingOfTheHillMode(game)) {
+            locations.push(this.starDistanceService.getGalacticCenter());
+        }
 
         do {
             // Try to find the star location X

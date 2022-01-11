@@ -10,7 +10,7 @@ module.exports = (container) => {
 
             let isBanned = await container.userService.getUserIsBanned(req.session.userId);
 
-            if (isBanned) {
+            if (isBanned && !req.session.isImpersonating) {
                 throw new ValidationError(`The account is banned.`, 401);
             }
 

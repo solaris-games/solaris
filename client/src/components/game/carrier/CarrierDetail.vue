@@ -24,6 +24,7 @@
             <a href="javascript:;" @click="onOpenOrbitingStarDetailRequested">{{getCarrierOrbitingStar().name}}</a>
           </span>
           <span title="The carrier is in transit" v-if="!carrier.orbiting">
+            <i class="fas fa-star mr-2"></i>
             <a title="The carrier is in transit from this star" href="javascript:;" @click="onOpenSourceStarDetailRequested">{{getFirstWaypointSourceName()}}</a>
             <i class="fas fa-arrow-right mr-2 ml-2"></i>
             <a title="The carrier is in transit to star" href="javascript:;" @click="onOpenDestinationStarDetailRequested">{{getFirstWaypointDestinationName()}}</a>

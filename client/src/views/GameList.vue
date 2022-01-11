@@ -82,6 +82,7 @@
                       'fa-satellite': games.special.settings.general.type === 'special_orbital',
                       'fa-home': games.special.settings.general.type === 'special_homeStar',
                       'fa-user-secret': games.special.settings.general.type === 'special_anonymous',
+                      'fa-crown': games.special.settings.general.type === 'special_kingOfTheHill',
                     }"></i>
                     <span class="ml-2">{{games.special.settings.general.name}}</span>
                   </h5>
@@ -260,10 +261,12 @@
                   <tr v-for="game in inProgressGames" v-bind:key="game._id">
                       <td>
                         <router-link :to="{ path: '/game/detail', query: { id: game._id } }">{{game.settings.general.name}}</router-link>
+                        <br v-if="game.state.afkSlots"/>
+                        <span class="badge badge-warning" v-if="game.state.afkSlots">{{game.state.afkSlots}} Open Slot<span v-if="game.state.afkSlots > 1">s</span></span>
                         <br/>
                         <small>{{getGameTypeFriendlyText(game)}}</small>
                       </td>
-                      <td class="d-none d-md-table-cell text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
+                      <td class="d-none d-md-table-cell text-center" :class="{'text-warning':game.state.afkSlots}">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
                       <td class="d-none d-sm-table-cell text-center">{{game.state.productionTick}}</td>
                       <td>
                           <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-success float-right">
@@ -411,7 +414,8 @@ export default {
         'special_orbital',
         'special_battleRoyale',
         'special_homeStar',
-        'special_anonymous'
+        'special_anonymous',
+        'special_kingOfTheHill'
       ]
       
       return this.serverGames.find(x => types.includes(x.settings.general.type))

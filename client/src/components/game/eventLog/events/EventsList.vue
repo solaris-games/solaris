@@ -11,8 +11,13 @@
       <div class="col-auto">
         <select class="form-control form-control-sm" v-model="selectedFilter" @change="onSelectedFilterChanged">
           <option value="all">All Events</option>
-          <option value="trade">Trade</option>
+          <option value="gameEvents">Game Events</option>
+          <option value="galacticCycles">Galactic Cycles</option>
           <option value="combat">Combat</option>
+          <option value="research">Research</option>
+          <option value="trade">Trade</option>
+          <option value="specialists">Specialists</option>
+          <option value="conversations">Conversations</option>
         </select>
       </div>
     </div>
@@ -101,6 +106,18 @@ export default {
     },
     onSelectedFilterChanged (e) {
       const categories = {
+        gameEvents: [
+          'gamePlayerJoined',
+          'gamePlayerQuit',
+          'gamePlayerDefeated',
+          'gamePlayerAFK',
+          'gameStarted',
+          'gameEnded',
+          'gamePaused',
+          'gamePlayerBadgePurchased',
+          'playerRenownReceived',
+          'playerRenownSent'
+        ],
         trade: [
           'playerTechnologyReceived',
           'playerTechnologySent',
@@ -108,8 +125,8 @@ export default {
           'playerCreditsSent',
           'playerCreditsSpecialistsReceived',
           'playerCreditsSpecialistsSent',
-          'playerRenownReceived',
-          'playerRenownSent',
+          'playerGiftReceived',
+          'playerGiftSent',
           'playerDebtSettled',
           'playerDebtForgiven'
         ],
@@ -117,6 +134,21 @@ export default {
           'playerCombatStar',
           'playerCombatCarrier',
           'playerStarAbandoned'
+        ],
+        galacticCycles: [
+          'playerGalacticCycleComplete'
+        ],
+        research: [
+          'playerResearchComplete'
+        ],
+        specialists: [
+          'playerStarSpecialistHired',
+          'playerCarrierSpecialistHired'
+        ],
+        conversations: [
+          'playerConversationCreated',
+          'playerConversationInvited',
+          'playerConversationLeft'
         ]
       }
 

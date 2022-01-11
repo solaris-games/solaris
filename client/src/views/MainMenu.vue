@@ -77,9 +77,9 @@
     
     <tutorial-game />
 
-    <!-- <hr/>
+    <hr/>
 
-    <div class="row">
+    <!-- <div class="row">
       <div class="col-12 col-lg-6">
         <recent-donations :maxLength="null" />
       </div>

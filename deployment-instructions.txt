@@ -1,42 +1,15 @@
-db.users.updateMany({}, {
+db.games.updateMany({
+    'settings.orbitalMechanics.orbitOrigin': { $ne: null }
+}, {
     $unset: {
-        'achievements.badges': {
-            ally: undefined,
-            conqueror: undefined,
-            cutthroatPirate: undefined,
-            dauntless: undefined,
-            deadSetBadass: undefined,
-            diplomat: undefined,
-            enemy: undefined,
-            ironborn: undefined,
-            lionheart: undefined,
-            luckyDevil: undefined,
-            madScientist: undefined,
-            masterStrategist: undefined,
-            quickDraw: undefined,
-            roleplay: undefined,
-            sentinel: undefined,
-            sleepless: undefined,
-            sliceOfCheese: undefined,
-            strangeOne: undefined,
-            strategist: undefined,
-            topAlly: undefined,
-            toxic: undefined,
-            wordsmith: undefined
-        }
+        'settings.orbitalMechanics.orbitOrigin': 1
     }
 });
 
-db.users.updateMany({}, {
-    $set: {
-        'achievements.badges': {
-            ally: 0,
-            enemy: 0,
-            diplomat: 0,
-            strategist: 0,
-            roleplay: 0,
-            dauntless: 0,
-            sleepless: 0,
-        }
+db.users.updateMany({
+    'gameSettings.map.background.backgroundStars': { $ne: null }
+}, {
+    $unset: {
+        'gameSettings.map.background.backgroundStars': 1
     }
 });

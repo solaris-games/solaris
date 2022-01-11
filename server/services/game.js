@@ -296,6 +296,9 @@ module.exports = class GameService extends EventEmitter {
     }
 
     assignPlayerToUser(game, player, userId, alias, avatar) {
+        let isAfker = game.afkers.find(x => x.equals(userId));
+        let isRejoiningAfkSlot = isAfker && player.afk && player.userId === userId.toString();
+
         // Assign the user to the player.
         player.userId = userId;
         player.alias = alias;
@@ -303,7 +306,7 @@ module.exports = class GameService extends EventEmitter {
 
         // Reset the defeated and afk status as the user may be filling
         // an afk slot.
-        player.hasFilledAfkSlot = player.afk;
+        player.hasFilledAfkSlot = !isRejoiningAfkSlot;
         player.defeated = false;
         player.defeatedDate = null;
         player.afk = false;

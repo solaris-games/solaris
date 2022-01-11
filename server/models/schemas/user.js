@@ -124,7 +124,6 @@ const schema = new Schema({
               nebulaMovementSpeed: { type: Types.Number, required: false, default: 1.0, min: 0.0, max: 2.0 },
               starsOpacity: { type: Types.Number, required: false, default: 1.0, min: 0.0, max: 1.0 },
               blendMode: { type: Types.String, required: false, enum: ['ADD', 'NORMAL'], default: 'NORMAL' },
-              backgroundStars: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'enabled' },
               nebulaColour1: { type: Types.String, required: false, default: '#FF0000' },
               nebulaColour2: { type: Types.String, required: false, default: '#00FF00' },
               nebulaColour3: { type: Types.String, required: false, default: '#0000FF' }

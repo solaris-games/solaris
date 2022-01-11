@@ -304,7 +304,7 @@ module.exports = (router, io, container) => {
 
     router.get('/api/user/donations/recent', async (req, res, next) => {
         try {
-            let result = await container.donateService.listRecentDonations(3);
+            let result = await container.donateService.listRecentDonations();
 
             return res.status(200).json(result);
         } catch (err) {

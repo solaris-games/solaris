@@ -113,6 +113,9 @@ module.exports = class GameTickService extends EventEmitter {
             this._orbitGalaxy(game);
             logTime('Orbital mechanics');
 
+            this._kingOfTheHillCheck(game);
+            logTime('King of the hill check');
+
             let hasWinner = await this._gameWinCheck(game, gameUsers);
             logTime('Game win check');
 
@@ -661,6 +664,16 @@ module.exports = class GameTickService extends EventEmitter {
             for (let carrier of game.galaxy.carriers) {
                 this.waypointService.cullWaypointsByHyperspaceRange(game, carrier);
             }
+        }
+    }
+
+    _kingOfTheHillCheck(game) {
+        if (!this.gameTypeService.isKingOfTheHillMode(game)) {
+            return;
+        }
+
+        if (this.gameStateService.isCountingDownToEnd(game) || this.playerService.getKingOfTheHillPlayer(game)) {
+            this.gameStateService.countdownToEnd(game);
         }
     }
 

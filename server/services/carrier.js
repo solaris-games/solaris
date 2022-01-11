@@ -1,9 +1,12 @@
 const mongoose = require('mongoose');
 const ValidationError = require('../errors/validation');
+const EventEmitter = require('events');
 
-module.exports = class CarrierService {
+module.exports = class CarrierService extends EventEmitter {
 
     constructor(gameRepo, achievementService, distanceService, starService, technologyService, specialistService, diplomacyService) {
+        super();
+
         this.gameRepo = gameRepo;
         this.achievementService = achievementService;
         this.distanceService = distanceService;
@@ -331,9 +334,27 @@ module.exports = class CarrierService {
 
             carrier.ownedByPlayerId = star.ownedByPlayerId; // Transfer ownership
             carrier.specialistId = null; // Remove the specialist. Note that this is required to get around an exploit where players can use a gift just before a battle to weaken the opponent.
-        }
 
-        carrier.isGift = false;
+            let eventObject = {
+                gameId: game._id,
+                gameTick: game.state.tick,
+                fromPlayer: carrierPlayer,
+                toPlayer: starPlayer,
+                carrier,
+                star
+            };
+    
+            this.emit('onPlayerGiftReceived', eventObject);
+            this.emit('onPlayerGiftSent', eventObject);
+
+            carrier.isGift = false;
+        } else if (!carrier.waypoints.length) {
+            // Note: If the carrier has landed at a star the player already owns and
+            // there are still waypoints then this means the carrier is passing
+            // through owned territory and therefore should not be ungifted.
+            // We should ungift in owned territory only if there are no remaining waypoints.
+            carrier.isGift = false;
+        }
     }
 
     async scuttle(game, player, carrierId) {

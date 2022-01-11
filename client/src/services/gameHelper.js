@@ -199,6 +199,10 @@ class GameHelper {
       return 'Unknown'
     }
 
+    if (this.isGameFinished(game)) {
+      return 'N/A'
+    }
+
     let t = this.getCountdownTime(game, date)
 
     return this.getDateToString(t, largestUnitOnly)
@@ -508,6 +512,10 @@ class GameHelper {
     return game.settings.general.mode === 'conquest' && game.settings.conquest.victoryCondition === 'homeStarPercentage'
   }
 
+  isKingOfTheHillMode (game) {
+    return game.settings.general.mode === 'kingOfTheHill'
+  }
+
   isTutorialGame (game) {
     return game.settings.general.type === 'tutorial'
   }
@@ -599,6 +607,11 @@ class GameHelper {
         if (this.isConquestHomeStars(game)) {
             if (a.stats.totalHomeStars > b.stats.totalHomeStars) return -1;
             if (a.stats.totalHomeStars < b.stats.totalHomeStars) return 1;
+        }
+
+        if (this.isKingOfTheHillMode(game) && a.isKingOfTheHill !== b.isKingOfTheHill) {
+          if (a.isKingOfTheHill) return -1;
+          if (b.isKingOfTheHill) return 1;
         }
 
         // Sort by total stars descending
@@ -890,6 +903,12 @@ class GameHelper {
         // If in real time mode, then calculate when the next tick will be and work out if we have reached that tick.
         nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'seconds');
     } else if (this.isTurnBasedGame(game)) {
+      let isAllPlayersReady = this.isAllUndefeatedPlayersReady(game)
+            
+      if (isAllPlayersReady) {
+        return true
+      }
+
         nextTick = moment(lastTick).utc().add(game.settings.gameTime.maxTurnWait, 'minutes');
     } else {
         throw new Error(`Unsupported game type.`);
@@ -1024,6 +1043,7 @@ class GameHelper {
       'special_battleRoyale': 'Battle Royale',
       'special_homeStar': 'Capital Stars',
       'special_anonymous': 'Anonymous',
+      'special_kingOfTheHill': 'King Of The Hill'
     }[game.settings.general.type]
   }
 

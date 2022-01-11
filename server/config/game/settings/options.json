@@ -8,6 +8,10 @@
           {
              "value":"battleRoyale",
              "text":"Battle Royale"
+          },
+          {
+             "value":"kingOfTheHill",
+             "text":"King Of The Hill"
           }
        ],
        "playerLimit":[
@@ -327,16 +331,6 @@
           {
              "value":25,
              "text":"Very Fast"
-          }
-       ],
-       "orbitOrigin":[
-          {
-             "value":"galacticCenter",
-             "text":"Galactic Center"
-          },
-          {
-             "value":"galacticCenterOfMass",
-             "text":"Galactic Center of Mass"
           }
        ]
     },

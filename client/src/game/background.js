@@ -60,7 +60,6 @@ class Background {
 
     let NEBULA_FREQUENCY = this.userSettings.map.background.nebulaFrequency
     let NEBULA_DENSITY = this.userSettings.map.background.nebulaDensity
-    let GENERATE_STARS = this.userSettings.map.background.backgroundStars == 'enabled'
 
     const FALLBACK_NEBULA_COLOR = 0xffffff
 
@@ -125,14 +124,9 @@ class Background {
           let sprite
           let nebulaTextureCount
           let textures
-          if(GENERATE_STARS) {
-            nebulaTextureCount = TextureService.STARLESS_NEBULA_TEXTURES.length
-            textures = TextureService.STARLESS_NEBULA_TEXTURES
-          }
-          else {
-            nebulaTextureCount = TextureService.NEBULA_TEXTURES.length
-            textures = TextureService.NEBULA_TEXTURES
-          }
+          
+          nebulaTextureCount = TextureService.STARLESS_NEBULA_TEXTURES.length
+          textures = TextureService.STARLESS_NEBULA_TEXTURES
 
           if( Math.round(this.rng.random()*16) <= NEBULA_FREQUENCY ) {
             let nebulaCount = 0
@@ -157,40 +151,36 @@ class Background {
               sprite.baseRotationTime = this.rng.random()*Math.PI*2.0
               sprite.baseScaleTime = this.rng.random()*Math.PI*2.0
 
-              if(GENERATE_STARS) {
-                sprite.tint = NEBULA_COLOUR1
-                if(this.rng.random()>(1.0/3.0)) { sprite.tint = NEBULA_COLOUR2 }
-                if(this.rng.random()>(1.0/3.0*2.0)) { sprite.tint = NEBULA_COLOUR3 }
-                sprite.scale.x = Background.NEBULA_SCALE
-                sprite.scale.y = Background.NEBULA_SCALE
-              }
+              sprite.tint = NEBULA_COLOUR1
+              if(this.rng.random()>(1.0/3.0)) { sprite.tint = NEBULA_COLOUR2 }
+              if(this.rng.random()>(1.0/3.0*2.0)) { sprite.tint = NEBULA_COLOUR3 }
+              sprite.scale.x = Background.NEBULA_SCALE
+              sprite.scale.y = Background.NEBULA_SCALE
 
               this.container.addChild(sprite)
 
-              if(GENERATE_STARS) {
-                let starCount = 0
-                texture = TextureService.STAR_TEXTURE
-                while(starCount < Background.STAR_DENSITY) {
-                  starCount+=1
-                  sprite = new PIXI.Sprite(texture)
-                  sprite.x = (x*CHUNK_SIZE) + (firstChunkX*CHUNK_SIZE) + (CHUNK_SIZE*this.rng.random())
-                  sprite.x += NEBULA_MAX_OFFSET * Math.round( (this.rng.random()*2.0)-1.0 )
-                  sprite.y = (y*CHUNK_SIZE) + (firstChunkY*CHUNK_SIZE) + (CHUNK_SIZE*this.rng.random())
-                  sprite.y += NEBULA_MAX_OFFSET * Math.round( (this.rng.random()*2.0)-1.0 )
-                  sprite.anchor.set(0.5)
+              let starCount = 0
+              texture = TextureService.STAR_TEXTURE
+              while(starCount < Background.STAR_DENSITY) {
+                starCount+=1
+                sprite = new PIXI.Sprite(texture)
+                sprite.x = (x*CHUNK_SIZE) + (firstChunkX*CHUNK_SIZE) + (CHUNK_SIZE*this.rng.random())
+                sprite.x += NEBULA_MAX_OFFSET * Math.round( (this.rng.random()*2.0)-1.0 )
+                sprite.y = (y*CHUNK_SIZE) + (firstChunkY*CHUNK_SIZE) + (CHUNK_SIZE*this.rng.random())
+                sprite.y += NEBULA_MAX_OFFSET * Math.round( (this.rng.random()*2.0)-1.0 )
+                sprite.anchor.set(0.5)
 
-                  sprite.parallax = this.rng.random()*Background.MAX_PARALLAX
-                  sprite.blendMode = this.blendMode
+                sprite.parallax = this.rng.random()*Background.MAX_PARALLAX
+                sprite.blendMode = this.blendMode
 
-                  sprite.originX = sprite.x
-                  sprite.originY = sprite.y
+                sprite.originX = sprite.x
+                sprite.originY = sprite.y
 
-                  let inverseParallaxNormalized = 1.0-(sprite.parallax/Background.MAX_PARALLAX)
-                  sprite.scale.x = ( (Background.STAR_SCALE) + (inverseParallaxNormalized*Background.STAR_SCALE) )/2.0
-                  sprite.scale.y = ( (Background.STAR_SCALE) + (inverseParallaxNormalized*Background.STAR_SCALE) )/2.0
+                let inverseParallaxNormalized = 1.0-(sprite.parallax/Background.MAX_PARALLAX)
+                sprite.scale.x = ( (Background.STAR_SCALE) + (inverseParallaxNormalized*Background.STAR_SCALE) )/2.0
+                sprite.scale.y = ( (Background.STAR_SCALE) + (inverseParallaxNormalized*Background.STAR_SCALE) )/2.0
 
-                  this.starContainer.addChild(sprite)
-                }
+                this.starContainer.addChild(sprite)
               }
 
             }

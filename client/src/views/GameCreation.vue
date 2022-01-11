@@ -22,7 +22,7 @@
       </div>
 
       <div class="form-group">
-        <label for="mode" class="col-form-label">Mode <help-tooltip tooltip="The game mode Conquest is victory by stars and Battle Royale is last man standing in a constantly shrinking galaxy"/></label>
+        <label for="mode" class="col-form-label">Mode <help-tooltip tooltip="The game mode Conquest is victory by stars, Battle Royale is last man standing in a constantly shrinking galaxy and King of the Hill is a fight for a key star"/></label>
         <select class="form-control" id="mode" v-model="settings.general.mode" :disabled="isCreatingGame">
           <option v-for="opt in options.general.mode" v-bind:key="opt.value" v-bind:value="opt.value">
             {{ opt.text }}
@@ -46,6 +46,13 @@
             {{ opt }}% of <span v-if="settings.conquest.victoryCondition === 'homeStarPercentage'">Capital</span> Stars
           </option>
         </select>
+      </div>
+
+      <div class="form-group" v-if="settings.general.mode === 'kingOfTheHill'">
+        <label for="kingOfTheHillProductionCycles" class="col-form-label">Countdown Cycles (<span class="text-warning">{{settings.kingOfTheHill.productionCycles}} production cycles</span>) <help-tooltip tooltip="How long the countdown is to the end of the game in production cycles when the center star is captured"/></label>
+        <div class="col">
+          <input type="range" min="1" max="25" step="1" class="form-range w-100" id="kingOfTheHillproductionCycles" v-model="settings.kingOfTheHill.productionCycles" :disabled="isCreatingGame">
+        </div>
       </div>
 
       <div class="form-group">
@@ -363,15 +370,6 @@
         <label for="orbitSpeed" class="col-form-label">Orbit Speed <help-tooltip tooltip="Determines how fast stars and carriers orbit"/></label>
         <select class="form-control" id="orbitSpeed" v-model="settings.orbitalMechanics.orbitSpeed" :disabled="isCreatingGame">
           <option v-for="opt in options.orbitalMechanics.orbitSpeed" v-bind:key="opt.value" v-bind:value="opt.value">
-            {{ opt.text }}
-          </option>
-        </select>
-      </div>
-
-      <div class="form-group" v-if="settings.orbitalMechanics.enabled === 'enabled'">
-        <label for="orbitOrigin" class="col-form-label">Orbit Origin <help-tooltip tooltip="Determines the central point of which to orbit stars and carriers"/></label>
-        <select class="form-control" id="orbitOrigin" v-model="settings.orbitalMechanics.orbitOrigin" :disabled="isCreatingGame">
-          <option v-for="opt in options.orbitalMechanics.orbitOrigin" v-bind:key="opt.value" v-bind:value="opt.value">
             {{ opt.text }}
           </option>
         </select>

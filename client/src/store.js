@@ -176,14 +176,12 @@ export default new Vuex.Store({
     gamePlayerReadyToQuit (state, data) {
       let player = GameHelper.getPlayerById(state.game, data.playerId)
 
-      player.ready = true
       player.readyToQuit = true
     },
 
     gamePlayerNotReadyToQuit (state, data) {
       let player = GameHelper.getPlayerById(state.game, data.playerId)
 
-      player.ready = false
       player.readyToQuit = false
     },
 
@@ -208,12 +206,18 @@ export default new Vuex.Store({
         GameContainer.reloadStar(star)
       })
 
+      player.credits -= data.cost
       player.stats.newShips = Math.round((player.stats.newShips + Number.EPSILON) * 100) / 100
+
+      if (data.currentResearchTicksEta) {
+        player.currentResearchTicksEta = data.currentResearchTicksEta
+      }
+      
+      if (data.nextResearchTicksEta) {
+        player.nextResearchTicksEta = data.nextResearchTicksEta
+      }
       
       // Update player total stats.
-
-      player.credits -= data.cost
-
       switch (data.infrastructureType) {
         case 'economy': 
           player.stats.totalEconomy += data.upgraded 
