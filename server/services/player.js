@@ -109,21 +109,12 @@ module.exports = class PlayerService extends EventEmitter {
     createEmptyPlayers(game) {
         let players = [];
 
-        let shapes = ['circle', 'square', 'diamond', 'hexagon'];
-        let shapeIndex = 0;
-        let colours = require('../config/game/colours').slice();
+        let shapeColours = this._generatePlayerColourShapeList(game.settings.general.playerLimit);
 
         for (let i = 0; i < game.settings.general.playerLimit; i++) {
-            // Get a random colour to assign to the player.
-            if (!colours.length) {
-                colours = require('../config/game/colours').slice();
-                shapeIndex++;
-            }
-
-            let colour = this._getRandomColour(colours);
-            let shape = shapes[shapeIndex];
-
-            players.push(this.createEmptyPlayer(game, colour, shape));
+            let shapeColour = shapeColours[i];
+            
+            players.push(this.createEmptyPlayer(game, shapeColour.colour, shapeColour.shape));
         }
 
         if (game.galaxy.homeStars && game.galaxy.homeStars.length) {
@@ -142,8 +133,30 @@ module.exports = class PlayerService extends EventEmitter {
         return players;
     }
 
-    _getRandomColour(colours) {
-        return colours.splice(this.randomService.getRandomNumber(colours.length - 1), 1)[0];
+    _generatePlayerColourShapeList(playerCount) {
+        let shapes = ['circle', 'square', 'diamond', 'hexagon'];
+        let colours = require('../config/game/colours').slice();
+
+        let combinations = [];
+
+        for (let shape of shapes) {
+            for (let colour of colours) {
+                combinations.push({
+                    shape,
+                    colour
+                });
+            }
+        }
+
+        let result = [];
+        
+        for (let i = 0; i < playerCount; i++) {
+            let shapeColour = combinations.splice(this.randomService.getRandomNumber(combinations.length - 1), 1)[0];
+
+            result.push(shapeColour);
+        }
+
+        return result;
     }
 
     _distributePlayerLinkedHomeStars(game, players) {
