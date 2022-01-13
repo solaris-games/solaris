@@ -11,7 +11,7 @@ const CLAIM_STAR_ACTION = 'CLAIM_STAR';
 const REINFORCE_STAR_ACTION = 'REINFORCE_STAR';
 
 const EMPTY_STAR_SCORE_MULTIPLIER = 1;
-const ENEMY_STAR_SCORE_MULTIPLIER = 3;
+const ENEMY_STAR_SCORE_MULTIPLIER = 5;
 
 // IMPORTANT IMPLEMENTATION NOTES
 // During AI tick, care must be taken to NEVER write any changes to the database.
