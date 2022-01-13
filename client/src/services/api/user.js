@@ -6,6 +6,10 @@ class UserService extends BaseApiService {
     return axios.get(this.BASE_URL + 'user', { withCredentials: true })
   }
 
+  getUserCredits () {
+    return axios.get(this.BASE_URL + 'user/credits', { withCredentials: true })
+  }
+
   getUserAchievements (userId) {
     return axios.get(this.BASE_URL + 'user/achievements/' + userId, { withCredentials: true })
   }
