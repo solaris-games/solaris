@@ -304,23 +304,28 @@ module.exports = class AIService {
     }
 
     async _useAssignment(context, game, player, assignments, assignment, waypoints, ships) {
+        console.log("Using assignment from " + assignment.star.name + ". " + assignment.carriers.length + " carriers present.");
         let shipsToTransfer = ships;
         const starId = assignment.star._id.toString();
         await this.shipTransferService.transferAllToStar(game, player, starId, false);
         let carrier = assignment.carriers && assignment.carriers[0];
         if (carrier) {
+            console.log("Using existing carrier " + carrier.name);
             assignment.carriers.shift();
         } else {
             const buildResult = await this.starUpgradeService.buildCarrier(game, player, starId, 1, false);
             carrier = buildResult.carrier;
             shipsToTransfer -= 1;
             assignment.totalShips -= 1;
+            console.log("Building new carrier " + carrier.name);
         }
         if (shipsToTransfer > 0) {
+            console.log("Ships for transfer: " + shipsToTransfer + ", assignment total: " + assignment.totalShips);
             const remaining = Math.max(assignment.totalShips - shipsToTransfer - 1, 0);
             await this.shipTransferService.transfer(game, player, carrier._id, shipsToTransfer + 1, starId, remaining);
             assignment.totalShips -= shipsToTransfer;
         }
+        console.log("Assignment ships after transfer: " + assignment.totalShips);
         await this.waypointService.saveWaypointsForCarrier(game, player, carrier, waypoints, false, false);
         const carrierRemaining = assignment.carriers && assignment.carriers.length > 0;
         if (!carrierRemaining && assignment.totalShips === 0) {
@@ -587,7 +592,10 @@ module.exports = class AIService {
         const orders = [];
         const starPriorities = this._computeStarPriorities(game, player, context);
 
+        console.log("Star priorities:");
         for (const [starId, priority] of starPriorities) {
+            console.log("Priority: " + context.starsById.get(starId).name + " => " + priority);
+
             const neighbors = context.reachablePlayerStars.get(starId);
             for (const neighbor of neighbors) {
                 if (this._isUnderAttack(context, neighbor)) {
@@ -621,6 +629,11 @@ module.exports = class AIService {
             const enemyStars = this._countEnemyStars(game, player, context, context.reachableFromPlayerStars.get(borderStarId));
             // Maybe include some other properties, like infrastructure/specialists in the priority calculation later
             borderStarPriorities.set(borderStarId, 1 + enemyStars);
+        }
+
+        console.log("Border star priorities:");
+        for (const [id, score] of borderStarPriorities) {
+            console.log("Priority: " + context.starsById.get(id).name + " => " + score);
         }
 
         const visited = new Set();
