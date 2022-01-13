@@ -10,7 +10,7 @@
 
     <achievements v-if="user" v-bind:victories="user.achievements.victories" v-bind:rank="user.achievements.rank" v-bind:renown="user.achievements.renown"/>
 
-    <p class="text-center pt-3 mb-3">Detailed statistics are listed below.</p>
+    <user-badges :userId="userId"/>
 
     <view-subtitle title="Games"/>
     <div class="row" v-if="user">
@@ -254,6 +254,7 @@ import PolarArea from '../components/game/intel/PolarAreaChart.js'
 import userService from '../services/api/user'
 import UserGuildInfoVue from './guild/UserGuildInfo'
 import Roles from '../components/game/player/Roles'
+import UserBadges from '../components/game/badges/UserBadges'
 
 export default {
   components: {
@@ -265,7 +266,8 @@ export default {
     'pie-chart': PieChart,
     'polar-area-chart': PolarArea,
     'user-guild-info': UserGuildInfoVue,
-    'roles': Roles
+    'roles': Roles,
+    'user-badges': UserBadges
   },
   data () {
     return {
@@ -321,7 +323,7 @@ export default {
   },
   async mounted () {
     try {
-      let response = await userService.getUserAchievements(this.$route.params.userId)
+      let response = await userService.getUserAchievements(this.userId)
 
       this.user = response.data
 
@@ -551,6 +553,11 @@ export default {
       }
 
       this.tradeChartData = chartData
+    }
+  },
+  computed: {
+    userId: function () {
+      return this.$route.params.userId
     }
   }
 }

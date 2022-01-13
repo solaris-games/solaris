@@ -18,15 +18,19 @@ module.exports = class BadgeService extends EventEmitter {
     async listBadgesByUser(userId) {
         const badges = this.listBadges();
 
-        const playerBadges = (await this.userService.getById(userId, {
+        const user = await this.userService.getById(userId, {
             'achievements.badges': 1
-        })).achievements.badges;
+        });
 
-        for (let badge of badges) {
-            badge.awarded = playerBadges[badge.key] || 0;
+        if (!user) {
+            return [];
         }
 
-        return badges;
+        for (let badge of badges) {
+            badge.awarded = user.achievements.badges[badge.key] || 0;
+        }
+
+        return badges.filter(b => b.awarded);
     }
 
     async listBadgesByPlayer(game, playerId) {

@@ -15,22 +15,21 @@
     </div>
 
     <div class="pt-3 pb-3" v-if="!isLoading && userHasBadges">
-        <div class="badge-container" v-for="badge in filteredBadges" :key="badge.key" @click="onOpenPurchasePlayerBadgeRequested">
-            <img :src="require(`../../../assets/badges/${badge.key}.png`)" :title="badge.name"/>
-            <span class="badge-label" :title="badge.name">{{badge.awarded}}</span>
-        </div>
+        <badge v-for="badge in filteredBadges" :key="badge.key" :badge="badge" @onOpenPurchasePlayerBadgeRequested="onOpenPurchasePlayerBadgeRequested" />
     </div>
 </div>
 </template>
 
 <script>
 import LoadingSpinner from '../../LoadingSpinner'
+import Badge from './Badge'
 import BadgeApiService from '../../../services/api/badge'
 import GameHelper from '../../../services/gameHelper'
 
 export default {
     components: {
-        'loading-spinner': LoadingSpinner
+        'loading-spinner': LoadingSpinner,
+        'badge': Badge
     },
   props: {
     playerId: String
@@ -69,9 +68,9 @@ export default {
     }
   },
   computed: {
-      userPlayer () {
-          return GameHelper.getUserPlayer(this.$store.state.game)
-      },
+    userPlayer () {
+        return GameHelper.getUserPlayer(this.$store.state.game)
+    },
     userHasBadges () {
         return this.badges.filter(b => b.awarded).length
     },
@@ -83,31 +82,4 @@ export default {
 </script>
 
 <style scoped>
-img {
-    width: 110px;
-    height: 110px;
-}
-
-@media screen and (max-width: 576px) {
-    img {
-        width: 95px;
-        height: 95px;
-    }
-}
-
-.badge-container {
-    display: inline-block;
-    position: relative;
-    cursor: pointer;
-}
-
-.badge-label {
-    position: absolute;
-    right: 8px;
-    top: 8px;
-    font-size: 20px;
-    background: #e74c3c;
-    padding: 0px 8px;
-    border-radius: 5px;
-}
 </style>
