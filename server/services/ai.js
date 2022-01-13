@@ -200,7 +200,7 @@ module.exports = class AIService {
             //console.log(order);
             if (order.type === DEFEND_STAR_ACTION) {
                 // Later, take weapons level and specialists into account
-                const attackData = this._getAttackData(game, player, context, order.star, order.ticksUntil) || this._createDefaultAttackData();
+                const attackData = this._getAttackData(game, player, context, order.star, order.ticksUntil) || this._createDefaultAttackData(game, order.star, order.ticksUntil);
                 const defendingStar = context.starsById.get(order.star);
                 const requiredAdditionallyForDefense = this._calculateRequiredShipsForDefense(game, player, context, attackData, order.incomingCarriers, defendingStar);
                 if (requiredAdditionallyForDefense === 0) {
