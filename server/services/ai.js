@@ -10,6 +10,9 @@ const DEFEND_STAR_ACTION = 'DEFEND_STAR';
 const CLAIM_STAR_ACTION = 'CLAIM_STAR';
 const REINFORCE_STAR_ACTION = 'REINFORCE_STAR';
 
+const EMPTY_STAR_SCORE_MULTIPLIER = 1;
+const ENEMY_STAR_SCORE_MULTIPLIER = 3;
+
 // IMPORTANT IMPLEMENTATION NOTES
 // During AI tick, care must be taken to NEVER write any changes to the database.
 // This is performed automatically by mongoose (when calling game.save()).
@@ -618,17 +621,28 @@ module.exports = class AIService {
     }
 
     _computeStarPriorities(game, player, context) {
-        // TODO: Improve priority computation
-        // Take into account empty adjacent stars
-        // and distance from capital
-        // to push reinforcements towards the border even on dark games etc
-
+        const hyperspaceRange = this._getHyperspaceRange(game, player);
         const borderStarPriorities = new Map();
+
         for (const borderStarId of context.borderStars) {
-            // Really, this should be calculated the other way around, going out from the enemy... but for now this should do it
-            const enemyStars = this._countEnemyStars(game, player, context, context.reachableFromPlayerStars.get(borderStarId));
-            // Maybe include some other properties, like infrastructure/specialists in the priority calculation later
-            borderStarPriorities.set(borderStarId, 1 + enemyStars);
+            const borderStar = context.starsById.get(borderStarId);
+            const reachables = context.reachableFromPlayerStars.get(borderStarId);
+            let score = 0;
+
+            for (const reachableId of reachables) {
+                const reachableStar = context.starsById.get(reachableId);
+                if (!reachableStar.ownedByPlayerId) {
+                    const distance = this.distanceService.getDistanceBetweenLocations(borderStar.location, reachableStar.location);
+                    const distanceScore = (distance / hyperspaceRange) * EMPTY_STAR_SCORE_MULTIPLIER;
+                    score += distanceScore;
+                } else if (reachableStar.ownedByPlayerId.toString() !== player._id.toString()) {
+                    const distance = this.distanceService.getDistanceBetweenLocations(borderStar.location, reachableStar.location);
+                    const distanceScore = distance / hyperspaceRange * ENEMY_STAR_SCORE_MULTIPLIER;
+                    score += distanceScore;
+                }
+            }
+
+            borderStarPriorities.set(borderStarId, score);
         }
 
         console.log("Border star priorities:");
@@ -664,21 +678,12 @@ module.exports = class AIService {
         return starPriorities;
     }
 
-    _countEnemyStars(game, player, context, starIds) {
-        let count = 0;
-
-        for (const starId of starIds) {
-            const star = context.starsById.get(starId);
-            if (star.ownedByPlayerId && star.ownedByPlayerId !== player._id) {
-                count++;
-            }
-        }
-
-        return count;
+    _getHyperspaceRange(game, player) {
+        return this.distanceService.getHyperspaceDistance(game, player.research.hyperspace.level);
     }
 
     _computeStarGraph(game, player, playerStars, starCandidates) {
-        const hyperspaceRange = this.distanceService.getHyperspaceDistance(game, player.research.hyperspace.level);
+        const hyperspaceRange = this._getHyperspaceRange(game, player);
         const hyperspaceRangeSquared = hyperspaceRange * hyperspaceRange;
 
         const starGraph = new Map();
