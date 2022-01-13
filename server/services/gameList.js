@@ -69,6 +69,9 @@ module.exports = class GameListService {
         return await Promise.all(games.map(async game => {
             game.userNotifications = await this.getUserPlayerNotifications(game, userId, true, true, true);
 
+            delete game.conversations;
+            delete game.galaxy;
+
             return game;
         }));
     }
@@ -116,6 +119,9 @@ module.exports = class GameListService {
 
         return await Promise.all(games.map(async game => {
             game.userNotifications = await this.getUserPlayerNotifications(game, userId, false, false, true);
+
+            delete game.conversations;
+            delete game.galaxy;
 
             return game;
         }));
