@@ -254,7 +254,7 @@ module.exports = class AIService {
                 }
 
                 const waypoints = this._createWaypointsFromTrace(found.trace);
-                await this._useAssignment(context, game, player, assignments, found.assignment, waypoints, assignment.totalShips);
+                await this._useAssignment(context, game, player, assignments, found.assignment, waypoints, found.assignment.totalShips);
                 for (const visitedStar of found.trace) {
                     newClaimedStars.add(visitedStar);
                 }
