@@ -256,7 +256,7 @@ module.exports = class AIService {
                 }
             } else if (order.type === REINFORCE_STAR_ACTION) {
                 const assignment = assignments.get(order.source);
-                if (!assignment) {
+                if (!assignment || assignment.totalShips <= 1) {
                     continue;
                 }
                 const hasCarrier = assignment.carriers && assignment.carriers.length > 0;
