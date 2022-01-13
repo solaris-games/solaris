@@ -101,13 +101,15 @@ module.exports = class AIService {
     _createContext(game, player) {
         const playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
+        const playerId = player._id.toString();
+
         const starsById = new Map()
 
         for (const star of game.galaxy.stars) {
             starsById.set(star._id.toString(), star);
         }
 
-        const traversableStars = game.galaxy.stars.filter(star => !star.ownedByPlayerId || star.ownedByPlayerId.toString() === player._id.toString());
+        const traversableStars = game.galaxy.stars.filter(star => !star.ownedByPlayerId || star.ownedByPlayerId.toString() === playerId);
         const reachableFromPlayerStars = this._computeStarGraph(game, player, playerStars, traversableStars);
         const reachablePlayerStars = this._computeStarGraph(game, player, playerStars, playerStars);
         const freelyReachableStars = this._computeStarGraph(game, player, traversableStars, traversableStars);
@@ -115,7 +117,7 @@ module.exports = class AIService {
         for (const [from, reachables] of reachableFromPlayerStars) {
             for (const reachableId of reachables) {
                 const reachable = starsById.get(reachableId);
-                if (!reachable.ownedByPlayerId) {
+                if (!reachable.ownedByPlayerId || reachable.ownedByPlayerId.toString() !== playerId) {
                     borderStars.push(from);
                 }
             }
@@ -137,10 +139,10 @@ module.exports = class AIService {
         }
 
         const incomingCarriers = game.galaxy.carriers
-            .filter(carrier => carrier.ownedByPlayerId.toString() !== player._id.toString())
+            .filter(carrier => carrier.ownedByPlayerId.toString() !== playerId)
             .map(carrier => [carrier, carrier.waypoints.find(wp => {
                 const star = starsById.get(wp.destination.toString());
-                const isPlayerStar = star.ownedByPlayerId && star.ownedByPlayerId.toString() === player._id.toString();
+                const isPlayerStar = star.ownedByPlayerId && star.ownedByPlayerId.toString() === playerId;
                 if (isPlayerStar) {
                     return [carrier, wp];
                 } else {
