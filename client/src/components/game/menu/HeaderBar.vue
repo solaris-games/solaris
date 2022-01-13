@@ -300,6 +300,10 @@ export default {
 
       let menuState = KEYBOARD_SHORTCUTS.all[key]
 
+      if (menuState == null) {
+        return this.setMenuState(null, null)
+      }
+
       if (isLoggedIn) {
         menuState = menuState || KEYBOARD_SHORTCUTS.user[key]
       }
