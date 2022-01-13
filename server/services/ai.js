@@ -138,7 +138,15 @@ module.exports = class AIService {
 
         const incomingCarriers = game.galaxy.carriers
             .filter(carrier => carrier.ownedByPlayerId.toString() !== player._id.toString())
-            .map(carrier => [carrier, carrier.waypoints.find(wp => starsById.has(wp.destination.toString()))])
+            .map(carrier => [carrier, carrier.waypoints.find(wp => {
+                const star = starsById.get(wp.destination.toString());
+                const isPlayerStar = star.ownedByPlayerId && star.ownedByPlayerId.toString() === player._id.toString();
+                if (isPlayerStar) {
+                    return [carrier, wp];
+                } else {
+                    return [];
+                }
+            })])
             .filter(incoming => Boolean(incoming[1]))
 
         const attacksByStarId = new Map();
