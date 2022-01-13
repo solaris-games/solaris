@@ -110,11 +110,12 @@ module.exports = class AIService {
         }
 
         const traversableStars = game.galaxy.stars.filter(star => !star.ownedByPlayerId || star.ownedByPlayerId.toString() === playerId);
-        const reachableFromPlayerStars = this._computeStarGraph(game, player, playerStars, traversableStars);
+        const allReachableFromPlayerStars = this._computeStarGraph(game, player, playerStars, game.galaxy.stars);
+        const freelyReachableFromPlayerStars = this._computeStarGraph(game, player, playerStars, traversableStars);
         const reachablePlayerStars = this._computeStarGraph(game, player, playerStars, playerStars);
         const freelyReachableStars = this._computeStarGraph(game, player, traversableStars, traversableStars);
         const borderStars = [];
-        for (const [from, reachables] of reachableFromPlayerStars) {
+        for (const [from, reachables] of allReachableFromPlayerStars) {
             for (const reachableId of reachables) {
                 const reachable = starsById.get(reachableId);
                 if (!reachable.ownedByPlayerId || reachable.ownedByPlayerId.toString() !== playerId) {
@@ -167,7 +168,8 @@ module.exports = class AIService {
             playerStars,
             playerCarriers,
             starsById,
-            reachableFromPlayerStars,
+            allReachableFromPlayerStars,
+            freelyReachableFromPlayerStars,
             reachablePlayerStars,
             borderStars,
             carriersOrbiting,
@@ -543,7 +545,7 @@ module.exports = class AIService {
         const orders = [];
         const used = new Set();
 
-        for (const [fromId, reachables] of context.reachableFromPlayerStars) {
+        for (const [fromId, reachables] of context.freelyReachableFromPlayerStars) {
             const claimCandidates = Array.from(reachables).map(starId => context.starsById.get(starId)).filter(star => !star.ownedByPlayerId);
             for (const candidate of claimCandidates) {
                 const candidateId = candidate._id.toString();
@@ -636,7 +638,7 @@ module.exports = class AIService {
 
         for (const borderStarId of context.borderStars) {
             const borderStar = context.starsById.get(borderStarId);
-            const reachables = context.reachableFromPlayerStars.get(borderStarId);
+            const reachables = context.allReachableFromPlayerStars.get(borderStarId);
             let score = 0;
 
             for (const reachableId of reachables) {
