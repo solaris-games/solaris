@@ -464,7 +464,7 @@ module.exports = class AIService {
         const attackers = [];
 
         for (const attackingCarrier of attackingCarriers) {
-            const attacker = game.players.find(player => player._id.toString() === attackingCarrier.ownedByPlayerId.toString());
+            const attacker = game.galaxy.players.find(player => player._id.toString() === attackingCarrier.ownedByPlayerId.toString());
             const attackerId = attacker._id.toString();
             if (!attackerIds.has(attackerId)) {
                 attackerIds.add(attackerId);
