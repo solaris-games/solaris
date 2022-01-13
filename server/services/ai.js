@@ -147,10 +147,10 @@ module.exports = class AIService {
                 if (isPlayerStar) {
                     return [carrier, wp];
                 } else {
-                    return [];
+                    return null;
                 }
             })])
-            .filter(incoming => Boolean(incoming[1]))
+            .filter(incoming => Boolean(incoming))
 
         const attacksByStarId = new Map();
         const attackedStarIds = new Set();
