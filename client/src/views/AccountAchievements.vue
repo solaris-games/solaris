@@ -12,7 +12,7 @@
 
     <user-badges :userId="userId"/>
 
-    <view-subtitle title="Games"/>
+    <view-subtitle title="Games" class="mt-2"/>
     <div class="row" v-if="user">
       <div class="col-sm-12 col-md-8 table-responsive">
       <table class="table table-striped table-hover">

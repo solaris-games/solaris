@@ -2,10 +2,6 @@
 <div>
     <loading-spinner :loading="isLoading" />
 
-    <div class="text-center pt-3" v-if="!isLoading && !userHasBadges">
-        <p class="mb-3">This player has no badges.</p>
-    </div>
-
     <div class="pt-3 pb-3 text-center" v-if="!isLoading && userHasBadges">
         <badge v-for="badge in badges" :key="badge.key" :badge="badge" />
     </div>
