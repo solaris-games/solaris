@@ -567,7 +567,7 @@ module.exports = class AIService {
     }
 
     _gatherDefenseOrders(game, player, context) {
-        const orders = new Array(context.attacksByStarId.size);
+        const orders = [];
 
         for (const [attackedStarId, attacks] of context.attacksByStarId) {
             for (const [attackInTicks, incomingCarriers] of attacks) {
