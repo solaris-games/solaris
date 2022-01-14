@@ -13,6 +13,8 @@ const REINFORCE_STAR_ACTION = 'REINFORCE_STAR';
 const EMPTY_STAR_SCORE_MULTIPLIER = 1;
 const ENEMY_STAR_SCORE_MULTIPLIER = 5;
 
+const REINFORCEMENT_MIN_CYCLES = 0.8;
+
 // IMPORTANT IMPLEMENTATION NOTES
 // During AI tick, care must be taken to NEVER write any changes to the database.
 // This is performed automatically by mongoose (when calling game.save()).
@@ -306,7 +308,7 @@ module.exports = class AIService {
                     const effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, source);
                     const shipProductionPerTick = this.starService.calculateStarShipsByTicks(effectiveTechs.manufacturing, source.infrastructure.industry, 1, game.settings.galaxy.productionTicks);
                     const ticksProduced = assignment.totalShips / shipProductionPerTick;
-                    if (ticksProduced > (game.settings.galaxy.productionTicks * 0.5) && this._canAffordCarrier(context, game, player, false)) {
+                    if (ticksProduced > (game.settings.galaxy.productionTicks * REINFORCEMENT_MIN_CYCLES) && this._canAffordCarrier(context, game, player, false)) {
                         await reinforce();
                     }
                 }
