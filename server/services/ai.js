@@ -229,6 +229,10 @@ module.exports = class AIService {
                 let shipsNeeded = requiredAdditionallyForDefense;
 
                 for (const {assignment, trace} of allPossibleAssignments) {
+                    if (shipsNeeded <= 0) {
+                        break;
+                    }
+
                     // Skip assignments that we cannot afford to fulfill
                     if ((!assignment.carriers || assignment.carriers.length === 0) && !this._canAffordCarrier(context, game, player, true)) {
                         continue;
@@ -245,10 +249,6 @@ module.exports = class AIService {
                     }
 
                     await this._useAssignment(context, game, player, assignments, assignment, this._createWaypointsFromTrace(trace), assignment.totalShips, (carrier) => attackData.carriersOnTheWay.push(carrier._id.toString()));
-
-                    if (shipsNeeded <= 0) {
-                        break;
-                    }
                 }
             } else if (order.type === CLAIM_STAR_ACTION) {
                 // Skip double claiming stars that might have been claimed by an earlier action
