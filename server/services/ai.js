@@ -220,28 +220,32 @@ module.exports = class AIService {
                 const attackData = this._getAttackData(game, player, context, order.star, order.ticksUntil) || this._createDefaultAttackData(game, order.star, order.ticksUntil);
                 const defendingStar = context.starsById.get(order.star);
                 const requiredAdditionallyForDefense = this._calculateRequiredShipsForDefense(game, player, context, attackData, order.incomingCarriers, defendingStar);
-                if (requiredAdditionallyForDefense === 0) {
-                    // We're going to be fine
-                    newKnownAttacks.push(attackData);
-                } else {
-                    console.log("Performing defense on: " + defendingStar.name);
-                    const allPossibleAssignments = this._findAssignmentsWithTickLimit(game, player, context, context.reachablePlayerStars, assignments, order.star, order.ticksUntil, this._canAffordCarrier(context, game, player, true));
+                newKnownAttacks.push(attackData);
+                console.log("Performing defense on: " + defendingStar.name);
+                const allPossibleAssignments = this._findAssignmentsWithTickLimit(game, player, context, context.reachablePlayerStars, assignments, order.star, order.ticksUntil, this._canAffordCarrier(context, game, player, true));
 
-                    let shipsNeeded = requiredAdditionallyForDefense;
+                let shipsNeeded = requiredAdditionallyForDefense;
 
-                    for (const {assignment, trace} of allPossibleAssignments) {
-                        // Skip assignments that we cannot afford to fulfill
-                        if ((!assignment.carriers || assignment.carriers.length === 0) && !this._canAffordCarrier(context, game, player, true)) {
-                            continue;
-                        }
+                for (const {assignment, trace} of allPossibleAssignments) {
+                    // Skip assignments that we cannot afford to fulfill
+                    if ((!assignment.carriers || assignment.carriers.length === 0) && !this._canAffordCarrier(context, game, player, true)) {
+                        continue;
+                    }
 
-                        shipsNeeded -= assignment.assignment.totalShips;
+                    let shipsUsed;
 
-                        await this._useAssignment(context, game, player, assignments, assignment, this._createWaypointsFromTrace(trace), assignment.totalShips);
+                    if (shipsNeeded <= assignment.totalShips) {
+                        shipsUsed = shipsNeeded;
+                        shipsNeeded = 0;
+                    } else {
+                        shipsUsed = assignment.totalShips;
+                        shipsNeeded -= assignment.totalShips;
+                    }
 
-                        if (shipsNeeded < 0) {
-                            break;
-                        }
+                    await this._useAssignment(context, game, player, assignments, assignment, this._createWaypointsFromTrace(trace), assignment.totalShips, (carrier) => attackData.carriersOnTheWay.push(carrier._id.toString()));
+
+                    if (shipsNeeded <= 0) {
+                        break;
                     }
                 }
             } else if (order.type === CLAIM_STAR_ACTION) {
@@ -323,7 +327,7 @@ module.exports = class AIService {
         player.aiState.startedClaims = claimsInProgress;
     }
 
-    async _useAssignment(context, game, player, assignments, assignment, waypoints, ships) {
+    async _useAssignment(context, game, player, assignments, assignment, waypoints, ships, onCarrierUsed = null) {
         console.log("Using assignment from " + assignment.star.name + ". " + assignment.carriers.length + " carriers present.");
         let shipsToTransfer = ships;
         const starId = assignment.star._id.toString();
@@ -350,6 +354,9 @@ module.exports = class AIService {
         const carrierRemaining = assignment.carriers && assignment.carriers.length > 0;
         if (!carrierRemaining && assignment.totalShips === 0) {
             assignments.delete(starId);
+        }
+        if (onCarrierUsed) {
+            onCarrierUsed(carrier);
         }
     }
 
