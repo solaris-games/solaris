@@ -248,7 +248,7 @@ module.exports = class AIService {
                         shipsNeeded -= assignment.totalShips;
                     }
 
-                    await this._useAssignment(context, game, player, assignments, assignment, this._createWaypointsFromTrace(trace), assignment.totalShips, (carrier) => attackData.carriersOnTheWay.push(carrier._id.toString()));
+                    await this._useAssignment(context, game, player, assignments, assignment, this._createWaypointsFromTrace(trace), shipsUsed, (carrier) => attackData.carriersOnTheWay.push(carrier._id.toString()));
                 }
             } else if (order.type === CLAIM_STAR_ACTION) {
                 // Skip double claiming stars that might have been claimed by an earlier action
