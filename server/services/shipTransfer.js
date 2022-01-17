@@ -76,7 +76,7 @@ module.exports = class ShipTransferService {
         };
     }
 
-    async transfer(game, player, carrierId, carrierShips, starId, starShips, skipDB = false) {
+    async transfer(game, player, carrierId, carrierShips, starId, starShips, writeDB = true) {
         let carrier = this.carrierService.getById(game, carrierId);
         let star = this.starService.getById(game, starId);
 
@@ -119,7 +119,7 @@ module.exports = class ShipTransferService {
         star.ships = Math.floor(star.shipsActual);
 
         // Update the DB.
-        if (!skipDB) {
+        if (!writeDB) {
             await this.gameRepo.bulkWrite([
                 {
                     updateOne: {

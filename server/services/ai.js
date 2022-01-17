@@ -74,7 +74,7 @@ module.exports = class AIService {
             this._updateState(game, player);
             const context = this._createContext(game, player);
             const orders = this._gatherOrders(game, player, context);
-            const assignments = this._gatherAssignments(game, player, context);
+            const assignments = await this._gatherAssignments(game, player, context);
             await this._evaluateOrders(game, player, context, orders, assignments);
             player.markModified('aiState');
             game.save();
@@ -333,7 +333,6 @@ module.exports = class AIService {
         console.log("Using assignment from " + assignment.star.name + ". " + assignment.carriers.length + " carriers present.");
         let shipsToTransfer = ships;
         const starId = assignment.star._id.toString();
-        await this.shipTransferService.transferAllToStar(game, player, starId, false);
         let carrier = assignment.carriers && assignment.carriers[0];
         if (carrier) {
             console.log("Using existing carrier " + carrier.name);
@@ -348,7 +347,7 @@ module.exports = class AIService {
         if (shipsToTransfer > 0) {
             console.log("Ships for transfer: " + shipsToTransfer + ", assignment total: " + assignment.totalShips);
             const remaining = Math.max(assignment.totalShips - shipsToTransfer - 1, 0);
-            await this.shipTransferService.transfer(game, player, carrier._id, shipsToTransfer + 1, starId, remaining);
+            await this.shipTransferService.transfer(game, player, carrier._id, shipsToTransfer + 1, starId, remaining, false);
             assignment.totalShips -= shipsToTransfer;
         }
         console.log("Assignment ships after transfer: " + assignment.totalShips);
@@ -524,19 +523,27 @@ module.exports = class AIService {
         }
     }
 
-    _gatherAssignments(game, player, context) {
+    async _gatherAssignments(game, player, context) {
         const assignments = new Map();
 
         for (const playerStar of context.playerStars) {
             const carriersHere = context.carriersOrbiting.get(playerStar._id.toString()) || [];
-            const totalShips = playerStar.ships + carriersHere.map(carrier => carrier.ships - 1).reduce((a, b) => a + b, 0);
-            if (totalShips < 1 && carriersHere.length === 0) {
+
+            for (const carrier of carriersHere) {
+                if (carrier.ships > 1) {
+                    const newStarShips = playerStar.ships + carrier.ships - 1;
+                    await this.shipTransferService.transfer(game, player, carrier._id, 1, playerStar._id, newStarShips, false);
+                }
+            }
+
+            if (playerStar.ships < 1 && carriersHere.length === 0) {
                 continue;
             }
+
             assignments.set(playerStar._id.toString(), {
                 carriers: carriersHere,
                 star: playerStar,
-                totalShips
+                totalShips: playerStar.ships
             });
         }
 
