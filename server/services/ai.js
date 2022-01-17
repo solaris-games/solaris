@@ -346,9 +346,9 @@ module.exports = class AIService {
         }
         if (shipsToTransfer > 0) {
             console.log("Ships for transfer: " + shipsToTransfer + ", assignment total: " + assignment.totalShips);
-            const remaining = Math.max(assignment.totalShips - shipsToTransfer - 1, 0);
+            const remaining = Math.max(assignment.star.ships - shipsToTransfer, 0);
             await this.shipTransferService.transfer(game, player, carrier._id, shipsToTransfer + 1, starId, remaining, false);
-            assignment.totalShips -= shipsToTransfer;
+            assignment.totalShips = assignment.star.ships;
         }
         console.log("Assignment ships after transfer: " + assignment.totalShips);
         await this.waypointService.saveWaypointsForCarrier(game, player, carrier, waypoints, false, false);
