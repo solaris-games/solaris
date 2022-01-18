@@ -2,7 +2,7 @@ const ValidationError = require("../errors/validation");
 
 module.exports = class MapService {
 
-    constructor(randomService, starService, starDistanceService, nameService, 
+    constructor(randomService, starService, starDistanceService, nameService,
         circularMapService, spiralMapService, doughnutMapService, circularBalancedMapService, irregularMapService, gameTypeService, customMapService) {
         this.randomService = randomService;
         this.starService = starService;
@@ -19,9 +19,6 @@ module.exports = class MapService {
 
     generateStars(game, starCount, playerLimit, customJSON) {
         let stars = [];
-
-        // Get an array of random star names for however many stars we want.
-        const starNames = this.nameService.getRandomStarNames(starCount);
 
         // Generate all of the locations for stars.
         let starLocations = [];
@@ -50,6 +47,12 @@ module.exports = class MapService {
         }
 
         let isCustomGalaxy = game.settings.galaxy.galaxyType === 'custom';
+
+        if (isCustomGalaxy) starCount = starLocations.length;
+
+        // Get an array of random star names for however many stars we want.
+        const starNames = this.nameService.getRandomStarNames(starCount);
+
         let starNamesIndex = 0;
 
         let unlinkedStars = starLocations.filter(l => !l.linked);
@@ -57,35 +60,33 @@ module.exports = class MapService {
         // Create a star for all locations returned by the map generator
         for (let i = 0; i < unlinkedStars.length; i++) {
             let starLocation = unlinkedStars[i];
-            
+
             let star;
             let starName = starNames[starNamesIndex++];
 
             if (isCustomGalaxy) {
                 star = this.starService.generateCustomGalaxyStar(starName, starLocation);
-            }
-            else {
+            } else {
                 star = this.starService.generateUnownedStar(starName, starLocation, starLocation.resources);
             }
-            
+
             stars.push(star);
 
             if (starLocation.homeStar) {
                 let linkedStars = [];
 
                 for (let linkedLocation of starLocation.linkedLocations) {
-                  let linkedStar;
-                  let linkedStarName = starNames[starNamesIndex++];
+                    let linkedStar;
+                    let linkedStarName = starNames[starNamesIndex++];
 
-                  if (isCustomGalaxy) {
-                    linkedStar = this.starService.generateCustomGalaxyStar(linkedStarName, linkedLocation)
-                  }
-                  else {
-                    linkedStar = this.starService.generateUnownedStar(linkedStarName, linkedLocation, linkedLocation.resources);
-                  }
+                    if (isCustomGalaxy) {
+                        linkedStar = this.starService.generateCustomGalaxyStar(linkedStarName, linkedLocation)
+                    } else {
+                        linkedStar = this.starService.generateUnownedStar(linkedStarName, linkedLocation, linkedLocation.resources);
+                    }
 
-                  stars.push(linkedStar);
-                  linkedStars.push(linkedStar._id);
+                    stars.push(linkedStar);
+                    linkedStars.push(linkedStar._id);
                 }
 
                 game.galaxy.homeStars.push(star._id)

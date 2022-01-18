@@ -3,9 +3,9 @@ const ValidationError = require('../errors/validation');
 const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
 module.exports = class GameCreateService {
-    
-    constructor(gameModel, gameService, gameListService, nameService, 
-        mapService, playerService, passwordService, conversationService, 
+
+    constructor(gameModel, gameService, gameListService, nameService,
+        mapService, playerService, passwordService, conversationService,
         historyService, achievementService, userService, gameCreateValidationService) {
         this.gameModel = gameModel;
         this.gameService = gameService;
@@ -54,7 +54,7 @@ module.exports = class GameCreateService {
                 throw new ValidationError(`You must complete at least one game in order to create a custom game.`);
             }
         }
-        
+
         if (settings.general.name.trim().length < 3 || settings.general.name.trim().length > 24) {
             throw new ValidationError('Game name must be between 3 and 24 characters.');
         }
@@ -98,14 +98,16 @@ module.exports = class GameCreateService {
             };
         }
 
-        if (game.settings.galaxy.galaxyType === 'custom') {
+        let isCustomGalaxy = game.settings.general.type === 'custom';
+
+        if (isCustomGalaxy) {
             game.settings.specialGalaxy.randomWarpGates = 0;
             game.settings.specialGalaxy.randomWormHoles = 0;
             game.settings.specialGalaxy.randomNebulas = 0;
             game.settings.specialGalaxy.randomAsteroidFields = 0;
             game.settings.specialGalaxy.randomBlackHoles = 0;
         }
-        
+
         // If the game name contains a special string, then replace it with a random name.
         if (game.settings.general.name.indexOf(RANDOM_NAME_STRING) > -1) {
             let randomGameName = this.nameService.getRandomGameName();
@@ -117,12 +119,12 @@ module.exports = class GameCreateService {
         game.galaxy.homeStars = [];
         game.galaxy.linkedStars = [];
         game.galaxy.stars = this.mapService.generateStars(
-            game, 
+            game,
             desiredStarCount,
             game.settings.general.playerLimit,
             settings.galaxy.customJSON
         );
-        
+
         // Setup players and assign to their starting positions.
         game.galaxy.players = this.playerService.createEmptyPlayers(game);
         game.galaxy.carriers = this.playerService.createHomeStarCarriers(game);
@@ -141,6 +143,11 @@ module.exports = class GameCreateService {
             this.conversationService.createConversationAllPlayers(game);
         }
 
+        if (isCustomGalaxy) {
+            game.settings.galaxy.starsPerPlayer = game.galaxy.stars.length / game.settings.general.playerLimit;
+            game.settings.player.startingStars = game.galaxy.stars.filter(star => star.ownedByPlayerId !== null).length / game.settings.general.playerLimit;
+        }
+
         this.gameCreateValidationService.validate(game);
 
         let gameObject = await game.save();
@@ -150,7 +157,7 @@ module.exports = class GameCreateService {
         // should only be applied for stars and carriers if its the very first tick.
         // await this.historyService.log(gameObject);
         // ^ Maybe fire an event for the historyService to capture?
-        
+
         return gameObject;
     }
 
@@ -181,7 +188,7 @@ module.exports = class GameCreateService {
     _setupTutorialPlayers(game) {
         // Dump the player who created the game straight into the first slot and set the other slots to AI.
         this.gameService.assignPlayerToUser(game, game.galaxy.players[0], game.settings.general.createdByUserId, `Player`, 0);
-        
+
         for (let i = 1; i < game.galaxy.players.length; i++) {
             const ai = game.galaxy.players[i];
 
