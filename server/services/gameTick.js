@@ -529,6 +529,8 @@ module.exports = class GameTickService extends EventEmitter {
                         experimentTechnology: experimentResult.technology,
                         experimentTechnologyLevel: experimentResult.level,
                         experimentAmount: experimentResult.amount,
+                        experimentLevelUp: experimentResult.levelUp,
+                        experimentResearchingNext: experimentResult.researchingNext,
                         carrierUpkeep: carrierUpkeepResult
                     });
                 }
