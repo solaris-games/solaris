@@ -317,20 +317,16 @@
        ],
        "orbitSpeed":[
           {
-             "value":2.5,
+             "value":1,
              "text":"Slow"
           },
           {
-             "value":5,
+             "value":3,
              "text":"Standard"
           },
           {
-             "value":10,
+             "value":5,
              "text":"Fast"
-          },
-          {
-             "value":25,
-             "text":"Very Fast"
           }
        ]
     },
