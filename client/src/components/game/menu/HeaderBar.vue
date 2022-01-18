@@ -300,7 +300,7 @@ export default {
 
       let menuState = KEYBOARD_SHORTCUTS.all[key]
 
-      if (menuState == null) {
+      if (menuState === null) {
         return this.setMenuState(null, null)
       }
 
