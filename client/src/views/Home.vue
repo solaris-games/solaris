@@ -19,16 +19,16 @@
     </div>
 
     <div class="row mb-3">
-      <div class="carousel slide" data-ride="carousel">
+      <div class="carousel slide w-100" data-ride="carousel">
         <div class="carousel-inner">
           <div class="carousel-item active">
-            <img :src="require('../assets/screenshots/game-carousel-1.png')" class="d-block w-100" alt="Solaris"/>
+              <img :src="require('../assets/screenshots/game-carousel-1.png')" alt="Solaris" class="d-block w-100"/>
           </div>
           <div class="carousel-item">
-            <img :src="require('../assets/screenshots/game-carousel-2.png')" class="d-block w-100" alt="Solaris"/>
+              <img :src="require('../assets/screenshots/game-carousel-2.png')" alt="Solaris" class="d-block w-100"/>
           </div>
           <div class="carousel-item">
-            <img :src="require('../assets/screenshots/game-carousel-3.png')" class="d-block w-100" alt="Solaris"/>
+              <img :src="require('../assets/screenshots/game-carousel-3.png')" alt="Solaris" class="d-block w-100"/>
           </div>
         </div>
       </div>
