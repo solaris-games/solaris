@@ -17,7 +17,7 @@
             <p class="mb-0 text-warning" v-if="isKingOfTheHillMode">Capture and hold the center star to win.</p>
             <p class="mb-0" v-if="game.settings.general.mode === 'battleRoyale'">Battle Royale - {{game.state.stars}} Stars Remaining</p>
             <p class="mb-0" v-if="isKingOfTheHillMode && game.state.ticksToEnd == null"><small>The countdown begins when the center star is captured</small></p>
-            <p class="mb-0 text-danger" v-if="isKingOfTheHillMode && game.state.ticksToEnd != null">Countdown - {{game.state.ticksToEnd}} Ticks Remaining</p>
+            <p class="mb-0 text-danger" v-if="isKingOfTheHillMode && game.state.ticksToEnd != null">Countdown - {{game.state.ticksToEnd}} Ticks Remaining <help-tooltip tooltip="The countdown will reset to 1 cycle if the center star is captured with less than 1 cycle left"/></p>
         </div>
     </div>
 
@@ -150,6 +150,7 @@ import MenuTitle from '../MenuTitle'
 import AudioService from '../../../game/audio'
 import ShareLinkVue from '../welcome/ShareLink'
 import PlayerAvatarVue from '../menu/PlayerAvatar'
+import HelpTooltip from '../../HelpTooltip'
 
 export default {
   components: {
@@ -157,7 +158,8 @@ export default {
     'modalButton': ModalButton,
     'dialogModal': DialogModal,
     'share-link': ShareLinkVue,
-    'player-avatar': PlayerAvatarVue
+    'player-avatar': PlayerAvatarVue,
+    'help-tooltip': HelpTooltip
   },
 
   data () {
