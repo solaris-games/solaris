@@ -18,10 +18,8 @@ export default {
         }
     },
     mounted () {
-        if (!GameHelper.isGameFinished(this.$store.state.game)) {
-            this.recalculateTime();
-            this.intervalFunction = setInterval(this.recalculateTime, 1000);
-        }
+        this.recalculateTime();
+        this.intervalFunction = setInterval(this.recalculateTime, 1000);
     },
     destroyed () {
         if (this.intervalFunction) {
