@@ -76,7 +76,7 @@ module.exports = class GameListService {
         }));
     }
 
-    async listRecentlyCompletedGames(select) {
+    async listRecentlyCompletedGames(select, limit = 20) {
         select = select || {
             'settings.general.type': 1,
             'settings.general.featured': 1,
@@ -91,7 +91,7 @@ module.exports = class GameListService {
         },
         select,
         { 'state.endDate': -1 },
-        10);
+        limit);
     }
 
     async listUserCompletedGames(userId) {

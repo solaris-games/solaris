@@ -1,15 +1,7 @@
 db.games.updateMany({
-    'settings.orbitalMechanics.orbitOrigin': { $ne: null }
+    'settings.orbitalMechanics.orbitSpeed': { $gt: 5 }
 }, {
-    $unset: {
-        'settings.orbitalMechanics.orbitOrigin': 1
-    }
-});
-
-db.users.updateMany({
-    'gameSettings.map.background.backgroundStars': { $ne: null }
-}, {
-    $unset: {
-        'gameSettings.map.background.backgroundStars': 1
+    $set: {
+        'settings.orbitalMechanics.orbitSpeed': 5
     }
 });

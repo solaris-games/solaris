@@ -238,7 +238,7 @@
         <div class="tab-pane fade" id="inProgressGames">
           <h4>In Progress Games</h4>
 
-          <p class="mb-1">These games are in progress, you can join games with open slots. <b>Fill slots to earn additional rank!</b></p>
+          <p class="mb-1">These games are in progress, you can join games with open slots. <b>Fill slots to earn additional rank!</b> <help-tooltip class="ml-1" tooltip="Players who fill an AFK slot and will be awarded 1.5x additional rank (minimum 1) when the game ends"/></p>
 
           <p class="mb-2"><small class="text-warning" v-if="inProgressGames.length">Total Games: {{inProgressGames.length}}</small></p>
 
@@ -340,6 +340,7 @@ import TutorialGame from '../components/game/menu/TutorialGame'
 import gameService from '../services/api/game'
 import GameHelper from '../services/gameHelper'
 import RandomHelper from '../services/randomHelper'
+import HelpTooltip from '../components/HelpTooltip'
 import * as moment from 'moment'
 
 export default {
@@ -347,7 +348,8 @@ export default {
     'loading-spinner': LoadingSpinnerVue,
     'view-container': ViewContainer,
     'view-title': ViewTitle,
-    'tutorial-game': TutorialGame
+    'tutorial-game': TutorialGame,
+    'help-tooltip': HelpTooltip
   },
   data () {
     return {
