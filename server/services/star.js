@@ -671,7 +671,8 @@ module.exports = class StarService extends EventEmitter {
         }
 
         if (this.gameTypeService.isKingOfTheHillMode(game) && 
-            this.gameStateService.isCountingDownToEndInLastCycle(game)) {
+            this.gameStateService.isCountingDownToEndInLastCycle(game) &&
+            this.isKingOfTheHillStar(star)) {
             this.gameStateService.setCountdownToEndToOneCycle(game);
         }
 
@@ -737,6 +738,12 @@ module.exports = class StarService extends EventEmitter {
         const center = this.starDistanceService.getGalacticCenter();
 
         return game.galaxy.stars.find(s => s.location.x === center.x && s.location.y === center.y);
+    }
+
+    isKingOfTheHillStar(star) {
+        const center = this.starDistanceService.getGalacticCenter();
+
+        return star.location.x === center.x && star.location.y === center.y;
     }
 
 }

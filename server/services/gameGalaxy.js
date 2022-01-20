@@ -330,6 +330,7 @@ module.exports = class GameGalaxyService {
     }
 
     _setCarrierInfoDetailed(doc, player) {
+        const isFinished = this.gameStateService.isFinished(doc);
         const isOrbital = this.gameTypeService.isOrbitalMode(doc);
 
         // If the game hasn't finished we need to filter and sanitize carriers.
@@ -350,7 +351,9 @@ module.exports = class GameGalaxyService {
                     c.specialist = this.specialistService.getByIdCarrier(c.specialistId)
                 }
 
-                if (player && !this.carrierService.canPlayerSeeCarrierShips(doc, player, c)) {
+                let canSeeCarrierShips = isFinished || (player && this.carrierService.canPlayerSeeCarrierShips(doc, player, c));
+
+                if (!canSeeCarrierShips) {
                     c.ships = null;
                 }
 
