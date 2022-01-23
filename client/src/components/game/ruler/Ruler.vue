@@ -46,14 +46,12 @@
     </div>
     <div class="row bg-primary pt-2 pb-2">
       <div class="col-6">
-      Speed Mod.
+      Speed Modifier
       </div>
       <div class="col-6 text-right">
         <select class="form-control form-control-sm" v-model="speedModifier" @change="onSpeedModifierChanged">
-          <option value="1">Normal (1.0x)</option>
-          <option value="0.5">0.5x</option>
-          <option value="1.5">1.5x</option>
-          <option value="2.0">2.0x</option>
+          <option value="1">1.0x (Normal)</option>
+          <option v-for="speed in speeds" v-bind:key="speed" :value="speed">{{speed}}x</option>
         </select>
       </div>
     </div>
@@ -64,12 +62,10 @@
        Speed Modifier
     </div>
     <div class="col-6 text-right">
-    <select class="form-control form-control-sm" v-model="speedModifier" @change="onSpeedModifierChanged">
-      <option value="1">Normal (1.0x)</option>
-      <option value="0.5">0.5x</option>
-      <option value="1.5">1.5x</option>
-      <option value="2.0">2.0x</option>
-    </select>
+      <select class="form-control form-control-sm" v-model="speedModifier" @change="onSpeedModifierChanged">
+        <option value="1">1.0x (Normal)</option>
+        <option v-for="speed in speeds" v-bind:key="speed" :value="speed">{{speed}}x</option>
+      </select>
     </div>
   </div>
   <div class="row bg-secondary pt-2 pb-2">
@@ -152,17 +148,14 @@ import MenuTitleVue from '../MenuTitle'
 import GameContainer from '../../../game/container'
 import GameHelper from '../../../services/gameHelper'
 import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning'
-import SpecialistService from '../../../services/api/specialist'
 
 export default {
   components: {
     'menu-title': MenuTitleVue,
-    'orbital-mechanics-eta-warning': OrbitalMechanicsETAWarningVue
+    'orbital-mechanics-eta-warning': OrbitalMechanicsETAWarningVue,
   },
   data () {
     return {
-      isLoading: false,
-      carrierSpecialists: [],
       points: [],
       etaTicks: 0,
       distanceLightYears: 0,
@@ -172,13 +165,14 @@ export default {
       totalEtaWarp: '',
       isStandardUIStyle: false,
       isCompactUIStyle: false,
-      speedModifier: 1
+      speedModifier: 1,
+      speeds: []
     }
   },
-  async mounted () {
-    await this.loadSpecialists()
+  mounted () {
     this.isStandardUIStyle = this.$store.state.settings.interface.uiStyle === 'standard'
     this.isCompactUIStyle = this.$store.state.settings.interface.uiStyle === 'compact'
+    this.getSpecialistSpeeds()
 
     // Set map to ruler mode
     GameContainer.setMode('ruler')
@@ -191,15 +185,6 @@ export default {
     GameContainer.resetMode()
   },
   methods: {
-    async loadSpecialists () {
-      this.isLoading = true
-      let requests = [ SpecialistService.getCarrierSpecialists( this.$store.state.game._id ) ]
-
-      const responses = await Promise.all(requests)
-
-      this.carrierSpecialists = responses[0].data
-      this.isLoading = false
-    },
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
     },
@@ -215,13 +200,8 @@ export default {
       this.points.push(e)
       if (e.type == 'carrier' && this.points.length == 1) {
         this.speedModifier = 1;
-        if (e.object.specialistId ) {
-          for (let i = 0; i < this.carrierSpecialists.length - 1; i++) {
-            if ( this.carrierSpecialists[i].id == e.object.specialistId  && this.carrierSpecialists[i].modifiers.local.speed ) {
-              this.speedModifier = this.carrierSpecialists[i].modifiers.local.speed
-              break
-            }
-          }
+        if (e.object.specialistId && e.object.specialist.modifiers.local.speed  ) {
+          this.speedModifier = e.object.specialist.modifiers.local.speed
         }
       }
       this.recalculateAll()
@@ -240,6 +220,16 @@ export default {
       if (this.points.length > 1) {
         this.recalculateETAs()
       }
+    },
+    getSpecialistSpeeds() {
+      let speedSpecialists = this.$store.state.carrierSpecialists.filter(i => i.modifiers.local && i.modifiers.local.speed)
+      for (let i = 0; i < speedSpecialists.length; i++) {
+        let spec = speedSpecialists[i]
+        if (spec.modifiers && spec.modifiers.local && spec.modifiers.local.speed && !this.speeds.includes(spec.modifiers.local.speed)) {
+          this.speeds.push(spec.modifiers.local.speed)
+        }
+      }
+      this.speeds = this.speeds.sort()
     },
     recalculateAll () {
       this.recalculateETAs()
