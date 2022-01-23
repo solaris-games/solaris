@@ -1,7 +1,8 @@
 <template>
 <div class="menu-page container">
-    <menu-title title="Ruler" @onCloseRequested="onCloseRequested">
-        <button class="btn btn-sm btn-primary" @click="resetRulerPoints"><i class="fas fa-undo"></i> Reset</button>
+
+  <menu-title title="Ruler" @onCloseRequested="onCloseRequested">
+       <button class="btn btn-sm btn-primary" @click="resetRulerPoints"><i class="fas fa-undo"></i> Reset</button>
         <button class="btn btn-sm btn-warning ml-1" @click="popRulerPoint" :disabled="points.length === 0"><i class="fas fa-undo"></i> Last</button>
     </menu-title>
     <div v-if="isCompactUIStyle">
@@ -43,10 +44,35 @@
           </span>
       </div>
     </div>
+    <div class="row bg-primary pt-2 pb-2">
+      <div class="col-6">
+      Speed Mod.
+      </div>
+      <div class="col-6 text-right">
+        <select class="form-control form-control-sm" v-model="speedModifier" @change="onSpeedModifierChanged">
+          <option value="1">Normal (1.0x)</option>
+          <option value="0.5">0.5x</option>
+          <option value="1.5">1.5x</option>
+          <option value="2.0">2.0x</option>
+        </select>
+      </div>
     </div>
-
-    <div v-if="isStandardUIStyle">
-      <div class="row bg-secondary pt-2 pb-2">
+  </div>
+<div v-if="isStandardUIStyle">
+  <div class="row bg-primary pt-2 pb-2">
+    <div class="col-6">
+       Speed Modifier
+    </div>
+    <div class="col-6 text-right">
+    <select class="form-control form-control-sm" v-model="speedModifier" @change="onSpeedModifierChanged">
+      <option value="1">Normal (1.0x)</option>
+      <option value="0.5">0.5x</option>
+      <option value="1.5">1.5x</option>
+      <option value="2.0">2.0x</option>
+    </select>
+    </div>
+  </div>
+  <div class="row bg-secondary pt-2 pb-2">
           <div class="col-6">
               Waypoints
           </div>
@@ -126,6 +152,7 @@ import MenuTitleVue from '../MenuTitle'
 import GameContainer from '../../../game/container'
 import GameHelper from '../../../services/gameHelper'
 import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning'
+import SpecialistService from '../../../services/api/specialist'
 
 export default {
   components: {
@@ -134,6 +161,8 @@ export default {
   },
   data () {
     return {
+      isLoading: false,
+      carrierSpecialists: [],
       points: [],
       etaTicks: 0,
       distanceLightYears: 0,
@@ -142,10 +171,12 @@ export default {
       totalEta: '',
       totalEtaWarp: '',
       isStandardUIStyle: false,
-      isCompactUIStyle: false
+      isCompactUIStyle: false,
+      speedModifier: 1
     }
   },
-  mounted () {
+  async mounted () {
+    await this.loadSpecialists()
     this.isStandardUIStyle = this.$store.state.settings.interface.uiStyle === 'standard'
     this.isCompactUIStyle = this.$store.state.settings.interface.uiStyle === 'compact'
 
@@ -160,6 +191,15 @@ export default {
     GameContainer.resetMode()
   },
   methods: {
+    async loadSpecialists () {
+      this.isLoading = true
+      let requests = [ SpecialistService.getCarrierSpecialists( this.$store.state.game._id ) ]
+
+      const responses = await Promise.all(requests)
+
+      this.carrierSpecialists = responses[0].data
+      this.isLoading = false
+    },
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
     },
@@ -173,7 +213,17 @@ export default {
     },
     onRulerPointCreated (e) {
       this.points.push(e)
-
+      if (e.type == 'carrier' && this.points.length == 1) {
+        this.speedModifier = 1;
+        if (e.object.specialistId ) {
+          for (let i = 0; i < this.carrierSpecialists.length - 1; i++) {
+            if ( this.carrierSpecialists[i].id == e.object.specialistId  && this.carrierSpecialists[i].modifiers.local.speed ) {
+              this.speedModifier = this.carrierSpecialists[i].modifiers.local.speed
+              break
+            }
+          }
+        }
+      }
       this.recalculateAll()
     },
     onRulerPointRemoved (e) {
@@ -186,6 +236,11 @@ export default {
 
       this.recalculateAll()
     },
+    onSpeedModifierChanged (e) {
+      if (this.points.length > 1) {
+        this.recalculateETAs()
+      }
+    },
     recalculateAll () {
       this.recalculateETAs()
       this.recalculateHyperspaceScanningLevel()
@@ -195,8 +250,8 @@ export default {
       let game = this.$store.state.game
       let locations = this.points.map(p => p.location)
 
-      let totalTicks = GameHelper.getTicksBetweenLocations(game, null, locations)
-      let totalTicksWarp = GameHelper.getTicksBetweenLocations(game, null, locations, game.constants.distances.warpSpeedMultiplier)
+      let totalTicks = GameHelper.getTicksBetweenLocations(game, null, locations, this.speedModifier)
+      let totalTicksWarp = GameHelper.getTicksBetweenLocations(game, null, locations, game.constants.distances.warpSpeedMultiplier * this.speedModifier)
 
       let totalTimeString = GameHelper.getCountdownTimeStringByTicks(game, totalTicks, true)
       let totalTimeWarpString = GameHelper.getCountdownTimeStringByTicks(game, totalTicksWarp, true)
@@ -257,7 +312,7 @@ export default {
       for (let starId of starIds) {
         sum += starPoints.find(p => p.object._id === starId).object.upgradeCosts.warpGate
       }
-      
+
       return sum
     }
   }
