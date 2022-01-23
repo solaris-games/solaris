@@ -19,13 +19,13 @@
 
         <div v-if="star.isNebula">
           <hr/>
-          <p class="mb-0">This star is hidden inside a <span class="text-warning">Nebula</span>.</p>
+          <p class="mb-0">This star is hidden inside a <span class="text-warning">Nebula</span><i class="fas fa-eye-slash ml-1"></i>.</p>
           <p class="mb-2 text-info"><small><i>Ships inside a Nebula are hidden from all other players.</i></small></p>
         </div>
 
         <div v-if="star.isAsteroidField">
           <hr/>
-          <p class="mb-0" v-if="star.isAsteroidField">This star is surrounded by an <span class="text-warning">Asteroid Field</span>.</p>
+          <p class="mb-0" v-if="star.isAsteroidField">This star is surrounded by an <span class="text-warning">Asteroid Field</span><i class="fas fa-meteor ml-1"></i>.</p>
           <p class="mb-2 text-info" v-if="star.isAsteroidField"><small><i>Asteroid Fields start with additional natural resources and x2 Defender Bonus (net +2 Weapons).</i></small></p>
         </div>
 
@@ -38,11 +38,11 @@
         <div v-if="star.warpGate">
         <hr/>
           <p class="mb-0">This star has a <strong>Warp Gate</strong><i class="fas fa-dungeon ml-2"></i>.</p>
-          <p class="mb-2 text-info"><small><i>Carriers travel {{ warpSpeedMultiplier }}x faster between warp gates.</i></small></p>
+          <p class="mb-2 text-info"><small><i>Carriers travel {{ warpSpeedMultiplier }}x faster between active warp gates.</i></small></p>
         </div>
         <div v-if="star.isBlackHole">
           <hr/>
-          <p class="mb-0" v-if="star.isBlackHole">This star is a <span class="text-warning">Black Hole</span>.</p>
+          <p class="mb-0" v-if="star.isBlackHole">This star is a <span class="text-warning">Black Hole</span><i class="far fa-circle ml-1"></i>.</p>
           <p class="mb-2 text-info" v-if="star.isBlackHole"><small><i>Black Holes have +3 Scanning Range but have reduced natural resources.</i></small></p>
         </div>
       </div>
