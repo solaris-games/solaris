@@ -296,7 +296,7 @@ module.exports = class GameService extends EventEmitter {
     }
 
     assignPlayerToUser(game, player, userId, alias, avatar) {
-        let isAfker = game.afkers.find(x => x.equals(userId));
+        let isAfker = game.afkers.find(x => x.equals(userId)) != null;
         let isRejoiningAfkSlot = this.gameStateService.isInProgress(game) && isAfker && player.afk && player.userId === userId.toString();
 
         // Assign the user to the player.
