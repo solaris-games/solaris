@@ -69,11 +69,14 @@ module.exports = class GameListService {
         return await Promise.all(games.map(async game => {
             game.userNotifications = await this.getUserPlayerNotifications(game, userId, true, true, true);
 
+            delete game.conversations;
+            delete game.galaxy;
+
             return game;
         }));
     }
 
-    async listRecentlyCompletedGames(select) {
+    async listRecentlyCompletedGames(select, limit = 20) {
         select = select || {
             'settings.general.type': 1,
             'settings.general.featured': 1,
@@ -88,7 +91,7 @@ module.exports = class GameListService {
         },
         select,
         { 'state.endDate': -1 },
-        10);
+        limit);
     }
 
     async listUserCompletedGames(userId) {
@@ -116,6 +119,9 @@ module.exports = class GameListService {
 
         return await Promise.all(games.map(async game => {
             game.userNotifications = await this.getUserPlayerNotifications(game, userId, false, false, true);
+
+            delete game.conversations;
+            delete game.galaxy;
 
             return game;
         }));

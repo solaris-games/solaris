@@ -411,7 +411,8 @@ export default {
         'galacticCenter': 'Galactic Center',
         'galacticCenterOfMass': 'Galactic Center of Mass',
         'starPercentage': 'Star Percentage',
-        'homeStarPercentage': 'Capital Star Percentage'
+        'homeStarPercentage': 'Capital Star Percentage',
+        'kingOfTheHill': 'King Of The Hill'
       }[option]
 
       return text || option

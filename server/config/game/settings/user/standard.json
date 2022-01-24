@@ -49,7 +49,7 @@
     },
     "orbitalMechanics":{
        "enabled":"disabled",
-       "orbitSpeed":5
+       "orbitSpeed":3
     },
     "player":{
        "startingStars":6,

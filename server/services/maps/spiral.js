@@ -21,7 +21,7 @@ module.exports = class SpiralMapService {
             branchCount = 3;
         }
 
-        let locations = this.generateSpiral(count, branchCount);
+        let locations = this.generateSpiral(game, count, branchCount);
 
         // TODO: Temporarily removed this as it screws with player positioning.
         // This service should be responsible for plotting where player home stars are as
@@ -37,7 +37,7 @@ module.exports = class SpiralMapService {
         return locations;
     }
 
-    generateSpiral(locationCount, branchCount) {
+    generateSpiral(game, locationCount, branchCount) {
         const locations = [];
 
         if (this.gameTypeService.isKingOfTheHillMode(game)) {

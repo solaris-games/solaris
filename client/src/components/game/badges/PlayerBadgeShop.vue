@@ -8,29 +8,14 @@
         <div class="col text-center pt-3">
             <p class="mb-1" v-if="recipientPlayer">Buy <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{recipientPlayer.alias}}</a> a <strong>Badge of Honor</strong>.</p>
             
-            <p v-if="userInfo"><small>You have <span class="text-warning"><strong>{{userInfo.credits}}</strong> Galactic Credits</span>.</small></p>
+            <p v-if="userCredits"><small>You have <span class="text-warning"><strong>{{userCredits.credits}}</strong> Galactic Credits</span>.</small></p>
         </div>
     </div>
 
     <loading-spinner :loading="isLoading"/>
 
-    <div class="pt-3 pb-1">
-        <div class="row mb-5" v-for="badge in badges" :key="badge.key">
-            <div class="col-auto">
-                <img :src="require(`../../../assets/badges/${badge.key}.png`)"/>
-
-                <button class="btn btn-block btn-sm btn-success" :disabled="isLoading" v-if="userInfo.credits >= badge.price" @click="purchaseBadge(badge)">
-                    <i class="fas fa-shopping-basket"></i> {{badge.price}} Credit<span v-if="badge.price > 1">s</span>
-                </button>
-                <router-link :to="{ name: 'galactic-credits-shop'}" :disabled="isLoading" class="btn btn-block btn-sm btn-danger" v-if="userInfo.credits < badge.price">
-                    <i class="fas fa-coins"></i> {{badge.price}} Credit<span v-if="badge.price > 1">s</span>
-                </router-link>
-            </div>
-            <div class="col">
-                <h5>{{badge.name}}</h5>
-                <p><small>{{badge.description}}</small></p>
-            </div>
-        </div>
+    <div class="pt-3 pb-3" v-if="!isLoading">
+        <badge-shop-list :badges="badges" :userCredits="userCredits.credits" :recipientName="recipientPlayer.alias" @onPurchaseBadgeConfirmed="onPurchaseBadgeConfirmed" />
     </div>
 </div>
 </template>
@@ -41,11 +26,13 @@ import LoadingSpinner from '../../LoadingSpinner'
 import BadgeApiService from '../../../services/api/badge'
 import UserApiService from '../../../services/api/user'
 import GameHelper from '../../../services/gameHelper'
+import BadgeShopList from './BadgeShopList'
 
 export default {
   components: {
     'menu-title': MenuTitle,
-    'loading-spinner': LoadingSpinner
+    'loading-spinner': LoadingSpinner,
+    'badge-shop-list': BadgeShopList
   },
   props: {
     recipientPlayerId: String
@@ -53,7 +40,7 @@ export default {
   data () {
     return {
         isLoading: false,
-        userInfo: null,
+        userCredits: null,
         badges: [],
         recipientPlayer: null
     }
@@ -75,10 +62,10 @@ export default {
         this.isLoading = true
 
         try {
-            let response = await UserApiService.getMyUserInfo()
+            let response = await UserApiService.getUserCredits()
 
             if (response.status === 200) {
-                this.userInfo = response.data
+                this.userCredits = response.data
             }
         } catch (err) {
             console.error(err)
@@ -101,11 +88,7 @@ export default {
 
         this.isLoading = false
     },
-    async purchaseBadge (badge) {
-        if (!await this.$confirm(`Purchase Badge`, `Are you sure you want to purchase the '${badge.name}' badge for ${this.recipientPlayer.alias}? It will cost ${badge.price} credit(s).`)) {
-            return
-        }
-
+    async onPurchaseBadgeConfirmed (badge) {
         this.isLoading = true
             
         try {
@@ -127,8 +110,4 @@ export default {
 </script>
 
 <style scoped>
-img {
-    width: 128px;
-    height: 128px;
-}
 </style>

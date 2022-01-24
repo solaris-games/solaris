@@ -105,6 +105,18 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.get('/api/user/credits', middleware.authenticate, async (req, res, next) => {
+        try {
+            let credits = await container.userService.getUserCredits(req.session.userId);
+
+            return res.status(200).json({
+                credits
+            });
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.get('/api/user/', middleware.authenticate, async (req, res, next) => {
         try {
             let user = await container.userService.getMe(req.session.userId);
