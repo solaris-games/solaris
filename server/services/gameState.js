@@ -3,7 +3,7 @@ const moment = require('moment');
 module.exports = class GameStateService {
 
     isInProgress(game) {
-        return game.state.startDate && !game.state.endDate;
+        return game.state.startDate != null && game.state.endDate == null;
     }
 
     isStarted(game) {

@@ -72,12 +72,6 @@
         </div>
       </div>
 
-      <div v-if="settings.map.territoryStyle!=='disabled'" class="row bg-secondary pt-1 pb-1 ml-1">
-        <div class="col">
-          <p class="text-warning mb-0"><small>Warning: Map territories will degrade performance when loading the game, especially in very large galaxies.</small></p>
-        </div>
-      </div>
-
       <div v-if="settings.map.territoryStyle=='marching-square'" class="row bg-secondary pt-1 pb-1 ml-1">
         <label for="territory-size" class="col-12 col-sm-6 col-form-label">Territory Size</label>
         <div class="col-12 col-sm-6">
