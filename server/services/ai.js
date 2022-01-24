@@ -9,6 +9,7 @@ const mongoose = require("mongoose");
 const DEFEND_STAR_ACTION = 'DEFEND_STAR';
 const CLAIM_STAR_ACTION = 'CLAIM_STAR';
 const REINFORCE_STAR_ACTION = 'REINFORCE_STAR';
+const INVADE_STAR_ACTION = 'INVADE_STAR';
 
 const EMPTY_STAR_SCORE_MULTIPLIER = 1;
 const ENEMY_STAR_SCORE_MULTIPLIER = 5;
@@ -513,7 +514,9 @@ module.exports = class AIService {
     priorityFromOrderCategory(category) {
         switch (category) {
             case DEFEND_STAR_ACTION:
-                return 3;
+                return 4;
+            case INVADE_STAR_ACTION:
+                return 3
             case CLAIM_STAR_ACTION:
                 return 2;
             case REINFORCE_STAR_ACTION:
@@ -552,10 +555,39 @@ module.exports = class AIService {
 
     _gatherOrders(game, player, context) {
         const defenseOrders = this._gatherDefenseOrders(game, player, context);
-        //For now, just expand to unowned stars. Later, we will launch attacks on other players.
+        const invasionOrders = this._gatherInvasionOrders(game, player, context);
         const expansionOrders = this._gatherExpansionOrders(game, player, context);
         const movementOrders = this._gatherMovementOrders(game, player, context);
-        return defenseOrders.concat(expansionOrders, movementOrders);
+        return defenseOrders.concat(invasionOrders, expansionOrders, movementOrders);
+    }
+
+    _isEnemyStar(game, player, context, star) {
+        return true; //TODO
+    }
+
+    _getStarInvasionScore(star) {
+        return star.infrastructure.economy + (2 * star.infrastructure.industry) + (3 * star.infrastructure.science);
+    }
+
+    _gatherInvasionOrders(game, player, context) {
+        const orders = [];
+
+        for (const [fromId, reachables] of context.allReachableFromPlayerStars) {
+            for (const reachable in reachables) {
+                const star = context.starsById.get(reachable);
+                if (this._isEnemyStar(star)) {
+                    const score = this._getStarInvasionScore(star);
+
+                    orders.push({
+                        type: INVADE_STAR_ACTION,
+                        star: reachable,
+                        score
+                    })
+                }
+            }
+        }
+
+        return orders;
     }
 
     _claimInProgress(player, starId) {
