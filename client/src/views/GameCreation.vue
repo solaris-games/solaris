@@ -187,7 +187,7 @@
         <textarea id='customJSON' class='col' v-model='settings.galaxy.customJSON' rows="10"></textarea>
       </div>
 
-      <div class="form-group">
+      <div class="form-group" v-if="settings.galaxy.galaxyType !== 'custom'">
         <label for="starsPerPlayer" class="col-form-label">Stars per Player (<span class="text-warning">{{settings.galaxy.starsPerPlayer}} stars</span>) <help-tooltip tooltip="How many stars will be generated per player in the galaxy"/></label>
         <div class="col">
           <input type="range" min="3" max="50" step="1" class="form-range w-100" id="starsPerPlayer" v-model="settings.galaxy.starsPerPlayer" :disabled="isCreatingGame">
@@ -377,7 +377,7 @@
 
       <view-subtitle title="Player Settings"/>
 
-      <div class="form-group">
+      <div class="form-group" v-if="settings.galaxy.galaxyType !== 'custom'">
         <label for="startingStars" class="col-form-label">Starting Stars (<span class="text-warning">{{settings.player.startingStars}} stars</span>) <help-tooltip tooltip="Determines how many stars each player is allocated at the start of the game"/></label>
         <div class="col">
           <input type="range" min="1" max="10" step="1" class="form-range w-100" id="startingStars" v-model="settings.player.startingStars" :disabled="isCreatingGame">
