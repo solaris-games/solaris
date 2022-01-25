@@ -1104,6 +1104,10 @@ class GameHelper {
         actualStatus
     }
   }
+
+  isNewPlayerGame (game) {
+    return ['new_player_rt', 'new_player_tb'].includes(game.settings.general.type)
+  }
 }
 
 export default new GameHelper()
