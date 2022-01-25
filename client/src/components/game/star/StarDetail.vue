@@ -17,30 +17,30 @@
         <p class="mb-2 text-danger" v-if="star.targeted">This star has been targeted for destruction.</p>
         <p class="mb-2 text-danger" v-if="star.isKingOfTheHillStar">Capture and hold this star to win.</p>
 
-        <div v-if="star.isNebula">
+        <div v-if="(!isCompactUIStyle || !star.ownedByPlayerId) && star.isNebula">
           <hr/>
           <p class="mb-0">This star is hidden inside a <span class="text-warning">Nebula <i class="fas fa-eye-slash"></i></span>.</p>
           <p class="mb-2 text-info"><small><i>Ships inside a Nebula are hidden from all other players.</i></small></p>
         </div>
 
-        <div v-if="star.isAsteroidField">
+        <div v-if="(!isCompactUIStyle || !star.ownedByPlayerId) && star.isAsteroidField">
           <hr/>
           <p class="mb-0" v-if="star.isAsteroidField">This star is surrounded by an <span class="text-warning">Asteroid Field <i class="fas fa-meteor"></i></span>.</p>
           <p class="mb-2 text-info" v-if="star.isAsteroidField"><small><i>Asteroid Fields start with additional natural resources and x2 Defender Bonus (net +2 Weapons).</i></small></p>
         </div>
         
-        <div v-if="star.wormHoleToStarId">
+        <div v-if="(!isCompactUIStyle || !star.ownedByPlayerId) && star.wormHoleToStarId">
           <hr/>
           <p class="mb-0" v-if="wormHolePairStar">This star is a <span class="text-warning">Worm Hole <i class="far fa-sun"></i></span> to <a href="javascript:;" @click="viewOnMap(wormHolePairStar)"><i class="fas fa-eye mr-1"></i>{{wormHolePairStar.name}}</a>.</p>
           <p class="mb-0" v-if="!wormHolePairStar">This star is a <span class="text-warning">Worm Hole <i class="far fa-sun"></i></span> to an unknown star.</p>
           <p class="mb-2 text-info"><small><i>Travel between Worm Holes takes 1 tick.</i></small></p>
         </div>
-        <div v-if="star.warpGate">
+        <div v-if="(!isCompactUIStyle || !star.ownedByPlayerId) && star.warpGate">
         <hr/>
           <p class="mb-0">This star has a <span class="text-warning">Warp Gate <i class="fas fa-dungeon"></i></span>.</p>
           <p class="mb-2 text-info"><small><i>Carriers travel {{ warpSpeedMultiplier }}x faster between active warp gates.</i></small></p>
         </div>
-        <div v-if="star.isBlackHole">
+        <div v-if="(!isCompactUIStyle || !star.ownedByPlayerId) && star.isBlackHole">
           <hr/>
           <p class="mb-0" v-if="star.isBlackHole">This star is a <span class="text-warning">Black Hole <i class="far fa-circle"></i></span>.</p>
           <p class="mb-2 text-info" v-if="star.isBlackHole"><small><i>Black Holes have +3 Scanning Range but have reduced natural resources.</i></small></p>
