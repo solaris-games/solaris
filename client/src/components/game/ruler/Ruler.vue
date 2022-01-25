@@ -44,22 +44,11 @@
           </span>
       </div>
     </div>
-    <div class="row bg-primary pt-2 pb-2">
-      <div class="col-6">
-      Speed Modifier
-      </div>
-      <div class="col-6 text-right">
-        <select class="form-control form-control-sm" v-model="speedModifier" @change="onSpeedModifierChanged">
-          <option value="1">1.0x (Normal)</option>
-          <option v-for="speed in speeds" v-bind:key="speed" :value="speed">{{speed}}x</option>
-        </select>
-      </div>
-    </div>
   </div>
-<div v-if="isStandardUIStyle">
+
   <div class="row bg-primary pt-2 pb-2">
     <div class="col-6">
-       Speed Modifier
+    Speed Modifier
     </div>
     <div class="col-6 text-right">
       <select class="form-control form-control-sm" v-model="speedModifier" @change="onSpeedModifierChanged">
@@ -68,6 +57,8 @@
       </select>
     </div>
   </div>
+
+<div v-if="isStandardUIStyle">
   <div class="row bg-secondary pt-2 pb-2">
           <div class="col-6">
               Waypoints
@@ -152,7 +143,7 @@ import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning'
 export default {
   components: {
     'menu-title': MenuTitleVue,
-    'orbital-mechanics-eta-warning': OrbitalMechanicsETAWarningVue,
+    'orbital-mechanics-eta-warning': OrbitalMechanicsETAWarningVue
   },
   data () {
     return {
@@ -165,14 +156,12 @@ export default {
       totalEtaWarp: '',
       isStandardUIStyle: false,
       isCompactUIStyle: false,
-      speedModifier: 1,
-      speeds: []
+      speedModifier: 1
     }
   },
   mounted () {
     this.isStandardUIStyle = this.$store.state.settings.interface.uiStyle === 'standard'
     this.isCompactUIStyle = this.$store.state.settings.interface.uiStyle === 'compact'
-    this.getSpecialistSpeeds()
 
     // Set map to ruler mode
     GameContainer.setMode('ruler')
@@ -200,7 +189,7 @@ export default {
       this.points.push(e)
       if (e.type == 'carrier' && this.points.length == 1) {
         this.speedModifier = 1;
-        if (e.object.specialistId && e.object.specialist.modifiers.local.speed  ) {
+        if (e.object.specialistId && e.object.specialist.modifiers && e.object.specialist.modifiers.local && e.object.specialist.modifiers.local.speed  ) {
           this.speedModifier = e.object.specialist.modifiers.local.speed
         }
       }
@@ -220,16 +209,6 @@ export default {
       if (this.points.length > 1) {
         this.recalculateETAs()
       }
-    },
-    getSpecialistSpeeds() {
-      let speedSpecialists = this.$store.state.carrierSpecialists.filter(i => i.modifiers.local && i.modifiers.local.speed)
-      for (let i = 0; i < speedSpecialists.length; i++) {
-        let spec = speedSpecialists[i]
-        if (spec.modifiers && spec.modifiers.local && spec.modifiers.local.speed && !this.speeds.includes(spec.modifiers.local.speed)) {
-          this.speeds.push(spec.modifiers.local.speed)
-        }
-      }
-      this.speeds = this.speeds.sort()
     },
     recalculateAll () {
       this.recalculateETAs()
@@ -304,6 +283,11 @@ export default {
       }
 
       return sum
+    },
+    speeds: function () {
+      let speedSpecialists = this.$store.state.carrierSpecialists.filter(i => i.modifiers && i.modifiers.local && i.modifiers.local.speed)
+
+      return [...new Set(speedSpecialists.map(s => s.modifiers.local.speed))].sort()
     }
   }
 }
