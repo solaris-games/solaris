@@ -49,7 +49,7 @@ module.exports = class MapService {
         let isCustomGalaxy = game.settings.galaxy.galaxyType === 'custom';
 
         // Get an array of random star names for however many stars we want.
-        const starNames = this.nameService.getRandomStarNames(isCustomGalaxy ? Math.min(32 * 50, starLocations.length) : starCount);
+        const starNames = this.nameService.getRandomStarNames(isCustomGalaxy ? Math.min(playerLimit * 50, starLocations.length) : starCount);
 
         let starNamesIndex = 0;
 
