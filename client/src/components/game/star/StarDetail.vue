@@ -321,7 +321,8 @@ export default {
       canDestroyWarpGates: false,
       isSpecialistsEnabled: false,
       isStandardUIStyle: false,
-      isCompactUIStyle: false
+      isCompactUIStyle: false,
+      warpSpeedMultiplier: '',
     }
   },
   mounted () {
@@ -332,7 +333,8 @@ export default {
 
     this.canBuildWarpGates = this.$store.state.game.settings.specialGalaxy.warpgateCost !== 'none'
     this.canDestroyWarpGates = this.$store.state.game.state.startDate != null
-    
+    this.warpSpeedMultiplier = this.$store.state.game.constants.distances.warpSpeedMultiplier
+
     // Can display specialist section if sepcialists are enabled and the star is owned by a player.
     // Otherwise if the star is unowned then display only if the star is within scanning range and it has a specialist on it.
     this.isSpecialistsEnabled = this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none'
