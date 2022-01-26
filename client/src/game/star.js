@@ -46,6 +46,7 @@ class Star extends EventEmitter {
     this.graphics_star = new PIXI.Graphics()
     this.graphics_targeted = new PIXI.Graphics()
     this.graphics_selected = new PIXI.Graphics()
+    this.graphics_kingOfTheHill = new PIXI.Graphics()
 
     this.container.addChild(this.graphics_star)
     this.container.addChild(this.graphics_shape_part)
@@ -54,6 +55,7 @@ class Star extends EventEmitter {
     this.container.addChild(this.graphics_shape_full_warp)
     this.container.addChild(this.graphics_targeted)
     this.container.addChild(this.graphics_selected)
+    this.container.addChild(this.graphics_kingOfTheHill)
 
     this.fixedContainer.addChild(this.graphics_scanningRange)
     this.fixedContainer.addChild(this.graphics_hyperspaceRange)
@@ -132,6 +134,7 @@ class Star extends EventEmitter {
     // If a star is revealed or a star becomes masked then we want to  the entire
     // star to be re-drawn.
 
+    this.drawKingOfTheHillCircle()
     this.drawWormHole()
     this.drawNebula()
     this.drawAsteroidField()
@@ -163,6 +166,11 @@ class Star extends EventEmitter {
       if (this.hasBlackHole()) {
         this.graphics_star = new PIXI.Graphics()
         this.graphics_star.beginFill(0x000000)
+
+        if (!this.data.ownedByPlayerId) { // Ensures that unowned black holes are easily visible.
+          this.graphics_star.lineStyle(0.3, 0xFFFFFF)
+        }
+
         this.graphics_star.drawCircle(0, 0, 4)
         this.graphics_star.endFill()
       } else if (this.data.homeStar) {
@@ -279,13 +287,13 @@ class Star extends EventEmitter {
   }
 
   drawSpecialist () {
-    if (!this.hasSpecialist()) {
-      return
-    }
-
     if (this.specialistSprite) {
       this.container.removeChild(this.specialistSprite)
       this.specialistSprite = null
+    }
+    
+    if (!this.hasSpecialist()) {
+      return
     }
 
     //FIXME potential resource leak, should not create a new sprite every time
@@ -391,7 +399,7 @@ class Star extends EventEmitter {
     for(let lod = 0; lod<Star.maxLod; lod+=1) {
       if(!this.graphics_natural_resources_ring[lod]) {
         this.graphics_natural_resources_ring[lod] = new PIXI.Graphics()
-        this.graphics_natural_resources_ring[lod].alpha = 0.3
+        this.graphics_natural_resources_ring[lod].alpha = 0.5
         this.graphics_natural_resources_ring[lod].zIndex = -1
       }
       this.graphics_natural_resources_ring[lod].clear()
@@ -697,6 +705,16 @@ class Star extends EventEmitter {
       this.graphics_selected.lineStyle(0.5, 0xFFFFFF)
       this.graphics_selected.alpha = 0.3
       this.graphics_selected.drawCircle(0, 0, 20)
+    }
+  }
+
+  drawKingOfTheHillCircle () {
+    this.graphics_kingOfTheHill.clear()
+
+    if (this.data.isKingOfTheHillStar) {
+      this.graphics_kingOfTheHill.lineStyle(0.5, 0xFFFFFF)
+      this.graphics_kingOfTheHill.alpha = 0.5
+      this.graphics_kingOfTheHill.drawCircle(0, 0, 20)
     }
   }
   

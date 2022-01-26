@@ -1,0 +1,44 @@
+[
+    {
+        "key": "ally",
+        "name": "Team Player",
+        "description": "Awarded to players who have proven themselves to be a great ally. These players support the alliance and show a level of commitment that goes above and beyond.",
+        "price": 1
+    },
+    {
+        "key": "enemy",
+        "name": "Worthy Adversary",
+        "description": "Awarded to players who are a great adversaries, gracious in defeat or victory. These players are tough and if the circumstances may have changed, would have been great allies.",
+        "price": 1
+    },
+    {
+        "key": "diplomat",
+        "name": "Diplomat",
+        "description": "Awarded to players who are cunning with diplomacy. These players have a way with words, can strike a seemingly fair bargain and can sow discord in rival alliances.",
+        "price": 1
+    },
+    {
+        "key": "strategist",
+        "name": "Master Strategist",
+        "description": "Awarded to players who are proven to be skillful in strategy and tactical play. These players can pull off clever moves to tip the balance of war in their favour.",
+        "price": 1
+    },
+    {
+        "key": "roleplay",
+        "name": "Masquerade",
+        "description": "Awarded to players who are adept with many identities. They build interesting characters, stories and lore behind their chosen race and are a joy to converse with.",
+        "price": 1
+    },
+    {
+        "key": "dauntless",
+        "name": "Dauntless",
+        "description": "Awarded to players who are tough, ruthless and aggressive. They show great courage and never give up, even in the face of defeat.",
+        "price": 1
+    },
+    {
+        "key": "sleepless",
+        "name": "Sleepless",
+        "description": "Awarded to players who always have an ever watchful eye on the galaxy. These players know all and see all.",
+        "price": 1
+    }
+]

@@ -39,6 +39,11 @@ class TradeService extends BaseApiService {
     return axios.get(this.BASE_URL + 'game/' + gameId + '/trade/tech/' + toPlayerId,
       { withCredentials: true })
   }
+
+  getTradeEventsBetweenPlayers (gameId, toPlayerId) {
+    return axios.get(this.BASE_URL + 'game/' + gameId + '/trade/' + toPlayerId + '/events',
+      { withCredentials: true })
+  }
 }
 
 export default new TradeService()

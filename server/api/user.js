@@ -105,6 +105,18 @@ module.exports = (router, io, container) => {
         }
     }, middleware.handleError);
 
+    router.get('/api/user/credits', middleware.authenticate, async (req, res, next) => {
+        try {
+            let credits = await container.userService.getUserCredits(req.session.userId);
+
+            return res.status(200).json({
+                credits
+            });
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.get('/api/user/', middleware.authenticate, async (req, res, next) => {
         try {
             let user = await container.userService.getMe(req.session.userId);
@@ -304,7 +316,7 @@ module.exports = (router, io, container) => {
 
     router.get('/api/user/donations/recent', async (req, res, next) => {
         try {
-            let result = await container.donateService.listRecentDonations(3);
+            let result = await container.donateService.listRecentDonations();
 
             return res.status(200).json(result);
         } catch (err) {

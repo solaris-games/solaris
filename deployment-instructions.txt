@@ -1,7 +1,7 @@
 db.games.updateMany({
-    'state.cleaned': true
+    'settings.orbitalMechanics.orbitSpeed': { $gt: 5 }
 }, {
     $set: {
-        'settings.general.timeMachine': 'disabled'
+        'settings.orbitalMechanics.orbitSpeed': 5
     }
 });

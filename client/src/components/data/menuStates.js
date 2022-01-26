@@ -38,5 +38,7 @@ export default {
   HIRE_SPECIALIST_STAR: 'hireSpecialistStar',
   GAME_NOTES: 'gameNotes',
   CREATE_CONVERSATION: 'createConversation',
-  CONVERSATION: 'conversation'
+  CONVERSATION: 'conversation',
+  PLAYER_BADGE_SHOP: 'playerBadgeShop',
+  REPORT_PLAYER: 'reportPlayer'
 }

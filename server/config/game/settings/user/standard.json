@@ -44,10 +44,12 @@
        "victoryCondition":"starPercentage",
        "victoryPercentage":50
     },
+    "kingOfTheHill": {
+      "productionCycles": 10
+    },
     "orbitalMechanics":{
        "enabled":"disabled",
-       "orbitSpeed":5,
-       "orbitOrigin":"galacticCenter"
+       "orbitSpeed":3
     },
     "player":{
        "startingStars":6,

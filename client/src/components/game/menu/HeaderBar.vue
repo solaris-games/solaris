@@ -11,7 +11,7 @@
             <span class="pointer" v-if="gameIsInProgress" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Next production tick"><i class="fas fa-clock"></i> {{timeRemaining}}</span>
             <span class="pointer" v-if="gameIsPendingStart" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Game starts in"><i class="fas fa-stopwatch"></i> {{timeRemaining}}</span>
         </div>
-        <div class="col-auto pt-1" v-if="isLoggedIn && isTimeMachineEnabled && !isDataCleaned">
+        <div class="col-auto pt-1" v-if="isLoggedIn && isTimeMachineEnabled && !isDataCleaned && !gameIsWaitingForPlayers">
           <tick-selector />
         </div>
         <div class="col text-right pt-1">
@@ -300,6 +300,10 @@ export default {
 
       let menuState = KEYBOARD_SHORTCUTS.all[key]
 
+      if (menuState === null) {
+        return this.setMenuState(null, null)
+      }
+
       if (isLoggedIn) {
         menuState = menuState || KEYBOARD_SHORTCUTS.user[key]
       }
@@ -376,6 +380,9 @@ export default {
     },
     gameIsJoinable () {
       return !this.gameIsInProgress && !this.gameIsFinished
+    },
+    gameIsWaitingForPlayers () {
+      return GameHelper.isGameWaitingForPlayers(this.$store.state.game)
     },
     getGameStatusText (game) {
       return GameHelper.getGameStatusText(this.$store.state.game)

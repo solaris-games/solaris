@@ -82,6 +82,8 @@
                       'fa-satellite': games.special.settings.general.type === 'special_orbital',
                       'fa-home': games.special.settings.general.type === 'special_homeStar',
                       'fa-user-secret': games.special.settings.general.type === 'special_anonymous',
+                      'fa-crown': games.special.settings.general.type === 'special_kingOfTheHill',
+                      'fa-search': games.special.settings.general.type === 'special_tinyGalaxy'
                     }"></i>
                     <span class="ml-2">{{games.special.settings.general.name}}</span>
                   </h5>
@@ -237,7 +239,7 @@
         <div class="tab-pane fade" id="inProgressGames">
           <h4>In Progress Games</h4>
 
-          <p class="mb-1">These games are in progress, you can join games with open slots. <b>Fill slots to earn additional rank!</b></p>
+          <p class="mb-1">These games are in progress, you can join games with open slots. <b>Fill slots to earn additional rank!</b> <help-tooltip class="ml-1" tooltip="Players who fill an AFK slot and will be awarded 1.5x additional rank (minimum 1) when the game ends"/></p>
 
           <p class="mb-2"><small class="text-warning" v-if="inProgressGames.length">Total Games: {{inProgressGames.length}}</small></p>
 
@@ -260,10 +262,12 @@
                   <tr v-for="game in inProgressGames" v-bind:key="game._id">
                       <td>
                         <router-link :to="{ path: '/game/detail', query: { id: game._id } }">{{game.settings.general.name}}</router-link>
+                        <br v-if="game.state.afkSlots"/>
+                        <span class="badge badge-warning" v-if="game.state.afkSlots">{{game.state.afkSlots}} Open Slot<span v-if="game.state.afkSlots > 1">s</span></span>
                         <br/>
                         <small>{{getGameTypeFriendlyText(game)}}</small>
                       </td>
-                      <td class="d-none d-md-table-cell text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
+                      <td class="d-none d-md-table-cell text-center" :class="{'text-warning':game.state.afkSlots}">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
                       <td class="d-none d-sm-table-cell text-center">{{game.state.productionTick}}</td>
                       <td>
                           <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-success float-right">
@@ -337,6 +341,7 @@ import TutorialGame from '../components/game/menu/TutorialGame'
 import gameService from '../services/api/game'
 import GameHelper from '../services/gameHelper'
 import RandomHelper from '../services/randomHelper'
+import HelpTooltip from '../components/HelpTooltip'
 import * as moment from 'moment'
 
 export default {
@@ -344,7 +349,8 @@ export default {
     'loading-spinner': LoadingSpinnerVue,
     'view-container': ViewContainer,
     'view-title': ViewTitle,
-    'tutorial-game': TutorialGame
+    'tutorial-game': TutorialGame,
+    'help-tooltip': HelpTooltip
   },
   data () {
     return {
@@ -411,7 +417,9 @@ export default {
         'special_orbital',
         'special_battleRoyale',
         'special_homeStar',
-        'special_anonymous'
+        'special_anonymous',
+        'special_kingOfTheHill',
+        'special_tinyGalaxy'
       ]
       
       return this.serverGames.find(x => types.includes(x.settings.general.type))

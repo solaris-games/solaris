@@ -1,11 +1,59 @@
 [
     {
-        "alias": "Red",
-        "value": "0xff2d4a"
+        "alias": "Aqua",
+        "value": "0x00FFFF"
+    },
+    {
+        "alias": "Blue",
+        "value": "0x0000FF"
+    },
+    {
+        "alias": "Fuchsia",
+        "value": "0xFF00FF"
+    },
+    {
+        "alias": "Gray",
+        "value": "0x808080"
     },
     {
         "alias": "Green",
-        "value": "0x82ff26"
+        "value": "0x008000"
+    },
+    {
+        "alias": "Lime",
+        "value": "0x00FF00"
+    },
+    {
+        "alias": "Maroon",
+        "value": "0x800000"
+    },
+    {
+        "alias": "Navy",
+        "value": "0x000080"
+    },
+    {
+        "alias": "Olive",
+        "value": "0x808000"
+    },
+    {
+        "alias": "Purple",
+        "value": "0x800080"
+    },
+    {
+        "alias": "Red",
+        "value": "0xFF0000"
+    },
+    {
+        "alias": "Silver",
+        "value": "0xC0C0C0"
+    },
+    {
+        "alias": "Teal",
+        "value": "0x008080"
+    },
+    {
+        "alias": "Yellow",
+        "value": "0xFFFF00"
     },
     {
         "alias": "Pink",
@@ -14,21 +62,5 @@
     {
         "alias": "Orange",
         "value": "0xff7a2a"
-    },
-    {
-        "alias": "Purple",
-        "value": "0x9c0fff"
-    },
-    {
-        "alias": "Yellow",
-        "value": "0xdaff2f"
-    },
-    {
-        "alias": "Blue",
-        "value": "0x00acec"
-    },
-    {
-        "alias": "Cyan",
-        "value": "0x45ffc6"
     }
 ]

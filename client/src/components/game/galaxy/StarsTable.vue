@@ -10,11 +10,11 @@
     <div class="col ml-2 mr-2">
       <input type="text" class="form-control form-control-sm" v-model="searchFilter" placeholder="Search...">
     </div>
-    <div class="col-auto">
-      <select class="form-control form-control-sm" v-if="!isGameFinished" v-model="allowUpgrades">
-        <option :value="true">Enable Upgrades</option>
-        <option :value="false">Disable Upgrades</option>
-      </select>
+    <div class="col-auto pt-1" v-if="!isGameFinished">
+      <input class="mr-1" type="checkbox" v-model="allowUpgrades" id="chkEnableUpgrades">
+      <label for="chkEnableUpgrades">
+        Upgrades
+      </label>
     </div>
   </div>
 

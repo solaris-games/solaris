@@ -21,6 +21,10 @@ module.exports = (router, io, container) => {
     }, middleware.handleError);
 
     router.patch('/api/game/:gameId/events/markAsRead', middleware.authenticate,middleware.loadGameLean, middleware.validateGameLocked, middleware.loadPlayer, async (req, res, next) => {
+        if (req.session.isImpersonating) {
+            return res.sendStatus(200);
+        }
+
         try {
             await container.eventService.markAllEventsAsRead(
                 req.game,
@@ -33,6 +37,10 @@ module.exports = (router, io, container) => {
     }, middleware.handleError);
 
     router.patch('/api/game/:gameId/events/:eventId/markAsRead', middleware.authenticate,middleware.loadGameLean, middleware.validateGameLocked, middleware.loadPlayer, async (req, res, next) => {
+        if (req.session.isImpersonating) {
+            return res.sendStatus(200);
+        }
+        
         try {
             await container.eventService.markEventAsRead(
                 req.game,

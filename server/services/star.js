@@ -4,7 +4,7 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class StarService extends EventEmitter {
 
-    constructor(gameRepo, randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService, diplomacyService, gameTypeService) {
+    constructor(gameRepo, randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService, diplomacyService, gameTypeService, gameStateService) {
         super();
 
         this.gameRepo = gameRepo;
@@ -17,6 +17,7 @@ module.exports = class StarService extends EventEmitter {
         this.userService = userService;
         this.diplomacyService = diplomacyService;
         this.gameTypeService = gameTypeService;
+        this.gameStateService = gameStateService;
     }
 
     generateUnownedStar(name, location, naturalResources) {
@@ -130,7 +131,7 @@ module.exports = class StarService extends EventEmitter {
     }
 
     isAlive(star) {
-        return !this.isDeadStar(star);
+        return !this.isDeadStar(star) || star.isBlackHole;
     }
 
     listStarsAliveOwnedByPlayer(stars, playerId) {
@@ -669,6 +670,12 @@ module.exports = class StarService extends EventEmitter {
             }
         }
 
+        if (this.gameTypeService.isKingOfTheHillMode(game) && 
+            this.gameStateService.isCountingDownToEndInLastCycle(game) &&
+            this.isKingOfTheHillStar(star)) {
+            this.gameStateService.setCountdownToEndToOneCycle(game);
+        }
+
         return {
             capturedById: newStarPlayer._id,
             capturedByAlias: newStarPlayer.alias,
@@ -726,4 +733,17 @@ module.exports = class StarService extends EventEmitter {
             })
             .filter(x => x.carriersInOrbit.length);
     }
+
+    getKingOfTheHillStar(game) {
+        const center = this.starDistanceService.getGalacticCenter();
+
+        return game.galaxy.stars.find(s => s.location.x === center.x && s.location.y === center.y);
+    }
+
+    isKingOfTheHillStar(star) {
+        const center = this.starDistanceService.getGalacticCenter();
+
+        return star.location.x === center.x && star.location.y === center.y;
+    }
+
 }

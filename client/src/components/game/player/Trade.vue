@@ -20,6 +20,8 @@
     <h4 v-if="player && player.research" class="mt-2">Technology</h4>
     
     <research v-if="player && player.research" :playerId="player._id"/>
+    
+    <trade-history v-if="player" :toPlayerId="player._id"/>
 
     <!-- <loading-spinner :loading="isLoadingLedger"/> -->
 </div>
@@ -32,10 +34,9 @@ import PlayerTitleVue from './PlayerTitle'
 import Research from './Research'
 import PlayerTradeVue from './PlayerTrade'
 import LedgerRowVue from '../ledger/LedgerRow'
-import gameService from '../../../services/api/game'
+import TradeHistoryVue from './TradeHistory'
 import GameHelper from '../../../services/gameHelper'
 import GameContainer from '../../../game/container'
-import LedgerApiService from '../../../services/api/ledger'
 
 export default {
   components: {
@@ -44,7 +45,8 @@ export default {
     'player-title': PlayerTitleVue,
     'research': Research,
     'player-trade': PlayerTradeVue,
-    'ledger-row': LedgerRowVue
+    'ledger-row': LedgerRowVue,
+    'trade-history': TradeHistoryVue
   },
   props: {
     playerId: String

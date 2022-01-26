@@ -23,8 +23,18 @@ module.exports = class GameTypeService {
             'special_orbital',
             'special_battleRoyale',
             'special_homeStar',
-            'special_anonymous'
-        ].includes(game.settings.general.mode);
+            'special_anonymous',
+            'special_kingOfTheHill',
+            'special_tinyGalaxy'
+        ].includes(game.settings.general.type);
+    }
+
+    isConquestMode(game) {
+        return game.settings.general.mode === 'conquest';
+    }
+
+    isKingOfTheHillMode(game) {
+        return game.settings.general.mode === 'kingOfTheHill';
     }
 
     isAnonymousGame(game) {

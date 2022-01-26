@@ -10,13 +10,21 @@
         </div>
     </div>
 
-    <div class="row" v-if="!game.state.endDate">
+    <div class="row mb-2" v-if="!game.state.endDate">
         <div class="col text-center pt-2">
             <p class="mb-0 text-warning" v-if="isConquestAllStars">Be the first to capture {{game.state.starsForVictory}} of {{game.state.stars}} stars.</p>
             <p class="mb-0 text-warning" v-if="isConquestHomeStars">Be the first to capture {{game.state.starsForVictory}} of {{game.settings.general.playerLimit}} capital stars.</p>
+            <p class="mb-0 text-warning" v-if="isKingOfTheHillMode">Capture and hold the center star to win.</p>
             <p class="mb-0" v-if="game.settings.general.mode === 'battleRoyale'">Battle Royale - {{game.state.stars}} Stars Remaining</p>
-            <p class="mb-2">Galactic Cycle {{$store.state.productionTick}} - Tick {{$store.state.tick}}</p>
-            <p class="mb-2 text-warning" v-if="isDarkModeExtra && getUserPlayer() != null"><small>The leaderboard is based on your scanning range.</small></p>
+            <p class="mb-0" v-if="isKingOfTheHillMode && game.state.ticksToEnd == null"><small>The countdown begins when the center star is captured</small></p>
+            <p class="mb-0 text-danger" v-if="isKingOfTheHillMode && game.state.ticksToEnd != null">Countdown - {{game.state.ticksToEnd}} Ticks Remaining <help-tooltip tooltip="The countdown will reset to 1 cycle if the center star is captured with less than 1 cycle left"/></p>
+        </div>
+    </div>
+
+    <div class="row bg-primary" v-if="!game.state.endDate">
+        <div class="col text-center pt-2">
+          <p class="mb-2">Galactic Cycle {{$store.state.productionTick}} - Tick {{$store.state.tick}}</p>
+          <p class="text-warning" v-if="isDarkModeExtra && getUserPlayer() != null"><small>The leaderboard is based on your scanning range.</small></p>
         </div>
     </div>
 
@@ -47,6 +55,9 @@
                           <!-- Text styling for defeated players? -->
                           <h5 class="alias-title">
                             {{player.alias}}
+                            <span v-if="isKingOfTheHillMode && player.isKingOfTheHill" title="This player is the king of the hill">
+                              <i class="fas fa-crown"></i>
+                            </span>
                             <span v-if="player.defeated" :title="getPlayerStatus(player)">
                               <i v-if="!player.afk" class="fas fa-skull-crossbones" title="This player has been defeated"></i>
                               <i v-if="player.afk" class="fas fa-user-clock" title="This player is AFK"></i>
@@ -56,7 +67,7 @@
                             </span>
                           </h5>
                       </td>
-                      <td class="fit pt-3 pr-2" v-if="isConquestAllStars">
+                      <td class="fit pt-3 pr-2" v-if="isConquestAllStars || isKingOfTheHillMode">
                         <span class="d-xs-block d-sm-none">
                           <i class="fas fa-star mr-0"></i> {{player.stats.totalStars}}
                         </span>
@@ -139,6 +150,7 @@ import MenuTitle from '../MenuTitle'
 import AudioService from '../../../game/audio'
 import ShareLinkVue from '../welcome/ShareLink'
 import PlayerAvatarVue from '../menu/PlayerAvatar'
+import HelpTooltip from '../../HelpTooltip'
 
 export default {
   components: {
@@ -146,7 +158,8 @@ export default {
     'modalButton': ModalButton,
     'dialogModal': DialogModal,
     'share-link': ShareLinkVue,
-    'player-avatar': PlayerAvatarVue
+    'player-avatar': PlayerAvatarVue,
+    'help-tooltip': HelpTooltip
   },
 
   data () {
@@ -293,7 +306,6 @@ export default {
         if (response.status === 200) {
           this.$toasted.show(`You have confirmed that you are ready to quit.`, { type: 'success' })
 
-          player.ready = true
           player.readyToQuit = true
         }
       } catch (err) {
@@ -309,7 +321,6 @@ export default {
         let response = await gameService.unconfirmReadyToQuit(this.$store.state.game._id)
 
         if (response.status === 200) {
-          player.ready = false
           player.readyToQuit = false
         }
       } catch (err) {
@@ -356,6 +367,9 @@ export default {
     },
     isConquestHomeStars () {
       return gameHelper.isConquestHomeStars(this.$store.state.game)
+    },
+    isKingOfTheHillMode () {
+      return gameHelper.isKingOfTheHillMode(this.$store.state.game)
     },
     canEndTurn () {
       return GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)

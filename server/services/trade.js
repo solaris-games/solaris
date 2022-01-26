@@ -4,10 +4,11 @@ const ValidationError = require('../errors/validation');
 
 module.exports = class TradeService extends EventEmitter {
 
-    constructor(gameRepo, userService, playerService, ledgerService, achievementService, reputationService, gameTypeService) {
+    constructor(gameRepo, eventRepo, userService, playerService, ledgerService, achievementService, reputationService, gameTypeService) {
         super();
 
         this.gameRepo = gameRepo;
+        this.eventRepo = eventRepo;
         this.userService = userService;
         this.playerService = playerService;
         this.ledgerService = ledgerService;
@@ -369,6 +370,42 @@ module.exports = class TradeService extends EventEmitter {
                 throw new ValidationError(`You cannot trade with this player, they are not within scanning range.`);
             }
         }
+    }
+
+    async listTradeEventsBetweenPlayers(game, playerId, playerIds) {
+        let events = await this.eventRepo.find({
+            gameId: game._id,
+            playerId: playerId,
+            type: {
+                $in: [
+                    'playerCreditsReceived',
+                    'playerCreditsSpecialistsReceived',
+                    'playerRenownReceived',
+                    'playerTechnologyReceived',
+                    'playerGiftReceived',
+                    'playerCreditsSent',
+                    'playerCreditsSpecialistsSent',
+                    'playerRenownSent',
+                    'playerTechnologySent',
+                    'playerGiftSent'
+                ]
+            },
+            $or: [
+                { 'data.fromPlayerId': { $in: playerIds } },
+                { 'data.toPlayerId': { $in: playerIds } }
+            ]
+        });
+
+        return events
+        .map(e => {
+            return {
+                playerId: e.playerId,
+                type: e.type,
+                data: e.data,
+                sentDate: moment(e._id.getTimestamp()),
+                sentTick: game.state.tick
+            }
+        });
     }
 
 };

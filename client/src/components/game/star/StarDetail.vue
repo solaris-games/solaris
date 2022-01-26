@@ -15,29 +15,34 @@
         <p class="mb-2" v-if="star.ownedByPlayerId == null">This star has not been claimed by any faction. Send a carrier here to claim it for yourself.</p>
         <p class="mb-2 text-danger" v-if="isDeadStar">This is a dead star, infrastructure cannot be built here.</p>
         <p class="mb-2 text-danger" v-if="star.targeted">This star has been targeted for destruction.</p>
+        <p class="mb-2 text-danger" v-if="star.isKingOfTheHillStar">Capture and hold this star to win.</p>
 
-        <div v-if="star.isNebula">
+        <div v-if="(!isCompactUIStyle || !star.ownedByPlayerId) && star.isNebula">
           <hr/>
-          <p class="mb-0">This star is hidden inside a <span class="text-warning">Nebula</span>.</p>
+          <p class="mb-0">This star is hidden inside a <span class="text-warning">Nebula <i class="fas fa-eye-slash"></i></span>.</p>
           <p class="mb-2 text-info"><small><i>Ships inside a Nebula are hidden from all other players.</i></small></p>
         </div>
 
-        <div v-if="star.isAsteroidField">
+        <div v-if="(!isCompactUIStyle || !star.ownedByPlayerId) && star.isAsteroidField">
           <hr/>
-          <p class="mb-0" v-if="star.isAsteroidField">This star is surrounded by an <span class="text-warning">Asteroid Field</span>.</p>
+          <p class="mb-0" v-if="star.isAsteroidField">This star is surrounded by an <span class="text-warning">Asteroid Field <i class="fas fa-meteor"></i></span>.</p>
           <p class="mb-2 text-info" v-if="star.isAsteroidField"><small><i>Asteroid Fields start with additional natural resources and x2 Defender Bonus (net +2 Weapons).</i></small></p>
         </div>
         
-        <div v-if="star.wormHoleToStarId">
+        <div v-if="(!isCompactUIStyle || !star.ownedByPlayerId) && star.wormHoleToStarId">
           <hr/>
-          <p class="mb-0" v-if="wormHolePairStar">This star is a <strong>Worm Hole</strong> to <a href="javascript:;" @click="viewOnMap(wormHolePairStar)"><i class="fas fa-eye mr-1"></i>{{wormHolePairStar.name}}</a>.</p>
-          <p class="mb-0" v-if="!wormHolePairStar">This star is a <strong>Worm Hole</strong> to an unknown star.</p>
+          <p class="mb-0" v-if="wormHolePairStar">This star is a <span class="text-warning">Worm Hole <i class="far fa-sun"></i></span> to <a href="javascript:;" @click="viewOnMap(wormHolePairStar)"><i class="fas fa-eye mr-1"></i>{{wormHolePairStar.name}}</a>.</p>
+          <p class="mb-0" v-if="!wormHolePairStar">This star is a <span class="text-warning">Worm Hole <i class="far fa-sun"></i></span> to an unknown star.</p>
           <p class="mb-2 text-info"><small><i>Travel between Worm Holes takes 1 tick.</i></small></p>
         </div>
-
-        <div v-if="star.isBlackHole">
+        <div v-if="(!isCompactUIStyle || !star.ownedByPlayerId) && star.warpGate">
+        <hr/>
+          <p class="mb-0">This star has a <span class="text-warning">Warp Gate <i class="fas fa-dungeon"></i></span>.</p>
+          <p class="mb-2 text-info"><small><i>Carriers travel {{ warpSpeedMultiplier }}x faster between active warp gates.</i></small></p>
+        </div>
+        <div v-if="(!isCompactUIStyle || !star.ownedByPlayerId) && star.isBlackHole">
           <hr/>
-          <p class="mb-0" v-if="star.isBlackHole">This star is a <span class="text-warning">Black Hole</span>.</p>
+          <p class="mb-0" v-if="star.isBlackHole">This star is a <span class="text-warning">Black Hole <i class="far fa-circle"></i></span>.</p>
           <p class="mb-2 text-info" v-if="star.isBlackHole"><small><i>Black Holes have +3 Scanning Range but have reduced natural resources.</i></small></p>
         </div>
       </div>
@@ -60,7 +65,7 @@
           <span v-if="star.isBlackHole" title="Black Hole - The star has +3 scanning range but reduced natural resources">
             <i class="far fa-circle ml-1"></i>
           </span>
-          <span :title="star.warpGate ? 'Warp Gate':'No Warp Gate'" :class="{'no-warp-gate':!star.warpGate}">
+          <span :title="star.warpGate ? 'Warp Gate - Carriers travel faster between active warp gates':'No Warp Gate'" :class="{'no-warp-gate':!star.warpGate}">
             <i class="fas fa-dungeon ml-2"></i>
           </span>
         </div>
@@ -139,7 +144,7 @@
           </div>
       </div>
 
-      <div class="row pt-1 pb-1 bg-secondary" v-if="star.infrastructure && !isDeadStar">
+      <div v-if="star.infrastructure && !isDeadStar" class="row pt-1 pb-1 bg-secondary">
           <div class="col">
               Natural Resources
           </div>
@@ -148,12 +153,22 @@
           </div>
       </div>
 
-      <div v-if="star.ownedByPlayerId && star.infrastructure && !isDeadStar" class="row mb-2 pt-1 pb-1 bg-secondary">
+      <div v-if="star.ownedByPlayerId && star.infrastructure && !isDeadStar" class="row pt-1 pb-1 bg-secondary">
           <div class="col">
               Terraformed Resources
           </div>
           <div class="col text-right">
               <star-resources :resources="star.terraformedResources" :iconAlignLeft="false" />
+          </div>
+      </div>
+
+      <div v-if="star.ownedByPlayerId && star.manufacturing != null" class="row pt-1 pb-1 bg-secondary">
+          <div class="col">
+              Ship Production
+          </div>
+          <div class="col text-right" title="Ship production per tick">
+            <span>{{star.manufacturing}}</span>
+            <i class="fas fa-wrench ml-2"></i>
           </div>
       </div>
     </div>
@@ -189,7 +204,7 @@
     </div>
 
     <div v-if="isStandardUIStyle && !isDeadStar">
-      <div v-if="star.infrastructure">
+      <div v-if="star.infrastructure" class="mb-2">
         <h4 class="pt-2">Infrastructure</h4>
 
         <infrastructure :starId="star._id"/>
@@ -202,30 +217,32 @@
           :science="star.upgradeCosts.science"/>
       </div>
 
-      <div class="row bg-secondary mt-2 mb-2" v-if="star.ownedByPlayerId && star.manufacturing != null">
-        <div class="col text-center pt-3">
-          <p>This star builds <b>{{star.manufacturing}}</b> ships every tick.</p>
-        </div>
-      </div>
-
       <!-- TODO: Turn these into components -->
-      <div v-if="isOwnedByUserPlayer && !userPlayer.defeated && star.upgradeCosts != null" class="mb-2">
+      <div v-if="isOwnedByUserPlayer && !userPlayer.defeated && star.upgradeCosts != null">
         <div class="row bg-secondary pt-2 pb-0 mb-1">
           <div class="col-8">
-            <p class="mb-2">Build a carrier to transport ships through hyperspace.</p>
+            <p class="mt-1 mb-2">Build a <strong>Carrier</strong> to transport ships through hyperspace.</p>
           </div>
           <div class="col-4">
-            <button :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.carriers || star.ships < 1 || isGameFinished" class="btn btn-block btn-primary mb-2" @click="onBuildCarrierRequested">Build for ${{star.upgradeCosts.carriers}}</button>
+            <button :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.carriers || star.ships < 1 || isGameFinished" 
+              class="btn btn-block btn-success mb-2" 
+              @click="onBuildCarrierRequested">Build for ${{star.upgradeCosts.carriers}}</button>
           </div>
         </div>
 
         <div class="row bg-secondary pt-2 pb-0 mb-1" v-if="(canBuildWarpGates && !star.warpGate) || (canDestroyWarpGates && star.warpGate)">
           <div class="col-8">
-            <p class="mb-2">Build a Warp Gate to accelerate carrier movement.</p>
+            <p class="mt-1 mb-2">Build a <strong>Warp Gate</strong> to accelerate carrier movement.</p>
           </div>
           <div class="col-4">
-            <modalButton v-if="canBuildWarpGates && !star.warpGate" :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished" modalName="buildWarpGateModal" classText="btn btn-block btn-primary mb-2">Build for ${{star.upgradeCosts.warpGate}}</modalButton>
-            <modalButton v-if="canDestroyWarpGates && star.warpGate" :disabled="$isHistoricalMode() || isGameFinished" modalName="destroyWarpGateModal" classText="btn btn-block btn-danger mb-2">Destroy Gate</modalButton>
+            <modalButton v-if="canBuildWarpGates && !star.warpGate" 
+              :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished" 
+              modalName="buildWarpGateModal" 
+              classText="btn btn-block btn-success mb-2">Build for ${{star.upgradeCosts.warpGate}}</modalButton>
+            <modalButton v-if="canDestroyWarpGates && star.warpGate" 
+              :disabled="$isHistoricalMode() || isGameFinished" 
+              modalName="destroyWarpGateModal"
+              classText="btn btn-block btn-danger mb-2">Destroy Gate</modalButton>
           </div>
         </div>
 
@@ -304,7 +321,8 @@ export default {
       canDestroyWarpGates: false,
       isSpecialistsEnabled: false,
       isStandardUIStyle: false,
-      isCompactUIStyle: false
+      isCompactUIStyle: false,
+      warpSpeedMultiplier: '',
     }
   },
   mounted () {
@@ -315,7 +333,8 @@ export default {
 
     this.canBuildWarpGates = this.$store.state.game.settings.specialGalaxy.warpgateCost !== 'none'
     this.canDestroyWarpGates = this.$store.state.game.state.startDate != null
-    
+    this.warpSpeedMultiplier = this.$store.state.game.constants.distances.warpSpeedMultiplier
+
     // Can display specialist section if sepcialists are enabled and the star is owned by a player.
     // Otherwise if the star is unowned then display only if the star is within scanning range and it has a specialist on it.
     this.isSpecialistsEnabled = this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none'

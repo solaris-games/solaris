@@ -1,6 +1,8 @@
 <template>
 <div>
-    <div class="list-group">
+    <loading-spinner :loading="!donations"></loading-spinner>
+
+    <div class="list-group" v-if="donations">
         <a href="https://www.buymeacoffee.com/hyperi0n" target="_blank" class="list-group-item list-group-item-action flex-column align-items-start" v-for="donation in donations" :key="donation.support_id">
             <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">{{donation.supporter_name}}</h5>
@@ -14,16 +16,20 @@
 </template>
 
 <script>
+import LoadingSpinnerVue from '../../LoadingSpinner'
 import UserApiService from '../../../services/api/user'
 import * as moment from 'moment'
 
 export default {
+    components: {
+        'loading-spinner': LoadingSpinnerVue
+    },
     props: {
         maxLength: Number
     },
   data () {
     return {
-        donations: []
+        donations: null
     };
   },
   async mounted () {

@@ -6,7 +6,7 @@
       <div class="col-sm-12 col-md-6 pb-3">
         <p>Discover a space strategy game filled with conquest, betrayal and subterfuge.</p>
         <p>Build alliances, make enemies and fight your way to victory to <span class="text-danger">galactic domination.</span></p>
-        <p>Will you conquer the galaxy?</p>
+        <p>Will <strong>you</strong> conquer the galaxy?</p>
         <a :href="documentationUrl" target="_blank">Learn more...</a>
       </div>
       <div class="col-sm-12 col-md-6">
@@ -19,10 +19,29 @@
     </div>
 
     <div class="row mb-3">
-      <img :src="require('../assets/screenshots/game1.png')" class="img-fluid w-100"/>
+      <div class="carousel slide w-100" data-ride="carousel">
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+              <img :src="require('../assets/screenshots/game-carousel-1.png')" alt="Solaris" class="d-block w-100"/>
+          </div>
+          <div class="carousel-item">
+              <img :src="require('../assets/screenshots/game-carousel-2.png')" alt="Solaris" class="d-block w-100"/>
+          </div>
+          <div class="carousel-item">
+              <img :src="require('../assets/screenshots/game-carousel-3.png')" alt="Solaris" class="d-block w-100"/>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <recent-donations :maxLength="null" />
+    <!-- <div class="row">
+      <div class="col-12 col-lg-6">
+        <recent-donations :maxLength="null" />
+      </div>
+      <div class="d-none d-lg-block col-6">
+        <iframe src="https://discord.com/widget?id=686524791943069734&theme=dark" style="width:100%;height:100%" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
+      </div>
+    </div> -->
   </view-container>
 </template>
 

@@ -455,6 +455,11 @@ module.exports = class StarUpgradeService extends EventEmitter {
             upgradeSummary
         });
 
+        if (infrastructureType === 'science') {
+            upgradeSummary.currentResearchTicksEta = this.researchService.calculateCurrentResearchETAInTicks(game, player);
+            upgradeSummary.nextResearchTicksEta = this.researchService.calculateNextResearchETAInTicks(game, player);
+        }
+
         return upgradeSummary;
     }
 

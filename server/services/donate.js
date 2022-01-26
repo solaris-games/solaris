@@ -9,6 +9,8 @@ module.exports = class DonateService {
     }
 
     async listRecentDonations(amount) {
+        amount = amount || 3;
+
         let cached = this.cacheService.get(this.CACHE_KEY_RECENT_DONATIONS);
 
         if (cached) {
@@ -42,9 +44,11 @@ module.exports = class DonateService {
                 });
             }
 
+            donators = donators.slice(0, amount);
+
             this.cacheService.put(this.CACHE_KEY_RECENT_DONATIONS, donators, 3600000); // 1 hour
 
-            return donators.slice(0, amount);
+            return donators;
         } catch (err) {
             console.error(err);
 
