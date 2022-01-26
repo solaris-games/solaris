@@ -83,6 +83,7 @@
                       'fa-home': games.special.settings.general.type === 'special_homeStar',
                       'fa-user-secret': games.special.settings.general.type === 'special_anonymous',
                       'fa-crown': games.special.settings.general.type === 'special_kingOfTheHill',
+                      'fa-search': games.special.settings.general.type === 'special_tinyGalaxy'
                     }"></i>
                     <span class="ml-2">{{games.special.settings.general.name}}</span>
                   </h5>
@@ -417,7 +418,8 @@ export default {
         'special_battleRoyale',
         'special_homeStar',
         'special_anonymous',
-        'special_kingOfTheHill'
+        'special_kingOfTheHill',
+        'special_tinyGalaxy'
       ]
       
       return this.serverGames.find(x => types.includes(x.settings.general.type))

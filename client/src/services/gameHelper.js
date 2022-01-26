@@ -1043,7 +1043,8 @@ class GameHelper {
       'special_battleRoyale': 'Battle Royale',
       'special_homeStar': 'Capital Stars',
       'special_anonymous': 'Anonymous',
-      'special_kingOfTheHill': 'King Of The Hill'
+      'special_kingOfTheHill': 'King Of The Hill',
+      'special_tinyGalaxy': 'Tiny Galaxy'
     }[game.settings.general.type]
   }
 
@@ -1103,6 +1104,10 @@ class GameHelper {
         statusTo,
         actualStatus
     }
+  }
+
+  isNewPlayerGame (game) {
+    return ['new_player_rt', 'new_player_tb'].includes(game.settings.general.type)
   }
 }
 

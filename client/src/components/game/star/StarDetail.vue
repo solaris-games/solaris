@@ -7,7 +7,7 @@
       </modalButton>
       <button @click="viewOnMap(star)" class="btn btn-sm btn-info ml-1"><i class="fas fa-eye"></i></button>
     </menu-title>
-
+    
     <div class="row bg-secondary">
       <div class="col text-center pt-2">
         <p class="mb-2" v-if="userPlayer && star.ownedByPlayerId == userPlayer._id">A star under your command.</p>
@@ -17,30 +17,30 @@
         <p class="mb-2 text-danger" v-if="star.targeted">This star has been targeted for destruction.</p>
         <p class="mb-2 text-danger" v-if="star.isKingOfTheHillStar">Capture and hold this star to win.</p>
 
-        <div v-if="star.isNebula">
+        <div v-if="(!isCompactUIStyle || !star.ownedByPlayerId) && star.isNebula">
           <hr/>
           <p class="mb-0">This star is hidden inside a <span class="text-warning">Nebula <i class="fas fa-eye-slash"></i></span>.</p>
           <p class="mb-2 text-info"><small><i>Ships inside a Nebula are hidden from all other players.</i></small></p>
         </div>
 
-        <div v-if="star.isAsteroidField">
+        <div v-if="(!isCompactUIStyle || !star.ownedByPlayerId) && star.isAsteroidField">
           <hr/>
           <p class="mb-0" v-if="star.isAsteroidField">This star is surrounded by an <span class="text-warning">Asteroid Field <i class="fas fa-meteor"></i></span>.</p>
           <p class="mb-2 text-info" v-if="star.isAsteroidField"><small><i>Asteroid Fields start with additional natural resources and x2 Defender Bonus (net +2 Weapons).</i></small></p>
         </div>
-
-        <div v-if="star.wormHoleToStarId">
+        
+        <div v-if="(!isCompactUIStyle || !star.ownedByPlayerId) && star.wormHoleToStarId">
           <hr/>
           <p class="mb-0" v-if="wormHolePairStar">This star is a <span class="text-warning">Worm Hole <i class="far fa-sun"></i></span> to <a href="javascript:;" @click="viewOnMap(wormHolePairStar)"><i class="fas fa-eye mr-1"></i>{{wormHolePairStar.name}}</a>.</p>
           <p class="mb-0" v-if="!wormHolePairStar">This star is a <span class="text-warning">Worm Hole <i class="far fa-sun"></i></span> to an unknown star.</p>
           <p class="mb-2 text-info"><small><i>Travel between Worm Holes takes 1 tick.</i></small></p>
         </div>
-        <div v-if="star.warpGate">
+        <div v-if="(!isCompactUIStyle || !star.ownedByPlayerId) && star.warpGate">
         <hr/>
           <p class="mb-0">This star has a <span class="text-warning">Warp Gate <i class="fas fa-dungeon"></i></span>.</p>
           <p class="mb-2 text-info"><small><i>Carriers travel {{ warpSpeedMultiplier }}x faster between active warp gates.</i></small></p>
         </div>
-        <div v-if="star.isBlackHole">
+        <div v-if="(!isCompactUIStyle || !star.ownedByPlayerId) && star.isBlackHole">
           <hr/>
           <p class="mb-0" v-if="star.isBlackHole">This star is a <span class="text-warning">Black Hole <i class="far fa-circle"></i></span>.</p>
           <p class="mb-2 text-info" v-if="star.isBlackHole"><small><i>Black Holes have +3 Scanning Range but have reduced natural resources.</i></small></p>
@@ -70,7 +70,7 @@
           </span>
         </div>
       </div>
-
+      
       <div class="row mt-2 pb-2">
         <div class="col">
           <span v-if="star.infrastructure && !isDeadStar" title="Economic infrastructure">
@@ -121,7 +121,7 @@
       </div>
 
       <div class="mb-0" v-if="!isDeadStar">
-        <infrastructureUpgradeCompact
+        <infrastructureUpgradeCompact 
           v-if="isOwnedByUserPlayer && !userPlayer.defeated && star.upgradeCosts != null"
           :star="star"
           :availableCredits="userPlayer.credits"
@@ -224,8 +224,8 @@
             <p class="mt-1 mb-2">Build a <strong>Carrier</strong> to transport ships through hyperspace.</p>
           </div>
           <div class="col-4">
-            <button :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.carriers || star.ships < 1 || isGameFinished"
-              class="btn btn-block btn-success mb-2"
+            <button :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.carriers || star.ships < 1 || isGameFinished" 
+              class="btn btn-block btn-success mb-2" 
               @click="onBuildCarrierRequested">Build for ${{star.upgradeCosts.carriers}}</button>
           </div>
         </div>
@@ -235,12 +235,12 @@
             <p class="mt-1 mb-2">Build a <strong>Warp Gate</strong> to accelerate carrier movement.</p>
           </div>
           <div class="col-4">
-            <modalButton v-if="canBuildWarpGates && !star.warpGate"
-              :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished"
-              modalName="buildWarpGateModal"
+            <modalButton v-if="canBuildWarpGates && !star.warpGate" 
+              :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished" 
+              modalName="buildWarpGateModal" 
               classText="btn btn-block btn-success mb-2">Build for ${{star.upgradeCosts.warpGate}}</modalButton>
-            <modalButton v-if="canDestroyWarpGates && star.warpGate"
-              :disabled="$isHistoricalMode() || isGameFinished"
+            <modalButton v-if="canDestroyWarpGates && star.warpGate" 
+              :disabled="$isHistoricalMode() || isGameFinished" 
               modalName="destroyWarpGateModal"
               classText="btn btn-block btn-danger mb-2">Destroy Gate</modalButton>
           </div>
@@ -322,7 +322,7 @@ export default {
       isSpecialistsEnabled: false,
       isStandardUIStyle: false,
       isCompactUIStyle: false,
-      warpSpeedMultiplier: 0,
+      warpSpeedMultiplier: '',
     }
   },
   mounted () {
@@ -333,12 +333,11 @@ export default {
 
     this.canBuildWarpGates = this.$store.state.game.settings.specialGalaxy.warpgateCost !== 'none'
     this.canDestroyWarpGates = this.$store.state.game.state.startDate != null
+    this.warpSpeedMultiplier = this.$store.state.game.constants.distances.warpSpeedMultiplier
 
     // Can display specialist section if sepcialists are enabled and the star is owned by a player.
     // Otherwise if the star is unowned then display only if the star is within scanning range and it has a specialist on it.
     this.isSpecialistsEnabled = this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none'
-
-    this.warpSpeedMultiplier = this.$store.state.game.constants.distances.warpSpeedMultiplier;
   },
   methods: {
     onCloseRequested (e) {
@@ -401,7 +400,7 @@ export default {
           this.$toasted.show(`Warp Gate built at ${this.star.name}.`)
 
           this.$store.commit('gameStarWarpGateBuilt', response.data)
-
+          
           AudioService.join()
         }
       } catch (err) {
@@ -418,7 +417,7 @@ export default {
           this.$store.commit('gameStarWarpGateDestroyed', {
             starId: this.star._id
           })
-
+          
           AudioService.leave()
         }
       } catch (err) {
@@ -428,12 +427,12 @@ export default {
     async transferAllToStar() {
       try {
         let response = await starService.transferAllToStar(this.$store.state.game._id, this.star._id)
-
+        
         if (response.status === 200) {
           let carriers = response.data.carriersAtStar
 
           carriers.forEach(responseCarrier => {
-            let mapObjectCarrier = gameHelper.getCarrierById(this.$store.state.game, responseCarrier._id)
+            let mapObjectCarrier = gameHelper.getCarrierById(this.$store.state.game, responseCarrier._id) 
             mapObjectCarrier.ships = responseCarrier.ships
           })
 
@@ -455,8 +454,8 @@ export default {
       return this.isSpecialistsEnabled && (this.star.specialistId || this.isOwnedByUserPlayer) && !this.isDeadStar
     },
     canHireSpecialist: function () {
-      return this.canShowSpecialist
-        && !GameHelper.isGameFinished(this.$store.state.game)
+      return this.canShowSpecialist 
+        && !GameHelper.isGameFinished(this.$store.state.game) 
         && !this.isDeadStar
         && (!this.star.specialistId || !this.star.specialist.oneShot)
     },
