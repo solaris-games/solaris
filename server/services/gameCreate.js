@@ -144,8 +144,8 @@ module.exports = class GameCreateService {
         }
 
         if (isCustomGalaxy) {
-            game.settings.galaxy.starsPerPlayer = game.galaxy.stars.length / game.settings.general.playerLimit | 0;
-            game.settings.player.startingStars = game.galaxy.stars.filter(star => star.ownedByPlayerId !== null).length / game.settings.general.playerLimit | 0;
+            game.settings.galaxy.starsPerPlayer = Math.min(50, game.galaxy.stars.length / game.settings.general.playerLimit | 0);
+            game.settings.player.startingStars = Math.min(10, game.galaxy.stars.filter(star => star.ownedByPlayerId !== null).length / game.settings.general.playerLimit | 0);
         }
 
         this.gameCreateValidationService.validate(game);
