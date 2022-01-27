@@ -148,10 +148,10 @@ a.btn-neutral:hover {
 
 /* Tables */
 .wy-table-odd td, .wy-table-striped tr:nth-child(2n-1) td, .rst-content table.docutils:not(.field-list) tr:nth-child(2n-1) td {
-	background-color: var(--bg-05);
+	background-color: var(--bg-05) !important;
 }
 
 .wy-table thead th, .rst-content table.docutils thead th, .rst-content table.field-list thead th,
 .wy-table td, .rst-content table.docutils td, .rst-content table.field-list td {
-	color: var(--text);
+	color: var(--text) !important;
 }
