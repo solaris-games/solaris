@@ -1109,6 +1109,18 @@ class GameHelper {
   isNewPlayerGame (game) {
     return ['new_player_rt', 'new_player_tb'].includes(game.settings.general.type)
   }
+
+  getLedgerGameEventPlayerSummary (game, gameEvent) {
+    const debtor = this.getPlayerById(game, gameEvent.data.debtorPlayerId)
+    const creditor = this.getPlayerById(game, gameEvent.data.creditorPlayerId)
+    const isCreditor = this.getUserPlayer(game) == creditor
+
+    return {
+      debtor,
+      creditor,
+      isCreditor
+    }
+  }
 }
 
 export default new GameHelper()
