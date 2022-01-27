@@ -14,7 +14,7 @@ When a Star is captured, all of its Economy is destroyed and the winner is award
 
 Combat can also occur between two carriers. When two carriers from different players intercept each other they will engage in carrier to carrier combat. In carrier to carrier combat there is no defender bonus.
 
-Note: In carrier to carrier combat, if the either side has **less than or equal ships** than the opposing side's weapons technology level then the carrier(s) will fight with **level 1 weapons**. This prevents players from exploiting 1 ship carriers to chip away at incoming enemy forces.
+> Note: In carrier to carrier combat, if the either side has **less than or equal ships** than the opposing side's weapons technology level then the carrier(s) will fight with **level 1 weapons**. This prevents players from exploiting 1 ship carriers to chip away at incoming enemy forces.
 
 The combat calculator is a useful tool to predict the outcome of combat. Simply input the defender and attacker's weapons level and number of ships and it will present the outcome.
 
@@ -47,4 +47,4 @@ When formal alliances is enabled then a there are a few conditions that need to 
 3. When a carrier intercepts another carrier in space, then combat occurs between enemies.
 4. When a player changes their diplomatic status from Allied to Enemy, then combat occurs.
 
-Note: More than 2 players can be in orbit at the star providing that they are allied with the defender. Combat will not occur if the guest players are enemies but are both allied to the defender.
+> Note: More than 2 players can be in orbit at the star providing that they are allied with the defender. Combat will not occur if the guest players are enemies but are both allied to the defender.

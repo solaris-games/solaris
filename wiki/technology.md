@@ -14,15 +14,15 @@ Improves the visible area star a star can see. The higher your scanning, the fur
 
 The equation is `(scanning + 1) * lightYear`.
 
-*Note: A `lightYear` distance unit is `50`.*
+> Note: A `lightYear` distance unit is `50`.
 
 ## Hyperspace Range
 
-Improves the distance a carrier can travel in betweeneach waypoint. 
+Improves the distance a carrier can travel in between each waypoint. 
 
 The equation is `(hyperspace + 1.5) * lightYear`.
 
-*Note: A `lightYear` distance unit is `50`.*
+> Note: A `lightYear` distance unit is `50`.
 
 ## Terraforming
 
@@ -51,7 +51,7 @@ Grants a `50` bonus points per level to a random technology each production.
 
 ## Weapons
 
-Improves the amount of enemy carriers each friendly carrier destroys in combat. Each carrier destroys enemy carriers exactly equal to the local weapons level.
+Improves the amount of enemy ships each friendly carrier destroys in combat. Each carrier destroys enemy ships exactly equal to the effective weapons level.
 
 ## Banking
 
