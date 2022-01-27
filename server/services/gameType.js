@@ -24,7 +24,8 @@ module.exports = class GameTypeService {
             'special_battleRoyale',
             'special_homeStar',
             'special_anonymous',
-            'special_kingOfTheHill'
+            'special_kingOfTheHill',
+            'special_tinyGalaxy'
         ].includes(game.settings.general.type);
     }
 

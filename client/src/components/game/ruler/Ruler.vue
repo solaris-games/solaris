@@ -1,7 +1,8 @@
 <template>
 <div class="menu-page container">
-    <menu-title title="Ruler" @onCloseRequested="onCloseRequested">
-        <button class="btn btn-sm btn-primary" @click="resetRulerPoints"><i class="fas fa-undo"></i> Reset</button>
+
+  <menu-title title="Ruler" @onCloseRequested="onCloseRequested">
+       <button class="btn btn-sm btn-primary" @click="resetRulerPoints"><i class="fas fa-undo"></i> Reset</button>
         <button class="btn btn-sm btn-warning ml-1" @click="popRulerPoint" :disabled="points.length === 0"><i class="fas fa-undo"></i> Last</button>
     </menu-title>
     <div v-if="isCompactUIStyle">
@@ -43,10 +44,22 @@
           </span>
       </div>
     </div>
-    </div>
+  </div>
 
-    <div v-if="isStandardUIStyle">
-      <div class="row bg-secondary pt-2 pb-2">
+  <div class="row bg-primary pt-2 pb-2">
+    <div class="col-6">
+    Speed Modifier
+    </div>
+    <div class="col-6 text-right">
+      <select class="form-control form-control-sm" v-model="speedModifier" @change="onSpeedModifierChanged">
+        <option value="1">1.0x (Normal)</option>
+        <option v-for="speed in speeds" v-bind:key="speed" :value="speed">{{speed}}x</option>
+      </select>
+    </div>
+  </div>
+
+<div v-if="isStandardUIStyle">
+  <div class="row bg-secondary pt-2 pb-2">
           <div class="col-6">
               Waypoints
           </div>
@@ -142,7 +155,8 @@ export default {
       totalEta: '',
       totalEtaWarp: '',
       isStandardUIStyle: false,
-      isCompactUIStyle: false
+      isCompactUIStyle: false,
+      speedModifier: 1
     }
   },
   mounted () {
@@ -173,7 +187,12 @@ export default {
     },
     onRulerPointCreated (e) {
       this.points.push(e)
-
+      if (e.type == 'carrier' && this.points.length == 1) {
+        this.speedModifier = 1;
+        if (e.object.specialistId && e.object.specialist.modifiers && e.object.specialist.modifiers.local && e.object.specialist.modifiers.local.speed  ) {
+          this.speedModifier = e.object.specialist.modifiers.local.speed
+        }
+      }
       this.recalculateAll()
     },
     onRulerPointRemoved (e) {
@@ -186,6 +205,11 @@ export default {
 
       this.recalculateAll()
     },
+    onSpeedModifierChanged (e) {
+      if (this.points.length > 1) {
+        this.recalculateETAs()
+      }
+    },
     recalculateAll () {
       this.recalculateETAs()
       this.recalculateHyperspaceScanningLevel()
@@ -195,8 +219,8 @@ export default {
       let game = this.$store.state.game
       let locations = this.points.map(p => p.location)
 
-      let totalTicks = GameHelper.getTicksBetweenLocations(game, null, locations)
-      let totalTicksWarp = GameHelper.getTicksBetweenLocations(game, null, locations, game.constants.distances.warpSpeedMultiplier)
+      let totalTicks = GameHelper.getTicksBetweenLocations(game, null, locations, this.speedModifier)
+      let totalTicksWarp = GameHelper.getTicksBetweenLocations(game, null, locations, game.constants.distances.warpSpeedMultiplier * this.speedModifier)
 
       let totalTimeString = GameHelper.getCountdownTimeStringByTicks(game, totalTicks, true)
       let totalTimeWarpString = GameHelper.getCountdownTimeStringByTicks(game, totalTicksWarp, true)
@@ -257,8 +281,13 @@ export default {
       for (let starId of starIds) {
         sum += starPoints.find(p => p.object._id === starId).object.upgradeCosts.warpGate
       }
-      
+
       return sum
+    },
+    speeds: function () {
+      let speedSpecialists = this.$store.state.carrierSpecialists.filter(i => i.modifiers && i.modifiers.local && i.modifiers.local.speed)
+
+      return [...new Set(speedSpecialists.map(s => s.modifiers.local.speed))].sort()
     }
   }
 }

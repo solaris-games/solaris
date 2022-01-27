@@ -28,6 +28,12 @@
         <p v-if="event.data.carrierShips" class="mb-1">
             <em>Sent <span class="text-warning">{{event.data.carrierShips}} ships</span>.</em>
         </p>
+        <p v-if="event.type === 'playerDebtSettled'" class="mb-1">
+          <em>Paid off <span class="text-warning">{{event.data.amount}} credits</span> of debt.</em>
+        </p>
+        <p v-if="event.type === 'playerDebtForgiven'" class="mb-1">
+          <em>Forgave <span class="text-warning">{{event.data.amount}} credits</span> of debt.</em>
+        </p>
       </div>
     </div>
 </div>
@@ -67,6 +73,10 @@ export default {
         case 'playerTechnologySent':
         case 'playerGiftSent':
           return GameHelper.getPlayerById(this.$store.state.game, this.event.playerId)
+        case 'playerDebtSettled':
+          return GameHelper.getPlayerById(this.$store.state.game, this.event.data.debtorPlayerId)
+        case 'playerDebtForgiven':
+          return GameHelper.getPlayerById(this.$store.state.game, this.event.data.creditorPlayerId)
       }
     },
     getFromPlayerColour () {

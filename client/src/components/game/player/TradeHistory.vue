@@ -38,6 +38,14 @@
                         <i class="mr-1 fas" :class="{'fa-arrow-right text-danger': event.data.toPlayerId, 'fa-arrow-left text-success': event.data.fromPlayerId}"></i>
                         <span>{{event.data.carrierShips}} <span class="text-warning">ships</span>.</span>
                     </p>
+                    <p v-if="event.type === 'playerDebtSettled'" class="mb-1">
+                        <i class="mr-1 fas" :class="{'fa-arrow-right text-danger': !isUserPlayerLedgerEventCreditor(event), 'fa-arrow-left text-success': isUserPlayerLedgerEventCreditor(event)}"></i>
+                        <span>{{event.data.amount}} <span class="text-warning">credits</span> of debt <span class="text-warning">settled</span>.</span>
+                    </p>
+                    <p v-if="event.type === 'playerDebtForgiven'" class="mb-1">
+                        <i class="mr-1 fas" :class="{'fa-arrow-left text-success': !isUserPlayerLedgerEventCreditor(event), 'fa-arrow-right text-danger': isUserPlayerLedgerEventCreditor(event)}"></i>
+                        <span>{{event.data.amount}} <span class="text-warning">credits</span> of debt <span class="text-warning">forgiven</span>.</span>
+                    </p>
                 </div>
                 <div class="col-auto">
                     <p class="mt-0 mb-0">
@@ -80,7 +88,7 @@ export default {
             this.isLoading = true
 
             try {
-                let response = await TradeApiService.getTradeEventsBetweenPlayers(this.$store.state.game._id, this.toPlayerId)
+                let response = await TradeApiService.listTradeEventsBetweenPlayers(this.$store.state.game._id, this.toPlayerId)
 
                 if (response.status === 200) {
                     this.tradeEvents = response.data.sort((a, b) => moment(b.sentDate).utc().toDate() - moment(a.sentDate).utc().toDate())
@@ -99,6 +107,15 @@ export default {
         },
         getDateString (date) {
             return GameHelper.getDateString(date)
+        },
+        isUserPlayerLedgerEventCreditor (event) {
+            if (event.type !== 'playerDebtSettled' && event.type !== 'playerDebtForgiven') {
+                return false
+            }
+
+            const summary = GameHelper.getLedgerGameEventPlayerSummary(this.$store.state.game, event)
+
+            return summary.isCreditor
         }
     }
 }

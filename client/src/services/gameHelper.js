@@ -1043,7 +1043,8 @@ class GameHelper {
       'special_battleRoyale': 'Battle Royale',
       'special_homeStar': 'Capital Stars',
       'special_anonymous': 'Anonymous',
-      'special_kingOfTheHill': 'King Of The Hill'
+      'special_kingOfTheHill': 'King Of The Hill',
+      'special_tinyGalaxy': 'Tiny Galaxy'
     }[game.settings.general.type]
   }
 
@@ -1102,6 +1103,22 @@ class GameHelper {
         statusFrom,
         statusTo,
         actualStatus
+    }
+  }
+
+  isNewPlayerGame (game) {
+    return ['new_player_rt', 'new_player_tb'].includes(game.settings.general.type)
+  }
+
+  getLedgerGameEventPlayerSummary (game, gameEvent) {
+    const debtor = this.getPlayerById(game, gameEvent.data.debtorPlayerId)
+    const creditor = this.getPlayerById(game, gameEvent.data.creditorPlayerId)
+    const isCreditor = this.getUserPlayer(game) == creditor
+
+    return {
+      debtor,
+      creditor,
+      isCreditor
     }
   }
 }
