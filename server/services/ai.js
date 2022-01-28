@@ -72,8 +72,8 @@ module.exports = class AIService {
                 this._setupAi(game, player);
                 player.ai = true;
             }
-            this._updateState(game, player);
             const context = this._createContext(game, player);
+            this._updateState(game, player, context);
             const orders = this._gatherOrders(game, player, context);
             const assignments = await this._gatherAssignments(game, player, context);
             await this._evaluateOrders(game, player, context, orders, assignments);
@@ -87,17 +87,22 @@ module.exports = class AIService {
     _setupAi(game, player) {
         player.aiState = {
             knownAttacks: [],
-            startedClaims: []
+            startedClaims: [],
+            invasionsInProgress: []
         }
     }
 
-    _updateState(game, player) {
+    _updateState(game, player, context) {
         if (!player.aiState) {
             return;
         }
 
         if (player.aiState.knownAttacks) {
             player.aiState.knownAttacks = player.aiState.knownAttacks.filter(attack => attack.arrivalTick > game.state.tick);
+        }
+
+        if (player.aiState.invasionsInProgress) {
+            player.aiState.invasionsInProgress = player.aiState.invasionsInProgress.filter(invasion => invasion.arrivalTick > game.state.tick);
         }
     }
 
@@ -130,7 +135,7 @@ module.exports = class AIService {
         const playerCarriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id);
 
         const carriersOrbiting = new Map();
-        for (const carrier of playerCarriers) {
+        for (const carrier of game.galaxy.carriers) {
             if ((!carrier.waypoints || carrier.waypoints.length === 0) && carrier.orbiting) {
                 const carriersInOrbit = getOrInsert(carriersOrbiting, carrier.orbiting.toString(), () => []);
                 carriersInOrbit.push(carrier);
@@ -251,6 +256,30 @@ module.exports = class AIService {
 
                     await this._useAssignment(context, game, player, assignments, assignment, this._createWaypointsFromTrace(trace), shipsUsed, (carrier) => attackData.carriersOnTheWay.push(carrier._id.toString()));
                 }
+            } else if (order.type === INVADE_STAR_ACTION) {
+                if (player.aiState && player.aiState.invasionsInProgress && player.aiState.invasionsInProgress.find(iv => order.star === iv.star)) {
+                    continue;
+                }
+
+                const starToInvade = context.starsById.get(order.star);
+                const requiredShips = this._calculateRequiredShipsForAttack(game, player, context, starToInvade);
+                const ticksLimit = game.settings.galaxy.productionTicks * 2;
+                const fittingAssignments = this._findAssignmentsWithTickLimit(game, player, context, context.freelyReachableStars, assignments, order.star, ticksLimit,  this._canAffordCarrier(context, game, player, false), false);
+
+                if (!fittingAssignments) {
+                    continue;
+                }
+
+                for (const {assignment, trace} of fittingAssignments) {
+                    if (assignment.totalShips >= requiredShips) {
+                        const carrierResult = await this._useAssignment(context, game, player, assignments, assignment, this._createWaypointsFromTrace(trace), requiredShips);
+                        player.aiState.invasionsInProgress.push({
+                            star: order.star,
+                            arrivalTick: game.state.tick + carrierResult.ticksEtaTotal
+                        });
+                        break;
+                    }
+                }
             } else if (order.type === CLAIM_STAR_ACTION) {
                 // Skip double claiming stars that might have been claimed by an earlier action
                 if (newClaimedStars.has(order.star)) {
@@ -352,7 +381,7 @@ module.exports = class AIService {
             assignment.totalShips = assignment.star.ships;
         }
         console.log("Assignment ships after transfer: " + assignment.totalShips);
-        await this.waypointService.saveWaypointsForCarrier(game, player, carrier, waypoints, false, false);
+        const carrierResult = await this.waypointService.saveWaypointsForCarrier(game, player, carrier, waypoints, false, false);
         const carrierRemaining = assignment.carriers && assignment.carriers.length > 0;
         if (!carrierRemaining && assignment.totalShips === 0) {
             assignments.delete(starId);
@@ -360,6 +389,7 @@ module.exports = class AIService {
         if (onCarrierUsed) {
             onCarrierUsed(carrier);
         }
+        return carrierResult;
     }
 
     _createWaypointsFromTrace(trace) {
@@ -483,6 +513,24 @@ module.exports = class AIService {
             arrivalTick,
             carriersOnTheWay: []
         }
+    }
+
+    _calculateRequiredShipsForAttack(game, player, context, starToInvade) {
+        const starId = starToInvade._id.toString();
+        const defendingPlayer = this.playerService.getById(game, starToInvade.ownedByPlayerId);
+        const defendingCarriers = context.carriersOrbiting.get(starId) || [];
+
+        const defender = {
+            ships: Math.floor(starToInvade.shipsActual) + defendingCarriers.reduce((sum, c) => sum + c.ships, 0),
+            weaponsLevel: this.technologyService.getStarEffectiveWeaponsLevel(game, defendingPlayer, starToInvade, defendingCarriers)
+        };
+        const attacker = {
+            ships: 1, // Just needed so we can get the actually needed number
+            weaponsLevel: player.research.weapons.level
+        };
+
+        const result = this.combatService.calculate(defender, attacker, true, true);
+        return result.needed.attacker;
     }
 
     _calculateRequiredShipsForDefense(game, player, context, attackData, attackingCarriers, defendingStar) {
