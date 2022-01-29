@@ -1,7 +1,8 @@
 module.exports = class BotHelperService {
 
-    constructor(botResponseService, gameService) {
+    constructor(botResponseService, gameGalaxyService, gameService) {
         this.botResponseService = botResponseService;
+        this.gameGalaxyService = gameGalaxyService
         this.gameService = gameService
     }
 

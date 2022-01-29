@@ -76,7 +76,7 @@ async function startup() {
     container = containerLoader({}, null);
 
     botResponseService = new BotResponseService();
-    botHelperService = new BotHelperService(botResponseService, container.gameService);
+    botHelperService = new BotHelperService(botResponseService, container.gameGalaxyService, container.gameService);
     commandService = new CommandService();
     reactionService = new ReactionService();
     publicCommandService = new PublicCommandService(botResponseService, botHelperService,
