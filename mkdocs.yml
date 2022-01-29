@@ -12,6 +12,8 @@ repo_url: 'https://github.com/mike-eason/solaris'
 
 nav:
   - Home: 'index.md'
+  - 'Community Guidelines': 'communityGuidelines.md'
+  - 'New Players': 'newPlayers.md'
   - Stars: 'stars.md'
   - Carriers: 'carriers.md'
   - Technology: 'technology.md'
