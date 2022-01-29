@@ -1,4 +1,4 @@
-const config = require('dotenv').config({path:__dirname + '/.env'});
+const config = require('dotenv').config({ path: __dirname + '/.env' });
 
 const Discord = require('discord.js');
 const client = new Discord.Client();
@@ -36,7 +36,7 @@ client.on('message', async (msg) => {
 
     //non-contenrelated responses; the bot has to react to a message, not for what is in it, but for where it has been sent or whatever non-contentrelated reason. Content may be taken into account later in the function
     // Whether the message is in specialist suggestions is being checked.
-    if([process.env.CHAT_ID_GENERAL_SUGGESTIONS, process.env.CHAT_ID_SPECIALIST_SUGGESTIONS, process.env.CHAT_ID_POLLS].includes(msg.channel.id)) {
+    if ([process.env.CHAT_ID_GENERAL_SUGGESTIONS, process.env.CHAT_ID_SPECIALIST_SUGGESTIONS, process.env.CHAT_ID_POLLS].includes(msg.channel.id)) {
         await contentUnrelated(msg);
     }
 
@@ -80,11 +80,11 @@ async function startup() {
     container = containerLoader({}, null);
 
     botResponseService = new BotResponseService();
-    botHelperService = new BotHelperService(botResponseService);
+    botHelperService = new BotHelperService(botResponseService, container.gameService);
     commandService = new CommandService();
     reactionService = new ReactionService();
     publicCommandService = new PublicCommandService(botResponseService, botHelperService,
-        container.gameGalaxyService, container.gameService, 
+        container.gameGalaxyService, container.gameService,
         container.leaderboardService, container.userService, container.gameTypeService);
     privateCommandService = new PrivateCommandService();
 

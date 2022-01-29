@@ -13,30 +13,9 @@ module.exports = class PublicCommandService {
     async gameinfo(msg, directions) {
         //!gameinfo <galaxy_name> <focus> ("ID")
 
-        // This checks if the gameID/name is valid and fetches the game with that ID/name if it exists
-        let game = [];
-        let focus;
-        let game_name = "";
-        if (directions[directions.length - 1] == "ID") {
-            if (this.botHelperService.isValidID(directions[0])) {
-                game = await this.gameService.getByIdAllLean(directions[0])
-            } else {
-                return msg.channel.send(this.botResponseService.error(msg.author.id, 'invalidID'))
-            }
-
-            focus = directions[directions.length - 2]
-        } else {
-            // Gamename can be searched, as it is filtered for uniqueness and existance later
-            if (directions.length === 1) {
-                directions.push('general');
-            }
-            for (let i = 0; i < directions.length - 1; i++) {
-                game_name += directions[i] + ' ';
-            }
-            game_name = game_name.trim()
-            game = await this.gameService.getByNameSettingsLean(game_name); // Slow...
-            focus = directions[directions.length - 1]
-        }
+        // Extracting the focus and game from the message in one simple command, while also validating the game
+        if(!this.botHelperService.getGame(directions, true, msg)) return;
+        let [game, focus] = this.botHelperService.getGame(directions, true, msg)
 
         const focusObject = {
             general: 0,
@@ -46,12 +25,6 @@ module.exports = class PublicCommandService {
             time: 4
         };
         const focusArray = Object.keys(focusObject);
-
-        // Checking if a game was found with the specified ID or name
-        if (!this.botHelperService.isValidGame(game, msg)) {
-            return;
-        }
-        game = this.botHelperService.isValidGame(game, msg);
 
         // Checking if the focus exists, which must be done after the game has been verified
         if (!this.botHelperService.isValidFocus(focus, focusArray, msg)) return;
@@ -110,7 +83,7 @@ module.exports = class PublicCommandService {
         //$help
         let id = msg.author.id;
         let response = `Hey <@${id}>,\nPlease visit https://github.com/mike-eason/solaris/blob/master/bots/discord/README.md for help on how to interact with me.`;
-        msg.channel.send(response);
+        return msg.channel.send(response);
     }
 
     async leaderboard_global(msg, directions) {
@@ -187,42 +160,15 @@ module.exports = class PublicCommandService {
     async leaderboard_local(msg, directions) {
         //$leaderboard_local <galaxy_name> <filter> ("ID")
 
-        let sortingKey;
-        let game = [];
-
-        // Checking if the <galaxy_name> is actually the name or just the ID of a game
-        // And when that has been determined, extract the game and ID
-        if (directions[directions.length - 1] == "ID") {
-            if (this.botHelperService.isValidID(directions[0])) {
-                game = await this.gameService.getByIdAllLean(directions[0])
-            } else {
-                return msg.channel.send(this.botResponseService.error(msg.author.id, 'invalidID'))
-            }
-            sortingKey = directions[directions.length - 2]
-        } else {
-            if (directions.length === 1) {
-                directions.push('stars');
-            }
-            let game_name = "";
-            for (let i = 0; i < directions.length - 1; i++) {
-                game_name += directions[i] + ' ';
-            }
-            game_name = game_name.trim()
-            game = await this.gameService.getByNameStateSettingsLean(game_name);
-            sortingKey = directions[directions.length - 1]
-        }
+        // Extracting the sorter and game from the message in one simple command, while also validating the game
+        if(!await this.botHelperService.getGame(directions, true, msg)) return;
+        let [game, sortingKey] = await this.botHelperService.getGame(directions, true, msg)
 
         const sorterArray = ['stars', 'carriers', 'ships', 'economy', 'industry', 'science', 'newShips', 'warpgates', 'starSpecialists', 'carrierSpecialists',
             'totalSpecialists', 'scanning', 'hyperspace', 'terraforming', 'experimentation', 'weapons', 'banking', 'manufacturing', 'specialists']
 
         // Checking if the sorter that the player specified is actually allowed
         if (!this.botHelperService.isValidFocus(sortingKey, sorterArray, msg)) return;
-
-        // Checking if we actually got 1 game, instead of 0 or more than 1, in which case we have to send an error message
-        if (!this.botHelperService.isValidGame(game, msg)) {
-            return;
-        }
-        game = this.botHelperService.isValidGame(game, msg);
 
         // Checking if we may actually give information about the game, so if it is an ongoing dark game, or an unstarted game
         if (this.gameTypeService.isDarkModeExtra(game) && !game.state.endDate) {
@@ -231,11 +177,6 @@ module.exports = class PublicCommandService {
         if (!game.state.startDate) {
             return msg.channel.send(this.botResponseService.error(msg.author.id, 'notStarted'))
         }
-
-        // Getting the game from a neutral observer with the getGalaxy function, this makes sure that all info that goes in will be public for sure
-        let gameId = game._id;
-        let gameTick = game.state.tick;
-        game = await this.gameGalaxyService.getGalaxy(gameId, null, gameTick);
 
         // This function is used to calculate from the responsedata what the response looks like
         // This function can then, combined with the responseData, be passed onto a generic multiPage/PCorMobile function
@@ -287,29 +228,9 @@ module.exports = class PublicCommandService {
     async status(msg, directions) {
         // $status <galaxy_name> ("ID")
 
-        // Checking if the <galaxy_name> is actually the name or just the ID of a game
-        // And when that has been determined, extract the game and ID
-        let game;
-        if (directions[directions.length - 1] == "ID") {
-            if (this.botHelperService.isValidID(directions[0])) {
-                game = await this.gameService.getByIdAllLean(directions[0])
-            } else {
-                return msg.channel.send(this.botResponseService.error(msg.author.id, 'invalidID'))
-            }
-        } else {
-            let game_name = "";
-            for (let i = 0; i < directions.length; i++) {
-                game_name += directions[i] + ' ';
-            }
-            game_name = game_name.trim()
-            game = await this.gameService.getByNameStateSettingsLean(game_name);
-        }
-
-        // Checking if we actually got 1 game, instead of 0 or more than 1, in which case we have to send an error message
-        if (!this.botHelperService.isValidGame(game, msg)) {
-            return;
-        }
-        game = this.botHelperService.isValidGame(game, msg);
+        // Extracting the sorter and game from the message in one simple command, while also validating the game
+        if(!this.botHelperService.getGame(directions, true, msg)) return;
+        let [game, focus] = this.botHelperService.getGame(directions, false, msg)
 
         // Checking if we may actually give information about the game, so if it is an ongoing dark game, or an unstarted game
         if (this.gameTypeService.isDarkModeExtra(game) && !game.state.endDate) {
@@ -318,11 +239,6 @@ module.exports = class PublicCommandService {
         if (!game.state.startDate) {
             return msg.channel.send(this.botResponseService.error(msg.author.id, 'notStarted'))
         }
-
-        // Getting the game from a neutral observer with the getGalaxy function, this makes sure that all info that goes in will be public for sure
-        let gameId = game._id;
-        let gameTick = game.state.tick;
-        game = await this.gameGalaxyService.getGalaxy(gameId, null, gameTick);
 
         // This function is used to calculate from the responsedata what the response looks like
         // This function can then, combined with the responseData, be passed onto a generic multiPage/PCorMobile function

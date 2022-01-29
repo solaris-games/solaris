@@ -1,7 +1,8 @@
 module.exports = class BotHelperService {
 
-    constructor(botResponseService) {
+    constructor(botResponseService, gameService) {
         this.botResponseService = botResponseService;
+        this.gameService = gameService
     }
 
     isValidID(id) {
@@ -16,9 +17,46 @@ module.exports = class BotHelperService {
         return validCharacters && id.length === 24;
     }
 
+    async getGame(directions, hasFocus, msg) {
+        let game = []
+        let focus = '';
+        if (directions[directions.length - 1] == "ID") {
+            if (this.isValidID(directions[0])) {
+                game = await this.gameService.getByIdAllLean(directions[0])
+            } else {
+                msg.channel.send(this.botResponseService.error(msg.author.id, 'invalidID'))
+                return false;
+            }
+            if (hasFocus) {
+                focus = directions[directions.length - 2]
+            }
+        } else {
+            if(directions.length <= (0 + hasFocus)) {
+                msg.channel.send(this.botResponseService.error('noDirections'))
+                return false
+            }
+            let game_name = "";
+            for (let i = 0; i < directions.length - hasFocus; i++) {
+                game_name += directions[i] + ' ';
+            }
+            game_name = game_name.trim()
+            game = await this.gameService.getByNameStateSettingsLean(game_name);
+            if(hasFocus) {
+                focus = directions[directions.length - 1]
+            }
+        }
+        game = this.isValidGame(game, msg);
+        if(!game) return false;
+
+        let gameId = game._id;
+        let gameTick = game.state.tick;
+        game = await this.gameGalaxyService.getGalaxy(gameId, null, gameTick);
+        return [game, focus];
+    }
+
     isValidGame(game, msg) {
         if (Array.isArray(game)) {
-            if (!game.length) { 
+            if (!game.length) {
                 msg.channel.send(this.botResponseService.error(msg.author.id, 'noGame'));
                 return false;
             } else if (game.length > 1) {
