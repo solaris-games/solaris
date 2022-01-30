@@ -29,10 +29,11 @@ export default {
     }
   },
   mounted () {
-    this.debtor = GameHelper.getPlayerById(this.$store.state.game, this.event.data.debtorPlayerId)
-    this.creditor = GameHelper.getPlayerById(this.$store.state.game, this.event.data.creditorPlayerId)
+    const summary = GameHelper.getLedgerGameEventPlayerSummary(this.$store.state.game, this.event)
 
-    this.isCreditor = GameHelper.getUserPlayer(this.$store.state.game) == this.creditor
+    this.debtor = summary.debtor
+    this.creditor = summary.creditor
+    this.isCreditor = summary.isCreditor
   },
   methods: {
     onOpenPlayerDetailRequested (player) {

@@ -387,12 +387,20 @@ module.exports = class TradeService extends EventEmitter {
                     'playerCreditsSpecialistsSent',
                     'playerRenownSent',
                     'playerTechnologySent',
-                    'playerGiftSent'
+                    'playerGiftSent',
+                    'playerDebtSettled',
+                    'playerDebtForgiven'
                 ]
             },
             $or: [
                 { 'data.fromPlayerId': { $in: playerIds } },
-                { 'data.toPlayerId': { $in: playerIds } }
+                { 'data.toPlayerId': { $in: playerIds } },
+                {
+                    $and: [
+                        { 'data.debtorPlayerId': { $in: playerIds } },
+                        { 'data.creditorPlayerId': { $in: playerIds } }
+                    ]
+                }
             ]
         });
 
