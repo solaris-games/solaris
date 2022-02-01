@@ -57,11 +57,11 @@ function getNewConversation(game, playerId, name, participantIds) {
 
 module.exports = class ConversationService extends EventEmitter {
 
-    constructor(gameRepo, eventRepo) {
+    constructor(gameRepo, tradeService) {
         super();
 
         this.gameRepo = gameRepo;
-        this.eventRepo = eventRepo;
+        this.tradeService = tradeService;
     }
 
     async create(game, playerId, name, participantIds) {
@@ -157,7 +157,7 @@ module.exports = class ConversationService extends EventEmitter {
         // If there are only two participants, then include any trade events that occurred
         // between the players.
         if (includeEvents && convo.participants.length === 2) {
-            let events = await this._getTradeEventsBetweenParticipants(game, playerId, convo.participants);
+            let events = await this.tradeService.listTradeEventsBetweenPlayers(game, playerId, convo.participants);
 
             convo.messages = convo.messages.concat(events);
         }
@@ -168,23 +168,24 @@ module.exports = class ConversationService extends EventEmitter {
         return convo;
     }
 
-    async send(game, playerId, conversationId, message) {
+    async send(game, player, conversationId, message) {
         message = message.trim()
 
         if (message === '') {
             throw new ValidationError(`Message must not be empty.`);
         }
 
-        let convo = await this.detail(game, playerId, conversationId, false); // Call this for the validation.
+        let convo = await this.detail(game, player._id, conversationId, false); // Call this for the validation.
 
         let newMessage = {
             _id: mongoose.Types.ObjectId(),
-            fromPlayerId: playerId,
+            fromPlayerId: player._id,
+            fromPlayerAlias: player.alias,
             message,
             sentDate: moment().utc(),
             sentTick: game.state.tick,
             pinned: false,
-            readBy: [playerId]
+            readBy: [player._id]
         };
 
         // Push a new message into the conversation messages array.
@@ -199,7 +200,7 @@ module.exports = class ConversationService extends EventEmitter {
 
         newMessage.conversationId = conversationId;
         newMessage.type = 'message';
-        newMessage.toPlayerIds = convo.participants.filter(p => p.toString() !== playerId.toString());
+        newMessage.toPlayerIds = convo.participants.filter(p => p.toString() !== player._id.toString());
 
         return newMessage;
     }
@@ -258,40 +259,6 @@ module.exports = class ConversationService extends EventEmitter {
         });
 
         return convo;
-    }
-
-    async _getTradeEventsBetweenParticipants(game, playerId, participants) {
-        let events = await this.eventRepo.find({
-            gameId: game._id,
-            playerId: playerId,
-            type: {
-                $in: [
-                    'playerCreditsReceived',
-                    'playerCreditsSpecialistsReceived',
-                    'playerRenownReceived',
-                    'playerTechnologyReceived',
-                    'playerCreditsSent',
-                    'playerCreditsSpecialistsSent',
-                    'playerRenownSent',
-                    'playerTechnologySent'
-                ]
-            },
-            $or: [
-                { 'data.fromPlayerId': { $in: participants } },
-                { 'data.toPlayerId': { $in: participants } }
-            ]
-        });
-
-        return events
-        .map(e => {
-            return {
-                playerId: e.playerId,
-                type: e.type,
-                data: e.data,
-                sentDate: moment(e._id.getTimestamp()),
-                sentTick: game.state.tick
-            }
-        });
     }
 
     getUnreadCount(game, playerId) {

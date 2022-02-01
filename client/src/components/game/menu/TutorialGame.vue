@@ -31,7 +31,7 @@
                                     <i class="fab fa-discord"></i> Discord
                                 </a>
                                 <a href="https://steamcommunity.com/app/1623930/discussions/" target="_blank" title="Forum" class="btn btn-primary mr-2">
-                                    <i class="far fa-comments"></i> Forums
+                                    <i class="far fa-comments"></i> Forum
                                 </a>
                             </div>
                         </div>

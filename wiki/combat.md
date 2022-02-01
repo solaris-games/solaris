@@ -14,7 +14,7 @@ When a Star is captured, all of its Economy is destroyed and the winner is award
 
 Combat can also occur between two carriers. When two carriers from different players intercept each other they will engage in carrier to carrier combat. In carrier to carrier combat there is no defender bonus.
 
-Note: In carrier to carrier combat, if the either side has **less than or equal ships** than the opposing side's weapons technology level then the carrier(s) will fight with **level 1 weapons**. This prevents players from exploiting 1 ship carriers to chip away at incoming enemy forces.
+> Note: In carrier to carrier combat, if the either side has **less than or equal ships** than the opposing side's weapons technology level then the carrier(s) will fight with **level 1 weapons**. This prevents players from exploiting 1 ship carriers to chip away at incoming enemy forces.
 
 The combat calculator is a useful tool to predict the outcome of combat. Simply input the defender and attacker's weapons level and number of ships and it will present the outcome.
 
@@ -47,4 +47,34 @@ When formal alliances is enabled then a there are a few conditions that need to 
 3. When a carrier intercepts another carrier in space, then combat occurs between enemies.
 4. When a player changes their diplomatic status from Allied to Enemy, then combat occurs.
 
-Note: More than 2 players can be in orbit at the star providing that they are allied with the defender. Combat will not occur if the guest players are enemies but are both allied to the defender.
+> Note: More than 2 players can be in orbit at the star providing that they are allied with the defender. Combat will not occur if the guest players are enemies but are both allied to the defender.
+
+## Weapon Buffs and Specialists Stacking Example
+
+Scenario:
+
+- **Player A** - `weapons level 11`
+    - Defending star:
+        - Trade Port - `-5 weapons`
+- **Player B** - `weapons level 13`
+    - Attacking with carriers:
+        - Lieutenant - `+1 weapons`
+        - Destroyer - `+5 weapons`
+        - Scrambler - `-1 weapons`
+        - Infiltrator - `-1 weapons to the enemy`
+
+The combat weapons level resolves to this:
+
+**Player A** - `weapons level 11`:
+    - Defender bonus = `+1 weapons`
+    - Largest buff = `N/A`
+    - Largest debuff = `-5 weapons` (Trade Port)
+    - Additional debuff = `-1 weapons` (Enemy Infiltrator)
+    - **Total weapons** = `6`
+
+**Player B** - `weapons level 13`
+    - Defender bonus = `N/A`
+    - Largest buff = `+5 weapons` (Destroyer)
+    - Largest debuff = `-1 weapons` (Scrambler)
+    - Additional debuff = `N/A`
+    - **Total weapons** = `17`

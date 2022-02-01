@@ -1,4 +1,3 @@
-const axios = require('axios');
 const ValidationError = require('../errors/validation');
 
 const COST_PER_TOKEN = 1;

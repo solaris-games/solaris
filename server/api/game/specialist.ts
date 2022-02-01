@@ -2,6 +2,26 @@ export default (router, io, container) => {
 
     const middleware = require('../middleware')(container);
 
+    router.get('/api/game/specialists/carrier', async (req, res, next) => {
+        try {
+            let specialists = await container.specialistService.listCarrier(null);
+
+            return res.status(200).json(specialists);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.get('/api/game/specialists/star', async (req, res, next) => {
+        try {
+            let specialists = await container.specialistService.listStar(null);
+
+            return res.status(200).json(specialists);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.get('/api/game/:gameId/specialists/carrier', middleware.loadGameLean, async (req, res, next) => {
         try {
             let specialists = await container.specialistService.listCarrier(req.game);

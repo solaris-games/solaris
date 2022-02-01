@@ -198,7 +198,9 @@ module.exports = class ResearchService extends EventEmitter {
         return {
             technology: tech.key,
             level: tech.technology.level,
-            amount: researchAmount
+            amount: researchAmount,
+            levelUp,
+            researchingNext: player.researchingNext
         };
     }
 

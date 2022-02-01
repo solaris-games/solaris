@@ -1,0 +1,250 @@
+{
+    "stars": [
+        {
+            "id": 0,
+            "playerId": 0,
+            "homeStar": true,
+            "location": {
+                "x": 250,
+                "y": 0
+            },
+            "naturalResources": {
+                "economy": 50,
+                "industry": 50,
+                "science": 50
+            },
+            "warpGate": false,
+            "isNebula": false,
+            "isAsteroidField": false,
+            "isBlackHole": false,
+            "wormHoleToStarId": 5,
+            "specialistId": 1
+        },
+        {
+            "id": 1,
+            "playerId": 0,
+            "homeStar": false,
+            "location": {
+                "x": 250,
+                "y": 50
+            },
+            "naturalResources": {
+                "economy": 10,
+                "industry": 10,
+                "science": 10
+            },
+            "warpGate": true,
+            "isNebula": false,
+            "isAsteroidField": false,
+            "isBlackHole": false,
+            "wormHoleToStarId": null,
+            "specialistId": null
+        },
+        {
+            "id": 2,
+            "playerId": 0,
+            "homeStar": false,
+            "location": {
+                "x": 250,
+                "y": -50
+            },
+            "naturalResources": {
+                "economy": 10,
+                "industry": 10,
+                "science": 10
+            },
+            "warpGate": false,
+            "isNebula": true,
+            "isAsteroidField": false,
+            "isBlackHole": false,
+            "wormHoleToStarId": null,
+            "specialistId": null
+        },
+        {
+            "id": 3,
+            "playerId": 0,
+            "homeStar": false,
+            "location": {
+                "x": 200,
+                "y": 0
+            },
+            "naturalResources": {
+                "economy": 10,
+                "industry": 10,
+                "science": 10
+            },
+            "warpGate": false,
+            "isNebula": false,
+            "isAsteroidField": true,
+            "isBlackHole": false,
+            "wormHoleToStarId": null,
+            "specialistId": null
+        },
+        {
+            "id": 4,
+            "playerId": 0,
+            "homeStar": false,
+            "location": {
+                "x": 300,
+                "y": 0
+            },
+            "naturalResources": {
+                "economy": 10,
+                "industry": 10,
+                "science": 10
+            },
+            "warpGate": false,
+            "isNebula": false,
+            "isAsteroidField": false,
+            "isBlackHole": true,
+            "wormHoleToStarId": null,
+            "specialistId": null
+        },
+
+
+        
+        {
+            "id": 5,
+            "playerId": 1,
+            "homeStar": true,
+            "location": {
+                "x": -250,
+                "y": 0
+            },
+            "naturalResources": {
+                "economy": 50,
+                "industry": 50,
+                "science": 50
+            },
+            "warpGate": false,
+            "isNebula": false,
+            "isAsteroidField": false,
+            "isBlackHole": false,
+            "wormHoleToStarId": 0,
+            "specialistId": 1
+        },
+        {
+            "id": 6,
+            "playerId": 1,
+            "homeStar": false,
+            "location": {
+                "x": -250,
+                "y": 50
+            },
+            "naturalResources": {
+                "economy": 10,
+                "industry": 10,
+                "science": 10
+            },
+            "warpGate": true,
+            "isNebula": false,
+            "isAsteroidField": false,
+            "isBlackHole": false,
+            "wormHoleToStarId": null,
+            "specialistId": null
+        },
+        {
+            "id": 7,
+            "playerId": 1,
+            "homeStar": false,
+            "location": {
+                "x": -250,
+                "y": -50
+            },
+            "naturalResources": {
+                "economy": 10,
+                "industry": 10,
+                "science": 10
+            },
+            "warpGate": false,
+            "isNebula": true,
+            "isAsteroidField": false,
+            "isBlackHole": false,
+            "wormHoleToStarId": null,
+            "specialistId": null
+        },
+        {
+            "id": 8,
+            "playerId": 1,
+            "homeStar": false,
+            "location": {
+                "x": -200,
+                "y": 0
+            },
+            "naturalResources": {
+                "economy": 10,
+                "industry": 10,
+                "science": 10
+            },
+            "warpGate": false,
+            "isNebula": false,
+            "isAsteroidField": true,
+            "isBlackHole": false,
+            "wormHoleToStarId": null,
+            "specialistId": null
+        },
+        {
+            "id": 9,
+            "playerId": 1,
+            "homeStar": false,
+            "location": {
+                "x": -300,
+                "y": 0
+            },
+            "naturalResources": {
+                "economy": 10,
+                "industry": 10,
+                "science": 10
+            },
+            "warpGate": false,
+            "isNebula": false,
+            "isAsteroidField": false,
+            "isBlackHole": true,
+            "wormHoleToStarId": null,
+            "specialistId": null
+        },
+
+
+
+        {
+            "id": 10,
+            "playerId": null,
+            "homeStar": false,
+            "location": {
+                "x": 50,
+                "y": 0
+            },
+            "naturalResources": {
+                "economy": 100,
+                "industry": 100,
+                "science": 100
+            },
+            "warpGate": false,
+            "isNebula": false,
+            "isAsteroidField": false,
+            "isBlackHole": false,
+            "wormHoleToStarId": null,
+            "specialistId": 6
+        },
+        {
+            "id": 11,
+            "playerId": null,
+            "homeStar": false,
+            "location": {
+                "x": -50,
+                "y": 0
+            },
+            "naturalResources": {
+                "economy": 100,
+                "industry": 100,
+                "science": 100
+            },
+            "warpGate": false,
+            "isNebula": false,
+            "isAsteroidField": false,
+            "isBlackHole": false,
+            "wormHoleToStarId": null,
+            "specialistId": 6
+        }
+    ]
+}

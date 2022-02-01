@@ -3,7 +3,7 @@
     <view-title title="Avatar Shop" />
 
     <p>Unlock new races to play with <strong class="text-warning">Galactic Credits</strong>. <router-link :to="{ name: 'galactic-credits-shop'}"><i class="fas fa-shopping-basket"></i> Purchase Galactic Credits</router-link> or earn credits by winning official games.</p>
-    <h5 v-if="userInfo">You have <span class="text-warning"><strong>{{userInfo.credits}}</strong> Galactic Credits</span>.</h5>
+    <h5 v-if="userCredits">You have <span class="text-warning"><strong>{{userCredits.credits}}</strong> Galactic Credits</span>.</h5>
 
     <hr />
 
@@ -20,10 +20,10 @@
               <h5>{{avatar.name}}</h5>
             </div>
             <div class="col-auto">
-              <button class="btn btn-sm btn-success" v-if="!avatar.purchased && userInfo.credits >= avatar.price" @click="purchaseAvatar(avatar)">
+              <button class="btn btn-sm btn-success" v-if="!avatar.purchased && userCredits.credits >= avatar.price" @click="purchaseAvatar(avatar)">
                 <i class="fas fa-shopping-basket"></i> {{avatar.price}} Credit<span v-if="avatar.price > 1">s</span>
               </button>
-              <router-link :to="{ name: 'galactic-credits-shop'}" class="btn btn-sm btn-danger" v-if="!avatar.purchased && userInfo.credits < avatar.price">
+              <router-link :to="{ name: 'galactic-credits-shop'}" class="btn btn-sm btn-danger" v-if="!avatar.purchased && userCredits.credits < avatar.price">
                 <i class="fas fa-coins"></i> {{avatar.price}} Credit<span v-if="avatar.price > 1">s</span>
               </router-link>
               <span class="badge badge-primary" v-if="avatar.purchased"><i class="fas fa-check"></i> Unlocked</span>
@@ -53,7 +53,7 @@ export default {
   data () {
     return {
         isLoading: false,
-        userInfo: null,
+        userCredits: null,
         avatars: []
     }
   },
@@ -66,10 +66,10 @@ export default {
   methods: {
     async loadGalacticCredits () {
       try {
-        let response = await UserApiService.getMyUserInfo()
+        let response = await UserApiService.getUserCredits()
 
         if (response.status === 200) {
-            this.userInfo = response.data
+            this.userCredits = response.data
         }
       } catch (err) {
           console.error(err)
@@ -102,7 +102,7 @@ export default {
 
         if (response.status === 200) {
           avatar.purchased = true
-          this.userInfo.credits -= avatar.price
+          this.userCredits.credits -= avatar.price
         }
       } catch (err) {
         console.error(err)

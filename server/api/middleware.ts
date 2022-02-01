@@ -10,7 +10,7 @@ export default (container) => {
 
             let isBanned = await container.userService.getUserIsBanned(req.session.userId);
 
-            if (isBanned) {
+            if (isBanned && !req.session.isImpersonating) {
                 throw new ValidationError(`The account is banned.`, 401);
             }
 
@@ -178,6 +178,33 @@ export default (container) => {
             req.game = await container.gameService.getByIdLean(req.params.gameId, {
                 'galaxy.players': 1,
                 'settings': 1
+            });
+
+            if (!req.game) {
+                throw new ValidationError('Game not found.', 404);
+            }
+
+            return next();
+        },
+
+        async loadGamePlayersState(req, res, next) {
+            req.game = await container.gameService.getByIdLean(req.params.gameId, {
+                'galaxy.players': 1,
+                'state': 1
+            });
+
+            if (!req.game) {
+                throw new ValidationError('Game not found.', 404);
+            }
+
+            return next();
+        },
+
+        async loadGamePlayersSettingsState(req, res, next) {
+            req.game = await container.gameService.getByIdLean(req.params.gameId, {
+                'settings': 1,
+                'galaxy.players': 1,
+                'state': 1
             });
 
             if (!req.game) {

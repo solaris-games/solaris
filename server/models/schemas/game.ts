@@ -28,10 +28,12 @@ const schema = new Schema({
 				'special_orbital',
 				'special_battleRoyale',
 				'special_homeStar',
-				'special_anonymous'
+				'special_anonymous',
+				'special_kingOfTheHill',
+				'special_tinyGalaxy'
 			], default: 'custom' },
 			mode: { type: Types.String, required: true, enum: [
-				'conquest', 'battleRoyale'
+				'conquest', 'battleRoyale', 'kingOfTheHill'
 			], default: 'conquest' },
 			featured: { type: Types.Boolean, required: false, default: false },
 			password: { type: Types.String, required: false },
@@ -44,9 +46,9 @@ const schema = new Schema({
 			awardRankTo: { type: Types.String, required: false, enum: ['all', 'winner'], default: 'all' },
         },
         galaxy: {
-			galaxyType: { type: Types.String, required: true, enum: ['circular', 'spiral', 'doughnut','circular-balanced', 'irregular'], default: 'circular' },
+			galaxyType: { type: Types.String, required: true, enum: ['circular', 'spiral', 'doughnut','circular-balanced', 'irregular', 'custom'], default: 'circular' },
 			starsPerPlayer: { type: Types.Number, required: true, min: 3, max: 50, default: 20 },
-			productionTicks: { type: Types.Number, required: true, enum: [10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36], default: 24 }
+			productionTicks: { type: Types.Number, required: true, min: 10, max: 36, default: 24 }
         },
         specialGalaxy: {
 			carrierCost: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' },
@@ -58,27 +60,35 @@ const schema = new Schema({
 			randomWormHoles: { type: Types.Number, min: 0, max: 50, default: 0 },
 			randomNebulas: { type: Types.Number, min: 0, max: 50, default: 0 },
 			randomAsteroidFields: { type: Types.Number, min: 0, max: 50, default: 0 },
+			randomBlackHoles: { type: Types.Number, min: 0, max: 50, default: 0 },
 			darkGalaxy: { type: Types.String, required: true, enum: ['disabled', 'standard', 'extra', 'start'], default: 'start' },
 			giftCarriers: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },
 			defenderBonus: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },
 			carrierToCarrierCombat: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
+			splitResources: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'disabled' },
 			resourceDistribution: { type: Types.String, required: true, enum: ['random','weightedCenter'], default: 'random' },
 			playerDistribution: { type: Types.String, required: true, enum: ['circular','random'], default: 'circular' },
 			carrierSpeed: { type: Types.Number, required: true, min: 1, max: 25, default: 5 },
+			specialistBans: {
+				star: [{ type: Types.Number, required: false }],
+				carrier: [{ type: Types.Number, required: false }]
+			},
         },
 		conquest: {
 			victoryCondition: { type: Types.String, required: true, enum: ['starPercentage', 'homeStarPercentage'], default: 'starPercentage' },
 			victoryPercentage: { type: Types.Number, required: true, enum: [25, 33, 50, 66, 75, 90, 100], default: 50 },
 		},
+		kingOfTheHill: {
+			productionCycles: { type: Types.Number, required: false, min: 1, max: 25, default: 10 }
+		},
 		orbitalMechanics: {
 			enabled: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
-			orbitSpeed: { type: Types.Number, required: false, enum: [2.5, 5, 10, 25], default: 5 },
-			orbitOrigin: { type: Types.String, required: false, enum: ['galacticCenter', 'galacticCenterOfMass'], default: 'galacticCenter' }
+			orbitSpeed: { type: Types.Number, required: false, min: 1, max: 5, default: 3 }
 		},
         player: {
 			startingStars: { type: Types.Number, required: true, min: 1, max: 10, default: 6 },
-			startingCredits: { type: Types.Number, required: true, enum: [25, 50, 100, 500, 1000, 1500, 2000, 2500, 3000], default: 500 },
-			startingCreditsSpecialists: { type: Types.Number, required: true, enum: [0, 1, 3, 5, 10, 25, 50, 100], default: 5 },
+			startingCredits: { type: Types.Number, required: true, min: 25, max: 3000, default: 500 },
+			startingCreditsSpecialists: { type: Types.Number, required: true, min: 0, max: 100, default: 5 },
 			startingShips: { type: Types.Number, required: true, min: 0, max: 100, default: 10 },
 			startingInfrastructure: {
 				economy: { type: Types.Number, required: true, min: 0, max: 30, default: 5 },
@@ -147,6 +157,7 @@ const schema = new Schema({
 		startDate: { type: Types.Date, required: false }, // Dates are in UTC
 		endDate: { type: Types.Date, required: false },
 		lastTickDate: { type: Types.Date, required: false },
+		ticksToEnd: { type: Types.Number, required: false, default: null },
 		stars: { type: Types.Number, required: true },
 		starsForVictory: { type: Types.Number, required: true },
 		players: { type: Types.Number, required: true, default: 0 },

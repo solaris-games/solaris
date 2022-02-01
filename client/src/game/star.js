@@ -2,6 +2,7 @@ import * as PIXI from 'pixi.js-legacy'
 import EventEmitter from 'events'
 import TextureService from './texture'
 import gameHelper from '../services/gameHelper'
+import seededRandom from 'random-seed'
 
 class Star extends EventEmitter {
 
@@ -10,6 +11,7 @@ class Star extends EventEmitter {
   static shipsSmallSize = 6
   static shipsBigSize = 10
   static maxLod = 4
+  static seededRNG = seededRandom.create()
 
   /*
     Defines what zoompercentage correspond to what
@@ -44,6 +46,7 @@ class Star extends EventEmitter {
     this.graphics_star = new PIXI.Graphics()
     this.graphics_targeted = new PIXI.Graphics()
     this.graphics_selected = new PIXI.Graphics()
+    this.graphics_kingOfTheHill = new PIXI.Graphics()
 
     this.container.addChild(this.graphics_star)
     this.container.addChild(this.graphics_shape_part)
@@ -52,6 +55,7 @@ class Star extends EventEmitter {
     this.container.addChild(this.graphics_shape_full_warp)
     this.container.addChild(this.graphics_targeted)
     this.container.addChild(this.graphics_selected)
+    this.container.addChild(this.graphics_kingOfTheHill)
 
     this.fixedContainer.addChild(this.graphics_scanningRange)
     this.fixedContainer.addChild(this.graphics_hyperspaceRange)
@@ -130,6 +134,8 @@ class Star extends EventEmitter {
     // If a star is revealed or a star becomes masked then we want to  the entire
     // star to be re-drawn.
 
+    this.drawKingOfTheHillCircle()
+    this.drawWormHole()
     this.drawNebula()
     this.drawAsteroidField()
     this.drawTarget()
@@ -153,9 +159,21 @@ class Star extends EventEmitter {
   drawStar () {
     this.container.removeChild(this.graphics_star)
 
+    const isGraphics = this.hasBlackHole()
     let isInScanningRange = this._isInScanningRange()
+
     if (isInScanningRange) {
-      if (this.data.homeStar) {
+      if (this.hasBlackHole()) {
+        this.graphics_star = new PIXI.Graphics()
+        this.graphics_star.beginFill(0x000000)
+
+        if (!this.data.ownedByPlayerId) { // Ensures that unowned black holes are easily visible.
+          this.graphics_star.lineStyle(0.3, 0xFFFFFF)
+        }
+
+        this.graphics_star.drawCircle(0, 0, 4)
+        this.graphics_star.endFill()
+      } else if (this.data.homeStar) {
         this.graphics_star = new PIXI.Sprite(TextureService.STAR_SYMBOLS['home'])
       }
       else if (this._isDeadStar() ) {
@@ -169,9 +187,13 @@ class Star extends EventEmitter {
       this.graphics_star = new PIXI.Sprite(TextureService.STAR_SYMBOLS['unscannable'])
       this.graphics_star.tint = 0xa0a0a0
     }
-    this.graphics_star.anchor.set(0.5)
-    this.graphics_star.width = 24.0/2.0
-    this.graphics_star.height = 24.0/2.0
+
+    if (!isGraphics) {
+      this.graphics_star.anchor.set(0.5)
+      this.graphics_star.width = 24.0/2.0
+      this.graphics_star.height = 24.0/2.0
+    }
+
     this.container.addChild(this.graphics_star)
   }
 
@@ -183,14 +205,16 @@ class Star extends EventEmitter {
       this.fixedContainer.removeChild(this.nebulaSprite)
       this.nebulaSprite = null
     }
-    let nebulaTexture = TextureService.getRandomStarNebulaTexture()
+    let seed = this.data._id
+    Star.seededRNG.seed(seed)
+    let nebulaTexture = TextureService.getRandomStarNebulaTexture(seed)
     this.nebulaSprite = new PIXI.Sprite(nebulaTexture)
 
     let spriteSize = 64
     this.nebulaSprite.width = spriteSize
     this.nebulaSprite.height = spriteSize
     this.nebulaSprite.anchor.set(0.5)
-    this.nebulaSprite.rotation = Math.random()*Math.PI*2.0
+    this.nebulaSprite.rotation = Star.seededRNG.random()*Math.PI*2.0
 
     let player = this._getStarPlayer()
     let playerColour = player ? player.colour.value : 0xFFFFFF
@@ -199,12 +223,40 @@ class Star extends EventEmitter {
 
     let blendSprite = new PIXI.Sprite(nebulaTexture)
     blendSprite.anchor.set(0.5)
-    blendSprite.rotation = Math.random()*Math.PI*2.0
+    blendSprite.rotation = Star.seededRNG.random()*Math.PI*2.0
     //blendSprite.blendMode = PIXI.BLEND_MODES.ADD
     blendSprite.tint = playerColour
     this.nebulaSprite.addChild(blendSprite)
 
     this.fixedContainer.addChild(this.nebulaSprite)
+  }
+
+  drawWormHole () {
+    if (!this.data.wormHoleToStarId) {
+      return
+    }
+
+    if (this.wormHoleSprite) {
+      this.fixedContainer.removeChild(this.wormHoleSprite)
+      this.wormHoleSprite = null
+    }
+
+    let texture = TextureService.getRandomWormholeTexture()
+    this.wormHoleSprite = new PIXI.Sprite(texture)
+
+    let spriteSize = 40
+    this.wormHoleSprite.width = spriteSize
+    this.wormHoleSprite.height = spriteSize
+    this.wormHoleSprite.anchor.set(0.5)
+    this.wormHoleSprite.rotation = Math.random()*Math.PI*2.0
+    this.wormHoleSprite.alpha = 0.35
+
+    let player = this._getStarPlayer()
+    let playerColour = player ? player.colour.value : 0xFFFFFF
+    this.wormHoleSprite.tint = playerColour
+    //this.asteroidFieldSprite.blendMode = PIXI.BLEND_MODES.ADD // for extra punch
+
+    this.fixedContainer.addChild(this.wormHoleSprite)
   }
 
   drawAsteroidField () {
@@ -215,14 +267,16 @@ class Star extends EventEmitter {
       this.fixedContainer.removeChild(this.asteroidFieldSprite)
       this.asteroidFieldSprite = null
     }
-    let texture = TextureService.getRandomStarAsteroidFieldTexture()
+    let seed = this.data._id
+    Star.seededRNG.seed(seed)
+    let texture = TextureService.getRandomStarAsteroidFieldTexture(seed)
     this.asteroidFieldSprite = new PIXI.Sprite(texture)
 
     let spriteSize = 64
     this.asteroidFieldSprite.width = spriteSize
     this.asteroidFieldSprite.height = spriteSize
     this.asteroidFieldSprite.anchor.set(0.5)
-    this.asteroidFieldSprite.rotation = Math.random()*Math.PI*2.0
+    this.asteroidFieldSprite.rotation = Star.seededRNG.random()*Math.PI*2.0
 
     let player = this._getStarPlayer()
     let playerColour = player ? player.colour.value : 0xFFFFFF
@@ -233,13 +287,13 @@ class Star extends EventEmitter {
   }
 
   drawSpecialist () {
-    if (!this.hasSpecialist()) {
-      return
-    }
-
     if (this.specialistSprite) {
       this.container.removeChild(this.specialistSprite)
       this.specialistSprite = null
+    }
+    
+    if (!this.hasSpecialist()) {
+      return
     }
 
     //FIXME potential resource leak, should not create a new sprite every time
@@ -250,7 +304,6 @@ class Star extends EventEmitter {
     this.specialistSprite.height = 10
     this.specialistSprite.x = -5
     this.specialistSprite.y = -5
-    this.specialistSprite.zIndex = -1
 
     this.container.addChild(this.specialistSprite)
   }
@@ -261,6 +314,10 @@ class Star extends EventEmitter {
 
   hasAsteroidField () {
     return this.data.isAsteroidField
+  }
+
+  hasBlackHole () {
+    return this.data.isBlackHole
   }
 
   hasSpecialist () {
@@ -336,10 +393,14 @@ class Star extends EventEmitter {
   }
 
   drawNaturalResourcesRing () {
+    if (!this.data.naturalResources) {
+      return
+    }
     for(let lod = 0; lod<Star.maxLod; lod+=1) {
       if(!this.graphics_natural_resources_ring[lod]) {
         this.graphics_natural_resources_ring[lod] = new PIXI.Graphics()
-        this.graphics_natural_resources_ring[lod].alpha = 0.3
+        this.graphics_natural_resources_ring[lod].alpha = 0.5
+        this.graphics_natural_resources_ring[lod].zIndex = -1
       }
       this.graphics_natural_resources_ring[lod].clear()
 
@@ -347,9 +408,11 @@ class Star extends EventEmitter {
         return
       }
 
+      let averageNaturalResources = this._calculateAverageNaturalResources(this.data.naturalResources);
+
       // let ringRadius = this.data.naturalResources > 100 ? 100 : this.data.naturalResources
       // TODO: Experimental:
-      let ringRadius = this.data.naturalResources <= 50 ? this.data.naturalResources : this.data.naturalResources > 400 ? 100 : (12.5 * Math.log2(this.data.naturalResources / 50) + 50)
+      let ringRadius = averageNaturalResources <= 50 ? averageNaturalResources : averageNaturalResources > 400 ? 100 : (12.5 * Math.log2(averageNaturalResources / 50) + 50)
 
       ringRadius /= 8.0
       let lineWidht = 1.0/8.0
@@ -364,12 +427,16 @@ class Star extends EventEmitter {
     }
   }
 
+  _calculateAverageNaturalResources(naturalResources) {
+    return Math.floor((naturalResources.economy + naturalResources.industry + naturalResources.science) / 3);
+  }
+
   _getPlanetsCount () {
     if (!this.data.naturalResources) {
       return 0
     }
-
-    return Math.min(Math.floor(this.data.naturalResources / 45 * 3), 5) // Anything over 45 gets 3 planets
+    let averageNaturalResources = this._calculateAverageNaturalResources(this.data.naturalResources);
+    return Math.min(Math.floor(averageNaturalResources / 45 * 3), 5) // Anything over 45 gets 3 planets
   }
 
   _getPlanetOrbitDirection () {
@@ -392,20 +459,9 @@ class Star extends EventEmitter {
     if (!player) {
       return
     }
-
-    switch (player.shape) {
-      case 'circle':
-        this._drawColourCircle()
-        break
-      case 'square':
-        this._drawColourSquare()
-        break
-      case 'diamond':
-        this._drawColourDiamond()
-        break;
-      case 'hexagon':
-        this._drawColourHexagon()
-        break;
+    if (Object.keys(TextureService.PLAYER_SYMBOLS).includes(player.shape)) {
+      this.graphics_shape_part = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS[player.shape][2+this.data.warpGate])
+      this.graphics_shape_full = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS[player.shape][0+this.data.warpGate])
     }
     this.graphics_shape_part.tint = player.colour.value
     this.graphics_shape_full.tint = player.colour.value
@@ -417,26 +473,6 @@ class Star extends EventEmitter {
     this.graphics_shape_full.height = 28.0
     this.container.addChild(this.graphics_shape_part)
     this.container.addChild(this.graphics_shape_full)
-  }
-
-  _drawColourCircle () {
-    this.graphics_shape_part = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['circle'][2+this.data.warpGate])
-    this.graphics_shape_full = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['circle'][0+this.data.warpGate])
-  }
-
-  _drawColourSquare () {
-    this.graphics_shape_part = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['square'][2+this.data.warpGate])
-    this.graphics_shape_full = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['square'][0+this.data.warpGate])
-  }
-
-  _drawColourDiamond () {
-    this.graphics_shape_part = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['diamond'][2+this.data.warpGate])
-    this.graphics_shape_full = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['diamond'][0+this.data.warpGate])
-  }
-
-  _drawColourHexagon () {
-    this.graphics_shape_part = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['hexagon'][2+this.data.warpGate])
-    this.graphics_shape_full = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS['hexagon'][0+this.data.warpGate])
   }
 
   _hasUnknownShips() {
@@ -584,7 +620,8 @@ class Star extends EventEmitter {
     // Get the player who owns the star.
     let player = this._getStarPlayer()
 
-    if (!player || this._isDeadStar()) { return }
+    // Dead stars do not have scanning range unless they are black holes
+    if (!player || (this._isDeadStar() && !this.hasBlackHole())) { return }
 
     if (!player.research) { return }
 
@@ -593,6 +630,10 @@ class Star extends EventEmitter {
 
     if (this.data.specialist && this.data.specialist.modifiers.local) {
       techLevel += this.data.specialist.modifiers.local.scanning || 0
+    }
+
+    if (this.hasBlackHole()) {
+      techLevel += 3
     }
 
     techLevel = Math.max(1, techLevel)
@@ -666,6 +707,16 @@ class Star extends EventEmitter {
       this.graphics_selected.drawCircle(0, 0, 20)
     }
   }
+
+  drawKingOfTheHillCircle () {
+    this.graphics_kingOfTheHill.clear()
+
+    if (this.data.isKingOfTheHillStar) {
+      this.graphics_kingOfTheHill.lineStyle(0.5, 0xFFFFFF)
+      this.graphics_kingOfTheHill.alpha = 0.5
+      this.graphics_kingOfTheHill.drawCircle(0, 0, 20)
+    }
+  }
   
   onZoomChanging(zoomPercent) {
     this.zoomPercent = zoomPercent
@@ -731,7 +782,7 @@ class Star extends EventEmitter {
       }
     }
 
-    this.graphics_star.visible = !this.hasSpecialist()
+    this.graphics_star.visible = !this.hasSpecialist() || this.hasBlackHole()
     this.graphics_hyperspaceRange.visible = this.isSelected
     this.graphics_scanningRange.visible = this.isSelected
 
@@ -808,7 +859,7 @@ class Star extends EventEmitter {
   }
 
   _isDeadStar () {
-    return this.data.naturalResources != null && this.data.naturalResources <= 0
+    return this.data.naturalResources != null && this.data.naturalResources.economy <= 0 && this.data.naturalResources.industry <= 0 && this.data.naturalResources.science <= 0;
   }
 
   select () {

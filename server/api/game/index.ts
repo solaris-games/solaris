@@ -115,7 +115,17 @@ export default (router, io, container) => {
 
     router.get('/api/game/list/completed', middleware.authenticate, async (req, res, next) => {
         try {
-            let games = await container.gameListService.listCompletedGames(req.session.userId);
+            let games = await container.gameListService.listRecentlyCompletedGames();
+
+            return res.status(200).json(games);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.get('/api/game/list/completed/user', middleware.authenticate, async (req, res, next) => {
+        try {
+            let games = await container.gameListService.listUserCompletedGames(req.session.userId);
 
             return res.status(200).json(games);
         } catch (err) {

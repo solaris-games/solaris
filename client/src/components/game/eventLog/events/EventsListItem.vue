@@ -18,6 +18,8 @@
         <game-player-quit :event="event" v-if="event.type === 'gamePlayerQuit'"
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
         <game-started :event="event" v-if="event.type === 'gameStarted'"/>
+        <game-player-badge-purchased :event="event" v-if="event.type === 'gamePlayerBadgePurchased'"
+            @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 
         <player-bulk-infrastructure-upgraded :event="event" v-if="event.type === 'playerBulkInfrastructureUpgraded'"/>
         <player-combat-star :event="event" v-if="event.type === 'playerCombatStar'"
@@ -30,6 +32,10 @@
         <player-credits-specialists-received :event="event" v-if="event.type === 'playerCreditsSpecialistsReceived'"
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
         <player-credits-specialists-sent :event="event" v-if="event.type === 'playerCreditsSpecialistsSent'"
+            @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        <player-gift-received :event="event" v-if="event.type === 'playerGiftReceived'"
+            @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        <player-gift-sent :event="event" v-if="event.type === 'playerGiftSent'"
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
         <player-galactic-cycle-complete :event="event" v-if="event.type === 'playerGalacticCycleComplete'"/>
         <player-renown-received :event="event" v-if="event.type === 'playerRenownReceived'"
@@ -61,6 +67,7 @@ import GameEndedVue from './GameEnded'
 import GamePausedVue from './GamePaused'
 import GamePlayerAFKVue from './GamePlayerAFK'
 import GamePlayerDefeatedVue from './GamePlayerDefeated'
+import GamePlayerBadgePurchasedVue from './GamePlayerBadgePurchased'
 import GamePlayerJoinedVue from './GamePlayerJoined'
 import GamePlayerQuitVue from './GamePlayerQuit'
 import GameStartedVue from './GameStarted'
@@ -71,6 +78,8 @@ import PlayerCreditsReceivedVue from './PlayerCreditsReceived'
 import PlayerCreditsSentVue from './PlayerCreditsSent'
 import PlayerCreditsSpecialistsReceivedVue from './PlayerCreditsSpecialistsReceived'
 import PlayerCreditsSpecialistsSentVue from './PlayerCreditsSpecialistsSent'
+import PlayerGiftReceivedVue from './PlayerGiftReceived'
+import PlayerGiftSentVue from './PlayerGiftSent'
 import PlayerGalacticCycleCompleteEventVue from './PlayerGalacticCycleCompleteEvent'
 import PlayerRenownReceivedVue from './PlayerRenownReceived'
 import PlayerRenownSentVue from './PlayerRenownSent'
@@ -92,6 +101,7 @@ export default {
     'game-paused': GamePausedVue,
     'game-player-afk': GamePlayerAFKVue,
     'game-player-defeated': GamePlayerDefeatedVue,
+    'game-player-badge-purchased': GamePlayerBadgePurchasedVue,
     'game-player-joined': GamePlayerJoinedVue,
     'game-player-quit': GamePlayerQuitVue,
     'game-started': GameStartedVue,
@@ -102,6 +112,8 @@ export default {
     'player-credits-sent': PlayerCreditsSentVue,
     'player-credits-specialists-received': PlayerCreditsSpecialistsReceivedVue,
     'player-credits-specialists-sent': PlayerCreditsSpecialistsSentVue,
+    'player-gift-received': PlayerGiftReceivedVue,
+    'player-gift-sent': PlayerGiftSentVue,
     'player-galactic-cycle-complete': PlayerGalacticCycleCompleteEventVue,
     'player-renown-received': PlayerRenownReceivedVue,
     'player-renown-sent': PlayerRenownSentVue,

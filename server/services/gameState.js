@@ -3,7 +3,7 @@ const moment = require('moment');
 module.exports = class GameStateService {
 
     isInProgress(game) {
-        return game.state.startDate && !game.state.endDate;
+        return game.state.startDate != null && game.state.endDate == null;
     }
 
     isStarted(game) {
@@ -30,6 +30,33 @@ module.exports = class GameStateService {
         game.state.paused = true;
         game.state.endDate = moment().utc();
         game.state.winner = winnerPlayer._id;
+    }
+
+    isCountingDownToEnd(game) {
+        return game.state.ticksToEnd != null;
+    }
+
+    isCountingDownToEndInLastCycle(game) {
+        return this.isCountingDownToEnd(game) && game.state.ticksToEnd < game.settings.galaxy.productionTicks;
+    }
+
+    countdownToEnd(game) {
+        // If we are already in the countdown, decrease the counter.
+        // Otherwise, try to start the countdown.
+        // Note this only applies to king of the hill.
+        if (this.isCountingDownToEnd(game)) {
+            game.state.ticksToEnd--;
+        } else {
+            game.state.ticksToEnd = game.settings.kingOfTheHill.productionCycles * game.settings.galaxy.productionTicks;
+        }
+    }
+
+    setCountdownToEndToOneCycle(game) {
+        game.state.ticksToEnd = game.settings.galaxy.productionTicks;
+    }
+
+    hasReachedCountdownEnd(game) {
+        return game.state.ticksToEnd <= 0;
     }
 
 }

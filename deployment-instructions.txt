@@ -1,25 +1,7 @@
 db.games.updateMany({
-    'settings.general.type': 'standard_dark_rt'
+    'settings.orbitalMechanics.orbitSpeed': { $gt: 5 }
 }, {
     $set: {
-        'settings.general.type': 'special_dark'
-    }
-});
-
-db.games.updateMany({
-    'settings.general.type': {
-        $in: [
-            'special_dark',
-            'special_ultraDark',
-            'special_orbital',
-            'special_battleRoyale',
-            'special_homeStar',
-            'special_anonymous'
-        ]
-    },
-    'state.startDate': { $eq: null }
-}, {
-    $set: {
-        'settings.general.type': 'custom'
+        'settings.orbitalMechanics.orbitSpeed': 5
     }
 });

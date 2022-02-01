@@ -14,6 +14,8 @@ const specialGameSettings = [
     require('../config/game/settings/official/special_ultraDark'),
     require('../config/game/settings/official/special_homeStar'),
     require('../config/game/settings/official/special_anonymous'),
+    require('../config/game/settings/official/special_kingOfTheHill'),
+    require('../config/game/settings/official/special_tinyGalaxy'),
 ];
 
 export default (container) => {

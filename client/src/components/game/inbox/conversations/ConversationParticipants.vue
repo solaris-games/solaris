@@ -1,13 +1,13 @@
 <template>
 <div class="participant-container">
   <p v-if="isPartialPlayers">
-    <span v-for="participant in conversation.participants" :key="participant" class="mr-2" @click="onOpenPlayerDetailRequested(participant)">
+    <span v-for="participant in conversation.participants" :key="participant" class="mr-2 pointer" @click="onOpenPlayerDetailRequested(participant)">
       <player-icon :playerId="getPlayer(participant)._id"/>
 
       {{getPlayer(participant).alias}}
     </span>
   </p>
-  <p v-if="!isPartialPlayers && !isOneVsOne" class="text-info">
+  <p v-if="!isPartialPlayers && !isOneVsOne" class="text-info mb-0">
     <i>This conversation is for <strong>all</strong> players.</i>
   </p>
   <!-- {{getPlayersString()}} -->
@@ -51,5 +51,7 @@ export default {
 </script>
 
 <style scoped>
-
+.pointer {
+  cursor: pointer;
+}
 </style>

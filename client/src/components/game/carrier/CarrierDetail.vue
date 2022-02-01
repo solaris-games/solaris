@@ -24,6 +24,7 @@
             <a href="javascript:;" @click="onOpenOrbitingStarDetailRequested">{{getCarrierOrbitingStar().name}}</a>
           </span>
           <span title="The carrier is in transit" v-if="!carrier.orbiting">
+            <i class="fas fa-star mr-2"></i>
             <a title="The carrier is in transit from this star" href="javascript:;" @click="onOpenSourceStarDetailRequested">{{getFirstWaypointSourceName()}}</a>
             <i class="fas fa-arrow-right mr-2 ml-2"></i>
             <a title="The carrier is in transit to star" href="javascript:;" @click="onOpenDestinationStarDetailRequested">{{getFirstWaypointDestinationName()}}</a>
@@ -70,7 +71,7 @@
 
       <div class="row pb-2 pt-2 bg-secondary" v-if="!$isHistoricalMode() && (canGiftCarrier || canTransferShips || canEditWaypoints)">
         <div class="col">
-          <button class="btn btn-sm btn-primary" @click="onShipTransferRequested" v-if="canTransferShips">
+          <button class="btn btn-sm btn-primary mr-1" @click="onShipTransferRequested" v-if="canTransferShips">
             Transfer <i class="fas fa-exchange-alt"></i>
           </button>
           <button class="btn btn-sm btn-warning" @click="onConfirmGiftCarrier" v-if="canGiftCarrier">

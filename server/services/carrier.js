@@ -1,9 +1,12 @@
 const mongoose = require('mongoose');
 const ValidationError = require('../errors/validation');
+const EventEmitter = require('events');
 
-module.exports = class CarrierService {
+module.exports = class CarrierService extends EventEmitter {
 
     constructor(gameRepo, achievementService, distanceService, starService, technologyService, specialistService, diplomacyService) {
+        super();
+
         this.gameRepo = gameRepo;
         this.achievementService = achievementService;
         this.distanceService = distanceService;
@@ -331,9 +334,27 @@ module.exports = class CarrierService {
 
             carrier.ownedByPlayerId = star.ownedByPlayerId; // Transfer ownership
             carrier.specialistId = null; // Remove the specialist. Note that this is required to get around an exploit where players can use a gift just before a battle to weaken the opponent.
-        }
 
-        carrier.isGift = false;
+            let eventObject = {
+                gameId: game._id,
+                gameTick: game.state.tick,
+                fromPlayer: carrierPlayer,
+                toPlayer: starPlayer,
+                carrier,
+                star
+            };
+    
+            this.emit('onPlayerGiftReceived', eventObject);
+            this.emit('onPlayerGiftSent', eventObject);
+
+            carrier.isGift = false;
+        } else if (!carrier.waypoints.length) {
+            // Note: If the carrier has landed at a star the player already owns and
+            // there are still waypoints then this means the carrier is passing
+            // through owned territory and therefore should not be ungifted.
+            // We should ungift in owned territory only if there are no remaining waypoints.
+            carrier.isGift = false;
+        }
     }
 
     async scuttle(game, player, carrierId) {
@@ -429,7 +450,8 @@ module.exports = class CarrierService {
         }
 
         // Reignite dead stars if applicable
-        if (this.starService.isDeadStar(destinationStar) && !carrier.isGift && this.specialistService.getReigniteDeadStar(carrier)) {
+        // Note: Black holes cannot be reignited.
+        if (!carrier.isGift && this.starService.isDeadStar(destinationStar) && this.specialistService.getReigniteDeadStar(carrier)) {
             let reigniteNaturalResources = this.specialistService.getReigniteDeadStarNaturalResources(carrier);
 
             this.starService.reigniteDeadStar(destinationStar, reigniteNaturalResources);
@@ -460,6 +482,13 @@ module.exports = class CarrierService {
 
     async moveCarrier(game, gameUsers, carrier) {
         let waypoint = carrier.waypoints[0];
+
+        // If the carrier is just about to launch, make damn sure the waypoint source is correct.
+        // Note: This is a plaster over an issue with the saving waypoint logic that doesn't validate waypoints correctly.
+        if (this.isLaunching(carrier)) {
+            waypoint.source = carrier.orbiting;
+        }
+
         let sourceStar = game.galaxy.stars.find(s => s._id.equals(waypoint.source));
         let destinationStar = game.galaxy.stars.find(s => s._id.equals(waypoint.destination));
         let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));

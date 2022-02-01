@@ -101,6 +101,7 @@ export default {
   width: 59px;
   height: 59px;
   cursor: pointer;
+  padding: 0;
 }
 
 .alias-title {
@@ -112,7 +113,7 @@ tr {
 }
 
 td {
-    padding: 0;
+  padding: 0;
 }
 
 .table td.fit,
@@ -132,7 +133,6 @@ td {
 
   .col-avatar {
     width: 45px;
-    padding-top: 0.25rem !important;
   }
 }
 </style>

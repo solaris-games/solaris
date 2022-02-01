@@ -38,7 +38,7 @@ export default {
       //       onClick: (e, toastObject) => {
       //         toastObject.goAway(0)
 
-      //         window.location.reload()
+      //         location.reload()
       //       }
       //     }
       //   ]

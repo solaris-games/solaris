@@ -20,10 +20,14 @@ import GuildApi from '../api/guild';
 import EventApi from '../api/game/event';
 import DiplomacyApi from '../api/game/diplomacy';
 import ShopApi from '../api/shop';
+import BadgesApi from '../api/badges';
+import ReportApi from '../api/report';
 
 export default async (config, app, io, container) => {
 
-    app.use(require('body-parser').json());
+    app.use(require('body-parser').json({
+        limit: '1000kb' // Note: This allows large custom galaxies to be uploaded.
+    }));
 
     // ---------------
     // Set up MongoDB session store
@@ -104,6 +108,8 @@ export default async (config, app, io, container) => {
     const event = EventApi(router, io, container);
     const diplomacy = DiplomacyApi(router, io, container);
     const shop = ShopApi(router, io, container);
+    const badges = BadgesApi(router, io, container);
+    const report = ReportApi(router, io, container);
 
     app.use(auth);
     app.use(admin);
@@ -120,6 +126,8 @@ export default async (config, app, io, container) => {
     app.use(event);
     app.use(diplomacy);
     app.use(shop);
+    app.use(badges);
+    app.use(report);
 
     return app;
 };

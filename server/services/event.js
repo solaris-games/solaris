@@ -10,6 +10,7 @@ module.exports = class EventService {
         GAME_STARTED: 'gameStarted',
         GAME_ENDED: 'gameEnded',
         GAME_PAUSED: 'gamePaused',
+        GAME_PLAYER_BADGE_PURCHASED: 'gamePlayerBadgePurchased',
 
         PLAYER_GALACTIC_CYCLE_COMPLETE: 'playerGalacticCycleComplete',
         PLAYER_COMBAT_STAR: 'playerCombatStar',
@@ -23,6 +24,8 @@ module.exports = class EventService {
         PLAYER_CREDITS_SPECIALISTS_SENT: 'playerCreditsSpecialistsSent',
         PLAYER_RENOWN_RECEIVED: 'playerRenownReceived',
         PLAYER_RENOWN_SENT: 'playerRenownSent',
+        PLAYER_GIFT_RECEIVED: 'playerGiftReceived',
+        PLAYER_GIFT_SENT: 'playerGiftSent',
         PLAYER_STAR_ABANDONED: 'playerStarAbandoned',
         PLAYER_BULK_INFRASTRUCTURE_UPGRADED: 'playerBulkInfrastructureUpgraded',
         PLAYER_DEBT_SETTLED: 'playerDebtSettled',
@@ -36,7 +39,7 @@ module.exports = class EventService {
 
     constructor(eventModel, eventRepo, broadcastService,
         gameService, gameTickService, researchService, starService, starUpgradeService, tradeService,
-        ledgerService, conversationService, combatService, specialistService) {
+        ledgerService, conversationService, combatService, specialistService, badgeService, carrierService) {
         this.eventModel = eventModel;
         this.eventRepo = eventRepo;
         this.broadcastService = broadcastService;
@@ -50,6 +53,8 @@ module.exports = class EventService {
         this.conversationService = conversationService;
         this.combatService = combatService;
         this.specialistService = specialistService;
+        this.badgeService = badgeService;
+        this.carrierService = carrierService;
 
         this.gameService.on('onGameDeleted', (args) => this.deleteByGameId(args.gameId));
         this.gameService.on('onPlayerJoined', (args) => this.createPlayerJoinedEvent(args.gameId, args.gameTick, args.player));
@@ -63,7 +68,10 @@ module.exports = class EventService {
             args.gameId, args.gameTick, args.defenders, args.attackers, args.combatResult));
         
         this.gameTickService.on('onPlayerGalacticCycleCompleted', (args) => this.createPlayerGalacticCycleCompleteEvent(
-            args.gameId, args.gameTick, args.player, args.creditsEconomy, args.creditsBanking, args.creditsSpecialists, args.experimentTechnology, args.experimentAmount, args.carrierUpkeep));
+            args.gameId, args.gameTick, args.player, 
+            args.creditsEconomy, args.creditsBanking, args.creditsSpecialists, 
+            args.experimentTechnology, args.experimentAmount, args.experimentLevelUp, args.experimentResearchingNext,
+            args.carrierUpkeep));
             
         this.gameTickService.on('onPlayerAfk', (args) => this.createPlayerAfkEvent(args.gameId, args.gameTick, args.player));
         this.gameTickService.on('onPlayerDefeated', (args) => this.createPlayerDefeatedEvent(args.gameId, args.gameTick, args.player));
@@ -84,6 +92,9 @@ module.exports = class EventService {
         this.tradeService.on('onPlayerTechnologyReceived', (args) => this.createTechnologyReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.technology));
         this.tradeService.on('onPlayerTechnologySent', (args) => this.createTechnologySentEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.technology));
 
+        this.carrierService.on('onPlayerGiftReceived', (args) => this.createGiftReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.carrier, args.star));
+        this.carrierService.on('onPlayerGiftSent', (args) => this.createGiftSentEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.carrier, args.star));
+
         this.ledgerService.on('onDebtAdded', (args) => this.createDebtAddedEvent(args.gameId, args.gameTick, args.debtor, args.creditor, args.amount));
         this.ledgerService.on('onDebtSettled', (args) => this.createDebtSettledEvent(args.gameId, args.gameTick, args.debtor, args.creditor, args.amount));
         this.ledgerService.on('onDebtForgiven', (args) => this.createDebtForgivenEvent(args.gameId, args.gameTick, args.debtor, args.creditor, args.amount));
@@ -91,6 +102,8 @@ module.exports = class EventService {
         this.conversationService.on('onConversationCreated', (args) => this.createPlayerConversationCreated(args.gameId, args.gameTick, args.convo));
         this.conversationService.on('onConversationInvited', (args) => this.createPlayerConversationInvited(args.gameId, args.gameTick, args.convo, args.playerId));
         this.conversationService.on('onConversationLeft', (args) => this.createPlayerConversationLeft(args.gameId, args.gameTick, args.convo, args.playerId));
+
+        this.badgeService.on('onGamePlayerBadgePurchased', (args) => this.createGamePlayerBadgePurchased(args.gameId, args.gameTick, args.purchasedByPlayerId, args.purchasedByPlayerAlias, args.purchasedForPlayerId, args.purchasedForPlayerAlias, args.badgeKey, args.badgeName));
     }
 
     async deleteByGameId(gameId) {
@@ -164,7 +177,9 @@ module.exports = class EventService {
                     this.EVENT_TYPES.PLAYER_CREDITS_SPECIALISTS_SENT,
                     this.EVENT_TYPES.PLAYER_CREDITS_SPECIALISTS_RECEIVED,
                     this.EVENT_TYPES.PLAYER_RENOWN_SENT,
-                    this.EVENT_TYPES.PLAYER_RENOWN_RECEIVED
+                    this.EVENT_TYPES.PLAYER_RENOWN_RECEIVED,
+                    this.EVENT_TYPES.PLAYER_GIFT_SENT,
+                    this.EVENT_TYPES.PLAYER_GIFT_RECEIVED
                 ]
             }
         },
@@ -281,13 +296,15 @@ module.exports = class EventService {
     /* PLAYER EVENTS */
 
     async createPlayerGalacticCycleCompleteEvent(gameId, gameTick, player, 
-        creditsEconomy, creditsBanking, creditsSpecialists, experimentTechnology, experimentAmount, carrierUpkeep) {
+        creditsEconomy, creditsBanking, creditsSpecialists, experimentTechnology, experimentAmount, experimentLevelUp, experimentResearchingNext, carrierUpkeep) {
         let data = {
             creditsEconomy,
             creditsBanking,
             creditsSpecialists,
             experimentTechnology,
             experimentAmount,
+            experimentLevelUp,
+            experimentResearchingNext,
             carrierUpkeep
         };
 
@@ -451,6 +468,32 @@ module.exports = class EventService {
         return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, this.EVENT_TYPES.PLAYER_RENOWN_SENT, data, true);
     }
 
+    async createGiftReceivedEvent(gameId, gameTick, fromPlayer, toPlayer, carrier, star) {
+        let data = {
+            fromPlayerId: fromPlayer._id,
+            carrierId: carrier._id,
+            carrierName: carrier.name,
+            carrierShips: carrier.ships,
+            starId: star._id,
+            starName: star.name
+        };
+
+        return await this.createPlayerEvent(gameId, gameTick, toPlayer._id, this.EVENT_TYPES.PLAYER_GIFT_RECEIVED, data);
+    }
+
+    async createGiftSentEvent(gameId, gameTick, fromPlayer, toPlayer, carrier, star) {
+        let data = {
+            toPlayerId: toPlayer._id,
+            carrierId: carrier._id,
+            carrierName: carrier.name,
+            carrierShips: carrier.ships,
+            starId: star._id,
+            starName: star.name
+        };
+
+        return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, this.EVENT_TYPES.PLAYER_GIFT_SENT, data, true);
+    }
+
     async createStarAbandonedEvent(gameId, gameTick, player, star) {
         let data = {
             starId: star._id,
@@ -556,6 +599,19 @@ module.exports = class EventService {
         };
 
         await this.createPlayerEvent(gameId, gameTick, playerId, this.EVENT_TYPES.PLAYER_CONVERSATION_LEFT, data, true);
+    }
+
+    async createGamePlayerBadgePurchased(gameId, gameTick, purchasedByPlayerId, purchasedByPlayerAlias, purchasedForPlayerId, purchasedForPlayerAlias, badgeKey, badgeName) {
+        let data = {
+            purchasedByPlayerId,
+            purchasedByPlayerAlias,
+            purchasedForPlayerId,
+            purchasedForPlayerAlias,
+            badgeKey,
+            badgeName
+        };
+
+        return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_PLAYER_BADGE_PURCHASED, data);
     }
 
 };

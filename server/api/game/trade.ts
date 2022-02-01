@@ -1,4 +1,5 @@
 const ValidationError = require('../../errors/validation');
+const mongoose = require('mongoose');
 
 export default (router, io, container) => {
 
@@ -164,6 +165,22 @@ export default (router, io, container) => {
                 req.params.toPlayerId);
 
             return res.status(200).json(techs);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.get('/api/game/:gameId/trade/:toPlayerId/events', middleware.authenticate, middleware.loadGamePlayersState, middleware.loadPlayer, async (req, res, next) => {
+        try {
+            let events = await container.tradeService.listTradeEventsBetweenPlayers(
+                req.game, 
+                req.player._id, 
+                [
+                    req.player._id, 
+                    mongoose.Types.ObjectId(req.params.toPlayerId)
+                ]);
+
+            return res.status(200).json(events);
         } catch (err) {
             return next(err);
         }

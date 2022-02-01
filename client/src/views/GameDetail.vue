@@ -9,6 +9,8 @@
 
       <p v-if="game.settings.general.description">{{game.settings.general.description}}</p>
 
+      <p v-if="isNewPlayerGame" class="text-warning">New Player Games do not affect Rank or Victories.</p>
+
       <div class="row mb-4">
         <div class="col">
           <router-link to="/game/list" tag="button" class="btn btn-primary"><i class="fas fa-arrow-left"></i> Return to List</router-link>
@@ -38,6 +40,7 @@ import ViewContainer from '../components/ViewContainer'
 import GameSettings from '../components/game/settings/GameSettings'
 import gameService from '../services/api/game'
 import router from '../router'
+import GameHelper from '../services/gameHelper'
 
 export default {
   components: {
@@ -94,6 +97,11 @@ export default {
 
         this.isDeletingGame = false
       }
+    }
+  },
+  computed: {
+    isNewPlayerGame () {
+      return GameHelper.isNewPlayerGame(this.game)
     }
   }
 }

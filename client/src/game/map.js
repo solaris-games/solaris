@@ -43,26 +43,26 @@ class Map extends EventEmitter {
   }
 
   _setupContainers () {
+    this.chunksContainer = new PIXI.Container()
     this.backgroundContainer = new PIXI.Container()
-    this.wormHoleContainer = new PIXI.Container()
+    this.territoryContainer = new PIXI.Container()
+    this.playerNamesContainer = new PIXI.Container()
     this.orbitalContainer = new PIXI.Container()
+    this.wormHoleContainer = new PIXI.Container()
     this.starContainer = new PIXI.Container()
     this.carrierContainer = new PIXI.Container()
     this.waypointContainer = new PIXI.Container()
     this.rulerPointContainer = new PIXI.Container()
-    this.territoryContainer = new PIXI.Container()
-    this.territoryContainer.zIndex = 2
-    this.playerNamesContainer = new PIXI.Container()
-    this.playerNamesContainer.zIndex = 3
     this.highlightLocationsContainer = new PIXI.Container()
 
     this.container.addChild(this.backgroundContainer)
     this.container.addChild(this.territoryContainer)
-    this.container.addChild(this.pathManager.container)
     this.container.addChild(this.wormHoleContainer)
-    this.container.addChild(this.orbitalContainer)
+    this.container.addChild(this.pathManager.container)
     this.container.addChild(this.rulerPointContainer)
     this.container.addChild(this.waypointContainer)
+    this.container.addChild(this.chunksContainer)
+    this.container.addChild(this.orbitalContainer)
     this.container.addChild(this.starContainer)
     this.container.addChild(this.carrierContainer)
     this.container.addChild(this.highlightLocationsContainer)
@@ -257,17 +257,14 @@ class Map extends EventEmitter {
 
   _isWormHolesEnabled () {
     return this.game.settings.specialGalaxy.randomWormHoles
+      || this.game.galaxy.stars.find(s => s.wormHoleToStarId)
   }
 
   _setupChunks() {
-
     if(this.chunksContainer) {
       console.log('resetting chunks')
-      this.container.removeChild(this.chunksContainer)
+      this.chunksContainer.removeChildren()
     }
-    this.chunksContainer = new PIXI.Container()
-    this.chunksContainer.zIndex = 1
-    this.container.addChild(this.chunksContainer)
 
     let carrierMinX = gameHelper.calculateMinCarrierX(this.game)
     let carrierMinY = gameHelper.calculateMinCarrierY(this.game)

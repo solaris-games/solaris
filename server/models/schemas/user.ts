@@ -82,21 +82,13 @@ const schema = new Schema({
             renownSent: { type: Types.Number, default: 0 },
         },
         badges: {
-            conqueror: { type: Types.Number, default: 0 },
-            cutthroatPirate: { type: Types.Number, default: 0 },
-            deadSetBadass: { type: Types.Number, default: 0 },
-            masterStrategist: { type: Types.Number, default: 0 },
-            wordsmith: { type: Types.Number, default: 0 },
-            lionheart: { type: Types.Number, default: 0 },
-            luckyDevil: { type: Types.Number, default: 0 },
-            sliceOfCheese: { type: Types.Number, default: 0 },
-            ironborn: { type: Types.Number, default: 0 },
-            quickDraw: { type: Types.Number, default: 0 },
-            sentinel: { type: Types.Number, default: 0 },
-            madScientist: { type: Types.Number, default: 0 },
-            strangeOne: { type: Types.Number, default: 0 },
-            toxic: { type: Types.Number, default: 0 },
-            topAlly: { type: Types.Number, default: 0 }
+            ally: { type: Types.Number, default: 0 },
+            enemy: { type: Types.Number, default: 0 },
+            diplomat: { type: Types.Number, default: 0 },
+            strategist: { type: Types.Number, default: 0 },
+            roleplay: { type: Types.Number, default: 0 },
+            dauntless: { type: Types.Number, default: 0 },
+            sleepless: { type: Types.Number, default: 0 },
         }
     },
     gameSettings: {
@@ -132,7 +124,6 @@ const schema = new Schema({
               nebulaMovementSpeed: { type: Types.Number, required: false, default: 1.0, min: 0.0, max: 2.0 },
               starsOpacity: { type: Types.Number, required: false, default: 1.0, min: 0.0, max: 1.0 },
               blendMode: { type: Types.String, required: false, enum: ['ADD', 'NORMAL'], default: 'NORMAL' },
-              backgroundStars: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'enabled' },
               nebulaColour1: { type: Types.String, required: false, default: '#FF0000' },
               nebulaColour2: { type: Types.String, required: false, default: '#00FF00' },
               nebulaColour3: { type: Types.String, required: false, default: '#0000FF' }

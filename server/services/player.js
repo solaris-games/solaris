@@ -79,7 +79,7 @@ module.exports = class PlayerService extends EventEmitter {
     }
 
     createEmptyPlayer(game, colour, shape) {
-        return {
+        let player = {
             _id: mongoose.Types.ObjectId(),
             userId: null,
             alias: 'Empty Slot',
@@ -100,29 +100,21 @@ module.exports = class PlayerService extends EventEmitter {
                 specialists: { level: game.settings.technology.startingTechnologyLevel.specialists }
             }
         };
+
+        this._setDefaultResearchTechnology(game, player);
+
+        return player;
     }
 
     createEmptyPlayers(game) {
         let players = [];
 
-        let shapes = ['circle', 'square', 'diamond', 'hexagon'];
-        let shapeIndex = 0;
-        let colours = require('../config/game/colours').slice();
+        let shapeColours = this._generatePlayerColourShapeList(game.settings.general.playerLimit);
 
-        for(let i = 0; i < game.settings.general.playerLimit; i++) {
-            // Get a random colour to assign to the player.
-            if (!colours.length) {
-                colours = require('../config/game/colours').slice();
-                shapeIndex++;
-            }
-
-            let colour = colours.splice(this.randomService.getRandomNumber(colours.length - 1), 1)[0];
-            let shape = shapes[shapeIndex];
-
-            let player = this.createEmptyPlayer(game, colour, shape);
-
-            this._setDefaultResearchTechnology(game, player);
-            players.push(player);
+        for (let i = 0; i < game.settings.general.playerLimit; i++) {
+            let shapeColour = shapeColours[i];
+            
+            players.push(this.createEmptyPlayer(game, shapeColour.colour, shapeColour.shape));
         }
 
         if (game.galaxy.homeStars && game.galaxy.homeStars.length) {
@@ -141,8 +133,34 @@ module.exports = class PlayerService extends EventEmitter {
         return players;
     }
 
+    _generatePlayerColourShapeList(playerCount) {
+        let shapes = ['circle', 'square', 'diamond', 'hexagon'];
+        let colours = require('../config/game/colours').slice();
+
+        let combinations = [];
+
+        for (let shape of shapes) {
+            for (let colour of colours) {
+                combinations.push({
+                    shape,
+                    colour
+                });
+            }
+        }
+
+        let result = [];
+        
+        for (let i = 0; i < playerCount; i++) {
+            let shapeColour = combinations.splice(this.randomService.getRandomNumber(combinations.length - 1), 1)[0];
+
+            result.push(shapeColour);
+        }
+
+        return result;
+    }
+
     _distributePlayerLinkedHomeStars(game, players) {
-        for(let player of players) {
+        for (let player of players) {
             let homeStarId = game.galaxy.homeStars.pop();
 
             // Set up the home star
@@ -233,10 +251,12 @@ module.exports = class PlayerService extends EventEmitter {
             star.ownedByPlayerId = player._id;
             star.shipsActual = game.settings.player.startingShips;
             star.ships = star.shipsActual;
-            star.specialistId = null;
-            star.infrastructure.economy = 0;
-            star.infrastructure.industry = 0;
-            star.infrastructure.science = 0;
+            
+            star.warpGate = star.warpGate ?? false;
+            star.specialistId = star.specialistId ?? null;
+            star.infrastructure.economy = star.infrastructure.economy ?? 0;
+            star.infrastructure.industry = star.infrastructure.industry ?? 0;
+            star.infrastructure.science = star.infrastructure.science ?? 0;
 
             if (resetWarpGates) {
                 star.warpGate = false;
@@ -458,7 +478,7 @@ module.exports = class PlayerService extends EventEmitter {
         let totalStars = playerStars.length;
         let totalHomeStars = this.calculateTotalHomeStars(playerStars);
 
-        // In BR mode, the player star count is based on living stars only.
+        // In BR mode, the player star count is based on living stars only. - TODO: Why?
         if (game.settings.general.mode === 'battleRoyale') {
             totalStars = playerStars.filter(s => !this.starService.isDeadStar(s)).length;
         }
@@ -616,16 +636,15 @@ module.exports = class PlayerService extends EventEmitter {
         });
     }
 
-    async declareReadyToQuit(game, player) {
-        if (game.state.productionTick <= 0) {
+    async declareReadyToQuit(game, player, force = false) {
+        if (!force && game.state.productionTick <= 0) {
             throw new ValidationError('Cannot declare ready to quit until at least 1 production cycle has completed.');
         }
 
-        if (this.gameTypeService.isTutorialGame(game)) {
+        if (!force && this.gameTypeService.isTutorialGame(game)) {
             throw new ValidationError('Cannot declare ready to quit in a tutorial.');
         }
 
-        player.ready = true;
         player.readyToQuit = true;
 
         await this.gameRepo.updateOne({
@@ -633,7 +652,6 @@ module.exports = class PlayerService extends EventEmitter {
             'galaxy.players._id': player._id
         }, {
             $set: {
-                'galaxy.players.$.ready': true,
                 'galaxy.players.$.readyToQuit': true
             }
         });
@@ -648,7 +666,6 @@ module.exports = class PlayerService extends EventEmitter {
             throw new ValidationError('Cannot undeclare ready to quit in a tutorial.');
         }
         
-        player.ready = false;
         player.readyToQuit = false;
 
         await this.gameRepo.updateOne({
@@ -656,7 +673,6 @@ module.exports = class PlayerService extends EventEmitter {
             'galaxy.players._id': player._id
         }, {
             $set: {
-                'galaxy.players.$.ready': false,
                 'galaxy.players.$.readyToQuit': false
             }
         });
@@ -843,6 +859,16 @@ module.exports = class PlayerService extends EventEmitter {
         }
         
         return query;
+    }
+
+    getKingOfTheHillPlayer(game) {
+        const star = this.starService.getKingOfTheHillStar(game);
+
+        if (!star.ownedByPlayerId) {
+            return null;
+        }
+
+        return this.getById(game, star.ownedByPlayerId);
     }
 
 }

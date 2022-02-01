@@ -1,14 +1,16 @@
 const randomSeeded = require('random-seed');
 const simplexNoise = require('simplex-noise');
+const ValidationError = require('../../errors/validation');
 
 module.exports = class IrregularMapService {
 
-    constructor(randomService, starService, starDistanceService, distanceService, resourceService) {
+    constructor(randomService, starService, starDistanceService, distanceService, resourceService, gameTypeService) {
         this.randomService = randomService;
         this.starService = starService;
         this.starDistanceService = starDistanceService;
         this.distanceService = distanceService;
         this.resourceService = resourceService;
+        this.gameTypeService = gameTypeService;
     }
     
     //TODO this is generator agnostic and could be on a base class or service
@@ -255,6 +257,9 @@ module.exports = class IrregularMapService {
     }
 
     generateLocations(game, starCount, resourceDistribution, playerCount) {
+        if (this.gameTypeService.isKingOfTheHillMode(game)) {
+            throw new ValidationError(`King of the hill is not supported in irregular maps.`);
+        }
 
         const SEED = ( Math.random()*(10**8) ).toFixed(0);
         const SPREAD = 2.5

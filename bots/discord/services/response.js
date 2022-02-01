@@ -13,21 +13,52 @@ module.exports = class ReponseService {
         return response;
     }
 
-    gameinfo(game, type) {
+    gameinfo(game, type, isPC) {
+        let response;
+        let sidePages = [];
         switch (type) {
-            case 'general':
-                return this.gameinfoGeneral(game);
-            case 'galaxy':
-                return this.gameinfoGalaxy(game);
-            case 'player':
-                return this.gameinfoPlayer(game);
-            case 'technology':
-                return this.gameinfoTechnology(game);
-            case 'time':
-                return this.gameinfoTime(game);
+            case 0: //General
+                response = this.gameinfoGeneral(game);
+                sidePages[0] = 'Time';
+                sidePages[1] = 'Galaxy';
+                break;
+            case 1: //Galaxy
+                response = this.gameinfoGalaxy(game);
+                sidePages[0] = 'General';
+                sidePages[1] = 'Player';
+                break;
+            case 2: //Player
+                response = this.gameinfoPlayer(game);
+                sidePages[0] = 'Galaxy';
+                sidePages[1] = 'Technology';
+                break;
+            case 3: //Technology
+                response = this.gameinfoTechnology(game);
+                sidePages[0] = 'Player';
+                sidePages[1] = 'Time';
+                break;
+            case 4: //Time
+                response = this.gameinfoTime(game);
+                sidePages[0] = 'Technology';
+                sidePages[1] = 'General';
+                break;
             default:
                 throw new Error('Unknown type: ' + type);
         }
+        if (isPC) {
+            response = response
+                .addFields(
+                    { name: sidePages[0], value: "⬅️⬅️⬅️", inline: true },
+                    { name: "\u200B", value: "\u200B", inline: true },
+                    { name: sidePages[1], value: "➡️➡️➡️", inline: true }
+                )
+        } else {
+            response = response
+                .addFields(
+                    { name: sidePages[0] + " / " + sidePages[1], value: "⬅️ / ➡️" }
+                )
+        }
+        return response;
     }
 
     gameinfoGeneral(game) {
@@ -52,10 +83,7 @@ module.exports = class ReponseService {
                 { name: "Anonymity", value: game.settings.general.anonymity, inline: true },//next line
                 { name: "Online Status", value: game.settings.general.playerOnlineStatus, inline: true },
                 { name: "Time Machine", value: game.settings.general.timeMachine, inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },//next line
-                { name: "Time", value: "⬅️⬅️⬅️", inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },
-                { name: "Galaxy", value: "➡️➡️➡️", inline: true }
+                { name: "\u200B", value: "\u200B", inline: true }
             );
         return response;
     }
@@ -88,10 +116,7 @@ module.exports = class ReponseService {
                 { name: "Defender Bonus", value: game.settings.specialGalaxy.defenderBonus, inline: true },//next line
                 { name: "Carrier to Carrier Combat", value: game.settings.specialGalaxy.carrierToCarrierCombat, inline: true },
                 { name: "Resource Distribution", value: game.settings.specialGalaxy.resourceDistribution, inline: true },
-                { name: "Player Distribution", value: game.settings.specialGalaxy.playerDistribution, inline: true },//next line
-                { name: "General", value: "⬅️⬅️⬅️", inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },
-                { name: "Player", value: "➡️➡️➡️", inline: true }
+                { name: "Player Distribution", value: game.settings.specialGalaxy.playerDistribution, inline: true }
             );
         return response;
     }
@@ -124,10 +149,7 @@ module.exports = class ReponseService {
                 { name: "Trade Scanning", value: game.settings.player.tradeScanning, inline: true },//next line
                 { name: "Trade Credits", value: game.settings.player.tradeCredits ? "true" : "false", inline: true },
                 { name: "Trade Specialist Tokens", value: game.settings.player.tradeCreditsSpecialists ? "true" : "false", inline: true },
-                { name: "Trade Technology Cost", value: game.settings.player.tradeCost, inline: true },//next line
-                { name: "Galaxy", value: "⬅️⬅️⬅️", inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },
-                { name: "Technology", value: "➡️➡️➡️", inline: true }
+                { name: "Trade Technology Cost", value: game.settings.player.tradeCost, inline: true }
             );
         return response;
     }
@@ -166,10 +188,7 @@ module.exports = class ReponseService {
                 { name: "\u200B", value: "\u200B", inline: true },//next line
                 { name: "Banking Reward", value: game.settings.technology.bankingReward, inline: true },
                 { name: "\u200B", value: "\u200B", inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },//next line
-                { name: "Player", value: "⬅️⬅️⬅️", inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },
-                { name: "Time", value: "➡️➡️➡️", inline: true }
+                { name: "\u200B", value: "\u200B", inline: true }
             );
         return response;
     }
@@ -202,30 +221,6 @@ module.exports = class ReponseService {
                 { name: "AFK Missed Turn Limit", value: game.settings.gameTime.afk.turnTimeout, inline: true },
                 { name: "\u200B", value: "\u200B", inline: true }//next line
             );
-        }
-        response = response.addFields(
-            { name: "Technology", value: "⬅️⬅️⬅️", inline: true },
-            { name: "\u200B", value: "\u200B", inline: true },
-            { name: "General", value: "➡️➡️➡️", inline: true }
-        );
-        return response;
-    }
-
-    gameinfoError(authorId, reason) {
-        let response;
-        switch (reason) {
-            case 'noFocus':
-                response = `Hey <@${authorId}>,\n` +
-                    `It looks like the focus you specified is not in the list, you can choose between "all", "general", "galaxy", "player", "technology" and "time". If you belief this is a bug, contact @Tristanvds#9505.`
-                break;
-            case 'noGame':
-                response = `Hey <@${authorId}>,\n` +
-                    `No game was found with this name, check if you spelt it correctly`;
-                break;
-            case 'multipleGames':
-                response = `Hey <@${authorId}>,\n` +
-                    `Multiple games were found with this name, instead of using the name for this you can use the gameID, which can be found in the link to the game: https://solaris.games/#/game?id=**<gameID>**.\n` +
-                    `If you do this, add the word "ID" after the filter, as an extra direction.`
         }
         return response;
     }
@@ -260,19 +255,9 @@ module.exports = class ReponseService {
         return response;
     }
 
-    async inviteError(authorId, reason) {
-        let response = `Hey @<${authorId}>,`
-        switch (reason) {
-            case 'noGame':
-                response += "It seems like the game you wanted to invite people to was not found, check if you used the correct link.\n" +
-                    "If you belief this is a bug, please contact @Tristanvds#9505"
-        }
-        return response;
-    }
-
-    leaderboard_global(page, sortingKey, position_list, username_list, sortingKey_list) {
-        let lowerLimit = (page - 1) * 20 + 1
-        let upperLimit = page * 20
+    leaderboard_globalPC(page, sortingKey, position_list, username_list, sortingKey_list) {
+        let lowerLimit = page * 20 + 1
+        let upperLimit = (page + 1) * 20
         let response = this.baseResponse()
         response = response
             .setTitle(`Top ${lowerLimit}-${upperLimit} for ${sortingKey}`)
@@ -280,72 +265,137 @@ module.exports = class ReponseService {
             .addFields(
                 { name: "Position", value: position_list, inline: true },
                 { name: "Name", value: username_list, inline: true },
-                { name: `${sortingKey}`, value: sortingKey_list, inline: true }
+                { name: sortingKey, value: sortingKey_list, inline: true }
             );
         return response;
     }
 
-    async leaderboard_globalError(authorId, reason) {
-        let response = `Hey @<${authorId}>,`
-        switch (reason) {
-            case 'invalidSorter':
-                response += 'The filter you specified is not on the list, make sure to check your sorter.\n' +
-                    'If you belief this is a bug, contact Tristanvds#9505'
-        }
+    leaderboard_globalMobile(page, sortingKey, data_list) {
+        let lowerLimit = page * 20 + 1;
+        let upperLimit = (page + 1) * 20;
+        let response = this.baseResponse();
+        response = response
+            .setTitle(`Top ${lowerLimit}-${upperLimit} for ${sortingKey}`)
+            .setURL(`https://solaris.games/#/leaderboard`)
+            .addFields(
+                { name: `position / ${sortingKey} / username`, value: data_list }
+            );
         return response;
     }
 
-    leaderboard_local(gameId, sortingKey, position_list, username_list, sortingKey_list) {
+    leaderboard_localPC(gameId, tick, sortingKey, position_list, username_list, sortingKey_list) {
         let response = this.baseResponse()
         response = response
             .setTitle(`Leaderboard for ${sortingKey}`)
             .setURL(`https://solaris.games/#/game?id=${gameId}`)
+            .setDescription(`Currently at tick ${tick}`)
             .addFields(
                 { name: "Position", value: position_list, inline: true },
                 { name: "Name", value: username_list, inline: true },
-                { name: `${sortingKey}`, value: sortingKey_list, inline: true }
+                { name: sortingKey, value: sortingKey_list, inline: true }
             );
         return response;
     }
 
-    leaderboard_localError(authorId, reason) {
-        let response;
-        switch (reason) {
-            case 'noGame':
-                response = `Hey <@${authorId}>,\n` +
-                `No game was found with this name, check if you spelled it correctly`;
-                break;
-            case 'multipleGames':
-                response = `Hey <@${authorId}>,\n` +
-                    `Multiple games were found with this name, instead of using the name for this you can use the gameID, which can be found in the link to the game: https://solaris.games/#/game?id=**<gameID>**.\n` +
-                    `If you do this, add the word "ID" after the filter, as an extra direction.`
-                break;
-            case 'extraDark':
-                response = `Hey <@${authorId}>,\n` +
-                    `The game you looked up is an extra Dark Galaxy, we can't spill you the secrets of those games`;
-                break;
-            case 'notStarted':
-                response = `Hey <@${authorId}>,\n` +
-                    `The game you looked up has not started yet, we can't tell you anything about it now...`;
-        }
+    leaderboard_localMobile(gameId, tick, sortingKey, data_list) {
+        let response = this.baseResponse()
+        response = response
+            .setTitle(`Leaderboard for ${sortingKey}`)
+            .setURL(`https://solaris.games/#/game?id=${gameId}`)
+            .setDescription(`Currently at tick ${tick}`)
+            .addFields(
+                { name: `position / ${sortingKey} / username`, value: data_list },
+            );
         return response;
     }
 
-    userinfo(user, type) {
+    statusPC(game, leaderboard, alive) {
+        let response = this.baseResponse();
+        response = response
+            .setTitle(`Status of ${game.settings.general.name}`)
+            .setURL(`https://solaris.games/#/game?id=${game._id}`)
+            .addFields(
+                { name: 'Finished?', value: game.state.endDate ? 'Game has ended' : 'Ongoing', inline: true }, //1
+                { name: 'Tick', value: game.state.tick, inline: true }, //1
+                { name: 'Living Players', value: alive, inline: true }, //1
+                { name: 'Stars Ranking', value: leaderboard.stars, inline: true }, //2
+                { name: 'Ships Ranking', value: leaderboard.ships, inline: true }, //2
+                { name: 'New Ships Ranking', value: leaderboard.newShips, inline: true }, //2
+                { name: 'Economy Ranking', value: leaderboard.economy, inline: true }, //3
+                { name: 'Industry Ranking', value: leaderboard.industry, inline: true }, //3
+                { name: 'Science Ranking', value: leaderboard.science, inline: true }, //3
+                { name: 'Weapons Ranking', value: leaderboard.weapons, inline: true }, //4
+                { name: 'Manufacturing Ranking', value: leaderboard.manufacturing, inline: true }, //4
+                { name: 'Specialists Ranking', value: leaderboard.specialists, inline: true }, //4
+            );
+        return response;
+    }
+
+    statusMobile(game, leaderboard) {
+        let response = this.baseResponse();
+        response = response
+            .setTitle(`Status of ${game.settings.general.name}`)
+            .setURL(`https://solaris.games/#/game?id=${game._id}`)
+            .addFields(
+                { name: 'Tick', value: game.state.tick },
+                { name: 'Stars Ranking', value: leaderboard.stars },
+                { name: 'Ships Ranking', value: leaderboard.ships },
+                { name: 'Economy Ranking', value: leaderboard.economy },
+                { name: 'Industry Ranking', value: leaderboard.industry },
+                { name: 'Science Ranking', value: leaderboard.science },
+                { name: 'Weapons Ranking', value: leaderboard.weapons },
+                { name: 'Manufacturing Ranking', value: leaderboard.manufacturing },
+                { name: 'Specialists Ranking', value: leaderboard.specialists }
+            );
+        return response;
+    }
+
+    userinfo(user, type, isPC) {
+        let response;
+        let sidePages = [];
         switch (type) {
-            case 'games':
-                return this.userinfoGames(user);
-            case 'combat':
-                return this.userinfoCombat(user);
-            case 'infrastructure':
-                return this.userinfoInfrastructure(user);
-            case 'research':
-                return this.userinfoResearch(user);
-            case 'trade':
-                return this.userinfoTrade(user);
+            case 0:
+                response = this.userinfoGames(user);
+                sidePages[0] = 'Trade';
+                sidePages[1] = 'Combat';
+                break;
+            case 1:
+                response = this.userinfoCombat(user);
+                sidePages[0] = 'Games';
+                sidePages[1] = 'Infrastructure';
+                break;
+            case 2:
+                response = this.userinfoInfrastructure(user);
+                sidePages[0] = 'Combat';
+                sidePages[1] = 'Research';
+                break;
+            case 3:
+                response = this.userinfoResearch(user);
+                sidePages[0] = 'Infrastructure';
+                sidePages[1] = 'Trade';
+                break;
+            case 4:
+                response = this.userinfoTrade(user);
+                sidePages[0] = 'Research';
+                sidePages[1] = 'Games';
+                break;
             default:
                 throw new Error('Unknown type: ' + type);
         }
+        if (isPC) {
+            response = response
+                .addFields(
+                    { name: sidePages[0], value: "⬅️⬅️⬅️", inline: true },
+                    { name: "\u200B", value: "\u200B", inline: true },
+                    { name: sidePages[1], value: "➡️➡️➡️", inline: true }
+                )
+        } else {
+            response = response
+                .addFields(
+                    { name: sidePages[0] + " / " + sidePages[1], value: "⬅️ / ➡️" }
+                )
+        }
+        return response;
     }
 
     userinfoGames(user) {
@@ -363,10 +413,7 @@ module.exports = class ReponseService {
                 { name: "Games Defeated", value: user.achievements.defeated, inline: true },//next line
                 { name: "Games Quit", value: user.achievements.quit, inline: true },
                 { name: "Games AFK", value: user.achievements.afk, inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },//next line
-                { name: "Trade", value: "⬅️⬅️⬅️", inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },
-                { name: "Combat", value: "➡️➡️➡️", inline: true }
+                { name: "\u200B", value: "\u200B", inline: true }
             );
         return response;
     }
@@ -388,10 +435,7 @@ module.exports = class ReponseService {
                 { name: "Stars Lost", value: user.achievements.combat.stars.lost, inline: true },
                 { name: "Capitals Captured", value: user.achievements.combat.homeStars.captured, inline: true },
                 { name: "Capitals Lost", value: user.achievements.combat.homeStars.lost, inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },//next line
-                { name: "Games", value: "⬅️⬅️⬅️", inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },
-                { name: "Infrastructure", value: "➡️➡️➡️", inline: true }
+                { name: "\u200B", value: "\u200B", inline: true }
             );
         return response;
     }
@@ -411,10 +455,7 @@ module.exports = class ReponseService {
                 { name: "Specialists Hired", value: user.achievements.infrastructure.specialistsHired, inline: true },//next line
                 { name: "Warp Gates Destroyed", value: user.achievements.infrastructure.warpGatesDestroyed, inline: true },
                 { name: "\u200B", value: "\u200B", inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },//next line
-                { name: "Combat", value: "⬅️⬅️⬅️", inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },
-                { name: "Research", value: "➡️➡️➡️", inline: true }
+                { name: "\u200B", value: "\u200B", inline: true }
             );
         return response;
     }
@@ -434,10 +475,7 @@ module.exports = class ReponseService {
                 { name: "Banking", value: user.achievements.research.banking, inline: true },//next line
                 { name: "Manufacturing", value: user.achievements.research.manufacturing, inline: true },
                 { name: "Specialists", value: user.achievements.research.specialists, inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },//next line
-                { name: "Infrastructure", value: "⬅️⬅️⬅️", inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },
-                { name: "Trade", value: "➡️➡️➡️", inline: true }
+                { name: "\u200B", value: "\u200B", inline: true }
             );
         return response;
     }
@@ -457,23 +495,43 @@ module.exports = class ReponseService {
                 { name: "Technologies Received", value: user.achievements.trade.technologyReceived, inline: true },//next line
                 { name: "Ships Gifted", value: user.achievements.trade.giftsSent, inline: true },
                 { name: "Ships Recieved", value: user.achievements.trade.giftsReceived, inline: true },
-                { name: "Renown Sent", value: user.achievements.trade.renownSent, inline: true },//next line
-                { name: "Research", value: "⬅️⬅️⬅️", inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },
-                { name: "Games", value: "➡️➡️➡️", inline: true }
+                { name: "Renown Sent", value: user.achievements.trade.renownSent, inline: true }
             );
         return response;
     }
-    
-    async userinfoError (authorId, reason) {
-        let response = `Hey @<${authorId}>,\n`
+
+    error(authorId, reason) {
+        let response = `Something went wrong <@${authorId}>,\n`;
         switch (reason) {
+            case 'noGame':
+                response += 'No game was found with that name, check if you used the right ID/spelled it correctly.';
+                break;
+            case 'multipleGames':
+                response += 'Multiple games were found with that name. Instead of searching by name, you can search by ID, which is in the gamelink: https://solaris.games/#/game?id="GAMEID". Make sure that when you do this, you add "ID" (without the "") behind the command.';
+                break;
             case 'noUser':
-                response += 'No user was found with this name, check if you spelled it correctly.'
+                response += 'No user was found with this name, check if you spelled the name correctly.';
                 break;
             case 'noFocus':
-                response += 'No focus was specified, make sure to add it to your command.'
+                response += 'No focus was specified, make sure to add it in the command.';
+                break;
+            case 'extraDark':
+                response += 'The game you asked about is an Extra Dark game, which means I cannot tell you anything about it.'
+                break;
+            case 'invalidSorter':
+                response += 'The sorter you specified does not exist, make sure you spelled it correctly.'
+                break;
+            case 'notStarted':
+                response += 'The game has not started yet, so no usefull information can be given about it.'
+                break;
+            case 'invalidID':
+                response += 'The ID of the game you gave is invalid, please check if it is correct.'
+                break;
+            default:
+                //This should never happen
+                response += 'Something horribly went wrong';
         }
+        response += '\nIf you belief this is a bug, contact Tristanvds';
         return response;
     }
 }

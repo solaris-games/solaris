@@ -2,12 +2,13 @@ const simplexNoise = require('simplex-noise');
 
 module.exports = class SpiralMapService {
 
-    constructor(randomService, starService, starDistanceService, distanceService, resourceService) {
+    constructor(randomService, starService, starDistanceService, distanceService, resourceService, gameTypeService) {
         this.randomService = randomService;
         this.starService = starService;
         this.starDistanceService = starDistanceService;
         this.distanceService = distanceService;
         this.resourceService = resourceService;
+        this.gameTypeService = gameTypeService;
     }
 
     generateLocations(game, count, resourceDistribution) {
@@ -20,7 +21,7 @@ module.exports = class SpiralMapService {
             branchCount = 3;
         }
 
-        let locations = this.generateSpiral(count, branchCount);
+        let locations = this.generateSpiral(game, count, branchCount);
 
         // TODO: Temporarily removed this as it screws with player positioning.
         // This service should be responsible for plotting where player home stars are as
@@ -36,8 +37,12 @@ module.exports = class SpiralMapService {
         return locations;
     }
 
-    generateSpiral(locationCount, branchCount) {
+    generateSpiral(game, locationCount, branchCount) {
         const locations = [];
+
+        if (this.gameTypeService.isKingOfTheHillMode(game)) {
+            locations.push(this.starDistanceService.getGalacticCenter());
+        }
 
         let BRANCHES = branchCount;
         let COPIES = 2;
@@ -208,7 +213,7 @@ module.exports = class SpiralMapService {
 
             for (let i = 0; i < locs.length; i++) {
                 let location = locs[i];
-                let size = location.resources;
+                let size = (location.resources.economy + location.resources.industry + location.resources.science) / 3;
 
                 let x_center = (location.x - x_init) * scale - size / 2
                 let y_center = (location.y - y_init) * scale - size / 2

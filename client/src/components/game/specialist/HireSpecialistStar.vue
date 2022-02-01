@@ -28,7 +28,10 @@
                 </h5>
             </div>
             <div class="col-auto mt-2">
-                <button class="btn btn-sm btn-success" v-if="!(star.specialistId && star.specialist.id === specialist.id)" :disabled="$isHistoricalMode() || isHiringSpecialist || cantAffordSpecialist(specialist) || isCurrentSpecialistOneShot" @click="hireSpecialist(specialist)">Hire for {{getSpecialistActualCostString(specialist)}}</button>
+                <button class="btn btn-sm btn-success" v-if="!(star.specialistId && star.specialist.id === specialist.id)" :disabled="$isHistoricalMode() || isHiringSpecialist || cantAffordSpecialist(specialist) || isCurrentSpecialistOneShot" @click="hireSpecialist(specialist)">
+                  <i class="fas fa-coins"></i>
+                  Hire for {{getSpecialistActualCostString(specialist)}}
+                </button>
                 <span class="badge badge-primary" v-if="star.specialistId && star.specialist.id === specialist.id">Active</span>
             </div>
             <div class="col-12 mt-2">
@@ -37,6 +40,8 @@
             </div>
         </div>
     </div>
+
+    <p v-if="specialists && !specialists.length" class="text-center pb-2">No specialists available to hire.</p>
 </div>
 </template>
 
@@ -67,7 +72,9 @@ export default {
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
     this.star = GameHelper.getStarById(this.$store.state.game, this.starId)
 
-    this.specialists = this.$store.state.starSpecialists;
+    const banList = this.$store.state.game.settings.specialGalaxy.specialistBans.star
+
+    this.specialists = this.$store.state.starSpecialists.filter(s => banList.indexOf(s.id) < 0)
   },
   methods: {
     onCloseRequested (e) {

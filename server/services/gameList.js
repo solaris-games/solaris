@@ -69,11 +69,32 @@ module.exports = class GameListService {
         return await Promise.all(games.map(async game => {
             game.userNotifications = await this.getUserPlayerNotifications(game, userId, true, true, true);
 
+            delete game.conversations;
+            delete game.galaxy;
+
             return game;
         }));
     }
 
-    async listCompletedGames(userId) {
+    async listRecentlyCompletedGames(select, limit = 20) {
+        select = select || {
+            'settings.general.type': 1,
+            'settings.general.featured': 1,
+            'settings.general.name': 1,
+            'settings.general.playerLimit': 1,
+            state: 1
+        };
+
+        return await this.gameRepo.find({
+            'state.endDate': { $ne: null }, // Game is finished
+            'settings.general.type': { $ne: 'tutorial'}
+        },
+        select,
+        { 'state.endDate': -1 },
+        limit);
+    }
+
+    async listUserCompletedGames(userId) {
         const games = await this.gameRepo.find({
             'state.endDate': { $ne: null }, // Game is finished
             'settings.general.type': { $ne: 'tutorial'},
@@ -98,6 +119,9 @@ module.exports = class GameListService {
 
         return await Promise.all(games.map(async game => {
             game.userNotifications = await this.getUserPlayerNotifications(game, userId, false, false, true);
+
+            delete game.conversations;
+            delete game.galaxy;
 
             return game;
         }));
@@ -164,7 +188,9 @@ module.exports = class GameListService {
                     'special_orbital',
                     'special_battleRoyale',
                     'special_homeStar',
-                    'special_anonymous'
+                    'special_anonymous',
+                    'special_kingOfTheHill',
+                    'special_tinyGalaxy'
                 ]
             },
             'state.startDate': { $eq: null }
@@ -179,7 +205,7 @@ module.exports = class GameListService {
     }
 
     async listInProgressGames() {
-        return await this.gameRepo.find({
+        let games = await this.gameRepo.find({
             'settings.general.type': { $nin: ['tutorial'] },
             'state.startDate': { $ne: null },
             'state.endDate': { $eq: null },
@@ -188,10 +214,19 @@ module.exports = class GameListService {
             'settings.general.name': 1,
             'settings.general.type': 1,
             'settings.general.playerLimit': 1,
-            state: 1
+            state: 1,
+            'galaxy.players.afk': 1
         }, {
             'state.startDate': -1
         });
+
+        for (let game of games) {
+            game.state.afkSlots = game.galaxy.players.filter(p => p.afk).length;
+
+            delete game.galaxy;
+        }
+
+        return games;
     }
 
     async listInProgressGamesGameTick() {

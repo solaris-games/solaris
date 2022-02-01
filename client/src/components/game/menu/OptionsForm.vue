@@ -72,12 +72,6 @@
         </div>
       </div>
 
-      <div v-if="settings.map.territoryStyle!=='disabled'" class="row bg-secondary pt-1 pb-1 ml-1">
-        <div class="col">
-          <p class="text-warning mb-0"><small>Warning: Map territories will degrade performance when loading the game, especially in very large galaxies.</small></p>
-        </div>
-      </div>
-
       <div v-if="settings.map.territoryStyle=='marching-square'" class="row bg-secondary pt-1 pb-1 ml-1">
         <label for="territory-size" class="col-12 col-sm-6 col-form-label">Territory Size</label>
         <div class="col-12 col-sm-6">
@@ -230,57 +224,43 @@
       </div>
 
       <div class="row bg-secondary pt-1 pb-1 ml-1">
-        <label for="background-stars" class="col-12 col-sm-6 col-form-label">Background Stars</label>
+        <label for="moving-nebulas" class="col-12 col-sm-6 col-form-label">Moving Nebulas</label>
         <div class="col-12 col-sm-6">
-          <select class="form-control" id="background-stars" v-model="settings.map.background.backgroundStars" :disabled="isSavingSettings">
+          <select class="form-control" id="moving-nebulas" v-model="settings.map.background.moveNebulas" :disabled="isSavingSettings">
             <option value="enabled">Enabled</option>
             <option value="disabled">Disabled</option>
           </select>
         </div>
       </div>
 
-      <div v-if="settings.map.background.backgroundStars=='enabled'" class="ml-3">
-
+      <div v-if="settings.map.background.moveNebulas=='enabled'" class="ml-3">
         <div class="row bg-secondary pt-1 pb-1 ml-1">
-          <label for="moving-nebulas" class="col-12 col-sm-6 col-form-label">Moving Nebulas</label>
-          <div class="col-12 col-sm-6">
-            <select class="form-control" id="moving-nebulas" v-model="settings.map.background.moveNebulas" :disabled="isSavingSettings">
-              <option value="enabled">Enabled</option>
-              <option value="disabled">Disabled</option>
-            </select>
+          <label for="nebula-speed" class="col col-form-label">Nebula Speed</label>
+          <div class="col">
+            <input type="range" min="0.0" max="2.0" step="0.125" class="form-range w-100" id="nebula-speed" v-model="settings.map.background.nebulaMovementSpeed" :disabled="isSavingSettings">
           </div>
         </div>
+      </div>
 
-        <div v-if="settings.map.background.moveNebulas=='enabled'" class="ml-3">
-          <div class="row bg-secondary pt-1 pb-1 ml-1">
-            <label for="nebula-speed" class="col col-form-label">Nebula Speed</label>
-            <div class="col">
-              <input type="range" min="0.0" max="2.0" step="0.125" class="form-range w-100" id="nebula-speed" v-model="settings.map.background.nebulaMovementSpeed" :disabled="isSavingSettings">
-            </div>
-          </div>
+      <div class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="nebula-colour-1" class="col-12 col-sm-6 col-form-label">Nebula Colour 1</label>
+        <div class="col-12 col-sm-6">
+        <input type="text" class="form-control" id="nebula-colour-1" v-model="settings.map.background.nebulaColour1" :disabled="isSavingSettings">
         </div>
+      </div>
 
-        <div class="row bg-secondary pt-1 pb-1 ml-1">
-          <label for="nebula-colour-1" class="col-12 col-sm-6 col-form-label">Nebula Colour 1</label>
-          <div class="col-12 col-sm-6">
-          <input type="text" class="form-control" id="nebula-colour-1" v-model="settings.map.background.nebulaColour1" :disabled="isSavingSettings">
-          </div>
+      <div class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="nebula-colour-2" class="col-12 col-sm-6 col-form-label">Nebula Colour 2</label>
+        <div class="col-12 col-sm-6">
+        <input type="text" class="form-control" id="nebula-colour-2" v-model="settings.map.background.nebulaColour2" :disabled="isSavingSettings">
         </div>
+      </div>
 
-        <div class="row bg-secondary pt-1 pb-1 ml-1">
-          <label for="nebula-colour-2" class="col-12 col-sm-6 col-form-label">Nebula Colour 2</label>
-          <div class="col-12 col-sm-6">
-          <input type="text" class="form-control" id="nebula-colour-2" v-model="settings.map.background.nebulaColour2" :disabled="isSavingSettings">
-          </div>
+      <div class="row bg-secondary pt-1 pb-1 ml-1">
+        <label for="nebula-colour-3" class="col-12 col-sm-6 col-form-label">Nebula Colour 3</label>
+        <div class="col-12 col-sm-6">
+        <input type="text" class="form-control" id="nebula-colour-3" v-model="settings.map.background.nebulaColour3" :disabled="isSavingSettings">
         </div>
-
-        <div class="row bg-secondary pt-1 pb-1 ml-1">
-          <label for="nebula-colour-3" class="col-12 col-sm-6 col-form-label">Nebula Colour 3</label>
-          <div class="col-12 col-sm-6">
-          <input type="text" class="form-control" id="nebula-colour-3" v-model="settings.map.background.nebulaColour3" :disabled="isSavingSettings">
-          </div>
-        </div>
-
       </div>
 
     </div>

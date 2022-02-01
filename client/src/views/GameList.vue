@@ -9,6 +9,9 @@
       <li class="nav-item">
           <a class="nav-link" data-toggle="tab" href="#inProgressGames">In Progress</a>
       </li>
+      <li class="nav-item">
+          <a class="nav-link" data-toggle="tab" href="#recentlyCompletedGames">Recent</a>
+      </li>
     </ul>
 
     <div class="tab-content pt-2">
@@ -79,6 +82,8 @@
                       'fa-satellite': games.special.settings.general.type === 'special_orbital',
                       'fa-home': games.special.settings.general.type === 'special_homeStar',
                       'fa-user-secret': games.special.settings.general.type === 'special_anonymous',
+                      'fa-crown': games.special.settings.general.type === 'special_kingOfTheHill',
+                      'fa-search': games.special.settings.general.type === 'special_tinyGalaxy'
                     }"></i>
                     <span class="ml-2">{{games.special.settings.general.name}}</span>
                   </h5>
@@ -208,7 +213,10 @@
               </thead>
               <tbody>
                   <tr v-for="game in userGames" v-bind:key="game._id">
-                      <td>{{game.settings.general.name}}</td>
+                      <td>
+                        {{game.settings.general.name}}
+                        <span class="badge badge-success" v-if="game.settings.general.featured">Featured</span>
+                      </td>
                       <td class="d-none d-md-table-cell text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
                       <td>
                           <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-success float-right">
@@ -231,7 +239,7 @@
         <div class="tab-pane fade" id="inProgressGames">
           <h4>In Progress Games</h4>
 
-          <p class="mb-1">These games are in progress, you can join games with open slots. <b>Fill slots to earn additional rank!</b></p>
+          <p class="mb-1">These games are in progress, you can join games with open slots. <b>Fill slots to earn additional rank!</b> <help-tooltip class="ml-1" tooltip="Players who fill an AFK slot and will be awarded 1.5x additional rank (minimum 1) when the game ends"/></p>
 
           <p class="mb-2"><small class="text-warning" v-if="inProgressGames.length">Total Games: {{inProgressGames.length}}</small></p>
 
@@ -254,10 +262,12 @@
                   <tr v-for="game in inProgressGames" v-bind:key="game._id">
                       <td>
                         <router-link :to="{ path: '/game/detail', query: { id: game._id } }">{{game.settings.general.name}}</router-link>
+                        <br v-if="game.state.afkSlots"/>
+                        <span class="badge badge-warning" v-if="game.state.afkSlots">{{game.state.afkSlots}} Open Slot<span v-if="game.state.afkSlots > 1">s</span></span>
                         <br/>
                         <small>{{getGameTypeFriendlyText(game)}}</small>
                       </td>
-                      <td class="d-none d-md-table-cell text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
+                      <td class="d-none d-md-table-cell text-center" :class="{'text-warning':game.state.afkSlots}">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
                       <td class="d-none d-sm-table-cell text-center">{{game.state.productionTick}}</td>
                       <td>
                           <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-success float-right">
@@ -265,6 +275,48 @@
                             <span class="d-xs-block d-sm-block d-md-none">
                               {{game.state.players}}/{{game.settings.general.playerLimit}}
                             </span>
+                          </router-link>
+                      </td>
+                  </tr>
+              </tbody>
+          </table>
+
+          <div class="text-right" v-if="!isLoading">
+            <router-link to="/game/create" tag="button" class="btn btn-info mr-1"><i class="fas fa-gamepad"></i> Create Game</router-link>
+            <router-link to="/game/active-games" tag="button" class="btn btn-success ml-1"><i class="fas fa-dice"></i> View My Games</router-link>
+          </div>
+        </div>
+        
+        <div class="tab-pane fade" id="recentlyCompletedGames">
+          <h4>Recently Completed Games</h4>
+
+          <loading-spinner :loading="isLoading"/>
+
+          <p v-if="!isLoading && !recentlyCompletedGames.length" class="text-danger mb-2">
+            There are no recent games to display.
+          </p>
+
+          <table v-if="!isLoading && recentlyCompletedGames.length" class="table table-striped table-hover">
+              <thead>
+                  <tr class="bg-primary">
+                      <th>Name</th>
+                      <th class="d-none d-md-table-cell text-center">Ended</th>
+                      <th class="d-none d-sm-table-cell text-center">Cycles</th>
+                      <th></th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr v-for="game in recentlyCompletedGames" v-bind:key="game._id">
+                      <td>
+                        <router-link :to="{ path: '/game', query: { id: game._id } }">{{game.settings.general.name}}</router-link>
+                        <br/>
+                        <small>{{getGameTypeFriendlyText(game)}}</small>
+                      </td>
+                      <td class="d-none d-md-table-cell text-center">{{getFriendlyDate(game.state.endDate)}}</td>
+                      <td class="d-none d-sm-table-cell text-center">{{game.state.productionTick}}</td>
+                      <td>
+                          <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success float-right">
+                            <span>View</span>
                           </router-link>
                       </td>
                   </tr>
@@ -288,19 +340,24 @@ import ViewContainer from '../components/ViewContainer'
 import TutorialGame from '../components/game/menu/TutorialGame'
 import gameService from '../services/api/game'
 import GameHelper from '../services/gameHelper'
+import RandomHelper from '../services/randomHelper'
+import HelpTooltip from '../components/HelpTooltip'
+import * as moment from 'moment'
 
 export default {
   components: {
     'loading-spinner': LoadingSpinnerVue,
     'view-container': ViewContainer,
     'view-title': ViewTitle,
-    'tutorial-game': TutorialGame
+    'tutorial-game': TutorialGame,
+    'help-tooltip': HelpTooltip
   },
   data () {
     return {
       serverGames: [],
       userGames: [],
       inProgressGames: [],
+      recentlyCompletedGames: [],
       isLoading: true,
       games: {
         featured: null,
@@ -321,7 +378,8 @@ export default {
       let requests = [
         gameService.listOfficialGames(),
         gameService.listUserGames(),
-        gameService.listInProgressGames()
+        gameService.listInProgressGames(),
+        gameService.listRecentlyCompletedGames()
       ]
 
       let responses = await Promise.all(requests)
@@ -329,6 +387,7 @@ export default {
       this.serverGames = responses[0].data
       this.userGames = responses[1].data
       this.inProgressGames = responses[2].data
+      this.recentlyCompletedGames = responses[3].data
 
       this.games.featured = this.getFeaturedGame()
       this.games.newPlayerRT = this.getOfficialGame('new_player_rt')
@@ -358,22 +417,27 @@ export default {
         'special_orbital',
         'special_battleRoyale',
         'special_homeStar',
-        'special_anonymous'
+        'special_anonymous',
+        'special_kingOfTheHill',
+        'special_tinyGalaxy'
       ]
       
       return this.serverGames.find(x => types.includes(x.settings.general.type))
     },
     getFeaturedGame () {
-      let featuredOfficial = this.serverGames.find(x => x.settings.general.featured)
-
-      if (featuredOfficial) {
-        return featuredOfficial
+      let featuredGames = this.serverGames.filter(x => x.settings.general.featured).concat(this.userGames.filter(x => x.settings.general.featured))
+      
+      if (featuredGames.length) {
+        return featuredGames[RandomHelper.getRandomNumberBetween(0, featuredGames.length - 1)]
       }
 
-      return this.userGames.find(x => x.settings.general.featured)
+      return null
     },
     getGameTypeFriendlyText (game) {
       return GameHelper.getGameTypeFriendlyText(game)
+    },
+    getFriendlyDate(date) {
+      return moment(date).utc().fromNow()
     }
   }
 }

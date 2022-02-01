@@ -1,14 +1,21 @@
+const ValidationError = require('../../errors/validation');
+
 module.exports = class DoughnutMapService {
 
-    constructor(randomService, starService, starDistanceService, distanceService, resourceService) {
+    constructor(randomService, starService, starDistanceService, distanceService, resourceService, gameTypeService) {
         this.randomService = randomService;
         this.starService = starService;
         this.starDistanceService = starDistanceService;
         this.distanceService = distanceService;
         this.resourceService = resourceService;
+        this.gameTypeService = gameTypeService;
     }
 
     generateLocations(game, starCount, resourceDistribution) {
+        if (this.gameTypeService.isKingOfTheHillMode(game)) {
+            throw new ValidationError(`King of the hill is not supported in doughnut maps.`);
+        }
+
         // The starDensity constant can really be a setting, once it is turned into an intuitive variable...
         const starDensity = 1.3 * 10**-4;
         const maxRadius = ((4 * starCount) / (3 * Math.PI * starDensity))**0.5;

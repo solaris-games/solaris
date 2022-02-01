@@ -125,7 +125,7 @@ export default {
         await this.$confirm('Support The Project', 
           `Hello there,
 
-Solaris is free, open source and does not have ads. Please consider donating to support the continued development of the project.
+Solaris is free, open source and does not have ads. Please consider donating or purchasing Galactic Credits to support the continued development of the project.
 
 Thank you,
 Hyperi0n`, 'Donate', 'Dismiss')) {
@@ -151,6 +151,7 @@ Hyperi0n`, 'Donate', 'Dismiss')) {
   top: 0;
   margin: 0;
   height: 100%;
+  width: 100%;
   overflow: hidden;
 }
 </style>

@@ -1,4 +1,4 @@
-## Trade
+# Trade
 
 Trade is an integral part of diplomacy. When you select a player in a game there will be an option to trade either technology or credits.
 
