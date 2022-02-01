@@ -223,7 +223,7 @@ export default class SpiralMapService {
             let x_init = galaxy.minX;
             let y_init = galaxy.minY;
 
-            let x_delta = galaxy.maxX; - galaxy.minX;
+            let x_delta = galaxy.maxX - galaxy.minX;
             let y_delta = galaxy.maxY - galaxy.minY;
 
             let scale = 0;
