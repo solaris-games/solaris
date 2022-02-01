@@ -6,7 +6,7 @@ import ConversationMessageSchema from './conversationMessage';
 
 const schema = new Schema({
     participants: [{ type: Types.ObjectId, required: true }],
-    createdBy: { type: Types.ObjectId, required: false },
+    createdBy: { type: Types.ObjectId, required: false, default: null },
     name: { type: Types.String, required: true },
     messages: [ConversationMessageSchema]
 });

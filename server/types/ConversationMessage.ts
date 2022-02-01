@@ -6,7 +6,7 @@ export interface ConversationMessage {
     fromPlayerAlias: string;
     message: string;
     sentDate: Date;
-    sentTick: number;
+    sentTick: number | null;
     pinned: boolean;
     readBy: ObjectId[]
 };

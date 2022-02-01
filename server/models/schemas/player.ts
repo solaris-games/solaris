@@ -13,8 +13,8 @@ const schema = new Schema({
         value: { type: Types.String, required: true }
     },
     shape: { type: Types.String, required: true, enum: ['circle', 'square', 'diamond', 'hexagon'], default: 'circle' },
-    lastSeen: { type: Types.Date, required: false },
-    lastSeenIP: { type: Types.String, required: false },
+    lastSeen: { type: Types.Date, required: false, default: null },
+    lastSeenIP: { type: Types.String, required: false, default: null },
     researchingNow: { type: Types.String, required: true, default: 'weapons' },
     researchingNext: { type: Types.String, required: true, default: 'weapons' },
     credits: { type: Types.Number, required: true },

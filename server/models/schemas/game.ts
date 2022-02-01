@@ -10,9 +10,9 @@ import ConversationSchema from './conversation';
 const schema = new Schema({
     settings: {
         general: {
-            createdByUserId: { type: Types.ObjectId, required: false },
+            createdByUserId: { type: Types.ObjectId, required: false, default: null },
             name: { type: Types.String, required: true },
-            description: { type: Types.String, required: false },
+            description: { type: Types.String, required: false, default: null },
 			type: { type: Types.String, required: true, enum: [
 				'tutorial',
 				'custom', 
@@ -36,8 +36,8 @@ const schema = new Schema({
 				'conquest', 'battleRoyale', 'kingOfTheHill'
 			], default: 'conquest' },
 			featured: { type: Types.Boolean, required: false, default: false },
-			password: { type: Types.String, required: false },
-			passwordRequired: { type: Types.Boolean, required: false },
+			password: { type: Types.String, required: false, default: null },
+			passwordRequired: { type: Types.Boolean, required: false, default: false },
 			playerLimit: { type: Types.Number, required: true, default: 8, min: 2, max: 32 },
 			playerType: { type: Types.String, required: true, enum: ['all', 'establishedPlayers'], default: 'all' },
 			anonymity: { type: Types.String, required: true, enum: ['normal', 'extra'], default: 'normal' },
@@ -154,15 +154,15 @@ const schema = new Schema({
 		tick: { type: Types.Number, required: true, default: 0 },
 		paused: { type: Types.Boolean, required: true, default: true },
 		productionTick: { type: Types.Number, required: true, default: 0 },
-		startDate: { type: Types.Date, required: false }, // Dates are in UTC
-		endDate: { type: Types.Date, required: false },
-		lastTickDate: { type: Types.Date, required: false },
+		startDate: { type: Types.Date, required: false, default: null }, // Dates are in UTC
+		endDate: { type: Types.Date, required: false, default: null },
+		lastTickDate: { type: Types.Date, required: false, default: null },
 		ticksToEnd: { type: Types.Number, required: false, default: null },
 		stars: { type: Types.Number, required: true },
 		starsForVictory: { type: Types.Number, required: true },
 		players: { type: Types.Number, required: true, default: 0 },
-		winner: { type: Types.ObjectId, required: false },
-		cleaned: { type: Types.Boolean, required: false }, // Represents if the events and history have been deleted.
+		winner: { type: Types.ObjectId, required: false, default: null },
+		cleaned: { type: Types.Boolean, required: false, default: false }, // Represents if the events and history have been deleted.
 	},
 	constants: {
 		distances: {
