@@ -353,7 +353,7 @@ export default {
       }
     },
     reloadPage () {
-      window.location.reload()
+      location.reload()
     }
   },
   computed: {
