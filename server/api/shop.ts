@@ -1,4 +1,4 @@
-const ValidationError = require('../errors/validation');
+import ValidationError from '../errors/validation';
 import Middleware from './middleware';
 
 const COST_PER_TOKEN = 1;

@@ -1,3 +1,5 @@
+import { ObjectId } from "mongoose";
+
 export default class DatabaseRepository {
 
     model: any;
@@ -6,17 +8,17 @@ export default class DatabaseRepository {
         this.model = model;
     }
 
-    async findById(id, select) {
+    async findById(id: ObjectId, select: any) {
         return await this.model.findById(id, select)
         .lean({ defaults: true })
         .exec();
     }
 
-    async findByIdAsModel(id, select) {
+    async findByIdAsModel(id: ObjectId, select: any) {
         return await this.model.findById(id, select).exec();
     }
 
-    async find(query, select, sort = null, limit = null, skip = null) {
+    async find(query: any, select: any, sort: any | null = null, limit: number | null = null, skip: number | null = null) {
         return await this.model.find(query, select)
         .sort(sort)
         .skip(skip)
@@ -25,7 +27,7 @@ export default class DatabaseRepository {
         .exec();
     }
 
-    async findAsModels(query, select, sort = null, limit = null, skip = null) {
+    async findAsModels(query: any, select: any, sort: any | null = null, limit: number | null = null, skip: number | null = null) {
         return await this.model.find(query, select)
         .sort(sort)
         .skip(skip)
@@ -33,18 +35,18 @@ export default class DatabaseRepository {
         .exec();
     }
 
-    async findOne(query, select) {
+    async findOne(query: any, select: any) {
         return await this.model.findOne(query, select)
         .lean({ defaults: true })
         .exec();
     }
 
-    async findOneAsModel(query, select) {
+    async findOneAsModel(query: any, select: any) {
         return await this.model.findOne(query, select)
         .exec();
     }
 
-    async count(query) {
+    async count(query: any) {
         return await this.model.countDocuments(query).exec();
     }
 
@@ -52,32 +54,32 @@ export default class DatabaseRepository {
         return this.model.estimatedDocumentCount();
     }
 
-    async updateOne(query, update, options = null) {
+    async updateOne(query: any, update: any, options: any | null = null) {
         return await this.model.updateOne(query, update, options).exec();
     }
 
-    async updateMany(query, update, options = null) {
+    async updateMany(query: any, update: any, options: any | null = null) {
         return await this.model.updateMany(query, update, options).exec();
     }
 
-    async bulkWrite(updates) {
+    async bulkWrite(updates: any[]) {
         return await this.model.bulkWrite(updates);
     }
 
-    async deleteOne(query) {
+    async deleteOne(query: any) {
         return await this.model.deleteOne(query).exec();
     }
 
-    async deleteMany(query) {
+    async deleteMany(query: any) {
         return await this.model.deleteMany(query).exec();
     }
 
-    objectIdFromDate(date) {
+    objectIdFromDate(date: Date) {
         return Math.floor(date.getTime() / 1000).toString(16) + "0000000000000000";
     }
     
-    dateFromObjectId(objectId) {
-        return new Date(parseInt(objectId.substring(0, 8), 16) * 1000);
+    dateFromObjectId(objectId: ObjectId | string) {
+        return new Date(parseInt(objectId.toString().substring(0, 8), 16) * 1000);
     }
 
 };

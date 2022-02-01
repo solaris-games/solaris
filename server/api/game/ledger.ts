@@ -1,4 +1,3 @@
-const ValidationError = require('../../errors/validation');
 import Middleware from '../middleware';
 
 export default (router, io, container) => {

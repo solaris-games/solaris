@@ -2,10 +2,10 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const Types = Schema.Types;
 
-const playerSchema = require('./player');
-const starSchema = require('./star');
-const carrierSchema = require('./carrier');
-const conversationSchema = require('./conversation');
+import PlayerSchema from './player';
+import StarSchema from './star';
+import CarrierSchema from './carrier';
+import ConversationSchema from './conversation';
 
 const schema = new Schema({
     settings: {
@@ -144,11 +144,11 @@ const schema = new Schema({
 		}
     },
     galaxy: {
-        players: [playerSchema],
-		stars: [starSchema],
-		carriers: [carrierSchema]
+        players: [PlayerSchema],
+		stars: [StarSchema],
+		carriers: [CarrierSchema]
 	},
-	conversations: [conversationSchema],
+	conversations: [ConversationSchema],
 	state: {
 		locked: { type: Types.Boolean, required: false, default: false },
 		tick: { type: Types.Number, required: true, default: 0 },

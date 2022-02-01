@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const Types = Schema.Types;
 
-const waypointSchema = require('./waypoint');
+import WaypointSchema from './waypoint';
 
 const schema = new Schema({
     ownedByPlayerId: { type: Types.ObjectId, required: true },
@@ -16,7 +16,7 @@ const schema = new Schema({
         x: { type: Types.Number, required: true },
         y: { type: Types.Number, required: true }
     },
-    waypoints: [waypointSchema]
+    waypoints: [WaypointSchema]
 });
 
 export default schema;

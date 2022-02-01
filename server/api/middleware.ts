@@ -1,4 +1,4 @@
-const ValidationError = require('../errors/validation');
+import ValidationError from '../errors/validation';
 
 export default (container) => {
 
