@@ -7,7 +7,6 @@ import EventModel from '../models/Event';
 import GuildModel from '../models/Guild';
 import PaymentModel from '../models/Payment';
 import ReportModel from '../models/Report';
-import DatabaseRepository from '../models/DatabaseRepository';
 
 import AdminService from '../services/admin';
 import PasswordService from '../services/password';
@@ -71,16 +70,25 @@ import IrregularMapService from '../services/maps/irregular';
 import CustomMapService from '../services/maps/custom';
 import { DependencyContainer } from '../types/DependencyContainer';
 
+import DatabaseRepository from '../models/DatabaseRepository';
+import { Game } from '../types/Game';
+import { User } from '../types/User';
+import { GameHistory } from '../types/GameHistory';
+import { GameEvent } from '../types/GameEvent';
+import { Guild } from '../types/Guild';
+import { Payment } from '../types/Payment';
+import { Report } from '../types/Report';
+
 const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
 
-const gameRepository = new DatabaseRepository(GameModel);
-const userRepository = new DatabaseRepository(UserModel);
-const historyRepository = new DatabaseRepository(HistoryModel);
-const eventRepository = new DatabaseRepository(EventModel);
-const guildRepository = new DatabaseRepository(GuildModel);
-const paymentRepository = new DatabaseRepository(PaymentModel);
-const reportRepository = new DatabaseRepository(ReportModel);
+const gameRepository = new DatabaseRepository<Game>(GameModel);
+const userRepository = new DatabaseRepository<User>(UserModel);
+const historyRepository = new DatabaseRepository<GameHistory>(HistoryModel);
+const eventRepository = new DatabaseRepository<GameEvent>(EventModel);
+const guildRepository = new DatabaseRepository<Guild>(GuildModel);
+const paymentRepository = new DatabaseRepository<Payment>(PaymentModel);
+const reportRepository = new DatabaseRepository<Report>(ReportModel);
 
 export default (config, io): DependencyContainer => {
 

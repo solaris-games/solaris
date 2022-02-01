@@ -1,13 +1,14 @@
 import { ObjectId } from "mongoose";
 import DatabaseRepository from "../models/DatabaseRepository";
+import { User } from "../types/User";
 import GuildService from "./guild";
 
 export default class AchievementService {
     
-    userRepo: DatabaseRepository;
+    userRepo: DatabaseRepository<User>;
     guildService: GuildService;
 
-    constructor(userRepo: DatabaseRepository, guildService: GuildService) {
+    constructor(userRepo: DatabaseRepository<User>, guildService: GuildService) {
         this.userRepo = userRepo;
         this.guildService = guildService;
     }
@@ -24,8 +25,11 @@ export default class AchievementService {
             'roles.gameMaster': 1
         });
 
-        if (user.guildId) {
-            user.guild = await this.guildService.getInfoById(user.guildId);
+        if (user && user.guildId) {
+            return {
+                ...user,
+                guild: await this.guildService.getInfoById(user.guildId)
+            }
         }
 
         return user;
@@ -132,6 +136,6 @@ export default class AchievementService {
     async isEstablishedPlayer(userId: ObjectId) {
         let userAchievements = await this.getAchievements(userId);
 
-        return userAchievements.achievements.rank > 0 || userAchievements.achievements.completed > 0;
+        return userAchievements && (userAchievements.achievements.rank > 0 || userAchievements.achievements.completed > 0);
     }
 };

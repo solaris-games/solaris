@@ -6,5 +6,8 @@ export interface Conversation {
     participants: ObjectId[];
     createdBy: ObjectId | null;
     name: string;
-    messages: [ConversationMessage]
+    messages: ConversationMessage[];
+
+    lastMessage?: ConversationMessage;
+    unreadCount?: number;
 };

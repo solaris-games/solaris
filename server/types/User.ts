@@ -160,4 +160,6 @@ export interface User {
         }
     },
     avatars: number[];
+
+    isEstablishedPlayer?: boolean;
 }

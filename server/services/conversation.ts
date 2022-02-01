@@ -2,7 +2,9 @@ const moment = require('moment');
 import { ObjectId } from 'mongoose';
 import ValidationError from '../errors/validation';
 import DatabaseRepository from '../models/DatabaseRepository';
+import { Conversation } from '../types/Conversation';
 import { ConversationMessage, ConversationMessageSentResult } from '../types/ConversationMessage';
+import { Game } from '../types/Game';
 import TradeService from './trade';
 const mongoose = require('mongoose');
 const EventEmitter = require('events');
@@ -22,7 +24,7 @@ function arrayIsEqual(a, b) {
     return true;
 }
 
-function getNewConversation(game, playerId, name, participantIds) {
+function getNewConversation(game: Game, playerId: ObjectId | null, name: string, participantIds: ObjectId[]): Conversation {
     if (name == null || !name.length || name.length > 100) {
         throw new ValidationError(`Name is required and must not exceed 100 characters.`);
     }
@@ -31,7 +33,7 @@ function getNewConversation(game, playerId, name, participantIds) {
 
     // Append the current player ID to the participants if it isn't there already.
     if (playerId && !participantIds.find(x => x.toString() === playerId.toString())) {
-        participantIds.unshift(playerId.toString());
+        participantIds.unshift(playerId);
     }
 
     if (participantIds.length < 2) {
@@ -49,11 +51,12 @@ function getNewConversation(game, playerId, name, participantIds) {
 
     let convoId = new mongoose.Types.ObjectId();
 
-    let newConvo = {
+    let newConvo: Conversation = {
         _id: convoId,
         name,
         createdBy: playerId,
-        participants: participantIds
+        participants: participantIds,
+        messages: []
     };
 
     return newConvo;
@@ -61,11 +64,11 @@ function getNewConversation(game, playerId, name, participantIds) {
 
 export default class ConversationService extends EventEmitter {
 
-    gameRepo: DatabaseRepository;
+    gameRepo: DatabaseRepository<Game>;
     tradeService: TradeService;
 
     constructor(
-        gameRepo: DatabaseRepository,
+        gameRepo: DatabaseRepository<Game>,
         tradeService: TradeService
     ) {
         super();
@@ -74,7 +77,7 @@ export default class ConversationService extends EventEmitter {
         this.tradeService = tradeService;
     }
 
-    async create(game: any, playerId: ObjectId, name: string, participantIds: ObjectId[]) {
+    async create(game: any, playerId: ObjectId, name: string, participantIds: ObjectId[]): Promise<Conversation> {
         let newConvo = getNewConversation(game, playerId, name, participantIds);
 
         // Create the convo.
@@ -105,7 +108,7 @@ export default class ConversationService extends EventEmitter {
         return newConvo;
     }
 
-    createConversationAllPlayers(game: any) {
+    createConversationAllPlayers(game: any): void {
         let name = game.settings.general.name;
         let participantIds = game.galaxy.players.map(p => p._id.toString());
 
@@ -114,23 +117,28 @@ export default class ConversationService extends EventEmitter {
         game.conversations.push(newConvo);
     }
 
-    async list(game: any, playerId: ObjectId) {
+    async list(game: Game, playerId: ObjectId) {
         // List all conversations the player is participating in
         // and the last message that was sent
         // and the count of unread messages
         let convos = game.conversations.filter(c => c.participants.find(p => p.equals(playerId)));
 
-        convos.forEach(c => {
+        return convos.map(c => {
             // Only return the last message
-            c.lastMessage = c.messages.slice(-1)[0] || null;
+            const lastMessage = c.messages.slice(-1)[0] || null;
 
             // Calculate how many messages in this conversation the player has NOT read.
-            c.unreadCount = c.messages.filter(m => m.readBy.find(r => r.equals(playerId)) == null).length;
+            const unreadCount = c.messages.filter(m => m.readBy.find(r => r.equals(playerId)) == null).length;
 
-            delete c.messages;
+            return {
+                _id: c._id,
+                participants: c.participants,
+                createdBy: c.createdBy,
+                name: c.name,
+                lastMessage,
+                unreadCount
+            }
         });
-
-        return convos;
     }
 
     // Gets the summary of a single chat (if exists) between two players

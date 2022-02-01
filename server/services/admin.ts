@@ -1,12 +1,17 @@
 import { ObjectId } from 'mongoose';
 import DatabaseRepository from '../models/DatabaseRepository';
+import { Game } from '../types/Game';
+import { User } from '../types/User';
 
 export default class AdminService {
     
-    userRepo: DatabaseRepository;
-    gameRepo: DatabaseRepository;
+    userRepo: DatabaseRepository<User>;
+    gameRepo: DatabaseRepository<Game>;
 
-    constructor(userRepo, gameRepo) {
+    constructor(
+        userRepo: DatabaseRepository<User>, 
+        gameRepo: DatabaseRepository<Game>
+    ) {
         this.userRepo = userRepo;
         this.gameRepo = gameRepo;
     }
