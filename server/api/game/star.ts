@@ -1,4 +1,5 @@
 import ValidationError from '../../errors/validation';
+import { DependencyContainer } from '../../types/DependencyContainer';
 import Middleware from '../middleware';
     
 function validate(req, res, next) {
@@ -15,7 +16,7 @@ function validate(req, res, next) {
     return next();
 }
 
-export default (router, io, container) => {
+export default (router, io, container: DependencyContainer) => {
 
     const middleware = Middleware(container);
 

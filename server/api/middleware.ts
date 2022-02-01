@@ -1,6 +1,7 @@
 import ValidationError from '../errors/validation';
+import { DependencyContainer } from '../types/DependencyContainer';
 
-export default (container) => {
+export default (container: DependencyContainer) => {
 
     return {
         async authenticate(req, res, next) {

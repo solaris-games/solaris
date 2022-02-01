@@ -23,7 +23,7 @@ export default class GameListService {
         });
     }
 
-    async listUserGames(select) {
+    async listUserGames(select?: any) {
         select = select || {
             'settings.general.type': 1,
             'settings.general.featured': 1,

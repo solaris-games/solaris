@@ -22,8 +22,9 @@ import DiplomacyApi from '../api/game/diplomacy';
 import ShopApi from '../api/shop';
 import BadgesApi from '../api/badges';
 import ReportApi from '../api/report';
+import { DependencyContainer } from '../types/DependencyContainer';
 
-export default async (config, app, io, container) => {
+export default async (config, app, io, container: DependencyContainer) => {
 
     app.use(require('body-parser').json({
         limit: '1000kb' // Note: This allows large custom galaxies to be uploaded.

@@ -1,7 +1,8 @@
 import ValidationError from '../../errors/validation';
 import Middleware from '../middleware';
+import { DependencyContainer } from '../../types/DependencyContainer';
 
-export default (router, io, container) => {
+export default (router, io, container: DependencyContainer) => {
 
     const middleware = Middleware(container);
 

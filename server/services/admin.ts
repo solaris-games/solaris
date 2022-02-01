@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongoose';
 import DatabaseRepository from '../models/DatabaseRepository';
 
 export default class AdminService {
@@ -10,7 +11,7 @@ export default class AdminService {
         this.gameRepo = gameRepo;
     }
 
-    async listUsers(limit) {
+    async listUsers(limit: number) {
         let users = await this.userRepo.find({
             // All users
         }, {
@@ -47,7 +48,7 @@ export default class AdminService {
         });
     }
 
-    async listGames(limit) {
+    async listGames(limit: number) {
         return await this.gameRepo.find({
             'settings.general.type': { $ne: 'tutorial' } // Non tutorial games
         }, {
@@ -59,7 +60,7 @@ export default class AdminService {
         limit);
     }
 
-    async setRoleContributor(userId, enabled = true) {
+    async setRoleContributor(userId: ObjectId, enabled: boolean = true) {
         await this.userRepo.updateOne({
             _id: userId
         }, {
@@ -67,7 +68,7 @@ export default class AdminService {
         });
     }
 
-    async setRoleDeveloper(userId, enabled = true) {
+    async setRoleDeveloper(userId: ObjectId, enabled: boolean = true) {
         await this.userRepo.updateOne({
             _id: userId
         }, {
@@ -75,7 +76,7 @@ export default class AdminService {
         });
     }
 
-    async setRoleCommunityManager(userId, enabled = true) {
+    async setRoleCommunityManager(userId: ObjectId, enabled: boolean = true) {
         await this.userRepo.updateOne({
             _id: userId
         }, {
@@ -83,7 +84,7 @@ export default class AdminService {
         });
     }
 
-    async setRoleGameMaster(userId, enabled = true) {
+    async setRoleGameMaster(userId: ObjectId, enabled: boolean = true) {
         await this.userRepo.updateOne({
             _id: userId
         }, {
@@ -91,7 +92,7 @@ export default class AdminService {
         });
     }
 
-    async ban(userId) {
+    async ban(userId: ObjectId) {
         await this.userRepo.updateOne({
             _id: userId
         }, {
@@ -99,7 +100,7 @@ export default class AdminService {
         });
     }
 
-    async unban(userId) {
+    async unban(userId: ObjectId) {
         await this.userRepo.updateOne({
             _id: userId
         }, {
@@ -107,7 +108,7 @@ export default class AdminService {
         });
     }
 
-    async resetAchievements(userId) {
+    async resetAchievements(userId: ObjectId) {
         await this.userRepo.updateOne({
             _id: userId
         }, {
@@ -157,7 +158,7 @@ export default class AdminService {
         });
     }
 
-    async promoteToEstablishedPlayer(userId) {
+    async promoteToEstablishedPlayer(userId: ObjectId) {
         await this.userRepo.updateOne({
             _id: userId,
             $and: [
@@ -171,7 +172,7 @@ export default class AdminService {
         });
     }
 
-    async setGameFeatured(gameId, featured) {
+    async setGameFeatured(gameId: ObjectId, featured: boolean) {
         await this.gameRepo.updateOne({
             _id: gameId
         }, {
@@ -179,7 +180,7 @@ export default class AdminService {
         });
     }
 
-    async setGameTimeMachine(gameId, enabled) {
+    async setGameTimeMachine(gameId: ObjectId, enabled: boolean) {
         await this.gameRepo.updateOne({
             _id: gameId
         }, {

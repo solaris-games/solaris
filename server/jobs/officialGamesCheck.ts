@@ -1,3 +1,5 @@
+import { DependencyContainer } from "../types/DependencyContainer";
+
 const officialGameSettings = [
     require('../config/game/settings/official/newPlayer'),
     require('../config/game/settings/official/standard'),
@@ -18,7 +20,7 @@ const specialGameSettings = [
     require('../config/game/settings/official/special_tinyGalaxy'),
 ];
 
-export default (container) => {
+export default (container: DependencyContainer) => {
 
     return {
 

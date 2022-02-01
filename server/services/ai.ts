@@ -1,14 +1,18 @@
+import StarUpgradeService from "./starUpgrade";
+
 const FIRST_TICK_BULK_UPGRADE_SCI_PERCENTAGE = 20;
 const FIRST_TICK_BULK_UPGRADE_IND_PERCENTAGE = 30;
 const LAST_TICK_BULK_UPGRADE_ECO_PERCENTAGE = 100;
 
 export default class AIService {
 
-    constructor(starUpgradeService) {
+    starUpgradeService: StarUpgradeService;
+
+    constructor(starUpgradeService: StarUpgradeService) {
         this.starUpgradeService = starUpgradeService;
     }
 
-    async play(game, player) {
+    async play(game: any, player: any) {
         if (!player.defeated) {
             throw new Error('The player is not under AI control.');
         }

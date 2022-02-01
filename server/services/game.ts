@@ -1,5 +1,6 @@
 const EventEmitter = require('events');
 const moment = require('moment');
+import { ObjectId } from 'mongoose';
 import ValidationError from '../errors/validation';
 
 export default class GameService extends EventEmitter {
@@ -27,7 +28,7 @@ export default class GameService extends EventEmitter {
         return await this.gameRepo.findById(id);
     }
 
-    async getById(id, select) {
+    async getById(id: ObjectId, select?: any) {
         return await this.gameRepo.findByIdAsModel(id, select);
     }
 
@@ -435,7 +436,7 @@ export default class GameService extends EventEmitter {
         });
     }
 
-    async delete(game, deletedByUserId) {
+    async delete(game: any, deletedByUserId?: ObjectId) {
         // If being deleted by a legit user then do some validation.
         if (deletedByUserId && game.state.startDate) {
             throw new ValidationError('Cannot delete games that are in progress or completed.');

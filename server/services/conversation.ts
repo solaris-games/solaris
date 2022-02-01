@@ -1,5 +1,9 @@
 const moment = require('moment');
+import { ObjectId } from 'mongoose';
 import ValidationError from '../errors/validation';
+import DatabaseRepository from '../models/DatabaseRepository';
+import { ConversationMessage, ConversationMessageSentResult } from '../types/ConversationMessage';
+import TradeService from './trade';
 const mongoose = require('mongoose');
 const EventEmitter = require('events');
 
@@ -57,14 +61,20 @@ function getNewConversation(game, playerId, name, participantIds) {
 
 export default class ConversationService extends EventEmitter {
 
-    constructor(gameRepo, tradeService) {
+    gameRepo: DatabaseRepository;
+    tradeService: TradeService;
+
+    constructor(
+        gameRepo: DatabaseRepository,
+        tradeService: TradeService
+    ) {
         super();
 
         this.gameRepo = gameRepo;
         this.tradeService = tradeService;
     }
 
-    async create(game, playerId, name, participantIds) {
+    async create(game: any, playerId: ObjectId, name: string, participantIds: ObjectId[]) {
         let newConvo = getNewConversation(game, playerId, name, participantIds);
 
         // Create the convo.
@@ -95,7 +105,7 @@ export default class ConversationService extends EventEmitter {
         return newConvo;
     }
 
-    createConversationAllPlayers(game) {
+    createConversationAllPlayers(game: any) {
         let name = game.settings.general.name;
         let participantIds = game.galaxy.players.map(p => p._id.toString());
 
@@ -104,7 +114,7 @@ export default class ConversationService extends EventEmitter {
         game.conversations.push(newConvo);
     }
 
-    async list(game, playerId) {
+    async list(game: any, playerId: ObjectId) {
         // List all conversations the player is participating in
         // and the last message that was sent
         // and the count of unread messages
@@ -124,7 +134,7 @@ export default class ConversationService extends EventEmitter {
     }
 
     // Gets the summary of a single chat (if exists) between two players
-    async privateChatSummary(game, playerIdA, playerIdB) {
+    async privateChatSummary(game: any, playerIdA: ObjectId, playerIdB: ObjectId) {
         let convos = await this.list(game, playerIdA)
 
         // Find the chat with the other participant
@@ -138,7 +148,7 @@ export default class ConversationService extends EventEmitter {
         return convo || null;
     }
 
-    async detail(game, playerId, conversationId, includeEvents = true) {
+    async detail(game: any, playerId: ObjectId, conversationId: ObjectId, includeEvents: boolean = true) {
         // Get the conversation that the player has requested in full.
         let convo = game.conversations.find(c => c._id.toString() === conversationId.toString());
 
@@ -168,7 +178,7 @@ export default class ConversationService extends EventEmitter {
         return convo;
     }
 
-    async send(game, player, conversationId, message) {
+    async send(game: any, player: any, conversationId: ObjectId, message: string): Promise<ConversationMessageSentResult> {
         message = message.trim()
 
         if (message === '') {
@@ -177,7 +187,7 @@ export default class ConversationService extends EventEmitter {
 
         let convo = await this.detail(game, player._id, conversationId, false); // Call this for the validation.
 
-        let newMessage = {
+        let newMessage: ConversationMessage = {
             _id: mongoose.Types.ObjectId(),
             fromPlayerId: player._id,
             fromPlayerAlias: player.alias,
@@ -198,14 +208,17 @@ export default class ConversationService extends EventEmitter {
             }
         });
 
-        newMessage.conversationId = conversationId;
-        newMessage.type = 'message';
-        newMessage.toPlayerIds = convo.participants.filter(p => p.toString() !== player._id.toString());
+        const sentMessageResult: ConversationMessageSentResult = {
+            ...newMessage,
+            conversationId,
+            type: 'message',
+            toPlayerIds: convo.participants.filter(p => p.toString() !== player._id.toString())
+        }
 
-        return newMessage;
+        return sentMessageResult;
     }
 
-    async markConversationAsRead(game, playerId, conversationId) {
+    async markConversationAsRead(game: any, playerId: ObjectId, conversationId: ObjectId) {
         let convo = await this.detail(game, playerId, conversationId, false);
 
         // Note: This is the best way as it may save a DB call
@@ -233,7 +246,7 @@ export default class ConversationService extends EventEmitter {
         return convo;
     }
 
-    async leave(game, playerId, conversationId) {
+    async leave(game: any, playerId: ObjectId, conversationId: ObjectId) {
         let convo = await this.detail(game, playerId, conversationId, false);
 
         if (convo.createdBy == null) {
@@ -261,7 +274,7 @@ export default class ConversationService extends EventEmitter {
         return convo;
     }
 
-    getUnreadCount(game, playerId) {
+    getUnreadCount(game: any, playerId: ObjectId) {
         return (game.conversations || [])
             .filter(c => c.participants.find(p => p.equals(playerId)))
             .reduce((sum, c) => {
@@ -269,15 +282,15 @@ export default class ConversationService extends EventEmitter {
             }, 0);
     }
 
-    async pinMessage(game, conversationId, messageId) {
+    async pinMessage(game: any, conversationId: ObjectId, messageId: ObjectId) {
         return await this.setPinnedMessage(game, conversationId, messageId, true);
     }
 
-    async unpinMessage(game, conversationId, messageId) {
+    async unpinMessage(game: any, conversationId: ObjectId, messageId: ObjectId) {
         return await this.setPinnedMessage(game, conversationId, messageId, false);
     }
 
-    async setPinnedMessage(game, conversationId, messageId, isPinned) {
+    async setPinnedMessage(game: any, conversationId: ObjectId, messageId: ObjectId, isPinned: boolean) {
         return await this.gameRepo.updateOne({
             _id: game._id
         }, {

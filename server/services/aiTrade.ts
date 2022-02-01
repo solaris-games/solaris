@@ -1,3 +1,10 @@
+import { ObjectId } from "mongoose";
+import DiplomacyService from "./diplomacy";
+import GameService from "./game";
+import RandomService from "./random";
+import ReputationService from "./reputation";
+import TradeService from "./trade";
+
 const TRADE_CHANCE_BASE = 50;
 const TRADE_CHANCE_STEP = 5;
 const TRADE_CHANCE_MIN_REPUTATION = 1;
@@ -5,18 +12,30 @@ const ALLY_REPUTATION_THRESHOLD = 5;
 
 export default class AITradeService {
 
-    constructor(reputationService, randomService, tradeService, gameService, diplomacyService) {
+    reputationService: ReputationService;
+    randomService: RandomService;
+    tradeService: TradeService;
+    gameService: GameService;
+    diplomacyService: DiplomacyService;
+
+    constructor(
+        reputationService: ReputationService,
+        randomService: RandomService,
+        tradeService: TradeService,
+        gameService: GameService,
+        diplomacyService: DiplomacyService
+    ) {
         this.reputationService = reputationService;
         this.randomService = randomService;
         this.tradeService = tradeService;
         this.gameService = gameService;
         this.diplomacyService = diplomacyService;
 
-        this.reputationService.on('onReputationIncreased', (args) => this.onReputationIncreased(args.gameId, args.player, args.forPlayer, args.amount));
-        this.reputationService.on('onReputationDecreased', (args) => this.onReputationDecreased(args.gameId, args.player, args.forPlayer, args.amount));
+        this.reputationService.on('onReputationIncreased', (args) => this.onReputationIncreased(args.gameId, args.player, args.forPlayer));
+        this.reputationService.on('onReputationDecreased', (args) => this.onReputationDecreased(args.gameId, args.player, args.forPlayer));
     }
 
-    async onReputationIncreased(gameId, player, forPlayer) {
+    async onReputationIncreased(gameId: ObjectId, player: any, forPlayer: any) {
         // Make sure the player is AI.
         if (!player.defeated) {
             return;
@@ -30,7 +49,7 @@ export default class AITradeService {
         await this._tryAlly(game, player, forPlayer, reputation);
     }
 
-    async onReputationDecreased(gameId, player, forPlayer) {
+    async onReputationDecreased(gameId: any, player: any, forPlayer: any) {
         // Make sure the player is AI.
         if (!player.defeated) {
             return;
@@ -43,7 +62,7 @@ export default class AITradeService {
         await this._tryEnemy(game, player, forPlayer, reputation);
     }
 
-    async _tryTrade(game, player, toPlayer, reputation) {
+    async _tryTrade(game: any, player: any, toPlayer: any, reputation: any) {
         if (reputation.score < TRADE_CHANCE_MIN_REPUTATION) {
             return;
         }

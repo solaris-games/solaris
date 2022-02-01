@@ -69,6 +69,7 @@ import SpiralMapService from '../services/maps/spiral';
 import DoughnutMapService from '../services/maps/doughnut';
 import IrregularMapService from '../services/maps/irregular';
 import CustomMapService from '../services/maps/custom';
+import { DependencyContainer } from '../types/DependencyContainer';
 
 const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
@@ -81,7 +82,7 @@ const guildRepository = new DatabaseRepository(GuildModel);
 const paymentRepository = new DatabaseRepository(PaymentModel);
 const reportRepository = new DatabaseRepository(ReportModel);
 
-export default (config, io) => {
+export default (config, io): DependencyContainer => {
 
     // Poor man's dependency injection.
 

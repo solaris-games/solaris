@@ -1,4 +1,6 @@
-export default (container) => {
+import { DependencyContainer } from "../types/DependencyContainer";
+
+export default (container: DependencyContainer) => {
 
     return {
 
