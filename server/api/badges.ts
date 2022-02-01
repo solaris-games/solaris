@@ -1,8 +1,9 @@
 const ValidationError = require('../errors/validation');
+import Middleware from './middleware';
 
-module.exports = (router, io, container) => {
+export default (router, io, container) => {
 
-    const middleware = require('./middleware')(container);
+    const middleware = Middleware(container);
 
     router.get('/api/badges', middleware.authenticate, async (req, res, next) => {
         let errors = [];
@@ -31,7 +32,7 @@ module.exports = (router, io, container) => {
     }, middleware.handleError);
 
     router.post('/api/badges/user/:userId', middleware.authenticate, async (req, res, next) => {
-        let errors = [];
+        let errors: string[] = [];
 
         if (!req.body.badgeKey) {
             errors.push('badgeKey is required.');
@@ -61,7 +62,7 @@ module.exports = (router, io, container) => {
     }, middleware.handleError);
 
     router.post('/api/badges/game/:gameId/player/:playerId', middleware.authenticate, middleware.loadGamePlayersState, async (req, res, next) => {
-        let errors = [];
+        let errors: string[] = [];
 
         if (!req.body.badgeKey) {
             errors.push('badgeKey is required.');

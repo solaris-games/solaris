@@ -1,9 +1,10 @@
 const ValidationError = require('../../errors/validation');
+import Middleware from '../middleware';
 const mongoose = require('mongoose');
 
 export default (router, io, container) => {
 
-    const middleware = require('../middleware')(container);
+    const middleware = Middleware(container);
 
     router.put('/api/game/:gameId/trade/credits', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameInProgress, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         let errors: string[] = [];

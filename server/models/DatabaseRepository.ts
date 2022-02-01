@@ -1,4 +1,4 @@
-module.exports = class DatabaseRepository {
+export default class DatabaseRepository {
 
     model: any;
     

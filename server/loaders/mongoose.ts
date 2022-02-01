@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 
-const EventModel = require('../models/Event');
-const GameModel = require('../models/Game');
-const GuildModel = require('../models/Guild');
-const HistoryModel = require('../models/History');
-const UserModel = require('../models/User');
-const PaymentModel = require('../models/Payment');
+import EventModel from '../models/Event';
+import GameModel from '../models/Game';
+import GuildModel from '../models/Guild';
+import HistoryModel from '../models/History';
+import UserModel from '../models/User';
+import PaymentModel from '../models/Payment';
 
 export default async (config, options) => {
 

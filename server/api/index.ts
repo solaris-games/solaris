@@ -1,7 +1,7 @@
 const express = require('express');
 const http = require('http');
 import loaders from '../loaders';
-const config = require('../config');
+import config from '../config';
 
 async function startServer() {
   const app = express();

@@ -1,7 +1,13 @@
 const Agenda = require('agenda');
-const config = require('../config');
-const mongooseLoader = require('../loaders/mongoose');
-const containerLoader = require('../loaders/container');
+import config from '../config';
+import mongooseLoader from '../loaders/mongoose';
+import containerLoader from '../loaders/container';
+
+import GameTickJob from './gameTick';
+import OfficialGamesCheckJob from './officialGamesCheck';
+import CleanupGamesTimedOutJob from './cleanupGamesTimedOut';
+import CleanupOldGameHistoryJob from './cleanupOldGameHistory';
+import CleanupOldTutorialsJob from './cleanupOldTutorials';
 
 let mongo;
 
@@ -28,11 +34,11 @@ async function startup() {
 
     // ------------------------------
 
-    const gameTickJob = require('./gameTick')(container);
-    const officialGamesCheckJob = require('./officialGamesCheck')(container);
-    const cleanupGamesTimedOutJob = require('./cleanupGamesTimedOut')(container);
-    const cleanupOldGameHistory = require('./cleanupOldGameHistory')(container);
-    const cleanupOldTutorials = require('./cleanupOldTutorials')(container);
+    const gameTickJob = GameTickJob(container);
+    const officialGamesCheckJob = OfficialGamesCheckJob(container);
+    const cleanupGamesTimedOutJob = CleanupGamesTimedOutJob(container);
+    const cleanupOldGameHistory = CleanupOldGameHistoryJob(container);
+    const cleanupOldTutorials = CleanupOldTutorialsJob(container);
 
     // Set up the agenda instance.
     const agendajs = new Agenda()

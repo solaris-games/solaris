@@ -1,8 +1,9 @@
 const ValidationError = require('../../errors/validation');
+import Middleware from '../middleware';
 
 export default (router, io, container) => {
 
-    const middleware = require('../middleware')(container);
+    const middleware = Middleware(container);
 
     router.put('/api/game/:gameId/carrier/:carrierId/waypoints', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {

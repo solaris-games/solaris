@@ -1,13 +1,13 @@
 const bcrypt = require('bcrypt');
 
-const GameModel = require('../models/Game');
-const UserModel = require('../models/User');
-const HistoryModel = require('../models/History');
-const EventModel = require('../models/Event');
-const GuildModel = require('../models/Guild');
-const PaymentModel = require('../models/Payment');
-const ReportModel = require('../models/Report');
-const DatabaseRepository = require('../models/DatabaseRepository');
+import GameModel from '../models/Game';
+import UserModel from '../models/User';
+import HistoryModel from '../models/History';
+import EventModel from '../models/Event';
+import GuildModel from '../models/Guild';
+import PaymentModel from '../models/Payment';
+import ReportModel from '../models/Report';
+import DatabaseRepository from '../models/DatabaseRepository';
 
 const gameRepository = new DatabaseRepository(GameModel);
 const userRepository = new DatabaseRepository(UserModel);

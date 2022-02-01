@@ -1,8 +1,9 @@
 const ValidationError = require('../errors/validation');
+import Middleware from './middleware';
 
 export default (router, io, container) => {
 
-    const middleware = require('./middleware')(container);
+    const middleware = Middleware(container);
 
     router.post('/api/auth/login', async (req, res, next) => {        
         let errors: string[] = [];

@@ -53,7 +53,8 @@ export default (container) => {
             // If there is an error in the pipleline
             // then test to see what type of error it is. If its a validation
             // error then return it with its status code.
-            if (err instanceof ValidationError) {
+            if (typeof(err) == ValidationError) {
+            // if (err instanceof ValidationError) {
                 let errors = err.message;
 
                 if (!Array.isArray(errors)) {

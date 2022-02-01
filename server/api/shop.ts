@@ -1,10 +1,11 @@
 const ValidationError = require('../errors/validation');
+import Middleware from './middleware';
 
 const COST_PER_TOKEN = 1;
 
 export default (router, io, container) => {
     
-    const middleware = require('./middleware')(container);
+    const middleware = Middleware(container);
 
     router.get('/api/shop/galacticcredits/purchase', middleware.authenticate, async (req, res, next) => {
         let errors: string[] = [];

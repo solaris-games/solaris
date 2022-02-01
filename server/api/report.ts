@@ -1,11 +1,12 @@
 const ValidationError = require('../errors/validation');
+import Middleware from './middleware';
 
-module.exports = (router, io, container) => {
+export default (router, io, container) => {
 
-    const middleware = require('./middleware')(container);
+    const middleware = Middleware(container);
 
     router.post('/api/game/:gameId/report', middleware.authenticate, middleware.loadGamePlayers, middleware.loadPlayer, async (req, res, next) => {
-        let errors = [];
+        let errors: string[] = [];
 
         if (!req.body.playerId) {
             errors.push('playerId is a required body field');

@@ -1,6 +1,8 @@
+import Middleware from '../middleware';
+
 export default (router, io, container) => {
 
-    const middleware = require('../middleware')(container);
+    const middleware = Middleware(container);
 
     router.get('/api/game/specialists/carrier', async (req, res, next) => {
         try {

@@ -1,8 +1,9 @@
 const ValidationError = require('../errors/validation');
+import Middleware from './middleware';
 
 export default (router, io, container) => {
     
-    const middleware = require('./middleware')(container);
+    const middleware = Middleware(container);
 
     router.get('/api/user/leaderboard', async (req, res, next) => {
         try {

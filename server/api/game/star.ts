@@ -1,4 +1,5 @@
 const ValidationError = require('../../errors/validation');
+import Middleware from '../middleware';
     
 function validate(req, res, next) {
     let errors: string[] = [];
@@ -16,7 +17,7 @@ function validate(req, res, next) {
 
 export default (router, io, container) => {
 
-    const middleware = require('../middleware')(container);
+    const middleware = Middleware(container);
 
     router.put('/api/game/:gameId/star/upgrade/economy', middleware.authenticate, validate, middleware.loadGameLean, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
