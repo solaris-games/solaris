@@ -1,7 +1,7 @@
 const CombatService = require('../services/combat');
 
 const fakeTechnologyService = {
-    getStarEffectiveWeaponsLevel(game, defender, star, defenderCarriers) {
+    getStarEffectiveWeaponsLevel(game, defenders, star, defenderCarriers) {
         return 1;
     },
     getCarriersEffectiveWeaponsLevel(game, attackers, attackerCarriers, isCarrierToStarCombat) {
