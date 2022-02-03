@@ -89,15 +89,14 @@ export default {
         
         this.isHiringSpecialist = true
 
-        // If the specialist hired or existing specialist in any way affects scanning, then reload the game map. Bit of a bodge but it works.
-        let affectsScanning = (!this.star.specialist || (this.star.specialist.modifiers && this.star.specialist.modifiers.local && this.star.specialist.modifiers.local.scanning != null)) ||
-                              (specialist.modifiers && specialist.modifiers.local && specialist.modifiers.local.scanning != null)
+        // If the specialist hired or existing specialist in any way affects scanning, manufacturing etc then reload the game map. Bit of a bodge but it works.
+        let requiresFullReload = this.shouldSpecialistRequireReload(this.star.specialist) || this.shouldSpecialistRequireReload(specialist)
 
         try {
             let response = await SpecialistApiService.hireStarSpecialist(this.$store.state.game._id, this.starId, specialist.id)
 
             if (response.status === 200) {
-              if (affectsScanning) { // Its a bit shit but fuck it, easier than doing it server side.
+              if (requiresFullReload) { // Its a bit shit but fuck it, easier than doing it server side.
                 this.$emit('onReloadGameRequested', specialist)
               } else {
                 let currency = this.$store.state.game.settings.specialGalaxy.specialistsCurrency
@@ -135,6 +134,37 @@ export default {
     },
     cantAffordSpecialist (specialist) {
         return this.userPlayer[this.$store.state.game.settings.specialGalaxy.specialistsCurrency] < this.getSpecialistActualCost(specialist)
+    },
+    shouldSpecialistRequireReload (specialist) {
+      if (!specialist) {
+        return false
+      }
+      
+      const localKeys = [
+        'scanning',
+        'manufacturing'
+      ]
+
+      const specialKeys = [
+        'economyInfrastructureMultiplier',
+        'scienceInfrastructureMultiplier'
+      ]
+
+      if (specialist.modifiers && specialist.modifiers.local) {
+        for (let key of localKeys) {
+          if (specialist.modifiers.local[key] != null) {
+            return true
+          }
+        }
+      }
+
+      if (specialist.modifiers && specialist.modifiers.special) {
+        for (let key of specialKeys) {
+          if (specialist.modifiers.special[key] != null) {
+            return true
+          }
+        }
+      }
     }
   },
   computed: {
