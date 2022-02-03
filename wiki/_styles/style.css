@@ -156,3 +156,8 @@ a.btn-neutral:hover {
 .wy-table td, .rst-content table.docutils td, .rst-content table.field-list td {
 	color: var(--text) !important;
 }
+
+/* Code blocks */
+.hljs {
+	color: red !important;
+}
