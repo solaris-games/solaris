@@ -62,16 +62,11 @@ export default {
   },
   data () {
     return {
-      userPlayer: null,
-      star: null,
       specialists: [],
       isHiringSpecialist: false
     }
   },
   mounted () {
-    this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
-    this.star = GameHelper.getStarById(this.$store.state.game, this.starId)
-
     const banList = this.$store.state.game.settings.specialGalaxy.specialistBans.star
 
     this.specialists = this.$store.state.starSpecialists.filter(s => banList.indexOf(s.id) < 0)
@@ -94,12 +89,17 @@ export default {
         
         this.isHiringSpecialist = true
 
+        // If the specialist hired or existing specialist in any way affects scanning, then reload the game map. Bit of a bodge but it works.
+        let affectsScanning = (!this.star.specialist || (this.star.specialist.modifiers && this.star.specialist.modifiers.local && this.star.specialist.modifiers.local.scanning != null)) ||
+                              (specialist.modifiers && specialist.modifiers.local && specialist.modifiers.local.scanning != null)
+
         try {
             let response = await SpecialistApiService.hireStarSpecialist(this.$store.state.game._id, this.starId, specialist.id)
 
             if (response.status === 200) {
-                this.$toasted.show(`${specialist.name} has been hired for the star ${this.star.name}.`)
-
+              if (affectsScanning) { // Its a bit shit but fuck it, easier than doing it server side.
+                this.$emit('onReloadGameRequested', specialist)
+              } else {
                 let currency = this.$store.state.game.settings.specialGalaxy.specialistsCurrency
 
                 this.star.specialistId = specialist.id
@@ -110,6 +110,9 @@ export default {
                 this.userPlayer.stats.totalSpecialists++
 
                 GameContainer.reloadStar(this.star)
+              }
+
+              this.$toasted.show(`${specialist.name} has been hired for the star ${this.star.name}.`)
             }
         } catch (err) {
             console.error(err)
@@ -135,6 +138,12 @@ export default {
     }
   },
   computed: {
+    star () {
+      return GameHelper.getStarById(this.$store.state.game, this.starId)
+    },
+    userPlayer () {
+      return GameHelper.getUserPlayer(this.$store.state.game)
+    },
     isCurrentSpecialistOneShot () {
       return this.star.specialist && this.star.specialist.oneShot
     }

@@ -166,6 +166,7 @@ module.exports = class SpecialistHireService {
         }
 
         // TODO: The star may have its manufacturing changed so return back the new manufacturing.
+        // TODO: Scanning changes are done by refreshing the entire game on the UI, would be ideally better to calculate it here?
         // TODO: Need to consider local and global effects and update the UI accordingly.
 
         return {
