@@ -1,7 +1,35 @@
-db.games.updateMany({
-    'settings.orbitalMechanics.orbitSpeed': { $gt: 5 }
-}, {
+db.users.updateMany({}, {
     $set: {
-        'settings.orbitalMechanics.orbitSpeed': 5
+        'achievements.badges.victor32': 0
     }
 });
+
+let victors = {};
+
+db.games.find({
+    'settings.general.type': '32_player_rt'
+}, {
+    'galaxy.players._id': 1,
+    'galaxy.players.userId': 1,
+    'state.winner': 1
+}).forEach(function(game) {
+    let winner = game.galaxy.players.find(p => p._id.equals(game.state.winner));
+
+    if (winner) {
+        if (victors[winner.userId]) {
+            victors[winner.userId]++;
+        } else {
+            victors[winner.userId] = 1;
+        }
+    }
+});
+
+for (let userId in victors) {
+    db.users.updateOne({
+        _id: ObjectId(userId)
+    }, {
+        $set: {
+            'achievements.badges.victor32': victors[userId]
+        }
+    });
+}

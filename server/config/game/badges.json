@@ -40,5 +40,11 @@
         "name": "Sleepless",
         "description": "Awarded to players who always have an ever watchful eye on the galaxy. These players know all and see all.",
         "price": 1
+    },
+    {
+        "key": "victor32",
+        "name": "Victor (32 Players)",
+        "description": "Awarded to players who have won a 32 player official game. This player has proven themselves to be a formiddable player.",
+        "price": null
     }
 ]

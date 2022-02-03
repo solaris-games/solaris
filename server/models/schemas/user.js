@@ -89,6 +89,7 @@ const schema = new Schema({
             roleplay: { type: Types.Number, default: 0 },
             dauntless: { type: Types.Number, default: 0 },
             sleepless: { type: Types.Number, default: 0 },
+            victor32: { type: Types.Number, default: 0 }
         }
     },
     gameSettings: {

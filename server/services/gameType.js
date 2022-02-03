@@ -29,6 +29,10 @@ module.exports = class GameTypeService {
         ].includes(game.settings.general.type);
     }
 
+    is32PlayerOfficialGame(game) {
+        return game.settings.general.type === '32_player_rt';
+    }
+
     isConquestMode(game) {
         return game.settings.general.mode === 'conquest';
     }
