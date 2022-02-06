@@ -32,9 +32,7 @@ This summary consists of, the gamemode, the anonimity, the dark settings, the ma
 For more info on a game, you can use the gameinfo command.
 
 ### Global Leaderboard
-The `$leaderboard_global <filter> <limit>` command gives you the top `<limit>` within a certain filter.
-
-The limit has to be a value between 1 and 20, the leaderboard will return the top x players, where x is that number.
+The `$leaderboard_global <filter>` command gives you the top 20 within a certain filter.
 
 The filters can be almost anything, the full list of possible filters is: 
 - `victories`
@@ -93,7 +91,7 @@ The second direction, the `<filter>`, is what the leaderboard will be sorted on.
 - total `economy`
 - total `industry`
 - total `science`
-- `newShip` production
+- `newShips` production
 - total `warpgates`
 - total `starSpecialists`
 - total `carrierSpecialists`
