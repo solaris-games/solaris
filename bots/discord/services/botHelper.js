@@ -1,7 +1,9 @@
 module.exports = class BotHelperService {
 
-    constructor(botResponseService) {
+    constructor(botResponseService, gameGalaxyService, gameService) {
         this.botResponseService = botResponseService;
+        this.gameGalaxyService = gameGalaxyService
+        this.gameService = gameService
     }
 
     isValidID(id) {
@@ -14,6 +16,65 @@ module.exports = class BotHelperService {
 
         // Returning whether or not the characters are all allowed and whether the id has the right length
         return validCharacters && id.length === 24;
+    }
+
+    async getGame(directions, hasFocus, msg) {
+        let game = []
+        let focus = '';
+        if (directions[directions.length - 1] == "ID") {
+            if (this.isValidID(directions[0])) {
+                game = await this.gameService.getByIdAllLean(directions[0])
+            } else {
+                msg.channel.send(this.botResponseService.error(msg.author.id, 'invalidID'))
+                return false;
+            }
+            if (hasFocus) {
+                focus = directions[directions.length - 2]
+            }
+        } else {
+            if(directions.length <= (0 + hasFocus)) {
+                msg.channel.send(this.botResponseService.error('noDirections'))
+                return false
+            }
+            let game_name = "";
+            for (let i = 0; i < directions.length - hasFocus; i++) {
+                game_name += directions[i] + ' ';
+            }
+            game_name = game_name.trim()
+            game = await this.gameService.getByNameStateSettingsLean(game_name);
+            if(hasFocus) {
+                focus = directions[directions.length - 1]
+            }
+        }
+        game = this.isValidGame(game, msg);
+        if(!game) return false;
+
+        let gameId = game._id;
+        let gameTick = game.state.tick;
+        game = await this.gameGalaxyService.getGalaxy(gameId, null, gameTick);
+        return [game, focus];
+    }
+
+    isValidGame(game, msg) {
+        if (Array.isArray(game)) {
+            if (!game.length) {
+                msg.channel.send(this.botResponseService.error(msg.author.id, 'noGame'));
+                return false;
+            } else if (game.length > 1) {
+                msg.channel.send(this.botResponseService.error(msg.author.id, 'multipleGames'));
+                return false;
+            }
+            game = game[0];
+        }
+        return game;
+    }
+
+    isValidFocus(focus, focusArray, msg) {
+        if (!focusArray.includes(focus)) {
+            msg.channel.send(this.botResponseService.error(msg.author.id, 'noFocus'));
+            return false;
+        }
+        return true;
     }
 
     async getNestedObject(nestedObj, pathArr) {
