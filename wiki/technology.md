@@ -28,7 +28,9 @@ The equation is `(hyperspace + 1.5) * lightYear`.
 
 Improves the natural resources at Stars to make infrastructure upgrades cheaper. 
 
-The equation is `max(1, floor((baseCost * expenseConfig * (current + 1)) / (terraformedResources / 100)))`.
+The equation for terraformed resources is `floor(naturalResource + (5 * terraforming))`.
+
+The equation for infrastructure cost is `max(1, floor((baseCost * expenseConfig * (current + 1)) / (terraformedResources / 100)))`.
 
 Where `baseCost` is:
 
