@@ -335,7 +335,7 @@ module.exports = class CarrierService extends EventEmitter {
             carrier.ownedByPlayerId = star.ownedByPlayerId; // Transfer ownership
             
             // Remove the specialist. Note that this is required to get around an exploit where players can use a gift just before a battle to weaken the opponent.
-            if (!this.diplomacyService.getDiplomaticStatusBetweenPlayers(game, [carrierPlayer,starPlayer]) == 'allies') {
+            if (!this.diplomacyService.isFormalAlliancesEnabled(game) || !this.diplomacyService.getDiplomaticStatusBetweenPlayers(game, [carrierPlayer,starPlayer]) == 'allies') {
                 carrier.specialistId = null;
             }
             
