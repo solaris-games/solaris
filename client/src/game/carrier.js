@@ -70,6 +70,7 @@ class Carrier extends EventEmitter {
     this.drawShips()
     this.drawSpecialist()
     this.drawCarrierWaypoints()
+    this.drawDepth()
   }
 
   drawActive () {
@@ -247,6 +248,19 @@ class Carrier extends EventEmitter {
       this.graphics_selected.lineStyle(0.5, 0xFFFFFF)
       this.graphics_selected.alpha = 0.3
       this.graphics_selected.drawCircle(0, 0, 15)
+    }
+  }
+
+  drawDepth () {
+    if (!this.data.orbiting) {
+      const waypoint = this.data.waypoints[0]
+      const seeds = [waypoint.source, waypoint.destination]
+      const depth = Helpers.calculateDepthModifiers(this.userSettings, seeds)
+
+      this.container.alpha = depth
+      this.baseScale = depth * 1.5
+    } else {
+      this.container.alpha = 1
     }
   }
 
