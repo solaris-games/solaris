@@ -297,7 +297,8 @@ module.exports = class GameService extends EventEmitter {
 
     assignPlayerToUser(game, player, userId, alias, avatar) {
         let isAfker = game.afkers.find(x => x.equals(userId)) != null;
-        let isRejoiningAfkSlot = this.gameStateService.isInProgress(game) && isAfker && player.afk && player.userId === userId.toString();
+        let isFillingAfkSlot = this.gameStateService.isInProgress(game) && player.afk;
+        let isRejoiningOwnAfkSlot = isFillingAfkSlot && isAfker && player.userId === userId.toString();
 
         // Assign the user to the player.
         player.userId = userId;
@@ -306,7 +307,7 @@ module.exports = class GameService extends EventEmitter {
 
         // Reset the defeated and afk status as the user may be filling
         // an afk slot.
-        player.hasFilledAfkSlot = !isRejoiningAfkSlot;
+        player.hasFilledAfkSlot = isFillingAfkSlot && !isRejoiningOwnAfkSlot;
         player.defeated = false;
         player.defeatedDate = null;
         player.afk = false;
