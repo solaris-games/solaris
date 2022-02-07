@@ -527,6 +527,9 @@ module.exports = class ReponseService {
             case 'invalidID':
                 response += 'The ID of the game you gave is invalid, please check if it is correct.'
                 break;
+            case 'noDirections':
+                response += 'The command you executed had too little directions, check `$help` for a detailed explanation on each command.'
+                break;
             default:
                 //This should never happen
                 response += 'Something horribly went wrong';
