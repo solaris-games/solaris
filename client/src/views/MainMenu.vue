@@ -130,6 +130,7 @@ export default {
       this.$store.commit('clearUserId')
       this.$store.commit('clearUsername')
       this.$store.commit('clearRoles')
+      this.$store.commit('clearUserCredits')
 
       this.isLoggingOut = false
 
@@ -141,6 +142,8 @@ export default {
 
         this.user = response.data
         this.achievements = response.data.achievements
+
+        this.$store.commit('setUserCredits', response.data.credits)
       } catch (err) {
         console.error(err)
       }
