@@ -32,25 +32,41 @@
                         <td class="text-right">{{carrier.after}}</td>
                     </tr>
                     <tr>
-                        <td>Carriers: Weapons {{event.data.combatResult.weapons.attacker}}</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr v-for="carrier of attackerCarriers" :key="carrier._id">
-                        <td>
-                            <i class="fas fa-rocket mr-2"></i>
-                            <span :style="{ 'color': getCarrierColour(carrier) }" class="name-and-icon">
-                              <player-icon-shape :filled="true" :shape="getCarrierShape(carrier)" :iconColour="getCarrierColour(carrier)" />
-                              {{carrier.name}}
-                            </span>
-                            <span v-if="carrier.specialist" :title="carrier.specialist.description"> ({{carrier.specialist.name}})</span>
-                        </td>
-                        <td class="text-right">{{carrier.before}}</td>
-                        <td class="text-right">{{carrier.lost}}</td>
-                        <td class="text-right">{{carrier.after}}</td>
+                      <td><strong>Totals</strong></td>
+                      <td class="text-right"><strong>{{totalDefenderBefore}}</strong></td>
+                      <td class="text-right"><strong>{{totalDefenderLost}}</strong></td>
+                      <td class="text-right"><strong>{{totalDefenderAfter}}</strong></td>
                     </tr>
                 </tbody>
+            </table>
+            <table class="table table-sm" v-if="event">
+              <tbody>
+                <tr>
+                    <td>Carriers: Weapons {{event.data.combatResult.weapons.attacker}}</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr v-for="carrier of attackerCarriers" :key="carrier._id">
+                    <td>
+                        <i class="fas fa-rocket mr-2"></i>
+                        <span :style="{ 'color': getCarrierColour(carrier) }" class="name-and-icon">
+                          <player-icon-shape :filled="true" :shape="getCarrierShape(carrier)" :iconColour="getCarrierColour(carrier)" />
+                          {{carrier.name}}
+                        </span>
+                        <span v-if="carrier.specialist" :title="carrier.specialist.description"> ({{carrier.specialist.name}})</span>
+                    </td>
+                    <td class="text-right">{{carrier.before}}</td>
+                    <td class="text-right">{{carrier.lost}}</td>
+                    <td class="text-right">{{carrier.after}}</td>
+                </tr>
+                <tr>
+                  <td><strong>Totals</strong></td>
+                  <td class="text-right"><strong>{{totalAttackerBefore}}</strong></td>
+                  <td class="text-right"><strong>{{totalAttackerLost}}</strong></td>
+                  <td class="text-right"><strong>{{totalAttackerAfter}}</strong></td>
+                </tr>
+              </tbody>
             </table>
         </div>
     </div>
@@ -89,6 +105,26 @@ export default {
     getCarrierShape (carrier) {
       return GameHelper.getPlayerById(this.$store.state.game, carrier.ownedByPlayerId).shape;
     },
+  },
+  computed: {
+    totalDefenderBefore: function () {
+      return this.defenderCarriers.reduce((sum, c) => sum + c.before | 0, 0)
+    },
+    totalDefenderLost: function () {
+      return this.defenderCarriers.reduce((sum, c) => sum + c.lost | 0, 0)
+    },
+    totalDefenderAfter: function () {
+      return this.defenderCarriers.reduce((sum, c) => sum + c.after | 0, 0)
+    },
+    totalAttackerBefore: function () {
+      return this.attackerCarriers.reduce((sum, c) => sum + c.before | 0, 0)
+    },
+    totalAttackerLost: function () {
+      return this.attackerCarriers.reduce((sum, c) => sum + c.lost | 0, 0)
+    },
+    totalAttackerAfter: function () {
+      return this.attackerCarriers.reduce((sum, c) => sum + c.after | 0, 0)
+    }
   }
 }
 </script>
