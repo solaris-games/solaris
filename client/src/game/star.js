@@ -724,7 +724,7 @@ class Star extends EventEmitter {
     const depth = Helpers.calculateDepthModifier(this.userSettings, this.data._id)
 
     this.container.alpha = depth
-    this.baseScale = depth * 1.5
+    this.baseScale = depth * (this.userSettings.map.objectsDepth === 'disabled' ? 1 : 1.5)
   }
   
   onZoomChanging(zoomPercent) {
