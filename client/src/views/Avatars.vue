@@ -103,6 +103,8 @@ export default {
         if (response.status === 200) {
           avatar.purchased = true
           this.userCredits.credits -= avatar.price
+
+          this.$store.commit('setUserCredits', this.userCredits.credits)
         }
       } catch (err) {
         console.error(err)

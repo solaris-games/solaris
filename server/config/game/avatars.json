@@ -299,5 +299,12 @@
         "description": "A literal God walking amongst mere mortals.",
         "price": 25,
         "isPatronAvatar": true
+    },
+    {
+        "id": 43,
+        "name": "Snurp Ascendancy",
+        "description": "This proud, onomatopoetic pack of star-farers ventures far and wide across the cosmos in search of truth, enlightenment, and treats, for they know that they are the goodest Snurps.",
+        "price": 10,
+        "isPatronAvatar": true
     }
 ]
