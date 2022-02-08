@@ -478,7 +478,7 @@ export default class LeaderboardService {
         specialists: 'player.research.specialists.level'
     }
 
-    constructor(userRepo, userService, playerService, guildUserService, ratingService, gameService, gameTypeService, gameStateService) {
+    constructor(userRepo, userService, playerService, guildUserService, ratingService, gameService, gameTypeService, gameStateService, badgeService) {
         this.userRepo = userRepo;
         this.userService = userService;
         this.playerService = playerService;
@@ -487,6 +487,7 @@ export default class LeaderboardService {
         this.gameService = gameService;
         this.gameTypeService = gameTypeService;
         this.gameStateService = gameStateService;
+        this.badgeService = badgeService;
     }
 
     async getLeaderboard(limit, sortingKey, skip = 0) {
@@ -644,6 +645,10 @@ export default class LeaderboardService {
                     user.achievements.victories++; // Increase the winner's victory count
                     user.credits++; // Give the winner a galactic credit.
                     rankIncrease = leaderboard.length; // Note: Using leaderboard length as this includes ALL players (including afk)
+
+                    if (this.gameTypeService.is32PlayerOfficialGame(game)) {
+                        this.badgeService.awardBadgeForUser(user, 'victor32');
+                    }
                 }
                 else if (game.settings.general.awardRankTo === 'all') {
                     rankIncrease = Math.round(leaderboard.length / 2 - i);

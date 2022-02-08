@@ -14,7 +14,7 @@ export default (router, io, container: DependencyContainer) => {
         }
 
         try {
-            const result = container.badgeService.listBadges();
+            const result = container.badgeService.listPurchasableBadges();
             
             return res.status(200).json(result);
         } catch (err) {

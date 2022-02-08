@@ -112,11 +112,21 @@
     <div class="mb-1 pb-1">
 
       <div class="row bg-secondary pt-1 pb-1">
-        <label for="objects-scaling" class="col-12 col-sm-6 col-form-label">Objects Scaling</label>
+        <label for="objects-scaling" class="col-12 col-sm-6 col-form-label">Object Scaling</label>
         <div class="col-12 col-sm-6">
           <select class="form-control" id="objects-scaling" v-model="settings.map.objectsScaling" :disabled="isSavingSettings">
             <option value="default">Default</option>
             <option value="clamped">Clamped</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row bg-secondary pt-1 pb-1">
+        <label for="objects-depth" class="col-12 col-sm-6 col-form-label">Object Depth</label>
+        <div class="col-12 col-sm-6">
+          <select class="form-control" id="objects-depth" v-model="settings.map.objectsDepth" :disabled="isSavingSettings">
+            <option value="disabled">Disabled</option>
+            <option value="enabled">Enabled</option>
           </select>
         </div>
       </div>

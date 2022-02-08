@@ -133,6 +133,11 @@ export default class WaypointService {
             return false;
         }
 
+        // If the stars are a wormhole pair then they are always considered to be in hyperspace range.
+        if (this.starService.isStarPairWormHole(sourceStar, destinationStar)) {
+            return true;
+        }
+
         let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, null, true);
         let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, effectiveTechs.hyperspace);
 

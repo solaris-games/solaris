@@ -211,13 +211,13 @@ describe('technology', () => {
             }
         };
 
-        const player = {
+        const players = [{
             research: {
                 weapons: {
                     level: 1
                 }
             }
-        };
+        }];
 
         const star = {
             specialistId: null
@@ -227,9 +227,48 @@ describe('technology', () => {
 
         setup();
 
-        const weapons = service.getStarEffectiveWeaponsLevel(game, player, star, carriersInOrbit);
+        const weapons = service.getStarEffectiveWeaponsLevel(game, players, star, carriersInOrbit);
 
         expect(weapons).toBe(1);
+    });
+
+    it('should calculate star effective weapons level - Star - No carriers - No specs - No defender bonus - Multiple defenders', () => {
+        const game = {
+            settings: {
+                specialGalaxy: {
+                    defenderBonus: 'disabled'
+                }
+            }
+        };
+
+        const players = [
+            {
+                research: {
+                    weapons: {
+                        level: 1
+                    }
+                }
+            },
+            {
+                research: {
+                    weapons: {
+                        level: 2
+                    }
+                }
+            }
+        ];
+
+        const star = {
+            specialistId: null
+        };
+
+        const carriersInOrbit = [];
+
+        setup();
+
+        const weapons = service.getStarEffectiveWeaponsLevel(game, players, star, carriersInOrbit);
+
+        expect(weapons).toBe(2);
     });
 
     it('should calculate star effective weapons level - Star - No carriers - No specs - Defender bonus', () => {
@@ -241,13 +280,13 @@ describe('technology', () => {
             }
         };
 
-        const player = {
+        const players = [{
             research: {
                 weapons: {
                     level: 1
                 }
             }
-        };
+        }];
 
         const star = {
             specialistId: null
@@ -257,7 +296,7 @@ describe('technology', () => {
 
         setup();
 
-        const weapons = service.getStarEffectiveWeaponsLevel(game, player, star, carriersInOrbit);
+        const weapons = service.getStarEffectiveWeaponsLevel(game, players, star, carriersInOrbit);
 
         expect(weapons).toBe(2);
     });
@@ -271,13 +310,13 @@ describe('technology', () => {
             }
         };
 
-        const player = {
+        const players = [{
             research: {
                 weapons: {
                     level: 1
                 }
             }
-        };
+        }];
 
         const star = {
             specialistId: 1
@@ -295,7 +334,7 @@ describe('technology', () => {
 
         setup(specialist, null);
 
-        const weapons = service.getStarEffectiveWeaponsLevel(game, player, star, carriersInOrbit);
+        const weapons = service.getStarEffectiveWeaponsLevel(game, players, star, carriersInOrbit);
 
         expect(weapons).toBe(2);
     });
@@ -309,13 +348,13 @@ describe('technology', () => {
             }
         };
 
-        const player = {
+        const players = [{
             research: {
                 weapons: {
                     level: 1
                 }
             }
-        };
+        }];
 
         const star = {
             specialistId: null
@@ -337,7 +376,7 @@ describe('technology', () => {
 
         setup(null, specialist);
 
-        const weapons = service.getStarEffectiveWeaponsLevel(game, player, star, carriersInOrbit);
+        const weapons = service.getStarEffectiveWeaponsLevel(game, players, star, carriersInOrbit);
 
         expect(weapons).toBe(2);
     });

@@ -333,8 +333,12 @@ export default class CarrierService extends EventEmitter {
             }
 
             carrier.ownedByPlayerId = star.ownedByPlayerId; // Transfer ownership
-            carrier.specialistId = null; // Remove the specialist. Note that this is required to get around an exploit where players can use a gift just before a battle to weaken the opponent.
-
+            
+            // Remove the specialist. Note that this is required to get around an exploit where players can use a gift just before a battle to weaken the opponent.
+            if (!this.diplomacyService.isFormalAlliancesEnabled(game) || !this.diplomacyService.isDiplomaticStatusBetweenPlayersAllied(game, [carrierPlayer._id, starPlayer._id])) {
+                carrier.specialistId = null;
+            }
+            
             let eventObject = {
                 gameId: game._id,
                 gameTick: game.state.tick,

@@ -3,6 +3,7 @@ import EventEmitter from 'events'
 import TextureService from './texture'
 import gameHelper from '../services/gameHelper'
 import seededRandom from 'random-seed'
+import Helpers from './helpers'
 
 class Star extends EventEmitter {
 
@@ -151,6 +152,7 @@ class Star extends EventEmitter {
     this.drawShips()
     this.drawInfrastructure()
     this.drawInfrastructureBulkIgnored()
+    this.drawDepth()
 
     this.isInScanningRange = this._isInScanningRange()
   }
@@ -716,6 +718,13 @@ class Star extends EventEmitter {
       this.graphics_kingOfTheHill.alpha = 0.5
       this.graphics_kingOfTheHill.drawCircle(0, 0, 20)
     }
+  }
+
+  drawDepth () {
+    const depth = Helpers.calculateDepthModifier(this.userSettings, this.data._id)
+
+    this.container.alpha = depth
+    this.baseScale = depth * 1.5
   }
   
   onZoomChanging(zoomPercent) {

@@ -1,7 +1,5 @@
-db.games.updateMany({
-    'settings.orbitalMechanics.orbitSpeed': { $gt: 5 }
-}, {
+db.users.updateMany({}, {
     $set: {
-        'settings.orbitalMechanics.orbitSpeed': 5
+        'gameSettings.map.objectsDepth': 'disabled'
     }
 });
