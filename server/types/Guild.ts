@@ -1,7 +1,7 @@
 import { ObjectId } from "mongoose";
 
 export interface Guild {
-    _id?: ObjectId;
+    _id: ObjectId;
     name: string;
     tag: string;
     leader: ObjectId;

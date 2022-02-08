@@ -52,7 +52,7 @@ export type GameTimeStartDelay = 0|1|5|10|30|60|120|240|360|480|600|720|1440;
 export type GameTimeMaxTurnWait = 1|5|10|30|60|360|480|600|720|1080|1440|2880;
 
 export interface Game {
-    _id?: ObjectId;
+    _id: ObjectId;
     settings: {
         general: {
             createdByUserId: ObjectId | null;

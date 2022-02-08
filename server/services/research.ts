@@ -254,9 +254,9 @@ export default class ResearchService extends EventEmitter {
 
         if (player.researchingNow !== player.researchingNext) {
           return this.calculateCurrentResearchETAInTicks(game, player) + this._calculateResearchETAInTicks(game, player, player.researchingNext);
-        } else {
-          return this.calculateDoubleIdenticalResearchETAInTicks(game, player)
         }
+
+        return this.calculateDoubleIdenticalResearchETAInTicks(game, player)
       }
 
     _calculateResearchETAInTicks(game, player, researchKey) {

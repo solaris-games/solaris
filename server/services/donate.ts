@@ -1,14 +1,19 @@
+import CacheService from "./cache";
+
 const axios = require('axios');
 
 export default class DonateService {
+    cacheService: CacheService;
 
     CACHE_KEY_RECENT_DONATIONS = 'listRecentDonations';
 
-    constructor(cacheService) {
+    constructor(
+        cacheService: CacheService
+    ) {
         this.cacheService = cacheService;
     }
 
-    async listRecentDonations(amount) {
+    async listRecentDonations(amount: number) {
         amount = amount || 3;
 
         let cached = this.cacheService.get(this.CACHE_KEY_RECENT_DONATIONS);

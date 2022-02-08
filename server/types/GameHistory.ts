@@ -75,7 +75,7 @@ export interface GameHistoryCarrier {
 };
 
 export interface GameHistory {
-    _id?: ObjectId;
+    _id: ObjectId;
     gameId: ObjectId;
     tick: number;
     productionTick: number;

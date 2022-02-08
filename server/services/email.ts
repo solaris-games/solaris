@@ -1,3 +1,15 @@
+import { ObjectId } from "mongoose";
+import { Config } from "../types/Config";
+import { EmailTemplate } from "../types/Email";
+import { User } from "../types/User";
+import GameService from "./game";
+import GameStateService from "./gameState";
+import GameTickService from "./gameTick";
+import GameTypeService from "./gameType";
+import LeaderboardService from "./leaderboard";
+import PlayerService from "./player";
+import UserService from "./user";
+
 const nodemailer = require('nodemailer');
 const fs = require('fs');
 const path = require('path');
@@ -65,7 +77,25 @@ export default class EmailService {
         }
     };
 
-    constructor(config, gameService, userService, leaderboardService, playerService, gameTypeService, gameStateService, gameTickService) {
+    config: Config;
+    gameService: GameService;
+    userService: UserService;
+    leaderboardService: LeaderboardService;
+    playerService: PlayerService;
+    gameTypeService: GameTypeService;
+    gameStateService: GameStateService;
+    gameTickService: GameTickService;
+
+    constructor(
+        config: Config,
+        gameService: GameService,
+        userService: UserService,
+        leaderboardService: LeaderboardService,
+        playerService: PlayerService,
+        gameTypeService: GameTypeService,
+        gameStateService: GameStateService,
+        gameTickService: GameTickService
+    ) {
         this.config = config;
         this.gameService = gameService;
         this.userService = userService;
@@ -100,7 +130,7 @@ export default class EmailService {
         }
     }
 
-    async send(toEmail, subject, text) {
+    async send(toEmail: string, subject: string, text: string) {
         const transport = this._getTransport();
         
         const message = {
@@ -113,7 +143,7 @@ export default class EmailService {
         return await transport.sendMail(message);
     }
 
-    async sendHtml(toEmail, subject, html) {
+    async sendHtml(toEmail: string, subject: string, html: string) {
         const transport = this._getTransport();
         
         const message = {
@@ -126,7 +156,7 @@ export default class EmailService {
         return await transport.sendMail(message);
     }
 
-    async sendTemplate(toEmail, template, parameters) {
+    async sendTemplate(toEmail: string, template: EmailTemplate, parameters: any[]) {
         parameters = parameters || [];
 
         const filePath = path.join(__dirname, '../templates/', template.fileName);
@@ -149,7 +179,7 @@ export default class EmailService {
         return await this.sendHtml(toEmail, template.subject, html);
     }
 
-    async sendWelcomeEmail(user) {
+    async sendWelcomeEmail(user: User) {
         try {
             await this.sendTemplate(user.email, this.TEMPLATES.WELCOME, [user.username]);
         } catch (err) {
@@ -157,7 +187,7 @@ export default class EmailService {
         }
     }
 
-    async sendGameStartedEmail(gameId) {
+    async sendGameStartedEmail(gameId: ObjectId) {
         let game = await this.gameService.getById(gameId);
         let gameUrl = `${process.env.CLIENT_URL}/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
@@ -178,7 +208,7 @@ export default class EmailService {
         }
     }
 
-    async sendGameFinishedEmail(gameId) {
+    async sendGameFinishedEmail(gameId: ObjectId) {
         let game = await this.gameService.getById(gameId);
         let gameUrl = `${process.env.CLIENT_URL}/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
@@ -199,7 +229,7 @@ export default class EmailService {
         }
     }
 
-    async sendGameCycleSummaryEmail(gameId) {      
+    async sendGameCycleSummaryEmail(gameId: ObjectId) {      
         let game = await this.gameService.getById(gameId);
         let leaderboard = this.leaderboardService.getLeaderboardRankings(game).leaderboard;
 
@@ -265,7 +295,7 @@ export default class EmailService {
         }
     }
 
-    async trySendLastPlayerTurnReminder(gameId) {
+    async trySendLastPlayerTurnReminder(gameId: ObjectId) {
         let game = await this.gameService.getById(gameId);
 
         if (!this.gameTypeService.isTurnBasedGame(game)) {
@@ -309,7 +339,7 @@ export default class EmailService {
         }
     }
 
-    async sendGameTimedOutEmail(gameId) {
+    async sendGameTimedOutEmail(gameId: ObjectId) {
         let game = await this.gameService.getById(gameId);
         let gameName = game.settings.general.name;
 
@@ -328,7 +358,7 @@ export default class EmailService {
         }
     }
 
-    async sendGamePlayerAfkEmail(gameId, playerId) {
+    async sendGamePlayerAfkEmail(gameId: ObjectId, playerId: ObjectId) {
         let game = await this.gameService.getById(gameId);
         let gameUrl = `${process.env.CLIENT_URL}/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;

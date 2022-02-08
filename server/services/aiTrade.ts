@@ -1,4 +1,6 @@
 import { ObjectId } from "mongoose";
+import { Game } from "../types/Game";
+import { Player, PlayerReputation } from "../types/Player";
 import DiplomacyService from "./diplomacy";
 import GameService from "./game";
 import RandomService from "./random";
@@ -49,7 +51,7 @@ export default class AITradeService {
         await this._tryAlly(game, player, forPlayer, reputation);
     }
 
-    async onReputationDecreased(gameId: any, player: any, forPlayer: any) {
+    async onReputationDecreased(gameId: ObjectId, player: Player, forPlayer: Player) {
         // Make sure the player is AI.
         if (!player.defeated) {
             return;
@@ -62,7 +64,7 @@ export default class AITradeService {
         await this._tryEnemy(game, player, forPlayer, reputation);
     }
 
-    async _tryTrade(game: any, player: any, toPlayer: any, reputation: any) {
+    async _tryTrade(game: Game, player: Player, toPlayer: Player, reputation: PlayerReputation) {
         if (reputation.score < TRADE_CHANCE_MIN_REPUTATION) {
             return;
         }
@@ -92,7 +94,7 @@ export default class AITradeService {
         await this.tradeService.sendTechnology(game, player, toPlayer._id, tradeTech.name, tradeTech.level);
     }
 
-    async _tryAlly(game, player, forPlayer, reputation) {
+    async _tryAlly(game: Game, player: Player, forPlayer: Player, reputation: PlayerReputation) {
         // If the game allows alliances and the reputation is greater than a certain threshold
         // then set the diplomatic status to the player to allied.
         if (!this.diplomacyService.isFormalAlliancesEnabled(game)) {
@@ -106,7 +108,7 @@ export default class AITradeService {
         await this.diplomacyService.declareAlly(game, player._id, forPlayer._id);
     }
 
-    async _tryEnemy(game, player, forPlayer, reputation) {
+    async _tryEnemy(game: Game, player: Player, forPlayer: Player, reputation: PlayerReputation) {
         // If the game allows alliances and the reputation is less than than a certain threshold
         // then set the diplomatic status to the player to enemy.
         if (!this.diplomacyService.isFormalAlliancesEnabled(game)) {

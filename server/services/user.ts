@@ -1,8 +1,11 @@
 const EventEmitter = require('events');
+import { ObjectId } from 'mongoose';
 import ValidationError from '../errors/validation';
+import { Game } from '../types/Game';
+import { User } from '../types/User';
 const moment = require('moment');
 
-function uuidv4() {
+function uuidv4(): string {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
         return v.toString(16);
@@ -31,17 +34,17 @@ export default class UserService extends EventEmitter {
         });
     }
 
-    async getById(id, select = null) {
+    async getById(id: ObjectId, select: any = null) {
         return await this.userRepo.findById(id, select);
     }
 
-    async getByUsername(username, select = null) {
+    async getByUsername(username: string, select: any = null) {
         return await this.userRepo.findOne({
             username
         }, select);
     }
 
-    async getByUsernameAchievementsLean(username) {
+    async getByUsernameAchievementsLean(username: string) {
         return await this.userRepo.findOne({
             username: username
         }, {
@@ -50,11 +53,11 @@ export default class UserService extends EventEmitter {
         });
     }
 
-    async getUserCount() {
+    async getUserCount(): Promise<number> {
         return this.userRepo.countAll();
     }
 
-    async getGameUsers(game) {
+    async getGameUsers(game: Game) {
         return await this.userRepo.findAsModels({
             _id: {
                 $in: game.galaxy.players.map(p => p.userId)
@@ -62,7 +65,7 @@ export default class UserService extends EventEmitter {
         });
     }
 
-    async getInfoById(id) {
+    async getInfoById(id: ObjectId) {
         return await this.userRepo.findByIdAsModel(id, {
             // Remove fields we don't want to send back.
             password: 0,
@@ -79,7 +82,7 @@ export default class UserService extends EventEmitter {
         });
     }
 
-    async getInfoByIdLean(id, select) {
+    async getInfoByIdLean(id: ObjectId, select: any | null) {
         select = select || {
             // Remove fields we don't want to send back.
             password: 0,
@@ -98,14 +101,14 @@ export default class UserService extends EventEmitter {
         return await this.userRepo.findById(id, select);
     }
     
-    async getEmailById(id) {
+    async getEmailById(id: ObjectId) {
         return await this.userRepo.findById(id, {
             email: 1,
             emailEnabled: 1
         });
     }
 
-    async getUsernameByEmail(email) {
+    async getUsernameByEmail(email: string) {
         email = email.trim();
         email = email.toLowerCase();
 
@@ -122,7 +125,7 @@ export default class UserService extends EventEmitter {
         return user.username;
     }
 
-    async getUserIsBanned(userId) {
+    async getUserIsBanned(userId: ObjectId) {
         let user = await this.userRepo.findOne({
             _id: userId
         }, {
@@ -136,7 +139,7 @@ export default class UserService extends EventEmitter {
         return null;
     }
 
-    async getUserIsAdmin(userId) {
+    async getUserIsAdmin(userId: ObjectId) {
         let user = await this.userRepo.findOne({
             _id: userId
         }, {
@@ -146,7 +149,7 @@ export default class UserService extends EventEmitter {
         return user.roles.administrator;
     }
 
-    async getUserIsSubAdmin(userId) {
+    async getUserIsSubAdmin(userId: ObjectId) {
         let user = await this.userRepo.findOne({
             _id: userId
         }, {
@@ -158,7 +161,7 @@ export default class UserService extends EventEmitter {
         return user.roles.administrator || user.roles.gameMaster || user.roles.communityManager;
     }
 
-    async getUserIsGameMaster(userId) {
+    async getUserIsGameMaster(userId: ObjectId) {
         let user = await this.userRepo.findOne({
             _id: userId,
             $or: [
@@ -172,7 +175,7 @@ export default class UserService extends EventEmitter {
         return user != null;
     }
 
-    async create(user, ipAddress) {
+    async create(user: User, ipAddress: string) {
         user.username = user.username.trim();
         user.email = user.email.trim();
         user.email = user.email.toLowerCase();
@@ -194,7 +197,7 @@ export default class UserService extends EventEmitter {
         return doc._id;
     }
 
-    async userExists(email) {
+    async userExists(email: string) {
         email = email.trim();
         email = email.toLowerCase();
 
@@ -205,7 +208,7 @@ export default class UserService extends EventEmitter {
         return user != null;
     }
 
-    async usernameExists(username) {
+    async usernameExists(username: string) {
         username = username.trim();
 
         let user = await this.userRepo.findOne({
@@ -217,7 +220,7 @@ export default class UserService extends EventEmitter {
         return user != null;
     }
 
-    async otherUsernameExists(username, ignoreUserId) {
+    async otherUsernameExists(username: string, ignoreUserId: ObjectId) {
         username = username.trim();
 
         let user = await this.userRepo.findOne({
@@ -230,7 +233,7 @@ export default class UserService extends EventEmitter {
         return user != null;
     }
 
-    async updateEmailPreference(id, preference) {
+    async updateEmailPreference(id: ObjectId, preference: string) {
         await this.userRepo.updateOne({
             _id: id
         }, {
@@ -238,7 +241,7 @@ export default class UserService extends EventEmitter {
         });
     }
 
-    async updateEmailAddress(id, email) {
+    async updateEmailAddress(id: ObjectId, email: string) {
         email = email.trim();
         email = email.toLowerCase();
 
@@ -253,7 +256,7 @@ export default class UserService extends EventEmitter {
         });
     }
 
-    async updateUsername(id, username) {
+    async updateUsername(id: ObjectId, username: string) {
         username = username.trim();
 
         if (username.length < 3 || username.length > 24) {
@@ -271,7 +274,7 @@ export default class UserService extends EventEmitter {
         });
     }
 
-    async updatePassword(id, currentPassword, newPassword) {
+    async updatePassword(id: ObjectId, currentPassword: string, newPassword: string) {
         let user = await this.userRepo.findById(id);
         
         // Make sure the current password matches.
@@ -291,7 +294,7 @@ export default class UserService extends EventEmitter {
         }
     }
 
-    async requestResetPassword(email) {
+    async requestResetPassword(email: string) {
         email = email.trim();
         email = email.toLowerCase();
 
@@ -314,7 +317,7 @@ export default class UserService extends EventEmitter {
         return resetPasswordToken;
     }
 
-    async resetPassword(resetPasswordToken, newPassword) {
+    async resetPassword(resetPasswordToken: string, newPassword: string) {
         if (resetPasswordToken == null || !resetPasswordToken.length) {
             throw new ValidationError(`The token is required`);
         }
@@ -338,13 +341,13 @@ export default class UserService extends EventEmitter {
         });
     }
 
-    async closeAccount(id) {
+    async closeAccount(id: ObjectId) {
         await this.userRepo.deleteOne({
             _id: id
         });
     }
 
-    async getGameSettings(userId) {
+    async getGameSettings(userId: ObjectId) {
         if (!userId) {
             return new this.userModel().gameSettings; // Return the default config
         }
@@ -354,7 +357,7 @@ export default class UserService extends EventEmitter {
         return user.gameSettings;
     }
 
-    async saveGameSettings(userId, settings) {
+    async saveGameSettings(userId: ObjectId, settings: any) {
         if (+settings.carrier.defaultAmount < 0) {
             throw new ValidationError(`Carrier default amount must be greater than 0.`);
         }
@@ -366,7 +369,7 @@ export default class UserService extends EventEmitter {
         });
     }
 
-    async updateLastSeen(userId, ipAddress) {
+    async updateLastSeen(userId: ObjectId, ipAddress: string) {
         await this.userRepo.updateOne({
             _id: userId
         }, {
@@ -377,7 +380,7 @@ export default class UserService extends EventEmitter {
         });
     }
 
-    async listUserEloRatingsByIds(userIds) {
+    async listUserEloRatingsByIds(userIds: ObjectId[]) {
         return await this.userRepo.find({
             _id: { $in: userIds }
         }, {
@@ -385,7 +388,7 @@ export default class UserService extends EventEmitter {
         });
     }
 
-    async listUsersInGuilds() {
+    async listUsersInGuilds(): Promise<User[]> {
         return await this.userRepo.find({ 
             guildId: { $ne: null }
         }, {
@@ -393,13 +396,13 @@ export default class UserService extends EventEmitter {
         });
     }
 
-    async listUsersInGuild(guildId, select = null) {
+    async listUsersInGuild(guildId: ObjectId, select: any = null) {
         return await this.userRepo.find({
             guildId
         }, select);
     }
 
-    async listUsers(userIds, select = null) {
+    async listUsers(userIds: ObjectId[], select: any = null) {
         return await this.userRepo.find({
             _id: {
                 $in: userIds
@@ -407,7 +410,7 @@ export default class UserService extends EventEmitter {
         }, select);
     }
 
-    async getUserCredits(userId) {
+    async getUserCredits(userId: ObjectId) {
         let userCredits = await this.userRepo.findById(userId, {
             credits: 1
         });
@@ -415,7 +418,7 @@ export default class UserService extends EventEmitter {
         return userCredits?.credits;
     }
 
-    async setCredits(userId, credits) {
+    async setCredits(userId: ObjectId, credits: number) {
         credits = Math.max(credits, 0);
         
         await this.userRepo.updateOne({
@@ -425,7 +428,7 @@ export default class UserService extends EventEmitter {
         });
     }
 
-    async incrementCredits(userId, credits) {
+    async incrementCredits(userId: ObjectId, credits: number) {
         await this.userRepo.updateOne({
             _id: userId
         }, {
@@ -435,7 +438,7 @@ export default class UserService extends EventEmitter {
         });
     }
 
-    async incrementCreditsByPurchase(userId, credits) {
+    async incrementCreditsByPurchase(userId: ObjectId, credits: number) {
         await this.userRepo.updateOne({
             _id: userId
         }, {

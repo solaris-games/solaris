@@ -11,7 +11,7 @@ export type SettingObjectScaling = 'default'|'clamped';
 export type SettingBlendMode = 'ADD'|'NORMAL';
 
 export interface User {
-    _id?: ObjectId;
+    _id: ObjectId;
     username: string;
     guildId: ObjectId | null;
     email: string;
@@ -162,4 +162,4 @@ export interface User {
     avatars: number[];
 
     isEstablishedPlayer?: boolean;
-}
+};

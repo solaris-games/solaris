@@ -7,6 +7,12 @@ export interface NaturalResources {
     science: number;
 };
 
+export interface TerraformedResources extends NaturalResources {
+    
+};
+
+export type InfrastructureType = 'economy' | 'industry' | 'science';
+
 export interface Infrastructure {
     economy: number;
     industry: number;
@@ -17,10 +23,10 @@ export interface IgnoreBulkUpgrade {
     economy: boolean;
     industry: boolean;
     science: boolean;
-}
+};
 
 export interface Star {
-    _id?: ObjectId;
+    _id: ObjectId;
     ownedByPlayerId: ObjectId | null;
     name: string;
     naturalResources: NaturalResources,
@@ -36,4 +42,4 @@ export interface Star {
     ignoreBulkUpgrade: IgnoreBulkUpgrade,
     infrastructure: Infrastructure,
     location: Location
-}
+};

@@ -19,7 +19,7 @@ export interface ResearchProgress {
 };
 
 export interface Player {
-    _id?: ObjectId;
+    _id: ObjectId;
     userId: string | null; // TODO: Should be an ObjectId
     homeStarId: ObjectId;
     alias: string | null;

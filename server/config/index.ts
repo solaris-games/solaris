@@ -1,6 +1,8 @@
+import { Config } from "../types/Config";
+
 require('dotenv').config({path:__dirname + '/../.env'});
 
-export default {
+const config: Config = {
     port: process.env.PORT,
     sessionSecret: process.env.SESSION_SECRET,
     sessionSecureCookies: process.env.SESSION_SECURE_COOKIES == "true",
@@ -13,3 +15,5 @@ export default {
         from: process.env.SMTP_FROM
     }
 };
+
+export default config;

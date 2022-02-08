@@ -1,3 +1,5 @@
+import { Game } from "../types/Game";
+import { Player } from "../types/Player";
 import StarUpgradeService from "./starUpgrade";
 
 const FIRST_TICK_BULK_UPGRADE_SCI_PERCENTAGE = 20;
@@ -8,11 +10,13 @@ export default class AIService {
 
     starUpgradeService: StarUpgradeService;
 
-    constructor(starUpgradeService: StarUpgradeService) {
+    constructor(
+        starUpgradeService: StarUpgradeService
+    ) {
         this.starUpgradeService = starUpgradeService;
     }
 
-    async play(game: any, player: any) {
+    async play(game: Game, player: Player) {
         if (!player.defeated) {
             throw new Error('The player is not under AI control.');
         }
@@ -32,7 +36,7 @@ export default class AIService {
         player.credits = Math.max(0, player.credits);
     }
 
-    async _playFirstTick(game, player) {
+    async _playFirstTick(game: Game, player: Player) {
         if (!player.credits || player.credits < 0) {
             return
         }
@@ -51,7 +55,7 @@ export default class AIService {
         }
     }
 
-    async _playLastTick(game, player) {
+    async _playLastTick(game: Game, player: Player) {
         if (!player.credits || player.credits <= 0) {
             return
         }

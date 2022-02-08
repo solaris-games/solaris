@@ -1,22 +1,36 @@
+import { ObjectId } from 'mongoose';
 import ValidationError from '../errors/validation';
+import DatabaseRepository from '../models/DatabaseRepository';
+import { Avatar, UserAvatar } from '../types/Avatar';
+import { User } from '../types/User';
+import UserService from './user';
 
 export default class AvatarService {
+    userRepo: DatabaseRepository<User>;
+    userService: UserService;
 
-    constructor(userRepo, userService) {
+    constructor(
+        userRepo: DatabaseRepository<User>,
+        userService: UserService
+    ) {
         this.userRepo = userRepo;
         this.userService = userService;
     }
 
-    listAllAvatars() {
+    listAllAvatars(): Avatar[] {
         return require('../config/game/avatars').slice();
     }
 
-    async listUserAvatars(userId) {
+    async listUserAvatars(userId: ObjectId): Promise<UserAvatar[]> {
         let avatars = require('../config/game/avatars').slice();
 
         let userAvatars = await this.userRepo.findById(userId, {
             avatars: 1
         });
+
+        if (!userAvatars) {
+            return [];
+        }
 
         for (let avatar of avatars) {
             avatar.purchased = avatar.price == null || (userAvatars.avatars || []).indexOf(avatar.id) > -1;
@@ -25,13 +39,13 @@ export default class AvatarService {
         return avatars;
     }
 
-    async getUserAvatar(userId, avatarId) {
-        return (await this.listUserAvatars(userId)).find(a => a.id === avatarId);
+    async getUserAvatar(userId: ObjectId, avatarId: number): Promise<UserAvatar> {
+        return (await this.listUserAvatars(userId)).find(a => a.id === avatarId)!;
     }
 
-    async purchaseAvatar(userId, avatarId) {
+    async purchaseAvatar(userId: ObjectId, avatarId: number) {
         let userCredits = await this.userService.getUserCredits(userId);
-        let avatar = await this.getUserAvatar(userId, +avatarId);
+        let avatar = await this.getUserAvatar(userId, avatarId);
 
         if (avatar.purchased) {
             throw new ValidationError(`You have already purchased this avatar.`);

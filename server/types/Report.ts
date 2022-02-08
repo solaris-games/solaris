@@ -8,7 +8,7 @@ export interface ReportReasons {
 };
 
 export interface Report {
-    _id?: ObjectId;
+    _id: ObjectId;
     gameId: ObjectId;
     reportedPlayerId: ObjectId;
     reportedUserId: ObjectId;

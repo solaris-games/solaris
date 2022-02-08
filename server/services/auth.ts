@@ -1,13 +1,21 @@
 import ValidationError from '../errors/validation';
+import DatabaseRepository from '../models/DatabaseRepository';
+import { User } from '../types/User';
+import PasswordService from './password';
 
 export default class AuthService {
+    userRepo: DatabaseRepository<User>;
+    passwordService: PasswordService;
     
-    constructor(userRepo, passwordService) {
+    constructor(
+        userRepo: DatabaseRepository<User>,
+        passwordService: PasswordService
+    ) {
         this.userRepo = userRepo;
         this.passwordService = passwordService;
     }
 
-    async login(email, password) {
+    async login(email: string, password: string) {
         email = email.trim();
         email = email.toLowerCase();
 

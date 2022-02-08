@@ -1,3 +1,20 @@
+import DatabaseRepository from "../models/DatabaseRepository";
+import { Game } from "../types/Game";
+import { Leaderboard, LeaderboardPlayer } from "../types/Leaderboard";
+import { Player } from "../types/Player";
+import { EloRatingChangeResult, GameRankingResult } from "../types/Rating";
+import { User } from "../types/User";
+import BadgeService from "./badge";
+import GameService from "./game";
+import GameStateService from "./gameState";
+import GameTypeService from "./gameType";
+import UserGuildService from "./guildUser";
+import PlayerService from "./player";
+import RatingService from "./rating";
+import UserService from "./user";
+
+const moment = require('moment');
+
 export default class LeaderboardService {
     static GLOBALSORTERS = {
         rank: {
@@ -478,7 +495,27 @@ export default class LeaderboardService {
         specialists: 'player.research.specialists.level'
     }
 
-    constructor(userRepo, userService, playerService, guildUserService, ratingService, gameService, gameTypeService, gameStateService, badgeService) {
+    userRepo: DatabaseRepository<User>;
+    userService: UserService;
+    playerService: PlayerService;
+    guildUserService: UserGuildService;
+    ratingService: RatingService;
+    gameService: GameService;
+    gameTypeService: GameTypeService;
+    gameStateService: GameStateService;
+    badgeService: BadgeService;
+
+    constructor(
+        userRepo: DatabaseRepository<User>,
+        userService: UserService,
+        playerService: PlayerService,
+        guildUserService: UserGuildService,
+        ratingService: RatingService,
+        gameService: GameService,
+        gameTypeService: GameTypeService,
+        gameStateService: GameStateService,
+        badgeService: BadgeService
+    ) {
         this.userRepo = userRepo;
         this.userService = userService;
         this.playerService = playerService;
@@ -490,7 +527,7 @@ export default class LeaderboardService {
         this.badgeService = badgeService;
     }
 
-    async getLeaderboard(limit, sortingKey, skip = 0) {
+    async getLeaderboard(limit: number, sortingKey: string, skip: number = 0) {
         const sorter = LeaderboardService.GLOBALSORTERS[sortingKey] || LeaderboardService.GLOBALSORTERS['rank'];
 
         let leaderboard = await this.userRepo
@@ -522,7 +559,7 @@ export default class LeaderboardService {
         };
     }
 
-    getLeaderboardRankings(game, sortingKey) {
+    getLeaderboardRankings(game: Game, sortingKey?: string): Leaderboard {
         let SORTERS = LeaderboardService.LOCALSORTERS;
 
         let kingOfTheHillPlayer = null;
@@ -601,12 +638,12 @@ export default class LeaderboardService {
 
         return {
             leaderboard,
-            fullKey: SORTERS[sortingKey]
+            fullKey: sortingKey ? SORTERS[sortingKey] : null
         };
     }
 
-    async addGameRankings(game, gameUsers, leaderboard) {
-        let result = {
+    async addGameRankings(game: Game, gameUsers: User[], leaderboard: LeaderboardPlayer[]): Promise<GameRankingResult> {
+        let result: GameRankingResult = {
             ranks: [],
             eloRating: null
         };
@@ -696,13 +733,13 @@ export default class LeaderboardService {
         return result;
     }
 
-    addUserRatingCheck(game, gameUsers) {
+    addUserRatingCheck(game: Game, gameUsers: User[]): EloRatingChangeResult | null {
         if (['1v1_rt', '1v1_tb'].includes(game.settings.general.type)) {
-            let winningPlayer = game.galaxy.players.find(p => p._id.equals(game.state.winner));
-            let losingPlayer = game.galaxy.players.find(p => !p._id.equals(game.state.winner));
+            let winningPlayer: Player = game.galaxy.players.find(p => p._id.equals(game.state.winner))!;
+            let losingPlayer: Player = game.galaxy.players.find(p => !p._id.equals(game.state.winner))!;
 
-            let winningUser = gameUsers.find(u => u._id.toString() === winningPlayer.userId);
-            let losingUser = gameUsers.find(u => u._id.toString() === losingPlayer.userId);
+            let winningUser: User = gameUsers.find(u => u._id.toString() === winningPlayer.userId)!;
+            let losingUser: User = gameUsers.find(u => u._id.toString() === losingPlayer.userId)!;
 
             let winningUserOldRating = winningUser.achievements.eloRating || 1200;
             let losingUserOldRating = losingUser.achievements.eloRating || 1200;
@@ -712,12 +749,12 @@ export default class LeaderboardService {
             return {
                 winner: {
                     _id: winningPlayer._id,
-                    newRating: winningUser.achievements.eloRating,
+                    newRating: winningUser.achievements.eloRating!,
                     oldRating: winningUserOldRating
                 },
                 loser: {
                     _id: losingPlayer._id,
-                    newRating: losingUser.achievements.eloRating,
+                    newRating: losingUser.achievements.eloRating!,
                     oldRating: losingUserOldRating
                 }
             };
@@ -726,7 +763,7 @@ export default class LeaderboardService {
         return null;
     }
 
-    getGameWinner(game) {
+    getGameWinner(game: Game): Player | null {
         let isKingOfTheHillMode = this.gameTypeService.isKingOfTheHillMode(game);
 
         let isAllUndefeatedPlayersReadyToQuit = this.gameService.isAllUndefeatedPlayersReadyToQuit(game);
@@ -760,7 +797,7 @@ export default class LeaderboardService {
         return null;
     }
 
-    getStarCountWinner(game) {
+    getStarCountWinner(game: Game): Player | null {
         // There could be more than one player who has reached
         // the number of stars required at the same time.
         // In this case we pick the player who has the most ships.
@@ -783,7 +820,7 @@ export default class LeaderboardService {
         return null;
     }
 
-    getLastManStanding(game) {
+    getLastManStanding(game: Game): Player | null {
         let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated);
 
         if (undefeatedPlayers.length === 1) {
@@ -801,7 +838,7 @@ export default class LeaderboardService {
         return null;
     }
 
-    getFirstPlacePlayer(game) {
+    getFirstPlacePlayer(game: Game): Player {
         let leaderboard = this.getLeaderboardRankings(game).leaderboard;
 
         return leaderboard[0].player;

@@ -1,7 +1,7 @@
 import { ObjectId } from "mongoose";
 
 export interface GameEvent {
-    _id?: ObjectId;
+    _id: ObjectId;
     gameId: ObjectId;
     playerId: ObjectId | null;
     tick: number;

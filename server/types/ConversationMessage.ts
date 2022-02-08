@@ -1,14 +1,14 @@
 import { ObjectId } from "mongoose"
 
 export interface ConversationMessage {
-    _id?: ObjectId;
+    _id: ObjectId;
     fromPlayerId: ObjectId;
     fromPlayerAlias: string;
     message: string;
     sentDate: Date;
     sentTick: number | null;
     pinned: boolean;
-    readBy: ObjectId[]
+    readBy: ObjectId[];
 };
 
 export interface ConversationMessageSentResult extends ConversationMessage {

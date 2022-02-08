@@ -280,7 +280,7 @@ export default class GameGalaxyService {
 
                 if (isOwnedByCurrentPlayer) {
                     // Calculate infrastructure upgrades for the star.
-                    this.starUpgradeService.setUpgradeCosts(doc, s);
+                    this.starUpgradeService.setUpgradeCosts(doc, s, s.terraformedResources);
 
                     if (s.specialistId) {
                         s.specialist = this.specialistService.getByIdStar(s.specialistId);

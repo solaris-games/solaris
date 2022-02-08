@@ -1,6 +1,25 @@
-export default class BattleRoyaleService {
+import { Game } from "../types/Game";
+import { Star } from "../types/Star";
+import CarrierService from "./carrier";
+import MapService from "./map";
+import StarService from "./star";
+import StarDistanceService from "./starDistance";
+import WaypointService from "./waypoint";
 
-    constructor(starService, carrierService, mapService, starDistanceService, waypointService) {
+export default class BattleRoyaleService {
+    starService: StarService;
+    carrierService: CarrierService;
+    mapService: MapService;
+    starDistanceService: StarDistanceService;
+    waypointService: WaypointService;
+
+    constructor(
+        starService: StarService,
+        carrierService: CarrierService,
+        mapService: MapService,
+        starDistanceService: StarDistanceService,
+        waypointService: WaypointService
+    ) {
         this.starService = starService;
         this.carrierService = carrierService;
         this.mapService = mapService;
@@ -8,7 +27,7 @@ export default class BattleRoyaleService {
         this.waypointService = waypointService;
     }
 
-    performBattleRoyaleTick(game) {
+    performBattleRoyaleTick(game: Game) {
         // Calculate which stars need to be destroyed.
         let starsToDestroy = this.getStarsToDestroy(game);
 
@@ -17,7 +36,7 @@ export default class BattleRoyaleService {
         }
     }
 
-    getStarsToDestroy(game) {
+    getStarsToDestroy(game: Game) {
         // Don't do anything for X number of turns for peace time.
         const peaceCycles = 3;
 
@@ -40,7 +59,7 @@ export default class BattleRoyaleService {
             .sort((a, b) => a._id.toString().localeCompare(b._id.toString()));
     }
 
-    destroyStar(game, star) {
+    destroyStar(game: Game, star: Star) {
         this.starService.destroyStar(game, star);
 
         let carriers = this.carrierService.getCarriersEnRouteToStar(game, star);

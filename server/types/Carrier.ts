@@ -3,7 +3,7 @@ import { Location } from "./Location";
 import { CarrierWaypoint } from "./CarrierWaypoint";
 
 export interface Carrier {
-    _id?: ObjectId;
+    _id: ObjectId;
     ownedByPlayerId: ObjectId;
     orbiting: ObjectId | null;
     waypointsLooped: boolean;

@@ -8,4 +8,4 @@ export interface LocationGeneration extends Location {
     linkedLocations: LocationGeneration[];
     distanceToClosestReachable: number | null;
     closestReachable: LocationGeneration | null;
-}
+};
