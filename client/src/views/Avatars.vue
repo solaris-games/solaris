@@ -10,14 +10,14 @@
     <loading-spinner v-if="isLoading" />
 
     <div v-if="avatars">
-      <div class="row mb-4" v-for="avatar in avatars" :key="avatar.id">
+      <div class="row mb-4" v-for="avatar in sortedAvatars" :key="avatar.id">
         <div class="col-auto">
           <img :src="getAvatarImage(avatar)" width="128" height="128">
         </div>
         <div class="col">
           <div class="row">
             <div class="col">
-              <h5>{{avatar.name}}</h5>
+              <h5>{{avatar.name}}<span class="badge badge-success ml-2" v-if="avatar.isPatronAvatar"><i class="fas fa-handshake"></i> Patron Avatar</span></h5>
             </div>
             <div class="col-auto">
               <button class="btn btn-sm btn-success" v-if="!avatar.purchased && userCredits.credits >= avatar.price" @click="purchaseAvatar(avatar)">
@@ -26,7 +26,7 @@
               <router-link :to="{ name: 'galactic-credits-shop'}" class="btn btn-sm btn-danger" v-if="!avatar.purchased && userCredits.credits < avatar.price">
                 <i class="fas fa-coins"></i> {{avatar.price}} Credit<span v-if="avatar.price > 1">s</span>
               </router-link>
-              <span class="badge badge-primary" v-if="avatar.purchased"><i class="fas fa-check"></i> Unlocked</span>
+              <h5><span class="badge badge-primary" v-if="avatar.purchased"><i class="fas fa-check"></i> Unlocked</span></h5>
             </div>
             <div class="col-12">
               <p><small class="linebreaks">{{avatar.description}}</small></p>
@@ -118,6 +118,11 @@ export default {
 
         return null
       }
+    }
+  },
+  computed: {
+    sortedAvatars: function () {
+      return this.avatars.sort((a, b) => a.isPatronAvatar - b.isPatronAvatar)
     }
   }
 }

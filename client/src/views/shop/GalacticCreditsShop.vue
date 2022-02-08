@@ -3,7 +3,7 @@
     <view-title title="Galactic Credit Packs" />
 
     <p>
-      Purchase <span class="text-warning">Galactic Credits</span> to spend in the <router-link :to="{ name: 'avatars'}"><i class="fas fa-shopping-basket"></i> Avatar Store</router-link>!
+      Purchase <span class="text-warning">Galactic Credits</span> to spend in the <router-link :to="{ name: 'avatars'}"><i class="fas fa-shopping-basket"></i> Avatar Store</router-link> or award <strong>Badges</strong> to players!
     </p>
 
     <p>
