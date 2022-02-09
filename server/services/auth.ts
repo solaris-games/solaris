@@ -26,7 +26,8 @@ export default class AuthService {
             username: 1,
             password: 1,
             banned: 1,
-            roles: 1
+            roles: 1,
+            credits: 1
         });
         
         if (!user) {

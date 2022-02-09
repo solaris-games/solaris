@@ -2,12 +2,15 @@
 <div class="container col-xs-12 col-sm-10 col-md-10 col-lg-6 pr-1 pl-1" v-if="userId">
   <div class="row no-gutters pb-0 pt-1">
     <div class="col">
+      <router-link :to="{ name: 'administration'}" v-if="userHasAdminRole" class="mr-2">
+        <i class="fas fa-users-cog"></i>
+      </router-link>
       <router-link to="/account/settings"><i class="fas fa-user mr-1"></i>{{username || 'My account'}}</router-link>
     </div>
     <div class="col-auto">
-      <router-link :to="{ name: 'administration'}" v-if="userHasAdminRole">
-        <i class="fas fa-users-cog"></i>
-        <span class="d-none d-md-inline-block ml-1">Admin</span>
+      <router-link :to="{ name: 'galactic-credits-shop'}">
+        <i class="fas fa-coins"></i>
+        <span class="d-none d-md-inline-block ml-1">{{userCredits}} Credit{{userCredits === 1 ? '' : 's'}}</span>
       </router-link>
       <router-link :to="{ name: 'account-achievements', params: { userId: userId }}" class="ml-3">
         <i class="fas fa-medal"></i>
@@ -41,6 +44,7 @@ export default {
       this.$store.commit('clearUserId')
       this.$store.commit('clearUsername')
       this.$store.commit('clearRoles')
+      this.$store.commit('clearUserCredits')
 
       this.isLoggingOut = false
 
@@ -56,6 +60,9 @@ export default {
     },
     username () {
       return this.$store.state.username
+    },
+    userCredits () {
+      return this.$store.state.userCredits || 0
     },
     userHasAdminRole () {
       return this.$store.state.roles && (this.$store.state.roles.administrator || this.$store.state.roles.communityManager || this.$store.state.roles.gameMaster)

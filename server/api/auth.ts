@@ -28,12 +28,14 @@ export default (router, io, container: DependencyContainer) => {
             req.session.userId = user._id;
             req.session.username = user.username;
             req.session.roles = user.roles;
+            req.session.userCredits = user.credits;
             req.session.isImpersonating = false;
 
             return res.status(200).json({
                 _id: user._id,
                 username: user.username,
-                roles: user.roles
+                roles: user.roles,
+                credits: user.credits
             });
         } catch (err) {
             next(err);
@@ -59,7 +61,8 @@ export default (router, io, container: DependencyContainer) => {
         return res.status(200).json({
             _id: req.session.userId,
             username: req.session.username,
-            roles: req.session.roles
+            roles: req.session.roles,
+            credits: req.session.userCredits
         });
     });
 
