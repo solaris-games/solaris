@@ -183,7 +183,7 @@ export default class ConversationService extends EventEmitter {
         }
 
         // Sort by sent date ascending.
-        convo.messages = convo.messages.sort((a, b) => a.sentDate.getTime() - b.sentDate.getTime());
+        convo.messages = convo.messages.sort((a, b) => moment(a.sentDate).valueOf() - moment(b.sentDate).valueOf());
         
         return convo;
     }
