@@ -198,7 +198,7 @@ export default class UserService extends EventEmitter {
 
         const newUser = new this.userModel(user);
     
-        newUser.password = await this.passwordService.hash(newUser.password);
+        newUser.password = await this.passwordService.hash(password);
 
         let doc = await newUser.save();
 
