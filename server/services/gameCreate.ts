@@ -151,12 +151,15 @@ export default class GameCreateService {
         // Create all of the stars required.
         (game.galaxy as any).homeStars = [];
         (game.galaxy as any).linkedStars = [];
-        game.galaxy.stars = this.mapService.generateStars(
+
+        let starGeneration: any = this.mapService.generateStars(
             game, 
             desiredStarCount,
             game.settings.general.playerLimit,
             settings.galaxy.customJSON
-        ) as any;
+        );
+
+        game.galaxy.stars = starGeneration.stars;
         
         // Setup players and assign to their starting positions.
         game.galaxy.players = this.playerService.createEmptyPlayers(game);
