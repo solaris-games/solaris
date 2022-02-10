@@ -6,7 +6,7 @@ export default class RecaptchaService {
         return process.env.GOOGLE_RECAPTCHA_ENABLED === 'true';
     }
 
-    verify(ipAddress, token) {
+    verify(ipAddress: string, token: string): Promise<void> {
         let siteKey = process.env.GOOGLE_RECAPTCHA_SITE_KEY;
         let secretKey = process.env.GOOGLE_RECAPTCHA_SECRET_KEY;
     

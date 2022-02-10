@@ -1,7 +1,7 @@
 const randomSeeded = require('random-seed');
 const simplexNoise = require('simplex-noise');
 import ValidationError from '../../errors/validation';
-import { ResourceDistribution } from '../../types/Enums';
+import { GameResourceDistribution } from '../../types/Game';
 import { Location } from '../../types/Location';
 import DistanceService from '../distance';
 import GameTypeService from '../gameType';
@@ -281,7 +281,7 @@ export default class IrregularMapService {
 
     }
 
-    generateLocations(game: any, starCount: number, resourceDistribution: ResourceDistribution, playerCount: number): Location[] {
+    generateLocations(game: any, starCount: number, resourceDistribution: GameResourceDistribution, playerCount: number): Location[] {
         if (this.gameTypeService.isKingOfTheHillMode(game)) {
             throw new ValidationError(`King of the hill is not supported in irregular maps.`);
         }
@@ -346,7 +346,7 @@ export default class IrregularMapService {
 
         while(startingStarsCount--) {
             for(let homeLocation of homeLocations) {
-                let closestUnlinkedLocation = this.distanceService.getClosestLocation(homeLocation, unlinkedLocations);
+                let closestUnlinkedLocation = this.distanceService.getClosestLocation(homeLocation, unlinkedLocations) as any;
                 (homeLocation as any).linkedLocations.push(closestUnlinkedLocation);
                 closestUnlinkedLocation.linked = true;
                 unlinkedLocations = unlinkedLocations.filter( (loc) => { return loc !== closestUnlinkedLocation; } );

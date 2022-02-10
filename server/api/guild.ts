@@ -60,7 +60,7 @@ export default (router, io, container: DependencyContainer) => {
 
     router.get('/api/guild/:guildId', middleware.authenticate, async (req, res, next) => {
         try {
-            const result = await container.guildService.detail(req.params.guildId, true, false);
+            const result = await container.guildService.detailWithUserInfo(req.params.guildId, false);
 
             return res.status(200).json(result);
         } catch (err) {

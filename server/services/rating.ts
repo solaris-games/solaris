@@ -1,8 +1,21 @@
+import { ObjectId } from "mongoose";
+import DatabaseRepository from "../models/DatabaseRepository";
+import { Game } from "../types/Game";
+import { User } from "../types/User";
+import UserService from "./user";
+
 const EloRating = require('elo-rating');
 
 export default class RatingService {
+    userRepo: DatabaseRepository<User>;
+    gameRepo: DatabaseRepository<Game>;
+    userService: UserService;
 
-    constructor(userRepo, gameRepo, userService) {
+    constructor(
+        userRepo: DatabaseRepository<User>,
+        gameRepo: DatabaseRepository<Game>,
+        userService: UserService
+    ) {
         this.userRepo = userRepo;
         this.gameRepo = gameRepo;
         this.userService = userService;
@@ -18,61 +31,7 @@ export default class RatingService {
         });
     }
 
-    async recalculateAllEloRatings() {
-        await this.resetAllEloRatings();
-
-        let completed1v1s = await this._listCompleted1v1s();
-        let userIds = [];
-
-        for (let game of completed1v1s) {
-            for (let player of game.galaxy.players) {
-                userIds.push(player.userId);
-            }
-        }
-
-        userIds = [...new Set(userIds)];
-
-        let users = await this.userService.listUserEloRatingsByIds(userIds);
-
-        for (let game of completed1v1s) {
-            let userA = users.find(u => u._id.toString() === game.galaxy.players[0].userId.toString());
-            let userB = users.find(u => u._id.toString() === game.galaxy.players[1].userId.toString());
-
-            let userAIsWinner;
-
-            // Note: This factors in whether user accounts still exist for both players.
-            if (!userA) {
-                userAIsWinner = false;
-            } else if (!userB) {
-                userAIsWinner = true;
-            } else {
-                let winningPlayer = game.galaxy.players.find(p => p._id.equals(game.state.winner));
-
-                userAIsWinner = userA._id.toString() === winningPlayer.userId;
-            }
-    
-            this.recalculateEloRating(userA, userB, userAIsWinner);
-        }
-
-        let dbWrites = users.map(u => {
-            return {
-                updateOne: {
-                    filter: {
-                        _id: u._id
-                    },
-                    update: {
-                        $set: {
-                            'achievements.eloRating': u.achievements.eloRating
-                        }
-                    }
-                }
-            };
-        });
-
-        await this.userRepo.bulkWrite(dbWrites);
-    }
-
-    recalculateEloRating(userA, userB, userAIsWinner) {
+    recalculateEloRating(userA: User, userB: User, userAIsWinner: boolean) {
         // Note that some players may no longer have accounts, in which case consider it a win for the
         // player against the same rank as their own.
         let userARating = userA == null ? userB.achievements.eloRating : userA.achievements.eloRating;

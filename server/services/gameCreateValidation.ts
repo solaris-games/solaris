@@ -1,8 +1,25 @@
 import ValidationError from '../errors/validation';
+import { Game } from '../types/Game';
+import CarrierService from './carrier';
+import GameTypeService from './gameType';
+import PlayerService from './player';
+import SpecialistService from './specialist';
+import StarService from './star';
 
 export default class GameCreateValidationService {
+    playerService: PlayerService;
+    starService: StarService;
+    carrierService: CarrierService;
+    specialistService: SpecialistService;
+    gameTypeService: GameTypeService;
     
-    constructor(playerService, starService, carrierService, specialistService, gameTypeService) {
+    constructor(
+        playerService: PlayerService,
+        starService: StarService,
+        carrierService: CarrierService,
+        specialistService: SpecialistService,
+        gameTypeService: GameTypeService
+    ) {
         this.playerService = playerService;
         this.starService = starService;
         this.carrierService = carrierService;
@@ -12,7 +29,7 @@ export default class GameCreateValidationService {
 
     // Note: The reason why this isn't in a unit test is because custom galaxies
     // need to run through this validation.
-    validate(game) {
+    validate(game: Game) {
         // Assert that there is the correct number of players.
         if (game.galaxy.players.length !== game.settings.general.playerLimit) {
             throw new ValidationError(`The game must have ${game.settings.general.playerLimit} players.`);
@@ -113,9 +130,9 @@ export default class GameCreateValidationService {
             }
 
             // Assert that all stars in the galaxy have valid infrastructure
-            if (star.infrastructure.economy < 0
-                || star.infrastructure.industry < 0
-                || star.infrastructure.science < 0) {
+            if (star.infrastructure.economy! < 0
+                || star.infrastructure.industry! < 0
+                || star.infrastructure.science! < 0) {
                     throw new ValidationError(`All stars must have valid infrastructure.`);
                 }
 
@@ -128,9 +145,9 @@ export default class GameCreateValidationService {
             }
 
             if (!star.homeStar && (
-                star.infrastructure.economy > 0
-                || star.infrastructure.industry > 0
-                || star.infrastructure.science > 0
+                star.infrastructure.economy! > 0
+                || star.infrastructure.industry! > 0
+                || star.infrastructure.science! > 0
             )) {
                 throw new ValidationError(`All non capital stars must start with 0 starting infrastructure.`);
             }
@@ -138,9 +155,9 @@ export default class GameCreateValidationService {
             // Assert that dead stars have valid infrastructure
             if (this.starService.isDeadStar(star)
                 && (
-                    star.infrastructure.economy > 0
-                    || star.infrastructure.industry > 0
-                    || star.infrastructure.science > 0
+                    star.infrastructure.economy! > 0
+                    || star.infrastructure.industry! > 0
+                    || star.infrastructure.science! > 0
                     || star.specialistId
                     // || star.warpGate // TODO: This is a bug, dead stars cannot have warp gates however the map gen sometimes assigns them which is incorrect.
                 )) {
@@ -148,7 +165,7 @@ export default class GameCreateValidationService {
                 }
     
             // Assert that all stars have valid starting ships
-            if (star.ships < 0 || star.shipsActual < 0) {
+            if (star.ships! < 0 || star.shipsActual! < 0) {
                 throw new ValidationError(`All stars must have 0 or greater ships.`);
             }
 

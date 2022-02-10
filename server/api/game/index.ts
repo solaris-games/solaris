@@ -178,7 +178,9 @@ export default (router, io, container: DependencyContainer) => {
 
             res.sendStatus(200);
                 
-            container.broadcastService.gamePlayerQuit(req.game, player);
+            if (player) {
+                container.broadcastService.gamePlayerQuit(req.game, player);
+            }
         } catch (err) {
             return next(err);
         }

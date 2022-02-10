@@ -1,4 +1,4 @@
-import { ObjectId } from "mongoose";
+import { DBObjectId } from "./DBObjectId";
 
 export interface ReportReasons {
     abuse: boolean;
@@ -8,13 +8,13 @@ export interface ReportReasons {
 };
 
 export interface Report {
-    _id: ObjectId;
-    gameId: ObjectId;
-    reportedPlayerId: ObjectId;
-    reportedUserId: ObjectId;
+    _id: DBObjectId;
+    gameId: DBObjectId;
+    reportedPlayerId: DBObjectId;
+    reportedUserId: DBObjectId;
     reportedPlayerAlias: string;
-    reportedByPlayerId: ObjectId;
-    reportedByUserId: ObjectId;
+    reportedByPlayerId: DBObjectId;
+    reportedByUserId: DBObjectId;
     reportedByPlayerAlias: string;
     reasons: ReportReasons,
     actioned: boolean;

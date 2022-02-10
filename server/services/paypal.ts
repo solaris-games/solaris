@@ -1,9 +1,19 @@
+import { DBObjectId } from "../types/DBObjectId";
+import DatabaseRepository from "../models/DatabaseRepository";
+import { Payment } from "../types/Payment";
+import CacheService from "./cache";
+import UserService from "./user";
+
 const axios = require('axios');
 
 const CURRENCY = 'GBP';
 const CACHE_KEY_TOKEN = 'paypalToken';
 
 export default class PaypalService {
+    PaymentModel: any;
+    paymentRepo: DatabaseRepository<Payment>;
+    userService: UserService;
+    cacheService: CacheService;
 
     API = {
         sandbox: {
@@ -20,7 +30,12 @@ export default class PaypalService {
         }
     };
 
-    constructor (PaymentModel, paymentRepo, userService, cacheService) {
+    constructor (
+        PaymentModel: any,
+        paymentRepo: DatabaseRepository<Payment>,
+        userService: UserService,
+        cacheService: CacheService
+    ) {
         this.PaymentModel= PaymentModel;
         this.paymentRepo = paymentRepo;
         this.userService = userService;
@@ -34,7 +49,7 @@ export default class PaypalService {
             return cached;
         }
 
-        const environment = process.env.PAYPAL_ENVIRONMENT;
+        const environment = process.env.PAYPAL_ENVIRONMENT!;
 
         const params = new URLSearchParams()
         params.append('grant_type', 'client_credentials')
@@ -56,8 +71,8 @@ export default class PaypalService {
         return token;
     }
 
-    async authorizePayment(userId, totalQuantity, totalCost, unitCost, returnUrl, cancelUrl) {
-        const environment = process.env.PAYPAL_ENVIRONMENT;
+    async authorizePayment(userId: DBObjectId, totalQuantity: number, totalCost: number, unitCost: number, returnUrl: string, cancelUrl: string) {
+        const environment = process.env.PAYPAL_ENVIRONMENT!;
 
         // Get a token from PayPal
         let token = await this.authorize();
@@ -116,8 +131,8 @@ export default class PaypalService {
         return approvalUrl;
     }
 
-    async processPayment(paymentId, payerId) {
-        const environment = process.env.PAYPAL_ENVIRONMENT;
+    async processPayment(paymentId: string, payerId: string) {
+        const environment = process.env.PAYPAL_ENVIRONMENT!;
         
         // Get the payment from the DB to verify transaction.
         const payment = await this.paymentRepo.findOne({

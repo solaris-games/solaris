@@ -1,11 +1,45 @@
 const EventEmitter = require('events');
 const moment = require('moment');
-import { ObjectId } from 'mongoose';
+import { DBObjectId } from '../types/DBObjectId';
 import ValidationError from '../errors/validation';
+import DatabaseRepository from '../models/DatabaseRepository';
+import { Game } from '../types/Game';
+import { Player } from '../types/Player';
+import { User } from '../types/User';
+import AchievementService from './achievement';
+import AvatarService from './avatar';
+import CarrierService from './carrier';
+import GameStateService from './gameState';
+import GameTypeService from './gameType';
+import PasswordService from './password';
+import PlayerService from './player';
+import StarService from './star';
+import UserService from './user';
 
 export default class GameService extends EventEmitter {
+    gameRepo: DatabaseRepository<Game>;
+    userService: UserService;
+    starService: StarService;
+    carrierService: CarrierService;
+    playerService: PlayerService;
+    passwordService: PasswordService;
+    achievementService: AchievementService;
+    avatarService: AvatarService;
+    gameTypeService: GameTypeService;
+    gameStateService: GameStateService;
 
-    constructor(gameRepo, userService, starService, carrierService, playerService, passwordService, achievementService, avatarService, gameTypeService, gameStateService) {
+    constructor(
+        gameRepo: DatabaseRepository<Game>,
+        userService: UserService,
+        starService: StarService,
+        carrierService: CarrierService,
+        playerService: PlayerService,
+        passwordService: PasswordService,
+        achievementService: AchievementService,
+        avatarService: AvatarService,
+        gameTypeService: GameTypeService,
+        gameStateService: GameStateService
+    ) {
         super();
         
         this.gameRepo = gameRepo;
@@ -20,19 +54,19 @@ export default class GameService extends EventEmitter {
         this.gameStateService = gameStateService;
     }
 
-    async getByIdAll(id) {
+    async getByIdAll(id: DBObjectId) {
         return await this.gameRepo.findByIdAsModel(id);
     }
 
-    async getByIdAllLean(id) {
+    async getByIdAllLean(id: DBObjectId) {
         return await this.gameRepo.findById(id);
     }
 
-    async getById(id: ObjectId, select?: any) {
+    async getById(id: DBObjectId, select?: any) {
         return await this.gameRepo.findByIdAsModel(id, select);
     }
 
-    async getByNameSettingsLean(name) {
+    async getByNameSettingsLean(name: string) {
         return await this.gameRepo.find({
             'settings.general.name': name
         }, {
@@ -40,7 +74,7 @@ export default class GameService extends EventEmitter {
         });
     }
 
-    async getByNameStateSettingsLean(name) {
+    async getByNameStateSettingsLean(name: string) {
         return await this.gameRepo.find({
             'settings.general.name': name
         }, {
@@ -49,17 +83,17 @@ export default class GameService extends EventEmitter {
         });
     }
 
-    async getByIdSettingsLean(id) {
+    async getByIdSettingsLean(id: DBObjectId) {
         return await this.gameRepo.findById(id, {
             'settings': 1
         });
     }
 
-    async getByIdLean(id, select) {
+    async getByIdLean(id: DBObjectId, select: any): Promise<Game | null> {
         return await this.gameRepo.findById(id, select);
     }
 
-    async getByIdGalaxy(id, select) {
+    async getByIdGalaxy(id: DBObjectId) {
         return await this.getById(id, {
             settings: 1,
             state: 1,
@@ -68,7 +102,7 @@ export default class GameService extends EventEmitter {
         });
     }
 
-    async getByIdGalaxyLean(id, select) {
+    async getByIdGalaxyLean(id: DBObjectId): Promise<Game | null> {
         return await this.getByIdLean(id, {
             settings: 1,
             state: 1,
@@ -77,7 +111,7 @@ export default class GameService extends EventEmitter {
         });
     }
 
-    async getGameStateTick(id) {
+    async getGameStateTick(id: DBObjectId) {
         let game = await this.getByIdLean(id, {
             'state.tick': 1
         });
@@ -89,28 +123,32 @@ export default class GameService extends EventEmitter {
         return game.state.tick;
     }
 
-    async getGameSettings(id) {
+    async getGameSettings(id: DBObjectId) {
         let game = await this.getByIdLean(id, {
             'settings': 1
         });
 
-        return game.settings;
+        return game?.settings;
     }
 
-    async getGameState(id) {
+    async getGameState(id: DBObjectId) {
         let game = await this.getByIdLean(id, {
             'state': 1
         });
 
-        return game.state;
+        return game?.state;
     }
 
-    async getByIdInfo(id, userId) {
+    async getByIdInfo(id: DBObjectId, userId: DBObjectId) {
         let game = await this.getByIdLean(id, {
             settings: 1,
             state: 1,
             constants: 1
         });
+
+        if (!game) {
+            return null;
+        }
 
         if (game.settings.general.createdByUserId) {
             game.settings.general.isGameAdmin = game.settings.general.createdByUserId.equals(userId);
@@ -121,7 +159,7 @@ export default class GameService extends EventEmitter {
         return game;
     }
 
-    async getByIdState(id, userId) {
+    async getByIdState(id: DBObjectId, userId: DBObjectId) {
         let game = await this.getByIdLean(id, {
             state: 1
         });
@@ -129,7 +167,7 @@ export default class GameService extends EventEmitter {
         return game;
     }
 
-    async getByIdMessages(id) {
+    async getByIdMessages(id: DBObjectId) {
         return await this.getById(id, {
             settings: 1,
             state: 1,
@@ -138,7 +176,7 @@ export default class GameService extends EventEmitter {
         });
     }
 
-    async getByIdMessagesLean(id) {
+    async getByIdMessagesLean(id: DBObjectId) {
         return await this.getByIdLean(id, {
             settings: 1,
             state: 1,
@@ -147,7 +185,7 @@ export default class GameService extends EventEmitter {
         });
     }
 
-    async getByIdConversations(id) {
+    async getByIdConversations(id: DBObjectId) {
         return await this.getById(id, {
             state: 1,
             conversations: 1,
@@ -155,7 +193,7 @@ export default class GameService extends EventEmitter {
         });
     }
 
-    async getByIdConversationsLean(id) {
+    async getByIdConversationsLean(id: DBObjectId) {
         return await this.getByIdLean(id, {
             state: 1,
             conversations: 1,
@@ -163,7 +201,7 @@ export default class GameService extends EventEmitter {
         });
     }
 
-    async getByIdDiplomacyLean(id) {
+    async getByIdDiplomacyLean(id: DBObjectId) {
         return await this.getByIdLean(id, {
             'galaxy.players._id': 1,
             'galaxy.players.userId': 1,
@@ -171,7 +209,7 @@ export default class GameService extends EventEmitter {
         });
     }
 
-    async join(game, userId, playerId, alias, avatar, password) {
+    async join(game: Game, userId: DBObjectId, playerId: DBObjectId, alias: string, avatar: number, password: string) {
         // The player cannot join the game if:
         // 1. The game has finished.
         // 2. They quit the game before the game started.
@@ -229,7 +267,7 @@ export default class GameService extends EventEmitter {
         }
 
         // Get the player and update it to assign the user to the player.
-        let player = game.galaxy.players.find(x => x._id.toString() === playerId);
+        let player = game.galaxy.players.find(x => x._id.toString() === playerId.toString());
 
         if (!player) {
             throw new ValidationError('The player is not participating in this game.');
@@ -296,7 +334,7 @@ export default class GameService extends EventEmitter {
         return gameIsFull; // Return whether the game is now full, the calling API endpoint can broadcast it.
     }
 
-    assignPlayerToUser(game, player, userId, alias, avatar) {
+    assignPlayerToUser(game: Game, player: Player, userId: DBObjectId | null, alias: string, avatar: number) {
         let isAfker = game.afkers.find(x => x.equals(userId)) != null;
         let isFillingAfkSlot = this.gameStateService.isInProgress(game) && player.afk;
         let isRejoiningOwnAfkSlot = isFillingAfkSlot && isAfker && player.userId === userId.toString();
@@ -304,7 +342,7 @@ export default class GameService extends EventEmitter {
         // Assign the user to the player.
         player.userId = userId;
         player.alias = alias;
-        player.avatar = avatar;
+        player.avatar = avatar.toString();
 
         // Reset the defeated and afk status as the user may be filling
         // an afk slot.
@@ -351,7 +389,7 @@ export default class GameService extends EventEmitter {
         return gameIsFull;
     }
 
-    async quit(game, player) {    
+    async quit(game: Game, player: Player) {    
         if (game.state.startDate) {
             throw new ValidationError('Cannot quit a game that has started.');
         }
@@ -362,7 +400,9 @@ export default class GameService extends EventEmitter {
 
         // If its a tutorial game then straight up delete it.
         if (this.gameTypeService.isTutorialGame(game)) {
-            return this.delete(game);
+            await this.delete(game);
+
+            return null;
         }
         
         let alias = player.alias;
@@ -393,7 +433,7 @@ export default class GameService extends EventEmitter {
         return player;
     }
 
-    async concedeDefeat(game, player) {
+    async concedeDefeat(game: Game, player: Player) {
         if (player.defeated) {
             throw new ValidationError('The player has already been defeated.');
         }
@@ -437,13 +477,13 @@ export default class GameService extends EventEmitter {
         });
     }
 
-    async delete(game: any, deletedByUserId?: ObjectId) {
+    async delete(game: Game, deletedByUserId?: DBObjectId) {
         // If being deleted by a legit user then do some validation.
         if (deletedByUserId && game.state.startDate) {
             throw new ValidationError('Cannot delete games that are in progress or completed.');
         }
 
-        if (deletedByUserId && !game.settings.general.createdByUserId.equals(deletedByUserId)) {
+        if (deletedByUserId && game.settings.general.createdByUserId && !game.settings.general.createdByUserId.equals(deletedByUserId)) {
             throw new ValidationError('Cannot delete this game, you did not create it.');
         }
 
@@ -469,13 +509,13 @@ export default class GameService extends EventEmitter {
         // TODO: Cleanup any orphaned docs
     }
 
-    async getPlayerUser(game, playerId) {
+    async getPlayerUser(game: Game, playerId: DBObjectId) {
         let player = game.galaxy.players.find(p => p._id.toString() === playerId.toString());
 
         return await this.userService.getInfoById(player.userId);
     }
 
-    async getPlayerUserLean(game, playerId) {
+    async getPlayerUserLean(game: Game, playerId: DBObjectId) {
         if (this.gameTypeService.isAnonymousGame(game)) {
             return null;
         }
@@ -492,7 +532,7 @@ export default class GameService extends EventEmitter {
     }
 
     // TODO: Move to a gameLockService
-    async lock(gameId, locked = true) {
+    async lock(gameId: DBObjectId, locked: boolean = true) {
         await this.gameRepo.updateOne({
             _id: gameId
         }, {
@@ -503,7 +543,7 @@ export default class GameService extends EventEmitter {
     }
 
     // TODO: Move to a gameLockService
-    async lockAll(locked = true) {
+    async lockAll(locked: boolean = true) {
         await this.gameRepo.updateMany({
             'state.locked': { $ne: locked }
         }, {
@@ -513,7 +553,7 @@ export default class GameService extends EventEmitter {
         });
     }
 
-    listAllUndefeatedPlayers(game) {
+    listAllUndefeatedPlayers(game: Game) {
         if (this.gameTypeService.isTutorialGame(game)) {
             return game.galaxy.players.filter(p => p.userId);
         }
@@ -521,19 +561,19 @@ export default class GameService extends EventEmitter {
         return game.galaxy.players.filter(p => !p.defeated);
     }
 
-    isAllUndefeatedPlayersReady(game) {
+    isAllUndefeatedPlayersReady(game: Game) {
         let undefeatedPlayers = this.listAllUndefeatedPlayers(game);
 
         return undefeatedPlayers.filter(x => x.ready).length === undefeatedPlayers.length;
     }
 
-    isAllUndefeatedPlayersReadyToQuit(game) {
+    isAllUndefeatedPlayersReadyToQuit(game: Game) {
         let undefeatedPlayers = this.listAllUndefeatedPlayers(game);
 
         return undefeatedPlayers.filter(x => x.readyToQuit).length === undefeatedPlayers.length;
     }
 
-    async forceAllUndefeatedPlayersReadyToQuit(game) {
+    async forceAllUndefeatedPlayersReadyToQuit(game: Game) {
         let undefeatedPlayers = this.listAllUndefeatedPlayers(game);
 
         for (let player of undefeatedPlayers) {
@@ -542,8 +582,8 @@ export default class GameService extends EventEmitter {
     }
     
     // TODO: Should be in a player service?
-    async quitAllActiveGames(userId) {
-        let allGames = await this.gameRepo.findAsModels({
+    async quitAllActiveGames(userId: DBObjectId) {
+        let allGames: any[] = await this.gameRepo.findAsModels({
             'galaxy.players': {
                 $elemMatch: { 
                     userId,             // User is in game
@@ -569,7 +609,7 @@ export default class GameService extends EventEmitter {
         }
     }
 
-    async markAsCleaned(gameId) {
+    async markAsCleaned(gameId: DBObjectId) {
         await this.gameRepo.updateOne({
             _id: gameId
         }, {

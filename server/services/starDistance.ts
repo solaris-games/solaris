@@ -1,28 +1,38 @@
-export default class StarDistanceService {
+import { DBObjectId } from "../types/DBObjectId";
+import { Game } from "../types/Game";
+import { Location } from "../types/Location";
+import { Player } from "../types/Player";
+import { Star } from "../types/Star";
+import DistanceService from "./distance";
 
-    constructor(distanceService) {
+export default class StarDistanceService {
+    distanceService: DistanceService;
+
+    constructor(
+        distanceService: DistanceService
+    ) {
         this.distanceService = distanceService;
     }
 
-    getDistanceBetweenStars(star1, star2) {
+    getDistanceBetweenStars(star1: Star, star2: Star) {
         return this.distanceService.getDistanceBetweenLocations(star1.location, star2.location);
     }
 
-    getDistanceBetweenStarAndLocation(star, loc){
+    getDistanceBetweenStarAndLocation(star: Star, loc: Location){
         return this.distanceService.getDistanceBetweenLocations(star.location, loc);
     }
 
-    getClosestStar(star, stars) {
+    getClosestStar(star: Star, stars: Star[]) {
         return this.getClosestStars(star, stars, 1)[0];
     }
 
-    getDistanceToClosestStar(star, stars) {
+    getDistanceToClosestStar(star: Star, stars: Star[]) {
         let closest = this.getClosestStar(star, stars);
 
         return this.distanceService.getDistanceBetweenLocations(star.location, closest.location);
     }
 
-    getClosestStars(star, stars, amount) {
+    getClosestStars(star: Star, stars: Star[], amount: number) {
         let sorted = stars
             .filter(s => s._id !== star._id) // Exclude the current star.
             .sort((a, b) => {
@@ -33,7 +43,7 @@ export default class StarDistanceService {
         return sorted.slice(0, amount); // Slice 1 ignores the first star because it will be the current star.
     }
 
-    getClosestUnownedStars(star, stars, amount) {
+    getClosestUnownedStars(star: Star, stars: Star[], amount: number) {
         let sorted = stars
             .filter(s => s._id !== star._id) // Exclude the current star.
             .filter(s => !s.ownedByPlayerId)
@@ -45,11 +55,11 @@ export default class StarDistanceService {
         return sorted.slice(0, amount);
     }
 
-    getClosestUnownedStar(star, stars) {
+    getClosestUnownedStar(star: Star, stars: Star[]) {
         return this.getClosestUnownedStars(star, stars, 1)[0];
     }
 
-    getClosestOwnedStars(star, stars) {
+    getClosestOwnedStars(star: Star, stars: Star[]) {
         return stars
             .filter(s => s._id !== star._id) // Exclude the current star.
             .filter(s => s.ownedByPlayerId)
@@ -59,79 +69,59 @@ export default class StarDistanceService {
             });
     }
 
-    getClosestPlayerOwnedStars(star, stars, player) {
+    getClosestPlayerOwnedStars(star: Star, stars: Star[], player: Player) {
         return this.getClosestOwnedStars(star, stars)
-            .filter(s => s.ownedByPlayerId.equals(player._id));
+            .filter(s => s.ownedByPlayerId && s.ownedByPlayerId.equals(player._id));
     }
 
-    getClosestPlayerOwnedStarsFromLocation(location, stars, ownedByPlayerId) {
+    getClosestPlayerOwnedStarsFromLocation(location: Location, stars: Star[], ownedByPlayerId: DBObjectId) {
         let sorted = stars
             .filter(s => s.ownedByPlayerId && s.ownedByPlayerId.equals(ownedByPlayerId))
-            .sort((a, b) => {
-                let star = {
-                    location
-                };
-
-                return this.getDistanceBetweenStars(star, a)
-                    - this.getDistanceBetweenStars(star, b);
-            });
+            .sort((a, b) => this.getDistanceBetweenStarAndLocation(a, location) - this.getDistanceBetweenStarAndLocation(b, location));
 
         return sorted;
     }
 
-    getClosestPlayerOwnedStarsFromLocationWithinDistance(location, stars, ownedByPlayerId, maxDistance) {
+    getClosestPlayerOwnedStarsFromLocationWithinDistance(location: Location, stars: Star[], ownedByPlayerId: DBObjectId, maxDistance: number) {
         let sorted = stars
             .filter(s => s.ownedByPlayerId && s.ownedByPlayerId.equals(ownedByPlayerId))
             .filter(s => {
-                let locationStar = { location };
-
-                let distance = this.getDistanceBetweenStars(locationStar, s);
+                let distance = this.getDistanceBetweenStarAndLocation(s, location);
                 
                 return maxDistance >= distance;
             })
-            .sort((a, b) => {
-                let locationStar = { location };
-
-                return this.getDistanceBetweenStars(locationStar, a) - this.getDistanceBetweenStars(locationStar, b);
-            });
+            .sort((a, b) => this.getDistanceBetweenStarAndLocation(a, location) - this.getDistanceBetweenStarAndLocation(b, location));
 
         return sorted;
     }
 
-    getClosestUnownedStarsFromLocation(location, stars, amount) {
+    getClosestUnownedStarsFromLocation(location: Location, stars: Star[], amount: number) {
         let sorted = stars
             .filter(s => !s.ownedByPlayerId)
-            .sort((a, b) => {
-                let star = {
-                    location
-                };
-
-                return this.getDistanceBetweenStars(star, a)
-                    - this.getDistanceBetweenStars(star, b);
-            });
+            .sort((a, b) => this.getDistanceBetweenStarAndLocation(a, location) - this.getDistanceBetweenStarAndLocation(b, location));
 
         return sorted.slice(0, amount);
     }
 
-    getClosestUnownedStarFromLocation(location, stars) {
+    getClosestUnownedStarFromLocation(location: Location, stars: Star[]) {
         return this.getClosestUnownedStarsFromLocation(location, stars, 1)[0];
     }
 
-    isStarTooClose(game, star, otherStar) {
+    isStarTooClose(game: Game, star: Star, otherStar: Star) {
         return this.isStarLocationTooClose(game, star.location, otherStar);
     }
 
-    isStarLocationTooClose(game, location, otherStar) {
+    isStarLocationTooClose(game: Game, location: Location, otherStar: Star) {
         return this.isLocationTooClose(game, location, otherStar.location);
     }
 
-    isLocationTooClose(game, location, otherLocation) {
+    isLocationTooClose(game: Game, location: Location, otherLocation: Location) {
         const distance = this.distanceService.getDistanceBetweenLocations(location, otherLocation);
 
         return distance < game.constants.distances.minDistanceBetweenStars;
     }
 
-    isDuplicateStarPosition(location, stars) {
+    isDuplicateStarPosition(location: Location, stars: Star[]) {
         const samePositionStars = 
             stars.filter((star2) => {
                 return location.x === star2.location.x
@@ -141,11 +131,11 @@ export default class StarDistanceService {
         return samePositionStars.length > 0;
     }
 
-    getClosestStarFromLocation(loc, stars){
+    getClosestStarFromLocation(loc: Location, stars: Star[]){
         return this.getClosestStarsFromLocation(loc, stars, 1);
     }
 
-    getClosestStarsFromLocation(loc, stars, amount){
+    getClosestStarsFromLocation(loc: Location, stars: Star[], amount: number){
         let sorted = stars
         .sort((a, b) => {
             return this.getDistanceBetweenStarAndLocation(a, loc)
@@ -155,7 +145,7 @@ export default class StarDistanceService {
         return sorted.slice(0, amount); 
     }
 
-    getFurthestStarsFromLocation(loc, stars, amount){
+    getFurthestStarsFromLocation(loc: Location, stars: Star[], amount: number){
         let sorted = stars
         .sort((a, b) => {
             return this.getDistanceBetweenStarAndLocation(b, loc)
@@ -165,13 +155,13 @@ export default class StarDistanceService {
         return sorted.slice(0, amount);
     }
 
-    getMaxGalaxyDiameter(locations) {
+    getMaxGalaxyDiameter(locations: Location[]) {
         const diameter = this.getGalaxyDiameter(locations);
 
         return diameter.x > diameter.y ? diameter.x : diameter.y;
     }
 
-    getGalaxyDiameter(locations) {
+    getGalaxyDiameter(locations: Location[]) {
         let xArray = locations.map((location) => { return location.x; });
         let yArray = locations.map((location) => { return location.y; });
 
@@ -187,7 +177,7 @@ export default class StarDistanceService {
         };
     }
 
-    getGalacticCenter() {
+    getGalacticCenter(): Location {
         return {
             x: 0,
             y: 0

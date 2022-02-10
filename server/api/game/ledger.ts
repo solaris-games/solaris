@@ -7,9 +7,7 @@ export default (router, io, container: DependencyContainer) => {
 
     router.get('/api/game/:gameId/ledger', middleware.authenticate, middleware.loadGameLean, middleware.loadPlayer, async (req, res, next) => {
         try {
-            let ledger = await container.ledgerService.getLedger(
-                req.game,
-                req.player);
+            let ledger = await container.ledgerService.getLedger(req.player);
 
             return res.status(200).json(ledger);
         } catch (err) {

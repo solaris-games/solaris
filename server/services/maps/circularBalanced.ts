@@ -1,7 +1,7 @@
 const RNG = require('random-seed');
 import ValidationError from '../../errors/validation';
-import { ResourceDistribution } from '../../types/Enums';
-import { Location, LocationGeneration } from "../../types/Location";
+import { GameResourceDistribution } from '../../types/Game';
+import { Location } from "../../types/Location";
 import DistanceService from "../distance";
 import GameTypeService from "../gameType";
 import RandomService from "../random";
@@ -47,7 +47,7 @@ export default class CircularBalancedMapService {
         };
     }
 
-    _getRotatedLocation(location: Location, angle: number): LocationGeneration {
+    _getRotatedLocation(location: Location, angle: number): any {
         return {
           x: Math.cos(angle)*location.x + Math.sin(angle)*location.y,
           y: Math.sin(angle)*-location.x + Math.cos(angle)*location.y,
@@ -58,7 +58,7 @@ export default class CircularBalancedMapService {
         };
     }
 
-    _moveLocationTowards(location: LocationGeneration, towards: LocationGeneration, minDistance: number) {
+    _moveLocationTowards(location: any, towards: any, minDistance: number) {
         let dx = towards.x - location.x;
         let dy = towards.y - location.y;
         let dist = this.distanceService.getDistanceBetweenLocations(location, towards);
@@ -68,12 +68,12 @@ export default class CircularBalancedMapService {
         location.y += dy*amount;
     }
 
-    generateLocations(game: any, starCount: number, resourceDistribution: ResourceDistribution, playerCount: number): Location[] {
+    generateLocations(game: any, starCount: number, resourceDistribution: GameResourceDistribution, playerCount: number): Location[] {
         if (this.gameTypeService.isKingOfTheHillMode(game)) {
             throw new ValidationError(`King of the hill is not supported in circular balanced maps.`);
         }
 
-        const locations: LocationGeneration[] = [];
+        const locations: any[] = [];
         let seed = ( Math.random()*(10**8) ).toFixed(0);
         const rng = RNG.create(seed); //TODO get seed from player
         const tau = 2.0*Math.PI;
@@ -91,7 +91,7 @@ export default class CircularBalancedMapService {
             // otherwise, all are accepted
             // this garantees that evey sector is identical
             for (let i = 0; i < maxTries; i++) {
-                let candidateLocations: LocationGeneration[] = [];
+                let candidateLocations: any[] = [];
                 let baseLocation = this._generateStarPositionInSector(currentRadius, rng, playerCount);
                 let locationRejected = false;
 
@@ -147,7 +147,7 @@ export default class CircularBalancedMapService {
 
         while(startingStarsCount--) {
             for(let homeLocation of homeLocations) {
-                let closestUnlinkedLocation = this.distanceService.getClosestLocation(homeLocation, unlinkedLocations);
+                let closestUnlinkedLocation = this.distanceService.getClosestLocation(homeLocation, unlinkedLocations) as any;
                 homeLocation.linkedLocations.push(closestUnlinkedLocation);
                 closestUnlinkedLocation.linked = true;
                 unlinkedLocations = unlinkedLocations.filter( (loc) => { return loc !== closestUnlinkedLocation; } );
@@ -158,8 +158,8 @@ export default class CircularBalancedMapService {
         let minimumClaimDistance = this.distanceService.getHyperspaceDistance(game, initialHyperRange)-2;//-2 to avoid floating point imprecisions
 
         for(let homeLocation of homeLocations) {
-            let reachableLocations: LocationGeneration[] = [];
-            let unreachebleLocations: LocationGeneration[] = [];
+            let reachableLocations: any[] = [];
+            let unreachebleLocations: any[] = [];
 
             reachableLocations.push(homeLocation);
             

@@ -1,22 +1,24 @@
+import { Game } from "../types/Game";
+
 export default class GameTypeService {
 
-    isNewPlayerGame(game) {
+    isNewPlayerGame(game: Game) {
         return ['new_player_rt', 'new_player_tb'].includes(game.settings.general.type);
     }
 
-    isTutorialGame(game) {
+    isTutorialGame(game: Game) {
         return game.settings.general.type === 'tutorial';
     }
 
-    isCustomGame(game) {
+    isCustomGame(game: Game) {
         return game.settings.general.type === 'custom';
     }
 
-    isFeaturedGame(game) {
+    isFeaturedGame(game: Game) {
         return game.settings.general.featured;
     }
 
-    isSpecialGameMode(game) {
+    isSpecialGameMode(game: Game) {
         return [
             'special_dark',
             'special_ultraDark',
@@ -29,56 +31,56 @@ export default class GameTypeService {
         ].includes(game.settings.general.type);
     }
 
-    is32PlayerOfficialGame(game) {
+    is32PlayerOfficialGame(game: Game) {
         return game.settings.general.type === '32_player_rt';
     }
 
-    isConquestMode(game) {
+    isConquestMode(game: Game) {
         return game.settings.general.mode === 'conquest';
     }
 
-    isKingOfTheHillMode(game) {
+    isKingOfTheHillMode(game: Game) {
         return game.settings.general.mode === 'kingOfTheHill';
     }
 
-    isAnonymousGame(game) {
+    isAnonymousGame(game: Game) {
         return game.settings.general.anonymity === 'extra';
     }
 
-    isForEstablishedPlayersOnly(game) {
+    isForEstablishedPlayersOnly(game: Game) {
         return game.settings.general.playerType === 'establishedPlayers'
     }
 
-    isOrbitalMode(game) {
+    isOrbitalMode(game: Game) {
         return game.settings.orbitalMechanics.enabled === 'enabled';
     }
 
-    isBattleRoyaleMode(game) {
+    isBattleRoyaleMode(game: Game) {
         return game.settings.general.mode === 'battleRoyale';
     }
 
-    isDarkModeExtra(game) {
+    isDarkModeExtra(game: Game) {
         return game.settings.specialGalaxy.darkGalaxy === 'extra';
     }
 
-    isDarkMode(game) {
+    isDarkMode(game: Game) {
         return game.settings.specialGalaxy.darkGalaxy === 'standard'
             || game.settings.specialGalaxy.darkGalaxy === 'extra';
     }
 
-    isDarkStart(game) {
+    isDarkStart(game: Game) {
         return game.settings.specialGalaxy.darkGalaxy === 'start';
     }
 
-    isTurnBasedGame(game) {
+    isTurnBasedGame(game: Game) {
         return game.settings.gameTime.gameType === 'turnBased';
     }
 
-    isRealTimeGame(game) {
+    isRealTimeGame(game: Game) {
         return game.settings.gameTime.gameType === 'realTime';
     }
 
-    isSplitResources(game) {
+    isSplitResources(game: Game) {
         return game.settings.specialGalaxy.splitResources === 'enabled';
     }
 

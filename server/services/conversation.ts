@@ -1,5 +1,5 @@
 const moment = require('moment');
-import { ObjectId } from 'mongoose';
+import { DBObjectId } from '../types/DBObjectId';
 import ValidationError from '../errors/validation';
 import DatabaseRepository from '../models/DatabaseRepository';
 import { Conversation } from '../types/Conversation';
@@ -25,7 +25,7 @@ function arrayIsEqual(a: any[], b: any[]): boolean {
     return true;
 }
 
-function getNewConversation(game: Game, playerId: ObjectId | null, name: string, participantIds: ObjectId[]): Conversation {
+function getNewConversation(game: Game, playerId: DBObjectId | null, name: string, participantIds: DBObjectId[]): Conversation {
     if (name == null || !name.length || name.length > 100) {
         throw new ValidationError(`Name is required and must not exceed 100 characters.`);
     }
@@ -77,7 +77,7 @@ export default class ConversationService extends EventEmitter {
         this.tradeService = tradeService;
     }
 
-    async create(game: Game, playerId: ObjectId, name: string, participantIds: ObjectId[]): Promise<Conversation> {
+    async create(game: Game, playerId: DBObjectId, name: string, participantIds: DBObjectId[]): Promise<Conversation> {
         let newConvo = getNewConversation(game, playerId, name, participantIds);
 
         // Create the convo.
@@ -110,25 +110,27 @@ export default class ConversationService extends EventEmitter {
 
     createConversationAllPlayers(game: Game): void {
         let name = game.settings.general.name;
-        let participantIds: ObjectId[] = game.galaxy.players.map(p => p._id);
+        let participantIds: DBObjectId[] = game.galaxy.players.map(p => p._id);
 
         let newConvo = getNewConversation(game, null, name, participantIds);
 
         game.conversations.push(newConvo);
     }
 
-    async list(game: Game, playerId: ObjectId) {
+    async list(game: Game, playerId: DBObjectId) {
         // List all conversations the player is participating in
         // and the last message that was sent
         // and the count of unread messages
         let convos = game.conversations.filter(c => c.participants.find(p => p.equals(playerId)));
 
         return convos.map(c => {
+            const msgs: ConversationMessage[] = c.messages as ConversationMessage[];
+
             // Only return the last message
-            const lastMessage = c.messages.slice(-1)[0] || null;
+            const lastMessage = msgs.slice(-1)[0] || null;
 
             // Calculate how many messages in this conversation the player has NOT read.
-            const unreadCount = c.messages.filter(m => m.readBy.find(r => r.equals(playerId)) == null).length;
+            const unreadCount = msgs.filter(m => m.readBy.find(r => r.equals(playerId)) == null).length;
 
             return {
                 _id: c._id,
@@ -142,7 +144,7 @@ export default class ConversationService extends EventEmitter {
     }
 
     // Gets the summary of a single chat (if exists) between two players
-    async privateChatSummary(game: Game, playerIdA: ObjectId, playerIdB: ObjectId) {
+    async privateChatSummary(game: Game, playerIdA: DBObjectId, playerIdB: DBObjectId) {
         let convos = await this.list(game, playerIdA)
 
         // Find the chat with the other participant
@@ -156,7 +158,7 @@ export default class ConversationService extends EventEmitter {
         return convo || null;
     }
 
-    async detail(game: Game, playerId: ObjectId, conversationId: ObjectId, includeEvents: boolean = true) {
+    async detail(game: Game, playerId: DBObjectId, conversationId: DBObjectId, includeEvents: boolean = true) {
         // Get the conversation that the player has requested in full.
         let convo = game.conversations.find(c => c._id.toString() === conversationId.toString());
 
@@ -181,12 +183,12 @@ export default class ConversationService extends EventEmitter {
         }
 
         // Sort by sent date ascending.
-        convo.messages = convo.messages.sort((a, b) => a.sentDate - b.sentDate);
+        convo.messages = convo.messages.sort((a, b) => a.sentDate.getTime() - b.sentDate.getTime());
         
         return convo;
     }
 
-    async send(game: Game, player: Player, conversationId: ObjectId, message: string): Promise<ConversationMessageSentResult> {
+    async send(game: Game, player: Player, conversationId: DBObjectId, message: string): Promise<ConversationMessageSentResult> {
         message = message.trim()
 
         if (message === '') {
@@ -226,12 +228,12 @@ export default class ConversationService extends EventEmitter {
         return sentMessageResult;
     }
 
-    async markConversationAsRead(game: Game, playerId: ObjectId, conversationId: ObjectId) {
+    async markConversationAsRead(game: Game, playerId: DBObjectId, conversationId: DBObjectId) {
         let convo = await this.detail(game, playerId, conversationId, false);
 
         // Note: This is the best way as it may save a DB call
         // if there are no unread messages.
-        let unreadMessages = convo.messages
+        let unreadMessages = (convo.messages as ConversationMessage[])
             .filter(m => m.type === 'message')
             .filter(m => m.readBy.find(r => r.equals(playerId)) == null)
             .map(m => m._id);
@@ -254,7 +256,7 @@ export default class ConversationService extends EventEmitter {
         return convo;
     }
 
-    async leave(game: Game, playerId: ObjectId, conversationId: ObjectId) {
+    async leave(game: Game, playerId: DBObjectId, conversationId: DBObjectId) {
         let convo = await this.detail(game, playerId, conversationId, false);
 
         if (convo.createdBy == null) {
@@ -282,23 +284,23 @@ export default class ConversationService extends EventEmitter {
         return convo;
     }
 
-    getUnreadCount(game: Game, playerId: ObjectId) {
+    getUnreadCount(game: Game, playerId: DBObjectId) {
         return (game.conversations || [])
             .filter(c => c.participants.find(p => p.equals(playerId)))
             .reduce((sum, c) => {
-                return sum + c.messages.filter(m => m.readBy.find(r => r.equals(playerId)) == null).length
+                return sum + (c.messages as ConversationMessage[]).filter(m => m.readBy.find(r => r.equals(playerId)) == null).length
             }, 0);
     }
 
-    async pinMessage(game: Game, conversationId: ObjectId, messageId: ObjectId) {
+    async pinMessage(game: Game, conversationId: DBObjectId, messageId: DBObjectId) {
         return await this.setPinnedMessage(game, conversationId, messageId, true);
     }
 
-    async unpinMessage(game: Game, conversationId: ObjectId, messageId: ObjectId) {
+    async unpinMessage(game: Game, conversationId: DBObjectId, messageId: DBObjectId) {
         return await this.setPinnedMessage(game, conversationId, messageId, false);
     }
 
-    async setPinnedMessage(game: Game, conversationId: ObjectId, messageId: ObjectId, isPinned: boolean) {
+    async setPinnedMessage(game: Game, conversationId: DBObjectId, messageId: DBObjectId, isPinned: boolean) {
         return await this.gameRepo.updateOne({
             _id: game._id
         }, {

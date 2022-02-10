@@ -1,4 +1,4 @@
-import { ResourceDistribution } from "../../types/Enums";
+import { GameResourceDistribution } from "../../types/Game";
 import { Location } from "../../types/Location";
 import DistanceService from "../distance";
 import GameTypeService from "../gameType";
@@ -31,7 +31,7 @@ export default class CircularMapService {
         this.gameTypeService = gameTypeService;
     }
 
-    generateLocations(game: any, starCount: number, resourceDistribution: ResourceDistribution): Location[] {
+    generateLocations(game: any, starCount: number, resourceDistribution: GameResourceDistribution): Location[] {
         // These two values should probably be ingame constants but they can for now just be plugged in here
         const starDensity = 1.3 * 10**-4
         const offset = 0.5

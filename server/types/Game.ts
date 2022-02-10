@@ -1,6 +1,6 @@
-import { ObjectId } from "mongoose";
 import { Carrier } from "./Carrier";
 import { Conversation } from "./Conversation";
+import { DBObjectId } from "./DBObjectId";
 import { Location } from "./Location";
 import { Player } from "./Player";
 import { Star } from "./Star";
@@ -51,123 +51,136 @@ export type GameTimeSpeed = 30|60|300|600|1800|3600|7200;
 export type GameTimeStartDelay = 0|1|5|10|30|60|120|240|360|480|600|720|1440;
 export type GameTimeMaxTurnWait = 1|5|10|30|60|360|480|600|720|1080|1440|2880;
 
-export interface Game {
-    _id: ObjectId;
-    settings: {
-        general: {
-            createdByUserId: ObjectId | null;
-            name: string;
-            description: string | null;
-			type: GameType;
-			mode: GameMode;
-			featured: boolean;
-			password: string | null;
-			passwordRequired: boolean;
-			playerLimit: number;
-			playerType: GamePlayerType;
-			anonymity: GamePlayerAnonymity;
-			playerOnlineStatus: GamePlayerOnlineStatus;
-			timeMachine: GameSettingEnabledDisabled;
-			awardRankTo: GameAwardRankTo;
-        },
-        galaxy: {
-			galaxyType: GameGalaxyType;
-			starsPerPlayer: number;
-			productionTicks: number;
-        },
-        specialGalaxy: {
-			carrierCost: GameCarrierCost;
-			carrierUpkeepCost: GameCarrierUpkeepCost;
-			warpgateCost: GameWarpgateCost;
-			specialistCost: GameSpecialistCost;
-			specialistsCurrency: GameSpecialistCurrency;
-			randomWarpGates: number;
-			randomWormHoles: number;
-			randomNebulas: number;
-			randomAsteroidFields: number;
-			randomBlackHoles: number;
-			darkGalaxy: GameDarkGalaxyMode;
-			giftCarriers: GameSettingEnabledDisabled;
-			defenderBonus: GameSettingEnabledDisabled;
-			carrierToCarrierCombat: GameSettingEnabledDisabled;
-			splitResources: GameSettingEnabledDisabled;
-			resourceDistribution: GameResourceDistribution;
-			playerDistribution: GamePlayerDistribution;
-			carrierSpeed: number;
-			specialistBans: {
-				star: number[];
-				carrier: number[];
-			},
-        },
-		conquest: {
-			victoryCondition: GameVictoryCondition;
-			victoryPercentage: GameVictoryPercentage;
+export interface GameSettings {
+	general: {
+		createdByUserId?: DBObjectId | null;
+		name: string;
+		description: string | null;
+		type: GameType;
+		mode: GameMode;
+		featured: boolean;
+		password?: string | null;
+		passwordRequired: boolean;
+		playerLimit: number;
+		playerType: GamePlayerType;
+		anonymity: GamePlayerAnonymity;
+		playerOnlineStatus: GamePlayerOnlineStatus;
+		timeMachine: GameSettingEnabledDisabled;
+		awardRankTo: GameAwardRankTo;
+		isGameAdmin?: boolean;
+	},
+	galaxy: {
+		galaxyType: GameGalaxyType;
+		starsPerPlayer: number;
+		productionTicks: number;
+		customJSON?: string;
+	},
+	specialGalaxy: {
+		carrierCost: GameCarrierCost;
+		carrierUpkeepCost: GameCarrierUpkeepCost;
+		warpgateCost: GameWarpgateCost;
+		specialistCost: GameSpecialistCost;
+		specialistsCurrency: GameSpecialistCurrency;
+		randomWarpGates: number;
+		randomWormHoles: number;
+		randomNebulas: number;
+		randomAsteroidFields: number;
+		randomBlackHoles: number;
+		darkGalaxy: GameDarkGalaxyMode;
+		giftCarriers: GameSettingEnabledDisabled;
+		defenderBonus: GameSettingEnabledDisabled;
+		carrierToCarrierCombat: GameSettingEnabledDisabled;
+		splitResources: GameSettingEnabledDisabled;
+		resourceDistribution: GameResourceDistribution;
+		playerDistribution: GamePlayerDistribution;
+		carrierSpeed: number;
+		specialistBans: {
+			star: number[];
+			carrier: number[];
 		},
-		kingOfTheHill: {
-			productionCycles: number;
+	},
+	conquest: {
+		victoryCondition: GameVictoryCondition;
+		victoryPercentage: GameVictoryPercentage;
+	},
+	kingOfTheHill: {
+		productionCycles: number;
+	},
+	orbitalMechanics: {
+		enabled: GameSettingEnabledDisabled;
+		orbitSpeed: number;
+	},
+	player: {
+		startingStars: number;
+		startingCredits: number;
+		startingCreditsSpecialists: number;
+		startingShips: number;
+		startingInfrastructure: {
+			economy: number;
+			industry: number;
+			science: number;
 		},
-		orbitalMechanics: {
-			enabled: GameSettingEnabledDisabled;
-			orbitSpeed: number;
+		developmentCost: {
+			economy: GameInfrastructureCost;
+			industry: GameInfrastructureCost;
+			science: GameInfrastructureCost;
 		},
-        player: {
-			startingStars: number;
-			startingCredits: number;
-			startingCreditsSpecialists: number;
-			startingShips: number;
-			startingInfrastructure: {
-				economy: number;
-				industry: number;
-				science: number;
-			},
-			developmentCost: {
-				economy: GameInfrastructureCost;
-				industry: GameInfrastructureCost;
-				science: GameInfrastructureCost;
-			},
-			tradeCredits: boolean;
-			tradeCreditsSpecialists: boolean;
-			tradeCost: GameTradeCost;
-			tradeScanning: GameTradeScanning;
-			alliances: GameSettingEnabledDisabled;
-        },
-        technology: {
-			startingTechnologyLevel: {
-				terraforming: number;
-				experimentation: number;
-				scanning: number;
-				hyperspace: number;
-				manufacturing: number;
-				banking: number;
-				weapons: number;
-				specialists: number;
-			},
-			researchCosts: {
-				terraforming: GameResearchCost;
-				experimentation: GameResearchCost;
-				scanning: GameResearchCost;
-				hyperspace: GameResearchCost;
-				manufacturing: GameResearchCost;
-				banking: GameResearchCost;
-				weapons: GameResearchCost;
-				specialists: GameResearchCost;
-			},
-			bankingReward: GameBankingReward;
-			specialistTokenReward: GameSpecialistTokenReward;
+		tradeCredits: boolean;
+		tradeCreditsSpecialists: boolean;
+		tradeCost: GameTradeCost;
+		tradeScanning: GameTradeScanning;
+		alliances: GameSettingEnabledDisabled;
+	},
+	technology: {
+		startingTechnologyLevel: {
+			terraforming: number;
+			experimentation: number;
+			scanning: number;
+			hyperspace: number;
+			manufacturing: number;
+			banking: number;
+			weapons: number;
+			specialists: number;
 		},
-		gameTime: {
-			gameType: GameTimeType;
-			speed: GameTimeSpeed;
-			startDelay: GameTimeStartDelay;
-			turnJumps: number;
-			maxTurnWait: GameTimeMaxTurnWait;
-			afk: {
-				lastSeenTimeout: number;
-				cycleTimeout: number;
-				turnTimeout: number;
-			}
+		researchCosts: {
+			terraforming: GameResearchCost;
+			experimentation: GameResearchCost;
+			scanning: GameResearchCost;
+			hyperspace: GameResearchCost;
+			manufacturing: GameResearchCost;
+			banking: GameResearchCost;
+			weapons: GameResearchCost;
+			specialists: GameResearchCost;
+		},
+		bankingReward: GameBankingReward;
+		specialistTokenReward: GameSpecialistTokenReward;
+	},
+	gameTime: {
+		gameType: GameTimeType;
+		speed: GameTimeSpeed;
+		startDelay: GameTimeStartDelay;
+		turnJumps: number;
+		maxTurnWait: GameTimeMaxTurnWait;
+		afk: {
+			lastSeenTimeout: number;
+			cycleTimeout: number;
+			turnTimeout: number;
 		}
-    },
+	}
+};
+
+export interface GameUserNotification {
+	unreadConversations: number | null;
+	unreadEvents: number | null;
+	unread: number | null;
+	turnWaiting: boolean | null;
+	defeated: boolean | null;
+	afk: boolean | null;
+};
+
+export interface Game {
+    _id: DBObjectId;
+    settings: GameSettings,
     galaxy: {
         players: Player[]
 		stars: Star[],
@@ -186,8 +199,9 @@ export interface Game {
 		stars: number;
 		starsForVictory: number;
 		players: number;
-		winner: ObjectId | null;
+		winner: DBObjectId | null;
 		cleaned: boolean;
+		afkSlots?: number;
 	},
 	constants: {
 		distances: {
@@ -195,7 +209,7 @@ export interface Game {
 			minDistanceBetweenStars: number;
 			maxDistanceBetweenStars: number;
 			warpSpeedMultiplier: number;
-			galaxyCenterLocation: Location
+			galaxyCenterLocation?: Location
 		},
 		research: {
 			progressMultiplier: number;
@@ -227,6 +241,9 @@ export interface Game {
 			}
 		}
 	},
-	quitters: ObjectId[],
-	afkers: ObjectId[]
+	quitters: DBObjectId[],
+	afkers: DBObjectId[],
+	userNotifications?: GameUserNotification;
+
+	save(): Promise<Game>;
 };

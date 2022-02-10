@@ -1,14 +1,26 @@
+import { DBObjectId } from '../types/DBObjectId';
 import ValidationError from '../errors/validation';
+import DatabaseRepository from '../models/DatabaseRepository';
+import { Game } from '../types/Game';
+import { Report, ReportReasons } from '../types/Report';
+import PlayerService from './player';
 
 export default class ReportService {
+    reportModel: any;
+    reportRepo: DatabaseRepository<Report>;
+    playerService: PlayerService;
 
-    constructor(reportModel, reportRepo, playerService) {
+    constructor(
+        reportModel: any,
+        reportRepo: DatabaseRepository<Report>,
+        playerService: PlayerService
+    ) {
         this.reportRepo = reportRepo;
         this.reportModel = reportModel;
         this.playerService = playerService;
     }
 
-    async reportPlayer(game, playerId, reportedByUserId, reasons) {
+    async reportPlayer(game: Game, playerId: DBObjectId, reportedByUserId: DBObjectId, reasons: ReportReasons) {
         let reportedPlayer = this.playerService.getById(game, playerId);
         let reportedByPlayer = this.playerService.getByUserId(game, reportedByUserId);
 
@@ -47,7 +59,7 @@ export default class ReportService {
         });
     }
 
-    async actionReport(reportId) {
+    async actionReport(reportId: DBObjectId) {
         return await this.reportRepo.updateOne({
             _id: reportId
         }, {

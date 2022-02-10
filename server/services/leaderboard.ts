@@ -1,6 +1,6 @@
 import DatabaseRepository from "../models/DatabaseRepository";
 import { Game } from "../types/Game";
-import { Leaderboard, LeaderboardPlayer } from "../types/Leaderboard";
+import { Leaderboard, LeaderboardPlayer, LeaderboardUser } from "../types/Leaderboard";
 import { Player } from "../types/Player";
 import { EloRatingChangeResult, GameRankingResult } from "../types/Rating";
 import { User } from "../types/User";
@@ -527,7 +527,7 @@ export default class LeaderboardService {
         this.badgeService = badgeService;
     }
 
-    async getLeaderboard(limit: number, sortingKey: string, skip: number = 0) {
+    async getLeaderboard(limit: number | null, sortingKey: string, skip: number = 0) {
         const sorter = LeaderboardService.GLOBALSORTERS[sortingKey] || LeaderboardService.GLOBALSORTERS['rank'];
 
         let leaderboard = await this.userRepo
@@ -542,12 +542,19 @@ export default class LeaderboardService {
         let userIds = leaderboard.map(x => x._id);
         let guildUsers = await this.guildUserService.listUsersWithGuildTags(userIds);
 
+        let guildUserPositions: LeaderboardUser[] = [];
+
         for (let i = 0; i < leaderboard.length; i++) {
             let user = leaderboard[i];
 
-            user.position = i + 1;
+            let position = i + 1;
+            let guild = guildUsers.find(x => x._id.equals(user._id))?.guild || null;
 
-            user.guild = guildUsers.find(x => x._id.equals(user._id)).guild;
+            guildUserPositions.push({
+                ...user,
+                position,
+                guild
+            });
         }
 
         let totalPlayers = await this.userRepo.countAll();
@@ -562,18 +569,21 @@ export default class LeaderboardService {
     getLeaderboardRankings(game: Game, sortingKey?: string): Leaderboard {
         let SORTERS = LeaderboardService.LOCALSORTERS;
 
-        let kingOfTheHillPlayer = null;
+        let kingOfTheHillPlayer: Player | null = null;
 
         if (this.gameTypeService.isKingOfTheHillMode(game)) {
             kingOfTheHillPlayer = this.playerService.getKingOfTheHillPlayer(game);
         }
 
         let playerStats = game.galaxy.players.map(p => {
-            p.isKingOfTheHill = kingOfTheHillPlayer != null && p._id.equals(kingOfTheHillPlayer._id);
+            let isKingOfTheHill = kingOfTheHillPlayer != null && p._id.equals(kingOfTheHillPlayer._id);
+            let stats = this.playerService.getStats(game, p);
 
             return {
                 player: p,
-                stats: p.stats ? p.stats : this.playerService.getStats(game, p) //This makes sure that when the function is called with a hidden galaxy (what a player sees) it will use the already generated stats.
+                isKingOfTheHill,
+                // stats: p.stats ? p.stats : this.playerService.getStats(game, p) //This makes sure that when the function is called with a hidden galaxy (what a player sees) it will use the already generated stats.
+                stats
             };
         });
 

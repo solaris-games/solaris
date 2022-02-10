@@ -1,14 +1,14 @@
-import { ObjectId } from "mongoose";
+import { DBObjectId } from "../types/DBObjectId";
 import DatabaseRepository from "../models/DatabaseRepository";
 import { BulkUpgradeReport } from "../types/InfrastructureUpgrade";
 import { Carrier } from "../types/Carrier";
-import { CombatResult } from "../types/Combat";
+import { CombatCarrier, CombatResult, CombatStar } from "../types/Combat";
 import { Conversation } from "../types/Conversation";
 import { Game } from "../types/Game";
 import { Player } from "../types/Player";
 import { GameRankingResult } from "../types/Rating";
 import { Specialist } from "../types/Specialist";
-import { Star } from "../types/Star";
+import { Star, StarCaptureResult } from "../types/Star";
 import BadgeService from "./badge";
 import BroadcastService from "./broadcast";
 import CarrierService from "./carrier";
@@ -22,6 +22,7 @@ import SpecialistService from "./specialist";
 import StarService from "./star";
 import StarUpgradeService from "./starUpgrade";
 import TradeService from "./trade";
+import { GameEvent } from "../types/GameEvent";
 
 const moment = require('moment');
 
@@ -63,7 +64,7 @@ export default class EventService {
     }
     
     eventModel: any;
-    eventRepo: DatabaseRepository<Event>;
+    eventRepo: DatabaseRepository<GameEvent>;
     broadcastService: BroadcastService;
     gameService: GameService;
     gameTickService: GameTickService;
@@ -80,7 +81,7 @@ export default class EventService {
 
     constructor(
         eventModel: any,
-        eventRepo: DatabaseRepository<Event>,
+        eventRepo: DatabaseRepository<GameEvent>,
         broadcastService: BroadcastService,
         gameService: GameService,
         gameTickService: GameTickService,
@@ -161,13 +162,13 @@ export default class EventService {
         this.badgeService.on('onGamePlayerBadgePurchased', (args) => this.createGamePlayerBadgePurchased(args.gameId, args.gameTick, args.purchasedByPlayerId, args.purchasedByPlayerAlias, args.purchasedForPlayerId, args.purchasedForPlayerAlias, args.badgeKey, args.badgeName));
     }
 
-    async deleteByGameId(gameId: ObjectId) {
+    async deleteByGameId(gameId: DBObjectId) {
         await this.eventRepo.deleteMany({
             gameId
         });
     }
 
-    async createGameEvent(gameId: ObjectId, gameTick: number, type: string, data: any) {
+    async createGameEvent(gameId: DBObjectId, gameTick: number, type: string, data: any) {
         let event = new this.eventModel({
             gameId,
             playerId: null,
@@ -180,7 +181,7 @@ export default class EventService {
         await event.save();
     }
 
-    async createPlayerEvent(gameId: ObjectId, gameTick: number, playerId: ObjectId, type: string, data: any, isRead: boolean = false) {
+    async createPlayerEvent(gameId: DBObjectId, gameTick: number, playerId: DBObjectId, type: string, data: any, isRead: boolean = false) {
         let event = new this.eventModel({
             gameId,
             playerId,
@@ -193,7 +194,7 @@ export default class EventService {
         await event.save();
     }
 
-    async getPlayerEvents(gameId: ObjectId, player: Player, startTick: number = 0) {
+    async getPlayerEvents(gameId: DBObjectId, player: Player, startTick: number = 0) {
         let events = await this.eventRepo.find({
             gameId: gameId,
             tick: { $gte: startTick },
@@ -213,8 +214,8 @@ export default class EventService {
         return events;
     }
 
-    async getPlayerTradeEvents(gameId: ObjectId, gameTick: number, player: Player, startTick: number = 0) {
-        let tradeEvents = await this.eventRepo.find({
+    async getPlayerTradeEvents(gameId: DBObjectId, player: Player, startTick: number = 0) {
+        let tradeEvents: GameEvent[] = await this.eventRepo.find({
             gameId: gameId,
             tick: { $gte: startTick },
             playerId: {
@@ -253,7 +254,7 @@ export default class EventService {
         return tradeEvents;
     }
 
-    async markAllEventsAsRead(game: Game, playerId: ObjectId) {
+    async markAllEventsAsRead(game: Game, playerId: DBObjectId) {
         await this.eventRepo.updateMany({
             gameId: game._id,
             playerId: playerId,
@@ -267,7 +268,7 @@ export default class EventService {
         this.broadcastService.playerAllEventsRead(game, playerId);
     }
 
-    async markEventAsRead(game: Game, playerId: ObjectId, eventId: ObjectId) {
+    async markEventAsRead(game: Game, playerId: DBObjectId, eventId: DBObjectId) {
         await this.eventRepo.updateOne({
             _id: eventId,
             gameId: game._id,
@@ -282,7 +283,7 @@ export default class EventService {
         this.broadcastService.playerEventRead(game, playerId, eventId);
     }
 
-    async getUnreadCount(game: Game, playerId: ObjectId) {
+    async getUnreadCount(game: Game, playerId: DBObjectId) {
         return await this.eventRepo.count({
             gameId: game._id,
             playerId: playerId,
@@ -292,7 +293,7 @@ export default class EventService {
 
     /* GLOBAL EVENTS */
 
-    async createPlayerJoinedEvent(gameId: ObjectId, gameTick: number, player: Player) {
+    async createPlayerJoinedEvent(gameId: DBObjectId, gameTick: number, player: Player) {
         let data = {
             playerId: player._id,
             alias: player.alias
@@ -301,7 +302,7 @@ export default class EventService {
         return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_PLAYER_JOINED, data);
     }
 
-    async createPlayerQuitEvent(gameId: ObjectId, gameTick: number, player: Player, alias: string) {
+    async createPlayerQuitEvent(gameId: DBObjectId, gameTick: number, player: Player, alias: string) {
         let data = {
             playerId: player._id,
             alias
@@ -310,7 +311,7 @@ export default class EventService {
         return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_PLAYER_QUIT, data);
     }
 
-    async createPlayerDefeatedEvent(gameId: ObjectId, gameTick: number, player: Player) {
+    async createPlayerDefeatedEvent(gameId: DBObjectId, gameTick: number, player: Player) {
         let data = {
             playerId: player._id,
             alias: player.alias
@@ -319,7 +320,7 @@ export default class EventService {
         return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_PLAYER_DEFEATED, data);
     }
 
-    async createPlayerAfkEvent(gameId: ObjectId, gameTick: number, player: Player) {
+    async createPlayerAfkEvent(gameId: DBObjectId, gameTick: number, player: Player) {
         let data = {
             playerId: player._id,
             alias: player.alias
@@ -328,13 +329,13 @@ export default class EventService {
         return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_PLAYER_AFK, data);
     }
 
-    async createGameStartedEvent(gameId: ObjectId, gameTick: number) {
+    async createGameStartedEvent(gameId: DBObjectId, gameTick: number) {
         let data = {};
 
         return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_STARTED, data);
     }
 
-    async createGameEndedEvent(gameId: ObjectId, gameTick: number, rankingResult: GameRankingResult) {
+    async createGameEndedEvent(gameId: DBObjectId, gameTick: number, rankingResult: GameRankingResult) {
         let data = {
             rankingResult
         };
@@ -342,7 +343,7 @@ export default class EventService {
         return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_ENDED, data);
     }
 
-    async createGamePausedEvent(gameId: ObjectId, gameTick: number) {
+    async createGamePausedEvent(gameId: DBObjectId, gameTick: number) {
         let data = {};
 
         return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_PAUSED, data);
@@ -350,7 +351,7 @@ export default class EventService {
 
     /* PLAYER EVENTS */
 
-    async createPlayerGalacticCycleCompleteEvent(gameId: ObjectId, gameTick: number, player: Player, 
+    async createPlayerGalacticCycleCompleteEvent(gameId: DBObjectId, gameTick: number, player: Player, 
         creditsEconomy: number, creditsBanking: number, creditsSpecialists: number, experimentTechnology: string, experimentAmount: number, experimentLevelUp: boolean, experimentResearchingNext: string, carrierUpkeep: number) {
         let data = {
             creditsEconomy,
@@ -366,7 +367,7 @@ export default class EventService {
         return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_GALACTIC_CYCLE_COMPLETE, data);
     }
 
-    async createPlayerCombatStarEvent(gameId: ObjectId, gameTick: number, owner: Player, defenders: Player[], attackers: Player[], star: Star, combatResult: CombatResult, captureResult: CaptureResult) {
+    async createPlayerCombatStarEvent(gameId: DBObjectId, gameTick: number, owner: Player, defenders: Player[], attackers: Player[], star: Star, combatResult: CombatResult, captureResult: StarCaptureResult) {
         let data = {
             playerIdOwner: owner._id,
             playerIdDefenders: defenders.map(p => p._id),
@@ -377,10 +378,10 @@ export default class EventService {
         };
 
         for (let defender of defenders) {
-            let defenderCombatResult = Object.assign({}, combatResult);
+            let defenderCombatResult: CombatResult = Object.assign({}, combatResult);
 
-            defenderCombatResult.star = this.tryMaskObjectShips(combatResult.star, defender);
-            defenderCombatResult.carriers = combatResult.carriers.map(c => this.tryMaskObjectShips(c, defender));
+            defenderCombatResult.star = this.tryMaskObjectShips(combatResult.star, defender) as CombatStar;
+            defenderCombatResult.carriers = combatResult.carriers.map(c => this.tryMaskObjectShips(c, defender)) as CombatCarrier[];
 
             await this.createPlayerEvent(gameId, gameTick, defender._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, { ...data, combatResult: defenderCombatResult });
         }
@@ -388,14 +389,14 @@ export default class EventService {
         for (let attacker of attackers) {
             let attackerCombatResult = Object.assign({}, combatResult);
 
-            attackerCombatResult.star = this.tryMaskObjectShips(combatResult.star, attacker);
-            attackerCombatResult.carriers = combatResult.carriers.map(c => this.tryMaskObjectShips(c, attacker));
+            attackerCombatResult.star = this.tryMaskObjectShips(combatResult.star, attacker) as CombatStar;
+            attackerCombatResult.carriers = combatResult.carriers.map(c => this.tryMaskObjectShips(c, attacker)) as CombatCarrier[];
 
             await this.createPlayerEvent(gameId, gameTick, attacker._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, { ...data, combatResult: attackerCombatResult });
         }
     }
 
-    async createPlayerCombatCarrierEvent(gameId: ObjectId, gameTick: number, defenders: Player[], attackers: Player[], combatResult: CombatResult) {
+    async createPlayerCombatCarrierEvent(gameId: DBObjectId, gameTick: number, defenders: Player[], attackers: Player[], combatResult: CombatResult) {
         let data = {
             playerIdDefenders: defenders.map(p => p._id),
             playerIdAttackers: attackers.map(p => p._id),
@@ -405,7 +406,7 @@ export default class EventService {
         for (let defender of defenders) {
             let defenderCombatResult = Object.assign({}, combatResult);
 
-            defenderCombatResult.carriers = combatResult.carriers.map(c => this.tryMaskObjectShips(c, defender));
+            defenderCombatResult.carriers = combatResult.carriers.map(c => this.tryMaskObjectShips(c, defender)) as CombatCarrier[];
 
             await this.createPlayerEvent(gameId, gameTick, defender._id, this.EVENT_TYPES.PLAYER_COMBAT_CARRIER, { ...data, combatResult: defenderCombatResult });
         }
@@ -413,17 +414,21 @@ export default class EventService {
         for (let attacker of attackers) {
             let attackerCombatResult = Object.assign({}, combatResult);
 
-            attackerCombatResult.carriers = combatResult.carriers.map(c => this.tryMaskObjectShips(c, attacker));
+            attackerCombatResult.carriers = combatResult.carriers.map(c => this.tryMaskObjectShips(c, attacker)) as CombatCarrier[];
 
             await this.createPlayerEvent(gameId, gameTick, attacker._id, this.EVENT_TYPES.PLAYER_COMBAT_CARRIER, { ...data, combatResult: attackerCombatResult });
         }
     }
 
-    tryMaskObjectShips(carrierOrStar: Star | Carrier, player: Player) {
+    tryMaskObjectShips(carrierOrStar: CombatStar | CombatCarrier | null, player: Player) {
+        if (!carrierOrStar) {
+            return carrierOrStar;
+        }
+
         // If the player doesn't own the object and the object is a scrambler then we need
         // to mask the before and lost amounts.
         if (!player._id.equals(carrierOrStar.ownedByPlayerId) && this.specialistService.getCarrierOrStarHideShips(carrierOrStar)) {
-            let clone = Object.assign({}, carrierOrStar);
+            let clone: CombatStar | CombatCarrier = Object.assign({}, carrierOrStar);
 
             clone.before = '???';
             clone.lost = '???';
@@ -440,7 +445,7 @@ export default class EventService {
         return carrierOrStar;
     }
 
-    async createResearchCompleteEvent(gameId: ObjectId, gameTick: number, playerId: ObjectId, technologyKey: string, technologyLevel: number, technologyKeyNext: string, technologyLevelNext: number) {
+    async createResearchCompleteEvent(gameId: DBObjectId, gameTick: number, playerId: DBObjectId, technologyKey: string, technologyLevel: number, technologyKeyNext: string, technologyLevelNext: number) {
         let data = {
             technologyKey,
             technologyLevel,
@@ -451,7 +456,7 @@ export default class EventService {
         return await this.createPlayerEvent(gameId, gameTick, playerId, this.EVENT_TYPES.PLAYER_RESEARCH_COMPLETE, data);
     }
 
-    async createTechnologyReceivedEvent(gameId: ObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, technology: string) {
+    async createTechnologyReceivedEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, technology: string) {
         let data = {
             fromPlayerId: fromPlayer._id,
             technology
@@ -460,7 +465,7 @@ export default class EventService {
         return await this.createPlayerEvent(gameId, gameTick, toPlayer._id, this.EVENT_TYPES.PLAYER_TECHNOLOGY_RECEIVED, data);
     }
 
-    async createTechnologySentEvent(gameId: ObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, technology: string) {
+    async createTechnologySentEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, technology: string) {
         let data = {
             toPlayerId: toPlayer._id,
             technology
@@ -469,7 +474,7 @@ export default class EventService {
         return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, this.EVENT_TYPES.PLAYER_TECHNOLOGY_SENT, data, true);
     }
 
-    async createCreditsReceivedEvent(gameId: ObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, credits: number) {
+    async createCreditsReceivedEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, credits: number) {
         let data = {
             fromPlayerId: fromPlayer._id,
             credits
@@ -478,7 +483,7 @@ export default class EventService {
         return await this.createPlayerEvent(gameId, gameTick, toPlayer._id, this.EVENT_TYPES.PLAYER_CREDITS_RECEIVED, data);
     }
 
-    async createCreditsSentEvent(gameId: ObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, credits: number) {
+    async createCreditsSentEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, credits: number) {
         let data = {
             toPlayerId: toPlayer._id,
             credits
@@ -487,7 +492,7 @@ export default class EventService {
         return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, this.EVENT_TYPES.PLAYER_CREDITS_SENT, data, true);
     }
 
-    async createCreditsSpecialistsReceivedEvent(gameId: ObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, creditsSpecialists: number) {
+    async createCreditsSpecialistsReceivedEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, creditsSpecialists: number) {
         let data = {
             fromPlayerId: fromPlayer._id,
             creditsSpecialists
@@ -496,7 +501,7 @@ export default class EventService {
         return await this.createPlayerEvent(gameId, gameTick, toPlayer._id, this.EVENT_TYPES.PLAYER_CREDITS_SPECIALISTS_RECEIVED, data);
     }
 
-    async createCreditsSpecialistsSentEvent(gameId: ObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, creditsSpecialists: number) {
+    async createCreditsSpecialistsSentEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, creditsSpecialists: number) {
         let data = {
             toPlayerId: toPlayer._id,
             creditsSpecialists
@@ -505,7 +510,7 @@ export default class EventService {
         return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, this.EVENT_TYPES.PLAYER_CREDITS_SPECIALISTS_SENT, data, true);
     }
 
-    async createRenownReceivedEvent(gameId: ObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, renown: number) {
+    async createRenownReceivedEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, renown: number) {
         let data = {
             fromPlayerId: fromPlayer._id,
             renown
@@ -514,7 +519,7 @@ export default class EventService {
         return await this.createPlayerEvent(gameId, gameTick, toPlayer._id, this.EVENT_TYPES.PLAYER_RENOWN_RECEIVED, data);
     }
 
-    async createRenownSentEvent(gameId: ObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, renown: number) {
+    async createRenownSentEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, renown: number) {
         let data = {
             toPlayerId: toPlayer._id,
             renown
@@ -523,7 +528,7 @@ export default class EventService {
         return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, this.EVENT_TYPES.PLAYER_RENOWN_SENT, data, true);
     }
 
-    async createGiftReceivedEvent(gameId: ObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, carrier: Carrier, star: Star) {
+    async createGiftReceivedEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, carrier: Carrier, star: Star) {
         let data = {
             fromPlayerId: fromPlayer._id,
             carrierId: carrier._id,
@@ -536,7 +541,7 @@ export default class EventService {
         return await this.createPlayerEvent(gameId, gameTick, toPlayer._id, this.EVENT_TYPES.PLAYER_GIFT_RECEIVED, data);
     }
 
-    async createGiftSentEvent(gameId: ObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, carrier: Carrier, star: Star) {
+    async createGiftSentEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, carrier: Carrier, star: Star) {
         let data = {
             toPlayerId: toPlayer._id,
             carrierId: carrier._id,
@@ -549,7 +554,7 @@ export default class EventService {
         return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, this.EVENT_TYPES.PLAYER_GIFT_SENT, data, true);
     }
 
-    async createStarAbandonedEvent(gameId: ObjectId, gameTick: number, player: Player, star: Star) {
+    async createStarAbandonedEvent(gameId: DBObjectId, gameTick: number, player: Player, star: Star) {
         let data = {
             starId: star._id,
             starName: star.name
@@ -558,7 +563,7 @@ export default class EventService {
         return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_STAR_ABANDONED, data, true);
     }
 
-    async createInfrastructureBulkUpgraded(gameId: ObjectId, gameTick: number, player: Player, upgradeReport: BulkUpgradeReport) {
+    async createInfrastructureBulkUpgraded(gameId: DBObjectId, gameTick: number, player: Player, upgradeReport: BulkUpgradeReport) {
         let data = {
             upgradeReport
         };
@@ -566,14 +571,14 @@ export default class EventService {
         return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_BULK_INFRASTRUCTURE_UPGRADED, data, true);
     }
 
-    async createDebtAddedEvent(gameId: ObjectId, gameTick: number, debtorPlayerId: ObjectId, creditorPlayerId: ObjectId, amount: number) {
+    async createDebtAddedEvent(gameId: DBObjectId, gameTick: number, debtorPlayerId: DBObjectId, creditorPlayerId: DBObjectId, amount: number) {
         // Debt added event is superfluous as we already have other events for when trades occur.
         // Just broadcast the event instead.
 
         this.broadcastService.gamePlayerDebtAdded(debtorPlayerId, creditorPlayerId, amount);
     }
 
-    async createDebtSettledEvent(gameId: ObjectId, gameTick: number, debtorPlayerId: ObjectId, creditorPlayerId: ObjectId, amount: number) {
+    async createDebtSettledEvent(gameId: DBObjectId, gameTick: number, debtorPlayerId: DBObjectId, creditorPlayerId: DBObjectId, amount: number) {
         let data = {
             debtorPlayerId,
             creditorPlayerId,
@@ -586,7 +591,7 @@ export default class EventService {
         this.broadcastService.gamePlayerDebtSettled(debtorPlayerId, creditorPlayerId, amount);
     }
 
-    async createDebtForgivenEvent(gameId: ObjectId, gameTick: number, debtorPlayerId: ObjectId, creditorPlayerId: ObjectId, amount: number) {
+    async createDebtForgivenEvent(gameId: DBObjectId, gameTick: number, debtorPlayerId: DBObjectId, creditorPlayerId: DBObjectId, amount: number) {
         let data = {
             debtorPlayerId,
             creditorPlayerId,
@@ -599,7 +604,7 @@ export default class EventService {
         this.broadcastService.gamePlayerDebtForgiven(debtorPlayerId, creditorPlayerId, amount);
     }
 
-    async createPlayerStarSpecialistHired(gameId: ObjectId, gameTick: number, player: Player, star: Star, specialist: Specialist) {
+    async createPlayerStarSpecialistHired(gameId: DBObjectId, gameTick: number, player: Player, star: Star, specialist: Specialist) {
         let data = {
             starId: star._id,
             starName: star.name,
@@ -612,7 +617,7 @@ export default class EventService {
         await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_STAR_SPECIALIST_HIRED, data, true);
     }
 
-    async createPlayerCarrierSpecialistHired(gameId: ObjectId, gameTick: number, player: Player, carrier: Carrier, specialist: Specialist) {
+    async createPlayerCarrierSpecialistHired(gameId: DBObjectId, gameTick: number, player: Player, carrier: Carrier, specialist: Specialist) {
         let data = {
             carrierId: carrier._id,
             carrierName: carrier.name, // Carriers may be destroyed so we need to keep track of the name separately
@@ -625,7 +630,7 @@ export default class EventService {
         await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_CARRIER_SPECIALIST_HIRED, data, true);
     }
 
-    async createPlayerConversationCreated(gameId: ObjectId, gameTick: number, convo: Conversation) {
+    async createPlayerConversationCreated(gameId: DBObjectId, gameTick: number, convo: Conversation) {
         let data = {
             conversationId: convo._id,
             createdBy: convo.createdBy,
@@ -633,10 +638,10 @@ export default class EventService {
             participants: convo.participants
         };
 
-        await this.createPlayerEvent(gameId, gameTick, convo.createdBy, this.EVENT_TYPES.PLAYER_CONVERSATION_CREATED, data, true);
+        await this.createPlayerEvent(gameId, gameTick, convo.createdBy!, this.EVENT_TYPES.PLAYER_CONVERSATION_CREATED, data, true);
     }
 
-    async createPlayerConversationInvited(gameId: ObjectId, gameTick: number, convo: Conversation, playerId: ObjectId) {
+    async createPlayerConversationInvited(gameId: DBObjectId, gameTick: number, convo: Conversation, playerId: DBObjectId) {
         let data = {
             conversationId: convo._id,
             name: convo.name,
@@ -646,7 +651,7 @@ export default class EventService {
         await this.createPlayerEvent(gameId, gameTick, playerId, this.EVENT_TYPES.PLAYER_CONVERSATION_INVITED, data);
     }
 
-    async createPlayerConversationLeft(gameId: ObjectId, gameTick: number, convo: Conversation, playerId: ObjectId) {
+    async createPlayerConversationLeft(gameId: DBObjectId, gameTick: number, convo: Conversation, playerId: DBObjectId) {
         let data = {
             conversationId: convo._id,
             name: convo.name,
@@ -656,7 +661,7 @@ export default class EventService {
         await this.createPlayerEvent(gameId, gameTick, playerId, this.EVENT_TYPES.PLAYER_CONVERSATION_LEFT, data, true);
     }
 
-    async createGamePlayerBadgePurchased(gameId: ObjectId, gameTick: number, purchasedByPlayerId: ObjectId, purchasedByPlayerAlias: string, purchasedForPlayerId: ObjectId, purchasedForPlayerAlias: string, badgeKey: string, badgeName: string) {
+    async createGamePlayerBadgePurchased(gameId: DBObjectId, gameTick: number, purchasedByPlayerId: DBObjectId, purchasedByPlayerAlias: string, purchasedForPlayerId: DBObjectId, purchasedForPlayerAlias: string, badgeKey: string, badgeName: string) {
         let data = {
             purchasedByPlayerId,
             purchasedByPlayerAlias,

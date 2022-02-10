@@ -1,8 +1,35 @@
+import { DBObjectId } from "../types/DBObjectId";
+import DatabaseRepository from "../models/DatabaseRepository";
+import { Game } from "../types/Game";
+import { Player } from "../types/Player";
+import { Specialist } from "../types/Specialist";
+import AchievementService from "./achievement";
+import GameTypeService from "./gameType";
+import PlayerService from "./player";
+import SpecialistService from "./specialist";
+import StarService from "./star";
+import WaypointService from "./waypoint";
+
 const ValidationError = require("../errors/validation");
 
 export default class SpecialistHireService {
+    gameRepo: DatabaseRepository<Game>;
+    specialistService: SpecialistService;
+    achievementService: AchievementService;
+    waypointService: WaypointService;
+    playerService: PlayerService;
+    starService: StarService;
+    gameTypeService: GameTypeService;
 
-    constructor(gameRepo, specialistService, achievementService, waypointService, playerService, starService, gameTypeService) {
+    constructor(
+        gameRepo: DatabaseRepository<Game>,
+        specialistService: SpecialistService,
+        achievementService: AchievementService,
+        waypointService: WaypointService,
+        playerService: PlayerService,
+        starService: StarService,
+        gameTypeService: GameTypeService
+    ) {
         this.gameRepo = gameRepo;
         this.specialistService = specialistService;
         this.achievementService = achievementService;
@@ -12,7 +39,7 @@ export default class SpecialistHireService {
         this.gameTypeService = gameTypeService;
     }
 
-    async hireCarrierSpecialist(game, player, carrierId, specialistId) {
+    async hireCarrierSpecialist(game: Game, player: Player, carrierId: DBObjectId, specialistId: number) {
         if (game.settings.specialGalaxy.specialistCost === 'none') {
             throw new ValidationError('The game settings has disabled the hiring of specialists.');
         }
@@ -80,7 +107,7 @@ export default class SpecialistHireService {
             }
         ]);
 
-        if (!player.defeated && !this.gameTypeService.isTutorialGame(game)) {
+        if (player.userId && !player.defeated && !this.gameTypeService.isTutorialGame(game)) {
             await this.achievementService.incrementSpecialistsHired(player.userId);
         }
 
@@ -99,7 +126,7 @@ export default class SpecialistHireService {
         return result;
     }
 
-    async hireStarSpecialist(game, player, starId, specialistId) {
+    async hireStarSpecialist(game: Game, player: Player, starId: DBObjectId, specialistId: number) {
         if (game.settings.specialGalaxy.specialistCost === 'none') {
             throw new ValidationError('The game settings has disabled the hiring of specialists.');
         }
@@ -161,7 +188,7 @@ export default class SpecialistHireService {
             }
         ]);
 
-        if (!player.defeated && !this.gameTypeService.isTutorialGame(game)) {
+        if (player.userId && !player.defeated && !this.gameTypeService.isTutorialGame(game)) {
             await this.achievementService.incrementSpecialistsHired(player.userId);
         }
 
@@ -176,7 +203,7 @@ export default class SpecialistHireService {
         };
     }
 
-    _canAffordSpecialist(game, player, specialist) {
+    _canAffordSpecialist(game: Game, player: Player, specialist: Specialist) {
         let cost = this.specialistService.getSpecialistActualCost(game, specialist);
 
         switch (game.settings.specialGalaxy.specialistsCurrency) {
@@ -189,15 +216,15 @@ export default class SpecialistHireService {
         }
     }
 
-    _isStarSpecialistBanned(game, specialistId) {
+    _isStarSpecialistBanned(game: Game, specialistId: number) {
         return game.settings.specialGalaxy.specialistBans.star.indexOf(specialistId) > -1;
     }
 
-    _isCarrierSpecialistBanned(game, specialistId) {
+    _isCarrierSpecialistBanned(game: Game, specialistId: number) {
         return game.settings.specialGalaxy.specialistBans.carrier.indexOf(specialistId) > -1;
     }
 
-    async _deductSpecialistCost(game, player, specialist) {
+    async _deductSpecialistCost(game: Game, player: Player, specialist: Specialist) {
         let cost = this.specialistService.getSpecialistActualCost(game, specialist);
 
         switch (game.settings.specialGalaxy.specialistsCurrency) {

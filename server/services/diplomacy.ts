@@ -1,8 +1,8 @@
-import { ObjectId } from "mongoose";
+import { DBObjectId } from "../types/DBObjectId";
 import DatabaseRepository from "../models/DatabaseRepository";
 import { DiplomaticState, DiplomaticStatus } from "../types/Diplomacy";
 import { Game } from "../types/Game";
-import { Player } from "../types/Player";
+import { Player, PlayerDiplomacy } from "../types/Player";
 
 export default class DiplomacyService {
     gameRepo: DatabaseRepository<Game>;
@@ -13,11 +13,11 @@ export default class DiplomacyService {
         this.gameRepo = gameRepo;
     }
 
-    isFormalAlliancesEnabled(game: Game) {
+    isFormalAlliancesEnabled(game: Game): boolean {
         return game.settings.player.alliances === 'enabled';
     }
 
-    getDiplomaticStatusBetweenPlayers(game: Game, playerIds: ObjectId[]) {
+    getDiplomaticStatusBetweenPlayers(game: Game, playerIds: DBObjectId[]): DiplomaticState {
         for (let i = 0; i < playerIds.length; i++) {
             for (let ii = 0; ii < playerIds.length; ii++) {
                 if (i === ii) {
@@ -38,7 +38,7 @@ export default class DiplomacyService {
         return 'allies';
     }
 
-    getDiplomaticStatusToPlayer(game: Game, playerIdA: ObjectId, playerIdB: ObjectId): DiplomaticStatus {
+    getDiplomaticStatusToPlayer(game: Game, playerIdA: DBObjectId, playerIdB: DBObjectId): DiplomaticStatus {
         if (playerIdA.toString() === playerIdB.toString()) return {
             playerIdFrom: playerIdA,
             playerIdTo: playerIdB,
@@ -47,8 +47,8 @@ export default class DiplomacyService {
             actualStatus: 'allies'
         }
 
-        let playerA: Player = game.galaxy.players.find(p => p._id.toString() === playerIdA.toString());
-        let playerB: Player = game.galaxy.players.find(p => p._id.toString() === playerIdB.toString());
+        let playerA: Player = game.galaxy.players.find(p => p._id.toString() === playerIdA.toString())!;
+        let playerB: Player = game.galaxy.players.find(p => p._id.toString() === playerIdB.toString())!;
 
         let statusTo: DiplomaticState = playerA.diplomacy.allies.find(x => x.equals(playerB._id)) ? 'allies' : 'enemies';
         let statusFrom: DiplomaticState = playerB.diplomacy.allies.find(x => x.equals(playerA._id)) ? 'allies' : 'enemies';
@@ -98,11 +98,11 @@ export default class DiplomacyService {
         return allies;
     }
 
-    isDiplomaticStatusBetweenPlayersAllied(game: Game, playerIds: ObjectId[]): boolean {
+    isDiplomaticStatusBetweenPlayersAllied(game: Game, playerIds: DBObjectId[]): boolean {
         return this.getDiplomaticStatusBetweenPlayers(game, playerIds) === 'allies';
     }
 
-    isDiplomaticStatusToPlayersAllied(game: Game, playerId: ObjectId, toPlayerIds: ObjectId[]): boolean {
+    isDiplomaticStatusToPlayersAllied(game: Game, playerId: DBObjectId, toPlayerIds: DBObjectId[]): boolean {
         let playerIdA = playerId;
 
         for (let i = 0; i < toPlayerIds.length; i++) {
@@ -118,13 +118,13 @@ export default class DiplomacyService {
         return true;
     }
 
-    getFilteredDiplomacy(player: Player, forPlayer: Player) {
+    getFilteredDiplomacy(player: Player, forPlayer: Player): PlayerDiplomacy {
         return {
             allies: player.diplomacy.allies.filter(a => a.equals(forPlayer._id))
         }
     }
 
-    async declareAlly(game: Game, playerId: ObjectId, playerIdTarget: ObjectId) {
+    async declareAlly(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId) {
         await this.gameRepo.updateOne({
             _id: game._id,
             'galaxy.players._id': playerId
@@ -135,7 +135,7 @@ export default class DiplomacyService {
         });
 
         // Need to do this so we can calculate the new diplomatic status.
-        let player: Player = game.galaxy.players.find(p => p._id.equals(playerId));
+        let player: Player = game.galaxy.players.find(p => p._id.equals(playerId))!;
 
         if (player.diplomacy.allies.indexOf(playerIdTarget) === -1) {
             player.diplomacy.allies.push(playerIdTarget);
@@ -146,7 +146,7 @@ export default class DiplomacyService {
         return diplomaticStatus;
     }
 
-    async declareEnemy(game: Game, playerId: ObjectId, playerIdTarget: ObjectId) {
+    async declareEnemy(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId) {
         // When declaring enemies, we need to ensure that both sides are declared
         // otherwise its possible that players can exploit a player who is not online.
         let dbWrites = [
@@ -183,13 +183,13 @@ export default class DiplomacyService {
         await this.gameRepo.bulkWrite(dbWrites);
 
         // Need to do this so we can calculate the new diplomatic status.
-        let player: Player = game.galaxy.players.find(p => p._id.equals(playerId));
+        let player: Player = game.galaxy.players.find(p => p._id.equals(playerId))!;
 
         if (player.diplomacy.allies.indexOf(playerIdTarget) >= 0) {
             player.diplomacy.allies.splice(player.diplomacy.allies.indexOf(playerIdTarget), 1);
         }
 
-        let targetPlayer: Player = game.galaxy.players.find(p => p._id.equals(playerIdTarget));
+        let targetPlayer: Player = game.galaxy.players.find(p => p._id.equals(playerIdTarget))!;
 
         if (targetPlayer.diplomacy.allies.indexOf(playerId) >= 0) {
             targetPlayer.diplomacy.allies.splice(targetPlayer.diplomacy.allies.indexOf(playerId), 1);

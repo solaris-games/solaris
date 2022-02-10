@@ -13,7 +13,7 @@ export default class DonateService {
         this.cacheService = cacheService;
     }
 
-    async listRecentDonations(amount: number) {
+    async listRecentDonations(amount: number = 3) {
         amount = amount || 3;
 
         let cached = this.cacheService.get(this.CACHE_KEY_RECENT_DONATIONS);

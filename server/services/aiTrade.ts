@@ -1,4 +1,4 @@
-import { ObjectId } from "mongoose";
+import { DBObjectId } from "../types/DBObjectId";
 import { Game } from "../types/Game";
 import { Player, PlayerReputation } from "../types/Player";
 import DiplomacyService from "./diplomacy";
@@ -37,7 +37,7 @@ export default class AITradeService {
         this.reputationService.on('onReputationDecreased', (args) => this.onReputationDecreased(args.gameId, args.player, args.forPlayer));
     }
 
-    async onReputationIncreased(gameId: ObjectId, player: any, forPlayer: any) {
+    async onReputationIncreased(gameId: DBObjectId, player: any, forPlayer: any) {
         // Make sure the player is AI.
         if (!player.defeated) {
             return;
@@ -45,13 +45,13 @@ export default class AITradeService {
 
         let game = await this.gameService.getById(gameId);
 
-        let reputation = this.reputationService.getReputation(player, forPlayer);
+        let rep = this.reputationService.getReputation(player, forPlayer);
 
-        await this._tryTrade(game, player, forPlayer, reputation);
-        await this._tryAlly(game, player, forPlayer, reputation);
+        await this._tryTrade(game, player, forPlayer, rep.reputation);
+        await this._tryAlly(game, player, forPlayer, rep.reputation);
     }
 
-    async onReputationDecreased(gameId: ObjectId, player: Player, forPlayer: Player) {
+    async onReputationDecreased(gameId: DBObjectId, player: Player, forPlayer: Player) {
         // Make sure the player is AI.
         if (!player.defeated) {
             return;
@@ -59,9 +59,9 @@ export default class AITradeService {
 
         let game = await this.gameService.getById(gameId);
 
-        let reputation = this.reputationService.getReputation(player, forPlayer);
+        let rep = this.reputationService.getReputation(player, forPlayer);
 
-        await this._tryEnemy(game, player, forPlayer, reputation);
+        await this._tryEnemy(game, player, forPlayer, rep.reputation);
     }
 
     async _tryTrade(game: Game, player: Player, toPlayer: Player, reputation: PlayerReputation) {

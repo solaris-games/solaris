@@ -1,49 +1,66 @@
+import { DBObjectId } from "../types/DBObjectId";
+import DatabaseRepository from "../models/DatabaseRepository";
+import { Game } from "../types/Game";
+import { Player, PlayerLedger } from "../types/Player";
+import PlayerService from "./player";
+
 const ValidationError = require("../errors/validation");
 const EventEmitter = require('events');
 
 export default class LedgerService extends EventEmitter {
+    gameRepo: DatabaseRepository<Game>;
+    playerService: PlayerService;
 
-    constructor(gameRepo, playerService) {
+    constructor(
+        gameRepo: DatabaseRepository<Game>,
+        playerService: PlayerService
+    ) {
         super();
 
         this.gameRepo = gameRepo;
         this.playerService = playerService;
     }
 
-    getLedger(game, player) {
+    getLedger(player: Player) {
         return player.ledger;
     }
 
-    getLedgerForPlayer(game, player, playerId) {
-        let fullLedger = this.getLedger(game, player);
+    getLedgerForPlayer(player: Player, playerId: DBObjectId) {
+        let fullLedger = this.getLedger(player);
 
         // Get the ledger between the two players.
-        let playerLedger = fullLedger.find(l => l.playerId.equals(playerId));
+        let playerLedger: PlayerLedger = fullLedger.find(l => l.playerId.equals(playerId))!;
+        let isNew: boolean = false;
 
         // If no ledger exists, create one.
         if (!playerLedger) {
             playerLedger = {
                 playerId,
                 debt: 0,
-                isNew: true
             };
 
             player.ledger.push(playerLedger);
+            isNew = true;
         }
 
-        return fullLedger.find(l => l.playerId.equals(playerId));
+        playerLedger = fullLedger.find(l => l.playerId.equals(playerId))!;
+
+        return {
+            ledger: playerLedger,
+            isNew
+        };
     }
 
-    async addDebt(game, creditor, debtor, debt) {
+    async addDebt(game: Game, creditor: Player, debtor: Player, debt: number) {
         // Get both of the ledgers between the two players.
-        let ledgerCreditor = this.getLedgerForPlayer(game, creditor, debtor._id);
-        let ledgerDebtor = this.getLedgerForPlayer(game, debtor, creditor._id);
+        let ledgerCreditor = this.getLedgerForPlayer(creditor, debtor._id);
+        let ledgerDebtor = this.getLedgerForPlayer(debtor, creditor._id);
 
-        ledgerCreditor.debt += debt;   // Player B now has debt to player A
-        ledgerDebtor.debt -= debt;   // Player A has paid off some of the debt to player B
+        ledgerCreditor.ledger.debt += debt;   // Player B now has debt to player A
+        ledgerDebtor.ledger.debt -= debt;   // Player A has paid off some of the debt to player B
 
-        await this._updateLedger(game, creditor, ledgerCreditor);
-        await this._updateLedger(game, debtor, ledgerDebtor);
+        await this._updateLedger(game, creditor, ledgerCreditor.ledger, ledgerCreditor.isNew);
+        await this._updateLedger(game, debtor, ledgerDebtor.ledger, ledgerDebtor.isNew);
         
         this.emit('onDebtAdded', {
             gameId: game._id,
@@ -56,18 +73,18 @@ export default class LedgerService extends EventEmitter {
         return ledgerCreditor;
     }
 
-    async settleDebt(game, debtor, playerBId) {
+    async settleDebt(game: Game, debtor: Player, playerBId: DBObjectId) {
         let creditor = this.playerService.getByObjectId(game, playerBId);
 
         // Get both of the ledgers between the two players.
-        let ledgerDebtor = this.getLedgerForPlayer(game, debtor, playerBId);
-        let ledgerCreditor = this.getLedgerForPlayer(game, creditor, debtor._id);
+        let ledgerDebtor = this.getLedgerForPlayer(debtor, playerBId);
+        let ledgerCreditor = this.getLedgerForPlayer(creditor, debtor._id);
 
-        if (ledgerDebtor.debt > 0) {
+        if (ledgerDebtor.ledger.debt > 0) {
             throw new ValidationError('You do not owe the player anything.');
         }
 
-        let debtAmount = Math.abs(ledgerDebtor.debt);
+        let debtAmount = Math.abs(ledgerDebtor.ledger.debt);
 
         // If the debtor cannot fully settle the debt then only
         // pay what they can (their total credits)
@@ -75,14 +92,14 @@ export default class LedgerService extends EventEmitter {
             debtAmount = debtor.credits;
         }
 
-        ledgerDebtor.debt += debtAmount;
-        ledgerCreditor.debt -= debtAmount;
+        ledgerDebtor.ledger.debt += debtAmount;
+        ledgerCreditor.ledger.debt -= debtAmount;
 
         await this.playerService.addCredits(game, debtor, -debtAmount);
         await this.playerService.addCredits(game, creditor, debtAmount);
 
-        await this._updateLedger(game, debtor, ledgerDebtor);
-        await this._updateLedger(game, creditor, ledgerCreditor);
+        await this._updateLedger(game, debtor, ledgerDebtor.ledger, ledgerDebtor.isNew);
+        await this._updateLedger(game, creditor, ledgerCreditor.ledger, ledgerCreditor.isNew);
 
         this.emit('onDebtSettled', {
             gameId: game._id,
@@ -95,24 +112,24 @@ export default class LedgerService extends EventEmitter {
         return ledgerDebtor;
     }
 
-    async forgiveDebt(game, creditor, playerBId) {
+    async forgiveDebt(game: Game, creditor: Player, playerBId: DBObjectId) {
         let debtor = this.playerService.getByObjectId(game, playerBId);
 
         // Get both of the ledgers between the two players.
-        let ledgerCreditor = this.getLedgerForPlayer(game, creditor, playerBId);
-        let ledgerDebtor = this.getLedgerForPlayer(game, debtor, creditor._id);
+        let ledgerCreditor = this.getLedgerForPlayer(creditor, playerBId);
+        let ledgerDebtor = this.getLedgerForPlayer(debtor, creditor._id);
 
-        if (ledgerCreditor.debt <= 0) {
+        if (ledgerCreditor.ledger.debt <= 0) {
             throw new ValidationError('The player does not owe you anything.');
         }
 
-        let debtAmount = ledgerCreditor.debt;
+        let debtAmount = ledgerCreditor.ledger.debt;
 
-        ledgerDebtor.debt += debtAmount; // Player B no longer has debt to player A
-        ledgerCreditor.debt = 0;             // Forgive Player B's debt.
+        ledgerDebtor.ledger.debt += debtAmount; // Player B no longer has debt to player A
+        ledgerCreditor.ledger.debt = 0;             // Forgive Player B's debt.
 
-        await this._updateLedger(game, creditor, ledgerCreditor);
-        await this._updateLedger(game, debtor, ledgerDebtor);
+        await this._updateLedger(game, creditor, ledgerCreditor.ledger, ledgerCreditor.isNew);
+        await this._updateLedger(game, debtor, ledgerDebtor.ledger, ledgerDebtor.isNew);
 
         this.emit('onDebtForgiven', {
             gameId: game._id,
@@ -125,10 +142,10 @@ export default class LedgerService extends EventEmitter {
         return ledgerCreditor;
     }
 
-    async _updateLedger(game, player, ledger) {
-        let dbWrites = [];
+    async _updateLedger(game: Game, player: Player, ledger: PlayerLedger, isNew: boolean) {
+        let dbWrites: any[] = [];
 
-        if (ledger.isNew) {
+        if (isNew) {
             dbWrites.push({
                 updateOne: {
                     filter: {

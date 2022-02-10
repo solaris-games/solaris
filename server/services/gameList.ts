@@ -1,8 +1,27 @@
+import { DBObjectId } from "../types/DBObjectId";
+import DatabaseRepository from "../models/DatabaseRepository";
+import { Game, GameUserNotification } from "../types/Game";
+import ConversationService from "./conversation";
+import EventService from "./event";
+import GameService from "./game";
+import GameTypeService from "./gameType";
+
 const moment = require('moment');
 
 export default class GameListService {
+    gameRepo: DatabaseRepository<Game>;
+    gameService: GameService;
+    conversationService: ConversationService;
+    eventService: EventService;
+    gameTypeService: GameTypeService;
     
-    constructor(gameRepo, gameService, conversationService, eventService, gameTypeService) {
+    constructor(
+        gameRepo: DatabaseRepository<Game>,
+        gameService: GameService,
+        conversationService: ConversationService,
+        eventService: EventService,
+        gameTypeService: GameTypeService
+    ) {
         this.gameRepo = gameRepo;
         this.gameService = gameService;
         this.conversationService = conversationService;
@@ -38,7 +57,7 @@ export default class GameListService {
         }, select);
     }
 
-    async listActiveGames(userId) {
+    async listActiveGames(userId: DBObjectId) {
         const games = await this.gameRepo.find({
             'state.endDate': { $eq: null }, // Game is in progress
             $or: [
@@ -69,14 +88,14 @@ export default class GameListService {
         return await Promise.all(games.map(async game => {
             game.userNotifications = await this.getUserPlayerNotifications(game, userId, true, true, true);
 
-            delete game.conversations;
-            delete game.galaxy;
+            delete (game as any).conversations;
+            delete (game as any).galaxy;
 
             return game;
         }));
     }
 
-    async listRecentlyCompletedGames(select, limit = 20) {
+    async listRecentlyCompletedGames(select: any = null, limit: number = 20) {
         select = select || {
             'settings.general.type': 1,
             'settings.general.featured': 1,
@@ -94,7 +113,7 @@ export default class GameListService {
         limit);
     }
 
-    async listUserCompletedGames(userId) {
+    async listUserCompletedGames(userId: DBObjectId) {
         const games = await this.gameRepo.find({
             'state.endDate': { $ne: null }, // Game is finished
             'settings.general.type': { $ne: 'tutorial'},
@@ -120,20 +139,20 @@ export default class GameListService {
         return await Promise.all(games.map(async game => {
             game.userNotifications = await this.getUserPlayerNotifications(game, userId, false, false, true);
 
-            delete game.conversations;
-            delete game.galaxy;
+            delete (game as any).conversations;
+            delete (game as any).galaxy;
 
             return game;
         }));
     }
 
-    async getUserPlayerNotifications(game, userId, includeTurnWaiting = true, includeUnreadEvents = true, includeUnreadConversastions = true) {
-        const player = game.galaxy.players.find(p => p.userId === userId.toString());
+    async getUserPlayerNotifications(game: Game, userId: DBObjectId, includeTurnWaiting: boolean = true, includeUnreadEvents: boolean = true, includeUnreadConversastions: boolean = true): Promise<GameUserNotification> {
+        const player = game.galaxy!.players.find(p => p.userId === userId.toString());
 
-        let unreadConversations = null,
-            unreadEvents = null,
-            totalUnread = null,
-            turnWaiting = null;
+        let unreadConversations: number | null = null,
+            unreadEvents: number | null = null,
+            totalUnread: number | null = null,
+            turnWaiting: boolean | null = null;
 
         // Note: The player may have gone afk and been replaced by another player so we need to
         // double check that the player is actually in the game to retrieve conversation counts etc.
@@ -145,17 +164,19 @@ export default class GameListService {
             totalUnread = (unreadConversations || 0) + (unreadEvents || 0);
         }
 
-        return {
+        let notification: GameUserNotification = {
             unreadConversations,
             unreadEvents,
             unread: totalUnread,
             turnWaiting,
-            defeated: player?.defeated,
-            afk: player?.afk
+            defeated: player?.defeated || null,
+            afk: player?.afk || null
         };
+
+        return notification;
     }
 
-    async listOldCompletedGamesNotCleaned(months = 1) {
+    async listOldCompletedGamesNotCleaned(months: number = 1) {
         let date = moment().subtract(months, 'month');
 
         let query = {
@@ -223,7 +244,7 @@ export default class GameListService {
         for (let game of games) {
             game.state.afkSlots = game.galaxy.players.filter(p => p.afk).length;
 
-            delete game.galaxy;
+            delete (game as any).galaxy;
         }
 
         return games;
@@ -245,14 +266,14 @@ export default class GameListService {
         });
     }
 
-    async listOpenGamesCreatedByUser(userId) {
+    async listOpenGamesCreatedByUser(userId: DBObjectId) {
         return await this.gameRepo.find({
             'settings.general.createdByUserId': { $eq: userId },
             'state.startDate': { $eq: null }
         });
     }
 
-    async getUserTutorial(userId) {
+    async getUserTutorial(userId: DBObjectId) {
         const tutorial = await this.gameRepo.findOne({
             'settings.general.type': 'tutorial',
             'state.endDate': { $eq: null }, // Game is in progress

@@ -1,8 +1,10 @@
-import { ObjectId } from "mongoose";
+import { DBObjectId } from "../types/DBObjectId";
 import { Conversation } from "../types/Conversation";
 import { ConversationMessageSentResult } from "../types/ConversationMessage";
 import { Game } from "../types/Game";
 import { Player } from "../types/Player";
+import { DiplomaticStatus } from "../types/Diplomacy";
+import { TradeEventTechnology } from "../types/Trade";
 
 
 export default class BroadcastService {
@@ -12,7 +14,7 @@ export default class BroadcastService {
         this.io = io;
     }
 
-    roomExists(socketId: ObjectId) {
+    roomExists(socketId: DBObjectId) {
         return this.io && this.io.sockets.adapter.rooms[socketId.toString()] != null;
     }
 
@@ -30,7 +32,7 @@ export default class BroadcastService {
         });
     }
 
-    gamePlayerJoined(game: Game, playerId: ObjectId, alias: string, avatar: number) {
+    gamePlayerJoined(game: Game, playerId: DBObjectId, alias: string, avatar: number) {
         this.io.to(game._id).emit('gamePlayerJoined', {
             playerId,
             alias,
@@ -57,14 +59,14 @@ export default class BroadcastService {
     }
 
     gamePlayerReadyToQuit(game: Game, player: Player) {
-        this.io.to(game.id).emit('gamePlayerReadyToQuit', {
-            playerId: player.id
+        this.io.to(game._id).emit('gamePlayerReadyToQuit', {
+            playerId: player._id
         });
     }
 
     gamePlayerNotReadyToQuit(game: Game, player: Player) {
-        this.io.to(game.id).emit('gamePlayerNotReadyToQuit', {
-            playerId: player.id
+        this.io.to(game._id).emit('gamePlayerNotReadyToQuit', {
+            playerId: player._id
         });
     }
 
@@ -72,28 +74,28 @@ export default class BroadcastService {
         message.toPlayerIds.forEach(p => this.io.to(p).emit('gameMessageSent', message));
     }
 
-    gameConversationRead(game: Game, conversation: Conversation, readByPlayerId: ObjectId) {
+    gameConversationRead(game: Game, conversation: Conversation, readByPlayerId: DBObjectId) {
         conversation.participants.forEach(p => this.io.to(p).emit('gameConversationRead', {
             conversationId: conversation._id,
             readByPlayerId
         }));
     }
 
-    gameConversationLeft(game: Game, conversation: Conversation, playerId: ObjectId) {
+    gameConversationLeft(game: Game, conversation: Conversation, playerId: DBObjectId) {
         conversation.participants.forEach(p => this.io.to(p).emit('gameConversationLeft', {
             conversationId: conversation._id,
             playerId
         }));
     }
 
-    gameConversationMessagePinned(game: Game, conversation: Conversation, messageId: ObjectId) {
+    gameConversationMessagePinned(game: Game, conversation: Conversation, messageId: DBObjectId) {
         conversation.participants.forEach(p => this.io.to(p).emit('gameConversationMessagePinned', {
             conversationId: conversation._id,
             messageId: messageId
         }));
     }
 
-    gameConversationMessageUnpinned(game: Game, conversation: Conversation, messageId: ObjectId) {
+    gameConversationMessageUnpinned(game: Game, conversation: Conversation, messageId: DBObjectId) {
         conversation.participants.forEach(p => this.io.to(p).emit('gameConversationMessageUnpinned', {
             conversationId: conversation._id,
             messageId: messageId
@@ -104,17 +106,17 @@ export default class BroadcastService {
     //     this.io.to(playerId).emit('gameMessagesAllRead');
     // }
 
-    playerEventRead(game: Game, playerId: ObjectId, eventId: ObjectId) {
+    playerEventRead(game: Game, playerId: DBObjectId, eventId: DBObjectId) {
         this.io.to(playerId).emit('playerEventRead', {
             eventId
         })
     }
 
-    playerAllEventsRead(game: Game, playerId: ObjectId) {
+    playerAllEventsRead(game: Game, playerId: DBObjectId) {
         this.io.to(playerId).emit('playerAllEventsRead', {})
     }
 
-    gamePlayerCreditsReceived(game: Game, fromPlayerId: ObjectId, toPlayerId: ObjectId, credits: number, date: Date) {
+    gamePlayerCreditsReceived(game: Game, fromPlayerId: DBObjectId, toPlayerId: DBObjectId, credits: number, date: Date) {
         this.io.to(toPlayerId).emit('playerCreditsReceived', {
             playerId: toPlayerId,
             type: 'playerCreditsReceived',
@@ -127,7 +129,7 @@ export default class BroadcastService {
         });
     }
 
-    gamePlayerCreditsSpecialistsReceived(game: Game, fromPlayerId: ObjectId, toPlayerId: ObjectId, creditsSpecialists: number, date: Date) {
+    gamePlayerCreditsSpecialistsReceived(game: Game, fromPlayerId: DBObjectId, toPlayerId: DBObjectId, creditsSpecialists: number, date: Date) {
         this.io.to(toPlayerId).emit('playerCreditsSpecialistsReceived', {
             playerId: toPlayerId,
             type: 'playerCreditsSpecialistsReceived',
@@ -140,7 +142,7 @@ export default class BroadcastService {
         });
     }
 
-    gamePlayerRenownReceived(game: Game, fromPlayerId: ObjectId, toPlayerId: ObjectId, renown: number, date: Date) {
+    gamePlayerRenownReceived(game: Game, fromPlayerId: DBObjectId, toPlayerId: DBObjectId, renown: number, date: Date) {
         this.io.to(toPlayerId).emit('playerRenownReceived', {
             playerId: toPlayerId,
             type: 'playerRenownReceived',
@@ -153,7 +155,7 @@ export default class BroadcastService {
         });
     }
 
-    gamePlayerTechnologyReceived(game: Game, fromPlayerId: ObjectId, toPlayerId: ObjectId, technology: string, date: Date) {
+    gamePlayerTechnologyReceived(game: Game, fromPlayerId: DBObjectId, toPlayerId: DBObjectId, technology: TradeEventTechnology, date: Date) {
         this.io.to(toPlayerId).emit('playerTechnologyReceived', {
             playerId: toPlayerId,
             type: 'playerTechnologyReceived',
@@ -166,7 +168,7 @@ export default class BroadcastService {
         });
     }
 
-    gamePlayerDebtAdded(debtorPlayerId: ObjectId, creditorPlayerId: ObjectId, amount: number) {
+    gamePlayerDebtAdded(debtorPlayerId: DBObjectId, creditorPlayerId: DBObjectId, amount: number) {
         let data = {
             debtorPlayerId,
             creditorPlayerId,
@@ -177,7 +179,7 @@ export default class BroadcastService {
         this.io.to(creditorPlayerId).emit('playerDebtAdded', data);
     }
 
-    gamePlayerDebtForgiven(debtorPlayerId: ObjectId, creditorPlayerId: ObjectId, amount: number) {
+    gamePlayerDebtForgiven(debtorPlayerId: DBObjectId, creditorPlayerId: DBObjectId, amount: number) {
         let data = {
             debtorPlayerId,
             creditorPlayerId,
@@ -188,7 +190,7 @@ export default class BroadcastService {
         this.io.to(creditorPlayerId).emit('playerDebtForgiven', data);
     }
 
-    gamePlayerDebtSettled(debtorPlayerId: ObjectId, creditorPlayerId: ObjectId, amount: number) {
+    gamePlayerDebtSettled(debtorPlayerId: DBObjectId, creditorPlayerId: DBObjectId, amount: number) {
         let data = {
             debtorPlayerId,
             creditorPlayerId,
@@ -199,7 +201,7 @@ export default class BroadcastService {
         this.io.to(creditorPlayerId).emit('playerDebtSettled', data);
     }
 
-    gamePlayerDiplomaticStatusChanged(playerIdFrom: ObjectId, playerIdTo: ObjectId, diplomaticStatus: string) {
+    gamePlayerDiplomaticStatusChanged(playerIdFrom: DBObjectId, playerIdTo: DBObjectId, diplomaticStatus: DiplomaticStatus) {
         let data = {
             diplomaticStatus
         };

@@ -1,17 +1,9 @@
-import { ObjectId } from "mongoose";
+import { DBObjectId } from "./DBObjectId";
 import { InfrastructureType, Star } from "./Star";
-
-export interface BulkUpgradeStar {
-    starId: ObjectId;
-    starName: string;
-    naturalResources: number;
-    infrastructureCurrent: number;
-    infrastructureCostTotal: number;
-};
 
 export interface BulkUpgradeReport {
     budget: number;
-    stars: BulkUpgradeStar[];
+    stars: any[];
     cost: number;
     upgraded: number;
     infrastructureType: InfrastructureType;
@@ -29,8 +21,8 @@ export interface InfrastructureUpgradeCosts {
 };
 
 export interface InfrastructureUpgradeReport {
-    playerId: ObjectId;
-    starId: ObjectId;
+    playerId: DBObjectId;
+    starId: DBObjectId;
     starName: string;
     infrastructure: number;
     cost: number;

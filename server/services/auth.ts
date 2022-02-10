@@ -39,7 +39,7 @@ export default class AuthService {
         }
 
         if (user.password == null) {
-            return user._id;
+            return user;
         }
 
         // Compare the passwords and if they match then the user is authenticated.

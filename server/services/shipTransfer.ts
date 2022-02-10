@@ -1,36 +1,49 @@
+import { DBObjectId } from '../types/DBObjectId';
 import ValidationError from '../errors/validation';
+import DatabaseRepository from '../models/DatabaseRepository';
+import { Game } from '../types/Game';
+import { Player } from '../types/Player';
+import CarrierService from './carrier';
+import StarService from './star';
 
 export default class ShipTransferService {
+    gameRepo: DatabaseRepository<Game>;
+    carrierService: CarrierService;
+    starService: StarService;
 
-    constructor(gameRepo, carrierService, starService) {
+    constructor(
+        gameRepo: DatabaseRepository<Game>,
+        carrierService: CarrierService,
+        starService: StarService
+    ) {
         this.gameRepo = gameRepo;
         this.carrierService = carrierService;
         this.starService = starService;
     }
 
-    async transferAllToStar(game, player, starId) {
+    async transferAllToStar(game: Game, player: Player, starId: DBObjectId) {
         let star = this.starService.getById(game, starId);
         let carriersAtStar = this.carrierService.getCarriersAtStar(game, starId)
-            .filter(c => c.ownedByPlayerId.equals(player._id));
+            .filter(c => c.ownedByPlayerId!.equals(player._id));
 
-        if (!star.ownedByPlayerId.equals(player._id)) {
+        if (!star.ownedByPlayerId || !star.ownedByPlayerId.equals(player._id)) {
             throw new ValidationError('The player does not own this star.');
         }
 
         let shipsToTransfer = 0;
         
         for (let carrier of carriersAtStar) {
-            if (carrier.ships > 1) {
-                shipsToTransfer += (carrier.ships-1)
+            if (carrier.ships! > 1) {
+                shipsToTransfer += (carrier.ships!-1)
                 carrier.ships = 1
             }
         }
 
-        star.shipsActual += shipsToTransfer;
-        star.ships = Math.floor(star.shipsActual);
+        star.shipsActual! += shipsToTransfer;
+        star.ships = Math.floor(star.shipsActual!);
 
         // Generate an array of all requires DB updates.
-        let dbWrites = carriersAtStar.map(c => {
+        let dbWrites: any[] = carriersAtStar.map(c => {
             return {
                 updateOne: {
                     filter: {
@@ -74,15 +87,15 @@ export default class ShipTransferService {
         };
     }
 
-    async transfer(game, player, carrierId, carrierShips, starId, starShips) {
+    async transfer(game: Game, player: Player, carrierId: DBObjectId, carrierShips: number, starId: DBObjectId, starShips: number) {
         let carrier = this.carrierService.getById(game, carrierId);
         let star = this.starService.getById(game, starId);
 
-        if (!carrier || !carrier.ownedByPlayerId.equals(player._id)) {
+        if (!carrier || !carrier.ownedByPlayerId!.equals(player._id)) {
             throw new ValidationError('The player does not own this carrier.');
         }
 
-        if (!star || !star.ownedByPlayerId.equals(player._id)) {
+        if (!star || !star.ownedByPlayerId || !star.ownedByPlayerId.equals(player._id)) {
             throw new ValidationError('The player does not own this star.');
         }
 
@@ -95,7 +108,7 @@ export default class ShipTransferService {
         }
 
         let totalTransferShips = carrierShips + starShips;
-        let totalShips = carrier.ships + star.ships;
+        let totalShips = carrier.ships! + star.ships!;
 
         if (totalTransferShips != totalShips) {
             throw new ValidationError('The total number of ships in the tranfer does not equal to the total number of ships garrisoned');
@@ -111,7 +124,7 @@ export default class ShipTransferService {
 
         carrier.ships = carrierShips;
 
-        let shipsFraction = star.shipsActual - star.ships; // Keep hold of the fractional amount of ships so we can add it back later.
+        let shipsFraction = star.shipsActual! - star.ships!; // Keep hold of the fractional amount of ships so we can add it back later.
         
         star.shipsActual = starShips + shipsFraction;
         star.ships = Math.floor(star.shipsActual);

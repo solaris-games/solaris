@@ -1,9 +1,24 @@
 const cache = require('memory-cache');
+import { DBObjectId } from '../types/DBObjectId';
 import ValidationError from '../errors/validation';
+import DatabaseRepository from '../models/DatabaseRepository';
+import { Game } from '../types/Game';
+import { GameHistory, GameHistoryCarrier } from '../types/GameHistory';
+import GameService from './game';
+import PlayerService from './player';
 
 export default class HistoryService {
+    historyModel: any;
+    historyRepo: DatabaseRepository<GameHistory>;
+    playerService: PlayerService;
+    gameService: GameService;
 
-    constructor(historyModel, historyRepo, playerService, gameService) {
+    constructor(
+        historyModel: any,
+        historyRepo: DatabaseRepository<GameHistory>,
+        playerService: PlayerService,
+        gameService: GameService
+    ) {
         this.historyModel = historyModel;
         this.historyRepo = historyRepo;
         this.playerService = playerService;
@@ -12,10 +27,10 @@ export default class HistoryService {
         this.gameService.on('onGameDeleted', (args) => this.deleteByGameId(args.gameId));
     }
 
-    async listIntel(gameId, startTick, endTick) {
+    async listIntel(gameId: DBObjectId, startTick: number, endTick: number) {
         let settings = await this.gameService.getGameSettings(gameId);
 
-        if (settings.specialGalaxy.darkGalaxy === 'extra') {
+        if (!settings || settings.specialGalaxy.darkGalaxy === 'extra') {
             throw new ValidationError('Intel is not available in this game mode.');
         }
 
@@ -68,7 +83,7 @@ export default class HistoryService {
         return intel;
     }
 
-    async log(game) {
+    async log(game: Game) {
         // Check if there is already a history record with this tick, if so we should
         // overwrite it.
         let history = await this.historyRepo.findOneAsModel({
@@ -143,12 +158,12 @@ export default class HistoryService {
         });
 
         history.carriers = game.galaxy.carriers.map(c => {
-            let x = {
+            let x: GameHistoryCarrier = {
                 carrierId: c._id,
-                ownedByPlayerId: c.ownedByPlayerId,
+                ownedByPlayerId: c.ownedByPlayerId!,
                 name: c.name,
                 orbiting: c.orbiting,
-                ships: c.ships,
+                ships: c.ships!,
                 specialistId: c.specialistId,
                 isGift: c.isGift,
                 location: c.location,
@@ -168,7 +183,7 @@ export default class HistoryService {
         await this.cleanupTimeMachineHistory(game);
     }
 
-    async cleanupTimeMachineHistory(game) {
+    async cleanupTimeMachineHistory(game: Game) {
         let maxTick;
 
         const MIN_HISTORY_TICK_OFFSET = null; // Decide how many ticks to store.
@@ -205,21 +220,20 @@ export default class HistoryService {
                 'players.$[].afk': '',
                 'players.$[].ready': '',
                 'players.$[].readyToQuit': '',
-                'players.$[].alias': '',
                 'stars': '',
                 'carriers': ''
             }
         });
     }
 
-    async getHistoryByTick(gameId, tick) {
+    async getHistoryByTick(gameId: DBObjectId, tick: number) {
         return await this.historyRepo.findOne({
             gameId,
             tick
         });
     }
 
-    async deleteByGameId(gameId) {
+    async deleteByGameId(gameId: DBObjectId) {
         await this.historyRepo.deleteMany({
             gameId
         });

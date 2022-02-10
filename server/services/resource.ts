@@ -1,13 +1,30 @@
-export default class ResourceService {
+import { Game, GameResourceDistribution } from "../types/Game";
+import { Location } from "../types/Location";
+import { NaturalResources } from "../types/Star";
+import DistanceService from "./distance";
+import GameTypeService from "./gameType";
+import RandomService from "./random";
+import StarDistanceService from "./starDistance";
 
-    constructor(randomService, distanceService, starDistanceService, gameTypeService) {
+export default class ResourceService {
+    randomService: RandomService;
+    distanceService: DistanceService;
+    starDistanceService: StarDistanceService;
+    gameTypeService: GameTypeService;
+
+    constructor(
+        randomService: RandomService,
+        distanceService: DistanceService,
+        starDistanceService: StarDistanceService,
+        gameTypeService: GameTypeService
+    ) {
         this.randomService = randomService;
         this.distanceService = distanceService;
         this.starDistanceService = starDistanceService;
         this.gameTypeService = gameTypeService;
     }
 
-    distribute(game, locations, resourceDistribution) {
+    distribute(game: Game, locations: Location[], resourceDistribution: GameResourceDistribution) {
         // Note: Always distribute randomly for doughnut and irregular regardless of setting.
         const forcedRandom = ['doughnut', 'irregular'].includes(game.settings.galaxy.galaxyType);
 
@@ -19,7 +36,7 @@ export default class ResourceService {
         return this._distributeRandom(game, locations);
     }
 
-    _distributeRandom(game, locations) {
+    _distributeRandom(game: Game, locations: Location[]) {
         // Allocate random resources.
         let minResources = game.constants.star.resources.minNaturalResources;
         let maxResources = game.constants.star.resources.maxNaturalResources;
@@ -31,7 +48,7 @@ export default class ResourceService {
         }
     }
 
-    _distributeRandomMirrored(game, locations, minResources, maxResources) {
+    _distributeRandomMirrored(game: Game, locations: Location[], minResources: number, maxResources: number) {
         let playerCount = game.settings.general.playerLimit;
         const splitRes = this.gameTypeService.isSplitResources(game);
 
@@ -39,20 +56,20 @@ export default class ResourceService {
             let resources = this._setResources(minResources, maxResources, splitRes);
 
             for (let j = 0; j < playerCount; j++) {
-                locations[i*playerCount+j].resources = resources;
+                (locations[i*playerCount+j] as any).resources = resources;
             }
         }
     }
 
-    _distributeRandomAny(game, locations, minResources, maxResources) {
+    _distributeRandomAny(game: Game, locations: Location[], minResources: number, maxResources: number) {
         const splitRes = this.gameTypeService.isSplitResources(game);
 
         for (let location of locations) {
-            location.resources = this._setResources(minResources, maxResources, splitRes);
+            (location as any).resources = this._setResources(minResources, maxResources, splitRes);
         }
     }
 
-    _distributeWeightedCenter(game, locations) {
+    _distributeWeightedCenter(game: Game, locations: Location[]) {
         // The closer to the center of the galaxy, the more likely (exponentially) to find stars with higher resources.
         let minResources = game.constants.star.resources.minNaturalResources;
         let maxResources = game.constants.star.resources.maxNaturalResources;
@@ -66,7 +83,7 @@ export default class ResourceService {
         }
     }
 
-    _distributeWeightedCenterMirrored(game, locations, minResources, maxResources, galaxyRadius, galacticCenter) {
+    _distributeWeightedCenterMirrored(game: Game, locations: Location[], minResources: number, maxResources: number, galaxyRadius: number, galacticCenter: Location) {
         let playerCount = game.settings.general.playerLimit;
         const splitRes = this.gameTypeService.isSplitResources(game);
         
@@ -79,12 +96,12 @@ export default class ResourceService {
             let resources = this._setResources(minResources, maxResources, splitRes, radius/galaxyRadius * 0.6 + 0.2);
 
             for (let j = 0; j < playerCount; j++) {
-                locations[i*playerCount + j].resources = resources;
+                (locations[i*playerCount + j] as any).resources = resources;
             }
         }
     }
 
-    _distributeWeightedCenterAny(game, locations, minResources, maxResources, galaxyRadius, galacticCenter) {
+    _distributeWeightedCenterAny(game: Game, locations: Location[], minResources: number, maxResources: number, galaxyRadius: number, galacticCenter: Location) {
         const splitRes = this.gameTypeService.isSplitResources(game);
 
         for (let location of locations) {
@@ -93,11 +110,11 @@ export default class ResourceService {
             // The * 0.6 + 0.2 in the function prevents values like 0 or 1, in which case randomisation is gone, and the outcome can only be a min or a max value
             // If you want the differences to be more extreme you can increase the 0.6 and decrease the 0.2 notice how: 1 - 0.6 = 2 * 0.2, keep that relation intact.
             // So for example a good tweak to make the center even stronger and the edges weaker would be to pick * 0.8 + 0.1, and notice again how 1 - 0.8 = 2 * 0.1 
-            location.resources = this._setResources(minResources, maxResources, splitRes, radius/galaxyRadius * 0.6 + 0.2);
+            (location as any).resources = this._setResources(minResources, maxResources, splitRes, radius/galaxyRadius * 0.6 + 0.2);
         }
     }
 
-    _setResources(minResources, maxResources, isSplitResources, EXP = 0.5) {
+    _setResources(minResources: number, maxResources: number, isSplitResources: boolean, EXP: number = 0.5): NaturalResources {
         if (isSplitResources) {
             return {
                 economy: this.randomService.getRandomNumberBetweenEXP(minResources, maxResources, EXP),

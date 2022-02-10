@@ -1,18 +1,19 @@
-import { ObjectId } from "mongoose"
+import { DBObjectId } from "./DBObjectId";
 
 export interface ConversationMessage {
-    _id: ObjectId;
-    fromPlayerId: ObjectId;
+    _id: DBObjectId;
+    fromPlayerId: DBObjectId;
     fromPlayerAlias: string;
     message: string;
     sentDate: Date;
     sentTick: number | null;
     pinned: boolean;
-    readBy: ObjectId[];
+    readBy: DBObjectId[];
+
+    type?: 'message'|'event';
 };
 
 export interface ConversationMessageSentResult extends ConversationMessage {
-    conversationId: ObjectId;
-    type: string;
-    toPlayerIds: ObjectId[];
+    conversationId: DBObjectId;
+    toPlayerIds: DBObjectId[];
 };

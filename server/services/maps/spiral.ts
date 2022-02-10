@@ -1,5 +1,4 @@
 import { Location } from '../../types/Location'
-import { ResourceDistribution } from "../../types/Enums";
 import DistanceService from "../distance";
 import GameTypeService from "../gameType";
 import RandomService from "../random";
@@ -7,6 +6,7 @@ import ResourceService from "../resource";
 import StarService from "../star";
 import StarDistanceService from "../starDistance";
 import { GalaxyDimensions } from '../../types/Dimensions';
+import { GameResourceDistribution } from '../../types/Game';
 
 const simplexNoise = require('simplex-noise');
 
@@ -34,7 +34,7 @@ export default class SpiralMapService {
         this.gameTypeService = gameTypeService;
     }
 
-    generateLocations(game: any, count: number, resourceDistribution: ResourceDistribution): Location[] {
+    generateLocations(game: any, count: number, resourceDistribution: GameResourceDistribution): Location[] {
         let branchCount = 4;
 
         // Hard code branches for small games.

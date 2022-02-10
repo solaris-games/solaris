@@ -1,12 +1,47 @@
 import ValidationError from '../errors/validation';
+import { Game, GameSettings } from '../types/Game';
+import AchievementService from './achievement';
+import ConversationService from './conversation';
+import GameService from './game';
+import GameCreateValidationService from './gameCreateValidation';
+import GameListService from './gameList';
+import HistoryService from './history';
+import MapService from './map';
+import NameService from './name';
+import PasswordService from './password';
+import PlayerService from './player';
+import UserService from './user';
 
 const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
 export default class GameCreateService {
-    
-    constructor(gameModel, gameService, gameListService, nameService, 
-        mapService, playerService, passwordService, conversationService, 
-        historyService, achievementService, userService, gameCreateValidationService) {
+    gameModel: any;
+    gameService: GameService;
+    gameListService: GameListService;
+    nameService: NameService;
+    mapService: MapService;
+    playerService: PlayerService;
+    passwordService: PasswordService;
+    conversationService: ConversationService;
+    historyService: HistoryService;
+    achievementService: AchievementService;
+    userService: UserService;
+    gameCreateValidationService: GameCreateValidationService;
+
+    constructor(
+        gameModel: any,
+        gameService: GameService,
+        gameListService: GameListService,
+        nameService: NameService, 
+        mapService: MapService,
+        playerService: PlayerService,
+        passwordService: PasswordService,
+        conversationService: ConversationService, 
+        historyService: HistoryService,
+        achievementService: AchievementService,
+        userService: UserService,
+        gameCreateValidationService: GameCreateValidationService
+    ) {
         this.gameModel = gameModel;
         this.gameService = gameService;
         this.gameListService = gameListService;
@@ -21,7 +56,7 @@ export default class GameCreateService {
         this.gameCreateValidationService = gameCreateValidationService;
     }
 
-    async create(settings) {
+    async create(settings: GameSettings) {
         const isTutorial = settings.general.type === 'tutorial';
 
         // If a legit user (not the system) created the game and it isn't a tutorial
@@ -66,7 +101,7 @@ export default class GameCreateService {
 
         let game = new this.gameModel({
             settings
-        });
+        }) as Game;
 
         // For non-custom galaxies we need to check that the player has actually provided
         // enough stars for each player.
@@ -114,14 +149,14 @@ export default class GameCreateService {
         }
 
         // Create all of the stars required.
-        game.galaxy.homeStars = [];
-        game.galaxy.linkedStars = [];
+        (game.galaxy as any).homeStars = [];
+        (game.galaxy as any).linkedStars = [];
         game.galaxy.stars = this.mapService.generateStars(
             game, 
             desiredStarCount,
             game.settings.general.playerLimit,
             settings.galaxy.customJSON
-        );
+        ) as any;
         
         // Setup players and assign to their starting positions.
         game.galaxy.players = this.playerService.createEmptyPlayers(game);
@@ -154,13 +189,13 @@ export default class GameCreateService {
         return gameObject;
     }
 
-    _setGalaxyCenter(game) {
+    _setGalaxyCenter(game: Game) {
         const starLocations = game.galaxy.stars.map(s => s.location);
 
         game.constants.distances.galaxyCenterLocation = this.mapService.getGalaxyCenter(starLocations);
     }
 
-    _calculateStarsForVictory(game) {
+    _calculateStarsForVictory(game: Game) {
         if (game.settings.general.mode === 'conquest') {
             // TODO: Find a better place for this as its shared in the star service.
             switch (game.settings.conquest.victoryCondition) {
@@ -178,9 +213,9 @@ export default class GameCreateService {
         return game.galaxy.stars.length;
     }
 
-    _setupTutorialPlayers(game) {
+    _setupTutorialPlayers(game: Game) {
         // Dump the player who created the game straight into the first slot and set the other slots to AI.
-        this.gameService.assignPlayerToUser(game, game.galaxy.players[0], game.settings.general.createdByUserId, `Player`, 0);
+        this.gameService.assignPlayerToUser(game, game.galaxy.players[0], game.settings.general.createdByUserId!, `Player`, 0);
         
         for (let i = 1; i < game.galaxy.players.length; i++) {
             const ai = game.galaxy.players[i];

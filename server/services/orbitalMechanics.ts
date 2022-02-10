@@ -1,27 +1,36 @@
-export default class OrbitalMechanicsService {
+import { Carrier } from "../types/Carrier";
+import { Game } from "../types/Game";
+import { Location } from "../types/Location";
+import { Star } from "../types/Star";
+import MapService from "./map";
 
-    constructor(mapService) {
+export default class OrbitalMechanicsService {
+    mapService: MapService;
+
+    constructor(
+        mapService: MapService
+    ) {
         this.mapService = mapService;
     }
 
-    orbitStar(game, star) {
+    orbitStar(game: Game, star: Star) {
         this.orbitObject(game, star);
     }
 
-    orbitCarrier(game, carrier) {
+    orbitCarrier(game: Game, carrier: Carrier) {
         this.orbitObject(game, carrier);
     }
 
-    orbitObject(game, objectWithLocation) {
+    orbitObject(game: Game, objectWithLocation: Star | Carrier) {
         objectWithLocation.location = this.getNextLocation(game, objectWithLocation);
     }
 
-    getNextLocation(game, objectWithLocation) {
+    getNextLocation(game: Game, objectWithLocation: Star | Carrier) {
         if (game.settings.orbitalMechanics.enabled === 'disabled') {
             throw new Error('Game settings disallow orbital mechanics.');
         }
 
-        let galaxyCenter = game.constants.distances.galaxyCenterLocation; // TODO: Refresh this constant(?) on rotation?
+        let galaxyCenter = game.constants.distances.galaxyCenterLocation!; // TODO: Refresh this constant(?) on rotation?
 
         let speed = game.settings.orbitalMechanics.orbitSpeed;
         let direction = 1; // TODO: Fuck it, clockwise everything.
@@ -41,7 +50,7 @@ export default class OrbitalMechanicsService {
             arcLength);
     }
 
-    rotate(cx, cy, x, y, angle) {
+    rotate(cx: number, cy: number, x: number, y: number, angle: number): Location {
         let radians = (Math.PI / 180) * angle,
             cos = Math.cos(radians),
             sin = Math.sin(radians),

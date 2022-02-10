@@ -75,11 +75,7 @@ export default (router, io, container: DependencyContainer) => {
                 }
             }
 
-            let userId = await container.userService.create({
-                email: email,
-                username,
-                password: req.body.password
-            }, ip);
+            let userId = await container.userService.create(email, username, req.body.password, ip);
 
             return res.status(201).json({ id: userId });
         } catch (err) {

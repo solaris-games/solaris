@@ -1,3 +1,5 @@
+export type SpecialistType = 'star'|'carrier';
+
 export interface Specialist {
     id: number;
     name: string;

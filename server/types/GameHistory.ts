@@ -1,11 +1,11 @@
-import { ObjectId } from "mongoose";
+import { DBObjectId } from "./DBObjectId";
 import { Location } from "./Location";
-import { ResearchProgress } from "./Player";
+import { ResearchProgress, ResearchType } from "./Player";
 import { IgnoreBulkUpgrade, Infrastructure, NaturalResources } from "./Star";
 
 export interface GameHistoryPlayer {
-    userId: ObjectId | null;
-    playerId: ObjectId;
+    userId: DBObjectId | null;
+    playerId: DBObjectId;
     statistics: {
         totalStars: number;
         totalHomeStars: number;
@@ -22,8 +22,8 @@ export interface GameHistoryPlayer {
     },
     alias: string;
     avatar: string | null;
-    researchingNow: string;
-    researchingNext: string;
+    researchingNow: ResearchType;
+    researchingNext: ResearchType;
     credits: number;
     creditsSpecialists: number;
     defeated: boolean;
@@ -44,8 +44,8 @@ export interface GameHistoryPlayer {
 };
 
 export interface GameHistoryStar {
-    starId: ObjectId;
-    ownedByPlayerId: ObjectId | null;
+    starId: DBObjectId;
+    ownedByPlayerId: DBObjectId | null;
     naturalResources: NaturalResources,
     ships: number;
     shipsActual: number;
@@ -58,15 +58,15 @@ export interface GameHistoryStar {
 };
 
 export interface GameHistoryCarrierWaypoint {
-    source: ObjectId;
-    destination: ObjectId;
+    source: DBObjectId;
+    destination: DBObjectId;
 };
 
 export interface GameHistoryCarrier {
-    carrierId: ObjectId;
-    ownedByPlayerId: ObjectId;
+    carrierId: DBObjectId;
+    ownedByPlayerId: DBObjectId;
     name: string;
-    orbiting: ObjectId | null;
+    orbiting: DBObjectId | null;
     ships: number;
     specialistId: number | null;
     isGift: boolean;
@@ -75,8 +75,8 @@ export interface GameHistoryCarrier {
 };
 
 export interface GameHistory {
-    _id: ObjectId;
-    gameId: ObjectId;
+    _id: DBObjectId;
+    gameId: DBObjectId;
     tick: number;
     productionTick: number;
     players: GameHistoryPlayer[],

@@ -1,9 +1,42 @@
+import { DBObjectId } from '../types/DBObjectId';
 import ValidationError from '../errors/validation';
+import DatabaseRepository from '../models/DatabaseRepository';
+import { Carrier } from '../types/Carrier';
+import { CarrierWaypoint, CarrierWaypointActionType } from '../types/CarrierWaypoint';
+import { Game } from '../types/Game';
+import { Player } from '../types/Player';
+import { Star } from '../types/Star';
+import CarrierService from './carrier';
+import DistanceService from './distance';
+import GameService from './game';
+import PlayerService from './player';
+import StarService from './star';
+import StarDistanceService from './starDistance';
+import TechnologyService from './technology';
+import { CarrierActionWaypoint } from '../types/GameTick';
+
+const mongoose = require('mongoose');
 
 export default class WaypointService {
+    gameRepo: DatabaseRepository<Game>;
+    carrierService: CarrierService;
+    starService: StarService;
+    distanceService: DistanceService;
+    starDistanceService: StarDistanceService;
+    technologyService: TechnologyService;
+    gameService: GameService;
+    playerService: PlayerService;
 
-    constructor(gameRepo, carrierService, starService, distanceService, 
-        starDistanceService, technologyService, gameService, playerService) {
+    constructor(
+        gameRepo: DatabaseRepository<Game>,
+        carrierService: CarrierService,
+        starService: StarService,
+        distanceService: DistanceService,
+        starDistanceService: StarDistanceService,
+        technologyService: TechnologyService,
+        gameService: GameService,
+        playerService: PlayerService
+    ) {
         this.gameRepo = gameRepo;
         this.carrierService = carrierService;
         this.starService = starService;
@@ -14,14 +47,14 @@ export default class WaypointService {
         this.playerService = playerService;
     }
 
-    async saveWaypoints(game, player, carrierId, waypoints, looped) {
+    async saveWaypoints(game: Game, player: Player, carrierId: DBObjectId, waypoints: CarrierWaypoint[], looped: boolean) {
         if (looped == null) {
             looped = false;
         }
         
         let carrier = this.carrierService.getById(game, carrierId);
         
-        if (!carrier.ownedByPlayerId.equals(player._id)) {
+        if (!carrier.ownedByPlayerId!.equals(player._id)) {
             throw new ValidationError('The player does not own this carrier.');
         }
 
@@ -36,8 +69,8 @@ export default class WaypointService {
             let newFirstWaypoint = waypoints[0];
 
             if (!newFirstWaypoint 
-                || currentWaypoint.source.toString() !== newFirstWaypoint.source
-                || currentWaypoint.destination.toString() !== newFirstWaypoint.destination) {
+                || !currentWaypoint.source.equals(newFirstWaypoint.source)
+                || !currentWaypoint.destination.equals(newFirstWaypoint.destination)) {
                     throw new ValidationError('The first waypoint course cannot be changed mid-flight.');
                 }
 
@@ -59,14 +92,14 @@ export default class WaypointService {
             waypoint.actionShips = waypoint.actionShips || 0;
             waypoint.action = waypoint.action || 'nothing';
 
-            if (waypoint.actionShips == null || waypoint.actionShips == '' || +waypoint.actionShips < 0) {
+            if (waypoint.actionShips == null || (waypoint.actionShips as any) == '' || +waypoint.actionShips < 0) {
                 waypoint.actionShips = 0;
             }
 
             // Make damn sure there is a delay ticks defined.
             waypoint.delayTicks = waypoint.delayTicks || 0;
             
-            if (waypoint.delayTicks == null || waypoint.delayTicks == '' || +waypoint.delayTicks < 0) {
+            if (waypoint.delayTicks == null || (waypoint.delayTicks as any) == '' || +waypoint.delayTicks < 0) {
                 waypoint.delayTicks = 0;
             }
 
@@ -113,7 +146,7 @@ export default class WaypointService {
 
         // Send back the eta ticks of the waypoints so that
         // the UI can be updated.
-        let reportCarrier = carrier.toObject();
+        let reportCarrier = carrier.toObject(); // TODO: Is this needed?
 
         this.populateCarrierWaypointEta(game, reportCarrier);
 
@@ -124,7 +157,7 @@ export default class WaypointService {
         };
     }
 
-    _waypointRouteIsWithinHyperspaceRange(game, carrier, waypoint) {
+    _waypointRouteIsWithinHyperspaceRange(game: Game, carrier: Carrier, waypoint: CarrierWaypoint) {
         let sourceStar = this.starService.getByObjectId(game, waypoint.source);
         let destinationStar = this.starService.getByObjectId(game, waypoint.destination);
 
@@ -138,7 +171,7 @@ export default class WaypointService {
             return true;
         }
 
-        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, null, true);
+        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, false, true);
         let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, effectiveTechs.hyperspace);
 
         let distanceBetweenStars = this.starDistanceService.getDistanceBetweenStars(sourceStar, destinationStar);
@@ -146,7 +179,7 @@ export default class WaypointService {
         return distanceBetweenStars <= hyperspaceDistance;
     }
 
-    _waypointRouteIsBetweenWormHoles(game, waypoint) {
+    _waypointRouteIsBetweenWormHoles(game: Game, waypoint: CarrierWaypoint) {
         let sourceStar = this.starService.getByObjectId(game, waypoint.source);
         let destinationStar = this.starService.getByObjectId(game, waypoint.destination);
 
@@ -158,7 +191,7 @@ export default class WaypointService {
         return this.starService.isStarPairWormHole(sourceStar, destinationStar);
     }
 
-    async cullWaypointsByHyperspaceRangeDB(game, carrier) {
+    async cullWaypointsByHyperspaceRangeDB(game: Game, carrier: Carrier) {
         let cullResult = this.cullWaypointsByHyperspaceRange(game, carrier);
 
         if (cullResult) {
@@ -176,7 +209,7 @@ export default class WaypointService {
         return cullResult;
     }
 
-    cullWaypointsByHyperspaceRange(game, carrier) {
+    cullWaypointsByHyperspaceRange(game: Game, carrier: Carrier) {
         let player = this.playerService.getById(game, carrier.ownedByPlayerId);
 
         // Iterate through all waypoints the carrier has one by one and
@@ -212,10 +245,10 @@ export default class WaypointService {
         return null;
     }
 
-    async loopWaypoints(game, player, carrierId, loop) {
+    async loopWaypoints(game: Game, player: Player, carrierId: DBObjectId, loop: boolean) {
         let carrier = this.carrierService.getById(game, carrierId);
         
-        if (!carrier.ownedByPlayerId.equals(player._id)) {
+        if (!carrier.ownedByPlayerId!.equals(player._id)) {
             throw new ValidationError('The player does not own this carrier.');
         }
         
@@ -244,12 +277,12 @@ export default class WaypointService {
         })
     }
 
-    canLoop(game, player, carrier) {
+    canLoop(game: Game, player: Player, carrier: Carrier) {
         if (carrier.waypoints.length < 2 || carrier.isGift) {
             return false;
         }
 
-        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, null, true);
+        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, false, true);
 
         // Check whether the last waypoint is in range of the first waypoint.
         let firstWaypoint = carrier.waypoints[0];
@@ -272,10 +305,10 @@ export default class WaypointService {
         return distanceBetweenStars <= hyperspaceDistance
     }
 
-    calculateWaypointTicks(game, carrier, waypoint) {
+    calculateWaypointTicks(game: Game, carrier: Carrier, waypoint: CarrierWaypoint) {
         const delayTicks = waypoint.delayTicks || 0;
 
-        let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
+        let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId))!;
 
         // if the waypoint is going to the same star then it is at least 1
         // tick, plus any delay ticks.
@@ -318,7 +351,7 @@ export default class WaypointService {
         return ticks;
     }
 
-    calculateWaypointTicksEta(game, carrier, waypoint) {
+    calculateWaypointTicksEta(game: Game, carrier: Carrier, waypoint: CarrierWaypoint) {
         let totalTicks = 0;
 
         for (let i = 0; i < carrier.waypoints.length; i++) {
@@ -334,8 +367,8 @@ export default class WaypointService {
         return totalTicks;
     }
 
-    performWaypointAction(carrier, star, waypoint) {
-        if (!carrier.ownedByPlayerId.equals(star.ownedByPlayerId)) {
+    performWaypointAction(carrier: Carrier, star: Star, waypoint: CarrierWaypoint) {
+        if (!carrier.ownedByPlayerId!.equals(star.ownedByPlayerId)) {
             throw new Error('Cannot perform waypoint action, the carrier and star are owned by different players.')
         }
 
@@ -370,7 +403,7 @@ export default class WaypointService {
         }
     }
 
-    populateCarrierWaypointEta(game, carrier) {
+    populateCarrierWaypointEta(game: Game, carrier: Carrier) {
         carrier.waypoints.forEach(w => {
             w.ticks = this.calculateWaypointTicks(game, carrier, w);
             w.ticksEta = this.calculateWaypointTicksEta(game, carrier, w);
@@ -385,25 +418,25 @@ export default class WaypointService {
         }
     }
 
-    _performWaypointActionDropAll(carrier, star, waypoint) {
-        star.shipsActual += (carrier.ships - 1)
-        star.ships = Math.floor(star.shipsActual);
+    _performWaypointActionDropAll(carrier: Carrier, star: Star, waypoint: CarrierWaypoint) {
+        star.shipsActual! += (carrier.ships! - 1)
+        star.ships = Math.floor(star.shipsActual!);
         carrier.ships = 1;
     }
 
-    _performWaypointActionCollectAll(carrier, star, waypoint) {
-        carrier.ships += star.ships;
-        star.shipsActual -= star.ships;
-        star.ships = Math.floor(star.shipsActual);
+    _performWaypointActionCollectAll(carrier: Carrier, star: Star, waypoint: CarrierWaypoint) {
+        carrier.ships! += star.ships!;
+        star.shipsActual! -= star.ships!;
+        star.ships = Math.floor(star.shipsActual!);
     }
 
-    _performWaypointActionDrop(carrier, star, waypoint) {
+    _performWaypointActionDrop(carrier: Carrier, star: Star, waypoint: CarrierWaypoint) {
         // If the carrier has more ships than needs to be dropped, then drop
         // however many are configured in the waypoint.
-        if (carrier.ships - 1 >= waypoint.actionShips) {
-            star.shipsActual += waypoint.actionShips;
-            star.ships = Math.floor(star.shipsActual);
-            carrier.ships -= waypoint.actionShips;
+        if (carrier.ships! - 1 >= waypoint.actionShips) {
+            star.shipsActual! += waypoint.actionShips;
+            star.ships = Math.floor(star.shipsActual!);
+            carrier.ships! -= waypoint.actionShips;
         }
         else {
             // If there aren't enough ships, then do a drop all.
@@ -411,17 +444,17 @@ export default class WaypointService {
         }
     }
     
-    performWaypointActionsDrops(game, waypoints) {
+    performWaypointActionsDrops(game: Game, waypoints: CarrierActionWaypoint[]) {
         this._performFilteredWaypointActions(game, waypoints, ['dropAll', 'drop', 'dropAllBut', 'dropPercentage']);
     }
 
-    _performWaypointActionCollect(carrier, star, waypoint) {
+    _performWaypointActionCollect(carrier: Carrier, star: Star, waypoint: CarrierWaypoint) {
         // If the star has more ships than needs to be collected, then collect
         // however many are configured in the waypoint.
-        if (star.ships >= waypoint.actionShips) {
-            star.shipsActual -= waypoint.actionShips;
-            star.ships = Math.floor(star.shipsActual);
-            carrier.ships += waypoint.actionShips;
+        if (star.ships! >= waypoint.actionShips) {
+            star.shipsActual! -= waypoint.actionShips;
+            star.ships = Math.floor(star.shipsActual!);
+            carrier.ships! += waypoint.actionShips;
         }
         else {
             // If there aren't enough ships, then do a collect all.
@@ -429,88 +462,88 @@ export default class WaypointService {
         }
     }
 
-    performWaypointActionsCollects(game, waypoints) {
+    performWaypointActionsCollects(game: Game, waypoints: CarrierActionWaypoint[]) {
         this._performFilteredWaypointActions(game, waypoints, ['collectAll', 'collect', 'collectAllBut', 'collectPercentage']);
     }
 
-    _performWaypointActionDropPercentage(carrier, star, waypoint) {
-        const toDrop = Math.floor(carrier.ships * (waypoint.actionShips * 0.01))
+    _performWaypointActionDropPercentage(carrier: Carrier, star: Star, waypoint: CarrierWaypoint) {
+        const toDrop = Math.floor(carrier.ships! * (waypoint.actionShips * 0.01))
 
-        if (toDrop >= 1 && carrier.ships - toDrop >= 1) {
-            star.shipsActual += toDrop
-            star.ships = Math.floor(star.shipsActual)
-            carrier.ships -= toDrop
+        if (toDrop >= 1 && carrier.ships! - toDrop >= 1) {
+            star.shipsActual! += toDrop
+            star.ships = Math.floor(star.shipsActual!)
+            carrier.ships! -= toDrop
         }
     }
 
-    _performWaypointActionDropAllBut(carrier, star, waypoint) {
+    _performWaypointActionDropAllBut(carrier: Carrier, star: Star, waypoint: CarrierWaypoint) {
         // Calculate the difference between how many ships we currently have
         // and how many need to remain after.
-        let difference = carrier.ships - waypoint.actionShips;
+        let difference = carrier.ships! - waypoint.actionShips;
 
         // If we have more than enough ships to transfer, then transfer
         // the desired amount. Otherwise do not drop anything.
-        if (difference > 0 && difference <= carrier.ships - 1) {
-            star.shipsActual += difference;
-            star.ships = Math.floor(star.shipsActual);
-            carrier.ships -= difference;
+        if (difference > 0 && difference <= carrier.ships! - 1) {
+            star.shipsActual! += difference;
+            star.ships = Math.floor(star.shipsActual!);
+            carrier.ships! -= difference;
         }
     }
 
-    _performWaypointActionCollectPercentage(carrier, star, waypoint) {
-        const toTransfer = Math.floor(star.ships * (waypoint.actionShips * 0.01))
+    _performWaypointActionCollectPercentage(carrier: Carrier, star: Star, waypoint: CarrierWaypoint) {
+        const toTransfer = Math.floor(star.ships! * (waypoint.actionShips * 0.01))
 
-        if (toTransfer >= 1 && star.ships - toTransfer >= 0) {
-            star.shipsActual -= toTransfer
-            star.ships = Math.floor(star.shipsActual)
-            carrier.ships += toTransfer
+        if (toTransfer >= 1 && star.ships! - toTransfer >= 0) {
+            star.shipsActual! -= toTransfer
+            star.ships = Math.floor(star.shipsActual!)
+            carrier.ships! += toTransfer
         }
     }
 
-    _performWaypointActionCollectAllBut(carrier, star, waypoint) {
+    _performWaypointActionCollectAllBut(carrier: Carrier, star: Star, waypoint: CarrierWaypoint) {
         // Calculate the difference between how many ships we currently have
         // and how many need to remain after.
-        let difference = star.ships - waypoint.actionShips;
+        let difference = star.ships! - waypoint.actionShips;
 
         // If we have more than enough ships to transfer, then transfer
         // the desired amount. Otherwise do not drop anything.
-        if (difference > 0 && difference <= star.ships) {
-            star.shipsActual -= difference;
-            star.ships = Math.floor(star.shipsActual);
-            carrier.ships += difference;
+        if (difference > 0 && difference <= star.ships!) {
+            star.shipsActual! -= difference;
+            star.ships = Math.floor(star.shipsActual!);
+            carrier.ships! += difference;
         }
     }
 
-    _performWaypointActionGarrison(carrier, star, waypoint) {
+    _performWaypointActionGarrison(carrier: Carrier, star: Star, waypoint: CarrierWaypoint) {
         // Calculate how many ships need to be dropped or collected
         // in order to garrison the star.
-        let difference = star.ships - waypoint.actionShips;
+        let difference = star.ships! - waypoint.actionShips;
 
         // If the difference is above 0 then move ships
         // from the star to the carrier, otherwise do the opposite.
         if (difference > 0) {
-            let allowed = Math.abs(Math.min(difference, star.ships));
+            let allowed = Math.abs(Math.min(difference, star.ships!));
 
-            star.shipsActual -= allowed;
-            carrier.ships += allowed;
+            star.shipsActual! -= allowed;
+            carrier.ships! += allowed;
         } else {
-            let allowed = Math.min(Math.abs(difference), carrier.ships - 1);
+            let allowed = Math.min(Math.abs(difference), carrier.ships! - 1);
 
-            star.shipsActual += allowed;
-            carrier.ships -= allowed;
+            star.shipsActual! += allowed;
+            carrier.ships! -= allowed;
         }
 
-        star.ships = Math.floor(star.shipsActual);
+        star.ships = Math.floor(star.shipsActual!);
     }
 
-    performWaypointActionsGarrisons(game, waypoints) {
+    performWaypointActionsGarrisons(game: Game, waypoints: CarrierActionWaypoint[]) {
         this._performFilteredWaypointActions(game, waypoints, ['garrison']);
     }
 
-    _performFilteredWaypointActions(game, waypoints, waypointTypes) {
+    _performFilteredWaypointActions(game: Game, waypoints: CarrierActionWaypoint[], waypointTypes: CarrierWaypointActionType[]) {
         let actionWaypoints = waypoints.filter(w => 
             waypointTypes.indexOf(w.waypoint.action) > -1
-            && w.carrier.ownedByPlayerId.equals(w.star.ownedByPlayerId) // The carrier must be owned by the player who owns the star.
+            && w.carrier.ownedByPlayerId!.equals(w.star.ownedByPlayerId) // The carrier must be owned by the player who owns the star.
         );
 
         for (let actionWaypoint of actionWaypoints) {
@@ -518,7 +551,7 @@ export default class WaypointService {
         }
     }
 
-    sanitiseAllCarrierWaypointsByScanningRange(game) {
+    sanitiseAllCarrierWaypointsByScanningRange(game: Game) {
         const scanningRanges = game.galaxy.players
             .map(p => {
                 return {
@@ -530,7 +563,7 @@ export default class WaypointService {
         game.galaxy.carriers
             .filter(c => c.waypoints.length)
             .map(c => {
-                let scanningRangePlayer = scanningRanges.find(s => s.player._id.equals(c.ownedByPlayerId));
+                let scanningRangePlayer = scanningRanges.find(s => s.player._id.equals(c.ownedByPlayerId))!;
 
                 return {
                     carrier: c,
@@ -541,7 +574,7 @@ export default class WaypointService {
             .forEach(x => this.sanitiseCarrierWaypointsByScanningRange(game, x.carrier, x.owner, x.ownerScannedStars));
     }
 
-    sanitiseCarrierWaypointsByScanningRange(game, carrier, owner, ownerScannedStars) {
+    sanitiseCarrierWaypointsByScanningRange(game: Game, carrier: Carrier, owner: Player, ownerScannedStars: Star[]) {
         // Verify that waypoints are still valid.
         // For example, if a star is captured then it may no longer be in scanning range
         // so any waypoints to it should be removed unless already in transit.
@@ -570,19 +603,19 @@ export default class WaypointService {
         }
     }
 
-    rerouteToNearestFriendlyStarFromStar(game, carrier) {
+    rerouteToNearestFriendlyStarFromStar(game: Game, carrier: Carrier) {
         if (!carrier.orbiting) {
             throw new ValidationError(`Star must be in orbit for it to be rerouted from a star.`);
         }
 
-        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, null, true);
+        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, false, true);
         let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, effectiveTechs.hyperspace);
 
         // Find the nearest friendly star, if there is none then we cannot reroute.
         let nearestStar = this.starDistanceService.getClosestPlayerOwnedStarsFromLocationWithinDistance(
             carrier.location,
             game.galaxy.stars,
-            carrier.ownedByPlayerId,
+            carrier.ownedByPlayerId!,
             hyperspaceDistance
         )[0];
 
@@ -591,6 +624,7 @@ export default class WaypointService {
         }
 
         carrier.waypoints = [{
+            _id: new mongoose.Types.ObjectId(),
             source: carrier.orbiting,
             destination: nearestStar._id,
             action: 'nothing',

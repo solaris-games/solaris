@@ -1,8 +1,8 @@
-import { ObjectId } from "mongoose";
+import { DBObjectId } from "./DBObjectId";
 
 export interface Payment {
-    _id: ObjectId;
-    userId: ObjectId;
+    _id: DBObjectId;
+    userId: DBObjectId;
     paymentId: string;
     totalCost: number;
     totalQuantity: number;

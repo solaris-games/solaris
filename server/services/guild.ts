@@ -1,5 +1,10 @@
 const mongoose = require('mongoose');
+import { DBObjectId } from '../types/DBObjectId';
 import ValidationError from '../errors/validation';
+import DatabaseRepository from '../models/DatabaseRepository';
+import { Guild, GuildLeaderboard, GuildRank, GuildUserApplication, GuildWithUsers } from '../types/Guild';
+import { User } from '../types/User';
+import UserService from './user';
 
 function toProperCase(string) {
     return string.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
@@ -12,8 +17,18 @@ export default class GuildService {
     MAX_INVITE_COUNT = 100
     CREATE_GUILD_CREDITS_COST = 3
     RENAME_GUILD_CREDITS_COST = 1
+
+    guildModel: any;
+    guildRepo: DatabaseRepository<Guild>;
+    userRepo: DatabaseRepository<User>;
+    userService: UserService;
     
-    constructor(guildModel, guildRepo, userRepo, userService) {
+    constructor(
+        guildModel: any,
+        guildRepo: DatabaseRepository<Guild>,
+        userRepo: DatabaseRepository<User>,
+        userService: UserService
+    ) {
         this.guildModel = guildModel;
         this.guildRepo = guildRepo;
         this.userRepo = userRepo;
@@ -30,16 +45,21 @@ export default class GuildService {
             tag: 1
         });
 
-        for (let guild in guilds) {
-            let usersInGuild = users.filter(x => x.guildId.equals(guild._id));
+        let guildsWithRank: GuildRank[] = guilds.map(guild => {
+            let usersInGuild = users.filter(x => x.guildId && x.guildId.equals(guild._id));
 
-            guild.totalRank = usersInGuild.reduce((sum, i) => sum + i.achievements.rank, 0);
-        }
+            let totalRank = usersInGuild.reduce((sum, i) => sum + i.achievements.rank, 0);
 
-        return guilds.sort((a, b) => b.totalRank - a.totalRank);
+            return {
+                ...guild,
+                totalRank
+            };
+        });
+
+        return guildsWithRank.sort((a, b) => b.totalRank - a.totalRank);
     }
 
-    async listInfoByIds(guildIds) {
+    async listInfoByIds(guildIds: DBObjectId[]) {
         return await this.guildRepo.find({
             _id: {
                 $in: guildIds
@@ -50,7 +70,7 @@ export default class GuildService {
         });
     }
 
-    async getInfoById(guildId) {
+    async getInfoById(guildId: DBObjectId) {
         return await this.guildRepo.findOne({
             _id: guildId
         }, {
@@ -59,7 +79,7 @@ export default class GuildService {
         });
     }
 
-    async listInvitations(userId) {
+    async listInvitations(userId: DBObjectId) {
         let guilds = await this.guildRepo.find({
             invitees: {
                 $in: [mongoose.Types.ObjectId(userId)]
@@ -72,7 +92,7 @@ export default class GuildService {
         return guilds;
     }
 
-    async listApplications(userId) {
+    async listApplications(userId: DBObjectId): Promise<GuildUserApplication[]> {
         let guilds = await this.guildRepo.find({
             // All guilds
         }, {
@@ -82,15 +102,17 @@ export default class GuildService {
         });
 
         return guilds.map(g => {
-            g.hasApplied = this._isApplicant(g, userId);
+            let hasApplied = this._isApplicant(g, userId);
 
-            delete g.applicants;
-
-            return g;
+            return {
+                name: g.name,
+                tag: g.tag,
+                hasApplied
+            };
         });
     }
 
-    async detail(guildId, withUserInfo = false, withInvitationsAndApplications = false) {
+    async detailWithUserInfo(guildId: DBObjectId, withInvitationsAndApplications: boolean = false): Promise<GuildWithUsers> {
         if (guildId == null) {
             throw new ValidationError("Guild ID is required.");
         }
@@ -103,47 +125,67 @@ export default class GuildService {
             throw new ValidationError("Guild not found.");
         }
 
-        if (withUserInfo) {
-            let userSelectObject = {
-                username: 1,
-                'achievements.rank': 1,
-                'achievements.victories': 1,
-                'achievements.renown': 1
-            };
+        let guildWithUsers: GuildWithUsers = {
+            _id: guild._id,
+            name: guild.name,
+            tag: guild.tag
+        };
 
-            let usersInGuild = await this.userService.listUsersInGuild(guildId, userSelectObject);
-            
-            guild.leader = usersInGuild.find(x => x._id.equals(guild.leader));
-            guild.officers = usersInGuild.filter(x => this._isOfficer(guild, x._id));
-            guild.members = usersInGuild.filter(x => this._isMember(guild, x._id));
+        let userSelectObject = {
+            username: 1,
+            'achievements.rank': 1,
+            'achievements.victories': 1,
+            'achievements.renown': 1
+        };
 
-            if (withInvitationsAndApplications) {
-                guild.invitees = await this.userService.listUsers(guild.invitees, userSelectObject);
-                guild.applicants = await this.userService.listUsers(guild.applicants, userSelectObject);
-            } else {
-                delete guild.invitees;
-                delete guild.applicants;
-            }
+        let usersInGuild = await this.userService.listUsersInGuild(guildId, userSelectObject);
+        
+        guildWithUsers.leader = usersInGuild.find(x => x._id.equals(guild!.leader))!;
+        guildWithUsers.officers = usersInGuild.filter(x => this._isOfficer(guild!, x._id));
+        guildWithUsers.members = usersInGuild.filter(x => this._isMember(guild!, x._id));
 
-            guild.totalRank = usersInGuild.reduce((sum, i) => sum + i.achievements.rank, 0);
+        if (withInvitationsAndApplications) {
+            guildWithUsers.invitees = await this.userService.listUsers(guild.invitees, userSelectObject);
+            guildWithUsers.applicants = await this.userService.listUsers(guild.applicants, userSelectObject);
+        } else {
+            delete guildWithUsers.invitees;
+            delete guildWithUsers.applicants;
         }
 
+        guildWithUsers.totalRank = usersInGuild.reduce((sum, i) => sum + i.achievements.rank, 0);
+
+        return guildWithUsers;
+    }
+
+    async detail(guildId: DBObjectId): Promise<Guild> {
+        if (guildId == null) {
+            throw new ValidationError("Guild ID is required.");
+        }
+
+        let guild = await this.guildRepo.findOne({
+            _id: guildId
+        });
+
+        if (!guild) {
+            throw new ValidationError("Guild not found.");
+        }
+        
         return guild;
     }
 
-    async detailMyGuild(userId, withUserInfo = false) {
+    async detailMyGuild(userId: DBObjectId, withUserInfo: boolean = false) {
         let user = await this.userService.getById(userId, {
             guildId: 1
         });
 
-        if (!user.guildId) {
+        if (!user || !user.guildId) {
             return null;
         }
 
-        return await this.detail(user.guildId, withUserInfo, true);
+        return await this.detailWithUserInfo(user.guildId, true);
     }
 
-    async create(userId, name, tag) {
+    async create(userId: DBObjectId, name: string, tag: string) {
         let isUserInAGuild = await this._isUserInAGuild(userId);
 
         if (isUserInAGuild) {
@@ -192,8 +234,8 @@ export default class GuildService {
         return guild;
     }
 
-    async rename(userId, newName, newTag) {
-        let guild = await this.detailMyGuild(userId, false);
+    async rename(userId: DBObjectId, newName: string, newTag: string) {
+        let guild = await this.detail(userId);
 
         if (!guild) {
             throw new ValidationError('You are not a member of a guild.');
@@ -234,7 +276,7 @@ export default class GuildService {
         });
     }
 
-    async delete(userId, guildId) {
+    async delete(userId: DBObjectId, guildId: DBObjectId) {
         let guild = await this.detail(guildId);
 
         if (!this._isLeader(guild, userId)) {
@@ -305,7 +347,7 @@ export default class GuildService {
         return user;
     }
 
-    async uninvite(userId, guildId, uninvitedByUserId) {
+    async uninvite(userId: DBObjectId, guildId: DBObjectId, uninvitedByUserId: DBObjectId) {
         let guild = await this.detail(guildId);
 
         let hasPermission = this._isLeader(guild, uninvitedByUserId) || this._isOfficer(guild, uninvitedByUserId);
@@ -327,7 +369,7 @@ export default class GuildService {
         });
     }
 
-    async decline(userId, guildId) {
+    async decline(userId: DBObjectId, guildId: DBObjectId) {
         let guild = await this.detail(guildId);
 
         if (!this._isInvitee(guild, userId)) {
@@ -343,7 +385,7 @@ export default class GuildService {
         });
     }
 
-    async declineAllInvitations(userId) {
+    async declineAllInvitations(userId: DBObjectId) {
         await this.guildRepo.updateMany({
             invitees: {
                 $in: [userId]
@@ -355,7 +397,7 @@ export default class GuildService {
         });
     }
 
-    async withdrawAllApplications(userId) {
+    async withdrawAllApplications(userId: DBObjectId) {
         await this.guildRepo.updateMany({
             applicants: {
                 $in: [userId]
@@ -367,7 +409,7 @@ export default class GuildService {
         });
     }
 
-    async apply(userId, guildId) {
+    async apply(userId: DBObjectId, guildId: DBObjectId) {
         let isUserInAGuild = await this._isUserInAGuild(userId);
 
         if (isUserInAGuild) {
@@ -389,7 +431,7 @@ export default class GuildService {
         });
     }
 
-    async withdraw(userId, guildId) {
+    async withdraw(userId: DBObjectId, guildId: DBObjectId) {
         let guild = await this.detail(guildId);
 
         if (!this._isApplicant(guild, userId)) {
@@ -405,7 +447,7 @@ export default class GuildService {
         });
     }
 
-    async accept(userId, guildId, acceptedByUserId) {
+    async accept(userId: DBObjectId, guildId: DBObjectId, acceptedByUserId: DBObjectId) {
         let guild = await this.detail(guildId);
 
         let hasPermission = this._isLeader(guild, acceptedByUserId) || this._isOfficer(guild, acceptedByUserId);
@@ -417,7 +459,7 @@ export default class GuildService {
         await this.join(userId, guildId);
     }
 
-    async reject(userId, guildId, rejectedByUserId) {
+    async reject(userId: DBObjectId, guildId: DBObjectId, rejectedByUserId: DBObjectId) {
         let guild = await this.detail(guildId);
 
         let hasPermission = this._isLeader(guild, rejectedByUserId) || this._isOfficer(guild, rejectedByUserId);
@@ -439,7 +481,7 @@ export default class GuildService {
         });
     }
 
-    async join(userId, guildId) {
+    async join(userId: DBObjectId, guildId: DBObjectId) {
         let guild = await this.detail(guildId);
 
         if (!this._isApplicant(guild, userId) && !this._isInvitee(guild, userId)) {
@@ -483,7 +525,7 @@ export default class GuildService {
         }
     }
 
-    async tryLeave(userId) {
+    async tryLeave(userId: DBObjectId) {
         let guild = await this.detailMyGuild(userId, false);
 
         if (guild) {
@@ -491,7 +533,7 @@ export default class GuildService {
         }
     }
 
-    async leave(userId, guildId) {
+    async leave(userId: DBObjectId, guildId: DBObjectId) {
         let guild = await this.detail(guildId);
 
         if (this._isLeader(guild, userId)) {
@@ -501,7 +543,7 @@ export default class GuildService {
         await this._removeUser(guild, userId);
     }
 
-    async promote(userId, guildId, promotedByUserId) {
+    async promote(userId: DBObjectId, guildId: DBObjectId, promotedByUserId: DBObjectId) {
         let guild = await this.detail(guildId);
 
         let hasPermission = this._isLeader(guild, promotedByUserId)
@@ -539,7 +581,7 @@ export default class GuildService {
         }
     }
 
-    async demote(userId, guildId, demotedByUserId) {
+    async demote(userId: DBObjectId, guildId: DBObjectId, demotedByUserId: DBObjectId) {
         let guild = await this.detail(guildId);
 
         let hasPermission = this._isLeader(guild, demotedByUserId);
@@ -548,7 +590,7 @@ export default class GuildService {
             throw new ValidationError(`You do not have the authority to demote this member.`);
         }
 
-        let updateObject = null;
+        let updateObject: any | null = null;
 
         if (this._isOfficer(guild, userId)) {
             // Officer to member
@@ -571,7 +613,7 @@ export default class GuildService {
         }, updateObject);
     }
 
-    async kick(userId, guildId, kickedByUserId) {
+    async kick(userId: DBObjectId, guildId: DBObjectId, kickedByUserId: DBObjectId) {
         let guild = await this.detail(guildId);
 
         if (this._isLeader(guild, userId)) {
@@ -588,8 +630,8 @@ export default class GuildService {
         await this._removeUser(guild, userId);
     }
 
-    async _removeUser(guild, userId) {
-        let updateObject = null;
+    async _removeUser(guild: Guild, userId: DBObjectId) {
+        let updateObject: any | null = null;
 
         if (this._isOfficer(guild, userId)) {
             updateObject = {
@@ -620,31 +662,31 @@ export default class GuildService {
         });
     }
 
-    _isLeader(guild, userId) {
+    _isLeader(guild: Guild, userId: DBObjectId) {
         return guild.leader.equals(userId);
     }
 
-    _isOfficer(guild, userId) {
-        return guild.officers.find(x => x.equals(userId));
+    _isOfficer(guild: Guild, userId: DBObjectId) {
+        return guild.officers.find(x => x.equals(userId)) != null;
     }
 
-    _isMember(guild, userId) {
-        return guild.members.find(x => x.equals(userId));
+    _isMember(guild: Guild, userId: DBObjectId) {
+        return guild.members.find(x => x.equals(userId)) != null;
     }
 
-    _isInvitee(guild, userId) {
-        return guild.invitees.find(x => x.equals(userId));
+    _isInvitee(guild: Guild, userId: DBObjectId) {
+        return guild.invitees.find(x => x.equals(userId)) != null;
     }
 
-    _isApplicant(guild, userId) {
-        return guild.applicants.find(x => x.equals(userId));
+    _isApplicant(guild: Guild, userId: DBObjectId) {
+        return guild.applicants.find(x => x.equals(userId)) != null;
     }
 
-    _totalMemberCount(guild) {
+    _totalMemberCount(guild: Guild) {
         return 1 + guild.officers.length + guild.members.length;
     }
 
-    async _isUserInAGuild(userId) {
+    async _isUserInAGuild(userId: DBObjectId) {
         return await this.userRepo.count({
             _id: userId,
             guildId: { $ne: null }
@@ -660,7 +702,7 @@ export default class GuildService {
         });
     }
 
-    async getLeaderboard(limit, sortingKey) {
+    async getLeaderboard(limit: number | null, sortingKey: string) {
         limit = limit || 100;
         sortingKey = GuildService.SORTERS.includes(sortingKey) ? sortingKey : 'totalRank';
 
@@ -675,14 +717,20 @@ export default class GuildService {
         // Calculate the rankings of each guild.
         let users = await this.listUserRanksInGuilds();
 
-        for (let guild of guilds) {
-            let usersInGuild = users.filter(x => x.guildId.equals(guild._id));
+        let guildsWithRank: GuildLeaderboard[] = guilds.map(guild => {
+            let usersInGuild = users.filter(x => x.guildId!.equals(guild._id));
 
-            guild.totalRank = usersInGuild.reduce((sum, i) => sum + i.achievements.rank, 0);
-            guild.memberCount = usersInGuild.length;
-        }
+            let totalRank = usersInGuild.reduce((sum, i) => sum + i.achievements.rank, 0);
+            let memberCount = usersInGuild.length;
 
-        let leaderboard = guilds
+            return {
+                ...guild,
+                totalRank,
+                memberCount
+            }
+        });
+
+        let leaderboard = guildsWithRank
                         .sort((a, b) => b[sortingKey] - a[sortingKey])
                         .slice(0, limit);
 
@@ -692,7 +740,7 @@ export default class GuildService {
 
         return {
             leaderboard,
-            totalGuilds: guilds.length
+            totalGuilds: guildsWithRank.length
         };
     }
 

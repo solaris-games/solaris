@@ -1,4 +1,4 @@
-import { ObjectId } from "mongoose";
+import { DBObjectId } from "../types/DBObjectId";
 
 export default class DatabaseRepository<T> {
 
@@ -8,17 +8,17 @@ export default class DatabaseRepository<T> {
         this.model = model;
     }
 
-    async findById(id: ObjectId, select: any): Promise<T | null> {
+    async findById(id: DBObjectId, select?: any): Promise<T | null> {
         return await this.model.findById(id, select)
         .lean({ defaults: true })
         .exec();
     }
 
-    async findByIdAsModel(id: ObjectId, select: any): Promise<any | null> {
+    async findByIdAsModel(id: DBObjectId, select?: any): Promise<any | null> {
         return await this.model.findById(id, select).exec();
     }
 
-    async find(query: any, select: any, sort: any | null = null, limit: number | null = null, skip: number | null = null): Promise<T[]> {
+    async find(query: any, select?: any | null, sort?: any | null, limit?: number | null, skip?: number | null): Promise<T[]> {
         return await this.model.find(query, select)
         .sort(sort)
         .skip(skip)
@@ -27,7 +27,7 @@ export default class DatabaseRepository<T> {
         .exec();
     }
 
-    async findAsModels(query: any, select: any, sort: any | null = null, limit: number | null = null, skip: number | null = null): Promise<any[]> {
+    async findAsModels(query: any, select?: any, sort?: any, limit?: number, skip?: number): Promise<any[]> {
         return await this.model.find(query, select)
         .sort(sort)
         .skip(skip)
@@ -35,13 +35,13 @@ export default class DatabaseRepository<T> {
         .exec();
     }
 
-    async findOne(query: any, select: any): Promise<T | null> {
+    async findOne(query: any, select?: any): Promise<T | null> {
         return await this.model.findOne(query, select)
         .lean({ defaults: true })
         .exec();
     }
 
-    async findOneAsModel(query: any, select: any): Promise<any | null> {
+    async findOneAsModel(query: any, select?: any): Promise<any | null> {
         return await this.model.findOne(query, select)
         .exec();
     }
@@ -54,11 +54,11 @@ export default class DatabaseRepository<T> {
         return this.model.estimatedDocumentCount();
     }
 
-    async updateOne(query: any, update: any, options: any | null = null): Promise<void> {
+    async updateOne(query: any, update: any, options?: any): Promise<void> {
         return await this.model.updateOne(query, update, options).exec();
     }
 
-    async updateMany(query: any, update: any, options: any | null = null): Promise<void> {
+    async updateMany(query: any, update: any, options?: any): Promise<void> {
         return await this.model.updateMany(query, update, options).exec();
     }
 
@@ -78,7 +78,7 @@ export default class DatabaseRepository<T> {
         return Math.floor(date.getTime() / 1000).toString(16) + "0000000000000000";
     }
     
-    dateFromObjectId(objectId: ObjectId | string) {
+    dateFromObjectId(objectId: DBObjectId | string) {
         return new Date(parseInt(objectId.toString().substring(0, 8), 16) * 1000);
     }
 

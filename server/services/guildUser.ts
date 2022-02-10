@@ -1,11 +1,22 @@
+import { DBObjectId } from "../types/DBObjectId";
+import DatabaseRepository from "../models/DatabaseRepository";
+import { User } from "../types/User";
+import GuildService from "./guild";
+import { GuildUserWithTag } from "../types/Guild";
+
 export default class UserGuildService {
+    userRepo: DatabaseRepository<User>;
+    guildService: GuildService;
     
-    constructor(userRepo, guildService) {
+    constructor(
+        userRepo: DatabaseRepository<User>,
+        guildService: GuildService
+    ) {
         this.userRepo = userRepo;
         this.guildService = guildService;
     }
 
-    async listUsersWithGuildTags(userIds) {
+    async listUsersWithGuildTags(userIds: DBObjectId[]): Promise<GuildUserWithTag[]> {
         let users = await this.userRepo.find({
             _id: {
                 $in: userIds
@@ -16,7 +27,7 @@ export default class UserGuildService {
             'gameSettings.guild.displayGuildTag': 1
         });
 
-        let guildIds = users.filter(x => x.guildId).map(x => x.guildId);
+        let guildIds = users.filter(x => x.guildId).map(x => x.guildId!);
 
         let guilds = await this.guildService.listInfoByIds(guildIds);
         
@@ -25,7 +36,7 @@ export default class UserGuildService {
                 _id: u._id,
                 username: u.username,
                 displayGuildTag: u.gameSettings.guild.displayGuildTag,
-                guild: guilds.find(g => g._id.equals(u.guildId))
+                guild: guilds.find(g => g._id.equals(u.guildId)) || null
             };
         });
     }

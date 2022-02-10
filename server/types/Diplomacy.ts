@@ -1,10 +1,10 @@
-import { ObjectId } from "mongoose";
+import { DBObjectId } from "./DBObjectId";
 
 export type DiplomaticState = 'allies' | 'enemies';
 
 export interface DiplomaticStatus {
-    playerIdFrom: ObjectId;
-    playerIdTo: ObjectId;
+    playerIdFrom: DBObjectId;
+    playerIdTo: DBObjectId;
     statusFrom: DiplomaticState;
     statusTo: DiplomaticState;
     actualStatus: DiplomaticState;

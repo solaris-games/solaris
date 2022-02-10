@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongoose';
+import { DBObjectId } from '../types/DBObjectId';
 import ValidationError from '../errors/validation';
 import DatabaseRepository from '../models/DatabaseRepository';
 import { Avatar, UserAvatar } from '../types/Avatar';
@@ -21,7 +21,7 @@ export default class AvatarService {
         return require('../config/game/avatars').slice();
     }
 
-    async listUserAvatars(userId: ObjectId): Promise<UserAvatar[]> {
+    async listUserAvatars(userId: DBObjectId): Promise<UserAvatar[]> {
         let avatars = require('../config/game/avatars').slice();
 
         let userAvatars = await this.userRepo.findById(userId, {
@@ -39,11 +39,11 @@ export default class AvatarService {
         return avatars;
     }
 
-    async getUserAvatar(userId: ObjectId, avatarId: number): Promise<UserAvatar> {
+    async getUserAvatar(userId: DBObjectId, avatarId: number): Promise<UserAvatar> {
         return (await this.listUserAvatars(userId)).find(a => a.id === avatarId)!;
     }
 
-    async purchaseAvatar(userId: ObjectId, avatarId: number) {
+    async purchaseAvatar(userId: DBObjectId, avatarId: number) {
         let userCredits = await this.userService.getUserCredits(userId);
         let avatar = await this.getUserAvatar(userId, avatarId);
 

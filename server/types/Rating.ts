@@ -1,7 +1,7 @@
-import { ObjectId } from "mongoose";
+import { DBObjectId } from "./DBObjectId";
 
 export interface EloRatingChange {
-    _id: ObjectId;
+    _id: DBObjectId;
     newRating: number;
     oldRating: number;
 };
@@ -12,7 +12,7 @@ export interface EloRatingChangeResult {
 };
 
 export interface GameRanking {
-    playerId: ObjectId;
+    playerId: DBObjectId;
     current: number;
     new: number;
 };

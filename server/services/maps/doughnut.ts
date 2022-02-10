@@ -1,5 +1,5 @@
 import ValidationError from '../../errors/validation';
-import { ResourceDistribution } from '../../types/Enums';
+import { GameResourceDistribution } from '../../types/Game';
 import { Location } from '../../types/Location';
 import DistanceService from '../distance';
 import GameTypeService from '../gameType';
@@ -32,7 +32,7 @@ export default class DoughnutMapService {
         this.gameTypeService = gameTypeService;
     }
 
-    generateLocations(game: any, starCount: number, resourceDistribution: ResourceDistribution): Location[] {
+    generateLocations(game: any, starCount: number, resourceDistribution: GameResourceDistribution): Location[] {
         if (this.gameTypeService.isKingOfTheHillMode(game)) {
             throw new ValidationError(`King of the hill is not supported in doughnut maps.`);
         }

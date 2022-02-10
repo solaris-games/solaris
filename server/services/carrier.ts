@@ -1,9 +1,11 @@
 const mongoose = require('mongoose');
-import { ObjectId } from 'mongoose';
+import { DBObjectId } from '../types/DBObjectId';
 import ValidationError from '../errors/validation';
 import DatabaseRepository from '../models/DatabaseRepository';
-import { Carrier } from '../types/Carrier';
+import { Carrier, CarrierInTransit } from '../types/Carrier';
+import { CarrierWaypoint } from '../types/CarrierWaypoint';
 import { Game } from '../types/Game';
+import { MapObject } from '../types/Map';
 import { Player } from '../types/Player';
 import { Star } from '../types/Star';
 import { User } from '../types/User';
@@ -44,17 +46,17 @@ export default class CarrierService extends EventEmitter {
         this.diplomacyService = diplomacyService;
     }
 
-    getByObjectId(game: Game, id: ObjectId) {
+    getByObjectId(game: Game, id: DBObjectId) {
         // return game.galaxy.carriers.find(s => s._id.equals(id));
         return this.getByIdBS(game, id); // Experimental
     }
 
-    getById(game: Game, id: ObjectId) {
+    getById(game: Game, id: DBObjectId) {
         // return game.galaxy.carriers.find(s => s._id.toString() === id.toString());
         return this.getByIdBS(game, id); // Experimental
     }
 
-    getByIdBS(game: Game, id: ObjectId) {
+    getByIdBS(game: Game, id: DBObjectId) {
         let start = 0;
         let end = game.galaxy.carriers.length - 1;
     
@@ -76,15 +78,15 @@ export default class CarrierService extends EventEmitter {
 
         // id wasn't found
         // Return the old way
-        return game.galaxy.carriers.find(s => s._id.toString() === id.toString());
+        return game.galaxy.carriers.find(s => s._id.toString() === id.toString())!;
     }
 
-    getCarriersAtStar(game: Game, starId: ObjectId) {
+    getCarriersAtStar(game: Game, starId: DBObjectId) {
       return game.galaxy.carriers.filter(carrier => carrier.orbiting && carrier.orbiting.toString() === starId.toString())
     }
 
     createAtStar(star: Star, carriers: Carrier[], ships: number = 1) {
-        if (!Math.floor(star.shipsActual)) {
+        if (!Math.floor(star.shipsActual!)) {
             throw new ValidationError('Star must have at least 1 ship to build a carrier.');
         }
 
@@ -104,13 +106,13 @@ export default class CarrierService extends EventEmitter {
         };
 
         // Reduce the star ships by how many we have added to the carrier.
-        star.shipsActual -= ships;
-        star.ships -= ships;
+        star.shipsActual! -= ships;
+        star.ships! -= ships;
 
         return carrier;
     }
 
-    listCarriersOwnedByPlayer(carriers: Carrier[], playerId: ObjectId) {
+    listCarriersOwnedByPlayer(carriers: Carrier[], playerId: DBObjectId) {
         return carriers.filter(s => s.ownedByPlayerId && s.ownedByPlayerId.equals(playerId));
     }
 
@@ -125,7 +127,7 @@ export default class CarrierService extends EventEmitter {
         return name;
     }
 
-    getCarriersWithinScanningRangeOfStarByCarrierIds(game: Game, star: Star, carriers: Carrier[]) {
+    getCarriersWithinScanningRangeOfStarByCarrierIds(game: Game, star: Star, carriers: MapObject[]): MapObject[] {
         // If the star isn't owned then it cannot have a scanning range
         if (star.ownedByPlayerId == null) {
             return [];
@@ -150,13 +152,13 @@ export default class CarrierService extends EventEmitter {
 
         // Start with all of the carriers that the player owns as
         // the player can always see those carriers.
-        let carriersInRange = game.galaxy.carriers
-            .filter(c => c.ownedByPlayerId.equals(player._id))
+        let carriersInRange: DBObjectId[] = game.galaxy.carriers
+            .filter(c => c.ownedByPlayerId!.equals(player._id))
             .map(c => c._id);
 
         // We need to check all carriers NOT owned by the player.
         let carriersToCheck = game.galaxy.carriers
-            .filter(c => !c.ownedByPlayerId.equals(player._id))
+            .filter(c => !c.ownedByPlayerId!.equals(player._id))
             .map(c => {
                 return {
                     _id: c._id,
@@ -169,8 +171,8 @@ export default class CarrierService extends EventEmitter {
             let carrierIds = this.getCarriersWithinScanningRangeOfStarByCarrierIds(game, star, carriersToCheck);
 
             for (let carrierId of carrierIds) {
-                if (carriersInRange.indexOf(carrierId) === -1) {
-                    carriersInRange.push(carrierId);
+                if (carriersInRange.indexOf(carrierId._id) === -1) {
+                    carriersInRange.push(carrierId._id);
                     carriersToCheck.splice(carriersToCheck.indexOf(carrierId), 1);
                 }
             }
@@ -181,7 +183,7 @@ export default class CarrierService extends EventEmitter {
             }
         }
 
-        return carriersInRange.map(c => this.getByObjectId(game, c._id));
+        return carriersInRange.map(c => this.getByObjectId(game, c));
     }
 
     sanitizeCarriersByPlayer(game: Game, player: Player) {
@@ -189,7 +191,7 @@ export default class CarrierService extends EventEmitter {
         // to the player.
         return game.galaxy.carriers
         .map(c => {
-            if (c.ownedByPlayerId.equals(player._id)) {
+            if (c.ownedByPlayerId!.equals(player._id)) {
                 return c;
             }
 
@@ -215,7 +217,7 @@ export default class CarrierService extends EventEmitter {
     }
 
     clearCarrierWaypointsNonTransit(carrier: Carrier, obfuscateFirstWaypoint: boolean = false) {
-        let waypoints = [];
+        let waypoints: CarrierWaypoint[] = [];
 
         if (!carrier.orbiting) {
             waypoints = carrier.waypoints.slice(0, 1);
@@ -258,7 +260,7 @@ export default class CarrierService extends EventEmitter {
             || !c.ownedByPlayerId.equals(player._id));
     }
 
-    getCarrierDistancePerTick(game: Game, carrier: Carrier, warpSpeed: boolean = false, instantSpeed: boolean = false) {
+    getCarrierDistancePerTick(game: Game, carrier: Carrier, warpSpeed: boolean = false, instantSpeed: boolean | null = false) {
         if (instantSpeed) {
             return null;
         }
@@ -276,14 +278,14 @@ export default class CarrierService extends EventEmitter {
         return game.settings.specialGalaxy.carrierSpeed * distanceModifier;
     }
 
-    async convertToGift(game: Game, player: Player, carrierId: ObjectId) {
+    async convertToGift(game: Game, player: Player, carrierId: DBObjectId) {
         let carrier = this.getById(game, carrierId);
 
         if (game.settings.specialGalaxy.giftCarriers === 'disabled') {
             throw new ValidationError(`Gifting carriers has been disabled in this game.`);
         }
 
-        if (!carrier.ownedByPlayerId.equals(player._id)) {
+        if (!carrier.ownedByPlayerId!.equals(player._id)) {
             throw new ValidationError(`Cannot convert carrier into a gift, you do not own this carrier.`);
         }
 
@@ -306,7 +308,7 @@ export default class CarrierService extends EventEmitter {
         });
     }
 
-    async rename(game: Game, player: Player, carrierId: ObjectId, name: string) {
+    async rename(game: Game, player: Player, carrierId: DBObjectId, name: string) {
         let carrier = this.getById(game, carrierId);
 
         if (!carrier) {
@@ -321,7 +323,7 @@ export default class CarrierService extends EventEmitter {
             throw new ValidationError('Name must be between greater than 3 and less than or equal to 30 characters long.');
         }
 
-        if (!carrier.ownedByPlayerId.equals(player._id)) {
+        if (!carrier.ownedByPlayerId!.equals(player._id)) {
             throw new ValidationError(`Cannot rename carrier, you are not its owner.`);
         }
 
@@ -342,10 +344,10 @@ export default class CarrierService extends EventEmitter {
             throw new ValidationError(`Cannot transfer ownership of a gifted carrier to this star, no player owns the star.`);
         }
 
-        let starPlayer = game.galaxy.players.find(p => p._id.equals(star.ownedByPlayerId));
+        let starPlayer = game.galaxy.players.find(p => p._id.equals(star.ownedByPlayerId))!;
         let starUser = gameUsers.find(u => u._id.equals(starPlayer.userId));
 
-        let carrierPlayer = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
+        let carrierPlayer = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId))!;
         let carrierUser = gameUsers.find(u => u._id.equals(carrierPlayer.userId));
 
         const isSamePlayer = starPlayer._id.equals(carrierPlayer._id);
@@ -353,11 +355,11 @@ export default class CarrierService extends EventEmitter {
         if (!isSamePlayer) {
             // If the star is not owned by the same player then increment player achievements.
             if (starUser && !starPlayer.defeated) {
-                starUser.achievements.trade.giftsReceived += carrier.ships;
+                starUser.achievements.trade.giftsReceived += carrier.ships!;
             }
     
             if (carrierUser && !carrierPlayer.defeated) {
-                carrierUser.achievements.trade.giftsSent += carrier.ships;
+                carrierUser.achievements.trade.giftsSent += carrier.ships!;
             }
 
             carrier.ownedByPlayerId = star.ownedByPlayerId; // Transfer ownership
@@ -389,14 +391,14 @@ export default class CarrierService extends EventEmitter {
         }
     }
 
-    async scuttle(game: Game, player: Player, carrierId: ObjectId) {
+    async scuttle(game: Game, player: Player, carrierId: DBObjectId) {
         let carrier = this.getById(game, carrierId);
 
         if (!carrier) {
             throw new ValidationError('Carrier does not exist');
         }
 
-        if (!carrier.ownedByPlayerId.equals(player._id)) {
+        if (!carrier.ownedByPlayerId!.equals(player._id)) {
             throw new ValidationError(`Cannot scuttle carrier, you are not its owner.`);
         }
 
@@ -418,7 +420,7 @@ export default class CarrierService extends EventEmitter {
     }
 
     canPlayerSeeCarrierShips(game: Game, player: Player, carrier: Carrier) {
-        const isOwnedByPlayer = carrier.ownedByPlayerId.toString() === player._id.toString();
+        const isOwnedByPlayer = carrier.ownedByPlayerId!.toString() === player._id.toString();
 
         if (isOwnedByPlayer) {
             return true;
@@ -492,13 +494,13 @@ export default class CarrierService extends EventEmitter {
         }
 
         // If the star is owned by another player, then perform combat.
-        if (!destinationStar.ownedByPlayerId.equals(carrier.ownedByPlayerId)) {
+        if (!destinationStar.ownedByPlayerId!.equals(carrier.ownedByPlayerId)) {
             // If the carrier is a gift, then transfer the carrier ownership to the star owning player.
             // Otherwise, perform combat.
             if (carrier.isGift) {
                 await this.transferGift(game, gameUsers, destinationStar, carrier);
             } else if (this.diplomacyService.isFormalAlliancesEnabled(game)) {
-                let isAllied = this.diplomacyService.isDiplomaticStatusBetweenPlayersAllied(game, [carrier.ownedByPlayerId, destinationStar.ownedByPlayerId]);
+                let isAllied = this.diplomacyService.isDiplomaticStatusBetweenPlayersAllied(game, [carrier.ownedByPlayerId!, destinationStar.ownedByPlayerId!]);
 
                 report.combatRequiredStar = !isAllied;
             } else {
@@ -512,24 +514,24 @@ export default class CarrierService extends EventEmitter {
         return report;
     }
 
-    async moveCarrier(game: Game, gameUsers: User[], carrier: Carrier) {
-        let waypoint = carrier.waypoints[0];
+    async moveCarrier(game: Game, gameUsers: User[], carrierInTransit: CarrierInTransit) {
+        let waypoint: CarrierWaypoint = carrierInTransit.carrier.waypoints[0];
 
         // If the carrier is just about to launch, make damn sure the waypoint source is correct.
         // Note: This is a plaster over an issue with the saving waypoint logic that doesn't validate waypoints correctly.
-        if (this.isLaunching(carrier)) {
-            waypoint.source = carrier.orbiting;
+        if (this.isLaunching(carrierInTransit.carrier)) {
+            waypoint.source = carrierInTransit.carrier.orbiting!;
         }
 
-        let sourceStar = game.galaxy.stars.find(s => s._id.equals(waypoint.source));
-        let destinationStar = game.galaxy.stars.find(s => s._id.equals(waypoint.destination));
-        let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
-        let warpSpeed = this.starService.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar);
+        let sourceStar = game.galaxy.stars.find(s => s._id.equals(waypoint.source))!;
+        let destinationStar = game.galaxy.stars.find(s => s._id.equals(waypoint.destination))!;
+        let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrierInTransit.carrier.ownedByPlayerId))!;
+        let warpSpeed = this.starService.canTravelAtWarpSpeed(game, carrierOwner, carrierInTransit.carrier, sourceStar, destinationStar);
         let instantSpeed = this.starService.isStarPairWormHole(sourceStar, destinationStar);
-        let distancePerTick = this.getCarrierDistancePerTick(game, carrier, warpSpeed, instantSpeed); // Null signifies instant travel
+        let distancePerTick = this.getCarrierDistancePerTick(game, carrierInTransit.carrier, warpSpeed, instantSpeed); // Null signifies instant travel
 
         let carrierMovementReport = {
-            carrier,
+            carrier: carrierInTransit.carrier,
             sourceStar,
             destinationStar,
             carrierOwner,
@@ -541,8 +543,8 @@ export default class CarrierService extends EventEmitter {
             arrivedAtStar: false
         };
         
-        if (instantSpeed || carrier.distanceToDestination <= distancePerTick) {
-            let starArrivalReport = await this.arriveAtStar(game, gameUsers, carrier, destinationStar);
+        if (instantSpeed || (distancePerTick && carrierInTransit.distanceToDestination <= distancePerTick)) {
+            let starArrivalReport = await this.arriveAtStar(game, gameUsers, carrierInTransit.carrier, destinationStar);
             
             carrierMovementReport.waypoint = starArrivalReport.waypoint;
             carrierMovementReport.combatRequiredStar = starArrivalReport.combatRequiredStar;
@@ -550,7 +552,7 @@ export default class CarrierService extends EventEmitter {
         }
         // Otherwise, move X distance in the direction of the star.
         else {
-            this.moveCarrierToCurrentWaypoint(carrier, destinationStar, distancePerTick);
+            this.moveCarrierToCurrentWaypoint(carrierInTransit.carrier, destinationStar, distancePerTick!);
         }
 
         return carrierMovementReport;
@@ -558,12 +560,12 @@ export default class CarrierService extends EventEmitter {
 
     getNextLocationToWaypoint(game: Game, carrier: Carrier) {
         let waypoint = carrier.waypoints[0];
-        let sourceStar = game.galaxy.stars.find(s => s._id.equals(waypoint.source));
-        let destinationStar = game.galaxy.stars.find(s => s._id.equals(waypoint.destination));
-        let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId));
+        let sourceStar = game.galaxy.stars.find(s => s._id.equals(waypoint.source))!;
+        let destinationStar = game.galaxy.stars.find(s => s._id.equals(waypoint.destination))!;
+        let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId))!;
 
         let warpSpeed = false;
-        let instantSpeed = false;
+        let instantSpeed: boolean | null = false;
         
         if (sourceStar) {
             warpSpeed = this.starService.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar);

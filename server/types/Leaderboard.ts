@@ -1,3 +1,5 @@
+import { DBObjectId } from "./DBObjectId";
+import { Guild } from "./Guild";
 import { Player } from "./Player";
 
 export interface PlayerStatistics {
@@ -18,9 +20,17 @@ export interface PlayerStatistics {
 export interface LeaderboardPlayer {
     player: Player;
     stats: PlayerStatistics;
+    isKingOfTheHill?: boolean;
 };
 
 export interface Leaderboard {
     leaderboard: LeaderboardPlayer[];
     fullKey: string;
+};
+
+export interface LeaderboardUser {
+    _id: DBObjectId,
+    username: string;
+    position: number;
+    guild: Guild | null;
 };

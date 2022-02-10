@@ -1,8 +1,8 @@
-import { Carrier } from "../types/Carrier";
-import { Attacker, CombatPart, CombatResult, Defender } from "../types/Combat";
+import { Carrier, CarrierInTransit } from "../types/Carrier";
+import { Attacker, CombatCarrier, CombatPart, CombatResult, CombatResultShips, CombatStar, Defender } from "../types/Combat";
 import { Game } from "../types/Game";
 import { Player } from "../types/Player";
-import { Star } from "../types/Star";
+import { Star, StarCaptureResult } from "../types/Star";
 import { User } from "../types/User";
 import DiplomacyService from "./diplomacy";
 import GameTypeService from "./gameType";
@@ -43,7 +43,7 @@ export default class CombatService extends EventEmitter {
         this.gameTypeService = gameTypeService;
     }
 
-    calculate(defender: Defender, attacker: Attacker, isTurnBased: boolean = true, calculateNeeded: boolean = false): CombatResult {    
+    calculate(defender: Defender, attacker: Attacker, isTurnBased: boolean = true, calculateNeeded: boolean = false): CombatResultShips {    
         let defenderShipsRemaining = defender.ships;
         let attackerShipsRemaining = attacker.ships;
 
@@ -96,7 +96,7 @@ export default class CombatService extends EventEmitter {
         attackerShipsRemaining = Math.max(0, attackerShipsRemaining);
         defenderShipsRemaining = Math.max(0, defenderShipsRemaining);
         
-        let result: CombatResult = {
+        let result: CombatResultShips = {
             weapons: {
                 defender: defendPower,
                 attacker: attackPower
@@ -122,11 +122,11 @@ export default class CombatService extends EventEmitter {
         return result;
     }
 
-    calculateStar(game: Game, star: Star, owner, defenders: Defender[], attackers: Attacker[], defenderCarriers: Carrier[], attackerCarriers: Carrier[]) {
+    calculateStar(game: Game, star: Star, owner, defenders: Player[], attackers: Player[], defenderCarriers: Carrier[], attackerCarriers: Carrier[]) {
         // Calculate the combined combat result taking into account
         // the star ships and all defenders vs. all attackers
-        let totalDefenders = Math.floor(star.shipsActual) + defenderCarriers.reduce((sum, c) => sum + c.ships, 0);
-        let totalAttackers = attackerCarriers.reduce((sum, c) => sum + c.ships, 0);
+        let totalDefenders = Math.floor(star.shipsActual!) + defenderCarriers.reduce((sum, c) => sum + c.ships!, 0);
+        let totalAttackers = attackerCarriers.reduce((sum, c) => sum + c.ships!, 0);
 
         // Calculate the weapons tech levels based on any specialists present at stars or carriers.
         let defenderWeaponsTechLevel = this.technologyService.getStarEffectiveWeaponsLevel(game, defenders, star, defenderCarriers);
@@ -153,9 +153,9 @@ export default class CombatService extends EventEmitter {
         return combatResult;
     }
 
-    calculateCarrier(game: Game, defenders: Defender[], attackers: Attacker[], defenderCarriers: Carrier[], attackerCarriers: Carrier[]) {
-        let totalDefenders = defenderCarriers.reduce((sum, c) => sum + c.ships, 0);
-        let totalAttackers = attackerCarriers.reduce((sum, c) => sum + c.ships, 0);
+    calculateCarrier(game: Game, defenders: Player[], attackers: Player[], defenderCarriers: Carrier[], attackerCarriers: Carrier[]) {
+        let totalDefenders = defenderCarriers.reduce((sum, c) => sum + c.ships!, 0);
+        let totalAttackers = attackerCarriers.reduce((sum, c) => sum + c.ships!, 0);
 
         // Calculate the weapons tech levels
         let defenderWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, defenders, defenderCarriers, false);
@@ -180,11 +180,11 @@ export default class CombatService extends EventEmitter {
         return combatResult;
     }
 
-    async performCombat(game: Game, gameUsers: User[], defender: Player, star: Star, carriers: Carrier[]) {
+    async performCombat(game: Game, gameUsers: User[], defender: Player, star: Star | null, carriers: Carrier[]) {
         // NOTE: If star is null then the combat mode is carrier-to-carrier.
 
         // Allies of the defender will be on the defending side.
-        let defenderAllies = [];
+        let defenderAllies: Player[] = [];
 
         if (this.diplomacyService.isFormalAlliancesEnabled(game)) {
             defenderAllies = this.diplomacyService.getAlliesOfPlayer(game, defender);
@@ -194,11 +194,11 @@ export default class CombatService extends EventEmitter {
         // Carriers who have the most ships will be target first in combat.
         let defenderCarriers = carriers
             .filter(c => 
-                c.ships > 0
+                c.ships! > 0
                 && !c.isGift
-                && (c.ownedByPlayerId.equals(defender._id) || defenderAllies.find(a => a._id.equals(c.ownedByPlayerId)))  // Either owned by the defender or owned by an ally
+                && (c.ownedByPlayerId!.equals(defender._id) || defenderAllies.find(a => a._id.equals(c.ownedByPlayerId)))  // Either owned by the defender or owned by an ally
             )
-            .sort((a, b) => b.ships - a.ships);
+            .sort((a, b) => b.ships! - a.ships!);
 
         // If in carrier-to-carrier combat, verify that there are carriers that can fight.
         if (!star && !defenderCarriers.length) {
@@ -208,12 +208,12 @@ export default class CombatService extends EventEmitter {
         // Get all attacker carriers.
         let attackerCarriers = carriers
             .filter(c => 
-                c.ships > 0 
+                c.ships! > 0 
                 && !c.isGift 
-                && !c.ownedByPlayerId.equals(defender._id)    // Not owned by the player and
+                && !c.ownedByPlayerId!.equals(defender._id)    // Not owned by the player and
                 && !defenderAllies.find(a => a._id.equals(c.ownedByPlayerId))   // Not owned by an ally
             )
-            .sort((a, b) => b.ships - a.ships);
+            .sort((a, b) => b.ships! - a.ships!);
 
         // Double check that the attacking carriers can fight.
         if (!attackerCarriers.length) {
@@ -221,14 +221,14 @@ export default class CombatService extends EventEmitter {
         }
 
         // Get the players for the defender and all attackers.
-        let defenderPlayerIds = defenderCarriers.map(c => c.ownedByPlayerId.toString());
+        let defenderPlayerIds = defenderCarriers.map(c => c.ownedByPlayerId!.toString());
         defenderPlayerIds.push(defender._id.toString());
         defenderPlayerIds = [...new Set(defenderPlayerIds)];
 
-        let attackerPlayerIds = [...new Set(attackerCarriers.map(c => c.ownedByPlayerId.toString()))];
+        let attackerPlayerIds = [...new Set(attackerCarriers.map(c => c.ownedByPlayerId!.toString()))];
 
-        let defenders = defenderPlayerIds.map(playerId => this.playerService.getById(game, playerId));
-        let attackers = attackerPlayerIds.map(playerId => this.playerService.getById(game, playerId));
+        let defenders: Player[] = defenderPlayerIds.map(playerId => this.playerService.getById(game, playerId));
+        let attackers: Player[] = attackerPlayerIds.map(playerId => this.playerService.getById(game, playerId));
 
         let defenderUsers: User[] = [];
         let attackerUsers: User[] = [];
@@ -250,13 +250,19 @@ export default class CombatService extends EventEmitter {
         }
 
         // Perform combat at the star.
-        let combatResult;
+        let combatResultShips: CombatResultShips;
         
         if (star) {
-            combatResult = this.calculateStar(game, star, defender, defenders, attackers, defenderCarriers, attackerCarriers);
+            combatResultShips = this.calculateStar(game, star, defender, defenders, attackers, defenderCarriers, attackerCarriers);
         } else {
-            combatResult = this.calculateCarrier(game, defenders, attackers, defenderCarriers, attackerCarriers);
+            combatResultShips = this.calculateCarrier(game, defenders, attackers, defenderCarriers, attackerCarriers);
         }
+
+        let combatResult: CombatResult = {
+            ...combatResultShips,
+            star: null,
+            carriers: []
+        };
 
         // Add all of the carriers to the combat result with a snapshot of
         // how many ships they had before combat occurs.
@@ -267,11 +273,11 @@ export default class CombatService extends EventEmitter {
             return {
                 _id: c._id,
                 name: c.name,
-                ownedByPlayerId: c.ownedByPlayerId,
+                ownedByPlayerId: c.ownedByPlayerId!,
                 specialist,
-                before: c.ships,
+                before: c.ships!,
                 lost: 0,
-                after: c.ships
+                after: c.ships!
             };
         });
 
@@ -283,9 +289,9 @@ export default class CombatService extends EventEmitter {
                 _id: star._id,
                 ownedByPlayerId: star.ownedByPlayerId,
                 specialist,
-                before: Math.floor(star.shipsActual),
+                before: Math.floor(star.shipsActual!),
                 lost: 0,
-                after: Math.floor(star.shipsActual)
+                after: Math.floor(star.shipsActual!)
             };
         }
 
@@ -320,10 +326,21 @@ export default class CombatService extends EventEmitter {
 
         // If the defender has been eliminated at the star then the attacker who travelled the shortest distance in the last tick
         // captures the star. Repeat star combat until there is only one player remaining.
-        let captureResult = null;
+        let captureResult: StarCaptureResult | null = null;
 
         if (star) {
-            captureResult = this._starDefeatedCheck(game, star, defender, defenders, defenderUsers, defenderCarriers, attackers, attackerUsers, attackerCarriers);
+            let attackerCarriersInTransit: CarrierInTransit[] = attackerCarriers.map(c => {
+                const waypoint = c.waypoints[0];
+                const destinationStar = game.galaxy.stars.find(s => s._id.equals(waypoint.destination))!;
+                const distanceToDestination = this.distanceService.getDistanceBetweenLocations(c.location, destinationStar.location);
+    
+                return {
+                    carrier: c,
+                    distanceToDestination
+                };
+            });
+
+            captureResult = this._starDefeatedCheck(game, star, defender, defenders, defenderUsers, defenderCarriers, attackers, attackerUsers, attackerCarriersInTransit);
         }
 
         // Deduct reputation for all attackers that the defender is fighting and vice versa.
@@ -343,7 +360,7 @@ export default class CombatService extends EventEmitter {
                 defenders,
                 attackers,
                 star,
-                combatResult,
+                combatResult: combatResultShips,
                 captureResult
             });
         } else {
@@ -352,12 +369,12 @@ export default class CombatService extends EventEmitter {
                 gameTick: game.state.tick,
                 defenders,
                 attackers,
-                combatResult
+                combatResult: combatResultShips
             });
         }
 
         // If there are still attackers remaining, recurse.
-        attackerPlayerIds = [...new Set(attackerCarriers.map(c => c.ownedByPlayerId.toString()))];
+        attackerPlayerIds = [...new Set(attackerCarriers.map(c => c.ownedByPlayerId!.toString()))];
 
         if (attackerPlayerIds.length > 1) {
             // Get the next player to act as the defender.
@@ -370,16 +387,16 @@ export default class CombatService extends EventEmitter {
             await this.performCombat(game, gameUsers, defender, star, attackerCarriers);
         }
 
-        return combatResult;
+        return combatResultShips;
     }
 
-    _starDefeatedCheck(game: Game, star: Star, owner: User, defenders: Defender[], defenderUsers: User[], defenderCarriers: Carrier[], attackers: Attacker, attackerUsers: User[], attackerCarriers: Carrier[]) {
-        let starDefenderDefeated = star && !Math.floor(star.shipsActual) && !defenderCarriers.length;
-        let hasAttackersRemaining = attackerCarriers.reduce((sum, c) => sum + c.ships, 0) > 0;
+    _starDefeatedCheck(game: Game, star: Star, owner: Player, defenders: Player[], defenderUsers: User[], defenderCarriers: Carrier[], attackers: Player[], attackerUsers: User[], attackerCarriersInTransit: CarrierInTransit[]) {
+        let starDefenderDefeated = star && !Math.floor(star.shipsActual!) && !defenderCarriers.length;
+        let hasAttackersRemaining = attackerCarriersInTransit.reduce((sum, c) => sum + c.carrier.ships!, 0) > 0;
         let hasCapturedStar = starDefenderDefeated && hasAttackersRemaining;
 
         if (hasCapturedStar) {
-            return this.starService.captureStar(game, star, owner, defenders, defenderUsers, attackers, attackerUsers, attackerCarriers);
+            return this.starService.captureStar(game, star, owner, defenders, defenderUsers, attackers, attackerUsers, attackerCarriersInTransit);
         }
 
         return null;
@@ -419,10 +436,10 @@ export default class CombatService extends EventEmitter {
 
             for (let obj of objectsToDeduct) {
                 let isCarrier = obj.shipsActual == null;
-                let combatObject = combatResult.carriers.find(c => c._id.equals(obj._id)) || combatResult.star;
+                let combatObject: CombatCarrier | CombatStar = (combatResult.carriers.find(c => c._id.equals(obj._id)) || combatResult.star)!;
 
                 // Calculate how many ships to kill, capped to however many ships the object has.
-                let killed;
+                let killed: number;
 
                 // If we are not destroying carriers then we need to keep
                 // at least 1 ship on the carrier, otherwise just kill them all.
@@ -434,8 +451,8 @@ export default class CombatService extends EventEmitter {
 
                 killed = Math.max(0, killed); // Just in case.
 
-                combatObject.after -= killed;
-                combatObject.lost += killed;
+                combatObject.after = (combatObject.after as number) - killed;
+                combatObject.lost = (combatObject.lost as number) + killed;
                 shipsToKill -= killed;
 
                 // Apply damage to the carrier or star.
@@ -466,10 +483,10 @@ export default class CombatService extends EventEmitter {
 
         // Add combat result stats to defender achievements.
         for (let defenderUser of defenderUsers) {
-            let defender = defenders.find(u => u.userId === defenderUser._id.toString());
+            let defender = defenders.find(u => u.userId === defenderUser._id.toString())!;
 
             if (defender && !defender.defeated) {
-                let playerCarriers = defenderCarriers.filter(c => c.ownedByPlayerId.equals(defender._id));
+                let playerCarriers = defenderCarriers.filter(c => c.ownedByPlayerId!.equals(defender._id));
 
                 defenderUser.achievements.combat.kills.ships += combatResult.lost.attacker;
                 defenderUser.achievements.combat.kills.carriers += attackerCarriersDestroyed;
@@ -483,10 +500,10 @@ export default class CombatService extends EventEmitter {
 
         // Add combat result stats to attacker achievements.
         for (let attackerUser of attackerUsers) {
-            let attacker = attackers.find(u => u.userId === attackerUser._id.toString());
+            let attacker = attackers.find(u => u.userId === attackerUser._id.toString())!;
 
             if (attacker && !attacker.defeated) {
-                let playerCarriers = attackerCarriers.filter(c => c.ownedByPlayerId.equals(attacker._id));
+                let playerCarriers = attackerCarriers.filter(c => c.ownedByPlayerId!.equals(attacker._id));
 
                 attackerUser.achievements.combat.kills.ships += combatResult.lost.defender;
                 attackerUser.achievements.combat.kills.carriers += defenderCarriersDestroyed;

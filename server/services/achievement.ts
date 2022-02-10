@@ -1,4 +1,4 @@
-import { ObjectId } from "mongoose";
+import { DBObjectId } from "../types/DBObjectId";
 import DatabaseRepository from "../models/DatabaseRepository";
 import { User } from "../types/User";
 import GuildService from "./guild";
@@ -13,7 +13,7 @@ export default class AchievementService {
         this.guildService = guildService;
     }
 
-    async getAchievements(id: ObjectId) {
+    async getAchievements(id: DBObjectId) {
         const user = await this.userRepo.findById(id, {
             // Remove fields we don't want to send back.
             achievements: 1,
@@ -35,7 +35,7 @@ export default class AchievementService {
         return user;
     }
 
-    async incrementAchievement(userId: ObjectId, achievement: string, amount: number = 1) {
+    async incrementAchievement(userId: DBObjectId, achievement: string, amount: number = 1) {
         let updateQuery = {
             $inc: {}
         };
@@ -47,23 +47,23 @@ export default class AchievementService {
         }, updateQuery);
     }
 
-    async incrementSpecialistsHired(userId: ObjectId, amount: number = 1) {
+    async incrementSpecialistsHired(userId: DBObjectId, amount: number = 1) {
         return await this.incrementAchievement(userId, 'achievements.infrastructure.specialistsHired', amount);
     }
 
-    async incrementWarpGatesBuilt(userId: ObjectId, amount: number = 1) {
+    async incrementWarpGatesBuilt(userId: DBObjectId, amount: number = 1) {
         return await this.incrementAchievement(userId, 'achievements.infrastructure.warpGates', amount);
     }
 
-    async incrementWarpGatesDestroyed(userId: ObjectId, amount: number = 1) {
+    async incrementWarpGatesDestroyed(userId: DBObjectId, amount: number = 1) {
         return await this.incrementAchievement(userId, 'achievements.infrastructure.warpGatesDestroyed', amount);
     }
 
-    async incrementCarriersBuilt(userId: ObjectId, amount: number = 1) {
+    async incrementCarriersBuilt(userId: DBObjectId, amount: number = 1) {
         return await this.incrementAchievement(userId, 'achievements.infrastructure.carriers', amount);
     }
 
-    async incrementInfrastructureBuilt(type: string, userId: ObjectId, amount: number = 1) {
+    async incrementInfrastructureBuilt(type: string, userId: DBObjectId, amount: number = 1) {
         switch (type) {
             case 'economy':
                 await this.incrementEconomyBuilt(userId, amount);
@@ -77,63 +77,63 @@ export default class AchievementService {
         }
     }
 
-    async incrementEconomyBuilt(userId: ObjectId, amount: number = 1) {
+    async incrementEconomyBuilt(userId: DBObjectId, amount: number = 1) {
         return await this.incrementAchievement(userId, 'achievements.infrastructure.economy', amount);
     }
 
-    async incrementIndustryBuilt(userId: ObjectId, amount: number = 1) {
+    async incrementIndustryBuilt(userId: DBObjectId, amount: number = 1) {
         return await this.incrementAchievement(userId, 'achievements.infrastructure.industry', amount);
     }
 
-    async incrementScienceBuilt(userId: ObjectId, amount: number = 1) {
+    async incrementScienceBuilt(userId: DBObjectId, amount: number = 1) {
         return await this.incrementAchievement(userId, 'achievements.infrastructure.science', amount);
     }
 
-    async incrementTradeCreditsSent(userId: ObjectId, amount: number = 0) {
+    async incrementTradeCreditsSent(userId: DBObjectId, amount: number = 0) {
         return await this.incrementAchievement(userId, 'achievements.trade.creditsSent', amount);
     }
 
-    async incrementTradeCreditsReceived(userId: ObjectId, amount: number = 0) {
+    async incrementTradeCreditsReceived(userId: DBObjectId, amount: number = 0) {
         return await this.incrementAchievement(userId, 'achievements.trade.creditsReceived', amount);
     }
 
-    async incrementTradeCreditsSpecialistsSent(userId: ObjectId, amount: number = 0) {
+    async incrementTradeCreditsSpecialistsSent(userId: DBObjectId, amount: number = 0) {
         return await this.incrementAchievement(userId, 'achievements.trade.creditsSpecialistsSent', amount);
     }
 
-    async incrementTradeCreditsSpecialistsReceived(userId: ObjectId, amount: number = 0) {
+    async incrementTradeCreditsSpecialistsReceived(userId: DBObjectId, amount: number = 0) {
         return await this.incrementAchievement(userId, 'achievements.trade.creditsSpecialistsReceived', amount);
     }
 
-    async incrementTradeTechnologySent(userId: ObjectId, amount: number = 1) {
+    async incrementTradeTechnologySent(userId: DBObjectId, amount: number = 1) {
         return await this.incrementAchievement(userId, 'achievements.trade.technologySent', amount);
     }
 
-    async incrementTradeTechnologyReceived(userId: ObjectId, amount: number = 1) {
+    async incrementTradeTechnologyReceived(userId: DBObjectId, amount: number = 1) {
         return await this.incrementAchievement(userId, 'achievements.trade.technologyReceived', amount);
     }
 
-    async incrementRenownSent(userId: ObjectId, amount: number = 1) {
+    async incrementRenownSent(userId: DBObjectId, amount: number = 1) {
         return await this.incrementAchievement(userId, 'achievements.trade.renownSent', amount);
     }
 
-    async incrementRenownReceived(userId: ObjectId, amount: number = 1) {
+    async incrementRenownReceived(userId: DBObjectId, amount: number = 1) {
         return await this.incrementAchievement(userId, 'achievements.renown', amount);
     }
 
-    async incrementDefeated(userId: ObjectId, amount: number = 1) {
+    async incrementDefeated(userId: DBObjectId, amount: number = 1) {
         return await this.incrementAchievement(userId, 'achievements.defeated', amount);
     }
 
-    async incrementJoined(userId: ObjectId, amount: number = 1) {
+    async incrementJoined(userId: DBObjectId, amount: number = 1) {
         return await this.incrementAchievement(userId, 'achievements.joined', amount);
     }
 
-    async incrementQuit(userId: ObjectId, amount: number = 1) {
+    async incrementQuit(userId: DBObjectId, amount: number = 1) {
         return await this.incrementAchievement(userId, 'achievements.quit', amount);
     }
 
-    async isEstablishedPlayer(userId: ObjectId) {
+    async isEstablishedPlayer(userId: DBObjectId) {
         let userAchievements = await this.getAchievements(userId);
 
         return userAchievements && (userAchievements.achievements.rank > 0 || userAchievements.achievements.completed > 0);

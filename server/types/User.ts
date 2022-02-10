@@ -1,5 +1,5 @@
-import { ObjectId } from "mongoose";
 import { CarrierWaypointActionType } from "./CarrierWaypoint";
+import { DBObjectId } from "./DBObjectId";
 
 export type SettingEnabledDisabled = 'enabled'|'disabled';
 export type SettingUIType = 'standard'|'compact';
@@ -11,9 +11,9 @@ export type SettingObjectScaling = 'default'|'clamped';
 export type SettingBlendMode = 'ADD'|'NORMAL';
 
 export interface User {
-    _id: ObjectId;
+    _id: DBObjectId;
     username: string;
-    guildId: ObjectId | null;
+    guildId: DBObjectId | null;
     email: string;
     emailEnabled: boolean;
     password: string | null;

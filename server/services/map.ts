@@ -1,9 +1,46 @@
+import { Game } from "../types/Game";
+import { Location } from "../types/Location";
+import { Star } from "../types/Star";
+import GameTypeService from "./gameType";
+import CircularMapService from "./maps/circular";
+import CircularBalancedMapService from "./maps/circularBalanced";
+import CustomMapService from "./maps/custom";
+import DoughnutMapService from "./maps/doughnut";
+import IrregularMapService from "./maps/irregular";
+import SpiralMapService from "./maps/spiral";
+import NameService from "./name";
+import RandomService from "./random";
+import StarService from "./star";
+import StarDistanceService from "./starDistance";
+
 const ValidationError = require("../errors/validation");
 
 export default class MapService {
+    randomService: RandomService;
+    starService: StarService;
+    starDistanceService: StarDistanceService;
+    nameService: NameService;
+    circularMapService: CircularMapService;
+    spiralMapService: SpiralMapService;
+    doughnutMapService: DoughnutMapService;
+    circularBalancedMapService: CircularBalancedMapService;
+    irregularMapService: IrregularMapService;
+    gameTypeService: GameTypeService;
+    customMapService: CustomMapService;
 
-    constructor(randomService, starService, starDistanceService, nameService, 
-        circularMapService, spiralMapService, doughnutMapService, circularBalancedMapService, irregularMapService, gameTypeService, customMapService) {
+    constructor(
+        randomService: RandomService, 
+        starService: StarService,
+        starDistanceService: StarDistanceService,
+        nameService: NameService,
+        circularMapService: CircularMapService,
+        spiralMapService: SpiralMapService,
+        doughnutMapService: DoughnutMapService,
+        circularBalancedMapService: CircularBalancedMapService,
+        irregularMapService: IrregularMapService,
+        gameTypeService: GameTypeService,
+        customMapService: CustomMapService
+    ) {
         this.randomService = randomService;
         this.starService = starService;
         this.starDistanceService = starDistanceService;
@@ -17,14 +54,16 @@ export default class MapService {
         this.customMapService = customMapService;
     }
 
-    generateStars(game, starCount, playerLimit, customJSON) {
-        let stars = [];
+    generateStars(game: Game, starCount: number, playerLimit: number, customJSON?: string | null) {
+        let stars: Star[] = [];
+        let homeStars: Star[] = [];
+        let linkedStars: any[] = [];
 
         // Get an array of random star names for however many stars we want.
         const starNames = this.nameService.getRandomStarNames(starCount);
 
         // Generate all of the locations for stars.
-        let starLocations = [];
+        let starLocations: any[] = [];
 
         switch (game.settings.galaxy.galaxyType) {
             case 'circular':
@@ -43,7 +82,7 @@ export default class MapService {
                 starLocations = this.irregularMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution, playerLimit);
                 break;
             case 'custom':
-                starLocations = this.customMapService.generateLocations(customJSON, playerLimit);
+                starLocations = this.customMapService.generateLocations(customJSON!, playerLimit);
                 break;
             default:
                 throw new ValidationError(`Galaxy type ${game.settings.galaxy.galaxyType} is not supported or has been disabled.`);
@@ -52,13 +91,13 @@ export default class MapService {
         let isCustomGalaxy = game.settings.galaxy.galaxyType === 'custom';
         let starNamesIndex = 0;
 
-        let unlinkedStars = starLocations.filter(l => !l.linked);
+        let unlinkedStars: any[] = starLocations.filter(l => !l.linked);
 
         // Create a star for all locations returned by the map generator
         for (let i = 0; i < unlinkedStars.length; i++) {
-            let starLocation = unlinkedStars[i];
+            let starLocation: any = unlinkedStars[i];
             
-            let star;
+            let star: any;
             let starName = starNames[starNamesIndex++];
 
             if (isCustomGalaxy) {
@@ -71,7 +110,7 @@ export default class MapService {
             stars.push(star);
 
             if (starLocation.homeStar) {
-                let linkedStars = [];
+                let locLinkedStars: any[] = [];
 
                 for (let linkedLocation of starLocation.linkedLocations) {
                   let linkedStar;
@@ -85,18 +124,22 @@ export default class MapService {
                   }
 
                   stars.push(linkedStar);
-                  linkedStars.push(linkedStar._id);
+                  locLinkedStars.push(linkedStar._id);
                 }
 
-                game.galaxy.homeStars.push(star._id)
-                game.galaxy.linkedStars.push(linkedStars);
+                homeStars.push(star._id)
+                linkedStars.push(locLinkedStars);
             }
         }
 
-        return stars;
+        return {
+            stars,
+            homeStars,
+            linkedStars
+        };
     }
 
-    generateTerrain(game) {
+    generateTerrain(game: Game) {
         const playerCount = game.settings.general.playerLimit;
 
         // If warp gates are enabled, assign random stars to start as warp gates.
@@ -125,7 +168,7 @@ export default class MapService {
         }
     }
 
-    generateGates(stars, playerCount, percentage) {
+    generateGates(stars: Star[], playerCount: number, percentage: number) {
         let gateCount = Math.floor((stars.length - playerCount) / 100 * percentage);
 
         // Pick stars at random and set them to be warp gates.
@@ -140,7 +183,7 @@ export default class MapService {
         } while (gateCount--);
     }
 
-    generateWormHoles(game, stars, playerCount, percentage) {
+    generateWormHoles(game: Game, stars: Star[], playerCount: number, percentage: number) {
         let wormHoleCount = Math.floor((stars.length - playerCount) / 2 / 100 * percentage); // Wormholes come in pairs so its half of stars
 
         // Pick stars at random and pair them up with another star to create a worm hole.
@@ -169,7 +212,7 @@ export default class MapService {
         }
     }
 
-    generateNebulas(game, stars, playerCount, percentage) {
+    generateNebulas(game: Game, stars: Star[], playerCount: number, percentage: number) {
         let count = Math.floor((stars.length - playerCount) / 100 * percentage);
 
         // Pick stars at random and set them to be nebulas
@@ -192,7 +235,7 @@ export default class MapService {
         } while (count--);
     }
 
-    generateAsteroidFields(game, stars, playerCount, percentage) {
+    generateAsteroidFields(game: Game, stars: Star[], playerCount: number, percentage: number) {
         let count = Math.floor((stars.length - playerCount) / 100 * percentage);
 
         // Pick stars at random and set them to be asteroid fields
@@ -224,7 +267,7 @@ export default class MapService {
         } while (count--);
     }
 
-    generateBlackHoles(game, stars, playerCount, percentage) {
+    generateBlackHoles(game: Game, stars: Star[], playerCount: number, percentage: number) {
         let count = Math.floor((stars.length - playerCount) / 100 * percentage);
 
         // Pick stars at random and set them to be asteroid fields
@@ -258,7 +301,7 @@ export default class MapService {
         } while (count--);
     }
 
-    getGalaxyCenter(starLocations) {
+    getGalaxyCenter(starLocations: Location[]) {
         if (!starLocations.length) {
             return {
                 x: 0,
@@ -277,7 +320,7 @@ export default class MapService {
         };
     }
 
-    getGalaxyCenterOfMass(starLocations) {
+    getGalaxyCenterOfMass(starLocations: Location[]) {
         if (!starLocations.length) {
             return {
                 x: 0,

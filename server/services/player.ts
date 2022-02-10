@@ -2,10 +2,40 @@ const mongoose = require('mongoose');
 const moment = require('moment');
 const EventEmitter = require('events');
 import ValidationError from '../errors/validation';
+import DatabaseRepository from '../models/DatabaseRepository';
+import { Game } from '../types/Game';
+import { PlayerColourShapeCombination, PlayerShape } from '../types/Player';
+import CarrierService from './carrier';
+import GameTypeService from './gameType';
+import MapService from './map';
+import RandomService from './random';
+import SpecialistService from './specialist';
+import StarService from './star';
+import StarDistanceService from './starDistance';
+import TechnologyService from './technology';
 
 export default class PlayerService extends EventEmitter {
+    gameRepo: DatabaseRepository<Game>;
+    randomService: RandomService;
+    mapService: MapService;
+    starService: StarService;
+    carrierService: CarrierService;
+    starDistanceService: StarDistanceService;
+    technologyService: TechnologyService;
+    specialistService: SpecialistService;
+    gameTypeService: GameTypeService;
     
-    constructor(gameRepo, randomService, mapService, starService, carrierService, starDistanceService, technologyService, specialistService, gameTypeService) {
+    constructor(
+        gameRepo: DatabaseRepository<Game>,
+        randomService: RandomService,
+        mapService: MapService,
+        starService: StarService,
+        carrierService: CarrierService,
+        starDistanceService: StarDistanceService,
+        technologyService: TechnologyService,
+        specialistService: SpecialistService,
+        gameTypeService: GameTypeService
+    ) {
         super();
         
         this.gameRepo = gameRepo;
@@ -106,8 +136,8 @@ export default class PlayerService extends EventEmitter {
         return player;
     }
 
-    createEmptyPlayers(game) {
-        let players = [];
+    createEmptyPlayers(game): any[] {
+        let players: any[] = [];
 
         let shapeColours = this._generatePlayerColourShapeList(game.settings.general.playerLimit);
 
@@ -134,10 +164,10 @@ export default class PlayerService extends EventEmitter {
     }
 
     _generatePlayerColourShapeList(playerCount) {
-        let shapes = ['circle', 'square', 'diamond', 'hexagon'];
+        let shapes: PlayerShape[] = ['circle', 'square', 'diamond', 'hexagon'];
         let colours = require('../config/game/colours').slice();
 
-        let combinations = [];
+        let combinations: PlayerColourShapeCombination[] = [];
 
         for (let shape of shapes) {
             for (let colour of colours) {
@@ -148,7 +178,7 @@ export default class PlayerService extends EventEmitter {
             }
         }
 
-        let result = [];
+        let result: PlayerColourShapeCombination[] = [];
         
         for (let i = 0; i < playerCount; i++) {
             let shapeColour = combinations.splice(this.randomService.getRandomNumber(combinations.length - 1), 1)[0];
@@ -327,7 +357,7 @@ export default class PlayerService extends EventEmitter {
         const increment = 360 / playerCount * Math.PI / 180;
         let current = 0;
 
-        let radians = [];
+        let radians: number[] = [];
 
         for (let i = 0; i < playerCount; i++) {
             radians.push(current);
@@ -362,8 +392,8 @@ export default class PlayerService extends EventEmitter {
         player.researchingNext = player.researchingNow;
     }
 
-    createHomeStarCarriers(game) {
-        let carriers = [];
+    createHomeStarCarriers(game): any[] {
+        let carriers: any[] = [];
 
         for (let i = 0; i < game.galaxy.players.length; i++) {
             let player = game.galaxy.players[i];
@@ -499,7 +529,7 @@ export default class PlayerService extends EventEmitter {
         };
     }
 
-    updateLastSeen(game, player, date) {
+    updateLastSeen(game, player, date?: Date) {
         player.lastSeen = date || moment().utc();
     }
 

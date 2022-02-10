@@ -1,4 +1,4 @@
-import { ObjectId } from "mongoose";
+import { DBObjectId } from "../types/DBObjectId";
 import { Config } from "../types/Config";
 import { EmailTemplate } from "../types/Email";
 import { User } from "../types/User";
@@ -187,7 +187,7 @@ export default class EmailService {
         }
     }
 
-    async sendGameStartedEmail(gameId: ObjectId) {
+    async sendGameStartedEmail(gameId: DBObjectId) {
         let game = await this.gameService.getById(gameId);
         let gameUrl = `${process.env.CLIENT_URL}/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
@@ -208,7 +208,7 @@ export default class EmailService {
         }
     }
 
-    async sendGameFinishedEmail(gameId: ObjectId) {
+    async sendGameFinishedEmail(gameId: DBObjectId) {
         let game = await this.gameService.getById(gameId);
         let gameUrl = `${process.env.CLIENT_URL}/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
@@ -229,7 +229,7 @@ export default class EmailService {
         }
     }
 
-    async sendGameCycleSummaryEmail(gameId: ObjectId) {      
+    async sendGameCycleSummaryEmail(gameId: DBObjectId) {      
         let game = await this.gameService.getById(gameId);
         let leaderboard = this.leaderboardService.getLeaderboardRankings(game).leaderboard;
 
@@ -295,7 +295,7 @@ export default class EmailService {
         }
     }
 
-    async trySendLastPlayerTurnReminder(gameId: ObjectId) {
+    async trySendLastPlayerTurnReminder(gameId: DBObjectId) {
         let game = await this.gameService.getById(gameId);
 
         if (!this.gameTypeService.isTurnBasedGame(game)) {
@@ -339,7 +339,7 @@ export default class EmailService {
         }
     }
 
-    async sendGameTimedOutEmail(gameId: ObjectId) {
+    async sendGameTimedOutEmail(gameId: DBObjectId) {
         let game = await this.gameService.getById(gameId);
         let gameName = game.settings.general.name;
 
@@ -358,7 +358,7 @@ export default class EmailService {
         }
     }
 
-    async sendGamePlayerAfkEmail(gameId: ObjectId, playerId: ObjectId) {
+    async sendGamePlayerAfkEmail(gameId: DBObjectId, playerId: DBObjectId) {
         let game = await this.gameService.getById(gameId);
         let gameUrl = `${process.env.CLIENT_URL}/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;

@@ -1,15 +1,17 @@
+import { Location } from "../types/Location";
+
 export default class RandomService {
 
-    getRandomNumber(max) {
+    getRandomNumber(max: number) {
         return Math.floor(Math.random() * max);
     }
 
     // Note that the max is INCLUSIVE
-    getRandomNumberBetween(min, max) {
+    getRandomNumberBetween(min: number, max: number): number {
         return Math.floor(Math.random() * (max - min + 1) + min);
     }
 
-    getRandomNumberBetweenEXP(min, max, P1 = 0.5) {
+    getRandomNumberBetweenEXP(min: number, max: number, P1: number = 0.5): number {
         // P1 is the chance that the result is below half. So if the end result is between 0 and 1, like a Math.random,
         // P1 describes the chance of the number being between 0 and 0.5, this makes P2 the chance of it being between 0.5 and 1
         let P2 = 1 - P1;
@@ -24,19 +26,19 @@ export default class RandomService {
         return Math.floor(t**exp * (max - min + 1) + min);
     }
 
-    getRandomAngle() {
+    getRandomAngle(): number {
         return Math.random() * Math.PI * 2;
     }
 
-    getRandomRadius(maxRadius, offset) {
+    getRandomRadius(maxRadius: number, offset: number): number {
         return maxRadius * Math.random()**offset;
     }
 
-    getRandomRadiusInRange(minRadius, maxRadius){
+    getRandomRadiusInRange(minRadius: number, maxRadius: number): number {
         return (Math.random()*(maxRadius**2 - minRadius**2) + minRadius**2)**0.5;
     }
 
-    getRandomPositionInCircle(maxRadius, offset = 0.5) {
+    getRandomPositionInCircle(maxRadius: number, offset: number = 0.5): Location {
         let angle = this.getRandomAngle();
         let radius = this.getRandomRadius(maxRadius, offset);
 
@@ -46,7 +48,7 @@ export default class RandomService {
         };
     }
 
-    getRandomPositionInCircleFromOrigin(originX, originY, radius) {
+    getRandomPositionInCircleFromOrigin(originX: number, originY: number, radius: number): Location {
         let position = this.getRandomPositionInCircle(radius);
 
         position.x += originX;
@@ -55,7 +57,7 @@ export default class RandomService {
         return position;
     }
 
-    getRandomPositionInDoughnut(minRadius, maxRadius) {
+    getRandomPositionInDoughnut(minRadius: number, maxRadius: number): Location {
         let angle = this.getRandomAngle();
         let radius = this.getRandomRadiusInRange(minRadius, maxRadius)
     
@@ -65,7 +67,7 @@ export default class RandomService {
         };
     }
 
-    generateStarNaturalResources(radius, x, y, minResources, maxResources, fuzzy = false){
+    generateStarNaturalResources(radius: number, x: number, y: number, minResources: number, maxResources: number, fuzzy: boolean = false): number {
         const RS_BASE = 2;
         const RS_EXPONENT = 5.8;
 

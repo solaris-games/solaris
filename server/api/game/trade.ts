@@ -43,7 +43,7 @@ export default (router, io, container: DependencyContainer) => {
                 reputation: trade.reputation
             });
 
-            container.broadcastService.gamePlayerCreditsReceived(req.game, trade.fromPlayer._id.toString(), trade.toPlayer._id.toString(), trade.amount, trade.date);
+            container.broadcastService.gamePlayerCreditsReceived(req.game, trade.fromPlayer._id, trade.toPlayer._id, trade.amount, trade.date);
         } catch (err) {
             return next(err);
         }
@@ -85,7 +85,7 @@ export default (router, io, container: DependencyContainer) => {
                 reputation: trade.reputation
             });
 
-            container.broadcastService.gamePlayerCreditsSpecialistsReceived(req.game, trade.fromPlayer._id.toString(), trade.toPlayer._id.toString(), trade.amount, trade.date);
+            container.broadcastService.gamePlayerCreditsSpecialistsReceived(req.game, trade.fromPlayer._id, trade.toPlayer._id, trade.amount, trade.date);
         } catch (err) {
             return next(err);
         }
@@ -124,7 +124,7 @@ export default (router, io, container: DependencyContainer) => {
 
             res.sendStatus(200);
 
-            container.broadcastService.gamePlayerRenownReceived(req.game, trade.fromPlayer._id.toString(), trade.toPlayer._id.toString(), trade.amount, trade.date);
+            container.broadcastService.gamePlayerRenownReceived(req.game, trade.fromPlayer._id, trade.toPlayer._id, trade.amount, trade.date);
         } catch (err) {
             return next(err);
         }
@@ -153,7 +153,7 @@ export default (router, io, container: DependencyContainer) => {
                 reputation: trade.reputation
             });
             
-            container.broadcastService.gamePlayerTechnologyReceived(req.game, trade.fromPlayer._id.toString(), trade.toPlayer._id.toString(), trade.technology, trade.date);
+            container.broadcastService.gamePlayerTechnologyReceived(req.game, trade.fromPlayer._id, trade.toPlayer._id, trade.technology, trade.date);
         } catch (err) {
             return next(err);
         }

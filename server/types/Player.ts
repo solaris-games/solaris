@@ -1,37 +1,55 @@
-import { ObjectId } from "mongoose";
+import { DBObjectId } from "./DBObjectId";
+import { PlayerStatistics } from "./Leaderboard";
 
 export type PlayerShape = 'circle'|'square'|'diamond'|'hexagon';
-export type ResearchType = 'scanning'|'hyperspace'|'terraforming'|'experimentation'|'weapons'|'banking'|'manufacturing'|'specialists';
+export type ResearchType = 'scanning'|'hyperspace'|'terraforming'|'experimentation'|'weapons'|'banking'|'manufacturing'|'specialists'|'random';
 
 export interface PlayerLedger {
-    playerId: ObjectId;
+    playerId: DBObjectId;
     debt: number;
 };
 
 export interface PlayerReputation {
-    playerId: ObjectId;
+    playerId: DBObjectId;
     score: number;
 };
 
 export interface ResearchProgress {
     level: number;
-    progress: number;
+    progress?: number;
+};
+
+export interface PlayerResearch {
+    scanning: ResearchProgress,
+    hyperspace: ResearchProgress,
+    terraforming: ResearchProgress,
+    experimentation: ResearchProgress,
+    weapons: ResearchProgress,
+    banking: ResearchProgress,
+    manufacturing: ResearchProgress,
+    specialists: ResearchProgress
+};
+
+export interface PlayerDiplomacy {
+    allies: DBObjectId[];
 };
 
 export interface Player {
-    _id: ObjectId;
+    _id: DBObjectId;
     userId: string | null; // TODO: Should be an ObjectId
-    homeStarId: ObjectId;
-    alias: string | null;
+    homeStarId: DBObjectId;
+    alias: string;
     avatar: string | null;
-    notes: string;
+    notes?: string;
     colour: {
         alias: string;
         value: string;
     },
     shape: PlayerShape;
     lastSeen: Date | null;
-    lastSeenIP: string | null;
+    isOnline?: boolean | null;
+    lastSeenIP?: string | null;
+    hasDuplicateIP?: boolean;
     researchingNow: ResearchType;
     researchingNext: ResearchType;
     credits: number;
@@ -45,19 +63,18 @@ export interface Player {
     missedTurns: number;
     hasSentTurnReminder: boolean;
     hasFilledAfkSlot: boolean;
-    research: {
-        scanning: ResearchProgress,
-        hyperspace: ResearchProgress,
-        terraforming: ResearchProgress,
-        experimentation: ResearchProgress,
-        weapons: ResearchProgress,
-        banking: ResearchProgress,
-        manufacturing: ResearchProgress,
-        specialists: ResearchProgress
-    },
+    research: PlayerResearch,
     ledger: PlayerLedger[],
     reputations: PlayerReputation[],
-    diplomacy: {
-        allies: ObjectId[]
-    }
+    diplomacy: PlayerDiplomacy,
+    stats?: PlayerStatistics;
+    isKingOfTheHill?: boolean;
+    isInScanningRange?: boolean;
+    currentResearchTicksEta?: number | null;
+    nextResearchTicksEta?: number | null;
+};
+
+export interface PlayerColourShapeCombination {
+    colour: string;
+    shape: PlayerShape;
 };

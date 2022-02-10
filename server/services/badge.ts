@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongoose';
+import { DBObjectId } from '../types/DBObjectId';
 import ValidationError from '../errors/validation';
 import DatabaseRepository from '../models/DatabaseRepository';
 import { Badge, UserBadge } from '../types/Badge';
@@ -56,7 +56,7 @@ export default class BadgeService extends EventEmitter {
         return userBadges.filter(b => b.awarded);
     }
 
-    async listBadgesByPlayer(game: Game, playerId: ObjectId) {
+    async listBadgesByPlayer(game: Game, playerId: DBObjectId) {
         let player = this.playerService.getById(game, playerId);
 
         if (!player) {
@@ -70,7 +70,7 @@ export default class BadgeService extends EventEmitter {
         return await this.listBadgesByUser(player.userId);
     }
 
-    async purchaseBadgeForUser(purchasedByUserId: ObjectId, purchasedForUserId: ObjectId, badgeKey: string) {
+    async purchaseBadgeForUser(purchasedByUserId: DBObjectId, purchasedForUserId: DBObjectId, badgeKey: string) {
         if (purchasedByUserId.toString() === purchasedForUserId.toString()) {
             throw new ValidationError(`Cannot purchased a badge for yourself.`);
         }
@@ -110,7 +110,7 @@ export default class BadgeService extends EventEmitter {
         return badge;
     }
 
-    async purchaseBadgeForPlayer(game: Game, purchasedByUserId: ObjectId, purchasedForPlayerId: ObjectId, badgeKey: string) {
+    async purchaseBadgeForPlayer(game: Game, purchasedByUserId: DBObjectId, purchasedForPlayerId: DBObjectId, badgeKey: string) {
         let buyer = this.playerService.getByUserId(game, purchasedByUserId);
         let recipient = this.playerService.getById(game, purchasedForPlayerId);
 
