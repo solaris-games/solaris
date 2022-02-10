@@ -36,7 +36,7 @@ export interface PlayerDiplomacy {
 
 export interface Player {
     _id: DBObjectId;
-    userId: string | null; // TODO: Should be an ObjectId
+    userId: DBObjectId | null;
     homeStarId: DBObjectId;
     alias: string;
     avatar: string | null;

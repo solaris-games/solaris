@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 const Types = Schema.Types;
 
 const schema = new Schema({
-    userId: { type: Types.String, required: false, default: null }, // TODO: This should be an object id
+    userId: { type: Types.ObjectId, required: false, default: null },
     homeStarId: { type: Types.ObjectId, required: true },
     alias: { type: Types.String, required: true },
     avatar: { type: Types.String, required: false, default: null },

@@ -1,5 +1,9 @@
-db.users.updateMany({}, {
-    $set: {
-        'gameSettings.map.objectsDepth': 'disabled'
+db.games.find({}).forEach(function(game) {
+    for (let player of game.galaxy.players) {
+        if (player.userId != null && (typeof player.userId === 'string' || player.userId instanceof String)) {
+            player.userId = new ObjectId(player.userId);
+        }
     }
+
+    db.games.save(game);
 });
