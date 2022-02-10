@@ -19,20 +19,16 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Jobs",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "program": "${workspaceFolder}/server/jobs/index.js",
+            "program": "${workspaceFolder}/server/jobs/index.ts",
+            "preLaunchTask": "npm: tsc - server",
             "envFile": "${workspaceFolder}/server/.env"
         },
         {
             "type": "node",
             "request": "launch",
             "name": "Launch API",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "program": "${workspaceFolder}/server/api/index.js",
+            "program": "${workspaceFolder}/server/api/index.ts",
+            "preLaunchTask": "npm: tsc - server",
             "envFile": "${workspaceFolder}/server/.env"
         },
         {

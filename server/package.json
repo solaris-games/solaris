@@ -6,6 +6,7 @@
     "test": "jasmine",
     "start-api": "ts-node api/index.ts",
     "start-jobs": "ts-node jobs/index.ts",
+    "pretsc": "rm -rf ./dist",
     "tsc": "tsc",
     "ts-node": "ts-node"
   },
