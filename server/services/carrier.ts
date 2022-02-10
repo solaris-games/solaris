@@ -344,11 +344,11 @@ export default class CarrierService extends EventEmitter {
             throw new ValidationError(`Cannot transfer ownership of a gifted carrier to this star, no player owns the star.`);
         }
 
-        let starPlayer = game.galaxy.players.find(p => p._id.equals(star.ownedByPlayerId))!;
-        let starUser = gameUsers.find(u => u._id.equals(starPlayer.userId));
+        let starPlayer = game.galaxy.players.find(p => star.ownedByPlayerId && p._id.equals(star.ownedByPlayerId))!;
+        let starUser = gameUsers.find(u => starPlayer.userId && u._id.equals(starPlayer.userId));
 
-        let carrierPlayer = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId))!;
-        let carrierUser = gameUsers.find(u => u._id.equals(carrierPlayer.userId));
+        let carrierPlayer = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId!))!;
+        let carrierUser = gameUsers.find(u => carrierPlayer.userId && u._id.equals(carrierPlayer.userId));
 
         const isSamePlayer = starPlayer._id.equals(carrierPlayer._id);
 
@@ -494,7 +494,7 @@ export default class CarrierService extends EventEmitter {
         }
 
         // If the star is owned by another player, then perform combat.
-        if (!destinationStar.ownedByPlayerId!.equals(carrier.ownedByPlayerId)) {
+        if (!destinationStar.ownedByPlayerId!.equals(carrier.ownedByPlayerId!)) {
             // If the carrier is a gift, then transfer the carrier ownership to the star owning player.
             // Otherwise, perform combat.
             if (carrier.isGift) {
@@ -525,7 +525,7 @@ export default class CarrierService extends EventEmitter {
 
         let sourceStar = game.galaxy.stars.find(s => s._id.equals(waypoint.source))!;
         let destinationStar = game.galaxy.stars.find(s => s._id.equals(waypoint.destination))!;
-        let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrierInTransit.carrier.ownedByPlayerId))!;
+        let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrierInTransit.carrier.ownedByPlayerId!))!;
         let warpSpeed = this.starService.canTravelAtWarpSpeed(game, carrierOwner, carrierInTransit.carrier, sourceStar, destinationStar);
         let instantSpeed = this.starService.isStarPairWormHole(sourceStar, destinationStar);
         let distancePerTick = this.getCarrierDistancePerTick(game, carrierInTransit.carrier, warpSpeed, instantSpeed); // Null signifies instant travel
@@ -562,7 +562,7 @@ export default class CarrierService extends EventEmitter {
         let waypoint = carrier.waypoints[0];
         let sourceStar = game.galaxy.stars.find(s => s._id.equals(waypoint.source))!;
         let destinationStar = game.galaxy.stars.find(s => s._id.equals(waypoint.destination))!;
-        let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId))!;
+        let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId!))!;
 
         let warpSpeed = false;
         let instantSpeed: boolean | null = false;

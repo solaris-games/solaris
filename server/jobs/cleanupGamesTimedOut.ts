@@ -16,7 +16,7 @@ export default (container: DependencyContainer) => {
                 }
 
                 try {
-                    await container.emailService.sendGameTimedOutEmail(game);
+                    await container.emailService.sendGameTimedOutEmail(game._id);
                     await container.gameService.delete(game);
                 } catch (e) {
                     console.error(e);

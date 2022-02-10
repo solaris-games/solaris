@@ -388,8 +388,8 @@ export default class StarService extends EventEmitter {
         // If both stars have warp gates and they are both owned by players...
         if (sourceStar.warpGate && destinationStar.warpGate && sourceStar.ownedByPlayerId && destinationStar.ownedByPlayerId) {
             // If both stars are owned by the player or by allies then carriers can always move at warp.
-            let sourceAllied = sourceStar.ownedByPlayerId.equals(carrier.ownedByPlayerId) || (this.diplomacyService.isFormalAlliancesEnabled(game) && this.diplomacyService.isDiplomaticStatusToPlayersAllied(game, sourceStar.ownedByPlayerId, [carrier.ownedByPlayerId]));
-            let desinationAllied = destinationStar.ownedByPlayerId.equals(carrier.ownedByPlayerId) || (this.diplomacyService.isFormalAlliancesEnabled(game) && this.diplomacyService.isDiplomaticStatusToPlayersAllied(game, destinationStar.ownedByPlayerId, [carrier.ownedByPlayerId]));
+            let sourceAllied = sourceStar.ownedByPlayerId.equals(carrier.ownedByPlayerId!) || (this.diplomacyService.isFormalAlliancesEnabled(game) && this.diplomacyService.isDiplomaticStatusToPlayersAllied(game, sourceStar.ownedByPlayerId, [carrier.ownedByPlayerId]));
+            let desinationAllied = destinationStar.ownedByPlayerId.equals(carrier.ownedByPlayerId!) || (this.diplomacyService.isFormalAlliancesEnabled(game) && this.diplomacyService.isDiplomaticStatusToPlayersAllied(game, destinationStar.ownedByPlayerId, [carrier.ownedByPlayerId]));
 
             // If both stars are owned by the player then carriers can always move at warp.
             if (sourceAllied && desinationAllied) {
@@ -480,8 +480,8 @@ export default class StarService extends EventEmitter {
             carrier.isGift = false;
         }
 
-        let carrierPlayer = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId))!;
-        let carrierUser = carrierPlayer.userId ? gameUsers.find(u => u._id.equals(carrierPlayer.userId)) : null;
+        let carrierPlayer = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId!))!;
+        let carrierUser = carrierPlayer.userId ? gameUsers.find(u => carrierPlayer.userId && u._id.equals(carrierPlayer.userId)) : null;
 
         if (carrierUser && !carrierPlayer.defeated && !this.gameTypeService.isTutorialGame(game)) {
             carrierUser.achievements.combat.stars.captured++;
@@ -660,7 +660,7 @@ export default class StarService extends EventEmitter {
             star.warpGate = false;
         }
 
-        let closestPlayerId = attackerCarriersInTransit.sort((a, b) => a.distanceToDestination - b.distanceToDestination)[0].carrier.ownedByPlayerId;
+        let closestPlayerId = attackerCarriersInTransit.sort((a, b) => a.distanceToDestination - b.distanceToDestination)[0].carrier.ownedByPlayerId!;
 
         // Capture the star.
         let newStarPlayer = attackers.find(p => p._id.equals(closestPlayerId))!;
@@ -683,7 +683,7 @@ export default class StarService extends EventEmitter {
         // Reset the ignore bulk upgrade statuses as it has been captured by a new player.
         this.resetIgnoreBulkUpgradeStatuses(star);
 
-        const oldStarUser = owner.userId ? defenderUsers.find(u => u._id.equals(owner.userId)) : null;
+        const oldStarUser = owner.userId ? defenderUsers.find(u => owner.userId && u._id.equals(owner.userId)) : null;
 
         if (!isTutorialGame) {
             if (oldStarUser && !owner.defeated) {

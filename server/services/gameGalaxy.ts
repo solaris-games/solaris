@@ -191,11 +191,11 @@ export default class GameGalaxyService {
         return game;
     }
 
-    _getCachedGalaxy(gameId: DBObjectId, userId: DBObjectId, requestedTick: number, currentTick: number) {
+    _getCachedGalaxy(gameId: DBObjectId, userId: DBObjectId, requestedTick: number | null, currentTick: number) {
         // Cache up to 24 ticks, any more and its too much memory.
         // Note: If we limit how much history data is logged we will
         // need to update this logic.
-        if (currentTick - requestedTick > 24) {
+        if (requestedTick && currentTick - requestedTick > 24) {
             return {
                 cacheKey: null,
                 galaxy: null
@@ -226,7 +226,7 @@ export default class GameGalaxyService {
             return null;
         }
 
-        return doc.galaxy.players.find(x => x.userId === userId.toString()) || null;
+        return doc.galaxy.players.find(x => x.userId?.equals(userId)) || null;
     }
 
     _setPlayerStats(doc: Game) {
@@ -447,7 +447,7 @@ export default class GameGalaxyService {
         let guildUsers: GuildUserWithTag[] = [];
 
         if (!this.gameTypeService.isAnonymousGame(doc)) {
-            let userIds: DBObjectId[] = doc.galaxy.players.filter(x => x.userId).map(x => x.userId);
+            let userIds: DBObjectId[] = doc.galaxy.players.filter(x => x.userId).map(x => x.userId!);
             guildUsers = await this.guildUserService.listUsersWithGuildTags(userIds)
         }
 
@@ -471,7 +471,7 @@ export default class GameGalaxyService {
             let playerGuild: Guild | null = null;
 
             if (p.userId) {
-                let guildUser = guildUsers.find(u => u._id.toString() === p.userId.toString());
+                let guildUser = guildUsers.find(u => p.userId && u._id.equals(p.userId));
 
                 if (guildUser && guildUser.displayGuildTag === 'visible') {
                     playerGuild = guildUser.guild;
@@ -596,7 +596,7 @@ export default class GameGalaxyService {
         doc.galaxy.carriers = [];
     }
 
-    async _maskGalaxy(game: Game, player: Player | null, isHistorical: boolean, tick: number) {
+    async _maskGalaxy(game: Game, player: Player | null, isHistorical: boolean, tick: number | null) {
         /*
             Masking of galaxy data occurs here, it prevent players from seeing what other
             players are doing until the tick has finished.

@@ -196,7 +196,7 @@ export default class CombatService extends EventEmitter {
             .filter(c => 
                 c.ships! > 0
                 && !c.isGift
-                && (c.ownedByPlayerId!.equals(defender._id) || defenderAllies.find(a => a._id.equals(c.ownedByPlayerId)))  // Either owned by the defender or owned by an ally
+                && (c.ownedByPlayerId!.equals(defender._id) || defenderAllies.find(a => a._id.equals(c.ownedByPlayerId!)))  // Either owned by the defender or owned by an ally
             )
             .sort((a, b) => b.ships! - a.ships!);
 
@@ -211,7 +211,7 @@ export default class CombatService extends EventEmitter {
                 c.ships! > 0 
                 && !c.isGift 
                 && !c.ownedByPlayerId!.equals(defender._id)    // Not owned by the player and
-                && !defenderAllies.find(a => a._id.equals(c.ownedByPlayerId))   // Not owned by an ally
+                && !defenderAllies.find(a => a._id.equals(c.ownedByPlayerId!))   // Not owned by an ally
             )
             .sort((a, b) => b.ships! - a.ships!);
 
@@ -234,7 +234,7 @@ export default class CombatService extends EventEmitter {
         let attackerUsers: User[] = [];
         
         for (let defender of defenders) {
-            let user = gameUsers.find(u => u._id.equals(defender.userId));
+            let user = gameUsers.find(u => u._id.equals(defender.userId!));
             
             if (user) {
                 defenderUsers.push(user);
@@ -242,7 +242,7 @@ export default class CombatService extends EventEmitter {
         }
         
         for (let attacker of attackers) {
-            let user = gameUsers.find(u => u._id.equals(attacker.userId));
+            let user = gameUsers.find(u => u._id.equals(attacker.userId!));
             
             if (user) {
                 attackerUsers.push(user);
@@ -483,7 +483,7 @@ export default class CombatService extends EventEmitter {
 
         // Add combat result stats to defender achievements.
         for (let defenderUser of defenderUsers) {
-            let defender = defenders.find(u => u.userId === defenderUser._id.toString())!;
+            let defender = defenders.find(u => u.userId?.equals(defenderUser._id))!;
 
             if (defender && !defender.defeated) {
                 let playerCarriers = defenderCarriers.filter(c => c.ownedByPlayerId!.equals(defender._id));
@@ -500,7 +500,7 @@ export default class CombatService extends EventEmitter {
 
         // Add combat result stats to attacker achievements.
         for (let attackerUser of attackerUsers) {
-            let attacker = attackers.find(u => u.userId === attackerUser._id.toString())!;
+            let attacker = attackers.find(u => u.userId?.equals(attackerUser._id))!;
 
             if (attacker && !attacker.defeated) {
                 let playerCarriers = attackerCarriers.filter(c => c.ownedByPlayerId!.equals(attacker._id));

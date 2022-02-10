@@ -670,7 +670,7 @@ export default class LeaderboardService {
         for (let i = 0; i < leaderboardPlayers.length; i++) {
             let player = leaderboardPlayers[i];
 
-            let user = gameUsers.find(u => u._id.equals(player.userId));
+            let user = gameUsers.find(u => player.userId && u._id.equals(player.userId));
 
             // Double check user isn't deleted.
             if (!user) {
@@ -745,11 +745,11 @@ export default class LeaderboardService {
 
     addUserRatingCheck(game: Game, gameUsers: User[]): EloRatingChangeResult | null {
         if (['1v1_rt', '1v1_tb'].includes(game.settings.general.type)) {
-            let winningPlayer: Player = game.galaxy.players.find(p => p._id.equals(game.state.winner))!;
-            let losingPlayer: Player = game.galaxy.players.find(p => !p._id.equals(game.state.winner))!;
+            let winningPlayer: Player = game.galaxy.players.find(p => p._id.equals(game.state.winner!))!;
+            let losingPlayer: Player = game.galaxy.players.find(p => !p._id.equals(game.state.winner!))!;
 
-            let winningUser: User = gameUsers.find(u => u._id.toString() === winningPlayer.userId)!;
-            let losingUser: User = gameUsers.find(u => u._id.toString() === losingPlayer.userId)!;
+            let winningUser: User = gameUsers.find(u => winningPlayer.userId && u._id.equals(winningPlayer.userId))!;
+            let losingUser: User = gameUsers.find(u => losingPlayer.userId && u._id.equals(losingPlayer.userId))!;
 
             let winningUserOldRating = winningUser.achievements.eloRating || 1200;
             let losingUserOldRating = losingUser.achievements.eloRating || 1200;

@@ -308,7 +308,7 @@ export default class WaypointService {
     calculateWaypointTicks(game: Game, carrier: Carrier, waypoint: CarrierWaypoint) {
         const delayTicks = waypoint.delayTicks || 0;
 
-        let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId))!;
+        let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId!))!;
 
         // if the waypoint is going to the same star then it is at least 1
         // tick, plus any delay ticks.
@@ -368,7 +368,7 @@ export default class WaypointService {
     }
 
     performWaypointAction(carrier: Carrier, star: Star, waypoint: CarrierWaypoint) {
-        if (!carrier.ownedByPlayerId!.equals(star.ownedByPlayerId)) {
+        if (!carrier.ownedByPlayerId!.equals(star.ownedByPlayerId!)) {
             throw new Error('Cannot perform waypoint action, the carrier and star are owned by different players.')
         }
 
@@ -543,7 +543,7 @@ export default class WaypointService {
     _performFilteredWaypointActions(game: Game, waypoints: CarrierActionWaypoint[], waypointTypes: CarrierWaypointActionType[]) {
         let actionWaypoints = waypoints.filter(w => 
             waypointTypes.indexOf(w.waypoint.action) > -1
-            && w.carrier.ownedByPlayerId!.equals(w.star.ownedByPlayerId) // The carrier must be owned by the player who owns the star.
+            && w.carrier.ownedByPlayerId!.equals(w.star.ownedByPlayerId!) // The carrier must be owned by the player who owns the star.
         );
 
         for (let actionWaypoint of actionWaypoints) {
@@ -563,7 +563,7 @@ export default class WaypointService {
         game.galaxy.carriers
             .filter(c => c.waypoints.length)
             .map(c => {
-                let scanningRangePlayer = scanningRanges.find(s => s.player._id.equals(c.ownedByPlayerId))!;
+                let scanningRangePlayer = scanningRanges.find(s => s.player._id.equals(c.ownedByPlayerId!))!;
 
                 return {
                     carrier: c,

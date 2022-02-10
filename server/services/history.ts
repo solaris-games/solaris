@@ -226,7 +226,7 @@ export default class HistoryService {
         });
     }
 
-    async getHistoryByTick(gameId: DBObjectId, tick: number) {
+    async getHistoryByTick(gameId: DBObjectId, tick: number | null) {
         return await this.historyRepo.findOne({
             gameId,
             tick

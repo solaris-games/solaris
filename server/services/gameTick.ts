@@ -639,11 +639,13 @@ export default class GameTickService extends EventEmitter {
             if (player.defeated) {
                 game.state.players--; // Deduct number of active players from the game.
 
-                let user = gameUsers.find(u => u._id.equals(player.userId));
+                let user = gameUsers.find(u => player.userId && u._id.equals(player.userId));
 
                 if (player.afk) {
                     // Keep a log of players who have been afk so they cannot rejoin.
-                    game.afkers.push(player.userId);
+                    if (player.userId) {
+                        game.afkers.push(player.userId);
+                    }
             
                     // AFK counts as a defeat as well.
                     if (user && !isTutorialGame) {
