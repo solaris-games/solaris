@@ -5,7 +5,7 @@
             "key": "mecha-head",
             "name": "Admiral",
             "description": "Grants x1.5 Speed, -1 Weapons, -2 Hyperspace Range to the carrier.",
-            "baseCostCredits": 200,
+            "baseCostCredits": 300,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
             "modifiers": {
@@ -21,7 +21,7 @@
             "key": "mecha-mask",
             "name": "Lieutenant",
             "description": "Grants +1 Weapons, -1 Hyperspace Range to the carrier.",
-            "baseCostCredits": 100,
+            "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 2,
             "oneShot": false,
             "modifiers": {
@@ -36,7 +36,7 @@
             "key": "android-mask",
             "name": "Colonel",
             "description": "Grants +2 Weapons, -1 Hyperspace Range, x0.75 Speed to the carrier.",
-            "baseCostCredits": 200,
+            "baseCostCredits": 300,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
             "modifiers": {
@@ -84,7 +84,7 @@
             "key": "lunar-module",
             "name": "Explorer",
             "description": "Grants +3 Hyperspace Range, x1.5 Speed, -3 Weapons to the carrier.",
-            "baseCostCredits": 200,
+            "baseCostCredits": 300,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
             "modifiers": {
@@ -116,7 +116,7 @@
             "key": "power-generator",
             "name": "Scrambler",
             "description": "Prevents other players from seeing how many ships the carrier has.",
-            "baseCostCredits": 200,
+            "baseCostCredits": 300,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
             "modifiers": {
@@ -130,7 +130,7 @@
             "key": "energise",
             "name": "Infiltrator",
             "description": "When participating in combat, the enemy fights with -1 Weapons.",
-            "baseCostCredits": 200,
+            "baseCostCredits": 300,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
             "modifiers": {
@@ -213,7 +213,7 @@
             "key": "spoutnik",
             "name": "Pathfinder",
             "description": "Grants +1 Hyperspace Range to the carrier.",
-            "baseCostCredits": 50,
+            "baseCostCredits": 100,
             "baseCostCreditsSpecialists": 1,
             "oneShot": false,
             "modifiers": {
@@ -284,7 +284,7 @@
             "key": "sattelite",
             "name": "Orbital Array",
             "description": "Grants +1 Scanning Range to the Star.",
-            "baseCostCredits": 50,
+            "baseCostCredits": 100,
             "baseCostCreditsSpecialists": 1,
             "oneShot": false,
             "modifiers": {
@@ -298,7 +298,7 @@
             "key": "airtight-hatch",
             "name": "Space Dock",
             "description": "Grants +2 Manufacturing, -1 Terraforming to the Star.",
-            "baseCostCredits": 100,
+            "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 2,
             "oneShot": false,
             "modifiers": {
@@ -313,7 +313,7 @@
             "key": "cannister",
             "name": "Atmosphere Processor",
             "description": "Grants +3 Terraforming, -1 Scanning to the Star.",
-            "baseCostCredits": 100,
+            "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 2,
             "oneShot": false,
             "modifiers": {
@@ -328,7 +328,7 @@
             "key": "defense-satellite",
             "name": "Orbital Cannon",
             "description": "Grants +1 Weapons to the Star.",
-            "baseCostCredits": 100,
+            "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 2,
             "oneShot": false,
             "modifiers": {
@@ -342,7 +342,7 @@
             "key": "habitat-dome",
             "name": "Warp Scrambler",
             "description": "Locks the Warp Gate at the Star to prevent enemy players from using it. Weapons -1.",
-            "baseCostCredits": 200,
+            "baseCostCredits": 300,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
             "modifiers": {
@@ -395,7 +395,7 @@
             "key": "power-generator",
             "name": "Scrambler",
             "description": "Prevents other players from seeing how many ships are garrisoned at the Star.",
-            "baseCostCredits": 200,
+            "baseCostCredits": 300,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
             "modifiers": {
@@ -482,6 +482,20 @@
                 "local": {
                     "scanning": 3,
                     "weapons": -3
+                }
+            }
+        },
+        {
+            "id": 14,
+            "key": "energy-tank",
+            "name": "Mineral Extractor",
+            "description": "Grants +2 Terraforming to the Star.",
+            "baseCostCredits": 100,
+            "baseCostCreditsSpecialists": 1,
+            "oneShot": false,
+            "modifiers": {
+                "local": {
+                    "terraforming": 2
                 }
             }
         }
