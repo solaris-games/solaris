@@ -142,6 +142,17 @@ export default class CombatService extends EventEmitter {
         defenderWeaponsTechLevel = Math.max(defenderWeaponsTechLevel - defenderWeaponsDeduction, 1);
         attackerWeaponsTechLevel = Math.max(attackerWeaponsTechLevel - attackerWeaponsDeduction, 1);
 
+        // Check to see if weapons tech should be swapped (joker specialist)
+        let shouldSwapWeaponsTech = this._shouldSwapWeaponsTech(defenderCarriers) || this._shouldSwapWeaponsTech(attackerCarriers);
+
+        if (shouldSwapWeaponsTech) {
+            let oldDefenderWeaponsTechLevel = defenderWeaponsTechLevel;
+            let oldAttackerWeaponsTechLevel = attackerWeaponsTechLevel;
+
+            defenderWeaponsTechLevel = oldAttackerWeaponsTechLevel;
+            attackerWeaponsTechLevel = oldDefenderWeaponsTechLevel;
+        }
+
         let combatResult = this.calculate({
             weaponsLevel: defenderWeaponsTechLevel,
             ships: totalDefenders
@@ -503,6 +514,12 @@ export default class CombatService extends EventEmitter {
                 attackerUser.achievements.combat.losses.specialists += playerCarriers.filter(c => !c.ships && c.specialistId).length;
             }
         }
+    }
+
+    _shouldSwapWeaponsTech(carriers: Carrier[]) {
+        return carriers
+            .filter(c => c.specialistId)
+            .find(c => this.specialistService.getByIdCarrier(c.specialistId)?.modifiers.special?.combatSwapWeaponsTechnology) != null;
     }
 
 }

@@ -276,6 +276,20 @@
                     "deductEnemyWeapons": 3
                 }
             }
+        },
+        {
+            "id": 18,
+            "key": "vintage-robot",
+            "name": "Joker",
+            "description": "When participating in combat, the calculated weapons technology levels are swapped between the two sides.",
+            "baseCostCredits": 2500,
+            "baseCostCreditsSpecialists": 25,
+            "oneShot": false,
+            "modifiers": {
+                "special": {
+                    "combatSwapWeaponsTechnology": true
+                }
+            }
         }
     ],
     "star": [

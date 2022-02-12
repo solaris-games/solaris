@@ -35,6 +35,7 @@ export default class SpecialistService {
         if (spec) {
             spec = {
                 id: spec.id,
+                key: spec.key,
                 name: spec.name,
                 description: spec.description
             };
@@ -57,6 +58,7 @@ export default class SpecialistService {
         if (spec) {
             spec = {
                 id: spec.id,
+                key: spec.key,
                 name: spec.name,
                 description: spec.description
             };
