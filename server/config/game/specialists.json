@@ -455,6 +455,21 @@
                     "creditsPerTickByScience": 2
                 }
             }
+        },
+        {
+            "id": 13,
+            "key": "radar-dish",
+            "name": "Telescope Array",
+            "description": "Grants +3 Scanning Range, -3 Weapons to the Star.",
+            "baseCostCredits": 600,
+            "baseCostCreditsSpecialists": 6,
+            "oneShot": false,
+            "modifiers": {
+                "local": {
+                    "scanning": 3,
+                    "weapons": -3
+                }
+            }
         }
     ]
 }
