@@ -35,6 +35,7 @@ export interface Specialist {
             economyInfrastructureMultiplier?: number;
             scienceInfrastructureMultiplier?: number;
             creditsPerTickByScience?: number;
+            autoCarrierSpecialistAssign?: number;
         },
         carrierToCarrierCombat?: {
             weapons: number;

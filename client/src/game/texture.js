@@ -107,6 +107,10 @@ class TextureService {
       this._loadSpecialistTexture('starfighter')
       this._loadSpecialistTexture('double-ringed-orb')
       this._loadSpecialistTexture('rocket')
+      this._loadSpecialistTexture('ray-gun')
+      this._loadSpecialistTexture('radar-dish')
+      this._loadSpecialistTexture('energy-tank')
+      this._loadSpecialistTexture('cryo-chamber')
     }
 
     _loadSpecialistTexture(name) {

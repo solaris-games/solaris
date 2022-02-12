@@ -102,12 +102,26 @@ export default class CarrierService extends EventEmitter {
             location: star.location,
             name,
             waypoints: [],
-            waypointsLooped: false
+            waypointsLooped: false,
+            specialistId: null,
+            specialist: null
         };
 
         // Reduce the star ships by how many we have added to the carrier.
         star.shipsActual! -= ships;
         star.ships! -= ships;
+
+        // Check to see if the carrier should be auto-assigned a specialist.
+        if (star.specialistId) {
+            let starSpecialist = this.specialistService.getByIdStar(star.specialistId);
+    
+            if (starSpecialist?.modifiers.special?.autoCarrierSpecialistAssign) {
+                // @ts-ignore
+                carrier.specialistId = starSpecialist.modifiers.special!.autoCarrierSpecialistAssign!;
+                // @ts-ignore
+                carrier.specialist = this.specialistService.getByIdCarrier(carrier.specialistId)
+            }
+        }
 
         return carrier;
     }

@@ -498,6 +498,20 @@
                     "terraforming": 2
                 }
             }
+        },
+        {
+            "id": 15,
+            "key": "cryo-chamber",
+            "name": "Cryo Chamber",
+            "description": "When a Carrier is built at this Star, a Lieutenant Carrier Specialist is automatically assigned to the Carrier.",
+            "baseCostCredits": 1500,
+            "baseCostCreditsSpecialists": 15,
+            "oneShot": false,
+            "modifiers": {
+                "special": {
+                    "autoCarrierSpecialistAssign": 2
+                }
+            }
         }
     ]
 }
