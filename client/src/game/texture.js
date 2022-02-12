@@ -115,10 +115,8 @@ class TextureService {
       this.SPECIALIST_TEXTURES[name].baseTexture.mipmap = 0
     }
 
-    getSpecialistTexture(specialistId, isCarrier) {
-      let name = gameHelper.getSpecialistName(isCarrier ? 'carrier':'star', specialistId)
-
-      return this.SPECIALIST_TEXTURES[name]
+    getSpecialistTexture(specialistKey) {
+      return this.SPECIALIST_TEXTURES[specialistKey]
     }
 
     _loadPlayerSymbols() {

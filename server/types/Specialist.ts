@@ -2,6 +2,7 @@ export type SpecialistType = 'star'|'carrier';
 
 export interface Specialist {
     id: number;
+    key: string;
     name: string;
     description: string;
     baseCostCredits: number;

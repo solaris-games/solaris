@@ -226,7 +226,7 @@ export default class GameGalaxyService {
             return null;
         }
 
-        return doc.galaxy.players.find(x => x.userId?.equals(userId)) || null;
+        return doc.galaxy.players.find(x => x.userId && x.userId.equals(userId)) || null;
     }
 
     _setPlayerStats(doc: Game) {

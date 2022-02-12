@@ -2,6 +2,7 @@
     "carrier": [
         {
             "id": 1,
+            "key": "mecha-head",
             "name": "Admiral",
             "description": "Grants x1.5 Speed, -1 Weapons, -2 Hyperspace Range to the carrier.",
             "baseCostCredits": 200,
@@ -17,6 +18,7 @@
         },
         {
             "id": 2,
+            "key": "mecha-mask",
             "name": "Lieutenant",
             "description": "Grants +1 Weapons, -1 Hyperspace Range to the carrier.",
             "baseCostCredits": 100,
@@ -31,6 +33,7 @@
         },
         {
             "id": 3,
+            "key": "android-mask",
             "name": "Colonel",
             "description": "Grants +2 Weapons, -1 Hyperspace Range, x0.75 Speed to the carrier.",
             "baseCostCredits": 200,
@@ -46,6 +49,7 @@
         },
         {
             "id": 4,
+            "key": "hazmat-suit",
             "name": "General",
             "description": "Grants +3 Weapons, -1 Hyperspace Range, x0.5 Speed to the carrier.",
             "baseCostCredits": 500,
@@ -61,6 +65,7 @@
         },
         {
             "id": 5,
+            "key": "cyborg-face",
             "name": "Smuggler",
             "description": "Grants x2 Speed, -1 Hyperspace Range, -1 Weapons to the carrier.",
             "baseCostCredits": 500,
@@ -76,6 +81,7 @@
         },
         {
             "id": 6,
+            "key": "lunar-module",
             "name": "Explorer",
             "description": "Grants +3 Hyperspace Range, x1.5 Speed, -3 Weapons to the carrier.",
             "baseCostCredits": 200,
@@ -91,6 +97,7 @@
         },
         {
             "id": 7,
+            "key": "spaceship",
             "name": "Destroyer",
             "description": "Grants +5 Weapons, -3 Hyperspace Range, x0.5 Speed to the carrier.",
             "baseCostCredits": 1000,
@@ -106,6 +113,7 @@
         },
         {
             "id": 8,
+            "key": "power-generator",
             "name": "Scrambler",
             "description": "Prevents other players from seeing how many ships the carrier has.",
             "baseCostCredits": 200,
@@ -119,6 +127,7 @@
         },
         {
             "id": 9,
+            "key": "energise",
             "name": "Infiltrator",
             "description": "When participating in combat, the enemy fights with -1 Weapons.",
             "baseCostCredits": 200,
@@ -132,6 +141,7 @@
         },
         {
             "id": 10,
+            "key": "afterburn",
             "name": "Warp Stabilizer",
             "description": "Warp Scramblers do not affect the carrier.",
             "baseCostCredits": 500,
@@ -145,6 +155,7 @@
         },
         {
             "id": 11,
+            "key": "strafe",
             "name": "Raider",
             "description": "Carrier travels at x2 Speed, -2 Weapons. The carrier is awarded x2 star capture rewards for destroying infrastructure.",
             "baseCostCredits": 500,
@@ -162,6 +173,7 @@
         },
         {
             "id": 12,
+            "key": "alien-stare",
             "name": "Coward",
             "description": "The carrier does not participate in carrier-to-carrier combat. x2 Speed.",
             "baseCostCredits": 1000,
@@ -178,6 +190,7 @@
         },
         {
             "id": 13,
+            "key": "pirate",
             "name": "Pirate",
             "description": "Grants +3 Weapons in carrier-to-carrier combat, -2 Weapons in carrier-to-star combat and x1.5 Speed.",
             "baseCostCredits": 500,
@@ -197,6 +210,7 @@
         },
         {
             "id": 14,
+            "key": "spoutnik",
             "name": "Pathfinder",
             "description": "Grants +1 Hyperspace Range to the carrier.",
             "baseCostCredits": 50,
@@ -210,6 +224,7 @@
         },
         {
             "id": 15,
+            "key": "starfighter",
             "name": "Marauder",
             "description": "The carrier does not participate in carrier-to-carrier combat. x1.5 Speed, -2 Hyperspace Range, -1 Weapons.",
             "baseCostCredits": 500,
@@ -228,6 +243,7 @@
         },
         {
             "id": 16,
+            "key": "rocket",
             "name": "Stellar Bomb",
             "description": "Reignites a dead star with 25 Natural Resources, the Stellar Bomb will be destroyed but the carrier will survive. x0.5 Speed.",
             "baseCostCredits": 300,
@@ -251,6 +267,7 @@
     "star": [
         {
             "id": 1,
+            "key": "sattelite",
             "name": "Orbital Array",
             "description": "Grants +1 Scanning Range to the Star.",
             "baseCostCredits": 50,
@@ -264,6 +281,7 @@
         },
         {
             "id": 2,
+            "key": "airtight-hatch",
             "name": "Space Dock",
             "description": "Grants +2 Manufacturing, -1 Terraforming to the Star.",
             "baseCostCredits": 100,
@@ -278,6 +296,7 @@
         },
         {
             "id": 3,
+            "key": "cannister",
             "name": "Atmosphere Processor",
             "description": "Grants +3 Terraforming, -1 Scanning to the Star.",
             "baseCostCredits": 100,
@@ -292,6 +311,7 @@
         },
         {
             "id": 4,
+            "key": "defense-satellite",
             "name": "Orbital Cannon",
             "description": "Grants +1 Weapons to the Star.",
             "baseCostCredits": 100,
@@ -305,6 +325,7 @@
         },
         {
             "id": 5,
+            "key": "habitat-dome",
             "name": "Warp Scrambler",
             "description": "Locks the Warp Gate at the Star to prevent enemy players from using it. Weapons -1.",
             "baseCostCredits": 200,
@@ -321,6 +342,7 @@
         },
         {
             "id": 6,
+            "key": "techno-heart",
             "name": "World Builder",
             "description": "Adds 1 to the Star's natural resources every tick, -3 Scanning, -5 Weapons.",
             "baseCostCredits": 1000,
@@ -338,6 +360,7 @@
         },
         {
             "id": 7,
+            "key": "missile-pod",
             "name": "War Machine",
             "description": "Deducts 1 from the Star's natural resources every tick, +5 Manufacturing, +5 Weapons. When the star reaches 0 natural resources, the star dies and the specialist retires.",
             "baseCostCredits": 500,
@@ -355,6 +378,7 @@
         },
         {
             "id": 8,
+            "key": "power-generator",
             "name": "Scrambler",
             "description": "Prevents other players from seeing how many ships are garrisoned at the Star.",
             "baseCostCredits": 200,
@@ -368,6 +392,7 @@
         },
         {
             "id": 9,
+            "key": "space-suit",
             "name": "Demolition Controller",
             "description": "If the Star is captured, all infrastructure is destroyed.",
             "baseCostCredits": 300,
@@ -381,6 +406,7 @@
         },
         {
             "id": 10,
+            "key": "ringed-planet",
             "name": "Trade Port",
             "description": "The Star's Economy infrastructure contributes x2 to economy production. -5 Terraforming, -3 Weapons, +1 Scanning.",
             "baseCostCredits": 1000,
@@ -399,6 +425,7 @@
         },
         {
             "id": 11,
+            "key": "observatory",
             "name": "Research Station",
             "description": "The Star's Science infrastructure contributes x2 to research. -3 Terraforming, -3 Weapons, +1 Scanning.",
             "baseCostCredits": 500,
@@ -417,6 +444,7 @@
         },
         {
             "id": 12,
+            "key": "double-ringed-orb",
             "name": "Financial Analyst",
             "description": "The star produces 2 credits per tick for each point of science on the star.",
             "baseCostCredits": 1000,

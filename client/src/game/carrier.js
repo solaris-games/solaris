@@ -161,7 +161,7 @@ class Carrier extends EventEmitter {
       return
     }
 
-    let specialistTexture = TextureService.getSpecialistTexture(this.data.specialistId, true)
+    let specialistTexture = TextureService.getSpecialistTexture(this.data.specialist.key)
     let specialistSprite = new PIXI.Sprite(specialistTexture)
     specialistSprite.width = 6
     specialistSprite.height = 6
@@ -172,7 +172,7 @@ class Carrier extends EventEmitter {
   }
 
   hasSpecialist () {
-    return this.data.specialistId && this.data.specialistId > 0
+    return this.data.specialistId && this.data.specialistId > 0 && this.data.specialist
   }
 
   clearPaths() {
