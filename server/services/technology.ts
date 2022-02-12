@@ -178,17 +178,17 @@ export default class TechnologyService {
         deduction = carriersToCheck
             .filter(c => c.specialistId != null)
             .map(c => {
-            let specialist = this.specialistService.getByIdCarrier(c.specialistId!);
+                let specialist = this.specialistService.getByIdCarrier(c.specialistId!);
 
-            if (specialist && specialist.modifiers.special && specialist.modifiers.special.deductEnemyWeapons) {
-                return specialist.modifiers.special.deductEnemyWeapons;
-            }
+                if (specialist && specialist.modifiers.special && specialist.modifiers.special.deductEnemyWeapons) {
+                    return specialist.modifiers.special.deductEnemyWeapons;
+                }
 
-            return 0;
-        })
-        .sort((a, b) => b - a)[0];
+                return 0;
+            })
+            .sort((a, b) => b - a)[0];
 
-        return deduction;
+        return deduction || 0;
     }
 
     getStarEffectiveWeaponsLevel(game: Game, players: Player[], star: Star, carriersInOrbit: Carrier[]) {

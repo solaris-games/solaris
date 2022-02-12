@@ -1,5 +1,5 @@
 import { DBObjectId } from "../types/DBObjectId";
-import { Carrier, CarrierInTransit, CarrierPosition } from "../types/Carrier";
+import { Carrier, CarrierPosition } from "../types/Carrier";
 import { Game } from "../types/Game";
 import { User } from "../types/User";
 import AIService from "./ai";
@@ -434,7 +434,7 @@ export default class GameTickService extends EventEmitter {
         //  1. To prevent carriers hopping over combat.
         //  2. To ensure that carriers who are closest to their destinations
         // land before any other carriers due to land in the same tick.
-        let carriersInTransit: CarrierInTransit[] = [];
+        let carriersInTransit: Carrier[] = [];
 
         let carriersWithWaypoints = game.galaxy.carriers.filter(c => c.waypoints.length);
 
@@ -460,15 +460,12 @@ export default class GameTickService extends EventEmitter {
             }
 
             // Save the distance travelled so it can be used later for combat.
-            const distanceToDestination = this.distanceService.getDistanceBetweenLocations(carrier.location, destinationStar.location);
-
-            carriersInTransit.push({
-                carrier,
-                distanceToDestination
-            });
+            carrier.distanceToDestination = this.distanceService.getDistanceBetweenLocations(carrier.location, destinationStar.location);
+             
+            carriersInTransit.push(carrier);
         }
 
-        carriersInTransit = carriersInTransit.sort((a, b) => a.distanceToDestination - b.distanceToDestination);
+        carriersInTransit = carriersInTransit.sort((a, b) => a.distanceToDestination! - b.distanceToDestination!);
 
         // 2. Iterate through each carrier, move it, then check for combat.
         // (DO NOT do any combat yet as we have to wait for all of the carriers to move)
@@ -488,7 +485,7 @@ export default class GameTickService extends EventEmitter {
             // append the movement waypoint to the array of action waypoints so that we can deal with it after combat.
             if (carrierMovementReport.arrivedAtStar) {
                 actionWaypoints.push({
-                    carrier: carrierInTransit.carrier,
+                    carrier: carrierInTransit,
                     star: carrierMovementReport.destinationStar,
                     waypoint: carrierMovementReport.waypoint
                 });

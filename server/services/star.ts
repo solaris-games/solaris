@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 import { DBObjectId } from '../types/DBObjectId';
 import ValidationError from '../errors/validation';
 import DatabaseRepository from '../models/DatabaseRepository';
-import { Carrier, CarrierInTransit } from '../types/Carrier';
+import { Carrier } from '../types/Carrier';
 import { Game, GameSettings } from '../types/Game';
 import { Location } from '../types/Location';
 import { MapObject } from '../types/Map';
@@ -646,7 +646,7 @@ export default class StarService extends EventEmitter {
         });
     }
 
-    captureStar(game: Game, star: Star, owner: Player, defenders: Player[], defenderUsers: User[], attackers: Player[], attackerUsers: User[], attackerCarriersInTransit: CarrierInTransit[]): StarCaptureResult {
+    captureStar(game: Game, star: Star, owner: Player, defenders: Player[], defenderUsers: User[], attackers: Player[], attackerUsers: User[], attackerCarriers: Carrier[]): StarCaptureResult {
         const isTutorialGame = this.gameTypeService.isTutorialGame(game);
 
         let specialist = this.specialistService.getByIdStar(star.specialistId);
@@ -660,12 +660,12 @@ export default class StarService extends EventEmitter {
             star.warpGate = false;
         }
 
-        let closestPlayerId = attackerCarriersInTransit.sort((a, b) => a.distanceToDestination - b.distanceToDestination)[0].carrier.ownedByPlayerId!;
+        let closestPlayerId = attackerCarriers.sort((a, b) => (a.distanceToDestination || 0) - (b.distanceToDestination || 0))[0].ownedByPlayerId!;
 
         // Capture the star.
         let newStarPlayer = attackers.find(p => p._id.equals(closestPlayerId))!;
         let newStarUser = attackerUsers.find(u => u._id.toString() === newStarPlayer.userId!.toString());
-        let newStarPlayerCarriers = attackerCarriersInTransit.filter(c => c.carrier.ownedByPlayerId!.equals(newStarPlayer._id));
+        let newStarPlayerCarriers = attackerCarriers.filter(c => c.ownedByPlayerId!.equals(newStarPlayer._id));
 
         let captureReward = star.infrastructure.economy! * 10; // Attacker gets 10 credits for every eco destroyed.
 

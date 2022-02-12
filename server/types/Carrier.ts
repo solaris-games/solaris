@@ -16,6 +16,7 @@ export interface Carrier extends MapObject {
     ticksEta?: number | null;
     ticksEtaTotal?: number | null;
     locationNext: Location;
+    distanceToDestination?: number;
 
     toObject(): Carrier;
 };
@@ -30,9 +31,4 @@ export interface CarrierPosition {
     distanceToDestinationCurrent: number;
     distanceToSourceNext: number;
     distanceToDestinationNext: number;
-};
-
-export interface CarrierInTransit {
-    carrier: Carrier;
-    distanceToDestination: number;
 };

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 import { DBObjectId } from '../types/DBObjectId';
 import ValidationError from '../errors/validation';
 import DatabaseRepository from '../models/DatabaseRepository';
-import { Carrier, CarrierInTransit } from '../types/Carrier';
+import { Carrier } from '../types/Carrier';
 import { CarrierWaypoint } from '../types/CarrierWaypoint';
 import { Game } from '../types/Game';
 import { MapObject } from '../types/Map';
@@ -514,24 +514,24 @@ export default class CarrierService extends EventEmitter {
         return report;
     }
 
-    async moveCarrier(game: Game, gameUsers: User[], carrierInTransit: CarrierInTransit) {
-        let waypoint: CarrierWaypoint = carrierInTransit.carrier.waypoints[0];
+    async moveCarrier(game: Game, gameUsers: User[], carrierInTransit: Carrier) {
+        let waypoint: CarrierWaypoint = carrierInTransit.waypoints[0];
 
         // If the carrier is just about to launch, make damn sure the waypoint source is correct.
         // Note: This is a plaster over an issue with the saving waypoint logic that doesn't validate waypoints correctly.
-        if (this.isLaunching(carrierInTransit.carrier)) {
-            waypoint.source = carrierInTransit.carrier.orbiting!;
+        if (this.isLaunching(carrierInTransit)) {
+            waypoint.source = carrierInTransit.orbiting!;
         }
 
         let sourceStar = game.galaxy.stars.find(s => s._id.equals(waypoint.source))!;
         let destinationStar = game.galaxy.stars.find(s => s._id.equals(waypoint.destination))!;
-        let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrierInTransit.carrier.ownedByPlayerId!))!;
-        let warpSpeed = this.starService.canTravelAtWarpSpeed(game, carrierOwner, carrierInTransit.carrier, sourceStar, destinationStar);
+        let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrierInTransit.ownedByPlayerId!))!;
+        let warpSpeed = this.starService.canTravelAtWarpSpeed(game, carrierOwner, carrierInTransit, sourceStar, destinationStar);
         let instantSpeed = this.starService.isStarPairWormHole(sourceStar, destinationStar);
-        let distancePerTick = this.getCarrierDistancePerTick(game, carrierInTransit.carrier, warpSpeed, instantSpeed); // Null signifies instant travel
+        let distancePerTick = this.getCarrierDistancePerTick(game, carrierInTransit, warpSpeed, instantSpeed); // Null signifies instant travel
 
         let carrierMovementReport = {
-            carrier: carrierInTransit.carrier,
+            carrier: carrierInTransit,
             sourceStar,
             destinationStar,
             carrierOwner,
@@ -543,8 +543,8 @@ export default class CarrierService extends EventEmitter {
             arrivedAtStar: false
         };
         
-        if (instantSpeed || (distancePerTick && carrierInTransit.distanceToDestination <= distancePerTick)) {
-            let starArrivalReport = await this.arriveAtStar(game, gameUsers, carrierInTransit.carrier, destinationStar);
+        if (instantSpeed || (distancePerTick && (carrierInTransit.distanceToDestination || 0) <= distancePerTick)) {
+            let starArrivalReport = await this.arriveAtStar(game, gameUsers, carrierInTransit, destinationStar);
             
             carrierMovementReport.waypoint = starArrivalReport.waypoint;
             carrierMovementReport.combatRequiredStar = starArrivalReport.combatRequiredStar;
@@ -552,7 +552,7 @@ export default class CarrierService extends EventEmitter {
         }
         // Otherwise, move X distance in the direction of the star.
         else {
-            this.moveCarrierToCurrentWaypoint(carrierInTransit.carrier, destinationStar, distancePerTick!);
+            this.moveCarrierToCurrentWaypoint(carrierInTransit, destinationStar, distancePerTick!);
         }
 
         return carrierMovementReport;

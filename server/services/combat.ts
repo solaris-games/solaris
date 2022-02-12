@@ -1,4 +1,4 @@
-import { Carrier, CarrierInTransit } from "../types/Carrier";
+import { Carrier } from "../types/Carrier";
 import { Attacker, CombatCarrier, CombatPart, CombatResult, CombatResultShips, CombatStar, Defender } from "../types/Combat";
 import { Game } from "../types/Game";
 import { Player } from "../types/Player";
@@ -329,18 +329,7 @@ export default class CombatService extends EventEmitter {
         let captureResult: StarCaptureResult | null = null;
 
         if (star) {
-            let attackerCarriersInTransit: CarrierInTransit[] = attackerCarriers.map(c => {
-                const waypoint = c.waypoints[0];
-                const destinationStar = game.galaxy.stars.find(s => s._id.equals(waypoint.destination))!;
-                const distanceToDestination = this.distanceService.getDistanceBetweenLocations(c.location, destinationStar.location);
-    
-                return {
-                    carrier: c,
-                    distanceToDestination
-                };
-            });
-
-            captureResult = this._starDefeatedCheck(game, star, defender, defenders, defenderUsers, defenderCarriers, attackers, attackerUsers, attackerCarriersInTransit);
+            captureResult = this._starDefeatedCheck(game, star, defender, defenders, defenderUsers, defenderCarriers, attackers, attackerUsers, attackerCarriers);
         }
 
         // Deduct reputation for all attackers that the defender is fighting and vice versa.
@@ -360,7 +349,7 @@ export default class CombatService extends EventEmitter {
                 defenders,
                 attackers,
                 star,
-                combatResult: combatResultShips,
+                combatResult,
                 captureResult
             });
         } else {
@@ -369,7 +358,7 @@ export default class CombatService extends EventEmitter {
                 gameTick: game.state.tick,
                 defenders,
                 attackers,
-                combatResult: combatResultShips
+                combatResult
             });
         }
 
@@ -390,13 +379,13 @@ export default class CombatService extends EventEmitter {
         return combatResultShips;
     }
 
-    _starDefeatedCheck(game: Game, star: Star, owner: Player, defenders: Player[], defenderUsers: User[], defenderCarriers: Carrier[], attackers: Player[], attackerUsers: User[], attackerCarriersInTransit: CarrierInTransit[]) {
+    _starDefeatedCheck(game: Game, star: Star, owner: Player, defenders: Player[], defenderUsers: User[], defenderCarriers: Carrier[], attackers: Player[], attackerUsers: User[], attackerCarriers: Carrier[]) {
         let starDefenderDefeated = star && !Math.floor(star.shipsActual!) && !defenderCarriers.length;
-        let hasAttackersRemaining = attackerCarriersInTransit.reduce((sum, c) => sum + c.carrier.ships!, 0) > 0;
+        let hasAttackersRemaining = attackerCarriers.reduce((sum, c) => sum + c.ships!, 0) > 0;
         let hasCapturedStar = starDefenderDefeated && hasAttackersRemaining;
 
         if (hasCapturedStar) {
-            return this.starService.captureStar(game, star, owner, defenders, defenderUsers, attackers, attackerUsers, attackerCarriersInTransit);
+            return this.starService.captureStar(game, star, owner, defenders, defenderUsers, attackers, attackerUsers, attackerCarriers);
         }
 
         return null;
