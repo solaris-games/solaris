@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "test": "jasmine",
+    "test": "ts-node node_modules/jasmine/bin/jasmine",
     "start-api": "ts-node api/index.ts",
     "start-jobs": "ts-node jobs/index.ts",
     "pretsc": "rm -rf ./dist",
@@ -36,6 +36,7 @@
     "socket.io": "^2.4.1"
   },
   "devDependencies": {
+    "@types/jasmine": "^3.10.3",
     "jasmine": "^3.7.0",
     "ts-node": "^10.4.0",
     "typescript": "^4.5.2"

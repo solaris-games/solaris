@@ -1,6 +1,6 @@
-const RandomService = require('../services/random');
-const MapService = require('../services/map');
-const CircularMapService = require('../services/maps/circular')
+import RandomService from '../services/random';
+import MapService from '../services/map';
+import CircularMapService from '../services/maps/circular';
 
 const game = {
     settings: {
@@ -65,7 +65,7 @@ const fakeDistanceService = {
 
 const fakeStarNameService = {
     getRandomStarNames(count) {
-        let names = [];
+        let names: string[] = [];
 
         for (let i = 0; i < count; i++) {
             names.push(`Star ${i}`);
@@ -87,18 +87,21 @@ describe('map', () => {
 
     const starCount = 10;
     const playerCount = 2;
+    let randomService;
     let mapService;
     let starMapService;
 
     beforeEach(() => {
         // Use a real random service because it would not be easy to fake for these tests.
         randomService = new RandomService();
+        // @ts-ignore
         starMapService = new CircularMapService(randomService, fakeStarService, fakeStarDistanceService, fakeDistanceService, fakeResourceService, fakeGameTypeService);
+        // @ts-ignore
         mapService = new MapService(randomService, fakeStarService, fakeStarDistanceService, fakeStarNameService, starMapService);
     });
 
     it('should generate a given number of stars', () => {
-        const stars = mapService.generateStars(game, starCount, playerCount);
+        const stars = mapService.generateStars(game, starCount, playerCount).stars;
         
         expect(stars).toBeTruthy();
         expect(stars.length).toEqual(starCount);

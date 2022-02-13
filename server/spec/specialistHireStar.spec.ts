@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
-const SpecialistHireService = require('../services/specialistHire');
+import SpecialistHireService from '../services/specialistHire';
 
 describe('specialistHire - Star', () => {
 
     // -------------
     // Mock Objects
 
-    function setup() {
+    function setup(): any {
         let obj = {
             service: null,
             gameRepo: {
@@ -41,15 +41,16 @@ describe('specialistHire - Star', () => {
                 }
             },
             playerId: new mongoose.Types.ObjectId(),
-            player: null,
+            player: {
+                _id: null
+            },
             starId: new mongoose.Types.ObjectId(),
             specialistId: 1
         };
 
-        obj.player = {
-            _id: obj.playerId
-        };
+        obj.player._id = obj.playerId;
 
+        // @ts-ignore
         obj.service = new SpecialistHireService(obj.gameRepo, obj.specialistService, obj.achievementService, obj.waypointService, obj.playerService, obj.starService, obj.gameTypeService);
 
         return obj;
@@ -79,7 +80,7 @@ describe('specialistHire - Star', () => {
 
         try {
             await testObj.service.hireStarSpecialist(testObj.game, testObj.player, testObj.starId, testObj.specialistId);
-        } catch (err) {
+        } catch (err: any) {
             hasError = true;
             expect(err.message).toContain('disabled the hiring of specialists');
         }
@@ -95,7 +96,7 @@ describe('specialistHire - Star', () => {
 
         try {
             await testObj.service.hireStarSpecialist(testObj.game, testObj.player, testObj.starId, testObj.specialistId);
-        } catch (err) {
+        } catch (err: any) {
             hasError = true;
             expect(err.message).toContain('banned');
         }
@@ -109,7 +110,7 @@ describe('specialistHire - Star', () => {
 
         try {
             await testObj.service.hireStarSpecialist(testObj.game, testObj.player, testObj.starId, testObj.specialistId);
-        } catch (err) {
+        } catch (err: any) {
             hasError = true;
             expect(err.message).toContain('you do not own');
         }
@@ -129,7 +130,7 @@ describe('specialistHire - Star', () => {
 
         try {
             await testObj.service.hireStarSpecialist(testObj.game, testObj.player, testObj.starId, testObj.specialistId);
-        } catch (err) {
+        } catch (err: any) {
             hasError = true;
             expect(err.message).toContain('dead star');
         }
@@ -153,7 +154,7 @@ describe('specialistHire - Star', () => {
         
         try {
             await testObj.service.hireStarSpecialist(testObj.game, testObj.player, testObj.starId, testObj.specialistId);
-        } catch (err) {
+        } catch (err: any) {
             hasError = true;
             expect(err.message).toContain('does not exist');
         }
@@ -177,7 +178,7 @@ describe('specialistHire - Star', () => {
         
         try {
             await testObj.service.hireStarSpecialist(testObj.game, testObj.player, testObj.starId, testObj.specialistId);
-        } catch (err) {
+        } catch (err: any) {
             hasError = true;
             expect(err.message).toContain('already has the specialist assigned');
         }
@@ -210,7 +211,7 @@ describe('specialistHire - Star', () => {
         
         try {
             await testObj.service.hireStarSpecialist(testObj.game, testObj.player, testObj.starId, testObj.specialistId);
-        } catch (err) {
+        } catch (err: any) {
             hasError = true;
             expect(err.message).toContain('cannot afford');
         }
@@ -243,7 +244,7 @@ describe('specialistHire - Star', () => {
         
         try {
             await testObj.service.hireStarSpecialist(testObj.game, testObj.player, testObj.starId, testObj.specialistId);
-        } catch (err) {
+        } catch (err: any) {
             hasError = true;
             expect(err.message).toContain('cannot afford');
         }

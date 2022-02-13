@@ -1,4 +1,4 @@
-const StarService = require('../services/star');
+import StarService from '../services/star';
 const starNames = require('../config/game/starNames');
 
 const fakeRandomService = {
@@ -50,6 +50,7 @@ describe('star', () => {
     let starService;
 
     beforeEach(() => {
+        // @ts-ignore
         starService = new StarService({}, fakeRandomService, fakeStarNameService, fakeDistanceService, fakeStarDistanceService);
     });
 
@@ -109,8 +110,14 @@ describe('star', () => {
 
         const homeStar = {
             _id: 2,
-            infrastructure: {},
-            naturalResources: {}
+            infrastructure: {
+                economy: 0,
+                industry: 0,
+                science: 0
+            },
+            naturalResources: {},
+            ownedByPlayerId: 0,
+            ships: 0
         };
 
         const gameSettings = {

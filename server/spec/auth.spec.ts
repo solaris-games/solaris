@@ -1,4 +1,4 @@
-const AuthService = require('../services/auth');
+import AuthService from '../services/auth';
 
 const fakeBcrypt = {
     compare(password1, password2) {
@@ -23,6 +23,7 @@ describe('auth', () => {
     let service;
 
     beforeAll(() => {
+        // @ts-ignore
         service = new AuthService(fakeUserModel, fakeBcrypt);
     });
 

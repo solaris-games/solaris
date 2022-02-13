@@ -1,4 +1,4 @@
-const StarService = require('../services/star');
+import StarService from '../services/star';
 const mongoose = require('mongoose');
 
 let playerId,
@@ -46,6 +46,7 @@ diplomacyService = {
 
 describe('warp speed', () => {
 
+    // @ts-ignore
     const service = new StarService(gameRepo, randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService, diplomacyService);
 
     beforeEach(() => {

@@ -1,8 +1,9 @@
-const CombatService = require('../services/combat');
+import CombatService from '../services/combat';
 const mongoose = require('mongoose');
 
 describe('damage distribution', () => {
 
+    // @ts-ignore
     const service = new CombatService();
 
     it('should distribute damage evenly between star and carrier', async () => {
@@ -31,6 +32,7 @@ describe('damage distribution', () => {
 
         let shipsToKill = 10;
 
+        // @ts-ignore
         let remaining = service._distributeDamage(combatResult, damageObjects, shipsToKill, true);
         
         expect(remaining).toBe(0);
@@ -72,6 +74,7 @@ describe('damage distribution', () => {
 
         let shipsToKill = 6;
 
+        // @ts-ignore
         let remaining = service._distributeDamage(combatResult, damageObjects, shipsToKill, true);
         
         expect(remaining).toBe(0);
@@ -108,6 +111,7 @@ describe('damage distribution', () => {
 
         let shipsToKill = 5;
 
+        // @ts-ignore
         let remaining = service._distributeDamage(combatResult, damageObjects, shipsToKill, true);
         
         expect(remaining).toBe(0);
@@ -142,6 +146,7 @@ describe('damage distribution', () => {
 
         let shipsToKill = 5;
 
+        // @ts-ignore
         let remaining = service._distributeDamage(combatResult, damageObjects, shipsToKill, false);
         
         expect(remaining).toBe(0);
@@ -182,6 +187,7 @@ describe('damage distribution', () => {
 
         let shipsToKill = 20;
 
+        // @ts-ignore
         let remaining = service._distributeDamage(combatResult, damageObjects, shipsToKill, true);
         
         expect(remaining).toBe(0);
@@ -224,6 +230,7 @@ describe('damage distribution', () => {
 
         let shipsToKill = 20;
 
+        // @ts-ignore
         let remaining = service._distributeDamage(combatResult, damageObjects, shipsToKill, true);
         
         expect(remaining).toBe(0);
@@ -259,6 +266,7 @@ describe('damage distribution', () => {
 
         let shipsToKill = 15;
 
+        // @ts-ignore
         let remaining = service._distributeDamage(combatResult, damageObjects, shipsToKill, false);
         
         expect(remaining).toBe(1);
@@ -300,6 +308,7 @@ describe('damage distribution', () => {
 
         let shipsToKill = 114;
 
+        // @ts-ignore
         let remaining = service._distributeDamage(combatResult, damageObjects, shipsToKill, true);
         
         expect(remaining).toBe(0);
@@ -342,6 +351,7 @@ describe('damage distribution', () => {
 
         let shipsToKill = 114;
 
+        // @ts-ignore
         let remaining = service._distributeDamage(combatResult, damageObjects, shipsToKill, true);
         
         expect(remaining).toBe(0);
@@ -384,6 +394,7 @@ describe('damage distribution', () => {
 
         let shipsToKill = 2;
 
+        // @ts-ignore
         let remaining = service._distributeDamage(combatResult, damageObjects, shipsToKill, true);
         
         expect(remaining).toBe(0);
@@ -426,6 +437,7 @@ describe('damage distribution', () => {
 
         let shipsToKill = 2;
 
+        // @ts-ignore
         let remaining = service._distributeDamage(combatResult, damageObjects, shipsToKill, true);
         
         expect(remaining).toBe(0);

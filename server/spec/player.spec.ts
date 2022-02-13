@@ -1,14 +1,14 @@
 const mongoose = require('mongoose');
 
-const DistanceService = require('../services/distance');
-const StarDistanceService = require('../services/starDistance');
-const MapService = require('../services/map');
-const RandomService = require('../services/random');
-const StarService = require('../services/star');
-const CarrierService = require('../services/carrier');
-const PlayerService = require('../services/player');
-const NameService = require('../services/name');
-const TechnologyService = require('../services/technology');
+import DistanceService from '../services/distance';
+import StarDistanceService from '../services/starDistance';
+import MapService from '../services/map';
+import RandomService from '../services/random';
+import StarService from '../services/star';
+import CarrierService from '../services/carrier';
+import PlayerService from '../services/player';
+import NameService from '../services/name';
+import TechnologyService from '../services/technology';
 
 const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
@@ -77,7 +77,7 @@ const game = {
 }
 
 function generateStarGrid() {
-    let stars = [];
+    let stars: any[] = [];
     let i = 0;
 
     // Generate a grid of stars.
@@ -136,6 +136,14 @@ function printStars(allStars) {
 
 describe('player', () => {
 
+    let randomService;
+    let distanceService;
+    let starDistanceService;
+    let carrierService;
+    let starService;
+    let nameService;
+    let mapService;
+    let technologyService;
     let playerService;
 
     beforeEach(() => {
@@ -143,11 +151,17 @@ describe('player', () => {
         randomService = new RandomService();
         distanceService = new DistanceService();
         starDistanceService = new StarDistanceService(distanceService);
+        // @ts-ignore
         carrierService = new CarrierService();
+        // @ts-ignore
         starService = new StarService({}, randomService);
+        // @ts-ignore
         nameService = new NameService(gameNames, starNames, randomService);
+        // @ts-ignore
         mapService = new MapService(randomService, starService, distanceService, starDistanceService, nameService);
+        // @ts-ignore
         technologyService = new TechnologyService();
+        // @ts-ignore
         playerService = new PlayerService(null, randomService, mapService, starService, carrierService, starDistanceService, technologyService);
     });
 
@@ -161,6 +175,7 @@ describe('player', () => {
 
     it('should create a list of empty players', () => {
         const allStars = generateStarGrid();
+        // @ts-ignore
         game.galaxy.stars = allStars;
         const players = playerService.createEmptyPlayers(game);
 
@@ -169,7 +184,7 @@ describe('player', () => {
         for(let i = 0; i < players.length; i++) {
             let newPlayer = players[i];
 
-            assertNewPlayer(newPlayer);
+            assertNewPlayer(newPlayer, null);
 
             // Assert owned stars.
             const starsOwned = allStars.filter(x => x.ownedByPlayerId === newPlayer._id);

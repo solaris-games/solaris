@@ -1,15 +1,15 @@
-const UserService = require('../services/user');
+import UserService from '../services/user';
 
 const fakeBcrypt = {
     compare(password1, password2) {
         return password1 == password2;
     },
-    hash(password, iterations) {
+    hash(password) {
         return password; // Doesn't need to do anything fancy.
     }
 };
 
-let userList = [];
+let userList: any[] = [];
 
 const fakeUserModel = {
 
@@ -31,6 +31,7 @@ describe('user', () => {
     let service;
 
     beforeAll(() => {
+        // @ts-ignore
         service = new UserService(fakeUserModel, fakeUserRepo, fakeBcrypt);
 
         userList = [
@@ -95,7 +96,7 @@ describe('user', () => {
 
         try {
             await service.updatePassword(userId, oldPassword, newPassword);
-        } catch (err) {
+        } catch (err: any) {
             expect(err.message).toBe('The current password is incorrect.');
         }
     });

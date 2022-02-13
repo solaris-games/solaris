@@ -1,9 +1,10 @@
-const CarrierService = require('../services/carrier');
+import CarrierService from '../services/carrier';
 
 describe('carrier', () => {
     let carrierService;
 
     beforeAll(() => {
+        // @ts-ignore
         carrierService = new CarrierService();
     });
     

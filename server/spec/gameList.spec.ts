@@ -1,4 +1,4 @@
-const GameListService = require('../services/gameList');
+import GameListService from '../services/gameList';
 
 const fakeGameModel = {
     find() {
@@ -10,6 +10,7 @@ describe('game list', () => {
     let gameListService;
 
     beforeAll(() => {
+        // @ts-ignore
         gameListService = new GameListService(fakeGameModel);
     });
     

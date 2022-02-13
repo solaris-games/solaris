@@ -1,5 +1,5 @@
-const RandomService = require('../services/random');
-const NameService = require('../services/name');
+import RandomService from '../services/random';
+import NameService from '../services/name';
 
 const gameNames = [
     'Game 1',
@@ -19,6 +19,7 @@ const starNames = [
 
 describe('star name', () => {
 
+    let randomService;
     let starService;
 
     beforeEach(() => {

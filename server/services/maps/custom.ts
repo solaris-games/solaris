@@ -1,7 +1,7 @@
 import { Location } from "../../types/Location";
 
 const mongoose = require('mongoose');
-const ValidationError = require("../../errors/validation");
+import ValidationError from "../../errors/validation";
 
 export default class CustomMapService {
     generateLocations(customJSON: string, playerLimit: number): Location[] {

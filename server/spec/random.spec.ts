@@ -1,4 +1,4 @@
-const RandomService = require('../services/random');
+import RandomService from '../services/random';
 
 describe('random', () => {
 
@@ -52,6 +52,7 @@ describe('random', () => {
 
         const minResourceValue = 10;
         const maxResourceValue = 50;
+        let radius;
 
         it('should generate a minimum resource score', () => {
 
@@ -90,6 +91,7 @@ describe('random', () => {
             let x = 0
             let y = 0;
 
+            // @ts-ignore
             let limit = Math.sqrt(Math.pow(radius)/2);
 
             let lastRes = maxResourceValue;

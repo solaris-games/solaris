@@ -1,4 +1,4 @@
-const AchievementService = require('../services/achievement');
+import AchievementService from '../services/achievement';
 
 const userId = 'abc';
 
@@ -15,7 +15,10 @@ describe('achievement', () => {
             }
         };
 
-        let service = new AchievementService(fakeUserRepo);
+        const fakeGuildService = {};
+
+        // @ts-ignore
+        let service = new AchievementService(fakeUserRepo, fakeGuildService);
         
         await incrementFunctionCallback(service);
 

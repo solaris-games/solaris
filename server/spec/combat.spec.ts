@@ -1,4 +1,4 @@
-const CombatService = require('../services/combat');
+import CombatService from '../services/combat';
 
 const fakeTechnologyService = {
     getStarEffectiveWeaponsLevel(game, defenders, star, defenderCarriers) {
@@ -34,6 +34,7 @@ const fakeDiplomacyService = {
 
 describe('combat', () => {
 
+    // @ts-ignore
     const service = new CombatService(fakeTechnologyService, fakeSpecialistService, fakePlayerService, fakeStarService, fakeReputationService, fakeDiplomacyService);
 
     it('should calculate basic combat', async () => {
@@ -138,6 +139,7 @@ describe('combat', () => {
             }
         ];
 
+        // @ts-ignore
         const combatResult = service.calculateStar(game, star, defenders, attackers, defenderCarriers, attackerCarriers);
 
         expect(combatResult.weapons.defender).toBe(1);
@@ -172,6 +174,7 @@ describe('combat', () => {
             }
         ];
 
+        // @ts-ignore
         const combatResult = service.calculateStar(game, star, defenders, attackers, defenderCarriers, attackerCarriers);
 
         expect(combatResult.weapons.defender).toBe(1);
@@ -210,6 +213,7 @@ describe('combat', () => {
             }
         ];
 
+        // @ts-ignore
         const combatResult = service.calculateStar(game, star, defenders, attackers, defenderCarriers, attackerCarriers);
 
         expect(combatResult.weapons.defender).toBe(1);
@@ -248,6 +252,7 @@ describe('combat', () => {
             }
         ];
 
+        // @ts-ignore
         const combatResult = service.calculateStar(game, star, defenders, attackers, defenderCarriers, attackerCarriers);
 
         expect(combatResult.weapons.defender).toBe(1);
@@ -284,6 +289,7 @@ describe('combat', () => {
             }
         ];
 
+        // @ts-ignore
         const combatResult = service.calculateCarrier(game, defenders, attackers, defenderCarriers, attackerCarriers);
 
         expect(combatResult.weapons.defender).toBe(1);
@@ -318,6 +324,7 @@ describe('combat', () => {
             }
         ];
 
+        // @ts-ignore
         const combatResult = service.calculateCarrier(game, defenders, attackers, defenderCarriers, attackerCarriers);
 
         expect(combatResult.weapons.defender).toBe(1);
@@ -352,6 +359,7 @@ describe('combat', () => {
             }
         ];
 
+        // @ts-ignore
         const combatResult = service.calculateCarrier(game, defenders, attackers, defenderCarriers, attackerCarriers);
 
         expect(combatResult.weapons.defender).toBe(1);
@@ -383,6 +391,7 @@ describe('combat', () => {
             }
         ];
 
+        // @ts-ignore
         const combatResult = service.calculateCarrier(game, defenders, attackers, defenderCarriers, attackerCarriers);
 
         expect(combatResult.weapons.defender).toBe(1);
@@ -414,6 +423,7 @@ describe('combat', () => {
             }
         ];
 
+        // @ts-ignore
         const combatResult = service.calculateCarrier(game, defenders, attackers, defenderCarriers, attackerCarriers);
 
         expect(combatResult.weapons.defender).toBe(1);

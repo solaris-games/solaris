@@ -1,9 +1,12 @@
-const TechnologyService = require('../services/technology');
+import TechnologyService from '../services/technology';
+const mongoose = require('mongoose');
 
 let service,
     specialistService;
 
-function setup(starSpecialist, carrierSpecialist) {
+const playerId = new mongoose.Types.ObjectId();
+
+function setup(starSpecialist?: any, carrierSpecialist?: any) {
     specialistService = {
         getByIdStar: () => { return starSpecialist || null; },
         getByIdCarrier: () => { return carrierSpecialist || null; }
@@ -762,14 +765,14 @@ describe('technology', () => {
             galaxy: {
                 players: [
                     {
-                        _id: '1'
+                        _id: playerId
                     }
                 ]
             }
         };
 
         const star = {
-            ownedByPlayerId: '1',
+            ownedByPlayerId: playerId,
             specialistId: null
         };
 
@@ -792,14 +795,14 @@ describe('technology', () => {
             galaxy: {
                 players: [
                     {
-                        _id: '1'
+                        _id: playerId
                     }
                 ]
             }
         };
 
         const star = {
-            ownedByPlayerId: '1',
+            ownedByPlayerId: playerId,
             specialistId: null,
             isBlackHole: true
         };
@@ -816,14 +819,14 @@ describe('technology', () => {
             galaxy: {
                 players: [
                     {
-                        _id: '1'
+                        _id: playerId
                     }
                 ]
             }
         };
 
         const star = {
-            ownedByPlayerId: '1',
+            ownedByPlayerId: playerId,
             specialistId: 1,
             isBlackHole: false
         };
@@ -864,14 +867,14 @@ describe('technology', () => {
             galaxy: {
                 players: [
                     {
-                        _id: '1'
+                        _id: playerId
                     }
                 ]
             }
         };
 
         const carrier = {
-            ownedByPlayerId: '1',
+            ownedByPlayerId: playerId,
             specialistId: null
         };
 
@@ -915,14 +918,14 @@ describe('technology', () => {
             galaxy: {
                 players: [
                     {
-                        _id: '1'
+                        _id: playerId
                     }
                 ]
             }
         };
 
         const carrier = {
-            ownedByPlayerId: '1',
+            ownedByPlayerId: playerId,
             specialistId: 1
         };
 
@@ -966,14 +969,14 @@ describe('technology', () => {
             galaxy: {
                 players: [
                     {
-                        _id: '1'
+                        _id: playerId
                     }
                 ]
             }
         };
 
         const carrier = {
-            ownedByPlayerId: '1',
+            ownedByPlayerId: playerId,
             specialistId: 1
         };
 
@@ -1002,14 +1005,14 @@ describe('technology', () => {
             galaxy: {
                 players: [
                     {
-                        _id: '1'
+                        _id: playerId
                     }
                 ]
             }
         };
 
         const carrier = {
-            ownedByPlayerId: '1',
+            ownedByPlayerId: playerId,
             specialistId: 1
         };
 

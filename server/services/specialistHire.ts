@@ -10,7 +10,7 @@ import SpecialistService from "./specialist";
 import StarService from "./star";
 import WaypointService from "./waypoint";
 
-const ValidationError = require("../errors/validation");
+import ValidationError from "../errors/validation";
 
 export default class SpecialistHireService {
     gameRepo: DatabaseRepository<Game>;
