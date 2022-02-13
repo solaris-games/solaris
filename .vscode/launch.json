@@ -20,7 +20,7 @@
             "request": "launch",
             "name": "Launch Jobs",
             "program": "${workspaceFolder}/server/jobs/index.ts",
-            "preLaunchTask": "npm: tsc - server",
+            "preLaunchTask": "npm: build - server",
             "envFile": "${workspaceFolder}/server/.env"
         },
         {
@@ -28,7 +28,7 @@
             "request": "launch",
             "name": "Launch API",
             "program": "${workspaceFolder}/server/api/index.ts",
-            "preLaunchTask": "npm: tsc - server",
+            "preLaunchTask": "npm: build - server",
             "envFile": "${workspaceFolder}/server/.env"
         },
         {

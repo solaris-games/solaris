@@ -1,10 +1,11 @@
+import { Router } from 'express';
 import ValidationError from '../errors/validation';
 import { DependencyContainer } from '../types/DependencyContainer';
 import Middleware from './middleware';
 
 const COST_PER_TOKEN = 1;
 
-export default (router, io, container: DependencyContainer) => {
+export default (router: Router, io, container: DependencyContainer) => {
     
     const middleware = Middleware(container);
 

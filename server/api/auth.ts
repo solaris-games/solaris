@@ -1,8 +1,9 @@
+import { Router } from 'express';
 import ValidationError from '../errors/validation';
 import { DependencyContainer } from '../types/DependencyContainer';
 import Middleware from './middleware';
 
-export default (router, io, container: DependencyContainer) => {
+export default (router: Router, io, container: DependencyContainer) => {
 
     const middleware = Middleware(container);
 
@@ -58,11 +59,13 @@ export default (router, io, container: DependencyContainer) => {
     }, middleware.handleError);
 
     router.post('/api/auth/verify', (req, res, next) => {
+        const session = (req as any).session;
+
         return res.status(200).json({
-            _id: req.session.userId,
-            username: req.session.username,
-            roles: req.session.roles,
-            credits: req.session.userCredits
+            _id: session.userId,
+            username: session.username,
+            roles: session.roles,
+            credits: session.userCredits
         });
     });
 

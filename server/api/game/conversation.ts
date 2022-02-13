@@ -1,8 +1,9 @@
+import { Router } from 'express';
 import ValidationError from '../../errors/validation';
 import Middleware from '../middleware';
 import { DependencyContainer } from '../../types/DependencyContainer';
 
-export default (router, io, container: DependencyContainer) => {
+export default (router: Router, io, container: DependencyContainer) => {
 
     const middleware = Middleware(container);
 
