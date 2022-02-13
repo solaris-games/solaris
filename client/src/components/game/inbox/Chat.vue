@@ -26,6 +26,7 @@ import GameHelper from '../../../services/gameHelper'
 import ConversationListVue from '../inbox/conversations/ConversationList'
 import ConversationCreateVue from './conversations/ConversationCreate.vue'
 import ConversationDetailVue from './conversations/ConversationDetail.vue'
+import AudioService from '../../../game/audio'
 
 export default {
   components: {
