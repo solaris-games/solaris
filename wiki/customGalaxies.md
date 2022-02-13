@@ -1,8 +1,8 @@
-## Custom Galaxies
+# Custom Galaxies
 
 Solaris supports custom galaxies, you can choose to define how you want the map to look and where stars are placed on the map. This includes star infrastructure, natural resources, warp gates, nebulas etc.
 
-### Setting up the Galaxy Map Data
+## Setting up the Galaxy Map Data
 
 To define the custom map, you will need to set up a **JSON Object** containing the map data, it looks like this:
 
@@ -38,7 +38,7 @@ See [here](https://raw.githubusercontent.com/mike-eason/solaris/master/server/co
 
 *Note: The galaxy must respect any game settings, for example if the `starsPerPlayer` is `10` then 10 stars for each player must be present in the custom galaxy map definition.*
 
-### Creating a Game
+## Creating a Game
 
 After defining what you want the galaxy to look like above, use the **Create Game** page to set up the game:
 

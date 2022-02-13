@@ -16,7 +16,8 @@
         <main-bar :menuState="menuState"
                   :menuArguments="menuArguments"
                   @onMenuStateChanged="onMenuStateChanged"
-                  @onPlayerSelected="onPlayerSelected"/>
+                  @onPlayerSelected="onPlayerSelected"
+                  @onReloadGameRequested="reloadGame"/>
 
         <chat @onOpenPlayerDetailRequested="onPlayerSelected"/>
     </div>
@@ -140,6 +141,7 @@ export default {
             this.$store.commit('setUserId', response.data._id)
             this.$store.commit('setUsername', response.data.username)
             this.$store.commit('setRoles', response.data.roles)
+            this.$store.commit('setUserCredits', response.data.credits)
           }
         }
       } catch (err) {
@@ -147,6 +149,10 @@ export default {
       }
     },
     async reloadGame () {
+      // if (this.$isHistoricalMode()) { // Do not reload if in historical mode
+      //   return
+      // }
+
       try {
         let galaxyResponse = await GameApiService.getGameGalaxy(this.$route.query.id)
 
@@ -333,7 +339,7 @@ export default {
             onClick: (e, toastObject) => {
               toastObject.goAway(0)
 
-              window.location.reload()
+              location.reload()
             }
           }
         ]

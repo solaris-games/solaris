@@ -89,6 +89,7 @@ const schema = new Schema({
             roleplay: { type: Types.Number, default: 0 },
             dauntless: { type: Types.Number, default: 0 },
             sleepless: { type: Types.Number, default: 0 },
+            victor32: { type: Types.Number, default: 0 }
         }
     },
     gameSettings: {
@@ -115,6 +116,7 @@ const schema = new Schema({
             objectsScaling: { type: Types.String, required: false, enum: ['default', 'clamped'], default: 'default' },
             objectsMinimumScale: { type: Types.Number, required: false, default: 8, min: 0, max: 32 },
             objectsMaximumScale: { type: Types.Number, required: false, default: 16, min: 12, max: 128 },
+            objectsDepth: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'disabled' },
             antiAliasing: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'enabled' },
             background:{
               nebulaFrequency: { type: Types.Number, required: false, default: 12, min: 0, max: 16 },

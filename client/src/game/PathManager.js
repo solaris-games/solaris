@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js-legacy'
 import gameHelper from '../services/gameHelper'
+import helpers from './helpers'
 
 class PathManager {
 
@@ -90,6 +91,8 @@ class PathManager {
 
   addSharedPath( objectA, objectB, carrierMapObject ) {
     let mapObjects = [ objectA, objectB ]
+    let objectAlpha = helpers.calculateDepthModifiers(this.userSettings, [objectA._id, objectB._id]) / 5
+
     this._orderObjects(mapObjects)
 
     let pathID = mapObjects[0].data._id + mapObjects[1].data._id
@@ -105,7 +108,8 @@ class PathManager {
     if( !this._pathContainsCarrier(carrierMapObject, path) ) {
       path.carriers.push(carrierMapObject)
     }
-    path.graphics.alpha = 0.3+path.carriers.length*0.1
+
+    path.graphics.alpha = objectAlpha+path.carriers.length*0.1
     return pathID
   }
 
@@ -117,7 +121,7 @@ class PathManager {
       if(carrierIndex>=0) {
         path.carriers.splice(path.carriers.indexOf(carrier), 1)
       }
-      path.graphics.alpha = 0.3+path.carriers.length*0.1
+      path.graphics.alpha = (helpers.calculateDepthModifier(this.userSettings, carrier._id)/5)+path.carriers.length*0.1
       if(path.carriers.length === 0) {
         if(pathGraphics.chunk) {
           pathGraphics.chunk.removeChild(pathGraphics)
@@ -132,7 +136,8 @@ class PathManager {
 
   addUniquePath( mapObject, star, looped, colour ) {
     const PATH_WIDTH = 0.5*this.userSettings.map.carrierPathWidth
-    let lineAlpha = looped ? 0.3 : 0.5
+    let objectAlpha = helpers.calculateDepthModifier(this.userSettings, mapObject._id) / 5
+    let lineAlpha = looped ? objectAlpha / 2 : objectAlpha
     let lineWidth = PATH_WIDTH
     let path
     if(looped) {

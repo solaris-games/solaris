@@ -8,7 +8,7 @@ module.exports = (container) => {
     return {
 
         async handler(job, done) {
-            let games = await container.gameListService.listOldCompletedGames(months, false);
+            let games = await container.gameListService.listOldCompletedGamesNotCleaned(months, false);
 
             for (let i = 0; i < games.length; i++) {
                 let game = games[i];
@@ -23,6 +23,8 @@ module.exports = (container) => {
                     console.error(e);
                 }
             }
+
+            console.log('Cleanup completed.');
 
             done();
         }

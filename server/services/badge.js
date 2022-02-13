@@ -15,6 +15,10 @@ module.exports = class BadgeService extends EventEmitter {
         return require('../config/game/badges').slice();
     }
 
+    listPurchasableBadges() {
+        return this.listBadges().filter(b => b.price);
+    }
+
     async listBadgesByUser(userId) {
         const badges = this.listBadges();
 
@@ -52,7 +56,7 @@ module.exports = class BadgeService extends EventEmitter {
             throw new ValidationError(`Cannot purchased a badge for yourself.`);
         }
 
-        const badge = this.listBadges().find(b => b.key === badgeKey);
+        const badge = this.listPurchasableBadges().find(b => b.key === badgeKey);
 
         if (!badge) {
             throw new ValidationError(`Badge ${badgeKey} does not exist.`);
@@ -113,4 +117,17 @@ module.exports = class BadgeService extends EventEmitter {
         });
     }
 
+    awardBadgeForUser(user, badgeKey) {
+        const badge = this.listBadges().find(b => b.key === badgeKey);
+
+        if (!badge) {
+            throw new ValidationError(`Badge ${badgeKey} does not exist.`);
+        }
+
+        user.achievements.badges[badgeKey]++;
+    }
+
+    awardBadgeForUserVictor32(user) {
+        this.awardBadgeForUser(user, 'victor32');
+    }
 };

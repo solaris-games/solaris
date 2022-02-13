@@ -109,7 +109,8 @@
       <hire-specialist-star v-if="menuState == MENU_STATES.HIRE_SPECIALIST_STAR"
         :starId="menuArguments"
         @onCloseRequested="onCloseRequested"
-        @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
+        @onOpenStarDetailRequested="onOpenStarDetailRequested"
+        @onReloadGameRequested="onReloadGameRequested"/>
       <game-notes v-if="menuState == MENU_STATES.GAME_NOTES"
         @onCloseRequested="onCloseRequested"/>
       <options v-if="menuState == MENU_STATES.OPTIONS"
@@ -330,6 +331,9 @@ export default {
     },
     canHandleConversationEvents () {
       return window.innerWidth < 992
+    },
+    onReloadGameRequested (e) {
+      this.$emit('onReloadGameRequested', e)
     }
   },
   computed: {

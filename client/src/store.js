@@ -54,6 +54,13 @@ export default new Vuex.Store({
       state.roles = null
     },
 
+    setUserCredits (state, credits) {
+      state.userCredits = credits
+    },
+    clearUserCredits (state) {
+      state.userCredits = null
+    },
+
     setTick (state, tick) {
       state.tick = tick
     },

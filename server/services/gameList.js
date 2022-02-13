@@ -155,21 +155,21 @@ module.exports = class GameListService {
         };
     }
 
-    async listOldCompletedGames(months = 1, cleaned = null) {
+    async listOldCompletedGamesNotCleaned(months = 1) {
         let date = moment().subtract(months, 'month');
 
         let query = {
             $and: [
                 { 'state.winner': { $ne: null } },
-                { 'state.endDate': { $lt: date } }
+                { 'state.endDate': { $lt: date } },
+                {
+                    $or: [
+                        { 'state.cleaned': false },
+                        { 'state.cleaned': { $eq: null } }
+                    ]
+                }
             ]
         };
-        
-        if (cleaned != null) {
-            query['$and'].push({
-                'state.cleaned': cleaned
-            });
-        }
 
         return await this.gameRepo.find(query, {
             _id: 1

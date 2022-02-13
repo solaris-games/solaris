@@ -7,6 +7,9 @@
         <footer class="mt-3">
           <div class="row">
             <div class="col">
+                <router-link :to="{ name: 'privacy-policy'}" class="mr-2" title="Privacy Policy">
+                  <i class="fas fa-file-alt"></i>
+                </router-link>
                 <a href="https://github.com/mike-eason/solaris" target="_blank" title="Code" class="mr-2">
                   <i class="fab fa-github"></i>
                 </a>

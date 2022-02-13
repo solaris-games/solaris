@@ -179,8 +179,8 @@ module.exports = class TechnologyService {
         return deduction;
     }
 
-    getStarEffectiveWeaponsLevel(game, player, star, carriersInOrbit) {
-        let weapons = player.research.weapons.level;
+    getStarEffectiveWeaponsLevel(game, players, star, carriersInOrbit) {
+        let weapons = players.sort((a, b) => b.research.weapons.level - a.research.weapons.level)[0].research.weapons.level;
         let defenderBonus = this.getDefenderBonus(game, star);
 
         let buffs = [];

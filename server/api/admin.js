@@ -135,12 +135,14 @@ module.exports = (router, io, container) => {
             req.session.userId = user._id;
             req.session.username = user.username;
             req.session.roles = user.roles;
+            req.session.userCredits = user.credits;
             req.session.isImpersonating = true;
 
             return res.status(200).json({
                 _id: user._id,
                 username: user.username,
-                roles: user.roles
+                roles: user.roles,
+                credits: user.credits
             });
         } catch (err) {
             return next(err);
