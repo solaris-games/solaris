@@ -14,11 +14,11 @@ module.exports = {
       watch: true,
       node_args: "--inspect=9231"
     },
-    // {
-    //   name: "solaris-client",
-    //   script: "npm run serve",
-    //   cwd: "client",
-    //   watch: false
-    // }
+    {
+      name: "solaris-client",
+      script: "npm run serve",
+      cwd: "client",
+      watch: false
+    }
   ]
 };
