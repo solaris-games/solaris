@@ -4,10 +4,13 @@
   "description": "",
   "scripts": {
     "test": "ts-node node_modules/jasmine/bin/jasmine",
-    "start-api": "ts-node-dev api/index.ts",
-    "start-jobs": "ts-node-dev jobs/index.ts",
+    "start-jobs:dev": "ts-node-dev --transpile-only --respawn --inspect=9230 jobs/index.ts",
+    "start-jobs:prod": "node dist/jobs/index.js",
+    "start-api:dev": "ts-node-dev --transpile-only --respawn --inspect=9231 api/index.ts",
+    "start-api:prod": "node dist/api/index.js",
     "prebuild": "rm -rf ./dist",
-    "build": "tsc -p .",
+    "build": "tsc",
+    "postbuild": "cp -r templates ./dist/templates && cp .env ./dist",
     "ts-node": "ts-node"
   },
   "author": "",

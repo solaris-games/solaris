@@ -234,8 +234,7 @@ export default class ConversationService extends EventEmitter {
         // Note: This is the best way as it may save a DB call
         // if there are no unread messages.
         let unreadMessages = (convo.messages as ConversationMessage[])
-            .filter(m => m.type === 'message')
-            .filter(m => m.readBy.find(r => r.equals(playerId)) == null)
+            .filter(m => m.type === 'message' && m.readBy.find(r => r.equals(playerId)) == null)
             .map(m => m._id);
 
         if (unreadMessages.length) {
