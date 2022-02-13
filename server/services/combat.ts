@@ -122,23 +122,64 @@ export default class CombatService extends EventEmitter {
         return result;
     }
 
-    calculateStar(game: Game, star: Star, owner, defenders: Player[], attackers: Player[], defenderCarriers: Carrier[], attackerCarriers: Carrier[]) {
-        // Calculate the combined combat result taking into account
-        // the star ships and all defenders vs. all attackers
-        let totalDefenders = Math.floor(star.shipsActual!) + defenderCarriers.reduce((sum, c) => sum + c.ships!, 0);
+    calculateStar(game: Game, star: Star, defenders: Player[], attackers: Player[], defenderCarriers: Carrier[], attackerCarriers: Carrier[]) {
+        let combatWeapons = this._calculateEffectiveWeaponsLevels(game, star, defenders, attackers, defenderCarriers, attackerCarriers);
+
+        let combatResult = this.calculate({
+            weaponsLevel: combatWeapons.defenderWeaponsTechLevel,
+            ships: combatWeapons.totalDefenders
+        }, {
+            weaponsLevel: combatWeapons.attackerWeaponsTechLevel,
+            ships: combatWeapons.totalAttackers
+        }, true);
+
+        return combatResult;
+    }
+
+    calculateCarrier(game: Game, defenders: Player[], attackers: Player[], defenderCarriers: Carrier[], attackerCarriers: Carrier[]) {
+        let combatWeapons = this._calculateEffectiveWeaponsLevels(game, null, defenders, attackers, defenderCarriers, attackerCarriers);
+
+        let combatResult = this.calculate({
+            weaponsLevel: combatWeapons.defenderWeaponsTechLevel,
+            ships: combatWeapons.totalDefenders
+        }, {
+            weaponsLevel: combatWeapons.attackerWeaponsTechLevel,
+            ships: combatWeapons.totalAttackers
+        }, false);
+
+        return combatResult;
+    }
+
+    _calculateEffectiveWeaponsLevels(game: Game, star: Star | null, defenders: Player[], attackers: Player[], defenderCarriers: Carrier[], attackerCarriers: Carrier[]) {        // Calculate the combined combat result taking into account
+        let isCarrierToStarCombat = star != null;
+
+        // Calculate the total number of defending ships
+        let totalDefenders = defenderCarriers.reduce((sum, c) => sum + c.ships!, 0);
+
+        if (isCarrierToStarCombat) {
+            totalDefenders += Math.floor(star!.shipsActual!);
+        }
+        
+        // Calculate the total number of attacking ships
         let totalAttackers = attackerCarriers.reduce((sum, c) => sum + c.ships!, 0);
 
-        // Calculate the weapons tech levels based on any specialists present at stars or carriers.
-        let defenderWeaponsTechLevel = this.technologyService.getStarEffectiveWeaponsLevel(game, defenders, star, defenderCarriers);
-        
-        // Use the highest weapons tech of the attacking players to calculate combat result.
-        let attackerWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, attackers, attackerCarriers, true);
+        // Calculate the defender weapons tech level based on any specialists present at stars or carriers.
+        let defenderWeaponsTechLevel: number;
 
-        // Check for deductions to weapons.
+        if (isCarrierToStarCombat) {
+            defenderWeaponsTechLevel = this.technologyService.getStarEffectiveWeaponsLevel(game, defenders, star!, defenderCarriers);
+        } else {
+            defenderWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, defenders, defenderCarriers, isCarrierToStarCombat);
+        }
+        
+        // Calculate the weapons tech level for the attacker
+        let attackerWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, attackers, attackerCarriers, isCarrierToStarCombat);
+
+        // Check for deductions to weapons to either side
         let defenderWeaponsDeduction = this.technologyService.getCarriersWeaponsDebuff(attackerCarriers);
         let attackerWeaponsDeduction = this.technologyService.getCarriersWeaponsDebuff(defenderCarriers);
 
-        // Note: Must fight with a minimum of 1.
+        // Ensure that both sides fight with AT LEAST level 1 weapons
         defenderWeaponsTechLevel = Math.max(defenderWeaponsTechLevel - defenderWeaponsDeduction, 1);
         attackerWeaponsTechLevel = Math.max(attackerWeaponsTechLevel - attackerWeaponsDeduction, 1);
 
@@ -153,42 +194,12 @@ export default class CombatService extends EventEmitter {
             attackerWeaponsTechLevel = oldDefenderWeaponsTechLevel;
         }
 
-        let combatResult = this.calculate({
-            weaponsLevel: defenderWeaponsTechLevel,
-            ships: totalDefenders
-        }, {
-            weaponsLevel: attackerWeaponsTechLevel,
-            ships: totalAttackers
-        }, true);
-
-        return combatResult;
-    }
-
-    calculateCarrier(game: Game, defenders: Player[], attackers: Player[], defenderCarriers: Carrier[], attackerCarriers: Carrier[]) {
-        let totalDefenders = defenderCarriers.reduce((sum, c) => sum + c.ships!, 0);
-        let totalAttackers = attackerCarriers.reduce((sum, c) => sum + c.ships!, 0);
-
-        // Calculate the weapons tech levels
-        let defenderWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, defenders, defenderCarriers, false);
-        let attackerWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, attackers, attackerCarriers, false);
-        
-        // Check for deductions to weapons.
-        let defenderWeaponsDeduction = this.technologyService.getCarriersWeaponsDebuff(attackerCarriers);
-        let attackerWeaponsDeduction = this.technologyService.getCarriersWeaponsDebuff(defenderCarriers);
-
-        // Note: Must fight with a minimum of 1.
-        defenderWeaponsTechLevel = Math.max(defenderWeaponsTechLevel - defenderWeaponsDeduction, 1);
-        attackerWeaponsTechLevel = Math.max(attackerWeaponsTechLevel - attackerWeaponsDeduction, 1);
-
-        let combatResult = this.calculate({
-            weaponsLevel: defenderWeaponsTechLevel,
-            ships: totalDefenders
-        }, {
-            weaponsLevel: attackerWeaponsTechLevel,
-            ships: totalAttackers
-        }, false);
-
-        return combatResult;
+        return {
+            totalDefenders,
+            totalAttackers,
+            defenderWeaponsTechLevel,
+            attackerWeaponsTechLevel
+        };
     }
 
     async performCombat(game: Game, gameUsers: User[], defender: Player, star: Star | null, carriers: Carrier[]) {
@@ -264,7 +275,7 @@ export default class CombatService extends EventEmitter {
         let combatResultShips: CombatResultShips;
         
         if (star) {
-            combatResultShips = this.calculateStar(game, star, defender, defenders, attackers, defenderCarriers, attackerCarriers);
+            combatResultShips = this.calculateStar(game, star, defenders, attackers, defenderCarriers, attackerCarriers);
         } else {
             combatResultShips = this.calculateCarrier(game, defenders, attackers, defenderCarriers, attackerCarriers);
         }

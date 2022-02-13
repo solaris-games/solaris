@@ -123,8 +123,6 @@ describe('combat', () => {
             shipsActual: 10
         };
 
-        const owner = { };
-
         const defenders = [];
 
         const attackers = [];
@@ -140,7 +138,7 @@ describe('combat', () => {
             }
         ];
 
-        const combatResult = service.calculateStar(game, star, owner, defenders, attackers, defenderCarriers, attackerCarriers);
+        const combatResult = service.calculateStar(game, star, defenders, attackers, defenderCarriers, attackerCarriers);
 
         expect(combatResult.weapons.defender).toBe(1);
         expect(combatResult.weapons.attacker).toBe(1);
@@ -159,8 +157,6 @@ describe('combat', () => {
             shipsActual: 10
         };
 
-        const owner = { };
-
         const defenders = [];
 
         const attackers = [];
@@ -176,7 +172,7 @@ describe('combat', () => {
             }
         ];
 
-        const combatResult = service.calculateStar(game, star, owner, defenders, attackers, defenderCarriers, attackerCarriers);
+        const combatResult = service.calculateStar(game, star, defenders, attackers, defenderCarriers, attackerCarriers);
 
         expect(combatResult.weapons.defender).toBe(1);
         expect(combatResult.weapons.attacker).toBe(1);
@@ -194,8 +190,6 @@ describe('combat', () => {
         const star = {
             shipsActual: 0
         };
-
-        const owner = { };
 
         const defenders = [];
 
@@ -216,7 +210,7 @@ describe('combat', () => {
             }
         ];
 
-        const combatResult = service.calculateStar(game, star, owner, defenders, attackers, defenderCarriers, attackerCarriers);
+        const combatResult = service.calculateStar(game, star, defenders, attackers, defenderCarriers, attackerCarriers);
 
         expect(combatResult.weapons.defender).toBe(1);
         expect(combatResult.weapons.attacker).toBe(1);
@@ -234,8 +228,6 @@ describe('combat', () => {
         const star = {
             shipsActual: 0
         };
-
-        const owner = { };
 
         const defenders = [];
 
@@ -256,7 +248,7 @@ describe('combat', () => {
             }
         ];
 
-        const combatResult = service.calculateStar(game, star, owner, defenders, attackers, defenderCarriers, attackerCarriers);
+        const combatResult = service.calculateStar(game, star, defenders, attackers, defenderCarriers, attackerCarriers);
 
         expect(combatResult.weapons.defender).toBe(1);
         expect(combatResult.weapons.attacker).toBe(1);
