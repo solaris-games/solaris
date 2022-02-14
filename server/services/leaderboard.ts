@@ -561,7 +561,7 @@ export default class LeaderboardService {
 
         return {
             totalPlayers,
-            leaderboard,
+            leaderboard: guildUserPositions,
             sorter
         };
     }
