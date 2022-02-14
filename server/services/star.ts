@@ -96,13 +96,7 @@ export default class StarService extends EventEmitter {
         return this.randomService.getRandomPositionInCircleFromOrigin(originX, originY, radius);
     }
 
-    getByObjectId(game: Game, id: DBObjectId) {
-        // return game.galaxy.stars.find(s => s._id.toString() === id));
-        return this.getByIdBS(game, id); // Experimental
-    }
-
     getById(game: Game, id: DBObjectId) {
-        // return game.galaxy.stars.find(s => s._id.toString() === id.toString());
         return this.getByIdBS(game, id); // Experimental
     }
 
@@ -251,7 +245,7 @@ export default class StarService extends EventEmitter {
                 .map(s => {
                     return {
                         source: s,
-                        destination: this.getByObjectId(game, s.wormHoleToStarId!)
+                        destination: this.getById(game, s.wormHoleToStarId!)
                     };
                 });
                 
@@ -266,7 +260,7 @@ export default class StarService extends EventEmitter {
             }
         }
 
-        return starsInRange.map(s => this.getByObjectId(game, s._id));
+        return starsInRange.map(s => this.getById(game, s._id));
     }
 
     filterStarsByScanningRangeAndWaypointDestinations(game: Game, player: Player) {
@@ -278,7 +272,7 @@ export default class StarService extends EventEmitter {
         let inTransitStars = game.galaxy.carriers
             .filter(c => c.ownedByPlayerId!.toString() === player._id.toString() && !c.orbiting)
             .map(c => c.waypoints[0].destination)
-            .map(d => this.getByObjectId(game, d));
+            .map(d => this.getById(game, d));
 
         for (let transitStar of inTransitStars) {
             if (starsInScanningRange.indexOf(transitStar) < 0) {
@@ -567,7 +561,7 @@ export default class StarService extends EventEmitter {
 
         // If the star was paired with a worm hole, then clear the other side.
         if (star.wormHoleToStarId) {
-            const wormHolePairStar = this.getByObjectId(game, star.wormHoleToStarId);
+            const wormHolePairStar = this.getById(game, star.wormHoleToStarId);
 
             if (wormHolePairStar) {
                 wormHolePairStar.wormHoleToStarId = null;

@@ -83,8 +83,8 @@ export default class WaypointService {
         for (let i = 0; i < waypoints.length; i++) {
             let waypoint = waypoints[i];
 
-            let sourceStar = this.starService.getByObjectId(game, waypoint.source);
-            let destinationStar = this.starService.getByObjectId(game, waypoint.destination);
+            let sourceStar = this.starService.getById(game, waypoint.source);
+            let destinationStar = this.starService.getById(game, waypoint.destination);
 
             let sourceStarName = sourceStar == null ? 'Unknown' : sourceStar.name; // Could be travelling from a destroyed star.
 
@@ -158,8 +158,8 @@ export default class WaypointService {
     }
 
     _waypointRouteIsWithinHyperspaceRange(game: Game, carrier: Carrier, waypoint: CarrierWaypoint) {
-        let sourceStar = this.starService.getByObjectId(game, waypoint.source);
-        let destinationStar = this.starService.getByObjectId(game, waypoint.destination);
+        let sourceStar = this.starService.getById(game, waypoint.source);
+        let destinationStar = this.starService.getById(game, waypoint.destination);
 
         // Stars may have been destroyed.
         if (sourceStar == null || destinationStar == null) {
@@ -180,8 +180,8 @@ export default class WaypointService {
     }
 
     _waypointRouteIsBetweenWormHoles(game: Game, waypoint: CarrierWaypoint) {
-        let sourceStar = this.starService.getByObjectId(game, waypoint.source);
-        let destinationStar = this.starService.getByObjectId(game, waypoint.destination);
+        let sourceStar = this.starService.getById(game, waypoint.source);
+        let destinationStar = this.starService.getById(game, waypoint.destination);
 
         // Stars may have been destroyed.
         if (sourceStar == null || destinationStar == null) {
@@ -288,8 +288,8 @@ export default class WaypointService {
         let firstWaypoint = carrier.waypoints[0];
         let lastWaypoint = carrier.waypoints[carrier.waypoints.length - 1];
 
-        let firstWaypointStar = this.starService.getByObjectId(game, firstWaypoint.source);
-        let lastWaypointStar = this.starService.getByObjectId(game, lastWaypoint.source);
+        let firstWaypointStar = this.starService.getById(game, firstWaypoint.source);
+        let lastWaypointStar = this.starService.getById(game, lastWaypoint.source);
 
         if (firstWaypointStar == null || lastWaypointStar == null) {
             return false;
@@ -316,8 +316,8 @@ export default class WaypointService {
             return 1 + delayTicks;
         }
 
-        let sourceStar = this.starService.getByObjectId(game, waypoint.source);
-        let destinationStar = this.starService.getByObjectId(game, waypoint.destination);
+        let sourceStar = this.starService.getById(game, waypoint.source);
+        let destinationStar = this.starService.getById(game, waypoint.destination);
 
         // If the carrier can travel instantly then it'll take 1 tick + any delay.
         let instantSpeed = sourceStar && this.starService.isStarPairWormHole(sourceStar, destinationStar);

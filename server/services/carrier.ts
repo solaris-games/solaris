@@ -46,10 +46,6 @@ export default class CarrierService extends EventEmitter {
         this.diplomacyService = diplomacyService;
     }
 
-    getByObjectId(game: Game, id: DBObjectId) {
-        return this.getByIdBS(game, id); // Experimental
-    }
-
     getById(game: Game, id: DBObjectId) {
         return this.getByIdBS(game, id); // Experimental
     }
@@ -195,7 +191,7 @@ export default class CarrierService extends EventEmitter {
             }
         }
 
-        return carriersInRange.map(c => this.getByObjectId(game, c));
+        return carriersInRange.map(c => this.getById(game, c));
     }
 
     sanitizeCarriersByPlayer(game: Game, player: Player) {

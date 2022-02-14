@@ -183,7 +183,7 @@ describe('specialistHire - Carrier', () => {
             return null;
         };
 
-        testObj.starService.getByObjectId = () => {
+        testObj.starService.getById = () => {
             return star;
         };
 
@@ -213,7 +213,7 @@ describe('specialistHire - Carrier', () => {
             return null;
         };
 
-        testObj.starService.getByObjectId = () => {
+        testObj.starService.getById = () => {
             return star;
         };
 
@@ -243,7 +243,7 @@ describe('specialistHire - Carrier', () => {
             return specialistBasic(testObj);
         };
 
-        testObj.starService.getByObjectId = () => {
+        testObj.starService.getById = () => {
             return star;
         };
 
@@ -273,7 +273,7 @@ describe('specialistHire - Carrier', () => {
             return specialistBasic(testObj);
         };
 
-        testObj.starService.getByObjectId = () => {
+        testObj.starService.getById = () => {
             return star;
         };
 
@@ -312,7 +312,7 @@ describe('specialistHire - Carrier', () => {
             return specialistBasic(testObj);
         };
 
-        testObj.starService.getByObjectId = () => {
+        testObj.starService.getById = () => {
             return star;
         };
 
@@ -352,7 +352,7 @@ describe('specialistHire - Carrier', () => {
             return specialistBasic(testObj);
         };
 
-        testObj.starService.getByObjectId = () => {
+        testObj.starService.getById = () => {
             return star;
         };
 

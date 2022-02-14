@@ -74,7 +74,7 @@ export default class LedgerService extends EventEmitter {
     }
 
     async settleDebt(game: Game, debtor: Player, playerBId: DBObjectId) {
-        let creditor = this.playerService.getByObjectId(game, playerBId);
+        let creditor = this.playerService.getById(game, playerBId);
 
         // Get both of the ledgers between the two players.
         let ledgerDebtor = this.getLedgerForPlayer(debtor, playerBId);
@@ -113,7 +113,7 @@ export default class LedgerService extends EventEmitter {
     }
 
     async forgiveDebt(game: Game, creditor: Player, playerBId: DBObjectId) {
-        let debtor = this.playerService.getByObjectId(game, playerBId);
+        let debtor = this.playerService.getById(game, playerBId);
 
         // Get both of the ledgers between the two players.
         let ledgerCreditor = this.getLedgerForPlayer(creditor, playerBId);

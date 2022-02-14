@@ -49,10 +49,6 @@ export default class PlayerService extends EventEmitter {
         this.gameTypeService = gameTypeService;
     }
 
-    getByObjectId(game, playerId) {
-        return game.galaxy.players.find(p => p._id.toString() === playerId.toString());
-    }
-
     getById(game, playerId) {
         return game.galaxy.players.find(p => p._id.toString() === playerId.toString());
     }
@@ -194,7 +190,7 @@ export default class PlayerService extends EventEmitter {
             let homeStarId = game.galaxy.homeStars.pop();
 
             // Set up the home star
-            let homeStar = this.starService.getByObjectId(game, homeStarId);
+            let homeStar = this.starService.getById(game, homeStarId);
 
             this.starService.setupHomeStar(game, homeStar, player, game.settings);
         }
@@ -246,7 +242,7 @@ export default class PlayerService extends EventEmitter {
             let linkedStars = game.galaxy.linkedStars.pop();
 
             for (let starId of linkedStars) {
-                let star = this.starService.getByObjectId(game, starId);
+                let star = this.starService.getById(game, starId);
 
                 this.setupStarForGameStart(game, star, player, false); 
             }
@@ -262,7 +258,7 @@ export default class PlayerService extends EventEmitter {
 
         while (starsToDistribute--) {
             for (let player of players) {
-                let homeStar = this.starService.getByObjectId(game, player.homeStarId);
+                let homeStar = this.starService.getById(game, player.homeStarId);
 
                 // Get X closest stars to the home star and also give those to the player.
                 let s = this.starDistanceService.getClosestUnownedStar(homeStar, game.galaxy.stars);

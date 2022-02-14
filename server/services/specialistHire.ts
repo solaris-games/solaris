@@ -58,7 +58,7 @@ export default class SpecialistHireService {
             throw new ValidationError(`Cannot assign a specialist to a carrier in transit.`);
         }
 
-        let star = this.starService.getByObjectId(game, carrier.orbiting);
+        let star = this.starService.getById(game, carrier.orbiting);
 
         if (this.starService.isDeadStar(star)) {
             throw new ValidationError('Cannot hire a specialist while in orbit of a dead star.');
