@@ -520,7 +520,7 @@ export default class StarUpgradeService extends EventEmitter {
     }
 
     async _upgradeStarAndSummary(game: Game, player: Player, upgradeSummary: BulkUpgradeReport, upgradeStar: any, infrastructureType: InfrastructureType) {
-        let summaryStar = upgradeSummary.stars.find(x => x.starId.equals(upgradeStar.star._id));
+        let summaryStar = upgradeSummary.stars.find(x => x.starId.toString() === upgradeStar.star._id.toString());
 
         if (!summaryStar) {
             summaryStar = {

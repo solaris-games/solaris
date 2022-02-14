@@ -48,7 +48,7 @@ export default class SpecialistHireService {
             throw new ValidationError('This specialist has been banned from this game.');
         }
 
-        let carrier = game.galaxy.carriers.find(x => x.ownedByPlayerId && x.ownedByPlayerId.equals(player._id) && x._id.toString() === carrierId.toString());
+        let carrier = game.galaxy.carriers.find(x => x.ownedByPlayerId && x.ownedByPlayerId.toString() === player._id.toString() && x._id.toString() === carrierId.toString());
 
         if (!carrier) {
             throw new ValidationError(`Cannot assign a specialist to a carrier that you do not own.`);
@@ -135,7 +135,7 @@ export default class SpecialistHireService {
             throw new ValidationError('This specialist has been banned from this game.');
         }
 
-        let star = game.galaxy.stars.find(x => x.ownedByPlayerId && x.ownedByPlayerId.equals(player._id) && x._id.toString() === starId.toString());
+        let star = game.galaxy.stars.find(x => x.ownedByPlayerId && x.ownedByPlayerId.toString() === player._id.toString() && x._id.toString() === starId.toString());
 
         if (!star) {
             throw new ValidationError(`Cannot assign a specialist to a star that you do not own.`);

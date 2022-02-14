@@ -29,7 +29,7 @@ export default class LedgerService extends EventEmitter {
         let fullLedger = this.getLedger(player);
 
         // Get the ledger between the two players.
-        let playerLedger: PlayerLedger = fullLedger.find(l => l.playerId.equals(playerId))!;
+        let playerLedger: PlayerLedger = fullLedger.find(l => l.playerId.toString() === playerId.toString())!;
         let isNew: boolean = false;
 
         // If no ledger exists, create one.
@@ -43,7 +43,7 @@ export default class LedgerService extends EventEmitter {
             isNew = true;
         }
 
-        playerLedger = fullLedger.find(l => l.playerId.equals(playerId))!;
+        playerLedger = fullLedger.find(l => l.playerId.toString() === playerId.toString())!;
 
         return {
             ledger: playerLedger,

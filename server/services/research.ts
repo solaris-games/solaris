@@ -157,7 +157,7 @@ export default class ResearchService extends EventEmitter {
         for (let i = 0; i < game.galaxy.players.length; i++) {
             let player = game.galaxy.players[i];
 
-            let user = player.userId ? gameUsers.find(u => player.userId && u._id.equals(player.userId))! : null;
+            let user = player.userId ? gameUsers.find(u => player.userId && u._id.toString() === player.userId.toString())! : null;
             
             await this.conductResearch(game, user, player);
         }

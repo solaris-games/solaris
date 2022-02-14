@@ -50,8 +50,8 @@ export default class DiplomacyService {
         let playerA: Player = game.galaxy.players.find(p => p._id.toString() === playerIdA.toString())!;
         let playerB: Player = game.galaxy.players.find(p => p._id.toString() === playerIdB.toString())!;
 
-        let statusTo: DiplomaticState = playerA.diplomacy.allies.find(x => x.equals(playerB._id)) ? 'allies' : 'enemies';
-        let statusFrom: DiplomaticState = playerB.diplomacy.allies.find(x => x.equals(playerA._id)) ? 'allies' : 'enemies';
+        let statusTo: DiplomaticState = playerA.diplomacy.allies.find(x => x.toString() === playerB._id.toString()) ? 'allies' : 'enemies';
+        let statusFrom: DiplomaticState = playerB.diplomacy.allies.find(x => x.toString() === playerA._id.toString()) ? 'allies' : 'enemies';
 
         let isAllied = statusTo === 'allies' && statusFrom === 'allies';
 
@@ -70,7 +70,7 @@ export default class DiplomacyService {
         let diplomaticStatuses: DiplomaticStatus[] = [];
 
         for (let otherPlayer of game.galaxy.players) {
-            if (player._id.equals(otherPlayer._id)) {
+            if (player._id.toString() === otherPlayer._id.toString()) {
                 continue;
             }
 
@@ -84,7 +84,7 @@ export default class DiplomacyService {
         let allies: Player[] = [];
 
         for (let otherPlayer of game.galaxy.players) {
-            if (otherPlayer._id.equals(player._id)) {
+            if (otherPlayer._id.toString() === player._id.toString()) {
                 continue;
             }
 
@@ -120,7 +120,7 @@ export default class DiplomacyService {
 
     getFilteredDiplomacy(player: Player, forPlayer: Player): PlayerDiplomacy {
         return {
-            allies: player.diplomacy.allies.filter(a => a.equals(forPlayer._id))
+            allies: player.diplomacy.allies.filter(a => a.toString() === forPlayer._id.toString())
         }
     }
 
@@ -135,7 +135,7 @@ export default class DiplomacyService {
         });
 
         // Need to do this so we can calculate the new diplomatic status.
-        let player: Player = game.galaxy.players.find(p => p._id.equals(playerId))!;
+        let player: Player = game.galaxy.players.find(p => p._id.toString() === playerId.toString())!;
 
         if (player.diplomacy.allies.indexOf(playerIdTarget) === -1) {
             player.diplomacy.allies.push(playerIdTarget);
@@ -183,13 +183,13 @@ export default class DiplomacyService {
         await this.gameRepo.bulkWrite(dbWrites);
 
         // Need to do this so we can calculate the new diplomatic status.
-        let player: Player = game.galaxy.players.find(p => p._id.equals(playerId))!;
+        let player: Player = game.galaxy.players.find(p => p._id.toString() === playerId.toString())!;
 
         if (player.diplomacy.allies.indexOf(playerIdTarget) >= 0) {
             player.diplomacy.allies.splice(player.diplomacy.allies.indexOf(playerIdTarget), 1);
         }
 
-        let targetPlayer: Player = game.galaxy.players.find(p => p._id.equals(playerIdTarget))!;
+        let targetPlayer: Player = game.galaxy.players.find(p => p._id.toString() === playerIdTarget.toString())!;
 
         if (targetPlayer.diplomacy.allies.indexOf(playerId) >= 0) {
             targetPlayer.diplomacy.allies.splice(targetPlayer.diplomacy.allies.indexOf(playerId), 1);

@@ -194,7 +194,7 @@ export default class MapService {
             let starB = remaining[this.randomService.getRandomNumberBetween(0, remaining.length - 1)];
 
             // Check validity of the random selection.
-            if (starA.homeStar || starB.homeStar || starA._id.equals(starB._id) || starA.wormHoleToStarId || starB.wormHoleToStarId) {
+            if (starA.homeStar || starB.homeStar || starA._id.toString() === starB._id.toString() || starA.wormHoleToStarId || starB.wormHoleToStarId) {
                 wormHoleCount++; // Increment because the while loop will decrement.
             } else {
                 starA.wormHoleToStarId = starB._id;

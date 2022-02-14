@@ -121,7 +121,7 @@ export default class ConversationService extends EventEmitter {
         // List all conversations the player is participating in
         // and the last message that was sent
         // and the count of unread messages
-        let convos = game.conversations.filter(c => c.participants.find(p => p.equals(playerId)));
+        let convos = game.conversations.filter(c => c.participants.find(p => p.toString() === playerId.toString()));
 
         return convos.map(c => {
             const msgs: ConversationMessage[] = c.messages as ConversationMessage[];
@@ -130,7 +130,7 @@ export default class ConversationService extends EventEmitter {
             const lastMessage = msgs.slice(-1)[0] || null;
 
             // Calculate how many messages in this conversation the player has NOT read.
-            const unreadCount = msgs.filter(m => m.readBy.find(r => r.equals(playerId)) == null).length;
+            const unreadCount = msgs.filter(m => m.readBy.find(r => r.toString() === playerId.toString()) == null).length;
 
             return {
                 _id: c._id,
@@ -166,7 +166,7 @@ export default class ConversationService extends EventEmitter {
             throw new ValidationError(`The conversation requested does not exist.`);
         }
 
-        if (convo.participants.find(p => p.equals(playerId) == null)) {
+        if (convo.participants.find(p => p.toString() === playerId.toString() == null)) {
             throw new ValidationError(`You are not participating in this conversation.`);
         }
 
@@ -234,7 +234,7 @@ export default class ConversationService extends EventEmitter {
         // Note: This is the best way as it may save a DB call
         // if there are no unread messages.
         let unreadMessages = (convo.messages as ConversationMessage[])
-            .filter(m => m.type === 'message' && m.readBy.find(r => r.equals(playerId)) == null)
+            .filter(m => m.type === 'message' && m.readBy.find(r => r.toString() === playerId.toString()) == null)
             .map(m => m._id);
 
         if (unreadMessages.length) {
@@ -285,9 +285,9 @@ export default class ConversationService extends EventEmitter {
 
     getUnreadCount(game: Game, playerId: DBObjectId) {
         return (game.conversations || [])
-            .filter(c => c.participants.find(p => p.equals(playerId)))
+            .filter(c => c.participants.find(p => p.toString() === playerId.toString()))
             .reduce((sum, c) => {
-                return sum + (c.messages as ConversationMessage[]).filter(m => m.readBy.find(r => r.equals(playerId)) == null).length
+                return sum + (c.messages as ConversationMessage[]).filter(m => m.readBy.find(r => r.toString() === playerId.toString()) == null).length
             }, 0);
     }
 

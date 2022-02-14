@@ -113,7 +113,7 @@ export default class TechnologyService {
     }
 
     getCarrierEffectiveTechnologyLevels(game: Game, carrier: Carrier, isCarrierToStarCombat: boolean, sanitize: boolean = true) {
-        let player = game.galaxy.players.find(x => x._id.equals(carrier.ownedByPlayerId!)) || null;
+        let player = game.galaxy.players.find(x => x._id.toString() === carrier.ownedByPlayerId!.toString()) || null;
 
         let techs = this.getPlayerEffectiveTechnologyLevels(game, player, false);
 

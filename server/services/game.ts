@@ -151,7 +151,7 @@ export default class GameService extends EventEmitter {
         }
 
         if (game.settings.general.createdByUserId) {
-            game.settings.general.isGameAdmin = game.settings.general.createdByUserId.equals(userId);
+            game.settings.general.isGameAdmin = game.settings.general.createdByUserId.toString() === userId.toString();
         } else {
             game.settings.general.isGameAdmin = false;
         }
@@ -252,7 +252,7 @@ export default class GameService extends EventEmitter {
         }
 
         // The user cannot rejoin if they quit early.
-        let isQuitter = game.quitters.find(x => x.equals(userId));
+        let isQuitter = game.quitters.find(x => x.toString() === userId.toString());
 
         if (isQuitter) {
             throw new ValidationError('You cannot rejoin this game.');
@@ -260,7 +260,7 @@ export default class GameService extends EventEmitter {
 
         // Disallow if they are already in the game as another player.
         // If the player they are in the game as is afk then that's fine.
-        let existing = game.galaxy.players.find(x => x.userId?.equals(userId));
+        let existing = game.galaxy.players.find(x => x.userId?.toString() === userId.toString());
 
         if (existing && !existing.afk) {
             throw new ValidationError('You are already participating in this game.');
@@ -275,11 +275,11 @@ export default class GameService extends EventEmitter {
 
         // If the user was an afk-er then they are only allowed to join
         // their slot.
-        let isAfker = game.afkers.find(x => x.equals(userId));
-        let isRejoiningAfkSlot = isAfker && player.afk && userId && player.userId?.equals(userId);
+        let isAfker = game.afkers.find(x => x.toString() === userId.toString());
+        let isRejoiningAfkSlot = isAfker && player.afk && userId && player.userId?.toString() === userId.toString();
 
         // If they have been afk'd then they are only allowed to join their slot again.
-        if (player.afk && isAfker && userId && player.userId?.equals(userId)) {
+        if (player.afk && isAfker && userId && player.userId?.toString() === userId.toString()) {
             throw new ValidationError('You can only rejoin this game in your own slot.');
         }
 
@@ -335,9 +335,9 @@ export default class GameService extends EventEmitter {
     }
 
     assignPlayerToUser(game: Game, player: Player, userId: DBObjectId | null, alias: string, avatar: number) {
-        let isAfker = userId && game.afkers.find(x => x.equals(userId)) != null;
+        let isAfker = userId && game.afkers.find(x => x.toString() === userId.toString()) != null;
         let isFillingAfkSlot = this.gameStateService.isInProgress(game) && player.afk;
-        let isRejoiningOwnAfkSlot = isFillingAfkSlot && isAfker && (userId && player.userId?.equals(userId));
+        let isRejoiningOwnAfkSlot = isFillingAfkSlot && isAfker && (userId && player.userId?.toString() === userId.toString());
 
         // Assign the user to the player.
         player.userId = userId;
@@ -483,7 +483,7 @@ export default class GameService extends EventEmitter {
             throw new ValidationError('Cannot delete games that are in progress or completed.');
         }
 
-        if (deletedByUserId && game.settings.general.createdByUserId && !game.settings.general.createdByUserId.equals(deletedByUserId)) {
+        if (deletedByUserId && game.settings.general.createdByUserId && game.settings.general.createdByUserId.toString() !== deletedByUserId.toString()) {
             throw new ValidationError('Cannot delete this game, you did not create it.');
         }
 

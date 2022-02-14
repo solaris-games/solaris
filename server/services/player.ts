@@ -50,7 +50,7 @@ export default class PlayerService extends EventEmitter {
     }
 
     getByObjectId(game, playerId) {
-        return game.galaxy.players.find(p => p._id.equals(playerId));
+        return game.galaxy.players.find(p => p._id.toString() === playerId.toString());
     }
 
     getById(game, playerId) {
@@ -105,7 +105,7 @@ export default class PlayerService extends EventEmitter {
 
     isInScanningRangeOfPlayer(game, sourcePlayer, targetPlayer) {
         return this.getPlayersWithinScanningRangeOfPlayer(game, [targetPlayer], sourcePlayer)
-            .find(p => p._id.equals(targetPlayer._id)) != null;
+            .find(p => p._id.toString() === targetPlayer._id.toString()) != null;
     }
 
     createEmptyPlayer(game, colour, shape) {
@@ -275,7 +275,7 @@ export default class PlayerService extends EventEmitter {
 
     // TODO: Shouldn't this be in the starService?
     setupStarForGameStart(game, star, player, resetWarpGates) {
-        if (player.homeStarId.equals(star._id)) {
+        if (player.homeStarId.toString() === star._id.toString()) {
             this.starService.setupHomeStar(game, star, player, game.settings);
         } else {
             star.ownedByPlayerId = player._id;
@@ -839,7 +839,7 @@ export default class PlayerService extends EventEmitter {
         }
 
         return game.galaxy.players.find(p => p.lastSeenIP 
-            && !p._id.equals(player._id) 
+            && !p._id.toString() === player._id.toString() 
             && p.lastSeenIP === player.lastSeenIP) != null;
     }
 

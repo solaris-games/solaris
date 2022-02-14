@@ -24,9 +24,9 @@ export default class ShipTransferService {
     async transferAllToStar(game: Game, player: Player, starId: DBObjectId) {
         let star = this.starService.getById(game, starId);
         let carriersAtStar = this.carrierService.getCarriersAtStar(game, starId)
-            .filter(c => c.ownedByPlayerId!.equals(player._id));
+            .filter(c => c.ownedByPlayerId!.toString() === player._id.toString());
 
-        if (!star.ownedByPlayerId || !star.ownedByPlayerId.equals(player._id)) {
+        if (!star.ownedByPlayerId || star.ownedByPlayerId.toString() !== player._id.toString()) {
             throw new ValidationError('The player does not own this star.');
         }
 
@@ -91,11 +91,11 @@ export default class ShipTransferService {
         let carrier = this.carrierService.getById(game, carrierId);
         let star = this.starService.getById(game, starId);
 
-        if (!carrier || !carrier.ownedByPlayerId!.equals(player._id)) {
+        if (!carrier || carrier.ownedByPlayerId!.toString() !== player._id.toString()) {
             throw new ValidationError('The player does not own this carrier.');
         }
 
-        if (!star || !star.ownedByPlayerId || !star.ownedByPlayerId.equals(player._id)) {
+        if (!star || !star.ownedByPlayerId || star.ownedByPlayerId.toString() !== player._id.toString()) {
             throw new ValidationError('The player does not own this star.');
         }
 
@@ -103,7 +103,7 @@ export default class ShipTransferService {
             throw new ValidationError('The carrier must be in orbit of a star to transfer ships.');
         }
 
-        if (!carrier.orbiting.equals(star._id)) {
+        if (carrier.orbiting.toString() !== star._id.toString()) {
             throw new ValidationError('The carrier must be in orbit of a the desired star to transfer ships.');
         }
 

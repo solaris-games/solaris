@@ -46,7 +46,7 @@ export default class GuildService {
         });
 
         let guildsWithRank: GuildRank[] = guilds.map(guild => {
-            let usersInGuild = users.filter(x => x.guildId && x.guildId.equals(guild._id));
+            let usersInGuild = users.filter(x => x.guildId && x.guildId.toString() === guild._id.toString());
 
             let totalRank = usersInGuild.reduce((sum, i) => sum + i.achievements.rank, 0);
 
@@ -140,7 +140,7 @@ export default class GuildService {
 
         let usersInGuild = await this.userService.listUsersInGuild(guildId, userSelectObject);
         
-        guildWithUsers.leader = usersInGuild.find(x => x._id.equals(guild!.leader))!;
+        guildWithUsers.leader = usersInGuild.find(x => x._id.toString() === guild!.leader.toString())!;
         guildWithUsers.officers = usersInGuild.filter(x => this._isOfficer(guild!, x._id));
         guildWithUsers.members = usersInGuild.filter(x => this._isMember(guild!, x._id));
 
@@ -663,23 +663,23 @@ export default class GuildService {
     }
 
     _isLeader(guild: Guild, userId: DBObjectId) {
-        return guild.leader.equals(userId);
+        return guild.leader.toString() === userId.toString();
     }
 
     _isOfficer(guild: Guild, userId: DBObjectId) {
-        return guild.officers.find(x => x.equals(userId)) != null;
+        return guild.officers.find(x => x.toString() === userId.toString()) != null;
     }
 
     _isMember(guild: Guild, userId: DBObjectId) {
-        return guild.members.find(x => x.equals(userId)) != null;
+        return guild.members.find(x => x.toString() === userId.toString()) != null;
     }
 
     _isInvitee(guild: Guild, userId: DBObjectId) {
-        return guild.invitees.find(x => x.equals(userId)) != null;
+        return guild.invitees.find(x => x.toString() === userId.toString()) != null;
     }
 
     _isApplicant(guild: Guild, userId: DBObjectId) {
-        return guild.applicants.find(x => x.equals(userId)) != null;
+        return guild.applicants.find(x => x.toString() === userId.toString()) != null;
     }
 
     _totalMemberCount(guild: Guild) {
@@ -718,7 +718,7 @@ export default class GuildService {
         let users = await this.listUserRanksInGuilds();
 
         let guildsWithRank: GuildLeaderboard[] = guilds.map(guild => {
-            let usersInGuild = users.filter(x => x.guildId!.equals(guild._id));
+            let usersInGuild = users.filter(x => x.guildId!.toString() === guild._id.toString());
 
             let totalRank = usersInGuild.reduce((sum, i) => sum + i.achievements.rank, 0);
             let memberCount = usersInGuild.length;

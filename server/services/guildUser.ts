@@ -36,7 +36,7 @@ export default class UserGuildService {
                 _id: u._id,
                 username: u.username,
                 displayGuildTag: u.gameSettings.guild.displayGuildTag,
-                guild: guilds.find(g => u.guildId && g._id.equals(u.guildId)) || null
+                guild: guilds.find(g => u.guildId && g._id.toString() === u.guildId.toString()) || null
             };
         });
     }

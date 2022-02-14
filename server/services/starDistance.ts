@@ -71,12 +71,12 @@ export default class StarDistanceService {
 
     getClosestPlayerOwnedStars(star: Star, stars: Star[], player: Player) {
         return this.getClosestOwnedStars(star, stars)
-            .filter(s => s.ownedByPlayerId && s.ownedByPlayerId.equals(player._id));
+            .filter(s => s.ownedByPlayerId && s.ownedByPlayerId.toString() === player._id.toString());
     }
 
     getClosestPlayerOwnedStarsFromLocation(location: Location, stars: Star[], ownedByPlayerId: DBObjectId) {
         let sorted = stars
-            .filter(s => s.ownedByPlayerId && s.ownedByPlayerId.equals(ownedByPlayerId))
+            .filter(s => s.ownedByPlayerId && s.ownedByPlayerId.toString() === ownedByPlayerId.toString())
             .sort((a, b) => this.getDistanceBetweenStarAndLocation(a, location) - this.getDistanceBetweenStarAndLocation(b, location));
 
         return sorted;
@@ -84,7 +84,7 @@ export default class StarDistanceService {
 
     getClosestPlayerOwnedStarsFromLocationWithinDistance(location: Location, stars: Star[], ownedByPlayerId: DBObjectId, maxDistance: number) {
         let sorted = stars
-            .filter(s => s.ownedByPlayerId && s.ownedByPlayerId.equals(ownedByPlayerId))
+            .filter(s => s.ownedByPlayerId && s.ownedByPlayerId.toString() === ownedByPlayerId.toString())
             .filter(s => {
                 let distance = this.getDistanceBetweenStarAndLocation(s, location);
                 

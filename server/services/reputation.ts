@@ -25,7 +25,7 @@ export default class ReputationService extends EventEmitter {
         let rep: PlayerReputation | null = null;
 
         if (player.reputations) {
-            rep = player.reputations.find(r => r.playerId.equals(forPlayer._id))!;
+            rep = player.reputations.find(r => r.playerId.toString() === forPlayer._id.toString())!;
         }
 
         let isNew: boolean = false;
@@ -44,7 +44,7 @@ export default class ReputationService extends EventEmitter {
             isNew = true;
         }
 
-        rep = player.reputations.find(r => r.playerId.equals(forPlayer._id))!;
+        rep = player.reputations.find(r => r.playerId.toString() === forPlayer._id.toString())!;
 
         return {
             reputation: rep,

@@ -427,7 +427,7 @@ export default class EventService {
 
         // If the player doesn't own the object and the object is a scrambler then we need
         // to mask the before and lost amounts.
-        if (carrierOrStar.ownedByPlayerId && !player._id.equals(carrierOrStar.ownedByPlayerId) && this.specialistService.getCarrierOrStarHideShips(carrierOrStar)) {
+        if (carrierOrStar.ownedByPlayerId && player._id.toString() !== carrierOrStar.ownedByPlayerId.toString() && this.specialistService.getCarrierOrStarHideShips(carrierOrStar)) {
             let clone: CombatStar | CombatCarrier = Object.assign({}, carrierOrStar);
 
             clone.before = '???';

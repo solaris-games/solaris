@@ -50,7 +50,7 @@ export default class GameCreateValidationService {
             
             // Assert that all players have a unique colour and shape combination.
             let otherPlayer = game.galaxy.players
-                .find(p => !p._id.equals(player._id) 
+                .find(p => p._id.toString() !== player._id.toString()
                     && p.shape === player.shape 
                     && p.colour.value === player.colour.value);
 

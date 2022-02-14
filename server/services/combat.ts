@@ -218,7 +218,7 @@ export default class CombatService extends EventEmitter {
             .filter(c => 
                 c.ships! > 0
                 && !c.isGift
-                && (c.ownedByPlayerId!.equals(defender._id) || defenderAllies.find(a => a._id.equals(c.ownedByPlayerId!)))  // Either owned by the defender or owned by an ally
+                && (c.ownedByPlayerId!.toString() === defender._id.toString()) || defenderAllies.find(a => a._id.toString() === c.ownedByPlayerId!.toString())  // Either owned by the defender or owned by an ally
             )
             .sort((a, b) => b.ships! - a.ships!);
 
@@ -232,8 +232,8 @@ export default class CombatService extends EventEmitter {
             .filter(c => 
                 c.ships! > 0 
                 && !c.isGift 
-                && !c.ownedByPlayerId!.equals(defender._id)    // Not owned by the player and
-                && !defenderAllies.find(a => a._id.equals(c.ownedByPlayerId!))   // Not owned by an ally
+                && c.ownedByPlayerId!.toString() !== defender._id.toString()    // Not owned by the player and
+                && !defenderAllies.find(a => a._id.toString() === c.ownedByPlayerId!.toString())   // Not owned by an ally
             )
             .sort((a, b) => b.ships! - a.ships!);
 
@@ -256,7 +256,7 @@ export default class CombatService extends EventEmitter {
         let attackerUsers: User[] = [];
         
         for (let defender of defenders) {
-            let user = gameUsers.find(u => u._id.equals(defender.userId!));
+            let user = gameUsers.find(u => u._id.toString() === defender.userId!.toString());
             
             if (user) {
                 defenderUsers.push(user);
@@ -264,7 +264,7 @@ export default class CombatService extends EventEmitter {
         }
         
         for (let attacker of attackers) {
-            let user = gameUsers.find(u => u._id.equals(attacker.userId!));
+            let user = gameUsers.find(u => u._id.toString() === attacker.userId!.toString());
             
             if (user) {
                 attackerUsers.push(user);
@@ -447,7 +447,7 @@ export default class CombatService extends EventEmitter {
 
             for (let obj of objectsToDeduct) {
                 let isCarrier = obj.shipsActual == null;
-                let combatObject: CombatCarrier | CombatStar = (combatResult.carriers.find(c => c._id.equals(obj._id)) || combatResult.star)!;
+                let combatObject: CombatCarrier | CombatStar = (combatResult.carriers.find(c => c._id.toString() === obj._id.toString()) || combatResult.star)!;
 
                 // Calculate how many ships to kill, capped to however many ships the object has.
                 let killed: number;
@@ -494,10 +494,10 @@ export default class CombatService extends EventEmitter {
 
         // Add combat result stats to defender achievements.
         for (let defenderUser of defenderUsers) {
-            let defender = defenders.find(u => u.userId?.equals(defenderUser._id))!;
+            let defender = defenders.find(u => u.userId?.toString() === defenderUser._id.toString())!;
 
             if (defender && !defender.defeated) {
-                let playerCarriers = defenderCarriers.filter(c => c.ownedByPlayerId!.equals(defender._id));
+                let playerCarriers = defenderCarriers.filter(c => c.ownedByPlayerId!.toString() === defender._id.toString());
 
                 defenderUser.achievements.combat.kills.ships += combatResult.lost.attacker;
                 defenderUser.achievements.combat.kills.carriers += attackerCarriersDestroyed;
@@ -511,10 +511,10 @@ export default class CombatService extends EventEmitter {
 
         // Add combat result stats to attacker achievements.
         for (let attackerUser of attackerUsers) {
-            let attacker = attackers.find(u => u.userId?.equals(attackerUser._id))!;
+            let attacker = attackers.find(u => u.userId?.toString() === attackerUser._id.toString())!;
 
             if (attacker && !attacker.defeated) {
-                let playerCarriers = attackerCarriers.filter(c => c.ownedByPlayerId!.equals(attacker._id));
+                let playerCarriers = attackerCarriers.filter(c => c.ownedByPlayerId!.toString() === attacker._id.toString());
 
                 attackerUser.achievements.combat.kills.ships += combatResult.lost.defender;
                 attackerUser.achievements.combat.kills.carriers += defenderCarriersDestroyed;

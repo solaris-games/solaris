@@ -363,7 +363,7 @@ export default class TradeService extends EventEmitter {
         // Get the players.
         let toPlayer: Player = this.playerService.getById(game, toPlayerId);
 
-        if (fromPlayer._id.equals(toPlayer._id)) {
+        if (fromPlayer._id.toString() === toPlayer._id.toString()) {
             throw new ValidationError('Cannot trade with the same player');
         }
 

@@ -81,7 +81,7 @@ export default class CustomMapService {
         for (let loc of locations.filter(l => l.wormHoleToStarId != null)) {
           loc.wormHoleToStarId = locations.find(l => l.id === loc.wormHoleToStarId)?._id;
 
-          if (!loc.wormHoleToStarId || loc.wormHoleToStarId.equals(loc._id)) {
+          if (!loc.wormHoleToStarId || loc.wormHoleToStarId.toString() === loc._id.toString()) {
             throw new ValidationError(`Worm hole to star id is invalid for ${JSON.stringify(loc)}`);
           }
         }

@@ -330,14 +330,14 @@ export default class GameTickService extends EventEmitter {
                             && (
                                 // Head to head combat:
                                 (
-                                    c.destination.equals(friendlyCarrier.source)
+                                    c.destination.toString() === friendlyCarrier.source.toString()
                                     && c.distanceToSourceCurrent <= friendlyCarrier.distanceToDestinationCurrent
                                     && c.distanceToSourceNext >= friendlyCarrier.distanceToDestinationNext
                                 )
                                 ||
                                 // Combat from behind: 
                                 (
-                                    c.destination.equals(friendlyCarrier.destination)
+                                    c.destination.toString() === friendlyCarrier.destination.toString()
                                     && c.distanceToDestinationCurrent <= friendlyCarrier.distanceToDestinationCurrent
                                     && c.distanceToDestinationNext >= friendlyCarrier.distanceToDestinationNext
                                 )
@@ -353,7 +353,7 @@ export default class GameTickService extends EventEmitter {
 
                 // If all of the carriers that have collided are friendly then no need to do combat.
                 let friendlyCarriers = collisionCarriers
-                    .filter(c => c.carrier.ships! > 0 && c.carrier.ownedByPlayerId!.equals(friendlyCarrier.carrier.ownedByPlayerId));
+                    .filter(c => c.carrier.ships! > 0 && c.carrier.ownedByPlayerId!.toString() === friendlyCarrier.carrier.ownedByPlayerId.toString());
 
                 // If all other carriers are friendly then skip.
                 if (friendlyCarriers.length === collisionCarriers.length) {
@@ -449,13 +449,13 @@ export default class GameTickService extends EventEmitter {
                 continue;
             }
 
-            let destinationStar = game.galaxy.stars.find(s => s._id.equals(waypoint.destination))!;
+            let destinationStar = game.galaxy.stars.find(s => s._id.toString() === waypoint.destination.toString())!;
 
             // If we are currently in orbit then this is the first movement, we
             // need to set the transit fields
             // Also double check that the waypoint isn't travelling to the current star
             // that the carrier is in orbit of.
-            if (carrier.orbiting && !carrier.orbiting.equals(waypoint.destination)) {
+            if (carrier.orbiting && carrier.orbiting.toString() !== waypoint.destination.toString()) {
                 carrier.orbiting = null; // We are just about to move now so this needs to be null.
             }
 
@@ -502,7 +502,7 @@ export default class GameTickService extends EventEmitter {
             let combatStar = combatStars[i];
 
             // Get all carriers orbiting the star and perform combat.
-            let carriersAtStar = game.galaxy.carriers.filter(c => c.orbiting && c.orbiting.equals(combatStar._id));
+            let carriersAtStar = game.galaxy.carriers.filter(c => c.orbiting && c.orbiting.toString() === combatStar._id.toString());
 
             let starOwningPlayer = this.playerService.getById(game, combatStar.ownedByPlayerId);
 
@@ -636,7 +636,7 @@ export default class GameTickService extends EventEmitter {
             if (player.defeated) {
                 game.state.players--; // Deduct number of active players from the game.
 
-                let user = gameUsers.find(u => player.userId && u._id.equals(player.userId));
+                let user = gameUsers.find(u => player.userId && u._id.toString() === player.userId.toString());
 
                 if (player.afk) {
                     // Keep a log of players who have been afk so they cannot rejoin.

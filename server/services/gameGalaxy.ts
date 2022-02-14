@@ -226,7 +226,7 @@ export default class GameGalaxyService {
             return null;
         }
 
-        return doc.galaxy.players.find(x => x.userId && x.userId.equals(userId)) || null;
+        return doc.galaxy.players.find(x => x.userId && x.userId.toString() === userId.toString()) || null;
     }
 
     _setPlayerStats(doc: Game) {
@@ -243,7 +243,7 @@ export default class GameGalaxyService {
             p.stats = this.playerService.getStats(doc, p);
 
             if (isKingOfTheHillMode) {
-                p.isKingOfTheHill = kingOfTheHillPlayer != null && kingOfTheHillPlayer._id.equals(p._id);
+                p.isKingOfTheHill = kingOfTheHillPlayer != null && kingOfTheHillPlayer._id.toString() === p._id.toString();
             }
         });
     }
@@ -282,7 +282,7 @@ export default class GameGalaxyService {
             } as Star;
 
             if (isKingOfTheHillMode) {
-                star.isKingOfTheHillStar = kingOfTheHillStar != null && kingOfTheHillStar._id.equals(s._id);;
+                star.isKingOfTheHillStar = kingOfTheHillStar != null && kingOfTheHillStar._id.toString() === s._id.toString();
             }
 
             return star;
@@ -346,11 +346,11 @@ export default class GameGalaxyService {
                 }
 
                 if (isKingOfTheHillMode) {
-                    s.isKingOfTheHillStar = kingOfTheHillStar != null && kingOfTheHillStar._id.equals(s._id);
+                    s.isKingOfTheHillStar = kingOfTheHillStar != null && kingOfTheHillStar._id.toString() === s._id.toString();
                 }
 
                 // Ignore stars the player owns, they will always be visible.
-                let isOwnedByCurrentPlayer = playerStars.find(y => y._id.equals(s._id));
+                let isOwnedByCurrentPlayer = playerStars.find(y => y._id.toString() === s._id.toString());
 
                 if (isOwnedByCurrentPlayer) {
                     // Calculate infrastructure upgrades for the star.
@@ -465,13 +465,13 @@ export default class GameGalaxyService {
         // Sanitize other players by only returning basic info about them.
         // We don't want players snooping on others via api responses containing sensitive info.
         doc.galaxy.players = doc.galaxy.players.map(p => {
-            let isCurrentUserPlayer = player && p._id.equals(player._id);
+            let isCurrentUserPlayer = player && p._id.toString() === player._id.toString();
 
             // Append the guild tag to the player alias.
             let playerGuild: Guild | null = null;
 
             if (p.userId) {
-                let guildUser = guildUsers.find(u => p.userId && u._id.equals(p.userId));
+                let guildUser = guildUsers.find(u => p.userId && u._id.toString() === p.userId.toString());
 
                 if (guildUser && guildUser.displayGuildTag === 'visible') {
                     playerGuild = guildUser.guild;
@@ -482,7 +482,7 @@ export default class GameGalaxyService {
                 }
             }
 
-            p.isInScanningRange = playersInRange.find(x => x._id.equals(p._id)) != null;
+            p.isInScanningRange = playersInRange.find(x => x._id.toString() === p._id.toString()) != null;
             p.shape = p.shape || 'circle'; // TODO: I don't know why the shape isn't being returned by mongoose defaults.
 
             // If the user is in the game and it is the current
@@ -504,7 +504,7 @@ export default class GameGalaxyService {
                 p.isOnline = null;
             } else {
                 // Work out whether the player is online.
-                p.isOnline = isCurrentUserPlayer || onlinePlayers.find(op => op._id.equals(p._id)) != null;
+                p.isOnline = isCurrentUserPlayer || onlinePlayers.find(op => op._id.toString() === p._id.toString()) != null;
             }
 
             let reputation: PlayerReputation | null = null;
@@ -638,7 +638,7 @@ export default class GameGalaxyService {
             for (let i = 0; i < game.galaxy.players.length; i++) {
                 let gamePlayer = game.galaxy.players[i];
 
-                let historyPlayer = history.players.find(x => x.playerId.equals(gamePlayer._id));
+                let historyPlayer = history.players.find(x => x.playerId.toString() === gamePlayer._id.toString());
 
                 if (historyPlayer) {
                     gamePlayer.userId = historyPlayer.userId;
@@ -664,16 +664,16 @@ export default class GameGalaxyService {
         for (let i = 0; i < game.galaxy.stars.length; i++) {
             let gameStar = game.galaxy.stars[i];
 
-            if (!isHistorical && player && gameStar.ownedByPlayerId && gameStar.ownedByPlayerId.equals(player._id)) {
+            if (!isHistorical && player && gameStar.ownedByPlayerId && gameStar.ownedByPlayerId.toString() === player._id.toString()) {
                 continue;
             }
 
-            let historyStar = history.stars.find(x => x.starId.equals(gameStar._id));
+            let historyStar = history.stars.find(x => x.starId.toString() === gameStar._id.toString());
 
             if (historyStar) {
                 // If the player has abandoned the star in the current tick, then display that representation of the star
                 // instead of the historical version.
-                if (player && historyStar.ownedByPlayerId && gameStar.ownedByPlayerId == null && historyStar.ownedByPlayerId.equals(player._id)) {
+                if (player && historyStar.ownedByPlayerId && gameStar.ownedByPlayerId == null && historyStar.ownedByPlayerId.toString() === player._id.toString()) {
                     continue;
                 }
 
@@ -696,11 +696,11 @@ export default class GameGalaxyService {
         for (let i = 0; i < game.galaxy.carriers.length; i++) {
             let gameCarrier = game.galaxy.carriers[i];
 
-            if (!isHistorical && player && gameCarrier.ownedByPlayerId!.equals(player._id)) {
+            if (!isHistorical && player && gameCarrier.ownedByPlayerId!.toString() === player._id.toString()) {
                 continue;
             }
 
-            let historyCarrier = history.carriers.find(x => x.carrierId.equals(gameCarrier._id));
+            let historyCarrier = history.carriers.find(x => x.carrierId.toString() === gameCarrier._id.toString());
 
             // Remove any carriers that exist in the current tick but not in the previous tick.
             if (!historyCarrier) {
@@ -724,7 +724,7 @@ export default class GameGalaxyService {
         // destroyed carriers.
         if (isHistorical) {
             for (let historyCarrier of history.carriers) {
-                let gameCarrier = game.galaxy.carriers.find(x => x._id.equals(historyCarrier.carrierId));
+                let gameCarrier = game.galaxy.carriers.find(x => x._id.toString() === historyCarrier.carrierId.toString());
                 
                 if (!gameCarrier) {
                     game.galaxy.carriers.push(historyCarrier as any);

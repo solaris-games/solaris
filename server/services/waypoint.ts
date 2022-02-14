@@ -54,7 +54,7 @@ export default class WaypointService {
         
         let carrier = this.carrierService.getById(game, carrierId);
         
-        if (!carrier.ownedByPlayerId!.equals(player._id)) {
+        if (carrier.ownedByPlayerId!.toString() !== player._id.toString()) {
             throw new ValidationError('The player does not own this carrier.');
         }
 
@@ -69,8 +69,8 @@ export default class WaypointService {
             let newFirstWaypoint = waypoints[0];
 
             if (!newFirstWaypoint 
-                || !currentWaypoint.source.equals(newFirstWaypoint.source)
-                || !currentWaypoint.destination.equals(newFirstWaypoint.destination)) {
+                || currentWaypoint.source.toString() !== newFirstWaypoint.source.toString()
+                || currentWaypoint.destination.toString() !== newFirstWaypoint.destination.toString()) {
                     throw new ValidationError('The first waypoint course cannot be changed mid-flight.');
                 }
 
@@ -248,7 +248,7 @@ export default class WaypointService {
     async loopWaypoints(game: Game, player: Player, carrierId: DBObjectId, loop: boolean) {
         let carrier = this.carrierService.getById(game, carrierId);
         
-        if (!carrier.ownedByPlayerId!.equals(player._id)) {
+        if (carrier.ownedByPlayerId!.toString() !== player._id.toString()) {
             throw new ValidationError('The player does not own this carrier.');
         }
         
@@ -308,11 +308,11 @@ export default class WaypointService {
     calculateWaypointTicks(game: Game, carrier: Carrier, waypoint: CarrierWaypoint) {
         const delayTicks = waypoint.delayTicks || 0;
 
-        let carrierOwner = game.galaxy.players.find(p => p._id.equals(carrier.ownedByPlayerId!))!;
+        let carrierOwner = game.galaxy.players.find(p => p._id.toString() === carrier.ownedByPlayerId!.toString())!;
 
         // if the waypoint is going to the same star then it is at least 1
         // tick, plus any delay ticks.
-        if (waypoint.source.equals(waypoint.destination)) {
+        if (waypoint.source.toString() === waypoint.destination.toString()) {
             return 1 + delayTicks;
         }
 
@@ -368,7 +368,7 @@ export default class WaypointService {
     }
 
     performWaypointAction(carrier: Carrier, star: Star, waypoint: CarrierWaypoint) {
-        if (!carrier.ownedByPlayerId!.equals(star.ownedByPlayerId!)) {
+        if (carrier.ownedByPlayerId!.toString() !== star.ownedByPlayerId!.toString()) {
             throw new Error('Cannot perform waypoint action, the carrier and star are owned by different players.')
         }
 
@@ -543,7 +543,7 @@ export default class WaypointService {
     _performFilteredWaypointActions(game: Game, waypoints: CarrierActionWaypoint[], waypointTypes: CarrierWaypointActionType[]) {
         let actionWaypoints = waypoints.filter(w => 
             waypointTypes.indexOf(w.waypoint.action) > -1
-            && w.carrier.ownedByPlayerId!.equals(w.star.ownedByPlayerId!) // The carrier must be owned by the player who owns the star.
+            && w.carrier.ownedByPlayerId!.toString() === w.star.ownedByPlayerId!.toString() // The carrier must be owned by the player who owns the star.
         );
 
         for (let actionWaypoint of actionWaypoints) {
@@ -563,7 +563,7 @@ export default class WaypointService {
         game.galaxy.carriers
             .filter(c => c.waypoints.length)
             .map(c => {
-                let scanningRangePlayer = scanningRanges.find(s => s.player._id.equals(c.ownedByPlayerId!))!;
+                let scanningRangePlayer = scanningRanges.find(s => s.player._id.toString() === c.ownedByPlayerId!.toString())!;
 
                 return {
                     carrier: c,
@@ -589,7 +589,7 @@ export default class WaypointService {
             let waypoint = carrier.waypoints[i];
 
             // If the destination is not within scanning range of the player, remove it and all subsequent waypoints.
-            let inRange = ownerScannedStars.find(s => s._id.equals(waypoint.destination)) != null;
+            let inRange = ownerScannedStars.find(s => s._id.toString() === waypoint.destination.toString()) != null;
 
             if (!inRange) {
                 carrier.waypoints.splice(i);
