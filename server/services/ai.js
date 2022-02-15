@@ -522,7 +522,7 @@ module.exports = class AIService {
 
         const defender = {
             ships: Math.floor(starToInvade.shipsActual) + defendingCarriers.reduce((sum, c) => sum + c.ships, 0),
-            weaponsLevel: this.technologyService.getStarEffectiveWeaponsLevel(game, defendingPlayer, starToInvade, defendingCarriers)
+            weaponsLevel: this.technologyService.getStarEffectiveWeaponsLevel(game, [defendingPlayer], starToInvade, defendingCarriers)
         };
         const attacker = {
             ships: 1, // Just needed so we can get the actually needed number
