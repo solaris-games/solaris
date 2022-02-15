@@ -10,7 +10,7 @@
     "start-api:prod": "node dist/api/index.js",
     "prebuild": "rm -rf ./dist",
     "build": "tsc",
-    "postbuild": "cp -r templates ./dist/templates && cp .env ./dist",
+    "postbuild": "cp -r templates ./dist/templates && cp .env ./dist | true",
     "ts-node": "ts-node"
   },
   "author": "",
