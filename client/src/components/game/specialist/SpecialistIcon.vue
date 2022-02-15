@@ -27,9 +27,7 @@ export default {
             return null
         }
         
-        let name = gameHelper.getSpecialistName(this.type, this.specialist.id)
-
-        return require(`../../../assets/specialists/${name}.svg`)
+        return require(`../../../assets/specialists/${this.specialist.key}.svg`)
     }
   }
 }

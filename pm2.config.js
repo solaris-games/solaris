@@ -2,17 +2,17 @@ module.exports = {
   apps: [
     {
       name: "solaris-jobs",
-      script: "jobs/index.js",
+      script: "npm",
+      args: "run start-jobs:dev",
       cwd: "server",
-      watch: true,
-      node_args: "--inspect=9230"
+      watch: false
     },
     {
       name: "solaris-api",
-      script: "api/index.js",
+      script: "npm",
+      args: "run start-api:dev",
       cwd: "server",
-      watch: true,
-      node_args: "--inspect=9231"
+      watch: false
     },
     {
       name: "solaris-client",

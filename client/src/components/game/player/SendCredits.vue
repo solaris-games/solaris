@@ -16,7 +16,7 @@
           <input type="number" class="form-control" v-model="amount"/>
         </div>
         <div class="col-5">
-          <modalButton modalName="sendCreditsModal" classText="btn btn-success btn-block" :disabled="$isHistoricalMode() || isSendingCredits"><i class="fas fa-paper-plane"></i> Send</modalButton>
+          <modalButton modalName="sendCreditsModal" classText="btn btn-success btn-block" :disabled="$isHistoricalMode() || isSendingCredits || amount <= 0"><i class="fas fa-paper-plane"></i> Send</modalButton>
         </div>
       </div>
     </form>

@@ -299,7 +299,7 @@ class Star extends EventEmitter {
     }
 
     //FIXME potential resource leak, should not create a new sprite every time
-    let specialistTexture = TextureService.getSpecialistTexture(this.data.specialistId, false)
+    let specialistTexture = TextureService.getSpecialistTexture(this.data.specialist.key)
     this.specialistSprite = new PIXI.Sprite(specialistTexture)
 
     this.specialistSprite.width = 10
@@ -323,7 +323,7 @@ class Star extends EventEmitter {
   }
 
   hasSpecialist () {
-    return this.data.specialistId && this.data.specialistId > 0
+    return this.data.specialistId && this.data.specialistId > 0 && this.data.specialist
   }
 
   drawPlanets () {

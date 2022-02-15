@@ -107,6 +107,11 @@ class TextureService {
       this._loadSpecialistTexture('starfighter')
       this._loadSpecialistTexture('double-ringed-orb')
       this._loadSpecialistTexture('rocket')
+      this._loadSpecialistTexture('ray-gun')
+      this._loadSpecialistTexture('radar-dish')
+      this._loadSpecialistTexture('energy-tank')
+      this._loadSpecialistTexture('cryo-chamber')
+      this._loadSpecialistTexture('vintage-robot')
     }
 
     _loadSpecialistTexture(name) {
@@ -115,10 +120,8 @@ class TextureService {
       this.SPECIALIST_TEXTURES[name].baseTexture.mipmap = 0
     }
 
-    getSpecialistTexture(specialistId, isCarrier) {
-      let name = gameHelper.getSpecialistName(isCarrier ? 'carrier':'star', specialistId)
-
-      return this.SPECIALIST_TEXTURES[name]
+    getSpecialistTexture(specialistKey) {
+      return this.SPECIALIST_TEXTURES[specialistKey]
     }
 
     _loadPlayerSymbols() {
