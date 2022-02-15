@@ -9,7 +9,7 @@ export default class DistanceService {
 
     getDistanceAlongLocationList(locations: Location[]) {
         if (!locations || locations.length < 2) {
-            return null;
+            return 0;
         }
 
         let distance = 0;

@@ -33,7 +33,7 @@ const REINFORCEMENT_MIN_CYCLES = 0.8;
 // This is performed automatically by mongoose (when calling game.save()).
 // Use the writeToDB parameters to skip (or introduce them where needed).
 // Otherwise, changes will get duplicated.
-module.exports = class AIService {
+export default class AIService {
     starUpgradeService: StarUpgradeService;
     carrierService: CarrierService;
     starService: StarService;

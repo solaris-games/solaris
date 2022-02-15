@@ -72,6 +72,7 @@ export interface Player {
     isInScanningRange?: boolean;
     currentResearchTicksEta?: number | null;
     nextResearchTicksEta?: number | null;
+    scheduledOrders?: any | null;
 };
 
 export interface PlayerColourShapeCombination {
