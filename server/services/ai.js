@@ -619,18 +619,22 @@ module.exports = class AIService {
 
     _gatherInvasionOrders(game, player, context) {
         const orders = [];
+        const visited = new Set();
 
         for (const [fromId, reachables] of context.allReachableFromPlayerStars) {
-            for (const reachable in reachables) {
-                const star = context.starsById.get(reachable);
-                if (this._isEnemyStar(star)) {
-                    const score = this._getStarInvasionScore(star);
+            for (const reachable of reachables) {
+                if (!visited.has(reachable)) {
+                    visited.add(reachable);
+                    const star = context.starsById.get(reachable);
+                    if (this._isEnemyStar(game, player, context, star)) {
+                        const score = this._getStarInvasionScore(star);
 
-                    orders.push({
-                        type: INVADE_STAR_ACTION,
-                        star: reachable,
-                        score
-                    })
+                        orders.push({
+                            type: INVADE_STAR_ACTION,
+                            star: reachable,
+                            score
+                        })
+                    }
                 }
             }
         }
