@@ -610,7 +610,7 @@ module.exports = class AIService {
     }
 
     _isEnemyStar(game, player, context, star) {
-        return star.ownedByPlayerId && star.ownedByPlayerId !== player._id; //TODO
+        return star.ownedByPlayerId && star.ownedByPlayerId.toString() !== player._id.toString(); //TODO
     }
 
     _getStarInvasionScore(star) {
