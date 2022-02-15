@@ -266,7 +266,7 @@ module.exports = class AIService {
                 const ticksLimit = game.settings.galaxy.productionTicks * 2;
                 const fittingAssignments = this._findAssignmentsWithTickLimit(game, player, context, context.freelyReachableStars, assignments, order.star, ticksLimit,  this._canAffordCarrier(context, game, player, false), false);
 
-                if (!fittingAssignments) {
+                if (!fittingAssignments || !fittingAssignments.length) {
                     continue;
                 }
 
