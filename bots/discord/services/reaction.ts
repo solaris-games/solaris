@@ -1,19 +1,19 @@
-module.exports = class ReactionService {
+export default class ReactionService {
 
-    thumbsUpDown(msg) {
+    thumbsUpDown(msg: any) {
         this.thumbsUp(msg);
         this.thumbsDown(msg);
     }
 
-    thumbsUp(msg) {
+    thumbsUp(msg: any) {
         msg.react('👍');
     }
 
-    thumbsDown(msg) {
+    thumbsDown(msg: any) {
         msg.react('👎');
     }
 
-    messageEmojis(msg) {
+    messageEmojis(msg: any) {
         const regexMatch = /\p{Emoji_Presentation}/gu;
         let emojiArray = msg.content.match(regexMatch);
 

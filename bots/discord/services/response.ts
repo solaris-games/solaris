@@ -1,6 +1,9 @@
+import { Game } from "../../../server/types/Game";
+import { User } from "../../../server/types/User";
+
 const Discord = require('discord.js');
 
-module.exports = class ReponseService {
+export default class ReponseService {
 
     baseResponse() {
         const response = new Discord.MessageEmbed()
@@ -13,9 +16,9 @@ module.exports = class ReponseService {
         return response;
     }
 
-    gameinfo(game, type, isPC) {
+    gameinfo(game: Game, type: number, isPC: boolean) {
         let response;
-        let sidePages = [];
+        let sidePages: string[] = [];
         switch (type) {
             case 0: //General
                 response = this.gameinfoGeneral(game);
@@ -61,7 +64,7 @@ module.exports = class ReponseService {
         return response;
     }
 
-    gameinfoGeneral(game) {
+    gameinfoGeneral(game: Game) {
         let game_name = game.settings.general.name;
         let gameId = game._id;
         let response = this.baseResponse();
@@ -88,7 +91,7 @@ module.exports = class ReponseService {
         return response;
     }
 
-    gameinfoGalaxy(game) {
+    gameinfoGalaxy(game: Game) {
         let game_name = game.settings.general.name;
         let gameId = game._id;
         let response = this.baseResponse();
@@ -121,7 +124,7 @@ module.exports = class ReponseService {
         return response;
     }
 
-    gameinfoPlayer(game) {
+    gameinfoPlayer(game: Game) {
         let game_name = game.settings.general.name;
         let gameId = game._id;
         let response = this.baseResponse();
@@ -154,7 +157,7 @@ module.exports = class ReponseService {
         return response;
     }
 
-    gameinfoTechnology(game) {
+    gameinfoTechnology(game: Game) {
         let game_name = game.settings.general.name;
         let gameId = game._id;
         let response = this.baseResponse();
@@ -193,7 +196,7 @@ module.exports = class ReponseService {
         return response;
     }
 
-    gameinfoTime(game) {
+    gameinfoTime(game: Game) {
         let game_name = game.settings.general.name;
         let gameId = game._id;
         let response = this.baseResponse();
@@ -225,7 +228,7 @@ module.exports = class ReponseService {
         return response;
     }
 
-    invite(game) {
+    invite(game: Game) {
         let response = this.baseResponse();
         response = response
             .setTitle(`Please join ${game.settings.general.name}`)
@@ -255,7 +258,7 @@ module.exports = class ReponseService {
         return response;
     }
 
-    leaderboard_globalPC(page, sortingKey, position_list, username_list, sortingKey_list) {
+    leaderboard_globalPC(page: number, sortingKey: string, position_list: string, username_list: string, sortingKey_list: string) {
         let lowerLimit = page * 20 + 1
         let upperLimit = (page + 1) * 20
         let response = this.baseResponse()
@@ -270,7 +273,7 @@ module.exports = class ReponseService {
         return response;
     }
 
-    leaderboard_globalMobile(page, sortingKey, data_list) {
+    leaderboard_globalMobile(page: number, sortingKey: string, data_list: string) {
         let lowerLimit = page * 20 + 1;
         let upperLimit = (page + 1) * 20;
         let response = this.baseResponse();
@@ -283,7 +286,7 @@ module.exports = class ReponseService {
         return response;
     }
 
-    leaderboard_localPC(gameId, tick, sortingKey, position_list, username_list, sortingKey_list) {
+    leaderboard_localPC(gameId: string, tick: number, sortingKey: string, position_list: string, username_list: string, sortingKey_list: string) {
         let response = this.baseResponse()
         response = response
             .setTitle(`Leaderboard for ${sortingKey}`)
@@ -297,7 +300,7 @@ module.exports = class ReponseService {
         return response;
     }
 
-    leaderboard_localMobile(gameId, tick, sortingKey, data_list) {
+    leaderboard_localMobile(gameId: string, tick: number, sortingKey: string, data_list: string) {
         let response = this.baseResponse()
         response = response
             .setTitle(`Leaderboard for ${sortingKey}`)
@@ -309,7 +312,7 @@ module.exports = class ReponseService {
         return response;
     }
 
-    statusPC(game, leaderboard, alive) {
+    statusPC(game: Game, leaderboard: any, alive: boolean) {
         let response = this.baseResponse();
         response = response
             .setTitle(`Status of ${game.settings.general.name}`)
@@ -331,7 +334,7 @@ module.exports = class ReponseService {
         return response;
     }
 
-    statusMobile(game, leaderboard) {
+    statusMobile(game: Game, leaderboard: any) {
         let response = this.baseResponse();
         response = response
             .setTitle(`Status of ${game.settings.general.name}`)
@@ -350,9 +353,9 @@ module.exports = class ReponseService {
         return response;
     }
 
-    userinfo(user, type, isPC) {
+    userinfo(user: User, type: number, isPC: boolean) {
         let response;
-        let sidePages = [];
+        let sidePages: string[] = [];
         switch (type) {
             case 0:
                 response = this.userinfoGames(user);
@@ -398,7 +401,7 @@ module.exports = class ReponseService {
         return response;
     }
 
-    userinfoGames(user) {
+    userinfoGames(user: User) {
         let response = this.baseResponse();
         response = response
             .setTitle(`Userinfo of ${user.username}`)
@@ -418,7 +421,7 @@ module.exports = class ReponseService {
         return response;
     }
 
-    userinfoCombat(user) {
+    userinfoCombat(user: User) {
         let response = this.baseResponse();
         response = response
             .setTitle(`Userinfo of ${user.username}`)
@@ -440,7 +443,7 @@ module.exports = class ReponseService {
         return response;
     }
 
-    userinfoInfrastructure(user) {
+    userinfoInfrastructure(user: User) {
         let response = this.baseResponse();
         response = response
             .setTitle(`Userinfo of ${user.username}`)
@@ -460,7 +463,7 @@ module.exports = class ReponseService {
         return response;
     }
 
-    userinfoResearch(user) {
+    userinfoResearch(user: User) {
         let response = this.baseResponse();
         response = response
             .setTitle(`Userinfo of ${user.username}`)
@@ -480,7 +483,7 @@ module.exports = class ReponseService {
         return response;
     }
 
-    userinfoTrade(user) {
+    userinfoTrade(user: User) {
         let response = this.baseResponse();
         response = response
             .setTitle(`Userinfo of ${user.username}`)
@@ -500,7 +503,7 @@ module.exports = class ReponseService {
         return response;
     }
 
-    error(authorId, reason) {
+    error(authorId: string, reason?: string) {
         let response = `Something went wrong <@${authorId}>,\n`;
         switch (reason) {
             case 'noGame':

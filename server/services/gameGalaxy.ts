@@ -100,7 +100,7 @@ export default class GameGalaxyService {
         this.diplomacyService = diplomacyService;
     }
 
-    async getGalaxy(gameId: DBObjectId, userId: DBObjectId, tick: number | null) {
+    async getGalaxy(gameId: DBObjectId, userId: DBObjectId | null, tick: number | null) {
         // Try loading the game for the user from the cache for historical ticks.
         let gameStateTick = await this.gameService.getGameStateTick(gameId);
 
@@ -191,7 +191,7 @@ export default class GameGalaxyService {
         return game;
     }
 
-    _getCachedGalaxy(gameId: DBObjectId, userId: DBObjectId, requestedTick: number | null, currentTick: number) {
+    _getCachedGalaxy(gameId: DBObjectId, userId: DBObjectId | null, requestedTick: number | null, currentTick: number) {
         // Cache up to 24 ticks, any more and its too much memory.
         // Note: If we limit how much history data is logged we will
         // need to update this logic.
@@ -221,7 +221,7 @@ export default class GameGalaxyService {
         };
     }
 
-    _getUserPlayer(doc: Game, userId: DBObjectId) {
+    _getUserPlayer(doc: Game, userId: DBObjectId | null) {
         if (!userId) {
             return null;
         }

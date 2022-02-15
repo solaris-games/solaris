@@ -3,32 +3,33 @@ const config = require('dotenv').config({ path: __dirname + '/.env' });
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
-const mongooseLoader = require('../../server/dist/loaders/mongoose.js').default;
-const containerLoader = require('../../server/dist/loaders/container.js').default;
+import mongooseLoader from '../../server/loaders/mongoose';
+import containerLoader from '../../server/loaders/container';
+import { DependencyContainer } from '../../server/types/DependencyContainer';
 
-const BotResponseService = require('./services/response.js');
-const BotHelperService = require('./services/botHelper.js');
-const CommandService = require('./services/command.js');
-const ReactionService = require('./services/reaction.js');
-const PublicCommandService = require('./services/publicCommand.js');
-const PrivateCommandService = require('./services/privateCommand.js');
+import BotResponseService from './services/response';
+import BotHelperService from './services/botHelper';
+import CommandService from './services/command';
+import ReactionService from './services/reaction';
+import PublicCommandService from './services/publicCommand';
+import PrivateCommandService from './services/privateCommand';
 
 const prefix = process.env.BOT_PREFIX || '$';
 
-let mongo,
-    container,
-    botResponseService,
-    botHelperService,
-    commandService,
-    reactionService,
-    publicCommandService,
-    privateCommandService;
+let mongo: any,
+    container: DependencyContainer,
+    botResponseService: BotResponseService,
+    botHelperService: BotHelperService,
+    commandService: CommandService,
+    reactionService: ReactionService,
+    publicCommandService: PublicCommandService,
+    privateCommandService: PrivateCommandService;
 
 client.once('ready', () => {
     console.log('-----------------------\nBanning Hyperi0n!\n-----------------------');
 });
 
-client.on('message', async (msg) => {
+client.on('message', async (msg: any) => {
     // Do not respond to bots.
     if (commandService.isBot(msg)) {
         return;
@@ -45,7 +46,7 @@ client.on('message', async (msg) => {
     }
 });
 
-async function contentUnrelated(msg) {
+async function contentUnrelated(msg: any) {
     let suggestionChannels = [process.env.CHAT_ID_SPECIALIST_SUGGESTIONS, process.env.CHAT_ID_GENERAL_SUGGESTIONS];
 
     if (suggestionChannels.includes(msg.channel.id)) {
@@ -57,7 +58,7 @@ async function contentUnrelated(msg) {
     }
 }
 
-async function executeCommand(msg) {
+async function executeCommand(msg: any) {
     const command = commandService.identify(msg, prefix);
 
     if (command.type === 'text') { // A normal server channel

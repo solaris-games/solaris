@@ -1,12 +1,24 @@
-module.exports = class BotHelperService {
+import ReponseService from "./response";
+import GameGalaxyService from '../../../server/services/gameGalaxy';
+import GameService from '../../../server/services/game';
+import { Game } from "../../../server/types/Game";
 
-    constructor(botResponseService, gameGalaxyService, gameService) {
+export default class BotHelperService {
+    botResponseService: ReponseService;
+    gameGalaxyService: GameGalaxyService;
+    gameService: GameService;
+
+    constructor(
+        botResponseService: ReponseService,
+        gameGalaxyService: GameGalaxyService,
+        gameService: GameService
+    ) {
         this.botResponseService = botResponseService;
         this.gameGalaxyService = gameGalaxyService
         this.gameService = gameService
     }
 
-    isValidID(id) {
+    isValidID(id: string) {
         // Splitting up the id and figuring out what characters an ID may consist of
         let characters = id.split('');
         const allowedCharacters = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
@@ -19,7 +31,7 @@ module.exports = class BotHelperService {
     }
 
     async getGame(directions, hasFocus, msg) {
-        let game = []
+        let game: Game | Game[] | null = []
         let focus = '';
         if (directions[directions.length - 1] == "ID") {
             if (this.isValidID(directions[0])) {
@@ -49,27 +61,27 @@ module.exports = class BotHelperService {
         game = this.isValidGame(game, msg);
         if(!game) return false;
 
-        let gameId = game._id;
-        let gameTick = game.state.tick;
+        let gameId = (game as Game)._id;
+        let gameTick = (game as Game).state.tick;
         game = await this.gameGalaxyService.getGalaxy(gameId, null, gameTick);
         return [game, focus];
     }
 
-    isValidGame(game, msg) {
+    isValidGame(game: Game | Game[] | null, msg: any) {
         if (Array.isArray(game)) {
             if (!game.length) {
                 msg.channel.send(this.botResponseService.error(msg.author.id, 'noGame'));
-                return false;
+                return null;
             } else if (game.length > 1) {
                 msg.channel.send(this.botResponseService.error(msg.author.id, 'multipleGames'));
-                return false;
+                return null;
             }
             game = game[0];
         }
         return game;
     }
 
-    isValidFocus(focus, focusArray, msg) {
+    isValidFocus(focus: string, focusArray: string[], msg: any) {
         if (!focusArray.includes(focus)) {
             msg.channel.send(this.botResponseService.error(msg.author.id, 'noFocus'));
             return false;
@@ -77,14 +89,14 @@ module.exports = class BotHelperService {
         return true;
     }
 
-    async getNestedObject(nestedObj, pathArr) {
+    async getNestedObject(nestedObj: any, pathArr: string[]) {
         // Here be dragons
         // This function gets data out of an object, where we know the path we have to take to get to the data
         return pathArr.reduce((obj, key) =>
             (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
     }
 
-    async PCorMobile(botMessage, userMessage, responseFunction, responseData) {
+    async PCorMobile(botMessage: any, userMessage: any, responseFunction: any, responseData: any) {
         // This function allows a user to switch between a mobile and a PC format for the bot response, as some bot responses may not look well on phone or PC
         let isPC = true;
 

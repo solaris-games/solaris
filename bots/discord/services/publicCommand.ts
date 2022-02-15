@@ -1,6 +1,29 @@
-module.exports = class PublicCommandService {
+import ResponseService from "./response";
+import BotHelperService from "./botHelper";
+import GameGalaxyService from '../../../server/services/gameGalaxy';
+import GameService from '../../../server/services/game';
+import LeaderboardService from '../../../server/services/leaderboard';
+import UserService from '../../../server/services/user';
+import GameTypeService from '../../../server/services/gameType';
 
-    constructor(botResponseService, botHelperService, gameGalaxyService, gameService, leaderboardService, userService, gameTypeService) {
+export default class PublicCommandService {
+    botResponseService: ResponseService;
+    botHelperService: BotHelperService;
+    gameGalaxyService: GameGalaxyService;
+    gameService: GameService;
+    leaderboardService: LeaderboardService;
+    userService: UserService;
+    gameTypeService: GameTypeService;
+
+    constructor(
+        botResponseService: ResponseService,
+        botHelperService: BotHelperService,
+        gameGalaxyService: GameGalaxyService,
+        gameService: GameService,
+        leaderboardService: LeaderboardService,
+        userService: UserService,
+        gameTypeService: GameTypeService
+    ) {
         this.botResponseService = botResponseService;
         this.botHelperService = botHelperService;
         this.gameGalaxyService = gameGalaxyService;
@@ -10,12 +33,12 @@ module.exports = class PublicCommandService {
         this.gameTypeService = gameTypeService;
     }
 
-    async gameinfo(msg, directions) {
+    async gameinfo(msg: any, directions: string[]) {
         //!gameinfo <galaxy_name> <focus> ("ID")
 
         // Extracting the focus and game from the message in one simple command, while also validating the game
         if(!this.botHelperService.getGame(directions, true, msg)) return;
-        let [game, focus] = this.botHelperService.getGame(directions, true, msg)
+        let [game, focus] = this.botHelperService.getGame(directions, true, msg) as any
 
         const focusObject = {
             general: 0,
@@ -51,7 +74,7 @@ module.exports = class PublicCommandService {
             .then(async message => this.botHelperService.multiPage(message, msg, Object.keys(focusObject).length, true, responseFunction, responseData, true));
     }
 
-    async invite(msg, directions) {
+    async invite(msg: any, directions: string[]) {
         // $invite <gamelink>
 
         // Plain and simple, extract the link to the game, from which we can extract the id from the game, which we then use to find the game
@@ -62,7 +85,7 @@ module.exports = class PublicCommandService {
         // This checks if the gameID is valid and fetches the game with that ID if it exists
         if (gameId) {
             if (this.botHelperService.isValidID(gameId)) {
-                game = await this.gameService.getByIdSettingsLean(gameId)
+                game = await this.gameService.getByIdSettingsLean(gameId as any)
             } else {
                 return msg.channel.send(this.botResponseService.error(msg.author.id, 'invalidID'))
             }
@@ -79,14 +102,14 @@ module.exports = class PublicCommandService {
         return msg.channel.send(this.botResponseService.invite(game))
     }
 
-    async help(msg, directions) {
+    async help(msg: any, directions: string[]) {
         //$help
         let id = msg.author.id;
         let response = `Hey <@${id}>,\nPlease visit https://github.com/mike-eason/solaris/blob/master/bots/discord/README.md for help on how to interact with me.`;
         return msg.channel.send(response);
     }
 
-    async leaderboard_global(msg, directions) {
+    async leaderboard_global(msg: any, directions: string[]) {
         //$leaderboard_global <filter> (<page>)
         // Calculating how the leaderboard looks
 
@@ -157,12 +180,12 @@ module.exports = class PublicCommandService {
             .then(async message => this.botHelperService.multiPage(message, msg, pageCount, false, responseFunction, responseData, true));
     }
 
-    async leaderboard_local(msg, directions) {
+    async leaderboard_local(msg: any, directions: string[]) {
         //$leaderboard_local <galaxy_name> <filter> ("ID")
 
         // Extracting the sorter and game from the message in one simple command, while also validating the game
         if(!await this.botHelperService.getGame(directions, true, msg)) return;
-        let [game, sortingKey] = await this.botHelperService.getGame(directions, true, msg)
+        let [game, sortingKey] = await this.botHelperService.getGame(directions, true, msg) as any
 
         const sorterArray = ['stars', 'carriers', 'ships', 'economy', 'industry', 'science', 'newShips', 'warpgates', 'starSpecialists', 'carrierSpecialists',
             'totalSpecialists', 'scanning', 'hyperspace', 'terraforming', 'experimentation', 'weapons', 'banking', 'manufacturing', 'specialists']
@@ -225,12 +248,12 @@ module.exports = class PublicCommandService {
             .then(async message => this.botHelperService.PCorMobile(message, msg, responseFunction, responseData));
     }
 
-    async status(msg, directions) {
+    async status(msg: any, directions: string[]) {
         // $status <galaxy_name> ("ID")
 
         // Extracting the sorter and game from the message in one simple command, while also validating the game
         if(!this.botHelperService.getGame(directions, true, msg)) return;
-        let [game, focus] = this.botHelperService.getGame(directions, false, msg)
+        let [game, focus] = this.botHelperService.getGame(directions, false, msg) as any
 
         // Checking if we may actually give information about the game, so if it is an ongoing dark game, or an unstarted game
         if (this.gameTypeService.isDarkModeExtra(game) && !game.state.endDate) {
@@ -296,7 +319,7 @@ module.exports = class PublicCommandService {
             .then(async message => this.botHelperService.PCorMobile(message, msg, responseFunction, responseData));
     }
 
-    async userinfo(msg, directions) {
+    async userinfo(msg: any, directions: string[]) {
         //$userinfo <username> <focus>
 
         //getting the basic values about the focus
