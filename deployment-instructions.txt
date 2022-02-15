@@ -7,3 +7,13 @@ db.games.find({}).forEach(function(game) {
 
     db.games.save(game);
 });
+
+db.games.updateMany({
+    'state.startDate': { $ne: null },
+    'state.endDate': { $eq: null }
+}, {
+    $addToSet: {
+        'settings.specialGalaxy.specialistBans.star': { $each: [ 13, 14, 15 ] },
+        'settings.specialGalaxy.specialistBans.carrier': { $each: [ 17, 18 ] }
+    }
+});

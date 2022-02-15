@@ -331,7 +331,7 @@ export default class CarrierService extends EventEmitter {
             throw new ValidationError('Name must be between greater than 3 and less than or equal to 30 characters long.');
         }
 
-        if (carrier.ownedByPlayerId!.toString() === player._id.toString()) {
+        if (carrier.ownedByPlayerId!.toString() !== player._id.toString()) {
             throw new ValidationError(`Cannot rename carrier, you are not its owner.`);
         }
 

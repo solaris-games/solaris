@@ -19,7 +19,7 @@ export default class BroadcastService {
     }
 
     playerRoomExists(player: Player) {
-        return this.io && this.io.sockets.adapter.rooms[player._id!.toString()] != null;
+        return this.io && this.io.sockets.adapter.rooms[player._id.toString()] != null;
     }
 
     getOnlinePlayers(game: Game) {

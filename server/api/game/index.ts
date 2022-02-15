@@ -294,7 +294,7 @@ export default (router: Router, io, container: DependencyContainer) => {
 
     router.get('/api/game/:gameId/player/:playerId', middleware.loadGamePlayers, async (req, res, next) => {
         try {
-            let user = await container.gameService.getPlayerUserLean(
+            let user = await container.gameService.getPlayerUser(
                 req.game,
                 req.params.playerId
             );

@@ -147,7 +147,7 @@ export default class GameListService {
     }
 
     async getUserPlayerNotifications(game: Game, userId: DBObjectId, includeTurnWaiting: boolean = true, includeUnreadEvents: boolean = true, includeUnreadConversastions: boolean = true): Promise<GameUserNotification> {
-        const player = game.galaxy.players.find(p => p.userId?.toString() === userId.toString());
+        const player = game.galaxy.players.find(p => p.userId && p.userId.toString() === userId.toString());
 
         let unreadConversations: number | null = null,
             unreadEvents: number | null = null,

@@ -260,7 +260,7 @@ export default class GameService extends EventEmitter {
 
         // Disallow if they are already in the game as another player.
         // If the player they are in the game as is afk then that's fine.
-        let existing = game.galaxy.players.find(x => x.userId?.toString() === userId.toString());
+        let existing = game.galaxy.players.find(x => x.userId && x.userId.toString() === userId.toString());
 
         if (existing && !existing.afk) {
             throw new ValidationError('You are already participating in this game.');
@@ -276,10 +276,10 @@ export default class GameService extends EventEmitter {
         // If the user was an afk-er then they are only allowed to join
         // their slot.
         let isAfker = game.afkers.find(x => x.toString() === userId.toString());
-        let isRejoiningAfkSlot = isAfker && player.afk && userId && player.userId?.toString() === userId.toString();
+        let isRejoiningAfkSlot = isAfker && player.afk && userId && player.userId && player.userId.toString() === userId.toString();
 
         // If they have been afk'd then they are only allowed to join their slot again.
-        if (player.afk && isAfker && userId && player.userId?.toString() === userId.toString()) {
+        if (player.afk && isAfker && userId && player.userId && player.userId.toString() === userId.toString()) {
             throw new ValidationError('You can only rejoin this game in your own slot.');
         }
 
@@ -337,7 +337,7 @@ export default class GameService extends EventEmitter {
     assignPlayerToUser(game: Game, player: Player, userId: DBObjectId | null, alias: string, avatar: number) {
         let isAfker = userId && game.afkers.find(x => x.toString() === userId.toString()) != null;
         let isFillingAfkSlot = this.gameStateService.isInProgress(game) && player.afk;
-        let isRejoiningOwnAfkSlot = isFillingAfkSlot && isAfker && (userId && player.userId?.toString() === userId.toString());
+        let isRejoiningOwnAfkSlot = isFillingAfkSlot && isAfker && (userId && player.userId && player.userId.toString() === userId.toString());
 
         // Assign the user to the player.
         player.userId = userId;
@@ -510,12 +510,6 @@ export default class GameService extends EventEmitter {
     }
 
     async getPlayerUser(game: Game, playerId: DBObjectId) {
-        let player = game.galaxy.players.find(p => p._id.toString() === playerId.toString())!;
-
-        return await this.userService.getInfoById(player.userId!);
-    }
-
-    async getPlayerUserLean(game: Game, playerId: DBObjectId) {
         if (this.gameTypeService.isAnonymousGame(game)) {
             return null;
         }

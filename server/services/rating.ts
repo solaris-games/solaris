@@ -21,16 +21,6 @@ export default class RatingService {
         this.userService = userService;
     }
 
-    async resetAllEloRatings() {
-        await this.userRepo.updateMany({
-            'achievements.eloRating': { $ne: null }
-        }, {
-            $set: {
-                'achievements.eloRating': null
-            }
-        });
-    }
-
     recalculateEloRating(userA: User, userB: User, userAIsWinner: boolean) {
         // Note that some players may no longer have accounts, in which case consider it a win for the
         // player against the same rank as their own.
@@ -49,19 +39,6 @@ export default class RatingService {
         if (userB) {
             userB.achievements.eloRating = eloResult.opponentRating;
         }
-    }
-
-    async _listCompleted1v1s() {
-        return await this.gameRepo.find({
-            'settings.general.type': { $in: ['1v1_rt', '1v1_tb'] },
-            'state.endDate': { $ne: null }
-        }, {
-            'state': 1,
-            'galaxy.players._id': 1,
-            'galaxy.players.userId': 1
-        }, {
-            'state.endDate': 1
-        });
     }
 
 };

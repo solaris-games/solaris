@@ -475,7 +475,7 @@ export default class StarService extends EventEmitter {
         }
 
         let carrierPlayer = game.galaxy.players.find(p => p._id.toString() === carrier.ownedByPlayerId!.toString())!;
-        let carrierUser = carrierPlayer.userId ? gameUsers.find(u => carrierPlayer.userId && u._id.toString() === carrierPlayer.userId.toString()) : null;
+        let carrierUser = gameUsers.find(u => carrierPlayer.userId && u._id.toString() === carrierPlayer.userId.toString()) || null;
 
         if (carrierUser && !carrierPlayer.defeated && !this.gameTypeService.isTutorialGame(game)) {
             carrierUser.achievements.combat.stars.captured++;
@@ -658,7 +658,7 @@ export default class StarService extends EventEmitter {
 
         // Capture the star.
         let newStarPlayer = attackers.find(p => p._id.toString() === closestPlayerId.toString())!;
-        let newStarUser = attackerUsers.find(u => u._id.toString() === newStarPlayer.userId!.toString());
+        let newStarUser = attackerUsers.find(u => newStarPlayer.userId && u._id.toString() === newStarPlayer.userId.toString());
         let newStarPlayerCarriers = attackerCarriers.filter(c => c.ownedByPlayerId!.toString() === newStarPlayer._id.toString());
 
         let captureReward = star.infrastructure.economy! * 10; // Attacker gets 10 credits for every eco destroyed.
@@ -677,7 +677,7 @@ export default class StarService extends EventEmitter {
         // Reset the ignore bulk upgrade statuses as it has been captured by a new player.
         this.resetIgnoreBulkUpgradeStatuses(star);
 
-        const oldStarUser = owner.userId ? defenderUsers.find(u => owner.userId && u._id.toString() === owner.userId.toString()) : null;
+        const oldStarUser = defenderUsers.find(u => owner.userId && u._id.toString() === owner.userId.toString()) || null;
 
         if (!isTutorialGame) {
             if (oldStarUser && !owner.defeated) {

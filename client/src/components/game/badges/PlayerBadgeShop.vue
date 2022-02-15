@@ -66,6 +66,8 @@ export default {
 
             if (response.status === 200) {
                 this.userCredits = response.data
+
+                this.$store.commit('setUserCredits', response.data.credits)
             }
         } catch (err) {
             console.error(err)

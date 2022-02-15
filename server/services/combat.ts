@@ -150,7 +150,7 @@ export default class CombatService extends EventEmitter {
         return combatResult;
     }
 
-    _calculateEffectiveWeaponsLevels(game: Game, star: Star | null, defenders: Player[], attackers: Player[], defenderCarriers: Carrier[], attackerCarriers: Carrier[]) {        // Calculate the combined combat result taking into account
+    _calculateEffectiveWeaponsLevels(game: Game, star: Star | null, defenders: Player[], attackers: Player[], defenderCarriers: Carrier[], attackerCarriers: Carrier[]) {
         let isCarrierToStarCombat = star != null;
 
         // Calculate the total number of defending ships
@@ -184,7 +184,10 @@ export default class CombatService extends EventEmitter {
         attackerWeaponsTechLevel = Math.max(attackerWeaponsTechLevel - attackerWeaponsDeduction, 1);
 
         // Check to see if weapons tech should be swapped (joker specialist)
-        let shouldSwapWeaponsTech = this._shouldSwapWeaponsTech(defenderCarriers) || this._shouldSwapWeaponsTech(attackerCarriers);
+        let defenderSwapWeapons = this._shouldSwapWeaponsTech(defenderCarriers);
+        let attackerSwapWeapons = this._shouldSwapWeaponsTech(attackerCarriers);
+
+        let shouldSwapWeaponsTech = defenderSwapWeapons !== attackerSwapWeapons; // Defender should swap OR attacker should swap BUT not both.
 
         if (shouldSwapWeaponsTech) {
             let oldDefenderWeaponsTechLevel = defenderWeaponsTechLevel;
@@ -256,7 +259,7 @@ export default class CombatService extends EventEmitter {
         let attackerUsers: User[] = [];
         
         for (let defender of defenders) {
-            let user = gameUsers.find(u => u._id.toString() === defender.userId!.toString());
+            let user = gameUsers.find(u => defender.userId && u._id.toString() === defender.userId.toString());
             
             if (user) {
                 defenderUsers.push(user);
@@ -264,7 +267,7 @@ export default class CombatService extends EventEmitter {
         }
         
         for (let attacker of attackers) {
-            let user = gameUsers.find(u => u._id.toString() === attacker.userId!.toString());
+            let user = gameUsers.find(u => attacker.userId && u._id.toString() === attacker.userId.toString());
             
             if (user) {
                 attackerUsers.push(user);
@@ -494,7 +497,7 @@ export default class CombatService extends EventEmitter {
 
         // Add combat result stats to defender achievements.
         for (let defenderUser of defenderUsers) {
-            let defender = defenders.find(u => u.userId?.toString() === defenderUser._id.toString())!;
+            let defender = defenders.find(u => u.userId && u.userId.toString() === defenderUser._id.toString())!;
 
             if (defender && !defender.defeated) {
                 let playerCarriers = defenderCarriers.filter(c => c.ownedByPlayerId!.toString() === defender._id.toString());
@@ -511,7 +514,7 @@ export default class CombatService extends EventEmitter {
 
         // Add combat result stats to attacker achievements.
         for (let attackerUser of attackerUsers) {
-            let attacker = attackers.find(u => u.userId?.toString() === attackerUser._id.toString())!;
+            let attacker = attackers.find(u => u.userId && u.userId.toString() === attackerUser._id.toString())!;
 
             if (attacker && !attacker.defeated) {
                 let playerCarriers = attackerCarriers.filter(c => c.ownedByPlayerId!.toString() === attacker._id.toString());

@@ -395,6 +395,7 @@ export default {
         'turnBased': 'Turn Based',
         'random': 'Random',
         'weightedCenter': 'Weighted (Center)',
+        'irregular': 'Irregular',
         'circular': 'Circular',
         'spiral': 'Spiral',
         'doughnut': 'Doughnut',

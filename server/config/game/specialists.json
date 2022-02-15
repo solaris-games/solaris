@@ -281,7 +281,7 @@
             "id": 18,
             "key": "vintage-robot",
             "name": "Joker",
-            "description": "When participating in combat, the calculated weapons technology levels are swapped between the two sides.",
+            "description": "When participating in combat, the calculated weapons technology levels are swapped between the two sides unless both sides have a Joker.",
             "baseCostCredits": 1000,
             "baseCostCreditsSpecialists": 10,
             "oneShot": false,
