@@ -16,6 +16,11 @@ export default {
   components: {
     'view-container': ViewContainer,
     'view-title': ViewTitle
+  },
+  mounted () {
+    let credits = +this.$route.query.credits
+
+    this.$store.commit('setUserCredits', this.$store.state.userCredits + credits)
   }
 }
 </script>

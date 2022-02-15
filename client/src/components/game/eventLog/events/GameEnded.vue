@@ -4,7 +4,7 @@
     The game has ended, send congratulations to <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{getWinnerAlias()}}</a>!
   </p>
   <p>
-    Show your support and award <span class="text-warning">renown</span> to your friends and enemies alike.
+    Show your support and award <span class="text-warning">badges</span> and <span class="text-warning">renown</span> to your friends and enemies alike.
   </p>
 
   <!-- Rank Change -->
@@ -74,7 +74,7 @@ export default {
   },
   computed: {
     hasRankResults () {
-      return this.event.data && this.event.data.rankingResult && this.event.data.rankingResult.ranks
+      return this.event.data && this.event.data.rankingResult && this.event.data.rankingResult.ranks && this.event.data.rankingResult.ranks.length
     },
     hasEloRatingResult () {
       return this.event.data && this.event.data.rankingResult && this.event.data.rankingResult.eloRating

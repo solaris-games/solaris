@@ -156,13 +156,13 @@ export default {
       return this.event.data.combatResult.star.after + this.defenderCarriers.reduce((sum, c) => sum + c.after | 0, 0)
     },
     totalAttackerBefore: function () {
-      return this.event.data.combatResult.star.before + this.attackerCarriers.reduce((sum, c) => sum + c.before | 0, 0)
+      return this.attackerCarriers.reduce((sum, c) => sum + c.before | 0, 0)
     },
     totalAttackerLost: function () {
-      return this.event.data.combatResult.star.lost + this.attackerCarriers.reduce((sum, c) => sum + c.lost | 0, 0)
+      return this.attackerCarriers.reduce((sum, c) => sum + c.lost | 0, 0)
     },
     totalAttackerAfter: function () {
-      return this.event.data.combatResult.star.after + this.attackerCarriers.reduce((sum, c) => sum + c.after | 0, 0)
+      return this.attackerCarriers.reduce((sum, c) => sum + c.after | 0, 0)
     }
   }
 }

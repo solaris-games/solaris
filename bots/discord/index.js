@@ -3,8 +3,8 @@ const config = require('dotenv').config({ path: __dirname + '/.env' });
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
-const mongooseLoader = require('../../server/loaders/mongoose.js');
-const containerLoader = require('../../server/loaders/container.js');
+const mongooseLoader = require('../../server/dist/loaders/mongoose.js').default;
+const containerLoader = require('../../server/dist/loaders/container.js').default;
 
 const BotResponseService = require('./services/response.js');
 const BotHelperService = require('./services/botHelper.js');

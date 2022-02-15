@@ -3,38 +3,45 @@
     // set up development environment.
     "version": "0.2.0",
     "configurations": [
+        // Jobs
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Jobs",
+            "protocol": "inspector",
+            "cwd": "${workspaceFolder}/server",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run-script", "start-jobs:dev"],
+            "envFile": ".env"
+        },
         {
             "type": "node",
             "request": "attach",
             "name": "Attach to Jobs",
-            "port": 9230
+            "port": 9230,
+            "restart": true
+        },
+
+        // API
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch API",
+            "protocol": "inspector",
+            "cwd": "${workspaceFolder}/server",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run-script", "start-api:dev"],
+            "envFile": ".env"
         },
         {
             "type": "node",
             "request": "attach",
             "name": "Attach to API",
-            "port": 9231
+            "port": 9231,
+            "restart": true
         },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Launch Jobs",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "program": "${workspaceFolder}/server/jobs/index.js",
-            "envFile": "${workspaceFolder}/server/.env"
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Launch API",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "program": "${workspaceFolder}/server/api/index.js",
-            "envFile": "${workspaceFolder}/server/.env"
-        },
+
+        // Bots
         {
             "type": "node",
             "request": "launch",
