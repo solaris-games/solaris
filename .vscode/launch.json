@@ -42,15 +42,23 @@
         },
 
         // Bots
+        // Discord
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Bot",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "program": "${workspaceFolder}/bots/discord/index.js",
-            "envFile": "${workspaceFolder}/bots/discord/.env"
+            "name": "Launch Discord Bot",
+            "protocol": "inspector",
+            "cwd": "${workspaceFolder}/bots/discord",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run-script", "start:dev"],
+            "envFile": ".env"
+        },
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "Attach to Discord Bot",
+            "port": 9232,
+            "restart": true
         }
     ]
 }

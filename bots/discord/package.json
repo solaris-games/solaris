@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start:dev": "ts-node-dev --transpile-only --respawn --inspect=9230 index.ts",
+    "start:dev": "ts-node-dev --transpile-only --respawn --inspect=9232 index.ts",
     "start:prod": "node dist/index.js",
     "prebuild": "rm -rf ./dist",
     "build": "tsc",
