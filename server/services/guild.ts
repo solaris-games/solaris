@@ -96,6 +96,7 @@ export default class GuildService {
         let guilds = await this.guildRepo.find({
             // All guilds
         }, {
+            _id: 1,
             name: 1,
             tag: 1,
             applicants: 1
@@ -105,6 +106,7 @@ export default class GuildService {
             let hasApplied = this._isApplicant(g, userId);
 
             return {
+                _id: g._id,
                 name: g.name,
                 tag: g.tag,
                 hasApplied
