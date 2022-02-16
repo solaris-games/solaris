@@ -64,11 +64,11 @@ async function executeCommand(msg: any) {
     if (command.type === 'text') { // A normal server channel
         if (publicCommandService[command.cmd] && commandService.isCorrectChannel(msg, command.cmd)) {
             //Executes the command, and then deletes the message that ordered it
-            publicCommandService[command.cmd](msg, command.directions);
+            await publicCommandService[command.cmd](msg, command.directions);
         }
     } else if (command.type === 'dm') { // A chat with one specific person
         if (privateCommandService[command.cmd]) {
-            privateCommandService[command.cmd](msg, command.directions);
+            await privateCommandService[command.cmd](msg, command.directions);
         }
     }
 }

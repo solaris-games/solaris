@@ -37,8 +37,8 @@ export default class PublicCommandService {
         //!gameinfo <galaxy_name> <focus> ("ID")
 
         // Extracting the focus and game from the message in one simple command, while also validating the game
-        if(!this.botHelperService.getGame(directions, true, msg)) return;
-        let [game, focus] = this.botHelperService.getGame(directions, true, msg) as any
+        if(!(await this.botHelperService.getGame(directions, true, msg))) return;
+        let [game, focus] = await this.botHelperService.getGame(directions, true, msg) as any;
 
         const focusObject = {
             general: 0,
@@ -85,9 +85,9 @@ export default class PublicCommandService {
         // This checks if the gameID is valid and fetches the game with that ID if it exists
         if (gameId) {
             if (this.botHelperService.isValidID(gameId)) {
-                game = await this.gameService.getByIdSettingsLean(gameId as any)
+                game = await this.gameService.getByIdSettingsLean(gameId as any);
             } else {
-                return msg.channel.send(this.botResponseService.error(msg.author.id, 'invalidID'))
+                return msg.channel.send(this.botResponseService.error(msg.author.id, 'invalidID'));
             }
 
             if (!game) {
@@ -99,7 +99,7 @@ export default class PublicCommandService {
         }
 
         // Sending the final message
-        return msg.channel.send(this.botResponseService.invite(game))
+        return msg.channel.send(this.botResponseService.invite(game));
     }
 
     async help(msg: any, directions: string[]) {
@@ -116,7 +116,7 @@ export default class PublicCommandService {
         // Determining basic values for the leaderboard, which will be used much later in the program
         let sortingKey = directions[0];
         let leaderboardSize = await this.userService.getUserCount();
-        let pageCount = Math.ceil(leaderboardSize / 20)
+        let pageCount = Math.ceil(leaderboardSize / 20);
 
         // All possible and allowed sorters that can be used
         let sorterArray = ['rank', 'victories', 'renown', 'joined', 'completed', 'quit', 'defeated', 'afk', 'ships-killed',
@@ -139,8 +139,8 @@ export default class PublicCommandService {
             let key = responseData.sortingKey;
 
             // Getting all the actual detailed information from the global leaderboard
-            let limit = 20
-            let skip = 20 * page // Page 0 is the first page
+            let limit = 20;
+            let skip = 20 * page; // Page 0 is the first page
             let result = await this.leaderboardService.getLeaderboard(limit, key, skip);
             let leaderboard = result.leaderboard;
             if (isPC) {
@@ -149,31 +149,31 @@ export default class PublicCommandService {
                 let username_list = "";
                 let sortingKey_list = "";
                 for (let i = 0; i < leaderboard.length; i++) {
-                    if (!leaderboard[i]) { break; }
+                    if (!leaderboard[i]) { break; };
                     position_list += (leaderboard[i].position + page * 20) + "\n";
                     username_list += leaderboard[i].username + "\n";
-                    sortingKey_list += await this.botHelperService.getNestedObject(leaderboard[i], result.sorter.fullKey.split('.')) + "\n"
+                    sortingKey_list += await this.botHelperService.getNestedObject(leaderboard[i], result.sorter.fullKey.split('.')) + "\n";
                 }
-                let response = this.botResponseService.leaderboard_globalPC(page, sortingKey, position_list, username_list, sortingKey_list)
+                let response = this.botResponseService.leaderboard_globalPC(page, sortingKey, position_list, username_list, sortingKey_list);
                 return response;
             }
             // This only runs now if the response is for mobile/tablet users
             // It is made to generate a response that makes sense to those users
             let data_list = "";
             for (let i = 0; i < leaderboard.length; i++) {
-                if (!leaderboard[i]) { break; }
+                if (!leaderboard[i]) { break; };
                 data_list += (leaderboard[i].position + page * 20) + ' / ' + await this.botHelperService.getNestedObject(leaderboard[i], result.sorter.fullKey.split('.')) + ' / ' + leaderboard[i].username + '\n';
             }
             let response = this.botResponseService.leaderboard_globalMobile(page, sortingKey, data_list);
             return response;
-        }
+        };
 
         // Generating the responseData, which in turn, fixes the message of the bot together with the responseFunction
         let responseData = {
             page: 0,
             isPC: true,
             sortingKey
-        }
+        };
 
         // Sending the message, and activating the multiPage function, as the global leaderboard has tons and tons of non-looping pages
         msg.channel.send(await responseFunction(responseData))
@@ -184,21 +184,21 @@ export default class PublicCommandService {
         //$leaderboard_local <galaxy_name> <filter> ("ID")
 
         // Extracting the sorter and game from the message in one simple command, while also validating the game
-        if(!await this.botHelperService.getGame(directions, true, msg)) return;
-        let [game, sortingKey] = await this.botHelperService.getGame(directions, true, msg) as any
+        if(!(await this.botHelperService.getGame(directions, true, msg))) return;
+        let [game, sortingKey] = await this.botHelperService.getGame(directions, true, msg) as any;
 
         const sorterArray = ['stars', 'carriers', 'ships', 'economy', 'industry', 'science', 'newShips', 'warpgates', 'starSpecialists', 'carrierSpecialists',
-            'totalSpecialists', 'scanning', 'hyperspace', 'terraforming', 'experimentation', 'weapons', 'banking', 'manufacturing', 'specialists']
+            'totalSpecialists', 'scanning', 'hyperspace', 'terraforming', 'experimentation', 'weapons', 'banking', 'manufacturing', 'specialists'];
 
         // Checking if the sorter that the player specified is actually allowed
         if (!this.botHelperService.isValidFocus(sortingKey, sorterArray, msg)) return;
 
         // Checking if we may actually give information about the game, so if it is an ongoing dark game, or an unstarted game
         if (this.gameTypeService.isDarkModeExtra(game) && !game.state.endDate) {
-            return msg.channel.send(this.botResponseService.error(msg.author.id, 'extraDark'))
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'extraDark'));
         }
         if (!game.state.startDate) {
-            return msg.channel.send(this.botResponseService.error(msg.author.id, 'notStarted'))
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'notStarted'));
         }
 
         // This function is used to calculate from the responsedata what the response looks like
@@ -234,14 +234,14 @@ export default class PublicCommandService {
                 data_list += (i + 1) + ' / ' + await this.botHelperService.getNestedObject(leaderboard[i], fullKey.split('.')) + ' / ' + leaderboard[i].player.alias + '\n';
             }
             return this.botResponseService.leaderboard_localMobile(game._id, game.state.tick, sortingKey, data_list);
-        }
+        };
 
         // Generating the responseData, which in turn, fixes the message of the bot together with the responseFunction
         let responseData = {
             game,
             sortingKey,
             isPC: true
-        }
+        };
 
         // Sending the message, and activating the PCorMobile function, as the local leaderboard is usable for both mobile and PC users
         msg.channel.send(await responseFunction(responseData))
@@ -252,15 +252,15 @@ export default class PublicCommandService {
         // $status <galaxy_name> ("ID")
 
         // Extracting the sorter and game from the message in one simple command, while also validating the game
-        if(!this.botHelperService.getGame(directions, true, msg)) return;
-        let [game, focus] = this.botHelperService.getGame(directions, false, msg) as any
+        if(!(await this.botHelperService.getGame(directions, false, msg))) return;
+        let [game, focus] = await this.botHelperService.getGame(directions, false, msg) as any;
 
         // Checking if we may actually give information about the game, so if it is an ongoing dark game, or an unstarted game
         if (this.gameTypeService.isDarkModeExtra(game) && !game.state.endDate) {
-            return msg.channel.send(this.botResponseService.error(msg.author.id, 'extraDark'))
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'extraDark'));
         }
         if (!game.state.startDate) {
-            return msg.channel.send(this.botResponseService.error(msg.author.id, 'notStarted'))
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'notStarted'));
         }
 
         // This function is used to calculate from the responsedata what the response looks like
@@ -278,7 +278,7 @@ export default class PublicCommandService {
             }
             // Generating the format for mobile/tablet users
             return this.botResponseService.statusMobile(game, leaderboard);
-        }
+        };
 
         // Generating the local leaderboards for the requested game
         let leaderboardData = {
@@ -291,16 +291,16 @@ export default class PublicCommandService {
             weapons: this.leaderboardService.getLeaderboardRankings(game, 'weapons'),
             manufacturing: this.leaderboardService.getLeaderboardRankings(game, 'manufacturing'),
             specialists: this.leaderboardService.getLeaderboardRankings(game, 'specialists')
-        }
+        };
 
         // Calculating the count of living players
-        let alive = game.galaxy.players.reduce((val, player) => player.defeated ? val : val + 1, 0)
+        let alive = game.galaxy.players.reduce((val, player) => player.defeated ? val : val + 1, 0);
         let leaderboard = {};
         let leaderboardSize = game.settings.general.playerLimit <= 3 ? game.settings.general.playerLimit : 3;
 
         // Generating the leaderboard in the right format
         for (let [key, value] of Object.entries(leaderboardData)) {
-            leaderboard[key] = ""
+            leaderboard[key] = "";
             for (let i = 0; i < leaderboardSize; i++) {
                 leaderboard[key] += await this.botHelperService.getNestedObject(value.leaderboard[i], value.fullKey.split('.')) + ' / ' + value.leaderboard[i].player.alias + '\n';
             }
@@ -357,7 +357,7 @@ export default class PublicCommandService {
             let page = responseData.page;
             let user = responseData.user;
             return this.botResponseService.userinfo(user, page, isPC);
-        }
+        };
 
         // Generating the responseData, which in turn, fixes the message of the bot together with the responseFunction
         let pageCount = focusArray.length;
@@ -365,7 +365,7 @@ export default class PublicCommandService {
             user: await this.userService.getByUsernameAchievementsLean(username),
             page: focusObject[focus],
             isPC: true
-        }
+        };
 
         // Sending the message, and activating the multiPage function, as the userinfo has 5 looping pages
         msg.channel.send(await responseFunction(responseData))

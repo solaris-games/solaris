@@ -30,32 +30,32 @@ export default class BotHelperService {
         return validCharacters && id.length === 24;
     }
 
-    async getGame(directions, hasFocus, msg) {
-        let game: Game | Game[] | null = []
+    async getGame(directions: any, hasFocus: any, msg: any) {
+        let game: Game | Game[] | null = [];
         let focus = '';
         if (directions[directions.length - 1] == "ID") {
             if (this.isValidID(directions[0])) {
-                game = await this.gameService.getByIdAllLean(directions[0])
+                game = await this.gameService.getByIdAllLean(directions[0]);
             } else {
-                msg.channel.send(this.botResponseService.error(msg.author.id, 'invalidID'))
+                msg.channel.send(this.botResponseService.error(msg.author.id, 'invalidID'));
                 return false;
             }
             if (hasFocus) {
-                focus = directions[directions.length - 2]
+                focus = directions[directions.length - 2];
             }
         } else {
             if(directions.length <= (0 + hasFocus)) {
-                msg.channel.send(this.botResponseService.error('noDirections'))
-                return false
+                msg.channel.send(this.botResponseService.error(msg.author.id, 'noDirections'));
+                return false;
             }
             let game_name = "";
             for (let i = 0; i < directions.length - hasFocus; i++) {
                 game_name += directions[i] + ' ';
             }
-            game_name = game_name.trim()
+            game_name = game_name.trim();
             game = await this.gameService.getByNameStateSettingsLean(game_name);
             if(hasFocus) {
-                focus = directions[directions.length - 1]
+                focus = directions[directions.length - 1];
             }
         }
         game = this.isValidGame(game, msg);
@@ -93,7 +93,7 @@ export default class BotHelperService {
         // Here be dragons
         // This function gets data out of an object, where we know the path we have to take to get to the data
         return pathArr.reduce((obj, key) =>
-            (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
+            (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj);
     }
 
     async PCorMobile(botMessage: any, userMessage: any, responseFunction: any, responseData: any) {
@@ -110,7 +110,7 @@ export default class BotHelperService {
         // Creating a collector that checks if the right person (the one that sent the command) responds with any of the right emojis
         const collector = botMessage.createReactionCollector(
             (reaction, user) => (reaction.emoji.name === '📱') && (user.id === userMessage.author.id), { time: 60000 }
-        )
+        );
 
         // Activating the collector
         collector.on('collect', () => {
@@ -130,7 +130,7 @@ export default class BotHelperService {
                 } catch (error) {
                     console.log('One of the emojis failed to react:', error);
                 }
-            })
+            });
         });
     }
 
@@ -149,7 +149,7 @@ export default class BotHelperService {
         // Creating a collector that checks if the right person (the one that sent the command) responds with any of the right emojis
         const collector = botMessage.createReactionCollector(
             (reaction, user) => emojiArray.includes(reaction.emoji.name) && user.id === userMessage.author.id, { time: 60000 }
-        )
+        );
 
         // Activating the collector
         collector.on('collect', (reaction) => {
@@ -173,7 +173,7 @@ export default class BotHelperService {
                         if (checkPC) isPC = !isPC;
                         break;
                     default:
-                        console.log('Something broke, unidentified caught emoji...')
+                        console.log('Something broke, unidentified caught emoji...');
                 }
 
                 // Making sure that pages never go in the negatives, because when that happens, the page either has to be 0, or has to loop around to the end
@@ -185,7 +185,7 @@ export default class BotHelperService {
                     }
                 } else if (pageNumber >= pageCount) {
                     if (looping) {
-                        pageNumber = pageNumber % pageCount // When it loops around, the page with index pageCount is the same as the one with index 0.
+                        pageNumber = pageNumber % pageCount; // When it loops around, the page with index pageCount is the same as the one with index 0.
                     } else {
                         pageNumber = pageCount - 1; // When it doesn't loop around, any page above the maximum is just the maximum page.
                     }
@@ -196,8 +196,8 @@ export default class BotHelperService {
                 responseData.page = pageNumber;
 
                 // Generating a response and editing the previously sent message from the bot with that response
-                let editedResponse = await responseFunction(responseData)
-                botMessage.edit(editedResponse)
+                let editedResponse = await responseFunction(responseData);
+                botMessage.edit(editedResponse);
 
                 // Reacting with the emojis again to make sure the user can use this system again
                 await this.reactPagesMobile(botMessage, looping, pageNumber, pageCount, checkPC);
