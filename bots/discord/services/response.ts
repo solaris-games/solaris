@@ -54,12 +54,12 @@ export default class ReponseService {
                     { name: sidePages[0], value: "⬅️⬅️⬅️", inline: true },
                     { name: "\u200B", value: "\u200B", inline: true },
                     { name: sidePages[1], value: "➡️➡️➡️", inline: true }
-                )
+                );
         } else {
             response = response
                 .addFields(
                     { name: sidePages[0] + " / " + sidePages[1], value: "⬅️ / ➡️" }
-                )
+                );
         }
         return response;
     }
@@ -69,7 +69,7 @@ export default class ReponseService {
         let gameId = game._id;
         let response = this.baseResponse();
         response = response
-            .setURL(`https://solaris.games/#/game?id=${gameId}`)
+            .setURL(`https://solaris.games/#/game?id=${gameId}`);
         if (game.settings.general.description) {
             response = response
                 .setDescription(game.settings.general.description);
@@ -96,7 +96,7 @@ export default class ReponseService {
         let gameId = game._id;
         let response = this.baseResponse();
         response = response
-            .setURL(`https://solaris.games/#/game?id=${gameId}`)
+            .setURL(`https://solaris.games/#/game?id=${gameId}`);
         if (game.settings.general.description) {
             response = response
                 .setDescription(game.settings.general.description);
@@ -129,7 +129,7 @@ export default class ReponseService {
         let gameId = game._id;
         let response = this.baseResponse();
         response = response
-            .setURL(`https://solaris.games/#/game?id=${gameId}`)
+            .setURL(`https://solaris.games/#/game?id=${gameId}`);
         if (game.settings.general.description) {
             response = response
                 .setDescription(game.settings.general.description);
@@ -162,7 +162,7 @@ export default class ReponseService {
         let gameId = game._id;
         let response = this.baseResponse();
         response = response
-            .setURL(`https://solaris.games/#/game?id=${gameId}`)
+            .setURL(`https://solaris.games/#/game?id=${gameId}`);
         if (game.settings.general.description) {
             response = response
                 .setDescription(game.settings.general.description);
@@ -188,10 +188,7 @@ export default class ReponseService {
                 { name: "Banking", value: game.settings.technology.researchCosts.banking, inline: true },//next line
                 { name: "Manufacturing", value: game.settings.technology.researchCosts.manufacturing, inline: true },
                 { name: "Specialists", value: game.settings.technology.researchCosts.specialists, inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },//next line
-                { name: "Banking Reward", value: game.settings.technology.bankingReward, inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },
-                { name: "\u200B", value: "\u200B", inline: true }
+                { name: "Banking Reward", value: game.settings.technology.bankingReward, inline: true }//next line
             );
         return response;
     }
@@ -201,7 +198,7 @@ export default class ReponseService {
         let gameId = game._id;
         let response = this.baseResponse();
         response = response
-            .setURL(`https://solaris.games/#/game?id=${gameId}`)
+            .setURL(`https://solaris.games/#/game?id=${gameId}`);
         if (game.settings.general.description) {
             response = response
                 .setDescription(game.settings.general.description);
@@ -255,13 +252,17 @@ export default class ReponseService {
                 { name: "Time per Turn", value: game.settings.gameTime.turnJumps + "hours", inline: true }//next line
             );
         }
+        if (game.settings.general.description) {
+            response = response
+                .setDescription(game.settings.general.description);
+        }
         return response;
     }
 
     leaderboard_globalPC(page: number, sortingKey: string, position_list: string, username_list: string, sortingKey_list: string) {
-        let lowerLimit = page * 20 + 1
-        let upperLimit = (page + 1) * 20
-        let response = this.baseResponse()
+        let lowerLimit = page * 20 + 1;
+        let upperLimit = (page + 1) * 20;
+        let response = this.baseResponse();
         response = response
             .setTitle(`Top ${lowerLimit}-${upperLimit} for ${sortingKey}`)
             .setURL(`https://solaris.games/#/leaderboard`)
@@ -287,7 +288,7 @@ export default class ReponseService {
     }
 
     leaderboard_localPC(gameId: string, tick: number, sortingKey: string, position_list: string, username_list: string, sortingKey_list: string) {
-        let response = this.baseResponse()
+        let response = this.baseResponse();
         response = response
             .setTitle(`Leaderboard for ${sortingKey}`)
             .setURL(`https://solaris.games/#/game?id=${gameId}`)
@@ -301,7 +302,7 @@ export default class ReponseService {
     }
 
     leaderboard_localMobile(gameId: string, tick: number, sortingKey: string, data_list: string) {
-        let response = this.baseResponse()
+        let response = this.baseResponse();
         response = response
             .setTitle(`Leaderboard for ${sortingKey}`)
             .setURL(`https://solaris.games/#/game?id=${gameId}`)
@@ -391,12 +392,12 @@ export default class ReponseService {
                     { name: sidePages[0], value: "⬅️⬅️⬅️", inline: true },
                     { name: "\u200B", value: "\u200B", inline: true },
                     { name: sidePages[1], value: "➡️➡️➡️", inline: true }
-                )
+                );
         } else {
             response = response
                 .addFields(
                     { name: sidePages[0] + " / " + sidePages[1], value: "⬅️ / ➡️" }
-                )
+                );
         }
         return response;
     }
@@ -436,9 +437,10 @@ export default class ReponseService {
                 { name: "Specialists Lost", value: user.achievements.combat.losses.specialists, inline: true },//next line
                 { name: "Stars Captured", value: user.achievements.combat.stars.captured, inline: true },
                 { name: "Stars Lost", value: user.achievements.combat.stars.lost, inline: true },
-                { name: "Capitals Captured", value: user.achievements.combat.homeStars.captured, inline: true },
+                { name: "Capitals Captured", value: user.achievements.combat.homeStars.captured, inline: true },//next line
                 { name: "Capitals Lost", value: user.achievements.combat.homeStars.lost, inline: true },
-                { name: "\u200B", value: "\u200B", inline: true }
+                { name: "\u200B", value: "\u200B", inline: true },
+                { name: "\u200B", value: "\u200B", inline: true }//next line
             );
         return response;
     }
@@ -516,22 +518,22 @@ export default class ReponseService {
                 response += 'No user was found with this name, check if you spelled the name correctly.';
                 break;
             case 'noFocus':
-                response += 'No focus was specified, make sure to add it in the command.';
+                response += 'No focus was specified or the specified focus was not recognised, make sure to check what focusses you can add.';
                 break;
             case 'extraDark':
-                response += 'The game you asked about is an Extra Dark game, which means I cannot tell you anything about it.'
+                response += 'The game you asked about is an Extra Dark game, which means I cannot tell you anything about it.';
                 break;
             case 'invalidSorter':
-                response += 'The sorter you specified does not exist, make sure you spelled it correctly.'
+                response += 'The sorter you specified does not exist, make sure you spelled it correctly.';
                 break;
             case 'notStarted':
-                response += 'The game has not started yet, so no usefull information can be given about it.'
+                response += 'The game has not started yet, so no usefull information can be given about it.';
                 break;
             case 'invalidID':
-                response += 'The ID of the game you gave is invalid, please check if it is correct.'
+                response += 'The ID of the game you gave is invalid, please check if it is correct.';
                 break;
             case 'noDirections':
-                response += 'The command you executed had too little directions, check `$help` for a detailed explanation on each command.'
+                response += 'The command you executed had too little directions, check `$help` for a detailed explanation on each command.';
                 break;
             default:
                 //This should never happen
