@@ -6,10 +6,11 @@ export interface KnownAttack {
 
 export interface InvasionInProgress {
     arrivalTick: number;
+    star: string;
 }
 
 export interface StartedClaim {
-
+    star: string;
 }
 
 export interface AiState {
