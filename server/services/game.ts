@@ -235,8 +235,9 @@ export default class GameService extends EventEmitter {
 
         // Perform a new player check if the game is for established players only.
         // If the player is new then they cannot join.
+
         if (this.gameTypeService.isForEstablishedPlayersOnly(game)) {
-            let isEstablishedPlayer = await this.achievementService.isEstablishedPlayer(userId);
+            const isEstablishedPlayer = await this.userService.isEstablishedPlayer(userId);
             
             // Disallow new players from joining non-new-player-games games if they haven't completed a game yet.
             if (!isEstablishedPlayer && !this.gameTypeService.isNewPlayerGame(game)) {
@@ -279,7 +280,7 @@ export default class GameService extends EventEmitter {
         let isRejoiningAfkSlot = isAfker && player.afk && userId && player.userId && player.userId.toString() === userId.toString();
 
         // If they have been afk'd then they are only allowed to join their slot again.
-        if (player.afk && isAfker && userId && player.userId && player.userId.toString() === userId.toString()) {
+        if (player.afk && isAfker && userId && player.userId && player.userId.toString() !== userId.toString()) {
             throw new ValidationError('You can only rejoin this game in your own slot.');
         }
 

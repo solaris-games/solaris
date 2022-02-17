@@ -736,6 +736,11 @@ export default class LeaderboardService {
             if (!player.defeated && !player.afk) {
                 user.achievements.completed++;
             }
+
+            // Any player who isn't afk in an NPG is now considered an established player.
+            if (!player.afk) {
+                user.isEstablishedPlayer = true;
+            }
         }
 
         result.eloRating = this.addUserRatingCheck(game, gameUsers);
@@ -744,38 +749,37 @@ export default class LeaderboardService {
     }
 
     addUserRatingCheck(game: Game, gameUsers: User[]): EloRatingChangeResult | null {
-        if (['1v1_rt', '1v1_tb'].includes(game.settings.general.type)) {
-            let winningPlayer: Player = game.galaxy.players.find(p => p._id.toString() === game.state.winner!.toString())!;
-            let losingPlayer: Player = game.galaxy.players.find(p => p._id.toString() !== game.state.winner!.toString())!;
-
-            let winningUser: User = gameUsers.find(u => winningPlayer.userId && u._id.toString() === winningPlayer.userId.toString())!;
-            let losingUser: User = gameUsers.find(u => losingPlayer.userId && u._id.toString() === losingPlayer.userId.toString())!;
-
-            let winningUserOldRating = winningUser.achievements.eloRating || 1200;
-            let losingUserOldRating = losingUser.achievements.eloRating || 1200;
-
-            this.ratingService.recalculateEloRating(winningUser, losingUser, true);
-
-            return {
-                winner: {
-                    _id: winningPlayer._id,
-                    newRating: winningUser.achievements.eloRating!,
-                    oldRating: winningUserOldRating
-                },
-                loser: {
-                    _id: losingPlayer._id,
-                    newRating: losingUser.achievements.eloRating!,
-                    oldRating: losingUserOldRating
-                }
-            };
+        if (!this.gameTypeService.is1v1Game(game)) {
+            return null;
         }
+        
+        let winningPlayer: Player = game.galaxy.players.find(p => p._id.toString() === game.state.winner!.toString())!;
+        let losingPlayer: Player = game.galaxy.players.find(p => p._id.toString() !== game.state.winner!.toString())!;
 
-        return null;
+        let winningUser: User = gameUsers.find(u => winningPlayer.userId && u._id.toString() === winningPlayer.userId.toString())!;
+        let losingUser: User = gameUsers.find(u => losingPlayer.userId && u._id.toString() === losingPlayer.userId.toString())!;
+
+        let winningUserOldRating = winningUser.achievements.eloRating || 1200;
+        let losingUserOldRating = losingUser.achievements.eloRating || 1200;
+
+        this.ratingService.recalculateEloRating(winningUser, losingUser, true);
+
+        return {
+            winner: {
+                _id: winningPlayer._id,
+                newRating: winningUser.achievements.eloRating!,
+                oldRating: winningUserOldRating
+            },
+            loser: {
+                _id: losingPlayer._id,
+                newRating: losingUser.achievements.eloRating!,
+                oldRating: losingUserOldRating
+            }
+        };
     }
 
     getGameWinner(game: Game): Player | null {
         let isKingOfTheHillMode = this.gameTypeService.isKingOfTheHillMode(game);
-
         let isAllUndefeatedPlayersReadyToQuit = this.gameService.isAllUndefeatedPlayersReadyToQuit(game);
 
         if (isAllUndefeatedPlayersReadyToQuit) {
@@ -786,7 +790,7 @@ export default class LeaderboardService {
             return this.getFirstPlacePlayer(game);
         }
 
-        if (game.settings.general.mode === 'conquest') {
+        if (this.gameTypeService.isConquestMode(game)) {
             let starWinner = this.getStarCountWinner(game);
 
             if (starWinner) {

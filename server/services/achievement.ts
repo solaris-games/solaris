@@ -132,10 +132,4 @@ export default class AchievementService {
     async incrementQuit(userId: DBObjectId, amount: number = 1) {
         return await this.incrementAchievement(userId, 'achievements.quit', amount);
     }
-
-    async isEstablishedPlayer(userId: DBObjectId) {
-        let userAchievements = await this.getAchievements(userId);
-
-        return userAchievements && (userAchievements.achievements.rank > 0 || userAchievements.achievements.completed > 0);
-    }
 };

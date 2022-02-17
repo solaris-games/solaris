@@ -519,7 +519,7 @@ class Star extends EventEmitter {
 
     let shipsText = ''
 
-    if (this.data.ownedByPlayerId) {
+    if (this.data.ownedByPlayerId || carriersOrbiting) {
       let scramblers = 0
       
       if (carriersOrbiting) {

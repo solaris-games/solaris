@@ -1,19 +1,16 @@
-db.games.find({}).forEach(function(game) {
-    for (let player of game.galaxy.players) {
-        if (player.userId != null && (typeof player.userId === 'string' || player.userId instanceof String)) {
-            player.userId = new ObjectId(player.userId);
-        }
+db.users.updateMany({}, {
+    $set: {
+        isEstablishedPlayer: false
     }
-
-    db.games.save(game);
 });
 
-db.games.updateMany({
-    'state.startDate': { $ne: null },
-    'state.endDate': { $eq: null }
+db.users.updateMany({
+    $or: [
+        {'achievements.rank': { $gt: 0 }},
+        {'achievements.completed': { $gt: 0 }}
+    ]
 }, {
-    $addToSet: {
-        'settings.specialGalaxy.specialistBans.star': { $each: [ 13, 14, 15 ] },
-        'settings.specialGalaxy.specialistBans.carrier': { $each: [ 17, 18 ] }
+    $set: {
+        isEstablishedPlayer: true
     }
 });

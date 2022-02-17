@@ -14,6 +14,7 @@ const schema = new Schema({
     banned: { type: Types.Boolean, default: false },
     lastSeen: { type: Types.Date, required: false, default: null },
     lastSeenIP: { type: Types.String, required: false, default: null },
+    isEstablishedPlayer: { type: Types.Boolean, required: true, default: false },
     roles: {
         administrator: { type: Types.Boolean, default: false },
         contributor: { type: Types.Boolean, default: false },
