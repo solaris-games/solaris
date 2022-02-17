@@ -184,6 +184,20 @@ export default class UserService extends EventEmitter {
         return user != null;
     }
 
+    async getUserIsCommunityManager(userId: DBObjectId) {
+        let user = await this.userRepo.findOne({
+            _id: userId,
+            $or: [
+                { 'roles.administrator': 1 },
+                { 'roles.communityManager': 1 }
+            ]
+        }, {
+            _id: 1
+        });
+
+        return user != null;
+    }
+
     async create(email: string, username: string, password: string, ipAddress: string) {
         let user = {
             username: username.trim(),

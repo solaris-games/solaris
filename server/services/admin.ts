@@ -16,10 +16,8 @@ export default class AdminService {
         this.gameRepo = gameRepo;
     }
 
-    async listUsers(limit: number) {
-        return await this.userRepo.find({
-            // All users
-        }, {
+    async listUsers(isAdmin: boolean, limit: number) {
+        let select = isAdmin ? {
             username: 1,
             email: 1,
             credits: 1,
@@ -28,10 +26,16 @@ export default class AdminService {
             emailEnabled: 1,
             lastSeen: 1,
             lastSeenIP: 1,
-            isEstablishedPlayer: 1,
-            'achievements.rank': 1,
-            'achievements.completed': 1
-        }, {
+            isEstablishedPlayer: 1
+        } : {
+            username: 1,
+            isEstablishedPlayer: 1
+        };
+
+        return await this.userRepo.find({
+            // All users
+        }, 
+        select, {
             lastSeen: -1
         }, limit);
     }

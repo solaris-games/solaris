@@ -6,7 +6,7 @@
       <li class="nav-item">
           <a class="nav-link active" data-toggle="tab" href="#games">Games</a>
       </li>
-      <li class="nav-item" v-if="isAdministrator">
+      <li class="nav-item" v-if="isCommunityManager">
           <a class="nav-link" data-toggle="tab" href="#users">Users</a>
       </li>
       <li class="nav-item" v-if="isAdministrator">
@@ -68,7 +68,7 @@
           </table>
         </div>
       </div>
-      <div class="tab-pane fade" id="users" v-if="isAdministrator">
+      <div class="tab-pane fade" id="users" v-if="isCommunityManager">
         <div v-if="users">
           <h4 class="mb-1">Recent Users</h4>
           <!-- <small class="text-warning">Total Users: {{users.length}}</small> -->
@@ -76,32 +76,32 @@
             <thead>
               <tr>
                 <th>Username</th>
-                <th>Last Seen</th>
-                <th>Roles</th>
-                <th>Credits</th>
-                <th>Email</th>
+                <th v-if="isAdministrator">Last Seen</th>
+                <th v-if="isAdministrator">Roles</th>
+                <th v-if="isAdministrator">Credits</th>
+                <th v-if="isAdministrator">Email</th>
                 <th>EP</th>
-                <th></th>
+                <th v-if="isAdministrator"></th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="user of users" :key="user._id">
                 <td :title="user.email">{{user.username}}</td>
-                <td :title="getDuplicateIPs(user)" :class="{'text-warning':getDuplicateIPs(user).length}">{{getLastSeenString(user.lastSeen)}}</td>
-                <td>
+                <td v-if="isAdministrator" :title="getDuplicateIPs(user)" :class="{'text-warning':getDuplicateIPs(user).length}">{{getLastSeenString(user.lastSeen)}}</td>
+                <td v-if="isAdministrator">
                   <i class="fas fa-hands-helping clickable" :class="{'disabled-role':!user.roles.contributor}" @click="toggleRole(user, 'contributor')" title="Toggle Contributor Role"></i>
                   <i class="fas fa-code ml-1 clickable" :class="{'disabled-role':!user.roles.developer}" @click="toggleRole(user, 'developer')" title="Toggle Developer Role"></i>
                   <i class="fas fa-user-friends ml-1 clickable" :class="{'disabled-role':!user.roles.communityManager}" @click="toggleRole(user, 'communityManager')" title="Toggle Community Manager Role"></i>
                   <i class="fas fa-dice ml-1 clickable" :class="{'disabled-role':!user.roles.gameMaster}" @click="toggleRole(user, 'gameMaster')" title="Toggle Game Master Role"></i>
                 </td>
-                <td>
+                <td v-if="isAdministrator">
                   <i class="fas fa-minus clickable text-danger" @click="setCredits(user, user.credits - 1)" title="Deduct Credits"></i>
                   {{user.credits}}
                   <i class="fas fa-plus clickable text-success" @click="setCredits(user, user.credits + 1)" title="Add Credits"></i>
                 </td>
-                <td><i class="fas" :class="{'fa-check':user.emailEnabled,'fa-times text-danger':!user.emailEnabled}"></i></td>
+                <td v-if="isAdministrator"><i class="fas" :class="{'fa-check':user.emailEnabled,'fa-times text-danger':!user.emailEnabled}"></i></td>
                 <td><i class="fas clickable" :class="{'fa-check':user.isEstablishedPlayer,'fa-times text-danger': !user.isEstablishedPlayer}" @click="promoteToEstablishedPlayer(user)"></i></td>
-                <td>
+                <td v-if="isAdministrator">
                   <i class="fas fa-hammer clickable text-danger" :class="{'disabled-role':!user.banned}" @click="toggleBan(user)" title="Toggle Banned"></i>
                   <i class="fas fa-eraser clickable text-warning ml-1" @click="resetAchievements(user)" title="Reset Achievements"></i>
                   <i class="fas fa-user clickable text-info ml-1" @click="impersonate(user._id)" title="Impersonate User"></i>
@@ -213,8 +213,11 @@ export default {
         AdminApiService.getGames()
       ]
 
-      if (this.isAdministrator) {
+      if (this.isCommunityManager) {
         requests.push(AdminApiService.getUsers())
+      }
+
+      if (this.isAdministrator) {
         requests.push(AdminApiService.getPasswordResets())
         requests.push(AdminApiService.getReports())
       }
@@ -321,6 +324,10 @@ export default {
         return
       }
 
+      if (!await this.$confirm('Promote to Established Player', 'Are you sure you want to promote this player to an established player?')) {
+        return
+      }
+
       try {
         user.isEstablishedPlayer = true
 
@@ -404,6 +411,9 @@ export default {
   computed: {
     isAdministrator () {
       return this.$store.state.roles.administrator
+    },
+    isCommunityManager () {
+      return this.isAdministrator || this.$store.state.roles.communityManager
     }
   }
 }
