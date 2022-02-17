@@ -1,5 +1,6 @@
 import { Game } from "../types/Game";
 import { Player } from "../types/Player";
+import {AiState, KnownAttack} from "../types/Ai";
 import CarrierService from "./carrier";
 import CombatService from "./combat";
 import DistanceService from "./distance";
@@ -9,6 +10,8 @@ import StarService from "./star";
 import StarUpgradeService from "./starUpgrade";
 import TechnologyService from "./technology";
 import WaypointService from "./waypoint";
+import {Star} from "../types/Star";
+import {Carrier} from "../types/Carrier";
 
 const FIRST_TICK_BULK_UPGRADE_SCI_PERCENTAGE = 20;
 const FIRST_TICK_BULK_UPGRADE_IND_PERCENTAGE = 30;
@@ -23,6 +26,27 @@ enum AiAction {
     ClaimStar,
     ReinforceStar,
     InvadeStar
+}
+
+type StarGraph = Map<string, Set<string>>;
+
+interface Context {
+    aiState: AiState;
+    playerStars: Star[];
+    playerCarriers: Carrier[];
+    starsById: Map<string, Star>;
+    allReachableFromPlayerStars: StarGraph;
+    freelyReachableFromPlayerStars: StarGraph;
+    reachablePlayerStars: StarGraph;
+    freelyReachableStars: StarGraph;
+    borderStars: Set<string>;
+    carriersOrbiting: Map<string, Carrier[]>;
+    carriersById: Map<string, Carrier>;
+    attacksByStarId: Map<string, Map<number, Carrier>>;
+    attackedStarIds: Set<string>;
+    playerEconomy: number;
+    playerIndustry: number;
+    playerScience: number;
 }
 
 const EMPTY_STAR_SCORE_MULTIPLIER = 1;
@@ -102,11 +126,14 @@ export default class AIService {
         // Considering the growing complexity of AI logic, 
         // it's better to catch any possible errors and have the game continue with disfunctional AI than to break the game tick logic.
         try {
-            if (isFirstTick || !player.ai) {
-                this._setupAi(game, player);
+            let aiState: AiState;
+            if (isFirstTick || !player.ai || !player.aiState) {
+                aiState = this._setupAi(game, player);
                 player.ai = true;
+            } else  {
+                aiState = player.aiState;
             }
-            const context = this._createContext(game, player);
+            const context = this._createContext(game, player, aiState);
             this._updateState(game, player, context);
             const orders = this._gatherOrders(game, player, context);
             const assignments = await this._gatherAssignments(game, player, context);
@@ -120,12 +147,14 @@ export default class AIService {
         }
     }
 
-    _setupAi(game: Game, player: Player) {
-        player.aiState = {
+    _setupAi(game: Game, player: Player): AiState {
+        const state = {
             knownAttacks: [],
             startedClaims: [],
             invasionsInProgress: []
-        }
+        };
+        player.aiState = state;
+        return state;
     }
 
     _updateState(game: Game, player: Player, context) {
@@ -142,7 +171,7 @@ export default class AIService {
         }
     }
 
-    _createContext(game, player) {
+    _createContext(game, player, aiState: AiState): Context {
         const playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
         const playerId = player._id.toString();
@@ -158,12 +187,12 @@ export default class AIService {
         const freelyReachableFromPlayerStars = this._computeStarGraph(game, player, playerStars, traversableStars);
         const reachablePlayerStars = this._computeStarGraph(game, player, playerStars, playerStars);
         const freelyReachableStars = this._computeStarGraph(game, player, traversableStars, traversableStars);
-        const borderStars: any[] = [];
+        const borderStars = new Set<string>();
         for (const [from, reachables] of allReachableFromPlayerStars) {
             for (const reachableId of reachables) {
                 const reachable = starsById.get(reachableId);
                 if (!reachable.ownedByPlayerId || reachable.ownedByPlayerId.toString() !== playerId) {
-                    borderStars.push(from);
+                    borderStars.add(from);
                 }
             }
         }
@@ -178,7 +207,7 @@ export default class AIService {
             }
         }
 
-        const carriersById = new Map();
+        const carriersById = new Map<string, Carrier>();
         for (const carrier of game.galaxy.carriers) {
             carriersById.set(carrier._id.toString(), carrier);
         }
@@ -202,7 +231,7 @@ export default class AIService {
             .filter(incoming => Boolean(incoming))
 
         const attacksByStarId = new Map();
-        const attackedStarIds = new Set();
+        const attackedStarIds = new Set<string>();
 
         for (const { carrier: incomingCarrier, waypoint: incomingWaypoint } of incomingCarriers) {
             const targetStar = incomingWaypoint.destination.toString();
@@ -214,18 +243,19 @@ export default class AIService {
         }
 
         return {
+            aiState,
             playerStars,
             playerCarriers,
             starsById,
             allReachableFromPlayerStars,
             freelyReachableFromPlayerStars,
+            freelyReachableStars,
             reachablePlayerStars,
             borderStars,
             carriersOrbiting,
             carriersById,
             attacksByStarId,
             attackedStarIds,
-            freelyReachableStars,
             playerEconomy: this.playerService.calculateTotalEconomy(playerStars),
             playerIndustry: this.playerService.calculateTotalIndustry(playerStars),
             playerScience: this.playerService.calculateTotalScience(playerStars)
@@ -251,7 +281,7 @@ export default class AIService {
             }
         }
 
-        const newKnownAttacks: any[] = [];
+        const newKnownAttacks: KnownAttack[] = [];
         const newClaimedStars = new Set(player.aiState.startedClaims);
 
         // For now, process orders in order of importance and try to find the best assignment possible for each order.
@@ -545,7 +575,7 @@ export default class AIService {
         return fittingAssignments;
     }
 
-    _createDefaultAttackData(game, starId, ticksUntil) {
+    _createDefaultAttackData(game, starId, ticksUntil): KnownAttack {
         const arrivalTick = game.state.tick + ticksUntil;
 
         return {
@@ -573,12 +603,12 @@ export default class AIService {
         return result.needed!.attacker;
     }
 
-    _calculateRequiredShipsForDefense(game, player, context, attackData, attackingCarriers, defendingStar) {
+    _calculateRequiredShipsForDefense(game: Game, player: Player, context: Context, attackData: KnownAttack, attackingCarriers, defendingStar) {
         const attackerIds = new Set();
         const attackers: Player[] = [];
 
         for (const attackingCarrier of attackingCarriers) {
-            const attacker = game.galaxy.players.find(player => player._id.toString() === attackingCarrier.ownedByPlayerId.toString());
+            const attacker = this.playerService.getById(game, attackingCarrier.ownedByPlayerId);
             const attackerId = attacker._id.toString();
             if (!attackerIds.has(attackerId)) {
                 attackerIds.add(attackerId);
@@ -587,7 +617,7 @@ export default class AIService {
         }
 
         const defenseCarriersAtStar = context.carriersOrbiting.get(defendingStar._id.toString()) || [];
-        const defenseCarriersOnTheWay = (attackData && attackData.carriersOnTheWay.filter(carrierId => !defenseCarriersAtStar.find(carrier => carrier._id.toString() === carrierId.toString())).map(carrierId => context.carriersById.get(carrierId.toString()))) || [];
+        const defenseCarriersOnTheWay = (attackData && attackData.carriersOnTheWay.map(carrierId => context.carriersById.get(carrierId.toString())!));
         const defenseCarriers = defenseCarriersAtStar.concat(defenseCarriersOnTheWay);
         const sides = this.combatService.constructSidesStar(game, defendingStar, player, [player], attackers, defenseCarriers, attackingCarriers);
         const result = this.combatService.calculate(sides.defender, sides.attacker, true, true);
@@ -714,13 +744,9 @@ export default class AIService {
         return orders;
     }
 
-    _getAttackData(game, player, context, attackedStarId, attackInTicks) {
-        if (!player.aiState || !player.aiState.knownAttacks) {
-            return null;
-        }
-
+    _getAttackData(game: Game, player: Player, context, attackedStarId, attackInTicks): KnownAttack | undefined {
         const attackAbsoluteTick = game.state.tick + attackInTicks;
-        return player.aiState.knownAttacks.find(attack => attack.starId === attackedStarId.toString() && attack.arrivalTick === attackAbsoluteTick);
+        return context.aiState.knownAttacks.find(attack => attack.starId === attackedStarId.toString() && attack.arrivalTick === attackAbsoluteTick);
     }
 
     _gatherDefenseOrders(game, player, context) {
@@ -839,7 +865,7 @@ export default class AIService {
         return this.distanceService.getHyperspaceDistance(game, player.research.hyperspace.level);
     }
 
-    _computeStarGraph(game, player, playerStars, starCandidates) {
+    _computeStarGraph(game, player, playerStars, starCandidates): StarGraph {
         const hyperspaceRange = this._getHyperspaceRange(game, player);
         const hyperspaceRangeSquared = hyperspaceRange * hyperspaceRange;
 

@@ -1,5 +1,6 @@
 import { DBObjectId } from "./DBObjectId";
 import { PlayerStatistics } from "./Leaderboard";
+import { AiState } from "./Ai";
 
 export type PlayerShape = 'circle'|'square'|'diamond'|'hexagon';
 export type ResearchType = 'scanning'|'hyperspace'|'terraforming'|'experimentation'|'weapons'|'banking'|'manufacturing'|'specialists'|'random';
@@ -32,13 +33,6 @@ export interface PlayerResearch {
 
 export interface PlayerDiplomacy {
     allies: DBObjectId[];
-};
-
-// TODO: Create module
-export interface AiState {
-    knownAttacks: any[];
-    invasionsInProgress: any[];
-    startedClaims: any[];
 };
 
 export interface Player {
