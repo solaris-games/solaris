@@ -16,10 +16,8 @@ export default class AdminService {
         this.gameRepo = gameRepo;
     }
 
-    async listUsers(limit: number) {
-        let users = await this.userRepo.find({
-            // All users
-        }, {
+    async listUsers(isAdmin: boolean, limit: number) {
+        let select = isAdmin ? {
             username: 1,
             email: 1,
             credits: 1,
@@ -28,17 +26,18 @@ export default class AdminService {
             emailEnabled: 1,
             lastSeen: 1,
             lastSeenIP: 1,
-            'achievements.rank': 1,
-            'achievements.completed': 1
-        }, {
+            isEstablishedPlayer: 1
+        } : {
+            username: 1,
+            isEstablishedPlayer: 1
+        };
+
+        return await this.userRepo.find({
+            // All users
+        }, 
+        select, {
             lastSeen: -1
         }, limit);
-
-        for (let user of users) {
-            user.isEstablishedPlayer = user.achievements.rank > 0 || user.achievements.completed > 0;
-        }
-
-        return users;
     }
 
     async listPasswordResets() {
@@ -165,14 +164,10 @@ export default class AdminService {
 
     async promoteToEstablishedPlayer(userId: DBObjectId) {
         await this.userRepo.updateOne({
-            _id: userId,
-            $and: [
-                { 'achievements.rank': { $eq: 0 }},
-                { 'achievements.completed': { $eq: 0 }}
-            ]
+            _id: userId
         }, {
-            $inc: {
-                'achievements.completed': 1
+            $set: {
+                isEstablishedPlayer: true
             }
         });
     }

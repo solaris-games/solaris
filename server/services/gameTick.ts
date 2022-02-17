@@ -681,22 +681,29 @@ export default class GameTickService extends EventEmitter {
         if (winner) {
             this.gameStateService.finishGame(game, winner);
 
-            let rankingResult: GameRankingResult | null = null;
-
-            // There must have been at least 3 production ticks in order for
-            // rankings to be added to players. This is to slow down players
-            // should they wish to cheat the system.
-            if (game.state.productionTick > 2 && !isTutorialGame) {
-                let leaderboard = this.leaderboardService.getLeaderboardRankings(game).leaderboard;
-                
-                rankingResult = await this.leaderboardService.addGameRankings(game, gameUsers, leaderboard);
-            }
-
             if (!isTutorialGame) {
+                let rankingResult: GameRankingResult | null = null;
+    
+                // There must have been at least X production ticks in order for
+                // rankings to be added to players. This is to slow down players
+                // should they wish to cheat the system.
+                let productionTickCap = this.gameTypeService.is1v1Game(game) ? 1 : 2;
+
+                if (game.state.productionTick > productionTickCap) {
+                    let leaderboard = this.leaderboardService.getLeaderboardRankings(game).leaderboard;
+                    
+                    rankingResult = await this.leaderboardService.addGameRankings(game, gameUsers, leaderboard);
+                }
+
+                // If the game is anonymous, then ranking results should be omitted from the game ended event.
+                if (this.gameTypeService.isAnonymousGame(game)) {
+                    rankingResult = null;
+                }
+                
                 this.emit('onGameEnded', {
                     gameId: game._id,
                     gameTick: game.state.tick,
-                    rankingResult: this.gameTypeService.isAnonymousGame(game) ? null : rankingResult // If the game is anonymous, then ranking results should be omitted from the game ended event.
+                    rankingResult
                 });
             }
 

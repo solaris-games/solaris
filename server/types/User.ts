@@ -10,6 +10,14 @@ export type SettingTerritoryStyle = 'disabled'|'marching-square'|'voronoi';
 export type SettingObjectScaling = 'default'|'clamped';
 export type SettingBlendMode = 'ADD'|'NORMAL';
 
+export interface UserRoles {
+    administrator: boolean;
+    contributor: boolean;
+    developer: boolean;
+    communityManager: boolean;
+    gameMaster: boolean;
+};
+
 export interface User {
     _id: DBObjectId;
     username: string;
@@ -23,13 +31,8 @@ export interface User {
     banned: boolean;
     lastSeen: Date | null;
     lastSeenIP: string | null;
-    roles: {
-        administrator: boolean;
-        contributor: boolean;
-        developer: boolean;
-        communityManager: boolean;
-        gameMaster: boolean;
-    },
+    isEstablishedPlayer: boolean;
+    roles: UserRoles,
     achievements: {
         victories: number;
         rank: number;
@@ -160,6 +163,4 @@ export interface User {
         }
     },
     avatars: number[];
-
-    isEstablishedPlayer?: boolean;
 };

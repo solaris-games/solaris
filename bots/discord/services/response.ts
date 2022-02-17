@@ -1,6 +1,9 @@
+import { Game } from "../../../server/types/Game";
+import { User } from "../../../server/types/User";
+
 const Discord = require('discord.js');
 
-module.exports = class ReponseService {
+export default class ReponseService {
 
     baseResponse() {
         const response = new Discord.MessageEmbed()
@@ -13,9 +16,9 @@ module.exports = class ReponseService {
         return response;
     }
 
-    gameinfo(game, type, isPC) {
+    gameinfo(game: Game, type: number, isPC: boolean) {
         let response;
-        let sidePages = [];
+        let sidePages: string[] = [];
         switch (type) {
             case 0: //General
                 response = this.gameinfoGeneral(game);
@@ -51,22 +54,22 @@ module.exports = class ReponseService {
                     { name: sidePages[0], value: "⬅️⬅️⬅️", inline: true },
                     { name: "\u200B", value: "\u200B", inline: true },
                     { name: sidePages[1], value: "➡️➡️➡️", inline: true }
-                )
+                );
         } else {
             response = response
                 .addFields(
                     { name: sidePages[0] + " / " + sidePages[1], value: "⬅️ / ➡️" }
-                )
+                );
         }
         return response;
     }
 
-    gameinfoGeneral(game) {
+    gameinfoGeneral(game: Game) {
         let game_name = game.settings.general.name;
         let gameId = game._id;
         let response = this.baseResponse();
         response = response
-            .setURL(`https://solaris.games/#/game?id=${gameId}`)
+            .setURL(`https://solaris.games/#/game?id=${gameId}`);
         if (game.settings.general.description) {
             response = response
                 .setDescription(game.settings.general.description);
@@ -88,12 +91,12 @@ module.exports = class ReponseService {
         return response;
     }
 
-    gameinfoGalaxy(game) {
+    gameinfoGalaxy(game: Game) {
         let game_name = game.settings.general.name;
         let gameId = game._id;
         let response = this.baseResponse();
         response = response
-            .setURL(`https://solaris.games/#/game?id=${gameId}`)
+            .setURL(`https://solaris.games/#/game?id=${gameId}`);
         if (game.settings.general.description) {
             response = response
                 .setDescription(game.settings.general.description);
@@ -121,12 +124,12 @@ module.exports = class ReponseService {
         return response;
     }
 
-    gameinfoPlayer(game) {
+    gameinfoPlayer(game: Game) {
         let game_name = game.settings.general.name;
         let gameId = game._id;
         let response = this.baseResponse();
         response = response
-            .setURL(`https://solaris.games/#/game?id=${gameId}`)
+            .setURL(`https://solaris.games/#/game?id=${gameId}`);
         if (game.settings.general.description) {
             response = response
                 .setDescription(game.settings.general.description);
@@ -154,12 +157,12 @@ module.exports = class ReponseService {
         return response;
     }
 
-    gameinfoTechnology(game) {
+    gameinfoTechnology(game: Game) {
         let game_name = game.settings.general.name;
         let gameId = game._id;
         let response = this.baseResponse();
         response = response
-            .setURL(`https://solaris.games/#/game?id=${gameId}`)
+            .setURL(`https://solaris.games/#/game?id=${gameId}`);
         if (game.settings.general.description) {
             response = response
                 .setDescription(game.settings.general.description);
@@ -185,20 +188,17 @@ module.exports = class ReponseService {
                 { name: "Banking", value: game.settings.technology.researchCosts.banking, inline: true },//next line
                 { name: "Manufacturing", value: game.settings.technology.researchCosts.manufacturing, inline: true },
                 { name: "Specialists", value: game.settings.technology.researchCosts.specialists, inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },//next line
-                { name: "Banking Reward", value: game.settings.technology.bankingReward, inline: true },
-                { name: "\u200B", value: "\u200B", inline: true },
-                { name: "\u200B", value: "\u200B", inline: true }
+                { name: "Banking Reward", value: game.settings.technology.bankingReward, inline: true }//next line
             );
         return response;
     }
 
-    gameinfoTime(game) {
+    gameinfoTime(game: Game) {
         let game_name = game.settings.general.name;
         let gameId = game._id;
         let response = this.baseResponse();
         response = response
-            .setURL(`https://solaris.games/#/game?id=${gameId}`)
+            .setURL(`https://solaris.games/#/game?id=${gameId}`);
         if (game.settings.general.description) {
             response = response
                 .setDescription(game.settings.general.description);
@@ -225,7 +225,7 @@ module.exports = class ReponseService {
         return response;
     }
 
-    invite(game) {
+    invite(game: Game) {
         let response = this.baseResponse();
         response = response
             .setTitle(`Please join ${game.settings.general.name}`)
@@ -252,13 +252,17 @@ module.exports = class ReponseService {
                 { name: "Time per Turn", value: game.settings.gameTime.turnJumps + "hours", inline: true }//next line
             );
         }
+        if (game.settings.general.description) {
+            response = response
+                .setDescription(game.settings.general.description);
+        }
         return response;
     }
 
-    leaderboard_globalPC(page, sortingKey, position_list, username_list, sortingKey_list) {
-        let lowerLimit = page * 20 + 1
-        let upperLimit = (page + 1) * 20
-        let response = this.baseResponse()
+    leaderboard_globalPC(page: number, sortingKey: string, position_list: string, username_list: string, sortingKey_list: string) {
+        let lowerLimit = page * 20 + 1;
+        let upperLimit = (page + 1) * 20;
+        let response = this.baseResponse();
         response = response
             .setTitle(`Top ${lowerLimit}-${upperLimit} for ${sortingKey}`)
             .setURL(`https://solaris.games/#/leaderboard`)
@@ -270,7 +274,7 @@ module.exports = class ReponseService {
         return response;
     }
 
-    leaderboard_globalMobile(page, sortingKey, data_list) {
+    leaderboard_globalMobile(page: number, sortingKey: string, data_list: string) {
         let lowerLimit = page * 20 + 1;
         let upperLimit = (page + 1) * 20;
         let response = this.baseResponse();
@@ -283,8 +287,8 @@ module.exports = class ReponseService {
         return response;
     }
 
-    leaderboard_localPC(gameId, tick, sortingKey, position_list, username_list, sortingKey_list) {
-        let response = this.baseResponse()
+    leaderboard_localPC(gameId: string, tick: number, sortingKey: string, position_list: string, username_list: string, sortingKey_list: string) {
+        let response = this.baseResponse();
         response = response
             .setTitle(`Leaderboard for ${sortingKey}`)
             .setURL(`https://solaris.games/#/game?id=${gameId}`)
@@ -297,8 +301,8 @@ module.exports = class ReponseService {
         return response;
     }
 
-    leaderboard_localMobile(gameId, tick, sortingKey, data_list) {
-        let response = this.baseResponse()
+    leaderboard_localMobile(gameId: string, tick: number, sortingKey: string, data_list: string) {
+        let response = this.baseResponse();
         response = response
             .setTitle(`Leaderboard for ${sortingKey}`)
             .setURL(`https://solaris.games/#/game?id=${gameId}`)
@@ -309,7 +313,7 @@ module.exports = class ReponseService {
         return response;
     }
 
-    statusPC(game, leaderboard, alive) {
+    statusPC(game: Game, leaderboard: any, alive: boolean) {
         let response = this.baseResponse();
         response = response
             .setTitle(`Status of ${game.settings.general.name}`)
@@ -331,7 +335,7 @@ module.exports = class ReponseService {
         return response;
     }
 
-    statusMobile(game, leaderboard) {
+    statusMobile(game: Game, leaderboard: any) {
         let response = this.baseResponse();
         response = response
             .setTitle(`Status of ${game.settings.general.name}`)
@@ -350,9 +354,9 @@ module.exports = class ReponseService {
         return response;
     }
 
-    userinfo(user, type, isPC) {
+    userinfo(user: User, type: number, isPC: boolean) {
         let response;
-        let sidePages = [];
+        let sidePages: string[] = [];
         switch (type) {
             case 0:
                 response = this.userinfoGames(user);
@@ -388,17 +392,17 @@ module.exports = class ReponseService {
                     { name: sidePages[0], value: "⬅️⬅️⬅️", inline: true },
                     { name: "\u200B", value: "\u200B", inline: true },
                     { name: sidePages[1], value: "➡️➡️➡️", inline: true }
-                )
+                );
         } else {
             response = response
                 .addFields(
                     { name: sidePages[0] + " / " + sidePages[1], value: "⬅️ / ➡️" }
-                )
+                );
         }
         return response;
     }
 
-    userinfoGames(user) {
+    userinfoGames(user: User) {
         let response = this.baseResponse();
         response = response
             .setTitle(`Userinfo of ${user.username}`)
@@ -418,7 +422,7 @@ module.exports = class ReponseService {
         return response;
     }
 
-    userinfoCombat(user) {
+    userinfoCombat(user: User) {
         let response = this.baseResponse();
         response = response
             .setTitle(`Userinfo of ${user.username}`)
@@ -433,14 +437,15 @@ module.exports = class ReponseService {
                 { name: "Specialists Lost", value: user.achievements.combat.losses.specialists, inline: true },//next line
                 { name: "Stars Captured", value: user.achievements.combat.stars.captured, inline: true },
                 { name: "Stars Lost", value: user.achievements.combat.stars.lost, inline: true },
-                { name: "Capitals Captured", value: user.achievements.combat.homeStars.captured, inline: true },
+                { name: "Capitals Captured", value: user.achievements.combat.homeStars.captured, inline: true },//next line
                 { name: "Capitals Lost", value: user.achievements.combat.homeStars.lost, inline: true },
-                { name: "\u200B", value: "\u200B", inline: true }
+                { name: "\u200B", value: "\u200B", inline: true },
+                { name: "\u200B", value: "\u200B", inline: true }//next line
             );
         return response;
     }
 
-    userinfoInfrastructure(user) {
+    userinfoInfrastructure(user: User) {
         let response = this.baseResponse();
         response = response
             .setTitle(`Userinfo of ${user.username}`)
@@ -460,7 +465,7 @@ module.exports = class ReponseService {
         return response;
     }
 
-    userinfoResearch(user) {
+    userinfoResearch(user: User) {
         let response = this.baseResponse();
         response = response
             .setTitle(`Userinfo of ${user.username}`)
@@ -480,7 +485,7 @@ module.exports = class ReponseService {
         return response;
     }
 
-    userinfoTrade(user) {
+    userinfoTrade(user: User) {
         let response = this.baseResponse();
         response = response
             .setTitle(`Userinfo of ${user.username}`)
@@ -500,7 +505,7 @@ module.exports = class ReponseService {
         return response;
     }
 
-    error(authorId, reason) {
+    error(authorId: string, reason?: string) {
         let response = `Something went wrong <@${authorId}>,\n`;
         switch (reason) {
             case 'noGame':
@@ -513,22 +518,22 @@ module.exports = class ReponseService {
                 response += 'No user was found with this name, check if you spelled the name correctly.';
                 break;
             case 'noFocus':
-                response += 'No focus was specified, make sure to add it in the command.';
+                response += 'No focus was specified or the specified focus was not recognised, make sure to check what focusses you can add.';
                 break;
             case 'extraDark':
-                response += 'The game you asked about is an Extra Dark game, which means I cannot tell you anything about it.'
+                response += 'The game you asked about is an Extra Dark game, which means I cannot tell you anything about it.';
                 break;
             case 'invalidSorter':
-                response += 'The sorter you specified does not exist, make sure you spelled it correctly.'
+                response += 'The sorter you specified does not exist, make sure you spelled it correctly.';
                 break;
             case 'notStarted':
-                response += 'The game has not started yet, so no usefull information can be given about it.'
+                response += 'The game has not started yet, so no usefull information can be given about it.';
                 break;
             case 'invalidID':
-                response += 'The ID of the game you gave is invalid, please check if it is correct.'
+                response += 'The ID of the game you gave is invalid, please check if it is correct.';
                 break;
             case 'noDirections':
-                response += 'The command you executed had too little directions, check `$help` for a detailed explanation on each command.'
+                response += 'The command you executed had too little directions, check `$help` for a detailed explanation on each command.';
                 break;
             default:
                 //This should never happen

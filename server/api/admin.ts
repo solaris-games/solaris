@@ -7,9 +7,9 @@ export default (router: Router, io, container: DependencyContainer) => {
 
     const middleware = Middleware(container);
 
-    router.get('/api/admin/user', middleware.authenticateAdmin, async (req, res, next) => {
+    router.get('/api/admin/user', middleware.authenticateCommunityManager, async (req, res, next) => {
         try {
-            let result = await container.adminService.listUsers(300);
+            let result = await container.adminService.listUsers(req.session.roles.administrator, 300);
             
             return res.status(200).json(result);
         } catch (err) {
@@ -117,7 +117,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/admin/user/:userId/promoteToEstablishedPlayer', middleware.authenticateAdmin, async (req, res, next) => {
+    router.patch('/api/admin/user/:userId/promoteToEstablishedPlayer', middleware.authenticateCommunityManager, async (req, res, next) => {
         try {
             await container.adminService.promoteToEstablishedPlayer(req.params.userId);
 

@@ -1,14 +1,14 @@
-module.exports = class CommandService {
+export default class CommandService {
 
-    isCommand(msg, prefix) {
+    isCommand(msg: any, prefix: string) {
         return msg.content.startsWith(prefix);
     }
 
-    isBot(msg) {
+    isBot(msg: any) {
         return msg.author.bot;
     }
 
-    isCorrectChannel(msg, cmd) {
+    isCorrectChannel(msg: any, cmd: string) {
         const channelArray = [
             process.env.CHAT_ID_BOTS,
             process.env.CHAT_ID_ACTIVE_GAMES,
@@ -21,7 +21,7 @@ module.exports = class CommandService {
         return channelArray.includes(msg.channel.id);
     }
 
-    identify(msg, prefix) {
+    identify(msg: any, prefix: string) {
         const directions = msg.content.slice(prefix.length).split(/\s+/);
         const cmd = directions[0];
         directions.shift();

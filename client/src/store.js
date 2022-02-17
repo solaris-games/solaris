@@ -301,11 +301,12 @@ export default new Vuex.Store({
       star.ships = 0
 
       // Redraw and remove carriers
-      let carriers = state.game.galaxy.carriers.filter(x => x.orbiting && x.orbiting === star._id)
+      let carriers = state.game.galaxy.carriers.filter(x => x.orbiting && x.orbiting === star._id && x.ownedByPlayerId === player._id)
 
-      carriers.forEach(c => GameContainer.undrawCarrier(c))
-
-      state.game.galaxy.carriers = state.game.galaxy.carriers.filter(x => (x.orbiting || '') !== star._id)
+      carriers.forEach(c => {
+        GameContainer.undrawCarrier(c)
+        state.game.galaxy.carriers.splice(state.game.galaxy.carriers.indexOf(c), 1)
+      })
 
       // Redraw the star
       GameContainer.reloadStar(star)
