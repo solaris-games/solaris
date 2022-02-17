@@ -1,10 +1,10 @@
 import ResponseService from "./response";
 import BotHelperService from "./botHelper";
-import GameGalaxyService from '../../../server/services/gameGalaxy';
-import GameService from '../../../server/services/game';
-import LeaderboardService from '../../../server/services/leaderboard';
-import UserService from '../../../server/services/user';
-import GameTypeService from '../../../server/services/gameType';
+import GameGalaxyService from '../../../services/gameGalaxy';
+import GameService from '../../../services/game';
+import LeaderboardService from '../../../services/leaderboard';
+import UserService from '../../../services/user';
+import GameTypeService from '../../../services/gameType';
 
 export default class PublicCommandService {
     botResponseService: ResponseService;

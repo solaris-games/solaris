@@ -1,5 +1,5 @@
-import { Game } from "../../../server/types/Game";
-import { User } from "../../../server/types/User";
+import { Game } from "../../../types/Game";
+import { User } from "../../../types/User";
 
 const Discord = require('discord.js');
 
