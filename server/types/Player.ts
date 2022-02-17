@@ -34,6 +34,13 @@ export interface PlayerDiplomacy {
     allies: DBObjectId[];
 };
 
+// TODO: Create module
+export interface AiState {
+    knownAttacks: any[];
+    invasionsInProgress: any[];
+    startedClaims: any[];
+};
+
 export interface Player {
     _id: DBObjectId;
     userId: DBObjectId | null;
@@ -57,6 +64,7 @@ export interface Player {
     defeated: boolean;
     defeatedDate: Date | null;
     afk: boolean;
+    ai: boolean;
     renownToGive: number;
     ready: boolean;
     readyToQuit: boolean;
@@ -72,7 +80,7 @@ export interface Player {
     isInScanningRange?: boolean;
     currentResearchTicksEta?: number | null;
     nextResearchTicksEta?: number | null;
-    scheduledOrders?: any | null;
+    aiState?: AiState | null;
 };
 
 export interface PlayerColourShapeCombination {

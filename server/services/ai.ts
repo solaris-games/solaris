@@ -18,10 +18,12 @@ const Heap = require('qheap');
 const { getOrInsert, minBy, minElementBy, reverseSort } = require('../utils.js')
 const mongoose = require("mongoose");
 
-const DEFEND_STAR_ACTION = 'DEFEND_STAR';
-const CLAIM_STAR_ACTION = 'CLAIM_STAR';
-const REINFORCE_STAR_ACTION = 'REINFORCE_STAR';
-const INVADE_STAR_ACTION = 'INVADE_STAR';
+enum AiAction {
+    DefendStar,
+    ClaimStar,
+    ReinforceStar,
+    InvadeStar
+}
 
 const EMPTY_STAR_SCORE_MULTIPLIER = 1;
 const ENEMY_STAR_SCORE_MULTIPLIER = 5;
@@ -79,7 +81,7 @@ export default class AIService {
         await this._doBasicLogic(game, player, isFirstTick, isLastTick);
     }
 
-    async _doBasicLogic(game, player, isFirstTick, isLastTick) {
+    async _doBasicLogic(game: Game, player: Player, isFirstTick: boolean, isLastTick: boolean) {
         try {
             if (isFirstTick) {
                 await this._playFirstTick(game, player);
@@ -96,7 +98,7 @@ export default class AIService {
         player.credits = Math.max(0, player.credits);
     }
 
-    async _doAdvancedLogic(game, player, isFirstTick, isLastTick) {
+    async _doAdvancedLogic(game: Game, player: Player, isFirstTick: boolean, isLastTick: boolean) {
         // Considering the growing complexity of AI logic, 
         // it's better to catch any possible errors and have the game continue with disfunctional AI than to break the game tick logic.
         try {
@@ -109,6 +111,8 @@ export default class AIService {
             const orders = this._gatherOrders(game, player, context);
             const assignments = await this._gatherAssignments(game, player, context);
             await this._evaluateOrders(game, player, context, orders, assignments);
+            // Mongoose method that cannot be typechecked
+            // @ts-ignore
             player.markModified('aiState');
             game.save();
         } catch (e) {
@@ -116,7 +120,7 @@ export default class AIService {
         }
     }
 
-    _setupAi(game, player) {
+    _setupAi(game: Game, player: Player) {
         player.aiState = {
             knownAttacks: [],
             startedClaims: [],
@@ -124,7 +128,7 @@ export default class AIService {
         }
     }
 
-    _updateState(game, player, context) {
+    _updateState(game: Game, player: Player, context) {
         if (!player.aiState) {
             return;
         }
@@ -242,7 +246,7 @@ export default class AIService {
         // This is a hack to ensure that ships are never assigned from a star where they are needed for defense.
         // Later, with an improved scoring system, this should not be necessary
         for (const order of orders) {
-            if (order.type === DEFEND_STAR_ACTION) {
+            if (order.type === AiAction.DefendStar) {
                 assignments.delete(order.star);
             }
         }
@@ -255,7 +259,7 @@ export default class AIService {
 
         for (const order of orders) {
             //console.log(order);
-            if (order.type === DEFEND_STAR_ACTION) {
+            if (order.type === AiAction.DefendStar) {
                 // Later, take weapons level and specialists into account
                 const attackData = this._getAttackData(game, player, context, order.star, order.ticksUntil) || this._createDefaultAttackData(game, order.star, order.ticksUntil);
                 const defendingStar = context.starsById.get(order.star);
@@ -286,9 +290,10 @@ export default class AIService {
                         shipsNeeded -= assignment.totalShips;
                     }
 
+                    console.log("Defending " + defendingStar.name + " with " + shipsUsed + " ships");
                     await this._useAssignment(context, game, player, assignments, assignment, this._createWaypointsFromTrace(trace), shipsUsed, (carrier) => attackData.carriersOnTheWay.push(carrier._id.toString()));
                 }
-            } else if (order.type === INVADE_STAR_ACTION) {
+            } else if (order.type === AiAction.InvadeStar) {
                 if (player.aiState && player.aiState.invasionsInProgress && player.aiState.invasionsInProgress.find(iv => order.star === iv.star)) {
                     continue;
                 }
@@ -305,6 +310,9 @@ export default class AIService {
                 for (const {assignment, trace} of fittingAssignments) {
                     if (assignment.totalShips >= requiredShips) {
                         const carrierResult = await this._useAssignment(context, game, player, assignments, assignment, this._createWaypointsFromTrace(trace), requiredShips);
+
+                        console.log("Invading " + starToInvade.name);
+
                         player.aiState.invasionsInProgress.push({
                             star: order.star,
                             arrivalTick: game.state.tick + carrierResult.ticksEtaTotal
@@ -312,7 +320,7 @@ export default class AIService {
                         break;
                     }
                 }
-            } else if (order.type === CLAIM_STAR_ACTION) {
+            } else if (order.type === AiAction.ClaimStar) {
                 // Skip double claiming stars that might have been claimed by an earlier action
                 if (newClaimedStars.has(order.star)) {
                     continue;
@@ -331,7 +339,7 @@ export default class AIService {
                 for (const visitedStar of found.trace) {
                     newClaimedStars.add(visitedStar);
                 }
-            } else if (order.type === REINFORCE_STAR_ACTION) {
+            } else if (order.type === AiAction.ReinforceStar) {
                 const assignment = assignments.get(order.source);
                 if (!assignment || assignment.totalShips <= 1) {
                     continue;
@@ -591,15 +599,15 @@ export default class AIService {
         }
     }
 
-    priorityFromOrderCategory(category) {
+    priorityFromOrderCategory(category: AiAction) {
         switch (category) {
-            case DEFEND_STAR_ACTION:
+            case AiAction.DefendStar:
                 return 4;
-            case INVADE_STAR_ACTION:
+            case AiAction.InvadeStar:
                 return 3
-            case CLAIM_STAR_ACTION:
+            case AiAction.ClaimStar:
                 return 2;
-            case REINFORCE_STAR_ACTION:
+            case AiAction.ReinforceStar:
                 return 1;
             default:
                 return 0;
@@ -662,7 +670,7 @@ export default class AIService {
                         const score = this._getStarInvasionScore(star);
 
                         orders.push({
-                            type: INVADE_STAR_ACTION,
+                            type: AiAction.InvadeStar,
                             star: reachable,
                             score
                         })
@@ -695,7 +703,7 @@ export default class AIService {
                     }
 
                     orders.push({
-                        type: CLAIM_STAR_ACTION,
+                        type: AiAction.ClaimStar,
                         star: candidateId,
                         score
                     });
@@ -724,7 +732,7 @@ export default class AIService {
                 const starScore = attackedStar.infrastructure.economy + 2 * attackedStar.infrastructure.industry + 3 * attackedStar.infrastructure.science;
 
                 orders.push({
-                    type: DEFEND_STAR_ACTION,
+                    type: AiAction.DefendStar,
                     score: starScore,
                     star: attackedStarId,
                     ticksUntil: attackInTicks,
@@ -757,7 +765,7 @@ export default class AIService {
                 const neighborPriority = starPriorities.get(neighbor);
                 if (neighborPriority < priority) {
                     orders.push({
-                        type: REINFORCE_STAR_ACTION,
+                        type: AiAction.ReinforceStar,
                         score: priority - neighborPriority,
                         star: starId,
                         source: neighbor
