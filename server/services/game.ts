@@ -235,8 +235,9 @@ export default class GameService extends EventEmitter {
 
         // Perform a new player check if the game is for established players only.
         // If the player is new then they cannot join.
+
         if (this.gameTypeService.isForEstablishedPlayersOnly(game)) {
-            let isEstablishedPlayer = await this.achievementService.isEstablishedPlayer(userId);
+            const isEstablishedPlayer = await this.userService.isEstablishedPlayer(userId);
             
             // Disallow new players from joining non-new-player-games games if they haven't completed a game yet.
             if (!isEstablishedPlayer && !this.gameTypeService.isNewPlayerGame(game)) {

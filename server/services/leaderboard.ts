@@ -736,6 +736,11 @@ export default class LeaderboardService {
             if (!player.defeated && !player.afk) {
                 user.achievements.completed++;
             }
+
+            // Any player who isn't afk in an NPG is now considered an established player.
+            if (!player.afk) {
+                user.isEstablishedPlayer = true;
+            }
         }
 
         result.eloRating = this.addUserRatingCheck(game, gameUsers);

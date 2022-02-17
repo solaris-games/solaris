@@ -465,4 +465,12 @@ export default class UserService extends EventEmitter {
         });
     }
 
+    async isEstablishedPlayer(userId: DBObjectId) {
+        let user = await this.userRepo.findById(userId, {
+            isEstablishedPlayer: 1
+        });
+
+        return user?.isEstablishedPlayer || false;
+    }
+
 };

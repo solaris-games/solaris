@@ -82,7 +82,7 @@ export default class GameCreateService {
                 throw new ValidationError(`Games larger than 16 players are reserved for official games or can be created by GMs.`);
             }
 
-            let isEstablishedPlayer = await this.achievementService.isEstablishedPlayer(settings.general.createdByUserId);
+            let isEstablishedPlayer = await this.userService.isEstablishedPlayer(settings.general.createdByUserId);
 
             // Disallow new players from creating games if they haven't completed a game yet.
             if (!isEstablishedPlayer) {

@@ -23,6 +23,7 @@ export interface User {
     banned: boolean;
     lastSeen: Date | null;
     lastSeenIP: string | null;
+    isEstablishedPlayer: boolean;
     roles: {
         administrator: boolean;
         contributor: boolean;
@@ -160,6 +161,4 @@ export interface User {
         }
     },
     avatars: number[];
-
-    isEstablishedPlayer?: boolean;
 };
