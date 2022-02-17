@@ -280,7 +280,7 @@ export default class GameService extends EventEmitter {
         let isRejoiningAfkSlot = isAfker && player.afk && userId && player.userId && player.userId.toString() === userId.toString();
 
         // If they have been afk'd then they are only allowed to join their slot again.
-        if (player.afk && isAfker && userId && player.userId && player.userId.toString() === userId.toString()) {
+        if (player.afk && isAfker && userId && player.userId && player.userId.toString() !== userId.toString()) {
             throw new ValidationError('You can only rejoin this game in your own slot.');
         }
 

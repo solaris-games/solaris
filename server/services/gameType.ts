@@ -84,4 +84,8 @@ export default class GameTypeService {
         return game.settings.specialGalaxy.splitResources === 'enabled';
     }
 
+    is1v1Game(game: Game) {
+        return ['1v1_rt', '1v1_tb'].includes(game.settings.general.type);
+    }
+
 }
