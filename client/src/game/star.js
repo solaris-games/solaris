@@ -494,8 +494,9 @@ class Star extends EventEmitter {
     }
 
     let totalKnownShips = (this.data.ships || 0) + this._getStarCarrierShips()
+    let carriersOrbiting = this._getStarCarriers()
 
-    if (this.data.ownedByPlayerId && (totalKnownShips > 0 || this._getStarCarriers().length > 0 || this._hasUnknownShips())) {
+    if ((this.data.ownedByPlayerId || carriersOrbiting) && (totalKnownShips > 0 || carriersOrbiting.length > 0 || this._hasUnknownShips())) {
       this.text_name.y = ( (Star.nameSize+Star.shipsSmallSize)/2.0 )-Star.nameSize
     } else {
       this.text_name.y = -(this.text_name.height / 2)
