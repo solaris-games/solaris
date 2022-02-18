@@ -9,12 +9,8 @@ export interface InvasionInProgress {
     star: string;
 }
 
-export interface StartedClaim {
-    star: string;
-}
-
 export interface AiState {
     knownAttacks: KnownAttack[];
     invasionsInProgress: InvasionInProgress[];
-    startedClaims: StartedClaim[];
+    startedClaims: string[];
 }
