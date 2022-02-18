@@ -15,7 +15,7 @@ export interface Carrier extends MapObject {
     waypoints: CarrierWaypoint[];
     ticksEta?: number | null;
     ticksEtaTotal?: number | null;
-    locationNext: Location;
+    locationNext: Location | null;
     distanceToDestination?: number;
 
     toObject(): Carrier;

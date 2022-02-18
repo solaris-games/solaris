@@ -13,6 +13,7 @@ import WaypointService from "./waypoint";
 import {Star} from "../types/Star";
 import {Carrier} from "../types/Carrier";
 import { getOrInsert, reverseSort, notNull } from "../utils";
+import {CarrierWaypoint} from "../types/CarrierWaypoint";
 
 const FIRST_TICK_BULK_UPGRADE_SCI_PERCENTAGE = 20;
 const FIRST_TICK_BULK_UPGRADE_IND_PERCENTAGE = 30;
@@ -47,6 +48,17 @@ interface Context {
     playerEconomy: number;
     playerIndustry: number;
     playerScience: number;
+}
+
+interface Assignment {
+    carriers: Carrier[];
+    star: Star;
+    totalShips: number;
+}
+
+interface FoundAssignment {
+    assignment: Assignment;
+    trace: string[];
 }
 
 const EMPTY_STAR_SCORE_MULTIPLIER = 1;
@@ -157,7 +169,7 @@ export default class AIService {
         return state;
     }
 
-    _updateState(game: Game, player: Player, context) {
+    _updateState(game: Game, player: Player, context: Context) {
         if (!player.aiState) {
             return;
         }
@@ -262,7 +274,7 @@ export default class AIService {
         }
     }
 
-    async _evaluateOrders(game: Game, player: Player, context: Context, orders, assignments) {
+    async _evaluateOrders(game: Game, player: Player, context: Context, orders, assignments: Map<string, Assignment>) {
         const sorter = (o1, o2) => {
             const categoryPriority = this.priorityFromOrderCategory(o1.type) - this.priorityFromOrderCategory(o2.type);
             if (categoryPriority !== 0) {
@@ -358,7 +370,7 @@ export default class AIService {
 
                 const ticksLimit = game.settings.galaxy.productionTicks * 2; // If star is not reachable in that time, try again next cycle
                 const fittingAssignments = this._findAssignmentsWithTickLimit(game, player, context, context.freelyReachableStars, assignments, order.star, ticksLimit, this._canAffordCarrier(context, game, player, false), true)
-                const found: any = fittingAssignments && fittingAssignments[0];
+                const found: FoundAssignment = fittingAssignments && fittingAssignments[0];
 
                 if (!found) {
                     continue;
@@ -367,7 +379,9 @@ export default class AIService {
                 const waypoints = this._createWaypointsFromTrace(found.trace);
                 await this._useAssignment(context, game, player, assignments, found.assignment, waypoints, found.assignment.totalShips);
                 for (const visitedStar of found.trace) {
-                    newClaimedStars.add(visitedStar);
+                    newClaimedStars.add({
+                        star: visitedStar.toString()
+                    });
                 }
             } else if (order.type === AiAction.ReinforceStar) {
                 const assignment = assignments.get(order.source);
@@ -377,7 +391,7 @@ export default class AIService {
                 const hasCarrier = assignment.carriers && assignment.carriers.length > 0;
 
                 const reinforce = async () => {
-                    const waypoints = [
+                    const waypoints: CarrierWaypoint[] = [
                         {
                             _id: new mongoose.Types.ObjectId(),
                             source: order.source,
@@ -428,11 +442,11 @@ export default class AIService {
         context.aiState.startedClaims = claimsInProgress;
     }
 
-    async _useAssignment(context: Context, game: Game, player: Player, assignments, assignment, waypoints, ships, onCarrierUsed: any | null = null) {
+    async _useAssignment(context: Context, game: Game, player: Player, assignments: Map<string, Assignment>, assignment: Assignment, waypoints: CarrierWaypoint[], ships: number, onCarrierUsed: ((Carrier) => void) | null = null) {
         console.log("Using assignment from " + assignment.star.name + ". " + assignment.carriers.length + " carriers present.");
         let shipsToTransfer = ships;
-        const starId = assignment.star._id.toString();
-        let carrier = assignment.carriers && assignment.carriers[0];
+        const starId = assignment.star._id;
+        let carrier: Carrier = assignment.carriers && assignment.carriers[0];
         if (carrier) {
             console.log("Using existing carrier " + carrier.name);
             assignment.carriers.shift();
@@ -445,15 +459,15 @@ export default class AIService {
         }
         if (shipsToTransfer > 0) {
             console.log("Ships for transfer: " + shipsToTransfer + ", assignment total: " + assignment.totalShips);
-            const remaining = Math.max(assignment.star.ships - shipsToTransfer, 0);
+            const remaining = Math.max(assignment.star.ships! - shipsToTransfer, 0);
             await this.shipTransferService.transfer(game, player, carrier._id, shipsToTransfer + 1, starId, remaining, false);
-            assignment.totalShips = assignment.star.ships;
+            assignment.totalShips = assignment.star.ships!;
         }
         console.log("Assignment ships after transfer: " + assignment.totalShips);
         const carrierResult = await this.waypointService.saveWaypointsForCarrier(game, player, carrier, waypoints, false, false);
         const carrierRemaining = assignment.carriers && assignment.carriers.length > 0;
         if (!carrierRemaining && assignment.totalShips === 0) {
-            assignments.delete(starId);
+            assignments.delete(starId.toString());
         }
         if (onCarrierUsed) {
             onCarrierUsed(carrier);
@@ -461,19 +475,15 @@ export default class AIService {
         return carrierResult;
     }
 
-    _createWaypointsFromTrace(trace) {
-        const waypoints: any[] = [];
-
-        if (trace.length <= 1) {
-            return null;
-        }
+    _createWaypointsFromTrace(trace: string[]): CarrierWaypoint[] {
+        const waypoints: CarrierWaypoint[] = [];
 
         let last = trace[0];
         for (let i = 1; i < trace.length; i++) {
             waypoints.push({
                 _id: new mongoose.Types.ObjectId(),
-                source: last,
-                destination: trace[i],
+                source: new mongoose.Types.ObjectId(last),
+                destination: new mongoose.Types.ObjectId(trace[i]),
                 action: 'nothing',
                 actionShips: 0,
                 delayTicks: 0
@@ -484,7 +494,7 @@ export default class AIService {
         return waypoints;
     }
 
-    _canAffordCarrier(context, game, player, highPriority) {
+    _canAffordCarrier(context: Context, game: Game, player: Player, highPriority: boolean): boolean {
         // Keep 20% of budget for upgrades
         const leaveOver = highPriority ? 0 : context.playerEconomy * 2;
         const availableFunds = player.credits - leaveOver;
@@ -492,7 +502,7 @@ export default class AIService {
         return availableFunds >= this.starUpgradeService.calculateCarrierCost(game, carrierExpenseConfig);
     }
 
-    _searchAssignments(context, starGraph, assignments, nextFilter, onAssignment, startStarId) {
+    _searchAssignments(context: Context, starGraph: StarGraph, assignments: Map<string, Assignment>, nextFilter, onAssignment, startStarId) {
         const queue = new Heap({
             comparBefore: (b1, b2) => b1.totalDistance > b2.totalDistance,
             compar: (b1, b2) => b2.totalDistance - b1.totalDistance
@@ -521,7 +531,7 @@ export default class AIService {
 
             const nextCandidates = starGraph.get(starId);
             if (nextCandidates) {
-                const star = context.starsById.get(starId);
+                const star = context.starsById.get(starId)!;
 
                 const fittingCandidates = Array.from(nextCandidates)
                     .filter(candidate => nextFilter(trace, candidate));
@@ -529,7 +539,7 @@ export default class AIService {
                 for (const fittingCandidate of fittingCandidates) {
                     if (!visited.has(fittingCandidate)) {
                         visited.add(fittingCandidate);
-                        const distToNext = this.distanceService.getDistanceSquaredBetweenLocations(star, context.starsById.get(fittingCandidate));
+                        const distToNext = this.distanceService.getDistanceSquaredBetweenLocations(star.location, context.starsById.get(fittingCandidate)!.location);
                         const newTotalDist = totalDistance + distToNext;
                         queue.push({
                             starId: fittingCandidate,
@@ -542,22 +552,22 @@ export default class AIService {
         }
     }
 
-    _filterAssignmentByCarrierPurchase(assignment, allowCarrierPurchase) {
+    _filterAssignmentByCarrierPurchase(assignment: Assignment, allowCarrierPurchase: boolean) {
         const hasCarriers = assignment.carriers && assignment.carriers.length > 0;
         return allowCarrierPurchase || hasCarriers;
     }
 
-    _findAssignmentsWithTickLimit(game, player, context, starGraph, assignments, destinationId, ticksLimit, allowCarrierPurchase, onlyOne = false) {
+    _findAssignmentsWithTickLimit(game: Game, player: Player, context: Context, starGraph: StarGraph, assignments: Map<string, Assignment>, destinationId, ticksLimit, allowCarrierPurchase, onlyOne = false): FoundAssignment[] {
         const distancePerTick = game.settings.specialGalaxy.carrierSpeed;
 
         const nextFilter = (trace, nextStarId) => {
-            const entireTrace = trace.concat([nextStarId]).map(starId => context.starsById.get(starId).location);
+            const entireTrace = trace.concat([nextStarId]).map(starId => context.starsById.get(starId)!.location);
             const entireDistance = this.distanceService.getDistanceAlongLocationList(entireTrace);
             const ticksRequired = Math.ceil(entireDistance / distancePerTick);
             return ticksRequired <= ticksLimit;
         }
 
-        const fittingAssignments: any[] = [];
+        const fittingAssignments: FoundAssignment[] = [];
 
         const onAssignment = (assignment, trace) => {
             if (this._filterAssignmentByCarrierPurchase(assignment, allowCarrierPurchase)) {
@@ -574,7 +584,7 @@ export default class AIService {
         return fittingAssignments;
     }
 
-    _createDefaultAttackData(game, starId, ticksUntil): KnownAttack {
+    _createDefaultAttackData(game: Game, starId: string, ticksUntil: number): KnownAttack {
         const arrivalTick = game.state.tick + ticksUntil;
 
         return {
@@ -584,13 +594,13 @@ export default class AIService {
         }
     }
 
-    _calculateRequiredShipsForAttack(game, player, context, starToInvade) {
+    _calculateRequiredShipsForAttack(game: Game, player: Player, context: Context, starToInvade: Star) {
         const starId = starToInvade._id.toString();
         const defendingPlayer = this.playerService.getById(game, starToInvade.ownedByPlayerId);
         const defendingCarriers = context.carriersOrbiting.get(starId) || [];
 
         const defender = {
-            ships: Math.floor(starToInvade.shipsActual) + defendingCarriers.reduce((sum, c) => sum + c.ships, 0),
+            ships: Math.floor(starToInvade.shipsActual || 0) + defendingCarriers.reduce((sum, c) => sum + (c.ships || 0), 0),
             weaponsLevel: this.technologyService.getStarEffectiveWeaponsLevel(game, [defendingPlayer], starToInvade, defendingCarriers)
         };
         const attacker = {
@@ -643,34 +653,34 @@ export default class AIService {
         }
     }
 
-    async _gatherAssignments(game, player, context) {
-        const assignments = new Map();
+    async _gatherAssignments(game: Game, player: Player, context: Context): Promise<Map<string, Assignment>> {
+        const assignments = new Map<string, Assignment>();
 
         for (const playerStar of context.playerStars) {
             const carriersHere = context.carriersOrbiting.get(playerStar._id.toString()) || [];
 
             for (const carrier of carriersHere) {
-                if (carrier.ships > 1) {
-                    const newStarShips = playerStar.ships + carrier.ships - 1;
+                if (carrier.ships! > 1) {
+                    const newStarShips = playerStar.ships! + carrier.ships! - 1;
                     await this.shipTransferService.transfer(game, player, carrier._id, 1, playerStar._id, newStarShips, false);
                 }
             }
 
-            if (playerStar.ships < 1 && carriersHere.length === 0) {
+            if (playerStar.ships! < 1 && carriersHere.length === 0) {
                 continue;
             }
 
             assignments.set(playerStar._id.toString(), {
                 carriers: carriersHere,
                 star: playerStar,
-                totalShips: playerStar.ships
+                totalShips: playerStar.ships!
             });
         }
 
         return assignments;
     }
 
-    _gatherOrders(game, player, context) {
+    _gatherOrders(game: Game, player: Player, context: Context) {
         const defenseOrders: any[] = this._gatherDefenseOrders(game, player, context);
         const invasionOrders = this._gatherInvasionOrders(game, player, context);
         const expansionOrders = this._gatherExpansionOrders(game, player, context);

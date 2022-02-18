@@ -79,7 +79,7 @@ export default class CarrierService extends EventEmitter {
       return game.galaxy.carriers.filter(carrier => carrier.orbiting && carrier.orbiting.toString() === starId.toString())
     }
 
-    createAtStar(star: Star, carriers: Carrier[], ships: number = 1) {
+    createAtStar(star: Star, carriers: Carrier[], ships: number = 1): Carrier {
         if (!Math.floor(star.shipsActual!)) {
             throw new ValidationError('Star must have at least 1 ship to build a carrier.');
         }
@@ -88,7 +88,7 @@ export default class CarrierService extends EventEmitter {
         // this name isn't already taken by another carrier.
         let name = this.generateCarrierName(star, carriers);
 
-        let carrier = {
+        let carrier: Carrier = {
             _id: mongoose.Types.ObjectId(),
             ownedByPlayerId: star.ownedByPlayerId,
             ships: ships,
@@ -98,7 +98,12 @@ export default class CarrierService extends EventEmitter {
             waypoints: [],
             waypointsLooped: false,
             specialistId: null,
-            specialist: null
+            specialist: undefined,
+            isGift: false,
+            locationNext: null,
+            toObject(): Carrier {
+                return this
+            }
         };
 
         // Reduce the star ships by how many we have added to the carrier.

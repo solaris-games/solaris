@@ -1,3 +1,5 @@
+import {Carrier} from "../types/Carrier";
+
 const EventEmitter = require('events');
 import { DBObjectId } from '../types/DBObjectId';
 import ValidationError from '../errors/validation';
@@ -121,7 +123,7 @@ export default class StarUpgradeService extends EventEmitter {
         }
     }
 
-    async buildCarrier(game: Game, player: Player, starId: DBObjectId, ships: number, writeToDB: boolean = true) {
+    async buildCarrier(game: Game, player: Player, starId: DBObjectId, ships: number, writeToDB: boolean = true): Promise<{carrier: Carrier, starShips: number}> {
         ships = ships || 1;
 
         if (ships < 1) {
@@ -196,7 +198,7 @@ export default class StarUpgradeService extends EventEmitter {
 
         return {
             carrier,
-            starShips: star.ships
+            starShips: star.ships || 0
         };
     }
 
