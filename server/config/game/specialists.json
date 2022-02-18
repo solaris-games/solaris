@@ -192,19 +192,23 @@
             "id": 13,
             "key": "pirate",
             "name": "Pirate",
-            "description": "Grants +3 Weapons in carrier-to-carrier combat, -2 Weapons in carrier-to-star combat and x1.5 Speed.",
+            "description": "Grants +3 Weapons in carrier-to-carrier combat, -2 Weapons in carrier-to-star combat and x1.5 Speed. The carrier can target enemy carriers with a x4 Speed.",
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
             "oneShot": false,
             "modifiers": {
                 "local": {
                     "speed": 1.5,
+                    "toCarrierSpeed": 4,
                     "carrierToCarrierCombat": {
                         "weapons": 3
                     },
                     "carrierToStarCombat": {
                         "weapons": -2
                     }
+                },
+                "special": {
+                    "targetCarriers": true
                 }
             }
         },

@@ -298,39 +298,62 @@ class GameHelper {
         return 1 + delayTicks
     }
 
-    let sourceStar = this.getStarById(game, waypoint.source)
-    let destinationStar = this.getStarById(game, waypoint.destination)
+    let isCarrier = waypoint.isCarrier
 
-    // If the carrier can travel instantly then it'll take 1 tick + any delay.
-    let instantSpeed = sourceStar && this.isStarPairWormHole(sourceStar, destinationStar)
+    if (isCarrier) {
+      let sourceStar = this.getStarById(game, waypoint.source)
+      let destinationCarrier = this.getCarrierById(game, waypoint.destination)
 
-    if (instantSpeed) {
-        return 1 + delayTicks
-    }
+      let source = sourceStar == null ? carrier.location : sourceStar.location
+      let destination = destinationCarrier.location
 
-    let source = sourceStar == null ? carrier.location : sourceStar.location
-    let destination = destinationStar.location
-
-    // If the carrier is already en-route, then the number of ticks will be relative
-    // to where the carrier is currently positioned.
-    if (!carrier.orbiting && carrier.waypoints[0]._id === waypoint._id) {
+      if (!carrier.orbiting && carrier.waypoints[0]._id === waypoint._id) {
         source = carrier.location
-    }
-    
-    let distance = this.getDistanceBetweenLocations(source, destination)
-    let warpSpeed = this.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar)
+      }
 
-    // Calculate how far the carrier will move per tick.
-    let tickDistance = this.getCarrierDistancePerTick(game, carrier, warpSpeed, instantSpeed)
-    let ticks = 1
+      let distance = this.getDistanceBetweenLocations(source, destination)
 
-    if (tickDistance) {
+      let tickDistance = this.getPirateDistancePerTick(game, carrier)
+      let ticks = Math.ceil(distance / tickDistance)
+
+      ticks += delayTicks
+
+      return ticks
+    } else {
+      let sourceStar = this.getStarById(game, waypoint.source)
+      let destinationStar = this.getStarById(game, waypoint.destination)
+
+      // If the carrier can travel instantly then it'll take 1 tick + any delay.
+      let instantSpeed = sourceStar && this.isStarPairWormHole(sourceStar, destinationStar)
+
+      if (instantSpeed) {
+        return 1 + delayTicks
+      }
+
+      let source = sourceStar == null ? carrier.location : sourceStar.location
+      let destination = destinationStar.location
+
+      // If the carrier is already en-route, then the number of ticks will be relative
+      // to where the carrier is currently positioned.
+      if (!carrier.orbiting && carrier.waypoints[0]._id === waypoint._id) {
+        source = carrier.location
+      }
+
+      let distance = this.getDistanceBetweenLocations(source, destination)
+      let warpSpeed = this.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar)
+
+      // Calculate how far the carrier will move per tick.
+      let tickDistance = this.getCarrierDistancePerTick(game, carrier, warpSpeed, instantSpeed)
+      let ticks = 1
+
+      if (tickDistance) {
         ticks = Math.ceil(distance / tickDistance)
+      }
+
+      ticks += delayTicks // Add any delay ticks the waypoint has.
+
+      return ticks;
     }
-
-    ticks += delayTicks // Add any delay ticks the waypoint has.
-
-    return ticks;
   }
 
   calculateWaypointTicksEta(game, carrier, waypoint) {
@@ -428,6 +451,12 @@ class GameHelper {
             distanceModifier *= (specialist.modifiers.local.speed || 1)
         }
     }
+
+    return game.settings.specialGalaxy.carrierSpeed * distanceModifier;
+  }
+
+  getPirateDistancePerTick(game, pirateCarrier) {
+    let distanceModifier = pirateCarrier.specialist.modifiers.local.toCarrierSpeed
 
     return game.settings.specialGalaxy.carrierSpeed * distanceModifier;
   }

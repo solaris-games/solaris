@@ -219,7 +219,7 @@ class Map extends EventEmitter {
     this.drawGalaxyCenter()
 
     if (this.mode === 'waypoints') {
-      this.drawWaypoints()
+      this.drawWaypoints(this.carriers)
     } else {
       this.drawStars()
       this.drawCarriers()
@@ -454,7 +454,7 @@ class Map extends EventEmitter {
 
     if (this.mode === 'waypoints') {
       this._disableCarriersInteractivity()
-      this.drawWaypoints()
+      this.drawWaypoints(this.carriers)
     }
 
     if (wasWaypoints) {
@@ -535,11 +535,26 @@ class Map extends EventEmitter {
     }
   }
 
-  drawWaypoints () {
+  drawWaypoints (disabledCarriers) {
     this.waypoints.draw(this.modeArgs)
 
     for (let i = 0; i < this.carriers.length; i++) {
       let c = this.carriers[i]
+
+      let pirateTargets = c.drawCarrierWaypoints()
+      if (pirateTargets && disabledCarriers) {
+        let currentCarrier = disabledCarriers.find(x => x.data === c.data)
+        let toggle = true;
+        if (this.game.settings.specialGalaxy.carrierToCarrierCombat) {
+          if (c.specialist) {
+            if (c.specialist.modifiers.special && c.specialist.modifiers.special.avoidCombatCarrierToCombat) {
+              toggle = false;
+            }
+          }
+
+          if (!c.isGift && toggle) currentCarrier.enableInteractivity()
+        }
+      }
 
       c.drawCarrierWaypoints()
     }
@@ -834,6 +849,8 @@ class Map extends EventEmitter {
       } else {
         selectedCarrier.unselect()
       }
+    } else if (this.mode === 'waypoints') {
+      this.waypoints.onCarrierClicked(e)
     } else if (this.mode === 'ruler') {
       this.rulerPoints.onCarrierClicked(e)
     }
