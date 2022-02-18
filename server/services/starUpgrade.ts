@@ -156,7 +156,7 @@ export default class StarUpgradeService extends EventEmitter {
         // Create a carrier at the star.
         let carrier = this.carrierService.createAtStar(star, game.galaxy.carriers, ships);
 
-        game.galaxy.carriers.push(carrier as any);
+        game.galaxy.carriers.push(carrier);
 
         // Deduct the cost of the carrier from the player's credits.
         player.credits -= cost;

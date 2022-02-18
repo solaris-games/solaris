@@ -479,7 +479,7 @@ export default class AIService {
             assignment.carriers.shift();
         } else {
             const buildResult = await this.starUpgradeService.buildCarrier(game, player, starId, 1, false);
-            carrier = buildResult.carrier;
+            carrier = this.carrierService.getById(game, buildResult.carrier._id);
             shipsToTransfer -= 1;
             assignment.totalShips -= 1;
             console.log("Building new carrier " + carrier.name);
