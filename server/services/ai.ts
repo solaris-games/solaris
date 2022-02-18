@@ -182,7 +182,6 @@ export default class AIService {
             // Mongoose method that cannot be typechecked
             // @ts-ignore
             player.markModified('aiState');
-            await game.save();
         } catch (e) {
             console.error(e);
         }
