@@ -268,12 +268,14 @@
             "key": "ray-gun",
             "name": "Saboteur",
             "description": "When participating in combat, the enemy fights with -3 Weapons.",
-            "baseCostCredits": 1500,
-            "baseCostCreditsSpecialists": 1500,
+            "baseCostCredits": 1000,
+            "baseCostCreditsSpecialists": 10,
             "oneShot": false,
             "modifiers": {
                 "special": {
-                    "deductEnemyWeapons": 3
+                    "deductEnemyWeapons": 3,
+                    "hyperspace": -2,
+                    "speed": 0.75
                 }
             }
         },
