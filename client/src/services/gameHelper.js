@@ -444,8 +444,8 @@ class GameHelper {
     let firstWaypoint = carrier.waypoints[0]
     let lastWaypoint = carrier.waypoints[carrier.waypoints.length - 1]
 
-    let firstWaypointStar = this.getStarById(game, firstWaypoint.source)
-    let lastWaypointStar = this.getStarById(game, lastWaypoint.source)
+    let firstWaypointStar = this.getStarById(game, firstWaypoint.destination)
+    let lastWaypointStar = this.getStarById(game, lastWaypoint.destination)
 
     if (firstWaypointStar == null || lastWaypointStar == null) {
       return false
