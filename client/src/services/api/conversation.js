@@ -58,6 +58,16 @@ class ConversationService extends BaseApiService {
     { withCredentials: true })
   }
 
+  mute (gameId, conversationId) {
+    return axios.patch(this.BASE_URL + 'game/' + gameId + '/conversations/' + conversationId + '/mute', { },
+    { withCredentials: true })
+  }
+
+  unmute (gameId, conversationId) {
+    return axios.patch(this.BASE_URL + 'game/' + gameId + '/conversations/' + conversationId + '/unmute', { },
+    { withCredentials: true })
+  }
+
 }
 
 export default new ConversationService()
