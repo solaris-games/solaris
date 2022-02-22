@@ -126,7 +126,7 @@ export default class GameTickService extends EventEmitter {
         let taskTime = process.hrtime();
         let taskTimeEnd: [number, number] | null = null;
 
-        let logTime = (taskName: string) => {
+        let logTime = (taskName) => {
             taskTimeEnd = process.hrtime(taskTime);
             taskTime = process.hrtime();
             console.info(`[${game.settings.general.name}] - ${taskName}: %ds %dms'`, taskTimeEnd[0], taskTimeEnd[1] / 1000000);
@@ -230,7 +230,7 @@ export default class GameTickService extends EventEmitter {
         }
 
         let lastTick = moment(game.state.lastTickDate).utc();
-        let nextTick: { diff: (arg0: any, arg1: string) => number; };
+        let nextTick;
         
         if (this.gameTypeService.isRealTimeGame(game)) {
             // If in real time mode, then calculate when the next tick will be and work out if we have reached that tick.
@@ -278,8 +278,8 @@ export default class GameTickService extends EventEmitter {
                 let distanceToDestinationCurrent = this.distanceService.getDistanceBetweenLocations(c.location, destinationStar.location);
                 let distanceToDestinationNext = this.distanceService.getDistanceBetweenLocations(locationNext.location, destinationStar.location);
 
-                let distanceToSourceCurrent: number,
-                    distanceToSourceNext: number;
+                let distanceToSourceCurrent,
+                    distanceToSourceNext;
 
                 // TODO: BUG: Its possible that a carrier is travelling from a star that has been destroyed
                 // and is no longer in the game, this will cause carrier to carrier combat to be actioned.
@@ -325,7 +325,7 @@ export default class GameTickService extends EventEmitter {
                 // First up, get all carriers that are heading from the destination and to the source
                 // and are in front of the carrier.
                 let collisionCarriers: CarrierPosition[] = positions
-                    .filter((c: { carrier: { ships: number; isGift: any; }; destination: { toString: () => any; }; distanceToSourceCurrent: number; distanceToSourceNext: number; distanceToDestinationCurrent: number; distanceToDestinationNext: number; }) => {
+                    .filter(c => {
                         return (c.carrier.ships > 0 && !c.carrier.isGift) // Is still alive and not a gift
                             && (
                                 // Head to head combat:
