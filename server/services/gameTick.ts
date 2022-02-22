@@ -695,6 +695,9 @@ export default class GameTickService extends EventEmitter {
                     rankingResult = await this.leaderboardService.addGameRankings(game, gameUsers, leaderboard);
                 }
 
+                // Mark all players as established regardless of game length.
+                this.leaderboardService.markNonAFKPlayersAsEstablishedPlayers(game, gameUsers);
+
                 // If the game is anonymous, then ranking results should be omitted from the game ended event.
                 if (this.gameTypeService.isAnonymousGame(game)) {
                     rankingResult = null;
