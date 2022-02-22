@@ -138,6 +138,7 @@ export default class GameCreateService {
             game.settings.specialGalaxy.randomWormHoles = 0;
             game.settings.specialGalaxy.randomNebulas = 0;
             game.settings.specialGalaxy.randomAsteroidFields = 0;
+            game.settings.specialGalaxy.randomBinaryStars = 0;
             game.settings.specialGalaxy.randomBlackHoles = 0;
         }
         

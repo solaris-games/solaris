@@ -7,6 +7,9 @@
       <button class="btn btn-sm" v-if="conversation.createdBy" :class="{'btn-default':!pinnedOnly, 'btn-success':pinnedOnly}" title="Show/Hide pinned messages" @click="toggledPinnedOnly">
         <i class="fas fa-thumbtack"></i>
       </button>
+      <button class="btn btn-sm ml-1" :class="{'btn-success':!conversation.isMuted, 'btn-danger':conversation.isMuted}" title="Mute/Unmute conversation" @click="toggleMuteConversation">
+        <i class="fas" :class="{'fa-bell-slash':conversation.isMuted,'fa-bell':!conversation.isMuted}"></i>
+      </button>
       <button class="btn btn-sm btn-info ml-1" @click="toggleConversationWindow" title="Toggle conversation display">
         <i class="fas" :class="{'fa-eye-slash':!toggleDisplay,'fa-eye':toggleDisplay}"></i>
       </button>
@@ -223,6 +226,19 @@ export default {
         } catch (err) {
           console.error(err)
         }
+      }
+    },
+    async toggleMuteConversation () {
+      try {
+        if (this.conversation.isMuted) {
+          this.conversation.isMuted = false
+          await ConversationApiService.unmute(this.$store.state.game._id, this.conversation._id)
+        } else {
+          this.conversation.isMuted = true
+          await ConversationApiService.mute(this.$store.state.game._id, this.conversation._id)
+        }
+      } catch (err) {
+        console.error(err)
       }
     }
   },

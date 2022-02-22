@@ -454,8 +454,9 @@ export default {
       return this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none' && (this.carrier.specialistId || this.isUserPlayerCarrier)
     },
     canHireSpecialist: function () {
-      return this.canShowSpecialist 
-        && this.carrier.orbiting 
+      return this.canShowSpecialist
+        && this.carrier.orbiting
+        && this.isStarOwnedByUserPlayer
         && !GameHelper.isGameFinished(this.$store.state.game) 
         && !this.isDeadStar
         && (!this.carrier.specialistId || !this.carrier.specialist.oneShot)

@@ -736,11 +736,6 @@ export default class LeaderboardService {
             if (!player.defeated && !player.afk) {
                 user.achievements.completed++;
             }
-
-            // Any player who isn't afk in an NPG is now considered an established player.
-            if (!player.afk) {
-                user.isEstablishedPlayer = true;
-            }
         }
 
         result.eloRating = this.addUserRatingCheck(game, gameUsers);
@@ -856,6 +851,21 @@ export default class LeaderboardService {
         let leaderboard = this.getLeaderboardRankings(game).leaderboard;
 
         return leaderboard[0].player;
+    }
+
+    markNonAFKPlayersAsEstablishedPlayers(game: Game, gameUsers: User[]) {
+        // Any player who isn't afk in an NPG is now considered an established player.
+        for (let player of game.galaxy.players) {
+            let user = gameUsers.find(u => player.userId && u._id.toString() === player.userId.toString());
+
+            if (!user) {
+                continue;
+            }
+
+            if (!player.afk) {
+                user.isEstablishedPlayer = true;
+            }
+        }
     }
 
 };

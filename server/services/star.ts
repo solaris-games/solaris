@@ -82,6 +82,7 @@ export default class StarService extends EventEmitter {
         warpGate: star.warpGate,
         isNebula: star.isNebula,
         isAsteroidField: star.isAsteroidField,
+        isBinaryStar: star.isBinaryStar,
         isBlackHole: star.isBlackHole,
         wormHoleToStarId: star.wormHoleToStarId,
         specialistId: star.specialistId
@@ -153,6 +154,10 @@ export default class StarService extends EventEmitter {
 
     listStarsOwnedByPlayer(stars: Star[], playerId: DBObjectId) {
         return stars.filter(s => s.ownedByPlayerId && s.ownedByPlayerId.toString() === playerId.toString());
+    }
+
+    isOwnedByPlayer(star: Star, player: Player) {
+        return star.ownedByPlayerId && star.ownedByPlayerId.toString() === player._id.toString();
     }
 
     isAlive(star: Star) {
