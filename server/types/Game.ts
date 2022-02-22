@@ -68,6 +68,7 @@ export interface GameSettings {
 		timeMachine: GameSettingEnabledDisabled;
 		awardRankTo: GameAwardRankTo;
 		isGameAdmin?: boolean;
+		advancedAI: GameSettingEnabledDisabled;
 	},
 	galaxy: {
 		galaxyType: GameGalaxyType;

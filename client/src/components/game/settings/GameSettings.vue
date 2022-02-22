@@ -36,6 +36,10 @@
             <td>Player Online Status <help-tooltip tooltip="Determines whether players can see who is online in real time"/></td>
             <td class="text-right">{{ getFriendlyText(game.settings.general.playerOnlineStatus) }}</td>
           </tr>
+          <tr>
+            <td>Advanced AI <help-tooltip tooltip="Use the advanced AI to replace defeated players"/></td>
+            <td class="text-right">{{ getFriendlyText(game.settings.general.advancedAI) }}</td>
+          </tr>
         </tbody>
       </table>
     </div>

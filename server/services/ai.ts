@@ -396,11 +396,14 @@ export default class AIService {
                     continue;
                 }
 
+                console.log("Attempting to claim " + context.starsById.get(order.star)!.name);
+
                 const ticksLimit = game.settings.galaxy.productionTicks * 2; // If star is not reachable in that time, try again next cycle
                 const fittingAssignments = this._findAssignmentsWithTickLimit(game, player, context, context.freelyReachableStars, assignments, order.star, ticksLimit, this._canAffordCarrier(context, game, player, false), true)
                 const found: FoundAssignment = fittingAssignments && fittingAssignments[0];
 
                 if (!found) {
+                    console.log("Skipping claim: No assignment found");
                     continue;
                 }
 
@@ -461,6 +464,7 @@ export default class AIService {
         for (const claim of newClaimedStars) {
             const star = context.starsById.get(claim)!;
             if (!star.ownedByPlayerId) {
+                console.log("Claiming " + star.name);
                 claimsInProgress.push(claim);
             }
         }
