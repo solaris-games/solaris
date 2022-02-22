@@ -27,6 +27,7 @@ export default class CustomMapService {
           star.warpGate = star.warpGate == null ? false : star.warpGate;
           star.isNebula = star.isNebula == null ? false : star.isNebula;
           star.isAsteroidField = star.isAsteroidField == null ? false : star.isAsteroidField;
+          star.isBinaryStar = star.isBinaryStar == null ? false : star.isBinaryStar;
           star.isBlackHole = star.isBlackHole == null ? false : star.isBlackHole;
           star.wormHoleToStarId = star.wormHoleToStarId == null ? null : +star.wormHoleToStarId;
           star.specialistId = star.specialistId == null ? null : +star.specialistId;
@@ -42,6 +43,7 @@ export default class CustomMapService {
           this._checkStarProperty(star, 'warpGate', 'boolean', true);
           this._checkStarProperty(star, 'isNebula', 'boolean', true);
           this._checkStarProperty(star, 'isAsteroidField', 'boolean', true);
+          this._checkStarProperty(star, 'isBinaryStar', 'boolean', true);
           this._checkStarProperty(star, 'isBlackHole', 'boolean', true);
           this._checkStarProperty(star, 'wormHoleToStarId', 'number', true);
           this._checkStarProperty(star, 'homeStar', 'boolean', true);
