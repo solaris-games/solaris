@@ -189,9 +189,11 @@ export default {
       this.recalculateLooped()
     },
     onWaypointCreated (e) {
-      // Overwrite the default action and default action ships
-      e.action = this.$store.state.settings.carrier.defaultAction
-      e.actionShips = this.$store.state.settings.carrier.defaultAmount
+      if (!e.isCarrier) {
+        // Overwrite the default action and default action ships
+        e.action = this.$store.state.settings.carrier.defaultAction
+        e.actionShips = this.$store.state.settings.carrier.defaultAmount
+      }
 
       AudioService.type()
 

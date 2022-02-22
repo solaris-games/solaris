@@ -83,34 +83,44 @@ export default class WaypointService {
         for (let i = 0; i < waypoints.length; i++) {
             let waypoint = waypoints[i];
 
-            let sourceStar = this.starService.getById(game, waypoint.source);
-            let destinationStar = this.starService.getById(game, waypoint.destination);
+            // sourceStar can be null, iself or a star.
+            // destinationStar can be a star or a carrier.
+            // if from the previous waypoint, waypoint.isCarrier is true, then waypoint.source is a carrier.
+            // if waypoint.isCarrier then the waypoint.destination is a carrier.
+            let sourceStar: Star | Carrier | null, destinationStar: Star | Carrier, sourceStarName: string
+            if (waypoint.isCarrier) {
+                destinationStar = this.carrierService.getById(game, waypoint.destination);
 
-            let sourceStarName = sourceStar == null ? 'Unknown' : sourceStar.name; // Could be travelling from a destroyed star.
-
-            // Make sure the user isn't being a dumbass.
-            waypoint.actionShips = waypoint.actionShips || 0;
-            waypoint.action = waypoint.action || 'nothing';
-
-            if (waypoint.actionShips == null || (waypoint.actionShips as any) == '' || +waypoint.actionShips < 0) {
+                // user cannot set this. (it will be not near a star)
                 waypoint.actionShips = 0;
+                waypoint.action = 'nothing';
+            } else {
+                destinationStar = this.starService.getById(game, waypoint.destination);
+
+                // Make sure the user isn't being a dumbass.
+                waypoint.actionShips = isNaN(waypoint.actionShips) || +waypoint.actionShips < 0 ? 0 : +waypoint.actionShips
+                waypoint.action = waypoint.action || 'nothing';
+            }
+
+            let previousWaypoint: null | CarrierWaypoint = null;
+            if (i !== 0) {
+                previousWaypoint = waypoints[i - 1];
+            }
+            if (previousWaypoint && previousWaypoint.isCarrier) {
+                sourceStar = this.carrierService.getById(game, previousWaypoint.destination);
+                sourceStarName = 'Unknown'; // Unknown because the carrier will destroy the other carrier if it survives in combat with it, it will not be a star.
+            } else {
+                sourceStar = this.starService.getById(game, waypoint.source);
+                sourceStarName = sourceStar == null ? 'Unknown' : sourceStar.name; // Could be travelling from a destroyed star.
             }
 
             // Make damn sure there is a delay ticks defined.
-            waypoint.delayTicks = waypoint.delayTicks || 0;
-            
-            if (waypoint.delayTicks == null || (waypoint.delayTicks as any) == '' || +waypoint.delayTicks < 0) {
-                waypoint.delayTicks = 0;
-            }
+            // And make sure the user isn't being a dumbass.
+            waypoint.delayTicks = isNaN(waypoint.delayTicks) || +waypoint.delayTicks < 0 ? 0 : +waypoint.delayTicks;
 
             // Make sure delay ticks isn't a decimal.
-            if (+waypoint.delayTicks % 1 != 0) {
+            if (waypoint.delayTicks % 1 != 0) {
                 throw new ValidationError(`The waypoint ${sourceStarName} -> ${destinationStar.name} delay cannot be a decimal.`);
-            }
-
-            // Make sure the user isn't being a dumbass.
-            if (+waypoint.delayTicks < 0) {
-                waypoint.delayTicks = 0;
             }
 
             // Validate waypoint hyperspace range if:
@@ -626,6 +636,7 @@ export default class WaypointService {
         carrier.waypoints = [{
             _id: new mongoose.Types.ObjectId(),
             source: carrier.orbiting,
+            isCarrier: false,
             destination: nearestStar._id,
             action: 'nothing',
             actionShips: 0,
