@@ -189,7 +189,10 @@ export default {
       this.recalculateLooped()
     },
     onWaypointCreated (e) {
-      if (!e.isCarrier) {
+      if (e.isCarrier) {
+        e.action = 'nothing'
+        e.actionShips = 0
+      } else {
         // Overwrite the default action and default action ships
         e.action = this.$store.state.settings.carrier.defaultAction
         e.actionShips = this.$store.state.settings.carrier.defaultAmount
