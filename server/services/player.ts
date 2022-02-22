@@ -175,13 +175,29 @@ export default class PlayerService extends EventEmitter {
         }
 
         let result: PlayerColourShapeCombination[] = [];
-        
-        for (let i = 0; i < playerCount; i++) {
-            let shapeColour = combinations.splice(this.randomService.getRandomNumber(combinations.length - 1), 1)[0];
 
-            result.push(shapeColour);
+        const maxAttempts: number = 2;
+        let attempts: number = 0;
+
+        while (result.length !== playerCount) {
+            // Choose a random shape colour combination
+            let shapeColourIndex = this.randomService.getRandomNumber(combinations.length - 1);
+            let shapeColour = combinations[shapeColourIndex];
+
+            // Test if the colour is already in the list,
+            // if it is, try again up to the max attempt limit.
+            // Ideally we do not want to have the same colours often.
+            let existingColour = result.find(r => r.colour.alias === shapeColour.colour.alias);
+
+            if (!existingColour || attempts >= maxAttempts) {
+                combinations.splice(shapeColourIndex, 1);
+                result.push(shapeColour);
+                attempts = 0;
+            } else {
+                attempts++;
+            }
         }
-
+        
         return result;
     }
 

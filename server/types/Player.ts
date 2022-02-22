@@ -5,6 +5,11 @@ import { AiState } from "./Ai";
 export type PlayerShape = 'circle'|'square'|'diamond'|'hexagon';
 export type ResearchType = 'scanning'|'hyperspace'|'terraforming'|'experimentation'|'weapons'|'banking'|'manufacturing'|'specialists'|'random';
 
+export interface PlayerColour {
+    alias: string;
+    value: string;
+};
+
 export interface PlayerLedger {
     playerId: DBObjectId;
     debt: number;
@@ -78,6 +83,6 @@ export interface Player {
 };
 
 export interface PlayerColourShapeCombination {
-    colour: string;
+    colour: PlayerColour;
     shape: PlayerShape;
 };

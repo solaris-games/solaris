@@ -658,7 +658,7 @@ class GameHelper {
   }
 
   getOnlineStatus (player) {
-    if (player.isOnline == null) {
+    if (player.isOnline == null || player.lastSeen == null) {
       return ''
     }
     else if (player.isOnline) {
