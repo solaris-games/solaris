@@ -14,6 +14,9 @@
           </small>
         </div>
         <div class="col-auto">
+          <small v-if="conversation.isMuted" title="This conversation is muted" class="mr-1">
+            <i class="fas fa-bell-slash"></i>
+          </small>
           <small v-if="!hasReadLastMessage && conversation.unreadCount">
             <i class="fas fa-envelope"></i>
             {{conversation.unreadCount}}
