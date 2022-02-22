@@ -267,7 +267,7 @@
             "id": 17,
             "key": "ray-gun",
             "name": "Saboteur",
-            "description": "When participating in combat, the enemy fights with -3 Weapons.",
+            "description": "When participating in combat, the enemy fights with -3 Weapons. The Saboteur has -2 Hyperspace Range and x0.75 Speed.",
             "baseCostCredits": 1000,
             "baseCostCreditsSpecialists": 10,
             "oneShot": false,
