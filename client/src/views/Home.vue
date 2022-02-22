@@ -4,7 +4,7 @@
 
     <div class="row">
       <div class="col-sm-12 col-md-6 pb-3">
-        <p>Discover a space strategy game filled with conquest, betrayal and subterfuge.</p>
+        <p>Discover a space strategy game filled with <span class="text-warning">conquest</span>, <span class="text-warning">betrayal</span> and <span class="text-warning">subterfuge</span>.</p>
         <p>Build alliances, make enemies and fight your way to victory to <span class="text-danger">galactic domination.</span></p>
         <p>Will <strong>you</strong> conquer the galaxy?</p>
         <a :href="documentationUrl" target="_blank">Learn more...</a>
@@ -15,6 +15,12 @@
         <loading-spinner :loading="isAutoLoggingIn"/>
 
         <account-login v-if="!isAutoLoggingIn"></account-login>
+      </div>
+    </div>
+
+    <div class="row bg-primary">
+      <div class="col text-center">
+        <p class="mb-2 mt-2">Play <span class="text-warning">Solaris</span> on <a href="https://solaris.games" target="_blank" title="Web">Web</a>, <a href="https://store.steampowered.com/app/1623930/Solaris/" target="_blank" title="Steam">Steam</a> and <a href="https://play.google.com/store/apps/details?id=com.voxel.solaris_android" target="_blank" title="Android">Android</a>.</p>
       </div>
     </div>
 

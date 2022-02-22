@@ -57,6 +57,7 @@ function getNewConversation(game: Game, playerId: DBObjectId | null, name: strin
         name,
         createdBy: playerId,
         participants: participantIds,
+        mutedBy: [],
         messages: []
     };
 
@@ -131,6 +132,7 @@ export default class ConversationService extends EventEmitter {
 
             // Calculate how many messages in this conversation the player has NOT read.
             const unreadCount = msgs.filter(m => m.readBy.find(r => r.toString() === playerId.toString()) == null).length;
+            const isMuted = c.mutedBy!.find(m => m.toString() === playerId.toString()) != null;
 
             return {
                 _id: c._id,
@@ -138,7 +140,8 @@ export default class ConversationService extends EventEmitter {
                 createdBy: c.createdBy,
                 name: c.name,
                 lastMessage,
-                unreadCount
+                unreadCount,
+                isMuted
             }
         });
     }
@@ -158,7 +161,7 @@ export default class ConversationService extends EventEmitter {
         return convo || null;
     }
 
-    async detail(game: Game, playerId: DBObjectId, conversationId: DBObjectId, includeEvents: boolean = true) {
+    _getConversationForPlayer(game: Game, conversationId: DBObjectId, playerId: DBObjectId) {
         // Get the conversation that the player has requested in full.
         let convo = game.conversations.find(c => c._id.toString() === conversationId.toString());
 
@@ -170,13 +173,22 @@ export default class ConversationService extends EventEmitter {
             throw new ValidationError(`You are not participating in this conversation.`);
         }
 
+        return convo;
+    }
+
+    async detail(game: Game, playerId: DBObjectId, conversationId: DBObjectId) {
+        let convo = this._getConversationForPlayer(game, conversationId, playerId);
+
+        convo.isMuted = convo.mutedBy!.find(m => m.toString() === playerId.toString()) != null;
+        delete convo.mutedBy;
+
         convo.messages.forEach(m => {
             m.type = 'message'; // Append the type of message as we may add trade events.
         });
 
         // If there are only two participants, then include any trade events that occurred
         // between the players.
-        if (includeEvents && convo.participants.length === 2) {
+        if (convo.participants.length === 2) {
             let events = await this.tradeService.listTradeEventsBetweenPlayers(game, playerId, convo.participants);
 
             convo.messages = convo.messages.concat(events);
@@ -195,7 +207,16 @@ export default class ConversationService extends EventEmitter {
             throw new ValidationError(`Message must not be empty.`);
         }
 
-        let convo = await this.detail(game, player._id, conversationId, false); // Call this for the validation.
+        // Get the conversation that the player has requested in full.
+        let convo = game.conversations.find(c => c._id.toString() === conversationId.toString());
+
+        if (convo == null) {
+            throw new ValidationError(`The conversation requested does not exist.`);
+        }
+
+        if (convo.participants.find(p => p.toString() === player._id.toString() == null)) {
+            throw new ValidationError(`You are not participating in this conversation.`);
+        }
 
         let newMessage: ConversationMessage = {
             _id: mongoose.Types.ObjectId(),
@@ -205,8 +226,12 @@ export default class ConversationService extends EventEmitter {
             sentDate: moment().utc(),
             sentTick: game.state.tick,
             pinned: false,
-            readBy: [player._id]
+            readBy: convo.mutedBy!
         };
+
+        if (!newMessage.readBy.find(r => r.toString() === player._id.toString())) {
+            newMessage.readBy.push(player._id);
+        }
 
         // Push a new message into the conversation messages array.
         await this.gameRepo.updateOne({
@@ -218,23 +243,25 @@ export default class ConversationService extends EventEmitter {
             }
         });
 
+        const toPlayerIds = convo.participants.filter(p => p.toString() !== player._id.toString());
+
         const sentMessageResult: ConversationMessageSentResult = {
             ...newMessage,
             conversationId,
             type: 'message',
-            toPlayerIds: convo.participants.filter(p => p.toString() !== player._id.toString())
+            toPlayerIds
         }
 
         return sentMessageResult;
     }
 
     async markConversationAsRead(game: Game, playerId: DBObjectId, conversationId: DBObjectId) {
-        let convo = await this.detail(game, playerId, conversationId, false);
+        let convo = this._getConversationForPlayer(game, conversationId, playerId);
 
         // Note: This is the best way as it may save a DB call
         // if there are no unread messages.
         let unreadMessages = (convo.messages as ConversationMessage[])
-            .filter(m => m.type === 'message' && m.readBy.find(r => r.toString() === playerId.toString()) == null)
+            .filter(m => m.readBy.find(r => r.toString() === playerId.toString()) == null)
             .map(m => m._id);
 
         if (unreadMessages.length) {
@@ -256,7 +283,7 @@ export default class ConversationService extends EventEmitter {
     }
 
     async leave(game: Game, playerId: DBObjectId, conversationId: DBObjectId) {
-        let convo = await this.detail(game, playerId, conversationId, false);
+        let convo = this._getConversationForPlayer(game, conversationId, playerId);
 
         if (convo.createdBy == null) {
             throw new ValidationError(`Cannot leave this conversation.`);
@@ -316,6 +343,28 @@ export default class ConversationService extends EventEmitter {
                     'm._id': messageId
                 }
             ]
+        });
+    }
+
+    async mute(game: Game, playerId: DBObjectId, conversationId: DBObjectId) {
+        return await this.gameRepo.updateOne({
+            _id: game._id,
+            'conversations._id': conversationId
+        }, {
+            $addToSet: {
+                'conversations.$.mutedBy': playerId
+            }
+        });
+    }
+
+    async unmute(game: Game, playerId: DBObjectId, conversationId: DBObjectId) {
+        return await this.gameRepo.updateOne({
+            _id: game._id,
+            'conversations._id': conversationId
+        }, {
+            $pull: {
+                'conversations.$.mutedBy': playerId
+            }
         });
     }
 

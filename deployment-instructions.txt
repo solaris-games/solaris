@@ -1,16 +1,7 @@
-db.users.updateMany({}, {
-    $set: {
-        isEstablishedPlayer: false
-    }
-});
-
-db.users.updateMany({
-    $or: [
-        {'achievements.rank': { $gt: 0 }},
-        {'achievements.completed': { $gt: 0 }}
-    ]
+db.games.updateMany({
+    'conversations': { $ne: null }
 }, {
     $set: {
-        isEstablishedPlayer: true
+        'conversations.$[].mutedBy': []
     }
 });

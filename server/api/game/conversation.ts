@@ -134,6 +134,32 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
+    router.patch('/api/game/:gameId/conversations/:conversationId/mute', middleware.authenticate, middleware.loadGameConversationsLean, middleware.validateGameLocked, middleware.loadPlayer, async (req, res, next) => {
+        try {
+            await container.conversationService.mute(
+                req.game,
+                req.player._id,
+                req.params.conversationId);
+
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.patch('/api/game/:gameId/conversations/:conversationId/unmute', middleware.authenticate, middleware.loadGameConversationsLean, middleware.validateGameLocked, middleware.loadPlayer, async (req, res, next) => {
+        try {
+            await container.conversationService.unmute(
+                req.game,
+                req.player._id,
+                req.params.conversationId);
+
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.patch('/api/game/:gameId/conversations/:conversationId/leave', middleware.authenticate, middleware.loadGameConversationsLean, middleware.validateGameLocked, middleware.loadPlayer, async (req, res, next) => {
         try {
             let convo = await container.conversationService.leave(

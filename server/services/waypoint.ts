@@ -298,8 +298,8 @@ export default class WaypointService {
         let firstWaypoint = carrier.waypoints[0];
         let lastWaypoint = carrier.waypoints[carrier.waypoints.length - 1];
 
-        let firstWaypointStar = this.starService.getById(game, firstWaypoint.source);
-        let lastWaypointStar = this.starService.getById(game, lastWaypoint.source);
+        let firstWaypointStar = this.starService.getById(game, firstWaypoint.destination);
+        let lastWaypointStar = this.starService.getById(game, lastWaypoint.destination);
 
         if (firstWaypointStar == null || lastWaypointStar == null) {
             return false;

@@ -5,8 +5,8 @@
 
     <div class="row pb-0">
       <div class="col-sm-12 col-md-6 col-lg-5">
-        <p>A space strategy game filled with conquest, betrayal and subterfuge.</p>
-        <p>Welcome back<span v-if="user">, <span class="text-warning">{{user.username}}</span></span>!</p>
+        <p class="mb-1">A space strategy game filled with conquest, betrayal and subterfuge.</p>
+        <p><small><span class="text-warning">Solaris</span> is available on <a href="https://solaris.games" target="_blank" title="Web">Web</a>, <a href="https://store.steampowered.com/app/1623930/Solaris/" target="_blank" title="Steam">Steam</a> and <a href="https://play.google.com/store/apps/details?id=com.voxel.solaris_android" target="_blank" title="Android">Android</a>.</small></p>
       </div>
       <div class="col-sm-12 col-md-6 col-lg-7">
         <!-- player quick stats -->

@@ -473,8 +473,8 @@ class GameHelper {
     let firstWaypoint = carrier.waypoints[0]
     let lastWaypoint = carrier.waypoints[carrier.waypoints.length - 1]
 
-    let firstWaypointStar = this.getStarById(game, firstWaypoint.source)
-    let lastWaypointStar = this.getStarById(game, lastWaypoint.source)
+    let firstWaypointStar = this.getStarById(game, firstWaypoint.destination)
+    let lastWaypointStar = this.getStarById(game, lastWaypoint.destination)
 
     if (firstWaypointStar == null || lastWaypointStar == null) {
       return false
@@ -687,7 +687,7 @@ class GameHelper {
   }
 
   getOnlineStatus (player) {
-    if (player.isOnline == null) {
+    if (player.isOnline == null || player.lastSeen == null) {
       return ''
     }
     else if (player.isOnline) {

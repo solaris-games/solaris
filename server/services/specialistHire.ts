@@ -64,6 +64,10 @@ export default class SpecialistHireService {
             throw new ValidationError('Cannot hire a specialist while in orbit of a dead star.');
         }
 
+        if (!this.starService.isOwnedByPlayer(star, player)) {
+            throw new ValidationError('Cannot hire a specialist while in orbit of a star that you do not own.');
+        }
+
         const specialist = this.specialistService.getByIdCarrier(specialistId);
 
         if (!specialist) {
