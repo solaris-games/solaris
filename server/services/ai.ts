@@ -141,7 +141,9 @@ export default class AIService {
         const isFirstTick = game.state.tick % game.settings.galaxy.productionTicks === 1;
         const isLastTick = game.state.tick % game.settings.galaxy.productionTicks === game.settings.galaxy.productionTicks - 1;
 
-        await this._doAdvancedLogic(game, player, isFirstTick, isLastTick);
+        if (game.settings.general.advancedAI === 'enabled') {
+            await this._doAdvancedLogic(game, player, isFirstTick, isLastTick);
+        }
 
         await this._doBasicLogic(game, player, isFirstTick, isLastTick);
     }
