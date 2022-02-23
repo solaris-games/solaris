@@ -10,8 +10,7 @@
     "start-api:prod": "node dist/api/index.js",
     "prebuild": "rm -rf ./dist",
     "build": "tsc",
-    "check": "tsc --noEmit",
-    "postbuild": "cp -r templates ./dist/templates && cp .env ./dist && cp ./bots/discord/.env ./dist/bots/discord | true",
+    "postbuild": "cp -r templates ./dist/templates && cp .env ./dist | true && cp ./bots/discord/.env ./dist/bots/discord | true",
     "ts-node": "ts-node"
   },
   "author": "",

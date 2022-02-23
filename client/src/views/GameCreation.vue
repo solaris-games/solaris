@@ -192,6 +192,7 @@
       </div>
 
       <div class="form-group" v-if="settings.galaxy.galaxyType == 'custom'">
+        <p class="mb-1">It is recommended to use the community galaxy generation tool which can be found here: <a href="https://kurtzmusch.github.io/solaris-galaxy-editor/" target="_blank">https://kurtzmusch.github.io/solaris-galaxy-editor/</a></p>
         <label for="customJSON" class="col-form-label">Galaxy JSON <help-tooltip tooltip="The JSON document for which represents the galaxy to create"/></label>
         <textarea id='customJSON' class='col' v-model='settings.galaxy.customJSON' rows="10"></textarea>
       </div>
@@ -279,9 +280,16 @@
       </div>
 
       <div class="form-group" v-if="settings.galaxy.galaxyType !== 'custom'">
-        <label for="randomAsteroidFields" class="col-form-label">Random Asteroid Fields (<span class="text-warning">{{settings.specialGalaxy.randomAsteroidFields}}%</span>) <help-tooltip tooltip="The percentage of random asteroid fields are generated in the galaxy - Asteroid fields start with additional resources and x2 defender bonus (net +2 weapons)"/></label>
+        <label for="randomAsteroidFields" class="col-form-label">Random Asteroid Fields (<span class="text-warning">{{settings.specialGalaxy.randomAsteroidFields}}%</span>) <help-tooltip tooltip="The percentage of random asteroid fields are generated in the galaxy - Asteroid fields have x2 defender bonus (net +2 weapons) in combat"/></label>
         <div class="col">
           <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomAsteroidFields" v-model="settings.specialGalaxy.randomAsteroidFields" :disabled="isCreatingGame">
+        </div>
+      </div>
+
+      <div class="form-group" v-if="settings.galaxy.galaxyType !== 'custom'">
+        <label for="randomBinaryStars" class="col-form-label">Random Binary Stars (<span class="text-warning">{{settings.specialGalaxy.randomBinaryStars}}%</span>) <help-tooltip tooltip="The percentage of random binary stars are generated in the galaxy - Binary stars start with additional resources"/></label>
+        <div class="col">
+          <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomBinaryStars" v-model="settings.specialGalaxy.randomBinaryStars" :disabled="isCreatingGame">
         </div>
       </div>
 

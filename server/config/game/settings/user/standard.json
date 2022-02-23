@@ -27,6 +27,7 @@
        "randomWormHoles":5,
        "randomNebulas":15,
        "randomAsteroidFields":10,
+       "randomBinaryStars": 10,
        "randomBlackHoles":5,
        "darkGalaxy":"disabled",
        "giftCarriers":"enabled",

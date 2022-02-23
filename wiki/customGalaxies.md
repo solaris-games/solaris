@@ -25,6 +25,7 @@ To define the custom map, you will need to set up a **JSON Object** containing t
             "warpGate": boolean | null,
             "isNebula": boolean | null,
             "isAsteroidField": boolean | null,
+            "isBinaryStar": boolean | null,
             "isBlackHole": boolean | null,
             "wormHoleToStarId": number | null,
             "specialistId": number | null

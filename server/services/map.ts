@@ -162,6 +162,11 @@ export default class MapService {
             this.generateAsteroidFields(game, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomAsteroidFields);
         }
 
+        // If binary stars are enabled, assign random binary stars to start
+        if (game.settings.specialGalaxy.randomBinaryStars) {
+            this.generateBinaryStars(game, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomBinaryStars);
+        }
+
         // If black holes are enabled, assign random black holes to start
         if (game.settings.specialGalaxy.randomBlackHoles) {
             this.generateBlackHoles(game, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomBlackHoles);
@@ -246,6 +251,21 @@ export default class MapService {
                 count++; // Increment because the while loop will decrement.
             } else {
                 star.isAsteroidField = true;
+            }
+        } while (count--);
+    }
+
+    generateBinaryStars(game: Game, stars: Star[], playerCount: number, percentage: number) {
+        let count = Math.floor((stars.length - playerCount) / 100 * percentage);
+
+        // Pick stars at random and set them to be binary stars
+        do {
+            let star = stars[this.randomService.getRandomNumberBetween(0, stars.length - 1)];
+
+            if (star.homeStar || star.isBinaryStar) {
+                count++; // Increment because the while loop will decrement.
+            } else {
+                star.isBinaryStar = true;
 
                 // Overwrite the natural resources
                 let minResources = game.constants.star.resources.maxNaturalResources * 1.5;
