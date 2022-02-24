@@ -12,7 +12,7 @@
           <p>Galactic Credits</p>
           <p><small>Purchase credits in the shop or earn credits by winning official games.</small></p>
         </div>
-        <div class="col">
+        <div class="col-auto">
           <p class="text-right">
             <i class="fas fa-coins mr-2"></i>
             <strong>{{ info.credits }}</strong> credits
