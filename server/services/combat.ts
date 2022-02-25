@@ -187,7 +187,8 @@ export default class CombatService extends EventEmitter {
         let defenderSwapWeapons = this._shouldSwapWeaponsTech(defenderCarriers);
         let attackerSwapWeapons = this._shouldSwapWeaponsTech(attackerCarriers);
 
-        let shouldSwapWeaponsTech = defenderSwapWeapons !== attackerSwapWeapons; // Defender should swap OR attacker should swap BUT not both.
+        let shouldSwapWeaponsTech = (isCarrierToStarCombat && attackerSwapWeapons && !defenderSwapWeapons) ||   // Attacker controls controls the weapon swap in c2s combat unless both have jokers
+                                    (!isCarrierToStarCombat && attackerSwapWeapons !== defenderSwapWeapons);    // In c2c combat, swap weapons unless both have jokers
 
         if (shouldSwapWeaponsTech) {
             let oldDefenderWeaponsTechLevel = defenderWeaponsTechLevel;
