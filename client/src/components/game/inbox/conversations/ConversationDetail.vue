@@ -183,10 +183,15 @@ export default {
       // before scrolling the div container to the bottom.
       setTimeout(async () => {
         if (this.conversation && this.conversation.messages.length) {
-          const el = this.$el.getElementsByClassName('compose-message')[0];
+          if (window.innerWidth >= 992) {
+            const el = this.$el.getElementsByClassName('compose-message')[0];
 
-          if (el) {
-            el.scrollIntoView()
+            if (el) {
+              el.scrollIntoView()
+            }
+          } else {
+            const el = this.$el.querySelector('.messages-container')
+            el.scrollTop = el.scrollHeight
           }
 
           await this.markConversationAsRead()
