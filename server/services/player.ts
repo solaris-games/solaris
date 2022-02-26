@@ -4,7 +4,7 @@ const EventEmitter = require('events');
 import ValidationError from '../errors/validation';
 import DatabaseRepository from '../models/DatabaseRepository';
 import { Game } from '../types/Game';
-import { PlayerColourShapeCombination, PlayerShape } from '../types/Player';
+import { Player, PlayerColourShapeCombination, PlayerShape } from '../types/Player';
 import CarrierService from './carrier';
 import GameTypeService from './gameType';
 import MapService from './map';
@@ -911,6 +911,17 @@ export default class PlayerService extends EventEmitter {
         }
 
         return this.getById(game, star.ownedByPlayerId);
+    }
+
+    async setHasSentTurnReminder(game: Game, player: Player, sent: boolean) {
+        await this.gameRepo.updateOne({
+            _id: game._id,
+            'galaxy.players._id': player._id
+        }, {
+            $set: {
+                'galaxy.players.$.hasSentTurnReminder': sent
+            }
+        });
     }
 
 }
