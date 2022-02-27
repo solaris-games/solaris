@@ -525,10 +525,17 @@ export default class CarrierService extends EventEmitter {
     async moveCarrier(game: Game, gameUsers: User[], carrierInTransit: Carrier) {
         let waypoint: CarrierWaypoint = carrierInTransit.waypoints[0];
 
-        // If the carrier is just about to launch, make damn sure the waypoint source is correct.
-        // Note: This is a plaster over an issue with the saving waypoint logic that doesn't validate waypoints correctly.
+        if (waypoint.delayTicks) {
+            throw new Error(`Cannot move carrier, the waypoint has a delay.`);
+        }
+
         if (this.isLaunching(carrierInTransit)) {
-            waypoint.source = carrierInTransit.orbiting!;
+            waypoint.source = carrierInTransit.orbiting!; // Make damn sure the waypoint source is correct.
+
+            // If the destination star is not the current one, then launch the carrier into space.
+            if (carrierInTransit.orbiting!.toString() !== waypoint.destination.toString()) {
+                carrierInTransit.orbiting = null;
+            }
         }
 
         let sourceStar = game.galaxy.stars.find(s => s._id.toString() === waypoint.source.toString())!;
