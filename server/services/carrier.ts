@@ -124,6 +124,10 @@ export default class CarrierService extends EventEmitter {
         return carriers.filter(s => s.ownedByPlayerId && s.ownedByPlayerId.toString() === playerId.toString());
     }
 
+    listCarriersOwnedByPlayerInOrbit(carriers: Carrier[], playerId: DBObjectId) {
+        return this.listCarriersOwnedByPlayer(carriers, playerId).filter(c => c.orbiting);
+    }
+
     generateCarrierName(star: Star, carriers: Carrier[]) {
         let i = 1;
         let name = `${star.name} ${i++}`;

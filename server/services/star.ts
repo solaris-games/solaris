@@ -97,11 +97,11 @@ export default class StarService extends EventEmitter {
         return this.randomService.getRandomPositionInCircleFromOrigin(originX, originY, radius);
     }
 
-    getById(game: Game, id: DBObjectId) {
+    getById(game: Game, id: DBObjectId | string) {
         return this.getByIdBS(game, id); // Experimental
     }
 
-    getByIdBS(game: Game, id: DBObjectId) {
+    getByIdBS(game: Game, id: DBObjectId | string) {
         let start = 0;
         let end = game.galaxy.stars.length - 1;
 
@@ -168,15 +168,17 @@ export default class StarService extends EventEmitter {
         return this.listStarsOwnedByPlayer(stars, playerId).filter(s => this.isAlive(s));
     }
 
+    listStarIdsWithPlayerCarriersInOrbit(game: Game, playerId: DBObjectId): string[] {
+        return game.galaxy.carriers
+            .filter(c => c.ownedByPlayerId!.toString() === playerId.toString() && c.orbiting)
+            .map(c => c.orbiting!.toString());
+    }
+
     listStarsWithScanningRangeByPlayer(game: Game, playerId: DBObjectId): Star[] {
-        let starIds: DBObjectId[] = this.listStarsOwnedByPlayer(game.galaxy.stars, playerId).map(s => s._id);
+        let starIds: string[] = this.listStarsOwnedByPlayer(game.galaxy.stars, playerId).map(s => s._id.toString());
 
         if (game.settings.player.alliances === 'enabled') { // This never occurs when alliances is disabled.
-            starIds = starIds.concat(
-                game.galaxy.carriers
-                    .filter(c => c.ownedByPlayerId!.toString() === playerId.toString() && c.orbiting)
-                    .map(c => c.orbiting!)
-            );
+            starIds = starIds.concat(this.listStarIdsWithPlayerCarriersInOrbit(game, playerId));
         }
 
         starIds = [...new Set(starIds)];
@@ -184,6 +186,19 @@ export default class StarService extends EventEmitter {
         return starIds
             .map(id => this.getById(game, id))
             .filter(s => this.isAlive(s));
+    }
+
+    listStarsOwnedOrInOrbitByPlayer(game: Game, playerId: DBObjectId): Star[] {
+        let starIds: string[] = this.listStarsOwnedByPlayer(game.galaxy.stars, playerId).map(s => s._id.toString());
+
+        if (game.settings.player.alliances === 'enabled') { // Don't need to check in orbit carriers if alliances is disabled
+            starIds = starIds.concat(this.listStarIdsWithPlayerCarriersInOrbit(game, playerId));
+        }
+
+        starIds = [...new Set(starIds)];
+
+        return starIds
+            .map(id => this.getById(game, id));
     }
 
     listStarsOwnedByPlayerBulkIgnored(stars: Star[], playerId: DBObjectId, infrastructureType: InfrastructureType) {
@@ -213,11 +228,22 @@ export default class StarService extends EventEmitter {
     }
 
     filterStarsByScanningRange(game: Game, player: Player) {
-        let starsInRange: MapObject[] = [];
-
         // Stars may have different scanning ranges independently so we need to check
         // each star to check what is within its scanning range.
-        let starsWithScanning = this.listStarsWithScanningRangeByPlayer(game, player._id);
+        let starsOwnedOrInOrbit = this.listStarsOwnedOrInOrbitByPlayer(game, player._id);
+        let starsWithScanning = starsOwnedOrInOrbit.filter(s => this.isAlive(s));
+
+        // Seed the stars that are in range to be the stars owned or are in orbit of.
+        let starsInRange: MapObject[] = starsOwnedOrInOrbit.map(s => {
+            return {
+                _id: s._id,
+                location: s.location,
+                ownedByPlayerId: s.ownedByPlayerId
+            }
+        });
+
+        // TODO: Optimazation here to seed this array
+        // EXCLUDING the stars in range above.
         let starsToCheck: MapObject[] = game.galaxy.stars.map(s => {
             return {
                 _id: s._id,
@@ -230,7 +256,7 @@ export default class StarService extends EventEmitter {
             let starIds = this.getStarsWithinScanningRangeOfStarByStarIds(game, star, starsToCheck);
 
             for (let starId of starIds) {
-                if (starsInRange.indexOf(starId) === -1) {
+                if (starsInRange.find(x => x._id.toString() === starId._id.toString()) == null) {
                     starsInRange.push(starId);
                     starsToCheck.splice(starsToCheck.indexOf(starId), 1);
                 }
@@ -245,7 +271,7 @@ export default class StarService extends EventEmitter {
         // If worm holes are present, then ensure that any owned star OR star in orbit
         // also has its paired star visible.
         if (game.settings.specialGalaxy.randomWormHoles) {
-            let wormHoleStars = starsWithScanning
+            let wormHoleStars = starsOwnedOrInOrbit
                 .filter(s => s.wormHoleToStarId)
                 .map(s => {
                     return {
@@ -304,15 +330,6 @@ export default class StarService extends EventEmitter {
         });
 
         return starsInRange;
-    }
-
-    isStarInScanningRangeOfPlayer(game: Game, star: Star, player: Player) {
-        // Stars may have different scanning ranges independently so we need to check
-        // each star to check what is within its scanning range.
-        let playerStars = this.listStarsWithScanningRangeByPlayer(game, player._id);
-        let isInScanRange = this.isStarWithinScanningRangeOfStars(game, star, playerStars);
-
-        return isInScanRange;
     }
 
     calculateActualNaturalResources(star: Star): NaturalResources {

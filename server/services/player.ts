@@ -56,20 +56,6 @@ export default class PlayerService extends EventEmitter {
     getByUserId(game, userId) {
         return game.galaxy.players.find(p => p.userId && p.userId.toString() === userId.toString());
     }
-    
-    getPlayersWithinScanningRangeOfStar(game, starId, players) {
-        if (players == null) {
-            players = game.galaxy.players;
-        }
-
-        let star = this.starService.getById(game, starId);
-
-        let playersWithinRange = players.filter(p => {
-            return this.starService.isStarInScanningRangeOfPlayer(game, star, p);
-        });
-
-        return playersWithinRange;
-    }
 
     getPlayersWithinScanningRangeOfPlayer(game, players, player) {
         let inRange = [player];
