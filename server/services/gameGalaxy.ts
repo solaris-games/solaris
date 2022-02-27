@@ -27,6 +27,7 @@ import WaypointService from './waypoint';
 import { Star } from '../types/Star';
 import { Guild, GuildUserWithTag } from '../types/Guild';
 import { CarrierWaypoint } from '../types/CarrierWaypoint';
+import { Carrier } from '../types/Carrier';
 
 export default class GameGalaxyService {
     cacheService: CacheService;
@@ -315,9 +316,13 @@ export default class GameGalaxyService {
 
         // Get all of the player's stars.
         let playerStars: Star[] = [];
+        let playerScanningStars: Star[] = [];
+        let playerCarriersInOrbit: Carrier[] = [];
 
         if (player) {
             playerStars = this.starService.listStarsOwnedByPlayer(doc.galaxy.stars, player._id);
+            playerScanningStars = this.starService.listStarsWithScanningRangeByPlayer(doc, player._id);
+            playerCarriersInOrbit = this.carrierService.listCarriersOwnedByPlayerInOrbit(doc.galaxy.carriers, player._id);
         }
 
         // Work out which ones are not in scanning range and clear their data.
@@ -370,7 +375,9 @@ export default class GameGalaxyService {
                 }
 
                 // Get the closest player star to this star.
-                let inRange = isFinished || this.starService.isStarInScanningRangeOfPlayer(doc, s, player);
+                let inRange = isFinished ||                                                                 // The game is finished
+                    this.starService.isStarWithinScanningRangeOfStars(doc, s, playerScanningStars) ||       // The star is within scanning range
+                    playerCarriersInOrbit.find(c => c.orbiting!.toString() === s._id.toString()) != null;   // The star has a friendly carrier in orbit
 
                 // If its in range then its all good, send the star back as is.
                 // Otherwise only return a subset of the data.

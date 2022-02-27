@@ -4,7 +4,7 @@
       <span class="icon-text"><i class="fas fa-comments mr-1"></i>{{unreadMessages ? unreadMessages : ''}}</span>
     </div>
 
-    <div id="window" class="bg-dark pt-2" v-if="isExpanded">
+    <div id="window" class="bg-dark" v-if="isExpanded">
       <conversation-list v-if="menuState === MENU_STATES.INBOX"/>
       <create-conversation v-if="menuState == MENU_STATES.CREATE_CONVERSATION"
         :participantIds="menuArguments"

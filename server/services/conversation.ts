@@ -310,6 +310,17 @@ export default class ConversationService extends EventEmitter {
         return convo;
     }
 
+    leaveAll(game: Game, playerId: DBObjectId) {
+        let convos = game.conversations.filter(c => c.createdBy && c.participants.indexOf(playerId) > -1);
+
+        for (let convo of convos) {
+            convo.participants.splice(
+                convo.participants.indexOf(playerId),
+                1
+            );
+        }
+    }
+
     getUnreadCount(game: Game, playerId: DBObjectId) {
         return (game.conversations || [])
             .filter(c => c.participants.find(p => p.toString() === playerId.toString()))

@@ -5,7 +5,7 @@
 
     <loading-spinner :loading="!settings"/>
 
-    <form @submit.prevent="handleSubmit" v-if="settings">
+    <form @submit.prevent="handleSubmit" v-if="settings" autocomplete="off">
       <div class="form-group">
         <label for="name" class="col-form-label">Name <help-tooltip tooltip="The name of the game, make it short and sweet"/></label>
         <input type="text" required="required" class="form-control" id="name" minlength="3" maxlength="24" v-model="settings.general.name" :disabled="isCreatingGame">
