@@ -74,6 +74,16 @@ export default class DatabaseRepository<T> {
         return await this.model.deleteMany(query).exec();
     }
 
+    async insertOne(document: any): Promise<void> {
+        return await this.bulkWrite([
+            {
+                insertOne: {
+                    document
+                }
+            }
+        ]);
+    }
+
     objectIdFromDate(date: Date) {
         return Math.floor(date.getTime() / 1000).toString(16) + "0000000000000000";
     }

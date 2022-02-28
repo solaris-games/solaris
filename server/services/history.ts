@@ -8,18 +8,15 @@ import GameService from './game';
 import PlayerService from './player';
 
 export default class HistoryService {
-    historyModel: any;
     historyRepo: DatabaseRepository<GameHistory>;
     playerService: PlayerService;
     gameService: GameService;
 
     constructor(
-        historyModel: any,
         historyRepo: DatabaseRepository<GameHistory>,
         playerService: PlayerService,
         gameService: GameService
     ) {
-        this.historyModel = historyModel;
         this.historyRepo = historyRepo;
         this.playerService = playerService;
         this.gameService = gameService;
@@ -84,32 +81,29 @@ export default class HistoryService {
     }
 
     async log(game: Game) {
-        // Check if there is already a history record with this tick, if so we should
-        // overwrite it.
-        let history = await this.historyRepo.findOneAsModel({
+        // Check if there is already a history record with this tick, if so we should ignore this call.
+        let history = await this.historyRepo.findOne({
             gameId: game._id,
             tick: game.state.tick
         });
 
-        if (!history) {
-            history = new this.historyModel({
-                gameId: game._id,
-                tick: game.state.tick,
-                productionTick: game.state.productionTick
-            });
+        if (history) {
+            return;
         }
 
-        // Reset just in case there was an existing history.
-        history.players = [];
-        history.stars = [];
-        history.carriers = [];
+        history = {
+            gameId: game._id,
+            tick: game.state.tick,
+            productionTick: game.state.productionTick,
+            players: [],
+            stars: [],
+            carriers: []
+        };
 
-        for (let i = 0; i < game.galaxy.players.length; i++) {
-            let player = game.galaxy.players[i];
-
+        history.players = game.galaxy.players.map(player => {
             let stats = this.playerService.getStats(game, player);
 
-            history.players.push({
+            return {
                 userId: player.userId,
                 playerId: player._id,
                 statistics: {
@@ -138,20 +132,20 @@ export default class HistoryService {
                 ready: player.ready,
                 readyToQuit: player.readyToQuit,
                 research: player.research
-            });
-        }
+            };
+        });
 
         history.stars = game.galaxy.stars.map(s => {
             return {
                 starId: s._id,
                 ownedByPlayerId: s.ownedByPlayerId,
                 naturalResources: s.naturalResources,
-                ships: s.ships,
-                shipsActual: s.shipsActual,
+                ships: s.ships!,
+                shipsActual: s.shipsActual!,
                 specialistId: s.specialistId,
                 homeStar: s.homeStar,
                 warpGate: s.warpGate,
-                ignoreBulkUpgrade: s.ignoreBulkUpgrade,
+                ignoreBulkUpgrade: s.ignoreBulkUpgrade!,
                 infrastructure: s.infrastructure,
                 location: s.location
             };
@@ -178,7 +172,7 @@ export default class HistoryService {
             return x;
         });
 
-        await history.save();
+        await this.historyRepo.insertOne(history);
 
         await this.cleanupTimeMachineHistory(game);
     }
