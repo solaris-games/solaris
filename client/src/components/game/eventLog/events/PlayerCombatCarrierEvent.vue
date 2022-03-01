@@ -6,14 +6,14 @@
         <div class="table-responsive mt-2">
             <table class="table table-sm" v-if="event">
                 <thead>
-                    <th></th>
+                    <th>Carriers</th>
                     <th class="text-right">Before</th>
                     <th class="text-right">Lost</th>
                     <th class="text-right">After</th>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>Carriers: Weapons {{event.data.combatResult.weapons.defender}}</td>
+                        <td><i>Weapons {{event.data.combatResult.weapons.defender}} <span v-if="event.data.combatResult.weapons.defenderBase !== event.data.combatResult.weapons.defender">(base {{event.data.combatResult.weapons.defenderBase}})</span></i></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -40,9 +40,15 @@
                 </tbody>
             </table>
             <table class="table table-sm" v-if="event">
+              <thead>
+                  <th>Carriers</th>
+                  <th class="text-right">Before</th>
+                  <th class="text-right">Lost</th>
+                  <th class="text-right">After</th>
+              </thead>
               <tbody>
                 <tr>
-                    <td>Carriers: Weapons {{event.data.combatResult.weapons.attacker}}</td>
+                    <td><i>Weapons {{event.data.combatResult.weapons.attacker}} <span v-if="event.data.combatResult.weapons.attackerBase !== event.data.combatResult.weapons.attacker">(base {{event.data.combatResult.weapons.attackerBase}})</span></i></td>
                     <td></td>
                     <td></td>
                     <td></td>

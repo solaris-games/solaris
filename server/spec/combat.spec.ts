@@ -55,6 +55,8 @@ describe('combat', () => {
 
         expect(combatResult.weapons.defender).toBe(defender.weaponsLevel);
         expect(combatResult.weapons.attacker).toBe(attacker.weaponsLevel);
+        expect(combatResult.weapons.defenderBase).toBe(defender.weaponsLevel);
+        expect(combatResult.weapons.attackerBase).toBe(attacker.weaponsLevel);
         expect(combatResult.before.defender).toBe(defender.ships);
         expect(combatResult.before.attacker).toBe(attacker.ships);
         expect(combatResult.after.defender).toBe(0);
@@ -81,6 +83,8 @@ describe('combat', () => {
 
         expect(combatResult.weapons.defender).toBe(defender.weaponsLevel);
         expect(combatResult.weapons.attacker).toBe(attacker.weaponsLevel);
+        expect(combatResult.weapons.defenderBase).toBe(defender.weaponsLevel);
+        expect(combatResult.weapons.attackerBase).toBe(attacker.weaponsLevel);
         expect(combatResult.before.defender).toBe(defender.ships);
         expect(combatResult.before.attacker).toBe(attacker.ships);
         expect(combatResult.after.defender).toBe(0);
@@ -107,6 +111,8 @@ describe('combat', () => {
 
         expect(combatResult.weapons.defender).toBe(defender.weaponsLevel);
         expect(combatResult.weapons.attacker).toBe(attacker.weaponsLevel);
+        expect(combatResult.weapons.defenderBase).toBe(defender.weaponsLevel);
+        expect(combatResult.weapons.attackerBase).toBe(attacker.weaponsLevel);
         expect(combatResult.before.defender).toBe(defender.ships);
         expect(combatResult.before.attacker).toBe(attacker.ships);
         expect(combatResult.after.defender).toBe(11);
@@ -144,6 +150,8 @@ describe('combat', () => {
 
         expect(combatResult.weapons.defender).toBe(1);
         expect(combatResult.weapons.attacker).toBe(1);
+        expect(combatResult.weapons.defenderBase).toBe(1);
+        expect(combatResult.weapons.attackerBase).toBe(1);
         expect(combatResult.before.defender).toBe(10);
         expect(combatResult.before.attacker).toBe(10);
         expect(combatResult.after.defender).toBe(1);
@@ -179,6 +187,8 @@ describe('combat', () => {
 
         expect(combatResult.weapons.defender).toBe(1);
         expect(combatResult.weapons.attacker).toBe(1);
+        expect(combatResult.weapons.defenderBase).toBe(1);
+        expect(combatResult.weapons.attackerBase).toBe(1);
         expect(combatResult.before.defender).toBe(10);
         expect(combatResult.before.attacker).toBe(100);
         expect(combatResult.after.defender).toBe(0);
@@ -218,6 +228,8 @@ describe('combat', () => {
 
         expect(combatResult.weapons.defender).toBe(1);
         expect(combatResult.weapons.attacker).toBe(1);
+        expect(combatResult.weapons.defenderBase).toBe(1);
+        expect(combatResult.weapons.attackerBase).toBe(1);
         expect(combatResult.before.defender).toBe(10);
         expect(combatResult.before.attacker).toBe(10);
         expect(combatResult.after.defender).toBe(1);
@@ -257,6 +269,8 @@ describe('combat', () => {
 
         expect(combatResult.weapons.defender).toBe(1);
         expect(combatResult.weapons.attacker).toBe(1);
+        expect(combatResult.weapons.defenderBase).toBe(1);
+        expect(combatResult.weapons.attackerBase).toBe(1);
         expect(combatResult.before.defender).toBe(10);
         expect(combatResult.before.attacker).toBe(100);
         expect(combatResult.after.defender).toBe(0);
@@ -294,6 +308,8 @@ describe('combat', () => {
 
         expect(combatResult.weapons.defender).toBe(1);
         expect(combatResult.weapons.attacker).toBe(1);
+        expect(combatResult.weapons.defenderBase).toBe(1);
+        expect(combatResult.weapons.attackerBase).toBe(1);
         expect(combatResult.before.defender).toBe(10);
         expect(combatResult.before.attacker).toBe(10);
         expect(combatResult.after.defender).toBe(0);
@@ -329,6 +345,8 @@ describe('combat', () => {
 
         expect(combatResult.weapons.defender).toBe(1);
         expect(combatResult.weapons.attacker).toBe(1);
+        expect(combatResult.weapons.defenderBase).toBe(1);
+        expect(combatResult.weapons.attackerBase).toBe(1);
         expect(combatResult.before.defender).toBe(100);
         expect(combatResult.before.attacker).toBe(10);
         expect(combatResult.after.defender).toBe(90);
@@ -364,6 +382,8 @@ describe('combat', () => {
 
         expect(combatResult.weapons.defender).toBe(1);
         expect(combatResult.weapons.attacker).toBe(1);
+        expect(combatResult.weapons.defenderBase).toBe(1);
+        expect(combatResult.weapons.attackerBase).toBe(1);
         expect(combatResult.before.defender).toBe(10);
         expect(combatResult.before.attacker).toBe(100);
         expect(combatResult.after.defender).toBe(0);
@@ -396,6 +416,8 @@ describe('combat', () => {
 
         expect(combatResult.weapons.defender).toBe(1);
         expect(combatResult.weapons.attacker).toBe(1);
+        expect(combatResult.weapons.defenderBase).toBe(1);
+        expect(combatResult.weapons.attackerBase).toBe(1);
         expect(combatResult.before.defender).toBe(10);
         expect(combatResult.before.attacker).toBe(1);
         expect(combatResult.after.defender).toBe(9);
@@ -428,6 +450,8 @@ describe('combat', () => {
 
         expect(combatResult.weapons.defender).toBe(1);
         expect(combatResult.weapons.attacker).toBe(1);
+        expect(combatResult.weapons.defenderBase).toBe(1);
+        expect(combatResult.weapons.attackerBase).toBe(1);
         expect(combatResult.before.defender).toBe(1);
         expect(combatResult.before.attacker).toBe(10);
         expect(combatResult.after.defender).toBe(0);

@@ -11,6 +11,13 @@ export interface Attacker {
     weaponsLevel: number;
 };
 
+export interface CombatWeapons {
+    defender: number;
+    defenderBase: number;
+    attacker: number;
+    attackerBase: number;
+};
+
 export interface CombatPart {
     defender: number;
     attacker: number;
@@ -38,7 +45,7 @@ export interface CombatCarrier {
 };
 
 export interface CombatResultShips {
-    weapons: CombatPart;
+    weapons: CombatWeapons;
     before: CombatPart;
     after: CombatPart;
     lost: CombatPart;

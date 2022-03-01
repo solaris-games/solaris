@@ -47,6 +47,8 @@ export default class CombatService extends EventEmitter {
         let defenderShipsRemaining = defender.ships;
         let attackerShipsRemaining = attacker.ships;
 
+        let defendPowerBase = defender.weaponsLevel;
+        let attackPowerBase = attacker.weaponsLevel;
         let defendPower = defender.weaponsLevel;
         let attackPower = attacker.weaponsLevel;
 
@@ -99,7 +101,9 @@ export default class CombatService extends EventEmitter {
         let result: CombatResultShips = {
             weapons: {
                 defender: defendPower,
-                attacker: attackPower
+                defenderBase: defendPowerBase,
+                attacker: attackPower,
+                attackerBase: attackPowerBase
             },
             before: {
                 defender: defender.ships,
