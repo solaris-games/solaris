@@ -295,6 +295,7 @@ export default class CombatService extends EventEmitter {
         // We will update this as we go along with combat.
         combatResult.carriers = carriers.map(c => {
             let specialist = this.specialistService.getByIdCarrierTrim(c.specialistId);
+            let scrambled = this.specialistService.getCarrierHideShips(c);
 
             return {
                 _id: c._id,
@@ -303,12 +304,14 @@ export default class CombatService extends EventEmitter {
                 specialist,
                 before: c.ships!,
                 lost: 0,
-                after: c.ships!
+                after: c.ships!,
+                scrambled
             };
         });
 
         if (star) {
             let specialist = this.specialistService.getByIdStarTrim(star.specialistId);
+            let scrambled = star.isNebula || this.specialistService.getStarHideShips(star);
 
             // Do the same with the star.
             combatResult.star = {
@@ -317,7 +320,8 @@ export default class CombatService extends EventEmitter {
                 specialist,
                 before: Math.floor(star.shipsActual!),
                 lost: 0,
-                after: Math.floor(star.shipsActual!)
+                after: Math.floor(star.shipsActual!),
+                scrambled
             };
         }
 
@@ -535,6 +539,43 @@ export default class CombatService extends EventEmitter {
         return carriers
             .filter(c => c.specialistId)
             .find(c => this.specialistService.getByIdCarrier(c.specialistId)?.modifiers.special?.combatSwapWeaponsTechnology) != null;
+    }
+
+    sanitiseCombatResult(combatResult: CombatResult, player: Player) {
+        let result: CombatResult = Object.assign({}, combatResult);
+
+        if (result.star) {
+            result.star = this.tryMaskObjectShips(combatResult.star, player) as CombatStar;
+        }
+
+        result.carriers = combatResult.carriers.map(c => this.tryMaskObjectShips(c, player)) as CombatCarrier[];
+
+        return result;
+    }
+
+    tryMaskObjectShips(carrierOrStar: CombatStar | CombatCarrier | null, player: Player) {
+        if (!carrierOrStar) {
+            return carrierOrStar;
+        }
+
+        // If the player doesn't own the object and the object is a scrambler then we need
+        // to mask the before and lost amounts.
+        if (carrierOrStar.scrambled && carrierOrStar.ownedByPlayerId && player._id.toString() !== carrierOrStar.ownedByPlayerId.toString()) {
+            let clone: CombatStar | CombatCarrier = Object.assign({}, carrierOrStar);
+
+            clone.before = '???';
+            clone.lost = '???';
+
+            // If the object lost ships and is now dead, then we need to mask the after value too.
+            // Note: Stars can have a 0 ship garrison and be a scrambler so we want to ensure that the 0 ships is still scrambled.
+            if (carrierOrStar.before === 0 || carrierOrStar.after > 0) {
+                clone.after = '???';
+            }
+
+            return clone;
+        }
+
+        return carrierOrStar;
     }
 
 }

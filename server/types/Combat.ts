@@ -23,6 +23,7 @@ export interface CombatStar {
     before: number;
     lost: number;
     after: number;
+    scrambled: boolean;
 };
 
 export interface CombatCarrier {
@@ -33,6 +34,7 @@ export interface CombatCarrier {
     before: number | string;
     lost: number | string;
     after: number | string;
+    scrambled: boolean;
 };
 
 export interface CombatResultShips {
