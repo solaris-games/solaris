@@ -196,7 +196,16 @@ export default class DiplomacyService {
     }
 
     async declareNeutral(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId) {
-        return await this._declareStatus(game, playerId, playerIdTarget, 'neutral');
+        // When declaring neutral, set both players to neutral if they were allies before.
+        let isAllied = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget).actualStatus === 'allies';
+        
+        await this._declareStatus(game, playerId, playerIdTarget, 'neutral');
+
+        if (isAllied) {
+            await this._declareStatus(game, playerIdTarget, playerId, 'neutral');
+        }
+
+        return this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
     }
 
 };
