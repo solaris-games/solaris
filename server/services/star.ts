@@ -242,15 +242,16 @@ export default class StarService extends EventEmitter {
             }
         });
 
-        // TODO: Optimazation here to seed this array
-        // EXCLUDING the stars in range above.
-        let starsToCheck: MapObject[] = game.galaxy.stars.map(s => {
-            return {
-                _id: s._id,
-                location: s.location,
-                ownedByPlayerId: s.ownedByPlayerId
-            }
-        });
+        // Calculate which stars need to be checked excluding the ones that the player can definitely see.
+        let starsToCheck: MapObject[] = game.galaxy.stars
+            .filter(s => starsInRange.find(r => r._id.toString() === s._id.toString()) == null)
+            .map(s => {
+                return {
+                    _id: s._id,
+                    location: s.location,
+                    ownedByPlayerId: s.ownedByPlayerId
+                }
+            });
 
         for (let star of starsWithScanning) {
             let starIds = this.getStarsWithinScanningRangeOfStarByStarIds(game, star, starsToCheck);
