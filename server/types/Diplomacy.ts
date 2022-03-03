@@ -1,6 +1,6 @@
 import { DBObjectId } from "./DBObjectId";
 
-export type DiplomaticState = 'allies' | 'enemies';
+export type DiplomaticState = 'enemies' | 'neutral' | 'allies';
 
 export interface DiplomaticStatus {
     playerIdFrom: DBObjectId;

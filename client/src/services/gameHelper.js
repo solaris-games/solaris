@@ -989,14 +989,14 @@ class GameHelper {
   }
 
   isDiplomaticStatusToPlayersAllied(game, playerId, toPlayerIds) {
-    let playerIdA = playerId
+    let playerIdA = playerId;
 
     for (let i = 0; i < toPlayerIds.length; i++) {
         let playerIdB = toPlayerIds[i]
 
         let diplomaticStatus = this.getDiplomaticStatusToPlayer(game, playerIdA, playerIdB)
 
-        if (diplomaticStatus.actualStatus === 'enemies') {
+        if (['enemies', 'neutral'].includes(diplomaticStatus.actualStatus)) {
             return false
         }
     }
@@ -1005,31 +1005,34 @@ class GameHelper {
   }
 
   getDiplomaticStatusToPlayer(game, playerIdA, playerIdB) {
-    if (playerIdA === playerIdB) return {
-        playerIdFrom: playerIdA,
-        playerIdTo: playerIdB,
-        statusFrom: 'allies',
-        statusTo: 'allies',
-        actualStatus: 'allies'
+    if (playerIdA.toString() === playerIdB.toString()) {
+      return {
+          playerIdFrom: playerIdA,
+          playerIdTo: playerIdB,
+          statusFrom: 'allies',
+          statusTo: 'allies',
+          actualStatus: 'allies'
+      }
     }
 
-    let playerA = game.galaxy.players.find(p => p._id === playerIdA)
-    let playerB = game.galaxy.players.find(p => p._id === playerIdB)
+    let playerA = game.galaxy.players.find(p => p._id.toString() === playerIdA.toString())
+    let playerB = game.galaxy.players.find(p => p._id.toString() === playerIdB.toString())
 
-    let statusTo = 'enemies'
-    let statusFrom = 'enemies'
-    
-    if (playerA.diplomacy) {
-      statusTo = playerA.diplomacy.allies.find(x => x === playerB._id) ? 'allies' : 'enemies'
+    let playerADiplo = playerA.diplomacy.find(x => x.playerId.toString() === playerB._id.toString())
+    let playerBDiplo = playerB.diplomacy.find(x => x.playerId.toString() === playerA._id.toString())
+
+    let statusTo = playerADiplo == null ? 'neutral' : playerADiplo.status
+    let statusFrom = playerBDiplo == null ? 'neutral' : playerADiplo.status
+
+    let actualStatus
+
+    if (statusTo === 'enemies' || statusFrom === 'enemies') {
+        actualStatus = 'enemies'
+    } else if (statusTo === 'neutral' || statusFrom === 'neutral') {
+        actualStatus = 'neutral'
+    } else {
+        actualStatus = 'allies'
     }
-
-    if (playerB.diplomacy) {
-      statusFrom = playerB.diplomacy.allies.find(x => x === playerA._id) ? 'allies' : 'enemies'
-    }
-
-    let isAllied = statusTo === 'allies' && statusFrom === 'allies'
-
-    let actualStatus = isAllied ? 'allies' : 'enemies'
 
     return {
         playerIdFrom: playerIdA,

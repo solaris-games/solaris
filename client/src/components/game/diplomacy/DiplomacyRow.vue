@@ -13,6 +13,7 @@
   <td class="fit pt-3 pb-2 pr-2">
     <div class="btn-group">
       <button class="btn btn-sm btn-success" :disabled="isGameFinished || diplomaticStatus.statusTo === 'allies'" @click="declareAlly(diplomaticStatus)" title="Declare this player an ally"><i class="fas fa-handshake"></i></button>
+      <button class="btn btn-sm btn-info" :disabled="isGameFinished || diplomaticStatus.statusTo === 'neutral'" @click="declareNeutral(diplomaticStatus)" title="Declare this player as neutral"><i class="fas fa-dove"></i></button>
       <button class="btn btn-sm btn-danger" :disabled="isGameFinished || diplomaticStatus.statusTo === 'enemies'" @click="declareEnemy(diplomaticStatus)" title="Declare this player as an enemy"><i class="fas fa-crosshairs"></i></button>
     </div>
   </td>
@@ -82,10 +83,31 @@ export default {
         }
       }
     },
+    async declareNeutral (diplomaticStatus) {
+      let playerAlias = this.getPlayerAlias(diplomaticStatus.playerIdTo)
+
+      if (await this.$confirm('Declare Neutral', `Are you sure you want to change your diplomatic status to ${playerAlias} to neutral?`)) {
+        try {
+          let response = await DiplomacyApiService.declareNeutral(this.$store.state.game._id, diplomaticStatus.playerIdTo)
+
+          if (response.status === 200) {
+            this.$toasted.show(`Your diplomatic status to ${playerAlias} is now neutral.`, { type: 'success' })
+          }
+
+          diplomaticStatus.statusFrom = response.data.statusFrom
+          diplomaticStatus.statusTo = response.data.statusTo
+          diplomaticStatus.actualStatus = response.data.actualStatus
+        } catch (err) {
+          console.error(err)
+        }
+      }
+    },
     getStatusIcon (status) {
       switch (status) {
         case 'allies':
           return 'fas fa-handshake text-success'
+        case 'neutral':
+          return 'fas fa-dove text-info'
         case 'enemies':
           return 'fas fa-crosshairs text-danger'
       }

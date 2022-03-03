@@ -1,4 +1,5 @@
 import { DBObjectId } from "./DBObjectId";
+import { DiplomaticState } from "./Diplomacy";
 import { PlayerStatistics } from "./Leaderboard";
 
 export type PlayerShape = 'circle'|'square'|'diamond'|'hexagon';
@@ -47,7 +48,8 @@ export interface PlayerTechnologyLevels {
 };
 
 export interface PlayerDiplomacy {
-    allies: DBObjectId[];
+    playerId: DBObjectId;
+    status: DiplomaticState;
 };
 
 export interface Player {
@@ -82,7 +84,7 @@ export interface Player {
     research: PlayerResearch,
     ledger: PlayerLedger[],
     reputations: PlayerReputation[],
-    diplomacy: PlayerDiplomacy,
+    diplomacy: PlayerDiplomacy[],
     stats?: PlayerStatistics;
     isKingOfTheHill?: boolean;
     isInScanningRange?: boolean;
