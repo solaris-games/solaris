@@ -65,7 +65,7 @@ class Star extends EventEmitter {
     this.container.on('mouseover', this.onMouseOver.bind(this))
     this.container.on('mouseout', this.onMouseOut.bind(this))
 
-    this.unselect()
+    this.isSelected = false
     this.isMouseOver = false
     this.isInScanningRange = false // Default to false to  initial redraw
     this.zoomPercent = 100
