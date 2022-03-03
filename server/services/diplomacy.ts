@@ -184,6 +184,9 @@ export default class DiplomacyService {
     }
 
     async declareAlly(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId) {
+        // TODO: Create a global event for peace reached if both players were at war.
+        // TODO: Create a private event for alliance established if both players are now allies.
+
         return await this._declareStatus(game, playerId, playerIdTarget, 'allies');
     }
 
@@ -191,6 +194,8 @@ export default class DiplomacyService {
         // When declaring enemies, set both to enemies irrespective of which side declared it.
         await this._declareStatus(game, playerId, playerIdTarget, 'enemies');
         await this._declareStatus(game, playerIdTarget, playerId, 'enemies');
+
+        // TODO: Create a global event for enemy declaration.
 
         return this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
     }
@@ -204,6 +209,8 @@ export default class DiplomacyService {
         if (isAllied) {
             await this._declareStatus(game, playerIdTarget, playerId, 'neutral');
         }
+
+        // TODO: Create a global event for peace reached if both players were at war.
 
         return this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
     }

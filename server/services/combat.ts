@@ -371,6 +371,10 @@ export default class CombatService extends EventEmitter {
             for (let attackerPlayer of attackers) {
                 await this.reputationService.decreaseReputation(game, defenderPlayer, attackerPlayer, true, false);
                 await this.reputationService.decreaseReputation(game, attackerPlayer, defenderPlayer, true, false);
+            
+                // TODO: If the players are NOT allies, declare war.
+                // Note: Players who are allied can fight eachother in certain scenarios
+                // so it is imperitive that declarations of war do not affect alliances.
             }
         }
 
