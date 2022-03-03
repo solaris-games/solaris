@@ -69,7 +69,7 @@ export default {
     },
     getAvatarImage (player) {
       try {
-        return require(`../../../assets/avatars/${player.avatar}.png`)
+        return require(`../../../assets/avatars/${player.avatar.file}`)
       } catch (err) {
         console.error(err)
         
