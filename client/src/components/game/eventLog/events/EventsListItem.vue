@@ -20,6 +20,8 @@
         <game-started :event="event" v-if="event.type === 'gameStarted'"/>
         <game-player-badge-purchased :event="event" v-if="event.type === 'gamePlayerBadgePurchased'"
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        <game-diplomacy-peace-declared :event="event" v-if="event.type === 'gameDiplomacyPeaceDeclared'"/>
+        <game-diplomacy-war-declared :event="event" v-if="event.type === 'gameDiplomacyWarDeclared'"/>
 
         <player-bulk-infrastructure-upgraded :event="event" v-if="event.type === 'playerBulkInfrastructureUpgraded'"/>
         <player-combat-star :event="event" v-if="event.type === 'playerCombatStar'"
@@ -57,6 +59,7 @@
         <player-conversation-created :event="event" v-if="event.type === 'playerConversationCreated'"/>
         <player-conversation-invited :event="event" v-if="event.type === 'playerConversationInvited'"/>
         <player-conversation-left :event="event" v-if="event.type === 'playerConversationLeft'"/>
+        <player-diplomacy-alliance-declared :event="event" v-if="event.type === 'playerDiplomacyAllianceDeclared'"/>
     </div>
 </div>
 </template>

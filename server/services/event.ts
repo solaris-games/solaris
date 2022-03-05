@@ -65,7 +65,7 @@ export default class EventService {
         PLAYER_CONVERSATION_CREATED: 'playerConversationCreated',
         PLAYER_CONVERSATION_INVITED: 'playerConversationInvited',
         PLAYER_CONVERSATION_LEFT: 'playerConversationLeft',
-        PLAYER_DIPLOMACY_ALLIANCE_DECLARED: 'gameDiplomacyAllianceDeclared',
+        PLAYER_DIPLOMACY_ALLIANCE_DECLARED: 'playerDiplomacyAllianceDeclared',
     }
     
     eventModel: any;
