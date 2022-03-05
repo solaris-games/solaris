@@ -94,6 +94,9 @@ import PlayerCarrierSpecialistHiredVue from './PlayerCarrierSpecialistHired'
 import PlayerConversationCreatedVue from './PlayerConversationCreated'
 import PlayerConversationInvitedVue from './PlayerConversationInvited'
 import PlayerConversationLeftVue from './PlayerConversationLeft'
+import GameDiplomacyPeaceDeclaredVue from './GameDiplomacyPeaceDeclared'
+import GameDiplomacyWarDeclaredVue from './GameDiplomacyWarDeclared'
+import PlayerDiplomacyAllianceDeclaredVue from './PlayerDiplomacyAllianceDeclared'
 
 export default {
   components: {
@@ -105,6 +108,9 @@ export default {
     'game-player-joined': GamePlayerJoinedVue,
     'game-player-quit': GamePlayerQuitVue,
     'game-started': GameStartedVue,
+    'game-diplomacy-peace-declared': GameDiplomacyPeaceDeclaredVue, 
+    'game-diplomacy-war-declared': GameDiplomacyWarDeclaredVue,
+
     'player-bulk-infrastructure-upgraded': PlayerBulkInfrastructureUpgradedVue,
     'player-combat-star': PlayerCombatStarEventVue,
     'player-combat-carrier': PlayerCombatCarrierEventVue,
@@ -127,7 +133,8 @@ export default {
     'player-carrier-specialist-hired': PlayerCarrierSpecialistHiredVue,
     'player-conversation-created': PlayerConversationCreatedVue,
     'player-conversation-invited': PlayerConversationInvitedVue,
-    'player-conversation-left': PlayerConversationLeftVue
+    'player-conversation-left': PlayerConversationLeftVue,
+    'player-diplomacy-alliance-declared': PlayerDiplomacyAllianceDeclaredVue,
   },
   props: {
     event: Object

@@ -48,18 +48,20 @@ export default class DiplomacyService extends EventEmitter {
     }
 
     getDiplomaticStatusToPlayer(game: Game, playerIdA: DBObjectId, playerIdB: DBObjectId): DiplomaticStatus {
+        let playerA: Player = game.galaxy.players.find(p => p._id.toString() === playerIdA.toString())!;
+        let playerB: Player = game.galaxy.players.find(p => p._id.toString() === playerIdB.toString())!;
+
         if (playerIdA.toString() === playerIdB.toString()) {
             return {
                 playerIdFrom: playerIdA,
                 playerIdTo: playerIdB,
+                playerFromAlias: playerA.alias,
+                playerToAlias: playerB.alias,
                 statusFrom: 'allies',
                 statusTo: 'allies',
                 actualStatus: 'allies'
             };
         }
-
-        let playerA: Player = game.galaxy.players.find(p => p._id.toString() === playerIdA.toString())!;
-        let playerB: Player = game.galaxy.players.find(p => p._id.toString() === playerIdB.toString())!;
 
         let statusTo: DiplomaticState = playerA.diplomacy.find(x => x.playerId.toString() === playerB._id.toString())?.status ?? 'neutral';
         let statusFrom: DiplomaticState = playerB.diplomacy.find(x => x.playerId.toString() === playerA._id.toString())?.status ?? 'neutral';
@@ -77,6 +79,8 @@ export default class DiplomacyService extends EventEmitter {
         return {
             playerIdFrom: playerIdA,
             playerIdTo: playerIdB,
+            playerFromAlias: playerA.alias,
+            playerToAlias: playerB.alias,
             statusFrom,
             statusTo,
             actualStatus
