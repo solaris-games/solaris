@@ -325,8 +325,8 @@ export default class GameTickService extends EventEmitter {
                 // First up, get all carriers that are heading from the destination and to the source
                 // and are in front of the carrier.
                 let collisionCarriers: CarrierPosition[] = positions
-                    .filter(c => {
-                        return (c.carrier.ships > 0 && !c.carrier.isGift) // Is still alive and not a gift
+                    .filter((c: CarrierPosition) => {
+                        return (c.carrier.ships !== null && c.carrier.ships > 0 && !c.carrier.isGift) // Is still alive and not a gift
                             && (
                                 // Head to head combat:
                                 (
