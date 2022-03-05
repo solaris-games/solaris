@@ -1,15 +1,18 @@
+const EventEmitter = require('events');
 import { DBObjectId } from "../types/DBObjectId";
 import DatabaseRepository from "../models/DatabaseRepository";
 import { DiplomaticState, DiplomaticStatus } from "../types/Diplomacy";
 import { Game } from "../types/Game";
 import { Player, PlayerDiplomacy } from "../types/Player";
 
-export default class DiplomacyService {
+export default class DiplomacyService extends EventEmitter {
     gameRepo: DatabaseRepository<Game>;
 
     constructor(
         gameRepo: DatabaseRepository<Game>
     ) {
+        super();
+
         this.gameRepo = gameRepo;
     }
 
@@ -188,35 +191,84 @@ export default class DiplomacyService {
     }
 
     async declareAlly(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId) {
-        // TODO: Create a global event for peace reached if both players were at war.
-        // TODO: Create a private event for alliance established if both players are now allies.
+        let wasAtWar = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget).actualStatus === 'enemies';
 
-        return await this._declareStatus(game, playerId, playerIdTarget, 'allies');
+        let newStatus = await this._declareStatus(game, playerId, playerIdTarget, 'allies');
+
+        let isAllied = newStatus.actualStatus === 'allies';
+        let isFriendly = isAllied || newStatus.actualStatus === 'neutral';
+        
+        // Create a global event for peace reached if both players were at war and are now either neutral or allied.
+        if (wasAtWar && isFriendly) {
+            this.emit('onDiplomacyPeaceDeclared', {
+                gameId: game._id,
+                gameTick: game.state.tick,
+                status: newStatus
+            });
+        }
+
+        // Create a private event for alliance established if both players are now allies.
+        if (isAllied) {
+            this.emit('onDiplomacyAllianceDeclared', {
+                gameId: game._id,
+                gameTick: game.state.tick,
+                status: newStatus
+            });
+        }
+
+        return newStatus;
     }
 
     async declareEnemy(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId, saveToDB: boolean = true) {
+        let oldStatus = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
+
+        let wasAtWar = oldStatus.actualStatus === 'enemies';
+
         // When declaring enemies, set both to enemies irrespective of which side declared it.
         await this._declareStatus(game, playerId, playerIdTarget, 'enemies', saveToDB);
         await this._declareStatus(game, playerIdTarget, playerId, 'enemies', saveToDB);
 
-        // TODO: Create a global event for enemy declaration.
+        let newStatus = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
 
-        return this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
+        // Create a global event for enemy declaration.
+        if (!wasAtWar) {
+            this.emit('onDiplomacyWarDeclared', {
+                gameId: game._id,
+                gameTick: game.state.tick,
+                status: newStatus
+            });
+        }
+
+        return newStatus;
     }
 
     async declareNeutral(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId) {
-        // When declaring neutral, set both players to neutral if they were allies before.
-        let isAllied = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget).actualStatus === 'allies';
+        let oldStatus = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
+
+        let wasAtWar = oldStatus.actualStatus === 'enemies';
+        let wasAllied = oldStatus.actualStatus === 'allies';
         
         await this._declareStatus(game, playerId, playerIdTarget, 'neutral');
 
-        if (isAllied) {
+        // When declaring neutral, set both players to neutral if they were allies before.
+        if (wasAllied) {
             await this._declareStatus(game, playerIdTarget, playerId, 'neutral');
         }
 
-        // TODO: Create a global event for peace reached if both players were at war.
+        let newStatus = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
 
-        return this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
+        let isNeutral = newStatus.actualStatus === 'neutral';
+
+        // Create a global event for peace reached if both players were at war.
+        if (wasAtWar && isNeutral) {
+            this.emit('onDiplomacyPeaceDeclared', {
+                gameId: game._id,
+                gameTick: game.state.tick,
+                status: newStatus
+            });
+        }
+
+        return newStatus;
     }
 
 };
