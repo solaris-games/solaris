@@ -72,20 +72,20 @@ export default class StarService extends EventEmitter {
     }
 
     generateCustomGalaxyStar(name: string, star: Star) {
-      return {
-        _id: star._id,
-        name: name,
-        naturalResources: star.naturalResources,
-        location: star.location,
-        infrastructure: star.infrastructure,
-        homeStar: star.homeStar,
-        warpGate: star.warpGate,
-        isNebula: star.isNebula,
-        isAsteroidField: star.isAsteroidField,
-        isBlackHole: star.isBlackHole,
-        wormHoleToStarId: star.wormHoleToStarId,
-        specialistId: star.specialistId
-      }
+        return {
+            _id: star._id,
+            name: name,
+            naturalResources: star.naturalResources,
+            location: star.location,
+            infrastructure: star.infrastructure,
+            homeStar: star.homeStar,
+            warpGate: star.warpGate,
+            isNebula: star.isNebula,
+            isAsteroidField: star.isAsteroidField,
+            isBlackHole: star.isBlackHole,
+            wormHoleToStarId: star.wormHoleToStarId,
+            specialistId: star.specialistId
+        }
     }
 
     generateStarPosition(game: Game, originX: number, originY: number, radius: number) {
@@ -137,11 +137,12 @@ export default class StarService extends EventEmitter {
 
         this.resetIgnoreBulkUpgradeStatuses(homeStar);
 
-        homeStar.naturalResources.economy = game.constants.star.resources.maxNaturalResources;
-        homeStar.naturalResources.industry = game.constants.star.resources.maxNaturalResources;
-        homeStar.naturalResources.science = game.constants.star.resources.maxNaturalResources;
-
-        // ONLY the home star gets the starting infrastructure.
+        if (game.settings.galaxy.galaxyType !== 'custom') {
+            homeStar.naturalResources.economy = game.constants.star.resources.maxNaturalResources;
+            homeStar.naturalResources.industry = game.constants.star.resources.maxNaturalResources;
+            homeStar.naturalResources.science = game.constants.star.resources.maxNaturalResources;
+            // ONLY the home star gets the starting infrastructure.
+        }
         homeStar.infrastructure.economy = gameSettings.player.startingInfrastructure.economy;
         homeStar.infrastructure.industry = gameSettings.player.startingInfrastructure.industry;
         homeStar.infrastructure.science = gameSettings.player.startingInfrastructure.science;
@@ -248,7 +249,7 @@ export default class StarService extends EventEmitter {
                         destination: this.getById(game, s.wormHoleToStarId!)
                     };
                 });
-                
+
             for (let wormHoleStar of wormHoleStars) {
                 if (starsInRange.find(s => s._id.toString() === wormHoleStar.destination._id.toString()) == null) {
                     starsInRange.push({
@@ -326,7 +327,7 @@ export default class StarService extends EventEmitter {
         }
     }
 
-    calculateTerraformedResource(naturalResource: number, terraforming: number) {        
+    calculateTerraformedResource(naturalResource: number, terraforming: number) {
         return Math.floor(naturalResource + (5 * terraforming));
     }
 
@@ -349,7 +350,7 @@ export default class StarService extends EventEmitter {
         // Destroy the carriers owned by the player who abandoned the star.
         // Note: If an ally is currently in orbit then they will capture the star on the next tick.
         let playerCarriers = game.galaxy.carriers
-            .filter(x => 
+            .filter(x =>
                 x.orbiting
                 && x.orbiting.toString() === star._id.toString()
                 && x.ownedByPlayerId!.toString() === player._id.toString()
@@ -429,8 +430,8 @@ export default class StarService extends EventEmitter {
     }
 
     isStarPairWormHole(sourceStar: Star, destinationStar: Star) {
-        return sourceStar.wormHoleToStarId 
-            && destinationStar.wormHoleToStarId 
+        return sourceStar.wormHoleToStarId
+            && destinationStar.wormHoleToStarId
             && sourceStar.wormHoleToStarId.toString() === destinationStar._id.toString()
             && destinationStar.wormHoleToStarId.toString() === sourceStar._id.toString();
     }
@@ -535,9 +536,9 @@ export default class StarService extends EventEmitter {
         if (Math.floor(star.naturalResources.science) <= 0) {
             star.naturalResources.science = 0;
         }
-        
+
         // if the star reaches 0 of all resources then reduce the star to a dead hunk.
-        if(this.isDeadStar(star)) {
+        if (this.isDeadStar(star)) {
             star.specialistId = null;
             star.warpGate = false;
             star.infrastructure.economy = 0;
@@ -682,22 +683,22 @@ export default class StarService extends EventEmitter {
         if (!isTutorialGame) {
             if (oldStarUser && !owner.defeated) {
                 oldStarUser.achievements.combat.stars.lost++;
-    
+
                 if (star.homeStar) {
                     oldStarUser.achievements.combat.homeStars.lost++;
                 }
             }
-            
+
             if (newStarUser && !newStarPlayer.defeated) {
                 newStarUser.achievements.combat.stars.captured++;
-    
+
                 if (star.homeStar) {
                     newStarUser.achievements.combat.homeStars.captured++;
                 }
             }
         }
 
-        if (this.gameTypeService.isKingOfTheHillMode(game) && 
+        if (this.gameTypeService.isKingOfTheHillMode(game) &&
             this.gameStateService.isCountingDownToEndInLastCycle(game) &&
             this.isKingOfTheHillStar(star)) {
             this.gameStateService.setCountdownToEndToOneCycle(game);
