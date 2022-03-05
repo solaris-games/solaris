@@ -136,7 +136,7 @@ export default class DiplomacyService {
         return player.diplomacy.filter(d => d.playerId.toString() === forPlayer._id.toString());
     }
 
-    async _declareStatus(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId, state: DiplomaticState) {
+    async _declareStatus(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId, state: DiplomaticState, saveToDB: boolean = true) {
         let player: Player = game.galaxy.players.find(p => p._id.toString() === playerId.toString())!;
 
         // Get the current status between the two players.
@@ -151,30 +151,34 @@ export default class DiplomacyService {
 
             player.diplomacy.push(diplo);
 
-            await this.gameRepo.updateOne({
-                _id: game._id,
-                'galaxy.players._id': playerId
-            }, {
-                $addToSet: {
-                    'galaxy.players.$.diplomacy': diplo
-                }
-            });
+            if (saveToDB) {
+                await this.gameRepo.updateOne({
+                    _id: game._id,
+                    'galaxy.players._id': playerId
+                }, {
+                    $addToSet: {
+                        'galaxy.players.$.diplomacy': diplo
+                    }
+                });
+            }
         } else {
             // Otherwise a diplomatic status exists, update the existing one.
             diplo.status = state;
 
-            await this.gameRepo.updateOne({
-                _id: game._id,
-            }, {
-                $set: {
-                    'galaxy.players.$[p].diplomacy.$[d].status': diplo.status
-                }
-            }, {
-                arrayFilters: [
-                    { 'p._id': player._id },
-                    { 'd.playerId': diplo.playerId }
-                ]
-            });
+            if (saveToDB) {
+                await this.gameRepo.updateOne({
+                    _id: game._id,
+                }, {
+                    $set: {
+                        'galaxy.players.$[p].diplomacy.$[d].status': diplo.status
+                    }
+                }, {
+                    arrayFilters: [
+                        { 'p._id': player._id },
+                        { 'd.playerId': diplo.playerId }
+                    ]
+                });
+            }
         }
 
         // Figure out what the new status is and return.
@@ -190,10 +194,10 @@ export default class DiplomacyService {
         return await this._declareStatus(game, playerId, playerIdTarget, 'allies');
     }
 
-    async declareEnemy(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId) {
+    async declareEnemy(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId, saveToDB: boolean = true) {
         // When declaring enemies, set both to enemies irrespective of which side declared it.
-        await this._declareStatus(game, playerId, playerIdTarget, 'enemies');
-        await this._declareStatus(game, playerIdTarget, playerId, 'enemies');
+        await this._declareStatus(game, playerId, playerIdTarget, 'enemies', saveToDB);
+        await this._declareStatus(game, playerIdTarget, playerId, 'enemies', saveToDB);
 
         // TODO: Create a global event for enemy declaration.
 
