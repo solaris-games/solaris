@@ -3,8 +3,8 @@ const Schema = mongoose.Schema;
 const Types = Schema.Types;
 
 const schema = new Schema({
-    fromPlayerId: { type: Types.ObjectId, required: true },
-    fromPlayerAlias: { type: Types.String, required: true },
+    fromPlayerId: { type: Types.ObjectId, required: false },
+    fromPlayerAlias: { type: Types.String, required: false },
     message: { type: Types.String, required: true },
     sentDate: { type: Types.Date, required: true },
     sentTick: { type: Types.Number, required: false, default: null },

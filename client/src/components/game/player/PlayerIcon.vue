@@ -1,6 +1,6 @@
 <template>
   <span v-if="player" class="span-container" :title="onlineStatus">
-    <player-icon-shape :filled="iconFilled" :iconColour="iconColour" :shape="player.shape" />
+    <player-icon-shape v-if="player" :filled="iconFilled" :iconColour="iconColour" :shape="player.shape" />
   </span>
 </template>
 <script>
@@ -24,16 +24,18 @@ export default {
       intervalFunction: null
     }
   },
-  mounted () {
-    this.player = GameHelper.getPlayerById(this.$store.state.game, this.playerId)
+    mounted() {
+      if (this.playerID) {
+        this.player = GameHelper.getPlayerById(this.$store.state.game, this.playerId)
 
-    this.iconColour = !this.colour ? GameHelper.getFriendlyColour(this.player.colour.value) : this.colour
+        this.iconColour = !this.colour ? GameHelper.getFriendlyColour(this.player.colour.value) : this.colour
 
-    let isHiddenPlayerOnlineStatus = GameHelper.isHiddenPlayerOnlineStatus(this.$store.state.game)
+        let isHiddenPlayerOnlineStatus = GameHelper.isHiddenPlayerOnlineStatus(this.$store.state.game)
 
-    if (!this.hideOnlineStatus && !isHiddenPlayerOnlineStatus) {
-      this.intervalFunction = setInterval(this.recalculateOnlineStatus, 1000)
-      this.recalculateOnlineStatus()
+        if (!this.hideOnlineStatus && !isHiddenPlayerOnlineStatus) {
+          this.intervalFunction = setInterval(this.recalculateOnlineStatus, 1000)
+          this.recalculateOnlineStatus()
+        }
     }
   },
   destroyed () {

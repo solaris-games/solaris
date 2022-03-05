@@ -2,7 +2,7 @@ import { DBObjectId } from "./DBObjectId";
 
 export interface ConversationMessage {
     _id: DBObjectId;
-    fromPlayerId: DBObjectId;
+    fromPlayerId: DBObjectId | null;
     fromPlayerAlias: string;
     message: string;
     sentDate: Date;
