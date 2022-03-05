@@ -7,7 +7,7 @@ export interface CarrierWaypoint {
     source: DBObjectId;
     destination: DBObjectId;
     action: CarrierWaypointActionType;
-    isCarrier: boolean;
+    toCarrier: boolean;
     actionShips: number;
     delayTicks: number;
 

@@ -88,7 +88,7 @@ export default class WaypointService {
             // if from the previous waypoint, waypoint.isCarrier is true, then waypoint.source is a carrier.
             // if waypoint.isCarrier then the waypoint.destination is a carrier.
             let sourceStar: Star | Carrier | null, destinationStar: Star | Carrier, sourceStarName: string
-            if (waypoint.isCarrier) {
+            if (waypoint.toCarrier) {
                 destinationStar = this.carrierService.getById(game, waypoint.destination);
 
                 // user cannot set this. (it will be not near a star)
@@ -106,7 +106,7 @@ export default class WaypointService {
             if (i !== 0) {
                 previousWaypoint = waypoints[i - 1];
             }
-            if (previousWaypoint && previousWaypoint.isCarrier) {
+            if (previousWaypoint && previousWaypoint.toCarrier) {
                 sourceStar = this.carrierService.getById(game, previousWaypoint.destination);
                 sourceStarName = 'Unknown'; // Unknown because the carrier will destroy the other carrier if it survives in combat with it, it will not be a star.
             } else {
@@ -636,7 +636,7 @@ export default class WaypointService {
         carrier.waypoints = [{
             _id: new mongoose.Types.ObjectId(),
             source: carrier.orbiting,
-            isCarrier: false,
+            toCarrier: false,
             destination: nearestStar._id,
             action: 'nothing',
             actionShips: 0,

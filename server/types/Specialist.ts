@@ -1,4 +1,4 @@
-export type SpecialistType = 'star'|'carrier';
+export type SpecialistType = 'star' | 'carrier';
 
 export interface Specialist {
     id: number;
@@ -11,11 +11,18 @@ export interface Specialist {
     modifiers: {
         local?: {
             speed?: number;
+            toCarrierSpeed?: number;
             weapons?: number;
             hyperspace?: number;
             scanning?: number;
             manufacturing?: number;
             terraforming?: number;
+            carrierToCarrierCombat?: {
+                weapons: number;
+            },
+            carrierToStarCombat?: {
+                weapons: number;
+            }
         },
         special?: {
             hideShips?: boolean;
@@ -37,12 +44,6 @@ export interface Specialist {
             creditsPerTickByScience?: number;
             autoCarrierSpecialistAssign?: number;
             combatSwapWeaponsTechnology?: boolean;
-        },
-        carrierToCarrierCombat?: {
-            weapons: number;
-        },
-        carrierToStarCombat?: {
-            weapons: number;
         }
     }
 };
