@@ -28,6 +28,7 @@ import { Star } from '../types/Star';
 import { Guild, GuildUserWithTag } from '../types/Guild';
 import { CarrierWaypoint } from '../types/CarrierWaypoint';
 import { Carrier } from '../types/Carrier';
+import AvatarService from './avatar';
 
 export default class GameGalaxyService {
     cacheService: CacheService;
@@ -52,6 +53,7 @@ export default class GameGalaxyService {
     gameTypeService: GameTypeService;
     gameStateService: GameStateService;
     diplomacyService: DiplomacyService;
+    avatarService: AvatarService;
 
     constructor(
         cacheService: CacheService,
@@ -75,7 +77,8 @@ export default class GameGalaxyService {
         orbitalMechanicsService: OrbitalMechanicsService,
         gameTypeService: GameTypeService,
         gameStateService: GameStateService,
-        diplomacyService: DiplomacyService
+        diplomacyService: DiplomacyService,
+        avatarService: AvatarService
     ) {
         this.cacheService = cacheService;
         this.broadcastService = broadcastService;
@@ -99,6 +102,7 @@ export default class GameGalaxyService {
         this.gameTypeService = gameTypeService;
         this.gameStateService = gameStateService;
         this.diplomacyService = diplomacyService;
+        this.avatarService = avatarService;
     }
 
     async getGalaxy(gameId: DBObjectId, userId: DBObjectId | null, tick: number | null) {
@@ -447,6 +451,8 @@ export default class GameGalaxyService {
     }
 
     async _setPlayerInfoBasic(doc: Game, player: Player | null) {
+        const avatars = this.avatarService.listAllAvatars();
+
         const isFinished = this.gameStateService.isFinished(doc);
         const isDarkModeExtra = this.gameTypeService.isDarkModeExtra(doc);
 
@@ -493,6 +499,7 @@ export default class GameGalaxyService {
 
             p.isInScanningRange = playersInRange.find(x => x._id.toString() === p._id.toString()) != null;
             p.shape = p.shape || 'circle'; // TODO: I don't know why the shape isn't being returned by mongoose defaults.
+            p.avatar = p.avatar ? avatars.find(a => a.id.toString() === p.avatar!.toString())!.file : null; // TODO: We should made the ID a number and not a string as it is an ID.
 
             // If the user is in the game and it is the current
             // player we are looking at then return everything.
@@ -555,7 +562,7 @@ export default class GameGalaxyService {
                 research = null;
             }
 
-            let diplomacy: PlayerDiplomacy | null = null;
+            let diplomacy: PlayerDiplomacy[] = [];
 
             if (player) {
                 diplomacy = this.diplomacyService.getFilteredDiplomacy(p, player);

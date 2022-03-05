@@ -59,7 +59,27 @@ export default class CustomMapService {
             }
           }
 
-          locations.push(star);
+          locations.push({
+            id: star.id,
+            homeStar: star.homeStar,
+            playerId: star.playerId,
+            warpGate: star.warpGate,
+            isNebula: star.isNebula,
+            isAsteroidField: star.isAsteroidField,
+            isBinaryStar: star.isBinaryStar,
+            isBlackHole: star.isBlackHole,
+            wormHoleToStarId: star.wormHoleToStarId,
+            specialistId: star.specialistId,
+            location: {
+              x: star.location.x,
+              y: star.location.y
+            },
+            naturalResources: {
+              economy: star.naturalResources.economy,
+              industry: star.naturalResources.industry,
+              science: star.naturalResources.science
+            }
+          });
         }
 
         playerIds = [...new Set(playerIds)]; // ignore repeated player indexes

@@ -44,7 +44,7 @@ The client uses the following tech:
 9. `npm run serve` in `client/` to start the client application.
 10. Browse to the site locally (default [http://localhost:8080](http://localhost:8080)).
 
-*Note: Development work is to be based on the `master` branch, for a new feature or bug fix, create a branch from `master`.*
+*Note: Development work is to be based on the `dev` branch, for a new feature or bug fix, create a branch from `dev`.*
 
 ### Development Environment Automation (Optional)
 To automate the development environment, it is recommended to use [PM2](https://pm2.keymetrics.io/).

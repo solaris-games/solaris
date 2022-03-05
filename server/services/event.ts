@@ -23,6 +23,8 @@ import StarService from "./star";
 import StarUpgradeService from "./starUpgrade";
 import TradeService from "./trade";
 import { GameEvent } from "../types/GameEvent";
+import DiplomacyService from "./diplomacy";
+import { DiplomaticStatus } from "../types/Diplomacy";
 
 const moment = require('moment');
 
@@ -37,6 +39,8 @@ export default class EventService {
         GAME_ENDED: 'gameEnded',
         GAME_PAUSED: 'gamePaused',
         GAME_PLAYER_BADGE_PURCHASED: 'gamePlayerBadgePurchased',
+        GAME_DIPLOMACY_PEACE_DECLARED: 'gameDiplomacyPeaceDeclared',
+        GAME_DIPLOMACY_WAR_DECLARED: 'gameDiplomacyWarDeclared',
 
         PLAYER_GALACTIC_CYCLE_COMPLETE: 'playerGalacticCycleComplete',
         PLAYER_COMBAT_STAR: 'playerCombatStar',
@@ -60,7 +64,8 @@ export default class EventService {
         PLAYER_CARRIER_SPECIALIST_HIRED: 'playerCarrierSpecialistHired',
         PLAYER_CONVERSATION_CREATED: 'playerConversationCreated',
         PLAYER_CONVERSATION_INVITED: 'playerConversationInvited',
-        PLAYER_CONVERSATION_LEFT: 'playerConversationLeft'
+        PLAYER_CONVERSATION_LEFT: 'playerConversationLeft',
+        PLAYER_DIPLOMACY_ALLIANCE_DECLARED: 'playerDiplomacyAllianceDeclared',
     }
     
     eventModel: any;
@@ -78,6 +83,7 @@ export default class EventService {
     specialistService: SpecialistService
     badgeService: BadgeService;
     carrierService: CarrierService;
+    diplomacyService: DiplomacyService;
 
     constructor(
         eventModel: any,
@@ -94,7 +100,8 @@ export default class EventService {
         combatService: CombatService,
         specialistService: SpecialistService,
         badgeService: BadgeService,
-        carrierService: CarrierService
+        carrierService: CarrierService,
+        diplomacyService: DiplomacyService
     ) {
         this.eventModel = eventModel;
         this.eventRepo = eventRepo;
@@ -111,6 +118,7 @@ export default class EventService {
         this.specialistService = specialistService;
         this.badgeService = badgeService;
         this.carrierService = carrierService;
+        this.diplomacyService = diplomacyService;
 
         this.gameService.on('onGameDeleted', (args) => this.deleteByGameId(args.gameId));
         this.gameService.on('onPlayerJoined', (args) => this.createPlayerJoinedEvent(args.gameId, args.gameTick, args.player));
@@ -160,6 +168,10 @@ export default class EventService {
         this.conversationService.on('onConversationLeft', (args) => this.createPlayerConversationLeft(args.gameId, args.gameTick, args.convo, args.playerId));
 
         this.badgeService.on('onGamePlayerBadgePurchased', (args) => this.createGamePlayerBadgePurchased(args.gameId, args.gameTick, args.purchasedByPlayerId, args.purchasedByPlayerAlias, args.purchasedForPlayerId, args.purchasedForPlayerAlias, args.badgeKey, args.badgeName));
+
+        this.diplomacyService.on('onDiplomacyPeaceDeclared', (args) => this.createGameDiplomacyPeaceDeclared(args.gameId, args.gameTick, args.status));
+        this.diplomacyService.on('onDiplomacyWarDeclared', (args) => this.createGameDiplomacyWarDeclared(args.gameId, args.gameTick, args.status));
+        this.diplomacyService.on('onDiplomacyAllianceDeclared', (args) => this.createPlayerDiplomacyAllianceDeclared(args.gameId, args.gameTick, args.status));
     }
 
     async deleteByGameId(gameId: DBObjectId) {
@@ -378,19 +390,13 @@ export default class EventService {
         };
 
         for (let defender of defenders) {
-            let defenderCombatResult: CombatResult = Object.assign({}, combatResult);
-
-            defenderCombatResult.star = this.tryMaskObjectShips(combatResult.star, defender) as CombatStar;
-            defenderCombatResult.carriers = combatResult.carriers.map(c => this.tryMaskObjectShips(c, defender)) as CombatCarrier[];
+            let defenderCombatResult: CombatResult = this.combatService.sanitiseCombatResult(combatResult, defender);
 
             await this.createPlayerEvent(gameId, gameTick, defender._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, { ...data, combatResult: defenderCombatResult });
         }
 
         for (let attacker of attackers) {
-            let attackerCombatResult = Object.assign({}, combatResult);
-
-            attackerCombatResult.star = this.tryMaskObjectShips(combatResult.star, attacker) as CombatStar;
-            attackerCombatResult.carriers = combatResult.carriers.map(c => this.tryMaskObjectShips(c, attacker)) as CombatCarrier[];
+            let attackerCombatResult: CombatResult = this.combatService.sanitiseCombatResult(combatResult, attacker);
 
             await this.createPlayerEvent(gameId, gameTick, attacker._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, { ...data, combatResult: attackerCombatResult });
         }
@@ -404,45 +410,16 @@ export default class EventService {
         };
 
         for (let defender of defenders) {
-            let defenderCombatResult = Object.assign({}, combatResult);
-
-            defenderCombatResult.carriers = combatResult.carriers.map(c => this.tryMaskObjectShips(c, defender)) as CombatCarrier[];
-
+            let defenderCombatResult: CombatResult = this.combatService.sanitiseCombatResult(combatResult, defender);
+            
             await this.createPlayerEvent(gameId, gameTick, defender._id, this.EVENT_TYPES.PLAYER_COMBAT_CARRIER, { ...data, combatResult: defenderCombatResult });
         }
 
         for (let attacker of attackers) {
-            let attackerCombatResult = Object.assign({}, combatResult);
-
-            attackerCombatResult.carriers = combatResult.carriers.map(c => this.tryMaskObjectShips(c, attacker)) as CombatCarrier[];
+            let attackerCombatResult: CombatResult = this.combatService.sanitiseCombatResult(combatResult, attacker);
 
             await this.createPlayerEvent(gameId, gameTick, attacker._id, this.EVENT_TYPES.PLAYER_COMBAT_CARRIER, { ...data, combatResult: attackerCombatResult });
         }
-    }
-
-    tryMaskObjectShips(carrierOrStar: CombatStar | CombatCarrier | null, player: Player) {
-        if (!carrierOrStar) {
-            return carrierOrStar;
-        }
-
-        // If the player doesn't own the object and the object is a scrambler then we need
-        // to mask the before and lost amounts.
-        if (carrierOrStar.ownedByPlayerId && player._id.toString() !== carrierOrStar.ownedByPlayerId.toString() && this.specialistService.getCarrierOrStarHideShips(carrierOrStar)) {
-            let clone: CombatStar | CombatCarrier = Object.assign({}, carrierOrStar);
-
-            clone.before = '???';
-            clone.lost = '???';
-
-            // If the object lost ships and is now dead, then we need to mask the after value too.
-            // Note: Stars can have a 0 ship garrison and be a scrambler so we want to ensure that the 0 ships is still scrambled.
-            if (carrierOrStar.before === 0 || carrierOrStar.after > 0) {
-                clone.after = '???';
-            }
-
-            return clone;
-        }
-
-        return carrierOrStar;
     }
 
     async createResearchCompleteEvent(gameId: DBObjectId, gameTick: number, playerId: DBObjectId, technologyKey: string, technologyLevel: number, technologyKeyNext: string, technologyLevelNext: number) {
@@ -672,6 +649,25 @@ export default class EventService {
         };
 
         return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_PLAYER_BADGE_PURCHASED, data);
+    }
+
+    async createGameDiplomacyPeaceDeclared(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus) {
+        let data = status;
+
+        return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_DIPLOMACY_PEACE_DECLARED, data);
+    }
+
+    async createGameDiplomacyWarDeclared(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus) {
+        let data = status;
+
+        return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_DIPLOMACY_WAR_DECLARED, data);
+    }
+
+    async createPlayerDiplomacyAllianceDeclared(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus) {
+        let data = status;
+
+        await this.createPlayerEvent(gameId, gameTick, status.playerIdFrom, this.EVENT_TYPES.PLAYER_DIPLOMACY_ALLIANCE_DECLARED, data);
+        await this.createPlayerEvent(gameId, gameTick, status.playerIdTo, this.EVENT_TYPES.PLAYER_DIPLOMACY_ALLIANCE_DECLARED, data);
     }
 
 };

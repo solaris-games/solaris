@@ -1,4 +1,5 @@
 import { DBObjectId } from "./DBObjectId";
+import { DiplomaticState } from "./Diplomacy";
 import { PlayerStatistics } from "./Leaderboard";
 import { AiState } from "./Ai";
 
@@ -36,8 +37,20 @@ export interface PlayerResearch {
     specialists: ResearchProgress
 };
 
+export interface PlayerTechnologyLevels {
+    scanning: number;
+    hyperspace: number;
+    terraforming: number;
+    experimentation: number;
+    weapons: number;
+    banking: number;
+    manufacturing: number;
+    specialists: number;
+};
+
 export interface PlayerDiplomacy {
-    allies: DBObjectId[];
+    playerId: DBObjectId;
+    status: DiplomaticState;
 };
 
 export interface Player {
@@ -73,7 +86,7 @@ export interface Player {
     research: PlayerResearch,
     ledger: PlayerLedger[],
     reputations: PlayerReputation[],
-    diplomacy: PlayerDiplomacy,
+    diplomacy: PlayerDiplomacy[],
     stats?: PlayerStatistics;
     isKingOfTheHill?: boolean;
     isInScanningRange?: boolean;

@@ -20,6 +20,8 @@
         <game-started :event="event" v-if="event.type === 'gameStarted'"/>
         <game-player-badge-purchased :event="event" v-if="event.type === 'gamePlayerBadgePurchased'"
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        <game-diplomacy-peace-declared :event="event" v-if="event.type === 'gameDiplomacyPeaceDeclared'"/>
+        <game-diplomacy-war-declared :event="event" v-if="event.type === 'gameDiplomacyWarDeclared'"/>
 
         <player-bulk-infrastructure-upgraded :event="event" v-if="event.type === 'playerBulkInfrastructureUpgraded'"/>
         <player-combat-star :event="event" v-if="event.type === 'playerCombatStar'"
@@ -57,6 +59,7 @@
         <player-conversation-created :event="event" v-if="event.type === 'playerConversationCreated'"/>
         <player-conversation-invited :event="event" v-if="event.type === 'playerConversationInvited'"/>
         <player-conversation-left :event="event" v-if="event.type === 'playerConversationLeft'"/>
+        <player-diplomacy-alliance-declared :event="event" v-if="event.type === 'playerDiplomacyAllianceDeclared'"/>
     </div>
 </div>
 </template>
@@ -94,6 +97,9 @@ import PlayerCarrierSpecialistHiredVue from './PlayerCarrierSpecialistHired'
 import PlayerConversationCreatedVue from './PlayerConversationCreated'
 import PlayerConversationInvitedVue from './PlayerConversationInvited'
 import PlayerConversationLeftVue from './PlayerConversationLeft'
+import GameDiplomacyPeaceDeclaredVue from './GameDiplomacyPeaceDeclared'
+import GameDiplomacyWarDeclaredVue from './GameDiplomacyWarDeclared'
+import PlayerDiplomacyAllianceDeclaredVue from './PlayerDiplomacyAllianceDeclared'
 
 export default {
   components: {
@@ -105,6 +111,9 @@ export default {
     'game-player-joined': GamePlayerJoinedVue,
     'game-player-quit': GamePlayerQuitVue,
     'game-started': GameStartedVue,
+    'game-diplomacy-peace-declared': GameDiplomacyPeaceDeclaredVue, 
+    'game-diplomacy-war-declared': GameDiplomacyWarDeclaredVue,
+
     'player-bulk-infrastructure-upgraded': PlayerBulkInfrastructureUpgradedVue,
     'player-combat-star': PlayerCombatStarEventVue,
     'player-combat-carrier': PlayerCombatCarrierEventVue,
@@ -127,7 +136,8 @@ export default {
     'player-carrier-specialist-hired': PlayerCarrierSpecialistHiredVue,
     'player-conversation-created': PlayerConversationCreatedVue,
     'player-conversation-invited': PlayerConversationInvitedVue,
-    'player-conversation-left': PlayerConversationLeftVue
+    'player-conversation-left': PlayerConversationLeftVue,
+    'player-diplomacy-alliance-declared': PlayerDiplomacyAllianceDeclaredVue,
   },
   props: {
     event: Object
