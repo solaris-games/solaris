@@ -77,6 +77,10 @@ export default class PublicCommandService {
     async invite(msg: any, directions: string[]) {
         // $invite <gamelink>
 
+        // Check if it has the right amount of directions
+        if(directions.length != 1) {
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'noDirections'));
+        }
         // Plain and simple, extract the link to the game, from which we can extract the id from the game, which we then use to find the game
         let gamelink = directions[0];
         let gameId = (gamelink.split('?id='))[1];
@@ -110,8 +114,12 @@ export default class PublicCommandService {
     }
 
     async leaderboard_global(msg: any, directions: string[]) {
-        //$leaderboard_global <filter> (<page>)
-        // Calculating how the leaderboard looks
+        //$leaderboard_global <filter>
+
+        // Check if it has the right amount of directions
+        if(directions.length != 1) {
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'noDirections'));
+        }
 
         // Determining basic values for the leaderboard, which will be used much later in the program
         let sortingKey = directions[0];
@@ -321,6 +329,11 @@ export default class PublicCommandService {
 
     async userinfo(msg: any, directions: string[]) {
         //$userinfo <username> <focus>
+
+        // Check if it has the bare minimum amount of directions
+        if(directions.length < 2) {
+            return msg.channel.send(this.botResponseService.error(msg.author.id, 'noDirections'));
+        }
 
         //getting the basic values about the focus
         let focus = directions[directions.length - 1];
