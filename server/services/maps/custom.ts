@@ -31,6 +31,9 @@ export default class CustomMapService {
           star.wormHoleToStarId = star.wormHoleToStarId == null ? null : +star.wormHoleToStarId;
           star.specialistId = star.specialistId == null ? null : +star.specialistId;
 
+          star.startingSpecialistId = star.specialistId;
+          star.startingWarpGate = star.warpGate;
+
           // Dont trust the user as far as you can throw him.
           this._checkStarProperty(star, 'id', 'number', false);
           this._checkStarProperty(star, 'playerId', 'number', true);

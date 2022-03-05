@@ -4,7 +4,8 @@ const EventEmitter = require('events');
 import ValidationError from '../errors/validation';
 import DatabaseRepository from '../models/DatabaseRepository';
 import { Game } from '../types/Game';
-import { PlayerColourShapeCombination, PlayerShape } from '../types/Player';
+import { Player, PlayerColourShapeCombination, PlayerShape } from '../types/Player';
+import { Star } from '../types/Star';
 import CarrierService from './carrier';
 import GameTypeService from './gameType';
 import MapService from './map';
@@ -270,7 +271,7 @@ export default class PlayerService extends EventEmitter {
     }
 
     // TODO: Shouldn't this be in the starService?
-    setupStarForGameStart(game, star, player, resetWarpGates) {
+    setupStarForGameStart(game: Game, star: Star, player: Player, resetWarpGates: boolean) {
         if (player.homeStarId.toString() === star._id.toString()) {
             this.starService.setupHomeStar(game, star, player, game.settings);
         } else {
@@ -279,13 +280,18 @@ export default class PlayerService extends EventEmitter {
             star.ships = star.shipsActual;
             
             star.warpGate = star.warpGate ?? false;
+            star.startingWarpGate = star.warpGate;
             star.specialistId = star.specialistId ?? null;
             star.infrastructure.economy = star.infrastructure.economy ?? 0;
             star.infrastructure.industry = star.infrastructure.industry ?? 0;
             star.infrastructure.science = star.infrastructure.science ?? 0;
 
             if (resetWarpGates) {
-                star.warpGate = false;
+                star.warpGate = star.startingWarpGate!
+            }
+
+            if (game.settings.galaxy.galaxyType === 'custom') {
+                star.specialistId = star.startingSpecialistId!
             }
 
             this.starService.resetIgnoreBulkUpgradeStatuses(star);

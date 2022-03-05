@@ -35,8 +35,10 @@ export interface Star extends MapObject {
     ships: number | null;
     shipsActual?: number;
     specialistId: number | null;
+    startingSpecialistId?: number | null;
     homeStar: boolean;
     warpGate: boolean;
+    startingWarpGate?: boolean;
     isNebula: boolean;
     isAsteroidField: boolean;
     isBlackHole: boolean;

@@ -179,6 +179,7 @@ export default class MapService {
                 gateCount++; // Increment because the while loop will decrement.
             } else {
                 star.warpGate = true;
+                star.startingWarpGate = true;
             }
         } while (gateCount--);
     }

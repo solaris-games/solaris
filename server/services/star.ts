@@ -137,21 +137,13 @@ export default class StarService extends EventEmitter {
 
         this.resetIgnoreBulkUpgradeStatuses(homeStar);
 
-        homeStar.naturalResources.economy = game.constants.star.resources.maxNaturalResources;
-        homeStar.naturalResources.industry = game.constants.star.resources.maxNaturalResources;
-        homeStar.naturalResources.science = game.constants.star.resources.maxNaturalResources;
-
-        if (gameSettings.galaxy.galaxyType === 'custom') { 
-            const customStar = JSON.parse(gameSettings.galaxy?.customJSON ?? "{stars:[]}").stars.find(s => s._id.toString() === homeStar._id.toString());
-            
-            if (customStar) {
-                homeStar.naturalResources.economy = customStar.naturalResources.economy;
-                homeStar.naturalResources.industry = customStar.naturalResources.industry;
-                homeStar.naturalResources.science = customStar.naturalResources.science;
-
-                homeStar.warpGate = customStar.warpGate;
-                homeStar.specialistId = customStar.specialistId;
-            }
+        if (gameSettings.galaxy.galaxyType !== 'custom') { 
+            homeStar.naturalResources.economy = game.constants.star.resources.maxNaturalResources;
+            homeStar.naturalResources.industry = game.constants.star.resources.maxNaturalResources;
+            homeStar.naturalResources.science = game.constants.star.resources.maxNaturalResources;
+        } else {
+            homeStar.warpGate = homeStar.startingWarpGate!;
+            homeStar.specialistId = homeStar.startingSpecialistId!;
         }
         // ONLY the home star gets the starting infrastructure.
         homeStar.infrastructure.economy = gameSettings.player.startingInfrastructure.economy;
