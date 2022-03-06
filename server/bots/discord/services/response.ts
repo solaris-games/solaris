@@ -533,7 +533,7 @@ export default class ReponseService {
                 response += 'The ID of the game you gave is invalid, please check if it is correct.';
                 break;
             case 'noDirections':
-                response += 'The command you executed had too little directions, check `$help` for a detailed explanation on each command.';
+                response += 'The command you executed had too little or invalid directions (that what comes after the first word), check `$help` for a detailed explanation on each command.';
                 break;
             default:
                 //This should never happen
