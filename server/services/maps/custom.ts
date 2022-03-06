@@ -50,19 +50,11 @@ export default class CustomMapService {
           this._checkStarProperty(star, 'specialistId', 'number', true);
           // this._checkStarProperty(star, 'ships', 'number');
 
-          if (star?.homeStar) {
-            homeStars.push(star);
-            star.linkedLocations = [];
-
-            if (star.playerId != null) { 
-              playerIds.push(star.playerId);
-            }
-          }
-
-          locations.push({
+          let mappedStar = {
             id: star.id,
             homeStar: star.homeStar,
             playerId: star.playerId,
+            linkedLocations: [],
             warpGate: star.warpGate,
             isNebula: star.isNebula,
             isAsteroidField: star.isAsteroidField,
@@ -79,7 +71,17 @@ export default class CustomMapService {
               industry: star.naturalResources.industry,
               science: star.naturalResources.science
             }
-          });
+          };
+
+          if (star?.homeStar) {
+            homeStars.push(mappedStar);
+
+            if (mappedStar.playerId != null) { 
+              playerIds.push(mappedStar.playerId);
+            }
+          }
+
+          locations.push(mappedStar);
         }
 
         playerIds = [...new Set(playerIds)]; // ignore repeated player indexes
