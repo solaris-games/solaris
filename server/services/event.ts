@@ -65,7 +65,7 @@ export default class EventService {
         PLAYER_CONVERSATION_CREATED: 'playerConversationCreated',
         PLAYER_CONVERSATION_INVITED: 'playerConversationInvited',
         PLAYER_CONVERSATION_LEFT: 'playerConversationLeft',
-        PLAYER_DIPLOMACY_ALLIANCE_DECLARED: 'playerDiplomacyAllianceDeclared',
+        PLAYER_DIPLOMACY_STATUS_CHANGED: 'playerDiplomacyStatusChanged',
     }
     
     eventModel: any;
@@ -171,12 +171,20 @@ export default class EventService {
 
         this.diplomacyService.on('onDiplomacyPeaceDeclared', (args) => this.createGameDiplomacyPeaceDeclared(args.gameId, args.gameTick, args.status));
         this.diplomacyService.on('onDiplomacyWarDeclared', (args) => this.createGameDiplomacyWarDeclared(args.gameId, args.gameTick, args.status));
-        this.diplomacyService.on('onDiplomacyAllianceDeclared', (args) => this.createPlayerDiplomacyAllianceDeclared(args.gameId, args.gameTick, args.status));
+        this.diplomacyService.on('onDiplomacyStatusChanged', (args) => this.createPlayerDiplomacyStatusChanged(args.gameId, args.gameTick, args.status));
     }
 
     async deleteByGameId(gameId: DBObjectId) {
         await this.eventRepo.deleteMany({
             gameId
+        });
+    }
+
+    async deleteByEventType(gameId: DBObjectId, gameTick: number, type: string) {
+        await this.eventRepo.deleteMany({
+            gameId,
+            tick: gameTick,
+            type
         });
     }
 
@@ -651,8 +659,34 @@ export default class EventService {
         return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_PLAYER_BADGE_PURCHASED, data);
     }
 
+    async _deleteGameDiplomacyDeclarationsInTick(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus) {
+        await this.eventRepo.deleteMany({
+            gameId,
+            tick: gameTick,
+            type: {
+                $in: [
+                    this.EVENT_TYPES.GAME_DIPLOMACY_PEACE_DECLARED, 
+                    this.EVENT_TYPES.GAME_DIPLOMACY_WAR_DECLARED
+                ]
+            },
+            $or: [
+                { 
+                    'data.playerIdFrom': status.playerIdFrom,
+                    'data.playerIdTo': status.playerIdTo
+                },
+                { 
+                    'data.playerIdFrom': status.playerIdTo,
+                    'data.playerIdTo': status.playerIdFrom
+                }
+            ]
+        });
+    }
+
     async createGameDiplomacyPeaceDeclared(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus) {
         let data = status;
+
+        // Peace/war can be declared multiple times in a single tick, delete any existing declarations
+        await this._deleteGameDiplomacyDeclarationsInTick(gameId, gameTick, status);
 
         return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_DIPLOMACY_PEACE_DECLARED, data);
     }
@@ -660,14 +694,20 @@ export default class EventService {
     async createGameDiplomacyWarDeclared(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus) {
         let data = status;
 
+        // Peace/war can be declared multiple times in a single tick, delete any existing declarations
+        await this._deleteGameDiplomacyDeclarationsInTick(gameId, gameTick, status);
+
         return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_DIPLOMACY_WAR_DECLARED, data);
     }
 
-    async createPlayerDiplomacyAllianceDeclared(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus) {
+    async createPlayerDiplomacyStatusChanged(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus) {
         let data = status;
 
-        await this.createPlayerEvent(gameId, gameTick, status.playerIdFrom, this.EVENT_TYPES.PLAYER_DIPLOMACY_ALLIANCE_DECLARED, data);
-        await this.createPlayerEvent(gameId, gameTick, status.playerIdTo, this.EVENT_TYPES.PLAYER_DIPLOMACY_ALLIANCE_DECLARED, data);
+        // Delete the event if it already exists - This prevents spam.
+        await this.deleteByEventType(gameId, gameTick, this.EVENT_TYPES.PLAYER_DIPLOMACY_STATUS_CHANGED);
+
+        await this.createPlayerEvent(gameId, gameTick, status.playerIdFrom, this.EVENT_TYPES.PLAYER_DIPLOMACY_STATUS_CHANGED, data);
+        await this.createPlayerEvent(gameId, gameTick, status.playerIdTo, this.EVENT_TYPES.PLAYER_DIPLOMACY_STATUS_CHANGED, data);
     }
 
 };

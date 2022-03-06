@@ -59,7 +59,7 @@
         <player-conversation-created :event="event" v-if="event.type === 'playerConversationCreated'"/>
         <player-conversation-invited :event="event" v-if="event.type === 'playerConversationInvited'"/>
         <player-conversation-left :event="event" v-if="event.type === 'playerConversationLeft'"/>
-        <player-diplomacy-alliance-declared :event="event" v-if="event.type === 'playerDiplomacyAllianceDeclared'"/>
+        <player-diplomacy-status-changed :event="event" v-if="event.type === 'playerDiplomacyStatusChanged'"/>
     </div>
 </div>
 </template>
@@ -99,7 +99,7 @@ import PlayerConversationInvitedVue from './PlayerConversationInvited'
 import PlayerConversationLeftVue from './PlayerConversationLeft'
 import GameDiplomacyPeaceDeclaredVue from './GameDiplomacyPeaceDeclared'
 import GameDiplomacyWarDeclaredVue from './GameDiplomacyWarDeclared'
-import PlayerDiplomacyAllianceDeclaredVue from './PlayerDiplomacyAllianceDeclared'
+import PlayerDiplomacyStatusChangedVue from './PlayerDiplomacyStatusChanged'
 
 export default {
   components: {
@@ -137,7 +137,7 @@ export default {
     'player-conversation-created': PlayerConversationCreatedVue,
     'player-conversation-invited': PlayerConversationInvitedVue,
     'player-conversation-left': PlayerConversationLeftVue,
-    'player-diplomacy-alliance-declared': PlayerDiplomacyAllianceDeclaredVue,
+    'player-diplomacy-status-changed': PlayerDiplomacyStatusChangedVue,
   },
   props: {
     event: Object
