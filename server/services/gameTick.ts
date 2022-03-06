@@ -306,87 +306,127 @@ export default class GameTickService extends EventEmitter {
                 };
             });
 
+        // Generating the graph, effectively making chunks of the map, where each chunk is a lane between two stars with carriers on it.
         const graph = this._getCarrierPositionGraph(carrierPositions);
-
         for (let carrierPath in graph) {
             let positions = graph[carrierPath];
 
+            // If there are 1 or less carriers on a carrierPath, it is impossible for c2cc to occur, so we can skip this path.
             if (positions.length <= 1) {
                 continue;
             }
 
-            for (let i = 0; i < positions.length; i++) {
+            let combats: any[] = [];
+            for (let i = 0; i < positions.length - 1; i++) {
                 let friendlyCarrier = positions[i];
 
-                if (friendlyCarrier.carrier.ships <= 0) {
+                // Checks if the carrier is still alive and not a gift.
+                if (friendlyCarrier.carrier.ships <= 0 || friendlyCarrier.carrier.isGift) {
                     continue;
                 }
 
-                // First up, get all carriers that are heading from the destination and to the source
-                // and are in front of the carrier.
-                let collisionCarriers: CarrierPosition[] = positions
-                    .filter(c => {
-                        return (c.carrier.ships > 0 && !c.carrier.isGift) // Is still alive and not a gift
-                            && (
-                                // Head to head combat:
-                                (
-                                    c.destination.toString() === friendlyCarrier.source.toString()
-                                    && c.distanceToSourceCurrent <= friendlyCarrier.distanceToDestinationCurrent
-                                    && c.distanceToSourceNext >= friendlyCarrier.distanceToDestinationNext
-                                )
-                                ||
-                                // Combat from behind: 
-                                (
-                                    c.destination.toString() === friendlyCarrier.destination.toString()
-                                    && c.distanceToDestinationCurrent <= friendlyCarrier.distanceToDestinationCurrent
-                                    && c.distanceToDestinationNext >= friendlyCarrier.distanceToDestinationNext
-                                )
-                            )
-                    });
-
-                // Filter any carriers that avoid carrier-to-carrier combat.
-                collisionCarriers = this._filterAvoidCarrierToCarrierCombatCarriers(collisionCarriers);
-
-                if (!collisionCarriers.length) {
+                // Check if it has a specialist that avoids c2cc.
+                if (this._checkAvoidCarrierToCarrierCombat(friendlyCarrier.carrier)) {
                     continue;
                 }
 
-                // If all of the carriers that have collided are friendly then no need to do combat.
-                let friendlyCarriers = collisionCarriers
-                    .filter(c => c.carrier.ships! > 0 && c.carrier.ownedByPlayerId!.toString() === friendlyCarrier.carrier.ownedByPlayerId.toString());
+                for (let j = i + 1; j < positions.length; j++) {
+                    let enemyCarrier = positions[j];
 
-                // If all other carriers are friendly then skip.
-                if (friendlyCarriers.length === collisionCarriers.length) {
-                    continue;
-                }
-
-                let friendlyPlayer = this.playerService.getById(game, friendlyCarrier.carrier.ownedByPlayerId);
-                
-                let combatCarriers = collisionCarriers
-                    .map(c => c.carrier)
-                    .filter(c => c.ships! > 0);
-
-                // Double check that there are carriers that can fight.
-                if (!combatCarriers.length) {
-                    continue;
-                }
-
-                // If alliances is enabled then ensure that only enemies fight.
-                // TODO: Alliance combat here is very complicated when more than 2 players are involved.
-                // For now, we will perform normal combat if any participant is an enemy of the others.
-                if (isAlliancesEnabled) {
-                    const playerIds: DBObjectId[] = [...new Set(combatCarriers.map(x => x.ownedByPlayerId!))];
-
-                    const isAllPlayersAllied = this.diplomacyService.isDiplomaticStatusBetweenPlayersAllied(game, playerIds);
-
-                    if (isAllPlayersAllied) {
+                    // Checks if a carrier is alive and not a gift, because only then can it engage in c2cc.
+                    if (enemyCarrier.carrier.ships <= 0 || enemyCarrier.isGift) {
                         continue;
                     }
+
+                    // Check if carriers have the same owner, if so, no combat occurs.
+                    if (friendlyCarrier.carrier.ownedByPlayerId === enemyCarrier.carrier.ownedByPlayerId) {
+                        continue;
+                    }
+
+                    // Check if the players are allied, in which case no combat occurs.
+                    if (isAlliancesEnabled) {
+                        const playerIds: DBObjectId[] = [friendlyCarrier.carrier.ownedByPlayerId, enemyCarrier.carrier.ownedByPlayerId];
+
+                        const isAllPlayersAllied = this.diplomacyService.isDiplomaticStatusBetweenPlayersAllied(game, playerIds);
+
+                        if (isAllPlayersAllied) {
+                            continue;
+                        }
+                    }
+
+                    // Checks if carriers will actually cross paths.
+                    let willCrossPaths = (
+                        // Head-to-head combat
+                        (
+                            enemyCarrier.destination.toString() === friendlyCarrier.source.toString()
+                            && enemyCarrier.distanceToSourceCurrent <= friendlyCarrier.distanceToDestinationCurrent
+                            && enemyCarrier.distanceToSourceNext >= friendlyCarrier.distanceToDestinationNext
+                        )
+                        ||
+                        // Head-to-rear combat
+                        (
+                            enemyCarrier.destination.toString() === friendlyCarrier.destination.toString()
+                            && (
+                                // Friendly carrier catches up on enemy carrier
+                                (
+                                    enemyCarrier.distanceToDestinationCurrent <= friendlyCarrier.distanceToDestinationCurrent
+                                    && enemyCarrier.distanceToDestinationNext >= friendlyCarrier.distanceToDestinationNext
+                                )
+                                ||
+                                // Enemy carrier catches up on friendly carrier
+                                (
+                                    enemyCarrier.distanceToDestinationCurrent >= friendlyCarrier.distanceToDestinationCurrent
+                                    && enemyCarrier.distanceToDestinationNext <= friendlyCarrier.distanceToDestinationNext
+                                )
+                            )
+                        )
+                    );
+
+                    // If willCrossPaths is fulfilled the carriers will actually engage in combat, so filter out all cases where this doesn't apply.
+                    if(!willCrossPaths) {
+                        continue;
+                    }
+
+                    // Check if it has a specialist that avoids c2cc.
+                    if (this._checkAvoidCarrierToCarrierCombat(enemyCarrier.carrier)) {
+                        continue;
+                    }
+
+                    // Now we know for sure the friendlyCarrier and enemyCarrier will engage in combat, therefore we must compute the time it will take for them to meet.
+                    let time: number;
+                    let distanceBetweenCarriers: number;
+                    let friendlySpeed = friendlyCarrier.distanceToDestinationCurrent - friendlyCarrier.distanceToDestinationNext;
+                    let enemySpeed = enemyCarrier.distanceToDestinationCurrent - enemyCarrier.distanceToDestinationNext;
+                    if (enemyCarrier.destination.toString() === friendlyCarrier.source.toString()) {
+                        // In case of Head-to-head combat the time is as follows
+                        distanceBetweenCarriers = enemyCarrier.distanceToDestinationCurrent - friendlyCarrier.distanceToSourceCurrent
+                        time = (distanceBetweenCarriers) / (friendlySpeed + enemySpeed)
+                    } else {
+                        distanceBetweenCarriers = Math.abs(enemyCarrier.distanceToDestinationCurrent - friendlyCarrier.distanceToDestinationCurrent);
+                        time = (distanceBetweenCarriers) / Math.abs(friendlySpeed - enemySpeed)
+                    }
+
+                    // Now that we know this combat will happen and when, we push this with the time, so we can sort it based on that.
+                    combats.push({
+                        time,
+                        carriers: [friendlyCarrier, enemyCarrier]
+                    });
                 }
+            }
 
-                // TODO: Check for specialists that affect pre-combat.
-
-                await this.combatService.performCombat(game, gameUsers, friendlyPlayer, null, combatCarriers);
+            // Now that we've figured out all combats that will happen in this carrierPath, we can sort them based on time and then perform them.
+            // This sorting makes sure that when carriers would intercept each other in the same tick, the one that would realistically be intercepted first gets intercepted first.
+            combats.sort((c1, c2) => c1.time - c2.time);
+            
+            for (let combat of combats) {
+                // Change the format so the combatcalculator can handle it
+                combat.carriers = combat.carriers.map(c => c.carrier);
+                // Check if the carrier has not been destroyed in previous combat
+                if(combat.carriers[0].ships > 0 && combat.carriers[1].ships > 0) {
+                    // In c2cc it does not really matter who is the defender, so we just choose the first carrier.
+                    let friendlyPlayer = this.playerService.getById(game, combat.carriers[0].ownedByPlayerId);
+                    await this.combatService.performCombat(game, gameUsers, friendlyPlayer, null, combat.carriers)
+                }
             }
         }
     }
@@ -414,17 +454,15 @@ export default class GameTickService extends EventEmitter {
         return graph;
     }
 
-    _filterAvoidCarrierToCarrierCombatCarriers(carrierPositions: CarrierPosition[]): CarrierPosition[] {
-        return carrierPositions.filter(c => {
-            let specialist = this.specialistService.getByIdCarrier(c.carrier.specialistId);
-
-            if (specialist && specialist.modifiers && specialist.modifiers.special 
-                && specialist.modifiers.special.avoidCombatCarrierToCarrier) {
-                return false;
-            }
-
-            return true;
-        });
+    _checkAvoidCarrierToCarrierCombat(carrier) {
+        // Returns true if and only if the carrier avoids c2cc.
+        let specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
+        return (
+            specialist
+            && specialist.modifiers
+            && specialist.modifiers.special
+            && specialist.modifiers.special.avoidCombatCarrierToCarrier
+            );
     }
 
     async _moveCarriers(game: Game, gameUsers: User[]) {
