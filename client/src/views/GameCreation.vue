@@ -100,8 +100,6 @@
         
       </div>
 
-      <view-subtitle title="Advanced Settings" class="centeredHeader"/>
-
       <view-subtitle title="Game Time Settings" @collapse="toggleCollpase" :collapseName="'displayGameTimeSettings'" />
       <div v-if="displayGameTimeSettings">
         <div class="form-group">
@@ -177,6 +175,8 @@
         </div>
 
       </div>
+
+      <view-subtitle title="Advanced Settings" class="centeredHeader"/>
 
       <view-subtitle title="Galaxy Settings" @collapse="toggleCollpase" :collapseName="'displayGalaxySettings'"/>
       <div v-if="displayGalaxySettings">

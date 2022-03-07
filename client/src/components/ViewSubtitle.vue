@@ -3,8 +3,8 @@
   <div class="col">
     <h4 class="mt-3 mb-3">{{ title }}</h4>
   </div>
-  <div class="collapseButton" v-if="collapseName">
-    <input type="button" :value="inputValue" @click="changeText()"/>
+  <div class="col-auto" style="margin: auto" v-if="collapseName">
+    <button class="btn btn-sm btn-default" @click="changeText()"> {{inputValue}} </button>
   </div>
 </div>
 </template>
@@ -42,8 +42,4 @@ export default {
 </script>
 
 <style scoped>
-    .collapseButton {
-      margin: auto;
-      padding: 5px
-    }
 </style>
