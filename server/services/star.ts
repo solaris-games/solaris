@@ -137,9 +137,11 @@ export default class StarService extends EventEmitter {
 
         this.resetIgnoreBulkUpgradeStatuses(homeStar);
 
-        homeStar.naturalResources.economy = game.constants.star.resources.maxNaturalResources;
-        homeStar.naturalResources.industry = game.constants.star.resources.maxNaturalResources;
-        homeStar.naturalResources.science = game.constants.star.resources.maxNaturalResources;
+        if (gameSettings.galaxy.galaxyType !== 'custom') { 
+            homeStar.naturalResources.economy = game.constants.star.resources.maxNaturalResources;
+            homeStar.naturalResources.industry = game.constants.star.resources.maxNaturalResources;
+            homeStar.naturalResources.science = game.constants.star.resources.maxNaturalResources;
+        }
 
         // ONLY the home star gets the starting infrastructure.
         homeStar.infrastructure.economy = gameSettings.player.startingInfrastructure.economy;
