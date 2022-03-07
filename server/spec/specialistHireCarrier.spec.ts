@@ -20,7 +20,9 @@ describe('specialistHire - Carrier', () => {
                 cullWaypointsByHyperspaceRangeDB: () => {}
             },
             playerService: {},
-            starService: {},
+            starService: {
+                isOwnedByPlayer: () => { return true; }
+            },
             gameTypeService: {
                 isTutorialGame: () => { return false; }
             },
@@ -86,7 +88,8 @@ describe('specialistHire - Carrier', () => {
 
     function starBasic(testObj) {
         return {
-            _id: testObj.starId
+            _id: testObj.starId,
+            ownedByPlayerId: testObj.playerId
         };
     }
 

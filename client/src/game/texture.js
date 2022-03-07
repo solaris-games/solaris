@@ -159,6 +159,10 @@ class TextureService {
       this.STAR_SYMBOLS['scannable'] = new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/128x128_star_scannable.svg')))
       this.STAR_SYMBOLS['unscannable'] = new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/128x128_star_unscannable.svg')))
       this.STAR_SYMBOLS['home'] = new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/128x128_star_home.svg')))
+      this.STAR_SYMBOLS['black_hole'] = new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/128x128_star_black_hole.svg')))
+      this.STAR_SYMBOLS['black_hole_binary'] = new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/128x128_star_black_hole_binary.svg')))
+      this.STAR_SYMBOLS['binary_scannable'] = new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/128x128_star_scannable_binary.svg')))
+      this.STAR_SYMBOLS['binary_unscannable'] = new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/128x128_star_unscannable_binary.svg')))
     }
 
     getRandomStarNebulaTexture(seed) {

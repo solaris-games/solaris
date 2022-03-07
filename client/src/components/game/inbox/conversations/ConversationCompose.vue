@@ -102,10 +102,14 @@ export default {
       this.$store.commit('updateCurrentConversationText', e.target.value)
     },
     async send () {
-      const messageText = this.$store.state.currentConversation.text
+      let messageText = ''
 
-      if (!messageText) {
-        return
+      if (this.$store.state.currentConversation) {
+        messageText = this.$store.state.currentConversation.text
+
+        if (!messageText) {
+          return
+        }
       }
 
       const message = MentionHelper.makeMentionsStatic(this.$store.state.game, messageText)

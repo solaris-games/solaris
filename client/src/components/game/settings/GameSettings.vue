@@ -139,8 +139,12 @@
             <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomNebulas) }}%</td>
           </tr>
           <tr v-if="game.settings.galaxy.galaxyType !== 'custom'">
-            <td>Random Asteroid Fields <help-tooltip tooltip="The percentage of random asteroid fields are generated in the galaxy - Asteroid fields start with additional resources and x2 defender bonus (net +2 weapons)"/></td>
+            <td>Random Asteroid Fields <help-tooltip tooltip="The percentage of random asteroid fields are generated in the galaxy - Asteroid fields have x2 defender bonus (net +2 weapons) in combat"/></td>
             <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomAsteroidFields) }}%</td>
+          </tr>
+          <tr v-if="game.settings.galaxy.galaxyType !== 'custom'">
+            <td>Random Binary Stars <help-tooltip tooltip="The percentage of random binary stars are generated in the galaxy - Binary stars start with additional natural resources"/></td>
+            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomBinaryStars) }}%</td>
           </tr>
           <tr v-if="game.settings.galaxy.galaxyType !== 'custom'">
             <td>Random Black Holes <help-tooltip tooltip="The percentage of random black holes are generated in the galaxy - Black holes cannot have infrastructure but have +3 scanning range"/></td>

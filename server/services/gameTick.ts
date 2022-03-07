@@ -451,14 +451,6 @@ export default class GameTickService extends EventEmitter {
 
             let destinationStar = game.galaxy.stars.find(s => s._id.toString() === waypoint.destination.toString())!;
 
-            // If we are currently in orbit then this is the first movement, we
-            // need to set the transit fields
-            // Also double check that the waypoint isn't travelling to the current star
-            // that the carrier is in orbit of.
-            if (carrier.orbiting && carrier.orbiting.toString() !== waypoint.destination.toString()) {
-                carrier.orbiting = null; // We are just about to move now so this needs to be null.
-            }
-
             // Save the distance travelled so it can be used later for combat.
             carrier.distanceToDestination = this.distanceService.getDistanceBetweenLocations(carrier.location, destinationStar.location);
              
@@ -694,6 +686,9 @@ export default class GameTickService extends EventEmitter {
                     
                     rankingResult = await this.leaderboardService.addGameRankings(game, gameUsers, leaderboard);
                 }
+
+                // Mark all players as established regardless of game length.
+                this.leaderboardService.markNonAFKPlayersAsEstablishedPlayers(game, gameUsers);
 
                 // If the game is anonymous, then ranking results should be omitted from the game ended event.
                 if (this.gameTypeService.isAnonymousGame(game)) {

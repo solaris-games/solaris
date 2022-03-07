@@ -26,7 +26,13 @@
         <div v-if="(!isCompactUIStyle || !star.ownedByPlayerId) && star.isAsteroidField">
           <hr/>
           <p class="mb-0" v-if="star.isAsteroidField">This star is surrounded by an <span class="text-warning">Asteroid Field <i class="fas fa-meteor"></i></span>.</p>
-          <p class="mb-2 text-info" v-if="star.isAsteroidField"><small><i>Asteroid Fields start with additional natural resources and x2 Defender Bonus (net +2 Weapons).</i></small></p>
+          <p class="mb-2 text-info" v-if="star.isAsteroidField"><small><i>Asteroid Fields have x2 Defender Bonus (net +2 Weapons) in combat.</i></small></p>
+        </div>
+
+        <div v-if="(!isCompactUIStyle || !star.ownedByPlayerId) && star.isBinaryStar">
+          <hr/>
+          <p class="mb-0" v-if="star.isBinaryStar">This is a <span class="text-warning">Binary Star <i class="fas fa-star"></i></span> system.</p>
+          <p class="mb-2 text-info" v-if="star.isBinaryStar"><small><i>Binary Stars start with additional natural resources.</i></small></p>
         </div>
         
         <div v-if="(!isCompactUIStyle || !star.ownedByPlayerId) && star.wormHoleToStarId">
@@ -56,8 +62,11 @@
           <span v-if="star.isNebula" title="Star is obscured inside a nebula - All ship counts are hidden from other players">
             <i class="fas fa-eye-slash ml-1"></i>
           </span>
-          <span v-if="star.isAsteroidField" title="Star is surrounded by an asteroid field - The star has additional natural resources and x2 defender bonus (net +2 weapons)">
+          <span v-if="star.isAsteroidField" title="Star is surrounded by an asteroid field - x2 defender bonus (net +2 weapons) in combat">
             <i class="fas fa-meteor ml-1"></i>
+          </span>
+          <span v-if="star.isBinaryStar" title="Binary Star - The system has additional natural resources">
+            <i class="fas fa-star ml-1"></i>
           </span>
           <span v-if="star.wormHoleToStarId" title="The star has a worm hole - Connected to another worm hole somewhere in the galaxy">
             <i class="far fa-sun ml-1"></i>

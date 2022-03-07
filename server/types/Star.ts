@@ -39,6 +39,7 @@ export interface Star extends MapObject {
     warpGate: boolean;
     isNebula: boolean;
     isAsteroidField: boolean;
+    isBinaryStar: boolean;
     isBlackHole: boolean;
     wormHoleToStarId: DBObjectId | null;
     ignoreBulkUpgrade?: IgnoreBulkUpgrade;

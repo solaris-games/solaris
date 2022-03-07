@@ -17,6 +17,7 @@ const schema = new Schema({
     warpGate: { type: Types.Boolean, required: true, default: false },
     isNebula: { type: Types.Boolean, required: true, default: false },
     isAsteroidField: { type: Types.Boolean, required: true, default: false },
+    isBinaryStar: { type: Types.Boolean, required: true, default: false },
     isBlackHole: { type: Types.Boolean, required: true, default: false },
     wormHoleToStarId: { type: Types.ObjectId, required: false, default: null },
     ignoreBulkUpgrade: {

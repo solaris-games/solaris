@@ -27,6 +27,8 @@ import WaypointService from './waypoint';
 import { Star } from '../types/Star';
 import { Guild, GuildUserWithTag } from '../types/Guild';
 import { CarrierWaypoint } from '../types/CarrierWaypoint';
+import { Carrier } from '../types/Carrier';
+import AvatarService from './avatar';
 
 export default class GameGalaxyService {
     cacheService: CacheService;
@@ -51,6 +53,7 @@ export default class GameGalaxyService {
     gameTypeService: GameTypeService;
     gameStateService: GameStateService;
     diplomacyService: DiplomacyService;
+    avatarService: AvatarService;
 
     constructor(
         cacheService: CacheService,
@@ -74,7 +77,8 @@ export default class GameGalaxyService {
         orbitalMechanicsService: OrbitalMechanicsService,
         gameTypeService: GameTypeService,
         gameStateService: GameStateService,
-        diplomacyService: DiplomacyService
+        diplomacyService: DiplomacyService,
+        avatarService: AvatarService
     ) {
         this.cacheService = cacheService;
         this.broadcastService = broadcastService;
@@ -98,6 +102,7 @@ export default class GameGalaxyService {
         this.gameTypeService = gameTypeService;
         this.gameStateService = gameStateService;
         this.diplomacyService = diplomacyService;
+        this.avatarService = avatarService;
     }
 
     async getGalaxy(gameId: DBObjectId, userId: DBObjectId | null, tick: number | null) {
@@ -277,6 +282,7 @@ export default class GameGalaxyService {
                 warpGate: false,
                 isNebula: false,
                 isAsteroidField: false,
+                isBinaryStar: false,
                 isBlackHole: false,
                 wormHoleToStarId: null
             } as Star;
@@ -314,9 +320,13 @@ export default class GameGalaxyService {
 
         // Get all of the player's stars.
         let playerStars: Star[] = [];
+        let playerScanningStars: Star[] = [];
+        let playerCarriersInOrbit: Carrier[] = [];
 
         if (player) {
             playerStars = this.starService.listStarsOwnedByPlayer(doc.galaxy.stars, player._id);
+            playerScanningStars = this.starService.listStarsWithScanningRangeByPlayer(doc, player._id);
+            playerCarriersInOrbit = this.carrierService.listCarriersOwnedByPlayerInOrbit(doc.galaxy.carriers, player._id);
         }
 
         // Work out which ones are not in scanning range and clear their data.
@@ -369,7 +379,9 @@ export default class GameGalaxyService {
                 }
 
                 // Get the closest player star to this star.
-                let inRange = isFinished || this.starService.isStarInScanningRangeOfPlayer(doc, s, player);
+                let inRange = isFinished ||                                                                 // The game is finished
+                    this.starService.isStarWithinScanningRangeOfStars(doc, s, playerScanningStars) ||       // The star is within scanning range
+                    playerCarriersInOrbit.find(c => c.orbiting!.toString() === s._id.toString()) != null;   // The star has a friendly carrier in orbit
 
                 // If its in range then its all good, send the star back as is.
                 // Otherwise only return a subset of the data.
@@ -395,6 +407,7 @@ export default class GameGalaxyService {
                         warpGate: false, // Hide warp gates outside of scanning range
                         isNebula: false, // Hide nebula outside of scanning range
                         isAsteroidField: false, // Hide asteroid fields outside of scanning range
+                        isBinaryStar: false, // Hide outside of scanning range
                         isBlackHole: false, // Hide outside of scanning range
                         wormHoleToStarId: s.wormHoleToStarId,
                         isKingOfTheHillStar: s.isKingOfTheHillStar
@@ -438,6 +451,8 @@ export default class GameGalaxyService {
     }
 
     async _setPlayerInfoBasic(doc: Game, player: Player | null) {
+        const avatars = this.avatarService.listAllAvatars();
+
         const isFinished = this.gameStateService.isFinished(doc);
         const isDarkModeExtra = this.gameTypeService.isDarkModeExtra(doc);
 
@@ -484,6 +499,7 @@ export default class GameGalaxyService {
 
             p.isInScanningRange = playersInRange.find(x => x._id.toString() === p._id.toString()) != null;
             p.shape = p.shape || 'circle'; // TODO: I don't know why the shape isn't being returned by mongoose defaults.
+            p.avatar = p.avatar ? avatars.find(a => a.id.toString() === p.avatar!.toString())!.file : null; // TODO: We should made the ID a number and not a string as it is an ID.
 
             // If the user is in the game and it is the current
             // player we are looking at then return everything.

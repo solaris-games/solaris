@@ -3,18 +3,23 @@
   <loading-spinner :loading="!conversation"/>
 
   <div class="container" v-if="conversation">
-    <menu-title :title="conversation.name" @onCloseRequested="onCloseRequested">
+    <menu-title class="menu-page-header bg-dark pb-1" @onCloseRequested="onCloseRequested">
       <button class="btn btn-sm" v-if="conversation.createdBy" :class="{'btn-default':!pinnedOnly, 'btn-success':pinnedOnly}" title="Show/Hide pinned messages" @click="toggledPinnedOnly">
         <i class="fas fa-thumbtack"></i>
       </button>
-      <button class="btn btn-sm btn-info ml-1" @click="toggleConversationWindow" title="Toggle conversation display">
+      <button class="btn btn-sm ml-1" :class="{'btn-success':!conversation.isMuted, 'btn-danger':conversation.isMuted}" title="Mute/Unmute conversation" @click="toggleMuteConversation">
+        <i class="fas" :class="{'fa-bell-slash':conversation.isMuted,'fa-bell':!conversation.isMuted}"></i>
+      </button>
+      <button class="btn btn-sm btn-info ml-1 d-lg-none" @click="toggleConversationWindow" title="Toggle conversation display">
         <i class="fas" :class="{'fa-eye-slash':!toggleDisplay,'fa-eye':toggleDisplay}"></i>
       </button>
       <button class="btn btn-sm btn-primary ml-1" @click="onOpenInboxRequested" title="Back to Inbox"><i class="fas fa-inbox"></i></button>
       <button class="btn btn-sm btn-warning ml-1" @click="leaveConversation" v-if="conversation.createdBy" title="Leave conversation"><i class="fas fa-sign-out-alt"></i></button>
     </menu-title>
 
-    <p v-if="!toggleDisplay" class="pb-2 text-warning">
+    <h5 v-if="conversation && toggleDisplay" class="menu-page-header-padding mb-0">{{conversation.name}}</h5>
+
+    <p v-if="!toggleDisplay" class="pb-0 mb-1 text-warning menu-page-header-padding">
       <small><i>Click the <i class="fas fa-eye-slash"></i> button to view the conversation.</i></small>
     </p>
 
@@ -35,7 +40,7 @@
         <p class="mb-0 text-center">No messages.</p>
     </div>
 
-    <compose-conversation-message v-if="toggleDisplay" :conversationId="conversationId" @onConversationMessageSent="onConversationMessageSent" />
+    <compose-conversation-message class="compose-message" v-if="toggleDisplay" :conversationId="conversationId" @onConversationMessageSent="onConversationMessageSent" />
   </div>
 </div>
 </template>
@@ -180,8 +185,16 @@ export default {
       // before scrolling the div container to the bottom.
       setTimeout(async () => {
         if (this.conversation && this.conversation.messages.length) {
-          const messagesContainer = this.$el.querySelector('.messages-container')
-          messagesContainer.scrollTop = messagesContainer.scrollHeight
+          if (window.innerWidth >= 992) {
+            const el = this.$el.getElementsByClassName('compose-message')[0];
+
+            if (el) {
+              el.scrollIntoView()
+            }
+          } else {
+            const el = this.$el.querySelector('.messages-container')
+            el.scrollTop = el.scrollHeight
+          }
 
           await this.markConversationAsRead()
         }
@@ -224,6 +237,19 @@ export default {
           console.error(err)
         }
       }
+    },
+    async toggleMuteConversation () {
+      try {
+        if (this.conversation.isMuted) {
+          this.conversation.isMuted = false
+          await ConversationApiService.unmute(this.$store.state.game._id, this.conversation._id)
+        } else {
+          this.conversation.isMuted = true
+          await ConversationApiService.mute(this.$store.state.game._id, this.conversation._id)
+        }
+      } catch (err) {
+        console.error(err)
+      }
     }
   },
   computed: {
@@ -239,8 +265,21 @@ export default {
 </script>
 
 <style scoped>
-.messages-container {
-  max-height: 400px;
-  overflow: auto;
+@media screen and (max-width: 992px) {
+  .messages-container {
+    max-height: 500px;
+    overflow: auto;
+  }
+}
+@media screen and (min-width: 992px) { 
+  .menu-page-header {
+    position: fixed;
+    z-index: 1;
+    width: 456px;
+  }
+
+  .menu-page-header-padding {
+    padding-top: 45px;
+  }
 }
 </style>

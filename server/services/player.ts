@@ -4,7 +4,7 @@ const EventEmitter = require('events');
 import ValidationError from '../errors/validation';
 import DatabaseRepository from '../models/DatabaseRepository';
 import { Game } from '../types/Game';
-import { PlayerColourShapeCombination, PlayerShape } from '../types/Player';
+import { Player, PlayerColourShapeCombination, PlayerShape } from '../types/Player';
 import CarrierService from './carrier';
 import GameTypeService from './gameType';
 import MapService from './map';
@@ -55,20 +55,6 @@ export default class PlayerService extends EventEmitter {
 
     getByUserId(game, userId) {
         return game.galaxy.players.find(p => p.userId && p.userId.toString() === userId.toString());
-    }
-    
-    getPlayersWithinScanningRangeOfStar(game, starId, players) {
-        if (players == null) {
-            players = game.galaxy.players;
-        }
-
-        let star = this.starService.getById(game, starId);
-
-        let playersWithinRange = players.filter(p => {
-            return this.starService.isStarInScanningRangeOfPlayer(game, star, p);
-        });
-
-        return playersWithinRange;
     }
 
     getPlayersWithinScanningRangeOfPlayer(game, players, player) {
@@ -911,6 +897,17 @@ export default class PlayerService extends EventEmitter {
         }
 
         return this.getById(game, star.ownedByPlayerId);
+    }
+
+    async setHasSentTurnReminder(game: Game, player: Player, sent: boolean) {
+        await this.gameRepo.updateOne({
+            _id: game._id,
+            'galaxy.players._id': player._id
+        }, {
+            $set: {
+                'galaxy.players.$.hasSentTurnReminder': sent
+            }
+        });
     }
 
 }

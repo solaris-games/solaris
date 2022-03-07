@@ -8,9 +8,11 @@
     "start-jobs:prod": "node dist/jobs/index.js",
     "start-api:dev": "ts-node-dev --transpile-only --respawn --inspect=9231 api/index.ts",
     "start-api:prod": "node dist/api/index.js",
+    "start-discord-bot:dev": "ts-node-dev --transpile-only --respawn --inspect=9231 bots/discord/index.ts",
+    "start-discord-bot:prod": "node dist/bots/discord/index.ts",
     "prebuild": "rm -rf ./dist",
     "build": "tsc",
-    "postbuild": "cp -r templates ./dist/templates && cp .env ./dist && cp ./bots/discord/.env ./dist/bots/discord | true",
+    "postbuild": "cp -r templates ./dist/templates && cp .env ./dist | true && cp ./bots/discord/.env ./dist/bots/discord | true",
     "ts-node": "ts-node"
   },
   "author": "",

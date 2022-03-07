@@ -1,16 +1,12 @@
-db.users.updateMany({}, {
-    $set: {
-        isEstablishedPlayer: false
+db.gameevents.updateMany({
+    type: {
+        $in: ['playerCombatStar', 'playerCombatCarrier']
     }
-});
-
-db.users.updateMany({
-    $or: [
-        {'achievements.rank': { $gt: 0 }},
-        {'achievements.completed': { $gt: 0 }}
-    ]
-}, {
-    $set: {
-        isEstablishedPlayer: true
+}, [
+    {
+        $set: {
+            'data.combatResult.weapons.defenderBase': '$data.combatResult.weapons.defender',
+            'data.combatResult.weapons.attackerBase': '$data.combatResult.weapons.attacker',
+        }
     }
-});
+]);

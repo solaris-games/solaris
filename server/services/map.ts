@@ -162,6 +162,11 @@ export default class MapService {
             this.generateAsteroidFields(game, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomAsteroidFields);
         }
 
+        // If binary stars are enabled, assign random binary stars to start
+        if (game.settings.specialGalaxy.randomBinaryStars) {
+            this.generateBinaryStars(game, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomBinaryStars);
+        }
+
         // If black holes are enabled, assign random black holes to start
         if (game.settings.specialGalaxy.randomBlackHoles) {
             this.generateBlackHoles(game, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomBlackHoles);
@@ -246,6 +251,21 @@ export default class MapService {
                 count++; // Increment because the while loop will decrement.
             } else {
                 star.isAsteroidField = true;
+            }
+        } while (count--);
+    }
+
+    generateBinaryStars(game: Game, stars: Star[], playerCount: number, percentage: number) {
+        let count = Math.floor((stars.length - playerCount) / 100 * percentage);
+
+        // Pick stars at random and set them to be binary stars
+        do {
+            let star = stars[this.randomService.getRandomNumberBetween(0, stars.length - 1)];
+
+            if (star.homeStar || star.isBinaryStar) {
+                count++; // Increment because the while loop will decrement.
+            } else {
+                star.isBinaryStar = true;
 
                 // Overwrite the natural resources
                 let minResources = game.constants.star.resources.maxNaturalResources * 1.5;
@@ -280,23 +300,9 @@ export default class MapService {
                 star.isBlackHole = true;
 
                 // Overwrite the natural resources
-                let minResources = 1;
-                let maxResources = game.constants.star.resources.minNaturalResources;
-
-                // Overwrite natural resources
-                if (this.gameTypeService.isSplitResources(game)) {
-                    star.naturalResources.economy = this.randomService.getRandomNumberBetween(minResources, maxResources);
-                    star.naturalResources.industry = this.randomService.getRandomNumberBetween(minResources, maxResources);
-                    star.naturalResources.science = this.randomService.getRandomNumberBetween(minResources, maxResources);
-                } else {
-                    let resources = this.randomService.getRandomNumberBetween(minResources, maxResources);
-
-                    star.naturalResources = {
-                        economy: resources,
-                        industry: resources,
-                        science: resources
-                    };
-                }
+                star.naturalResources.economy = Math.ceil(star.naturalResources.economy * 0.2);
+                star.naturalResources.industry = Math.ceil(star.naturalResources.industry * 0.2);
+                star.naturalResources.science = Math.ceil(star.naturalResources.science * 0.2);
             }
         } while (count--);
     }
