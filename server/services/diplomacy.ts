@@ -201,19 +201,16 @@ export default class DiplomacyService extends EventEmitter {
 
         let isAllied = newStatus.actualStatus === 'allies';
         let isFriendly = isAllied || newStatus.actualStatus === 'neutral';
+
+        this.emit('onDiplomacyStatusChanged', {
+            gameId: game._id,
+            gameTick: game.state.tick,
+            status: newStatus
+        });
         
         // Create a global event for peace reached if both players were at war and are now either neutral or allied.
         if (wasAtWar && isFriendly) {
             this.emit('onDiplomacyPeaceDeclared', {
-                gameId: game._id,
-                gameTick: game.state.tick,
-                status: newStatus
-            });
-        }
-
-        // Create a private event for alliance established if both players are now allies.
-        if (isAllied) {
-            this.emit('onDiplomacyAllianceDeclared', {
                 gameId: game._id,
                 gameTick: game.state.tick,
                 status: newStatus
@@ -234,6 +231,12 @@ export default class DiplomacyService extends EventEmitter {
 
         let newStatus = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
 
+        this.emit('onDiplomacyStatusChanged', {
+            gameId: game._id,
+            gameTick: game.state.tick,
+            status: newStatus
+        });
+        
         // Create a global event for enemy declaration.
         if (!wasAtWar) {
             this.emit('onDiplomacyWarDeclared', {
@@ -263,6 +266,12 @@ export default class DiplomacyService extends EventEmitter {
 
         let isNeutral = newStatus.actualStatus === 'neutral';
 
+        this.emit('onDiplomacyStatusChanged', {
+            gameId: game._id,
+            gameTick: game.state.tick,
+            status: newStatus
+        });
+        
         // Create a global event for peace reached if both players were at war.
         if (wasAtWar && isNeutral) {
             this.emit('onDiplomacyPeaceDeclared', {

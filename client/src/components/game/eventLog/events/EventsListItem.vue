@@ -1,11 +1,12 @@
 <template>
-<div class="bg-primary pt-2 pb-1 mb-2 pointer" :class="{'unread':!isRead}" @click="markAsRead">
-    <div v-if="event.tick">
-        <div class="col text-right">
-            <span class="badge" :class="{'badge-success':isRead,'badge-warning':!isRead}">Tick {{event.tick}}</span>
-        </div>
+<div class="bg-primary pt-2 pb-1 mb-2 pointer row" :class="{'unread':!isRead, 'bg-secondary': isGlobal}" @click="markAsRead">
+    <div class="col">
+        <span class="badge badge-info" v-if="isGlobal">Global Event</span>
     </div>
-    <div class="col mt-2">
+    <div v-if="event.tick" class="col-auto">
+        <span class="badge" :class="{'badge-success':isRead,'badge-warning':!isRead}">Tick {{event.tick}}</span>
+    </div>
+    <div class="col-12 mt-2">
         <game-ended :event="event" v-if="event.type === 'gameEnded'"
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
         <game-paused :event="event" v-if="event.type === 'gamePaused'"/>
@@ -59,7 +60,7 @@
         <player-conversation-created :event="event" v-if="event.type === 'playerConversationCreated'"/>
         <player-conversation-invited :event="event" v-if="event.type === 'playerConversationInvited'"/>
         <player-conversation-left :event="event" v-if="event.type === 'playerConversationLeft'"/>
-        <player-diplomacy-alliance-declared :event="event" v-if="event.type === 'playerDiplomacyAllianceDeclared'"/>
+        <player-diplomacy-status-changed :event="event" v-if="event.type === 'playerDiplomacyStatusChanged'"/>
     </div>
 </div>
 </template>
@@ -99,7 +100,7 @@ import PlayerConversationInvitedVue from './PlayerConversationInvited'
 import PlayerConversationLeftVue from './PlayerConversationLeft'
 import GameDiplomacyPeaceDeclaredVue from './GameDiplomacyPeaceDeclared'
 import GameDiplomacyWarDeclaredVue from './GameDiplomacyWarDeclared'
-import PlayerDiplomacyAllianceDeclaredVue from './PlayerDiplomacyAllianceDeclared'
+import PlayerDiplomacyStatusChangedVue from './PlayerDiplomacyStatusChanged'
 
 export default {
   components: {
@@ -137,7 +138,7 @@ export default {
     'player-conversation-created': PlayerConversationCreatedVue,
     'player-conversation-invited': PlayerConversationInvitedVue,
     'player-conversation-left': PlayerConversationLeftVue,
-    'player-diplomacy-alliance-declared': PlayerDiplomacyAllianceDeclaredVue,
+    'player-diplomacy-status-changed': PlayerDiplomacyStatusChangedVue,
   },
   props: {
     event: Object
@@ -164,6 +165,9 @@ export default {
   computed: {
       isRead () {
           return this.event.read || this.event.read == null
+      },
+      isGlobal () {
+          return this.event.read == null
       }
   }
 }
@@ -175,6 +179,7 @@ export default {
 }
 
 .unread {
-    border: 3px solid #f39c12;
+    border-top: 4px solid #f39c12;
+    border-bottom: 4px solid #f39c12;
 }
 </style>
