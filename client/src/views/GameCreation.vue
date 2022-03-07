@@ -189,11 +189,11 @@
           </select>
         </div>
 
-      <div class="form-group" v-if="settings.galaxy.galaxyType == 'custom'">
-        <p class="mb-1">It is recommended to use the community galaxy generation tool which can be found here: <a href="https://kurtzmusch.github.io/solaris-galaxy-editor/" target="_blank">https://kurtzmusch.github.io/solaris-galaxy-editor/</a></p>
-        <label for="customJSON" class="col-form-label">Galaxy JSON <help-tooltip tooltip="The JSON document for which represents the galaxy to create"/></label>
-        <textarea id='customJSON' class='col' v-model='settings.galaxy.customJSON' rows="10"></textarea>
-      </div>
+        <div class="form-group" v-if="settings.galaxy.galaxyType == 'custom'">
+          <p class="mb-1">It is recommended to use the community galaxy generation tool which can be found here: <a href="https://kurtzmusch.github.io/solaris-galaxy-editor/" target="_blank">https://kurtzmusch.github.io/solaris-galaxy-editor/</a></p>
+          <label for="customJSON" class="col-form-label">Galaxy JSON <help-tooltip tooltip="The JSON document for which represents the galaxy to create"/></label>
+          <textarea id='customJSON' class='col' v-model='settings.galaxy.customJSON' rows="10"></textarea>
+        </div>
 
         <div class="form-group">
           <label for="starsPerPlayer" class="col-form-label">Stars per Player (<span class="text-warning">{{settings.galaxy.starsPerPlayer}} stars</span>) <help-tooltip tooltip="How many stars will be generated per player in the galaxy"/></label>
@@ -278,98 +278,99 @@
           </div>
         </div>
 
-      <div class="form-group" v-if="settings.galaxy.galaxyType !== 'custom'">
-        <label for="randomAsteroidFields" class="col-form-label">Random Asteroid Fields (<span class="text-warning">{{settings.specialGalaxy.randomAsteroidFields}}%</span>) <help-tooltip tooltip="The percentage of random asteroid fields are generated in the galaxy - Asteroid fields have x2 defender bonus (net +2 weapons) in combat"/></label>
-        <div class="col">
-          <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomAsteroidFields" v-model="settings.specialGalaxy.randomAsteroidFields" :disabled="isCreatingGame">
-        </div>
-
-      <div class="form-group" v-if="settings.galaxy.galaxyType !== 'custom'">
-        <label for="randomBinaryStars" class="col-form-label">Random Binary Stars (<span class="text-warning">{{settings.specialGalaxy.randomBinaryStars}}%</span>) <help-tooltip tooltip="The percentage of random binary stars are generated in the galaxy - Binary stars start with additional resources"/></label>
-        <div class="col">
-          <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomBinaryStars" v-model="settings.specialGalaxy.randomBinaryStars" :disabled="isCreatingGame">
-        </div>
-      </div>
-
-      <div class="form-group" v-if="settings.galaxy.galaxyType !== 'custom'">
-        <label for="randomBlackHoles" class="col-form-label">Random Black Holes (<span class="text-warning">{{settings.specialGalaxy.randomBlackHoles}}%</span>) <help-tooltip tooltip="The percentage of random black holes are generated in the galaxy - Black holes cannot have infrastructure but have +3 scanning range"/></label>
-        <div class="col">
-          <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomBlackHoles" v-model="settings.specialGalaxy.randomBlackHoles" :disabled="isCreatingGame">
-        </div>
-
-        <div class="form-group">
-          <label for="darkGalaxy" class="col-form-label">Dark Galaxy <help-tooltip tooltip="Dark galaxies hide stars outside of player scanning ranges - Extra dark galaxies hide player statistics so that players only know what other players have based on what they can see in their scanning range"/></label>
-          <select class="form-control" id="darkGalaxy" v-model="settings.specialGalaxy.darkGalaxy" :disabled="isCreatingGame">
-            <option v-for="opt in options.specialGalaxy.darkGalaxy" v-bind:key="opt.value" v-bind:value="opt.value">
-              {{ opt.text }}
-            </option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="giftCarriers" class="col-form-label">Gift Carriers <help-tooltip tooltip="Determines whether carriers can be gifted to other players"/></label>
-          <select class="form-control" id="giftCarriers" v-model="settings.specialGalaxy.giftCarriers" :disabled="isCreatingGame">
-            <option v-for="opt in options.specialGalaxy.giftCarriers" v-bind:key="opt.value" v-bind:value="opt.value">
-              {{ opt.text }}
-            </option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="defenderBonus" class="col-form-label">Defender Bonus <help-tooltip tooltip="Enables or disables the defender bonus - Grants +1 to the defender in carrier-to-star combat"/></label>
-          <select class="form-control" id="defenderBonus" v-model="settings.specialGalaxy.defenderBonus" :disabled="isCreatingGame">
-            <option v-for="opt in options.specialGalaxy.defenderBonus" v-bind:key="opt.value" v-bind:value="opt.value">
-              {{ opt.text }}
-            </option>
-          </select>
-        </div>
-
-        <div class="form-group" v-if="settings.orbitalMechanics.enabled === 'disabled'">
-          <label for="carrierToCarrierCombat" class="col-form-label">Carrier-to-Carrier Combat <help-tooltip tooltip="Determines whether carrier-to-carrier combat is enabled. If disabled, carriers will not fight eachother in space"/></label>
-          <select class="form-control" id="carrierToCarrierCombat" v-model="settings.specialGalaxy.carrierToCarrierCombat" :disabled="isCreatingGame">
-            <option v-for="opt in options.specialGalaxy.carrierToCarrierCombat" v-bind:key="opt.value" v-bind:value="opt.value">
-              {{ opt.text }}
-            </option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="splitResources" class="col-form-label">Split Resources <help-tooltip tooltip="Determines whether star natural resources are independent values, giving the game more granular infrastructure costs"/></label>
-          <select class="form-control" id="splitResources" v-model="settings.specialGalaxy.splitResources" :disabled="isCreatingGame">
-            <option v-for="opt in options.specialGalaxy.splitResources" v-bind:key="opt.value" v-bind:value="opt.value">
-              {{ opt.text }}
-            </option>
-          </select>
+        <div class="form-group" v-if="settings.galaxy.galaxyType !== 'custom'">
+          <label for="randomAsteroidFields" class="col-form-label">Random Asteroid Fields (<span class="text-warning">{{settings.specialGalaxy.randomAsteroidFields}}%</span>) <help-tooltip tooltip="The percentage of random asteroid fields are generated in the galaxy - Asteroid fields have x2 defender bonus (net +2 weapons) in combat"/></label>
+          <div class="col">
+            <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomAsteroidFields" v-model="settings.specialGalaxy.randomAsteroidFields" :disabled="isCreatingGame">
+          </div>
         </div>
 
         <div class="form-group" v-if="settings.galaxy.galaxyType !== 'custom'">
-          <label for="resourceDistribution" class="col-form-label">Resource Distribution <help-tooltip tooltip="Determines the shape of distributed natural resources in the galaxy"/></label>
-          <select class="form-control" id="resourceDistribution" v-model="settings.specialGalaxy.resourceDistribution" :disabled="isCreatingGame">
-            <option v-for="opt in options.specialGalaxy.resourceDistribution" v-bind:key="opt.value" v-bind:value="opt.value">
-              {{ opt.text }}
-            </option>
-          </select>
+          <label for="randomBinaryStars" class="col-form-label">Random Binary Stars (<span class="text-warning">{{settings.specialGalaxy.randomBinaryStars}}%</span>) <help-tooltip tooltip="The percentage of random binary stars are generated in the galaxy - Binary stars start with additional resources"/></label>
+          <div class="col">
+            <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomBinaryStars" v-model="settings.specialGalaxy.randomBinaryStars" :disabled="isCreatingGame">
+          </div>
         </div>
 
         <div class="form-group" v-if="settings.galaxy.galaxyType !== 'custom'">
-          <label for="playerDistribution" class="col-form-label">Player Distribution <help-tooltip tooltip="Determines where player home stars are located at the start of the game"/></label>
-          <select class="form-control" id="playerDistribution" v-model="settings.specialGalaxy.playerDistribution" :disabled="isCreatingGame">
-            <option v-for="opt in options.specialGalaxy.playerDistribution" v-bind:key="opt.value" v-bind:value="opt.value">
-              {{ opt.text }}
-            </option>
-          </select>
-        </div>
+          <label for="randomBlackHoles" class="col-form-label">Random Black Holes (<span class="text-warning">{{settings.specialGalaxy.randomBlackHoles}}%</span>) <help-tooltip tooltip="The percentage of random black holes are generated in the galaxy - Black holes cannot have infrastructure but have +3 scanning range"/></label>
+          <div class="col">
+            <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomBlackHoles" v-model="settings.specialGalaxy.randomBlackHoles" :disabled="isCreatingGame">
+          </div>
 
-        <div class="form-group">
-          <label for="carrierSpeed" class="col-form-label">Carrier Speed <help-tooltip tooltip="Carriers go brrr"/></label>
-          <select class="form-control" id="carrierSpeed" v-model="settings.specialGalaxy.carrierSpeed" :disabled="isCreatingGame">
-            <option v-for="opt in options.specialGalaxy.carrierSpeed" v-bind:key="opt.value" v-bind:value="opt.value">
-              {{ opt.text }}
-            </option>
-          </select>
+          <div class="form-group">
+            <label for="darkGalaxy" class="col-form-label">Dark Galaxy <help-tooltip tooltip="Dark galaxies hide stars outside of player scanning ranges - Extra dark galaxies hide player statistics so that players only know what other players have based on what they can see in their scanning range"/></label>
+            <select class="form-control" id="darkGalaxy" v-model="settings.specialGalaxy.darkGalaxy" :disabled="isCreatingGame">
+              <option v-for="opt in options.specialGalaxy.darkGalaxy" v-bind:key="opt.value" v-bind:value="opt.value">
+                {{ opt.text }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="giftCarriers" class="col-form-label">Gift Carriers <help-tooltip tooltip="Determines whether carriers can be gifted to other players"/></label>
+            <select class="form-control" id="giftCarriers" v-model="settings.specialGalaxy.giftCarriers" :disabled="isCreatingGame">
+              <option v-for="opt in options.specialGalaxy.giftCarriers" v-bind:key="opt.value" v-bind:value="opt.value">
+                {{ opt.text }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="defenderBonus" class="col-form-label">Defender Bonus <help-tooltip tooltip="Enables or disables the defender bonus - Grants +1 to the defender in carrier-to-star combat"/></label>
+            <select class="form-control" id="defenderBonus" v-model="settings.specialGalaxy.defenderBonus" :disabled="isCreatingGame">
+              <option v-for="opt in options.specialGalaxy.defenderBonus" v-bind:key="opt.value" v-bind:value="opt.value">
+                {{ opt.text }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group" v-if="settings.orbitalMechanics.enabled === 'disabled'">
+            <label for="carrierToCarrierCombat" class="col-form-label">Carrier-to-Carrier Combat <help-tooltip tooltip="Determines whether carrier-to-carrier combat is enabled. If disabled, carriers will not fight eachother in space"/></label>
+            <select class="form-control" id="carrierToCarrierCombat" v-model="settings.specialGalaxy.carrierToCarrierCombat" :disabled="isCreatingGame">
+              <option v-for="opt in options.specialGalaxy.carrierToCarrierCombat" v-bind:key="opt.value" v-bind:value="opt.value">
+                {{ opt.text }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="splitResources" class="col-form-label">Split Resources <help-tooltip tooltip="Determines whether star natural resources are independent values, giving the game more granular infrastructure costs"/></label>
+            <select class="form-control" id="splitResources" v-model="settings.specialGalaxy.splitResources" :disabled="isCreatingGame">
+              <option v-for="opt in options.specialGalaxy.splitResources" v-bind:key="opt.value" v-bind:value="opt.value">
+                {{ opt.text }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group" v-if="settings.galaxy.galaxyType !== 'custom'">
+            <label for="resourceDistribution" class="col-form-label">Resource Distribution <help-tooltip tooltip="Determines the shape of distributed natural resources in the galaxy"/></label>
+            <select class="form-control" id="resourceDistribution" v-model="settings.specialGalaxy.resourceDistribution" :disabled="isCreatingGame">
+              <option v-for="opt in options.specialGalaxy.resourceDistribution" v-bind:key="opt.value" v-bind:value="opt.value">
+                {{ opt.text }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group" v-if="settings.galaxy.galaxyType !== 'custom'">
+            <label for="playerDistribution" class="col-form-label">Player Distribution <help-tooltip tooltip="Determines where player home stars are located at the start of the game"/></label>
+            <select class="form-control" id="playerDistribution" v-model="settings.specialGalaxy.playerDistribution" :disabled="isCreatingGame">
+              <option v-for="opt in options.specialGalaxy.playerDistribution" v-bind:key="opt.value" v-bind:value="opt.value">
+                {{ opt.text }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="carrierSpeed" class="col-form-label">Carrier Speed <help-tooltip tooltip="Carriers go brrr"/></label>
+            <select class="form-control" id="carrierSpeed" v-model="settings.specialGalaxy.carrierSpeed" :disabled="isCreatingGame">
+              <option v-for="opt in options.specialGalaxy.carrierSpeed" v-bind:key="opt.value" v-bind:value="opt.value">
+                {{ opt.text }}
+              </option>
+            </select>
+          </div>
         </div>
       </div>
-
       <view-subtitle title="Orbital Mechanics" @collapse="toggleCollpase" :collapseName="'displayOrbitalMechanics'"/>
       <div v-if="displayOrbitalMechanics">
         <div class="form-group">
