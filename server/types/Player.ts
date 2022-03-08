@@ -77,6 +77,7 @@ export interface Player {
     afk: boolean;
     renownToGive: number;
     ready: boolean;
+    readyToCycle: boolean;
     readyToQuit: boolean;
     missedTurns: number;
     hasSentTurnReminder: boolean;
