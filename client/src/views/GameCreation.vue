@@ -4,9 +4,7 @@
     <loading-spinner :loading="!settings"/>
     <loading-spinner :loading="isCreatingGame"/>
     <form @submit.prevent="handleSubmit" v-if="settings">
-      <view-subtitle title="Basic Settings" class="centeredHeader"/>
-      <view-subtitle title="Game Settings" @collapse="toggleCollpase" :collapseName="'displayGameSettings'" :startsOpened="displayGameSettings" />
-      <div v-if="displayGameSettings">
+      <view-collapse-panel title="Game Settings" :startsOpened="true">
         <div class="form-group">
           <label for="name" class="col-form-label">Name <help-tooltip tooltip="The name of the game, make it short and sweet"/></label>
           <input type="text" required="required" class="form-control" id="name" minlength="3" maxlength="24" v-model="settings.general.name" :disabled="isCreatingGame">
@@ -58,9 +56,9 @@
         <form-error-list v-bind:errors="errors"/>
 
         <button type="submit" class="btn btn-success btn-lg mb-3 btn-block" :disabled="isCreatingGame"><i class="fas fa-gamepad"></i> Create Game</button>
-      </div>
-      <view-subtitle title="Player Settings" @collapse="toggleCollpase" :collapseName="'displayPlayerSettings'"/>
-      <div v-if="displayPlayerSettings">
+      </view-collapse-panel>
+
+      <view-collapse-panel title="Player Settings" :startsOpened="true">
         <div class="form-group">
           <label for="players" class="col-form-label">Players <help-tooltip tooltip="Total number of player slots"/></label>
           <select class="form-control" id="players" v-model="settings.general.playerLimit" :disabled="isCreatingGame">
@@ -98,10 +96,9 @@
         </div>
         
         
-      </div>
+      </view-collapse-panel>
 
-      <view-subtitle title="Game Time Settings" @collapse="toggleCollpase" :collapseName="'displayGameTimeSettings'" />
-      <div v-if="displayGameTimeSettings">
+      <view-collapse-panel title="Game Time Settings" :startsOpened="true">
         <div class="form-group">
           <label for="gameType" class="col-form-label">Game Type <help-tooltip tooltip="Real time games are constantly running however Turn based games all players must submit their turn in order for the game to progress"/></label>
           <select class="form-control" id="gameType" v-model="settings.gameTime.gameType" :disabled="isCreatingGame">
@@ -174,12 +171,11 @@
           </select>
         </div>
 
-      </div>
+      </view-collapse-panel>
 
       <view-subtitle title="Advanced Settings" class="centeredHeader"/>
 
-      <view-subtitle title="Galaxy Settings" @collapse="toggleCollpase" :collapseName="'displayGalaxySettings'"/>
-      <div v-if="displayGalaxySettings">
+      <view-collapse-panel title="Galaxy Settings">
         <div class="form-group">
           <label for="galaxyType" class="col-form-label">Galaxy Type <help-tooltip tooltip="The shape of the galaxy that will be generated for the game"/></label>
           <select class="form-control" id="galaxyType" v-model="settings.galaxy.galaxyType" :disabled="isCreatingGame">
@@ -208,10 +204,9 @@
             <input type="range" min="10" max="36" step="2" class="form-range w-100" id="productionTicks" v-model="settings.galaxy.productionTicks" :disabled="isCreatingGame">
           </div>
         </div>
-      </div>
+      </view-collapse-panel>
 
-      <view-subtitle title="Special Galaxy Settings" @collapse="toggleCollpase" :collapseName="'displaySpecialGalaxySettings'"/>
-      <div v-if="displaySpecialGalaxySettings">
+      <view-collapse-panel title="Special Galaxy Settings">
         <div class="form-group">
           <label for="carrierCost" class="col-form-label">Carrier Cost <help-tooltip tooltip="Determines how expensive carriers cost to build"/></label>
           <select class="form-control" id="carrierCost" v-model="settings.specialGalaxy.carrierCost" :disabled="isCreatingGame">
@@ -370,9 +365,9 @@
             </select>
           </div>
         </div>
-      </div>
-      <view-subtitle title="Orbital Mechanics" @collapse="toggleCollpase" :collapseName="'displayOrbitalMechanics'"/>
-      <div v-if="displayOrbitalMechanics">
+      </view-collapse-panel>
+
+      <view-collapse-panel title="Orbital Mechanics">
         <div class="form-group">
           <label for="orbitalMechanicsEnabled" class="col-form-label">Galaxy Rotation <help-tooltip tooltip="If enabled, orbits stars and carriers around the center of the galaxy every tick"/></label>
           <select class="form-control" id="orbitalMechanicsEnabled" v-model="settings.orbitalMechanics.enabled" :disabled="isCreatingGame">
@@ -390,10 +385,9 @@
             </option>
           </select>
         </div>
-      </div>
+      </view-collapse-panel>
 
-      <view-subtitle title="Player Start Settings" @collapse="toggleCollpase" :collapseName="'displayPlayerStartSettings'"/>
-      <div v-if="displayPlayerStartSettings">
+      <view-collapse-panel title="Player Start Settings">
         <div class="form-group">
           <label for="startingStars" class="col-form-label">Starting Stars (<span class="text-warning">{{settings.player.startingStars}} stars</span>) <help-tooltip tooltip="Determines how many stars each player is allocated at the start of the game"/></label>
           <div class="col">
@@ -467,10 +461,9 @@
             </option>
           </select>
         </div>
-      </div>
+      </view-collapse-panel>
 
-      <view-subtitle title="Infrastructure Settings" @collapse="toggleCollpase" :collapseName="'displayInfrastructureSettings'"/>
-      <div v-if="displayInfrastructureSettings">
+      <view-collapse-panel title="Infrastructure Settings">
         <div class="form-group">
           <label for="startingInfrastructureEconomy" class="col-form-label">Starting Economic Infrastructure (<span class="text-warning">{{settings.player.startingInfrastructure.economy}} Economy</span>) <help-tooltip tooltip="Determines the infrastructure of the home star of each player at the start of the game"/></label>
           <div class="col">
@@ -510,10 +503,9 @@
             </option>
           </select>
         </div>
-      </div>
+      </view-collapse-panel>
 
-      <view-subtitle title="Technology Settings" @collapse="toggleCollpase" :collapseName="'displayTechnologySettings'"/>
-      <div v-if="displayTechnologySettings">
+      <view-collapse-panel title="Technology Settings">
         <div class="form-group">
           <label for="startingTechLevelTerraforming" class="col-form-label">Starting Terraforming Technology (<span class="text-warning">{{settings.technology.startingTechnologyLevel.terraforming}} Terraforming</span>) <help-tooltip tooltip="Determines the starting technology levels for all players"/></label>
           <div class="col">
@@ -631,15 +623,14 @@
             </option>
           </select>
         </div>
-      </div>
+      </view-collapse-panel>
 
-      <view-subtitle title="Specialist Bans" v-if="settings.specialGalaxy.specialistCost !== 'none'" @collapse="toggleCollpase" :collapseName="'displaySpecialistBans'"/>
-      <div v-if="displaySpecialistBans">
+      <view-collapse-panel title="Specialist Bans" v-if="settings.specialGalaxy.specialistCost !== 'none'">
         <div class="form-group" v-if="settings.specialGalaxy.specialistCost !== 'none'">
           <p><small>Choose to ban certain specialists from the game, they cannot be hired by any player.</small></p>
           <specialist-ban-list-selection @onSpecialistBanSelectionChanged="onSpecialistBanSelectionChanged" />
         </div>
-      </div>
+      </view-collapse-panel>
 
       <form-error-list v-bind:errors="errors"/>
 
@@ -652,6 +643,7 @@
 <script>
 import LoadingSpinnerVue from '../components/LoadingSpinner'
 import ViewContainer from '../components/ViewContainer'
+import ViewCollapsePanel from '../components/ViewCollapsePanel'
 import ViewTitle from '../components/ViewTitle'
 import ViewSubtitle from '../components/ViewSubtitle'
 import FormErrorList from '../components/FormErrorList'
@@ -664,6 +656,7 @@ export default {
   components: {
     'loading-spinner': LoadingSpinnerVue,
     'view-container': ViewContainer,
+    'view-collapse-panel': ViewCollapsePanel,
     'view-title': ViewTitle,
     'view-subtitle': ViewSubtitle,
     'form-error-list': FormErrorList,
@@ -675,17 +668,7 @@ export default {
       isCreatingGame: false,
       errors: [],
       settings: null,
-      options: null,
-      displayGameSettings: true,
-      displayGameTimeSettings: false,
-      displayGalaxySettings: false,
-      displaySpecialGalaxySettings:false,
-      displayOrbitalMechanics:false,
-      displayPlayerSettings:false,
-      displayPlayerStartSettings:false,
-      displayInfrastructureSettings:false,
-      displayTechnologySettings:false,
-      displaySpecialistBans:false
+      options: null
     }
   },
   async mounted () {
@@ -729,9 +712,6 @@ export default {
     },
     onSpecialistBanSelectionChanged (e) {
       this.settings.specialGalaxy.specialistBans = e
-    },
-    toggleCollpase(collapseName) {
-        this[collapseName] = !this[collapseName];
     }
   }
 }
