@@ -452,11 +452,22 @@
             </option>
           </select>
         </div>
+      </view-collapse-panel>
 
+      <view-collapse-panel title="Formal Alliances">
         <div class="form-group">
-          <label for="alliances" class="col-form-label">Formal Alliances <help-tooltip tooltip="If enabled, players can change their diplomatic status to allied or enemies - Allied players can orbit eachother's stars and support eachother in combat"/></label>
-          <select class="form-control" id="alliances" v-model="settings.player.alliances" :disabled="isCreatingGame">
-            <option v-for="opt in options.player.alliances" v-bind:key="opt.value" v-bind:value="opt.value">
+          <label for="alliances" class="col-form-label">Enabled <help-tooltip tooltip="If enabled, players can change their diplomatic status to allied or enemies - Allied players can orbit eachother's stars and support eachother in combat"/></label>
+          <select class="form-control" id="alliances" v-model="settings.alliances.enabled" :disabled="isCreatingGame">
+            <option v-for="opt in options.alliances.enabled" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+        
+        <div class="form-group" v-if="settings.alliances.enabled === 'enabled'">
+          <label for="alliancesGlobalEvents" class="col-form-label">Global Events <help-tooltip tooltip="If enabled, global events will be displayed when players declare war or make peace"/></label>
+          <select class="form-control" id="alliancesGlobalEvents" v-model="settings.alliances.globalEvents" :disabled="isCreatingGame">
+            <option v-for="opt in options.alliances.globalEvents" v-bind:key="opt.value" v-bind:value="opt.value">
               {{ opt.text }}
             </option>
           </select>

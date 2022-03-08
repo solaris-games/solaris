@@ -67,8 +67,11 @@
     "tradeCredits": false,
     "tradeCreditsSpecialists": false,
     "tradeCost": 0,
-    "tradeScanning": "all",
-    "alliances": "disabled"
+    "tradeScanning": "all"
+  },
+  "alliances": {
+    "enabled": "disabled",
+    "globalEvents": "disabled"
   },
   "technology": {
     "startingTechnologyLevel": {

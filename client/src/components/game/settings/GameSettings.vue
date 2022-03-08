@@ -269,9 +269,21 @@
             <td>Trade Scanning <help-tooltip tooltip="If enabled, players can only trade with other players who are in their scanning range"/></td>
             <td class="text-right">{{ getFriendlyText(game.settings.player.tradeScanning) }}</td>
           </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <view-subtitle title="Formal Alliances"/>
+    <div class="table-responsive" v-if="game">
+      <table class="table table-striped table-hover">
+        <tbody>
           <tr>
-            <td>Formal Alliances <help-tooltip tooltip="If enabled, players can change their diplomatic status to allied or enemies - Allied players can orbit eachother's stars and support eachother in combat"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.player.alliances) }}</td>
+            <td>Enabled <help-tooltip tooltip="If enabled, players can change their diplomatic status to allied or enemies - Allied players can orbit eachother's stars and support eachother in combat"/></td>
+            <td class="text-right">{{ getFriendlyText(game.settings.alliances.enabled) }}</td>
+          </tr>
+          <tr v-if="game.settings.alliances.enabled === 'enabled'">>
+            <td>Global Events <help-tooltip tooltip="If enabled, global events will be displayed when players declare war or make peace"/></td>
+            <td class="text-right">{{ getFriendlyText(game.settings.alliances.globalEvents) }}</td>
           </tr>
         </tbody>
       </table>

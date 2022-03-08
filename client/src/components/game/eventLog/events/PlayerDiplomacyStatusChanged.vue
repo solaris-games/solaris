@@ -12,9 +12,6 @@
   <p>
     The combined diplomatic status is now: <span :class="getDiplomaticStatusClass(event.data.actualStatus)">{{event.data.actualStatus}}</span>
   </p>
-  <p>
-    <small><i>This event is private.</i></small>
-  </p>
 </div>
 </template>
 

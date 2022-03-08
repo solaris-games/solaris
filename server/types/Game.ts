@@ -132,6 +132,10 @@ export interface GameSettings {
 		tradeScanning: GameTradeScanning;
 		alliances: GameSettingEnabledDisabled;
 	},
+	alliances: {
+		enabled: GameSettingEnabledDisabled;
+		globalEvents: GameSettingEnabledDisabled;
+	},
 	technology: {
 		startingTechnologyLevel: {
 			terraforming: number;

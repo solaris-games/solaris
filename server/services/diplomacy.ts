@@ -17,7 +17,11 @@ export default class DiplomacyService extends EventEmitter {
     }
 
     isFormalAlliancesEnabled(game: Game): boolean {
-        return game.settings.player.alliances === 'enabled';
+        return game.settings.alliances.enabled === 'enabled';
+    }
+
+    isGlobalEventsEnabled(game: Game): boolean {
+        return game.settings.alliances.globalEvents === 'enabled';
     }
 
     getDiplomaticStatusBetweenPlayers(game: Game, playerIds: DBObjectId[]): DiplomaticState {
@@ -209,7 +213,7 @@ export default class DiplomacyService extends EventEmitter {
         });
         
         // Create a global event for peace reached if both players were at war and are now either neutral or allied.
-        if (wasAtWar && isFriendly) {
+        if (this.isGlobalEventsEnabled(game) && wasAtWar && isFriendly) {
             this.emit('onDiplomacyPeaceDeclared', {
                 gameId: game._id,
                 gameTick: game.state.tick,
@@ -238,7 +242,7 @@ export default class DiplomacyService extends EventEmitter {
         });
         
         // Create a global event for enemy declaration.
-        if (!wasAtWar) {
+        if (this.isGlobalEventsEnabled(game) && !wasAtWar) {
             this.emit('onDiplomacyWarDeclared', {
                 gameId: game._id,
                 gameTick: game.state.tick,
@@ -273,7 +277,7 @@ export default class DiplomacyService extends EventEmitter {
         });
         
         // Create a global event for peace reached if both players were at war.
-        if (wasAtWar && isNeutral) {
+        if (this.isGlobalEventsEnabled(game) && wasAtWar && isNeutral) {
             this.emit('onDiplomacyPeaceDeclared', {
                 gameId: game._id,
                 gameTick: game.state.tick,

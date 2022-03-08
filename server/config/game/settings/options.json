@@ -400,16 +400,28 @@
              "value":"scanned",
              "text":"Trade with scanned players only"
           }
+       ]
+    },
+    "alliances":{
+       "enabled": [
+         {
+            "value":"enabled",
+            "text":"Enabled"
+         },
+         {
+            "value":"disabled",
+            "text":"Disabled"
+         }
        ],
-       "alliances":[
-          {
-             "value":"enabled",
-             "text":"Enabled"
-          },
-          {
-             "value":"disabled",
-             "text":"Disabled"
-          }
+       "globalEvents": [
+         {
+            "value":"enabled",
+            "text":"Enabled"
+         },
+         {
+            "value":"disabled",
+            "text":"Disabled"
+         }
        ]
     },
     "technology":{
