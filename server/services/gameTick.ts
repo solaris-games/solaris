@@ -293,12 +293,15 @@ export default class GameTickService extends EventEmitter {
                     distanceToSourceNext = distanceToSourceCurrent + locationNext.distance;
                 }
 
+                let actualSpeed = this.carrierService.getCarrierSpeed(game, c);
+
                 return {
                     carrier: c,
                     source: waypoint.source,
                     destination: waypoint.destination,
                     locationCurrent: c.location,
                     locationNext: locationNext.location,
+                    actualSpeed,
                     distanceToSourceCurrent,
                     distanceToDestinationCurrent,
                     distanceToSourceNext,
@@ -315,6 +318,10 @@ export default class GameTickService extends EventEmitter {
             if (positions.length <= 1) {
                 continue;
             }
+
+            // We define a pathDirection here, which is a star that is guaranteed to exist and be a source or destination of all carriers in this path.
+            // This pathDirection will later be used to determine the combat location of all combats in this carrierPath
+            let pathDirection = positions[0].destination.toString();
 
             let combats: any[] = [];
             for (let i = 0; i < positions.length - 1; i++) {
@@ -354,29 +361,51 @@ export default class GameTickService extends EventEmitter {
                         }
                     }
 
+                    let friendlySpeed = friendlyCarrier.actualSpeed;
+                    let enemySpeed = enemyCarrier.actualSpeed;
+                    let friendlyDistance = friendlyCarrier.distanceToDestinationCurrent - friendlyCarrier.distanceToDestinationNext;
+                    let enemyDistance =  enemyCarrier.distanceToDestinationCurrent - enemyCarrier.distanceToDestinationNext;
+
                     // Checks if carriers will actually cross paths.
                     let willCrossPaths = (
                         // Head-to-head combat
                         (
                             enemyCarrier.destination.toString() === friendlyCarrier.source.toString()
-                            && enemyCarrier.distanceToSourceCurrent <= friendlyCarrier.distanceToDestinationCurrent
-                            && enemyCarrier.distanceToSourceNext >= friendlyCarrier.distanceToDestinationNext
+                            && enemyCarrier.distanceToSourceCurrent < friendlyCarrier.distanceToDestinationCurrent + 10**-6
+                            && friendlyCarrier.distanceToDestinationNext < enemyCarrier.distanceToSourceNext + 10**-6
                         )
                         ||
                         // Head-to-rear combat
                         (
                             enemyCarrier.destination.toString() === friendlyCarrier.destination.toString()
                             && (
-                                // Friendly carrier catches up on enemy carrier
                                 (
-                                    enemyCarrier.distanceToDestinationCurrent <= friendlyCarrier.distanceToDestinationCurrent
-                                    && enemyCarrier.distanceToDestinationNext >= friendlyCarrier.distanceToDestinationNext
-                                )
-                                ||
-                                // Enemy carrier catches up on friendly carrier
-                                (
-                                    enemyCarrier.distanceToDestinationCurrent >= friendlyCarrier.distanceToDestinationCurrent
-                                    && enemyCarrier.distanceToDestinationNext <= friendlyCarrier.distanceToDestinationNext
+                                    // Friendly carrier catches up on enemy carrier
+                                    (
+                                        enemyCarrier.distanceToDestinationCurrent < friendlyCarrier.distanceToDestinationCurrent + 10**-6
+                                        && friendlyCarrier.distanceToDestinationNext < enemyCarrier.distanceToDestinationNext + 10**-6
+                                        && (
+                                            // Making sure that not both carriers reach their endpoint, in which case special logic is required
+                                            enemyCarrier.distanceToDestinationNext > 0
+                                            ||
+                                            // The special logic, checking if the carrier catching up has the time to catch up
+                                            ( friendlyDistance / enemyDistance ) < ( friendlySpeed / enemySpeed ) + 10**-6
+                                        )
+                                    )
+                                    ||
+                                    // Enemy carrier catches up on friendly carrier
+                                    (
+                                        friendlyCarrier.distanceToDestinationCurrent < enemyCarrier.distanceToDestinationCurrent + 10**-6
+                                        && enemyCarrier.distanceToDestinationNext < friendlyCarrier.distanceToDestinationNext + 10**-6
+                                        // Making sure that not both carriers reach their endpoint, in which case special logic is required.
+                                        && (
+                                            // Making sure that not both carriers reach their endpoint, in which case special logic is required
+                                            friendlyCarrier.distanceToDestinationNext > 0
+                                            ||
+                                            // The special logic, checking if the carrier catching up has the time to catch up
+                                            ( enemyDistance / friendlyDistance ) < ( enemySpeed / friendlySpeed ) + 10**-6
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -395,20 +424,30 @@ export default class GameTickService extends EventEmitter {
                     // Now we know for sure the friendlyCarrier and enemyCarrier will engage in combat, therefore we must compute the time it will take for them to meet.
                     let time: number;
                     let distanceBetweenCarriers: number;
-                    let friendlySpeed = friendlyCarrier.distanceToDestinationCurrent - friendlyCarrier.distanceToDestinationNext;
-                    let enemySpeed = enemyCarrier.distanceToDestinationCurrent - enemyCarrier.distanceToDestinationNext;
+
                     if (enemyCarrier.destination.toString() === friendlyCarrier.source.toString()) {
                         // In case of Head-to-head combat the time is as follows
                         distanceBetweenCarriers = enemyCarrier.distanceToDestinationCurrent - friendlyCarrier.distanceToSourceCurrent
                         time = (distanceBetweenCarriers) / (friendlySpeed + enemySpeed)
                     } else {
+                        // Note that no check is being done to make sure that friendlySpeed does not equal enemySpeed
+                        // This is because this check is secretly being done in the willCrossPaths logic
                         distanceBetweenCarriers = Math.abs(enemyCarrier.distanceToDestinationCurrent - friendlyCarrier.distanceToDestinationCurrent);
                         time = (distanceBetweenCarriers) / Math.abs(friendlySpeed - enemySpeed)
+                    }
+
+                    let combatLocation: number; // This will be the distance which we use to check if combat happens in the same location
+                    // Now the combat location will be the distance towards the second star at the location of the combat
+                    if (friendlyCarrier.destination.toString() === pathDirection) {
+                        combatLocation = friendlyCarrier.distanceToDestinationCurrent - time * friendlySpeed;
+                    } else {
+                        combatLocation = friendlyCarrier.distanceToSourceCurrent + time * friendlySpeed;
                     }
 
                     // Now that we know this combat will happen and when, we push this with the time, so we can sort it based on that.
                     combats.push({
                         time,
+                        combatLocation,
                         carriers: [friendlyCarrier, enemyCarrier]
                     });
                 }
@@ -416,19 +455,98 @@ export default class GameTickService extends EventEmitter {
 
             // Now that we've figured out all combats that will happen in this carrierPath, we can sort them based on time and then perform them.
             // This sorting makes sure that when carriers would intercept each other in the same tick, the one that would realistically be intercepted first gets intercepted first.
-            combats.sort((c1, c2) => c1.time - c2.time);
-            
+            if (combats.length > 1) {
+                combats.sort((c1, c2) => c1.time - c2.time);
+                combats = this._calculateToMergeCombats(combats);
+            }
+
             for (let combat of combats) {
                 // Change the format so the combatcalculator can handle it
                 combat.carriers = combat.carriers.map(c => c.carrier);
-                // Check if the carrier has not been destroyed in previous combat
-                if(combat.carriers[0].ships > 0 && combat.carriers[1].ships > 0) {
+
+                // Check if some carriers have not been destroyed in previous combat
+                combat.carriers = combat.carriers.filter(c => c.ships > 0);
+                if(combat.carriers.length >= 2) {
                     // In c2cc it does not really matter who is the defender, so we just choose the first carrier.
                     let friendlyPlayer = this.playerService.getById(game, combat.carriers[0].ownedByPlayerId);
-                    await this.combatService.performCombat(game, gameUsers, friendlyPlayer, null, combat.carriers)
+                    await this.combatService.performCombat(game, gameUsers, friendlyPlayer, null, combat.carriers);
                 }
             }
         }
+    }
+
+    _calculateToMergeCombats(combats: any[]) {
+        let indexArray = [...Array(combats.length).keys()];
+        let partition: any[] = [];
+        while (indexArray.length > 0) {
+            let i = indexArray[0]
+            indexArray.splice(0, 1);
+            if (indexArray.length == 0) {
+                partition.push([i])
+                break;
+            }
+            let toMerge: any[] = [i];
+            let t = 0;
+            do {
+                let j = indexArray[t];
+
+                // Combats happen at roughly the same time
+                if (combats[i].time + 10**-6 < combats[i+j]) {
+                    // There is no temporal correlation, and since it is sorted that way, no later combat will have this correlation, meaning we can stop the search for this combat i.
+                    break;
+                }
+
+                // Combats happen at roughly the same time
+                if (Math.abs(combats[i].combatLocation - combats[i+j].combatLocation) < 10**-6) {
+                    // There is temporal and spacial correlation, therefore there will be c2cc. Which means these combats merge
+                    toMerge.push(j);
+                    indexArray.splice(t, 1);
+                } else {
+                    // There is temporal but no spacial correlation, meaning we should move to the next index to see if that may have spacial correlation
+                    t++;
+                }
+            } while (t < indexArray.length)
+            partition.push(toMerge);
+        }
+        let newCombats = this._mergeCombatsFromPartion(combats, partition);
+        return newCombats;
+    }
+
+    _mergeCombatsFromPartion(combats, partition) {
+        let newCombats: any[] = [];
+        for (let indexes of partition) {
+            let toMerge: any[] = [];
+            for (let i of indexes) {
+                toMerge.push(combats[i]);
+            }
+            newCombats.push(this._mergeCombats(toMerge))
+        }
+        return newCombats;
+    }
+
+    _mergeCombats(combats) {
+        let mergedCarriers: any[] = [];
+        for (let combat of combats) {
+            for(let carrier of combat.carriers) {
+                mergedCarriers.push(carrier);
+            }
+        }
+        console.log(mergedCarriers.length);
+        for (let i = 0; i < mergedCarriers.length; i++) {
+            console.log(mergedCarriers[i].carrier._id.toString());
+            for (let j = i + 1; j < mergedCarriers.length;) {
+                if (mergedCarriers[i].carrier._id.toString() === mergedCarriers[j].carrier._id.toString()) {
+                    mergedCarriers.splice(j, 1);
+                } else {
+                    j++;
+                }
+            }
+        }
+        return {
+            time: combats[0].time,
+            combatLocation: combats[0].combatLocation,
+            carriers: mergedCarriers
+        };
     }
 
     _getCarrierPositionGraph(carrierPositions: CarrierPosition[]) {

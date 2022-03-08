@@ -619,6 +619,32 @@ export default class CarrierService extends EventEmitter {
         };
     }
 
+    getCarrierSpeed(game, carrier):number {
+        let waypoint = carrier.waypoints[0];
+        let sourceStar = game.galaxy.stars.find(s => s._id.toString() === waypoint.source.toString())!;
+        let destinationStar = game.galaxy.stars.find(s => s._id.toString() === waypoint.destination.toString())!;
+        let carrierOwner = game.galaxy.players.find(p => p._id.toString() === carrier.ownedByPlayerId!.toString())!;
+
+        let warpSpeed = false;
+        let instantSpeed: boolean | null = false;
+        
+        if (sourceStar) {
+            warpSpeed = this.starService.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar);
+            instantSpeed = this.starService.isStarPairWormHole(sourceStar, destinationStar);
+        }
+
+        let distancePerTick;
+
+        if (instantSpeed) {
+            let distanceToDestination = this.distanceService.getDistanceBetweenLocations(carrier.location, destinationStar.location);
+            distancePerTick = distanceToDestination;
+        } else {
+            distancePerTick = this.getCarrierDistancePerTick(game, carrier, warpSpeed, instantSpeed);
+        }
+
+        return distancePerTick;
+    }
+
     isInTransit(carrier: Carrier) {
         return !carrier.orbiting;
     }
