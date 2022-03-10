@@ -1,6 +1,6 @@
 <template>
   <span v-if="player" class="span-container" :title="onlineStatus">
-    <player-icon-shape v-if="player" :filled="iconFilled" :iconColour="iconColour" :shape="player.shape" />
+    <player-icon-shape :filled="iconFilled" :iconColour="iconColour" :shape="player.shape" />
   </span>
 </template>
 <script>
@@ -25,7 +25,7 @@ export default {
     }
   },
     mounted() {
-      if (this.playerID) {
+      if (this.playerId) {
         this.player = GameHelper.getPlayerById(this.$store.state.game, this.playerId)
 
         this.iconColour = !this.colour ? GameHelper.getFriendlyColour(this.player.colour.value) : this.colour

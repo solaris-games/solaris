@@ -117,14 +117,13 @@ export default class ConversationService extends EventEmitter {
         let newConvo = getNewConversation(game, null, name, participantIds);
         
         let newMessage: ConversationMessage = {
-            _id: mongoose.Types.ObjectId(),
             fromPlayerId: null,
-            fromPlayerAlias: "Global Chat",
+            fromPlayerAlias: "Solaris",
             message: "Welcome to " + name + "!\n\nThis is the global chat. Any messages sent here will be delivered to all players in the game!\n\nGood Luck, Commanders!",
             sentDate: moment().utc(),
             sentTick: game.state.tick,
             pinned: false,
-            readBy: newConvo.mutedBy!
+            readBy: [],
         };
         newConvo.messages.push(newMessage);
         
