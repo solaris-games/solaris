@@ -50,16 +50,38 @@ export default class CustomMapService {
           this._checkStarProperty(star, 'specialistId', 'number', true);
           // this._checkStarProperty(star, 'ships', 'number');
 
-          if (star?.homeStar) {
-            homeStars.push(star);
-            star.linkedLocations = [];
+          let mappedStar = {
+            id: star.id,
+            homeStar: star.homeStar,
+            playerId: star.playerId,
+            linkedLocations: [],
+            warpGate: star.warpGate,
+            isNebula: star.isNebula,
+            isAsteroidField: star.isAsteroidField,
+            isBinaryStar: star.isBinaryStar,
+            isBlackHole: star.isBlackHole,
+            wormHoleToStarId: star.wormHoleToStarId,
+            specialistId: star.specialistId,
+            location: {
+              x: star.location.x,
+              y: star.location.y
+            },
+            naturalResources: {
+              economy: star.naturalResources.economy,
+              industry: star.naturalResources.industry,
+              science: star.naturalResources.science
+            }
+          };
 
-            if (star.playerId != null) { 
-              playerIds.push(star.playerId);
+          if (star?.homeStar) {
+            homeStars.push(mappedStar);
+
+            if (mappedStar.playerId != null) { 
+              playerIds.push(mappedStar.playerId);
             }
           }
 
-          locations.push(star);
+          locations.push(mappedStar);
         }
 
         playerIds = [...new Set(playerIds)]; // ignore repeated player indexes

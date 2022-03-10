@@ -1,6 +1,6 @@
 import { Carrier } from "../types/Carrier";
 import { Game } from "../types/Game";
-import { Player, ResearchType } from "../types/Player";
+import { Player, PlayerTechnologyLevels, ResearchType } from "../types/Player";
 import { Star } from "../types/Star";
 import SpecialistService from "./specialist";
 
@@ -53,7 +53,7 @@ export default class TechnologyService {
         return techs;
     }
 
-    getPlayerEffectiveTechnologyLevels(game: Game, player: Player | null, sanitize: boolean = true) {
+    getPlayerEffectiveTechnologyLevels(game: Game, player: Player | null, sanitize: boolean = true): PlayerTechnologyLevels {
         // TODO: This is a plaster over a bug where in the gameGalaxy service
         // it sets research to null if its in extra dark galaxy but somehow
         // this function is still being called by getStats. Needs investigating...
@@ -91,7 +91,7 @@ export default class TechnologyService {
         return techs;
     }
 
-    getStarEffectiveTechnologyLevels(game: Game, star: Star, sanitize: boolean = true) {
+    getStarEffectiveTechnologyLevels(game: Game, star: Star, sanitize: boolean = true): PlayerTechnologyLevels {
         let player = star.ownedByPlayerId ?
             game.galaxy.players.find(x => x._id.toString() === star.ownedByPlayerId!.toString()) || null : null;
 

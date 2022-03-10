@@ -135,6 +135,8 @@ export default class HistoryService {
             };
         });
 
+        // Note: We save the star and carrier data in the history for galaxy masking.
+        
         history.stars = game.galaxy.stars.map(s => {
             return {
                 starId: s._id,

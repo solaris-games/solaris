@@ -35,6 +35,17 @@ export interface PlayerResearch {
     specialists: ResearchProgress
 };
 
+export interface PlayerTechnologyLevels {
+    scanning: number;
+    hyperspace: number;
+    terraforming: number;
+    experimentation: number;
+    weapons: number;
+    banking: number;
+    manufacturing: number;
+    specialists: number;
+};
+
 export interface PlayerDiplomacy {
     allies: DBObjectId[];
 };
