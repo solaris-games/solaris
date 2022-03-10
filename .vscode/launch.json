@@ -48,9 +48,9 @@
             "request": "launch",
             "name": "Launch Discord Bot",
             "protocol": "inspector",
-            "cwd": "${workspaceFolder}/bots/discord",
+            "cwd": "${workspaceFolder}/server",
             "runtimeExecutable": "npm",
-            "runtimeArgs": ["run-script", "start:dev"],
+            "runtimeArgs": ["run-script", "start-discord-bot:dev"],
             "envFile": ".env"
         },
         {
