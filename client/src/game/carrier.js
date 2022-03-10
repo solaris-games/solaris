@@ -321,7 +321,6 @@ class Carrier extends EventEmitter {
   }
 
   updateVisibility() {
-
     if (this.graphics_ship) this.graphics_ship.visible = !this.data.orbiting && !this.hasSpecialist()
     if (this.text_ships) this.text_ships.visible = !this.data.orbiting && (this.zoomPercent >= Carrier.zoomLevel || (this.isSelected && this.zoomPercent > Carrier.zoomLevel ) || (this.isMouseOver && this.zoomPercent > Carrier.zoomLevel))
   }
@@ -362,12 +361,14 @@ class Carrier extends EventEmitter {
     this.isSelected = true
     this.drawSelectedCircle()
     this.emit('onSelected', this.data)
+    this.updateVisibility()
   }
 
   unselect () {
     this.isSelected = false
     this.drawSelectedCircle()
     this.emit('onUnselected', this.data)
+    this.updateVisibility()
   }
 
   toggleSelected () {
