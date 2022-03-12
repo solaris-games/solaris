@@ -191,7 +191,7 @@ export default class StarService extends EventEmitter {
     listStarsOwnedOrInOrbitByPlayer(game: Game, playerId: DBObjectId): Star[] {
         let starIds: string[] = this.listStarsOwnedByPlayer(game.galaxy.stars, playerId).map(s => s._id.toString());
 
-        if (game.settings.player.alliances === 'enabled') { // Don't need to check in orbit carriers if alliances is disabled
+        if (game.settings.alliances.enabled === 'enabled') { // Don't need to check in orbit carriers if alliances is disabled
             starIds = starIds.concat(this.listStarIdsWithPlayerCarriersInOrbit(game, playerId));
         }
 
