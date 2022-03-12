@@ -57,7 +57,7 @@
 
       <div class="form-group">
         <label for="players" class="col-form-label">Players <help-tooltip tooltip="Total number of player slots"/></label>
-        <select class="form-control" id="players" v-model="settings.general.playerLimit" :disabled="isCreatingGame">
+        <select class="form-control" id="players" v-model="settings.general.playerLimit" :disabled="isCreatingGame" @change="onPlayerLimitChanged">
           <option v-for="opt in options.general.playerLimit" v-bind:key="opt" v-bind:value="opt">
             {{ opt }} Players
           </option>
@@ -464,7 +464,7 @@
       <div class="form-group">
         <label for="maxAlliances" class="col-form-label">Max Number of Alliances (<span class="text-warning">{{settings.alliances.maxAlliances}} Allies</span>) <help-tooltip tooltip="Determines how many formal alliance each player may have at once.  Set to 0 to not limit the number of alliances."/></label>
         <div class="col">
-          <input type="range" min="0" max="16" step="1" class="form-range w-100" id="maxAlliances" v-model="settings.alliances.maxAlliances" :disabled="isCreatingGame">
+          <input type="range" min="0" max="32" step="1" class="form-range w-100" id="maxAlliances" v-model="settings.alliances.maxAlliances" :disabled="isCreatingGame">
         </div>
       </div>
 
@@ -735,6 +735,11 @@ export default {
     },
     onSpecialistBanSelectionChanged (e) {
       this.settings.specialGalaxy.specialistBans = e
+    },
+    onPlayerLimitChanged (e) {
+      if (this.settings.general.playerLimit < this.settings.alliances.maxAlliances) {
+        this.settings.alliances.maxAlliances = this.settings.general.playerLimit;
+      }
     }
   }
 }
