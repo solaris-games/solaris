@@ -3,7 +3,7 @@
   <loading-spinner :loading="!conversation"/>
 
   <div class="container" v-if="conversation">
-    <menu-title class="menu-page-header bg-dark" :title="conversation.name" @onCloseRequested="onCloseRequested">
+    <menu-title class="menu-page-header bg-dark pb-1" @onCloseRequested="onCloseRequested">
       <button class="btn btn-sm" v-if="conversation.createdBy" :class="{'btn-default':!pinnedOnly, 'btn-success':pinnedOnly}" title="Show/Hide pinned messages" @click="toggledPinnedOnly">
         <i class="fas fa-thumbtack"></i>
       </button>
@@ -17,11 +17,13 @@
       <button class="btn btn-sm btn-warning ml-1" @click="leaveConversation" v-if="conversation.createdBy" title="Leave conversation"><i class="fas fa-sign-out-alt"></i></button>
     </menu-title>
 
-    <p v-if="!toggleDisplay" class="pb-0 text-warning menu-page-header-padding">
+    <h5 v-if="conversation && toggleDisplay" class="menu-page-header-padding mb-0">{{conversation.name}}</h5>
+
+    <p v-if="!toggleDisplay" class="pb-0 mb-1 text-warning menu-page-header-padding">
       <small><i>Click the <i class="fas fa-eye-slash"></i> button to view the conversation.</i></small>
     </p>
 
-    <conversation-participants class="menu-page-header-padding" v-if="toggleDisplay" :conversation="conversation" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+    <conversation-participants v-if="toggleDisplay" :conversation="conversation" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 
     <div class="messages-container">
       <div class="pt-0 mb-2 mt-2" v-if="toggleDisplay && filteredMessages.length">
@@ -183,10 +185,15 @@ export default {
       // before scrolling the div container to the bottom.
       setTimeout(async () => {
         if (this.conversation && this.conversation.messages.length) {
-          const el = this.$el.getElementsByClassName('compose-message')[0];
+          if (window.innerWidth >= 992) {
+            const el = this.$el.getElementsByClassName('compose-message')[0];
 
-          if (el) {
-            el.scrollIntoView()
+            if (el) {
+              el.scrollIntoView()
+            }
+          } else {
+            const el = this.$el.querySelector('.messages-container')
+            el.scrollTop = el.scrollHeight
           }
 
           await this.markConversationAsRead()

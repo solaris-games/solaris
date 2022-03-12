@@ -31,6 +31,7 @@ effective weapons level = max debuff + max buff
 3. If multiple specialists with buffs/debuffs participate, then the **highest** buff and **lowest** debuff are used.
 
 For example:
+
 - Specialist A has Weapons +3
 - Specialist B has Weapons +1
 - Specialist C has Weapons -2
@@ -66,15 +67,17 @@ Scenario:
 The combat weapons level resolves to this:
 
 **Player A** - `weapons level 11`:
-    - Defender bonus = `+1 weapons`
-    - Largest buff = `N/A`
-    - Largest debuff = `-5 weapons` (Trade Port)
-    - Additional debuff = `-1 weapons` (Enemy Infiltrator)
-    - **Total weapons** = `6`
+
+- Defender bonus = `+1 weapons`
+- Largest buff = `N/A`
+- Largest debuff = `-5 weapons` (Trade Port)
+- Additional debuff = `-1 weapons` (Enemy Infiltrator)
+- **Total weapons** = `6`
 
 **Player B** - `weapons level 13`
-    - Defender bonus = `N/A`
-    - Largest buff = `+5 weapons` (Destroyer)
-    - Largest debuff = `-1 weapons` (Scrambler)
-    - Additional debuff = `N/A`
-    - **Total weapons** = `17`
+
+- Defender bonus = `N/A`
+- Largest buff = `+5 weapons` (Destroyer)
+- Largest debuff = `-1 weapons` (Scrambler)
+- Additional debuff = `N/A`
+- **Total weapons** = `17`

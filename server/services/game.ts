@@ -15,6 +15,7 @@ import PasswordService from './password';
 import PlayerService from './player';
 import StarService from './star';
 import UserService from './user';
+import ConversationService from './conversation';
 
 export default class GameService extends EventEmitter {
     gameRepo: DatabaseRepository<Game>;
@@ -27,6 +28,7 @@ export default class GameService extends EventEmitter {
     avatarService: AvatarService;
     gameTypeService: GameTypeService;
     gameStateService: GameStateService;
+    conversationService: ConversationService;
 
     constructor(
         gameRepo: DatabaseRepository<Game>,
@@ -38,7 +40,8 @@ export default class GameService extends EventEmitter {
         achievementService: AchievementService,
         avatarService: AvatarService,
         gameTypeService: GameTypeService,
-        gameStateService: GameStateService
+        gameStateService: GameStateService,
+        conversationService: ConversationService
     ) {
         super();
         
@@ -52,6 +55,7 @@ export default class GameService extends EventEmitter {
         this.avatarService = avatarService;
         this.gameTypeService = gameTypeService;
         this.gameStateService = gameStateService;
+        this.conversationService = conversationService;
     }
 
     async getByIdAll(id: DBObjectId) {
@@ -339,6 +343,7 @@ export default class GameService extends EventEmitter {
         let isAfker = userId && game.afkers.find(x => x.toString() === userId.toString()) != null;
         let isFillingAfkSlot = this.gameStateService.isInProgress(game) && player.afk;
         let isRejoiningOwnAfkSlot = isFillingAfkSlot && isAfker && (userId && player.userId && player.userId.toString() === userId.toString());
+        let hasFilledOtherPlayerAfkSlot = isFillingAfkSlot && !isRejoiningOwnAfkSlot;
 
         // Assign the user to the player.
         player.userId = userId;
@@ -347,7 +352,7 @@ export default class GameService extends EventEmitter {
 
         // Reset the defeated and afk status as the user may be filling
         // an afk slot.
-        player.hasFilledAfkSlot = isFillingAfkSlot && !isRejoiningOwnAfkSlot;
+        player.hasFilledAfkSlot = hasFilledOtherPlayerAfkSlot;
         player.defeated = false;
         player.defeatedDate = null;
         player.afk = false;
@@ -385,6 +390,12 @@ export default class GameService extends EventEmitter {
             }
         } else {
             this.playerService.updateLastSeen(game, player);
+
+            // If the player is joining another player's AFK slot, remove them
+            // from any conversation that the other player was in.
+            if (hasFilledOtherPlayerAfkSlot) {
+                this.conversationService.leaveAll(game, player._id);
+            }
         }
 
         return gameIsFull;

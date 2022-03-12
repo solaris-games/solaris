@@ -300,23 +300,9 @@ export default class MapService {
                 star.isBlackHole = true;
 
                 // Overwrite the natural resources
-                let minResources = 1;
-                let maxResources = game.constants.star.resources.minNaturalResources;
-
-                // Overwrite natural resources
-                if (this.gameTypeService.isSplitResources(game)) {
-                    star.naturalResources.economy = this.randomService.getRandomNumberBetween(minResources, maxResources);
-                    star.naturalResources.industry = this.randomService.getRandomNumberBetween(minResources, maxResources);
-                    star.naturalResources.science = this.randomService.getRandomNumberBetween(minResources, maxResources);
-                } else {
-                    let resources = this.randomService.getRandomNumberBetween(minResources, maxResources);
-
-                    star.naturalResources = {
-                        economy: resources,
-                        industry: resources,
-                        science: resources
-                    };
-                }
+                star.naturalResources.economy = Math.ceil(star.naturalResources.economy * 0.2);
+                star.naturalResources.industry = Math.ceil(star.naturalResources.industry * 0.2);
+                star.naturalResources.science = Math.ceil(star.naturalResources.science * 0.2);
             }
         } while (count--);
     }

@@ -1,7 +1,12 @@
-db.games.updateMany({
-    'conversations': { $ne: null }
-}, {
-    $set: {
-        'conversations.$[].mutedBy': []
+db.gameevents.updateMany({
+    type: {
+        $in: ['playerCombatStar', 'playerCombatCarrier']
     }
-});
+}, [
+    {
+        $set: {
+            'data.combatResult.weapons.defenderBase': '$data.combatResult.weapons.defender',
+            'data.combatResult.weapons.attackerBase': '$data.combatResult.weapons.attacker',
+        }
+    }
+]);

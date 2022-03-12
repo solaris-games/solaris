@@ -4,9 +4,9 @@
 
     <loading-spinner :loading="isLoading"/>
 
-    <p v-if="!isFormalAlliancesEnabled" class="pb-2">Formal alliances has been disabled in this game.</p>
+    <p v-if="!isFormalAlliancesEnabled" class="pb-1 text-danger">Formal alliances has been disabled in this game.</p>
 
-    <p class="mb-2">
+    <p class="mb-2" v-if="isFormalAlliancesEnabled">
       Declare your diplomatic statuses to players.
     </p>
 
@@ -24,7 +24,7 @@
       </div>
     </div>
 
-    <p class="mt-2 pb-2">
+    <p class="mt-2 pb-2" v-if="isFormalAlliancesEnabled">
       <small>
         If you are allied with another player, you can visit their stars.
         <br/>

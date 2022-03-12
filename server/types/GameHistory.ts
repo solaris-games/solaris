@@ -75,7 +75,7 @@ export interface GameHistoryCarrier {
 };
 
 export interface GameHistory {
-    _id: DBObjectId;
+    _id?: DBObjectId;
     gameId: DBObjectId;
     tick: number;
     productionTick: number;

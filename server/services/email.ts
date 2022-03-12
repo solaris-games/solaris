@@ -318,8 +318,7 @@ export default class EmailService {
                 return;
             }
 
-            player.hasSentTurnReminder = true;
-            await game.save();
+            await this.playerService.setHasSentTurnReminder(game, player, true);
 
             let gameUrl = `${process.env.CLIENT_URL}/#/game?id=${game._id}`;
             let gameName = game.settings.general.name;

@@ -175,16 +175,12 @@ export default class SpecialistService {
         return this._getCarrierSpecialValue(carrier, 'reigniteDeadStarNaturalResources', 1);
     }
 
-    getCarrierOrStarHideShips(carrierOrStar: CombatStar | CombatCarrier) {
-        if (!carrierOrStar.specialist) {
-            return false;
-        }
+    getStarHideShips(star: Star) {
+        return this._getStarSpecialValue(star, 'hideShips', false);
+    }
 
-        const specialist = this.getByIdCarrier(carrierOrStar.specialist.id);
-
-        let result = specialist?.modifiers?.special?.hideShips;
-
-        return result ?? false;
+    getCarrierHideShips(carrier: Carrier) {
+        return this._getCarrierSpecialValue(carrier, 'hideShips', false);
     }
     
 };

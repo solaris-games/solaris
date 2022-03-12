@@ -379,19 +379,13 @@ export default class EventService {
         };
 
         for (let defender of defenders) {
-            let defenderCombatResult: CombatResult = Object.assign({}, combatResult);
-
-            defenderCombatResult.star = this.tryMaskObjectShips(combatResult.star, defender) as CombatStar;
-            defenderCombatResult.carriers = combatResult.carriers.map(c => this.tryMaskObjectShips(c, defender)) as CombatCarrier[];
+            let defenderCombatResult: CombatResult = this.combatService.sanitiseCombatResult(combatResult, defender);
 
             await this.createPlayerEvent(gameId, gameTick, defender._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, { ...data, combatResult: defenderCombatResult });
         }
 
         for (let attacker of attackers) {
-            let attackerCombatResult = Object.assign({}, combatResult);
-
-            attackerCombatResult.star = this.tryMaskObjectShips(combatResult.star, attacker) as CombatStar;
-            attackerCombatResult.carriers = combatResult.carriers.map(c => this.tryMaskObjectShips(c, attacker)) as CombatCarrier[];
+            let attackerCombatResult: CombatResult = this.combatService.sanitiseCombatResult(combatResult, attacker);
 
             await this.createPlayerEvent(gameId, gameTick, attacker._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, { ...data, combatResult: attackerCombatResult });
         }
@@ -405,45 +399,16 @@ export default class EventService {
         };
 
         for (let defender of defenders) {
-            let defenderCombatResult = Object.assign({}, combatResult);
-
-            defenderCombatResult.carriers = combatResult.carriers.map(c => this.tryMaskObjectShips(c, defender)) as CombatCarrier[];
-
+            let defenderCombatResult: CombatResult = this.combatService.sanitiseCombatResult(combatResult, defender);
+            
             await this.createPlayerEvent(gameId, gameTick, defender._id, this.EVENT_TYPES.PLAYER_COMBAT_CARRIER, { ...data, combatResult: defenderCombatResult });
         }
 
         for (let attacker of attackers) {
-            let attackerCombatResult = Object.assign({}, combatResult);
-
-            attackerCombatResult.carriers = combatResult.carriers.map(c => this.tryMaskObjectShips(c, attacker)) as CombatCarrier[];
+            let attackerCombatResult: CombatResult = this.combatService.sanitiseCombatResult(combatResult, attacker);
 
             await this.createPlayerEvent(gameId, gameTick, attacker._id, this.EVENT_TYPES.PLAYER_COMBAT_CARRIER, { ...data, combatResult: attackerCombatResult });
         }
-    }
-
-    tryMaskObjectShips(carrierOrStar: CombatStar | CombatCarrier | null, player: Player) {
-        if (!carrierOrStar) {
-            return carrierOrStar;
-        }
-
-        // If the player doesn't own the object and the object is a scrambler then we need
-        // to mask the before and lost amounts.
-        if (carrierOrStar.ownedByPlayerId && player._id.toString() !== carrierOrStar.ownedByPlayerId.toString() && this.specialistService.getCarrierOrStarHideShips(carrierOrStar)) {
-            let clone: CombatStar | CombatCarrier = Object.assign({}, carrierOrStar);
-
-            clone.before = '???';
-            clone.lost = '???';
-
-            // If the object lost ships and is now dead, then we need to mask the after value too.
-            // Note: Stars can have a 0 ship garrison and be a scrambler so we want to ensure that the 0 ships is still scrambled.
-            if (carrierOrStar.before === 0 || carrierOrStar.after > 0) {
-                clone.after = '???';
-            }
-
-            return clone;
-        }
-
-        return carrierOrStar;
     }
 
     async createResearchCompleteEvent(gameId: DBObjectId, gameTick: number, playerId: DBObjectId, technologyKey: string, technologyLevel: number, technologyKeyNext: string, technologyLevelNext: number) {
