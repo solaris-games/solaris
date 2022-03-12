@@ -127,7 +127,7 @@ export default class EventService {
             args.gameId, args.gameTick, args.player, 
             args.creditsEconomy, args.creditsBanking, args.creditsSpecialists, 
             args.experimentTechnology, args.experimentAmount, args.experimentLevelUp, args.experimentResearchingNext,
-            args.carrierUpkeep));
+            args.carrierUpkeep, args.allianceUpkeep));
             
         this.gameTickService.on('onPlayerAfk', (args) => this.createPlayerAfkEvent(args.gameId, args.gameTick, args.player));
         this.gameTickService.on('onPlayerDefeated', (args) => this.createPlayerDefeatedEvent(args.gameId, args.gameTick, args.player));
@@ -352,7 +352,7 @@ export default class EventService {
     /* PLAYER EVENTS */
 
     async createPlayerGalacticCycleCompleteEvent(gameId: DBObjectId, gameTick: number, player: Player, 
-        creditsEconomy: number, creditsBanking: number, creditsSpecialists: number, experimentTechnology: string, experimentAmount: number, experimentLevelUp: boolean, experimentResearchingNext: string, carrierUpkeep: number) {
+        creditsEconomy: number, creditsBanking: number, creditsSpecialists: number, experimentTechnology: string, experimentAmount: number, experimentLevelUp: boolean, experimentResearchingNext: string, carrierUpkeep: number, allianceUpkeep: number ) {
         let data = {
             creditsEconomy,
             creditsBanking,
@@ -361,7 +361,8 @@ export default class EventService {
             experimentAmount,
             experimentLevelUp,
             experimentResearchingNext,
-            carrierUpkeep
+            carrierUpkeep,
+            allianceUpkeep
         };
 
         return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_GALACTIC_CYCLE_COMPLETE, data);
