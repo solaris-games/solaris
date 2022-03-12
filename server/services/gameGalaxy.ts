@@ -562,7 +562,10 @@ export default class GameGalaxyService {
                 research = null;
             }
 
-            let diplomacy: PlayerDiplomacy[] = [];
+            let diplomacy: PlayerDiplomacy = {
+              otherPlayers: [], 
+              alliancesMadeThisCycle: 0 
+            };
 
             if (player) {
                 diplomacy = this.diplomacyService.getFilteredDiplomacy(p, player);
