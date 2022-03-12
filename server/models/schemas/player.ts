@@ -77,7 +77,8 @@ const schema = new Schema({
         }
     ],
     diplomacy: {
-        allies: [{ type: Types.ObjectId, required: true }]
+        allies: [{ type: Types.ObjectId, required: true }],
+        alliancesMadeThisCycle : { type: Types.Number, required: true, default: 0 }
     }
 });
 
