@@ -47,6 +47,8 @@
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
         <player-research-complete :event="event" v-if="event.type === 'playerResearchComplete'"/>
         <player-star-abandoned :event="event" v-if="event.type === 'playerStarAbandoned'"/>
+        <player-star-died :event="event" v-if="event.type === 'playerStarDied'"/>
+        <player-star-reignited :event="event" v-if="event.type === 'playerStarReignited'"/>
         <player-technology-received :event="event" v-if="event.type === 'playerTechnologyReceived'"
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
         <player-technology-sent :event="event" v-if="event.type === 'playerTechnologySent'"
@@ -89,6 +91,8 @@ import PlayerRenownReceivedVue from './PlayerRenownReceived'
 import PlayerRenownSentVue from './PlayerRenownSent'
 import PlayerResearchCompleteVue from './PlayerResearchComplete'
 import PlayerStarAbandonedVue from './PlayerStarAbandoned'
+import PlayerStarDiedVue from './PlayerStarDied'
+import PlayerStarReignitedVue from './PlayerStarReignited'
 import PlayerTechnologyReceivedVue from './PlayerTechnologyReceived'
 import PlayerTechnologySentVue from './PlayerTechnologySent'
 import PlayerDebtForgivenVue from './PlayerDebtForgiven'
@@ -129,6 +133,8 @@ export default {
     'player-renown-sent': PlayerRenownSentVue,
     'player-research-complete': PlayerResearchCompleteVue,
     'player-star-abandoned': PlayerStarAbandonedVue,
+    'player-star-died': PlayerStarDiedVue,
+    'player-star-reignited': PlayerStarReignitedVue,
     'player-technology-received': PlayerTechnologyReceivedVue,
     'player-technology-sent': PlayerTechnologySentVue,
     'player-debt-forgiven': PlayerDebtForgivenVue,
