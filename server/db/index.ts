@@ -27,8 +27,6 @@ async function startup() {
 
         await script.migrate(mongo.connection.db);
     }
-
-    console.log('Database migrated.');
 }
 
 process.on('SIGINT', async () => {
@@ -42,7 +40,7 @@ process.on('SIGINT', async () => {
 });
 
 startup().then(() => {
-    console.log('Database migration started.');
+    console.log('Database migrated.');
 });
 
 export {};

@@ -29,14 +29,14 @@ db.games.find({}).forEach(function(game) {
     }
 
     // Alliance settings migration.
-    if (game.settings.player.alliances) {
-        game.settings.alliances = {
-            enabled: game.settings.player.alliances,
-            globalEvents: 'disabled'
-        };
-
-        delete game.settings.player.alliances;
-    }
+    //if (game.settings.player.alliances) {
+    //    game.settings.alliances = {
+    //        enabled: game.settings.player.alliances,
+    //        globalEvents: 'disabled'
+    //    };
+    //
+    //    delete game.settings.player.alliances;
+    //}
 
     db.games.save(game);
 });
