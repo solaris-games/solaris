@@ -119,7 +119,8 @@ export default class ReponseService {
                 { name: "Defender Bonus", value: game.settings.specialGalaxy.defenderBonus, inline: true },//next line
                 { name: "Carrier to Carrier Combat", value: game.settings.specialGalaxy.carrierToCarrierCombat, inline: true },
                 { name: "Resource Distribution", value: game.settings.specialGalaxy.resourceDistribution, inline: true },
-                { name: "Player Distribution", value: game.settings.specialGalaxy.playerDistribution, inline: true }
+                { name: "Player Distribution", value: game.settings.specialGalaxy.playerDistribution, inline: true },
+                { name: "Formal Alliances", value: game.settings.alliances.enabled, inline: true }
             );
         return response;
     }
