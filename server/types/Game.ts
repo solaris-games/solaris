@@ -32,6 +32,7 @@ export type GameAwardRankTo = 'all'|'winner';
 export type GameGalaxyType = 'circular'|'spiral'|'doughnut'|'circular-balanced'|'irregular'|'custom';
 export type GameCarrierCost = 'cheap'|'standard'|'expensive';
 export type GameCarrierUpkeepCost = 'none'|'cheap'|'standard'|'expensive';
+export type GameAllianceUpkeepCost = 'none'|'cheap'|'standard'|'expensive'; 
 export type GameWarpgateCost = 'none'|'cheap'|'standard'|'expensive';
 export type GameSpecialistCost = 'none'|'standard'|'expensive'|'veryExpensive'|'crazyExpensive';
 export type GameSpecialistCurrency = 'credits'|'creditsSpecialists';
@@ -130,8 +131,14 @@ export interface GameSettings {
 		tradeCreditsSpecialists: boolean;
 		tradeCost: GameTradeCost;
 		tradeScanning: GameTradeScanning;
-		alliances: GameSettingEnabledDisabled;
-	},
+},
+  alliances:
+  {
+    enabled: GameSettingEnabledDisabled;
+    allianceOnlyTrading: GameSettingEnabledDisabled;
+    maxAlliances: number;
+    allianceUpkeepCost: GameAllianceUpkeepCost;
+	 },
 	technology: {
 		startingTechnologyLevel: {
 			terraforming: number;
