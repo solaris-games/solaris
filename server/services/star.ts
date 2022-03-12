@@ -171,7 +171,7 @@ export default class StarService extends EventEmitter {
     listStarsWithScanningRangeByPlayer(game: Game, playerId: DBObjectId): Star[] {
         let starIds: DBObjectId[] = this.listStarsOwnedByPlayer(game.galaxy.stars, playerId).map(s => s._id);
 
-        if (game.settings.player.alliances === 'enabled') { // This never occurs when alliances is disabled.
+        if (game.settings.alliances.enabled === 'enabled') { // This never occurs when alliances is disabled.
             starIds = starIds.concat(
                 game.galaxy.carriers
                     .filter(c => c.ownedByPlayerId!.toString() === playerId.toString() && c.orbiting)
