@@ -71,6 +71,10 @@
     "tradeScanning": "scanned"
   },
   "alliances": {
+    "enabled": "enabled",
+    "globalEvents": "disabled"
+  },
+  "alliances": {
     "enabled": "enabled"
   },
  "technology": {

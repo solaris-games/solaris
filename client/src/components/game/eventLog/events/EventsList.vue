@@ -15,6 +15,7 @@
           <option value="galacticCycles">Galactic Cycles</option>
           <option value="combat">Combat</option>
           <option value="research">Research</option>
+          <option value="diplomacy">Diplomacy</option>
           <option value="trade">Trade</option>
           <option value="specialists">Specialists</option>
           <option value="conversations">Conversations</option>
@@ -149,6 +150,11 @@ export default {
           'playerConversationCreated',
           'playerConversationInvited',
           'playerConversationLeft'
+        ],
+        diplomacy: [
+          'gameDiplomacyPeaceDeclared',
+          'gameDiplomacyWarDeclared',
+          'gameDiplomacyAllianceDeclared'
         ]
       }
 

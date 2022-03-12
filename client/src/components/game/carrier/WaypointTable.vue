@@ -3,7 +3,7 @@
     <table class="table table-striped table-hover mb-1">
         <thead>
             <tr class="bg-primary">
-                <td>Delay</td>
+                <td v-if="userPlayerOwnsCarrier">Delay</td>
                 <td>Destination</td>
                 <td v-if="!showAction" title="Show actions">
                   <a href="javascript:;" @click="toggleShowAction">ETA</a>
@@ -11,8 +11,8 @@
                 <td v-if="showAction" title="Show ETA's">
                   <a href="javascript:;" @click="toggleShowAction">Action</a>
                 </td>
-                <td class="text-right">
-                  <a href="javascript:;" v-if="!$isHistoricalMode() && canEditWaypoints" @click="onEditWaypointsRequested">
+                <td class="text-right" v-if="!$isHistoricalMode() && canEditWaypoints">
+                  <a href="javascript:;" @click="onEditWaypointsRequested">
                     <i class="fas fa-pencil-alt"></i>
                   </a>
                 </td>
@@ -60,8 +60,12 @@ export default {
     }
   },
   computed: {
+    userPlayerOwnsCarrier: function () {
+      return GameHelper.getUserPlayer(this.$store.state.game) &&
+        GameHelper.getCarrierOwningPlayer(this.$store.state.game, this.carrier)._id === GameHelper.getUserPlayer(this.$store.state.game)._id
+    },
     canEditWaypoints: function () {
-      return !GameHelper.isGameFinished(this.$store.state.game)
+      return !GameHelper.isGameFinished(this.$store.state.game) && this.userPlayerOwnsCarrier
     }
   }
 }

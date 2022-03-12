@@ -211,12 +211,14 @@ export default class CombatService extends EventEmitter {
     }
 
     async performCombat(game: Game, gameUsers: User[], defender: Player, star: Star | null, carriers: Carrier[]) {
+        const isFormalAlliancesEnabled = this.diplomacyService.isFormalAlliancesEnabled(game);
+
         // NOTE: If star is null then the combat mode is carrier-to-carrier.
 
         // Allies of the defender will be on the defending side.
         let defenderAllies: Player[] = [];
 
-        if (this.diplomacyService.isFormalAlliancesEnabled(game)) {
+        if (isFormalAlliancesEnabled) {
             defenderAllies = this.diplomacyService.getAlliesOfPlayer(game, defender);
         }
 
@@ -371,6 +373,13 @@ export default class CombatService extends EventEmitter {
             for (let attackerPlayer of attackers) {
                 await this.reputationService.decreaseReputation(game, defenderPlayer, attackerPlayer, true, false);
                 await this.reputationService.decreaseReputation(game, attackerPlayer, defenderPlayer, true, false);
+            
+                // If the players are NEUTRAL, declare war.
+                // Note: Players who are allied can fight eachother in certain scenarios
+                // so it is imperitive that declarations of war do not affect alliances.
+                if (isFormalAlliancesEnabled && this.diplomacyService.getDiplomaticStatusToPlayer(game, attackerPlayer._id, defenderPlayer._id).actualStatus === 'neutral') {
+                    this.diplomacyService.declareEnemy(game, attackerPlayer._id, defenderPlayer._id, false);
+                }
             }
         }
 

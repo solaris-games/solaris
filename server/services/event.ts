@@ -23,6 +23,8 @@ import StarService from "./star";
 import StarUpgradeService from "./starUpgrade";
 import TradeService from "./trade";
 import { GameEvent } from "../types/GameEvent";
+import DiplomacyService from "./diplomacy";
+import { DiplomaticStatus } from "../types/Diplomacy";
 
 const moment = require('moment');
 
@@ -37,6 +39,8 @@ export default class EventService {
         GAME_ENDED: 'gameEnded',
         GAME_PAUSED: 'gamePaused',
         GAME_PLAYER_BADGE_PURCHASED: 'gamePlayerBadgePurchased',
+        GAME_DIPLOMACY_PEACE_DECLARED: 'gameDiplomacyPeaceDeclared',
+        GAME_DIPLOMACY_WAR_DECLARED: 'gameDiplomacyWarDeclared',
 
         PLAYER_GALACTIC_CYCLE_COMPLETE: 'playerGalacticCycleComplete',
         PLAYER_COMBAT_STAR: 'playerCombatStar',
@@ -60,7 +64,8 @@ export default class EventService {
         PLAYER_CARRIER_SPECIALIST_HIRED: 'playerCarrierSpecialistHired',
         PLAYER_CONVERSATION_CREATED: 'playerConversationCreated',
         PLAYER_CONVERSATION_INVITED: 'playerConversationInvited',
-        PLAYER_CONVERSATION_LEFT: 'playerConversationLeft'
+        PLAYER_CONVERSATION_LEFT: 'playerConversationLeft',
+        PLAYER_DIPLOMACY_STATUS_CHANGED: 'playerDiplomacyStatusChanged',
     }
     
     eventModel: any;
@@ -78,6 +83,7 @@ export default class EventService {
     specialistService: SpecialistService
     badgeService: BadgeService;
     carrierService: CarrierService;
+    diplomacyService: DiplomacyService;
 
     constructor(
         eventModel: any,
@@ -94,7 +100,8 @@ export default class EventService {
         combatService: CombatService,
         specialistService: SpecialistService,
         badgeService: BadgeService,
-        carrierService: CarrierService
+        carrierService: CarrierService,
+        diplomacyService: DiplomacyService
     ) {
         this.eventModel = eventModel;
         this.eventRepo = eventRepo;
@@ -111,6 +118,7 @@ export default class EventService {
         this.specialistService = specialistService;
         this.badgeService = badgeService;
         this.carrierService = carrierService;
+        this.diplomacyService = diplomacyService;
 
         this.gameService.on('onGameDeleted', (args) => this.deleteByGameId(args.gameId));
         this.gameService.on('onPlayerJoined', (args) => this.createPlayerJoinedEvent(args.gameId, args.gameTick, args.player));
@@ -160,11 +168,23 @@ export default class EventService {
         this.conversationService.on('onConversationLeft', (args) => this.createPlayerConversationLeft(args.gameId, args.gameTick, args.convo, args.playerId));
 
         this.badgeService.on('onGamePlayerBadgePurchased', (args) => this.createGamePlayerBadgePurchased(args.gameId, args.gameTick, args.purchasedByPlayerId, args.purchasedByPlayerAlias, args.purchasedForPlayerId, args.purchasedForPlayerAlias, args.badgeKey, args.badgeName));
+
+        this.diplomacyService.on('onDiplomacyPeaceDeclared', (args) => this.createGameDiplomacyPeaceDeclared(args.gameId, args.gameTick, args.status));
+        this.diplomacyService.on('onDiplomacyWarDeclared', (args) => this.createGameDiplomacyWarDeclared(args.gameId, args.gameTick, args.status));
+        this.diplomacyService.on('onDiplomacyStatusChanged', (args) => this.createPlayerDiplomacyStatusChanged(args.gameId, args.gameTick, args.status));
     }
 
     async deleteByGameId(gameId: DBObjectId) {
         await this.eventRepo.deleteMany({
             gameId
+        });
+    }
+
+    async deleteByEventType(gameId: DBObjectId, gameTick: number, type: string) {
+        await this.eventRepo.deleteMany({
+            gameId,
+            tick: gameTick,
+            type
         });
     }
 
@@ -638,6 +658,57 @@ export default class EventService {
         };
 
         return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_PLAYER_BADGE_PURCHASED, data);
+    }
+
+    async _deleteGameDiplomacyDeclarationsInTick(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus) {
+        await this.eventRepo.deleteMany({
+            gameId,
+            tick: gameTick,
+            type: {
+                $in: [
+                    this.EVENT_TYPES.GAME_DIPLOMACY_PEACE_DECLARED, 
+                    this.EVENT_TYPES.GAME_DIPLOMACY_WAR_DECLARED
+                ]
+            },
+            $or: [
+                { 
+                    'data.playerIdFrom': status.playerIdFrom,
+                    'data.playerIdTo': status.playerIdTo
+                },
+                { 
+                    'data.playerIdFrom': status.playerIdTo,
+                    'data.playerIdTo': status.playerIdFrom
+                }
+            ]
+        });
+    }
+
+    async createGameDiplomacyPeaceDeclared(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus) {
+        let data = status;
+
+        // Peace/war can be declared multiple times in a single tick, delete any existing declarations
+        await this._deleteGameDiplomacyDeclarationsInTick(gameId, gameTick, status);
+
+        return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_DIPLOMACY_PEACE_DECLARED, data);
+    }
+
+    async createGameDiplomacyWarDeclared(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus) {
+        let data = status;
+
+        // Peace/war can be declared multiple times in a single tick, delete any existing declarations
+        await this._deleteGameDiplomacyDeclarationsInTick(gameId, gameTick, status);
+
+        return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_DIPLOMACY_WAR_DECLARED, data);
+    }
+
+    async createPlayerDiplomacyStatusChanged(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus) {
+        let data = status;
+
+        // Delete the event if it already exists - This prevents spam.
+        await this.deleteByEventType(gameId, gameTick, this.EVENT_TYPES.PLAYER_DIPLOMACY_STATUS_CHANGED);
+
+        await this.createPlayerEvent(gameId, gameTick, status.playerIdFrom, this.EVENT_TYPES.PLAYER_DIPLOMACY_STATUS_CHANGED, data);
+        await this.createPlayerEvent(gameId, gameTick, status.playerIdTo, this.EVENT_TYPES.PLAYER_DIPLOMACY_STATUS_CHANGED, data);
     }
 
 };

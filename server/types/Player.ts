@@ -1,4 +1,5 @@
 import { DBObjectId } from "./DBObjectId";
+import { DiplomaticState } from "./Diplomacy";
 import { PlayerStatistics } from "./Leaderboard";
 
 export type PlayerShape = 'circle'|'square'|'diamond'|'hexagon';
@@ -46,8 +47,13 @@ export interface PlayerTechnologyLevels {
     specialists: number;
 };
 
+export interface PlayerDiplomaticState { 
+    playerId: DBObjectId;
+    status: DiplomaticState;
+};
+
 export interface PlayerDiplomacy {
-    allies: DBObjectId[];
+    otherPlayers: PlayerDiplomaticState[];
     alliancesMadeThisCycle: number;
 };
 
@@ -76,6 +82,7 @@ export interface Player {
     afk: boolean;
     renownToGive: number;
     ready: boolean;
+    readyToCycle: boolean;
     readyToQuit: boolean;
     missedTurns: number;
     hasSentTurnReminder: boolean;

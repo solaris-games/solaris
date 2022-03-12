@@ -562,7 +562,7 @@ export default class GameGalaxyService {
                 research = null;
             }
 
-            let diplomacy: PlayerDiplomacy | null = null;
+            let diplomacy: PlayerDiplomacy[] = [];
 
             if (player) {
                 diplomacy = this.diplomacyService.getFilteredDiplomacy(p, player);

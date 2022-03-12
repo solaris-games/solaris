@@ -421,15 +421,15 @@
        ]
     },
     "alliances":{
-      "enabled":[
-          {
-             "value":"enabled",
-             "text":"Enabled"
-          },
-          {
-             "value":"disabled",
-             "text":"Disabled"
-          }
+       "enabled": [
+         {
+            "value":"enabled",
+            "text":"Enabled"
+         },
+         {
+            "value":"disabled",
+            "text":"Disabled"
+         }
        ],
        "allianceOnlyTrading":[
          { 
@@ -439,6 +439,16 @@
          {
            "value":"disabled",
            "text":"Disabled"
+         }
+        ],
+       "globalEvents": [
+         {
+            "value":"enabled",
+            "text":"Enabled"
+         },
+         {
+            "value":"disabled",
+            "text":"Disabled"
          }
        ]
     },

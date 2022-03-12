@@ -1,12 +1,42 @@
-db.gameevents.updateMany({
-    type: {
-        $in: ['playerCombatStar', 'playerCombatCarrier']
-    }
-}, [
-    {
-        $set: {
-            'data.combatResult.weapons.defenderBase': '$data.combatResult.weapons.defender',
-            'data.combatResult.weapons.attackerBase': '$data.combatResult.weapons.attacker',
+db.games.find({}).forEach(function(game) {
+    // Alliance migration
+    for (let player of game.galaxy.players) {
+        if (player.diplomacy && player.diplomacy.allies) {
+            player.diplomacy = player.diplomacy.allies.map(function(p) {
+                return {
+                    playerId: p,
+                    status: 'allies'
+                };
+            });
+
+            for (let otherPlayer of game.galaxy.players) {
+                if (otherPlayer._id.toString() === player._id.toString()) {
+                    continue;
+                }
+
+                if (player.diplomacy.find(function(p) {
+                    return p.playerId.toString() === otherPlayer._id.toString();
+                })) {
+                    continue;
+                }
+
+                player.diplomacy.push({
+                    playerId: otherPlayer._id,
+                    status: 'enemies'
+                });
+            }
         }
     }
-]);
+
+    // Alliance settings migration.
+    if (game.settings.player.alliances) {
+        game.settings.alliances = {
+            enabled: game.settings.player.alliances,
+            globalEvents: 'disabled'
+        };
+
+        delete game.settings.player.alliances;
+    }
+
+    db.games.save(game);
+});

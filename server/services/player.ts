@@ -304,6 +304,7 @@ export default class PlayerService extends EventEmitter {
         player.credits = game.settings.player.startingCredits;
         player.creditsSpecialists = game.settings.player.startingCreditsSpecialists;
         player.ready = false;
+        player.readyToCycle = false;
         player.readyToQuit = false;
 
         // Reset the player's research
@@ -677,15 +678,37 @@ export default class PlayerService extends EventEmitter {
         });
     }
 
-    async undeclareReady(game, player) {
-        player.ready = false;
+    async declareReadyToCycle(game, player) {
+        player.ready = true;
+        player.readyToCycle = true;
 
         await this.gameRepo.updateOne({
             _id: game._id,
             'galaxy.players._id': player._id
         }, {
             $set: {
-                'galaxy.players.$.ready': false
+                'galaxy.players.$.ready': true,
+                'galaxy.players.$.readyToCycle': true
+            }
+        });
+
+        this.emit('onGamePlayerReady', {
+            gameId: game._id,
+            gameTick: game.state.tick,
+        });
+    }
+
+    async undeclareReady(game, player) {
+        player.ready = false;
+        player.readyToCycle = false;
+
+        await this.gameRepo.updateOne({
+            _id: game._id,
+            'galaxy.players._id': player._id
+        }, {
+            $set: {
+                'galaxy.players.$.ready': false,
+                'galaxy.players.$.readyToCycle': false
             }
         });
     }
@@ -790,14 +813,26 @@ export default class PlayerService extends EventEmitter {
         }
     }
 
-    resetReadyStatuses(game) {
+    resetReadyStatuses(game: Game, hasProductionTicked: boolean) {
         for (let player of game.galaxy.players) {
             // Reset whether we have sent the player a turn reminder.
             player.hasSentTurnReminder = false;
 
             // Reset the ready status for players who have a legit user.
             // Accounts could be deleted, could be a tutorial etc.
-            player.ready = player.userId == null;
+            if (player.userId == null) {
+                player.ready = true;
+                player.readyToCycle = true;
+            }
+            // If the player hasn't ready to cycled then standard procedure applies.
+            else if (!player.readyToCycle) {
+                player.ready = false;
+            }
+            // Otherwise if they have ready to cycled then reset only if a production cycle has occurred.
+            else if (player.readyToCycle && hasProductionTicked) {
+                player.ready = false;
+                player.readyToCycle = false;
+            }
         }
     }
 

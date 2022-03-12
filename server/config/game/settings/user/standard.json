@@ -73,10 +73,10 @@
        "tradeCost":15,
        "tradeScanning":"scanned"
     },
-    "alliances": 
-    {
-      "enabled":"enabled",
-      "maxAlliances": 16 
+   "alliances": {
+      "enabled": "enabled",
+      "maxAlliances": 16, 
+      "globalEvents": "disabled"
     },
     "technology":{
        "startingTechnologyLevel":{

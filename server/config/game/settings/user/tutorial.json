@@ -69,7 +69,8 @@
     "tradeScanning": "all"
   },
   "alliances": {
-    "enabled": "disabled"
+    "enabled": "disabled",
+    "globalEvents": "disabled"
   },
   "technology": {
     "startingTechnologyLevel": {

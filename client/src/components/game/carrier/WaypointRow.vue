@@ -1,13 +1,13 @@
 <template>
     <tr>
-        <td><span v-if="!(isFirstWaypoint(waypoint) && isInTransit)">{{waypoint.delayTicks}}</span></td>
+        <td v-if="userPlayerOwnsCarrier"><span v-if="!(isFirstWaypoint(waypoint) && isInTransit)">{{waypoint.delayTicks}}</span></td>
         <td><a href="javascript:;" @click="onOpenStarDetailRequested">{{getStarName(waypoint.destination)}}</a></td>
         <td v-if="!showAction">{{timeRemainingEta}}</td>
         <td v-if="showAction">
             <span>{{getWaypointActionFriendlyText(waypoint)}}</span>
         </td>
-        <td class="text-right">
-          <a href="javascript:;" v-if="!$isHistoricalMode() && canEditWaypoints" @click="editWaypoint">Edit</a>
+        <td class="text-right" v-if="!$isHistoricalMode() && canEditWaypoints">
+          <a href="javascript:;" @click="editWaypoint">Edit</a>
         </td>
     </tr>
 </template>
@@ -81,8 +81,12 @@ export default {
     }
   },
   computed: {
+    userPlayerOwnsCarrier: function () {
+      return GameHelper.getUserPlayer(this.$store.state.game) &&
+        GameHelper.getCarrierOwningPlayer(this.$store.state.game, this.carrier)._id === GameHelper.getUserPlayer(this.$store.state.game)._id
+    },
     canEditWaypoints: function () {
-      return !GameHelper.isGameFinished(this.$store.state.game)
+      return !GameHelper.isGameFinished(this.$store.state.game) && this.userPlayerOwnsCarrier
     },
     isInTransit () {
       return !this.carrier.orbiting

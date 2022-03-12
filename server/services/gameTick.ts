@@ -145,6 +145,8 @@ export default class GameTickService extends EventEmitter {
             this.playerService.incrementMissedTurns(game);
         }
 
+        let hasProductionTicked: boolean = false;
+
         while (iterations--) {
             game.state.tick++;
 
@@ -165,8 +167,12 @@ export default class GameTickService extends EventEmitter {
             await this._combatContestedStars(game, gameUsers);
             logTime('Combat at contested stars');
 
-            await this._endOfGalacticCycleCheck(game);
+            let ticked: boolean = await this._endOfGalacticCycleCheck(game);
             logTime('Galactic cycle check');
+
+            if (ticked && !hasProductionTicked) {
+                hasProductionTicked = true;
+            }
 
             await this._gameLoseCheck(game, gameUsers);
             logTime('Game lose check');
@@ -197,7 +203,7 @@ export default class GameTickService extends EventEmitter {
             }
         }
 
-        this.playerService.resetReadyStatuses(game);
+        this.playerService.resetReadyStatuses(game, hasProductionTicked);
 
         await game.save();
         logTime('Save game');
@@ -565,8 +571,10 @@ export default class GameTickService extends EventEmitter {
     }
 
     async _endOfGalacticCycleCheck(game: Game) {
+        let hasProductionTicked: boolean = game.state.tick % game.settings.galaxy.productionTicks === 0;
+
         // Check if we have reached the production tick.
-        if (game.state.tick % game.settings.galaxy.productionTicks === 0) {
+        if (hasProductionTicked) {
             game.state.productionTick++;
 
             // For each player, perform the end of cycle actions.
@@ -609,6 +617,8 @@ export default class GameTickService extends EventEmitter {
                 gameId: game._id
             });
         }
+
+        return hasProductionTicked;
     }
 
     async _logHistory(game: Game) {

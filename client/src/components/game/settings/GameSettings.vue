@@ -269,28 +269,33 @@
             <td>Trade Scanning <help-tooltip tooltip="If enabled, players can only trade with other players who are in their scanning range"/></td>
             <td class="text-right">{{ getFriendlyText(game.settings.player.tradeScanning) }}</td>
           </tr>
-         </tbody>
+        </tbody>
       </table>
     </div>
-    <view-subtitle title="Formal Alliance Settings"/>
+
+    <view-subtitle title="Formal Alliances"/>
     <div class="table-responsive" v-if="game">
       <table class="table table-striped table-hover">
         <tbody>
           <tr>
-            <td>Enabled<help-tooltip tooltip="If enabled, players can change their diplomatic status to allied or enemies - Allied players can orbit eachother's stars and support eachother in combat"/></td>
+            <td>Enabled <help-tooltip tooltip="If enabled, players can change their diplomatic status to allied or enemies - Allied players can orbit eachother's stars and support eachother in combat"/></td>
             <td class="text-right">{{ getFriendlyText(game.settings.alliances.enabled) }}</td>
           </tr>
-          <tr>
+          <tr v-if="game.settings.alliances.enabled === 'enabled'">
             <td>Max Number of Alliances <help-tooltip tooltip="Determines how many formal alliance each player may have at once.  Set to 0 to not limit the number of alliances."/></td>
             <td class="text-right">{{ getFriendlyText(game.settings.alliances.maxAlliances) }}</td>
           </tr>
-          <tr>
+          <tr v-if="game.settings.alliances.enabled === 'enabled'">
             <td>Alliance Upkeep Cost <help-tooltip tooltip="Determines how expensive the alliance upkeep is - Upkeep is paid at the end of a galactic cycle"/></td>
             <td class="text-right">{{ getFriendlyText(game.settings.alliances.allianceUpkeepCost) }}</td>
           </tr>
-         <tr>
+          <tr v-if="game.settings.alliances.enabled === 'enabled'">
             <td>Alliance Only Trading <help-tooltip tooltip="If enabled, players can only trade with formal allies."/></td>
             <td class="text-right">{{ getFriendlyText(game.settings.alliances.allianceOnlyTrading) }}</td>
+          </tr>
+          <tr v-if="game.settings.alliances.enabled === 'enabled'">
+            <td>Global Events <help-tooltip tooltip="If enabled, global events will be displayed when players declare war or make peace"/></td>
+            <td class="text-right">{{ getFriendlyText(game.settings.alliances.globalEvents) }}</td>
           </tr>
         </tbody>
       </table>
