@@ -450,14 +450,42 @@
         </select>
       </div>
 
+      <view-subtitle title="Alliance Settings"/>
+
       <div class="form-group">
         <label for="alliances" class="col-form-label">Formal Alliances <help-tooltip tooltip="If enabled, players can change their diplomatic status to allied or enemies - Allied players can orbit eachother's stars and support eachother in combat"/></label>
-        <select class="form-control" id="alliances" v-model="settings.player.alliances" :disabled="isCreatingGame">
-          <option v-for="opt in options.player.alliances" v-bind:key="opt.value" v-bind:value="opt.value">
+        <select class="form-control" id="alliances" v-model="settings.alliances.enabled" :disabled="isCreatingGame">
+          <option v-for="opt in options.alliances.enabled" v-bind:key="opt.value" v-bind:value="opt.value">
             {{ opt.text }}
           </option>
         </select>
       </div>
+
+      <div class="form-group">
+        <label for="maxAlliances" class="col-form-label">Max Number of Alliances (<span class="text-warning">{{settings.alliances.maxAlliances}} Allies</span>) <help-tooltip tooltip="Determines how many formal alliance each player may have at once.  Set to 0 to not limit the number of alliances."/></label>
+        <div class="col">
+          <input type="range" min="0" max="16" step="1" class="form-range w-100" id="maxAlliances" v-model="settings.alliances.maxAlliances" :disabled="isCreatingGame">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="allianceUpkeepCost" class="col-form-label">Alliance Upkeep Cost <help-tooltip tooltip="Determines how expensive the alliance upkeep is - Upkeep is paid at the end of a galactic cycle"/></label>
+        <select class="form-control" id="allianceUpkeepCost" v-model="settings.specialGalaxy.allianceUpkeepCost" :disabled="isCreatingGame">
+          <option v-for="opt in options.specialGalaxy.allianceUpkeepCost" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="allianceOnlyTrading" class="col-form-label">Alliance Only Trading<help-tooltip tooltip="If enabled, only allies can trade with eachother."/></label>
+         <select class="form-control" id="allianceOnlyTrading" v-model="settings.alliances.allianceOnlyTrading" :disabled="isCreatingGame">
+          <option v-for="opt in options.alliances.allianceOnlyTrading" v-bind:key="opt.value" v-bind:value="opt.value">
+            {{ opt.text }}
+          </option>
+        </select>
+      </div>
+
 
       <view-subtitle title="Infrastructure Settings"/>
 
@@ -628,7 +656,7 @@
 
         <specialist-ban-list-selection @onSpecialistBanSelectionChanged="onSpecialistBanSelectionChanged" />
       </div>
-      
+
       <form-error-list v-bind:errors="errors"/>
 
       <button type="submit" class="btn btn-success btn-lg mb-3 btn-block" :disabled="isCreatingGame"><i class="fas fa-gamepad"></i> Create Game</button>
