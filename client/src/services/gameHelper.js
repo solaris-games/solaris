@@ -985,7 +985,7 @@ class GameHelper {
   /* Diplomacy */
 
   isFormalAlliancesEnabled (game) {
-    return game.settings.player.alliances === 'enabled'
+    return game.settings.alliances.enabled === 'enabled'
   }
 
   isDiplomaticStatusToPlayersAllied(game, playerId, toPlayerIds) {
