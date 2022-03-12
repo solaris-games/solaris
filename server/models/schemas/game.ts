@@ -15,13 +15,13 @@ const schema = new Schema({
             description: { type: Types.String, required: false, default: null },
 			type: { type: Types.String, required: true, enum: [
 				'tutorial',
-				'custom', 
-				'standard_rt', 
-				'standard_tb', 
-				'1v1_rt', 
-				'1v1_tb', 
-				'new_player_rt', 
-				'new_player_tb', 
+				'custom',
+				'standard_rt',
+				'standard_tb',
+				'1v1_rt',
+				'1v1_tb',
+				'new_player_rt',
+				'new_player_tb',
 				'32_player_rt',
 				'special_dark',
 				'special_ultraDark',
@@ -105,7 +105,12 @@ const schema = new Schema({
 			tradeCreditsSpecialists: { type: Types.Boolean, required: false, default: true },
 			tradeCost: { type: Types.Number, required: true, enum: [0, 5, 15, 25, 50, 100], default: 15 }, // TODO: This could be renamed.
 			tradeScanning: { type: Types.String, required: true, enum: ['all', 'scanned'], default: 'all' },
-			alliances: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
+       },
+        alliances: {
+          enabled: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
+          allianceOnlyTrading: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
+          maxAlliances: { type: Types.Number, required: true, min: 1, max: 31, default: 31 },
+            allianceUpkeepCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'none' }
         },
         technology: {
 			startingTechnologyLevel: {
