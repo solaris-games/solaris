@@ -37,6 +37,7 @@ export interface PlayerResearch {
 
 export interface PlayerDiplomacy {
     allies: DBObjectId[];
+    alliancesMadeThisCycle: number;
 };
 
 export interface Player {
