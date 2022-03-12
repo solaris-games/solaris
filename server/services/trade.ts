@@ -9,6 +9,8 @@ import { Player, ResearchType } from '../types/Player';
 import { TradeEvent, TradeEventTechnology, TradeTechnology } from '../types/Trade';
 import AchievementService from './achievement';
 import GameTypeService from './gameType';
+import DiplomacyService from './diplomacy';
+import { DiplomaticState, DiplomaticStatus } from "../types/Diplomacy";
 import LedgerService from './ledger';
 import PlayerService from './player';
 import ReputationService from './reputation';
@@ -20,6 +22,7 @@ export default class TradeService extends EventEmitter {
     eventRepo: DatabaseRepository<GameEvent>;
     userService: UserService;
     playerService: PlayerService;
+    diplomacyService: DiplomacyService;
     ledgerService: LedgerService;
     achievementService: AchievementService;
     reputationService: ReputationService;
@@ -30,6 +33,7 @@ export default class TradeService extends EventEmitter {
         eventRepo: DatabaseRepository<GameEvent>,
         userService: UserService,
         playerService: PlayerService,
+        diplomacyService: DiplomacyService,
         ledgerService: LedgerService,
         achievementService: AchievementService,
         reputationService: ReputationService,
@@ -41,6 +45,7 @@ export default class TradeService extends EventEmitter {
         this.eventRepo = eventRepo;
         this.userService = userService;
         this.playerService = playerService;
+        this.diplomacyService = diplomacyService;
         this.ledgerService = ledgerService;
         this.achievementService = achievementService;
         this.reputationService = reputationService;
@@ -49,6 +54,10 @@ export default class TradeService extends EventEmitter {
 
     isTradingCreditsDisabled(game: Game) {
         return game.settings.player.tradeCredits === false;
+    }
+
+    isTradingAllyRestricted(game: Game) {
+      return game.settings.alliances.enabled === 'enabled' && game.settings.alliances.allianceOnlyTrading === 'enabled';
     }
 
     isTradingCreditsSpecialistsDisabled(game: Game) {
@@ -80,6 +89,13 @@ export default class TradeService extends EventEmitter {
             throw new ValidationError(`Cannot send credits to yourself.`);
         }
 
+        if (fromPlayer.userId && this.isTradingAllyRestricted(game)) {
+          let diplomaticStatus: DiplomaticStatus = this.diplomacyService.getDiplomaticStatusToPlayer(game, fromPlayer.userId, toPlayerId);
+          if (diplomaticStatus.actualStatus != 'allies') {
+            throw new ValidationError(`Cannot send credits to enemies.`);
+          }
+        }
+
         this._tradeScanningCheck(game, fromPlayer, toPlayer);
 
         if (fromPlayer.credits < amount) {
@@ -99,7 +115,7 @@ export default class TradeService extends EventEmitter {
             if (fromPlayer.userId && !fromPlayer.defeated) {
                 await this.achievementService.incrementTradeCreditsSent(fromPlayer.userId, amount);
             }
-    
+
             if (toPlayer.userId && !toPlayer.defeated) {
                 await this.achievementService.incrementTradeCreditsReceived(toPlayer.userId, amount);
             }
@@ -145,6 +161,13 @@ export default class TradeService extends EventEmitter {
             throw new ValidationError(`Cannot send specialist tokens to yourself.`);
         }
 
+        if (fromPlayer.userId && this.isTradingAllyRestricted(game)) {
+          let diplomaticStatus: DiplomaticStatus = this.diplomacyService.getDiplomaticStatusToPlayer(game, fromPlayer.userId, toPlayerId);
+          if (diplomaticStatus.actualStatus != 'allies') {
+            throw new ValidationError(`Cannot send specialist tokens to enemies.`);
+          }
+        }
+
         this._tradeScanningCheck(game, fromPlayer, toPlayer);
 
         if (fromPlayer.creditsSpecialists < amount) {
@@ -162,7 +185,7 @@ export default class TradeService extends EventEmitter {
             if (fromPlayer.userId && !fromPlayer.defeated) {
                 await this.achievementService.incrementTradeCreditsSpecialistsSent(fromPlayer.userId, amount);
             }
-    
+
             if (toPlayer.userId && !toPlayer.defeated && toPlayer.userId) {
                 await this.achievementService.incrementTradeCreditsSpecialistsReceived(toPlayer.userId, amount);
             }
@@ -270,6 +293,13 @@ export default class TradeService extends EventEmitter {
 
         if (fromPlayer === toPlayer) {
             throw new ValidationError(`Cannot trade technology with yourself.`);
+        }
+
+        if (fromPlayer.userId && this.isTradingAllyRestricted(game)) {
+          let diplomaticStatus: DiplomaticStatus = this.diplomacyService.getDiplomaticStatusToPlayer(game, fromPlayer.userId, toPlayerId);
+          if (diplomaticStatus.actualStatus != 'allies') {
+            throw new ValidationError(`Cannot send technology to enemies.`);
+          }
         }
 
         this._tradeScanningCheck(game, fromPlayer, toPlayer);
