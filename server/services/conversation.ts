@@ -81,6 +81,7 @@ export default class ConversationService extends EventEmitter {
     async create(game: Game, playerId: DBObjectId, name: string, participantIds: DBObjectId[]): Promise<Conversation> {
         let newConvo = getNewConversation(game, playerId, name, participantIds);
 
+
         // Create the convo.
         await this.gameRepo.updateOne({
             _id: game._id
@@ -114,8 +115,20 @@ export default class ConversationService extends EventEmitter {
         let participantIds: DBObjectId[] = game.galaxy.players.map(p => p._id);
 
         let newConvo = getNewConversation(game, null, name, participantIds);
-
+        
+        let newMessage: ConversationMessage = {
+            fromPlayerId: null,
+            fromPlayerAlias: "Solaris",
+            message: "Welcome to " + name + "!\n\nThis is the global chat. Any messages sent here will be delivered to all players in the game!\n\nGood Luck, Commanders!",
+            sentDate: moment().utc(),
+            sentTick: game.state.tick,
+            pinned: false,
+            readBy: [],
+        };
+        newConvo.messages.push(newMessage);
+        
         game.conversations.push(newConvo);
+
     }
 
     async list(game: Game, playerId: DBObjectId) {

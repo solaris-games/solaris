@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 const Types = Schema.Types;
 
 const schema = new Schema({
-    fromPlayerId: { type: Types.ObjectId, required: true },
+    fromPlayerId: { type: Types.ObjectId, required: false },
     fromPlayerAlias: { type: Types.String, required: true },
     message: { type: Types.String, required: true },
     sentDate: { type: Types.Date, required: true },
