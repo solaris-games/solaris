@@ -6,6 +6,7 @@ import DatabaseRepository from '../models/DatabaseRepository';
 import { Game } from '../types/Game';
 import { PlayerColourShapeCombination, PlayerShape } from '../types/Player';
 import CarrierService from './carrier';
+import DiplomacyService from './diplomacy';
 import GameTypeService from './gameType';
 import MapService from './map';
 import RandomService from './random';
@@ -24,25 +25,27 @@ export default class PlayerService extends EventEmitter {
     technologyService: TechnologyService;
     specialistService: SpecialistService;
     gameTypeService: GameTypeService;
-    
+
     constructor(
         gameRepo: DatabaseRepository<Game>,
         randomService: RandomService,
         mapService: MapService,
         starService: StarService,
         carrierService: CarrierService,
+        diplomacyService: DiplomacyService,
         starDistanceService: StarDistanceService,
         technologyService: TechnologyService,
         specialistService: SpecialistService,
         gameTypeService: GameTypeService
     ) {
         super();
-        
+
         this.gameRepo = gameRepo;
         this.randomService = randomService;
         this.mapService = mapService;
         this.starService = starService;
         this.carrierService = carrierService;
+        this.diplomacyService = diplomacyService;
         this.starDistanceService = starDistanceService;
         this.technologyService = technologyService;
         this.specialistService = specialistService;
@@ -56,7 +59,7 @@ export default class PlayerService extends EventEmitter {
     getByUserId(game, userId) {
         return game.galaxy.players.find(p => p.userId && p.userId.toString() === userId.toString());
     }
-    
+
     getPlayersWithinScanningRangeOfStar(game, starId, players) {
         if (players == null) {
             players = game.galaxy.players;
@@ -90,7 +93,7 @@ export default class PlayerService extends EventEmitter {
                     break;
                 }
             }
-            
+
             if (isInRange) {
                 inRange.push(otherPlayer);
             }
@@ -139,7 +142,7 @@ export default class PlayerService extends EventEmitter {
 
         for (let i = 0; i < game.settings.general.playerLimit; i++) {
             let shapeColour = shapeColours[i];
-            
+
             players.push(this.createEmptyPlayer(game, shapeColour.colour, shapeColour.shape));
         }
 
@@ -197,7 +200,7 @@ export default class PlayerService extends EventEmitter {
                 attempts++;
             }
         }
-        
+
         return result;
     }
 
@@ -260,7 +263,7 @@ export default class PlayerService extends EventEmitter {
             for (let starId of linkedStars) {
                 let star = this.starService.getById(game, starId);
 
-                this.setupStarForGameStart(game, star, player, false); 
+                this.setupStarForGameStart(game, star, player, false);
             }
         }
     }
@@ -293,7 +296,7 @@ export default class PlayerService extends EventEmitter {
             star.ownedByPlayerId = player._id;
             star.shipsActual = game.settings.player.startingShips;
             star.ships = star.shipsActual;
-            
+
             star.warpGate = star.warpGate ?? false;
             star.specialistId = star.specialistId ?? null;
             star.infrastructure.economy = star.infrastructure.economy ?? 0;
@@ -331,7 +334,7 @@ export default class PlayerService extends EventEmitter {
         this.carrierService.clearPlayerCarriers(game, player);
 
         let homeCarrier = this.createHomeStarCarrier(game, player);
-        
+
         game.galaxy.carriers.push(homeCarrier);
     }
 
@@ -442,7 +445,7 @@ export default class PlayerService extends EventEmitter {
     }
 
     calculateTotalShips(ownedStars, ownedCarriers) {
-        return ownedStars.reduce((sum, s) => sum + s.ships, 0) 
+        return ownedStars.reduce((sum, s) => sum + s.ships, 0)
             + ownedCarriers.reduce((sum, c) => sum + c.ships, 0);
     }
 
@@ -622,6 +625,29 @@ export default class PlayerService extends EventEmitter {
         throw new Error(`Unsupported specialist reward type: ${game.settings.technology.specialistTokenReward}.`);
     }
 
+    deductAllianceUpkeepCost(game, player, credits) {
+      const upkeepCosts = {
+        'none': 0,
+        'cheap': .02,
+        'standard': .05,
+        'expensive': .10
+      };
+
+      let costPerAlly = upkeepCosts[game.settings.alliances.allianceUpkeepCost];
+      if (!costPerAlly) {
+        return null;
+      }
+      let allyCount = player.diplomacy.alliancesMadeThisCycle;
+      let totalCost = Math.round(allyCount * costPerAlly * credits);
+      player.credits -= totalCost;
+      player.diplomacy.alliancesMadeThisCycle = this.diplomacyService.getAlliesOfPlayer(game, player).length;
+
+      return {
+        allyCount,
+        totalCost
+      };
+    }
+
     deductCarrierUpkeepCost(game, player) {
         const upkeepCosts = {
             'none': 0,
@@ -707,7 +733,7 @@ export default class PlayerService extends EventEmitter {
         if (this.gameTypeService.isTutorialGame(game)) {
             throw new ValidationError('Cannot undeclare ready to quit in a tutorial.');
         }
-        
+
         player.readyToQuit = false;
 
         await this.gameRepo.updateOne({
@@ -752,7 +778,7 @@ export default class PlayerService extends EventEmitter {
             // If there are no stars and there are no carriers then the player is defeated.
             if (stars.length === 0) {
                 let carriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id); // Note: This logic looks a bit weird, but its more performant.
-    
+
                 if (carriers.length === 0) {
                     this.setPlayerAsDefeated(game, player);
                 }
@@ -794,7 +820,7 @@ export default class PlayerService extends EventEmitter {
         // 1. They haven't been seen for X days.
         // 2. They missed the turn limit in a turn based game.
         // 3. They missed X cycles in a real time game (minimum of 12 hours)
-        
+
         // Note: In tutorial games, only legit players can be considered afk.
         if (this.gameTypeService.isTutorialGame(game) && !player.userId) {
             return false;
@@ -850,8 +876,8 @@ export default class PlayerService extends EventEmitter {
             return false;
         }
 
-        return game.galaxy.players.find(p => p.lastSeenIP 
-            && !p._id.toString() === player._id.toString() 
+        return game.galaxy.players.find(p => p.lastSeenIP
+            && !p._id.toString() === player._id.toString()
             && p.lastSeenIP === player.lastSeenIP) != null;
     }
 
@@ -871,11 +897,11 @@ export default class PlayerService extends EventEmitter {
                 }
             }
         }
-        
+
         if (commit) {
             await this.gameRepo.bulkWrite([query]);
         }
-        
+
         return query;
     }
 
@@ -895,11 +921,11 @@ export default class PlayerService extends EventEmitter {
                 }
             }
         }
-        
+
         if (commit) {
             await this.gameRepo.bulkWrite([query]);
         }
-        
+
         return query;
     }
 
