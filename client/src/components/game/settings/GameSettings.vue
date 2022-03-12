@@ -271,7 +271,15 @@
           </tr>
           <tr>
             <td>Formal Alliances <help-tooltip tooltip="If enabled, players can change their diplomatic status to allied or enemies - Allied players can orbit eachother's stars and support eachother in combat"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.player.alliances) }}</td>
+            <td class="text-right">{{ getFriendlyText(game.settings.alliances.enabled) }}</td>
+          </tr>
+          <tr>
+            <td>Max Number of Alliances <help-tooltip tooltip="Determines how many formal alliance each player may have at once.  Set to 0 to not limit the number of alliances."/></td>
+            <td class="text-right">{{ getFriendlyText(game.settings.alliances.maxAlliances) }}</td>
+          </tr>
+          <tr>
+            <td>Alliance Upkeep Cost <help-tooltip tooltip="Determines how expensive the alliance upkeep is - Upkeep is paid at the end of a galactic cycle"/></td>
+            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.allianceUpkeepCost) }}</td>
           </tr>
         </tbody>
       </table>
