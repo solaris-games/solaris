@@ -26,7 +26,7 @@
       </button>
     </div>
     <div class="col-auto">
-      <button class="btn btn-warning" v-if="!gameHasFinished && isTradeEnabled" @click="onOpenTradeRequested">
+      <button class="btn btn-warning" v-if="!gameHasFinished && isTradeEnabled && (!isFormalAlliancesEnabled || !isTradeAllyRestricted || (diplomaticStatus && diplomaticStatus.actualStatus == 'allies'))" @click="onOpenTradeRequested">
         <i class="fas fa-handshake"></i>
         Trade
       </button>
@@ -41,6 +41,7 @@ import Statistics from './Statistics'
 import PlayerTitleVue from './PlayerTitle'
 import gameHelper from '../../../services/gameHelper'
 import ConversationApiService from '../../../services/api/conversation'
+import DiplomacyApiService from '../../../services/api/diplomacy'
 
 export default {
   components: {
@@ -48,7 +49,7 @@ export default {
     'player-title': PlayerTitleVue
   },
   props: {
-    playerId: String
+    playerId: String,
   },
   data () {
     return {
@@ -56,7 +57,8 @@ export default {
       player: null,
       gameHasStarted: null,
       gameHasFinished: null,
-      conversation: null
+      conversation: null,
+      diplomaticStatus: null
     }
   },
   async mounted () {
@@ -67,6 +69,7 @@ export default {
     this.gameHasFinished = this.$store.state.game.state.endDate != null
 
     await this.loadConversation()
+    await this.loadDiplomaticStatus()
   },
   methods: {
     onViewConversationRequested (e) {
@@ -98,6 +101,24 @@ export default {
         return null
       }
     },
+    async loadDiplomaticStatus () {
+      const userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
+
+      if (!userPlayer || this.playerId === userPlayer._id) {
+        return
+      }
+  
+      try {
+        const response = await DiplomacyApiService.getDiplomaticStatusToPlayer(this.$store.state.game._id, this.playerId)
+
+        if (response.status === 200) {
+          this.diplomaticStatus = response.data
+        }
+      } catch (err) {
+        console.error(err)
+        this.diplomaticStatus = null
+      }
+    },
     async loadConversation () {
       if (this.userPlayer && this.userPlayer._id !== this.player._id) {
         try {
@@ -113,11 +134,17 @@ export default {
     }
   },
   computed: {
+    isFormalAlliancesEnabled () { 
+      return gameHelper.isFormalAlliancesEnabled(this.$store.state.game)
+    },
     isDarkModeExtra () {
       return gameHelper.isDarkModeExtra(this.$store.state.game)
     },
     isTradeEnabled () {
       return gameHelper.isTradeEnabled(this.$store.state.game)
+    },
+    isTradeAllyRestricted() {
+      return gameHelper.isTradeAllyRestricted(this.$store.state.game)
     },
     canCreateConversation: function () {
       return this.$store.state.game.settings.general.playerLimit > 2
