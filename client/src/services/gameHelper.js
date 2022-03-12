@@ -102,11 +102,11 @@ class GameHelper {
   getDistanceBetweenLocations (loc1, loc2) {
     return Math.hypot(loc2.x - loc1.x, loc2.y - loc1.y);
   }
-  
+
   getClosestStar (stars, point) {
     let closestStar = stars[0]
     let smallerDistance = Number.MAX_VALUE
-    
+
     for(let star of stars) {
       let distance = this.getDistanceBetweenLocations(star.location, point)
 
@@ -121,7 +121,7 @@ class GameHelper {
       distance: smallerDistance
     }
   }
-  
+
   getClosestPlayerStar (stars, point, player) {
     let closestStar = stars[0]
     let smallerDistance = Number.MAX_VALUE
@@ -130,7 +130,7 @@ class GameHelper {
 
     for(let star of playerStars) {
       let distance = this.getDistanceBetweenLocations(star.location, point)
-      
+
       if (distance < smallerDistance ) {
         smallerDistance = distance
         closestStar = star
@@ -212,7 +212,7 @@ class GameHelper {
     if (game == null) {
       return ''
     }
-    
+
     if (game.settings.gameTime.gameType === 'realTime') {
       let date = useNowDate ? moment().utc() : game.state.lastTickDate
 
@@ -273,7 +273,7 @@ class GameHelper {
 
   getCountdownTimeForProductionCycle (game) {
     const ticksToProduction = this.getTicksToProduction(game, game.state.tick, game.state.productionTick);
-    
+
     return this.calculateTimeByTicks(ticksToProduction, game.settings.gameTime.speed, game.state.lastTickDate);
   }
 
@@ -316,7 +316,7 @@ class GameHelper {
     if (!carrier.orbiting && carrier.waypoints[0]._id === waypoint._id) {
         source = carrier.location
     }
-    
+
     let distance = this.getDistanceBetweenLocations(source, destination)
     let warpSpeed = this.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar)
 
@@ -338,7 +338,7 @@ class GameHelper {
 
     for (let i = 0; i < carrier.waypoints.length; i++) {
         let cwaypoint = carrier.waypoints[i]
-        
+
         totalTicks += this.calculateWaypointTicks(game, carrier, cwaypoint)
 
         if (cwaypoint === waypoint) {
@@ -383,7 +383,7 @@ class GameHelper {
         // which player it belongs to or whether the stars it is travelling to or from have locked warp gates.
         if (carrier.specialistId && carrier.specialist) {
             let carrierSpecialist = carrier.specialist
-    
+
             if (carrierSpecialist.modifiers.special && carrierSpecialist.modifiers.special.unlockWarpGates) {
                 return true
             }
@@ -436,7 +436,7 @@ class GameHelper {
     if (carrier.waypoints.length < 2 || carrier.isGift) {
       return false
     }
-    
+
     // TODO: Calculate effective techs for the carrier. Need to find a way to share this
     // logic with the server.
 
@@ -462,8 +462,8 @@ class GameHelper {
   }
 
   isStarPairWormHole (sourceStar, destinationStar) {
-    return sourceStar.wormHoleToStarId 
-      && destinationStar.wormHoleToStarId 
+    return sourceStar.wormHoleToStarId
+      && destinationStar.wormHoleToStarId
       && sourceStar.wormHoleToStarId === destinationStar._id
       && destinationStar.wormHoleToStarId === sourceStar._id
   }
@@ -728,7 +728,7 @@ class GameHelper {
 
     return game.galaxy.carriers.sort((a, b) => b.location.y - a.location.y)[0].location.y
   }
-  
+
   isSpecialistsEnabled (game) {
     return game.settings.specialGalaxy.specialistCost !== 'none'
   }
@@ -838,7 +838,7 @@ class GameHelper {
         nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'seconds');
     } else if (this.isTurnBasedGame(game)) {
       let isAllPlayersReady = this.isAllUndefeatedPlayersReady(game)
-            
+
       if (isAllPlayersReady) {
         return true
       }
@@ -957,7 +957,7 @@ class GameHelper {
     if (playerIds.indexOf(star.ownedByPlayerId) > -1) {
       playerIds.splice(playerIds.indexOf(star.ownedByPlayerId), 1)
     }
-    
+
     return playerIds.length
   }
 
@@ -986,6 +986,10 @@ class GameHelper {
 
   isFormalAlliancesEnabled (game) {
     return game.settings.alliances.enabled === 'enabled'
+  }
+
+  isTradeAllyRestricted (game) {
+    return game.settings.alliances.allianceOnlyTrading === 'enabled'
   }
 
   isDiplomaticStatusToPlayersAllied(game, playerId, toPlayerIds) {
