@@ -96,6 +96,24 @@
              "text":"Expensive"
           }
        ],
+       "allianceUpkeepCost":[
+         {
+           "value":"none",
+           "text":"None"
+         },
+         {
+           "value":"cheap",
+           "text":"Cheap"
+         },
+         {
+           "value":"standard",
+           "text":"Standard"
+        },
+         {
+           "value":"expensive",
+           "text":"Expensive"
+         }
+       ],
        "warpgateCost":[
           {
              "value":"none",
@@ -400,8 +418,10 @@
              "value":"scanned",
              "text":"Trade with scanned players only"
           }
-       ],
-       "alliances":[
+       ]
+    },
+    "alliances":{
+      "enabled":[
           {
              "value":"enabled",
              "text":"Enabled"
@@ -410,6 +430,16 @@
              "value":"disabled",
              "text":"Disabled"
           }
+       ],
+       "allianceOnlyTrading":[
+         { 
+           "value":"enabled",
+           "text":"Enabled"
+         },
+         {
+           "value":"disabled",
+           "text":"Disabled"
+         }
        ]
     },
     "technology":{

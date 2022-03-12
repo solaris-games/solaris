@@ -19,6 +19,7 @@
     "specialGalaxy":{
        "carrierCost":"standard",
        "carrierUpkeepCost":"none",
+       "allianceUpkeepCost": "none",
        "warpgateCost":"standard",
        "specialistCost":"standard",
        "specialistsCurrency":"creditsSpecialists",
@@ -70,8 +71,12 @@
        "tradeCredits":true,
        "tradeCreditsSpecialists":true,
        "tradeCost":15,
-       "tradeScanning":"scanned",
-       "alliances":"enabled"
+       "tradeScanning":"scanned"
+    },
+    "alliances": 
+    {
+      "enabled":"enabled",
+      "maxAlliances": 16 
     },
     "technology":{
        "startingTechnologyLevel":{
