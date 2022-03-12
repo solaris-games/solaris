@@ -6,8 +6,8 @@
     <div class="row mt-0" v-if="message">
       <div class="col mt-1 mb-0">
         <span class="pointer" @click="onOpenPlayerDetailRequested">
-          <player-icon :playerId="message.fromPlayerId"/>
-          <strong class="ml-2">{{message.fromPlayerAlias}}</strong>
+          <player-icon class="mr-2" v-if="message.fromPlayerId" :playerId="message.fromPlayerId"/>
+          <strong>{{message.fromPlayerAlias}}</strong>
         </span>
       </div>
       <div class="col-auto thumbtack" v-if="conversation.createdBy">
