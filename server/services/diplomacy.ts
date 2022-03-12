@@ -14,7 +14,7 @@ export default class DiplomacyService {
     }
 
     isFormalAlliancesEnabled(game: Game): boolean {
-        return game.settings.player.alliances === 'enabled';
+        return game.settings.alliances.enabled === 'enabled';
     }
 
     getDiplomaticStatusBetweenPlayers(game: Game, playerIds: DBObjectId[]): DiplomaticState {
@@ -120,25 +120,55 @@ export default class DiplomacyService {
 
     getFilteredDiplomacy(player: Player, forPlayer: Player): PlayerDiplomacy {
         return {
-            allies: player.diplomacy.allies.filter(a => a.toString() === forPlayer._id.toString())
+            allies: player.diplomacy.allies.filter(a => a.toString() === forPlayer._id.toString()),
+            alliancesMadeThisCycle: player.diplomacy.alliancesMadeThisCycle
         }
     }
 
     async declareAlly(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId) {
-        await this.gameRepo.updateOne({
-            _id: game._id,
-            'galaxy.players._id': playerId
-        }, {
-            $addToSet: {
-                'galaxy.players.$.diplomacy.allies': playerIdTarget
-            }
-        });
 
-        // Need to do this so we can calculate the new diplomatic status.
-        let player: Player = game.galaxy.players.find(p => p._id.toString() === playerId.toString())!;
+      let player: Player = game.galaxy.players.find(p => p._id.toString() === playerId.toString())!;
 
-        if (player.diplomacy.allies.indexOf(playerIdTarget) === -1) {
-            player.diplomacy.allies.push(playerIdTarget);
+       let allyCount = -1;
+        if (game.settings.alliances.maxAlliances > 0) {
+          allyCount = this.getAlliesOfPlayer(game, player).length;
+        }
+
+        let diplomaticStatusBefore = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
+
+        //only add alliance request if the target player is not allready an ally and if the player has capacity for more allies
+        if (allyCount < game.settings.alliances.maxAlliances && diplomaticStatusBefore.actualStatus == 'enemies') {
+
+          await this.gameRepo.updateOne({
+              _id: game._id,
+              'galaxy.players._id': playerId
+          }, {
+              $addToSet: {
+                  'galaxy.players.$.diplomacy.allies': playerIdTarget
+              },
+              $inc: {
+                  //add one if this makes a new alliance (if target player was already allied).
+                  'galaxy.players.$.diplomacy.alliancesMadeThisCycle': ((diplomaticStatusBefore.statusFrom == 'allies')?1:0)
+              }
+          });
+
+          // if this is a new ally, increment the target players alliancesHeldCount also
+          if (diplomaticStatusBefore.statusFrom == 'allies')
+          {
+            await this.gameRepo.updateOne({
+              _id: game._id,
+              'galaxy.players._id': playerIdTarget
+            }, {
+              $inc: {
+                'galaxy.players.$.diplomacy.alliancesMadeThisCycle': 1
+              }
+            });
+          }
+
+          // Need to do this so we can calculate the new diplomatic status.
+          if (player.diplomacy.allies.indexOf(playerIdTarget) === -1) {
+              player.diplomacy.allies.push(playerIdTarget);
+          }
         }
 
         let diplomaticStatus = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
@@ -179,7 +209,7 @@ export default class DiplomacyService {
                 }
             }
         ];
-        
+
         await this.gameRepo.bulkWrite(dbWrites);
 
         // Need to do this so we can calculate the new diplomatic status.
