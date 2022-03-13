@@ -992,6 +992,10 @@ class GameHelper {
     return game.settings.alliances.allianceOnlyTrading === 'enabled'
   }
 
+  maxAlliances (game) {
+    return game.settings.alliances.maxAlliances
+  }
+
   isDiplomaticStatusToPlayersAllied(game, playerId, toPlayerIds) {
     let playerIdA = playerId;
 
