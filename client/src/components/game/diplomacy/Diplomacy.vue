@@ -14,8 +14,8 @@
       <div class="table-responsive">
         <table class="table table-sm table-striped mb-0">
           <tbody>
-            <diplomacy-row 
-              v-for="diplomaticStatus in diplomaticStatuses" 
+            <diplomacy-row
+              v-for="diplomaticStatus in diplomaticStatuses"
               :key="diplomaticStatus.playerId"
               :diplomaticStatus="diplomaticStatus"
               @onPlayerDetailRequested="onPlayerDetailRequested"/>
@@ -28,7 +28,15 @@
       <small>
         If you are allied with another player, you can visit their stars.
         <br/>
-        Combat will not occur if all players at a star are allied with the star owner. See the help guide for more details.
+        Combat will not occur if all players at a star are allied with the star owner.<br/>
+        <div v-if="isTradeAllyRestricted">
+        You can only trade with allies.<br/>
+        </div>
+        <div v-if="maxAlliances > 0">
+        You may only ally with {{ maxAlliances }} player(s).<br/>
+        </div>
+        See the help guide for more details.
+
       </small>
     </p>
 </div>
@@ -101,6 +109,12 @@ export default {
   computed: {
     isFormalAlliancesEnabled () {
       return GameHelper.isFormalAlliancesEnabled(this.$store.state.game)
+    },
+    isTradeAllyRestricted () {
+      return GameHelper.isTradeAllyRestricted(this.$store.state.game)
+    },
+    maxAlliances() {
+      return GameHelper.maxAlliances(this.$store.state.game)
     }
   }
 }
