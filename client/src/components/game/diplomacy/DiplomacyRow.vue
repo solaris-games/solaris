@@ -53,7 +53,12 @@ export default {
           let response = await DiplomacyApiService.declareAlly(this.$store.state.game._id, diplomaticStatus.playerIdTo)
 
           if (response.status === 200) {
-            this.$toasted.show(`Your diplomatic status to ${playerAlias} is now allied.`, { type: 'success' })
+            if (response.data.statusTo == 'allies') {
+              this.$toasted.show(`Your diplomatic status to ${playerAlias} is now allied.`, { type: 'success' })
+            } else
+            {
+              this.$toasted.show(`You can not ally ${playerAlias}. Check the maximum alliance limits.`, { type: 'error' })
+            }
           }
 
           diplomaticStatus.statusFrom = response.data.statusFrom
