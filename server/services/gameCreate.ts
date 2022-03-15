@@ -10,6 +10,7 @@ import MapService from './map';
 import NameService from './name';
 import PasswordService from './password';
 import PlayerService from './player';
+import SpecialistBanService from './specialistBan';
 import UserService from './user';
 
 const RANDOM_NAME_STRING = '[[[RANDOM]]]';
@@ -27,6 +28,7 @@ export default class GameCreateService {
     achievementService: AchievementService;
     userService: UserService;
     gameCreateValidationService: GameCreateValidationService;
+    specialistBanService: SpecialistBanService;
 
     constructor(
         gameModel: any,
@@ -40,7 +42,8 @@ export default class GameCreateService {
         historyService: HistoryService,
         achievementService: AchievementService,
         userService: UserService,
-        gameCreateValidationService: GameCreateValidationService
+        gameCreateValidationService: GameCreateValidationService,
+        specialistBanService: SpecialistBanService
     ) {
         this.gameModel = gameModel;
         this.gameService = gameService;
@@ -54,10 +57,13 @@ export default class GameCreateService {
         this.achievementService = achievementService;
         this.userService = userService;
         this.gameCreateValidationService = gameCreateValidationService;
+        this.specialistBanService = specialistBanService;
     }
 
     async create(settings: GameSettings) {
         const isTutorial = settings.general.type === 'tutorial';
+        const isNewPlayerGame = settings.general.type === 'new_player_rt' || settings.general.type === 'new_player_tb';
+        const isOfficialGame = settings.general.createdByUserId == null;
 
         // If a legit user (not the system) created the game and it isn't a tutorial
         // then that game must be set as a custom game.
@@ -130,6 +136,15 @@ export default class GameCreateService {
             game.settings.specialGalaxy.specialistBans = {
                 star: [],
                 carrier: []
+            };
+        }
+        // For official games, add this month's specialist bans.
+        else if (isOfficialGame && !isTutorial && !isNewPlayerGame) {
+            const banAmount = 3; // Random 3 specs of each type.
+
+            game.settings.specialGalaxy.specialistBans = {
+                star: this.specialistBanService.getCurrentMonthStarBans(banAmount),
+                carrier: this.specialistBanService.getCurrentMonthCarrierBans(banAmount)
             };
         }
 

@@ -43,6 +43,7 @@ import UserService from '../services/user';
 import HistoryService from '../services/history';
 import LedgerService from '../services/ledger';
 import SpecialistService from '../services/specialist';
+import SpecialistBanService from '../services/specialistBan';
 import SpecialistHireService from '../services/specialistHire';
 import AchievementService from '../services/achievement';
 import ConversationService from '../services/conversation';
@@ -141,7 +142,8 @@ export default (config, io): DependencyContainer => {
     const researchService = new ResearchService(gameRepository, technologyService, randomService, playerService, starService, userService, gameTypeService);
     const combatService = new CombatService(technologyService, specialistService, playerService, starService, reputationService, diplomacyService, gameTypeService);
     const waypointService = new WaypointService(gameRepository, carrierService, starService, distanceService, starDistanceService, technologyService, gameService, playerService);
-    const specialistHireService = new SpecialistHireService(gameRepository, specialistService, achievementService, waypointService, playerService, starService, gameTypeService);
+    const specialistBanService = new SpecialistBanService(specialistService);
+    const specialistHireService = new SpecialistHireService(gameRepository, specialistService, achievementService, waypointService, playerService, starService, gameTypeService, specialistBanService);
     const starUpgradeService = new StarUpgradeService(gameRepository, starService, carrierService, achievementService, researchService, technologyService, playerService, gameTypeService);
     const aiService = new AIService(starUpgradeService);
     const historyService = new HistoryService(historyRepository, playerService, gameService);
@@ -159,8 +161,10 @@ export default (config, io): DependencyContainer => {
 
     const gameListService = new GameListService(gameRepository, gameService, conversationService, eventService, gameTypeService);
     const gameCreateValidationService = new GameCreateValidationService(playerService, starService, carrierService, specialistService, gameTypeService);
-    const gameCreateService = new GameCreateService(GameModel, gameService, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService, gameCreateValidationService);
+    const gameCreateService = new GameCreateService(GameModel, gameService, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService, gameCreateValidationService, specialistBanService);
 
+    console.log('Dependency Container Initialized');
+    
     return {
         adminService,
         passwordService,
@@ -198,6 +202,7 @@ export default (config, io): DependencyContainer => {
         historyService,
         ledgerService,
         specialistService,
+        specialistBanService,
         specialistHireService,
         achievementService,
         conversationService,

@@ -24,6 +24,9 @@ describe('specialistHire - Star', () => {
             gameTypeService: {
                 isTutorialGame: () => { return false; }
             },
+            specialistBanService: {
+                isStarSpecialistBanned: () => { return false; }
+            },
             game: { 
                 settings: {
                     specialGalaxy: {
@@ -51,7 +54,7 @@ describe('specialistHire - Star', () => {
         obj.player._id = obj.playerId;
 
         // @ts-ignore
-        obj.service = new SpecialistHireService(obj.gameRepo, obj.specialistService, obj.achievementService, obj.waypointService, obj.playerService, obj.starService, obj.gameTypeService);
+        obj.service = new SpecialistHireService(obj.gameRepo, obj.specialistService, obj.achievementService, obj.waypointService, obj.playerService, obj.starService, obj.gameTypeService, obj.specialistBanService);
 
         return obj;
     }
@@ -92,7 +95,7 @@ describe('specialistHire - Star', () => {
         let testObj = setup();
         let hasError = false;
 
-        testObj.game.settings.specialGalaxy.specialistBans.star.push(testObj.specialistId);
+        testObj.specialistBanService.isStarSpecialistBanned = () => true;
 
         try {
             await testObj.service.hireStarSpecialist(testObj.game, testObj.player, testObj.starId, testObj.specialistId);
