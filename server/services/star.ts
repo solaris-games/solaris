@@ -179,7 +179,7 @@ export default class StarService extends EventEmitter {
     listStarsWithScanningRangeByPlayer(game: Game, playerId: DBObjectId): Star[] {
         let starIds: string[] = this.listStarsOwnedByPlayer(game.galaxy.stars, playerId).map(s => s._id.toString());
 
-        if (game.settings.player.alliances === 'enabled') { // This never occurs when alliances is disabled.
+        if (game.settings.alliances.enabled === 'enabled') { // This never occurs when alliances is disabled.
             starIds = starIds.concat(this.listStarIdsWithPlayerCarriersInOrbit(game, playerId));
         }
 
@@ -193,7 +193,7 @@ export default class StarService extends EventEmitter {
     listStarsOwnedOrInOrbitByPlayer(game: Game, playerId: DBObjectId): Star[] {
         let starIds: string[] = this.listStarsOwnedByPlayer(game.galaxy.stars, playerId).map(s => s._id.toString());
 
-        if (game.settings.player.alliances === 'enabled') { // Don't need to check in orbit carriers if alliances is disabled
+        if (game.settings.alliances.enabled === 'enabled') { // Don't need to check in orbit carriers if alliances is disabled
             starIds = starIds.concat(this.listStarIdsWithPlayerCarriersInOrbit(game, playerId));
         }
 
@@ -536,6 +536,8 @@ export default class StarService extends EventEmitter {
     }
 
     addNaturalResources(game: Game, star: Star, amount: number) {
+        let wasDeadStar = this.isDeadStar(star);
+
         if (this.gameTypeService.isSplitResources(game)) {
             let total = star.naturalResources.economy + star.naturalResources.industry + star.naturalResources.science;
 
@@ -568,15 +570,45 @@ export default class StarService extends EventEmitter {
             star.infrastructure.economy = 0;
             star.infrastructure.industry = 0;
             star.infrastructure.science = 0;
+
+            if (star.ownedByPlayerId) {
+                this.emit('onPlayerStarDied', {
+                    gameId: game._id,
+                    gameTick: game.state.tick,
+                    playerId: star.ownedByPlayerId,
+                    starId: star._id,
+                    starName: star.name
+                });
+            }
+        }
+        // If it was a dead star but is now not a dead star then it has been reignited.
+        else if (wasDeadStar && star.ownedByPlayerId) {
+            this.emit('onPlayerStarReignited', {
+                gameId: game._id,
+                gameTick: game.state.tick,
+                playerId: star.ownedByPlayerId,
+                starId: star._id,
+                starName: star.name
+            });
         }
     }
 
-    reigniteDeadStar(star: Star, naturalResources: NaturalResources) {
+    reigniteDeadStar(game: Game, star: Star, naturalResources: NaturalResources) {
         if (!this.isDeadStar(star)) {
             throw new Error('The star cannot be reignited, it is not dead.');
         }
 
         star.naturalResources = naturalResources;
+
+        if (star.ownedByPlayerId) {
+            this.emit('onPlayerStarReignited', {
+                gameId: game._id,
+                gameTick: game.state.tick,
+                playerId: star.ownedByPlayerId,
+                starId: star._id,
+                starName: star.name
+            });
+        }
     }
 
     destroyStar(game: Game, star: Star) {

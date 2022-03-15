@@ -84,10 +84,11 @@
                         </span> 
                       </td>
                       <td class="fit pt-2 pb-2 pr-1 text-center" v-if="isTurnBasedGame && canEndTurn">
-                        <h5 v-if="player.ready" class="pt-2 pr-2 pl-2" @click="unconfirmReady(player)" :disabled="$isHistoricalMode()">
+                        <h5 v-if="player.ready && !isUserPlayer(player)" class="pt-2 pr-2 pl-2">
                           <i class="fas fa-check text-success" title="This player has completed their turn"></i>
                         </h5>
-                        <button class="btn btn-success pulse" v-if="isUserPlayer(player) && !player.ready && !player.defeated" @click="confirmReady(player)" :disabled="$isHistoricalMode()" title="End your turn"><i class="fas fa-check"></i></button>
+
+                        <ready-status-button v-if="!$isHistoricalMode() && getUserPlayer() && isUserPlayer(player) && !getUserPlayer().defeated" />
                       </td>
                       <td class="fit pt-2 pb-2 pr-2">
                           <button class="btn btn-info" @click="panToPlayer(player)"><i class="fas fa-eye"></i></button>
@@ -151,6 +152,7 @@ import AudioService from '../../../game/audio'
 import ShareLinkVue from '../welcome/ShareLink'
 import PlayerAvatarVue from '../menu/PlayerAvatar'
 import HelpTooltip from '../../HelpTooltip'
+import ReadyStatusButtonVue from '../menu/ReadyStatusButton'
 
 export default {
   components: {
@@ -159,7 +161,8 @@ export default {
     'dialogModal': DialogModal,
     'share-link': ShareLinkVue,
     'player-avatar': PlayerAvatarVue,
-    'help-tooltip': HelpTooltip
+    'help-tooltip': HelpTooltip,
+    'ready-status-button': ReadyStatusButtonVue
   },
 
   data () {
@@ -255,7 +258,7 @@ export default {
       this.isQuittingGame = false
     },
     async confirmReady (player) {
-      if (!await this.$confirm('End turn', 'Are you sure you want to end your turn?')) {
+      if (!await this.$confirm('End Turn', 'Are you sure you want to end your turn?')) {
         return
       }
       
@@ -269,8 +272,29 @@ export default {
             this.$toasted.show(`You have confirmed your move, once all players are ready the game will progress automatically.`, { type: 'success' })
           }
           
-
           player.ready = true
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    async confirmReadyToCycle (player) {
+      if (!await this.$confirm('End Cycle', 'Are you sure you want to end your turn up to the end of the current galactic cycle?')) {
+        return
+      }
+      
+      try {
+        let response = await gameService.confirmReadyToCycle(this.$store.state.game._id)
+
+        if (response.status === 200) {
+          if (this.isTutorialGame) {
+            this.$toasted.show(`You have confirmed your move, please wait while the game processes the tick.`, { type: 'success' })
+          } else {
+            this.$toasted.show(`You have confirmed your move, once all players are ready the game will progress automatically.`, { type: 'success' })
+          }
+          
+          player.ready = true
+          player.readyToCycle = true
         }
       } catch (err) {
         console.error(err)
@@ -286,6 +310,7 @@ export default {
 
         if (response.status === 200) {
           player.ready = false
+          player.readyToCycle = false
         }
       } catch (err) {
         console.error(err)
@@ -372,7 +397,7 @@ export default {
       return gameHelper.isKingOfTheHillMode(this.$store.state.game)
     },
     canEndTurn () {
-      return GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)
+      return !GameHelper.isGameFinished(this.$store.state.game)
     },
     isTutorialGame () {
       return GameHelper.isTutorialGame(this.$store.state.game)

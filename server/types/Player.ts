@@ -79,6 +79,7 @@ export interface Player {
     ai: boolean;
     renownToGive: number;
     ready: boolean;
+    readyToCycle: boolean;
     readyToQuit: boolean;
     missedTurns: number;
     hasSentTurnReminder: boolean;

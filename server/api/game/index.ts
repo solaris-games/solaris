@@ -213,6 +213,20 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
+    router.put('/api/game/:gameId/readytocycle', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+        try {
+            await container.playerService.declareReadyToCycle(
+                req.game,
+                req.player);
+            
+            res.sendStatus(200);
+
+            container.broadcastService.gamePlayerReady(req.game, req.player);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.put('/api/game/:gameId/notready', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             await container.playerService.undeclareReady(

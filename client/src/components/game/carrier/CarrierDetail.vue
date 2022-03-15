@@ -127,7 +127,7 @@
         </div>
       </div>
 
-      <div v-if="hasWaypoints && carrierOwningPlayer == userPlayer" class="row pt-0 pb-0 mb-0">
+      <div v-if="(hasWaypoints && isStandardUIStyle) || (hasWaypoints && isUserPlayerCarrier)" class="row pt-0 pb-0 mb-0">
         <waypointTable :carrier="carrier" 
           @onEditWaypointRequested="onEditWaypointRequested"
           @onEditWaypointsRequested="editWaypoints"
