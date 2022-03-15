@@ -96,25 +96,7 @@
              "text":"Expensive"
           }
        ],
-       "allianceUpkeepCost":[
-         {
-           "value":"none",
-           "text":"None"
-         },
-         {
-           "value":"cheap",
-           "text":"Cheap"
-         },
-         {
-           "value":"standard",
-           "text":"Standard"
-        },
-         {
-           "value":"expensive",
-           "text":"Expensive"
-         }
-       ],
-       "warpgateCost":[
+      "warpgateCost":[
           {
              "value":"none",
              "text":"No"
@@ -429,6 +411,24 @@
          {
             "value":"disabled",
             "text":"Disabled"
+         }
+       ],
+       "allianceUpkeepCost":[
+         {
+           "value":"none",
+           "text":"None"
+         },
+         {
+           "value":"cheap",
+           "text":"Cheap"
+         },
+         {
+           "value":"standard",
+           "text":"Standard"
+        },
+         {
+           "value":"expensive",
+           "text":"Expensive"
          }
        ],
        "allianceOnlyTrading":[

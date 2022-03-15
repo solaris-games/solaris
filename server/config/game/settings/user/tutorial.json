@@ -19,7 +19,6 @@
   "specialGalaxy": {
     "carrierCost": "standard",
     "carrierUpkeepCost": "none",
-    "allianceUpkeepCost": "none",
     "warpgateCost": "standard",
     "specialistCost": "standard",
     "specialistsCurrency": "creditsSpecialists",
@@ -70,6 +69,9 @@
   },
   "alliances": {
     "enabled": "disabled",
+    "allianceUpkeepCost": "none",
+    "allianceOnlyTrading": "disabled", 
+    "maxAlliances": 31, 
     "globalEvents": "disabled"
   },
   "technology": {
