@@ -2,10 +2,25 @@ module.exports = {
     async migrate(db) {
         const games = db.collection('games');
 
+        // Clear out any old games.
+        await games.updateMany({
+            $and: [
+                { 'state.endDate': { $ne: null } },
+                { 'galaxy.players.diplomacy.allies': { $ne: null } },
+                { 'galaxy.players.diplomacy.playerId': { $eq: null } }
+            ]
+        }, {
+            $set: {
+                'galaxy.players.$[].diplomacy': []
+            }
+        });
+
+        // In progress games:
         let dbWrites = [];
 
         await games.find({
             $and: [
+                { 'state.endDate': { $eq: null } },
                 { 'galaxy.players.diplomacy.allies': { $ne: null } },
                 { 'galaxy.players.diplomacy.playerId': { $eq: null } }
             ]
