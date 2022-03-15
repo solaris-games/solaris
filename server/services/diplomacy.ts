@@ -1,5 +1,6 @@
 const EventEmitter = require('events');
 import { DBObjectId } from "../types/DBObjectId";
+import ValidationError from '../errors/validation';
 import DatabaseRepository from "../models/DatabaseRepository";
 import { DiplomaticState, DiplomaticStatus } from "../types/Diplomacy";
 import { Game } from "../types/Game";
@@ -151,17 +152,17 @@ export default class DiplomacyService extends EventEmitter {
     async _declareStatus(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId, state: DiplomaticState, saveToDB: boolean = true) {
       let player: Player = game.galaxy.players.find(p => p._id.toString() === playerId.toString())!;
 
-       let allyCount = -1;
+       let allianceCount = -1;
         if (game.settings.alliances.maxAlliances > 0) {
-          allyCount = this.getAlliesOfPlayer(game, player, true).length;
+          allianceCount = this.getAlliesOfPlayer(game, player, true).length;
         }
 
         let diploStatusBefore = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
         let diplo = player.diplomacy.otherPlayers.find(d => d.playerId.toString() === playerIdTarget.toString());
 
         //only add alliance request if the target player is not already an ally and if the player has capacity for more allies
-        if (state == 'allies' && (allyCount >= game.settings.alliances.maxAlliances || diploStatusBefore.actualStatus == 'allies')) {
-            return diploStatusBefore; // no change
+        if (state == 'allies' && (allianceCount >= game.settings.alliances.maxAlliances || diploStatusBefore.actualStatus == 'allies')) {
+          return diploStatusBefore; 
         }
 
         if (!diplo) {
