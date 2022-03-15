@@ -2,9 +2,11 @@ module.exports = {
     async migrate(db) {
         const games = db.collection('games');
 
-        await games.update({
-            'settings.player.alliances': { $ne: null },
-            'settings.alliances': { $eq: null }
+        await games.updateMany({
+            $and: [
+                { 'settings.player.alliances': { $ne: null } },
+                { 'settings.alliances': { $eq: null } }
+            ]
         }, [{
             $set: {
                 'settings.alliances': {

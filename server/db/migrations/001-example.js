@@ -3,7 +3,7 @@ module.exports = {
         // Use the collection function to get the desired collection to modify
         // const users = db.collection('users');
 
-        // Migrate the database for example:
+        // Migrate the database, for example:
         // await users.updateOne({
         //     username: 'Hyperi0n'
         // }, {

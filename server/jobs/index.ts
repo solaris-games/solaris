@@ -15,12 +15,10 @@ async function startup() {
     const container = containerLoader(config, null);
 
     mongo = await mongooseLoader(config, {
-        syncIndexes: true,
+        unlockJobs: true,
         poolSize: 1
     });
     
-    console.log('MongoDB Intialized');
-
     // ------------------------------
     // Jobs that run every time the server restarts.
 

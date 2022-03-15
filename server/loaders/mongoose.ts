@@ -39,6 +39,7 @@ export default async (config, options) => {
         await HistoryModel.syncIndexes();
         await UserModel.syncIndexes();
         await PaymentModel.syncIndexes();
+        // TODO ReportModel?
         console.log('Indexes synced.');
     }
     
@@ -49,6 +50,7 @@ export default async (config, options) => {
     options = options || {};
     options.connectionString = options.connectionString || config.connectionString;
     options.syncIndexes = options.syncIndexes == null ? false : options.syncIndexes;
+    options.unlockJobs = options.unlockJobs == null ? false : options.unlockJobs;
     options.poolSize = options.poolSize || 5;
 
     console.log(`Connecting to database: ${options.connectionString}`);
@@ -61,11 +63,15 @@ export default async (config, options) => {
         poolSize: options.poolSize
     });
 
-    await unlockAgendaJobs(db);
-
     if (options.syncIndexes) {
         await syncIndexes();
     }
+
+    if (options.unlockJobs) {
+        await unlockAgendaJobs(db);
+    }
+
+    console.log('MongoDB Intialized');
 
     return db;
 };

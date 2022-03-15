@@ -11,13 +11,13 @@ async function startup() {
         poolSize: 1
     });
     
-    console.log('MongoDB Intialized');
-
     console.log('Running migrations...');
 
     const dirPath: string = path.join(__dirname, 'migrations');
 
-    let files: string[] = fs.readdirSync(dirPath).sort((a, b) => a.localeCompare(b));
+    let files: string[] = fs.readdirSync(dirPath)
+        .filter(a => !a.endsWith('js.map'))
+        .sort((a, b) => a.localeCompare(b));
 
     for (let file of files) {
         console.log(file);
@@ -25,22 +25,38 @@ async function startup() {
         const filePath = path.join(dirPath, file);
         const script = require(filePath);
 
-        await script.migrate(mongo.connection.db);
+        try {
+            await script.migrate(mongo.connection.db);
+        } catch (e) {
+            console.error(e);
+
+            return Promise.reject(e);
+        }
     }
+    
+    return Promise.resolve();
 }
 
 process.on('SIGINT', async () => {
+    await shutdown();
+});
+
+async function shutdown() {
     console.log('Shutting down...');
 
     await mongo.disconnect();
 
     console.log('Shutdown complete.');
-
+    
     process.exit();
-});
+}
 
-startup().then(() => {
+startup().then(async () => {
     console.log('Database migrated.');
+
+    await shutdown();
+}).catch(async err => {
+    await shutdown();
 });
 
 export {};
