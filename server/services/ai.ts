@@ -372,7 +372,7 @@ export default class AIService {
                 const starToInvade = context.starsById.get(order.star)!;
                 const requiredShips = this._calculateRequiredShipsForAttack(game, player, context, starToInvade);
                 const ticksLimit = game.settings.galaxy.productionTicks * 2;
-                const fittingAssignments = this._findAssignmentsWithTickLimit(game, player, context, context.freelyReachableStars, assignments, order.star, ticksLimit,  this._canAffordCarrier(context, game, player, false), false);
+                const fittingAssignments = this._findAssignmentsWithTickLimit(game, player, context, context.allReachableFromPlayerStars, assignments, order.star, ticksLimit,  this._canAffordCarrier(context, game, player, false), false);
 
                 if (!fittingAssignments || !fittingAssignments.length) {
                     continue;
