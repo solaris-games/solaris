@@ -586,7 +586,7 @@ export default class GameTickService extends EventEmitter {
                 let creditsResult = this.playerService.givePlayerCreditsEndOfCycleRewards(game, player);
                 let experimentResult = this.researchService.conductExperiments(game, player);
                 let carrierUpkeepResult = this.playerService.deductCarrierUpkeepCost(game, player);
-                let allianceUpkeepResult = this.playerService.deductAllianceUpkeepCost(game, player, creditsResult.creditsFromEconomy ); 
+                let allianceUpkeepResult = this.playerService.deductAllianceUpkeepCost(game, player, creditsResult.creditsFromEconomy); // TODO: creditsTotal?
 
                 // Raise an event if the player isn't defeated, AI doesn't care about events.
                 if (!player.defeated) {

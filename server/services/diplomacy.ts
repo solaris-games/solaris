@@ -21,6 +21,10 @@ export default class DiplomacyService extends EventEmitter {
         return game.settings.alliances.enabled === 'enabled';
     }
 
+    isAllianceOnlyTradingEnabled(game: Game): boolean {
+        return game.settings.alliances.allianceOnlyTrading === 'enabled';
+    }
+
     isGlobalEventsEnabled(game: Game): boolean {
         return game.settings.alliances.globalEvents === 'enabled';
     }
@@ -230,6 +234,15 @@ export default class DiplomacyService extends EventEmitter {
     }
 
     async declareAlly(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId, saveToDB: boolean = true) {
+        let oldStatus = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
+
+        if (oldStatus.statusFrom === "allies") {
+            throw new ValidationError(`The player has already been declared as allies`);
+        }
+
+        // TODO: If max alliances is enabled, ensure that the player has the capacity to declare the player as an ally here. If not, validation error?
+        // If so, declare as allies and increment alliances made this cycle counter outside of the _declareStatus function?
+        
         let wasAtWar = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget).actualStatus === 'enemies';
 
         let newStatus = await this._declareStatus(game, playerId, playerIdTarget, 'allies', saveToDB);
@@ -257,6 +270,12 @@ export default class DiplomacyService extends EventEmitter {
 
     async declareEnemy(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId, saveToDB: boolean = true) {
         let oldStatus = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
+
+        if (oldStatus.statusFrom === "enemies") {
+            throw new ValidationError(`The player has already been declared as enemies`);
+        }
+
+        // TODO: If max alliances is enabled, ensure that the player has the capacity to declare the player as an ally.
 
         let wasAtWar = oldStatus.actualStatus === 'enemies';
 
@@ -286,6 +305,10 @@ export default class DiplomacyService extends EventEmitter {
 
     async declareNeutral(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId, saveToDB: boolean = true) {
         let oldStatus = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
+
+        if (oldStatus.statusFrom === "neutral") {
+            throw new ValidationError(`The player has already been declared as neutral`);
+        }
 
         let wasAtWar = oldStatus.actualStatus === 'enemies';
         let wasAllied = oldStatus.actualStatus === 'allies';

@@ -613,27 +613,29 @@ export default class PlayerService extends EventEmitter {
     }
 
     deductAllianceUpkeepCost(game, player, credits) {
-      const upkeepCosts = {
-        'none': 0,
-        'cheap': .02,
-        'standard': .05,
-        'expensive': .10
-      };
+        const upkeepCosts = {
+            'none': 0,
+            'cheap': .02,
+            'standard': .05,
+            'expensive': .10
+        };
 
-      let costPerAlly = upkeepCosts[game.settings.alliances.allianceUpkeepCost];
-      if (costPerAlly == 0) {
-        return null;
-      }
+        let costPerAlly = upkeepCosts[game.settings.alliances.allianceUpkeepCost];
 
-      let allianceCount = player.diplomacy.alliancesMadeThisCycle;
-      let totalCost = Math.round(allianceCount * costPerAlly * credits);
-      player.credits -= totalCost;
-      player.diplomacy.alliancesMadeThisCycle = this.diplomacyService.getAlliesOfPlayer(game, player).length;
+        if (costPerAlly == 0) {
+            return null;
+        }
 
-      return {
-        allianceCount,
-        totalCost
-      };
+        let allianceCount = player.diplomacy.alliancesMadeThisCycle;
+        let totalCost = Math.round(allianceCount * costPerAlly * credits);
+        
+        player.credits -= totalCost;
+        player.diplomacy.alliancesMadeThisCycle = this.diplomacyService.getAlliesOfPlayer(game, player).length;
+
+        return {
+            allianceCount,
+            totalCost
+        };
     }
 
     deductCarrierUpkeepCost(game, player) {

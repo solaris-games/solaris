@@ -61,7 +61,7 @@ export default class TradeService extends EventEmitter {
     }
 
     isTradingAllyRestricted(game: Game) {
-      return game.settings.alliances.enabled === 'enabled' && game.settings.alliances.allianceOnlyTrading === 'enabled';
+        return this.diplomacyService.isFormalAlliancesEnabled(game) && this.diplomacyService.isAllianceOnlyTradingEnabled(game);
     }
 
     isTradingCreditsSpecialistsDisabled(game: Game) {
@@ -93,11 +93,9 @@ export default class TradeService extends EventEmitter {
             throw new ValidationError(`Cannot send credits to yourself.`);
         }
 
-        if (this.isTradingAllyRestricted(game)) {
-          let diplomaticStatus: DiplomaticStatus = this.diplomacyService.getDiplomaticStatusToPlayer(game, fromPlayer._id, toPlayerId);
-          if (diplomaticStatus.actualStatus != 'allies') {
-            throw new ValidationError(`Cannot send credits to non-allies.`);
-          }
+        if (this.isTradingAllyRestricted(game) &&
+            this.diplomacyService.getDiplomaticStatusToPlayer(game, fromPlayer._id, toPlayerId).actualStatus !== 'allies') {
+            throw new ValidationError(`You are only allowed to trade with allies.`);
         }
 
         this._tradeScanningCheck(game, fromPlayer, toPlayer);
@@ -168,11 +166,9 @@ export default class TradeService extends EventEmitter {
             throw new ValidationError(`Cannot send specialist tokens to yourself.`);
         }
 
-        if (this.isTradingAllyRestricted(game)) {
-          let diplomaticStatus: DiplomaticStatus = this.diplomacyService.getDiplomaticStatusToPlayer(game, fromPlayer._id, toPlayerId);
-          if (diplomaticStatus.actualStatus != 'allies') {
-            throw new ValidationError(`Cannot send specialist tokens to non-allies.`);
-          }
+        if (this.isTradingAllyRestricted(game) &&
+            this.diplomacyService.getDiplomaticStatusToPlayer(game, fromPlayer._id, toPlayerId).actualStatus !== 'allies') {
+            throw new ValidationError(`You are only allowed to trade with allies.`);
         }
 
         this._tradeScanningCheck(game, fromPlayer, toPlayer);
@@ -306,11 +302,9 @@ export default class TradeService extends EventEmitter {
             throw new ValidationError(`Cannot trade technology with yourself.`);
         }
 
-        if (this.isTradingAllyRestricted(game)) {
-          let diplomaticStatus: DiplomaticStatus = this.diplomacyService.getDiplomaticStatusToPlayer(game, fromPlayer._id, toPlayerId);
-          if (diplomaticStatus.actualStatus != 'allies') {
-            throw new ValidationError(`Cannot send technology to non-allies.`);
-          }
+        if (this.isTradingAllyRestricted(game) &&
+            this.diplomacyService.getDiplomaticStatusToPlayer(game, fromPlayer._id, toPlayerId).actualStatus !== 'allies') {
+            throw new ValidationError(`You are only allowed to trade with allies.`);
         }
 
         this._tradeScanningCheck(game, fromPlayer, toPlayer);
