@@ -533,7 +533,7 @@ export default class AIService {
         return availableFunds >= this.starUpgradeService.calculateCarrierCost(game, carrierExpenseConfig);
     }
 
-    _searchAssignments(context: Context, starGraph: StarGraph, assignments: Map<string, Assignment>, nextFilter, onAssignment, startStarId) {
+    _searchAssignments(context: Context, starGraph: StarGraph, assignments: Map<string, Assignment>, nextFilter: (trace: string[], nextStarId: string) => boolean, onAssignment: (assignment: Assignment, trace: string[]) => boolean, startStarId: string) {
         const queue = new Heap({
             comparBefore: (b1, b2) => b1.totalDistance > b2.totalDistance,
             compar: (b1, b2) => b2.totalDistance - b1.totalDistance
@@ -588,14 +588,18 @@ export default class AIService {
         return allowCarrierPurchase || hasCarriers;
     }
 
-    _findAssignmentsWithTickLimit(game: Game, player: Player, context: Context, starGraph: StarGraph, assignments: Map<string, Assignment>, destinationId: string, ticksLimit: number, allowCarrierPurchase: boolean, onlyOne = false): FoundAssignment[] {
+    _findAssignmentsWithTickLimit(game: Game, player: Player, context: Context, starGraph: StarGraph, assignments: Map<string, Assignment>, destinationId: string, ticksLimit: number, allowCarrierPurchase: boolean, onlyOne = false, filterNext: ((trace: string[], nextStarId: string) => boolean) | null = null): FoundAssignment[] {
         const distancePerTick = game.settings.specialGalaxy.carrierSpeed;
 
         const nextFilter = (trace, nextStarId) => {
             const entireTrace = trace.concat([nextStarId]).map(starId => context.starsById.get(starId)!.location);
             const entireDistance = this.distanceService.getDistanceAlongLocationList(entireTrace);
             const ticksRequired = Math.ceil(entireDistance / distancePerTick);
-            return ticksRequired <= ticksLimit;
+            const withinLimit = ticksRequired <= ticksLimit;
+            if (filterNext) {
+                return withinLimit && filterNext(trace, nextStarId);
+            }
+            return withinLimit;
         }
 
         const fittingAssignments: FoundAssignment[] = [];
@@ -738,6 +742,8 @@ export default class AIService {
                     const star = context.starsById.get(reachable)!;
                     if (this._isEnemyStar(game, player, context, star)) {
                         const score = this._getStarScore(star);
+
+                        console.log("Invasion candidate: " + star.name);
 
                         orders.push({
                             type: AiAction.InvadeStar,
