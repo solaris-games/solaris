@@ -89,7 +89,7 @@ export default class TradeService extends EventEmitter {
             throw new ValidationError(`Cannot send credits to yourself.`);
         }
 
-        if (fromPlayer.userId && this.isTradingAllyRestricted(game)) {
+        if (this.isTradingAllyRestricted(game)) {
           let diplomaticStatus: DiplomaticStatus = this.diplomacyService.getDiplomaticStatusToPlayer(game, fromPlayer._id, toPlayerId);
           if (diplomaticStatus.actualStatus != 'allies') {
             throw new ValidationError(`Cannot send credits to non-allies.`);
@@ -161,7 +161,7 @@ export default class TradeService extends EventEmitter {
             throw new ValidationError(`Cannot send specialist tokens to yourself.`);
         }
 
-        if (fromPlayer._id && this.isTradingAllyRestricted(game)) {
+        if (this.isTradingAllyRestricted(game)) {
           let diplomaticStatus: DiplomaticStatus = this.diplomacyService.getDiplomaticStatusToPlayer(game, fromPlayer._id, toPlayerId);
           if (diplomaticStatus.actualStatus != 'allies') {
             throw new ValidationError(`Cannot send specialist tokens to non-allies.`);
@@ -295,7 +295,7 @@ export default class TradeService extends EventEmitter {
             throw new ValidationError(`Cannot trade technology with yourself.`);
         }
 
-        if (fromPlayer._id && this.isTradingAllyRestricted(game)) {
+        if (this.isTradingAllyRestricted(game)) {
           let diplomaticStatus: DiplomaticStatus = this.diplomacyService.getDiplomaticStatusToPlayer(game, fromPlayer._id, toPlayerId);
           if (diplomaticStatus.actualStatus != 'allies') {
             throw new ValidationError(`Cannot send technology to non-allies.`);
