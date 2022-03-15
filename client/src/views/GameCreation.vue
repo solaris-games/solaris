@@ -460,15 +460,15 @@
           </select>
         </div>
         <div class="form-group">
-          <label for="maxAlliances" class="col-form-label">Max Number of Alliances (<span class="text-warning">{{settings.alliances.maxAlliances}} Allies</span>) <help-tooltip tooltip="Determines how many formal alliance each player may have at once.  Set to 0 to not limit the number of alliances."/></label>
+          <label for="maxAlliances" class="col-form-label">Max Number of Alliances (<span class="text-warning">{{settings.alliances.maxAlliances}} Allies</span>) <help-tooltip tooltip="Determines how many formal alliance each player may have at once."/></label>
           <div class="col">
-            <input type="range" min="0" max="32" step="1" class="form-range w-100" id="maxAlliances" v-model="settings.alliances.maxAlliances" :disabled="isCreatingGame">
+            <input type="range" min="1" :max="settings.general.playerLimit-1" step="1" class="form-range w-100" id="maxAlliances" v-model="settings.alliances.maxAlliances" :disabled="isCreatingGame">
           </div>
         </div>
         <div class="form-group">
           <label for="allianceUpkeepCost" class="col-form-label">Alliance Upkeep Cost <help-tooltip tooltip="Determines how expensive the alliance upkeep is - Upkeep is paid at the end of a galactic cycle"/></label>
-          <select class="form-control" id="allianceUpkeepCost" v-model="settings.specialGalaxy.allianceUpkeepCost" :disabled="isCreatingGame">
-            <option v-for="opt in options.specialGalaxy.allianceUpkeepCost" v-bind:key="opt.value" v-bind:value="opt.value">
+          <select class="form-control" id="allianceUpkeepCost" v-model="settings.alliances.allianceUpkeepCost" :disabled="isCreatingGame">
+            <option v-for="opt in options.alliances.allianceUpkeepCost" v-bind:key="opt.value" v-bind:value="opt.value">
               {{ opt.text }}
             </option>
           </select>
@@ -742,9 +742,7 @@ export default {
       this.settings.specialGalaxy.specialistBans = e
     },
     onPlayerLimitChanged (e) {
-      if (this.settings.general.playerLimit < this.settings.alliances.maxAlliances) {
-        this.settings.alliances.maxAlliances = this.settings.general.playerLimit;
-      }
+      this.settings.alliances.maxAlliances = this.settings.general.playerLimit - 1;
     }
   }
 }
