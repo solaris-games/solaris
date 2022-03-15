@@ -131,15 +131,14 @@ export interface GameSettings {
 		tradeCreditsSpecialists: boolean;
 		tradeCost: GameTradeCost;
 		tradeScanning: GameTradeScanning;
-  },
-  alliances:
-  {
-    enabled: GameSettingEnabledDisabled;
-    allianceOnlyTrading: GameSettingEnabledDisabled;
-    maxAlliances: number;
-    allianceUpkeepCost: GameAllianceUpkeepCost;
-	  globalEvents: GameSettingEnabledDisabled;
-  },
+  	},
+	alliances: {
+		enabled: GameSettingEnabledDisabled;
+		allianceOnlyTrading: GameSettingEnabledDisabled;
+		maxAlliances: number;
+		allianceUpkeepCost: GameAllianceUpkeepCost;
+		globalEvents: GameSettingEnabledDisabled;
+	},
 	technology: {
 		startingTechnologyLevel: {
 			terraforming: number;
