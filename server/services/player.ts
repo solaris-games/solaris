@@ -621,16 +621,17 @@ export default class PlayerService extends EventEmitter {
       };
 
       let costPerAlly = upkeepCosts[game.settings.alliances.allianceUpkeepCost];
-      if (!costPerAlly) {
+      if (costPerAlly == 0) {
         return null;
       }
-      let allyCount = player.diplomacy.alliancesMadeThisCycle;
-      let totalCost = Math.round(allyCount * costPerAlly * credits);
+
+      let allianceCount = player.diplomacy.alliancesMadeThisCycle;
+      let totalCost = Math.round(allianceCount * costPerAlly * credits);
       player.credits -= totalCost;
       player.diplomacy.alliancesMadeThisCycle = this.diplomacyService.getAlliesOfPlayer(game, player).length;
 
       return {
-        allyCount,
+        allianceCount,
         totalCost
       };
     }
