@@ -282,7 +282,7 @@
             <td class="text-right">{{ getFriendlyText(game.settings.alliances.enabled) }}</td>
           </tr>
           <tr v-if="game.settings.alliances.enabled === 'enabled'">
-            <td>Max Number of Alliances <help-tooltip tooltip="Determines how many formal alliance each player may have at once.  Set to 0 to not limit the number of alliances."/></td>
+            <td>Max Number of Alliances <help-tooltip tooltip="Determines how many formal alliance each player may have at once."/></td>
             <td class="text-right">{{ getFriendlyText(game.settings.alliances.maxAlliances) }}</td>
           </tr>
           <tr v-if="game.settings.alliances.enabled === 'enabled'">
