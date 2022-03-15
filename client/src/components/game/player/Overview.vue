@@ -26,7 +26,7 @@
       </button>
     </div>
     <div class="col-auto">
-      <button class="btn btn-warning" v-if="!gameHasFinished && isTradeEnabled && (!isFormalAlliancesEnabled || !isTradeAllyRestricted || (diplomaticStatus && diplomaticStatus.actualStatus == 'allies'))" @click="onOpenTradeRequested">
+      <button class="btn btn-warning" v-if="!gameHasFinished && isTradeEnabled && isTradePossible " @click="onOpenTradeRequested">
         <i class="fas fa-handshake"></i>
         Trade
       </button>
@@ -143,8 +143,8 @@ export default {
     isTradeEnabled () {
       return gameHelper.isTradeEnabled(this.$store.state.game)
     },
-    isTradeAllyRestricted() {
-      return gameHelper.isTradeAllyRestricted(this.$store.state.game)
+    isTradePossible() {
+      return !gameHelper.isFormalAlliancesEnabled(this.$store.state.game) || !gameHelper.isTradeAllyRestricted(this.$store.state.game) || (this.diplomaticStatus && this.diplomaticStatus.actualStatus == 'allies')
     },
     canCreateConversation: function () {
       return this.$store.state.game.settings.general.playerLimit > 2
