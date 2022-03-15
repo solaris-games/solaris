@@ -330,7 +330,6 @@ export default class AIService {
         // Later, a different scoring process could be used to maximize overall scores.
 
         for (const order of orders) {
-            //console.log(order);
             if (order.type === AiAction.DefendStar) {
                 // Later, take weapons level and specialists into account
                 const attackData = this._getAttackData(game, player, context, order.star, order.ticksUntil) || this._createDefaultAttackData(game, order.star, order.ticksUntil);
@@ -819,9 +818,7 @@ export default class AIService {
         const orders: Order[] = [];
         const starPriorities = this._computeStarPriorities(game, player, context);
 
-        console.log("Star priorities:");
         for (const [starId, priority] of starPriorities) {
-            console.log("Priority: " + context.starsById.get(starId)!.name + " => " + priority);
 
             const neighbors = context.reachablePlayerStars.get(starId)!;
             for (const neighbor of neighbors) {
@@ -867,11 +864,6 @@ export default class AIService {
             }
 
             borderStarPriorities.set(borderStarId, score);
-        }
-
-        console.log("Border star priorities:");
-        for (const [id, score] of borderStarPriorities) {
-            console.log("Priority: " + context.starsById.get(id)!.name + " => " + score);
         }
 
         const visited = new Set();
