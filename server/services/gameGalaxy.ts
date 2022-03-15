@@ -138,13 +138,13 @@ export default class GameGalaxyService {
         }
 
         // Check if the user is playing in this game.
-        let player = this._getUserPlayer(game, userId);
+        let userPlayer = this._getUserPlayer(game, userId);
 
         // Remove who created the game.
         delete game.settings.general.createdByUserId;
         delete game.settings.general.password; // Don't really need to explain why this is removed.
 
-        await this._maskGalaxy(game, player, isHistorical, tick);
+        await this._maskGalaxy(game, userPlayer, isHistorical, tick);
 
         // Append the player stats to each player.
         this._setPlayerStats(game);
@@ -159,7 +159,7 @@ export default class GameGalaxyService {
         // if the user isn't playing this game, then only return
         // basic data about the stars, exclude any important info like ships.
         // If the game has finished then everyone should be able to view the full game.
-        if (!player && !this.gameStateService.isFinished(game)) {
+        if (!userPlayer && !this.gameStateService.isFinished(game)) {
             this._setStarInfoBasic(game);
 
             // Also remove all carriers from players.
@@ -170,9 +170,9 @@ export default class GameGalaxyService {
         } else {
             // Populate the rest of the details about stars,
             // carriers and players providing that they are in scanning range.
-            this._setCarrierInfoDetailed(game, player!);
-            this._setStarInfoDetailed(game, player!);
-            await this._setPlayerInfoBasic(game, player!);
+            this._setCarrierInfoDetailed(game, userPlayer!);
+            this._setStarInfoDetailed(game, userPlayer!);
+            await this._setPlayerInfoBasic(game, userPlayer!);
         }
 
         // For extra dark mode games, overwrite the player stats as by this stage
@@ -416,17 +416,17 @@ export default class GameGalaxyService {
             }) as any;
     }
 
-    _setCarrierInfoDetailed(doc: Game, player: Player) {
+    _setCarrierInfoDetailed(doc: Game, userPlayer: Player) {
         const isFinished = this.gameStateService.isFinished(doc);
         const isOrbital = this.gameTypeService.isOrbitalMode(doc);
 
         // If the game hasn't finished we need to filter and sanitize carriers.
         if (!this.gameStateService.isFinished(doc)) {
-            doc.galaxy.carriers = this.carrierService.filterCarriersByScanningRange(doc, player);
+            doc.galaxy.carriers = this.carrierService.filterCarriersByScanningRange(doc, userPlayer);
 
             // Remove all waypoints (except those in transit) for all carriers that do not belong
             // to the player.
-            doc.galaxy.carriers = this.carrierService.sanitizeCarriersByPlayer(doc, player) as any;
+            doc.galaxy.carriers = this.carrierService.sanitizeCarriersByPlayer(doc, userPlayer) as any;
         }
 
         // Populate the number of ticks it will take for all waypoints.
@@ -438,7 +438,7 @@ export default class GameGalaxyService {
                     c.specialist = this.specialistService.getByIdCarrier(c.specialistId)
                 }
 
-                let canSeeCarrierShips = isFinished || (player && this.carrierService.canPlayerSeeCarrierShips(doc, player, c));
+                let canSeeCarrierShips = isFinished || (userPlayer && this.carrierService.canPlayerSeeCarrierShips(doc, userPlayer, c));
 
                 if (!canSeeCarrierShips) {
                     c.ships = null;
@@ -450,7 +450,7 @@ export default class GameGalaxyService {
             });
     }
 
-    async _setPlayerInfoBasic(doc: Game, player: Player | null) {
+    async _setPlayerInfoBasic(doc: Game, userPlayer: Player | null) {
         const avatars = this.avatarService.listAllAvatars();
 
         const isFinished = this.gameStateService.isFinished(doc);
@@ -469,8 +469,8 @@ export default class GameGalaxyService {
         // Calculate which players are in scanning range.
         let playersInRange: Player[] = [];
 
-        if (player) {
-            playersInRange = this.playerService.getPlayersWithinScanningRangeOfPlayer(doc, doc.galaxy.players, player);
+        if (userPlayer) {
+            playersInRange = this.playerService.getPlayersWithinScanningRangeOfPlayer(doc, doc.galaxy.players, userPlayer);
         }
 
         let displayOnlineStatus = doc.settings.general.playerOnlineStatus === 'visible';
@@ -480,7 +480,7 @@ export default class GameGalaxyService {
         // Sanitize other players by only returning basic info about them.
         // We don't want players snooping on others via api responses containing sensitive info.
         doc.galaxy.players = doc.galaxy.players.map(p => {
-            let isCurrentUserPlayer = player && p._id.toString() === player._id.toString();
+            let isCurrentUserPlayer = userPlayer && p._id.toString() === userPlayer._id.toString();
 
             // Append the guild tag to the player alias.
             let playerGuild: Guild | null = null;
@@ -504,8 +504,8 @@ export default class GameGalaxyService {
             // If the user is in the game and it is the current
             // player we are looking at then return everything.
             if (isCurrentUserPlayer) {
-                player!.currentResearchTicksEta = this.researchService.calculateCurrentResearchETAInTicks(doc, player!);
-                player!.nextResearchTicksEta = this.researchService.calculateNextResearchETAInTicks(doc, player!);
+                userPlayer!.currentResearchTicksEta = this.researchService.calculateCurrentResearchETAInTicks(doc, userPlayer!);
+                userPlayer!.nextResearchTicksEta = this.researchService.calculateNextResearchETAInTicks(doc, userPlayer!);
 
                 delete p.notes; // Don't need to send this back.
                 delete p.lastSeenIP; // Super sensitive data.
@@ -525,8 +525,8 @@ export default class GameGalaxyService {
 
             let reputation: PlayerReputation | null = null;
 
-            if (player) {
-                reputation = this.reputationService.getReputation(p, player)?.reputation;
+            if (userPlayer) {
+                reputation = this.reputationService.getReputation(p, userPlayer)?.reputation;
             }
 
             let research: PlayerResearch | null = {
@@ -567,8 +567,8 @@ export default class GameGalaxyService {
               alliancesMadeThisCycle: 0 
             };
 
-            if (player) {
-                diplomacy = this.diplomacyService.getFilteredDiplomacy(p, player);
+            if (userPlayer) {
+                diplomacy = this.diplomacyService.getFilteredDiplomacy(p, userPlayer);
             }
 
             // Return a subset of the user, key info only.
@@ -615,7 +615,7 @@ export default class GameGalaxyService {
         doc.galaxy.carriers = [];
     }
 
-    async _maskGalaxy(game: Game, player: Player | null, isHistorical: boolean, tick: number | null) {
+    async _maskGalaxy(game: Game, userPlayer: Player | null, isHistorical: boolean, tick: number | null) {
         /*
             Masking of galaxy data occurs here, it prevent players from seeing what other
             players are doing until the tick has finished.
@@ -683,7 +683,7 @@ export default class GameGalaxyService {
         for (let i = 0; i < game.galaxy.stars.length; i++) {
             let gameStar = game.galaxy.stars[i];
 
-            if (!isHistorical && player && gameStar.ownedByPlayerId && gameStar.ownedByPlayerId.toString() === player._id.toString()) {
+            if (!isHistorical && userPlayer && gameStar.ownedByPlayerId && gameStar.ownedByPlayerId.toString() === userPlayer._id.toString()) {
                 continue;
             }
 
@@ -692,7 +692,7 @@ export default class GameGalaxyService {
             if (historyStar) {
                 // If the player has abandoned the star in the current tick, then display that representation of the star
                 // instead of the historical version.
-                if (player && historyStar.ownedByPlayerId && gameStar.ownedByPlayerId == null && historyStar.ownedByPlayerId.toString() === player._id.toString()) {
+                if (userPlayer && historyStar.ownedByPlayerId && gameStar.ownedByPlayerId == null && historyStar.ownedByPlayerId.toString() === userPlayer._id.toString()) {
                     continue;
                 }
 
@@ -715,7 +715,7 @@ export default class GameGalaxyService {
         for (let i = 0; i < game.galaxy.carriers.length; i++) {
             let gameCarrier = game.galaxy.carriers[i];
 
-            if (!isHistorical && player && gameCarrier.ownedByPlayerId!.toString() === player._id.toString()) {
+            if (!isHistorical && userPlayer && gameCarrier.ownedByPlayerId!.toString() === userPlayer._id.toString()) {
                 continue;
             }
 

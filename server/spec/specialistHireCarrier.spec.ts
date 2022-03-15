@@ -26,6 +26,9 @@ describe('specialistHire - Carrier', () => {
             gameTypeService: {
                 isTutorialGame: () => { return false; }
             },
+            specialistBanService: {
+                isCarrierSpecialistBanned: () => { return false; }
+            },
             game: { 
                 settings: {
                     specialGalaxy: {
@@ -54,7 +57,7 @@ describe('specialistHire - Carrier', () => {
         obj.player._id = obj.playerId;
 
         // @ts-ignore
-        obj.service = new SpecialistHireService(obj.gameRepo, obj.specialistService, obj.achievementService, obj.waypointService, obj.playerService, obj.starService, obj.gameTypeService);
+        obj.service = new SpecialistHireService(obj.gameRepo, obj.specialistService, obj.achievementService, obj.waypointService, obj.playerService, obj.starService, obj.gameTypeService, obj.specialistBanService);
 
         return obj;
     }
@@ -130,7 +133,7 @@ describe('specialistHire - Carrier', () => {
         let testObj = setup();
         let hasError = false;
 
-        testObj.game.settings.specialGalaxy.specialistBans.carrier.push(testObj.specialistId);
+        testObj.specialistBanService.isCarrierSpecialistBanned = () => true;
 
         try {
             await testObj.service.hireCarrierSpecialist(testObj.game, testObj.player, testObj.carrierId, testObj.specialistId);

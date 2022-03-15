@@ -43,12 +43,12 @@ import UserService from '../services/user';
 import HistoryService from '../services/history';
 import LedgerService from '../services/ledger';
 import SpecialistService from '../services/specialist';
+import SpecialistBanService from '../services/specialistBan';
 import SpecialistHireService from '../services/specialistHire';
 import AchievementService from '../services/achievement';
 import ConversationService from '../services/conversation';
 import ReputationService from '../services/reputation';
 import AIService from '../services/ai';
-import AITradeService from '../services/aiTrade';
 import GuildService from '../services/guild';
 import GuildUserService from '../services/guildUser';
 import OrbitalMechanicsService from '../services/orbitalMechanics';
@@ -130,18 +130,19 @@ export default (config, io): DependencyContainer => {
     const customMapService = new CustomMapService();
     const mapService = new MapService(randomService, starService, starDistanceService, nameService, circularMapService, spiralMapService, doughnutMapService, circularBalancedMapService, irregularMapService, gameTypeService, customMapService);
     const playerService = new PlayerService(gameRepository, randomService, mapService, starService, carrierService, diplomacyService, starDistanceService, technologyService, specialistService, gameTypeService);
-    const reputationService = new ReputationService(gameRepository, playerService);
     const badgeService = new BadgeService(userRepository, userService, playerService);
     const reportService = new ReportService(ReportModel, reportRepository, playerService);
     const ledgerService = new LedgerService(gameRepository, playerService);
-    const tradeService = new TradeService(gameRepository, eventRepository, userService, playerService, diplomacyService, ledgerService, achievementService, reputationService, gameTypeService);
+    const reputationService = new ReputationService(gameRepository, playerService, diplomacyService);
+    const tradeService = new TradeService(gameRepository, eventRepository, userService, playerService, diplomacyService, ledgerService, achievementService, reputationService, gameTypeService, randomService);
     const conversationService = new ConversationService(gameRepository, tradeService);
     const gameService = new GameService(gameRepository, userService, starService, carrierService, playerService, passwordService, achievementService, avatarService, gameTypeService, gameStateService, conversationService);
     const leaderboardService = new LeaderboardService(userRepository, userService, playerService, guildUserService, ratingService, gameService, gameTypeService, gameStateService, badgeService);
     const researchService = new ResearchService(gameRepository, technologyService, randomService, playerService, starService, userService, gameTypeService);
     const combatService = new CombatService(technologyService, specialistService, playerService, starService, reputationService, diplomacyService, gameTypeService);
     const waypointService = new WaypointService(gameRepository, carrierService, starService, distanceService, starDistanceService, technologyService, gameService, playerService);
-    const specialistHireService = new SpecialistHireService(gameRepository, specialistService, achievementService, waypointService, playerService, starService, gameTypeService);
+    const specialistBanService = new SpecialistBanService(specialistService);
+    const specialistHireService = new SpecialistHireService(gameRepository, specialistService, achievementService, waypointService, playerService, starService, gameTypeService, specialistBanService);
     const starUpgradeService = new StarUpgradeService(gameRepository, starService, carrierService, achievementService, researchService, technologyService, playerService, gameTypeService);
     const aiService = new AIService(starUpgradeService);
     const historyService = new HistoryService(historyRepository, playerService, gameService);
@@ -151,7 +152,6 @@ export default (config, io): DependencyContainer => {
     const gameTickService = new GameTickService(distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService, specialistService, starUpgradeService, reputationService, aiService, battleRoyaleService, orbitalMechanicsService, diplomacyService, gameTypeService, gameStateService);
     const emailService = new EmailService(config, gameService, userService, leaderboardService, playerService, gameTypeService, gameStateService, gameTickService);
     const shipTransferService = new ShipTransferService(gameRepository, carrierService, starService);
-    const aiTradeService = new AITradeService(reputationService, randomService, tradeService, gameService, diplomacyService);
     const donateService = new DonateService(cacheService);
 
     const eventService = new EventService(EventModel, eventRepository, broadcastService, gameService, gameTickService, researchService, starService, starUpgradeService, tradeService,
@@ -159,8 +159,10 @@ export default (config, io): DependencyContainer => {
 
     const gameListService = new GameListService(gameRepository, gameService, conversationService, eventService, gameTypeService);
     const gameCreateValidationService = new GameCreateValidationService(playerService, starService, carrierService, specialistService, gameTypeService);
-    const gameCreateService = new GameCreateService(GameModel, gameService, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService, gameCreateValidationService);
+    const gameCreateService = new GameCreateService(GameModel, gameService, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService, gameCreateValidationService, specialistBanService);
 
+    console.log('Dependency Container Initialized');
+    
     return {
         adminService,
         passwordService,
@@ -198,12 +200,12 @@ export default (config, io): DependencyContainer => {
         historyService,
         ledgerService,
         specialistService,
+        specialistBanService,
         specialistHireService,
         achievementService,
         conversationService,
         reputationService,
         aiService,
-        aiTradeService,
         battleRoyaleService,
         orbitalMechanicsService,
         cacheService,

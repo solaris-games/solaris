@@ -1,7 +1,6 @@
 import AchievementService from "../services/achievement";
 import AdminService from "../services/admin";
 import AIService from "../services/ai";
-import AITradeService from "../services/aiTrade";
 import AuthService from "../services/auth";
 import AvatarService from "../services/avatar";
 import BadgeService from "../services/badge";
@@ -43,6 +42,7 @@ import ReputationService from "../services/reputation";
 import ResearchService from "../services/research";
 import ShipTransferService from "../services/shipTransfer";
 import SpecialistService from "../services/specialist";
+import SpecialistBanService from "../services/specialistBan";
 import SpecialistHireService from "../services/specialistHire";
 import StarService from "../services/star";
 import StarDistanceService from "../services/starDistance";
@@ -89,12 +89,12 @@ export interface DependencyContainer {
     historyService: HistoryService,
     ledgerService: LedgerService,
     specialistService: SpecialistService,
+    specialistBanService: SpecialistBanService,
     specialistHireService: SpecialistHireService,
     achievementService: AchievementService,
     conversationService: ConversationService,
     reputationService: ReputationService,
     aiService: AIService,
-    aiTradeService: AITradeService,
     battleRoyaleService: BattleRoyaleService,
     orbitalMechanicsService: OrbitalMechanicsService,
     cacheService: CacheService,

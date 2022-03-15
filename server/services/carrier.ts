@@ -500,7 +500,7 @@ export default class CarrierService extends EventEmitter {
         if (!carrier.isGift && this.starService.isDeadStar(destinationStar) && this.specialistService.getReigniteDeadStar(carrier)) {
             let reigniteNaturalResources = this.specialistService.getReigniteDeadStarNaturalResources(carrier);
 
-            this.starService.reigniteDeadStar(destinationStar, reigniteNaturalResources);
+            this.starService.reigniteDeadStar(game, destinationStar, reigniteNaturalResources);
 
             carrier.specialistId = null;
         }
