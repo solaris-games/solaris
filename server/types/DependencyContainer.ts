@@ -1,7 +1,6 @@
 import AchievementService from "../services/achievement";
 import AdminService from "../services/admin";
 import AIService from "../services/ai";
-import AITradeService from "../services/aiTrade";
 import AuthService from "../services/auth";
 import AvatarService from "../services/avatar";
 import BadgeService from "../services/badge";
@@ -96,7 +95,6 @@ export interface DependencyContainer {
     conversationService: ConversationService,
     reputationService: ReputationService,
     aiService: AIService,
-    aiTradeService: AITradeService,
     battleRoyaleService: BattleRoyaleService,
     orbitalMechanicsService: OrbitalMechanicsService,
     cacheService: CacheService,
