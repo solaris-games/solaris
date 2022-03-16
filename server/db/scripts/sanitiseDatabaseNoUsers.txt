@@ -1,0 +1,41 @@
+use solaris;
+
+// Remove all users
+db.users.deleteMany({});
+
+// Remove all games in progress or have not yet started.
+db.games.deleteMany({
+    'state.endDate': { $eq: null }
+});
+
+// Obfuscate aliases from game histories
+db.gamehistories.updateMany({}, {
+    $set: {
+        'players.$[].userId': null,
+        'players.$[].alias': 'Unknown'
+    }
+});
+
+// Delete all game events (they could contain the player alias)
+// Note: May need to work out a solution for this.
+db.gameevents.deleteMany({});
+
+// Remove all sensitive data from games and players.
+db.games.updateMany({}, {
+    $set: {
+        'settings.general.createdByUserId': null,
+        conversations: [],
+        'galaxy.players.$[].userId': null,
+        'galaxy.players.$[].alias': 'Unknown',
+        'galaxy.players.$[].notes': null,
+        'galaxy.players.$[].lastSeen': null,
+        'galaxy.players.$[].lastSeenIP': null
+    }
+});
+
+// Remove all other unnecessary data.
+db.agendaJobs.deleteMany({});
+db.guilds.deleteMany({});
+db.payments.deleteMany({});
+db.reports.deleteMany({});
+db.sessions.deleteMany({});
