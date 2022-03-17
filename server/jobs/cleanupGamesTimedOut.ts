@@ -4,7 +4,7 @@ export default (container: DependencyContainer) => {
 
     return {
 
-        async handler(job, done) {
+        async handler(job: any, done: any) {
             let games = await container.gameListService.listGamesTimedOutWaitingForPlayers();
 
             for (let i = 0; i < games.length; i++) {

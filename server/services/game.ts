@@ -604,7 +604,7 @@ export default class GameService extends EventEmitter {
         // Find all games that are pending start and quit.
         // Find all games that are active and admit defeat.
         for (let game of allGames) {
-            let player = this.playerService.getByUserId(game, userId);
+            let player = this.playerService.getByUserId(game, userId)!;
 
             if (this.gameStateService.isInProgress(game)) {
                 await this.concedeDefeat(game, player);

@@ -2,11 +2,11 @@ import { Router } from 'express';
 import { DependencyContainer } from '../../types/DependencyContainer';
 import Middleware from '../middleware';
 
-export default (router: Router, io, container: DependencyContainer) => {
+export default (router: Router, io: any, container: DependencyContainer) => {
 
     const middleware = Middleware(container);
 
-    router.get('/api/game/:gameId/events', middleware.authenticate, middleware.loadGameLean, middleware.loadPlayer, async (req, res, next) => {
+    router.get('/api/game/:gameId/events', middleware.authenticate, middleware.loadGameLean, middleware.loadPlayer, async (req: any, res: any, next: any) => {
         let startTick = +req.query.startTick || 0;
         
         try {
@@ -22,7 +22,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/game/:gameId/events/markAsRead', middleware.authenticate,middleware.loadGameLean, middleware.validateGameLocked, middleware.loadPlayer, async (req, res, next) => {
+    router.patch('/api/game/:gameId/events/markAsRead', middleware.authenticate,middleware.loadGameLean, middleware.validateGameLocked, middleware.loadPlayer, async (req: any, res: any, next: any) => {
         if (req.session.isImpersonating) {
             return res.sendStatus(200);
         }
@@ -38,7 +38,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/game/:gameId/events/:eventId/markAsRead', middleware.authenticate,middleware.loadGameLean, middleware.validateGameLocked, middleware.loadPlayer, async (req, res, next) => {
+    router.patch('/api/game/:gameId/events/:eventId/markAsRead', middleware.authenticate,middleware.loadGameLean, middleware.validateGameLocked, middleware.loadPlayer, async (req: any, res: any, next: any) => {
         if (req.session.isImpersonating) {
             return res.sendStatus(200);
         }
@@ -55,7 +55,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/events/trade', middleware.authenticate, middleware.loadGameLean, middleware.loadPlayer, async (req, res, next) => {
+    router.get('/api/game/:gameId/events/trade', middleware.authenticate, middleware.loadGameLean, middleware.loadPlayer, async (req: any, res: any, next: any) => {
         let startTick = +req.query.startTick || 0;
         
         try {
@@ -71,7 +71,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/events/unread', middleware.authenticate, middleware.loadGameLean, middleware.loadPlayer, async (req, res, next) => {
+    router.get('/api/game/:gameId/events/unread', middleware.authenticate, middleware.loadGameLean, middleware.loadPlayer, async (req: any, res: any, next: any) => {
         try {
             let result = await container.eventService.getUnreadCount(
                 req.game,

@@ -3,11 +3,11 @@ import ValidationError from '../errors/validation';
 import { DependencyContainer } from '../types/DependencyContainer';
 import Middleware from './middleware';
 
-export default (router: Router, io, container: DependencyContainer) => {
+export default (router: Router, io: any, container: DependencyContainer) => {
     
     const middleware = Middleware(container);
 
-    router.get('/api/user/leaderboard', async (req, res, next) => {
+    router.get('/api/user/leaderboard', async (req: any, res: any, next: any) => {
         try {
             const limit = +req.query.limit || null;
             const result = await container.leaderboardService.getLeaderboard(limit, req.query.sortingKey);
@@ -18,7 +18,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.post('/api/user/', async (req, res, next) => {
+    router.post('/api/user/', async (req: any, res: any, next: any) => {
         let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
         let recaptchaEnabled = container.recaptchaService.isEnabled();
 
@@ -84,7 +84,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/user/settings', async (req, res, next) => {
+    router.get('/api/user/settings', async (req: any, res: any, next: any) => {
         try {
             let settings = await container.userService.getGameSettings(req.session.userId);
 
@@ -94,7 +94,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/user/settings', middleware.authenticate, async (req, res, next) => {
+    router.put('/api/user/settings', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             await container.userService.saveGameSettings(req.session.userId, req.body);
 
@@ -104,7 +104,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/user/credits', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/user/credits', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             let credits = await container.userService.getUserCredits(req.session.userId);
 
@@ -116,7 +116,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/user/', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/user/', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             let user = await container.userService.getMe(req.session.userId);
 
@@ -126,7 +126,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/user/avatars', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/user/avatars', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             let avatars = await container.avatarService.listUserAvatars(req.session.userId);
 
@@ -136,7 +136,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.post('/api/user/avatars/:avatarId/purchase', middleware.authenticate, async (req, res, next) => {
+    router.post('/api/user/avatars/:avatarId/purchase', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             await container.avatarService.purchaseAvatar(req.session.userId, parseInt(req.params.avatarId));
 
@@ -146,7 +146,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/user/:id', async (req, res, next) => {
+    router.get('/api/user/:id', async (req: any, res: any, next: any) => {
         try {
             let user = await container.userService.getInfoByIdLean(req.params.id);
 
@@ -156,7 +156,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/user/achievements/:id', async (req, res, next) => {
+    router.get('/api/user/achievements/:id', async (req: any, res: any, next: any) => {
         try {
             let achievements = await container.achievementService.getAchievements(req.params.id);
 
@@ -166,7 +166,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/user/changeEmailPreference', middleware.authenticate, async (req, res, next) => {
+    router.put('/api/user/changeEmailPreference', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             await container.userService.updateEmailPreference(req.session.userId, req.body.enabled);
 
@@ -176,7 +176,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/user/changeUsername', middleware.authenticate, async (req, res, next) => {
+    router.put('/api/user/changeUsername', middleware.authenticate, async (req: any, res: any, next: any) => {
         let errors: string[] = [];
 
         if (!req.body.username) {
@@ -196,7 +196,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/user/changeEmailAddress', middleware.authenticate, async (req, res, next) => {
+    router.put('/api/user/changeEmailAddress', middleware.authenticate, async (req: any, res: any, next: any) => {
         let errors: string[] = [];
 
         if (!req.body.email) {
@@ -216,7 +216,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/user/changePassword', middleware.authenticate, async (req, res, next) => {
+    router.put('/api/user/changePassword', middleware.authenticate, async (req: any, res: any, next: any) => {
         let errors: string[] = [];
 
         if (!req.body.currentPassword) {
@@ -243,7 +243,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.post('/api/user/requestResetPassword', async (req, res, next) => {
+    router.post('/api/user/requestResetPassword', async (req: any, res: any, next: any) => {
         try {
             let token = await container.userService.requestResetPassword(req.body.email);
 
@@ -261,7 +261,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.post('/api/user/resetPassword', async (req, res, next) => {
+    router.post('/api/user/resetPassword', async (req: any, res: any, next: any) => {
         if (req.body.token == null || !req.body.token.length) {
             throw new ValidationError(`The token is required`);
         }
@@ -275,7 +275,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.post('/api/user/requestUsername', async (req, res, next) => {
+    router.post('/api/user/requestUsername', async (req: any, res: any, next: any) => {
         try {
             let username = await container.userService.getUsernameByEmail(req.body.email);
 
@@ -293,7 +293,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.delete('/api/user/closeaccount', middleware.authenticate, async (req, res, next) => {
+    router.delete('/api/user/closeaccount', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             await container.gameService.quitAllActiveGames(req.session.userId);
             await container.guildService.tryLeave(req.session.userId);
@@ -301,7 +301,7 @@ export default (router: Router, io, container: DependencyContainer) => {
             await container.userService.closeAccount(req.session.userId);
 
             // Delete the session object.
-            req.session.destroy((err) => {
+            req.session.destroy((err: any) => {
                 if (err) {
                     return next(err);
                 }
@@ -313,7 +313,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/user/donations/recent', async (req, res, next) => {
+    router.get('/api/user/donations/recent', async (req: any, res: any, next: any) => {
         try {
             let result = await container.donateService.listRecentDonations();
 

@@ -1,6 +1,6 @@
 import { DBObjectId } from "./DBObjectId";
 import { Location } from "./Location";
-import { ResearchProgress, ResearchType } from "./Player";
+import { ResearchProgress, ResearchType, ResearchTypeNotRandom } from "./Player";
 import { IgnoreBulkUpgrade, Infrastructure, NaturalResources } from "./Star";
 
 export interface GameHistoryPlayer {
@@ -22,7 +22,7 @@ export interface GameHistoryPlayer {
     },
     alias: string;
     avatar: string | null;
-    researchingNow: ResearchType;
+    researchingNow: ResearchTypeNotRandom;
     researchingNext: ResearchType;
     credits: number;
     creditsSpecialists: number;

@@ -109,7 +109,7 @@ export default class BotHelperService {
 
         // Creating a collector that checks if the right person (the one that sent the command) responds with any of the right emojis
         const collector = botMessage.createReactionCollector(
-            (reaction, user) => (reaction.emoji.name === '📱') && (user.id === userMessage.author.id), { time: 60000 }
+            (reaction: any, user: any) => (reaction.emoji.name === '📱') && (user.id === userMessage.author.id), { time: 60000 }
         );
 
         // Activating the collector
@@ -134,7 +134,7 @@ export default class BotHelperService {
         });
     }
 
-    async multiPage(botMessage, userMessage, pageCount, looping, responseFunction, responseData, checkPC = true /*A variable as long as not all functions have a mobile version*/) {
+    async multiPage(botMessage: any, userMessage: any, pageCount: number, looping: boolean, responseFunction: any, responseData: any, checkPC: boolean = true /*A variable as long as not all functions have a mobile version*/) {
         // This function makes a response that has multiple pages, where the user can move between pages by adding the proper response
         let pageNumber = responseData.page || 0;
         let isPC = true;
@@ -148,11 +148,11 @@ export default class BotHelperService {
 
         // Creating a collector that checks if the right person (the one that sent the command) responds with any of the right emojis
         const collector = botMessage.createReactionCollector(
-            (reaction, user) => emojiArray.includes(reaction.emoji.name) && user.id === userMessage.author.id, { time: 60000 }
+            (reaction: any, user: any) => emojiArray.includes(reaction.emoji.name) && user.id === userMessage.author.id, { time: 60000 }
         );
 
         // Activating the collector
-        collector.on('collect', (reaction) => {
+        collector.on('collect', (reaction: any) => {
             // First thing to do when the right emoji is added is to remove all emojis that have been used
             botMessage.reactions.removeAll().then(async () => {
                 // Checking what has to happen with the current page/isPC variable now that the emoji has been sent
@@ -205,7 +205,7 @@ export default class BotHelperService {
         })
     }
 
-    async reactPagesMobile(botMessage, looping, pageNumber, pageCount, mobileCheck) {
+    async reactPagesMobile(botMessage: any, looping: boolean, pageNumber: number, pageCount: number, mobileCheck: boolean) {
         // A function meant to react with the right emojis when the multiPage function is called
         try {
             if (!looping && pageNumber > 1) await botMessage.react('⏪');

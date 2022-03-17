@@ -7,9 +7,9 @@ import HistoryModel from '../models/History';
 import UserModel from '../models/User';
 import PaymentModel from '../models/Payment';
 
-export default async (config, options) => {
+export default async (config: any, options: any) => {
 
-    async function unlockAgendaJobs(db) {
+    async function unlockAgendaJobs(db: any) {
         try {
             const collection = await db.connection.db.collection('agendaJobs');
     

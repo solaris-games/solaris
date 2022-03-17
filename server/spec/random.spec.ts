@@ -2,7 +2,7 @@ import RandomService from '../services/random';
 
 describe('random', () => {
 
-    let randomService;
+    let randomService: any;
 
     beforeEach(() => {
         randomService = new RandomService();

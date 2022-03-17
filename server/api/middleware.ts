@@ -4,7 +4,7 @@ import { DependencyContainer } from '../types/DependencyContainer';
 export default (container: DependencyContainer) => {
 
     return {
-        async authenticate(req, res, next) {
+        async authenticate(req: any, res: any, next: any) {
             if (!req.session.userId) {
                 return res.sendStatus(401);
             }
@@ -22,7 +22,7 @@ export default (container: DependencyContainer) => {
             next();
         },
 
-        async authenticateAdmin(req, res, next) {
+        async authenticateAdmin(req: any, res: any, next: any) {
             if (!req.session.userId) {
                 return res.sendStatus(401);
             }
@@ -36,7 +36,7 @@ export default (container: DependencyContainer) => {
             next();
         },
 
-        async authenticateSubAdmin(req, res, next) {
+        async authenticateSubAdmin(req: any, res: any, next: any) {
             if (!req.session.userId) {
                 return res.sendStatus(401);
             }
@@ -50,7 +50,7 @@ export default (container: DependencyContainer) => {
             next();
         },
 
-        async authenticateCommunityManager(req, res, next) {
+        async authenticateCommunityManager(req: any, res: any, next: any) {
             if (!req.session.userId) {
                 return res.sendStatus(401);
             }
@@ -64,7 +64,7 @@ export default (container: DependencyContainer) => {
             next();
         },
 
-        handleError(err, req, res, next) {
+        handleError(err: any, req: any, res: any, next: any) {
             // If there is an error in the pipleline
             // then test to see what type of error it is. If its a validation
             // error then return it with its status code.
@@ -88,7 +88,7 @@ export default (container: DependencyContainer) => {
             });
         },
 
-        async loadGame(req, res, next) {
+        async loadGame(req: any, res: any, next: any) {
             req.game = await container.gameService.getByIdGalaxy(req.params.gameId);
 
             if (!req.game) {
@@ -98,7 +98,7 @@ export default (container: DependencyContainer) => {
             return next();
         },
 
-        async loadGameLean(req, res, next) {
+        async loadGameLean(req: any, res: any, next: any) {
             req.game = await container.gameService.getByIdGalaxyLean(req.params.gameId);
 
             if (!req.game) {
@@ -108,7 +108,7 @@ export default (container: DependencyContainer) => {
             return next();
         },
 
-        async loadGameAll(req, res, next) {
+        async loadGameAll(req: any, res: any, next: any) {
             req.game = await container.gameService.getByIdAll(req.params.gameId);
 
             if (!req.game) {
@@ -118,7 +118,7 @@ export default (container: DependencyContainer) => {
             return next();
         },
 
-        async loadGameInfo(req, res, next) {
+        async loadGameInfo(req: any, res: any, next: any) {
             req.game = await container.gameService.getByIdInfo(req.params.gameId, req.session.userId);
 
             if (!req.game) {
@@ -130,7 +130,7 @@ export default (container: DependencyContainer) => {
             return next();
         },
 
-        async loadGameState(req, res, next) {
+        async loadGameState(req: any, res: any, next: any) {
             req.game = await container.gameService.getByIdState(req.params.gameId, req.session.userId);
 
             if (!req.game) {
@@ -140,7 +140,7 @@ export default (container: DependencyContainer) => {
             return next();
         },
 
-        async loadGameMessages(req, res, next) {
+        async loadGameMessages(req: any, res: any, next: any) {
             req.game = await container.gameService.getByIdMessages(req.params.gameId);
 
             if (!req.game) {
@@ -150,7 +150,7 @@ export default (container: DependencyContainer) => {
             return next();
         },
 
-        async loadGameMessagesLean(req, res, next) {
+        async loadGameMessagesLean(req: any, res: any, next: any) {
             req.game = await container.gameService.getByIdMessagesLean(req.params.gameId);
 
             if (!req.game) {
@@ -160,7 +160,7 @@ export default (container: DependencyContainer) => {
             return next();
         },
 
-        async loadGameConversations(req, res, next) {
+        async loadGameConversations(req: any, res: any, next: any) {
             req.game = await container.gameService.getByIdConversations(req.params.gameId);
 
             if (!req.game) {
@@ -170,7 +170,7 @@ export default (container: DependencyContainer) => {
             return next();
         },
 
-        async loadGameConversationsLean(req, res, next) {
+        async loadGameConversationsLean(req: any, res: any, next: any) {
             req.game = await container.gameService.getByIdConversationsLean(req.params.gameId);
 
             if (!req.game) {
@@ -180,7 +180,7 @@ export default (container: DependencyContainer) => {
             return next();
         },
 
-        async loadGameDiplomacyLean(req, res, next) {
+        async loadGameDiplomacyLean(req: any, res: any, next: any) {
             req.game = await container.gameService.getByIdDiplomacyLean(req.params.gameId);
 
             if (!req.game) {
@@ -190,7 +190,7 @@ export default (container: DependencyContainer) => {
             return next();
         },
 
-        async loadGamePlayers(req, res, next) {
+        async loadGamePlayers(req: any, res: any, next: any) {
             req.game = await container.gameService.getByIdLean(req.params.gameId, {
                 'galaxy.players': 1,
                 'settings': 1
@@ -203,7 +203,7 @@ export default (container: DependencyContainer) => {
             return next();
         },
 
-        async loadGamePlayersState(req, res, next) {
+        async loadGamePlayersState(req: any, res: any, next: any) {
             req.game = await container.gameService.getByIdLean(req.params.gameId, {
                 'galaxy.players': 1,
                 'state': 1
@@ -216,7 +216,7 @@ export default (container: DependencyContainer) => {
             return next();
         },
 
-        async loadGamePlayersSettingsState(req, res, next) {
+        async loadGamePlayersSettingsState(req: any, res: any, next: any) {
             req.game = await container.gameService.getByIdLean(req.params.gameId, {
                 'settings': 1,
                 'galaxy.players': 1,
@@ -230,7 +230,7 @@ export default (container: DependencyContainer) => {
             return next();
         },
 
-        async loadPlayer(req, res, next) {
+        async loadPlayer(req: any, res: any, next: any) {
             let player = container.playerService.getByUserId(req.game, req.session.userId);
 
             if (!player) {
@@ -242,7 +242,7 @@ export default (container: DependencyContainer) => {
             return next();
         },
 
-        validateGameLocked(req, res, next) {
+        validateGameLocked(req: any, res: any, next: any) {
             if (container.gameStateService.isLocked(req.game)) {
                 throw new ValidationError('You cannot perform this action, the game is locked by the system. Please try again.');
             }
@@ -250,7 +250,7 @@ export default (container: DependencyContainer) => {
             return next();
         },
 
-        validateUndefeatedPlayer(req, res, next) {
+        validateUndefeatedPlayer(req: any, res: any, next: any) {
             if (req.player.defeated) {
                 throw new ValidationError('You cannot participate in this game, you have been defeated.');
             }
@@ -259,7 +259,7 @@ export default (container: DependencyContainer) => {
         },
 
         // TODO: Does this need a rework because games can be waiting to start?
-        validateGameInProgress(req, res, next) {
+        validateGameInProgress(req: any, res: any, next: any) {
             if (!container.gameStateService.isInProgress(req.game)) {
                 throw new ValidationError('You cannot perform this action, the game is not in progress.');
             }
@@ -268,7 +268,7 @@ export default (container: DependencyContainer) => {
         },
 
         // TODO: Does this need a rework because games can be waiting to start?
-        validateGameStarted(req, res, next) {
+        validateGameStarted(req: any, res: any, next: any) {
             if (!container.gameStateService.isStarted(req.game)) {
                 throw new ValidationError('You cannot perform this action, the game has not yet started.');
             }
@@ -276,7 +276,7 @@ export default (container: DependencyContainer) => {
             return next();
         },
 
-        validateGameNotFinished(req, res, next) {
+        validateGameNotFinished(req: any, res: any, next: any) {
             if (container.gameStateService.isFinished(req.game)) {
                 throw new ValidationError('You cannot perform this action, the game is over.');
             }

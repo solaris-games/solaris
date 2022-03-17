@@ -210,7 +210,7 @@ export default class WaypointService {
     }
 
     cullWaypointsByHyperspaceRange(game: Game, carrier: Carrier) {
-        let player = this.playerService.getById(game, carrier.ownedByPlayerId);
+        let player = this.playerService.getById(game, carrier.ownedByPlayerId!)!;
 
         // Iterate through all waypoints the carrier has one by one and
         // if any of them are not valid then remove it and all subsequent waypoints.

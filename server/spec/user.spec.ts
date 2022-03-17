@@ -1,10 +1,10 @@
 import UserService from '../services/user';
 
 const fakeBcrypt = {
-    compare(password1, password2) {
+    compare(password1: any, password2: any) {
         return password1 == password2;
     },
-    hash(password) {
+    hash(password: any) {
         return password; // Doesn't need to do anything fancy.
     }
 };
@@ -16,19 +16,19 @@ const fakeUserModel = {
 };
 
 const fakeUserRepo = {
-    async findById(id) {
+    async findById(id: any) {
         return Promise.resolve(userList.find(x => x._id == id));
     },
-    async findOne(user) {
+    async findOne(user: any) {
         return Promise.resolve(userList.find(x => x.email == user.email));
     },
-    async updateOne(user) {
+    async updateOne(user: any) {
         return Promise.resolve(user);
     }
 };
 
 describe('user', () => {
-    let service;
+    let service: any;
 
     beforeAll(() => {
         // @ts-ignore

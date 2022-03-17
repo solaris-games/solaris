@@ -20,6 +20,7 @@ describe('specialistHire - Star', () => {
                 cullWaypointsByHyperspaceRangeDB: () => {}
             },
             playerService: {},
+            playerCreditsService: {},
             starService: {},
             gameTypeService: {
                 isTutorialGame: () => { return false; }
@@ -59,7 +60,7 @@ describe('specialistHire - Star', () => {
         return obj;
     }
 
-    function starWithSpecialist(testObj, specId) {
+    function starWithSpecialist(testObj: any, specId: any) {
         return {
             _id: testObj.starId,
             ownedByPlayerId: testObj.playerId,
@@ -67,7 +68,7 @@ describe('specialistHire - Star', () => {
         };
     }
 
-    function specialistBasic(testObj) {
+    function specialistBasic(testObj: any) {
         return {
             id: testObj.specialistId
         }
@@ -262,7 +263,7 @@ describe('specialistHire - Star', () => {
 
         testObj.game.galaxy.stars.push(star);
 
-        testObj.specialistService.getByIdStar = (id) => {
+        testObj.specialistService.getByIdStar = (id: any) => {
             return specialistBasic(testObj);
         };
 
@@ -276,7 +277,7 @@ describe('specialistHire - Star', () => {
             }
         };
 
-        testObj.playerService.addCredits = (game, player, amount) => {
+        testObj.playerCreditsService.addCredits = (game: any, player: any, amount: number) => {
             expect(amount).toBe(-100);
         };
 

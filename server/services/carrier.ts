@@ -600,7 +600,8 @@ export default class CarrierService extends EventEmitter {
             distancePerTick = distanceToDestination;
             nextLocation = destinationStar.location;
         } else {
-            distancePerTick = this.getCarrierDistancePerTick(game, carrier, warpSpeed, instantSpeed);
+            distancePerTick = this.getCarrierDistancePerTick(game, carrier, warpSpeed, instantSpeed)!;
+
             if (distancePerTick >= distanceToDestination) {
                 distancePerTick = distanceToDestination;
                 nextLocation = destinationStar.location;

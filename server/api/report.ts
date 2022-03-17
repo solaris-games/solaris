@@ -3,11 +3,11 @@ import ValidationError from '../errors/validation';
 import { DependencyContainer } from '../types/DependencyContainer';
 import Middleware from './middleware';
 
-export default (router: Router, io, container: DependencyContainer) => {
+export default (router: Router, io: any, container: DependencyContainer) => {
 
     const middleware = Middleware(container);
 
-    router.post('/api/game/:gameId/report', middleware.authenticate, middleware.loadGamePlayers, middleware.loadPlayer, async (req, res, next) => {
+    router.post('/api/game/:gameId/report', middleware.authenticate, middleware.loadGamePlayers, middleware.loadPlayer, async (req: any, res: any, next: any) => {
         let errors: string[] = [];
 
         if (!req.body.playerId) {

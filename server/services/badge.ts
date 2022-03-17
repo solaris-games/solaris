@@ -33,7 +33,7 @@ export default class BadgeService extends EventEmitter {
         return this.listBadges().filter(b => b.price);
     }
 
-    async listBadgesByUser(userId): Promise<UserBadge[]> {
+    async listBadgesByUser(userId: DBObjectId): Promise<UserBadge[]> {
         const badges = this.listBadges();
 
         const user = await this.userService.getById(userId, {
@@ -49,7 +49,7 @@ export default class BadgeService extends EventEmitter {
         for (let badge of badges) {
             userBadges.push({
                 ...badge,
-                awarded: user.achievements.badges[badge.key] || 0
+                awarded: (user.achievements.badges as any)[badge.key] || 0
             });
         }
 
@@ -97,7 +97,7 @@ export default class BadgeService extends EventEmitter {
         // TODO: This would be better in a bulk update.
         await this.userService.incrementCredits(purchasedByUserId, -1);
 
-        let updateQuery = {
+        let updateQuery: any = {
             $inc: {}
         };
 
@@ -111,7 +111,7 @@ export default class BadgeService extends EventEmitter {
     }
 
     async purchaseBadgeForPlayer(game: Game, purchasedByUserId: DBObjectId, purchasedForPlayerId: DBObjectId, badgeKey: string) {
-        let buyer = this.playerService.getByUserId(game, purchasedByUserId);
+        let buyer = this.playerService.getByUserId(game, purchasedByUserId)!;
         let recipient = this.playerService.getById(game, purchasedForPlayerId);
 
         if (!recipient) {
@@ -143,10 +143,10 @@ export default class BadgeService extends EventEmitter {
             throw new ValidationError(`Badge ${badgeKey} does not exist.`);
         }
 
-        user.achievements.badges[badgeKey]++;
+        (user.achievements.badges as any)[badgeKey]++;
     }
 
-    awardBadgeForUserVictor32(user): void {
+    awardBadgeForUserVictor32(user: User): void {
         this.awardBadgeForUser(user, 'victor32');
     }
 };

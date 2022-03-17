@@ -9,7 +9,7 @@ const ValidationError = require("../errors/validation");
 export default class SpecialistService {
 
     getById(id: number, type: SpecialistType) {
-        return specialists[type].find(x => x.id === id);
+        return specialists[type].find((x: any) => x.id === id);
     }
 
     getByIdCarrier(id: number | null) {
@@ -76,10 +76,10 @@ export default class SpecialistService {
 
             let currency = game.settings.specialGalaxy.specialistsCurrency;
     
-            return specs.sort((a, b) => a.cost[currency] - b.cost[currency]);
+            return specs.sort((a: any, b: any) => a.cost[currency] - b.cost[currency]);
         }
 
-        return specs.sort((a, b) => a.name - b.name);
+        return specs.sort((a: any, b: any) => a.name - b.name);
     }
 
     listCarrier(game: Game | null) {
@@ -96,7 +96,7 @@ export default class SpecialistService {
             creditsSpecialists: 0
         };
 
-        const expenseConfig = game.constants.star.specialistsExpenseMultipliers[game.settings.specialGalaxy.specialistCost];
+        const expenseConfig = (game.constants.star.specialistsExpenseMultipliers as any)[game.settings.specialGalaxy.specialistCost];
 
         result.credits = specialist.baseCostCredits * expenseConfig;
         result.creditsSpecialists = specialist.baseCostCreditsSpecialists * expenseConfig;

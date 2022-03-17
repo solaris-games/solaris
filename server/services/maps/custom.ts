@@ -127,7 +127,7 @@ export default class CustomMapService {
     }
 
      /*link owned stars to their home stars so at a latter stage players will claim the correct stars*/
-    _linkStars(homeStars, stars) {
+    _linkStars(homeStars: any[], stars: any[]) {
       let commonStars = stars.filter(star => !star.homeStar);
 
       for (let homeStar of homeStars) {

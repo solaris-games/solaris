@@ -3,11 +3,11 @@ import ValidationError from '../errors/validation';
 import { DependencyContainer } from '../types/DependencyContainer';
 import Middleware from './middleware';
 
-export default (router: Router, io, container: DependencyContainer) => {
+export default (router: Router, io: any, container: DependencyContainer) => {
 
     const middleware = Middleware(container);
 
-    router.get('/api/guild/list', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/guild/list', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             let result = await container.guildService.list();
                 
@@ -17,7 +17,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/guild', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/guild', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             let result = await container.guildService.detailMyGuild(req.session.userId, true);
                 
@@ -27,7 +27,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/guild/leaderboard', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/guild/leaderboard', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             let limit = +req.query.limit || null;
             let sortingKey = req.query.sortingKey || null;
@@ -39,7 +39,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/guild/invites', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/guild/invites', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             let result = await container.guildService.listInvitations(req.session.userId);
                 
@@ -49,7 +49,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/guild/applications', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/guild/applications', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             let result = await container.guildService.listApplications(req.session.userId);
                 
@@ -59,7 +59,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/guild/:guildId', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/guild/:guildId', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             const result = await container.guildService.detailWithUserInfo(req.params.guildId, false);
 
@@ -69,7 +69,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.post('/api/guild', middleware.authenticate, async (req, res, next) => {
+    router.post('/api/guild', middleware.authenticate, async (req: any, res: any, next: any) => {
         if (!req.body.name) {
             throw new ValidationError(`name is required.`);
         }
@@ -87,7 +87,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/guild', middleware.authenticate, async (req, res, next) => {
+    router.patch('/api/guild', middleware.authenticate, async (req: any, res: any, next: any) => {
         if (!req.body.name) {
             throw new ValidationError(`name is required.`);
         }
@@ -105,7 +105,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.delete('/api/guild/:guildId', middleware.authenticate, async (req, res, next) => {
+    router.delete('/api/guild/:guildId', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             await container.guildService.delete(req.session.userId, req.params.guildId);
                 
@@ -115,7 +115,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/guild/:guildId/invite', middleware.authenticate, async (req, res, next) => {
+    router.put('/api/guild/:guildId/invite', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             let result = await container.guildService.invite(req.body.username, req.params.guildId, req.session.userId);
                 
@@ -125,7 +125,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/guild/:guildId/uninvite/:userId', middleware.authenticate, async (req, res, next) => {
+    router.patch('/api/guild/:guildId/uninvite/:userId', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             await container.guildService.uninvite(req.params.userId, req.params.guildId, req.session.userId);
                 
@@ -135,7 +135,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/guild/:guildId/accept/:userId', middleware.authenticate, async (req, res, next) => {
+    router.patch('/api/guild/:guildId/accept/:userId', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             await container.guildService.accept(req.params.userId, req.params.guildId, req.session.userId);
                 
@@ -145,7 +145,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/guild/:guildId/accept', middleware.authenticate, async (req, res, next) => {
+    router.patch('/api/guild/:guildId/accept', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             await container.guildService.join(req.session.userId, req.params.guildId);
                 
@@ -155,7 +155,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/guild/:guildId/decline', middleware.authenticate, async (req, res, next) => {
+    router.patch('/api/guild/:guildId/decline', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             await container.guildService.decline(req.session.userId, req.params.guildId);
                 
@@ -165,7 +165,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/guild/:guildId/apply', middleware.authenticate, async (req, res, next) => {
+    router.put('/api/guild/:guildId/apply', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             await container.guildService.apply(req.session.userId, req.params.guildId);
                 
@@ -175,7 +175,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/guild/:guildId/withdraw', middleware.authenticate, async (req, res, next) => {
+    router.patch('/api/guild/:guildId/withdraw', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             await container.guildService.withdraw(req.session.userId, req.params.guildId);
                 
@@ -185,7 +185,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/guild/:guildId/reject/:userId', middleware.authenticate, async (req, res, next) => {
+    router.patch('/api/guild/:guildId/reject/:userId', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             await container.guildService.reject(req.params.userId, req.params.guildId, req.session.userId);
                 
@@ -195,7 +195,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/guild/:guildId/leave', middleware.authenticate, async (req, res, next) => {
+    router.patch('/api/guild/:guildId/leave', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             await container.guildService.leave(req.session.userId, req.params.guildId);
                 
@@ -205,7 +205,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/guild/:guildId/promote/:userId', middleware.authenticate, async (req, res, next) => {
+    router.patch('/api/guild/:guildId/promote/:userId', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             await container.guildService.promote(req.params.userId, req.params.guildId, req.session.userId);
                 
@@ -215,7 +215,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/guild/:guildId/demote/:userId', middleware.authenticate, async (req, res, next) => {
+    router.patch('/api/guild/:guildId/demote/:userId', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             await container.guildService.demote(req.params.userId, req.params.guildId, req.session.userId);
                 
@@ -225,7 +225,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/guild/:guildId/kick/:userId', middleware.authenticate, async (req, res, next) => {
+    router.patch('/api/guild/:guildId/kick/:userId', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             await container.guildService.kick(req.params.userId, req.params.guildId, req.session.userId);
                 

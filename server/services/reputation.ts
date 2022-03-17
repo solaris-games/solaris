@@ -2,7 +2,7 @@ import DatabaseRepository from "../models/DatabaseRepository";
 import { Game } from "../types/Game";
 import { Player, PlayerReputation } from "../types/Player";
 import DiplomacyService from "./diplomacy";
-import PlayerService from "./player";
+import PlayerStatisticsService from "./playerStatistics";
 
 const EventEmitter = require('events');
 
@@ -15,18 +15,18 @@ const ENEMY_REPUTATION_THRESHOLD = -1;
 export default class ReputationService extends EventEmitter {
 
     gameRepo: DatabaseRepository<Game>;
-    playerService: PlayerService;
+    playerStatisticsService: PlayerStatisticsService;
     diplomacyService: DiplomacyService;
 
     constructor(
         gameRepo: DatabaseRepository<Game>,
-        playerService: PlayerService,
-        diplomacyService: DiplomacyService
+        playerStatisticsService: PlayerStatisticsService,
+        diplomacyService: DiplomacyService,
     ) {
         super();
         
         this.gameRepo = gameRepo;
-        this.playerService = playerService;
+        this.playerStatisticsService = playerStatisticsService;
         this.diplomacyService = diplomacyService;
     }
 
@@ -139,7 +139,7 @@ export default class ReputationService extends EventEmitter {
     }
 
     async tryIncreaseReputationCredits(game: Game, fromPlayer: Player, toPlayer: Player, amount: number) {
-        let playerStats = this.playerService.getStats(game, toPlayer);
+        let playerStats = this.playerStatisticsService.getStats(game, toPlayer);
         let creditsRequired = playerStats.totalEconomy * 10 / 2;
         let increased = amount >= creditsRequired;
 

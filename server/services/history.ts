@@ -6,22 +6,26 @@ import { Game } from '../types/Game';
 import { GameHistory, GameHistoryCarrier } from '../types/GameHistory';
 import GameService from './game';
 import PlayerService from './player';
+import PlayerStatisticsService from './playerStatistics';
 
 export default class HistoryService {
     historyRepo: DatabaseRepository<GameHistory>;
     playerService: PlayerService;
     gameService: GameService;
+    playerStatisticsService: PlayerStatisticsService;
 
     constructor(
         historyRepo: DatabaseRepository<GameHistory>,
         playerService: PlayerService,
-        gameService: GameService
+        gameService: GameService,
+        playerStatisticsService: PlayerStatisticsService
     ) {
         this.historyRepo = historyRepo;
         this.playerService = playerService;
         this.gameService = gameService;
+        this.playerStatisticsService = playerStatisticsService;
 
-        this.gameService.on('onGameDeleted', (args) => this.deleteByGameId(args.gameId));
+        this.gameService.on('onGameDeleted', (args: any) => this.deleteByGameId(args.gameId));
     }
 
     async listIntel(gameId: DBObjectId, startTick: number, endTick: number) {
@@ -101,7 +105,7 @@ export default class HistoryService {
         };
 
         history.players = game.galaxy.players.map(player => {
-            let stats = this.playerService.getStats(game, player);
+            let stats = this.playerStatisticsService.getStats(game, player);
 
             return {
                 userId: player.userId,

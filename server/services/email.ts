@@ -9,6 +9,7 @@ import GameTypeService from "./gameType";
 import LeaderboardService from "./leaderboard";
 import PlayerService from "./player";
 import UserService from "./user";
+import { Player } from "../types/Player";
 
 const nodemailer = require('nodemailer');
 const fs = require('fs');
@@ -16,7 +17,7 @@ const path = require('path');
 
 function getFakeTransport() {
     return {
-        async sendMail(message) {
+        async sendMail(message: any) {
             console.log('-----');
             console.log(`SMTP DISABLED - Attempted to send email to [${message.to}] from [${message.from}]`);
             // console.log(message.text);
@@ -26,7 +27,7 @@ function getFakeTransport() {
     };
 }
 
-function sleep(ms) {
+function sleep(ms: number) {
     return new Promise((resolve) => {
         setTimeout(resolve, ms);
     });
@@ -105,13 +106,13 @@ export default class EmailService {
         this.gameStateService = gameStateService;
         this.gameTickService = gameTickService;
 
-        this.gameService.on('onGameStarted', (data) => this.sendGameStartedEmail(data.gameId));
-        this.userService.on('onUserCreated', (user) => this.sendWelcomeEmail(user));
-        this.playerService.on('onGamePlayerReady', (data) => this.trySendLastPlayerTurnReminder(data.gameId));
+        this.gameService.on('onGameStarted', (data: any) => this.sendGameStartedEmail(data.gameId));
+        this.userService.on('onUserCreated', (user: any) => this.sendWelcomeEmail(user));
+        this.playerService.on('onGamePlayerReady', (data: any) => this.trySendLastPlayerTurnReminder(data.gameId));
 
-        this.gameTickService.on('onPlayerAfk', (args) => this.sendGamePlayerAfkEmail(args.gameId, args.player._id));
-        this.gameTickService.on('onGameEnded', (args) => this.sendGameFinishedEmail(args.gameId));
-        this.gameTickService.on('onGameCycleEnded', (args) => this.sendGameCycleSummaryEmail(args.gameId));
+        this.gameTickService.on('onPlayerAfk', (args: any) => this.sendGamePlayerAfkEmail(args.gameId, args.player._id));
+        this.gameTickService.on('onGameEnded', (args: any) => this.sendGameFinishedEmail(args.gameId));
+        this.gameTickService.on('onGameCycleEnded', (args: any) => this.sendGameCycleSummaryEmail(args.gameId));
     }
 
     _getTransport() {
@@ -253,7 +254,7 @@ export default class EmailService {
         let gameName = game.settings.general.name;
 
         // Send the email only to undefeated players.
-        let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated);
+        let undefeatedPlayers = game.galaxy.players.filter((p: Player) => !p.defeated);
         let winConditionText = '';
 
         switch (game.settings.general.mode) {
@@ -306,7 +307,7 @@ export default class EmailService {
             return;
         }
 
-        let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated && !p.ready);
+        let undefeatedPlayers = game.galaxy.players.filter((p: Player) => !p.defeated && !p.ready);
 
         if (undefeatedPlayers.length === 1) {
             let player = undefeatedPlayers[0];
@@ -363,7 +364,7 @@ export default class EmailService {
         let gameName = game.settings.general.name;
         let player = this.playerService.getById(game, playerId);
         
-        if (player) {
+        if (player && player.userId) {
             let user = await this.userService.getEmailById(player.userId);
             
             if (user && user.emailEnabled) {

@@ -3,11 +3,11 @@ import ValidationError from '../errors/validation';
 import { DependencyContainer } from '../types/DependencyContainer';
 import Middleware from './middleware';
 
-export default (router: Router, io, container: DependencyContainer) => {
+export default (router: Router, io: any, container: DependencyContainer) => {
 
     const middleware = Middleware(container);
 
-    router.post('/api/auth/login', async (req, res, next) => {        
+    router.post('/api/auth/login', async (req: any, res: any, next: any) => {        
         let errors: string[] = [];
     
         if (!req.body.email) {
@@ -43,10 +43,10 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
     
-    router.post('/api/auth/logout', (req, res, next) => {
+    router.post('/api/auth/logout', (req: any, res: any, next: any) => {
         if (req.session) {
             // Delete the session object.
-            req.session.destroy((err) => {
+            req.session.destroy((err: any) => {
                 if (err) {
                     return next(err);
                 }
@@ -58,7 +58,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.post('/api/auth/verify', (req, res, next) => {
+    router.post('/api/auth/verify', (req: any, res: any, next: any) => {
         const session = (req as any).session;
 
         return res.status(200).json({

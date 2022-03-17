@@ -42,6 +42,7 @@ export type GamePlayerDistribution = 'circular'|'random';
 export type GameVictoryCondition = 'starPercentage'|'homeStarPercentage';
 export type GameVictoryPercentage = 25|33|50|66|75|90|100;
 export type GameInfrastructureCost = 'cheap'|'standard'|'expensive';
+export type GameInfrastructureExpenseMultiplier = 'cheap'|'standard'|'expensive'|'crazyExpensive';
 export type GameTradeCost = 0|5|15|25|50|100;
 export type GameTradeScanning = 'all'|'scanned';
 export type GameResearchCost = 'none'|'cheap'|'standard'|'expensive'|'veryExpensive'|'crazyExpensive';
@@ -192,7 +193,9 @@ export interface Game {
     galaxy: {
         players: Player[]
 		stars: Star[],
-		carriers: Carrier[]
+		carriers: Carrier[],
+		homeStars?: DBObjectId[],
+		linkedStars: DBObjectId[][]
 	},
 	conversations: Conversation[]
 	state: {

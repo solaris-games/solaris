@@ -4,7 +4,7 @@ export default class DatabaseRepository<T> {
 
     model: any;
     
-    constructor(model) {
+    constructor(model: any) {
         this.model = model;
     }
 

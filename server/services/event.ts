@@ -122,60 +122,60 @@ export default class EventService {
         this.carrierService = carrierService;
         this.diplomacyService = diplomacyService;
 
-        this.gameService.on('onGameDeleted', (args) => this.deleteByGameId(args.gameId));
-        this.gameService.on('onPlayerJoined', (args) => this.createPlayerJoinedEvent(args.gameId, args.gameTick, args.player));
-        this.gameService.on('onGameStarted', (args) => this.createGameStartedEvent(args.gameId, args.gameTick));
-        this.gameService.on('onPlayerQuit', (args) => this.createPlayerQuitEvent(args.gameId, args.gameTick, args.player, args.alias));
-        this.gameService.on('onPlayerDefeated', (args) => this.createPlayerDefeatedEvent(args.gameId, args.gameTick, args.player));
+        this.gameService.on('onGameDeleted', (args: any) => this.deleteByGameId(args.gameId));
+        this.gameService.on('onPlayerJoined', (args: any) => this.createPlayerJoinedEvent(args.gameId, args.gameTick, args.player));
+        this.gameService.on('onGameStarted', (args: any) => this.createGameStartedEvent(args.gameId, args.gameTick));
+        this.gameService.on('onPlayerQuit', (args: any) => this.createPlayerQuitEvent(args.gameId, args.gameTick, args.player, args.alias));
+        this.gameService.on('onPlayerDefeated', (args: any) => this.createPlayerDefeatedEvent(args.gameId, args.gameTick, args.player));
         
-        this.combatService.on('onPlayerCombatStar', (args) => this.createPlayerCombatStarEvent(
+        this.combatService.on('onPlayerCombatStar', (args: any) => this.createPlayerCombatStarEvent(
             args.gameId, args.gameTick, args.owner, args.defenders, args.attackers, args.star, args.combatResult, args.captureResult));
-        this.combatService.on('onPlayerCombatCarrier', (args) => this.createPlayerCombatCarrierEvent(
+        this.combatService.on('onPlayerCombatCarrier', (args: any) => this.createPlayerCombatCarrierEvent(
             args.gameId, args.gameTick, args.defenders, args.attackers, args.combatResult));
         
-        this.gameTickService.on('onPlayerGalacticCycleCompleted', (args) => this.createPlayerGalacticCycleCompleteEvent(
+        this.gameTickService.on('onPlayerGalacticCycleCompleted', (args: any) => this.createPlayerGalacticCycleCompleteEvent(
             args.gameId, args.gameTick, args.player, 
             args.creditsEconomy, args.creditsBanking, args.creditsSpecialists, 
             args.experimentTechnology, args.experimentAmount, args.experimentLevelUp, args.experimentResearchingNext,
             args.carrierUpkeep, args.allianceUpkeep));
             
-        this.gameTickService.on('onPlayerAfk', (args) => this.createPlayerAfkEvent(args.gameId, args.gameTick, args.player));
-        this.gameTickService.on('onPlayerDefeated', (args) => this.createPlayerDefeatedEvent(args.gameId, args.gameTick, args.player));
-        this.gameTickService.on('onGameEnded', (args) => this.createGameEndedEvent(args.gameId, args.gameTick, args.rankingResult));
+        this.gameTickService.on('onPlayerAfk', (args: any) => this.createPlayerAfkEvent(args.gameId, args.gameTick, args.player));
+        this.gameTickService.on('onPlayerDefeated', (args: any) => this.createPlayerDefeatedEvent(args.gameId, args.gameTick, args.player));
+        this.gameTickService.on('onGameEnded', (args: any) => this.createGameEndedEvent(args.gameId, args.gameTick, args.rankingResult));
         
-        this.researchService.on('onPlayerResearchCompleted', (args) => this.createResearchCompleteEvent(args.gameId, args.gameTick, args.playerId, args.technologyKey, args.technologyLevel, args.technologyKeyNext, args.technologyLevelNext));
+        this.researchService.on('onPlayerResearchCompleted', (args: any) => this.createResearchCompleteEvent(args.gameId, args.gameTick, args.playerId, args.technologyKey, args.technologyLevel, args.technologyKeyNext, args.technologyLevelNext));
 
-        this.starService.on('onPlayerStarAbandoned', (args) => this.createStarAbandonedEvent(args.gameId, args.gameTick, args.player, args.star));
-        this.starService.on('onPlayerStarDied', (args) => this.createStarDiedEvent(args.gameId, args.gameTick, args.playerId, args.starId, args.starName));
-        this.starService.on('onPlayerStarReignited', (args) => this.createStarReignitedEvent(args.gameId, args.gameTick, args.playerId, args.starId, args.starName));
+        this.starService.on('onPlayerStarAbandoned', (args: any) => this.createStarAbandonedEvent(args.gameId, args.gameTick, args.player, args.star));
+        this.starService.on('onPlayerStarDied', (args: any) => this.createStarDiedEvent(args.gameId, args.gameTick, args.playerId, args.starId, args.starName));
+        this.starService.on('onPlayerStarReignited', (args: any) => this.createStarReignitedEvent(args.gameId, args.gameTick, args.playerId, args.starId, args.starName));
         
-        this.starUpgradeService.on('onPlayerInfrastructureBulkUpgraded', (args) => this.createInfrastructureBulkUpgraded(args.gameId, args.gameTick, args.player, args.upgradeSummary));
+        this.starUpgradeService.on('onPlayerInfrastructureBulkUpgraded', (args: any) => this.createInfrastructureBulkUpgraded(args.gameId, args.gameTick, args.player, args.upgradeSummary));
 
-        this.tradeService.on('onPlayerCreditsReceived', (args) => this.createCreditsReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.amount));
-        this.tradeService.on('onPlayerCreditsSent', (args) => this.createCreditsSentEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.amount));
-        this.tradeService.on('onPlayerCreditsSpecialistsReceived', (args) => this.createCreditsSpecialistsReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.amount));
-        this.tradeService.on('onPlayerCreditsSpecialistsSent', (args) => this.createCreditsSpecialistsSentEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.amount));
-        this.tradeService.on('onPlayerRenownReceived', (args) => this.createRenownReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.amount));
-        this.tradeService.on('onPlayerRenownSent', (args) => this.createRenownSentEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.amount));
-        this.tradeService.on('onPlayerTechnologyReceived', (args) => this.createTechnologyReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.technology));
-        this.tradeService.on('onPlayerTechnologySent', (args) => this.createTechnologySentEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.technology));
+        this.tradeService.on('onPlayerCreditsReceived', (args: any) => this.createCreditsReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.amount));
+        this.tradeService.on('onPlayerCreditsSent', (args: any) => this.createCreditsSentEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.amount));
+        this.tradeService.on('onPlayerCreditsSpecialistsReceived', (args: any) => this.createCreditsSpecialistsReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.amount));
+        this.tradeService.on('onPlayerCreditsSpecialistsSent', (args: any) => this.createCreditsSpecialistsSentEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.amount));
+        this.tradeService.on('onPlayerRenownReceived', (args: any) => this.createRenownReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.amount));
+        this.tradeService.on('onPlayerRenownSent', (args: any) => this.createRenownSentEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.amount));
+        this.tradeService.on('onPlayerTechnologyReceived', (args: any) => this.createTechnologyReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.technology));
+        this.tradeService.on('onPlayerTechnologySent', (args: any) => this.createTechnologySentEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.technology));
 
-        this.carrierService.on('onPlayerGiftReceived', (args) => this.createGiftReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.carrier, args.star));
-        this.carrierService.on('onPlayerGiftSent', (args) => this.createGiftSentEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.carrier, args.star));
+        this.carrierService.on('onPlayerGiftReceived', (args: any) => this.createGiftReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.carrier, args.star));
+        this.carrierService.on('onPlayerGiftSent', (args: any) => this.createGiftSentEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.carrier, args.star));
 
-        this.ledgerService.on('onDebtAdded', (args) => this.createDebtAddedEvent(args.gameId, args.gameTick, args.debtor, args.creditor, args.amount));
-        this.ledgerService.on('onDebtSettled', (args) => this.createDebtSettledEvent(args.gameId, args.gameTick, args.debtor, args.creditor, args.amount));
-        this.ledgerService.on('onDebtForgiven', (args) => this.createDebtForgivenEvent(args.gameId, args.gameTick, args.debtor, args.creditor, args.amount));
+        this.ledgerService.on('onDebtAdded', (args: any) => this.createDebtAddedEvent(args.gameId, args.gameTick, args.debtor, args.creditor, args.amount));
+        this.ledgerService.on('onDebtSettled', (args: any) => this.createDebtSettledEvent(args.gameId, args.gameTick, args.debtor, args.creditor, args.amount));
+        this.ledgerService.on('onDebtForgiven', (args: any) => this.createDebtForgivenEvent(args.gameId, args.gameTick, args.debtor, args.creditor, args.amount));
 
-        this.conversationService.on('onConversationCreated', (args) => this.createPlayerConversationCreated(args.gameId, args.gameTick, args.convo));
-        this.conversationService.on('onConversationInvited', (args) => this.createPlayerConversationInvited(args.gameId, args.gameTick, args.convo, args.playerId));
-        this.conversationService.on('onConversationLeft', (args) => this.createPlayerConversationLeft(args.gameId, args.gameTick, args.convo, args.playerId));
+        this.conversationService.on('onConversationCreated', (args: any) => this.createPlayerConversationCreated(args.gameId, args.gameTick, args.convo));
+        this.conversationService.on('onConversationInvited', (args: any) => this.createPlayerConversationInvited(args.gameId, args.gameTick, args.convo, args.playerId));
+        this.conversationService.on('onConversationLeft', (args: any) => this.createPlayerConversationLeft(args.gameId, args.gameTick, args.convo, args.playerId));
 
-        this.badgeService.on('onGamePlayerBadgePurchased', (args) => this.createGamePlayerBadgePurchased(args.gameId, args.gameTick, args.purchasedByPlayerId, args.purchasedByPlayerAlias, args.purchasedForPlayerId, args.purchasedForPlayerAlias, args.badgeKey, args.badgeName));
+        this.badgeService.on('onGamePlayerBadgePurchased', (args: any) => this.createGamePlayerBadgePurchased(args.gameId, args.gameTick, args.purchasedByPlayerId, args.purchasedByPlayerAlias, args.purchasedForPlayerId, args.purchasedForPlayerAlias, args.badgeKey, args.badgeName));
 
-        this.diplomacyService.on('onDiplomacyPeaceDeclared', (args) => this.createGameDiplomacyPeaceDeclared(args.gameId, args.gameTick, args.status));
-        this.diplomacyService.on('onDiplomacyWarDeclared', (args) => this.createGameDiplomacyWarDeclared(args.gameId, args.gameTick, args.status));
-        this.diplomacyService.on('onDiplomacyStatusChanged', (args) => this.createPlayerDiplomacyStatusChanged(args.gameId, args.gameTick, args.status));
+        this.diplomacyService.on('onDiplomacyPeaceDeclared', (args: any) => this.createGameDiplomacyPeaceDeclared(args.gameId, args.gameTick, args.status));
+        this.diplomacyService.on('onDiplomacyWarDeclared', (args: any) => this.createGameDiplomacyWarDeclared(args.gameId, args.gameTick, args.status));
+        this.diplomacyService.on('onDiplomacyStatusChanged', (args: any) => this.createPlayerDiplomacyStatusChanged(args.gameId, args.gameTick, args.status));
     }
 
     async deleteByGameId(gameId: DBObjectId) {

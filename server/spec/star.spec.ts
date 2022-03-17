@@ -2,16 +2,16 @@ import StarService from '../services/star';
 const starNames = require('../config/game/starNames');
 
 const fakeRandomService = {
-    getRandomNumber(max) {
+    getRandomNumber(max: any) {
         return max;
     },
-    getRandomNumberBetween(min, max) {
+    getRandomNumberBetween(min: any, max: any) {
         return max;
     },
-    getRandomPositionInCircle(radius) {
+    getRandomPositionInCircle(radius: any) {
         return radius;
     },
-    getRandomPositionInCircleFromOrigin(originX, originY, radius) {
+    getRandomPositionInCircleFromOrigin(originX: any, originY: any, radius: any) {
         return radius;
     },
     generateStarNaturalResources() {
@@ -47,7 +47,7 @@ const game = {
 
 describe('star', () => {
 
-    let starService;
+    let starService: any;
 
     beforeEach(() => {
         // @ts-ignore

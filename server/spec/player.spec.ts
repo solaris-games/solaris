@@ -100,7 +100,7 @@ function generateStarGrid() {
     return stars;
 }
 
-function assertNewPlayer(newPlayer, colour) {
+function assertNewPlayer(newPlayer: any, colour: any) {
     colour = colour || newPlayer.colour;
 
     expect(newPlayer).not.toBe(null);
@@ -112,18 +112,18 @@ function assertNewPlayer(newPlayer, colour) {
 
     for(var key in newPlayer.research) {
         const res1 = newPlayer.research[key].level;
-        const res2 = game.settings.technology.startingTechnologyLevel[key];
+        const res2 = (game.settings.technology.startingTechnologyLevel as any)[key];
         expect(res1).toEqual(res2);
     }
 }
 
-function printStars(allStars) {
+function printStars(allStars: any) {
     console.log();
     
     for(let y = 0; y < 100; y += 10) {
-        let starsOnY = allStars.filter(x => x.location.y == y);
+        let starsOnY = allStars.filter((x: any) => x.location.y == y);
 
-        console.log(starsOnY.map(p => {
+        console.log(starsOnY.map((p: any) => {
             if (p.ownedByPlayerId) {
                 let key = p.ownedByPlayerId.toString();
                 return key[key.length - 1] + ' ';
@@ -144,7 +144,7 @@ describe('player', () => {
     let nameService;
     let mapService;
     let technologyService;
-    let playerService;
+    let playerService: any;
 
     beforeEach(() => {
         // Use real services because I cannot fathom how to fake all this shit.

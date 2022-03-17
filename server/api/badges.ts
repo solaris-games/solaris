@@ -3,12 +3,12 @@ import ValidationError from '../errors/validation';
 import { DependencyContainer } from '../types/DependencyContainer';
 import Middleware from './middleware';
 
-export default (router: Router, io, container: DependencyContainer) => {
+export default (router: Router, io: any, container: DependencyContainer) => {
 
     const middleware = Middleware(container);
 
-    router.get('/api/badges', middleware.authenticate, async (req, res, next) => {
-        let errors = [];
+    router.get('/api/badges', middleware.authenticate, async (req: any, res: any, next: any) => {
+        let errors: string[] = [];
 
         if (errors.length) {
             throw new ValidationError(errors);
@@ -23,7 +23,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/badges/user/:userId', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/badges/user/:userId', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             const result = await container.badgeService.listBadgesByUser(req.params.userId);
             
@@ -33,7 +33,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.post('/api/badges/user/:userId', middleware.authenticate, async (req, res, next) => {
+    router.post('/api/badges/user/:userId', middleware.authenticate, async (req: any, res: any, next: any) => {
         let errors: string[] = [];
 
         if (!req.body.badgeKey) {
@@ -53,7 +53,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/badges/game/:gameId/player/:playerId', middleware.authenticate, middleware.loadGamePlayersState, async (req, res, next) => {
+    router.get('/api/badges/game/:gameId/player/:playerId', middleware.authenticate, middleware.loadGamePlayersState, async (req: any, res: any, next: any) => {
         try {
             const result = await container.badgeService.listBadgesByPlayer(req.game, req.params.playerId);
             
@@ -63,7 +63,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.post('/api/badges/game/:gameId/player/:playerId', middleware.authenticate, middleware.loadGamePlayersState, async (req, res, next) => {
+    router.post('/api/badges/game/:gameId/player/:playerId', middleware.authenticate, middleware.loadGamePlayersState, async (req: any, res: any, next: any) => {
         let errors: string[] = [];
 
         if (!req.body.badgeKey) {

@@ -11,6 +11,7 @@ import CarrierService from "../services/carrier";
 import CombatService from "../services/combat";
 import ConversationService from "../services/conversation";
 import DiplomacyService from "../services/diplomacy";
+import DiplomacyUpkeepService from "../services/diplomacyUpkeep";
 import DistanceService from "../services/distance";
 import DonateService from "../services/donate";
 import EmailService from "../services/email";
@@ -34,6 +35,8 @@ import OrbitalMechanicsService from "../services/orbitalMechanics";
 import PasswordService from "../services/password";
 import PaypalService from "../services/paypal";
 import PlayerService from "../services/player";
+import PlayerCreditsService from "../services/playerCredits";
+import PlayerStatisticsService from "../services/playerStatistics";
 import RandomService from "../services/random";
 import RatingService from "../services/rating";
 import RecaptchaService from "../services/recaptcha";
@@ -106,4 +109,7 @@ export interface DependencyContainer {
     paypalService: PaypalService,
     badgeService: BadgeService,
     reportService: ReportService,
+    playerStatisticsService: PlayerStatisticsService,
+    playerCreditsService: PlayerCreditsService,
+    diplomacyUpkeepService: DiplomacyUpkeepService,
 };

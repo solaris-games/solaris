@@ -19,8 +19,8 @@ const starNames = [
 
 describe('star name', () => {
 
-    let randomService;
-    let starService;
+    let randomService: any;
+    let starService: any;
 
     beforeEach(() => {
         // Use a real random service because it would not be easy to fake for these tests.

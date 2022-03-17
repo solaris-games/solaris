@@ -4,6 +4,7 @@ import { PlayerStatistics } from "./Leaderboard";
 
 export type PlayerShape = 'circle'|'square'|'diamond'|'hexagon';
 export type ResearchType = 'scanning'|'hyperspace'|'terraforming'|'experimentation'|'weapons'|'banking'|'manufacturing'|'specialists'|'random';
+export type ResearchTypeNotRandom = 'scanning'|'hyperspace'|'terraforming'|'experimentation'|'weapons'|'banking'|'manufacturing'|'specialists';
 
 export interface PlayerColour {
     alias: string;
@@ -68,7 +69,7 @@ export interface Player {
     isOnline?: boolean | null;
     lastSeenIP?: string | null;
     hasDuplicateIP?: boolean;
-    researchingNow: ResearchType;
+    researchingNow: ResearchTypeNotRandom;
     researchingNext: ResearchType;
     credits: number;
     creditsSpecialists: number;

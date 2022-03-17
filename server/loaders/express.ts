@@ -24,7 +24,7 @@ import BadgesApi from '../api/badges';
 import ReportApi from '../api/report';
 import { DependencyContainer } from '../types/DependencyContainer';
 
-export default async (config, app, io, container: DependencyContainer) => {
+export default async (config: any, app: any, io: any, container: DependencyContainer) => {
 
     app.use(require('body-parser').json({
         limit: '1000kb' // Note: This allows large custom galaxies to be uploaded.
@@ -38,7 +38,7 @@ export default async (config, app, io, container: DependencyContainer) => {
     });
 
     // Catch session store errors
-    store.on('error', function(err) {
+    store.on('error', function(err: any) {
         console.error(err);
     });
 
@@ -57,7 +57,7 @@ export default async (config, app, io, container: DependencyContainer) => {
 
     // ---------------
     // Enable CORS
-    app.use((req, res, next) => {
+    app.use((req: any, res: any, next: any) => {
         res.header("Access-Control-Allow-Origin", config.clientUrl);
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         res.header('Access-Control-Allow-Headers', 'Content-Type');
@@ -81,7 +81,7 @@ export default async (config, app, io, container: DependencyContainer) => {
     // compress all responses
     app.use(compression({
         threshold: 0,
-        filter: (req, res) => {
+        filter: (req: any, res: any) => {
             if (req.headers['x-no-compression']) {
                 // don't compress responses if this request header is present
                 return false;

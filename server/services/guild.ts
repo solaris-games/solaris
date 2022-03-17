@@ -6,8 +6,8 @@ import { Guild, GuildLeaderboard, GuildRank, GuildUserApplication, GuildWithUser
 import { User } from '../types/User';
 import UserService from './user';
 
-function toProperCase(string) {
-    return string.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+function toProperCase(string: string) {
+    return string.replace(/\w\S*/g, function(txt: string){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 };
 
 export default class GuildService {
@@ -298,7 +298,7 @@ export default class GuildService {
         });
     }
 
-    async invite(username, guildId, invitedByUserId) {
+    async invite(username: string, guildId: DBObjectId, invitedByUserId: DBObjectId) {
         let user = await this.userService.getByUsername(username, {
             username: 1,
             'achievements.rank': 1,
@@ -733,7 +733,7 @@ export default class GuildService {
         });
 
         let leaderboard = guildsWithRank
-                        .sort((a, b) => b[sortingKey] - a[sortingKey])
+                        .sort((a, b) => (b as any)[sortingKey] - (a as any)[sortingKey])
                         .slice(0, limit);
 
         for (let i = 0; i < leaderboard.length; i++) {

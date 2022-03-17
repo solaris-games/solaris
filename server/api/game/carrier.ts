@@ -3,11 +3,11 @@ import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../types/DependencyContainer';
 import Middleware from '../middleware';
 
-export default (router: Router, io, container: DependencyContainer) => {
+export default (router: Router, io: any, container: DependencyContainer) => {
 
     const middleware = Middleware(container);
 
-    router.put('/api/game/:gameId/carrier/:carrierId/waypoints', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/carrier/:carrierId/waypoints', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req: any, res: any, next: any) => {
         try {
             let report = await container.waypointService.saveWaypoints(
                 req.game,
@@ -22,7 +22,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/carrier/:carrierId/waypoints/loop', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/carrier/:carrierId/waypoints/loop', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req: any, res: any, next: any) => {
         let errors: string[] = [];
 
         if (req.body.loop == null) {
@@ -46,7 +46,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/carrier/:carrierId/transfer', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/carrier/:carrierId/transfer', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req: any, res: any, next: any) => {
         let errors: string[] = [];
 
         if (req.body.carrierShips == null) {
@@ -80,7 +80,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/carrier/:carrierId/gift', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/carrier/:carrierId/gift', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req: any, res: any, next: any) => {
         try {
             await container.carrierService.convertToGift(
                 req.game,
@@ -93,7 +93,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/game/:gameId/carrier/:carrierId/rename', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.patch('/api/game/:gameId/carrier/:carrierId/rename', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req: any, res: any, next: any) => {
         try {
             await container.carrierService.rename(
                 req.game,
@@ -107,7 +107,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.delete('/api/game/:gameId/carrier/:carrierId/scuttle', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.delete('/api/game/:gameId/carrier/:carrierId/scuttle', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req: any, res: any, next: any) => {
         try {
             await container.carrierService.scuttle(
                 req.game,
@@ -120,7 +120,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.post('/api/game/:gameId/carrier/calculateCombat', middleware.authenticate, (req, res, next) => {
+    router.post('/api/game/:gameId/carrier/calculateCombat', middleware.authenticate, (req: any, res: any, next: any) => {
         let errors: string[] = [];
 
         if (req.body.defender.ships == null) {

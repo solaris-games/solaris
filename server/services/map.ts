@@ -113,7 +113,7 @@ export default class MapService {
                 let locLinkedStars: any[] = [];
 
                 for (let linkedLocation of starLocation.linkedLocations) {
-                  let linkedStar;
+                  let linkedStar: any;
                   let linkedStarName = starNames[starNamesIndex++];
 
                   if (isCustomGalaxy) {

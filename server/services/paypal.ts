@@ -19,14 +19,14 @@ export default class PaypalService {
         sandbox: {
             auth: 'https://api-m.sandbox.paypal.com/v1/oauth2/token',
             payment: 'https://api-m.sandbox.paypal.com/v1/payments/payment',
-            execute: (paymentId) => `https://api-m.sandbox.paypal.com/v1/payments/payment/${paymentId}/execute`,
-            capture: (authorizationId) => `https://api-m.sandbox.paypal.com/v1/payments/authorization/${authorizationId}/capture`
+            execute: (paymentId: string) => `https://api-m.sandbox.paypal.com/v1/payments/payment/${paymentId}/execute`,
+            capture: (authorizationId: string) => `https://api-m.sandbox.paypal.com/v1/payments/authorization/${authorizationId}/capture`
         },
         production: {
             auth: 'https://api-m.paypal.com/v1/oauth2/token',
             payment: 'https://api-m.paypal.com/v1/payments/payment',
-            execute: (paymentId) => `https://api-m.paypal.com/v1/payments/payment/${paymentId}/execute`,
-            capture: (authorizationId) => `https://api-m.paypal.com/v1/payments/authorization/${authorizationId}/capture`
+            execute: (paymentId: string) => `https://api-m.paypal.com/v1/payments/payment/${paymentId}/execute`,
+            capture: (authorizationId: string) => `https://api-m.paypal.com/v1/payments/authorization/${authorizationId}/capture`
         }
     };
 
@@ -54,7 +54,7 @@ export default class PaypalService {
         const params = new URLSearchParams()
         params.append('grant_type', 'client_credentials')
 
-        let authResponse = await axios.post(this.API[environment].auth, params, {
+        let authResponse = await axios.post((this.API as any)[environment].auth, params, {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
@@ -83,7 +83,7 @@ export default class PaypalService {
         };
 
         // Authorize a payment
-        let paymentResponse = await axios.post(this.API[environment].payment, {
+        let paymentResponse = await axios.post((this.API as any)[environment].payment, {
             intent: 'authorize',
             payer: {
                 payment_method: "paypal"
@@ -126,7 +126,7 @@ export default class PaypalService {
         await payment.save();
 
         // Redirect the user to the authorize URL
-        let approvalUrl = paymentResponse.data.links.find(l => l.rel === 'approval_url').href;
+        let approvalUrl = paymentResponse.data.links.find((l: any) => l.rel === 'approval_url').href;
 
         return approvalUrl;
     }
@@ -152,15 +152,15 @@ export default class PaypalService {
         };
 
         // Execute the approved payment
-        let executeResponse = await axios.post(this.API[environment].execute(paymentId), {
+        let executeResponse = await axios.post((this.API as any)[environment].execute(paymentId), {
             payer_id: payerId
         }, requestOptions);
 
         for (let transaction of executeResponse.data.transactions) {
-            const authorizationId = transaction.related_resources.find(r => r.authorization != null).authorization.id;
+            const authorizationId = transaction.related_resources.find((r: any) => r.authorization != null).authorization.id;
 
             // Capture the payment.
-            await axios.post(this.API[environment].capture(authorizationId), {
+            await axios.post((this.API as any)[environment].capture(authorizationId), {
                 amount: {
                     total: parseFloat(transaction.amount.total).toFixed(2),
                     currency: transaction.amount.currency

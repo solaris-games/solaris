@@ -6,25 +6,25 @@ let playerId,
     sourceStarId,
     destinationStarId;
 
-let game,
-    player,
-    carrier,
-    sourceStar,
-    destinationStar,
-    starSpecialist,
-    carrierSpecialist,
-    isFormalAlliancesEnabled,
-    isDiplomaticStatusToPlayersAllied;
+let game: any,
+    player: any,
+    carrier: any,
+    sourceStar: any,
+    destinationStar: any,
+    starSpecialist: any,
+    carrierSpecialist: any,
+    isFormalAlliancesEnabled: any,
+    isDiplomaticStatusToPlayersAllied: any;
 
-let gameRepo, 
-    randomService, 
-    nameService, 
-    distanceService, 
-    starDistanceService, 
-    technologyService, 
-    specialistService,
-    userService, 
-    diplomacyService;
+let gameRepo: any, 
+    randomService: any, 
+    nameService: any, 
+    distanceService: any, 
+    starDistanceService: any, 
+    technologyService: any, 
+    specialistService: any,
+    userService: any, 
+    diplomacyService: any;
 
 specialistService = {
     getByIdStar() {

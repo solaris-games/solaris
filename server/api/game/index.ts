@@ -3,18 +3,18 @@ import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../types/DependencyContainer';
 import Middleware from '../middleware';
 
-export default (router: Router, io, container: DependencyContainer) => {
+export default (router: Router, io: any, container: DependencyContainer) => {
     
     const middleware = Middleware(container);
 
-    router.get('/api/game/defaultSettings', middleware.authenticate, (req, res, next) => {
+    router.get('/api/game/defaultSettings', middleware.authenticate, (req: any, res: any, next: any) => {
         return res.status(200).json({
             settings: require('../../config/game/settings/user/standard.json'),
             options: require('../../config/game/settings/options.json')
         });
     }, middleware.handleError);
 
-    router.post('/api/game/', middleware.authenticate, async (req, res, next) => {
+    router.post('/api/game/', middleware.authenticate, async (req: any, res: any, next: any) => {
         req.body.general.createdByUserId = req.session.userId;
 
         try {
@@ -26,7 +26,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.post('/api/game/tutorial', middleware.authenticate, async (req, res, next) => {
+    router.post('/api/game/tutorial', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             let tutorial = await container.gameListService.getUserTutorial(req.session.userId);
 
@@ -44,7 +44,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/info', middleware.loadGameInfo, async (req, res, next) => {
+    router.get('/api/game/:gameId/info', middleware.loadGameInfo, async (req: any, res: any, next: any) => {
         try {
             return res.status(200).json(req.game);
         } catch (err) {
@@ -52,7 +52,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/state', middleware.loadGameState, async (req, res, next) => {
+    router.get('/api/game/:gameId/state', middleware.loadGameState, async (req: any, res: any, next: any) => {
         try {
             return res.status(200).json(req.game);
         } catch (err) {
@@ -60,7 +60,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/galaxy', async (req, res, next) => {
+    router.get('/api/game/:gameId/galaxy', async (req: any, res: any, next: any) => {
         try {
             let tick = +req.query.tick || null;
     
@@ -76,7 +76,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/list/official', async (req, res, next) => {
+    router.get('/api/game/list/official', async (req: any, res: any, next: any) => {
         try {
             let games = await container.gameListService.listOfficialGames();
 
@@ -86,7 +86,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/list/user', async (req, res, next) => {
+    router.get('/api/game/list/user', async (req: any, res: any, next: any) => {
         try {
             let games = await container.gameListService.listUserGames();
 
@@ -96,7 +96,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/list/inprogress', async (req, res, next) => {
+    router.get('/api/game/list/inprogress', async (req: any, res: any, next: any) => {
         try {
             let games = await container.gameListService.listInProgressGames();
 
@@ -106,7 +106,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/list/active', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/game/list/active', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             let games = await container.gameListService.listActiveGames(req.session.userId);
 
@@ -116,7 +116,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/list/completed', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/game/list/completed', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             let games = await container.gameListService.listRecentlyCompletedGames();
 
@@ -126,7 +126,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/list/completed/user', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/game/list/completed/user', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             let games = await container.gameListService.listUserCompletedGames(req.session.userId);
 
@@ -136,7 +136,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/intel', middleware.authenticate, async (req, res, next) => {
+    router.get('/api/game/:gameId/intel', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             let startTick = +req.query.startTick || 0;
             let endTick = +req.query.endTick || Number.MAX_VALUE;
@@ -149,7 +149,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/join', middleware.authenticate, middleware.loadGameAll, middleware.validateGameLocked, async (req, res, next) => {
+    router.put('/api/game/:gameId/join', middleware.authenticate, middleware.loadGameAll, middleware.validateGameLocked, async (req: any, res: any, next: any) => {
         try {
             let gameIsFull = await container.gameService.join(
                 req.game,
@@ -171,7 +171,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/quit', middleware.authenticate, middleware.loadGameAll, middleware.validateGameLocked, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/quit', middleware.authenticate, middleware.loadGameAll, middleware.validateGameLocked, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req: any, res: any, next: any) => {
         try {
             let player = await container.gameService.quit(
                 req.game,
@@ -187,7 +187,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/concedeDefeat', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameInProgress, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/concedeDefeat', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameInProgress, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req: any, res: any, next: any) => {
         try {
             await container.gameService.concedeDefeat(
                 req.game,
@@ -199,7 +199,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/ready', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/ready', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req: any, res: any, next: any) => {
         try {
             await container.playerService.declareReady(
                 req.game,
@@ -213,7 +213,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/readytocycle', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/readytocycle', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req: any, res: any, next: any) => {
         try {
             await container.playerService.declareReadyToCycle(
                 req.game,
@@ -227,7 +227,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/notready', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/notready', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req: any, res: any, next: any) => {
         try {
             await container.playerService.undeclareReady(
                 req.game,
@@ -241,7 +241,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/readyToQuit', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/readyToQuit', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req: any, res: any, next: any) => {
         try {
             await container.playerService.declareReadyToQuit(
                 req.game,
@@ -255,7 +255,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/notReadyToQuit', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/notReadyToQuit', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req: any, res: any, next: any) => {
         try {
             await container.playerService.undeclareReadyToQuit(
                 req.game,
@@ -269,7 +269,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/notes', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, async (req, res, next) => {
+    router.get('/api/game/:gameId/notes', middleware.authenticate, middleware.loadGame, middleware.loadPlayer, async (req: any, res: any, next: any) => {
         try {
             let notes = await container.playerService.getGameNotes(
                 req.game,
@@ -281,7 +281,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/notes', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.loadPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/notes', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.loadPlayer, async (req: any, res: any, next: any) => {
         try {
             await container.playerService.updateGameNotes(
                 req.game,
@@ -294,7 +294,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.delete('/api/game/:gameId', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, async (req, res, next) => {
+    router.delete('/api/game/:gameId', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, async (req: any, res: any, next: any) => {
         try {
             await container.gameService.delete(
                 req.game,
@@ -306,7 +306,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/player/:playerId', middleware.loadGamePlayers, async (req, res, next) => {
+    router.get('/api/game/:gameId/player/:playerId', middleware.loadGamePlayers, async (req: any, res: any, next: any) => {
         try {
             let user = await container.gameService.getPlayerUser(
                 req.game,
@@ -319,7 +319,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/game/:gameId/player/touch', middleware.authenticate, async (req, res, next) => {
+    router.patch('/api/game/:gameId/player/touch', middleware.authenticate, async (req: any, res: any, next: any) => {
         try {
             let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 

@@ -3,11 +3,11 @@ import ValidationError from '../../errors/validation';
 import Middleware from '../middleware';
 import { DependencyContainer } from '../../types/DependencyContainer';
 
-export default (router: Router, io, container: DependencyContainer) => {
+export default (router: Router, io: any, container: DependencyContainer) => {
 
     const middleware = Middleware(container);
 
-    router.get('/api/game/:gameId/conversations', middleware.authenticate, middleware.loadGameConversationsLean, middleware.loadPlayer, async (req, res, next) => {
+    router.get('/api/game/:gameId/conversations', middleware.authenticate, middleware.loadGameConversationsLean, middleware.loadPlayer, async (req: any, res: any, next: any) => {
         try {
             let result = await container.conversationService.list(
                 req.game,
@@ -19,7 +19,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/conversations/private/:withPlayerId', middleware.authenticate, middleware.loadGameConversationsLean, middleware.loadPlayer, async (req, res, next) => {
+    router.get('/api/game/:gameId/conversations/private/:withPlayerId', middleware.authenticate, middleware.loadGameConversationsLean, middleware.loadPlayer, async (req: any, res: any, next: any) => {
         try {
             let result = await container.conversationService.privateChatSummary(
                 req.game,
@@ -32,7 +32,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/conversations/unread', middleware.authenticate, middleware.loadGameConversationsLean, middleware.loadPlayer, async (req, res, next) => {
+    router.get('/api/game/:gameId/conversations/unread', middleware.authenticate, middleware.loadGameConversationsLean, middleware.loadPlayer, async (req: any, res: any, next: any) => {
         try {
             let result = container.conversationService.getUnreadCount(
                 req.game,
@@ -46,7 +46,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/conversations/:conversationId', middleware.authenticate, middleware.loadGameConversationsLean, middleware.loadPlayer, async (req, res, next) => {
+    router.get('/api/game/:gameId/conversations/:conversationId', middleware.authenticate, middleware.loadGameConversationsLean, middleware.loadPlayer, async (req: any, res: any, next: any) => {
         try {
             let result = await container.conversationService.detail(
                 req.game,
@@ -59,7 +59,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.post('/api/game/:gameId/conversations', middleware.authenticate, middleware.loadGameConversationsLean, middleware.validateGameLocked, middleware.loadPlayer, async (req, res, next) => {
+    router.post('/api/game/:gameId/conversations', middleware.authenticate, middleware.loadGameConversationsLean, middleware.validateGameLocked, middleware.loadPlayer, async (req: any, res: any, next: any) => {
         try {
             let errors: string[] = [];
 
@@ -89,7 +89,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/game/:gameId/conversations/:conversationId/send', middleware.authenticate, middleware.loadGameConversationsLean, middleware.validateGameLocked, middleware.loadPlayer, async (req, res, next) => {
+    router.patch('/api/game/:gameId/conversations/:conversationId/send', middleware.authenticate, middleware.loadGameConversationsLean, middleware.validateGameLocked, middleware.loadPlayer, async (req: any, res: any, next: any) => {
         try {
             let errors: string[] = [];
 
@@ -115,7 +115,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/game/:gameId/conversations/:conversationId/markAsRead', middleware.authenticate, middleware.loadGameConversations, middleware.validateGameLocked, middleware.loadPlayer, async (req, res, next) => {
+    router.patch('/api/game/:gameId/conversations/:conversationId/markAsRead', middleware.authenticate, middleware.loadGameConversations, middleware.validateGameLocked, middleware.loadPlayer, async (req: any, res: any, next: any) => {
         if (req.session.isImpersonating) {
             return res.sendStatus(200);
         }
@@ -134,7 +134,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/game/:gameId/conversations/:conversationId/mute', middleware.authenticate, middleware.loadGameConversationsLean, middleware.validateGameLocked, middleware.loadPlayer, async (req, res, next) => {
+    router.patch('/api/game/:gameId/conversations/:conversationId/mute', middleware.authenticate, middleware.loadGameConversationsLean, middleware.validateGameLocked, middleware.loadPlayer, async (req: any, res: any, next: any) => {
         try {
             await container.conversationService.mute(
                 req.game,
@@ -147,7 +147,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/game/:gameId/conversations/:conversationId/unmute', middleware.authenticate, middleware.loadGameConversationsLean, middleware.validateGameLocked, middleware.loadPlayer, async (req, res, next) => {
+    router.patch('/api/game/:gameId/conversations/:conversationId/unmute', middleware.authenticate, middleware.loadGameConversationsLean, middleware.validateGameLocked, middleware.loadPlayer, async (req: any, res: any, next: any) => {
         try {
             await container.conversationService.unmute(
                 req.game,
@@ -160,7 +160,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/game/:gameId/conversations/:conversationId/leave', middleware.authenticate, middleware.loadGameConversationsLean, middleware.validateGameLocked, middleware.loadPlayer, async (req, res, next) => {
+    router.patch('/api/game/:gameId/conversations/:conversationId/leave', middleware.authenticate, middleware.loadGameConversationsLean, middleware.validateGameLocked, middleware.loadPlayer, async (req: any, res: any, next: any) => {
         try {
             let convo = await container.conversationService.leave(
                 req.game,
@@ -175,7 +175,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/game/:gameId/conversations/:conversationId/pin/:messageId', middleware.authenticate, middleware.loadGameConversationsLean, middleware.validateGameLocked, middleware.loadPlayer, async (req, res, next) => {
+    router.patch('/api/game/:gameId/conversations/:conversationId/pin/:messageId', middleware.authenticate, middleware.loadGameConversationsLean, middleware.validateGameLocked, middleware.loadPlayer, async (req: any, res: any, next: any) => {
         try {
             await container.conversationService.pinMessage(
                 req.game,
@@ -195,7 +195,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/game/:gameId/conversations/:conversationId/unpin/:messageId', middleware.authenticate, middleware.loadGameConversationsLean, middleware.validateGameLocked, middleware.loadPlayer, async (req, res, next) => {
+    router.patch('/api/game/:gameId/conversations/:conversationId/unpin/:messageId', middleware.authenticate, middleware.loadGameConversationsLean, middleware.validateGameLocked, middleware.loadPlayer, async (req: any, res: any, next: any) => {
         try {
             await container.conversationService.unpinMessage(
                 req.game,

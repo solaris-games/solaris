@@ -25,13 +25,13 @@ const game = {
 }
 
 const fakeStarService = {
-    generateUnownedStar(name, location) {
+    generateUnownedStar(name: string, location: any) {
         return {
             name,
             location
         }
     },
-    generateStarPosition(game, x, y) {
+    generateStarPosition(game: any, x: number, y: number) {
         return {
             x: 10,
             y: 10
@@ -40,16 +40,16 @@ const fakeStarService = {
 };
 
 const fakeStarDistanceService = {
-    isStarTooClose(game, star1, star2) {
+    isStarTooClose(game: any, star1: any, star2: any) {
         return false;
     },
-    isDuplicateStarPosition(location, stars) {
+    isDuplicateStarPosition(location: any, stars: any) {
         return false;
     },
-    isStarLocationTooClose(game, location, stars) {
+    isStarLocationTooClose(game: any, location: any, stars: any) {
         return false;
     },
-    isLocationTooClose(game, location, locations) {
+    isLocationTooClose(game: any, location: any, locations: any) {
         return false;
     }
 };
@@ -64,7 +64,7 @@ const fakeDistanceService = {
 };
 
 const fakeStarNameService = {
-    getRandomStarNames(count) {
+    getRandomStarNames(count: number) {
         let names: string[] = [];
 
         for (let i = 0; i < count; i++) {
@@ -87,9 +87,9 @@ describe('map', () => {
 
     const starCount = 10;
     const playerCount = 2;
-    let randomService;
-    let mapService;
-    let starMapService;
+    let randomService: any;
+    let mapService: any;
+    let starMapService: any;
 
     beforeEach(() => {
         // Use a real random service because it would not be easy to fake for these tests.
@@ -113,7 +113,7 @@ describe('map', () => {
         for(let i = 0; i < stars.length; i++) {
             let star = stars[i];
 
-            let duplicates = stars.filter(s => s.name === star.name);
+            let duplicates = stars.filter((s: any) => s.name === star.name);
 
             // Should equal 1 because we are checking against the same star.
             expect(duplicates.length).toEqual(1);

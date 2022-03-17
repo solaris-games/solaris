@@ -5,18 +5,18 @@ import ValidationError from '../errors/validation';
 import DatabaseRepository from '../models/DatabaseRepository';
 import { Game } from '../types/Game';
 import { GameEvent } from '../types/GameEvent';
-import { Player, PlayerReputation, ResearchType } from '../types/Player';
+import { Player, PlayerReputation, ResearchTypeNotRandom } from '../types/Player';
 import { TradeEvent, TradeEventTechnology, TradeTechnology } from '../types/Trade';
 import AchievementService from './achievement';
 import GameTypeService from './gameType';
 import DiplomacyService from './diplomacy';
-import { DiplomaticState, DiplomaticStatus } from "../types/Diplomacy";
 import LedgerService from './ledger';
 import PlayerService from './player';
 import ReputationService from './reputation';
 import UserService from './user';
 import { User } from '../types/User';
 import RandomService from './random';
+import PlayerCreditsService from './playerCredits';
 
 export default class TradeService extends EventEmitter {
     gameRepo: DatabaseRepository<Game>;
@@ -29,6 +29,7 @@ export default class TradeService extends EventEmitter {
     reputationService: ReputationService;
     gameTypeService: GameTypeService;
     randomService: RandomService;
+    playerCreditsService: PlayerCreditsService;
 
     constructor(
         gameRepo: DatabaseRepository<Game>,
@@ -40,7 +41,8 @@ export default class TradeService extends EventEmitter {
         achievementService: AchievementService,
         reputationService: ReputationService,
         gameTypeService: GameTypeService,
-        randomService: RandomService
+        randomService: RandomService,
+        playerCreditsService: PlayerCreditsService
     ) {
         super();
 
@@ -54,6 +56,7 @@ export default class TradeService extends EventEmitter {
         this.reputationService = reputationService;
         this.gameTypeService = gameTypeService;
         this.randomService = randomService;
+        this.playerCreditsService = playerCreditsService;
     }
 
     isTradingCreditsDisabled(game: Game) {
@@ -87,7 +90,7 @@ export default class TradeService extends EventEmitter {
         }
 
         // Get the players.
-        let toPlayer: Player = this.playerService.getById(game, toPlayerId);
+        let toPlayer: Player = this.playerService.getById(game, toPlayerId)!;
 
         if (fromPlayer === toPlayer) {
             throw new ValidationError(`Cannot send credits to yourself.`);
@@ -105,8 +108,8 @@ export default class TradeService extends EventEmitter {
         }
 
         let dbWrites = [
-            await this.playerService.addCredits(game, fromPlayer, -amount, false),
-            await this.playerService.addCredits(game, toPlayer, amount, false)
+            await this.playerCreditsService.addCredits(game, fromPlayer, -amount, false),
+            await this.playerCreditsService.addCredits(game, toPlayer, amount, false)
         ];
 
         await this.gameRepo.bulkWrite(dbWrites);
@@ -160,7 +163,7 @@ export default class TradeService extends EventEmitter {
         }
 
         // Get the players.
-        let toPlayer: Player = this.playerService.getById(game, toPlayerId);
+        let toPlayer: Player = this.playerService.getById(game, toPlayerId)!;
 
         if (fromPlayer === toPlayer) {
             throw new ValidationError(`Cannot send specialist tokens to yourself.`);
@@ -178,8 +181,8 @@ export default class TradeService extends EventEmitter {
         }
 
         let dbWrites = [
-            await this.playerService.addCreditsSpecialists(game, fromPlayer, -amount, false),
-            await this.playerService.addCreditsSpecialists(game, toPlayer, amount, false)
+            await this.playerCreditsService.addCreditsSpecialists(game, fromPlayer, -amount, false),
+            await this.playerCreditsService.addCreditsSpecialists(game, toPlayer, amount, false)
         ];
 
         await this.gameRepo.bulkWrite(dbWrites);
@@ -232,7 +235,7 @@ export default class TradeService extends EventEmitter {
         }
 
         // Get the players.
-        let toPlayer: Player = this.playerService.getById(game, toPlayerId);
+        let toPlayer: Player = this.playerService.getById(game, toPlayerId)!;
 
         if (fromPlayer === toPlayer) {
             throw new ValidationError(`Cannot award renown to yourself.`);
@@ -290,13 +293,13 @@ export default class TradeService extends EventEmitter {
         return eventObject;
     }
 
-    async sendTechnology(game: Game, fromPlayer: Player, toPlayerId: DBObjectId, technology: ResearchType, techLevel: number) {
+    async sendTechnology(game: Game, fromPlayer: Player, toPlayerId: DBObjectId, technology: ResearchTypeNotRandom, techLevel: number) {
         if (this.isTradingTechnologyDisabled(game)) {
             throw new ValidationError(`Trading technology is disabled.`);
         }
 
         // Get the players.
-        let toPlayer: Player = this.playerService.getById(game, toPlayerId);
+        let toPlayer: Player = this.playerService.getById(game, toPlayerId)!;
 
         if (fromPlayer === toPlayer) {
             throw new ValidationError(`Cannot trade technology with yourself.`);
@@ -333,12 +336,12 @@ export default class TradeService extends EventEmitter {
         // toPlayerTech.progress = 0;
         // fromPlayer.credits -= tradeTech.cost;
 
-        let updateResearchQuery = {};
+        let updateResearchQuery: any = {};
         updateResearchQuery['galaxy.players.$.research.' + tradeTech.name + '.level'] = tradeTech.level;
         updateResearchQuery['galaxy.players.$.research.' + tradeTech.name + '.progress'] = 0;
 
         let dbWrites = [
-            await this.playerService.addCredits(game, fromPlayer, -tradeTech.cost, false),
+            await this.playerCreditsService.addCredits(game, fromPlayer, -tradeTech.cost, false),
             {
                 updateOne: {
                     filter: {
@@ -400,7 +403,7 @@ export default class TradeService extends EventEmitter {
         }
 
         // Get the players.
-        let toPlayer: Player = this.playerService.getById(game, toPlayerId);
+        let toPlayer: Player = this.playerService.getById(game, toPlayerId)!;
 
         if (fromPlayer._id.toString() === toPlayer._id.toString()) {
             throw new ValidationError('Cannot trade with the same player');
@@ -408,10 +411,10 @@ export default class TradeService extends EventEmitter {
 
         // Get all of the technologies that the from player has that have a higher
         // level than the to player.
-        let techKeys = Object.keys(fromPlayer.research)
+        let techKeys: ResearchTypeNotRandom[] = Object.keys(fromPlayer.research)
             .filter(k => {
                 return k.match(/^[^_\$]/) != null;
-            });
+            }) as ResearchTypeNotRandom[];
 
         let tradeTechs: TradeTechnology[] = [];
 
@@ -424,7 +427,7 @@ export default class TradeService extends EventEmitter {
 
             while (techLevel > techToPlayer.level) {
                 tradeTechs.push({
-                    name: techKey as ResearchType,
+                    name: techKey,
                     level: techLevel,
                     cost: techLevel * game.settings.player.tradeCost
                 });

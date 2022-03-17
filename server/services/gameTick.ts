@@ -26,6 +26,8 @@ import WaypointService from "./waypoint";
 import { CarrierActionWaypoint } from "../types/GameTick";
 import { Star } from "../types/Star";
 import { GameRankingResult } from "../types/Rating";
+import DiplomacyUpkeepService from "./diplomacyUpkeep";
+import PlayerCreditsService from "./playerCredits";
 
 const EventEmitter = require('events');
 const moment = require('moment');
@@ -52,6 +54,8 @@ export default class GameTickService extends EventEmitter {
     diplomacyService: DiplomacyService;
     gameTypeService: GameTypeService;
     gameStateService: GameStateService;
+    playerCreditsService: PlayerCreditsService;
+    diplomacyUpkeepService: DiplomacyUpkeepService;
     
     constructor(
         distanceService: DistanceService,
@@ -74,7 +78,9 @@ export default class GameTickService extends EventEmitter {
         orbitalMechanicsService: OrbitalMechanicsService,
         diplomacyService: DiplomacyService,
         gameTypeService: GameTypeService,
-        gameStateService: GameStateService
+        gameStateService: GameStateService,
+        playerCreditsService: PlayerCreditsService,
+        diplomacyUpkeepService: DiplomacyUpkeepService
     ) {
         super();
             
@@ -99,6 +105,8 @@ export default class GameTickService extends EventEmitter {
         this.diplomacyService = diplomacyService;
         this.gameTypeService = gameTypeService;
         this.gameStateService = gameStateService;
+        this.playerCreditsService = playerCreditsService;
+        this.diplomacyUpkeepService = diplomacyUpkeepService;
     }
 
     async tick(gameId: DBObjectId) {
@@ -126,7 +134,7 @@ export default class GameTickService extends EventEmitter {
         let taskTime = process.hrtime();
         let taskTimeEnd: [number, number] | null = null;
 
-        let logTime = (taskName) => {
+        let logTime = (taskName: string) => {
             taskTimeEnd = process.hrtime(taskTime);
             taskTime = process.hrtime();
             console.info(`[${game.settings.general.name}] - ${taskName}: %ds %dms'`, taskTimeEnd[0], taskTimeEnd[1] / 1000000);
@@ -315,7 +323,7 @@ export default class GameTickService extends EventEmitter {
         const graph = this._getCarrierPositionGraph(carrierPositions);
 
         for (let carrierPath in graph) {
-            let positions = graph[carrierPath];
+            let positions = (graph as any)[carrierPath];
 
             if (positions.length <= 1) {
                 continue;
@@ -331,8 +339,8 @@ export default class GameTickService extends EventEmitter {
                 // First up, get all carriers that are heading from the destination and to the source
                 // and are in front of the carrier.
                 let collisionCarriers: CarrierPosition[] = positions
-                    .filter(c => {
-                        return (c.carrier.ships > 0 && !c.carrier.isGift) // Is still alive and not a gift
+                    .filter((c: CarrierPosition) => {
+                        return (c.carrier.ships! > 0 && !c.carrier.isGift) // Is still alive and not a gift
                             && (
                                 // Head to head combat:
                                 (
@@ -366,7 +374,7 @@ export default class GameTickService extends EventEmitter {
                     continue;
                 }
 
-                let friendlyPlayer = this.playerService.getById(game, friendlyCarrier.carrier.ownedByPlayerId);
+                let friendlyPlayer = this.playerService.getById(game, friendlyCarrier.carrier.ownedByPlayerId)!;
                 
                 let combatCarriers = collisionCarriers
                     .map(c => c.carrier)
@@ -408,12 +416,12 @@ export default class GameTickService extends EventEmitter {
                 continue;
             }
 
-            const graphObj = graph[graphKeyA] || graph[graphKeyB];
+            const graphObj = (graph as any)[graphKeyA] || (graph as any)[graphKeyB];
             
             if (graphObj) {
                 graphObj.push(carrierPosition);
             } else {
-                graph[graphKeyA] = [ carrierPosition ];
+                (graph as any)[graphKeyA] = [ carrierPosition ];
             }
         }
 
@@ -502,7 +510,7 @@ export default class GameTickService extends EventEmitter {
             // Get all carriers orbiting the star and perform combat.
             let carriersAtStar = game.galaxy.carriers.filter(c => c.orbiting && c.orbiting.toString() === combatStar._id.toString());
 
-            let starOwningPlayer = this.playerService.getById(game, combatStar.ownedByPlayerId);
+            let starOwningPlayer = this.playerService.getById(game, combatStar.ownedByPlayerId!)!;
 
             await this.combatService.performCombat(game, gameUsers, starOwningPlayer, combatStar, carriersAtStar);
         }
@@ -538,7 +546,7 @@ export default class GameTickService extends EventEmitter {
         for (let i = 0; i < contestedStars.length; i++) {
             let contestedStar = contestedStars[i];
 
-            let starOwningPlayer = this.playerService.getById(game, contestedStar.star.ownedByPlayerId);
+            let starOwningPlayer = this.playerService.getById(game, contestedStar.star.ownedByPlayerId!)!;
 
             await this.combatService.performCombat(game, gameUsers, starOwningPlayer, contestedStar.star, contestedStar.carriersInOrbit);
         }
@@ -583,10 +591,10 @@ export default class GameTickService extends EventEmitter {
             for (let i = 0; i < game.galaxy.players.length; i++) {
                 let player = game.galaxy.players[i];
 
-                let creditsResult = this.playerService.givePlayerCreditsEndOfCycleRewards(game, player);
+                let creditsResult = this.playerCreditsService.givePlayerCreditsEndOfCycleRewards(game, player);
                 let experimentResult = this.researchService.conductExperiments(game, player);
                 let carrierUpkeepResult = this.playerService.deductCarrierUpkeepCost(game, player);
-                let allianceUpkeepResult = this.playerService.deductAllianceUpkeepCost(game, player, creditsResult.creditsFromEconomy); // TODO: creditsTotal?
+                let allianceUpkeepResult = this.diplomacyUpkeepService.deductTotalUpkeepCost(game, player, creditsResult.creditsFromEconomy); // TODO: creditsTotal?
 
                 // Raise an event if the player isn't defeated, AI doesn't care about events.
                 if (!player.defeated) {

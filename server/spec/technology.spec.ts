@@ -1,8 +1,8 @@
 import TechnologyService from '../services/technology';
 const mongoose = require('mongoose');
 
-let service,
-    specialistService;
+let service: any,
+    specialistService: any;
 
 const playerId = new mongoose.Types.ObjectId();
 
@@ -226,7 +226,7 @@ describe('technology', () => {
             specialistId: null
         };
 
-        const carriersInOrbit = [];
+        const carriersInOrbit: any[] = [];
 
         setup();
 
@@ -265,7 +265,7 @@ describe('technology', () => {
             specialistId: null
         };
 
-        const carriersInOrbit = [];
+        const carriersInOrbit: any[] = [];
 
         setup();
 
@@ -295,7 +295,7 @@ describe('technology', () => {
             specialistId: null
         };
 
-        const carriersInOrbit = [];
+        const carriersInOrbit: any[] = [];
 
         setup();
 
@@ -333,7 +333,7 @@ describe('technology', () => {
             }
         };
 
-        const carriersInOrbit = [];
+        const carriersInOrbit: any[] = [];
 
         setup(specialist, null);
 
@@ -622,7 +622,7 @@ describe('technology', () => {
     /* CARRIER DEBUFFS */
 
     it('should calculate carrier debuff - No carriers', () => {
-        const carriers = [];
+        const carriers: any[] = [];
 
         setup();
 

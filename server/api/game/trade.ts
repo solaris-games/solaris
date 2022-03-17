@@ -4,11 +4,11 @@ import { DependencyContainer } from '../../types/DependencyContainer';
 import Middleware from '../middleware';
 const mongoose = require('mongoose');
 
-export default (router: Router, io, container: DependencyContainer) => {
+export default (router: Router, io: any, container: DependencyContainer) => {
 
     const middleware = Middleware(container);
 
-    router.put('/api/game/:gameId/trade/credits', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameInProgress, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/trade/credits', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameInProgress, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req: any, res: any, next: any) => {
         let errors: string[] = [];
 
         if (!req.body.toPlayerId) {
@@ -50,7 +50,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/trade/creditsSpecialists', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameInProgress, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/trade/creditsSpecialists', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameInProgress, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req: any, res: any, next: any) => {
         let errors: string[] = [];
 
         if (!req.body.toPlayerId) {
@@ -92,7 +92,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/trade/renown', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameStarted, middleware.loadPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/trade/renown', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameStarted, middleware.loadPlayer, async (req: any, res: any, next: any) => {
         let errors: string[] = [];
 
         if (!req.body.toPlayerId) {
@@ -131,7 +131,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/trade/tech', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameInProgress, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.put('/api/game/:gameId/trade/tech', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameInProgress, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req: any, res: any, next: any) => {
         let errors: string[] = [];
 
         if (!req.body.toPlayerId) {
@@ -160,7 +160,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/trade/tech/:toPlayerId', middleware.authenticate, middleware.loadGameLean, middleware.validateGameInProgress, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
+    router.get('/api/game/:gameId/trade/tech/:toPlayerId', middleware.authenticate, middleware.loadGameLean, middleware.validateGameInProgress, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req: any, res: any, next: any) => {
         try {
             let techs = await container.tradeService.getTradeableTechnologies(
                 req.game,
@@ -173,7 +173,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/trade/:toPlayerId/events', middleware.authenticate, middleware.loadGamePlayersState, middleware.loadPlayer, async (req, res, next) => {
+    router.get('/api/game/:gameId/trade/:toPlayerId/events', middleware.authenticate, middleware.loadGamePlayersState, middleware.loadPlayer, async (req: any, res: any, next: any) => {
         try {
             let events = await container.tradeService.listTradeEventsBetweenPlayers(
                 req.game, 

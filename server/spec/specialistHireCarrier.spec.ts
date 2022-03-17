@@ -62,7 +62,7 @@ describe('specialistHire - Carrier', () => {
         return obj;
     }
 
-    function carrierUnowned(testObj) {
+    function carrierUnowned(testObj: any) {
         return {
             _id: testObj.carrierId,
             ownedByPlayerId: new mongoose.Types.ObjectId(),
@@ -71,7 +71,7 @@ describe('specialistHire - Carrier', () => {
         };
     }
 
-    function carrierInTransit(testObj) {
+    function carrierInTransit(testObj: any) {
         return {
             _id: testObj.carrierId,
             ownedByPlayerId: testObj.playerId,
@@ -80,7 +80,7 @@ describe('specialistHire - Carrier', () => {
         };
     }
     
-    function carrierInOrbit(testObj) {
+    function carrierInOrbit(testObj: any) {
         return {
             _id: testObj.carrierId,
             ownedByPlayerId: testObj.playerId,
@@ -89,14 +89,14 @@ describe('specialistHire - Carrier', () => {
         };
     }
 
-    function starBasic(testObj) {
+    function starBasic(testObj: any) {
         return {
             _id: testObj.starId,
             ownedByPlayerId: testObj.playerId
         };
     }
 
-    function carrierInOrbitWithSpec(testObj, specId) {
+    function carrierInOrbitWithSpec(testObj: any, specId: any) {
         return {
             _id: testObj.carrierId,
             ownedByPlayerId: testObj.playerId,
@@ -105,7 +105,7 @@ describe('specialistHire - Carrier', () => {
         };
     }
 
-    function specialistBasic(testObj) {
+    function specialistBasic(testObj: any) {
         return {
             id: testObj.specialistId
         }
@@ -185,7 +185,7 @@ describe('specialistHire - Carrier', () => {
         testObj.game.galaxy.carriers.push(carrierInOrbit(testObj));
         testObj.game.galaxy.stars.push(star);
 
-        testObj.specialistService.getByIdCarrier = (id) => {
+        testObj.specialistService.getByIdCarrier = (id: any) => {
             return null;
         };
 
@@ -215,7 +215,7 @@ describe('specialistHire - Carrier', () => {
         testObj.game.galaxy.carriers.push(carrierInOrbit(testObj));
         testObj.game.galaxy.stars.push(star);
 
-        testObj.specialistService.getByIdCarrier = (id) => {
+        testObj.specialistService.getByIdCarrier = (id: any) => {
             return null;
         };
 
@@ -245,7 +245,7 @@ describe('specialistHire - Carrier', () => {
         testObj.game.galaxy.carriers.push(carrierInOrbitWithSpec(testObj, testObj.specialistId));
         testObj.game.galaxy.stars.push(star);
 
-        testObj.specialistService.getByIdCarrier = (id) => {
+        testObj.specialistService.getByIdCarrier = (id: any) => {
             return specialistBasic(testObj);
         };
 
@@ -275,7 +275,7 @@ describe('specialistHire - Carrier', () => {
         testObj.game.galaxy.carriers.push(carrierInOrbitWithSpec(testObj, null));
         testObj.game.galaxy.stars.push(star);
 
-        testObj.specialistService.getByIdCarrier = (id) => {
+        testObj.specialistService.getByIdCarrier = (id: any) => {
             return specialistBasic(testObj);
         };
 
@@ -314,7 +314,7 @@ describe('specialistHire - Carrier', () => {
         testObj.game.galaxy.carriers.push(carrierInOrbitWithSpec(testObj, null));
         testObj.game.galaxy.stars.push(star);
 
-        testObj.specialistService.getByIdCarrier = (id) => {
+        testObj.specialistService.getByIdCarrier = (id: any) => {
             return specialistBasic(testObj);
         };
 
@@ -354,7 +354,7 @@ describe('specialistHire - Carrier', () => {
         testObj.game.galaxy.carriers.push(carrier);
         testObj.game.galaxy.stars.push(star);
 
-        testObj.specialistService.getByIdCarrier = (id) => {
+        testObj.specialistService.getByIdCarrier = (id: any) => {
             return specialistBasic(testObj);
         };
 
@@ -372,7 +372,7 @@ describe('specialistHire - Carrier', () => {
             }
         };
 
-        testObj.playerService.addCredits = (game, player, amount) => {
+        testObj.playerCreditsService.addCredits = (game: any, player: any, amount: number) => {
             expect(amount).toBe(-100);
         };
 

@@ -1,13 +1,13 @@
 import AuthService from '../services/auth';
 
 const fakeBcrypt = {
-    compare(password1, password2) {
+    compare(password1: string, password2: string) {
         return password1 == password2;
     }
 };
 
 const fakeUserModel = {
-    async findOne(user) {
+    async findOne(user: any) {
         return Promise.resolve([
             {
                 _id: 1,
@@ -20,7 +20,7 @@ const fakeUserModel = {
 };
 
 describe('auth', () => {
-    let service;
+    let service: any;
 
     beforeAll(() => {
         // @ts-ignore

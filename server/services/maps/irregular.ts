@@ -123,7 +123,7 @@ export default class IrregularMapService {
         homeLocations.push(firstLocation);
 
         while(homeLocations.length<playerCount) {
-            let position;
+            let position: any;
             let positionIsValid = false;
             let attempts = 0;
             while(!positionIsValid) {
@@ -311,8 +311,8 @@ export default class IrregularMapService {
         let locations: Location[] = [];
         let homeLocations = this._generateHomeLocations(PIVOT_DISTANCE, playerCount, RNG, SIMPLEX_NOISE, NOISE_SPREAD);
         let supplementaryHomeLocations = this._generateSupplementaryHomeLocations(PIVOT_DISTANCE, homeLocations);
-        let baseLocations = [];
-        let supplementaryLocations = [];
+        let baseLocations: any[] = [];
+        let supplementaryLocations: any[] = [];
 
         
         for( let homeLocation of homeLocations ) {
