@@ -598,7 +598,7 @@ export default class GameTickService extends EventEmitter {
             // Conduct experiments.
             for (let i = 0; i < game.galaxy.players.length; i++) {
                 let player = game.galaxy.players[i];
-
+                
                 let creditsResult = this.playerCreditsService.givePlayerCreditsEndOfCycleRewards(game, player);
                 let experimentResult = this.researchService.conductExperiments(game, player);
                 let carrierUpkeepResult = this.playerService.deductCarrierUpkeepCost(game, player);
