@@ -1,7 +1,7 @@
 import { DBObjectId } from '../types/DBObjectId';
 import ValidationError from '../errors/validation';
 import { Game } from '../types/Game';
-import { Player, PlayerDiplomacy, PlayerReputation, PlayerResearch } from '../types/Player';
+import { Player, PlayerDiplomaticState, PlayerReputation, PlayerResearch } from '../types/Player';
 import BattleRoyaleService from './battleRoyale';
 import BroadcastService from './broadcast';
 import CacheService from './cache';
@@ -562,10 +562,7 @@ export default class GameGalaxyService {
                 research = null;
             }
 
-            let diplomacy: PlayerDiplomacy = {
-              otherPlayers: [], 
-              alliancesMadeThisCycle: 0 
-            };
+            let diplomacy: PlayerDiplomaticState[] = [];
 
             if (userPlayer) {
                 diplomacy = this.diplomacyService.getFilteredDiplomacy(p, userPlayer);

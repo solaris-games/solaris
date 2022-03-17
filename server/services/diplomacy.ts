@@ -4,7 +4,7 @@ import ValidationError from '../errors/validation';
 import DatabaseRepository from "../models/DatabaseRepository";
 import { DiplomaticState, DiplomaticStatus } from "../types/Diplomacy";
 import { Game } from "../types/Game";
-import { Player, PlayerDiplomacy } from "../types/Player";
+import { Player, PlayerDiplomaticState } from "../types/Player";
 
 export default class DiplomacyService extends EventEmitter {
     gameRepo: DatabaseRepository<Game>;
@@ -72,8 +72,8 @@ export default class DiplomacyService extends EventEmitter {
             };
         }
 
-        let statusTo: DiplomaticState = playerA.diplomacy.otherPlayers.find(x => x.playerId.toString() === playerB._id.toString())?.status ?? 'neutral';
-        let statusFrom: DiplomaticState = playerB.diplomacy.otherPlayers.find(x => x.playerId.toString() === playerA._id.toString())?.status ?? 'neutral';
+        let statusTo: DiplomaticState = playerA.diplomacy.find(x => x.playerId.toString() === playerB._id.toString())?.status ?? 'neutral';
+        let statusFrom: DiplomaticState = playerB.diplomacy.find(x => x.playerId.toString() === playerA._id.toString())?.status ?? 'neutral';
 
         let actualStatus: DiplomaticState;
 
@@ -146,11 +146,8 @@ export default class DiplomacyService extends EventEmitter {
         return true;
     }
 
-    getFilteredDiplomacy(player: Player, forPlayer: Player): PlayerDiplomacy {
-        return {
-            otherPlayers: player.diplomacy.otherPlayers.filter(a => a.toString() === forPlayer._id.toString()),
-            alliancesMadeThisCycle: player.diplomacy.alliancesMadeThisCycle
-        }
+    getFilteredDiplomacy(player: Player, forPlayer: Player): PlayerDiplomaticState[] {
+        return player.diplomacy.filter(a => a.toString() === forPlayer._id.toString());
     }
 
     async _declareStatus(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId, state: DiplomaticState, saveToDB: boolean = true) {
@@ -163,7 +160,7 @@ export default class DiplomacyService extends EventEmitter {
         }
 
         let diploStatusBefore = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
-        let diplo = player.diplomacy.otherPlayers.find(d => d.playerId.toString() === playerIdTarget.toString());
+        let diplo = player.diplomacy.find(d => d.playerId.toString() === playerIdTarget.toString());
 
         //only add alliance request if the target player is not already an ally and if the player has capacity for more allies
         if (state == 'allies' && (allianceCount >= game.settings.alliances.maxAlliances || diploStatusBefore.actualStatus == 'allies')) {
@@ -176,7 +173,7 @@ export default class DiplomacyService extends EventEmitter {
                 status: state
             };
 
-            player.diplomacy.otherPlayers.push(diplo);
+            player.diplomacy.push(diplo);
 
             if (saveToDB) {
                 await this.gameRepo.updateOne({
@@ -184,11 +181,7 @@ export default class DiplomacyService extends EventEmitter {
                     'galaxy.players._id': playerId
                 }, {
                     $addToSet: {
-                        'galaxy.players.$.diplomacy.otherPlayers': diplo
-                    },
-                    $inc: {
-                        //add one if this makes a new alliance (if target player was already allied).
-                        'galaxy.players.$.diplomacy.alliancesMadeThisCycle': ((diploStatusBefore.statusFrom == 'allies' && diplo.status == 'allies')?1:0)
+                        'galaxy.players.$.diplomacy': diplo
                     }
                 });
             }
@@ -200,11 +193,7 @@ export default class DiplomacyService extends EventEmitter {
                     _id: game._id,
                 }, {
                     $set: {
-                        'galaxy.players.$[p].diplomacy.otherPlayers.$[d].status': diplo.status
-                    },
-                    $inc: {
-                        //add one if this makes a new alliance (if target player was already allied).
-                        'galaxy.players.$[p].diplomacy.alliancesMadeThisCycle': ((diploStatusBefore.statusFrom == 'allies' && diplo.status == 'allies')?1:0)
+                        'galaxy.players.$[p].diplomacy.$[d].status': diplo.status
                     }
                 }, {
                     arrayFilters: [
@@ -213,18 +202,6 @@ export default class DiplomacyService extends EventEmitter {
                     ]
                 });
             }
-        }
-
-        // if this is a new ally, increment the target players alliancesHeldCount also
-        if (saveToDB && diploStatusBefore.statusFrom == 'allies' && diplo.status == 'allies') {
-            await this.gameRepo.updateOne({
-                _id: game._id,
-                'galaxy.players._id': playerIdTarget
-            }, {
-                $inc: {
-                    'galaxy.players.$.diplomacy.alliancesMadeThisCycle': 1
-                }
-            });
         }
 
         // Figure out what the new status is and return.

@@ -77,15 +77,12 @@ const schema = new Schema({
             score: { type: Types.Number, required: true, default: 0  }
         }
     ],
-    diplomacy: {
-        otherPlayers: [ 
-          {
-              playerId: { type: Types.ObjectId, required: true },
-              status: { type: Types.String, required: true }
-          }
-        ],
-        alliancesMadeThisCycle : { type: Types.Number, required: true, default: 0 }
-    }
+    diplomacy: [
+        {
+            playerId: { type: Types.ObjectId, required: true },
+            status: { type: Types.String, required: true }
+        }
+    ]
 });
 
 export default schema;

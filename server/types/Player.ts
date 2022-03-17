@@ -52,11 +52,6 @@ export interface PlayerDiplomaticState {
     status: DiplomaticState;
 };
 
-export interface PlayerDiplomacy {
-    otherPlayers: PlayerDiplomaticState[];
-    alliancesMadeThisCycle: number;
-};
-
 export interface Player {
     _id: DBObjectId;
     userId: DBObjectId | null;
@@ -90,7 +85,7 @@ export interface Player {
     research: PlayerResearch,
     ledger: PlayerLedger[],
     reputations: PlayerReputation[],
-    diplomacy: PlayerDiplomacy,
+    diplomacy: PlayerDiplomaticState[],
     stats?: PlayerStatistics;
     isKingOfTheHill?: boolean;
     isInScanningRange?: boolean;

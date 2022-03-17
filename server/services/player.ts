@@ -612,7 +612,7 @@ export default class PlayerService extends EventEmitter {
         throw new Error(`Unsupported specialist reward type: ${game.settings.technology.specialistTokenReward}.`);
     }
 
-    deductAllianceUpkeepCost(game, player, credits) {
+    deductAllianceUpkeepCost(game: Game, player: Player, credits: number) {
         const upkeepCosts = {
             'none': 0,
             'cheap': .02,
@@ -626,11 +626,10 @@ export default class PlayerService extends EventEmitter {
             return null;
         }
 
-        let allianceCount = player.diplomacy.alliancesMadeThisCycle;
+        let allianceCount = this.diplomacyService.getAlliesOfPlayer(game, player).length;
         let totalCost = Math.round(allianceCount * costPerAlly * credits);
         
         player.credits -= totalCost;
-        player.diplomacy.alliancesMadeThisCycle = this.diplomacyService.getAlliesOfPlayer(game, player).length;
 
         return {
             allianceCount,
