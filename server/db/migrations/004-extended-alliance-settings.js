@@ -23,7 +23,7 @@ module.exports = {
         }).forEach(function(game) {
             game.settings.alliances.maxAlliances = game.settings.general.playerLimit - 1;
 
-            db.games.save(game);
+            games.save(game);
         });
     }
 };

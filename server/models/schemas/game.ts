@@ -106,13 +106,13 @@ const schema = new Schema({
 			tradeCost: { type: Types.Number, required: true, enum: [0, 5, 15, 25, 50, 100], default: 15 }, // TODO: This could be renamed.
 			tradeScanning: { type: Types.String, required: true, enum: ['all', 'scanned'], default: 'all' }
     },
-		alliances: {
-			enabled: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
-	    allianceOnlyTrading: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
-      maxAlliances: { type: Types.Number, required: true, min: 1, max: 31, default: 31 },
-      allianceUpkeepCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'none' },
-  		globalEvents: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' }
-		},
+	alliances: {
+		enabled: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
+		allianceOnlyTrading: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
+		maxAlliances: { type: Types.Number, required: true, min: 1, max: 31, default: 31 },
+		allianceUpkeepCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'none' },
+		globalEvents: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' }
+	},
     technology: {
 			startingTechnologyLevel: {
 				terraforming: { type: Types.Number, required: true, min: 1, max: 16, default: 1 },
@@ -209,6 +209,14 @@ const schema = new Schema({
 				expensive: { type: Types.Number, required: true, default: 2 },
 				veryExpensive: { type: Types.Number, required: true, default: 4 },
 				crazyExpensive: { type: Types.Number, required: true, default: 8 }
+			}
+		},
+		alliances: {
+			upkeepExpenseMultipliers: {
+				none: { type: Types.Number, required: true, default: 0 },
+				cheap: { type: Types.Number, required: true, default: 0.02 },
+				standard: { type: Types.Number, required: true, default: 0.05 },
+				expensive: { type: Types.Number, required: true, default: 0.10 }
 			}
 		}
 	},

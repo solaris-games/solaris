@@ -613,16 +613,9 @@ export default class PlayerService extends EventEmitter {
     }
 
     deductAllianceUpkeepCost(game: Game, player: Player, credits: number) {
-        const upkeepCosts = {
-            'none': 0,
-            'cheap': .02,
-            'standard': .05,
-            'expensive': .10
-        };
+        let costPerAlly = game.constants.alliances.upkeepExpenseMultipliers[game.settings.alliances.allianceUpkeepCost];
 
-        let costPerAlly = upkeepCosts[game.settings.alliances.allianceUpkeepCost];
-
-        if (costPerAlly == 0) {
+        if (costPerAlly === 0) {
             return null;
         }
 

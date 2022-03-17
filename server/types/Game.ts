@@ -247,6 +247,14 @@ export interface Game {
 				veryExpensive: number;
 				crazyExpensive: number;
 			}
+		},
+		alliances: {
+			upkeepExpenseMultipliers: {
+				none: number;
+				cheap: number;
+				standard: number;
+				expensive: number;
+			}
 		}
 	},
 	quitters: DBObjectId[],
