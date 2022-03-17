@@ -474,27 +474,22 @@ export default class AIService {
     }
 
     async _useAssignment(context: Context, game: Game, player: Player, assignments: Map<string, Assignment>, assignment: Assignment, waypoints: CarrierWaypoint[], ships: number, onCarrierUsed: ((Carrier) => void) | null = null) {
-        console.log("Using assignment from " + assignment.star.name + ". " + assignment.carriers.length + " carriers present.");
         let shipsToTransfer = ships;
         const starId = assignment.star._id;
         let carrier: Carrier = assignment.carriers && assignment.carriers[0];
         if (carrier) {
-            console.log("Using existing carrier " + carrier.name);
             assignment.carriers.shift();
         } else {
             const buildResult = await this.starUpgradeService.buildCarrier(game, player, starId, 1, false);
             carrier = this.carrierService.getById(game, buildResult.carrier._id);
             shipsToTransfer -= 1;
             assignment.totalShips -= 1;
-            console.log("Building new carrier " + carrier.name);
         }
         if (shipsToTransfer > 0) {
-            console.log("Ships for transfer: " + shipsToTransfer + ", assignment total: " + assignment.totalShips);
             const remaining = Math.max(assignment.star.ships! - shipsToTransfer, 0);
             await this.shipTransferService.transfer(game, player, carrier._id, shipsToTransfer + 1, starId, remaining, false);
             assignment.totalShips = assignment.star.ships!;
         }
-        console.log("Assignment ships after transfer: " + assignment.totalShips);
         const carrierResult = await this.waypointService.saveWaypointsForCarrier(game, player, carrier, waypoints, false, false);
         const carrierRemaining = assignment.carriers && assignment.carriers.length > 0;
         if (!carrierRemaining && assignment.totalShips === 0) {
