@@ -255,11 +255,7 @@
                 },
                 "special": {
                     "reigniteDeadStar": true,
-                    "reigniteDeadStarNaturalResources": {
-                        "economy": 25,
-                        "industry": 25,
-                        "science": 25
-                    }
+                    "reigniteDeadStarNaturalResources": 25
                 }
             }
         },

@@ -496,9 +496,15 @@ export default class CarrierService extends EventEmitter {
         }
 
         // Reignite dead stars if applicable
-        // Note: Black holes cannot be reignited.
         if (!carrier.isGift && this.starService.isDeadStar(destinationStar) && this.specialistService.getReigniteDeadStar(carrier)) {
-            let reigniteNaturalResources = this.specialistService.getReigniteDeadStarNaturalResources(carrier);
+            let baseNaturalResources = this.specialistService.getReigniteDeadStarNaturalResources(carrier);
+
+            let reigniteNaturalResources = {
+                "economy": destinationStar.isBinaryStar ? baseNaturalResources * 2 : baseNaturalResources,
+                "industry": destinationStar.isBinaryStar ? baseNaturalResources * 2 : baseNaturalResources,
+                "science": destinationStar.isBinaryStar ? baseNaturalResources * 2 : baseNaturalResources
+            };
+
 
             this.starService.reigniteDeadStar(game, destinationStar, reigniteNaturalResources);
 
