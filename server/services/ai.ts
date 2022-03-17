@@ -94,7 +94,7 @@ interface FoundAssignment {
 const EMPTY_STAR_SCORE_MULTIPLIER = 1;
 const ENEMY_STAR_SCORE_MULTIPLIER = 5;
 
-const REINFORCEMENT_MIN_CYCLES = 0.8;
+const REINFORCEMENT_MIN_CYCLES = 1.5;
 
 // IMPORTANT IMPLEMENTATION NOTES
 // During AI tick, care must be taken to NEVER write any changes to the database.
