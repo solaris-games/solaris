@@ -8,6 +8,8 @@ import BattleRoyaleService from "../services/battleRoyale";
 import BroadcastService from "../services/broadcast";
 import CacheService from "../services/cache";
 import CarrierService from "../services/carrier";
+import CarrierGiftService from "../services/carrierGift";
+import CarrierMovementService from "../services/carrierMovement";
 import CombatService from "../services/combat";
 import ConversationService from "../services/conversation";
 import DiplomacyService from "../services/diplomacy";
@@ -112,4 +114,6 @@ export interface DependencyContainer {
     playerStatisticsService: PlayerStatisticsService,
     playerCreditsService: PlayerCreditsService,
     diplomacyUpkeepService: DiplomacyUpkeepService,
+    carrierGiftService: CarrierGiftService,
+    carrierMovementService: CarrierMovementService,
 };

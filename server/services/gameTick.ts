@@ -28,6 +28,8 @@ import { Star } from "../types/Star";
 import { GameRankingResult } from "../types/Rating";
 import DiplomacyUpkeepService from "./diplomacyUpkeep";
 import PlayerCreditsService from "./playerCredits";
+import CarrierGiftService from "./carrierGift";
+import CarrierMovementService from "./carrierMovement";
 
 const EventEmitter = require('events');
 const moment = require('moment');
@@ -56,6 +58,8 @@ export default class GameTickService extends EventEmitter {
     gameStateService: GameStateService;
     playerCreditsService: PlayerCreditsService;
     diplomacyUpkeepService: DiplomacyUpkeepService;
+    carrierMovementService: CarrierMovementService;
+    carrierGiftService: CarrierGiftService;
     
     constructor(
         distanceService: DistanceService,
@@ -80,7 +84,9 @@ export default class GameTickService extends EventEmitter {
         gameTypeService: GameTypeService,
         gameStateService: GameStateService,
         playerCreditsService: PlayerCreditsService,
-        diplomacyUpkeepService: DiplomacyUpkeepService
+        diplomacyUpkeepService: DiplomacyUpkeepService,
+        carrierMovementService: CarrierMovementService,
+        carrierGiftService: CarrierGiftService
     ) {
         super();
             
@@ -107,6 +113,8 @@ export default class GameTickService extends EventEmitter {
         this.gameStateService = gameStateService;
         this.playerCreditsService = playerCreditsService;
         this.diplomacyUpkeepService = diplomacyUpkeepService;
+        this.carrierMovementService = carrierMovementService;
+        this.carrierGiftService = carrierGiftService;
     }
 
     async tick(gameId: DBObjectId) {
@@ -277,12 +285,12 @@ export default class GameTickService extends EventEmitter {
         // and where they will be moving to.
         let carrierPositions: CarrierPosition[] = game.galaxy.carriers
             .filter(x => 
-                this.carrierService.isInTransit(x)           // Carrier is already in transit
-                || this.carrierService.isLaunching(x)        // Or the carrier is just about to launch (this prevent carrier from hopping over attackers)
+                this.carrierMovementService.isInTransit(x)           // Carrier is already in transit
+                || this.carrierMovementService.isLaunching(x)        // Or the carrier is just about to launch (this prevent carrier from hopping over attackers)
             )
             .map(c => {
                 let waypoint = c.waypoints[0];
-                let locationNext = this.carrierService.getNextLocationToWaypoint(game, c);
+                let locationNext = this.carrierMovementService.getNextLocationToWaypoint(game, c);
 
                 let sourceStar = this.starService.getById(game, waypoint.source);
                 let destinationStar = this.starService.getById(game, waypoint.destination);
@@ -485,7 +493,7 @@ export default class GameTickService extends EventEmitter {
         for (let i = 0; i < carriersInTransit.length; i++) {
             let carrierInTransit = carriersInTransit[i];
         
-            let carrierMovementReport = await this.carrierService.moveCarrier(game, gameUsers, carrierInTransit);
+            let carrierMovementReport = await this.carrierMovementService.moveCarrier(game, gameUsers, carrierInTransit);
 
             // If the carrier has arrived at the star then
             // append the movement waypoint to the array of action waypoints so that we can deal with it after combat.
@@ -779,7 +787,7 @@ export default class GameTickService extends EventEmitter {
         for (let carrier of carriers) {
             const star = this.starService.getById(game, carrier.orbiting!);
 
-            this.carrierService.transferGift(game, gameUsers, star, carrier);
+            this.carrierGiftService.transferGift(game, gameUsers, star, carrier);
         }
     }
 }

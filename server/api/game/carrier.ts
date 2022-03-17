@@ -82,7 +82,7 @@ export default (router: Router, io: any, container: DependencyContainer) => {
 
     router.put('/api/game/:gameId/carrier/:carrierId/gift', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req: any, res: any, next: any) => {
         try {
-            await container.carrierService.convertToGift(
+            await container.carrierGiftService.convertToGift(
                 req.game,
                 req.player,
                 req.params.carrierId);
