@@ -89,7 +89,9 @@ export default {
 
         if (response.status === 200) {
           for (let e of this.events) {
-            e.read = true
+            if (e.read === false) {
+              e.read = true
+            }
           }
         }
       } catch (err) {
