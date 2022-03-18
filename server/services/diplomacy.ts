@@ -229,7 +229,7 @@ export default class DiplomacyService extends EventEmitter {
         if (this.diplomacyUpkeepService.isAllianceUpkeepEnabled(game)) {
             let player = game.galaxy.players.find(p => p._id.toString() === playerId.toString())!;
 
-            await this.diplomacyUpkeepService.deductUpkeep(game, player, 1);
+            await this.diplomacyUpkeepService.deductUpkeep(game, player, 1, saveToDB);
         }
         
         let wasAtWar = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget).actualStatus === 'enemies';

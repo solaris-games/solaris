@@ -21,7 +21,7 @@ export default class DiplomacyUpkeepService {
         return game.settings.alliances.allianceUpkeepCost !== 'none';
     }
 
-    async deductUpkeep(game: Game, player: Player, allianceCount: number) {
+    async deductUpkeep(game: Game, player: Player, allianceCount: number, saveToDB: boolean = true) {
         if (!this.isAllianceUpkeepEnabled(game)) {
             throw new Error(`Alliance upkeep is not enabled in this game`);
         }
@@ -34,11 +34,17 @@ export default class DiplomacyUpkeepService {
             return null;
         }
 
-        if (player.credits < upkeep.totalCost) {
-            throw new ValidationError(`You cannot afford to declare an alliance with this player. The upfront alliance cost is ${upkeep.totalCost} credits.`);
+        if (saveToDB) {
+            // Note: The only time we need to validate this is when we are attempting to save to DB
+            // as this is currently the only scenario where the function is called from an API request and not internally.
+            if (player.credits < upkeep.totalCost) {
+                throw new ValidationError(`You cannot afford to declare an alliance with this player. The upfront alliance cost is ${upkeep.totalCost} credits.`);
+            }
+    
+            await this.playerCreditsService.addCredits(game, player, -upkeep.totalCost);
+        } else {
+            player.credits -= upkeep.totalCost;
         }
-
-        await this.playerCreditsService.addCredits(game, player, -upkeep.totalCost);
 
         return upkeep;
     }
