@@ -5,7 +5,7 @@ import ValidationError from '../errors/validation';
 import DatabaseRepository from '../models/DatabaseRepository';
 import { Game } from '../types/Game';
 import { GameEvent } from '../types/GameEvent';
-import { Player, ResearchType } from '../types/Player';
+import { Player, PlayerReputation, ResearchType } from '../types/Player';
 import { TradeEvent, TradeEventTechnology, TradeTechnology } from '../types/Trade';
 import AchievementService from './achievement';
 import GameTypeService from './gameType';
@@ -14,6 +14,7 @@ import PlayerService from './player';
 import ReputationService from './reputation';
 import UserService from './user';
 import { User } from '../types/User';
+import RandomService from './random';
 
 export default class TradeService extends EventEmitter {
     gameRepo: DatabaseRepository<Game>;
@@ -24,6 +25,7 @@ export default class TradeService extends EventEmitter {
     achievementService: AchievementService;
     reputationService: ReputationService;
     gameTypeService: GameTypeService;
+    randomService: RandomService;
 
     constructor(
         gameRepo: DatabaseRepository<Game>,
@@ -33,7 +35,8 @@ export default class TradeService extends EventEmitter {
         ledgerService: LedgerService,
         achievementService: AchievementService,
         reputationService: ReputationService,
-        gameTypeService: GameTypeService
+        gameTypeService: GameTypeService,
+        randomService: RandomService
     ) {
         super();
 
@@ -45,6 +48,7 @@ export default class TradeService extends EventEmitter {
         this.achievementService = achievementService;
         this.reputationService = reputationService;
         this.gameTypeService = gameTypeService;
+        this.randomService = randomService;
     }
 
     isTradingCreditsDisabled(game: Game) {
@@ -103,10 +107,13 @@ export default class TradeService extends EventEmitter {
             if (toPlayer.userId && !toPlayer.defeated) {
                 await this.achievementService.incrementTradeCreditsReceived(toPlayer.userId, amount);
             }
-
         }
 
-        let reputation = await this.reputationService.tryIncreaseReputationCredits(game, fromPlayer, toPlayer, amount);
+        let reputationResult = await this.reputationService.tryIncreaseReputationCredits(game, toPlayer, fromPlayer, amount);
+
+        if (reputationResult.increased) {
+            await this.tryTradeBack(game, toPlayer, fromPlayer, reputationResult.rep.reputation);
+        }
 
         let eventObject = {
             gameId: game._id,
@@ -114,7 +121,7 @@ export default class TradeService extends EventEmitter {
             fromPlayer,
             toPlayer,
             amount,
-            reputation,
+            reputation: reputationResult.rep.reputation,
             date: moment().utc()
         };
 
@@ -168,7 +175,11 @@ export default class TradeService extends EventEmitter {
             }
         }
 
-        let reputation = await this.reputationService.tryIncreaseReputationCreditsSpecialists(game, fromPlayer, toPlayer, amount);
+        let reputationResult = await this.reputationService.tryIncreaseReputationCreditsSpecialists(game, toPlayer, fromPlayer, amount);
+
+        if (reputationResult.increased) {
+            await this.tryTradeBack(game, toPlayer, fromPlayer, reputationResult.rep.reputation);
+        }
 
         let eventObject = {
             gameId: game._id,
@@ -176,7 +187,7 @@ export default class TradeService extends EventEmitter {
             fromPlayer,
             toPlayer,
             amount,
-            reputation,
+            reputation: reputationResult.rep.reputation,
             date: moment().utc()
         };
 
@@ -337,7 +348,11 @@ export default class TradeService extends EventEmitter {
             difference: levelDifference
         };
 
-        let reputation = await this.reputationService.tryIncreaseReputationTechnology(game, fromPlayer, toPlayer, eventTechnology);
+        let reputationResult = await this.reputationService.tryIncreaseReputationTechnology(game, toPlayer, fromPlayer, eventTechnology);
+
+        if (reputationResult.increased) {
+            await this.tryTradeBack(game, toPlayer, fromPlayer, reputationResult.rep.reputation);
+        }
 
         let eventObject = {
             gameId: game._id,
@@ -345,7 +360,7 @@ export default class TradeService extends EventEmitter {
             fromPlayer,
             toPlayer,
             technology: eventTechnology,
-            reputation,
+            reputation: reputationResult.rep.reputation,
             date: moment().utc()
         };
 
@@ -449,6 +464,45 @@ export default class TradeService extends EventEmitter {
                 sentTick: game.state.tick
             }
         });
+    }
+
+    async tryTradeBack(game: Game, fromPlayer: Player, toPlayer: Player, reputation: PlayerReputation) {
+        // Note: Trade backs can only occur from AI to player
+        if (!fromPlayer.defeated) {
+            return;
+        }
+
+        const TRADE_CHANCE_BASE = 50;
+        const TRADE_CHANCE_STEP = 5;
+        const TRADE_CHANCE_MIN_REPUTATION = 1;
+
+        if (reputation.score < TRADE_CHANCE_MIN_REPUTATION) {
+            return;
+        }
+
+        let tradeChance = TRADE_CHANCE_BASE + (TRADE_CHANCE_STEP * reputation.score);
+        let tradeRoll = this.randomService.getRandomNumber(100);
+        let canPerformTrade = tradeRoll <= tradeChance || true;
+
+        if (!canPerformTrade) {
+            return;
+        }
+        
+        // TODO: Consider scanning range trade setting.
+
+        // Get the differences in tech levels between the two players that the AI can afford.
+        let tradeTechs = await this.getTradeableTechnologies(game, fromPlayer, toPlayer._id);
+
+        tradeTechs = tradeTechs.filter(t => t.cost <= fromPlayer.credits);
+
+        if (!tradeTechs.length) {
+            return;
+        }
+
+        // Pick a random tech(?) and send it to the player.
+        let tradeTech = tradeTechs[this.randomService.getRandomNumber(tradeTechs.length - 1)];
+        
+        await this.sendTechnology(game, fromPlayer, toPlayer._id, tradeTech.name, tradeTech.level);
     }
 
 };

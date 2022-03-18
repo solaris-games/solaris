@@ -143,8 +143,8 @@ export default class DiplomacyService extends EventEmitter {
         return true;
     }
 
-    getFilteredDiplomacy(player: Player, forPlayer: Player): PlayerDiplomacy[] {
-        return player.diplomacy.filter(d => d.playerId.toString() === forPlayer._id.toString());
+    getFilteredDiplomacy(fromPlayer: Player, toPlayer: Player): PlayerDiplomacy[] {
+        return fromPlayer.diplomacy.filter(d => d.playerId.toString() === toPlayer._id.toString());
     }
 
     async _declareStatus(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId, state: DiplomaticState, saveToDB: boolean = true) {
@@ -198,10 +198,10 @@ export default class DiplomacyService extends EventEmitter {
         return diplomaticStatus;
     }
 
-    async declareAlly(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId) {
+    async declareAlly(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId, saveToDB: boolean = true) {
         let wasAtWar = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget).actualStatus === 'enemies';
 
-        let newStatus = await this._declareStatus(game, playerId, playerIdTarget, 'allies');
+        let newStatus = await this._declareStatus(game, playerId, playerIdTarget, 'allies', saveToDB);
 
         let isAllied = newStatus.actualStatus === 'allies';
         let isFriendly = isAllied || newStatus.actualStatus === 'neutral';
@@ -253,17 +253,17 @@ export default class DiplomacyService extends EventEmitter {
         return newStatus;
     }
 
-    async declareNeutral(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId) {
+    async declareNeutral(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId, saveToDB: boolean = true) {
         let oldStatus = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
 
         let wasAtWar = oldStatus.actualStatus === 'enemies';
         let wasAllied = oldStatus.actualStatus === 'allies';
         
-        await this._declareStatus(game, playerId, playerIdTarget, 'neutral');
+        await this._declareStatus(game, playerId, playerIdTarget, 'neutral', saveToDB);
 
         // When declaring neutral, set both players to neutral if they were allies before.
         if (wasAllied) {
-            await this._declareStatus(game, playerIdTarget, playerId, 'neutral');
+            await this._declareStatus(game, playerIdTarget, playerId, 'neutral', saveToDB);
         }
 
         let newStatus = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);

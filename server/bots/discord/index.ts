@@ -85,16 +85,13 @@ async function startup() {
         container.leaderboardService, container.userService, container.gameTypeService);
     privateCommandService = new PrivateCommandService();
 
-    console.log('Container Initialized');
+    console.log('Discord Dependency Container Initialized');
 
     mongo = await mongooseLoader({
         connectionString: process.env.CONNECTION_STRING
     }, {
-        syncIndexes: false,
         poolSize: 1
     });
-
-    console.log('MongoDB Intialized');
 
     client.login(process.env.BOT_TOKEN);
 

@@ -9,19 +9,12 @@ let mongo;
 export default {
   
   async init(expressApp, expressServer) {
-    mongo = await mongooseLoader(config, {
-      syncIndexes: false
-    });
-    console.log('MongoDB Intialized');
+    mongo = await mongooseLoader(config, {});
     
     const io = socketLoader(config, expressServer);
-    console.log('Sockets Initialized');
-
     const container = containerLoader(config, io);
-    console.log('Dependency container loaded');
   
     await expressLoader(config, expressApp, io, container);
-    console.log('Express Intialized');
 
     // await container.donateService.listRecentDonations();
     // console.log('Loaded recent donations to cache');

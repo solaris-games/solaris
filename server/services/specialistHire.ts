@@ -11,6 +11,7 @@ import StarService from "./star";
 import WaypointService from "./waypoint";
 
 import ValidationError from "../errors/validation";
+import SpecialistBanService from "./specialistBan";
 
 export default class SpecialistHireService {
     gameRepo: DatabaseRepository<Game>;
@@ -20,6 +21,7 @@ export default class SpecialistHireService {
     playerService: PlayerService;
     starService: StarService;
     gameTypeService: GameTypeService;
+    specialistBanService: SpecialistBanService;
 
     constructor(
         gameRepo: DatabaseRepository<Game>,
@@ -28,7 +30,8 @@ export default class SpecialistHireService {
         waypointService: WaypointService,
         playerService: PlayerService,
         starService: StarService,
-        gameTypeService: GameTypeService
+        gameTypeService: GameTypeService,
+        specialistBanService: SpecialistBanService
     ) {
         this.gameRepo = gameRepo;
         this.specialistService = specialistService;
@@ -37,6 +40,7 @@ export default class SpecialistHireService {
         this.playerService = playerService;
         this.starService = starService;
         this.gameTypeService = gameTypeService;
+        this.specialistBanService = specialistBanService;
     }
 
     async hireCarrierSpecialist(game: Game, player: Player, carrierId: DBObjectId, specialistId: number) {
@@ -44,7 +48,7 @@ export default class SpecialistHireService {
             throw new ValidationError('The game settings has disabled the hiring of specialists.');
         }
 
-        if (this._isCarrierSpecialistBanned(game, specialistId)) {
+        if (this.specialistBanService.isCarrierSpecialistBanned(game, specialistId)) {
             throw new ValidationError('This specialist has been banned from this game.');
         }
 
@@ -135,7 +139,7 @@ export default class SpecialistHireService {
             throw new ValidationError('The game settings has disabled the hiring of specialists.');
         }
 
-        if (this._isStarSpecialistBanned(game, specialistId)) {
+        if (this.specialistBanService.isStarSpecialistBanned(game, specialistId)) {
             throw new ValidationError('This specialist has been banned from this game.');
         }
 
@@ -218,14 +222,6 @@ export default class SpecialistHireService {
             default:
                 throw new Error(`Unsupported specialist currency type: ${game.settings.specialGalaxy.specialistsCurrency}`);
         }
-    }
-
-    _isStarSpecialistBanned(game: Game, specialistId: number) {
-        return game.settings.specialGalaxy.specialistBans.star.indexOf(specialistId) > -1;
-    }
-
-    _isCarrierSpecialistBanned(game: Game, specialistId: number) {
-        return game.settings.specialGalaxy.specialistBans.carrier.indexOf(specialistId) > -1;
     }
 
     async _deductSpecialistCost(game: Game, player: Player, specialist: Specialist) {

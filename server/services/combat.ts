@@ -371,15 +371,8 @@ export default class CombatService extends EventEmitter {
         // Deduct reputation for all attackers that the defender is fighting and vice versa.
         for (let defenderPlayer of defenders) {
             for (let attackerPlayer of attackers) {
-                await this.reputationService.decreaseReputation(game, defenderPlayer, attackerPlayer, true, false);
                 await this.reputationService.decreaseReputation(game, attackerPlayer, defenderPlayer, true, false);
-            
-                // If the players are NEUTRAL, declare war.
-                // Note: Players who are allied can fight eachother in certain scenarios
-                // so it is imperitive that declarations of war do not affect alliances.
-                if (isFormalAlliancesEnabled && this.diplomacyService.getDiplomaticStatusToPlayer(game, attackerPlayer._id, defenderPlayer._id).actualStatus === 'neutral') {
-                    this.diplomacyService.declareEnemy(game, attackerPlayer._id, defenderPlayer._id, false);
-                }
+                await this.reputationService.decreaseReputation(game, defenderPlayer, attackerPlayer, true, false);
             }
         }
 
