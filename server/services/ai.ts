@@ -97,6 +97,8 @@ const ENEMY_STAR_SCORE_MULTIPLIER = 5;
 const REINFORCEMENT_MIN_CYCLES = 1.5;
 const REINFORCEMENT_MIN_FACTOR = 1.4;
 
+const INVASION_ATTACK_FACTOR = 1.5;
+
 // IMPORTANT IMPLEMENTATION NOTES
 // During AI tick, care must be taken to NEVER write any changes to the database.
 // This is performed automatically by mongoose (when calling game.save()).
@@ -374,7 +376,7 @@ export default class AIService {
                 }
 
                 const starToInvade = context.starsById.get(order.star)!;
-                const requiredShips = this._calculateRequiredShipsForAttack(game, player, context, starToInvade);
+                const requiredShips = Math.floor(this._calculateRequiredShipsForAttack(game, player, context, starToInvade) * INVASION_ATTACK_FACTOR);
                 const ticksLimit = game.settings.galaxy.productionTicks * 2;
                 const fittingAssignments = this._findAssignmentsWithTickLimit(game, player, context, context.allStars, assignments, order.star, ticksLimit,  this._canAffordCarrier(context, game, player, false), false);
 
