@@ -225,13 +225,12 @@ export default class DiplomacyService extends EventEmitter {
         // TODO: If max alliances is enabled, ensure that the player has the capacity to declare the player as an ally here. If not, validation error?
         // If so, declare as allies and increment alliances made this cycle counter outside of the _declareStatus function?
 
-        // TODO: Below causes dependency hell.
         // If there is an upkeep cost, deduct 1 cycle's worth of up for 1 alliance upfront.
-        // if (game.settings.alliances.allianceUpkeepCost !== 'none') {
-        //     let player = game.galaxy.players.find(p => p._id.toString() === playerId.toString())!;
+        if (this.diplomacyUpkeepService.isAllianceUpkeepEnabled(game)) {
+            let player = game.galaxy.players.find(p => p._id.toString() === playerId.toString())!;
 
-        //     await this.diplomacyUpkeepService.deductUpkeep(game, player, ..., 1);
-        // }
+            await this.diplomacyUpkeepService.deductUpkeep(game, player, 1);
+        }
         
         let wasAtWar = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget).actualStatus === 'enemies';
 
