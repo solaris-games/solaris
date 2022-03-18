@@ -27,9 +27,10 @@ import { CarrierActionWaypoint } from "../types/GameTick";
 import { Star } from "../types/Star";
 import { GameRankingResult } from "../types/Rating";
 import DiplomacyUpkeepService from "./diplomacyUpkeep";
-import PlayerCreditsService from "./playerCredits";
 import CarrierGiftService from "./carrierGift";
 import CarrierMovementService from "./carrierMovement";
+import PlayerCycleRewardsService from "./playerCycleRewards";
+import StarContestedService from "./starContested";
 
 const EventEmitter = require('events');
 const moment = require('moment');
@@ -56,10 +57,11 @@ export default class GameTickService extends EventEmitter {
     diplomacyService: DiplomacyService;
     gameTypeService: GameTypeService;
     gameStateService: GameStateService;
-    playerCreditsService: PlayerCreditsService;
+    playerCycleRewardsService: PlayerCycleRewardsService;
     diplomacyUpkeepService: DiplomacyUpkeepService;
     carrierMovementService: CarrierMovementService;
     carrierGiftService: CarrierGiftService;
+    starContestedService: StarContestedService;
     
     constructor(
         distanceService: DistanceService,
@@ -83,10 +85,11 @@ export default class GameTickService extends EventEmitter {
         diplomacyService: DiplomacyService,
         gameTypeService: GameTypeService,
         gameStateService: GameStateService,
-        playerCreditsService: PlayerCreditsService,
+        playerCycleRewardsService: PlayerCycleRewardsService,
         diplomacyUpkeepService: DiplomacyUpkeepService,
         carrierMovementService: CarrierMovementService,
-        carrierGiftService: CarrierGiftService
+        carrierGiftService: CarrierGiftService,
+        starContestedService: StarContestedService
     ) {
         super();
             
@@ -111,10 +114,11 @@ export default class GameTickService extends EventEmitter {
         this.diplomacyService = diplomacyService;
         this.gameTypeService = gameTypeService;
         this.gameStateService = gameStateService;
-        this.playerCreditsService = playerCreditsService;
+        this.playerCycleRewardsService = playerCycleRewardsService;
         this.diplomacyUpkeepService = diplomacyUpkeepService;
         this.carrierMovementService = carrierMovementService;
         this.carrierGiftService = carrierGiftService;
+        this.starContestedService = starContestedService;
     }
 
     async tick(gameId: DBObjectId) {
@@ -549,7 +553,7 @@ export default class GameTickService extends EventEmitter {
 
         // Check for scenario where a player changes diplomatic status to another player.
         // Perform combat at contested stars.
-        let contestedStars = this.starService.listContestedStars(game);
+        let contestedStars = this.starContestedService.listContestedStars(game);
 
         for (let i = 0; i < contestedStars.length; i++) {
             let contestedStar = contestedStars[i];
@@ -567,14 +571,14 @@ export default class GameTickService extends EventEmitter {
             return;
         }
 
-        let contestedAbandonedStars = this.starService.listContestedUnownedStars(game);
+        let contestedAbandonedStars = this.starContestedService.listContestedUnownedStars(game);
 
         for (let i = 0; i < contestedAbandonedStars.length; i++) {
             let contestedStar = contestedAbandonedStars[i];
 
             // The player who owns the carrier with the most ships will capture the star.
             let carrier = contestedStar.carriersInOrbit
-                .sort((a, b) => b.ships! - a.ships!)[0];
+                .sort((a: Carrier, b: Carrier) => b.ships! - a.ships!)[0];
 
             this.starService.claimUnownedStar(game, gameUsers, contestedStar.star, carrier);
         }
@@ -599,7 +603,7 @@ export default class GameTickService extends EventEmitter {
             for (let i = 0; i < game.galaxy.players.length; i++) {
                 let player = game.galaxy.players[i];
                 
-                let creditsResult = this.playerCreditsService.givePlayerCreditsEndOfCycleRewards(game, player);
+                let creditsResult = this.playerCycleRewardsService.givePlayerCreditsEndOfCycleRewards(game, player);
                 let experimentResult = this.researchService.conductExperiments(game, player);
                 let carrierUpkeepResult = this.playerService.deductCarrierUpkeepCost(game, player);
 

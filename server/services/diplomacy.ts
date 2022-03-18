@@ -6,7 +6,6 @@ import { DiplomaticState, DiplomaticStatus } from "../types/Diplomacy";
 import { Game } from "../types/Game";
 import { Player, PlayerDiplomaticState } from "../types/Player";
 import DiplomacyUpkeepService from "./diplomacyUpkeep";
-// import DiplomacyUpkeepService from "./diplomacyUpkeep";
 
 export default class DiplomacyService extends EventEmitter {
 
@@ -231,7 +230,7 @@ export default class DiplomacyService extends EventEmitter {
         // if (game.settings.alliances.allianceUpkeepCost !== 'none') {
         //     let player = game.galaxy.players.find(p => p._id.toString() === playerId.toString())!;
 
-        //     await this.diplomacyUpkeepService.deductUpkeep(game, player, 1);
+        //     await this.diplomacyUpkeepService.deductUpkeep(game, player, ..., 1);
         // }
         
         let wasAtWar = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget).actualStatus === 'enemies';

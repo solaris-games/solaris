@@ -73,6 +73,8 @@ import PlayerCreditsService from '../services/playerCredits';
 import PlayerStatisticsService from '../services/playerStatistics';
 import CarrierMovementService from '../services/carrierMovement';
 import CarrierGiftService from '../services/carrierGift';
+import PlayerCycleRewardsService from '../services/playerCycleRewards';
+import StarContestedService from '../services/starContested';
 
 import { DependencyContainer } from '../types/DependencyContainer';
 
@@ -118,6 +120,7 @@ export default (config: any, io: any): DependencyContainer => {
     const specialistService = new SpecialistService();
     const gameTypeService = new GameTypeService();
     const gameStateService = new GameStateService();
+    const playerCreditsService = new PlayerCreditsService(gameRepository);
     const diplomacyUpkeepService = new DiplomacyUpkeepService();
     const diplomacyService = new DiplomacyService(gameRepository, diplomacyUpkeepService);
     const avatarService = new AvatarService(userRepository, userService);
@@ -126,7 +129,8 @@ export default (config: any, io: any): DependencyContainer => {
     const nameService = new NameService(gameNames, starNames, randomService);
     const starDistanceService = new StarDistanceService(distanceService);
     const technologyService = new TechnologyService(specialistService);
-    const starService = new StarService(gameRepository, randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService, diplomacyService, gameTypeService, gameStateService);
+    const starService = new StarService(gameRepository, randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService, gameTypeService, gameStateService);
+    const starContestedService = new StarContestedService(diplomacyService);
     const carrierService = new CarrierService(gameRepository, distanceService, starService, technologyService, specialistService);
     const carrierGiftService = new CarrierGiftService(gameRepository, diplomacyService);
     const carrierMovementService = new CarrierMovementService(gameRepository, distanceService, starService, specialistService, diplomacyService, carrierGiftService);
@@ -139,7 +143,7 @@ export default (config: any, io: any): DependencyContainer => {
     const customMapService = new CustomMapService();
     const mapService = new MapService(randomService, starService, starDistanceService, nameService, circularMapService, spiralMapService, doughnutMapService, circularBalancedMapService, irregularMapService, gameTypeService, customMapService);
     const playerStatisticsService = new PlayerStatisticsService(starService, carrierService, technologyService, specialistService);
-    const playerCreditsService = new PlayerCreditsService(gameRepository, starService, technologyService, playerStatisticsService);
+    const playerCycleRewardsService = new PlayerCycleRewardsService(starService, technologyService, playerStatisticsService);
     const playerService = new PlayerService(gameRepository, randomService, mapService, starService, carrierService, starDistanceService, technologyService, specialistService, gameTypeService);
     const badgeService = new BadgeService(userRepository, userService, playerService);
     const reportService = new ReportService(ReportModel, reportRepository, playerService);
@@ -160,7 +164,7 @@ export default (config: any, io: any): DependencyContainer => {
     const battleRoyaleService = new BattleRoyaleService(starService, carrierService, mapService, starDistanceService, waypointService, carrierMovementService);
     const orbitalMechanicsService = new OrbitalMechanicsService(mapService);
     const gameGalaxyService = new GameGalaxyService(cacheService, broadcastService, gameService, mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, specialistService, technologyService, reputationService, guildUserService, historyService, battleRoyaleService, orbitalMechanicsService, gameTypeService, gameStateService, diplomacyService, avatarService, playerStatisticsService);
-    const gameTickService = new GameTickService(distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService, specialistService, starUpgradeService, reputationService, aiService, battleRoyaleService, orbitalMechanicsService, diplomacyService, gameTypeService, gameStateService, playerCreditsService, diplomacyUpkeepService, carrierMovementService, carrierGiftService);
+    const gameTickService = new GameTickService(distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService, specialistService, starUpgradeService, reputationService, aiService, battleRoyaleService, orbitalMechanicsService, diplomacyService, gameTypeService, gameStateService, playerCycleRewardsService, diplomacyUpkeepService, carrierMovementService, carrierGiftService, starContestedService);
     const emailService = new EmailService(config, gameService, userService, leaderboardService, playerService, gameTypeService, gameStateService, gameTickService);
     const shipTransferService = new ShipTransferService(gameRepository, carrierService, starService);
     const donateService = new DonateService(cacheService);
@@ -232,6 +236,8 @@ export default (config: any, io: any): DependencyContainer => {
         playerCreditsService,
         diplomacyUpkeepService,
         carrierGiftService,
-        carrierMovementService
+        carrierMovementService,
+        playerCycleRewardsService,
+        starContestedService,
     };
 };

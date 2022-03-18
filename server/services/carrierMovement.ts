@@ -2,6 +2,7 @@ import DatabaseRepository from '../models/DatabaseRepository';
 import { Carrier } from '../types/Carrier';
 import { CarrierWaypoint } from '../types/CarrierWaypoint';
 import { Game } from '../types/Game';
+import { Player } from '../types/Player';
 import { Star } from '../types/Star';
 import { User } from '../types/User';
 import CarrierGiftService from './carrierGift';
@@ -131,7 +132,7 @@ export default class CarrierMovementService {
         let sourceStar = game.galaxy.stars.find(s => s._id.toString() === waypoint.source.toString())!;
         let destinationStar = game.galaxy.stars.find(s => s._id.toString() === waypoint.destination.toString())!;
         let carrierOwner = game.galaxy.players.find(p => p._id.toString() === carrierInTransit.ownedByPlayerId!.toString())!;
-        let warpSpeed = this.starService.canTravelAtWarpSpeed(game, carrierOwner, carrierInTransit, sourceStar, destinationStar);
+        let warpSpeed = this.canTravelAtWarpSpeed(game, carrierOwner, carrierInTransit, sourceStar, destinationStar);
         let instantSpeed = this.starService.isStarPairWormHole(sourceStar, destinationStar);
         let distancePerTick = this.getCarrierDistancePerTick(game, carrierInTransit, warpSpeed, instantSpeed); // Null signifies instant travel
 
@@ -173,7 +174,7 @@ export default class CarrierMovementService {
         let instantSpeed: boolean | null = false;
         
         if (sourceStar) {
-            warpSpeed = this.starService.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar);
+            warpSpeed = this.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar);
             instantSpeed = this.starService.isStarPairWormHole(sourceStar, destinationStar);
         }
 
@@ -204,6 +205,61 @@ export default class CarrierMovementService {
             sourceStar,
             destinationStar
         };
+    }
+
+    canTravelAtWarpSpeed(game: Game, player: Player, carrier: Carrier, sourceStar: Star, destinationStar: Star) {
+        // Double check for destroyed stars.
+        if (sourceStar == null || destinationStar == null) {
+            return false;
+        }
+
+        // If both stars have warp gates and they are both owned by players...
+        if (sourceStar.warpGate && destinationStar.warpGate && sourceStar.ownedByPlayerId && destinationStar.ownedByPlayerId) {
+            // If both stars are owned by the player or by allies then carriers can always move at warp.
+            let sourceAllied = sourceStar.ownedByPlayerId.toString() === carrier.ownedByPlayerId!.toString() || (this.diplomacyService.isFormalAlliancesEnabled(game) && this.diplomacyService.isDiplomaticStatusToPlayersAllied(game, sourceStar.ownedByPlayerId, [carrier.ownedByPlayerId!]));
+            let desinationAllied = destinationStar.ownedByPlayerId.toString() === carrier.ownedByPlayerId!.toString() || (this.diplomacyService.isFormalAlliancesEnabled(game) && this.diplomacyService.isDiplomaticStatusToPlayersAllied(game, destinationStar.ownedByPlayerId, [carrier.ownedByPlayerId!]));
+
+            // If both stars are owned by the player then carriers can always move at warp.
+            if (sourceAllied && desinationAllied) {
+                return true;
+            }
+
+            // If one of the stars are not owned by the current player then we need to check for
+            // warp scramblers.
+
+            // But if the carrier has the warp stabilizer specialist then it can travel at warp speed no matter
+            // which player it belongs to or whether the stars it is travelling to or from have locked warp gates.
+            if (carrier.specialistId) {
+                let carrierSpecialist = this.specialistService.getByIdCarrier(carrier.specialistId);
+
+                if (carrierSpecialist.modifiers.special && carrierSpecialist.modifiers.special.unlockWarpGates) {
+                    return true;
+                }
+            }
+
+            // If either star has a warp scrambler present then carriers cannot move at warp.
+            // Note that we only need to check for scramblers on stars that do not belong to the player.
+            if (!sourceAllied && sourceStar.specialistId) {
+                let specialist = this.specialistService.getByIdStar(sourceStar.specialistId);
+
+                if (specialist.modifiers.special && specialist.modifiers.special.lockWarpGates) {
+                    return false;
+                }
+            }
+
+            if (!desinationAllied && destinationStar.specialistId) {
+                let specialist = this.specialistService.getByIdStar(destinationStar.specialistId);
+
+                if (specialist.modifiers.special && specialist.modifiers.special.lockWarpGates) {
+                    return false;
+                }
+            }
+
+            // If none of the stars have scramblers then warp speed ahead.
+            return true;
+        }
+
+        return false;
     }
 
     isInTransit(carrier: Carrier) {

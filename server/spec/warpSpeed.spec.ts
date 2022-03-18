@@ -1,3 +1,4 @@
+import CarrierMovementService from '../services/carrierMovement';
 import StarService from '../services/star';
 const mongoose = require('mongoose');
 
@@ -17,14 +18,11 @@ let game: any,
     isDiplomaticStatusToPlayersAllied: any;
 
 let gameRepo: any, 
-    randomService: any, 
-    nameService: any, 
     distanceService: any, 
-    starDistanceService: any, 
-    technologyService: any, 
     specialistService: any,
-    userService: any, 
-    diplomacyService: any;
+    diplomacyService: any,
+    starService: any,
+    carrierGiftService: any;
 
 specialistService = {
     getByIdStar() {
@@ -47,7 +45,7 @@ diplomacyService = {
 describe('warp speed', () => {
 
     // @ts-ignore
-    const service = new StarService(gameRepo, randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService, diplomacyService);
+    const service = new CarrierMovementService(gameRepo, distanceService, starService, specialistService, diplomacyService, carrierGiftService);
 
     beforeEach(() => {
         // Default values:
