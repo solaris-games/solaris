@@ -111,25 +111,33 @@ export default {
     getCarrierShape (carrier) {
       return GameHelper.getPlayerById(this.$store.state.game, carrier.ownedByPlayerId).shape;
     },
+    totalShips(array, index) {
+      let normalCarriers = array.filter(c => c[index] != "???") //Unscrambled Carriers
+      let scrambledCarriers = array.filter(c => c[index] == "???") //Scrambled Carriers
+
+      if (!normalCarriers.length) return "???" //If everything is scrambled, the total is scrambled.
+      let result = normalCarriers.reduce((sum, c) => sum + c[index], 0) //Add up all the ships
+      return result + (scrambledCarriers.length ? "*" : "") //If any carriers are scramled, add a *
+    }
   },
   computed: {
     totalDefenderBefore: function () {
-      return this.defenderCarriers.reduce((sum, c) => sum + c.before | 0, 0)
+      return this.totalShips(this.defenderCarriers, "before")
     },
     totalDefenderLost: function () {
-      return this.defenderCarriers.reduce((sum, c) => sum + c.lost | 0, 0)
+      return this.totalShips(this.defenderCarriers, "lost")
     },
     totalDefenderAfter: function () {
-      return this.defenderCarriers.reduce((sum, c) => sum + c.after | 0, 0)
+      return this.totalShips(this.defenderCarriers, "after")
     },
     totalAttackerBefore: function () {
-      return this.attackerCarriers.reduce((sum, c) => sum + c.before | 0, 0)
+      return this.totalShips(this.attackerCarriers, "before")
     },
     totalAttackerLost: function () {
-      return this.attackerCarriers.reduce((sum, c) => sum + c.lost | 0, 0)
+      return this.totalShips(this.attackerCarriers, "lost")
     },
     totalAttackerAfter: function () {
-      return this.attackerCarriers.reduce((sum, c) => sum + c.after | 0, 0)
+      return this.totalShips(this.attackerCarriers, "after")
     }
   }
 }

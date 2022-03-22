@@ -299,7 +299,7 @@ export default class CombatService extends EventEmitter {
         // We will update this as we go along with combat.
         combatResult.carriers = carriers.map(c => {
             let specialist = this.specialistService.getByIdCarrierTrim(c.specialistId);
-            let scrambled = this.specialistService.getCarrierHideShips(c);
+            let scrambled = (star && star.isNebula && defenderPlayerIds.includes(c.ownedByPlayerId!.toString())) || this.specialistService.getCarrierHideShips(c); 
 
             return {
                 _id: c._id,
