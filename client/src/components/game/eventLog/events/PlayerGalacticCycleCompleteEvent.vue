@@ -29,7 +29,7 @@
   </p>
 
   <p v-if="event.data.allianceUpkeep && (event.data.allianceUpkeep.allianceCount || event.data.allianceUpkeep.totalCost)">
-    The upkeep of <span class="text-warning">{{event.data.allianceUpkeep.allianceCount}} alliances</span> incurred a cost of
+    The upkeep of <span class="text-warning">{{event.data.allianceUpkeep.allianceCount}} alliance(s)</span> incurred a cost of
     <span class="text-danger">${{event.data.allianceUpkeep.totalCost}}</span>.
   </p>
 </div>

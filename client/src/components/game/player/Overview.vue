@@ -42,7 +42,6 @@ import PlayerTitleVue from './PlayerTitle'
 import gameHelper from '../../../services/gameHelper'
 import DiplomacyHelper from '../../../services/diplomacyHelper'
 import ConversationApiService from '../../../services/api/conversation'
-import DiplomacyApiService from '../../../services/api/diplomacy'
 
 export default {
   components: {
@@ -58,8 +57,7 @@ export default {
       player: null,
       gameHasStarted: null,
       gameHasFinished: null,
-      conversation: null,
-      diplomaticStatus: null
+      conversation: null
     }
   },
   async mounted () {
@@ -70,7 +68,6 @@ export default {
     this.gameHasFinished = this.$store.state.game.state.endDate != null
 
     await this.loadConversation()
-    await this.loadDiplomaticStatus()
   },
   methods: {
     onViewConversationRequested (e) {
@@ -100,24 +97,6 @@ export default {
         console.error(err)
         
         return null
-      }
-    },
-    async loadDiplomaticStatus () {
-      const userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
-
-      if (!userPlayer || this.playerId === userPlayer._id) {
-        return
-      }
-  
-      try {
-        const response = await DiplomacyApiService.getDiplomaticStatusToPlayer(this.$store.state.game._id, this.playerId)
-
-        if (response.status === 200) {
-          this.diplomaticStatus = response.data
-        }
-      } catch (err) {
-        console.error(err)
-        this.diplomaticStatus = null
       }
     },
     async loadConversation () {
