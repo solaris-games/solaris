@@ -25,13 +25,13 @@ const game = {
 }
 
 const fakeStarService = {
-    generateUnownedStar(name, location) {
+    generateUnownedStar(name: string, location) {
         return {
             name,
             location
         }
     },
-    generateStarPosition(game, x, y) {
+    generateStarPosition(game, x: number, y: number) {
         return {
             x: 10,
             y: 10
@@ -64,7 +64,7 @@ const fakeDistanceService = {
 };
 
 const fakeStarNameService = {
-    getRandomStarNames(count) {
+    getRandomStarNames(count: number) {
         let names: string[] = [];
 
         for (let i = 0; i < count; i++) {
@@ -113,7 +113,7 @@ describe('map', () => {
         for(let i = 0; i < stars.length; i++) {
             let star = stars[i];
 
-            let duplicates = stars.filter(s => s.name === star.name);
+            let duplicates = stars.filter((s) => s.name === star.name);
 
             // Should equal 1 because we are checking against the same star.
             expect(duplicates.length).toEqual(1);

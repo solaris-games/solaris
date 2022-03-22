@@ -16,7 +16,7 @@ import PrivateCommandService from './services/privateCommand';
 
 const prefix = process.env.BOT_PREFIX || '$';
 
-let mongo: any,
+let mongo,
     container: DependencyContainer,
     botResponseService: BotResponseService,
     botHelperService: BotHelperService,
@@ -29,7 +29,7 @@ client.once('ready', () => {
     console.log('-----------------------\nBanning Hyperi0n!\n-----------------------');
 });
 
-client.on('message', async (msg: any) => {
+client.on('message', async (msg) => {
     // Do not respond to bots.
     if (commandService.isBot(msg)) {
         return;
@@ -46,7 +46,7 @@ client.on('message', async (msg: any) => {
     }
 });
 
-async function contentUnrelated(msg: any) {
+async function contentUnrelated(msg) {
     let suggestionChannels = [process.env.CHAT_ID_SPECIALIST_SUGGESTIONS, process.env.CHAT_ID_GENERAL_SUGGESTIONS];
 
     if (suggestionChannels.includes(msg.channel.id)) {
@@ -58,17 +58,20 @@ async function contentUnrelated(msg: any) {
     }
 }
 
-async function executeCommand(msg: any) {
+async function executeCommand(msg) {
     const command = commandService.identify(msg, prefix);
 
+    let publicService = publicCommandService;
+    let privateService = privateCommandService;
+
     if (command.type === 'text') { // A normal server channel
-        if (publicCommandService[command.cmd] && commandService.isCorrectChannel(msg, command.cmd)) {
+        if (publicService[command.cmd] && commandService.isCorrectChannel(msg, command.cmd)) {
             //Executes the command, and then deletes the message that ordered it
-            await publicCommandService[command.cmd](msg, command.directions);
+            await publicService[command.cmd](msg, command.directions);
         }
     } else if (command.type === 'dm') { // A chat with one specific person
-        if (privateCommandService[command.cmd]) {
-            await privateCommandService[command.cmd](msg, command.directions);
+        if (privateService[command.cmd]) {
+            await privateService[command.cmd](msg, command.directions);
         }
     }
 }

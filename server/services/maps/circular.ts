@@ -31,7 +31,7 @@ export default class CircularMapService {
         this.gameTypeService = gameTypeService;
     }
 
-    generateLocations(game: any, starCount: number, resourceDistribution: GameResourceDistribution): Location[] {
+    generateLocations(game, starCount: number, resourceDistribution: GameResourceDistribution): Location[] {
         // These two values should probably be ingame constants but they can for now just be plugged in here
         const starDensity = 1.3 * 10**-4
         const offset = 0.5
@@ -64,7 +64,7 @@ export default class CircularMapService {
         return locations;
     }
 
-    isLocationTooCloseToOthers(game: any, location: Location, locations: Location[]): boolean {
+    isLocationTooCloseToOthers(game, location: Location, locations: Location[]): boolean {
         // Return False if there are no stars in range, True if there is a star in range
         return locations.find(l => this.starDistanceService.isLocationTooClose(game, location, l)) != null;
     }

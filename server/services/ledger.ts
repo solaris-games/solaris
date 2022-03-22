@@ -3,6 +3,7 @@ import DatabaseRepository from "../models/DatabaseRepository";
 import { Game } from "../types/Game";
 import { Player, PlayerLedger } from "../types/Player";
 import PlayerService from "./player";
+import PlayerCreditsService from "./playerCredits";
 
 const ValidationError = require("../errors/validation");
 const EventEmitter = require('events');
@@ -10,15 +11,18 @@ const EventEmitter = require('events');
 export default class LedgerService extends EventEmitter {
     gameRepo: DatabaseRepository<Game>;
     playerService: PlayerService;
+    playerCreditsService: PlayerCreditsService;
 
     constructor(
         gameRepo: DatabaseRepository<Game>,
-        playerService: PlayerService
+        playerService: PlayerService,
+        playerCreditsService: PlayerCreditsService
     ) {
         super();
 
         this.gameRepo = gameRepo;
         this.playerService = playerService;
+        this.playerCreditsService = playerCreditsService;
     }
 
     getLedger(player: Player) {
@@ -74,7 +78,7 @@ export default class LedgerService extends EventEmitter {
     }
 
     async settleDebt(game: Game, debtor: Player, playerBId: DBObjectId) {
-        let creditor = this.playerService.getById(game, playerBId);
+        let creditor = this.playerService.getById(game, playerBId)!;
 
         // Get both of the ledgers between the two players.
         let ledgerDebtor = this.getLedgerForPlayer(debtor, playerBId);
@@ -95,8 +99,8 @@ export default class LedgerService extends EventEmitter {
         ledgerDebtor.ledger.debt += debtAmount;
         ledgerCreditor.ledger.debt -= debtAmount;
 
-        await this.playerService.addCredits(game, debtor, -debtAmount);
-        await this.playerService.addCredits(game, creditor, debtAmount);
+        await this.playerCreditsService.addCredits(game, debtor, -debtAmount);
+        await this.playerCreditsService.addCredits(game, creditor, debtAmount);
 
         await this._updateLedger(game, debtor, ledgerDebtor.ledger, ledgerDebtor.isNew);
         await this._updateLedger(game, creditor, ledgerCreditor.ledger, ledgerCreditor.isNew);
@@ -113,7 +117,7 @@ export default class LedgerService extends EventEmitter {
     }
 
     async forgiveDebt(game: Game, creditor: Player, playerBId: DBObjectId) {
-        let debtor = this.playerService.getById(game, playerBId);
+        let debtor = this.playerService.getById(game, playerBId)!;
 
         // Get both of the ledgers between the two players.
         let ledgerCreditor = this.getLedgerForPlayer(creditor, playerBId);

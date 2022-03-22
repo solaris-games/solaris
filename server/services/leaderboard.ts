@@ -10,6 +10,7 @@ import GameStateService from "./gameState";
 import GameTypeService from "./gameType";
 import UserGuildService from "./guildUser";
 import PlayerService from "./player";
+import PlayerStatisticsService from "./playerStatistics";
 import RatingService from "./rating";
 import UserService from "./user";
 
@@ -504,6 +505,7 @@ export default class LeaderboardService {
     gameTypeService: GameTypeService;
     gameStateService: GameStateService;
     badgeService: BadgeService;
+    playerStatisticsService: PlayerStatisticsService;
 
     constructor(
         userRepo: DatabaseRepository<User>,
@@ -514,7 +516,8 @@ export default class LeaderboardService {
         gameService: GameService,
         gameTypeService: GameTypeService,
         gameStateService: GameStateService,
-        badgeService: BadgeService
+        badgeService: BadgeService,
+        playerStatisticsService: PlayerStatisticsService
     ) {
         this.userRepo = userRepo;
         this.userService = userService;
@@ -525,6 +528,7 @@ export default class LeaderboardService {
         this.gameTypeService = gameTypeService;
         this.gameStateService = gameStateService;
         this.badgeService = badgeService;
+        this.playerStatisticsService = playerStatisticsService;
     }
 
     async getLeaderboard(limit: number | null, sortingKey: string, skip: number = 0) {
@@ -577,17 +581,17 @@ export default class LeaderboardService {
 
         let playerStats = game.galaxy.players.map(p => {
             let isKingOfTheHill = kingOfTheHillPlayer != null && p._id.toString() === kingOfTheHillPlayer._id.toString();
-            let stats = this.playerService.getStats(game, p);
+            let stats = this.playerStatisticsService.getStats(game, p);
 
             return {
                 player: p,
                 isKingOfTheHill,
-                // stats: p.stats ? p.stats : this.playerService.getStats(game, p) //This makes sure that when the function is called with a hidden galaxy (what a player sees) it will use the already generated stats.
+                // stats: p.stats ? p.stats : this.playerStatisticsService.getStats(game, p) //This makes sure that when the function is called with a hidden galaxy (what a player sees) it will use the already generated stats.
                 stats
             };
         });
 
-        const getNestedObject = (nestedObj, pathArr) => {
+        const getNestedObject = (nestedObj, pathArr: string[]) => {
             return pathArr.reduce((obj, key) =>
                 (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
         }

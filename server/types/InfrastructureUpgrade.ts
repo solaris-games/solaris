@@ -3,7 +3,7 @@ import { InfrastructureType, Star } from "./Star";
 
 export interface BulkUpgradeReport {
     budget: number;
-    stars: any[];
+    stars;
     cost: number;
     upgraded: number;
     infrastructureType: InfrastructureType;

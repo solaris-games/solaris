@@ -259,8 +259,8 @@ export default class CombatService extends EventEmitter {
 
         let attackerPlayerIds = [...new Set(attackerCarriers.map(c => c.ownedByPlayerId!.toString()))];
 
-        let defenders: Player[] = defenderPlayerIds.map(playerId => this.playerService.getById(game, playerId));
-        let attackers: Player[] = attackerPlayerIds.map(playerId => this.playerService.getById(game, playerId));
+        let defenders: Player[] = defenderPlayerIds.map(playerId => this.playerService.getById(game, playerId as any)!);
+        let attackers: Player[] = attackerPlayerIds.map(playerId => this.playerService.getById(game, playerId as any)!);
 
         let defenderUsers: User[] = [];
         let attackerUsers: User[] = [];
@@ -331,7 +331,7 @@ export default class CombatService extends EventEmitter {
             };
         }
 
-        let defenderObjects: any[] = [...defenderCarriers];
+        let defenderObjects: (Star | Carrier)[] = [...defenderCarriers];
 
         if (star) {
             defenderObjects.push(star);
@@ -404,9 +404,9 @@ export default class CombatService extends EventEmitter {
         if (attackerPlayerIds.length > 1) {
             // Get the next player to act as the defender.
             if (star) {
-                defender = this.playerService.getById(game, star.ownedByPlayerId);
+                defender = this.playerService.getById(game, star.ownedByPlayerId!)!;
             } else {
-                defender = this.playerService.getById(game, attackerPlayerIds[0]);
+                defender = this.playerService.getById(game, attackerPlayerIds[0] as any)!;
             }
 
             await this.performCombat(game, gameUsers, defender, star, attackerCarriers);
@@ -427,7 +427,7 @@ export default class CombatService extends EventEmitter {
         return null;
     }
 
-    _distributeDamage(combatResult: CombatResult, damageObjects: any[], shipsToKill: number, destroyCarriers: boolean = true) {
+    _distributeDamage(combatResult: CombatResult, damageObjects, shipsToKill: number, destroyCarriers: boolean = true) {
         while (shipsToKill) {
             let objectsToDeduct = damageObjects
                 .filter(c => 

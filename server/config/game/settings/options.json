@@ -96,7 +96,7 @@
              "text":"Expensive"
           }
        ],
-       "warpgateCost":[
+      "warpgateCost":[
           {
              "value":"none",
              "text":"No"
@@ -402,7 +402,7 @@
           }
        ]
     },
-    "alliances":{
+    "diplomacy":{
        "enabled": [
          {
             "value":"enabled",
@@ -413,6 +413,34 @@
             "text":"Disabled"
          }
        ],
+       "upkeepCost":[
+         {
+           "value":"none",
+           "text":"None"
+         },
+         {
+           "value":"cheap",
+           "text":"Cheap"
+         },
+         {
+           "value":"standard",
+           "text":"Standard"
+        },
+         {
+           "value":"expensive",
+           "text":"Expensive"
+         }
+       ],
+       "tradeRestricted":[
+         { 
+           "value":"enabled",
+           "text":"Enabled"
+         },
+         {
+           "value":"disabled",
+           "text":"Disabled"
+         }
+        ],
        "globalEvents": [
          {
             "value":"enabled",

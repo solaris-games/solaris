@@ -1,6 +1,7 @@
 import { Game } from "../types/Game";
 import { Star } from "../types/Star";
 import CarrierService from "./carrier";
+import CarrierMovementService from "./carrierMovement";
 import MapService from "./map";
 import StarService from "./star";
 import StarDistanceService from "./starDistance";
@@ -12,19 +13,22 @@ export default class BattleRoyaleService {
     mapService: MapService;
     starDistanceService: StarDistanceService;
     waypointService: WaypointService;
+    carrierMovementService: CarrierMovementService;
 
     constructor(
         starService: StarService,
         carrierService: CarrierService,
         mapService: MapService,
         starDistanceService: StarDistanceService,
-        waypointService: WaypointService
+        waypointService: WaypointService,
+        carrierMovementService: CarrierMovementService
     ) {
         this.starService = starService;
         this.carrierService = carrierService;
         this.mapService = mapService;
         this.starDistanceService = starDistanceService;
         this.waypointService = waypointService;
+        this.carrierMovementService = carrierMovementService;
     }
 
     performBattleRoyaleTick(game: Game) {
@@ -62,14 +66,14 @@ export default class BattleRoyaleService {
     destroyStar(game: Game, star: Star) {
         this.starService.destroyStar(game, star);
 
-        let carriers = this.carrierService.getCarriersEnRouteToStar(game, star);
+        let carriers = this.carrierMovementService.getCarriersEnRouteToStar(game, star);
 
         // Cull the waypoints of carriers that have the given star in its
         // waypoint queue and destroy those that are lost in space.
         for (let carrier of carriers) {
             this.waypointService.cullWaypointsByHyperspaceRange(game, carrier);
 
-            if (this.carrierService.isLostInSpace(game, carrier)) {
+            if (this.carrierMovementService.isLostInSpace(game, carrier)) {
                 this.carrierService.destroyCarrier(game, carrier);
             }
         }

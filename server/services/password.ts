@@ -1,8 +1,8 @@
 export default class PasswordService {
-    bcrypt: any;
+    bcrypt;
 
     constructor(
-        bcrypt: any
+        bcrypt
     ) {
         this.bcrypt = bcrypt;
     }

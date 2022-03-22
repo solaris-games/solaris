@@ -10,7 +10,7 @@ import TradeService from './trade';
 const mongoose = require('mongoose');
 const EventEmitter = require('events');
 
-function arrayIsEqual(a: any[], b: any[]): boolean {
+function arrayIsEqual(a, b): boolean {
     if (a.length !== b.length) return false;
 
     const uniqueValues = new Set([...a, ...b]);

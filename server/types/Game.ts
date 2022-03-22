@@ -32,6 +32,7 @@ export type GameAwardRankTo = 'all'|'winner';
 export type GameGalaxyType = 'circular'|'spiral'|'doughnut'|'circular-balanced'|'irregular'|'custom';
 export type GameCarrierCost = 'cheap'|'standard'|'expensive';
 export type GameCarrierUpkeepCost = 'none'|'cheap'|'standard'|'expensive';
+export type GameAllianceUpkeepCost = 'none'|'cheap'|'standard'|'expensive'; 
 export type GameWarpgateCost = 'none'|'cheap'|'standard'|'expensive';
 export type GameSpecialistCost = 'none'|'standard'|'expensive'|'veryExpensive'|'crazyExpensive';
 export type GameSpecialistCurrency = 'credits'|'creditsSpecialists';
@@ -41,6 +42,7 @@ export type GamePlayerDistribution = 'circular'|'random';
 export type GameVictoryCondition = 'starPercentage'|'homeStarPercentage';
 export type GameVictoryPercentage = 25|33|50|66|75|90|100;
 export type GameInfrastructureCost = 'cheap'|'standard'|'expensive';
+export type GameInfrastructureExpenseMultiplier = 'cheap'|'standard'|'expensive'|'crazyExpensive';
 export type GameTradeCost = 0|5|15|25|50|100;
 export type GameTradeScanning = 'all'|'scanned';
 export type GameResearchCost = 'none'|'cheap'|'standard'|'expensive'|'veryExpensive'|'crazyExpensive';
@@ -130,10 +132,12 @@ export interface GameSettings {
 		tradeCreditsSpecialists: boolean;
 		tradeCost: GameTradeCost;
 		tradeScanning: GameTradeScanning;
-		alliances: GameSettingEnabledDisabled;
-	},
-	alliances: {
+  	},
+	diplomacy: {
 		enabled: GameSettingEnabledDisabled;
+		tradeRestricted: GameSettingEnabledDisabled;
+		maxAlliances: number;
+		upkeepCost: GameAllianceUpkeepCost;
 		globalEvents: GameSettingEnabledDisabled;
 	},
 	technology: {
@@ -189,7 +193,9 @@ export interface Game {
     galaxy: {
         players: Player[]
 		stars: Star[],
-		carriers: Carrier[]
+		carriers: Carrier[],
+		homeStars?: DBObjectId[],
+		linkedStars: DBObjectId[][]
 	},
 	conversations: Conversation[]
 	state: {
@@ -243,6 +249,14 @@ export interface Game {
 				expensive: number;
 				veryExpensive: number;
 				crazyExpensive: number;
+			}
+		},
+		diplomacy: {
+			upkeepExpenseMultipliers: {
+				none: number;
+				cheap: number;
+				standard: number;
+				expensive: number;
 			}
 		}
 	},

@@ -49,6 +49,7 @@ export interface Star extends MapObject {
     specialist?: Specialist;
     targeted?: boolean;
     upgradeCosts?: InfrastructureUpgradeCosts;
+    manufacturing?: number;
 };
 
 export interface StarCaptureResult {

@@ -6,12 +6,12 @@ import { Report, ReportReasons } from '../types/Report';
 import PlayerService from './player';
 
 export default class ReportService {
-    reportModel: any;
+    reportModel;
     reportRepo: DatabaseRepository<Report>;
     playerService: PlayerService;
 
     constructor(
-        reportModel: any,
+        reportModel,
         reportRepo: DatabaseRepository<Report>,
         playerService: PlayerService
     ) {
@@ -21,8 +21,8 @@ export default class ReportService {
     }
 
     async reportPlayer(game: Game, playerId: DBObjectId, reportedByUserId: DBObjectId, reasons: ReportReasons) {
-        let reportedPlayer = this.playerService.getById(game, playerId);
-        let reportedByPlayer = this.playerService.getByUserId(game, reportedByUserId);
+        let reportedPlayer = this.playerService.getById(game, playerId)!;
+        let reportedByPlayer = this.playerService.getByUserId(game, reportedByUserId)!;
 
         if (!reportedPlayer.userId) {
             throw new ValidationError(`The reported player is not a valid user.`);
