@@ -26,7 +26,7 @@ export default class DiplomacyService extends EventEmitter {
         return game.settings.diplomacy.enabled === 'enabled';
     }
 
-    isAllianceOnlyTradingEnabled(game: Game): boolean {
+    isTradeRestricted(game: Game): boolean {
         return game.settings.diplomacy.tradeRestricted === 'enabled';
     }
 

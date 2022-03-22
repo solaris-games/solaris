@@ -46,7 +46,7 @@ export default {
   },
   methods: {
     async loadDiplomaticStatus () {
-      if (!DiplomacyHelper.isFormalAlliancesEnabled(this.$store.state.game) || !DiplomacyHelper.isAllianceOnlyTrading(this.$store.state.game)) {
+      if (!DiplomacyHelper.isFormalAlliancesEnabled(this.$store.state.game) || !DiplomacyHelper.isTradeRestricted(this.$store.state.game)) {
         return
       }
 
@@ -80,7 +80,7 @@ export default {
     },
     isTradePossibleByDiplomacy: function () {
       return !DiplomacyHelper.isFormalAlliancesEnabled(this.$store.state.game) || 
-        !DiplomacyHelper.isAllianceOnlyTrading(this.$store.state.game) || 
+        !DiplomacyHelper.isTradeRestricted(this.$store.state.game) || 
         (this.diplomaticStatus && this.diplomaticStatus.actualStatus == 'allies')
     },
     isGameFinished: function () {

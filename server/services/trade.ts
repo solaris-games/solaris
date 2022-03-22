@@ -64,7 +64,7 @@ export default class TradeService extends EventEmitter {
     }
 
     isTradingAllyRestricted(game: Game) {
-        return this.diplomacyService.isFormalAlliancesEnabled(game) && this.diplomacyService.isAllianceOnlyTradingEnabled(game);
+        return this.diplomacyService.isFormalAlliancesEnabled(game) && this.diplomacyService.isTradeRestricted(game);
     }
 
     isTradingCreditsSpecialistsDisabled(game: Game) {

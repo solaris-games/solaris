@@ -40,7 +40,7 @@
         <li>
           <small>Combat will not occur if all players at a star are <span class="text-warning">allied</span> with the star owner.</small>
         </li>
-        <li v-if="isAllianceOnlyTrading">
+        <li v-if="isTradeRestricted">
           <small>You are only allowed to trade with allies.</small>
         </li>
         <li v-if="isMaxAlliancesEnabled">
@@ -139,8 +139,8 @@ export default {
     isFormalAlliancesEnabled () {
       return DiplomacyHelper.isFormalAlliancesEnabled(this.$store.state.game)
     },
-    isAllianceOnlyTrading () {
-      return DiplomacyHelper.isAllianceOnlyTrading(this.$store.state.game)
+    isTradeRestricted () {
+      return DiplomacyHelper.isTradeRestricted(this.$store.state.game)
     },
     isMaxAlliancesEnabled () {
       return DiplomacyHelper.isMaxAlliancesEnabled(this.$store.state.game)

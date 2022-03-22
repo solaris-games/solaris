@@ -4,7 +4,7 @@ class DiplomacyHelper {
     return game.settings.diplomacy.enabled === 'enabled'
   }
 
-  isAllianceOnlyTrading (game) {
+  isTradeRestricted (game) {
     return game.settings.diplomacy.tradeRestricted === 'enabled'
   }
 
