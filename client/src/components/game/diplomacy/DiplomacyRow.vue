@@ -76,9 +76,14 @@ export default {
             diplomaticStatus.actualStatus = response.data.actualStatus
 
             userPlayer.credits -= allianceFee
+
+            this.$emit('onApiRequestSuccess')
+          } else {
+            this.$emit('onApiRequestError', response.data)
           }
         } catch (err) {
           console.error(err)
+          this.$emit('onApiRequestError', err.response.data)
         }
       }
     },
@@ -95,9 +100,14 @@ export default {
             diplomaticStatus.statusFrom = response.data.statusFrom
             diplomaticStatus.statusTo = response.data.statusTo
             diplomaticStatus.actualStatus = response.data.actualStatus
+
+            this.$emit('onApiRequestSuccess')
+          } else {
+            this.$emit('onApiRequestError', response.data)
           }
         } catch (err) {
           console.error(err)
+          this.$emit('onApiRequestError', err.response.data)
         }
       }
     },
@@ -114,9 +124,14 @@ export default {
             diplomaticStatus.statusFrom = response.data.statusFrom
             diplomaticStatus.statusTo = response.data.statusTo
             diplomaticStatus.actualStatus = response.data.actualStatus
+
+            this.$emit('onApiRequestSuccess')
+          } else {
+            this.$emit('onApiRequestError', response.data)
           }
         } catch (err) {
           console.error(err)
+          this.$emit('onApiRequestError', err.response.data)
         }
       }
     },

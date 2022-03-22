@@ -459,13 +459,13 @@
             </option>
           </select>
         </div>
-        <div class="form-group">
+        <div class="form-group" v-if="settings.diplomacy.enabled === 'enabled'">
           <label for="maxAlliances" class="col-form-label">Max Number of Alliances (<span class="text-warning">{{settings.diplomacy.maxAlliances}} Allies</span>) <help-tooltip tooltip="Determines how many formal alliance each player may have at once."/></label>
           <div class="col">
             <input type="range" min="1" :max="settings.general.playerLimit-1" step="1" class="form-range w-100" id="maxAlliances" v-model="settings.diplomacy.maxAlliances" :disabled="isCreatingGame">
           </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" v-if="settings.diplomacy.enabled === 'enabled'">
           <label for="allianceUpkeepCost" class="col-form-label">Alliance Upkeep Cost <help-tooltip tooltip="Determines how expensive the alliance upkeep is - Upkeep is paid at the end of a galactic cycle"/></label>
           <select class="form-control" id="allianceUpkeepCost" v-model="settings.diplomacy.upkeepCost" :disabled="isCreatingGame">
             <option v-for="opt in options.diplomacy.upkeepCost" v-bind:key="opt.value" v-bind:value="opt.value">
@@ -473,8 +473,8 @@
             </option>
           </select>
         </div>
-        <div class="form-group">
-          <label for="allianceTradeRestricted" class="col-form-label">Alliance Only Trading<help-tooltip tooltip="If enabled, only allies can trade with eachother."/></label>
+        <div class="form-group" v-if="settings.diplomacy.enabled === 'enabled'">
+          <label for="allianceTradeRestricted" class="col-form-label">Alliance Only Trading <help-tooltip tooltip="If enabled, only allies can trade with eachother."/></label>
            <select class="form-control" id="allianceTradeRestricted" v-model="settings.diplomacy.tradeRestricted" :disabled="isCreatingGame">
             <option v-for="opt in options.diplomacy.tradeRestricted" v-bind:key="opt.value" v-bind:value="opt.value">
               {{ opt.text }}

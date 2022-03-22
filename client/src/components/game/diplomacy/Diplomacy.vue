@@ -10,6 +10,8 @@
       Declare your diplomatic statuses to players.
     </p>
 
+    <form-error-list :errors="errors" />
+
     <div class="row" v-if="!isLoading && isFormalAlliancesEnabled">
       <div class="table-responsive">
         <table class="table table-sm table-striped mb-0">
@@ -18,7 +20,9 @@
               v-for="diplomaticStatus in diplomaticStatuses"
               :key="diplomaticStatus.playerId"
               :diplomaticStatus="diplomaticStatus"
-              @onPlayerDetailRequested="onPlayerDetailRequested"/>
+              @onPlayerDetailRequested="onPlayerDetailRequested"
+              @onApiRequestError="onApiRequestError"
+              @onApiRequestSuccess="onApiRequestSuccess"/>
           </tbody>
         </table>
       </div>
@@ -34,19 +38,19 @@
           <small>If you are allied with another player, you can visit their stars.</small>
         </li>
         <li>
-          <small>Combat will not occur if all players at a star are allied with the star owner.</small>
+          <small>Combat will not occur if all players at a star are <span class="text-warning">allied</span> with the star owner.</small>
         </li>
         <li v-if="isAllianceOnlyTrading">
           <small>You are only allowed to trade with allies.</small>
         </li>
         <li v-if="isMaxAlliancesEnabled">
-          <small>You may only ally with a maximum of {{ maxAlliances }} player(s).</small>
+          <small>You may only ally with a maximum of <span class="text-warning">{{ maxAlliances }} player(s)</span>.</small>
         </li>
         <li v-if="isAllianceUpkeepEnabled">
-          <small>An alliance upkeep cost will be deducted at the end of every cycle based on your cycle income.</small>
+          <small>An alliance <span class="text-warning">upkeep cost</span> will be deducted at the end of every cycle based on your cycle income.</small>
         </li>
         <li v-if="isAllianceUpkeepEnabled">
-          <small>Establishing an alliance will incur an upfront upkeep fee based on your cycle income.</small>
+          <small>Establishing an alliance will incur an <span class="text-warning">upfront upkeep fee</span> based on your cycle income.</small>
         </li>
       </ul>
 
@@ -63,16 +67,19 @@ import LoadingSpinner from '../../LoadingSpinner'
 import DiplomacyApiService from '../../../services/api/diplomacy'
 import DiplomacyRowVue from './DiplomacyRow'
 import DiplomacyHelper from '../../../services/diplomacyHelper'
+import FormErrorList from '../../FormErrorList'
 
 export default {
   components: {
     'menu-title': MenuTitle,
     'loading-spinner': LoadingSpinner,
-    'diplomacy-row': DiplomacyRowVue
+    'diplomacy-row': DiplomacyRowVue,
+    'form-error-list': FormErrorList
   },
   data () {
     return {
         isLoading: false,
+        errors: [],
         diplomaticStatuses: []
     }
   },
@@ -91,6 +98,13 @@ export default {
     },
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
+    },
+    // TODO: This is super lazy
+    onApiRequestSuccess (e) {
+      this.errors = []
+    },
+    onApiRequestError (e) {
+      this.errors = e.errors
     },
     async loadDiplomaticStatus () {
       if (!this.isFormalAlliancesEnabled) {
