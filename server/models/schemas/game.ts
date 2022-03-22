@@ -106,11 +106,11 @@ const schema = new Schema({
 			tradeCost: { type: Types.Number, required: true, enum: [0, 5, 15, 25, 50, 100], default: 15 }, // TODO: This could be renamed.
 			tradeScanning: { type: Types.String, required: true, enum: ['all', 'scanned'], default: 'all' }
     },
-	alliances: {
+	diplomacy: {
 		enabled: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
-		allianceOnlyTrading: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
+		tradeRestricted: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
 		maxAlliances: { type: Types.Number, required: true, min: 1, max: 31, default: 31 },
-		allianceUpkeepCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'none' },
+		upkeepCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'none' },
 		globalEvents: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' }
 	},
     technology: {
@@ -211,7 +211,7 @@ const schema = new Schema({
 				crazyExpensive: { type: Types.Number, required: true, default: 8 }
 			}
 		},
-		alliances: {
+		diplomacy: {
 			upkeepExpenseMultipliers: {
 				none: { type: Types.Number, required: true, default: 0 },
 				cheap: { type: Types.Number, required: true, default: 0.02 },

@@ -24,21 +24,36 @@
       </div>
     </div>
 
-    <p class="mt-2 pb-2" v-if="isFormalAlliancesEnabled">
-      <small>
-        If you are allied with another player, you can visit their stars.
-        <br/>
-        Combat will not occur if all players at a star are allied with the star owner.<br/>
-        <div v-if="isTradeAllyRestricted">
-        You can only trade with allies.<br/>
-        </div>
-        <div v-if="maxAlliances > 0">
-        You may only ally with {{ maxAlliances }} player(s).<br/>
-        </div>
-        See the help guide for more details.
+    <div class="mt-2" v-if="isFormalAlliancesEnabled">
+      <hr/>
+      
+      <h5>Alliance Settings</h5>
 
-      </small>
-    </p>
+      <ul>
+        <li>
+          <small>If you are allied with another player, you can visit their stars.</small>
+        </li>
+        <li>
+          <small>Combat will not occur if all players at a star are allied with the star owner.</small>
+        </li>
+        <li v-if="isAllianceOnlyTrading">
+          <small>You are only allowed to trade with allies.</small>
+        </li>
+        <li v-if="isMaxAlliancesEnabled">
+          <small>You may only ally with a maximum of {{ maxAlliances }} player(s).</small>
+        </li>
+        <li v-if="isAllianceUpkeepEnabled">
+          <small>An alliance upkeep cost will be deducted at the end of every cycle based on your cycle income.</small>
+        </li>
+        <li v-if="isAllianceUpkeepEnabled">
+          <small>Establishing an alliance will incur an upfront upkeep fee based on your cycle income.</small>
+        </li>
+      </ul>
+
+      <p class="pb-2">
+        See the help guide for more details.
+      </p>
+    </div>
 </div>
 </template>
 
@@ -47,7 +62,7 @@ import MenuTitle from '../MenuTitle'
 import LoadingSpinner from '../../LoadingSpinner'
 import DiplomacyApiService from '../../../services/api/diplomacy'
 import DiplomacyRowVue from './DiplomacyRow'
-import GameHelper from '../../../services/gameHelper'
+import DiplomacyHelper from '../../../services/diplomacyHelper'
 
 export default {
   components: {
@@ -108,13 +123,19 @@ export default {
   },
   computed: {
     isFormalAlliancesEnabled () {
-      return GameHelper.isFormalAlliancesEnabled(this.$store.state.game)
+      return DiplomacyHelper.isFormalAlliancesEnabled(this.$store.state.game)
     },
-    isTradeAllyRestricted () {
-      return GameHelper.isTradeAllyRestricted(this.$store.state.game)
+    isAllianceOnlyTrading () {
+      return DiplomacyHelper.isAllianceOnlyTrading(this.$store.state.game)
+    },
+    isMaxAlliancesEnabled () {
+      return DiplomacyHelper.isMaxAlliancesEnabled(this.$store.state.game)
     },
     maxAlliances() {
-      return GameHelper.maxAlliances(this.$store.state.game)
+      return DiplomacyHelper.maxAlliances(this.$store.state.game)
+    },
+    isAllianceUpkeepEnabled () {
+      return DiplomacyHelper.isAllianceUpkeepEnabled(this.$store.state.game)
     }
   }
 }

@@ -5,11 +5,11 @@ module.exports = {
         await games.updateMany({
             $and: [
                 { 'settings.player.alliances': { $ne: null } },
-                { 'settings.alliances': { $eq: null } }
+                { 'settings.diplomacy': { $eq: null } }
             ]
         }, [{
             $set: {
-                'settings.alliances': {
+                'settings.diplomacy': {
                     enabled: '$settings.player.alliances',
                     globalEvents: 'disabled'
                 }

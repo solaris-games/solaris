@@ -3,10 +3,10 @@ module.exports = {
         const games = db.collection('games');
 
         await games.updateMany({
-            'constants.alliances.upkeepExpenseMultipliers': { $eq: null }
+            'constants.diplomacy.upkeepExpenseMultipliers': { $eq: null }
         }, {
             $set: {
-                'constants.alliances.upkeepExpenseMultipliers': {
+                'constants.diplomacy.upkeepExpenseMultipliers': {
                     none: 0,
                     cheap: 0.02,
                     standard: 0.05,

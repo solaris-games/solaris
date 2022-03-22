@@ -26,7 +26,7 @@
       </button>
     </div>
     <div class="col-auto">
-      <button class="btn btn-warning" v-if="!gameHasFinished && isTradeEnabled && isTradePossible " @click="onOpenTradeRequested">
+      <button class="btn btn-warning" v-if="!gameHasFinished && isTradeEnabled " @click="onOpenTradeRequested">
         <i class="fas fa-handshake"></i>
         Trade
       </button>
@@ -40,6 +40,7 @@ import eventBus from '../../../eventBus'
 import Statistics from './Statistics'
 import PlayerTitleVue from './PlayerTitle'
 import gameHelper from '../../../services/gameHelper'
+import DiplomacyHelper from '../../../services/diplomacyHelper'
 import ConversationApiService from '../../../services/api/conversation'
 import DiplomacyApiService from '../../../services/api/diplomacy'
 
@@ -135,16 +136,13 @@ export default {
   },
   computed: {
     isFormalAlliancesEnabled () { 
-      return gameHelper.isFormalAlliancesEnabled(this.$store.state.game)
+      return DiplomacyHelper.isFormalAlliancesEnabled(this.$store.state.game)
     },
     isDarkModeExtra () {
       return gameHelper.isDarkModeExtra(this.$store.state.game)
     },
     isTradeEnabled () {
       return gameHelper.isTradeEnabled(this.$store.state.game)
-    },
-    isTradePossible() {
-      return !gameHelper.isFormalAlliancesEnabled(this.$store.state.game) || !gameHelper.isTradeAllyRestricted(this.$store.state.game) || (this.diplomaticStatus && this.diplomaticStatus.actualStatus == 'allies')
     },
     canCreateConversation: function () {
       return this.$store.state.game.settings.general.playerLimit > 2

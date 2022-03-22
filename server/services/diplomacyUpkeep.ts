@@ -18,7 +18,7 @@ export default class DiplomacyUpkeepService {
     }
 
     isAllianceUpkeepEnabled(game: Game) {
-        return game.settings.alliances.allianceUpkeepCost !== 'none';
+        return game.settings.diplomacy.upkeepCost !== 'none';
     }
 
     async deductUpkeep(game: Game, player: Player, allianceCount: number, saveToDB: boolean = true) {
@@ -38,7 +38,7 @@ export default class DiplomacyUpkeepService {
             // Note: The only time we need to validate this is when we are attempting to save to DB
             // as this is currently the only scenario where the function is called from an API request and not internally.
             if (player.credits < upkeep.totalCost) {
-                throw new ValidationError(`You cannot afford to declare an alliance with this player. The upfront alliance cost is ${upkeep.totalCost} credits.`);
+                throw new ValidationError(`You cannot afford to declare an alliance with this player. The upfront alliance fee is ${upkeep.totalCost} credits.`);
             }
     
             await this.playerCreditsService.addCredits(game, player, -upkeep.totalCost);
@@ -66,7 +66,7 @@ export default class DiplomacyUpkeepService {
     }
     
     getUpkeepCost(game: Game, creditsFromEconomy: number, allianceCount: number) {
-        let costPerAlly = game.constants.alliances.upkeepExpenseMultipliers[game.settings.alliances.allianceUpkeepCost];
+        let costPerAlly = game.constants.diplomacy.upkeepExpenseMultipliers[game.settings.diplomacy.upkeepCost];
 
         if (costPerAlly === 0) {
             return null;

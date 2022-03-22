@@ -133,11 +133,11 @@ export interface GameSettings {
 		tradeCost: GameTradeCost;
 		tradeScanning: GameTradeScanning;
   	},
-	alliances: {
+	diplomacy: {
 		enabled: GameSettingEnabledDisabled;
-		allianceOnlyTrading: GameSettingEnabledDisabled;
+		tradeRestricted: GameSettingEnabledDisabled;
 		maxAlliances: number;
-		allianceUpkeepCost: GameAllianceUpkeepCost;
+		upkeepCost: GameAllianceUpkeepCost;
 		globalEvents: GameSettingEnabledDisabled;
 	},
 	technology: {
@@ -251,7 +251,7 @@ export interface Game {
 				crazyExpensive: number;
 			}
 		},
-		alliances: {
+		diplomacy: {
 			upkeepExpenseMultipliers: {
 				none: number;
 				cheap: number;

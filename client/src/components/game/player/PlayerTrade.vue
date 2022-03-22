@@ -1,13 +1,14 @@
 <template>
     <div v-if="isTradeAllowed">
-      <div v-if="isTradePossible">
+      <div v-if="isTradePossibleByScanning && isTradePossibleByDiplomacy">
         <reputation v-if="player.defeated" :playerId="player._id"/>
         <sendCredits v-if="tradeCreditsIsEnabled" :player="player" :userPlayer="userPlayer"/>
         <sendCreditsSpecialists v-if="tradeCreditsSpecialistsIsEnabled" :player="player" :userPlayer="userPlayer"/>
         <sendTechnology v-if="player && tradeTechnologyIsEnabled" :playerId="player._id"/>
       </div>
 
-      <p v-if="!isTradePossible" class="text-danger pt-2 pb-2">You cannot trade with this player, they are not within scanning range.</p>
+      <p v-if="!isTradePossibleByScanning" class="text-danger pt-2 pb-2">You cannot trade with this player, they are not within scanning range.</p>
+      <p v-if="!isTradePossibleByDiplomacy" class="text-danger pt-2 pb-2">You cannot trade with this player, they are not an ally.</p>
     </div>
 </template>
 
@@ -17,6 +18,7 @@ import SendCredits from './SendCredits'
 import SendCreditsSpecialists from './SendCreditsSpecialists'
 import Reputation from './Reputation'
 import GameHelper from '../../../services/gameHelper'
+import DiplomacyHelper from '../../../services/diplomacyHelper'
 
 export default {
   components: {
@@ -50,9 +52,14 @@ export default {
         && !this.isGameFinished 
         && (this.tradeTechnologyIsEnabled || this.tradeCreditsIsEnabled || this.tradeCreditsSpecialistsIsEnabled)
     },
-    isTradePossible: function () {
+    isTradePossibleByScanning: function () {
       return this.player.stats.totalStars > 0 
         && (this.$store.state.game.settings.player.tradeScanning === 'all' || (this.player && this.player.isInScanningRange))
+    },
+    isTradePossibleByDiplomacy: function () {
+      return !DiplomacyHelper.isFormalAlliancesEnabled(this.$store.state.game) || 
+        !DiplomacyHelper.isAllianceOnlyTrading(this.$store.state.game) || 
+        (this.diplomaticStatus && this.diplomaticStatus.actualStatus == 'allies')
     },
     isGameFinished: function () {
       return GameHelper.isGameFinished(this.$store.state.game)

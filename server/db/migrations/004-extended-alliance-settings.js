@@ -3,27 +3,32 @@ module.exports = {
         const games = db.collection('games');
 
         await games.updateMany({
-            'settings.alliances.allianceOnlyTrading': { $eq: null }
+            'settings.diplomacy.tradeRestricted': { $eq: null }
         }, {
             $set: {
-                'settings.alliances.allianceOnlyTrading': 'disabled'
+                'settings.diplomacy.tradeRestricted': 'disabled'
             }
         });
 
         await games.updateMany({
-            'settings.alliances.allianceUpkeepCost': { $eq: null }
+            'settings.diplomacy.upkeepCost': { $eq: null }
         }, {
             $set: {
-                'settings.alliances.allianceUpkeepCost': 'none'
+                'settings.diplomacy.upkeepCost': 'none'
             }
         });
 
-        await games.find({
-            'settings.alliances.maxAlliances': { $eq: null }
-        }).forEach(function(game) {
-            game.settings.alliances.maxAlliances = game.settings.general.playerLimit - 1;
-
-            games.save(game);
-        });
+        await games.updateMany({
+                'settings.diplomacy.maxAlliances': { $eq: null }
+        }, [{
+            $set: {
+                'settings.diplomacy.maxAlliances': {
+                    $sum: [
+                        '$settings.general.playerLimit',
+                        -1
+                    ]
+                }
+            }
+        }]);
     }
 };

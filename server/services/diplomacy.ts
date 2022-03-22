@@ -23,15 +23,19 @@ export default class DiplomacyService extends EventEmitter {
     }
 
     isFormalAlliancesEnabled(game: Game): boolean {
-        return game.settings.alliances.enabled === 'enabled';
+        return game.settings.diplomacy.enabled === 'enabled';
     }
 
     isAllianceOnlyTradingEnabled(game: Game): boolean {
-        return game.settings.alliances.allianceOnlyTrading === 'enabled';
+        return game.settings.diplomacy.tradeRestricted === 'enabled';
+    }
+
+    isMaxAlliancesEnabled(game: Game): boolean {
+        return game.settings.diplomacy.maxAlliances < game.settings.general.playerLimit - 1
     }
 
     isGlobalEventsEnabled(game: Game): boolean {
-        return game.settings.alliances.globalEvents === 'enabled';
+        return game.settings.diplomacy.globalEvents === 'enabled';
     }
 
     getDiplomaticStatusBetweenPlayers(game: Game, playerIds: DBObjectId[]): DiplomaticState {
@@ -157,20 +161,7 @@ export default class DiplomacyService extends EventEmitter {
 
     async _declareStatus(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId, state: DiplomaticState, saveToDB: boolean = true) {
         let player: Player = game.galaxy.players.find(p => p._id.toString() === playerId.toString())!;
-
-        let allianceCount = -1;
-
-        if (game.settings.alliances.maxAlliances > 0) {
-            allianceCount = this.getAlliesOfPlayer(game, player, true).length;
-        }
-
-        let diploStatusBefore = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
         let diplo = player.diplomacy.find(d => d.playerId.toString() === playerIdTarget.toString());
-
-        //only add alliance request if the target player is not already an ally and if the player has capacity for more allies
-        if (state == 'allies' && (allianceCount >= game.settings.alliances.maxAlliances || diploStatusBefore.actualStatus == 'allies')) {
-            return diploStatusBefore; 
-        }
 
         if (!diplo) {
             diplo = {
@@ -218,12 +209,19 @@ export default class DiplomacyService extends EventEmitter {
     async declareAlly(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId, saveToDB: boolean = true) {
         let oldStatus = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
 
-        if (oldStatus.statusFrom === "allies") {
+        if (oldStatus.statusTo === "allies") {
             throw new ValidationError(`The player has already been declared as allies`);
         }
 
-        // TODO: If max alliances is enabled, ensure that the player has the capacity to declare the player as an ally here. If not, validation error?
-        // If so, declare as allies and increment alliances made this cycle counter outside of the _declareStatus function?
+        if (this.isMaxAlliancesEnabled(game)) {
+            let player = game.galaxy.players.find(p => p._id.toString() === playerId.toString())!;
+    
+            let allianceCount = this.getAlliesOfPlayer(game, player, true).length;
+
+            if (allianceCount >= game.settings.diplomacy.maxAlliances) {
+                throw new ValidationError(`You have reached the alliance cap, you cannot declare any more alliances.`);
+            }
+        }
 
         // If there is an upkeep cost, deduct 1 cycle's worth of up for 1 alliance upfront.
         if (this.diplomacyUpkeepService.isAllianceUpkeepEnabled(game)) {
@@ -260,11 +258,9 @@ export default class DiplomacyService extends EventEmitter {
     async declareEnemy(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId, saveToDB: boolean = true) {
         let oldStatus = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
 
-        if (oldStatus.statusFrom === "enemies") {
+        if (oldStatus.statusTo === "enemies") {
             throw new ValidationError(`The player has already been declared as enemies`);
         }
-
-        // TODO: If max alliances is enabled, ensure that the player has the capacity to declare the player as an ally.
 
         let wasAtWar = oldStatus.actualStatus === 'enemies';
 
@@ -295,7 +291,7 @@ export default class DiplomacyService extends EventEmitter {
     async declareNeutral(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId, saveToDB: boolean = true) {
         let oldStatus = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
 
-        if (oldStatus.statusFrom === "neutral") {
+        if (oldStatus.statusTo === "neutral") {
             throw new ValidationError(`The player has already been declared as neutral`);
         }
 

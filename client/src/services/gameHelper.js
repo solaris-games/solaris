@@ -1,4 +1,5 @@
 import moment from 'moment'
+import DiplomacyHelper from './diplomacyHelper'
 
 class GameHelper {
   getUserPlayer (game) {
@@ -368,8 +369,8 @@ class GameHelper {
     // If both stars have warp gates and they are both owned by players...
     if (sourceStar.warpGate && destinationStar.warpGate && sourceStar.ownedByPlayerId && destinationStar.ownedByPlayerId) {
         // If both stars are owned by the player or by allies then carriers can always move at warp.
-        let sourceAllied = sourceStar.ownedByPlayerId === carrier.ownedByPlayerId || (this.isFormalAlliancesEnabled(game) && this.isDiplomaticStatusToPlayersAllied(game, sourceStar.ownedByPlayerId, [carrier.ownedByPlayerId]))
-        let desinationAllied = destinationStar.ownedByPlayerId === carrier.ownedByPlayerId || (this.isFormalAlliancesEnabled(game) && this.isDiplomaticStatusToPlayersAllied(game, destinationStar.ownedByPlayerId, [carrier.ownedByPlayerId]))
+        let sourceAllied = sourceStar.ownedByPlayerId === carrier.ownedByPlayerId || (DiplomacyHelper.isFormalAlliancesEnabled(game) && DiplomacyHelper.isDiplomaticStatusToPlayersAllied(game, sourceStar.ownedByPlayerId, [carrier.ownedByPlayerId]))
+        let desinationAllied = destinationStar.ownedByPlayerId === carrier.ownedByPlayerId || (DiplomacyHelper.isFormalAlliancesEnabled(game) && DiplomacyHelper.isDiplomaticStatusToPlayersAllied(game, destinationStar.ownedByPlayerId, [carrier.ownedByPlayerId]))
 
         // If both stars are owned by the player then carriers can always move at warp.
         if (sourceAllied && desinationAllied) {
@@ -944,6 +945,11 @@ class GameHelper {
     return player.stats.totalCarriers * costPerCarrier;
   }
 
+  calculateIncomeMinusUpkeep (game, player) {
+    const fromEconomy = player.stats.totalEconomy * 10
+    return fromEconomy + this._getBankingCredits(game, player);
+  }
+
   calculateIncome (game, player) {
     const fromEconomy = player.stats.totalEconomy * 10
     const upkeep = this._getUpkeepCosts(game, player);
@@ -980,75 +986,6 @@ class GameHelper {
       'special_kingOfTheHill': 'King Of The Hill',
       'special_tinyGalaxy': 'Tiny Galaxy'
     }[game.settings.general.type]
-  }
-
-  /* Diplomacy */
-
-  isFormalAlliancesEnabled (game) {
-    return game.settings.alliances.enabled === 'enabled'
-  }
-
-  isTradeAllyRestricted (game) {
-    return game.settings.alliances.allianceOnlyTrading === 'enabled'
-  }
-
-  maxAlliances (game) {
-    return game.settings.alliances.maxAlliances
-  }
-
-  isDiplomaticStatusToPlayersAllied(game, playerId, toPlayerIds) {
-    let playerIdA = playerId;
-
-    for (let i = 0; i < toPlayerIds.length; i++) {
-        let playerIdB = toPlayerIds[i]
-
-        let diplomaticStatus = this.getDiplomaticStatusToPlayer(game, playerIdA, playerIdB)
-
-        if (['enemies', 'neutral'].includes(diplomaticStatus.actualStatus)) {
-            return false
-        }
-    }
-
-    return true
-  }
-
-  getDiplomaticStatusToPlayer(game, playerIdA, playerIdB) {
-    if (playerIdA.toString() === playerIdB.toString()) {
-      return {
-          playerIdFrom: playerIdA,
-          playerIdTo: playerIdB,
-          statusFrom: 'allies',
-          statusTo: 'allies',
-          actualStatus: 'allies'
-      }
-    }
-
-    let playerA = game.galaxy.players.find(p => p._id.toString() === playerIdA.toString())
-    let playerB = game.galaxy.players.find(p => p._id.toString() === playerIdB.toString())
-
-    let playerADiplo = playerA.diplomacy.find(x => x.playerId.toString() === playerB._id.toString())
-    let playerBDiplo = playerB.diplomacy.find(x => x.playerId.toString() === playerA._id.toString())
-
-    let statusTo = playerADiplo == null ? 'neutral' : playerADiplo.status
-    let statusFrom = playerBDiplo == null ? 'neutral' : playerADiplo.status
-
-    let actualStatus
-
-    if (statusTo === 'enemies' || statusFrom === 'enemies') {
-        actualStatus = 'enemies'
-    } else if (statusTo === 'neutral' || statusFrom === 'neutral') {
-        actualStatus = 'neutral'
-    } else {
-        actualStatus = 'allies'
-    }
-
-    return {
-        playerIdFrom: playerIdA,
-        playerIdTo: playerIdB,
-        statusFrom,
-        statusTo,
-        actualStatus
-    }
   }
 
   isNewPlayerGame (game) {

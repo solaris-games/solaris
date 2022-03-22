@@ -69,11 +69,11 @@
     "tradeCost": 0,
     "tradeScanning": "all"
   },
-  "alliances": {
+  "diplomacy": {
     "enabled": "disabled",
-    "allianceUpkeepCost": "none",
-    "allianceOnlyTrading": "disabled", 
-    "maxAlliances": 31, 
+    "upkeepCost": "none",
+    "tradeRestricted": "disabled", 
+    "maxAlliances": 1, 
     "globalEvents": "disabled"
   },
   "technology": {
