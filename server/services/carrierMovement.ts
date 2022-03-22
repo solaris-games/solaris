@@ -87,6 +87,13 @@ export default class CarrierMovementService {
         if (!carrier.isGift && this.starService.isDeadStar(destinationStar) && this.specialistService.getReigniteDeadStar(carrier)) {
             let reigniteNaturalResources = this.specialistService.getReigniteDeadStarNaturalResources(carrier);
 
+            // Double resources for binary stars.
+            if (destinationStar.isBinaryStar) {
+                reigniteNaturalResources.economy *= 2;
+                reigniteNaturalResources.industry *= 2;
+                reigniteNaturalResources.science *= 2;
+            }
+            
             this.starService.reigniteDeadStar(game, destinationStar, reigniteNaturalResources);
 
             carrier.specialistId = null;
