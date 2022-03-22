@@ -609,7 +609,7 @@ export default class GameTickService extends EventEmitter {
                 let allianceUpkeepResult: any | null = null; // TODO: Type
 
                 if (this.diplomacyUpkeepService.isAllianceUpkeepEnabled(game)) {
-                    let allianceCount = this.diplomacyService.getAlliesOfPlayer(game, player, true).length;
+                    let allianceCount = this.diplomacyService.getAlliesOfPlayer(game, player).length;
                     
                     allianceUpkeepResult = this.diplomacyUpkeepService.deductTotalUpkeep(game, player, creditsResult.creditsFromBanking, allianceCount); // TODO: creditsTotal?
                 }

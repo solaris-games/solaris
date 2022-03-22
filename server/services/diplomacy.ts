@@ -119,15 +119,35 @@ export default class DiplomacyService extends EventEmitter {
         return diplomaticStatuses;
     }
 
-    getAlliesOfPlayer(game: Game, player: Player, actualOrOffer : Boolean = false): Player[] {
+    getAlliesOfPlayer(game: Game, player: Player): Player[] {
         let allies: Player[] = [];
+
         for (let otherPlayer of game.galaxy.players) {
             if (otherPlayer._id.toString() === player._id.toString()) {
                 continue;
             }
 
             let diplomaticStatus = this.getDiplomaticStatusToPlayer(game, player._id, otherPlayer._id);
-            if ( diplomaticStatus.actualStatus === 'allies' || (actualOrOffer && diplomaticStatus.statusTo === 'allies')) {
+
+            if (diplomaticStatus.actualStatus === 'allies') {
+                allies.push(otherPlayer);
+            }
+        }
+
+        return allies;
+    }
+
+    getAlliesOrOffersOfPlayer(game: Game, player: Player): Player[] {
+        let allies: Player[] = [];
+
+        for (let otherPlayer of game.galaxy.players) {
+            if (otherPlayer._id.toString() === player._id.toString()) {
+                continue;
+            }
+
+            let diplomaticStatus = this.getDiplomaticStatusToPlayer(game, player._id, otherPlayer._id);
+
+            if (diplomaticStatus.actualStatus === 'allies' || diplomaticStatus.statusTo === 'allies') {
                 allies.push(otherPlayer);
             }
         }
@@ -216,7 +236,7 @@ export default class DiplomacyService extends EventEmitter {
         if (this.isMaxAlliancesEnabled(game)) {
             let player = game.galaxy.players.find(p => p._id.toString() === playerId.toString())!;
     
-            let allianceCount = this.getAlliesOfPlayer(game, player, true).length;
+            let allianceCount = this.getAlliesOrOffersOfPlayer(game, player).length;
 
             if (allianceCount >= game.settings.diplomacy.maxAlliances) {
                 throw new ValidationError(`You have reached the alliance cap, you cannot declare any more alliances.`);

@@ -26,7 +26,7 @@
       </button>
     </div>
     <div class="col-auto">
-      <button class="btn btn-warning" v-if="!gameHasFinished && isTradeEnabled " @click="onOpenTradeRequested">
+      <button class="btn btn-warning" v-if="!gameHasFinished && isTradeEnabled" @click="onOpenTradeRequested">
         <i class="fas fa-handshake"></i>
         Trade
       </button>
@@ -40,7 +40,6 @@ import eventBus from '../../../eventBus'
 import Statistics from './Statistics'
 import PlayerTitleVue from './PlayerTitle'
 import gameHelper from '../../../services/gameHelper'
-import DiplomacyHelper from '../../../services/diplomacyHelper'
 import ConversationApiService from '../../../services/api/conversation'
 
 export default {
@@ -49,7 +48,7 @@ export default {
     'player-title': PlayerTitleVue
   },
   props: {
-    playerId: String,
+    playerId: String
   },
   data () {
     return {
@@ -114,9 +113,6 @@ export default {
     }
   },
   computed: {
-    isFormalAlliancesEnabled () { 
-      return DiplomacyHelper.isFormalAlliancesEnabled(this.$store.state.game)
-    },
     isDarkModeExtra () {
       return gameHelper.isDarkModeExtra(this.$store.state.game)
     },

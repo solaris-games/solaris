@@ -947,7 +947,7 @@ class GameHelper {
 
   calculateIncomeMinusUpkeep (game, player) {
     const fromEconomy = player.stats.totalEconomy * 10
-    return fromEconomy + this._getBankingCredits(game, player);
+    return fromEconomy + this._getBankingCredits(game, player)
   }
 
   calculateIncome (game, player) {
