@@ -1,7 +1,7 @@
 import { DBObjectId } from '../types/DBObjectId';
 import ValidationError from '../errors/validation';
 import { Game } from '../types/Game';
-import { Player, PlayerDiplomacy, PlayerReputation, PlayerResearch } from '../types/Player';
+import { Player, PlayerDiplomaticState, PlayerReputation, PlayerResearch } from '../types/Player';
 import BattleRoyaleService from './battleRoyale';
 import BroadcastService from './broadcast';
 import CacheService from './cache';
@@ -29,6 +29,7 @@ import { Guild, GuildUserWithTag } from '../types/Guild';
 import { CarrierWaypoint } from '../types/CarrierWaypoint';
 import { Carrier } from '../types/Carrier';
 import AvatarService from './avatar';
+import PlayerStatisticsService from './playerStatistics';
 
 export default class GameGalaxyService {
     cacheService: CacheService;
@@ -54,6 +55,7 @@ export default class GameGalaxyService {
     gameStateService: GameStateService;
     diplomacyService: DiplomacyService;
     avatarService: AvatarService;
+    playerStatisticsService: PlayerStatisticsService;
 
     constructor(
         cacheService: CacheService,
@@ -78,7 +80,8 @@ export default class GameGalaxyService {
         gameTypeService: GameTypeService,
         gameStateService: GameStateService,
         diplomacyService: DiplomacyService,
-        avatarService: AvatarService
+        avatarService: AvatarService,
+        playerStatisticsService: PlayerStatisticsService
     ) {
         this.cacheService = cacheService;
         this.broadcastService = broadcastService;
@@ -103,6 +106,7 @@ export default class GameGalaxyService {
         this.gameStateService = gameStateService;
         this.diplomacyService = diplomacyService;
         this.avatarService = avatarService;
+        this.playerStatisticsService = playerStatisticsService;
     }
 
     async getGalaxy(gameId: DBObjectId, userId: DBObjectId | null, tick: number | null) {
@@ -190,7 +194,7 @@ export default class GameGalaxyService {
         }
 
         if (isHistorical && cached) {
-            this.cacheService.put(cached.cacheKey, game, 1200000); // 20 minutes.
+            this.cacheService.put(cached.cacheKey!, game, 1200000); // 20 minutes.
         }
 
         return game;
@@ -245,7 +249,7 @@ export default class GameGalaxyService {
 
         // Get all of the player's statistics.
         doc.galaxy.players.forEach(p => {
-            p.stats = this.playerService.getStats(doc, p);
+            p.stats = this.playerStatisticsService.getStats(doc, p);
 
             if (isKingOfTheHillMode) {
                 p.isKingOfTheHill = kingOfTheHillPlayer != null && kingOfTheHillPlayer._id.toString() === p._id.toString();
@@ -562,7 +566,7 @@ export default class GameGalaxyService {
                 research = null;
             }
 
-            let diplomacy: PlayerDiplomacy[] = [];
+            let diplomacy: PlayerDiplomaticState[] = [];
 
             if (userPlayer) {
                 diplomacy = this.diplomacyService.getFilteredDiplomacy(p, userPlayer);

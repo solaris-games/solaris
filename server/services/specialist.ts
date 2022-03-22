@@ -9,7 +9,7 @@ const ValidationError = require("../errors/validation");
 export default class SpecialistService {
 
     getById(id: number, type: SpecialistType) {
-        return specialists[type].find(x => x.id === id);
+        return specialists[type].find((x) => x.id === id);
     }
 
     getByIdCarrier(id: number | null) {
@@ -104,7 +104,7 @@ export default class SpecialistService {
         return result;
     }
 
-    _getCarrierSpecialValue(carrier: Carrier, name: string, defaultValue: any) {
+    _getCarrierSpecialValue(carrier: Carrier, name: string, defaultValue) {
         if (!carrier.specialistId) {
             return defaultValue;
         }
@@ -120,7 +120,7 @@ export default class SpecialistService {
         return val == null ? defaultValue : val;
     }
 
-    _getStarSpecialValue(star: Star, name: string, defaultValue: any) {
+    _getStarSpecialValue(star: Star, name: string, defaultValue) {
         if (!star.specialistId) {
             return defaultValue;
         }

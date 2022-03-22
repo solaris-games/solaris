@@ -6,22 +6,25 @@ describe('specialistHire - Carrier', () => {
     // -------------
     // Mock Objects
 
-    function setup(): any {
+    function setup() {
         let obj = {
-            service: null,
+            service: {} as any,
             gameRepo: {
                 bulkWrite: () => {}
             },
-            specialistService: {},
+            specialistService: {} as any,
             achievementService: {
                 incrementSpecialistsHired: () => {}
             },
             waypointService: {
                 cullWaypointsByHyperspaceRangeDB: () => {}
             },
-            playerService: {},
+            playerService: {} as any,
+            playerCreditsService: {} as any,
             starService: {
-                isOwnedByPlayer: () => { return true; }
+                isOwnedByPlayer: () => { return true; },
+                getById: () => { return {} as any; },
+                isDeadStar: () => { return false; }
             },
             gameTypeService: {
                 isTutorialGame: () => { return false; }
@@ -35,19 +38,21 @@ describe('specialistHire - Carrier', () => {
                         specialistCost: 'standard',
                         specialistsCurrency: 'credits',
                         specialistBans: {
-                            star: [],
-                            carrier: []
+                            star: [] as any[],
+                            carrier: [] as any[]
                         }
                     }
                 },
                 galaxy: {
-                    carriers: [],
-                    stars: []
+                    carriers: [] as any[],
+                    stars: [] as any[]
                 }
             },
             playerId: new mongoose.Types.ObjectId(),
             player: {
-                _id: null
+                _id: null,
+                credits: 0,
+                creditsSpecialists: 0
             },
             carrierId: new mongoose.Types.ObjectId(),
             starId: new mongoose.Types.ObjectId(),
@@ -57,7 +62,7 @@ describe('specialistHire - Carrier', () => {
         obj.player._id = obj.playerId;
 
         // @ts-ignore
-        obj.service = new SpecialistHireService(obj.gameRepo, obj.specialistService, obj.achievementService, obj.waypointService, obj.playerService, obj.starService, obj.gameTypeService, obj.specialistBanService);
+        obj.service = new SpecialistHireService(obj.gameRepo, obj.specialistService, obj.achievementService, obj.waypointService, obj.playerCreditsService, obj.starService, obj.gameTypeService, obj.specialistBanService);
 
         return obj;
     }
@@ -372,7 +377,7 @@ describe('specialistHire - Carrier', () => {
             }
         };
 
-        testObj.playerService.addCredits = (game, player, amount) => {
+        testObj.playerCreditsService.addCredits = (game, player, amount: number) => {
             expect(amount).toBe(-100);
         };
 
@@ -381,7 +386,7 @@ describe('specialistHire - Carrier', () => {
 
         try {
             await testObj.service.hireCarrierSpecialist(testObj.game, testObj.player, testObj.carrierId, testObj.specialistId);
-        } catch (err) {
+        } catch (err: any) {
             hasError = true;
         }
         

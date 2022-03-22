@@ -16,7 +16,7 @@ import UserService from './user';
 const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
 export default class GameCreateService {
-    gameModel: any;
+    gameModel;
     gameService: GameService;
     gameListService: GameListService;
     nameService: NameService;
@@ -31,7 +31,7 @@ export default class GameCreateService {
     specialistBanService: SpecialistBanService;
 
     constructor(
-        gameModel: any,
+        gameModel,
         gameService: GameService,
         gameListService: GameListService,
         nameService: NameService, 
@@ -156,6 +156,9 @@ export default class GameCreateService {
             game.settings.specialGalaxy.randomBinaryStars = 0;
             game.settings.specialGalaxy.randomBlackHoles = 0;
         }
+
+        // Clamp max alliances if its invalid (minimum of 1)
+        game.settings.diplomacy.maxAlliances = Math.max(1, Math.min(game.settings.diplomacy.maxAlliances, game.settings.general.playerLimit - 1));
         
         // If the game name contains a special string, then replace it with a random name.
         if (game.settings.general.name.indexOf(RANDOM_NAME_STRING) > -1) {
@@ -165,10 +168,10 @@ export default class GameCreateService {
         }
 
         // Create all of the stars required.
-        (game.galaxy as any).homeStars = [];
-        (game.galaxy as any).linkedStars = [];
+        game.galaxy.homeStars = [];
+        game.galaxy.linkedStars = [];
 
-        let starGeneration: any = this.mapService.generateStars(
+        let starGeneration = this.mapService.generateStars(
             game, 
             desiredStarCount,
             game.settings.general.playerLimit,

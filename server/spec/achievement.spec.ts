@@ -3,7 +3,7 @@ import AchievementService from '../services/achievement';
 const userId = 'abc';
 
 describe('achievement', () => {
-    const incrementAchievementTest = async (key, incrementAmount, incrementFunctionCallback) => {
+    const incrementAchievementTest = async (key: string, incrementAmount: number, incrementFunctionCallback) => {
         let calls = 0;
 
         const fakeUserRepo = {

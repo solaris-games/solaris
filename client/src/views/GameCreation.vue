@@ -9,12 +9,10 @@
           <label for="name" class="col-form-label">Name <help-tooltip tooltip="The name of the game, make it short and sweet"/></label>
           <input type="text" required="required" class="form-control" id="name" minlength="3" maxlength="24" v-model="settings.general.name" :disabled="isCreatingGame">
         </div>
-
         <div class="form-group">
           <label for="description" class="col-form-label">Description <help-tooltip tooltip="Give your game a long description detailing some key settings and entice players to join your custom game"/></label>
           <textarea rows="4" class="form-control" id="description" v-model="settings.general.description"></textarea>
         </div>
-
         <div class="form-group">
           <label for="password" class="col-form-label">Password <help-tooltip tooltip="Password protect your game for you and a select group of players"/></label>
           <input type="password" class="form-control" id="password" v-model="settings.general.password" :disabled="isCreatingGame">
@@ -61,7 +59,7 @@
       <view-collapse-panel title="Player Settings" :startsOpened="true">
         <div class="form-group">
           <label for="players" class="col-form-label">Players <help-tooltip tooltip="Total number of player slots"/></label>
-          <select class="form-control" id="players" v-model="settings.general.playerLimit" :disabled="isCreatingGame">
+          <select class="form-control" id="players" v-model="settings.general.playerLimit" :disabled="isCreatingGame" @change="onPlayerLimitChanged">
             <option v-for="opt in options.general.playerLimit" v-bind:key="opt" v-bind:value="opt">
               {{ opt }} Players
             </option>
@@ -94,8 +92,6 @@
             </option>
           </select>
         </div>
-        
-        
       </view-collapse-panel>
 
       <view-collapse-panel title="Game Time Settings" :startsOpened="true">
@@ -456,18 +452,39 @@
 
       <view-collapse-panel title="Formal Alliances">
         <div class="form-group">
-          <label for="alliances" class="col-form-label">Enabled <help-tooltip tooltip="If enabled, players can change their diplomatic status to allied or enemies - Allied players can orbit eachother's stars and support eachother in combat"/></label>
-          <select class="form-control" id="alliances" v-model="settings.alliances.enabled" :disabled="isCreatingGame">
-            <option v-for="opt in options.alliances.enabled" v-bind:key="opt.value" v-bind:value="opt.value">
+          <label for="diplomacy" class="col-form-label">Enabled <help-tooltip tooltip="If enabled, players can change their diplomatic status to allied or enemies - Allied players can orbit eachother's stars and support eachother in combat"/></label>
+          <select class="form-control" id="diplomacy" v-model="settings.diplomacy.enabled" :disabled="isCreatingGame">
+            <option v-for="opt in options.diplomacy.enabled" v-bind:key="opt.value" v-bind:value="opt.value">
               {{ opt.text }}
             </option>
           </select>
         </div>
-        
-        <div class="form-group" v-if="settings.alliances.enabled === 'enabled'">
+        <div class="form-group" v-if="settings.diplomacy.enabled === 'enabled'">
+          <label for="maxAlliances" class="col-form-label">Max Number of Alliances (<span class="text-warning">{{settings.diplomacy.maxAlliances}} Allies</span>) <help-tooltip tooltip="Determines how many formal alliance each player may have at once."/></label>
+          <div class="col">
+            <input type="range" min="1" :max="settings.general.playerLimit-1" step="1" class="form-range w-100" id="maxAlliances" v-model="settings.diplomacy.maxAlliances" :disabled="isCreatingGame">
+          </div>
+        </div>
+        <div class="form-group" v-if="settings.diplomacy.enabled === 'enabled'">
+          <label for="allianceUpkeepCost" class="col-form-label">Alliance Upkeep Cost <help-tooltip tooltip="Determines how expensive the alliance upkeep is - Upkeep is paid at the end of a galactic cycle"/></label>
+          <select class="form-control" id="allianceUpkeepCost" v-model="settings.diplomacy.upkeepCost" :disabled="isCreatingGame">
+            <option v-for="opt in options.diplomacy.upkeepCost" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group" v-if="settings.diplomacy.enabled === 'enabled'">
+          <label for="allianceTradeRestricted" class="col-form-label">Alliance Only Trading <help-tooltip tooltip="If enabled, only allies can trade with eachother."/></label>
+           <select class="form-control" id="allianceTradeRestricted" v-model="settings.diplomacy.tradeRestricted" :disabled="isCreatingGame">
+            <option v-for="opt in options.diplomacy.tradeRestricted" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+        <div class="form-group" v-if="settings.diplomacy.enabled === 'enabled'">
           <label for="alliancesGlobalEvents" class="col-form-label">Global Events <help-tooltip tooltip="If enabled, global events will be displayed when players declare war or make peace"/></label>
-          <select class="form-control" id="alliancesGlobalEvents" v-model="settings.alliances.globalEvents" :disabled="isCreatingGame">
-            <option v-for="opt in options.alliances.globalEvents" v-bind:key="opt.value" v-bind:value="opt.value">
+          <select class="form-control" id="alliancesGlobalEvents" v-model="settings.diplomacy.globalEvents" :disabled="isCreatingGame">
+            <option v-for="opt in options.diplomacy.globalEvents" v-bind:key="opt.value" v-bind:value="opt.value">
               {{ opt.text }}
             </option>
           </select>
@@ -723,6 +740,9 @@ export default {
     },
     onSpecialistBanSelectionChanged (e) {
       this.settings.specialGalaxy.specialistBans = e
+    },
+    onPlayerLimitChanged (e) {
+      this.settings.diplomacy.maxAlliances = this.settings.general.playerLimit - 1;
     }
   }
 }

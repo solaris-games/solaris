@@ -30,7 +30,7 @@ export default class BotHelperService {
         return validCharacters && id.length === 24;
     }
 
-    async getGame(directions: any, hasFocus: any, msg: any) {
+    async getGame(directions, hasFocus, msg) {
         let game: Game | Game[] | null = [];
         let focus = '';
         if (directions[directions.length - 1] == "ID") {
@@ -67,7 +67,7 @@ export default class BotHelperService {
         return [game, focus];
     }
 
-    isValidGame(game: Game | Game[] | null, msg: any) {
+    isValidGame(game: Game | Game[] | null, msg) {
         if (Array.isArray(game)) {
             if (!game.length) {
                 msg.channel.send(this.botResponseService.error(msg.author.id, 'noGame'));
@@ -81,7 +81,7 @@ export default class BotHelperService {
         return game;
     }
 
-    isValidFocus(focus: string, focusArray: string[], msg: any) {
+    isValidFocus(focus: string, focusArray: string[], msg) {
         if (!focusArray.includes(focus)) {
             msg.channel.send(this.botResponseService.error(msg.author.id, 'noFocus'));
             return false;
@@ -89,14 +89,14 @@ export default class BotHelperService {
         return true;
     }
 
-    async getNestedObject(nestedObj: any, pathArr: string[]) {
+    async getNestedObject(nestedObj, pathArr: string[]) {
         // Here be dragons
         // This function gets data out of an object, where we know the path we have to take to get to the data
         return pathArr.reduce((obj, key) =>
             (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj);
     }
 
-    async PCorMobile(botMessage: any, userMessage: any, responseFunction: any, responseData: any) {
+    async PCorMobile(botMessage, userMessage, responseFunction, responseData) {
         // This function allows a user to switch between a mobile and a PC format for the bot response, as some bot responses may not look well on phone or PC
         let isPC = true;
 
@@ -134,7 +134,7 @@ export default class BotHelperService {
         });
     }
 
-    async multiPage(botMessage, userMessage, pageCount, looping, responseFunction, responseData, checkPC = true /*A variable as long as not all functions have a mobile version*/) {
+    async multiPage(botMessage, userMessage, pageCount: number, looping: boolean, responseFunction, responseData, checkPC: boolean = true /*A variable as long as not all functions have a mobile version*/) {
         // This function makes a response that has multiple pages, where the user can move between pages by adding the proper response
         let pageNumber = responseData.page || 0;
         let isPC = true;
@@ -205,7 +205,7 @@ export default class BotHelperService {
         })
     }
 
-    async reactPagesMobile(botMessage, looping, pageNumber, pageCount, mobileCheck) {
+    async reactPagesMobile(botMessage, looping: boolean, pageNumber: number, pageCount: number, mobileCheck: boolean) {
         // A function meant to react with the right emojis when the multiPage function is called
         try {
             if (!looping && pageNumber > 1) await botMessage.react('⏪');

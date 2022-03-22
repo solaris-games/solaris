@@ -279,11 +279,23 @@
         <tbody>
           <tr>
             <td>Enabled <help-tooltip tooltip="If enabled, players can change their diplomatic status to allied or enemies - Allied players can orbit eachother's stars and support eachother in combat"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.alliances.enabled) }}</td>
+            <td class="text-right">{{ getFriendlyText(game.settings.diplomacy.enabled) }}</td>
           </tr>
-          <tr v-if="game.settings.alliances.enabled === 'enabled'">>
+          <tr v-if="game.settings.diplomacy.enabled === 'enabled'">
+            <td>Max Number of Alliances <help-tooltip tooltip="Determines how many formal alliance each player may have at once."/></td>
+            <td class="text-right">{{ getFriendlyText(game.settings.diplomacy.maxAlliances) }}</td>
+          </tr>
+          <tr v-if="game.settings.diplomacy.enabled === 'enabled'">
+            <td>Alliance Upkeep Cost <help-tooltip tooltip="Determines how expensive the alliance upkeep is - Upkeep is paid at the end of a galactic cycle"/></td>
+            <td class="text-right">{{ getFriendlyText(game.settings.diplomacy.upkeepCost) }}</td>
+          </tr>
+          <tr v-if="game.settings.diplomacy.enabled === 'enabled'">
+            <td>Alliance Only Trading <help-tooltip tooltip="If enabled, players can only trade with formal allies."/></td>
+            <td class="text-right">{{ getFriendlyText(game.settings.diplomacy.tradeRestricted) }}</td>
+          </tr>
+          <tr v-if="game.settings.diplomacy.enabled === 'enabled'">
             <td>Global Events <help-tooltip tooltip="If enabled, global events will be displayed when players declare war or make peace"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.alliances.globalEvents) }}</td>
+            <td class="text-right">{{ getFriendlyText(game.settings.diplomacy.globalEvents) }}</td>
           </tr>
         </tbody>
       </table>

@@ -33,7 +33,7 @@ export default class PublicCommandService {
         this.gameTypeService = gameTypeService;
     }
 
-    async gameinfo(msg: any, directions: string[]) {
+    async gameinfo(msg, directions: string[]) {
         //!gameinfo <galaxy_name> <focus> ("ID")
 
         // Extracting the focus and game from the message in one simple command, while also validating the game
@@ -71,10 +71,10 @@ export default class PublicCommandService {
 
         // Sending the message, and activating the multiPage function, as the gameinfo has 5 looping pages
         msg.channel.send(await responseFunction(responseData))
-            .then(async message => this.botHelperService.multiPage(message, msg, Object.keys(focusObject).length, true, responseFunction, responseData, true));
+            .then(async (message) => this.botHelperService.multiPage(message, msg, Object.keys(focusObject).length, true, responseFunction, responseData, true));
     }
 
-    async invite(msg: any, directions: string[]) {
+    async invite(msg, directions: string[]) {
         // $invite <gamelink>
 
         // Check if it has the right amount of directions
@@ -106,14 +106,14 @@ export default class PublicCommandService {
         return msg.channel.send(this.botResponseService.invite(game));
     }
 
-    async help(msg: any, directions: string[]) {
+    async help(msg, directions: string[]) {
         //$help
         let id = msg.author.id;
         let response = `Hey <@${id}>,\nPlease visit https://github.com/mike-eason/solaris/blob/master/bots/discord/README.md for help on how to interact with me.`;
         return msg.channel.send(response);
     }
 
-    async leaderboard_global(msg: any, directions: string[]) {
+    async leaderboard_global(msg, directions: string[]) {
         //$leaderboard_global <filter>
 
         // Check if it has the right amount of directions
@@ -185,10 +185,10 @@ export default class PublicCommandService {
 
         // Sending the message, and activating the multiPage function, as the global leaderboard has tons and tons of non-looping pages
         msg.channel.send(await responseFunction(responseData))
-            .then(async message => this.botHelperService.multiPage(message, msg, pageCount, false, responseFunction, responseData, true));
+            .then(async (message) => this.botHelperService.multiPage(message, msg, pageCount, false, responseFunction, responseData, true));
     }
 
-    async leaderboard_local(msg: any, directions: string[]) {
+    async leaderboard_local(msg, directions: string[]) {
         //$leaderboard_local <galaxy_name> <filter> ("ID")
 
         // Extracting the sorter and game from the message in one simple command, while also validating the game
@@ -253,10 +253,10 @@ export default class PublicCommandService {
 
         // Sending the message, and activating the PCorMobile function, as the local leaderboard is usable for both mobile and PC users
         msg.channel.send(await responseFunction(responseData))
-            .then(async message => this.botHelperService.PCorMobile(message, msg, responseFunction, responseData));
+            .then(async (message) => this.botHelperService.PCorMobile(message, msg, responseFunction, responseData));
     }
 
-    async status(msg: any, directions: string[]) {
+    async status(msg, directions: string[]) {
         // $status <galaxy_name> ("ID")
 
         // Extracting the sorter and game from the message in one simple command, while also validating the game
@@ -324,10 +324,10 @@ export default class PublicCommandService {
 
         // Sending the message, and activating the PCorMobile function, as the status is usable for both mobile and PC users
         msg.channel.send(await responseFunction(responseData))
-            .then(async message => this.botHelperService.PCorMobile(message, msg, responseFunction, responseData));
+            .then(async (message) => this.botHelperService.PCorMobile(message, msg, responseFunction, responseData));
     }
 
-    async userinfo(msg: any, directions: string[]) {
+    async userinfo(msg, directions: string[]) {
         //$userinfo <username> <focus>
 
         // Check if it has the bare minimum amount of directions
@@ -382,6 +382,6 @@ export default class PublicCommandService {
 
         // Sending the message, and activating the multiPage function, as the userinfo has 5 looping pages
         msg.channel.send(await responseFunction(responseData))
-            .then(async message => this.botHelperService.multiPage(message, msg, pageCount, true, responseFunction, responseData, true));
+            .then(async (message) => this.botHelperService.multiPage(message, msg, pageCount, true, responseFunction, responseData, true));
     }
 }

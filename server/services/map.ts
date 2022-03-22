@@ -91,13 +91,13 @@ export default class MapService {
         let isCustomGalaxy = game.settings.galaxy.galaxyType === 'custom';
         let starNamesIndex = 0;
 
-        let unlinkedStars: any[] = starLocations.filter(l => !l.linked);
+        let unlinkedStars = starLocations.filter(l => !l.linked);
 
         // Create a star for all locations returned by the map generator
         for (let i = 0; i < unlinkedStars.length; i++) {
             let starLocation: any = unlinkedStars[i];
             
-            let star: any;
+            let star;
             let starName = starNames[starNamesIndex++];
 
             if (isCustomGalaxy) {

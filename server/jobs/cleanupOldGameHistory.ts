@@ -1,4 +1,6 @@
-export default (container) => {
+import { DependencyContainer } from "../types/DependencyContainer";
+
+export default (container: DependencyContainer) => {
 
     /*
         Delete game history for games that completed more than 1 month ago.
@@ -8,7 +10,7 @@ export default (container) => {
     return {
 
         async handler(job, done) {
-            let games = await container.gameListService.listOldCompletedGamesNotCleaned(months, false);
+            let games = await container.gameListService.listOldCompletedGamesNotCleaned(months);
 
             for (let i = 0; i < games.length; i++) {
                 let game = games[i];

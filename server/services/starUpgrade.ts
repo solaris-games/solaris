@@ -3,16 +3,16 @@ import { DBObjectId } from '../types/DBObjectId';
 import ValidationError from '../errors/validation';
 import DatabaseRepository from '../models/DatabaseRepository';
 import { BulkUpgradeReport, InfrastructureUpgradeCosts, InfrastructureUpgradeReport } from '../types/InfrastructureUpgrade';
-import { Game } from '../types/Game';
+import { Game, GameInfrastructureExpenseMultiplier } from '../types/Game';
 import { Player } from '../types/Player';
 import { InfrastructureType, NaturalResources, Star, TerraformedResources } from '../types/Star';
 import AchievementService from './achievement';
 import CarrierService from './carrier';
 import GameTypeService from './gameType';
-import PlayerService from './player';
 import ResearchService from './research';
 import StarService from './star';
 import TechnologyService from './technology';
+import PlayerCreditsService from './playerCredits';
 const Heap = require('qheap');
 
 export default class StarUpgradeService extends EventEmitter {
@@ -22,7 +22,7 @@ export default class StarUpgradeService extends EventEmitter {
     achievementService: AchievementService;
     researchService: ResearchService;
     technologyService: TechnologyService;
-    playerService: PlayerService;
+    playerCreditsService: PlayerCreditsService;
     gameTypeService: GameTypeService;
 
     constructor(
@@ -32,7 +32,7 @@ export default class StarUpgradeService extends EventEmitter {
         achievementService: AchievementService,
         researchService: ResearchService,
         technologyService: TechnologyService,
-        playerService: PlayerService,
+        playerCreditsService: PlayerCreditsService,
         gameTypeService: GameTypeService
     ) {
         super();
@@ -43,7 +43,7 @@ export default class StarUpgradeService extends EventEmitter {
         this.achievementService = achievementService;
         this.researchService = researchService;
         this.technologyService = technologyService;
-        this.playerService = playerService;
+        this.playerCreditsService = playerCreditsService;
         this.gameTypeService = gameTypeService;
     }
 
@@ -198,7 +198,7 @@ export default class StarUpgradeService extends EventEmitter {
         };
     }
 
-    _calculateUpgradeInfrastructureCost(game: Game, star: Star, expenseConfigKey: string, economyType: InfrastructureType, calculateCostCallback: any) {
+    _calculateUpgradeInfrastructureCost(game: Game, star: Star, expenseConfigKey: GameInfrastructureExpenseMultiplier, economyType: InfrastructureType, calculateCostCallback) {
         if (this.starService.isDeadStar(star)) {
             return null;
         }
@@ -275,7 +275,7 @@ export default class StarUpgradeService extends EventEmitter {
         }
     }
 
-    async _upgradeInfrastructure(game: Game, player: Player, starId: DBObjectId, expenseConfigKey: string, economyType: InfrastructureType, calculateCostCallback: any, writeToDB: boolean = true): Promise<InfrastructureUpgradeReport> {
+    async _upgradeInfrastructure(game: Game, player: Player, starId: DBObjectId, expenseConfigKey: GameInfrastructureExpenseMultiplier, economyType: InfrastructureType, calculateCostCallback, writeToDB: boolean = true): Promise<InfrastructureUpgradeReport> {
         // Get the star.
         let star = this.starService.getById(game, starId);
 
@@ -341,7 +341,7 @@ export default class StarUpgradeService extends EventEmitter {
     }
 
     _getStarsWithNextUpgradeCost(game: Game, player: Player, infrastructureType: InfrastructureType, includeIgnored: boolean = true) {
-        let expenseConfig;
+        let expenseConfig: number;
         let calculateCostFunction;
         let upgradeFunction;
 
@@ -519,7 +519,7 @@ export default class StarUpgradeService extends EventEmitter {
         })
     }
 
-    async _upgradeStarAndSummary(game: Game, player: Player, upgradeSummary: BulkUpgradeReport, upgradeStar: any, infrastructureType: InfrastructureType) {
+    async _upgradeStarAndSummary(game: Game, player: Player, upgradeSummary: BulkUpgradeReport, upgradeStar, infrastructureType: InfrastructureType) {
         let summaryStar = upgradeSummary.stars.find(x => x.starId.toString() === upgradeStar.star._id.toString());
 
         if (!summaryStar) {
@@ -726,7 +726,7 @@ export default class StarUpgradeService extends EventEmitter {
     }
 
     async _getDeductPlayerCreditsDBWrite(game: Game, player: Player, cost: number) {
-        return await this.playerService.addCredits(game, player, -cost, false);
+        return await this.playerCreditsService.addCredits(game, player, -cost, false);
     }
 
     _getSetStarWarpGateDBWrite(game: Game, star: Star, warpGate: boolean) {

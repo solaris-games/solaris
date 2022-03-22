@@ -8,9 +8,9 @@ import { TradeEventTechnology } from "../types/Trade";
 
 
 export default class BroadcastService {
-    io: any;
+    io;
 
-    constructor(io: any) {
+    constructor(io) {
         this.io = io;
     }
 

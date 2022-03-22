@@ -1,19 +1,19 @@
 export default class ReactionService {
 
-    thumbsUpDown(msg: any) {
+    thumbsUpDown(msg) {
         this.thumbsUp(msg);
         this.thumbsDown(msg);
     }
 
-    thumbsUp(msg: any) {
+    thumbsUp(msg) {
         msg.react('👍');
     }
 
-    thumbsDown(msg: any) {
+    thumbsDown(msg) {
         msg.react('👎');
     }
 
-    messageEmojis(msg: any) {
+    messageEmojis(msg) {
         const regexMatch = /\p{Emoji_Presentation}/gu;
         let emojiArray = msg.content.match(regexMatch);
 
