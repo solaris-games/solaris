@@ -98,7 +98,7 @@ const guildRepository = new DatabaseRepository<Guild>(GuildModel);
 const paymentRepository = new DatabaseRepository<Payment>(PaymentModel);
 const reportRepository = new DatabaseRepository<Report>(ReportModel);
 
-export default (config: any, io: any): DependencyContainer => {
+export default (config, io): DependencyContainer => {
 
     // Poor man's dependency injection.
 

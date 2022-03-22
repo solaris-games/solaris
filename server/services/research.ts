@@ -165,7 +165,7 @@ export default class ResearchService extends EventEmitter {
 
     getRequiredResearchProgress(game: Game, technologyKey: ResearchTypeNotRandom, technologyLevel: number) {
         const researchCostConfig = game.settings.technology.researchCosts[technologyKey];
-        const expenseCostConfig = (game.constants.star.infrastructureExpenseMultipliers as any)[researchCostConfig];
+        const expenseCostConfig = game.constants.star.infrastructureExpenseMultipliers[researchCostConfig];
         const progressMultiplierConfig = expenseCostConfig * game.constants.research.progressMultiplier;
 
         return technologyLevel * progressMultiplierConfig;

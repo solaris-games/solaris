@@ -6,12 +6,12 @@ import { Report, ReportReasons } from '../types/Report';
 import PlayerService from './player';
 
 export default class ReportService {
-    reportModel: any;
+    reportModel;
     reportRepo: DatabaseRepository<Report>;
     playerService: PlayerService;
 
     constructor(
-        reportModel: any,
+        reportModel,
         reportRepo: DatabaseRepository<Report>,
         playerService: PlayerService
     ) {

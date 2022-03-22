@@ -113,7 +113,7 @@ export default class CustomMapService {
         return locations;
     }
 
-    _checkStarProperty(star: any, property: string, type: string, allowNull: boolean): boolean {
+    _checkStarProperty(star, property: string, type: string, allowNull: boolean): boolean {
         if (star === undefined) throw new ValidationError(`Missing property of star ${star}`);
         if (star?.[property] === undefined) throw new ValidationError(`Missing property ${property} of star ${JSON.stringify(star)}`);
 
@@ -127,7 +127,7 @@ export default class CustomMapService {
     }
 
      /*link owned stars to their home stars so at a latter stage players will claim the correct stars*/
-    _linkStars(homeStars: any[], stars: any[]) {
+    _linkStars(homeStars, stars) {
       let commonStars = stars.filter(star => !star.homeStar);
 
       for (let homeStar of homeStars) {

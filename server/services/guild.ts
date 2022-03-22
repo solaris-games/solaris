@@ -18,13 +18,13 @@ export default class GuildService {
     CREATE_GUILD_CREDITS_COST = 3
     RENAME_GUILD_CREDITS_COST = 1
 
-    guildModel: any;
+    guildModel;
     guildRepo: DatabaseRepository<Guild>;
     userRepo: DatabaseRepository<User>;
     userService: UserService;
     
     constructor(
-        guildModel: any,
+        guildModel,
         guildRepo: DatabaseRepository<Guild>,
         userRepo: DatabaseRepository<User>,
         userService: UserService
@@ -733,7 +733,7 @@ export default class GuildService {
         });
 
         let leaderboard = guildsWithRank
-                        .sort((a, b) => (b as any)[sortingKey] - (a as any)[sortingKey])
+                        .sort((a, b) => b[sortingKey] - a[sortingKey])
                         .slice(0, limit);
 
         for (let i = 0; i < leaderboard.length; i++) {

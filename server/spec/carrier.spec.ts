@@ -1,7 +1,7 @@
 import CarrierService from '../services/carrier';
 
 describe('carrier', () => {
-    let carrierService: any;
+    let carrierService;
 
     beforeAll(() => {
         // @ts-ignore

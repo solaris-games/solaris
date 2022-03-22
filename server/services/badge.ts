@@ -49,7 +49,7 @@ export default class BadgeService extends EventEmitter {
         for (let badge of badges) {
             userBadges.push({
                 ...badge,
-                awarded: (user.achievements.badges as any)[badge.key] || 0
+                awarded: user.achievements.badges[badge.key] || 0
             });
         }
 
@@ -97,7 +97,7 @@ export default class BadgeService extends EventEmitter {
         // TODO: This would be better in a bulk update.
         await this.userService.incrementCredits(purchasedByUserId, -1);
 
-        let updateQuery: any = {
+        let updateQuery = {
             $inc: {}
         };
 
@@ -143,7 +143,7 @@ export default class BadgeService extends EventEmitter {
             throw new ValidationError(`Badge ${badgeKey} does not exist.`);
         }
 
-        (user.achievements.badges as any)[badgeKey]++;
+        user.achievements.badges[badgeKey]++;
     }
 
     awardBadgeForUserVictor32(user: User): void {

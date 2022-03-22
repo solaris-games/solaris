@@ -198,7 +198,7 @@ export default class StarUpgradeService extends EventEmitter {
         };
     }
 
-    _calculateUpgradeInfrastructureCost(game: Game, star: Star, expenseConfigKey: GameInfrastructureExpenseMultiplier, economyType: InfrastructureType, calculateCostCallback: any) {
+    _calculateUpgradeInfrastructureCost(game: Game, star: Star, expenseConfigKey: GameInfrastructureExpenseMultiplier, economyType: InfrastructureType, calculateCostCallback) {
         if (this.starService.isDeadStar(star)) {
             return null;
         }
@@ -275,7 +275,7 @@ export default class StarUpgradeService extends EventEmitter {
         }
     }
 
-    async _upgradeInfrastructure(game: Game, player: Player, starId: DBObjectId, expenseConfigKey: GameInfrastructureExpenseMultiplier, economyType: InfrastructureType, calculateCostCallback: any, writeToDB: boolean = true): Promise<InfrastructureUpgradeReport> {
+    async _upgradeInfrastructure(game: Game, player: Player, starId: DBObjectId, expenseConfigKey: GameInfrastructureExpenseMultiplier, economyType: InfrastructureType, calculateCostCallback, writeToDB: boolean = true): Promise<InfrastructureUpgradeReport> {
         // Get the star.
         let star = this.starService.getById(game, starId);
 
@@ -342,8 +342,8 @@ export default class StarUpgradeService extends EventEmitter {
 
     _getStarsWithNextUpgradeCost(game: Game, player: Player, infrastructureType: InfrastructureType, includeIgnored: boolean = true) {
         let expenseConfig: number;
-        let calculateCostFunction: any;
-        let upgradeFunction: any;
+        let calculateCostFunction;
+        let upgradeFunction;
 
         switch (infrastructureType) {
             case 'economy':
@@ -512,14 +512,14 @@ export default class StarUpgradeService extends EventEmitter {
 
     _createUpgradeQueue(size: number) {
         return new Heap({
-            comparBefore: (s1: any, s2: any) => s1.infrastructureCost < s2.infrastructureCost,
-            compar: (s1: any, s2: any) => s1.infrastructureCost - s2.infrastructureCost,
+            comparBefore: (s1, s2) => s1.infrastructureCost < s2.infrastructureCost,
+            compar: (s1, s2) => s1.infrastructureCost - s2.infrastructureCost,
             freeSpace: false,
             size
         })
     }
 
-    async _upgradeStarAndSummary(game: Game, player: Player, upgradeSummary: BulkUpgradeReport, upgradeStar: any, infrastructureType: InfrastructureType) {
+    async _upgradeStarAndSummary(game: Game, player: Player, upgradeSummary: BulkUpgradeReport, upgradeStar, infrastructureType: InfrastructureType) {
         let summaryStar = upgradeSummary.stars.find(x => x.starId.toString() === upgradeStar.star._id.toString());
 
         if (!summaryStar) {
@@ -697,7 +697,7 @@ export default class StarUpgradeService extends EventEmitter {
         const economyExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.player.developmentCost.economy];
         const industryExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.player.developmentCost.industry];
         const scienceExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.player.developmentCost.science];
-        const warpGateExpenseConfig = (game.constants.star.infrastructureExpenseMultipliers as any)[game.settings.specialGalaxy.warpgateCost]; // TODO: Wtf is causing this TS error?
+        const warpGateExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.warpgateCost];
         const carrierExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.carrierCost];
 
         // Calculate upgrade costs for the star.

@@ -25,7 +25,7 @@ export default class HistoryService {
         this.gameService = gameService;
         this.playerStatisticsService = playerStatisticsService;
 
-        this.gameService.on('onGameDeleted', (args: any) => this.deleteByGameId(args.gameId));
+        this.gameService.on('onGameDeleted', (args) => this.deleteByGameId(args.gameId));
     }
 
     async listIntel(gameId: DBObjectId, startTick: number, endTick: number) {

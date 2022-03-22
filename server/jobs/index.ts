@@ -9,7 +9,7 @@ import CleanupGamesTimedOutJob from './cleanupGamesTimedOut';
 import CleanupOldGameHistoryJob from './cleanupOldGameHistory';
 import CleanupOldTutorialsJob from './cleanupOldTutorials';
 
-let mongo: any;
+let mongo;
 
 async function startup() {
     const container = containerLoader(config, null);

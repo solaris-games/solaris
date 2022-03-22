@@ -25,13 +25,13 @@ const game = {
 }
 
 const fakeStarService = {
-    generateUnownedStar(name: string, location: any) {
+    generateUnownedStar(name: string, location) {
         return {
             name,
             location
         }
     },
-    generateStarPosition(game: any, x: number, y: number) {
+    generateStarPosition(game, x: number, y: number) {
         return {
             x: 10,
             y: 10
@@ -40,16 +40,16 @@ const fakeStarService = {
 };
 
 const fakeStarDistanceService = {
-    isStarTooClose(game: any, star1: any, star2: any) {
+    isStarTooClose(game, star1, star2) {
         return false;
     },
-    isDuplicateStarPosition(location: any, stars: any) {
+    isDuplicateStarPosition(location, stars) {
         return false;
     },
-    isStarLocationTooClose(game: any, location: any, stars: any) {
+    isStarLocationTooClose(game, location, stars) {
         return false;
     },
-    isLocationTooClose(game: any, location: any, locations: any) {
+    isLocationTooClose(game, location, locations) {
         return false;
     }
 };
@@ -87,9 +87,9 @@ describe('map', () => {
 
     const starCount = 10;
     const playerCount = 2;
-    let randomService: any;
-    let mapService: any;
-    let starMapService: any;
+    let randomService;
+    let mapService;
+    let starMapService;
 
     beforeEach(() => {
         // Use a real random service because it would not be easy to fake for these tests.
@@ -113,7 +113,7 @@ describe('map', () => {
         for(let i = 0; i < stars.length; i++) {
             let star = stars[i];
 
-            let duplicates = stars.filter((s: any) => s.name === star.name);
+            let duplicates = stars.filter((s) => s.name === star.name);
 
             // Should equal 1 because we are checking against the same star.
             expect(duplicates.length).toEqual(1);

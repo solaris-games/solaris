@@ -2,11 +2,11 @@ import { Router } from 'express';
 import { DependencyContainer } from '../../types/DependencyContainer';
 import Middleware from '../middleware';
 
-export default (router: Router, io: any, container: DependencyContainer) => {
+export default (router: Router, io, container: DependencyContainer) => {
 
     const middleware = Middleware(container);
 
-    router.get('/api/game/:gameId/diplomacy', middleware.authenticate, middleware.loadGameDiplomacyLean, middleware.loadPlayer, async (req: any, res: any, next: any) => {
+    router.get('/api/game/:gameId/diplomacy', middleware.authenticate, middleware.loadGameDiplomacyLean, middleware.loadPlayer, async (req, res, next) => {
         try {
             let diplomaticStatuses = await container.diplomacyService.getDiplomaticStatusToAllPlayers(
                 req.game,
@@ -18,7 +18,7 @@ export default (router: Router, io: any, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/:gameId/diplomacy/:toPlayerId', middleware.authenticate, middleware.loadGameDiplomacyLean, middleware.loadPlayer, async (req: any, res: any, next: any) => {
+    router.get('/api/game/:gameId/diplomacy/:toPlayerId', middleware.authenticate, middleware.loadGameDiplomacyLean, middleware.loadPlayer, async (req, res, next) => {
         try {
             let diplomaticStatus = await container.diplomacyService.getDiplomaticStatusToPlayer(
                 req.game,
@@ -31,7 +31,7 @@ export default (router: Router, io: any, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/diplomacy/ally/:playerId', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req: any, res: any, next: any) => {
+    router.put('/api/game/:gameId/diplomacy/ally/:playerId', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             let newStatus = await container.diplomacyService.declareAlly(
                 req.game,
@@ -46,7 +46,7 @@ export default (router: Router, io: any, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/diplomacy/enemy/:playerId', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req: any, res: any, next: any) => {
+    router.put('/api/game/:gameId/diplomacy/enemy/:playerId', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             let newStatus = await container.diplomacyService.declareEnemy(
                 req.game,
@@ -61,7 +61,7 @@ export default (router: Router, io: any, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.put('/api/game/:gameId/diplomacy/neutral/:playerId', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req: any, res: any, next: any) => {
+    router.put('/api/game/:gameId/diplomacy/neutral/:playerId', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.validateGameNotFinished, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
             let newStatus = await container.diplomacyService.declareNeutral(
                 req.game,

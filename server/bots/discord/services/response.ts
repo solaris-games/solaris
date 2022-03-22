@@ -314,7 +314,7 @@ export default class ReponseService {
         return response;
     }
 
-    statusPC(game: Game, leaderboard: any, alive: boolean) {
+    statusPC(game: Game, leaderboard, alive: boolean) {
         let response = this.baseResponse();
         response = response
             .setTitle(`Status of ${game.settings.general.name}`)
@@ -336,7 +336,7 @@ export default class ReponseService {
         return response;
     }
 
-    statusMobile(game: Game, leaderboard: any) {
+    statusMobile(game: Game, leaderboard) {
         let response = this.baseResponse();
         response = response
             .setTitle(`Status of ${game.settings.general.name}`)

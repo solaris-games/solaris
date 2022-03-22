@@ -609,7 +609,7 @@ export default class StarService extends EventEmitter {
 
         let newValue = star.ignoreBulkUpgrade![infrastructureType] ? false : true;
 
-        let updateObject: any = {
+        let updateObject = {
             $set: {}
         };
 

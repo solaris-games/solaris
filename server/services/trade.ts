@@ -336,7 +336,7 @@ export default class TradeService extends EventEmitter {
         // toPlayerTech.progress = 0;
         // fromPlayer.credits -= tradeTech.cost;
 
-        let updateResearchQuery: any = {};
+        let updateResearchQuery = {};
         updateResearchQuery['galaxy.players.$.research.' + tradeTech.name + '.level'] = tradeTech.level;
         updateResearchQuery['galaxy.players.$.research.' + tradeTech.name + '.progress'] = 0;
 

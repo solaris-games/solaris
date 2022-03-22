@@ -29,7 +29,7 @@ export default class TechnologyService {
       return game.settings.technology.researchCosts[technologyKey] !== 'none'
     }
 
-    _applyTechModifiers(techs: PlayerTechnologyLevels, modifiers: any, sanitize: boolean = true) { // TODO: types
+    _applyTechModifiers(techs: PlayerTechnologyLevels, modifiers, sanitize: boolean = true) { // TODO: types
         techs.scanning += modifiers.scanning || 0;
         techs.hyperspace += modifiers.hyperspace || 0;
         techs.terraforming += modifiers.terraforming || 0;

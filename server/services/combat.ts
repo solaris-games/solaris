@@ -331,7 +331,7 @@ export default class CombatService extends EventEmitter {
             };
         }
 
-        let defenderObjects: any[] = [...defenderCarriers];
+        let defenderObjects: (Star | Carrier)[] = [...defenderCarriers];
 
         if (star) {
             defenderObjects.push(star);
@@ -427,7 +427,7 @@ export default class CombatService extends EventEmitter {
         return null;
     }
 
-    _distributeDamage(combatResult: CombatResult, damageObjects: any[], shipsToKill: number, destroyCarriers: boolean = true) {
+    _distributeDamage(combatResult: CombatResult, damageObjects, shipsToKill: number, destroyCarriers: boolean = true) {
         while (shipsToKill) {
             let objectsToDeduct = damageObjects
                 .filter(c => 

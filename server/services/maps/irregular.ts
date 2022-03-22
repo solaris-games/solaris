@@ -46,7 +46,7 @@ export default class IrregularMapService {
     }
 
     //TODO this is generator agnostic and could be on a base class or service
-    _removeLocationFromArray(array: any[], location: any) {
+    _removeLocationFromArray(array, location) {
         let index = array.indexOf(location);
         array.splice(index, 1);
     }
@@ -110,7 +110,7 @@ export default class IrregularMapService {
         return ringIndex;
     }
 
-    _generateHomeLocations(pivotDistance: number, playerCount: number, rng: any, simplexNoiseGenerator: any, noiseSpread: number) {
+    _generateHomeLocations(pivotDistance: number, playerCount: number, rng, simplexNoiseGenerator, noiseSpread: number) {
         const ONE_SIXTH = 1.0/6.0;
         const TAU = 2.0*Math.PI;
 
@@ -123,7 +123,7 @@ export default class IrregularMapService {
         homeLocations.push(firstLocation);
 
         while(homeLocations.length<playerCount) {
-            let position: any;
+            let position;
             let positionIsValid = false;
             let attempts = 0;
             while(!positionIsValid) {
@@ -232,7 +232,7 @@ export default class IrregularMapService {
         }
     }
 
-    _randomlyDislocateLocations(locations: Location[], threshold: number, rng: any) {
+    _randomlyDislocateLocations(locations: Location[], threshold: number, rng) {
         const ONE_SIXTH = 1.0/6.0;
         const TAU = 2.0*Math.PI;
         for( let location of locations ) {
@@ -247,7 +247,7 @@ export default class IrregularMapService {
         }
     }
 
-    _pruneLocationsWithNoise(locations: Location[], desiredLocationCount: number, simplexNoiseGenerator: any, noiseSpread: number) {
+    _pruneLocationsWithNoise(locations: Location[], desiredLocationCount: number, simplexNoiseGenerator, noiseSpread: number) {
         for( let location of locations ) {
             (location as any).noiseIntensity = simplexNoiseGenerator.noise2D(location.x/noiseSpread, location.y/noiseSpread);
         }
@@ -259,7 +259,7 @@ export default class IrregularMapService {
 
     //removes locations outside the metaball composed of home locations
     //locations have a chance of beeing removed based on the distance from the metaball
-    _pruneLocationsOutsideMetaball(locations: Location[], homeLocations: Location[], homeStarRadius: number, rng: any) {
+    _pruneLocationsOutsideMetaball(locations: Location[], homeLocations: Location[], homeStarRadius: number, rng) {
         const METABALL_FALLOFF = 8.0; //higher values reduces the spread of the metaball
         // probably better not to remove items while iterating, so add to this array instead
         let toRemove: Location[] = [];
@@ -281,7 +281,7 @@ export default class IrregularMapService {
 
     }
 
-    generateLocations(game: any, starCount: number, resourceDistribution: GameResourceDistribution, playerCount: number): Location[] {
+    generateLocations(game, starCount: number, resourceDistribution: GameResourceDistribution, playerCount: number): Location[] {
         if (this.gameTypeService.isKingOfTheHillMode(game)) {
             throw new ValidationError(`King of the hill is not supported in irregular maps.`);
         }
@@ -311,8 +311,8 @@ export default class IrregularMapService {
         let locations: Location[] = [];
         let homeLocations = this._generateHomeLocations(PIVOT_DISTANCE, playerCount, RNG, SIMPLEX_NOISE, NOISE_SPREAD);
         let supplementaryHomeLocations = this._generateSupplementaryHomeLocations(PIVOT_DISTANCE, homeLocations);
-        let baseLocations: any[] = [];
-        let supplementaryLocations: any[] = [];
+        let baseLocations = [];
+        let supplementaryLocations = [];
 
         
         for( let homeLocation of homeLocations ) {

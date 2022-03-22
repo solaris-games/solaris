@@ -167,7 +167,7 @@ export default class ReputationService extends EventEmitter {
         };
     }
 
-    async tryIncreaseReputationTechnology(game: Game, fromPlayer: Player, toPlayer: Player, technology: any) { // TODO: Technology type
+    async tryIncreaseReputationTechnology(game: Game, fromPlayer: Player, toPlayer: Player, technology) { // TODO: Technology type
         await this.increaseReputation(game, fromPlayer, toPlayer, technology.difference);
 
         return {

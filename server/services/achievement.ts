@@ -36,7 +36,7 @@ export default class AchievementService {
     }
 
     async incrementAchievement(userId: DBObjectId, achievement: string, amount: number = 1) {
-        let updateQuery: any = {
+        let updateQuery = {
             $inc: {}
         };
 

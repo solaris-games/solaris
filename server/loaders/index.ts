@@ -4,11 +4,11 @@ import mongooseLoader from './mongoose';
 import socketLoader from './sockets';
 import containerLoader from './container';
 
-let mongo: any;
+let mongo;
 
 export default {
   
-  async init(expressApp: any, expressServer: any) {
+  async init(expressApp, expressServer) {
     mongo = await mongooseLoader(config, {});
     
     const io = socketLoader(config, expressServer);

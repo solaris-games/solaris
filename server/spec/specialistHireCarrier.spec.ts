@@ -6,23 +6,25 @@ describe('specialistHire - Carrier', () => {
     // -------------
     // Mock Objects
 
-    function setup(): any {
+    function setup() {
         let obj = {
-            service: null,
+            service: {} as any,
             gameRepo: {
                 bulkWrite: () => {}
             },
-            specialistService: {},
+            specialistService: {} as any,
             achievementService: {
                 incrementSpecialistsHired: () => {}
             },
             waypointService: {
                 cullWaypointsByHyperspaceRangeDB: () => {}
             },
-            playerService: {},
-            playerCreditsService: {},
+            playerService: {} as any,
+            playerCreditsService: {} as any,
             starService: {
-                isOwnedByPlayer: () => { return true; }
+                isOwnedByPlayer: () => { return true; },
+                getById: () => { return {} as any; },
+                isDeadStar: () => { return false; }
             },
             gameTypeService: {
                 isTutorialGame: () => { return false; }
@@ -36,19 +38,21 @@ describe('specialistHire - Carrier', () => {
                         specialistCost: 'standard',
                         specialistsCurrency: 'credits',
                         specialistBans: {
-                            star: [],
-                            carrier: []
+                            star: [] as any[],
+                            carrier: [] as any[]
                         }
                     }
                 },
                 galaxy: {
-                    carriers: [],
-                    stars: []
+                    carriers: [] as any[],
+                    stars: [] as any[]
                 }
             },
             playerId: new mongoose.Types.ObjectId(),
             player: {
-                _id: null
+                _id: null,
+                credits: 0,
+                creditsSpecialists: 0
             },
             carrierId: new mongoose.Types.ObjectId(),
             starId: new mongoose.Types.ObjectId(),
@@ -63,7 +67,7 @@ describe('specialistHire - Carrier', () => {
         return obj;
     }
 
-    function carrierUnowned(testObj: any) {
+    function carrierUnowned(testObj) {
         return {
             _id: testObj.carrierId,
             ownedByPlayerId: new mongoose.Types.ObjectId(),
@@ -72,7 +76,7 @@ describe('specialistHire - Carrier', () => {
         };
     }
 
-    function carrierInTransit(testObj: any) {
+    function carrierInTransit(testObj) {
         return {
             _id: testObj.carrierId,
             ownedByPlayerId: testObj.playerId,
@@ -81,7 +85,7 @@ describe('specialistHire - Carrier', () => {
         };
     }
     
-    function carrierInOrbit(testObj: any) {
+    function carrierInOrbit(testObj) {
         return {
             _id: testObj.carrierId,
             ownedByPlayerId: testObj.playerId,
@@ -90,14 +94,14 @@ describe('specialistHire - Carrier', () => {
         };
     }
 
-    function starBasic(testObj: any) {
+    function starBasic(testObj) {
         return {
             _id: testObj.starId,
             ownedByPlayerId: testObj.playerId
         };
     }
 
-    function carrierInOrbitWithSpec(testObj: any, specId: any) {
+    function carrierInOrbitWithSpec(testObj, specId) {
         return {
             _id: testObj.carrierId,
             ownedByPlayerId: testObj.playerId,
@@ -106,7 +110,7 @@ describe('specialistHire - Carrier', () => {
         };
     }
 
-    function specialistBasic(testObj: any) {
+    function specialistBasic(testObj) {
         return {
             id: testObj.specialistId
         }
@@ -186,7 +190,7 @@ describe('specialistHire - Carrier', () => {
         testObj.game.galaxy.carriers.push(carrierInOrbit(testObj));
         testObj.game.galaxy.stars.push(star);
 
-        testObj.specialistService.getByIdCarrier = (id: any) => {
+        testObj.specialistService.getByIdCarrier = (id) => {
             return null;
         };
 
@@ -216,7 +220,7 @@ describe('specialistHire - Carrier', () => {
         testObj.game.galaxy.carriers.push(carrierInOrbit(testObj));
         testObj.game.galaxy.stars.push(star);
 
-        testObj.specialistService.getByIdCarrier = (id: any) => {
+        testObj.specialistService.getByIdCarrier = (id) => {
             return null;
         };
 
@@ -246,7 +250,7 @@ describe('specialistHire - Carrier', () => {
         testObj.game.galaxy.carriers.push(carrierInOrbitWithSpec(testObj, testObj.specialistId));
         testObj.game.galaxy.stars.push(star);
 
-        testObj.specialistService.getByIdCarrier = (id: any) => {
+        testObj.specialistService.getByIdCarrier = (id) => {
             return specialistBasic(testObj);
         };
 
@@ -276,7 +280,7 @@ describe('specialistHire - Carrier', () => {
         testObj.game.galaxy.carriers.push(carrierInOrbitWithSpec(testObj, null));
         testObj.game.galaxy.stars.push(star);
 
-        testObj.specialistService.getByIdCarrier = (id: any) => {
+        testObj.specialistService.getByIdCarrier = (id) => {
             return specialistBasic(testObj);
         };
 
@@ -315,7 +319,7 @@ describe('specialistHire - Carrier', () => {
         testObj.game.galaxy.carriers.push(carrierInOrbitWithSpec(testObj, null));
         testObj.game.galaxy.stars.push(star);
 
-        testObj.specialistService.getByIdCarrier = (id: any) => {
+        testObj.specialistService.getByIdCarrier = (id) => {
             return specialistBasic(testObj);
         };
 
@@ -355,7 +359,7 @@ describe('specialistHire - Carrier', () => {
         testObj.game.galaxy.carriers.push(carrier);
         testObj.game.galaxy.stars.push(star);
 
-        testObj.specialistService.getByIdCarrier = (id: any) => {
+        testObj.specialistService.getByIdCarrier = (id) => {
             return specialistBasic(testObj);
         };
 
@@ -373,7 +377,7 @@ describe('specialistHire - Carrier', () => {
             }
         };
 
-        testObj.playerCreditsService.addCredits = (game: any, player: any, amount: number) => {
+        testObj.playerCreditsService.addCredits = (game, player, amount: number) => {
             expect(amount).toBe(-100);
         };
 
@@ -382,7 +386,7 @@ describe('specialistHire - Carrier', () => {
 
         try {
             await testObj.service.hireCarrierSpecialist(testObj.game, testObj.player, testObj.carrierId, testObj.specialistId);
-        } catch (err) {
+        } catch (err: any) {
             hasError = true;
         }
         

@@ -6,22 +6,22 @@ describe('specialistHire - Star', () => {
     // -------------
     // Mock Objects
 
-    function setup(): any {
+    function setup() {
         let obj = {
-            service: null,
+            service: {} as any,
             gameRepo: {
                 bulkWrite: () => {}
             },
-            specialistService: {},
+            specialistService: {} as any,
             achievementService: {
                 incrementSpecialistsHired: () => {}
             },
             waypointService: {
                 cullWaypointsByHyperspaceRangeDB: () => {}
             },
-            playerService: {},
-            playerCreditsService: {},
-            starService: {},
+            playerService: {} as any,
+            playerCreditsService: {} as any,
+            starService: {} as any,
             gameTypeService: {
                 isTutorialGame: () => { return false; }
             },
@@ -34,19 +34,21 @@ describe('specialistHire - Star', () => {
                         specialistCost: 'standard',
                         specialistsCurrency: 'credits',
                         specialistBans: {
-                            star: [],
-                            carrier: []
+                            star: [] as any,
+                            carrier: [] as any
                         }
                     }
                 },
                 galaxy: {
-                    carriers: [],
-                    stars: []
+                    carriers: [] as any[],
+                    stars: [] as any[]
                 }
             },
             playerId: new mongoose.Types.ObjectId(),
             player: {
-                _id: null
+                _id: null,
+                credits: 0,
+                creditsSpecialists: 0
             },
             starId: new mongoose.Types.ObjectId(),
             specialistId: 1
@@ -60,7 +62,7 @@ describe('specialistHire - Star', () => {
         return obj;
     }
 
-    function starWithSpecialist(testObj: any, specId: any) {
+    function starWithSpecialist(testObj, specId) {
         return {
             _id: testObj.starId,
             ownedByPlayerId: testObj.playerId,
@@ -68,7 +70,7 @@ describe('specialistHire - Star', () => {
         };
     }
 
-    function specialistBasic(testObj: any) {
+    function specialistBasic(testObj) {
         return {
             id: testObj.specialistId
         }
@@ -263,7 +265,7 @@ describe('specialistHire - Star', () => {
 
         testObj.game.galaxy.stars.push(star);
 
-        testObj.specialistService.getByIdStar = (id: any) => {
+        testObj.specialistService.getByIdStar = (id) => {
             return specialistBasic(testObj);
         };
 
@@ -277,7 +279,7 @@ describe('specialistHire - Star', () => {
             }
         };
 
-        testObj.playerCreditsService.addCredits = (game: any, player: any, amount: number) => {
+        testObj.playerCreditsService.addCredits = (game, player, amount: number) => {
             expect(amount).toBe(-100);
         };
 
@@ -286,7 +288,7 @@ describe('specialistHire - Star', () => {
 
         try {
             await testObj.service.hireStarSpecialist(testObj.game, testObj.player, testObj.starId, testObj.specialistId);
-        } catch (err) {
+        } catch (err: any) {
             hasError = true;
         }
         

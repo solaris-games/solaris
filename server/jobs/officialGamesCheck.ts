@@ -24,7 +24,7 @@ export default (container: DependencyContainer) => {
 
     return {
 
-        async handler(job: any, done: any) {
+        async handler(job, done) {
             // Check if there is an official game with the settings game name which
             // is currently waiting for players.
             let games = await container.gameListService.listOfficialGames();

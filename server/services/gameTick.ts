@@ -335,7 +335,7 @@ export default class GameTickService extends EventEmitter {
         const graph = this._getCarrierPositionGraph(carrierPositions);
 
         for (let carrierPath in graph) {
-            let positions = (graph as any)[carrierPath];
+            let positions = graph[carrierPath];
 
             if (positions.length <= 1) {
                 continue;
@@ -428,12 +428,12 @@ export default class GameTickService extends EventEmitter {
                 continue;
             }
 
-            const graphObj = (graph as any)[graphKeyA] || (graph as any)[graphKeyB];
+            const graphObj = graph[graphKeyA] || graph[graphKeyB];
             
             if (graphObj) {
                 graphObj.push(carrierPosition);
             } else {
-                (graph as any)[graphKeyA] = [ carrierPosition ];
+                graph[graphKeyA] = [ carrierPosition ];
             }
         }
 
@@ -606,7 +606,7 @@ export default class GameTickService extends EventEmitter {
                 let creditsResult = this.playerCycleRewardsService.givePlayerCreditsEndOfCycleRewards(game, player);
                 let experimentResult = this.researchService.conductExperiments(game, player);
                 let carrierUpkeepResult = this.playerService.deductCarrierUpkeepCost(game, player);
-                let allianceUpkeepResult = null;
+                let allianceUpkeepResult: any | null = null; // TODO: Type
 
                 if (this.diplomacyUpkeepService.isAllianceUpkeepEnabled(game)) {
                     let allianceCount = this.diplomacyService.getAlliesOfPlayer(game, player, true).length;

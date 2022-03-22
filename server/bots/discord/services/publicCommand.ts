@@ -33,7 +33,7 @@ export default class PublicCommandService {
         this.gameTypeService = gameTypeService;
     }
 
-    async gameinfo(msg: any, directions: string[]) {
+    async gameinfo(msg, directions: string[]) {
         //!gameinfo <galaxy_name> <focus> ("ID")
 
         // Extracting the focus and game from the message in one simple command, while also validating the game
@@ -55,7 +55,7 @@ export default class PublicCommandService {
         // This function is used to calculate from the responsedata what the response looks like
         // This function can then, combined with the responseData, be passed onto a generic multiPage/PCorMobile function
         // That allows all unique commands to use the same multiPage/PCorMobile function, as they have a unique responseFunction and data
-        const responseFunction = async (responseData: any) => {
+        const responseFunction = async (responseData) => {
             let game = responseData.game;
             let page = responseData.page;
             let isPC = responseData.isPC;
@@ -65,16 +65,16 @@ export default class PublicCommandService {
         // This is the response data previously discussed that gets passed into the multiPage and the response function
         let responseData = {
             game,
-            page: (focusObject as any)[focus],
+            page: focusObject[focus],
             isPC: true
         };
 
         // Sending the message, and activating the multiPage function, as the gameinfo has 5 looping pages
         msg.channel.send(await responseFunction(responseData))
-            .then(async (message: any) => this.botHelperService.multiPage(message, msg, Object.keys(focusObject).length, true, responseFunction, responseData, true));
+            .then(async (message) => this.botHelperService.multiPage(message, msg, Object.keys(focusObject).length, true, responseFunction, responseData, true));
     }
 
-    async invite(msg: any, directions: string[]) {
+    async invite(msg, directions: string[]) {
         // $invite <gamelink>
 
         // Check if it has the right amount of directions
@@ -106,14 +106,14 @@ export default class PublicCommandService {
         return msg.channel.send(this.botResponseService.invite(game));
     }
 
-    async help(msg: any, directions: string[]) {
+    async help(msg, directions: string[]) {
         //$help
         let id = msg.author.id;
         let response = `Hey <@${id}>,\nPlease visit https://github.com/mike-eason/solaris/blob/master/bots/discord/README.md for help on how to interact with me.`;
         return msg.channel.send(response);
     }
 
-    async leaderboard_global(msg: any, directions: string[]) {
+    async leaderboard_global(msg, directions: string[]) {
         //$leaderboard_global <filter>
 
         // Check if it has the right amount of directions
@@ -140,7 +140,7 @@ export default class PublicCommandService {
         // This function is used to calculate from the responsedata what the response looks like
         // This function can then, combined with the responseData, be passed onto a generic multiPage/PCorMobile function
         // That allows all unique commands to use the same multiPage/PCorMobile function, as they have a unique responseFunction and data
-        const responseFunction = async (responseData: any) => {
+        const responseFunction = async (responseData) => {
             // Calculating the basic variables that set all others from the responseData
             let page = responseData.page;
             let isPC = responseData.isPC;
@@ -185,10 +185,10 @@ export default class PublicCommandService {
 
         // Sending the message, and activating the multiPage function, as the global leaderboard has tons and tons of non-looping pages
         msg.channel.send(await responseFunction(responseData))
-            .then(async (message: any) => this.botHelperService.multiPage(message, msg, pageCount, false, responseFunction, responseData, true));
+            .then(async (message) => this.botHelperService.multiPage(message, msg, pageCount, false, responseFunction, responseData, true));
     }
 
-    async leaderboard_local(msg: any, directions: string[]) {
+    async leaderboard_local(msg, directions: string[]) {
         //$leaderboard_local <galaxy_name> <filter> ("ID")
 
         // Extracting the sorter and game from the message in one simple command, while also validating the game
@@ -212,7 +212,7 @@ export default class PublicCommandService {
         // This function is used to calculate from the responsedata what the response looks like
         // This function can then, combined with the responseData, be passed onto a generic multiPage/PCorMobile function
         // That allows all unique commands to use the same multiPage/PCorMobile function, as they have a unique responseFunction and data
-        const responseFunction = async (responseData: any) => {
+        const responseFunction = async (responseData) => {
             // Getting the basic info that we'll need from the responseData
             let game = responseData.game;
             let sortingKey = responseData.sortingKey;
@@ -253,10 +253,10 @@ export default class PublicCommandService {
 
         // Sending the message, and activating the PCorMobile function, as the local leaderboard is usable for both mobile and PC users
         msg.channel.send(await responseFunction(responseData))
-            .then(async (message: any) => this.botHelperService.PCorMobile(message, msg, responseFunction, responseData));
+            .then(async (message) => this.botHelperService.PCorMobile(message, msg, responseFunction, responseData));
     }
 
-    async status(msg: any, directions: string[]) {
+    async status(msg, directions: string[]) {
         // $status <galaxy_name> ("ID")
 
         // Extracting the sorter and game from the message in one simple command, while also validating the game
@@ -274,7 +274,7 @@ export default class PublicCommandService {
         // This function is used to calculate from the responsedata what the response looks like
         // This function can then, combined with the responseData, be passed onto a generic multiPage/PCorMobile function
         // That allows all unique commands to use the same multiPage/PCorMobile function, as they have a unique responseFunction and data
-        const responseFunction = async (responseData: any) => {
+        const responseFunction = async (responseData) => {
             // Getting the basic info that we'll need from the responseData
             let isPC = responseData.isPC;
             let game = responseData.game;
@@ -302,15 +302,15 @@ export default class PublicCommandService {
         };
 
         // Calculating the count of living players
-        let alive = game.galaxy.players.reduce((val: any, player: any) => player.defeated ? val : val + 1, 0);
+        let alive = game.galaxy.players.reduce((val, player) => player.defeated ? val : val + 1, 0);
         let leaderboard = {};
         let leaderboardSize = game.settings.general.playerLimit <= 3 ? game.settings.general.playerLimit : 3;
 
         // Generating the leaderboard in the right format
         for (let [key, value] of Object.entries(leaderboardData)) {
-            (leaderboard as any)[key] = "";
+            leaderboard[key] = "";
             for (let i = 0; i < leaderboardSize; i++) {
-                (leaderboard as any)[key] += await this.botHelperService.getNestedObject(value.leaderboard[i], value.fullKey.split('.')) + ' / ' + value.leaderboard[i].player.alias + '\n';
+                leaderboard[key] += await this.botHelperService.getNestedObject(value.leaderboard[i], value.fullKey.split('.')) + ' / ' + value.leaderboard[i].player.alias + '\n';
             }
         }
 
@@ -324,10 +324,10 @@ export default class PublicCommandService {
 
         // Sending the message, and activating the PCorMobile function, as the status is usable for both mobile and PC users
         msg.channel.send(await responseFunction(responseData))
-            .then(async (message: any) => this.botHelperService.PCorMobile(message, msg, responseFunction, responseData));
+            .then(async (message) => this.botHelperService.PCorMobile(message, msg, responseFunction, responseData));
     }
 
-    async userinfo(msg: any, directions: string[]) {
+    async userinfo(msg, directions: string[]) {
         //$userinfo <username> <focus>
 
         // Check if it has the bare minimum amount of directions
@@ -365,7 +365,7 @@ export default class PublicCommandService {
         // This function is used to calculate from the responsedata what the response looks like
         // This function can then, combined with the responseData, be passed onto a generic multiPage/PCorMobile function
         // That allows all unique commands to use the same multiPage/PCorMobile function, as they have a unique responseFunction and data
-        const responseFunction = async (responseData: any) => {
+        const responseFunction = async (responseData) => {
             let isPC = responseData.isPC;
             let page = responseData.page;
             let user = responseData.user;
@@ -376,12 +376,12 @@ export default class PublicCommandService {
         let pageCount = focusArray.length;
         let responseData = {
             user: await this.userService.getByUsernameAchievementsLean(username),
-            page: (focusObject as any)[focus],
+            page: focusObject[focus],
             isPC: true
         };
 
         // Sending the message, and activating the multiPage function, as the userinfo has 5 looping pages
         msg.channel.send(await responseFunction(responseData))
-            .then(async (message: any) => this.botHelperService.multiPage(message, msg, pageCount, true, responseFunction, responseData, true));
+            .then(async (message) => this.botHelperService.multiPage(message, msg, pageCount, true, responseFunction, responseData, true));
     }
 }

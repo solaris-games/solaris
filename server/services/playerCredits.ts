@@ -14,7 +14,7 @@ export default class PlayerCreditsService {
     async addCredits(game: Game, player: Player, amount: number, commit: boolean = true) {
         player.credits += amount;
 
-        let query = {
+        let query: any = {
             updateOne: {
                 filter: {
                     _id: game._id,
@@ -38,7 +38,7 @@ export default class PlayerCreditsService {
     async addCreditsSpecialists(game: Game, player: Player, amount: number, commit: boolean = true) {
         player.creditsSpecialists += amount;
 
-        let query = {
+        let query: any = {
             updateOne: {
                 filter: {
                     _id: game._id,

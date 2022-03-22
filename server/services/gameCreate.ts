@@ -16,7 +16,7 @@ import UserService from './user';
 const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
 export default class GameCreateService {
-    gameModel: any;
+    gameModel;
     gameService: GameService;
     gameListService: GameListService;
     nameService: NameService;
@@ -31,7 +31,7 @@ export default class GameCreateService {
     specialistBanService: SpecialistBanService;
 
     constructor(
-        gameModel: any,
+        gameModel,
         gameService: GameService,
         gameListService: GameListService,
         nameService: NameService, 
@@ -165,10 +165,10 @@ export default class GameCreateService {
         }
 
         // Create all of the stars required.
-        (game.galaxy as any).homeStars = [];
-        (game.galaxy as any).linkedStars = [];
+        game.galaxy.homeStars = [];
+        game.galaxy.linkedStars = [];
 
-        let starGeneration: any = this.mapService.generateStars(
+        let starGeneration = this.mapService.generateStars(
             game, 
             desiredStarCount,
             game.settings.general.playerLimit,

@@ -1,13 +1,13 @@
 import CombatService from '../services/combat';
 
 const fakeTechnologyService = {
-    getStarEffectiveWeaponsLevel(game: any, defenders: any, star: any, defenderCarriers: any) {
+    getStarEffectiveWeaponsLevel(game, defenders, star, defenderCarriers) {
         return 1;
     },
-    getCarriersEffectiveWeaponsLevel(game: any, attackers: any, attackerCarriers: any, isCarrierToStarCombat: any) {
+    getCarriersEffectiveWeaponsLevel(game, attackers, attackerCarriers, isCarrierToStarCombat) {
         return 1;
     },
-    getCarriersWeaponsDebuff(carriers: any) {
+    getCarriersWeaponsDebuff(carriers) {
         return 0;
     }
 };
@@ -130,11 +130,11 @@ describe('combat', () => {
             shipsActual: 10
         };
 
-        const defenders: any[] = [];
+        const defenders = [];
 
-        const attackers: any[] = [];
+        const attackers = [];
 
-        const defenderCarriers: any[] = [];
+        const defenderCarriers = [];
         
         const attackerCarriers = [
             {
@@ -167,11 +167,11 @@ describe('combat', () => {
             shipsActual: 10
         };
 
-        const defenders: any[] = [];
+        const defenders = [];
 
-        const attackers: any[] = [];
+        const attackers = [];
 
-        const defenderCarriers: any[] = [];
+        const defenderCarriers = [];
         
         const attackerCarriers = [
             {
@@ -204,9 +204,9 @@ describe('combat', () => {
             shipsActual: 0
         };
 
-        const defenders: any[] = [];
+        const defenders = [];
 
-        const attackers: any[] = [];
+        const attackers = [];
 
         const defenderCarriers = [
             {
@@ -245,9 +245,9 @@ describe('combat', () => {
             shipsActual: 0
         };
 
-        const defenders: any[] = [];
+        const defenders = [];
 
-        const attackers: any[] = [];
+        const attackers = [];
 
         const defenderCarriers = [
             {
@@ -284,9 +284,9 @@ describe('combat', () => {
     it('should calculate carrier to carrier combat - mutual destruction', async () => {
         const game = { };
 
-        const defenders: any[] = [];
+        const defenders = [];
 
-        const attackers: any[] = [];
+        const attackers = [];
 
         const defenderCarriers = [
             {
@@ -321,9 +321,9 @@ describe('combat', () => {
     it('should calculate carrier to carrier combat - defender wins', async () => {
         const game = { };
 
-        const defenders: any[] = [];
+        const defenders = [];
 
-        const attackers: any[] = [];
+        const attackers = [];
 
         const defenderCarriers = [
             {
@@ -358,9 +358,9 @@ describe('combat', () => {
     it('should calculate carrier to carrier combat - attacker wins', async () => {
         const game = { };
 
-        const defenders: any[] = [];
+        const defenders = [];
 
-        const attackers: any[] = [];
+        const attackers = [];
 
         const defenderCarriers = [
             {
@@ -395,9 +395,9 @@ describe('combat', () => {
     it('should destroy carriers in carrier to carrier combat if they cannot withstand a single blow - defender wins', async () => {
         const game = { };
 
-        const defenders: any[] = [];
+        const defenders = [];
 
-        const attackers: any[] = [];
+        const attackers = [];
 
         const defenderCarriers = [
             {
@@ -429,9 +429,9 @@ describe('combat', () => {
     it('should destroy carriers in carrier to carrier combat if they cannot withstand a single blow - attacker wins', async () => {
         const game = { };
 
-        const defenders: any[] = [];
+        const defenders = [];
 
-        const attackers: any[] = [];
+        const attackers = [];
 
         const defenderCarriers = [
             {

@@ -9,7 +9,7 @@ export default (container: DependencyContainer) => {
 
     return {
 
-        async handler(job: any, done: any) {
+        async handler(job, done) {
             let games = await container.gameListService.listOldCompletedGamesNotCleaned(months);
 
             for (let i = 0; i < games.length; i++) {

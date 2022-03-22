@@ -5,11 +5,11 @@ import Middleware from './middleware';
 
 const COST_PER_TOKEN = 1;
 
-export default (router: Router, io: any, container: DependencyContainer) => {
+export default (router: Router, io, container: DependencyContainer) => {
     
     const middleware = Middleware(container);
 
-    router.get('/api/shop/galacticcredits/purchase', middleware.authenticate, async (req: any, res: any, next: any) => {
+    router.get('/api/shop/galacticcredits/purchase', middleware.authenticate, async (req, res, next) => {
         let errors: string[] = [];
 
         if (!req.query.amount) {
@@ -51,7 +51,7 @@ export default (router: Router, io: any, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/shop/galacticcredits/purchase/process', middleware.authenticate, async (req: any, res: any, next: any) => {
+    router.get('/api/shop/galacticcredits/purchase/process', middleware.authenticate, async (req, res, next) => {
         try {
             const result = await container.paypalService.processPayment(req.query.paymentId, req.query.PayerID);
 

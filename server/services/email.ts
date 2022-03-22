@@ -17,7 +17,7 @@ const path = require('path');
 
 function getFakeTransport() {
     return {
-        async sendMail(message: any) {
+        async sendMail(message) {
             console.log('-----');
             console.log(`SMTP DISABLED - Attempted to send email to [${message.to}] from [${message.from}]`);
             // console.log(message.text);
@@ -106,13 +106,13 @@ export default class EmailService {
         this.gameStateService = gameStateService;
         this.gameTickService = gameTickService;
 
-        this.gameService.on('onGameStarted', (data: any) => this.sendGameStartedEmail(data.gameId));
-        this.userService.on('onUserCreated', (user: any) => this.sendWelcomeEmail(user));
-        this.playerService.on('onGamePlayerReady', (data: any) => this.trySendLastPlayerTurnReminder(data.gameId));
+        this.gameService.on('onGameStarted', (data) => this.sendGameStartedEmail(data.gameId));
+        this.userService.on('onUserCreated', (user) => this.sendWelcomeEmail(user));
+        this.playerService.on('onGamePlayerReady', (data) => this.trySendLastPlayerTurnReminder(data.gameId));
 
-        this.gameTickService.on('onPlayerAfk', (args: any) => this.sendGamePlayerAfkEmail(args.gameId, args.player._id));
-        this.gameTickService.on('onGameEnded', (args: any) => this.sendGameFinishedEmail(args.gameId));
-        this.gameTickService.on('onGameCycleEnded', (args: any) => this.sendGameCycleSummaryEmail(args.gameId));
+        this.gameTickService.on('onPlayerAfk', (args) => this.sendGamePlayerAfkEmail(args.gameId, args.player._id));
+        this.gameTickService.on('onGameEnded', (args) => this.sendGameFinishedEmail(args.gameId));
+        this.gameTickService.on('onGameCycleEnded', (args) => this.sendGameCycleSummaryEmail(args.gameId));
     }
 
     _getTransport() {
@@ -157,7 +157,7 @@ export default class EmailService {
         return await transport.sendMail(message);
     }
 
-    async sendTemplate(toEmail: string, template: EmailTemplate, parameters: any[]) {
+    async sendTemplate(toEmail: string, template: EmailTemplate, parameters) {
         parameters = parameters || [];
 
         const filePath = path.join(__dirname, '../templates/', template.fileName);

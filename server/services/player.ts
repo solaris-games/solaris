@@ -123,7 +123,7 @@ export default class PlayerService extends EventEmitter {
         return player;
     }
 
-    createEmptyPlayers(game: Game): any[] {
+    createEmptyPlayers(game: Game) {
         let players: any[] = [];
 
         let shapeColours = this._generatePlayerColourShapeList(game.settings.general.playerLimit);
@@ -396,7 +396,7 @@ export default class PlayerService extends EventEmitter {
         player.researchingNext = player.researchingNow;
     }
 
-    createHomeStarCarriers(game: Game): any[] {
+    createHomeStarCarriers(game: Game) {
         let carriers: any[] = [];
 
         for (let i = 0; i < game.galaxy.players.length; i++) {

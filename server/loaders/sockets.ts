@@ -1,13 +1,13 @@
 const socketio = require('socket.io');
 
-export default (config: any, server: any) => {
+export default (config, server) => {
 
     const io = socketio(server);
 
-    io.on('connection', (socket: any) => {
+    io.on('connection', (socket) => {
         // When the user opens a game, they will be put
         // into that room to receive web sockets scoped to the game room.
-        socket.on('gameRoomJoined', (data: any) => {
+        socket.on('gameRoomJoined', (data) => {
             socket.join(data.gameId); // Join the game room to receive game-wide messages.
             socket.join(data.userId); // Join a private room to receive user/player specific messages.
 
@@ -21,7 +21,7 @@ export default (config: any, server: any) => {
             }
         });
 
-        socket.on('gameRoomLeft', (data: any) => {
+        socket.on('gameRoomLeft', (data) => {
             socket.leave(data.gameId)
             socket.leave(data.userId)
 

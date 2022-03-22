@@ -3,11 +3,11 @@ import ValidationError from '../errors/validation';
 import { DependencyContainer } from '../types/DependencyContainer';
 import Middleware from './middleware';
 
-export default (router: Router, io: any, container: DependencyContainer) => {
+export default (router: Router, io, container: DependencyContainer) => {
 
     const middleware = Middleware(container);
 
-    router.get('/api/admin/user', middleware.authenticateCommunityManager, async (req: any, res: any, next: any) => {
+    router.get('/api/admin/user', middleware.authenticateCommunityManager, async (req, res, next) => {
         try {
             let result = await container.adminService.listUsers(req.session.roles.administrator, 300);
             
@@ -17,7 +17,7 @@ export default (router: Router, io: any, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/admin/passwordresets', middleware.authenticateAdmin, async (req: any, res: any, next: any) => {
+    router.get('/api/admin/passwordresets', middleware.authenticateAdmin, async (req, res, next) => {
         try {
             let result = await container.adminService.listPasswordResets();
             
@@ -27,7 +27,7 @@ export default (router: Router, io: any, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/admin/reports', middleware.authenticateAdmin, async (req: any, res: any, next: any) => {
+    router.get('/api/admin/reports', middleware.authenticateAdmin, async (req, res, next) => {
         try {
             let result = await container.reportService.listReports();
             
@@ -37,7 +37,7 @@ export default (router: Router, io: any, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/admin/user/:userId/contributor', middleware.authenticateAdmin, async (req: any, res: any, next: any) => {
+    router.patch('/api/admin/user/:userId/contributor', middleware.authenticateAdmin, async (req, res, next) => {
         try {
             await container.adminService.setRoleContributor(req.params.userId, req.body.enabled);
 
@@ -47,7 +47,7 @@ export default (router: Router, io: any, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/admin/user/:userId/developer', middleware.authenticateAdmin, async (req: any, res: any, next: any) => {
+    router.patch('/api/admin/user/:userId/developer', middleware.authenticateAdmin, async (req, res, next) => {
         try {
             await container.adminService.setRoleDeveloper(req.params.userId, req.body.enabled);
 
@@ -57,7 +57,7 @@ export default (router: Router, io: any, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/admin/user/:userId/communityManager', middleware.authenticateAdmin, async (req: any, res: any, next: any) => {
+    router.patch('/api/admin/user/:userId/communityManager', middleware.authenticateAdmin, async (req, res, next) => {
         try {
             await container.adminService.setRoleCommunityManager(req.params.userId, req.body.enabled);
 
@@ -67,7 +67,7 @@ export default (router: Router, io: any, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/admin/user/:userId/gameMaster', middleware.authenticateAdmin, async (req: any, res: any, next: any) => {
+    router.patch('/api/admin/user/:userId/gameMaster', middleware.authenticateAdmin, async (req, res, next) => {
         try {
             await container.adminService.setRoleGameMaster(req.params.userId, req.body.enabled);
 
@@ -77,7 +77,7 @@ export default (router: Router, io: any, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/admin/user/:userId/credits', middleware.authenticateAdmin, async (req: any, res: any, next: any) => {
+    router.patch('/api/admin/user/:userId/credits', middleware.authenticateAdmin, async (req, res, next) => {
         try {
             await container.userService.setCredits(req.params.userId, +req.body.credits);
 
@@ -87,7 +87,7 @@ export default (router: Router, io: any, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/admin/user/:userId/ban', middleware.authenticateAdmin, async (req: any, res: any, next: any) => {
+    router.patch('/api/admin/user/:userId/ban', middleware.authenticateAdmin, async (req, res, next) => {
         try {
             await container.adminService.ban(req.params.userId);
 
@@ -97,7 +97,7 @@ export default (router: Router, io: any, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/admin/user/:userId/unban', middleware.authenticateAdmin, async (req: any, res: any, next: any) => {
+    router.patch('/api/admin/user/:userId/unban', middleware.authenticateAdmin, async (req, res, next) => {
         try {
             await container.adminService.unban(req.params.userId);
 
@@ -107,7 +107,7 @@ export default (router: Router, io: any, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/admin/user/:userId/resetAchievements', middleware.authenticateAdmin, async (req: any, res: any, next: any) => {
+    router.patch('/api/admin/user/:userId/resetAchievements', middleware.authenticateAdmin, async (req, res, next) => {
         try {
             await container.adminService.resetAchievements(req.params.userId);
 
@@ -117,7 +117,7 @@ export default (router: Router, io: any, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/admin/user/:userId/promoteToEstablishedPlayer', middleware.authenticateCommunityManager, async (req: any, res: any, next: any) => {
+    router.patch('/api/admin/user/:userId/promoteToEstablishedPlayer', middleware.authenticateCommunityManager, async (req, res, next) => {
         try {
             await container.adminService.promoteToEstablishedPlayer(req.params.userId);
 
@@ -127,7 +127,7 @@ export default (router: Router, io: any, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.post('/api/admin/user/:userId/impersonate', middleware.authenticateAdmin, async (req: any, res: any, next: any) => {
+    router.post('/api/admin/user/:userId/impersonate', middleware.authenticateAdmin, async (req, res, next) => {
         try {
             const user = await container.userService.getById(req.params.userId);
 
@@ -152,7 +152,7 @@ export default (router: Router, io: any, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/admin/game', middleware.authenticateSubAdmin, async (req: any, res: any, next: any) => {
+    router.get('/api/admin/game', middleware.authenticateSubAdmin, async (req, res, next) => {
         try {
             let result = await container.adminService.listGames(100);
             
@@ -162,7 +162,7 @@ export default (router: Router, io: any, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/admin/game/:gameId/featured', middleware.authenticateSubAdmin, async (req: any, res: any, next: any) => {
+    router.patch('/api/admin/game/:gameId/featured', middleware.authenticateSubAdmin, async (req, res, next) => {
         try {
             await container.adminService.setGameFeatured(req.params.gameId, req.body.featured);
 
@@ -172,7 +172,7 @@ export default (router: Router, io: any, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/admin/game/:gameId/timeMachine', middleware.authenticateAdmin, async (req: any, res: any, next: any) => {
+    router.patch('/api/admin/game/:gameId/timeMachine', middleware.authenticateAdmin, async (req, res, next) => {
         try {
             await container.adminService.setGameTimeMachine(req.params.gameId, req.body.timeMachine);
 
@@ -182,7 +182,7 @@ export default (router: Router, io: any, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/admin/game/:gameId/finish', middleware.authenticateAdmin, middleware.loadGamePlayersSettingsState, middleware.validateGameLocked, middleware.validateGameInProgress, async (req: any, res: any, next: any) => {
+    router.patch('/api/admin/game/:gameId/finish', middleware.authenticateAdmin, middleware.loadGamePlayersSettingsState, middleware.validateGameLocked, middleware.validateGameInProgress, async (req, res, next) => {
         try {
             await container.gameService.forceAllUndefeatedPlayersReadyToQuit(req.game);
 
@@ -192,7 +192,7 @@ export default (router: Router, io: any, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.patch('/api/admin/reports/:reportId/action', middleware.authenticateAdmin, async (req: any, res: any, next: any) => {
+    router.patch('/api/admin/reports/:reportId/action', middleware.authenticateAdmin, async (req, res, next) => {
         try {
             await container.reportService.actionReport(req.params.reportId);
 

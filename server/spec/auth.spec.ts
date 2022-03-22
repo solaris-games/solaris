@@ -7,7 +7,7 @@ const fakeBcrypt = {
 };
 
 const fakeUserModel = {
-    async findOne(user: any) {
+    async findOne(user) {
         return Promise.resolve([
             {
                 _id: 1,
@@ -20,7 +20,7 @@ const fakeUserModel = {
 };
 
 describe('auth', () => {
-    let service: any;
+    let service;
 
     beforeAll(() => {
         // @ts-ignore

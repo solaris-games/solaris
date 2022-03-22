@@ -532,7 +532,7 @@ export default class LeaderboardService {
     }
 
     async getLeaderboard(limit: number | null, sortingKey: string, skip: number = 0) {
-        const sorter = (LeaderboardService.GLOBALSORTERS as any)[sortingKey] || LeaderboardService.GLOBALSORTERS['rank'];
+        const sorter = LeaderboardService.GLOBALSORTERS[sortingKey] || LeaderboardService.GLOBALSORTERS['rank'];
 
         let leaderboard = await this.userRepo
             .find(
@@ -591,17 +591,15 @@ export default class LeaderboardService {
             };
         });
 
-        const getNestedObject = (nestedObj: any, pathArr: string[]) => {
+        const getNestedObject = (nestedObj, pathArr: string[]) => {
             return pathArr.reduce((obj, key) =>
                 (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
         }
 
-        function sortPlayers(a: any, b: any) {
-            let sorters = SORTERS as any;
-
+        function sortPlayers(a, b) {
             if (sortingKey) {
-                if (getNestedObject(a, sorters[sortingKey].split('.')) > getNestedObject(b, sorters[sortingKey].split('.'))) return -1;
-                if (getNestedObject(a, sorters[sortingKey].split('.')) < getNestedObject(b, sorters[sortingKey].split('.'))) return 1;
+                if (getNestedObject(a, SORTERS[sortingKey].split('.')) > getNestedObject(b, SORTERS[sortingKey].split('.'))) return -1;
+                if (getNestedObject(a, SORTERS[sortingKey].split('.')) < getNestedObject(b, SORTERS[sortingKey].split('.'))) return 1;
             }
 
             // If its a conquest and home star victory then sort by home stars first, then by total stars.
@@ -654,7 +652,7 @@ export default class LeaderboardService {
 
         return {
             leaderboard,
-            fullKey: sortingKey ? (SORTERS as any)[sortingKey] : null
+            fullKey: sortingKey ? SORTERS[sortingKey] : null
         };
     }
 
@@ -825,7 +823,7 @@ export default class LeaderboardService {
             && game.settings.conquest.victoryCondition === 'homeStarPercentage' ? 'totalHomeStars' : 'totalStars';
 
         let starWinners = leaderboard
-            .filter(p => !p.player.defeated && (p.stats as any)[totalStarsKey] >= game.state.starsForVictory)
+            .filter(p => !p.player.defeated && p.stats[totalStarsKey] >= game.state.starsForVictory)
             .map(p => p.player);
 
         if (starWinners.length) {

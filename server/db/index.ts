@@ -3,7 +3,7 @@ import mongooseLoader from '../loaders/mongoose';
 import fs from 'fs';
 import path from 'path';
 
-let mongo: any;
+let mongo;
 
 async function startup() {
     mongo = await mongooseLoader(config, {

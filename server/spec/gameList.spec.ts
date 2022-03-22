@@ -7,7 +7,7 @@ const fakeGameModel = {
 };
 
 describe('game list', () => {
-    let gameListService: any;
+    let gameListService;
 
     beforeAll(() => {
         // @ts-ignore
