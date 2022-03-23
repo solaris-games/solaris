@@ -150,18 +150,10 @@ export default {
     getStarShape () {
       return GameHelper.getPlayerById(this.$store.state.game, this.event.data.playerIdOwner).shape;
     },
-    totalDefenderShips(index) {
-      let starHidden = this.event.data.combatResult.star[index] == "???"
-      let normalCarriers = this.defenderCarriers.filter(c => c[index] != "???")
-      let scrambledCarriers = this.defenderCarriers.filter(c => c[index] == "???")
-
-      if (starHidden && !normalCarriers.length) return "???"
-      let result = (this.event.data.combatResult.star[index] | 0) + normalCarriers.reduce((sum, c) => sum + c[index], 0)
-      return result + (starHidden || scrambledCarriers.length ? "*" : "")
-    },
-    totalAttackerShips(index) {
-      let normalCarriers = this.attackerCarriers.filter(c => c[index] != "???") //Unscrambled Carriers
-      let scrambledCarriers = this.attackerCarriers.filter(c => c[index] == "???") //Scrambled Carriers
+    totalShips(carriers, index, star = null) {
+      if (star) carriers = carriers.concat([star, star]) //Add the star if we need to
+      let normalCarriers = carriers.filter(c => c[index] != "???") //Unscrambled Carriers
+      let scrambledCarriers = carriers.filter(c => c[index] == "???") //Scrambled Carriers
 
       if (!normalCarriers.length) return "???" //If everything is scrambled, the total is scrambled.
       let result = normalCarriers.reduce((sum, c) => sum + c[index], 0) //Add up all the ships
@@ -170,22 +162,22 @@ export default {
   },
   computed: {
     totalDefenderBefore: function () {
-      return this.totalDefenderShips("before")
+      return this.totalShips(this.defenderCarriers, "before", this.event.data.combatResult.star)
     },
     totalDefenderLost: function () {
-      return this.totalDefenderShips("lost")
+      return this.totalShips(this.defenderCarriers, "lost", this.event.data.combatResult.star)
     },
     totalDefenderAfter: function () {
-      return this.totalDefenderShips("after")
+      return this.totalShips(this.defenderCarriers, "after", this.event.data.combatResult.star)
     },
     totalAttackerBefore: function () {
-      return this.totalAttackerShips("before")
+      return this.totalShips(this.attackerCarriers, "before")
     },
     totalAttackerLost: function () {
-      return this.totalAttackerShips("lost")
+      return this.totalShips(this.attackerCarriers, "lost")
     },
     totalAttackerAfter: function () {
-      return this.totalAttackerShips("after")
+      return this.totalShips(this.attackerCarriers, "after")
     }
   }
 }
