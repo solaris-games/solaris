@@ -11,6 +11,11 @@ export default {
     starId: String,
     starName: String
   },
+  mounted () {
+    if (!this.starName) {
+      this.starName = gameHelper.getStarById(this.$store.state.game, this.starId).name
+    }
+  },
   methods: {
     pan (e) {
       let star = gameHelper.getStarById(this.$store.state.game, this.starId)
