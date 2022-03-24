@@ -1003,6 +1003,23 @@ class GameHelper {
       isCreditor
     }
   }
+
+  calculateCombatEventShipCount(star, carriers, key) {
+    let array = star ? carriers.concat([star]) : carriers //Add the star if we need to
+
+    let unscrambled = array.filter(c => c[key] !== "???")
+    let scrambled = array.filter(c => c[key] === "???")
+
+    if (scrambled.length === unscrambled.length) return "???" //If everything is scrambled, the total is scrambled.
+    
+    let result = unscrambled.reduce((sum, c) => sum + c[key], 0).toString() //Add up all the ships
+
+    if (scrambled.length) { //If any carriers are scramled, add a *
+      result += "*"
+    }
+
+    return result
+  }
 }
 
 export default new GameHelper()
