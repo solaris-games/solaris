@@ -29,6 +29,7 @@
 
 <script>
 import GameHelper from '../../../services/gameHelper'
+import DiplomacyHelper from '../../../services/diplomacyHelper'
 import PlayerIconVue from '../player/PlayerIcon'
 import PlayerOnlineStatusVue from './PlayerOnlineStatus'
 import PlayerMissedTurnsVue from './PlayerMissedTurns'
@@ -62,7 +63,7 @@ export default {
   },
   computed: {
     isFormalAlliancesEnabled () {
-      return GameHelper.isFormalAlliancesEnabled(this.$store.state.game)
+      return DiplomacyHelper.isFormalAlliancesEnabled(this.$store.state.game)
     }
   }
 }

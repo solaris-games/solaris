@@ -1,11 +1,12 @@
 <template>
-<div class="bg-primary pt-2 pb-1 mb-2 pointer" :class="{'unread':!isRead}" @click="markAsRead">
-    <div v-if="event.tick">
-        <div class="col text-right">
-            <span class="badge" :class="{'badge-success':isRead,'badge-warning':!isRead}">Tick {{event.tick}}</span>
-        </div>
+<div class="bg-primary pt-2 pb-1 mb-2 pointer row" :class="{'unread':!isRead, 'bg-secondary': isGlobal}" @click="markAsRead">
+    <div class="col">
+        <span class="badge badge-info" v-if="isGlobal">Global Event</span>
     </div>
-    <div class="col mt-2">
+    <div v-if="event.tick" class="col-auto">
+        <span class="badge" :class="{'badge-success':isRead,'badge-warning':!isRead}">Tick {{event.tick}}</span>
+    </div>
+    <div class="col-12 mt-2">
         <game-ended :event="event" v-if="event.type === 'gameEnded'"
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
         <game-paused :event="event" v-if="event.type === 'gamePaused'"/>
@@ -20,6 +21,8 @@
         <game-started :event="event" v-if="event.type === 'gameStarted'"/>
         <game-player-badge-purchased :event="event" v-if="event.type === 'gamePlayerBadgePurchased'"
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        <game-diplomacy-peace-declared :event="event" v-if="event.type === 'gameDiplomacyPeaceDeclared'"/>
+        <game-diplomacy-war-declared :event="event" v-if="event.type === 'gameDiplomacyWarDeclared'"/>
 
         <player-bulk-infrastructure-upgraded :event="event" v-if="event.type === 'playerBulkInfrastructureUpgraded'"/>
         <player-combat-star :event="event" v-if="event.type === 'playerCombatStar'"
@@ -44,6 +47,8 @@
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
         <player-research-complete :event="event" v-if="event.type === 'playerResearchComplete'"/>
         <player-star-abandoned :event="event" v-if="event.type === 'playerStarAbandoned'"/>
+        <player-star-died :event="event" v-if="event.type === 'playerStarDied'"/>
+        <player-star-reignited :event="event" v-if="event.type === 'playerStarReignited'"/>
         <player-technology-received :event="event" v-if="event.type === 'playerTechnologyReceived'"
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
         <player-technology-sent :event="event" v-if="event.type === 'playerTechnologySent'"
@@ -57,6 +62,7 @@
         <player-conversation-created :event="event" v-if="event.type === 'playerConversationCreated'"/>
         <player-conversation-invited :event="event" v-if="event.type === 'playerConversationInvited'"/>
         <player-conversation-left :event="event" v-if="event.type === 'playerConversationLeft'"/>
+        <player-diplomacy-status-changed :event="event" v-if="event.type === 'playerDiplomacyStatusChanged'"/>
     </div>
 </div>
 </template>
@@ -85,6 +91,8 @@ import PlayerRenownReceivedVue from './PlayerRenownReceived'
 import PlayerRenownSentVue from './PlayerRenownSent'
 import PlayerResearchCompleteVue from './PlayerResearchComplete'
 import PlayerStarAbandonedVue from './PlayerStarAbandoned'
+import PlayerStarDiedVue from './PlayerStarDied'
+import PlayerStarReignitedVue from './PlayerStarReignited'
 import PlayerTechnologyReceivedVue from './PlayerTechnologyReceived'
 import PlayerTechnologySentVue from './PlayerTechnologySent'
 import PlayerDebtForgivenVue from './PlayerDebtForgiven'
@@ -94,6 +102,9 @@ import PlayerCarrierSpecialistHiredVue from './PlayerCarrierSpecialistHired'
 import PlayerConversationCreatedVue from './PlayerConversationCreated'
 import PlayerConversationInvitedVue from './PlayerConversationInvited'
 import PlayerConversationLeftVue from './PlayerConversationLeft'
+import GameDiplomacyPeaceDeclaredVue from './GameDiplomacyPeaceDeclared'
+import GameDiplomacyWarDeclaredVue from './GameDiplomacyWarDeclared'
+import PlayerDiplomacyStatusChangedVue from './PlayerDiplomacyStatusChanged'
 
 export default {
   components: {
@@ -105,6 +116,9 @@ export default {
     'game-player-joined': GamePlayerJoinedVue,
     'game-player-quit': GamePlayerQuitVue,
     'game-started': GameStartedVue,
+    'game-diplomacy-peace-declared': GameDiplomacyPeaceDeclaredVue, 
+    'game-diplomacy-war-declared': GameDiplomacyWarDeclaredVue,
+
     'player-bulk-infrastructure-upgraded': PlayerBulkInfrastructureUpgradedVue,
     'player-combat-star': PlayerCombatStarEventVue,
     'player-combat-carrier': PlayerCombatCarrierEventVue,
@@ -119,6 +133,8 @@ export default {
     'player-renown-sent': PlayerRenownSentVue,
     'player-research-complete': PlayerResearchCompleteVue,
     'player-star-abandoned': PlayerStarAbandonedVue,
+    'player-star-died': PlayerStarDiedVue,
+    'player-star-reignited': PlayerStarReignitedVue,
     'player-technology-received': PlayerTechnologyReceivedVue,
     'player-technology-sent': PlayerTechnologySentVue,
     'player-debt-forgiven': PlayerDebtForgivenVue,
@@ -127,7 +143,8 @@ export default {
     'player-carrier-specialist-hired': PlayerCarrierSpecialistHiredVue,
     'player-conversation-created': PlayerConversationCreatedVue,
     'player-conversation-invited': PlayerConversationInvitedVue,
-    'player-conversation-left': PlayerConversationLeftVue
+    'player-conversation-left': PlayerConversationLeftVue,
+    'player-diplomacy-status-changed': PlayerDiplomacyStatusChangedVue,
   },
   props: {
     event: Object
@@ -154,6 +171,9 @@ export default {
   computed: {
       isRead () {
           return this.event.read || this.event.read == null
+      },
+      isGlobal () {
+          return this.event.read == null
       }
   }
 }
@@ -165,6 +185,7 @@ export default {
 }
 
 .unread {
-    border: 3px solid #f39c12;
+    border-top: 4px solid #f39c12;
+    border-bottom: 4px solid #f39c12;
 }
 </style>

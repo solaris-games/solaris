@@ -34,7 +34,7 @@ export default class SpiralMapService {
         this.gameTypeService = gameTypeService;
     }
 
-    generateLocations(game: any, count: number, resourceDistribution: GameResourceDistribution): Location[] {
+    generateLocations(game, count: number, resourceDistribution: GameResourceDistribution): Location[] {
         let branchCount = 4;
 
         // Hard code branches for small games.
@@ -60,7 +60,7 @@ export default class SpiralMapService {
         return locations;
     }
 
-    generateSpiral(game: any, locationCount: number, branchCount: number): Location[] {
+    generateSpiral(game, locationCount: number, branchCount: number): Location[] {
         const locations: Location[] = [];
 
         if (this.gameTypeService.isKingOfTheHillMode(game)) {
@@ -204,7 +204,7 @@ export default class SpiralMapService {
         }
     }
 
-    scaleUp(game: any, locations: Location[]): Location[] {
+    scaleUp(game, locations: Location[]): Location[] {
         // Start out at the minimum possible galaxy size and increment up
         // in steps until ALL stars are at least minimum distance away from others.
         let C_HEIGHT = game.constants.distances.minDistanceBetweenStars;
@@ -254,7 +254,7 @@ export default class SpiralMapService {
         return locs;
     }
 
-    isValidGalaxyCheck(game: any, locations: Location[]): boolean {
+    isValidGalaxyCheck(game, locations: Location[]): boolean {
         // If the average distance to closest star is greater than the minimum distance allowed then the galaxy is valid.
         let average = 
             locations.reduce((sum, l) => sum + this.distanceService.getDistanceToClosestLocation(l, locations), 0) 

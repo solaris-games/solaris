@@ -616,7 +616,6 @@ class Map extends EventEmitter {
 
     star.onClicked()
     star.select()
-    star.updateVisibility()
   }
 
   clickCarrier (carrierId) {
@@ -631,7 +630,6 @@ class Map extends EventEmitter {
       let s = this.stars[i]
 
       s.unselect()
-      s.updateVisibility() // Should be fine to pass in false for force
     }
   }
 
@@ -640,7 +638,6 @@ class Map extends EventEmitter {
       let c = this.carriers[i]
 
       c.unselect()
-      c.updateVisibility()
     }
   }
 
@@ -652,8 +649,6 @@ class Map extends EventEmitter {
         if (s.data._id !== star.data._id) {
           s.unselect()
         }
-
-        s.updateVisibility()
       })
   }
 
@@ -665,8 +660,6 @@ class Map extends EventEmitter {
         if (c.data._id !== carrier.data._id) {
           c.unselect()
         }
-
-        c.updateVisibility()
       })
   }
 
@@ -767,15 +760,10 @@ class Map extends EventEmitter {
           this.unselectAllCarriers()
           this.unselectAllStarsExcept(selectedStar)
 
-          selectedStar.toggleSelected()
-
           if (!this.tryMultiSelect(e.location)) {
+            selectedStar.toggleSelected()
             this.emit('onStarClicked', e)
-          } else {
-            selectedStar.unselect() // If multi-select then do not select the star.
           }
-
-          selectedStar.updateVisibility()
         } else if (this.mode === 'waypoints') {
           this.waypoints.onStarClicked(e)
         } else if (this.mode === 'ruler') {
@@ -890,6 +878,7 @@ class Map extends EventEmitter {
     let closeStars = this.stars
       .map(s => {
         return {
+          ref: s,
           type: 'star',
           distance: gameHelper.getDistanceBetweenLocations(location, s.data.location),
           data: s.data
@@ -900,6 +889,7 @@ class Map extends EventEmitter {
     let closeCarriers = this.carriers
       .map(s => {
         return {
+          ref: s,
           type: 'carrier',
           distance: gameHelper.getDistanceBetweenLocations(location, s.data.location),
           data: s.data
@@ -918,6 +908,12 @@ class Map extends EventEmitter {
       })
 
     if (closeObjects.length > 1) {
+      let star = closeObjects.find(co => co.type === 'star')
+
+      if (star) {
+        star.ref.toggleSelected() // Select to star to get the ranges drawn on the map
+      }
+
       this.emit('onObjectsClicked', closeObjects)
 
       return true

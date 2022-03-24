@@ -1,5 +1,4 @@
 import { Carrier } from "../types/Carrier";
-import { CombatCarrier, CombatStar } from "../types/Combat";
 import { Game } from "../types/Game";
 import { Specialist, SpecialistType } from "../types/Specialist";
 import { Star } from "../types/Star";
@@ -7,18 +6,10 @@ import { Star } from "../types/Star";
 const specialists = require('../config/game/specialists.json');
 const ValidationError = require("../errors/validation");
 
-const TIER_BASE_COSTS = {
-    "1": 25,
-    "2": 50,
-    "3": 100,
-    "4": 250,
-    "5": 500
-}
-
 export default class SpecialistService {
 
     getById(id: number, type: SpecialistType) {
-        return specialists[type].find(x => x.id === id);
+        return specialists[type].find((x) => x.id === id);
     }
 
     getByIdCarrier(id: number | null) {
@@ -113,7 +104,7 @@ export default class SpecialistService {
         return result;
     }
 
-    _getCarrierSpecialValue(carrier: Carrier, name: string, defaultValue: any) {
+    _getCarrierSpecialValue(carrier: Carrier, name: string, defaultValue) {
         if (!carrier.specialistId) {
             return defaultValue;
         }
@@ -129,7 +120,7 @@ export default class SpecialistService {
         return val == null ? defaultValue : val;
     }
 
-    _getStarSpecialValue(star: Star, name: string, defaultValue: any) {
+    _getStarSpecialValue(star: Star, name: string, defaultValue) {
         if (!star.specialistId) {
             return defaultValue;
         }

@@ -23,6 +23,11 @@ class DiplomacyService extends BaseApiService {
       { withCredentials: true })
   }
 
+  declareNeutral (gameId, playerId) {
+    return axios.put(this.BASE_URL + 'game/' + gameId + '/diplomacy/neutral/' + playerId, {},
+      { withCredentials: true })
+  }
+
 }
 
 export default new DiplomacyService()

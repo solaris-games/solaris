@@ -1,8 +1,8 @@
 import { DBObjectId } from "./DBObjectId";
-import { ResearchType } from "./Player";
+import { ResearchTypeNotRandom } from "./Player";
 
 export interface TradeTechnology {
-    name: ResearchType;
+    name: ResearchTypeNotRandom;
     level: number;
     cost: number;
 };
@@ -10,7 +10,7 @@ export interface TradeTechnology {
 export interface TradeEvent {
     playerId: DBObjectId;
     type: string;
-    data: any;
+    data;
     sentDate: Date;
     sentTick: number;
 };

@@ -2,23 +2,23 @@ import { DBObjectId } from "../types/DBObjectId";
 
 export default class DatabaseRepository<T> {
 
-    model: any;
+    model;
     
     constructor(model) {
         this.model = model;
     }
 
-    async findById(id: DBObjectId, select?: any): Promise<T | null> {
+    async findById(id: DBObjectId, select?): Promise<T | null> {
         return await this.model.findById(id, select)
         .lean({ defaults: true })
         .exec();
     }
 
-    async findByIdAsModel(id: DBObjectId, select?: any): Promise<any | null> {
+    async findByIdAsModel(id: DBObjectId, select?): Promise<any | null> {
         return await this.model.findById(id, select).exec();
     }
 
-    async find(query: any, select?: any | null, sort?: any | null, limit?: number | null, skip?: number | null): Promise<T[]> {
+    async find(query, select?: any | null, sort?: any | null, limit?: number | null, skip?: number | null): Promise<T[]> {
         return await this.model.find(query, select)
         .sort(sort)
         .skip(skip)
@@ -27,7 +27,7 @@ export default class DatabaseRepository<T> {
         .exec();
     }
 
-    async findAsModels(query: any, select?: any, sort?: any, limit?: number, skip?: number): Promise<any[]> {
+    async findAsModels(query, select?, sort?, limit?: number, skip?: number): Promise<any[]> {
         return await this.model.find(query, select)
         .sort(sort)
         .skip(skip)
@@ -35,18 +35,18 @@ export default class DatabaseRepository<T> {
         .exec();
     }
 
-    async findOne(query: any, select?: any): Promise<T | null> {
+    async findOne(query, select?): Promise<T | null> {
         return await this.model.findOne(query, select)
         .lean({ defaults: true })
         .exec();
     }
 
-    async findOneAsModel(query: any, select?: any): Promise<any | null> {
+    async findOneAsModel(query, select?): Promise<any | null> {
         return await this.model.findOne(query, select)
         .exec();
     }
 
-    async count(query: any): Promise<number> {
+    async count(query): Promise<number> {
         return await this.model.countDocuments(query).exec();
     }
 
@@ -54,27 +54,27 @@ export default class DatabaseRepository<T> {
         return this.model.estimatedDocumentCount();
     }
 
-    async updateOne(query: any, update: any, options?: any): Promise<void> {
+    async updateOne(query, update, options?): Promise<void> {
         return await this.model.updateOne(query, update, options).exec();
     }
 
-    async updateMany(query: any, update: any, options?: any): Promise<void> {
+    async updateMany(query, update, options?): Promise<void> {
         return await this.model.updateMany(query, update, options).exec();
     }
 
-    async bulkWrite(updates: any[]): Promise<void> {
+    async bulkWrite(updates): Promise<void> {
         return await this.model.bulkWrite(updates);
     }
 
-    async deleteOne(query: any): Promise<void> {
+    async deleteOne(query): Promise<void> {
         return await this.model.deleteOne(query).exec();
     }
 
-    async deleteMany(query: any): Promise<void> {
+    async deleteMany(query): Promise<void> {
         return await this.model.deleteMany(query).exec();
     }
 
-    async insertOne(document: any): Promise<void> {
+    async insertOne(document): Promise<void> {
         return await this.bulkWrite([
             {
                 insertOne: {

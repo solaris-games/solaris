@@ -1,7 +1,7 @@
 import AuthService from '../services/auth';
 
 const fakeBcrypt = {
-    compare(password1, password2) {
+    compare(password1: string, password2: string) {
         return password1 == password2;
     }
 };

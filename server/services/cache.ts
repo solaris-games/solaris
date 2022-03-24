@@ -2,7 +2,7 @@ const cache = require('memory-cache');
 
 export default class CacheService {
     
-    put(key: string, obj: any, time: number) {
+    put(key: string, obj, time: number) {
         if (this._isCacheEnabled()) {
             return cache.put(key, obj, time);
         }

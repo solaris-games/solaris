@@ -130,5 +130,7 @@ export default async (config, app, io, container: DependencyContainer) => {
     app.use(badges);
     app.use(report);
 
+    console.log('Express Intialized');
+    
     return app;
 };

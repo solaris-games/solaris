@@ -30,10 +30,10 @@
     <!-- <div class="row mt-1" :style="{'background-color': colour}" style="height:6px;"></div> -->
     <div class="row bg-secondary mt-0">
         <div class="col-12" v-if="hasLastMessage">
-            <p class="mt-2 mb-2" :class="{'truncate':isTruncated}">
-              <player-icon :playerId="lastMessageSender._id"/>
-              {{lastMessage}}
-            </p>
+          <p class="mt-2 mb-2" :class="{'truncate':isTruncated}">
+            <player-icon v-if="lastMessage.fromPlayerId" :playerId="lastMessageSender._id" />
+            {{lastMessage}}
+          </p>
         </div>
         <div class="col-12" v-if="hasLastMessage">
             <small class="float-right mb-2"><i>{{getDateString(conversation.lastMessage.sentDate)}}</i></small>

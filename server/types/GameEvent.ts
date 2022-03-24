@@ -6,7 +6,7 @@ export interface GameEvent {
     playerId: DBObjectId | null;
     tick: number;
     type: string;
-    data: any;
+    data;
     read: boolean;
 
     date?: Date;

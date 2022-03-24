@@ -15,13 +15,13 @@ const schema = new Schema({
             description: { type: Types.String, required: false, default: null },
 			type: { type: Types.String, required: true, enum: [
 				'tutorial',
-				'custom', 
-				'standard_rt', 
-				'standard_tb', 
-				'1v1_rt', 
-				'1v1_tb', 
-				'new_player_rt', 
-				'new_player_tb', 
+				'custom',
+				'standard_rt',
+				'standard_tb',
+				'1v1_rt',
+				'1v1_tb',
+				'new_player_rt',
+				'new_player_tb',
 				'32_player_rt',
 				'special_dark',
 				'special_ultraDark',
@@ -104,10 +104,16 @@ const schema = new Schema({
 			tradeCredits: { type: Types.Boolean, required: false, default: true },
 			tradeCreditsSpecialists: { type: Types.Boolean, required: false, default: true },
 			tradeCost: { type: Types.Number, required: true, enum: [0, 5, 15, 25, 50, 100], default: 15 }, // TODO: This could be renamed.
-			tradeScanning: { type: Types.String, required: true, enum: ['all', 'scanned'], default: 'all' },
-			alliances: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
-        },
-        technology: {
+			tradeScanning: { type: Types.String, required: true, enum: ['all', 'scanned'], default: 'all' }
+		},
+		diplomacy: {
+			enabled: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
+			tradeRestricted: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
+			maxAlliances: { type: Types.Number, required: true, min: 1, max: 31, default: 31 },
+			upkeepCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'none' },
+			globalEvents: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' }
+		},
+		technology: {
 			startingTechnologyLevel: {
 				terraforming: { type: Types.Number, required: true, min: 1, max: 16, default: 1 },
 				experimentation: { type: Types.Number, required: true, min: 0, max: 16, default: 1 },
@@ -203,6 +209,14 @@ const schema = new Schema({
 				expensive: { type: Types.Number, required: true, default: 2 },
 				veryExpensive: { type: Types.Number, required: true, default: 4 },
 				crazyExpensive: { type: Types.Number, required: true, default: 8 }
+			}
+		},
+		diplomacy: {
+			upkeepExpenseMultipliers: {
+				none: { type: Types.Number, required: true, default: 0 },
+				cheap: { type: Types.Number, required: true, default: 0.02 },
+				standard: { type: Types.Number, required: true, default: 0.05 },
+				expensive: { type: Types.Number, required: true, default: 0.10 }
 			}
 		}
 	},

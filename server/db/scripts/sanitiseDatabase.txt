@@ -1,0 +1,151 @@
+use solaris;
+
+// Remove identifiable user info.
+db.users.updateMany({}, {
+    $set: {
+        guildId: null,
+        password: null,
+        resetPasswordToken: null,
+        credits: 0,
+        premiumEndDate: null,
+        banned: false,
+        lastSeen: null,
+        lastSeenIP: null,
+        avatars: [],
+        roles: {
+            administrator: false,
+            contributor: false,
+            developer: false,
+            communityManager: false,
+            gameMaster: false
+        },
+        achievements: {
+            victories: 0,
+            rank: 0,
+            eloRating: null,
+            renown: 0,
+            joined: 0,
+            completed: 0,
+            quit: 0,
+            defeated: 0,
+            afk: 0,
+            combat: {
+                kills: {
+                    ships: 0,
+                    carriers: 0,
+                    specialists: 0,
+                },
+                losses: {
+                    ships: 0,
+                    carriers: 0,
+                    specialists: 0,
+                },
+                stars: {
+                    captured: 0,
+                    lost: 0,
+                },
+                homeStars: {
+                    captured: 0,
+                    lost: 0,
+                }
+            },
+            infrastructure: {
+                economy: 0,
+                industry: 0,
+                science: 0,
+                warpGates: 0,
+                warpGatesDestroyed: 0,
+                carriers: 0,
+                specialistsHired: 0,
+            },
+            research: {
+                scanning: 0,
+                hyperspace: 0,
+                terraforming: 0,
+                experimentation: 0,
+                weapons: 0,
+                banking: 0,
+                manufacturing: 0,
+                specialists: 0
+            },
+            trade: {
+                creditsSent: 0,
+                creditsReceived: 0,
+                creditsSpecialistsSent: 0,
+                creditsSpecialistsReceived: 0,
+                technologySent: 0,
+                technologyReceived: 0,
+                giftsSent: 0,
+                giftsReceived: 0,
+                renownSent: 0,
+            },
+            badges: {
+                ally: 0,
+                enemy: 0,
+                diplomat: 0,
+                strategist: 0,
+                roleplay: 0,
+                dauntless: 0,
+                sleepless: 0,
+                victor32: 0
+            }
+        }
+    }
+});
+
+// Obfuscate usernames and email addresses
+let index = 0;
+
+db.users.find({}).forEach(function(user) {
+    user.username = 'test' + index.toString();
+    user.email = 'test' + index.toString() + '@solaris.games';
+
+    index++;
+
+    db.users.save(user);
+
+    // Update any associated players to the same username.
+    db.games.updateMany({
+        'galaxy.players.userId': user._id
+    }, {
+        $set: {
+            'galaxy.players.$.alias': user.username
+        }
+    });
+});
+
+// Remove all games in progress or have not yet started.
+db.games.deleteMany({
+    'state.endDate': { $eq: null }
+});
+
+// Delete all game histories (to save space)
+db.gamehistories.deleteMany({});
+
+// Delete aliases from game histories
+//db.gamehistories.updateMany({}, {
+//    $set: {
+//        'players.$[].alias': ''
+//    }
+//});
+
+// Delete all game events (they could contain the player alias)
+// Note: May need to work out a solution for this.
+db.gameevents.deleteMany({});
+
+// Remove all sensitive data from games and players.
+db.games.updateMany({}, {
+    $set: {
+        conversations: [],
+        'galaxy.players.$[].notes': null,
+        'galaxy.players.$[].lastSeen': null,
+        'galaxy.players.$[].lastSeenIP': null
+    }
+});
+
+// Remove all other unnecessary data.
+db.agendaJobs.deleteMany({});
+db.guilds.deleteMany({});
+db.payments.deleteMany({});
+db.reports.deleteMany({});
+db.sessions.deleteMany({});

@@ -6,8 +6,8 @@ import { Guild, GuildLeaderboard, GuildRank, GuildUserApplication, GuildWithUser
 import { User } from '../types/User';
 import UserService from './user';
 
-function toProperCase(string) {
-    return string.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+function toProperCase(string: string) {
+    return string.replace(/\w\S*/g, function(txt: string){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 };
 
 export default class GuildService {
@@ -18,13 +18,13 @@ export default class GuildService {
     CREATE_GUILD_CREDITS_COST = 3
     RENAME_GUILD_CREDITS_COST = 1
 
-    guildModel: any;
+    guildModel;
     guildRepo: DatabaseRepository<Guild>;
     userRepo: DatabaseRepository<User>;
     userService: UserService;
     
     constructor(
-        guildModel: any,
+        guildModel,
         guildRepo: DatabaseRepository<Guild>,
         userRepo: DatabaseRepository<User>,
         userService: UserService
@@ -298,7 +298,7 @@ export default class GuildService {
         });
     }
 
-    async invite(username, guildId, invitedByUserId) {
+    async invite(username: string, guildId: DBObjectId, invitedByUserId: DBObjectId) {
         let user = await this.userService.getByUsername(username, {
             username: 1,
             'achievements.rank': 1,

@@ -18,6 +18,7 @@ class AudioService {
     if (this.store && this.store.state.settings.interface.audio === 'disabled') {
       return
     }
+    audio.volume = 0.5
     audio.play()
   }
 

@@ -211,12 +211,14 @@ export default class CombatService extends EventEmitter {
     }
 
     async performCombat(game: Game, gameUsers: User[], defender: Player, star: Star | null, carriers: Carrier[]) {
+        const isFormalAlliancesEnabled = this.diplomacyService.isFormalAlliancesEnabled(game);
+
         // NOTE: If star is null then the combat mode is carrier-to-carrier.
 
         // Allies of the defender will be on the defending side.
         let defenderAllies: Player[] = [];
 
-        if (this.diplomacyService.isFormalAlliancesEnabled(game)) {
+        if (isFormalAlliancesEnabled) {
             defenderAllies = this.diplomacyService.getAlliesOfPlayer(game, defender);
         }
 
@@ -257,8 +259,8 @@ export default class CombatService extends EventEmitter {
 
         let attackerPlayerIds = [...new Set(attackerCarriers.map(c => c.ownedByPlayerId!.toString()))];
 
-        let defenders: Player[] = defenderPlayerIds.map(playerId => this.playerService.getById(game, playerId));
-        let attackers: Player[] = attackerPlayerIds.map(playerId => this.playerService.getById(game, playerId));
+        let defenders: Player[] = defenderPlayerIds.map(playerId => this.playerService.getById(game, playerId as any)!);
+        let attackers: Player[] = attackerPlayerIds.map(playerId => this.playerService.getById(game, playerId as any)!);
 
         let defenderUsers: User[] = [];
         let attackerUsers: User[] = [];
@@ -329,7 +331,7 @@ export default class CombatService extends EventEmitter {
             };
         }
 
-        let defenderObjects: any[] = [...defenderCarriers];
+        let defenderObjects: (Star | Carrier)[] = [...defenderCarriers];
 
         if (star) {
             defenderObjects.push(star);
@@ -369,8 +371,8 @@ export default class CombatService extends EventEmitter {
         // Deduct reputation for all attackers that the defender is fighting and vice versa.
         for (let defenderPlayer of defenders) {
             for (let attackerPlayer of attackers) {
-                await this.reputationService.decreaseReputation(game, defenderPlayer, attackerPlayer, true, false);
                 await this.reputationService.decreaseReputation(game, attackerPlayer, defenderPlayer, true, false);
+                await this.reputationService.decreaseReputation(game, defenderPlayer, attackerPlayer, true, false);
             }
         }
 
@@ -402,9 +404,9 @@ export default class CombatService extends EventEmitter {
         if (attackerPlayerIds.length > 1) {
             // Get the next player to act as the defender.
             if (star) {
-                defender = this.playerService.getById(game, star.ownedByPlayerId);
+                defender = this.playerService.getById(game, star.ownedByPlayerId!)!;
             } else {
-                defender = this.playerService.getById(game, attackerPlayerIds[0]);
+                defender = this.playerService.getById(game, attackerPlayerIds[0] as any)!;
             }
 
             await this.performCombat(game, gameUsers, defender, star, attackerCarriers);
@@ -425,7 +427,7 @@ export default class CombatService extends EventEmitter {
         return null;
     }
 
-    _distributeDamage(combatResult: CombatResult, damageObjects: any[], shipsToKill: number, destroyCarriers: boolean = true) {
+    _distributeDamage(combatResult: CombatResult, damageObjects, shipsToKill: number, destroyCarriers: boolean = true) {
         while (shipsToKill) {
             let objectsToDeduct = damageObjects
                 .filter(c => 

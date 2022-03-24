@@ -67,8 +67,14 @@
     "tradeCredits": true,
     "tradeCreditsSpecialists": true,
     "tradeCost": 15,
-    "tradeScanning": "scanned",
-    "alliances": "enabled"
+    "tradeScanning": "scanned"
+  },
+  "diplomacy": {
+    "enabled": "enabled",
+    "upkeepCost": "none",
+    "tradeRestricted": "disabled", 
+    "maxAlliances": 31, 
+    "globalEvents": "disabled"
   },
   "technology": {
     "startingTechnologyLevel": {
