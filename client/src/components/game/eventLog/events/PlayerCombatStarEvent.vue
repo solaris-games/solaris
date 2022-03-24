@@ -149,35 +149,26 @@ export default {
     },
     getStarShape () {
       return GameHelper.getPlayerById(this.$store.state.game, this.event.data.playerIdOwner).shape;
-    },
-    totalShips(carriers, index, star = null) {
-      if (star) carriers = carriers.concat([star, star]) //Add the star if we need to
-      let normalCarriers = carriers.filter(c => c[index] != "???") //Unscrambled Carriers
-      let scrambledCarriers = carriers.filter(c => c[index] == "???") //Scrambled Carriers
-
-      if (!normalCarriers.length) return "???" //If everything is scrambled, the total is scrambled.
-      let result = normalCarriers.reduce((sum, c) => sum + c[index], 0) //Add up all the ships
-      return result + (scrambledCarriers.length ? "*" : "") //If any carriers are scramled, add a *
     }
   },
   computed: {
     totalDefenderBefore: function () {
-      return this.totalShips(this.defenderCarriers, "before", this.event.data.combatResult.star)
+      return GameHelper.calculateCombatEventShipCount(this.event.data.combatResult.star, this.defenderCarriers, "before")
     },
     totalDefenderLost: function () {
-      return this.totalShips(this.defenderCarriers, "lost", this.event.data.combatResult.star)
+      return GameHelper.calculateCombatEventShipCount(this.event.data.combatResult.star, this.defenderCarriers, "lost")
     },
     totalDefenderAfter: function () {
-      return this.totalShips(this.defenderCarriers, "after", this.event.data.combatResult.star)
+      return GameHelper.calculateCombatEventShipCount(this.event.data.combatResult.star, this.defenderCarriers, "after")
     },
     totalAttackerBefore: function () {
-      return this.totalShips(this.attackerCarriers, "before")
+      return GameHelper.calculateCombatEventShipCount(null, this.attackerCarriers, "before")
     },
     totalAttackerLost: function () {
-      return this.totalShips(this.attackerCarriers, "lost")
+      return GameHelper.calculateCombatEventShipCount(null, this.attackerCarriers, "lost")
     },
     totalAttackerAfter: function () {
-      return this.totalShips(this.attackerCarriers, "after")
+      return GameHelper.calculateCombatEventShipCount(null, this.attackerCarriers, "after")
     }
   }
 }
