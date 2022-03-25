@@ -381,6 +381,8 @@ export default {
                 await this.reloadGame()
 
                 this.$toasted.show(`The game has ticked. Cycle ${response.data.state.productionTick}, Tick ${response.data.state.tick}.`, { type: 'success' })
+
+                AudioService.download()
               }
             }
           }
