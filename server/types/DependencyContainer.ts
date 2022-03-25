@@ -39,6 +39,7 @@ import PaypalService from "../services/paypal";
 import PlayerService from "../services/player";
 import PlayerCreditsService from "../services/playerCredits";
 import PlayerCycleRewardsService from "../services/playerCycleRewards";
+import PlayerReadyService from "../services/playerReady";
 import PlayerStatisticsService from "../services/playerStatistics";
 import RandomService from "../services/random";
 import RatingService from "../services/rating";
@@ -82,6 +83,7 @@ export interface DependencyContainer {
     guildUserService: UserGuildService,
     mapService: MapService,
     playerService: PlayerService,
+    playerReadyService: PlayerReadyService,
     randomService: RandomService,
     researchService: ResearchService,
     starService: StarService,

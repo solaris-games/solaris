@@ -31,6 +31,7 @@ import CarrierGiftService from "./carrierGift";
 import CarrierMovementService from "./carrierMovement";
 import PlayerCycleRewardsService from "./playerCycleRewards";
 import StarContestedService from "./starContested";
+import PlayerReadyService from "./playerReady";
 
 const EventEmitter = require('events');
 const moment = require('moment');
@@ -62,6 +63,7 @@ export default class GameTickService extends EventEmitter {
     carrierMovementService: CarrierMovementService;
     carrierGiftService: CarrierGiftService;
     starContestedService: StarContestedService;
+    playerReadyService: PlayerReadyService;
     
     constructor(
         distanceService: DistanceService,
@@ -89,7 +91,8 @@ export default class GameTickService extends EventEmitter {
         diplomacyUpkeepService: DiplomacyUpkeepService,
         carrierMovementService: CarrierMovementService,
         carrierGiftService: CarrierGiftService,
-        starContestedService: StarContestedService
+        starContestedService: StarContestedService,
+        playerReadyService: PlayerReadyService
     ) {
         super();
             
@@ -119,6 +122,7 @@ export default class GameTickService extends EventEmitter {
         this.carrierMovementService = carrierMovementService;
         this.carrierGiftService = carrierGiftService;
         this.starContestedService = starContestedService;
+        this.playerReadyService = playerReadyService;
     }
 
     async tick(gameId: DBObjectId) {
@@ -223,7 +227,7 @@ export default class GameTickService extends EventEmitter {
             }
         }
 
-        this.playerService.resetReadyStatuses(game, hasProductionTicked);
+        this.playerReadyService.resetReadyStatuses(game, hasProductionTicked);
 
         await game.save();
         logTime('Save game');

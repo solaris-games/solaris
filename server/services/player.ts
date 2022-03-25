@@ -1,9 +1,7 @@
 const mongoose = require('mongoose');
 const moment = require('moment');
 const EventEmitter = require('events');
-import ValidationError from '../errors/validation';
 import DatabaseRepository from '../models/DatabaseRepository';
-import { Carrier } from '../types/Carrier';
 import { DBObjectId } from '../types/DBObjectId';
 import { Game } from '../types/Game';
 import { Location } from '../types/Location';
@@ -12,7 +10,7 @@ import { Star } from '../types/Star';
 import CarrierService from './carrier';
 import GameTypeService from './gameType';
 import MapService from './map';
-import PlayerCreditsService from './playerCredits';
+import PlayerReadyService from './playerReady';
 import RandomService from './random';
 import SpecialistService from './specialist';
 import StarService from './star';
@@ -29,6 +27,7 @@ export default class PlayerService extends EventEmitter {
     technologyService: TechnologyService;
     specialistService: SpecialistService;
     gameTypeService: GameTypeService;
+    playerReadyService: PlayerReadyService;
 
     constructor(
         gameRepo: DatabaseRepository<Game>,
@@ -39,7 +38,8 @@ export default class PlayerService extends EventEmitter {
         starDistanceService: StarDistanceService,
         technologyService: TechnologyService,
         specialistService: SpecialistService,
-        gameTypeService: GameTypeService
+        gameTypeService: GameTypeService,
+        playerReadyService: PlayerReadyService
     ) {
         super();
 
@@ -51,7 +51,8 @@ export default class PlayerService extends EventEmitter {
         this.starDistanceService = starDistanceService;
         this.technologyService = technologyService;
         this.specialistService = specialistService;
-        this.gameTypeService = gameTypeService
+        this.gameTypeService = gameTypeService;
+        this.playerReadyService = playerReadyService;
     }
 
     getById(game: Game, playerId: DBObjectId) {
@@ -464,101 +465,6 @@ export default class PlayerService extends EventEmitter {
         };
     }
 
-    async declareReady(game: Game, player: Player) {
-        player.ready = true;
-
-        await this.gameRepo.updateOne({
-            _id: game._id,
-            'galaxy.players._id': player._id
-        }, {
-            $set: {
-                'galaxy.players.$.ready': true
-            }
-        });
-
-        this.emit('onGamePlayerReady', {
-            gameId: game._id,
-            gameTick: game.state.tick,
-        });
-    }
-
-    async declareReadyToCycle(game: Game, player: Player) {
-        player.ready = true;
-        player.readyToCycle = true;
-
-        await this.gameRepo.updateOne({
-            _id: game._id,
-            'galaxy.players._id': player._id
-        }, {
-            $set: {
-                'galaxy.players.$.ready': true,
-                'galaxy.players.$.readyToCycle': true
-            }
-        });
-
-        this.emit('onGamePlayerReady', {
-            gameId: game._id,
-            gameTick: game.state.tick,
-        });
-    }
-
-    async undeclareReady(game: Game, player: Player) {
-        player.ready = false;
-        player.readyToCycle = false;
-
-        await this.gameRepo.updateOne({
-            _id: game._id,
-            'galaxy.players._id': player._id
-        }, {
-            $set: {
-                'galaxy.players.$.ready': false,
-                'galaxy.players.$.readyToCycle': false
-            }
-        });
-    }
-
-    async declareReadyToQuit(game: Game, player: Player, force: boolean = false) {
-        if (!force && game.state.productionTick <= 0) {
-            throw new ValidationError('Cannot declare ready to quit until at least 1 production cycle has completed.');
-        }
-
-        if (!force && this.gameTypeService.isTutorialGame(game)) {
-            throw new ValidationError('Cannot declare ready to quit in a tutorial.');
-        }
-
-        player.readyToQuit = true;
-
-        await this.gameRepo.updateOne({
-            _id: game._id,
-            'galaxy.players._id': player._id
-        }, {
-            $set: {
-                'galaxy.players.$.readyToQuit': true
-            }
-        });
-    }
-
-    async undeclareReadyToQuit(game: Game, player: Player) {
-        if (game.state.productionTick <= 0) {
-            throw new ValidationError('Cannot undeclare ready to quit until at least 1 production cycle has completed.');
-        }
-
-        if (this.gameTypeService.isTutorialGame(game)) {
-            throw new ValidationError('Cannot undeclare ready to quit in a tutorial.');
-        }
-
-        player.readyToQuit = false;
-
-        await this.gameRepo.updateOne({
-            _id: game._id,
-            'galaxy.players._id': player._id
-        }, {
-            $set: {
-                'galaxy.players.$.readyToQuit': false
-            }
-        });
-    }
-
     async getGameNotes(game: Game, player: Player) {
         return player.notes;
     }
@@ -613,29 +519,6 @@ export default class PlayerService extends EventEmitter {
             else {
                 // Reset the missed turns if the player was ready, we'll kick the player if they have missed consecutive turns only.
                 player.missedTurns = 0;
-            }
-        }
-    }
-
-    resetReadyStatuses(game: Game, hasProductionTicked: boolean) {
-        for (let player of game.galaxy.players) {
-            // Reset whether we have sent the player a turn reminder.
-            player.hasSentTurnReminder = false;
-
-            // Reset the ready status for players who have a legit user.
-            // Accounts could be deleted, could be a tutorial etc.
-            if (player.userId == null) {
-                player.ready = true;
-                player.readyToCycle = true;
-            }
-            // If the player hasn't ready to cycled then standard procedure applies.
-            else if (!player.readyToCycle) {
-                player.ready = false;
-            }
-            // Otherwise if they have ready to cycled then reset only if a production cycle has occurred.
-            else if (player.readyToCycle && hasProductionTicked) {
-                player.ready = false;
-                player.readyToCycle = false;
             }
         }
     }

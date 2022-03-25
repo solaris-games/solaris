@@ -16,6 +16,7 @@ import PlayerService from './player';
 import StarService from './star';
 import UserService from './user';
 import ConversationService from './conversation';
+import PlayerReadyService from './playerReady';
 
 export default class GameService extends EventEmitter {
     gameRepo: DatabaseRepository<Game>;
@@ -29,6 +30,7 @@ export default class GameService extends EventEmitter {
     gameTypeService: GameTypeService;
     gameStateService: GameStateService;
     conversationService: ConversationService;
+    playerReadyService: PlayerReadyService;
 
     constructor(
         gameRepo: DatabaseRepository<Game>,
@@ -41,7 +43,8 @@ export default class GameService extends EventEmitter {
         avatarService: AvatarService,
         gameTypeService: GameTypeService,
         gameStateService: GameStateService,
-        conversationService: ConversationService
+        conversationService: ConversationService,
+        playerReadyService: PlayerReadyService
     ) {
         super();
         
@@ -56,6 +59,7 @@ export default class GameService extends EventEmitter {
         this.gameTypeService = gameTypeService;
         this.gameStateService = gameStateService;
         this.conversationService = conversationService;
+        this.playerReadyService = playerReadyService;
     }
 
     async getByIdAll(id: DBObjectId) {
@@ -583,7 +587,7 @@ export default class GameService extends EventEmitter {
         let undefeatedPlayers = this.listAllUndefeatedPlayers(game);
 
         for (let player of undefeatedPlayers) {
-            await this.playerService.declareReadyToQuit(game, player, true);
+            await this.playerReadyService.declareReadyToQuit(game, player, true);
         }
     }
     
