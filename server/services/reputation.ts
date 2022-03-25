@@ -80,11 +80,11 @@ export default class ReputationService extends EventEmitter {
         return rep;
     }
 
-    async decreaseReputation(game: Game, fromPlayer: Player, toPlayer: Player, resetReputationAboveZero: boolean = false, updateDatabase: boolean = true) {
+    async decreaseReputation(game: Game, fromPlayer: Player, toPlayer: Player, updateDatabase: boolean = true) {
         let rep = this.getReputation(fromPlayer, toPlayer);
 
         if (rep.reputation.score > MIN_REPUTATION) {
-            if (resetReputationAboveZero && rep.reputation.score > 0) {
+            if (rep.reputation.score > 0) {
                 rep.reputation.score = 0;
             } else {
                 rep.reputation.score -= REPUTATION_INCREMENT;
@@ -106,6 +106,8 @@ export default class ReputationService extends EventEmitter {
             this.diplomacyService.getDiplomaticStatusToPlayer(game, fromPlayer._id, toPlayer._id).actualStatus === 'neutral') {
             this.diplomacyService.declareEnemy(game, fromPlayer._id, toPlayer._id, false);
         }
+
+        return rep;
     }
 
     async _updateReputation(game: Game, fromPlayer: Player, toPlayer: Player, reputation: PlayerReputation, isNew: boolean) {

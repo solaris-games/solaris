@@ -371,8 +371,8 @@ export default class CombatService extends EventEmitter {
         // Deduct reputation for all attackers that the defender is fighting and vice versa.
         for (let defenderPlayer of defenders) {
             for (let attackerPlayer of attackers) {
-                await this.reputationService.decreaseReputation(game, attackerPlayer, defenderPlayer, true, false);
-                await this.reputationService.decreaseReputation(game, defenderPlayer, attackerPlayer, true, false);
+                await this.reputationService.decreaseReputation(game, attackerPlayer, defenderPlayer, false);
+                await this.reputationService.decreaseReputation(game, defenderPlayer, attackerPlayer, false);
             }
         }
 
