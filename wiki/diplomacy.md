@@ -8,9 +8,18 @@ It may prove to be useful to become the sole player who has a large technology l
 
 Be aware that other players may be plotting to destroy your empire, especially if you have a lead or are relatively weak. Remember to keep communications open and your borders protected from unwanted aggression.
 
+## Diplomatic Statuses
+
+
 ## Alliances
 
-Your diplomatic status to other players can be changed in the **Menu -> Diplomacy** (hotkey D) screen. If both you and another player set each other to **allied** then you both will receive the following benefits:
+Your diplomatic status to other players can be changed in the **Menu -> Diplomacy** (hotkey D) screen. The diplomatic statuses are:
+
+- **Neutral** - Default state - If combat occurs then war will be declared.
+- **Allies** - Allies have more benefits compared to neutral players, more information below.
+- **Enemies** - At war.
+
+If both you and another player set each other to **allies** then you both will receive the following benefits:
 
 - You may visit allied stars.
 - When in orbit at an allied star, your scanning range will take effect.

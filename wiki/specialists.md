@@ -6,6 +6,10 @@ Specialists can provide any number of modifiers to a star or carrier's statistic
 
 By default, specialists require specialist tokens. You can change this setting to make specialists require credits instead.
 
+### Specialist Monthly Bans
+
+In **official games**, 3 specialists are banned from each pool (star and carrier), this resets on the 1st of every month. Check the game settings before joining an official game to see which specialists are banned and adapt your strategy and tactical play to gain an edge.
+
 ## Star Specialists
 
 | Icon                                                                                                                                   | Specialist Name          | Effect     | Tokens  | Credits |
@@ -37,7 +41,7 @@ By default, specialists require specialist tokens. You can change this setting t
 | <img src="https://raw.githubusercontent.com/mike-eason/solaris/master/client/src/assets/specialists/lunar-module.svg" width="60">                   | **Explorer**        | Grants +3 Hyperspace Range, x1.5 Speed, -3 Weapons to the carrier. | 3 | $300
 | <img src="https://raw.githubusercontent.com/mike-eason/solaris/master/client/src/assets/specialists/power-generator.svg" width="60">                | **Scrambler**       | Prevents other players from seeing how many ships the carrier has. | 3 | $300
 | <img src="https://raw.githubusercontent.com/mike-eason/solaris/master/client/src/assets/specialists/energise.svg" width="60">                       | **Infiltrator**     | When participating in combat, the enemies fight with -1 Weapons. | 3 | $300
-| <img src="https://raw.githubusercontent.com/mike-eason/solaris/master/client/src/assets/specialists/rocket.svg" width="60">                         | **Stellar Bomb**    | Reignites a dead star with 25 Natural Resources, the Stellar Bomb will be destroyed but the carrier will survive. x0.5 Speed. | 3 | $300
+| <img src="https://raw.githubusercontent.com/mike-eason/solaris/master/client/src/assets/specialists/rocket.svg" width="60">                         | **Stellar Bomb**    | Reignites a dead star with 25 Natural Resources (x2 for Binary Stars), the Stellar Bomb will be destroyed but the carrier will survive. x0.5 Speed. | 3 | $300
 | <img src="https://raw.githubusercontent.com/mike-eason/solaris/master/client/src/assets/specialists/hazmat-suit.svg" width="60">                    | **General**         | Grants +3 Weapons, -1 Hyperspace Range, x0.5 Speed to the carrier. | 5 | $500
 | <img src="https://raw.githubusercontent.com/mike-eason/solaris/master/client/src/assets/specialists/cyborg-face.svg" width="60">                    | **Smuggler**        | Grants x2 Speed, -1 Hyperspace Range, -1 Weapons to the carrier. | 5 | $500
 | <img src="https://raw.githubusercontent.com/mike-eason/solaris/master/client/src/assets/specialists/afterburn.svg" width="60">                      | **Warp Stabilizer** | Warp Scramblers do not affect the carrier. | 5 | $500
