@@ -237,11 +237,15 @@ export default class GuildService {
     }
 
     async rename(userId: DBObjectId, newName: string, newTag: string) {
-        let guild = await this.detail(userId);
+        let user = await this.userService.getById(userId, {
+            guildId: 1
+        });
 
-        if (!guild) {
+        if (!user!.guildId) {
             throw new ValidationError('You are not a member of a guild.');
         }
+
+        let guild = await this.detail(user!.guildId!);
 
         let isLeader = this._isLeader(guild, userId);
 
