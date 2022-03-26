@@ -214,6 +214,10 @@ export default class GuildService {
             throw new ValidationError(`A guild with the same name or tag already exists.`);
         }
 
+        // Remove all invites and applications to this user for any guild.
+        await this.declineAllInvitations(userId);
+        await this.withdrawAllApplications(userId);
+
         let guild = new this.guildModel();
 
         guild.leader = userId;
