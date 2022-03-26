@@ -25,6 +25,7 @@ import TradeService from "./trade";
 import { GameEvent } from "../types/GameEvent";
 import DiplomacyService from "./diplomacy";
 import { DiplomaticStatus } from "../types/Diplomacy";
+import CarrierGiftService from "./carrierGift";
 
 const moment = require('moment');
 
@@ -84,7 +85,7 @@ export default class EventService {
     combatService: CombatService;
     specialistService: SpecialistService
     badgeService: BadgeService;
-    carrierService: CarrierService;
+    carrierGiftService: CarrierGiftService;
     diplomacyService: DiplomacyService;
 
     constructor(
@@ -102,7 +103,7 @@ export default class EventService {
         combatService: CombatService,
         specialistService: SpecialistService,
         badgeService: BadgeService,
-        carrierService: CarrierService,
+        carrierGiftService: CarrierGiftService,
         diplomacyService: DiplomacyService
     ) {
         this.eventModel = eventModel;
@@ -119,7 +120,7 @@ export default class EventService {
         this.combatService = combatService;
         this.specialistService = specialistService;
         this.badgeService = badgeService;
-        this.carrierService = carrierService;
+        this.carrierGiftService = carrierGiftService;
         this.diplomacyService = diplomacyService;
 
         this.gameService.on('onGameDeleted', (args) => this.deleteByGameId(args.gameId));
@@ -160,8 +161,8 @@ export default class EventService {
         this.tradeService.on('onPlayerTechnologyReceived', (args) => this.createTechnologyReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.technology));
         this.tradeService.on('onPlayerTechnologySent', (args) => this.createTechnologySentEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.technology));
 
-        this.carrierService.on('onPlayerGiftReceived', (args) => this.createGiftReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.carrier, args.star));
-        this.carrierService.on('onPlayerGiftSent', (args) => this.createGiftSentEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.carrier, args.star));
+        this.carrierGiftService.on('onPlayerGiftReceived', (args) => this.createGiftReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.carrier, args.star));
+        this.carrierGiftService.on('onPlayerGiftSent', (args) => this.createGiftSentEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.carrier, args.star));
 
         this.ledgerService.on('onDebtAdded', (args) => this.createDebtAddedEvent(args.gameId, args.gameTick, args.debtor, args.creditor, args.amount));
         this.ledgerService.on('onDebtSettled', (args) => this.createDebtSettledEvent(args.gameId, args.gameTick, args.debtor, args.creditor, args.amount));

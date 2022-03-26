@@ -25,7 +25,7 @@ export default class CarrierGiftService extends EventEmitter {
     }
 
     async convertToGift(game: Game, player: Player, carrierId: DBObjectId) {
-        let carrier = this.getById(game, carrierId);
+        let carrier = game.galaxy.carriers.find(c => c._id.toString() === carrierId.toString())!;
 
         if (game.settings.specialGalaxy.giftCarriers === 'disabled') {
             throw new ValidationError(`Gifting carriers has been disabled in this game.`);
