@@ -1,7 +1,7 @@
 <template>
 <div>
   <p>
-    A galactic cycle is complete.
+    <strong>A galactic cycle has completed!</strong>
   </p>
 
   <p v-if="event.data.creditsEconomy || event.data.creditsBanking">

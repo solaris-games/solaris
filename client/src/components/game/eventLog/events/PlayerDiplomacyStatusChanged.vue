@@ -10,7 +10,7 @@
     <span :class="getDiplomaticStatusClass(event.data.statusTo)">{{event.data.statusTo}}</span>.
   </p>
   <p>
-    The combined diplomatic status is now: <span :class="getDiplomaticStatusClass(event.data.actualStatus)">{{event.data.actualStatus}}</span>
+    <small>The combined diplomatic status is now: <span :class="getDiplomaticStatusClass(event.data.actualStatus)">{{event.data.actualStatus}}</span></small>
   </p>
 </div>
 </template>
