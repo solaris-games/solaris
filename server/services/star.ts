@@ -32,7 +32,6 @@ export default class StarService extends EventEmitter {
         technologyService: TechnologyService,
         specialistService: SpecialistService,
         userService: UserService,
-        diplomacyService: DiplomacyService,
         gameTypeService: GameTypeService,
         gameStateService: GameStateService
     ) {
@@ -46,7 +45,6 @@ export default class StarService extends EventEmitter {
         this.technologyService = technologyService;
         this.specialistService = specialistService;
         this.userService = userService;
-        this.diplomacyService = diplomacyService;
         this.gameTypeService = gameTypeService;
         this.gameStateService = gameStateService;
     }
@@ -179,7 +177,7 @@ export default class StarService extends EventEmitter {
     listStarsWithScanningRangeByPlayer(game: Game, playerId: DBObjectId): Star[] {
         let starIds: string[] = this.listStarsOwnedByPlayer(game.galaxy.stars, playerId).map(s => s._id.toString());
 
-        if (game.settings.alliances.enabled === 'enabled') { // This never occurs when alliances is disabled.
+        if (game.settings.diplomacy.enabled === 'enabled') { // This never occurs when alliances is disabled.
             starIds = starIds.concat(this.listStarIdsWithPlayerCarriersInOrbit(game, playerId));
         }
 
@@ -193,7 +191,7 @@ export default class StarService extends EventEmitter {
     listStarsOwnedOrInOrbitByPlayer(game: Game, playerId: DBObjectId): Star[] {
         let starIds: string[] = this.listStarsOwnedByPlayer(game.galaxy.stars, playerId).map(s => s._id.toString());
 
-        if (game.settings.alliances.enabled === 'enabled') { // Don't need to check in orbit carriers if alliances is disabled
+        if (game.settings.diplomacy.enabled === 'enabled') { // Don't need to check in orbit carriers if alliances is disabled
             starIds = starIds.concat(this.listStarIdsWithPlayerCarriersInOrbit(game, playerId));
         }
 
@@ -396,61 +394,6 @@ export default class StarService extends EventEmitter {
             player,
             star
         });
-    }
-
-    canTravelAtWarpSpeed(game: Game, player: Player, carrier: Carrier, sourceStar: Star, destinationStar: Star) {
-        // Double check for destroyed stars.
-        if (sourceStar == null || destinationStar == null) {
-            return false;
-        }
-
-        // If both stars have warp gates and they are both owned by players...
-        if (sourceStar.warpGate && destinationStar.warpGate && sourceStar.ownedByPlayerId && destinationStar.ownedByPlayerId) {
-            // If both stars are owned by the player or by allies then carriers can always move at warp.
-            let sourceAllied = sourceStar.ownedByPlayerId.toString() === carrier.ownedByPlayerId!.toString() || (this.diplomacyService.isFormalAlliancesEnabled(game) && this.diplomacyService.isDiplomaticStatusToPlayersAllied(game, sourceStar.ownedByPlayerId, [carrier.ownedByPlayerId]));
-            let desinationAllied = destinationStar.ownedByPlayerId.toString() === carrier.ownedByPlayerId!.toString() || (this.diplomacyService.isFormalAlliancesEnabled(game) && this.diplomacyService.isDiplomaticStatusToPlayersAllied(game, destinationStar.ownedByPlayerId, [carrier.ownedByPlayerId]));
-
-            // If both stars are owned by the player then carriers can always move at warp.
-            if (sourceAllied && desinationAllied) {
-                return true;
-            }
-
-            // If one of the stars are not owned by the current player then we need to check for
-            // warp scramblers.
-
-            // But if the carrier has the warp stabilizer specialist then it can travel at warp speed no matter
-            // which player it belongs to or whether the stars it is travelling to or from have locked warp gates.
-            if (carrier.specialistId) {
-                let carrierSpecialist = this.specialistService.getByIdCarrier(carrier.specialistId);
-
-                if (carrierSpecialist.modifiers.special && carrierSpecialist.modifiers.special.unlockWarpGates) {
-                    return true;
-                }
-            }
-
-            // If either star has a warp scrambler present then carriers cannot move at warp.
-            // Note that we only need to check for scramblers on stars that do not belong to the player.
-            if (!sourceAllied && sourceStar.specialistId) {
-                let specialist = this.specialistService.getByIdStar(sourceStar.specialistId);
-
-                if (specialist.modifiers.special && specialist.modifiers.special.lockWarpGates) {
-                    return false;
-                }
-            }
-
-            if (!desinationAllied && destinationStar.specialistId) {
-                let specialist = this.specialistService.getByIdStar(destinationStar.specialistId);
-
-                if (specialist.modifiers.special && specialist.modifiers.special.lockWarpGates) {
-                    return false;
-                }
-            }
-
-            // If none of the stars have scramblers then warp speed ahead.
-            return true;
-        }
-
-        return false;
     }
 
     isStarPairWormHole(sourceStar: Star, destinationStar: Star) {
@@ -779,45 +722,6 @@ export default class StarService extends EventEmitter {
 
     listHomeStars(game: Game) {
         return game.galaxy.stars.filter(s => s.homeStar);
-    }
-
-    listContestedStars(game: Game) {
-        return game.galaxy.stars
-            .filter(s => s.ownedByPlayerId)
-            .map(s => {
-                // Calculate other players in orbit of the star
-                let carriersInOrbit = game.galaxy.carriers.filter(c => c.orbiting && c.orbiting.toString() === s._id.toString());
-                let otherPlayerIdsInOrbit = [...new Set(carriersInOrbit.map(c => c.ownedByPlayerId!))];
-
-                if (otherPlayerIdsInOrbit.indexOf(s.ownedByPlayerId!) > -1) {
-                    otherPlayerIdsInOrbit.splice(otherPlayerIdsInOrbit.indexOf(s.ownedByPlayerId!), 1); // Remove the star owner as we don't need it here.
-                }
-
-                return {
-                    star: s,
-                    carriersInOrbit,
-                    otherPlayerIdsInOrbit
-                };
-            })
-            .filter(x => {
-                // Filter stars where there are other players in orbit and those players are not allied with the star owner.
-                return x.otherPlayerIdsInOrbit.length
-                    && !this.diplomacyService.isDiplomaticStatusToPlayersAllied(game, x.star.ownedByPlayerId, x.otherPlayerIdsInOrbit);
-            });
-    }
-
-    listContestedUnownedStars(game: Game) {
-        return game.galaxy.stars
-            .filter(s => s.ownedByPlayerId == null)
-            .map(s => {
-                let carriersInOrbit = game.galaxy.carriers.filter(c => c.orbiting && c.orbiting.toString() === s._id.toString());
-
-                return {
-                    star: s,
-                    carriersInOrbit
-                };
-            })
-            .filter(x => x.carriersInOrbit.length);
     }
 
     getKingOfTheHillStar(game: Game) {

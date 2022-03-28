@@ -26,6 +26,12 @@ import WaypointService from "./waypoint";
 import { CarrierActionWaypoint } from "../types/GameTick";
 import { Star } from "../types/Star";
 import { GameRankingResult } from "../types/Rating";
+import DiplomacyUpkeepService from "./diplomacyUpkeep";
+import CarrierGiftService from "./carrierGift";
+import CarrierMovementService from "./carrierMovement";
+import PlayerCycleRewardsService from "./playerCycleRewards";
+import StarContestedService from "./starContested";
+import PlayerReadyService from "./playerReady";
 
 const EventEmitter = require('events');
 const moment = require('moment');
@@ -52,6 +58,12 @@ export default class GameTickService extends EventEmitter {
     diplomacyService: DiplomacyService;
     gameTypeService: GameTypeService;
     gameStateService: GameStateService;
+    playerCycleRewardsService: PlayerCycleRewardsService;
+    diplomacyUpkeepService: DiplomacyUpkeepService;
+    carrierMovementService: CarrierMovementService;
+    carrierGiftService: CarrierGiftService;
+    starContestedService: StarContestedService;
+    playerReadyService: PlayerReadyService;
     
     constructor(
         distanceService: DistanceService,
@@ -74,7 +86,13 @@ export default class GameTickService extends EventEmitter {
         orbitalMechanicsService: OrbitalMechanicsService,
         diplomacyService: DiplomacyService,
         gameTypeService: GameTypeService,
-        gameStateService: GameStateService
+        gameStateService: GameStateService,
+        playerCycleRewardsService: PlayerCycleRewardsService,
+        diplomacyUpkeepService: DiplomacyUpkeepService,
+        carrierMovementService: CarrierMovementService,
+        carrierGiftService: CarrierGiftService,
+        starContestedService: StarContestedService,
+        playerReadyService: PlayerReadyService
     ) {
         super();
             
@@ -99,6 +117,12 @@ export default class GameTickService extends EventEmitter {
         this.diplomacyService = diplomacyService;
         this.gameTypeService = gameTypeService;
         this.gameStateService = gameStateService;
+        this.playerCycleRewardsService = playerCycleRewardsService;
+        this.diplomacyUpkeepService = diplomacyUpkeepService;
+        this.carrierMovementService = carrierMovementService;
+        this.carrierGiftService = carrierGiftService;
+        this.starContestedService = starContestedService;
+        this.playerReadyService = playerReadyService;
     }
 
     async tick(gameId: DBObjectId) {
@@ -126,7 +150,7 @@ export default class GameTickService extends EventEmitter {
         let taskTime = process.hrtime();
         let taskTimeEnd: [number, number] | null = null;
 
-        let logTime = (taskName) => {
+        let logTime = (taskName: string) => {
             taskTimeEnd = process.hrtime(taskTime);
             taskTime = process.hrtime();
             console.info(`[${game.settings.general.name}] - ${taskName}: %ds %dms'`, taskTimeEnd[0], taskTimeEnd[1] / 1000000);
@@ -203,7 +227,7 @@ export default class GameTickService extends EventEmitter {
             }
         }
 
-        this.playerService.resetReadyStatuses(game, hasProductionTicked);
+        this.playerReadyService.resetReadyStatuses(game, hasProductionTicked);
 
         await game.save();
         logTime('Save game');
@@ -269,12 +293,12 @@ export default class GameTickService extends EventEmitter {
         // and where they will be moving to.
         let carrierPositions: CarrierPosition[] = game.galaxy.carriers
             .filter(x => 
-                this.carrierService.isInTransit(x)           // Carrier is already in transit
-                || this.carrierService.isLaunching(x)        // Or the carrier is just about to launch (this prevent carrier from hopping over attackers)
+                this.carrierMovementService.isInTransit(x)           // Carrier is already in transit
+                || this.carrierMovementService.isLaunching(x)        // Or the carrier is just about to launch (this prevent carrier from hopping over attackers)
             )
             .map(c => {
                 let waypoint = c.waypoints[0];
-                let locationNext = this.carrierService.getNextLocationToWaypoint(game, c);
+                let locationNext = this.carrierMovementService.getNextLocationToWaypoint(game, c);
 
                 let sourceStar = this.starService.getById(game, waypoint.source);
                 let destinationStar = this.starService.getById(game, waypoint.destination);
@@ -331,8 +355,8 @@ export default class GameTickService extends EventEmitter {
                 // First up, get all carriers that are heading from the destination and to the source
                 // and are in front of the carrier.
                 let collisionCarriers: CarrierPosition[] = positions
-                    .filter(c => {
-                        return (c.carrier.ships > 0 && !c.carrier.isGift) // Is still alive and not a gift
+                    .filter((c: CarrierPosition) => {
+                        return (c.carrier.ships! > 0 && !c.carrier.isGift) // Is still alive and not a gift
                             && (
                                 // Head to head combat:
                                 (
@@ -366,7 +390,7 @@ export default class GameTickService extends EventEmitter {
                     continue;
                 }
 
-                let friendlyPlayer = this.playerService.getById(game, friendlyCarrier.carrier.ownedByPlayerId);
+                let friendlyPlayer = this.playerService.getById(game, friendlyCarrier.carrier.ownedByPlayerId)!;
                 
                 let combatCarriers = collisionCarriers
                     .map(c => c.carrier)
@@ -477,7 +501,7 @@ export default class GameTickService extends EventEmitter {
         for (let i = 0; i < carriersInTransit.length; i++) {
             let carrierInTransit = carriersInTransit[i];
         
-            let carrierMovementReport = await this.carrierService.moveCarrier(game, gameUsers, carrierInTransit);
+            let carrierMovementReport = await this.carrierMovementService.moveCarrier(game, gameUsers, carrierInTransit);
 
             // If the carrier has arrived at the star then
             // append the movement waypoint to the array of action waypoints so that we can deal with it after combat.
@@ -502,7 +526,7 @@ export default class GameTickService extends EventEmitter {
             // Get all carriers orbiting the star and perform combat.
             let carriersAtStar = game.galaxy.carriers.filter(c => c.orbiting && c.orbiting.toString() === combatStar._id.toString());
 
-            let starOwningPlayer = this.playerService.getById(game, combatStar.ownedByPlayerId);
+            let starOwningPlayer = this.playerService.getById(game, combatStar.ownedByPlayerId!)!;
 
             await this.combatService.performCombat(game, gameUsers, starOwningPlayer, combatStar, carriersAtStar);
         }
@@ -533,12 +557,12 @@ export default class GameTickService extends EventEmitter {
 
         // Check for scenario where a player changes diplomatic status to another player.
         // Perform combat at contested stars.
-        let contestedStars = this.starService.listContestedStars(game);
+        let contestedStars = this.starContestedService.listContestedStars(game);
 
         for (let i = 0; i < contestedStars.length; i++) {
             let contestedStar = contestedStars[i];
 
-            let starOwningPlayer = this.playerService.getById(game, contestedStar.star.ownedByPlayerId);
+            let starOwningPlayer = this.playerService.getById(game, contestedStar.star.ownedByPlayerId!)!;
 
             await this.combatService.performCombat(game, gameUsers, starOwningPlayer, contestedStar.star, contestedStar.carriersInOrbit);
         }
@@ -551,14 +575,14 @@ export default class GameTickService extends EventEmitter {
             return;
         }
 
-        let contestedAbandonedStars = this.starService.listContestedUnownedStars(game);
+        let contestedAbandonedStars = this.starContestedService.listContestedUnownedStars(game);
 
         for (let i = 0; i < contestedAbandonedStars.length; i++) {
             let contestedStar = contestedAbandonedStars[i];
 
             // The player who owns the carrier with the most ships will capture the star.
             let carrier = contestedStar.carriersInOrbit
-                .sort((a, b) => b.ships! - a.ships!)[0];
+                .sort((a: Carrier, b: Carrier) => b.ships! - a.ships!)[0];
 
             this.starService.claimUnownedStar(game, gameUsers, contestedStar.star, carrier);
         }
@@ -582,10 +606,17 @@ export default class GameTickService extends EventEmitter {
             // Conduct experiments.
             for (let i = 0; i < game.galaxy.players.length; i++) {
                 let player = game.galaxy.players[i];
-
-                let creditsResult = this.playerService.givePlayerCreditsEndOfCycleRewards(game, player);
+                
+                let creditsResult = this.playerCycleRewardsService.givePlayerCreditsEndOfCycleRewards(game, player);
                 let experimentResult = this.researchService.conductExperiments(game, player);
                 let carrierUpkeepResult = this.playerService.deductCarrierUpkeepCost(game, player);
+                let allianceUpkeepResult: any | null = null; // TODO: Type
+
+                if (this.diplomacyUpkeepService.isAllianceUpkeepEnabled(game)) {
+                    let allianceCount = this.diplomacyService.getAlliesOfPlayer(game, player).length;
+                    
+                    allianceUpkeepResult = this.diplomacyUpkeepService.deductTotalUpkeep(game, player, creditsResult.creditsFromBanking, allianceCount); // TODO: creditsTotal?
+                }
 
                 // Raise an event if the player isn't defeated, AI doesn't care about events.
                 if (!player.defeated) {
@@ -601,7 +632,8 @@ export default class GameTickService extends EventEmitter {
                         experimentAmount: experimentResult.amount,
                         experimentLevelUp: experimentResult.levelUp,
                         experimentResearchingNext: experimentResult.researchingNext,
-                        carrierUpkeep: carrierUpkeepResult
+                        carrierUpkeep: carrierUpkeepResult,
+                        allianceUpkeep: allianceUpkeepResult
                     });
                 }
             }
@@ -769,7 +801,7 @@ export default class GameTickService extends EventEmitter {
         for (let carrier of carriers) {
             const star = this.starService.getById(game, carrier.orbiting!);
 
-            this.carrierService.transferGift(game, gameUsers, star, carrier);
+            this.carrierGiftService.transferGift(game, gameUsers, star, carrier);
         }
     }
 }

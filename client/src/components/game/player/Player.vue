@@ -66,7 +66,6 @@ import Achievements from './Achievements'
 import SendRenown from './SendRenown'
 import PlayerBadges from '../badges/PlayerBadges'
 import Reputation from './Reputation'
-import PlayerTradeVue from './PlayerTrade'
 import EloRating from './EloRating'
 import PlayerReport from './PlayerReport'
 import gameService from '../../../services/api/game'
@@ -85,7 +84,6 @@ export default {
     'sendRenown': SendRenown,
     'player-badges': PlayerBadges,
     'reputation': Reputation,
-    'player-trade': PlayerTradeVue,
     'elo-rating': EloRating,
     'player-report': PlayerReport
   },

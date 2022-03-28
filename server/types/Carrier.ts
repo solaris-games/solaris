@@ -26,7 +26,7 @@ export interface CarrierPosition {
     source: DBObjectId;
     destination: DBObjectId;
     locationCurrent: Location;
-    locationNext: DBObjectId;
+    locationNext: Location;
     distanceToSourceCurrent: number;
     distanceToDestinationCurrent: number;
     distanceToSourceNext: number;

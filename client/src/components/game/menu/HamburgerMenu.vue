@@ -44,6 +44,7 @@
 
 <script>
 import GameHelper from '../../../services/gameHelper'
+import DiplomacyHelper from '../../../services/diplomacyHelper'
 import router from '../../../router'
 import MENU_STATES from '../../data/menuStates'
 import GameContainer from '../../../game/container'
@@ -122,7 +123,7 @@ export default {
       return process.env.VUE_APP_DOCUMENTATION_URL
     },
     isFormalAlliancesEnabled () {
-      return GameHelper.isFormalAlliancesEnabled(this.$store.state.game)
+      return DiplomacyHelper.isFormalAlliancesEnabled(this.$store.state.game)
     },
     isTradeEnabled () {
       return GameHelper.isTradeEnabled(this.$store.state.game)

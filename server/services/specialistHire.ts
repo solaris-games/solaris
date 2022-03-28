@@ -5,20 +5,20 @@ import { Player } from "../types/Player";
 import { Specialist } from "../types/Specialist";
 import AchievementService from "./achievement";
 import GameTypeService from "./gameType";
-import PlayerService from "./player";
 import SpecialistService from "./specialist";
 import StarService from "./star";
 import WaypointService from "./waypoint";
 
 import ValidationError from "../errors/validation";
 import SpecialistBanService from "./specialistBan";
+import PlayerCreditsService from "./playerCredits";
 
 export default class SpecialistHireService {
     gameRepo: DatabaseRepository<Game>;
     specialistService: SpecialistService;
     achievementService: AchievementService;
     waypointService: WaypointService;
-    playerService: PlayerService;
+    playerCreditsService: PlayerCreditsService;
     starService: StarService;
     gameTypeService: GameTypeService;
     specialistBanService: SpecialistBanService;
@@ -28,7 +28,7 @@ export default class SpecialistHireService {
         specialistService: SpecialistService,
         achievementService: AchievementService,
         waypointService: WaypointService,
-        playerService: PlayerService,
+        playerCreditsService: PlayerCreditsService,
         starService: StarService,
         gameTypeService: GameTypeService,
         specialistBanService: SpecialistBanService
@@ -37,7 +37,7 @@ export default class SpecialistHireService {
         this.specialistService = specialistService;
         this.achievementService = achievementService;
         this.waypointService = waypointService;
-        this.playerService = playerService;
+        this.playerCreditsService = playerCreditsService;
         this.starService = starService;
         this.gameTypeService = gameTypeService;
         this.specialistBanService = specialistBanService;
@@ -231,11 +231,11 @@ export default class SpecialistHireService {
             case 'credits':
                 player.credits -= cost.credits;
 
-                return await this.playerService.addCredits(game, player, -cost.credits, false);
+                return await this.playerCreditsService.addCredits(game, player, -cost.credits, false);
             case 'creditsSpecialists':
                 player.creditsSpecialists -= cost.creditsSpecialists;
 
-                return await this.playerService.addCreditsSpecialists(game, player, -cost.creditsSpecialists, false);
+                return await this.playerCreditsService.addCreditsSpecialists(game, player, -cost.creditsSpecialists, false);
             default:
                 throw new Error(`Unsupported specialist currency type: ${game.settings.specialGalaxy.specialistsCurrency}`);
         }

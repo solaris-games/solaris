@@ -201,7 +201,7 @@ export default (router: Router, io, container: DependencyContainer) => {
 
     router.put('/api/game/:gameId/ready', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
-            await container.playerService.declareReady(
+            await container.playerReadyService.declareReady(
                 req.game,
                 req.player);
             
@@ -215,7 +215,7 @@ export default (router: Router, io, container: DependencyContainer) => {
 
     router.put('/api/game/:gameId/readytocycle', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
-            await container.playerService.declareReadyToCycle(
+            await container.playerReadyService.declareReadyToCycle(
                 req.game,
                 req.player);
             
@@ -229,7 +229,7 @@ export default (router: Router, io, container: DependencyContainer) => {
 
     router.put('/api/game/:gameId/notready', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
-            await container.playerService.undeclareReady(
+            await container.playerReadyService.undeclareReady(
                 req.game,
                 req.player);
 
@@ -243,7 +243,7 @@ export default (router: Router, io, container: DependencyContainer) => {
 
     router.put('/api/game/:gameId/readyToQuit', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
-            await container.playerService.declareReadyToQuit(
+            await container.playerReadyService.declareReadyToQuit(
                 req.game,
                 req.player);
             
@@ -257,7 +257,7 @@ export default (router: Router, io, container: DependencyContainer) => {
 
     router.put('/api/game/:gameId/notReadyToQuit', middleware.authenticate, middleware.loadGame, middleware.validateGameLocked, middleware.loadPlayer, middleware.validateUndefeatedPlayer, async (req, res, next) => {
         try {
-            await container.playerService.undeclareReadyToQuit(
+            await container.playerReadyService.undeclareReadyToQuit(
                 req.game,
                 req.player);
 

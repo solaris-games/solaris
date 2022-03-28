@@ -33,7 +33,7 @@ export default class CircularBalancedMapService {
         this.gameTypeService = gameTypeService;
     }
 
-    _generateStarPositionInSector(currentRadius: number, rng: any, playerCount: number) {
+    _generateStarPositionInSector(currentRadius: number, rng, playerCount: number) {
         const tau = 2.0*Math.PI;
         let angle = rng.random()*(tau/playerCount);
         //let angle = (tau/playerCount);
@@ -47,7 +47,7 @@ export default class CircularBalancedMapService {
         };
     }
 
-    _getRotatedLocation(location: Location, angle: number): any {
+    _getRotatedLocation(location: Location, angle: number) {
         return {
           x: Math.cos(angle)*location.x + Math.sin(angle)*location.y,
           y: Math.sin(angle)*-location.x + Math.cos(angle)*location.y,
@@ -58,7 +58,7 @@ export default class CircularBalancedMapService {
         };
     }
 
-    _moveLocationTowards(location: any, towards: any, minDistance: number) {
+    _moveLocationTowards(location, towards, minDistance: number) {
         let dx = towards.x - location.x;
         let dy = towards.y - location.y;
         let dist = this.distanceService.getDistanceBetweenLocations(location, towards);
@@ -68,7 +68,7 @@ export default class CircularBalancedMapService {
         location.y += dy*amount;
     }
 
-    generateLocations(game: any, starCount: number, resourceDistribution: GameResourceDistribution, playerCount: number): Location[] {
+    generateLocations(game, starCount: number, resourceDistribution: GameResourceDistribution, playerCount: number): Location[] {
         if (this.gameTypeService.isKingOfTheHillMode(game)) {
             throw new ValidationError(`King of the hill is not supported in circular balanced maps.`);
         }
@@ -211,7 +211,7 @@ export default class CircularBalancedMapService {
         return locations;
     }
 
-    isLocationTooCloseToOthers(game: any, location: Location, locations: Location[]): boolean {
+    isLocationTooCloseToOthers(game, location: Location, locations: Location[]): boolean {
         return locations.find(l => this.starDistanceService.isLocationTooClose(game, location, l)) != null;
     }
 

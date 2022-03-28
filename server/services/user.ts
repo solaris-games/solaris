@@ -15,12 +15,12 @@ function uuidv4(): string {
 }
 
 export default class UserService extends EventEmitter {
-    userModel: any;
+    userModel;
     userRepo: DatabaseRepository<User>;
     passwordService: PasswordService;
     
     constructor(
-        userModel: any,
+        userModel,
         userRepo: DatabaseRepository<User>,
         passwordService: PasswordService
     ) {
@@ -43,11 +43,11 @@ export default class UserService extends EventEmitter {
         });
     }
 
-    async getById(id: DBObjectId, select: any = null) {
+    async getById(id: DBObjectId, select: any | null = null) {
         return await this.userRepo.findById(id, select);
     }
 
-    async getByUsername(username: string, select: any = null) {
+    async getByUsername(username: string, select: any | null = null) {
         return await this.userRepo.findOne({
             username
         }, select);
@@ -385,7 +385,7 @@ export default class UserService extends EventEmitter {
         return user!.gameSettings;
     }
 
-    async saveGameSettings(userId: DBObjectId, settings: any) {
+    async saveGameSettings(userId: DBObjectId, settings) {
         if (+settings.carrier.defaultAmount < 0) {
             throw new ValidationError(`Carrier default amount must be greater than 0.`);
         }
@@ -424,13 +424,13 @@ export default class UserService extends EventEmitter {
         });
     }
 
-    async listUsersInGuild(guildId: DBObjectId, select: any = null) {
+    async listUsersInGuild(guildId: DBObjectId, select: any | null = null) {
         return await this.userRepo.find({
             guildId
         }, select);
     }
 
-    async listUsers(userIds: DBObjectId[], select: any = null) {
+    async listUsers(userIds: DBObjectId[], select: any | null = null) {
         return await this.userRepo.find({
             _id: {
                 $in: userIds

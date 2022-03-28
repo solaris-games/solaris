@@ -1,4 +1,5 @@
 import moment from 'moment'
+import DiplomacyHelper from './diplomacyHelper'
 
 class GameHelper {
   getUserPlayer (game) {
@@ -102,11 +103,11 @@ class GameHelper {
   getDistanceBetweenLocations (loc1, loc2) {
     return Math.hypot(loc2.x - loc1.x, loc2.y - loc1.y);
   }
-  
+
   getClosestStar (stars, point) {
     let closestStar = stars[0]
     let smallerDistance = Number.MAX_VALUE
-    
+
     for(let star of stars) {
       let distance = this.getDistanceBetweenLocations(star.location, point)
 
@@ -121,7 +122,7 @@ class GameHelper {
       distance: smallerDistance
     }
   }
-  
+
   getClosestPlayerStar (stars, point, player) {
     let closestStar = stars[0]
     let smallerDistance = Number.MAX_VALUE
@@ -130,7 +131,7 @@ class GameHelper {
 
     for(let star of playerStars) {
       let distance = this.getDistanceBetweenLocations(star.location, point)
-      
+
       if (distance < smallerDistance ) {
         smallerDistance = distance
         closestStar = star
@@ -212,7 +213,7 @@ class GameHelper {
     if (game == null) {
       return ''
     }
-    
+
     if (game.settings.gameTime.gameType === 'realTime') {
       let date = useNowDate ? moment().utc() : game.state.lastTickDate
 
@@ -273,7 +274,7 @@ class GameHelper {
 
   getCountdownTimeForProductionCycle (game) {
     const ticksToProduction = this.getTicksToProduction(game, game.state.tick, game.state.productionTick);
-    
+
     return this.calculateTimeByTicks(ticksToProduction, game.settings.gameTime.speed, game.state.lastTickDate);
   }
 
@@ -316,7 +317,7 @@ class GameHelper {
     if (!carrier.orbiting && carrier.waypoints[0]._id === waypoint._id) {
         source = carrier.location
     }
-    
+
     let distance = this.getDistanceBetweenLocations(source, destination)
     let warpSpeed = this.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar)
 
@@ -338,7 +339,7 @@ class GameHelper {
 
     for (let i = 0; i < carrier.waypoints.length; i++) {
         let cwaypoint = carrier.waypoints[i]
-        
+
         totalTicks += this.calculateWaypointTicks(game, carrier, cwaypoint)
 
         if (cwaypoint === waypoint) {
@@ -368,8 +369,8 @@ class GameHelper {
     // If both stars have warp gates and they are both owned by players...
     if (sourceStar.warpGate && destinationStar.warpGate && sourceStar.ownedByPlayerId && destinationStar.ownedByPlayerId) {
         // If both stars are owned by the player or by allies then carriers can always move at warp.
-        let sourceAllied = sourceStar.ownedByPlayerId === carrier.ownedByPlayerId || (this.isFormalAlliancesEnabled(game) && this.isDiplomaticStatusToPlayersAllied(game, sourceStar.ownedByPlayerId, [carrier.ownedByPlayerId]))
-        let desinationAllied = destinationStar.ownedByPlayerId === carrier.ownedByPlayerId || (this.isFormalAlliancesEnabled(game) && this.isDiplomaticStatusToPlayersAllied(game, destinationStar.ownedByPlayerId, [carrier.ownedByPlayerId]))
+        let sourceAllied = sourceStar.ownedByPlayerId === carrier.ownedByPlayerId || (DiplomacyHelper.isFormalAlliancesEnabled(game) && DiplomacyHelper.isDiplomaticStatusToPlayersAllied(game, sourceStar.ownedByPlayerId, [carrier.ownedByPlayerId]))
+        let desinationAllied = destinationStar.ownedByPlayerId === carrier.ownedByPlayerId || (DiplomacyHelper.isFormalAlliancesEnabled(game) && DiplomacyHelper.isDiplomaticStatusToPlayersAllied(game, destinationStar.ownedByPlayerId, [carrier.ownedByPlayerId]))
 
         // If both stars are owned by the player then carriers can always move at warp.
         if (sourceAllied && desinationAllied) {
@@ -383,7 +384,7 @@ class GameHelper {
         // which player it belongs to or whether the stars it is travelling to or from have locked warp gates.
         if (carrier.specialistId && carrier.specialist) {
             let carrierSpecialist = carrier.specialist
-    
+
             if (carrierSpecialist.modifiers.special && carrierSpecialist.modifiers.special.unlockWarpGates) {
                 return true
             }
@@ -436,7 +437,7 @@ class GameHelper {
     if (carrier.waypoints.length < 2 || carrier.isGift) {
       return false
     }
-    
+
     // TODO: Calculate effective techs for the carrier. Need to find a way to share this
     // logic with the server.
 
@@ -462,8 +463,8 @@ class GameHelper {
   }
 
   isStarPairWormHole (sourceStar, destinationStar) {
-    return sourceStar.wormHoleToStarId 
-      && destinationStar.wormHoleToStarId 
+    return sourceStar.wormHoleToStarId
+      && destinationStar.wormHoleToStarId
       && sourceStar.wormHoleToStarId === destinationStar._id
       && destinationStar.wormHoleToStarId === sourceStar._id
   }
@@ -728,7 +729,7 @@ class GameHelper {
 
     return game.galaxy.carriers.sort((a, b) => b.location.y - a.location.y)[0].location.y
   }
-  
+
   isSpecialistsEnabled (game) {
     return game.settings.specialGalaxy.specialistCost !== 'none'
   }
@@ -838,7 +839,7 @@ class GameHelper {
         nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'seconds');
     } else if (this.isTurnBasedGame(game)) {
       let isAllPlayersReady = this.isAllUndefeatedPlayersReady(game)
-            
+
       if (isAllPlayersReady) {
         return true
       }
@@ -944,6 +945,11 @@ class GameHelper {
     return player.stats.totalCarriers * costPerCarrier;
   }
 
+  calculateIncomeMinusUpkeep (game, player) {
+    const fromEconomy = player.stats.totalEconomy * 10
+    return fromEconomy + this._getBankingCredits(game, player)
+  }
+
   calculateIncome (game, player) {
     const fromEconomy = player.stats.totalEconomy * 10
     const upkeep = this._getUpkeepCosts(game, player);
@@ -957,7 +963,7 @@ class GameHelper {
     if (playerIds.indexOf(star.ownedByPlayerId) > -1) {
       playerIds.splice(playerIds.indexOf(star.ownedByPlayerId), 1)
     }
-    
+
     return playerIds.length
   }
 
@@ -982,67 +988,6 @@ class GameHelper {
     }[game.settings.general.type]
   }
 
-  /* Diplomacy */
-
-  isFormalAlliancesEnabled (game) {
-    return game.settings.alliances.enabled === 'enabled'
-  }
-
-  isDiplomaticStatusToPlayersAllied(game, playerId, toPlayerIds) {
-    let playerIdA = playerId;
-
-    for (let i = 0; i < toPlayerIds.length; i++) {
-        let playerIdB = toPlayerIds[i]
-
-        let diplomaticStatus = this.getDiplomaticStatusToPlayer(game, playerIdA, playerIdB)
-
-        if (['enemies', 'neutral'].includes(diplomaticStatus.actualStatus)) {
-            return false
-        }
-    }
-
-    return true
-  }
-
-  getDiplomaticStatusToPlayer(game, playerIdA, playerIdB) {
-    if (playerIdA.toString() === playerIdB.toString()) {
-      return {
-          playerIdFrom: playerIdA,
-          playerIdTo: playerIdB,
-          statusFrom: 'allies',
-          statusTo: 'allies',
-          actualStatus: 'allies'
-      }
-    }
-
-    let playerA = game.galaxy.players.find(p => p._id.toString() === playerIdA.toString())
-    let playerB = game.galaxy.players.find(p => p._id.toString() === playerIdB.toString())
-
-    let playerADiplo = playerA.diplomacy.find(x => x.playerId.toString() === playerB._id.toString())
-    let playerBDiplo = playerB.diplomacy.find(x => x.playerId.toString() === playerA._id.toString())
-
-    let statusTo = playerADiplo == null ? 'neutral' : playerADiplo.status
-    let statusFrom = playerBDiplo == null ? 'neutral' : playerADiplo.status
-
-    let actualStatus
-
-    if (statusTo === 'enemies' || statusFrom === 'enemies') {
-        actualStatus = 'enemies'
-    } else if (statusTo === 'neutral' || statusFrom === 'neutral') {
-        actualStatus = 'neutral'
-    } else {
-        actualStatus = 'allies'
-    }
-
-    return {
-        playerIdFrom: playerIdA,
-        playerIdTo: playerIdB,
-        statusFrom,
-        statusTo,
-        actualStatus
-    }
-  }
-
   isNewPlayerGame (game) {
     return ['new_player_rt', 'new_player_tb'].includes(game.settings.general.type)
   }
@@ -1057,6 +1002,23 @@ class GameHelper {
       creditor,
       isCreditor
     }
+  }
+
+  calculateCombatEventShipCount(star, carriers, key) {
+    let array = star ? carriers.concat([star]) : carriers //Add the star if we need to
+
+    let unscrambled = array.filter(c => c[key] !== "???")
+    let scrambled = array.filter(c => c[key] === "???")
+
+    if (scrambled.length === unscrambled.length) return "???" //If everything is scrambled, the total is scrambled.
+    
+    let result = unscrambled.reduce((sum, c) => sum + c[key], 0).toString() //Add up all the ships
+
+    if (scrambled.length) { //If any carriers are scramled, add a *
+      result += "*"
+    }
+
+    return result
   }
 }
 

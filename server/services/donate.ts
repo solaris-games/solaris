@@ -38,7 +38,7 @@ export default class DonateService {
             let donators = [];
 
             if (response.status === 200) {
-                donators = response.data.data.map(d => {
+                donators = response.data.data.map((d) => {
                     return {
                         support_id: d.support_id,
                         supporter_name: d.supporter_name,

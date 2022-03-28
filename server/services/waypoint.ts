@@ -14,6 +14,7 @@ import StarService from './star';
 import StarDistanceService from './starDistance';
 import TechnologyService from './technology';
 import { CarrierActionWaypoint } from '../types/GameTick';
+import CarrierMovementService from './carrierMovement';
 
 const mongoose = require('mongoose');
 
@@ -26,6 +27,7 @@ export default class WaypointService {
     technologyService: TechnologyService;
     gameService: GameService;
     playerService: PlayerService;
+    carrierMovementService: CarrierMovementService;
 
     constructor(
         gameRepo: DatabaseRepository<Game>,
@@ -35,7 +37,8 @@ export default class WaypointService {
         starDistanceService: StarDistanceService,
         technologyService: TechnologyService,
         gameService: GameService,
-        playerService: PlayerService
+        playerService: PlayerService,
+        carrierMovementService: CarrierMovementService
     ) {
         this.gameRepo = gameRepo;
         this.carrierService = carrierService;
@@ -45,6 +48,7 @@ export default class WaypointService {
         this.technologyService = technologyService;
         this.gameService = gameService;
         this.playerService = playerService;
+        this.carrierMovementService = carrierMovementService;
     }
 
     async saveWaypoints(game: Game, player: Player, carrierId: DBObjectId, waypoints: CarrierWaypoint[], looped: boolean) {
@@ -120,7 +124,7 @@ export default class WaypointService {
             // The waypoint is not the first waypoint in the array.
             // The carrier isn't in transit to the first waypoint.
             if (
-                (i > 0 || (i === 0 && !this.carrierService.isInTransit(carrier))) &&                    // Is one of the next waypoints OR is the first waypoint and isn't in transit
+                (i > 0 || (i === 0 && !this.carrierMovementService.isInTransit(carrier))) &&                    // Is one of the next waypoints OR is the first waypoint and isn't in transit
                 (sourceStar && (!this._waypointRouteIsBetweenWormHoles(game, waypoint) && !this._waypointRouteIsWithinHyperspaceRange(game, carrier, waypoint)))     // Validation of whether the waypoint is within hyperspace range
             ) {
                 throw new ValidationError(`The waypoint ${sourceStarName} -> ${destinationStar.name} exceeds hyperspace range.`);
@@ -215,14 +219,14 @@ export default class WaypointService {
     }
 
     cullWaypointsByHyperspaceRange(game: Game, carrier: Carrier) {
-        let player = this.playerService.getById(game, carrier.ownedByPlayerId);
+        let player = this.playerService.getById(game, carrier.ownedByPlayerId!)!;
 
         // Iterate through all waypoints the carrier has one by one and
         // if any of them are not valid then remove it and all subsequent waypoints.
         let waypointsCulled = false;
 
         // If in transit, then cull starting from the 2nd waypoint.
-        let startingWaypointIndex = this.carrierService.isInTransit(carrier) ? 1 : 0;
+        let startingWaypointIndex = this.carrierMovementService.isInTransit(carrier) ? 1 : 0;
 
         for (let i = startingWaypointIndex; i < carrier.waypoints.length; i++) {
             let waypoint = carrier.waypoints[i];
@@ -341,10 +345,10 @@ export default class WaypointService {
         }
         
         let distance = this.distanceService.getDistanceBetweenLocations(source, destination);
-        let warpSpeed = this.starService.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar);
+        let warpSpeed = this.carrierMovementService.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar);
 
         // Calculate how far the carrier will move per tick.
-        let tickDistance = this.carrierService.getCarrierDistancePerTick(game, carrier, warpSpeed, instantSpeed);
+        let tickDistance = this.carrierMovementService.getCarrierDistancePerTick(game, carrier, warpSpeed, instantSpeed);
         let ticks = 1;
 
         if (tickDistance) {
@@ -588,7 +592,7 @@ export default class WaypointService {
             return;
         }
 
-        let startIndex = this.carrierService.isInTransit(carrier) ? 1 : 0;
+        let startIndex = this.carrierMovementService.isInTransit(carrier) ? 1 : 0;
 
         for (let i = startIndex; i < carrier.waypoints.length; i++) {
             let waypoint = carrier.waypoints[i];

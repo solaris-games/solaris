@@ -110,26 +110,26 @@ export default {
     },
     getCarrierShape (carrier) {
       return GameHelper.getPlayerById(this.$store.state.game, carrier.ownedByPlayerId).shape;
-    },
+    }
   },
   computed: {
     totalDefenderBefore: function () {
-      return this.defenderCarriers.reduce((sum, c) => sum + c.before | 0, 0)
+      return GameHelper.calculateCombatEventShipCount(null, this.defenderCarriers, "before")
     },
     totalDefenderLost: function () {
-      return this.defenderCarriers.reduce((sum, c) => sum + c.lost | 0, 0)
+      return GameHelper.calculateCombatEventShipCount(null, this.defenderCarriers, "lost")
     },
     totalDefenderAfter: function () {
-      return this.defenderCarriers.reduce((sum, c) => sum + c.after | 0, 0)
+      return GameHelper.calculateCombatEventShipCount(null, this.defenderCarriers, "after")
     },
     totalAttackerBefore: function () {
-      return this.attackerCarriers.reduce((sum, c) => sum + c.before | 0, 0)
+      return GameHelper.calculateCombatEventShipCount(null, this.attackerCarriers, "before")
     },
     totalAttackerLost: function () {
-      return this.attackerCarriers.reduce((sum, c) => sum + c.lost | 0, 0)
+      return GameHelper.calculateCombatEventShipCount(null, this.attackerCarriers, "lost")
     },
     totalAttackerAfter: function () {
-      return this.attackerCarriers.reduce((sum, c) => sum + c.after | 0, 0)
+      return GameHelper.calculateCombatEventShipCount(null, this.attackerCarriers, "after")
     }
   }
 }

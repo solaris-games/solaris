@@ -16,6 +16,7 @@ import PlayerService from './player';
 import StarService from './star';
 import UserService from './user';
 import ConversationService from './conversation';
+import PlayerReadyService from './playerReady';
 
 export default class GameService extends EventEmitter {
     gameRepo: DatabaseRepository<Game>;
@@ -29,6 +30,7 @@ export default class GameService extends EventEmitter {
     gameTypeService: GameTypeService;
     gameStateService: GameStateService;
     conversationService: ConversationService;
+    playerReadyService: PlayerReadyService;
 
     constructor(
         gameRepo: DatabaseRepository<Game>,
@@ -41,7 +43,8 @@ export default class GameService extends EventEmitter {
         avatarService: AvatarService,
         gameTypeService: GameTypeService,
         gameStateService: GameStateService,
-        conversationService: ConversationService
+        conversationService: ConversationService,
+        playerReadyService: PlayerReadyService
     ) {
         super();
         
@@ -56,6 +59,7 @@ export default class GameService extends EventEmitter {
         this.gameTypeService = gameTypeService;
         this.gameStateService = gameStateService;
         this.conversationService = conversationService;
+        this.playerReadyService = playerReadyService;
     }
 
     async getByIdAll(id: DBObjectId) {
@@ -66,7 +70,7 @@ export default class GameService extends EventEmitter {
         return await this.gameRepo.findById(id);
     }
 
-    async getById(id: DBObjectId, select?: any) {
+    async getById(id: DBObjectId, select?) {
         return await this.gameRepo.findByIdAsModel(id, select);
     }
 
@@ -93,7 +97,7 @@ export default class GameService extends EventEmitter {
         });
     }
 
-    async getByIdLean(id: DBObjectId, select: any): Promise<Game | null> {
+    async getByIdLean(id: DBObjectId, select): Promise<Game | null> {
         return await this.gameRepo.findById(id, select);
     }
 
@@ -577,13 +581,13 @@ export default class GameService extends EventEmitter {
         let undefeatedPlayers = this.listAllUndefeatedPlayers(game);
 
         for (let player of undefeatedPlayers) {
-            await this.playerService.declareReadyToQuit(game, player, true);
+            await this.playerReadyService.declareReadyToQuit(game, player, true);
         }
     }
     
     // TODO: Should be in a player service?
     async quitAllActiveGames(userId: DBObjectId) {
-        let allGames: any[] = await this.gameRepo.findAsModels({
+        let allGames = await this.gameRepo.findAsModels({
             'galaxy.players': {
                 $elemMatch: { 
                     userId,             // User is in game
@@ -598,7 +602,7 @@ export default class GameService extends EventEmitter {
         // Find all games that are pending start and quit.
         // Find all games that are active and admit defeat.
         for (let game of allGames) {
-            let player = this.playerService.getByUserId(game, userId);
+            let player = this.playerService.getByUserId(game, userId)!;
 
             if (this.gameStateService.isInProgress(game)) {
                 await this.concedeDefeat(game, player);

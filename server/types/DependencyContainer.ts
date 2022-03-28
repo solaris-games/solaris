@@ -8,9 +8,12 @@ import BattleRoyaleService from "../services/battleRoyale";
 import BroadcastService from "../services/broadcast";
 import CacheService from "../services/cache";
 import CarrierService from "../services/carrier";
+import CarrierGiftService from "../services/carrierGift";
+import CarrierMovementService from "../services/carrierMovement";
 import CombatService from "../services/combat";
 import ConversationService from "../services/conversation";
 import DiplomacyService from "../services/diplomacy";
+import DiplomacyUpkeepService from "../services/diplomacyUpkeep";
 import DistanceService from "../services/distance";
 import DonateService from "../services/donate";
 import EmailService from "../services/email";
@@ -34,6 +37,10 @@ import OrbitalMechanicsService from "../services/orbitalMechanics";
 import PasswordService from "../services/password";
 import PaypalService from "../services/paypal";
 import PlayerService from "../services/player";
+import PlayerCreditsService from "../services/playerCredits";
+import PlayerCycleRewardsService from "../services/playerCycleRewards";
+import PlayerReadyService from "../services/playerReady";
+import PlayerStatisticsService from "../services/playerStatistics";
 import RandomService from "../services/random";
 import RatingService from "../services/rating";
 import RecaptchaService from "../services/recaptcha";
@@ -45,6 +52,7 @@ import SpecialistService from "../services/specialist";
 import SpecialistBanService from "../services/specialistBan";
 import SpecialistHireService from "../services/specialistHire";
 import StarService from "../services/star";
+import StarContestedService from "../services/starContested";
 import StarDistanceService from "../services/starDistance";
 import StarUpgradeService from "../services/starUpgrade";
 import TechnologyService from "../services/technology";
@@ -75,6 +83,7 @@ export interface DependencyContainer {
     guildUserService: UserGuildService,
     mapService: MapService,
     playerService: PlayerService,
+    playerReadyService: PlayerReadyService,
     randomService: RandomService,
     researchService: ResearchService,
     starService: StarService,
@@ -106,4 +115,11 @@ export interface DependencyContainer {
     paypalService: PaypalService,
     badgeService: BadgeService,
     reportService: ReportService,
+    playerStatisticsService: PlayerStatisticsService,
+    playerCreditsService: PlayerCreditsService,
+    diplomacyUpkeepService: DiplomacyUpkeepService,
+    carrierGiftService: CarrierGiftService,
+    carrierMovementService: CarrierMovementService,
+    playerCycleRewardsService: PlayerCycleRewardsService,
+    starContestedService: StarContestedService,
 };

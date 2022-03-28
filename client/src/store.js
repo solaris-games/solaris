@@ -67,7 +67,7 @@ export default new Vuex.Store({
     setProductionTick (state, tick) {
       state.productionTick = tick
     },
-    
+
     setGame (state, game) {
       state.game = game
     },
@@ -162,7 +162,7 @@ export default new Vuex.Store({
 
     gamePlayerQuit (state, data) {
       let player = GameHelper.getPlayerById(state.game, data.playerId)
-      
+
       player.isEmptySlot = true
       player.alias = 'Empty Slot'
       player.avatar = null
@@ -226,14 +226,14 @@ export default new Vuex.Store({
       
       // Update player total stats.
       switch (data.infrastructureType) {
-        case 'economy': 
-          player.stats.totalEconomy += data.upgraded 
+        case 'economy':
+          player.stats.totalEconomy += data.upgraded
           break;
-        case 'industry': 
-          player.stats.totalIndustry += data.upgraded 
+        case 'industry':
+          player.stats.totalIndustry += data.upgraded
           break;
-        case 'science': 
-          player.stats.totalScience += data.upgraded 
+        case 'science':
+          player.stats.totalScience += data.upgraded
           break;
       }
     },
@@ -286,7 +286,7 @@ export default new Vuex.Store({
       star.ships = data.star.ships
 
       data.carriers.forEach(carrier => {
-        let mapObjectCarrier = GameHelper.getCarrierById(state.game, carrier._id) 
+        let mapObjectCarrier = GameHelper.getCarrierById(state.game, carrier._id)
 
         mapObjectCarrier.ships = carrier.ships
       })
@@ -380,7 +380,7 @@ export default new Vuex.Store({
       ]
 
       const responses = await Promise.all(requests)
-      
+
       commit('setCarrierSpecialists', responses[0].data)
       commit('setStarSpecialists', responses[1].data)
     },
@@ -388,9 +388,9 @@ export default new Vuex.Store({
       const modal = window.$('#confirmModal')
       const close = async () => {
         modal.modal('toggle')
-        await new Promise(r => setTimeout(r, 400));
+        await new Promise((resolve, reject) => setTimeout(resolve, 400));
       }
-      return new Promise((resolve, _reject) => {
+      return new Promise((resolve, reject) => {
         const settings = {
           confirmText: data.confirmText || 'Yes',
           cancelText: data.cancelText || 'No',

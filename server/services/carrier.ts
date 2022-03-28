@@ -8,9 +8,6 @@ import { Game } from '../types/Game';
 import { MapObject } from '../types/Map';
 import { Player } from '../types/Player';
 import { Star } from '../types/Star';
-import { User } from '../types/User';
-import AchievementService from './achievement';
-import DiplomacyService from './diplomacy';
 import DistanceService from './distance';
 import SpecialistService from './specialist';
 import StarService from './star';
@@ -19,31 +16,25 @@ const EventEmitter = require('events');
 
 export default class CarrierService extends EventEmitter {
     gameRepo: DatabaseRepository<Game>;
-    achievementService: AchievementService;
     distanceService: DistanceService;
     starService: StarService;
     technologyService: TechnologyService;
     specialistService: SpecialistService;
-    diplomacyService: DiplomacyService;
 
     constructor(
         gameRepo: DatabaseRepository<Game>,
-        achievementService: AchievementService,
         distanceService: DistanceService,
         starService: StarService,
         technologyService: TechnologyService,
-        specialistService: SpecialistService,
-        diplomacyService: DiplomacyService
+        specialistService: SpecialistService
     ) {
         super();
 
         this.gameRepo = gameRepo;
-        this.achievementService = achievementService;
         this.distanceService = distanceService;
         this.starService = starService;
         this.technologyService = technologyService;
         this.specialistService = specialistService;
-        this.diplomacyService = diplomacyService;
     }
 
     getById(game: Game, id: DBObjectId) {
@@ -277,54 +268,6 @@ export default class CarrierService extends EventEmitter {
             || c.ownedByPlayerId.toString() !== player._id.toString());
     }
 
-    getCarrierDistancePerTick(game: Game, carrier: Carrier, warpSpeed: boolean = false, instantSpeed: boolean | null = false) {
-        if (instantSpeed) {
-            return null;
-        }
-
-        let distanceModifier = warpSpeed ? game.constants.distances.warpSpeedMultiplier : 1;
-
-        if (carrier.specialistId) {
-            let specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
-
-            if (specialist.modifiers.local) {
-                distanceModifier *= (specialist.modifiers.local.speed || 1);
-            }
-        }
-
-        return game.settings.specialGalaxy.carrierSpeed * distanceModifier;
-    }
-
-    async convertToGift(game: Game, player: Player, carrierId: DBObjectId) {
-        let carrier = this.getById(game, carrierId);
-
-        if (game.settings.specialGalaxy.giftCarriers === 'disabled') {
-            throw new ValidationError(`Gifting carriers has been disabled in this game.`);
-        }
-
-        if (carrier.ownedByPlayerId!.toString() !== player._id.toString()) {
-            throw new ValidationError(`Cannot convert carrier into a gift, you do not own this carrier.`);
-        }
-
-        if (carrier.isGift) {
-            throw new ValidationError(`The carrier has already been converted into a gift.`);
-        }
-
-        // Convert the carrier into a gift.
-        carrier.isGift = true;
-        carrier.waypointsLooped = false;
-
-        await this.gameRepo.updateOne({
-            _id: game._id,
-            'galaxy.carriers._id': carrier._id
-        }, {
-            $set: {
-                'galaxy.carriers.$.isGift': true,
-                'galaxy.carriers.$.waypointsLooped': false,
-            }
-        });
-    }
-
     async rename(game: Game, player: Player, carrierId: DBObjectId, name: string) {
         let carrier = this.getById(game, carrierId);
 
@@ -354,58 +297,6 @@ export default class CarrierService extends EventEmitter {
                 'galaxy.carriers.$.name': carrierName
             }
         });
-    }
-
-    async transferGift(game: Game, gameUsers: User[], star: Star, carrier: Carrier) {
-        if (!star.ownedByPlayerId) {
-            throw new ValidationError(`Cannot transfer ownership of a gifted carrier to this star, no player owns the star.`);
-        }
-
-        let starPlayer = game.galaxy.players.find(p => star.ownedByPlayerId && p._id.toString() === star.ownedByPlayerId.toString())!;
-        let starUser = gameUsers.find(u => starPlayer.userId && u._id.toString() === starPlayer.userId.toString());
-
-        let carrierPlayer = game.galaxy.players.find(p => p._id.toString() === carrier.ownedByPlayerId!.toString())!;
-        let carrierUser = gameUsers.find(u => carrierPlayer.userId && u._id.toString() === carrierPlayer.userId.toString());
-
-        const isSamePlayer = starPlayer._id.toString() === carrierPlayer._id.toString();
-
-        if (!isSamePlayer) {
-            // If the star is not owned by the same player then increment player achievements.
-            if (starUser && !starPlayer.defeated) {
-                starUser.achievements.trade.giftsReceived += carrier.ships!;
-            }
-    
-            if (carrierUser && !carrierPlayer.defeated) {
-                carrierUser.achievements.trade.giftsSent += carrier.ships!;
-            }
-
-            carrier.ownedByPlayerId = star.ownedByPlayerId; // Transfer ownership
-            
-            // Remove the specialist. Note that this is required to get around an exploit where players can use a gift just before a battle to weaken the opponent.
-            if (!this.diplomacyService.isFormalAlliancesEnabled(game) || !this.diplomacyService.isDiplomaticStatusBetweenPlayersAllied(game, [carrierPlayer._id, starPlayer._id])) {
-                carrier.specialistId = null;
-            }
-            
-            let eventObject = {
-                gameId: game._id,
-                gameTick: game.state.tick,
-                fromPlayer: carrierPlayer,
-                toPlayer: starPlayer,
-                carrier,
-                star
-            };
-    
-            this.emit('onPlayerGiftReceived', eventObject);
-            this.emit('onPlayerGiftSent', eventObject);
-
-            carrier.isGift = false;
-        } else if (!carrier.waypoints.length) {
-            // Note: If the carrier has landed at a star the player already owns and
-            // there are still waypoints then this means the carrier is passing
-            // through owned territory and therefore should not be ungifted.
-            // We should ungift in owned territory only if there are no remaining waypoints.
-            carrier.isGift = false;
-        }
     }
 
     async scuttle(game: Game, player: Player, carrierId: DBObjectId) {
@@ -471,197 +362,10 @@ export default class CarrierService extends EventEmitter {
         return false;
     }
 
-    moveCarrierToCurrentWaypoint(carrier: Carrier, destinationStar: Star, distancePerTick: number) {
-        let nextLocation = this.distanceService.getNextLocationTowardsLocation(carrier.location, destinationStar.location, distancePerTick);
-
-        carrier.location = nextLocation;
-    }
-
-    async arriveAtStar(game: Game, gameUsers: User[], carrier: Carrier, destinationStar: Star) {
-        // Remove the current waypoint as we have arrived at the destination.
-        let currentWaypoint = carrier.waypoints.splice(0, 1)[0];
-
-        let report = {
-            waypoint: currentWaypoint,
-            combatRequiredStar: false
-        };
-
-        carrier.orbiting = destinationStar._id;
-        carrier.location = destinationStar.location;
-
-        // If the carrier waypoints are looped then append the
-        // carrier waypoint back onto the waypoint stack.
-        if (carrier.waypointsLooped) {
-            carrier.waypoints.push(currentWaypoint);
-        }
-
-        // If the star is unclaimed, then claim it.
-        if (destinationStar.ownedByPlayerId == null) {
-            await this.starService.claimUnownedStar(game, gameUsers, destinationStar, carrier);
-        }
-
-        // Reignite dead stars if applicable
-        // Note: Black holes cannot be reignited.
-        if (!carrier.isGift && this.starService.isDeadStar(destinationStar) && this.specialistService.getReigniteDeadStar(carrier)) {
-            let reigniteNaturalResources = this.specialistService.getReigniteDeadStarNaturalResources(carrier);
-
-            this.starService.reigniteDeadStar(game, destinationStar, reigniteNaturalResources);
-
-            carrier.specialistId = null;
-        }
-
-        // If the star is owned by another player, then perform combat.
-        if (destinationStar.ownedByPlayerId!.toString() !== carrier.ownedByPlayerId!.toString()) {
-            // If the carrier is a gift, then transfer the carrier ownership to the star owning player.
-            // Otherwise, perform combat.
-            if (carrier.isGift) {
-                await this.transferGift(game, gameUsers, destinationStar, carrier);
-            } else if (this.diplomacyService.isFormalAlliancesEnabled(game)) {
-                let isAllied = this.diplomacyService.isDiplomaticStatusBetweenPlayersAllied(game, [carrier.ownedByPlayerId!, destinationStar.ownedByPlayerId!]);
-
-                report.combatRequiredStar = !isAllied;
-            } else {
-                report.combatRequiredStar = true;
-            }
-        } else {
-            // Make sure the carrier gift is reset if the star is owned by the same player.
-            carrier.isGift = false;
-        }
-
-        return report;
-    }
-
-    async moveCarrier(game: Game, gameUsers: User[], carrierInTransit: Carrier) {
-        let waypoint: CarrierWaypoint = carrierInTransit.waypoints[0];
-
-        if (waypoint.delayTicks) {
-            throw new Error(`Cannot move carrier, the waypoint has a delay.`);
-        }
-
-        if (this.isLaunching(carrierInTransit)) {
-            waypoint.source = carrierInTransit.orbiting!; // Make damn sure the waypoint source is correct.
-
-            // If the destination star is not the current one, then launch the carrier into space.
-            if (carrierInTransit.orbiting!.toString() !== waypoint.destination.toString()) {
-                carrierInTransit.orbiting = null;
-            }
-        }
-
-        let sourceStar = game.galaxy.stars.find(s => s._id.toString() === waypoint.source.toString())!;
-        let destinationStar = game.galaxy.stars.find(s => s._id.toString() === waypoint.destination.toString())!;
-        let carrierOwner = game.galaxy.players.find(p => p._id.toString() === carrierInTransit.ownedByPlayerId!.toString())!;
-        let warpSpeed = this.starService.canTravelAtWarpSpeed(game, carrierOwner, carrierInTransit, sourceStar, destinationStar);
-        let instantSpeed = this.starService.isStarPairWormHole(sourceStar, destinationStar);
-        let distancePerTick = this.getCarrierDistancePerTick(game, carrierInTransit, warpSpeed, instantSpeed); // Null signifies instant travel
-
-        let carrierMovementReport = {
-            carrier: carrierInTransit,
-            sourceStar,
-            destinationStar,
-            carrierOwner,
-            warpSpeed,
-            instantSpeed,
-            distancePerTick,
-            waypoint,
-            combatRequiredStar: false,
-            arrivedAtStar: false
-        };
-        
-        if (instantSpeed || (distancePerTick && (carrierInTransit.distanceToDestination || 0) <= distancePerTick)) {
-            let starArrivalReport = await this.arriveAtStar(game, gameUsers, carrierInTransit, destinationStar);
-            
-            carrierMovementReport.waypoint = starArrivalReport.waypoint;
-            carrierMovementReport.combatRequiredStar = starArrivalReport.combatRequiredStar;
-            carrierMovementReport.arrivedAtStar = true;
-        }
-        // Otherwise, move X distance in the direction of the star.
-        else {
-            this.moveCarrierToCurrentWaypoint(carrierInTransit, destinationStar, distancePerTick!);
-        }
-
-        return carrierMovementReport;
-    }
-
-    getNextLocationToWaypoint(game: Game, carrier: Carrier) {
-        let waypoint = carrier.waypoints[0];
-        let sourceStar = game.galaxy.stars.find(s => s._id.toString() === waypoint.source.toString())!;
-        let destinationStar = game.galaxy.stars.find(s => s._id.toString() === waypoint.destination.toString())!;
-        let carrierOwner = game.galaxy.players.find(p => p._id.toString() === carrier.ownedByPlayerId!.toString())!;
-
-        let warpSpeed = false;
-        let instantSpeed: boolean | null = false;
-        
-        if (sourceStar) {
-            warpSpeed = this.starService.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar);
-            instantSpeed = this.starService.isStarPairWormHole(sourceStar, destinationStar);
-        }
-
-        let nextLocation;
-        let distancePerTick;
-        let distanceToDestination = this.distanceService.getDistanceBetweenLocations(carrier.location, destinationStar.location);
-
-
-        if (instantSpeed) {
-            distancePerTick = distanceToDestination;
-            nextLocation = destinationStar.location;
-        } else {
-            distancePerTick = this.getCarrierDistancePerTick(game, carrier, warpSpeed, instantSpeed);
-            if (distancePerTick >= distanceToDestination) {
-                distancePerTick = distanceToDestination;
-                nextLocation = destinationStar.location;
-            } else{
-                nextLocation = this.distanceService.getNextLocationTowardsLocation(carrier.location, destinationStar.location, distancePerTick);
-            }
-        }
-
-        return {
-            location: nextLocation,
-            distance: distancePerTick,
-            warpSpeed,
-            instantSpeed,
-            sourceStar,
-            destinationStar
-        };
-    }
-
-    isInTransit(carrier: Carrier) {
-        return !carrier.orbiting;
-    }
-
-    isInTransitTo(carrier: Carrier, star: Star) {
-        return this.isInTransit(carrier) && carrier.waypoints[0].destination.toString() === star._id.toString();
-    }
-
-    isLaunching(carrier: Carrier) {
-        return carrier.orbiting && carrier.waypoints.length && carrier.waypoints[0].delayTicks === 0;
-    }
-
     destroyCarrier(game: Game, carrier: Carrier) {
         game.galaxy.carriers.splice(game.galaxy.carriers.indexOf(carrier), 1);
     }
     
-    getCarriersEnRouteToStar(game: Game, star: Star) {
-        return game.galaxy.carriers.filter(c => 
-            c.waypoints && c.waypoints.length && c.waypoints.find(w => w.destination.toString() === star._id.toString()) != null
-        );
-    }
-
-    isLostInSpace(game: Game, carrier: Carrier) {
-        // If not in transit then it obviously isn't lost in space
-        if (!this.isInTransit(carrier)) {
-            return false;
-        }
-
-        // If the carrier has a waypoint then check if the
-        // current destination exists.
-        if (carrier.waypoints.length) {
-            return game.galaxy.stars.find(s => s._id.toString() === carrier.waypoints[0].destination.toString()) == null;
-        }
-
-        // If there are no waypoints and they are in transit then must be lost, otherwise all good.
-        return carrier.waypoints.length === 0;
-    }
-
     listGiftCarriersInOrbit(game: Game) {
         return game.galaxy.carriers.filter(c => c.isGift && c.orbiting);
     }

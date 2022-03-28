@@ -1,4 +1,5 @@
 import { Game } from "../types/Game";
+import { Specialist } from "../types/Specialist";
 import SpecialistService from "./specialist";
 const RNG = require('random-seed');
 const moment = require('moment');
@@ -47,13 +48,13 @@ export default class SpecialistBanService {
     }
 
     getCurrentMonthStarBans(amount: number) {
-        const ids = this.specialistService.listStar(null).map(s => s.id);
+        const ids = this.specialistService.listStar(null).map((s: Specialist) => s.id);
 
         return this._getCurrentMonthBans(ids, amount);
     }
 
     getCurrentMonthCarrierBans(amount: number) {
-        const ids = this.specialistService.listCarrier(null).map(s => s.id);
+        const ids = this.specialistService.listCarrier(null).map((s: Specialist) => s.id);
 
         return this._getCurrentMonthBans(ids, amount);
     }
