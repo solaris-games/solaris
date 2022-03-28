@@ -14,6 +14,7 @@ import { Star } from "../types/Star";
 import { Carrier } from "../types/Carrier";
 import { getOrInsert, reverseSort, notNull } from "../utils";
 import { CarrierWaypoint } from "../types/CarrierWaypoint";
+import ReputationService from "./reputation";
 
 const FIRST_TICK_BULK_UPGRADE_SCI_PERCENTAGE = 20;
 const FIRST_TICK_BULK_UPGRADE_IND_PERCENTAGE = 30;
@@ -114,6 +115,7 @@ export default class AIService {
     shipTransferService: ShipTransferService;
     technologyService: TechnologyService;
     playerService: PlayerService;
+    reputationService: ReputationService;
 
     constructor(
         starUpgradeService: StarUpgradeService,
@@ -124,7 +126,8 @@ export default class AIService {
         combatService: CombatService,
         shipTransferService: ShipTransferService,
         technologyService: TechnologyService,
-        playerService: PlayerService
+        playerService: PlayerService,
+        reputationService: ReputationService
     ) {
         this.starUpgradeService = starUpgradeService;
         this.carrierService = carrierService;
@@ -135,6 +138,7 @@ export default class AIService {
         this.shipTransferService = shipTransferService;
         this.technologyService = technologyService;
         this.playerService = playerService;
+        this.reputationService = reputationService;
     }
 
     async play(game: Game, player: Player) {
