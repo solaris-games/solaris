@@ -536,8 +536,8 @@ export default class AIService {
     }
 
     _canAffordCarrier(context: Context, game: Game, player: Player, highPriority: boolean): boolean {
-        // Keep 20% of budget for upgrades
-        const leaveOver = highPriority ? 0 : context.playerEconomy * 2;
+        // Keep 50% of budget for upgrades
+        const leaveOver = highPriority ? 0 : context.playerEconomy * 5;
         const availableFunds = player.credits - leaveOver;
         const carrierExpenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.specialGalaxy.carrierCost];
         return availableFunds >= this.starUpgradeService.calculateCarrierCost(game, carrierExpenseConfig);
