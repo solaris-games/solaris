@@ -2,7 +2,7 @@
 <div>
   <p>
     <a href="javascript:;" @click="onOpenPlayerDetailRequested(event.data.playerIdFrom)">{{event.data.playerFromAlias}}</a>
-    has changed their 
+    has changed their
     <strong>diplomatic status</strong>
     with
     <a href="javascript:;" @click="onOpenPlayerDetailRequested(event.data.playerIdTo)">{{event.data.playerToAlias}}</a>

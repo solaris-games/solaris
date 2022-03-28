@@ -54,14 +54,14 @@ Vue.prototype.$isHistoricalMode = function() {
 }
 
 Vue.prototype.$isMobile = function () {
-  return window.matchMedia("only screen and (max-width: 576px)").matches
+  return window.matchMedia('only screen and (max-width: 576px)').matches
 }
 
-Vue.directive('tooltip', function(el, binding){
+Vue.directive('tooltip', function(el, binding) {
   $(el).tooltip({
     title: binding.value,
     placement: binding.arg,
-    trigger: 'hover'             
+    trigger: 'hover'
   })
 })
 
