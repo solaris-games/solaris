@@ -13,7 +13,9 @@ export default {
   },
   mounted () {
     if (!this.starName) {
-      this.starName = gameHelper.getStarById(this.$store.state.game, this.starId).name
+      let star = gameHelper.getStarById(this.$store.state.game, this.starId)
+
+      this.starName = star ? star.name : 'Unknown'
     }
   },
   methods: {

@@ -13,7 +13,9 @@ export default {
   },
   mounted () {
     if (!this.carrierName) {
-      this.carrierName = gameHelper.getCarrierById(this.$store.state.game, this.carrierId).name
+      let carrier = gameHelper.getCarrierById(this.$store.state.game, this.carrierId)
+
+      this.carrierName = carrier ? carrier.name : 'Unknown'
     }
   },
   methods: {
