@@ -24,6 +24,7 @@ const schema = new Schema({
     afk: { type: Types.Boolean, required: false, default: false },      // TODO: Same treatment as with defeatedDate.
     renownToGive: { type: Types.Number, required: true, default: 8 },
     ready: { type: Types.Boolean, required: false, default: false },
+    readyToCycle: { type: Types.Boolean, required: false, default: false },
     readyToQuit: { type: Types.Boolean, required: false, default: false },
     missedTurns: { type: Types.Number, required: false, default: 0 },
     hasSentTurnReminder: { type: Types.Boolean, required: false, default: false },
@@ -76,9 +77,12 @@ const schema = new Schema({
             score: { type: Types.Number, required: true, default: 0  }
         }
     ],
-    diplomacy: {
-        allies: [{ type: Types.ObjectId, required: true }]
-    }
+    diplomacy: [
+        {
+            playerId: { type: Types.ObjectId, required: true },
+            status: { type: Types.String, required: true }
+        }
+    ]
 });
 
 export default schema;

@@ -10,12 +10,13 @@ import MapService from './map';
 import NameService from './name';
 import PasswordService from './password';
 import PlayerService from './player';
+import SpecialistBanService from './specialistBan';
 import UserService from './user';
 
 const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
 export default class GameCreateService {
-    gameModel: any;
+    gameModel;
     gameService: GameService;
     gameListService: GameListService;
     nameService: NameService;
@@ -27,9 +28,10 @@ export default class GameCreateService {
     achievementService: AchievementService;
     userService: UserService;
     gameCreateValidationService: GameCreateValidationService;
+    specialistBanService: SpecialistBanService;
 
     constructor(
-        gameModel: any,
+        gameModel,
         gameService: GameService,
         gameListService: GameListService,
         nameService: NameService, 
@@ -40,7 +42,8 @@ export default class GameCreateService {
         historyService: HistoryService,
         achievementService: AchievementService,
         userService: UserService,
-        gameCreateValidationService: GameCreateValidationService
+        gameCreateValidationService: GameCreateValidationService,
+        specialistBanService: SpecialistBanService
     ) {
         this.gameModel = gameModel;
         this.gameService = gameService;
@@ -54,10 +57,13 @@ export default class GameCreateService {
         this.achievementService = achievementService;
         this.userService = userService;
         this.gameCreateValidationService = gameCreateValidationService;
+        this.specialistBanService = specialistBanService;
     }
 
     async create(settings: GameSettings) {
         const isTutorial = settings.general.type === 'tutorial';
+        const isNewPlayerGame = settings.general.type === 'new_player_rt' || settings.general.type === 'new_player_tb';
+        const isOfficialGame = settings.general.createdByUserId == null;
 
         // If a legit user (not the system) created the game and it isn't a tutorial
         // then that game must be set as a custom game.
@@ -132,6 +138,15 @@ export default class GameCreateService {
                 carrier: []
             };
         }
+        // For official games, add this month's specialist bans.
+        else if (isOfficialGame && !isTutorial && !isNewPlayerGame) {
+            const banAmount = 3; // Random 3 specs of each type.
+
+            game.settings.specialGalaxy.specialistBans = {
+                star: this.specialistBanService.getCurrentMonthStarBans(banAmount),
+                carrier: this.specialistBanService.getCurrentMonthCarrierBans(banAmount)
+            };
+        }
 
         if (game.settings.galaxy.galaxyType === 'custom') {
             game.settings.specialGalaxy.randomWarpGates = 0;
@@ -141,6 +156,9 @@ export default class GameCreateService {
             game.settings.specialGalaxy.randomBinaryStars = 0;
             game.settings.specialGalaxy.randomBlackHoles = 0;
         }
+
+        // Clamp max alliances if its invalid (minimum of 1)
+        game.settings.diplomacy.maxAlliances = Math.max(1, Math.min(game.settings.diplomacy.maxAlliances, game.settings.general.playerLimit - 1));
         
         // If the game name contains a special string, then replace it with a random name.
         if (game.settings.general.name.indexOf(RANDOM_NAME_STRING) > -1) {
@@ -150,10 +168,10 @@ export default class GameCreateService {
         }
 
         // Create all of the stars required.
-        (game.galaxy as any).homeStars = [];
-        (game.galaxy as any).linkedStars = [];
+        game.galaxy.homeStars = [];
+        game.galaxy.linkedStars = [];
 
-        let starGeneration: any = this.mapService.generateStars(
+        let starGeneration = this.mapService.generateStars(
             game, 
             desiredStarCount,
             game.settings.general.playerLimit,

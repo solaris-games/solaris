@@ -42,7 +42,7 @@ export default class GameListService {
         });
     }
 
-    async listUserGames(select?: any) {
+    async listUserGames(select?) {
         select = select || {
             'settings.general.type': 1,
             'settings.general.featured': 1,
@@ -95,7 +95,7 @@ export default class GameListService {
         }));
     }
 
-    async listRecentlyCompletedGames(select: any = null, limit: number = 20) {
+    async listRecentlyCompletedGames(select: any | null = null, limit: number = 20) {
         select = select || {
             'settings.general.type': 1,
             'settings.general.featured': 1,

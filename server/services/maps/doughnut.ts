@@ -32,7 +32,7 @@ export default class DoughnutMapService {
         this.gameTypeService = gameTypeService;
     }
 
-    generateLocations(game: any, starCount: number, resourceDistribution: GameResourceDistribution): Location[] {
+    generateLocations(game, starCount: number, resourceDistribution: GameResourceDistribution): Location[] {
         if (this.gameTypeService.isKingOfTheHillMode(game)) {
             throw new ValidationError(`King of the hill is not supported in doughnut maps.`);
         }
@@ -62,7 +62,7 @@ export default class DoughnutMapService {
         return locations;
     }
 
-    isLocationTooCloseToOthers(game: any, location: Location, locations: Location[]): boolean {
+    isLocationTooCloseToOthers(game, location: Location, locations: Location[]): boolean {
         // Return False if there are no stars in range, True if there is a star in range
         return locations.find(l => this.starDistanceService.isLocationTooClose(game, location, l)) != null;
     }

@@ -24,17 +24,17 @@ export default {
       intervalFunction: null
     }
   },
-  mounted () {
-    this.player = GameHelper.getPlayerById(this.$store.state.game, this.playerId)
+    mounted() {
+      this.player = GameHelper.getPlayerById(this.$store.state.game, this.playerId)
 
-    this.iconColour = !this.colour ? GameHelper.getFriendlyColour(this.player.colour.value) : this.colour
+      this.iconColour = !this.colour ? GameHelper.getFriendlyColour(this.player.colour.value) : this.colour
 
-    let isHiddenPlayerOnlineStatus = GameHelper.isHiddenPlayerOnlineStatus(this.$store.state.game)
+      let isHiddenPlayerOnlineStatus = GameHelper.isHiddenPlayerOnlineStatus(this.$store.state.game)
 
-    if (!this.hideOnlineStatus && !isHiddenPlayerOnlineStatus) {
-      this.intervalFunction = setInterval(this.recalculateOnlineStatus, 1000)
-      this.recalculateOnlineStatus()
-    }
+      if (!this.hideOnlineStatus && !isHiddenPlayerOnlineStatus) {
+        this.intervalFunction = setInterval(this.recalculateOnlineStatus, 1000)
+        this.recalculateOnlineStatus()
+      }
   },
   destroyed () {
     clearInterval(this.intervalFunction)

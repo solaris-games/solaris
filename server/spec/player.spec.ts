@@ -121,9 +121,9 @@ function printStars(allStars) {
     console.log();
     
     for(let y = 0; y < 100; y += 10) {
-        let starsOnY = allStars.filter(x => x.location.y == y);
+        let starsOnY = allStars.filter((x) => x.location.y == y);
 
-        console.log(starsOnY.map(p => {
+        console.log(starsOnY.map((p) => {
             if (p.ownedByPlayerId) {
                 let key = p.ownedByPlayerId.toString();
                 return key[key.length - 1] + ' ';
@@ -174,7 +174,7 @@ describe('player', () => {
     });
 
     it('should create a list of empty players', () => {
-        const allStars = generateStarGrid();
+        const allStars: any[] = generateStarGrid();
         // @ts-ignore
         game.galaxy.stars = allStars;
         const players = playerService.createEmptyPlayers(game);
@@ -197,7 +197,7 @@ describe('player', () => {
             });
 
             // Assert home star.
-            const homeStar = allStars.find(x => x._id === newPlayer.homeStarId);
+            const homeStar: any = allStars.find(x => x._id === newPlayer.homeStarId);
             
             expect(homeStar.ships).toEqual(game.settings.player.startingShips);
         }

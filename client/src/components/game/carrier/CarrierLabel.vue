@@ -11,6 +11,13 @@ export default {
     carrierId: String,
     carrierName: String
   },
+  mounted () {
+    if (!this.carrierName) {
+      let carrier = gameHelper.getCarrierById(this.$store.state.game, this.carrierId)
+
+      this.carrierName = carrier ? carrier.name : 'Unknown'
+    }
+  },
   methods: {
     pan (e) {
       let carrier = gameHelper.getCarrierById(this.$store.state.game, this.carrierId)

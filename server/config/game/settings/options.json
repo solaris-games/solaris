@@ -96,7 +96,7 @@
              "text":"Expensive"
           }
        ],
-       "warpgateCost":[
+      "warpgateCost":[
           {
              "value":"none",
              "text":"No"
@@ -400,16 +400,56 @@
              "value":"scanned",
              "text":"Trade with scanned players only"
           }
+       ]
+    },
+    "diplomacy":{
+       "enabled": [
+         {
+            "value":"enabled",
+            "text":"Enabled"
+         },
+         {
+            "value":"disabled",
+            "text":"Disabled"
+         }
        ],
-       "alliances":[
-          {
-             "value":"enabled",
-             "text":"Enabled"
-          },
-          {
-             "value":"disabled",
-             "text":"Disabled"
-          }
+       "upkeepCost":[
+         {
+           "value":"none",
+           "text":"None"
+         },
+         {
+           "value":"cheap",
+           "text":"Cheap"
+         },
+         {
+           "value":"standard",
+           "text":"Standard"
+        },
+         {
+           "value":"expensive",
+           "text":"Expensive"
+         }
+       ],
+       "tradeRestricted":[
+         { 
+           "value":"enabled",
+           "text":"Enabled"
+         },
+         {
+           "value":"disabled",
+           "text":"Disabled"
+         }
+        ],
+       "globalEvents": [
+         {
+            "value":"enabled",
+            "text":"Enabled"
+         },
+         {
+            "value":"disabled",
+            "text":"Disabled"
+         }
        ]
     },
     "technology":{

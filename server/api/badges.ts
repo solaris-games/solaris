@@ -8,12 +8,6 @@ export default (router: Router, io, container: DependencyContainer) => {
     const middleware = Middleware(container);
 
     router.get('/api/badges', middleware.authenticate, async (req, res, next) => {
-        let errors = [];
-
-        if (errors.length) {
-            throw new ValidationError(errors);
-        }
-
         try {
             const result = container.badgeService.listPurchasableBadges();
             

@@ -128,6 +128,9 @@ describe('star', () => {
                     industry: 10,
                     science: 1
                 }
+            },
+            galaxy: {
+                galaxyType: 'irregular'
             }
         };
 

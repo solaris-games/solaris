@@ -2,13 +2,19 @@
 <div class="menu-page container">
     <menu-title title="Ship Transfer" @onCloseRequested="onCloseRequested"/>
 
-    <div class="row bg-secondary mb-2">
-      <div class="col text-center pt-3">
-        <p>While in orbit of a star you may move ships to and from a fleet Carrier.</p>
+    <div class="row bg-secondary mb-0">
+      <div class="col text-center pt-2 pb-2">
+        <p class="mb-0"><small>While in <strong>orbit</strong> of a star you may transfer ships.</small></p>
       </div>
     </div>
 
-    <div class="row">
+    <div class="row mb-0 pt-2 pb-2 bg-primary" v-if="carrier.waypoints && carrier.waypoints.length">
+      <div class="col">
+        <p class="mb-0"><i class="fas fa-map-marker-alt mr-2"></i><strong>{{carrier.name}}</strong>'s next waypoint is to <star-label :starId="carrier.waypoints[0].destination"/>.</p>
+      </div>
+    </div>
+
+    <div class="row mt-2">
         <div class="col" v-if="star">
             <p class="mb-0"><i class="fas fa-star mr-1"></i>{{star.name}}</p>
         </div>
@@ -71,11 +77,12 @@ import { mapState } from 'vuex'
 import GameHelper from '../../../services/gameHelper'
 import CarrierApiService from '../../../services/api/carrier'
 import MenuTitle from '../MenuTitle'
-import GameContainer from '../../../game/container'
+import StarLabelVue from '../star/StarLabel'
 
 export default {
   components: {
-    'menu-title': MenuTitle
+    'menu-title': MenuTitle,
+    'star-label': StarLabelVue
   },
   props: {
     carrierId: String

@@ -153,22 +153,22 @@ export default {
   },
   computed: {
     totalDefenderBefore: function () {
-      return this.event.data.combatResult.star.before + this.defenderCarriers.reduce((sum, c) => sum + c.before | 0, 0)
+      return GameHelper.calculateCombatEventShipCount(this.event.data.combatResult.star, this.defenderCarriers, "before")
     },
     totalDefenderLost: function () {
-      return this.event.data.combatResult.star.lost + this.defenderCarriers.reduce((sum, c) => sum + c.lost | 0, 0)
+      return GameHelper.calculateCombatEventShipCount(this.event.data.combatResult.star, this.defenderCarriers, "lost")
     },
     totalDefenderAfter: function () {
-      return this.event.data.combatResult.star.after + this.defenderCarriers.reduce((sum, c) => sum + c.after | 0, 0)
+      return GameHelper.calculateCombatEventShipCount(this.event.data.combatResult.star, this.defenderCarriers, "after")
     },
     totalAttackerBefore: function () {
-      return this.attackerCarriers.reduce((sum, c) => sum + c.before | 0, 0)
+      return GameHelper.calculateCombatEventShipCount(null, this.attackerCarriers, "before")
     },
     totalAttackerLost: function () {
-      return this.attackerCarriers.reduce((sum, c) => sum + c.lost | 0, 0)
+      return GameHelper.calculateCombatEventShipCount(null, this.attackerCarriers, "lost")
     },
     totalAttackerAfter: function () {
-      return this.attackerCarriers.reduce((sum, c) => sum + c.after | 0, 0)
+      return GameHelper.calculateCombatEventShipCount(null, this.attackerCarriers, "after")
     }
   }
 }

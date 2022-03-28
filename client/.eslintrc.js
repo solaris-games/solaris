@@ -26,7 +26,8 @@ module.exports = {
     'block-spacing': 'off',
     'comma-dangle': 'off',
     'no-multi-spaces': 'off',
-    'comma-spacing': 'off'
+    'comma-spacing': 'off',
+    'no-trailing-spaces': 'off'
   },
   parserOptions: {
     parser: 'babel-eslint'

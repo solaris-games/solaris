@@ -1,13 +1,16 @@
 const mongoose = require('mongoose');
 const moment = require('moment');
 const EventEmitter = require('events');
-import ValidationError from '../errors/validation';
 import DatabaseRepository from '../models/DatabaseRepository';
+import { DBObjectId } from '../types/DBObjectId';
 import { Game } from '../types/Game';
-import { Player, PlayerColourShapeCombination, PlayerShape } from '../types/Player';
+import { Location } from '../types/Location';
+import { Player, PlayerColour, PlayerColourShapeCombination, PlayerShape } from '../types/Player';
+import { Star } from '../types/Star';
 import CarrierService from './carrier';
 import GameTypeService from './gameType';
 import MapService from './map';
+import PlayerReadyService from './playerReady';
 import RandomService from './random';
 import SpecialistService from './specialist';
 import StarService from './star';
@@ -24,7 +27,8 @@ export default class PlayerService extends EventEmitter {
     technologyService: TechnologyService;
     specialistService: SpecialistService;
     gameTypeService: GameTypeService;
-    
+    playerReadyService: PlayerReadyService;
+
     constructor(
         gameRepo: DatabaseRepository<Game>,
         randomService: RandomService,
@@ -34,10 +38,11 @@ export default class PlayerService extends EventEmitter {
         starDistanceService: StarDistanceService,
         technologyService: TechnologyService,
         specialistService: SpecialistService,
-        gameTypeService: GameTypeService
+        gameTypeService: GameTypeService,
+        playerReadyService: PlayerReadyService
     ) {
         super();
-        
+
         this.gameRepo = gameRepo;
         this.randomService = randomService;
         this.mapService = mapService;
@@ -47,17 +52,18 @@ export default class PlayerService extends EventEmitter {
         this.technologyService = technologyService;
         this.specialistService = specialistService;
         this.gameTypeService = gameTypeService;
+        this.playerReadyService = playerReadyService;
     }
 
-    getById(game, playerId) {
+    getById(game: Game, playerId: DBObjectId) {
         return game.galaxy.players.find(p => p._id.toString() === playerId.toString());
     }
 
-    getByUserId(game, userId) {
+    getByUserId(game: Game, userId: DBObjectId) {
         return game.galaxy.players.find(p => p.userId && p.userId.toString() === userId.toString());
     }
 
-    getPlayersWithinScanningRangeOfPlayer(game, players, player) {
+    getPlayersWithinScanningRangeOfPlayer(game: Game, players: Player[], player: Player) {
         let inRange = [player];
         let playerStars = this.starService.listStarsWithScanningRangeByPlayer(game, player._id);
 
@@ -76,7 +82,7 @@ export default class PlayerService extends EventEmitter {
                     break;
                 }
             }
-            
+
             if (isInRange) {
                 inRange.push(otherPlayer);
             }
@@ -85,12 +91,12 @@ export default class PlayerService extends EventEmitter {
         return inRange;
     }
 
-    isInScanningRangeOfPlayer(game, sourcePlayer, targetPlayer) {
+    isInScanningRangeOfPlayer(game: Game, sourcePlayer: Player, targetPlayer: Player) {
         return this.getPlayersWithinScanningRangeOfPlayer(game, [targetPlayer], sourcePlayer)
             .find(p => p._id.toString() === targetPlayer._id.toString()) != null;
     }
 
-    createEmptyPlayer(game, colour, shape) {
+    createEmptyPlayer(game: Game, colour: PlayerColour, shape: PlayerShape) {
         let player = {
             _id: mongoose.Types.ObjectId(),
             userId: null,
@@ -113,19 +119,19 @@ export default class PlayerService extends EventEmitter {
             }
         };
 
-        this._setDefaultResearchTechnology(game, player);
+        this._setDefaultResearchTechnology(game, player as any);
 
         return player;
     }
 
-    createEmptyPlayers(game): any[] {
+    createEmptyPlayers(game: Game) {
         let players: any[] = [];
 
         let shapeColours = this._generatePlayerColourShapeList(game.settings.general.playerLimit);
 
         for (let i = 0; i < game.settings.general.playerLimit; i++) {
             let shapeColour = shapeColours[i];
-            
+
             players.push(this.createEmptyPlayer(game, shapeColour.colour, shapeColour.shape));
         }
 
@@ -145,7 +151,7 @@ export default class PlayerService extends EventEmitter {
         return players;
     }
 
-    _generatePlayerColourShapeList(playerCount) {
+    _generatePlayerColourShapeList(playerCount: number) {
         let shapes: PlayerShape[] = ['circle', 'square', 'diamond', 'hexagon'];
         let colours = require('../config/game/colours').slice();
 
@@ -183,13 +189,13 @@ export default class PlayerService extends EventEmitter {
                 attempts++;
             }
         }
-        
+
         return result;
     }
 
-    _distributePlayerLinkedHomeStars(game, players) {
+    _distributePlayerLinkedHomeStars(game: Game, players: Player[]) {
         for (let player of players) {
-            let homeStarId = game.galaxy.homeStars.pop();
+            let homeStarId = game.galaxy.homeStars!.pop()!;
 
             // Set up the home star
             let homeStar = this.starService.getById(game, homeStarId);
@@ -198,7 +204,7 @@ export default class PlayerService extends EventEmitter {
         }
     }
 
-    _distributePlayerHomeStars(game, players) {
+    _distributePlayerHomeStars(game: Game, players: Player[]) {
         // Divide the galaxy into equal chunks, each player will spawned
         // at near equal distance from the center of the galaxy.
         const starLocations = game.galaxy.stars.map(s => s.location);
@@ -220,7 +226,7 @@ export default class PlayerService extends EventEmitter {
         }
     }
 
-    _getDesiredPlayerDistanceFromCenter(game) {
+    _getDesiredPlayerDistanceFromCenter(game: Game) {
         let distanceFromCenter;
         const locations = game.galaxy.stars.map(s => s.location);
 
@@ -239,19 +245,19 @@ export default class PlayerService extends EventEmitter {
         return distanceFromCenter;
     }
 
-    _distributePlayerLinkedStartingStars(game, players) {
+    _distributePlayerLinkedStartingStars(game: Game, players: Player[]) {
         for (let player of players) {
-            let linkedStars = game.galaxy.linkedStars.pop();
+            let linkedStars = game.galaxy.linkedStars.pop()!;
 
             for (let starId of linkedStars) {
                 let star = this.starService.getById(game, starId);
 
-                this.setupStarForGameStart(game, star, player, false); 
+                this.setupStarForGameStart(game, star, player, false);
             }
         }
     }
 
-    _distributePlayerStartingStars(game, players) {
+    _distributePlayerStartingStars(game: Game, players: Player[]) {
         // The fairest way to distribute stars to players is to
         // iterate over each player and give them 1 star at a time, this is arguably the fairest way
         // otherwise we'll end up with the last player potentially having a really bad position as their
@@ -272,14 +278,14 @@ export default class PlayerService extends EventEmitter {
     }
 
     // TODO: Shouldn't this be in the starService?
-    setupStarForGameStart(game, star, player, resetWarpGates) {
+    setupStarForGameStart(game: Game, star: Star, player: Player, resetWarpGates: boolean) {
         if (player.homeStarId.toString() === star._id.toString()) {
             this.starService.setupHomeStar(game, star, player, game.settings);
         } else {
             star.ownedByPlayerId = player._id;
             star.shipsActual = game.settings.player.startingShips;
             star.ships = star.shipsActual;
-            
+
             star.warpGate = star.warpGate ?? false;
             star.specialistId = star.specialistId ?? null;
             star.infrastructure.economy = star.infrastructure.economy ?? 0;
@@ -294,13 +300,14 @@ export default class PlayerService extends EventEmitter {
         }
     }
 
-    resetPlayerForGameStart(game, player) {
+    resetPlayerForGameStart(game: Game, player: Player) {
         player.userId = null;
         player.alias = "Empty Slot";
         player.avatar = null;
         player.credits = game.settings.player.startingCredits;
         player.creditsSpecialists = game.settings.player.startingCreditsSpecialists;
         player.ready = false;
+        player.readyToCycle = false;
         player.readyToQuit = false;
 
         // Reset the player's research
@@ -317,11 +324,11 @@ export default class PlayerService extends EventEmitter {
         this.carrierService.clearPlayerCarriers(game, player);
 
         let homeCarrier = this.createHomeStarCarrier(game, player);
-        
-        game.galaxy.carriers.push(homeCarrier);
+
+        game.galaxy.carriers.push(homeCarrier as any);
     }
 
-    _getNewPlayerHomeStar(game, starLocations, galaxyCenter, distanceFromCenter, radians) {
+    _getNewPlayerHomeStar(game: Game, starLocations: Location[], galaxyCenter: Location, distanceFromCenter: number, radians: number[]) {
         switch (game.settings.specialGalaxy.playerDistribution) {
             case 'circular':
                 return this._getNewPlayerHomeStarCircular(game, starLocations, galaxyCenter, distanceFromCenter, radians);
@@ -332,7 +339,7 @@ export default class PlayerService extends EventEmitter {
         throw new Error(`Unsupported player distribution setting: ${game.settings.specialGalaxy.playerDistribution}`);
     }
 
-    _getNewPlayerHomeStarCircular(game, starLocations, galaxyCenter, distanceFromCenter, radians) {
+    _getNewPlayerHomeStarCircular(game: Game, starLocations: Location[], galaxyCenter: Location, distanceFromCenter: number, radians: number[]) {
         // Get the player's starting location.
         let startingLocation = this._getPlayerStartingLocation(radians, galaxyCenter, distanceFromCenter);
 
@@ -342,7 +349,7 @@ export default class PlayerService extends EventEmitter {
         return homeStar;
     }
 
-    _getNewPlayerHomeStarRandom(game) {
+    _getNewPlayerHomeStarRandom(game: Game) {
         // Pick a random unowned star.
         let unownedStars = game.galaxy.stars.filter(s => s.ownedByPlayerId == null);
 
@@ -351,7 +358,7 @@ export default class PlayerService extends EventEmitter {
         return unownedStars[rnd];
     }
 
-    _getPlayerStartingLocationRadians(playerCount) {
+    _getPlayerStartingLocationRadians(playerCount: number) {
         const increment = 360 / playerCount * Math.PI / 180;
         let current = 0;
 
@@ -365,7 +372,7 @@ export default class PlayerService extends EventEmitter {
         return radians;
     }
 
-    _getPlayerStartingLocation(radians, galaxyCenter, distanceFromCenter) {
+    _getPlayerStartingLocation(radians: number[], galaxyCenter: Location, distanceFromCenter: number) {
         // Pick a random radian for the player's starting position.
         let radianIndex = this.randomService.getRandomNumber(radians.length);
         let currentRadians = radians.splice(radianIndex, 1)[0];
@@ -383,14 +390,14 @@ export default class PlayerService extends EventEmitter {
         return startingLocation;
     }
 
-    _setDefaultResearchTechnology(game, player) {
+    _setDefaultResearchTechnology(game: Game, player: Player) {
         let enabledTechs = this.technologyService.getEnabledTechnologies(game);
 
         player.researchingNow = enabledTechs[0] || 'weapons';
         player.researchingNext = player.researchingNow;
     }
 
-    createHomeStarCarriers(game): any[] {
+    createHomeStarCarriers(game: Game) {
         let carriers: any[] = [];
 
         for (let i = 0; i < game.galaxy.players.length; i++) {
@@ -404,7 +411,7 @@ export default class PlayerService extends EventEmitter {
         return carriers;
     }
 
-    createHomeStarCarrier(game, player) {
+    createHomeStarCarrier(game: Game, player: Player) {
         let homeStar = this.starService.getPlayerHomeStar(game.galaxy.stars, player);
 
         if (!homeStar) {
@@ -417,121 +424,11 @@ export default class PlayerService extends EventEmitter {
         return homeCarrier;
     }
 
-    calculateTotalStars(player, stars) {
-        let playerStars = this.starService.listStarsOwnedByPlayer(stars, player._id);
-
-        return playerStars.length;
-    }
-
-    calculateTotalHomeStars(playerStars) {
-        return playerStars.filter(s => s.homeStar).length;
-    }
-
-    calculateTotalShips(ownedStars, ownedCarriers) {
-        return ownedStars.reduce((sum, s) => sum + s.ships, 0) 
-            + ownedCarriers.reduce((sum, c) => sum + c.ships, 0);
-    }
-
-    calculateTotalEconomy(playerStars) {
-        let totalEconomy = playerStars.reduce((sum, s) => {
-            let multiplier = this.specialistService.getEconomyInfrastructureMultiplier(s);
-            let eco = s.infrastructure?.economy ?? 0;
-
-            return sum + (eco * multiplier)
-        }, 0);
-
-        return totalEconomy;
-    }
-
-    calculateTotalIndustry(playerStars) {
-        let totalIndustry = playerStars.reduce((sum, s) => {
-            let ind = s.infrastructure?.industry ?? 0;
-
-            return sum + ind;
-        }, 0);
-
-        return totalIndustry;
-    }
-
-    calculateTotalScience(playerStars) {
-        let totalScience = playerStars.reduce((sum, s) => {
-            let multiplier = this.specialistService.getScienceInfrastructureMultiplier(s);
-            let sci = s.infrastructure?.science ?? 0;
-
-            return sum + (sci * multiplier)
-        }, 0);
-
-        return totalScience;
-    }
-
-    calculateTotalManufacturing(game, playerStars) {
-        // Calculate the manufacturing level for all of the stars the player owns.
-        playerStars.forEach(s => {
-            let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, s);
-            let ind = s.infrastructure?.industry ?? 0;
-
-            s.manufacturing = this.starService.calculateStarShipsByTicks(effectiveTechs.manufacturing, ind, 1, game.settings.galaxy.productionTicks)
-        });
-
-        let totalManufacturing = playerStars.reduce((sum, s) => sum + s.manufacturing, 0);
-
-        return Math.round((totalManufacturing + Number.EPSILON) * 100) / 100
-    }
-
-    calculateWarpgates(playerStars) {
-        return playerStars.reduce((sum, s) => s.warpGate ? sum + 1 : sum, 0);
-    }
-
-    calculateTotalCarriers(player, carriers) {
-        let playerCarriers = this.carrierService.listCarriersOwnedByPlayer(carriers, player._id);
-
-        return playerCarriers.length;
-    }
-
-    calculateTotalStarSpecialists(playerStars) {
-        return playerStars.filter(s => s.specialistId).length;
-    }
-
-    calculateTotalCarrierSpecialists(playerCarriers) {
-        return playerCarriers.filter(c => c.specialistId).length;
-    }
-
-    getStats(game, player) {
-        let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
-        let playerCarriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id);
-
-        let totalStarSpecialists = this.calculateTotalStarSpecialists(playerStars);
-        let totalCarrierSpecialists = this.calculateTotalCarrierSpecialists(playerCarriers);
-
-        let totalStars = playerStars.length;
-        let totalHomeStars = this.calculateTotalHomeStars(playerStars);
-
-        // In BR mode, the player star count is based on living stars only. - TODO: Why?
-        if (game.settings.general.mode === 'battleRoyale') {
-            totalStars = playerStars.filter(s => !this.starService.isDeadStar(s)).length;
-        }
-
-        return {
-            totalStars: totalStars,
-            totalHomeStars: totalHomeStars,
-            totalCarriers: playerCarriers.length,
-            totalShips: this.calculateTotalShips(playerStars, playerCarriers),
-            totalEconomy: this.calculateTotalEconomy(playerStars),
-            totalIndustry: this.calculateTotalIndustry(playerStars),
-            totalScience: this.calculateTotalScience(playerStars),
-            newShips: this.calculateTotalManufacturing(game, playerStars),
-            warpgates: this.calculateWarpgates(playerStars),
-            totalStarSpecialists,
-            totalCarrierSpecialists,
-            totalSpecialists: totalStarSpecialists + totalCarrierSpecialists,
-        };
-    }
-
-    updateLastSeen(game, player, date?: Date) {
+    updateLastSeen(game: Game, player: Player, date?: Date) {
         player.lastSeen = date || moment().utc();
     }
 
-    async updateLastSeenLean(gameId, userId, ipAddress) {
+    async updateLastSeenLean(gameId: DBObjectId, userId: DBObjectId, ipAddress: string) {
         await this.gameRepo.updateOne({
             _id: gameId,
             'galaxy.players.userId': userId
@@ -543,72 +440,7 @@ export default class PlayerService extends EventEmitter {
         });
     }
 
-    givePlayerCreditsEndOfCycleRewards(game, player) {
-        let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
-
-        let totalEco = this.calculateTotalEconomy(playerStars);
-
-        let creditsFromEconomy = totalEco * 10;
-        let creditsFromBanking = this._getBankingReward(game, player, playerStars, totalEco);
-        let creditsTotal = creditsFromEconomy + creditsFromBanking;
-        let creditsFromSpecialistsTechnology = this._getCreditsSpecialistsReward(game, player, playerStars);
-
-        player.credits += creditsTotal;
-        player.creditsSpecialists += creditsFromSpecialistsTechnology;
-
-        return {
-            creditsFromEconomy,
-            creditsFromBanking,
-            creditsTotal,
-            creditsFromSpecialistsTechnology
-        };
-    }
-
-    _getBankingReward(game, player, playerStars, totalEco) {
-        let isBankingEnabled = this.technologyService.isTechnologyEnabled(game, 'banking');
-
-        if (!isBankingEnabled || !playerStars.length) { // Players must have stars in order to get credits from banking.
-            return 0;
-        }
-
-        let banking = player.research.banking.level;
-
-        switch (game.settings.technology.bankingReward) {
-            case 'standard':
-                return Math.round((banking * 75) + (0.15 * banking * totalEco));
-            case 'legacy':
-                return banking * 75;
-        }
-
-        throw new Error(`Unsupported banking reward type: ${game.settings.technology.bankingReward}.`);
-    }
-
-    _getCreditsSpecialistsReward(game, player, playerStars) {
-        if (!playerStars.length) {
-            return 0;
-        }
-
-        let isSpecialistsCreditsEnabled = this.technologyService.isTechnologyEnabled(game, 'specialists');
-        let isCreditsSpecialistsCurrency = game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists';
-
-        if (!isSpecialistsCreditsEnabled || !isCreditsSpecialistsCurrency) {
-            return 0;
-        }
-
-        let starCount = playerStars.length;
-        let specialists = player.research.specialists.level;
-
-        switch (game.settings.technology.specialistTokenReward) {
-            case 'standard':
-                return specialists;
-            case 'experimental':
-                return Math.ceil(Math.min(starCount * specialists * 0.1, specialists));
-        }
-
-        throw new Error(`Unsupported specialist reward type: ${game.settings.technology.specialistTokenReward}.`);
-    }
-
-    deductCarrierUpkeepCost(game, player) {
+    deductCarrierUpkeepCost(game: Game, player: Player) {
         const upkeepCosts = {
             'none': 0,
             'cheap': 1,
@@ -633,84 +465,11 @@ export default class PlayerService extends EventEmitter {
         };
     }
 
-    async declareReady(game, player) {
-        player.ready = true;
-
-        await this.gameRepo.updateOne({
-            _id: game._id,
-            'galaxy.players._id': player._id
-        }, {
-            $set: {
-                'galaxy.players.$.ready': true
-            }
-        });
-
-        this.emit('onGamePlayerReady', {
-            gameId: game._id,
-            gameTick: game.state.tick,
-        });
-    }
-
-    async undeclareReady(game, player) {
-        player.ready = false;
-
-        await this.gameRepo.updateOne({
-            _id: game._id,
-            'galaxy.players._id': player._id
-        }, {
-            $set: {
-                'galaxy.players.$.ready': false
-            }
-        });
-    }
-
-    async declareReadyToQuit(game, player, force = false) {
-        if (!force && game.state.productionTick <= 0) {
-            throw new ValidationError('Cannot declare ready to quit until at least 1 production cycle has completed.');
-        }
-
-        if (!force && this.gameTypeService.isTutorialGame(game)) {
-            throw new ValidationError('Cannot declare ready to quit in a tutorial.');
-        }
-
-        player.readyToQuit = true;
-
-        await this.gameRepo.updateOne({
-            _id: game._id,
-            'galaxy.players._id': player._id
-        }, {
-            $set: {
-                'galaxy.players.$.readyToQuit': true
-            }
-        });
-    }
-
-    async undeclareReadyToQuit(game, player) {
-        if (game.state.productionTick <= 0) {
-            throw new ValidationError('Cannot undeclare ready to quit until at least 1 production cycle has completed.');
-        }
-
-        if (this.gameTypeService.isTutorialGame(game)) {
-            throw new ValidationError('Cannot undeclare ready to quit in a tutorial.');
-        }
-        
-        player.readyToQuit = false;
-
-        await this.gameRepo.updateOne({
-            _id: game._id,
-            'galaxy.players._id': player._id
-        }, {
-            $set: {
-                'galaxy.players.$.readyToQuit': false
-            }
-        });
-    }
-
-    async getGameNotes(game, player) {
+    async getGameNotes(game: Game, player: Player) {
         return player.notes;
     }
 
-    async updateGameNotes(game, player, notes) {
+    async updateGameNotes(game: Game, player: Player, notes: string) {
         player.notes = notes;
 
         await this.gameRepo.updateOne({
@@ -723,7 +482,7 @@ export default class PlayerService extends EventEmitter {
         });
     }
 
-    performDefeatedOrAfkCheck(game, player, isTurnBasedGame) {
+    performDefeatedOrAfkCheck(game: Game, player: Player, isTurnBasedGame: boolean) {
         // Check if the player has been AFK.
         let isAfk = this.isAfk(game, player, isTurnBasedGame);
 
@@ -738,7 +497,7 @@ export default class PlayerService extends EventEmitter {
             // If there are no stars and there are no carriers then the player is defeated.
             if (stars.length === 0) {
                 let carriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id); // Note: This logic looks a bit weird, but its more performant.
-    
+
                 if (carriers.length === 0) {
                     this.setPlayerAsDefeated(game, player);
                 }
@@ -751,7 +510,7 @@ export default class PlayerService extends EventEmitter {
         }
     }
 
-    incrementMissedTurns(game) {
+    incrementMissedTurns(game: Game) {
         for (let player of game.galaxy.players) {
             // If the player isn't ready, increase their number of missed turns.
             if (!player.ready && !player.defeated) {
@@ -764,23 +523,12 @@ export default class PlayerService extends EventEmitter {
         }
     }
 
-    resetReadyStatuses(game) {
-        for (let player of game.galaxy.players) {
-            // Reset whether we have sent the player a turn reminder.
-            player.hasSentTurnReminder = false;
-
-            // Reset the ready status for players who have a legit user.
-            // Accounts could be deleted, could be a tutorial etc.
-            player.ready = player.userId == null;
-        }
-    }
-
-    isAfk(game, player, isTurnBasedGame) {
+    isAfk(game: Game, player: Player, isTurnBasedGame: boolean) {
         // The player is afk if:
         // 1. They haven't been seen for X days.
         // 2. They missed the turn limit in a turn based game.
         // 3. They missed X cycles in a real time game (minimum of 12 hours)
-        
+
         // Note: In tutorial games, only legit players can be considered afk.
         if (this.gameTypeService.isTutorialGame(game) && !player.userId) {
             return false;
@@ -803,11 +551,10 @@ export default class PlayerService extends EventEmitter {
         return lastSeenMoreThanXSecondsAgo;
     }
 
-    setPlayerAsDefeated(game, player) {
+    setPlayerAsDefeated(game: Game, player: Player) {
         player.defeated = true;
         player.defeatedDate = moment().utc();
         player.researchingNext = 'random'; // Set up the AI for random research.
-        player.diplomacy.allies = []; // Set all players to enemies.
 
         // Auto-ready the player so they don't hold up the game.
         if (game.settings.gameTime.gameType === 'turnBased') {
@@ -825,78 +572,30 @@ export default class PlayerService extends EventEmitter {
         this.carrierService.clearPlayerCarrierWaypointsLooped(game, player);
     }
 
-    setPlayerAsAfk(game, player) {
+    setPlayerAsAfk(game: Game, player: Player) {
         this.setPlayerAsDefeated(game, player);
 
         player.afk = true;
     }
 
-    hasDuplicateLastSeenIP(game, player) {
+    hasDuplicateLastSeenIP(game: Game, player: Player) {
         if (!player.lastSeenIP) {
             return false;
         }
 
-        return game.galaxy.players.find(p => p.lastSeenIP 
-            && !p._id.toString() === player._id.toString() 
+        return game.galaxy.players.find(p => p.lastSeenIP
+            && p._id.toString() !== player._id.toString()
             && p.lastSeenIP === player.lastSeenIP) != null;
     }
 
-    async addCredits(game, player, amount, commit = true) {
-        player.credits += amount;
-
-        let query = {
-            updateOne: {
-                filter: {
-                    _id: game._id,
-                    'galaxy.players._id': player._id
-                },
-                update: {
-                    $inc: {
-                        'galaxy.players.$.credits': amount
-                    }
-                }
-            }
-        }
-        
-        if (commit) {
-            await this.gameRepo.bulkWrite([query]);
-        }
-        
-        return query;
-    }
-
-    async addCreditsSpecialists(game, player, amount, commit = true) {
-        player.creditsSpecialists += amount;
-
-        let query = {
-            updateOne: {
-                filter: {
-                    _id: game._id,
-                    'galaxy.players._id': player._id
-                },
-                update: {
-                    $inc: {
-                        'galaxy.players.$.creditsSpecialists': amount
-                    }
-                }
-            }
-        }
-        
-        if (commit) {
-            await this.gameRepo.bulkWrite([query]);
-        }
-        
-        return query;
-    }
-
-    getKingOfTheHillPlayer(game) {
+    getKingOfTheHillPlayer(game: Game) {
         const star = this.starService.getKingOfTheHillStar(game);
 
         if (!star.ownedByPlayerId) {
             return null;
         }
 
-        return this.getById(game, star.ownedByPlayerId);
+        return this.getById(game, star.ownedByPlayerId)!;
     }
 
     async setHasSentTurnReminder(game: Game, player: Player, sent: boolean) {

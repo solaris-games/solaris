@@ -1,8 +1,10 @@
 import { DBObjectId } from "./DBObjectId";
+import { DiplomaticState } from "./Diplomacy";
 import { PlayerStatistics } from "./Leaderboard";
 
 export type PlayerShape = 'circle'|'square'|'diamond'|'hexagon';
 export type ResearchType = 'scanning'|'hyperspace'|'terraforming'|'experimentation'|'weapons'|'banking'|'manufacturing'|'specialists'|'random';
+export type ResearchTypeNotRandom = 'scanning'|'hyperspace'|'terraforming'|'experimentation'|'weapons'|'banking'|'manufacturing'|'specialists';
 
 export interface PlayerColour {
     alias: string;
@@ -46,8 +48,9 @@ export interface PlayerTechnologyLevels {
     specialists: number;
 };
 
-export interface PlayerDiplomacy {
-    allies: DBObjectId[];
+export interface PlayerDiplomaticState { 
+    playerId: DBObjectId;
+    status: DiplomaticState;
 };
 
 export interface Player {
@@ -66,7 +69,7 @@ export interface Player {
     isOnline?: boolean | null;
     lastSeenIP?: string | null;
     hasDuplicateIP?: boolean;
-    researchingNow: ResearchType;
+    researchingNow: ResearchTypeNotRandom;
     researchingNext: ResearchType;
     credits: number;
     creditsSpecialists: number;
@@ -75,6 +78,7 @@ export interface Player {
     afk: boolean;
     renownToGive: number;
     ready: boolean;
+    readyToCycle: boolean;
     readyToQuit: boolean;
     missedTurns: number;
     hasSentTurnReminder: boolean;
@@ -82,7 +86,7 @@ export interface Player {
     research: PlayerResearch,
     ledger: PlayerLedger[],
     reputations: PlayerReputation[],
-    diplomacy: PlayerDiplomacy,
+    diplomacy: PlayerDiplomaticState[],
     stats?: PlayerStatistics;
     isKingOfTheHill?: boolean;
     isInScanningRange?: boolean;

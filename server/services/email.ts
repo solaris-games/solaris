@@ -9,6 +9,7 @@ import GameTypeService from "./gameType";
 import LeaderboardService from "./leaderboard";
 import PlayerService from "./player";
 import UserService from "./user";
+import { Player } from "../types/Player";
 
 const nodemailer = require('nodemailer');
 const fs = require('fs');
@@ -26,7 +27,7 @@ function getFakeTransport() {
     };
 }
 
-function sleep(ms) {
+function sleep(ms: number) {
     return new Promise((resolve) => {
         setTimeout(resolve, ms);
     });
@@ -156,7 +157,7 @@ export default class EmailService {
         return await transport.sendMail(message);
     }
 
-    async sendTemplate(toEmail: string, template: EmailTemplate, parameters: any[]) {
+    async sendTemplate(toEmail: string, template: EmailTemplate, parameters) {
         parameters = parameters || [];
 
         const filePath = path.join(__dirname, '../templates/', template.fileName);
@@ -253,7 +254,7 @@ export default class EmailService {
         let gameName = game.settings.general.name;
 
         // Send the email only to undefeated players.
-        let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated);
+        let undefeatedPlayers = game.galaxy.players.filter((p: Player) => !p.defeated);
         let winConditionText = '';
 
         switch (game.settings.general.mode) {
@@ -306,7 +307,7 @@ export default class EmailService {
             return;
         }
 
-        let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated && !p.ready);
+        let undefeatedPlayers = game.galaxy.players.filter((p: Player) => !p.defeated && !p.ready);
 
         if (undefeatedPlayers.length === 1) {
             let player = undefeatedPlayers[0];
@@ -363,7 +364,7 @@ export default class EmailService {
         let gameName = game.settings.general.name;
         let player = this.playerService.getById(game, playerId);
         
-        if (player) {
+        if (player && player.userId) {
             let user = await this.userService.getEmailById(player.userId);
             
             if (user && user.emailEnabled) {

@@ -15,6 +15,7 @@
           <option value="galacticCycles">Galactic Cycles</option>
           <option value="combat">Combat</option>
           <option value="research">Research</option>
+          <option value="diplomacy">Diplomacy</option>
           <option value="trade">Trade</option>
           <option value="specialists">Specialists</option>
           <option value="conversations">Conversations</option>
@@ -88,7 +89,9 @@ export default {
 
         if (response.status === 200) {
           for (let e of this.events) {
-            e.read = true
+            if (e.read === false) {
+              e.read = true
+            }
           }
         }
       } catch (err) {
@@ -149,6 +152,11 @@ export default {
           'playerConversationCreated',
           'playerConversationInvited',
           'playerConversationLeft'
+        ],
+        diplomacy: [
+          'gameDiplomacyPeaceDeclared',
+          'gameDiplomacyWarDeclared',
+          'gameDiplomacyAllianceDeclared'
         ]
       }
 
