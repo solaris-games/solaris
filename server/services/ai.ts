@@ -635,8 +635,10 @@ export default class AIService {
     }
 
     _calculateRequiredShipsForAttack(game: Game, player: Player, context: Context, starToInvade: Star) {
+        const invadedPlayer = starToInvade.ownedByPlayerId!;
+
         const starId = starToInvade._id.toString();
-        const defendingPlayer = this.playerService.getById(game, starToInvade.ownedByPlayerId);
+        const defendingPlayer = this.playerService.getById(game, invadedPlayer)!;
         const defendingCarriers = context.carriersOrbiting.get(starId) || [];
 
         const defender = {
@@ -657,7 +659,7 @@ export default class AIService {
         const attackers: Player[] = [];
 
         for (const attackingCarrier of attackingCarriers) {
-            const attacker = this.playerService.getById(game, attackingCarrier.ownedByPlayerId);
+            const attacker = this.playerService.getById(game, attackingCarrier.ownedByPlayerId)!;
             const attackerId = attacker._id.toString();
             if (!attackerIds.has(attackerId)) {
                 attackerIds.add(attackerId);
