@@ -1,5 +1,6 @@
 import { Game } from "../types/Game";
 import { Player } from "../types/Player";
+import { DiplomaticState } from "../types/Diplomacy";
 import { AiState, KnownAttack } from "../types/Ai";
 import CarrierService from "./carrier";
 import CombatService from "./combat";
@@ -15,6 +16,7 @@ import { Carrier } from "../types/Carrier";
 import { getOrInsert, reverseSort, notNull } from "../utils";
 import { CarrierWaypoint } from "../types/CarrierWaypoint";
 import ReputationService from "./reputation";
+import DiplomacyService from "./diplomacy";
 
 const FIRST_TICK_BULK_UPGRADE_SCI_PERCENTAGE = 20;
 const FIRST_TICK_BULK_UPGRADE_IND_PERCENTAGE = 30;
@@ -116,6 +118,7 @@ export default class AIService {
     technologyService: TechnologyService;
     playerService: PlayerService;
     reputationService: ReputationService;
+    diplomacyService: DiplomacyService;
 
     constructor(
         starUpgradeService: StarUpgradeService,
@@ -127,7 +130,8 @@ export default class AIService {
         shipTransferService: ShipTransferService,
         technologyService: TechnologyService,
         playerService: PlayerService,
-        reputationService: ReputationService
+        reputationService: ReputationService,
+        diplomacyService: DiplomacyService
     ) {
         this.starUpgradeService = starUpgradeService;
         this.carrierService = carrierService;
@@ -139,6 +143,7 @@ export default class AIService {
         this.technologyService = technologyService;
         this.playerService = playerService;
         this.reputationService = reputationService;
+        this.diplomacyService = diplomacyService;
     }
 
     async play(game: Game, player: Player) {
@@ -731,7 +736,11 @@ export default class AIService {
     }
 
     _isEnemyStar(game: Game, player: Player, context: Context, star: Star) {
-        return star.ownedByPlayerId && star.ownedByPlayerId.toString() !== player._id.toString(); //TODO
+        if (star.ownedByPlayerId) {
+            const starOwner = star.ownedByPlayerId;
+            return starOwner !== player._id && this.diplomacyService.getDiplomaticStatusToPlayer(game, player._id, starOwner).actualStatus !== 'allies';
+        }
+        return false;
     }
 
     _getStarScore(star: Star): number {
