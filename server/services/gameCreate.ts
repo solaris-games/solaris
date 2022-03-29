@@ -179,6 +179,8 @@ export default class GameCreateService {
         );
 
         game.galaxy.stars = starGeneration.stars;
+        game.galaxy.homeStars = starGeneration.homeStars;
+        game.galaxy.linkedStars = starGeneration.linkedStars;
         
         // Setup players and assign to their starting positions.
         game.galaxy.players = this.playerService.createEmptyPlayers(game);
