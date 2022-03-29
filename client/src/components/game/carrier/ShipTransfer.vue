@@ -10,7 +10,7 @@
 
     <div class="row mb-0 pt-2 pb-2 bg-primary" v-if="carrier.waypoints && carrier.waypoints.length">
       <div class="col">
-        <p class="mb-0"><i class="fas fa-map-marker-alt mr-2"></i><strong>{{carrier.name}}</strong>'s next waypoint is to <star-label :starId="carrier.waypoints[0].destination"/>.</p>
+        <p class="mb-0"><i class="fas fa-map-marker-alt mr-2"></i><strong>{{carrier.name}}</strong>'s next waypoint is to <star-label :starId="carrierWaypointDestination"/>.</p>
       </div>
     </div>
 
@@ -93,7 +93,8 @@ export default {
       star: null,
       starShips: 0,
       carrierShips: 0,
-      isTransferringShips: false
+      isTransferringShips: false,
+      carrierWaypointDestination: null
     }
   },
   mounted () {
@@ -102,6 +103,10 @@ export default {
 
     this.starShips = this.star.ships
     this.carrierShips = this.carrier.ships
+
+    if (this.carrier.waypoints && this.carrier.waypoints.length) {
+      this.carrierWaypointDestination = this.carrier.waypoints[0].destination
+    }
   },
   methods: {
     onCloseRequested (e) {
