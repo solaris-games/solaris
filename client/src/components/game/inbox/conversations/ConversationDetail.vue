@@ -230,9 +230,9 @@ export default {
     async leaveConversation () {
       if (await this.$confirm('Leave conversation', `Are you sure you want to leave this conversation?`)) {
         try {
-          this.onOpenInboxRequested()
-
           await ConversationApiService.leave(this.$store.state.game._id, this.conversation._id)
+          
+          this.onOpenInboxRequested()
         } catch (err) {
           console.error(err)
         }
