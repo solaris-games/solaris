@@ -213,8 +213,8 @@ export default class GameTickService extends EventEmitter {
             this._orbitGalaxy(game);
             logTime('Orbital mechanics');
 
-            this._kingOfTheHillCheck(game);
-            logTime('King of the hill check');
+            this._countdownToEndCheck(game);
+            logTime('Countdown to end check');
 
             let hasWinner = await this._gameWinCheck(game, gameUsers);
             logTime('Game win check');
@@ -785,12 +785,11 @@ export default class GameTickService extends EventEmitter {
         }
     }
 
-    _kingOfTheHillCheck(game: Game) {
-        if (!this.gameTypeService.isKingOfTheHillMode(game)) {
-            return;
-        }
-
-        if (this.gameStateService.isCountingDownToEnd(game) || this.playerService.getKingOfTheHillPlayer(game)) {
+    _countdownToEndCheck(game: Game) {
+        if (
+            this.gameStateService.isCountingDownToEnd(game) ||                                                      // Is already counting down
+            (this.gameTypeService.isKingOfTheHillMode(game) && this.playerService.getKingOfTheHillPlayer(game))     // Is KotH and there is a king
+        ) {
             this.gameStateService.countdownToEnd(game);
         }
     }
