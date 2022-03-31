@@ -154,7 +154,7 @@ class Map extends EventEmitter {
     if (this._isWormHolesEnabled()) {
       this.wormHoleLayer = new WormHoleLayer()
       this.drawWormHoles()
-      this.orbitalContainer.addChild(this.wormHoleLayer.container)
+      this.wormHoleContainer.addChild(this.wormHoleLayer.container)
     }
 
     // -----------
