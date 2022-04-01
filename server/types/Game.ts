@@ -223,6 +223,7 @@ export interface Game {
 			galaxyCenterLocation?: Location
 		},
 		research: {
+			sciencePointMultiplier: number;
 			progressMultiplier: number;
 		},
 		star: {
@@ -250,9 +251,8 @@ export interface Game {
 				veryExpensive: number;
 				crazyExpensive: number;
 			},
-			captureRewardMultiplier: number,
-			researchPointScienceMultiplier: number,
-			homeStarDefenderBonusMultiplier: number,
+			captureRewardMultiplier: number;
+			homeStarDefenderBonusMultiplier: number;
 		},
 		diplomacy: {
 			upkeepExpenseMultipliers: {

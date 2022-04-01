@@ -21,10 +21,10 @@ module.exports = {
         });
 
         await games.updateMany({
-            'constants.star.researchPointScienceMultiplier': { $eq: null }
+            'constants.research.sciencePointMultiplier': { $eq: null }
         }, {
             $set: {
-                'constants.star.researchPointScienceMultiplier': 1
+                'constants.research.sciencePointMultiplier': 1
             }
         });
 

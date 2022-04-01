@@ -100,8 +100,9 @@ export default class ResearchService extends EventEmitter {
         let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
         let totalScience = this.playerStatisticsService.calculateTotalScience(playerStars);
-            
-        tech.progress! += totalScience;
+        let multiplier = game.constants.research.sciencePointMultiplier;
+
+        tech.progress! += totalScience * multiplier;
 
         // If the player isn't being controlled by AI then increment achievements.
         if (user && !player.defeated && !this.gameTypeService.isTutorialGame(game)) {

@@ -183,6 +183,7 @@ const schema = new Schema({
 			}
 		},
 		research: {
+			sciencePointMultiplier: { type: Types.Number, required: true, default: 1 },
 			progressMultiplier: { type: Types.Number, required: true, default: 50 }
 		},
 		star: {
@@ -211,7 +212,6 @@ const schema = new Schema({
 				crazyExpensive: { type: Types.Number, required: true, default: 8 }
 			},
 			captureRewardMultiplier: { type: Types.Number, required: true, default: 10 },
-			researchPointScienceMultiplier: { type: Types.Number, required: true, default: 1 },
 			homeStarDefenderBonusMultiplier: { type: Types.Number, required: true, default: 1 }
 		},
 		diplomacy: {
