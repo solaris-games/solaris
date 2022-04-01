@@ -2,6 +2,15 @@
   <view-container>
     <view-title title="Join Game" />
 
+    <div class="row bg-info mb-2" v-if="flux" style="margin-top: -0.5rem!important;">
+      <div class="col">
+        <p class="mt-1 mb-1"><small><i class="fas fa-dice-d20 mr-1"></i>{{flux.month}} Flux</small></p>
+      </div>
+      <div class="col-auto">
+        <p class="mt-1 mb-1"><small><strong>{{flux.name}}</strong> - {{flux.description}}</small></p>
+      </div>
+    </div>
+
     <ul class="nav nav-tabs">
       <li class="nav-item">
           <a class="nav-link active" data-toggle="tab" href="#newGames">New Games</a>
@@ -368,7 +377,8 @@ export default {
         oneVsOneTB: null,
         thirtyTwoPlayerRT: null,
         special: null
-      }
+      },
+      flux: null
     }
   },
   async mounted () {
@@ -376,6 +386,7 @@ export default {
 
     try {
       let requests = [
+        gameService.getCurrentFlux(),
         gameService.listOfficialGames(),
         gameService.listUserGames(),
         gameService.listInProgressGames(),
@@ -384,10 +395,11 @@ export default {
 
       let responses = await Promise.all(requests)
 
-      this.serverGames = responses[0].data
-      this.userGames = responses[1].data
-      this.inProgressGames = responses[2].data
-      this.recentlyCompletedGames = responses[3].data
+      this.flux = responses[0].data
+      this.serverGames = responses[1].data
+      this.userGames = responses[2].data
+      this.inProgressGames = responses[3].data
+      this.recentlyCompletedGames = responses[4].data
 
       this.games.featured = this.getFeaturedGame()
       this.games.newPlayerRT = this.getOfficialGame('new_player_rt')
