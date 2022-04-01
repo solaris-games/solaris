@@ -211,7 +211,7 @@ const schema = new Schema({
 				crazyExpensive: { type: Types.Number, required: true, default: 8 }
 			},
 			captureRewardMultiplier: { type: Types.Number, required: true, default: 10 },
-			researchPointMultiplier: { type: Types.Number, required: true, default: 1 },
+			researchPointScienceMultiplier: { type: Types.Number, required: true, default: 1 },
 			homeStarDefenderBonusMultiplier: { type: Types.Number, required: true, default: 1 }
 		},
 		diplomacy: {
