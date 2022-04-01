@@ -4,15 +4,19 @@
         <p class="mt-1 mb-1"><small><i class="fas fa-dice-d20 mr-1"></i>{{flux.month}} Flux</small></p>
       </div>
       <div class="col-auto">
-        <p class="mt-1 mb-1"><small><strong>{{flux.name}}</strong> - {{flux.description}}</small></p>
+        <p class="mt-1 mb-1"><small><strong>{{flux.name}}</strong> - {{flux.description}} <help-tooltip v-if="flux.tooltip" :tooltip="flux.tooltip"/></small></p>
       </div>
     </div>
 </template>
 
 <script>
 import GameApiService from '../../../services/api/game'
+import HelpTooltip from '../../HelpTooltip'
 
 export default {
+    components: {
+        'help-tooltip': HelpTooltip
+    },
     data () {
         return {
             flux: null

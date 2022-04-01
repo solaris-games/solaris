@@ -24,6 +24,7 @@ nav:
   - Territories: 'territories.md'
   - Combat: 'combat.md'
   - 'Game Types': 'gameTypes.md'
+  - 'Game Flux': 'flux.md'
   - 'Game Tick Events': 'gameTick.md'
   - Rankings: 'rankings.md'
   - Achievements: 'achievements.md'
