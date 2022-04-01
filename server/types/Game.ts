@@ -223,8 +223,9 @@ export interface Game {
 			galaxyCenterLocation?: Location
 		},
 		research: {
-			sciencePointMultiplier: number;
 			progressMultiplier: number;
+			sciencePointMultiplier: number;
+			experimentationMultiplier: number;
 		},
 		star: {
 			resources: {
@@ -263,7 +264,11 @@ export interface Game {
 			}
 		},
 		player: {
+			rankRewardMultiplier: number;
 			bankingCycleRewardMultiplier: number;
+		},
+		specialists: {
+			monthlyBanAmount: number;
 		}
 	},
 	quitters: DBObjectId[],

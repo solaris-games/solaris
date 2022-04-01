@@ -4,6 +4,7 @@ import AchievementService from './achievement';
 import ConversationService from './conversation';
 import GameService from './game';
 import GameCreateValidationService from './gameCreateValidation';
+import GameFluxService from './gameFlux';
 import GameListService from './gameList';
 import HistoryService from './history';
 import MapService from './map';
@@ -28,6 +29,7 @@ export default class GameCreateService {
     achievementService: AchievementService;
     userService: UserService;
     gameCreateValidationService: GameCreateValidationService;
+    gameFluxService: GameFluxService;
     specialistBanService: SpecialistBanService;
 
     constructor(
@@ -43,6 +45,7 @@ export default class GameCreateService {
         achievementService: AchievementService,
         userService: UserService,
         gameCreateValidationService: GameCreateValidationService,
+        gameFluxService: GameFluxService,
         specialistBanService: SpecialistBanService
     ) {
         this.gameModel = gameModel;
@@ -57,6 +60,7 @@ export default class GameCreateService {
         this.achievementService = achievementService;
         this.userService = userService;
         this.gameCreateValidationService = gameCreateValidationService;
+        this.gameFluxService = gameFluxService;
         this.specialistBanService = specialistBanService;
     }
 
@@ -138,9 +142,11 @@ export default class GameCreateService {
                 carrier: []
             };
         }
-        // For official games, add this month's specialist bans.
+        // For official games, add this month's flux and specialist bans.
         else if (isOfficialGame && !isTutorial && !isNewPlayerGame) {
-            const banAmount = 3; // Random 3 specs of each type.
+            this.gameFluxService.applyMonthlyFlux(game);
+
+            const banAmount = game.constants.specialists.monthlyBanAmount; // Random X specs of each type.
 
             game.settings.specialGalaxy.specialistBans = {
                 star: this.specialistBanService.getCurrentMonthStarBans(banAmount),

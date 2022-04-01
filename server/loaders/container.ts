@@ -76,6 +76,7 @@ import CarrierMovementService from '../services/carrierMovement';
 import CarrierGiftService from '../services/carrierGift';
 import PlayerCycleRewardsService from '../services/playerCycleRewards';
 import StarContestedService from '../services/starContested';
+import GameFluxService from '../services/gameFlux';
 
 import { DependencyContainer } from '../types/DependencyContainer';
 
@@ -170,13 +171,14 @@ export default (config, io): DependencyContainer => {
     const emailService = new EmailService(config, gameService, userService, leaderboardService, playerService, gameTypeService, gameStateService, gameTickService);
     const shipTransferService = new ShipTransferService(gameRepository, carrierService, starService);
     const donateService = new DonateService(cacheService);
+    const gameFluxService = new GameFluxService();
 
     const eventService = new EventService(EventModel, eventRepository, broadcastService, gameService, gameTickService, researchService, starService, starUpgradeService, tradeService,
         ledgerService, conversationService, combatService, specialistService, badgeService, carrierGiftService, diplomacyService);
 
     const gameListService = new GameListService(gameRepository, gameService, conversationService, eventService, gameTypeService);
     const gameCreateValidationService = new GameCreateValidationService(playerService, starService, carrierService, specialistService, gameTypeService);
-    const gameCreateService = new GameCreateService(GameModel, gameService, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService, gameCreateValidationService, specialistBanService);
+    const gameCreateService = new GameCreateService(GameModel, gameService, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService, gameCreateValidationService, gameFluxService, specialistBanService);
 
     console.log('Dependency Container Initialized');
     
@@ -242,5 +244,6 @@ export default (config, io): DependencyContainer => {
         carrierMovementService,
         playerCycleRewardsService,
         starContestedService,
+        gameFluxService,
     };
 };

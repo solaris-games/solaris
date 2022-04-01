@@ -21,6 +21,7 @@ import EventService from "../services/event";
 import GameService from "../services/game";
 import GameCreateService from "../services/gameCreate";
 import GameCreateValidationService from "../services/gameCreateValidation";
+import GameFluxService from "../services/gameFlux";
 import GameGalaxyService from "../services/gameGalaxy";
 import GameListService from "../services/gameList";
 import GameStateService from "../services/gameState";
@@ -122,4 +123,5 @@ export interface DependencyContainer {
     carrierMovementService: CarrierMovementService,
     playerCycleRewardsService: PlayerCycleRewardsService,
     starContestedService: StarContestedService,
+    gameFluxService: GameFluxService,
 };

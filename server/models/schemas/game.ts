@@ -183,8 +183,9 @@ const schema = new Schema({
 			}
 		},
 		research: {
+			progressMultiplier: { type: Types.Number, required: true, default: 50 },
 			sciencePointMultiplier: { type: Types.Number, required: true, default: 1 },
-			progressMultiplier: { type: Types.Number, required: true, default: 50 }
+			experimentationMultiplier: { type: Types.Number, required: true, default: 1 }
 		},
 		star: {
 			resources: {
@@ -223,7 +224,11 @@ const schema = new Schema({
 			}
 		},
 		player: {
+			rankRewardMultiplier: { type: Types.Number, required: true, default: 1 },
 			bankingCycleRewardMultiplier: { type: Types.Number, required: true, default: 75 }
+		},
+		specialists: {
+			monthlyBanAmount: { type: Types.Number, required: true, default: 3 }
 		}
 	},
 	quitters: [{ type: Types.ObjectId, required: false }],

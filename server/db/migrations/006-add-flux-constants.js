@@ -7,7 +7,18 @@ module.exports = {
         }, {
             $set: {
                 'constants.player': {
+                    rankRewardMultiplier: 1,
                     bankingCycleRewardMultiplier: 75
+                }
+            }
+        });
+
+        await games.updateMany({
+            'constants.specialists': { $eq: null }
+        }, {
+            $set: {
+                'constants.specialists': {
+                    monthlyBanAmount: 3
                 }
             }
         });
@@ -25,6 +36,14 @@ module.exports = {
         }, {
             $set: {
                 'constants.research.sciencePointMultiplier': 1
+            }
+        });
+
+        await games.updateMany({
+            'constants.research.experimentationMultiplier': { $eq: null }
+        }, {
+            $set: {
+                'constants.research.experimentationMultiplier': 1
             }
         });
 

@@ -198,7 +198,7 @@ export default class ResearchService extends EventEmitter {
             return noExperimentation;
         }
 
-        let researchAmount = player.research.experimentation.level * game.constants.research.progressMultiplier;
+        let researchAmount = player.research.experimentation.level * (game.constants.research.progressMultiplier * game.constants.research.experimentationMultiplier);
 
         tech.technology.progress! += researchAmount;
 

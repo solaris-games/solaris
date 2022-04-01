@@ -721,6 +721,9 @@ export default class LeaderboardService {
                 if (rankIncrease > 0 && this.gameTypeService.isSpecialGameMode(game)) {
                     rankIncrease *= 2;
                 }
+                
+                // Apply any additional rank multiplier at the end.
+                rankIncrease *= game.constants.player.rankRewardMultiplier;
 
                 let currentRank = user.achievements.rank;
                 let newRank = Math.max(user.achievements.rank + rankIncrease, 0); // Cannot go less than 0.
