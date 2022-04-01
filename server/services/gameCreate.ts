@@ -142,17 +142,6 @@ export default class GameCreateService {
                 carrier: []
             };
         }
-        // For official games, add this month's flux and specialist bans.
-        else if (isOfficialGame && !isTutorial && !isNewPlayerGame) {
-            this.gameFluxService.applyMonthlyFlux(game);
-
-            const banAmount = game.constants.specialists.monthlyBanAmount; // Random X specs of each type.
-
-            game.settings.specialGalaxy.specialistBans = {
-                star: this.specialistBanService.getCurrentMonthStarBans(banAmount),
-                carrier: this.specialistBanService.getCurrentMonthCarrierBans(banAmount)
-            };
-        }
 
         if (game.settings.galaxy.galaxyType === 'custom') {
             game.settings.specialGalaxy.randomWarpGates = 0;
@@ -171,6 +160,21 @@ export default class GameCreateService {
             let randomGameName = this.nameService.getRandomGameName();
 
             game.settings.general.name = game.settings.general.name.replace(RANDOM_NAME_STRING, randomGameName);
+        }
+
+        // For official games, add this month's flux and specialist bans.
+        if (isOfficialGame && !isTutorial && !isNewPlayerGame) {
+            this.gameFluxService.applyCurrentFlux(game);
+
+            // Apply spec bans if applicable.
+            if (game.settings.specialGalaxy.specialistCost !== 'none') {
+                const banAmount = game.constants.specialists.monthlyBanAmount; // Random X specs of each type.
+    
+                game.settings.specialGalaxy.specialistBans = {
+                    star: this.specialistBanService.getCurrentMonthStarBans(banAmount),
+                    carrier: this.specialistBanService.getCurrentMonthCarrierBans(banAmount)
+                };
+            }
         }
 
         // Create all of the stars required.

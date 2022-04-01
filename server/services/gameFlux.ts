@@ -1,6 +1,7 @@
 import { Game } from "../types/Game";
 
 const moment = require('moment');
+const fluxes = require('../config/game/flux.json');
 
 export default class GameFluxService {
 
@@ -19,16 +20,30 @@ export default class GameFluxService {
         this.applyDecFlux
     ];
 
-    applyMonthlyFlux(game: Game) {
-        const fluxId = moment().utc().month();
-        const flux = this.FLUX[fluxId];
+    getCurrentFlux() {
+        return this.getFluxById(moment().utc().month() + 1);
+    }
 
-        flux(game);
+    getFluxById(fluxId: number | null) {
+        if (fluxId == null) {
+            return null;
+        }
+
+        return fluxes.find(f => f.id === fluxId);
+    }
+
+    applyCurrentFlux(game: Game) {
+        const fluxId = moment().utc().month();
+        const applyFlux = this.FLUX[fluxId];
+
+        applyFlux(game);
+
+        game.settings.general.fluxId = fluxId + 1;
     }
 
     applyJanFlux(game: Game) {
         // Banking rewards are increased.
-        game.constants.player.bankingCycleRewardMultiplier = 125;
+        game.constants.player.bankingCycleRewardMultiplier = 50;
     }
 
     applyFebFlux(game: Game) {

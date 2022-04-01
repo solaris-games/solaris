@@ -53,8 +53,16 @@ export type GameTimeSpeed = 30|60|300|600|1800|3600|7200;
 export type GameTimeStartDelay = 0|1|5|10|30|60|120|240|360|480|600|720|1440;
 export type GameTimeMaxTurnWait = 1|5|10|30|60|360|480|600|720|1080|1440|2880;
 
+export interface GameFlux {
+	id: number;
+	name: string;
+	month: string;
+	description: string;
+};
+
 export interface GameSettings {
 	general: {
+		fluxId: number | null;
 		createdByUserId?: DBObjectId | null;
 		name: string;
 		description: string | null;
@@ -70,6 +78,7 @@ export interface GameSettings {
 		timeMachine: GameSettingEnabledDisabled;
 		awardRankTo: GameAwardRankTo;
 		isGameAdmin?: boolean;
+		flux?: GameFlux;
 	},
 	galaxy: {
 		galaxyType: GameGalaxyType;

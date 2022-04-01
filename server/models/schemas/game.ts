@@ -10,6 +10,7 @@ import ConversationSchema from './conversation';
 const schema = new Schema({
     settings: {
         general: {
+			fluxId: { type: Types.Number, required: false, default: null },
             createdByUserId: { type: Types.ObjectId, required: false, default: null },
             name: { type: Types.String, required: true },
             description: { type: Types.String, required: false, default: null },
