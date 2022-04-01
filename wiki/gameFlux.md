@@ -1,8 +1,10 @@
 # Flux
 
-**Flux** is a galaxy effect that is present in all official games (excluding 1v1s), it changes on the 1st of every month.
+**Flux** is a galaxy effect that is present in all **official games** (excluding 1v1s), it changes on the 1st of every month.
 
 Flux affects games in interesting ways that mix up the metagame from month to month.
+
+*Note: Flux is applied when a game is created. If the flux changes, it does not affect in progress games.*
 
 ## Flux Types
 

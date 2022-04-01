@@ -372,8 +372,7 @@ export default {
         oneVsOneTB: null,
         thirtyTwoPlayerRT: null,
         special: null
-      },
-      flux: null
+      }
     }
   },
   async mounted () {
