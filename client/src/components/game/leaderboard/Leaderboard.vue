@@ -12,7 +12,7 @@
 
     <div class="row bg-info" v-if="game.settings.general.flux">
       <div class="col text-center">
-        <p class="mt-2 mb-2"><i class="fas fa-dice-d20 mr-1"></i><strong>{{game.settings.general.flux.name}}</strong> - {{game.settings.general.flux.description}}</p>
+        <p class="mt-2 mb-2"><small><i class="fas fa-dice-d20 mr-1"></i><strong>{{game.settings.general.flux.name}}</strong> - {{game.settings.general.flux.description}}</small></p>
       </div>
     </div>
 

@@ -6,6 +6,7 @@ import GameService from './game';
 import GameCreateValidationService from './gameCreateValidation';
 import GameFluxService from './gameFlux';
 import GameListService from './gameList';
+import GameTypeService from './gameType';
 import HistoryService from './history';
 import MapService from './map';
 import NameService from './name';
@@ -31,6 +32,7 @@ export default class GameCreateService {
     gameCreateValidationService: GameCreateValidationService;
     gameFluxService: GameFluxService;
     specialistBanService: SpecialistBanService;
+    gameTypeService: GameTypeService;
 
     constructor(
         gameModel,
@@ -46,7 +48,8 @@ export default class GameCreateService {
         userService: UserService,
         gameCreateValidationService: GameCreateValidationService,
         gameFluxService: GameFluxService,
-        specialistBanService: SpecialistBanService
+        specialistBanService: SpecialistBanService,
+        gameTypeService: GameTypeService
     ) {
         this.gameModel = gameModel;
         this.gameService = gameService;
@@ -62,6 +65,7 @@ export default class GameCreateService {
         this.gameCreateValidationService = gameCreateValidationService;
         this.gameFluxService = gameFluxService;
         this.specialistBanService = specialistBanService;
+        this.gameTypeService = gameTypeService;
     }
 
     async create(settings: GameSettings) {
@@ -162,19 +166,18 @@ export default class GameCreateService {
             game.settings.general.name = game.settings.general.name.replace(RANDOM_NAME_STRING, randomGameName);
         }
 
-        // For official games, add this month's flux and specialist bans.
-        if (isOfficialGame && !isTutorial && !isNewPlayerGame) {
+        if (this.gameTypeService.isFluxGame(game)) {
             this.gameFluxService.applyCurrentFlux(game);
+        }
 
-            // Apply spec bans if applicable.
-            if (game.settings.specialGalaxy.specialistCost !== 'none') {
-                const banAmount = game.constants.specialists.monthlyBanAmount; // Random X specs of each type.
-    
-                game.settings.specialGalaxy.specialistBans = {
-                    star: this.specialistBanService.getCurrentMonthStarBans(banAmount),
-                    carrier: this.specialistBanService.getCurrentMonthCarrierBans(banAmount)
-                };
-            }
+        // Apply spec bans if applicable.
+        if (game.settings.specialGalaxy.specialistCost !== 'none') {
+            const banAmount = game.constants.specialists.monthlyBanAmount; // Random X specs of each type.
+
+            game.settings.specialGalaxy.specialistBans = {
+                star: this.specialistBanService.getCurrentMonthStarBans(banAmount),
+                carrier: this.specialistBanService.getCurrentMonthCarrierBans(banAmount)
+            };
         }
 
         // Create all of the stars required.
