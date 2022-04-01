@@ -209,7 +209,10 @@ const schema = new Schema({
 				expensive: { type: Types.Number, required: true, default: 2 },
 				veryExpensive: { type: Types.Number, required: true, default: 4 },
 				crazyExpensive: { type: Types.Number, required: true, default: 8 }
-			}
+			},
+			captureRewardMultiplier: { type: Types.Number, required: true, default: 10 },
+			researchPointMultiplier: { type: Types.Number, required: true, default: 1 },
+			homeStarDefenderBonusMultiplier: { type: Types.Number, required: true, default: 1 }
 		},
 		diplomacy: {
 			upkeepExpenseMultipliers: {
@@ -218,6 +221,9 @@ const schema = new Schema({
 				standard: { type: Types.Number, required: true, default: 0.05 },
 				expensive: { type: Types.Number, required: true, default: 0.10 }
 			}
+		},
+		player: {
+			bankingCycleRewardMultiplier: { type: Types.Number, required: true, default: 75 }
 		}
 	},
 	quitters: [{ type: Types.ObjectId, required: false }],

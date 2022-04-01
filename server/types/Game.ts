@@ -249,7 +249,10 @@ export interface Game {
 				expensive: number;
 				veryExpensive: number;
 				crazyExpensive: number;
-			}
+			},
+			captureRewardMultiplier: number,
+			researchPointScienceMultiplier: number,
+			homeStarDefenderBonusMultiplier: number,
 		},
 		diplomacy: {
 			upkeepExpenseMultipliers: {
@@ -258,6 +261,9 @@ export interface Game {
 				standard: number;
 				expensive: number;
 			}
+		},
+		player: {
+			bankingCycleRewardMultiplier: number;
 		}
 	},
 	quitters: DBObjectId[],
