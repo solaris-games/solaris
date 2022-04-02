@@ -540,7 +540,7 @@ export default class ReponseService {
                 //This should never happen
                 response += 'Something horribly went wrong';
         }
-        response += '\nIf you belief this is a bug, contact Tristanvds';
+        response += '\nIf you believe this is a bug, contact Tristanvds';
         return response;
     }
 }

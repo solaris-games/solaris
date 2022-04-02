@@ -174,7 +174,11 @@ export default {
       this.$toasted.show(`You received ${data.data.creditsSpecialists} specialist token(s) from ${fromPlayer.alias}.`, { type: 'info' })
     },
     onTechnologyReceived (data) {
+      let player = GameHelper.getUserPlayer(this.$store.state.game)
       let fromPlayer = GameHelper.getPlayerById(this.$store.state.game, data.data.fromPlayerId)
+
+      player.research[data.data.technology.name].level = data.data.technology.level
+      player.research[data.data.technology.name].progress = 0
 
       this.$toasted.show(`You received ${data.data.technology.name} level ${data.data.technology.level} from ${fromPlayer.alias}.`, { type: 'info' })
     },

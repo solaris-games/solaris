@@ -1,5 +1,5 @@
 <template>
-  <a href="javascript:;" @click="pan">{{starName}}<i class="fas fa-eye ml-1"></i></a>
+  <a href="javascript:;" @click="pan">{{actualStarName}}<i class="fas fa-eye ml-1"></i></a>
 </template>
 
 <script>
@@ -11,11 +11,18 @@ export default {
     starId: String,
     starName: String
   },
+  data () {
+    return {
+      actualStarName: null
+    }
+  },
   mounted () {
-    if (!this.starName) {
+    if (this.starName != null) {
+      this.actualStarName = this.starName
+    } else {
       let star = gameHelper.getStarById(this.$store.state.game, this.starId)
 
-      this.starName = star ? star.name : 'Unknown'
+      this.actualStarName = star ? star.name : 'Unknown'
     }
   },
   methods: {

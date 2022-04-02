@@ -56,7 +56,7 @@ export default class MapService {
 
     generateStars(game: Game, starCount: number, playerLimit: number, customJSON?: string | null) {
         let stars: Star[] = [];
-        let homeStars: Star[] = [];
+        let homeStars: any[] = [];
         let linkedStars: any[] = [];
 
         // Get an array of random star names for however many stars we want.
