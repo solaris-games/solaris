@@ -1,40 +1,43 @@
 <template>
   <div>
+    <p class="mb-2">
+      <small>Settings are <span class="text-warning">highlighted</span> if they differ from standard.</small>
+    </p>
     <view-subtitle title="General Settings"/>
-    <div class="table-responsive" v-if="game">
+    <div class="table-responsive" v-if="game && compareSettings">
       <table class="table table-striped table-hover">
         <tbody>
           <tr>
             <td>Mode <help-tooltip tooltip="The game mode Conquest is victory by stars, Battle Royale is last man standing in a constantly shrinking galaxy and King of the Hill is a fight for a key star"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.general.mode) }}</td>
+            <td class="text-right" :class="{'text-warning':compareValue(game.settings.general.mode, compareSettings.general.mode)}">{{ getFriendlyText(game.settings.general.mode) }}</td>
           </tr>
           <tr v-if="game.settings.general.mode === 'conquest'">
             <td>Victory Condition <help-tooltip tooltip="The victory condition in which a Conquest game will be decided."/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.conquest.victoryCondition) }}</td>
+            <td class="text-right" :class="{'text-warning':compareValue(game.settings.conquest.victoryCondition, compareSettings.conquest.victoryCondition)}">{{ getFriendlyText(game.settings.conquest.victoryCondition) }}</td>
           </tr>
           <tr v-if="game.settings.general.mode === 'conquest'">
             <td>Stars For Victory <help-tooltip tooltip="How many stars are needed for a player to win the game"/></td>
-            <td class="text-right">{{ game.settings.conquest.victoryPercentage }}%</td>
+            <td class="text-right" :class="{'text-warning':compareValue(game.settings.conquest.victoryPercentage, compareSettings.conquest.victoryPercentage)}">{{ game.settings.conquest.victoryPercentage }}%</td>
           </tr>
           <tr v-if="game.settings.general.mode === 'kingOfTheHill'">
             <td>Countdown Cycles <help-tooltip tooltip="How long the countdown is to the end of the game in production cycles when the center star is captured"/></td>
-            <td class="text-right">{{ game.settings.kingOfTheHill.productionCycles }}</td>
+            <td class="text-right" :class="{'text-warning':compareValue(game.settings.kingOfTheHill.productionCycles, compareSettings.kingOfTheHill.productionCycles)}">{{ game.settings.kingOfTheHill.productionCycles }}</td>
           </tr>
           <tr>
             <td>Players <help-tooltip tooltip="Total number of player slots"/></td>
-            <td class="text-right">{{ game.settings.general.playerLimit }}</td>
+            <td class="text-right" :class="{'text-warning':compareValue(game.settings.general.playerLimit, compareSettings.general.playerLimit)}">{{ game.settings.general.playerLimit }}</td>
           </tr>
           <tr>
             <td>Player Type <help-tooltip tooltip="Determines what type of players can join the game"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.general.playerType) }}</td>
+            <td class="text-right" :class="{'text-warning':compareValue(game.settings.general.playerType, compareSettings.general.playerType)}">{{ getFriendlyText(game.settings.general.playerType) }}</td>
           </tr>
           <tr>
             <td>Anonymity <help-tooltip tooltip="Extra anonymity will hide player identities such as their Victories, Rank and Renown"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.general.anonymity) }}</td>
+            <td class="text-right" :class="{'text-warning':compareValue(game.settings.general.anonymity, compareSettings.general.anonymity)}">{{ getFriendlyText(game.settings.general.anonymity) }}</td>
           </tr>
           <tr>
             <td>Player Online Status <help-tooltip tooltip="Determines whether players can see who is online in real time"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.general.playerOnlineStatus) }}</td>
+            <td class="text-right" :class="{'text-warning':compareValue(game.settings.general.playerOnlineStatus, compareSettings.general.playerOnlineStatus)}">{{ getFriendlyText(game.settings.general.playerOnlineStatus) }}</td>
           </tr>
         </tbody>
       </table>
@@ -400,6 +403,7 @@
 import ViewSubtitle from '../../ViewSubtitle.vue'
 import HelpTooltip from '../../HelpTooltip'
 import SpecialistBanList from '../specialist/SpecialistBanList'
+import GameApiService from '../../../services/api/game'
 
 export default {
   components: {
@@ -409,6 +413,20 @@ export default {
   },
   props: {
     game: Object
+  },
+  data () {
+    return {
+      compareSettings: null
+    }
+  },
+  async mounted () {
+    try {
+      let response = await GameApiService.getDefaultGameSettings()
+
+      this.compareSettings = response.data.settings
+    } catch (err) {
+      console.error(err)
+    }
   },
   methods: {
     getFriendlyText (option) {
@@ -453,6 +471,9 @@ export default {
       }[option]
 
       return text || option
+    },
+    compareValue (fromValue, toValue) {
+      return fromValue !== toValue
     }
   }
 }
