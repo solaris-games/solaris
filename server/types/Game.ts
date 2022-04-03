@@ -176,6 +176,8 @@ export interface GameSettings {
 	gameTime: {
 		gameType: GameTimeType;
 		speed: GameTimeSpeed;
+		isTickLimited: GameSettingEnabledDisabled;
+		tickLimit: number | null;
 		startDelay: GameTimeStartDelay;
 		turnJumps: number;
 		maxTurnWait: GameTimeMaxTurnWait;

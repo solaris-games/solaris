@@ -144,6 +144,8 @@ const schema = new Schema({
 			startDelay: { type: Types.Number, required: true, enum: [0, 1, 5, 10, 30, 60, 120, 240, 360, 480, 600, 720, 1440], default: 240 },	// Time in minutes
 			turnJumps: { type: Types.Number, required: true, min: 1, max: 24, default: 8 },
 			maxTurnWait: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60, 360, 480, 600, 720, 1080, 1440, 2880], default: 1440 },	// Time in minutes
+			isTickLimited: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'disabled' },
+			tickLimit: { type: Types.Number, required: false, min: 200, max: 2000, default: null },
 			afk: {
 				lastSeenTimeout: { type: Types.Number, required: true, min: 1, max: 7, default: 2}, // Time in days, real time and turn based
 				cycleTimeout: { type: Types.Number, required: true, min: 3, max: 10, default: 3}, // Real time games' production cycle limit

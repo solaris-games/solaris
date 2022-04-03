@@ -147,6 +147,14 @@ export default class GameCreateService {
             };
         }
 
+        // Ensure that tick limited games have their ticks to end state preset
+        if (game.settings.gameTime.isTickLimited === 'enabled') {
+            game.state.ticksToEnd = game.settings.gameTime.tickLimit;
+        } else {
+            game.settings.gameTime.tickLimit = null;
+            game.state.ticksToEnd = null;
+        }
+
         if (game.settings.galaxy.galaxyType === 'custom') {
             game.settings.specialGalaxy.randomWarpGates = 0;
             game.settings.specialGalaxy.randomWormHoles = 0;

@@ -106,6 +106,8 @@
     "gameTime":{
        "gameType":"realTime",
        "speed":1800,
+       "isTickLimited": "disabled",
+       "tickLimit": 1000,
        "startDelay":240,
        "turnJumps":6,
        "maxTurnWait":1440,

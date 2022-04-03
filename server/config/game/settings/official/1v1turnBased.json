@@ -102,6 +102,7 @@
   },
   "gameTime": {
     "gameType": "turnBased",
+    "isTickLimited": "disabled",
     "turnJumps": 4,
     "maxTurnWait": 1440,
     "afk": {

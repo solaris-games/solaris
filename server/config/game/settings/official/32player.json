@@ -103,6 +103,7 @@
   "gameTime": {
     "gameType": "realTime",
     "speed": 3600,
+    "isTickLimited": "disabled",
     "startDelay": 360,
     "afk": {
       "lastSeenTimeout": 2,

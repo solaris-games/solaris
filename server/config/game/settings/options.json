@@ -541,6 +541,16 @@
              "text":"Very Slow (1 tick = 2 hours)"
           }
        ],
+       "isTickLimited": [
+         {
+            "value": "enabled",
+            "text": "Enabled"
+         },
+         {
+            "value": "disabled",
+            "text": "Disabled"
+         }
+       ],
        "startDelay":[
           {
              "value":1,

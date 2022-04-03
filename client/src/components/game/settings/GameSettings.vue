@@ -53,6 +53,14 @@
             <td class="text-right" v-if="game.settings.gameTime.speed >= 60">{{ game.settings.gameTime.speed/60 }} minute(s)/tick</td>
             <td class="text-right" v-if="game.settings.gameTime.speed < 60">{{ game.settings.gameTime.speed }} second(s)/tick</td>
           </tr>
+          <tr>
+            <td>Tick Limited <help-tooltip tooltip="Determines whether the game has a time limit"/></td>
+            <td class="text-right">{{ getFriendlyText(game.settings.gameTime.isTickLimited) }}</td>
+          </tr>
+          <tr v-if="game.settings.gameTime.isTickLimited === 'enabled'">
+            <td>Tick Limit <help-tooltip tooltip="Determines the maximum number of ticks before the game is automatically concluded"/></td>
+            <td class="text-right">{{ game.settings.gameTime.tickLimit }} ticks</td>
+          </tr>
           <tr v-if="game.settings.gameTime.gameType === 'realTime'">
             <td>Start Delay <help-tooltip tooltip="Determines how long the warmup period is before games start, for large games it is recommended to have a long start delay"/></td>
             <td class="text-right">{{ game.settings.gameTime.startDelay }} minutes</td>

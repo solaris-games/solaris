@@ -113,6 +113,22 @@
           </select>
         </div>
 
+        <div class="form-group">
+          <label for="isTickLimited" class="col-form-label">Time Limited <help-tooltip tooltip="Determines whether the game has a time limit"/></label>
+          <select class="form-control" id="isTickLimited" v-model="settings.gameTime.isTickLimited" :disabled="isCreatingGame">
+            <option v-for="opt in options.gameTime.isTickLimited" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group" v-if="settings.gameTime.isTickLimited === 'enabled'">
+          <label for="tickLimit" class="col-form-label">Time Limit (<span class="text-warning">{{settings.gameTime.tickLimit}} ticks</span>) <help-tooltip tooltip="Determines the maximum number of ticks before the game is automatically concluded"/></label>
+          <div class="col">
+            <input type="range" min="200" max="2000" step="100" class="form-range w-100" id="tickLimit" v-model="settings.gameTime.tickLimit" :disabled="isCreatingGame">
+          </div>
+        </div>
+
         <div class="form-group" v-if="settings.gameTime.gameType === 'realTime'">
           <label for="startDelay" class="col-form-label">Start Delay <help-tooltip tooltip="Determines how long the warmup period is before games start, for large games it is recommended to have a long start delay"/></label>
           <select class="form-control" id="startDelay" v-model="settings.gameTime.startDelay" :disabled="isCreatingGame">
