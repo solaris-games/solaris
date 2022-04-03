@@ -2,7 +2,7 @@
 <div class="menu-page container">
     <menu-title title="Research" @onCloseRequested="onCloseRequested"/>
 
-    <p><small>Each point of science on your stars contributes <span class="text-info">1 point</span> of research every tick towards your chosen technology.</small></p>
+    <p><small>Each point of science on your stars contributes <span class="text-info">{{game.constants.research.sciencePointMultiplier}} point<span v-if="game.constants.research.sciencePointMultiplier > 1">s</span></span> of research every tick towards your chosen technology.</small></p>
 
     <selection/>
 
@@ -28,6 +28,11 @@ export default {
   methods: {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
+    }
+  },
+  computed: {
+    game () {
+      return this.$store.state.game
     }
   }
 }

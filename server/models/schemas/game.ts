@@ -10,6 +10,7 @@ import ConversationSchema from './conversation';
 const schema = new Schema({
     settings: {
         general: {
+			fluxId: { type: Types.Number, required: false, default: null },
             createdByUserId: { type: Types.ObjectId, required: false, default: null },
             name: { type: Types.String, required: true },
             description: { type: Types.String, required: false, default: null },
@@ -183,7 +184,9 @@ const schema = new Schema({
 			}
 		},
 		research: {
-			progressMultiplier: { type: Types.Number, required: true, default: 50 }
+			progressMultiplier: { type: Types.Number, required: true, default: 50 },
+			sciencePointMultiplier: { type: Types.Number, required: true, default: 1 },
+			experimentationMultiplier: { type: Types.Number, required: true, default: 1 }
 		},
 		star: {
 			resources: {
@@ -209,7 +212,9 @@ const schema = new Schema({
 				expensive: { type: Types.Number, required: true, default: 2 },
 				veryExpensive: { type: Types.Number, required: true, default: 4 },
 				crazyExpensive: { type: Types.Number, required: true, default: 8 }
-			}
+			},
+			captureRewardMultiplier: { type: Types.Number, required: true, default: 10 },
+			homeStarDefenderBonusMultiplier: { type: Types.Number, required: true, default: 1 }
 		},
 		diplomacy: {
 			upkeepExpenseMultipliers: {
@@ -218,6 +223,13 @@ const schema = new Schema({
 				standard: { type: Types.Number, required: true, default: 0.05 },
 				expensive: { type: Types.Number, required: true, default: 0.10 }
 			}
+		},
+		player: {
+			rankRewardMultiplier: { type: Types.Number, required: true, default: 1 },
+			bankingCycleRewardMultiplier: { type: Types.Number, required: true, default: 75 }
+		},
+		specialists: {
+			monthlyBanAmount: { type: Types.Number, required: true, default: 3 }
 		}
 	},
 	quitters: [{ type: Types.ObjectId, required: false }],

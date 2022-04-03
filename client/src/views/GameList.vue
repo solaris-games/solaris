@@ -2,6 +2,8 @@
   <view-container>
     <view-title title="Join Game" />
 
+    <flux-bar class="mb-2"/>
+
     <ul class="nav nav-tabs">
       <li class="nav-item">
           <a class="nav-link active" data-toggle="tab" href="#newGames">New Games</a>
@@ -342,6 +344,7 @@ import gameService from '../services/api/game'
 import GameHelper from '../services/gameHelper'
 import RandomHelper from '../services/randomHelper'
 import HelpTooltip from '../components/HelpTooltip'
+import FluxBar from '../components/game/menu/FluxBar'
 import * as moment from 'moment'
 
 export default {
@@ -350,7 +353,8 @@ export default {
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'tutorial-game': TutorialGame,
-    'help-tooltip': HelpTooltip
+    'help-tooltip': HelpTooltip,
+    'flux-bar': FluxBar
   },
   data () {
     return {
