@@ -4,138 +4,143 @@
     @onMenuStateChanged="onMenuStateChanged"
     @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 
-  <div class="menu">
-    <not-logged-in-bar v-if="!isLoggedIn"/>
-    <dark-mode-warning-bar v-if="isSpectatingDarkMode"/>
-
-    <player-list @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
-
-    <div class="menu-content bg-dark" v-if="menuState">
-      <welcome v-if="menuState == MENU_STATES.WELCOME" @onCloseRequested="onCloseRequested"
-        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-        @onViewSettingsRequested="onViewSettingsRequested"/>
-      <tutorial v-if="menuState == MENU_STATES.TUTORIAL" @onCloseRequested="onCloseRequested"
-        @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
-      <leaderboard v-if="menuState == MENU_STATES.LEADERBOARD" @onCloseRequested="onCloseRequested"
-        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-        @onViewSettingsRequested="onViewSettingsRequested"/>
-      <player v-if="menuState == MENU_STATES.PLAYER" @onCloseRequested="onCloseRequested" :playerId="menuArguments" :key="menuArguments"
-        @onViewCompareIntelRequested="onViewCompareIntelRequested"
-        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-        @onOpenTradeRequested="onOpenTradeRequested"
-        @onOpenPurchasePlayerBadgeRequested="onOpenPurchasePlayerBadgeRequested"
-        @onOpenReportPlayerRequested="onOpenReportPlayerRequested"/>
-      <trade v-if="menuState == MENU_STATES.TRADE" 
-        @onCloseRequested="onCloseRequested" :playerId="menuArguments" :key="menuArguments"
-        @onOpenTradeRequested="onOpenTradeRequested"
-        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
-      <research v-if="menuState == MENU_STATES.RESEARCH" @onCloseRequested="onCloseRequested"/>
-      <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" :starId="menuArguments" :key="menuArguments"
-        @onCloseRequested="onCloseRequested"
-        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
-        @onViewCompareIntelRequested="onViewCompareIntelRequested"
-        @onEditWaypointsRequested="onEditWaypointsRequested"
-        @onViewHireStarSpecialistRequested="onViewHireStarSpecialistRequested"
-        @onBuildCarrierRequested="onBuildCarrierRequested"
-        @onShipTransferRequested="onShipTransferRequested"/>
-      <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL" 
-        @onCloseRequested="onCloseRequested" :carrierId="menuArguments" :key="menuArguments"
-        @onShipTransferRequested="onShipTransferRequested"
-        @onEditWaypointsRequested="onEditWaypointsRequested"
-        @onEditWaypointRequested="onEditWaypointRequested"
-        @onOpenStarDetailRequested="onOpenStarDetailRequested"
-        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-        @onViewCompareIntelRequested="onViewCompareIntelRequested"
-        @onViewHireCarrierSpecialistRequested="onViewHireCarrierSpecialistRequested"
-        @onCarrierRenameRequested="onCarrierRenameRequested" 
-        @onViewCarrierCombatCalculatorRequested="onViewCarrierCombatCalculatorRequested"/>
-      <carrier-waypoints v-if="menuState == MENU_STATES.CARRIER_WAYPOINTS"
-        @onCloseRequested="onCloseRequested" :carrierId="menuArguments"
-        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
-        @onEditWaypointRequested="onEditWaypointRequested"/>
-      <carrier-waypoint v-if="menuState == MENU_STATES.CARRIER_WAYPOINT_DETAIL"
-        @onCloseRequested="onCloseRequested"
-        :carrierId="menuArguments.carrierId"
-        :waypoint="menuArguments.waypoint"
-        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
-      <carrier-rename v-if="menuState == MENU_STATES.CARRIER_RENAME"
-        @onCloseRequested="onCloseRequested"
-        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
-        :carrierId="menuArguments" />
-      <combat-calculator v-if="menuState == MENU_STATES.COMBAT_CALCULATOR" 
-        :carrierId="menuArguments"
-        @onCloseRequested="onCloseRequested"/>
-      <ship-transfer v-if="menuState == MENU_STATES.SHIP_TRANSFER" 
-        @onCloseRequested="onCloseRequested" 
-        :carrierId="menuArguments" 
-        @onShipsTransferred="onShipsTransferred" 
-        @onEditWaypointsRequested="onEditWaypointsRequested"/>
-      <build-carrier v-if="menuState == MENU_STATES.BUILD_CARRIER"
-        :starId="menuArguments"
-        @onCloseRequested="onCloseRequested"
-        @onOpenStarDetailRequested="onOpenStarDetailRequested"
-        @onEditWaypointsRequested="onEditWaypointsRequested"/>
-      <inbox v-if="menuState == MENU_STATES.INBOX"
-        @onCloseRequested="onCloseRequested"
-        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
-      <event-log v-if="menuState == MENU_STATES.EVENT_LOG"
-        @onCloseRequested="onCloseRequested"
-        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
-      <intel v-if="menuState == MENU_STATES.INTEL" @onCloseRequested="onCloseRequested" :compareWithPlayerId="menuArguments"/>
-      <galaxy v-if="menuState == MENU_STATES.GALAXY"
-        :tab="menuArguments"
-        @onCloseRequested="onCloseRequested"
-        @onOpenStarDetailRequested="onOpenStarDetailRequested"
-        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
-      <bulk-infrastructure-upgrade v-if="menuState == MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE" 
-        @onCloseRequested="onCloseRequested"
-        @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
-      <map-object-selector v-if="menuState == MENU_STATES.MAP_OBJECT_SELECTOR" 
-        @onCloseRequested="onCloseRequested" 
-        :mapObjects="menuArguments" 
-        @onOpenStarDetailRequested="onOpenStarDetailRequested" 
-        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested" 
-        @onEditWaypointsRequested="onEditWaypointsRequested" 
-        @onShipTransferRequested="onShipTransferRequested"
-        @onBuildCarrierRequested="onBuildCarrierRequested"/>
-      <ruler v-if="menuState == MENU_STATES.RULER" @onCloseRequested="onCloseRequested"/>
-      <ledger v-if="menuState == MENU_STATES.LEDGER" @onCloseRequested="onCloseRequested" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
-      <diplomacy v-if="menuState == MENU_STATES.DIPLOMACY" @onCloseRequested="onCloseRequested" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
-      <hire-specialist-carrier v-if="menuState == MENU_STATES.HIRE_SPECIALIST_CARRIER"
-        :carrierId="menuArguments"
-        @onCloseRequested="onCloseRequested"
-        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
-      <hire-specialist-star v-if="menuState == MENU_STATES.HIRE_SPECIALIST_STAR"
-        :starId="menuArguments"
-        @onCloseRequested="onCloseRequested"
-        @onOpenStarDetailRequested="onOpenStarDetailRequested"
-        @onReloadGameRequested="onReloadGameRequested"/>
-      <game-notes v-if="menuState == MENU_STATES.GAME_NOTES"
-        @onCloseRequested="onCloseRequested"/>
-      <options v-if="menuState == MENU_STATES.OPTIONS"
-        @onCloseRequested="onCloseRequested"/>
-      <settings v-if="menuState == MENU_STATES.SETTINGS"
-        @onCloseRequested="onCloseRequested"/>
-      <create-conversation v-if="menuState == MENU_STATES.CREATE_CONVERSATION"
-        :participantIds="menuArguments"
-        @onCloseRequested="onCloseRequested"/>
-      <conversation v-if="menuState == MENU_STATES.CONVERSATION"
-        :conversationId="menuArguments"
-        :key="menuArguments"
-        @onCloseRequested="onCloseRequested"
-        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
-      <player-badge-shop v-if="menuState == MENU_STATES.PLAYER_BADGE_SHOP"
-        :recipientPlayerId="menuArguments"
-        @onCloseRequested="onCloseRequested"
-        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
-      <report-player v-if="menuState == MENU_STATES.REPORT_PLAYER"
-        :playerId="menuArguments"
-        @onCloseRequested="onCloseRequested"
-        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+  <div class="row no-gutters menu-container">
+    <div class="col-auto bg-dark d-none d-md-block">
+      <sidebar-menu @onMenuStateChanged="onMenuStateChanged"/>
     </div>
+    <div class="col menu">
+      <not-logged-in-bar v-if="!isLoggedIn"/>
+      <dark-mode-warning-bar v-if="isSpectatingDarkMode"/>
 
-    <div class="spacing-footer d-block d-sm-none"></div>
+      <player-list @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+
+      <div class="menu-content bg-dark" v-if="menuState">
+        <welcome v-if="menuState == MENU_STATES.WELCOME" @onCloseRequested="onCloseRequested"
+          @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+          @onViewSettingsRequested="onViewSettingsRequested"/>
+        <tutorial v-if="menuState == MENU_STATES.TUTORIAL" @onCloseRequested="onCloseRequested"
+          @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
+        <leaderboard v-if="menuState == MENU_STATES.LEADERBOARD" @onCloseRequested="onCloseRequested"
+          @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+          @onViewSettingsRequested="onViewSettingsRequested"/>
+        <player v-if="menuState == MENU_STATES.PLAYER" @onCloseRequested="onCloseRequested" :playerId="menuArguments" :key="menuArguments"
+          @onViewCompareIntelRequested="onViewCompareIntelRequested"
+          @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+          @onOpenTradeRequested="onOpenTradeRequested"
+          @onOpenPurchasePlayerBadgeRequested="onOpenPurchasePlayerBadgeRequested"
+          @onOpenReportPlayerRequested="onOpenReportPlayerRequested"/>
+        <trade v-if="menuState == MENU_STATES.TRADE" 
+          @onCloseRequested="onCloseRequested" :playerId="menuArguments" :key="menuArguments"
+          @onOpenTradeRequested="onOpenTradeRequested"
+          @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        <research v-if="menuState == MENU_STATES.RESEARCH" @onCloseRequested="onCloseRequested"/>
+        <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" :starId="menuArguments" :key="menuArguments"
+          @onCloseRequested="onCloseRequested"
+          @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+          @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
+          @onViewCompareIntelRequested="onViewCompareIntelRequested"
+          @onEditWaypointsRequested="onEditWaypointsRequested"
+          @onViewHireStarSpecialistRequested="onViewHireStarSpecialistRequested"
+          @onBuildCarrierRequested="onBuildCarrierRequested"
+          @onShipTransferRequested="onShipTransferRequested"/>
+        <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL" 
+          @onCloseRequested="onCloseRequested" :carrierId="menuArguments" :key="menuArguments"
+          @onShipTransferRequested="onShipTransferRequested"
+          @onEditWaypointsRequested="onEditWaypointsRequested"
+          @onEditWaypointRequested="onEditWaypointRequested"
+          @onOpenStarDetailRequested="onOpenStarDetailRequested"
+          @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+          @onViewCompareIntelRequested="onViewCompareIntelRequested"
+          @onViewHireCarrierSpecialistRequested="onViewHireCarrierSpecialistRequested"
+          @onCarrierRenameRequested="onCarrierRenameRequested" 
+          @onViewCarrierCombatCalculatorRequested="onViewCarrierCombatCalculatorRequested"/>
+        <carrier-waypoints v-if="menuState == MENU_STATES.CARRIER_WAYPOINTS"
+          @onCloseRequested="onCloseRequested" :carrierId="menuArguments"
+          @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
+          @onEditWaypointRequested="onEditWaypointRequested"/>
+        <carrier-waypoint v-if="menuState == MENU_STATES.CARRIER_WAYPOINT_DETAIL"
+          @onCloseRequested="onCloseRequested"
+          :carrierId="menuArguments.carrierId"
+          :waypoint="menuArguments.waypoint"
+          @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
+        <carrier-rename v-if="menuState == MENU_STATES.CARRIER_RENAME"
+          @onCloseRequested="onCloseRequested"
+          @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
+          :carrierId="menuArguments" />
+        <combat-calculator v-if="menuState == MENU_STATES.COMBAT_CALCULATOR" 
+          :carrierId="menuArguments"
+          @onCloseRequested="onCloseRequested"/>
+        <ship-transfer v-if="menuState == MENU_STATES.SHIP_TRANSFER" 
+          @onCloseRequested="onCloseRequested" 
+          :carrierId="menuArguments" 
+          @onShipsTransferred="onShipsTransferred" 
+          @onEditWaypointsRequested="onEditWaypointsRequested"/>
+        <build-carrier v-if="menuState == MENU_STATES.BUILD_CARRIER"
+          :starId="menuArguments"
+          @onCloseRequested="onCloseRequested"
+          @onOpenStarDetailRequested="onOpenStarDetailRequested"
+          @onEditWaypointsRequested="onEditWaypointsRequested"/>
+        <inbox v-if="menuState == MENU_STATES.INBOX"
+          @onCloseRequested="onCloseRequested"
+          @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        <event-log v-if="menuState == MENU_STATES.EVENT_LOG"
+          @onCloseRequested="onCloseRequested"
+          @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        <intel v-if="menuState == MENU_STATES.INTEL" @onCloseRequested="onCloseRequested" :compareWithPlayerId="menuArguments"/>
+        <galaxy v-if="menuState == MENU_STATES.GALAXY"
+          :tab="menuArguments"
+          @onCloseRequested="onCloseRequested"
+          @onOpenStarDetailRequested="onOpenStarDetailRequested"
+          @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
+        <bulk-infrastructure-upgrade v-if="menuState == MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE" 
+          @onCloseRequested="onCloseRequested"
+          @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
+        <map-object-selector v-if="menuState == MENU_STATES.MAP_OBJECT_SELECTOR" 
+          @onCloseRequested="onCloseRequested" 
+          :mapObjects="menuArguments" 
+          @onOpenStarDetailRequested="onOpenStarDetailRequested" 
+          @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested" 
+          @onEditWaypointsRequested="onEditWaypointsRequested" 
+          @onShipTransferRequested="onShipTransferRequested"
+          @onBuildCarrierRequested="onBuildCarrierRequested"/>
+        <ruler v-if="menuState == MENU_STATES.RULER" @onCloseRequested="onCloseRequested"/>
+        <ledger v-if="menuState == MENU_STATES.LEDGER" @onCloseRequested="onCloseRequested" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        <diplomacy v-if="menuState == MENU_STATES.DIPLOMACY" @onCloseRequested="onCloseRequested" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        <hire-specialist-carrier v-if="menuState == MENU_STATES.HIRE_SPECIALIST_CARRIER"
+          :carrierId="menuArguments"
+          @onCloseRequested="onCloseRequested"
+          @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
+        <hire-specialist-star v-if="menuState == MENU_STATES.HIRE_SPECIALIST_STAR"
+          :starId="menuArguments"
+          @onCloseRequested="onCloseRequested"
+          @onOpenStarDetailRequested="onOpenStarDetailRequested"
+          @onReloadGameRequested="onReloadGameRequested"/>
+        <game-notes v-if="menuState == MENU_STATES.GAME_NOTES"
+          @onCloseRequested="onCloseRequested"/>
+        <options v-if="menuState == MENU_STATES.OPTIONS"
+          @onCloseRequested="onCloseRequested"/>
+        <settings v-if="menuState == MENU_STATES.SETTINGS"
+          @onCloseRequested="onCloseRequested"/>
+        <create-conversation v-if="menuState == MENU_STATES.CREATE_CONVERSATION"
+          :participantIds="menuArguments"
+          @onCloseRequested="onCloseRequested"/>
+        <conversation v-if="menuState == MENU_STATES.CONVERSATION"
+          :conversationId="menuArguments"
+          :key="menuArguments"
+          @onCloseRequested="onCloseRequested"
+          @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        <player-badge-shop v-if="menuState == MENU_STATES.PLAYER_BADGE_SHOP"
+          :recipientPlayerId="menuArguments"
+          @onCloseRequested="onCloseRequested"
+          @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        <report-player v-if="menuState == MENU_STATES.REPORT_PLAYER"
+          :playerId="menuArguments"
+          @onCloseRequested="onCloseRequested"
+          @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+      </div>
+
+      <div class="spacing-footer d-block d-sm-none"></div>
+    </div>
   </div>
 
   <footer-bar class="footer-bar d-xs-block d-sm-none" 
@@ -171,6 +176,7 @@ import GameHelper from '../../../services/gameHelper'
 import CombatCalculatorVue from '../carrier/CombatCalculator.vue'
 import RulerVue from '../ruler/Ruler.vue'
 import HeaderBarVue from './HeaderBar'
+import SidebarMenuVue from './SidebarMenu'
 import LedgerVue from '../ledger/Ledger.vue'
 import DiplomacyVue from '../diplomacy/Diplomacy.vue'
 import HireSpecialistCarrierVue from '../specialist/HireSpecialistCarrier.vue'
@@ -190,6 +196,7 @@ export default {
   components: {
     'header-bar': HeaderBarVue,
     'footer-bar': FooterBarVue,
+    'sidebar-menu': SidebarMenuVue,
     'welcome': WelcomeVue,
     'tutorial': TutorialVue,
     'player-list': PlayerListVue,
@@ -364,12 +371,19 @@ export default {
   bottom: 0px;
 }
 
-.menu {
-  /* This is a must otherwise the div overlays the map */
+.menu-container {
   position:absolute;
-  width: 473px;
   padding-top: 45px;
   max-height: 100%;
+}
+
+.menu {
+  /* This is a must otherwise the div overlays the map */
+  /* position:absolute;
+  width: 473px;
+  padding-top: 45px;
+  max-height: 100%; */
+  width: 473px;
   overflow: auto;
   overflow-x: hidden;
   scrollbar-width: none;
