@@ -45,6 +45,9 @@
     "victoryCondition": "starPercentage",
     "victoryPercentage": 50
   },
+  "kingOfTheHill": {
+    "productionCycles": 10
+  },
   "orbitalMechanics": {
     "enabled": "disabled",
     "orbitSpeed": 3
@@ -104,7 +107,10 @@
     "gameType": "realTime",
     "speed": 1800,
     "isTickLimited": "disabled",
+    "tickLimit": 1000,
     "startDelay": 240,
+    "turnJumps":6,
+    "maxTurnWait":1440,
     "afk": {
       "lastSeenTimeout": 2,
       "cycleTimeout": 3,
