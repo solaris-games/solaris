@@ -374,7 +374,6 @@ export default {
 .menu-container {
   position:absolute;
   padding-top: 45px;
-  max-height: 100%;
 }
 
 .menu {
@@ -383,6 +382,7 @@ export default {
   width: 473px;
   padding-top: 45px;
   max-height: 100%; */
+  max-height: 100%;
   width: 473px;
   overflow: auto;
   overflow-x: hidden;
