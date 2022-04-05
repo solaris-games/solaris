@@ -54,7 +54,7 @@
                 <i class="fas fa-inbox"></i> <span class="ml-1" v-if="unreadEvents">{{unreadEvents}}</span>
             </button>
 
-            <hamburger-menu class="ml-1 d-none d-sm-inline-block" :buttonClass="'btn-sm btn-info'" :dropType="'dropleft'" @onMenuStateChanged="onMenuStateChanged"/>
+            <hamburger-menu class="ml-1 d-none d-sm-inline-block" :buttonClass="'btn-sm btn-info'" :dropType="'dropleft'" />
             
             <button class="btn btn-sm btn-info ml-1 d-none d-sm-inline-block" type="button" @click="goToMyGames()">
                 <i class="fas fa-chevron-left"></i>
@@ -147,13 +147,10 @@ export default {
       }
     },
     setMenuState (state, args) {
-      this.$emit('onMenuStateChanged', {
+      this.$store.commit('setMenuState', {
         state,
         args
       })
-    },
-    onMenuStateChanged (e) {
-      this.$emit('onMenuStateChanged', e)
     },
     onCreditsReceived (data) {
       // TODO: This logic should be in the store like the other subscriptions.

@@ -109,7 +109,7 @@ export default class PublicCommandService {
     async help(msg, directions: string[]) {
         //$help
         let id = msg.author.id;
-        let response = `Hey <@${id}>,\nPlease visit https://github.com/mike-eason/solaris/blob/master/bots/discord/README.md for help on how to interact with me.`;
+        let response = `Hey <@${id}>,\nPlease visit https://github.com/mike-eason/solaris/blob/master/server/bots/discord/README.md for help on how to interact with me.`;
         return msg.channel.send(response);
     }
 

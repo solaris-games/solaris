@@ -27,8 +27,7 @@
           </button>
         </div>
         <div class="col">
-          <hamburger-menu :dropType="'dropup'"
-            @onMenuStateChanged="onMenuStateChanged" />
+          <hamburger-menu :dropType="'dropup'" />
         </div>
     </div>
 </div>
@@ -54,13 +53,10 @@ export default {
   },
   methods: {
     setMenuState (state, args) {
-      this.$emit('onMenuStateChanged', {
+      this.$store.commit('setMenuState', {
         state,
         args
       })
-    },
-    onMenuStateChanged (e) {
-      this.$emit('onMenuStateChanged', e)
     },
     panToHomeStar () {
       GameContainer.map.panToUser(this.$store.state.game)
