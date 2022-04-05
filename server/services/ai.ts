@@ -198,6 +198,8 @@ export default class AIService {
             const orders = this._gatherOrders(game, player, context);
             const assignments = await this._gatherAssignments(game, player, context);
             await this._evaluateOrders(game, player, context, orders, assignments);
+
+            player.aiState = context.aiState;
             // Mongoose method that cannot be typechecked
             // @ts-ignore
             player.markModified('aiState');
