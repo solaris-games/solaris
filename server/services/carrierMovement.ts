@@ -130,7 +130,7 @@ export default class CarrierMovementService {
         let instantSpeed: boolean | null = false;
 
         if (sourceStar) {
-            warpSpeed = this.starService.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar);
+            warpSpeed = this.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar);
             instantSpeed = this.starService.isStarPairWormHole(sourceStar, destinationStar);
         }
 
