@@ -586,7 +586,6 @@ export default class LeaderboardService {
             return {
                 player: p,
                 isKingOfTheHill,
-                // stats: p.stats ? p.stats : this.playerStatisticsService.getStats(game, p) //This makes sure that when the function is called with a hidden galaxy (what a player sees) it will use the already generated stats.
                 stats
             };
         });
