@@ -1,10 +1,9 @@
 <template>
 <div>
   <header-bar class="header-bar" 
-    @onMenuStateChanged="onMenuStateChanged"
     @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 
-  <sidebar-menu @onMenuStateChanged="onMenuStateChanged"/>
+  <sidebar-menu />
 
   <div class="menu">
     <not-logged-in-bar v-if="!isLoggedIn"/>
@@ -141,7 +140,6 @@
   </div>
 
   <footer-bar class="footer-bar d-xs-block d-sm-none" 
-    @onMenuStateChanged="onMenuStateChanged"
     @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 </div>
 </template>
@@ -230,10 +228,6 @@ export default {
     'player-badge-shop': PlayerBadgeShopVue,
     'report-player': ReportPlayerVue
   },
-  props: {
-    menuState: String,
-    menuArguments: [Object, String, Array]
-  },
   data () {
     return {
       MENU_STATES: MENU_STATES
@@ -252,13 +246,10 @@ export default {
   },
   methods: {
     changeMenuState (state, args) {
-      this.onMenuStateChanged({
+      this.$store.commit('setMenuState', {
         state,
         args
       })
-    },
-    onMenuStateChanged (e) {
-      this.$emit('onMenuStateChanged', e)
     },
     onCloseRequested (e) {
       this.changeMenuState(null, null)
@@ -341,6 +332,12 @@ export default {
     }
   },
   computed: {
+    menuState () {
+      return this.$store.state.menuState
+    },
+    menuArguments () {
+      return this.$store.state.menuArguments
+    },
     game () {
       return this.$store.state.game
     },

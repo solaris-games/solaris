@@ -64,7 +64,7 @@ export default {
   },
   methods: {
     setMenuState (state, args) {
-      this.$emit('onMenuStateChanged', {
+      this.$store.commit('setMenuState', {
         state,
         args
       })
