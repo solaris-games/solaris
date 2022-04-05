@@ -15,6 +15,7 @@ import HistoryService from "./history";
 import LeaderboardService from "./leaderboard";
 import OrbitalMechanicsService from "./orbitalMechanics";
 import PlayerService from "./player";
+import RandomService from "./random"
 import ReputationService from "./reputation";
 import ResearchService from "./research";
 import SpecialistService from "./specialist";
@@ -37,6 +38,7 @@ const EventEmitter = require('events');
 const moment = require('moment');
 
 export default class GameTickService extends EventEmitter {
+    randomService: RandomService;
     distanceService: DistanceService;
     starService: StarService;
     carrierService: CarrierService;
@@ -66,6 +68,7 @@ export default class GameTickService extends EventEmitter {
     playerReadyService: PlayerReadyService;
     
     constructor(
+        randomService: RandomService,
         distanceService: DistanceService,
         starService: StarService,
         carrierService: CarrierService,
@@ -96,6 +99,7 @@ export default class GameTickService extends EventEmitter {
     ) {
         super();
             
+        this.randomService = randomService;
         this.distanceService = distanceService;
         this.starService = starService;
         this.carrierService = carrierService;
@@ -498,7 +502,8 @@ export default class GameTickService extends EventEmitter {
                 combat.carriers = combat.carriers.filter(c => c.ships > 0);
                 if(combat.carriers.length >= 2) {
                     // In c2cc it does not really matter who is the defender, so we just choose the first carrier.
-                    let friendlyPlayer = this.playerService.getById(game, combat.carriers[0].ownedByPlayerId)!;
+                    let randomIndex = this.randomService.getRandomNumber(combat.carriers.length);
+                    let friendlyPlayer = this.playerService.getById(game, combat.carriers[randomIndex].ownedByPlayerId)!;
                     await this.combatService.performCombat(game, gameUsers, friendlyPlayer, null, combat.carriers);
                 }
             }
