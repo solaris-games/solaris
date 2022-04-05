@@ -74,6 +74,7 @@ interface Context {
     freelyReachableFromPlayerStars: StarGraph;
     reachablePlayerStars: StarGraph;
     freelyReachableStars: StarGraph;
+    allCanReachPlayerStars: StarGraph;
     borderStars: Set<string>;
     carriersOrbiting: Map<string, Carrier[]>;
     carriersById: Map<string, Carrier>;
@@ -246,6 +247,7 @@ export default class AIService {
         const traversableStars = game.galaxy.stars.filter(star => !star.ownedByPlayerId || star.ownedByPlayerId.toString() === playerId);
         const allStars = this._computeStarGraph(game, player, game.galaxy.stars, game.galaxy.stars);
         const allReachableFromPlayerStars = this._computeStarGraph(game, player, playerStars, game.galaxy.stars);
+        const allCanReachPlayerStars = this._computeStarGraph(game, player, game.galaxy.stars, playerStars);
         const freelyReachableFromPlayerStars = this._computeStarGraph(game, player, playerStars, traversableStars);
         const reachablePlayerStars = this._computeStarGraph(game, player, playerStars, playerStars);
         const freelyReachableStars = this._computeStarGraph(game, player, traversableStars, traversableStars);
@@ -312,6 +314,7 @@ export default class AIService {
             allStars,
             allReachableFromPlayerStars,
             freelyReachableFromPlayerStars,
+            allCanReachPlayerStars,
             freelyReachableStars,
             reachablePlayerStars,
             borderStars,
@@ -393,7 +396,7 @@ export default class AIService {
                 const starToInvade = context.starsById.get(order.star)!;
                 const requiredShips = Math.floor(this._calculateRequiredShipsForAttack(game, player, context, starToInvade) * INVASION_ATTACK_FACTOR);
                 const ticksLimit = game.settings.galaxy.productionTicks * 2;
-                const fittingAssignments = this._findAssignmentsWithTickLimit(game, player, context, context.allStars, assignments, order.star, ticksLimit,  this._canAffordCarrier(context, game, player, false), false);
+                const fittingAssignments = this._findAssignmentsWithTickLimit(game, player, context, context.allCanReachPlayerStars, assignments, order.star, ticksLimit,  this._canAffordCarrier(context, game, player, false), false);
 
                 if (!fittingAssignments || !fittingAssignments.length) {
                     continue;
@@ -926,16 +929,16 @@ export default class AIService {
         return this.distanceService.getHyperspaceDistance(game, player.research.hyperspace.level);
     }
 
-    _computeStarGraph(game: Game, player: Player, playerStars: Star[], starCandidates: Star[]): StarGraph {
+    _computeStarGraph(game: Game, player: Player, traverseStars: Star[], reachStars: Star[]): StarGraph {
         const hyperspaceRange = this._getHyperspaceRange(game, player);
         const hyperspaceRangeSquared = hyperspaceRange * hyperspaceRange;
 
         const starGraph = new Map<string, Set<string>>();
 
-        playerStars.forEach(star=> {
+        traverseStars.forEach(star=> {
             const reachableFromPlayerStars = new Set<string>();
 
-            starCandidates.forEach(otherStar => {
+            reachStars.forEach(otherStar => {
                 if (star._id !== otherStar._id && this.distanceService.getDistanceSquaredBetweenLocations(star.location, otherStar.location) <= hyperspaceRangeSquared) {
                     reachableFromPlayerStars.add(otherStar._id.toString());
                 }
