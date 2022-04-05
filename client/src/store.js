@@ -26,6 +26,38 @@ export default new Vuex.Store({
     confirmationDialog: {}
   },
   mutations: {
+    // Menu
+    setMenuState (state, menuState) {
+      menuState.state = menuState.state || null
+      menuState.args = menuState.args || null
+
+      // Toggle menu if its already open.
+      if (menuState.state === state.menuState && menuState.args === state.menuArguments) {
+        state.menuArguments = null
+        state.menuState = null
+      } else {
+        state.menuArguments = menuState.args
+        state.menuState = menuState.state
+      }
+    },
+    clearMenuState (state) {
+      state.menuState = null
+      state.menuArguments = null
+    },
+
+    setMenuStateChat (state, menuState) {
+      menuState.state = menuState.state || null
+      menuState.args = menuState.args || null
+
+      state.menuArgumentsChat = menuState.args
+      state.menuStateChat = menuState.state
+    },
+    clearMenuStateChat (state) {
+      state.menuStateChat = null
+      state.menuArgumentsChat = null
+    },
+    // -------
+
     setCarrierSpecialists (state, carrierSpecialists) {
       state.carrierSpecialists = carrierSpecialists;
     },
