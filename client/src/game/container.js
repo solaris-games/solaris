@@ -186,6 +186,8 @@ class GameContainer {
 
     if ( process.env.NODE_ENV == 'development' && true) {
       let bitmapFont = { fontName: "space-mono", fontSize: 16 }
+      let left = 64
+      let top = 32
 
       this.fpsNowText = new PIXI.BitmapText("", bitmapFont)
       this.fpsMAText = new PIXI.BitmapText("", bitmapFont)
@@ -193,18 +195,18 @@ class GameContainer {
       this.jitterText = new PIXI.BitmapText("", bitmapFont)
       this.lowestText = new PIXI.BitmapText("", bitmapFont)
       this.zoomText = new PIXI.BitmapText("", bitmapFont)
-      this.fpsNowText.x = 32
+      this.fpsNowText.x = left
       this.fpsNowText.y = 128+16
-      this.fpsMAText.x = 32
-      this.fpsMAText.y = this.fpsNowText.y + 32+2
-      this.fpsMA32Text.x = 32
-      this.fpsMA32Text.y = this.fpsMAText.y +32+2
-      this.jitterText.x = 32
-      this.jitterText.y = this.fpsMA32Text.y + 32+2
-      this.lowestText.x = 32
-      this.lowestText.y = this.jitterText.y +32+2
-      this.zoomText.x = 32
-      this.zoomText.y = this.lowestText.y +32+2
+      this.fpsMAText.x = left
+      this.fpsMAText.y = this.fpsNowText.y + top+2
+      this.fpsMA32Text.x = left
+      this.fpsMA32Text.y = this.fpsMAText.y +top+2
+      this.jitterText.x = left
+      this.jitterText.y = this.fpsMA32Text.y + top+2
+      this.lowestText.x = left
+      this.lowestText.y = this.jitterText.y +top+2
+      this.zoomText.x = left
+      this.zoomText.y = this.lowestText.y +top+2
       this.app.stage.addChild(this.fpsNowText)
       this.app.stage.addChild(this.jitterText)
       this.app.stage.addChild(this.lowestText)
