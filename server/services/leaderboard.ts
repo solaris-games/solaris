@@ -581,12 +581,11 @@ export default class LeaderboardService {
 
         let playerStats = game.galaxy.players.map(p => {
             let isKingOfTheHill = kingOfTheHillPlayer != null && p._id.toString() === kingOfTheHillPlayer._id.toString();
-            let stats = this.playerStatisticsService.getStats(game, p);
+            let stats = p.stats ?? this.playerStatisticsService.getStats(game, p);
 
             return {
                 player: p,
                 isKingOfTheHill,
-                // stats: p.stats ? p.stats : this.playerStatisticsService.getStats(game, p) //This makes sure that when the function is called with a hidden galaxy (what a player sees) it will use the already generated stats.
                 stats
             };
         });

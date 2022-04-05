@@ -914,7 +914,15 @@ class Map extends EventEmitter {
         star.ref.toggleSelected() // Select to star to get the ranges drawn on the map
       }
 
-      this.emit('onObjectsClicked', closeObjects)
+      let eventObj = closeObjects.map(co => {
+        return {
+          type: co.type,
+          data: co.data,
+          distance: co.distance
+        }
+      })
+
+      this.emit('onObjectsClicked', eventObj)
 
       return true
     }
