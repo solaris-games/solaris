@@ -62,7 +62,7 @@ class DiplomacyHelper {
     let playerBDiplo = playerB.diplomacy.find(x => x.playerId.toString() === playerA._id.toString())
 
     let statusTo = playerADiplo == null ? 'neutral' : playerADiplo.status
-    let statusFrom = playerBDiplo == null ? 'neutral' : playerADiplo.status
+    let statusFrom = playerBDiplo == null ? 'neutral' : playerBDiplo.status
 
     let actualStatus
 
