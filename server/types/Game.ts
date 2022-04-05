@@ -53,8 +53,16 @@ export type GameTimeSpeed = 30|60|300|600|1800|3600|7200;
 export type GameTimeStartDelay = 0|1|5|10|30|60|120|240|360|480|600|720|1440;
 export type GameTimeMaxTurnWait = 1|5|10|30|60|360|480|600|720|1080|1440|2880;
 
+export interface GameFlux {
+	id: number;
+	name: string;
+	month: string;
+	description: string;
+};
+
 export interface GameSettings {
 	general: {
+		fluxId: number | null;
 		createdByUserId?: DBObjectId | null;
 		name: string;
 		description: string | null;
@@ -71,6 +79,7 @@ export interface GameSettings {
 		awardRankTo: GameAwardRankTo;
 		isGameAdmin?: boolean;
 		advancedAI: GameSettingEnabledDisabled;
+		flux?: GameFlux;
 	},
 	galaxy: {
 		galaxyType: GameGalaxyType;
@@ -168,6 +177,8 @@ export interface GameSettings {
 	gameTime: {
 		gameType: GameTimeType;
 		speed: GameTimeSpeed;
+		isTickLimited: GameSettingEnabledDisabled;
+		tickLimit: number | null;
 		startDelay: GameTimeStartDelay;
 		turnJumps: number;
 		maxTurnWait: GameTimeMaxTurnWait;
@@ -225,6 +236,8 @@ export interface Game {
 		},
 		research: {
 			progressMultiplier: number;
+			sciencePointMultiplier: number;
+			experimentationMultiplier: number;
 		},
 		star: {
 			resources: {
@@ -250,7 +263,9 @@ export interface Game {
 				expensive: number;
 				veryExpensive: number;
 				crazyExpensive: number;
-			}
+			},
+			captureRewardMultiplier: number;
+			homeStarDefenderBonusMultiplier: number;
 		},
 		diplomacy: {
 			upkeepExpenseMultipliers: {
@@ -259,6 +274,13 @@ export interface Game {
 				standard: number;
 				expensive: number;
 			}
+		},
+		player: {
+			rankRewardMultiplier: number;
+			bankingCycleRewardMultiplier: number;
+		},
+		specialists: {
+			monthlyBanAmount: number;
 		}
 	},
 	quitters: DBObjectId[],

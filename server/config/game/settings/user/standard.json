@@ -13,7 +13,7 @@
        "advancedAI": "enabled"
     },
     "galaxy":{
-       "galaxyType":"circular",
+       "galaxyType":"irregular",
        "starsPerPlayer":20,
        "productionTicks":20
     },
@@ -29,7 +29,7 @@
        "randomAsteroidFields":10,
        "randomBinaryStars": 10,
        "randomBlackHoles":5,
-       "darkGalaxy":"disabled",
+       "darkGalaxy":"start",
        "giftCarriers":"enabled",
        "defenderBonus":"enabled",
        "carrierToCarrierCombat":"enabled",
@@ -107,6 +107,8 @@
     "gameTime":{
        "gameType":"realTime",
        "speed":1800,
+       "isTickLimited": "disabled",
+       "tickLimit": 1000,
        "startDelay":240,
        "turnJumps":6,
        "maxTurnWait":1440,

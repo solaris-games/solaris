@@ -100,6 +100,8 @@
   },
   "gameTime": {
     "gameType": "turnBased",
+    "isTickLimited": "enabled",
+    "tickLimit": 240,
     "startDelay": 0,
     "turnJumps": 4,
     "maxTurnWait": 1440,

@@ -2,6 +2,8 @@
   <view-container>
     <view-title title="Game Settings" navigation="main-menu"/>
 
+    <flux-bar class="mb-2" v-if="!isLoadingGame && isFluxGame"/>
+
     <loading-spinner :loading="isLoadingGame"/>
 
     <div v-if="!isLoadingGame">
@@ -38,6 +40,7 @@ import ViewTitle from '../components/ViewTitle'
 import ViewSubtitle from '../components/ViewSubtitle'
 import ViewContainer from '../components/ViewContainer'
 import GameSettings from '../components/game/settings/GameSettings'
+import FluxBar from '../components/game/menu/FluxBar'
 import gameService from '../services/api/game'
 import router from '../router'
 import GameHelper from '../services/gameHelper'
@@ -48,7 +51,8 @@ export default {
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'view-subtitle': ViewSubtitle,
-    'game-settings': GameSettings
+    'game-settings': GameSettings,
+    'flux-bar': FluxBar
   },
   data () {
     return {
@@ -102,6 +106,9 @@ export default {
   computed: {
     isNewPlayerGame () {
       return GameHelper.isNewPlayerGame(this.game)
+    },
+    isFluxGame () {
+      return GameHelper.isFluxGame(this.game)
     }
   }
 }

@@ -992,6 +992,22 @@ class GameHelper {
     return ['new_player_rt', 'new_player_tb'].includes(game.settings.general.type)
   }
 
+  isFluxGame (game) {
+    return [
+      'standard_rt',
+      'standard_tb',
+      '32_player_rt',
+      'special_dark',
+      'special_ultraDark',
+      'special_orbital',
+      'special_battleRoyale',
+      'special_homeStar',
+      'special_anonymous',
+      'special_kingOfTheHill',
+      'special_tinyGalaxy'
+    ].includes(game.settings.general.type)
+  }
+
   getLedgerGameEventPlayerSummary (game, gameEvent) {
     const debtor = this.getPlayerById(game, gameEvent.data.debtorPlayerId)
     const creditor = this.getPlayerById(game, gameEvent.data.creditorPlayerId)

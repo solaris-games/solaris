@@ -4,7 +4,9 @@ import AchievementService from './achievement';
 import ConversationService from './conversation';
 import GameService from './game';
 import GameCreateValidationService from './gameCreateValidation';
+import GameFluxService from './gameFlux';
 import GameListService from './gameList';
+import GameTypeService from './gameType';
 import HistoryService from './history';
 import MapService from './map';
 import NameService from './name';
@@ -28,7 +30,9 @@ export default class GameCreateService {
     achievementService: AchievementService;
     userService: UserService;
     gameCreateValidationService: GameCreateValidationService;
+    gameFluxService: GameFluxService;
     specialistBanService: SpecialistBanService;
+    gameTypeService: GameTypeService;
 
     constructor(
         gameModel,
@@ -43,7 +47,9 @@ export default class GameCreateService {
         achievementService: AchievementService,
         userService: UserService,
         gameCreateValidationService: GameCreateValidationService,
-        specialistBanService: SpecialistBanService
+        gameFluxService: GameFluxService,
+        specialistBanService: SpecialistBanService,
+        gameTypeService: GameTypeService
     ) {
         this.gameModel = gameModel;
         this.gameService = gameService;
@@ -57,7 +63,9 @@ export default class GameCreateService {
         this.achievementService = achievementService;
         this.userService = userService;
         this.gameCreateValidationService = gameCreateValidationService;
+        this.gameFluxService = gameFluxService;
         this.specialistBanService = specialistBanService;
+        this.gameTypeService = gameTypeService;
     }
 
     async create(settings: GameSettings) {
@@ -138,14 +146,13 @@ export default class GameCreateService {
                 carrier: []
             };
         }
-        // For official games, add this month's specialist bans.
-        else if (isOfficialGame && !isTutorial && !isNewPlayerGame) {
-            const banAmount = 3; // Random 3 specs of each type.
 
-            game.settings.specialGalaxy.specialistBans = {
-                star: this.specialistBanService.getCurrentMonthStarBans(banAmount),
-                carrier: this.specialistBanService.getCurrentMonthCarrierBans(banAmount)
-            };
+        // Ensure that tick limited games have their ticks to end state preset
+        if (game.settings.gameTime.isTickLimited === 'enabled') {
+            game.state.ticksToEnd = game.settings.gameTime.tickLimit;
+        } else {
+            game.settings.gameTime.tickLimit = null;
+            game.state.ticksToEnd = null;
         }
 
         if (game.settings.galaxy.galaxyType === 'custom') {
@@ -165,6 +172,20 @@ export default class GameCreateService {
             let randomGameName = this.nameService.getRandomGameName();
 
             game.settings.general.name = game.settings.general.name.replace(RANDOM_NAME_STRING, randomGameName);
+        }
+
+        if (this.gameTypeService.isFluxGame(game)) {
+            this.gameFluxService.applyCurrentFlux(game);
+        }
+
+        // Apply spec bans if applicable.
+        if (game.settings.specialGalaxy.specialistCost !== 'none') {
+            const banAmount = game.constants.specialists.monthlyBanAmount; // Random X specs of each type.
+
+            game.settings.specialGalaxy.specialistBans = {
+                star: this.specialistBanService.getCurrentMonthStarBans(banAmount),
+                carrier: this.specialistBanService.getCurrentMonthCarrierBans(banAmount)
+            };
         }
 
         // Create all of the stars required.

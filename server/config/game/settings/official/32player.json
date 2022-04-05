@@ -28,7 +28,7 @@
     "randomAsteroidFields": 10,
     "randomBinaryStars": 10,
     "randomBlackHoles": 5,
-    "darkGalaxy": "standard",
+    "darkGalaxy": "extra",
     "giftCarriers": "enabled",
     "defenderBonus": "enabled",
     "carrierToCarrierCombat": "enabled",
@@ -103,6 +103,7 @@
   "gameTime": {
     "gameType": "realTime",
     "speed": 3600,
+    "isTickLimited": "disabled",
     "startDelay": 360,
     "afk": {
       "lastSeenTimeout": 2,

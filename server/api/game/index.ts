@@ -13,6 +13,16 @@ export default (router: Router, io, container: DependencyContainer) => {
             options: require('../../config/game/settings/options.json')
         });
     }, middleware.handleError);
+    
+    router.get('/api/game/flux', middleware.authenticate, async (req, res, next) => {
+        try {
+            const flux = container.gameFluxService.getCurrentFlux();
+
+            return res.status(200).json(flux);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
 
     router.post('/api/game/', middleware.authenticate, async (req, res, next) => {
         req.body.general.createdByUserId = req.session.userId;

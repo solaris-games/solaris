@@ -10,6 +10,7 @@ import ConversationSchema from './conversation';
 const schema = new Schema({
     settings: {
         general: {
+			fluxId: { type: Types.Number, required: false, default: null },
             createdByUserId: { type: Types.ObjectId, required: false, default: null },
             name: { type: Types.String, required: true },
             description: { type: Types.String, required: false, default: null },
@@ -144,6 +145,8 @@ const schema = new Schema({
 			startDelay: { type: Types.Number, required: true, enum: [0, 1, 5, 10, 30, 60, 120, 240, 360, 480, 600, 720, 1440], default: 240 },	// Time in minutes
 			turnJumps: { type: Types.Number, required: true, min: 1, max: 24, default: 8 },
 			maxTurnWait: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60, 360, 480, 600, 720, 1080, 1440, 2880], default: 1440 },	// Time in minutes
+			isTickLimited: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'disabled' },
+			tickLimit: { type: Types.Number, required: false, min: 200, max: 2000, default: null },
 			afk: {
 				lastSeenTimeout: { type: Types.Number, required: true, min: 1, max: 7, default: 2}, // Time in days, real time and turn based
 				cycleTimeout: { type: Types.Number, required: true, min: 3, max: 10, default: 3}, // Real time games' production cycle limit
@@ -184,7 +187,9 @@ const schema = new Schema({
 			}
 		},
 		research: {
-			progressMultiplier: { type: Types.Number, required: true, default: 50 }
+			progressMultiplier: { type: Types.Number, required: true, default: 50 },
+			sciencePointMultiplier: { type: Types.Number, required: true, default: 1 },
+			experimentationMultiplier: { type: Types.Number, required: true, default: 1 }
 		},
 		star: {
 			resources: {
@@ -210,7 +215,9 @@ const schema = new Schema({
 				expensive: { type: Types.Number, required: true, default: 2 },
 				veryExpensive: { type: Types.Number, required: true, default: 4 },
 				crazyExpensive: { type: Types.Number, required: true, default: 8 }
-			}
+			},
+			captureRewardMultiplier: { type: Types.Number, required: true, default: 10 },
+			homeStarDefenderBonusMultiplier: { type: Types.Number, required: true, default: 1 }
 		},
 		diplomacy: {
 			upkeepExpenseMultipliers: {
@@ -219,6 +226,13 @@ const schema = new Schema({
 				standard: { type: Types.Number, required: true, default: 0.05 },
 				expensive: { type: Types.Number, required: true, default: 0.10 }
 			}
+		},
+		player: {
+			rankRewardMultiplier: { type: Types.Number, required: true, default: 1 },
+			bankingCycleRewardMultiplier: { type: Types.Number, required: true, default: 75 }
+		},
+		specialists: {
+			monthlyBanAmount: { type: Types.Number, required: true, default: 3 }
 		}
 	},
 	quitters: [{ type: Types.ObjectId, required: false }],

@@ -46,10 +46,10 @@ export default class GameStateService {
     countdownToEnd(game: Game) {
         // If we are already in the countdown, decrease the counter.
         // Otherwise, try to start the countdown.
-        // Note this only applies to king of the hill.
         if (this.isCountingDownToEnd(game)) {
             game.state.ticksToEnd!--;
         } else {
+            // Note: This should only occur if in KotH mode.
             game.state.ticksToEnd = game.settings.kingOfTheHill.productionCycles * game.settings.galaxy.productionTicks;
         }
     }

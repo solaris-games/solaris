@@ -503,11 +503,6 @@ export default class PlayerService extends EventEmitter {
                 }
             }
         }
-
-        // For the tutorial, prevent players from doing stupid stuff because you KNOW someone's gonna do it.
-        if (!player.defeated && this.gameTypeService.isTutorialGame(game) && game.state.productionTick >= 25) {
-            this.setPlayerAsDefeated(game, player);
-        }
     }
 
     incrementMissedTurns(game: Game) {
