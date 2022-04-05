@@ -878,12 +878,14 @@ class Star extends EventEmitter {
     this.isSelected = true
     this.drawSelectedCircle()
     this.emit('onSelected', this.data)
+    this.updateVisibility()
   }
 
   unselect () {
     this.isSelected = false
     this.drawSelectedCircle()
     this.emit('onUnselected', this.data)
+    this.updateVisibility()
   }
 
   toggleSelected () {

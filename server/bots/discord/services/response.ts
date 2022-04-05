@@ -119,7 +119,8 @@ export default class ReponseService {
                 { name: "Defender Bonus", value: game.settings.specialGalaxy.defenderBonus, inline: true },//next line
                 { name: "Carrier to Carrier Combat", value: game.settings.specialGalaxy.carrierToCarrierCombat, inline: true },
                 { name: "Resource Distribution", value: game.settings.specialGalaxy.resourceDistribution, inline: true },
-                { name: "Player Distribution", value: game.settings.specialGalaxy.playerDistribution, inline: true }
+                { name: "Player Distribution", value: game.settings.specialGalaxy.playerDistribution, inline: true },
+                { name: "Formal Alliances", value: game.settings.diplomacy.enabled, inline: true }
             );
         return response;
     }
@@ -313,7 +314,7 @@ export default class ReponseService {
         return response;
     }
 
-    statusPC(game: Game, leaderboard: any, alive: boolean) {
+    statusPC(game: Game, leaderboard, alive: boolean) {
         let response = this.baseResponse();
         response = response
             .setTitle(`Status of ${game.settings.general.name}`)
@@ -335,7 +336,7 @@ export default class ReponseService {
         return response;
     }
 
-    statusMobile(game: Game, leaderboard: any) {
+    statusMobile(game: Game, leaderboard) {
         let response = this.baseResponse();
         response = response
             .setTitle(`Status of ${game.settings.general.name}`)
@@ -533,13 +534,13 @@ export default class ReponseService {
                 response += 'The ID of the game you gave is invalid, please check if it is correct.';
                 break;
             case 'noDirections':
-                response += 'The command you executed had too little directions, check `$help` for a detailed explanation on each command.';
+                response += 'The command you executed had too little or invalid directions (that what comes after the first word), check `$help` for a detailed explanation on each command.';
                 break;
             default:
                 //This should never happen
                 response += 'Something horribly went wrong';
         }
-        response += '\nIf you belief this is a bug, contact Tristanvds';
+        response += '\nIf you believe this is a bug, contact Tristanvds';
         return response;
     }
 }

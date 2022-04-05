@@ -1,0 +1,27 @@
+use solaris;
+
+// Pause
+db.games.updateMany({
+    $and: [
+        { 'state.paused': false },
+        { 'state.endDate': { $eq: null } },
+        { 'state.startDate': { $ne: null } }
+    ]
+}, {
+    $set: {
+        'state.paused': true
+    }
+});
+
+// Unpause
+db.games.updateMany({
+    $and: [
+        { 'state.paused': true },
+        { 'state.endDate': { $eq: null } },
+        { 'state.startDate': { $ne: null } }
+    ]
+}, {
+    $set: {
+        'state.paused': false
+    }
+});

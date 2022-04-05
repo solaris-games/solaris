@@ -12,7 +12,7 @@
        "timeMachine":"disabled"
     },
     "galaxy":{
-       "galaxyType":"circular",
+       "galaxyType":"irregular",
        "starsPerPlayer":20,
        "productionTicks":20
     },
@@ -28,7 +28,7 @@
        "randomAsteroidFields":10,
        "randomBinaryStars": 10,
        "randomBlackHoles":5,
-       "darkGalaxy":"disabled",
+       "darkGalaxy":"start",
        "giftCarriers":"enabled",
        "defenderBonus":"enabled",
        "carrierToCarrierCombat":"enabled",
@@ -70,8 +70,14 @@
        "tradeCredits":true,
        "tradeCreditsSpecialists":true,
        "tradeCost":15,
-       "tradeScanning":"scanned",
-       "alliances":"enabled"
+       "tradeScanning":"scanned"
+    },
+   "diplomacy": {
+      "enabled": "enabled",
+      "upkeepCost": "none",
+      "tradeRestricted": "disabled", 
+      "maxAlliances": 7, 
+      "globalEvents": "disabled"
     },
     "technology":{
        "startingTechnologyLevel":{
@@ -100,6 +106,8 @@
     "gameTime":{
        "gameType":"realTime",
        "speed":1800,
+       "isTickLimited": "disabled",
+       "tickLimit": 1000,
        "startDelay":240,
        "turnJumps":6,
        "maxTurnWait":1440,

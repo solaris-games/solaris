@@ -2,10 +2,10 @@ const EventEmitter = require('events');
 import ValidationError from '../errors/validation';
 import DatabaseRepository from '../models/DatabaseRepository';
 import { Game } from '../types/Game';
-import { Player, ResearchType } from '../types/Player';
+import { Player, ResearchType, ResearchTypeNotRandom } from '../types/Player';
 import { User } from '../types/User';
 import GameTypeService from './gameType';
-import PlayerService from './player';
+import PlayerStatisticsService from './playerStatistics';
 import RandomService from './random';
 import StarService from './star';
 import TechnologyService from './technology';
@@ -15,7 +15,7 @@ export default class ResearchService extends EventEmitter {
     gameRepo: DatabaseRepository<Game>;
     technologyService: TechnologyService;
     randomService: RandomService;
-    playerService: PlayerService;
+    playerStatisticsService: PlayerStatisticsService;
     starService: StarService;
     userService: UserService;
     gameTypeService: GameTypeService;
@@ -24,7 +24,7 @@ export default class ResearchService extends EventEmitter {
         gameRepo: DatabaseRepository<Game>,
         technologyService: TechnologyService,
         randomService: RandomService,
-        playerService: PlayerService,
+        playerStatisticsService: PlayerStatisticsService,
         starService: StarService,
         userService: UserService,
         gameTypeService: GameTypeService
@@ -34,13 +34,13 @@ export default class ResearchService extends EventEmitter {
         this.gameRepo = gameRepo;
         this.technologyService = technologyService;
         this.randomService = randomService;
-        this.playerService = playerService;
+        this.playerStatisticsService = playerStatisticsService;
         this.starService = starService;
         this.userService = userService;
         this.gameTypeService = gameTypeService;
     }
 
-    async updateResearchNow(game: Game, player: Player, preference: ResearchType) {
+    async updateResearchNow(game: Game, player: Player, preference: ResearchTypeNotRandom) {
         if (!this.technologyService.isTechnologyEnabled(game, preference)
             || !this.technologyService.isTechnologyResearchable(game, preference)) {
             throw new ValidationError(`Cannot change technology, the chosen tech is not researchable.`);
@@ -99,9 +99,10 @@ export default class ResearchService extends EventEmitter {
 
         let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
-        let totalScience = this.playerService.calculateTotalScience(playerStars);
-            
-        tech.progress += totalScience;
+        let totalScience = this.playerStatisticsService.calculateTotalScience(playerStars);
+        let multiplier = game.constants.research.sciencePointMultiplier;
+
+        tech.progress! += totalScience * multiplier;
 
         // If the player isn't being controlled by AI then increment achievements.
         if (user && !player.defeated && !this.gameTypeService.isTutorialGame(game)) {
@@ -114,9 +115,9 @@ export default class ResearchService extends EventEmitter {
 
         let levelUp = false;
 
-        while (tech.progress >= requiredProgress) {
+        while (tech.progress! >= requiredProgress) {
             tech.level++;
-            tech.progress -= requiredProgress;
+            tech.progress! -= requiredProgress;
             
             requiredProgress = this.getRequiredResearchProgress(game, techKey, tech.level);
             levelUp = true
@@ -163,7 +164,7 @@ export default class ResearchService extends EventEmitter {
         }
     }
 
-    getRequiredResearchProgress(game: Game, technologyKey: ResearchType, technologyLevel: number) {
+    getRequiredResearchProgress(game: Game, technologyKey: ResearchTypeNotRandom, technologyLevel: number) {
         const researchCostConfig = game.settings.technology.researchCosts[technologyKey];
         const expenseCostConfig = game.constants.star.infrastructureExpenseMultipliers[researchCostConfig];
         const progressMultiplierConfig = expenseCostConfig * game.constants.research.progressMultiplier;
@@ -197,9 +198,9 @@ export default class ResearchService extends EventEmitter {
             return noExperimentation;
         }
 
-        let researchAmount = player.research.experimentation.level * game.constants.research.progressMultiplier;
+        let researchAmount = player.research.experimentation.level * (game.constants.research.progressMultiplier * game.constants.research.experimentationMultiplier);
 
-        tech.technology.progress += researchAmount;
+        tech.technology.progress! += researchAmount;
 
         // If the current progress is greater than the required progress
         // then increase the level and carry over the remainder.
@@ -207,9 +208,9 @@ export default class ResearchService extends EventEmitter {
 
         let levelUp = false;
 
-        while (tech.technology.progress >= requiredProgress) {
+        while (tech.technology.progress! >= requiredProgress) {
             tech.technology.level++;
-            tech.technology.progress -= requiredProgress;
+            tech.technology.progress! -= requiredProgress;
             requiredProgress = this.getRequiredResearchProgress(game, tech.key, tech.technology.level);
             levelUp = true;
         }
@@ -250,10 +251,10 @@ export default class ResearchService extends EventEmitter {
     _getRandomTechnology(game: Game, player: Player) {
         let techs = Object.keys(player.research).filter(k => {
             return k.match(/^[^_\$]/) != null;
-        });
+        }) as ResearchTypeNotRandom[];
 
-        techs = techs.filter(t => this.technologyService.isTechnologyEnabled(game, t as ResearchType)
-                                && this.technologyService.isTechnologyResearchable(game, t as ResearchType));
+        techs = techs.filter(t => this.technologyService.isTechnologyEnabled(game, t)
+                                && this.technologyService.isTechnologyResearchable(game, t));
 
         if (!techs.length) {
             return null;
@@ -261,11 +262,11 @@ export default class ResearchService extends EventEmitter {
 
         let researchTechsCount = techs.length;
 
-        let techKey = techs[this.randomService.getRandomNumber(researchTechsCount - 1)];
+        let techKey = techs[this.randomService.getRandomNumber(researchTechsCount - 1)] as ResearchTypeNotRandom;
         let tech = player.research[techKey];
 
         return {
-            key: techKey as ResearchType,
+            key: techKey,
             technology: tech
         };
     }
@@ -311,14 +312,14 @@ export default class ResearchService extends EventEmitter {
         
         let requiredProgress = this.getRequiredResearchProgress(game, player.researchingNow, tech.level) 
                              + this.getRequiredResearchProgress(game, player.researchingNow, tech.level + 1);
-        let remainingPoints = requiredProgress - tech.progress;
+        let remainingPoints = requiredProgress - tech.progress!;
 
         return this._calculateResearchETAInTicksByRemainingPoints(game, player, remainingPoints);
     }
 
     _calculateResearchETAInTicksByRemainingPoints(game: Game, player: Player, remainingPoints: number) {
         let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
-        let totalScience = this.playerService.calculateTotalScience(playerStars);
+        let totalScience = this.playerStatisticsService.calculateTotalScience(playerStars);
         
         // If there is no science then there cannot be an end date to the research.
         if (totalScience === 0) {

@@ -5,35 +5,44 @@ import ValidationError from '../errors/validation';
 import DatabaseRepository from '../models/DatabaseRepository';
 import { Game } from '../types/Game';
 import { GameEvent } from '../types/GameEvent';
-import { Player, ResearchType } from '../types/Player';
+import { Player, PlayerReputation, ResearchTypeNotRandom } from '../types/Player';
 import { TradeEvent, TradeEventTechnology, TradeTechnology } from '../types/Trade';
 import AchievementService from './achievement';
 import GameTypeService from './gameType';
+import DiplomacyService from './diplomacy';
 import LedgerService from './ledger';
 import PlayerService from './player';
 import ReputationService from './reputation';
 import UserService from './user';
 import { User } from '../types/User';
+import RandomService from './random';
+import PlayerCreditsService from './playerCredits';
 
 export default class TradeService extends EventEmitter {
     gameRepo: DatabaseRepository<Game>;
     eventRepo: DatabaseRepository<GameEvent>;
     userService: UserService;
     playerService: PlayerService;
+    diplomacyService: DiplomacyService;
     ledgerService: LedgerService;
     achievementService: AchievementService;
     reputationService: ReputationService;
     gameTypeService: GameTypeService;
+    randomService: RandomService;
+    playerCreditsService: PlayerCreditsService;
 
     constructor(
         gameRepo: DatabaseRepository<Game>,
         eventRepo: DatabaseRepository<GameEvent>,
         userService: UserService,
         playerService: PlayerService,
+        diplomacyService: DiplomacyService,
         ledgerService: LedgerService,
         achievementService: AchievementService,
         reputationService: ReputationService,
-        gameTypeService: GameTypeService
+        gameTypeService: GameTypeService,
+        randomService: RandomService,
+        playerCreditsService: PlayerCreditsService
     ) {
         super();
 
@@ -41,14 +50,21 @@ export default class TradeService extends EventEmitter {
         this.eventRepo = eventRepo;
         this.userService = userService;
         this.playerService = playerService;
+        this.diplomacyService = diplomacyService;
         this.ledgerService = ledgerService;
         this.achievementService = achievementService;
         this.reputationService = reputationService;
         this.gameTypeService = gameTypeService;
+        this.randomService = randomService;
+        this.playerCreditsService = playerCreditsService;
     }
 
     isTradingCreditsDisabled(game: Game) {
         return game.settings.player.tradeCredits === false;
+    }
+
+    isTradingAllyRestricted(game: Game) {
+        return this.diplomacyService.isFormalAlliancesEnabled(game) && this.diplomacyService.isTradeRestricted(game);
     }
 
     isTradingCreditsSpecialistsDisabled(game: Game) {
@@ -74,10 +90,15 @@ export default class TradeService extends EventEmitter {
         }
 
         // Get the players.
-        let toPlayer: Player = this.playerService.getById(game, toPlayerId);
+        let toPlayer: Player = this.playerService.getById(game, toPlayerId)!;
 
         if (fromPlayer === toPlayer) {
             throw new ValidationError(`Cannot send credits to yourself.`);
+        }
+
+        if (this.isTradingAllyRestricted(game) &&
+            this.diplomacyService.getDiplomaticStatusToPlayer(game, fromPlayer._id, toPlayerId).actualStatus !== 'allies') {
+            throw new ValidationError(`You are only allowed to trade with allies.`);
         }
 
         this._tradeScanningCheck(game, fromPlayer, toPlayer);
@@ -87,8 +108,8 @@ export default class TradeService extends EventEmitter {
         }
 
         let dbWrites = [
-            await this.playerService.addCredits(game, fromPlayer, -amount, false),
-            await this.playerService.addCredits(game, toPlayer, amount, false)
+            await this.playerCreditsService.addCredits(game, fromPlayer, -amount, false),
+            await this.playerCreditsService.addCredits(game, toPlayer, amount, false)
         ];
 
         await this.gameRepo.bulkWrite(dbWrites);
@@ -99,14 +120,17 @@ export default class TradeService extends EventEmitter {
             if (fromPlayer.userId && !fromPlayer.defeated) {
                 await this.achievementService.incrementTradeCreditsSent(fromPlayer.userId, amount);
             }
-    
+
             if (toPlayer.userId && !toPlayer.defeated) {
                 await this.achievementService.incrementTradeCreditsReceived(toPlayer.userId, amount);
             }
-
         }
 
-        let reputation = await this.reputationService.tryIncreaseReputationCredits(game, fromPlayer, toPlayer, amount);
+        let reputationResult = await this.reputationService.tryIncreaseReputationCredits(game, toPlayer, fromPlayer, amount);
+
+        if (reputationResult.increased) {
+            await this.tryTradeBack(game, toPlayer, fromPlayer, reputationResult.rep.reputation);
+        }
 
         let eventObject = {
             gameId: game._id,
@@ -114,7 +138,7 @@ export default class TradeService extends EventEmitter {
             fromPlayer,
             toPlayer,
             amount,
-            reputation,
+            reputation: reputationResult.rep.reputation,
             date: moment().utc()
         };
 
@@ -139,10 +163,15 @@ export default class TradeService extends EventEmitter {
         }
 
         // Get the players.
-        let toPlayer: Player = this.playerService.getById(game, toPlayerId);
+        let toPlayer: Player = this.playerService.getById(game, toPlayerId)!;
 
         if (fromPlayer === toPlayer) {
             throw new ValidationError(`Cannot send specialist tokens to yourself.`);
+        }
+
+        if (this.isTradingAllyRestricted(game) &&
+            this.diplomacyService.getDiplomaticStatusToPlayer(game, fromPlayer._id, toPlayerId).actualStatus !== 'allies') {
+            throw new ValidationError(`You are only allowed to trade with allies.`);
         }
 
         this._tradeScanningCheck(game, fromPlayer, toPlayer);
@@ -152,8 +181,8 @@ export default class TradeService extends EventEmitter {
         }
 
         let dbWrites = [
-            await this.playerService.addCreditsSpecialists(game, fromPlayer, -amount, false),
-            await this.playerService.addCreditsSpecialists(game, toPlayer, amount, false)
+            await this.playerCreditsService.addCreditsSpecialists(game, fromPlayer, -amount, false),
+            await this.playerCreditsService.addCreditsSpecialists(game, toPlayer, amount, false)
         ];
 
         await this.gameRepo.bulkWrite(dbWrites);
@@ -162,13 +191,17 @@ export default class TradeService extends EventEmitter {
             if (fromPlayer.userId && !fromPlayer.defeated) {
                 await this.achievementService.incrementTradeCreditsSpecialistsSent(fromPlayer.userId, amount);
             }
-    
+
             if (toPlayer.userId && !toPlayer.defeated && toPlayer.userId) {
                 await this.achievementService.incrementTradeCreditsSpecialistsReceived(toPlayer.userId, amount);
             }
         }
 
-        let reputation = await this.reputationService.tryIncreaseReputationCreditsSpecialists(game, fromPlayer, toPlayer, amount);
+        let reputationResult = await this.reputationService.tryIncreaseReputationCreditsSpecialists(game, toPlayer, fromPlayer, amount);
+
+        if (reputationResult.increased) {
+            await this.tryTradeBack(game, toPlayer, fromPlayer, reputationResult.rep.reputation);
+        }
 
         let eventObject = {
             gameId: game._id,
@@ -176,7 +209,7 @@ export default class TradeService extends EventEmitter {
             fromPlayer,
             toPlayer,
             amount,
-            reputation,
+            reputation: reputationResult.rep.reputation,
             date: moment().utc()
         };
 
@@ -202,7 +235,7 @@ export default class TradeService extends EventEmitter {
         }
 
         // Get the players.
-        let toPlayer: Player = this.playerService.getById(game, toPlayerId);
+        let toPlayer: Player = this.playerService.getById(game, toPlayerId)!;
 
         if (fromPlayer === toPlayer) {
             throw new ValidationError(`Cannot award renown to yourself.`);
@@ -260,16 +293,21 @@ export default class TradeService extends EventEmitter {
         return eventObject;
     }
 
-    async sendTechnology(game: Game, fromPlayer: Player, toPlayerId: DBObjectId, technology: ResearchType, techLevel: number) {
+    async sendTechnology(game: Game, fromPlayer: Player, toPlayerId: DBObjectId, technology: ResearchTypeNotRandom, techLevel: number) {
         if (this.isTradingTechnologyDisabled(game)) {
             throw new ValidationError(`Trading technology is disabled.`);
         }
 
         // Get the players.
-        let toPlayer: Player = this.playerService.getById(game, toPlayerId);
+        let toPlayer: Player = this.playerService.getById(game, toPlayerId)!;
 
         if (fromPlayer === toPlayer) {
             throw new ValidationError(`Cannot trade technology with yourself.`);
+        }
+
+        if (this.isTradingAllyRestricted(game) &&
+            this.diplomacyService.getDiplomaticStatusToPlayer(game, fromPlayer._id, toPlayerId).actualStatus !== 'allies') {
+            throw new ValidationError(`You are only allowed to trade with allies.`);
         }
 
         this._tradeScanningCheck(game, fromPlayer, toPlayer);
@@ -303,7 +341,7 @@ export default class TradeService extends EventEmitter {
         updateResearchQuery['galaxy.players.$.research.' + tradeTech.name + '.progress'] = 0;
 
         let dbWrites = [
-            await this.playerService.addCredits(game, fromPlayer, -tradeTech.cost, false),
+            await this.playerCreditsService.addCredits(game, fromPlayer, -tradeTech.cost, false),
             {
                 updateOne: {
                     filter: {
@@ -337,7 +375,11 @@ export default class TradeService extends EventEmitter {
             difference: levelDifference
         };
 
-        let reputation = await this.reputationService.tryIncreaseReputationTechnology(game, fromPlayer, toPlayer, eventTechnology);
+        let reputationResult = await this.reputationService.tryIncreaseReputationTechnology(game, toPlayer, fromPlayer, eventTechnology);
+
+        if (reputationResult.increased) {
+            await this.tryTradeBack(game, toPlayer, fromPlayer, reputationResult.rep.reputation);
+        }
 
         let eventObject = {
             gameId: game._id,
@@ -345,7 +387,7 @@ export default class TradeService extends EventEmitter {
             fromPlayer,
             toPlayer,
             technology: eventTechnology,
-            reputation,
+            reputation: reputationResult.rep.reputation,
             date: moment().utc()
         };
 
@@ -361,7 +403,7 @@ export default class TradeService extends EventEmitter {
         }
 
         // Get the players.
-        let toPlayer: Player = this.playerService.getById(game, toPlayerId);
+        let toPlayer: Player = this.playerService.getById(game, toPlayerId)!;
 
         if (fromPlayer._id.toString() === toPlayer._id.toString()) {
             throw new ValidationError('Cannot trade with the same player');
@@ -369,10 +411,10 @@ export default class TradeService extends EventEmitter {
 
         // Get all of the technologies that the from player has that have a higher
         // level than the to player.
-        let techKeys = Object.keys(fromPlayer.research)
+        let techKeys: ResearchTypeNotRandom[] = Object.keys(fromPlayer.research)
             .filter(k => {
                 return k.match(/^[^_\$]/) != null;
-            });
+            }) as ResearchTypeNotRandom[];
 
         let tradeTechs: TradeTechnology[] = [];
 
@@ -385,7 +427,7 @@ export default class TradeService extends EventEmitter {
 
             while (techLevel > techToPlayer.level) {
                 tradeTechs.push({
-                    name: techKey as ResearchType,
+                    name: techKey,
                     level: techLevel,
                     cost: techLevel * game.settings.player.tradeCost
                 });
@@ -449,6 +491,45 @@ export default class TradeService extends EventEmitter {
                 sentTick: game.state.tick
             }
         });
+    }
+
+    async tryTradeBack(game: Game, fromPlayer: Player, toPlayer: Player, reputation: PlayerReputation) {
+        // Note: Trade backs can only occur from AI to player
+        if (!fromPlayer.defeated) {
+            return;
+        }
+
+        const TRADE_CHANCE_BASE = 50;
+        const TRADE_CHANCE_STEP = 5;
+        const TRADE_CHANCE_MIN_REPUTATION = 1;
+
+        if (reputation.score < TRADE_CHANCE_MIN_REPUTATION) {
+            return;
+        }
+
+        let tradeChance = TRADE_CHANCE_BASE + (TRADE_CHANCE_STEP * reputation.score);
+        let tradeRoll = this.randomService.getRandomNumber(100);
+        let canPerformTrade = tradeRoll <= tradeChance || true;
+
+        if (!canPerformTrade) {
+            return;
+        }
+        
+        // TODO: Consider scanning range trade setting.
+
+        // Get the differences in tech levels between the two players that the AI can afford.
+        let tradeTechs = await this.getTradeableTechnologies(game, fromPlayer, toPlayer._id);
+
+        tradeTechs = tradeTechs.filter(t => t.cost <= fromPlayer.credits);
+
+        if (!tradeTechs.length) {
+            return;
+        }
+
+        // Pick a random tech(?) and send it to the player.
+        let tradeTech = tradeTechs[this.randomService.getRandomNumber(tradeTechs.length - 1)];
+        
+        await this.sendTechnology(game, fromPlayer, toPlayer._id, tradeTech.name, tradeTech.level);
     }
 
 };

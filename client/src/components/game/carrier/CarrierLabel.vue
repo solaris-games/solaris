@@ -1,5 +1,5 @@
 <template>
-  <a href="javascript:;" @click="pan">{{carrierName}}<i class="fas fa-eye ml-1"></i></a>
+  <a href="javascript:;" @click="pan">{{actualCarrierName}}<i class="fas fa-eye ml-1"></i></a>
 </template>
 
 <script>
@@ -10,6 +10,20 @@ export default {
   props: {
     carrierId: String,
     carrierName: String
+  },
+  data () {
+    return {
+      actualCarrierName: null
+    }
+  },
+  mounted () {
+    if (this.carrierName) {
+      this.actualCarrierName = this.carrierName
+    } else {
+      let carrier = gameHelper.getCarrierById(this.$store.state.game, this.carrierId)
+
+      this.actualCarrierName = carrier ? carrier.name : 'Unknown'
+    }
   },
   methods: {
     pan (e) {

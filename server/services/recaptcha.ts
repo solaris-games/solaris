@@ -23,7 +23,7 @@ export default class RecaptchaService {
         
             let recaptcha = new Recaptcha(siteKey, secretKey, data);
         
-            recaptcha.verify((success, error_code) => {
+            recaptcha.verify((success: boolean, error_code: string) => {
                 if (success) {
                     resolve();
                 }

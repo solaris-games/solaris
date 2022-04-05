@@ -6,8 +6,8 @@ import { Guild, GuildLeaderboard, GuildRank, GuildUserApplication, GuildWithUser
 import { User } from '../types/User';
 import UserService from './user';
 
-function toProperCase(string) {
-    return string.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+function toProperCase(string: string) {
+    return string.replace(/\w\S*/g, function(txt: string){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 };
 
 export default class GuildService {
@@ -18,13 +18,13 @@ export default class GuildService {
     CREATE_GUILD_CREDITS_COST = 3
     RENAME_GUILD_CREDITS_COST = 1
 
-    guildModel: any;
+    guildModel;
     guildRepo: DatabaseRepository<Guild>;
     userRepo: DatabaseRepository<User>;
     userService: UserService;
     
     constructor(
-        guildModel: any,
+        guildModel,
         guildRepo: DatabaseRepository<Guild>,
         userRepo: DatabaseRepository<User>,
         userService: UserService
@@ -214,6 +214,10 @@ export default class GuildService {
             throw new ValidationError(`A guild with the same name or tag already exists.`);
         }
 
+        // Remove all invites and applications to this user for any guild.
+        await this.declineAllInvitations(userId);
+        await this.withdrawAllApplications(userId);
+
         let guild = new this.guildModel();
 
         guild.leader = userId;
@@ -237,11 +241,15 @@ export default class GuildService {
     }
 
     async rename(userId: DBObjectId, newName: string, newTag: string) {
-        let guild = await this.detail(userId);
+        let user = await this.userService.getById(userId, {
+            guildId: 1
+        });
 
-        if (!guild) {
+        if (!user!.guildId) {
             throw new ValidationError('You are not a member of a guild.');
         }
+
+        let guild = await this.detail(user!.guildId!);
 
         let isLeader = this._isLeader(guild, userId);
 
@@ -298,7 +306,7 @@ export default class GuildService {
         });
     }
 
-    async invite(username, guildId, invitedByUserId) {
+    async invite(username: string, guildId: DBObjectId, invitedByUserId: DBObjectId) {
         let user = await this.userService.getByUsername(username, {
             username: 1,
             'achievements.rank': 1,

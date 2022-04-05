@@ -1,0 +1,11 @@
+use solaris;
+
+let gameId = ObjectId('gameid');
+
+db.games.updateOne({
+    _id: gameId
+}, {
+    $set: {
+        quitters: []
+    }
+});

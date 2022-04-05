@@ -28,7 +28,7 @@
     "randomAsteroidFields": 10,
     "randomBinaryStars": 10,
     "randomBlackHoles": 5,
-    "darkGalaxy": "standard",
+    "darkGalaxy": "extra",
     "giftCarriers": "enabled",
     "defenderBonus": "enabled",
     "carrierToCarrierCombat": "enabled",
@@ -67,8 +67,14 @@
     "tradeCredits": true,
     "tradeCreditsSpecialists": true,
     "tradeCost": 15,
-    "tradeScanning": "scanned",
-    "alliances": "enabled"
+    "tradeScanning": "scanned"
+  },
+  "diplomacy": {
+    "enabled": "enabled",
+    "upkeepCost": "none",
+    "tradeRestricted": "disabled", 
+    "maxAlliances": 31, 
+    "globalEvents": "disabled"
   },
   "technology": {
     "startingTechnologyLevel": {
@@ -97,6 +103,7 @@
   "gameTime": {
     "gameType": "realTime",
     "speed": 3600,
+    "isTickLimited": "disabled",
     "startDelay": 360,
     "afk": {
       "lastSeenTimeout": 2,

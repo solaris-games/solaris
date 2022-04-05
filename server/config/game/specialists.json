@@ -245,7 +245,7 @@
             "id": 16,
             "key": "rocket",
             "name": "Stellar Bomb",
-            "description": "Reignites a dead star with 25 Natural Resources, the Stellar Bomb will be destroyed but the carrier will survive. x0.5 Speed.",
+            "description": "Reignites a dead star with 25 Natural Resources (x2 for Binary Stars), the Stellar Bomb will be destroyed but the carrier will survive. x0.5 Speed.",
             "baseCostCredits": 300,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,

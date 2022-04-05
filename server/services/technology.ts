@@ -1,6 +1,6 @@
 import { Carrier } from "../types/Carrier";
 import { Game } from "../types/Game";
-import { Player, PlayerTechnologyLevels, ResearchType } from "../types/Player";
+import { Player, PlayerResearch, PlayerTechnologyLevels, ResearchType, ResearchTypeNotRandom } from "../types/Player";
 import { Star } from "../types/Star";
 import SpecialistService from "./specialist";
 
@@ -14,22 +14,22 @@ export default class TechnologyService {
     }
 
     getEnabledTechnologies(game: Game) {
-        let techs = Object.keys(game.settings.technology.researchCosts).filter(k => {
+        let techs: ResearchTypeNotRandom[] = Object.keys(game.settings.technology.researchCosts).filter(k => {
             return k.match(/^[^_\$]/) != null;
-        });
+        }) as ResearchTypeNotRandom[];
 
-        return techs.filter(t => this.isTechnologyEnabled(game, t as ResearchType));
+        return techs.filter(t => this.isTechnologyEnabled(game, t));
     }
 
-    isTechnologyEnabled(game: Game, techKey: ResearchType) {
+    isTechnologyEnabled(game: Game, techKey: ResearchTypeNotRandom) {
         return game.settings.technology.startingTechnologyLevel[techKey] > 0;
     }
 
-    isTechnologyResearchable(game: Game, technologyKey: ResearchType) {
+    isTechnologyResearchable(game: Game, technologyKey: ResearchTypeNotRandom) {
       return game.settings.technology.researchCosts[technologyKey] !== 'none'
     }
 
-    _applyTechModifiers(techs, modifiers, sanitize = true) { // TODO: types
+    _applyTechModifiers(techs: PlayerTechnologyLevels, modifiers, sanitize: boolean = true) { // TODO: types
         techs.scanning += modifiers.scanning || 0;
         techs.hyperspace += modifiers.hyperspace || 0;
         techs.terraforming += modifiers.terraforming || 0;
@@ -228,8 +228,16 @@ export default class TechnologyService {
     }   
 
     getDefenderBonus(game: Game, star: Star) {
-        const bonus = game.settings.specialGalaxy.defenderBonus === 'enabled' ? 1 : 0;
+        let bonus = game.settings.specialGalaxy.defenderBonus === 'enabled' ? 1 : 0;
 
-        return star.isAsteroidField ? bonus * 2 : bonus;
+        if (star.homeStar) {
+            bonus *= game.constants.star.homeStarDefenderBonusMultiplier;
+        }
+
+        if (star.isAsteroidField) {
+            bonus *= 2;
+        }
+
+        return bonus;
     }
 }

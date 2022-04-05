@@ -9,7 +9,7 @@ async function startServer() {
 
   await loaders.init(app, server);
 
-  server.listen(config.port, (err: any) => {
+  server.listen(config.port, (err) => {
     if (err) {
       console.log(err);
       return;

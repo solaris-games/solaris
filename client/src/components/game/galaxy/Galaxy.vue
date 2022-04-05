@@ -16,6 +16,9 @@
             <li class="nav-item">
                 <a class="nav-link" :class="{'active':activeTab === 'capitals'}" data-toggle="tab" href="#capitals">Capitals</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" :class="{'active':activeTab === 'naturalResources'}" data-toggle="tab" href="#naturalResources">Resources</a>
+            </li>
         </ul>
     </div>
 
@@ -37,6 +40,10 @@
             <capitals-table
               @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
         </div>
+        <div class="tab-pane fade" :class="{'show active':activeTab=== 'naturalResources'}" id="naturalResources">
+            <natural-resources-table
+              @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
+        </div>
     </div>
 </div>
 </template>
@@ -47,6 +54,7 @@ import StarsTableVue from './StarsTable'
 import CarriersTableVue from './CarriersTable'
 import ShipsTableVue from './ShipsTable'
 import CapitalsTableVue from './CapitalsTable'
+import NaturalResourcesTableVue from './NaturalResourcesTable'
 
 export default {
   components: {
@@ -54,7 +62,8 @@ export default {
     'stars-table': StarsTableVue,
     'carriers-table': CarriersTableVue,
     'ships-table': ShipsTableVue,
-    'capitals-table': CapitalsTableVue
+    'capitals-table': CapitalsTableVue,
+    'natural-resources-table': NaturalResourcesTableVue
   },
   props: {
     'tab': String

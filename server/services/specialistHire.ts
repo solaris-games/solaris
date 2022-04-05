@@ -5,38 +5,42 @@ import { Player } from "../types/Player";
 import { Specialist } from "../types/Specialist";
 import AchievementService from "./achievement";
 import GameTypeService from "./gameType";
-import PlayerService from "./player";
 import SpecialistService from "./specialist";
 import StarService from "./star";
 import WaypointService from "./waypoint";
 
 import ValidationError from "../errors/validation";
+import SpecialistBanService from "./specialistBan";
+import PlayerCreditsService from "./playerCredits";
 
 export default class SpecialistHireService {
     gameRepo: DatabaseRepository<Game>;
     specialistService: SpecialistService;
     achievementService: AchievementService;
     waypointService: WaypointService;
-    playerService: PlayerService;
+    playerCreditsService: PlayerCreditsService;
     starService: StarService;
     gameTypeService: GameTypeService;
+    specialistBanService: SpecialistBanService;
 
     constructor(
         gameRepo: DatabaseRepository<Game>,
         specialistService: SpecialistService,
         achievementService: AchievementService,
         waypointService: WaypointService,
-        playerService: PlayerService,
+        playerCreditsService: PlayerCreditsService,
         starService: StarService,
-        gameTypeService: GameTypeService
+        gameTypeService: GameTypeService,
+        specialistBanService: SpecialistBanService
     ) {
         this.gameRepo = gameRepo;
         this.specialistService = specialistService;
         this.achievementService = achievementService;
         this.waypointService = waypointService;
-        this.playerService = playerService;
+        this.playerCreditsService = playerCreditsService;
         this.starService = starService;
         this.gameTypeService = gameTypeService;
+        this.specialistBanService = specialistBanService;
     }
 
     async hireCarrierSpecialist(game: Game, player: Player, carrierId: DBObjectId, specialistId: number) {
@@ -44,7 +48,7 @@ export default class SpecialistHireService {
             throw new ValidationError('The game settings has disabled the hiring of specialists.');
         }
 
-        if (this._isCarrierSpecialistBanned(game, specialistId)) {
+        if (this.specialistBanService.isCarrierSpecialistBanned(game, specialistId)) {
             throw new ValidationError('This specialist has been banned from this game.');
         }
 
@@ -135,7 +139,7 @@ export default class SpecialistHireService {
             throw new ValidationError('The game settings has disabled the hiring of specialists.');
         }
 
-        if (this._isStarSpecialistBanned(game, specialistId)) {
+        if (this.specialistBanService.isStarSpecialistBanned(game, specialistId)) {
             throw new ValidationError('This specialist has been banned from this game.');
         }
 
@@ -220,14 +224,6 @@ export default class SpecialistHireService {
         }
     }
 
-    _isStarSpecialistBanned(game: Game, specialistId: number) {
-        return game.settings.specialGalaxy.specialistBans.star.indexOf(specialistId) > -1;
-    }
-
-    _isCarrierSpecialistBanned(game: Game, specialistId: number) {
-        return game.settings.specialGalaxy.specialistBans.carrier.indexOf(specialistId) > -1;
-    }
-
     async _deductSpecialistCost(game: Game, player: Player, specialist: Specialist) {
         let cost = this.specialistService.getSpecialistActualCost(game, specialist);
 
@@ -235,11 +231,11 @@ export default class SpecialistHireService {
             case 'credits':
                 player.credits -= cost.credits;
 
-                return await this.playerService.addCredits(game, player, -cost.credits, false);
+                return await this.playerCreditsService.addCredits(game, player, -cost.credits, false);
             case 'creditsSpecialists':
                 player.creditsSpecialists -= cost.creditsSpecialists;
 
-                return await this.playerService.addCreditsSpecialists(game, player, -cost.creditsSpecialists, false);
+                return await this.playerCreditsService.addCreditsSpecialists(game, player, -cost.creditsSpecialists, false);
             default:
                 throw new Error(`Unsupported specialist currency type: ${game.settings.specialGalaxy.specialistsCurrency}`);
         }

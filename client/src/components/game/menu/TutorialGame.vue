@@ -49,6 +49,10 @@ import gameService from '../../../services/api/game'
 export default {
     methods: {
         async viewTutorial () {
+            if (!await this.$confirm(`Start Tutorial`, `You are about to start the tutorial, are you sure you want to continue?`)) {
+                return
+            }
+            
             try {
                 let response = await gameService.createTutorialGame()
 

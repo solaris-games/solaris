@@ -1,10 +1,11 @@
 <template>
 <div>
   <p>
-    The game has ended, send congratulations to <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{getWinnerAlias()}}</a>!
+    The game has ended, <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{getWinnerAlias()}}</a> is the winner!
   </p>
+
   <p>
-    Show your support and award <span class="text-warning">badges</span> and <span class="text-warning">renown</span> to your friends and enemies alike.
+    <small>Show your support and award <span class="text-warning">badges</span> and <span class="text-warning">renown</span> to your friends and enemies alike.</small>
   </p>
 
   <!-- Rank Change -->

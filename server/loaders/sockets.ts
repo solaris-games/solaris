@@ -36,5 +36,7 @@ export default (config, server) => {
         });
     });
 
+    console.log('Sockets Initialized');
+    
     return io;
 };

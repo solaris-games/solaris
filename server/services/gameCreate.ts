@@ -4,18 +4,21 @@ import AchievementService from './achievement';
 import ConversationService from './conversation';
 import GameService from './game';
 import GameCreateValidationService from './gameCreateValidation';
+import GameFluxService from './gameFlux';
 import GameListService from './gameList';
+import GameTypeService from './gameType';
 import HistoryService from './history';
 import MapService from './map';
 import NameService from './name';
 import PasswordService from './password';
 import PlayerService from './player';
+import SpecialistBanService from './specialistBan';
 import UserService from './user';
 
 const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
 export default class GameCreateService {
-    gameModel: any;
+    gameModel;
     gameService: GameService;
     gameListService: GameListService;
     nameService: NameService;
@@ -27,9 +30,12 @@ export default class GameCreateService {
     achievementService: AchievementService;
     userService: UserService;
     gameCreateValidationService: GameCreateValidationService;
+    gameFluxService: GameFluxService;
+    specialistBanService: SpecialistBanService;
+    gameTypeService: GameTypeService;
 
     constructor(
-        gameModel: any,
+        gameModel,
         gameService: GameService,
         gameListService: GameListService,
         nameService: NameService, 
@@ -40,7 +46,10 @@ export default class GameCreateService {
         historyService: HistoryService,
         achievementService: AchievementService,
         userService: UserService,
-        gameCreateValidationService: GameCreateValidationService
+        gameCreateValidationService: GameCreateValidationService,
+        gameFluxService: GameFluxService,
+        specialistBanService: SpecialistBanService,
+        gameTypeService: GameTypeService
     ) {
         this.gameModel = gameModel;
         this.gameService = gameService;
@@ -54,10 +63,15 @@ export default class GameCreateService {
         this.achievementService = achievementService;
         this.userService = userService;
         this.gameCreateValidationService = gameCreateValidationService;
+        this.gameFluxService = gameFluxService;
+        this.specialistBanService = specialistBanService;
+        this.gameTypeService = gameTypeService;
     }
 
     async create(settings: GameSettings) {
         const isTutorial = settings.general.type === 'tutorial';
+        const isNewPlayerGame = settings.general.type === 'new_player_rt' || settings.general.type === 'new_player_tb';
+        const isOfficialGame = settings.general.createdByUserId == null;
 
         // If a legit user (not the system) created the game and it isn't a tutorial
         // then that game must be set as a custom game.
@@ -133,6 +147,14 @@ export default class GameCreateService {
             };
         }
 
+        // Ensure that tick limited games have their ticks to end state preset
+        if (game.settings.gameTime.isTickLimited === 'enabled') {
+            game.state.ticksToEnd = game.settings.gameTime.tickLimit;
+        } else {
+            game.settings.gameTime.tickLimit = null;
+            game.state.ticksToEnd = null;
+        }
+
         if (game.settings.galaxy.galaxyType === 'custom') {
             game.settings.specialGalaxy.randomWarpGates = 0;
             game.settings.specialGalaxy.randomWormHoles = 0;
@@ -141,6 +163,9 @@ export default class GameCreateService {
             game.settings.specialGalaxy.randomBinaryStars = 0;
             game.settings.specialGalaxy.randomBlackHoles = 0;
         }
+
+        // Clamp max alliances if its invalid (minimum of 1)
+        game.settings.diplomacy.maxAlliances = Math.max(1, Math.min(game.settings.diplomacy.maxAlliances, game.settings.general.playerLimit - 1));
         
         // If the game name contains a special string, then replace it with a random name.
         if (game.settings.general.name.indexOf(RANDOM_NAME_STRING) > -1) {
@@ -149,11 +174,25 @@ export default class GameCreateService {
             game.settings.general.name = game.settings.general.name.replace(RANDOM_NAME_STRING, randomGameName);
         }
 
-        // Create all of the stars required.
-        (game.galaxy as any).homeStars = [];
-        (game.galaxy as any).linkedStars = [];
+        if (this.gameTypeService.isFluxGame(game)) {
+            this.gameFluxService.applyCurrentFlux(game);
+        }
 
-        let starGeneration: any = this.mapService.generateStars(
+        // Apply spec bans if applicable.
+        if (game.settings.specialGalaxy.specialistCost !== 'none') {
+            const banAmount = game.constants.specialists.monthlyBanAmount; // Random X specs of each type.
+
+            game.settings.specialGalaxy.specialistBans = {
+                star: this.specialistBanService.getCurrentMonthStarBans(banAmount),
+                carrier: this.specialistBanService.getCurrentMonthCarrierBans(banAmount)
+            };
+        }
+
+        // Create all of the stars required.
+        game.galaxy.homeStars = [];
+        game.galaxy.linkedStars = [];
+
+        let starGeneration = this.mapService.generateStars(
             game, 
             desiredStarCount,
             game.settings.general.playerLimit,
@@ -161,6 +200,8 @@ export default class GameCreateService {
         );
 
         game.galaxy.stars = starGeneration.stars;
+        game.galaxy.homeStars = starGeneration.homeStars;
+        game.galaxy.linkedStars = starGeneration.linkedStars;
         
         // Setup players and assign to their starting positions.
         game.galaxy.players = this.playerService.createEmptyPlayers(game);

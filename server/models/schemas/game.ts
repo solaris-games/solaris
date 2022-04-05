@@ -10,18 +10,19 @@ import ConversationSchema from './conversation';
 const schema = new Schema({
     settings: {
         general: {
+			fluxId: { type: Types.Number, required: false, default: null },
             createdByUserId: { type: Types.ObjectId, required: false, default: null },
             name: { type: Types.String, required: true },
             description: { type: Types.String, required: false, default: null },
 			type: { type: Types.String, required: true, enum: [
 				'tutorial',
-				'custom', 
-				'standard_rt', 
-				'standard_tb', 
-				'1v1_rt', 
-				'1v1_tb', 
-				'new_player_rt', 
-				'new_player_tb', 
+				'custom',
+				'standard_rt',
+				'standard_tb',
+				'1v1_rt',
+				'1v1_tb',
+				'new_player_rt',
+				'new_player_tb',
 				'32_player_rt',
 				'special_dark',
 				'special_ultraDark',
@@ -104,10 +105,16 @@ const schema = new Schema({
 			tradeCredits: { type: Types.Boolean, required: false, default: true },
 			tradeCreditsSpecialists: { type: Types.Boolean, required: false, default: true },
 			tradeCost: { type: Types.Number, required: true, enum: [0, 5, 15, 25, 50, 100], default: 15 }, // TODO: This could be renamed.
-			tradeScanning: { type: Types.String, required: true, enum: ['all', 'scanned'], default: 'all' },
-			alliances: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
-        },
-        technology: {
+			tradeScanning: { type: Types.String, required: true, enum: ['all', 'scanned'], default: 'all' }
+		},
+		diplomacy: {
+			enabled: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
+			tradeRestricted: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
+			maxAlliances: { type: Types.Number, required: true, min: 1, max: 31, default: 31 },
+			upkeepCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'none' },
+			globalEvents: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' }
+		},
+		technology: {
 			startingTechnologyLevel: {
 				terraforming: { type: Types.Number, required: true, min: 1, max: 16, default: 1 },
 				experimentation: { type: Types.Number, required: true, min: 0, max: 16, default: 1 },
@@ -137,6 +144,8 @@ const schema = new Schema({
 			startDelay: { type: Types.Number, required: true, enum: [0, 1, 5, 10, 30, 60, 120, 240, 360, 480, 600, 720, 1440], default: 240 },	// Time in minutes
 			turnJumps: { type: Types.Number, required: true, min: 1, max: 24, default: 8 },
 			maxTurnWait: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60, 360, 480, 600, 720, 1080, 1440, 2880], default: 1440 },	// Time in minutes
+			isTickLimited: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'disabled' },
+			tickLimit: { type: Types.Number, required: false, min: 200, max: 2000, default: null },
 			afk: {
 				lastSeenTimeout: { type: Types.Number, required: true, min: 1, max: 7, default: 2}, // Time in days, real time and turn based
 				cycleTimeout: { type: Types.Number, required: true, min: 3, max: 10, default: 3}, // Real time games' production cycle limit
@@ -177,7 +186,9 @@ const schema = new Schema({
 			}
 		},
 		research: {
-			progressMultiplier: { type: Types.Number, required: true, default: 50 }
+			progressMultiplier: { type: Types.Number, required: true, default: 50 },
+			sciencePointMultiplier: { type: Types.Number, required: true, default: 1 },
+			experimentationMultiplier: { type: Types.Number, required: true, default: 1 }
 		},
 		star: {
 			resources: {
@@ -203,7 +214,24 @@ const schema = new Schema({
 				expensive: { type: Types.Number, required: true, default: 2 },
 				veryExpensive: { type: Types.Number, required: true, default: 4 },
 				crazyExpensive: { type: Types.Number, required: true, default: 8 }
+			},
+			captureRewardMultiplier: { type: Types.Number, required: true, default: 10 },
+			homeStarDefenderBonusMultiplier: { type: Types.Number, required: true, default: 1 }
+		},
+		diplomacy: {
+			upkeepExpenseMultipliers: {
+				none: { type: Types.Number, required: true, default: 0 },
+				cheap: { type: Types.Number, required: true, default: 0.02 },
+				standard: { type: Types.Number, required: true, default: 0.05 },
+				expensive: { type: Types.Number, required: true, default: 0.10 }
 			}
+		},
+		player: {
+			rankRewardMultiplier: { type: Types.Number, required: true, default: 1 },
+			bankingCycleRewardMultiplier: { type: Types.Number, required: true, default: 75 }
+		},
+		specialists: {
+			monthlyBanAmount: { type: Types.Number, required: true, default: 3 }
 		}
 	},
 	quitters: [{ type: Types.ObjectId, required: false }],

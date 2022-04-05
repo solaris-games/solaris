@@ -32,6 +32,7 @@ export type GameAwardRankTo = 'all'|'winner';
 export type GameGalaxyType = 'circular'|'spiral'|'doughnut'|'circular-balanced'|'irregular'|'custom';
 export type GameCarrierCost = 'cheap'|'standard'|'expensive';
 export type GameCarrierUpkeepCost = 'none'|'cheap'|'standard'|'expensive';
+export type GameAllianceUpkeepCost = 'none'|'cheap'|'standard'|'expensive'; 
 export type GameWarpgateCost = 'none'|'cheap'|'standard'|'expensive';
 export type GameSpecialistCost = 'none'|'standard'|'expensive'|'veryExpensive'|'crazyExpensive';
 export type GameSpecialistCurrency = 'credits'|'creditsSpecialists';
@@ -41,6 +42,7 @@ export type GamePlayerDistribution = 'circular'|'random';
 export type GameVictoryCondition = 'starPercentage'|'homeStarPercentage';
 export type GameVictoryPercentage = 25|33|50|66|75|90|100;
 export type GameInfrastructureCost = 'cheap'|'standard'|'expensive';
+export type GameInfrastructureExpenseMultiplier = 'cheap'|'standard'|'expensive'|'crazyExpensive';
 export type GameTradeCost = 0|5|15|25|50|100;
 export type GameTradeScanning = 'all'|'scanned';
 export type GameResearchCost = 'none'|'cheap'|'standard'|'expensive'|'veryExpensive'|'crazyExpensive';
@@ -51,8 +53,16 @@ export type GameTimeSpeed = 30|60|300|600|1800|3600|7200;
 export type GameTimeStartDelay = 0|1|5|10|30|60|120|240|360|480|600|720|1440;
 export type GameTimeMaxTurnWait = 1|5|10|30|60|360|480|600|720|1080|1440|2880;
 
+export interface GameFlux {
+	id: number;
+	name: string;
+	month: string;
+	description: string;
+};
+
 export interface GameSettings {
 	general: {
+		fluxId: number | null;
 		createdByUserId?: DBObjectId | null;
 		name: string;
 		description: string | null;
@@ -68,6 +78,7 @@ export interface GameSettings {
 		timeMachine: GameSettingEnabledDisabled;
 		awardRankTo: GameAwardRankTo;
 		isGameAdmin?: boolean;
+		flux?: GameFlux;
 	},
 	galaxy: {
 		galaxyType: GameGalaxyType;
@@ -130,7 +141,13 @@ export interface GameSettings {
 		tradeCreditsSpecialists: boolean;
 		tradeCost: GameTradeCost;
 		tradeScanning: GameTradeScanning;
-		alliances: GameSettingEnabledDisabled;
+  	},
+	diplomacy: {
+		enabled: GameSettingEnabledDisabled;
+		tradeRestricted: GameSettingEnabledDisabled;
+		maxAlliances: number;
+		upkeepCost: GameAllianceUpkeepCost;
+		globalEvents: GameSettingEnabledDisabled;
 	},
 	technology: {
 		startingTechnologyLevel: {
@@ -159,6 +176,8 @@ export interface GameSettings {
 	gameTime: {
 		gameType: GameTimeType;
 		speed: GameTimeSpeed;
+		isTickLimited: GameSettingEnabledDisabled;
+		tickLimit: number | null;
 		startDelay: GameTimeStartDelay;
 		turnJumps: number;
 		maxTurnWait: GameTimeMaxTurnWait;
@@ -185,7 +204,9 @@ export interface Game {
     galaxy: {
         players: Player[]
 		stars: Star[],
-		carriers: Carrier[]
+		carriers: Carrier[],
+		homeStars?: DBObjectId[],
+		linkedStars: DBObjectId[][]
 	},
 	conversations: Conversation[]
 	state: {
@@ -214,6 +235,8 @@ export interface Game {
 		},
 		research: {
 			progressMultiplier: number;
+			sciencePointMultiplier: number;
+			experimentationMultiplier: number;
 		},
 		star: {
 			resources: {
@@ -239,7 +262,24 @@ export interface Game {
 				expensive: number;
 				veryExpensive: number;
 				crazyExpensive: number;
+			},
+			captureRewardMultiplier: number;
+			homeStarDefenderBonusMultiplier: number;
+		},
+		diplomacy: {
+			upkeepExpenseMultipliers: {
+				none: number;
+				cheap: number;
+				standard: number;
+				expensive: number;
 			}
+		},
+		player: {
+			rankRewardMultiplier: number;
+			bankingCycleRewardMultiplier: number;
+		},
+		specialists: {
+			monthlyBanAmount: number;
 		}
 	},
 	quitters: DBObjectId[],

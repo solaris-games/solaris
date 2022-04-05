@@ -56,7 +56,7 @@ export default class MapService {
 
     generateStars(game: Game, starCount: number, playerLimit: number, customJSON?: string | null) {
         let stars: Star[] = [];
-        let homeStars: Star[] = [];
+        let homeStars: any[] = [];
         let linkedStars: any[] = [];
 
         // Get an array of random star names for however many stars we want.
@@ -91,13 +91,13 @@ export default class MapService {
         let isCustomGalaxy = game.settings.galaxy.galaxyType === 'custom';
         let starNamesIndex = 0;
 
-        let unlinkedStars: any[] = starLocations.filter(l => !l.linked);
+        let unlinkedStars = starLocations.filter(l => !l.linked);
 
         // Create a star for all locations returned by the map generator
         for (let i = 0; i < unlinkedStars.length; i++) {
             let starLocation: any = unlinkedStars[i];
             
-            let star: any;
+            let star;
             let starName = starNames[starNamesIndex++];
 
             if (isCustomGalaxy) {

@@ -10,27 +10,54 @@
       Declare your diplomatic statuses to players.
     </p>
 
+    <form-error-list :errors="errors" />
+
     <div class="row" v-if="!isLoading && isFormalAlliancesEnabled">
       <div class="table-responsive">
         <table class="table table-sm table-striped mb-0">
           <tbody>
-            <diplomacy-row 
-              v-for="diplomaticStatus in diplomaticStatuses" 
+            <diplomacy-row
+              v-for="diplomaticStatus in diplomaticStatuses"
               :key="diplomaticStatus.playerId"
               :diplomaticStatus="diplomaticStatus"
-              @onPlayerDetailRequested="onPlayerDetailRequested"/>
+              @onPlayerDetailRequested="onPlayerDetailRequested"
+              @onApiRequestError="onApiRequestError"
+              @onApiRequestSuccess="onApiRequestSuccess"/>
           </tbody>
         </table>
       </div>
     </div>
 
-    <p class="mt-2 pb-2" v-if="isFormalAlliancesEnabled">
-      <small>
-        If you are allied with another player, you can visit their stars.
-        <br/>
-        Combat will not occur if all players at a star are allied with the star owner. See the help guide for more details.
-      </small>
-    </p>
+    <div class="mt-2" v-if="isFormalAlliancesEnabled">
+      <hr/>
+      
+      <h5>Alliance Settings</h5>
+
+      <ul>
+        <li>
+          <small>If you are allied with another player, you can visit their stars.</small>
+        </li>
+        <li>
+          <small>Combat will not occur if all players at a star are <span class="text-warning">allied</span> with the star owner.</small>
+        </li>
+        <li v-if="isTradeRestricted">
+          <small>You are only allowed to trade with allies.</small>
+        </li>
+        <li v-if="isMaxAlliancesEnabled">
+          <small>You may only ally with a maximum of <span class="text-warning">{{ maxAlliances }} player(s)</span>.</small>
+        </li>
+        <li v-if="isAllianceUpkeepEnabled">
+          <small>An alliance <span class="text-warning">upkeep cost</span> will be deducted at the end of every cycle based on your cycle income.</small>
+        </li>
+        <li v-if="isAllianceUpkeepEnabled">
+          <small>Establishing an alliance will incur an <span class="text-warning">upfront upkeep fee</span> based on your cycle income.</small>
+        </li>
+      </ul>
+
+      <p class="pb-2">
+        See the help guide for more details.
+      </p>
+    </div>
 </div>
 </template>
 
@@ -39,17 +66,20 @@ import MenuTitle from '../MenuTitle'
 import LoadingSpinner from '../../LoadingSpinner'
 import DiplomacyApiService from '../../../services/api/diplomacy'
 import DiplomacyRowVue from './DiplomacyRow'
-import GameHelper from '../../../services/gameHelper'
+import DiplomacyHelper from '../../../services/diplomacyHelper'
+import FormErrorList from '../../FormErrorList'
 
 export default {
   components: {
     'menu-title': MenuTitle,
     'loading-spinner': LoadingSpinner,
-    'diplomacy-row': DiplomacyRowVue
+    'diplomacy-row': DiplomacyRowVue,
+    'form-error-list': FormErrorList
   },
   data () {
     return {
         isLoading: false,
+        errors: [],
         diplomaticStatuses: []
     }
   },
@@ -68,6 +98,13 @@ export default {
     },
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
+    },
+    // TODO: This is super lazy
+    onApiRequestSuccess (e) {
+      this.errors = []
+    },
+    onApiRequestError (e) {
+      this.errors = e.errors
     },
     async loadDiplomaticStatus () {
       if (!this.isFormalAlliancesEnabled) {
@@ -100,7 +137,19 @@ export default {
   },
   computed: {
     isFormalAlliancesEnabled () {
-      return GameHelper.isFormalAlliancesEnabled(this.$store.state.game)
+      return DiplomacyHelper.isFormalAlliancesEnabled(this.$store.state.game)
+    },
+    isTradeRestricted () {
+      return DiplomacyHelper.isTradeRestricted(this.$store.state.game)
+    },
+    isMaxAlliancesEnabled () {
+      return DiplomacyHelper.isMaxAlliancesEnabled(this.$store.state.game)
+    },
+    maxAlliances() {
+      return DiplomacyHelper.maxAlliances(this.$store.state.game)
+    },
+    isAllianceUpkeepEnabled () {
+      return DiplomacyHelper.isAllianceUpkeepEnabled(this.$store.state.game)
     }
   }
 }

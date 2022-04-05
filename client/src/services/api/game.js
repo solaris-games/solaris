@@ -11,6 +11,11 @@ class GameService extends BaseApiService {
       { withCredentials: true })
   }
 
+  getCurrentFlux () {
+    return axios.get(this.BASE_URL + 'game/flux',
+      { withCredentials: true })
+  }
+
   createGame (settings) {
     return axios.post(this.BASE_URL + 'game', settings,
       { withCredentials: true })
@@ -102,6 +107,11 @@ class GameService extends BaseApiService {
 
   confirmReady (gameId) {
     return axios.put(this.BASE_URL + 'game/' + gameId + '/ready', null,
+      { withCredentials: true })
+  }
+
+  confirmReadyToCycle (gameId) {
+    return axios.put(this.BASE_URL + 'game/' + gameId + '/readytocycle', null,
       { withCredentials: true })
   }
 

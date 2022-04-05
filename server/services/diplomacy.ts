@@ -1,23 +1,41 @@
 const EventEmitter = require('events');
 import { DBObjectId } from "../types/DBObjectId";
+import ValidationError from '../errors/validation';
 import DatabaseRepository from "../models/DatabaseRepository";
 import { DiplomaticState, DiplomaticStatus } from "../types/Diplomacy";
 import { Game } from "../types/Game";
-import { Player, PlayerDiplomacy } from "../types/Player";
+import { Player, PlayerDiplomaticState } from "../types/Player";
+import DiplomacyUpkeepService from "./diplomacyUpkeep";
 
 export default class DiplomacyService extends EventEmitter {
+
     gameRepo: DatabaseRepository<Game>;
+    diplomacyUpkeepService: DiplomacyUpkeepService;
 
     constructor(
-        gameRepo: DatabaseRepository<Game>
+        gameRepo: DatabaseRepository<Game>,
+        diplomacyUpkeepService: DiplomacyUpkeepService
     ) {
         super();
 
         this.gameRepo = gameRepo;
+        this.diplomacyUpkeepService = diplomacyUpkeepService;
     }
 
     isFormalAlliancesEnabled(game: Game): boolean {
-        return game.settings.player.alliances === 'enabled';
+        return game.settings.diplomacy.enabled === 'enabled';
+    }
+
+    isTradeRestricted(game: Game): boolean {
+        return game.settings.diplomacy.tradeRestricted === 'enabled';
+    }
+
+    isMaxAlliancesEnabled(game: Game): boolean {
+        return game.settings.diplomacy.maxAlliances < game.settings.general.playerLimit - 1
+    }
+
+    isGlobalEventsEnabled(game: Game): boolean {
+        return game.settings.diplomacy.globalEvents === 'enabled';
     }
 
     getDiplomaticStatusBetweenPlayers(game: Game, playerIds: DBObjectId[]): DiplomaticState {
@@ -37,13 +55,13 @@ export default class DiplomacyService extends EventEmitter {
                 statuses.push(diplomaticStatus.actualStatus);
             }
         }
-        
+
         if (statuses.indexOf('enemies') > -1) {
             return 'enemies';
         } else if (statuses.indexOf('neutral') > -1) {
             return 'neutral';
         }
-        
+
         return 'allies';
     }
 
@@ -119,6 +137,24 @@ export default class DiplomacyService extends EventEmitter {
         return allies;
     }
 
+    getAlliesOrOffersOfPlayer(game: Game, player: Player): Player[] {
+        let allies: Player[] = [];
+
+        for (let otherPlayer of game.galaxy.players) {
+            if (otherPlayer._id.toString() === player._id.toString()) {
+                continue;
+            }
+
+            let diplomaticStatus = this.getDiplomaticStatusToPlayer(game, player._id, otherPlayer._id);
+
+            if (diplomaticStatus.actualStatus === 'allies' || diplomaticStatus.statusTo === 'allies') {
+                allies.push(otherPlayer);
+            }
+        }
+
+        return allies;
+    }
+
     isDiplomaticStatusBetweenPlayersAllied(game: Game, playerIds: DBObjectId[]): boolean {
         return this.getDiplomaticStatusBetweenPlayers(game, playerIds) === 'allies';
     }
@@ -139,17 +175,14 @@ export default class DiplomacyService extends EventEmitter {
         return true;
     }
 
-    getFilteredDiplomacy(player: Player, forPlayer: Player): PlayerDiplomacy[] {
-        return player.diplomacy.filter(d => d.playerId.toString() === forPlayer._id.toString());
+    getFilteredDiplomacy(player: Player, forPlayer: Player): PlayerDiplomaticState[] {
+        return player.diplomacy.filter(a => a.toString() === forPlayer._id.toString());
     }
 
     async _declareStatus(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId, state: DiplomaticState, saveToDB: boolean = true) {
         let player: Player = game.galaxy.players.find(p => p._id.toString() === playerId.toString())!;
-
-        // Get the current status between the two players.
         let diplo = player.diplomacy.find(d => d.playerId.toString() === playerIdTarget.toString());
 
-        // If there isn't a status, then its new, insert one.
         if (!diplo) {
             diplo = {
                 playerId: playerIdTarget,
@@ -169,7 +202,6 @@ export default class DiplomacyService extends EventEmitter {
                 });
             }
         } else {
-            // Otherwise a diplomatic status exists, update the existing one.
             diplo.status = state;
 
             if (saveToDB) {
@@ -194,26 +226,46 @@ export default class DiplomacyService extends EventEmitter {
         return diplomaticStatus;
     }
 
-    async declareAlly(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId) {
+    async declareAlly(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId, saveToDB: boolean = true) {
+        let oldStatus = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
+
+        if (oldStatus.statusTo === "allies") {
+            throw new ValidationError(`The player has already been declared as allies`);
+        }
+
+        if (this.isMaxAlliancesEnabled(game)) {
+            let player = game.galaxy.players.find(p => p._id.toString() === playerId.toString())!;
+    
+            let allianceCount = this.getAlliesOrOffersOfPlayer(game, player).length;
+
+            if (allianceCount >= game.settings.diplomacy.maxAlliances) {
+                throw new ValidationError(`You have reached the alliance cap, you cannot declare any more alliances.`);
+            }
+        }
+
+        // If there is an upkeep cost, deduct 1 cycle's worth of up for 1 alliance upfront.
+        if (this.diplomacyUpkeepService.isAllianceUpkeepEnabled(game)) {
+            let player = game.galaxy.players.find(p => p._id.toString() === playerId.toString())!;
+
+            await this.diplomacyUpkeepService.deductUpkeep(game, player, 1, saveToDB);
+        }
+        
         let wasAtWar = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget).actualStatus === 'enemies';
 
-        let newStatus = await this._declareStatus(game, playerId, playerIdTarget, 'allies');
+        let newStatus = await this._declareStatus(game, playerId, playerIdTarget, 'allies', saveToDB);
 
         let isAllied = newStatus.actualStatus === 'allies';
         let isFriendly = isAllied || newStatus.actualStatus === 'neutral';
-        
-        // Create a global event for peace reached if both players were at war and are now either neutral or allied.
-        if (wasAtWar && isFriendly) {
-            this.emit('onDiplomacyPeaceDeclared', {
-                gameId: game._id,
-                gameTick: game.state.tick,
-                status: newStatus
-            });
-        }
 
-        // Create a private event for alliance established if both players are now allies.
-        if (isAllied) {
-            this.emit('onDiplomacyAllianceDeclared', {
+        this.emit('onDiplomacyStatusChanged', {
+            gameId: game._id,
+            gameTick: game.state.tick,
+            status: newStatus
+        });
+
+        // Create a global event for peace reached if both players were at war and are now either neutral or allied.
+        if (this.isGlobalEventsEnabled(game) && wasAtWar && isFriendly) {
+            this.emit('onDiplomacyPeaceDeclared', {
                 gameId: game._id,
                 gameTick: game.state.tick,
                 status: newStatus
@@ -226,6 +278,10 @@ export default class DiplomacyService extends EventEmitter {
     async declareEnemy(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId, saveToDB: boolean = true) {
         let oldStatus = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
 
+        if (oldStatus.statusTo === "enemies") {
+            throw new ValidationError(`The player has already been declared as enemies`);
+        }
+
         let wasAtWar = oldStatus.actualStatus === 'enemies';
 
         // When declaring enemies, set both to enemies irrespective of which side declared it.
@@ -234,8 +290,14 @@ export default class DiplomacyService extends EventEmitter {
 
         let newStatus = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
 
+        this.emit('onDiplomacyStatusChanged', {
+            gameId: game._id,
+            gameTick: game.state.tick,
+            status: newStatus
+        });
+
         // Create a global event for enemy declaration.
-        if (!wasAtWar) {
+        if (this.isGlobalEventsEnabled(game) && !wasAtWar) {
             this.emit('onDiplomacyWarDeclared', {
                 gameId: game._id,
                 gameTick: game.state.tick,
@@ -246,25 +308,35 @@ export default class DiplomacyService extends EventEmitter {
         return newStatus;
     }
 
-    async declareNeutral(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId) {
+    async declareNeutral(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId, saveToDB: boolean = true) {
         let oldStatus = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
+
+        if (oldStatus.statusTo === "neutral") {
+            throw new ValidationError(`The player has already been declared as neutral`);
+        }
 
         let wasAtWar = oldStatus.actualStatus === 'enemies';
         let wasAllied = oldStatus.actualStatus === 'allies';
         
-        await this._declareStatus(game, playerId, playerIdTarget, 'neutral');
+        await this._declareStatus(game, playerId, playerIdTarget, 'neutral', saveToDB);
 
         // When declaring neutral, set both players to neutral if they were allies before.
         if (wasAllied) {
-            await this._declareStatus(game, playerIdTarget, playerId, 'neutral');
+            await this._declareStatus(game, playerIdTarget, playerId, 'neutral', saveToDB);
         }
 
         let newStatus = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
 
         let isNeutral = newStatus.actualStatus === 'neutral';
 
+        this.emit('onDiplomacyStatusChanged', {
+            gameId: game._id,
+            gameTick: game.state.tick,
+            status: newStatus
+        });
+
         // Create a global event for peace reached if both players were at war.
-        if (wasAtWar && isNeutral) {
+        if (this.isGlobalEventsEnabled(game) && wasAtWar && isNeutral) {
             this.emit('onDiplomacyPeaceDeclared', {
                 gameId: game._id,
                 gameTick: game.state.tick,

@@ -17,3 +17,10 @@ Turn based games play differently to real time games. The game does not run in r
 When all players are ready, a given number of ticks (based on game settings) will happen all at once. This means that games can be played much much faster than real time games or allow players who do not have enough time to monitor real time games to play competitively.
 
 Like in real time games, turn based games have an auto-resign function. If a player misses a number of consecutive turns equal to the game’s settings, or doesn’t do anything on the first turn, that player will be automatically resigned.
+
+### Ready and Ready to Cycle
+
+In turn based games you must declare that you are ready and have ended your turn. You can set your status to one of the following:
+
+- **Ready** - The player has finished their turn. This status resets when the game progresses to the next turn.
+- **Ready to Cycle** - The player has finished their turn and will not become *unready* until the next cycle.

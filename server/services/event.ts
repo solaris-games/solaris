@@ -25,6 +25,7 @@ import TradeService from "./trade";
 import { GameEvent } from "../types/GameEvent";
 import DiplomacyService from "./diplomacy";
 import { DiplomaticStatus } from "../types/Diplomacy";
+import CarrierGiftService from "./carrierGift";
 
 const moment = require('moment');
 
@@ -57,6 +58,8 @@ export default class EventService {
         PLAYER_GIFT_RECEIVED: 'playerGiftReceived',
         PLAYER_GIFT_SENT: 'playerGiftSent',
         PLAYER_STAR_ABANDONED: 'playerStarAbandoned',
+        PLAYER_STAR_DIED: 'playerStarDied',
+        PLAYER_STAR_REIGNITED: 'playerStarReignited',
         PLAYER_BULK_INFRASTRUCTURE_UPGRADED: 'playerBulkInfrastructureUpgraded',
         PLAYER_DEBT_SETTLED: 'playerDebtSettled',
         PLAYER_DEBT_FORGIVEN: 'playerDebtForgiven',
@@ -65,10 +68,10 @@ export default class EventService {
         PLAYER_CONVERSATION_CREATED: 'playerConversationCreated',
         PLAYER_CONVERSATION_INVITED: 'playerConversationInvited',
         PLAYER_CONVERSATION_LEFT: 'playerConversationLeft',
-        PLAYER_DIPLOMACY_ALLIANCE_DECLARED: 'playerDiplomacyAllianceDeclared',
+        PLAYER_DIPLOMACY_STATUS_CHANGED: 'playerDiplomacyStatusChanged',
     }
     
-    eventModel: any;
+    eventModel;
     eventRepo: DatabaseRepository<GameEvent>;
     broadcastService: BroadcastService;
     gameService: GameService;
@@ -82,11 +85,11 @@ export default class EventService {
     combatService: CombatService;
     specialistService: SpecialistService
     badgeService: BadgeService;
-    carrierService: CarrierService;
+    carrierGiftService: CarrierGiftService;
     diplomacyService: DiplomacyService;
 
     constructor(
-        eventModel: any,
+        eventModel,
         eventRepo: DatabaseRepository<GameEvent>,
         broadcastService: BroadcastService,
         gameService: GameService,
@@ -100,7 +103,7 @@ export default class EventService {
         combatService: CombatService,
         specialistService: SpecialistService,
         badgeService: BadgeService,
-        carrierService: CarrierService,
+        carrierGiftService: CarrierGiftService,
         diplomacyService: DiplomacyService
     ) {
         this.eventModel = eventModel;
@@ -117,7 +120,7 @@ export default class EventService {
         this.combatService = combatService;
         this.specialistService = specialistService;
         this.badgeService = badgeService;
-        this.carrierService = carrierService;
+        this.carrierGiftService = carrierGiftService;
         this.diplomacyService = diplomacyService;
 
         this.gameService.on('onGameDeleted', (args) => this.deleteByGameId(args.gameId));
@@ -135,7 +138,7 @@ export default class EventService {
             args.gameId, args.gameTick, args.player, 
             args.creditsEconomy, args.creditsBanking, args.creditsSpecialists, 
             args.experimentTechnology, args.experimentAmount, args.experimentLevelUp, args.experimentResearchingNext,
-            args.carrierUpkeep));
+            args.carrierUpkeep, args.allianceUpkeep));
             
         this.gameTickService.on('onPlayerAfk', (args) => this.createPlayerAfkEvent(args.gameId, args.gameTick, args.player));
         this.gameTickService.on('onPlayerDefeated', (args) => this.createPlayerDefeatedEvent(args.gameId, args.gameTick, args.player));
@@ -144,6 +147,8 @@ export default class EventService {
         this.researchService.on('onPlayerResearchCompleted', (args) => this.createResearchCompleteEvent(args.gameId, args.gameTick, args.playerId, args.technologyKey, args.technologyLevel, args.technologyKeyNext, args.technologyLevelNext));
 
         this.starService.on('onPlayerStarAbandoned', (args) => this.createStarAbandonedEvent(args.gameId, args.gameTick, args.player, args.star));
+        this.starService.on('onPlayerStarDied', (args) => this.createStarDiedEvent(args.gameId, args.gameTick, args.playerId, args.starId, args.starName));
+        this.starService.on('onPlayerStarReignited', (args) => this.createStarReignitedEvent(args.gameId, args.gameTick, args.playerId, args.starId, args.starName));
         
         this.starUpgradeService.on('onPlayerInfrastructureBulkUpgraded', (args) => this.createInfrastructureBulkUpgraded(args.gameId, args.gameTick, args.player, args.upgradeSummary));
 
@@ -156,8 +161,8 @@ export default class EventService {
         this.tradeService.on('onPlayerTechnologyReceived', (args) => this.createTechnologyReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.technology));
         this.tradeService.on('onPlayerTechnologySent', (args) => this.createTechnologySentEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.technology));
 
-        this.carrierService.on('onPlayerGiftReceived', (args) => this.createGiftReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.carrier, args.star));
-        this.carrierService.on('onPlayerGiftSent', (args) => this.createGiftSentEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.carrier, args.star));
+        this.carrierGiftService.on('onPlayerGiftReceived', (args) => this.createGiftReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.carrier, args.star));
+        this.carrierGiftService.on('onPlayerGiftSent', (args) => this.createGiftSentEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.carrier, args.star));
 
         this.ledgerService.on('onDebtAdded', (args) => this.createDebtAddedEvent(args.gameId, args.gameTick, args.debtor, args.creditor, args.amount));
         this.ledgerService.on('onDebtSettled', (args) => this.createDebtSettledEvent(args.gameId, args.gameTick, args.debtor, args.creditor, args.amount));
@@ -171,7 +176,7 @@ export default class EventService {
 
         this.diplomacyService.on('onDiplomacyPeaceDeclared', (args) => this.createGameDiplomacyPeaceDeclared(args.gameId, args.gameTick, args.status));
         this.diplomacyService.on('onDiplomacyWarDeclared', (args) => this.createGameDiplomacyWarDeclared(args.gameId, args.gameTick, args.status));
-        this.diplomacyService.on('onDiplomacyAllianceDeclared', (args) => this.createPlayerDiplomacyAllianceDeclared(args.gameId, args.gameTick, args.status));
+        this.diplomacyService.on('onDiplomacyStatusChanged', (args) => this.createPlayerDiplomacyStatusChanged(args.gameId, args.gameTick, args.status));
     }
 
     async deleteByGameId(gameId: DBObjectId) {
@@ -180,7 +185,15 @@ export default class EventService {
         });
     }
 
-    async createGameEvent(gameId: DBObjectId, gameTick: number, type: string, data: any) {
+    async deleteByEventType(gameId: DBObjectId, gameTick: number, type: string) {
+        await this.eventRepo.deleteMany({
+            gameId,
+            tick: gameTick,
+            type
+        });
+    }
+
+    async createGameEvent(gameId: DBObjectId, gameTick: number, type: string, data) {
         let event = new this.eventModel({
             gameId,
             playerId: null,
@@ -193,7 +206,7 @@ export default class EventService {
         await event.save();
     }
 
-    async createPlayerEvent(gameId: DBObjectId, gameTick: number, playerId: DBObjectId, type: string, data: any, isRead: boolean = false) {
+    async createPlayerEvent(gameId: DBObjectId, gameTick: number, playerId: DBObjectId, type: string, data, isRead: boolean = false) {
         let event = new this.eventModel({
             gameId,
             playerId,
@@ -364,7 +377,7 @@ export default class EventService {
     /* PLAYER EVENTS */
 
     async createPlayerGalacticCycleCompleteEvent(gameId: DBObjectId, gameTick: number, player: Player, 
-        creditsEconomy: number, creditsBanking: number, creditsSpecialists: number, experimentTechnology: string, experimentAmount: number, experimentLevelUp: boolean, experimentResearchingNext: string, carrierUpkeep: number) {
+        creditsEconomy: number, creditsBanking: number, creditsSpecialists: number, experimentTechnology: string, experimentAmount: number, experimentLevelUp: boolean, experimentResearchingNext: string, carrierUpkeep: number, allianceUpkeep: number ) {
         let data = {
             creditsEconomy,
             creditsBanking,
@@ -373,7 +386,8 @@ export default class EventService {
             experimentAmount,
             experimentLevelUp,
             experimentResearchingNext,
-            carrierUpkeep
+            carrierUpkeep,
+            allianceUpkeep
         };
 
         return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_GALACTIC_CYCLE_COMPLETE, data);
@@ -540,6 +554,24 @@ export default class EventService {
         return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_STAR_ABANDONED, data, true);
     }
 
+    async createStarDiedEvent(gameId: DBObjectId, gameTick: number, playerId: DBObjectId, starId: DBObjectId, starName: string) {
+        let data = {
+            starId,
+            starName
+        };
+
+        await this.createPlayerEvent(gameId, gameTick, playerId, this.EVENT_TYPES.PLAYER_STAR_DIED, data);
+    }
+
+    async createStarReignitedEvent(gameId: DBObjectId, gameTick: number, playerId: DBObjectId, starId: DBObjectId, starName: string) {
+        let data = {
+            starId,
+            starName
+        };
+
+        await this.createPlayerEvent(gameId, gameTick, playerId, this.EVENT_TYPES.PLAYER_STAR_REIGNITED, data);
+    }
+
     async createInfrastructureBulkUpgraded(gameId: DBObjectId, gameTick: number, player: Player, upgradeReport: BulkUpgradeReport) {
         let data = {
             upgradeReport
@@ -651,8 +683,34 @@ export default class EventService {
         return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_PLAYER_BADGE_PURCHASED, data);
     }
 
+    async _deleteGameDiplomacyDeclarationsInTick(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus) {
+        await this.eventRepo.deleteMany({
+            gameId,
+            tick: gameTick,
+            type: {
+                $in: [
+                    this.EVENT_TYPES.GAME_DIPLOMACY_PEACE_DECLARED, 
+                    this.EVENT_TYPES.GAME_DIPLOMACY_WAR_DECLARED
+                ]
+            },
+            $or: [
+                { 
+                    'data.playerIdFrom': status.playerIdFrom,
+                    'data.playerIdTo': status.playerIdTo
+                },
+                { 
+                    'data.playerIdFrom': status.playerIdTo,
+                    'data.playerIdTo': status.playerIdFrom
+                }
+            ]
+        });
+    }
+
     async createGameDiplomacyPeaceDeclared(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus) {
         let data = status;
+
+        // Peace/war can be declared multiple times in a single tick, delete any existing declarations
+        await this._deleteGameDiplomacyDeclarationsInTick(gameId, gameTick, status);
 
         return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_DIPLOMACY_PEACE_DECLARED, data);
     }
@@ -660,14 +718,20 @@ export default class EventService {
     async createGameDiplomacyWarDeclared(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus) {
         let data = status;
 
+        // Peace/war can be declared multiple times in a single tick, delete any existing declarations
+        await this._deleteGameDiplomacyDeclarationsInTick(gameId, gameTick, status);
+
         return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_DIPLOMACY_WAR_DECLARED, data);
     }
 
-    async createPlayerDiplomacyAllianceDeclared(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus) {
+    async createPlayerDiplomacyStatusChanged(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus) {
         let data = status;
 
-        await this.createPlayerEvent(gameId, gameTick, status.playerIdFrom, this.EVENT_TYPES.PLAYER_DIPLOMACY_ALLIANCE_DECLARED, data);
-        await this.createPlayerEvent(gameId, gameTick, status.playerIdTo, this.EVENT_TYPES.PLAYER_DIPLOMACY_ALLIANCE_DECLARED, data);
+        // Delete the event if it already exists - This prevents spam.
+        await this.deleteByEventType(gameId, gameTick, this.EVENT_TYPES.PLAYER_DIPLOMACY_STATUS_CHANGED);
+
+        await this.createPlayerEvent(gameId, gameTick, status.playerIdFrom, this.EVENT_TYPES.PLAYER_DIPLOMACY_STATUS_CHANGED, data);
+        await this.createPlayerEvent(gameId, gameTick, status.playerIdTo, this.EVENT_TYPES.PLAYER_DIPLOMACY_STATUS_CHANGED, data);
     }
 
 };

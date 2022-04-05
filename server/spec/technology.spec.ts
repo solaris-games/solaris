@@ -6,7 +6,7 @@ let service,
 
 const playerId = new mongoose.Types.ObjectId();
 
-function setup(starSpecialist?: any, carrierSpecialist?: any) {
+function setup(starSpecialist?, carrierSpecialist?) {
     specialistService = {
         getByIdStar: () => { return starSpecialist || null; },
         getByIdCarrier: () => { return carrierSpecialist || null; }
