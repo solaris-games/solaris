@@ -17,6 +17,7 @@ import { getOrInsert, reverseSort, notNull } from "../utils";
 import { CarrierWaypoint } from "../types/CarrierWaypoint";
 import ReputationService from "./reputation";
 import DiplomacyService from "./diplomacy";
+import PlayerStatisticsService from "./playerStatistics";
 
 const FIRST_TICK_BULK_UPGRADE_SCI_PERCENTAGE = 20;
 const FIRST_TICK_BULK_UPGRADE_IND_PERCENTAGE = 30;
@@ -119,6 +120,7 @@ export default class AIService {
     playerService: PlayerService;
     reputationService: ReputationService;
     diplomacyService: DiplomacyService;
+    playerStatisticsService: PlayerStatisticsService;
 
     constructor(
         starUpgradeService: StarUpgradeService,
@@ -131,7 +133,8 @@ export default class AIService {
         technologyService: TechnologyService,
         playerService: PlayerService,
         reputationService: ReputationService,
-        diplomacyService: DiplomacyService
+        diplomacyService: DiplomacyService,
+        playerStatisticsService: PlayerStatisticsService
     ) {
         this.starUpgradeService = starUpgradeService;
         this.carrierService = carrierService;
@@ -144,6 +147,7 @@ export default class AIService {
         this.playerService = playerService;
         this.reputationService = reputationService;
         this.diplomacyService = diplomacyService;
+        this.playerStatisticsService = playerStatisticsService;
     }
 
     async play(game: Game, player: Player) {
@@ -313,9 +317,9 @@ export default class AIService {
             carriersById,
             attacksByStarId,
             attackedStarIds,
-            playerEconomy: this.playerService.calculateTotalEconomy(playerStars),
-            playerIndustry: this.playerService.calculateTotalIndustry(playerStars),
-            playerScience: this.playerService.calculateTotalScience(playerStars)
+            playerEconomy: this.playerStatisticsService.calculateTotalEconomy(playerStars),
+            playerIndustry: this.playerStatisticsService.calculateTotalIndustry(playerStars),
+            playerScience: this.playerStatisticsService.calculateTotalScience(playerStars)
         }
     }
 
