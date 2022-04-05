@@ -1,5 +1,6 @@
 <template>
-    <div class="sidebar-menu d-none d-md-block" :class="{'bg-dark':!$isHistoricalMode(),'bg-primary':$isHistoricalMode()}">
+  <div class="sidebar-menu d-none d-md-block" :class="{'bg-dark':!$isHistoricalMode(),'bg-primary':$isHistoricalMode()}">
+    <div class="sidebar-menu-top">
       <div v-if="!userPlayer && gameIsJoinable">
         <a v-on:click="setMenuState(MENU_STATES.WELCOME)" title="Join Game"><i class="fas fa-handshake"></i></a>
       </div>
@@ -18,8 +19,17 @@
       <a v-if="isLoggedIn" v-on:click="setMenuState(MENU_STATES.COMBAT_CALCULATOR)" title="Calculator (C)"><i class="fas fa-calculator"></i></a>
       <a v-if="isLoggedIn" v-on:click="setMenuState(MENU_STATES.RULER)" title="Ruler (V)"><i class="fas fa-ruler"></i></a>
       <a v-if="isLoggedIn && !isDarkModeExtra && !isDataCleaned" v-on:click="setMenuState(MENU_STATES.INTEL)" title="Intel (I)"><i class="fas fa-chart-line"></i></a>
-      <a v-if="isLoggedIn" v-on:click="setMenuState(MENU_STATES.OPTIONS)" title="Options (O)"><i class="fas fa-cog"></i></a>
     </div>
+
+    <div class="sidebar-menu-bottom">
+      <a v-if="isLoggedIn" v-on:click="setMenuState(MENU_STATES.OPTIONS)" title="Options (O)"><i class="fas fa-cog"></i></a>
+      <a :href="documentationUrl" target="_blank" title="How to Play"><i class="far fa-question-circle"></i></a>
+      <router-link v-if="isLoggedIn" to="/game/active-games" title="My Games"><i class="fas fa-dice"></i></router-link>
+      <a v-if="isLoggedIn" v-on:click="goToMainMenu()" title="Main Menu"><i class="fas fa-chevron-left"></i></a>
+      <router-link v-if="!isLoggedIn" to="/" title="Log In"><i class="fas fa-sign-in-alt"></i></router-link>
+      <router-link v-if="!isLoggedIn" to="/account/create" title="Register"><i class="fas fa-user-plus"></i></router-link>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -70,6 +80,9 @@ export default {
     },
     isTradeEnabled () {
       return GameHelper.isTradeEnabled(this.$store.state.game)
+    },
+    documentationUrl () {
+      return process.env.VUE_APP_DOCUMENTATION_URL
     }
   }
 }
@@ -78,12 +91,20 @@ export default {
 <style scoped>
 .sidebar-menu {
   position:absolute;
-  width: 50px;
   padding-top: 45px;
   height: 100%;
   /* border-style: solid;
   border-width: 0px 2px 0px 0px;
   border-color: #375a7f; */
+}
+
+.sidebar-menu-top, .sidebar-menu-bottom {
+  width: 50px;
+}
+
+.sidebar-menu-bottom {
+  position: absolute;
+  bottom: 0;
 }
 
 a {
@@ -95,5 +116,10 @@ a {
   margin-left: 12px;
   margin-right: 12px;
   cursor: pointer;
+  color: white !important;
+}
+
+a:hover {
+  color: #3498db !important;
 }
 </style>
