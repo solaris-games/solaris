@@ -1,5 +1,5 @@
 <template>
-    <div class="sidebar-menu">
+    <div class="sidebar-menu d-none d-md-block" :class="{'bg-dark':!$isHistoricalMode(),'bg-primary':$isHistoricalMode()}">
       <div v-if="!userPlayer && gameIsJoinable">
         <a v-on:click="setMenuState(MENU_STATES.WELCOME)" title="Join Game"><i class="fas fa-handshake"></i></a>
       </div>
@@ -65,9 +65,6 @@ export default {
     isDataCleaned () {
       return this.$store.state.game.state.cleaned
     },
-    documentationUrl () {
-      return process.env.VUE_APP_DOCUMENTATION_URL
-    },
     isFormalAlliancesEnabled () {
       return DiplomacyHelper.isFormalAlliancesEnabled(this.$store.state.game)
     },
@@ -79,19 +76,22 @@ export default {
 </script>
 
 <style scoped>
-.pointer {
-  cursor:pointer;
-}
-
 .sidebar-menu {
+  position:absolute;
+  width: 50px;
+  padding-top: 45px;
   height: 100%;
+  /* border-style: solid;
+  border-width: 0px 2px 0px 0px;
+  border-color: #375a7f; */
 }
 
 a {
   display: block;
   text-align: center;
-  font-size: 30px;
-  margin-bottom: 20px;
+  font-size: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
   margin-left: 12px;
   margin-right: 12px;
   cursor: pointer;
