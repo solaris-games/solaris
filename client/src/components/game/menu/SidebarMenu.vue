@@ -2,27 +2,29 @@
   <div class="sidebar-menu d-none d-md-block" :class="{'bg-dark':!$isHistoricalMode(),'bg-primary':$isHistoricalMode()}">
     <div class="sidebar-menu-top">
       <div v-if="!userPlayer && gameIsJoinable">
-        <a v-on:click="setMenuState(MENU_STATES.WELCOME)" title="Join Game"><i class="fas fa-handshake"></i></a>
+        <sidebar-menu-item :menuState="MENU_STATES.WELCOME" tooltip="Join Game" iconClass="fas fa-handshake" />
       </div>
       <div v-if="!userPlayer && !gameIsJoinable">
-        <a v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Leaderboard (Q)"><i class="fas fa-users"></i></a>
+        <sidebar-menu-item :menuState="MENU_STATES.LEADERBOARD" tooltip="Leaderboard (Q)" iconClass="fas fa-users" />
       </div>
       <div v-if="userPlayer">
-        <a v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Leaderboard (Q)"><i class="fas fa-users"></i></a>
-        <a v-on:click="setMenuState(MENU_STATES.GALAXY)" title="Galaxy (G)"><i class="fas fa-sun"></i></a>
-        <a v-on:click="setMenuState(MENU_STATES.RESEARCH)" title="Research (R)"><i class="fas fa-flask"></i></a>
-        <a v-on:click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)" title="Bulk Upgrade (B)"><i class="fas fa-money-bill"></i></a>
-        <a v-on:click="setMenuState(MENU_STATES.DIPLOMACY)" title="Diplomacy (D)" v-if="isFormalAlliancesEnabled"><i class="fas fa-globe-americas"></i></a>
-        <a v-on:click="setMenuState(MENU_STATES.LEDGER)" title="Ledger (L)" v-if="isTradeEnabled"><i class="fas fa-file-invoice-dollar"></i></a>
-        <a v-on:click="setMenuState(MENU_STATES.GAME_NOTES)" title="Notes (N)"><i class="fas fa-book-open"></i></a>
+        <sidebar-menu-item :menuState="MENU_STATES.LEADERBOARD" tooltip="Leaderboard (Q)" iconClass="fas fa-users" />
+        <sidebar-menu-item :menuState="MENU_STATES.GALAXY" tooltip="Galaxy (G)" iconClass="fas fa-sun" />
+        <sidebar-menu-item :menuState="MENU_STATES.RESEARCH" tooltip="Research (R)" iconClass="fas fa-flask" />
+        <sidebar-menu-item :menuState="MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE" tooltip="Bulk Upgrade (B)" iconClass="fas fa-money-bill" />
+        <sidebar-menu-item v-if="isFormalAlliancesEnabled" :menuState="MENU_STATES.DIPLOMACY" tooltip="Diplomacy (D)" iconClass="fas fa-globe-americas" />
+        <sidebar-menu-item v-if="isTradeEnabled" :menuState="MENU_STATES.LEDGER" tooltip="Ledger (L)" iconClass="fas fa-file-invoice-dollar" />
+        <sidebar-menu-item :menuState="MENU_STATES.GAME_NOTES" tooltip="Notes (N)" iconClass="fas fa-book-open" />
       </div>
-      <a v-if="isLoggedIn" v-on:click="setMenuState(MENU_STATES.COMBAT_CALCULATOR)" title="Calculator (C)"><i class="fas fa-calculator"></i></a>
-      <a v-if="isLoggedIn" v-on:click="setMenuState(MENU_STATES.RULER)" title="Ruler (V)"><i class="fas fa-ruler"></i></a>
-      <a v-if="isLoggedIn && !isDarkModeExtra && !isDataCleaned" v-on:click="setMenuState(MENU_STATES.INTEL)" title="Intel (I)"><i class="fas fa-chart-line"></i></a>
+      <div v-if="isLoggedIn">
+        <sidebar-menu-item :menuState="MENU_STATES.COMBAT_CALCULATOR" tooltip="Calculator (C)" iconClass="fas fa-calculator" />
+        <sidebar-menu-item :menuState="MENU_STATES.RULER" tooltip="Ruler (V)" iconClass="fas fa-ruler" />
+        <sidebar-menu-item v-if="!isDarkModeExtra && !isDataCleaned" :menuState="MENU_STATES.INTEL" tooltip="Intel (I)" iconClass="fas fa-chart-line" />
+      </div>
     </div>
 
     <div class="sidebar-menu-bottom">
-      <a v-if="isLoggedIn" v-on:click="setMenuState(MENU_STATES.OPTIONS)" title="Options (O)"><i class="fas fa-cog"></i></a>
+      <sidebar-menu-item :menuState="MENU_STATES.OPTIONS" tooltip="Options (O)" iconClass="fas fa-cog" />
       <a :href="documentationUrl" target="_blank" title="How to Play"><i class="far fa-question-circle"></i></a>
       <router-link v-if="isLoggedIn" to="/game/active-games" title="My Games"><i class="fas fa-dice"></i></router-link>
       <a v-if="isLoggedIn" v-on:click="goToMainMenu()" title="Main Menu"><i class="fas fa-chevron-left"></i></a>
@@ -37,9 +39,12 @@ import GameHelper from '../../../services/gameHelper'
 import DiplomacyHelper from '../../../services/diplomacyHelper'
 import router from '../../../router'
 import MENU_STATES from '../../data/menuStates'
-import GameContainer from '../../../game/container'
+import SidebarMenuItem from './SidebarMenuItem'
 
 export default {
+  components: {
+    'sidebar-menu-item': SidebarMenuItem
+  },
   data () {
     return {
       MENU_STATES: MENU_STATES
@@ -93,9 +98,6 @@ export default {
   position:absolute;
   padding-top: 45px;
   height: 100%;
-  /* border-style: solid;
-  border-width: 0px 2px 0px 0px;
-  border-color: #375a7f; */
 }
 
 .sidebar-menu-top, .sidebar-menu-bottom {
@@ -111,15 +113,15 @@ a {
   display: block;
   text-align: center;
   font-size: 20px;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  margin-left: 12px;
-  margin-right: 12px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 12px;
+  padding-right: 12px;
   cursor: pointer;
   color: white !important;
 }
 
 a:hover {
-  color: #3498db !important;
+  color: #375a7f !important;
 }
 </style>
