@@ -91,7 +91,7 @@ class PathManager {
 
   addSharedPath( objectA, objectB, carrierMapObject ) {
     let mapObjects = [ objectA, objectB ]
-    let objectAlpha = helpers.calculateDepthModifiers(this.userSettings, [objectA._id, objectB._id]) / 5
+    let objectAlpha = helpers.calculateDepthModifiers(this.userSettings, [objectA._id, objectB._id])/2
 
     this._orderObjects(mapObjects)
 
@@ -121,7 +121,7 @@ class PathManager {
       if(carrierIndex>=0) {
         path.carriers.splice(path.carriers.indexOf(carrier), 1)
       }
-      path.graphics.alpha = (helpers.calculateDepthModifier(this.userSettings, carrier._id)/5)+path.carriers.length*0.1
+      path.graphics.alpha = (helpers.calculateDepthModifier(this.userSettings, carrier._id)/2)+path.carriers.length*0.1
       if(path.carriers.length === 0) {
         if(pathGraphics.chunk) {
           pathGraphics.chunk.removeChild(pathGraphics)
@@ -136,7 +136,7 @@ class PathManager {
 
   addUniquePath( mapObject, star, looped, colour ) {
     const PATH_WIDTH = 0.5*this.userSettings.map.carrierPathWidth
-    let objectAlpha = helpers.calculateDepthModifier(this.userSettings, mapObject._id) / 5
+    let objectAlpha = helpers.calculateDepthModifier(this.userSettings, mapObject._id)/2
     let lineAlpha = looped ? objectAlpha / 2 : objectAlpha
     let lineWidth = PATH_WIDTH
     let path
