@@ -10,9 +10,10 @@
         </div>
     </div>
 
-    <div class="row bg-info" v-if="game.settings.general.flux">
+    <div class="row bg-info" v-if="game.settings.general.flux" title="This Game's Flux">
       <div class="col text-center">
-        <p class="mt-2 mb-2"><small><i class="fas fa-dice-d20 mr-1"></i><strong>{{game.settings.general.flux.name}}</strong> - {{game.settings.general.flux.description}} <help-tooltip v-if="game.settings.general.flux.tooltip" :tooltip="game.settings.general.flux.tooltip"/></small></p>
+        <!-- <p class="mt-2 mb-2"><small><i class="fas fa-dice-d20 mr-1"></i><strong>{{game.settings.general.flux.name}}</strong> - {{game.settings.general.flux.description}} <help-tooltip v-if="game.settings.general.flux.tooltip" :tooltip="game.settings.general.flux.tooltip"/></small></p> -->
+        <p class="mt-2 mb-2"><small><i class="fas fa-dice-d20 mr-1"></i>{{game.settings.general.flux.description}} <help-tooltip v-if="game.settings.general.flux.tooltip" :tooltip="game.settings.general.flux.tooltip"/></small></p>
       </div>
     </div>
 
