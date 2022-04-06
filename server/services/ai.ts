@@ -371,7 +371,7 @@ export default class AIService {
                 let shipsNeeded = requiredAdditionallyForDefense;
 
                 for (const {assignment, trace} of allPossibleAssignments) {
-                    if (shipsNeeded <= 0) {
+                    if (shipsNeeded <= 0 || assignment.totalShips === 1) {
                         break;
                     }
 
