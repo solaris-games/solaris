@@ -345,9 +345,8 @@ export default {
       return this.$store.state.userId != null
     },
     isSpectatingDarkMode () {
-      return GameHelper.isUserSpectatingGame(this.game)
-        && (GameHelper.isDarkModeStandard(this.game) || GameHelper.isDarkModeExtra(this.game))
-    },
+      return GameHelper.isUserSpectatingGame(this.game) && GameHelper.isDarkMode(this.game)
+    }
   }
 }
 </script>

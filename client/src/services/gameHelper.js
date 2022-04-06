@@ -489,12 +489,13 @@ class GameHelper {
     return game.state.endDate != null
   }
 
-  isDarkModeStandard (game) {
-    return game.settings.specialGalaxy.darkGalaxy === 'standard'
-  }
-
   isDarkModeExtra (game) {
     return game.settings.specialGalaxy.darkGalaxy === 'extra'
+  }
+
+  isDarkMode (game) {
+    return (game.settings.specialGalaxy.darkGalaxy === 'standard' || game.settings.specialGalaxy.darkGalaxy === 'extra') ||
+          (game.settings.specialGalaxy.darkGalaxy === 'start' && game.state.startDate == null)
   }
 
   isTradeEnabled (game) {
@@ -908,7 +909,7 @@ class GameHelper {
   }
 
   isUserSpectatingGame (game) {
-    return this.isGameInProgress(game) && !this.getUserPlayer(game)
+    return !this.getUserPlayer(game) // If the user isn't in the game then they are spectating
   }
 
   _getBankingCredits (game, player) {
