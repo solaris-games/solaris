@@ -485,6 +485,11 @@
             :valueText="getFriendlyText(game.settings.technology.bankingReward)"
             :value="game.settings.technology.bankingReward"
             :compareValue="compareSettings.technology.bankingReward"/>
+          <game-setting-value title="Experimentation Reward"
+            tooltip="Determines the amount of research points awarded for the experimentation technology at the end of a galactic cycle"
+            :valueText="getFriendlyText(game.settings.technology.experimentationReward)"
+            :value="game.settings.technology.experimentationReward"
+            :compareValue="compareSettings.technology.experimentationReward"/>
           <game-setting-value title="Specialist Token Reward"
             tooltip="Determines the amount of specialist tokens awarded for the banking technology at the end of a galactic cycle"
             :valueText="getFriendlyText(game.settings.technology.specialistTokenReward)"

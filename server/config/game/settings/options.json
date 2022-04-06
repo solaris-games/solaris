@@ -489,6 +489,16 @@
              "text":"Legacy"
           }
        ],
+       "experimentationReward":[
+          {
+             "value":"standard",
+             "text":"Standard"
+          },
+          {
+             "value":"experimental",
+             "text":"Experimental"
+          }
+       ],
        "specialistTokenReward":[
           {
              "value":"standard",

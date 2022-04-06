@@ -48,6 +48,7 @@ export type GameTradeCost = 0|5|15|25|50|100;
 export type GameTradeScanning = 'all'|'scanned';
 export type GameResearchCost = 'none'|'cheap'|'standard'|'expensive'|'veryExpensive'|'crazyExpensive';
 export type GameBankingReward = 'standard'|'legacy';
+export type GameExperimentationReward = 'standard'|'experimental';
 export type GameSpecialistTokenReward = 'standard'|'experimental';
 export type GameTimeType = 'realTime'|'turnBased';
 export type GameTimeSpeed = 30|60|300|600|1800|3600|7200;
@@ -172,6 +173,7 @@ export interface GameSettings {
 			specialists: GameResearchCost;
 		},
 		bankingReward: GameBankingReward;
+		experimentationReward: GameExperimentationReward;
 		specialistTokenReward: GameSpecialistTokenReward;
 	},
 	gameTime: {

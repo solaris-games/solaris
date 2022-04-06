@@ -98,6 +98,7 @@
       "specialists": "standard"
     },
     "bankingReward": "standard",
+    "experimentationReward": "standard",
     "specialistTokenReward": "standard"
   },
   "gameTime": {

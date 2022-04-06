@@ -14,7 +14,7 @@ Flux affects games in interesting ways that mix up the metagame from month to mo
 | February  | ?    | Capturing Star rewards for destroying Economy are increased. | Increased from 10 credits to 25 per Economy point.                                         |
 | March     | ?    | Research points from Science are increased.                  | Research contribution from Science is increased from 1 to 2 points per Science.            |
 | April     | ?    | Capital Stars have an increased Defender Bonus.              | Capital Stars have x2 Defender Bonus.                                                      |
-| May       | ?    | End of cycle Experimentation rewards are increased.          | Experimentation rewards are increased by x2.                                               |
+| May       | ?    | End of cycle Experimentation rewards are increased.          | Experimentation reward multiplier is increased from 50 to 100.                                               |
 | June      | ?    | Trade cost is increased to 'Very Expensive'.                 | 50 credits per technology level.                                                           |
 | July      | ?    | Weapons technology is fixed.                                 | Weapons technology is fixed at Level 7.                                                    |
 | August    | ?    | The Defender Bonus is disabled.                              |                                                                                            |

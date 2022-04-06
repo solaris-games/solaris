@@ -137,6 +137,7 @@ const schema = new Schema({
 				specialists: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' }
 			},
 			bankingReward: { type: Types.String, required: true, enum: ['standard', 'legacy'], default: 'standard' },
+			experimentationReward: { type: Types.String, required: true, enum: ['standard', 'experimental'], default: 'standard' },
 			specialistTokenReward: { type: Types.String, required: true, enum: ['standard', 'experimental'], default: 'standard' }
 		},
 		gameTime: {

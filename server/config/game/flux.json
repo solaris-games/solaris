@@ -32,7 +32,7 @@
         "name": "Unnamed",
         "month": "May",
         "description": "End of cycle Experimentation rewards are increased.",
-        "tooltip": "Experimentation rewards are increased by x2."
+        "tooltip": "Experimentation reward multiplier is increased from 50 to 100."
     },
     {
         "id": 6,
