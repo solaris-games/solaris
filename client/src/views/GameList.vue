@@ -45,7 +45,7 @@
 
           <h4>Standard Games</h4>
 
-          <p>These are official games and award rank.</p>
+          <p>These are official games.</p>
 
           <loading-spinner :loading="isLoading"/>
 
