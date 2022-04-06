@@ -23,7 +23,7 @@
       </div>
     </div>
 
-    <div class="sidebar-menu-bottom">
+    <div class="sidebar-menu-bottom" v-if="canDisplayBottomBar">
       <sidebar-menu-item :menuState="MENU_STATES.OPTIONS" tooltip="Options (O)" iconClass="fas fa-cog" />
       <a :href="documentationUrl" target="_blank" title="How to Play"><i class="far fa-question-circle"></i></a>
       <router-link v-if="isLoggedIn" to="/game/active-games" title="My Games"><i class="fas fa-dice"></i></router-link>
@@ -88,6 +88,9 @@ export default {
     },
     documentationUrl () {
       return process.env.VUE_APP_DOCUMENTATION_URL
+    },
+    canDisplayBottomBar () {
+      return window.innerHeight >= 750
     }
   }
 }
