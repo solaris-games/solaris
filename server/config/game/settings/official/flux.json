@@ -1,15 +1,15 @@
 {
   "general": {
     "name": "[[[RANDOM]]]",
-    "description": "This game has 32 players, expect big alliances and epic battles in this huge galaxy!",
-    "type": "32_player_rt",
+    "description": "The galaxy is in flux, there are nuances in this game that change every month.",
+    "type": "flux_rt",
     "mode": "conquest",
     "password": null,
-    "playerLimit": 32,
+    "playerLimit": 8,
     "playerType": "establishedPlayers",
     "anonymity": "normal",
     "playerOnlineStatus": "hidden",
-    "timeMachine": "disabled"
+    "timeMachine": "enabled"
   },
   "galaxy": {
     "galaxyType": "irregular",
@@ -18,7 +18,7 @@
   },
   "specialGalaxy": {
     "carrierCost": "standard",
-    "carrierUpkeepCost": "standard",
+    "carrierUpkeepCost": "none",
     "warpgateCost": "standard",
     "specialistCost": "standard",
     "specialistsCurrency": "creditsSpecialists",
@@ -28,14 +28,14 @@
     "randomAsteroidFields": 10,
     "randomBinaryStars": 10,
     "randomBlackHoles": 5,
-    "darkGalaxy": "standard",
+    "darkGalaxy": "start",
     "giftCarriers": "enabled",
     "defenderBonus": "enabled",
     "carrierToCarrierCombat": "enabled",
     "splitResources": "disabled",
     "resourceDistribution": "random",
     "playerDistribution": "circular",
-    "carrierSpeed": 20,
+    "carrierSpeed": 10,
     "specialistBans": {
       "star": [],
       "carrier": []
@@ -43,7 +43,10 @@
   },
   "conquest": {
     "victoryCondition": "starPercentage",
-    "victoryPercentage": 33
+    "victoryPercentage": 50
+  },
+  "kingOfTheHill": {
+    "productionCycles": 10
   },
   "orbitalMechanics": {
     "enabled": "disabled",
@@ -51,13 +54,13 @@
   },
   "player": {
     "startingStars": 6,
-    "startingCredits": 1000,
-    "startingCreditsSpecialists": 10,
+    "startingCredits": 500,
+    "startingCreditsSpecialists": 5,
     "startingShips": 10,
     "startingInfrastructure": {
-      "economy": 10,
-      "industry": 10,
-      "science": 3
+      "economy": 5,
+      "industry": 5,
+      "science": 1
     },
     "developmentCost": {
       "economy": "standard",
@@ -73,15 +76,15 @@
     "enabled": "enabled",
     "upkeepCost": "none",
     "tradeRestricted": "disabled", 
-    "maxAlliances": 31, 
+    "maxAlliances": 7, 
     "globalEvents": "disabled"
   },
   "technology": {
     "startingTechnologyLevel": {
       "terraforming": 1,
       "experimentation": 1,
-      "scanning": 3,
-      "hyperspace": 2,
+      "scanning": 1,
+      "hyperspace": 1,
       "manufacturing": 1,
       "banking": 1,
       "weapons": 1,
@@ -102,9 +105,12 @@
   },
   "gameTime": {
     "gameType": "realTime",
-    "speed": 3600,
+    "speed": 1800,
     "isTickLimited": "disabled",
-    "startDelay": 360,
+    "tickLimit": 1000,
+    "startDelay": 240,
+    "turnJumps":6,
+    "maxTurnWait":1440,
     "afk": {
       "lastSeenTimeout": 2,
       "cycleTimeout": 3,

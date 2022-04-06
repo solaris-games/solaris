@@ -984,7 +984,8 @@ class GameHelper {
       'special_homeStar': 'Capital Stars',
       'special_anonymous': 'Anonymous',
       'special_kingOfTheHill': 'King Of The Hill',
-      'special_tinyGalaxy': 'Tiny Galaxy'
+      'special_tinyGalaxy': 'Tiny Galaxy',
+      'flux_rt': 'Flux'
     }[game.settings.general.type]
   }
 
@@ -994,17 +995,19 @@ class GameHelper {
 
   isFluxGame (game) {
     return [
-      'standard_rt',
-      'standard_tb',
-      '32_player_rt',
-      'special_dark',
-      'special_ultraDark',
-      'special_orbital',
-      'special_battleRoyale',
-      'special_homeStar',
-      'special_anonymous',
-      'special_kingOfTheHill',
-      'special_tinyGalaxy'
+      // The world was not ready for this.
+      // 'standard_rt',
+      // 'standard_tb',
+      // '32_player_rt',
+      // 'special_dark',
+      // 'special_ultraDark',
+      // 'special_orbital',
+      // 'special_battleRoyale',
+      // 'special_homeStar',
+      // 'special_anonymous',
+      // 'special_kingOfTheHill',
+      // 'special_tinyGalaxy',
+      'flux_rt'
     ].includes(game.settings.general.type)
   }
 
