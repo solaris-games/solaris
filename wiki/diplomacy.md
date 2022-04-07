@@ -19,9 +19,12 @@ Your diplomatic status to other players can be changed in the **Menu -> Diplomac
 - **Allies** - Allies have more benefits compared to neutral players, more information below.
 - **Enemies** - At war.
 
+The **enemy** status has no gameplay difference from the **neutral** status and currently exists purely to help players see who they're negatively interacting with at a glance.
+
 If both you and another player set each other to **allies** then you both will receive the following benefits:
 
 - You may visit allied stars.
+- If all players at a star are **allies** with the star owner, combat will not occur.
 - When in orbit at an allied star, your scanning range will take effect.
 - When more than 1 player is in orbit at a star, the star indicator will display a `+` suffix. For example: `100/1+` means that the star has 100 ships with 1 carrier in orbit where the carrier is not owned by the player who owns the star.
 
