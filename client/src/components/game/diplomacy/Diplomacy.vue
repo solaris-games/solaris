@@ -55,7 +55,7 @@
       </ul>
 
       <p class="pb-2">
-        See the help guide for more details.
+        See the <a href="https://solaris4x.readthedocs.io/en/latest/diplomacy/#diplomatic-statuses" target="_blank">help guide</a> for more details.
       </p>
     </div>
 </div>
