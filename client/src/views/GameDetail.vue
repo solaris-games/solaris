@@ -13,7 +13,7 @@
 
       <p v-if="isNewPlayerGame" class="text-warning">New Player Games do not affect Rank or Victories.</p>
 
-      <div class="row mb-4">
+      <div class="row mb-1 bg-secondary pt-2 pb-2">
         <div class="col">
           <router-link to="/game/list" tag="button" class="btn btn-primary"><i class="fas fa-arrow-left"></i> Return to List</router-link>
         </div>
