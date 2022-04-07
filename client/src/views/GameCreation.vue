@@ -92,6 +92,15 @@
             </option>
           </select>
         </div>
+
+        <div class="form-group">
+          <label for="fluxEnabled" class="col-form-label">Flux Enabled <help-tooltip tooltip="Determines whether this month's flux is applied to the game"/></label>
+          <select class="form-control" id="fluxEnabled" v-model="settings.general.fluxEnabled" :disabled="isCreatingGame">
+            <option v-for="opt in options.general.fluxEnabled" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
       </view-collapse-panel>
 
       <view-collapse-panel title="Game Time Settings" :startsOpened="true">

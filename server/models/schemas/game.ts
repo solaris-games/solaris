@@ -46,6 +46,7 @@ const schema = new Schema({
 			playerOnlineStatus: { type: Types.String, required: true, enum: ['hidden', 'visible'], default: 'hidden' },
 			timeMachine: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
 			awardRankTo: { type: Types.String, required: false, enum: ['all', 'winner'], default: 'all' },
+			fluxEnabled: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
         },
         galaxy: {
 			galaxyType: { type: Types.String, required: true, enum: ['circular', 'spiral', 'doughnut','circular-balanced', 'irregular', 'custom'], default: 'circular' },

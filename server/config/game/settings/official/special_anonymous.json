@@ -9,7 +9,8 @@
     "playerType": "establishedPlayers",
     "anonymity": "extra",
     "playerOnlineStatus": "visible",
-    "timeMachine": "enabled"
+    "timeMachine": "enabled",
+    "fluxEnabled": "disabled"
   },
   "galaxy": {
     "galaxyType": "irregular",

@@ -53,6 +53,11 @@
             :valueText="getFriendlyText(game.settings.general.playerOnlineStatus)"
             :value="game.settings.general.playerOnlineStatus"
             :compareValue="compareSettings.general.playerOnlineStatus"/>
+          <game-setting-value title="Flux Enabled"
+            tooltip="Determines whether this month's flux is applied to the game"
+            :valueText="getFriendlyText(game.settings.general.fluxEnabled)"
+            :value="game.settings.general.fluxEnabled"
+            :compareValue="compareSettings.general.fluxEnabled"/>
         </tbody>
       </table>
     </div>

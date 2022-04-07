@@ -61,6 +61,16 @@
              "value":"visible",
              "text":"Visible"
           }
+       ],
+       "fluxEnabled":[
+          {
+             "value":"enabled",
+             "text":"Enabled"
+          },
+          {
+             "value":"disabled",
+             "text":"Disabled"
+          }
        ]
     },
     "specialGalaxy":{

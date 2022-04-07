@@ -9,7 +9,8 @@
     "playerType": "all",
     "anonymity": "normal",
     "playerOnlineStatus": "hidden",
-    "timeMachine": "enabled"
+    "timeMachine": "enabled",
+    "fluxEnabled": "disabled"
   },
   "galaxy": {
     "galaxyType": "circular",

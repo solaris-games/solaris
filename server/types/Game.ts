@@ -79,6 +79,7 @@ export interface GameSettings {
 		playerOnlineStatus: GamePlayerOnlineStatus;
 		timeMachine: GameSettingEnabledDisabled;
 		awardRankTo: GameAwardRankTo;
+		fluxEnabled: GameSettingEnabledDisabled;
 		isGameAdmin?: boolean;
 		flux?: GameFlux;
 	},

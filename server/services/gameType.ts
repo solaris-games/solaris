@@ -89,21 +89,7 @@ export default class GameTypeService {
     }
 
     isFluxGame(game: Game) {
-        return [
-            // The world was not ready for this.
-            // 'standard_rt',
-            // 'standard_tb',
-            // '32_player_rt',
-            // 'special_dark',
-            // 'special_ultraDark',
-            // 'special_orbital',
-            // 'special_battleRoyale',
-            // 'special_homeStar',
-            // 'special_anonymous',
-            // 'special_kingOfTheHill',
-            // 'special_tinyGalaxy'
-            'flux_rt'
-        ].includes(game.settings.general.type)
+        return game.settings.general.fluxEnabled === 'enabled'
     }
 
 }

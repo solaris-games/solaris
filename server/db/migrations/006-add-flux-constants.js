@@ -3,6 +3,14 @@ module.exports = {
         const games = db.collection('games');
 
         await games.updateMany({
+            'settings.general.fluxEnabled': { $eq: null }
+        }, {
+            $set: {
+                'settings.general.fluxEnabled': 'disabled'
+            }
+        });
+
+        await games.updateMany({
             'constants.player': { $eq: null }
         }, {
             $set: {
