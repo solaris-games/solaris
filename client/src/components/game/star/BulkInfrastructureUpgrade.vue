@@ -3,7 +3,7 @@
     <menu-title title="Bulk Upgrade" @onCloseRequested="onCloseRequested" />
 
     <div class="row">
-      <p class="col-12">Select an amount of money to spend and the kind of infrastructure you would like to buy. The cheapest infrastructure will be purchased throughout your empire.</p>
+      <p class="col-12"><small>Select an amount of credits to spend and the kind of infrastructure you would like to buy. The cheapest infrastructure will be purchased throughout your empire.</small></p>
     </div>
 
     <form-error-list v-bind:errors="errors"/>

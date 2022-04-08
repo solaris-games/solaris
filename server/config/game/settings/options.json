@@ -8,6 +8,10 @@
           {
              "value":"battleRoyale",
              "text":"Battle Royale"
+          },
+          {
+             "value":"kingOfTheHill",
+             "text":"King Of The Hill"
           }
        ],
        "playerLimit":[
@@ -57,6 +61,16 @@
              "value":"visible",
              "text":"Visible"
           }
+       ],
+       "fluxEnabled":[
+          {
+             "value":"enabled",
+             "text":"Enabled"
+          },
+          {
+             "value":"disabled",
+             "text":"Disabled"
+          }
        ]
     },
     "specialGalaxy":{
@@ -92,7 +106,7 @@
              "text":"Expensive"
           }
        ],
-       "warpgateCost":[
+      "warpgateCost":[
           {
              "value":"none",
              "text":"No"
@@ -313,30 +327,16 @@
        ],
        "orbitSpeed":[
           {
-             "value":2.5,
+             "value":1,
              "text":"Slow"
           },
           {
-             "value":5,
+             "value":3,
              "text":"Standard"
           },
           {
-             "value":10,
+             "value":5,
              "text":"Fast"
-          },
-          {
-             "value":25,
-             "text":"Very Fast"
-          }
-       ],
-       "orbitOrigin":[
-          {
-             "value":"galacticCenter",
-             "text":"Galactic Center"
-          },
-          {
-             "value":"galacticCenterOfMass",
-             "text":"Galactic Center of Mass"
           }
        ]
     },
@@ -410,16 +410,56 @@
              "value":"scanned",
              "text":"Trade with scanned players only"
           }
+       ]
+    },
+    "diplomacy":{
+       "enabled": [
+         {
+            "value":"enabled",
+            "text":"Enabled"
+         },
+         {
+            "value":"disabled",
+            "text":"Disabled"
+         }
        ],
-       "alliances":[
-          {
-             "value":"enabled",
-             "text":"Enabled"
-          },
-          {
-             "value":"disabled",
-             "text":"Disabled"
-          }
+       "upkeepCost":[
+         {
+           "value":"none",
+           "text":"None"
+         },
+         {
+           "value":"cheap",
+           "text":"Cheap"
+         },
+         {
+           "value":"standard",
+           "text":"Standard"
+        },
+         {
+           "value":"expensive",
+           "text":"Expensive"
+         }
+       ],
+       "tradeRestricted":[
+         { 
+           "value":"enabled",
+           "text":"Enabled"
+         },
+         {
+           "value":"disabled",
+           "text":"Disabled"
+         }
+        ],
+       "globalEvents": [
+         {
+            "value":"enabled",
+            "text":"Enabled"
+         },
+         {
+            "value":"disabled",
+            "text":"Disabled"
+         }
        ]
     },
     "technology":{
@@ -457,6 +497,16 @@
           {
              "value":"legacy",
              "text":"Legacy"
+          }
+       ],
+       "experimentationReward":[
+          {
+             "value":"standard",
+             "text":"Standard"
+          },
+          {
+             "value":"experimental",
+             "text":"Experimental"
           }
        ],
        "specialistTokenReward":[
@@ -510,6 +560,16 @@
              "value":7200,
              "text":"Very Slow (1 tick = 2 hours)"
           }
+       ],
+       "isTickLimited": [
+         {
+            "value": "enabled",
+            "text": "Enabled"
+         },
+         {
+            "value": "disabled",
+            "text": "Disabled"
+         }
        ],
        "startDelay":[
           {

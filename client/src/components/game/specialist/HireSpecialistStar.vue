@@ -28,7 +28,10 @@
                 </h5>
             </div>
             <div class="col-auto mt-2">
-                <button class="btn btn-sm btn-success" v-if="!(star.specialistId && star.specialist.id === specialist.id)" :disabled="$isHistoricalMode() || isHiringSpecialist || cantAffordSpecialist(specialist) || isCurrentSpecialistOneShot" @click="hireSpecialist(specialist)">Hire for {{getSpecialistActualCostString(specialist)}}</button>
+                <button class="btn btn-sm btn-success" v-if="!(star.specialistId && star.specialist.id === specialist.id)" :disabled="$isHistoricalMode() || isHiringSpecialist || cantAffordSpecialist(specialist) || isCurrentSpecialistOneShot" @click="hireSpecialist(specialist)">
+                  <i class="fas fa-coins"></i>
+                  Hire for {{getSpecialistActualCostString(specialist)}}
+                </button>
                 <span class="badge badge-primary" v-if="star.specialistId && star.specialist.id === specialist.id">Active</span>
             </div>
             <div class="col-12 mt-2">
@@ -59,16 +62,11 @@ export default {
   },
   data () {
     return {
-      userPlayer: null,
-      star: null,
       specialists: [],
       isHiringSpecialist: false
     }
   },
   mounted () {
-    this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
-    this.star = GameHelper.getStarById(this.$store.state.game, this.starId)
-
     const banList = this.$store.state.game.settings.specialGalaxy.specialistBans.star
 
     this.specialists = this.$store.state.starSpecialists.filter(s => banList.indexOf(s.id) < 0)
@@ -91,12 +89,16 @@ export default {
         
         this.isHiringSpecialist = true
 
+        // If the specialist hired or existing specialist in any way affects scanning, manufacturing etc then reload the game map. Bit of a bodge but it works.
+        let requiresFullReload = this.shouldSpecialistRequireReload(this.star.specialist) || this.shouldSpecialistRequireReload(specialist)
+
         try {
             let response = await SpecialistApiService.hireStarSpecialist(this.$store.state.game._id, this.starId, specialist.id)
 
             if (response.status === 200) {
-                this.$toasted.show(`${specialist.name} has been hired for the star ${this.star.name}.`)
-
+              if (requiresFullReload) { // Its a bit shit but fuck it, easier than doing it server side.
+                this.$emit('onReloadGameRequested', specialist)
+              } else {
                 let currency = this.$store.state.game.settings.specialGalaxy.specialistsCurrency
 
                 this.star.specialistId = specialist.id
@@ -107,6 +109,9 @@ export default {
                 this.userPlayer.stats.totalSpecialists++
 
                 GameContainer.reloadStar(this.star)
+              }
+
+              this.$toasted.show(`${specialist.name} has been hired for the star ${this.star.name}.`)
             }
         } catch (err) {
             console.error(err)
@@ -129,9 +134,46 @@ export default {
     },
     cantAffordSpecialist (specialist) {
         return this.userPlayer[this.$store.state.game.settings.specialGalaxy.specialistsCurrency] < this.getSpecialistActualCost(specialist)
+    },
+    shouldSpecialistRequireReload (specialist) {
+      if (!specialist) {
+        return false
+      }
+      
+      const localKeys = [
+        'scanning',
+        'manufacturing'
+      ]
+
+      const specialKeys = [
+        'economyInfrastructureMultiplier',
+        'scienceInfrastructureMultiplier'
+      ]
+
+      if (specialist.modifiers && specialist.modifiers.local) {
+        for (let key of localKeys) {
+          if (specialist.modifiers.local[key] != null) {
+            return true
+          }
+        }
+      }
+
+      if (specialist.modifiers && specialist.modifiers.special) {
+        for (let key of specialKeys) {
+          if (specialist.modifiers.special[key] != null) {
+            return true
+          }
+        }
+      }
     }
   },
   computed: {
+    star () {
+      return GameHelper.getStarById(this.$store.state.game, this.starId)
+    },
+    userPlayer () {
+      return GameHelper.getUserPlayer(this.$store.state.game)
+    },
     isCurrentSpecialistOneShot () {
       return this.star.specialist && this.star.specialist.oneShot
     }

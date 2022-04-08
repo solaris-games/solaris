@@ -8,20 +8,26 @@ extra_css: [
     _styles/style.css
 ]
 
-repo_url: 'https://github.com/mike-eason/solaris'
+repo_url: 'https://github.com/solaris-games/solaris'
 
 nav:
   - Home: 'index.md'
+  - 'Community Guidelines': 'communityGuidelines.md'
+  - 'New Players': 'newPlayers.md'
   - Stars: 'stars.md'
   - Carriers: 'carriers.md'
   - Technology: 'technology.md'
   - Diplomacy: 'diplomacy.md'
+  - 'AI Reputation': 'reputation.md'
   - Trade: 'trade.md'
   - Specialists: 'specialists.md'
   - Territories: 'territories.md'
   - Combat: 'combat.md'
-  - GameTypes: 'gameTypes.md'
-  - GameTickEvents: 'gameTick.md'
+  - 'Game Types': 'gameTypes.md'
+  - 'Game Flux': 'flux.md'
+  - 'Game Tick Events': 'gameTick.md'
   - Rankings: 'rankings.md'
   - Achievements: 'achievements.md'
-  - CustomGalaxies: 'customGalaxies.md'
+  - 'Custom Galaxies': 'customGalaxies.md'
+  - 'AFK Rules': 'afkRules.md'
+  - 'Keyboard Shortcuts': 'keyboardShortcuts.md'

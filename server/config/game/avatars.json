@@ -1,260 +1,362 @@
 [
     {
         "id": 0,
+        "file": "0.png",
         "name": "Xurian Consulate",
         "description": "Legend has it that the first Xurian arose from a malfunctioning cloning vat eons ago. In the millennia since they have built their reputation as a peaceful and harmonious race dedicated to furthering their own knowledge. Curiously, they all seem identical.",
-        "price": 1
+        "price": 1,
+        "isPatronAvatar": false
     },
     {
         "id": 1,
+        "file": "1.png",
         "name": "Lurian Expedition",
         "description": "The Lurian Expedition claims to have been sent from a higher dimension to study this reality. Members of the Expedition are haughty, looking upon other lifeforms in disdain. They value intelligence above all else and have nearly unmatched intellect.",
-        "price": 1
+        "price": 1,
+        "isPatronAvatar": false
     },
     {
         "id": 2,
+        "file": "2.png",
         "name": "Lurian Expedition",
         "description": "The Lurian Expedition claims to have been sent from a higher dimension to study this reality. Members of the Expedition are haughty, looking upon other lifeforms in disdain. They value intelligence above all else and have nearly unmatched intellect.",
-        "price": 1
+        "price": 1,
+        "isPatronAvatar": false
     },
     {
         "id": 3,
-        "name": "The Kingdom of Tro’pas",
+        "file": "3.png",
+        "name": "The Kingdom of Tro'pas",
         "description": "Tropians are a race of avian humanoids that value beauty above all else. They take to the stars in an attempt to establish their grand works as the highest form of art and culture the galaxy can achieve.",
-        "price": 3
+        "price": 3,
+        "isPatronAvatar": false
     },
     {
         "id": 4,
-        "name": "The Kingdom of Tro’pas",
+        "file": "4.png",
+        "name": "The Kingdom of Tro'pas",
         "description": "Tropians are a race of avian humanoids that value beauty above all else. They take to the stars in an attempt to establish their grand works as the highest form of art and culture the galaxy can achieve.",
-        "price": 3
+        "price": 3,
+        "isPatronAvatar": false
     },
     {
         "id": 5,
+        "file": "5.png",
         "name": "Athrixi Air Caste",
-        "description": "The Athrixi Air Caste are a regal race and are the galaxy’s most talented diplomats. They excel at subterfuge and one must always watch their back when dealing with members of the Air Caste.",
-        "price": 1
+        "description": "The Athrixi Air Caste are a regal race and are the galaxy's most talented diplomats. They excel at subterfuge and one must always watch their back when dealing with members of the Air Caste.",
+        "price": 1,
+        "isPatronAvatar": false
     },
     {
         "id": 6,
+        "file": "6.png",
         "name": "Athrixi Air Caste",
-        "description": "The Athrixi Air Caste are a regal race and are the galaxy’s most talented diplomats. They excel at subterfuge and one must always watch their back when dealing with members of the Air Caste.",
-        "price": 1
+        "description": "The Athrixi Air Caste are a regal race and are the galaxy's most talented diplomats. They excel at subterfuge and one must always watch their back when dealing with members of the Air Caste.",
+        "price": 1,
+        "isPatronAvatar": false
     },
     {
         "id": 7,
+        "file": "7.png",
         "name": "Morn",
-        "description": "The Morn’s history of interstellar expansion is strife with betrayal and regret. Every attempt at peaceful contact with other races has been met with conflict, leaving the Morn jaded. Developing a culture of suspicion and pessimism that accompanies them across the stars.",
-        "price": null
+        "description": "The Morn's history of interstellar expansion is strife with betrayal and regret. Every attempt at peaceful contact with other races has been met with conflict, leaving the Morn jaded. Developing a culture of suspicion and pessimism that accompanies them across the stars.",
+        "price": 1,
+        "isPatronAvatar": false
     },
     {
         "id": 8,
+        "file": "8.png",
         "name": "Morn",
-        "description": "The Morn’s history of interstellar expansion is strife with betrayal and regret. Every attempt at peaceful contact with other races has been met with conflict, leaving the Morn jaded. Developing a culture of suspicion and pessimism that accompanies them across the stars.",
-        "price": null
+        "description": "The Morn's history of interstellar expansion is strife with betrayal and regret. Every attempt at peaceful contact with other races has been met with conflict, leaving the Morn jaded. Developing a culture of suspicion and pessimism that accompanies them across the stars.",
+        "price": 1,
+        "isPatronAvatar": false
     },
     {
         "id": 9,
+        "file": "9.png",
         "name": "Achara",
         "description": "After a millennia of subjugation at the hands of the Garan Dominion, the Acharans are finally free. They have vowed to take to the stars to teach other races how to survive in a harsh and unforgiving galaxy.",
-        "price": 1
+        "price": 1,
+        "isPatronAvatar": false
     },
     {
         "id": 10,
+        "file": "10.png",
         "name": "Achara",
         "description": "After a millennia of subjugation at the hands of the Garan Dominion, the Acharans are finally free. They have vowed to take to the stars to teach other races how to survive in a harsh and unforgiving galaxy.",
-        "price": 1
+        "price": 1,
+        "isPatronAvatar": false
     },
     {
         "id": 11,
+        "file": "11.png",
         "name": "The Biso Combine",
         "description": "The Biso Combine are master strategists. Resources were sparse on their homeworld, and as such they learned how to inflict the most damage at the least cost. They know well the value of a well placed fleet and are dangerous foes.",
-        "price": null
+        "price": null,
+        "isPatronAvatar": false
     },
     {
         "id": 12,
+        "file": "12.png",
         "name": "The Biso Combine",
         "description": "The Biso Combine are master strategists. Resources were sparse on their homeworld, and as such they learned how to inflict the most damage at the least cost. They know well the value of a well placed fleet and are dangerous foes.",
-        "price": null
+        "price": null,
+        "isPatronAvatar": false
     },
     {
         "id": 13,
+        "file": "13.png",
         "name": "The Garan Dominion",
         "description": "The Garans are a warrior species of proud, tradition-bound beings who value honor and combat. The aggressive Garan culture makes them an interstellar military power to be respected and feared.",
-        "price": 3
+        "price": 3,
+        "isPatronAvatar": false
     },
     {
         "id": 14,
+        "file": "14.png",
         "name": "The Garan Dominion",
         "description": "The Garans are a warrior species of proud, tradition-bound beings who value honor and combat. The aggressive Garan culture makes them an interstellar military power to be respected and feared.",
-        "price": 3
+        "price": 3,
+        "isPatronAvatar": false
     },
     {
         "id": 15,
+        "file": "15.png",
         "name": "Chesh",
         "description": "The Chesh are a stately race who have made it their mission to ensure galactic peace and prosperity. They have witnessed firsthand the horrors of galactic war and swore that no other being should ever be subjected to it again.",
-        "price": 1
+        "price": 1,
+        "isPatronAvatar": false
     },
     {
         "id": 16,
+        "file": "16.png",
         "name": "Chesh",
         "description": "The Chesh are a stately race who have made it their mission to ensure galactic peace and prosperity. They have witnessed firsthand the horrors of galactic war and swore that no other being should ever be subjected to it again.",
-        "price": 1
+        "price": 1,
+        "isPatronAvatar": false
     },
     {
         "id": 17,
+        "file": "17.png",
         "name": "The Dratan Congregation",
-        "description": "Members of the Dratan Congregation are fervent worshippers of their god Dro’koth. Their leaders rule through the mandate of heaven and have made it their mission to convert all other intelligent lifeforms to the true teachings of Kthul’ulu, disciple of Dro’koth.",
-        "price": 2
+        "description": "Members of the Dratan Congregation are fervent worshippers of their god Dro'koth. Their leaders rule through the mandate of heaven and have made it their mission to convert all other intelligent lifeforms to the true teachings of Kthul'ulu, disciple of Dro'koth.",
+        "price": 2,
+        "isPatronAvatar": false
     },
     {
         "id": 18,
+        "file": "18.png",
         "name": "The Dratan Congregation",
-        "description": "Members of the Dratan Congregation are fervent worshippers of their god Dro’koth. Their leaders rule through the mandate of heaven and have made it their mission to convert all other intelligent lifeforms to the true teachings of Kthul’ulu, disciple of Dro’koth.",
-        "price": 2
+        "description": "Members of the Dratan Congregation are fervent worshippers of their god Dro'koth. Their leaders rule through the mandate of heaven and have made it their mission to convert all other intelligent lifeforms to the true teachings of Kthul'ulu, disciple of Dro'koth.",
+        "price": 2,
+        "isPatronAvatar": false
     },
     {
         "id": 19,
+        "file": "19.png",
         "name": "C'zoth",
-        "description": "The C’zoth are an ancient and mysterious race of beings whose physical appearance is seemingly beyond comprehension. They travel from system to system converting planets to formless wastelands, before erecting millions of hulking monoliths.",
-        "price": 3
+        "description": "The C'zoth are an ancient and mysterious race of beings whose physical appearance is seemingly beyond comprehension. They travel from system to system converting planets to formless wastelands, before erecting millions of hulking monoliths.",
+        "price": 3,
+        "isPatronAvatar": false
     },
     {
         "id": 20,
+        "file": "20.png",
         "name": "C'zoth",
-        "description": "The C’zoth are an ancient and mysterious race of beings whose physical appearance is seemingly beyond comprehension. They travel from system to system converting planets to formless wastelands, before erecting millions of hulking monoliths.",
-        "price": 3
+        "description": "The C'zoth are an ancient and mysterious race of beings whose physical appearance is seemingly beyond comprehension. They travel from system to system converting planets to formless wastelands, before erecting millions of hulking monoliths.",
+        "price": 3,
+        "isPatronAvatar": false
     },
     {
         "id": 21,
+        "file": "21.png",
         "name": "The Cassian Administration",
         "description": "Cassians excel at all things, and do not suffer fools lightly. They are willing to assist lesser races so long as they respect Cassian rule.",
-        "price": null
+        "price": null,
+        "isPatronAvatar": false
     },
     {
         "id": 22,
+        "file": "22.png",
         "name": "The Cassian Administration",
         "description": "Cassians excel at all things, and do not suffer fools lightly. They are willing to assist lesser races so long as they respect Cassian rule.",
-        "price": null
+        "price": null,
+        "isPatronAvatar": false
     },
     {
         "id": 23,
+        "file": "23.png",
         "name": "Ordarans",
         "description": "The Ordarans fear that galactic war will interfere with the development of more primitive species, and vow to protect these races from savage forces.",
-        "price": 3
+        "price": 3,
+        "isPatronAvatar": false
     },
     {
         "id": 24,
+        "file": "24.png",
         "name": "Athrixi Earth Caste",
         "description": "The Athrixi Earth Caste evolved alongside the Athrixi Air Caste whom they serve. They are an industrious but cowardly race that are constantly seeking to ally themselves with the strongest entity.",
-        "price": 2
+        "price": 2,
+        "isPatronAvatar": false
     },
     {
         "id": 25,
+        "file": "25.png",
         "name": "Athrixi Earth Caste",
         "description": "The Athrixi Earth Caste evolved alongside the Athrixi Air Caste whom they serve. They are an industrious but cowardly race that are constantly seeking to ally themselves with the strongest entity.",
-        "price": 2
+        "price": 2,
+        "isPatronAvatar": false
     },
     {
         "id": 26,
+        "file": "26.png",
         "name": "Cult of Nifra",
         "description": "With each life taken, the Nifrans grow closer to their pantheon of death god's. Once enough blood has been spilled they will earn a place at their master's table.",
-        "price": null
+        "price": 1,
+        "isPatronAvatar": false
     },
     {
         "id": 27,
+        "file": "27.png",
         "name": "Cult of Nifra",
         "description": "With each life taken, the Nifrans grow closer to their pantheon of death god's. Once enough blood has been spilled they will earn a place at their master's table.",
-        "price": null
+        "price": 1,
+        "isPatronAvatar": false
     },
     {
         "id": 28,
+        "file": "28.png",
         "name": "Maintenance Procedure T12",
         "description": "Robotic stewards of a race that have ascended to the digital plane. They surround stars with computational spheres that host their makers' simulated environments. These beings are ruthless and obey their prime directive only.",
-        "price": 3
+        "price": 3,
+        "isPatronAvatar": false
     },
     {
         "id": 29,
+        "file": "29.png",
         "name": "Maintenance Procedure T12",
         "description": "Robotic stewards of a race that have ascended to the digital plane. They surround stars with computational spheres that host their makers' simulated environments. These beings are ruthless and obey their prime directive only.",
-        "price": 3
+        "price": 3,
+        "isPatronAvatar": false
     },
     {
         "id": 30,
+        "file": "30.png",
         "name": "Pichek",
         "description": "The Pichek's home system is littered with asteroids, resulting in hazardous space that's difficult to navigate. By looting these stranded vessels the Pichek literally stole their way to the stars, bringing that same spirit of piracy with them.",
-        "price": null
+        "price": 1,
+        "isPatronAvatar": false
     },
     {
         "id": 31,
+        "file": "31.png",
         "name": "Pichek",
         "description": "The Pichek's home system is littered with asteroids, resulting in hazardous space that's difficult to navigate. By looting these stranded vessels the Pichek literally stole their way to the stars, bringing that same spirit of piracy with them.",
-        "price": null
+        "price": 1,
+        "isPatronAvatar": false
     },
     {
         "id": 32,
+        "file": "32.png",
         "name": "The Cha'gun Empire",
-        "description": "The Cha’gun rarely stay in one place for very long for they are a restless race, and many feel called to the vast dark expanse between the stars. Little else is known about the Cha’gun as they are exceedingly secretive and distrustful of outsiders, preferring to keep to their own kind.",
-        "price": 1
+        "description": "The Cha'gun rarely stay in one place for very long for they are a restless race, and many feel called to the vast dark expanse between the stars. Little else is known about the Cha'gun as they are exceedingly secretive and distrustful of outsiders, preferring to keep to their own kind.",
+        "price": 1,
+        "isPatronAvatar": false
     },
     {
         "id": 33,
+        "file": "33.png",
         "name": "The Cha'gun Empire",
-        "description": "The Cha’gun rarely stay in one place for very long for they are a restless race, and many feel called to the vast dark expanse between the stars. Little else is known about the Cha’gun as they are exceedingly secretive and distrustful of outsiders, preferring to keep to their own kind.",
-        "price": 1
+        "description": "The Cha'gun rarely stay in one place for very long for they are a restless race, and many feel called to the vast dark expanse between the stars. Little else is known about the Cha'gun as they are exceedingly secretive and distrustful of outsiders, preferring to keep to their own kind.",
+        "price": 1,
+        "isPatronAvatar": false
     },
     {
         "id": 34,
+        "file": "34.png",
         "name": "The Cha'gun Empire",
-        "description": "The Cha’gun rarely stay in one place for very long for they are a restless race, and many feel called to the vast dark expanse between the stars. Little else is known about the Cha’gun as they are exceedingly secretive and distrustful of outsiders, preferring to keep to their own kind.",
-        "price": 1
+        "description": "The Cha'gun rarely stay in one place for very long for they are a restless race, and many feel called to the vast dark expanse between the stars. Little else is known about the Cha'gun as they are exceedingly secretive and distrustful of outsiders, preferring to keep to their own kind.",
+        "price": 1,
+        "isPatronAvatar": false
     },
     {
         "id": 35,
+        "file": "35.png",
         "name": "Mihn",
         "description": "The Mihn see advanced technology as a blight to the natural order. They plan to revert the galaxy to a more primitive state, before dismantling their own ships and continuing as nature intended.",
-        "price": null
+        "price": 1,
+        "isPatronAvatar": false
     },
     {
         "id": 36,
+        "file": "36.png",
         "name": "Mihn",
         "description": "The Mihn see advanced technology as a blight to the natural order. They plan to revert the galaxy to a more primitive state, before dismantling their own ships and continuing as nature intended.",
-        "price": null
+        "price": 1,
+        "isPatronAvatar": false
     },
     {
         "id": 37,
+        "file": "37.png",
         "name": "Sarad Commonwealth",
         "description": "The Sarad are well known for their hospitality and leadership. Sacrifice and cooperation are key tenets in Sarad culture and they are always willing to lend a helping hand.",
-        "price": null
+        "price": null,
+        "isPatronAvatar": false
     },
     {
         "id": 38,
+        "file": "38.png",
         "name": "Sarad Commonwealth",
         "description": "The Sarad are well known for their hospitality and leadership. Sacrifice and cooperation are key tenets in Sarad culture and they are always willing to lend a helping hand.",
-        "price": null
+        "price": null,
+        "isPatronAvatar": false
     },
     {
         "id": 39,
+        "file": "39.png",
         "name": "Ghrotlk Merchant Guild",
-        "description": "The Ghrotlk seek supremacy through economic superiority and their business dealings are as slimy as their reptilian scales.  Much of the galaxy’s trade flows through at least one Ghrotlk port, they’ve made sure of it.",
-        "price": 2
+        "description": "The Ghrotlk seek supremacy through economic superiority and their business dealings are as slimy as their reptilian scales.  Much of the galaxy's trade flows through at least one Ghrotlk port, they've made sure of it.",
+        "price": 2,
+        "isPatronAvatar": false
     },
     {
         "id": 40,
+        "file": "40.png",
         "name": "Ghrotlk Merchant Guild",
-        "description": "The Ghrotlk seek supremacy through economic superiority and their business dealings are as slimy as their reptilian scales.  Much of the galaxy’s trade flows through at least one Ghrotlk port, they’ve made sure of it.",
-        "price": 2
+        "description": "The Ghrotlk seek supremacy through economic superiority and their business dealings are as slimy as their reptilian scales.  Much of the galaxy's trade flows through at least one Ghrotlk port, they've made sure of it.",
+        "price": 2,
+        "isPatronAvatar": false
     },
     {
         "id": 41,
+        "file": "41.png",
         "name": "Oni",
         "description": "ORIGIN: UNKNOWN\nMOTIVE: UNKNOWN",
-        "price": 10
+        "price": 10,
+        "isPatronAvatar": false
     },
     {
         "id": 42,
+        "file": "42.png",
         "name": "Hyperi0n",
         "description": "A literal God walking amongst mere mortals.",
-        "price": 25
+        "price": 25,
+        "isPatronAvatar": true
+    },
+    {
+        "id": 43,
+        "file": "43.png",
+        "name": "Snurp Ascendancy",
+        "description": "This proud, onomatopoetic pack of star-farers ventures far and wide across the cosmos in search of truth, enlightenment, and treats, for they know that they are the goodest Snurps.",
+        "price": 10,
+        "isPatronAvatar": true
+    },
+    {
+        "id": 44,
+        "file": "fab.gif",
+        "name": "The FAB Federation",
+        "description": "Born from within the stars, the marshmallow people of The FAB Federation have emerged in the name of diplomacy. Their willingness to sue for peace should not be mistaken for weakness though, as their silver tongued elected council is only in place to protect you from the wrath of their god @Nhilas.",
+        "price": 10,
+        "isPatronAvatar": true
     }
 ]

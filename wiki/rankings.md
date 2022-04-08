@@ -9,12 +9,14 @@ When a game ends, rank is awarded to all players using the following rules:
 - Players who have filled AFK slots are awarded 1.5x rank rounded up (at least 0).
 
 So for example, in a 4 player game:
+
 - 1st place receives 4 rank.
 - 2nd place receives 1 rank.
 - 3rd place receives 0 rank.
 - 4th receives -1 rank.
 
 Additionally:
+
 - 1st place receives a galactic credit.
 - Players who are undefeated and active (not AFK) receive +1 to their completed statistic on their profile.
 - Players cannot have less than 0 rank in their profiles.

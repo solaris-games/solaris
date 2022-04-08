@@ -26,6 +26,7 @@ import Avatars from './views/Avatars.vue'
 import GalacticCreditsShop from './views/shop/GalacticCreditsShop.vue'
 import ShopPurchaseComplete from './views/shop/PurchaseComplete.vue'
 import ShopPurchaseFailed from './views/shop/PurchaseFailed.vue'
+import PrivacyPolicy from './views/PrivacyPolicy.vue'
 
 Vue.use(Router)
 
@@ -160,6 +161,11 @@ export default new Router({
       path: '/shop/paymentfailed',
       name: 'galactic-credits-shop-payment-failed',
       component: ShopPurchaseFailed
+    },
+    {
+      path: '/privacypolicy',
+      name: 'privacy-policy',
+      component: PrivacyPolicy
     }
   ]
 })

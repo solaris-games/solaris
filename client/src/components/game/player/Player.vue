@@ -42,11 +42,16 @@
     <sendRenown v-if="canSendRenown" :player="player" :userPlayer="userPlayer"
       @onRenownSent="onRenownSent"/>
 
-    <!--
-    <h4 class="mt-2">Badges</h4>
+    <h4 class="mt-2" v-if="player && isValidUser">Badges</h4>
 
-    <badges v-if="user" :user="user"/>
-    -->
+    <player-badges v-if="player && isValidUser" 
+      :playerId="player._id"
+      @onOpenPurchasePlayerBadgeRequested="onOpenPurchasePlayerBadgeRequested"/>
+
+    <player-report 
+      v-if="player && !player.isEmptySlot && userPlayer && player != userPlayer"
+      :playerId="player._id"
+      @onOpenReportPlayerRequested="onOpenReportPlayerRequested"/>
 </div>
 </template>
 
@@ -59,10 +64,10 @@ import YourInfrastructure from './YourInfrastructure'
 import Research from './Research'
 import Achievements from './Achievements'
 import SendRenown from './SendRenown'
-import Badges from './Badges'
+import PlayerBadges from '../badges/PlayerBadges'
 import Reputation from './Reputation'
-import PlayerTradeVue from './PlayerTrade'
 import EloRating from './EloRating'
+import PlayerReport from './PlayerReport'
 import gameService from '../../../services/api/game'
 import GameHelper from '../../../services/gameHelper'
 import GameContainer from '../../../game/container'
@@ -77,10 +82,10 @@ export default {
     'research': Research,
     'achievements': Achievements,
     'sendRenown': SendRenown,
-    'badges': Badges,
+    'player-badges': PlayerBadges,
     'reputation': Reputation,
-    'player-trade': PlayerTradeVue,
-    'elo-rating': EloRating
+    'elo-rating': EloRating,
+    'player-report': PlayerReport
   },
   props: {
     playerId: String
@@ -123,6 +128,12 @@ export default {
     },
     onOpenTradeRequested (e) {
       this.$emit('onOpenTradeRequested', this.playerId)
+    },
+    onOpenPurchasePlayerBadgeRequested (e) {
+      this.$emit('onOpenPurchasePlayerBadgeRequested', e)
+    },
+    onOpenReportPlayerRequested (e) {
+      this.$emit('onOpenReportPlayerRequested', e)
     },
     panToPlayer (e) {
       GameContainer.map.panToPlayer(this.$store.state.game, this.player)

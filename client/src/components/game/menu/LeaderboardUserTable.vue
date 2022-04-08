@@ -23,7 +23,7 @@
         </th>
       </template>
       <template v-slot:row="{ value: player, getColumnClass }">
-        <tr>
+        <tr :class="{'bg-primary':$store.state.userId === player._id}">
           <td>{{player.position}}</td>
           <td>
               <router-link :to="{ name: 'account-achievements', params: { userId: player._id }}">

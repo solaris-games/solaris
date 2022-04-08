@@ -12,7 +12,7 @@
         <th style="width: 10%" class="text-right sortable-header col">ELO</th>
       </thead>
       <tbody>
-        <tr v-for="player of leaderboard" :key="player._id">
+        <tr v-for="player of leaderboard" :key="player._id" :class="{'bg-primary':$store.state.userId === player._id}">
           <td>{{player.position}}</td>
           <td>
               <router-link :to="{ name: 'account-achievements', params: { userId: player._id }}">

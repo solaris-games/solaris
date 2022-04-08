@@ -7,7 +7,10 @@
         <footer class="mt-3">
           <div class="row">
             <div class="col">
-                <a href="https://github.com/mike-eason/solaris" target="_blank" title="Code" class="mr-2">
+                <router-link :to="{ name: 'privacy-policy'}" class="mr-2" title="Privacy Policy">
+                  <i class="fas fa-file-alt"></i>
+                </router-link>
+                <a href="https://github.com/solaris-games/solaris" target="_blank" title="Code" class="mr-2">
                   <i class="fab fa-github"></i>
                 </a>
                 <a href="https://store.steampowered.com/app/1623930/Solaris/" target="_blank" title="Steam" class="mr-2">

@@ -1,0 +1,12 @@
+use solaris;
+
+let playerId = ObjectId('playerid');
+
+db.games.updateOne({
+    'galaxy.players._id': playerId
+}, {
+    $set: {
+        'galaxy.players.$.afk': true,
+        'galaxy.players.$.defeated': true
+    }
+});

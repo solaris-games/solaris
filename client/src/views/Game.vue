@@ -13,10 +13,8 @@
                     @onCarrierRightClicked="onCarrierRightClicked"
                     @onObjectsClicked="onObjectsClicked"/>
 
-        <main-bar :menuState="menuState"
-                  :menuArguments="menuArguments"
-                  @onMenuStateChanged="onMenuStateChanged"
-                  @onPlayerSelected="onPlayerSelected"/>
+        <main-bar @onPlayerSelected="onPlayerSelected"
+                  @onReloadGameRequested="reloadGame"/>
 
         <chat @onOpenPlayerDetailRequested="onPlayerSelected"/>
     </div>
@@ -49,8 +47,6 @@ export default {
   data () {
     return {
       audio: null,
-      menuState: null,
-      menuArguments: null,
       MENU_STATES: MENU_STATES,
       polling: null
     }
@@ -87,15 +83,15 @@ export default {
     
     if (userPlayer && !userPlayer.defeated) {
       if (GameHelper.isTutorialGame(this.$store.state.game)) {
-        this.menuState = MENU_STATES.TUTORIAL
+        this.$store.commit('setMenuState', { state: MENU_STATES.TUTORIAL })
       } else {
-        this.menuState = MENU_STATES.LEADERBOARD
+        this.$store.commit('setMenuState', { state: MENU_STATES.LEADERBOARD })
       }
     } else {
       if (this.$store.state.userId && GameHelper.gameHasOpenSlots(this.$store.state.game)) {
-        this.menuState = MENU_STATES.WELCOME
+        this.$store.commit('setMenuState', { state: MENU_STATES.WELCOME })
       } else {
-        this.menuState = MENU_STATES.LEADERBOARD // Assume the user is spectating.
+        this.$store.commit('setMenuState', { state: MENU_STATES.LEADERBOARD }) // Assume the user is spectating.
       }
     }
 
@@ -140,6 +136,7 @@ export default {
             this.$store.commit('setUserId', response.data._id)
             this.$store.commit('setUsername', response.data.username)
             this.$store.commit('setRoles', response.data.roles)
+            this.$store.commit('setUserCredits', response.data.credits)
           }
         }
       } catch (err) {
@@ -147,6 +144,10 @@ export default {
       }
     },
     async reloadGame () {
+      // if (this.$isHistoricalMode()) { // Do not reload if in historical mode
+      //   return
+      // }
+
       try {
         let galaxyResponse = await GameApiService.getGameGalaxy(this.$route.query.id)
 
@@ -181,33 +182,21 @@ export default {
     // MENU
 
     resetMenuState () {
-      this.menuArguments = null
-      this.menuState = null
-    },
-    onMenuStateChanged (e) {
-      e.args = e.args || null
-      e.state = e.state || null
-
-      // Toggle menu if its already open.
-      if (e.state === this.menuState && e.args === this.menuArguments) {
-        this.menuArguments = null
-        this.menuState = null
-      } else {
-        this.menuArguments = e.args
-        this.menuState = e.state
-      }
-
-      this.$emit('onMenuStateChanged', e)
+      this.$store.commit('clearMenuState')
     },
     onPlayerSelected (e) {
-      this.menuArguments = e
-      this.menuState = MENU_STATES.PLAYER
+      this.$store.commit('setMenuState', {
+        state: MENU_STATES.PLAYER,
+        args: e
+      })
 
       this.$emit('onPlayerSelected', e)
     },
     onStarClicked (e) {
-      this.menuArguments = e
-      this.menuState = MENU_STATES.STAR_DETAIL
+      this.$store.commit('setMenuState', {
+        state: MENU_STATES.STAR_DETAIL,
+        args: e
+      })
 
       AudioService.click()
     },
@@ -222,8 +211,10 @@ export default {
       AudioService.click()
     },
     onCarrierClicked (e) {
-      this.menuArguments = e
-      this.menuState = MENU_STATES.CARRIER_DETAIL
+      this.$store.commit('setMenuState', {
+        state: MENU_STATES.CARRIER_DETAIL,
+        args: e
+      })
 
       AudioService.click()
     },
@@ -238,8 +229,10 @@ export default {
       AudioService.click()
     },
     onObjectsClicked (e) {
-      this.menuArguments = e
-      this.menuState = MENU_STATES.MAP_OBJECT_SELECTOR
+      this.$store.commit('setMenuState', {
+        state: MENU_STATES.MAP_OBJECT_SELECTOR,
+        args: e
+      })
 
       AudioService.open()
     },
@@ -302,7 +295,7 @@ export default {
           {
             text: 'View',
             onClick: (e, toastObject) => {
-              this.onMenuStateChanged({
+              this.$store.commit('setMenuState', {
                 state: MENU_STATES.CONVERSATION,
                 args: conversationId
               })
@@ -333,7 +326,7 @@ export default {
             onClick: (e, toastObject) => {
               toastObject.goAway(0)
 
-              window.location.reload()
+              location.reload()
             }
           }
         ]
@@ -373,6 +366,10 @@ export default {
                 this.$store.commit('setProductionTick', response.data.state.productionTick)
               } else {
                 await this.reloadGame()
+
+                this.$toasted.show(`The game has ticked. Cycle ${response.data.state.productionTick}, Tick ${response.data.state.tick}.`, { type: 'success' })
+
+                AudioService.download()
               }
             }
           }
@@ -383,6 +380,12 @@ export default {
     }
   },
   computed: {
+    menuState () {
+      return this.$store.state.menuState
+    },
+    menuArguments () {
+      return this.$store.state.menuArguments
+    },
     gameId () {
       return this.$store.state.game._id
     },

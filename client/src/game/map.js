@@ -43,26 +43,26 @@ class Map extends EventEmitter {
   }
 
   _setupContainers () {
+    this.chunksContainer = new PIXI.Container()
     this.backgroundContainer = new PIXI.Container()
-    this.wormHoleContainer = new PIXI.Container()
+    this.territoryContainer = new PIXI.Container()
+    this.playerNamesContainer = new PIXI.Container()
     this.orbitalContainer = new PIXI.Container()
+    this.wormHoleContainer = new PIXI.Container()
     this.starContainer = new PIXI.Container()
     this.carrierContainer = new PIXI.Container()
     this.waypointContainer = new PIXI.Container()
     this.rulerPointContainer = new PIXI.Container()
-    this.territoryContainer = new PIXI.Container()
-    this.territoryContainer.zIndex = 2
-    this.playerNamesContainer = new PIXI.Container()
-    this.playerNamesContainer.zIndex = 3
     this.highlightLocationsContainer = new PIXI.Container()
 
     this.container.addChild(this.backgroundContainer)
     this.container.addChild(this.territoryContainer)
-    this.container.addChild(this.pathManager.container)
     this.container.addChild(this.wormHoleContainer)
-    this.container.addChild(this.orbitalContainer)
+    this.container.addChild(this.pathManager.container)
     this.container.addChild(this.rulerPointContainer)
     this.container.addChild(this.waypointContainer)
+    this.container.addChild(this.chunksContainer)
+    this.container.addChild(this.orbitalContainer)
     this.container.addChild(this.starContainer)
     this.container.addChild(this.carrierContainer)
     this.container.addChild(this.highlightLocationsContainer)
@@ -154,7 +154,7 @@ class Map extends EventEmitter {
     if (this._isWormHolesEnabled()) {
       this.wormHoleLayer = new WormHoleLayer()
       this.drawWormHoles()
-      this.orbitalContainer.addChild(this.wormHoleLayer.container)
+      this.wormHoleContainer.addChild(this.wormHoleLayer.container)
     }
 
     // -----------
@@ -261,14 +261,10 @@ class Map extends EventEmitter {
   }
 
   _setupChunks() {
-
     if(this.chunksContainer) {
       console.log('resetting chunks')
-      this.container.removeChild(this.chunksContainer)
+      this.chunksContainer.removeChildren()
     }
-    this.chunksContainer = new PIXI.Container()
-    this.chunksContainer.zIndex = 1
-    this.container.addChild(this.chunksContainer)
 
     let carrierMinX = gameHelper.calculateMinCarrierX(this.game)
     let carrierMinY = gameHelper.calculateMinCarrierY(this.game)
@@ -620,7 +616,6 @@ class Map extends EventEmitter {
 
     star.onClicked()
     star.select()
-    star.updateVisibility()
   }
 
   clickCarrier (carrierId) {
@@ -635,7 +630,6 @@ class Map extends EventEmitter {
       let s = this.stars[i]
 
       s.unselect()
-      s.updateVisibility() // Should be fine to pass in false for force
     }
   }
 
@@ -644,7 +638,6 @@ class Map extends EventEmitter {
       let c = this.carriers[i]
 
       c.unselect()
-      c.updateVisibility()
     }
   }
 
@@ -656,8 +649,6 @@ class Map extends EventEmitter {
         if (s.data._id !== star.data._id) {
           s.unselect()
         }
-
-        s.updateVisibility()
       })
   }
 
@@ -669,8 +660,6 @@ class Map extends EventEmitter {
         if (c.data._id !== carrier.data._id) {
           c.unselect()
         }
-
-        c.updateVisibility()
       })
   }
 
@@ -771,15 +760,10 @@ class Map extends EventEmitter {
           this.unselectAllCarriers()
           this.unselectAllStarsExcept(selectedStar)
 
-          selectedStar.toggleSelected()
-
           if (!this.tryMultiSelect(e.location)) {
+            selectedStar.toggleSelected()
             this.emit('onStarClicked', e)
-          } else {
-            selectedStar.unselect() // If multi-select then do not select the star.
           }
-
-          selectedStar.updateVisibility()
         } else if (this.mode === 'waypoints') {
           this.waypoints.onStarClicked(e)
         } else if (this.mode === 'ruler') {
@@ -894,6 +878,7 @@ class Map extends EventEmitter {
     let closeStars = this.stars
       .map(s => {
         return {
+          ref: s,
           type: 'star',
           distance: gameHelper.getDistanceBetweenLocations(location, s.data.location),
           data: s.data
@@ -904,6 +889,7 @@ class Map extends EventEmitter {
     let closeCarriers = this.carriers
       .map(s => {
         return {
+          ref: s,
           type: 'carrier',
           distance: gameHelper.getDistanceBetweenLocations(location, s.data.location),
           data: s.data
@@ -922,7 +908,21 @@ class Map extends EventEmitter {
       })
 
     if (closeObjects.length > 1) {
-      this.emit('onObjectsClicked', closeObjects)
+      let star = closeObjects.find(co => co.type === 'star')
+
+      if (star) {
+        star.ref.toggleSelected() // Select to star to get the ranges drawn on the map
+      }
+
+      let eventObj = closeObjects.map(co => {
+        return {
+          type: co.type,
+          data: co.data,
+          distance: co.distance
+        }
+      })
+
+      this.emit('onObjectsClicked', eventObj)
 
       return true
     }

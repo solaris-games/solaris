@@ -70,6 +70,7 @@ class Carrier extends EventEmitter {
     this.drawShips()
     this.drawSpecialist()
     this.drawCarrierWaypoints()
+    this.drawDepth()
   }
 
   drawActive () {
@@ -160,7 +161,7 @@ class Carrier extends EventEmitter {
       return
     }
 
-    let specialistTexture = TextureService.getSpecialistTexture(this.data.specialistId, true)
+    let specialistTexture = TextureService.getSpecialistTexture(this.data.specialist.key)
     let specialistSprite = new PIXI.Sprite(specialistTexture)
     specialistSprite.width = 6
     specialistSprite.height = 6
@@ -171,7 +172,7 @@ class Carrier extends EventEmitter {
   }
 
   hasSpecialist () {
-    return this.data.specialistId && this.data.specialistId > 0
+    return this.data.specialistId && this.data.specialistId > 0 && this.data.specialist
   }
 
   clearPaths() {
@@ -250,6 +251,19 @@ class Carrier extends EventEmitter {
     }
   }
 
+  drawDepth () {
+    if (!this.data.orbiting) {
+      const waypoint = this.data.waypoints[0]
+      const seeds = [waypoint.source, waypoint.destination]
+      const depth = Helpers.calculateDepthModifiers(this.userSettings, seeds)
+
+      this.container.alpha = depth
+      this.baseScale = depth * (this.userSettings.map.objectsDepth === 'disabled' ? 1 : 1.5)
+    } else {
+      this.container.alpha = 1
+    }
+  }
+
   enableInteractivity() {
     // Can only be interactive if its in transit
     if (!this.data.orbiting) {
@@ -307,7 +321,6 @@ class Carrier extends EventEmitter {
   }
 
   updateVisibility() {
-
     if (this.graphics_ship) this.graphics_ship.visible = !this.data.orbiting && !this.hasSpecialist()
     if (this.text_ships) this.text_ships.visible = !this.data.orbiting && (this.zoomPercent >= Carrier.zoomLevel || (this.isSelected && this.zoomPercent > Carrier.zoomLevel ) || (this.isMouseOver && this.zoomPercent > Carrier.zoomLevel))
   }
@@ -348,12 +361,14 @@ class Carrier extends EventEmitter {
     this.isSelected = true
     this.drawSelectedCircle()
     this.emit('onSelected', this.data)
+    this.updateVisibility()
   }
 
   unselect () {
     this.isSelected = false
     this.drawSelectedCircle()
     this.emit('onUnselected', this.data)
+    this.updateVisibility()
   }
 
   toggleSelected () {

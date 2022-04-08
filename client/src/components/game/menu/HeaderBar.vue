@@ -11,7 +11,7 @@
             <span class="pointer" v-if="gameIsInProgress" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Next production tick"><i class="fas fa-clock"></i> {{timeRemaining}}</span>
             <span class="pointer" v-if="gameIsPendingStart" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Game starts in"><i class="fas fa-stopwatch"></i> {{timeRemaining}}</span>
         </div>
-        <div class="col-auto pt-1" v-if="isLoggedIn && isTimeMachineEnabled && !isDataCleaned">
+        <div class="col-auto pt-1" v-if="isLoggedIn && isTimeMachineEnabled && !isDataCleaned && !gameIsWaitingForPlayers">
           <tick-selector />
         </div>
         <div class="col text-right pt-1">
@@ -44,11 +44,7 @@
 
             <button class="btn btn-sm btn-success ml-1" v-if="!userPlayer && gameIsJoinable" @click="setMenuState(MENU_STATES.WELCOME)">Join Now</button>
 
-            <!-- Ready button -->
-            <button class="btn btn-sm ml-1" v-if="userPlayer && isTurnBasedGame && !gameIsFinished && !userPlayer.defeated" :class="{'btn-success pulse': !userPlayer.ready, 'btn-danger': userPlayer.ready}" v-on:click="toggleReadyStatus()">
-                <i class="fas fa-times" v-if="userPlayer.ready"></i>
-                <i class="fas fa-check" v-if="!userPlayer.ready"></i>
-            </button>
+            <ready-status-button :smallButtons="true" v-if="!$isHistoricalMode() && userPlayer && isTurnBasedGame && canEndTurn && !userPlayer.defeated" class="ml-1" />
 
             <button class="btn btn-sm ml-1 d-lg-none" v-if="userPlayer && !isTutorialGame" :class="{'btn-info': !unreadMessages, 'btn-warning': unreadMessages}" v-on:click="setMenuState(MENU_STATES.INBOX)" title="Inbox (M)">
                 <i class="fas fa-comments"></i> <span class="ml-1" v-if="unreadMessages">{{unreadMessages}}</span>
@@ -58,7 +54,7 @@
                 <i class="fas fa-inbox"></i> <span class="ml-1" v-if="unreadEvents">{{unreadEvents}}</span>
             </button>
 
-            <hamburger-menu class="ml-1 d-none d-sm-inline-block" :buttonClass="'btn-sm btn-info'" :dropType="'dropleft'" @onMenuStateChanged="onMenuStateChanged"/>
+            <hamburger-menu class="ml-1 d-none d-sm-inline-block" :buttonClass="'btn-sm btn-info'" :dropType="'dropleft'" />
             
             <button class="btn btn-sm btn-info ml-1 d-none d-sm-inline-block" type="button" @click="goToMyGames()">
                 <i class="fas fa-chevron-left"></i>
@@ -80,16 +76,17 @@ import ResearchProgressVue from './ResearchProgress'
 import AudioService from '../../../game/audio'
 import ConversationApiService from '../../../services/api/conversation'
 import EventApiService from '../../../services/api/event'
-import GameApiService from '../../../services/api/game'
 import HamburgerMenuVue from './HamburgerMenu'
 import TickSelectorVue from './TickSelector'
+import ReadyStatusButtonVue from './ReadyStatusButton'
 
 export default {
   components: {
     'server-connection-status': ServerConnectionStatusVue,
     'research-progress': ResearchProgressVue,
     'hamburger-menu': HamburgerMenuVue,
-    'tick-selector': TickSelectorVue
+    'tick-selector': TickSelectorVue,
+    'ready-status-button': ReadyStatusButtonVue
   },
   data () {
     return {
@@ -150,13 +147,10 @@ export default {
       }
     },
     setMenuState (state, args) {
-      this.$emit('onMenuStateChanged', {
+      this.$store.commit('setMenuState', {
         state,
         args
       })
-    },
-    onMenuStateChanged (e) {
-      this.$emit('onMenuStateChanged', e)
     },
     onCreditsReceived (data) {
       // TODO: This logic should be in the store like the other subscriptions.
@@ -177,7 +171,11 @@ export default {
       this.$toasted.show(`You received ${data.data.creditsSpecialists} specialist token(s) from ${fromPlayer.alias}.`, { type: 'info' })
     },
     onTechnologyReceived (data) {
+      let player = GameHelper.getUserPlayer(this.$store.state.game)
       let fromPlayer = GameHelper.getPlayerById(this.$store.state.game, data.data.fromPlayerId)
+
+      player.research[data.data.technology.name].level = data.data.technology.level
+      player.research[data.data.technology.name].progress = 0
 
       this.$toasted.show(`You received ${data.data.technology.name} level ${data.data.technology.level} from ${fromPlayer.alias}.`, { type: 'info' })
     },
@@ -256,35 +254,6 @@ export default {
         console.error(err)
       }
     },
-    async toggleReadyStatus () {
-      try {
-        if (this.userPlayer.ready) {
-          let response = await GameApiService.unconfirmReady(this.$store.state.game._id)
-
-          if (response.status === 200) {
-            this.userPlayer.ready = false
-          }
-        } else {
-          if (!await this.$confirm('End turn', 'Are you sure you want to end your turn?')) {
-            return
-          }
-
-          let response = await GameApiService.confirmReady(this.$store.state.game._id)
-
-          if (response.status === 200) {
-            if (this.isTutorialGame) {
-              this.$toasted.show(`You have confirmed your move, please wait while the game processes the tick.`, { type: 'success' })
-            } else {
-              this.$toasted.show(`You have confirmed your move, once all players are ready the game will progress automatically.`, { type: 'success' })
-            }
-            
-            this.userPlayer.ready = true
-          }
-        }
-      } catch (err) {
-        console.error(err)
-      }
-    },
     handleKeyDown (e) {
       if (/^(?:input|textarea|select|button)$/i.test(e.target.tagName)) return
 
@@ -299,6 +268,10 @@ export default {
       let isInGame = this.userPlayer != null
 
       let menuState = KEYBOARD_SHORTCUTS.all[key]
+
+      if (menuState === null) {
+        return this.setMenuState(null, null)
+      }
 
       if (isLoggedIn) {
         menuState = menuState || KEYBOARD_SHORTCUTS.user[key]
@@ -349,7 +322,7 @@ export default {
       }
     },
     reloadPage () {
-      window.location.reload()
+      location.reload()
     }
   },
   computed: {
@@ -377,6 +350,9 @@ export default {
     gameIsJoinable () {
       return !this.gameIsInProgress && !this.gameIsFinished
     },
+    gameIsWaitingForPlayers () {
+      return GameHelper.isGameWaitingForPlayers(this.$store.state.game)
+    },
     getGameStatusText (game) {
       return GameHelper.getGameStatusText(this.$store.state.game)
     },
@@ -394,6 +370,9 @@ export default {
     },
     isTutorialGame () {
       return GameHelper.isTutorialGame(this.$store.state.game)
+    },
+    canEndTurn () {
+      return !GameHelper.isGameFinished(this.$store.state.game)
     }
   },
   watch: {

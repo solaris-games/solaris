@@ -6,14 +6,14 @@
         <div class="table-responsive mt-2">
             <table class="table table-sm" v-if="event">
                 <thead>
-                    <th></th>
+                    <th>Defender</th>
                     <th class="text-right">Before</th>
                     <th class="text-right">Lost</th>
                     <th class="text-right">After</th>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>Defender: Weapons {{event.data.combatResult.weapons.defender}}</td>
+                        <td><i>Weapons {{event.data.combatResult.weapons.defender}} <span v-if="event.data.combatResult.weapons.defenderBase !== event.data.combatResult.weapons.defender">(base {{event.data.combatResult.weapons.defenderBase}})</span></i></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -45,26 +45,48 @@
                         <td class="text-right">{{carrier.after}}</td>
                     </tr>
                     <tr>
-                        <td>Attacker(s): Weapons {{event.data.combatResult.weapons.attacker}}</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr v-for="carrier of attackerCarriers" :key="carrier._id">
-                        <td>
-                            <i class="fas fa-rocket mr-2"></i>
-                            <span :style="{ 'color': getCarrierColour(carrier) }" class="name-and-icon">
-                              <player-icon-shape :filled="true" :iconColour="getCarrierColour(carrier)" :shape="getCarrierShape(carrier)" />
-                              {{carrier.name}}
-                            </span>
-                            <span v-if="carrier.specialist" :title="carrier.specialist.description"> ({{carrier.specialist.name}})</span>
-                        </td>
-                        <td class="text-right">{{carrier.before}}</td>
-                        <td class="text-right">{{carrier.lost}}</td>
-                        <td class="text-right">{{carrier.after}}</td>
+                      <td><strong>Totals</strong></td>
+                      <td class="text-right"><strong>{{totalDefenderBefore}}</strong></td>
+                      <td class="text-right"><strong>{{totalDefenderLost}}</strong></td>
+                      <td class="text-right"><strong>{{totalDefenderAfter}}</strong></td>
                     </tr>
                 </tbody>
             </table>
+            <table class="table table-sm" v-if="event">
+                <thead>
+                    <th>Attacker(s)</th>
+                    <th class="text-right">Before</th>
+                    <th class="text-right">Lost</th>
+                    <th class="text-right">After</th>
+                </thead>
+                <tbody>
+                  <tr>
+                      <td><i>Weapons {{event.data.combatResult.weapons.attacker}} <span v-if="event.data.combatResult.weapons.attackerBase !== event.data.combatResult.weapons.attacker">(base {{event.data.combatResult.weapons.attackerBase}})</span></i></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                  </tr>
+                  <tr v-for="carrier of attackerCarriers" :key="carrier._id">
+                      <td>
+                          <i class="fas fa-rocket mr-2"></i>
+                          <span :style="{ 'color': getCarrierColour(carrier) }" class="name-and-icon">
+                            <player-icon-shape :filled="true" :iconColour="getCarrierColour(carrier)" :shape="getCarrierShape(carrier)" />
+                            {{carrier.name}}
+                          </span>
+                          <span v-if="carrier.specialist" :title="carrier.specialist.description"> ({{carrier.specialist.name}})</span>
+                      </td>
+                      <td class="text-right">{{carrier.before}}</td>
+                      <td class="text-right">{{carrier.lost}}</td>
+                      <td class="text-right">{{carrier.after}}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Totals</strong></td>
+                    <td class="text-right"><strong>{{totalAttackerBefore}}</strong></td>
+                    <td class="text-right"><strong>{{totalAttackerLost}}</strong></td>
+                    <td class="text-right"><strong>{{totalAttackerAfter}}</strong></td>
+                  </tr>
+              </tbody>
+          </table>
         </div>
         
         <hr class="mt-0"/>
@@ -127,6 +149,26 @@ export default {
     },
     getStarShape () {
       return GameHelper.getPlayerById(this.$store.state.game, this.event.data.playerIdOwner).shape;
+    }
+  },
+  computed: {
+    totalDefenderBefore: function () {
+      return GameHelper.calculateCombatEventShipCount(this.event.data.combatResult.star, this.defenderCarriers, "before")
+    },
+    totalDefenderLost: function () {
+      return GameHelper.calculateCombatEventShipCount(this.event.data.combatResult.star, this.defenderCarriers, "lost")
+    },
+    totalDefenderAfter: function () {
+      return GameHelper.calculateCombatEventShipCount(this.event.data.combatResult.star, this.defenderCarriers, "after")
+    },
+    totalAttackerBefore: function () {
+      return GameHelper.calculateCombatEventShipCount(null, this.attackerCarriers, "before")
+    },
+    totalAttackerLost: function () {
+      return GameHelper.calculateCombatEventShipCount(null, this.attackerCarriers, "lost")
+    },
+    totalAttackerAfter: function () {
+      return GameHelper.calculateCombatEventShipCount(null, this.attackerCarriers, "after")
     }
   }
 }

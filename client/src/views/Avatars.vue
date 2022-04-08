@@ -3,30 +3,30 @@
     <view-title title="Avatar Shop" />
 
     <p>Unlock new races to play with <strong class="text-warning">Galactic Credits</strong>. <router-link :to="{ name: 'galactic-credits-shop'}"><i class="fas fa-shopping-basket"></i> Purchase Galactic Credits</router-link> or earn credits by winning official games.</p>
-    <h5 v-if="userInfo">You have <span class="text-warning"><strong>{{userInfo.credits}}</strong> Galactic Credits</span>.</h5>
+    <h5 v-if="userCredits">You have <span class="text-warning"><strong>{{userCredits.credits}}</strong> Galactic Credits</span>.</h5>
 
     <hr />
 
     <loading-spinner v-if="isLoading" />
 
     <div v-if="avatars">
-      <div class="row mb-4" v-for="avatar in avatars" :key="avatar.id">
+      <div class="row mb-4" v-for="avatar in sortedAvatars" :key="avatar.id">
         <div class="col-auto">
           <img :src="getAvatarImage(avatar)" width="128" height="128">
         </div>
         <div class="col">
           <div class="row">
             <div class="col">
-              <h5>{{avatar.name}}</h5>
+              <h5>{{avatar.name}}<span class="badge badge-success ml-2" v-if="avatar.isPatronAvatar"><i class="fas fa-handshake"></i> Patron Avatar</span></h5>
             </div>
             <div class="col-auto">
-              <button class="btn btn-sm btn-success" v-if="!avatar.purchased && userInfo.credits >= avatar.price" @click="purchaseAvatar(avatar)">
+              <button class="btn btn-sm btn-success" v-if="!avatar.purchased && userCredits.credits >= avatar.price" @click="purchaseAvatar(avatar)">
                 <i class="fas fa-shopping-basket"></i> {{avatar.price}} Credit<span v-if="avatar.price > 1">s</span>
               </button>
-              <router-link :to="{ name: 'galactic-credits-shop'}" class="btn btn-sm btn-danger" v-if="!avatar.purchased && userInfo.credits < avatar.price">
+              <router-link :to="{ name: 'galactic-credits-shop'}" class="btn btn-sm btn-danger" v-if="!avatar.purchased && userCredits.credits < avatar.price">
                 <i class="fas fa-coins"></i> {{avatar.price}} Credit<span v-if="avatar.price > 1">s</span>
               </router-link>
-              <span class="badge badge-primary" v-if="avatar.purchased"><i class="fas fa-check"></i> Unlocked</span>
+              <h5><span class="badge badge-primary" v-if="avatar.purchased"><i class="fas fa-check"></i> Unlocked</span></h5>
             </div>
             <div class="col-12">
               <p><small class="linebreaks">{{avatar.description}}</small></p>
@@ -53,7 +53,7 @@ export default {
   data () {
     return {
         isLoading: false,
-        userInfo: null,
+        userCredits: null,
         avatars: []
     }
   },
@@ -66,10 +66,12 @@ export default {
   methods: {
     async loadGalacticCredits () {
       try {
-        let response = await UserApiService.getMyUserInfo()
+        let response = await UserApiService.getUserCredits()
 
         if (response.status === 200) {
-            this.userInfo = response.data
+            this.userCredits = response.data
+
+            this.$store.commit('setUserCredits', response.data.credits)
         }
       } catch (err) {
           console.error(err)
@@ -102,7 +104,9 @@ export default {
 
         if (response.status === 200) {
           avatar.purchased = true
-          this.userInfo.credits -= avatar.price
+          this.userCredits.credits -= avatar.price
+
+          this.$store.commit('setUserCredits', this.userCredits.credits)
         }
       } catch (err) {
         console.error(err)
@@ -112,12 +116,17 @@ export default {
     },
     getAvatarImage (avatar) {
       try {
-        return require('../assets/avatars/' + avatar.id.toString() + '.png')
+        return require('../assets/avatars/' + avatar.file)
       } catch (err) {
         console.error(err)
 
         return null
       }
+    }
+  },
+  computed: {
+    sortedAvatars: function () {
+      return this.avatars.sort((a, b) => a.isPatronAvatar - b.isPatronAvatar)
     }
   }
 }

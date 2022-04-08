@@ -9,7 +9,8 @@
     "playerType": "establishedPlayers",
     "anonymity": "normal",
     "playerOnlineStatus": "hidden",
-    "timeMachine": "disabled"
+    "timeMachine": "disabled",
+    "fluxEnabled": "disabled"
   },
   "galaxy": {
     "galaxyType": "irregular",
@@ -26,6 +27,7 @@
     "randomWormHoles": 5,
     "randomNebulas": 15,
     "randomAsteroidFields": 10,
+    "randomBinaryStars": 10,
     "randomBlackHoles": 5,
     "darkGalaxy": "standard",
     "giftCarriers": "enabled",
@@ -46,8 +48,7 @@
   },
   "orbitalMechanics": {
     "enabled": "disabled",
-    "orbitSpeed": 5,
-    "orbitOrigin": "galacticCenter"
+    "orbitSpeed": 3
   },
   "player": {
     "startingStars": 6,
@@ -67,8 +68,14 @@
     "tradeCredits": true,
     "tradeCreditsSpecialists": true,
     "tradeCost": 15,
-    "tradeScanning": "scanned",
-    "alliances": "enabled"
+    "tradeScanning": "scanned"
+  },
+  "diplomacy": {
+    "enabled": "enabled",
+    "upkeepCost": "none",
+    "tradeRestricted": "disabled", 
+    "maxAlliances": 31, 
+    "globalEvents": "disabled"
   },
   "technology": {
     "startingTechnologyLevel": {
@@ -92,11 +99,13 @@
       "specialists": "standard"
     },
     "bankingReward": "standard",
+    "experimentationReward": "standard",
     "specialistTokenReward": "standard"
   },
   "gameTime": {
     "gameType": "realTime",
     "speed": 3600,
+    "isTickLimited": "disabled",
     "startDelay": 360,
     "afk": {
       "lastSeenTimeout": 2,

@@ -26,6 +26,38 @@ export default new Vuex.Store({
     confirmationDialog: {}
   },
   mutations: {
+    // Menu
+    setMenuState (state, menuState) {
+      menuState.state = menuState.state || null
+      menuState.args = menuState.args || null
+
+      // Toggle menu if its already open.
+      if (menuState.state === state.menuState && menuState.args === state.menuArguments) {
+        state.menuArguments = null
+        state.menuState = null
+      } else {
+        state.menuArguments = menuState.args
+        state.menuState = menuState.state
+      }
+    },
+    clearMenuState (state) {
+      state.menuState = null
+      state.menuArguments = null
+    },
+
+    setMenuStateChat (state, menuState) {
+      menuState.state = menuState.state || null
+      menuState.args = menuState.args || null
+
+      state.menuArgumentsChat = menuState.args
+      state.menuStateChat = menuState.state
+    },
+    clearMenuStateChat (state) {
+      state.menuStateChat = null
+      state.menuArgumentsChat = null
+    },
+    // -------
+
     setCarrierSpecialists (state, carrierSpecialists) {
       state.carrierSpecialists = carrierSpecialists;
     },
@@ -54,13 +86,20 @@ export default new Vuex.Store({
       state.roles = null
     },
 
+    setUserCredits (state, credits) {
+      state.userCredits = credits
+    },
+    clearUserCredits (state) {
+      state.userCredits = null
+    },
+
     setTick (state, tick) {
       state.tick = tick
     },
     setProductionTick (state, tick) {
       state.productionTick = tick
     },
-    
+
     setGame (state, game) {
       state.game = game
     },
@@ -155,7 +194,7 @@ export default new Vuex.Store({
 
     gamePlayerQuit (state, data) {
       let player = GameHelper.getPlayerById(state.game, data.playerId)
-      
+
       player.isEmptySlot = true
       player.alias = 'Empty Slot'
       player.avatar = null
@@ -176,14 +215,12 @@ export default new Vuex.Store({
     gamePlayerReadyToQuit (state, data) {
       let player = GameHelper.getPlayerById(state.game, data.playerId)
 
-      player.ready = true
       player.readyToQuit = true
     },
 
     gamePlayerNotReadyToQuit (state, data) {
       let player = GameHelper.getPlayerById(state.game, data.playerId)
 
-      player.ready = false
       player.readyToQuit = false
     },
 
@@ -208,21 +245,27 @@ export default new Vuex.Store({
         GameContainer.reloadStar(star)
       })
 
+      player.credits -= data.cost
       player.stats.newShips = Math.round((player.stats.newShips + Number.EPSILON) * 100) / 100
+
+      if (data.currentResearchTicksEta) {
+        player.currentResearchTicksEta = data.currentResearchTicksEta
+      }
+      
+      if (data.nextResearchTicksEta) {
+        player.nextResearchTicksEta = data.nextResearchTicksEta
+      }
       
       // Update player total stats.
-
-      player.credits -= data.cost
-
       switch (data.infrastructureType) {
-        case 'economy': 
-          player.stats.totalEconomy += data.upgraded 
+        case 'economy':
+          player.stats.totalEconomy += data.upgraded
           break;
-        case 'industry': 
-          player.stats.totalIndustry += data.upgraded 
+        case 'industry':
+          player.stats.totalIndustry += data.upgraded
           break;
-        case 'science': 
-          player.stats.totalScience += data.upgraded 
+        case 'science':
+          player.stats.totalScience += data.upgraded
           break;
       }
     },
@@ -275,7 +318,7 @@ export default new Vuex.Store({
       star.ships = data.star.ships
 
       data.carriers.forEach(carrier => {
-        let mapObjectCarrier = GameHelper.getCarrierById(state.game, carrier._id) 
+        let mapObjectCarrier = GameHelper.getCarrierById(state.game, carrier._id)
 
         mapObjectCarrier.ships = carrier.ships
       })
@@ -290,11 +333,12 @@ export default new Vuex.Store({
       star.ships = 0
 
       // Redraw and remove carriers
-      let carriers = state.game.galaxy.carriers.filter(x => x.orbiting && x.orbiting === star._id)
+      let carriers = state.game.galaxy.carriers.filter(x => x.orbiting && x.orbiting === star._id && x.ownedByPlayerId === player._id)
 
-      carriers.forEach(c => GameContainer.undrawCarrier(c))
-
-      state.game.galaxy.carriers = state.game.galaxy.carriers.filter(x => (x.orbiting || '') !== star._id)
+      carriers.forEach(c => {
+        GameContainer.undrawCarrier(c)
+        state.game.galaxy.carriers.splice(state.game.galaxy.carriers.indexOf(c), 1)
+      })
 
       // Redraw the star
       GameContainer.reloadStar(star)
@@ -368,7 +412,7 @@ export default new Vuex.Store({
       ]
 
       const responses = await Promise.all(requests)
-      
+
       commit('setCarrierSpecialists', responses[0].data)
       commit('setStarSpecialists', responses[1].data)
     },
@@ -376,9 +420,9 @@ export default new Vuex.Store({
       const modal = window.$('#confirmModal')
       const close = async () => {
         modal.modal('toggle')
-        await new Promise(r => setTimeout(r, 400));
+        await new Promise((resolve, reject) => setTimeout(resolve, 400));
       }
-      return new Promise((resolve, _reject) => {
+      return new Promise((resolve, reject) => {
         const settings = {
           confirmText: data.confirmText || 'Yes',
           cancelText: data.cancelText || 'No',

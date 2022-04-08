@@ -29,6 +29,7 @@
 
 <script>
 import GameHelper from '../../../services/gameHelper'
+import DiplomacyHelper from '../../../services/diplomacyHelper'
 
 export default {
   props: {
@@ -53,7 +54,7 @@ export default {
       return GameHelper.isSpecialistsCurrencyCreditsSpecialists(this.$store.state.game)
     },
     isFormalAlliancesEnabled () {
-      return GameHelper.isFormalAlliancesEnabled(this.$store.state.game)
+      return DiplomacyHelper.isFormalAlliancesEnabled(this.$store.state.game)
     }
   }
 }

@@ -1,3 +1,5 @@
+import seededRandom from 'random-seed'
+
 class Helpers {
 
     rotateCarrierTowardsWaypoint (carrier, stars, graphics) {
@@ -31,6 +33,33 @@ class Helpers {
       let deltaY = destination.y - source.y
   
       return Math.atan2(deltaY, deltaX)
+    }
+
+    calculateDepthModifier (userSettings, seed) {
+        if (userSettings.map.objectsDepth === 'disabled') {
+            return 1
+        }
+
+        const min = 50
+        const max = 100
+
+        const seededRNG = seededRandom.create()
+        seededRNG.seed(seed)
+
+        const alpha = (Math.floor(seededRNG.random() * (max - min + 1) + min)) / 100
+
+        return alpha
+    }
+
+    calculateDepthModifiers (userSettings, seeds) {
+        if (userSettings.map.objectsDepth === 'disabled') {
+            return 1
+        }
+
+        const sum = seeds.reduce((a, b) => this.calculateDepthModifier(userSettings, a) + this.calculateDepthModifier(userSettings, b))
+        const avg = sum / seeds.length
+        
+        return avg
     }
 
 }

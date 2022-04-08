@@ -24,6 +24,7 @@
             <a href="javascript:;" @click="onOpenOrbitingStarDetailRequested">{{getCarrierOrbitingStar().name}}</a>
           </span>
           <span title="The carrier is in transit" v-if="!carrier.orbiting">
+            <i class="fas fa-star mr-2"></i>
             <a title="The carrier is in transit from this star" href="javascript:;" @click="onOpenSourceStarDetailRequested">{{getFirstWaypointSourceName()}}</a>
             <i class="fas fa-arrow-right mr-2 ml-2"></i>
             <a title="The carrier is in transit to star" href="javascript:;" @click="onOpenDestinationStarDetailRequested">{{getFirstWaypointDestinationName()}}</a>
@@ -126,7 +127,7 @@
         </div>
       </div>
 
-      <div v-if="hasWaypoints && carrierOwningPlayer == userPlayer" class="row pt-0 pb-0 mb-0">
+      <div v-if="(hasWaypoints && isStandardUIStyle) || (hasWaypoints && isUserPlayerCarrier)" class="row pt-0 pb-0 mb-0">
         <waypointTable :carrier="carrier" 
           @onEditWaypointRequested="onEditWaypointRequested"
           @onEditWaypointsRequested="editWaypoints"
@@ -453,8 +454,9 @@ export default {
       return this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none' && (this.carrier.specialistId || this.isUserPlayerCarrier)
     },
     canHireSpecialist: function () {
-      return this.canShowSpecialist 
-        && this.carrier.orbiting 
+      return this.canShowSpecialist
+        && this.carrier.orbiting
+        && this.isStarOwnedByUserPlayer
         && !GameHelper.isGameFinished(this.$store.state.game) 
         && !this.isDeadStar
         && (!this.carrier.specialistId || !this.carrier.specialist.oneShot)

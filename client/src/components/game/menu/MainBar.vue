@@ -1,8 +1,9 @@
 <template>
 <div>
   <header-bar class="header-bar" 
-    @onMenuStateChanged="onMenuStateChanged"
     @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+
+  <sidebar-menu />
 
   <div class="menu">
     <not-logged-in-bar v-if="!isLoggedIn"/>
@@ -22,7 +23,9 @@
       <player v-if="menuState == MENU_STATES.PLAYER" @onCloseRequested="onCloseRequested" :playerId="menuArguments" :key="menuArguments"
         @onViewCompareIntelRequested="onViewCompareIntelRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-        @onOpenTradeRequested="onOpenTradeRequested"/>
+        @onOpenTradeRequested="onOpenTradeRequested"
+        @onOpenPurchasePlayerBadgeRequested="onOpenPurchasePlayerBadgeRequested"
+        @onOpenReportPlayerRequested="onOpenReportPlayerRequested"/>
       <trade v-if="menuState == MENU_STATES.TRADE" 
         @onCloseRequested="onCloseRequested" :playerId="menuArguments" :key="menuArguments"
         @onOpenTradeRequested="onOpenTradeRequested"
@@ -107,7 +110,8 @@
       <hire-specialist-star v-if="menuState == MENU_STATES.HIRE_SPECIALIST_STAR"
         :starId="menuArguments"
         @onCloseRequested="onCloseRequested"
-        @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
+        @onOpenStarDetailRequested="onOpenStarDetailRequested"
+        @onReloadGameRequested="onReloadGameRequested"/>
       <game-notes v-if="menuState == MENU_STATES.GAME_NOTES"
         @onCloseRequested="onCloseRequested"/>
       <options v-if="menuState == MENU_STATES.OPTIONS"
@@ -122,13 +126,20 @@
         :key="menuArguments"
         @onCloseRequested="onCloseRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+      <player-badge-shop v-if="menuState == MENU_STATES.PLAYER_BADGE_SHOP"
+        :recipientPlayerId="menuArguments"
+        @onCloseRequested="onCloseRequested"
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+      <report-player v-if="menuState == MENU_STATES.REPORT_PLAYER"
+        :playerId="menuArguments"
+        @onCloseRequested="onCloseRequested"
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
     </div>
 
     <div class="spacing-footer d-block d-sm-none"></div>
   </div>
 
   <footer-bar class="footer-bar d-xs-block d-sm-none" 
-    @onMenuStateChanged="onMenuStateChanged"
     @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 </div>
 </template>
@@ -160,6 +171,7 @@ import GameHelper from '../../../services/gameHelper'
 import CombatCalculatorVue from '../carrier/CombatCalculator.vue'
 import RulerVue from '../ruler/Ruler.vue'
 import HeaderBarVue from './HeaderBar'
+import SidebarMenuVue from './SidebarMenu'
 import LedgerVue from '../ledger/Ledger.vue'
 import DiplomacyVue from '../diplomacy/Diplomacy.vue'
 import HireSpecialistCarrierVue from '../specialist/HireSpecialistCarrier.vue'
@@ -172,11 +184,14 @@ import ConversationDetailVue from '../inbox/conversations/ConversationDetail.vue
 import FooterBarVue from './FooterBar.vue'
 import NotLoggedInBarVue from './NotLoggedInBar'
 import DarkModeWarningBarVue from './DarkModeWarningBar.vue'
+import PlayerBadgeShopVue from '../badges/PlayerBadgeShop.vue'
+import ReportPlayerVue from '../report/ReportPlayer.vue'
 
 export default {
   components: {
     'header-bar': HeaderBarVue,
     'footer-bar': FooterBarVue,
+    'sidebar-menu': SidebarMenuVue,
     'welcome': WelcomeVue,
     'tutorial': TutorialVue,
     'player-list': PlayerListVue,
@@ -210,10 +225,8 @@ export default {
     'conversation': ConversationDetailVue,
     'not-logged-in-bar': NotLoggedInBarVue,
     'dark-mode-warning-bar': DarkModeWarningBarVue,
-  },
-  props: {
-    menuState: String,
-    menuArguments: [Object, String, Array]
+    'player-badge-shop': PlayerBadgeShopVue,
+    'report-player': ReportPlayerVue
   },
   data () {
     return {
@@ -233,13 +246,10 @@ export default {
   },
   methods: {
     changeMenuState (state, args) {
-      this.onMenuStateChanged({
+      this.$store.commit('setMenuState', {
         state,
         args
       })
-    },
-    onMenuStateChanged (e) {
-      this.$emit('onMenuStateChanged', e)
     },
     onCloseRequested (e) {
       this.changeMenuState(null, null)
@@ -308,11 +318,26 @@ export default {
         this.changeMenuState(MENU_STATES.CREATE_CONVERSATION, e.participantIds)
       }
     },
+    onOpenPurchasePlayerBadgeRequested (e) {
+      this.changeMenuState(MENU_STATES.PLAYER_BADGE_SHOP, e)
+    },
+    onOpenReportPlayerRequested (e) {
+      this.changeMenuState(MENU_STATES.REPORT_PLAYER, e)
+    },
     canHandleConversationEvents () {
       return window.innerWidth < 992
+    },
+    onReloadGameRequested (e) {
+      this.$emit('onReloadGameRequested', e)
     }
   },
   computed: {
+    menuState () {
+      return this.$store.state.menuState
+    },
+    menuArguments () {
+      return this.$store.state.menuArguments
+    },
     game () {
       return this.$store.state.game
     },
@@ -320,9 +345,8 @@ export default {
       return this.$store.state.userId != null
     },
     isSpectatingDarkMode () {
-      return GameHelper.isUserSpectatingGame(this.game)
-        && (GameHelper.isDarkModeStandard(this.game) || GameHelper.isDarkModeExtra(this.game))
-    },
+      return GameHelper.isUserSpectatingGame(this.game) && GameHelper.isDarkMode(this.game)
+    }
   }
 }
 </script>
@@ -343,6 +367,7 @@ export default {
 .menu {
   /* This is a must otherwise the div overlays the map */
   position:absolute;
+  left: 50px;
   width: 473px;
   padding-top: 45px;
   max-height: 100%;
@@ -364,6 +389,12 @@ export default {
 @media(max-width: 473px) {
     .menu {
         width: 100%;
+    }
+}
+
+@media(max-width: 768px) {
+    .menu {
+        left: 0px;
     }
 }
 </style>

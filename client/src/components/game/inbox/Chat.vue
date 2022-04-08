@@ -4,7 +4,7 @@
       <span class="icon-text"><i class="fas fa-comments mr-1"></i>{{unreadMessages ? unreadMessages : ''}}</span>
     </div>
 
-    <div id="window" class="bg-dark pt-2" v-if="isExpanded">
+    <div id="window" class="bg-dark" v-if="isExpanded">
       <conversation-list v-if="menuState === MENU_STATES.INBOX"/>
       <create-conversation v-if="menuState == MENU_STATES.CREATE_CONVERSATION"
         :participantIds="menuArguments"
@@ -26,6 +26,7 @@ import GameHelper from '../../../services/gameHelper'
 import ConversationListVue from '../inbox/conversations/ConversationList'
 import ConversationCreateVue from './conversations/ConversationCreate.vue'
 import ConversationDetailVue from './conversations/ConversationDetail.vue'
+import AudioService from '../../../game/audio'
 
 export default {
   components: {
@@ -36,9 +37,7 @@ export default {
   data () {
     return {
       MENU_STATES: MENU_STATES,
-      isExpanded: false,
-      menuState: null,
-      menuArguments: null
+      isExpanded: false
     }
   },
   created () {
@@ -48,7 +47,10 @@ export default {
     this.sockets.subscribe('gameMessageSent', (data) => this.onMessageReceived(data))
   },
   mounted () {
-    this.menuState = MENU_STATES.INBOX
+    this.$store.commit('setMenuStateChat', {
+      state: MENU_STATES.INBOX,
+      args: null
+    })
 
     // TODO: These event names should be global constants
     eventBus.$on('onCreateNewConversationRequested', this.onCreateNewConversationRequested)
@@ -72,9 +74,10 @@ export default {
     toggle () {
       this.isExpanded = !this.isExpanded;
 
-      if (!this.isExpanded) {
-        this.menuState = MENU_STATES.INBOX;
-      }
+      this.$store.commit('setMenuStateChat', {
+        state: MENU_STATES.INBOX,
+        args: null
+      })
     },
     onViewConversationRequested (e) {
       if (!this.canHandleConversationEvents()) {
@@ -82,11 +85,15 @@ export default {
       }
 
       if (e.conversationId) {
-        this.menuState = MENU_STATES.CONVERSATION
-        this.menuArguments = e.conversationId
+        this.$store.commit('setMenuStateChat', {
+          state: MENU_STATES.CONVERSATION,
+          args: e.conversationId
+        })
       } else if (e.participantIds) {
-        this.menuState = MENU_STATES.CREATE_CONVERSATION
-        this.menuArguments = e.participantIds
+        this.$store.commit('setMenuStateChat', {
+          state: MENU_STATES.CREATE_CONVERSATION,
+          args: e.participantIds
+        })
       }
 
       this.isExpanded = true
@@ -96,8 +103,10 @@ export default {
         return
       }
       
-      this.menuState = MENU_STATES.INBOX
-      this.menuArguments = null
+      this.$store.commit('setMenuStateChat', {
+        state: MENU_STATES.INBOX,
+        args: null
+      })
 
       this.isExpanded = true
     },
@@ -106,8 +115,10 @@ export default {
         return
       }
       
-      this.menuState = MENU_STATES.CREATE_CONVERSATION
-      this.menuArguments = e.participantIds || null
+      this.$store.commit('setMenuStateChat', {
+        state: MENU_STATES.CREATE_CONVERSATION,
+        args: e.participantIds || null
+      })
 
       this.isExpanded = true
     },
@@ -140,8 +151,11 @@ export default {
           {
             text: 'View',
             onClick: (e, toastObject) => {
-              this.menuState = MENU_STATES.CONVERSATION
-              this.menuArguments = conversationId
+              this.$store.commit('setMenuStateChat', {
+                state: MENU_STATES.CONVERSATION,
+                args: conversationId
+              })
+
               this.isExpanded = true
 
               toastObject.goAway(0)
@@ -181,8 +195,11 @@ export default {
         return
       }
 
-      this.menuState = menuState
-      this.menuArguments = null
+      this.$store.commit('setMenuStateChat', {
+        state: menuState,
+        args: null
+      })
+
       this.toggle()
     },
     handleResize (e) {
@@ -197,6 +214,12 @@ export default {
     }
   },
   computed: {
+    menuState () {
+      return this.$store.state.menuStateChat
+    },
+    menuArguments () {
+      return this.$store.state.menuArgumentsChat
+    },
     unreadMessages () {
       return this.$store.state.unreadMessages
     },

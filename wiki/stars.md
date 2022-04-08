@@ -35,6 +35,17 @@ and a button for purchasing a warpgate at the star.
 
 ![The menu of a star](img/star-menu.png)
 
+## Special Star Types
+
+Some stars are different and grant special buffs and abilities, the possible star types are as follows:
+
+- **Normal Stars** - These stars have no special buffs or abilities.
+- **Black Holes** - Black Holes have `+3` Scanning Range but have reduced natural resources.
+- **Nebulas** - Ships inside a Nebula are hidden from all other players.
+- **Asteroid Fields** - Asteroid Fields have `x2` Defender Bonus in combat.
+- **Binary Stars** - Binary Star systems start with additional natural resources.
+- **Worm Holes** - Stars with Worm Holes come in pairs, travel between connected worm holes takes `1 tick`.
+
 ## Infrastructure
 
 There are 3 types of infrastructure that can be built at stars:

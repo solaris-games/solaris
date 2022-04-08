@@ -25,15 +25,15 @@
             </div>
             <div v-if="userPlayer">
                 <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Leaderboard (Q)"><i class="fas fa-users mr-2"></i>Leaderboard</a>
-                <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.RESEARCH)" title="Research (R)"><i class="fas fa-flask mr-2"></i>Research</a>
                 <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GALAXY)" title="Galaxy (G)"><i class="fas fa-sun mr-2"></i>Galaxy</a>
+                <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.RESEARCH)" title="Research (R)"><i class="fas fa-flask mr-2"></i>Research</a>
                 <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.DIPLOMACY)" title="Diplomacy (D)" v-if="isFormalAlliancesEnabled"><i class="fas fa-globe-americas mr-2"></i>Diplomacy</a>
                 <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEDGER)" title="Ledger (L)" v-if="isTradeEnabled"><i class="fas fa-file-invoice-dollar mr-2"></i>Ledger</a>
                 <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GAME_NOTES)" title="Notes (N)"><i class="fas fa-book-open mr-2"></i>Notes</a>
             </div>
             <a v-if="isLoggedIn && !isDarkModeExtra && !isDataCleaned" class="dropdown-item" v-on:click="setMenuState(MENU_STATES.INTEL)" title="Intel (I)"><i class="fas fa-chart-line mr-2"></i>Intel</a>
-            <a :href="documentationUrl" class="dropdown-item" target="_blank"><i class="far fa-question-circle mr-2"></i>How to Play</a>
             <a v-if="isLoggedIn" class="dropdown-item" v-on:click="setMenuState(MENU_STATES.OPTIONS)" title="Options (O)"><i class="fas fa-cog mr-2"></i>Options</a>
+            <a :href="documentationUrl" class="dropdown-item" target="_blank"><i class="far fa-question-circle mr-2"></i>How to Play</a>
             <router-link v-if="isLoggedIn" to="/game/active-games" class="dropdown-item"><i class="fas fa-dice mr-2"></i>My Games</router-link>
             <a v-if="isLoggedIn" class="dropdown-item" v-on:click="goToMainMenu()"><i class="fas fa-chevron-left mr-2"></i>Main Menu</a>
             <router-link v-if="!isLoggedIn" to="/" class="dropdown-item"><i class="fas fa-sign-in-alt mr-2"></i>Log In</router-link>
@@ -44,6 +44,7 @@
 
 <script>
 import GameHelper from '../../../services/gameHelper'
+import DiplomacyHelper from '../../../services/diplomacyHelper'
 import router from '../../../router'
 import MENU_STATES from '../../data/menuStates'
 import GameContainer from '../../../game/container'
@@ -63,7 +64,7 @@ export default {
   },
   methods: {
     setMenuState (state, args) {
-      this.$emit('onMenuStateChanged', {
+      this.$store.commit('setMenuState', {
         state,
         args
       })
@@ -90,7 +91,7 @@ export default {
       }
     },
     reloadPage () {
-      window.location.reload()
+      location.reload()
     }
   },
   computed: {
@@ -122,7 +123,7 @@ export default {
       return process.env.VUE_APP_DOCUMENTATION_URL
     },
     isFormalAlliancesEnabled () {
-      return GameHelper.isFormalAlliancesEnabled(this.$store.state.game)
+      return DiplomacyHelper.isFormalAlliancesEnabled(this.$store.state.game)
     },
     isTradeEnabled () {
       return GameHelper.isTradeEnabled(this.$store.state.game)

@@ -1,7 +1,7 @@
 import gameHelper from './gameHelper.js'
 
 class MentionHelper {
-  static MENTION_REGEX = /(#|@)(?:(?:{(.*?)})|([\w\[\]]*))/g
+  static MENTION_REGEX = /(#|@)(?:(?:{(.*?)})|([\w\[\]]+))/g
   static INTERNAL_MENTION_REGEX = /{{(\w)\/(\w+?)\/(.+?)}}/g
   static HYPERLINK_REGEX = /https?:\/\/\S+/g
   static STAR_MENTION_CHARACTER = '#'

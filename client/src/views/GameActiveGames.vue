@@ -40,10 +40,10 @@
                     <span v-if="game.userNotifications.defeated && !game.userNotifications.afk" class="ml-1 badge badge-danger">Defeated</span>
                     <span v-if="!game.userNotifications.defeated && game.userNotifications.turnWaiting" class="ml-1 badge badge-danger">Turn Waiting</span>
                     <span v-if="!game.userNotifications.defeated && game.userNotifications.unreadEvents" class="ml-1 badge badge-warning">{{game.userNotifications.unreadEvents}} Events</span>
-                    <span v-if="!game.userNotifications.defeated && game.userNotifications.unreadConversations" class="ml-1 badge badge-info">{{game.userNotifications.unreadConversations}} Messages</span>
+                    <span v-if="game.userNotifications.unreadConversations" class="ml-1 badge badge-info">{{game.userNotifications.unreadConversations}} Messages</span>
                     <span v-if="game.userNotifications.afk" class="ml-1 badge badge-warning">AFK</span>
 
-                    <div class="d-md-none">
+                    <div class="d-md-none text-info">
                       <small>
                         <span v-if="isGameWaitingForPlayers(game)">
                           Waiting for Players

@@ -11,7 +11,7 @@
             <p v-if="star.specialist">{{star.specialist.description}}</p>
             <p v-if="star.specialist && star.specialist.oneShot" class="text-warning"><small>This specialist cannot be replaced.</small></p>
             <p class="mb-2" v-if="!star.specialistId">
-                This star does not have a specialist assigned.
+                <i>This star does not have a specialist assigned.</i>
             </p>
         </div>
     </div>

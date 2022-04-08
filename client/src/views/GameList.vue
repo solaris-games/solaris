@@ -2,6 +2,8 @@
   <view-container>
     <view-title title="Join Game" />
 
+    <flux-bar class="mb-2"/>
+
     <ul class="nav nav-tabs">
       <li class="nav-item">
           <a class="nav-link active" data-toggle="tab" href="#newGames">New Games</a>
@@ -69,8 +71,25 @@
               </div>
             </div>
 
+            <!-- Flux -->
+            <div class="col-sm-12 col-md-4 col-lg-4 pr-1 pl-1" v-if="games.fluxRT">
+              <div class="card bg-dark text-white flux-game" @click="routeToPath('/game/detail', { id: games.fluxRT._id })">
+                <img class="card-img" :src="require('../assets/screenshots/home-5.png')" alt="Standard Game">
+                <div class="card-img-overlay">
+                  <h5 class="card-title flux-card-title">
+                    <i class="fas fa-dice-d20"></i>
+                    <span class="ml-2">{{games.fluxRT.settings.general.name}}</span>
+                  </h5>
+                  <p class="card-title card-subtitle flux-card-subtitle">
+                    {{getGameTypeFriendlyText(games.fluxRT)}}
+                    ({{games.fluxRT.state.players}}/{{games.fluxRT.settings.general.playerLimit}})
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <!-- Special Game -->
-            <div class="col-sm-12 col-md-8 col-lg-8 pl-1" v-if="games.special">
+            <div class="col-sm-12 col-md-4 col-lg-4 pl-1" v-if="games.special">
               <div class="card bg-dark text-white special-game" @click="routeToPath('/game/detail', { id: games.special._id })">
                 <img class="card-img" :src="require('../assets/screenshots/' + games.special.settings.general.type + '.png')" alt="Special Game">
                 <div class="card-img-overlay">
@@ -82,6 +101,8 @@
                       'fa-satellite': games.special.settings.general.type === 'special_orbital',
                       'fa-home': games.special.settings.general.type === 'special_homeStar',
                       'fa-user-secret': games.special.settings.general.type === 'special_anonymous',
+                      'fa-crown': games.special.settings.general.type === 'special_kingOfTheHill',
+                      'fa-search': games.special.settings.general.type === 'special_tinyGalaxy'
                     }"></i>
                     <span class="ml-2">{{games.special.settings.general.name}}</span>
                   </h5>
@@ -237,7 +258,7 @@
         <div class="tab-pane fade" id="inProgressGames">
           <h4>In Progress Games</h4>
 
-          <p class="mb-1">These games are in progress, you can join games with open slots. <b>Fill slots to earn additional rank!</b></p>
+          <p class="mb-1">These games are in progress, you can join games with open slots. <b>Fill slots to earn additional rank!</b> <help-tooltip class="ml-1" tooltip="Players who fill an AFK slot and will be awarded 1.5x additional rank (minimum 1) when the game ends"/></p>
 
           <p class="mb-2"><small class="text-warning" v-if="inProgressGames.length">Total Games: {{inProgressGames.length}}</small></p>
 
@@ -260,10 +281,12 @@
                   <tr v-for="game in inProgressGames" v-bind:key="game._id">
                       <td>
                         <router-link :to="{ path: '/game/detail', query: { id: game._id } }">{{game.settings.general.name}}</router-link>
+                        <br v-if="game.state.afkSlots"/>
+                        <span class="badge badge-warning" v-if="game.state.afkSlots">{{game.state.afkSlots}} Open Slot<span v-if="game.state.afkSlots > 1">s</span></span>
                         <br/>
                         <small>{{getGameTypeFriendlyText(game)}}</small>
                       </td>
-                      <td class="d-none d-md-table-cell text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
+                      <td class="d-none d-md-table-cell text-center" :class="{'text-warning':game.state.afkSlots}">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
                       <td class="d-none d-sm-table-cell text-center">{{game.state.productionTick}}</td>
                       <td>
                           <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-success float-right">
@@ -337,6 +360,8 @@ import TutorialGame from '../components/game/menu/TutorialGame'
 import gameService from '../services/api/game'
 import GameHelper from '../services/gameHelper'
 import RandomHelper from '../services/randomHelper'
+import HelpTooltip from '../components/HelpTooltip'
+import FluxBar from '../components/game/menu/FluxBar'
 import * as moment from 'moment'
 
 export default {
@@ -344,7 +369,9 @@ export default {
     'loading-spinner': LoadingSpinnerVue,
     'view-container': ViewContainer,
     'view-title': ViewTitle,
-    'tutorial-game': TutorialGame
+    'tutorial-game': TutorialGame,
+    'help-tooltip': HelpTooltip,
+    'flux-bar': FluxBar
   },
   data () {
     return {
@@ -361,7 +388,8 @@ export default {
         oneVsOneRT: null,
         oneVsOneTB: null,
         thirtyTwoPlayerRT: null,
-        special: null
+        special: null,
+        fluxRT: null
       }
     }
   },
@@ -391,6 +419,7 @@ export default {
       this.games.oneVsOneTB = this.getOfficialGame('1v1_tb')
       this.games.thirtyTwoPlayerRT = this.getOfficialGame('32_player_rt')
       this.games.special = this.getSpecialGame()
+      this.games.fluxRT = this.getOfficialGame('flux_rt')
     } catch (err) {
       console.error(err)
     }
@@ -411,7 +440,9 @@ export default {
         'special_orbital',
         'special_battleRoyale',
         'special_homeStar',
-        'special_anonymous'
+        'special_anonymous',
+        'special_kingOfTheHill',
+        'special_tinyGalaxy'
       ]
       
       return this.serverGames.find(x => types.includes(x.settings.general.type))
@@ -483,6 +514,10 @@ export default {
   background-color: #d62c1a;
 }
 
+.flux-card-title {
+  background-color: #3498DB;
+}
+
 .card-subtitle {
   font-size: 12px;
   position: absolute;
@@ -508,6 +543,10 @@ p.card-subtitle {
   background-color: #d62c1a;
 }
 
+.flux-card-subtitle {
+  background-color: #3498DB;
+}
+
 .new-player-game {
   border: 3px solid #f39c12;
 }
@@ -518,5 +557,9 @@ p.card-subtitle {
 
 .special-game {
   border: 3px solid #d62c1a;
+}
+
+.flux-game {
+  border: 3px solid #3498DB;
 }
 </style>

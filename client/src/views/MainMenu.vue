@@ -5,8 +5,8 @@
 
     <div class="row pb-0">
       <div class="col-sm-12 col-md-6 col-lg-5">
-        <p>A space strategy game filled with conquest, betrayal and subterfuge.</p>
-        <p>Welcome back<span v-if="user">, <span class="text-warning">{{user.username}}</span></span>!</p>
+        <p class="mb-1">A space strategy game filled with conquest, betrayal and subterfuge.</p>
+        <p><small><span class="text-warning">Solaris</span> is available on <a href="https://solaris.games" target="_blank" title="Web">Web</a>, <a href="https://store.steampowered.com/app/1623930/Solaris/" target="_blank" title="Steam">Steam</a> and <a href="https://play.google.com/store/apps/details?id=com.voxel.solaris_android" target="_blank" title="Android">Android</a>.</small></p>
       </div>
       <div class="col-sm-12 col-md-6 col-lg-7">
         <!-- player quick stats -->
@@ -79,11 +79,14 @@
 
     <hr/>
 
-    <div class="row pb-0">
-      <div class="col d-none d-md-block">
-        <leaderboard-user-table :limit="10"></leaderboard-user-table>
+    <!-- <div class="row">
+      <div class="col-12 col-lg-6">
+        <recent-donations :maxLength="null" />
       </div>
-    </div>
+      <div class="d-none d-lg-block col-6">
+        <iframe src="https://discord.com/widget?id=686524791943069734&theme=dark" style="width:100%;height:100%" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
+      </div>
+    </div> -->
   </view-container>
 </div>
 </template>
@@ -96,7 +99,6 @@ import userService from '../services/api/user'
 import ViewContainer from '../components/ViewContainer'
 import ViewTitle from '../components/ViewTitle'
 import Achievements from '../components/game/player/Achievements'
-import LeaderboardUserTable from '../components/game/menu/LeaderboardUserTable'
 import RecentDonations from '../components/game/donate/RecentDonations.vue'
 import TutorialGame from '../components/game/menu/TutorialGame'
 
@@ -106,7 +108,6 @@ export default {
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'achievements': Achievements,
-    'leaderboard-user-table': LeaderboardUserTable,
     'recent-donations': RecentDonations,
     'tutorial-game': TutorialGame
   },
@@ -129,6 +130,7 @@ export default {
       this.$store.commit('clearUserId')
       this.$store.commit('clearUsername')
       this.$store.commit('clearRoles')
+      this.$store.commit('clearUserCredits')
 
       this.isLoggingOut = false
 
@@ -140,6 +142,8 @@ export default {
 
         this.user = response.data
         this.achievements = response.data.achievements
+
+        this.$store.commit('setUserCredits', response.data.credits)
       } catch (err) {
         console.error(err)
       }

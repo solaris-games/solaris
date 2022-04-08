@@ -14,7 +14,6 @@ class TextureService {
     STAR_NEBULA_TEXTURES = []
     STAR_ASTEROID_FIELD_TEXTURES = []
     STAR_WORMHOLE_TEXTURES = []
-    NEBULA_TEXTURES = []
     SPECIALIST_TEXTURES = {}
     PLAYER_SYMBOLS = {}
     STAR_SYMBOLS = {}
@@ -64,12 +63,6 @@ class TextureService {
 
       this.STAR_TEXTURE = new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/stars/star.png')))
 
-      // NEBULAS
-      this.NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/neb1.png'))))
-      this.NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/neb2.png'))))
-      this.NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/neb3.png'))))
-      this.NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/neb4.png'))))
-
       // STARLESS NEBULAS
       this.STARLESS_NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/neb0-starless.png'))))
       this.STARLESS_NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/nebula/neb1-starless.png'))))
@@ -114,6 +107,11 @@ class TextureService {
       this._loadSpecialistTexture('starfighter')
       this._loadSpecialistTexture('double-ringed-orb')
       this._loadSpecialistTexture('rocket')
+      this._loadSpecialistTexture('ray-gun')
+      this._loadSpecialistTexture('radar-dish')
+      this._loadSpecialistTexture('energy-tank')
+      this._loadSpecialistTexture('cryo-chamber')
+      this._loadSpecialistTexture('vintage-robot')
     }
 
     _loadSpecialistTexture(name) {
@@ -122,10 +120,8 @@ class TextureService {
       this.SPECIALIST_TEXTURES[name].baseTexture.mipmap = 0
     }
 
-    getSpecialistTexture(specialistId, isCarrier) {
-      let name = gameHelper.getSpecialistName(isCarrier ? 'carrier':'star', specialistId)
-
-      return this.SPECIALIST_TEXTURES[name]
+    getSpecialistTexture(specialistKey) {
+      return this.SPECIALIST_TEXTURES[specialistKey]
     }
 
     _loadPlayerSymbols() {
@@ -163,6 +159,10 @@ class TextureService {
       this.STAR_SYMBOLS['scannable'] = new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/128x128_star_scannable.svg')))
       this.STAR_SYMBOLS['unscannable'] = new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/128x128_star_unscannable.svg')))
       this.STAR_SYMBOLS['home'] = new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/128x128_star_home.svg')))
+      this.STAR_SYMBOLS['black_hole'] = new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/128x128_star_black_hole.svg')))
+      this.STAR_SYMBOLS['black_hole_binary'] = new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/128x128_star_black_hole_binary.svg')))
+      this.STAR_SYMBOLS['binary_scannable'] = new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/128x128_star_scannable_binary.svg')))
+      this.STAR_SYMBOLS['binary_unscannable'] = new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/128x128_star_unscannable_binary.svg')))
     }
 
     getRandomStarNebulaTexture(seed) {

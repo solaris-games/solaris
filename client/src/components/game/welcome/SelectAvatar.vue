@@ -94,7 +94,7 @@ export default {
     },
     getAvatarImage () {
       try {
-        return require('../../../assets/avatars/' + this.avatar.id + '.png')
+        return require('../../../assets/avatars/' + this.avatar.file)
       } catch (err) {
         console.error(err)
         

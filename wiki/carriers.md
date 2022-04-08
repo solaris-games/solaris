@@ -25,4 +25,9 @@ By default a Carrier will transfer **all** garrisoned Ships at the Star it was b
 
 By default, Carrier waypoints will **Collect All Ships** when landing at a destination. To change that, after setting a carrier's waypoints click save and edit to change what actions the carrier will perform at its next waypoint.
 
-Carriers can also be gifted to other players. When a gifted carrier arrives at its destination the player who owns the star will gain control of the carrier and its ships. Note that if a carrier has a specialist, that specialist will be retired.
+## Gifting Carrier
+Carriers can be gifted to other players. When a gifted carrier arrives at its destination the player who owns the star will gain control of the carrier and its ships.
+
+To gift a carrier to another player, open the carrier detail page and click on the "Gift" button.
+
+*Note: If a carrier has a specialist, that specialist will be retired unless the player is allied with you.*

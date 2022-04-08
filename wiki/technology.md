@@ -14,21 +14,23 @@ Improves the visible area star a star can see. The higher your scanning, the fur
 
 The equation is `(scanning + 1) * lightYear`.
 
-*Note: A `lightYear` distance unit is `50`.*
+> Note: A `lightYear` distance unit is `50`.
 
 ## Hyperspace Range
 
-Improves the distance a carrier can travel in betweeneach waypoint. 
+Improves the distance a carrier can travel in between each waypoint. 
 
 The equation is `(hyperspace + 1.5) * lightYear`.
 
-*Note: A `lightYear` distance unit is `50`.*
+> Note: A `lightYear` distance unit is `50`.
 
 ## Terraforming
 
 Improves the natural resources at Stars to make infrastructure upgrades cheaper. 
 
-The equation is `max(1, floor((baseCost * expenseConfig * (current + 1)) / (terraformedResources / 100)))`.
+The equation for terraformed resources is `floor(naturalResource + (5 * terraforming))`.
+
+The equation for infrastructure cost is `max(1, floor((baseCost * expenseConfig * (current + 1)) / (terraformedResources / 100)))`.
 
 Where `baseCost` is:
 
@@ -49,15 +51,23 @@ Where `expenseConfig` is:
 
 Grants a `50` bonus points per level to a random technology each production.
 
+The equation is:
+
+- Standard: `experimentation * 50`
+- Experimental: `(experimentation * 50) + (0.15 * experimentation * totalScience)`
+
 ## Weapons
 
-Improves the amount of enemy carriers each friendly carrier destroys in combat. Each carrier destroys enemy carriers exactly equal to the local weapons level.
+Improves the amount of enemy ships each friendly carrier destroys in combat. Each carrier destroys enemy ships exactly equal to the effective weapons level.
 
 ## Banking
 
 Earns extra credits every production cycle. 
 
-The equation is `(banking * 75) + (0.15 * banking * totalEco)` for standard and for legacy banking its `banking * 75`.
+The equation is:
+
+- Standard: `(banking * 75) + (0.15 * banking * totalEco)`
+- Legacy: `banking * 75`
 
 ## Manufacturing
 
@@ -68,4 +78,7 @@ The formula is a star produces `(X*(Y+5))/T` ships per tick, where `X` is the st
 ## Specialists
 Increases the number of specialist tokens awarded at the end of a galactic cycle, these are used to hire specialists. 
 
-The equation is `tokens = tech level` for standard and `ceil(min(star count * tech level * 0.1, tech level))` for experimental.
+The equation is:
+
+- Standard: `tokens = tech level`
+- Experimental: `ceil(min(star count * tech level * 0.1, tech level))`

@@ -9,7 +9,8 @@
     "playerType": "all",
     "anonymity": "normal",
     "playerOnlineStatus": "hidden",
-    "timeMachine": "enabled"
+    "timeMachine": "enabled",
+    "fluxEnabled": "disabled"
   },
   "galaxy": {
     "galaxyType": "circular",
@@ -26,6 +27,7 @@
     "randomWormHoles": 10,
     "randomNebulas": 15,
     "randomAsteroidFields": 10,
+    "randomBinaryStars": 10,
     "randomBlackHoles": 5,
     "darkGalaxy": "disabled",
     "giftCarriers": "enabled",
@@ -42,12 +44,11 @@
   },
   "conquest": {
     "victoryCondition": "starPercentage",
-    "victoryPercentage": 66
+    "victoryPercentage": 50
   },
   "orbitalMechanics": {
     "enabled": "disabled",
-    "orbitSpeed": 5,
-    "orbitOrigin": "galacticCenter"
+    "orbitSpeed": 3
   },
   "player": {
     "startingStars": 3,
@@ -67,8 +68,14 @@
     "tradeCredits": true,
     "tradeCreditsSpecialists": true,
     "tradeCost": 15,
-    "tradeScanning": "all",
-    "alliances": "enabled"
+    "tradeScanning": "all"
+  },
+  "diplomacy": {
+    "enabled": "enabled",
+    "upkeepCost": "none",
+    "tradeRestricted": "disabled", 
+    "maxAlliances": 3, 
+    "globalEvents": "disabled"
   },
   "technology": {
     "startingTechnologyLevel": {
@@ -92,11 +99,13 @@
       "specialists": "standard"
     },
     "bankingReward": "standard",
+    "experimentationReward": "standard",
     "specialistTokenReward": "standard"
   },
   "gameTime": {
     "gameType": "realTime",
     "speed": 1800,
+    "isTickLimited": "disabled",
     "startDelay": 60,
     "afk": {
       "lastSeenTimeout": 2,

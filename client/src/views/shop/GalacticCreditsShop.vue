@@ -3,14 +3,14 @@
     <view-title title="Galactic Credit Packs" />
 
     <p>
-      Purchase <span class="text-warning">Galactic Credits</span> to spend in the <router-link :to="{ name: 'avatars'}"><i class="fas fa-shopping-basket"></i> Avatar Store</router-link>!
+      Purchase <span class="text-warning">Galactic Credits</span> to spend in the <router-link :to="{ name: 'avatars'}"><i class="fas fa-shopping-basket"></i> Avatar Store</router-link> or award <strong>Badges</strong> to players!
     </p>
 
     <p>
       By purchasing packs, you help support the continued development of <strong>Solaris</strong>, any purchase will award you with the <span class="text-info"><i class="fas fa-hands-helping"></i> Contributor</span> badge on your player profile.
     </p>
 
-    <h5 v-if="userInfo">You have <span class="text-warning"><strong>{{userInfo.credits}}</strong> Galactic Credits</span>.</h5>
+    <h5 v-if="userCredits">You have <span class="text-warning"><strong>{{userCredits.credits}}</strong> Galactic Credits</span>.</h5>
 
     <hr/>
 
@@ -117,7 +117,7 @@ export default {
   data () {
     return {
       isLoading: false,
-      userInfo: null,
+      userCredits: null,
     }
   },
   async mounted () {
@@ -128,10 +128,12 @@ export default {
   methods: {
     async loadGalacticCredits () {
       try {
-        let response = await UserApiService.getMyUserInfo()
+        let response = await UserApiService.getUserCredits()
 
         if (response.status === 200) {
-            this.userInfo = response.data
+            this.userCredits = response.data
+
+            this.$store.commit('setUserCredits', response.data.credits)
         }
       } catch (err) {
           console.error(err)
