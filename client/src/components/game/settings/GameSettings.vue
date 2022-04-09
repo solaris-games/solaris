@@ -33,6 +33,11 @@
             :value="game.settings.kingOfTheHill.productionCycles"
             :compareValue="compareSettings.kingOfTheHill.productionCycles"
             v-if="game.settings.general.mode === 'kingOfTheHill'"/>
+          <game-setting-value title="Flux"
+            tooltip="Determines whether this month's flux is applied to the game"
+            :valueText="getFriendlyText(game.settings.general.fluxEnabled)"
+            :value="game.settings.general.fluxEnabled"
+            :compareValue="compareSettings.general.fluxEnabled"/>
           <game-setting-value title="Players"
             tooltip="Total number of player slots"
             :valueText="game.settings.general.playerLimit"
@@ -490,6 +495,11 @@
             :valueText="getFriendlyText(game.settings.technology.bankingReward)"
             :value="game.settings.technology.bankingReward"
             :compareValue="compareSettings.technology.bankingReward"/>
+          <game-setting-value title="Experimentation Reward"
+            tooltip="Determines the amount of research points awarded for the experimentation technology at the end of a galactic cycle"
+            :valueText="getFriendlyText(game.settings.technology.experimentationReward)"
+            :value="game.settings.technology.experimentationReward"
+            :compareValue="compareSettings.technology.experimentationReward"/>
           <game-setting-value title="Specialist Token Reward"
             tooltip="Determines the amount of specialist tokens awarded for the banking technology at the end of a galactic cycle"
             :valueText="getFriendlyText(game.settings.technology.specialistTokenReward)"
@@ -509,7 +519,6 @@
 
 <script>
 import ViewSubtitle from '../../ViewSubtitle.vue'
-import HelpTooltip from '../../HelpTooltip'
 import SpecialistBanList from '../specialist/SpecialistBanList'
 import GameApiService from '../../../services/api/game'
 import GameSettingValue from './GameSettingValue'
@@ -518,7 +527,6 @@ import LoadingSpinner from '../../LoadingSpinner'
 export default {
   components: {
     'view-subtitle': ViewSubtitle,
-    'help-tooltip': HelpTooltip,
     'specialist-ban-list': SpecialistBanList,
     'game-setting-value': GameSettingValue,
     'loading-spinner': LoadingSpinner

@@ -10,6 +10,7 @@
        "anonymity":"normal",
        "playerOnlineStatus":"hidden",
        "timeMachine":"disabled",
+       "fluxEnabled": "disabled",
        "advancedAI": "enabled"
     },
     "galaxy":{
@@ -102,6 +103,7 @@
           "specialists":"standard"
        },
        "bankingReward":"standard",
+       "experimentationReward": "standard",
        "specialistTokenReward":"standard"
     },
     "gameTime":{

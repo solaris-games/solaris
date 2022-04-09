@@ -14,4 +14,4 @@ You are welcome to join our [Discord](https://discord.com/invite/v7PD33d)
 
 If you like Solaris, you can [buy me a coffee](https://www.buymeacoffee.com/hyperi0n) or [support me on Patreon](https://www.patreon.com/hyperi0n_solaris)
 
-Solaris is free and open source, licensed under the MIT License. You can view the source code [here](https://github.com/mike-eason/solaris).
+Solaris is free and open source, licensed under the MIT License. You can view the source code [here](https://github.com/solaris-games/solaris).

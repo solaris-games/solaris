@@ -74,7 +74,7 @@
             <!-- Flux -->
             <div class="col-sm-12 col-md-4 col-lg-4 pr-1 pl-1" v-if="games.fluxRT">
               <div class="card bg-dark text-white flux-game" @click="routeToPath('/game/detail', { id: games.fluxRT._id })">
-                <img class="card-img" :src="require('../assets/screenshots/standard_rt.png')" alt="Standard Game">
+                <img class="card-img" :src="require('../assets/screenshots/home-5.png')" alt="Standard Game">
                 <div class="card-img-overlay">
                   <h5 class="card-title flux-card-title">
                     <i class="fas fa-dice-d20"></i>

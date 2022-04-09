@@ -46,6 +46,7 @@ const schema = new Schema({
 			playerOnlineStatus: { type: Types.String, required: true, enum: ['hidden', 'visible'], default: 'hidden' },
 			timeMachine: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
 			awardRankTo: { type: Types.String, required: false, enum: ['all', 'winner'], default: 'all' },
+			fluxEnabled: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
 			advancedAI: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'enabled' }
         },
         galaxy: {
@@ -138,6 +139,7 @@ const schema = new Schema({
 				specialists: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' }
 			},
 			bankingReward: { type: Types.String, required: true, enum: ['standard', 'legacy'], default: 'standard' },
+			experimentationReward: { type: Types.String, required: true, enum: ['standard', 'experimental'], default: 'standard' },
 			specialistTokenReward: { type: Types.String, required: true, enum: ['standard', 'experimental'], default: 'standard' }
 		},
 		gameTime: {

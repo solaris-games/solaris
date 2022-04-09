@@ -71,6 +71,16 @@
              "value": "disabled",
              "text": "Disabled"
           }
+       ],
+       "fluxEnabled":[
+          {
+             "value":"enabled",
+             "text":"Enabled"
+          },
+          {
+             "value":"disabled",
+             "text":"Disabled"
+          }
        ]
     },
     "specialGalaxy":{
@@ -497,6 +507,16 @@
           {
              "value":"legacy",
              "text":"Legacy"
+          }
+       ],
+       "experimentationReward":[
+          {
+             "value":"standard",
+             "text":"Standard"
+          },
+          {
+             "value":"experimental",
+             "text":"Experimental"
           }
        ],
        "specialistTokenReward":[

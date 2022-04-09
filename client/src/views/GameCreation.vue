@@ -1,8 +1,8 @@
 <template>
   <view-container>
     <view-title title="Create Game" />
-    <loading-spinner :loading="!settings"/>
-    <loading-spinner :loading="isCreatingGame"/>
+    <loading-spinner :loading="!settings || isCreatingGame"/>
+
     <form @submit.prevent="handleSubmit" v-if="settings">
       <view-collapse-panel title="Game Settings" :startsOpened="true">
         <div class="form-group">
@@ -51,6 +51,7 @@
             <input type="range" min="1" max="25" step="1" class="form-range w-100" id="kingOfTheHillproductionCycles" v-model="settings.kingOfTheHill.productionCycles" :disabled="isCreatingGame">
           </div>
         </div>
+
         <form-error-list v-bind:errors="errors"/>
 
         <button type="submit" class="btn btn-success btn-lg mb-3 btn-block" :disabled="isCreatingGame"><i class="fas fa-gamepad"></i> Create Game</button>
@@ -197,6 +198,19 @@
       </view-collapse-panel>
 
       <view-subtitle title="Advanced Settings" class="centeredHeader"/>
+
+      <view-collapse-panel title="Flux">
+        <flux-bar />
+
+        <div class="form-group">
+          <label for="fluxEnabled" class="col-form-label">Enabled <help-tooltip tooltip="Determines whether this month's flux is applied to the game"/></label>
+          <select class="form-control" id="fluxEnabled" v-model="settings.general.fluxEnabled" :disabled="isCreatingGame">
+            <option v-for="opt in options.general.fluxEnabled" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+      </view-collapse-panel>
 
       <view-collapse-panel title="Galaxy Settings">
         <div class="form-group">
@@ -671,6 +685,15 @@
         </div>
 
         <div class="form-group">
+          <label for="experimentationReward" class="col-form-label">Experimentation Reward <help-tooltip tooltip="Determines the amount of research points awarded for the experimentation technology at the end of a galactic cycle"/></label>
+          <select class="form-control" id="experimentationReward" v-model="settings.technology.experimentationReward" :disabled="isCreatingGame">
+            <option v-for="opt in options.technology.experimentationReward" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
           <label for="specialistTokenReward" class="col-form-label">Specialist Token Reward <help-tooltip tooltip="Determines the amount of specialist tokens awarded for the banking technology at the end of a galactic cycle"/></label>
           <select class="form-control" id="specialistTokenReward" v-model="settings.technology.specialistTokenReward" :disabled="isCreatingGame">
             <option v-for="opt in options.technology.specialistTokenReward" v-bind:key="opt.value" v-bind:value="opt.value">
@@ -704,6 +727,7 @@ import ViewSubtitle from '../components/ViewSubtitle'
 import FormErrorList from '../components/FormErrorList'
 import HelpTooltip from '../components/HelpTooltip'
 import SpecialistBanListSelection from '../components/game/specialist/SpecialistBanListSelection'
+import FluxBar from '../components/game/menu/FluxBar'
 import gameService from '../services/api/game'
 import router from '../router'
 
@@ -716,7 +740,8 @@ export default {
     'view-subtitle': ViewSubtitle,
     'form-error-list': FormErrorList,
     'help-tooltip': HelpTooltip,
-    'specialist-ban-list-selection': SpecialistBanListSelection
+    'specialist-ban-list-selection': SpecialistBanListSelection,
+    'flux-bar': FluxBar
   },
   data () {
     return {

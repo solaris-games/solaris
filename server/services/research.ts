@@ -197,9 +197,24 @@ export default class ResearchService extends EventEmitter {
         if (!tech) {
             return noExperimentation;
         }
+        
+        let techLevel = player.research.experimentation.level;
+        let progressMultiplier = game.constants.research.progressMultiplier;
+        let experimentationMultiplier = game.constants.research.experimentationMultiplier;
+        let researchAmount;
 
-        let researchAmount = player.research.experimentation.level * (game.constants.research.progressMultiplier * game.constants.research.experimentationMultiplier);
-
+        switch (game.settings.technology.experimentationReward) {
+            case 'standard':
+                researchAmount = techLevel * (progressMultiplier * experimentationMultiplier);
+                break;
+            case 'experimental':
+                let totalScience = this.playerStatisticsService.calculateTotalScience(playerStars);
+                researchAmount = (techLevel * (progressMultiplier * experimentationMultiplier)) + (0.15 * techLevel * totalScience);
+                break;
+            default:
+                throw new Error(`Unsupported experimentation reward ${game.settings.technology.experimentationReward}`);
+        }
+        
         tech.technology.progress! += researchAmount;
 
         // If the current progress is greater than the required progress

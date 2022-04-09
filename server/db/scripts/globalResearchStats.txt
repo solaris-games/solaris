@@ -1,0 +1,30 @@
+// Stats for less than 100,000 to ignore players with stupid stats.
+db.users.aggregate([
+	{
+		$match: {
+			$and: [
+				{ 'achievements.research.scanning': { $lt: 100000 } },
+				{ 'achievements.research.hyperspace': { $lt: 100000 } },
+				{ 'achievements.research.terraforming': { $lt: 100000 } },
+				{ 'achievements.research.experimentation': { $lt: 100000 } },
+				{ 'achievements.research.weapons': { $lt: 100000 } },
+				{ 'achievements.research.banking': { $lt: 100000 } },
+				{ 'achievements.research.manufacturing': { $lt: 100000 } },
+				{ 'achievements.research.specialists': { $lt: 100000 } }
+			]
+		}
+	},
+	{
+		$group: {
+			_id: null,
+			scanning: { $sum: '$achievements.research.scanning' },
+			hyperspace: { $sum: '$achievements.research.hyperspace' },
+			terraforming: { $sum: '$achievements.research.terraforming' },
+			experimentation: { $sum: '$achievements.research.experimentation' },
+			weapons: { $sum: '$achievements.research.weapons' },
+			banking: { $sum: '$achievements.research.banking' },
+			manufacturing: { $sum: '$achievements.research.manufacturing' },
+			specialists: { $sum: '$achievements.research.specialists' }
+		}
+	}
+]);

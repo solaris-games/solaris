@@ -168,7 +168,7 @@ export default class EmailService {
         html = html.replace('[{solaris_url}]', process.env.CLIENT_URL);
         html = html.replace('[{solaris_url_gamelist}]', `${process.env.CLIENT_URL}/#/game/list`);
         html = html.replace('[{solaris_url_resetpassword}]', `${process.env.CLIENT_URL}/#/account/reset-password-external`);
-        html = html.replace('[{source_code_url}]', 'https://github.com/mike-eason/solaris');
+        html = html.replace('[{source_code_url}]', 'https://github.com/solaris-games/solaris');
 
         // Replace the parameters in the file
         for (let i = 0; i < parameters.length; i++) {
