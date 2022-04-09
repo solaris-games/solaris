@@ -13,7 +13,7 @@ import TechnologyService from "./technology";
 import WaypointService from "./waypoint";
 import { Star } from "../types/Star";
 import { Carrier } from "../types/Carrier";
-import { getOrInsert, reverseSort, notNull } from "../utils";
+import {getOrInsert, reverseSort, notNull, maxBy} from "../utils";
 import {CarrierWaypoint, CarrierWaypointActionType} from "../types/CarrierWaypoint";
 import ReputationService from "./reputation";
 import DiplomacyService from "./diplomacy";
@@ -80,6 +80,7 @@ interface Context {
     reachablePlayerStars: StarGraph;
     freelyReachableStars: StarGraph;
     allCanReachPlayerStars: StarGraph;
+    starsInGlobalRange: StarGraph;
     borderStars: Set<string>;
     carriersOrbiting: Map<string, Carrier[]>;
     carriersById: Map<string, Carrier>;
@@ -250,14 +251,15 @@ export default class AIService {
         }
 
         const traversableStars = game.galaxy.stars.filter(star => !star.ownedByPlayerId || star.ownedByPlayerId.toString() === playerId);
-        const allStars = this._computeStarGraph(game, player, game.galaxy.stars, game.galaxy.stars);
-        const allReachableFromPlayerStars = this._computeStarGraph(game, player, playerStars, game.galaxy.stars);
-        const allCanReachPlayerStars = this._computeStarGraph(game, player, game.galaxy.stars, playerStars);
-        const freelyReachableFromPlayerStars = this._computeStarGraph(game, player, playerStars, traversableStars);
-        const reachablePlayerStars = this._computeStarGraph(game, player, playerStars, playerStars);
-        const freelyReachableStars = this._computeStarGraph(game, player, traversableStars, traversableStars);
+        const allStars = this._computeStarGraph(game, player, game.galaxy.stars, game.galaxy.stars, this._getHyperspaceRange(game, player));
+        const allReachableFromPlayerStars = this._computeStarGraph(game, player, playerStars, game.galaxy.stars, this._getHyperspaceRange(game, player));
+        const allCanReachPlayerStars = this._computeStarGraph(game, player, game.galaxy.stars, playerStars, this._getHyperspaceRange(game, player));
+        const freelyReachableFromPlayerStars = this._computeStarGraph(game, player, playerStars, traversableStars, this._getHyperspaceRange(game, player));
+        const reachablePlayerStars = this._computeStarGraph(game, player, playerStars, playerStars, this._getHyperspaceRange(game, player));
+        const freelyReachableStars = this._computeStarGraph(game, player, traversableStars, traversableStars, this._getHyperspaceRange(game, player));
+        const starsInGlobalRange = this._computeStarGraph(game, player, playerStars, game.galaxy.stars, this._getGlobalHighestHyperspaceRange(game));
         const borderStars = new Set<string>();
-        for (const [from, reachables] of allReachableFromPlayerStars) {
+        for (const [from, reachables] of starsInGlobalRange) {
             for (const reachableId of reachables) {
                 const reachable = starsById.get(reachableId)!;
                 if (!reachable.ownedByPlayerId || reachable.ownedByPlayerId.toString() !== playerId) {
@@ -322,6 +324,7 @@ export default class AIService {
             allCanReachPlayerStars,
             freelyReachableStars,
             reachablePlayerStars,
+            starsInGlobalRange,
             borderStars,
             carriersOrbiting,
             carriersById,
@@ -881,12 +884,12 @@ export default class AIService {
     }
 
     _computeStarPriorities(game: Game, player: Player, context: Context): Map<string, number> {
-        const hyperspaceRange = this._getHyperspaceRange(game, player);
+        const hyperspaceRange = this._getGlobalHighestHyperspaceRange(game);
         const borderStarPriorities = new Map<string, number>();
 
         for (const borderStarId of context.borderStars) {
             const borderStar = context.starsById.get(borderStarId)!;
-            const reachables = context.allReachableFromPlayerStars.get(borderStarId)!;
+            const reachables = context.starsInGlobalRange.get(borderStarId)!;
             let score = 0;
 
             for (const reachableId of reachables) {
@@ -933,12 +936,16 @@ export default class AIService {
         return starPriorities;
     }
 
+    _getGlobalHighestHyperspaceRange(game: Game): number {
+        const highestLevel = maxBy((p: Player) => p.research.hyperspace.level, game.galaxy.players);
+        return this.distanceService.getHyperspaceDistance(game, highestLevel);
+    }
+
     _getHyperspaceRange(game: Game, player: Player): number {
         return this.distanceService.getHyperspaceDistance(game, player.research.hyperspace.level);
     }
 
-    _computeStarGraph(game: Game, player: Player, traverseStars: Star[], reachStars: Star[]): StarGraph {
-        const hyperspaceRange = this._getHyperspaceRange(game, player);
+    _computeStarGraph(game: Game, player: Player, traverseStars: Star[], reachStars: Star[], hyperspaceRange: number): StarGraph {
         const hyperspaceRangeSquared = hyperspaceRange * hyperspaceRange;
 
         const starGraph = new Map<string, Set<string>>();
