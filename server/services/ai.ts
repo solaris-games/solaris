@@ -74,7 +74,6 @@ interface Context {
     playerStars: Star[];
     playerCarriers: Carrier[];
     starsById: Map<string, Star>;
-    allStars: StarGraph;
     allReachableFromPlayerStars: StarGraph;
     freelyReachableFromPlayerStars: StarGraph;
     reachablePlayerStars: StarGraph;
@@ -251,7 +250,6 @@ export default class AIService {
         }
 
         const traversableStars = game.galaxy.stars.filter(star => !star.ownedByPlayerId || star.ownedByPlayerId.toString() === playerId);
-        const allStars = this._computeStarGraph(game, player, game.galaxy.stars, game.galaxy.stars, this._getHyperspaceRange(game, player));
         const allReachableFromPlayerStars = this._computeStarGraph(game, player, playerStars, game.galaxy.stars, this._getHyperspaceRange(game, player));
         const allCanReachPlayerStars = this._computeStarGraph(game, player, game.galaxy.stars, playerStars, this._getHyperspaceRange(game, player));
         const freelyReachableFromPlayerStars = this._computeStarGraph(game, player, playerStars, traversableStars, this._getHyperspaceRange(game, player));
@@ -318,7 +316,6 @@ export default class AIService {
             playerStars,
             playerCarriers,
             starsById,
-            allStars,
             allReachableFromPlayerStars,
             freelyReachableFromPlayerStars,
             allCanReachPlayerStars,
