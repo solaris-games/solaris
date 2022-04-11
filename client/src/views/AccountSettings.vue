@@ -61,25 +61,19 @@
         </div>
       </div>
 
-      <!-- TODO: This should be in a component -->
       <div class="row pt-3 pb-3 bg-secondary">
         <div class="col">
           <p>Discord Integration</p>
         </div>
-        <div class="col">
-          <p class="text-right">
-            <!-- TODO -->
-            <!-- <button class="btn btn-danger" v-if="isAuthenticatedWithDiscord" @click="unlinkDiscordAccount">
-              Unlink
-              <i class="fas fa-times"></i>
-            </button> -->
-            <a class="btn"
-              :class="{'btn-success':isAuthenticatedWithDiscord,'btn-primary':!isAuthenticatedWithDiscord}"
-              :href="discordOauthURL">
-              {{isAuthenticatedWithDiscord ? 'Linked' : 'Login'}}
-              <i :class="{'fas fa-check':isAuthenticatedWithDiscord,'fab fa-discord':!isAuthenticatedWithDiscord}"></i>
-            </a>
-          </p>
+        <div class="col text-right">
+          <a class="btn btn-success" v-if="isAuthenticatedWithDiscord" @click="unlinkDiscordAccount">
+            Unlink
+            <i class="fas fa-check"></i>
+          </a>
+          <a id="discordLogin" class="btn btn-primary" v-if="!isAuthenticatedWithDiscord" :href="discordOauthURL">
+            Login
+            <i class="fab fa-discord"></i>
+          </a>
         </div>
       </div>
     </div>

@@ -87,6 +87,7 @@ export default (router: Router, io, container: DependencyContainer) => {
                     scope: 'identify',
                 } as any);
 
+                // This API request does not work?
                 const oauthResult = await axios.post('https://discord.com/api/oauth2/token', params, {
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
