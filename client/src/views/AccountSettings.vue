@@ -67,11 +67,11 @@
         </div>
         <div class="col text-right">
           <a class="btn btn-success" v-if="isAuthenticatedWithDiscord" @click="unlinkDiscordAccount">
-            Unlink
+            Connected
             <i class="fas fa-check"></i>
           </a>
           <a id="discordLogin" class="btn btn-primary" v-if="!isAuthenticatedWithDiscord" :href="discordOauthURL">
-            Login
+            Connect
             <i class="fab fa-discord"></i>
           </a>
         </div>
@@ -170,6 +170,9 @@ export default {
       }
 
       this.isClosingAccount = false
+    },
+    async unlinkDiscordAccount () {
+      alert('not implemented yet')
     }
   },
   computed: {
@@ -177,7 +180,7 @@ export default {
       return process.env.VUE_APP_DISCORD_OAUTH_URL
     },
     isAuthenticatedWithDiscord () {
-      return this.info.oauth.discord.userId != null
+      return this.info.oauth && this.info.oauth.discord.userId != null
     }
   }
 }
