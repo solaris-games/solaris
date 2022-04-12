@@ -78,6 +78,7 @@ export default (router: Router, io, container: DependencyContainer) => {
             try {
                 await container.authService.clearOauthDiscord(req.session.userId);
 
+                // Documentation: https://discordjs.guide/oauth2/#a-quick-example
                 const params = new URLSearchParams({
                     client_id: process.env.DISCORD_CLIENTID,
                     client_secret: process.env.DISCORD_CLIENT_SECRET,
@@ -87,7 +88,6 @@ export default (router: Router, io, container: DependencyContainer) => {
                     scope: 'identify',
                 } as any);
 
-                // This API request does not work?
                 const oauthResult = await axios.post('https://discord.com/api/oauth2/token', params, {
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
