@@ -154,6 +154,7 @@ export default {
           'playerConversationLeft'
         ],
         diplomacy: [
+          'playerDiplomacyStatusChanged',
           'gameDiplomacyPeaceDeclared',
           'gameDiplomacyWarDeclared',
           'gameDiplomacyAllianceDeclared'

@@ -158,30 +158,24 @@
         </div>
 
         <div class="form-group">
-          <label for="lastSeenTimeout" class="col-form-label">AFK Last Seen Limit <help-tooltip tooltip="Determines how long before a player is kicked for being AFK - This is paired with the AFK Galactic Cycle Limit setting, the timeout is whichever comes first"/></label>
-          <select class="form-control" id="lastSeenTimeout" v-model="settings.gameTime.afk.lastSeenTimeout" :disabled="isCreatingGame">
-            <option v-for="opt in options.gameTime.afk.lastSeenTimeout" v-bind:key="opt.value" v-bind:value="opt.value">
-              {{ opt.text }}
-            </option>
-          </select>
+          <label for="lastSeenTimeout" class="col-form-label">AFK Last Seen Limit (<span class="text-warning">{{settings.gameTime.afk.lastSeenTimeout}} day(s)</span>) <help-tooltip tooltip="Determines how long before a player is kicked for being AFK - This is paired with the AFK Galactic Cycle Limit setting, the timeout is whichever comes first"/></label>
+          <div class="col">
+            <input type="range" min="1" max="7" step="1" class="form-range w-100" id="lastSeenTimeout" v-model="settings.gameTime.afk.lastSeenTimeout" :disabled="isCreatingGame">
+          </div>
         </div>
 
         <div class="form-group" v-if="settings.gameTime.gameType === 'realTime'">
-          <label for="cycleTimeout" class="col-form-label">AFK Galactic Cycle Limit <help-tooltip tooltip="Determines how many cycles before a player is kicked before being AFK - This is paired with the AFK Last Seen Limit setting, the timeout is whichever comes first"/></label>
-          <select class="form-control" id="cycleTimeout" v-model="settings.gameTime.afk.cycleTimeout" :disabled="isCreatingGame">
-            <option v-for="opt in options.gameTime.afk.cycleTimeout" v-bind:key="opt.value" v-bind:value="opt.value">
-              {{ opt.text }}
-            </option>
-          </select>
+          <label for="cycleTimeout" class="col-form-label">AFK Galactic Cycle Limit (<span class="text-warning">{{settings.gameTime.afk.cycleTimeout}} cycles</span>) <help-tooltip tooltip="Determines how many cycles before a player is kicked before being AFK - This is paired with the AFK Last Seen Limit setting, the timeout is whichever comes first"/></label>
+          <div class="col">
+            <input type="range" min="3" max="25" step="1" class="form-range w-100" id="cycleTimeout" v-model="settings.gameTime.afk.cycleTimeout" :disabled="isCreatingGame">
+          </div>
         </div>
 
         <div class="form-group" v-if="settings.gameTime.gameType === 'turnBased'">
-          <label for="turnTimeout" class="col-form-label">AFK Missed Turn Limit <help-tooltip tooltip="Determines how many missed turns before a player is kicked before being AFK - This is paired with the AFK Last Seen Limit setting, the timeout is whichever comes first"/></label>
-          <select class="form-control" id="turnTimeout" v-model="settings.gameTime.afk.turnTimeout" :disabled="isCreatingGame">
-            <option v-for="opt in options.gameTime.afk.turnTimeout" v-bind:key="opt.value" v-bind:value="opt.value">
-              {{ opt.text }}
-            </option>
-          </select>
+          <label for="turnTimeout" class="col-form-label">AFK Missed Turn Limit (<span class="text-warning">{{settings.gameTime.afk.turnTimeout}} missed turn(s)</span>) <help-tooltip tooltip="Determines how many missed turns before a player is kicked before being AFK - This is paired with the AFK Last Seen Limit setting, the timeout is whichever comes first"/></label>
+          <div class="col">
+            <input type="range" min="1" max="60" step="1" class="form-range w-100" id="turnTimeout" v-model="settings.gameTime.afk.turnTimeout" :disabled="isCreatingGame">
+          </div>
         </div>
 
       </view-collapse-panel>

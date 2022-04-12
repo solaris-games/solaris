@@ -127,8 +127,8 @@ export default (router: Router, io, container: DependencyContainer) => {
             errors.push('defender.ships is required.');
         }
 
-        if (+req.body.defender.ships <= 0) {
-            errors.push('defender.ships must be greater than 0.');
+        if (+req.body.defender.ships < 0) {
+            errors.push('defender.ships must be greater than or equal to 0.');
         }
 
         if (req.body.defender.weaponsLevel == null) {
@@ -143,8 +143,8 @@ export default (router: Router, io, container: DependencyContainer) => {
             errors.push('attacker.ships is required.');
         }
 
-        if (+req.body.attacker.ships <= 0) {
-            errors.push('attacker.ships must be greater than 0.');
+        if (+req.body.attacker.ships < 0) {
+            errors.push('attacker.ships must be greater than or equal to 0.');
         }
 
         if (req.body.attacker.weaponsLevel == null) {
