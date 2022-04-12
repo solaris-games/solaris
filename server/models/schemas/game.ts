@@ -152,7 +152,7 @@ const schema = new Schema({
 			tickLimit: { type: Types.Number, required: false, min: 200, max: 2000, default: null },
 			afk: {
 				lastSeenTimeout: { type: Types.Number, required: true, min: 1, max: 7, default: 2}, // Time in days, real time and turn based
-				cycleTimeout: { type: Types.Number, required: true, min: 3, max: 10, default: 3}, // Real time games' production cycle limit
+				cycleTimeout: { type: Types.Number, required: true, min: 3, max: 25, default: 3}, // Real time games' production cycle limit
 				turnTimeout: { type: Types.Number, required: true, min: 1, max: 60, default: 3 },	// Turn based games' missed turn limit
 			}
 		}

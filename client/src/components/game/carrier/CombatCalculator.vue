@@ -189,16 +189,16 @@ export default {
         this.errors.push('Defender weapons level must be greater than 0.')
       }
 
-      if (this.defender.ships <= 0) {
-        this.errors.push('Defender ships must be greater than 0.')
+      if (this.defender.ships < 0) {
+        this.errors.push('Defender ships must be greater than or equal to 0.')
       }
 
       if (this.attacker.weaponsLevel <= 0) {
         this.errors.push('Attacker weapons level must be greater than 0.')
       }
 
-      if (this.attacker.ships <= 0) {
-        this.errors.push('Attacker ships must be greater than 0.')
+      if (this.attacker.ships < 0) {
+        this.errors.push('Attacker ships must be greater than or equal to 0.')
       }
 
       if (e) {
