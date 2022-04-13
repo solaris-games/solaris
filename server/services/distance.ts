@@ -4,7 +4,7 @@ import { Location } from "../types/Location";
 export default class DistanceService {  
 
     getDistanceBetweenLocations(loc1: Location, loc2: Location) {
-        return Math.sqrt(this.getDistanceSquaredBetweenLocations(loc1, loc2));
+        return Math.hypot(loc2.x - loc1.x, loc2.y - loc1.y);
     }
 
     getDistanceAlongLocationList(locations: Location[]) {

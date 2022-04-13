@@ -89,7 +89,7 @@ export default class CarrierService extends EventEmitter {
             waypoints: [],
             waypointsLooped: false,
             specialistId: null,
-            specialist: undefined,
+            specialist: null,
             isGift: false,
             locationNext: null,
             toObject(): Carrier {
