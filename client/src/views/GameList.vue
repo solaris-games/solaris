@@ -45,7 +45,7 @@
 
           <h4>Standard Games</h4>
 
-          <p>These are official games and award rank.</p>
+          <p>These are official games and award rank.<help-tooltip class="ml-1" tooltip="Note: New Player games do not award rank - 1v1 games do not award galactic credits"/></p>
 
           <loading-spinner :loading="isLoading"/>
 
