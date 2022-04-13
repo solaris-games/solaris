@@ -1,3 +1,4 @@
+import { Config } from "./Config";
 import AchievementService from "../services/achievement";
 import AdminService from "../services/admin";
 import AIService from "../services/ai";
@@ -62,6 +63,7 @@ import UserService from "../services/user";
 import WaypointService from "../services/waypoint";
 
 export interface DependencyContainer {
+    config: Config,
     adminService: AdminService,
     passwordService: PasswordService,
     authService: AuthService,
