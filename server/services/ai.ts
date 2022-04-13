@@ -193,7 +193,7 @@ export default class AIService {
     async _doAdvancedLogic(game: Game, player: Player, isFirstTick: boolean, isLastTick: boolean) {
         let aiState: AiState;
         if (isFirstTick || !player.ai || !player.aiState) {
-            aiState = this._setupAi(game, player);
+            aiState = this._createInitialAIState(game, player);
             player.ai = true;
         } else  {
             aiState = player.aiState;
@@ -210,7 +210,7 @@ export default class AIService {
         player.markModified('aiState');
     }
 
-    _setupAi(game: Game, player: Player): AiState {
+    _createInitialAIState(game: Game, player: Player): AiState {
         const state = {
             knownAttacks: [],
             startedClaims: [],
