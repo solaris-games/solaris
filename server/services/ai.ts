@@ -667,7 +667,7 @@ export default class AIService {
             weaponsLevel: this.technologyService.getStarEffectiveWeaponsLevel(game, [defendingPlayer], starToInvade, defendingCarriers)
         };
         const attacker = {
-            ships: 1, // Just needed so we can get the actually needed number
+            ships: 0,
             weaponsLevel: player.research.weapons.level
         };
 
