@@ -164,22 +164,24 @@ export default class AIService {
         const isFirstTick = game.state.tick % game.settings.galaxy.productionTicks === 1;
         const isLastTick = game.state.tick % game.settings.galaxy.productionTicks === game.settings.galaxy.productionTicks - 1;
 
-        if (game.settings.general.advancedAI === 'enabled') {
-            await this._doAdvancedLogic(game, player, isFirstTick, isLastTick);
-        }
+        // Considering the growing complexity of AI logic,
+        // it's better to catch any possible errors and have the game continue with disfunctional AI than to break the game tick logic.
+        try {
+            if (game.settings.general.advancedAI === 'enabled') {
+                await this._doAdvancedLogic(game, player, isFirstTick, isLastTick);
+            }
 
-        await this._doBasicLogic(game, player, isFirstTick, isLastTick);
+            await this._doBasicLogic(game, player, isFirstTick, isLastTick);
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     async _doBasicLogic(game: Game, player: Player, isFirstTick: boolean, isLastTick: boolean) {
-        try {
-            if (isFirstTick) {
-                await this._playFirstTick(game, player);
-            } else if (isLastTick) {
-                await this._playLastTick(game, player);
-            }
-        } catch (e) {
-            console.error(e);
+        if (isFirstTick) {
+            await this._playFirstTick(game, player);
+        } else if (isLastTick) {
+            await this._playLastTick(game, player);
         }
 
         // TODO: Not sure if this is an issue but there was an occassion during debugging
@@ -189,29 +191,23 @@ export default class AIService {
     }
 
     async _doAdvancedLogic(game: Game, player: Player, isFirstTick: boolean, isLastTick: boolean) {
-        // Considering the growing complexity of AI logic, 
-        // it's better to catch any possible errors and have the game continue with disfunctional AI than to break the game tick logic.
-        try {
-            let aiState: AiState;
-            if (isFirstTick || !player.ai || !player.aiState) {
-                aiState = this._setupAi(game, player);
-                player.ai = true;
-            } else  {
-                aiState = player.aiState;
-            }
-            const context = this._createContext(game, player, aiState);
-            this._updateState(game, player, context);
-            const orders = this._gatherOrders(game, player, context);
-            const assignments = await this._gatherAssignments(game, player, context);
-            await this._evaluateOrders(game, player, context, orders, assignments);
-
-            player.aiState = context.aiState;
-            // Mongoose method that cannot be typechecked
-            // @ts-ignore
-            player.markModified('aiState');
-        } catch (e) {
-            console.error(e);
+        let aiState: AiState;
+        if (isFirstTick || !player.ai || !player.aiState) {
+            aiState = this._setupAi(game, player);
+            player.ai = true;
+        } else  {
+            aiState = player.aiState;
         }
+        const context = this._createContext(game, player, aiState);
+        this._updateState(game, player, context);
+        const orders = this._gatherOrders(game, player, context);
+        const assignments = await this._gatherAssignments(game, player, context);
+        await this._evaluateOrders(game, player, context, orders, assignments);
+
+        player.aiState = context.aiState;
+        // Mongoose method that cannot be typechecked
+        // @ts-ignore
+        player.markModified('aiState');
     }
 
     _setupAi(game: Game, player: Player): AiState {
