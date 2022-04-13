@@ -280,18 +280,18 @@ export default class AIService {
         const incomingCarriers = game.galaxy.carriers
             .filter(carrier => carrier.ownedByPlayerId!.toString() !== playerId)
             .map(carrier => {
-                const waypoint = carrier.waypoints.find(wp => {
-                    const star = starsById.get(wp.destination.toString())!;
-                    return star.ownedByPlayerId && star.ownedByPlayerId.toString() === playerId;
-                });
-                if (waypoint) {
-                    return {
-                        carrier,
-                        waypoint
+                if (carrier.waypoints.length > 0) {
+                    const waypoint = carrier.waypoints[0];
+                    const destinationId = waypoint.destination;
+                    const destinationStar = starsById.get(destinationId.toString())!;
+                    if (destinationStar.ownedByPlayerId && destinationStar.ownedByPlayerId.toString() === playerId) {
+                        return {
+                            carrier,
+                            waypoint
+                        }
                     }
-                } else {
-                    return null;
                 }
+                return null;
             })
             .filter(notNull);
 
