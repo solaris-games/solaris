@@ -1,6 +1,6 @@
 <template>
 <div>
-  <div class="row bg-primary mb-3">
+  <div class="row bg-primary mb-2">
     <div class="col">
       <h4 class="mt-3 mb-3">{{ title }}</h4>
     </div>
@@ -19,8 +19,8 @@ export default {
   props: {
     title: String,
     startsOpened: {
-        default: false,
-        type: Boolean
+      default: false,
+      type: Boolean
     }
   },
   data() {
@@ -31,9 +31,9 @@ export default {
   mounted () {
     this.isCollapsed = !this.startsOpened || false
   },
-  methods:{
+  methods: {
     toggle () {
-        this.isCollapsed = !this.isCollapsed;
+      this.isCollapsed = !this.isCollapsed;
     }
   },
   computed: {

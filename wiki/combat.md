@@ -10,7 +10,7 @@ Starting with the defender, each player takes it in turns to deal damage to the 
 
 If multiple opposing Players are in combat at the same time, they will be split into Attackers and Defenders. Where the defender is the player who owns the star and the attackers are all other players. Combat is repeated until there is one player remaining.
 
-When a Star is captured, all of its Economy is destroyed and the winner is awarded 10 credits per point of Economy. Industry, Science, Warp Gates and Star Specialists are undamaged and are captured by the winning player.
+When a Star is captured, all of its Economy is destroyed and the winner is awarded credits (default $10) per point of Economy. Industry, Science, Warp Gates and Star Specialists are undamaged and are captured by the winning player.
 
 Combat can also occur between two carriers. When two carriers from different players intercept each other they will engage in carrier to carrier combat. In carrier to carrier combat there is no defender bonus.
 

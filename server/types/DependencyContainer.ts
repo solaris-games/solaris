@@ -1,3 +1,4 @@
+import { Config } from "./Config";
 import AchievementService from "../services/achievement";
 import AdminService from "../services/admin";
 import AIService from "../services/ai";
@@ -21,6 +22,7 @@ import EventService from "../services/event";
 import GameService from "../services/game";
 import GameCreateService from "../services/gameCreate";
 import GameCreateValidationService from "../services/gameCreateValidation";
+import GameFluxService from "../services/gameFlux";
 import GameGalaxyService from "../services/gameGalaxy";
 import GameListService from "../services/gameList";
 import GameStateService from "../services/gameState";
@@ -61,6 +63,7 @@ import UserService from "../services/user";
 import WaypointService from "../services/waypoint";
 
 export interface DependencyContainer {
+    config: Config,
     adminService: AdminService,
     passwordService: PasswordService,
     authService: AuthService,
@@ -122,4 +125,5 @@ export interface DependencyContainer {
     carrierMovementService: CarrierMovementService,
     playerCycleRewardsService: PlayerCycleRewardsService,
     starContestedService: StarContestedService,
+    gameFluxService: GameFluxService,
 };

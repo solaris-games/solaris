@@ -1,382 +1,505 @@
 <template>
-  <div>
+<div>
+  <loading-spinner :loading="!game || !compareSettings"/>
+
+  <div v-if="game && compareSettings">
+    <p class="mb-2">
+      <small>Settings are <span class="text-warning">highlighted</span> if they differ from standard.</small>
+    </p>
     <view-subtitle title="General Settings"/>
-    <div class="table-responsive" v-if="game">
+    <div class="table-responsive">
       <table class="table table-striped table-hover">
         <tbody>
-          <tr>
-            <td>Mode <help-tooltip tooltip="The game mode Conquest is victory by stars, Battle Royale is last man standing in a constantly shrinking galaxy and King of the Hill is a fight for a key star"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.general.mode) }}</td>
-          </tr>
-          <tr v-if="game.settings.general.mode === 'conquest'">
-            <td>Victory Condition <help-tooltip tooltip="The victory condition in which a Conquest game will be decided."/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.conquest.victoryCondition) }}</td>
-          </tr>
-          <tr v-if="game.settings.general.mode === 'conquest'">
-            <td>Stars For Victory <help-tooltip tooltip="How many stars are needed for a player to win the game"/></td>
-            <td class="text-right">{{ game.settings.conquest.victoryPercentage }}%</td>
-          </tr>
-          <tr v-if="game.settings.general.mode === 'kingOfTheHill'">
-            <td>Countdown Cycles <help-tooltip tooltip="How long the countdown is to the end of the game in production cycles when the center star is captured"/></td>
-            <td class="text-right">{{ game.settings.kingOfTheHill.productionCycles }}</td>
-          </tr>
-          <tr>
-            <td>Players <help-tooltip tooltip="Total number of player slots"/></td>
-            <td class="text-right">{{ game.settings.general.playerLimit }}</td>
-          </tr>
-          <tr>
-            <td>Player Type <help-tooltip tooltip="Determines what type of players can join the game"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.general.playerType) }}</td>
-          </tr>
-          <tr>
-            <td>Anonymity <help-tooltip tooltip="Extra anonymity will hide player identities such as their Victories, Rank and Renown"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.general.anonymity) }}</td>
-          </tr>
-          <tr>
-            <td>Player Online Status <help-tooltip tooltip="Determines whether players can see who is online in real time"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.general.playerOnlineStatus) }}</td>
-          </tr>
+          <game-setting-value title="Mode"
+            tooltip="The game mode Conquest is victory by stars, Battle Royale is last man standing in a constantly shrinking galaxy and King of the Hill is a fight for a key star"
+            :valueText="getFriendlyText(game.settings.general.mode)"
+            :value="game.settings.general.mode"
+            :compareValue="compareSettings.general.mode"/>
+          <game-setting-value title="Victory Condition"
+            tooltip="The victory condition in which a Conquest game will be decided."
+            :valueText="getFriendlyText(game.settings.conquest.victoryCondition)"
+            :value="game.settings.conquest.victoryCondition"
+            :compareValue="compareSettings.conquest.victoryCondition"
+            v-if="game.settings.general.mode === 'conquest'"/>
+          <game-setting-value title="Stars For Victory"
+            tooltip="How many stars are needed for a player to win the game"
+            :valueText="game.settings.conquest.victoryPercentage + '%'"
+            :value="game.settings.conquest.victoryPercentage"
+            :compareValue="compareSettings.conquest.victoryPercentage"
+            v-if="game.settings.general.mode === 'conquest'"/>
+          <game-setting-value title="Countdown Cycles"
+            tooltip="How long the countdown is to the end of the game in production cycles when the center star is captured"
+            :valueText="game.settings.kingOfTheHill.productionCycles"
+            :value="game.settings.kingOfTheHill.productionCycles"
+            :compareValue="compareSettings.kingOfTheHill.productionCycles"
+            v-if="game.settings.general.mode === 'kingOfTheHill'"/>
+          <game-setting-value title="Flux"
+            tooltip="Determines whether this month's flux is applied to the game"
+            :valueText="getFriendlyText(game.settings.general.fluxEnabled)"
+            :value="game.settings.general.fluxEnabled"
+            :compareValue="compareSettings.general.fluxEnabled"/>
+          <game-setting-value title="Players"
+            tooltip="Total number of player slots"
+            :valueText="game.settings.general.playerLimit"
+            :value="game.settings.general.playerLimit"
+            :compareValue="compareSettings.general.playerLimit"/>
+          <game-setting-value title="Player Type"
+            tooltip="Determines what type of players can join the game"
+            :valueText="getFriendlyText(game.settings.general.playerType)"
+            :value="game.settings.general.playerType"
+            :compareValue="compareSettings.general.playerType"/>
+          <game-setting-value title="Anonymity"
+            tooltip="Extra anonymity will hide player identities such as their Victories, Rank and Renown"
+            :valueText="getFriendlyText(game.settings.general.anonymity)"
+            :value="game.settings.general.anonymity"
+            :compareValue="compareSettings.general.anonymity"/>
+          <game-setting-value title="Player Online Status"
+            tooltip="Determines whether players can see who is online in real time"
+            :valueText="getFriendlyText(game.settings.general.playerOnlineStatus)"
+            :value="game.settings.general.playerOnlineStatus"
+            :compareValue="compareSettings.general.playerOnlineStatus"/>
         </tbody>
       </table>
     </div>
 
     <view-subtitle title="Game Time Settings"/>
-    <div class="table-responsive" v-if="game">
+    <div class="table-responsive">
       <table class="table table-striped table-hover">
         <tbody>
-          <tr>
-            <td>Game Type <help-tooltip tooltip="Real time games are constantly running however Turn based games all players must submit their turn in order for the game to progress"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.gameTime.gameType) }}</td>
-          </tr>
-          <tr v-if="game.settings.gameTime.gameType === 'realTime'">
-            <td>Game Speed <help-tooltip tooltip="Determines how fast a single tick will take"/></td>
-            <td class="text-right" v-if="game.settings.gameTime.speed >= 60">{{ game.settings.gameTime.speed/60 }} minute(s)/tick</td>
-            <td class="text-right" v-if="game.settings.gameTime.speed < 60">{{ game.settings.gameTime.speed }} second(s)/tick</td>
-          </tr>
-          <tr v-if="game.settings.gameTime.gameType === 'realTime'">
-            <td>Start Delay <help-tooltip tooltip="Determines how long the warmup period is before games start, for large games it is recommended to have a long start delay"/></td>
-            <td class="text-right">{{ game.settings.gameTime.startDelay }} minutes</td>
-          </tr>
-          <tr v-if="game.settings.gameTime.gameType === 'turnBased'">
-            <td>Turn Jumps <help-tooltip tooltip="Determines how many ticks are processed for a single turn"/></td>
-            <td class="text-right">{{ game.settings.gameTime.turnJumps }} tick jumps</td>
-          </tr>
-          <tr v-if="game.settings.gameTime.gameType === 'turnBased'">
-            <td>Max Turn Wait <help-tooltip tooltip="The timeout period in which players have to take their turn, if the limit is reached then the turn will process regardless of whether players are ready or not"/></td>
-            <td class="text-right" v-if="game.settings.gameTime.maxTurnWait >= 60">{{ game.settings.gameTime.maxTurnWait/60 }} hour(s)</td>
-            <td class="text-right" v-if="game.settings.gameTime.maxTurnWait < 60">{{ game.settings.gameTime.maxTurnWait }} minute(s)</td>
-          </tr>
-          <tr>
-            <td>AFK Last Seen Limit <help-tooltip tooltip="Determines how long before a player is kicked for being AFK - This is paired with the AFK Galactic Cycle Limit setting, the timeout is whichever comes first"/></td>
-            <td class="text-right">{{ game.settings.gameTime.afk.lastSeenTimeout }} day(s)</td>
-          </tr>
-          <tr v-if="game.settings.gameTime.gameType === 'realTime'">
-            <td>AFK Galactic Cycle Limit <help-tooltip tooltip="Determines how many cycles before a player is kicked before being AFK - This is paired with the AFK Last Seen Limit setting, the timeout is whichever comes first"/></td>
-            <td class="text-right">{{ game.settings.gameTime.afk.cycleTimeout }} cycles</td>
-          </tr>
-          <tr v-if="game.settings.gameTime.gameType === 'turnBased'">
-            <td>AFK Missed Turn Limit <help-tooltip tooltip="Determines how many missed turns before a player is kicked before being AFK - This is paired with the AFK Last Seen Limit setting, the timeout is whichever comes first"/></td>
-            <td class="text-right">{{ game.settings.gameTime.afk.turnTimeout }} missed turns</td>
-          </tr>
+          <game-setting-value title="Game Type"
+            tooltip="Real time games are constantly running however Turn based games all players must submit their turn in order for the game to progress"
+            :valueText="getFriendlyText(game.settings.gameTime.gameType)"
+            :value="game.settings.gameTime.gameType"
+            :compareValue="compareSettings.gameTime.gameType"/>
+          <game-setting-value title="Game Speed"
+            tooltip="Determines how fast a single tick will take"
+            :valueText="game.settings.gameTime.speed >= 60 ? (game.settings.gameTime.speed/60)+' minute(s)/tick' : game.settings.gameTime.speed+'second(s)/tick'"
+            :value="game.settings.gameTime.speed"
+            :compareValue="compareSettings.gameTime.speed"
+            v-if="game.settings.gameTime.gameType === 'realTime'"/>
+          <game-setting-value title="Tick Limited"
+            tooltip="Determines whether the game has a time limit"
+            :valueText="getFriendlyText(game.settings.gameTime.isTickLimited)"
+            :value="game.settings.gameTime.isTickLimited"
+            :compareValue="compareSettings.gameTime.isTickLimited"/>
+          <game-setting-value title="Tick Limit"
+            tooltip="Determines the maximum number of ticks before the game is automatically concluded"
+            :valueText="game.settings.gameTime.tickLimit + ' ticks'"
+            :value="game.settings.gameTime.tickLimit"
+            :compareValue="compareSettings.gameTime.tickLimit"
+            v-if="game.settings.gameTime.isTickLimited === 'enabled'"/>
+          <game-setting-value title="Start Delay"
+            tooltip="Determines how long the warmup period is before games start, for large games it is recommended to have a long start delay"
+            :valueText="game.settings.gameTime.startDelay + ' minutes'"
+            :value="game.settings.gameTime.startDelay"
+            :compareValue="compareSettings.gameTime.startDelay"
+            v-if="game.settings.gameTime.gameType === 'realTime'"/>
+          <game-setting-value title="Turn Jumps"
+            tooltip="Determines how many ticks are processed for a single turn"
+            :valueText="game.settings.gameTime.turnJumps + ' tick jumps'"
+            :value="game.settings.gameTime.turnJumps"
+            :compareValue="compareSettings.gameTime.turnJumps"
+            v-if="game.settings.gameTime.gameType === 'turnBased'"/>
+          <game-setting-value title="Max Turn Wait"
+            tooltip="The timeout period in which players have to take their turn, if the limit is reached then the turn will process regardless of whether players are ready or not"
+            :valueText="game.settings.gameTime.maxTurnWait >= 60?(game.settings.gameTime.maxTurnWait/60)+' hour(s)':game.settings.gameTime.maxTurnWait+' minute(s)'"
+            :value="game.settings.gameTime.maxTurnWait"
+            :compareValue="compareSettings.gameTime.maxTurnWait"
+            v-if="game.settings.gameTime.gameType === 'turnBased'"/>
+          <game-setting-value title="AFK Last Seen Limit"
+            tooltip="Determines how long before a player is kicked for being AFK - This is paired with the AFK Galactic Cycle Limit setting, the timeout is whichever comes first"
+            :valueText="game.settings.gameTime.afk.lastSeenTimeout + ' day(s)'"
+            :value="game.settings.gameTime.afk.lastSeenTimeout"
+            :compareValue="compareSettings.gameTime.afk.lastSeenTimeout"/>
+          <game-setting-value title="AFK Galactic Cycle Limit"
+            tooltip="Determines how many cycles before a player is kicked before being AFK - This is paired with the AFK Last Seen Limit setting, the timeout is whichever comes first"
+            :valueText="game.settings.gameTime.afk.cycleTimeout + ' cycles'"
+            :value="game.settings.gameTime.afk.cycleTimeout"
+            :compareValue="compareSettings.gameTime.afk.cycleTimeout"
+            v-if="game.settings.gameTime.gameType === 'realTime'"/>
+          <game-setting-value title="AFK Missed Turn Limit"
+            tooltip="Determines how many missed turns before a player is kicked before being AFK - This is paired with the AFK Last Seen Limit setting, the timeout is whichever comes first"
+            :valueText="game.settings.gameTime.afk.turnTimeout + ' missed turns'"
+            :value="game.settings.gameTime.afk.turnTimeout"
+            :compareValue="compareSettings.gameTime.afk.turnTimeout"
+            v-if="game.settings.gameTime.gameType === 'turnBased'"/>
         </tbody>
       </table>
     </div>
 
     <view-subtitle title="Galaxy Settings"/>
-    <div class="table-responsive" v-if="game">
+    <div class="table-responsive">
       <table class="table table-striped table-hover">
         <tbody>
-          <tr>
-            <td>Galaxy Type <help-tooltip tooltip="The shape of the galaxy that will be generated for the game"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.galaxy.galaxyType) }}</td>
-          </tr>
-          <tr>
-            <td>Stars Per Player <help-tooltip tooltip="How many stars will be generated per player in the galaxy"/></td>
-            <td class="text-right">{{ game.settings.galaxy.starsPerPlayer }}</td>
-          </tr>
-          <tr>
-            <td>Production Ticks <help-tooltip tooltip="How many ticks are in a galactic cycle"/></td>
-            <td class="text-right">{{ game.settings.galaxy.productionTicks }} ticks/cycle</td>
-          </tr>
+          <game-setting-value title="Galaxy Type"
+            tooltip="The shape of the galaxy that will be generated for the game"
+            :valueText="getFriendlyText(game.settings.galaxy.galaxyType)"
+            :value="game.settings.galaxy.galaxyType"
+            :compareValue="compareSettings.galaxy.galaxyType"/>
+          <game-setting-value title="Stars Per Player"
+            tooltip="How many stars will be generated per player in the galaxy"
+            :valueText="game.settings.galaxy.starsPerPlayer"
+            :value="game.settings.galaxy.starsPerPlayer"
+            :compareValue="compareSettings.galaxy.starsPerPlayer"/>
+          <game-setting-value title="Production Ticks"
+            tooltip="How many ticks are in a galactic cycle"
+            :valueText="game.settings.galaxy.productionTicks + ' ticks/cycle'"
+            :value="game.settings.galaxy.productionTicks"
+            :compareValue="compareSettings.galaxy.productionTicks"/>
         </tbody>
       </table>
     </div>
 
     <view-subtitle title="Special Galaxy Settings"/>
-    <div class="table-responsive" v-if="game">
+    <div class="table-responsive">
       <table class="table table-striped table-hover">
         <tbody>
-          <tr>
-            <td>Carrier Cost <help-tooltip tooltip="Determines how expensive carriers cost to build"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.carrierCost) }}</td>
-          </tr>
-          <tr>
-            <td>Carrier Upkeep Cost <help-tooltip tooltip="Determines how expensive the carrier upkeep is - Upkeep is paid at the end of a galactic cycle"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.carrierUpkeepCost) }}</td>
-          </tr>
-          <tr>
-            <td>Warpgate Cost <help-tooltip tooltip="Determines how expensive warp gates cost to build"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.warpgateCost) }}</td>
-          </tr>
-          <tr>
-            <td>Specialist Cost <help-tooltip tooltip="Determines how expensive specialists cost to hire"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.specialistCost) }}</td>
-          </tr>
-          <tr v-if="game.settings.specialGalaxy.specialistCost !== 'none'">
-            <td>Specialist Currency <help-tooltip tooltip="Determines the type of currency used to hire specialists"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.specialistsCurrency) }}</td>
-          </tr>
-          <tr v-if="game.settings.galaxy.galaxyType !== 'custom'">
-            <td>Random Warp Gates <help-tooltip tooltip="The percentage of random warp gates are seeded at the start of the game - Warp gates increase carrier movement speed"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomWarpGates) }}%</td>
-          </tr>
-          <tr v-if="game.settings.galaxy.galaxyType !== 'custom'">
-            <td>Random Worm Holes <help-tooltip tooltip="The percentage of random worm holes are generated in the galaxy - Worm holes provide instant travel between paired worm hole stars"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomWormHoles) }}%</td>
-          </tr>
-          <tr v-if="game.settings.galaxy.galaxyType !== 'custom'">
-            <td>Random Nebulas <help-tooltip tooltip="The percentage of random nebulas are generated in the galaxy - Nebulas hide ships at stars"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomNebulas) }}%</td>
-          </tr>
-          <tr v-if="game.settings.galaxy.galaxyType !== 'custom'">
-            <td>Random Asteroid Fields <help-tooltip tooltip="The percentage of random asteroid fields are generated in the galaxy - Asteroid fields have x2 defender bonus (net +2 weapons) in combat"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomAsteroidFields) }}%</td>
-          </tr>
-          <tr v-if="game.settings.galaxy.galaxyType !== 'custom'">
-            <td>Random Binary Stars <help-tooltip tooltip="The percentage of random binary stars are generated in the galaxy - Binary stars start with additional natural resources"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomBinaryStars) }}%</td>
-          </tr>
-          <tr v-if="game.settings.galaxy.galaxyType !== 'custom'">
-            <td>Random Black Holes <help-tooltip tooltip="The percentage of random black holes are generated in the galaxy - Black holes cannot have infrastructure but have +3 scanning range"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.randomBlackHoles) }}%</td>
-          </tr>
-          <tr>
-            <td>Dark Galaxy <help-tooltip tooltip="Dark galaxies hide stars outside of player scanning ranges - Extra dark galaxies hide player statistics so that players only know what other players have based on what they can see in their scanning range"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.darkGalaxy) }}</td>
-          </tr>
-          <tr>
-            <td>Gift Carriers <help-tooltip tooltip="Determines whether carriers can be gifted to other players"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.giftCarriers) }}</td>
-          </tr>
-          <tr>
-            <td>Defender Bonus <help-tooltip tooltip="Enables or disables the defender bonus - Grants +1 to the defender in carrier-to-star combat"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.defenderBonus) }}</td>
-          </tr>
-          <tr>
-            <td>Carrier-to-Carrier Combat <help-tooltip tooltip="Determines whether carrier-to-carrier combat is enabled. If disabled, carriers will not fight eachother in space"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.carrierToCarrierCombat) }}</td>
-          </tr>
-          <tr v-if="game.settings.specialGalaxy.splitResources">
-            <td>Split Resources <help-tooltip tooltip="Determines whether star natural resources are independent values, giving the game more granular infrastructure costs"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.splitResources) }}</td>
-          </tr>
-          <tr v-if="game.settings.galaxy.galaxyType !== 'custom'">
-            <td>Resource Distribution <help-tooltip tooltip="Determines the shape of distributed natural resources in the galaxy"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.resourceDistribution) }}</td>
-          </tr>
-          <tr v-if="game.settings.galaxy.galaxyType !== 'custom'">
-            <td>Player Distribution <help-tooltip tooltip="Determines where player home stars are located at the start of the game"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.specialGalaxy.playerDistribution) }}</td>
-          </tr>
-          <tr>
-            <td>Carrier Speed <help-tooltip tooltip="Carriers go brrr"/></td>
-            <td class="text-right">{{ game.settings.specialGalaxy.carrierSpeed / game.constants.distances.lightYear }}/ly tick</td>
-          </tr>
+          <game-setting-value title="Carrier Cost"
+            tooltip="Determines how expensive carriers cost to build"
+            :valueText="getFriendlyText(game.settings.specialGalaxy.carrierCost)"
+            :value="game.settings.specialGalaxy.carrierCost"
+            :compareValue="compareSettings.specialGalaxy.carrierCost"/>
+          <game-setting-value title="Carrier Upkeep Cost"
+            tooltip="Determines how expensive the carrier upkeep is - Upkeep is paid at the end of a galactic cycle"
+            :valueText="getFriendlyText(game.settings.specialGalaxy.carrierUpkeepCost)"
+            :value="game.settings.specialGalaxy.carrierUpkeepCost"
+            :compareValue="compareSettings.specialGalaxy.carrierUpkeepCost"/>
+          <game-setting-value title="Warpgate Cost"
+            tooltip="Determines how expensive warp gates cost to build"
+            :valueText="getFriendlyText(game.settings.specialGalaxy.warpgateCost)"
+            :value="game.settings.specialGalaxy.warpgateCost"
+            :compareValue="compareSettings.specialGalaxy.warpgateCost"/>
+          <game-setting-value title="Specialist Cost"
+            tooltip="Determines how expensive specialists cost to hire"
+            :valueText="getFriendlyText(game.settings.specialGalaxy.specialistCost)"
+            :value="game.settings.specialGalaxy.specialistCost"
+            :compareValue="compareSettings.specialGalaxy.specialistCost"/>
+          <game-setting-value title="Specialist Currency"
+            tooltip="Determines the type of currency used to hire specialists"
+            :valueText="getFriendlyText(game.settings.specialGalaxy.specialistsCurrency)"
+            :value="game.settings.specialGalaxy.specialistsCurrency"
+            :compareValue="compareSettings.specialGalaxy.specialistsCurrency"
+            v-if="game.settings.specialGalaxy.specialistCost !== 'none'"/>
+          <game-setting-value title="Random Warp Gates"
+            tooltip="The percentage of random warp gates are seeded at the start of the game - Warp gates increase carrier movement speed"
+            :valueText="getFriendlyText(game.settings.specialGalaxy.randomWarpGates)+'%'"
+            :value="game.settings.specialGalaxy.randomWarpGates"
+            :compareValue="compareSettings.specialGalaxy.randomWarpGates"
+            v-if="game.settings.galaxy.galaxyType !== 'custom'"/>
+          <game-setting-value title="Random Worm Holes"
+            tooltip="The percentage of random worm holes are generated in the galaxy - Worm holes provide instant travel between paired worm hole stars"
+            :valueText="getFriendlyText(game.settings.specialGalaxy.randomWormHoles)+'%'"
+            :value="game.settings.specialGalaxy.randomWormHoles"
+            :compareValue="compareSettings.specialGalaxy.randomWormHoles"
+            v-if="game.settings.galaxy.galaxyType !== 'custom'"/>
+          <game-setting-value title="Random Nebulas"
+            tooltip="The percentage of random nebulas are generated in the galaxy - Nebulas hide ships at stars"
+            :valueText="getFriendlyText(game.settings.specialGalaxy.randomNebulas)+'%'"
+            :value="game.settings.specialGalaxy.randomNebulas"
+            :compareValue="compareSettings.specialGalaxy.randomNebulas"
+            v-if="game.settings.galaxy.galaxyType !== 'custom'"/>
+          <game-setting-value title="Random Asteroid Fields"
+            tooltip="The percentage of random asteroid fields are generated in the galaxy - Asteroid fields have x2 defender bonus (net +2 weapons) in combat"
+            :valueText="getFriendlyText(game.settings.specialGalaxy.randomAsteroidFields)+'%'"
+            :value="game.settings.specialGalaxy.randomAsteroidFields"
+            :compareValue="compareSettings.specialGalaxy.randomAsteroidFields"
+            v-if="game.settings.galaxy.galaxyType !== 'custom'"/>
+          <game-setting-value title="Random Binary Stars"
+            tooltip="The percentage of random binary stars are generated in the galaxy - Binary stars start with additional natural resources"
+            :valueText="getFriendlyText(game.settings.specialGalaxy.randomBinaryStars)+'%'"
+            :value="game.settings.specialGalaxy.randomBinaryStars"
+            :compareValue="compareSettings.specialGalaxy.randomBinaryStars"
+            v-if="game.settings.galaxy.galaxyType !== 'custom'"/>
+          <game-setting-value title="Random Black Holes"
+            tooltip="The percentage of random black holes are generated in the galaxy - Black holes cannot have infrastructure but have +3 scanning range"
+            :valueText="getFriendlyText(game.settings.specialGalaxy.randomBlackHoles)+'%'"
+            :value="game.settings.specialGalaxy.randomBlackHoles"
+            :compareValue="compareSettings.specialGalaxy.randomBlackHoles"
+            v-if="game.settings.galaxy.galaxyType !== 'custom'"/>
+          <game-setting-value title="Dark Galaxy"
+            tooltip="Dark galaxies hide stars outside of player scanning ranges - Extra dark galaxies hide player statistics so that players only know what other players have based on what they can see in their scanning range"
+            :valueText="getFriendlyText(game.settings.specialGalaxy.darkGalaxy)"
+            :value="game.settings.specialGalaxy.darkGalaxy"
+            :compareValue="compareSettings.specialGalaxy.darkGalaxy"/>
+          <game-setting-value title="Gift Carriers"
+            tooltip="Determines whether carriers can be gifted to other players"
+            :valueText="getFriendlyText(game.settings.specialGalaxy.giftCarriers)"
+            :value="game.settings.specialGalaxy.giftCarriers"
+            :compareValue="compareSettings.specialGalaxy.giftCarriers"/>
+          <game-setting-value title="Defender Bonus"
+            tooltip="Enables or disables the defender bonus - Grants +1 to the defender in carrier-to-star combat"
+            :valueText="getFriendlyText(game.settings.specialGalaxy.defenderBonus)"
+            :value="game.settings.specialGalaxy.defenderBonus"
+            :compareValue="compareSettings.specialGalaxy.defenderBonus"/>
+          <game-setting-value title="Carrier-to-Carrier Combat"
+            tooltip="Determines whether carrier-to-carrier combat is enabled. If disabled, carriers will not fight eachother in space"
+            :valueText="getFriendlyText(game.settings.specialGalaxy.carrierToCarrierCombat)"
+            :value="game.settings.specialGalaxy.carrierToCarrierCombat"
+            :compareValue="compareSettings.specialGalaxy.carrierToCarrierCombat"/>
+          <game-setting-value title="Split Resources"
+            tooltip="Determines whether star natural resources are independent values, giving the game more granular infrastructure costs"
+            :valueText="getFriendlyText(game.settings.specialGalaxy.splitResources)"
+            :value="game.settings.specialGalaxy.splitResources"
+            :compareValue="compareSettings.specialGalaxy.splitResources"
+            v-if="game.settings.specialGalaxy.splitResources"/>
+          <game-setting-value title="Resource Distribution"
+            tooltip="Determines the shape of distributed natural resources in the galaxy"
+            :valueText="getFriendlyText(game.settings.specialGalaxy.resourceDistribution)"
+            :value="game.settings.specialGalaxy.resourceDistribution"
+            :compareValue="compareSettings.specialGalaxy.resourceDistribution"
+            v-if="game.settings.galaxy.galaxyType !== 'custom'"/>
+          <game-setting-value title="Player Distribution"
+            tooltip="Determines where player home stars are located at the start of the game"
+            :valueText="getFriendlyText(game.settings.specialGalaxy.playerDistribution)"
+            :value="game.settings.specialGalaxy.playerDistribution"
+            :compareValue="compareSettings.specialGalaxy.playerDistribution"
+            v-if="game.settings.galaxy.galaxyType !== 'custom'"/>
+          <game-setting-value title="Carrier Speed"
+            tooltip="Carriers go brrr"
+            :valueText="(game.settings.specialGalaxy.carrierSpeed / game.constants.distances.lightYear)+'/ly tick'"
+            :value="game.settings.specialGalaxy.carrierSpeed"
+            :compareValue="compareSettings.specialGalaxy.carrierSpeed"/>
         </tbody>
       </table>
     </div>
 
     <view-subtitle title="Orbital Mechanics"/>
-    <div class="table-responsive" v-if="game">
+    <div class="table-responsive">
       <table class="table table-striped table-hover">
         <tbody>
-          <tr>
-            <td>Galaxy Rotation <help-tooltip tooltip="If enabled, orbits stars and carriers around the center of the galaxy every tick"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.orbitalMechanics.enabled) }}</td>
-          </tr>
-          <tr v-if="game.settings.orbitalMechanics.enabled === 'enabled'">
-            <td>Orbit Speed <help-tooltip tooltip="Determines how fast stars and carriers orbit"/></td>
-            <td class="text-right">{{ game.settings.orbitalMechanics.orbitSpeed }}</td>
-          </tr>
+          <game-setting-value title="Galaxy Rotation"
+            tooltip="If enabled, orbits stars and carriers around the center of the galaxy every tick"
+            :valueText="getFriendlyText(game.settings.orbitalMechanics.enabled)"
+            :value="game.settings.orbitalMechanics.enabled"
+            :compareValue="compareSettings.orbitalMechanics.enabled"/>
+          <game-setting-value title="Orbit Speed"
+            tooltip="Determines how fast stars and carriers orbit"
+            :valueText="game.settings.orbitalMechanics.orbitSpeed"
+            :value="game.settings.orbitalMechanics.orbitSpeed"
+            :compareValue="compareSettings.orbitalMechanics.orbitSpeed"
+            v-if="game.settings.orbitalMechanics.enabled === 'enabled'"/>
         </tbody>
       </table>
     </div>
 
     <view-subtitle title="Player Settings"/>
-    <div class="table-responsive" v-if="game">
+    <div class="table-responsive">
       <table class="table table-striped table-hover">
         <tbody>
-          <tr>
-            <td>Starting Stars <help-tooltip tooltip="Determines how many stars each player is allocated at the start of the game"/></td>
-            <td class="text-right">{{ game.settings.player.startingStars }}</td>
-          </tr>
-          <tr>
-            <td>Starting Credits <help-tooltip tooltip="Determines how many credits each player is allocated at the start of the game"/></td>
-            <td class="text-right">{{ game.settings.player.startingCredits }}</td>
-          </tr>
-          <tr v-if="game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'">
-            <td>Starting Specialist Tokens <help-tooltip tooltip="Determines how many specialist tokens each player is allocated at the start of the game"/></td>
-            <td class="text-right">{{ game.settings.player.startingCreditsSpecialists }}</td>
-          </tr>
-          <tr>
-            <td>Starting Ships <help-tooltip tooltip="Determines how many ships the home star of each player is allocated at the start of the game"/></td>
-            <td class="text-right">{{ game.settings.player.startingShips }}</td>
-          </tr>
-          <tr>
-            <td>Starting Economy <help-tooltip tooltip="Determines the infrastructure of the home star of each player at the start of the game"/></td>
-            <td class="text-right">{{ game.settings.player.startingInfrastructure.economy }}</td>
-          </tr>
-          <tr>
-            <td>Starting Industry <help-tooltip tooltip="Determines the infrastructure of the home star of each player at the start of the game"/></td>
-            <td class="text-right">{{ game.settings.player.startingInfrastructure.industry }}</td>
-          </tr>
-          <tr>
-            <td>Starting Science <help-tooltip tooltip="Determines the infrastructure of the home star of each player at the start of the game"/></td>
-            <td class="text-right">{{ game.settings.player.startingInfrastructure.science }}</td>
-          </tr>
-          <tr>
-            <td>Economy Cost <help-tooltip tooltip="Determines how expensive infrastructure costs to build"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.player.developmentCost.economy) }}</td>
-          </tr>
-          <tr>
-            <td>Industry Cost <help-tooltip tooltip="Determines how expensive infrastructure costs to build"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.player.developmentCost.industry) }}</td>
-          </tr>
-          <tr>
-            <td>Science Cost <help-tooltip tooltip="Determines how expensive infrastructure costs to build"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.player.developmentCost.science) }}</td>
-          </tr>
-          <tr>
-            <td>Trade Credits <help-tooltip tooltip="Determines whether players can trade credits"/></td>
-            <td class="text-right">
-              <span v-if="game.settings.player.tradeCredits">Enabled</span>
-              <span v-if="!game.settings.player.tradeCredits">Disabled</span>
-            </td>
-          </tr>
-          <tr v-if="game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'">
-            <td>Trade Specialist Tokens <help-tooltip tooltip="Determines whether players can trade specialist tokens"/></td>
-            <td class="text-right" v-if="game.settings.player.tradeCreditsSpecialists != null">
-              <span v-if="game.settings.player.tradeCreditsSpecialists">Enabled</span>
-              <span v-if="!game.settings.player.tradeCreditsSpecialists">Disabled</span>
-            </td>
-          </tr>
-          <tr>
-            <td>Technology Trade Cost <help-tooltip tooltip="Determines how expensive the technology trade fee costs"/></td>
-            <td class="text-right" v-if="game.settings.player.tradeCost > 0">{{ getFriendlyText(game.settings.player.tradeCost) }} credits/level</td>
-            <td class="text-right" v-if="game.settings.player.tradeCost === 0">Disabled</td>
-          </tr>
-          <tr v-if="game.settings.player.tradeCost > 0">
-            <td>Trade Scanning <help-tooltip tooltip="If enabled, players can only trade with other players who are in their scanning range"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.player.tradeScanning) }}</td>
-          </tr>
+          <game-setting-value title="Starting Stars"
+            tooltip="Determines how many stars each player is allocated at the start of the game"
+            :valueText="game.settings.player.startingStars"
+            :value="game.settings.player.startingStars"
+            :compareValue="compareSettings.player.startingStars"/>
+          <game-setting-value title="Starting Credits"
+            tooltip="Determines how many credits each player is allocated at the start of the game"
+            :valueText="game.settings.player.startingCredits"
+            :value="game.settings.player.startingCredits"
+            :compareValue="compareSettings.player.startingCredits"/>
+          <game-setting-value title="Starting Specialist Tokens"
+            tooltip="Determines how many specialist tokens each player is allocated at the start of the game"
+            :valueText="game.settings.player.startingCreditsSpecialists"
+            :value="game.settings.player.startingCreditsSpecialists"
+            :compareValue="compareSettings.player.startingCreditsSpecialists"
+            v-if="game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'"/>
+          <game-setting-value title="Starting Ships"
+            tooltip="Determines how many ships the home star of each player is allocated at the start of the game"
+            :valueText="game.settings.player.startingShips"
+            :value="game.settings.player.startingShips"
+            :compareValue="compareSettings.player.startingShips"/>
+          <game-setting-value title="Starting Economy"
+            tooltip="Determines the infrastructure of the home star of each player at the start of the game"
+            :valueText="game.settings.player.startingInfrastructure.economy"
+            :value="game.settings.player.startingInfrastructure.economy"
+            :compareValue="compareSettings.player.startingInfrastructure.economy"/>
+          <game-setting-value title="Starting Industry"
+            tooltip="Determines the infrastructure of the home star of each player at the start of the game"
+            :valueText="game.settings.player.startingInfrastructure.industry"
+            :value="game.settings.player.startingInfrastructure.industry"
+            :compareValue="compareSettings.player.startingInfrastructure.industry"/>
+          <game-setting-value title="Starting Science"
+            tooltip="Determines the infrastructure of the home star of each player at the start of the game"
+            :valueText="game.settings.player.startingInfrastructure.science"
+            :value="game.settings.player.startingInfrastructure.science"
+            :compareValue="compareSettings.player.startingInfrastructure.science"/>
+          <game-setting-value title="Economy Cost"
+            tooltip="Determines how expensive infrastructure costs to build"
+            :valueText="getFriendlyText(game.settings.player.developmentCost.economy)"
+            :value="game.settings.player.developmentCost.economy"
+            :compareValue="compareSettings.player.developmentCost.economy"/>
+          <game-setting-value title="Industry Cost"
+            tooltip="Determines how expensive infrastructure costs to build"
+            :valueText="getFriendlyText(game.settings.player.developmentCost.industry)"
+            :value="game.settings.player.developmentCost.industry"
+            :compareValue="compareSettings.player.developmentCost.industry"/>
+          <game-setting-value title="Science Cost"
+            tooltip="Determines how expensive infrastructure costs to build"
+            :valueText="getFriendlyText(game.settings.player.developmentCost.science)"
+            :value="game.settings.player.developmentCost.science"
+            :compareValue="compareSettings.player.developmentCost.science"/>
+          <game-setting-value title="Trade Credits"
+            tooltip="Determines whether players can trade credits"
+            :valueText="game.settings.player.tradeCredits?'Enabled':'Disabled'"
+            :value="game.settings.player.tradeCredits"
+            :compareValue="compareSettings.player.tradeCredits"/>
+          <game-setting-value title="Trade Specialist Tokens"
+            tooltip="Determines whether players can trade specialist tokens"
+            :valueText="game.settings.player.tradeCreditsSpecialists?'Enabled':'Disabled'"
+            :value="game.settings.player.tradeCreditsSpecialists"
+            :compareValue="compareSettings.player.tradeCreditsSpecialists"
+            v-if="game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists' && game.settings.player.tradeCreditsSpecialists != null"/>
+          <game-setting-value title="Technology Trade Cost"
+            tooltip="Determines how expensive the technology trade fee costs"
+            :valueText="game.settings.player.tradeCost > 0?getFriendlyText(game.settings.player.tradeCost)+' credits/level':'Disabled'"
+            :value="game.settings.player.tradeCost"
+            :compareValue="compareSettings.player.tradeCost"/>
+          <game-setting-value title="Trade Scanning"
+            tooltip="If enabled, players can only trade with other players who are in their scanning range"
+            :valueText="getFriendlyText(game.settings.player.tradeScanning)"
+            :value="game.settings.player.tradeScanning"
+            :compareValue="compareSettings.player.tradeScanning"
+            v-if="game.settings.player.tradeCost > 0"/>
         </tbody>
       </table>
     </div>
 
     <view-subtitle title="Formal Alliances"/>
-    <div class="table-responsive" v-if="game">
+    <div class="table-responsive">
       <table class="table table-striped table-hover">
         <tbody>
-          <tr>
-            <td>Enabled <help-tooltip tooltip="If enabled, players can change their diplomatic status to allied or enemies - Allied players can orbit eachother's stars and support eachother in combat"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.diplomacy.enabled) }}</td>
-          </tr>
-          <tr v-if="game.settings.diplomacy.enabled === 'enabled'">
-            <td>Max Number of Alliances <help-tooltip tooltip="Determines how many formal alliance each player may have at once."/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.diplomacy.maxAlliances) }}</td>
-          </tr>
-          <tr v-if="game.settings.diplomacy.enabled === 'enabled'">
-            <td>Alliance Upkeep Cost <help-tooltip tooltip="Determines how expensive the alliance upkeep is - Upkeep is paid at the end of a galactic cycle"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.diplomacy.upkeepCost) }}</td>
-          </tr>
-          <tr v-if="game.settings.diplomacy.enabled === 'enabled'">
-            <td>Alliance Only Trading <help-tooltip tooltip="If enabled, players can only trade with formal allies."/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.diplomacy.tradeRestricted) }}</td>
-          </tr>
-          <tr v-if="game.settings.diplomacy.enabled === 'enabled'">
-            <td>Global Events <help-tooltip tooltip="If enabled, global events will be displayed when players declare war or make peace"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.diplomacy.globalEvents) }}</td>
-          </tr>
+          <game-setting-value title="Enabled"
+            tooltip="If enabled, players can change their diplomatic status to allied or enemies - Allied players can orbit eachother's stars and support eachother in combat"
+            :valueText="getFriendlyText(game.settings.diplomacy.enabled)"
+            :value="game.settings.diplomacy.enabled"
+            :compareValue="compareSettings.diplomacy.enabled"/>
+          <game-setting-value title="Max Number of Alliances"
+            tooltip="Determines how many formal alliance each player may have at once"
+            :valueText="getFriendlyText(game.settings.diplomacy.maxAlliances)"
+            :value="game.settings.diplomacy.maxAlliances"
+            :compareValue="compareSettings.diplomacy.maxAlliances"
+            v-if="game.settings.diplomacy.enabled === 'enabled'"/>
+          <game-setting-value title="Alliance Upkeep Cost"
+            tooltip="Determines how expensive the alliance upkeep is - Upkeep is paid at the end of a galactic cycle"
+            :valueText="getFriendlyText(game.settings.diplomacy.upkeepCost)"
+            :value="game.settings.diplomacy.upkeepCost"
+            :compareValue="compareSettings.diplomacy.upkeepCost"
+            v-if="game.settings.diplomacy.enabled === 'enabled'"/>
+          <game-setting-value title="Alliance Only Trading"
+            tooltip="If enabled, players can only trade with formal allies"
+            :valueText="getFriendlyText(game.settings.diplomacy.tradeRestricted)"
+            :value="game.settings.diplomacy.tradeRestricted"
+            :compareValue="compareSettings.diplomacy.tradeRestricted"
+            v-if="game.settings.diplomacy.enabled === 'enabled'"/>
+          <game-setting-value title="Global Events"
+            tooltip="If enabled, global events will be displayed when players declare war or make peace"
+            :valueText="getFriendlyText(game.settings.diplomacy.globalEvents)"
+            :value="game.settings.diplomacy.globalEvents"
+            :compareValue="compareSettings.diplomacy.globalEvents"
+            v-if="game.settings.diplomacy.enabled === 'enabled'"/>
         </tbody>
       </table>
     </div>
 
     <view-subtitle title="Technology Settings"/>
-    <div class="table-responsive" v-if="game">
+    <div class="table-responsive">
       <table class="table table-striped table-hover">
         <tbody>
-          <tr>
-            <td>Starting Terraforming Level <help-tooltip tooltip="Determines the starting technology level for all players"/></td>
-            <td class="text-right">{{ game.settings.technology.startingTechnologyLevel.terraforming }}</td>
-          </tr>
-          <tr>
-            <td>Starting Experimentation Level <help-tooltip tooltip="Determines the starting technology level for all players"/></td>
-            <td class="text-right">{{ game.settings.technology.startingTechnologyLevel.experimentation }}</td>
-          </tr>
-          <tr>
-            <td>Starting Scanning Level <help-tooltip tooltip="Determines the starting technology level for all players"/></td>
-            <td class="text-right">{{ game.settings.technology.startingTechnologyLevel.scanning }}</td>
-          </tr>
-          <tr>
-            <td>Starting Hyperspace Level <help-tooltip tooltip="Determines the starting technology level for all players"/></td>
-            <td class="text-right">{{ game.settings.technology.startingTechnologyLevel.hyperspace }}</td>
-          </tr>
-          <tr>
-            <td>Starting Manufacturing Level <help-tooltip tooltip="Determines the starting technology level for all players"/></td>
-            <td class="text-right">{{ game.settings.technology.startingTechnologyLevel.manufacturing }}</td>
-          </tr>
-          <tr>
-            <td>Starting Banking Level <help-tooltip tooltip="Determines the starting technology level for all players"/></td>
-            <td class="text-right">{{ game.settings.technology.startingTechnologyLevel.banking }}</td>
-          </tr>
-          <tr>
-            <td>Starting Weapons Level <help-tooltip tooltip="Determines the starting technology level for all players"/></td>
-            <td class="text-right">{{ game.settings.technology.startingTechnologyLevel.weapons }}</td>
-          </tr>
-          <tr v-if="game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'">
-            <td>Starting Specialists Level <help-tooltip tooltip="Determines the starting technology level for all players"/></td>
-            <td class="text-right">{{ game.settings.technology.startingTechnologyLevel.specialists }}</td>
-          </tr>
-          <tr>
-            <td>Terraforming Cost <help-tooltip tooltip="Determines how many research points it takes to level up the technology"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.technology.researchCosts.terraforming) }}</td>
-          </tr>
-          <tr>
-            <td>Experimentation Cost <help-tooltip tooltip="Determines how many research points it takes to level up the technology"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.technology.researchCosts.experimentation) }}</td>
-          </tr>
-          <tr>
-            <td>Scanning Cost <help-tooltip tooltip="Determines how many research points it takes to level up the technology"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.technology.researchCosts.scanning) }}</td>
-          </tr>
-          <tr>
-            <td>Hyperspace Cost <help-tooltip tooltip="Determines how many research points it takes to level up the technology"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.technology.researchCosts.hyperspace) }}</td>
-          </tr>
-          <tr>
-            <td>Manufacturing Cost <help-tooltip tooltip="Determines how many research points it takes to level up the technology"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.technology.researchCosts.manufacturing) }}</td>
-          </tr>
-          <tr>
-            <td>Banking Cost <help-tooltip tooltip="Determines how many research points it takes to level up the technology"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.technology.researchCosts.banking) }}</td>
-          </tr>
-          <tr>
-            <td>Weapons Cost <help-tooltip tooltip="Determines how many research points it takes to level up the technology"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.technology.researchCosts.weapons) }}</td>
-          </tr>
-          <tr>
-            <td>Specialists Cost <help-tooltip tooltip="Determines how many research points it takes to level up the technology"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.technology.researchCosts.specialists) }}</td>
-          </tr>
-          <tr>
-            <td>Banking Reward <help-tooltip tooltip="Determines the amount of credits awarded for the banking technology at the end of a galactic cycle"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.technology.bankingReward) }}</td>
-          </tr>
-          <tr>
-            <td>Specialist Token Reward <help-tooltip tooltip="Determines the amount of specialist tokens awarded for the banking technology at the end of a galactic cycle"/></td>
-            <td class="text-right">{{ getFriendlyText(game.settings.technology.specialistTokenReward) }}</td>
-          </tr>
+          <game-setting-value title="Starting Terraforming Level"
+            tooltip="Determines the starting technology level for all players"
+            :valueText="game.settings.technology.startingTechnologyLevel.terraforming"
+            :value="game.settings.technology.startingTechnologyLevel.terraforming"
+            :compareValue="compareSettings.technology.startingTechnologyLevel.terraforming"/>
+          <game-setting-value title="Starting Experimentation Level"
+            tooltip="Determines the starting technology level for all players"
+            :valueText="game.settings.technology.startingTechnologyLevel.experimentation"
+            :value="game.settings.technology.startingTechnologyLevel.experimentation"
+            :compareValue="compareSettings.technology.startingTechnologyLevel.experimentation"/>
+          <game-setting-value title="Starting Scanning Level"
+            tooltip="Determines the starting technology level for all players"
+            :valueText="game.settings.technology.startingTechnologyLevel.scanning"
+            :value="game.settings.technology.startingTechnologyLevel.scanning"
+            :compareValue="compareSettings.technology.startingTechnologyLevel.scanning"/>
+          <game-setting-value title="Starting Hyperspace Level"
+            tooltip="Determines the starting technology level for all players"
+            :valueText="game.settings.technology.startingTechnologyLevel.hyperspace"
+            :value="game.settings.technology.startingTechnologyLevel.hyperspace"
+            :compareValue="compareSettings.technology.startingTechnologyLevel.hyperspace"/>
+          <game-setting-value title="Starting Manufacturing Level"
+            tooltip="Determines the starting technology level for all players"
+            :valueText="game.settings.technology.startingTechnologyLevel.manufacturing"
+            :value="game.settings.technology.startingTechnologyLevel.manufacturing"
+            :compareValue="compareSettings.technology.startingTechnologyLevel.manufacturing"/>
+          <game-setting-value title="Starting Banking Level"
+            tooltip="Determines the starting technology level for all players"
+            :valueText="game.settings.technology.startingTechnologyLevel.banking"
+            :value="game.settings.technology.startingTechnologyLevel.banking"
+            :compareValue="compareSettings.technology.startingTechnologyLevel.banking"/>
+          <game-setting-value title="Starting Weapons Level"
+            tooltip="Determines the starting technology level for all players"
+            :valueText="game.settings.technology.startingTechnologyLevel.weapons"
+            :value="game.settings.technology.startingTechnologyLevel.weapons"
+            :compareValue="compareSettings.technology.startingTechnologyLevel.weapons"/>
+          <game-setting-value title="Starting Specialists Level"
+            tooltip="Determines the starting technology level for all players"
+            :valueText="game.settings.technology.startingTechnologyLevel.specialists"
+            :value="game.settings.technology.startingTechnologyLevel.specialists"
+            :compareValue="compareSettings.technology.startingTechnologyLevel.specialists"
+            v-if="game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'"/>
+          <game-setting-value title="Terraforming Cost"
+            tooltip="Determines how many research points it takes to level up the technology"
+            :valueText="getFriendlyText(game.settings.technology.researchCosts.terraforming)"
+            :value="game.settings.technology.researchCosts.terraforming"
+            :compareValue="compareSettings.technology.researchCosts.terraforming"/>
+          <game-setting-value title="Experimentation Cost"
+            tooltip="Determines how many research points it takes to level up the technology"
+            :valueText="getFriendlyText(game.settings.technology.researchCosts.experimentation)"
+            :value="game.settings.technology.researchCosts.experimentation"
+            :compareValue="compareSettings.technology.researchCosts.experimentation"/>
+          <game-setting-value title="Scanning Cost"
+            tooltip="Determines how many research points it takes to level up the technology"
+            :valueText="getFriendlyText(game.settings.technology.researchCosts.scanning)"
+            :value="game.settings.technology.researchCosts.scanning"
+            :compareValue="compareSettings.technology.researchCosts.scanning"/>
+          <game-setting-value title="Hyperspace Cost"
+            tooltip="Determines how many research points it takes to level up the technology"
+            :valueText="getFriendlyText(game.settings.technology.researchCosts.hyperspace)"
+            :value="game.settings.technology.researchCosts.hyperspace"
+            :compareValue="compareSettings.technology.researchCosts.hyperspace"/>
+          <game-setting-value title="Manufacturing Cost"
+            tooltip="Determines how many research points it takes to level up the technology"
+            :valueText="getFriendlyText(game.settings.technology.researchCosts.manufacturing)"
+            :value="game.settings.technology.researchCosts.manufacturing"
+            :compareValue="compareSettings.technology.researchCosts.manufacturing"/>
+          <game-setting-value title="Banking Cost"
+            tooltip="Determines how many research points it takes to level up the technology"
+            :valueText="getFriendlyText(game.settings.technology.researchCosts.banking)"
+            :value="game.settings.technology.researchCosts.banking"
+            :compareValue="compareSettings.technology.researchCosts.banking"/>
+          <game-setting-value title="Weapons Cost"
+            tooltip="Determines how many research points it takes to level up the technology"
+            :valueText="getFriendlyText(game.settings.technology.researchCosts.weapons)"
+            :value="game.settings.technology.researchCosts.weapons"
+            :compareValue="compareSettings.technology.researchCosts.weapons"/>
+          <game-setting-value title="Specialists Cost"
+            tooltip="Determines how many research points it takes to level up the technology"
+            :valueText="getFriendlyText(game.settings.technology.researchCosts.specialists)"
+            :value="game.settings.technology.researchCosts.specialists"
+            :compareValue="compareSettings.technology.researchCosts.specialists"/>
+          <game-setting-value title="Banking Reward"
+            tooltip="Determines the amount of credits awarded for the banking technology at the end of a galactic cycle"
+            :valueText="getFriendlyText(game.settings.technology.bankingReward)"
+            :value="game.settings.technology.bankingReward"
+            :compareValue="compareSettings.technology.bankingReward"/>
+          <game-setting-value title="Experimentation Reward"
+            tooltip="Determines the amount of research points awarded for the experimentation technology at the end of a galactic cycle"
+            :valueText="getFriendlyText(game.settings.technology.experimentationReward)"
+            :value="game.settings.technology.experimentationReward"
+            :compareValue="compareSettings.technology.experimentationReward"/>
+          <game-setting-value title="Specialist Token Reward"
+            tooltip="Determines the amount of specialist tokens awarded for the banking technology at the end of a galactic cycle"
+            :valueText="getFriendlyText(game.settings.technology.specialistTokenReward)"
+            :value="game.settings.technology.specialistTokenReward"
+            :compareValue="compareSettings.technology.specialistTokenReward"/>
         </tbody>
       </table>
     </div>
@@ -386,21 +509,39 @@
       <specialist-ban-list :game="game"/>
     </div>
   </div>
+</div>
 </template>
 
 <script>
 import ViewSubtitle from '../../ViewSubtitle.vue'
-import HelpTooltip from '../../HelpTooltip'
 import SpecialistBanList from '../specialist/SpecialistBanList'
+import GameApiService from '../../../services/api/game'
+import GameSettingValue from './GameSettingValue'
+import LoadingSpinner from '../../LoadingSpinner'
 
 export default {
   components: {
     'view-subtitle': ViewSubtitle,
-    'help-tooltip': HelpTooltip,
-    'specialist-ban-list': SpecialistBanList
+    'specialist-ban-list': SpecialistBanList,
+    'game-setting-value': GameSettingValue,
+    'loading-spinner': LoadingSpinner
   },
   props: {
     game: Object
+  },
+  data () {
+    return {
+      compareSettings: null
+    }
+  },
+  async mounted () {
+    try {
+      let response = await GameApiService.getDefaultGameSettings()
+
+      this.compareSettings = response.data.settings
+    } catch (err) {
+      console.error(err)
+    }
   },
   methods: {
     getFriendlyText (option) {
@@ -427,6 +568,7 @@ export default {
         'circular': 'Circular',
         'spiral': 'Spiral',
         'doughnut': 'Doughnut',
+        'circular-balanced': 'Circular Balanced',
         'normal': 'Normal',
         'extra': 'Extra',
         'hidden': 'Hidden',
@@ -445,6 +587,9 @@ export default {
       }[option]
 
       return text || option
+    },
+    compareValue (fromValue, toValue) {
+      return fromValue !== toValue
     }
   }
 }

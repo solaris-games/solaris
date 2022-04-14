@@ -35,7 +35,7 @@ To define the custom map, you will need to set up a **JSON Object** containing t
 }
 ```
 
-See [here](https://raw.githubusercontent.com/mike-eason/solaris/master/server/config/game/settings/user/customGalaxyExample.json) for an example template.
+See [here](https://raw.githubusercontent.com/solaris-games/solaris/master/server/config/game/settings/user/customGalaxyExample.json) for an example template.
 
 *Note: The galaxy must respect any game settings, for example if the `starsPerPlayer` is `10` then 10 stars for each player must be present in the custom galaxy map definition.*
 

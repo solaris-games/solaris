@@ -9,7 +9,8 @@
     "playerType": "all",
     "anonymity": "extra",
     "playerOnlineStatus": "hidden",
-    "timeMachine": "disabled"
+    "timeMachine": "disabled",
+    "fluxEnabled": "disabled"
   },
   "galaxy": {
     "galaxyType": "circular",
@@ -96,10 +97,13 @@
       "specialists": "standard"
     },
     "bankingReward": "standard",
+    "experimentationReward": "standard",
     "specialistTokenReward": "standard"
   },
   "gameTime": {
     "gameType": "turnBased",
+    "isTickLimited": "enabled",
+    "tickLimit": 240,
     "startDelay": 0,
     "turnJumps": 4,
     "maxTurnWait": 1440,

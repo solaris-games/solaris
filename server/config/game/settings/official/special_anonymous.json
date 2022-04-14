@@ -9,7 +9,8 @@
     "playerType": "establishedPlayers",
     "anonymity": "extra",
     "playerOnlineStatus": "visible",
-    "timeMachine": "enabled"
+    "timeMachine": "enabled",
+    "fluxEnabled": "disabled"
   },
   "galaxy": {
     "galaxyType": "irregular",
@@ -98,11 +99,13 @@
       "specialists": "standard"
     },
     "bankingReward": "standard",
+    "experimentationReward": "standard",
     "specialistTokenReward": "standard"
   },
   "gameTime": {
     "gameType": "realTime",
     "speed": 1800,
+    "isTickLimited": "disabled",
     "startDelay": 240,
     "afk": {
       "lastSeenTimeout": 2,

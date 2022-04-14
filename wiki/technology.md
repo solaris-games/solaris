@@ -51,6 +51,11 @@ Where `expenseConfig` is:
 
 Grants a `50` bonus points per level to a random technology each production.
 
+The equation is:
+
+- Standard: `experimentation * 50`
+- Experimental: `(experimentation * 50) + (0.15 * experimentation * totalScience)`
+
 ## Weapons
 
 Improves the amount of enemy ships destroyed per combat step. Each step, an amount of enemy ships exactly equal to the effective weapons level is destroyed.
@@ -59,7 +64,10 @@ Improves the amount of enemy ships destroyed per combat step. Each step, an amou
 
 Earns extra credits every production cycle. 
 
-The equation is `(banking * 75) + (0.15 * banking * totalEco)` for standard and for legacy banking its `banking * 75`.
+The equation is:
+
+- Standard: `(banking * 75) + (0.15 * banking * totalEco)`
+- Legacy: `banking * 75`
 
 ## Manufacturing
 
@@ -70,4 +78,7 @@ The formula is a star produces `(X*(Y+5))/T` ships per tick, where `X` is the st
 ## Specialists
 Increases the number of specialist tokens awarded at the end of a galactic cycle, these are used to hire specialists. 
 
-The equation is `tokens = tech level` for standard and `ceil(min(star count * tech level * 0.1, tech level))` for experimental.
+The equation is:
+
+- Standard: `tokens = tech level`
+- Experimental: `ceil(min(star count * tech level * 0.1, tech level))`
