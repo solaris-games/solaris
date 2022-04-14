@@ -1,6 +1,6 @@
 # Combat
 
-Combat occurs when a Carrier arrives at an enemy Star or when a Carrier intercepts an enemy Carrier in hyperspace. The combat summary can be viewed in the event log.
+Combat occurs when a Carrier arrives at a non-allied Star or when a Carrier intercepts a non-allied Carrier in hyperspace. The combat summary can be viewed in the event log.
 
 ![Summary of a combat in the event log](img/combat-summary.png)
 
@@ -42,11 +42,11 @@ For example:
 When formal alliances is enabled then a there are a few conditions that need to be met in order for combat to take place:
 
 1. When a carrier arrives at a star, if the player is allied with the defender then no combat occurs.
-2. When a carrier arrives at a star, if the player is enemies with the defender then combat occurs.
+2. When a carrier arrives at a star, if the player is not allied with the defender then combat occurs.
 2a. Carriers in orbit who are allied to the defender will help defend.
-2b. If the attacker wins and captures the star, then combat will repeat until there are no enemies to the defender.
-3. When a carrier intercepts another carrier in space, then combat occurs between enemies.
-4. When a player changes their diplomatic status from Allied to Enemy, then combat occurs.
+2b. If the attacker wins and captures the star, then combat will repeat until there are no non-allies to the defender.
+3. When a carrier intercepts another carrier in space, then combat occurs between non-allies.
+4. When a player changes their diplomatic status from allied to neutral or enemy, then combat occurs.
 
 > Note: More than 2 players can be in orbit at the star providing that they are allied with the defender. Combat will not occur if the guest players are enemies but are both allied to the defender.
 

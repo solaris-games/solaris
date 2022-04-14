@@ -53,7 +53,7 @@ Grants a `50` bonus points per level to a random technology each production.
 
 ## Weapons
 
-Improves the amount of enemy ships each friendly carrier destroys in combat. Each carrier destroys enemy ships exactly equal to the effective weapons level.
+Improves the amount of enemy ships destroyed per combat step. Each step, an amount of enemy ships exactly equal to the effective weapons level is destroyed.
 
 ## Banking
 
