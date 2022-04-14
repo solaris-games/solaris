@@ -161,4 +161,10 @@ export default {
     width:300px;
     left:-15px;
 }
+
+@media screen and (max-width: 473px) {
+    .tick-form {
+        left: -135px;
+    }
+}
 </style>

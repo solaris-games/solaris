@@ -9,17 +9,28 @@
     <form-error-list v-bind:errors="errors"/>
 
     <form @submit.prevent>
-      <div class="row no-gutters mb-2">
-        <select class="form-control" id="strategyType" v-on:change="resetPreview" v-model="selectedUpgradeStrategy" :disabled="isChecking || isUpgrading">
-          <option value="totalCredits">Spend credits</option>
-          <option value="infrastructureAmount">Buy infrastructure amount</option>
-          <option value="belowPrice">Buy below price</option>
-        </select>
-      </div>
       <div class="row no-gutters">
-        <div class="form-group input-group col-6 col-sm-4">
+        <div class="form-group input-group col">
           <div class="input-group-prepend">
-            <span class="input-group-text">{{ upgradeStrategyUnit }}</span>
+            <span class="input-group-text">
+              <i class="fas fa-calculator"></i>
+            </span>
+          </div>
+          <select class="form-control" id="strategyType" v-on:change="resetPreview" v-model="selectedUpgradeStrategy" :disabled="isChecking || isUpgrading">
+            <option value="totalCredits">Spend credits</option>
+            <option value="infrastructureAmount">Buy infrastructure amount</option>
+            <option value="belowPrice">Buy below price</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group input-group col pr-1">
+          <div class="input-group-prepend">
+            <span class="input-group-text">
+              <i class="fas fa-dollar-sign" v-if="selectedUpgradeStrategy === 'totalCredits'"></i>
+              <i class="fas fa-dollar-sign" v-if="selectedUpgradeStrategy === 'belowPrice'"></i>
+              <i class="fas fa-industry" v-if="selectedUpgradeStrategy === 'infrastructureAmount'"></i>
+            </span>
           </div>
           <input v-on:input="resetHasChecked"
             class="form-control"
@@ -30,7 +41,7 @@
             :disabled="isChecking || isUpgrading"
           />
         </div>
-        <div class="form-group col-6 col-sm-4 pl-1 pr-1">
+        <div class="form-group col pl-0 pr-0">
           <select class="form-control" id="infrastructureType" v-on:change="resetPreview" v-model="selectedType" :disabled="isChecking || isUpgrading">
             <option
               v-for="opt in types"
@@ -39,28 +50,31 @@
             >{{ opt.name }}</option>
           </select>
         </div>
-        <div class="form-group col-12 col-sm-4">
-          <button class="btn btn-success btn-block" v-on:click="doAction"
-                  :disabled="$isHistoricalMode() || isUpgrading || isChecking || gameIsFinished()" ><i class="fas fa-hammer"></i>{{ hasChecked ? " Upgrade" : " Check" }}</button>
+        <div class="form-group col-4 pl-1">
+          <button class="btn btn-info btn-block" v-on:click="check"
+            :disabled="$isHistoricalMode() || isUpgrading || isChecking || gameIsFinished()" ><i class="fas fa-hammer mr-1"></i>Check</button>
         </div>
       </div>
     </form>
 
-    <div v-if="hasChecked" class="row bg-secondary">
-      <div class="col text-center pt-3">
-        <p v-if="selectedUpgradeStrategy === 'totalCredits'">
-          <b class="text-warning">${{previewAmount}}</b> budget: <b class="text-success">{{upgradeAvailable}}</b> upgrades for <b class="text-danger">${{cost}}</b>
-        </p>
-        <p v-if="selectedUpgradeStrategy === 'infrastructureAmount' || selectedUpgradeStrategy === 'belowPrice'">
-          <b class="text-success">{{upgradeAvailable}}</b> upgrades for <b class="text-danger">${{cost}}</b>
-        </p>
-        <p v-if="ignoredCount"><small>{{ignoredCount}} star(s) have been ignored by the bulk upgrade.</small></p>
+    <loading-spinner :loading="isChecking" />
+
+    <div class="row bg-secondary" v-if="hasChecked && !isChecking">
+      <div class="col pt-3" >
+        <p><b class="text-success">{{upgradeAvailable}}</b> upgrade<span v-if="upgradeAvailable > 1">s</span> for <b class="text-danger">${{cost}}</b></p>
+      </div>
+      <div class="col-4 pt-2 pl-1">
+        <button class="btn btn-success btn-block" v-on:click="upgrade"
+          :disabled="$isHistoricalMode() || isUpgrading || isChecking || gameIsFinished()" ><i class="fas fa-check mr-1"></i>Confirm</button>
+      </div>
+      <div class="col-12" v-if="ignoredCount">
+        <p><small>{{ignoredCount}} star(s) have been ignored by the bulk upgrade.</small></p>
       </div>
     </div>
 
     <div v-if="hasChecked && upgradePreview && upgradePreview.stars.length" class="row">
       <!-- TODO: This should be a component -->
-      <table class="table table-striped table-hover mb-1">
+      <table class="table table-striped table-hover">
         <thead>
             <tr class="bg-primary">
                 <td>Star</td>
@@ -89,6 +103,9 @@
         </tbody>
       </table>
     </div>
+
+    <h4 class="mt-2">Bulk Ignore Stars</h4>
+
     <star-table @onOpenStarDetailRequested="onOpenStarDetailRequested" @bulkIgnoreChanged="resetPreview" :highlightIgnoredInfrastructure="selectedType"/>
   </div>
 </template>
@@ -101,12 +118,14 @@ import GameHelper from '../../../services/gameHelper'
 import AudioService from '../../../game/audio'
 import GameContainer from '../../../game/container'
 import BulkInfrastructureUpgradeStarTableVue from './BulkInfrastructureUpgradeStarTable'
+import LoadingSpinner from '../../LoadingSpinner'
 
 export default {
   components: {
     'menu-title': MenuTitle,
     'form-error-list': FormErrorList,
-    'star-table': BulkInfrastructureUpgradeStarTableVue
+    'star-table': BulkInfrastructureUpgradeStarTableVue,
+    'loading-spinner': LoadingSpinner
   },
   data () {
     return {
@@ -168,9 +187,6 @@ export default {
     },
     resetHasChecked () {
       this.hasChecked = false
-    },
-    doAction () {
-      this.hasChecked ? this.upgrade() : this.check()
     },
     async check () {
       this.errors = []
@@ -245,17 +261,6 @@ export default {
     },
     getStar(starId) {
       return GameHelper.getStarById(this.$store.state.game, starId)
-    }
-  },
-  computed: {
-    upgradeStrategyUnit () {
-      if (this.selectedUpgradeStrategy === 'totalCredits') {
-        return '$'
-      } else if (this.selectedUpgradeStrategy === 'belowPrice') {
-        return '<$'
-      } else if (this.selectedUpgradeStrategy === 'infrastructureAmount') {
-        return '1'
-      }
     }
   }
 }
