@@ -1,0 +1,114 @@
+<template>
+    <div>
+        <div class="row">
+            <div class="col-sm-12 col-md-6 col-lg-6">
+                <div class="card bg-dark text-white tutorial-game" @click="viewTutorial()">
+                    <img class="card-img" :src="require('../../../../assets/screenshots/tutorial.png')" alt="View Tutorial">
+                    <div class="card-img-overlay">
+                        <h5 class="card-title tutorial-card-title">
+                            <i class="fas fa-user-graduate"></i>
+                            <span class="ml-2">Tutorial</span>
+                        </h5>
+                        <h6 class="card-title card-subtitle">
+                            Learn to Play
+                        </h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-6 col-lg-6 pl-md-0">
+                <div class="row">
+                    <div class="col-12">
+                        <h4>Learn to Play</h4>
+                        <p>
+                            New to <span class="text-info">Solaris</span>? Learn the basics by completing the tutorial and when you're ready, join a standard game to fight against real players.
+                        </p>
+                    </div>
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col"></div>
+                            <div class="col-auto">
+                                <a href="https://discord.com/invite/v7PD33d" target="_blank" title="Discord" class="btn btn-info mr-2">
+                                    <i class="fab fa-discord"></i> Discord
+                                </a>
+                                <a href="https://steamcommunity.com/app/1623930/discussions/" target="_blank" title="Forum" class="btn btn-primary mr-2">
+                                    <i class="far fa-comments"></i> Forum
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+import router from '../../../../router'
+import gameService from '../../../../services/api/game'
+
+export default {
+    methods: {
+        async viewTutorial () {
+            if (!await this.$confirm(`Start Tutorial`, `You are about to start the tutorial, are you sure you want to continue?`)) {
+                return
+            }
+            
+            try {
+                let response = await gameService.createTutorialGame()
+
+                if (response.status === 201) {
+                    router.push({ name: 'game', query: { id: response.data } })
+                }
+            } catch (err) {
+                console.error(err)
+            }
+        }
+    }
+}
+</script>
+
+<style scoped>
+.card {
+  height: 175px;
+  margin-bottom: 1rem;
+  cursor: pointer;
+}
+
+.card-img {
+  object-fit: cover;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* .featured-card .card-img {
+  max-height: 250px;
+} */
+
+.card-img-overlay {
+  padding: 0.5rem;
+}
+
+.card-title {
+  background-color: #375a7f;
+  padding: 0.25rem;
+  display: inline-block;
+  border-radius: 3px;
+}
+
+.card-subtitle {
+  font-size: 12px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  margin: 8px;
+  background-color: #3498DB;
+}
+
+.tutorial-card-title {
+  background-color: #3498DB;
+}
+
+.tutorial-game {
+  border: 3px solid #3498DB;
+}
+</style>
