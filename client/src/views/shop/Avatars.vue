@@ -116,7 +116,7 @@ export default {
     },
     getAvatarImage (avatar) {
       try {
-        return require('../assets/avatars/' + avatar.file)
+        return require('../../assets/avatars/' + avatar.file)
       } catch (err) {
         console.error(err)
 
