@@ -1,0 +1,197 @@
+<template>
+<tr>
+  <td :style="{'width': '8px', 'background-color': getFriendlyColour(diplomaticStatus.playerIdTo)}"></td>
+  <td class="col-avatar" :title="getPlayerAlias(diplomaticStatus.playerIdTo)">
+    <player-avatar @onClick="onPlayerDetailRequested(diplomaticStatus.playerIdTo)" :player="getPlayer(diplomaticStatus.playerIdTo)"/>
+  </td>
+  <td class="pl-2 pt-3 pb-2">
+    <h5 class="alias-title">{{getPlayerAlias(diplomaticStatus.playerIdTo)}}</h5>
+  </td>
+  <td class="fit pt-3 pr-1">
+    <i :class="getStatusIcon(diplomaticStatus.statusFrom)" :title="diplomaticStatus.statusFrom"></i> (<i :class="getStatusIcon(diplomaticStatus.actualStatus)" :title="diplomaticStatus.actualStatus"></i>) <i :class="getStatusIcon(diplomaticStatus.statusTo)" :title="diplomaticStatus.statusTo"></i>
+  </td>
+  <td class="fit pt-3 pb-2 pr-2">
+    <div class="btn-group">
+      <button class="btn btn-sm btn-success" :disabled="isGameFinished || diplomaticStatus.statusTo === 'allies'" @click="declareAlly(diplomaticStatus)" title="Declare this player an ally"><i class="fas fa-handshake"></i></button>
+      <button class="btn btn-sm btn-info" :disabled="isGameFinished || diplomaticStatus.statusTo === 'neutral'" @click="declareNeutral(diplomaticStatus)" title="Declare this player as neutral"><i class="fas fa-dove"></i></button>
+      <button class="btn btn-sm btn-danger" :disabled="isGameFinished || diplomaticStatus.statusTo === 'enemies'" @click="declareEnemy(diplomaticStatus)" title="Declare this player as an enemy"><i class="fas fa-crosshairs"></i></button>
+    </div>
+  </td>
+</tr>
+</template>
+
+<script>
+import PlayerAvatarVue from '../menu/PlayerAvatar'
+import DiplomacyApiService from '../../../../services/api/diplomacy'
+import gameHelper from '../../../../services/gameHelper'
+import DiplomacyHelper from '../../../../services/diplomacyHelper'
+
+export default {
+  components: {
+    'player-avatar': PlayerAvatarVue
+  },
+  props: {
+    'diplomaticStatus': Object
+  },
+  methods: {
+    getPlayer (playerId) {
+      return gameHelper.getPlayerById(this.$store.state.game, playerId)
+    },
+    getPlayerAlias (playerId) {
+      return this.getPlayer(playerId).alias
+    },
+    getFriendlyColour (playerId) {
+      return gameHelper.getPlayerColour(this.$store.state.game, playerId)
+    },
+    onPlayerDetailRequested(playerId) {
+      this.$emit('onOpenPlayerDetailRequested', playerId)
+    },
+    async declareAlly (diplomaticStatus) {
+      const userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
+      let playerAlias = this.getPlayerAlias(diplomaticStatus.playerIdTo)
+      let allianceFee = 0
+
+      if (DiplomacyHelper.isAllianceUpkeepEnabled(this.$store.state.game)) {
+        allianceFee = DiplomacyHelper.getAllianceUpkeepCost(this.$store.state.game, userPlayer, 1)
+
+        if (!await this.$confirm('Alliance Fee', `Allying with this player will cost you $${allianceFee} credits, are you sure you want to continue?`)) {
+          return
+        }
+      }
+
+      if (await this.$confirm('Declare Allies', `Are you sure you want to change your diplomatic status to ${playerAlias} to allied?`)) {
+        try {
+          let response = await DiplomacyApiService.declareAlly(this.$store.state.game._id, diplomaticStatus.playerIdTo)
+
+          if (response.status === 200) {
+            if (response.data.statusTo == 'allies') {
+              this.$toasted.show(`Your diplomatic status to ${playerAlias} is now allied.`, { type: 'success' })
+            } else
+            {
+              this.$toasted.show(`You can not ally ${playerAlias}. Check the maximum alliance limits.`, { type: 'error' })
+            }
+
+            diplomaticStatus.statusFrom = response.data.statusFrom
+            diplomaticStatus.statusTo = response.data.statusTo
+            diplomaticStatus.actualStatus = response.data.actualStatus
+
+            userPlayer.credits -= allianceFee
+
+            this.$emit('onApiRequestSuccess')
+          } else {
+            this.$emit('onApiRequestError', response.data)
+          }
+        } catch (err) {
+          console.error(err)
+          this.$emit('onApiRequestError', err.response.data)
+        }
+      }
+    },
+    async declareEnemy (diplomaticStatus) {
+      let playerAlias = this.getPlayerAlias(diplomaticStatus.playerIdTo)
+
+      if (await this.$confirm('Declare Enemy', `Are you sure you want to change your diplomatic status to ${playerAlias} to enemies?`)) {
+        try {
+          let response = await DiplomacyApiService.declareEnemy(this.$store.state.game._id, diplomaticStatus.playerIdTo)
+
+          if (response.status === 200) {
+            this.$toasted.show(`Your diplomatic status to ${playerAlias} is now enemies.`, { type: 'success' })
+
+            diplomaticStatus.statusFrom = response.data.statusFrom
+            diplomaticStatus.statusTo = response.data.statusTo
+            diplomaticStatus.actualStatus = response.data.actualStatus
+
+            this.$emit('onApiRequestSuccess')
+          } else {
+            this.$emit('onApiRequestError', response.data)
+          }
+        } catch (err) {
+          console.error(err)
+          this.$emit('onApiRequestError', err.response.data)
+        }
+      }
+    },
+    async declareNeutral (diplomaticStatus) {
+      let playerAlias = this.getPlayerAlias(diplomaticStatus.playerIdTo)
+
+      if (await this.$confirm('Declare Neutral', `Are you sure you want to change your diplomatic status to ${playerAlias} to neutral?`)) {
+        try {
+          let response = await DiplomacyApiService.declareNeutral(this.$store.state.game._id, diplomaticStatus.playerIdTo)
+
+          if (response.status === 200) {
+            this.$toasted.show(`Your diplomatic status to ${playerAlias} is now neutral.`, { type: 'success' })
+
+            diplomaticStatus.statusFrom = response.data.statusFrom
+            diplomaticStatus.statusTo = response.data.statusTo
+            diplomaticStatus.actualStatus = response.data.actualStatus
+
+            this.$emit('onApiRequestSuccess')
+          } else {
+            this.$emit('onApiRequestError', response.data)
+          }
+        } catch (err) {
+          console.error(err)
+          this.$emit('onApiRequestError', err.response.data)
+        }
+      }
+    },
+    getStatusIcon (status) {
+      switch (status) {
+        case 'allies':
+          return 'fas fa-handshake text-success'
+        case 'neutral':
+          return 'fas fa-dove text-info'
+        case 'enemies':
+          return 'fas fa-crosshairs text-danger'
+      }
+    }
+  },
+  computed: {
+    isGameFinished: function () {
+      return gameHelper.isGameFinished(this.$store.state.game)
+    }
+  }
+}
+</script>
+
+<style scoped>
+.col-avatar {
+  position:absolute;
+  width: 59px;
+  height: 59px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.alias-title {
+  padding-left: 59px;
+}
+
+tr {
+  height: 59px;
+}
+
+td {
+  padding: 0;
+}
+
+.table td.fit,
+.table th.fit {
+    white-space: nowrap;
+    width: 1%;
+}
+
+@media screen and (max-width: 576px) {
+  tr {
+    height: 45px;
+  }
+
+  .alias-title {
+    padding-left: 45px;
+  }
+
+  .col-avatar {
+    width: 45px;
+  }
+}
+</style>

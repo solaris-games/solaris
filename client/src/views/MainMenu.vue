@@ -1,5 +1,4 @@
 <template>
-<div>
   <view-container>
     <view-title title="Main Menu" :hideHomeButton="true" :showSocialLinks="true"/>
 
@@ -88,19 +87,18 @@
       </div>
     </div> -->
   </view-container>
-</div>
 </template>
 
 <script>
-import LoadingSpinnerVue from '../components/LoadingSpinner'
+import LoadingSpinnerVue from './components/LoadingSpinner'
 import router from '../router'
 import authService from '../services/api/auth'
 import userService from '../services/api/user'
-import ViewContainer from '../components/ViewContainer'
-import ViewTitle from '../components/ViewTitle'
-import Achievements from '../components/game/player/Achievements'
-import RecentDonations from '../components/game/donate/RecentDonations.vue'
-import TutorialGame from '../components/game/menu/TutorialGame'
+import ViewContainer from './components/ViewContainer'
+import ViewTitle from './components/ViewTitle'
+import Achievements from './game/components/player/Achievements'
+import RecentDonations from './game/components/donate/RecentDonations.vue'
+import TutorialGame from './game/components/menu/TutorialGame'
 
 export default {
   components: {
