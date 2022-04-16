@@ -2,6 +2,8 @@
   <view-container>
     <view-title title="Join Game" />
 
+    <flux-bar class="mb-2"/>
+
     <ul class="nav nav-tabs">
       <li class="nav-item">
           <a class="nav-link active" data-toggle="tab" href="#newGames">New Games</a>
@@ -43,7 +45,7 @@
 
           <h4>Standard Games</h4>
 
-          <p>These are official games and award rank.</p>
+          <p>These are official games and award rank.<help-tooltip class="ml-1" tooltip="Note: New Player games do not award rank - 1v1 games do not award galactic credits"/></p>
 
           <loading-spinner :loading="isLoading"/>
 
@@ -69,8 +71,25 @@
               </div>
             </div>
 
+            <!-- Flux -->
+            <div class="col-sm-12 col-md-4 col-lg-4 pr-1 pl-1" v-if="games.fluxRT">
+              <div class="card bg-dark text-white flux-game" @click="routeToPath('/game/detail', { id: games.fluxRT._id })">
+                <img class="card-img" :src="require('../assets/screenshots/home-5.png')" alt="Standard Game">
+                <div class="card-img-overlay">
+                  <h5 class="card-title flux-card-title">
+                    <i class="fas fa-dice-d20"></i>
+                    <span class="ml-2">{{games.fluxRT.settings.general.name}}</span>
+                  </h5>
+                  <p class="card-title card-subtitle flux-card-subtitle">
+                    {{getGameTypeFriendlyText(games.fluxRT)}}
+                    ({{games.fluxRT.state.players}}/{{games.fluxRT.settings.general.playerLimit}})
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <!-- Special Game -->
-            <div class="col-sm-12 col-md-8 col-lg-8 pl-1" v-if="games.special">
+            <div class="col-sm-12 col-md-4 col-lg-4 pl-1" v-if="games.special">
               <div class="card bg-dark text-white special-game" @click="routeToPath('/game/detail', { id: games.special._id })">
                 <img class="card-img" :src="require('../assets/screenshots/' + games.special.settings.general.type + '.png')" alt="Special Game">
                 <div class="card-img-overlay">
@@ -342,6 +361,7 @@ import gameService from '../services/api/game'
 import GameHelper from '../services/gameHelper'
 import RandomHelper from '../services/randomHelper'
 import HelpTooltip from '../components/HelpTooltip'
+import FluxBar from '../components/game/menu/FluxBar'
 import * as moment from 'moment'
 
 export default {
@@ -350,7 +370,8 @@ export default {
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'tutorial-game': TutorialGame,
-    'help-tooltip': HelpTooltip
+    'help-tooltip': HelpTooltip,
+    'flux-bar': FluxBar
   },
   data () {
     return {
@@ -367,7 +388,8 @@ export default {
         oneVsOneRT: null,
         oneVsOneTB: null,
         thirtyTwoPlayerRT: null,
-        special: null
+        special: null,
+        fluxRT: null
       }
     }
   },
@@ -397,6 +419,7 @@ export default {
       this.games.oneVsOneTB = this.getOfficialGame('1v1_tb')
       this.games.thirtyTwoPlayerRT = this.getOfficialGame('32_player_rt')
       this.games.special = this.getSpecialGame()
+      this.games.fluxRT = this.getOfficialGame('flux_rt')
     } catch (err) {
       console.error(err)
     }
@@ -491,6 +514,10 @@ export default {
   background-color: #d62c1a;
 }
 
+.flux-card-title {
+  background-color: #3498DB;
+}
+
 .card-subtitle {
   font-size: 12px;
   position: absolute;
@@ -516,6 +543,10 @@ p.card-subtitle {
   background-color: #d62c1a;
 }
 
+.flux-card-subtitle {
+  background-color: #3498DB;
+}
+
 .new-player-game {
   border: 3px solid #f39c12;
 }
@@ -526,5 +557,9 @@ p.card-subtitle {
 
 .special-game {
   border: 3px solid #d62c1a;
+}
+
+.flux-game {
+  border: 3px solid #3498DB;
 }
 </style>

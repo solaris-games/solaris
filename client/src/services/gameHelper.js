@@ -489,12 +489,13 @@ class GameHelper {
     return game.state.endDate != null
   }
 
-  isDarkModeStandard (game) {
-    return game.settings.specialGalaxy.darkGalaxy === 'standard'
-  }
-
   isDarkModeExtra (game) {
     return game.settings.specialGalaxy.darkGalaxy === 'extra'
+  }
+
+  isDarkMode (game) {
+    return (game.settings.specialGalaxy.darkGalaxy === 'standard' || game.settings.specialGalaxy.darkGalaxy === 'extra') ||
+          (game.settings.specialGalaxy.darkGalaxy === 'start' && game.state.startDate == null)
   }
 
   isTradeEnabled (game) {
@@ -908,7 +909,7 @@ class GameHelper {
   }
 
   isUserSpectatingGame (game) {
-    return this.isGameInProgress(game) && !this.getUserPlayer(game)
+    return !this.getUserPlayer(game) // If the user isn't in the game then they are spectating
   }
 
   _getBankingCredits (game, player) {
@@ -984,12 +985,17 @@ class GameHelper {
       'special_homeStar': 'Capital Stars',
       'special_anonymous': 'Anonymous',
       'special_kingOfTheHill': 'King Of The Hill',
-      'special_tinyGalaxy': 'Tiny Galaxy'
+      'special_tinyGalaxy': 'Tiny Galaxy',
+      'flux_rt': 'Flux'
     }[game.settings.general.type]
   }
 
   isNewPlayerGame (game) {
     return ['new_player_rt', 'new_player_tb'].includes(game.settings.general.type)
+  }
+
+  isFluxGame (game) {
+    return game.settings.general.fluxEnabled === 'enabled'
   }
 
   getLedgerGameEventPlayerSummary (game, gameEvent) {

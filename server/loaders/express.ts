@@ -23,8 +23,9 @@ import ShopApi from '../api/shop';
 import BadgesApi from '../api/badges';
 import ReportApi from '../api/report';
 import { DependencyContainer } from '../types/DependencyContainer';
+import { Config } from '../types/Config';
 
-export default async (config, app, io, container: DependencyContainer) => {
+export default async (config: Config, app, io, container: DependencyContainer) => {
 
     app.use(require('body-parser').json({
         limit: '1000kb' // Note: This allows large custom galaxies to be uploaded.
@@ -33,7 +34,7 @@ export default async (config, app, io, container: DependencyContainer) => {
     // ---------------
     // Set up MongoDB session store
     let store = new MongoDBStore({
-        uri: process.env.CONNECTION_STRING,
+        uri: config.connectionString,
         collection: 'sessions'
     });
 

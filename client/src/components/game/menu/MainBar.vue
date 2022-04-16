@@ -1,8 +1,9 @@
 <template>
 <div>
   <header-bar class="header-bar" 
-    @onMenuStateChanged="onMenuStateChanged"
     @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+
+  <sidebar-menu />
 
   <div class="menu">
     <not-logged-in-bar v-if="!isLoggedIn"/>
@@ -139,7 +140,6 @@
   </div>
 
   <footer-bar class="footer-bar d-xs-block d-sm-none" 
-    @onMenuStateChanged="onMenuStateChanged"
     @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 </div>
 </template>
@@ -171,6 +171,7 @@ import GameHelper from '../../../services/gameHelper'
 import CombatCalculatorVue from '../carrier/CombatCalculator.vue'
 import RulerVue from '../ruler/Ruler.vue'
 import HeaderBarVue from './HeaderBar'
+import SidebarMenuVue from './SidebarMenu'
 import LedgerVue from '../ledger/Ledger.vue'
 import DiplomacyVue from '../diplomacy/Diplomacy.vue'
 import HireSpecialistCarrierVue from '../specialist/HireSpecialistCarrier.vue'
@@ -190,6 +191,7 @@ export default {
   components: {
     'header-bar': HeaderBarVue,
     'footer-bar': FooterBarVue,
+    'sidebar-menu': SidebarMenuVue,
     'welcome': WelcomeVue,
     'tutorial': TutorialVue,
     'player-list': PlayerListVue,
@@ -226,10 +228,6 @@ export default {
     'player-badge-shop': PlayerBadgeShopVue,
     'report-player': ReportPlayerVue
   },
-  props: {
-    menuState: String,
-    menuArguments: [Object, String, Array]
-  },
   data () {
     return {
       MENU_STATES: MENU_STATES
@@ -248,13 +246,10 @@ export default {
   },
   methods: {
     changeMenuState (state, args) {
-      this.onMenuStateChanged({
+      this.$store.commit('setMenuState', {
         state,
         args
       })
-    },
-    onMenuStateChanged (e) {
-      this.$emit('onMenuStateChanged', e)
     },
     onCloseRequested (e) {
       this.changeMenuState(null, null)
@@ -337,6 +332,12 @@ export default {
     }
   },
   computed: {
+    menuState () {
+      return this.$store.state.menuState
+    },
+    menuArguments () {
+      return this.$store.state.menuArguments
+    },
     game () {
       return this.$store.state.game
     },
@@ -344,9 +345,8 @@ export default {
       return this.$store.state.userId != null
     },
     isSpectatingDarkMode () {
-      return GameHelper.isUserSpectatingGame(this.game)
-        && (GameHelper.isDarkModeStandard(this.game) || GameHelper.isDarkModeExtra(this.game))
-    },
+      return GameHelper.isUserSpectatingGame(this.game) && GameHelper.isDarkMode(this.game)
+    }
   }
 }
 </script>
@@ -367,6 +367,7 @@ export default {
 .menu {
   /* This is a must otherwise the div overlays the map */
   position:absolute;
+  left: 50px;
   width: 473px;
   padding-top: 45px;
   max-height: 100%;
@@ -388,6 +389,12 @@ export default {
 @media(max-width: 473px) {
     .menu {
         width: 100%;
+    }
+}
+
+@media(max-width: 768px) {
+    .menu {
+        left: 0px;
     }
 }
 </style>

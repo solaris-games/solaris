@@ -1,0 +1,23 @@
+// playerCarrierSpecialistHired
+// playerStarSpecialistHired
+
+let type = 'playerCarrierSpecialistHired'
+
+db.gameevents.aggregate([
+    {
+        $match: {
+            type: { $in: [ type ] }
+        }
+    },
+    {
+        $group: {
+            _id: "$data.specialistId",
+            totalHired: { $sum: 1 }
+        }
+    },
+    {
+        $sort: {
+            totalHired: 1
+        }
+    }
+])

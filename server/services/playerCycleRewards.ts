@@ -56,12 +56,13 @@ export default class PlayerCycleRewardsService {
         }
 
         let banking = player.research.banking.level;
+        let multiplier = game.constants.player.bankingCycleRewardMultiplier;
 
         switch (game.settings.technology.bankingReward) {
             case 'standard':
-                return Math.round((banking * 75) + (0.15 * banking * totalEco));
+                return Math.round((banking * multiplier) + (0.15 * banking * totalEco));
             case 'legacy':
-                return banking * 75;
+                return banking * multiplier;
         }
 
         throw new Error(`Unsupported banking reward type: ${game.settings.technology.bankingReward}.`);

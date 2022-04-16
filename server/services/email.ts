@@ -165,10 +165,10 @@ export default class EmailService {
 
         // Replace the default parameters in the file
         // TODO: These should be environment variables.
-        html = html.replace('[{solaris_url}]', process.env.CLIENT_URL);
-        html = html.replace('[{solaris_url_gamelist}]', `${process.env.CLIENT_URL}/#/game/list`);
-        html = html.replace('[{solaris_url_resetpassword}]', `${process.env.CLIENT_URL}/#/account/reset-password-external`);
-        html = html.replace('[{source_code_url}]', 'https://github.com/mike-eason/solaris');
+        html = html.replace('[{solaris_url}]', this.config.clientUrl);
+        html = html.replace('[{solaris_url_gamelist}]', `${this.config.clientUrl}/#/game/list`);
+        html = html.replace('[{solaris_url_resetpassword}]', `${this.config.clientUrl}/#/account/reset-password-external`);
+        html = html.replace('[{source_code_url}]', 'https://github.com/solaris-games/solaris');
 
         // Replace the parameters in the file
         for (let i = 0; i < parameters.length; i++) {
@@ -190,7 +190,7 @@ export default class EmailService {
 
     async sendGameStartedEmail(gameId: DBObjectId) {
         let game = await this.gameService.getById(gameId);
-        let gameUrl = `${process.env.CLIENT_URL}/#/game?id=${game._id}`;
+        let gameUrl = `${this.config.clientUrl}/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
 
         for (let player of game.galaxy.players) {
@@ -211,7 +211,7 @@ export default class EmailService {
 
     async sendGameFinishedEmail(gameId: DBObjectId) {
         let game = await this.gameService.getById(gameId);
-        let gameUrl = `${process.env.CLIENT_URL}/#/game?id=${game._id}`;
+        let gameUrl = `${this.config.clientUrl}/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
 
         for (let player of game.galaxy.players) {
@@ -250,7 +250,7 @@ export default class EmailService {
             .join('');
         }
 
-        let gameUrl = `${process.env.CLIENT_URL}/#/game?id=${game._id}`;
+        let gameUrl = `${this.config.clientUrl}/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
 
         // Send the email only to undefeated players.
@@ -321,7 +321,7 @@ export default class EmailService {
 
             await this.playerService.setHasSentTurnReminder(game, player, true);
 
-            let gameUrl = `${process.env.CLIENT_URL}/#/game?id=${game._id}`;
+            let gameUrl = `${this.config.clientUrl}/#/game?id=${game._id}`;
             let gameName = game.settings.general.name;
 
             let user = await this.userService.getEmailById(player.userId);
@@ -360,7 +360,7 @@ export default class EmailService {
 
     async sendGamePlayerAfkEmail(gameId: DBObjectId, playerId: DBObjectId) {
         let game = await this.gameService.getById(gameId);
-        let gameUrl = `${process.env.CLIENT_URL}/#/game?id=${game._id}`;
+        let gameUrl = `${this.config.clientUrl}/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
         let player = this.playerService.getById(game, playerId);
         

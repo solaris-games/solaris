@@ -1,8 +1,8 @@
 <template>
   <view-container>
     <view-title title="Create Game" />
-    <loading-spinner :loading="!settings"/>
-    <loading-spinner :loading="isCreatingGame"/>
+    <loading-spinner :loading="!settings || isCreatingGame"/>
+
     <form @submit.prevent="handleSubmit" v-if="settings">
       <view-collapse-panel title="Game Settings" :startsOpened="true">
         <div class="form-group">
@@ -51,6 +51,7 @@
             <input type="range" min="1" max="25" step="1" class="form-range w-100" id="kingOfTheHillproductionCycles" v-model="settings.kingOfTheHill.productionCycles" :disabled="isCreatingGame">
           </div>
         </div>
+
         <form-error-list v-bind:errors="errors"/>
 
         <button type="submit" class="btn btn-success btn-lg mb-3 btn-block" :disabled="isCreatingGame"><i class="fas fa-gamepad"></i> Create Game</button>
@@ -92,6 +93,17 @@
             </option>
           </select>
         </div>
+
+        <div class="form-group">
+          <label for="advancedAI" class="col-form-label">Advanced AI <help-tooltip tooltip="Use the advanced AI to replace defeated players"></help-tooltip></label>
+          <select class="form-control" id="advancedAI" v-model="settings.general.advancedAI" :disabled="isCreatingGame">
+            <option v-for="opt in options.general.advancedAI" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+
       </view-collapse-panel>
 
       <view-collapse-panel title="Game Time Settings" :startsOpened="true">
@@ -111,6 +123,22 @@
               {{ opt.text }}
             </option>
           </select>
+        </div>
+
+        <div class="form-group">
+          <label for="isTickLimited" class="col-form-label">Time Limited <help-tooltip tooltip="Determines whether the game has a time limit"/></label>
+          <select class="form-control" id="isTickLimited" v-model="settings.gameTime.isTickLimited" :disabled="isCreatingGame">
+            <option v-for="opt in options.gameTime.isTickLimited" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group" v-if="settings.gameTime.isTickLimited === 'enabled'">
+          <label for="tickLimit" class="col-form-label">Time Limit (<span class="text-warning">{{settings.gameTime.tickLimit}} ticks</span>) <help-tooltip tooltip="Determines the maximum number of ticks before the game is automatically concluded"/></label>
+          <div class="col">
+            <input type="range" min="200" max="2000" step="100" class="form-range w-100" id="tickLimit" v-model="settings.gameTime.tickLimit" :disabled="isCreatingGame">
+          </div>
         </div>
 
         <div class="form-group" v-if="settings.gameTime.gameType === 'realTime'">
@@ -141,35 +169,42 @@
         </div>
 
         <div class="form-group">
-          <label for="lastSeenTimeout" class="col-form-label">AFK Last Seen Limit <help-tooltip tooltip="Determines how long before a player is kicked for being AFK - This is paired with the AFK Galactic Cycle Limit setting, the timeout is whichever comes first"/></label>
-          <select class="form-control" id="lastSeenTimeout" v-model="settings.gameTime.afk.lastSeenTimeout" :disabled="isCreatingGame">
-            <option v-for="opt in options.gameTime.afk.lastSeenTimeout" v-bind:key="opt.value" v-bind:value="opt.value">
-              {{ opt.text }}
-            </option>
-          </select>
+          <label for="lastSeenTimeout" class="col-form-label">AFK Last Seen Limit (<span class="text-warning">{{settings.gameTime.afk.lastSeenTimeout}} day(s)</span>) <help-tooltip tooltip="Determines how long before a player is kicked for being AFK - This is paired with the AFK Galactic Cycle Limit setting, the timeout is whichever comes first"/></label>
+          <div class="col">
+            <input type="range" min="1" max="7" step="1" class="form-range w-100" id="lastSeenTimeout" v-model="settings.gameTime.afk.lastSeenTimeout" :disabled="isCreatingGame">
+          </div>
         </div>
 
         <div class="form-group" v-if="settings.gameTime.gameType === 'realTime'">
-          <label for="cycleTimeout" class="col-form-label">AFK Galactic Cycle Limit <help-tooltip tooltip="Determines how many cycles before a player is kicked before being AFK - This is paired with the AFK Last Seen Limit setting, the timeout is whichever comes first"/></label>
-          <select class="form-control" id="cycleTimeout" v-model="settings.gameTime.afk.cycleTimeout" :disabled="isCreatingGame">
-            <option v-for="opt in options.gameTime.afk.cycleTimeout" v-bind:key="opt.value" v-bind:value="opt.value">
-              {{ opt.text }}
-            </option>
-          </select>
+          <label for="cycleTimeout" class="col-form-label">AFK Galactic Cycle Limit (<span class="text-warning">{{settings.gameTime.afk.cycleTimeout}} cycles</span>) <help-tooltip tooltip="Determines how many cycles before a player is kicked before being AFK - This is paired with the AFK Last Seen Limit setting, the timeout is whichever comes first"/></label>
+          <div class="col">
+            <input type="range" min="3" max="25" step="1" class="form-range w-100" id="cycleTimeout" v-model="settings.gameTime.afk.cycleTimeout" :disabled="isCreatingGame">
+          </div>
         </div>
 
         <div class="form-group" v-if="settings.gameTime.gameType === 'turnBased'">
-          <label for="turnTimeout" class="col-form-label">AFK Missed Turn Limit <help-tooltip tooltip="Determines how many missed turns before a player is kicked before being AFK - This is paired with the AFK Last Seen Limit setting, the timeout is whichever comes first"/></label>
-          <select class="form-control" id="turnTimeout" v-model="settings.gameTime.afk.turnTimeout" :disabled="isCreatingGame">
-            <option v-for="opt in options.gameTime.afk.turnTimeout" v-bind:key="opt.value" v-bind:value="opt.value">
-              {{ opt.text }}
-            </option>
-          </select>
+          <label for="turnTimeout" class="col-form-label">AFK Missed Turn Limit (<span class="text-warning">{{settings.gameTime.afk.turnTimeout}} missed turn(s)</span>) <help-tooltip tooltip="Determines how many missed turns before a player is kicked before being AFK - This is paired with the AFK Last Seen Limit setting, the timeout is whichever comes first"/></label>
+          <div class="col">
+            <input type="range" min="1" max="60" step="1" class="form-range w-100" id="turnTimeout" v-model="settings.gameTime.afk.turnTimeout" :disabled="isCreatingGame">
+          </div>
         </div>
 
       </view-collapse-panel>
 
       <view-subtitle title="Advanced Settings" class="centeredHeader"/>
+
+      <view-collapse-panel title="Flux">
+        <flux-bar />
+
+        <div class="form-group">
+          <label for="fluxEnabled" class="col-form-label">Enabled <help-tooltip tooltip="Determines whether this month's flux is applied to the game"/></label>
+          <select class="form-control" id="fluxEnabled" v-model="settings.general.fluxEnabled" :disabled="isCreatingGame">
+            <option v-for="opt in options.general.fluxEnabled" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+      </view-collapse-panel>
 
       <view-collapse-panel title="Galaxy Settings">
         <div class="form-group">
@@ -644,6 +679,15 @@
         </div>
 
         <div class="form-group">
+          <label for="experimentationReward" class="col-form-label">Experimentation Reward <help-tooltip tooltip="Determines the amount of research points awarded for the experimentation technology at the end of a galactic cycle"/></label>
+          <select class="form-control" id="experimentationReward" v-model="settings.technology.experimentationReward" :disabled="isCreatingGame">
+            <option v-for="opt in options.technology.experimentationReward" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
           <label for="specialistTokenReward" class="col-form-label">Specialist Token Reward <help-tooltip tooltip="Determines the amount of specialist tokens awarded for the banking technology at the end of a galactic cycle"/></label>
           <select class="form-control" id="specialistTokenReward" v-model="settings.technology.specialistTokenReward" :disabled="isCreatingGame">
             <option v-for="opt in options.technology.specialistTokenReward" v-bind:key="opt.value" v-bind:value="opt.value">
@@ -677,6 +721,7 @@ import ViewSubtitle from '../components/ViewSubtitle'
 import FormErrorList from '../components/FormErrorList'
 import HelpTooltip from '../components/HelpTooltip'
 import SpecialistBanListSelection from '../components/game/specialist/SpecialistBanListSelection'
+import FluxBar from '../components/game/menu/FluxBar'
 import gameService from '../services/api/game'
 import router from '../router'
 
@@ -689,7 +734,8 @@ export default {
     'view-subtitle': ViewSubtitle,
     'form-error-list': FormErrorList,
     'help-tooltip': HelpTooltip,
-    'specialist-ban-list-selection': SpecialistBanListSelection
+    'specialist-ban-list-selection': SpecialistBanListSelection,
+    'flux-bar': FluxBar
   },
   data () {
     return {

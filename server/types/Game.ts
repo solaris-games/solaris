@@ -21,7 +21,8 @@ export type GameType = 'tutorial'|
 'special_homeStar'|
 'special_anonymous'|
 'special_kingOfTheHill'|
-'special_tinyGalaxy';
+'special_tinyGalaxy' |
+'flux_rt';
 
 export type GameMode = 'conquest'|'battleRoyale'|'kingOfTheHill';
 export type GamePlayerType = 'all'|'establishedPlayers';
@@ -47,14 +48,23 @@ export type GameTradeCost = 0|5|15|25|50|100;
 export type GameTradeScanning = 'all'|'scanned';
 export type GameResearchCost = 'none'|'cheap'|'standard'|'expensive'|'veryExpensive'|'crazyExpensive';
 export type GameBankingReward = 'standard'|'legacy';
+export type GameExperimentationReward = 'standard'|'experimental';
 export type GameSpecialistTokenReward = 'standard'|'experimental';
 export type GameTimeType = 'realTime'|'turnBased';
 export type GameTimeSpeed = 30|60|300|600|1800|3600|7200;
 export type GameTimeStartDelay = 0|1|5|10|30|60|120|240|360|480|600|720|1440;
 export type GameTimeMaxTurnWait = 1|5|10|30|60|360|480|600|720|1080|1440|2880;
 
+export interface GameFlux {
+	id: number;
+	name: string;
+	month: string;
+	description: string;
+};
+
 export interface GameSettings {
 	general: {
+		fluxId: number | null;
 		createdByUserId?: DBObjectId | null;
 		name: string;
 		description: string | null;
@@ -69,7 +79,10 @@ export interface GameSettings {
 		playerOnlineStatus: GamePlayerOnlineStatus;
 		timeMachine: GameSettingEnabledDisabled;
 		awardRankTo: GameAwardRankTo;
+		fluxEnabled: GameSettingEnabledDisabled;
 		isGameAdmin?: boolean;
+		advancedAI: GameSettingEnabledDisabled;
+		flux?: GameFlux;
 	},
 	galaxy: {
 		galaxyType: GameGalaxyType;
@@ -162,11 +175,14 @@ export interface GameSettings {
 			specialists: GameResearchCost;
 		},
 		bankingReward: GameBankingReward;
+		experimentationReward: GameExperimentationReward;
 		specialistTokenReward: GameSpecialistTokenReward;
 	},
 	gameTime: {
 		gameType: GameTimeType;
 		speed: GameTimeSpeed;
+		isTickLimited: GameSettingEnabledDisabled;
+		tickLimit: number | null;
 		startDelay: GameTimeStartDelay;
 		turnJumps: number;
 		maxTurnWait: GameTimeMaxTurnWait;
@@ -224,6 +240,8 @@ export interface Game {
 		},
 		research: {
 			progressMultiplier: number;
+			sciencePointMultiplier: number;
+			experimentationMultiplier: number;
 		},
 		star: {
 			resources: {
@@ -249,7 +267,9 @@ export interface Game {
 				expensive: number;
 				veryExpensive: number;
 				crazyExpensive: number;
-			}
+			},
+			captureRewardMultiplier: number;
+			homeStarDefenderBonusMultiplier: number;
 		},
 		diplomacy: {
 			upkeepExpenseMultipliers: {
@@ -258,6 +278,13 @@ export interface Game {
 				standard: number;
 				expensive: number;
 			}
+		},
+		player: {
+			rankRewardMultiplier: number;
+			bankingCycleRewardMultiplier: number;
+		},
+		specialists: {
+			monthlyBanAmount: number;
 		}
 	},
 	quitters: DBObjectId[],

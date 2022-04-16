@@ -1,0 +1,86 @@
+[
+    {
+        "id": 1,
+        "name": "Unnamed",
+        "month": "January",
+        "description": "End of cycle Banking rewards are decreased.",
+        "tooltip": "Banking reward multiplier is reduced from 75 to 50."
+    },
+    {
+        "id": 2,
+        "name": "Unnamed",
+        "month": "February",
+        "description": "Capturing Star rewards for destroying Economy are increased.",
+        "tooltip": "Increased from 10 credits to 25 per Economy point."
+    },
+    {
+        "id": 3,
+        "name": "Unnamed",
+        "month": "March",
+        "description": "Research points from Science are increased.",
+        "tooltip": "Research contribution from Science is increased from 1 to 2 points per Science."
+    },
+    {
+        "id": 4,
+        "name": "Unnamed",
+        "month": "April",
+        "description": "Capital Stars have an increased Defender Bonus.",
+        "tooltip": "Capital Stars have x2 Defender Bonus."
+    },
+    {
+        "id": 5,
+        "name": "Unnamed",
+        "month": "May",
+        "description": "End of cycle Experimentation rewards are increased.",
+        "tooltip": "Experimentation reward multiplier is increased from 50 to 100."
+    },
+    {
+        "id": 6,
+        "name": "Unnamed",
+        "month": "June",
+        "description": "Trade cost is increased to 'Very Expensive'.",
+        "tooltip": "50 credits per technology level."
+    },
+    {
+        "id": 7,
+        "name": "Unnamed",
+        "month": "July",
+        "description": "Weapons technology is fixed.",
+        "tooltip": "Weapons technology is fixed at Level 7."
+    },
+    {
+        "id": 8,
+        "name": "Unnamed",
+        "month": "August",
+        "description": "The Defender Bonus is disabled.",
+        "tooltip": ""
+    },
+    {
+        "id": 9,
+        "name": "Unnamed",
+        "month": "September",
+        "description": "Production Cycles are shorter by 6 ticks.",
+        "tooltip": ""
+    },
+    {
+        "id": 10,
+        "name": "Unnamed",
+        "month": "October",
+        "description": "The number of specialist bans this month has increased.",
+        "tooltip": "Increased from 3 to 6 bans."
+    },
+    {
+        "id": 11,
+        "name": "Unnamed",
+        "month": "November",
+        "description": "Increased starting credits and specialist tokens.",
+        "tooltip": "Credits are increased by x2 (max 3000) and Specialist Tokens are increased by x2 (max 100)"
+    },
+    {
+        "id": 12,
+        "name": "Unnamed",
+        "month": "December",
+        "description": "Gain more rank from playing games.",
+        "tooltip": "Rank rewards are increased by x2 on top of any other multipliers (special games grant x2)."
+    }
+]

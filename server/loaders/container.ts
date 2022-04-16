@@ -76,6 +76,7 @@ import CarrierMovementService from '../services/carrierMovement';
 import CarrierGiftService from '../services/carrierGift';
 import PlayerCycleRewardsService from '../services/playerCycleRewards';
 import StarContestedService from '../services/starContested';
+import GameFluxService from '../services/gameFlux';
 
 import { DependencyContainer } from '../types/DependencyContainer';
 
@@ -108,7 +109,7 @@ export default (config, io): DependencyContainer => {
     const authService = new AuthService(userRepository, passwordService);
     const userService = new UserService(UserModel, userRepository, passwordService);
     const adminService = new AdminService(userRepository, gameRepository);
-    const recaptchaService = new RecaptchaService();
+    const recaptchaService = new RecaptchaService(config);
 
     const guildService = new GuildService(GuildModel, guildRepository, userRepository, userService);
     const guildUserService = new GuildUserService(userRepository, guildService);
@@ -116,11 +117,12 @@ export default (config, io): DependencyContainer => {
     const broadcastService = new BroadcastService(io);
     const distanceService = new DistanceService();
     const randomService = new RandomService();
-    const cacheService = new CacheService();
-    const paypalService = new PaypalService(PaymentModel, paymentRepository, userService, cacheService);
+    const cacheService = new CacheService(config);
+    const paypalService = new PaypalService(PaymentModel, config, paymentRepository, userService, cacheService);
     const specialistService = new SpecialistService();
     const gameTypeService = new GameTypeService();
     const gameStateService = new GameStateService();
+    const gameFluxService = new GameFluxService();
     const playerCreditsService = new PlayerCreditsService(gameRepository);
     const avatarService = new AvatarService(userRepository, userService);
     const achievementService = new AchievementService(userRepository, guildService);
@@ -161,26 +163,26 @@ export default (config, io): DependencyContainer => {
     const specialistBanService = new SpecialistBanService(specialistService);
     const specialistHireService = new SpecialistHireService(gameRepository, specialistService, achievementService, waypointService, playerCreditsService, starService, gameTypeService, specialistBanService);
     const starUpgradeService = new StarUpgradeService(gameRepository, starService, carrierService, achievementService, researchService, technologyService, playerCreditsService, gameTypeService);
-    const aiService = new AIService(starUpgradeService);
+    const shipTransferService = new ShipTransferService(gameRepository, carrierService, starService);
+    const aiService = new AIService(starUpgradeService, carrierService, starService, distanceService, waypointService, combatService, shipTransferService, technologyService, playerService, reputationService, diplomacyService, playerStatisticsService);
     const historyService = new HistoryService(historyRepository, playerService, gameService, playerStatisticsService);
     const battleRoyaleService = new BattleRoyaleService(starService, carrierService, mapService, starDistanceService, waypointService, carrierMovementService);
     const orbitalMechanicsService = new OrbitalMechanicsService(mapService);
-    const gameGalaxyService = new GameGalaxyService(cacheService, broadcastService, gameService, mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, specialistService, technologyService, reputationService, guildUserService, historyService, battleRoyaleService, orbitalMechanicsService, gameTypeService, gameStateService, diplomacyService, avatarService, playerStatisticsService);
+    const gameGalaxyService = new GameGalaxyService(cacheService, broadcastService, gameService, mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, specialistService, technologyService, reputationService, guildUserService, historyService, battleRoyaleService, orbitalMechanicsService, gameTypeService, gameStateService, diplomacyService, avatarService, playerStatisticsService, gameFluxService);
     const gameTickService = new GameTickService(distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService, specialistService, starUpgradeService, reputationService, aiService, battleRoyaleService, orbitalMechanicsService, diplomacyService, gameTypeService, gameStateService, playerCycleRewardsService, diplomacyUpkeepService, carrierMovementService, carrierGiftService, starContestedService, playerReadyService);
     const emailService = new EmailService(config, gameService, userService, leaderboardService, playerService, gameTypeService, gameStateService, gameTickService);
-    const shipTransferService = new ShipTransferService(gameRepository, carrierService, starService);
-    const donateService = new DonateService(cacheService);
-
+    const donateService = new DonateService(config, cacheService);
     const eventService = new EventService(EventModel, eventRepository, broadcastService, gameService, gameTickService, researchService, starService, starUpgradeService, tradeService,
         ledgerService, conversationService, combatService, specialistService, badgeService, carrierGiftService, diplomacyService);
 
     const gameListService = new GameListService(gameRepository, gameService, conversationService, eventService, gameTypeService);
     const gameCreateValidationService = new GameCreateValidationService(playerService, starService, carrierService, specialistService, gameTypeService);
-    const gameCreateService = new GameCreateService(GameModel, gameService, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService, gameCreateValidationService, specialistBanService);
+    const gameCreateService = new GameCreateService(GameModel, gameService, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService, gameCreateValidationService, gameFluxService, specialistBanService, gameTypeService);
 
     console.log('Dependency Container Initialized');
     
     return {
+        config,
         adminService,
         passwordService,
         authService,
@@ -242,5 +244,6 @@ export default (config, io): DependencyContainer => {
         carrierMovementService,
         playerCycleRewardsService,
         starContestedService,
+        gameFluxService,
     };
 };

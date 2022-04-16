@@ -23,6 +23,17 @@ import UserService from './user';
 
 export default class StarService extends EventEmitter {
 
+    gameRepo: DatabaseRepository<Game>;
+    randomService: RandomService;
+    nameService: NameService;
+    distanceService: DistanceService;
+    starDistanceService: StarDistanceService;
+    technologyService: TechnologyService;
+    specialistService: SpecialistService;
+    userService: UserService;
+    gameTypeService: GameTypeService;
+    gameStateService: GameStateService;
+
     constructor(
         gameRepo: DatabaseRepository<Game>,
         randomService: RandomService,
@@ -315,14 +326,14 @@ export default class StarService extends EventEmitter {
         return starsInScanningRange;
     }
 
-    getStarsWithinScanningRangeOfStarByStarIds(game: Game, star: MapObject, stars: MapObject[]) {
+    getStarsWithinScanningRangeOfStarByStarIds(game: Game, star: Star, stars: MapObject[]) {
         // If the star isn't owned then it cannot have a scanning range
         if (star.ownedByPlayerId == null) {
             return [];
         }
 
         // Calculate the scanning distance of the given star.
-        let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
+        let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star, true);
         let scanningRangeDistance = this.distanceService.getScanningDistance(game, effectiveTechs.scanning);
 
         // Go through all stars and find each star that is in scanning range.
@@ -661,7 +672,7 @@ export default class StarService extends EventEmitter {
         let newStarUser = attackerUsers.find(u => newStarPlayer.userId && u._id.toString() === newStarPlayer.userId.toString());
         let newStarPlayerCarriers = attackerCarriers.filter(c => c.ownedByPlayerId!.toString() === newStarPlayer._id.toString());
 
-        let captureReward = star.infrastructure.economy! * 10; // Attacker gets 10 credits for every eco destroyed.
+        let captureReward = star.infrastructure.economy! * game.constants.star.captureRewardMultiplier; // Attacker gets X credits for every eco destroyed.
 
         // Check to see whether to double the capture reward.
         let captureRewardMultiplier = this.specialistService.hasAwardDoubleCaptureRewardSpecialist(newStarPlayerCarriers);

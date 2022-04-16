@@ -22,6 +22,8 @@ const schema = new Schema({
     defeated: { type: Types.Boolean, required: false, default: false }, // TODO: We can remove this in favour of using defeatedDate below.
     defeatedDate: { type: Types.Date, required: false, default: null },
     afk: { type: Types.Boolean, required: false, default: false },      // TODO: Same treatment as with defeatedDate.
+    ai: { type: Types.Boolean, required: false, default: false },
+    aiState: { type: Types.Mixed, required: false, default: null },
     renownToGive: { type: Types.Number, required: true, default: 8 },
     ready: { type: Types.Boolean, required: false, default: false },
     readyToCycle: { type: Types.Boolean, required: false, default: false },

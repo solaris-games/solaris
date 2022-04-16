@@ -88,4 +88,8 @@ export default class GameTypeService {
         return ['1v1_rt', '1v1_tb'].includes(game.settings.general.type);
     }
 
+    isFluxGame(game: Game) {
+        return game.settings.general.fluxEnabled === 'enabled'
+    }
+
 }

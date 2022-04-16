@@ -693,11 +693,15 @@ export default class LeaderboardService {
 
                 if (i == 0) {
                     user.achievements.victories++; // Increase the winner's victory count
-                    user.credits++; // Give the winner a galactic credit.
                     rankIncrease = leaderboard.length; // Note: Using leaderboard length as this includes ALL players (including afk)
 
                     if (this.gameTypeService.is32PlayerOfficialGame(game)) {
                         this.badgeService.awardBadgeForUser(user, 'victor32');
+                    }
+
+                    // Give the winner a galactic credit providing it isn't a 1v1.
+                    if (!this.gameTypeService.is1v1Game(game)) {
+                        user.credits++;
                     }
                 }
                 else if (game.settings.general.awardRankTo === 'all') {
@@ -720,6 +724,9 @@ export default class LeaderboardService {
                 if (rankIncrease > 0 && this.gameTypeService.isSpecialGameMode(game)) {
                     rankIncrease *= 2;
                 }
+                
+                // Apply any additional rank multiplier at the end.
+                rankIncrease *= game.constants.player.rankRewardMultiplier;
 
                 let currentRank = user.achievements.rank;
                 let newRank = Math.max(user.achievements.rank + rankIncrease, 0); // Cannot go less than 0.

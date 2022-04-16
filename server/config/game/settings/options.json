@@ -61,6 +61,26 @@
              "value":"visible",
              "text":"Visible"
           }
+       ],
+       "advancedAI": [
+          {
+             "value": "enabled",
+             "text": "Enabled"
+          },
+          {
+             "value": "disabled",
+             "text": "Disabled"
+          }
+       ],
+       "fluxEnabled":[
+          {
+             "value":"enabled",
+             "text":"Enabled"
+          },
+          {
+             "value":"disabled",
+             "text":"Disabled"
+          }
        ]
     },
     "specialGalaxy":{
@@ -489,6 +509,16 @@
              "text":"Legacy"
           }
        ],
+       "experimentationReward":[
+          {
+             "value":"standard",
+             "text":"Standard"
+          },
+          {
+             "value":"experimental",
+             "text":"Experimental"
+          }
+       ],
        "specialistTokenReward":[
           {
              "value":"standard",
@@ -540,6 +570,16 @@
              "value":7200,
              "text":"Very Slow (1 tick = 2 hours)"
           }
+       ],
+       "isTickLimited": [
+         {
+            "value": "enabled",
+            "text": "Enabled"
+         },
+         {
+            "value": "disabled",
+            "text": "Disabled"
+         }
        ],
        "startDelay":[
           {
@@ -666,106 +706,6 @@
              "value":2880,
              "text":"48 Hours"
           }
-       ],
-       "afk":{
-          "lastSeenTimeout":[
-             {
-                "value":1,
-                "text":"1 Day"
-             },
-             {
-                "value":2,
-                "text":"2 Days"
-             },
-             {
-                "value":3,
-                "text":"3 Days"
-             },
-             {
-                "value":4,
-                "text":"4 Days"
-             },
-             {
-                "value":5,
-                "text":"5 Days"
-             },
-             {
-                "value":6,
-                "text":"6 Days"
-             },
-             {
-                "value":7,
-                "text":"7 Days"
-             }
-          ],
-          "cycleTimeout":[
-             {
-                "value":3,
-                "text":"3 Cycles"
-             },
-             {
-                "value":4,
-                "text":"4 Cycles"
-             },
-             {
-                "value":5,
-                "text":"5 Cycles"
-             },
-             {
-                "value":6,
-                "text":"6 Cycles"
-             },
-             {
-                "value":7,
-                "text":"7 Cycles"
-             },
-             {
-                "value":8,
-                "text":"8 Cycles"
-             },
-             {
-                "value":9,
-                "text":"9 Cycles"
-             },
-             {
-                "value":10,
-                "text":"10 Cycles"
-             }
-          ],
-          "turnTimeout":[
-             {
-                "value":1,
-                "text":"1 Missed Turn"
-             },
-             {
-                "value":2,
-                "text":"2 Missed Turns"
-             },
-             {
-                "value":3,
-                "text":"3 Missed Turns"
-             },
-             {
-                "value":4,
-                "text":"4 Missed Turns"
-             },
-             {
-                "value":5,
-                "text":"5 Missed Turns"
-             },
-             {
-                "value":10,
-                "text":"10 Missed Turns"
-             },
-             {
-                "value":30,
-                "text":"30 Missed Turns"
-             },
-             {
-                "value":60,
-                "text":"60 Missed Turns"
-             }
-          ]
-       }
+       ]
     }
  }
