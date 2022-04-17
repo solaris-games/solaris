@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import ConfirmationDialog from './components/modal/ConfirmationDialog'
+import ConfirmationDialog from './views/components/modal/ConfirmationDialog'
 
 export default {
   components: {
