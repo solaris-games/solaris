@@ -50,9 +50,10 @@ export default {
       const userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
       let playerAlias = this.getPlayerAlias(diplomaticStatus.playerIdTo)
       let allianceFee = 0
+      let cycleCredits = gameHelper.calculateIncome(this.$store.state.game, userPlayer); 
 
       if (DiplomacyHelper.isAllianceUpkeepEnabled(this.$store.state.game)) {
-        allianceFee = DiplomacyHelper.getAllianceUpkeepCost(this.$store.state.game, userPlayer, 1)
+        allianceFee = DiplomacyHelper.getAllianceUpkeepCost(this.$store.state.game, userPlayer, cycleCredits, 1)
 
         if (!await this.$confirm('Alliance Fee', `Allying with this player will cost you $${allianceFee} credits, are you sure you want to continue?`)) {
           return
