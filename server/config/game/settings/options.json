@@ -439,6 +439,10 @@
          {
            "value":"expensive",
            "text":"Expensive"
+         },
+         {
+           "value":"crazyExpensive",
+           "text":"Crazy Expensive"
          }
        ],
        "tradeRestricted":[
