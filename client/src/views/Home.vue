@@ -52,13 +52,13 @@
 </template>
 
 <script>
-import ViewContainer from '../components/ViewContainer'
-import ViewTitle from '../components/ViewTitle'
-import AccountLoginVue from './AccountLogin'
+import ViewContainer from './components/ViewContainer'
+import ViewTitle from './components/ViewTitle'
+import AccountLoginVue from './account/components/Login'
 import ApiAuthService from '../services/api/auth'
 import router from '../router'
-import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
-import RecentDonationsVue from '../components/game/donate/RecentDonations.vue'
+import LoadingSpinnerVue from './components/LoadingSpinner.vue'
+import RecentDonationsVue from './game/components/donate/RecentDonations.vue'
 
 export default {
   components: {
