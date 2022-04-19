@@ -49,14 +49,26 @@ export default class ShipTransferService {
                     updateOne: {
                         filter: {
                             _id: game._id,
-                            'galaxy.stars._id': star._id
+                            'galaxy.carriers._id': c._id
                         },
                         update: {
-                            'galaxy.stars.$.shipsActual': star.shipsActual,
-                            'galaxy.stars.$.ships': star.ships
+                            'galaxy.carriers.$.ships': c.ships
                         }
                     }
                 };
+            });
+    
+            dbWrites.push({
+                updateOne: {
+                    filter: {
+                        _id: game._id,
+                        'galaxy.stars._id': star._id
+                    },
+                    update: {
+                        'galaxy.stars.$.shipsActual': star.shipsActual,
+                        'galaxy.stars.$.ships': star.ships
+                    }
+                }
             });
     
             // Update the DB.
