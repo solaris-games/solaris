@@ -627,7 +627,7 @@ export default class GameTickService extends EventEmitter {
                 if (this.diplomacyUpkeepService.isAllianceUpkeepEnabled(game)) {
                     let allianceCount = this.diplomacyService.getAlliesOfPlayer(game, player).length;
                     
-                    allianceUpkeepResult = this.diplomacyUpkeepService.deductTotalUpkeep(game, player, creditsResult.creditsFromBanking, allianceCount); // TODO: creditsTotal?
+                    allianceUpkeepResult = this.diplomacyUpkeepService.deductTotalUpkeep(game, player, creditsResult.creditsTotal, allianceCount); 
                 }
 
                 // Raise an event if the player isn't defeated, AI doesn't care about events.

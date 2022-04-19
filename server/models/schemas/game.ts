@@ -224,9 +224,10 @@ const schema = new Schema({
 		diplomacy: {
 			upkeepExpenseMultipliers: {
 				none: { type: Types.Number, required: true, default: 0 },
-				cheap: { type: Types.Number, required: true, default: 0.02 },
-				standard: { type: Types.Number, required: true, default: 0.05 },
-				expensive: { type: Types.Number, required: true, default: 0.10 }
+				cheap: { type: Types.Number, required: true, default: 0.05 },
+				standard: { type: Types.Number, required: true, default: 0.10 },
+				expensive: { type: Types.Number, required: true, default: 0.15 },
+        crazyExpensive: { type: Types.Number, required: true, default: 0.25 }
 			}
 		},
 		player: {
