@@ -1,6 +1,5 @@
 import { Game } from "../types/Game";
 import { Player } from "../types/Player";
-import { DiplomaticState } from "../types/Diplomacy";
 import { AiState, KnownAttack } from "../types/Ai";
 import CarrierService from "./carrier";
 import CombatService from "./combat";
@@ -19,6 +18,7 @@ import ReputationService from "./reputation";
 import DiplomacyService from "./diplomacy";
 import PlayerStatisticsService from "./playerStatistics";
 import {DBObjectId} from "../types/DBObjectId";
+import { Location } from "../types/Location";
 
 const FIRST_TICK_BULK_UPGRADE_SCI_PERCENTAGE = 20;
 const FIRST_TICK_BULK_UPGRADE_IND_PERCENTAGE = 30;
@@ -395,7 +395,6 @@ export default class AIService {
                 }
 
                 const starToInvade = context.starsById.get(order.star)!;
-                const requiredShips = Math.floor(this._calculateRequiredShipsForAttack(game, player, context, starToInvade) * INVASION_ATTACK_FACTOR);
                 const ticksLimit = game.settings.galaxy.productionTicks * 2;
                 const fittingAssignments = this._findAssignmentsWithTickLimit(game, player, context, context.allCanReachPlayerStars, assignments, order.star, ticksLimit,  this._canAffordCarrier(context, game, player, false), false);
 
@@ -404,6 +403,9 @@ export default class AIService {
                 }
 
                 for (const {assignment, trace} of fittingAssignments) {
+                    const ticksUntilArrival = this._calculateTraceDuration(game, trace.map(te => context.starsById.get(te.starId)!.location));
+                    const requiredShips = Math.floor(this._calculateRequiredShipsForAttack(game, player, context, starToInvade, ticksUntilArrival) * INVASION_ATTACK_FACTOR);
+
                     if (assignment.totalShips >= requiredShips) {
                         const carrierResult = await this._useAssignment(context, game, player, assignments, assignment, this._createWaypointsFromTrace(trace), requiredShips);
 
@@ -615,13 +617,18 @@ export default class AIService {
         return allowCarrierPurchase || hasCarriers;
     }
 
+    _calculateTraceDuration(game: Game, trace: Location[]): number {
+        const distancePerTick = game.settings.specialGalaxy.carrierSpeed;
+        const entireDistance = this.distanceService.getDistanceAlongLocationList(trace);
+        return Math.ceil(entireDistance / distancePerTick);
+    }
+
     _findAssignmentsWithTickLimit(game: Game, player: Player, context: Context, starGraph: StarGraph, assignments: Map<string, Assignment>, destinationId: string, ticksLimit: number, allowCarrierPurchase: boolean, onlyOne = false, filterNext: ((trace: TracePoint[], nextStarId: string) => boolean) | null = null): FoundAssignment[] {
         const distancePerTick = game.settings.specialGalaxy.carrierSpeed;
 
         const nextFilter = (trace: TracePoint[], nextStarId: string) => {
             const entireTrace = trace.concat([{starId: nextStarId}]).map(te => context.starsById.get(te.starId)!.location);
-            const entireDistance = this.distanceService.getDistanceAlongLocationList(entireTrace);
-            const ticksRequired = Math.ceil(entireDistance / distancePerTick);
+            const ticksRequired = this._calculateTraceDuration(game, entireTrace);
             const withinLimit = ticksRequired <= ticksLimit;
             if (filterNext) {
                 return withinLimit && filterNext(trace, nextStarId);
@@ -656,15 +663,20 @@ export default class AIService {
         }
     }
 
-    _calculateRequiredShipsForAttack(game: Game, player: Player, context: Context, starToInvade: Star) {
+    _calculateRequiredShipsForAttack(game: Game, player: Player, context: Context, starToInvade: Star, ticksToArrival: number) {
         const invadedPlayer = starToInvade.ownedByPlayerId!;
 
         const starId = starToInvade._id.toString();
         const defendingPlayer = this.playerService.getById(game, invadedPlayer)!;
         const defendingCarriers = context.carriersOrbiting.get(starId) || [];
 
+        const techLevel = this.technologyService.getStarEffectiveTechnologyLevels(game, starToInvade, false);
+        const shipsOnCarriers = defendingCarriers.reduce((sum, c) => sum + (c.ships || 0), 0);
+        const shipsProduced = this.starService.calculateStarShipsByTicks(techLevel.manufacturing, starToInvade.infrastructure.industry || 0, ticksToArrival, game.settings.galaxy.productionTicks);
+        const shipsAtArrival = (starToInvade.shipsActual || 0) + shipsOnCarriers + shipsProduced;
+
         const defender = {
-            ships: Math.floor(starToInvade.shipsActual || 0) + defendingCarriers.reduce((sum, c) => sum + (c.ships || 0), 0),
+            ships: Math.ceil(shipsAtArrival),
             weaponsLevel: this.technologyService.getStarEffectiveWeaponsLevel(game, [defendingPlayer], starToInvade, defendingCarriers)
         };
         const attacker = {
