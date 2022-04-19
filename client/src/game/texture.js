@@ -1,5 +1,4 @@
 import * as PIXI from 'pixi.js-legacy'
-import gameHelper from '../services/gameHelper'
 import seededRandom from 'random-seed'
 
 class TextureService {

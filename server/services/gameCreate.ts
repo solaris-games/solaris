@@ -179,7 +179,7 @@ export default class GameCreateService {
         }
 
         // Apply spec bans if applicable.
-        if (game.settings.specialGalaxy.specialistCost !== 'none') {
+        if (game.settings.specialGalaxy.specialistCost !== 'none' && isOfficialGame && !isNewPlayerGame && !isTutorial) {
             const banAmount = game.constants.specialists.monthlyBanAmount; // Random X specs of each type.
 
             game.settings.specialGalaxy.specialistBans = {

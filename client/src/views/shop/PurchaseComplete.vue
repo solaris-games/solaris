@@ -9,8 +9,8 @@
 </template>
 
 <script>
-import ViewTitle from '../../components/ViewTitle'
-import ViewContainer from '../../components/ViewContainer'
+import ViewTitle from '../components/ViewTitle'
+import ViewContainer from '../components/ViewContainer'
 
 export default {
   components: {

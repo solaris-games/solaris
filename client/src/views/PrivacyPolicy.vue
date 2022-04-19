@@ -457,8 +457,8 @@
 </template>
 
 <script>
-import ViewContainer from "../components/ViewContainer"
-import ViewTitle from "../components/ViewTitle"
+import ViewContainer from "./components/ViewContainer"
+import ViewTitle from "./components/ViewTitle"
 
 export default {
   components: {
