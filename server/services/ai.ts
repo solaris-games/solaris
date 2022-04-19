@@ -18,6 +18,7 @@ import {CarrierWaypoint, CarrierWaypointActionType} from "../types/CarrierWaypoi
 import ReputationService from "./reputation";
 import DiplomacyService from "./diplomacy";
 import PlayerStatisticsService from "./playerStatistics";
+import {DBObjectId} from "../types/DBObjectId";
 
 const FIRST_TICK_BULK_UPGRADE_SCI_PERCENTAGE = 20;
 const FIRST_TICK_BULK_UPGRADE_IND_PERCENTAGE = 30;
@@ -278,7 +279,7 @@ export default class AIService {
 
         // Enemy carriers that are in transition to one of our stars
         const incomingCarriers = game.galaxy.carriers
-            .filter(carrier => carrier.ownedByPlayerId!.toString() !== playerId && carrier.orbiting === null)
+            .filter(carrier => carrier.ownedByPlayerId && this._isEnemyPlayer(game, player, carrier.ownedByPlayerId) && carrier.orbiting === null)
             .map(carrier => {
                 if (carrier.waypoints.length > 0) {
                     const waypoint = carrier.waypoints[0];
@@ -750,10 +751,13 @@ export default class AIService {
         return defenseOrders.concat(invasionOrders, expansionOrders, movementOrders);
     }
 
-    _isEnemyStar(game: Game, player: Player, context: Context, star: Star) {
+    _isEnemyPlayer(game: Game, player: Player, otherPlayerId: DBObjectId): boolean {
+        return player._id !== otherPlayerId && this.diplomacyService.getDiplomaticStatusToPlayer(game, player._id, otherPlayerId).actualStatus !== 'allies';
+    }
+
+    _isEnemyStar(game: Game, player: Player, context: Context, star: Star): boolean {
         if (star.ownedByPlayerId) {
-            const starOwner = star.ownedByPlayerId;
-            return starOwner !== player._id && this.diplomacyService.getDiplomaticStatusToPlayer(game, player._id, starOwner).actualStatus !== 'allies';
+            return this._isEnemyPlayer(game, player, star.ownedByPlayerId);
         }
         return false;
     }
