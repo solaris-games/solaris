@@ -75,15 +75,15 @@
 </template>
 
 <script>
-import ViewContainer from '../../components/ViewContainer'
-import ViewTitle from '../../components/ViewTitle'
-import LoadingSpinner from '../../components/LoadingSpinner'
+import ViewContainer from '../components/ViewContainer'
+import ViewTitle from '../components/ViewTitle'
+import LoadingSpinner from '../components/LoadingSpinner'
 import GuildApiService from '../../services/api/guild'
-import GuildNewInvite from './GuildNewInvite'
-import GuildInvite from './GuildInvite'
-import GuildApplication from './GuildApplication'
-import GuildMember from './GuildMember'
-import GuildMemberList from './GuildMemberList'
+import GuildNewInvite from './components/NewInvite'
+import GuildInvite from './components/Invite'
+import GuildApplication from './components/Application'
+import GuildMember from './components/Member'
+import GuildMemberList from './components/MemberList'
 
 export default {
   components: {

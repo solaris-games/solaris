@@ -78,6 +78,8 @@ export default class CarrierMovementService {
         }
 
         // If the star is unclaimed, then claim it.
+        // TODO: Move this logic out of this function so that carrier movement will correctly
+        // take into account multiple players arriving at an unclaimed star at the same time.
         if (destinationStar.ownedByPlayerId == null) {
             await this.starService.claimUnownedStar(game, gameUsers, destinationStar, carrier);
         }
