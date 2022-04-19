@@ -230,23 +230,40 @@ export default {
   },
   data () {
     return {
-      MENU_STATES: MENU_STATES
+      MENU_STATES: MENU_STATES,
+      menuState: null,
+      menuArguments: null
     }
   },
   mounted () {
     // TODO: These event names should be global constants
+    eventBus.$on('onMenuRequested', this.onMenuRequested)
     eventBus.$on('onCreateNewConversationRequested', this.onCreateNewConversationRequested)
     eventBus.$on('onViewConversationRequested', this.onViewConversationRequested)
     eventBus.$on('onOpenInboxRequested', this.onOpenInboxRequested)
   },
   destroyed () {
+    eventBus.$off('onMenuRequested', this.onMenuRequested)
     eventBus.$off('onCreateNewConversationRequested', this.onCreateNewConversationRequested)
     eventBus.$off('onViewConversationRequested', this.onViewConversationRequested)
     eventBus.$off('onOpenInboxRequested', this.onOpenInboxRequested)
   },
   methods: {
+    onMenuRequested (menuState) {
+      menuState.state = menuState.state || null
+      menuState.args = menuState.args || null
+
+      // Toggle menu if its already open.
+      if (menuState.state === this.menuState && menuState.args === this.menuArguments) {
+        this.menuArguments = null
+        this.menuState = null
+      } else {
+        this.menuArguments = menuState.args
+        this.menuState = menuState.state
+      }
+    },
     changeMenuState (state, args) {
-      this.$store.commit('setMenuState', {
+      this.onMenuRequested({
         state,
         args
       })
@@ -332,12 +349,6 @@ export default {
     }
   },
   computed: {
-    menuState () {
-      return this.$store.state.menuState
-    },
-    menuArguments () {
-      return this.$store.state.menuArguments
-    },
     game () {
       return this.$store.state.game
     },
