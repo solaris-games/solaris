@@ -77,7 +77,6 @@ export interface Player {
     defeated: boolean;
     defeatedDate: Date | null;
     afk: boolean;
-    ai: boolean;
     renownToGive: number;
     ready: boolean;
     readyToCycle: boolean;

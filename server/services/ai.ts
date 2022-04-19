@@ -192,9 +192,8 @@ export default class AIService {
 
     async _doAdvancedLogic(game: Game, player: Player, isFirstTick: boolean, isLastTick: boolean) {
         let aiState: AiState;
-        if (isFirstTick || !player.ai || !player.aiState) {
+        if (isFirstTick || !player.aiState) {
             aiState = this._createInitialAIState(game, player);
-            player.ai = true;
         } else  {
             aiState = player.aiState;
         }
