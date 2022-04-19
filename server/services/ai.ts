@@ -276,8 +276,9 @@ export default class AIService {
             carriersById.set(carrier._id.toString(), carrier);
         }
 
+        // Enemy carriers that are in transition to one of our stars
         const incomingCarriers = game.galaxy.carriers
-            .filter(carrier => carrier.ownedByPlayerId!.toString() !== playerId)
+            .filter(carrier => carrier.ownedByPlayerId!.toString() !== playerId && carrier.orbiting === null)
             .map(carrier => {
                 if (carrier.waypoints.length > 0) {
                     const waypoint = carrier.waypoints[0];
