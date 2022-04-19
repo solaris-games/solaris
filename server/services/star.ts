@@ -408,7 +408,9 @@ export default class StarService extends EventEmitter {
     }
 
     isStarPairWormHole(sourceStar: Star, destinationStar: Star) {
-        return sourceStar.wormHoleToStarId 
+        return sourceStar
+            && destinationStar
+            && sourceStar.wormHoleToStarId
             && destinationStar.wormHoleToStarId 
             && sourceStar.wormHoleToStarId.toString() === destinationStar._id.toString()
             && destinationStar.wormHoleToStarId.toString() === sourceStar._id.toString();
