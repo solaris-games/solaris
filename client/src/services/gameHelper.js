@@ -463,7 +463,9 @@ class GameHelper {
   }
 
   isStarPairWormHole (sourceStar, destinationStar) {
-    return sourceStar.wormHoleToStarId
+    return sourceStar
+      && destinationStar
+      && sourceStar.wormHoleToStarId
       && destinationStar.wormHoleToStarId
       && sourceStar.wormHoleToStarId === destinationStar._id
       && destinationStar.wormHoleToStarId === sourceStar._id
