@@ -58,6 +58,11 @@
             :valueText="getFriendlyText(game.settings.general.playerOnlineStatus)"
             :value="game.settings.general.playerOnlineStatus"
             :compareValue="compareSettings.general.playerOnlineStatus"/>
+          <game-setting-value title="Advanced AI"
+            tooltip="Use the advanced AI to replace defeated players"
+            :valueText="getFriendlyText(game.settings.general.advancedAI)"
+            :value="game.settings.general.advancedAI"
+            :compareValue="game.settings.general.advancedAI"/>
         </tbody>
       </table>
     </div>
