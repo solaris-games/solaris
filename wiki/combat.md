@@ -4,7 +4,7 @@ Combat occurs when a Carrier arrives at a non-allied Star or when a Carrier inte
 
 ![Summary of a combat in the event log](img/combat-summary.png)
 
-When 2 opposing Carriers arrive at a Star on the same tick, the Carrier that travelled the least distance in the current tick will arrive at the Star first and receive the Defender Bonus (if enabled).
+When 2 opposing Carriers arrive at a Star on the same tick, the Carrier that has the most ships (or if equal, travelled the least distance in the current tick) will arrive at the Star first and receive the Defender Bonus (if enabled).
 
 Starting with the defender, each player takes it in turns to deal damage to the opposing player. Damage dealt per turn is equal to the effective weapons level, factoring in weapons technology and specialist abilities. Damage is dealt roughly equally to all Carriers and the Star per turn.
 
@@ -17,6 +17,28 @@ Combat can also occur between two carriers. When two carriers from different pla
 > Note: In carrier to carrier combat, if the either side has **less than or equal ships** than the opposing side's weapons technology level then the carrier(s) will fight with **level 1 weapons**. This prevents players from exploiting 1 ship carriers to chip away at incoming enemy forces.
 
 The combat calculator is a useful tool to predict the outcome of combat. Simply input the defender and attacker's weapons level and number of ships and it will present the outcome.
+
+## Combat FAQ
+
+Here are some commonly asked rule clarifications for carrier-to-star and carrier-to-carrier combat:
+
+#### Carrier to Star Combat
+
+- Allies of the defender will join the defending side.
+- Enemies of the defender will join the attacking side.
+- Combat occurs in turns, the defender going first dealing damage equal to their effective weapons level each turn.
+- Attackers are awarded credits (default $10) per point of Economy destroyed.
+- If the star is captured and the star has a specialist, it will be captured by the attacker.
+- If there are more than 2 players attacking and the defender is defeated then the player with a carrier with the highest ship count will capture the star.
+- If there are 2 or more players attacking an unclaimed star then the player with a carrier with the highest ship count will capture the star.
+- If the attackers defeat the defender and they are enemies, then combat will continue until only one player remains or all players who remain are allied with the defender.
+
+#### Carrier to Carrier Combat
+
+- Combat occurs at the same time, mutual destruction.
+- Combat occurs between carriers traveling to and from the same stars.
+- Carriers can attack from the front (head-to-head combat) and catch up from behind.
+- All carriers travel independently, prioritizing carriers with the largest number of ships first.
 
 ## Combat Weapons Technology
 
