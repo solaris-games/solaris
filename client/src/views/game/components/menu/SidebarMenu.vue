@@ -91,7 +91,13 @@ export default {
     },
     canDisplayBottomBar () {
       return window.innerHeight >= 750
-    }
+    },
+    gameIsInProgress () {
+      return GameHelper.isGameInProgress(this.$store.state.game)
+    },
+    gameIsFinished () {
+      return GameHelper.isGameFinished(this.$store.state.game)
+    },
   }
 }
 </script>
