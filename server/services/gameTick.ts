@@ -763,7 +763,7 @@ export default class GameTickService extends EventEmitter {
     }
 
     async _playAI(game: Game) {
-        for (let player of game.galaxy.players.filter(p => p.defeated)) {
+        for (let player of game.galaxy.players.filter(p => this.aiService.isAIControlled(p))) {
             await this.aiService.play(game, player);
         }
     }

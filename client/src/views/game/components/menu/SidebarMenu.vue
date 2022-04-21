@@ -19,7 +19,7 @@
       <div v-if="isLoggedIn">
         <sidebar-menu-item :menuState="MENU_STATES.COMBAT_CALCULATOR" tooltip="Calculator (C)" iconClass="fas fa-calculator" />
         <sidebar-menu-item :menuState="MENU_STATES.RULER" tooltip="Ruler (V)" iconClass="fas fa-ruler" />
-        <sidebar-menu-item v-if="!isDarkModeExtra && !isDataCleaned" :menuState="MENU_STATES.INTEL" tooltip="Intel (I)" iconClass="fas fa-chart-line" />
+        <sidebar-menu-item v-if="!isDarkModeExtra && !isDataCleaned && (gameIsInProgress || gameIsFinished)" :menuState="MENU_STATES.INTEL" tooltip="Intel (I)" iconClass="fas fa-chart-line" />
       </div>
     </div>
 
@@ -91,7 +91,13 @@ export default {
     },
     canDisplayBottomBar () {
       return window.innerHeight >= 750
-    }
+    },
+    gameIsInProgress () {
+      return GameHelper.isGameInProgress(this.$store.state.game)
+    },
+    gameIsFinished () {
+      return GameHelper.isGameFinished(this.$store.state.game)
+    },
   }
 }
 </script>

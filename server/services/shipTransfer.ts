@@ -21,7 +21,7 @@ export default class ShipTransferService {
         this.starService = starService;
     }
 
-    async transferAllToStar(game: Game, player: Player, starId: DBObjectId) {
+    async transferAllToStar(game: Game, player: Player, starId: DBObjectId, writeToDB: boolean = true) {
         let star = this.starService.getById(game, starId);
         let carriersAtStar = this.carrierService.getCarriersAtStar(game, starId)
             .filter(c => c.ownedByPlayerId!.toString() === player._id.toString());
@@ -42,36 +42,38 @@ export default class ShipTransferService {
         star.shipsActual! += shipsToTransfer;
         star.ships = Math.floor(star.shipsActual!);
 
-        // Generate an array of all requires DB updates.
-        let dbWrites: any[] = carriersAtStar.map(c => {
-            return {
+        if (writeToDB) {
+            // Generate an array of all requires DB updates.
+            let dbWrites: any[] = carriersAtStar.map(c => {
+                return {
+                    updateOne: {
+                        filter: {
+                            _id: game._id,
+                            'galaxy.carriers._id': c._id
+                        },
+                        update: {
+                            'galaxy.carriers.$.ships': c.ships
+                        }
+                    }
+                };
+            });
+    
+            dbWrites.push({
                 updateOne: {
                     filter: {
                         _id: game._id,
-                        'galaxy.carriers._id': c._id
+                        'galaxy.stars._id': star._id
                     },
                     update: {
-                        'galaxy.carriers.$.ships': c.ships
+                        'galaxy.stars.$.shipsActual': star.shipsActual,
+                        'galaxy.stars.$.ships': star.ships
                     }
                 }
-            };
-        });
-
-        dbWrites.push({
-            updateOne: {
-                filter: {
-                    _id: game._id,
-                    'galaxy.stars._id': star._id
-                },
-                update: {
-                    'galaxy.stars.$.shipsActual': star.shipsActual,
-                    'galaxy.stars.$.ships': star.ships
-                }
-            }
-        });
-
-        // Update the DB.
-        await this.gameRepo.bulkWrite(dbWrites);
+            });
+    
+            // Update the DB.
+            await this.gameRepo.bulkWrite(dbWrites);
+        }
 
         return {
             star: {
@@ -87,7 +89,7 @@ export default class ShipTransferService {
         };
     }
 
-    async transfer(game: Game, player: Player, carrierId: DBObjectId, carrierShips: number, starId: DBObjectId, starShips: number) {
+    async transfer(game: Game, player: Player, carrierId: DBObjectId, carrierShips: number, starId: DBObjectId, starShips: number, writeDB: boolean = true) {
         let carrier = this.carrierService.getById(game, carrierId);
         let star = this.starService.getById(game, starId);
 
@@ -111,15 +113,15 @@ export default class ShipTransferService {
         let totalShips = carrier.ships! + star.ships!;
 
         if (totalTransferShips != totalShips) {
-            throw new ValidationError('The total number of ships in the tranfer does not equal to the total number of ships garrisoned');
+            throw new ValidationError('The total number of ships in the transfer does not equal to the total number of ships garrisoned');
         }
 
         if (carrierShips <= 0) {
-            throw new ValidationError('The number of carrier ships in the tranfer must be greater than 0. Carriers must have at least 1 ship.');
+            throw new ValidationError('The number of carrier ships in the transfer must be greater than 0. Carriers must have at least 1 ship.');
         }
 
         if (starShips < 0) {
-            throw new ValidationError('The number of carrier ships in the tranfer must be 0 or greater.');
+            throw new ValidationError('The number of carrier ships in the transfer must be 0 or greater.');
         }
 
         carrier.ships = carrierShips;
@@ -130,31 +132,33 @@ export default class ShipTransferService {
         star.ships = Math.floor(star.shipsActual);
 
         // Update the DB.
-        await this.gameRepo.bulkWrite([
-            {
-                updateOne: {
-                    filter: {
-                        _id: game._id,
-                        'galaxy.stars._id': star._id
-                    },
-                    update: {
-                        'galaxy.stars.$.shipsActual': star.shipsActual,
-                        'galaxy.stars.$.ships': star.ships
+        if (writeDB) {
+            await this.gameRepo.bulkWrite([
+                {
+                    updateOne: {
+                        filter: {
+                            _id: game._id,
+                            'galaxy.stars._id': star._id
+                        },
+                        update: {
+                            'galaxy.stars.$.shipsActual': star.shipsActual,
+                            'galaxy.stars.$.ships': star.ships
+                        }
+                    }
+                },
+                {
+                    updateOne: {
+                        filter: {
+                            _id: game._id,
+                            'galaxy.carriers._id': carrier._id
+                        },
+                        update: {
+                            'galaxy.carriers.$.ships': carrier.ships
+                        }
                     }
                 }
-            },
-            {
-                updateOne: {
-                    filter: {
-                        _id: game._id,
-                        'galaxy.carriers._id': carrier._id
-                    },
-                    update: {
-                        'galaxy.carriers.$.ships': carrier.ships
-                    }
-                }
-            }
-        ]);
+            ]);
+        }
 
         return {
             player,

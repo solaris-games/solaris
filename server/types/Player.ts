@@ -1,6 +1,7 @@
 import { DBObjectId } from "./DBObjectId";
 import { DiplomaticState } from "./Diplomacy";
 import { PlayerStatistics } from "./Leaderboard";
+import { AiState } from "./Ai";
 
 export type PlayerShape = 'circle'|'square'|'diamond'|'hexagon';
 export type ResearchType = 'scanning'|'hyperspace'|'terraforming'|'experimentation'|'weapons'|'banking'|'manufacturing'|'specialists'|'random';
@@ -92,6 +93,7 @@ export interface Player {
     isInScanningRange?: boolean;
     currentResearchTicksEta?: number | null;
     nextResearchTicksEta?: number | null;
+    aiState?: AiState | null;
 };
 
 export interface PlayerColourShapeCombination {

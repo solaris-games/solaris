@@ -549,6 +549,7 @@ export default class PlayerService extends EventEmitter {
     setPlayerAsDefeated(game: Game, player: Player) {
         player.defeated = true;
         player.defeatedDate = moment().utc();
+
         player.researchingNext = 'random'; // Set up the AI for random research.
 
         // Auto-ready the player so they don't hold up the game.
@@ -557,7 +558,7 @@ export default class PlayerService extends EventEmitter {
         }
 
         // Make sure all stars are marked as not ignored - This is so the AI can bulk upgrade them.
-        let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+        const playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
         for (let star of playerStars) {
             this.starService.resetIgnoreBulkUpgradeStatuses(star);

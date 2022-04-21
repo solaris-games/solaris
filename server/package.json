@@ -15,7 +15,8 @@
     "prebuild": "rm -rf ./dist",
     "build": "tsc",
     "postbuild": "cp -r templates ./dist/templates && cp .env ./dist | true && cp ./bots/discord/.env ./dist/bots/discord | true",
-    "ts-node": "ts-node"
+    "ts-node": "ts-node",
+    "check": "tsc --noEmit"
   },
   "author": "",
   "license": "ISC",
