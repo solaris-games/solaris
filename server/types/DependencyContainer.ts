@@ -61,6 +61,7 @@ import TechnologyService from "../services/technology";
 import TradeService from "../services/trade";
 import UserService from "../services/user";
 import WaypointService from "../services/waypoint";
+import NotificationService from "../services/notification";
 
 export interface DependencyContainer {
     config: Config,
@@ -126,4 +127,5 @@ export interface DependencyContainer {
     playerCycleRewardsService: PlayerCycleRewardsService,
     starContestedService: StarContestedService,
     gameFluxService: GameFluxService,
+    notificationService: NotificationService,
 };

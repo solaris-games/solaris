@@ -18,6 +18,19 @@ export interface UserRoles {
     gameMaster: boolean;
 };
 
+export interface UserOAuth {
+    discord?: {
+        userId?: string;
+        token?: {
+            access_token: string;
+            token_type: string;
+            expires_in: string;
+            refresh_token: string;
+            scope: string;
+        }
+    }
+};
+
 export interface User {
     _id: DBObjectId;
     username: string;
@@ -163,4 +176,5 @@ export interface User {
         }
     },
     avatars: number[];
+    oauth: UserOAuth;
 };

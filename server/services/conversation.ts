@@ -264,6 +264,11 @@ export default class ConversationService extends EventEmitter {
             type: 'message',
             toPlayerIds
         }
+        
+        this.emit('onConversationMessageSent', {
+            conversation: convo,
+            sentMessageResult
+        });
 
         return sentMessageResult;
     }

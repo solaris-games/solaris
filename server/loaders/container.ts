@@ -77,6 +77,7 @@ import CarrierGiftService from '../services/carrierGift';
 import PlayerCycleRewardsService from '../services/playerCycleRewards';
 import StarContestedService from '../services/starContested';
 import GameFluxService from '../services/gameFlux';
+import NotificationService from '../services/notification';
 
 import { DependencyContainer } from '../types/DependencyContainer';
 
@@ -179,6 +180,8 @@ export default (config, io): DependencyContainer => {
     const gameCreateValidationService = new GameCreateValidationService(playerService, starService, carrierService, specialistService, gameTypeService);
     const gameCreateService = new GameCreateService(GameModel, gameService, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService, gameCreateValidationService, gameFluxService, specialistBanService, gameTypeService);
 
+    const notificationService = new NotificationService(config, userRepository, gameRepository, authService, conversationService);
+
     console.log('Dependency Container Initialized');
     
     return {
@@ -245,5 +248,6 @@ export default (config, io): DependencyContainer => {
         playerCycleRewardsService,
         starContestedService,
         gameFluxService,
+        notificationService,
     };
 };

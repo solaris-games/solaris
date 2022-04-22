@@ -26,5 +26,11 @@ export interface Config {
     },
     buymeacoffee: {
         accessToken?: string;
+    },
+    discord: {
+        clientId?: string;
+        clientSecret?: string;
+        oauthRedirectUri?: string;
+        botToken?: string;
     }
 };
