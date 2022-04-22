@@ -81,6 +81,7 @@ export interface GameSettings {
 		awardRankTo: GameAwardRankTo;
 		fluxEnabled: GameSettingEnabledDisabled;
 		isGameAdmin?: boolean;
+		advancedAI: GameSettingEnabledDisabled;
 		flux?: GameFlux;
 	},
 	galaxy: {

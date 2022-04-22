@@ -1,10 +1,10 @@
 # Combat
 
-Combat occurs when a Carrier arrives at an enemy Star or when a Carrier intercepts an enemy Carrier in hyperspace. The combat summary can be viewed in the event log.
+Combat occurs when a Carrier arrives at a non-allied Star or when a Carrier intercepts a non-allied Carrier in hyperspace. The combat summary can be viewed in the event log.
 
 ![Summary of a combat in the event log](img/combat-summary.png)
 
-When 2 opposing Carriers arrive at a Star on the same tick, the Carrier that travelled the least distance in the current tick will arrive at the Star first and receive the Defender Bonus (if enabled).
+When 2 opposing Carriers arrive at a Star on the same tick, the Carrier that has the most ships (or if equal, travelled the least distance in the current tick) will arrive at the Star first and receive the Defender Bonus (if enabled).
 
 Starting with the defender, each player takes it in turns to deal damage to the opposing player. Damage dealt per turn is equal to the effective weapons level, factoring in weapons technology and specialist abilities. Damage is dealt roughly equally to all Carriers and the Star per turn.
 
@@ -17,6 +17,28 @@ Combat can also occur between two carriers. When two carriers from different pla
 > Note: In carrier to carrier combat, if the either side has **less than or equal ships** than the opposing side's weapons technology level then the carrier(s) will fight with **level 1 weapons**. This prevents players from exploiting 1 ship carriers to chip away at incoming enemy forces.
 
 The combat calculator is a useful tool to predict the outcome of combat. Simply input the defender and attacker's weapons level and number of ships and it will present the outcome.
+
+## Combat FAQ
+
+Here are some commonly asked rule clarifications for carrier-to-star and carrier-to-carrier combat:
+
+#### Carrier to Star Combat
+
+- Allies of the defender will join the defending side.
+- Enemies of the defender will join the attacking side.
+- Combat occurs in turns, the defender going first dealing damage equal to their effective weapons level each turn.
+- Attackers are awarded credits (default $10) per point of Economy destroyed.
+- If the star is captured and the star has a specialist, it will be captured by the attacker.
+- If there are more than 2 players attacking and the defender is defeated then the player with a carrier with the highest ship count will capture the star.
+- If there are 2 or more players attacking an unclaimed star then the player with a carrier with the highest ship count will capture the star.
+- If the attackers defeat the defender and they are enemies, then combat will continue until only one player remains or all players who remain are allied with the defender.
+
+#### Carrier to Carrier Combat
+
+- Combat occurs at the same time, mutual destruction.
+- Combat occurs between carriers traveling to and from the same stars.
+- Carriers can attack from the front (head-to-head combat) and catch up from behind.
+- All carriers travel independently, prioritizing carriers with the largest number of ships first.
 
 ## Combat Weapons Technology
 
@@ -42,11 +64,11 @@ For example:
 When formal alliances is enabled then a there are a few conditions that need to be met in order for combat to take place:
 
 1. When a carrier arrives at a star, if the player is allied with the defender then no combat occurs.
-2. When a carrier arrives at a star, if the player is enemies with the defender then combat occurs.
+2. When a carrier arrives at a star, if the player is not allied with the defender then combat occurs.
 2a. Carriers in orbit who are allied to the defender will help defend.
-2b. If the attacker wins and captures the star, then combat will repeat until there are no enemies to the defender.
-3. When a carrier intercepts another carrier in space, then combat occurs between enemies.
-4. When a player changes their diplomatic status from Allied to Enemy, then combat occurs.
+2b. If the attacker wins and captures the star, then combat will repeat until there are no non-allies to the defender.
+3. When a carrier intercepts another carrier in space, then combat occurs between non-allies.
+4. When a player changes their diplomatic status from allied to neutral or enemy, then combat occurs.
 
 > Note: More than 2 players can be in orbit at the star providing that they are allied with the defender. Combat will not occur if the guest players are enemies but are both allied to the defender.
 

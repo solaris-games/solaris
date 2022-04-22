@@ -52,11 +52,14 @@ export default class WaypointService {
     }
 
     async saveWaypoints(game: Game, player: Player, carrierId: DBObjectId, waypoints: CarrierWaypoint[], looped: boolean) {
+        let carrier = this.carrierService.getById(game, carrierId);
+        return await this.saveWaypointsForCarrier(game, player, carrier, waypoints, looped);
+    }
+
+    async saveWaypointsForCarrier(game: Game, player: Player, carrier: Carrier, waypoints: CarrierWaypoint[], looped: boolean, writeToDB: boolean = true) {
         if (looped == null) {
             looped = false;
         }
-        
-        let carrier = this.carrierService.getById(game, carrierId);
         
         if (carrier.ownedByPlayerId!.toString() !== player._id.toString()) {
             throw new ValidationError('The player does not own this carrier.');
@@ -138,19 +141,21 @@ export default class WaypointService {
         carrier.waypointsLooped = looped;
 
         // Update the DB.
-        await this.gameRepo.updateOne({
-            _id: game._id,
-            'galaxy.carriers._id': carrier._id
-        }, {
-            $set: {
-                'galaxy.carriers.$.waypoints': waypoints,
-                'galaxy.carriers.$.waypointsLooped': looped,
-            }
-        })
+        if (writeToDB) {
+            await this.gameRepo.updateOne({
+                _id: game._id,
+                'galaxy.carriers._id': carrier._id
+            }, {
+                $set: {
+                    'galaxy.carriers.$.waypoints': waypoints,
+                    'galaxy.carriers.$.waypointsLooped': looped,
+                }
+            });
+        }
 
         // Send back the eta ticks of the waypoints so that
         // the UI can be updated.
-        let reportCarrier = carrier.toObject(); // TODO: Is this needed?
+        const reportCarrier = Boolean(carrier.toObject) ? carrier.toObject() : carrier;
 
         this.populateCarrierWaypointEta(game, reportCarrier);
 

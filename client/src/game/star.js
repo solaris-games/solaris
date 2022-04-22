@@ -645,7 +645,7 @@ class Star extends EventEmitter {
 
     let radius = ((techLevel || 1) + 1) * this.lightYearDistance
 
-    this.graphics_scanningRange.lineStyle(1, player.colour.value, 0.2)
+    this.graphics_scanningRange.lineStyle(1, 0xFFFFFF, 0.2)
     this.graphics_scanningRange.beginFill(player.colour.value, 0.075)
     this.graphics_scanningRange.drawCircle(0, 0, radius)
     this.graphics_scanningRange.endFill()
@@ -680,7 +680,7 @@ class Star extends EventEmitter {
 
     let radius = ((techLevel || 1) + 1.5) * this.lightYearDistance
 
-    this.graphics_hyperspaceRange.lineStyle(1, player.colour.value, 0.2)
+    this.graphics_hyperspaceRange.lineStyle(1, 0xFFFFFF, 0.2)
     this.graphics_hyperspaceRange.beginFill(player.colour.value, 0.075)
     this.graphics_hyperspaceRange.drawStar(0, 0, radius, radius, radius - 3)
     this.graphics_hyperspaceRange.endFill()

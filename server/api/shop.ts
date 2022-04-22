@@ -37,8 +37,8 @@ export default (router: Router, io, container: DependencyContainer) => {
         const totalCost = totalQuantity * unitCost;
 
         try {
-            const returnUrl = `${process.env.SERVER_URL}/api/shop/galacticcredits/purchase/process`;
-            const cancelUrl =`${process.env.CLIENT_URL}/#/shop`;
+            const returnUrl = `${container.config.serverUrl}/api/shop/galacticcredits/purchase/process`;
+            const cancelUrl =`${container.config.clientUrl}/#/shop`;
 
             let approvalUrl = await container.paypalService.authorizePayment(req.session.userId, totalQuantity, totalCost, unitCost, returnUrl, cancelUrl);
             
@@ -55,11 +55,11 @@ export default (router: Router, io, container: DependencyContainer) => {
         try {
             const result = await container.paypalService.processPayment(req.query.paymentId, req.query.PayerID);
 
-            return res.redirect(`${process.env.CLIENT_URL}/#/shop/paymentcomplete?credits=${result.galacticTokens}`);
+            return res.redirect(`${container.config.clientUrl}/#/shop/paymentcomplete?credits=${result.galacticTokens}`);
         } catch (err) {
             console.error(err);
 
-            return res.redirect(`${process.env.CLIENT_URL}/#/shop/paymentfailed`);
+            return res.redirect(`${container.config.clientUrl}/#/shop/paymentfailed`);
         }
     }, middleware.handleError);
 

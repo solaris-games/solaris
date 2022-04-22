@@ -47,6 +47,7 @@ const schema = new Schema({
 			timeMachine: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
 			awardRankTo: { type: Types.String, required: false, enum: ['all', 'winner'], default: 'all' },
 			fluxEnabled: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
+			advancedAI: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'disabled' }
         },
         galaxy: {
 			galaxyType: { type: Types.String, required: true, enum: ['circular', 'spiral', 'doughnut','circular-balanced', 'irregular', 'custom'], default: 'circular' },
@@ -224,9 +225,10 @@ const schema = new Schema({
 		diplomacy: {
 			upkeepExpenseMultipliers: {
 				none: { type: Types.Number, required: true, default: 0 },
-				cheap: { type: Types.Number, required: true, default: 0.02 },
-				standard: { type: Types.Number, required: true, default: 0.05 },
-				expensive: { type: Types.Number, required: true, default: 0.10 }
+				cheap: { type: Types.Number, required: true, default: 0.05 },
+				standard: { type: Types.Number, required: true, default: 0.10 },
+				expensive: { type: Types.Number, required: true, default: 0.15 },
+        crazyExpensive: { type: Types.Number, required: true, default: 0.25 }
 			}
 		},
 		player: {

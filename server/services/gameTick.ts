@@ -487,7 +487,19 @@ export default class GameTickService extends EventEmitter {
             carriersInTransit.push(carrier);
         }
 
-        carriersInTransit = carriersInTransit.sort((a, b) => a.distanceToDestination! - b.distanceToDestination!);
+        // Carriers in transit will prioritize carriers with the most ships first.
+        // This is to ensure that capturing of unclaimed stars uses this priority.
+        // TODO: This is more of a bodge to get around the unclaimed stars thing, it would
+        // be better to refactor the capturing of unclaimed stars to occur after all movements
+        // have taken place.
+        carriersInTransit = carriersInTransit.sort((a, b) => {
+            // Sort by ship count (highest ships first)
+            if (a.ships! > b.ships!) return -1;
+            if (a.ships! < b.ships!) return 1;
+
+            // Then by distance (closest carrier first)
+            return (a.distanceToDestination || 0) - (b.distanceToDestination || 0);
+        });
 
         // 2. Iterate through each carrier, move it, then check for combat.
         // (DO NOT do any combat yet as we have to wait for all of the carriers to move)
@@ -615,7 +627,7 @@ export default class GameTickService extends EventEmitter {
                 if (this.diplomacyUpkeepService.isAllianceUpkeepEnabled(game)) {
                     let allianceCount = this.diplomacyService.getAlliesOfPlayer(game, player).length;
                     
-                    allianceUpkeepResult = this.diplomacyUpkeepService.deductTotalUpkeep(game, player, creditsResult.creditsFromBanking, allianceCount); // TODO: creditsTotal?
+                    allianceUpkeepResult = this.diplomacyUpkeepService.deductTotalUpkeep(game, player, creditsResult.creditsTotal, allianceCount); 
                 }
 
                 // Raise an event if the player isn't defeated, AI doesn't care about events.
@@ -751,7 +763,7 @@ export default class GameTickService extends EventEmitter {
     }
 
     async _playAI(game: Game) {
-        for (let player of game.galaxy.players.filter(p => p.defeated)) {
+        for (let player of game.galaxy.players.filter(p => this.aiService.isAIControlled(p))) {
             await this.aiService.play(game, player);
         }
     }

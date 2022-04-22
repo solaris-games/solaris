@@ -473,12 +473,13 @@ export default class GameService extends EventEmitter {
 
         // NOTE: The game will check for a winner on each tick so no need to 
         // repeat that here.
-        
-        // TODO: We may want to do this in future when the AI becomes clevererer.
-        // // Remove all carrier waypoints (unless in transit)
-        // this.carrierService.clearPlayerCarrierWaypointsNonTransit(game, player);
-        // TODO: Instead of above, just clear the player's looped waypoints.
-        this.carrierService.clearPlayerCarrierWaypointsLooped(game, player);
+
+        // TODO: This is temporary. The advanced AI will be able to handle this.
+        // In the meantime, if we're still using normal AI we should clear looped carriers.
+        // TODO: Remove when basic AI is removed.
+        if (game.settings.general.advancedAI === 'disabled') {
+            this.carrierService.clearPlayerCarrierWaypointsLooped(game, player);
+        }
 
         if (player.userId && !this.gameTypeService.isTutorialGame(game)) {
             await this.achievementService.incrementDefeated(player.userId, 1);

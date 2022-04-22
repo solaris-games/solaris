@@ -11,8 +11,8 @@ Carriers that have waypoints will have a line drawn to their destination. If tho
 - Build a Carrier at a star.
 - Plot the waypoints that the Carrier will follow.
 - Transfer Ships between Carriers and Stars.
-- Capture neutral or enemy Stars by sending a Carrier to one.
-- Send a Carrier to intercept an incoming enemy Carrier.
+- Capture unoccupied or non-allied Stars by sending a Carrier to one.
+- Send a Carrier to intercept an incoming non-allied Carrier.
 - Purchase a specialist on a carrier to grant special abilities.
 
 ![The menu of a carrier](img/carrier-menu.png)

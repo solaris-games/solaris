@@ -62,6 +62,16 @@
              "text":"Visible"
           }
        ],
+       "advancedAI": [
+          {
+             "value": "enabled",
+             "text": "Enabled"
+          },
+          {
+             "value": "disabled",
+             "text": "Disabled"
+          }
+       ],
        "fluxEnabled":[
           {
              "value":"enabled",
@@ -439,6 +449,10 @@
          {
            "value":"expensive",
            "text":"Expensive"
+         },
+         {
+           "value":"crazyExpensive",
+           "text":"Crazy Expensive"
          }
        ],
        "tradeRestricted":[
