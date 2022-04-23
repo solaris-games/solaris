@@ -127,6 +127,10 @@ export default {
     this.recalculateTotalEta()
   },
   destroyed () {
+    this.carrier.waypoints = this.oldWaypoints
+    this.carrier.waypointsLooped = this.oldWaypointsLooped
+    GameContainer.drawWaypoints()
+
     GameContainer.resetMode()
 
     GameContainer.map.off('onWaypointCreated', this.waypointCreatedHandler)
@@ -136,10 +140,6 @@ export default {
       this.display = !this.display
     },
     onCloseRequested (e) {
-      this.carrier.waypoints = this.oldWaypoints
-      this.carrier.waypointsLooped = this.oldWaypointsLooped
-      GameContainer.drawWaypoints()
-
       this.$emit('onCloseRequested', e)
     },
     onOpenStarDetailRequested (e) {
