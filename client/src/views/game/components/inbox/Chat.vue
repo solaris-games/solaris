@@ -123,7 +123,7 @@ export default {
       this.isExpanded = true
     },
     onMessageReceived (e) {
-      if (this.canHandleConversationEvents()) { // Don't do this if the window is too small as this component won't be displayed
+      if (!this.canHandleConversationEvents()) { // Don't do this if the window is too small as this component won't be displayed
         return
       }
 
