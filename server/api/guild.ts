@@ -70,15 +70,15 @@ export default (router: Router, io, container: DependencyContainer) => {
     }, middleware.handleError);
 
     router.post('/api/guild', middleware.authenticate, async (req, res, next) => {
-        if (!req.body.name) {
-            throw new ValidationError(`name is required.`);
-        }
-
-        if (!req.body.tag) {
-            throw new ValidationError(`tag is required.`);
-        }
-
         try {
+            if (!req.body.name) {
+                throw new ValidationError(`name is required.`);
+            }
+
+            if (!req.body.tag) {
+                throw new ValidationError(`tag is required.`);
+            }
+
             let result = await container.guildService.create(req.session.userId, req.body.name, req.body.tag);
                 
             return res.status(201).json(result);
@@ -88,15 +88,15 @@ export default (router: Router, io, container: DependencyContainer) => {
     }, middleware.handleError);
 
     router.patch('/api/guild', middleware.authenticate, async (req, res, next) => {
-        if (!req.body.name) {
-            throw new ValidationError(`name is required.`);
-        }
-
-        if (!req.body.tag) {
-            throw new ValidationError(`tag is required.`);
-        }
-
         try {
+            if (!req.body.name) {
+                throw new ValidationError(`name is required.`);
+            }
+
+            if (!req.body.tag) {
+                throw new ValidationError(`tag is required.`);
+            }
+
             await container.guildService.rename(req.session.userId, req.body.name, req.body.tag);
                 
             return res.sendStatus(200);

@@ -29,11 +29,11 @@ export default (router: Router, io, container: DependencyContainer) => {
             errors.push('loop field is required.');
         }
 
-        if (errors.length) {
-            throw new ValidationError(errors);
-        }
-
         try {
+            if (errors.length) {
+                throw new ValidationError(errors);
+            }
+
             await container.waypointService.loopWaypoints(
                 req.game,
                 req.player,
@@ -61,11 +61,11 @@ export default (router: Router, io, container: DependencyContainer) => {
             errors.push('starId is required.');
         }
 
-        if (errors.length) {
-            throw new ValidationError(errors);
-        }
-
         try {
+            if (errors.length) {
+                throw new ValidationError(errors);
+            }
+
             await container.shipTransferService.transfer(
                 req.game,
                 req.player,
@@ -155,11 +155,11 @@ export default (router: Router, io, container: DependencyContainer) => {
             errors.push('attacker.weaponsLevel must be greater than 0.');
         }
 
-        if (errors.length) {
-            throw new ValidationError(errors);
-        }
-
         try {
+            if (errors.length) {
+                throw new ValidationError(errors);
+            }
+
             let result = container.combatService.calculate(
                 req.body.defender,
                 req.body.attacker,

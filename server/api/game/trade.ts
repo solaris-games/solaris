@@ -29,11 +29,11 @@ export default (router: Router, io, container: DependencyContainer) => {
             errors.push('amount must be greater than 0.');
         }
 
-        if (errors.length) {
-            throw new ValidationError(errors);
-        }
-
         try {
+            if (errors.length) {
+                throw new ValidationError(errors);
+            }
+
             let trade = await container.tradeService.sendCredits(
                 req.game,
                 req.player,
@@ -71,11 +71,11 @@ export default (router: Router, io, container: DependencyContainer) => {
             errors.push('amount must be greater than 0.');
         }
 
-        if (errors.length) {
-            throw new ValidationError(errors);
-        }
-
         try {
+            if (errors.length) {
+                throw new ValidationError(errors);
+            }
+
             let trade = await container.tradeService.sendCreditsSpecialists(
                 req.game,
                 req.player,
@@ -109,11 +109,11 @@ export default (router: Router, io, container: DependencyContainer) => {
             errors.push('amount must be greater than 0.');
         }
 
-        if (errors.length) {
-            throw new ValidationError(errors);
-        }
-
         try {
+            if (errors.length) {
+                throw new ValidationError(errors);
+            }
+
             let trade = await container.tradeService.sendRenown(
                 req.game,
                 req.player,
@@ -138,11 +138,11 @@ export default (router: Router, io, container: DependencyContainer) => {
             errors.push('toPlayerId is required.');
         }
 
-        if (errors.length) {
-            throw new ValidationError(errors);
-        }
-
         try {
+            if (errors.length) {
+                throw new ValidationError(errors);
+            }
+
             let trade = await container.tradeService.sendTechnology(
                 req.game,
                 req.player,

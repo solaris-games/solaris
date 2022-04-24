@@ -183,11 +183,11 @@ export default (router: Router, io, container: DependencyContainer) => {
             errors.push('Username is a required field');
         }
 
-        if (errors.length) {
-            throw new ValidationError(errors);
-        }
-
         try {
+            if (errors.length) {
+                throw new ValidationError(errors);
+            }
+
             await container.userService.updateUsername(req.session.userId, req.body.username);
 
             return res.sendStatus(200);
@@ -203,11 +203,11 @@ export default (router: Router, io, container: DependencyContainer) => {
             errors.push('Email is a required field');
         }
 
-        if (errors.length) {
-            throw new ValidationError(errors);
-        }
-
         try {
+            if (errors.length) {
+                throw new ValidationError(errors);
+            }
+
             await container.userService.updateEmailAddress(req.session.userId, req.body.email);
 
             return res.sendStatus(200);
@@ -227,11 +227,11 @@ export default (router: Router, io, container: DependencyContainer) => {
             errors.push('New password is a required field');
         }
 
-        if (errors.length) {
-            throw new ValidationError(errors);
-        }
-
         try {
+            if (errors.length) {
+                throw new ValidationError(errors);
+            }
+
             await container.userService.updatePassword(
                 req.session.userId,
                 req.body.currentPassword,
@@ -262,11 +262,11 @@ export default (router: Router, io, container: DependencyContainer) => {
     }, middleware.handleError);
 
     router.post('/api/user/resetPassword', async (req, res, next) => {
-        if (req.body.token == null || !req.body.token.length) {
-            throw new ValidationError(`The token is required`);
-        }
-
         try {
+            if (req.body.token == null || !req.body.token.length) {
+                throw new ValidationError(`The token is required`);
+            }
+
             await container.userService.resetPassword(req.body.token, req.body.newPassword);
 
             return res.sendStatus(200);
