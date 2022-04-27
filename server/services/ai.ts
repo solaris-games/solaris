@@ -96,6 +96,8 @@ interface Context {
     playerEconomy: number;
     playerIndustry: number;
     playerScience: number;
+    transitFromCarriers: Map<string, Carrier[]>,
+    transitToCarriers: Map<string, Carrier[]>
 }
 
 interface Assignment {
@@ -335,6 +337,22 @@ export default class AIService {
             simultaneousAttacks.push(incomingCarrier);
         }
 
+        const transitFromCarriers = new Map<string, Carrier[]>();
+        const transitToCarriers = new Map<string, Carrier[]>();
+
+        for (const carrier of playerCarriers) {
+            if (carrier.waypoints.length !== 0) {
+                const fromId = carrier.waypoints[0].source.toString();
+                const toId = carrier.waypoints[0].destination.toString();
+
+                const fromCarriers = getOrInsert(transitFromCarriers, fromId, () => []);
+                fromCarriers.push(carrier);
+
+                const toCarriers = getOrInsert(transitToCarriers, toId, () => []);
+                toCarriers.push(carrier);
+            }
+        }
+
         return {
             playerStars,
             playerCarriers,
@@ -352,7 +370,9 @@ export default class AIService {
             attackedStarIds,
             playerEconomy: this.playerStatisticsService.calculateTotalEconomy(playerStars),
             playerIndustry: this.playerStatisticsService.calculateTotalIndustry(playerStars),
-            playerScience: this.playerStatisticsService.calculateTotalScience(playerStars)
+            playerScience: this.playerStatisticsService.calculateTotalScience(playerStars),
+            transitFromCarriers,
+            transitToCarriers
         };
     }
 
