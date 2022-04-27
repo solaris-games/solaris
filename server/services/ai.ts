@@ -1,6 +1,6 @@
-import { Game } from "../types/Game";
-import { Player } from "../types/Player";
-import { KnownAttack } from "../types/Ai";
+import {Game} from "../types/Game";
+import {Player} from "../types/Player";
+import {KnownAttack} from "../types/Ai";
 import CarrierService from "./carrier";
 import CombatService from "./combat";
 import DistanceService from "./distance";
@@ -10,15 +10,15 @@ import StarService from "./star";
 import StarUpgradeService from "./starUpgrade";
 import TechnologyService from "./technology";
 import WaypointService from "./waypoint";
-import { Star } from "../types/Star";
-import { Carrier } from "../types/Carrier";
-import {getOrInsert, reverseSort, notNull, maxBy} from "../utils";
+import {Star} from "../types/Star";
+import {Carrier} from "../types/Carrier";
+import {getOrInsert, maxBy, notNull, reverseSort} from "../utils";
 import {CarrierWaypoint, CarrierWaypointActionType} from "../types/CarrierWaypoint";
 import ReputationService from "./reputation";
 import DiplomacyService from "./diplomacy";
 import PlayerStatisticsService from "./playerStatistics";
 import {DBObjectId} from "../types/DBObjectId";
-import { Location } from "../types/Location";
+import {Location} from "../types/Location";
 
 const Heap = require('qheap');
 const mongoose = require("mongoose");
@@ -495,7 +495,7 @@ export default class AIService {
                     continue;
                 }
 
-                const hasCarrier = assignment.carriers && assignment.carriers.length > 0;
+                const hasIdleCarrier = assignment.carriers && assignment.carriers.length > 0;
 
                 const reinforce = async () => {
                     const waypoints: CarrierWaypoint[] = [
@@ -520,18 +520,22 @@ export default class AIService {
                     await this._useAssignment(context, game, player, assignments, assignment, waypoints, assignment.totalShips);
                 }
 
-                if (hasCarrier) {
+                if (hasIdleCarrier) {
                     // Since a carrier is standing around, we might as well use it
                     await reinforce();
-                } else {
-                    // TODO: We want to be smarter about reinforcements. Maybe sort the orders by the number of ships involved?
+                } else if (this._canAffordCarrier(context, game, player, false)) {
+                    const hasRoute = this._logisticRouteExists(context, order.source, order.star);
+
+                    if (!hasRoute) {
+                        await reinforce();
+                    }
+
+                    //TODO
                     const source = context.starsById.get(order.source)!;
                     const effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, source);
                     const shipProductionPerTick = this.starService.calculateStarShipsByTicks(effectiveTechs.manufacturing, source.infrastructure.industry || 0, 1, game.settings.galaxy.productionTicks);
                     const ticksProduced = assignment.totalShips / shipProductionPerTick;
-                    if (ticksProduced > (game.settings.galaxy.productionTicks * REINFORCEMENT_MIN_CYCLES) && this._canAffordCarrier(context, game, player, false)) {
-                        await reinforce();
-                    }
+
                 }
             }
         }
@@ -618,6 +622,17 @@ export default class AIService {
         }
 
         return waypoints;
+    }
+
+    _logisticRouteExists(context: Context, fromStarId: string, toStarId: string): boolean {
+        const movingFrom = context.transitFromCarriers.get(fromStarId) ?? [];
+        const hasRouteOutbound = Boolean(movingFrom.find((c) => c.waypoints[0].destination.toString() === toStarId));
+        if (hasRouteOutbound) {
+            return true;
+        }
+
+        const movingTo = context.arrivingAtCarriers.get(fromStarId) ?? [];
+        return Boolean(movingTo.find((c) => c.waypoints[0].source.toString() === toStarId));
     }
 
     _canAffordCarrier(context: Context, game: Game, player: Player, highPriority: boolean): boolean {
