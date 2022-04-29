@@ -228,7 +228,7 @@ export interface Game {
 		players: number;
 		winner: DBObjectId | null;
 		cleaned: boolean;
-		afkSlots?: number;
+		openSlots?: number;
 	},
 	constants: {
 		distances: {
