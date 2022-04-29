@@ -220,13 +220,14 @@ export default class GameService extends EventEmitter {
     async join(game: Game, userId: DBObjectId, playerId: DBObjectId, alias: string, avatar: number, password: string) {
         // The player cannot join the game if:
         // 1. The game has finished.
-        // 2. They quit the game before the game started.
-        // 3. They are already playing the game as an undefeated non-afk player.
-        // 4. They are trying to play in a different slot if they have been afk'd.
-        // 5. The password entered is invalid.
-        // 6. The player does not own any stars.
-        // 7. The alias is already taken.
-        // 8. The alias (username) is already taken.
+        // 2. They quit the game before the game started or they conceded defeat.
+        // 3. They are already playing in the game.
+        // 4. They are trying to join a slot that isn't open.
+        // 5. They are trying to play in a different slot if they have been afk'd.
+        // 6. The password entered is invalid.
+        // 7. The player does not own any stars.
+        // 8. The alias is already taken.
+        // 9. The alias (username) is already taken.
 
         // Only allow join if the game hasn't finished.
         if (game.state.endDate) {
@@ -260,7 +261,7 @@ export default class GameService extends EventEmitter {
             throw new ValidationError(`You have not purchased the selected avatar.`);
         }
 
-        // The user cannot rejoin if they quit early.
+        // The user cannot rejoin if they quit early or conceded defeat.
         let isQuitter = game.quitters.find(x => x.toString() === userId.toString());
 
         if (isQuitter) {
@@ -282,6 +283,10 @@ export default class GameService extends EventEmitter {
             throw new ValidationError('The player is not participating in this game.');
         }
 
+        if (!player.isOpenSlot) {
+            throw new ValidationError(`The player slot is not open to be filled.`);
+        }
+
         // If the user was an afk-er then they are only allowed to join
         // their slot.
         let isAfker = game.afkers.find(x => x.toString() === userId.toString());
@@ -296,12 +301,6 @@ export default class GameService extends EventEmitter {
 
         if (!stars.length) {
             throw new ValidationError('Cannot fill this slot, the player does not own any stars.');
-        }
-
-        // Only allow if the player isn't already occupied and is afk
-        // We want to allow players to join in-progress games to fill afk slots.
-        if (player && player.userId && !player.afk) {
-            throw new ValidationError('This player spot has already been taken by another user.');
         }
 
         let aliasCheckPlayer = game.galaxy.players.find(x => x.userId && x.alias.toLowerCase() === alias.toLowerCase());
@@ -471,6 +470,8 @@ export default class GameService extends EventEmitter {
         if (this.gameTypeService.isTutorialGame(game)) {
             return this.delete(game);
         }
+
+        game.quitters.push(player.userId!); // We need to track this to ensure that they don't try to rejoin in another open slot.
 
         this.playerService.setPlayerAsDefeated(game, player);
 

@@ -100,7 +100,7 @@ export default class PlayerService extends EventEmitter {
         let researchingNow: ResearchTypeNotRandom = 'terraforming';
         let researchingNext: ResearchTypeNotRandom = 'terraforming';
 
-        let player = {
+        let player: Player = {
             _id: mongoose.Types.ObjectId(),
             userId: null,
             homeStarId: null,
@@ -126,7 +126,6 @@ export default class PlayerService extends EventEmitter {
             missedTurns: 0,
             hasSentTurnReminder: false,
             hasFilledAfkSlot: false,
-            carriers: [],
             research: {
                 terraforming: { level: game.settings.technology.startingTechnologyLevel.terraforming },
                 experimentation: { level: game.settings.technology.startingTechnologyLevel.experimentation },
