@@ -821,7 +821,7 @@ class GameHelper {
     }
 
     return game.galaxy.players.filter(p => {
-      return p.isEmptySlot || p.afk
+      return p.isOpenSlot || p.afk
     }).length > 0
   }
 

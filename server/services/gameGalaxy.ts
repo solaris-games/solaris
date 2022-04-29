@@ -586,9 +586,8 @@ export default class GameGalaxyService {
                 colour: p.colour,
                 shape: p.shape,
                 research,
-                isEmptySlot: p.userId == null, // Do not send the user ID back to the client.
-                isInScanningRange: p.isInScanningRange,
                 isOpenSlot: p.isOpenSlot,
+                isInScanningRange: p.isInScanningRange,
                 defeated: p.defeated,
                 defeatedDate: p.defeatedDate,
                 afk: p.afk,

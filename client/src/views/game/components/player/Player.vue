@@ -31,7 +31,7 @@
     
     <research v-if="player && player.research" :playerId="player._id"/>
 
-    <loading-spinner :loading="player && !player.isEmptySlot && !user"/>
+    <loading-spinner :loading="player && !player.isOpenSlot && !user"/>
 
     <h4 class="mt-2" v-if="canViewAchievements">Achievements</h4>
 
@@ -49,7 +49,7 @@
       @onOpenPurchasePlayerBadgeRequested="onOpenPurchasePlayerBadgeRequested"/>
 
     <player-report 
-      v-if="player && !player.isEmptySlot && userPlayer && player != userPlayer"
+      v-if="player && !player.isOpenSlot && userPlayer && player != userPlayer"
       :playerId="player._id"
       @onOpenReportPlayerRequested="onOpenReportPlayerRequested"/>
 </div>
@@ -105,7 +105,7 @@ export default {
 
     // If there is a legit user associated with this user then get the
     // user info so we can show more info like achievements.
-    if (this.$store.state.userId && !this.player.isEmptySlot && GameHelper.isNormalAnonymity(this.$store.state.game)) {
+    if (this.$store.state.userId && !this.player.isOpenSlot && GameHelper.isNormalAnonymity(this.$store.state.game)) {
       try {
         let response = await gameService.getPlayerUserInfo(this.$store.state.game._id, this.player._id)
 
@@ -185,9 +185,9 @@ export default {
     },
     canViewAchievements () {
       if (this.isAnonymousGame) {
-        return this.player && !this.player.isEmptySlot && this.isGameFinished && this.player != this.userPlayer
+        return this.player && !this.player.isOpenSlot && this.isGameFinished && this.player != this.userPlayer
       } else {
-        return this.player && !this.player.isEmptySlot && this.isValidUser
+        return this.player && !this.player.isOpenSlot && this.isValidUser
       }
     },
     canSendRenown () {
