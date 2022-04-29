@@ -344,6 +344,10 @@ export default class GameService extends EventEmitter {
     }
 
     assignPlayerToUser(game: Game, player: Player, userId: DBObjectId | null, alias: string, avatar: number) {
+        if (!player.isOpenSlot) {
+            throw new ValidationError(`The player slot is not open to be filled`);
+        }
+        
         let isAfker = userId && game.afkers.find(x => x.toString() === userId.toString()) != null;
         let isFillingAfkSlot = this.gameStateService.isInProgress(game) && player.afk;
         let isRejoiningOwnAfkSlot = isFillingAfkSlot && isAfker && (userId && player.userId && player.userId.toString() === userId.toString());
@@ -357,6 +361,7 @@ export default class GameService extends EventEmitter {
         // Reset the defeated and afk status as the user may be filling
         // an afk slot.
         player.hasFilledAfkSlot = hasFilledOtherPlayerAfkSlot;
+        player.isOpenSlot = false;
         player.defeated = false;
         player.defeatedDate = null;
         player.afk = false;

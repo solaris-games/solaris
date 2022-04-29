@@ -676,6 +676,7 @@ export default class GameGalaxyService {
                     gamePlayer.researchingNext = historyPlayer.researchingNext;
                     gamePlayer.credits = historyPlayer.credits;
                     gamePlayer.creditsSpecialists = historyPlayer.creditsSpecialists;
+                    gamePlayer.isOpenSlot = historyPlayer.isOpenSlot;
                     gamePlayer.defeated = historyPlayer.defeated;
                     gamePlayer.defeatedDate = historyPlayer.defeatedDate;
                     gamePlayer.afk = historyPlayer.afk;

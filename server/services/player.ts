@@ -5,7 +5,7 @@ import DatabaseRepository from '../models/DatabaseRepository';
 import { DBObjectId } from '../types/DBObjectId';
 import { Game } from '../types/Game';
 import { Location } from '../types/Location';
-import { Player, PlayerColour, PlayerColourShapeCombination, PlayerShape } from '../types/Player';
+import { Player, PlayerColour, PlayerColourShapeCombination, PlayerShape, ResearchTypeNotRandom } from '../types/Player';
 import { Star } from '../types/Star';
 import CarrierService from './carrier';
 import GameTypeService from './gameType';
@@ -96,16 +96,36 @@ export default class PlayerService extends EventEmitter {
             .find(p => p._id.toString() === targetPlayer._id.toString()) != null;
     }
 
-    createEmptyPlayer(game: Game, colour: PlayerColour, shape: PlayerShape) {
+    createEmptyPlayer(game: Game, colour: PlayerColour, shape: PlayerShape): Player {
+        let researchingNow: ResearchTypeNotRandom = 'terraforming';
+        let researchingNext: ResearchTypeNotRandom = 'terraforming';
+
         let player = {
             _id: mongoose.Types.ObjectId(),
             userId: null,
+            homeStarId: null,
             alias: 'Empty Slot',
+            avatar: null,
+            notes: null,
             colour: colour,
             shape: shape,
+            lastSeen: null,
+            lastSeenIP: null,
+            researchingNow,
+            researchingNext,
             credits: game.settings.player.startingCredits,
             creditsSpecialists: game.settings.player.startingCreditsSpecialists,
+            isOpenSlot: true,
+            defeated: false,
+            defeatedDate: null,
+            afk: false,
             renownToGive: game.settings.general.playerLimit,
+            ready: false,
+            readyToCycle: false,
+            readyToQuit: false,
+            missedTurns: 0,
+            hasSentTurnReminder: false,
+            hasFilledAfkSlot: false,
             carriers: [],
             research: {
                 terraforming: { level: game.settings.technology.startingTechnologyLevel.terraforming },
@@ -116,7 +136,10 @@ export default class PlayerService extends EventEmitter {
                 banking: { level: game.settings.technology.startingTechnologyLevel.banking },
                 weapons: { level: game.settings.technology.startingTechnologyLevel.weapons },
                 specialists: { level: game.settings.technology.startingTechnologyLevel.specialists }
-            }
+            },
+            ledger: [],
+            reputations: [],
+            diplomacy: []
         };
 
         this._setDefaultResearchTechnology(game, player as any);
@@ -125,7 +148,7 @@ export default class PlayerService extends EventEmitter {
     }
 
     createEmptyPlayers(game: Game) {
-        let players: any[] = [];
+        let players: Player[] = [];
 
         let shapeColours = this._generatePlayerColourShapeList(game.settings.general.playerLimit);
 
@@ -266,7 +289,7 @@ export default class PlayerService extends EventEmitter {
 
         while (starsToDistribute--) {
             for (let player of players) {
-                let homeStar = this.starService.getById(game, player.homeStarId);
+                let homeStar = this.starService.getById(game, player.homeStarId!);
 
                 // Get X closest stars to the home star and also give those to the player.
                 let s = this.starDistanceService.getClosestUnownedStar(homeStar, game.galaxy.stars);
@@ -279,7 +302,7 @@ export default class PlayerService extends EventEmitter {
 
     // TODO: Shouldn't this be in the starService?
     setupStarForGameStart(game: Game, star: Star, player: Player, resetWarpGates: boolean) {
-        if (player.homeStarId.toString() === star._id.toString()) {
+        if (player.homeStarId!.toString() === star._id.toString()) {
             this.starService.setupHomeStar(game, star, player, game.settings);
         } else {
             star.ownedByPlayerId = player._id;
@@ -547,6 +570,7 @@ export default class PlayerService extends EventEmitter {
     }
 
     setPlayerAsDefeated(game: Game, player: Player) {
+        player.isOpenSlot = false; // TODO: This needs to be extended to allow slots to be opened.
         player.defeated = true;
         player.defeatedDate = moment().utc();
 
@@ -571,6 +595,7 @@ export default class PlayerService extends EventEmitter {
     setPlayerAsAfk(game: Game, player: Player) {
         this.setPlayerAsDefeated(game, player);
 
+        player.isOpenSlot = true; // AFK players will always have their slots open.
         player.afk = true;
     }
 

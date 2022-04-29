@@ -57,10 +57,10 @@ export interface PlayerDiplomaticState {
 export interface Player {
     _id: DBObjectId;
     userId: DBObjectId | null;
-    homeStarId: DBObjectId;
+    homeStarId: DBObjectId | null;
     alias: string;
     avatar: string | null;
-    notes?: string;
+    notes?: string | null;
     colour: {
         alias: string;
         value: string;

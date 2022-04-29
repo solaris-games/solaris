@@ -160,7 +160,7 @@ export default class StarService extends EventEmitter {
     }
 
     getPlayerHomeStar(stars: Star[], player: Player) {
-        return this.listStarsOwnedByPlayer(stars, player._id).find(s => s._id.toString() === player.homeStarId.toString());
+        return this.listStarsOwnedByPlayer(stars, player._id).find(s => s._id.toString() === player.homeStarId!.toString());
     }
 
     listStarsOwnedByPlayer(stars: Star[], playerId: DBObjectId) {
