@@ -19,6 +19,7 @@ const schema = new Schema({
     researchingNext: { type: Types.String, required: true, default: 'weapons' },
     credits: { type: Types.Number, required: true },
     creditsSpecialists: { type: Types.Number, required: true },
+    isOpenSlot: { type: Types.Boolean, required: true, default: true },
     defeated: { type: Types.Boolean, required: false, default: false }, // TODO: We can remove this in favour of using defeatedDate below.
     defeatedDate: { type: Types.Date, required: false, default: null },
     afk: { type: Types.Boolean, required: false, default: false },      // TODO: Same treatment as with defeatedDate.

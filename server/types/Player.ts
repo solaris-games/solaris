@@ -74,6 +74,7 @@ export interface Player {
     researchingNext: ResearchType;
     credits: number;
     creditsSpecialists: number;
+    isOpenSlot: boolean;
     defeated: boolean;
     defeatedDate: Date | null;
     afk: boolean;
