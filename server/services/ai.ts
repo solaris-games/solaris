@@ -1118,4 +1118,8 @@ export default class AIService {
     getStarName(context: Context, starId: string) {
         return context.starsById.get(starId)!.name;
     }
+
+    cleanupState(player: Player) {
+        player.aiState = null;
+    }
 };
