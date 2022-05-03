@@ -627,16 +627,27 @@ export default class LeaderboardService {
             if (a.stats.totalCarriers < b.stats.totalCarriers) return 1;
 
             // Then by defeated date descending
-            if (a.defeated && b.defeated) {
-                if (moment(a.defeatedDate) > moment(b.defeatedDate)) return -1;
-                if (moment(a.defeatedDate) < moment(b.defeatedDate)) return 1;
+            if (a.player.defeated && b.player.defeated) {
+                if (moment(a.player.defeatedDate) > moment(b.player.defeatedDate)) return -1;
+                if (moment(a.player.defeatedDate) < moment(b.player.defeatedDate)) return 1;
             }
 
             // Sort defeated players last.
-            return (a.defeated === b.defeated) ? 0 : a.defeated ? 1 : -1;
+            return (a.player.defeated === b.player.defeated) ? 0 : a.player.defeated ? 1 : -1;
         }
 
-        let leaderboard = playerStats.sort(sortPlayers);
+        // Sort the undefeated players first.
+        let undefeatedLeaderboard = playerStats
+            .filter(x => !x.player.defeated)
+            .sort(sortPlayers);
+
+        // Sort the defeated players next.
+        let defeatedLeaderboard = playerStats
+            .filter(x => x.player.defeated)
+            .sort(sortPlayers);
+
+        // Join both sorted arrays together to produce the leaderboard.
+        let leaderboard = undefeatedLeaderboard.concat(defeatedLeaderboard);
 
         return {
             leaderboard,
