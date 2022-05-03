@@ -113,7 +113,6 @@ class GameContainer {
     // Add a new map to the viewport
     this.map = new Map(this.app, this.store, this)
     this.viewport.addChild(this.map.container)
-
   }
 
   destroy () {
