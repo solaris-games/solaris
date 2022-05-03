@@ -655,7 +655,7 @@ export default class LeaderboardService {
         };
     }
 
-    async addGameRankings(game: Game, gameUsers: User[], leaderboard: LeaderboardPlayer[]): Promise<GameRankingResult> {
+    addGameRankings(game: Game, gameUsers: User[], leaderboard: LeaderboardPlayer[]): GameRankingResult {
         let result: GameRankingResult = {
             ranks: [],
             eloRating: null
@@ -728,7 +728,7 @@ export default class LeaderboardService {
         return result;
     }
 
-    addGameAchievements(game: Game, gameUsers: User[], leaderboard: LeaderboardPlayer[], isRankedGame: boolean) {
+    addGameAchievements(game: Game, gameUsers: User[], leaderboard: LeaderboardPlayer[], isRankedGame: boolean, awardCredits: boolean) {
         let leaderboardPlayers = leaderboard.map(x => x.player);
 
         for (let i = 0; i < leaderboardPlayers.length; i++) {
@@ -749,7 +749,7 @@ export default class LeaderboardService {
                 }
 
                 // Give the winner a galactic credit providing it isn't a 1v1.
-                if (!this.gameTypeService.is1v1Game(game)) {
+                if (!this.gameTypeService.is1v1Game(game) && awardCredits) {
                     user.credits++;
                 }
             }
@@ -773,20 +773,28 @@ export default class LeaderboardService {
         let winningUser: User = gameUsers.find(u => winningPlayer.userId && u._id.toString() === winningPlayer.userId.toString())!;
         let losingUser: User = gameUsers.find(u => losingPlayer.userId && u._id.toString() === losingPlayer.userId.toString())!;
 
-        let winningUserOldRating = winningUser.achievements.eloRating || 1200;
-        let losingUserOldRating = losingUser.achievements.eloRating || 1200;
+        let winningUserOldRating = 1200;
+        let losingUserOldRating = 1200;
+
+        if (winningUser) {
+            winningUserOldRating = winningUser.achievements.eloRating || 1200;
+        }
+
+        if (losingUser) {
+            losingUserOldRating = losingUser.achievements.eloRating || 1200;
+        }
 
         this.ratingService.recalculateEloRating(winningUser, losingUser, true);
 
         return {
             winner: {
                 _id: winningPlayer._id,
-                newRating: winningUser.achievements.eloRating!,
+                newRating: winningUser ? winningUser.achievements.eloRating! : 1200,
                 oldRating: winningUserOldRating
             },
             loser: {
                 _id: losingPlayer._id,
-                newRating: losingUser.achievements.eloRating!,
+                newRating: losingUser ? losingUser.achievements.eloRating! : 1200,
                 oldRating: losingUserOldRating
             }
         };
