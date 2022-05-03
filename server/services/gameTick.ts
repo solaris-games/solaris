@@ -720,7 +720,8 @@ export default class GameTickService extends EventEmitter {
     }
 
     async _gameWinCheck(game: Game, gameUsers: User[]) {
-        let isTutorialGame = this.gameTypeService.isTutorialGame(game);
+        const isTutorialGame = this.gameTypeService.isTutorialGame(game);
+        const isRankedGame = !isTutorialGame && !this.gameTypeService.isNewPlayerGame(game) && (!this.gameTypeService.isCustomGame(game) || this.gameTypeService.isFeaturedGame(game)); // Official games are either not user created or featured (featured games can be user created)
 
         let winner = this.leaderboardService.getGameWinner(game);
 
@@ -738,7 +739,11 @@ export default class GameTickService extends EventEmitter {
                 if (game.state.productionTick > productionTickCap) {
                     let leaderboard = this.leaderboardService.getLeaderboardRankings(game).leaderboard;
                     
-                    rankingResult = await this.leaderboardService.addGameRankings(game, gameUsers, leaderboard);
+                    if (isRankedGame) {
+                        rankingResult = await this.leaderboardService.addGameRankings(game, gameUsers, leaderboard);
+                    }
+
+                    this.leaderboardService.addGameAchievements(game, gameUsers, leaderboard, isRankedGame);
                 }
 
                 // Mark all players as established regardless of game length.

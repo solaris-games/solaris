@@ -636,18 +636,7 @@ export default class LeaderboardService {
             return (a.defeated === b.defeated) ? 0 : a.defeated ? 1 : -1;
         }
 
-        // Sort the undefeated players first.
-        let undefeatedLeaderboard = playerStats
-            .filter(x => !x.player.defeated)
-            .sort(sortPlayers);
-
-        // Sort the defeated players next.
-        let defeatedLeaderboard = playerStats
-            .filter(x => x.player.defeated)
-            .sort(sortPlayers);
-
-        // Join both sorted arrays together to produce the leaderboard.
-        let leaderboard = undefeatedLeaderboard.concat(defeatedLeaderboard);
+        let leaderboard = playerStats.sort(sortPlayers);
 
         return {
             leaderboard,
@@ -660,13 +649,6 @@ export default class LeaderboardService {
             ranks: [],
             eloRating: null
         };
-
-        if (this.gameTypeService.isTutorialGame(game)) {
-            return result;
-        }
-
-        // Official games are either not user created or featured (featured games can be user created)
-        const isRankedGame = !this.gameTypeService.isNewPlayerGame(game) && (!this.gameTypeService.isCustomGame(game) || this.gameTypeService.isFeaturedGame(game));
 
         let leaderboardPlayers = leaderboard.map(x => x.player);
 
@@ -688,57 +670,77 @@ export default class LeaderboardService {
             // 3rd place will receive 0 rank (4 / 2 - 2)
             // 4th place will receive -1 rank (4 / 2 - 3)
 
-            if (isRankedGame) {
-                let rankIncrease = 0;
+            let rankIncrease = 0;
 
-                if (i == 0) {
-                    user.achievements.victories++; // Increase the winner's victory count
-                    rankIncrease = leaderboard.length; // Note: Using leaderboard length as this includes ALL players (including afk)
+            if (i == 0) {
+                rankIncrease = leaderboard.length; // Note: Using leaderboard length as this includes ALL players (including afk)
+            }
+            else if (game.settings.general.awardRankTo === 'all') {
+                rankIncrease = Math.round(leaderboard.length / 2 - i);
+            }
 
-                    if (this.gameTypeService.is32PlayerOfficialGame(game)) {
-                        this.badgeService.awardBadgeForUser(user, 'victor32');
-                    }
+            // For AFK players, do not award any positive rank
+            // and make sure they are deducted at least 1 rank.
+            if (player.afk) {
+                rankIncrease = Math.min(rankIncrease, -1);
+            }
+            // However if they are active and they have
+            // filled an AFK slot then reward the player.
+            // Award extra rank (at least 0) and do not allow a decrease in rank.
+            else if (player.hasFilledAfkSlot) {
+                rankIncrease = Math.max(Math.round(rankIncrease * 1.5), 0);
+            }
 
-                    // Give the winner a galactic credit providing it isn't a 1v1.
-                    if (!this.gameTypeService.is1v1Game(game)) {
-                        user.credits++;
-                    }
+            // For special game modes, award x2 positive rank.
+            if (rankIncrease > 0 && this.gameTypeService.isSpecialGameMode(game)) {
+                rankIncrease *= 2;
+            }
+            
+            // Apply any additional rank multiplier at the end.
+            rankIncrease *= game.constants.player.rankRewardMultiplier;
+
+            let currentRank = user.achievements.rank;
+            let newRank = Math.max(user.achievements.rank + rankIncrease, 0); // Cannot go less than 0.
+
+            user.achievements.rank = newRank;
+
+            // Append the rank adjustment to the results.
+            result.ranks.push({
+                playerId: player._id,
+                current: currentRank,
+                new: newRank
+            });
+        }
+
+        result.eloRating = this.addUserRatingCheck(game, gameUsers);
+
+        return result;
+    }
+
+    addGameAchievements(game: Game, gameUsers: User[], leaderboard: LeaderboardPlayer[], isRankedGame: boolean) {
+        let leaderboardPlayers = leaderboard.map(x => x.player);
+
+        for (let i = 0; i < leaderboardPlayers.length; i++) {
+            let player = leaderboardPlayers[i];
+
+            let user = gameUsers.find(u => player.userId && u._id.toString() === player.userId.toString());
+
+            // Double check user isn't deleted.
+            if (!user) {
+                continue;
+            }
+
+            if (isRankedGame && i === 0) {
+                user.achievements.victories++; // Increase the winner's victory count
+
+                if (this.gameTypeService.is32PlayerOfficialGame(game)) {
+                    this.badgeService.awardBadgeForUser(user, 'victor32');
                 }
-                else if (game.settings.general.awardRankTo === 'all') {
-                    rankIncrease = Math.round(leaderboard.length / 2 - i);
+
+                // Give the winner a galactic credit providing it isn't a 1v1.
+                if (!this.gameTypeService.is1v1Game(game)) {
+                    user.credits++;
                 }
-
-                // For AFK players, do not award any positive rank
-                // and make sure they are deducted at least 1 rank.
-                if (player.afk) {
-                    rankIncrease = Math.min(rankIncrease, -1);
-                }
-                // However if they are active and they have
-                // filled an AFK slot then reward the player.
-                // Award extra rank (at least 0) and do not allow a decrease in rank.
-                else if (player.hasFilledAfkSlot) {
-                    rankIncrease = Math.max(Math.round(rankIncrease * 1.5), 0);
-                }
-
-                // For special game modes, award x2 positive rank.
-                if (rankIncrease > 0 && this.gameTypeService.isSpecialGameMode(game)) {
-                    rankIncrease *= 2;
-                }
-                
-                // Apply any additional rank multiplier at the end.
-                rankIncrease *= game.constants.player.rankRewardMultiplier;
-
-                let currentRank = user.achievements.rank;
-                let newRank = Math.max(user.achievements.rank + rankIncrease, 0); // Cannot go less than 0.
-
-                user.achievements.rank = newRank;
-
-                // Append the rank adjustment to the results.
-                result.ranks.push({
-                    playerId: player._id,
-                    current: currentRank,
-                    new: newRank
-                });
             }
 
             // If the player hasn't been defeated 
@@ -747,10 +749,6 @@ export default class LeaderboardService {
                 user.achievements.completed++;
             }
         }
-
-        result.eloRating = this.addUserRatingCheck(game, gameUsers);
-
-        return result;
     }
 
     addUserRatingCheck(game: Game, gameUsers: User[]): EloRatingChangeResult | null {
