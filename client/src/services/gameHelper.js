@@ -987,8 +987,7 @@ class GameHelper {
       'special_homeStar': 'Capital Stars',
       'special_anonymous': 'Anonymous',
       'special_kingOfTheHill': 'King Of The Hill',
-      'special_tinyGalaxy': 'Tiny Galaxy',
-      'flux_rt': 'Flux'
+      'special_tinyGalaxy': 'Tiny Galaxy'
     }[game.settings.general.type]
   }
 

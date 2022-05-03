@@ -10,7 +10,7 @@
     "anonymity": "normal",
     "playerOnlineStatus": "hidden",
     "timeMachine": "disabled",
-    "fluxEnabled": "disabled",
+    "fluxEnabled": "enabled",
     "advancedAI": "disabled"
   },
   "galaxy": {
