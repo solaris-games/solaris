@@ -1077,8 +1077,12 @@ export default class AIService {
 
         const starGraph = new Map<string, Set<string>>();
 
-        traverseStars.forEach(star=> {
+        traverseStars.forEach(star => {
             const reachableFromPlayerStars = new Set<string>();
+
+            if (star.wormHoleToStarId) {
+                reachableFromPlayerStars.add(star.wormHoleToStarId.toString());
+            }
 
             reachStars.forEach(otherStar => {
                 if (star._id !== otherStar._id && this.distanceService.getDistanceSquaredBetweenLocations(star.location, otherStar.location) <= hyperspaceRangeSquared) {
