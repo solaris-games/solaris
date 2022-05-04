@@ -68,6 +68,15 @@
         </div>
 
         <div class="form-group">
+          <label for="playerName" class="col-form-label">AI players <help-tooltip tooltip="Total number of AI from the start"/></label>
+          <select class="form-control" id="playerName" v-model="settings.general.aiPlayers" :disabled="isCreatingGame">
+            <option v-for="opt in options.general.aiPlayers" v-bind:key="opt" v-bind:value="opt">
+              {{ opt }} AI
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
           <label for="playerType" class="col-form-label">Player Type <help-tooltip tooltip="Determines what type of players can join the game"/></label>
           <select class="form-control" id="playerType" v-model="settings.general.playerType" :disabled="isCreatingGame">
             <option v-for="opt in options.general.playerType" v-bind:key="opt.value" v-bind:value="opt.value">
@@ -789,6 +798,7 @@ export default {
     },
     onPlayerLimitChanged (e) {
       this.settings.diplomacy.maxAlliances = this.settings.general.playerLimit - 1;
+      this.settings.general.aiPlayers = this.settings.general.playerLimit - 1;
     }
   }
 }

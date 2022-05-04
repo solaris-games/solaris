@@ -40,6 +40,7 @@ const schema = new Schema({
 			password: { type: Types.String, required: false, default: null },
 			passwordRequired: { type: Types.Boolean, required: false, default: false },
 			playerLimit: { type: Types.Number, required: true, default: 8, min: 2, max: 32 },
+			aiPlayers: { type: Types.Number, required: true, default: 0, min: 0, max: 31 },
 			playerType: { type: Types.String, required: true, enum: ['all', 'establishedPlayers'], default: 'all' },
 			anonymity: { type: Types.String, required: true, enum: ['normal', 'extra'], default: 'normal' },
 			playerOnlineStatus: { type: Types.String, required: true, enum: ['hidden', 'visible'], default: 'hidden' },
