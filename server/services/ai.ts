@@ -524,18 +524,18 @@ export default class AIService {
                     // Since a carrier is standing around, we might as well use it
                     await reinforce();
                 } else if (this._canAffordCarrier(context, game, player, false)) {
-                    const hasRoute = this._logisticRouteExists(context, order.source, order.star);
+                    const routeCarrier = this._logisticRouteExists(context, order.source, order.star);
 
-                    if (!hasRoute) {
+                    if (!routeCarrier) {
                         await reinforce();
+                    } else {
+                        const lastWaypoint = routeCarrier.waypoints[routeCarrier.waypoints.length - 1];
+                        const ticksUntilCarrierIsBack = this.waypointService.calculateWaypointTicks(game, routeCarrier, lastWaypoint);
+
+                        if (ticksUntilCarrierIsBack > game.settings.galaxy.productionTicks) {
+                            await reinforce();
+                        }
                     }
-
-                    //TODO
-                    const source = context.starsById.get(order.source)!;
-                    const effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, source);
-                    const shipProductionPerTick = this.starService.calculateStarShipsByTicks(effectiveTechs.manufacturing, source.infrastructure.industry || 0, 1, game.settings.galaxy.productionTicks);
-                    const ticksProduced = assignment.totalShips / shipProductionPerTick;
-
                 }
             }
         }
@@ -624,15 +624,15 @@ export default class AIService {
         return waypoints;
     }
 
-    _logisticRouteExists(context: Context, fromStarId: string, toStarId: string): boolean {
+    _logisticRouteExists(context: Context, fromStarId: string, toStarId: string): Carrier | undefined {
         const movingFrom = context.transitFromCarriers.get(fromStarId) ?? [];
-        const hasRouteOutbound = Boolean(movingFrom.find((c) => c.waypoints[0].destination.toString() === toStarId));
-        if (hasRouteOutbound) {
-            return true;
+        const hasCarrierOutbound = movingFrom.find((c) => c.waypoints[0].destination.toString() === toStarId);
+        if (hasCarrierOutbound) {
+            return hasCarrierOutbound;
         }
 
         const movingTo = context.arrivingAtCarriers.get(fromStarId) ?? [];
-        return Boolean(movingTo.find((c) => c.waypoints[0].source.toString() === toStarId));
+        return movingTo.find((c) => c.waypoints[0].source.toString() === toStarId);
     }
 
     _canAffordCarrier(context: Context, game: Game, player: Player, highPriority: boolean): boolean {
