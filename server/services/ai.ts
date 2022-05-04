@@ -826,7 +826,10 @@ export default class AIService {
         }
 
         const defenseCarriersAtStar = context.carriersOrbiting.get(defendingStar._id.toString()) || [];
-        const defenseCarriersOnTheWay = (attackData && attackData.carriersOnTheWay.map(carrierId => context.carriersById.get(carrierId.toString())!));
+        let defenseCarriersOnTheWay: Carrier[] = [];
+        if (attackData) {
+            defenseCarriersOnTheWay = attackData.carriersOnTheWay.map(carrierId => context.carriersById.get(carrierId.toString())!);
+        }
         const defenseCarriers = defenseCarriersAtStar.concat(defenseCarriersOnTheWay);
         const result = this.combatService.calculateStar(game, defendingStar, [player], attackers, defenseCarriers, attackingCarriers, true);
 
