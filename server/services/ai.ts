@@ -689,13 +689,7 @@ export default class AIService {
                     if (!visited.has(fittingCandidate)) {
                         visited.add(fittingCandidate);
 
-                        let distToNext;
-                        if (star.wormHoleToStarId && star.wormHoleToStarId.toString() === fittingCandidate) {
-                            distToNext = 0;
-                        } else {
-                            distToNext = this.distanceService.getDistanceSquaredBetweenLocations(star.location, context.starsById.get(fittingCandidate)!.location);
-                        }
-
+                        const distToNext = this._calculateTravelDistance(star, context.starsById.get(fittingCandidate)!)
                         const newTotalDist = totalDistance + distToNext;
 
                         queue.push({
@@ -716,7 +710,7 @@ export default class AIService {
     }
 
     _calculateTravelDistance(star1: Star, star2: Star): number {
-        if (star1.wormHoleToStarId && star1.wormHoleToStarId === star2._id) {
+        if (this.starService.isStarPairWormHole(star1, star2)) {
             return 0;
         } else {
             return this.distanceService.getDistanceBetweenLocations(star1.location, star2.location);
