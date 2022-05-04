@@ -34,11 +34,11 @@ export default (router: Router, io, container: DependencyContainer) => {
             errors.push('badgeKey is required.');
         }
 
-        if (errors.length) {
-            throw new ValidationError(errors);
-        }
-
         try {
+            if (errors.length) {
+                throw new ValidationError(errors);
+            }
+
             await container.badgeService.purchaseBadgeForUser(req.session.userId, req.params.userId, req.body.badgeKey);
             
             return res.sendStatus(200);
@@ -64,11 +64,11 @@ export default (router: Router, io, container: DependencyContainer) => {
             errors.push('badgeKey is required.');
         }
 
-        if (errors.length) {
-            throw new ValidationError(errors);
-        }
-
         try {
+            if (errors.length) {
+                throw new ValidationError(errors);
+            }
+
             await container.badgeService.purchaseBadgeForPlayer(req.game, req.session.userId, req.params.playerId, req.body.badgeKey);
             
             return res.sendStatus(200);

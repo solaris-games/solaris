@@ -5,63 +5,79 @@ export default (container: DependencyContainer) => {
 
     return {
         async authenticate(req, res, next) {
-            if (!req.session.userId) {
-                return res.sendStatus(401);
+            try {
+                if (!req.session.userId) {
+                    return res.sendStatus(401);
+                }
+
+                let isBanned = await container.userService.getUserIsBanned(req.session.userId);
+
+                if (isBanned && !req.session.isImpersonating) {
+                    throw new ValidationError(`The account is banned.`, 401);
+                }
+
+                if (!req.session.isImpersonating) {
+                    await container.userService.updateLastSeen(req.session.userId, req.headers['x-forwarded-for'] || req.connection.remoteAddress);
+                }
+
+                next();
+            } catch (err) {
+                next(err);
             }
-
-            let isBanned = await container.userService.getUserIsBanned(req.session.userId);
-
-            if (isBanned && !req.session.isImpersonating) {
-                throw new ValidationError(`The account is banned.`, 401);
-            }
-
-            if (!req.session.isImpersonating) {
-                await container.userService.updateLastSeen(req.session.userId, req.headers['x-forwarded-for'] || req.connection.remoteAddress);
-            }
-
-            next();
         },
 
         async authenticateAdmin(req, res, next) {
-            if (!req.session.userId) {
-                return res.sendStatus(401);
+            try {
+                if (!req.session.userId) {
+                    return res.sendStatus(401);
+                }
+
+                let isAdmin = await container.userService.getUserIsAdmin(req.session.userId);
+
+                if (!isAdmin) {
+                    throw new ValidationError(`The account is not an administrator.`, 401);
+                }
+
+                next();
+            } catch(err) {
+                next(err);
             }
-
-            let isAdmin = await container.userService.getUserIsAdmin(req.session.userId);
-
-            if (!isAdmin) {
-                throw new ValidationError(`The account is not an administrator.`, 401);
-            }
-
-            next();
         },
 
         async authenticateSubAdmin(req, res, next) {
-            if (!req.session.userId) {
-                return res.sendStatus(401);
+            try {
+                if (!req.session.userId) {
+                    return res.sendStatus(401);
+                }
+
+                let isAdmin = await container.userService.getUserIsSubAdmin(req.session.userId);
+
+                if (!isAdmin) {
+                    throw new ValidationError(`The account is not a sub administrator.`, 401);
+                }
+
+                next();
+            } catch(err) {
+                next(err);
             }
-
-            let isAdmin = await container.userService.getUserIsSubAdmin(req.session.userId);
-
-            if (!isAdmin) {
-                throw new ValidationError(`The account is not a sub administrator.`, 401);
-            }
-
-            next();
         },
 
         async authenticateCommunityManager(req, res, next) {
-            if (!req.session.userId) {
-                return res.sendStatus(401);
+            try {
+                if (!req.session.userId) {
+                    return res.sendStatus(401);
+                }
+
+                let isAdmin = await container.userService.getUserIsCommunityManager(req.session.userId);
+
+                if (!isAdmin) {
+                    throw new ValidationError(`The account is not a community manager.`, 401);
+                }
+
+                next();
+            } catch(err) {
+                next(err);
             }
-
-            let isAdmin = await container.userService.getUserIsCommunityManager(req.session.userId);
-
-            if (!isAdmin) {
-                throw new ValidationError(`The account is not a community manager.`, 401);
-            }
-
-            next();
         },
 
         handleError(err, req, res, next) {
@@ -89,148 +105,200 @@ export default (container: DependencyContainer) => {
         },
 
         async loadGame(req, res, next) {
-            req.game = await container.gameService.getByIdGalaxy(req.params.gameId);
+            try {
+                req.game = await container.gameService.getByIdGalaxy(req.params.gameId);
 
-            if (!req.game) {
-                throw new ValidationError('Game not found.', 404);
+                if (!req.game) {
+                    throw new ValidationError('Game not found.', 404);
+                }
+
+                next();
+            } catch(err) {
+                next(err);
             }
-
-            return next();
         },
 
         async loadGameLean(req, res, next) {
-            req.game = await container.gameService.getByIdGalaxyLean(req.params.gameId);
+            try {
+                req.game = await container.gameService.getByIdGalaxyLean(req.params.gameId);
 
-            if (!req.game) {
-                throw new ValidationError('Game not found.', 404);
+                if (!req.game) {
+                    throw new ValidationError('Game not found.', 404);
+                }
+
+                next();
+            } catch(err) {
+                next(err);
             }
-
-            return next();
         },
 
         async loadGameAll(req, res, next) {
-            req.game = await container.gameService.getByIdAll(req.params.gameId);
+            try {
+                req.game = await container.gameService.getByIdAll(req.params.gameId);
 
-            if (!req.game) {
-                throw new ValidationError('Game not found.', 404);
+                if (!req.game) {
+                    throw new ValidationError('Game not found.', 404);
+                }
+
+                next();
+            } catch(err) {
+                next(err);
             }
-
-            return next();
         },
 
         async loadGameInfo(req, res, next) {
-            req.game = await container.gameService.getByIdInfo(req.params.gameId, req.session.userId);
+            try {
+                req.game = await container.gameService.getByIdInfo(req.params.gameId, req.session.userId);
 
-            if (!req.game) {
-                throw new ValidationError('Game not found.', 404);
+                if (!req.game) {
+                    throw new ValidationError('Game not found.', 404);
+                }
+
+                delete req.game.settings.general.password;
+
+                next();
+            } catch(err) {
+                next(err);
             }
-
-            delete req.game.settings.general.password;
-
-            return next();
         },
 
         async loadGameState(req, res, next) {
-            req.game = await container.gameService.getByIdState(req.params.gameId, req.session.userId);
+            try {
+                req.game = await container.gameService.getByIdState(req.params.gameId, req.session.userId);
 
-            if (!req.game) {
-                throw new ValidationError('Game not found.', 404);
+                if (!req.game) {
+                    throw new ValidationError('Game not found.', 404);
+                }
+
+                next();
+            } catch(err) {
+                next(err);
             }
-
-            return next();
         },
 
         async loadGameMessages(req, res, next) {
-            req.game = await container.gameService.getByIdMessages(req.params.gameId);
+            try {
+                req.game = await container.gameService.getByIdMessages(req.params.gameId);
 
-            if (!req.game) {
-                throw new ValidationError('Game not found.', 404);
+                if (!req.game) {
+                    throw new ValidationError('Game not found.', 404);
+                }
+
+                next();
+            } catch(err) {
+                next(err);
             }
-
-            return next();
         },
 
         async loadGameMessagesLean(req, res, next) {
-            req.game = await container.gameService.getByIdMessagesLean(req.params.gameId);
+            try {
+                req.game = await container.gameService.getByIdMessagesLean(req.params.gameId);
 
-            if (!req.game) {
-                throw new ValidationError('Game not found.', 404);
+                if (!req.game) {
+                    throw new ValidationError('Game not found.', 404);
+                }
+
+                next();
+            } catch(err) {
+                next(err);
             }
-
-            return next();
         },
 
         async loadGameConversations(req, res, next) {
-            req.game = await container.gameService.getByIdConversations(req.params.gameId);
+            try {
+                req.game = await container.gameService.getByIdConversations(req.params.gameId);
 
-            if (!req.game) {
-                throw new ValidationError('Game not found.', 404);
+                if (!req.game) {
+                    throw new ValidationError('Game not found.', 404);
+                }
+
+                return next();
+            } catch(err) {
+                next(err);
             }
-
-            return next();
         },
 
         async loadGameConversationsLean(req, res, next) {
-            req.game = await container.gameService.getByIdConversationsLean(req.params.gameId);
+            try {
+                req.game = await container.gameService.getByIdConversationsLean(req.params.gameId);
 
-            if (!req.game) {
-                throw new ValidationError('Game not found.', 404);
+                if (!req.game) {
+                    throw new ValidationError('Game not found.', 404);
+                }
+
+                next();
+            } catch(err) {
+                next(err);
             }
-
-            return next();
         },
 
         async loadGameDiplomacyLean(req, res, next) {
-            req.game = await container.gameService.getByIdDiplomacyLean(req.params.gameId);
+            try {
+                req.game = await container.gameService.getByIdDiplomacyLean(req.params.gameId);
 
-            if (!req.game) {
-                throw new ValidationError('Game not found.', 404);
+                if (!req.game) {
+                    throw new ValidationError('Game not found.', 404);
+                }
+
+                next();
+            } catch(err) {
+                next(err);
             }
-
-            return next();
         },
 
         async loadGamePlayers(req, res, next) {
-            req.game = await container.gameService.getByIdLean(req.params.gameId, {
-                'galaxy.players': 1,
-                'settings': 1
-            });
+            try {
+                req.game = await container.gameService.getByIdLean(req.params.gameId, {
+                    'galaxy.players': 1,
+                    'settings': 1
+                });
 
-            if (!req.game) {
-                throw new ValidationError('Game not found.', 404);
+                if (!req.game) {
+                    throw new ValidationError('Game not found.', 404);
+                }
+
+                next();
+            } catch(err) {
+                next(err);
             }
-
-            return next();
         },
 
         async loadGamePlayersState(req, res, next) {
-            req.game = await container.gameService.getByIdLean(req.params.gameId, {
-                'galaxy.players': 1,
-                'state': 1
-            });
+            try {
+                req.game = await container.gameService.getByIdLean(req.params.gameId, {
+                    'galaxy.players': 1,
+                    'state': 1
+                });
 
-            if (!req.game) {
-                throw new ValidationError('Game not found.', 404);
+                if (!req.game) {
+                    throw new ValidationError('Game not found.', 404);
+                }
+
+                next();
+            } catch(err) {
+                next(err);
             }
-
-            return next();
         },
 
         async loadGamePlayersSettingsState(req, res, next) {
-            req.game = await container.gameService.getByIdLean(req.params.gameId, {
-                'settings': 1,
-                'galaxy.players': 1,
-                'state': 1
-            });
+            try {
+                req.game = await container.gameService.getByIdLean(req.params.gameId, {
+                    'settings': 1,
+                    'galaxy.players': 1,
+                    'state': 1
+                });
 
-            if (!req.game) {
-                throw new ValidationError('Game not found.', 404);
+                if (!req.game) {
+                    throw new ValidationError('Game not found.', 404);
+                }
+
+                next();
+            } catch(err) {
+                next(err);
             }
-
-            return next();
         },
 
-        async loadPlayer(req, res, next) {
+        loadPlayer(req, res, next) {
             let player = container.playerService.getByUserId(req.game, req.session.userId);
 
             if (!player) {
@@ -239,7 +307,7 @@ export default (container: DependencyContainer) => {
 
             req.player = player;
 
-            return next();
+            next();
         },
 
         validateGameLocked(req, res, next) {
@@ -247,7 +315,7 @@ export default (container: DependencyContainer) => {
                 throw new ValidationError('You cannot perform this action, the game is locked by the system. Please try again.');
             }
 
-            return next();
+            next();
         },
 
         validateUndefeatedPlayer(req, res, next) {
@@ -255,7 +323,7 @@ export default (container: DependencyContainer) => {
                 throw new ValidationError('You cannot participate in this game, you have been defeated.');
             }
 
-            return next();
+            next();
         },
 
         // TODO: Does this need a rework because games can be waiting to start?
@@ -264,7 +332,7 @@ export default (container: DependencyContainer) => {
                 throw new ValidationError('You cannot perform this action, the game is not in progress.');
             }
 
-            return next();
+            next();
         },
 
         // TODO: Does this need a rework because games can be waiting to start?
@@ -273,7 +341,7 @@ export default (container: DependencyContainer) => {
                 throw new ValidationError('You cannot perform this action, the game has not yet started.');
             }
 
-            return next();
+            next();
         },
 
         validateGameNotFinished(req, res, next) {
@@ -281,7 +349,7 @@ export default (container: DependencyContainer) => {
                 throw new ValidationError('You cannot perform this action, the game is over.');
             }
 
-            return next();
+            next();
         }
     }
 

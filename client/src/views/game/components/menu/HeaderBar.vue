@@ -377,7 +377,9 @@ export default {
   },
   watch: {
     game (newGame, oldGame) {
-      this.checkForUnreadEvents()
+      if (!this.$isHistoricalMode()) {
+        this.checkForUnreadEvents()
+      }
     }
   }
 }

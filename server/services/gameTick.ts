@@ -720,12 +720,14 @@ export default class GameTickService extends EventEmitter {
     }
 
     async _gameWinCheck(game: Game, gameUsers: User[]) {
-        let isTutorialGame = this.gameTypeService.isTutorialGame(game);
+        const isTutorialGame = this.gameTypeService.isTutorialGame(game);
 
         let winner = this.leaderboardService.getGameWinner(game);
 
         if (winner) {
             this.gameStateService.finishGame(game, winner);
+            
+            let rankingResult = this._tryAwardEndGameRank(game, gameUsers, true);
 
             for (const player of game.galaxy.players) {
                 if (this.aiService.isAIControlled(player)) {
@@ -734,27 +736,9 @@ export default class GameTickService extends EventEmitter {
             }
 
             if (!isTutorialGame) {
-                let rankingResult: GameRankingResult | null = null;
-    
-                // There must have been at least X production ticks in order for
-                // rankings to be added to players. This is to slow down players
-                // should they wish to cheat the system.
-                let productionTickCap = this.gameTypeService.is1v1Game(game) ? 1 : 2;
-
-                if (game.state.productionTick > productionTickCap) {
-                    let leaderboard = this.leaderboardService.getLeaderboardRankings(game).leaderboard;
-                    
-                    rankingResult = await this.leaderboardService.addGameRankings(game, gameUsers, leaderboard);
-                }
-
                 // Mark all players as established regardless of game length.
                 this.leaderboardService.markNonAFKPlayersAsEstablishedPlayers(game, gameUsers);
-
-                // If the game is anonymous, then ranking results should be omitted from the game ended event.
-                if (this.gameTypeService.isAnonymousGame(game)) {
-                    rankingResult = null;
-                }
-                
+    
                 this.emit('onGameEnded', {
                     gameId: game._id,
                     gameTick: game.state.tick,
@@ -766,6 +750,38 @@ export default class GameTickService extends EventEmitter {
         }
 
         return false;
+    }
+
+    _tryAwardEndGameRank(game: Game, gameUsers: User[], awardCredits: boolean) {
+        const isRankedGame = this.gameTypeService.isRankedGame(game);
+
+        if (!isRankedGame) {
+            return null;
+        }
+
+        let rankingResult: GameRankingResult | null = null;
+    
+        // There must have been at least X production ticks in order for
+        // rankings to be added to players. This is to slow down players
+        // should they wish to cheat the system.
+        let productionTickCap = this.gameTypeService.is1v1Game(game) ? 1 : 2;
+
+        if (game.state.productionTick > productionTickCap) {
+            let leaderboard = this.leaderboardService.getLeaderboardRankings(game).leaderboard;
+            
+            if (isRankedGame) {
+                rankingResult = this.leaderboardService.addGameRankings(game, gameUsers, leaderboard);
+            }
+
+            this.leaderboardService.addGameAchievements(game, gameUsers, leaderboard, isRankedGame, awardCredits);
+        }
+
+        // If the game is anonymous, then ranking results should be omitted from the game ended event.
+        if (this.gameTypeService.isAnonymousGame(game)) {
+            rankingResult = null;
+        }
+        
+        return rankingResult;
     }
 
     async _playAI(game: Game) {

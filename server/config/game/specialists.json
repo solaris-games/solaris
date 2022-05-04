@@ -345,13 +345,13 @@
             "id": 4,
             "key": "defense-satellite",
             "name": "Orbital Cannon",
-            "description": "Grants +1 Weapons to the Star.",
+            "description": "Grants +1 Defender Bonus to the Star.",
             "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 2,
             "oneShot": false,
             "modifiers": {
-                "local": {
-                    "weapons": 1
+                "special": {
+                    "defenderBonus": 1
                 }
             }
         },

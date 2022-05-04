@@ -18,11 +18,11 @@ export default (router: Router, io, container: DependencyContainer) => {
             errors.push('reasons is a required body field');
         }
 
-        if (errors.length) {
-            throw new ValidationError(errors);
-        }
-
         try {
+            if (errors.length) {
+                throw new ValidationError(errors);
+            }
+
             await container.reportService.reportPlayer(req.game, req.body.playerId, req.session.userId, req.body.reasons);
             
             return res.sendStatus(200);
