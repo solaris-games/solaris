@@ -1068,7 +1068,7 @@ export default class AIService {
                     visited.add(starId);
 
                     const reachables = context.reachablePlayerStars.get(starId)!;
-                    
+
                     for (const reachableId of reachables) {
                         const oldPriority = starPriorities.get(reachableId) || 0;
                         const transitivePriority = priority * 0.5;
@@ -1113,7 +1113,7 @@ export default class AIService {
         traverseStars.forEach(star => {
             const reachableFromPlayerStars = new Set<string>();
 
-            if (star.wormHoleToStarId) {
+            if (star.wormHoleToStarId && reachStars.find(os => os._id === star.wormHoleToStarId)) {
                 reachableFromPlayerStars.add(star.wormHoleToStarId.toString());
             }
 
