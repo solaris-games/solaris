@@ -267,11 +267,17 @@ export default class AIService {
         }
 
         const traversableStars = game.galaxy.stars.filter(star => !star.ownedByPlayerId || star.ownedByPlayerId.toString() === playerId);
-        const allReachableFromPlayerStars = this._computeStarGraph(game, player, playerStars, game.galaxy.stars, this._getHyperspaceRange(game, player));
-        const allCanReachPlayerStars = this._computeStarGraph(game, player, game.galaxy.stars, playerStars, this._getHyperspaceRange(game, player));
-        const freelyReachableFromPlayerStars = this._computeStarGraph(game, player, playerStars, traversableStars, this._getHyperspaceRange(game, player));
-        const reachablePlayerStars = this._computeStarGraph(game, player, playerStars, playerStars, this._getHyperspaceRange(game, player));
-        const freelyReachableStars = this._computeStarGraph(game, player, traversableStars, traversableStars, this._getHyperspaceRange(game, player));
+        // All stars (belonging to anyone) that can be reached directly from a player star
+        const allReachableFromPlayerStars = this._computeStarGraph(game, player, playerStars, game.galaxy.stars, this._getHyperspaceRangeExternal(game, player));
+        // All stars (belonging to anyone) that can reach a player star (with our players range)
+        const allCanReachPlayerStars = this._computeStarGraph(game, player, game.galaxy.stars, playerStars, this._getHyperspaceRangeExternal(game, player));
+        // All stars (unowned or owned by this player) that can be reached from player stars
+        const freelyReachableFromPlayerStars = this._computeStarGraph(game, player, playerStars, traversableStars, this._getHyperspaceRangeExternal(game, player));
+        // Player stars reachable from player stars
+        const reachablePlayerStars = this._computeStarGraph(game, player, playerStars, playerStars, this._getHyperspaceRangeInternal(game, player));
+        // All free stars that can be reached from other free stars
+        const freelyReachableStars = this._computeStarGraph(game, player, traversableStars, traversableStars, this._getHyperspaceRangeExternal(game, player));
+        // All stars that can be reached from player stars with globally highest range tech
         const starsInGlobalRange = this._computeStarGraph(game, player, playerStars, game.galaxy.stars, this._getGlobalHighestHyperspaceRange(game));
 
         const borderStars = new Set<string>();
@@ -1058,7 +1064,13 @@ export default class AIService {
         return this.distanceService.getHyperspaceDistance(game, highestLevel);
     }
 
-    _getHyperspaceRange(game: Game, player: Player): number {
+    _getHyperspaceRangeExternal(game: Game, player: Player): number {
+        const scanningRange = this.distanceService.getScanningDistance(game, player.research.scanning.level);
+        const hyperspaceRange = this.distanceService.getHyperspaceDistance(game, player.research.hyperspace.level);
+        return Math.min(scanningRange, hyperspaceRange);
+    }
+
+    _getHyperspaceRangeInternal(game: Game, player: Player): number {
         return this.distanceService.getHyperspaceDistance(game, player.research.hyperspace.level);
     }
 
