@@ -459,7 +459,7 @@ export default class AIService {
                 }
 
                 for (const {assignment, trace} of fittingAssignments) {
-                    const ticksUntilArrival = this._calculateTraceDuration(game, trace.map(te => context.starsById.get(te.starId)!.location));
+                    const ticksUntilArrival = this._calculateTraceDuration(context, game, trace);
                     const requiredShips = Math.floor(this._calculateRequiredShipsForAttack(game, player, context, starToInvade, ticksUntilArrival) * INVASION_ATTACK_FACTOR);
 
                     if (assignment.totalShips >= requiredShips) {
@@ -689,7 +689,13 @@ export default class AIService {
                     if (!visited.has(fittingCandidate)) {
                         visited.add(fittingCandidate);
 
-                        const distToNext = this.distanceService.getDistanceSquaredBetweenLocations(star.location, context.starsById.get(fittingCandidate)!.location);
+                        let distToNext;
+                        if (star.wormHoleToStarId && star.wormHoleToStarId.toString() === fittingCandidate) {
+                            distToNext = 0;
+                        } else {
+                            distToNext = this.distanceService.getDistanceSquaredBetweenLocations(star.location, context.starsById.get(fittingCandidate)!.location);
+                        }
+
                         const newTotalDist = totalDistance + distToNext;
 
                         queue.push({
@@ -709,17 +715,44 @@ export default class AIService {
         return allowCarrierPurchase || hasCarriers;
     }
 
-    _calculateTraceDuration(game: Game, trace: Location[]): number {
-        const distancePerTick = game.settings.specialGalaxy.carrierSpeed;
-        const entireDistance = this.distanceService.getDistanceAlongLocationList(trace);
+    _calculateTravelDistance(star1: Star, star2: Star): number {
+        if (star1.wormHoleToStarId && star1.wormHoleToStarId === star2._id) {
+            return 0;
+        } else {
+            return this.distanceService.getDistanceBetweenLocations(star1.location, star2.location);
+        }
+    }
 
+    _calculateTraceDistance(context: Context, game: Game, trace: TracePoint[]): number {
+        if (trace.length < 2) {
+            return 0;
+        }
+
+        let last = trace[0];
+        let distance = 0;
+
+        for (let i = 1; i < trace.length; i++) {
+            const lastStar = context.starsById.get(last.starId)!;
+            const thisStar = context.starsById.get(trace[i].starId)!;
+
+            distance += this._calculateTravelDistance(lastStar, thisStar);
+
+            last = trace[i];
+        }
+
+        return distance;
+    }
+
+    _calculateTraceDuration(context: Context, game: Game, trace: TracePoint[]): number {
+        const distancePerTick = game.settings.specialGalaxy.carrierSpeed;
+        const entireDistance = this._calculateTraceDistance(context, game, trace);
         return Math.ceil(entireDistance / distancePerTick);
     }
 
     _findAssignmentsWithTickLimit(game: Game, player: Player, context: Context, starGraph: StarGraph, assignments: Map<string, Assignment>, destinationId: string, ticksLimit: number, allowCarrierPurchase: boolean, onlyOne = false, filterNext: ((trace: TracePoint[], nextStarId: string) => boolean) | null = null): FoundAssignment[] {
         const nextFilter = (trace: TracePoint[], nextStarId: string) => {
-            const entireTrace = trace.concat([{starId: nextStarId}]).map(te => context.starsById.get(te.starId)!.location);
-            const ticksRequired = this._calculateTraceDuration(game, entireTrace);
+            const entireTrace = trace.concat([{starId: nextStarId}]);
+            const ticksRequired = this._calculateTraceDuration(context, game, entireTrace);
             const withinLimit = ticksRequired <= ticksLimit;
 
             if (filterNext) {
@@ -1035,7 +1068,7 @@ export default class AIService {
                     visited.add(starId);
 
                     const reachables = context.reachablePlayerStars.get(starId)!;
-
+                    
                     for (const reachableId of reachables) {
                         const oldPriority = starPriorities.get(reachableId) || 0;
                         const transitivePriority = priority * 0.5;
