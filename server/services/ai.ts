@@ -717,8 +717,6 @@ export default class AIService {
     }
 
     _findAssignmentsWithTickLimit(game: Game, player: Player, context: Context, starGraph: StarGraph, assignments: Map<string, Assignment>, destinationId: string, ticksLimit: number, allowCarrierPurchase: boolean, onlyOne = false, filterNext: ((trace: TracePoint[], nextStarId: string) => boolean) | null = null): FoundAssignment[] {
-        const distancePerTick = game.settings.specialGalaxy.carrierSpeed;
-
         const nextFilter = (trace: TracePoint[], nextStarId: string) => {
             const entireTrace = trace.concat([{starId: nextStarId}]).map(te => context.starsById.get(te.starId)!.location);
             const ticksRequired = this._calculateTraceDuration(game, entireTrace);
