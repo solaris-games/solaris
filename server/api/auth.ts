@@ -19,11 +19,11 @@ export default (router: Router, io, container: DependencyContainer) => {
             errors.push('Password is a required field');
         }
     
-        if (errors.length) {
-            throw new ValidationError(errors);
-        }
-    
         try {
+            if (errors.length) {
+                throw new ValidationError(errors);
+            }
+    
             let user = await container.authService.login(req.body.email, req.body.password);
     
             // Store the user id in the session.

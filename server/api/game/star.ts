@@ -4,17 +4,21 @@ import { DependencyContainer } from '../../types/DependencyContainer';
 import Middleware from '../middleware';
     
 function validate(req, res, next) {
-    let errors: string[] = [];
+    try {
+        let errors: string[] = [];
 
-    if (!req.body.starId) {
-        errors.push('starId is required.');
+        if (!req.body.starId) {
+            errors.push('starId is required.');
+        }
+
+        if (errors.length) {
+            throw new ValidationError(errors);
+        }
+
+        next();
+    } catch(err) {
+        next(err);
     }
-
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    return next();
 }
 
 export default (router: Router, io, container: DependencyContainer) => {

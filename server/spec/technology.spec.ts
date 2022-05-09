@@ -202,6 +202,58 @@ describe('technology', () => {
         expect(bonus).toBe(0);
     });
 
+    it('should get 2 defender bonus for defender bonus specialist and defender bonus is enabled', () => {
+        const game = {
+            settings: {
+                specialGalaxy: {
+                    defenderBonus: 'enabled'
+                }
+            }
+        };
+
+        const star = {
+            specialist: {
+                modifiers: {
+                    special: {
+                        defenderBonus: 1
+                    }
+                }
+            }
+        };
+
+        setup();
+
+        const bonus = service.getDefenderBonus(game, star);
+
+        expect(bonus).toBe(2);
+    });
+
+    it('should get 1 defender bonus for defender bonus specialist and defender bonus is disabled', () => {
+        const game = {
+            settings: {
+                specialGalaxy: {
+                    defenderBonus: 'disabled'
+                }
+            }
+        };
+
+        const star = {
+            specialist: {
+                modifiers: {
+                    special: {
+                        defenderBonus: 1
+                    }
+                }
+            }
+        };
+
+        setup();
+
+        const bonus = service.getDefenderBonus(game, star);
+
+        expect(bonus).toBe(1);
+    });
+
     /* EFFECTIVE WEAPON LEVELS */
     /* STAR */
 

@@ -65,6 +65,9 @@ class Star extends EventEmitter {
     this.container.on('mouseover', this.onMouseOver.bind(this))
     this.container.on('mouseout', this.onMouseOut.bind(this))
 
+    this.planets = null
+    this.handleOrbitPlanetsStep = null
+
     this.isSelected = false
     this.isMouseOver = false
     this.isInScanningRange = false // Default to false to  initial redraw
@@ -331,12 +334,15 @@ class Star extends EventEmitter {
   drawPlanets () {
     if (this.userSettings.map.naturalResources !== 'planets') {
       if (this.container_planets) {
+        this.unsubscribeToEvents()
         this.container.removeChild(this.container_planets)
         this.container_planets = null
+        this.planets = null
       }
 
       return
     }
+
     if (!this.container_planets) {
       this.container_planets = new PIXI.Container()
 
@@ -352,6 +358,8 @@ class Star extends EventEmitter {
 
       let rotationDirection = this._getPlanetOrbitDirection()
       let rotationSpeedModifier = this._getPlanetOrbitSpeed()
+
+      this.planets = []
 
       for (let i = 0; i < planetCount; i++) {
         let planetContainer = new PIXI.Container()
@@ -380,19 +388,33 @@ class Star extends EventEmitter {
 
         let rotationSpeed = (planetCount - i) / rotationSpeedModifier
 
-        this.app.ticker.add((delta) => {
-          //TODO maybe check if visible? no need to rotate planets outside viewport
-          if (rotationDirection) {
-            planetContainer.rotation += rotationSpeed * delta
-          } else {
-            planetContainer.rotation -= rotationSpeed * delta
-          }
-        })
-
         this.container_planets.addChild(planetContainer)
+
+        this.planets.push({
+          index: i,
+          container: planetContainer,
+          rotationSpeed,
+          rotationDirection
+        })
       }
 
+      this.subscribeToEvents()
+
       this.container.addChild(this.container_planets)
+    }
+  }
+
+  orbitPlanentsStep (delta) {
+    if (!this.planets) {
+      return
+    }
+    
+    for (let planet of this.planets) {
+      if (planet.rotationDirection) {
+        planet.container.rotation += planet.rotationSpeed * delta
+      } else {
+        planet.container.rotation -= planet.rotationSpeed * delta
+      }
     }
   }
 
@@ -804,7 +826,6 @@ class Star extends EventEmitter {
       }
     }
 
-
     if (this.text_name) this.text_name.visible = this.isSelected || this.zoomPercent >= Star.zoomLevelDefinitions.name
     if (this.container_planets) this.container_planets.visible = this._isInScanningRange() && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources
     if (this.text_infrastructure) this.text_infrastructure.visible = this.isSelected || this.zoomPercent >= Star.zoomLevelDefinitions.infrastructure
@@ -825,6 +846,20 @@ class Star extends EventEmitter {
     this.graphics_shape_full_warp.visible = !partial_ring && this.data.warpGate
 
     // this.baseScale = this.isSelected ? 1.5 : 1
+  }
+
+  subscribeToEvents () {
+    if (this.container_planets) {
+      this.handleOrbitPlanetsStep = this.orbitPlanentsStep.bind(this)
+      this.app.ticker.add(this.handleOrbitPlanetsStep)
+    }
+  }
+
+  unsubscribeToEvents () {
+    if (this.container_planets) {
+      this.app.ticker.remove(this.handleOrbitPlanetsStep)
+      this.handleOrbitPlanetsStep = null
+    }
   }
 
   deselectAllText () {

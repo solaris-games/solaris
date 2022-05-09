@@ -37,6 +37,7 @@ export interface Specialist {
             creditsPerTickByScience?: number;
             autoCarrierSpecialistAssign?: number;
             combatSwapWeaponsTechnology?: boolean;
+            defenderBonus: number;
         },
         carrierToCarrierCombat?: {
             weapons: number;

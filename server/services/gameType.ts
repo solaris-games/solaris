@@ -92,4 +92,11 @@ export default class GameTypeService {
         return game.settings.general.fluxEnabled === 'enabled'
     }
 
+    isRankedGame(game: Game) {
+        // Official games are either not user created or featured (featured games can be user created)
+        return !this.isTutorialGame(game) &&
+                !this.isNewPlayerGame(game) &&
+                (!this.isCustomGame(game) || this.isFeaturedGame(game));
+    }
+
 }
