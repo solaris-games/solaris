@@ -165,6 +165,20 @@ const schema = new Schema({
                 scope: { type: Types.String, required: false }
             }
         }
+    },
+    subscriptions: {
+        discord: {
+            gameStarted: { type: Types.Boolean, required: false, default: true },
+            gameEnded: { type: Types.Boolean, required: false, default: true },
+            playerGalacticCycleComplete: { type: Types.Boolean, required: false, default: true },
+            playerCombatStar: { type: Types.Boolean, required: false, default: true },
+            playerCombatCarrier: { type: Types.Boolean, required: false, default: true },
+            playerResearchComplete: { type: Types.Boolean, required: false, default: true },
+            playerTechnologyReceived: { type: Types.Boolean, required: false, default: true },
+            playerCreditsReceived: { type: Types.Boolean, required: false, default: true },
+            playerCreditsSpecialistsReceived: { type: Types.Boolean, required: false, default: true },
+            playerRenownReceived: { type: Types.Boolean, required: false, default: true }
+        }
     }
 });
 
