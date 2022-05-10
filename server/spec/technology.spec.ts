@@ -182,7 +182,7 @@ describe('technology', () => {
         expect(bonus).toBe(2);
     });
 
-    it('should get 0 defender bonus for asteroid field if disabled', () => {
+    it('should get 1 defender bonus for asteroid field if disabled', () => {
         const game = {
             settings: {
                 specialGalaxy: {
@@ -199,7 +199,7 @@ describe('technology', () => {
 
         const bonus = service.getDefenderBonus(game, star);
 
-        expect(bonus).toBe(0);
+        expect(bonus).toBe(1);
     });
 
     it('should get 2 defender bonus for defender bonus specialist and defender bonus is enabled', () => {
