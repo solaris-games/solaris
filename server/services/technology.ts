@@ -230,16 +230,16 @@ export default class TechnologyService {
     getDefenderBonus(game: Game, star: Star) {
         let bonus = game.settings.specialGalaxy.defenderBonus === 'enabled' ? 1 : 0;
 
+        if (star.isAsteroidField) {
+            bonus++;
+        }
+
         if (star.specialist?.modifiers.special?.defenderBonus) {
             bonus += star.specialist.modifiers.special.defenderBonus;
         }
 
         if (star.homeStar) {
             bonus *= game.constants.star.homeStarDefenderBonusMultiplier;
-        }
-
-        if (star.isAsteroidField) {
-            bonus *= 2;
         }
 
         return bonus;

@@ -162,7 +162,7 @@ describe('technology', () => {
         expect(bonus).toBe(0);
     });
 
-    it('should get x2 defender bonus if star is asteroid field', () => {
+    it('should get +1 defender bonus if star is asteroid field', () => {
         const game = {
             settings: {
                 specialGalaxy: {
