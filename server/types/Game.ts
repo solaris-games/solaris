@@ -21,8 +21,7 @@ export type GameType = 'tutorial'|
 'special_homeStar'|
 'special_anonymous'|
 'special_kingOfTheHill'|
-'special_tinyGalaxy' |
-'flux_rt';
+'special_tinyGalaxy';
 
 export type GameMode = 'conquest'|'battleRoyale'|'kingOfTheHill';
 export type GamePlayerType = 'all'|'establishedPlayers';

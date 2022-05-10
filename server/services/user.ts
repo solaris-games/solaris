@@ -3,7 +3,7 @@ import { DBObjectId } from '../types/DBObjectId';
 import ValidationError from '../errors/validation';
 import DatabaseRepository from '../models/DatabaseRepository';
 import { Game } from '../types/Game';
-import { User } from '../types/User';
+import { User, UserSubscriptions } from '../types/User';
 import PasswordService from './password';
 const moment = require('moment');
 
@@ -39,7 +39,8 @@ export default class UserService extends EventEmitter {
             premiumEndDate: 0,
             banned: 0,
             lastSeen: 0,
-            lastSeenIP: 0
+            lastSeenIP: 0,
+            'oauth.discord.token': 0,
         });
     }
 
@@ -87,7 +88,8 @@ export default class UserService extends EventEmitter {
             username: 0,
             gameSettings: 0,
             lastSeen: 0,
-            lastSeenIP: 0
+            lastSeenIP: 0,
+            oauth: 0,
         });
     }
 
@@ -104,7 +106,8 @@ export default class UserService extends EventEmitter {
             username: 0,
             gameSettings: 0,
             lastSeen: 0,
-            lastSeenIP: 0
+            lastSeenIP: 0,
+            oauth: 0,
         };
 
         return await this.userRepo.findById(id, select);
@@ -394,6 +397,35 @@ export default class UserService extends EventEmitter {
             _id: userId
         }, {
             gameSettings: settings
+        });
+    }
+
+    async getSubscriptions(userId: DBObjectId) {
+        let user = await this.getMe(userId);
+
+        return user!.subscriptions;
+    }
+
+    async saveSubscriptions(userId: DBObjectId, subscriptions: any) {
+        let obj: UserSubscriptions = {};
+
+        if (subscriptions.discord) {
+            obj.discord = {
+                gameEnded: subscriptions.discord.gameEnded || false,
+                gameStarted: subscriptions.discord.gameStarted || false,
+                playerCreditsReceived: subscriptions.discord.playerCreditsReceived || false,
+                playerCreditsSpecialistsReceived: subscriptions.discord.playerCreditsSpecialistsReceived || false,
+                playerGalacticCycleComplete: subscriptions.discord.playerGalacticCycleComplete || false,
+                playerRenownReceived: subscriptions.discord.playerRenownReceived || false,
+                playerResearchComplete: subscriptions.discord.playerResearchComplete || false,
+                playerTechnologyReceived: subscriptions.discord.playerTechnologyReceived || false,
+            }
+        }
+
+        await this.userRepo.updateOne({
+            _id: userId
+        }, {
+            subscriptions: obj
         });
     }
 

@@ -1,9 +1,11 @@
+import EventEmitter from 'events';
 import ValidationError from '../errors/validation';
 import DatabaseRepository from '../models/DatabaseRepository';
+import { DBObjectId } from '../types/DBObjectId';
 import { User } from '../types/User';
 import PasswordService from './password';
 
-export default class AuthService {
+export default class AuthService extends EventEmitter {
     userRepo: DatabaseRepository<User>;
     passwordService: PasswordService;
     
@@ -11,6 +13,8 @@ export default class AuthService {
         userRepo: DatabaseRepository<User>,
         passwordService: PasswordService
     ) {
+        super();
+
         this.userRepo = userRepo;
         this.passwordService = passwordService;
     }

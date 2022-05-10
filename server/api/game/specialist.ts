@@ -6,6 +6,17 @@ export default (router: Router, io, container: DependencyContainer) => {
 
     const middleware = Middleware(container);
 
+    router.get('/api/game/specialists/bans', async (req, res, next) => {
+        try {
+            const amount = container.gameFluxService.getThisMonthSpecialistBanAmount();
+            const bans = container.specialistBanService.getCurrentMonthBans(amount);
+
+            return res.status(200).json(bans);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.get('/api/game/specialists/carrier', async (req, res, next) => {
         try {
             let specialists = await container.specialistService.listCarrier(null);

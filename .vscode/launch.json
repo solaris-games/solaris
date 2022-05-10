@@ -60,6 +60,25 @@
             "restart": true
         },
 
+        // Recalculate Ranks
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Recalc Ranks",
+            "protocol": "inspector",
+            "cwd": "${workspaceFolder}/server",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run-script", "start-db-recalc-ranks:dev"],
+            "envFile": ".env"
+        },
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "Attach to Recalc Ranks",
+            "port": 9234,
+            "restart": true
+        },
+
         // Bots
         // Discord
         {

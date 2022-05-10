@@ -86,6 +86,42 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
+    router.get('/api/game/list/summary', async (req, res, next) => {
+        try {
+            let official = await container.gameListService.listOfficialGames();
+            let user = await container.gameListService.listUserGames();
+            let inProgress = await container.gameListService.listInProgressGames();
+            let completed = await container.gameListService.listRecentlyCompletedGames();
+
+            let result = {
+                official,
+                user,
+                inProgress,
+                completed
+            };
+
+            return res.status(200).json(result);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.get('/api/game/list/summary/user', async (req, res, next) => {
+        try {
+            let active = await container.gameListService.listActiveGames(req.session.userId);
+            let completed = await container.gameListService.listUserCompletedGames(req.session.userId);
+
+            let result = {
+                active,
+                completed
+            };
+
+            return res.status(200).json(result);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.get('/api/game/list/official', async (req, res, next) => {
         try {
             let games = await container.gameListService.listOfficialGames();
@@ -116,16 +152,6 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
-    router.get('/api/game/list/active', middleware.authenticate, async (req, res, next) => {
-        try {
-            let games = await container.gameListService.listActiveGames(req.session.userId);
-
-            return res.status(200).json(games);
-        } catch (err) {
-            return next(err);
-        }
-    }, middleware.handleError);
-
     router.get('/api/game/list/completed', middleware.authenticate, async (req, res, next) => {
         try {
             let games = await container.gameListService.listRecentlyCompletedGames();
@@ -139,6 +165,16 @@ export default (router: Router, io, container: DependencyContainer) => {
     router.get('/api/game/list/completed/user', middleware.authenticate, async (req, res, next) => {
         try {
             let games = await container.gameListService.listUserCompletedGames(req.session.userId);
+
+            return res.status(200).json(games);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.get('/api/game/list/active', middleware.authenticate, async (req, res, next) => {
+        try {
+            let games = await container.gameListService.listActiveGames(req.session.userId);
 
             return res.status(200).json(games);
         } catch (err) {

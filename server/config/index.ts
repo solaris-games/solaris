@@ -30,6 +30,13 @@ const config: Config = {
     },
     buymeacoffee: {
         accessToken: process.env.BUYMEACOFFEE_ACCESS_TOKEN
+    },
+    discord: {
+        serverId: process.env.DISCORD_SERVERID,
+        clientId: process.env.DISCORD_CLIENTID,
+        clientSecret: process.env.DISCORD_CLIENT_SECRET,
+        oauthRedirectUri: process.env.DISCORD_OAUTH_REDIRECT_URI,
+        botToken: process.env.DISCORD_BOT_TOKEN
     }
 };
 

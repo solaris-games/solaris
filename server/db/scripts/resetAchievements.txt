@@ -1,0 +1,51 @@
+// NOTE: This is copied from server/services/admin.ts
+
+db.users.updateOne({
+    _id: ObjectId('...')
+}, {
+    $set: {
+        'achievements.victories': 0,
+        'achievements.rank': 0,
+        'achievements.eloRating': null,
+        'achievements.renown': 0,
+        'achievements.joined': 0,
+        'achievements.completed': 0,
+        'achievements.quit': 0,
+        'achievements.defeated': 0,
+        'achievements.afk': 0,
+        'achievements.combat.kills.ships': 0,
+        'achievements.combat.kills.carriers': 0,
+        'achievements.combat.kills.specialists': 0,
+        'achievements.combat.losses.ships': 0,
+        'achievements.combat.losses.carriers': 0,
+        'achievements.combat.losses.specialists': 0,
+        'achievements.combat.stars.captured': 0,
+        'achievements.combat.stars.lost': 0,
+        'achievements.combat.homeStars.captured': 0,
+        'achievements.combat.homeStars.lost': 0,
+        'achievements.infrastructure.economy': 0,
+        'achievements.infrastructure.industry': 0,
+        'achievements.infrastructure.science': 0,
+        'achievements.infrastructure.warpGates': 0,
+        'achievements.infrastructure.warpGatesDestroyed': 0,
+        'achievements.infrastructure.carriers': 0,
+        'achievements.infrastructure.specialistsHired': 0,
+        'achievements.research.scanning': 0,
+        'achievements.research.hyperspace': 0,
+        'achievements.research.terraforming': 0,
+        'achievements.research.experimentation': 0,
+        'achievements.research.weapons': 0,
+        'achievements.research.banking': 0,
+        'achievements.research.manufacturing': 0,
+        'achievements.research.specialists': 0,
+        'achievements.trade.creditsSent': 0,
+        'achievements.trade.creditsReceived': 0,
+        'achievements.trade.creditsSpecialistsSent': 0,
+        'achievements.trade.creditsSpecialistsReceived': 0,
+        'achievements.trade.technologySent': 0,
+        'achievements.trade.technologyReceived': 0,
+        'achievements.trade.giftsSent': 0,
+        'achievements.trade.giftsReceived': 0,
+        'achievements.trade.renownSent': 0
+    }
+});
