@@ -2,7 +2,7 @@ import { DBObjectId } from "../types/DBObjectId";
 import DatabaseRepository from "../models/DatabaseRepository";
 import { BulkUpgradeReport } from "../types/InfrastructureUpgrade";
 import { Carrier } from "../types/Carrier";
-import { CombatCarrier, CombatResult, CombatStar } from "../types/Combat";
+import { CombatResult } from "../types/Combat";
 import { Conversation } from "../types/Conversation";
 import { Game } from "../types/Game";
 import { Player } from "../types/Player";
@@ -11,7 +11,6 @@ import { Specialist } from "../types/Specialist";
 import { Star, StarCaptureResult } from "../types/Star";
 import BadgeService from "./badge";
 import BroadcastService from "./broadcast";
-import CarrierService from "./carrier";
 import CombatService from "./combat";
 import ConversationService from "./conversation";
 import GameService from "./game";
@@ -26,7 +25,16 @@ import { GameEvent } from "../types/GameEvent";
 import DiplomacyService from "./diplomacy";
 import { DiplomaticStatus } from "../types/Diplomacy";
 import CarrierGiftService from "./carrierGift";
-import PlayerGalacticCycleCompletedEvent from './events/playerGalacticCycleComplete';
+import PlayerGalacticCycleCompletedEvent from '../types/events/playerGalacticCycleComplete';
+import GamePlayerJoinedEvent from "../types/events/gamePlayerJoined";
+import GamePlayerQuitEvent from "../types/events/gamePlayerQuit";
+import GamePlayerDefeatedEvent from "../types/events/gamePlayerDefeated";
+import GamePlayerAFKEvent from "../types/events/gamePlayerAFK";
+import { BaseGameEvent } from "../types/events/baseGameEvent";
+import GameEndedEvent from "../types/events/gameEnded";
+import GamePlayerBadgePurchasedEvent from "../types/events/gamePlayerBadgePurchased";
+import GameDiplomacyPeaceDeclaredEvent from "../types/events/gameDiplomacyPeaceDeclared";
+import GameDiplomacyWarDeclaredEvent from "../types/events/gameDiplomacyWarDeclared";
 
 const moment = require('moment');
 
@@ -39,11 +47,11 @@ export default class EventService {
         GAME_PLAYER_AFK: 'gamePlayerAFK',
         GAME_STARTED: 'gameStarted',
         GAME_ENDED: 'gameEnded',
-        GAME_PAUSED: 'gamePaused',
         GAME_PLAYER_BADGE_PURCHASED: 'gamePlayerBadgePurchased',
         GAME_DIPLOMACY_PEACE_DECLARED: 'gameDiplomacyPeaceDeclared',
         GAME_DIPLOMACY_WAR_DECLARED: 'gameDiplomacyWarDeclared',
 
+        // TODO: Need event types for the ones below, see ../types/events directory
         PLAYER_GALACTIC_CYCLE_COMPLETE: 'playerGalacticCycleComplete',
         PLAYER_COMBAT_STAR: 'playerCombatStar',
         PLAYER_COMBAT_CARRIER: 'playerCombatCarrier',
@@ -125,21 +133,21 @@ export default class EventService {
         this.diplomacyService = diplomacyService;
 
         this.gameService.on('onGameDeleted', (args) => this.deleteByGameId(args.gameId));
-        this.gameService.on('onPlayerJoined', (args) => this.createPlayerJoinedEvent(args.gameId, args.gameTick, args.player));
-        this.gameService.on('onGameStarted', (args) => this.createGameStartedEvent(args.gameId, args.gameTick));
-        this.gameService.on('onPlayerQuit', (args) => this.createPlayerQuitEvent(args.gameId, args.gameTick, args.player, args.alias));
-        this.gameService.on('onPlayerDefeated', (args) => this.createPlayerDefeatedEvent(args.gameId, args.gameTick, args.player));
+        this.gameService.on('onPlayerJoined', this.createPlayerJoinedEvent.bind(this));
+        this.gameService.on('onGameStarted', this.createGameStartedEvent.bind(this));
+        this.gameService.on('onPlayerQuit', this.createPlayerQuitEvent.bind(this));
+        this.gameService.on('onPlayerDefeated', this.createPlayerDefeatedEvent.bind(this));
         
         this.combatService.on('onPlayerCombatStar', (args) => this.createPlayerCombatStarEvent(
             args.gameId, args.gameTick, args.owner, args.defenders, args.attackers, args.star, args.combatResult, args.captureResult));
         this.combatService.on('onPlayerCombatCarrier', (args) => this.createPlayerCombatCarrierEvent(
             args.gameId, args.gameTick, args.defenders, args.attackers, args.combatResult));
         
-        this.gameTickService.on('onPlayerGalacticCycleCompleted', (args: PlayerGalacticCycleCompletedEvent) => this.createPlayerGalacticCycleCompleteEvent(args));
+        this.gameTickService.on('onPlayerGalacticCycleCompleted', this.createPlayerGalacticCycleCompleteEvent.bind(this));
             
-        this.gameTickService.on('onPlayerAfk', (args) => this.createPlayerAfkEvent(args.gameId, args.gameTick, args.player));
-        this.gameTickService.on('onPlayerDefeated', (args) => this.createPlayerDefeatedEvent(args.gameId, args.gameTick, args.player));
-        this.gameTickService.on('onGameEnded', (args) => this.createGameEndedEvent(args.gameId, args.gameTick, args.rankingResult));
+        this.gameTickService.on('onPlayerAfk', this.createPlayerAfkEvent.bind(this));
+        this.gameTickService.on('onPlayerDefeated', (args) => this.createPlayerDefeatedEvent.bind(this));
+        this.gameTickService.on('onGameEnded', this.createGameEndedEvent.bind(this));
         
         this.researchService.on('onPlayerResearchCompleted', (args) => this.createResearchCompleteEvent(args.gameId, args.gameTick, args.playerId, args.technologyKey, args.technologyLevel, args.technologyKeyNext, args.technologyLevelNext));
 
@@ -169,10 +177,10 @@ export default class EventService {
         this.conversationService.on('onConversationInvited', (args) => this.createPlayerConversationInvited(args.gameId, args.gameTick, args.convo, args.playerId));
         this.conversationService.on('onConversationLeft', (args) => this.createPlayerConversationLeft(args.gameId, args.gameTick, args.convo, args.playerId));
 
-        this.badgeService.on('onGamePlayerBadgePurchased', (args) => this.createGamePlayerBadgePurchased(args.gameId, args.gameTick, args.purchasedByPlayerId, args.purchasedByPlayerAlias, args.purchasedForPlayerId, args.purchasedForPlayerAlias, args.badgeKey, args.badgeName));
+        this.badgeService.on('onGamePlayerBadgePurchased', this.createGamePlayerBadgePurchased.bind(this));
 
-        this.diplomacyService.on('onDiplomacyPeaceDeclared', (args) => this.createGameDiplomacyPeaceDeclared(args.gameId, args.gameTick, args.status));
-        this.diplomacyService.on('onDiplomacyWarDeclared', (args) => this.createGameDiplomacyWarDeclared(args.gameId, args.gameTick, args.status));
+        this.diplomacyService.on('onDiplomacyPeaceDeclared', this.createGameDiplomacyPeaceDeclared.bind(this));
+        this.diplomacyService.on('onDiplomacyWarDeclared', this.createGameDiplomacyWarDeclared.bind(this));
         this.diplomacyService.on('onDiplomacyStatusChanged', (args) => this.createPlayerDiplomacyStatusChanged(args.gameId, args.gameTick, args.status));
     }
 
@@ -315,60 +323,54 @@ export default class EventService {
 
     /* GLOBAL EVENTS */
 
-    async createPlayerJoinedEvent(gameId: DBObjectId, gameTick: number, player: Player) {
+    async createPlayerJoinedEvent(args: GamePlayerJoinedEvent) {
         let data = {
-            playerId: player._id,
-            alias: player.alias
+            playerId: args.playerId,
+            alias: args.playerAlias
         };
 
-        return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_PLAYER_JOINED, data);
+        return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_PLAYER_JOINED, data);
     }
 
-    async createPlayerQuitEvent(gameId: DBObjectId, gameTick: number, player: Player, alias: string) {
+    async createPlayerQuitEvent(args: GamePlayerQuitEvent) {
         let data = {
-            playerId: player._id,
-            alias
+            playerId: args.playerId,
+            alias: args.playerAlias
         };
 
-        return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_PLAYER_QUIT, data);
+        return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_PLAYER_QUIT, data);
     }
 
-    async createPlayerDefeatedEvent(gameId: DBObjectId, gameTick: number, player: Player) {
+    async createPlayerDefeatedEvent(args: GamePlayerDefeatedEvent) {
         let data = {
-            playerId: player._id,
-            alias: player.alias
+            playerId: args.playerId,
+            alias: args.playerAlias
         };
 
-        return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_PLAYER_DEFEATED, data);
+        return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_PLAYER_DEFEATED, data);
     }
 
-    async createPlayerAfkEvent(gameId: DBObjectId, gameTick: number, player: Player) {
+    async createPlayerAfkEvent(args: GamePlayerAFKEvent) {
         let data = {
-            playerId: player._id,
-            alias: player.alias
+            playerId: args.playerId,
+            alias: args.playerAlias
         };
 
-        return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_PLAYER_AFK, data);
+        return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_PLAYER_AFK, data);
     }
 
-    async createGameStartedEvent(gameId: DBObjectId, gameTick: number) {
+    async createGameStartedEvent(args: BaseGameEvent) {
         let data = {};
 
-        return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_STARTED, data);
+        return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_STARTED, data);
     }
 
-    async createGameEndedEvent(gameId: DBObjectId, gameTick: number, rankingResult: GameRankingResult) {
+    async createGameEndedEvent(args: GameEndedEvent) {
         let data = {
-            rankingResult
+            rankingResult: args.rankingResult
         };
 
-        return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_ENDED, data);
-    }
-
-    async createGamePausedEvent(gameId: DBObjectId, gameTick: number) {
-        let data = {};
-
-        return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_PAUSED, data);
+        return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_ENDED, data);
     }
 
     /* PLAYER EVENTS */
@@ -654,17 +656,17 @@ export default class EventService {
         await this.createPlayerEvent(gameId, gameTick, playerId, this.EVENT_TYPES.PLAYER_CONVERSATION_LEFT, data, true);
     }
 
-    async createGamePlayerBadgePurchased(gameId: DBObjectId, gameTick: number, purchasedByPlayerId: DBObjectId, purchasedByPlayerAlias: string, purchasedForPlayerId: DBObjectId, purchasedForPlayerAlias: string, badgeKey: string, badgeName: string) {
+    async createGamePlayerBadgePurchased(args: GamePlayerBadgePurchasedEvent) {
         let data = {
-            purchasedByPlayerId,
-            purchasedByPlayerAlias,
-            purchasedForPlayerId,
-            purchasedForPlayerAlias,
-            badgeKey,
-            badgeName
+            purchasedByPlayerId: args.purchasedByPlayerId,
+            purchasedByPlayerAlias: args.purchasedByPlayerAlias,
+            purchasedForPlayerId: args.purchasedForPlayerId,
+            purchasedForPlayerAlias: args.purchasedForPlayerAlias,
+            badgeKey: args.badgeKey,
+            badgeName: args.badgeName
         };
 
-        return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_PLAYER_BADGE_PURCHASED, data);
+        return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_PLAYER_BADGE_PURCHASED, data);
     }
 
     async _deleteGameDiplomacyDeclarationsInTick(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus) {
@@ -690,22 +692,22 @@ export default class EventService {
         });
     }
 
-    async createGameDiplomacyPeaceDeclared(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus) {
-        let data = status;
+    async createGameDiplomacyPeaceDeclared(args: GameDiplomacyPeaceDeclaredEvent) {
+        let data = args.status;
 
         // Peace/war can be declared multiple times in a single tick, delete any existing declarations
-        await this._deleteGameDiplomacyDeclarationsInTick(gameId, gameTick, status);
+        await this._deleteGameDiplomacyDeclarationsInTick(args.gameId, args.gameTick, args.status);
 
-        return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_DIPLOMACY_PEACE_DECLARED, data);
+        return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_DIPLOMACY_PEACE_DECLARED, data);
     }
 
-    async createGameDiplomacyWarDeclared(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus) {
-        let data = status;
+    async createGameDiplomacyWarDeclared(args: GameDiplomacyWarDeclaredEvent) {
+        let data = args.status;
 
         // Peace/war can be declared multiple times in a single tick, delete any existing declarations
-        await this._deleteGameDiplomacyDeclarationsInTick(gameId, gameTick, status);
+        await this._deleteGameDiplomacyDeclarationsInTick(args.gameId, args.gameTick, args.status);
 
-        return await this.createGameEvent(gameId, gameTick, this.EVENT_TYPES.GAME_DIPLOMACY_WAR_DECLARED, data);
+        return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_DIPLOMACY_WAR_DECLARED, data);
     }
 
     async createPlayerDiplomacyStatusChanged(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus) {

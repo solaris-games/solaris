@@ -28,6 +28,7 @@ export interface Config {
         accessToken?: string;
     },
     discord: {
+        serverId?: string;
         clientId?: string;
         clientSecret?: string;
         oauthRedirectUri?: string;

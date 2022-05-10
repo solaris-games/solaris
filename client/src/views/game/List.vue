@@ -379,28 +379,23 @@ export default {
     this.isLoading = true
 
     try {
-      let requests = [
-        gameService.listOfficialGames(),
-        gameService.listUserGames(),
-        gameService.listInProgressGames(),
-        gameService.listRecentlyCompletedGames()
-      ]
+      let response = await gameService.listJoinGamesSummary()
 
-      let responses = await Promise.all(requests)
+      if (response.status === 200) {
+        this.serverGames = response.data.official
+        this.userGames = response.data.user
+        this.inProgressGames = response.data.inProgress
+        this.recentlyCompletedGames = response.data.completed
 
-      this.serverGames = responses[0].data
-      this.userGames = responses[1].data
-      this.inProgressGames = responses[2].data
-      this.recentlyCompletedGames = responses[3].data
-
-      this.games.featured = this.getFeaturedGame()
-      this.games.newPlayerRT = this.getOfficialGame('new_player_rt')
-      this.games.standardRT = this.getOfficialGame('standard_rt')
-      this.games.standardTB = this.getOfficialGame('standard_tb')
-      this.games.oneVsOneRT = this.getOfficialGame('1v1_rt')
-      this.games.oneVsOneTB = this.getOfficialGame('1v1_tb')
-      this.games.thirtyTwoPlayerRT = this.getOfficialGame('32_player_rt')
-      this.games.special = this.getSpecialGame()
+        this.games.featured = this.getFeaturedGame()
+        this.games.newPlayerRT = this.getOfficialGame('new_player_rt')
+        this.games.standardRT = this.getOfficialGame('standard_rt')
+        this.games.standardTB = this.getOfficialGame('standard_tb')
+        this.games.oneVsOneRT = this.getOfficialGame('1v1_rt')
+        this.games.oneVsOneTB = this.getOfficialGame('1v1_tb')
+        this.games.thirtyTwoPlayerRT = this.getOfficialGame('32_player_rt')
+        this.games.special = this.getSpecialGame()
+      }
     } catch (err) {
       console.error(err)
     }

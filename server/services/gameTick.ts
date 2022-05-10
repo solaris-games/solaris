@@ -32,7 +32,10 @@ import CarrierMovementService from "./carrierMovement";
 import PlayerCycleRewardsService from "./playerCycleRewards";
 import StarContestedService from "./starContested";
 import PlayerReadyService from "./playerReady";
-import PlayerGalacticCycleCompletedEvent from "./events/playerGalacticCycleComplete"
+import PlayerGalacticCycleCompletedEvent from "../types/events/playerGalacticCycleComplete"
+import GamePlayerDefeatedEvent from "../types/events/gamePlayerDefeated";
+import GamePlayerAFKEvent from "../types/events/gamePlayerAFK";
+import GameEndedEvent from "../types/events/gameEnded";
 
 const EventEmitter = require('events');
 const moment = require('moment');
@@ -697,22 +700,28 @@ export default class GameTickService extends EventEmitter {
                         user.achievements.afk++;
                     }
 
-                    this.emit('onPlayerAfk', {
+                    let e: GamePlayerAFKEvent = {
                         gameId: game._id,
                         gameTick: game.state.tick,
-                        player
-                    });
+                        playerId: player._id,
+                        playerAlias: player.alias
+                    };
+
+                    this.emit('onPlayerAfk', e);
                 }
                 else {
                     if (user && !isTutorialGame) {
                         user.achievements.defeated++;
                     }
 
-                    this.emit('onPlayerDefeated', {
+                    let e: GamePlayerDefeatedEvent = {
                         gameId: game._id,
                         gameTick: game.state.tick,
-                        player
-                    });
+                        playerId: player._id,
+                        playerAlias: player.alias
+                    };
+                    
+                    this.emit('onPlayerDefeated', e);
                 }
             }
         }
@@ -739,11 +748,13 @@ export default class GameTickService extends EventEmitter {
                 this.leaderboardService.markNonAFKPlayersAsEstablishedPlayers(game, gameUsers);
                 this.leaderboardService.incrementPlayersCompletedAchievement(game, gameUsers);
     
-                this.emit('onGameEnded', {
+                let e: GameEndedEvent = {
                     gameId: game._id,
                     gameTick: game.state.tick,
                     rankingResult
-                });
+                };
+
+                this.emit('onGameEnded', e);
             }
 
             return true;

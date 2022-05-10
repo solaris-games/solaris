@@ -6,6 +6,7 @@ import { Game } from '../types/Game';
 import { User } from '../types/User';
 import PlayerService from './player';
 import UserService from './user';
+import GamePlayerBadgePurchasedEvent from '../types/events/gamePlayerBadgePurchased';
 const EventEmitter = require('events');
 
 export default class BadgeService extends EventEmitter {
@@ -124,7 +125,7 @@ export default class BadgeService extends EventEmitter {
 
         const badge = await this.purchaseBadgeForUser(purchasedByUserId, recipient.userId, badgeKey);
 
-        this.emit('onGamePlayerBadgePurchased', {
+        let e: GamePlayerBadgePurchasedEvent = {
             gameId: game._id,
             gameTick: game.state.tick,
             purchasedByPlayerId: buyer._id,
@@ -133,7 +134,9 @@ export default class BadgeService extends EventEmitter {
             purchasedForPlayerAlias: recipient.alias,
             badgeKey,
             badgeName: badge.name
-        });
+        };
+
+        this.emit('onGamePlayerBadgePurchased', e);
     }
 
     awardBadgeForUser(user: User, badgeKey: string): void {

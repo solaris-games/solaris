@@ -76,7 +76,7 @@ export default (router: Router, io, container: DependencyContainer) => {
 
         if (code) {
             try {
-                await container.authService.clearOauthDiscord(req.session.userId);
+                await container.discordService.clearOAuth(req.session.userId);
 
                 // Documentation: https://discordjs.guide/oauth2/#a-quick-example
                 const params = new URLSearchParams({
@@ -102,7 +102,7 @@ export default (router: Router, io, container: DependencyContainer) => {
                     });
 
                     if (userResult.status === 200) {
-                        await container.authService.updateOauthDiscord(req.session.userId, userResult.data.id, oauthResult.data);
+                        await container.discordService.updateOAuth(req.session.userId, userResult.data.id, oauthResult.data);
         
                         return res.redirect(`${process.env.CLIENT_URL_ACCOUNT_SETTINGS}?discordSuccess=true`);
                     }
@@ -119,7 +119,7 @@ export default (router: Router, io, container: DependencyContainer) => {
     
     router.delete('/api/auth/discord', middleware.authenticate, async (req, res, next) => {
         try {
-            await container.authService.clearOauthDiscord(req.session.userId);
+            await container.discordService.clearOAuth(req.session.userId);
     
             return res.sendStatus(200);
         } catch (err) {

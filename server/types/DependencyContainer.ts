@@ -62,12 +62,14 @@ import TradeService from "../services/trade";
 import UserService from "../services/user";
 import WaypointService from "../services/waypoint";
 import NotificationService from "../services/notification";
+import DiscordService from "../services/discord";
 
 export interface DependencyContainer {
     config: Config,
     adminService: AdminService,
     passwordService: PasswordService,
     authService: AuthService,
+    discordService: DiscordService,
     broadcastService: BroadcastService,
     carrierService: CarrierService,
     combatService: CombatService,

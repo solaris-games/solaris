@@ -175,7 +175,8 @@ const schema = new Schema({
             playerTechnologyReceived: { type: Types.Boolean, required: false, default: true },
             playerCreditsReceived: { type: Types.Boolean, required: false, default: true },
             playerCreditsSpecialistsReceived: { type: Types.Boolean, required: false, default: true },
-            playerRenownReceived: { type: Types.Boolean, required: false, default: true }
+            playerRenownReceived: { type: Types.Boolean, required: false, default: true },
+            conversationMessageSent: { type: Types.Boolean, required: false, default: true }
         }
     }
 });

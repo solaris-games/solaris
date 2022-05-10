@@ -18,6 +18,9 @@ async function startup() {
         unlockJobs: true,
         poolSize: 1
     });
+
+    await container.discordService.initialize();
+    container.notificationService.initialize();
     
     // ------------------------------
     // Jobs that run every time the server restarts.

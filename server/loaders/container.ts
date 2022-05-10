@@ -78,6 +78,7 @@ import PlayerCycleRewardsService from '../services/playerCycleRewards';
 import StarContestedService from '../services/starContested';
 import GameFluxService from '../services/gameFlux';
 import NotificationService from '../services/notification';
+import DiscordService from '../services/discord';
 
 import { DependencyContainer } from '../types/DependencyContainer';
 
@@ -108,6 +109,7 @@ export default (config, io): DependencyContainer => {
     const passwordService = new PasswordService(bcrypt);
 
     const authService = new AuthService(userRepository, passwordService);
+    const discordService = new DiscordService(config, userRepository);
     const userService = new UserService(UserModel, userRepository, passwordService);
     const adminService = new AdminService(userRepository, gameRepository);
     const recaptchaService = new RecaptchaService(config);
@@ -180,7 +182,7 @@ export default (config, io): DependencyContainer => {
     const gameCreateValidationService = new GameCreateValidationService(playerService, starService, carrierService, specialistService, gameTypeService);
     const gameCreateService = new GameCreateService(GameModel, gameService, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService, gameCreateValidationService, gameFluxService, specialistBanService, gameTypeService);
 
-    const notificationService = new NotificationService(config, userRepository, gameRepository, authService, conversationService, gameService, gameTickService, researchService, tradeService);
+    const notificationService = new NotificationService(config, userRepository, gameRepository, discordService, conversationService, gameService, gameTickService, researchService, tradeService);
 
     console.log('Dependency Container Initialized');
     
@@ -189,6 +191,7 @@ export default (config, io): DependencyContainer => {
         adminService,
         passwordService,
         authService,
+        discordService,
         broadcastService,
         carrierService,
         combatService,

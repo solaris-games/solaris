@@ -1,6 +1,6 @@
-import { BaseEvent } from "./baseEvent";
+import { BaseGameEvent } from "./baseGameEvent";
 
-export default interface PlayerGalacticCycleCompleteEvent extends BaseEvent {
+export default interface PlayerGalacticCycleCompleteEvent extends BaseGameEvent {
     creditsEconomy: number;
     creditsBanking: number;
     creditsSpecialists: number;

@@ -55,37 +55,4 @@ export default class AuthService extends EventEmitter {
             throw new ValidationError('The email address or password is incorrect.');
         }
     }
-
-    async updateOauthDiscord(userId, discordUserId, oauth) {
-        await this.userRepo.updateOne({
-            _id: userId
-        }, {
-            $set: {
-                'oauth.discord': {
-                    userId: discordUserId,
-                    token: {
-                        access_token: oauth.access_token,
-                        token_type: oauth.token_type,
-                        expires_in: oauth.expires_in,
-                        refresh_token: oauth.refresh_token,
-                        scope: oauth.scope
-                    }
-                }
-            }
-        });
-
-        this.emit('onDiscordOAuthConnected', {
-            discordUserId
-        });
-    }
-
-    async clearOauthDiscord(userId) {
-        await this.userRepo.updateOne({
-            _id: userId
-        }, {
-            $set: {
-                'oauth.discord': null
-            }
-        });
-    }
 }

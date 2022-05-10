@@ -6,6 +6,8 @@ import { DiplomaticState, DiplomaticStatus } from "../types/Diplomacy";
 import { Game } from "../types/Game";
 import { Player, PlayerDiplomaticState } from "../types/Player";
 import DiplomacyUpkeepService from "./diplomacyUpkeep";
+import GameDiplomacyPeaceDeclaredEvent from "../types/events/gameDiplomacyPeaceDeclared";
+import GameDiplomacyWarDeclaredEvent from "../types/events/gameDiplomacyWarDeclared";
 
 export default class DiplomacyService extends EventEmitter {
 
@@ -265,11 +267,13 @@ export default class DiplomacyService extends EventEmitter {
 
         // Create a global event for peace reached if both players were at war and are now either neutral or allied.
         if (this.isGlobalEventsEnabled(game) && wasAtWar && isFriendly) {
-            this.emit('onDiplomacyPeaceDeclared', {
+            let e: GameDiplomacyPeaceDeclaredEvent = {
                 gameId: game._id,
                 gameTick: game.state.tick,
                 status: newStatus
-            });
+            };
+
+            this.emit('onDiplomacyPeaceDeclared', e);
         }
 
         return newStatus;
@@ -298,11 +302,13 @@ export default class DiplomacyService extends EventEmitter {
 
         // Create a global event for enemy declaration.
         if (this.isGlobalEventsEnabled(game) && !wasAtWar) {
-            this.emit('onDiplomacyWarDeclared', {
+            let e: GameDiplomacyWarDeclaredEvent = {
                 gameId: game._id,
                 gameTick: game.state.tick,
                 status: newStatus
-            });
+            };
+            
+            this.emit('onDiplomacyWarDeclared', e);
         }
 
         return newStatus;
@@ -337,11 +343,13 @@ export default class DiplomacyService extends EventEmitter {
 
         // Create a global event for peace reached if both players were at war.
         if (this.isGlobalEventsEnabled(game) && wasAtWar && isNeutral) {
-            this.emit('onDiplomacyPeaceDeclared', {
+            let e: GameDiplomacyPeaceDeclaredEvent = {
                 gameId: game._id,
                 gameTick: game.state.tick,
                 status: newStatus
-            });
+            };
+
+            this.emit('onDiplomacyPeaceDeclared', e);
         }
 
         return newStatus;

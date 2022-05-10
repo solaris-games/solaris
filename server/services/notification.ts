@@ -6,16 +6,16 @@ import { DBObjectId } from '../types/DBObjectId';
 import { Game } from '../types/Game';
 import { Player } from '../types/Player';
 import { User } from '../types/User';
-import AuthService from './auth';
+import DiscordService from './discord';
 import ConversationService from './conversation';
 import GameService from './game';
 import GameTickService from './gameTick';
 import ResearchService from './research';
 import TradeService from './trade';
-import PlayerGalacticCycleCompletedEvent from './events/playerGalacticCycleComplete';
-
-const Discord = require('discord.js');
-const client = new Discord.Client();
+import PlayerGalacticCycleCompletedEvent from '../types/events/playerGalacticCycleComplete';
+import { BaseGameEvent } from '../types/events/baseGameEvent';
+import GameEndedEvent from '../types/events/gameEnded';
+import ConversationMessageSentEvent from '../types/events/conversationMessageSent';
 
 // Note: We only support discord subscriptions at this point, if any new ones are added
 // this class will need to be refactored to use something like the strategy pattern.
@@ -27,13 +27,14 @@ type SubscriptionEvent = 'gameStarted'|
     'playerTechnologyReceived'|
     'playerCreditsReceived'|
     'playerCreditsSpecialistsReceived'|
-    'playerRenownReceived';
+    'playerRenownReceived'|
+    'conversationMessageSent';
 
 export default class NotificationService {
     config: Config;
     userRepo: DatabaseRepository<User>;
     gameRepo: DatabaseRepository<Game>;
-    authService: AuthService;
+    discordService: DiscordService;
     conversationService: ConversationService;
     gameService: GameService;
     gameTickService: GameTickService;
@@ -44,7 +45,7 @@ export default class NotificationService {
         config: Config,
         userRepo: DatabaseRepository<User>,
         gameRepo: DatabaseRepository<Game>,
-        authService: AuthService,
+        discordService: DiscordService,
         conversationService: ConversationService,
         gameService: GameService,
         gameTickService: GameTickService,
@@ -54,30 +55,28 @@ export default class NotificationService {
         this.config = config;
         this.userRepo = userRepo;
         this.gameRepo = gameRepo;
-        this.authService = authService;
+        this.discordService = discordService;
         this.conversationService = conversationService;
         this.gameService = gameService;
         this.gameTickService = gameTickService;
         this.researchService = researchService;
         this.tradeService = tradeService;
+    }
 
-        if (config.discord.botToken) { // Don't initialize the notification service if there's no token configured.
-            client.login(config.discord.botToken);
-    
-            this.authService.on('onDiscordOAuthConnected', (e) => this.onDiscordOAuthConnected(e));
+    initialize() {
+        if (this.discordService.isConnected()) { // Don't initialize the notification service if there's no token configured.
+            this.conversationService.on('onConversationMessageSent', this.onConversationMessageSent.bind(this));
 
-            // TODO: This can be easily abused.
-            // TODO: The game id needs to be passed into the data
-            // this.conversationService.on('onConversationMessageSent', (e) => this.onConversationMessageSent(e));
-
-            this.gameService.on('onGameStarted', (args) => this.onGameStarted(args.gameId));
-            this.gameTickService.on('onGameEnded', (args) => this.onGameEnded(args.gameId));
-            this.gameTickService.on('onPlayerGalacticCycleCompleted', (args: PlayerGalacticCycleCompletedEvent) => this.onPlayerGalacticCycleCompleted(args));
+            this.gameService.on('onGameStarted', this.onGameStarted.bind(this));
+            this.gameTickService.on('onGameEnded', this.onGameEnded.bind(this));
+            this.gameTickService.on('onPlayerGalacticCycleCompleted', this.onPlayerGalacticCycleCompleted.bind(this));
             this.researchService.on('onPlayerResearchCompleted', (args) => this.onPlayerResearchCompleted(args.gameId, args.playerId, args.technologyKey, args.technologyLevel, args.technologyKeyNext, args.technologyLevelNext));
             this.tradeService.on('onPlayerCreditsReceived', (args) => this.onPlayerCreditsReceived(args.gameId, args.fromPlayer, args.toPlayer, args.amount));
             this.tradeService.on('onPlayerCreditsSpecialistsReceived', (args) => this.onPlayerCreditsSpecialistsReceived(args.gameId, args.fromPlayer, args.toPlayer, args.amount));
             this.tradeService.on('onPlayerRenownReceived', (args) => this.onPlayerRenownReceived(args.gameId, args.fromPlayer, args.toPlayer, args.amount));
             this.tradeService.on('onPlayerTechnologyReceived', (args) => this.onPlayerTechnologyReceived(args.gameId, args.fromPlayer, args.toPlayer, args.technology));
+
+            console.log('Notifications Initialized')
         }
     }
 
@@ -123,7 +122,6 @@ export default class NotificationService {
         // Try to send a notification to each user in the context
         for (let user of context.users) {
             if (
-                !user.oauth || !user.oauth[type] ||                             // User doesn't have oauth or no oauth for the given type
                 !user.subscriptions[type] || !user.subscriptions[type]![event]  // User doesn't have subscriptions for the type or no subscriptions for the given event
             ) {
                 continue;
@@ -131,18 +129,6 @@ export default class NotificationService {
 
             await sendNotificationCallback(context.game, user);
         }
-    }
-
-    async _trySendDiscordNotification(user: User, messageTemplate: any) {
-        const duser = await client.users.fetch(user.oauth.discord!.userId);
-
-        if (!duser) {
-            return;
-        }
-
-        duser.send({
-            embed: messageTemplate
-        });
     }
 
     _generateBaseDiscordMessageTemplate(game: Game, title: string, description: string) {
@@ -161,29 +147,23 @@ export default class NotificationService {
         }
     }
 
-    async onDiscordOAuthConnected(e) {
-        const user = await client.users.fetch(e.discordUserId);
-
-        user.send(`Hello there, you've just connected your Solaris account to Discord!\r\n\r\n We'll start sending notifications to you for in-game events. To change your subscriptions, head over to your user account page.`);
-    }
-
-    async onGameStarted(gameId: DBObjectId) {
+    async onGameStarted(args: BaseGameEvent) {
         // Send the game started notification for Discord subscription to all players.
-        await this._trySendNotifications(gameId, null, 'discord', 'gameStarted',
+        await this._trySendNotifications(args.gameId, null, 'discord', 'gameStarted',
             async (game: Game, user: User) => {
                 const template = this._generateBaseDiscordMessageTemplate(game, 'Game Started', 'The game has started. Good luck and have fun!');
 
-                await this._trySendDiscordNotification(user, template);
+                await this.discordService.sendMessageOAuth(user, template);
             });
     }
 
-    async onGameEnded(gameId: DBObjectId) {
+    async onGameEnded(args: GameEndedEvent) {
         // Send the game ended notification for Discord subscription to all players.
-        await this._trySendNotifications(gameId, null, 'discord', 'gameEnded', 
+        await this._trySendNotifications(args.gameId, null, 'discord', 'gameEnded', 
             async (game: Game, user: User) => {
                 const template = this._generateBaseDiscordMessageTemplate(game, 'Game Ended', 'The game has ended.');
 
-                await this._trySendDiscordNotification(user, template);
+                await this.discordService.sendMessageOAuth(user, template);
             });
     }
 
@@ -249,7 +229,7 @@ export default class NotificationService {
                     });
                 }
 
-                await this._trySendDiscordNotification(user, template);
+                await this.discordService.sendMessageOAuth(user, template);
             });
     }
 
@@ -271,7 +251,7 @@ export default class NotificationService {
                     inline: false
                 });
 
-                await this._trySendDiscordNotification(user, template);
+                await this.discordService.sendMessageOAuth(user, template);
             });
     }
 
@@ -279,9 +259,9 @@ export default class NotificationService {
         // Send the credits received notification for Discord subscription to the player.
         await this._trySendNotifications(gameId, [toPlayer._id.toString()], 'discord', 'playerCreditsReceived', 
             async (game: Game, user: User) => {
-                const template = this._generateBaseDiscordMessageTemplate(game, 'Credits Received', `You have received **$${amount}** credit(s) from **${fromPlayer.alias}(()).`);
+                const template = this._generateBaseDiscordMessageTemplate(game, 'Credits Received', `You have received **$${amount}** credit(s) from **${fromPlayer.alias}**.`);
 
-                await this._trySendDiscordNotification(user, template);
+                await this.discordService.sendMessageOAuth(user, template);
             });
     }
 
@@ -291,7 +271,7 @@ export default class NotificationService {
             async (game: Game, user: User) => {
                 const template = this._generateBaseDiscordMessageTemplate(game, 'Specialist Tokens Received', `You have received **${amount}** specialist token(s) from **${fromPlayer.alias}**.`);
 
-                await this._trySendDiscordNotification(user, template);
+                await this.discordService.sendMessageOAuth(user, template);
             });
     }
 
@@ -301,7 +281,7 @@ export default class NotificationService {
             async (game: Game, user: User) => {
                 const template = this._generateBaseDiscordMessageTemplate(game, 'Technology Received', `You have received **Level ${technology.level} ${technology.name}** from **${fromPlayer.alias}**.`);
 
-                await this._trySendDiscordNotification(user, template);
+                await this.discordService.sendMessageOAuth(user, template);
             });
     }
 
@@ -311,49 +291,24 @@ export default class NotificationService {
             async (game: Game, user: User) => {
                 const template = this._generateBaseDiscordMessageTemplate(game, 'Renown Received', `You have received **${amount}** renown from **${fromPlayer.alias}**.`);
 
-                await this._trySendDiscordNotification(user, template);
+                await this.discordService.sendMessageOAuth(user, template);
             });
     }
 
-    // TODO: All the other subscriptions
+    async onConversationMessageSent(args: ConversationMessageSentEvent) {
+        const toPlayerIds = args.sentMessageResult.toPlayerIds.map(id => id.toString());
+        const readBy = args.sentMessageResult.readBy.map(id => id.toString());
 
-    // async onConversationMessageSent(e) {
-    //     const gameId: DBObjectId = e.gameId;
-    //     const convo: Conversation = e.conversation;
-    //     const result: ConversationMessageSentResult = e.sentMessageResult;
+        // Filter the players who haven't auto-read the message.
+        const playerIdsToCheck = toPlayerIds.filter(pid => !readBy.includes(pid));
 
-    //     const toPlayerIds = result.toPlayerIds.map(id => id.toString());
-    //     const readBy = result.readBy.map(id => id.toString());
+        await this._trySendNotifications(args.gameId, playerIdsToCheck, 'discord', 'conversationMessageSent',
+            async (game: Game, user: User) => {
+                const template = this._generateBaseDiscordMessageTemplate(game, 'New Message Received', args.sentMessageResult.message);
 
-    //     // Get the oauth settings for users who have not auto-read the message.
-    //     const playerIdsToCheck = toPlayerIds.filter(pid => !readBy.includes(pid));
+                template.author.name = args.sentMessageResult.fromPlayerAlias;
 
-    //     const context = await this._getNotificationContext(gameId, playerIdsToCheck);
-
-    //     // Attempt to send a message to each player
-    //     for (let user of context.users) {
-    //         const duser = await client.users.fetch(user.oauth.discord!.userId);
-
-    //         if (!duser) {
-    //             continue;
-    //         }
-
-    //         const template = this._generateConversationMessageTemplate(context.game, convo, result);
-
-    //         duser.send(template);
-    //     }
-    // }
-
-    // _generateConversationMessageTemplate(game: Game, convo: Conversation, result: ConversationMessageSentResult) {
-    //     const footer = game.settings.general.name === convo.name ? 
-    //         convo.name : `${game.settings.general.name} - ${convo.name}`;
-
-    //     return new Discord.MessageEmbed()
-    //         .setTitle(`New Message Received`)
-    //         .setURL(`${this.config.clientUrl}/#/game/?id=${game._id}`)
-    //         .setAuthor(result.fromPlayerAlias)
-    //         .setDescription(result.message)
-    //         .setTimestamp()
-    //         .setFooter(footer);
-    // }
+                await this.discordService.sendMessageOAuth(user, template);
+            });
+    }
 }

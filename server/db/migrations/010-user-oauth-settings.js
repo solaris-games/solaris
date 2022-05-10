@@ -25,7 +25,8 @@ module.exports = {
                         'playerTechnologyReceived': true,
                         'playerCreditsReceived': true,
                         'playerCreditsSpecialistsReceived': true,
-                        'playerRenownReceived': true
+                        'playerRenownReceived': true,
+                        'conversationMessageSent': true
                     }
                 }
             }

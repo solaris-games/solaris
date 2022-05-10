@@ -64,15 +64,20 @@
       <div class="row pt-3 pb-3 bg-secondary">
         <div class="col">
           <p>Discord Integration</p>
+          <p><small><strong>You must be a member</strong> of the official Solaris discord server.</small></p>
         </div>
         <div class="col text-right">
+          <a href="https://discord.com/invite/v7PD33d" target="_blank" title="Discord" class="btn btn-primary mr-1">
+            Join
+            <i class="fab fa-discord"></i>
+          </a>
           <a class="btn btn-success" v-if="isAuthenticatedWithDiscord" @click="unlinkDiscordAccount">
             Connected
             <i class="fas fa-check"></i>
           </a>
           <a id="discordLogin" class="btn btn-primary" v-if="!isAuthenticatedWithDiscord" :href="discordOauthURL">
-            Connect
-            <i class="fab fa-discord"></i>
+            Setup
+            <i class="fas fa-cog"></i>
           </a>
         </div>
       </div>

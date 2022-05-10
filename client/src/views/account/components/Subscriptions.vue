@@ -91,6 +91,16 @@
                         </select>
                     </div>
                 </div>
+                
+                <div class="row bg-secondary pt-1 pb-1">
+                    <label for="conversationMessageSent" class="col-12 col-sm-6 col-form-label">Diplomacy - Message Received</label>
+                    <div class="col-12 col-sm-6">
+                        <select class="form-control" id="conversationMessageSent" v-model="subscriptions.discord.conversationMessageSent" :disabled="isSaving">
+                            <option :value="true">Enabled</option>
+                            <option :value="false">Disabled</option>
+                        </select>
+                    </div>
+                </div>
             </div>
 
             <!-- <form-error-list v-bind:errors="errors"/> -->
