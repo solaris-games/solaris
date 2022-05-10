@@ -21,8 +21,6 @@ module.exports = {
                         'gameStarted': true,
                         'gameEnded': true,
                         'playerGalacticCycleComplete': true,
-                        'playerCombatStar': true,
-                        'playerCombatCarrier': true,
                         'playerResearchComplete': true,
                         'playerTechnologyReceived': true,
                         'playerCreditsReceived': true,

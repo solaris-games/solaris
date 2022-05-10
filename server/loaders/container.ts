@@ -180,7 +180,7 @@ export default (config, io): DependencyContainer => {
     const gameCreateValidationService = new GameCreateValidationService(playerService, starService, carrierService, specialistService, gameTypeService);
     const gameCreateService = new GameCreateService(GameModel, gameService, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService, gameCreateValidationService, gameFluxService, specialistBanService, gameTypeService);
 
-    const notificationService = new NotificationService(config, userRepository, gameRepository, authService, conversationService);
+    const notificationService = new NotificationService(config, userRepository, gameRepository, authService, conversationService, gameService, gameTickService, researchService, tradeService);
 
     console.log('Dependency Container Initialized');
     

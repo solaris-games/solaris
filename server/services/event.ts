@@ -26,6 +26,7 @@ import { GameEvent } from "../types/GameEvent";
 import DiplomacyService from "./diplomacy";
 import { DiplomaticStatus } from "../types/Diplomacy";
 import CarrierGiftService from "./carrierGift";
+import PlayerGalacticCycleCompletedEvent from './events/playerGalacticCycleComplete';
 
 const moment = require('moment');
 
@@ -134,11 +135,7 @@ export default class EventService {
         this.combatService.on('onPlayerCombatCarrier', (args) => this.createPlayerCombatCarrierEvent(
             args.gameId, args.gameTick, args.defenders, args.attackers, args.combatResult));
         
-        this.gameTickService.on('onPlayerGalacticCycleCompleted', (args) => this.createPlayerGalacticCycleCompleteEvent(
-            args.gameId, args.gameTick, args.player, 
-            args.creditsEconomy, args.creditsBanking, args.creditsSpecialists, 
-            args.experimentTechnology, args.experimentAmount, args.experimentLevelUp, args.experimentResearchingNext,
-            args.carrierUpkeep, args.allianceUpkeep));
+        this.gameTickService.on('onPlayerGalacticCycleCompleted', (args: PlayerGalacticCycleCompletedEvent) => this.createPlayerGalacticCycleCompleteEvent(args));
             
         this.gameTickService.on('onPlayerAfk', (args) => this.createPlayerAfkEvent(args.gameId, args.gameTick, args.player));
         this.gameTickService.on('onPlayerDefeated', (args) => this.createPlayerDefeatedEvent(args.gameId, args.gameTick, args.player));
@@ -376,21 +373,8 @@ export default class EventService {
 
     /* PLAYER EVENTS */
 
-    async createPlayerGalacticCycleCompleteEvent(gameId: DBObjectId, gameTick: number, player: Player, 
-        creditsEconomy: number, creditsBanking: number, creditsSpecialists: number, experimentTechnology: string, experimentAmount: number, experimentLevelUp: boolean, experimentResearchingNext: string, carrierUpkeep: number, allianceUpkeep: number ) {
-        let data = {
-            creditsEconomy,
-            creditsBanking,
-            creditsSpecialists,
-            experimentTechnology,
-            experimentAmount,
-            experimentLevelUp,
-            experimentResearchingNext,
-            carrierUpkeep,
-            allianceUpkeep
-        };
-
-        return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_GALACTIC_CYCLE_COMPLETE, data);
+    async createPlayerGalacticCycleCompleteEvent(data: PlayerGalacticCycleCompletedEvent) {
+        return await this.createPlayerEvent(data.gameId, data.gameTick, data.playerId!, this.EVENT_TYPES.PLAYER_GALACTIC_CYCLE_COMPLETE, data);
     }
 
     async createPlayerCombatStarEvent(gameId: DBObjectId, gameTick: number, owner: Player, defenders: Player[], attackers: Player[], star: Star, combatResult: CombatResult, captureResult: StarCaptureResult) {

@@ -32,6 +32,7 @@ import CarrierMovementService from "./carrierMovement";
 import PlayerCycleRewardsService from "./playerCycleRewards";
 import StarContestedService from "./starContested";
 import PlayerReadyService from "./playerReady";
+import PlayerGalacticCycleCompletedEvent from "./events/playerGalacticCycleComplete"
 
 const EventEmitter = require('events');
 const moment = require('moment');
@@ -632,10 +633,10 @@ export default class GameTickService extends EventEmitter {
 
                 // Raise an event if the player isn't defeated, AI doesn't care about events.
                 if (!player.defeated) {
-                    this.emit('onPlayerGalacticCycleCompleted', {
+                    let e: PlayerGalacticCycleCompletedEvent = {
                         gameId: game._id,
                         gameTick: game.state.tick,
-                        player, 
+                        playerId: player._id,
                         creditsEconomy: creditsResult.creditsFromEconomy, 
                         creditsBanking: creditsResult.creditsFromBanking,
                         creditsSpecialists: creditsResult.creditsFromSpecialistsTechnology,
@@ -646,7 +647,9 @@ export default class GameTickService extends EventEmitter {
                         experimentResearchingNext: experimentResult.researchingNext,
                         carrierUpkeep: carrierUpkeepResult,
                         allianceUpkeep: allianceUpkeepResult
-                    });
+                    };
+
+                    this.emit('onPlayerGalacticCycleCompleted', e);
                 }
             }
 

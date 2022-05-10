@@ -19,6 +19,10 @@ class AuthService extends BaseApiService {
   verify () {
     return axios.post(this.BASE_URL + 'auth/verify', {}, { withCredentials: true })
   }
+
+  clearOauthDiscord () {
+    return axios.delete(this.BASE_URL + 'auth/discord', { withCredentials: true })
+  }
 }
 
 export default new AuthService()

@@ -116,6 +116,16 @@ export default (router: Router, io, container: DependencyContainer) => {
 
         return res.redirect(`${process.env.CLIENT_URL_ACCOUNT_SETTINGS}?discordSuccess=false`);
     });
+    
+    router.delete('/api/auth/discord', middleware.authenticate, async (req, res, next) => {
+        try {
+            await container.authService.clearOauthDiscord(req.session.userId);
+    
+            return res.sendStatus(200);
+        } catch (err) {
+            next(err);
+        }
+    }, middleware.handleError)
 
     return router;
 

@@ -61,12 +61,16 @@ export default class AuthService extends EventEmitter {
             _id: userId
         }, {
             $set: {
-                'oauth.discord.userId': discordUserId,
-                'oauth.discord.token.access_token': oauth.access_token,
-                'oauth.discord.token.token_type': oauth.token_type,
-                'oauth.discord.token.expires_in': oauth.expires_in,
-                'oauth.discord.token.refresh_token': oauth.refresh_token,
-                'oauth.discord.token.scope': oauth.scope,
+                'oauth.discord': {
+                    userId: discordUserId,
+                    token: {
+                        access_token: oauth.access_token,
+                        token_type: oauth.token_type,
+                        expires_in: oauth.expires_in,
+                        refresh_token: oauth.refresh_token,
+                        scope: oauth.scope
+                    }
+                }
             }
         });
 
@@ -80,8 +84,7 @@ export default class AuthService extends EventEmitter {
             _id: userId
         }, {
             $set: {
-                'oauth.discord.userId': null,
-                'oauth.discord.token': {}
+                'oauth.discord': null
             }
         });
     }

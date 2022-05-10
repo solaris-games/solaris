@@ -171,8 +171,6 @@ const schema = new Schema({
             gameStarted: { type: Types.Boolean, required: false, default: true },
             gameEnded: { type: Types.Boolean, required: false, default: true },
             playerGalacticCycleComplete: { type: Types.Boolean, required: false, default: true },
-            playerCombatStar: { type: Types.Boolean, required: false, default: true },
-            playerCombatCarrier: { type: Types.Boolean, required: false, default: true },
             playerResearchComplete: { type: Types.Boolean, required: false, default: true },
             playerTechnologyReceived: { type: Types.Boolean, required: false, default: true },
             playerCreditsReceived: { type: Types.Boolean, required: false, default: true },

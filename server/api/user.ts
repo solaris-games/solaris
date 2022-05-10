@@ -104,6 +104,26 @@ export default (router: Router, io, container: DependencyContainer) => {
         }
     }, middleware.handleError);
 
+    router.get('/api/user/subscriptions', middleware.authenticate, async (req, res, next) => {
+        try {
+            let subscriptions = await container.userService.getSubscriptions(req.session.userId);
+
+            return res.status(200).json(subscriptions);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
+    router.put('/api/user/subscriptions', middleware.authenticate, async (req, res, next) => {
+        try {
+            await container.userService.saveSubscriptions(req.session.userId, req.body);
+
+            return res.sendStatus(200);
+        } catch (err) {
+            return next(err);
+        }
+    }, middleware.handleError);
+
     router.get('/api/user/credits', middleware.authenticate, async (req, res, next) => {
         try {
             let credits = await container.userService.getUserCredits(req.session.userId);

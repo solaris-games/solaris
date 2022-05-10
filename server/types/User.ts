@@ -31,6 +31,19 @@ export interface UserOAuth {
     }
 };
 
+export interface UserSubscriptions {
+    discord?: {
+        gameStarted: boolean;
+        gameEnded: boolean;
+        playerGalacticCycleComplete: boolean;
+        playerResearchComplete: boolean;
+        playerTechnologyReceived: boolean;
+        playerCreditsReceived: boolean;
+        playerCreditsSpecialistsReceived: boolean;
+        playerRenownReceived: boolean;
+    }
+}
+
 export interface User {
     _id: DBObjectId;
     username: string;
@@ -177,4 +190,5 @@ export interface User {
     },
     avatars: number[];
     oauth: UserOAuth;
+    subscriptions: UserSubscriptions;
 };

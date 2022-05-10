@@ -83,6 +83,8 @@
       <router-link to="/account/reset-password" tag="button" class="btn btn-primary ml-1">Change Password</router-link>
     </div>
 
+    <subscriptions v-if="isAuthenticatedWithDiscord"/>
+
     <view-subtitle title="Options" class="mt-3"/>
 
     <options-form />
@@ -94,8 +96,10 @@ import LoadingSpinnerVue from '../components/LoadingSpinner'
 import ViewContainer from '../components/ViewContainer'
 import ViewTitle from '../components/ViewTitle'
 import ViewSubtitleVue from '../components/ViewSubtitle'
+import SubscriptionsVue from './components/Subscriptions'
 import OptionsFormVue from '../game/components/menu/OptionsForm'
 import userService from '../../services/api/user'
+import authService from '../../services/api/auth'
 import router from '../../router'
 import Roles from '../game/components/player/Roles'
 
@@ -105,6 +109,7 @@ export default {
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'view-subtitle': ViewSubtitleVue,
+    'subscriptions': SubscriptionsVue,
     'options-form': OptionsFormVue,
     'roles': Roles
   },
@@ -172,7 +177,23 @@ export default {
       this.isClosingAccount = false
     },
     async unlinkDiscordAccount () {
-      alert('not implemented yet')
+      if (!await this.$confirm('Disconnect Discord', 'Are you sure you want to disconnect Discord? You will no longer receive any notifications from event subscriptions.')) {
+        return
+      }
+
+      try {
+        let response = await authService.clearOauthDiscord()
+
+        if (response.status === 200) {
+          this.$toasted.show(`Successfully disconnected from Discord`, { type: 'success' })
+
+          this.info.oauth.discord = null
+        } else {
+          this.$toasted.show(`There was a problem disconecting from Discord, please try again.`, { type: 'error' })
+        }
+      } catch (err) {
+        console.error(err)
+      }
     }
   },
   computed: {
@@ -180,7 +201,7 @@ export default {
       return process.env.VUE_APP_DISCORD_OAUTH_URL
     },
     isAuthenticatedWithDiscord () {
-      return this.info.oauth && this.info.oauth.discord.userId != null
+      return this.info && this.info.oauth && this.info.oauth.discord && this.info.oauth.discord.userId != null
     }
   }
 }
