@@ -770,7 +770,7 @@ export default class GameTickService extends EventEmitter {
         // rankings to be added to players. This is to slow down players
         // should they wish to cheat the system.
         let productionTickCap = this.gameTypeService.is1v1Game(game) ? 1 : 2;
-        let canAwardRank = game.state.productionTick > productionTickCap;
+        let canAwardRank = this.gameTypeService.isRankedGame(game) && game.state.productionTick > productionTickCap;
 
         if (canAwardRank) {
             let leaderboard = this.leaderboardService.getLeaderboardRankings(game).leaderboard;
