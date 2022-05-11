@@ -51,7 +51,8 @@ jobs:
         server: ${{ secrets.ftp_server }}
         username: ${{ secrets.ftp_username }}
         password: ${{ secrets.ftp_password }}
-        local-dir: ${{ env.directory-client }}/dist
+        local-dir: ${{ env.directory-client }}/dist/
         server-dir: ${{ secrets.ftp_server_client_directory }}
+        protocol: ftps
         dangerous-clean-slate: true
         dry-run: true
