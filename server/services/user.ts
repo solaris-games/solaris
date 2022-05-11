@@ -419,6 +419,7 @@ export default class UserService extends EventEmitter {
                 playerRenownReceived: subscriptions.discord.playerRenownReceived || false,
                 playerResearchComplete: subscriptions.discord.playerResearchComplete || false,
                 playerTechnologyReceived: subscriptions.discord.playerTechnologyReceived || false,
+                conversationMessageSent: subscriptions.discord.conversationMessageSent || false
             }
         }
 
