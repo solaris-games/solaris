@@ -41,6 +41,7 @@ export interface UserSubscriptions {
         playerCreditsReceived: boolean;
         playerCreditsSpecialistsReceived: boolean;
         playerRenownReceived: boolean;
+        conversationMessageSent: boolean;
     }
 }
 
