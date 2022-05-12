@@ -19,7 +19,6 @@ import GuildApi from '../api/guild';
 import EventApi from '../api/game/event';
 import DiplomacyApi from '../api/game/diplomacy';
 import ShopApi from '../api/shop';
-import BadgesApi from '../api/badges';
 import ReportApi from '../api/report';
 import { DependencyContainer } from '../types/DependencyContainer';
 import { Config } from '../types/Config';
@@ -110,7 +109,6 @@ export default async (config: Config, app, io, container: DependencyContainer) =
     const event = EventApi(router, io, container);
     const diplomacy = DiplomacyApi(router, io, container);
     const shop = ShopApi(router, io, container);
-    const badges = BadgesApi(router, io, container);
     const report = ReportApi(router, io, container);
 
     app.use(user);
@@ -126,7 +124,6 @@ export default async (config: Config, app, io, container: DependencyContainer) =
     app.use(event);
     app.use(diplomacy);
     app.use(shop);
-    app.use(badges);
     app.use(report);
 
     console.log('Express Intialized');

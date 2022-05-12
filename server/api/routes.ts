@@ -3,11 +3,13 @@ import { DependencyContainer } from "../types/DependencyContainer";
 import Middleware from './middleware';
 import AdminController from './controllers/admin';
 import AuthController from './controllers/auth';
+import BadgeController from './controllers/badges';
 
 export default (router: Router, io, container: DependencyContainer) => {
     const middleware = Middleware(container);
     const adminController = AdminController(container, io);
     const authController = AuthController(container, io);
+    const badgesController = BadgeController(container, io);
     
     /* ADMIN */
     router.get('/api/admin/user', middleware.authenticateCommunityManager, adminController.listUsers, middleware.handleError);
@@ -35,6 +37,13 @@ export default (router: Router, io, container: DependencyContainer) => {
     router.post('/api/auth/verify', authController.verify);
     router.get('/api/auth/discord', authController.authoriseDiscord); // TODO: This should be in another api file. oauth.js?
     router.delete('/api/auth/discord', middleware.authenticate, authController.unauthoriseDiscord, middleware.handleError);
+
+    /* BADGES */
+    router.get('/api/badges', middleware.authenticate, badgesController.listAll, middleware.handleError);
+    router.get('/api/badges/user/:userId', middleware.authenticate, badgesController.listForUser, middleware.handleError);
+    router.post('/api/badges/game/:gameId/player/:playerId', middleware.authenticate, middleware.loadGamePlayersState, badgesController.purchaseForPlayer, middleware.handleError);
+    router.post('/api/badges/user/:userId', middleware.authenticate, badgesController.purchaseForUser, middleware.handleError);
+    router.get('/api/badges/game/:gameId/player/:playerId', middleware.authenticate, middleware.loadGamePlayersState, badgesController.listForPlayer, middleware.handleError);
 
     // TODO: The others.
     
