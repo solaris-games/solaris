@@ -6,44 +6,44 @@ import AuthController from './controllers/auth';
 import BadgeController from './controllers/badges';
 
 export default (router: Router, io, container: DependencyContainer) => {
-    const middleware = Middleware(container);
-    const adminController = AdminController(container, io);
-    const authController = AuthController(container, io);
-    const badgesController = BadgeController(container, io);
+    const mw = Middleware(container);
+    const admin = AdminController(container, io);
+    const auth = AuthController(container, io);
+    const badges = BadgeController(container, io);
     
     /* ADMIN */
-    router.get('/api/admin/user', middleware.authenticateCommunityManager, adminController.listUsers, middleware.handleError);
-    router.get('/api/admin/passwordresets', middleware.authenticateAdmin, adminController.listPasswordResets, middleware.handleError);
-    router.get('/api/admin/reports', middleware.authenticateAdmin, adminController.listReports, middleware.handleError);
-    router.patch('/api/admin/reports/:reportId/action', middleware.authenticateAdmin, adminController.actionReport, middleware.handleError);
-    router.patch('/api/admin/user/:userId/contributor', middleware.authenticateAdmin, adminController.setRoleContributor, middleware.handleError);
-    router.patch('/api/admin/user/:userId/developer', middleware.authenticateAdmin, adminController.setRoleDeveloper, middleware.handleError);
-    router.patch('/api/admin/user/:userId/communityManager', middleware.authenticateAdmin, adminController.setRoleCommunityManager, middleware.handleError);
-    router.patch('/api/admin/user/:userId/gameMaster', middleware.authenticateAdmin, adminController.setRoleGameMaster, middleware.handleError);
-    router.patch('/api/admin/user/:userId/credits', middleware.authenticateAdmin, adminController.setCredits, middleware.handleError);
-    router.patch('/api/admin/user/:userId/ban', middleware.authenticateAdmin, adminController.banUser, middleware.handleError);
-    router.patch('/api/admin/user/:userId/unban', middleware.authenticateAdmin, adminController.unbanUser, middleware.handleError);
-    router.patch('/api/admin/user/:userId/resetAchievements', middleware.authenticateAdmin, adminController.resetAchievements, middleware.handleError);
-    router.patch('/api/admin/user/:userId/promoteToEstablishedPlayer', middleware.authenticateCommunityManager, adminController.promoteToEstablishedPlayer, middleware.handleError);
-    router.post('/api/admin/user/:userId/impersonate', middleware.authenticateAdmin, adminController.impersonate, middleware.handleError);
-    router.get('/api/admin/game', middleware.authenticateSubAdmin, adminController.listGames, middleware.handleError);
-    router.patch('/api/admin/game/:gameId/featured', middleware.authenticateSubAdmin, adminController.setGameFeatured, middleware.handleError);
-    router.patch('/api/admin/game/:gameId/timeMachine', middleware.authenticateAdmin, adminController.setGameTimeMachine, middleware.handleError);
-    router.patch('/api/admin/game/:gameId/finish', middleware.authenticateAdmin, middleware.loadGamePlayersSettingsState, middleware.validateGameLocked, middleware.validateGameInProgress, adminController.forceEndGame, middleware.handleError);
+    router.get('/api/admin/user', mw.authenticateCommunityManager, admin.listUsers, mw.handleError);
+    router.get('/api/admin/passwordresets', mw.authenticateAdmin, admin.listPasswordResets, mw.handleError);
+    router.get('/api/admin/reports', mw.authenticateAdmin, admin.listReports, mw.handleError);
+    router.patch('/api/admin/reports/:reportId/action', mw.authenticateAdmin, admin.actionReport, mw.handleError);
+    router.patch('/api/admin/user/:userId/contributor', mw.authenticateAdmin, admin.setRoleContributor, mw.handleError);
+    router.patch('/api/admin/user/:userId/developer', mw.authenticateAdmin, admin.setRoleDeveloper, mw.handleError);
+    router.patch('/api/admin/user/:userId/communityManager', mw.authenticateAdmin, admin.setRoleCommunityManager, mw.handleError);
+    router.patch('/api/admin/user/:userId/gameMaster', mw.authenticateAdmin, admin.setRoleGameMaster, mw.handleError);
+    router.patch('/api/admin/user/:userId/credits', mw.authenticateAdmin, admin.setCredits, mw.handleError);
+    router.patch('/api/admin/user/:userId/ban', mw.authenticateAdmin, admin.banUser, mw.handleError);
+    router.patch('/api/admin/user/:userId/unban', mw.authenticateAdmin, admin.unbanUser, mw.handleError);
+    router.patch('/api/admin/user/:userId/resetAchievements', mw.authenticateAdmin, admin.resetAchievements, mw.handleError);
+    router.patch('/api/admin/user/:userId/promoteToEstablishedPlayer', mw.authenticateCommunityManager, admin.promoteToEstablishedPlayer, mw.handleError);
+    router.post('/api/admin/user/:userId/impersonate', mw.authenticateAdmin, admin.impersonate, mw.handleError);
+    router.get('/api/admin/game', mw.authenticateSubAdmin, admin.listGames, mw.handleError);
+    router.patch('/api/admin/game/:gameId/featured', mw.authenticateSubAdmin, admin.setGameFeatured, mw.handleError);
+    router.patch('/api/admin/game/:gameId/timeMachine', mw.authenticateAdmin, admin.setGameTimeMachine, mw.handleError);
+    router.patch('/api/admin/game/:gameId/finish', mw.authenticateAdmin, mw.loadGamePlayersSettingsState, mw.validateGameLocked, mw.validateGameInProgress, admin.forceEndGame, mw.handleError);
 
     /* AUTH */
-    router.post('/api/auth/login', authController.login, middleware.handleError);
-    router.post('/api/auth/logout', authController.logout, middleware.handleError);
-    router.post('/api/auth/verify', authController.verify);
-    router.get('/api/auth/discord', authController.authoriseDiscord); // TODO: This should be in another api file. oauth.js?
-    router.delete('/api/auth/discord', middleware.authenticate, authController.unauthoriseDiscord, middleware.handleError);
+    router.post('/api/auth/login', auth.login, mw.handleError);
+    router.post('/api/auth/logout', auth.logout, mw.handleError);
+    router.post('/api/auth/verify', auth.verify);
+    router.get('/api/auth/discord', auth.authoriseDiscord); // TODO: This should be in another api file. oauth.js?
+    router.delete('/api/auth/discord', mw.authenticate, auth.unauthoriseDiscord, mw.handleError);
 
     /* BADGES */
-    router.get('/api/badges', middleware.authenticate, badgesController.listAll, middleware.handleError);
-    router.get('/api/badges/user/:userId', middleware.authenticate, badgesController.listForUser, middleware.handleError);
-    router.post('/api/badges/game/:gameId/player/:playerId', middleware.authenticate, middleware.loadGamePlayersState, badgesController.purchaseForPlayer, middleware.handleError);
-    router.post('/api/badges/user/:userId', middleware.authenticate, badgesController.purchaseForUser, middleware.handleError);
-    router.get('/api/badges/game/:gameId/player/:playerId', middleware.authenticate, middleware.loadGamePlayersState, badgesController.listForPlayer, middleware.handleError);
+    router.get('/api/badges', mw.authenticate, badges.listAll, mw.handleError);
+    router.get('/api/badges/user/:userId', mw.authenticate, badges.listForUser, mw.handleError);
+    router.post('/api/badges/game/:gameId/player/:playerId', mw.authenticate, mw.loadGamePlayersState, badges.purchaseForPlayer, mw.handleError);
+    router.post('/api/badges/user/:userId', mw.authenticate, badges.purchaseForUser, mw.handleError);
+    router.get('/api/badges/game/:gameId/player/:playerId', mw.authenticate, mw.loadGamePlayersState, badges.listForPlayer, mw.handleError);
 
     // TODO: The others.
     
