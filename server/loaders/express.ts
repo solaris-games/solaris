@@ -5,7 +5,7 @@ const compression = require('compression');
 const rateLimit = require("express-rate-limit");
 const MongoDBStore = require('connect-mongodb-session')(session);
 
-import AdminApi from '../api/admin';
+import registerRoutes from '../api/routes';
 import GameApi from '../api/game';
 import ResearchApi from '../api/game/research';
 import TradeApi from '../api/game/trade';
@@ -95,7 +95,9 @@ export default async (config: Config, app, io, container: DependencyContainer) =
 
     // ---------------
     // Register routes
-    const admin = AdminApi(router, io, container);
+
+    registerRoutes(router, io, container);
+
     const game = GameApi(router, io, container);
     const research = ResearchApi(router, io, container);
     const trade = TradeApi(router, io, container);
@@ -114,7 +116,6 @@ export default async (config: Config, app, io, container: DependencyContainer) =
     const report = ReportApi(router, io, container);
 
     app.use(auth);
-    app.use(admin);
     app.use(user);
     app.use(game);
     app.use(research);
