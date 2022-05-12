@@ -14,7 +14,6 @@ import CarrierApi from '../api/game/carrier';
 import ConversationApi from '../api/game/conversation';
 import LedgerApi from '../api/game/ledger';
 import SpecialistApi from '../api/game/specialist';
-import AuthApi from '../api/auth';
 import UserApi from '../api/user';
 import GuildApi from '../api/guild';
 import EventApi from '../api/game/event';
@@ -106,7 +105,6 @@ export default async (config: Config, app, io, container: DependencyContainer) =
     const conversation = ConversationApi(router, io, container);
     const ledger = LedgerApi(router, io, container);
     const specialist = SpecialistApi(router, io, container);
-    const auth = AuthApi(router, io, container);
     const user = UserApi(router, io, container);
     const guild = GuildApi(router, io, container);
     const event = EventApi(router, io, container);
@@ -115,7 +113,6 @@ export default async (config: Config, app, io, container: DependencyContainer) =
     const badges = BadgesApi(router, io, container);
     const report = ReportApi(router, io, container);
 
-    app.use(auth);
     app.use(user);
     app.use(game);
     app.use(research);
