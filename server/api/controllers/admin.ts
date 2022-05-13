@@ -174,7 +174,7 @@ export default (container: DependencyContainer, io) => {
         },
         forceEndGame: async (req, res, next) => {
             try {
-                await container.gameService.forceAllUndefeatedPlayersReadyToQuit(req.game);
+                await container.gameService.forceEndGame(req.game);
     
                 return res.sendStatus(200);
             } catch (err) {

@@ -6,20 +6,6 @@ const rateLimit = require("express-rate-limit");
 const MongoDBStore = require('connect-mongodb-session')(session);
 
 import registerRoutes from '../api/routes';
-import GameApi from '../api/game';
-import ResearchApi from '../api/game/research';
-import TradeApi from '../api/game/trade';
-import StarApi from '../api/game/star';
-import CarrierApi from '../api/game/carrier';
-import ConversationApi from '../api/game/conversation';
-import LedgerApi from '../api/game/ledger';
-import SpecialistApi from '../api/game/specialist';
-import UserApi from '../api/user';
-import GuildApi from '../api/guild';
-import EventApi from '../api/game/event';
-import DiplomacyApi from '../api/game/diplomacy';
-import ShopApi from '../api/shop';
-import ReportApi from '../api/report';
 import { DependencyContainer } from '../types/DependencyContainer';
 import { Config } from '../types/Config';
 
@@ -95,36 +81,6 @@ export default async (config: Config, app, io, container: DependencyContainer) =
     // Register routes
 
     registerRoutes(router, io, container);
-
-    const game = GameApi(router, io, container);
-    const research = ResearchApi(router, io, container);
-    const trade = TradeApi(router, io, container);
-    const star = StarApi(router, io, container);
-    const carrier = CarrierApi(router, io, container);
-    const conversation = ConversationApi(router, io, container);
-    const ledger = LedgerApi(router, io, container);
-    const specialist = SpecialistApi(router, io, container);
-    const user = UserApi(router, io, container);
-    const guild = GuildApi(router, io, container);
-    const event = EventApi(router, io, container);
-    const diplomacy = DiplomacyApi(router, io, container);
-    const shop = ShopApi(router, io, container);
-    const report = ReportApi(router, io, container);
-
-    app.use(user);
-    app.use(game);
-    app.use(research);
-    app.use(trade);
-    app.use(star);
-    app.use(carrier);
-    app.use(conversation);
-    app.use(ledger);
-    app.use(specialist);
-    app.use(guild);
-    app.use(event);
-    app.use(diplomacy);
-    app.use(shop);
-    app.use(report);
 
     console.log('Express Intialized');
     

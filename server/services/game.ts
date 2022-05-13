@@ -598,7 +598,7 @@ export default class GameService extends EventEmitter {
         return undefeatedPlayers.filter(x => x.readyToQuit).length === undefeatedPlayers.length;
     }
 
-    async forceAllUndefeatedPlayersReadyToQuit(game: Game) {
+    async forceEndGame(game: Game) {
         let undefeatedPlayers = this.listAllUndefeatedPlayers(game);
 
         for (let player of undefeatedPlayers) {

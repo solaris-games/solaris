@@ -21,7 +21,7 @@ export default class ShipTransferService {
         this.starService = starService;
     }
 
-    async transferAllToStar(game: Game, player: Player, starId: DBObjectId, writeToDB: boolean = true) {
+    async garrisonAllShips(game: Game, player: Player, starId: DBObjectId, writeToDB: boolean = true) {
         let star = this.starService.getById(game, starId);
         let carriersAtStar = this.carrierService.getCarriersAtStar(game, starId)
             .filter(c => c.ownedByPlayerId!.toString() === player._id.toString());

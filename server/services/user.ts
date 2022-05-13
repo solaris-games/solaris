@@ -471,7 +471,7 @@ export default class UserService extends EventEmitter {
         }, select);
     }
 
-    async getUserCredits(userId: DBObjectId) {
+    async getCredits(userId: DBObjectId) {
         let userCredits = await this.userRepo.findById(userId, {
             credits: 1
         });
