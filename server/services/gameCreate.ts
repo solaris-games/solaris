@@ -183,8 +183,8 @@ export default class GameCreateService {
             const banAmount = game.constants.specialists.monthlyBanAmount; // Random X specs of each type.
 
             game.settings.specialGalaxy.specialistBans = {
-                star: this.specialistBanService.getCurrentMonthStarBans(banAmount),
-                carrier: this.specialistBanService.getCurrentMonthCarrierBans(banAmount)
+                star: this.specialistBanService.getCurrentMonthStarBans(banAmount).map(s => s.id),
+                carrier: this.specialistBanService.getCurrentMonthCarrierBans(banAmount).map(s => s.id)
             };
         }
 

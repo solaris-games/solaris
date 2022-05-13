@@ -728,37 +728,23 @@ export default class LeaderboardService {
         return result;
     }
 
-    addGameAchievements(game: Game, gameUsers: User[], leaderboard: LeaderboardPlayer[], isRankedGame: boolean, awardCredits: boolean) {
-        let leaderboardPlayers = leaderboard.map(x => x.player);
+    incrementGameWinnerAchievements(game: Game, gameUsers: User[], winner: Player, awardCredits: boolean) {
+        let user = gameUsers.find(u => winner.userId && u._id.toString() === winner.userId.toString());
 
-        for (let i = 0; i < leaderboardPlayers.length; i++) {
-            let player = leaderboardPlayers[i];
+        // Double check user isn't deleted.
+        if (!user) {
+            return;
+        }
 
-            let user = gameUsers.find(u => player.userId && u._id.toString() === player.userId.toString());
+        user.achievements.victories++; // Increase the winner's victory count
 
-            // Double check user isn't deleted.
-            if (!user) {
-                continue;
-            }
+        if (this.gameTypeService.is32PlayerOfficialGame(game)) {
+            this.badgeService.awardBadgeForUser(user, 'victor32');
+        }
 
-            if (isRankedGame && i === 0) {
-                user.achievements.victories++; // Increase the winner's victory count
-
-                if (this.gameTypeService.is32PlayerOfficialGame(game)) {
-                    this.badgeService.awardBadgeForUser(user, 'victor32');
-                }
-
-                // Give the winner a galactic credit providing it isn't a 1v1.
-                if (!this.gameTypeService.is1v1Game(game) && awardCredits) {
-                    user.credits++;
-                }
-            }
-
-            // If the player hasn't been defeated 
-            // and they are active then add completed stats.
-            if (!player.defeated && !player.afk) {
-                user.achievements.completed++;
-            }
+        // Give the winner a galactic credit providing it isn't a 1v1.
+        if (!this.gameTypeService.is1v1Game(game) && awardCredits) {
+            user.credits++;
         }
     }
 
@@ -892,6 +878,18 @@ export default class LeaderboardService {
             if (!player.afk) {
                 user.isEstablishedPlayer = true;
             }
+        }
+    }
+
+    incrementPlayersCompletedAchievement(game: Game, gameUsers: User[]) {
+        for (let player of game.galaxy.players.filter(p => !p.defeated && !p.afk)) {
+            let user = gameUsers.find(u => player.userId && u._id.toString() === player.userId.toString());
+
+            if (!user) {
+                continue;
+            }
+
+            user.achievements.completed++;
         }
     }
 

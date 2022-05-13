@@ -312,7 +312,7 @@ export default class TradeService extends EventEmitter {
 
         this._tradeScanningCheck(game, fromPlayer, toPlayer);
 
-        let tradeTechs = this.getTradeableTechnologies(game, fromPlayer, toPlayerId);
+        let tradeTechs = this.listTradeableTechnologies(game, fromPlayer, toPlayerId);
 
         let tradeTech = tradeTechs.find(t => t.name === technology && t.level === techLevel);
 
@@ -397,7 +397,7 @@ export default class TradeService extends EventEmitter {
         return eventObject;
     }
 
-    getTradeableTechnologies(game: Game, fromPlayer: Player, toPlayerId: DBObjectId) {
+    listTradeableTechnologies(game: Game, fromPlayer: Player, toPlayerId: DBObjectId) {
         if (this.isTradingTechnologyDisabled(game)) {
             return [];
         }
@@ -518,7 +518,7 @@ export default class TradeService extends EventEmitter {
         // TODO: Consider scanning range trade setting.
 
         // Get the differences in tech levels between the two players that the AI can afford.
-        let tradeTechs = await this.getTradeableTechnologies(game, fromPlayer, toPlayer._id);
+        let tradeTechs = await this.listTradeableTechnologies(game, fromPlayer, toPlayer._id);
 
         tradeTechs = tradeTechs.filter(t => t.cost <= fromPlayer.credits);
 

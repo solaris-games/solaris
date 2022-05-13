@@ -5,6 +5,9 @@ const fluxes = require('../config/game/flux.json');
 
 export default class GameFluxService {
 
+    SPECIALIST_BANS_STANDARD = 3;
+    SPECIALIST_BANS_FLUX = 6;
+
     FLUX = [
         this.applyJanFlux,
         this.applyFebFlux,
@@ -89,7 +92,7 @@ export default class GameFluxService {
 
     applyOctFlux(game: Game) {
         // Increased spec bans
-        game.constants.specialists.monthlyBanAmount = 6;
+        game.constants.specialists.monthlyBanAmount = this.SPECIALIST_BANS_FLUX;
     }
 
     applyNovFlux(game: Game) {
@@ -101,5 +104,9 @@ export default class GameFluxService {
     applyDecFlux(game: Game) {
         // Increased rank from finishing games
         game.constants.player.rankRewardMultiplier = 2;
+    }
+
+    getThisMonthSpecialistBanAmount() {
+        return moment().utc().month() === 9 ? this.SPECIALIST_BANS_FLUX : this.SPECIALIST_BANS_STANDARD;
     }
 }

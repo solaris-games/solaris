@@ -18,6 +18,9 @@ export default {
 
     // await container.donateService.listRecentDonations();
     // console.log('Loaded recent donations to cache');
+
+    await container.discordService.initialize();
+    container.notificationService.initialize();
   },
 
   async cleanup() {

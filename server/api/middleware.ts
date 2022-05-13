@@ -350,6 +350,24 @@ export default (container: DependencyContainer) => {
             }
 
             next();
+        },
+
+        validateStarIdBody(req, res, next) {
+            try {
+                let errors: string[] = [];
+        
+                if (!req.body.starId) {
+                    errors.push('starId is required.');
+                }
+        
+                if (errors.length) {
+                    throw new ValidationError(errors);
+                }
+        
+                next();
+            } catch(err) {
+                next(err);
+            }
         }
     }
 

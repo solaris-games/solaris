@@ -17,6 +17,10 @@ import StarService from './star';
 import UserService from './user';
 import ConversationService from './conversation';
 import PlayerReadyService from './playerReady';
+import GamePlayerJoinedEvent from '../types/events/gamePlayerJoined'
+import GamePlayerQuitEvent from '../types/events/gamePlayerQuit';
+import GamePlayerDefeatedEvent from '../types/events/gamePlayerDefeated';
+import { BaseGameEvent } from '../types/events/baseGameEvent';
 
 export default class GameService extends EventEmitter {
     gameRepo: DatabaseRepository<Game>;
@@ -327,17 +331,22 @@ export default class GameService extends EventEmitter {
             await this.achievementService.incrementJoined(player.userId);
         }
 
-        this.emit('onPlayerJoined', {
+        let playerJoinedEvent: GamePlayerJoinedEvent = {
             gameId: game._id,
             gameTick: game.state.tick,
-            player
-        });
+            playerId: player._id,
+            playerAlias: player.alias
+        };
+
+        this.emit('onPlayerJoined', playerJoinedEvent);
 
         if (gameIsFull) {
-            this.emit('onGameStarted', {
+            let e: BaseGameEvent = {
                 gameId: game._id,
                 gameTick: game.state.tick
-            });
+            };
+
+            this.emit('onGameStarted', e);
         }
 
         return gameIsFull; // Return whether the game is now full, the calling API endpoint can broadcast it.
@@ -439,12 +448,14 @@ export default class GameService extends EventEmitter {
         
         await game.save();
 
-        this.emit('onPlayerQuit', {
+        let e: GamePlayerQuitEvent = {
             gameId: game._id,
             gameTick: game.state.tick,
-            player,
-            alias
-        });
+            playerId: player._id,
+            playerAlias: alias
+        };
+
+        this.emit('onPlayerQuit', e);
 
         return player;
     }
@@ -487,11 +498,14 @@ export default class GameService extends EventEmitter {
 
         await game.save();
 
-        this.emit('onPlayerDefeated', {
+        let e: GamePlayerDefeatedEvent = {
             gameId: game._id,
             gameTick: game.state.tick,
-            player
-        });
+            playerId: player._id,
+            playerAlias: player.alias
+        };
+
+        this.emit('onPlayerDefeated', e);
     }
 
     async delete(game: Game, deletedByUserId?: DBObjectId) {
@@ -584,7 +598,7 @@ export default class GameService extends EventEmitter {
         return undefeatedPlayers.filter(x => x.readyToQuit).length === undefeatedPlayers.length;
     }
 
-    async forceAllUndefeatedPlayersReadyToQuit(game: Game) {
+    async forceEndGame(game: Game) {
         let undefeatedPlayers = this.listAllUndefeatedPlayers(game);
 
         for (let player of undefeatedPlayers) {

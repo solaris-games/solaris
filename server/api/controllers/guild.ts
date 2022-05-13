@@ -1,0 +1,214 @@
+import ValidationError from '../../errors/validation';
+import { DependencyContainer } from '../../types/DependencyContainer';
+
+export default (container: DependencyContainer, io) => {
+    return {
+        list: async (req, res, next) => {
+            try {
+                let result = await container.guildService.list();
+                    
+                return res.status(200).json(result);
+            } catch (err) {
+                return next(err);
+            }
+        },
+        detailMine: async (req, res, next) => {
+            try {
+                let result = await container.guildService.detailMyGuild(req.session.userId, true);
+                    
+                return res.status(200).json(result);
+            } catch (err) {
+                return next(err);
+            }
+        },
+        listLeaderboard: async (req, res, next) => {
+            try {
+                let limit = +req.query.limit || null;
+                let sortingKey = req.query.sortingKey || null;
+                let result = await container.guildService.getLeaderboard(limit, sortingKey);
+                    
+                return res.status(200).json(result);
+            } catch (err) {
+                return next(err);
+            }
+        },
+        listMyInvites: async (req, res, next) => {
+            try {
+                let result = await container.guildService.listInvitations(req.session.userId);
+                    
+                return res.status(200).json(result);
+            } catch (err) {
+                return next(err);
+            }
+        },
+        listMyApplications: async (req, res, next) => {
+            try {
+                let result = await container.guildService.listApplications(req.session.userId);
+                    
+                return res.status(200).json(result);
+            } catch (err) {
+                return next(err);
+            }
+        },
+        detail: async (req, res, next) => {
+            try {
+                const result = await container.guildService.detailWithUserInfo(req.params.guildId, false);
+    
+                return res.status(200).json(result);
+            } catch (err) {
+                return next(err);
+            }
+        },
+        create: async (req, res, next) => {
+            try {
+                if (!req.body.name) {
+                    throw new ValidationError(`name is required.`);
+                }
+    
+                if (!req.body.tag) {
+                    throw new ValidationError(`tag is required.`);
+                }
+    
+                let result = await container.guildService.create(req.session.userId, req.body.name, req.body.tag);
+                    
+                return res.status(201).json(result);
+            } catch (err) {
+                return next(err);
+            }
+        },
+        rename: async (req, res, next) => {
+            try {
+                if (!req.body.name) {
+                    throw new ValidationError(`name is required.`);
+                }
+    
+                if (!req.body.tag) {
+                    throw new ValidationError(`tag is required.`);
+                }
+    
+                await container.guildService.rename(req.session.userId, req.body.name, req.body.tag);
+                    
+                return res.sendStatus(200);
+            } catch (err) {
+                return next(err);
+            }
+        },
+        delete: async (req, res, next) => {
+            try {
+                await container.guildService.delete(req.session.userId, req.params.guildId);
+                    
+                return res.sendStatus(200);
+            } catch (err) {
+                return next(err);
+            }
+        },
+        invite: async (req, res, next) => {
+            try {
+                let result = await container.guildService.invite(req.body.username, req.params.guildId, req.session.userId);
+                    
+                return res.status(200).json(result);
+            } catch (err) {
+                return next(err);
+            }
+        },
+        uninvite: async (req, res, next) => {
+            try {
+                await container.guildService.uninvite(req.params.userId, req.params.guildId, req.session.userId);
+                    
+                return res.sendStatus(200);
+            } catch (err) {
+                return next(err);
+            }
+        },
+        acceptInviteForApplicant: async (req, res, next) => {
+            try {
+                await container.guildService.accept(req.params.userId, req.params.guildId, req.session.userId);
+                    
+                return res.sendStatus(200);
+            } catch (err) {
+                return next(err);
+            }
+        },
+        acceptInvite: async (req, res, next) => {
+            try {
+                await container.guildService.join(req.session.userId, req.params.guildId);
+                    
+                return res.sendStatus(200);
+            } catch (err) {
+                return next(err);
+            }
+        },
+        declineInvite: async (req, res, next) => {
+            try {
+                await container.guildService.decline(req.session.userId, req.params.guildId);
+                    
+                return res.sendStatus(200);
+            } catch (err) {
+                return next(err);
+            }
+        },
+        apply: async (req, res, next) => {
+            try {
+                await container.guildService.apply(req.session.userId, req.params.guildId);
+                    
+                return res.sendStatus(200);
+            } catch (err) {
+                return next(err);
+            }
+        },
+        withdraw: async (req, res, next) => {
+            try {
+                await container.guildService.withdraw(req.session.userId, req.params.guildId);
+                    
+                return res.sendStatus(200);
+            } catch (err) {
+                return next(err);
+            }
+        },
+        reject: async (req, res, next) => {
+            try {
+                await container.guildService.reject(req.params.userId, req.params.guildId, req.session.userId);
+                    
+                return res.sendStatus(200);
+            } catch (err) {
+                return next(err);
+            }
+        },
+        leave: async (req, res, next) => {
+            try {
+                await container.guildService.leave(req.session.userId, req.params.guildId);
+                    
+                return res.sendStatus(200);
+            } catch (err) {
+                return next(err);
+            }
+        },
+        promote: async (req, res, next) => {
+            try {
+                await container.guildService.promote(req.params.userId, req.params.guildId, req.session.userId);
+                    
+                return res.sendStatus(200);
+            } catch (err) {
+                return next(err);
+            }
+        },
+        demote: async (req, res, next) => {
+            try {
+                await container.guildService.demote(req.params.userId, req.params.guildId, req.session.userId);
+                    
+                return res.sendStatus(200);
+            } catch (err) {
+                return next(err);
+            }
+        },
+        kick: async (req, res, next) => {
+            try {
+                await container.guildService.kick(req.params.userId, req.params.guildId, req.session.userId);
+                    
+                return res.sendStatus(200);
+            } catch (err) {
+                return next(err);
+            }
+        }
+    }
+};

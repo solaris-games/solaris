@@ -10,6 +10,8 @@ import LeaderboardService from "./leaderboard";
 import PlayerService from "./player";
 import UserService from "./user";
 import { Player } from "../types/Player";
+import GamePlayerAFKEvent from "../types/events/gamePlayerAFK";
+import { BaseGameEvent } from "../types/events/baseGameEvent";
 
 const nodemailer = require('nodemailer');
 const fs = require('fs');
@@ -106,11 +108,11 @@ export default class EmailService {
         this.gameStateService = gameStateService;
         this.gameTickService = gameTickService;
 
-        this.gameService.on('onGameStarted', (data) => this.sendGameStartedEmail(data.gameId));
+        this.gameService.on('onGameStarted', this.sendGameStartedEmail.bind(this));
         this.userService.on('onUserCreated', (user) => this.sendWelcomeEmail(user));
         this.playerService.on('onGamePlayerReady', (data) => this.trySendLastPlayerTurnReminder(data.gameId));
 
-        this.gameTickService.on('onPlayerAfk', (args) => this.sendGamePlayerAfkEmail(args.gameId, args.player._id));
+        this.gameTickService.on('onPlayerAfk', this.sendGamePlayerAfkEmail.bind(this));
         this.gameTickService.on('onGameEnded', (args) => this.sendGameFinishedEmail(args.gameId));
         this.gameTickService.on('onGameCycleEnded', (args) => this.sendGameCycleSummaryEmail(args.gameId));
     }
@@ -188,8 +190,8 @@ export default class EmailService {
         }
     }
 
-    async sendGameStartedEmail(gameId: DBObjectId) {
-        let game = await this.gameService.getById(gameId);
+    async sendGameStartedEmail(args: BaseGameEvent) {
+        let game = await this.gameService.getById(args.gameId);
         let gameUrl = `${this.config.clientUrl}/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
 
@@ -358,11 +360,11 @@ export default class EmailService {
         }
     }
 
-    async sendGamePlayerAfkEmail(gameId: DBObjectId, playerId: DBObjectId) {
-        let game = await this.gameService.getById(gameId);
+    async sendGamePlayerAfkEmail(args: GamePlayerAFKEvent) {
+        let game = await this.gameService.getById(args.gameId);
         let gameUrl = `${this.config.clientUrl}/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
-        let player = this.playerService.getById(game, playerId);
+        let player = this.playerService.getById(game, args.playerId!);
         
         if (player && player.userId) {
             let user = await this.userService.getEmailById(player.userId);
