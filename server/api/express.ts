@@ -5,7 +5,7 @@ const compression = require('compression');
 const rateLimit = require("express-rate-limit");
 const MongoDBStore = require('connect-mongodb-session')(session);
 
-import registerRoutes from '../api/routes';
+import registerRoutes from './routes';
 import { DependencyContainer } from '../types/DependencyContainer';
 import { Config } from '../types/Config';
 

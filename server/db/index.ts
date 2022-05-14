@@ -1,5 +1,5 @@
 import config from '../config';
-import mongooseLoader from '../loaders/mongoose';
+import mongooseLoader from '../models/mongoose';
 import fs from 'fs';
 import path from 'path';
 

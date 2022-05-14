@@ -1,13 +1,29 @@
 const express = require('express');
 const http = require('http');
-import loaders from '../loaders';
 import config from '../config';
+import expressLoader from './express';
+import mongooseLoader from '../models/mongoose';
+import socketLoader from './sockets';
+import containerLoader from '../container';
+
+let mongo;
 
 async function startServer() {
   const app = express();
   const server = http.createServer(app);
 
-  await loaders.init(app, server);
+  mongo = await mongooseLoader(config, {});
+    
+  const io = socketLoader(config, server);
+  const container = containerLoader(config, io);
+
+  await expressLoader(config, app, io, container);
+
+  // await container.donateService.listRecentDonations();
+  // console.log('Loaded recent donations to cache');
+
+  await container.discordService.initialize();
+  container.notificationService.initialize();
 
   server.listen(config.port, (err) => {
     if (err) {
@@ -22,7 +38,9 @@ async function startServer() {
 process.on('SIGINT', async () => {
   console.log('Shutting down...');
 
-  await loaders.cleanup();
+  console.log('Disconnecting from MongoDB...');
+  await mongo.disconnect();
+  console.log('MongoDB disconnected.');
 
   console.log('Shutdown complete.');
   

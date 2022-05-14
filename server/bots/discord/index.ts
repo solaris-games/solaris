@@ -3,8 +3,8 @@ const config = require('dotenv').config({ path: __dirname + '/.env' });
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
-import mongooseLoader from '../../loaders/mongoose';
-import containerLoader from '../../loaders/container';
+import mongooseLoader from '../../models/mongoose';
+import containerLoader from '../../container';
 import { DependencyContainer } from '../../types/DependencyContainer';
 
 import BotResponseService from './services/response';
