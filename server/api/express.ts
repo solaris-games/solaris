@@ -82,6 +82,8 @@ export default async (config: Config, app, io, container: DependencyContainer) =
 
     registerRoutes(router, io, container);
 
+    app.use(router);
+
     console.log('Express Intialized');
     
     return app;
