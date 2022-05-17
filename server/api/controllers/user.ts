@@ -1,5 +1,6 @@
 import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../types/DependencyContainer';
+import { mapToUserCreateUserRequest, mapToUserRequestPasswordResetRequest, mapToUserRequestUsernameRequest, mapToUserResetPasswordResetRequest, mapToUserUpdateEmailPreferenceRequest, mapToUserUpdateEmailRequest, mapToUserUpdatePasswordRequest, mapToUserUpdateUsernameRequest } from '../requests/user';
 
 export default (container: DependencyContainer, io) => {
     return {
@@ -18,46 +19,22 @@ export default (container: DependencyContainer, io) => {
             let recaptchaEnabled = container.recaptchaService.isEnabled();
     
             try {
-                let errors: string[] = [];
-    
-                if (!req.body.email) {
-                    errors.push('Email is a required field');
-                }
-    
-                if (!req.body.username) {
-                    errors.push('Username is a required field');
-                }
-    
-                if (!req.body.password) {
-                    errors.push('Password is a required field');
-                }
-    
-                if (recaptchaEnabled && !req.body.recaptchaToken) {
-                    errors.push('Recaptcha token is required');
-                }
-    
-                if (errors.length) {
-                    throw new ValidationError(errors);
-                }
-    
-                const email = req.body.email.toLowerCase();
+                const reqObj = mapToUserCreateUserRequest(req.body, recaptchaEnabled);
+
+                const email = reqObj.email.toLowerCase();
     
                 const emailExists = await container.userService.userExists(email);
     
                 if (emailExists) {
-                    errors.push('An account with this email already exists');
+                    throw new ValidationError('An account with this email already exists');
                 }
     
-                const username = req.body.username;
+                const username = reqObj.username;
     
                 const usernameExists = await container.userService.usernameExists(username);
     
                 if (usernameExists) {
-                    errors.push('An account with this username already exists');
-                }
-    
-                if (errors.length) {
-                    throw new ValidationError(errors);
+                    throw new ValidationError('An account with this username already exists');
                 }
     
                 // Before we create a new account, verify that the user is not a robot.
@@ -65,13 +42,13 @@ export default (container: DependencyContainer, io) => {
                     try {
                         let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
     
-                        await container.recaptchaService.verify(ip, req.body.recaptchaToken);
+                        await container.recaptchaService.verify(ip, reqObj.recaptchaToken!);
                     } catch (err) {
                         throw new ValidationError(['Recaptcha is invalid']);
                     }
                 }
     
-                let userId = await container.userService.create(email, username, req.body.password, ip);
+                let userId = await container.userService.create(email, username, reqObj.password, ip);
     
                 return res.status(201).json({ id: userId });
             } catch (err) {
@@ -172,7 +149,9 @@ export default (container: DependencyContainer, io) => {
         },
         updateEmailPreference: async (req, res, next) => {
             try {
-                await container.userService.updateEmailPreference(req.session.userId, req.body.enabled);
+                const reqObj = mapToUserUpdateEmailPreferenceRequest(req.body);
+    
+                await container.userService.updateEmailPreference(req.session.userId, reqObj.enabled);
     
                 return res.sendStatus(200);
             } catch (err) {
@@ -180,18 +159,10 @@ export default (container: DependencyContainer, io) => {
             }
         },
         updateUsername: async (req, res, next) => {
-            let errors: string[] = [];
-    
-            if (!req.body.username) {
-                errors.push('Username is a required field');
-            }
-    
             try {
-                if (errors.length) {
-                    throw new ValidationError(errors);
-                }
-    
-                await container.userService.updateUsername(req.session.userId, req.body.username);
+                const reqObj = mapToUserUpdateUsernameRequest(req.body);
+                
+                await container.userService.updateUsername(req.session.userId, reqObj.username);
     
                 return res.sendStatus(200);
             } catch (err) {
@@ -199,18 +170,10 @@ export default (container: DependencyContainer, io) => {
             }
         },
         updateEmailAddress: async (req, res, next) => {
-            let errors: string[] = [];
-    
-            if (!req.body.email) {
-                errors.push('Email is a required field');
-            }
-    
             try {
-                if (errors.length) {
-                    throw new ValidationError(errors);
-                }
-    
-                await container.userService.updateEmailAddress(req.session.userId, req.body.email);
+                const reqObj = mapToUserUpdateEmailRequest(req.body);
+                
+                await container.userService.updateEmailAddress(req.session.userId, reqObj.email);
     
                 return res.sendStatus(200);
             } catch (err) {
@@ -218,25 +181,13 @@ export default (container: DependencyContainer, io) => {
             }
         },
         updatePassword: async (req, res, next) => {
-            let errors: string[] = [];
-    
-            if (!req.body.currentPassword) {
-                errors.push('Current password is a required field');
-            }
-    
-            if (!req.body.newPassword) {
-                errors.push('New password is a required field');
-            }
-    
             try {
-                if (errors.length) {
-                    throw new ValidationError(errors);
-                }
-    
+                const reqObj = mapToUserUpdatePasswordRequest(req.body);
+                
                 await container.userService.updatePassword(
                     req.session.userId,
-                    req.body.currentPassword,
-                    req.body.newPassword);
+                    reqObj.currentPassword,
+                    reqObj.newPassword);
     
                 return res.sendStatus(200);
             } catch (err) {
@@ -245,10 +196,12 @@ export default (container: DependencyContainer, io) => {
         },
         requestPasswordReset: async (req, res, next) => {
             try {
-                let token = await container.userService.requestResetPassword(req.body.email);
+                const reqObj = mapToUserRequestPasswordResetRequest(req.body);
+                
+                let token = await container.userService.requestResetPassword(reqObj.email);
     
                 try {
-                    await container.emailService.sendTemplate(req.body.email, container.emailService.TEMPLATES.RESET_PASSWORD, [token]);
+                    await container.emailService.sendTemplate(reqObj.email, container.emailService.TEMPLATES.RESET_PASSWORD, [token]);
                 } catch (emailError) {
                     console.error(emailError);
     
@@ -262,11 +215,9 @@ export default (container: DependencyContainer, io) => {
         },
         resetPassword: async (req, res, next) => {
             try {
-                if (req.body.token == null || !req.body.token.length) {
-                    throw new ValidationError(`The token is required`);
-                }
-    
-                await container.userService.resetPassword(req.body.token, req.body.newPassword);
+                const reqObj = mapToUserResetPasswordResetRequest(req.body);
+                
+                await container.userService.resetPassword(reqObj.token, reqObj.newPassword);
     
                 return res.sendStatus(200);
             } catch (err) {
@@ -275,10 +226,12 @@ export default (container: DependencyContainer, io) => {
         },
         requestUsername: async (req, res, next) => {
             try {
-                let username = await container.userService.getUsernameByEmail(req.body.email);
+                const reqObj = mapToUserRequestUsernameRequest(req.body);
+                
+                let username = await container.userService.getUsernameByEmail(reqObj.email);
     
                 try {
-                    await container.emailService.sendTemplate(req.body.email, container.emailService.TEMPLATES.FORGOT_USERNAME, [username]);
+                    await container.emailService.sendTemplate(reqObj.email, container.emailService.TEMPLATES.FORGOT_USERNAME, [username]);
                 } catch (emailError) {
                     console.error(emailError);
     

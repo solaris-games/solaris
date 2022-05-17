@@ -1,5 +1,5 @@
-import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../types/DependencyContainer';
+import { mapToBadgesPurchaseBadgeRequest } from '../requests/badges';
 
 export default (container: DependencyContainer, io) => {
     return {
@@ -31,18 +31,10 @@ export default (container: DependencyContainer, io) => {
             }
         },
         purchaseForUser: async (req, res, next) => {
-            let errors: string[] = [];
-    
-            if (!req.body.badgeKey) {
-                errors.push('badgeKey is required.');
-            }
-    
             try {
-                if (errors.length) {
-                    throw new ValidationError(errors);
-                }
-    
-                await container.badgeService.purchaseBadgeForUser(req.session.userId, req.params.userId, req.body.badgeKey);
+                const reqObj = mapToBadgesPurchaseBadgeRequest(req.body);
+                
+                await container.badgeService.purchaseBadgeForUser(req.session.userId, req.params.userId, reqObj.badgeKey);
                 
                 return res.sendStatus(200);
             } catch (err) {
@@ -50,18 +42,10 @@ export default (container: DependencyContainer, io) => {
             }
         },
         purchaseForPlayer: async (req, res, next) => {
-            let errors: string[] = [];
-    
-            if (!req.body.badgeKey) {
-                errors.push('badgeKey is required.');
-            }
-    
             try {
-                if (errors.length) {
-                    throw new ValidationError(errors);
-                }
-    
-                await container.badgeService.purchaseBadgeForPlayer(req.game, req.session.userId, req.params.playerId, req.body.badgeKey);
+                const reqObj = mapToBadgesPurchaseBadgeRequest(req.body);
+                
+                await container.badgeService.purchaseBadgeForPlayer(req.game, req.session.userId, req.params.playerId, reqObj.badgeKey);
                 
                 return res.sendStatus(200);
             } catch (err) {

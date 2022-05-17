@@ -1,14 +1,16 @@
-import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../types/DependencyContainer';
+import { mapToStarAbandonStarRequest, mapToStarBuildCarrierRequest, mapToStarDestroyInfrastructureRequest, mapToStarGarrisonAllShipsRequest, mapToStarSetBulkIgnoreAllStatusRequest, mapToStarToggleBulkIgnoreStatusRequest, mapToStarUpgradeInfrastructureBulkRequest, mapToStarUpgradeInfrastructureRequest, StarUpgradeInfrastructureRequest } from '../requests/star';
 
 export default (container: DependencyContainer, io) => {
     return {
         upgradeEconomy: async (req, res, next) => {
             try {
+                const reqObj = mapToStarUpgradeInfrastructureRequest(req.body);
+
                 let report = await container.starUpgradeService.upgradeEconomy(
                     req.game,
                     req.player,
-                    req.body.starId);
+                    reqObj.starId);
     
                 return res.status(200).json(report);
             } catch (err) {
@@ -17,10 +19,12 @@ export default (container: DependencyContainer, io) => {
         },
         upgradeIndustry: async (req, res, next) => {
             try {
+                const reqObj = mapToStarUpgradeInfrastructureRequest(req.body);
+
                 let report = await container.starUpgradeService.upgradeIndustry(
                     req.game,
                     req.player,
-                    req.body.starId);
+                    reqObj.starId);
     
                 return res.status(200).json(report);
             } catch (err) {
@@ -29,10 +33,12 @@ export default (container: DependencyContainer, io) => {
         },
         upgradeScience: async (req, res, next) => {
             try {
+                const reqObj = mapToStarUpgradeInfrastructureRequest(req.body);
+
                 let report = await container.starUpgradeService.upgradeScience(
                     req.game,
                     req.player,
-                    req.body.starId);
+                    reqObj.starId);
     
                 return res.status(200).json(report);
             } catch (err) {
@@ -41,12 +47,14 @@ export default (container: DependencyContainer, io) => {
         },
         upgradeBulk: async (req, res, next) => {
             try {
+                const reqObj = mapToStarUpgradeInfrastructureBulkRequest(req.body);
+                
                 let summary = await container.starUpgradeService.upgradeBulk(
                     req.game,
                     req.player,
-                    req.body.upgradeStrategy,
-                    req.body.infrastructure,
-                    +req.body.amount);
+                    reqObj.upgradeStrategy,
+                    reqObj.infrastructure,
+                    +reqObj.amount);
     
                 return res.status(200).json(summary);
             } catch (err) {
@@ -55,12 +63,14 @@ export default (container: DependencyContainer, io) => {
         },
         upgradeBulkCheck: async (req, res, next) => {
             try {
+                const reqObj = mapToStarUpgradeInfrastructureBulkRequest(req.body);
+                
                 let summary = await container.starUpgradeService.generateUpgradeBulkReport(
                     req.game,
                     req.player,
-                    req.body.upgradeStrategy,
-                    req.body.infrastructure,
-                    +req.body.amount);
+                    reqObj.upgradeStrategy,
+                    reqObj.infrastructure,
+                    +reqObj.amount);
     
                 return res.status(200).json(summary);
             } catch (err) {
@@ -69,10 +79,12 @@ export default (container: DependencyContainer, io) => {
         },
         buildWarpGate: async (req, res, next) => {
             try {
+                const reqObj: StarUpgradeInfrastructureRequest = req.body;
+                
                 let report = await container.starUpgradeService.buildWarpGate(
                     req.game,
                     req.player,
-                    req.body.starId);
+                    reqObj.starId);
     
                 return res.status(200).json(report);
             } catch (err) {
@@ -81,10 +93,12 @@ export default (container: DependencyContainer, io) => {
         },
         destroyWarpGate: async (req, res, next) => {
             try {
+                const reqObj = mapToStarDestroyInfrastructureRequest(req.body);
+                
                 await container.starUpgradeService.destroyWarpGate(
                     req.game,
                     req.player,
-                    req.body.starId);
+                    reqObj.starId);
     
                 return res.sendStatus(200);
             } catch (err) {
@@ -92,13 +106,19 @@ export default (container: DependencyContainer, io) => {
             }
         },
         buildCarrier: async (req, res, next) => {
-            let ships = +req.body.ships || 1;
-    
             try {
+                const reqObj = mapToStarBuildCarrierRequest(req.body);
+                
+                let ships = 1;
+                
+                if (reqObj.ships) {
+                    ships = +reqObj.ships;
+                }
+        
                 let report = await container.starUpgradeService.buildCarrier(
                     req.game,
                     req.player,
-                    req.body.starId,
+                    reqObj.starId,
                     ships);
     
                 return res.status(200).json(report);
@@ -108,10 +128,12 @@ export default (container: DependencyContainer, io) => {
         },
         garrisonAllShips: async (req, res, next) => {
             try {
+                const reqObj = mapToStarGarrisonAllShipsRequest(req.body);
+                
                 let report = await container.shipTransferService.garrisonAllShips(
                     req.game,
                     req.player,
-                    req.body.starId);
+                    reqObj.starId);
     
                 return res.status(200).json(report);
             } catch (err) {
@@ -120,10 +142,12 @@ export default (container: DependencyContainer, io) => {
         },
         abandon: async (req, res, next) => {
             try {
+                const reqObj = mapToStarAbandonStarRequest(req.body);
+                
                 await container.starService.abandonStar(
                     req.game,
                     req.player,
-                    req.body.starId);
+                    reqObj.starId);
     
                 return res.sendStatus(200);
             } catch (err) {
@@ -132,11 +156,13 @@ export default (container: DependencyContainer, io) => {
         },
         toggleBulkIgnore: async (req, res, next) => {
             try {
+                const reqObj = mapToStarToggleBulkIgnoreStatusRequest(req.body);
+
                 await container.starService.toggleIgnoreBulkUpgrade(
                     req.game,
                     req.player,
-                    req.body.starId,
-                    req.body.infrastructureType);
+                    reqObj.starId,
+                    reqObj.infrastructureType);
     
                 return res.sendStatus(200);
             } catch (err) {
@@ -145,11 +171,13 @@ export default (container: DependencyContainer, io) => {
         },
         toggleBulkIgnoreAll: async (req, res, next) => {
             try {
+                const reqObj = mapToStarSetBulkIgnoreAllStatusRequest(req.body);
+                
                 await container.starService.toggleIgnoreBulkUpgradeAll(
                     req.game,
                     req.player,
-                    req.body.starId,
-                    req.body.ignoreStatus);
+                    reqObj.starId,
+                    reqObj.ignoreStatus);
     
                 return res.sendStatus(200);
             } catch (err) {
