@@ -4,7 +4,7 @@ import config from '../config';
 import expressLoader from './express';
 import mongooseLoader from '../models/mongoose';
 import socketLoader from './sockets';
-import containerLoader from '../container';
+import containerLoader from '../services';
 
 let mongo;
 

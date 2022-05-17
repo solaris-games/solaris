@@ -1,6 +1,6 @@
 import config from '../config';
 import mongooseLoader from '../models/mongoose';
-import containerLoader from '../container';
+import containerLoader from '../services';
 import { DependencyContainer } from '../types/DependencyContainer';
 import { User } from '../types/User';
 

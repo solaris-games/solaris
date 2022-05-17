@@ -1,7 +1,7 @@
 const Agenda = require('agenda');
 import config from '../config';
 import mongooseLoader from '../models/mongoose';
-import containerLoader from '../container';
+import containerLoader from '../services';
 
 import GameTickJob from './gameTick';
 import OfficialGamesCheckJob from './officialGamesCheck';
