@@ -15,19 +15,19 @@ export const keyHasNumberValue = (obj: any, key: string) => {
 };
 
 export const keyHasBooleanValue = (obj: any, key: string) => {
-    const value = obj[key].toString();
+    const value = obj[key];
 
     return value != null && typeof(value) === 'boolean';
 };
 
 export const keyHasObjectValue = (obj: any, key: string) => {
-    const value = obj[key].toString();
+    const value = obj[key];
 
     return value != null && typeof(value) === 'object' && !Array.isArray(value);
 };
 
 export const keyHasArrayValue = (obj: any, key: string) => {
-    const value = obj[key].toString();
+    const value = obj[key];
 
     return value != null && Array.isArray(value);
 };

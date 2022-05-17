@@ -120,7 +120,7 @@ export interface CarrierRenameCarrierRequest {
 export const mapToCarrierRenameCarrierRequest = (body: any): CarrierRenameCarrierRequest => {
     let errors: string[] = [];
 
-    if (!keyHasNumberValue(body, 'name')) {
+    if (!keyHasStringValue(body, 'name')) {
         errors.push('Name is required.');
     }
 

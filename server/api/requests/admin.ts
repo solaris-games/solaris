@@ -1,5 +1,5 @@
 import ValidationError from "../../errors/validation";
-import { keyHasBooleanValue, keyHasNumberValue } from './helpers';
+import { keyHasBooleanValue, keyHasNumberValue, keyHasStringValue } from './helpers';
 
 export interface AdminSetUserRoleRequest {
     enabled: boolean;
@@ -44,11 +44,11 @@ export const mapToAdminSetGameFeaturedRequest = (body: any): AdminSetGameFeature
 };
 
 export interface AdminSetGameTimeMachineRequest {
-    timeMachine: boolean;
+    timeMachine: string;
 };
 
 export const mapToAdminSetGameTimeMachineRequest = (body: any): AdminSetGameTimeMachineRequest => {
-    if (!keyHasBooleanValue(body, 'timeMachine')) {
+    if (!keyHasStringValue(body, 'timeMachine')) {
         throw new ValidationError(`Time Machine is required.`);
     }
 

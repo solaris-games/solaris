@@ -24,7 +24,6 @@ export const mapToStarUpgradeInfrastructureRequest = (body: any): StarUpgradeInf
 };
 
 export interface StarUpgradeInfrastructureBulkRequest {
-    starId: DBObjectId;
     upgradeStrategy: string;
     infrastructure: InfrastructureType;
     amount: number;
@@ -32,10 +31,6 @@ export interface StarUpgradeInfrastructureBulkRequest {
 
 export const mapToStarUpgradeInfrastructureBulkRequest = (body: any): StarUpgradeInfrastructureBulkRequest => {
     let errors: string[] = [];
-
-    if (!keyHasStringValue(body, 'starId')) {
-        errors.push('Star ID is required.');
-    }
 
     if (!keyHasStringValue(body, 'upgradeStrategy')) {
         errors.push('Upgrade Strategy is required.');
@@ -54,7 +49,6 @@ export const mapToStarUpgradeInfrastructureBulkRequest = (body: any): StarUpgrad
     }
 
     return {
-        starId: body.starId,
         upgradeStrategy: body.upgradeStrategy,
         infrastructure: body.infrastructure,
         amount: body.amount

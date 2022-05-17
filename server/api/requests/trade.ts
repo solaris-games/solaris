@@ -39,7 +39,6 @@ export const mapToTradeSendToPlayerRequest = (body: any, userId: any): TradeSend
 
 export interface TradeSendTechnologyToPlayerRequest {
     toPlayerId: DBObjectId;
-    amount: number;
     technology: ResearchTypeNotRandom;
     level: number;
 };
@@ -49,10 +48,6 @@ export const mapToTradeSendTechnologyToPlayerRequest = (body: any): TradeSendTec
 
     if (!keyHasStringValue(body, 'toPlayerId')) {
         errors.push('To Player Id is required.');
-    }
-
-    if (!keyHasNumberValue(body, 'amount')) {
-        errors.push('Amount is required.');
     }
 
     if (!keyHasStringValue(body, 'technology')) {
@@ -69,7 +64,6 @@ export const mapToTradeSendTechnologyToPlayerRequest = (body: any): TradeSendTec
 
     return {
         toPlayerId: body.toPlayerId,
-        amount: body.amount,
         technology: body.technology,
         level: body.level
     }
