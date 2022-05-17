@@ -108,18 +108,12 @@ export default (container: DependencyContainer, io) => {
         buildCarrier: async (req, res, next) => {
             try {
                 const reqObj = mapToStarBuildCarrierRequest(req.body);
-                
-                let ships = 1;
-                
-                if (reqObj.ships) {
-                    ships = +reqObj.ships;
-                }
         
                 let report = await container.starUpgradeService.buildCarrier(
                     req.game,
                     req.player,
                     reqObj.starId,
-                    ships);
+                    reqObj.ships);
     
                 return res.status(200).json(report);
             } catch (err) {
