@@ -1,25 +1,13 @@
-import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../types/DependencyContainer';
+import { mapToReportCreateReportRequest } from '../requests/report';
 
 export default (container: DependencyContainer, io) => {
     return {
         create: async (req, res, next) => {
-            let errors: string[] = [];
-    
-            if (!req.body.playerId) {
-                errors.push('playerId is a required body field');
-            }
-    
-            if (!req.body.reasons) {
-                errors.push('reasons is a required body field');
-            }
-    
             try {
-                if (errors.length) {
-                    throw new ValidationError(errors);
-                }
-    
-                await container.reportService.reportPlayer(req.game, req.body.playerId, req.session.userId, req.body.reasons);
+                const reqObj = mapToReportCreateReportRequest(req.body);
+                
+                await container.reportService.reportPlayer(req.game, reqObj.playerId, req.session.userId, reqObj.reasons);
                 
                 return res.sendStatus(200);
             } catch (err) {

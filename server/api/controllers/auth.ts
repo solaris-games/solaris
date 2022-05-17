@@ -1,26 +1,15 @@
 import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../types/DependencyContainer';
+import { mapToAuthLoginRequest } from '../requests/auth';
 const axios = require('axios');
 
 export default (container: DependencyContainer, io) => {
     return {
         login: async (req, res, next) => {        
-            let errors: string[] = [];
-        
-            if (!req.body.email) {
-                errors.push('Email is a required field');
-            }
-        
-            if (!req.body.password) {
-                errors.push('Password is a required field');
-            }
-        
             try {
-                if (errors.length) {
-                    throw new ValidationError(errors);
-                }
-        
-                let user = await container.authService.login(req.body.email, req.body.password);
+                const reqObj = mapToAuthLoginRequest(req.body);
+                
+                let user = await container.authService.login(reqObj.email, reqObj.password);
         
                 // Store the user id in the session.
                 req.session.userId = user._id;

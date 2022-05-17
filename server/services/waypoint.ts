@@ -2,7 +2,7 @@ import { DBObjectId } from '../types/DBObjectId';
 import ValidationError from '../errors/validation';
 import DatabaseRepository from '../models/DatabaseRepository';
 import { Carrier } from '../types/Carrier';
-import { CarrierWaypoint, CarrierWaypointActionType } from '../types/CarrierWaypoint';
+import { CarrierWaypoint, CarrierWaypointActionType, CarrierWaypointBase } from '../types/CarrierWaypoint';
 import { Game } from '../types/Game';
 import { Player } from '../types/Player';
 import { Star } from '../types/Star';
@@ -51,12 +51,12 @@ export default class WaypointService {
         this.carrierMovementService = carrierMovementService;
     }
 
-    async saveWaypoints(game: Game, player: Player, carrierId: DBObjectId, waypoints: CarrierWaypoint[], looped: boolean) {
+    async saveWaypoints(game: Game, player: Player, carrierId: DBObjectId, waypoints: CarrierWaypointBase[], looped: boolean) {
         let carrier = this.carrierService.getById(game, carrierId);
         return await this.saveWaypointsForCarrier(game, player, carrier, waypoints, looped);
     }
 
-    async saveWaypointsForCarrier(game: Game, player: Player, carrier: Carrier, waypoints: CarrierWaypoint[], looped: boolean, writeToDB: boolean = true) {
+    async saveWaypointsForCarrier(game: Game, player: Player, carrier: Carrier, waypoints: CarrierWaypointBase[], looped: boolean, writeToDB: boolean = true) {
         if (looped == null) {
             looped = false;
         }
@@ -131,7 +131,16 @@ export default class WaypointService {
             }
         }
         
-        carrier.waypoints = waypoints;
+        carrier.waypoints = waypoints.map(w => {
+            return {
+                _id: new mongoose.Types.ObjectId(),
+                source: w.source,
+                destination: w.destination,
+                action: w.action,
+                actionShips: w.actionShips,
+                delayTicks: w.delayTicks
+            }
+        });
 
         // If the waypoints are not a valid loop then throw an error.
         if (looped && !this.canLoop(game, player, carrier)) {
@@ -166,7 +175,7 @@ export default class WaypointService {
         };
     }
 
-    _waypointRouteIsWithinHyperspaceRange(game: Game, carrier: Carrier, waypoint: CarrierWaypoint) {
+    _waypointRouteIsWithinHyperspaceRange(game: Game, carrier: Carrier, waypoint: CarrierWaypointBase) {
         let sourceStar = this.starService.getById(game, waypoint.source);
         let destinationStar = this.starService.getById(game, waypoint.destination);
 
@@ -188,7 +197,7 @@ export default class WaypointService {
         return distanceBetweenStars <= hyperspaceDistance;
     }
 
-    _waypointRouteIsBetweenWormHoles(game: Game, waypoint: CarrierWaypoint) {
+    _waypointRouteIsBetweenWormHoles(game: Game, waypoint: CarrierWaypointBase) {
         let sourceStar = this.starService.getById(game, waypoint.source);
         let destinationStar = this.starService.getById(game, waypoint.destination);
 

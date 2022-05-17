@@ -1,5 +1,6 @@
 import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../types/DependencyContainer';
+import { mapToGameJoinGameRequest, mapToGameSaveNotesRequest } from '../requests/game';
 
 export default (container: DependencyContainer, io) => {
     return {
@@ -19,6 +20,7 @@ export default (container: DependencyContainer, io) => {
             }
         },
         create: async (req, res, next) => {
+            // TODO: This needs a request interface.
             req.body.general.createdByUserId = req.session.userId;
     
             try {
@@ -177,17 +179,19 @@ export default (container: DependencyContainer, io) => {
         },
         join: async (req, res, next) => {
             try {
+                const reqObj = mapToGameJoinGameRequest(req.body);
+                
                 let gameIsFull = await container.gameService.join(
                     req.game,
                     req.session.userId,
-                    req.body.playerId,
-                    req.body.alias,
-                    req.body.avatar,
-                    req.body.password);
+                    reqObj.playerId,
+                    reqObj.alias,
+                    reqObj.avatar,
+                    reqObj.password);
     
                 res.sendStatus(200);
     
-                container.broadcastService.gamePlayerJoined(req.game, req.body.playerId, req.body.alias, req.body.avatar);
+                container.broadcastService.gamePlayerJoined(req.game, reqObj.playerId, reqObj.alias, reqObj.avatar);
     
                 if (gameIsFull) {
                     container.broadcastService.gameStarted(req.game);
@@ -300,10 +304,12 @@ export default (container: DependencyContainer, io) => {
         },
         saveNotes: async (req, res, next) => {
             try {
+                const reqObj = mapToGameSaveNotesRequest(req.body);
+
                 await container.playerService.updateGameNotes(
                     req.game,
                     req.player,
-                    req.body.notes);
+                    reqObj.notes);
                 
                 res.sendStatus(200);
             } catch (err) {

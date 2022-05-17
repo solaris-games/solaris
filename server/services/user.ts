@@ -260,7 +260,7 @@ export default class UserService extends EventEmitter {
         return user != null;
     }
 
-    async updateEmailPreference(id: DBObjectId, preference: string) {
+    async updateEmailPreference(id: DBObjectId, preference: boolean) {
         await this.userRepo.updateOne({
             _id: id
         }, {
