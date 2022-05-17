@@ -77,7 +77,7 @@ export const mapToStarDestroyInfrastructureRequest = (body: any): StarDestroyInf
 
 export interface StarBuildCarrierRequest {
     starId: DBObjectId;
-    ships?: number;
+    ships: number;
 };
 
 export const mapToStarBuildCarrierRequest = (body: any): StarBuildCarrierRequest => {
@@ -95,9 +95,15 @@ export const mapToStarBuildCarrierRequest = (body: any): StarBuildCarrierRequest
         throw new ValidationError(errors);
     }
 
+    let ships = 1;
+                
+    if (body.ships) {
+        ships = +body.ships;
+    }
+
     return {
         starId: body.starId,
-        ships: body.ships
+        ships
     }
 };
 

@@ -17,8 +17,10 @@ export const mapToResearchUpdateNowRequest = (body: any): ResearchUpdateNowReque
         throw new ValidationError(errors);
     }
 
+    let preference = body.preference.toLowerCase().trim() as ResearchTypeNotRandom;
+
     return {
-        preference: body.preference
+        preference
     }
 };
 
@@ -37,7 +39,9 @@ export const mapToResearchUpdateNextRequest = (body: any): ResearchUpdateNextReq
         throw new ValidationError(errors);
     }
     
+    let preference = body.preference.toLowerCase().trim() as ResearchType;
+
     return {
-        preference: body.preference
+        preference
     }
 };
