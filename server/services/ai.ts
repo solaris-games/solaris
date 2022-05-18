@@ -538,15 +538,9 @@ export default class AIService {
                 } else if (this._canAffordCarrier(context, game, player, false)) {
                     const routeCarrier = this._logisticRouteExists(context, order.source, order.star);
 
+                    // Only allow one carrier per route
                     if (!routeCarrier) {
                         await reinforce();
-                    } else {
-                        const lastWaypoint = routeCarrier.waypoints[routeCarrier.waypoints.length - 1];
-                        const ticksUntilCarrierIsBack = this.waypointService.calculateWaypointTicks(game, routeCarrier, lastWaypoint);
-
-                        if (ticksUntilCarrierIsBack > game.settings.galaxy.productionTicks) {
-                            await reinforce();
-                        }
                     }
                 }
             }
