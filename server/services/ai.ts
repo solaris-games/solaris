@@ -443,7 +443,13 @@ export default class AIService {
                         shipsNeeded -= assignment.totalShips;
                     }
 
-                    await this._useAssignment(context, game, player, assignments, assignment, this._createWaypointsDropAndReturn(trace), shipsUsed, (carrier) => attackData.carriersOnTheWay.push(carrier._id.toString()));
+                    // We'll wait until the last possible moment to launch the defense to avoid wasting carriers
+                    const timeLeftUntilSchedule =  order.ticksUntil - this._calculateTraceDuration(context, game, trace);
+                    if (timeLeftUntilSchedule > 0) {
+                        assignments.delete(assignment.star._id.toString());
+                    } else {
+                        await this._useAssignment(context, game, player, assignments, assignment, this._createWaypointsDropAndReturn(trace), shipsUsed, (carrier) => attackData.carriersOnTheWay.push(carrier._id.toString()));
+                    }
                 }
             } else if (order.type === AiAction.InvadeStar) {
                 if (player.aiState && player.aiState.invasionsInProgress && player.aiState.invasionsInProgress.find(iv => order.star === iv.star)) {
