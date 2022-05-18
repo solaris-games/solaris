@@ -1,5 +1,5 @@
-import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../types/DependencyContainer';
+import { mapToGuildCreateGuildRequest, mapToGuildInviteUserRequest, mapToGuildRenameGuildRequest } from '../requests/guild';
 
 export default (container: DependencyContainer, io) => {
     return {
@@ -61,15 +61,9 @@ export default (container: DependencyContainer, io) => {
         },
         create: async (req, res, next) => {
             try {
-                if (!req.body.name) {
-                    throw new ValidationError(`name is required.`);
-                }
-    
-                if (!req.body.tag) {
-                    throw new ValidationError(`tag is required.`);
-                }
-    
-                let result = await container.guildService.create(req.session.userId, req.body.name, req.body.tag);
+                const reqObj = mapToGuildCreateGuildRequest(req.body);
+
+                let result = await container.guildService.create(req.session.userId, reqObj.name, reqObj.tag);
                     
                 return res.status(201).json(result);
             } catch (err) {
@@ -78,15 +72,9 @@ export default (container: DependencyContainer, io) => {
         },
         rename: async (req, res, next) => {
             try {
-                if (!req.body.name) {
-                    throw new ValidationError(`name is required.`);
-                }
-    
-                if (!req.body.tag) {
-                    throw new ValidationError(`tag is required.`);
-                }
-    
-                await container.guildService.rename(req.session.userId, req.body.name, req.body.tag);
+                const reqObj = mapToGuildRenameGuildRequest(req.body);
+                
+                await container.guildService.rename(req.session.userId, reqObj.name, reqObj.tag);
                     
                 return res.sendStatus(200);
             } catch (err) {
@@ -104,7 +92,9 @@ export default (container: DependencyContainer, io) => {
         },
         invite: async (req, res, next) => {
             try {
-                let result = await container.guildService.invite(req.body.username, req.params.guildId, req.session.userId);
+                const reqObj = mapToGuildInviteUserRequest(req.body);
+                
+                let result = await container.guildService.invite(reqObj.username, req.params.guildId, req.session.userId);
                     
                 return res.status(200).json(result);
             } catch (err) {

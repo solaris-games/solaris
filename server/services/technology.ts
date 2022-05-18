@@ -234,8 +234,12 @@ export default class TechnologyService {
             bonus++;
         }
 
-        if (star.specialist?.modifiers.special?.defenderBonus) {
-            bonus += star.specialist.modifiers.special.defenderBonus;
+        if (star.specialistId) {
+            let specialist = this.specialistService.getByIdStar(star.specialistId);
+
+            if (specialist.modifiers.special?.defenderBonus) {
+                bonus += specialist.modifiers.special.defenderBonus;
+            }
         }
 
         if (star.homeStar) {

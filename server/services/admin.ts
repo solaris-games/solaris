@@ -180,7 +180,7 @@ export default class AdminService {
         });
     }
 
-    async setGameTimeMachine(gameId: DBObjectId, enabled: boolean) {
+    async setGameTimeMachine(gameId: DBObjectId, enabled: string) {
         await this.gameRepo.updateOne({
             _id: gameId
         }, {

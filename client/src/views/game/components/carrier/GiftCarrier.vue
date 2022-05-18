@@ -54,13 +54,15 @@ export default {
           this.carrier.isGift = true
           this.carrier.waypointsLooped = false;
 
-          let firstWaypoint = this.carrier.waypoints[0];
+          if (this.carrier.waypoints && this.carrier.waypoints.length) {
+            let firstWaypoint = this.carrier.waypoints[0];
 
-          firstWaypoint.action = 'nothing';
-          firstWaypoint.actionShips = 0;
-          firstWaypoint.delayTicks = 0;
+            firstWaypoint.action = 'nothing';
+            firstWaypoint.actionShips = 0;
+            firstWaypoint.delayTicks = 0;
 
-          this.carrier.waypoints = [firstWaypoint];
+            this.carrier.waypoints = [firstWaypoint];
+          }
 
           GameContainer.reloadCarrier(this.carrier)
 

@@ -78,14 +78,6 @@ export default class GameService extends EventEmitter {
         return await this.gameRepo.findByIdAsModel(id, select);
     }
 
-    async getByNameSettingsLean(name: string) {
-        return await this.gameRepo.find({
-            'settings.general.name': name
-        }, {
-            'settings': 1
-        });
-    }
-
     async getByNameStateSettingsLean(name: string) {
         return await this.gameRepo.find({
             'settings.general.name': name
@@ -103,15 +95,6 @@ export default class GameService extends EventEmitter {
 
     async getByIdLean(id: DBObjectId, select): Promise<Game | null> {
         return await this.gameRepo.findById(id, select);
-    }
-
-    async getByIdGalaxy(id: DBObjectId) {
-        return await this.getById(id, {
-            settings: 1,
-            state: 1,
-            galaxy: 1,
-            constants: 1,
-        });
     }
 
     async getByIdGalaxyLean(id: DBObjectId): Promise<Game | null> {
@@ -141,84 +124,6 @@ export default class GameService extends EventEmitter {
         });
 
         return game?.settings;
-    }
-
-    async getGameState(id: DBObjectId) {
-        let game = await this.getByIdLean(id, {
-            'state': 1
-        });
-
-        return game?.state;
-    }
-
-    async getByIdInfo(id: DBObjectId, userId: DBObjectId) {
-        let game = await this.getByIdLean(id, {
-            settings: 1,
-            state: 1,
-            constants: 1
-        });
-
-        if (!game) {
-            return null;
-        }
-
-        if (game.settings.general.createdByUserId) {
-            game.settings.general.isGameAdmin = game.settings.general.createdByUserId.toString() === userId.toString();
-        } else {
-            game.settings.general.isGameAdmin = false;
-        }
-
-        return game;
-    }
-
-    async getByIdState(id: DBObjectId, userId: DBObjectId) {
-        let game = await this.getByIdLean(id, {
-            state: 1
-        });
-
-        return game;
-    }
-
-    async getByIdMessages(id: DBObjectId) {
-        return await this.getById(id, {
-            settings: 1,
-            state: 1,
-            messages: 1,
-            'galaxy.players': 1
-        });
-    }
-
-    async getByIdMessagesLean(id: DBObjectId) {
-        return await this.getByIdLean(id, {
-            settings: 1,
-            state: 1,
-            messages: 1,
-            'galaxy.players': 1
-        });
-    }
-
-    async getByIdConversations(id: DBObjectId) {
-        return await this.getById(id, {
-            state: 1,
-            conversations: 1,
-            'galaxy.players': 1
-        });
-    }
-
-    async getByIdConversationsLean(id: DBObjectId) {
-        return await this.getByIdLean(id, {
-            state: 1,
-            conversations: 1,
-            'galaxy.players': 1
-        });
-    }
-
-    async getByIdDiplomacyLean(id: DBObjectId) {
-        return await this.getByIdLean(id, {
-            'galaxy.players._id': 1,
-            'galaxy.players.userId': 1,
-            'galaxy.players.diplomacy': 1
-        });
     }
 
     async join(game: Game, userId: DBObjectId, playerId: DBObjectId, alias: string, avatar: number, password: string) {

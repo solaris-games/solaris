@@ -1,41 +1,19 @@
-import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../types/DependencyContainer';
+import { mapToTradeSendTechnologyToPlayerRequest, mapToTradeSendToPlayerRequest } from '../requests/trade';
 
 const mongoose = require('mongoose');
 
 export default (container: DependencyContainer, io) => {
     return {
         sendCredits: async (req, res, next) => {
-            let errors: string[] = [];
-    
-            if (!req.body.toPlayerId) {
-                errors.push('toPlayerId is required.');
-            }
-    
-            if (req.session.userId === req.body.toPlayerId) {
-                errors.push('Cannot send credits to yourself.');
-            }
-            
-            req.body.amount = parseInt(req.body.amount || 0);
-    
-            if (!req.body.amount) {
-                errors.push('amount is required.');
-            }
-            
-            if (req.body.amount <= 0) {
-                errors.push('amount must be greater than 0.');
-            }
-    
             try {
-                if (errors.length) {
-                    throw new ValidationError(errors);
-                }
+                const reqObj = mapToTradeSendToPlayerRequest(req.body, req.session.userId);
     
                 let trade = await container.tradeService.sendCredits(
                     req.game,
                     req.player,
-                    req.body.toPlayerId,
-                    req.body.amount);
+                    reqObj.toPlayerId,
+                    reqObj.amount);
                 
                 res.status(200).json({
                     reputation: trade.reputation
@@ -47,36 +25,14 @@ export default (container: DependencyContainer, io) => {
             }
         },
         sendCreditsSpecialists: async (req, res, next) => {
-            let errors: string[] = [];
-    
-            if (!req.body.toPlayerId) {
-                errors.push('toPlayerId is required.');
-            }
-    
-            if (req.session.userId === req.body.toPlayerId) {
-                errors.push('Cannot send specialist tokens to yourself.');
-            }
-            
-            req.body.amount = parseInt(req.body.amount || 0);
-    
-            if (!req.body.amount) {
-                errors.push('amount is required.');
-            }
-            
-            if (req.body.amount <= 0) {
-                errors.push('amount must be greater than 0.');
-            }
-    
             try {
-                if (errors.length) {
-                    throw new ValidationError(errors);
-                }
+                const reqObj = mapToTradeSendToPlayerRequest(req.body, req.session.userId);
     
                 let trade = await container.tradeService.sendCreditsSpecialists(
                     req.game,
                     req.player,
-                    req.body.toPlayerId,
-                    req.body.amount);
+                    reqObj.toPlayerId,
+                    reqObj.amount);
                 
                 res.status(200).json({
                     reputation: trade.reputation
@@ -87,36 +43,18 @@ export default (container: DependencyContainer, io) => {
                 return next(err);
             }
         },
-        sendRenown: async (req, res, next) => {
-            let errors: string[] = [];
-    
-            if (!req.body.toPlayerId) {
-                errors.push('toPlayerId is required.');
-            }
-    
-            req.body.amount = parseInt(req.body.amount || 0);
-    
-            if (!req.body.amount) {
-                errors.push('amount is required.');
-            }
-            
-            if (req.body.amount <= 0) {
-                errors.push('amount must be greater than 0.');
-            }
-    
+        sendRenown: async (req, res, next) => {    
             try {
-                if (errors.length) {
-                    throw new ValidationError(errors);
-                }
+                const reqObj = mapToTradeSendToPlayerRequest(req.body, req.session.userId);
     
                 let trade = await container.tradeService.sendRenown(
                     req.game,
                     req.player,
-                    req.body.toPlayerId,
-                    req.body.amount);
+                    reqObj.toPlayerId,
+                    reqObj.amount);
     
                 // TODO: Implement receiving renown on the UI, should use a user socket.
-                //container.broadcastService.userRenownReceived(req.game, // to user id, req.body.amount);
+                //container.broadcastService.userRenownReceived(req.game, // to user id, reqObj.amount);
     
                 res.sendStatus(200);
     
@@ -126,23 +64,15 @@ export default (container: DependencyContainer, io) => {
             }
         },
         sendTechnology: async (req, res, next) => {
-            let errors: string[] = [];
-    
-            if (!req.body.toPlayerId) {
-                errors.push('toPlayerId is required.');
-            }
-    
             try {
-                if (errors.length) {
-                    throw new ValidationError(errors);
-                }
-    
+                const reqObj = mapToTradeSendTechnologyToPlayerRequest(req.body);
+                
                 let trade = await container.tradeService.sendTechnology(
                     req.game,
                     req.player,
-                    req.body.toPlayerId,
-                    req.body.technology,
-                    req.body.level);
+                    reqObj.toPlayerId,
+                    reqObj.technology,
+                    reqObj.level);
     
                 res.status(200).json({
                     reputation: trade.reputation

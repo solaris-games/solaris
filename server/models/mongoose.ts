@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 
-import EventModel from '../models/Event';
-import GameModel from '../models/Game';
-import GuildModel from '../models/Guild';
-import HistoryModel from '../models/History';
-import UserModel from '../models/User';
-import PaymentModel from '../models/Payment';
+import EventModel from './Event';
+import GameModel from './Game';
+import GuildModel from './Guild';
+import HistoryModel from './History';
+import UserModel from './User';
+import PaymentModel from './Payment';
 
 export default async (config, options) => {
 

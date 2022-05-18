@@ -1,5 +1,5 @@
-import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../types/DependencyContainer';
+import { mapToConversationCreateConversationRequest, mapToConversationSendMessageRequest } from '../requests/conversation';
 
 export default (container: DependencyContainer, io) => {
     return {
@@ -53,25 +53,13 @@ export default (container: DependencyContainer, io) => {
         },
         create: async (req, res, next) => {
             try {
-                let errors: string[] = [];
-    
-                if (!req.body.name || !req.body.name.length) {
-                    errors.push('name is required.');
-                }
-    
-                if (!req.body.participants || !req.body.participants.length) {
-                    errors.push('participants is required.');
-                }
-    
-                if (errors.length) {
-                    throw new ValidationError(errors);
-                }
-                
+                const reqObj = mapToConversationCreateConversationRequest(req.body);
+
                 let convo = await container.conversationService.create(
                     req.game,
                     req.player._id,
-                    req.body.name,
-                    req.body.participants);
+                    reqObj.name,
+                    reqObj.participants);
     
                 // TODO: Broadcast convo created.
     
@@ -81,22 +69,14 @@ export default (container: DependencyContainer, io) => {
             }
         },
         sendMessage: async (req, res, next) => {
-            try {
-                let errors: string[] = [];
+            try {    
+                const reqObj = mapToConversationSendMessageRequest(req.body);
     
-                if (!req.body.message || !req.body.message.length) {
-                    errors.push('message is required.');
-                }
-    
-                if (errors.length) {
-                    throw new ValidationError(errors);
-                }
-                
                 let message = await container.conversationService.send(
                     req.game,
                     req.player,
                     req.params.conversationId,
-                    req.body.message);
+                    reqObj.message);
     
                 container.broadcastService.gameMessageSent(req.game, message);
     
