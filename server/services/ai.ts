@@ -12,7 +12,7 @@ import TechnologyService from "./technology";
 import WaypointService from "./waypoint";
 import {Star} from "../types/Star";
 import {Carrier} from "../types/Carrier";
-import {getOrInsert, maxBy, notNull, reverseSort} from "../utils";
+import {getOrInsert, maxBy, minBy, notNull, reverseSort} from "../utils";
 import {CarrierWaypoint, CarrierWaypointActionType} from "../types/CarrierWaypoint";
 import ReputationService from "./reputation";
 import DiplomacyService from "./diplomacy";
@@ -540,7 +540,10 @@ export default class AIService {
 
                     // Only allow one carrier per route
                     if (!routeCarrier) {
-                        await reinforce();
+                        const nextReturning = this._nextArrivingCarrierIn(context, game, order.source);
+                        if (!nextReturning)  {
+                            await reinforce();
+                        }
                     }
                 }
             }
@@ -559,6 +562,11 @@ export default class AIService {
         }
 
         player.aiState!.startedClaims = claimsInProgress;
+    }
+
+    _nextArrivingCarrierIn(context: Context, game: Game, starId: string): number | undefined {
+        const carriers = context.arrivingAtCarriers.get(starId);
+        return carriers && minBy(c => this.waypointService.calculateWaypointTicks(game, c, c.waypoints[0]), carriers)
     }
 
     async _useAssignment(context: Context, game: Game, player: Player, assignments: Map<string, Assignment>, assignment: Assignment, waypoints: CarrierWaypoint[], ships: number, onCarrierUsed: ((Carrier) => void) | null = null) {
