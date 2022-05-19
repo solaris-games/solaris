@@ -236,13 +236,13 @@ export default class GameListService {
             'settings.general.type': 1,
             'settings.general.playerLimit': 1,
             state: 1,
-            'galaxy.players.afk': 1
+            'galaxy.players.isOpenSlot': 1
         }, {
             'state.startDate': -1
         });
 
         for (let game of games) {
-            game.state.afkSlots = game.galaxy.players.filter(p => p.afk).length;
+            game.state.openSlots = game.galaxy.players.filter(p => p.isOpenSlot).length;
 
             delete (game as any).galaxy;
         }

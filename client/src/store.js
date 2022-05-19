@@ -177,7 +177,7 @@ export default new Vuex.Store({
     gamePlayerJoined (state, data) {
       let player = GameHelper.getPlayerById(state.game, data.playerId)
 
-      player.isEmptySlot = false
+      player.isOpenSlot = false
       player.alias = data.alias
       player.avatar = data.avatar
       player.defeated = false
@@ -188,7 +188,7 @@ export default new Vuex.Store({
     gamePlayerQuit (state, data) {
       let player = GameHelper.getPlayerById(state.game, data.playerId)
 
-      player.isEmptySlot = true
+      player.isOpenSlot = true
       player.alias = 'Empty Slot'
       player.avatar = null
     },

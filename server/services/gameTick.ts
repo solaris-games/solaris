@@ -718,7 +718,8 @@ export default class GameTickService extends EventEmitter {
                         gameId: game._id,
                         gameTick: game.state.tick,
                         playerId: player._id,
-                        playerAlias: player.alias
+                        playerAlias: player.alias,
+                        openSlot: false
                     };
                     
                     this.emit('onPlayerDefeated', e);

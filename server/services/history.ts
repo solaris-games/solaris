@@ -130,6 +130,7 @@ export default class HistoryService {
                 researchingNext: player.researchingNext,
                 credits: player.credits,
                 creditsSpecialists: player.creditsSpecialists,
+                isOpenSlot: player.isOpenSlot,
                 defeated: player.defeated,
                 defeatedDate: player.defeatedDate,
                 afk: player.afk,

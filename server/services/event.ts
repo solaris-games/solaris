@@ -344,7 +344,8 @@ export default class EventService {
     async createPlayerDefeatedEvent(args: GamePlayerDefeatedEvent) {
         let data = {
             playerId: args.playerId,
-            alias: args.playerAlias
+            alias: args.playerAlias,
+            openSlot: args.openSlot
         };
 
         return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_PLAYER_DEFEATED, data);
