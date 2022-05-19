@@ -121,26 +121,13 @@
           <button v-if="canReadyToQuit && !getUserPlayer().defeated && getUserPlayer().readyToQuit" @click="unconfirmReadyToQuit(getUserPlayer())" class="btn btn-sm btn-success mr-1">
             <i class="fas fa-check"></i> Ready to Quit
           </button>
-          <modalButton v-if="!isTutorialGame && game.state.startDate && !getUserPlayer().defeated" :disabled="isConcedingDefeat" modalName="concedeDefeatModal" classText="btn btn-sm btn-danger">
-            <i class="fas fa-skull-crossbones"></i> Concede Defeat
-          </modalButton>
-          <modalButton v-if="isTutorialGame && game.state.startDate && !getUserPlayer().defeated" :disabled="isConcedingDefeat" modalName="exitTutorialModal" classText="btn btn-sm btn-danger">
-            <i class="fas fa-skull-crossbones"></i> Quit Tutorial
-          </modalButton>
+          <concede-defeat-button />
       </div>
     </div>
 
     <!-- Modals -->
     <dialogModal modalName="quitGameModal" titleText="Quit Game" cancelText="No" confirmText="Yes" @onConfirm="quitGame">
       <p>Are you sure you want to quit this game? Your position will be opened again and you will <b>not</b> be able to rejoin.</p>
-    </dialogModal>
-
-    <dialogModal modalName="concedeDefeatModal" titleText="Concede Defeat" cancelText="No" confirmText="Yes" @onConfirm="concedeDefeat">
-      <p>Are you sure you want to concede defeat in this game?</p>
-    </dialogModal>
-
-    <dialogModal modalName="exitTutorialModal" titleText="Quit Tutorial" cancelText="No" confirmText="Yes" @onConfirm="concedeDefeat">
-      <p>Are you sure you want to quit the tutorial? All progress will be lost.</p>
     </dialogModal>
 </div>
 </template>
@@ -159,6 +146,7 @@ import ShareLinkVue from '../welcome/ShareLink'
 import PlayerAvatarVue from '../menu/PlayerAvatar'
 import HelpTooltip from '../../../components/HelpTooltip'
 import ReadyStatusButtonVue from '../menu/ReadyStatusButton'
+import ConcedeDefeatButton from './ConcedeDefeatButton'
 
 export default {
   components: {
@@ -168,7 +156,8 @@ export default {
     'share-link': ShareLinkVue,
     'player-avatar': PlayerAvatarVue,
     'help-tooltip': HelpTooltip,
-    'ready-status-button': ReadyStatusButtonVue
+    'ready-status-button': ReadyStatusButtonVue,
+    'concede-defeat-button': ConcedeDefeatButton
   },
 
   data () {
@@ -176,8 +165,7 @@ export default {
       audio: null,
       players: [],
       timeRemaining: null,
-      isQuittingGame: false,
-      isConcedingDefeat: false
+      isQuittingGame: false
     }
   },
   mounted () {
@@ -224,27 +212,6 @@ export default {
       } else if (gameHelper.isTurnBasedGame(this.$store.state.game)) {
         this.timeRemaining = `Next turn: ${gameHelper.getCountdownTimeStringForTurnTimeout(this.$store.state.game)}`
       }
-    },
-    async concedeDefeat () {
-      this.isConcedingDefeat = true
-
-      try {
-        let response = await gameService.concedeDefeat(this.$store.state.game._id)
-
-        if (response.status === 200) {
-          AudioService.quit()
-
-          if (!this.isTutorialGame) {
-            this.$toasted.show(`You have conceded defeat, better luck next time.`, { type: 'error' })
-          }
-
-          router.push({ name: 'main-menu' })
-        }
-      } catch (err) {
-        console.error(err)
-      }
-
-      this.isConcedingDefeat = false
     },
     async quitGame () {
       this.isQuittingGame = true

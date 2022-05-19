@@ -26,6 +26,7 @@ export interface GameHistoryPlayer {
     researchingNext: ResearchType;
     credits: number;
     creditsSpecialists: number;
+    isOpenSlot: boolean;
     defeated: boolean;
     defeatedDate: Date | null;
     afk: boolean;

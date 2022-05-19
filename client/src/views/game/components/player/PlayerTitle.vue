@@ -22,6 +22,7 @@
         </h4>
       </div>
   </div>
+  <player-open-slot-status :player="player"/>
   <player-online-status :player="player"/>
   <player-missed-turns :player="player"/>
 </div>
@@ -31,6 +32,7 @@
 import GameHelper from '../../../../services/gameHelper'
 import DiplomacyHelper from '../../../../services/diplomacyHelper'
 import PlayerIconVue from '../player/PlayerIcon'
+import PlayerOpenSlotStatusVue from './PlayerOpenSlotStatus'
 import PlayerOnlineStatusVue from './PlayerOnlineStatus'
 import PlayerMissedTurnsVue from './PlayerMissedTurns'
 import PlayerDiplomaticStatusIcon from './PlayerDiplomaticStatusIcon'
@@ -38,6 +40,7 @@ import PlayerDiplomaticStatusIcon from './PlayerDiplomaticStatusIcon'
 export default {
   components: {
     'player-icon': PlayerIconVue,
+    'player-open-slot-status': PlayerOpenSlotStatusVue,
     'player-online-status': PlayerOnlineStatusVue,
     'player-missed-turns': PlayerMissedTurnsVue,
     'player-diplomatic-status-icon': PlayerDiplomaticStatusIcon

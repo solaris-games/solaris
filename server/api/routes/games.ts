@@ -158,7 +158,8 @@ export default (router: Router, io, container: DependencyContainer) => {
             settings: true,
             state: true,
             galaxy: true,
-            constants: true
+            constants: true,
+            quitters: true
         }),
         mwGame.validateGameState({
             isUnlocked: true,

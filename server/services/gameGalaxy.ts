@@ -586,7 +586,7 @@ export default class GameGalaxyService {
                 colour: p.colour,
                 shape: p.shape,
                 research,
-                isEmptySlot: p.userId == null, // Do not send the user ID back to the client.
+                isOpenSlot: p.isOpenSlot,
                 isInScanningRange: p.isInScanningRange,
                 defeated: p.defeated,
                 defeatedDate: p.defeatedDate,
@@ -675,6 +675,7 @@ export default class GameGalaxyService {
                     gamePlayer.researchingNext = historyPlayer.researchingNext;
                     gamePlayer.credits = historyPlayer.credits;
                     gamePlayer.creditsSpecialists = historyPlayer.creditsSpecialists;
+                    gamePlayer.isOpenSlot = historyPlayer.isOpenSlot;
                     gamePlayer.defeated = historyPlayer.defeated;
                     gamePlayer.defeatedDate = historyPlayer.defeatedDate;
                     gamePlayer.afk = historyPlayer.afk;

@@ -1,6 +1,6 @@
 import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../types/DependencyContainer';
-import { mapToGameJoinGameRequest, mapToGameSaveNotesRequest } from '../requests/game';
+import { mapToGameConcedeDefeatRequest, mapToGameJoinGameRequest, mapToGameSaveNotesRequest } from '../requests/game';
 
 export default (container: DependencyContainer, io) => {
     return {
@@ -217,9 +217,12 @@ export default (container: DependencyContainer, io) => {
         },
         concede: async (req, res, next) => {
             try {
+                const reqObj = mapToGameConcedeDefeatRequest(req.body);
+
                 await container.gameService.concedeDefeat(
                     req.game,
-                    req.player);
+                    req.player,
+                    reqObj.openSlot);
                     
                 return res.sendStatus(200);
             } catch (err) {
