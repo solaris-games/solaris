@@ -840,9 +840,7 @@ class GameHelper {
       return false
     }
 
-    return game.galaxy.players.filter(p => {
-      return p.isOpenSlot || p.afk
-    }).length > 0
+    return game.galaxy.players.filter(p => p.isOpenSlot).length > 0
   }
 
   canTick(game) {

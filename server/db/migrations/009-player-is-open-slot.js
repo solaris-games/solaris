@@ -4,10 +4,7 @@ module.exports = {
 
         // Completed games
         await games.updateMany({
-            $and: [
-                { 'state.endDate': { $ne: null } },
-                { 'galaxy.players.isOpenSlot': { $eq: null } }
-            ]
+            'galaxy.players.isOpenSlot': { $eq: null }
         }, {
             $set: {
                 'galaxy.players.$[].isOpenSlot': false
@@ -15,12 +12,9 @@ module.exports = {
         });
 
         // In progress games
-        // Afk players - open slot
+        // Ensure that AFK players have their slots open.
         await games.updateMany({
-            $and: [
-                { 'state.endDate': { $eq: null } },
-                { 'galaxy.players.isOpenSlot': { $eq: null } }
-            ]
+            'state.endDate': { $eq: null }
         }, {
             $set: {
                 'galaxy.players.$[p].isOpenSlot': true
@@ -28,26 +22,9 @@ module.exports = {
         }, {
             arrayFilters: [
                 {
+                    'p.isOpenSlot': false,
                     'p.defeated': true,
                     'p.afk': true
-                }
-            ]
-        });
-
-        // Not afk players - closed slot
-        await games.updateMany({
-            $and: [
-                { 'state.endDate': { $eq: null } },
-                { 'galaxy.players.isOpenSlot': { $eq: null } }
-            ]
-        }, {
-            $set: {
-                'galaxy.players.$[p].isOpenSlot': false
-            }
-        }, {
-            arrayFilters: [
-                {
-                    'p.afk': false
                 }
             ]
         });
