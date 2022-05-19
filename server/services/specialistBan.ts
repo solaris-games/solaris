@@ -47,16 +47,30 @@ export default class SpecialistBanService {
         return bans;
     }
 
-    getCurrentMonthStarBans(amount: number) {
-        const ids = this.specialistService.listStar(null).map((s: Specialist) => s.id);
+    getCurrentMonthStarBans(amount: number): Specialist[] {
+        const specs = this.specialistService.listStar(null);
+        const ids = specs.map((s: Specialist) => s.id);
+        const bans = this._getCurrentMonthBans(ids, amount);
 
-        return this._getCurrentMonthBans(ids, amount);
+        return specs.filter((s: Specialist) => bans.includes(s.id));
     }
 
-    getCurrentMonthCarrierBans(amount: number) {
-        const ids = this.specialistService.listCarrier(null).map((s: Specialist) => s.id);
+    getCurrentMonthCarrierBans(amount: number): Specialist[] {
+        const specs = this.specialistService.listCarrier(null);
+        const ids = specs.map((s: Specialist) => s.id);
+        const bans = this._getCurrentMonthBans(ids, amount);
 
-        return this._getCurrentMonthBans(ids, amount);
+        return specs.filter((s: Specialist) => bans.includes(s.id));
+    }
+
+    getCurrentMonthBans(amount: number) {
+        const carrierBans = this.getCurrentMonthCarrierBans(amount);
+        const starBans = this.getCurrentMonthStarBans(amount);
+
+        return{
+            carrier: carrierBans,
+            star: starBans
+        };
     }
 
 };

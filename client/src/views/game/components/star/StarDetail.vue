@@ -26,7 +26,7 @@
         <div v-if="(!isCompactUIStyle || !star.ownedByPlayerId) && star.isAsteroidField">
           <hr/>
           <p class="mb-0" v-if="star.isAsteroidField">This star is surrounded by an <span class="text-warning">Asteroid Field <i class="fas fa-meteor"></i></span>.</p>
-          <p class="mb-2 text-info" v-if="star.isAsteroidField"><small><i>Asteroid Fields have x2 Defender Bonus (net +2 Weapons) in combat.</i></small></p>
+          <p class="mb-2 text-info" v-if="star.isAsteroidField"><small><i>Asteroid Fields have +1 Defender Bonus (net +2 Weapons) in combat.</i></small></p>
         </div>
 
         <div v-if="(!isCompactUIStyle || !star.ownedByPlayerId) && star.isBinaryStar">
@@ -62,7 +62,7 @@
           <span v-if="star.isNebula" title="Star is obscured inside a nebula - All ship counts are hidden from other players">
             <i class="fas fa-eye-slash ml-1"></i>
           </span>
-          <span v-if="star.isAsteroidField" title="Star is surrounded by an asteroid field - x2 defender bonus (net +2 weapons) in combat">
+          <span v-if="star.isAsteroidField" title="Star is surrounded by an asteroid field - +1 defender bonus (net +2 weapons) in combat">
             <i class="fas fa-meteor ml-1"></i>
           </span>
           <span v-if="star.isBinaryStar" title="Binary Star - The system has additional natural resources">

@@ -204,7 +204,7 @@
             :compareValue="compareSettings.specialGalaxy.randomNebulas"
             v-if="game.settings.galaxy.galaxyType !== 'custom'"/>
           <game-setting-value title="Random Asteroid Fields"
-            tooltip="The percentage of random asteroid fields are generated in the galaxy - Asteroid fields have x2 defender bonus (net +2 weapons) in combat"
+            tooltip="The percentage of random asteroid fields are generated in the galaxy - Asteroid fields have +1 defender bonus (net +2 weapons) in combat"
             :valueText="getFriendlyText(game.settings.specialGalaxy.randomAsteroidFields)+'%'"
             :value="game.settings.specialGalaxy.randomAsteroidFields"
             :compareValue="compareSettings.specialGalaxy.randomAsteroidFields"

@@ -32,6 +32,10 @@ import CarrierMovementService from "./carrierMovement";
 import PlayerCycleRewardsService from "./playerCycleRewards";
 import StarContestedService from "./starContested";
 import PlayerReadyService from "./playerReady";
+import PlayerGalacticCycleCompletedEvent from "../types/events/playerGalacticCycleComplete"
+import GamePlayerDefeatedEvent from "../types/events/gamePlayerDefeated";
+import GamePlayerAFKEvent from "../types/events/gamePlayerAFK";
+import GameEndedEvent from "../types/events/gameEnded";
 
 const EventEmitter = require('events');
 const moment = require('moment');
@@ -632,10 +636,10 @@ export default class GameTickService extends EventEmitter {
 
                 // Raise an event if the player isn't defeated, AI doesn't care about events.
                 if (!player.defeated) {
-                    this.emit('onPlayerGalacticCycleCompleted', {
+                    let e: PlayerGalacticCycleCompletedEvent = {
                         gameId: game._id,
                         gameTick: game.state.tick,
-                        player, 
+                        playerId: player._id,
                         creditsEconomy: creditsResult.creditsFromEconomy, 
                         creditsBanking: creditsResult.creditsFromBanking,
                         creditsSpecialists: creditsResult.creditsFromSpecialistsTechnology,
@@ -646,7 +650,9 @@ export default class GameTickService extends EventEmitter {
                         experimentResearchingNext: experimentResult.researchingNext,
                         carrierUpkeep: carrierUpkeepResult,
                         allianceUpkeep: allianceUpkeepResult
-                    });
+                    };
+
+                    this.emit('onPlayerGalacticCycleCompleted', e);
                 }
             }
 
@@ -690,28 +696,32 @@ export default class GameTickService extends EventEmitter {
                         game.afkers.push(player.userId);
                     }
             
-                    // AFK counts as a defeat as well.
                     if (user && !isTutorialGame) {
-                        user.achievements.defeated++;
                         user.achievements.afk++;
                     }
 
-                    this.emit('onPlayerAfk', {
+                    let e: GamePlayerAFKEvent = {
                         gameId: game._id,
                         gameTick: game.state.tick,
-                        player
-                    });
+                        playerId: player._id,
+                        playerAlias: player.alias
+                    };
+
+                    this.emit('onPlayerAfk', e);
                 }
                 else {
                     if (user && !isTutorialGame) {
                         user.achievements.defeated++;
                     }
 
-                    this.emit('onPlayerDefeated', {
+                    let e: GamePlayerDefeatedEvent = {
                         gameId: game._id,
                         gameTick: game.state.tick,
-                        player
-                    });
+                        playerId: player._id,
+                        playerAlias: player.alias
+                    };
+                    
+                    this.emit('onPlayerDefeated', e);
                 }
             }
         }
@@ -720,7 +730,7 @@ export default class GameTickService extends EventEmitter {
     }
 
     async _gameWinCheck(game: Game, gameUsers: User[]) {
-        let isTutorialGame = this.gameTypeService.isTutorialGame(game);
+        const isTutorialGame = this.gameTypeService.isTutorialGame(game);
 
         let winner = this.leaderboardService.getGameWinner(game);
 
@@ -729,37 +739,53 @@ export default class GameTickService extends EventEmitter {
 
             if (!isTutorialGame) {
                 let rankingResult: GameRankingResult | null = null;
-    
-                // There must have been at least X production ticks in order for
-                // rankings to be added to players. This is to slow down players
-                // should they wish to cheat the system.
-                let productionTickCap = this.gameTypeService.is1v1Game(game) ? 1 : 2;
 
-                if (game.state.productionTick > productionTickCap) {
-                    let leaderboard = this.leaderboardService.getLeaderboardRankings(game).leaderboard;
-                    
-                    rankingResult = await this.leaderboardService.addGameRankings(game, gameUsers, leaderboard);
+                if (this.gameTypeService.isRankedGame(game)) {
+                    rankingResult = this._awardEndGameRank(game, gameUsers, true);
                 }
 
                 // Mark all players as established regardless of game length.
                 this.leaderboardService.markNonAFKPlayersAsEstablishedPlayers(game, gameUsers);
-
-                // If the game is anonymous, then ranking results should be omitted from the game ended event.
-                if (this.gameTypeService.isAnonymousGame(game)) {
-                    rankingResult = null;
-                }
-                
-                this.emit('onGameEnded', {
+                this.leaderboardService.incrementPlayersCompletedAchievement(game, gameUsers);
+    
+                let e: GameEndedEvent = {
                     gameId: game._id,
                     gameTick: game.state.tick,
                     rankingResult
-                });
+                };
+
+                this.emit('onGameEnded', e);
             }
 
             return true;
         }
 
         return false;
+    }
+
+    _awardEndGameRank(game: Game, gameUsers: User[], awardCredits: boolean) {
+        let rankingResult: GameRankingResult | null = null;
+    
+        // There must have been at least X production ticks in order for
+        // rankings to be added to players. This is to slow down players
+        // should they wish to cheat the system.
+        let productionTickCap = this.gameTypeService.is1v1Game(game) ? 1 : 2;
+        let canAwardRank = this.gameTypeService.isRankedGame(game) && game.state.productionTick > productionTickCap;
+
+        if (canAwardRank) {
+            let leaderboard = this.leaderboardService.getLeaderboardRankings(game).leaderboard;
+
+            rankingResult = this.leaderboardService.addGameRankings(game, gameUsers, leaderboard);
+
+            this.leaderboardService.incrementGameWinnerAchievements(game, gameUsers, leaderboard[0].player, awardCredits);
+        }
+
+        // If the game is anonymous, then ranking results should be omitted from the game ended event.
+        if (this.gameTypeService.isAnonymousGame(game)) {
+            rankingResult = null;
+        }
+        
+        return rankingResult;
     }
 
     async _playAI(game: Game) {

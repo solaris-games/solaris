@@ -10,7 +10,7 @@
     "anonymity": "normal",
     "playerOnlineStatus": "hidden",
     "timeMachine": "disabled",
-    "fluxEnabled": "disabled",
+    "fluxEnabled": "enabled",
     "advancedAI": "disabled"
   },
   "galaxy": {
@@ -30,7 +30,7 @@
     "randomAsteroidFields": 10,
     "randomBinaryStars": 10,
     "randomBlackHoles": 5,
-    "darkGalaxy": "standard",
+    "darkGalaxy": "extra",
     "giftCarriers": "enabled",
     "defenderBonus": "enabled",
     "carrierToCarrierCombat": "enabled",

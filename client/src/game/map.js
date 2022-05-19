@@ -669,8 +669,11 @@ class Map extends EventEmitter {
 
     let viewportXRadius = viewportWidth / 2.0
     let viewportYRadius = viewportHeight / 2.0
-
+    
     let viewportCenter = this.gameContainer.viewport.center
+
+    this.lastViewportCenter = this.currentViewportCenter || null
+    this.currentViewportCenter = this.gameContainer.viewport.center
 
     this.zoomPercent = (this.gameContainer.viewport.screenWidth/viewportWidth) * 100
 
@@ -688,7 +691,13 @@ class Map extends EventEmitter {
     let lastX = Math.floor(this.gameContainer.viewport.right/Map.chunkSize)
     let lastY = Math.floor(this.gameContainer.viewport.bottom/Map.chunkSize)
 
+    let positionChanging = this.lastViewportCenter == null || this.currentViewportCenter.x !== this.lastViewportCenter.x || this.currentViewportCenter.y !== this.lastViewportCenter.y
     let zoomChanging = Math.abs(this.zoomPercent-this.lastZoomPercent) > (1.0/128.0)
+
+    if (!positionChanging && !zoomChanging) {
+      return
+    }
+
     for(let ix=0; ix<this.numof_chunkX; ix++) {
       for(let iy=0; iy<this.numof_chunkY; iy++) {
         if(

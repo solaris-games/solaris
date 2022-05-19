@@ -55,7 +55,7 @@
           
           <div class="row no-gutters" v-if="!isLoading">
             <!-- New Player -->
-            <div class="col-sm-12 col-md-4 col-lg-4 pr-1" v-if="games.newPlayerRT">
+            <div class="col-sm-12 col-md-6 col-lg-6 pr-1" v-if="games.newPlayerRT">
               <div class="card bg-dark text-white new-player-game" @click="routeToPath('/game/detail', { id: games.newPlayerRT._id })">
                 <img class="card-img" :src="require('../../assets/screenshots/new_player_rt.png')" alt="View New Player Game">
                 <div class="card-img-overlay">
@@ -71,25 +71,8 @@
               </div>
             </div>
 
-            <!-- Flux -->
-            <div class="col-sm-12 col-md-4 col-lg-4 pr-1 pl-1" v-if="games.fluxRT">
-              <div class="card bg-dark text-white flux-game" @click="routeToPath('/game/detail', { id: games.fluxRT._id })">
-                <img class="card-img" :src="require('../../assets/screenshots/home-5.png')" alt="Standard Game">
-                <div class="card-img-overlay">
-                  <h5 class="card-title flux-card-title">
-                    <i class="fas fa-dice-d20"></i>
-                    <span class="ml-2">{{games.fluxRT.settings.general.name}}</span>
-                  </h5>
-                  <p class="card-title card-subtitle flux-card-subtitle">
-                    {{getGameTypeFriendlyText(games.fluxRT)}}
-                    ({{games.fluxRT.state.players}}/{{games.fluxRT.settings.general.playerLimit}})
-                  </p>
-                </div>
-              </div>
-            </div>
-
             <!-- Special Game -->
-            <div class="col-sm-12 col-md-4 col-lg-4 pl-1" v-if="games.special">
+            <div class="col-sm-12 col-md-6 col-lg-6 pl-1" v-if="games.special">
               <div class="card bg-dark text-white special-game" @click="routeToPath('/game/detail', { id: games.special._id })">
                 <img class="card-img" :src="require('../../assets/screenshots/' + games.special.settings.general.type + '.png')" alt="Special Game">
                 <div class="card-img-overlay">
@@ -388,8 +371,7 @@ export default {
         oneVsOneRT: null,
         oneVsOneTB: null,
         thirtyTwoPlayerRT: null,
-        special: null,
-        fluxRT: null
+        special: null
       }
     }
   },
@@ -397,29 +379,23 @@ export default {
     this.isLoading = true
 
     try {
-      let requests = [
-        gameService.listOfficialGames(),
-        gameService.listUserGames(),
-        gameService.listInProgressGames(),
-        gameService.listRecentlyCompletedGames()
-      ]
+      let response = await gameService.listJoinGamesSummary()
 
-      let responses = await Promise.all(requests)
+      if (response.status === 200) {
+        this.serverGames = response.data.official
+        this.userGames = response.data.user
+        this.inProgressGames = response.data.inProgress
+        this.recentlyCompletedGames = response.data.completed
 
-      this.serverGames = responses[0].data
-      this.userGames = responses[1].data
-      this.inProgressGames = responses[2].data
-      this.recentlyCompletedGames = responses[3].data
-
-      this.games.featured = this.getFeaturedGame()
-      this.games.newPlayerRT = this.getOfficialGame('new_player_rt')
-      this.games.standardRT = this.getOfficialGame('standard_rt')
-      this.games.standardTB = this.getOfficialGame('standard_tb')
-      this.games.oneVsOneRT = this.getOfficialGame('1v1_rt')
-      this.games.oneVsOneTB = this.getOfficialGame('1v1_tb')
-      this.games.thirtyTwoPlayerRT = this.getOfficialGame('32_player_rt')
-      this.games.special = this.getSpecialGame()
-      this.games.fluxRT = this.getOfficialGame('flux_rt')
+        this.games.featured = this.getFeaturedGame()
+        this.games.newPlayerRT = this.getOfficialGame('new_player_rt')
+        this.games.standardRT = this.getOfficialGame('standard_rt')
+        this.games.standardTB = this.getOfficialGame('standard_tb')
+        this.games.oneVsOneRT = this.getOfficialGame('1v1_rt')
+        this.games.oneVsOneTB = this.getOfficialGame('1v1_tb')
+        this.games.thirtyTwoPlayerRT = this.getOfficialGame('32_player_rt')
+        this.games.special = this.getSpecialGame()
+      }
     } catch (err) {
       console.error(err)
     }
@@ -514,10 +490,6 @@ export default {
   background-color: #d62c1a;
 }
 
-.flux-card-title {
-  background-color: #3498DB;
-}
-
 .card-subtitle {
   font-size: 12px;
   position: absolute;
@@ -543,10 +515,6 @@ p.card-subtitle {
   background-color: #d62c1a;
 }
 
-.flux-card-subtitle {
-  background-color: #3498DB;
-}
-
 .new-player-game {
   border: 3px solid #f39c12;
 }
@@ -557,9 +525,5 @@ p.card-subtitle {
 
 .special-game {
   border: 3px solid #d62c1a;
-}
-
-.flux-game {
-  border: 3px solid #3498DB;
 }
 </style>

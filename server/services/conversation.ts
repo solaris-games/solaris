@@ -7,6 +7,7 @@ import { ConversationMessage, ConversationMessageSentResult } from '../types/Con
 import { Game } from '../types/Game';
 import { Player } from '../types/Player';
 import TradeService from './trade';
+import ConversationMessageSentEvent from '../types/events/conversationMessageSent';
 const mongoose = require('mongoose');
 const EventEmitter = require('events');
 
@@ -264,6 +265,15 @@ export default class ConversationService extends EventEmitter {
             type: 'message',
             toPlayerIds
         }
+        
+        let e: ConversationMessageSentEvent = {
+            gameId: game._id,
+            gameTick: game.state.tick,
+            conversation: convo,
+            sentMessageResult
+        };
+
+        this.emit('onConversationMessageSent', e);
 
         return sentMessageResult;
     }

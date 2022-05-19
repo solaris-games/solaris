@@ -604,41 +604,61 @@ class GameHelper {
     // Sort by total number of stars, then by total ships, then by total carriers.
     // Note that this sorting is different from the server side sorting as
     // on the UI we want to preserve defeated player positions relative to how many
-    // stars they have.
-    return [...game.galaxy.players]
-      .sort((a, b) => {
-        // If its a conquest and home star victory then sort by home stars first, then by total stars.
-        if (this.isConquestHomeStars(game)) {
-            if (a.stats.totalHomeStars > b.stats.totalHomeStars) return -1;
-            if (a.stats.totalHomeStars < b.stats.totalHomeStars) return 1;
-        }
+    // stars they have as long as the game is in progress.
+    let playerStats = [...game.galaxy.players]
 
-        if (this.isKingOfTheHillMode(game) && a.isKingOfTheHill !== b.isKingOfTheHill) {
-          if (a.isKingOfTheHill) return -1;
-          if (b.isKingOfTheHill) return 1;
-        }
+    const sortPlayers = (a, b) => {
+      // If its a conquest and home star victory then sort by home stars first, then by total stars.
+      if (this.isConquestHomeStars(game)) {
+        if (a.stats.totalHomeStars > b.stats.totalHomeStars) return -1;
+        if (a.stats.totalHomeStars < b.stats.totalHomeStars) return 1;
+      }
 
-        // Sort by total stars descending
-        if (a.stats.totalStars > b.stats.totalStars) return -1;
-        if (a.stats.totalStars < b.stats.totalStars) return 1;
+      if (this.isKingOfTheHillMode(game) && a.isKingOfTheHill !== b.isKingOfTheHill) {
+        if (a.isKingOfTheHill) return -1;
+        if (b.isKingOfTheHill) return 1;
+      }
 
-        // Then by total ships descending
-        if (a.stats.totalShips > b.stats.totalShips) return -1
-        if (a.stats.totalShips < b.stats.totalShips) return 1
+      // Sort by total stars descending
+      if (a.stats.totalStars > b.stats.totalStars) return -1;
+      if (a.stats.totalStars < b.stats.totalStars) return 1;
 
-        // Then by total carriers descending
-        if (a.stats.totalCarriers > b.stats.totalCarriers) return -1
-        if (a.stats.totalCarriers < b.stats.totalCarriers) return 1
+      // Then by total ships descending
+      if (a.stats.totalShips > b.stats.totalShips) return -1
+      if (a.stats.totalShips < b.stats.totalShips) return 1
 
-        // Then by defeated date descending
-        if (a.defeated && b.defeated) {
-          if (moment(a.defeatedDate) > moment(b.defeatedDate)) return -1
-          if (moment(a.defeatedDate) < moment(b.defeatedDate)) return 1
-        }
+      // Then by total carriers descending
+      if (a.stats.totalCarriers > b.stats.totalCarriers) return -1
+      if (a.stats.totalCarriers < b.stats.totalCarriers) return 1
 
-        // Sort defeated players last.
-        return (a.defeated === b.defeated) ? 0 : a.defeated ? 1 : -1
-      })
+      // Then by defeated date descending
+      if (a.defeated && b.defeated) {
+        if (moment(a.defeatedDate) > moment(b.defeatedDate)) return -1
+        if (moment(a.defeatedDate) < moment(b.defeatedDate)) return 1
+      }
+
+      // Sort defeated players last.
+      return (a.defeated === b.defeated) ? 0 : a.defeated ? 1 : -1
+    }
+
+    if (this.isGameFinished(game)) {
+      // Sort the undefeated players first.
+      let undefeatedLeaderboard = playerStats
+        .filter(x => !x.defeated)
+        .sort(sortPlayers);
+
+      // Sort the defeated players next.
+      let defeatedLeaderboard = playerStats
+        .filter(x => x.defeated)
+        .sort(sortPlayers);
+
+      // Join both sorted arrays together to produce the leaderboard.
+      let leaderboard = undefeatedLeaderboard.concat(defeatedLeaderboard)
+
+      return leaderboard
+    } else {
+      return playerStats.sort(sortPlayers)
+    }
   }
 
   isNormalAnonymity (game) {
@@ -987,8 +1007,7 @@ class GameHelper {
       'special_homeStar': 'Capital Stars',
       'special_anonymous': 'Anonymous',
       'special_kingOfTheHill': 'King Of The Hill',
-      'special_tinyGalaxy': 'Tiny Galaxy',
-      'flux_rt': 'Flux'
+      'special_tinyGalaxy': 'Tiny Galaxy'
     }[game.settings.general.type]
   }
 
