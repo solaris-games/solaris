@@ -49,7 +49,7 @@
       @onOpenPurchasePlayerBadgeRequested="onOpenPurchasePlayerBadgeRequested"/>
 
     <player-report 
-      v-if="player && !player.isOpenSlot && userPlayer && player != userPlayer"
+      v-if="isValidUser && player && !player.isOpenSlot && userPlayer && player != userPlayer"
       :playerId="player._id"
       @onOpenReportPlayerRequested="onOpenReportPlayerRequested"/>
 </div>

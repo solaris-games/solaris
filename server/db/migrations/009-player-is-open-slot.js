@@ -15,7 +15,8 @@ module.exports = {
         // Ensure that unfilled slots have their slots open.
         await games.updateMany({
             'state.endDate': { $eq: null },
-            'settings.general.type': { $ne: 'tutorial' }
+            'settings.general.type': { $ne: 'tutorial' },
+            'galaxy.players.isOpenSlot': { $eq: null }
         }, {
             $set: {
                 'galaxy.players.$[p].isOpenSlot': true
@@ -23,6 +24,7 @@ module.exports = {
         }, {
             arrayFilters: [
                 {
+                    'p.isOpenSlot': { $eq: null },
                     'p.userId': { $eq: null }
                 }
             ]
@@ -32,7 +34,8 @@ module.exports = {
         // Ensure that AFK players have their slots open.
         await games.updateMany({
             'state.endDate': { $eq: null },
-            'settings.general.type': { $ne: 'tutorial' }
+            'settings.general.type': { $ne: 'tutorial' },
+            'galaxy.players.isOpenSlot': { $eq: null }
         }, {
             $set: {
                 'galaxy.players.$[p].isOpenSlot': true
@@ -40,8 +43,8 @@ module.exports = {
         }, {
             arrayFilters: [
                 {
+                    'p.isOpenSlot': { $eq: null },
                     'p.userId': { $ne: null },
-                    'p.isOpenSlot': false,
                     'p.defeated': true,
                     'p.afk': true
                 }
