@@ -30,6 +30,7 @@ const schema = new Schema({
             researchingNext: { type: Types.String, required: true },
             credits: { type: Types.Number, required: true },
             creditsSpecialists: { type: Types.Number, required: true },
+            isOpenSlot: { type: Types.Boolean, required: false, default: false },
             defeated: { type: Types.Boolean, required: true },
             defeatedDate: { type: Types.Date, required: false, default: null },
             afk: { type: Types.Boolean, required: true },

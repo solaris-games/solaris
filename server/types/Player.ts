@@ -57,10 +57,10 @@ export interface PlayerDiplomaticState {
 export interface Player {
     _id: DBObjectId;
     userId: DBObjectId | null;
-    homeStarId: DBObjectId;
+    homeStarId: DBObjectId | null;
     alias: string;
     avatar: string | null;
-    notes?: string;
+    notes?: string | null;
     colour: {
         alias: string;
         value: string;
@@ -74,6 +74,7 @@ export interface Player {
     researchingNext: ResearchType;
     credits: number;
     creditsSpecialists: number;
+    isOpenSlot: boolean;
     defeated: boolean;
     defeatedDate: Date | null;
     afk: boolean;

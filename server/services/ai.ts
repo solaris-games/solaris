@@ -1,6 +1,6 @@
-import { Game } from "../types/Game";
-import { Player } from "../types/Player";
-import { KnownAttack } from "../types/Ai";
+import {Game} from "../types/Game";
+import {Player} from "../types/Player";
+import {KnownAttack} from "../types/Ai";
 import CarrierService from "./carrier";
 import CombatService from "./combat";
 import DistanceService from "./distance";
@@ -10,15 +10,15 @@ import StarService from "./star";
 import StarUpgradeService from "./starUpgrade";
 import TechnologyService from "./technology";
 import WaypointService from "./waypoint";
-import { Star } from "../types/Star";
-import { Carrier } from "../types/Carrier";
-import {getOrInsert, reverseSort, notNull, maxBy} from "../utils";
+import {Star} from "../types/Star";
+import {Carrier} from "../types/Carrier";
+import {getOrInsert, maxBy, minBy, notNull, reverseSort} from "../utils";
 import {CarrierWaypoint, CarrierWaypointActionType} from "../types/CarrierWaypoint";
 import ReputationService from "./reputation";
 import DiplomacyService from "./diplomacy";
 import PlayerStatisticsService from "./playerStatistics";
 import {DBObjectId} from "../types/DBObjectId";
-import { Location } from "../types/Location";
+import {Location} from "../types/Location";
 
 const Heap = require('qheap');
 const mongoose = require("mongoose");
@@ -96,6 +96,8 @@ interface Context {
     playerEconomy: number;
     playerIndustry: number;
     playerScience: number;
+    transitFromCarriers: Map<string, Carrier[]>,
+    arrivingAtCarriers: Map<string, Carrier[]>
 }
 
 interface Assignment {
@@ -265,12 +267,18 @@ export default class AIService {
         }
 
         const traversableStars = game.galaxy.stars.filter(star => !star.ownedByPlayerId || star.ownedByPlayerId.toString() === playerId);
-        const allReachableFromPlayerStars = this._computeStarGraph(game, player, playerStars, game.galaxy.stars, this._getHyperspaceRange(game, player));
-        const allCanReachPlayerStars = this._computeStarGraph(game, player, game.galaxy.stars, playerStars, this._getHyperspaceRange(game, player));
-        const freelyReachableFromPlayerStars = this._computeStarGraph(game, player, playerStars, traversableStars, this._getHyperspaceRange(game, player));
-        const reachablePlayerStars = this._computeStarGraph(game, player, playerStars, playerStars, this._getHyperspaceRange(game, player));
-        const freelyReachableStars = this._computeStarGraph(game, player, traversableStars, traversableStars, this._getHyperspaceRange(game, player));
-        const starsInGlobalRange = this._computeStarGraph(game, player, playerStars, game.galaxy.stars, this._getGlobalHighestHyperspaceRange(game));
+        // All stars (belonging to anyone) that can be reached directly from a player star
+        const allReachableFromPlayerStars = this._computeStarGraph(starsById, game, player, playerStars, game.galaxy.stars, this._getHyperspaceRangeExternal(game, player));
+        // All stars (belonging to anyone) that can reach a player star (with our players range)
+        const allCanReachPlayerStars = this._computeStarGraph(starsById, game, player, game.galaxy.stars, playerStars, this._getHyperspaceRangeExternal(game, player));
+        // All stars (unowned or owned by this player) that can be reached from player stars
+        const freelyReachableFromPlayerStars = this._computeStarGraph(starsById, game, player, playerStars, traversableStars, this._getHyperspaceRangeExternal(game, player));
+        // Player stars reachable from player stars
+        const reachablePlayerStars = this._computeStarGraph(starsById, game, player, playerStars, playerStars, this._getHyperspaceRangeInternal(game, player));
+        // All free stars that can be reached from other free stars
+        const freelyReachableStars = this._computeStarGraph(starsById, game, player, traversableStars, traversableStars, this._getHyperspaceRangeExternal(game, player));
+        // All stars that can be reached from player stars with globally highest range tech
+        const starsInGlobalRange = this._computeStarGraph(starsById, game, player, playerStars, game.galaxy.stars, this._getGlobalHighestHyperspaceRange(game));
 
         const borderStars = new Set<string>();
 
@@ -335,6 +343,24 @@ export default class AIService {
             simultaneousAttacks.push(incomingCarrier);
         }
 
+        const transitFromCarriers = new Map<string, Carrier[]>();
+        const arrivingAtCarriers = new Map<string, Carrier[]>();
+
+        for (const carrier of playerCarriers) {
+            if (carrier.waypoints.length !== 0) {
+                const fromId = carrier.waypoints[0].source.toString();
+
+                const fromCarriers = getOrInsert(transitFromCarriers, fromId, () => []);
+                fromCarriers.push(carrier);
+
+                if (carrier.waypoints.length === 1) {
+                    const toId = carrier.waypoints[0].destination.toString();
+                    const toCarriers = getOrInsert(arrivingAtCarriers, toId, () => []);
+                    toCarriers.push(carrier);
+                }
+            }
+        }
+
         return {
             playerStars,
             playerCarriers,
@@ -352,7 +378,9 @@ export default class AIService {
             attackedStarIds,
             playerEconomy: this.playerStatisticsService.calculateTotalEconomy(playerStars),
             playerIndustry: this.playerStatisticsService.calculateTotalIndustry(playerStars),
-            playerScience: this.playerStatisticsService.calculateTotalScience(playerStars)
+            playerScience: this.playerStatisticsService.calculateTotalScience(playerStars),
+            transitFromCarriers,
+            arrivingAtCarriers
         };
     }
 
@@ -415,7 +443,13 @@ export default class AIService {
                         shipsNeeded -= assignment.totalShips;
                     }
 
-                    await this._useAssignment(context, game, player, assignments, assignment, this._createWaypointsDropAndReturn(trace), shipsUsed, (carrier) => attackData.carriersOnTheWay.push(carrier._id.toString()));
+                    // We'll wait until the last possible moment to launch the defense to avoid wasting carriers
+                    const timeLeftUntilSchedule =  order.ticksUntil - this._calculateTraceDuration(context, game, trace);
+                    if (timeLeftUntilSchedule > 0) {
+                        assignments.delete(assignment.star._id.toString());
+                    } else {
+                        await this._useAssignment(context, game, player, assignments, assignment, this._createWaypointsDropAndReturn(trace), shipsUsed, (carrier) => attackData.carriersOnTheWay.push(carrier._id.toString()));
+                    }
                 }
             } else if (order.type === AiAction.InvadeStar) {
                 if (player.aiState && player.aiState.invasionsInProgress && player.aiState.invasionsInProgress.find(iv => order.star === iv.star)) {
@@ -431,7 +465,7 @@ export default class AIService {
                 }
 
                 for (const {assignment, trace} of fittingAssignments) {
-                    const ticksUntilArrival = this._calculateTraceDuration(game, trace.map(te => context.starsById.get(te.starId)!.location));
+                    const ticksUntilArrival = this._calculateTraceDuration(context, game, trace);
                     const requiredShips = Math.floor(this._calculateRequiredShipsForAttack(game, player, context, starToInvade, ticksUntilArrival) * INVASION_ATTACK_FACTOR);
 
                     if (assignment.totalShips >= requiredShips) {
@@ -473,7 +507,7 @@ export default class AIService {
                     continue;
                 }
 
-                const hasCarrier = assignment.carriers && assignment.carriers.length > 0;
+                const hasIdleCarrier = assignment.carriers && assignment.carriers.length > 0;
 
                 const reinforce = async () => {
                     const waypoints: CarrierWaypoint[] = [
@@ -498,17 +532,18 @@ export default class AIService {
                     await this._useAssignment(context, game, player, assignments, assignment, waypoints, assignment.totalShips);
                 }
 
-                if (hasCarrier) {
+                if (hasIdleCarrier) {
                     // Since a carrier is standing around, we might as well use it
                     await reinforce();
-                } else {
-                    // TODO: We want to be smarter about reinforcements. Maybe sort the orders by the number of ships involved?
-                    const source = context.starsById.get(order.source)!;
-                    const effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, source);
-                    const shipProductionPerTick = this.starService.calculateStarShipsByTicks(effectiveTechs.manufacturing, source.infrastructure.industry || 0, 1, game.settings.galaxy.productionTicks);
-                    const ticksProduced = assignment.totalShips / shipProductionPerTick;
-                    if (ticksProduced > (game.settings.galaxy.productionTicks * REINFORCEMENT_MIN_CYCLES) && this._canAffordCarrier(context, game, player, false)) {
-                        await reinforce();
+                } else if (this._canAffordCarrier(context, game, player, false)) {
+                    const routeCarrier = this._logisticRouteExists(context, order.source, order.star);
+
+                    // Only allow one carrier per route
+                    if (!routeCarrier) {
+                        const nextReturning = this._nextArrivingCarrierIn(context, game, order.source);
+                        if (!nextReturning)  {
+                            await reinforce();
+                        }
                     }
                 }
             }
@@ -527,6 +562,11 @@ export default class AIService {
         }
 
         player.aiState!.startedClaims = claimsInProgress;
+    }
+
+    _nextArrivingCarrierIn(context: Context, game: Game, starId: string): number | undefined {
+        const carriers = context.arrivingAtCarriers.get(starId);
+        return carriers && minBy(c => this.waypointService.calculateWaypointTicks(game, c, c.waypoints[0]), carriers)
     }
 
     async _useAssignment(context: Context, game: Game, player: Player, assignments: Map<string, Assignment>, assignment: Assignment, waypoints: CarrierWaypoint[], ships: number, onCarrierUsed: ((Carrier) => void) | null = null) {
@@ -598,6 +638,17 @@ export default class AIService {
         return waypoints;
     }
 
+    _logisticRouteExists(context: Context, fromStarId: string, toStarId: string): Carrier | undefined {
+        const movingFrom = context.transitFromCarriers.get(fromStarId) ?? [];
+        const hasCarrierOutbound = movingFrom.find((c) => c.waypoints[0].destination.toString() === toStarId);
+        if (hasCarrierOutbound) {
+            return hasCarrierOutbound;
+        }
+
+        const movingTo = context.arrivingAtCarriers.get(fromStarId) ?? [];
+        return movingTo.find((c) => c.waypoints[0].source.toString() === toStarId);
+    }
+
     _canAffordCarrier(context: Context, game: Game, player: Player, highPriority: boolean): boolean {
         // Keep 50% of budget for upgrades
         const leaveOver = highPriority ? 0 : context.playerEconomy * 5;
@@ -646,7 +697,7 @@ export default class AIService {
                     if (!visited.has(fittingCandidate)) {
                         visited.add(fittingCandidate);
 
-                        const distToNext = this.distanceService.getDistanceSquaredBetweenLocations(star.location, context.starsById.get(fittingCandidate)!.location);
+                        const distToNext = this._calculateTravelDistance(star, context.starsById.get(fittingCandidate)!)
                         const newTotalDist = totalDistance + distToNext;
 
                         queue.push({
@@ -666,19 +717,44 @@ export default class AIService {
         return allowCarrierPurchase || hasCarriers;
     }
 
-    _calculateTraceDuration(game: Game, trace: Location[]): number {
-        const distancePerTick = game.settings.specialGalaxy.carrierSpeed;
-        const entireDistance = this.distanceService.getDistanceAlongLocationList(trace);
+    _calculateTravelDistance(star1: Star, star2: Star): number {
+        if (this.starService.isStarPairWormHole(star1, star2)) {
+            return 0;
+        } else {
+            return this.distanceService.getDistanceBetweenLocations(star1.location, star2.location);
+        }
+    }
 
+    _calculateTraceDistance(context: Context, game: Game, trace: TracePoint[]): number {
+        if (trace.length < 2) {
+            return 0;
+        }
+
+        let last = trace[0];
+        let distance = 0;
+
+        for (let i = 1; i < trace.length; i++) {
+            const lastStar = context.starsById.get(last.starId)!;
+            const thisStar = context.starsById.get(trace[i].starId)!;
+
+            distance += this._calculateTravelDistance(lastStar, thisStar);
+
+            last = trace[i];
+        }
+
+        return distance;
+    }
+
+    _calculateTraceDuration(context: Context, game: Game, trace: TracePoint[]): number {
+        const distancePerTick = game.settings.specialGalaxy.carrierSpeed;
+        const entireDistance = this._calculateTraceDistance(context, game, trace);
         return Math.ceil(entireDistance / distancePerTick);
     }
 
     _findAssignmentsWithTickLimit(game: Game, player: Player, context: Context, starGraph: StarGraph, assignments: Map<string, Assignment>, destinationId: string, ticksLimit: number, allowCarrierPurchase: boolean, onlyOne = false, filterNext: ((trace: TracePoint[], nextStarId: string) => boolean) | null = null): FoundAssignment[] {
-        const distancePerTick = game.settings.specialGalaxy.carrierSpeed;
-
         const nextFilter = (trace: TracePoint[], nextStarId: string) => {
-            const entireTrace = trace.concat([{starId: nextStarId}]).map(te => context.starsById.get(te.starId)!.location);
-            const ticksRequired = this._calculateTraceDuration(game, entireTrace);
+            const entireTrace = trace.concat([{starId: nextStarId}]);
+            const ticksRequired = this._calculateTraceDuration(context, game, entireTrace);
             const withinLimit = ticksRequired <= ticksLimit;
 
             if (filterNext) {
@@ -758,7 +834,10 @@ export default class AIService {
         }
 
         const defenseCarriersAtStar = context.carriersOrbiting.get(defendingStar._id.toString()) || [];
-        const defenseCarriersOnTheWay = (attackData && attackData.carriersOnTheWay.map(carrierId => context.carriersById.get(carrierId.toString())!));
+        let defenseCarriersOnTheWay: Carrier[] = [];
+        if (attackData) {
+            defenseCarriersOnTheWay = attackData.carriersOnTheWay.map(carrierId => context.carriersById.get(carrierId.toString())!);
+        }
         const defenseCarriers = defenseCarriersAtStar.concat(defenseCarriersOnTheWay);
         const result = this.combatService.calculateStar(game, defendingStar, [player], attackers, defenseCarriers, attackingCarriers, true);
 
@@ -1021,20 +1100,24 @@ export default class AIService {
         return this.distanceService.getHyperspaceDistance(game, highestLevel);
     }
 
-    _getHyperspaceRange(game: Game, player: Player): number {
+    _getHyperspaceRangeExternal(game: Game, player: Player): number {
+        const scanningRange = this.distanceService.getScanningDistance(game, player.research.scanning.level);
+        const hyperspaceRange = this.distanceService.getHyperspaceDistance(game, player.research.hyperspace.level);
+        return Math.min(scanningRange, hyperspaceRange);
+    }
+
+    _getHyperspaceRangeInternal(game: Game, player: Player): number {
         return this.distanceService.getHyperspaceDistance(game, player.research.hyperspace.level);
     }
 
-    _computeStarGraph(game: Game, player: Player, traverseStars: Star[], reachStars: Star[], hyperspaceRange: number): StarGraph {
-        const hyperspaceRangeSquared = hyperspaceRange * hyperspaceRange;
-
+    _computeStarGraph(starsById: Map<string, Star>, game: Game, player: Player, traverseStars: Star[], reachStars: Star[], hyperspaceRange: number): StarGraph {
         const starGraph = new Map<string, Set<string>>();
 
-        traverseStars.forEach(star=> {
+        traverseStars.forEach(star => {
             const reachableFromPlayerStars = new Set<string>();
 
             reachStars.forEach(otherStar => {
-                if (star._id !== otherStar._id && this.distanceService.getDistanceSquaredBetweenLocations(star.location, otherStar.location) <= hyperspaceRangeSquared) {
+                if (star._id !== otherStar._id && this._calculateTravelDistance(star, otherStar) <= hyperspaceRange) {
                     reachableFromPlayerStars.add(otherStar._id.toString());
                 }
             });
@@ -1080,5 +1163,9 @@ export default class AIService {
 
     getStarName(context: Context, starId: string) {
         return context.starsById.get(starId)!.name;
+    }
+
+    cleanupState(player: Player) {
+        player.aiState = null;
     }
 };

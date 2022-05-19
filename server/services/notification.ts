@@ -304,7 +304,11 @@ export default class NotificationService {
 
         await this._trySendNotifications(args.gameId, playerIdsToCheck, 'discord', 'conversationMessageSent',
             async (game: Game, user: User) => {
-                const template = this._generateBaseDiscordMessageTemplate(game, 'New Message Received', args.sentMessageResult.message);
+                // Note: We have fancy mentions on the UI so we need to account for that here.
+                // Surround any mentions with square brackets.
+                const formattedMessage = args.sentMessageResult.message.replace(/{{(\w)\/(\w+?)\/(.+?)}}/g, (match, type, id, name) => `{${name}}`);
+
+                const template = this._generateBaseDiscordMessageTemplate(game, 'New Message Received', formattedMessage);
 
                 template.author.name = args.sentMessageResult.fromPlayerAlias;
 

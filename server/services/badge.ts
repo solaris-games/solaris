@@ -89,7 +89,7 @@ export default class BadgeService extends EventEmitter {
         }
 
         // Check if the buyer can afford the badge.
-        const creditsOwned = await this.userService.getUserCredits(purchasedByUserId);
+        const creditsOwned = await this.userService.getCredits(purchasedByUserId);
 
         if (!creditsOwned || creditsOwned < badge.price) {
             throw new ValidationError(`You cannot afford to purchase this badge.`);

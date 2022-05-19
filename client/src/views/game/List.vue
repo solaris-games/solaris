@@ -264,12 +264,12 @@
                   <tr v-for="game in inProgressGames" v-bind:key="game._id">
                       <td>
                         <router-link :to="{ path: '/game/detail', query: { id: game._id } }">{{game.settings.general.name}}</router-link>
-                        <br v-if="game.state.afkSlots"/>
-                        <span class="badge badge-warning" v-if="game.state.afkSlots">{{game.state.afkSlots}} Open Slot<span v-if="game.state.afkSlots > 1">s</span></span>
+                        <br v-if="game.state.openSlots"/>
+                        <span class="badge badge-warning" v-if="game.state.openSlots">{{game.state.openSlots}} Open Slot<span v-if="game.state.openSlots > 1">s</span></span>
                         <br/>
                         <small>{{getGameTypeFriendlyText(game)}}</small>
                       </td>
-                      <td class="d-none d-md-table-cell text-center" :class="{'text-warning':game.state.afkSlots}">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
+                      <td class="d-none d-md-table-cell text-center" :class="{'text-warning':game.state.openSlots}">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
                       <td class="d-none d-sm-table-cell text-center">{{game.state.productionTick}}</td>
                       <td>
                           <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-success float-right">

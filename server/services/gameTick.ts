@@ -718,7 +718,8 @@ export default class GameTickService extends EventEmitter {
                         gameId: game._id,
                         gameTick: game.state.tick,
                         playerId: player._id,
-                        playerAlias: player.alias
+                        playerAlias: player.alias,
+                        openSlot: false
                     };
                     
                     this.emit('onPlayerDefeated', e);
@@ -736,6 +737,12 @@ export default class GameTickService extends EventEmitter {
 
         if (winner) {
             this.gameStateService.finishGame(game, winner);
+
+            for (const player of game.galaxy.players) {
+                if (this.aiService.isAIControlled(player)) {
+                    this.aiService.cleanupState(player);
+                }
+            }
 
             if (!isTutorialGame) {
                 let rankingResult: GameRankingResult | null = null;

@@ -1,0 +1,83 @@
+import ValidationError from "../../errors/validation";
+import { DBObjectId } from "../../types/DBObjectId";
+import { keyHasBooleanValue, keyHasNumberValue, keyHasStringValue } from "./helpers";
+
+export interface GameCreateGameRequest {
+    // TODO
+};
+
+export interface GameJoinGameRequest {
+    playerId: DBObjectId;
+    alias: string;
+    avatar: number;
+    password: string;
+};
+
+export const mapToGameJoinGameRequest = (body: any): GameJoinGameRequest => {
+    let errors: string[] = [];
+
+    if (!keyHasStringValue(body, 'playerId')) {
+        errors.push('Player ID is required.');
+    }
+
+    if (!keyHasStringValue(body, 'alias')) {
+        errors.push('Alias is required.');
+    }
+
+    if (!keyHasNumberValue(body, 'avatar')) {
+        errors.push('Avatar is required.');
+    }
+
+    // TODO: Password?
+
+    if (errors.length) {
+        throw new ValidationError(errors);
+    }
+    
+    return {
+        playerId: body.playerId,
+        alias: body.alias,
+        avatar: body.avatar,
+        password: body.password
+    }
+};
+
+export interface GameSaveNotesRequest {
+    notes: string;
+};
+
+export const mapToGameSaveNotesRequest = (body: any): GameSaveNotesRequest => {
+    let errors: string[] = [];
+
+    if (!keyHasStringValue(body, 'notes')) {
+        errors.push('Notes is required.');
+    }
+
+    if (errors.length) {
+        throw new ValidationError(errors);
+    }
+
+    return {
+        notes: body.notes
+    }
+};
+
+export interface GameConcedeDefeatRequest {
+    openSlot: boolean;
+}
+
+export const mapToGameConcedeDefeatRequest = (body: any): GameConcedeDefeatRequest => {
+    let errors: string[] = [];
+
+    if (!keyHasBooleanValue(body, 'openSlot')) {
+        errors.push('Open Slot is required.');
+    }
+
+    if (errors.length) {
+        throw new ValidationError(errors);
+    }
+
+    return {
+        openSlot: body.openSlot
+    }
+}

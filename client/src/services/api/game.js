@@ -68,8 +68,8 @@ class GameService extends BaseApiService {
       { withCredentials: true })
   }
 
-  listUserGames () {
-    return axios.get(this.BASE_URL + 'game/list/user',
+  listCustomGames () {
+    return axios.get(this.BASE_URL + 'game/list/custom',
       { withCredentials: true })
   }
 
@@ -105,9 +105,11 @@ class GameService extends BaseApiService {
       { withCredentials: true })
   }
 
-  concedeDefeat (gameId) {
-    return axios.put(this.BASE_URL + 'game/' + gameId + '/concedeDefeat', null,
-      { withCredentials: true })
+  concedeDefeat (gameId, openSlot) {
+    return axios.put(this.BASE_URL + 'game/' + gameId + '/concedeDefeat', {
+      openSlot
+    },
+    { withCredentials: true })
   }
 
   delete (gameId) {

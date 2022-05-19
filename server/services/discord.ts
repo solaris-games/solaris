@@ -32,15 +32,21 @@ export default class DiscordService {
         return this.client != null;
     }
 
+    async isServerMember(discordUserId: string) {
+        let guild = await this.client.guilds.fetch(this.config.discord.serverId);
+        let guildMember = await guild.members.resolveID(discordUserId);
+
+        return guildMember != null;
+    }
+
     async updateOAuth(userId, discordUserId, oauth) {
         if (!this.isConnected()) {
             throw new Error(`The Discord integration is not enabled.`);
         }
 
-        let guild = await this.client.guilds.fetch(this.config.discord.serverId);
-        let guildMember = await guild.members.resolveID(discordUserId);
+        const isServerMember = await this.isServerMember(discordUserId);
 
-        if (!guildMember) {
+        if (!isServerMember) {
             throw new ValidationError(`You must be a member of the official Solaris discord server to continue. Please join the server and try again.`);
         }
 
@@ -80,6 +86,14 @@ export default class DiscordService {
         const duser = await this.client.users.fetch(discordUserId);
 
         if (!duser) {
+            return;
+        }
+
+        // We need to double check that the user is a member of the Solaris discord server
+        // because if they are not, then we cannot send a PM to them.
+        const isServerMember = await this.isServerMember(discordUserId);
+
+        if (!isServerMember) {
             return;
         }
 

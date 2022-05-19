@@ -78,14 +78,6 @@ export default class GameService extends EventEmitter {
         return await this.gameRepo.findByIdAsModel(id, select);
     }
 
-    async getByNameSettingsLean(name: string) {
-        return await this.gameRepo.find({
-            'settings.general.name': name
-        }, {
-            'settings': 1
-        });
-    }
-
     async getByNameStateSettingsLean(name: string) {
         return await this.gameRepo.find({
             'settings.general.name': name
@@ -103,15 +95,6 @@ export default class GameService extends EventEmitter {
 
     async getByIdLean(id: DBObjectId, select): Promise<Game | null> {
         return await this.gameRepo.findById(id, select);
-    }
-
-    async getByIdGalaxy(id: DBObjectId) {
-        return await this.getById(id, {
-            settings: 1,
-            state: 1,
-            galaxy: 1,
-            constants: 1,
-        });
     }
 
     async getByIdGalaxyLean(id: DBObjectId): Promise<Game | null> {
@@ -143,94 +126,17 @@ export default class GameService extends EventEmitter {
         return game?.settings;
     }
 
-    async getGameState(id: DBObjectId) {
-        let game = await this.getByIdLean(id, {
-            'state': 1
-        });
-
-        return game?.state;
-    }
-
-    async getByIdInfo(id: DBObjectId, userId: DBObjectId) {
-        let game = await this.getByIdLean(id, {
-            settings: 1,
-            state: 1,
-            constants: 1
-        });
-
-        if (!game) {
-            return null;
-        }
-
-        if (game.settings.general.createdByUserId) {
-            game.settings.general.isGameAdmin = game.settings.general.createdByUserId.toString() === userId.toString();
-        } else {
-            game.settings.general.isGameAdmin = false;
-        }
-
-        return game;
-    }
-
-    async getByIdState(id: DBObjectId, userId: DBObjectId) {
-        let game = await this.getByIdLean(id, {
-            state: 1
-        });
-
-        return game;
-    }
-
-    async getByIdMessages(id: DBObjectId) {
-        return await this.getById(id, {
-            settings: 1,
-            state: 1,
-            messages: 1,
-            'galaxy.players': 1
-        });
-    }
-
-    async getByIdMessagesLean(id: DBObjectId) {
-        return await this.getByIdLean(id, {
-            settings: 1,
-            state: 1,
-            messages: 1,
-            'galaxy.players': 1
-        });
-    }
-
-    async getByIdConversations(id: DBObjectId) {
-        return await this.getById(id, {
-            state: 1,
-            conversations: 1,
-            'galaxy.players': 1
-        });
-    }
-
-    async getByIdConversationsLean(id: DBObjectId) {
-        return await this.getByIdLean(id, {
-            state: 1,
-            conversations: 1,
-            'galaxy.players': 1
-        });
-    }
-
-    async getByIdDiplomacyLean(id: DBObjectId) {
-        return await this.getByIdLean(id, {
-            'galaxy.players._id': 1,
-            'galaxy.players.userId': 1,
-            'galaxy.players.diplomacy': 1
-        });
-    }
-
     async join(game: Game, userId: DBObjectId, playerId: DBObjectId, alias: string, avatar: number, password: string) {
         // The player cannot join the game if:
         // 1. The game has finished.
-        // 2. They quit the game before the game started.
-        // 3. They are already playing the game as an undefeated non-afk player.
-        // 4. They are trying to play in a different slot if they have been afk'd.
-        // 5. The password entered is invalid.
-        // 6. The player does not own any stars.
-        // 7. The alias is already taken.
-        // 8. The alias (username) is already taken.
+        // 2. They quit the game before the game started or they conceded defeat.
+        // 3. They are already playing in the game.
+        // 4. They are trying to join a slot that isn't open.
+        // 5. They are trying to play in a different slot if they have been afk'd.
+        // 6. The password entered is invalid.
+        // 7. The player does not own any stars.
+        // 8. The alias is already taken.
+        // 9. The alias (username) is already taken.
 
         // Only allow join if the game hasn't finished.
         if (game.state.endDate) {
@@ -264,7 +170,7 @@ export default class GameService extends EventEmitter {
             throw new ValidationError(`You have not purchased the selected avatar.`);
         }
 
-        // The user cannot rejoin if they quit early.
+        // The user cannot rejoin if they quit early or conceded defeat.
         let isQuitter = game.quitters.find(x => x.toString() === userId.toString());
 
         if (isQuitter) {
@@ -286,6 +192,10 @@ export default class GameService extends EventEmitter {
             throw new ValidationError('The player is not participating in this game.');
         }
 
+        if (!player.isOpenSlot) {
+            throw new ValidationError(`The player slot is not open to be filled.`);
+        }
+
         // If the user was an afk-er then they are only allowed to join
         // their slot.
         let isAfker = game.afkers.find(x => x.toString() === userId.toString());
@@ -300,12 +210,6 @@ export default class GameService extends EventEmitter {
 
         if (!stars.length) {
             throw new ValidationError('Cannot fill this slot, the player does not own any stars.');
-        }
-
-        // Only allow if the player isn't already occupied and is afk
-        // We want to allow players to join in-progress games to fill afk slots.
-        if (player && player.userId && !player.afk) {
-            throw new ValidationError('This player spot has already been taken by another user.');
         }
 
         let aliasCheckPlayer = game.galaxy.players.find(x => x.userId && x.alias.toLowerCase() === alias.toLowerCase());
@@ -353,6 +257,10 @@ export default class GameService extends EventEmitter {
     }
 
     assignPlayerToUser(game: Game, player: Player, userId: DBObjectId | null, alias: string, avatar: number) {
+        if (!player.isOpenSlot) {
+            throw new ValidationError(`The player slot is not open to be filled`);
+        }
+        
         let isAfker = userId && game.afkers.find(x => x.toString() === userId.toString()) != null;
         let isFillingAfkSlot = this.gameStateService.isInProgress(game) && player.afk;
         let isRejoiningOwnAfkSlot = isFillingAfkSlot && isAfker && (userId && player.userId && player.userId.toString() === userId.toString());
@@ -366,6 +274,7 @@ export default class GameService extends EventEmitter {
         // Reset the defeated and afk status as the user may be filling
         // an afk slot.
         player.hasFilledAfkSlot = hasFilledOtherPlayerAfkSlot;
+        player.isOpenSlot = false;
         player.defeated = false;
         player.defeatedDate = null;
         player.afk = false;
@@ -460,7 +369,7 @@ export default class GameService extends EventEmitter {
         return player;
     }
 
-    async concedeDefeat(game: Game, player: Player) {
+    async concedeDefeat(game: Game, player: Player, openSlot: boolean) {
         if (player.defeated) {
             throw new ValidationError('The player has already been defeated.');
         }
@@ -478,7 +387,9 @@ export default class GameService extends EventEmitter {
             return this.delete(game);
         }
 
-        this.playerService.setPlayerAsDefeated(game, player);
+        game.quitters.push(player.userId!); // We need to track this to ensure that they don't try to rejoin in another open slot.
+
+        this.playerService.setPlayerAsDefeated(game, player, openSlot);
 
         game.state.players--; // Deduct number of active players from the game.
 
@@ -502,7 +413,8 @@ export default class GameService extends EventEmitter {
             gameId: game._id,
             gameTick: game.state.tick,
             playerId: player._id,
-            playerAlias: player.alias
+            playerAlias: player.alias,
+            openSlot
         };
 
         this.emit('onPlayerDefeated', e);
@@ -598,7 +510,7 @@ export default class GameService extends EventEmitter {
         return undefeatedPlayers.filter(x => x.readyToQuit).length === undefeatedPlayers.length;
     }
 
-    async forceAllUndefeatedPlayersReadyToQuit(game: Game) {
+    async forceEndGame(game: Game) {
         let undefeatedPlayers = this.listAllUndefeatedPlayers(game);
 
         for (let player of undefeatedPlayers) {
@@ -626,7 +538,7 @@ export default class GameService extends EventEmitter {
             let player = this.playerService.getByUserId(game, userId)!;
 
             if (this.gameStateService.isInProgress(game)) {
-                await this.concedeDefeat(game, player);
+                await this.concedeDefeat(game, player, false);
             }
             else {
                 await this.quit(game, player);

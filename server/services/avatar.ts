@@ -44,7 +44,7 @@ export default class AvatarService {
     }
 
     async purchaseAvatar(userId: DBObjectId, avatarId: number) {
-        let userCredits = await this.userService.getUserCredits(userId);
+        let userCredits = await this.userService.getCredits(userId);
         let avatar = await this.getUserAvatar(userId, avatarId);
 
         if (avatar.purchased) {

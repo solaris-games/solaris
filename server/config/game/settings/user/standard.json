@@ -11,7 +11,7 @@
        "playerOnlineStatus":"hidden",
        "timeMachine":"disabled",
        "fluxEnabled": "enabled",
-       "advancedAI": "disabled"
+       "advancedAI": "enabled"
     },
     "galaxy":{
        "galaxyType":"irregular",
