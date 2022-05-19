@@ -521,7 +521,7 @@ export default class PlayerService extends EventEmitter {
                 let carriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id); // Note: This logic looks a bit weird, but its more performant.
 
                 if (carriers.length === 0) {
-                    this.setPlayerAsDefeated(game, player);
+                    this.setPlayerAsDefeated(game, player, false);
                 }
             }
         }
@@ -568,8 +568,8 @@ export default class PlayerService extends EventEmitter {
         return lastSeenMoreThanXSecondsAgo;
     }
 
-    setPlayerAsDefeated(game: Game, player: Player) {
-        player.isOpenSlot = false; // TODO: This needs to be extended to allow slots to be opened.
+    setPlayerAsDefeated(game: Game, player: Player, openSlot: boolean) {
+        player.isOpenSlot = openSlot;
         player.defeated = true;
         player.defeatedDate = moment().utc();
 
@@ -592,7 +592,7 @@ export default class PlayerService extends EventEmitter {
     }
 
     setPlayerAsAfk(game: Game, player: Player) {
-        this.setPlayerAsDefeated(game, player);
+        this.setPlayerAsDefeated(game, player, true);
 
         player.isOpenSlot = true; // AFK players will always have their slots open.
         player.afk = true;

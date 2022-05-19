@@ -369,7 +369,7 @@ export default class GameService extends EventEmitter {
         return player;
     }
 
-    async concedeDefeat(game: Game, player: Player) {
+    async concedeDefeat(game: Game, player: Player, openSlot: boolean) {
         if (player.defeated) {
             throw new ValidationError('The player has already been defeated.');
         }
@@ -389,7 +389,7 @@ export default class GameService extends EventEmitter {
 
         game.quitters.push(player.userId!); // We need to track this to ensure that they don't try to rejoin in another open slot.
 
-        this.playerService.setPlayerAsDefeated(game, player);
+        this.playerService.setPlayerAsDefeated(game, player, openSlot);
 
         game.state.players--; // Deduct number of active players from the game.
 
@@ -413,7 +413,8 @@ export default class GameService extends EventEmitter {
             gameId: game._id,
             gameTick: game.state.tick,
             playerId: player._id,
-            playerAlias: player.alias
+            playerAlias: player.alias,
+            openSlot
         };
 
         this.emit('onPlayerDefeated', e);
@@ -537,7 +538,7 @@ export default class GameService extends EventEmitter {
             let player = this.playerService.getByUserId(game, userId)!;
 
             if (this.gameStateService.isInProgress(game)) {
-                await this.concedeDefeat(game, player);
+                await this.concedeDefeat(game, player, false);
             }
             else {
                 await this.quit(game, player);

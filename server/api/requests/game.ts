@@ -1,6 +1,6 @@
 import ValidationError from "../../errors/validation";
 import { DBObjectId } from "../../types/DBObjectId";
-import { keyHasNumberValue, keyHasStringValue } from "./helpers";
+import { keyHasBooleanValue, keyHasNumberValue, keyHasStringValue } from "./helpers";
 
 export interface GameCreateGameRequest {
     // TODO
@@ -61,3 +61,23 @@ export const mapToGameSaveNotesRequest = (body: any): GameSaveNotesRequest => {
         notes: body.notes
     }
 };
+
+export interface GameConcedeDefeatRequest {
+    openSlot: boolean;
+}
+
+export const mapToGameConcedeDefeatRequest = (body: any): GameConcedeDefeatRequest => {
+    let errors: string[] = [];
+
+    if (!keyHasBooleanValue(body, 'openSlot')) {
+        errors.push('Open Slot is required.');
+    }
+
+    if (errors.length) {
+        throw new ValidationError(errors);
+    }
+
+    return {
+        openSlot: body.openSlot
+    }
+}
