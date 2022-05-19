@@ -212,16 +212,18 @@ describe('technology', () => {
         };
 
         const star = {
-            specialist: {
-                modifiers: {
-                    special: {
-                        defenderBonus: 1
-                    }
+            specialistId: 1
+        };
+
+        const specialist = {
+            modifiers: {
+                special: {
+                    defenderBonus: 1
                 }
             }
         };
 
-        setup();
+        setup(specialist);
 
         const bonus = service.getDefenderBonus(game, star);
 
@@ -238,16 +240,18 @@ describe('technology', () => {
         };
 
         const star = {
-            specialist: {
-                modifiers: {
-                    special: {
-                        defenderBonus: 1
-                    }
+            specialistId: 1
+        };
+
+        const specialist = {
+            modifiers: {
+                special: {
+                    defenderBonus: 1
                 }
             }
         };
 
-        setup();
+        setup(specialist);
 
         const bonus = service.getDefenderBonus(game, star);
 
