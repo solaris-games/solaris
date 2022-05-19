@@ -260,7 +260,7 @@ export default class UserService extends EventEmitter {
         return user != null;
     }
 
-    async updateEmailPreference(id: DBObjectId, preference: string) {
+    async updateEmailPreference(id: DBObjectId, preference: boolean) {
         await this.userRepo.updateOne({
             _id: id
         }, {
@@ -471,7 +471,7 @@ export default class UserService extends EventEmitter {
         }, select);
     }
 
-    async getUserCredits(userId: DBObjectId) {
+    async getCredits(userId: DBObjectId) {
         let userCredits = await this.userRepo.findById(userId, {
             credits: 1
         });

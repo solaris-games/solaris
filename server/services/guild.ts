@@ -194,7 +194,7 @@ export default class GuildService {
             throw new ValidationError(`Cannot create a guild if you are already a member in another guild.`);
         }
 
-        let userCredits = await this.userService.getUserCredits(userId);
+        let userCredits = await this.userService.getCredits(userId);
 
         if (userCredits < this.CREATE_GUILD_CREDITS_COST) {
             throw new ValidationError(`You do not have enough credits to found a guild. The cost is ${this.CREATE_GUILD_CREDITS_COST} credits, you have ${userCredits}.`);
@@ -257,7 +257,7 @@ export default class GuildService {
             throw new ValidationError('Only guild leaders can rename their guild.');
         }
 
-        let userCredits = await this.userService.getUserCredits(userId);
+        let userCredits = await this.userService.getCredits(userId);
 
         if (userCredits < this.RENAME_GUILD_CREDITS_COST) {
             throw new ValidationError(`You do not have enough credits to rename your guild. The cost is ${this.RENAME_GUILD_CREDITS_COST} credits, you have ${userCredits}.`);

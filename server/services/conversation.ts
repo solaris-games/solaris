@@ -82,7 +82,6 @@ export default class ConversationService extends EventEmitter {
     async create(game: Game, playerId: DBObjectId, name: string, participantIds: DBObjectId[]): Promise<Conversation> {
         let newConvo = getNewConversation(game, playerId, name, participantIds);
 
-
         // Create the convo.
         await this.gameRepo.updateOne({
             _id: game._id

@@ -68,8 +68,8 @@ class GameService extends BaseApiService {
       { withCredentials: true })
   }
 
-  listUserGames () {
-    return axios.get(this.BASE_URL + 'game/list/user',
+  listCustomGames () {
+    return axios.get(this.BASE_URL + 'game/list/custom',
       { withCredentials: true })
   }
 
