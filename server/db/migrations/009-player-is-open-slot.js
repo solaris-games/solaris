@@ -4,6 +4,7 @@ module.exports = {
 
         // Completed games
         await games.updateMany({
+            'state.endDate': { $ne: null },
             'galaxy.players.isOpenSlot': { $eq: null }
         }, {
             $set: {
