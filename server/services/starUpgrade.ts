@@ -1,13 +1,13 @@
-import {Carrier} from "../types/Carrier";
+import {Carrier} from "./types/Carrier";
 
 const EventEmitter = require('events');
-import { DBObjectId } from '../types/DBObjectId';
+import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
-import DatabaseRepository from '../models/DatabaseRepository';
-import { BulkUpgradeReport, InfrastructureUpgradeCosts, InfrastructureUpgradeReport } from '../types/InfrastructureUpgrade';
-import { Game, GameInfrastructureExpenseMultiplier } from '../types/Game';
-import { Player } from '../types/Player';
-import { InfrastructureType, NaturalResources, Star, TerraformedResources } from '../types/Star';
+import Repository from './repository';
+import { BulkUpgradeReport, InfrastructureUpgradeCosts, InfrastructureUpgradeReport } from './types/InfrastructureUpgrade';
+import { Game, GameInfrastructureExpenseMultiplier } from './types/Game';
+import { Player } from './types/Player';
+import { InfrastructureType, NaturalResources, Star, TerraformedResources } from './types/Star';
 import AchievementService from './achievement';
 import CarrierService from './carrier';
 import GameTypeService from './gameType';
@@ -18,7 +18,7 @@ import PlayerCreditsService from './playerCredits';
 const Heap = require('qheap');
 
 export default class StarUpgradeService extends EventEmitter {
-    gameRepo: DatabaseRepository<Game>;
+    gameRepo: Repository<Game>;
     starService: StarService;
     carrierService: CarrierService;
     achievementService: AchievementService;
@@ -28,7 +28,7 @@ export default class StarUpgradeService extends EventEmitter {
     gameTypeService: GameTypeService;
 
     constructor(
-        gameRepo: DatabaseRepository<Game>,
+        gameRepo: Repository<Game>,
         starService: StarService,
         carrierService: CarrierService,
         achievementService: AchievementService,

@@ -1,9 +1,9 @@
-import { DBObjectId } from "../types/DBObjectId";
-import DatabaseRepository from "../models/DatabaseRepository";
-import { Payment } from "../types/Payment";
+import { DBObjectId } from "./types/DBObjectId";
+import Repository from "./repository";
+import { Payment } from "./types/Payment";
 import CacheService from "./cache";
 import UserService from "./user";
-import { Config } from "../types/Config";
+import { Config } from "../config/types/Config";
 
 const axios = require('axios');
 
@@ -13,7 +13,7 @@ const CACHE_KEY_TOKEN = 'paypalToken';
 export default class PaypalService {
     PaymentModel: any;
     config: Config;
-    paymentRepo: DatabaseRepository<Payment>;
+    paymentRepo: Repository<Payment>;
     userService: UserService;
     cacheService: CacheService;
 
@@ -35,7 +35,7 @@ export default class PaypalService {
     constructor (
         PaymentModel,
         config: Config,
-        paymentRepo: DatabaseRepository<Payment>,
+        paymentRepo: Repository<Payment>,
         userService: UserService,
         cacheService: CacheService
     ) {

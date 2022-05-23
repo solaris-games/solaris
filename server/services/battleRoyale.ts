@@ -1,5 +1,5 @@
-import { Game } from "../types/Game";
-import { Star } from "../types/Star";
+import { Game } from "./types/Game";
+import { Star } from "./types/Star";
 import CarrierService from "./carrier";
 import CarrierMovementService from "./carrierMovement";
 import MapService from "./map";

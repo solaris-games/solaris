@@ -1,19 +1,18 @@
-import { ObjectId } from "mongoose";
-import DatabaseRepository from "../models/DatabaseRepository";
-import { Game } from "../types/Game";
-import { User } from "../types/User";
+import Repository from "./repository";
+import { Game } from "./types/Game";
+import { User } from "./types/User";
 import UserService from "./user";
 
 const EloRating = require('elo-rating');
 
 export default class RatingService {
-    userRepo: DatabaseRepository<User>;
-    gameRepo: DatabaseRepository<Game>;
+    userRepo: Repository<User>;
+    gameRepo: Repository<Game>;
     userService: UserService;
 
     constructor(
-        userRepo: DatabaseRepository<User>,
-        gameRepo: DatabaseRepository<Game>,
+        userRepo: Repository<User>,
+        gameRepo: Repository<Game>,
         userService: UserService
     ) {
         this.userRepo = userRepo;

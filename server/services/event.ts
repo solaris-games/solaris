@@ -1,14 +1,13 @@
-import { DBObjectId } from "../types/DBObjectId";
-import DatabaseRepository from "../models/DatabaseRepository";
-import { BulkUpgradeReport } from "../types/InfrastructureUpgrade";
-import { Carrier } from "../types/Carrier";
-import { CombatResult } from "../types/Combat";
-import { Conversation } from "../types/Conversation";
-import { Game } from "../types/Game";
-import { Player } from "../types/Player";
-import { GameRankingResult } from "../types/Rating";
-import { Specialist } from "../types/Specialist";
-import { Star, StarCaptureResult } from "../types/Star";
+import { DBObjectId } from "./types/DBObjectId";
+import Repository from "./repository";
+import { BulkUpgradeReport } from "./types/InfrastructureUpgrade";
+import { Carrier } from "./types/Carrier";
+import { CombatResult } from "./types/Combat";
+import { Conversation } from "./types/Conversation";
+import { Game } from "./types/Game";
+import { Player } from "./types/Player";
+import { Specialist } from "./types/Specialist";
+import { Star, StarCaptureResult } from "./types/Star";
 import BadgeService from "./badge";
 import BroadcastService from "./broadcast";
 import CombatService from "./combat";
@@ -21,20 +20,20 @@ import SpecialistService from "./specialist";
 import StarService from "./star";
 import StarUpgradeService from "./starUpgrade";
 import TradeService from "./trade";
-import { GameEvent } from "../types/GameEvent";
+import { GameEvent } from "./types/GameEvent";
 import DiplomacyService from "./diplomacy";
-import { DiplomaticStatus } from "../types/Diplomacy";
+import { DiplomaticStatus } from "./types/Diplomacy";
 import CarrierGiftService from "./carrierGift";
-import PlayerGalacticCycleCompletedEvent from '../types/events/playerGalacticCycleComplete';
-import GamePlayerJoinedEvent from "../types/events/gamePlayerJoined";
-import GamePlayerQuitEvent from "../types/events/gamePlayerQuit";
-import GamePlayerDefeatedEvent from "../types/events/gamePlayerDefeated";
-import GamePlayerAFKEvent from "../types/events/gamePlayerAFK";
-import { BaseGameEvent } from "../types/events/baseGameEvent";
-import GameEndedEvent from "../types/events/gameEnded";
-import GamePlayerBadgePurchasedEvent from "../types/events/gamePlayerBadgePurchased";
-import GameDiplomacyPeaceDeclaredEvent from "../types/events/gameDiplomacyPeaceDeclared";
-import GameDiplomacyWarDeclaredEvent from "../types/events/gameDiplomacyWarDeclared";
+import PlayerGalacticCycleCompletedEvent from './types/events/PlayerGalacticCycleComplete';
+import GamePlayerJoinedEvent from "./types/events/GamePlayerJoined";
+import GamePlayerQuitEvent from "./types/events/GamePlayerQuit";
+import GamePlayerDefeatedEvent from "./types/events/GamePlayerDefeated";
+import GamePlayerAFKEvent from "./types/events/GamePlayerAFK";
+import { BaseGameEvent } from "./types/events/BaseGameEvent";
+import GameEndedEvent from "./types/events/GameEnded";
+import GamePlayerBadgePurchasedEvent from "./types/events/GamePlayerBadgePurchased";
+import GameDiplomacyPeaceDeclaredEvent from "./types/events/GameDiplomacyPeaceDeclared";
+import GameDiplomacyWarDeclaredEvent from "./types/events/GameDiplomacyWarDeclared";
 
 const moment = require('moment');
 
@@ -51,7 +50,7 @@ export default class EventService {
         GAME_DIPLOMACY_PEACE_DECLARED: 'gameDiplomacyPeaceDeclared',
         GAME_DIPLOMACY_WAR_DECLARED: 'gameDiplomacyWarDeclared',
 
-        // TODO: Need event types for the ones below, see ../types/events directory
+        // TODO: Need event types for the ones below, see ./types/events directory
         PLAYER_GALACTIC_CYCLE_COMPLETE: 'playerGalacticCycleComplete',
         PLAYER_COMBAT_STAR: 'playerCombatStar',
         PLAYER_COMBAT_CARRIER: 'playerCombatCarrier',
@@ -81,7 +80,7 @@ export default class EventService {
     }
     
     eventModel;
-    eventRepo: DatabaseRepository<GameEvent>;
+    eventRepo: Repository<GameEvent>;
     broadcastService: BroadcastService;
     gameService: GameService;
     gameTickService: GameTickService;
@@ -99,7 +98,7 @@ export default class EventService {
 
     constructor(
         eventModel,
-        eventRepo: DatabaseRepository<GameEvent>,
+        eventRepo: Repository<GameEvent>,
         broadcastService: BroadcastService,
         gameService: GameService,
         gameTickService: GameTickService,

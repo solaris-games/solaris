@@ -1,16 +1,16 @@
 const EventEmitter = require('events');
 import ValidationError from '../errors/validation';
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Game } from '../types/Game';
-import { Player } from '../types/Player';
+import Repository from './repository';
+import { Game } from './types/Game';
+import { Player } from './types/Player';
 import GameTypeService from './gameType';
 
 export default class PlayerReadyService extends EventEmitter {
-    gameRepo: DatabaseRepository<Game>;
+    gameRepo: Repository<Game>;
     gameTypeService: GameTypeService;
 
     constructor(
-        gameRepo: DatabaseRepository<Game>,
+        gameRepo: Repository<Game>,
         gameTypeService: GameTypeService
     ) {
         super();

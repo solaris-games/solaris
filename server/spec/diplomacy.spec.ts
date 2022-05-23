@@ -1,5 +1,5 @@
 import DiplomacyService from '../services/diplomacy';
-import { DiplomaticState } from '../types/Diplomacy';
+import { DiplomaticState } from '../services/types/Diplomacy';
 
 describe('diplomacy', () => {
 

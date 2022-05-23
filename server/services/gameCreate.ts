@@ -1,5 +1,5 @@
 import ValidationError from '../errors/validation';
-import { Game, GameSettings } from '../types/Game';
+import { Game, GameSettings } from './types/Game';
 import AchievementService from './achievement';
 import ConversationService from './conversation';
 import GameService from './game';

@@ -1,13 +1,13 @@
 const moment = require('moment');
-import { DBObjectId } from '../types/DBObjectId';
+import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Conversation } from '../types/Conversation';
-import { ConversationMessage, ConversationMessageSentResult } from '../types/ConversationMessage';
-import { Game } from '../types/Game';
-import { Player } from '../types/Player';
+import Repository from './repository';
+import { Conversation } from './types/Conversation';
+import { ConversationMessage, ConversationMessageSentResult } from './types/ConversationMessage';
+import { Game } from './types/Game';
+import { Player } from './types/Player';
 import TradeService from './trade';
-import ConversationMessageSentEvent from '../types/events/conversationMessageSent';
+import ConversationMessageSentEvent from './types/events/ConversationMessageSent';
 const mongoose = require('mongoose');
 const EventEmitter = require('events');
 
@@ -66,11 +66,11 @@ function getNewConversation(game: Game, playerId: DBObjectId | null, name: strin
 }
 
 export default class ConversationService extends EventEmitter {
-    gameRepo: DatabaseRepository<Game>;
+    gameRepo: Repository<Game>;
     tradeService: TradeService;
 
     constructor(
-        gameRepo: DatabaseRepository<Game>,
+        gameRepo: Repository<Game>,
         tradeService: TradeService
     ) {
         super();

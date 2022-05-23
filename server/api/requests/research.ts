@@ -1,5 +1,5 @@
 import ValidationError from "../../errors/validation";
-import { ResearchType, ResearchTypeNotRandom } from "../../types/Player";
+import { ResearchType, ResearchTypeNotRandom } from "../../services/types/Player";
 import { keyHasStringValue } from "./helpers";
 
 export interface ResearchUpdateNowRequest {

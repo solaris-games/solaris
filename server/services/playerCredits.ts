@@ -1,12 +1,12 @@
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Game } from '../types/Game';
-import { Player } from '../types/Player';
+import Repository from './repository';
+import { Game } from './types/Game';
+import { Player } from './types/Player';
 
 export default class PlayerCreditsService {
-    gameRepo: DatabaseRepository<Game>;
+    gameRepo: Repository<Game>;
 
     constructor(
-        gameRepo: DatabaseRepository<Game>
+        gameRepo: Repository<Game>
     ) {
         this.gameRepo = gameRepo;
     }

@@ -1,12 +1,12 @@
-import { Location } from '../../types/Location'
+import { Location } from '../types/Location'
 import DistanceService from "../distance";
 import GameTypeService from "../gameType";
 import RandomService from "../random";
 import ResourceService from "../resource";
 import StarService from "../star";
 import StarDistanceService from "../starDistance";
-import { GalaxyDimensions } from '../../types/Dimensions';
-import { GameResourceDistribution } from '../../types/Game';
+import { GalaxyDimensions } from '../types/Dimensions';
+import { GameResourceDistribution } from '../types/Game';
 
 const simplexNoise = require('simplex-noise');
 

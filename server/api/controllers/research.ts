@@ -1,5 +1,5 @@
-import { DependencyContainer } from '../../types/DependencyContainer';
-import { ResearchType, ResearchTypeNotRandom } from '../../types/Player';
+import { DependencyContainer } from '../../services/types/DependencyContainer';
+import { ResearchType, ResearchTypeNotRandom } from '../../services/types/Player';
 import { mapToResearchUpdateNextRequest, mapToResearchUpdateNowRequest } from '../requests/research';
 
 export default (container: DependencyContainer, io) => {

@@ -1,7 +1,6 @@
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Game } from '../types/Game';
-import { Player } from '../types/Player';
-import { Star } from '../types/Star';
+import { Game } from './types/Game';
+import { Player } from './types/Player';
+import { Star } from './types/Star';
 import PlayerStatisticsService from './playerStatistics';
 import StarService from './star';
 import TechnologyService from './technology';

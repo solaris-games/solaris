@@ -1,7 +1,7 @@
-import { DBObjectId } from "../types/DBObjectId";
-import { Carrier, CarrierPosition } from "../types/Carrier";
-import { Game } from "../types/Game";
-import { User } from "../types/User";
+import { DBObjectId } from "./types/DBObjectId";
+import { Carrier, CarrierPosition } from "./types/Carrier";
+import { Game } from "./types/Game";
+import { User } from "./types/User";
 import AIService from "./ai";
 import BattleRoyaleService from "./battleRoyale";
 import CarrierService from "./carrier";
@@ -23,19 +23,19 @@ import StarUpgradeService from "./starUpgrade";
 import TechnologyService from "./technology";
 import UserService from "./user";
 import WaypointService from "./waypoint";
-import { CarrierActionWaypoint } from "../types/GameTick";
-import { Star } from "../types/Star";
-import { GameRankingResult } from "../types/Rating";
+import { CarrierActionWaypoint } from "./types/GameTick";
+import { Star } from "./types/Star";
+import { GameRankingResult } from "./types/Rating";
 import DiplomacyUpkeepService from "./diplomacyUpkeep";
 import CarrierGiftService from "./carrierGift";
 import CarrierMovementService from "./carrierMovement";
 import PlayerCycleRewardsService from "./playerCycleRewards";
 import StarContestedService from "./starContested";
 import PlayerReadyService from "./playerReady";
-import PlayerGalacticCycleCompletedEvent from "../types/events/playerGalacticCycleComplete"
-import GamePlayerDefeatedEvent from "../types/events/gamePlayerDefeated";
-import GamePlayerAFKEvent from "../types/events/gamePlayerAFK";
-import GameEndedEvent from "../types/events/gameEnded";
+import PlayerGalacticCycleCompletedEvent from "./types/events/PlayerGalacticCycleComplete"
+import GamePlayerDefeatedEvent from "./types/events/GamePlayerDefeated";
+import GamePlayerAFKEvent from "./types/events/GamePlayerAFK";
+import GameEndedEvent from "./types/events/GameEnded";
 
 const EventEmitter = require('events');
 const moment = require('moment');

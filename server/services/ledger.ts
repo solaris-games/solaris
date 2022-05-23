@@ -1,20 +1,20 @@
-import { DBObjectId } from "../types/DBObjectId";
-import DatabaseRepository from "../models/DatabaseRepository";
-import { Game } from "../types/Game";
-import { Player, PlayerLedger } from "../types/Player";
+import { DBObjectId } from "./types/DBObjectId";
+import Repository from "./repository";
+import { Game } from "./types/Game";
+import { Player, PlayerLedger } from "./types/Player";
 import PlayerService from "./player";
 import PlayerCreditsService from "./playerCredits";
+import ValidationError from "../errors/validation";
 
-const ValidationError = require("../errors/validation");
 const EventEmitter = require('events');
 
 export default class LedgerService extends EventEmitter {
-    gameRepo: DatabaseRepository<Game>;
+    gameRepo: Repository<Game>;
     playerService: PlayerService;
     playerCreditsService: PlayerCreditsService;
 
     constructor(
-        gameRepo: DatabaseRepository<Game>,
+        gameRepo: Repository<Game>,
         playerService: PlayerService,
         playerCreditsService: PlayerCreditsService
     ) {

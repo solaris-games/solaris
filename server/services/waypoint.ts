@@ -1,11 +1,11 @@
-import { DBObjectId } from '../types/DBObjectId';
+import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Carrier } from '../types/Carrier';
-import { CarrierWaypoint, CarrierWaypointActionType, CarrierWaypointBase } from '../types/CarrierWaypoint';
-import { Game } from '../types/Game';
-import { Player } from '../types/Player';
-import { Star } from '../types/Star';
+import Repository from './repository';
+import { Carrier } from './types/Carrier';
+import { CarrierWaypoint, CarrierWaypointActionType, CarrierWaypointBase } from './types/CarrierWaypoint';
+import { Game } from './types/Game';
+import { Player } from './types/Player';
+import { Star } from './types/Star';
 import CarrierService from './carrier';
 import DistanceService from './distance';
 import GameService from './game';
@@ -13,13 +13,13 @@ import PlayerService from './player';
 import StarService from './star';
 import StarDistanceService from './starDistance';
 import TechnologyService from './technology';
-import { CarrierActionWaypoint } from '../types/GameTick';
+import { CarrierActionWaypoint } from './types/GameTick';
 import CarrierMovementService from './carrierMovement';
 
 const mongoose = require('mongoose');
 
 export default class WaypointService {
-    gameRepo: DatabaseRepository<Game>;
+    gameRepo: Repository<Game>;
     carrierService: CarrierService;
     starService: StarService;
     distanceService: DistanceService;
@@ -30,7 +30,7 @@ export default class WaypointService {
     carrierMovementService: CarrierMovementService;
 
     constructor(
-        gameRepo: DatabaseRepository<Game>,
+        gameRepo: Repository<Game>,
         carrierService: CarrierService,
         starService: StarService,
         distanceService: DistanceService,

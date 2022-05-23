@@ -1,5 +1,5 @@
 import ValidationError from '../errors/validation';
-import { Game } from '../types/Game';
+import { Game } from './types/Game';
 import CarrierService from './carrier';
 import GameTypeService from './gameType';
 import PlayerService from './player';

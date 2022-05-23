@@ -1,16 +1,16 @@
-import { DBObjectId } from '../types/DBObjectId';
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Game } from '../types/Game';
-import { User } from '../types/User';
+import { DBObjectId } from './types/DBObjectId';
+import Repository from './repository';
+import { Game } from './types/Game';
+import { User } from './types/User';
 
 export default class AdminService {
     
-    userRepo: DatabaseRepository<User>;
-    gameRepo: DatabaseRepository<Game>;
+    userRepo: Repository<User>;
+    gameRepo: Repository<Game>;
 
     constructor(
-        userRepo: DatabaseRepository<User>, 
-        gameRepo: DatabaseRepository<Game>
+        userRepo: Repository<User>, 
+        gameRepo: Repository<Game>
     ) {
         this.userRepo = userRepo;
         this.gameRepo = gameRepo;

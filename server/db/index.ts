@@ -1,62 +1,77 @@
-import config from '../config';
-import mongooseLoader from '../models/mongoose';
-import fs from 'fs';
-import path from 'path';
+const mongoose = require('mongoose');
 
-let mongo;
+import EventModel from './models/Event';
+import GameModel from './models/Game';
+import GuildModel from './models/Guild';
+import HistoryModel from './models/History';
+import UserModel from './models/User';
+import PaymentModel from './models/Payment';
 
-async function startup() {
-    mongo = await mongooseLoader(config, {
-        syncIndexes: true,
-        poolSize: 1
-    });
-    
-    console.log('Running migrations...');
+export default async (config, options) => {
 
-    const dirPath: string = path.join(__dirname, 'migrations');
-
-    let files: string[] = fs.readdirSync(dirPath)
-        .filter(a => !a.endsWith('js.map'))
-        .sort((a, b) => a.localeCompare(b));
-
-    for (let file of files) {
-        console.log(file);
-    
-        const filePath = path.join(dirPath, file);
-        const script = require(filePath);
-
+    async function unlockAgendaJobs(db) {
         try {
-            await script.migrate(mongo.connection.db);
+            const collection = await db.connection.db.collection('agendaJobs');
+    
+            const numUnlocked = await collection.updateMany({
+                lockedAt: { $exists: true }
+                // lastFinishedAt:{$exists:false} 
+            }, {
+                $unset: { 
+                lockedAt : undefined,
+                lastModifiedBy:undefined,
+                    lastRunAt:undefined
+                },
+                $set: { nextRunAt:new Date() }
+            });
+    
+            console.log(`Unlocked #${numUnlocked.modifiedCount} jobs.`);
         } catch (e) {
             console.error(e);
-
-            return Promise.reject(e);
         }
     }
     
-    return Promise.resolve();
-}
-
-process.on('SIGINT', async () => {
-    await shutdown();
-});
-
-async function shutdown() {
-    console.log('Shutting down...');
-
-    await mongo.disconnect();
-
-    console.log('Shutdown complete.');
+    async function syncIndexes() {
+        console.log('Syncing indexes...');
+        await EventModel.syncIndexes();
+        await GameModel.syncIndexes();
+        await GuildModel.syncIndexes();
+        await HistoryModel.syncIndexes();
+        await UserModel.syncIndexes();
+        await PaymentModel.syncIndexes();
+        // TODO ReportModel?
+        console.log('Indexes synced.');
+    }
     
-    process.exit();
-}
+    const dbConnection = mongoose.connection;
 
-startup().then(async () => {
-    console.log('Database migrated.');
+    dbConnection.on('error', console.error.bind(console, 'connection error:'));
 
-    await shutdown();
-}).catch(async err => {
-    await shutdown();
-});
+    options = options || {};
+    options.connectionString = options.connectionString || config.connectionString;
+    options.syncIndexes = options.syncIndexes == null ? false : options.syncIndexes;
+    options.unlockJobs = options.unlockJobs == null ? false : options.unlockJobs;
+    options.poolSize = options.poolSize || 5;
 
-export {};
+    console.log(`Connecting to database: ${options.connectionString}`);
+
+    const db = await mongoose.connect(options.connectionString, {
+        useUnifiedTopology: true,
+        useNewUrlParser: true,
+        useCreateIndex: true,
+        keepAlive: true,
+        poolSize: options.poolSize
+    });
+
+    if (options.syncIndexes) {
+        await syncIndexes();
+    }
+
+    if (options.unlockJobs) {
+        await unlockAgendaJobs(db);
+    }
+
+    console.log('MongoDB Intialized');
+
+    return db;
+};

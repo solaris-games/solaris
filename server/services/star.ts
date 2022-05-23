@@ -1,16 +1,15 @@
 const EventEmitter = require('events');
 const mongoose = require('mongoose');
-import { DBObjectId } from '../types/DBObjectId';
+import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Carrier } from '../types/Carrier';
-import { Game, GameSettings } from '../types/Game';
-import { Location } from '../types/Location';
-import { MapObject } from '../types/Map';
-import { Player } from '../types/Player';
-import { InfrastructureType, NaturalResources, Star, StarCaptureResult, TerraformedResources } from '../types/Star';
-import { User } from '../types/User';
-import DiplomacyService from './diplomacy';
+import Repository from './repository';
+import { Carrier } from './types/Carrier';
+import { Game, GameSettings } from './types/Game';
+import { Location } from './types/Location';
+import { MapObject } from './types/Map';
+import { Player } from './types/Player';
+import { InfrastructureType, NaturalResources, Star, StarCaptureResult, TerraformedResources } from './types/Star';
+import { User } from './types/User';
 import DistanceService from './distance';
 import GameStateService from './gameState';
 import GameTypeService from './gameType';
@@ -23,7 +22,7 @@ import UserService from './user';
 
 export default class StarService extends EventEmitter {
 
-    gameRepo: DatabaseRepository<Game>;
+    gameRepo: Repository<Game>;
     randomService: RandomService;
     nameService: NameService;
     distanceService: DistanceService;
@@ -35,7 +34,7 @@ export default class StarService extends EventEmitter {
     gameStateService: GameStateService;
 
     constructor(
-        gameRepo: DatabaseRepository<Game>,
+        gameRepo: Repository<Game>,
         randomService: RandomService,
         nameService: NameService,
         distanceService: DistanceService,

@@ -1,6 +1,6 @@
 import ValidationError from "../errors/validation";
-import { Game } from "../types/Game";
-import { Player } from "../types/Player";
+import { Game } from "./types/Game";
+import { Player } from "./types/Player";
 import PlayerCreditsService from "./playerCredits";
 import PlayerCycleRewardsService from "./playerCycleRewards";
 

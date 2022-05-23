@@ -1,6 +1,6 @@
-import DatabaseRepository from "../models/DatabaseRepository";
-import { Game } from "../types/Game";
-import { Player, PlayerReputation } from "../types/Player";
+import Repository from "./repository";
+import { Game } from "./types/Game";
+import { Player, PlayerReputation } from "./types/Player";
 import DiplomacyService from "./diplomacy";
 import PlayerStatisticsService from "./playerStatistics";
 
@@ -14,12 +14,12 @@ const ENEMY_REPUTATION_THRESHOLD = -1;
 
 export default class ReputationService extends EventEmitter {
 
-    gameRepo: DatabaseRepository<Game>;
+    gameRepo: Repository<Game>;
     playerStatisticsService: PlayerStatisticsService;
     diplomacyService: DiplomacyService;
 
     constructor(
-        gameRepo: DatabaseRepository<Game>,
+        gameRepo: Repository<Game>,
         playerStatisticsService: PlayerStatisticsService,
         diplomacyService: DiplomacyService,
     ) {

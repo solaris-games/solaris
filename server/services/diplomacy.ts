@@ -1,21 +1,21 @@
 const EventEmitter = require('events');
-import { DBObjectId } from "../types/DBObjectId";
+import { DBObjectId } from "./types/DBObjectId";
 import ValidationError from '../errors/validation';
-import DatabaseRepository from "../models/DatabaseRepository";
-import { DiplomaticState, DiplomaticStatus } from "../types/Diplomacy";
-import { Game } from "../types/Game";
-import { Player, PlayerDiplomaticState } from "../types/Player";
+import Repository from "./repository";
+import { DiplomaticState, DiplomaticStatus } from "./types/Diplomacy";
+import { Game } from "./types/Game";
+import { Player, PlayerDiplomaticState } from "./types/Player";
 import DiplomacyUpkeepService from "./diplomacyUpkeep";
-import GameDiplomacyPeaceDeclaredEvent from "../types/events/gameDiplomacyPeaceDeclared";
-import GameDiplomacyWarDeclaredEvent from "../types/events/gameDiplomacyWarDeclared";
+import GameDiplomacyPeaceDeclaredEvent from "./types/events/GameDiplomacyPeaceDeclared";
+import GameDiplomacyWarDeclaredEvent from "./types/events/GameDiplomacyWarDeclared";
 
 export default class DiplomacyService extends EventEmitter {
 
-    gameRepo: DatabaseRepository<Game>;
+    gameRepo: Repository<Game>;
     diplomacyUpkeepService: DiplomacyUpkeepService;
 
     constructor(
-        gameRepo: DatabaseRepository<Game>,
+        gameRepo: Repository<Game>,
         diplomacyUpkeepService: DiplomacyUpkeepService
     ) {
         super();

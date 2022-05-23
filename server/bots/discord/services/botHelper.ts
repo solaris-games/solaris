@@ -1,7 +1,7 @@
 import ReponseService from "./response";
 import GameGalaxyService from '../../../services/gameGalaxy';
 import GameService from '../../../services/game';
-import { Game } from "../../../types/Game";
+import { Game } from "../../../services/types/Game";
 
 export default class BotHelperService {
     botResponseService: ReponseService;

@@ -1,21 +1,19 @@
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Config } from '../types/Config';
-import { Conversation } from '../types/Conversation';
-import { ConversationMessageSentResult } from '../types/ConversationMessage';
-import { DBObjectId } from '../types/DBObjectId';
-import { Game } from '../types/Game';
-import { Player } from '../types/Player';
-import { User } from '../types/User';
+import Repository from './repository';
+import { Config } from '../config/types/Config';
+import { DBObjectId } from './types/DBObjectId';
+import { Game } from './types/Game';
+import { Player } from './types/Player';
+import { User } from './types/User';
 import DiscordService from './discord';
 import ConversationService from './conversation';
 import GameService from './game';
 import GameTickService from './gameTick';
 import ResearchService from './research';
 import TradeService from './trade';
-import PlayerGalacticCycleCompletedEvent from '../types/events/playerGalacticCycleComplete';
-import { BaseGameEvent } from '../types/events/baseGameEvent';
-import GameEndedEvent from '../types/events/gameEnded';
-import ConversationMessageSentEvent from '../types/events/conversationMessageSent';
+import PlayerGalacticCycleCompletedEvent from './types/events/PlayerGalacticCycleComplete';
+import { BaseGameEvent } from './types/events/BaseGameEvent';
+import GameEndedEvent from './types/events/GameEnded';
+import ConversationMessageSentEvent from './types/events/ConversationMessageSent';
 
 // Note: We only support discord subscriptions at this point, if any new ones are added
 // this class will need to be refactored to use something like the strategy pattern.
@@ -32,8 +30,8 @@ type SubscriptionEvent = 'gameStarted'|
 
 export default class NotificationService {
     config: Config;
-    userRepo: DatabaseRepository<User>;
-    gameRepo: DatabaseRepository<Game>;
+    userRepo: Repository<User>;
+    gameRepo: Repository<Game>;
     discordService: DiscordService;
     conversationService: ConversationService;
     gameService: GameService;
@@ -43,8 +41,8 @@ export default class NotificationService {
 
     constructor(
         config: Config,
-        userRepo: DatabaseRepository<User>,
-        gameRepo: DatabaseRepository<Game>,
+        userRepo: Repository<User>,
+        gameRepo: Repository<Game>,
         discordService: DiscordService,
         conversationService: ConversationService,
         gameService: GameService,

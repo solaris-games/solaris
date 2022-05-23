@@ -1,9 +1,9 @@
-import { Carrier } from "../types/Carrier";
-import { Attacker, CombatCarrier, CombatPart, CombatResult, CombatResultShips, CombatStar, Defender } from "../types/Combat";
-import { Game } from "../types/Game";
-import { Player } from "../types/Player";
-import { Star, StarCaptureResult } from "../types/Star";
-import { User } from "../types/User";
+import { Carrier } from "./types/Carrier";
+import { Attacker, CombatCarrier, CombatPart, CombatResult, CombatResultShips, CombatStar, Defender } from "./types/Combat";
+import { Game } from "./types/Game";
+import { Player } from "./types/Player";
+import { Star, StarCaptureResult } from "./types/Star";
+import { User } from "./types/User";
 import DiplomacyService from "./diplomacy";
 import GameTypeService from "./gameType";
 import PlayerService from "./player";

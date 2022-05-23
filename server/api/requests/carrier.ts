@@ -1,6 +1,6 @@
 import ValidationError from "../../errors/validation";
-import { CarrierWaypointActionType } from "../../types/CarrierWaypoint";
-import { DBObjectId } from "../../types/DBObjectId";
+import { CarrierWaypointActionType } from "../../services/types/CarrierWaypoint";
+import { DBObjectId } from "../../services/types/DBObjectId";
 import { keyHasArrayValue, keyHasBooleanValue, keyHasNumberValue, keyHasObjectValue, keyHasStringValue } from "./helpers";
 
 export interface CarrierSaveWaypointsRequest {

@@ -1,6 +1,6 @@
-import { Game, GameResourceDistribution } from "../types/Game";
-import { Location } from "../types/Location";
-import { NaturalResources } from "../types/Star";
+import { Game, GameResourceDistribution } from "./types/Game";
+import { Location } from "./types/Location";
+import { NaturalResources } from "./types/Star";
 import DistanceService from "./distance";
 import GameTypeService from "./gameType";
 import RandomService from "./random";

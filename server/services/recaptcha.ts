@@ -1,4 +1,4 @@
-import { Config } from "../types/Config";
+import { Config } from "../config/types/Config";
 
 const Recaptcha = require('recaptcha-v2').Recaptcha;
 

@@ -1,13 +1,13 @@
 const mongoose = require('mongoose');
-import { DBObjectId } from '../types/DBObjectId';
+import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Carrier } from '../types/Carrier';
-import { CarrierWaypoint } from '../types/CarrierWaypoint';
-import { Game } from '../types/Game';
-import { MapObject } from '../types/Map';
-import { Player } from '../types/Player';
-import { Star } from '../types/Star';
+import Repository from './repository';
+import { Carrier } from './types/Carrier';
+import { CarrierWaypoint } from './types/CarrierWaypoint';
+import { Game } from './types/Game';
+import { MapObject } from './types/Map';
+import { Player } from './types/Player';
+import { Star } from './types/Star';
 import DistanceService from './distance';
 import SpecialistService from './specialist';
 import StarService from './star';
@@ -15,14 +15,14 @@ import TechnologyService from './technology';
 const EventEmitter = require('events');
 
 export default class CarrierService extends EventEmitter {
-    gameRepo: DatabaseRepository<Game>;
+    gameRepo: Repository<Game>;
     distanceService: DistanceService;
     starService: StarService;
     technologyService: TechnologyService;
     specialistService: SpecialistService;
 
     constructor(
-        gameRepo: DatabaseRepository<Game>,
+        gameRepo: Repository<Game>,
         distanceService: DistanceService,
         starService: StarService,
         technologyService: TechnologyService,

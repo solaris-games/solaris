@@ -1,4 +1,4 @@
-import { Config } from "../types/Config";
+import { Config } from "../config/types/Config";
 import CacheService from "./cache";
 
 const axios = require('axios');

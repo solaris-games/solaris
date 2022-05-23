@@ -1,4 +1,4 @@
-import { Location } from "../types/Location";
+import { Location } from "./types/Location";
 
 export default class RandomService {
 

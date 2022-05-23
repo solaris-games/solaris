@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
 const moment = require('moment');
 const EventEmitter = require('events');
-import DatabaseRepository from '../models/DatabaseRepository';
-import { DBObjectId } from '../types/DBObjectId';
-import { Game } from '../types/Game';
-import { Location } from '../types/Location';
-import { Player, PlayerColour, PlayerColourShapeCombination, PlayerShape, ResearchTypeNotRandom } from '../types/Player';
-import { Star } from '../types/Star';
+import Repository from './repository';
+import { DBObjectId } from './types/DBObjectId';
+import { Game } from './types/Game';
+import { Location } from './types/Location';
+import { Player, PlayerColour, PlayerColourShapeCombination, PlayerShape, ResearchTypeNotRandom } from './types/Player';
+import { Star } from './types/Star';
 import CarrierService from './carrier';
 import GameTypeService from './gameType';
 import MapService from './map';
@@ -18,7 +18,7 @@ import StarDistanceService from './starDistance';
 import TechnologyService from './technology';
 
 export default class PlayerService extends EventEmitter {
-    gameRepo: DatabaseRepository<Game>;
+    gameRepo: Repository<Game>;
     randomService: RandomService;
     mapService: MapService;
     starService: StarService;
@@ -30,7 +30,7 @@ export default class PlayerService extends EventEmitter {
     playerReadyService: PlayerReadyService;
 
     constructor(
-        gameRepo: DatabaseRepository<Game>,
+        gameRepo: Repository<Game>,
         randomService: RandomService,
         mapService: MapService,
         starService: StarService,
@@ -331,6 +331,7 @@ export default class PlayerService extends EventEmitter {
         player.ready = false;
         player.readyToCycle = false;
         player.readyToQuit = false;
+        player.isOpenSlot = true;
 
         // Reset the player's research
         this._setDefaultResearchTechnology(game, player);

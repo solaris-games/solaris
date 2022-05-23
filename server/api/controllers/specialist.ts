@@ -1,5 +1,5 @@
 import ValidationError from '../../errors/validation';
-import { DependencyContainer } from '../../types/DependencyContainer';
+import { DependencyContainer } from '../../services/types/DependencyContainer';
 
 export default (container: DependencyContainer, io) => {
     return {

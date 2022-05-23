@@ -1,5 +1,5 @@
-import { Game } from "../types/Game";
-import { Location } from "../types/Location";
+import { Game } from "./types/Game";
+import { Location } from "./types/Location";
 
 export default class DistanceService {  
 

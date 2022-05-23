@@ -1,16 +1,15 @@
 import EventEmitter from 'events';
 import ValidationError from '../errors/validation';
-import DatabaseRepository from '../models/DatabaseRepository';
-import { DBObjectId } from '../types/DBObjectId';
-import { User } from '../types/User';
+import Repository from './repository';
+import { User } from './types/User';
 import PasswordService from './password';
 
 export default class AuthService extends EventEmitter {
-    userRepo: DatabaseRepository<User>;
+    userRepo: Repository<User>;
     passwordService: PasswordService;
     
     constructor(
-        userRepo: DatabaseRepository<User>,
+        userRepo: Repository<User>,
         passwordService: PasswordService
     ) {
         super();

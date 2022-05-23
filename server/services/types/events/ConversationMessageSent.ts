@@ -1,6 +1,6 @@
 import { Conversation } from "../Conversation";
 import { ConversationMessageSentResult } from "../ConversationMessage";
-import { BaseGameEvent } from "./baseGameEvent";
+import { BaseGameEvent } from "./BaseGameEvent";
 
 export default interface ConversationMessageSentEvent extends BaseGameEvent {
     conversation: Conversation,

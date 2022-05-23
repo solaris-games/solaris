@@ -2,18 +2,18 @@ const express = require('express');
 const http = require('http');
 import config from '../config';
 import expressLoader from './express';
-import mongooseLoader from '../models/mongoose';
+import mongooseLoader from '../db';
 import socketLoader from './sockets';
 import containerLoader from '../services';
 
 let mongo;
 
 async function startServer() {
+  mongo = await mongooseLoader(config, {});
+
   const app = express();
   const server = http.createServer(app);
-
-  mongo = await mongooseLoader(config, {});
-    
+  
   const io = socketLoader(config, server);
   const container = containerLoader(config, io);
 

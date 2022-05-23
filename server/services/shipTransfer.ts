@@ -1,18 +1,18 @@
-import { DBObjectId } from '../types/DBObjectId';
+import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Game } from '../types/Game';
-import { Player } from '../types/Player';
+import Repository from './repository';
+import { Game } from './types/Game';
+import { Player } from './types/Player';
 import CarrierService from './carrier';
 import StarService from './star';
 
 export default class ShipTransferService {
-    gameRepo: DatabaseRepository<Game>;
+    gameRepo: Repository<Game>;
     carrierService: CarrierService;
     starService: StarService;
 
     constructor(
-        gameRepo: DatabaseRepository<Game>,
+        gameRepo: Repository<Game>,
         carrierService: CarrierService,
         starService: StarService
     ) {

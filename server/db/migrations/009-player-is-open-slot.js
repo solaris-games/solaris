@@ -12,7 +12,7 @@ module.exports = {
             }
         });
 
-        // In progress games
+        // Not started/in progress games
         // Ensure that unfilled slots have their slots open.
         await games.updateMany({
             'state.endDate': { $eq: null },

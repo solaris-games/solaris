@@ -1,8 +1,8 @@
 import config from '../config';
-import mongooseLoader from '../models/mongoose';
+import mongooseLoader from '.';
 import containerLoader from '../services';
-import { DependencyContainer } from '../types/DependencyContainer';
-import { User } from '../types/User';
+import { DependencyContainer } from '../services/types/DependencyContainer';
+import { User } from '../services/types/User';
 
 let mongo,
     container: DependencyContainer;
@@ -99,7 +99,7 @@ async function startup() {
             // Quitters
             let quitterUserIds: string[] = game.quitters.filter(q => q != null).map(q => q.toString());
             // Afkers and in game afk players
-            let afkerUserIds: string[] = [...new Set(game.afkers.filter(a => a != null).map(a => a.toString()).concat(game.galaxy.players.filter(p => p.userId && p.afk).map(p => p.userId!.toString())))];
+            let afkerUserIds: string[] = [...new Set(game.afkers.filter(a => a != null).map(a => a.toString()).concat(game.galaxy.players.filter(p => p.userId && p.afk).map(p => p.userId!.toString())))] as string[];
             // In game defeated players (not afk)
             let defeatedUserIds: string[] = game.galaxy.players.filter(p => p.userId && p.defeated && !p.afk).map(p => p.userId!.toString());
             // In game completed players (not defeated or afk)

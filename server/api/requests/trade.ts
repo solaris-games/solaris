@@ -1,6 +1,6 @@
 import ValidationError from "../../errors/validation";
-import { DBObjectId } from "../../types/DBObjectId";
-import { ResearchTypeNotRandom } from "../../types/Player";
+import { DBObjectId } from "../../services/types/DBObjectId";
+import { ResearchTypeNotRandom } from "../../services/types/Player";
 import { keyHasNumberValue, keyHasStringValue } from "./helpers";
 
 export interface TradeSendToPlayerRequest {

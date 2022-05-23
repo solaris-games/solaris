@@ -1,4 +1,4 @@
-import { Config } from "../types/Config";
+import { Config } from "./types/Config";
 
 require('dotenv').config({path:__dirname + '/../.env'});
 

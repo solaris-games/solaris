@@ -1,11 +1,10 @@
 const EventEmitter = require('events');
 const moment = require('moment');
-import { DBObjectId } from '../types/DBObjectId';
+import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Game } from '../types/Game';
-import { Player } from '../types/Player';
-import { User } from '../types/User';
+import Repository from './repository';
+import { Game } from './types/Game';
+import { Player } from './types/Player';
 import AchievementService from './achievement';
 import AvatarService from './avatar';
 import CarrierService from './carrier';
@@ -17,13 +16,13 @@ import StarService from './star';
 import UserService from './user';
 import ConversationService from './conversation';
 import PlayerReadyService from './playerReady';
-import GamePlayerJoinedEvent from '../types/events/gamePlayerJoined'
-import GamePlayerQuitEvent from '../types/events/gamePlayerQuit';
-import GamePlayerDefeatedEvent from '../types/events/gamePlayerDefeated';
-import { BaseGameEvent } from '../types/events/baseGameEvent';
+import GamePlayerJoinedEvent from './types/events/GamePlayerJoined'
+import GamePlayerQuitEvent from './types/events/GamePlayerQuit';
+import GamePlayerDefeatedEvent from './types/events/GamePlayerDefeated';
+import { BaseGameEvent } from './types/events/BaseGameEvent';
 
 export default class GameService extends EventEmitter {
-    gameRepo: DatabaseRepository<Game>;
+    gameRepo: Repository<Game>;
     userService: UserService;
     starService: StarService;
     carrierService: CarrierService;
@@ -37,7 +36,7 @@ export default class GameService extends EventEmitter {
     playerReadyService: PlayerReadyService;
 
     constructor(
-        gameRepo: DatabaseRepository<Game>,
+        gameRepo: Repository<Game>,
         userService: UserService,
         starService: StarService,
         carrierService: CarrierService,

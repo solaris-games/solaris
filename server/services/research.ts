@@ -1,9 +1,9 @@
 const EventEmitter = require('events');
 import ValidationError from '../errors/validation';
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Game } from '../types/Game';
-import { Player, ResearchType, ResearchTypeNotRandom } from '../types/Player';
-import { User } from '../types/User';
+import Repository from './repository';
+import { Game } from './types/Game';
+import { Player, ResearchType, ResearchTypeNotRandom } from './types/Player';
+import { User } from './types/User';
 import GameTypeService from './gameType';
 import PlayerStatisticsService from './playerStatistics';
 import RandomService from './random';
@@ -12,7 +12,7 @@ import TechnologyService from './technology';
 import UserService from './user';
 
 export default class ResearchService extends EventEmitter {
-    gameRepo: DatabaseRepository<Game>;
+    gameRepo: Repository<Game>;
     technologyService: TechnologyService;
     randomService: RandomService;
     playerStatisticsService: PlayerStatisticsService;
@@ -21,7 +21,7 @@ export default class ResearchService extends EventEmitter {
     gameTypeService: GameTypeService;
 
     constructor(
-        gameRepo: DatabaseRepository<Game>,
+        gameRepo: Repository<Game>,
         technologyService: TechnologyService,
         randomService: RandomService,
         playerStatisticsService: PlayerStatisticsService,

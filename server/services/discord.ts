@@ -1,19 +1,19 @@
 import ValidationError from '../errors/validation';
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Config } from '../types/Config';
-import { User } from '../types/User';
+import Repository from './repository';
+import { Config } from '../config/types/Config';
+import { User } from './types/User';
 
 const Discord = require('discord.js');
 
 export default class DiscordService {
     config: Config;
-    userRepo: DatabaseRepository<User>;
+    userRepo: Repository<User>;
 
     client: any = null;
     
     constructor(
         config: Config,
-        userRepo: DatabaseRepository<User>
+        userRepo: Repository<User>
     ) {
         this.config = config;
         this.userRepo = userRepo;

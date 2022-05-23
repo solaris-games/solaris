@@ -1,16 +1,16 @@
-import { DBObjectId } from '../types/DBObjectId';
+import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Avatar, UserAvatar } from '../types/Avatar';
-import { User } from '../types/User';
+import Repository from './repository';
+import { Avatar, UserAvatar } from './types/Avatar';
+import { User } from './types/User';
 import UserService from './user';
 
 export default class AvatarService {
-    userRepo: DatabaseRepository<User>;
+    userRepo: Repository<User>;
     userService: UserService;
 
     constructor(
-        userRepo: DatabaseRepository<User>,
+        userRepo: Repository<User>,
         userService: UserService
     ) {
         this.userRepo = userRepo;

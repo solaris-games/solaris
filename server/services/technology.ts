@@ -1,7 +1,7 @@
-import { Carrier } from "../types/Carrier";
-import { Game } from "../types/Game";
-import { Player, PlayerResearch, PlayerTechnologyLevels, ResearchType, ResearchTypeNotRandom } from "../types/Player";
-import { Star } from "../types/Star";
+import { Carrier } from "./types/Carrier";
+import { Game } from "./types/Game";
+import { Player, PlayerTechnologyLevels, ResearchTypeNotRandom } from "./types/Player";
+import { Star } from "./types/Star";
 import SpecialistService from "./specialist";
 
 export default class TechnologyService {

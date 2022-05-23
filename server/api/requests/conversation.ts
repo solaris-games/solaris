@@ -1,5 +1,5 @@
 import ValidationError from "../../errors/validation";
-import { DBObjectId } from "../../types/DBObjectId";
+import { DBObjectId } from "../../services/types/DBObjectId";
 import { keyHasArrayValue, keyHasStringValue } from "./helpers";
 
 export interface ConversationCreateConversationRequest {

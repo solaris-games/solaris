@@ -1,21 +1,21 @@
 const mongoose = require('mongoose');
-import { DBObjectId } from '../types/DBObjectId';
+import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Carrier } from '../types/Carrier';
-import { Game } from '../types/Game';
-import { Player } from '../types/Player';
-import { Star } from '../types/Star';
-import { User } from '../types/User';
+import Repository from './repository';
+import { Carrier } from './types/Carrier';
+import { Game } from './types/Game';
+import { Player } from './types/Player';
+import { Star } from './types/Star';
+import { User } from './types/User';
 import DiplomacyService from './diplomacy';
 const EventEmitter = require('events');
 
 export default class CarrierGiftService extends EventEmitter {
-    gameRepo: DatabaseRepository<Game>;
+    gameRepo: Repository<Game>;
     diplomacyService: DiplomacyService;
 
     constructor(
-        gameRepo: DatabaseRepository<Game>,
+        gameRepo: Repository<Game>,
         diplomacyService: DiplomacyService
     ) {
         super();

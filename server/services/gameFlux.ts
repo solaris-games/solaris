@@ -1,4 +1,4 @@
-import { Game } from "../types/Game";
+import { Game } from "./types/Game";
 
 const moment = require('moment');
 const fluxes = require('../config/game/flux.json');

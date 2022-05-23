@@ -1,4 +1,4 @@
-import { DependencyContainer } from '../../types/DependencyContainer';
+import { DependencyContainer } from '../../services/types/DependencyContainer';
 import { mapToCarrierCalculateCombatRequest, mapToCarrierLoopWaypointsRequest, mapToCarrierRenameCarrierRequest, mapToCarrierSaveWaypointsRequest, mapToCarrierTransferShipsRequest } from '../requests/carrier';
 
 export default (container: DependencyContainer, io) => {

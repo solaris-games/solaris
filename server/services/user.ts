@@ -1,9 +1,9 @@
 const EventEmitter = require('events');
-import { DBObjectId } from '../types/DBObjectId';
+import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Game } from '../types/Game';
-import { User, UserSubscriptions } from '../types/User';
+import Repository from './repository';
+import { Game } from './types/Game';
+import { User, UserSubscriptions } from './types/User';
 import PasswordService from './password';
 const moment = require('moment');
 
@@ -16,12 +16,12 @@ function uuidv4(): string {
 
 export default class UserService extends EventEmitter {
     userModel;
-    userRepo: DatabaseRepository<User>;
+    userRepo: Repository<User>;
     passwordService: PasswordService;
     
     constructor(
         userModel,
-        userRepo: DatabaseRepository<User>,
+        userRepo: Repository<User>,
         passwordService: PasswordService
     ) {
         super();

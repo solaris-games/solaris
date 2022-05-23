@@ -1,6 +1,6 @@
-import { DBObjectId } from "../types/DBObjectId";
-import DatabaseRepository from "../models/DatabaseRepository";
-import { Game, GameUserNotification } from "../types/Game";
+import { DBObjectId } from "./types/DBObjectId";
+import Repository from "./repository";
+import { Game, GameUserNotification } from "./types/Game";
 import ConversationService from "./conversation";
 import EventService from "./event";
 import GameService from "./game";
@@ -9,14 +9,14 @@ import GameTypeService from "./gameType";
 const moment = require('moment');
 
 export default class GameListService {
-    gameRepo: DatabaseRepository<Game>;
+    gameRepo: Repository<Game>;
     gameService: GameService;
     conversationService: ConversationService;
     eventService: EventService;
     gameTypeService: GameTypeService;
     
     constructor(
-        gameRepo: DatabaseRepository<Game>,
+        gameRepo: Repository<Game>,
         gameService: GameService,
         conversationService: ConversationService,
         eventService: EventService,

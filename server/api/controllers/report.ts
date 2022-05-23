@@ -1,4 +1,4 @@
-import { DependencyContainer } from '../../types/DependencyContainer';
+import { DependencyContainer } from '../../services/types/DependencyContainer';
 import { mapToReportCreateReportRequest } from '../requests/report';
 
 export default (container: DependencyContainer, io) => {

@@ -1,4 +1,4 @@
-import { DependencyContainer } from "../types/DependencyContainer";
+import { DependencyContainer } from "../services/types/DependencyContainer";
 
 const officialGameSettings = [
     require('../config/game/settings/official/newPlayer'),

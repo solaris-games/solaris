@@ -1,9 +1,9 @@
-import DatabaseRepository from "../models/DatabaseRepository";
-import { Game } from "../types/Game";
-import { Leaderboard, LeaderboardPlayer, LeaderboardUser } from "../types/Leaderboard";
-import { Player } from "../types/Player";
-import { EloRatingChangeResult, GameRankingResult } from "../types/Rating";
-import { User } from "../types/User";
+import Repository from "./repository";
+import { Game } from "./types/Game";
+import { Leaderboard, LeaderboardPlayer, LeaderboardUser } from "./types/Leaderboard";
+import { Player } from "./types/Player";
+import { EloRatingChangeResult, GameRankingResult } from "./types/Rating";
+import { User } from "./types/User";
 import BadgeService from "./badge";
 import GameService from "./game";
 import GameStateService from "./gameState";
@@ -496,7 +496,7 @@ export default class LeaderboardService {
         specialists: 'player.research.specialists.level'
     }
 
-    userRepo: DatabaseRepository<User>;
+    userRepo: Repository<User>;
     userService: UserService;
     playerService: PlayerService;
     guildUserService: UserGuildService;
@@ -508,7 +508,7 @@ export default class LeaderboardService {
     playerStatisticsService: PlayerStatisticsService;
 
     constructor(
-        userRepo: DatabaseRepository<User>,
+        userRepo: Repository<User>,
         userService: UserService,
         playerService: PlayerService,
         guildUserService: UserGuildService,

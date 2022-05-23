@@ -1,4 +1,4 @@
-import { DependencyContainer } from '../../types/DependencyContainer';
+import { DependencyContainer } from '../../services/types/DependencyContainer';
 import { mapToBadgesPurchaseBadgeRequest } from '../requests/badges';
 
 export default (container: DependencyContainer, io) => {

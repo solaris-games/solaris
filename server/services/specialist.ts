@@ -1,10 +1,10 @@
-import { Carrier } from "../types/Carrier";
-import { Game } from "../types/Game";
-import { Specialist, SpecialistType } from "../types/Specialist";
-import { Star } from "../types/Star";
+import { Carrier } from "./types/Carrier";
+import { Game } from "./types/Game";
+import { Specialist, SpecialistType } from "./types/Specialist";
+import { Star } from "./types/Star";
+import ValidationError from "../errors/validation";
 
 const specialists = require('../config/game/specialists.json');
-const ValidationError = require("../errors/validation");
 
 export default class SpecialistService {
 

@@ -1,6 +1,6 @@
-import { DBObjectId } from "../types/DBObjectId";
+import { DBObjectId } from "./types/DBObjectId";
 
-export default class DatabaseRepository<T> {
+export default class Repository<T> {
 
     model;
     

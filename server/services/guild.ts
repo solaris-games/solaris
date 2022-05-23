@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
-import { DBObjectId } from '../types/DBObjectId';
+import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Guild, GuildLeaderboard, GuildRank, GuildUserApplication, GuildWithUsers } from '../types/Guild';
-import { User } from '../types/User';
+import Repository from './repository';
+import { Guild, GuildLeaderboard, GuildRank, GuildUserApplication, GuildWithUsers } from './types/Guild';
+import { User } from './types/User';
 import UserService from './user';
 
 function toProperCase(string: string) {
@@ -19,14 +19,14 @@ export default class GuildService {
     RENAME_GUILD_CREDITS_COST = 1
 
     guildModel;
-    guildRepo: DatabaseRepository<Guild>;
-    userRepo: DatabaseRepository<User>;
+    guildRepo: Repository<Guild>;
+    userRepo: Repository<User>;
     userService: UserService;
     
     constructor(
         guildModel,
-        guildRepo: DatabaseRepository<Guild>,
-        userRepo: DatabaseRepository<User>,
+        guildRepo: Repository<Guild>,
+        userRepo: Repository<User>,
         userService: UserService
     ) {
         this.guildModel = guildModel;

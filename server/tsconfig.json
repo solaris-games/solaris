@@ -17,6 +17,6 @@
     "**/*.ts",
     "db/migrations/*.js",
     "config/**/*.json",
-    "templates/*.html"
+    "services/emailTemplates/*.html"
   ]
 }

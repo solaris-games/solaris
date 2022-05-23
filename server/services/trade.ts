@@ -1,12 +1,12 @@
 const EventEmitter = require('events');
 const moment = require('moment');
-import { DBObjectId } from '../types/DBObjectId';
+import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Game } from '../types/Game';
-import { GameEvent } from '../types/GameEvent';
-import { Player, PlayerReputation, ResearchTypeNotRandom } from '../types/Player';
-import { TradeEvent, TradeEventTechnology, TradeTechnology } from '../types/Trade';
+import Repository from './repository';
+import { Game } from './types/Game';
+import { GameEvent } from './types/GameEvent';
+import { Player, PlayerReputation, ResearchTypeNotRandom } from './types/Player';
+import { TradeEvent, TradeEventTechnology, TradeTechnology } from './types/Trade';
 import AchievementService from './achievement';
 import GameTypeService from './gameType';
 import DiplomacyService from './diplomacy';
@@ -14,13 +14,13 @@ import LedgerService from './ledger';
 import PlayerService from './player';
 import ReputationService from './reputation';
 import UserService from './user';
-import { User } from '../types/User';
+import { User } from './types/User';
 import RandomService from './random';
 import PlayerCreditsService from './playerCredits';
 
 export default class TradeService extends EventEmitter {
-    gameRepo: DatabaseRepository<Game>;
-    eventRepo: DatabaseRepository<GameEvent>;
+    gameRepo: Repository<Game>;
+    eventRepo: Repository<GameEvent>;
     userService: UserService;
     playerService: PlayerService;
     diplomacyService: DiplomacyService;
@@ -32,8 +32,8 @@ export default class TradeService extends EventEmitter {
     playerCreditsService: PlayerCreditsService;
 
     constructor(
-        gameRepo: DatabaseRepository<Game>,
-        eventRepo: DatabaseRepository<GameEvent>,
+        gameRepo: Repository<Game>,
+        eventRepo: Repository<GameEvent>,
         userService: UserService,
         playerService: PlayerService,
         diplomacyService: DiplomacyService,

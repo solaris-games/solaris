@@ -1,7 +1,7 @@
-import { DBObjectId } from "../types/DBObjectId";
-import { Config } from "../types/Config";
-import { EmailTemplate } from "../types/Email";
-import { User } from "../types/User";
+import { DBObjectId } from "./types/DBObjectId";
+import { Config } from "../config/types/Config";
+import { EmailTemplate } from "./types/Email";
+import { User } from "./types/User";
 import GameService from "./game";
 import GameStateService from "./gameState";
 import GameTickService from "./gameTick";
@@ -9,9 +9,9 @@ import GameTypeService from "./gameType";
 import LeaderboardService from "./leaderboard";
 import PlayerService from "./player";
 import UserService from "./user";
-import { Player } from "../types/Player";
-import GamePlayerAFKEvent from "../types/events/gamePlayerAFK";
-import { BaseGameEvent } from "../types/events/baseGameEvent";
+import { Player } from "./types/Player";
+import GamePlayerAFKEvent from "./types/events/GamePlayerAFK";
+import { BaseGameEvent } from "./types/events/BaseGameEvent";
 
 const nodemailer = require('nodemailer');
 const fs = require('fs');
@@ -162,7 +162,7 @@ export default class EmailService {
     async sendTemplate(toEmail: string, template: EmailTemplate, parameters) {
         parameters = parameters || [];
 
-        const filePath = path.join(__dirname, '../templates/', template.fileName);
+        const filePath = path.join(__dirname, './emailTemplates/', template.fileName);
         let html = fs.readFileSync(filePath, { encoding: 'UTF8' });
 
         // Replace the default parameters in the file

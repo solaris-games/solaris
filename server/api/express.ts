@@ -6,8 +6,8 @@ const rateLimit = require("express-rate-limit");
 const MongoDBStore = require('connect-mongodb-session')(session);
 
 import registerRoutes from './routes';
-import { DependencyContainer } from '../types/DependencyContainer';
-import { Config } from '../types/Config';
+import { DependencyContainer } from '../services/types/DependencyContainer';
+import { Config } from '../config/types/Config';
 
 export default async (config: Config, app, io, container: DependencyContainer) => {
 

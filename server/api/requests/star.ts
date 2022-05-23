@@ -1,6 +1,6 @@
 import ValidationError from "../../errors/validation";
-import { DBObjectId } from "../../types/DBObjectId";
-import { InfrastructureType } from "../../types/Star";
+import { DBObjectId } from "../../services/types/DBObjectId";
+import { InfrastructureType } from "../../services/types/Star";
 import { keyHasBooleanValue, keyHasNumberValue, keyHasStringValue } from "./helpers";
 
 export interface StarUpgradeInfrastructureRequest {

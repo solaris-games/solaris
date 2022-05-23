@@ -1,21 +1,21 @@
-import { DBObjectId } from '../types/DBObjectId';
+import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Badge, UserBadge } from '../types/Badge';
-import { Game } from '../types/Game';
-import { User } from '../types/User';
+import Repository from './repository';
+import { Badge, UserBadge } from './types/Badge';
+import { Game } from './types/Game';
+import { User } from './types/User';
 import PlayerService from './player';
 import UserService from './user';
-import GamePlayerBadgePurchasedEvent from '../types/events/gamePlayerBadgePurchased';
+import GamePlayerBadgePurchasedEvent from './types/events/GamePlayerBadgePurchased';
 const EventEmitter = require('events');
 
 export default class BadgeService extends EventEmitter {
-    userRepo: DatabaseRepository<User>;
+    userRepo: Repository<User>;
     userService: UserService;
     playerService: PlayerService;
 
     constructor(
-        userRepo: DatabaseRepository<User>,
+        userRepo: Repository<User>,
         userService: UserService,
         playerService: PlayerService
     ) {

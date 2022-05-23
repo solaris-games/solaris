@@ -1,7 +1,7 @@
-import { Carrier } from '../types/Carrier';
-import { Game } from '../types/Game';
-import { Player } from '../types/Player';
-import { Star } from '../types/Star';
+import { Carrier } from './types/Carrier';
+import { Game } from './types/Game';
+import { Player } from './types/Player';
+import { Star } from './types/Star';
 import CarrierService from './carrier';
 import SpecialistService from './specialist';
 import StarService from './star';

@@ -1,12 +1,12 @@
 const bcrypt = require('bcrypt');
 
-import GameModel from '../models/Game';
-import UserModel from '../models/User';
-import HistoryModel from '../models/History';
-import EventModel from '../models/Event';
-import GuildModel from '../models/Guild';
-import PaymentModel from '../models/Payment';
-import ReportModel from '../models/Report';
+import GameModel from '../db/models/Game';
+import UserModel from '../db/models/User';
+import HistoryModel from '../db/models/History';
+import EventModel from '../db/models/Event';
+import GuildModel from '../db/models/Guild';
+import PaymentModel from '../db/models/Payment';
+import ReportModel from '../db/models/Report';
 
 import AdminService from './admin';
 import PasswordService from './password';
@@ -80,27 +80,27 @@ import GameFluxService from './gameFlux';
 import NotificationService from './notification';
 import DiscordService from './discord';
 
-import { DependencyContainer } from '../types/DependencyContainer';
+import { DependencyContainer } from './types/DependencyContainer';
 
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Game } from '../types/Game';
-import { User } from '../types/User';
-import { GameHistory } from '../types/GameHistory';
-import { GameEvent } from '../types/GameEvent';
-import { Guild } from '../types/Guild';
-import { Payment } from '../types/Payment';
-import { Report } from '../types/Report';
+import Repository from './repository';
+import { Game } from './types/Game';
+import { User } from './types/User';
+import { GameHistory } from './types/GameHistory';
+import { GameEvent } from './types/GameEvent';
+import { Guild } from './types/Guild';
+import { Payment } from './types/Payment';
+import { Report } from './types/Report';
 
 const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
 
-const gameRepository = new DatabaseRepository<Game>(GameModel);
-const userRepository = new DatabaseRepository<User>(UserModel);
-const historyRepository = new DatabaseRepository<GameHistory>(HistoryModel);
-const eventRepository = new DatabaseRepository<GameEvent>(EventModel);
-const guildRepository = new DatabaseRepository<Guild>(GuildModel);
-const paymentRepository = new DatabaseRepository<Payment>(PaymentModel);
-const reportRepository = new DatabaseRepository<Report>(ReportModel);
+const gameRepository = new Repository<Game>(GameModel);
+const userRepository = new Repository<User>(UserModel);
+const historyRepository = new Repository<GameHistory>(HistoryModel);
+const eventRepository = new Repository<GameEvent>(EventModel);
+const guildRepository = new Repository<Guild>(GuildModel);
+const paymentRepository = new Repository<Payment>(PaymentModel);
+const reportRepository = new Repository<Report>(ReportModel);
 
 export default (config, io): DependencyContainer => {
 

@@ -1,18 +1,18 @@
-import { DBObjectId } from '../types/DBObjectId';
+import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Game } from '../types/Game';
-import { Report, ReportReasons } from '../types/Report';
+import Repository from './repository';
+import { Game } from './types/Game';
+import { Report, ReportReasons } from './types/Report';
 import PlayerService from './player';
 
 export default class ReportService {
     reportModel;
-    reportRepo: DatabaseRepository<Report>;
+    reportRepo: Repository<Report>;
     playerService: PlayerService;
 
     constructor(
         reportModel,
-        reportRepo: DatabaseRepository<Report>,
+        reportRepo: Repository<Report>,
         playerService: PlayerService
     ) {
         this.reportRepo = reportRepo;

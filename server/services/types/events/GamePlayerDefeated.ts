@@ -1,4 +1,4 @@
-import { BaseGameEvent } from "./baseGameEvent";
+import { BaseGameEvent } from "./BaseGameEvent";
 
 export default interface GamePlayerDefeatedEvent extends BaseGameEvent {
     playerAlias: string;

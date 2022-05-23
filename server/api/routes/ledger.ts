@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { DependencyContainer } from "../../types/DependencyContainer";
+import { DependencyContainer } from "../../services/types/DependencyContainer";
 import LedgerController from '../controllers/ledger';
 
 import AuthMiddleware from '../middleware/auth';
