@@ -68,6 +68,11 @@ export default class BadgeService extends EventEmitter {
             return null;
         }
 
+        // Do not reveal badges for anon games.
+        if (game.settings.general.anonymity === 'extra') {
+            return []
+        }
+
         return await this.listBadgesByUser(player.userId);
     }
 

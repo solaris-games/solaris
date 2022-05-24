@@ -665,6 +665,10 @@ class GameHelper {
     return game.settings.general.anonymity === 'normal'
   }
 
+  isExtraAnonymity (game) {
+    return game.settings.general.anonymity === 'extra'
+  }
+
   isHiddenPlayerOnlineStatus (game) {
     return game.settings.general.playerOnlineStatus === 'hidden'
   }

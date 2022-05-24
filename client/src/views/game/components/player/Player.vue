@@ -35,21 +35,21 @@
 
     <h4 class="mt-2" v-if="canViewAchievements">Achievements</h4>
 
-    <achievements v-if="isValidUser" :victories="user.achievements.victories"
+    <achievements v-if="canViewAchievements" :victories="user.achievements.victories"
                     :rank="user.achievements.rank"
                     :renown="user.achievements.renown"/>
 
     <sendRenown v-if="canSendRenown" :player="player" :userPlayer="userPlayer"
       @onRenownSent="onRenownSent"/>
 
-    <h4 class="mt-2" v-if="player && isValidUser">Badges</h4>
+    <h4 class="mt-2" v-if="player && player.isRealUser">Badges</h4>
 
-    <player-badges v-if="player && isValidUser" 
+    <player-badges v-if="player && player.isRealUser" 
       :playerId="player._id"
       @onOpenPurchasePlayerBadgeRequested="onOpenPurchasePlayerBadgeRequested"/>
 
     <player-report 
-      v-if="isValidUser && player && !player.isOpenSlot && userPlayer && player != userPlayer"
+      v-if="player && player.isRealUser && userPlayer && player != userPlayer"
       :playerId="player._id"
       @onOpenReportPlayerRequested="onOpenReportPlayerRequested"/>
 </div>
@@ -171,9 +171,6 @@ export default {
     game () {
       return this.$store.state.game
     },
-    isValidUser () {
-      return this.user && this.user.achievements
-    },
     isGameFinished: function () {
       return GameHelper.isGameFinished(this.$store.state.game)
     },
@@ -184,11 +181,7 @@ export default {
       return GameHelper.is1v1Game(this.game)
     },
     canViewAchievements () {
-      if (this.isAnonymousGame) {
-        return this.player && !this.player.isOpenSlot && this.isGameFinished && this.player != this.userPlayer
-      } else {
-        return this.player && !this.player.isOpenSlot && this.isValidUser
-      }
+      return this.player && this.player.isRealUser && this.user && this.user.achievements
     },
     canSendRenown () {
       if (this.isAnonymousGame) {

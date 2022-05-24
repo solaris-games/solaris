@@ -2,7 +2,13 @@
 <div>
     <loading-spinner :loading="isLoading" />
 
-    <div class="row bg-primary" v-if="!isLoading || !userHasBadges">
+    <div class="row bg-primary" v-if="isExtraAnonymity && (!isLoading || !userHasBadges)">
+        <div v-if="!userHasBadges" class="col text-center pt-3">
+            <p class="mb-3"><small>Badges are hidden in anonymous games but you can still award a badge to this player.</small></p>
+        </div>
+    </div>
+
+    <div class="row bg-primary" v-if="isNormalAnonymity && (!isLoading || !userHasBadges)">
         <div v-if="!userHasBadges" class="col text-center pt-3">
             <p class="mb-3">This player has no badges.</p>
         </div>
@@ -76,6 +82,12 @@ export default {
     },
     filteredBadges () {
         return this.badges.filter(b => b.awarded)
+    },
+    isNormalAnonymity () {
+        return GameHelper.isNormalAnonymity(this.$store.state.game)
+    },
+    isExtraAnonymity () {
+        return GameHelper.isExtraAnonymity(this.$store.state.game)
     }
   }
 }

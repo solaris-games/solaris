@@ -43,6 +43,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         mwGame.loadGame({
             lean: true,
             state: true,
+            settings: true,
             'galaxy.players': true
         }),
         controller.listForPlayer,

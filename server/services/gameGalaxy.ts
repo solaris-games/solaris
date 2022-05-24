@@ -582,6 +582,7 @@ export default class GameGalaxyService {
             // Return a subset of the user, key info only.
             return {
                 _id: p._id,
+                isRealUser: p.userId != null,
                 homeStarId: p.homeStarId,
                 colour: p.colour,
                 shape: p.shape,
