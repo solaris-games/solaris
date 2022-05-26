@@ -1,8 +1,11 @@
 <template>
     <div class="row bg-secondary pt-2 pb-0 mb-1" v-if="star">
         <div class="col">
-            <h5 v-if="!star.specialist" class="pt-1 text-danger">None Assigned</h5>
-            <h5 v-if="star.specialist" class="pt-1 text-warning">{{star.specialist.name}}</h5>
+          <h5 v-if="!star.specialist" class="pt-1 text-danger">None Assigned</h5>
+          <h5 v-if="star.specialist" class="pt-1 text-warning">
+            <specialist-icon :type="'star'" :defaultIcon="'user-astronaut'" :specialist="star.specialist"></specialist-icon>
+            {{star.specialist.name}}
+          </h5>
         </div>
         <div v-if="!$isHistoricalMode() && canHireSpecialist && !isGameFinished" class="col-auto">
             <button class="btn btn-sm btn-success" @click="onViewHireStarSpecialistRequested"><i class="fas fa-wrench"></i> Hire Specialist</button>
@@ -19,8 +22,12 @@
 
 <script>
 import GameHelper from '../../../../services/gameHelper'
+import SpecialistIconVue from '../specialist/SpecialistIcon.vue'
 
 export default {
+  components: {
+    'specialist-icon': SpecialistIconVue
+  },
   props: {
     starId: String
   },
