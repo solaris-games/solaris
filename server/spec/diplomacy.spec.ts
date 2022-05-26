@@ -4,12 +4,13 @@ import { DiplomaticState } from '../services/types/Diplomacy';
 describe('diplomacy', () => {
 
     const fakeGameRepo: any = {};
+    const fakeEventRepo: any = {};
     const fakeDiplomacyUpkeepService: any = {};
 
     let service: DiplomacyService;
 
     beforeEach(() => {
-        service = new DiplomacyService(fakeGameRepo, fakeDiplomacyUpkeepService);
+        service = new DiplomacyService(fakeGameRepo, fakeEventRepo, fakeDiplomacyUpkeepService);
     });
 
     // ------------------------
