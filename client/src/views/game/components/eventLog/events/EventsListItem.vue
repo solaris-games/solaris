@@ -62,7 +62,8 @@
         <player-conversation-created :event="event" v-if="event.type === 'playerConversationCreated'"/>
         <player-conversation-invited :event="event" v-if="event.type === 'playerConversationInvited'"/>
         <player-conversation-left :event="event" v-if="event.type === 'playerConversationLeft'"/>
-        <player-diplomacy-status-changed :event="event" v-if="event.type === 'playerDiplomacyStatusChanged'"/>
+        <player-diplomacy-status-changed :event="event" v-if="event.type === 'playerDiplomacyStatusChanged'"
+            @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
     </div>
 </div>
 </template>
