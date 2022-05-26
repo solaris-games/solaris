@@ -16,7 +16,7 @@
               v-for="ledger in ledgers" 
               :key="ledger.playerId" 
               :ledger="ledger"
-              @onPlayerDetailRequested="onPlayerDetailRequested"/>
+              @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
           </tbody>
         </table>
       </div>
@@ -58,7 +58,7 @@ export default {
     this.sockets.unsubscribe('playerDebtSettled')
   },
   methods: {
-    onPlayerDetailRequested(playerId) {
+    onOpenPlayerDetailRequested(playerId) {
       this.$emit('onOpenPlayerDetailRequested', playerId)
     },
     async loadLedger () {

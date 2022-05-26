@@ -2,7 +2,7 @@
 <tr>
   <td :style="{'width': '8px', 'background-color': getFriendlyColour(diplomaticStatus.playerIdTo)}"></td>
   <td class="col-avatar" :title="getPlayerAlias(diplomaticStatus.playerIdTo)">
-    <player-avatar @onClick="onPlayerDetailRequested(diplomaticStatus.playerIdTo)" :player="getPlayer(diplomaticStatus.playerIdTo)"/>
+    <player-avatar @onClick="onOpenPlayerDetailRequested(diplomaticStatus.playerIdTo)" :player="getPlayer(diplomaticStatus.playerIdTo)"/>
   </td>
   <td class="pl-2 pt-3 pb-2">
     <h5 class="alias-title">{{getPlayerAlias(diplomaticStatus.playerIdTo)}}</h5>
@@ -48,7 +48,7 @@ export default {
     getFriendlyColour (playerId) {
       return gameHelper.getPlayerColour(this.$store.state.game, playerId)
     },
-    onPlayerDetailRequested(playerId) {
+    onOpenPlayerDetailRequested(playerId) {
       this.$emit('onOpenPlayerDetailRequested', playerId)
     },
     async declareAlly (diplomaticStatus) {

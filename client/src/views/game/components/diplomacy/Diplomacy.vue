@@ -20,7 +20,7 @@
               v-for="diplomaticStatus in diplomaticStatuses"
               :key="diplomaticStatus.playerId"
               :diplomaticStatus="diplomaticStatus"
-              @onPlayerDetailRequested="onPlayerDetailRequested"
+              @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
               @onApiRequestError="onApiRequestError"
               @onApiRequestSuccess="onApiRequestSuccess"/>
           </tbody>
@@ -93,7 +93,7 @@ export default {
     this.sockets.unsubscribe('playerDiplomaticStatusChanged')
   },
   methods: {
-    onPlayerDetailRequested(playerId) {
+    onOpenPlayerDetailRequested(playerId) {
       this.$emit('onOpenPlayerDetailRequested', playerId)
     },
     onCloseRequested (e) {
