@@ -62,7 +62,7 @@
             </button>
         </div>
         <div class="col-auto">
-            <button type="button" class="btn btn-success btn-block" :disabled="$isHistoricalMode() || isBuildingCarrier || starShips < 0 || carrierShips < 0" @click="saveTransfer">
+            <button type="button" class="btn btn-info btn-block" :disabled="$isHistoricalMode() || isBuildingCarrier || starShips < 0 || carrierShips < 0" @click="saveTransfer">
                 <i class="fas fa-rocket"></i>
                 Build for ${{star.upgradeCosts.carriers}}
             </button>

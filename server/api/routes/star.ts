@@ -29,7 +29,8 @@ export default (router: Router, io, container: DependencyContainer) => {
             isNotFinished: true
         }),
         mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }), controller.upgradeEconomy,
+        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        controller.upgradeEconomy,
         mwCore.handleError);
 
     router.put('/api/game/:gameId/star/upgrade/industry',
@@ -46,7 +47,8 @@ export default (router: Router, io, container: DependencyContainer) => {
             isNotFinished: true
         }),
         mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }), controller.upgradeIndustry,
+        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        controller.upgradeIndustry,
         mwCore.handleError);
 
     router.put('/api/game/:gameId/star/upgrade/science',
@@ -63,7 +65,8 @@ export default (router: Router, io, container: DependencyContainer) => {
             isNotFinished: true
         }),
         mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }), controller.upgradeScience,
+        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        controller.upgradeScience,
         mwCore.handleError);
 
     router.put('/api/game/:gameId/star/upgrade/bulk',
@@ -80,7 +83,8 @@ export default (router: Router, io, container: DependencyContainer) => {
             isNotFinished: true
         }),
         mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }), controller.upgradeBulk,
+        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        controller.upgradeBulk,
         mwCore.handleError);
 
     router.put('/api/game/:gameId/star/upgrade/bulkCheck',
@@ -97,7 +101,8 @@ export default (router: Router, io, container: DependencyContainer) => {
             isNotFinished: true
         }),
         mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }), controller.upgradeBulkCheck,
+        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        controller.upgradeBulkCheck,
         mwCore.handleError);
 
     router.put('/api/game/:gameId/star/build/warpgate',
@@ -114,7 +119,8 @@ export default (router: Router, io, container: DependencyContainer) => {
             isNotFinished: true
         }),
         mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }), controller.buildWarpGate,
+        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        controller.buildWarpGate,
         mwCore.handleError);
 
     router.put('/api/game/:gameId/star/destroy/warpgate',
@@ -132,7 +138,8 @@ export default (router: Router, io, container: DependencyContainer) => {
             isStarted: true
         }),
         mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }), controller.destroyWarpGate,
+        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        controller.destroyWarpGate,
         mwCore.handleError);
 
     router.put('/api/game/:gameId/star/build/carrier',
@@ -149,7 +156,8 @@ export default (router: Router, io, container: DependencyContainer) => {
             isNotFinished: true
         }),
         mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }), controller.buildCarrier,
+        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        controller.buildCarrier,
         mwCore.handleError);
 
     router.put('/api/game/:gameId/star/transferall',
@@ -166,7 +174,8 @@ export default (router: Router, io, container: DependencyContainer) => {
             isNotFinished: true
         }),
         mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }), controller.garrisonAllShips,
+        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        controller.garrisonAllShips,
         mwCore.handleError);
 
     router.put('/api/game/:gameId/star/abandon',
@@ -183,7 +192,8 @@ export default (router: Router, io, container: DependencyContainer) => {
             isInProgress: true
         }),
         mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }), controller.abandon,
+        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        controller.abandon,
         mwCore.handleError);
 
     router.put('/api/game/:gameId/star/toggleignorebulkupgrade',
@@ -199,7 +209,8 @@ export default (router: Router, io, container: DependencyContainer) => {
             isUnlocked: true
         }),
         mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }), controller.toggleBulkIgnore,
+        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        controller.toggleBulkIgnore,
         mwCore.handleError);
 
     router.put('/api/game/:gameId/star/toggleignorebulkupgradeall',
@@ -215,7 +226,8 @@ export default (router: Router, io, container: DependencyContainer) => {
             isUnlocked: true
         }),
         mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }), controller.toggleBulkIgnoreAll,
+        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        controller.toggleBulkIgnoreAll,
         mwCore.handleError);
 
     return router;

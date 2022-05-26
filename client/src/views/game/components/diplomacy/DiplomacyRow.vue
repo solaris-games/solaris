@@ -2,13 +2,16 @@
 <tr>
   <td :style="{'width': '8px', 'background-color': getFriendlyColour(diplomaticStatus.playerIdTo)}"></td>
   <td class="col-avatar" :title="getPlayerAlias(diplomaticStatus.playerIdTo)">
-    <player-avatar @onClick="onPlayerDetailRequested(diplomaticStatus.playerIdTo)" :player="getPlayer(diplomaticStatus.playerIdTo)"/>
+    <player-avatar @onClick="onOpenPlayerDetailRequested(diplomaticStatus.playerIdTo)" :player="getPlayer(diplomaticStatus.playerIdTo)"/>
   </td>
   <td class="pl-2 pt-3 pb-2">
     <h5 class="alias-title">{{getPlayerAlias(diplomaticStatus.playerIdTo)}}</h5>
   </td>
   <td class="fit pt-3 pr-1">
-    <i :class="getStatusIcon(diplomaticStatus.statusFrom)" :title="diplomaticStatus.statusFrom"></i> (<i :class="getStatusIcon(diplomaticStatus.actualStatus)" :title="diplomaticStatus.actualStatus"></i>) <i :class="getStatusIcon(diplomaticStatus.statusTo)" :title="diplomaticStatus.statusTo"></i>
+    <diplomacy-icons 
+      :statusFrom="diplomaticStatus.statusFrom"
+      :statusTo="diplomaticStatus.statusTo"
+      :actualStatus="diplomaticStatus.actualStatus"/>
   </td>
   <td class="fit pt-3 pb-2 pr-2">
     <div class="btn-group">
@@ -25,10 +28,12 @@ import PlayerAvatarVue from '../menu/PlayerAvatar'
 import DiplomacyApiService from '../../../../services/api/diplomacy'
 import gameHelper from '../../../../services/gameHelper'
 import DiplomacyHelper from '../../../../services/diplomacyHelper'
+import DiplomacyIconsVue from './DiplomacyIcons'
 
 export default {
   components: {
-    'player-avatar': PlayerAvatarVue
+    'player-avatar': PlayerAvatarVue,
+    'diplomacy-icons': DiplomacyIconsVue
   },
   props: {
     'diplomaticStatus': Object
@@ -43,7 +48,7 @@ export default {
     getFriendlyColour (playerId) {
       return gameHelper.getPlayerColour(this.$store.state.game, playerId)
     },
-    onPlayerDetailRequested(playerId) {
+    onOpenPlayerDetailRequested(playerId) {
       this.$emit('onOpenPlayerDetailRequested', playerId)
     },
     async declareAlly (diplomaticStatus) {
@@ -134,16 +139,6 @@ export default {
           console.error(err)
           this.$emit('onApiRequestError', err.response.data)
         }
-      }
-    },
-    getStatusIcon (status) {
-      switch (status) {
-        case 'allies':
-          return 'fas fa-handshake text-success'
-        case 'neutral':
-          return 'fas fa-dove text-info'
-        case 'enemies':
-          return 'fas fa-crosshairs text-danger'
       }
     }
   },

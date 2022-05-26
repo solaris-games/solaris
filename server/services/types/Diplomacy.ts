@@ -11,3 +11,11 @@ export interface DiplomaticStatus {
     statusTo: DiplomaticState;
     actualStatus: DiplomaticState;
 };
+
+export interface DiplomacyEvent {
+    playerId: DBObjectId;
+    type: string;
+    data: DiplomaticStatus;
+    sentDate: Date;
+    sentTick: number;
+};
