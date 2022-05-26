@@ -7,7 +7,7 @@
       <div class="col"></div>
       <div class="col-auto">
         <p class="mt-0 mb-0">
-          <small><em>{{getDateString(event.sentDate)}}</em></small>
+          <small><em>{{dateText}}</em></small>
         </p>
       </div>
     </div>
@@ -33,6 +33,24 @@
         </p>
         <p v-if="event.type === 'playerDebtForgiven'" class="mb-1">
           <em>Forgave <span class="text-warning">{{event.data.amount}} credits</span> of debt.</em>
+        </p>
+        <p v-if="event.type === 'playerDiplomacyStatusChanged'" class="mb-1">
+          <em><strong>Diplomatic status changed</strong>:</em>
+          <br/><br/>
+          <em>{{event.data.playerFromAlias}}: <span :class="{
+            'text-success':event.data.statusFrom==='allies',
+            'text-info':event.data.statusFrom==='neutral',
+            'text-danger':event.data.statusFrom==='enemies'}">{{event.data.statusFrom}}</span></em>
+          <br/>
+          <em>{{event.data.playerToAlias}}: <span :class="{
+            'text-success':event.data.statusTo==='allies',
+            'text-info':event.data.statusTo==='neutral',
+            'text-danger':event.data.statusTo==='enemies'}">{{event.data.statusTo}}</span></em>
+          <br/><br/>
+          <em>Actual status: <span :class="{
+            'text-success':event.data.actualStatus==='allies',
+            'text-info':event.data.actualStatus==='neutral',
+            'text-danger':event.data.actualStatus==='enemies'}">{{event.data.actualStatus}}</span></em>
         </p>
       </div>
     </div>
@@ -77,6 +95,8 @@ export default {
           return GameHelper.getPlayerById(this.$store.state.game, this.event.data.debtorPlayerId)
         case 'playerDebtForgiven':
           return GameHelper.getPlayerById(this.$store.state.game, this.event.data.creditorPlayerId)
+        case 'playerDiplomacyStatusChanged':
+          return GameHelper.getPlayerById(this.$store.state.game, this.event.data.playerIdFrom)
       }
     },
     getFromPlayerColour () {
@@ -86,6 +106,14 @@ export default {
   computed: {
     isFromUserPlayer: function () {
       return this.getFromPlayer()._id === this.getUserPlayer()._id
+    },
+    dateText: function () {
+      const date = GameHelper.getDateString(this.event.sentDate)
+      let tick = ''
+      if (this.event.sentTick || this.event.sentTick === 0) {
+        tick = ` (tick ${this.event.sentTick})`
+      }
+      return date + tick
     }
   }
 }

@@ -488,7 +488,7 @@ export default class TradeService extends EventEmitter {
                 type: e.type,
                 data: e.data,
                 sentDate: moment(e._id.getTimestamp()) as Date,
-                sentTick: game.state.tick
+                sentTick: e.tick
             }
         });
     }
