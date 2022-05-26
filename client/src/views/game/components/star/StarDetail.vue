@@ -438,12 +438,14 @@ export default {
         let response = await starService.transferAllToStar(this.$store.state.game._id, this.star._id)
         
         if (response.status === 200) {
-          let carriers = response.data.carriersAtStar
+          let carriers = response.data.carriers
 
           carriers.forEach(responseCarrier => {
             let mapObjectCarrier = gameHelper.getCarrierById(this.$store.state.game, responseCarrier._id) 
             mapObjectCarrier.ships = responseCarrier.ships
           })
+
+          this.star.ships = response.data.star.ships
 
           this.$toasted.show(`All ships transfered to ${this.star.name}.`)
         }
