@@ -234,8 +234,11 @@
           </div>
           <div class="col-4">
             <button :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.carriers || star.ships < 1 || isGameFinished" 
-              class="btn btn-block btn-success mb-2" 
-              @click="onBuildCarrierRequested">Build for ${{star.upgradeCosts.carriers}}</button>
+              class="btn btn-block btn-info mb-2" 
+              @click="onBuildCarrierRequested">
+              <i class="fas fa-rocket"></i>
+              Build for ${{star.upgradeCosts.carriers}}
+            </button>
           </div>
         </div>
 
@@ -247,11 +250,17 @@
             <modalButton v-if="canBuildWarpGates && !star.warpGate" 
               :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished" 
               modalName="buildWarpGateModal" 
-              classText="btn btn-block btn-success mb-2">Build for ${{star.upgradeCosts.warpGate}}</modalButton>
+              classText="btn btn-block btn-success mb-2">
+              <i class="fas fa-dungeon"></i>
+              Build for ${{star.upgradeCosts.warpGate}}
+            </modalButton>
             <modalButton v-if="canDestroyWarpGates && star.warpGate" 
               :disabled="$isHistoricalMode() || isGameFinished" 
               modalName="destroyWarpGateModal"
-              classText="btn btn-block btn-danger mb-2">Destroy Gate</modalButton>
+              classText="btn btn-block btn-danger mb-2">
+              <i class="fas fa-trash"></i>
+              Destroy Gate
+            </modalButton>
           </div>
         </div>
 
@@ -260,7 +269,10 @@
             <p class="mb-2">Abandon this star for another player to claim.</p>
           </div>
           <div class="col-4">
-            <modalButton modalName="abandonStarModal" classText="btn btn-block btn-danger mb-2" :disabled="$isHistoricalMode()">Abandon Star</modalButton>
+            <modalButton modalName="abandonStarModal" classText="btn btn-block btn-danger mb-2" :disabled="$isHistoricalMode()">
+              <i class="fas fa-trash"></i>
+              Abandon Star
+            </modalButton>
           </div>
         </div>
       </div>
