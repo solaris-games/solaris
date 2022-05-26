@@ -847,10 +847,16 @@ class Map extends EventEmitter {
   onCarrierMouseOver (e) {
     // If the carrier is orbiting something then send the mouse over event
     // to the star.
-    if (e.orbiting) {
-      let star = this.stars.find(s => s.data._id === e.orbiting)
+    if (e.data.orbiting) {
+      let star = this.stars.find(s => s.data._id === e.data.orbiting)
       star.onMouseOver()
     }
+
+    // Bring to front (for the tooltip)
+    // TODO: We should instead have a separate class to deal with tooltips
+    // along with a separate container for them.
+    this.carrierContainer.removeChild(e.fixedContainer)
+    this.carrierContainer.addChild(e.fixedContainer)
   }
 
   onCarrierMouseOut (e) {
