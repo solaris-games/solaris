@@ -369,20 +369,6 @@ export default class DiplomacyService extends EventEmitter {
                 { 'data.playerIdFrom': playerIdB },
                 { 'data.playerIdTo': playerIdB }
             ]
-            // $and: [
-            //     {
-            //         $or: [
-            //             { 'data.playerIdFrom': playerIdA },
-            //             { 'data.playerIdFrom': playerIdB },
-            //         ]
-            //     },
-            //     {
-            //         $or: [
-            //             { 'data.playerIdTo': playerIdA },
-            //             { 'data.playerIdTo': playerIdB },
-            //         ]
-            //     }
-            // ]
         });
 
         return events
