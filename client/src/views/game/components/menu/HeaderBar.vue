@@ -142,7 +142,7 @@ export default {
       this.recalculateTimeRemaining()
 
       if (GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)) {
-        this.intervalFunction = setInterval(this.recalculateTimeRemaining, 1000)
+        this.intervalFunction = setInterval(this.recalculateTimeRemaining, 250)
         this.recalculateTimeRemaining()
       }
     },

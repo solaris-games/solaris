@@ -19,7 +19,7 @@ export default {
     },
     mounted () {
         this.recalculateTime();
-        this.intervalFunction = setInterval(this.recalculateTime, 1000);
+        this.intervalFunction = setInterval(this.recalculateTime, 250);
     },
     destroyed () {
         if (this.intervalFunction) {

@@ -264,43 +264,6 @@ class Carrier extends EventEmitter {
     }
   }
 
-  drawTooltip () {
-    // TODO: Refactor this into a new helper class,
-    // we want to be able to share tooltip logic between stars and carriers.
-    if (this.data.ticksEta) {
-      this.containerTooltip = new PIXI.Container()
-  
-      let paddingX = 3
-      let paddingY = 1
-  
-      let bitmapFont = {fontName: "space-mono-bold", fontSize: 4}
-      let text_eta = new PIXI.BitmapText(`ETA: ${this.data.ticksEta} ticks`, bitmapFont)
-      text_eta.x = paddingX
-      text_eta.y = paddingY
-  
-      let graphics = new PIXI.Graphics()
-      graphics.lineStyle(1, 0xFFFFFF)
-      graphics.beginFill(0x000000)
-      graphics.drawRoundedRect(text_eta.x - paddingX, text_eta.y - paddingY, text_eta.width + paddingX + paddingX, text_eta.height + paddingY + paddingY, 2)
-      graphics.endFill()
-  
-      this.containerTooltip.addChild(graphics)
-      this.containerTooltip.addChild(text_eta)
-  
-      this.containerTooltip.x = -(graphics.width / 2)
-      this.containerTooltip.y = -12
-  
-      this.container.addChild(this.containerTooltip)
-    }
-  }
-
-  undrawTooltip () {
-    if (this.containerTooltip) {
-      this.container.removeChild(this.containerTooltip)
-      this.containerTooltip = null
-    }
-  }
-
   enableInteractivity() {
     // Can only be interactive if its in transit
     if (!this.data.orbiting) {
@@ -371,16 +334,12 @@ class Carrier extends EventEmitter {
     this.isMouseOver = true
 
     this.emit('onCarrierMouseOver', this)
-    
-    this.drawTooltip()
   }
 
   onMouseOut (e) {
     this.isMouseOver = false
 
-    this.emit('onCarrierMouseOut', this.data)
-
-    this.undrawTooltip()
+    this.emit('onCarrierMouseOut', this)
   }
 
   refreshZoom (zoomPercent) {

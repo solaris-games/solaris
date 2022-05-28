@@ -53,6 +53,12 @@ class GameHelper {
     return game.galaxy.players.find(x => x._id === carrier.ownedByPlayerId)
   }
 
+  isOwnedByUserPlayer (game, carrierOrStar) {
+    const userPlayer = this.getUserPlayer(game)
+
+    return userPlayer && carrierOrStar.ownedByPlayerId === userPlayer._id
+  }
+
   getCarrierOrbitingStar (game, carrier) {
     return game.galaxy.stars.find(x => x._id === carrier.orbiting)
   }

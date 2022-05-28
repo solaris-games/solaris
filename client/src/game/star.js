@@ -870,13 +870,13 @@ class Star extends EventEmitter {
   onMouseOver (e) {
     this.isMouseOver = true
 
-    this.emit('onStarMouseOver', this.data)
+    this.emit('onStarMouseOver', this)
   }
 
   onMouseOut (e) {
     this.isMouseOver = false
 
-    this.emit('onStarMouseOut', this.data)
+    this.emit('onStarMouseOut', this)
   }
 
   //This could in the future be a setter function on ZoomPercent
