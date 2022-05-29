@@ -34,6 +34,8 @@ const REINFORCEMENT_MIN_FACTOR = 1.4;
 
 const INVASION_ATTACK_FACTOR = 1.5;
 
+const BORDER_STAR_ANGLE_THRESHOLD_RADIAN = Math.PI / 2; // 90 degrees
+
 enum AiAction {
     DefendStar,
     ClaimStar,
@@ -279,17 +281,7 @@ export default class AIService {
         // All stars that can be reached from player stars with globally highest range tech
         const starsInGlobalRange = this._computeStarGraph(starsById, game, player, playerStars, game.galaxy.stars, this._getGlobalHighestHyperspaceRange(game));
 
-        const borderStars = new Set<string>();
-
-        for (const [from, reachables] of starsInGlobalRange) {
-            for (const reachableId of reachables) {
-                const reachable = starsById.get(reachableId)!;
-
-                if (!reachable.ownedByPlayerId || reachable.ownedByPlayerId.toString() !== playerId) {
-                    borderStars.add(from);
-                }
-            }
-        }
+        const borderStars = this._findBorderStars(game, player, starsById, allReachableFromPlayerStars);
 
         const playerCarriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id);
 
@@ -381,6 +373,49 @@ export default class AIService {
             transitFromCarriers,
             arrivingAtCarriers
         };
+    }
+
+    _findBorderStars(game: Game, player: Player, starsById: Map<string, Star>, allReachableFromPlayerStars: StarGraph): Set<string> {
+        const borderStars = new Set<string>();
+
+        allReachableFromPlayerStars.forEach((reachables, starId) => {
+            const star = starsById.get(starId)!;
+            const anglesToOtherStars = new Array<number>(reachables.size);
+
+            for (const otherStarId of reachables) {
+                const otherStar = starsById.get(otherStarId)!;
+
+                const dx = otherStar.location.x - star.location.x;
+                const dy = otherStar.location.y - star.location.y;
+                const angle = Math.atan2(dy, dx);
+                console.log("Angle between " + star.name + " and " + otherStar.name + ": " + angle);
+                anglesToOtherStars.push(angle);
+            }
+
+            anglesToOtherStars.sort();
+            let largestGap = 0;
+
+            for (let i = 0; i < anglesToOtherStars.length; i++) {
+                const angle = anglesToOtherStars[i];
+                let nextAngle = anglesToOtherStars[(i + 1) % anglesToOtherStars.length];
+
+                if (nextAngle < angle) {
+                    nextAngle += Math.PI * 2;
+                }
+
+                const delta = nextAngle - angle;
+                if (delta > largestGap) {
+                    largestGap = delta;
+                }
+            }
+            console.log("Largest gap: " + largestGap);
+
+            if (largestGap > BORDER_STAR_ANGLE_THRESHOLD_RADIAN) {
+                borderStars.add(starId);
+            }
+        });
+
+        return borderStars;
     }
 
     async _evaluateOrders(game: Game, player: Player, context: Context, orders: Order[], assignments: Map<string, Assignment>) {
