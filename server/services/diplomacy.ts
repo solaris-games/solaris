@@ -1,26 +1,31 @@
 const EventEmitter = require('events');
+const moment = require('moment')
 import { DBObjectId } from "./types/DBObjectId";
 import ValidationError from '../errors/validation';
 import Repository from "./repository";
-import { DiplomaticState, DiplomaticStatus } from "./types/Diplomacy";
+import { DiplomacyEvent, DiplomaticState, DiplomaticStatus } from "./types/Diplomacy";
 import { Game } from "./types/Game";
 import { Player, PlayerDiplomaticState } from "./types/Player";
 import DiplomacyUpkeepService from "./diplomacyUpkeep";
 import GameDiplomacyPeaceDeclaredEvent from "./types/events/GameDiplomacyPeaceDeclared";
 import GameDiplomacyWarDeclaredEvent from "./types/events/GameDiplomacyWarDeclared";
+import { GameEvent } from "./types/GameEvent";
 
 export default class DiplomacyService extends EventEmitter {
 
     gameRepo: Repository<Game>;
+    eventRepo: Repository<GameEvent>;
     diplomacyUpkeepService: DiplomacyUpkeepService;
 
     constructor(
         gameRepo: Repository<Game>,
+        eventRepo: Repository<GameEvent>,
         diplomacyUpkeepService: DiplomacyUpkeepService
     ) {
         super();
 
         this.gameRepo = gameRepo;
+        this.eventRepo = eventRepo;
         this.diplomacyUpkeepService = diplomacyUpkeepService;
     }
 
@@ -353,6 +358,29 @@ export default class DiplomacyService extends EventEmitter {
         }
 
         return newStatus;
+    }
+
+    async listDiplomacyEventsBetweenPlayers(game: Game, playerIdA: DBObjectId, playerIdB: DBObjectId): Promise<DiplomacyEvent[]> {
+        let events = await this.eventRepo.find({
+            gameId: game._id,
+            playerId: playerIdA,
+            type: 'playerDiplomacyStatusChanged',
+            $or: [
+                { 'data.playerIdFrom': playerIdB },
+                { 'data.playerIdTo': playerIdB }
+            ]
+        });
+
+        return events
+        .map(e => {
+            return {
+                playerId: e.playerId!,
+                type: e.type,
+                data: e.data,
+                sentDate: moment(e._id.getTimestamp()) as Date,
+                sentTick: e.tick
+            }
+        });
     }
 
 };

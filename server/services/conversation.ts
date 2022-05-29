@@ -8,6 +8,7 @@ import { Game } from './types/Game';
 import { Player } from './types/Player';
 import TradeService from './trade';
 import ConversationMessageSentEvent from './types/events/ConversationMessageSent';
+import DiplomacyService from './diplomacy';
 const mongoose = require('mongoose');
 const EventEmitter = require('events');
 
@@ -68,15 +69,18 @@ function getNewConversation(game: Game, playerId: DBObjectId | null, name: strin
 export default class ConversationService extends EventEmitter {
     gameRepo: Repository<Game>;
     tradeService: TradeService;
+    diplomacyService: DiplomacyService;
 
     constructor(
         gameRepo: Repository<Game>,
-        tradeService: TradeService
+        tradeService: TradeService,
+        diplomacyService: DiplomacyService
     ) {
         super();
 
         this.gameRepo = gameRepo;
         this.tradeService = tradeService;
+        this.diplomacyService = diplomacyService;
     }
 
     async create(game: Game, playerId: DBObjectId, name: string, participantIds: DBObjectId[]): Promise<Conversation> {
@@ -202,9 +206,18 @@ export default class ConversationService extends EventEmitter {
         // If there are only two participants, then include any trade events that occurred
         // between the players.
         if (convo.participants.length === 2) {
-            let events = await this.tradeService.listTradeEventsBetweenPlayers(game, playerId, convo.participants);
+            const playerIdA = playerId
+            const playerIdB = convo.participants.filter(p => p.toString() !== playerIdA.toString())[0]
 
-            convo.messages = convo.messages.concat(events);
+            // TODO: This needs to be refactored like the diplomacy service diplo events function as to not pass in an array of participants
+            // because it doesnt make sense to do so, instead just pass in player A and player B.
+            let tradeEvents = await this.tradeService.listTradeEventsBetweenPlayers(game, playerId, convo.participants);
+
+            convo.messages = convo.messages.concat(tradeEvents);
+
+            let diploEvents = await this.diplomacyService.listDiplomacyEventsBetweenPlayers(game, playerIdA, playerIdB)
+
+            convo.messages = convo.messages.concat(diploEvents)
         }
 
         // Sort by sent date ascending.

@@ -1,5 +1,5 @@
-import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
+const mongoose = require('mongoose')
 
 export default (container: DependencyContainer, io) => {
     return {
@@ -31,7 +31,7 @@ export default (container: DependencyContainer, io) => {
                 let newStatus = await container.diplomacyService.declareAlly(
                     req.game,
                     req.player._id,
-                    req.params.playerId);
+                    new mongoose.Types.ObjectId(req.params.playerId));
     
                 await container.broadcastService.gamePlayerDiplomaticStatusChanged(req.player._id, req.params.playerId, newStatus);
     
@@ -45,7 +45,7 @@ export default (container: DependencyContainer, io) => {
                 let newStatus = await container.diplomacyService.declareEnemy(
                     req.game,
                     req.player._id,
-                    req.params.playerId);
+                    new mongoose.Types.ObjectId(req.params.playerId));
     
                 await container.broadcastService.gamePlayerDiplomaticStatusChanged(req.player._id, req.params.playerId, newStatus);
     
@@ -59,7 +59,7 @@ export default (container: DependencyContainer, io) => {
                 let newStatus = await container.diplomacyService.declareNeutral(
                     req.game,
                     req.player._id,
-                    req.params.playerId);
+                    new mongoose.Types.ObjectId(req.params.playerId));
     
                 await container.broadcastService.gamePlayerDiplomaticStatusChanged(req.player._id, req.params.playerId, newStatus);
     
