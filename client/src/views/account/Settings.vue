@@ -15,8 +15,8 @@
         <div class="col-auto">
           <p class="text-right">
             <i class="fas fa-coins mr-2"></i>
-            <strong>{{ info.credits }}</strong> credits
-            <router-link :to="{ name: 'galactic-credits-shop'}" class="btn btn-success ml-2"><i class="fas fa-shopping-cart"></i></router-link>
+            <strong>{{ info.credits }}</strong> credit<span v-if="info.credits !== 1">s</span>
+            <router-link :to="{ name: 'galactic-credits-shop'}" class="btn btn-success ml-2"><i class="fas fa-shopping-cart"></i> Store</router-link>
           </p>
         </div>
       </div>
@@ -47,7 +47,7 @@
 
       <div class="row pt-3 pb-3 bg-primary">
         <div class="col">
-          <p>Email Notifications</p>
+          <p>Email Game Notifications</p>
         </div>
         <div class="col text-right">
           <button v-if="info.emailEnabled" :disabled="isChangingEmailNotifications" @click="toggleEmailNotifications(false)" class="btn btn-success">
@@ -63,11 +63,27 @@
 
       <div class="row pt-3 pb-3 bg-secondary">
         <div class="col">
-          <p>Discord Integration</p>
+          <p>Email Updates &amp; Newsletters</p>
+        </div>
+        <div class="col text-right">
+          <button v-if="info.emailOtherEnabled" :disabled="isChangingEmailNotifications" @click="toggleEmailOtherNotifications(false)" class="btn btn-success">
+            Enabled
+            <i class="fas fa-check"></i>
+          </button>
+          <button v-if="!info.emailOtherEnabled" :disabled="isChangingEmailNotifications" @click="toggleEmailOtherNotifications(true)" class="btn btn-danger">
+            Disabled
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="row pt-3 pb-3 bg-primary">
+        <div class="col">
+          <p>Discord Game Notifications</p>
           <p><small><strong>You must be a member</strong> of the official Solaris discord server.</small></p>
         </div>
         <div class="col text-right">
-          <a href="https://discord.com/invite/v7PD33d" target="_blank" title="Discord" class="btn btn-primary mr-1">
+          <a href="https://discord.com/invite/v7PD33d" target="_blank" title="Discord" class="btn btn-secondary mr-1">
             Join
             <i class="fab fa-discord"></i>
           </a>
@@ -75,7 +91,7 @@
             Connected
             <i class="fas fa-check"></i>
           </a>
-          <a id="discordLogin" class="btn btn-primary" v-if="!isAuthenticatedWithDiscord" :href="discordOauthURL">
+          <a id="discordLogin" class="btn btn-secondary" v-if="!isAuthenticatedWithDiscord" :href="discordOauthURL">
             Setup
             <i class="fas fa-cog"></i>
           </a>
@@ -84,8 +100,8 @@
     </div>
 
     <div class="mt-3">
-      <button :disabled="isClosingAccount" class="btn btn-danger" @click="closeAccount">Delete Account</button>
-      <router-link to="/account/reset-password" tag="button" class="btn btn-primary ml-1">Change Password</router-link>
+      <button :disabled="isClosingAccount" class="btn btn-danger" @click="closeAccount"><i class="fas fa-trash"></i> Delete Account</button>
+      <router-link to="/account/reset-password" tag="button" class="btn btn-primary ml-1"><i class="fas fa-lock"></i> Change Password</router-link>
     </div>
 
     <subscriptions v-if="isAuthenticatedWithDiscord"/>
@@ -134,9 +150,9 @@ export default {
 
     let discordSuccess = this.$route.query.discordSuccess
     
-    if (discordSuccess === "true") {
+    if (discordSuccess === 'true') {
       this.$toasted.show(`Successfully authenticated with Discord!`, { type: 'success' })
-    } else if (discordSuccess === "false") {
+    } else if (discordSuccess === 'false') {
       this.$toasted.show(`There was a problem connecting to Discord, please try again.`, { type: 'error' })
     }
   },
@@ -148,6 +164,19 @@ export default {
         this.isChangingEmailNotifications = true
 
         await userService.toggleEmailNotifications(this.info.emailEnabled)
+      } catch (err) {
+        console.error(err)
+      }
+
+      this.isChangingEmailNotifications = false
+    },
+    async toggleEmailOtherNotifications (enabled) {
+      this.info.emailOtherEnabled = enabled
+
+      try {
+        this.isChangingEmailNotifications = true
+
+        await userService.toggleEmailOtherNotifications(this.info.emailOtherEnabled)
       } catch (err) {
         console.error(err)
       }

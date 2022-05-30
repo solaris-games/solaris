@@ -8,6 +8,7 @@ import OfficialGamesCheckJob from './officialGamesCheck';
 import CleanupGamesTimedOutJob from './cleanupGamesTimedOut';
 import CleanupOldGameHistoryJob from './cleanupOldGameHistory';
 import CleanupOldTutorialsJob from './cleanupOldTutorials';
+import SendReviewRemindersJob from './sendReviewReminders';
 
 let mongo;
 
@@ -40,6 +41,7 @@ async function startup() {
     const cleanupGamesTimedOutJob = CleanupGamesTimedOutJob(container);
     const cleanupOldGameHistory = CleanupOldGameHistoryJob(container);
     const cleanupOldTutorials = CleanupOldTutorialsJob(container);
+    const sendReviewReminders = SendReviewRemindersJob(container);
 
     // Set up the agenda instance.
     const agendajs = new Agenda()
@@ -82,6 +84,12 @@ async function startup() {
     },
     cleanupOldTutorials.handler);
 
+    // Send review reminders
+    agendajs.define('send-review-reminders', {
+        priority: 'high', concurrency: 1
+    },
+    sendReviewReminders.handler);
+
     // ...
 
     // ------------------------------
@@ -94,6 +102,7 @@ async function startup() {
     agendajs.every('1 hour', 'cleanup-games-timed-out');
     agendajs.every('1 day', 'cleanup-old-game-history');
     agendajs.every('1 day', 'cleanup-old-tutorials');
+    agendajs.every('10 seconds', 'send-review-reminders'); // TODO: Every 10 seconds until we've gone through all backlogged users.
 }
 
 process.on('SIGINT', async () => {

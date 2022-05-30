@@ -20,11 +20,9 @@ const path = require('path');
 function getFakeTransport() {
     return {
         async sendMail(message) {
-            console.log('-----');
-            console.log(`SMTP DISABLED - Attempted to send email to [${message.to}] from [${message.from}]`);
+            console.log(`SMTP DISABLED`);
             // console.log(message.text);
             // console.log(message.html);
-            console.log('-----');
         }
     };
 }
@@ -77,6 +75,10 @@ export default class EmailService {
         GAME_PLAYER_AFK: {
             fileName: 'gamePlayerAfk.html',
             subject: 'Solaris - You\'ve gone AFK'
+        },
+        REVIEW_REMINDER_30_DAYS: {
+            fileName: 'reviewReminder.html',
+            subject: 'Solaris - How did we do?'
         }
     };
 
@@ -117,10 +119,14 @@ export default class EmailService {
         this.gameTickService.on('onGameCycleEnded', (args) => this.sendGameCycleSummaryEmail(args.gameId));
     }
 
+    isEnabled() {
+        return this.config.smtp.enabled
+    }
+
     _getTransport() {
         // If emails are disabled, return a fake transport which
         //outputs the message to the console.
-        if (this.config.smtp.enabled) {
+        if (this.isEnabled()) {
             return nodemailer.createTransport({
                 host: this.config.smtp.host,
                 port: this.config.smtp.port,
@@ -143,6 +149,8 @@ export default class EmailService {
             text
         };
         
+        console.log(`EMAIL: [${message.from}] -> [${message.to}] - ${subject}`);
+
         return await transport.sendMail(message);
     }
 
@@ -156,6 +164,8 @@ export default class EmailService {
             html
         };
         
+        console.log(`EMAIL HTML: [${message.from}] -> [${message.to}] - ${subject}`);
+
         return await transport.sendMail(message);
     }
 
@@ -188,6 +198,16 @@ export default class EmailService {
         } catch (err) {
             console.error(err);
         }
+    }
+
+    async sendReviewReminderEmail(user: User) {
+        if (!user.emailOtherEnabled) {
+            throw new Error(`The user is not subscribed to review reminder emails.`);
+        }
+
+        await this.sendTemplate(user.email, this.TEMPLATES.REVIEW_REMINDER_30_DAYS, [
+            user.username
+        ]);
     }
 
     async sendGameStartedEmail(args: BaseGameEvent) {
