@@ -28,6 +28,12 @@
         Every time a tick occurs, carriers will move, ships are built, research is conducted, combat between players is performed and stars are captured.
     </p>
 
+    <p>
+        <span class="text-danger">Solaris is a slow game</span>, carriers travel in real-time and <span class="text-danger">will take real hours to complete.</span>
+        It is perfectly normal to play a couple of minutes and come back hours later.
+        In the meantime, many players will plan their next steps and engage in diplomacy.
+    </p>
+
     <p class="text-warning">
         <i>Note: This tutorial is <strong>turn based</strong>, use the green tick at the top right to submit your turn and the game will progress within a few seconds.</i>
     </p>
