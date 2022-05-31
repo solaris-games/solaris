@@ -281,7 +281,7 @@ export default class AIService {
         // All stars that can be reached from player stars with globally highest range tech
         const starsInGlobalRange = this._computeStarGraph(starsById, game, player, playerStars, game.galaxy.stars, this._getGlobalHighestHyperspaceRange(game));
 
-        const borderStars = this._findBorderStars(game, player, starsById, allReachableFromPlayerStars);
+        const borderStars = this._findBorderStars(game, player, starsById, reachablePlayerStars);
 
         const playerCarriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id);
 
@@ -375,12 +375,20 @@ export default class AIService {
         };
     }
 
-    _findBorderStars(game: Game, player: Player, starsById: Map<string, Star>, allReachableFromPlayerStars: StarGraph): Set<string> {
+    _findBorderStars(game: Game, player: Player, starsById: Map<string, Star>, reachablePlayerStars: StarGraph): Set<string> {
         const borderStars = new Set<string>();
 
-        allReachableFromPlayerStars.forEach((reachables, starId) => {
+        for (const [starId, reachables] of reachablePlayerStars) {
+            if (reachables.size === 0) {
+                borderStars.add(starId);
+                const star = starsById.get(starId)!;
+                console.log(star.name + " is a border star");
+                continue;
+            }
+
             const star = starsById.get(starId)!;
             const anglesToOtherStars = new Array<number>(reachables.size);
+            console.log("Checking if " + star.name + " is a border star...")
 
             for (const otherStarId of reachables) {
                 const otherStar = starsById.get(otherStarId)!;
@@ -393,11 +401,14 @@ export default class AIService {
             }
 
             anglesToOtherStars.sort();
+            const smallest = anglesToOtherStars[0];
+            anglesToOtherStars.push(2 * Math.PI + smallest); //Push first angle to the back again to compute angles between all stars
+
             let largestGap = 0;
 
-            for (let i = 0; i < anglesToOtherStars.length; i++) {
+            for (let i = 0; i < anglesToOtherStars.length - 1; i++) {
                 const angle = anglesToOtherStars[i];
-                let nextAngle = anglesToOtherStars[(i + 1) % anglesToOtherStars.length];
+                let nextAngle = anglesToOtherStars[i + 1];
 
                 if (nextAngle < angle) {
                     nextAngle += Math.PI * 2;
@@ -412,8 +423,10 @@ export default class AIService {
 
             if (largestGap > BORDER_STAR_ANGLE_THRESHOLD_RADIAN) {
                 borderStars.add(starId);
+                console.log(star.name + " is a border star");
             }
-        });
+
+        }
 
         return borderStars;
     }
