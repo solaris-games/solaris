@@ -106,7 +106,7 @@ const schema = new Schema({
             displayGuildTag: { type: Types.String, required: false, enum: ['visible', 'hidden'], default: 'visible' },
         },
         map: {
-            naturalResources: { type: Types.String, required: false, enum: ['planets', 'single-ring'], default: 'planets' },
+            naturalResources: { type: Types.String, required: false, enum: ['planets', 'single-ring'], default: 'single-ring' },
             carrierLoopStyle: { type: Types.String, required: false, enum: ['solid', 'dashed'], default: 'dashed' },
             carrierPathWidth: { type: Types.Number, required: false, default: 1, min: 1, max: 8 },
             carrierPathDashLength: { type: Types.Number, required: false, default: 6, min: 4, max: 16 },
