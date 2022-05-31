@@ -21,11 +21,13 @@ export default (container: DependencyContainer) => {
             for (const user of users) {
                 try {
                     await container.emailService.sendReviewReminderEmail(user);
-                    await container.userService.setReviewReminderEmailSent(user._id, true);
-                    await sleep(1000) // Wait for a second before sending the next email.
                 } catch (e) {
                     console.error(e);
+                } finally {
+                    await container.userService.setReviewReminderEmailSent(user._id, true);
                 }
+                
+                await sleep(1000) // Wait for a second before sending the next email.
             }
 
             done();
