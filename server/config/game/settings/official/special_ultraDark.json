@@ -7,7 +7,7 @@
     "password": null,
     "playerLimit": 8,
     "playerType": "establishedPlayers",
-    "anonymity": "normal",
+    "anonymity": "extra",
     "playerOnlineStatus": "hidden",
     "timeMachine": "enabled",
     "fluxEnabled": "enabled",
