@@ -24,7 +24,7 @@
       </button>
     </div>
     <div class="col-auto pl-0" v-if="userPlayer">
-      <button v-if="canBuildWarpGates && !star.warpGate" :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished" class="btn btn-sm btn-info mr-1" title="Build a warp gate - Grants x3 speed between warp gates" @click="confirmBuildWarpGate">
+      <button v-if="canBuildWarpGates && !star.warpGate" :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished" class="btn btn-sm btn-primary mr-1" title="Build a warp gate - Grants x3 speed between warp gates" @click="confirmBuildWarpGate">
         <i class="fas fa-dungeon mr-1"></i>${{star.upgradeCosts.warpGate}}
       </button>
       <button v-if="canDestroyWarpGates && star.warpGate" :disabled="$isHistoricalMode() || isGameFinished" class="btn btn-sm btn-danger mr-1" @click="confirmDestroyWarpGate" title="Destroy the warp gate">

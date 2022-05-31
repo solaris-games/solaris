@@ -188,7 +188,10 @@
           <h4>Carriers</h4>
         </div>
         <div class="col-auto">
-          <button title="Transfer all ships to the star" v-if="isOwnedByUserPlayer" type="button" class="btn btn-sm btn-primary" @click="transferAllToStar()"><i class="fas fa-chevron-up"></i></button>
+          <button title="Transfer all ships to the star" v-if="isOwnedByUserPlayer" type="button" class="btn btn-sm btn-primary" @click="transferAllToStar()">
+            <i class="fas fa-chevron-up"></i>
+            Garrison All
+          </button>
         </div>
       </div>
 

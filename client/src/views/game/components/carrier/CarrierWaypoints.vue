@@ -37,8 +37,8 @@
 
       <form-error-list v-bind:errors="errors" class="mt-2"/>
 
-		  <div class="row bg-primary pt-2 pb-2 mt-2">
-		  	<div class="col-12">
+		  <div class="row mt-2">
+		  	<div class="col-12 pt-2 pb-2 bg-primary" v-if="carrier.waypoints && carrier.waypoints.length">
           <!--Yes, that key-property depending on the current date is there for a reason. Otherwise, under certain circumstances, the text is not updated on screen on iOS Safari.-->
           <!-- https://stackoverflow.com/questions/55008261/my-react-component-does-not-update-in-the-safari-browser -->
           <!-- Seriously, what is wrong with you, Safari? -->

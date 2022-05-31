@@ -8,13 +8,13 @@
           </h5>
         </div>
         <div v-if="!$isHistoricalMode() && canHireSpecialist && !isGameFinished" class="col-auto">
-            <button class="btn btn-sm btn-success" @click="onViewHireCarrierSpecialistRequested"><i class="fas fa-wrench"></i> Hire Specialist</button>
+            <button class="btn btn-sm btn-success" @click="onViewHireCarrierSpecialistRequested"><i class="fas fa-user-astronaut"></i> Hire Specialist</button>
         </div>
         <div class="col-12 mt-2">
             <p v-if="carrier.specialist">{{carrier.specialist.description}}</p>
             <p v-if="carrier.specialist && carrier.specialist.oneShot" class="text-warning"><small>This specialist cannot be replaced.</small></p>
             <p class="mb-2" v-if="!carrier.specialistId">
-                <i>This carrier does not have a specialist assigned.</i>
+              <small><i>This carrier does not have a specialist assigned.</i></small>
             </p>
         </div>
     </div>

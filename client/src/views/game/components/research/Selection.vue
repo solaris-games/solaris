@@ -1,6 +1,6 @@
 <template>
  <form @submit.prevent v-if="player">
-    <div class="form-group row mb-0 bg-primary">
+    <div class="form-group row mb-0 bg-info">
         <label class="col col-form-label">Total Science:</label>
         <div class="col text-right">
             <label class="col-form-label">{{player.stats.totalScience}} <i class="fas fa-flask"></i></label>
@@ -24,7 +24,7 @@
             <label class="col-form-label">{{timeRemainingEta}}</label>
         </div>
     </div>
-    <div class="form-group row pt-2 pb-2 mb-0 bg-secondary" v-if="!player.defeated">
+    <div class="form-group row pt-2 pb-2 mb-0 bg-secondary mt-1" v-if="!player.defeated">
         <label class="col-5 col-form-label">Next:</label>
         <div class="col-7">
             <select class="form-control" v-model="player.researchingNext" v-on:change="updateResearchNext" v-if="!loadingNext" :disabled="$isHistoricalMode() || isGameFinished">

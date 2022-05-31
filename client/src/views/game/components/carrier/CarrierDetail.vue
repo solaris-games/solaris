@@ -91,7 +91,7 @@
           </button>
           <button class="btn btn-sm btn-success ml-1" v-if="canEditWaypoints" @click="editWaypoints()">
             Waypoints
-            <i class="fas fa-pencil-alt"></i>
+            <i class="fas fa-map-marker-alt"></i>
           </button>
         </div>
       </div>
@@ -157,7 +157,7 @@
         <div class="col-auto">
           <button class="btn btn-sm btn-success" @click="editWaypoints()">
             Edit Waypoints
-            <i class="fas fa-pencil-alt"></i>
+            <i class="fas fa-map-marker-alt"></i>
           </button>
         </div>
       </div>

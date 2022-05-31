@@ -23,9 +23,7 @@
     <infrastructure v-if="player" :playerId="player._id"/>
 
     <yourInfrastructure v-if="userPlayer && player != userPlayer"
-                    :economy="userPlayer.stats.totalEconomy"
-                    :industry="userPlayer.stats.totalIndustry"
-                    :science="userPlayer.stats.totalScience"/>
+                    :comparePlayerId="player._id"/>
 
     <h4 v-if="player && player.research" class="mt-2">Technology</h4>
     

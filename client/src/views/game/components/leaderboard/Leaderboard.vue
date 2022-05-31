@@ -19,12 +19,12 @@
 
     <div class="row mb-2" v-if="!game.state.endDate">
         <div class="col text-center pt-2">
-            <p class="mb-0 text-warning" v-if="isConquestAllStars">Be the first to capture {{game.state.starsForVictory}} of {{game.state.stars}} stars.</p>
-            <p class="mb-0 text-warning" v-if="isConquestHomeStars">Be the first to capture {{game.state.starsForVictory}} of {{game.settings.general.playerLimit}} capital stars.</p>
-            <p class="mb-0 text-warning" v-if="isKingOfTheHillMode">Capture and hold the center star to win.</p>
+            <p class="mb-0 text-warning" v-if="isConquestAllStars">Be the first to capture {{game.state.starsForVictory}} of {{game.state.stars}} stars</p>
+            <p class="mb-0 text-warning" v-if="isConquestHomeStars">Be the first to capture {{game.state.starsForVictory}} of {{game.settings.general.playerLimit}} capital stars</p>
+            <p class="mb-0 text-warning" v-if="isKingOfTheHillMode">Capture and hold the center star to win</p>
             <p class="mb-0" v-if="game.settings.general.mode === 'battleRoyale'">Battle Royale - {{game.state.stars}} Stars Remaining</p>
             <p class="mb-0" v-if="isKingOfTheHillMode && game.state.ticksToEnd == null"><small>The countdown begins when the center star is captured</small></p>
-            <p class="mb-0 text-danger" v-if="game.state.ticksToEnd != null">Countdown - {{game.state.ticksToEnd}} Ticks Remaining <help-tooltip v-if="isKingOfTheHillMode" tooltip="The countdown will reset to 1 cycle if the center star is captured with less than 1 cycle left"/></p>
+            <p class="mb-0 text-danger" v-if="game.state.ticksToEnd != null">Countdown - {{game.state.ticksToEnd}} Tick<span v-if="game.state.ticksToEnd !== 1">s</span> Remaining <help-tooltip v-if="isKingOfTheHillMode" tooltip="The countdown will reset to 1 cycle if the center star is captured with less than 1 cycle left"/></p>
         </div>
     </div>
 
@@ -79,7 +79,7 @@
                           <i class="fas fa-star mr-0"></i> {{player.stats.totalStars}}
                         </span>
                         <span class="d-none d-sm-block">
-                          {{player.stats.totalStars}} Stars
+                          {{player.stats.totalStars}} Star<span v-if="player.stats.totalStars !== 1">s</span>
                         </span> 
                       </td>
                       <td class="fit pt-3 pr-2" v-if="isConquestHomeStars">
@@ -87,7 +87,7 @@
                           <i class="fas fa-star mr-0"></i> {{player.stats.totalHomeStars}}({{player.stats.totalStars}})
                         </span>
                         <span class="d-none d-sm-block">
-                          {{player.stats.totalHomeStars}}({{player.stats.totalStars}}) Stars
+                          {{player.stats.totalHomeStars}}({{player.stats.totalStars}}) Star<span v-if="player.stats.totalStars !== 1">s</span>
                         </span> 
                       </td>
                       <td class="fit pt-2 pb-2 pr-1 text-center" v-if="isTurnBasedGame && canEndTurn">

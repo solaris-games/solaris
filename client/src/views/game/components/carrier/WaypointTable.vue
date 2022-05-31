@@ -13,7 +13,7 @@
                 </td>
                 <td class="text-right" v-if="!$isHistoricalMode() && canEditWaypoints">
                   <a href="javascript:;" @click="onEditWaypointsRequested">
-                    <i class="fas fa-pencil-alt"></i>
+                    Edit
                   </a>
                 </td>
             </tr>

@@ -16,7 +16,7 @@
 
     <div class="row bg-secondary" v-if="!isLoading && userPlayer && playerId !== userPlayer._id">
         <div class="col text-center pt-3">
-            <p class="mb-3">Buy this player a <a href="javascript:;" @click="onOpenPurchasePlayerBadgeRequested">Badge of Honor</a>.</p>
+            <p class="mb-3">Buy this player a <a href="javascript:;" @click="onOpenPurchasePlayerBadgeRequested">Badge of Honor<i class="fas fa-medal ml-1"></i></a></p>
         </div>
     </div>
 
