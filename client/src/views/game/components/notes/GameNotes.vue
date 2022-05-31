@@ -9,9 +9,11 @@
             <textarea v-model="notes" class="form-control" rows="15" placeholder="Write your notes here..."></textarea>
         </div>
 
-        <div class="col"></div>
+        <div class="col">
+          <span :class="{'text-danger':isExceededMaxLength}">{{ noteLength }}/2000</span>
+        </div>
         <div class="col-auto mt-2 mb-2">
-            <button class="btn btn-success" :disabled="isSavingNotes" @click="updateGameNotes">
+            <button class="btn btn-success" :disabled="isSavingNotes || isExceededMaxLength" @click="updateGameNotes">
                 <i class="fas fa-save"></i> Save Notes
             </button>
         </div>
@@ -72,6 +74,14 @@ export default {
         }
 
         this.isSavingNotes = false
+    }
+  },
+  computed: {
+    noteLength () {
+      return this.notes.length
+    },
+    isExceededMaxLength () {
+      return this.noteLength > 2000
     }
   }
 }

@@ -49,8 +49,8 @@ export interface GameSaveNotesRequest {
 export const mapToGameSaveNotesRequest = (body: any): GameSaveNotesRequest => {
     let errors: string[] = [];
 
-    if (!keyHasStringValue(body, 'notes')) {
-        errors.push('Notes is required.');
+    if (!keyHasStringValue(body, 'notes', 0, 2000)) {
+        errors.push('Notes is required and must not be greater than 2000 characters.');
     }
 
     if (errors.length) {
