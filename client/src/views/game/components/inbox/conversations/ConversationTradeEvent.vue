@@ -37,12 +37,12 @@
         <p v-if="event.type === 'playerDiplomacyStatusChanged'" class="mb-1">
           <em><strong>Diplomatic status changed</strong>:</em>
           <br/><br/>
-          <em>{{event.data.playerFromAlias}}: <span :class="{
+          <em>{{event.data.playerToAlias}}: <span :class="{
             'text-success':event.data.statusFrom==='allies',
             'text-info':event.data.statusFrom==='neutral',
             'text-danger':event.data.statusFrom==='enemies'}">{{event.data.statusFrom}}</span></em>
           <br/>
-          <em>{{event.data.playerToAlias}}: <span :class="{
+          <em>{{event.data.playerFromAlias}}: <span :class="{
             'text-success':event.data.statusTo==='allies',
             'text-info':event.data.statusTo==='neutral',
             'text-danger':event.data.statusTo==='enemies'}">{{event.data.statusTo}}</span></em>
