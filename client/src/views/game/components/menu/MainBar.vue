@@ -250,6 +250,9 @@ export default {
   },
   methods: {
     onMenuRequested (menuState) {
+      // TODO: For some reason, using the state to drive
+      // the menus doesn't work correctly so instead we use the data() function
+      // above to store the menu state in the component.
       menuState.state = menuState.state || null
       menuState.args = menuState.args || null
 
@@ -263,7 +266,7 @@ export default {
       }
     },
     changeMenuState (state, args) {
-      this.onMenuRequested({
+      this.$store.commit('setMenuState', {
         state,
         args
       })

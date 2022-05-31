@@ -29,9 +29,24 @@ export default new Vuex.Store({
   mutations: {
     // Menu
     setMenuState (state, menuState) {
+      menuState.state = menuState.state || null
+      menuState.args = menuState.args || null
+
+      // Toggle menu if its already open.
+      if (menuState.state === state.menuState && menuState.args === state.menuArguments) {
+        state.menuArguments = null
+        state.menuState = null
+      } else {
+        state.menuArguments = menuState.args
+        state.menuState = menuState.state
+      }
+
       eventBus.$emit('onMenuRequested', menuState)
     },
     clearMenuState (state) {
+      state.menuState = null
+      state.menuArguments = null
+
       eventBus.$emit('onMenuRequested', {
         state: null,
         args: null
