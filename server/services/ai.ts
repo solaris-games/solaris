@@ -395,7 +395,8 @@ export default class AIService {
 
                 const dx = otherStar.location.x - star.location.x;
                 const dy = otherStar.location.y - star.location.y;
-                const angle = Math.atan2(dy, dx);
+                const angleRad = Math.atan2(dy, dx);
+                const angle = (angleRad * (180 / Math.PI)) + 180;
                 console.log("Angle between " + star.name + " and " + otherStar.name + ": " + angle);
                 anglesToOtherStars.push(angle);
             }
