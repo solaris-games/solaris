@@ -379,7 +379,7 @@ export default class AIService {
         const borderStars = new Set<string>();
 
         for (const [starId, reachables] of reachablePlayerStars) {
-            if (reachables.size === 0) {
+            if (reachables.size === 0 || reachables.size === 1) {
                 borderStars.add(starId);
                 const star = starsById.get(starId)!;
                 console.log(star.name + " is a border star");
