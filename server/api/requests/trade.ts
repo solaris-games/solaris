@@ -31,6 +31,8 @@ export const mapToTradeSendToPlayerRequest = (body: any, userId: any): TradeSend
         throw new ValidationError(errors);
     }
 
+    body.amount = +body.amount;
+
     return {
         toPlayerId: body.toPlayerId,
         amount: body.amount
@@ -61,6 +63,8 @@ export const mapToTradeSendTechnologyToPlayerRequest = (body: any): TradeSendTec
     if (errors.length) {
         throw new ValidationError(errors);
     }
+
+    body.level = +body.level;
 
     return {
         toPlayerId: body.toPlayerId,

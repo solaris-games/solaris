@@ -48,6 +48,8 @@ export const mapToStarUpgradeInfrastructureBulkRequest = (body: any): StarUpgrad
         throw new ValidationError(errors);
     }
 
+    body.amount = +body.amount;
+
     return {
         upgradeStrategy: body.upgradeStrategy,
         infrastructure: body.infrastructure,

@@ -33,6 +33,8 @@ export const mapToGameJoinGameRequest = (body: any): GameJoinGameRequest => {
     if (errors.length) {
         throw new ValidationError(errors);
     }
+
+    body.avatar = +body.avatar;
     
     return {
         playerId: body.playerId,
