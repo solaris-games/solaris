@@ -403,17 +403,15 @@ export default class AIService {
 
             anglesToOtherStars.sort();
             const smallest = anglesToOtherStars[0];
-            anglesToOtherStars.push(2 * Math.PI + smallest); //Push first angle to the back again to compute angles between all stars
+            anglesToOtherStars.push(360 + smallest); //Push first angle to the back again to compute angles between all stars
+
+            console.log("Angles: " + anglesToOtherStars.join(", "));
 
             let largestGap = 0;
 
             for (let i = 0; i < anglesToOtherStars.length - 1; i++) {
                 const angle = anglesToOtherStars[i];
                 let nextAngle = anglesToOtherStars[i + 1];
-
-                if (nextAngle < angle) {
-                    nextAngle += Math.PI * 2;
-                }
 
                 const delta = nextAngle - angle;
                 if (delta > largestGap) {
@@ -428,6 +426,11 @@ export default class AIService {
             }
 
         }
+
+        console.log("Border stars:");
+        borderStars.forEach(starId => {
+            console.log(starsById.get(starId)!.name);
+        });
 
         return borderStars;
     }
