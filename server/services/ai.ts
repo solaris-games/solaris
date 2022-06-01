@@ -387,7 +387,7 @@ export default class AIService {
             }
 
             const star = starsById.get(starId)!;
-            const anglesToOtherStars = new Array<number>(reachables.size);
+            const anglesToOtherStars = new Array<number>();
             console.log("Checking if " + star.name + " is a border star...")
 
             for (const otherStarId of reachables) {
@@ -401,7 +401,7 @@ export default class AIService {
                 anglesToOtherStars.push(angle);
             }
 
-            anglesToOtherStars.sort();
+            anglesToOtherStars.sort((a, b) => a - b);
             const smallest = anglesToOtherStars[0];
             anglesToOtherStars.push(360 + smallest); //Push first angle to the back again to compute angles between all stars
 
