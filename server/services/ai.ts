@@ -34,7 +34,7 @@ const REINFORCEMENT_MIN_FACTOR = 1.4;
 
 const INVASION_ATTACK_FACTOR = 1.5;
 
-const BORDER_STAR_ANGLE_THRESHOLD_RADIAN = Math.PI / 2; // 90 degrees
+const BORDER_STAR_ANGLE_THRESHOLD_DEGREES = 90;
 
 enum AiAction {
     DefendStar,
@@ -422,7 +422,7 @@ export default class AIService {
             }
             console.log("Largest gap: " + largestGap);
 
-            if (largestGap > BORDER_STAR_ANGLE_THRESHOLD_RADIAN) {
+            if (largestGap > BORDER_STAR_ANGLE_THRESHOLD_DEGREES) {
                 borderStars.add(starId);
                 console.log(star.name + " is a border star");
             }
