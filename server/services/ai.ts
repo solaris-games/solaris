@@ -281,7 +281,9 @@ export default class AIService {
         // All stars that can be reached from player stars with globally highest range tech
         const starsInGlobalRange = this._computeStarGraph(starsById, game, player, playerStars, game.galaxy.stars, this._getGlobalHighestHyperspaceRange(game));
 
-        const borderStars = this._findBorderStars(game, player, starsById, reachablePlayerStars);
+        const playerStarsInLogicalRange = this._computeStarGraph(starsById, game, player, playerStars, playerStars, this._getHyperspaceRangeLogical(game, player));
+
+        const borderStars = this._findBorderStars(game, player, starsById, playerStarsInLogicalRange);
 
         const playerCarriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id);
 
@@ -1149,6 +1151,12 @@ export default class AIService {
         const highestLevel = maxBy((p: Player) => p.research.hyperspace.level, game.galaxy.players);
 
         return this.distanceService.getHyperspaceDistance(game, highestLevel);
+    }
+
+    _getHyperspaceRangeLogical(game: Game, player: Player): number {
+        const scanningRange = this.distanceService.getScanningDistance(game, player.research.scanning.level);
+        const hyperspaceRange = this.distanceService.getHyperspaceDistance(game, player.research.hyperspace.level);
+        return Math.max(scanningRange, hyperspaceRange);
     }
 
     _getHyperspaceRangeExternal(game: Game, player: Player): number {
