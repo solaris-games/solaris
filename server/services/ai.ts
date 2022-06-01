@@ -383,14 +383,11 @@ export default class AIService {
         for (const [starId, reachables] of reachablePlayerStars) {
             if (reachables.size === 0 || reachables.size === 1) {
                 borderStars.add(starId);
-                const star = starsById.get(starId)!;
-                console.log(star.name + " is a border star");
                 continue;
             }
 
             const star = starsById.get(starId)!;
             const anglesToOtherStars = new Array<number>();
-            console.log("Checking if " + star.name + " is a border star...")
 
             for (const otherStarId of reachables) {
                 const otherStar = starsById.get(otherStarId)!;
@@ -399,15 +396,12 @@ export default class AIService {
                 const dy = otherStar.location.y - star.location.y;
                 const angleRad = Math.atan2(dy, dx);
                 const angle = (angleRad * (180 / Math.PI)) + 180;
-                console.log("Angle between " + star.name + " and " + otherStar.name + ": " + angle);
                 anglesToOtherStars.push(angle);
             }
 
             anglesToOtherStars.sort((a, b) => a - b);
             const smallest = anglesToOtherStars[0];
             anglesToOtherStars.push(360 + smallest); //Push first angle to the back again to compute angles between all stars
-
-            console.log("Angles: " + anglesToOtherStars.join(", "));
 
             let largestGap = 0;
 
@@ -420,13 +414,10 @@ export default class AIService {
                     largestGap = delta;
                 }
             }
-            console.log("Largest gap: " + largestGap);
 
             if (largestGap > BORDER_STAR_ANGLE_THRESHOLD_DEGREES) {
                 borderStars.add(starId);
-                console.log(star.name + " is a border star");
             }
-
         }
 
         console.log("Border stars:");
