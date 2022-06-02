@@ -1,4 +1,5 @@
 <template>
+<div class="full-container">
   <view-container>
     <view-title title="Create Account" navigation="home"/>
 
@@ -9,6 +10,18 @@
         <p>Build alliances, make enemies and fight your way to victory to <span class="text-danger">galactic domination.</span></p>
         <p><span class="text-info">Research and improve technologies</span> to gain an edge over your opponents. Trade with allies and build up huge fleets of ships.</p>
         <p>Will you conquer the galaxy?</p>
+        <p class="mt-5">You can play <span class="text-warning">Solaris</span> on any of the following platforms:</p>
+        <p>
+          <a href="https://solaris.games" target="_blank" title="Web" class="mr-2">
+            <i class="fab fa-chrome"></i> Web
+          </a>
+          <a href="https://store.steampowered.com/app/1623930/Solaris/" target="_blank" title="Steam" class="mr-2">
+            <i class="fab fa-steam"></i> Steam
+          </a>
+          <a href="https://play.google.com/store/apps/details?id=com.voxel.solaris_android" target="_blank" title="Android">
+            <i class="fab fa-google-play"></i> Android
+          </a>
+        </p>
       </div>
       <div class="col-sm-12 col-md-6">
         <form-error-list v-bind:errors="errors"/>
@@ -60,7 +73,26 @@
         <loading-spinner :loading="isLoading"/>
       </div>
     </div>
+
+    <!-- <div class="row mb-3">
+      <div class="carousel slide w-100" data-ride="carousel">
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+              <img :src="require('../../assets/screenshots/game-carousel-1.png')" alt="Solaris" class="d-block w-100"/>
+          </div>
+          <div class="carousel-item">
+              <img :src="require('../../assets/screenshots/game-carousel-2.png')" alt="Solaris" class="d-block w-100"/>
+          </div>
+          <div class="carousel-item">
+              <img :src="require('../../assets/screenshots/game-carousel-3.png')" alt="Solaris" class="d-block w-100"/>
+          </div>
+        </div>
+      </div>
+    </div> -->
   </view-container>
+
+  <parallax />
+</div>
 </template>
 
 <script>
@@ -71,6 +103,7 @@ import router from '../../router'
 import ViewTitle from '../components/ViewTitle'
 import FormErrorList from '../components/FormErrorList'
 import userService from '../../services/api/user'
+import ParallaxVue from '../components/Parallax'
 
 export default {
   components: {
@@ -78,7 +111,8 @@ export default {
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'form-error-list': FormErrorList,
-    'recaptcha': VueRecaptcha
+    'recaptcha': VueRecaptcha,
+    'parallax': ParallaxVue
   },
   data () {
     return {
@@ -159,4 +193,11 @@ export default {
 </script>
 
 <style scoped>
+img {
+  object-fit: cover;
+}
+
+.full-container {
+  background-color: black !important;
+}
 </style>
