@@ -21,6 +21,8 @@
 
     <select-colour v-if="!isJoiningGame" v-on:onJoinRequested="onJoinRequested" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 
+    <new-player-message />
+
     <share-link message="Invite your friends and take on the Galaxy together!"/>
 </div>
 </template>
@@ -33,6 +35,7 @@ import FormErrorListVue from '../../../components/FormErrorList'
 import SelectAliasVue from './SelectAlias.vue'
 import EnterPasswordVue from './EnterPassword.vue'
 import SelectColourVue from './SelectColour.vue'
+import NewPlayerMessageVue from './NewPlayerMessage'
 import ShareLinkVue from './ShareLink.vue'
 
 export default {
@@ -43,6 +46,7 @@ export default {
     'select-alias': SelectAliasVue,
     'enter-password': EnterPasswordVue,
     'select-colour': SelectColourVue,
+    'new-player-message': NewPlayerMessageVue,
     'share-link': ShareLinkVue
   },
   data () {

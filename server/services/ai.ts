@@ -158,7 +158,7 @@ export default class AIService {
     }
 
     isAIControlled(player: Player) {
-        return player.defeated || !player.userId; // Note: Null user IDs is considered AI (applies to the tutorial)
+        return player.defeated || !player.userId; // Note: Null user IDs is considered AI as there is not a user controlling it.
     }
 
     async play(game: Game, player: Player) {

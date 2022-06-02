@@ -521,6 +521,8 @@ export default class GameGalaxyService {
                 delete p.notes; // Don't need to send this back.
                 delete p.lastSeenIP; // Super sensitive data.
 
+                p.isRealUser = true;
+                
                 return p;
             }
 

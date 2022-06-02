@@ -22,9 +22,6 @@ async function startServer() {
   // await container.donateService.listRecentDonations();
   // console.log('Loaded recent donations to cache');
 
-  await container.discordService.initialize();
-  container.notificationService.initialize();
-
   server.listen(config.port, (err) => {
     if (err) {
       console.log(err);
@@ -33,6 +30,9 @@ async function startServer() {
 
     console.log(`Server is running on port ${config.port}.`);
   });
+
+  await container.discordService.initialize();
+  container.notificationService.initialize();
 }
 
 process.on('SIGINT', async () => {

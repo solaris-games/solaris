@@ -106,6 +106,8 @@
         </div>
     </div>
 
+    <new-player-message />
+
     <share-link v-if="!game.state.startDate" message="Invite your friends and take on the Galaxy together!"/>
     <share-link v-if="game.state.startDate && !game.state.endDate" message="Share this game with your friends to spectate, no sign-up required!"/>
     <share-link v-if="game.state.endDate" message="Share this game with your friends, no sign-up required!"/>
@@ -142,6 +144,7 @@ import DialogModal from '../../../components/modal/DialogModal'
 import gameHelper from '../../../../services/gameHelper'
 import MenuTitle from '../MenuTitle'
 import AudioService from '../../../../game/audio'
+import NewPlayerMessageVue from '../welcome/NewPlayerMessage'
 import ShareLinkVue from '../welcome/ShareLink'
 import PlayerAvatarVue from '../menu/PlayerAvatar'
 import HelpTooltip from '../../../components/HelpTooltip'
@@ -153,6 +156,7 @@ export default {
     'menu-title': MenuTitle,
     'modalButton': ModalButton,
     'dialogModal': DialogModal,
+    'new-player-message': NewPlayerMessageVue,
     'share-link': ShareLinkVue,
     'player-avatar': PlayerAvatarVue,
     'help-tooltip': HelpTooltip,

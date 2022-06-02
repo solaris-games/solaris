@@ -485,6 +485,10 @@ class GameHelper {
     return game.state.paused
   }
 
+  isGameNotStarted (game) {
+    return !game.state.startDate
+  }
+
   isGameInProgress (game) {
     return !this.isGameWaitingForPlayers(game) && !this.isGamePaused(game) && game.state.startDate != null && moment().utc().diff(game.state.startDate) >= 0 && !game.state.endDate
   }

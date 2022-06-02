@@ -183,9 +183,9 @@ export default {
     },
     canSendRenown () {
       if (this.isAnonymousGame) {
-        return this.game.state.startDate && this.userPlayer && this.player != this.userPlayer && this.isGameFinished
+        return this.player && this.game.state.startDate && this.player.isRealUser && this.userPlayer && this.player != this.userPlayer && this.isGameFinished
       } else {
-        return this.game.state.startDate && this.userPlayer && this.player != this.userPlayer
+        return this.player && this.game.state.startDate && this.player.isRealUser && this.userPlayer && this.player != this.userPlayer
       }
     }
   }

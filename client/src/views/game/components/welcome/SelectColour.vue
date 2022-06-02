@@ -58,7 +58,11 @@ export default {
     getFriendlyColour (colour) {
       return gameHelper.getFriendlyColour(colour)
     },
-    onJoinRequested (player) {
+    async onJoinRequested (player) {
+      if (gameHelper.isNewPlayerGame(this.$store.state.game)) {
+        await this.$confirm('Join Game', 'You are about to join a new player game, it will start when 2 players have joined the game. Good luck and have fun!', 'OK', 'Cancel', true)
+      }
+
       this.$emit('onJoinRequested', player._id)
     },
     onOpenPlayerDetailRequested (e) {

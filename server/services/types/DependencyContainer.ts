@@ -20,6 +20,7 @@ import DonateService from "../donate";
 import EmailService from "../email";
 import EventService from "../event";
 import GameService from "../game";
+import GameJoinService from "../gameJoin";
 import GameCreateService from "../gameCreate";
 import GameCreateValidationService from "../gameCreateValidation";
 import GameFluxService from "../gameFlux";
@@ -78,6 +79,7 @@ export interface DependencyContainer {
     eventService: EventService,
     leaderboardService: LeaderboardService,
     gameService: GameService,
+    gameJoinService: GameJoinService,
     gameCreateValidationService: GameCreateValidationService,
     gameCreateService: GameCreateService,
     gameGalaxyService: GameGalaxyService,
