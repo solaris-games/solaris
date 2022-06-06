@@ -4,7 +4,7 @@
 
     <ul class="nav nav-tabs">
       <li class="nav-item">
-          <a class="nav-link active" data-toggle="tab" href="#games">Games</a>
+          <a class="nav-link" data-toggle="tab" href="#games">Games</a>
       </li>
       <li class="nav-item" v-if="isCommunityManager">
           <a class="nav-link" data-toggle="tab" href="#users">Users</a>
@@ -14,6 +14,9 @@
       </li>
       <li class="nav-item" v-if="isAdministrator">
           <a class="nav-link" data-toggle="tab" href="#reports">Reports</a>
+      </li>
+      <li class="nav-item" v-if="isAdministrator">
+          <a class="nav-link" data-toggle="tab" href="#insights">Insights</a>
       </li>
     </ul>
 
@@ -174,6 +177,10 @@
           </table>
         </div>
       </div>
+      <div class="tab-pane fade" id="insights" v-if="isAdministrator">
+        <h4 class="mb-1">Insights</h4>
+        <insights />
+      </div>
     </div>
   </view-container>
 </template>
@@ -183,6 +190,7 @@ import ViewContainer from '../components/ViewContainer'
 import ViewTitle from '../components/ViewTitle'
 import LoadingSpinner from '../components/LoadingSpinner'
 import AdminApiService from '../../services/api/admin'
+import InsightsVue from './components/Insights'
 import router from '../../router'
 import moment from 'moment'
 
@@ -190,7 +198,8 @@ export default {
   components: {
     'view-container': ViewContainer,
     'view-title': ViewTitle,
-    'loading-spinner': LoadingSpinner
+    'loading-spinner': LoadingSpinner,
+    'insights': InsightsVue
   },
   data () {
     return {

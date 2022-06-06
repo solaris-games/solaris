@@ -13,6 +13,11 @@ export default (router: Router, io, container: DependencyContainer) => {
 
     const controller = AdminController(container, io);
     
+    router.get('/api/admin/insights',
+        mwAuth.authenticate({ admin: true }),
+        controller.getInsights,
+        mwCore.handleError);
+    
     router.get('/api/admin/user',
         mwAuth.authenticate({ communityManager: true }),
         controller.listUsers,
