@@ -66,6 +66,15 @@ export default new Vuex.Store({
     },
     // -------
 
+    // TUTORIAL
+    setTutorialPage (state, page) {
+      state.tutorialPage = page || 0
+    },
+    clearTutorialPage (state) {
+      state.tutorialPage = 0
+    },
+    // -------
+
     setCarrierSpecialists (state, carrierSpecialists) {
       state.carrierSpecialists = carrierSpecialists;
     },
