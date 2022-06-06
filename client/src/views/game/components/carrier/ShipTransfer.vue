@@ -63,10 +63,13 @@
     <div class="row pb-2 pt-2 bg-secondary">
         <div class="col-6"></div>
         <div class="col pr-0">
-            <button type="button" class="btn btn-success btn-block mr-1" :disabled="$isHistoricalMode() || isTransferringShips || starShips < 0 || carrierShips < 0" @click="saveTransfer">Transfer</button>
+            <button type="button" class="btn btn-success btn-block mr-1" :disabled="$isHistoricalMode() || isTransferringShips || starShips < 0 || carrierShips < 0" @click="saveTransfer">
+              <i class="fas fa-check"></i>
+              Transfer
+            </button>
         </div>
         <div class="col-auto pl-1">
-            <button type="button" class="btn btn-primary" @click="onEditWaypointsRequested"><i class="fas fa-plus"></i></button>
+            <button type="button" class="btn btn-primary" @click="onEditWaypointsRequested"><i class="fas fa-map-marker-alt"></i></button>
         </div>
     </div>
 </div>
