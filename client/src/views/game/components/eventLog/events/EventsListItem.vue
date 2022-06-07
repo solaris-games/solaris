@@ -1,10 +1,10 @@
 <template>
-<div class="bg-primary pt-2 pb-1 mb-2 pointer row" :class="{'unread':!isRead, 'bg-secondary': isGlobal}" @click="markAsRead">
+<div class="bg-dark pt-2 pb-1 mb-2 pointer row" :class="{'unread':!isRead, 'bg-secondary': isGlobal}" @click="markAsRead">
     <div class="col">
-        <span class="badge badge-info" v-if="isGlobal">Global Event</span>
+        <span class="badge bg-info" v-if="isGlobal">Global Event</span>
     </div>
     <div v-if="event.tick" class="col-auto">
-        <span class="badge" :class="{'badge-success':isRead,'badge-warning':!isRead}">Tick {{event.tick}}</span>
+        <span class="badge" :class="{'bg-success':isRead,'bg-warning':!isRead}">Tick {{event.tick}}</span>
     </div>
     <div class="col-12 mt-2">
         <game-ended :event="event" v-if="event.type === 'gameEnded'"

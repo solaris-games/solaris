@@ -1,13 +1,13 @@
 <template>
 <div>
-    <div class="row text-center bg-primary">
+    <div class="row text-center">
         <div class="col">
             <p class="mb-0 mt-2 mb-2">Select a colour and starting location.</p>
         </div>
     </div>
 
     <div class="row">
-      <div class="table-responsive">
+      <div class="table-responsive p-0">
         <table class="table table-sm table-striped">
             <tbody>
                 <tr v-for="player in players" v-bind:key="player._id">
@@ -15,7 +15,7 @@
                     <td class="col-avatar" :title="player.colour.alias + ' ' + player.shape" @click="onOpenPlayerDetailRequested(player)">
                         <player-avatar :player="player"/>
                     </td>
-                    <td class="pl-2 pt-3 pb-2">
+                    <td class="ps-2 pt-3 pb-2">
                         <h5 class="alias-title" style="vertical-align: middle;">
                           {{player.alias}}
                           <span v-if="player.defeated" :title="getPlayerStatus(player)">
@@ -24,9 +24,9 @@
                           </span>
                         </h5>
                     </td>
-                    <td class="fit pl-2 pt-2 pb-2 pr-2">
-                        <button class="btn btn-info" @click="panToPlayer(player)"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-success ml-1" @click="onJoinRequested(player)" v-if="!$isHistoricalMode() && player.isOpenSlot">Join</button>
+                    <td class="fit ps-2 pt-2 pb-2 pe-2">
+                        <button class="btn btn-outline-info" @click="panToPlayer(player)"><i class="fas fa-eye"></i></button>
+                        <button class="btn btn-success ms-1" @click="onJoinRequested(player)" v-if="!$isHistoricalMode() && player.isOpenSlot">Join</button>
                     </td>
                 </tr>
             </tbody>

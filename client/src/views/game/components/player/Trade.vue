@@ -1,10 +1,10 @@
 <template>
 <div class="menu-page container" v-if="player">
     <menu-title title="Trade" @onCloseRequested="onCloseRequested">
-      <button @click="onOpenPlayerDetailRequested" class="btn btn-sm btn-primary"><i class="fas fa-user"></i> Profile</button>
-      <button @click="onOpenPrevPlayerDetailRequested" class="btn btn-sm btn-info ml-1"><i class="fas fa-chevron-left"></i></button>
-      <button @click="onOpenNextPlayerDetailRequested" class="btn btn-sm btn-info ml-1"><i class="fas fa-chevron-right"></i></button>
-      <button @click="panToPlayer" class="btn btn-sm btn-info ml-1"><i class="fas fa-eye"></i></button>
+      <button @click="onOpenPlayerDetailRequested" class="btn btn-sm btn-outline-primary"><i class="fas fa-user"></i> Profile</button>
+      <button @click="onOpenPrevPlayerDetailRequested" class="btn btn-sm btn-outline-info ms-1"><i class="fas fa-chevron-left"></i></button>
+      <button @click="onOpenNextPlayerDetailRequested" class="btn btn-sm btn-outline-info ms-1"><i class="fas fa-chevron-right"></i></button>
+      <button @click="panToPlayer" class="btn btn-sm btn-outline-info ms-1"><i class="fas fa-eye"></i></button>
     </menu-title>
 
     <player-title :player="player"/>

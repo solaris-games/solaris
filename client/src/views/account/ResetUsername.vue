@@ -3,7 +3,7 @@
     <view-title title="Reset Username" />
 
     <form @submit.prevent="handleSubmit">
-      <div class="form-group">
+      <div class="mb-2">
         <label for="username">New Username</label>
         <input type="text" required="required" class="form-control" minlength="3" maxlength="24" v-model="username" :disabled="isLoading"/>
       </div>
@@ -12,7 +12,7 @@
 
       <div>
         <button type="submit" class="btn btn-success" :disabled="isLoading">Change Username</button>
-        <router-link to="/account/settings" tag="button" class="btn btn-danger float-right">Cancel</router-link>
+        <router-link to="/account/settings" tag="button" class="btn btn-danger float-end">Cancel</router-link>
       </div>
     </form>
 

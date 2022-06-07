@@ -4,19 +4,19 @@
       <th style="width: 40%">Player</th>
       <th style="width: 15%" class="sortable-header" title="Role" @click="actions.sort('role')" :class="actions.getColumnClass('role')">
         Role
-        <i v-if="actions.isActive('role')" class="fas fa-chevron-down ml-2"></i>
+        <i v-if="actions.isActive('role')" class="fas fa-chevron-down"></i>
       </th>
-      <th style="width: 10%" class="text-right sortable-header" title="Rank" @click="actions.sort('rank')" :class="actions.getColumnClass('rank')">
+      <th style="width: 10%" class="text-end sortable-header" title="Rank" @click="actions.sort('rank')" :class="actions.getColumnClass('rank')">
+        <i v-if="actions.isActive('rank')" class="fas fa-chevron-down"></i>
         <i class="fas fa-star text-info"></i>
-        <i v-if="actions.isActive('rank')" class="fas fa-chevron-down ml-2"></i>
       </th>
-      <th style="width: 10%" class="text-right sortable-header" title="Victories" @click="actions.sort('victories')" :class="actions.getColumnClass('victories')">
+      <th style="width: 10%" class="text-end sortable-header" title="Victories" @click="actions.sort('victories')" :class="actions.getColumnClass('victories')">
+        <i v-if="actions.isActive('victories')" class="fas fa-chevron-down"></i>
         <i class="fas fa-trophy text-warning"></i>
-        <i v-if="actions.isActive('victories')" class="fas fa-chevron-down ml-2"></i>
       </th>
-      <th style="width: 10%" class="text-right sortable-header" title="Renown" @click="actions.sort('renown')" :class="actions.getColumnClass('renown')">
+      <th style="width: 10%" class="text-end sortable-header" title="Renown" @click="actions.sort('renown')" :class="actions.getColumnClass('renown')">
+        <i v-if="actions.isActive('renown')" class="fas fa-chevron-down"></i>
         <i class="fas fa-heart text-danger"></i>
-        <i v-if="actions.isActive('renown')" class="fas fa-chevron-down ml-2"></i>
       </th>
       <th v-if="isInGuild"></th>
     </template>

@@ -2,11 +2,11 @@
 <div class="menu-page container">
 
   <menu-title title="Ruler" @onCloseRequested="onCloseRequested">
-       <button class="btn btn-sm btn-primary" @click="resetRulerPoints"><i class="fas fa-undo"></i> Reset</button>
-        <button class="btn btn-sm btn-warning ml-1" @click="popRulerPoint" :disabled="points.length === 0"><i class="fas fa-undo"></i> Last</button>
+       <button class="btn btn-sm btn-outline-primary" @click="resetRulerPoints"><i class="fas fa-undo"></i> Reset</button>
+        <button class="btn btn-sm btn-outline-warning ms-1" @click="popRulerPoint" :disabled="points.length === 0"><i class="fas fa-undo"></i> Last</button>
     </menu-title>
     <div v-if="isCompactUIStyle">
-    <div class="row bg-primary pt-2 pb-2">
+    <div class="row pt-2 pb-2 bg-dark">
       <div class="col-3 text-left">
           <span title="Total number of waypoints plotted">
            <i class="fas fa-map-marker-alt"></i> {{points.length}}
@@ -22,23 +22,23 @@
             <i class="fas fa-binoculars"></i> {{scanningLevel}}
           </span>
       </div>
-      <div class="col-3 text-right">
+      <div class="col-3 text-end">
           <span title="Required hyperspace level">
             <i class="fas fa-gas-pump"></i> {{hyperspaceLevel}}
           </span>
       </div>
     </div>
 
-    <div class="row bg-secondary pt-2 pb-2">
+    <div class="row bg-dark pt-2 pb-2 mt-1">
       <div class="col-2">
           ETA<orbital-mechanics-eta-warning />
       </div>
-      <div class="col-5 text-right">
+      <div class="col-5 text-end">
           <span title="ETA base speed">
             Base {{totalEta || 'N/A'}}
           </span>
       </div>
-      <div class="col-5 text-right">
+      <div class="col-5 text-end">
           <span title="ETA warp speed">
             Warp {{totalEtaWarp || 'N/A'}}
           </span>
@@ -46,11 +46,11 @@
     </div>
   </div>
 
-  <div class="row bg-primary pt-2 pb-2">
+  <div class="row pt-2 pb-2">
     <div class="col-6">
     Speed Modifier
     </div>
-    <div class="col-6 text-right">
+    <div class="col-6 text-end">
       <select class="form-control form-control-sm" v-model="speedModifier" @change="onSpeedModifierChanged">
         <option value="1">1.0x (Normal)</option>
         <option v-for="speed in speeds" v-bind:key="speed" :value="speed">{{speed}}x</option>
@@ -59,66 +59,66 @@
   </div>
 
 <div v-if="isStandardUIStyle">
-  <div class="row bg-secondary pt-2 pb-2">
+  <div class="row bg-dark pt-2 pb-2">
           <div class="col-6">
               Waypoints
           </div>
-          <div class="col-6 text-right">
+          <div class="col-6 text-end">
               <span title="Total number of waypoints plotted">
                 <i class="fas fa-map-marker-alt"></i> {{points.length}}
               </span>
           </div>
       </div>
 
-      <div class="row bg-primary pt-2 pb-2">
+      <div class="row pt-2 pb-2">
           <div class="col-6">
              Distance (ly)
           </div>
-          <div class="col-6 text-right">
+          <div class="col-6 text-end">
               <span title="Total distance (ly)">
                 <i class="fas fa-sun"></i> {{distanceLightYears}}
               </span>
           </div>
       </div>
 
-      <div class="row bg-secondary pt-2 pb-2">
+      <div class="row bg-dark pt-2 pb-2">
           <div class="col-8">
               Required Scanning Level
           </div>
-          <div class="col-4 text-right">
+          <div class="col-4 text-end">
               <span title="Required scanning level">
                 <i class="fas fa-binoculars"></i> {{scanningLevel}}
               </span>
           </div>
       </div>
 
-      <div class="row bg-primary pt-2 pb-2">
+      <div class="row pt-2 pb-2">
           <div class="col-8">
               Required Hyperspace Level
           </div>
-          <div class="col-4 text-right">
+          <div class="col-4 text-end">
               <span title="Required hyperspace level">
                 <i class="fas fa-gas-pump"></i> {{hyperspaceLevel}}
               </span>
           </div>
       </div>
 
-      <div class="row bg-secondary pt-2 pb-2">
+      <div class="row bg-dark pt-2 pb-2">
           <div class="col-6">
               ETA Base Speed
           </div>
-          <div class="col-6 text-right">
+          <div class="col-6 text-end">
               <span title="ETA base speed">
                 {{totalEta || 'N/A'}}
               </span>
           </div>
       </div>
 
-      <div class="row bg-primary pt-2 pb-2">
+      <div class="row pt-2 pb-2">
           <div class="col-6">
               ETA Warp Speed
           </div>
-          <div class="col-6 text-right">
+          <div class="col-6 text-end">
               <span title="ETA warp speed">
                 {{totalEtaWarp || 'N/A'}}
               </span>

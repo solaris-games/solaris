@@ -78,6 +78,10 @@ export default {
   },
   computed: {
     noteLength () {
+      if (this.notes == null) {
+        return 0
+      }
+      
       return this.notes.length
     },
     isExceededMaxLength () {

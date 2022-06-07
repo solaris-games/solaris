@@ -1,9 +1,9 @@
 <template>
-<div class="container bg-secondary mb-1"
+<div class="container bg-dark mb-1"
     v-if="event"
     :class="{'left-message': !isFromUserPlayer, 'right-message': isFromUserPlayer}">
     <div class="row mt-0" :style="{'background-color': getFromPlayerColour()}" style="height:6px;"></div>
-    <div class="row mt-0 bg-secondary">
+    <div class="row mt-0 ">
       <div class="col"></div>
       <div class="col-auto">
         <p class="mt-0 mb-0">
@@ -11,7 +11,7 @@
         </p>
       </div>
     </div>
-    <div class="row mt-0 bg-secondary">
+    <div class="row mt-0 ">
       <div class="col mt-1">
         <p v-if="event.data.renown" class="mb-1">
             <em>Sent <span class="text-warning">{{event.data.renown}}</span> renown.</em>

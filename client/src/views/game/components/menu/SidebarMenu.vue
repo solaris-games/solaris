@@ -1,5 +1,5 @@
 <template>
-  <div class="sidebar-menu d-none d-md-block" :class="{'bg-dark':!$isHistoricalMode(),'bg-primary':$isHistoricalMode()}">
+  <div class="sidebar-menu d-none d-md-block" :class="{'header-bar-bg':!$isHistoricalMode(),'bg-dark':$isHistoricalMode()}">
     <div class="sidebar-menu-top">
       <div v-if="!userPlayer && gameIsJoinable">
         <sidebar-menu-item :menuState="MENU_STATES.WELCOME" tooltip="Join Game" iconClass="fas fa-handshake" />

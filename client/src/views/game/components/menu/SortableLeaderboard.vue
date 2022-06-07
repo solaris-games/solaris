@@ -1,7 +1,7 @@
 <template>
   <div class="table-responsive">
     <table class="table table-striped table-hover leaderboard-table" v-if="leaderboard">
-      <thead>
+      <thead class="table-dark">
         <slot name="header" v-bind:sort="sortBy" v-bind:getColumnClass="getColumnClass" v-bind:isActive="isActiveSorting"></slot>
       </thead>
       <tbody>

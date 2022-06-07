@@ -5,14 +5,14 @@
     <form-error-list v-bind:errors="errors"/>
 
     <form @submit.prevent="handleSubmit">
-      <div class="form-group">
+      <div class="mb-2">
         <label for="email">Email Address</label>
         <input type="email" required="required" class="form-control" name="email" v-model="email" :disabled="isLoading">
       </div>
 
       <div>
         <button type="submit" class="btn btn-success" :disabled="isLoading">Send Username</button>
-        <router-link to="/" tag="button" class="btn btn-danger float-right">Cancel</router-link>
+        <router-link to="/" tag="button" class="btn btn-danger float-end">Cancel</router-link>
       </div>
     </form>
 

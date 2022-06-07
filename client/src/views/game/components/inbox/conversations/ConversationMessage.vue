@@ -1,12 +1,12 @@
 <template>
   <div class="container message-container"
     :class="{'left-message': !isFromUserPlayer, 'right-message': isFromUserPlayer,
-            'bg-secondary': !message.pinned, 'bg-primary': message.pinned}">
+            'bg-dark': !message.pinned, 'bg-secondary': message.pinned}">
     <div class="row mt-0" v-if="fromPlayer" :style="{'background-color': getFriendlyColour(fromPlayer.colour.value)}" style="height:6px;"></div>
     <div class="row mt-0" v-if="message">
       <div class="col mt-1 mb-0">
         <span class="pointer" @click="onOpenPlayerDetailRequested">
-          <player-icon class="mr-2" v-if="message.fromPlayerId" :playerId="message.fromPlayerId"/>
+          <player-icon class="me-2" v-if="message.fromPlayerId" :playerId="message.fromPlayerId"/>
           <strong>{{message.fromPlayerAlias}}</strong>
         </span>
       </div>
@@ -15,7 +15,7 @@
       </div>
       <div class="col-12">
         <p class="mt-0 mb-0">
-          <i class="fas fa-envelope mr-2" v-if="!userPlayerHasReadMessage"></i>
+          <i class="fas fa-envelope me-2" v-if="!userPlayerHasReadMessage"></i>
           <small><em>{{dateText}}</em></small>
         </p>
       </div>

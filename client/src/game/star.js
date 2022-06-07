@@ -510,7 +510,7 @@ class Star extends EventEmitter {
 
   drawName () {
     if (!this.text_name) {
-      let bitmapFont = {fontName: "space-mono", fontSize: Star.nameSize}
+      let bitmapFont = {fontName: "chakrapetch", fontSize: Star.nameSize}
       this.text_name = new PIXI.BitmapText(this.data.name, bitmapFont)
       this.text_name.x = 5
 
@@ -574,7 +574,7 @@ class Star extends EventEmitter {
 
     if (shipsText) {
       if (!this.text_ships_small) {
-        let bitmapFont = {fontName: "space-mono", fontSize: Star.shipsSmallSize}
+        let bitmapFont = {fontName: "chakrapetch", fontSize: Star.shipsSmallSize}
         this.text_ships_small = new PIXI.BitmapText(this.data.name, bitmapFont)
         this.container.addChild(this.text_ships_small)
         this.text_ships_small.x = 5
@@ -582,7 +582,7 @@ class Star extends EventEmitter {
       }
 
       if (!this.text_ships_big) {
-        let bitmapFont = {fontName: "space-mono", fontSize: Star.shipsBigSize}
+        let bitmapFont = {fontName: "chakrapetch", fontSize: Star.shipsBigSize}
         this.text_ships_big = new PIXI.BitmapText(this.data.name, bitmapFont)
         this.container.addChild(this.text_ships_big)
         this.text_ships_big.x = 5
@@ -607,7 +607,7 @@ class Star extends EventEmitter {
       if (this.data.ownedByPlayerId && this._isInScanningRange()) {
         let displayInfrastructure = `${this.data.infrastructure.economy} ${this.data.infrastructure.industry} ${this.data.infrastructure.science}`
 
-        let bitmapFont = {fontName: "space-mono", fontSize: 4}
+        let bitmapFont = {fontName: "chakrapetch", fontSize: 4}
         this.text_infrastructure = new PIXI.BitmapText(displayInfrastructure, bitmapFont);
         this.text_infrastructure.x = -(this.text_infrastructure.width / 2.0)
         this.text_infrastructure.y = -15
@@ -631,7 +631,7 @@ class Star extends EventEmitter {
     if (!this.text_infrastructureBulkIgnored) {
       let displayInfrastructure = `${this.data.ignoreBulkUpgrade.economy ? ' ' : 'E'} ${this.data.ignoreBulkUpgrade.industry ? ' ' : 'I'} ${this.data.ignoreBulkUpgrade.science ? ' ' : 'S'}`
 
-      let bitmapFont = {fontName: "space-mono", fontSize: 8}
+      let bitmapFont = {fontName: "chakrapetch", fontSize: 8}
       this.text_infrastructureBulkIgnored = new PIXI.BitmapText(displayInfrastructure, bitmapFont);
       this.text_infrastructureBulkIgnored.x = -(this.text_infrastructureBulkIgnored.width / 2.0)
       this.text_infrastructureBulkIgnored.y = 12

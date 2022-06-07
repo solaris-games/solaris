@@ -2,7 +2,7 @@
 <div class="menu-page">
   <div class="container">
     <menu-title title="New Conversation" @onCloseRequested="onCloseRequested">
-      <button class="btn btn-sm btn-primary" @click="onOpenInboxRequested" title="Back to Inbox"><i class="fas fa-inbox"></i></button>
+      <button class="btn btn-sm btn-outline-primary" @click="onOpenInboxRequested" title="Back to Inbox"><i class="fas fa-inbox"></i></button>
     </menu-title>
 
     <div class="row">
@@ -10,12 +10,12 @@
         <div class="col-12">
             <form-error-list v-bind:errors="errors"/>
         </div>
-        <div class="form-group">
+        <div class="mb-2">
           <label for="name">Name</label>
           <input type="text" class="form-control" id="name" placeholder="Enter a name for the group" v-model="name">
         </div>
 
-        <div class="form-group">
+        <div class="mb-2">
           <label for="participants">Participants</label>
           <select multiple class="form-control" id="participants" v-model="participants">
             <option v-for="participant in possibleParticipants" :key="participant._id" :value="participant._id">
@@ -24,7 +24,7 @@
           </select>
         </div>
 
-        <button type="submit" class="btn btn-success float-right" :disabled="isLoading">
+        <button type="submit" class="btn btn-success float-end" :disabled="isLoading">
           <i class="fas fa-comments"></i>
           Create Conversation
         </button>

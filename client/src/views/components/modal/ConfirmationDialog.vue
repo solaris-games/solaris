@@ -4,6 +4,7 @@
   :cancelText="dialogSettings.cancelText"
   :confirmText="dialogSettings.confirmText"
   :hideCancelButton="dialogSettings.hideCancelButton"
+  :cover="dialogSettings.cover"
   modalName="confirmModal"
   :titleText="dialogSettings.titleText"
   @onConfirm="onConfirm"

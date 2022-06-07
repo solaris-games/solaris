@@ -7,49 +7,49 @@
     <div v-if="info">
       <roles :user="info" />
 
-      <div class="row pt-3 pb-3 bg-info">
+      <div class="row pt-3 pb-3 bg-dark">
         <div class="col">
           <p>Galactic Credits</p>
           <p><small>Purchase credits in the shop or earn credits by winning official games.</small></p>
         </div>
         <div class="col-auto">
-          <p class="text-right">
-            <i class="fas fa-coins mr-2"></i>
+          <p class="text-end">
+            <i class="fas fa-coins me-2"></i>
             <strong>{{ info.credits }}</strong> credit<span v-if="info.credits !== 1">s</span>
-            <router-link :to="{ name: 'galactic-credits-shop'}" class="btn btn-success ml-2"><i class="fas fa-shopping-cart"></i> Store</router-link>
+            <router-link :to="{ name: 'galactic-credits-shop'}" class="btn btn-success ms-2"><i class="fas fa-shopping-cart"></i> Store</router-link>
           </p>
         </div>
       </div>
      
-      <div class="row pt-3 pb-3 bg-primary">
+      <div class="row pt-2 pb-2">
         <div class="col">
           <p>Username</p>
         </div>
         <div class="col">
-          <p class="text-right">
+          <p class="text-end">
             {{ info.username }}
             <router-link to="/account/reset-username" tag="a"><i class="fas fa-pencil-alt"></i></router-link>
           </p>
         </div>
       </div>
 
-      <div class="row pt-3 pb-3 bg-secondary">
+      <div class="row pt-2 pb-2">
         <div class="col">
           <p>Email Address</p>
         </div>
         <div class="col">
-          <p class="text-right">
+          <p class="text-end">
             {{ info.email }}
             <router-link to="/account/reset-email" tag="a"><i class="fas fa-pencil-alt"></i></router-link>
           </p>
         </div>
       </div>
 
-      <div class="row pt-3 pb-3 bg-primary">
+      <div class="row pt-2 pb-2">
         <div class="col">
           <p>Email Game Notifications</p>
         </div>
-        <div class="col text-right">
+        <div class="col text-end">
           <button v-if="info.emailEnabled" :disabled="isChangingEmailNotifications" @click="toggleEmailNotifications(false)" class="btn btn-success">
             Enabled
             <i class="fas fa-check"></i>
@@ -61,11 +61,11 @@
         </div>
       </div>
 
-      <div class="row pt-3 pb-3 bg-secondary">
+      <div class="row pt-2 pb-2">
         <div class="col">
           <p>Email Updates &amp; Newsletters</p>
         </div>
-        <div class="col text-right">
+        <div class="col text-end">
           <button v-if="info.emailOtherEnabled" :disabled="isChangingEmailNotifications" @click="toggleEmailOtherNotifications(false)" class="btn btn-success">
             Enabled
             <i class="fas fa-check"></i>
@@ -77,13 +77,13 @@
         </div>
       </div>
 
-      <div class="row pt-3 pb-3 bg-primary">
+      <div class="row pt-2 pb-2">
         <div class="col">
           <p>Discord Game Notifications</p>
           <p><small><strong>You must be a member</strong> of the official Solaris discord server.</small></p>
         </div>
-        <div class="col text-right">
-          <a href="https://discord.com/invite/v7PD33d" target="_blank" title="Discord" class="btn btn-secondary mr-1">
+        <div class="col text-end">
+          <a href="https://discord.com/invite/v7PD33d" target="_blank" title="Discord" class="btn btn-secondary me-1">
             Join
             <i class="fab fa-discord"></i>
           </a>
@@ -99,9 +99,9 @@
       </div>
     </div>
 
-    <div class="mt-3">
-      <button :disabled="isClosingAccount" class="btn btn-danger" @click="closeAccount"><i class="fas fa-trash"></i> Delete Account</button>
-      <router-link to="/account/reset-password" tag="button" class="btn btn-primary ml-1"><i class="fas fa-lock"></i> Change Password</router-link>
+    <div class="mt-3 text-end">
+      <button :disabled="isClosingAccount" class="btn btn-outline-danger" @click="closeAccount"><i class="fas fa-trash"></i> Delete Account</button>
+      <router-link to="/account/reset-password" tag="button" class="btn btn-primary ms-1"><i class="fas fa-lock"></i> Change Password</router-link>
     </div>
 
     <subscriptions v-if="isAuthenticatedWithDiscord"/>

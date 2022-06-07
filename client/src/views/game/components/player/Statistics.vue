@@ -1,60 +1,60 @@
 <template>
 <div class="table-responsive mb-0" v-if="player">
-  <table class="table table-sm bg-secondary mb-1">
-      <thead>
+  <table class="table table-sm  mb-1">
+      <thead class="table-dark">
           <tr>
               <th></th>
               <th v-if="!isUserPlayer()"></th>
-              <th v-if="userIsInGame()" class="text-right">You</th>
+              <th v-if="userIsInGame()" class="text-end">You</th>
           </tr>
       </thead>
       <tbody>
           <tr>
               <td>Stars</td>
-              <td class="text-right">{{player.stats.totalStars}}</td>
-              <td class="text-right" v-if="userIsInGame() && !isUserPlayer()"
+              <td class="text-end">{{player.stats.totalStars}}</td>
+              <td class="text-end" v-if="userIsInGame() && !isUserPlayer()"
                 :class="{'text-danger': player.stats.totalStars > userPlayer.stats.totalStars,
                           'text-success': player.stats.totalStars < userPlayer.stats.totalStars}">{{userPlayer.stats.totalStars}}</td>
           </tr>
           <tr v-if="isConquestHomeStars">
               <td>Capitals</td>
-              <td class="text-right">{{player.stats.totalHomeStars}}</td>
-              <td class="text-right" v-if="userIsInGame() && !isUserPlayer()"
+              <td class="text-end">{{player.stats.totalHomeStars}}</td>
+              <td class="text-end" v-if="userIsInGame() && !isUserPlayer()"
                 :class="{'text-danger': player.stats.totalHomeStars > userPlayer.stats.totalHomeStars,
                           'text-success': player.stats.totalHomeStars < userPlayer.stats.totalHomeStars}">{{userPlayer.stats.totalHomeStars}}</td>
           </tr>
           <tr>
               <td>Carriers</td>
-              <td class="text-right">{{player.stats.totalCarriers}}</td>
-              <td class="text-right" v-if="userIsInGame() && !isUserPlayer()"
+              <td class="text-end">{{player.stats.totalCarriers}}</td>
+              <td class="text-end" v-if="userIsInGame() && !isUserPlayer()"
                 :class="{'text-danger': player.stats.totalCarriers > userPlayer.stats.totalCarriers,
                           'text-success': player.stats.totalCarriers < userPlayer.stats.totalCarriers}">{{userPlayer.stats.totalCarriers}}</td>
           </tr>
           <tr v-if="isSpecialistsEnabled">
               <td>Specialists</td>
-              <td class="text-right">{{player.stats.totalSpecialists}}</td>
-              <td class="text-right" v-if="userIsInGame() && !isUserPlayer()"
+              <td class="text-end">{{player.stats.totalSpecialists}}</td>
+              <td class="text-end" v-if="userIsInGame() && !isUserPlayer()"
                 :class="{'text-danger': player.stats.totalSpecialists > userPlayer.stats.totalSpecialists,
                           'text-success': player.stats.totalSpecialists < userPlayer.stats.totalSpecialists}">{{userPlayer.stats.totalSpecialists}}</td>
           </tr>
           <tr>
               <td>Ships</td>
-              <td class="text-right">{{player.stats.totalShips}}</td>
-              <td class="text-right" v-if="userIsInGame() && !isUserPlayer()"
+              <td class="text-end">{{player.stats.totalShips}}</td>
+              <td class="text-end" v-if="userIsInGame() && !isUserPlayer()"
                 :class="{'text-danger': player.stats.totalShips > userPlayer.stats.totalShips,
                           'text-success': player.stats.totalShips < userPlayer.stats.totalShips}">{{userPlayer.stats.totalShips}}</td>
           </tr>
           <tr>
               <td>New Ships</td>
-              <td class="text-right">{{player.stats.newShips}}</td>
-              <td class="text-right" v-if="userIsInGame() && !isUserPlayer()"
+              <td class="text-end">{{player.stats.newShips}}</td>
+              <td class="text-end" v-if="userIsInGame() && !isUserPlayer()"
                 :class="{'text-danger': player.stats.newShips > userPlayer.stats.newShips,
                           'text-success': player.stats.newShips < userPlayer.stats.newShips}">{{userPlayer.stats.newShips}}</td>
           </tr>
           <tr>
             <td>Cycle Income</td>
-            <td class="text-right">${{playerIncome}}</td>
-            <td class="text-right" v-if="userIsInGame() && !isUserPlayer()"
+            <td class="text-end">${{playerIncome}}</td>
+            <td class="text-end" v-if="userIsInGame() && !isUserPlayer()"
               :class="{'text-danger': playerIncome > userPlayerIncome,
                         'text-success': playerIncome < userPlayerIncome}">${{userPlayerIncome}}</td>
           </tr>

@@ -9,14 +9,12 @@
     <form-error-list v-bind:errors="errors"/>
 
     <form @submit.prevent>
-      <div class="row no-gutters">
-        <div class="form-group input-group col">
-          <div class="input-group-prepend">
-            <span class="input-group-text">
-              <i class="fas fa-calculator"></i>
-            </span>
-          </div>
-          <select class="form-control" id="strategyType" v-on:change="resetPreview" v-model="selectedUpgradeStrategy" :disabled="isChecking || isUpgrading">
+      <div class="row g-0">
+        <div class="mb-2 input-group col">
+          <span class="input-group-text">
+            <i class="fas fa-calculator"></i>
+          </span>
+          <select class="form-select" id="strategyType" v-on:change="resetPreview" v-model="selectedUpgradeStrategy" :disabled="isChecking || isUpgrading">
             <option value="totalCredits">Spend credits</option>
             <option value="infrastructureAmount">Buy infrastructure amount</option>
             <option value="belowPrice">Buy below price</option>
@@ -24,14 +22,12 @@
         </div>
       </div>
       <div class="row">
-        <div class="form-group input-group col pr-1">
-          <div class="input-group-prepend">
-            <span class="input-group-text">
-              <i class="fas fa-dollar-sign" v-if="selectedUpgradeStrategy === 'totalCredits'"></i>
-              <i class="fas fa-dollar-sign" v-if="selectedUpgradeStrategy === 'belowPrice'"></i>
-              <i class="fas fa-industry" v-if="selectedUpgradeStrategy === 'infrastructureAmount'"></i>
-            </span>
-          </div>
+        <div class="mb-2 input-group col pe-1">
+          <span class="input-group-text">
+            <i class="fas fa-dollar-sign" v-if="selectedUpgradeStrategy === 'totalCredits'"></i>
+            <i class="fas fa-dollar-sign" v-if="selectedUpgradeStrategy === 'belowPrice'"></i>
+            <i class="fas fa-industry" v-if="selectedUpgradeStrategy === 'infrastructureAmount'"></i>
+          </span>
           <input v-on:input="resetHasChecked"
             class="form-control"
             id="amount"
@@ -41,7 +37,7 @@
             :disabled="isChecking || isUpgrading"
           />
         </div>
-        <div class="form-group col pl-0 pr-0">
+        <div class="mb-2 col ps-0 pe-0">
           <select class="form-control" id="infrastructureType" v-on:change="resetPreview" v-model="selectedType" :disabled="isChecking || isUpgrading">
             <option
               v-for="opt in types"
@@ -50,36 +46,40 @@
             >{{ opt.name }}</option>
           </select>
         </div>
-        <div class="form-group col-4 pl-1">
-          <button class="btn btn-info btn-block" v-on:click="check"
-            :disabled="$isHistoricalMode() || isUpgrading || isChecking || gameIsFinished()" ><i class="fas fa-hammer mr-1"></i>Check</button>
+        <div class="mb-2 col-4 ps-1">
+          <div class="d-grid gap-2">
+            <button class="btn btn-outline-info" v-on:click="check"
+              :disabled="$isHistoricalMode() || isUpgrading || isChecking || gameIsFinished()" ><i class="fas fa-hammer me-1"></i>Check</button>
+          </div>
         </div>
       </div>
     </form>
 
     <loading-spinner :loading="isChecking" />
 
-    <div class="row bg-secondary" v-if="hasChecked && !isChecking">
+    <div class="row bg-dark" v-if="hasChecked && !isChecking">
       <div class="col pt-3" >
         <p><b class="text-success">{{upgradeAvailable}}</b> upgrade<span v-if="upgradeAvailable > 1">s</span> for <b class="text-danger">${{cost}}</b></p>
       </div>
-      <div class="col-4 pt-2 pl-1">
-        <button class="btn btn-success btn-block" v-on:click="upgrade"
-          :disabled="$isHistoricalMode() || isUpgrading || isChecking || gameIsFinished()" ><i class="fas fa-check mr-1"></i>Confirm</button>
+      <div class="col-4 pt-2 ps-1">
+        <div class="d-grid gap-2">
+          <button class="btn btn-success" v-on:click="upgrade"
+            :disabled="$isHistoricalMode() || isUpgrading || isChecking || gameIsFinished()" ><i class="fas fa-check me-1"></i>Confirm</button>
+        </div>
       </div>
       <div class="col-12" v-if="ignoredCount">
         <p><small>{{ignoredCount}} star(s) have been ignored by the bulk upgrade.</small></p>
       </div>
     </div>
 
-    <div v-if="hasChecked && upgradePreview && upgradePreview.stars.length" class="row">
+    <div v-if="hasChecked && upgradePreview && upgradePreview.stars.length" class="row mt-2">
       <!-- TODO: This should be a component -->
       <table class="table table-striped table-hover">
-        <thead>
-            <tr class="bg-primary">
+        <thead class="table-dark">
+            <tr>
                 <td>Star</td>
-                <td class="text-right">Upgrade</td>
-                <td class="text-right"><i class="fas fa-dollar-sign"></i></td>
+                <td class="text-end">Upgrade</td>
+                <td class="text-end"><i class="fas fa-dollar-sign"></i></td>
             </tr>
         </thead>
         <tbody>
@@ -91,12 +91,12 @@
                 {{getStar(previewStar.starId).name}}
               </a>
             </td>
-            <td class="text-right">
+            <td class="text-end">
               <span class="text-danger">{{previewStar.infrastructureCurrent}}</span>
-              <i class="fas fa-arrow-right ml-2 mr-2"></i>
+              <i class="fas fa-arrow-right ms-2 me-2"></i>
               <span class="text-success">{{previewStar.infrastructure}}</span>
             </td>
-            <td class="text-right">
+            <td class="text-end">
               {{previewStar.infrastructureCostTotal}}
             </td>
           </tr>

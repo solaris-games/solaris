@@ -1,6 +1,6 @@
 <template>
     <table class="table table-striped table-hover" v-if="insights">
-        <thead>
+        <thead class="table-dark">
             <tr>
                 <th></th>
                 <th>24h</th>

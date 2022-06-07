@@ -1,29 +1,29 @@
 <template>
 <div>
-    <div class="row text-center bg-primary">
+    <div class="row text-center bg-primary mb-2">
         <div class="col">
             <p class="mb-0 mt-2 mb-2">Select a race and an alias for your commander.</p>
         </div>
     </div>
 
-    <div class="row bg-secondary">
+    <div class="row bg-dark p-2">
         <div class="col">
             <form @submit.prevent>
                 <div class="row">
-                  <div class="col-auto bg-primary">
+                  <div class="col-auto bg-dark">
                     <select-avatar v-on:onAvatarChanged="onAvatarChanged"/>
                   </div>
-                  <div class="col pt-3">
+                  <div class="col pt-0">
                     <p v-if="!avatar">Every great story needs both heroes and villians. Which will you be?</p>
 
                     <h5 v-if="avatar">{{avatar.name}}</h5>
                     <p v-if="avatar"><small class="linebreaks">{{avatar.description}}</small></p>
 
-                    <div class="form-group">
+                    <div class="mb-2">
                       <input name="alias" class="form-control" required="required" placeholder="Enter your alias here" type="text" minlength="3" maxlength="24" v-model="alias" v-on:keyup="onAliasChanged">
                     </div>
 
-                    <!-- <div class="form-group text-center small">
+                    <!-- <div class="mb-2 text-center small">
                         <p>Your alias must be between 3 and 24 characters.</p>
                     </div> -->
                   </div>

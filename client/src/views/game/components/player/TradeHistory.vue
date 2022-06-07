@@ -5,7 +5,7 @@
                 <h4 class="mt-2">Trade History</h4>
             </div>
             <div class="col-auto">
-                <button class="btn btn-sm btn-success mt-2" @click="loadTradeEvents" :disabled="isLoading"><i class="fas fa-sync"></i> Refresh</button>
+                <button class="btn btn-sm btn-outline-success mt-2" @click="loadTradeEvents" :disabled="isLoading"><i class="fas fa-sync"></i> Refresh</button>
             </div>
         </div>
 
@@ -19,31 +19,31 @@
             <div class="row" v-for="event in tradeEvents" :key="event._id">
                 <div class="col">
                     <p v-if="event.data.renown" class="mb-1">
-                        <i class="mr-1 fas" :class="{'fa-arrow-right text-danger': event.data.toPlayerId, 'fa-arrow-left text-success': event.data.fromPlayerId}"></i>
+                        <i class="me-1 fas" :class="{'fa-arrow-right text-danger': event.data.toPlayerId, 'fa-arrow-left text-success': event.data.fromPlayerId}"></i>
                         <span>{{event.data.renown}} <span class="text-warning">renown</span>.</span>
                     </p>
                     <p v-if="event.data.credits" class="mb-1">
-                        <i class="mr-1 fas" :class="{'fa-arrow-right text-danger': event.data.toPlayerId, 'fa-arrow-left text-success': event.data.fromPlayerId}"></i>
+                        <i class="me-1 fas" :class="{'fa-arrow-right text-danger': event.data.toPlayerId, 'fa-arrow-left text-success': event.data.fromPlayerId}"></i>
                         <span>{{event.data.credits}} <span class="text-warning">credits</span>.</span>
                     </p>
                     <p v-if="event.data.creditsSpecialists" class="mb-1">
-                        <i class="mr-1 fas" :class="{'fa-arrow-right text-danger': event.data.toPlayerId, 'fa-arrow-left text-success': event.data.fromPlayerId}"></i>
+                        <i class="me-1 fas" :class="{'fa-arrow-right text-danger': event.data.toPlayerId, 'fa-arrow-left text-success': event.data.fromPlayerId}"></i>
                         <span>{{event.data.creditsSpecialists}} <span class="text-warning">specialist token(s)</span>.</span>
                     </p>
                     <p v-if="event.data.technology" class="mb-1">
-                        <i class="mr-1 fas" :class="{'fa-arrow-right text-danger': event.data.toPlayerId, 'fa-arrow-left text-success': event.data.fromPlayerId}"></i>
+                        <i class="me-1 fas" :class="{'fa-arrow-right text-danger': event.data.toPlayerId, 'fa-arrow-left text-success': event.data.fromPlayerId}"></i>
                         <span>Level {{event.data.technology.level}} <span class="text-warning">{{getTechnologyFriendlyName(event.data.technology.name)}}</span></span>.
                     </p>
                     <p v-if="event.data.carrierShips" class="mb-1">
-                        <i class="mr-1 fas" :class="{'fa-arrow-right text-danger': event.data.toPlayerId, 'fa-arrow-left text-success': event.data.fromPlayerId}"></i>
+                        <i class="me-1 fas" :class="{'fa-arrow-right text-danger': event.data.toPlayerId, 'fa-arrow-left text-success': event.data.fromPlayerId}"></i>
                         <span>{{event.data.carrierShips}} <span class="text-warning">ships</span>.</span>
                     </p>
                     <p v-if="event.type === 'playerDebtSettled'" class="mb-1">
-                        <i class="mr-1 fas" :class="{'fa-arrow-right text-danger': !isUserPlayerLedgerEventCreditor(event), 'fa-arrow-left text-success': isUserPlayerLedgerEventCreditor(event)}"></i>
+                        <i class="me-1 fas" :class="{'fa-arrow-right text-danger': !isUserPlayerLedgerEventCreditor(event), 'fa-arrow-left text-success': isUserPlayerLedgerEventCreditor(event)}"></i>
                         <span>{{event.data.amount}} <span class="text-warning">credits</span> of debt <span class="text-warning">settled</span>.</span>
                     </p>
                     <p v-if="event.type === 'playerDebtForgiven'" class="mb-1">
-                        <i class="mr-1 fas" :class="{'fa-arrow-left text-success': !isUserPlayerLedgerEventCreditor(event), 'fa-arrow-right text-danger': isUserPlayerLedgerEventCreditor(event)}"></i>
+                        <i class="me-1 fas" :class="{'fa-arrow-left text-success': !isUserPlayerLedgerEventCreditor(event), 'fa-arrow-right text-danger': isUserPlayerLedgerEventCreditor(event)}"></i>
                         <span>{{event.data.amount}} <span class="text-warning">credits</span> of debt <span class="text-warning">forgiven</span>.</span>
                     </p>
                 </div>

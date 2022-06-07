@@ -6,13 +6,13 @@
 
     <ul class="nav nav-tabs">
       <li class="nav-item">
-          <a class="nav-link active" data-toggle="tab" href="#newGames">New Games</a>
+          <a class="nav-link active" data-bs-toggle="tab" href="#newGames">New Games</a>
       </li>
       <li class="nav-item">
-          <a class="nav-link" data-toggle="tab" href="#inProgressGames">In Progress</a>
+          <a class="nav-link" data-bs-toggle="tab" href="#inProgressGames">In Progress</a>
       </li>
       <li class="nav-item">
-          <a class="nav-link" data-toggle="tab" href="#recentlyCompletedGames">Recent</a>
+          <a class="nav-link" data-bs-toggle="tab" href="#recentlyCompletedGames">Recent</a>
       </li>
     </ul>
 
@@ -20,15 +20,15 @@
         <div class="tab-pane fade show active" id="newGames">
           <h4 v-if="games.featured">Featured Game</h4>
 
-          <div class="row no-gutters" v-if="!isLoading">
+          <div class="row" v-if="!isLoading">
             <!-- Featured -->
             <div class="col-sm-12 col-md-12 col-lg-12 mb-0" v-if="games.featured">
-              <div class="card featured-card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.featured._id })">
+              <div class="card featured-card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.featured._id })">
                 <img class="card-img" :src="require('../../assets/screenshots/featured.png')" alt="Featured Game">
                 <div class="card-img-overlay">
                   <h4 class="card-title featured-card-title">
                     <i class="fas fa-star"></i>
-                    <span class="ml-0">
+                    <span class="ms-0">
                       {{games.featured.settings.general.name}}
                     </span>
                   </h4>
@@ -45,7 +45,7 @@
 
           <h4>Standard Games</h4>
 
-          <p>These are official games and award rank.<help-tooltip class="ml-1" tooltip="Note: New Player games do not award rank - 1v1 games do not award galactic credits"/></p>
+          <p>These are official games and award rank.<help-tooltip class="ms-1" tooltip="Note: New Player games do not award rank - 1v1 games do not award galactic credits"/></p>
 
           <loading-spinner :loading="isLoading"/>
 
@@ -53,27 +53,33 @@
             There are no official games available.
           </p>
           
-          <div class="row no-gutters" v-if="!isLoading">
+          <div class="row" v-if="!isLoading">
             <!-- New Player -->
-            <div class="col-sm-12 col-md-6 col-lg-6 pr-1" v-if="games.newPlayerRT">
-              <div class="card bg-dark text-white new-player-game" @click="routeToPath('/game/detail', { id: games.newPlayerRT._id })">
+            <div class="col-sm-12 col-md-6 col-lg-6" v-if="games.newPlayerRT">
+              <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.newPlayerRT._id })">
                 <img class="card-img" :src="require('../../assets/screenshots/new_player_rt.png')" alt="View New Player Game">
                 <div class="card-img-overlay">
                   <h5 class="card-title new-player-card-title">
                     <i class="fas fa-user-graduate"></i>
-                    <span class="ml-2">{{getGameTypeFriendlyText(games.newPlayerRT)}}</span>
+                    <span class="ms-2">{{getGameTypeFriendlyText(games.newPlayerRT)}}</span>
                   </h5>
                   <h6 class="card-title card-subtitle new-player-card-subtitle">
                     {{games.newPlayerRT.settings.general.name}}
                     ({{games.newPlayerRT.state.players}}/{{games.newPlayerRT.settings.general.playerLimit}})
                   </h6>
                 </div>
+                <div class="card-arrow">
+                  <div class="card-arrow-top-left"></div>
+                  <div class="card-arrow-top-right"></div>
+                  <div class="card-arrow-bottom-left"></div>
+                  <div class="card-arrow-bottom-right"></div>
+                </div>
               </div>
             </div>
 
             <!-- Special Game -->
-            <div class="col-sm-12 col-md-6 col-lg-6 pl-1" v-if="games.special">
-              <div class="card bg-dark text-white special-game" @click="routeToPath('/game/detail', { id: games.special._id })">
+            <div class="col-sm-12 col-md-6 col-lg-6" v-if="games.special">
+              <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.special._id })">
                 <img class="card-img" :src="require('../../assets/screenshots/' + games.special.settings.general.type + '.png')" alt="Special Game">
                 <div class="card-img-overlay">
                   <h5 class="card-title special-card-title">
@@ -87,7 +93,7 @@
                       'fa-crown': games.special.settings.general.type === 'special_kingOfTheHill',
                       'fa-search': games.special.settings.general.type === 'special_tinyGalaxy'
                     }"></i>
-                    <span class="ml-2">{{games.special.settings.general.name}}</span>
+                    <span class="ms-2">{{games.special.settings.general.name}}</span>
                   </h5>
                   <h6 class="card-title card-subtitle special-card-subtitle">
                     {{getGameTypeFriendlyText(games.special)}}
@@ -95,98 +101,134 @@
                     <strong>x2 Rank</strong>
                   </h6>
                 </div>
+                <div class="card-arrow">
+                  <div class="card-arrow-top-left"></div>
+                  <div class="card-arrow-top-right"></div>
+                  <div class="card-arrow-bottom-left"></div>
+                  <div class="card-arrow-bottom-right"></div>
+                </div>
               </div>
             </div>
 
             <!-- Standard -->
-            <div class="col-sm-12 col-md-3 col-lg-3 pr-1" v-if="games.standardRT">
-              <div class="card bg-dark text-white standard-game" @click="routeToPath('/game/detail', { id: games.standardRT._id })">
+            <div class="col-sm-12 col-md-3 col-lg-3" v-if="games.standardRT">
+              <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.standardRT._id })">
                 <img class="card-img" :src="require('../../assets/screenshots/standard_rt.png')" alt="Standard Game">
                 <div class="card-img-overlay">
                   <h6 class="card-title standard-card-title">
                     <i class="fas fa-user-astronaut"></i>
-                    <span class="ml-2">{{games.standardRT.settings.general.name}}</span>
+                    <span class="ms-2">{{games.standardRT.settings.general.name}}</span>
                   </h6>
                   <p class="card-title card-subtitle standard-card-subtitle">
                     {{getGameTypeFriendlyText(games.standardRT)}}
                     ({{games.standardRT.state.players}}/{{games.standardRT.settings.general.playerLimit}})
                   </p>
                 </div>
+                <div class="card-arrow">
+                  <div class="card-arrow-top-left"></div>
+                  <div class="card-arrow-top-right"></div>
+                  <div class="card-arrow-bottom-left"></div>
+                  <div class="card-arrow-bottom-right"></div>
+                </div>
               </div>
             </div>
 
             <!-- Standard TB -->
-            <div class="col-sm-12 col-md-3 col-lg-3 pr-1 pl-1" v-if="games.standardTB">
-              <div class="card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.standardTB._id })">
+            <div class="col-sm-12 col-md-3 col-lg-3" v-if="games.standardTB">
+              <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.standardTB._id })">
                 <img class="card-img" :src="require('../../assets/screenshots/standard_tb.png')" alt="Standard Turn Based Game">
                 <div class="card-img-overlay">
                   <h6 class="card-title">
                     <i class="fas fa-user-astronaut"></i>
-                    <span class="ml-2">{{games.standardTB.settings.general.name}}</span>
+                    <span class="ms-2">{{games.standardTB.settings.general.name}}</span>
                   </h6>
                   <p class="card-title card-subtitle">
                     {{getGameTypeFriendlyText(games.standardTB)}}
                     ({{games.standardTB.state.players}}/{{games.standardTB.settings.general.playerLimit}})
                   </p>
                 </div>
+                <div class="card-arrow">
+                  <div class="card-arrow-top-left"></div>
+                  <div class="card-arrow-top-right"></div>
+                  <div class="card-arrow-bottom-left"></div>
+                  <div class="card-arrow-bottom-right"></div>
+                </div>
               </div>
             </div>
 
             <!-- 1v1 -->
-            <div class="col-sm-12 col-md-3 col-lg-3 pr-1 pl-1" v-if="games.oneVsOneRT">
-              <div class="card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.oneVsOneRT._id })">
+            <div class="col-sm-12 col-md-3 col-lg-3" v-if="games.oneVsOneRT">
+              <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.oneVsOneRT._id })">
                 <img class="card-img" :src="require('../../assets/screenshots/1v1_rt.png')" alt="1 vs. 1 Game">
                 <div class="card-img-overlay">
                   <h6 class="card-title">
                     <i class="fas fa-user-friends"></i>
-                    <span class="ml-2">{{games.oneVsOneRT.settings.general.name}}</span>
+                    <span class="ms-2">{{games.oneVsOneRT.settings.general.name}}</span>
                   </h6>
                   <p class="card-title card-subtitle">
                     {{getGameTypeFriendlyText(games.oneVsOneRT)}}
                     ({{games.oneVsOneRT.state.players}}/{{games.oneVsOneRT.settings.general.playerLimit}})
                   </p>
                 </div>
+                <div class="card-arrow">
+                  <div class="card-arrow-top-left"></div>
+                  <div class="card-arrow-top-right"></div>
+                  <div class="card-arrow-bottom-left"></div>
+                  <div class="card-arrow-bottom-right"></div>
+                </div>
               </div>
             </div>
 
             <!-- 1v1 TB -->
-            <div class="col-sm-12 col-md-3 col-lg-3 pl-1" v-if="games.oneVsOneTB">
-              <div class="card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.oneVsOneTB._id })">
+            <div class="col-sm-12 col-md-3 col-lg-3" v-if="games.oneVsOneTB">
+              <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.oneVsOneTB._id })">
                 <img class="card-img" :src="require('../../assets/screenshots/1v1_tb.png')" alt="1 vs. 1 Turn Based Game">
                 <div class="card-img-overlay">
                   <h6 class="card-title">
                     <i class="fas fa-user-friends"></i>
-                    <span class="ml-2">{{games.oneVsOneTB.settings.general.name}}</span>
+                    <span class="ms-2">{{games.oneVsOneTB.settings.general.name}}</span>
                   </h6>
                   <p class="card-title card-subtitle">
                     {{getGameTypeFriendlyText(games.oneVsOneTB)}}
                     ({{games.oneVsOneTB.state.players}}/{{games.oneVsOneTB.settings.general.playerLimit}})
                   </p>
                 </div>
+                <div class="card-arrow">
+                  <div class="card-arrow-top-left"></div>
+                  <div class="card-arrow-top-right"></div>
+                  <div class="card-arrow-bottom-left"></div>
+                  <div class="card-arrow-bottom-right"></div>
+                </div>
               </div>
             </div>
 
             <!-- 32 Player -->
             <div class="col-sm-12 col-md-12 col-lg-12" v-if="games.thirtyTwoPlayerRT">
-              <div class="card bg-dark text-white" @click="routeToPath('/game/detail', { id: games.thirtyTwoPlayerRT._id })">
+              <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.thirtyTwoPlayerRT._id })">
                 <img class="card-img" :src="require('../../assets/screenshots/32_player.png')" alt="32 Player Game">
                 <div class="card-img-overlay">
                   <h5 class="card-title">
                     <i class="fas fa-users"></i>
-                    <span class="ml-2">{{games.thirtyTwoPlayerRT.settings.general.name}}</span>
+                    <span class="ms-2">{{games.thirtyTwoPlayerRT.settings.general.name}}</span>
                   </h5>
                   <h6 class="card-title card-subtitle">
                     {{getGameTypeFriendlyText(games.thirtyTwoPlayerRT)}}
                     ({{games.thirtyTwoPlayerRT.state.players}}/{{games.thirtyTwoPlayerRT.settings.general.playerLimit}})
                   </h6>
                 </div>
+                <div class="card-arrow">
+                  <div class="card-arrow-top-left"></div>
+                  <div class="card-arrow-top-right"></div>
+                  <div class="card-arrow-bottom-left"></div>
+                  <div class="card-arrow-bottom-right"></div>
+                </div>
               </div>
             </div>
           </div>
 
-          <div class="text-right" v-if="!isLoading">
-            <router-link to="/game/create" tag="button" class="btn btn-info mr-1"><i class="fas fa-gamepad"></i> Create Game</router-link>
-            <router-link to="/game/active-games" tag="button" class="btn btn-success ml-1"><i class="fas fa-dice"></i> View My Games</router-link>
+          <div class="text-end" v-if="!isLoading">
+            <router-link to="/game/create" tag="button" class="btn btn-info me-1"><i class="fas fa-gamepad"></i> Create Game</router-link>
+            <router-link to="/game/active-games" tag="button" class="btn btn-success ms-1"><i class="fas fa-dice"></i> View My Games</router-link>
           </div>
 
           <hr/>
@@ -206,8 +248,8 @@
           </div>
 
           <table v-if="!isLoading && userGames.length" class="table table-striped table-hover">
-              <thead>
-                  <tr class="bg-primary">
+              <thead class="table-dark">
+                  <tr>
                       <td>Name</td>
                       <td class="d-none d-md-table-cell text-center">Players</td>
                       <td></td>
@@ -217,11 +259,11 @@
                   <tr v-for="game in userGames" v-bind:key="game._id">
                       <td>
                         {{game.settings.general.name}}
-                        <span class="badge badge-success" v-if="game.settings.general.featured">Featured</span>
+                        <span class="badge bg-success" v-if="game.settings.general.featured">Featured</span>
                       </td>
                       <td class="d-none d-md-table-cell text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
                       <td>
-                          <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-success float-right">
+                          <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-outline-success float-end">
                             <span class="d-none d-md-block">View</span>
                             <span class="d-xs-block d-sm-block d-md-none">
                               {{game.state.players}}/{{game.settings.general.playerLimit}}
@@ -232,16 +274,16 @@
               </tbody>
           </table>
 
-          <div class="text-right" v-if="!isLoading">
-            <router-link to="/game/create" tag="button" class="btn btn-info mr-1"><i class="fas fa-gamepad"></i> Create Game</router-link>
-            <router-link to="/game/active-games" tag="button" class="btn btn-success ml-1"><i class="fas fa-dice"></i> View My Games</router-link>
+          <div class="text-end" v-if="!isLoading">
+            <router-link to="/game/create" tag="button" class="btn btn-info me-1"><i class="fas fa-gamepad"></i> Create Game</router-link>
+            <router-link to="/game/active-games" tag="button" class="btn btn-success ms-1"><i class="fas fa-dice"></i> View My Games</router-link>
           </div>
         </div>
         
         <div class="tab-pane fade" id="inProgressGames">
           <h4>In Progress Games</h4>
 
-          <p class="mb-1">These games are in progress, you can join games with open slots. <b>Fill slots to earn additional rank!</b> <help-tooltip class="ml-1" tooltip="Players who fill an AFK slot and will be awarded 1.5x additional rank (minimum 1) when the game ends"/></p>
+          <p class="mb-1">These games are in progress, you can join games with open slots. <b>Fill slots to earn additional rank!</b> <help-tooltip class="ms-1" tooltip="Players who fill an AFK slot and will be awarded 1.5x additional rank (minimum 1) when the game ends"/></p>
 
           <p class="mb-2"><small class="text-warning" v-if="inProgressGames.length">Total Games: {{inProgressGames.length}}</small></p>
 
@@ -252,8 +294,8 @@
           </p>
 
           <table v-if="!isLoading && inProgressGames.length" class="table table-striped table-hover">
-              <thead>
-                  <tr class="bg-primary">
+              <thead class="table-dark">
+                  <tr>
                       <th>Name</th>
                       <th class="d-none d-md-table-cell text-center">Players</th>
                       <th class="d-none d-sm-table-cell text-center">Cycle</th>
@@ -265,14 +307,14 @@
                       <td>
                         <router-link :to="{ path: '/game/detail', query: { id: game._id } }">{{game.settings.general.name}}</router-link>
                         <br v-if="game.state.openSlots"/>
-                        <span class="badge badge-warning" v-if="game.state.openSlots">{{game.state.openSlots}} Open Slot<span v-if="game.state.openSlots > 1">s</span></span>
+                        <span class="badge bg-warning" v-if="game.state.openSlots">{{game.state.openSlots}} Open Slot<span v-if="game.state.openSlots > 1">s</span></span>
                         <br/>
                         <small>{{getGameTypeFriendlyText(game)}}</small>
                       </td>
                       <td class="d-none d-md-table-cell text-center" :class="{'text-warning':game.state.openSlots}">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
                       <td class="d-none d-sm-table-cell text-center">{{game.state.productionTick}}</td>
                       <td>
-                          <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-success float-right">
+                          <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-outline-success float-end">
                             <span class="d-none d-md-block">View</span>
                             <span class="d-xs-block d-sm-block d-md-none">
                               {{game.state.players}}/{{game.settings.general.playerLimit}}
@@ -283,14 +325,16 @@
               </tbody>
           </table>
 
-          <div class="text-right" v-if="!isLoading">
-            <router-link to="/game/create" tag="button" class="btn btn-info mr-1"><i class="fas fa-gamepad"></i> Create Game</router-link>
-            <router-link to="/game/active-games" tag="button" class="btn btn-success ml-1"><i class="fas fa-dice"></i> View My Games</router-link>
+          <div class="text-end" v-if="!isLoading">
+            <router-link to="/game/create" tag="button" class="btn btn-info me-1"><i class="fas fa-gamepad"></i> Create Game</router-link>
+            <router-link to="/game/active-games" tag="button" class="btn btn-success ms-1"><i class="fas fa-dice"></i> View My Games</router-link>
           </div>
         </div>
         
         <div class="tab-pane fade" id="recentlyCompletedGames">
           <h4>Recently Completed Games</h4>
+
+          <p class="mb-1">These are games that finished recently, you can view the end result.</p>
 
           <loading-spinner :loading="isLoading"/>
 
@@ -299,8 +343,8 @@
           </p>
 
           <table v-if="!isLoading && recentlyCompletedGames.length" class="table table-striped table-hover">
-              <thead>
-                  <tr class="bg-primary">
+              <thead class="table-dark">
+                  <tr>
                       <th>Name</th>
                       <th class="d-none d-md-table-cell text-center">Ended</th>
                       <th class="d-none d-sm-table-cell text-center">Cycles</th>
@@ -317,7 +361,7 @@
                       <td class="d-none d-md-table-cell text-center">{{getFriendlyDate(game.state.endDate)}}</td>
                       <td class="d-none d-sm-table-cell text-center">{{game.state.productionTick}}</td>
                       <td>
-                          <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success float-right">
+                          <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-outline-success float-end">
                             <span>View</span>
                           </router-link>
                       </td>
@@ -325,9 +369,9 @@
               </tbody>
           </table>
 
-          <div class="text-right" v-if="!isLoading">
-            <router-link to="/game/create" tag="button" class="btn btn-info mr-1"><i class="fas fa-gamepad"></i> Create Game</router-link>
-            <router-link to="/game/active-games" tag="button" class="btn btn-success ml-1"><i class="fas fa-dice"></i> View My Games</router-link>
+          <div class="text-end" v-if="!isLoading">
+            <router-link to="/game/create" tag="button" class="btn btn-info me-1"><i class="fas fa-gamepad"></i> Create Game</router-link>
+            <router-link to="/game/active-games" tag="button" class="btn btn-success ms-1"><i class="fas fa-dice"></i> View My Games</router-link>
           </div>
         </div>
     </div>
@@ -471,7 +515,6 @@ export default {
   background-color: #375a7f;
   padding: 0.25rem;
   display: inline-block;
-  border-radius: 3px;
 }
 
 .featured-card-title {
@@ -513,17 +556,5 @@ p.card-subtitle {
 
 .special-card-subtitle {
   background-color: #d62c1a;
-}
-
-.new-player-game {
-  border: 3px solid #f39c12;
-}
-
-.standard-game {
-  border: 3px solid #00bc8c;
-}
-
-.special-game {
-  border: 3px solid #d62c1a;
 }
 </style>

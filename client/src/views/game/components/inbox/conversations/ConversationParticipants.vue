@@ -2,8 +2,8 @@
 <div class="participant-container">
   <p v-if="isPartialPlayers" class="mb-2">
     <small>
-      <span v-for="participant in conversation.participants" :key="participant" class="mr-2 pointer" @click="onOpenPlayerDetailRequested(participant)">
-        <player-icon :playerId="getPlayer(participant)._id"/>
+      <span v-for="participant in conversation.participants" :key="participant" class="me-2 pointer" @click="onOpenPlayerDetailRequested(participant)">
+        <player-icon :playerId="getPlayer(participant)._id" class="me-1"/>
 
         {{getPlayer(participant).alias}}
       </span>

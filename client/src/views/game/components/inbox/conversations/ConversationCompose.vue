@@ -1,18 +1,20 @@
 <template>
 <form class="pb-1 conversation">
-    <div class="mention-overlay bg-primary mb-1" v-if="suggestMentions && currentMention && currentMention.suggestions && currentMention.suggestions.length">
+    <div class="mention-overlay bg-dark mb-1" v-if="suggestMentions && currentMention && currentMention.suggestions && currentMention.suggestions.length">
       <ul>
         <li v-for="(suggestion, index) in currentMention.suggestions" :class="{ selected: index === selectedSuggestion }" :key="suggestion" @click="() => useSuggestion(suggestion)">{{suggestion}}</li>
       </ul>
     </div>
-    <div class="form-group mb-2">
+    <div class="mb-2 mb-2">
         <textarea class="form-control" id="txtMessage" rows="3" :placeholder="placeholderText" ref="messageElement" :value="this.$store.state.currentConversation.text" @input="onMessageChange" @keydown="onKeyDown" @keyup="updateSuggestions" @select="updateSuggestions" @focus="updateSuggestions"></textarea>
     </div>
-    <div class="form-group text-right">
-        <button type="button" class="btn btn-success btn-block" @click="send" :disabled="isSendingMessage">
+    <div class="mb-2 text-end">
+      <div class="d-grid gap-2">
+        <button type="button" class="btn btn-success" @click="send" :disabled="isSendingMessage">
           <i class="fas fa-paper-plane"></i>
           Send Message
         </button>
+      </div>
     </div>
 </form>
 </template>

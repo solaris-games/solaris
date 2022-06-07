@@ -1,19 +1,37 @@
 <template>
   <div class="row">
-    <div class="col text-center bg-primary pt-2 pb-1">
+    <div class="col-4 text-center pt-2 pb-1 ps-1 pe-1 card bg-dark">
         <h6>Economy</h6>
-        <h3 v-if="!isSmallHeaders"><i class="fas fa-money-bill-wave text-success mr-2"></i>{{ economy }}</h3>
-        <h4 v-if="isSmallHeaders"><i class="fas fa-money-bill-wave text-success mr-2"></i>{{ economy }}</h4>
+        <h3 v-if="!isSmallHeaders"><i class="fas fa-money-bill-wave text-success me-2"></i>{{ economy }}</h3>
+        <h4 v-if="isSmallHeaders"><i class="fas fa-money-bill-wave text-success me-2"></i>{{ economy }}</h4>
+        <div class="card-arrow">
+          <div class="card-arrow-top-left"></div>
+          <div class="card-arrow-top-right"></div>
+          <div class="card-arrow-bottom-left"></div>
+          <div class="card-arrow-bottom-right"></div>
+        </div>
     </div>
-    <div class="col text-center bg-secondary pt-2 pb-1">
+    <div class="col-4 text-center pt-2 pb-1 ps-1 pe-1 card">
         <h6>Industry</h6>
-        <h3 v-if="!isSmallHeaders"><i class="fas fa-tools text-warning mr-2"></i>{{ industry }}</h3>
-        <h4 v-if="isSmallHeaders"><i class="fas fa-tools text-warning mr-2"></i>{{ industry }}</h4>
+        <h3 v-if="!isSmallHeaders"><i class="fas fa-tools text-warning me-2"></i>{{ industry }}</h3>
+        <h4 v-if="isSmallHeaders"><i class="fas fa-tools text-warning me-2"></i>{{ industry }}</h4>
+        <div class="card-arrow">
+          <div class="card-arrow-top-left"></div>
+          <div class="card-arrow-top-right"></div>
+          <div class="card-arrow-bottom-left"></div>
+          <div class="card-arrow-bottom-right"></div>
+        </div>
     </div>
-    <div class="col text-center bg-primary pt-2 pb-1">
+    <div class="col-4 text-center pt-2 pb-1 ps-1 pe-1 card bg-dark">
         <h6>Science</h6>
-        <h3 v-if="!isSmallHeaders"><i class="fas fa-flask text-info mr-2"></i>{{ science }}</h3>
-        <h4 v-if="isSmallHeaders"><i class="fas fa-flask text-info mr-2"></i>{{ science }}</h4>
+        <h3 v-if="!isSmallHeaders"><i class="fas fa-flask text-info me-2"></i>{{ science }}</h3>
+        <h4 v-if="isSmallHeaders"><i class="fas fa-flask text-info me-2"></i>{{ science }}</h4>
+        <div class="card-arrow">
+          <div class="card-arrow-top-left"></div>
+          <div class="card-arrow-top-right"></div>
+          <div class="card-arrow-bottom-left"></div>
+          <div class="card-arrow-bottom-right"></div>
+        </div>
     </div>
   </div>
 </template>
@@ -58,4 +76,7 @@ export default {
 </script>
 
 <style scoped>
+.row {
+  --bs-gutter-x: 0px;
+}
 </style>

@@ -1,6 +1,6 @@
 <template>
 <span v-if="userPlayer" @click="onViewResearchRequested">
-    <i class="mr-1" :class="getIcon()"></i>{{researchProgress}}%
+    <i :class="getIcon()"></i> {{researchProgress}}%
 </span>
 </template>
 

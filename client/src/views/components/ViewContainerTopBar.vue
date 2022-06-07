@@ -1,25 +1,45 @@
 <template>
-<div class="container col-xs-12 col-sm-10 col-md-10 col-lg-6 pr-1 pl-1" v-if="userId">
-  <div class="row no-gutters pb-0 pt-1">
-    <div class="col">
-      <router-link :to="{ name: 'administration'}" v-if="userHasAdminRole" class="mr-2">
-        <i class="fas fa-users-cog"></i>
+<div id="header" class="app-header">  
+  <div class="brand">
+    <a href="javascript:;" class="brand-logo" @click="goHome">
+      <span class="brand-img"></span>
+      <span class="brand-text">SOLARIS</span>
+    </a>
+  </div>
+
+  <div class="menu" v-if="userId">
+    <div class="menu-item dropdown dropdown-mobile-full">
+      <router-link :to="{ name: 'administration'}" v-if="userHasAdminRole" class="menu-link">
+        <div class="menu-icon"><i class="fas fa-users-cog"></i></div>
+        <div class="menu-text d-sm-block d-none ms-1">Admin</div>
       </router-link>
-      <router-link to="/account/settings"><i class="fas fa-user mr-1"></i>{{username || 'My account'}}</router-link>
     </div>
-    <div class="col-auto">
-      <router-link :to="{ name: 'galactic-credits-shop'}">
-        <i class="fas fa-coins"></i>
-        <span class="d-none d-md-inline-block ml-1">{{userCredits}} Credit{{userCredits === 1 ? '' : 's'}}</span>
+    <div class="menu-item dropdown dropdown-mobile-full">
+      <router-link :to="{ name: 'galactic-credits-shop'}" class="menu-link">
+        <div class="menu-icon"><i class="fas fa-coins"></i></div>
+        <div class="menu-text d-sm-block d-none ms-1">{{userCredits}} Credit{{userCredits === 1 ? '' : 's'}}</div>
       </router-link>
-      <router-link :to="{ name: 'account-achievements', params: { userId: userId }}" class="ml-3">
-        <i class="fas fa-medal"></i>
-        <span class="d-none d-md-inline-block ml-1">Achievements</span>
-      </router-link>
-      <a href="javascript:;" @click="logout" :disabled="isLoggingOut" class="ml-3">
-        <i class="fas fa-sign-out-alt"></i>
-        <span class="ml-1">Log Out</span>
+    </div>
+    <div class="menu-item dropdown dropdown-mobile-full">
+      <a href="#" data-bs-toggle="dropdown" data-bs-display="static" class="menu-link">
+        <!-- <div class="menu-img online">
+          <img src="assets/img/user/profile.jpg" alt="Profile" height="60">
+        </div> -->
+        <div class="menu-icon"><i class="fas fa-user"></i></div>
+        <div class="menu-text d-sm-block d-none ms-1">{{username}}</div>
       </a>
+      <div class="dropdown-menu dropdown-menu-end me-lg-3 fs-11px mt-1">
+        <router-link to="/account/settings" class="dropdown-item d-flex align-items-center">
+          ACCOUNT <i class="fas fa-user ms-auto text-theme fs-16px my-n1"></i>
+        </router-link>
+        <router-link :to="{ name: 'account-achievements', params: { userId: userId }}" class="dropdown-item d-flex align-items-center">
+          ACHIEVEMENTS <i class="fas fa-medal ms-auto text-theme fs-16px my-n1"></i>
+        </router-link>
+        <div class="dropdown-divider"></div>
+        <a href="javascript:;" @click="logout" :disabled="isLoggingOut" class="dropdown-item d-flex align-items-center">
+          LOGOUT <i class="fas fa-sign-out-alt ms-auto text-theme fs-16px my-n1"></i>
+        </a>
+      </div>
     </div>
   </div>
 </div>
@@ -52,6 +72,9 @@ export default {
     },
     routeToPath(path) {
       router.push(path)
+    },
+    goHome () {
+      router.push({name: 'home'})
     }
   },
   computed: {

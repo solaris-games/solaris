@@ -1,6 +1,6 @@
 <template>
     <div>
-        <button class="btn btn-primary mb-2" type="button" data-toggle="collapse" data-target="#collapsePanel" aria-expanded="false" aria-controls="collapsePanel">
+        <button class="btn btn-primary mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePanel" aria-expanded="false" aria-controls="collapsePanel">
             Toggle Ban List
         </button>
 

@@ -1,14 +1,14 @@
 <template>
 <div class="menu-page container" v-if="carrierId">
   <menu-title title="Rename Carrier" @onCloseRequested="onCloseRequested" :disabled="isSaving">
-    <button @click="viewOnMap" class="btn btn-sm btn-info ml-1"><i class="fas fa-eye"></i></button>
+    <button @click="viewOnMap" class="btn btn-sm btn-outline-info ms-1"><i class="fas fa-eye"></i></button>
   </menu-title>
 
   <form @submit="doRename">
-    <div class="form-group">
+    <div class="mb-2">
       <input type="text" class="form-control" id="name" placeholder="Enter a new carrier name" v-model="currentName" minlength="4" maxlength="30" @change="onNameChanged">
     </div>
-    <div class="form-group row pb-2 pt-2 bg-secondary">
+    <div class="mb-2 row pb-2 pt-2 ">
       <div class="col">
         <button type="button" class="btn btn-sm btn-primary" :disabled="isSaving" @click="onOpenCarrierDetailRequested">
           <i class="fas fa-arrow-left"></i>

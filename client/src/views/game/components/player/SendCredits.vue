@@ -1,5 +1,5 @@
 <template>
-<div class="row bg-secondary pt-2 pb-2">
+<div class="row bg-dark pt-2 pb-2">
   <div class="col-12">
     <form-error-list v-bind:errors="errors"/>
   </div>
@@ -7,16 +7,16 @@
   <div class="col-12">
     <p class="mb-2">Send <strong>Credits</strong>. (You have <span class="text-warning">${{userPlayer.credits}}</span>)</p>
 
-    <form>
-      <div class="form-row">
-        <div class="col-7 input-group">
-          <div class="input-group-prepend">
-            <span class="input-group-text">$</span>
-          </div>
+    <form class="row">
+      <div class="col-7">
+        <div class="input-group">
+          <span class="input-group-text">$</span>
           <input type="number" class="form-control" v-model="amount"/>
         </div>
-        <div class="col-5">
-          <modalButton modalName="sendCreditsModal" classText="btn btn-success btn-block" :disabled="$isHistoricalMode() || isSendingCredits || amount <= 0"><i class="fas fa-paper-plane"></i> Send</modalButton>
+      </div>
+      <div class="col-5">
+        <div class="d-grid gap-2">
+          <modalButton modalName="sendCreditsModal" classText="btn btn-success" :disabled="$isHistoricalMode() || isSendingCredits || amount <= 0"><i class="fas fa-paper-plane"></i> Send</modalButton>
         </div>
       </div>
     </form>
