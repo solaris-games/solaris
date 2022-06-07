@@ -48,4 +48,9 @@ export default {
 .card>:not(.card-arrow):not(.card-img-overlay):not(.card-img):not(.hljs-container) {
   z-index: 0 !important;
 }
+
+/* Option backgrounds are always white in Chrome */
+option {
+  background: rgba(29,40,53,.98);
+}
 </style>
