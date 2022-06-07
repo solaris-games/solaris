@@ -25,7 +25,7 @@
       </button>
     </div>
     <div class="col-auto">
-      <button class="btn btn-outline-success me-1" @click="onViewConversationRequested"
+      <button class="btn btn-success me-1" @click="onViewConversationRequested"
         :class="{'btn-warning': conversation && conversation.unreadCount}"
         v-if="canCreateConversation">
         <i class="fas fa-envelope"></i>
