@@ -15,13 +15,13 @@
     </ul>
 
     <form @submit="handleSubmit">
-      <div class="form-group">
+      <div class="mb-2">
         <label for="name">Guild Name</label>
         <input type="text" required="required" class="form-control" minlength="4" maxlength="31" name="name" v-model="name" :disabled="isLoading"
           @change="onGuildNameChanged">
       </div>
 
-      <div class="form-group">
+      <div class="mb-2">
         <label for="tag">Guild Tag</label>
         <input type="text" required="required" class="form-control" minlength="2" maxlength="4" name="tag" v-model="tag" :disabled="isLoading">
       </div>
@@ -30,7 +30,7 @@
 
       <p><span class="text-warning">Warning</span>: Founding a guild costs <strong class="text-danger">3 Galactic Credits</strong>. <router-link :to="{ name: 'galactic-credits-shop'}"><i class="fas fa-shopping-basket"></i> Purchase Galactic Credits</router-link> or earn credits by winning official games.</p>
       
-      <div class="form-group">
+      <div class="mb-2">
         <div class="row">
           <div class="col">
             <router-link to="/guild" tag="button" class="btn btn-danger">

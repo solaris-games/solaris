@@ -3,7 +3,7 @@
     <view-title title="Reset Email Address" />
 
     <form @submit.prevent="handleSubmit">
-      <div class="form-group">
+      <div class="mb-2">
         <label for="email">New Email Address</label>
         <input type="email" required="required" class="form-control" v-model="email" :disabled="isLoading"/>
       </div>
@@ -12,7 +12,7 @@
 
       <div>
         <button type="submit" class="btn btn-success" :disabled="isLoading">Change Email</button>
-        <router-link to="/account/settings" tag="button" class="btn btn-danger float-right">Cancel</router-link>
+        <router-link to="/account/settings" tag="button" class="btn btn-danger float-end">Cancel</router-link>
       </div>
     </form>
 

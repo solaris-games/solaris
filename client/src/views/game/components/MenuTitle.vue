@@ -5,7 +5,7 @@
     </div>
     <div class="col-auto">
         <slot></slot>
-        <button @click="close" class="btn btn-danger btn-sm ml-1"><i class="fas fa-times"></i></button>
+        <button @click="close" class="btn btn-danger btn-sm ms-1"><i class="fas fa-times"></i></button>
     </div>
 </div>
 </template>

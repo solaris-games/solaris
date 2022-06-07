@@ -7,11 +7,11 @@
     <form-error-list :errors="errors"/>
       
     <form @submit="handleSubmit">
-        <div class="row no-gutters">
+        <div class="row g-0">
             <div class="col">
                 <input type="text" required="required" class="form-control" name="username" v-model="username" :disabled="isLoading" placeholder="Enter Player Name...">
             </div>
-            <div class="col-auto ml-2">
+            <div class="col-auto ms-2">
                 <button type="submit" class="btn btn-success" :disabled="isLoading">
                     <i class="fas fa-user-plus"></i>
                     Invite

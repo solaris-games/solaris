@@ -5,11 +5,11 @@
         </p>
         <div class="table-responsive mt-2">
             <table class="table table-sm" v-if="event">
-                <thead>
+                <thead class="table-dark">
                     <th>Carriers</th>
-                    <th class="text-right">Before</th>
-                    <th class="text-right">Lost</th>
-                    <th class="text-right">After</th>
+                    <th class="text-end">Before</th>
+                    <th class="text-end">Lost</th>
+                    <th class="text-end">After</th>
                 </thead>
                 <tbody>
                     <tr>
@@ -20,31 +20,31 @@
                     </tr>
                     <tr v-for="carrier of defenderCarriers" :key="carrier._id">
                         <td>
-                            <i class="fas fa-rocket mr-2"></i>
+                            <i class="fas fa-rocket me-2"></i>
                             <span :style="{ 'color': getCarrierColour(carrier) }" class="name-and-icon">
                               <player-icon-shape :filled="true" :shape="getCarrierShape(carrier)" :iconColour="getCarrierColour(carrier)" />
                               {{carrier.name}}
                             </span>
                             <span v-if="carrier.specialist" :title="carrier.specialist.description"> ({{carrier.specialist.name}})</span>
                         </td>
-                        <td class="text-right">{{carrier.before}}</td>
-                        <td class="text-right">{{carrier.lost}}</td>
-                        <td class="text-right">{{carrier.after}}</td>
+                        <td class="text-end">{{carrier.before}}</td>
+                        <td class="text-end">{{carrier.lost}}</td>
+                        <td class="text-end">{{carrier.after}}</td>
                     </tr>
                     <tr>
                       <td><strong>Totals</strong></td>
-                      <td class="text-right"><strong>{{totalDefenderBefore}}</strong></td>
-                      <td class="text-right"><strong>{{totalDefenderLost}}</strong></td>
-                      <td class="text-right"><strong>{{totalDefenderAfter}}</strong></td>
+                      <td class="text-end"><strong>{{totalDefenderBefore}}</strong></td>
+                      <td class="text-end"><strong>{{totalDefenderLost}}</strong></td>
+                      <td class="text-end"><strong>{{totalDefenderAfter}}</strong></td>
                     </tr>
                 </tbody>
             </table>
             <table class="table table-sm" v-if="event">
-              <thead>
+              <thead class="table-dark">
                   <th>Carriers</th>
-                  <th class="text-right">Before</th>
-                  <th class="text-right">Lost</th>
-                  <th class="text-right">After</th>
+                  <th class="text-end">Before</th>
+                  <th class="text-end">Lost</th>
+                  <th class="text-end">After</th>
               </thead>
               <tbody>
                 <tr>
@@ -55,22 +55,22 @@
                 </tr>
                 <tr v-for="carrier of attackerCarriers" :key="carrier._id">
                     <td>
-                        <i class="fas fa-rocket mr-2"></i>
+                        <i class="fas fa-rocket me-2"></i>
                         <span :style="{ 'color': getCarrierColour(carrier) }" class="name-and-icon">
                           <player-icon-shape :filled="true" :shape="getCarrierShape(carrier)" :iconColour="getCarrierColour(carrier)" />
                           {{carrier.name}}
                         </span>
                         <span v-if="carrier.specialist" :title="carrier.specialist.description"> ({{carrier.specialist.name}})</span>
                     </td>
-                    <td class="text-right">{{carrier.before}}</td>
-                    <td class="text-right">{{carrier.lost}}</td>
-                    <td class="text-right">{{carrier.after}}</td>
+                    <td class="text-end">{{carrier.before}}</td>
+                    <td class="text-end">{{carrier.lost}}</td>
+                    <td class="text-end">{{carrier.after}}</td>
                 </tr>
                 <tr>
                   <td><strong>Totals</strong></td>
-                  <td class="text-right"><strong>{{totalAttackerBefore}}</strong></td>
-                  <td class="text-right"><strong>{{totalAttackerLost}}</strong></td>
-                  <td class="text-right"><strong>{{totalAttackerAfter}}</strong></td>
+                  <td class="text-end"><strong>{{totalAttackerBefore}}</strong></td>
+                  <td class="text-end"><strong>{{totalAttackerLost}}</strong></td>
+                  <td class="text-end"><strong>{{totalAttackerAfter}}</strong></td>
                 </tr>
               </tbody>
             </table>

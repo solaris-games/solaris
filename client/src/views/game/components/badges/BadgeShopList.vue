@@ -4,12 +4,16 @@
         <div class="col-auto">
             <img :src="require(`../../../../assets/badges/${badge.key}.png`)"/>
 
-            <button class="btn btn-block btn-sm btn-success" v-if="userCredits >= badge.price" @click="purchaseBadge(badge)">
-                <i class="fas fa-shopping-basket"></i> {{badge.price}} Credit<span v-if="badge.price > 1">s</span>
-            </button>
-            <router-link :to="{ name: 'galactic-credits-shop'}" class="btn btn-block btn-sm btn-danger" v-if="userCredits < badge.price">
-                <i class="fas fa-coins"></i> {{badge.price}} Credit<span v-if="badge.price > 1">s</span>
-            </router-link>
+            <div class="d-grid gap-2">
+                <button class="btn btn-sm btn-success" v-if="userCredits >= badge.price" @click="purchaseBadge(badge)">
+                    <i class="fas fa-shopping-basket"></i> {{badge.price}} Credit<span v-if="badge.price > 1">s</span>
+                </button>
+            </div>
+            <div class="d-grid gap-2">
+                <router-link :to="{ name: 'galactic-credits-shop'}" class="btn btn-sm btn-danger" v-if="userCredits < badge.price">
+                    <i class="fas fa-coins"></i> {{badge.price}} Credit<span v-if="badge.price > 1">s</span>
+                </router-link>
+            </div>
         </div>
         <div class="col">
             <h5>{{badge.name}}</h5>

@@ -4,13 +4,13 @@
 
     <ul class="nav nav-tabs">
       <li class="nav-item">
-          <a class="nav-link active" data-toggle="tab" href="#players">All Players</a>
+          <a class="nav-link active" data-bs-toggle="tab" href="#players">All Players</a>
       </li>
       <li class="nav-item">
-          <a class="nav-link" data-toggle="tab" href="#elos">ELO</a>
+          <a class="nav-link" data-bs-toggle="tab" href="#elos">ELO</a>
       </li>
       <li class="nav-item">
-          <a class="nav-link" data-toggle="tab" href="#guilds">Guilds</a>
+          <a class="nav-link" data-bs-toggle="tab" href="#guilds">Guilds</a>
       </li>
     </ul>
 

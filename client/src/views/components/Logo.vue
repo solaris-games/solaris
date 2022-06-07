@@ -1,5 +1,5 @@
 <template>
-<div class="img-container pt-3 pb-3 pl-3 pr-3 container">
+<div class="img-container pt-3 pb-3 ps-3 pe-3 container">
     <div class="row">
         <div class="col-sm-12 col-md-6 col-lg-4 offset-md-3 offset-lg-4">
             <img @click="goHome" :src="require('../../assets/solaris_logo_text_1000w.png')">

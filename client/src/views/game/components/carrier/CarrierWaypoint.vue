@@ -2,7 +2,7 @@
 	<div class="menu-page container" v-if="carrier">
     	<menu-title title="Edit Fleet Order" @onCloseRequested="onCloseRequested"/>
 
-        <div class="row no-gutters mb-1">
+        <div class="row g-0 mb-1">
             <div class="col-2 text-center">
                 <span>Delay</span>
             </div>
@@ -18,7 +18,7 @@
             </div>
         </div>
         
-        <div class="row no-gutters mb-2" v-if="currentWaypoint">
+        <div class="row g-0 mb-2" v-if="currentWaypoint">
             <div class="col-2 text-center">
               <input type="number" class="form-control input-sm" v-if="!(isFirstWaypoint(currentWaypoint) && isInTransit)" v-model="currentWaypoint.delayTicks" @change="recalculateWaypointDuration">
             </div>
@@ -45,7 +45,7 @@
             </div>
         </div>
 
-        <div class="row bg-primary pt-2 pb-0 mb-0">
+        <div class="row pt-2 pb-0 mb-0">
           <div class="col">
             <p class="mb-2">ETA<orbital-mechanics-eta-warning />: {{waypointEta}}</p>
           </div>
@@ -54,28 +54,28 @@
           </div>
         </div>
 
-		<div class="row bg-secondary pt-2 pb-2">
-			<div class="col pr-0">
+		<div class="row bg-dark pt-2 pb-2">
+			<div class="col pe-0">
 				<button class="btn btn-sm btn-primary" @click="previousWaypoint()" :disabled="isSavingWaypoints">
           <i class="fas fa-chevron-left"></i>
-          <span class="ml-1">Prev</span>
+          <span class="ms-1">Prev</span>
         </button>
-				<button class="btn btn-sm btn-primary ml-1" @click="nextWaypoint()" :disabled="isSavingWaypoints">
-          <span class="mr-1">Next</span>
+				<button class="btn btn-sm btn-primary ms-1" @click="nextWaypoint()" :disabled="isSavingWaypoints">
+          <span class="me-1">Next</span>
           <i class="fas fa-chevron-right"></i>
         </button>
-				<button class="btn btn-sm ml-1" :class="{'btn-success':carrier.waypointsLooped,'btn-primary':!carrier.waypointsLooped}" @click="toggleLooped()" :disabled="$isHistoricalMode() || !canLoop" title="Loop/Unloop the carrier's waypoints">
+				<button class="btn btn-sm ms-1" :class="{'btn-success':carrier.waypointsLooped,'btn-outline-primary':!carrier.waypointsLooped}" @click="toggleLooped()" :disabled="$isHistoricalMode() || !canLoop" title="Loop/Unloop the carrier's waypoints">
           <i class="fas fa-sync"></i>
         </button>
 			</div>
 			<div class="col-auto" v-if="!$isHistoricalMode()">
-				<button class="btn btn-sm btn-success" @click="saveWaypoints()" :disabled="isSavingWaypoints">
+				<button class="btn btn-sm btn-outline-success" @click="saveWaypoints()" :disabled="isSavingWaypoints">
           <i class="fas fa-save"></i>
-          <span class="ml-1">Save</span>
+          <span class="ms-1">Save</span>
         </button>
-				<button class="btn btn-sm btn-success ml-1" @click="saveWaypoints(true)" :disabled="isSavingWaypoints">
+				<button class="btn btn-sm btn-success ms-1" @click="saveWaypoints(true)" :disabled="isSavingWaypoints">
           <i class="fas fa-check"></i>
-          <span class="ml-1 d-none d-sm-inline-block">Save &amp; Edit</span>
+          <span class="ms-1 d-none d-sm-inline-block">Save &amp; Edit</span>
         </button>
 			</div>
 		</div>

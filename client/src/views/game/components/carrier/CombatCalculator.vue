@@ -7,25 +7,25 @@
                 <form-error-list v-bind:errors="errors"/>
             </div>
             <form class="col-12" @submit="calculate">
-                <div class="form-group row">
+                <div class="mb-2 row">
                     <label for="defenderWeaponTech" class="col-8 col-form-label">
                       <i class="fas" :class="{'fa-fighter-jet':!defender.player,'fa-user':defender.player}"></i> 
-                      <span class="text-success ml-2">{{defender.player ? defender.player.alias : 'Defender'}}</span> Weapons
+                      <span class="text-success ms-2">{{defender.player ? defender.player.alias : 'Defender'}}</span> Weapons
                     </label>
                     <div class="col-4">
                         <input type="number" class="form-control" id="defenderWeaponTech" placeholder="Tech Level" v-model="defender.weaponsLevel" required="required">
                     </div>
                 </div>
-                <div class="form-group row">
+                <div class="mb-2 row">
                     <label for="defenderShips" class="col-8 col-form-label">
                       <i class="fas" :class="{'fa-rocket':!defender.star,'fa-star':defender.star}"></i> 
-                      <span class="text-success ml-2">{{defender.star ? defender.star.name : 'Defender'}}</span> Ships
+                      <span class="text-success ms-2">{{defender.star ? defender.star.name : 'Defender'}}</span> Ships
                     </label>
                     <div class="col-4">
                         <input type="number" class="form-control" id="defenderShips" placeholder="Ships" v-model="defender.ships" required="required">
                     </div>
                 </div>
-                <div class="form-group row">
+                <div class="mb-2 row">
                   <div class="col-8">
                     <div class="form-check">
                       <input class="form-check-input" type="checkbox" v-model="isTurnBased" id="chkIsTurnBased">
@@ -35,7 +35,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="form-group row" v-if="hasDefenderBonus">
+                <div class="mb-2 row" v-if="hasDefenderBonus">
                   <div class="col-8">
                     <div class="form-check">
                       <input class="form-check-input" type="checkbox" v-model="includeDefenderBonus" id="chkDefenderBonus">
@@ -45,36 +45,38 @@
                     </div>
                   </div>
 
-                  <label class="col-4 col-form-label text-right text-success pt-0 pb-0" v-if="includeDefenderBonus">+1 Weapons</label>
+                  <label class="col-4 col-form-label text-end text-success pt-0 pb-0" v-if="includeDefenderBonus">+1 Weapons</label>
                 </div>
 
                 <hr/>
 
-                <div class="form-group row">
+                <div class="mb-2 row">
                     <label for="attackerWeaponTech" class="col-8 col-form-label">
                       <i class="fas" :class="{'fa-fighter-jet':!attacker.player,'fa-user':attacker.player}"></i> 
-                      <span class="text-danger ml-2">{{attacker.player ? attacker.player.alias : 'Attacker'}}</span> Weapons
+                      <span class="text-danger ms-2">{{attacker.player ? attacker.player.alias : 'Attacker'}}</span> Weapons
                     </label>
                     <div class="col-4">
                         <input type="number" class="form-control" id="attackerWeaponTech" placeholder="Tech Level" v-model="attacker.weaponsLevel" required="required">
                     </div>
                 </div>
-                <div class="form-group row">
+                <div class="mb-2 row">
                     <label for="attackerShips" class="col-8 col-form-label">
                       <i class="fas fa-rocket"></i> 
-                      <span class="text-danger ml-2">{{attacker.carrier ? attacker.carrier.name : 'Attacker'}}</span> Ships
+                      <span class="text-danger ms-2">{{attacker.carrier ? attacker.carrier.name : 'Attacker'}}</span> Ships
                     </label>
                     <div class="col-4">
                         <input type="number" class="form-control" id="attackerShips" placeholder="Ships" v-model="attacker.ships" required="required">
                     </div>
                 </div>
 
-                <div class="form-group row">
+                <div class="mb-2 row">
                   <div class="col-auto col-sm-8">
-                    <button type="button" class="btn btn-info" :disabled="isLoading" title="Swap the defender/attacker values" @click="swapValues"><i class="fas fa-exchange-alt"></i></button>
+                    <button type="button" class="btn btn-outline-info" :disabled="isLoading" title="Swap the defender/attacker values" @click="swapValues"><i class="fas fa-exchange-alt"></i> Swap Values</button>
                   </div>
                   <div class="col col-sm-4">
-                      <button type="submit" class="btn btn-success btn-block" :disabled="isLoading" title="Calculate the combat result"><i class="fas fa-fist-raised"></i> Fight</button>
+                    <div class="d-grid gap-2">
+                      <button type="submit" class="btn btn-success" :disabled="isLoading" title="Calculate the combat result"><i class="fas fa-fist-raised"></i> Fight</button>
+                    </div>
                   </div>
                 </div>
             </form>
@@ -82,11 +84,11 @@
 
         <loading-spinner :loading="isLoading"/>
 
-        <div class="row bg-secondary pt-2 pb-2" v-if="result">
+        <div class="row bg-dark pt-2 pb-2" v-if="result">
           <p class="col text-center mb-0" v-if="result.after.defender >= result.after.attacker"><span class="text-success">Defender</span> wins with <span class="text-success">{{result.after.defender}}</span> ship(s) remaining.</p>
           <p class="col text-center mb-0" v-if="result.after.attacker > result.after.defender"><span class="text-danger">Attacker</span> wins with <span class="text-danger">{{result.after.attacker}}</span> ship(s) remaining.</p>
         </div>
-        <div class="row bg-secondary pb-2" v-if="result">
+        <div class="row bg-dark pb-2" v-if="result">
           <p class="col text-center mb-0" v-if="result.needed.defender"><small><span class="text-success">Defender</span> would need <span class="text-success">{{result.needed.defender}}</span> ship(s) to win.</small></p>
           <p class="col text-center mb-0" v-if="result.needed.attacker"><small><span class="text-danger">Attacker</span> would need <span class="text-danger">{{result.needed.attacker}}</span> ship(s) to win.</small></p>
         </div>

@@ -11,7 +11,7 @@
             If the reason is not listed, please contact a developer or community manager on
             <a href="https://discord.com/invite/v7PD33d" target="_blank" title="Discord">
                 <i class="fab fa-discord"></i>
-                <span class="ml-1">Discord</span>
+                <span class="ms-1">Discord</span>
             </a>
         </small>
     </p>
@@ -46,8 +46,8 @@
             <small>WARNING: Abuse of the report feature may lead to your account being banned.</small>
         </p>
 
-        <div class="text-right pt-2 pb-2">
-            <button class="btn btn-danger mr-1" type="button" @click="onOpenPlayerDetailRequested">
+        <div class="text-end pt-2 pb-2">
+            <button class="btn btn-danger me-1" type="button" @click="onOpenPlayerDetailRequested">
                 <i class="fas fa-arrow-left"></i>
                 Cancel
             </button>

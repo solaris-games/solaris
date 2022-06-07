@@ -1,6 +1,6 @@
 <template>
 <div class="full-container">
-  <view-container>
+  <view-container :hideTopBar="true">
     <view-title title="Create Account" navigation="home"/>
 
     <div class="row">
@@ -12,10 +12,10 @@
         <p>Will you conquer the galaxy?</p>
         <p class="mt-5">You can play <span class="text-warning">Solaris</span> on any of the following platforms:</p>
         <p>
-          <a href="https://solaris.games" target="_blank" title="Web" class="mr-2">
+          <a href="https://solaris.games" target="_blank" title="Web" class="me-2">
             <i class="fab fa-chrome"></i> Web
           </a>
-          <a href="https://store.steampowered.com/app/1623930/Solaris/" target="_blank" title="Steam" class="mr-2">
+          <a href="https://store.steampowered.com/app/1623930/Solaris/" target="_blank" title="Steam" class="me-2">
             <i class="fab fa-steam"></i> Steam
           </a>
           <a href="https://play.google.com/store/apps/details?id=com.voxel.solaris_android" target="_blank" title="Android">
@@ -27,27 +27,27 @@
         <form-error-list v-bind:errors="errors"/>
 
         <form @submit="handleSubmit">
-          <div class="form-group">
+          <div class="mb-2">
             <label for="email">Email Address</label>
             <input type="email" required="required" class="form-control" name="email" v-model="email" :disabled="isLoading">
           </div>
 
-          <div class="form-group">
+          <div class="mb-2">
             <label for="username">Username</label>
             <input type="text" required="required" class="form-control" name="username" minlength="3" maxlength="24" v-model="username" :disabled="isLoading">
           </div>
 
-          <div class="form-group">
+          <div class="mb-2">
             <label for="password">Password</label>
             <input type="password" required="required" class="form-control" name="password" v-model="password" :disabled="isLoading">
           </div>
 
-          <div class="form-group">
+          <div class="mb-2">
             <label for="passwordConfirm">Re-enter Password</label>
             <input type="password" required="required" class="form-control" name="passwordConfirm" v-model="passwordConfirm" :disabled="isLoading">
           </div>
 
-          <div class="form-group" v-if="recaptchaEnabled">
+          <div class="mb-2" v-if="recaptchaEnabled">
             <recaptcha
               :sitekey="recaptchaSiteKey"
               @verify="onRecaptchaVerify" 
@@ -55,16 +55,20 @@
             </recaptcha>
           </div>
 
-          <div class="form-group">
+          <div class="mb-2">
             <div class="row">
               <div class="col-6">
-                <button type="submit" class="btn btn-success btn-block" :disabled="isLoading">
-                  <i class="fas fa-sign-in-alt"></i>
-                  Register
-                </button>
+                <div class="d-grid gap-2">
+                  <button type="submit" class="btn btn-success" :disabled="isLoading">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Register
+                  </button>
+                </div>
               </div>
               <div class="col-6">
-                <router-link to="/" tag="button" class="btn btn-danger btn-block">Cancel</router-link>
+                <div class="d-grid gap-2">
+                  <router-link to="/" tag="button" class="btn btn-outline-danger">Cancel</router-link>
+                </div>
               </div>
             </div>
           </div>

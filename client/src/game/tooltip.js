@@ -34,7 +34,7 @@ export default class {
         internalContainer.y = paddingY
     
         let textStyle = new PIXI.TextStyle({
-            fontFamily: `'Space Mono', monospace`,
+            // fontFamily: `chakrapetch`,
             fill: 0xFFFFFF,
             fontSize: 6,
             fontWeight: 'bold'

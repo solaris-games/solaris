@@ -1,15 +1,15 @@
 <template>
 <div class="menu-page container" v-if="carrier">
     <menu-title :title="carrier.name" @onCloseRequested="onCloseRequested">
-      <button v-if="hasWaypoints" @click="onViewCombatCalculatorRequested" class="btn btn-sm btn-warning"><i class="fas fa-calculator"></i></button>
-      <modalButton modalName="scuttleCarrierModal" v-if="!$isHistoricalMode() && canScuttleCarrier" classText="btn btn-sm btn-danger ml-1">
-        <i class="fas fa-rocket"></i> <i class="fas fa-trash ml-1"></i>
+      <button v-if="hasWaypoints" @click="onViewCombatCalculatorRequested" class="btn btn-sm btn-outline-warning"><i class="fas fa-calculator"></i></button>
+      <modalButton modalName="scuttleCarrierModal" v-if="!$isHistoricalMode() && canScuttleCarrier" classText="btn btn-sm btn-outline-danger ms-1">
+        <i class="fas fa-rocket"></i> <i class="fas fa-trash ms-1"></i>
       </modalButton>
-      <button v-if="!$isHistoricalMode() && isOwnedByUserPlayer && isGameInProgress" @click="onCarrierRenameRequested" class="btn btn-sm btn-success ml-1"><i class="fas fa-pencil-alt"></i></button>
-      <button @click="viewOnMap" class="btn btn-sm btn-info ml-1"><i class="fas fa-eye"></i></button>
+      <button v-if="!$isHistoricalMode() && isOwnedByUserPlayer && isGameInProgress" @click="onCarrierRenameRequested" class="btn btn-sm btn-outline-success ms-1"><i class="fas fa-pencil-alt"></i></button>
+      <button @click="viewOnMap" class="btn btn-sm btn-outline-info ms-1"><i class="fas fa-eye"></i></button>
     </menu-title>
 
-    <div class="row bg-secondary" :class="{'bg-warning': carrier.isGift}">
+    <div class="row bg-dark" :class="{'bg-warning': carrier.isGift}">
       <div class="col text-center pt-2">
         <p class="mb-2" v-if="isUserPlayerCarrier && !carrier.isGift">A carrier under your command.</p>
         <p class="mb-2" v-if="isNotUserPlayerCarrier">This carrier is controlled by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{carrierOwningPlayer.alias}}</a>.</p>
@@ -22,19 +22,19 @@
       <div class="row mt-2">
         <div class="col">
           <span title="The carrier is in orbit" v-if="carrier.orbiting">
-            <i class="fas fa-star mr-2"></i>
+            <i class="fas fa-star me-2"></i>
             <a href="javascript:;" @click="onOpenOrbitingStarDetailRequested">{{getCarrierOrbitingStar().name}}</a>
           </span>
           <span title="The carrier is in transit" v-if="!carrier.orbiting">
-            <i class="fas fa-star mr-2"></i>
+            <i class="fas fa-star me-2"></i>
             <a title="The carrier is in transit from this star" href="javascript:;" @click="onOpenSourceStarDetailRequested">{{getFirstWaypointSourceName()}}</a>
-            <i class="fas fa-arrow-right mr-2 ml-2"></i>
+            <i class="fas fa-arrow-right me-2 ms-2"></i>
             <a title="The carrier is in transit to star" href="javascript:;" @click="onOpenDestinationStarDetailRequested">{{getFirstWaypointDestinationName()}}</a>
           </span>
         </div>
         <div class="col-auto">
           <span title="The total number of ships the carrier has">
-            {{carrier.ships == null ? '???' : carrier.ships}} <i class="fas fa-rocket ml-1"></i>
+            {{carrier.ships == null ? '???' : carrier.ships}} <i class="fas fa-rocket ms-1"></i>
           </span>
         </div>
       </div>
@@ -44,7 +44,7 @@
           <span v-if="canShowSpecialist && isOwnedByUserPlayer && canHireSpecialist">
             <specialist-icon :type="'carrier'" :defaultIcon="'user-astronaut'" :specialist="carrier.specialist"></specialist-icon>
             <a href="javascript:;" @click="onViewHireCarrierSpecialistRequested">
-              <span class="ml-1" v-if="carrier.specialistId" :title="carrier.specialist.description">{{carrier.specialist.name}}</span>
+              <span class="ms-1" v-if="carrier.specialistId" :title="carrier.specialist.description">{{carrier.specialist.name}}</span>
               <span v-if="!carrier.specialistId">No Specialist</span>
             </a>
           </span>
@@ -59,8 +59,8 @@
         <div class="col-auto">
           <span title="The total number of waypoints the carrier has - Plot waypoints to capture stars">
             {{carrier.waypoints.length}} 
-            <i class="fas fa-map-marker-alt ml-1" v-if="!carrier.waypointsLooped"></i>
-            <i class="fas fa-sync ml-1" v-if="carrier.waypointsLooped"></i>
+            <i class="fas fa-map-marker-alt ms-1" v-if="!carrier.waypointsLooped"></i>
+            <i class="fas fa-sync ms-1" v-if="carrier.waypointsLooped"></i>
           </span>
         </div>
       </div>
@@ -71,9 +71,9 @@
         </div>
       </div>
 
-      <div class="row pb-2 pt-2 bg-secondary" v-if="!$isHistoricalMode() && (canGiftCarrier || canTransferShips || canEditWaypoints)">
+      <div class="row pb-2 pt-2 " v-if="!$isHistoricalMode() && (canGiftCarrier || canTransferShips || canEditWaypoints)">
         <div class="col">
-          <button class="btn btn-sm btn-primary mr-1" @click="onShipTransferRequested" v-if="canTransferShips">
+          <button class="btn btn-sm btn-primary me-1" @click="onShipTransferRequested" v-if="canTransferShips">
             Transfer <i class="fas fa-exchange-alt"></i>
           </button>
           <button class="btn btn-sm btn-warning" @click="onConfirmGiftCarrier" v-if="canGiftCarrier">
@@ -85,11 +85,11 @@
             Loop
             <i class="fas fa-sync"></i>
           </button>
-          <button class="btn btn-danger  btn-sm ml-1" v-if="canEditWaypoints && carrier.waypoints.length > 1 && carrier.waypointsLooped" @click="toggleWaypointsLooped()" :disabled="isLoopingWaypoints">
+          <button class="btn btn-danger  btn-sm ms-1" v-if="canEditWaypoints && carrier.waypoints.length > 1 && carrier.waypointsLooped" @click="toggleWaypointsLooped()" :disabled="isLoopingWaypoints">
             Unloop
             <i class="fas fa-map-marker-alt"></i>
           </button>
-          <button class="btn btn-sm btn-success ml-1" v-if="canEditWaypoints" @click="editWaypoints()">
+          <button class="btn btn-sm btn-success ms-1" v-if="canEditWaypoints" @click="editWaypoints()">
             Waypoints
             <i class="fas fa-map-marker-alt"></i>
           </button>
@@ -103,8 +103,8 @@
           <div class="col">
               Ships
           </div>
-          <div class="col text-right">
-              {{carrier.ships == null ? '???' : carrier.ships}} <i class="fas fa-rocket ml-1"></i>
+          <div class="col text-end">
+              {{carrier.ships == null ? '???' : carrier.ships}} <i class="fas fa-rocket ms-1"></i>
           </div>
       </div>
     </div>
@@ -112,18 +112,18 @@
     <h4 class="pt-0" v-if="isStandardUIStyle">Navigation</h4>
 
     <div>
-      <div v-if="carrier.orbiting && isStandardUIStyle" class="row bg-secondary pt-2 pb-0 mb-0">
+      <div v-if="carrier.orbiting && isStandardUIStyle" class="row bg-dark pt-2 pb-0 mb-1">
         <div class="col">
           <p class="mb-2 align-middle">Orbiting: <a href="javascript:;" @click="onOpenOrbitingStarDetailRequested">{{getCarrierOrbitingStar().name}}</a></p>
         </div>
         <div class="col-auto" v-if="!$isHistoricalMode() && isStarOwnedByUserPlayer">
-          <button class="btn btn-sm btn-primary mb-2" @click="onShipTransferRequested" v-if="canTransferShips">
+          <button class="btn btn-sm btn-outline-primary mb-2" @click="onShipTransferRequested" v-if="canTransferShips">
             <i class="fas fa-exchange-alt"></i> Ship Transfer
           </button>
         </div>
       </div>
 
-      <div v-if="isStandardUIStyle && !hasWaypoints" class="row bg-primary pt-2 pb-2 mb-0">
+      <div v-if="isStandardUIStyle && !hasWaypoints" class="row pt-2 pb-2 mb-0">
         <div class="col">
           <p class="mb-0">Waypoints: None.</p>
         </div>
@@ -136,15 +136,15 @@
           @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
       </div>
 
-      <div class="row bg-primary pt-2 pb-0 mb-0" v-if="hasWaypoints">
+      <div class="row pt-2 pb-0 mb-0" v-if="hasWaypoints">
         <div class="col">
           <p class="mb-2">ETA<orbital-mechanics-eta-warning />: {{timeRemainingEta}} <span v-if="carrier.waypoints.length > 1">({{timeRemainingEtaTotal}})</span></p>
         </div>
       </div>
 
-      <div v-if="!$isHistoricalMode() && canEditWaypoints && isStandardUIStyle" class="row bg-secondary pt-2 pb-2 mb-0">
+      <div v-if="!$isHistoricalMode() && canEditWaypoints && isStandardUIStyle" class="row bg-dark pt-2 pb-2 mb-0">
         <div class="col">
-          <button class="btn btn-sm btn-success" v-if="carrier.waypoints.length > 1 && !carrier.waypointsLooped" @click="toggleWaypointsLooped()" :disabled="isLoopingWaypoints">
+          <button class="btn btn-sm btn-outline-success" v-if="carrier.waypoints.length > 1 && !carrier.waypointsLooped" @click="toggleWaypointsLooped()" :disabled="isLoopingWaypoints">
             Loop
             <i class="fas fa-sync"></i>
           </button>

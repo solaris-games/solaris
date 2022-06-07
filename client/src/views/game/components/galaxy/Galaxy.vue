@@ -5,19 +5,19 @@
 
         <ul class="nav nav-tabs">
             <li class="nav-item">
-                <a class="nav-link" :class="{'active':activeTab=== 'stars'}" data-toggle="tab" href="#stars">Stars</a>
+                <a class="nav-link" :class="{'active':activeTab=== 'stars'}" data-bs-toggle="tab" href="#stars">Stars</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" :class="{'active':activeTab === 'carriers'}" data-toggle="tab" href="#carriers">Carriers</a>
+                <a class="nav-link" :class="{'active':activeTab === 'carriers'}" data-bs-toggle="tab" href="#carriers">Carriers</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" :class="{'active':activeTab === 'ships'}" data-toggle="tab" href="#ships">Ships</a>
+                <a class="nav-link" :class="{'active':activeTab === 'ships'}" data-bs-toggle="tab" href="#ships">Ships</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" :class="{'active':activeTab === 'capitals'}" data-toggle="tab" href="#capitals">Capitals</a>
+                <a class="nav-link" :class="{'active':activeTab === 'capitals'}" data-bs-toggle="tab" href="#capitals">Capitals</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" :class="{'active':activeTab === 'naturalResources'}" data-toggle="tab" href="#naturalResources">Resources</a>
+                <a class="nav-link" :class="{'active':activeTab === 'naturalResources'}" data-bs-toggle="tab" href="#naturalResources">Resources</a>
             </li>
         </ul>
     </div>

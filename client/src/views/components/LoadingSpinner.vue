@@ -1,6 +1,8 @@
 <template>
 <div class="pt-2 pb-2 text-center" v-if="loading">
-    <h1><i class="fas fa-atom fa-spin"></i></h1>
+    <h1>
+      <div class="spinner-border"></div>
+    </h1>
     <p class="mb-1" v-if="!hideText">{{text || 'Loading...'}}</p>
 </div>
 </template>

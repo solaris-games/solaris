@@ -132,7 +132,7 @@ class Carrier extends EventEmitter {
 
       let shipsText = totalShips.toString()
 
-      let bitmapFont = {fontName: "space-mono-bold", fontSize: 4}
+      let bitmapFont = {fontName: "chakrapetch", fontSize: 4}
       this.text_ships = new PIXI.BitmapText(shipsText, bitmapFont)
 
       this.text_ships.x = -(this.text_ships.width / 2.0)
@@ -141,7 +141,7 @@ class Carrier extends EventEmitter {
       this.container.addChild(this.text_ships)
       if( this.data.isGift ) {
         let style = new PIXI.TextStyle({
-          fontFamily: `'Space Mono', monospace`,
+          // fontFamily: `chakrapetch`,
           fill: 0xFFFFFF,
           padding: 3,
           fontSize: 4,

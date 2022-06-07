@@ -2,12 +2,12 @@
   <tr>
     <td class="row-icon"><i class="fas" :class="iconClass"></i></td>
     <td>{{title}}</td>
-    <td class="text-right" :class="playerStyle">
+    <td class="text-end" :class="playerStyle">
       Level {{ playerResearchLevel }}
     </td>
     <td
       v-if="userPlayer && player != userPlayer"
-      class="text-right"
+      class="text-end"
       :class="userPlayerStyle"
     >
       {{ userPlayerResearchLevel }}

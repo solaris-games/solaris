@@ -1,9 +1,9 @@
 <template>
 	<div class="menu-page container" v-if="carrier">
     <menu-title :title="carrier.name" @onCloseRequested="onCloseRequested">
-      <span class="mr-2" title="Hyperspace technology level" v-if="userPlayer"><i class="fas fa-gas-pump mr-1"></i>{{userPlayer.research.hyperspace.level}}</span>
-      <span class="mr-2"><i class="fas fa-rocket mr-1"></i>{{carrier.ships == null ? '???' : carrier.ships}}</span>
-    	<button class="btn btn-sm btn-info" @click="toggleCarrierWaypointsDisplay" title="Toggle taypoints display">
+      <span class="me-2" title="Hyperspace technology level" v-if="userPlayer"><i class="fas fa-gas-pump me-1"></i>{{userPlayer.research.hyperspace.level}}</span>
+      <span class="me-2"><i class="fas fa-rocket me-1"></i>{{carrier.ships == null ? '???' : carrier.ships}}</span>
+    	<button class="btn btn-sm btn-outline-info" @click="toggleCarrierWaypointsDisplay" title="Toggle taypoints display">
         <i class="fas" :class="{'fa-eye-slash':!display,'fa-eye':display}"></i>
       </button>
     </menu-title>
@@ -15,12 +15,12 @@
     <template v-if="display">
       <strong>Waypoints</strong>:
       <span v-if="!carrier.waypoints.length" class="text-warning">None</span>
-		  <ul class="pl-4 mt-2" v-if="isStandardUIStyle">
+		  <ul class="ps-4 mt-2" v-if="isStandardUIStyle">
 		  	<li v-for="waypoint in carrier.waypoints" :key="waypoint._id">
 		  		<!-- <a href="javascript:;" @click="onOpenStarDetailRequested(waypoint.destination)">{{getStarName(waypoint.destination)}}</a> -->
 		  		<span>{{getStarName(waypoint.destination)}}</span>
 
-		  		<i class="ml-2" :class="{
+		  		<i class="ms-2" :class="{
 		  			'fas fa-angle-double-up text-success': waypoint.action == 'collectAll',
 		  			'fas fa-angle-double-down text-danger': waypoint.action == 'dropAll',
 		  			'fas fa-caret-up text-success': waypoint.action == 'collect',
@@ -38,7 +38,7 @@
       <form-error-list v-bind:errors="errors" class="mt-2"/>
 
 		  <div class="row mt-2">
-		  	<div class="col-12 pt-2 pb-2 bg-primary" v-if="carrier.waypoints && carrier.waypoints.length">
+		  	<div class="col-12 pt-2 pb-2 bg-dark" v-if="carrier.waypoints && carrier.waypoints.length">
           <!--Yes, that key-property depending on the current date is there for a reason. Otherwise, under certain circumstances, the text is not updated on screen on iOS Safari.-->
           <!-- https://stackoverflow.com/questions/55008261/my-react-component-does-not-update-in-the-safari-browser -->
           <!-- Seriously, what is wrong with you, Safari? -->
@@ -46,28 +46,28 @@
 		  	</div>
       </div>
 
-      <div class="row bg-secondary pt-2 pb-2">
+      <div class="row bg-dark pt-2 pb-2">
 		  	<div class="col">
 		  		<button class="btn btn-sm btn-warning" @click="removeLastWaypoint()" :disabled="isSavingWaypoints">
             <i class="fas fa-undo"></i>
-            <span class="ml-1 d-none d-sm-inline-block">Last</span>
+            <span class="ms-1 d-none d-sm-inline-block">Last</span>
           </button>
-		  		<button class="btn btn-sm btn-danger ml-1" @click="removeAllWaypoints()" :disabled="isSavingWaypoints">
+		  		<button class="btn btn-sm btn-outline-danger ms-1" @click="removeAllWaypoints()" :disabled="isSavingWaypoints">
             <i class="fas fa-trash"></i>
-            <span class="ml-1 d-none d-sm-inline-block">All</span>
+            <span class="ms-1 d-none d-sm-inline-block">All</span>
           </button>
-		  		<button class="btn btn-sm ml-1" :class="{'btn-success':carrier.waypointsLooped,'btn-primary':!carrier.waypointsLooped}" @click="toggleLooped()" :disabled="!canLoop" title="Loop/Unloop the carrier's waypoints">
+		  		<button class="btn btn-sm ms-1" :class="{'btn-success':carrier.waypointsLooped,'btn-outline-primary':!carrier.waypointsLooped}" @click="toggleLooped()" :disabled="!canLoop" title="Loop/Unloop the carrier's waypoints">
             <i class="fas fa-sync"></i>
           </button>
 		  	</div>
 		  	<div class="col-auto" v-if="!$isHistoricalMode()">
-		  		<button class="btn btn-sm btn-success ml-1" @click="saveWaypoints()" :disabled="isSavingWaypoints">
+		  		<button class="btn btn-sm btn-outline-success ms-1" @click="saveWaypoints()" :disabled="isSavingWaypoints">
             <i class="fas fa-save"></i>
-            <span class="ml-1">Save</span>
+            <span class="ms-1">Save</span>
           </button>
-		  		<button class="btn btn-sm btn-success ml-1" @click="saveWaypoints(true)" :disabled="isSavingWaypoints">
+		  		<button class="btn btn-sm btn-success ms-1" @click="saveWaypoints(true)" :disabled="isSavingWaypoints">
             <i class="fas fa-edit"></i> 
-            <span class="ml-1 d-none d-sm-inline-block">Save &amp; Edit</span>
+            <span class="ms-1 d-none d-sm-inline-block">Save &amp; Edit</span>
           </button>
 		  	</div>
 		  </div>

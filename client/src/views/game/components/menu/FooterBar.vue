@@ -1,6 +1,6 @@
 <template>
 <div class="container-fluid bg-dark pt-2 pb-2 footer-bar">
-    <div class="row no-gutters">
+    <div class="row g-0">
         <div class="col" v-if="!userPlayer && gameIsJoinable">
           <button class="btn" v-on:click="setMenuState(MENU_STATES.WELCOME)">
             <i class="fas fa-handshake"></i>

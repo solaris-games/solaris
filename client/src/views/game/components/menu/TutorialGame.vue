@@ -2,16 +2,22 @@
     <div>
         <div class="row">
             <div class="col-sm-12 col-md-6 col-lg-6">
-                <div class="card bg-dark text-white tutorial-game" @click="viewTutorial()">
+                <div class="card bg-dark text-white tutorial-game p-1" @click="viewTutorial()">
                     <img class="card-img" :src="require('../../../../assets/screenshots/tutorial.png')" alt="View Tutorial">
                     <div class="card-img-overlay">
                         <h5 class="card-title tutorial-card-title">
                             <i class="fas fa-user-graduate"></i>
-                            <span class="ml-2">Tutorial</span>
+                            <span class="ms-2">Tutorial</span>
                         </h5>
                         <h6 class="card-title card-subtitle">
                             Learn to Play
                         </h6>
+                    </div>
+                    <div class="card-arrow">
+                        <div class="card-arrow-top-left"></div>
+                        <div class="card-arrow-top-right"></div>
+                        <div class="card-arrow-bottom-left"></div>
+                        <div class="card-arrow-bottom-right"></div>
                     </div>
                 </div>
             </div>
@@ -27,10 +33,10 @@
                         <div class="row">
                             <div class="col"></div>
                             <div class="col-auto">
-                                <a href="https://discord.com/invite/v7PD33d" target="_blank" title="Discord" class="btn btn-info mr-2">
+                                <a href="https://discord.com/invite/v7PD33d" target="_blank" title="Discord" class="btn btn-info me-2">
                                     <i class="fab fa-discord"></i> Discord
                                 </a>
-                                <a href="https://steamcommunity.com/app/1623930/discussions/" target="_blank" title="Forum" class="btn btn-primary mr-2">
+                                <a href="https://steamcommunity.com/app/1623930/discussions/" target="_blank" title="Forum" class="btn btn-primary me-2">
                                     <i class="far fa-comments"></i> Forum
                                 </a>
                             </div>
@@ -92,7 +98,6 @@ export default {
   background-color: #375a7f;
   padding: 0.25rem;
   display: inline-block;
-  border-radius: 3px;
 }
 
 .card-subtitle {
@@ -109,6 +114,6 @@ export default {
 }
 
 .tutorial-game {
-  border: 3px solid #3498DB;
+  /* border: 3px solid #3498DB; */
 }
 </style>

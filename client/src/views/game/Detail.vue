@@ -13,13 +13,13 @@
 
       <p v-if="isNewPlayerGame" class="text-warning">New Player Games do not affect Rank or Victories.</p>
 
-      <div class="row mb-1 bg-secondary pt-2 pb-2">
+      <div class="row mb-1 bg-dark pt-2 pb-2">
         <div class="col">
           <router-link to="/game/list" tag="button" class="btn btn-primary"><i class="fas fa-arrow-left"></i> Return to List</router-link>
         </div>
         <div class="col-auto">
           <button class="btn btn-danger" v-if="!game.state.startDate && game.settings.general.isGameAdmin" @click="deleteGame">Delete Game</button>
-          <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success ml-1">Open Game <i class="fas fa-arrow-right"></i></router-link>
+          <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success ms-1">Open Game <i class="fas fa-arrow-right"></i></router-link>
         </div>
       </div>
 

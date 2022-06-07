@@ -5,8 +5,8 @@
             <p class="mt-1 mb-0">You are not logged in.</p>
         </div>
         <div class="col-sm-auto col-xs-12 text-center">
-            <router-link to="/" class="btn btn-sm"><i class="fas fa-sign-in-alt mr-2"></i>Log In</router-link>
-            <router-link to="/account/create" class="btn btn-sm"><i class="fas fa-user-plus mr-2"></i>Register</router-link>
+            <router-link to="/" class="btn btn-sm"><i class="fas fa-sign-in-alt me-2"></i>Log In</router-link>
+            <router-link to="/account/create" class="btn btn-sm"><i class="fas fa-user-plus me-2"></i>Register</router-link>
         </div>
     </div>
 </div>

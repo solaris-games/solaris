@@ -2,7 +2,7 @@
     <div class="btn-group">
         <button v-if="player.ready" class="btn btn-danger" :class="{'btn-sm':smallButtons}" @click="unconfirmReady()" title="Not ready"><i class="fas fa-times"></i></button>
         <button v-if="!player.ready" class="btn btn-success pulse" :class="{'btn-sm':smallButtons}" @click="confirmReady()" title="End your turn"><i class="fas fa-check"></i></button>
-        <button v-if="!player.ready" type="button" :class="{'btn-sm':smallButtons}" class="btn btn-success dropdown-toggle dropdown-toggle-split pulse" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <button v-if="!player.ready" type="button" :class="{'btn-sm':smallButtons}" class="btn btn-success dropdown-toggle dropdown-toggle-split pulse" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span class="sr-only">Toggle Dropdown</span>
         </button>
         <div v-if="!player.ready" class="dropdown-menu">

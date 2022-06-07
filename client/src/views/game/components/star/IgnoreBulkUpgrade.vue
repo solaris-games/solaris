@@ -1,32 +1,32 @@
 <template>
     <div class="btn-group">
-        <button class="btn btn-secondary btn-sm dropdown-toggle"
+        <button class="btn btn-sm dropdown-toggle"
             :class="{'btn-danger':highlightIgnoredInfrastructure && getInfrastructureIgnoreStatus(highlightIgnoredInfrastructure),
-                     'btn-success':highlightIgnoredInfrastructure && !getInfrastructureIgnoreStatus(highlightIgnoredInfrastructure)}"
-            type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="fas mr-1" :class="{'fa-ban':isAllIgnored,'fa-check-double':isAllIncluded,'fa-check':!isAllIgnored && !isAllIncluded}"></i>
+                     'btn-outline-success':highlightIgnoredInfrastructure && !getInfrastructureIgnoreStatus(highlightIgnoredInfrastructure)}"
+            type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fas me-1" :class="{'fa-ban':isAllIgnored,'fa-check-double':isAllIncluded,'fa-check':!isAllIgnored && !isAllIncluded}"></i>
         </button>
         <div class="dropdown-menu">
             <h6 class="dropdown-header">Bulk Upgrade</h6>
             <a class="dropdown-item" href="javascript:;" @click="toggleBulkIgnore('economy')">
-                <i class="fas mr-1" :class="{'fa-ban': getInfrastructureIgnoreStatus('economy'), 'fa-check': !getInfrastructureIgnoreStatus('economy')}"></i>
+                <i class="fas me-1" :class="{'fa-ban': getInfrastructureIgnoreStatus('economy'), 'fa-check': !getInfrastructureIgnoreStatus('economy')}"></i>
                 Economy
             </a>
             <a class="dropdown-item" href="javascript:;" @click="toggleBulkIgnore('industry')">
-                <i class="fas mr-1" :class="{'fa-ban': getInfrastructureIgnoreStatus('industry'), 'fa-check': !getInfrastructureIgnoreStatus('industry')}"></i>
+                <i class="fas me-1" :class="{'fa-ban': getInfrastructureIgnoreStatus('industry'), 'fa-check': !getInfrastructureIgnoreStatus('industry')}"></i>
                 Industry
             </a>
             <a class="dropdown-item" href="javascript:;" @click="toggleBulkIgnore('science')">
-                <i class="fas mr-1" :class="{'fa-ban': getInfrastructureIgnoreStatus('science'), 'fa-check': !getInfrastructureIgnoreStatus('science')}"></i>
+                <i class="fas me-1" :class="{'fa-ban': getInfrastructureIgnoreStatus('science'), 'fa-check': !getInfrastructureIgnoreStatus('science')}"></i>
                 Science
             </a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="javascript:;" @click="toggleBulkIgnoreAll(true)">
-                <i class="fas fa-ban mr-1"></i>
+                <i class="fas fa-ban me-1"></i>
                 Ignore All
             </a>
             <a class="dropdown-item" href="javascript:;" @click="toggleBulkIgnoreAll(false)">
-                <i class="fas fa-check mr-1"></i>
+                <i class="fas fa-check me-1"></i>
                 Include All
             </a>
         </div>

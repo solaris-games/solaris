@@ -1,10 +1,10 @@
 <template>
   <div class="d-none d-lg-block" v-if="isUserInGame && !isTutorialGame">
     <div id="toggle" class="text-center" :class="{'bg-success has-read': !unreadMessages, 'bg-warning has-unread pulse': unreadMessages}" @click="toggle" title="Inbox (M)">
-      <span class="icon-text"><i class="fas fa-comments mr-1"></i>{{unreadMessages ? unreadMessages : ''}}</span>
+      <span class="icon-text"><i class="fas fa-comments me-1"></i>{{unreadMessages ? unreadMessages : ''}}</span>
     </div>
 
-    <div id="window" class="bg-dark" v-if="isExpanded">
+    <div id="window" v-if="isExpanded" class="header-bar-bg">
       <conversation-list v-if="menuState === MENU_STATES.INBOX"/>
       <create-conversation v-if="menuState == MENU_STATES.CREATE_CONVERSATION"
         :participantIds="menuArguments"

@@ -1,5 +1,5 @@
 <template>
-<div class="row bg-primary">
+<div class="row">
     <div class="col">
       <div class="table-responsive mb-0">
         <table class="table table-sm mb-1" v-if="research">
@@ -13,14 +13,14 @@
                       <span class="level-label">Level</span>
                       {{research.scanning.level}}
                     </td>
-                    <td class="text-right" v-if="isTechnologyResearchable('scanning')">
+                    <td class="text-end" v-if="isTechnologyResearchable('scanning')">
                       {{research.scanning.progress}}
                       <span class="of-label">of</span>
                       <span class="slash-label">/</span>
                       {{getRequiredTotal('scanning')}}
                     </td>
                     <td v-if="!isTechnologyResearchable('scanning')"></td>
-                    <td class="text-right">
+                    <td class="text-end">
                       <help-tooltip tooltip="Determines how far your stars can see"/>
                     </td>
                 </tr>
@@ -33,14 +33,14 @@
                       <span class="level-label">Level</span>
                       {{research.hyperspace.level}}
                     </td>
-                    <td class="text-right" v-if="isTechnologyResearchable('hyperspace')">
+                    <td class="text-end" v-if="isTechnologyResearchable('hyperspace')">
                       {{research.hyperspace.progress}}
                       <span class="of-label">of</span>
                       <span class="slash-label">/</span>
                       {{getRequiredTotal('hyperspace')}}
                     </td>
                     <td v-if="!isTechnologyResearchable('hyperspace')"></td>
-                    <td class="text-right">
+                    <td class="text-end">
                       <help-tooltip tooltip="Determines how far your carriers can travel in a single jump"/>
                     </td>
                 </tr>
@@ -53,14 +53,14 @@
                       <span class="level-label">Level</span>
                       {{research.terraforming.level}}
                     </td>
-                    <td class="text-right" v-if="isTechnologyResearchable('terraforming')">
+                    <td class="text-end" v-if="isTechnologyResearchable('terraforming')">
                       {{research.terraforming.progress}}
                       <span class="of-label">of</span>
                       <span class="slash-label">/</span>
                       {{getRequiredTotal('terraforming')}}
                     </td>
                     <td v-if="!isTechnologyResearchable('terraforming')"></td>
-                    <td class="text-right">
+                    <td class="text-end">
                       <help-tooltip tooltip="Determines infrastructure cost. The higher the terraforming level, the lower infrastructure will cost to upgrade"/>
                     </td>
                 </tr>
@@ -73,14 +73,14 @@
                       <span class="level-label">Level</span>
                       {{research.experimentation.level}}
                     </td>
-                    <td class="text-right" v-if="isTechnologyResearchable('experimentation')">
+                    <td class="text-end" v-if="isTechnologyResearchable('experimentation')">
                       {{research.experimentation.progress}}
                       <span class="of-label">of</span>
                       <span class="slash-label">/</span>
                       {{getRequiredTotal('experimentation')}}
                     </td>
                     <td v-if="!isTechnologyResearchable('experimentation')"></td>
-                    <td class="text-right">
+                    <td class="text-end">
                       <help-tooltip tooltip="Determines how many research points are awarded at the end of the galactic cycle to a random technology"/>
                     </td>
                 </tr>
@@ -93,14 +93,14 @@
                       <span class="level-label">Level</span>
                       {{research.weapons.level}}
                     </td>
-                    <td class="text-right" v-if="isTechnologyResearchable('weapons')">
+                    <td class="text-end" v-if="isTechnologyResearchable('weapons')">
                       {{research.weapons.progress}}
                       <span class="of-label">of</span>
                       <span class="slash-label">/</span>
                       {{getRequiredTotal('weapons')}}
                     </td>
                     <td v-if="!isTechnologyResearchable('weapons')"></td>
-                    <td class="text-right">
+                    <td class="text-end">
                       <help-tooltip tooltip="Determines combat strength of your ships"/>
                     </td>
                 </tr>
@@ -113,14 +113,14 @@
                       <span class="level-label">Level</span>
                       {{research.banking.level}}
                     </td>
-                    <td class="text-right" v-if="isTechnologyResearchable('banking')">
+                    <td class="text-end" v-if="isTechnologyResearchable('banking')">
                       {{research.banking.progress}}
                       <span class="of-label">of</span>
                       <span class="slash-label">/</span>
                       {{getRequiredTotal('banking')}}
                     </td>
                     <td v-if="!isTechnologyResearchable('banking')"></td>
-                    <td class="text-right">
+                    <td class="text-end">
                       <help-tooltip tooltip="Determines how many credits are awarded at the end of the galactic cycle"/>
                     </td>
                 </tr>
@@ -133,14 +133,14 @@
                       <span class="level-label">Level</span>
                       {{research.manufacturing.level}}
                     </td>
-                    <td class="text-right" v-if="isTechnologyResearchable('manufacturing')">
+                    <td class="text-end" v-if="isTechnologyResearchable('manufacturing')">
                       {{research.manufacturing.progress}}
                       <span class="of-label">of</span>
                       <span class="slash-label">/</span>
                       {{getRequiredTotal('manufacturing')}}
                     </td>
                     <td v-if="!isTechnologyResearchable('manufacturing')"></td>
-                    <td class="text-right">
+                    <td class="text-end">
                       <help-tooltip tooltip="Determines how many ships are built via industrial infrastructure per tick"/>
                     </td>
                 </tr>
@@ -153,14 +153,14 @@
                       <span class="level-label">Level</span>
                       {{research.specialists.level}}
                     </td>
-                    <td class="text-right" v-if="isTechnologyResearchable('specialists')">
+                    <td class="text-end" v-if="isTechnologyResearchable('specialists')">
                       {{research.specialists.progress}}
                       <span class="of-label">of</span>
                       <span class="slash-label">/</span>
                       {{getRequiredTotal('specialists')}}
                     </td>
                     <td v-if="!isTechnologyResearchable('specialists')"></td>
-                    <td class="text-right">
+                    <td class="text-end">
                       <help-tooltip tooltip="Determines how many specialist tokens are awarded at the end of the galactic cycle"/>
                     </td>
                 </tr>

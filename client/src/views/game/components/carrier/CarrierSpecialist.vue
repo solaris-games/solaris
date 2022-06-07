@@ -1,5 +1,5 @@
 <template>
-    <div class="row bg-secondary pt-2 pb-0 mb-1" v-if="carrier">
+    <div class="row bg-dark pt-2 pb-0 mb-1" v-if="carrier">
         <div class="col">
           <h5 v-if="!carrier.specialist" class="pt-1 text-danger">None Assigned</h5>
           <h5 v-if="carrier.specialist" class="pt-1 text-warning">

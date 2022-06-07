@@ -2,13 +2,13 @@
 
 <div>
     <div @click="toggleDisplay" class="pointer">
-        <span class="mr-1">
+        <span class="me-1">
             <i class="fas fa-stopwatch"></i>
         </span>
-        <span class="d-none d-md-inline-block mr-1">
+        <span class="d-none d-md-inline-block me-1">
             Tick
         </span>
-        <span class="d-none d-sm-inline-block user-select-none mr-1">
+        <span class="d-none d-sm-inline-block user-select-none me-1">
             {{tick}}
         </span>
         <span>
@@ -16,8 +16,8 @@
         </span>
     </div>
 
-    <div class="tick-form container mt-1" :class="{'bg-dark':!$isHistoricalMode(),'bg-primary':$isHistoricalMode()}" v-if="display">
-        <div class="row mt-0 pt-2 pb-2 no-gutters">
+    <div class="tick-form container mt-1 p-3" :class="{'header-bar-bg':!$isHistoricalMode(),'bg-dark':$isHistoricalMode()}" v-if="display">
+        <div class="row mt-0 pt-2 pb-2 g-0">
             <div class="col-12 mb-1">
                 <input type="range" :min="minimumTick" :max="stateTick" class="slider" v-model="tick" @change="onRequestedTickChanged" :disabled="isLoading">
             </div>
@@ -25,18 +25,18 @@
 				<button class="btn btn-sm btn-secondary" @click="loadPreviousTick(6)" :disabled="isLoading || tick <= minimumTick" title="Jump back 6 ticks">
                     <i class="fas fa-angle-double-left"></i>
                 </button>
-                <button class="btn btn-sm btn-secondary ml-1" @click="loadPreviousTick(1)" :disabled="isLoading || tick <= minimumTick" title="Previous tick">
+                <button class="btn btn-sm btn-secondary ms-1" @click="loadPreviousTick(1)" :disabled="isLoading || tick <= minimumTick" title="Previous tick">
                     <i class="fas fa-angle-left"></i> Prev
                 </button>
 			</div>
             <div class="col-2 text-center">
                 {{tick}}
             </div>
-			<div class="col-5 text-right">
+			<div class="col-5 text-end">
 				<button class="btn btn-sm btn-secondary" @click="loadNextTick(1)" :disabled="isLoading || tick >= stateTick" title="Next tick">
                     Next <i class="fas fa-angle-right"></i>
                 </button>
-                <button class="btn btn-sm btn-secondary ml-1" @click="loadNextTick(6)" :disabled="isLoading || tick >= stateTick" title="Jump forward 6 ticks">
+                <button class="btn btn-sm btn-secondary ms-1" @click="loadNextTick(6)" :disabled="isLoading || tick >= stateTick" title="Jump forward 6 ticks">
                     <i class="fas fa-angle-double-right"></i>
                 </button>
 			</div>
@@ -155,16 +155,15 @@ export default {
 }
 
 .tick-form {
-    border-radius: 6px;
     z-index: 1;
     position:absolute;
     width:300px;
-    left:-15px;
+    left:0px;
 }
 
 @media screen and (max-width: 473px) {
     .tick-form {
-        left: -135px;
+        left: 0px;
     }
 }
 </style>

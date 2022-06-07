@@ -1,13 +1,13 @@
 <template>
 <div class="container">
-  <div class="row mb-2 no-gutters">
+  <div class="row mb-2 g-0">
     <div class="col-auto">
       <button class="btn btn-sm" :class="{ 'btn-danger': !showAll, 'btn-success': showAll }" @click="toggleShowAll">
         <span v-if="!showAll">Show All</span>
         <span v-if="showAll">Show Yours</span>
       </button>
     </div>
-    <div class="col ml-2">
+    <div class="col ms-2">
       <input type="text" class="form-control form-control-sm" v-model="searchFilter" placeholder="Search...">
     </div>
   </div>
@@ -15,14 +15,14 @@
   <div class="row">
     <div class="table-responsive">
       <table class="table table-striped table-hover mb-0">
-          <thead>
-              <tr class="bg-primary">
+          <thead class="table-dark">
+              <tr>
                   <td><i class="fas fa-user"></i></td>
                   <td><a href="javascript:;" @click="sort('name')">Name</a></td>
                   <td></td>
                   <td></td>
                   <td></td>
-                  <td class="text-right"><a href="javascript:;" @click="sort('ships')"><i class="fas fa-rocket"></i></a></td>
+                  <td class="text-end"><a href="javascript:;" @click="sort('ships')"><i class="fas fa-rocket"></i></a></td>
               </tr>
           </thead>
           <tbody>

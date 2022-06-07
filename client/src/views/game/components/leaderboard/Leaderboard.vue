@@ -1,10 +1,10 @@
 <template>
 <div class="menu-page container pb-2">
     <menu-title title="Leaderboard" @onCloseRequested="onCloseRequested">
-      <button title="View Settings" tag="button" class="btn btn-sm btn-primary" @click="onViewSettingsRequested"><i class="fas fa-cog"></i></button>
+      <button title="View Settings" tag="button" class="btn btn-sm btn-outline-primary" @click="onViewSettingsRequested"><i class="fas fa-cog"></i></button>
     </menu-title>
 
-    <div class="row bg-primary">
+    <div class="row">
         <div class="col">
             <h4 class="text-center mt-2">{{game.settings.general.name}}</h4>
         </div>
@@ -12,8 +12,8 @@
 
     <div class="row bg-info" v-if="game.settings.general.flux" title="This Game's Flux">
       <div class="col text-center">
-        <!-- <p class="mt-2 mb-2"><small><i class="fas fa-dice-d20 mr-1"></i><strong>{{game.settings.general.flux.name}}</strong> - {{game.settings.general.flux.description}} <help-tooltip v-if="game.settings.general.flux.tooltip" :tooltip="game.settings.general.flux.tooltip"/></small></p> -->
-        <p class="mt-2 mb-2"><small><i class="fas fa-dice-d20 mr-1"></i>{{game.settings.general.flux.description}} <help-tooltip v-if="game.settings.general.flux.tooltip" :tooltip="game.settings.general.flux.tooltip"/></small></p>
+        <!-- <p class="mt-2 mb-2"><small><i class="fas fa-dice-d20 me-1"></i><strong>{{game.settings.general.flux.name}}</strong> - {{game.settings.general.flux.description}} <help-tooltip v-if="game.settings.general.flux.tooltip" :tooltip="game.settings.general.flux.tooltip"/></small></p> -->
+        <p class="mt-2 mb-2"><small><i class="fas fa-dice-d20 me-1"></i>{{game.settings.general.flux.description}} <help-tooltip v-if="game.settings.general.flux.tooltip" :tooltip="game.settings.general.flux.tooltip"/></small></p>
       </div>
     </div>
 
@@ -28,14 +28,14 @@
         </div>
     </div>
 
-    <div class="row bg-primary" v-if="!game.state.endDate">
+    <div class="row bg-dark" v-if="!game.state.endDate">
         <div class="col text-center pt-2">
           <p class="mb-2">Galactic Cycle {{$store.state.productionTick}} - Tick {{$store.state.tick}}</p>
           <p class="text-warning" v-if="isDarkModeExtra && getUserPlayer() != null"><small>The leaderboard is based on your scanning range.</small></p>
         </div>
     </div>
 
-    <div class="row bg-secondary" v-if="game.state.startDate && !game.state.endDate">
+    <div class="row" v-if="game.state.startDate && !game.state.endDate">
         <div class="col text-center pt-2 pb-0">
             <p class="pb-0 mb-2">{{timeRemaining}}</p>
         </div>
@@ -49,7 +49,7 @@
     </div>
 
     <div class="row">
-        <div class="table-responsive">
+        <div class="table-responsive p-0">
           <table class="table table-sm table-striped">
               <tbody>
                   <!--  v-bind:style="{'opacity':player.defeated ? 0.5: 1}" -->
@@ -58,7 +58,7 @@
                       <td class="col-avatar" :title="player.colour.alias + ' ' + player.shape">
                           <player-avatar :player="player" @onClick="onOpenPlayerDetailRequested(player)"/>
                       </td>
-                      <td class="pl-2 pt-3 pb-2">
+                      <td class="ps-2 pt-3 pb-2">
                           <!-- Text styling for defeated players? -->
                           <h5 class="alias-title">
                             {{player.alias}}
@@ -74,31 +74,31 @@
                             </span>
                           </h5>
                       </td>
-                      <td class="fit pt-3 pr-2" v-if="isConquestAllStars || isKingOfTheHillMode">
+                      <td class="fit pt-3 pe-2" v-if="isConquestAllStars || isKingOfTheHillMode">
                         <span class="d-xs-block d-sm-none">
-                          <i class="fas fa-star mr-0"></i> {{player.stats.totalStars}}
+                          <i class="fas fa-star me-0"></i> {{player.stats.totalStars}}
                         </span>
                         <span class="d-none d-sm-block">
                           {{player.stats.totalStars}} Star<span v-if="player.stats.totalStars !== 1">s</span>
                         </span> 
                       </td>
-                      <td class="fit pt-3 pr-2" v-if="isConquestHomeStars">
+                      <td class="fit pt-3 pe-2" v-if="isConquestHomeStars">
                         <span class="d-xs-block d-sm-none">
-                          <i class="fas fa-star mr-0"></i> {{player.stats.totalHomeStars}}({{player.stats.totalStars}})
+                          <i class="fas fa-star me-0"></i> {{player.stats.totalHomeStars}}({{player.stats.totalStars}})
                         </span>
                         <span class="d-none d-sm-block">
                           {{player.stats.totalHomeStars}}({{player.stats.totalStars}}) Star<span v-if="player.stats.totalStars !== 1">s</span>
                         </span> 
                       </td>
-                      <td class="fit pt-2 pb-2 pr-1 text-center" v-if="isTurnBasedGame && canEndTurn">
-                        <h5 v-if="player.ready && !isUserPlayer(player)" class="pt-2 pr-2 pl-2">
+                      <td class="fit pt-2 pb-2 pe-1 text-center" v-if="isTurnBasedGame && canEndTurn">
+                        <h5 v-if="player.ready && !isUserPlayer(player)" class="pt-2 pe-2 ps-2">
                           <i class="fas fa-check text-success" title="This player has completed their turn"></i>
                         </h5>
 
                         <ready-status-button v-if="!$isHistoricalMode() && getUserPlayer() && isUserPlayer(player) && !getUserPlayer().defeated" />
                       </td>
-                      <td class="fit pt-2 pb-2 pr-2">
-                          <button class="btn btn-info" @click="panToPlayer(player)"><i class="fas fa-eye"></i></button>
+                      <td class="fit pt-2 pb-2 pe-2">
+                          <button class="btn btn-outline-info" @click="panToPlayer(player)"><i class="fas fa-eye"></i></button>
                       </td>
                   </tr>
               </tbody>
@@ -113,14 +113,14 @@
     <share-link v-if="game.state.endDate" message="Share this game with your friends, no sign-up required!"/>
 
     <div class="row" v-if="getUserPlayer() != null && !game.state.endDate">
-      <div class="col text-right pr-2">
+      <div class="col text-end pe-2">
           <modalButton v-if="!game.state.startDate" :disabled="isQuittingGame" modalName="quitGameModal" classText="btn btn-sm btn-danger">
             <i class="fas fa-sign-out-alt"></i> Quit Game
           </modalButton>
-          <button v-if="canReadyToQuit && !getUserPlayer().defeated && !getUserPlayer().readyToQuit" @click="confirmReadyToQuit(getUserPlayer())" class="btn btn-sm btn-warning mr-1">
+          <button v-if="canReadyToQuit && !getUserPlayer().defeated && !getUserPlayer().readyToQuit" @click="confirmReadyToQuit(getUserPlayer())" class="btn btn-sm btn-outline-warning me-1">
             <i class="fas fa-times"></i> Declare Ready to Quit
           </button>
-          <button v-if="canReadyToQuit && !getUserPlayer().defeated && getUserPlayer().readyToQuit" @click="unconfirmReadyToQuit(getUserPlayer())" class="btn btn-sm btn-success mr-1">
+          <button v-if="canReadyToQuit && !getUserPlayer().defeated && getUserPlayer().readyToQuit" @click="unconfirmReadyToQuit(getUserPlayer())" class="btn btn-sm btn-success me-1">
             <i class="fas fa-check"></i> Ready to Quit
           </button>
           <concede-defeat-button />

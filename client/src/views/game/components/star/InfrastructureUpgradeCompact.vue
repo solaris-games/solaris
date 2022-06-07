@@ -1,37 +1,37 @@
 <template>
-  <div class="row bg-secondary pt-2 pb-2" v-if="userPlayer">
-    <div class="col pr-0">
-      <button class="btn btn-sm mr-1"
+  <div class="row bg-dark pt-2 pb-2" v-if="userPlayer">
+    <div class="col pe-0">
+      <button class="btn btn-sm me-1"
               :class="{'btn-success': availableCredits >= economy, 'btn-primary': availableCredits < economy}"
               :disabled="$isHistoricalMode() || isUpgradingEconomy || availableCredits < economy || isGameFinished"
               @click="upgradeEconomy"
               title="Upgrade economic infrastructure">
-        <i class="fas fa-money-bill-wave mr-1"></i>${{economy}}
+        <i class="fas fa-money-bill-wave me-1"></i>${{economy}}
       </button>
-      <button class="btn btn-sm mr-1"
+      <button class="btn btn-sm me-1"
               :class="{'btn-success': availableCredits >= industry, 'btn-primary': availableCredits < industry}"
               :disabled="$isHistoricalMode() || isUpgradingIndustry || availableCredits < industry || isGameFinished"
               @click="upgradeIndustry"
               title="Upgrade industrial infrastructure">
-        <i class="fas fa-tools mr-1"></i>${{industry}}
+        <i class="fas fa-tools me-1"></i>${{industry}}
       </button>
       <button class="btn btn-sm"
               :class="{'btn-success': availableCredits >= science, 'btn-primary': availableCredits < science}"
               :disabled="$isHistoricalMode() || isUpgradingScience || availableCredits < science || isGameFinished"
               @click="upgradeScience"
               title="Upgrade scientific infrastructure">
-        <i class="fas fa-flask mr-1"></i>${{science}}
+        <i class="fas fa-flask me-1"></i>${{science}}
       </button>
     </div>
-    <div class="col-auto pl-0" v-if="userPlayer">
-      <button v-if="canBuildWarpGates && !star.warpGate" :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished" class="btn btn-sm btn-primary mr-1" title="Build a warp gate - Grants x3 speed between warp gates" @click="confirmBuildWarpGate">
-        <i class="fas fa-dungeon mr-1"></i>${{star.upgradeCosts.warpGate}}
+    <div class="col-auto ps-0" v-if="userPlayer">
+      <button v-if="canBuildWarpGates && !star.warpGate" :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished" class="btn btn-sm btn-primary me-1" title="Build a warp gate - Grants x3 speed between warp gates" @click="confirmBuildWarpGate">
+        <i class="fas fa-dungeon me-1"></i>${{star.upgradeCosts.warpGate}}
       </button>
-      <button v-if="canDestroyWarpGates && star.warpGate" :disabled="$isHistoricalMode() || isGameFinished" class="btn btn-sm btn-danger mr-1" @click="confirmDestroyWarpGate" title="Destroy the warp gate">
-        <i class="fas fa-dungeon"></i> <i class="fas fa-trash ml-1"></i>
+      <button v-if="canDestroyWarpGates && star.warpGate" :disabled="$isHistoricalMode() || isGameFinished" class="btn btn-sm btn-danger me-1" @click="confirmDestroyWarpGate" title="Destroy the warp gate">
+        <i class="fas fa-dungeon"></i> <i class="fas fa-trash ms-1"></i>
       </button>
       <button :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.carriers || star.ships < 1 || isGameFinished" class="btn btn-sm btn-info" @click="onBuildCarrierRequested">
-        <i class="fas fa-rocket mr-1"></i>${{star.upgradeCosts.carriers}}
+        <i class="fas fa-rocket me-1"></i>${{star.upgradeCosts.carriers}}
       </button>
     </div>
   </div>

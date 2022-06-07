@@ -1,5 +1,5 @@
 <template>
-  <a href="javascript:;" @click="pan">{{actualCarrierName}}<i class="fas fa-eye ml-1"></i></a>
+  <a href="javascript:;" @click="pan">{{actualCarrierName}}<i class="fas fa-eye ms-1"></i></a>
 </template>
 
 <script>

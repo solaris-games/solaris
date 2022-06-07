@@ -1,12 +1,12 @@
 <template>
 <div class="menu-page container">
     <menu-title title="Award Player Badge" @onCloseRequested="onCloseRequested">
-        <button @click="onOpenPlayerDetailRequested" class="btn btn-sm btn-primary" title="Back to Player Profile"><i class="fas fa-arrow-left"></i></button>
+        <button @click="onOpenPlayerDetailRequested" class="btn btn-sm btn-outline-primary" title="Back to Player Profile"><i class="fas fa-arrow-left"></i></button>
     </menu-title>
 
-    <div class="row bg-primary">
+    <div class="row">
         <div class="col text-center pt-3">
-            <p class="mb-1" v-if="recipientPlayer">Buy <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{recipientPlayer.alias}}</a> a <strong>Badge of Honor<i class="fas fa-medal ml-1"></i></strong></p>
+            <p class="mb-1" v-if="recipientPlayer">Buy <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{recipientPlayer.alias}}</a> a <strong>Badge of Honor<i class="fas fa-medal ms-1"></i></strong></p>
             
             <p v-if="userCredits"><small>You have <span class="text-warning"><strong>{{userCredits.credits}}</strong> Galactic Credits</span>.</small></p>
         </div>

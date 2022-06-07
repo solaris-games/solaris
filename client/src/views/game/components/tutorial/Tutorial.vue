@@ -4,10 +4,10 @@
 
     <div class="row pb-2">
         <div class="col">
-            <button type="button" title="Next" class="btn btn-primary" @click="prevPage()" :disabled="page === 0"><i class="fas fa-arrow-left mr-1"></i>Previous</button>
+            <button type="button" title="Next" class="btn btn-primary" @click="prevPage()" :disabled="page === 0"><i class="fas fa-arrow-left me-1"></i>Previous</button>
         </div>
         <div class="col-auto">
-            <button type="button" title="Next" class="btn btn-success" @click="nextPage()" :disabled="page >= maxPage">Next<i class="fas fa-arrow-right ml-1"></i></button>
+            <button type="button" title="Next" class="btn btn-success" @click="nextPage()" :disabled="page >= maxPage">Next<i class="fas fa-arrow-right ms-1"></i></button>
         </div>
     </div>
 
@@ -101,7 +101,7 @@
         </p>
 
         <p>
-            The numbers displayed directly above stars on the map are the <span class="text-success">Economy</span>, <span class="text-warning">Industry</span> and <span class="text-info">Science</span> (<span class="text-success mr-1">E</span><span class="text-warning mr-1">I</span><span class="text-info">S</span>) values of the star.
+            The numbers displayed directly above stars on the map are the <span class="text-success">Economy</span>, <span class="text-warning">Industry</span> and <span class="text-info">Science</span> (<span class="text-success me-1">E</span><span class="text-warning me-1">I</span><span class="text-info">S</span>) values of the star.
         </p>
 
         <p class="text-warning">

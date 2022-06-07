@@ -1,12 +1,12 @@
 <template>
-<div class="container-fluid header-bar" :class="{'bg-dark':!$isHistoricalMode(),'bg-primary':$isHistoricalMode()}">
-    <div class="row pt-2 pb-2 no-gutters">
-        <div class="col-auto d-none d-md-inline-block mr-5 pointer pt-1" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">
+<div class="container-fluid header-bar" :class="{'header-bar-bg':!$isHistoricalMode(),'bg-dark':$isHistoricalMode()}">
+    <div class="row pt-2 pb-2 g-0">
+        <div class="col-auto d-none d-md-inline-block me-5 pointer pt-1" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">
             <server-connection-status/>
 
             {{game.settings.general.name}}
         </div>
-        <div class="col-auto pt-1 mr-3">
+        <div class="col-auto pt-1 me-3">
             <span class="pointer" v-if="gameIsPaused" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)">{{getGameStatusText}}</span>
             <span class="pointer" v-if="gameIsInProgress" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Next production tick"><i class="fas fa-clock"></i> {{timeRemaining}}</span>
             <span class="pointer" v-if="gameIsPendingStart" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Game starts in"><i class="fas fa-stopwatch"></i> {{timeRemaining}}</span>
@@ -14,49 +14,49 @@
         <div class="col-auto pt-1" v-if="isLoggedIn && isTimeMachineEnabled && !isDataCleaned && !gameIsWaitingForPlayers">
           <tick-selector />
         </div>
-        <div class="col text-right pt-1">
-            <span v-if="userPlayer" class="pointer" title="Total credits" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)">
-                <i class="fas fa-dollar-sign mr-1"></i>{{userPlayer.credits}}
+        <div class="col text-end pt-1">
+            <span v-if="userPlayer" class="pointer me-2" title="Total credits" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)">
+                <i class="fas fa-dollar-sign text-success"></i> {{userPlayer.credits}}
             </span>
 
-            <span class="pointer" v-if="userPlayer && isSpecialistsCurrencyCreditsSpecialists" title="Total specialist tokens" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)">
-                <i class="fas fa-coins mr-1"></i>{{userPlayer.creditsSpecialists}}
+            <span class="pointer me-2" v-if="userPlayer && isSpecialistsCurrencyCreditsSpecialists" title="Total specialist tokens" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)">
+                <i class="fas fa-coins text-success"></i> {{userPlayer.creditsSpecialists}}
             </span>
 
-            <research-progress class="d-none d-lg-inline-block ml-2" v-if="userPlayer" @onViewResearchRequested="onViewResearchRequested"/>
+            <research-progress class="d-none d-lg-inline-block me-2" v-if="userPlayer" @onViewResearchRequested="onViewResearchRequested"/>
         </div>
-        <div class="col-auto text-right pointer pt-1" v-if="userPlayer" @click="onViewBulkUpgradeRequested">
-            <span class="d-none d-lg-inline-block ml-3">
-                <i class="fas fa-money-bill-wave text-success mr-1"></i>{{userPlayer.stats.totalEconomy}}
+        <div class="col-auto text-end pointer pt-1" v-if="userPlayer" @click="onViewBulkUpgradeRequested">
+            <span class="d-none d-lg-inline-block me-2">
+                <i class="fas fa-money-bill-wave text-success"></i> {{userPlayer.stats.totalEconomy}}
             </span>
-            <span class="d-none d-lg-inline-block ml-2">
-                <i class="fas fa-tools text-warning mr-1"></i>{{userPlayer.stats.totalIndustry}}
+            <span class="d-none d-lg-inline-block me-2">
+                <i class="fas fa-tools text-warning"></i> {{userPlayer.stats.totalIndustry}}
             </span>
-            <span class="d-none d-lg-inline-block ml-2">
-                <i class="fas fa-flask text-info mr-1"></i>{{userPlayer.stats.totalScience}}
+            <span class="d-none d-lg-inline-block me-2">
+                <i class="fas fa-flask text-info"></i> {{userPlayer.stats.totalScience}}
             </span>
         </div>
-        <div class="col-auto ml-1">
-            <button class="btn btn-sm btn-warning ml-1" v-if="isTutorialGame" @click="setMenuState(MENU_STATES.TUTORIAL)">
+        <div class="col-auto">
+            <button class="btn btn-sm btn-warning" v-if="isTutorialGame" @click="setMenuState(MENU_STATES.TUTORIAL)">
               <i class="fas fa-user-graduate"></i>
-              <span class="d-none d-md-inline-block ml-1">Tutorial</span>
+              <span class="d-none d-md-inline-block ms-1">Tutorial</span>
             </button>
 
-            <button class="btn btn-sm btn-success ml-1" v-if="!userPlayer && gameIsJoinable" @click="setMenuState(MENU_STATES.WELCOME)">Join Now</button>
+            <button class="btn btn-sm btn-success ms-1" v-if="!userPlayer && gameIsJoinable" @click="setMenuState(MENU_STATES.WELCOME)">Join Now</button>
 
-            <ready-status-button :smallButtons="true" v-if="!$isHistoricalMode() && userPlayer && isTurnBasedGame && canEndTurn && !userPlayer.defeated" class="ml-1" />
+            <ready-status-button :smallButtons="true" v-if="!$isHistoricalMode() && userPlayer && isTurnBasedGame && canEndTurn && !userPlayer.defeated" class="ms-1" />
 
-            <button class="btn btn-sm ml-1 d-lg-none" v-if="userPlayer && !isTutorialGame" :class="{'btn-info': !unreadMessages, 'btn-warning': unreadMessages}" v-on:click="setMenuState(MENU_STATES.INBOX)" title="Inbox (M)">
-                <i class="fas fa-comments"></i> <span class="ml-1" v-if="unreadMessages">{{unreadMessages}}</span>
+            <button class="btn btn-sm ms-1 d-lg-none" v-if="userPlayer && !isTutorialGame" :class="{'btn-info': !unreadMessages, 'btn-warning': unreadMessages}" v-on:click="setMenuState(MENU_STATES.INBOX)" title="Inbox (M)">
+                <i class="fas fa-comments"></i> <span class="ms-1" v-if="unreadMessages">{{unreadMessages}}</span>
             </button>
 
-            <button class="btn btn-sm ml-1" v-if="userPlayer" :class="{'btn-info': !unreadEvents, 'btn-warning': unreadEvents}" v-on:click="setMenuState(MENU_STATES.EVENT_LOG)" title="Event Log (E)">
-                <i class="fas fa-inbox"></i> <span class="ml-1" v-if="unreadEvents">{{unreadEvents}}</span>
+            <button class="btn btn-sm ms-1" v-if="userPlayer" :class="{'btn-info': !unreadEvents, 'btn-warning': unreadEvents}" v-on:click="setMenuState(MENU_STATES.EVENT_LOG)" title="Event Log (E)">
+                <i class="fas fa-inbox"></i> <span class="ms-1" v-if="unreadEvents">{{unreadEvents}}</span>
             </button>
 
-            <hamburger-menu class="ml-1 d-none d-sm-inline-block" :buttonClass="'btn-sm btn-info'" :dropType="'dropleft'" />
+            <hamburger-menu class="ms-1 d-none d-sm-inline-block" :buttonClass="'btn-sm btn-info'" :dropType="'dropleft'" />
             
-            <button class="btn btn-sm btn-info ml-1 d-none d-sm-inline-block" type="button" @click="goToMyGames()">
+            <button class="btn btn-sm btn-info ms-1 d-none d-sm-inline-block" type="button" @click="goToMyGames()">
                 <i class="fas fa-chevron-left"></i>
             </button>
         </div>

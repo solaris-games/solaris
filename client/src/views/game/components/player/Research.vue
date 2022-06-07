@@ -1,14 +1,14 @@
 <template>
-  <div class="row bg-primary" v-if="player">
+  <div class="row" v-if="player">
     <div class="col">
       <div class="table-responsive mb-0">
         <table class="table table-sm mb-0">
-          <thead>
+          <thead class="table-dark">
             <tr v-if="userPlayer && player != userPlayer">
               <th></th>
               <th></th>
               <th></th>
-              <th class="text-right">You</th>
+              <th class="text-end">You</th>
             </tr>
           </thead>
           <tbody>

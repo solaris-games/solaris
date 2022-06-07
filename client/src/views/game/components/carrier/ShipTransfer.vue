@@ -2,24 +2,24 @@
 <div class="menu-page container">
     <menu-title title="Ship Transfer" @onCloseRequested="onCloseRequested"/>
 
-    <div class="row bg-secondary mb-0">
+    <div class="row mb-0">
       <div class="col text-center pt-2 pb-2">
         <p class="mb-0"><small>While in <strong>orbit</strong> of a star you may transfer ships.</small></p>
       </div>
     </div>
 
-    <div class="row mb-0 pt-2 pb-2 bg-primary" v-if="carrier && carrier.waypoints && carrier.waypoints.length">
+    <div class="row mb-0 pt-2 pb-2 bg-dark" v-if="carrier && carrier.waypoints && carrier.waypoints.length">
       <div class="col">
-        <p class="mb-0"><i class="fas fa-map-marker-alt mr-2"></i><strong>{{carrier.name}}</strong>'s next waypoint is to <star-label :starId="carrierWaypointDestination"/>.</p>
+        <p class="mb-0"><i class="fas fa-map-marker-alt me-2"></i><strong>{{carrier.name}}</strong>'s next waypoint is to <star-label :starId="carrierWaypointDestination"/>.</p>
       </div>
     </div>
 
     <div class="row mt-2">
         <div class="col" v-if="star">
-            <p class="mb-0"><i class="fas fa-star mr-1"></i>{{star.name}}</p>
+            <p class="mb-0"><i class="fas fa-star me-1"></i>{{star.name}}</p>
         </div>
         <div class="col" v-if="carrier">
-            <p class="mb-0"><i class="fas fa-rocket mr-1"></i>{{carrier.name}}</p>
+            <p class="mb-0"><i class="fas fa-rocket me-1"></i>{{carrier.name}}</p>
         </div>
     </div>
 
@@ -34,42 +34,48 @@
 
     <div class="row mb-2">
         <div class="col-6">
-            <div class="row no-gutters">
+            <div class="row g-0">
                 <div class="col-4">
-                    <button type="button" title="Transfer all ships to the star" class="btn btn-danger btn-block" @click="onMinShipsClicked">Min</button>
+                  <div class="d-grid gap-2">
+                    <button type="button" title="Transfer all ships to the star" class="btn btn-danger" @click="onMinShipsClicked">Min</button>
+                  </div>
                 </div>
                 <div class="col">
-                    <button type="button" title="Transfer 1 ship to the star" class="btn btn-primary float-right ml-1" @click="onTransferLeftClicked(1)" :disabled="carrierShips <= 1"><i class="fas fa-angle-left"></i></button>
-                    <button type="button" title="Transfer 10 ships to the star"  class="btn btn-primary ml-1 float-right" @click="onTransferLeftClicked(10)" :disabled="carrierShips <= 10"><i class="fas fa-angle-double-left"></i></button>
-                    <button type="button" title="Transfer 100 ships to the star"  class="btn btn-primary float-right" @click="onTransferLeftClicked(100)" :disabled="carrierShips <= 100"><i class="fas fa-angle-left"></i><i class="fas fa-angle-double-left"></i></button>
+                    <button type="button" title="Transfer 1 ship to the star" class="btn btn-outline-primary float-end ms-1" @click="onTransferLeftClicked(1)" :disabled="carrierShips <= 1"><i class="fas fa-angle-left"></i></button>
+                    <button type="button" title="Transfer 10 ships to the star"  class="btn btn-outline-primary ms-1 float-end" @click="onTransferLeftClicked(10)" :disabled="carrierShips <= 10"><i class="fas fa-angle-double-left"></i></button>
+                    <button type="button" title="Transfer 100 ships to the star"  class="btn btn-outline-primary float-end" @click="onTransferLeftClicked(100)" :disabled="carrierShips <= 100"><i class="fas fa-angle-left"></i><i class="fas fa-angle-double-left"></i></button>
                 </div>
             </div>
         </div>
 
         <div class="col-6">
-            <div class="row no-gutters">
+            <div class="row g-0">
                 <div class="col">
-                    <button type="button" title="Transfer 1 ship to the carrier" class="btn btn-primary" @click="onTransferRightClicked(1)" :disabled="starShips <= 0"><i class="fas fa-angle-right"></i></button>
-                    <button type="button" title="Transfer 10 ships to the carrier"  class="btn btn-primary ml-1" @click="onTransferRightClicked(10)" :disabled="starShips < 10"><i class="fas fa-angle-double-right"></i></button>
-                    <button type="button" title="Transfer 100 ships to the carrier"  class="btn btn-primary ml-1 " @click="onTransferRightClicked(100)" :disabled="starShips < 100"><i class="fas fa-angle-double-right"></i><i class="fas fa-angle-right"></i></button>
+                    <button type="button" title="Transfer 1 ship to the carrier" class="btn btn-outline-primary" @click="onTransferRightClicked(1)" :disabled="starShips <= 0"><i class="fas fa-angle-right"></i></button>
+                    <button type="button" title="Transfer 10 ships to the carrier"  class="btn btn-outline-primary ms-1" @click="onTransferRightClicked(10)" :disabled="starShips < 10"><i class="fas fa-angle-double-right"></i></button>
+                    <button type="button" title="Transfer 100 ships to the carrier"  class="btn btn-outline-primary ms-1 " @click="onTransferRightClicked(100)" :disabled="starShips < 100"><i class="fas fa-angle-double-right"></i><i class="fas fa-angle-right"></i></button>
                 </div>
                 <div class="col-4">
-                    <button type="button" title="Transfer all ships to the carrier" class="btn btn-success btn-block" @click="onMaxShipsClicked">Max</button>
+                  <div class="d-grid gap-2">
+                    <button type="button" title="Transfer all ships to the carrier" class="btn btn-success" @click="onMaxShipsClicked">Max</button>
+                  </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row pb-2 pt-2 bg-secondary">
+    <div class="row pb-2 pt-2 bg-dark">
         <div class="col-6"></div>
-        <div class="col pr-0">
-            <button type="button" class="btn btn-success btn-block mr-1" :disabled="$isHistoricalMode() || isTransferringShips || starShips < 0 || carrierShips < 0" @click="saveTransfer">
+        <div class="col pe-0">
+          <div class="d-grid gap-2">
+            <button type="button" class="btn btn-success me-1" :disabled="$isHistoricalMode() || isTransferringShips || starShips < 0 || carrierShips < 0" @click="saveTransfer">
               <i class="fas fa-check"></i>
               Transfer
             </button>
+          </div>
         </div>
-        <div class="col-auto pl-1">
-            <button type="button" class="btn btn-primary" @click="onEditWaypointsRequested"><i class="fas fa-map-marker-alt"></i></button>
+        <div class="col-auto ps-0">
+            <button type="button" class="btn btn-outline-primary" @click="onEditWaypointsRequested"><i class="fas fa-map-marker-alt"></i></button>
         </div>
     </div>
 </div>

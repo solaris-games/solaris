@@ -7,7 +7,7 @@
         <h4>Active Games</h4>
       </div>
       <div class="col-auto">
-        <input class="form-check-input" type="checkbox" v-model="includeDefeated" id="chkIncludeDefeated">
+        <input class="form-check-input me-1" type="checkbox" v-model="includeDefeated" id="chkIncludeDefeated">
         <label class="form-check-label" for="chkIncludeDefeated">
           Show Defeated/AFK
         </label>
@@ -22,8 +22,8 @@
 
     <div class="table-responsive">
       <table v-if="!isLoadingActiveGames && filteredActiveGames.length" class="table table-striped table-hover">
-          <thead>
-              <tr class="bg-primary">
+          <thead class="table-dark">
+              <tr>
                   <td class="col-9 col-md-6">Name</td>
                   <td class="col-3 d-none d-md-table-cell">Cycle/Turn</td>
                   <td class="col-1 col-md-6 text-center">Players</td>
@@ -37,11 +37,11 @@
                     <br/>
                     <small>{{getGameTypeFriendlyText(game)}}</small>
                     <br/>
-                    <span v-if="game.userNotifications.defeated && !game.userNotifications.afk" class="ml-1 badge badge-danger">Defeated</span>
-                    <span v-if="!game.userNotifications.defeated && game.userNotifications.turnWaiting" class="ml-1 badge badge-danger">Turn Waiting</span>
-                    <span v-if="!game.userNotifications.defeated && game.userNotifications.unreadEvents" class="ml-1 badge badge-warning">{{game.userNotifications.unreadEvents}} Events</span>
-                    <span v-if="game.userNotifications.unreadConversations" class="ml-1 badge badge-info">{{game.userNotifications.unreadConversations}} Messages</span>
-                    <span v-if="game.userNotifications.afk" class="ml-1 badge badge-warning">AFK</span>
+                    <span v-if="game.userNotifications.defeated && !game.userNotifications.afk" class="ms-1 badge badge-danger">Defeated</span>
+                    <span v-if="!game.userNotifications.defeated && game.userNotifications.turnWaiting" class="ms-1 badge badge-danger">Turn Waiting</span>
+                    <span v-if="!game.userNotifications.defeated && game.userNotifications.unreadEvents" class="ms-1 badge bg-warning">{{game.userNotifications.unreadEvents}} Events</span>
+                    <span v-if="game.userNotifications.unreadConversations" class="ms-1 badge bg-info">{{game.userNotifications.unreadConversations}} Messages</span>
+                    <span v-if="game.userNotifications.afk" class="ms-1 badge bg-warning">AFK</span>
 
                     <div class="d-md-none text-info">
                       <small>
@@ -69,19 +69,21 @@
                     </span>
                   </td>
                   <td class="col-1 col-md-6 text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
-                  <td class="col-auto btn-group">
-                    <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary">View</router-link>
-                    <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success">
-                      Play
-                    </router-link>
+                  <td class="col-auto">
+                    <div class="btn-group">
+                      <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-primary">View</router-link>
+                      <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success">
+                        Play
+                      </router-link>
+                    </div>
                   </td>
               </tr>
           </tbody>
       </table>
     </div>
 
-    <div class="text-right" v-if="!isLoadingActiveGames">
-      <router-link to="/game/create" tag="button" class="btn btn-info mr-1"><i class="fas fa-gamepad"></i> Create Game</router-link>
+    <div class="text-end" v-if="!isLoadingActiveGames">
+      <router-link to="/game/create" tag="button" class="btn btn-info me-1"><i class="fas fa-gamepad"></i> Create Game</router-link>
       <router-link to="/game/list" tag="button" class="btn btn-success">Join New  Game <i class="fas fa-arrow-right"></i></router-link>
     </div>
 
@@ -96,10 +98,10 @@
     </div>
 
     <table v-if="!isLoadingCompletedGames && completedGames.length" class="table table-striped table-hover">
-        <thead>
-            <tr class="bg-primary">
+        <thead class="table-dark">
+            <tr>
                 <td>Name</td>
-                <td class="d-none d-sm-table-cell text-right">Completed</td>
+                <td class="d-none d-sm-table-cell text-end">Completed</td>
                 <td></td>
             </tr>
         </thead>
@@ -107,20 +109,20 @@
             <tr v-for="game in completedGames" v-bind:key="game._id">
                 <td>
                   <router-link :to="{ path: '/game/detail', query: { id: game._id } }">{{game.settings.general.name}}</router-link>
-                  <span v-if="game.userNotifications.unreadConversations" class="ml-1 badge badge-info">{{game.userNotifications.unreadConversations}} Messages</span>
+                  <span v-if="game.userNotifications.unreadConversations" class="ms-1 badge bg-info">{{game.userNotifications.unreadConversations}} Messages</span>
                   <br/>
                   <small>{{getGameTypeFriendlyText(game)}}</small>
                 </td>
-                <td class="d-none d-sm-table-cell text-right">{{getEndDateFromNow(game)}}</td>
+                <td class="d-none d-sm-table-cell text-end">{{getEndDateFromNow(game)}}</td>
                 <td>
-                    <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-success float-right">View</router-link>
+                    <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-outline-success float-end">View</router-link>
                 </td>
             </tr>
         </tbody>
     </table>
 
-    <div class="text-right" v-if="!isLoadingCompletedGames">
-      <router-link to="/game/create" tag="button" class="btn btn-info mr-1"><i class="fas fa-gamepad"></i> Create Game</router-link>
+    <div class="text-end" v-if="!isLoadingCompletedGames">
+      <router-link to="/game/create" tag="button" class="btn btn-info me-1"><i class="fas fa-gamepad"></i> Create Game</router-link>
       <router-link to="/game/list" tag="button" class="btn btn-success">Join New  Game <i class="fas fa-arrow-right"></i></router-link>
     </div>
 

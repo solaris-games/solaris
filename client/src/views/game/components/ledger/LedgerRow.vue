@@ -4,15 +4,15 @@
   <td class="col-avatar" :title="getPlayerAlias(ledger.playerId)">
     <player-avatar @onClick="onOpenPlayerDetailRequested(ledger.playerId)" :player="getPlayer(ledger.playerId)"/>
   </td>
-  <td class="pl-2 pt-3 pb-2">
+  <td class="ps-2 pt-3 pb-2">
     <h5 class="alias-title">{{getPlayerAlias(ledger.playerId)}}</h5>
   </td>
-  <td class="fit pt-3 pr-4">
+  <td class="fit pt-3 pe-4">
     <h5 :class="{'text-success':ledger.debt>0,'text-danger':ledger.debt<0}">${{ledger.debt}}</h5>
   </td>
-  <td class="fit pt-2 pb-2 pr-2">
+  <td class="fit pt-2 pb-2 pe-2">
     <button class="btn btn-danger" :disabled="ledger.debt >= 0 || ledger.isSettlingDebt || isGameFinished" @click="settleDebt(ledger)" title="Settle your debt to this player"><i class="fas fa-money-check-alt"></i></button>
-    <button class="btn btn-success ml-1" :disabled="ledger.debt <= 0 || ledger.isForgivingDebt || isGameFinished" @click="forgiveDebt(ledger)" title="Forgive this player's debt to you"><i class="fas fa-hands-helping"></i></button>
+    <button class="btn btn-success ms-1" :disabled="ledger.debt <= 0 || ledger.isForgivingDebt || isGameFinished" @click="forgiveDebt(ledger)" title="Forgive this player's debt to you"><i class="fas fa-hands-helping"></i></button>
   </td>
 </tr>
 </template>

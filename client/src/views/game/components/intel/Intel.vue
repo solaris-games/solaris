@@ -1,5 +1,5 @@
 <template>
-<div class="menu-page bg-secondary pb-2">
+<div class="menu-page  pb-2">
   <div class="container">
     <menu-title title="Intel" @onCloseRequested="onCloseRequested"></menu-title>
 
@@ -8,7 +8,7 @@
 
   <div v-if="history">
     <div class="container">
-      <div class="row no-gutters">
+      <div class="row g-0">
         <div class="col">
         <select class="form-control input-sm" id="intelType" v-model="intelType" v-on:change="fillData" :disabled="history == null">
           <option key="totalStars" value="totalStars">Total Stars</option>
@@ -33,7 +33,7 @@
           <option key="specialists" value="specialists" v-if="isSpecialistsTechnologyEnabled">Specialists</option>
         </select>
         </div>
-        <div class="col-auto ml-1">
+        <div class="col-auto ms-1">
           <select class="form-control input-sm" v-model="startTick" v-on:change="reloadData" :disabled="history == null">
             <option v-for="option in startTickOptions" :key="option.text" :value="option.value">
               {{option.text}}
@@ -43,7 +43,7 @@
       </div>
     </div>
 
-    <div class="mb-2 mt-2 ml-1 mr-1" v-if="datacollection != null">
+    <div class="mb-2 mt-2 ms-1 me-1" v-if="datacollection != null">
         <line-chart :chart-data="datacollection" :options="dataoptions" />
     </div>
 
@@ -55,9 +55,9 @@
         <div class="row mb-2">
             <div class="col">
               <div class="btn-group">
-                <button class="btn btn-success" @click="showAll">All</button>
-                <button class="btn btn-info" @click="showActive">Active</button>
-                <button class="btn btn-primary" @click="showNone">
+                <button class="btn btn-outline-success" @click="showAll">All</button>
+                <button class="btn btn-outline-info" @click="showActive">Active</button>
+                <button class="btn btn-outline-primary" @click="showNone">
                   <span v-if="userPlayer">You</span>
                   <span v-if="!userPlayer">None</span>
                 </button>
@@ -67,7 +67,7 @@
         <div class="row">
           <div class="col">
             <button v-for="playerFilter in playerFilters" :key="playerFilter._id"
-              class="btn mr-1 mb-1"
+              class="btn me-1 mb-1"
               :class="{'btn-primary': playerFilter.enabled}"
               @click="togglePlayerFilter(playerFilter)"
               :title="playerFilter.alias">

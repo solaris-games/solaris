@@ -1,5 +1,5 @@
 <template>
-    <button type="button" :class="classText" data-toggle="modal" :data-target="'#' + modalName">
+    <button type="button" :class="classText" data-bs-toggle="modal" :data-bs-target="'#' + modalName">
         <slot></slot>
     </button>
 </template>

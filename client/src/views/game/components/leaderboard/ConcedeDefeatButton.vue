@@ -3,7 +3,7 @@
         <button class="btn btn-danger btn-sm" @click="concedeDefeat(false)" title="Concede Defeat">
             <i class="fas fa-skull-crossbones"></i> {{isTutorialGame ? 'Quit Tutorial' : 'Concede Defeat'}}
         </button>
-        <button type="button" class="btn btn-sm btn-danger dropdown-toggle dropdown-toggle-split pulse" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-if="!isTutorialGame">
+        <button type="button" class="btn btn-sm btn-danger dropdown-toggle dropdown-toggle-split pulse" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-if="!isTutorialGame">
             <span class="sr-only">Toggle Dropdown</span>
         </button>
         <div class="dropdown-menu" v-if="!isTutorialGame">

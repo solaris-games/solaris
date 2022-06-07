@@ -9,17 +9,17 @@
         <th style="width: 5%">#</th>
         <th style="width: 30%">Player</th>
         <th style="width: 30%" class="d-none d-md-table-cell">Guild</th>
-        <th style="width: 10%" class="text-right sortable-header col" :class="actions.getColumnClass('rank')" title="Total rank" @click="actions.sort('rank')">
+        <th style="width: 10%" class="text-end sortable-header col" :class="actions.getColumnClass('rank')" title="Total rank" @click="actions.sort('rank')">
+          <i v-if="actions.isActive('rank')" class="fas fa-chevron-down"></i>
           <i class="fas fa-star text-info"></i>
-          <i v-if="actions.isActive('rank')" class="fas fa-chevron-down ml-2"></i>
         </th>
-        <th style="width: 10%" class="text-right sortable-header col" :class="actions.getColumnClass('victories')" title="Total victories" @click="actions.sort('victories')">
+        <th style="width: 10%" class="text-end sortable-header col" :class="actions.getColumnClass('victories')" title="Total victories" @click="actions.sort('victories')">
+          <i v-if="actions.isActive('victories')" class="fas fa-chevron-down"></i>
           <i class="fas fa-trophy text-warning"></i>
-          <i v-if="actions.isActive('victories')" class="fas fa-chevron-down ml-2"></i>
         </th>
-        <th style="width: 10%" class="text-right sortable-header col" :class="actions.getColumnClass('renown')" title="Total renown" @click="actions.sort('renown')">
+        <th style="width: 10%" class="text-end sortable-header col" :class="actions.getColumnClass('renown')" title="Total renown" @click="actions.sort('renown')">
+          <i v-if="actions.isActive('renown')" class="fas fa-chevron-down"></i>
           <i class="fas fa-heart text-danger"></i>
-          <i v-if="actions.isActive('renown')" class="fas fa-chevron-down ml-2"></i>
         </th>
       </template>
       <template v-slot:row="{ value: player, getColumnClass }">
@@ -29,10 +29,10 @@
               <router-link :to="{ name: 'account-achievements', params: { userId: player._id }}">
                   <span>{{player.username}}</span>
               </router-link>
-              <i class="fas fa-hands-helping ml-1" title="This player is a contributor" v-if="player.roles && player.roles.contributor"></i>
-              <i class="fas fa-code ml-1" title="This player is an active developer" v-if="player.roles && player.roles.developer"></i>
-              <i class="fas fa-user-friends ml-1" title="This player is an active community manager" v-if="player.roles && player.roles.communityManager"></i>
-              <i class="fas fa-dice ml-1" title="This player is an active game master" v-if="player.roles && player.roles.gameMaster"></i>
+              <i class="fas fa-hands-helping ms-1" title="This player is a contributor" v-if="player.roles && player.roles.contributor"></i>
+              <i class="fas fa-code ms-1" title="This player is an active developer" v-if="player.roles && player.roles.developer"></i>
+              <i class="fas fa-user-friends ms-1" title="This player is an active community manager" v-if="player.roles && player.roles.communityManager"></i>
+              <i class="fas fa-dice ms-1" title="This player is an active game master" v-if="player.roles && player.roles.gameMaster"></i>
           </td>
           <td class="d-none d-md-table-cell">
             <router-link v-if="player.guild" :to="{ name: 'guild-details', params: { guildId: player.guild._id }}">

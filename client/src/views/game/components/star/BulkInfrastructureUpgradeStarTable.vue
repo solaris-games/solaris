@@ -1,23 +1,23 @@
 <template>
 <div class="container">
   <div class="row mb-2" v-if="tableData.length">
-    <div class="col-6 pl-0">
+    <div class="col-6 ps-0">
       <input type="text" class="form-control form-control-sm" v-model="searchFilter" placeholder="Search...">
     </div>
   </div>
   
   <div class="row" v-if="tableData.length">
-    <div class="table-responsive">
+    <div class="table-responsive ps-0 pe-0">
       <table class="table table-striped table-hover mb-0">
-          <thead>
-              <tr class="bg-primary">
+          <thead class="table-dark">
+              <tr>
                   <td><a href="javascript:;" @click="sort(['ships'])">Name</a></td>
                   <td></td>
                   <td></td>
-                  <td class="text-right">
+                  <td class="text-end">
                     <span class="infrastructure-filters">
-                      <a href="javascript:;" @click="sort(['infrastructure','economy'])"><i class="fas fa-money-bill-wave mr-2"></i></a>
-                      <a href="javascript:;" @click="sort(['infrastructure','industry'])"><i class="fas fa-tools mr-2"></i></a>
+                      <a href="javascript:;" @click="sort(['infrastructure','economy'])"><i class="fas fa-money-bill-wave me-2"></i></a>
+                      <a href="javascript:;" @click="sort(['infrastructure','industry'])"><i class="fas fa-tools me-2"></i></a>
                       <a href="javascript:;" @click="sort(['infrastructure','science'])"><i class="fas fa-flask"></i></a>
                     </span>
                   </td>

@@ -5,8 +5,8 @@
   <div class="container" v-if="events">
     <div class="row">
       <div class="col">
-        <button class="btn btn-sm btn-primary" @click="loadEvents"><span class="d-none d-sm-inline-block">Refresh</span><i class="fas fa-sync ml-1"></i></button>
-        <button class="btn btn-sm btn-success ml-1" @click="markAllRead">Read All<i class="fas fa-check ml-1"></i></button>
+        <button class="btn btn-sm btn-outline-primary" @click="loadEvents"><span class="d-none d-sm-inline-block">Refresh</span><i class="fas fa-sync ms-1"></i></button>
+        <button class="btn btn-sm btn-success ms-1" @click="markAllRead">Read All<i class="fas fa-check ms-1"></i></button>
       </div>
       <div class="col-auto">
         <select class="form-control form-control-sm" v-model="selectedFilter" @change="onSelectedFilterChanged">

@@ -4,20 +4,20 @@
   <td class="col-avatar" :title="getPlayerAlias(diplomaticStatus.playerIdTo)">
     <player-avatar @onClick="onOpenPlayerDetailRequested(diplomaticStatus.playerIdTo)" :player="getPlayer(diplomaticStatus.playerIdTo)"/>
   </td>
-  <td class="pl-2 pt-3 pb-2">
+  <td class="ps-2 pt-3 pb-2">
     <h5 class="alias-title">{{getPlayerAlias(diplomaticStatus.playerIdTo)}}</h5>
   </td>
-  <td class="fit pt-3 pr-1">
+  <td class="fit pt-3 pe-1">
     <diplomacy-icons 
       :statusFrom="diplomaticStatus.statusFrom"
       :statusTo="diplomaticStatus.statusTo"
       :actualStatus="diplomaticStatus.actualStatus"/>
   </td>
-  <td class="fit pt-3 pb-2 pr-2">
+  <td class="fit pt-3 pb-2 pe-2" v-if="!isGameFinished">
     <div class="btn-group">
-      <button class="btn btn-sm btn-success" :disabled="isGameFinished || diplomaticStatus.statusTo === 'allies'" @click="declareAlly(diplomaticStatus)" title="Declare this player an ally"><i class="fas fa-handshake"></i></button>
-      <button class="btn btn-sm btn-info" :disabled="isGameFinished || diplomaticStatus.statusTo === 'neutral'" @click="declareNeutral(diplomaticStatus)" title="Declare this player as neutral"><i class="fas fa-dove"></i></button>
-      <button class="btn btn-sm btn-danger" :disabled="isGameFinished || diplomaticStatus.statusTo === 'enemies'" @click="declareEnemy(diplomaticStatus)" title="Declare this player as an enemy"><i class="fas fa-crosshairs"></i></button>
+      <button class="btn btn-sm" :class="{'btn-success':diplomaticStatus.statusTo === 'allies', 'btn-outline-success':diplomaticStatus.statusTo !== 'allies'}" @click="declareAlly(diplomaticStatus)" title="Declare this player an ally"><i class="fas fa-handshake"></i></button>
+      <button class="btn btn-sm" :class="{'btn-info':diplomaticStatus.statusTo === 'neutral', 'btn-outline-info':diplomaticStatus.statusTo !== 'neutral'}" @click="declareNeutral(diplomaticStatus)" title="Declare this player as neutral"><i class="fas fa-dove"></i></button>
+      <button class="btn btn-sm" :class="{'btn-danger':diplomaticStatus.statusTo === 'enemies', 'btn-outline-danger':diplomaticStatus.statusTo !== 'enemies'}" @click="declareEnemy(diplomaticStatus)" title="Declare this player as an enemy"><i class="fas fa-crosshairs"></i></button>
     </div>
   </td>
 </tr>

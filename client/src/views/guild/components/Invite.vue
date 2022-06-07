@@ -5,11 +5,11 @@
         <span>{{invite.name}} [{{invite.tag}}]</span>
       </router-link>
     </td>
-    <td class="text-right">
-      <button class="btn btn-sm btn-success ml-1" :disabled="isLoading" @click="accept()" title="Accept invitation">
+    <td class="text-end">
+      <button class="btn btn-sm btn-success ms-1" :disabled="isLoading" @click="accept()" title="Accept invitation">
         <i class="fas fa-check"></i>
       </button>
-      <button class="btn btn-sm btn-danger ml-1" :disabled="isLoading" @click="reject()" title="Reject invitation">
+      <button class="btn btn-sm btn-danger ms-1" :disabled="isLoading" @click="reject()" title="Reject invitation">
         <i class="fas fa-trash"></i>
       </button>
     </td>

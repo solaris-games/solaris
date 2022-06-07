@@ -1,8 +1,8 @@
 <template>
-<div class="table-responsive">
+<div class="table-responsive p-0">
     <table class="table table-striped table-hover mb-1">
-        <thead>
-            <tr class="bg-primary">
+        <thead class="table-dark">
+            <tr>
                 <td v-if="userPlayerOwnsCarrier">Delay</td>
                 <td>Destination</td>
                 <td v-if="!showAction" title="Show actions">
@@ -11,7 +11,7 @@
                 <td v-if="showAction" title="Show ETA's">
                   <a href="javascript:;" @click="toggleShowAction">Action</a>
                 </td>
-                <td class="text-right" v-if="!$isHistoricalMode() && canEditWaypoints">
+                <td class="text-end" v-if="!$isHistoricalMode() && canEditWaypoints">
                   <a href="javascript:;" @click="onEditWaypointsRequested">
                     Edit
                   </a>

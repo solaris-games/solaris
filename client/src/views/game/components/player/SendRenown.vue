@@ -1,21 +1,19 @@
 <template>
-<div class="row pt-2 pb-2 bg-secondary">
+<div class="pt-2 pb-2">
   <div class="col-12">
     <form-error-list v-bind:errors="errors"/>
   </div>
 
-  <div class="col-12">
-    <form>
-      <div class="form-row">
-        <div class="col-7">
-          <p class="mb-2"><span class="text-warning">{{userPlayer.renownToGive == null ? 0 : userPlayer.renownToGive}} Renown</span> to distribute.</p>
-        </div>
-        <div class="col-5">
-          <button type="button" class="btn btn-success btn-block" @click="confirmAwardRenown" :disabled="isAwardingRenown || !userPlayer.renownToGive"><i class="fas fa-heart"></i> Award Renown</button>
-        </div>
+  <form class="row">
+    <div class="col-7">
+      <p class="mb-2"><span class="text-warning">{{userPlayer.renownToGive == null ? 0 : userPlayer.renownToGive}} Renown</span> to distribute.</p>
+    </div>
+    <div class="col-5">
+      <div class="d-grid gap-2">
+        <button type="button" class="btn btn-success" @click="confirmAwardRenown" :disabled="isAwardingRenown || !userPlayer.renownToGive"><i class="fas fa-heart"></i> Award Renown</button>
       </div>
-    </form>
-  </div>
+    </div>
+  </form>
 </div>
 </template>
 

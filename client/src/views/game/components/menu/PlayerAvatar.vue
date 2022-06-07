@@ -1,7 +1,7 @@
 <template>
-  <div @click="onClick" class="player-icon text-center">
+  <div @click="onClick" class="player-icon text-center bg-dark">
     <img v-if="player.avatar" :src="getAvatarImage()" :class="{'defeated-player': player.defeated}">
-    <i v-if="!player.avatar" class="far fa-user ml-2 mr-2 mt-2 mb-2"></i>
+    <i v-if="!player.avatar" class="far fa-user ms-2 me-2 mt-2 mb-2"></i>
     <span v-if="canShowShapeIcon()" class="shapeIcon">
       <player-icon :playerId="player._id"/>
     </span>

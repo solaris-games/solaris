@@ -5,11 +5,11 @@
         <span>{{application.name}} [{{application.tag}}]</span>
       </router-link>
     </td>
-    <td class="text-right">
-      <button class="btn btn-sm btn-success ml-1" v-if="!application.hasApplied" :disabled="isLoading" @click="apply()" title="Send application">
+    <td class="text-end">
+      <button class="btn btn-sm btn-success ms-1" v-if="!application.hasApplied" :disabled="isLoading" @click="apply()" title="Send application">
         <i class="fas fa-paper-plane"></i> Apply
       </button>
-      <button class="btn btn-sm btn-danger ml-1" v-if="application.hasApplied" :disabled="isLoading" @click="withdraw()" title="Withdraw application">
+      <button class="btn btn-sm btn-danger ms-1" v-if="application.hasApplied" :disabled="isLoading" @click="withdraw()" title="Withdraw application">
         <i class="fas fa-trash"></i> Withdraw
       </button>
     </td>

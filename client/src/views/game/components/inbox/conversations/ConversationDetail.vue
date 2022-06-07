@@ -3,18 +3,18 @@
   <loading-spinner :loading="!conversation"/>
 
   <div class="container" v-if="conversation">
-    <menu-title class="menu-page-header bg-dark pb-1" @onCloseRequested="onCloseRequested">
-      <button class="btn btn-sm" v-if="conversation.createdBy" :class="{'btn-default':!pinnedOnly, 'btn-success':pinnedOnly}" title="Show/Hide pinned messages" @click="toggledPinnedOnly">
+    <menu-title class="menu-page-header pb-1 bg-dark" @onCloseRequested="onCloseRequested">
+      <button class="btn btn-sm" v-if="conversation.createdBy" :class="{'btn-outline-default':!pinnedOnly, 'btn-success':pinnedOnly}" title="Show/Hide pinned messages" @click="toggledPinnedOnly">
         <i class="fas fa-thumbtack"></i>
       </button>
-      <button class="btn btn-sm ml-1" :class="{'btn-success':!conversation.isMuted, 'btn-danger':conversation.isMuted}" title="Mute/Unmute conversation" @click="toggleMuteConversation">
+      <button class="btn btn-sm ms-1" :class="{'btn-outline-success':!conversation.isMuted, 'btn-danger':conversation.isMuted}" title="Mute/Unmute conversation" @click="toggleMuteConversation">
         <i class="fas" :class="{'fa-bell-slash':conversation.isMuted,'fa-bell':!conversation.isMuted}"></i>
       </button>
-      <button class="btn btn-sm btn-info ml-1 d-lg-none" @click="toggleConversationWindow" title="Toggle conversation display">
+      <button class="btn btn-sm btn-outline-info ms-1 d-lg-none" @click="toggleConversationWindow" title="Toggle conversation display">
         <i class="fas" :class="{'fa-eye-slash':!toggleDisplay,'fa-eye':toggleDisplay}"></i>
       </button>
-      <button class="btn btn-sm btn-primary ml-1" @click="onOpenInboxRequested" title="Back to Inbox"><i class="fas fa-inbox"></i></button>
-      <button class="btn btn-sm btn-warning ml-1" @click="leaveConversation" v-if="conversation.createdBy" title="Leave conversation"><i class="fas fa-sign-out-alt"></i></button>
+      <button class="btn btn-sm btn-outline-primary ms-1" @click="onOpenInboxRequested" title="Back to Inbox"><i class="fas fa-inbox"></i></button>
+      <button class="btn btn-sm btn-outline-warning ms-1" @click="leaveConversation" v-if="conversation.createdBy" title="Leave conversation"><i class="fas fa-sign-out-alt"></i></button>
     </menu-title>
 
     <h5 v-if="conversation && toggleDisplay" class="menu-page-header-padding mb-0">{{conversation.name}}</h5>

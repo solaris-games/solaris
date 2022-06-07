@@ -16,10 +16,6 @@ export default {
 </script>
 
 <style>
-body {
-    font-family: 'Space Mono', monospace !important;
-}
-
 /* Animations */
 @keyframes fadeInAnimation {
   from {opacity: 0;}
@@ -30,6 +26,11 @@ body {
   opacity: 1;
   animation-name: fadeInAnimation;
   animation-duration: 0.3s;
+  background-color: rgba(29,40,53,1);
+}
+
+.header-bar-bg {
+  background-color: rgba(29,40,53,1);
 }
 
 /* Scroll Bar */

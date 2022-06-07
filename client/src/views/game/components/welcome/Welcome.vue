@@ -1,13 +1,13 @@
 <template>
 <div class="menu-page container">
     <menu-title title="Welcome" @onCloseRequested="onCloseRequested">
-      <button title="View Settings" tag="button" class="btn btn-sm btn-primary" @click="onViewSettingsRequested"><i class="fas fa-cog"></i></button>
+      <button title="View Settings" tag="button" class="btn btn-sm btn-outline-primary" @click="onViewSettingsRequested"><i class="fas fa-cog"></i></button>
     </menu-title>
 
     <div class="row bg-info" v-if="game.settings.general.flux" title="This Game's Flux">
       <div class="col text-center">
-        <!-- <p class="mt-2 mb-2"><small><i class="fas fa-dice-d20 mr-1"></i><strong>{{game.settings.general.flux.name}}</strong> - {{game.settings.general.flux.description}} <help-tooltip v-if="game.settings.general.flux.tooltip" :tooltip="game.settings.general.flux.tooltip"/></small></p> -->
-        <p class="mt-2 mb-2"><small><i class="fas fa-dice-d20 mr-1"></i>{{game.settings.general.flux.description}} <help-tooltip v-if="game.settings.general.flux.tooltip" :tooltip="game.settings.general.flux.tooltip"/></small></p>
+        <!-- <p class="mt-2 mb-2"><small><i class="fas fa-dice-d20 me-1"></i><strong>{{game.settings.general.flux.name}}</strong> - {{game.settings.general.flux.description}} <help-tooltip v-if="game.settings.general.flux.tooltip" :tooltip="game.settings.general.flux.tooltip"/></small></p> -->
+        <p class="mt-2 mb-2"><small><i class="fas fa-dice-d20 me-1"></i>{{game.settings.general.flux.description}} <help-tooltip v-if="game.settings.general.flux.tooltip" :tooltip="game.settings.general.flux.tooltip"/></small></p>
       </div>
     </div>
 
