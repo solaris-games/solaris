@@ -36,13 +36,14 @@ Vue.use(Toasted, {
   duration: 2500
 })
 
-Vue.prototype.$confirm = async function(title, text, confirmText = 'Yes', cancelText = 'No', hideCancelButton = false) {
+Vue.prototype.$confirm = async function(title, text, confirmText = 'Yes', cancelText = 'No', hideCancelButton = false, cover = false) {
   return this.$store.dispatch('confirm', {
     titleText: title,
     text,
     confirmText,
     cancelText,
-    hideCancelButton
+    hideCancelButton,
+    cover
   })
 }
 

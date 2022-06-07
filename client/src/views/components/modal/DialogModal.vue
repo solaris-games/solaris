@@ -1,5 +1,5 @@
 <template>
-    <div class="modal fade" :id="modalName" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal fade" :id="modalName" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" :class="{'modal-cover': cover}">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -10,7 +10,7 @@
                     <slot></slot>
                 </div>
                 <div class="modal-footer">
-                    <button @click="onCancel" type="button" class="btn btn-danger ps-3 pe-3" data-bs-dismiss="modal" v-if="!hideCancelButton">
+                    <button @click="onCancel" type="button" class="btn btn-outline-danger ps-3 pe-3" data-bs-dismiss="modal" v-if="!hideCancelButton">
                       <i class="fas fa-times"></i> {{cancelText || 'Cancel'}}
                     </button>
                     <button @click="onConfirm" type="button" class="btn btn-success ps-3 pe-3" data-bs-dismiss="modal">
@@ -29,7 +29,8 @@ export default {
     titleText: String,
     cancelText: String,
     confirmText: String,
-    hideCancelButton: Boolean
+    hideCancelButton: Boolean,
+    cover: Boolean
   },
   methods: {
     onCancel () {

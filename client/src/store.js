@@ -444,6 +444,7 @@ export default new Vuex.Store({
           confirmText: data.confirmText || 'Yes',
           cancelText: data.cancelText || 'No',
           hideCancelButton: Boolean(data.hideCancelButton),
+          cover: Boolean(data.cover),
           titleText: data.titleText,
           text: data.text,
           onConfirm: async () => {
