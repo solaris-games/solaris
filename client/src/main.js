@@ -7,9 +7,6 @@ import router from './router'
 import store from './store'
 
 import $ from 'jquery'
-// import 'bootstrap'
-// import 'bootswatch/dist/darkly/bootstrap.min.css'
-
 import 'pixi.js-legacy'
 import 'pixi-viewport'
 
@@ -58,7 +55,7 @@ Vue.prototype.$isMobile = function () {
 }
 
 Vue.directive('tooltip', function(el, binding) {
-  $(el).tooltip({
+  new bootstrap.Tooltip($(el), {
     title: binding.value,
     placement: binding.arg,
     trigger: 'hover'
