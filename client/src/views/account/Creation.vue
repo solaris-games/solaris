@@ -10,7 +10,8 @@
         <p>Build alliances, make enemies and fight your way to victory to <span class="text-danger">galactic domination.</span></p>
         <p><span class="text-info">Research and improve technologies</span> to gain an edge over your opponents. Trade with allies and build up huge fleets of ships.</p>
         <p>Will you conquer the galaxy?</p>
-        <p class="mt-5">You can play <span class="text-warning">Solaris</span> on any of the following platforms:</p>
+        <hr/>
+        <p>You can play <span class="text-warning">Solaris</span> on any of the following platforms:</p>
         <p>
           <a href="https://solaris.games" target="_blank" title="Web" class="me-2">
             <i class="fab fa-chrome"></i> Web

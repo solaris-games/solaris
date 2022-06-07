@@ -11,7 +11,7 @@
 
     <player-list @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 
-    <div class="menu-content bg-dark" v-if="menuState">
+    <div class="menu-content" v-if="menuState">
       <welcome v-if="menuState == MENU_STATES.WELCOME" @onCloseRequested="onCloseRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onViewSettingsRequested="onViewSettingsRequested"/>

@@ -26,11 +26,11 @@ export default {
   opacity: 1;
   animation-name: fadeInAnimation;
   animation-duration: 0.3s;
-  background-color: rgba(29,40,53,1);
+  background-color: rgba(29,40,53,.98);
 }
 
 .header-bar-bg {
-  background-color: rgba(29,40,53,1);
+  background-color: rgba(29,40,53,.98);
 }
 
 /* Scroll Bar */

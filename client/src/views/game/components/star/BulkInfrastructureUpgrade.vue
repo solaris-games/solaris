@@ -48,7 +48,7 @@
         </div>
         <div class="mb-2 col-4 ps-1">
           <div class="d-grid gap-2">
-            <button class="btn btn-info" v-on:click="check"
+            <button class="btn btn-outline-info" v-on:click="check"
               :disabled="$isHistoricalMode() || isUpgrading || isChecking || gameIsFinished()" ><i class="fas fa-hammer me-1"></i>Check</button>
           </div>
         </div>

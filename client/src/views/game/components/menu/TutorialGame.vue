@@ -33,10 +33,10 @@
                         <div class="row">
                             <div class="col"></div>
                             <div class="col-auto">
-                                <a href="https://discord.com/invite/v7PD33d" target="_blank" title="Discord" class="btn btn-info me-2">
+                                <a href="https://discord.com/invite/v7PD33d" target="_blank" title="Discord" class="btn btn-success me-2">
                                     <i class="fab fa-discord"></i> Discord
                                 </a>
-                                <a href="https://steamcommunity.com/app/1623930/discussions/" target="_blank" title="Forum" class="btn btn-primary me-2">
+                                <a href="https://steamcommunity.com/app/1623930/discussions/" target="_blank" title="Forum" class="btn btn-info me-2">
                                     <i class="far fa-comments"></i> Forum
                                 </a>
                             </div>
