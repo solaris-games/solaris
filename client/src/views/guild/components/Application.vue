@@ -6,7 +6,7 @@
       </router-link>
     </td>
     <td class="text-end">
-      <button class="btn btn-sm btn-success ms-1" v-if="!application.hasApplied" :disabled="isLoading" @click="apply()" title="Send application">
+      <button class="btn btn-sm btn-outline-success ms-1" v-if="!application.hasApplied" :disabled="isLoading" @click="apply()" title="Send application">
         <i class="fas fa-paper-plane"></i> Apply
       </button>
       <button class="btn btn-sm btn-danger ms-1" v-if="application.hasApplied" :disabled="isLoading" @click="withdraw()" title="Withdraw application">

@@ -40,9 +40,9 @@
     <sendRenown v-if="canSendRenown" :player="player" :userPlayer="userPlayer"
       @onRenownSent="onRenownSent"/>
 
-    <h4 class="mt-2" v-if="player && player.isRealUser">Badges</h4>
+    <h4 class="mt-2" v-if="canAwardBadge">Badges</h4>
 
-    <player-badges v-if="player && player.isRealUser" 
+    <player-badges v-if="canAwardBadge" 
       :playerId="player._id"
       @onOpenPurchasePlayerBadgeRequested="onOpenPurchasePlayerBadgeRequested"/>
 
@@ -187,6 +187,9 @@ export default {
       } else {
         return this.player && this.game.state.startDate && this.player.isRealUser && this.userPlayer && this.player != this.userPlayer
       }
+    },
+    canAwardBadge () {
+      return this.player && this.player.isRealUser && this.userPlayer && this.player != this.userPlayer
     }
   }
 }
