@@ -434,9 +434,9 @@ export default new Vuex.Store({
       commit('setStarSpecialists', responses[1].data)
     },
     async confirm ({ commit, state }, data) {
-      const modal = window.$('#confirmModal')
+      const modal = new bootstrap.Modal(window.$('#confirmModal'), {})
       const close = async () => {
-        modal.modal('toggle')
+        modal.toggle()
         await new Promise((resolve, reject) => setTimeout(resolve, 400));
       }
       return new Promise((resolve, reject) => {
@@ -456,7 +456,7 @@ export default new Vuex.Store({
           }
         }
         commit('setConfirmationDialogSettings', settings)
-        modal.modal('toggle')
+        modal.toggle()
       })
     }
   },
