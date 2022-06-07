@@ -24,13 +24,13 @@ class TextureService {
 
       this.CARRIER_TEXTURE = new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/128x128_carrier.svg')))
       this.DEFAULT_FONT_STYLE = new PIXI.TextStyle({
-        // fontFamily: `chakrapetch`,
+        fontFamily: `Chakra Petch,sans-serif;`,
         fill: 0xFFFFFF,
         padding: 3
       })
 
       this.DEFAULT_FONT_STYLE_BOLD = new PIXI.TextStyle({
-        // fontFamily: `chakrapetch`,
+        fontFamily: `Chakra Petch,sans-serif;`,
         fill: 0xFFFFFF,
         fontWeight: "bold",
         padding: 3
