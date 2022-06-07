@@ -29,8 +29,8 @@
             <li>How to win the game</li>
         </ul>
     
-        <div class="embed-responsive embed-responsive-16by9 mb-2">
-            <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/cnRXQMQ43Gs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <div class="ratio ratio-16x9 mb-2">
+            <iframe src="https://www.youtube.com/embed/cnRXQMQ43Gs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
 
         <p class="pb-2">
