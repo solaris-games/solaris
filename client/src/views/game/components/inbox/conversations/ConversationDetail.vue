@@ -17,7 +17,7 @@
       <button class="btn btn-sm btn-outline-warning ms-1" @click="leaveConversation" v-if="conversation.createdBy" title="Leave conversation"><i class="fas fa-sign-out-alt"></i></button>
     </menu-title>
 
-    <h5 v-if="conversation && toggleDisplay" class="menu-page-header-padding mb-0">{{conversation.name}}</h5>
+    <h5 v-if="conversation && toggleDisplay" class="menu-page-header-padding mb-0 mt-1">{{conversation.name}}</h5>
 
     <p v-if="!toggleDisplay" class="pb-0 mb-1 text-warning menu-page-header-padding">
       <small><i>Click the <i class="fas fa-eye-slash"></i> button to view the conversation.</i></small>
@@ -279,7 +279,7 @@ export default {
   }
 
   .menu-page-header-padding {
-    padding-top: 45px;
+    padding-top: 48px;
   }
 }
 </style>

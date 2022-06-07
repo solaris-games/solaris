@@ -265,7 +265,7 @@
               <modalButton v-if="canDestroyWarpGates && star.warpGate" 
                 :disabled="$isHistoricalMode() || isGameFinished" 
                 modalName="destroyWarpGateModal"
-                classText="btn btn-danger mb-2">
+                classText="btn btn-outline-danger mb-2">
                 <i class="fas fa-trash"></i>
                 Destroy Gate
               </modalButton>

@@ -1,5 +1,5 @@
 <template>
-<div class="container-fluid bg-dark pt-2 pb-2 footer-bar">
+<div class="container-fluid header-bar-bg pt-2 pb-2 footer-bar">
     <div class="row g-0">
         <div class="col" v-if="!userPlayer && gameIsJoinable">
           <button class="btn" v-on:click="setMenuState(MENU_STATES.WELCOME)">

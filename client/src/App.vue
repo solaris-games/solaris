@@ -43,4 +43,9 @@ export default {
 ::-webkit-scrollbar-thumb {
   background: #375a7f;
 }
+
+/* I dunno what this is all about but for some reason content inside cards has a high z-index and this causes popovers to appear underneath them. */
+.card>:not(.card-arrow):not(.card-img-overlay):not(.card-img):not(.hljs-container) {
+  z-index: 0 !important;
+}
 </style>

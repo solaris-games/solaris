@@ -72,7 +72,7 @@
       </div>
     </div>
 
-    <div v-if="hasChecked && upgradePreview && upgradePreview.stars.length" class="row">
+    <div v-if="hasChecked && upgradePreview && upgradePreview.stars.length" class="row mt-2">
       <!-- TODO: This should be a component -->
       <table class="table table-striped table-hover">
         <thead class="table-dark">

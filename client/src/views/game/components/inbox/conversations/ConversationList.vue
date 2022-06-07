@@ -5,7 +5,7 @@
   <div v-if="conversations">
     <div class="row">
       <div class="col">
-        <button class="btn btn-sm btn-outline-primary" @click="onRefreshClicked">Refresh <i class="fas fa-sync"></i></button>
+        <button class="btn btn-sm btn-outline-primary" @click="onRefreshClicked"><i class="fas fa-sync"></i> Refresh</button>
       </div>
       <div class="col-auto" v-if="canCreateConversation">
         <!-- <button class="btn btn-sm btn-primary" @click="markAllAsRead" v-if="getConversationsHasUnread()">Mark All Read</button> -->

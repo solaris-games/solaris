@@ -376,6 +376,7 @@ export default {
   position: fixed;
   height: 52px;
   bottom: 0px;
+  z-index: 1;
 }
 
 .menu {

@@ -81,11 +81,11 @@
           </button>
         </div>
         <div class="col-auto">
-          <button class="btn btn-success btn-sm" v-if="canEditWaypoints && carrier.waypoints.length > 1 && !carrier.waypointsLooped" @click="toggleWaypointsLooped()" :disabled="isLoopingWaypoints">
+          <button class="btn btn-outline-success btn-sm" v-if="canEditWaypoints && carrier.waypoints.length > 1 && !carrier.waypointsLooped" @click="toggleWaypointsLooped()" :disabled="isLoopingWaypoints">
             Loop
             <i class="fas fa-sync"></i>
           </button>
-          <button class="btn btn-danger  btn-sm ms-1" v-if="canEditWaypoints && carrier.waypoints.length > 1 && carrier.waypointsLooped" @click="toggleWaypointsLooped()" :disabled="isLoopingWaypoints">
+          <button class="btn btn-danger btn-sm ms-1" v-if="canEditWaypoints && carrier.waypoints.length > 1 && carrier.waypointsLooped" @click="toggleWaypointsLooped()" :disabled="isLoopingWaypoints">
             Unloop
             <i class="fas fa-map-marker-alt"></i>
           </button>

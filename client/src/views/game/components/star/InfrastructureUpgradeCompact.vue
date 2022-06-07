@@ -27,7 +27,7 @@
       <button v-if="canBuildWarpGates && !star.warpGate" :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished" class="btn btn-sm btn-primary me-1" title="Build a warp gate - Grants x3 speed between warp gates" @click="confirmBuildWarpGate">
         <i class="fas fa-dungeon me-1"></i>${{star.upgradeCosts.warpGate}}
       </button>
-      <button v-if="canDestroyWarpGates && star.warpGate" :disabled="$isHistoricalMode() || isGameFinished" class="btn btn-sm btn-danger me-1" @click="confirmDestroyWarpGate" title="Destroy the warp gate">
+      <button v-if="canDestroyWarpGates && star.warpGate" :disabled="$isHistoricalMode() || isGameFinished" class="btn btn-sm btn-outline-danger me-1" @click="confirmDestroyWarpGate" title="Destroy the warp gate">
         <i class="fas fa-dungeon"></i> <i class="fas fa-trash ms-1"></i>
       </button>
       <button :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.carriers || star.ships < 1 || isGameFinished" class="btn btn-sm btn-info" @click="onBuildCarrierRequested">

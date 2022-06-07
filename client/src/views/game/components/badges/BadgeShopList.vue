@@ -10,7 +10,7 @@
                 </button>
             </div>
             <div class="d-grid gap-2">
-                <router-link :to="{ name: 'galactic-credits-shop'}" class="btn btn-sm btn-danger" v-if="userCredits < badge.price">
+                <router-link :to="{ name: 'galactic-credits-shop'}" class="btn btn-sm btn-outline-danger" v-if="userCredits < badge.price">
                     <i class="fas fa-coins"></i> {{badge.price}} Credit<span v-if="badge.price > 1">s</span>
                 </router-link>
             </div>
