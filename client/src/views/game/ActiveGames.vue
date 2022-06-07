@@ -37,8 +37,8 @@
                     <br/>
                     <small>{{getGameTypeFriendlyText(game)}}</small>
                     <br/>
-                    <span v-if="game.userNotifications.defeated && !game.userNotifications.afk" class="ms-1 badge badge-danger">Defeated</span>
-                    <span v-if="!game.userNotifications.defeated && game.userNotifications.turnWaiting" class="ms-1 badge badge-danger">Turn Waiting</span>
+                    <span v-if="game.userNotifications.defeated && !game.userNotifications.afk" class="ms-1 badge bg-danger">Defeated</span>
+                    <span v-if="!game.userNotifications.defeated && game.userNotifications.turnWaiting" class="ms-1 badge bg-danger">Turn Waiting</span>
                     <span v-if="!game.userNotifications.defeated && game.userNotifications.unreadEvents" class="ms-1 badge bg-warning">{{game.userNotifications.unreadEvents}} Events</span>
                     <span v-if="game.userNotifications.unreadConversations" class="ms-1 badge bg-info">{{game.userNotifications.unreadConversations}} Messages</span>
                     <span v-if="game.userNotifications.afk" class="ms-1 badge bg-warning">AFK</span>
