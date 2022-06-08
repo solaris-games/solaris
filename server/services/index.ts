@@ -1,3 +1,5 @@
+import BasicAIService from "./basicAi";
+
 const bcrypt = require('bcrypt');
 
 import GameModel from '../db/models/Game';
@@ -169,7 +171,8 @@ export default (config, io): DependencyContainer => {
     const specialistHireService = new SpecialistHireService(gameRepository, specialistService, achievementService, waypointService, playerCreditsService, starService, gameTypeService, specialistBanService);
     const starUpgradeService = new StarUpgradeService(gameRepository, starService, carrierService, achievementService, researchService, technologyService, playerCreditsService, gameTypeService);
     const shipTransferService = new ShipTransferService(gameRepository, carrierService, starService);
-    const aiService = new AIService(starUpgradeService, carrierService, starService, distanceService, waypointService, combatService, shipTransferService, technologyService, playerService, reputationService, diplomacyService, playerStatisticsService);
+    const basicAiService = new BasicAIService(starUpgradeService);
+    const aiService = new AIService(starUpgradeService, carrierService, starService, distanceService, waypointService, combatService, shipTransferService, technologyService, playerService, reputationService, diplomacyService, playerStatisticsService, basicAiService);
     const historyService = new HistoryService(historyRepository, playerService, gameService, playerStatisticsService);
     const battleRoyaleService = new BattleRoyaleService(starService, carrierService, mapService, starDistanceService, waypointService, carrierMovementService);
     const orbitalMechanicsService = new OrbitalMechanicsService(mapService);
@@ -234,6 +237,7 @@ export default (config, io): DependencyContainer => {
         achievementService,
         conversationService,
         reputationService,
+        basicAiService,
         aiService,
         battleRoyaleService,
         orbitalMechanicsService,

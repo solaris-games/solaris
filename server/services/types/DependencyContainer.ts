@@ -64,6 +64,7 @@ import UserService from "../user";
 import WaypointService from "../waypoint";
 import NotificationService from "../notification";
 import DiscordService from "../discord";
+import BasicAIService from "../basicAi";
 
 export interface DependencyContainer {
     config: Config,
@@ -111,6 +112,7 @@ export interface DependencyContainer {
     achievementService: AchievementService,
     conversationService: ConversationService,
     reputationService: ReputationService,
+    basicAiService: BasicAIService,
     aiService: AIService,
     battleRoyaleService: BattleRoyaleService,
     orbitalMechanicsService: OrbitalMechanicsService,
