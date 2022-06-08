@@ -33,6 +33,8 @@ export const mapToGameJoinGameRequest = (body: any): GameJoinGameRequest => {
     if (errors.length) {
         throw new ValidationError(errors);
     }
+
+    body.avatar = +body.avatar;
     
     return {
         playerId: body.playerId,
@@ -49,8 +51,8 @@ export interface GameSaveNotesRequest {
 export const mapToGameSaveNotesRequest = (body: any): GameSaveNotesRequest => {
     let errors: string[] = [];
 
-    if (!keyHasStringValue(body, 'notes')) {
-        errors.push('Notes is required.');
+    if (!keyHasStringValue(body, 'notes', 0, 2000)) {
+        errors.push('Notes is required and must not be greater than 2000 characters.');
     }
 
     if (errors.length) {

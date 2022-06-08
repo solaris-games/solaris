@@ -1,11 +1,11 @@
 <template>
-<div class="container bg-primary pt-1" 
-  :class="{'bg-light': isAllPlayersConversation, 'bg-warning':conversation.unreadCount}"
+<div class="container pt-1" 
+  :class="{'bg-secondary': !isAllPlayersConversation, 'bg-primary': isAllPlayersConversation, 'bg-warning':conversation.unreadCount}"
     @click="openConversation">
     <div class="row pb-1">
         <div class="col">
           <span>
-              {{conversation.name}}
+              <strong>{{conversation.name}}</strong>
           </span>
         </div>
         <div class="col-auto player-icons" v-if="!isAllPlayersConversation">
@@ -14,7 +14,7 @@
           </small>
         </div>
         <div class="col-auto">
-          <small v-if="conversation.isMuted" title="This conversation is muted" class="mr-1">
+          <small v-if="conversation.isMuted" title="This conversation is muted" class="me-1">
             <i class="fas fa-bell-slash"></i>
           </small>
           <small v-if="!hasReadLastMessage && conversation.unreadCount">
@@ -28,7 +28,7 @@
         </div>
     </div>
     <!-- <div class="row mt-1" :style="{'background-color': colour}" style="height:6px;"></div> -->
-    <div class="row bg-secondary mt-0">
+    <div class="row bg-dark mt-0">
         <div class="col-12" v-if="hasLastMessage">
           <p class="mt-2 mb-2" :class="{'truncate':isTruncated}">
             <player-icon v-if="lastMessage.fromPlayerId" :playerId="lastMessageSender._id" />
@@ -36,7 +36,7 @@
           </p>
         </div>
         <div class="col-12" v-if="hasLastMessage">
-            <small class="float-right mb-2"><i>{{getDateString(conversation.lastMessage.sentDate)}}</i></small>
+            <small class="float-end mb-2"><i>{{getDateString(conversation.lastMessage.sentDate)}}</i></small>
         </div>
         <div class="col-12" v-if="!hasLastMessage">
             <p class="mt-2 mb-2">No messages.</p>

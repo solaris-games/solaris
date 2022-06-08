@@ -1,5 +1,5 @@
 <template>
-<div class="row bg-secondary pt-2 pb-2" v-if="selectedTechnology">
+<div class="row bg-dark pt-2 pb-2" v-if="selectedTechnology">
   <div class="col-12">
     <form-error-list v-bind:errors="errors"/>
   </div>
@@ -7,17 +7,17 @@
   <div class="col-12">
     <p class="mb-2">Share Technology. (Costs <span class="text-warning">${{getTradeCost()}}</span> per tech level)</p>
 
-    <form>
-      <div class="form-row">
-        <div class="col-7">
-          <select class="form-control" id="technologySelection" v-model="selectedTechnology" :disabled="!availableTechnologies.length">
-            <option v-for="opt in availableTechnologies" v-bind:key="opt.name + opt.level" v-bind:value="opt">
-              {{ getTechnologyFriendlyName(opt.name) }} {{opt.level}} (${{opt.cost}})
-            </option>
-          </select>
-        </div>
-        <div class="col-5">
-          <modalButton modalName="shareTechnologyModal" classText="btn btn-success btn-block" 
+    <form class="row">
+      <div class="col-7">
+        <select class="form-control" id="technologySelection" v-model="selectedTechnology" :disabled="!availableTechnologies.length">
+          <option v-for="opt in availableTechnologies" v-bind:key="opt.name + opt.level" v-bind:value="opt">
+            {{ getTechnologyFriendlyName(opt.name) }} {{opt.level}} (${{opt.cost}})
+          </option>
+        </select>
+      </div>
+      <div class="col-5">
+        <div class="d-grid gap-2">
+          <modalButton modalName="shareTechnologyModal" classText="btn btn-success" 
             :disabled="$isHistoricalMode() || isSendingTech || !availableTechnologies.length || selectedTechnology.cost > userPlayer.credits"><i class="fas fa-paper-plane"></i> Share</modalButton>
         </div>
       </div>

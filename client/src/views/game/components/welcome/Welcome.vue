@@ -1,13 +1,13 @@
 <template>
 <div class="menu-page container">
     <menu-title title="Welcome" @onCloseRequested="onCloseRequested">
-      <button title="View Settings" tag="button" class="btn btn-sm btn-primary" @click="onViewSettingsRequested"><i class="fas fa-cog"></i></button>
+      <button title="View Settings" tag="button" class="btn btn-sm btn-outline-primary" @click="onViewSettingsRequested"><i class="fas fa-cog"></i></button>
     </menu-title>
 
     <div class="row bg-info" v-if="game.settings.general.flux" title="This Game's Flux">
       <div class="col text-center">
-        <!-- <p class="mt-2 mb-2"><small><i class="fas fa-dice-d20 mr-1"></i><strong>{{game.settings.general.flux.name}}</strong> - {{game.settings.general.flux.description}} <help-tooltip v-if="game.settings.general.flux.tooltip" :tooltip="game.settings.general.flux.tooltip"/></small></p> -->
-        <p class="mt-2 mb-2"><small><i class="fas fa-dice-d20 mr-1"></i>{{game.settings.general.flux.description}} <help-tooltip v-if="game.settings.general.flux.tooltip" :tooltip="game.settings.general.flux.tooltip"/></small></p>
+        <!-- <p class="mt-2 mb-2"><small><i class="fas fa-dice-d20 me-1"></i><strong>{{game.settings.general.flux.name}}</strong> - {{game.settings.general.flux.description}} <help-tooltip v-if="game.settings.general.flux.tooltip" :tooltip="game.settings.general.flux.tooltip"/></small></p> -->
+        <p class="mt-2 mb-2"><small><i class="fas fa-dice-d20 me-1"></i>{{game.settings.general.flux.description}} <help-tooltip v-if="game.settings.general.flux.tooltip" :tooltip="game.settings.general.flux.tooltip"/></small></p>
       </div>
     </div>
 
@@ -21,6 +21,8 @@
 
     <select-colour v-if="!isJoiningGame" v-on:onJoinRequested="onJoinRequested" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 
+    <new-player-message />
+
     <share-link message="Invite your friends and take on the Galaxy together!"/>
 </div>
 </template>
@@ -33,6 +35,7 @@ import FormErrorListVue from '../../../components/FormErrorList'
 import SelectAliasVue from './SelectAlias.vue'
 import EnterPasswordVue from './EnterPassword.vue'
 import SelectColourVue from './SelectColour.vue'
+import NewPlayerMessageVue from './NewPlayerMessage'
 import ShareLinkVue from './ShareLink.vue'
 
 export default {
@@ -43,6 +46,7 @@ export default {
     'select-alias': SelectAliasVue,
     'enter-password': EnterPasswordVue,
     'select-colour': SelectColourVue,
+    'new-player-message': NewPlayerMessageVue,
     'share-link': ShareLinkVue
   },
   data () {

@@ -1,6 +1,6 @@
 <template>
 <div>
-    <div class="row bg-secondary pt-2 pb-0 mb-1" v-if="carrier">
+    <div class="row bg-dark pt-2 pb-2 mb-1" v-if="carrier">
         <div class="col">
             <p class="mb-2">
                 Convert this Carrier into a gift.

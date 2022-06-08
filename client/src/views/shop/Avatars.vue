@@ -17,16 +17,16 @@
         <div class="col">
           <div class="row">
             <div class="col">
-              <h5>{{avatar.name}}<span class="badge badge-success ml-2" v-if="avatar.isPatronAvatar"><i class="fas fa-handshake"></i> Patron Avatar</span></h5>
+              <h5>{{avatar.name}}<span class="badge bg-success ms-2" v-if="avatar.isPatronAvatar"><i class="fas fa-handshake"></i> Patron Avatar</span></h5>
             </div>
             <div class="col-auto">
               <button class="btn btn-sm btn-success" v-if="!avatar.purchased && userCredits.credits >= avatar.price" @click="purchaseAvatar(avatar)">
                 <i class="fas fa-shopping-basket"></i> {{avatar.price}} Credit<span v-if="avatar.price > 1">s</span>
               </button>
-              <router-link :to="{ name: 'galactic-credits-shop'}" class="btn btn-sm btn-danger" v-if="!avatar.purchased && userCredits.credits < avatar.price">
+              <router-link :to="{ name: 'galactic-credits-shop'}" class="btn btn-sm btn-outline-danger" v-if="!avatar.purchased && userCredits.credits < avatar.price">
                 <i class="fas fa-coins"></i> {{avatar.price}} Credit<span v-if="avatar.price > 1">s</span>
               </router-link>
-              <h5><span class="badge badge-primary" v-if="avatar.purchased"><i class="fas fa-check"></i> Unlocked</span></h5>
+              <h5><span class="badge bg-primary" v-if="avatar.purchased"><i class="fas fa-check"></i> Unlocked</span></h5>
             </div>
             <div class="col-12">
               <p><small class="linebreaks">{{avatar.description}}</small></p>

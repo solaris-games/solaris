@@ -29,9 +29,24 @@ export default new Vuex.Store({
   mutations: {
     // Menu
     setMenuState (state, menuState) {
+      menuState.state = menuState.state || null
+      menuState.args = menuState.args || null
+
+      // Toggle menu if its already open.
+      if (menuState.state === state.menuState && menuState.args === state.menuArguments) {
+        state.menuArguments = null
+        state.menuState = null
+      } else {
+        state.menuArguments = menuState.args
+        state.menuState = menuState.state
+      }
+
       eventBus.$emit('onMenuRequested', menuState)
     },
     clearMenuState (state) {
+      state.menuState = null
+      state.menuArguments = null
+
       eventBus.$emit('onMenuRequested', {
         state: null,
         args: null
@@ -48,6 +63,15 @@ export default new Vuex.Store({
     clearMenuStateChat (state) {
       state.menuStateChat = null
       state.menuArgumentsChat = null
+    },
+    // -------
+
+    // TUTORIAL
+    setTutorialPage (state, page) {
+      state.tutorialPage = page || 0
+    },
+    clearTutorialPage (state) {
+      state.tutorialPage = 0
     },
     // -------
 
@@ -410,9 +434,9 @@ export default new Vuex.Store({
       commit('setStarSpecialists', responses[1].data)
     },
     async confirm ({ commit, state }, data) {
-      const modal = window.$('#confirmModal')
+      const modal = new bootstrap.Modal(window.$('#confirmModal'), {})
       const close = async () => {
-        modal.modal('toggle')
+        modal.toggle()
         await new Promise((resolve, reject) => setTimeout(resolve, 400));
       }
       return new Promise((resolve, reject) => {
@@ -420,6 +444,7 @@ export default new Vuex.Store({
           confirmText: data.confirmText || 'Yes',
           cancelText: data.cancelText || 'No',
           hideCancelButton: Boolean(data.hideCancelButton),
+          cover: Boolean(data.cover),
           titleText: data.titleText,
           text: data.text,
           onConfirm: async () => {
@@ -432,7 +457,7 @@ export default new Vuex.Store({
           }
         }
         commit('setConfirmationDialogSettings', settings)
-        modal.modal('toggle')
+        modal.toggle()
       })
     }
   },

@@ -7,6 +7,7 @@ const schema = new Schema({
     guildId: { type: Types.ObjectId, default: null },
     email: { type: Types.String, required: true },
     emailEnabled: { type: Types.Boolean, default: true },
+    emailOtherEnabled: { type: Types.Boolean, default: true },
     password: { type: Types.String, required: false, default: null },
     resetPasswordToken: { type: Types.String, required: false, default: null },
     credits: { type: Types.Number, default: 0 },
@@ -15,6 +16,7 @@ const schema = new Schema({
     lastSeen: { type: Types.Date, required: false, default: null },
     lastSeenIP: { type: Types.String, required: false, default: null },
     isEstablishedPlayer: { type: Types.Boolean, required: true, default: false },
+    hasSentReviewReminder: { type: Types.Boolean, required: true, default: false },
     roles: {
         administrator: { type: Types.Boolean, default: false },
         contributor: { type: Types.Boolean, default: false },
@@ -104,7 +106,7 @@ const schema = new Schema({
             displayGuildTag: { type: Types.String, required: false, enum: ['visible', 'hidden'], default: 'visible' },
         },
         map: {
-            naturalResources: { type: Types.String, required: false, enum: ['planets', 'single-ring'], default: 'planets' },
+            naturalResources: { type: Types.String, required: false, enum: ['planets', 'single-ring'], default: 'single-ring' },
             carrierLoopStyle: { type: Types.String, required: false, enum: ['solid', 'dashed'], default: 'dashed' },
             carrierPathWidth: { type: Types.Number, required: false, default: 1, min: 1, max: 8 },
             carrierPathDashLength: { type: Types.Number, required: false, default: 6, min: 4, max: 16 },

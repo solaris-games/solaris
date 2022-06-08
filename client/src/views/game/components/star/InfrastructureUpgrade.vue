@@ -1,22 +1,28 @@
 <template>
     <div class="row">
-        <div class="col text-center bg-secondary pt-2 pb-2">
-            <button class="btn btn-block"
+        <div class="col text-center  pt-2 pb-2">
+          <div class="d-grid gap-2">
+            <button class="btn"
               :class="{'btn-success': availableCredits >= economy, 'btn-secondary': availableCredits < economy}"
               :disabled="$isHistoricalMode() || isUpgradingEconomy || availableCredits < economy || isGameFinished"
               @click="upgradeEconomy"><small>Buy for ${{economy}}</small></button>
+          </div>
         </div>
-        <div class="col text-center bg-primary pt-2 pb-2">
-            <button class="btn btn-block"
+        <div class="col text-center bg-dark pt-2 pb-2">
+          <div class="d-grid gap-2">
+            <button class="btn"
               :class="{'btn-success': availableCredits >= industry, 'btn-secondary': availableCredits < industry}"
               :disabled="$isHistoricalMode() || isUpgradingIndustry || availableCredits < industry || isGameFinished"
               @click="upgradeIndustry"><small>Buy for ${{industry}}</small></button>
+          </div>
         </div>
-        <div class="col text-center bg-secondary pt-2 pb-2">
-            <button class="btn btn-block"
+        <div class="col text-center  pt-2 pb-2">
+          <div class="d-grid gap-2">
+            <button class="btn"
               :class="{'btn-success': availableCredits >= science, 'btn-secondary': availableCredits < science}"
               :disabled="$isHistoricalMode() || isUpgradingScience || availableCredits < science || isGameFinished"
               @click="upgradeScience"><small>Buy for ${{science}}</small></button>
+          </div>
         </div>
     </div>
 </template>

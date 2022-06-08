@@ -51,6 +51,7 @@ export interface User {
     guildId: DBObjectId | null;
     email: string;
     emailEnabled: boolean;
+    emailOtherEnabled: boolean;
     password: string | null;
     resetPasswordToken: string | null;
     credits: number;
@@ -59,6 +60,7 @@ export interface User {
     lastSeen: Date | null;
     lastSeenIP: string | null;
     isEstablishedPlayer: boolean;
+    hasSentReviewReminder: boolean;
     roles: UserRoles,
     achievements: {
         victories: number;

@@ -24,6 +24,8 @@ export const mapToAdminSetUserCreditsRequest = (body: any): AdminSetUserCreditsR
         throw new ValidationError(`Credits is required.`);
     }
 
+    body.credits = +body.credits;
+
     return {
         credits: body.credits
     }

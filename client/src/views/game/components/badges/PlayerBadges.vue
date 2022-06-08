@@ -2,21 +2,21 @@
 <div>
     <loading-spinner :loading="isLoading" />
 
-    <div class="row bg-primary" v-if="isExtraAnonymity && (!isLoading || !userHasBadges)">
-        <div v-if="!userHasBadges" class="col text-center pt-3">
-            <p class="mb-3"><small>Badges are hidden in anonymous games but you can still award a badge to this player.</small></p>
-        </div>
-    </div>
-
-    <div class="row bg-primary" v-if="isNormalAnonymity && (!isLoading || !userHasBadges)">
+    <div class="row" v-if="isNormalAnonymity && (!isLoading || !userHasBadges)">
         <div v-if="!userHasBadges" class="col text-center pt-3">
             <p class="mb-3">This player has no badges.</p>
         </div>
     </div>
 
-    <div class="row bg-secondary" v-if="!isLoading && userPlayer && playerId !== userPlayer._id">
+    <div class="row bg-dark" v-if="!isLoading && userPlayer && playerId !== userPlayer._id">
         <div class="col text-center pt-3">
-            <p class="mb-3">Buy this player a <a href="javascript:;" @click="onOpenPurchasePlayerBadgeRequested">Badge of Honor</a>.</p>
+            <p class="mb-3">Buy this player a <a href="javascript:;" @click="onOpenPurchasePlayerBadgeRequested">Badge of Honor<i class="fas fa-medal ms-1"></i></a></p>
+        </div>
+    </div>
+
+    <div class="row" v-if="isExtraAnonymity && (!isLoading || !userHasBadges)">
+        <div v-if="!userHasBadges" class="col text-center pt-3">
+            <p class="mb-3"><small>Badges are hidden in anonymous games but you can still award a badge to this player.</small></p>
         </div>
     </div>
 

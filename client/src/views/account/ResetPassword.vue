@@ -3,17 +3,17 @@
     <view-title title="Reset Password" />
 
     <form @submit.prevent="handleSubmit">
-      <div class="form-group">
+      <div class="mb-2">
         <label for="currentPassword">Current Password</label>
         <input type="password" required="required" name="currentPassword" class="form-control" v-model="currentPassword" :disabled="isLoading">
       </div>
 
-      <div class="form-group">
+      <div class="mb-2">
         <label for="newPassword">New Password</label>
         <input type="password" required="required" name="newPassword" class="form-control" v-model="newPassword" :disabled="isLoading">
       </div>
 
-      <div class="form-group">
+      <div class="mb-2">
         <label for="newPasswordConfirm">Confirm New Password</label>
         <input type="password" required="required" name="newPasswordConfirm" class="form-control" v-model="newPasswordConfirm" :disabled="isLoading">
       </div>
@@ -22,7 +22,7 @@
 
       <div>
         <button type="submit" class="btn btn-success" :disabled="isLoading">Change Password</button>
-        <router-link to="/account/settings" tag="button" class="btn btn-danger float-right">Cancel</router-link>
+        <router-link to="/account/settings" tag="button" class="btn btn-danger float-end">Cancel</router-link>
       </div>
     </form>
 

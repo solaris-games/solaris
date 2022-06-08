@@ -4,13 +4,13 @@
     <td><a href="javascript:;" @click="clickCarrier">{{carrier.name}}</a></td>
     <td><a href="javascript:;" @click="goToCarrier"><i class="far fa-eye"></i></a></td>
     <td><specialist-icon :type="'carrier'" :defaultIcon="'rocket'" :specialist="carrier.specialist" :hideDefaultIcon="true"></specialist-icon></td>
-    <td class="text-right">{{carrier.ships == null ? '???' : carrier.ships}}</td>
-    <td class="text-right" :class="{'text-warning':carrier.waypointsLooped}" :title="carrier.waypointsLooped?'Looped':'Unlooped'">{{carrier.waypoints.length}}</td>
+    <td class="text-end">{{carrier.ships == null ? '???' : carrier.ships}}</td>
+    <td class="text-end" :class="{'text-warning':carrier.waypointsLooped}" :title="carrier.waypointsLooped?'Looped':'Unlooped'">{{carrier.waypoints.length}}</td>
     <!-- <td><i class="fas fa-sync" v-if="carrier.waypointsLooped"></i></td> -->
-    <td class="text-right">
+    <td class="text-end">
       <span class="text-small" v-if="carrier.waypoints.length" :title="timeRemainingEtaActual">{{timeRemainingEta}}</span>
     </td>
-    <td class="text-right text-muted">
+    <td class="text-end text-muted">
       <span v-if="carrier.waypoints.length" class="text-small" :title="timeRemainingEtaTotalActual">{{timeRemainingEtaTotal}}</span>
     </td>
 </tr>
@@ -41,7 +41,7 @@ export default {
     this.recalculateTimeRemaining()
 
     if (GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)) {
-      this.intervalFunction = setInterval(this.recalculateTimeRemaining, 1000)
+      this.intervalFunction = setInterval(this.recalculateTimeRemaining, 250)
       this.recalculateTimeRemaining()
     }
   },

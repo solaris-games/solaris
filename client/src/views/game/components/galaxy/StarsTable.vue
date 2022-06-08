@@ -1,17 +1,17 @@
 <template>
 <div class="container">
-  <div class="row mb-2 no-gutters">
+  <div class="row mb-2 g-0">
     <div class="col-auto">
       <button class="btn btn-sm" :class="{ 'btn-danger': !showAll, 'btn-success': showAll }" @click="toggleShowAll">
         <span v-if="!showAll">Show All</span>
         <span v-if="showAll">Show Yours</span>
       </button>
     </div>
-    <div class="col ml-2 mr-2">
+    <div class="col ms-2 me-2">
       <input type="text" class="form-control form-control-sm" v-model="searchFilter" placeholder="Search...">
     </div>
     <div class="col-auto pt-1" v-if="!isGameFinished">
-      <input class="mr-1" type="checkbox" v-model="allowUpgrades" id="chkEnableUpgrades">
+      <input class="me-1" type="checkbox" v-model="allowUpgrades" id="chkEnableUpgrades">
       <label for="chkEnableUpgrades">
         Upgrades
       </label>
@@ -21,25 +21,25 @@
   <div class="row">
     <div class="table-responsive">
       <table class="table table-striped table-hover mb-0">
-          <thead>
-              <tr class="bg-primary">
+          <thead class="table-dark">
+              <tr>
                   <td><i class="fas fa-user"></i></td>
                   <td><a href="javascript:;" @click="sort(['ships'])">Name</a></td>
                   <td></td>
                   <td></td>
-                  <td class="text-right">
+                  <td class="text-end">
                     <span class="infrastructure-filters">
-                      <a href="javascript:;" @click="sort(['infrastructure','economy'])"><i class="fas fa-money-bill-wave mr-2"></i></a>
-                      <a href="javascript:;" @click="sort(['infrastructure','industry'])"><i class="fas fa-tools mr-2"></i></a>
+                      <a href="javascript:;" @click="sort(['infrastructure','economy'])"><i class="fas fa-money-bill-wave me-2"></i></a>
+                      <a href="javascript:;" @click="sort(['infrastructure','industry'])"><i class="fas fa-tools me-2"></i></a>
                       <a href="javascript:;" @click="sort(['infrastructure','science'])"><i class="fas fa-flask"></i></a>
                     </span>
                   </td>
-                  <!-- <td class="text-right"><a href="javascript:;" @click="sort(['infrastructure','economy'])"><i class="fas fa-money-bill-wave"></i></a></td>
-                  <td class="text-right"><a href="javascript:;" @click="sort(['infrastructure','industry'])"><i class="fas fa-tools"></i></a></td>
-                  <td class="text-right"><a href="javascript:;" @click="sort(['infrastructure','science'])"><i class="fas fa-flask"></i></a></td> -->
-                  <td class="text-right"><a href="javascript:;" @click="sort(['upgradeCosts','economy'])">$E</a></td>
-                  <td class="text-right"><a href="javascript:;" @click="sort(['upgradeCosts','industry'])">$I</a></td>
-                  <td class="text-right"><a href="javascript:;" @click="sort(['upgradeCosts','science'])">$S</a></td>
+                  <!-- <td class="text-end"><a href="javascript:;" @click="sort(['infrastructure','economy'])"><i class="fas fa-money-bill-wave"></i></a></td>
+                  <td class="text-end"><a href="javascript:;" @click="sort(['infrastructure','industry'])"><i class="fas fa-tools"></i></a></td>
+                  <td class="text-end"><a href="javascript:;" @click="sort(['infrastructure','science'])"><i class="fas fa-flask"></i></a></td> -->
+                  <td class="text-end"><a href="javascript:;" @click="sort(['upgradeCosts','economy'])">$E</a></td>
+                  <td class="text-end"><a href="javascript:;" @click="sort(['upgradeCosts','industry'])">$I</a></td>
+                  <td class="text-end"><a href="javascript:;" @click="sort(['upgradeCosts','science'])">$S</a></td>
               </tr>
           </thead>
           <tbody>

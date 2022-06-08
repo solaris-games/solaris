@@ -2,10 +2,10 @@ export const keyExists = (obj: any, key: string) => {
     return obj[key] != null;
 };
 
-export const keyHasStringValue = (obj: any, key: string) => {
+export const keyHasStringValue = (obj: any, key: string, minLength: number = 1, maxLength: number | null = null) => {
     const value = obj[key];
 
-    return value != null && (typeof value === 'string' || value instanceof String) && value.length;
+    return value != null && (typeof value === 'string' || value instanceof String) && value.length >= minLength && (maxLength == null || value.length <= maxLength);
 };
 
 export const keyHasNumberValue = (obj: any, key: string) => {

@@ -1,5 +1,5 @@
 <template>
-  <div class="row bg-primary" v-if="player && player.reputation">
+  <div class="row" v-if="player && player.reputation">
     <div class="col">
       <p class="mb-1">
         <small>

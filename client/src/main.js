@@ -7,9 +7,6 @@ import router from './router'
 import store from './store'
 
 import $ from 'jquery'
-import 'bootstrap'
-import 'bootswatch/dist/darkly/bootstrap.min.css'
-
 import 'pixi.js-legacy'
 import 'pixi-viewport'
 
@@ -39,13 +36,14 @@ Vue.use(Toasted, {
   duration: 2500
 })
 
-Vue.prototype.$confirm = async function(title, text, confirmText = 'Yes', cancelText = 'No', hideCancelButton = false) {
+Vue.prototype.$confirm = async function(title, text, confirmText = 'Yes', cancelText = 'No', hideCancelButton = false, cover = false) {
   return this.$store.dispatch('confirm', {
     titleText: title,
     text,
     confirmText,
     cancelText,
-    hideCancelButton
+    hideCancelButton,
+    cover
   })
 }
 
@@ -58,7 +56,7 @@ Vue.prototype.$isMobile = function () {
 }
 
 Vue.directive('tooltip', function(el, binding) {
-  $(el).tooltip({
+  new bootstrap.Tooltip($(el), {
     title: binding.value,
     placement: binding.arg,
     trigger: 'hover'

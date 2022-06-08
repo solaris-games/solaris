@@ -1,10 +1,10 @@
 <template>
   <form @submit.prevent="handleSubmit">
-    <div class="form-group" v-if="!isLoading">
+    <div class="mb-2" v-if="!isLoading">
         <input type="text" required="required" class="form-control" placeholder="Email" v-model="email" :disabled="isLoading"/>
     </div>
 
-    <div class="form-group" v-if="!isLoading">
+    <div class="mb-2" v-if="!isLoading">
         <input type="password" required="required" class="form-control" placeholder="Password" v-model="password"  :disabled="isLoading"/>
     </div>
 
@@ -12,24 +12,28 @@
 
     <form-error-list v-bind:errors="errors"/>
 
-    <div class="form-group">
+    <div class="mb-2">
       <div class="row">
         <div class="col-6">
-          <button type="submit" class="btn btn-success btn-block" :disabled="isLoading">
-            Login
-            <i class="fas fa-sign-in-alt"></i>
-          </button>
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-success" :disabled="isLoading">
+              Login
+              <i class="fas fa-sign-in-alt"></i>
+            </button>
+          </div>
         </div>
         <div class="col-6">
-          <router-link to="/account/create" tag="button" class="btn btn-primary btn-block" :disabled="isLoading">
-            Register
-            <i class="fas fa-arrow-right"></i>
-          </router-link>
+          <div class="d-grid gap-2">
+            <router-link to="/account/create" tag="button" class="btn btn-primary" :disabled="isLoading">
+              Register
+              <i class="fas fa-arrow-right"></i>
+            </router-link>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="form-group">
+    <div class="mb-2">
       Forgot <router-link to="/account/forgot-password">Password</router-link>/<router-link to="/account/forgot-username">Username</router-link>?
     </div>
   </form>

@@ -1,7 +1,7 @@
 <template>
     <tr>
         <td>{{title}} <help-tooltip :tooltip="tooltip"/></td>
-        <td class="text-right" :class="{'text-warning': value !== compareValue}">{{valueText}}</td>
+        <td class="text-end" :class="{'text-warning': value !== compareValue}">{{valueText}}</td>
     </tr>
 </template>
 

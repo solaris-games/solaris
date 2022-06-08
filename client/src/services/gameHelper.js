@@ -53,6 +53,12 @@ class GameHelper {
     return game.galaxy.players.find(x => x._id === carrier.ownedByPlayerId)
   }
 
+  isOwnedByUserPlayer (game, carrierOrStar) {
+    const userPlayer = this.getUserPlayer(game)
+
+    return userPlayer && carrierOrStar.ownedByPlayerId === userPlayer._id
+  }
+
   getCarrierOrbitingStar (game, carrier) {
     return game.galaxy.stars.find(x => x._id === carrier.orbiting)
   }
@@ -477,6 +483,10 @@ class GameHelper {
 
   isGamePaused (game) {
     return game.state.paused
+  }
+
+  isGameNotStarted (game) {
+    return !game.state.startDate
   }
 
   isGameInProgress (game) {

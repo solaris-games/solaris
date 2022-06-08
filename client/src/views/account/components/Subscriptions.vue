@@ -12,7 +12,7 @@
             <div v-if="subscriptions.discord">
                 <h5 class="pt-2">Discord</h5>
                 
-                <div class="row bg-secondary pt-1 pb-1">
+                <div class="row pt-1 pb-1">
                     <label for="gameStarted" class="col-12 col-sm-6 col-form-label">Game - Started</label>
                     <div class="col-12 col-sm-6">
                         <select class="form-control" id="gameStarted" v-model="subscriptions.discord.gameStarted" :disabled="isSaving">
@@ -22,7 +22,7 @@
                     </div>
                 </div>
                 
-                <div class="row bg-secondary pt-1 pb-1">
+                <div class="row pt-1 pb-1">
                     <label for="gameEnded" class="col-12 col-sm-6 col-form-label">Game - Finished</label>
                     <div class="col-12 col-sm-6">
                         <select class="form-control" id="gameEnded" v-model="subscriptions.discord.gameEnded" :disabled="isSaving">
@@ -32,7 +32,7 @@
                     </div>
                 </div>
                 
-                <div class="row bg-secondary pt-1 pb-1">
+                <div class="row pt-1 pb-1">
                     <label for="playerGalacticCycleComplete" class="col-12 col-sm-6 col-form-label">Game - Galactic Cycle Completed</label>
                     <div class="col-12 col-sm-6">
                         <select class="form-control" id="playerGalacticCycleComplete" v-model="subscriptions.discord.playerGalacticCycleComplete" :disabled="isSaving">
@@ -42,7 +42,7 @@
                     </div>
                 </div>
                 
-                <div class="row bg-secondary pt-1 pb-1">
+                <div class="row pt-1 pb-1">
                     <label for="playerRenownReceived" class="col-12 col-sm-6 col-form-label">Game - Renown Received</label>
                     <div class="col-12 col-sm-6">
                         <select class="form-control" id="playerRenownReceived" v-model="subscriptions.discord.playerRenownReceived" :disabled="isSaving">
@@ -52,7 +52,7 @@
                     </div>
                 </div>
                 
-                <div class="row bg-secondary pt-1 pb-1">
+                <div class="row pt-1 pb-1">
                     <label for="playerResearchComplete" class="col-12 col-sm-6 col-form-label">Game - Research Completed</label>
                     <div class="col-12 col-sm-6">
                         <select class="form-control" id="playerResearchComplete" v-model="subscriptions.discord.playerResearchComplete" :disabled="isSaving">
@@ -62,7 +62,7 @@
                     </div>
                 </div>
                 
-                <div class="row bg-secondary pt-1 pb-1">
+                <div class="row pt-1 pb-1">
                     <label for="playerTechnologyReceived" class="col-12 col-sm-6 col-form-label">Trade - Technology Received</label>
                     <div class="col-12 col-sm-6">
                         <select class="form-control" id="playerTechnologyReceived" v-model="subscriptions.discord.playerTechnologyReceived" :disabled="isSaving">
@@ -72,7 +72,7 @@
                     </div>
                 </div>
                 
-                <div class="row bg-secondary pt-1 pb-1">
+                <div class="row pt-1 pb-1">
                     <label for="playerCreditsReceived" class="col-12 col-sm-6 col-form-label">Trade - Credits Received</label>
                     <div class="col-12 col-sm-6">
                         <select class="form-control" id="playerCreditsReceived" v-model="subscriptions.discord.playerCreditsReceived" :disabled="isSaving">
@@ -82,7 +82,7 @@
                     </div>
                 </div>
                 
-                <div class="row bg-secondary pt-1 pb-1">
+                <div class="row pt-1 pb-1">
                     <label for="playerCreditsSpecialistsReceived" class="col-12 col-sm-6 col-form-label">Trade - Specialist Tokens Received</label>
                     <div class="col-12 col-sm-6">
                         <select class="form-control" id="playerCreditsSpecialistsReceived" v-model="subscriptions.discord.playerCreditsSpecialistsReceived" :disabled="isSaving">
@@ -92,7 +92,7 @@
                     </div>
                 </div>
                 
-                <div class="row bg-secondary pt-1 pb-1">
+                <div class="row pt-1 pb-1">
                     <label for="conversationMessageSent" class="col-12 col-sm-6 col-form-label">Diplomacy - Message Received</label>
                     <div class="col-12 col-sm-6">
                         <select class="form-control" id="conversationMessageSent" v-model="subscriptions.discord.conversationMessageSent" :disabled="isSaving">

@@ -5,11 +5,11 @@
   <small class="text-warning">Improve your ELO by participating in 1v1's</small>
   <div class="table-responsive mt-2">
     <table class="table table-striped table-hover leaderboard-table">
-      <thead>
+      <thead class="table-dark">
         <th style="width: 5%">#</th>
         <th style="width: 30%">Player</th>
         <th style="width: 30%" class="d-none d-md-table-cell">Guild</th>
-        <th style="width: 10%" class="text-right sortable-header col">ELO</th>
+        <th style="width: 10%" class="text-end sortable-header col">ELO</th>
       </thead>
       <tbody>
         <tr v-for="player of leaderboard" :key="player._id" :class="{'bg-primary':$store.state.userId === player._id}">
@@ -18,10 +18,10 @@
               <router-link :to="{ name: 'account-achievements', params: { userId: player._id }}">
                   <span>{{player.username}}</span>
               </router-link>
-              <i class="fas fa-hands-helping ml-1" title="This player is a contributor" v-if="player.roles && player.roles.contributor"></i>
-              <i class="fas fa-code ml-1" title="This player is an active developer" v-if="player.roles && player.roles.developer"></i>
-              <i class="fas fa-user-friends ml-1" title="This player is an active community manager" v-if="player.roles && player.roles.communityManager"></i>
-              <i class="fas fa-dice ml-1" title="This player is an active game master" v-if="player.roles && player.roles.gameMaster"></i>
+              <i class="fas fa-hands-helping ms-1" title="This player is a contributor" v-if="player.roles && player.roles.contributor"></i>
+              <i class="fas fa-code ms-1" title="This player is an active developer" v-if="player.roles && player.roles.developer"></i>
+              <i class="fas fa-user-friends ms-1" title="This player is an active community manager" v-if="player.roles && player.roles.communityManager"></i>
+              <i class="fas fa-dice ms-1" title="This player is an active game master" v-if="player.roles && player.roles.gameMaster"></i>
           </td>
           <td class="d-none d-md-table-cell">
             <router-link v-if="player.guild" :to="{ name: 'guild-details', params: { guildId: player.guild._id }}">

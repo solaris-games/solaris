@@ -2,10 +2,10 @@
   <view-container>
     <view-title title="Main Menu" :hideHomeButton="true" :showSocialLinks="true"/>
 
-    <div class="row pb-0">
+    <div class="row pb-0 achievements">
       <div class="col-sm-12 col-md-6 col-lg-5">
         <p class="mb-1">A space strategy game filled with conquest, betrayal and subterfuge.</p>
-        <p><small><span class="text-warning">Solaris</span> is available on <a href="https://solaris.games" target="_blank" title="Web">Web</a>, <a href="https://store.steampowered.com/app/1623930/Solaris/" target="_blank" title="Steam">Steam</a> and <a href="https://play.google.com/store/apps/details?id=com.voxel.solaris_android" target="_blank" title="Android">Android</a>.</small></p>
+        <p class="mb-2 mt-2"><small>Play <span class="text-warning">Solaris</span> on <a href="https://solaris.games" target="_blank" title="Web"><i class="fab fa-chrome me-1"></i>Web</a>, <a href="https://store.steampowered.com/app/1623930/Solaris/" target="_blank" title="Steam"><i class="fab fa-steam me-1"></i>Steam</a> and <a href="https://play.google.com/store/apps/details?id=com.voxel.solaris_android" target="_blank" title="Android"><i class="fab fa-google-play me-1"></i>Android</a>.</small></p>
       </div>
       <div class="col-sm-12 col-md-6 col-lg-7">
         <!-- player quick stats -->
@@ -14,59 +14,89 @@
       </div>
     </div>
 
-    <div class="row no-gutters pb-0">
-      <div class="col-sm-12 col-md-6 col-lg-6 pr-1">
-        <div class="card bg-dark text-white" @click="routeToPath('/game/active-games')">
+    <div class="row pb-0 pt-3">
+      <div class="col-sm-12 col-md-6 col-lg-6">
+        <div class="card bg-dark text-white p-1" @click="routeToPath('/game/active-games')">
           <img class="card-img" :src="require('../assets/screenshots/home-1.png')" alt="View my games">
           <div class="card-img-overlay">
             <h5 class="card-title">
               <i class="fas fa-user"></i> 
-              <span class="ml-2">My Games</span>
+              <span class="ms-2">My Games</span>
             </h5>
+          </div>
+          <div class="card-arrow">
+            <div class="card-arrow-top-left"></div>
+            <div class="card-arrow-top-right"></div>
+            <div class="card-arrow-bottom-left"></div>
+            <div class="card-arrow-bottom-right"></div>
           </div>
         </div>
       </div>
-      <div class="col-sm-12 col-md-6 col-lg-6 pl-1" @click="routeToPath('/game/list')">
-        <div class="card bg-dark text-white">
+      <div class="col-sm-12 col-md-6 col-lg-6" @click="routeToPath('/game/list')">
+        <div class="card bg-dark text-white p-1">
           <img class="card-img" :src="require('../assets/screenshots/home-2.png')" alt="Join a game">
           <div class="card-img-overlay">
             <h5 class="card-title">
               <i class="fas fa-gamepad"></i>
-              <span class="ml-2">Join Game</span>
+              <span class="ms-2">Join Game</span>
             </h5>
+          </div>
+          <div class="card-arrow">
+            <div class="card-arrow-top-left"></div>
+            <div class="card-arrow-top-right"></div>
+            <div class="card-arrow-bottom-left"></div>
+            <div class="card-arrow-bottom-right"></div>
           </div>
         </div>
       </div>
-      <div class="col-sm-12 col-md-4 col-lg-4 pr-1">
-        <div class="card bg-dark text-white" @click="routeToPath('/leaderboard')">
+      <div class="col-sm-12 col-md-4 col-lg-4">
+        <div class="card bg-dark text-white p-1" @click="routeToPath('/leaderboard')">
           <img class="card-img" :src="require('../assets/screenshots/home-3.png')" alt="Leaderboard">
           <div class="card-img-overlay">
             <h5 class="card-title">
               <i class="fas fa-list-ol"></i>
-              <span class="ml-2">Leaderboard</span>
+              <span class="ms-2">Leaderboard</span>
             </h5>
+          </div>
+          <div class="card-arrow">
+            <div class="card-arrow-top-left"></div>
+            <div class="card-arrow-top-right"></div>
+            <div class="card-arrow-bottom-left"></div>
+            <div class="card-arrow-bottom-right"></div>
           </div>
         </div>
       </div>
-      <div class="col-sm-12 col-md-4 col-lg-4 pr-1 pl-1">
-        <div class="card bg-dark text-white" @click="routeToPath('/guild')">
+      <div class="col-sm-12 col-md-4 col-lg-4">
+        <div class="card bg-dark text-white p-1" @click="routeToPath('/guild')">
           <img class="card-img" :src="require('../assets/screenshots/home-4.png')" alt="Guilds">
           <div class="card-img-overlay">
             <h5 class="card-title">
               <i class="fas fa-shield-alt"></i>
-              <span class="ml-2">{{user && user.guildId ? 'My Guild' : 'Guilds'}}</span>
+              <span class="ms-2">{{user && user.guildId ? 'My Guild' : 'Guilds'}}</span>
             </h5>
+          </div>
+          <div class="card-arrow">
+            <div class="card-arrow-top-left"></div>
+            <div class="card-arrow-top-right"></div>
+            <div class="card-arrow-bottom-left"></div>
+            <div class="card-arrow-bottom-right"></div>
           </div>
         </div>
       </div>
-      <div class="col-sm-12 col-md-4 col-lg-4 pl-1">
-        <div class="card bg-dark text-white" @click="routeToPath('/avatars')">
+      <div class="col-sm-12 col-md-4 col-lg-4">
+        <div class="card bg-dark text-white p-1" @click="routeToPath('/avatars')">
           <img class="card-img" :src="require('../assets/screenshots/home-5.png')" alt="Shop">
           <div class="card-img-overlay">
             <h5 class="card-title card-title-success">
               <i class="fas fa-shopping-basket"></i>
-              <span class="ml-2">Avatar Shop</span>
+              <span class="ms-2">Avatar Shop</span>
             </h5>
+          </div>
+          <div class="card-arrow">
+            <div class="card-arrow-top-left"></div>
+            <div class="card-arrow-top-right"></div>
+            <div class="card-arrow-bottom-left"></div>
+            <div class="card-arrow-bottom-right"></div>
           </div>
         </div>
       </div>
@@ -159,14 +189,6 @@ export default {
 </script>
 
 <style scoped>
-button {
-  display: block;
-}
-
-.row {
-  padding-bottom: 15px;
-}
-
 .card {
   max-height: 150px;
   margin-bottom: 1rem;
@@ -188,7 +210,6 @@ button {
   background-color: #375a7f;
   padding: 0.25rem;
   display: inline-block;
-  border-radius: 3px;
 }
 
 .card-title-success {

@@ -1,34 +1,34 @@
 <template>
 <div class="menu-page container">
     <menu-title title="Hire Specialist" @onCloseRequested="onCloseRequested">
-      <button @click="onOpenCarrierDetailRequested(carrier)" class="btn btn-sm btn-primary" title="Back to Carrier"><i class="fas fa-arrow-left"></i></button>
+      <button @click="onOpenCarrierDetailRequested(carrier)" class="btn btn-sm btn-outline-primary" title="Back to Carrier"><i class="fas fa-arrow-left"></i></button>
     </menu-title>
 
-    <div class="row bg-primary">
+    <div class="row">
         <div class="col">
             <h4 class="mt-2">Carrier</h4>
         </div>
     </div>
 
-    <div class="row mb-2 pt-1 pb-1 bg-secondary" v-if="carrier">
+    <div class="row mb-2 pt-1 pb-1 bg-dark" v-if="carrier">
         <div class="col">
-            <a href="javascript:;" @click="onOpenCarrierDetailRequested(carrier)">{{carrier.name}}</a>
+            <a href="javascript:;" @click="onOpenCarrierDetailRequested(carrier)"><i class="fas fa-rocket"></i> {{carrier.name}}</a>
         </div>
         <div class="col-auto">
             <i class="fas fa-map-marker-alt"></i>
-            <i class="fas fa-sync ml-1" v-if="carrier.waypointsLooped"></i> {{carrier.waypoints.length}}
+            <i class="fas fa-sync ms-1" v-if="carrier.waypointsLooped"></i> {{carrier.waypoints.length}}
         </div>
         <div class="col-auto">
-            {{carrier.ships}} <i class="fas fa-rocket ml-1"></i>
+            {{carrier.ships}} <i class="fas fa-rocket ms-1"></i>
         </div>
     </div>
 
     <div v-if="specialists && specialists.length">
-        <div v-for="specialist in specialists" :key="specialist.id" class="row mb-2 pt-1 pb-1 bg-secondary">
+        <div v-for="specialist in specialists" :key="specialist.id" class="row mb-2 pt-1 pb-1 ">
             <div class="col mt-2">
                 <h5 class="pt-1 text-warning">
                     <specialist-icon :type="'carrier'" :defaultIcon="'rocket'" :specialist="specialist"/>
-                    <span class="ml-1">{{specialist.name}}</span>
+                    <span class="ms-1">{{specialist.name}}</span>
                 </h5>
             </div>
             <div class="col-auto mt-2">
@@ -36,7 +36,7 @@
                   <i class="fas fa-coins"></i>
                   Hire for {{getSpecialistActualCostString(specialist)}}
                 </button>
-                <span class="badge badge-primary" v-if="carrier.specialistId && carrier.specialist.id === specialist.id">Active</span>
+                <span class="badge bg-primary" v-if="carrier.specialistId && carrier.specialist.id === specialist.id">Active</span>
             </div>
             <div class="col-12 mt-2">
                 <p>{{specialist.description}}</p>

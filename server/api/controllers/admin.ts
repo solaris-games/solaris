@@ -4,6 +4,15 @@ import { mapToAdminSetGameFeaturedRequest, mapToAdminSetGameTimeMachineRequest, 
 
 export default (container: DependencyContainer, io) => {
     return {
+        getInsights: async (req, res, next) => {
+            try {
+                let result = await container.adminService.getInsights();
+                
+                return res.status(200).json(result);
+            } catch (err) {
+                return next(err);
+            }
+        },
         listUsers: async (req, res, next) => {
             try {
                 let result = await container.adminService.listUsers(req.session.roles.administrator, 300);

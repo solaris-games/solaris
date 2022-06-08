@@ -71,6 +71,11 @@ export default (router: Router, io, container: DependencyContainer) => {
         controller.updateEmailPreference,
         mwCore.handleError);
 
+    router.put('/api/user/changeEmailOtherPreference',
+        mwAuth.authenticate(),
+        controller.updateEmailOtherPreference,
+        mwCore.handleError);
+
     router.put('/api/user/changeUsername',
         mwAuth.authenticate(),
         controller.updateUsername,

@@ -158,6 +158,17 @@ export default (container: DependencyContainer, io) => {
                 return next(err);
             }
         },
+        updateEmailOtherPreference: async (req, res, next) => {
+            try {
+                const reqObj = mapToUserUpdateEmailPreferenceRequest(req.body);
+    
+                await container.userService.updateEmailOtherPreference(req.session.userId, reqObj.enabled);
+    
+                return res.sendStatus(200);
+            } catch (err) {
+                return next(err);
+            }
+        },
         updateUsername: async (req, res, next) => {
             try {
                 const reqObj = mapToUserUpdateUsernameRequest(req.body);

@@ -48,6 +48,9 @@ export const mapToCarrierSaveWaypointsRequest = (body: any): CarrierSaveWaypoint
             if (!keyHasNumberValue(waypoint, 'delayTicks')) {
                 errors.push('Delay Ticks is required.');
             }
+
+            waypoint.actionShips = +waypoint.actionShips;
+            waypoint.delayTicks = +waypoint.delayTicks;
         }
     }
 
@@ -105,6 +108,8 @@ export const mapToCarrierTransferShipsRequest = (body: any): CarrierTransferShip
     if (errors.length) {
         throw new ValidationError(errors);
     }
+
+    body.starShips = +body.starShips;
 
     return {
         carrierShips: body.carrierShips,
@@ -172,6 +177,9 @@ export const mapToCarrierCalculateCombatRequest = (body: any): CarrierCalculateC
         if (body.defender.weaponsLevel && +body.defender.weaponsLevel <= 0) {
             errors.push('Defender Weapons Level must be greater than 0.');
         }
+
+        body.defender.ships = +body.defender.ships;
+        body.defender.weaponsLevel = +body.defender.weaponsLevel;
     }
 
     if (!keyHasObjectValue(body, 'attacker')) {
@@ -194,6 +202,9 @@ export const mapToCarrierCalculateCombatRequest = (body: any): CarrierCalculateC
         if (body.attacker.weaponsLevel && +body.attacker.weaponsLevel <= 0) {
             errors.push('Attacker Weapons Level must be greater than 0.');
         }
+
+        body.attacker.ships = +body.attacker.ships;
+        body.attacker.weaponsLevel = +body.attacker.weaponsLevel;
     }
     
     if (errors.length) {

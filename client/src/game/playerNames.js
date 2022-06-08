@@ -28,7 +28,7 @@ class PlayerNames {
       }
 
       let style = new PIXI.TextStyle({
-        fontFamily: `'Space Mono', monospace`,
+        fontFamily: `Chakra Petch,sans-serif;`,
         fill: 0xFFFFFF,
         padding: 3,
         fontSize: 50

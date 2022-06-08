@@ -258,11 +258,11 @@ export default (router: Router, io, container: DependencyContainer) => {
     router.get('/api/game/:gameId/notes',
         mwAuth.authenticate(),
         mwGame.loadGame({
-            lean: false,
-            settings: true,
-            state: true,
+            lean: true,
+            settings: false,
+            state: false,
             galaxy: true,
-            constants: true
+            constants: false
         }),
         mwPlayer.loadPlayer,
         controller.getNotes,
@@ -271,11 +271,11 @@ export default (router: Router, io, container: DependencyContainer) => {
     router.put('/api/game/:gameId/notes',
         mwAuth.authenticate(),
         mwGame.loadGame({
-            lean: false,
-            settings: true,
+            lean: true,
+            settings: false,
             state: true,
             galaxy: true,
-            constants: true
+            constants: false
         }),
         mwGame.validateGameState({
             isUnlocked: true

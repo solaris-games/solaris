@@ -21,6 +21,14 @@ export default class AvatarService {
         return require('../config/game/avatars').slice();
     }
 
+    listAllSolarisAvatars(): Avatar[] {
+        return this.listAllAvatars().filter(a => !a.isPatronAvatar);
+    }
+
+    listAllAliases(): string[] {
+        return require('../config/game/aliases').slice();
+    }
+
     async listUserAvatars(userId: DBObjectId): Promise<UserAvatar[]> {
         let avatars = require('../config/game/avatars').slice();
 

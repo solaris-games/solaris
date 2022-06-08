@@ -10,16 +10,16 @@
 
   <!-- Rank Change -->
   <table v-if="hasRankResults" class="table table-sm">
-    <thead>
+    <thead class="table-dark">
       <tr>
         <td><small>Player</small></td>
-        <td class="text-right"><small>Rank Change</small></td>
+        <td class="text-end"><small>Rank Change</small></td>
       </tr>
     </thead>
     <tbody>
       <tr v-for="rank in event.data.rankingResult.ranks" :key="rank.playerId">
         <td><small>{{getPlayerAlias(rank.playerId)}}</small></td>
-        <td class="text-right"><small>{{rank.current}}<i class="fas fa-arrow-right ml-2 mr-2"></i>{{rank.new}}</small></td>
+        <td class="text-end"><small>{{rank.current}}<i class="fas fa-arrow-right ms-2 me-2"></i>{{rank.new}}</small></td>
       </tr>
     </tbody>
   </table>

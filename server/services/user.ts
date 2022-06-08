@@ -268,6 +268,14 @@ export default class UserService extends EventEmitter {
         });
     }
 
+    async updateEmailOtherPreference(id: DBObjectId, preference: boolean) {
+        await this.userRepo.updateOne({
+            _id: id
+        }, {
+            emailOtherEnabled: preference
+        });
+    }
+
     async updateEmailAddress(id: DBObjectId, email: string) {
         email = email.trim();
         email = email.toLowerCase();
@@ -518,6 +526,35 @@ export default class UserService extends EventEmitter {
         });
 
         return user?.isEstablishedPlayer || false;
+    }
+
+    async listUsersEligibleForReviewReminder(limit: number) {
+        const date = moment().utc().add(-30, 'days').toDate();
+        const ltId = this.userRepo.objectIdFromDate(date);
+
+        return await this.userRepo.find({
+            _id: { $lte: ltId },
+            emailOtherEnabled: true,
+            hasSentReviewReminder: false
+        }, {
+            _id: 1,
+            username: 1,
+            email: 1,
+            emailOtherEnabled: 1
+        }, {
+            _id: 1
+        },
+        limit);
+    }
+
+    async setReviewReminderEmailSent(userId: DBObjectId, sent: boolean) {
+        await this.userRepo.updateOne({
+            _id: userId
+        }, {
+            $set: {
+                hasSentReviewReminder: sent
+            }
+        });
     }
 
 };

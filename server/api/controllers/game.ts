@@ -181,7 +181,7 @@ export default (container: DependencyContainer, io) => {
             try {
                 const reqObj = mapToGameJoinGameRequest(req.body);
                 
-                let gameIsFull = await container.gameService.join(
+                let gameIsFull = await container.gameJoinService.join(
                     req.game,
                     req.session.userId,
                     reqObj.playerId,

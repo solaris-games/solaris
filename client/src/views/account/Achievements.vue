@@ -19,31 +19,31 @@
         <tbody>
           <tr>
             <td>Victories</td>
-            <td class="text-right">{{ user.achievements.victories }}</td>
+            <td class="text-end">{{ user.achievements.victories }}</td>
           </tr>
           <tr>
             <td>ELO <i class="fas fa-question-circle" title="Improve your ELO by participating in 1v1's"></i></td>
-            <td class="text-right">{{ user.achievements.eloRating || 1200 }}</td>
+            <td class="text-end">{{ user.achievements.eloRating || 1200 }}</td>
           </tr>
           <tr>
             <td>Joined</td>
-            <td class="text-right">{{ user.achievements.joined }}</td>
+            <td class="text-end">{{ user.achievements.joined }}</td>
           </tr>
           <tr>
             <td>Completed</td>
-            <td class="text-right">{{ user.achievements.completed }}</td>
+            <td class="text-end">{{ user.achievements.completed }}</td>
           </tr>
           <tr>
             <td>Defeated</td>
-            <td class="text-right">{{ user.achievements.defeated }}</td>
+            <td class="text-end">{{ user.achievements.defeated }}</td>
           </tr>
           <tr>
             <td>Quit</td>
-            <td class="text-right">{{ user.achievements.quit }}</td>
+            <td class="text-end">{{ user.achievements.quit }}</td>
           </tr>
           <tr>
             <td>AFK</td>
-            <td class="text-right">{{ user.achievements.afk }}</td>
+            <td class="text-end">{{ user.achievements.afk }}</td>
           </tr>
         </tbody>
       </table>
@@ -60,43 +60,43 @@
           <tbody>
             <tr>
               <td>Ship Kills</td>
-              <td class="text-right">{{ user.achievements.combat.kills.ships }}</td>
+              <td class="text-end">{{ user.achievements.combat.kills.ships }}</td>
             </tr>
             <tr>
               <td>Ship Losses</td>
-              <td class="text-right">{{ user.achievements.combat.losses.ships }}</td>
+              <td class="text-end">{{ user.achievements.combat.losses.ships }}</td>
             </tr>
             <tr>
               <td>Carrier Kills</td>
-              <td class="text-right">{{ user.achievements.combat.kills.carriers }}</td>
+              <td class="text-end">{{ user.achievements.combat.kills.carriers }}</td>
             </tr>
             <tr>
               <td>Carrier Losses</td>
-              <td class="text-right">{{ user.achievements.combat.losses.carriers }}</td>
+              <td class="text-end">{{ user.achievements.combat.losses.carriers }}</td>
             </tr>
             <tr>
               <td>Specialist Kills</td>
-              <td class="text-right">{{ user.achievements.combat.kills.specialists }}</td>
+              <td class="text-end">{{ user.achievements.combat.kills.specialists }}</td>
             </tr>
             <tr>
               <td>Specialist Losses</td>
-              <td class="text-right">{{ user.achievements.combat.losses.specialists }}</td>
+              <td class="text-end">{{ user.achievements.combat.losses.specialists }}</td>
             </tr>
             <tr>
               <td>Stars Captured</td>
-              <td class="text-right">{{ user.achievements.combat.stars.captured }}</td>
+              <td class="text-end">{{ user.achievements.combat.stars.captured }}</td>
             </tr>
             <tr>
               <td>Stars Lost</td>
-              <td class="text-right">{{ user.achievements.combat.stars.lost }}</td>
+              <td class="text-end">{{ user.achievements.combat.stars.lost }}</td>
             </tr>
             <tr>
               <td>Capital Stars Captured</td>
-              <td class="text-right">{{ user.achievements.combat.homeStars.captured }}</td>
+              <td class="text-end">{{ user.achievements.combat.homeStars.captured }}</td>
             </tr>
             <tr>
               <td>Capital Stars Lost</td>
-              <td class="text-right">{{ user.achievements.combat.homeStars.lost }}</td>
+              <td class="text-end">{{ user.achievements.combat.homeStars.lost }}</td>
             </tr>
           </tbody>
         </table>
@@ -113,27 +113,27 @@
           <tbody>
             <tr>
               <td>Economy</td>
-              <td class="text-right">{{ user.achievements.infrastructure.economy }}</td>
+              <td class="text-end">{{ user.achievements.infrastructure.economy }}</td>
             </tr>
             <tr>
               <td>Industry</td>
-              <td class="text-right">{{ user.achievements.infrastructure.industry }}</td>
+              <td class="text-end">{{ user.achievements.infrastructure.industry }}</td>
             </tr>
             <tr>
               <td>Science</td>
-              <td class="text-right">{{ user.achievements.infrastructure.science }}</td>
+              <td class="text-end">{{ user.achievements.infrastructure.science }}</td>
             </tr>
             <tr>
               <td>Warp Gates Built</td>
-              <td class="text-right">{{ user.achievements.infrastructure.warpGates }}</td>
+              <td class="text-end">{{ user.achievements.infrastructure.warpGates }}</td>
             </tr>
             <tr>
               <td>Warp Gates Destroyed</td>
-              <td class="text-right">{{ user.achievements.infrastructure.warpGatesDestroyed }}</td>
+              <td class="text-end">{{ user.achievements.infrastructure.warpGatesDestroyed }}</td>
             </tr>
             <tr>
               <td>Specialists Hired</td>
-              <td class="text-right">{{ user.achievements.infrastructure.specialistsHired }}</td>
+              <td class="text-end">{{ user.achievements.infrastructure.specialistsHired }}</td>
             </tr>
           </tbody>
         </table>
@@ -150,35 +150,35 @@
           <tbody>
             <tr>
               <td>Scanning</td>
-              <td class="text-right">{{ user.achievements.research.scanning }}</td>
+              <td class="text-end">{{ user.achievements.research.scanning }}</td>
             </tr>
             <tr>
               <td>Hyperspace</td>
-              <td class="text-right">{{ user.achievements.research.hyperspace }}</td>
+              <td class="text-end">{{ user.achievements.research.hyperspace }}</td>
             </tr>
             <tr>
               <td>Terraforming</td>
-              <td class="text-right">{{ user.achievements.research.terraforming }}</td>
+              <td class="text-end">{{ user.achievements.research.terraforming }}</td>
             </tr>
             <tr>
               <td>Weapons</td>
-              <td class="text-right">{{ user.achievements.research.weapons }}</td>
+              <td class="text-end">{{ user.achievements.research.weapons }}</td>
             </tr>
             <tr>
               <td>Banking</td>
-              <td class="text-right">{{ user.achievements.research.banking }}</td>
+              <td class="text-end">{{ user.achievements.research.banking }}</td>
             </tr>
             <tr>
               <td>Manufacturing</td>
-              <td class="text-right">{{ user.achievements.research.manufacturing }}</td>
+              <td class="text-end">{{ user.achievements.research.manufacturing }}</td>
             </tr>
             <tr>
               <td>Experimentation</td>
-              <td class="text-right">{{ user.achievements.research.experimentation }}</td>
+              <td class="text-end">{{ user.achievements.research.experimentation }}</td>
             </tr>
             <tr>
               <td>Specialists</td>
-              <td class="text-right">{{ user.achievements.research.specialists }}</td>
+              <td class="text-end">{{ user.achievements.research.specialists }}</td>
             </tr>
           </tbody>
         </table>
@@ -195,43 +195,43 @@
           <tbody>
             <tr>
               <td>Credits Sent</td>
-              <td class="text-right">{{ user.achievements.trade.creditsSent }}</td>
+              <td class="text-end">{{ user.achievements.trade.creditsSent }}</td>
             </tr>
             <tr>
               <td>Credits Received</td>
-              <td class="text-right">{{ user.achievements.trade.creditsReceived }}</td>
+              <td class="text-end">{{ user.achievements.trade.creditsReceived }}</td>
             </tr>
             <tr>
               <td>Specialist Tokens Sent</td>
-              <td class="text-right">{{ user.achievements.trade.creditsSpecialistsSent }}</td>
+              <td class="text-end">{{ user.achievements.trade.creditsSpecialistsSent }}</td>
             </tr>
             <tr>
               <td>Specialist Tokens Received</td>
-              <td class="text-right">{{ user.achievements.trade.creditsSpecialistsReceived }}</td>
+              <td class="text-end">{{ user.achievements.trade.creditsSpecialistsReceived }}</td>
             </tr>
             <tr>
               <td>Technology Sent</td>
-              <td class="text-right">{{ user.achievements.trade.technologySent }}</td>
+              <td class="text-end">{{ user.achievements.trade.technologySent }}</td>
             </tr>
             <tr>
               <td>Technology Received</td>
-              <td class="text-right">{{ user.achievements.trade.technologyReceived }}</td>
+              <td class="text-end">{{ user.achievements.trade.technologyReceived }}</td>
             </tr>
             <tr>
               <td>Gifts Sent</td>
-              <td class="text-right">{{ user.achievements.trade.giftsSent }}</td>
+              <td class="text-end">{{ user.achievements.trade.giftsSent }}</td>
             </tr>
             <tr>
               <td>Gifts Received</td>
-              <td class="text-right">{{ user.achievements.trade.giftsReceived }}</td>
+              <td class="text-end">{{ user.achievements.trade.giftsReceived }}</td>
             </tr>
             <tr>
               <td>Renown Sent</td>
-              <td class="text-right">{{ user.achievements.trade.renownSent }}</td>
+              <td class="text-end">{{ user.achievements.trade.renownSent }}</td>
             </tr>
             <tr>
               <td>Renown Received</td>
-              <td class="text-right">{{ user.achievements.renown }}</td>
+              <td class="text-end">{{ user.achievements.renown }}</td>
             </tr>
           </tbody>
         </table>

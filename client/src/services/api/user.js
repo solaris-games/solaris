@@ -54,6 +54,13 @@ class UserService extends BaseApiService {
       { withCredentials: true })
   }
 
+  toggleEmailOtherNotifications (enabled) {
+    return axios.put(this.BASE_URL + 'user/changeEmailOtherPreference', {
+      enabled
+    },
+      { withCredentials: true })
+  }
+
   updateEmailAddress (email) {
     return axios.put(this.BASE_URL + 'user/changeEmailAddress', {
       email

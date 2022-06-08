@@ -7,19 +7,21 @@
     </div>
 
     <div class="row mt-1 mb-1">
-      <div class="col pr-0 pl-0">
+      <div class="col pe-0 ps-0">
         <button class="btn btn-primary" @click="prevAvatar()"><i class="fas fa-chevron-left"></i></button>
       </div>
-      <div class="col-auto pr-0 pl-0">
+      <div class="col-auto pe-0 ps-0">
         <button class="btn btn-primary" @click="nextAvatar()"><i class="fas fa-chevron-right"></i></button>
       </div>
     </div>
 
     <div class="row">
-      <div class="col-12 pr-2 pl-2 mt-1 mb-1">
-        <router-link :to="{ name: 'avatars'}" class="btn btn-sm btn-block btn-success">
-          <i class="fas fa-shopping-cart"></i> Shop
-        </router-link>
+      <div class="col-12 pe-0 ps-0 mt-1 mb-1">
+        <div class="d-grid gap-2">
+          <router-link :to="{ name: 'avatars'}" class="btn btn-sm btn-success">
+            <i class="fas fa-shopping-cart"></i> Shop
+          </router-link>
+        </div>
       </div>
     </div>
 </div>

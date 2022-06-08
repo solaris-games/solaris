@@ -9,31 +9,31 @@
             <tbody>
                 <tr v-for="mapObject in mapObjects" :key="mapObject._id">
                     <td :style="{'padding': '0', 'width': '8px', 'background-color': getFriendlyColour(mapObject)}"></td>
-                    <td v-if="mapObject.type === 'star'" class="col-auto text-center pl-2 pr-2" @click="onViewObjectRequested(mapObject)">
+                    <td v-if="mapObject.type === 'star'" class="col-auto text-center ps-2 pe-2" @click="onViewObjectRequested(mapObject)">
                         <specialist-icon :type="'star'" :defaultIcon="'star'" :specialist="mapObject.data.specialist" />
                     </td>
-                    <td v-if="mapObject.type === 'carrier'" class="col-auto text-center pl-2 pr-2" @click="onViewObjectRequested(mapObject)">
+                    <td v-if="mapObject.type === 'carrier'" class="col-auto text-center ps-2 pe-2" @click="onViewObjectRequested(mapObject)">
                         <specialist-icon :type="'carrier'" :defaultIcon="'rocket'" :specialist="mapObject.data.specialist" />
                     </td>
-                    <td class="bg-secondary text-center pl-2 pr-2">
+                    <td class="bg-dark text-center ps-2 pe-2">
                         <span>{{mapObject.data.ships == null ? '???' : mapObject.data.ships}}</span>
                     </td>
-                    <td class="pl-2 pr-2">
+                    <td class="ps-2 pe-2">
                         <span><a href="javascript:;" @click="onViewObjectRequested(mapObject)">{{mapObject.data.name}}</a></span>
                     </td>
-                    <td class="text-right pl-2 pr-2">
+                    <td class="text-end ps-2 pe-2">
                         <span v-if="mapObject.type === 'carrier' && (userOwnsObject(mapObject) || mapObject.data.waypoints.length)">
                           <i class="fas fa-map-marker-alt"></i>
-                          <i class="fas fa-sync ml-1" v-if="mapObject.data.waypointsLooped"></i>
+                          <i class="fas fa-sync ms-1" v-if="mapObject.data.waypointsLooped"></i>
                           {{mapObject.data.waypoints.length}}
                         </span>
                     </td>
-                    <td v-if="userOwnsObject(mapObject) && !getObjectOwningPlayer(mapObject).defeated && !isGameFinished()" class="text-right pl-2 pr-2" style="">
-                        <button title="Transfer ships between carrier and star" v-if="mapObject.type === 'carrier' && mapObject.data.orbiting && userOwnsStar(mapObject.data.orbiting)" type="button" class="btn btn-primary" @click="onShipTransferRequested(mapObject)"><i class="fas fa-exchange-alt"></i></button>
-                        <button title="Edit carrier waypoints" v-if="mapObject.type === 'carrier'" type="button" class="btn btn-primary ml-1" @click="onEditWaypointsRequested(mapObject.data._id)"><i class="fas fa-map-marker-alt"></i> </button>
+                    <td v-if="userOwnsObject(mapObject) && !getObjectOwningPlayer(mapObject).defeated && !isGameFinished()" class="text-end ps-2 pe-2" style="">
+                        <button title="Transfer ships between carrier and star" v-if="mapObject.type === 'carrier' && mapObject.data.orbiting && userOwnsStar(mapObject.data.orbiting)" type="button" class="btn btn-outline-primary" @click="onShipTransferRequested(mapObject)"><i class="fas fa-exchange-alt"></i></button>
+                        <button title="Edit carrier waypoints" v-if="mapObject.type === 'carrier'" type="button" class="btn btn-primary ms-1" @click="onEditWaypointsRequested(mapObject.data._id)"><i class="fas fa-map-marker-alt"></i> </button>
 
-                        <button title="Build a new carrier" v-if="mapObject.type === 'star' && mapObject.data.ships && hasEnoughCredits(mapObject) && mapObject.data.naturalResources && mapObject.data.naturalResources.economy && mapObject.data.naturalResources.industry && mapObject.data.naturalResources.science" type="button" class="btn btn-primary" @click="onBuildCarrierRequested(mapObject.data._id)"><i class="fas fa-rocket"></i></button>
-                        <button title="Transfer all ships to the star" v-if="mapObject.type === 'star' && hasCarriersInOrbit(mapObject)" type="button" class="btn btn-primary ml-1" @click="transferAllToStar(mapObject)"><i class="fas fa-chevron-up"></i></button>
+                        <button title="Transfer all ships to the star" v-if="mapObject.type === 'star' && hasCarriersInOrbit(mapObject)" type="button" class="btn btn-outline-primary" @click="transferAllToStar(mapObject)"><i class="fas fa-chevron-up"></i></button>
+                        <button title="Build a new carrier" v-if="mapObject.type === 'star' && mapObject.data.ships && hasEnoughCredits(mapObject) && mapObject.data.naturalResources && mapObject.data.naturalResources.economy && mapObject.data.naturalResources.industry && mapObject.data.naturalResources.science" type="button" class="btn btn-info ms-1" @click="onBuildCarrierRequested(mapObject.data._id)"><i class="fas fa-rocket"></i></button>
                     </td>
                 </tr>
             </tbody>

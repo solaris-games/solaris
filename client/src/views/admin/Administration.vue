@@ -4,16 +4,19 @@
 
     <ul class="nav nav-tabs">
       <li class="nav-item">
-          <a class="nav-link active" data-toggle="tab" href="#games">Games</a>
+          <a class="nav-link" data-bs-toggle="tab" href="#games">Games</a>
       </li>
       <li class="nav-item" v-if="isCommunityManager">
-          <a class="nav-link" data-toggle="tab" href="#users">Users</a>
+          <a class="nav-link" data-bs-toggle="tab" href="#users">Users</a>
       </li>
       <li class="nav-item" v-if="isAdministrator">
-          <a class="nav-link" data-toggle="tab" href="#passwordResets">Password Resets</a>
+          <a class="nav-link" data-bs-toggle="tab" href="#passwordResets">Password Resets</a>
       </li>
       <li class="nav-item" v-if="isAdministrator">
-          <a class="nav-link" data-toggle="tab" href="#reports">Reports</a>
+          <a class="nav-link" data-bs-toggle="tab" href="#reports">Reports</a>
+      </li>
+      <li class="nav-item" v-if="isAdministrator">
+          <a class="nav-link" data-bs-toggle="tab" href="#insights">Insights</a>
       </li>
     </ul>
 
@@ -27,7 +30,7 @@
           <p><small class="text-warning">Total Started: {{games.filter(x => x.state.startDate).length}}</small></p>
           <p><small class="text-warning">Total Completed: {{games.filter(x => x.state.endDate).length}}</small></p> -->
           <table class="mt-2 table table-sm table-striped table-responsive">
-            <thead>
+            <thead class="table-dark">
               <tr>
                 <th>Name</th>
                 <th>Players</th>
@@ -51,7 +54,7 @@
                 <td>
                   <i class="clickable fas" :class="{'fa-star text-success':game.settings.general.featured,'fa-star text-danger':!game.settings.general.featured}"
                     @click="toggleFeaturedGame(game)" title="Featured"></i>
-                  <i class="clickable ml-1 fas" :class="{'fa-clock text-success':game.settings.general.timeMachine === 'enabled','fa-clock text-danger':game.settings.general.timeMachine === 'disabled'}"
+                  <i class="clickable ms-1 fas" :class="{'fa-clock text-success':game.settings.general.timeMachine === 'enabled','fa-clock text-danger':game.settings.general.timeMachine === 'disabled'}"
                     @click="toggleTimeMachineGame(game)" v-if="isAdministrator" title="Time Machine"></i>
                 </td>
                 <td><i class="fas" :class="{'fa-check text-success':game.state.startDate,'fa-times text-danger':!game.state.startDate}" :title="game.state.startDate"></i></td>
@@ -61,7 +64,7 @@
                 </td>
                 <td :class="{'text-warning':gameNeedsAttention(game)}">{{game.state.tick}}</td>
                 <td>
-                  <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-success">View</router-link>
+                  <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-outline-success">View</router-link>
                 </td>
               </tr>
             </tbody>
@@ -73,7 +76,7 @@
           <h4 class="mb-1">Recent Users</h4>
           <!-- <small class="text-warning">Total Users: {{users.length}}</small> -->
           <table class="mt-2 table table-sm table-striped table-responsive">
-            <thead>
+            <thead class="table-dark">
               <tr>
                 <th>Username</th>
                 <th v-if="isAdministrator">Last Seen</th>
@@ -90,9 +93,9 @@
                 <td v-if="isAdministrator" :title="getDuplicateIPs(user)" :class="{'text-warning':getDuplicateIPs(user).length}">{{getLastSeenString(user.lastSeen)}}</td>
                 <td v-if="isAdministrator">
                   <i class="fas fa-hands-helping clickable" :class="{'disabled-role':!user.roles.contributor}" @click="toggleRole(user, 'contributor')" title="Toggle Contributor Role"></i>
-                  <i class="fas fa-code ml-1 clickable" :class="{'disabled-role':!user.roles.developer}" @click="toggleRole(user, 'developer')" title="Toggle Developer Role"></i>
-                  <i class="fas fa-user-friends ml-1 clickable" :class="{'disabled-role':!user.roles.communityManager}" @click="toggleRole(user, 'communityManager')" title="Toggle Community Manager Role"></i>
-                  <i class="fas fa-dice ml-1 clickable" :class="{'disabled-role':!user.roles.gameMaster}" @click="toggleRole(user, 'gameMaster')" title="Toggle Game Master Role"></i>
+                  <i class="fas fa-code ms-1 clickable" :class="{'disabled-role':!user.roles.developer}" @click="toggleRole(user, 'developer')" title="Toggle Developer Role"></i>
+                  <i class="fas fa-user-friends ms-1 clickable" :class="{'disabled-role':!user.roles.communityManager}" @click="toggleRole(user, 'communityManager')" title="Toggle Community Manager Role"></i>
+                  <i class="fas fa-dice ms-1 clickable" :class="{'disabled-role':!user.roles.gameMaster}" @click="toggleRole(user, 'gameMaster')" title="Toggle Game Master Role"></i>
                 </td>
                 <td v-if="isAdministrator">
                   <i class="fas fa-minus clickable text-danger" @click="setCredits(user, user.credits - 1)" title="Deduct Credits"></i>
@@ -103,8 +106,8 @@
                 <td><i class="fas clickable" :class="{'fa-check':user.isEstablishedPlayer,'fa-times text-danger': !user.isEstablishedPlayer}" @click="promoteToEstablishedPlayer(user)"></i></td>
                 <td v-if="isAdministrator">
                   <i class="fas fa-hammer clickable text-danger" :class="{'disabled-role':!user.banned}" @click="toggleBan(user)" title="Toggle Banned"></i>
-                  <i class="fas fa-eraser clickable text-warning ml-1" @click="resetAchievements(user)" title="Reset Achievements"></i>
-                  <i class="fas fa-user clickable text-info ml-1" @click="impersonate(user._id)" title="Impersonate User"></i>
+                  <i class="fas fa-eraser clickable text-warning ms-1" @click="resetAchievements(user)" title="Reset Achievements"></i>
+                  <i class="fas fa-user clickable text-info ms-1" @click="impersonate(user._id)" title="Impersonate User"></i>
                 </td>
               </tr>
             </tbody>
@@ -115,7 +118,7 @@
         <div v-if="passwordResets">
           <h4 class="mb-1">Recent Password Resets</h4>
           <table class="mt-2 table table-sm table-striped table-responsive">
-            <thead>
+            <thead class="table-dark">
               <tr>
                 <th>Username</th>
                 <th>Email</th>
@@ -138,7 +141,7 @@
         <div v-if="reports">
           <h4 class="mb-1">Recent Reports</h4>
           <table class="mt-2 table table-sm table-striped table-responsive">
-            <thead>
+            <thead class="table-dark">
               <tr>
                 <th>Player</th>
                 <th>Reported By</th>
@@ -158,10 +161,10 @@
                   {{report.reportedByPlayerAlias}}
                 </td>
                 <td>
-                  <span v-if="report.reasons.abuse" class="mr-2">Abuse</span>
-                  <span v-if="report.reasons.spamming" class="mr-2">Spamming</span>
-                  <span v-if="report.reasons.multiboxing" class="mr-2">Multiboxing</span>
-                  <span v-if="report.reasons.inappropriateAlias" class="mr-2">Inappropriate Alias</span>
+                  <span v-if="report.reasons.abuse" class="me-2">Abuse</span>
+                  <span v-if="report.reasons.spamming" class="me-2">Spamming</span>
+                  <span v-if="report.reasons.multiboxing" class="me-2">Multiboxing</span>
+                  <span v-if="report.reasons.inappropriateAlias" class="me-2">Inappropriate Alias</span>
                 </td>
                 <td>
                   <router-link :to="{ path: '/game/detail', query: { id: report.gameId } }">View</router-link>
@@ -174,6 +177,10 @@
           </table>
         </div>
       </div>
+      <div class="tab-pane fade" id="insights" v-if="isAdministrator">
+        <h4 class="mb-1">Insights</h4>
+        <insights />
+      </div>
     </div>
   </view-container>
 </template>
@@ -183,6 +190,7 @@ import ViewContainer from '../components/ViewContainer'
 import ViewTitle from '../components/ViewTitle'
 import LoadingSpinner from '../components/LoadingSpinner'
 import AdminApiService from '../../services/api/admin'
+import InsightsVue from './components/Insights'
 import router from '../../router'
 import moment from 'moment'
 
@@ -190,7 +198,8 @@ export default {
   components: {
     'view-container': ViewContainer,
     'view-title': ViewTitle,
-    'loading-spinner': LoadingSpinner
+    'loading-spinner': LoadingSpinner,
+    'insights': InsightsVue
   },
   data () {
     return {

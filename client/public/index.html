@@ -12,16 +12,24 @@
     <link rel="apple-touch-icon" sizes="180x180" href="<%= BASE_URL %>solaris_icon-iphone.png">
     <link rel="apple-touch-icon" sizes="167x167" href="<%= BASE_URL %>solaris_icon-ipad-r.png">
     <link rel="shortcut icon" sizes="196x196" href="<%= BASE_URL %>solaris_icon-android.png">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap" rel="stylesheet">
     <script src="https://www.google.com/recaptcha/api.js?onload=vueRecaptchaApiLoaded&render=explicit" async defer></script>
+
+    <!-- ================== BEGIN core-css ================== -->
+    <link href="assets/css/vendor.min.css" rel="stylesheet" />
+    <link href="assets/css/app.min.css" rel="stylesheet" />
+    <!-- ================== END core-css ================== -->
     <title>Solaris</title>
   </head>
   <body>
     <noscript>
       <strong>We're sorry but client doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
-    <div id="app"></div>
+    <div id="app" class="app"></div>
     <!-- built files will be auto injected -->
+	
+    <!-- ================== BEGIN core-js ================== -->
+    <script src="assets/js/vendor.min.js"></script>
+    <script src="assets/js/app.min.js"></script>
+    <!-- ================== END core-js ================== -->
   </body>
 </html>

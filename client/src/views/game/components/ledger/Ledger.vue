@@ -1,5 +1,5 @@
 <template>
-<div class="menu-page container">
+<div class="menu-page container pb-2">
     <menu-title title="Ledger" @onCloseRequested="onCloseRequested"/>
 
     <p><small>Debts that you owe are in <span class="text-danger">red</span>. Use the <b>Settle Debt</b> button to send credits and settle the debt.</small></p>
@@ -9,7 +9,7 @@
     <loading-spinner :loading="isLoadingLedger"/>
 
     <div v-if="!isLoadingLedger" class="row">
-      <div class="table-responsive" v-if="ledgers.length">
+      <div class="table-responsive p-0" v-if="ledgers.length">
         <table class="table table-sm table-striped mb-0">
           <tbody>
             <ledger-row 

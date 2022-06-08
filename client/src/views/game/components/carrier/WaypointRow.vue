@@ -6,7 +6,7 @@
         <td v-if="showAction">
             <span>{{getWaypointActionFriendlyText(waypoint)}}</span>
         </td>
-        <td class="text-right" v-if="!$isHistoricalMode() && canEditWaypoints">
+        <td class="text-end" v-if="!$isHistoricalMode() && canEditWaypoints">
           <a href="javascript:;" @click="editWaypoint">Edit</a>
         </td>
     </tr>
@@ -30,7 +30,7 @@ export default {
     this.recalculateTimeRemaining()
 
     if (GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)) {
-      this.intervalFunction = setInterval(this.recalculateTimeRemaining, 1000)
+      this.intervalFunction = setInterval(this.recalculateTimeRemaining, 250)
       this.recalculateTimeRemaining()
     }
   },

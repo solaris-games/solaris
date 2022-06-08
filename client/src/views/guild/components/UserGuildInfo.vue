@@ -2,7 +2,7 @@
     <div>
       <loading-spinner v-if="isLoadingGuild"/>
 
-      <div class="row bg-secondary mb-2 pt-2 pb-2" v-if="!isLoadingGuild && user">
+      <div class="row bg-dark mb-2 pt-2 pb-2" v-if="!isLoadingGuild && user">
         <div class="col">
           <h5 class="mb-0 pt-2 pb-2">
             <span>Guild: </span>

@@ -1,30 +1,30 @@
 <template>
 <div class="menu-page container">
     <menu-title title="Hire Specialist" @onCloseRequested="onCloseRequested">
-      <button @click="onOpenStarDetailRequested(star)" class="btn btn-sm btn-primary" title="Back to Star"><i class="fas fa-arrow-left"></i></button>
+      <button @click="onOpenStarDetailRequested(star)" class="btn btn-sm btn-outline-primary" title="Back to Star"><i class="fas fa-arrow-left"></i></button>
     </menu-title>
 
-    <div class="row bg-primary">
+    <div class="row">
         <div class="col">
             <h4 class="mt-2">Star</h4>
         </div>
     </div>
 
-    <div class="row mb-2 pt-1 pb-1 bg-secondary" v-if="star">
+    <div class="row mb-2 pt-1 pb-1 bg-dark" v-if="star">
         <div class="col">
-            <a href="javascript:;" @click="onOpenStarDetailRequested(star)">{{star.name}}</a>
+            <a href="javascript:;" @click="onOpenStarDetailRequested(star)"><i class="fas fa-star"></i> {{star.name}}</a>
         </div>
         <div class="col-auto">
-            {{star.ships}} <i class="fas fa-rocket ml-1"></i>
+            {{star.ships}} <i class="fas fa-rocket ms-1"></i>
         </div>
     </div>
 
     <div v-if="specialists && specialists.length">
-        <div v-for="specialist in specialists" :key="specialist.id" class="row mb-2 pt-1 pb-1 bg-secondary">
+        <div v-for="specialist in specialists" :key="specialist.id" class="row mb-2 pt-1 pb-1 ">
             <div class="col mt-2">
                 <h5 class="pt-1 text-warning">
                     <specialist-icon :type="'star'" :defaultIcon="'star'" :specialist="specialist"/>
-                    <span class="ml-1">{{specialist.name}}</span>
+                    <span class="ms-1">{{specialist.name}}</span>
                 </h5>
             </div>
             <div class="col-auto mt-2">
@@ -32,7 +32,7 @@
                   <i class="fas fa-coins"></i>
                   Hire for {{getSpecialistActualCostString(specialist)}}
                 </button>
-                <span class="badge badge-primary" v-if="star.specialistId && star.specialist.id === specialist.id">Active</span>
+                <span class="badge bg-primary" v-if="star.specialistId && star.specialist.id === specialist.id">Active</span>
             </div>
             <div class="col-12 mt-2">
                 <p>{{specialist.description}}</p>

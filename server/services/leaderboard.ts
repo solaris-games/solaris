@@ -831,12 +831,12 @@ export default class LeaderboardService {
         let totalStarsKey = this.gameTypeService.isConquestMode(game)
             && game.settings.conquest.victoryCondition === 'homeStarPercentage' ? 'totalHomeStars' : 'totalStars';
 
-        let starWinners = leaderboard
-            .filter(p => !p.player.defeated && p.stats[totalStarsKey] >= game.state.starsForVictory)
-            .map(p => p.player);
+        // Firstly, check if ANYONE has reached the star limit, if so we need to end the game.
+        let starWinners = leaderboard.filter(p => p.stats[totalStarsKey] >= game.state.starsForVictory);
 
+        // If someone has reached the star limit then pick the first player who is not defeated.
         if (starWinners.length) {
-            return starWinners[0];
+            return leaderboard.filter(p => !p.player.defeated).map(p => p.player)[0];
         }
 
         return null;

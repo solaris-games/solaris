@@ -4,22 +4,22 @@
     <td><a href="javascript:;" @click="clickStar">{{star.name}}</a></td>
     <td class="no-padding"><a href="javascript:;" @click="goToStar"><i class="far fa-eye"></i></a></td>
     <td class="sm-padding"><specialist-icon :type="'star'" :specialist="star.specialist" :hideDefaultIcon="true"></specialist-icon></td>
-    <td class="text-right">
-      <span v-if="star.infrastructure" class="text-success mr-2" title="Economic infrastructure - Contributes to credits earned at the end of a cycle">{{star.infrastructure.economy}}</span>
-      <span v-if="star.infrastructure" class="text-warning mr-2" title="Industrial infrastructure - Contributes to ship production">{{star.infrastructure.industry}}</span>
+    <td class="text-end">
+      <span v-if="star.infrastructure" class="text-success me-2" title="Economic infrastructure - Contributes to credits earned at the end of a cycle">{{star.infrastructure.economy}}</span>
+      <span v-if="star.infrastructure" class="text-warning me-2" title="Industrial infrastructure - Contributes to ship production">{{star.infrastructure.industry}}</span>
       <span v-if="star.infrastructure" class="text-info" title="Scientific infrastructure - Contributes to technology research">{{star.infrastructure.science}}</span>
     </td>
-    <td class="text-right">
+    <td class="text-end">
       <span v-if="hasEconomyCost && !canUpgradeEconomy">${{star.upgradeCosts.economy}}</span>
       <a href="javascript:;" v-if="hasEconomyCost && canUpgradeEconomy"
         @click="upgradeEconomy()" :disabled="$isHistoricalMode()">${{star.upgradeCosts.economy}}</a>
     </td>
-    <td class="text-right">
+    <td class="text-end">
       <span v-if="hasIndustryCost && !canUpgradeIndustry">${{star.upgradeCosts.industry}}</span>
       <a href="javascript:;" v-if="hasIndustryCost && canUpgradeIndustry"
         @click="upgradeIndustry()" :disabled="$isHistoricalMode()">${{star.upgradeCosts.industry}}</a>
     </td>
-    <td class="text-right">
+    <td class="text-end">
       <span v-if="hasScienceCost && !canUpgradeScience">${{star.upgradeCosts.science}}</span>
       <a href="javascript:;" v-if="hasScienceCost && canUpgradeScience"
         @click="upgradeScience()" :disabled="$isHistoricalMode()">${{star.upgradeCosts.science}}</a>

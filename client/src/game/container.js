@@ -184,7 +184,7 @@ class GameContainer {
     this.map.draw()
 
     if ( process.env.NODE_ENV == 'development' && true) {
-      let bitmapFont = { fontName: "space-mono", fontSize: 16 }
+      let bitmapFont = {fontName: "chakrapetch", fontSize: 16}
       let left = 64
       let top = 32
 

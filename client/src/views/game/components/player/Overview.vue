@@ -2,34 +2,34 @@
 <div v-if="player">
   <player-title :player="player"/>
 
-  <div class="row">
-      <div class="col-auto text-center pl-0 pr-0">
+  <div class="row pt-0">
+      <div class="col-auto text-center ps-0 pe-0">
         <img v-if="player.avatar" :src="getAvatarImage()">
-        <i v-if="!player.avatar" class="far fa-user mr-2 mt-2 ml-2 mb-2" style="font-size:100px;"></i>
+        <i v-if="!player.avatar" class="far fa-user me-2 mt-2 ms-2 mb-2" style="font-size:100px;"></i>
       </div>
-      <div class="col bg-secondary">
+      <div class="col  bg-dark">
           <statistics :playerId="playerId"/>
       </div>
   </div>
 
-  <div class="row pt-2 pb-2 bg-primary" v-if="!(!userPlayer || !gameHasStarted || player.userId)">
+  <div class="row pt-2 pb-2 bg-dark" v-if="!(!userPlayer || !gameHasStarted || player.userId)">
     <div class="col">
-      <button class="btn btn-secondary mr-1" @click="onOpenDiplomacyRequested" title="Open Diplomacy" v-if="isFormalAlliancesEnabled">
+      <button class="btn btn-outline-secondary me-1" @click="onOpenDiplomacyRequested" title="Open Diplomacy" v-if="isFormalAlliancesEnabled">
         <i class="fas fa-globe-americas"></i>
       </button>
-      <button class="btn btn-secondary mr-1" @click="onOpenLedgerRequested" title="Open Ledger" v-if="isTradeEnabled">
+      <button class="btn btn-outline-secondary me-1" @click="onOpenLedgerRequested" title="Open Ledger" v-if="isTradeEnabled">
         <i class="fas fa-file-invoice-dollar"></i>
       </button>
-      <button class="btn btn-secondary" @click="onViewCompareIntelRequested" title="Compare Intel" v-if="!isDarkModeExtra">
+      <button class="btn btn-outline-secondary" @click="onViewCompareIntelRequested" title="Compare Intel" v-if="!isDarkModeExtra">
         <i class="fas fa-chart-line"></i>
       </button>
     </div>
     <div class="col-auto">
-      <button class="btn btn-success mr-1" @click="onViewConversationRequested"
+      <button class="btn btn-success me-1" @click="onViewConversationRequested"
         :class="{'btn-warning': conversation && conversation.unreadCount}"
         v-if="canCreateConversation">
         <i class="fas fa-envelope"></i>
-        <span v-if="conversation && conversation.unreadCount" class="ml-1">{{conversation.unreadCount}}</span>
+        <span v-if="conversation && conversation.unreadCount" class="ms-1">{{conversation.unreadCount}}</span>
       </button>
       <button class="btn btn-info" v-if="!gameHasFinished && isTradeEnabled" @click="onOpenTradeRequested">
         <i class="fas fa-handshake"></i>

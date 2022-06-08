@@ -11,7 +11,7 @@
 
     <player-list @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 
-    <div class="menu-content bg-dark" v-if="menuState">
+    <div class="menu-content" v-if="menuState">
       <welcome v-if="menuState == MENU_STATES.WELCOME" @onCloseRequested="onCloseRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onViewSettingsRequested="onViewSettingsRequested"/>
@@ -250,6 +250,9 @@ export default {
   },
   methods: {
     onMenuRequested (menuState) {
+      // TODO: For some reason, using the state to drive
+      // the menus doesn't work correctly so instead we use the data() function
+      // above to store the menu state in the component.
       menuState.state = menuState.state || null
       menuState.args = menuState.args || null
 
@@ -263,7 +266,7 @@ export default {
       }
     },
     changeMenuState (state, args) {
-      this.onMenuRequested({
+      this.$store.commit('setMenuState', {
         state,
         args
       })
@@ -373,6 +376,7 @@ export default {
   position: fixed;
   height: 52px;
   bottom: 0px;
+  z-index: 1;
 }
 
 .menu {
