@@ -78,6 +78,7 @@ interface TracePoint {
 
 interface BorderStarData {
     otherPlayersBordering: Set<string>;
+    hasHostileBorder: boolean;
 }
 
 type Order = DefendStarOrder | ClaimStarOrder | ReinforceStarOrder | InvadeStarOrder;
@@ -207,12 +208,12 @@ export default class AIService {
         this._updateState(game, player, context);
 
         if (isFirstTickOfCycle) {
-            this._handleBulkUpgradeStates(game, player, context);
+            await this._handleBulkUpgradeStates(game, player, context);
             await this._playFirstTick(game, player);
         }
 
         if (isLastTickOfCycle) {
-            this._handleBulkUpgradeStates(game, player, context);
+            await this._handleBulkUpgradeStates(game, player, context);
             await this._playLastTick(game, player);
         }
 
@@ -226,8 +227,24 @@ export default class AIService {
         player.markModified('aiState');
     }
 
-    _handleBulkUpgradeStates(game: Game, player: Player, context: Context) {
+    async _handleBulkUpgradeStates(game: Game, player: Player, context: Context) {
+        for (const star of context.playerStars) {
+            const borderStarData = context.borderStars.get(star._id.toString());
 
+            if (borderStarData && borderStarData.hasHostileBorder) {
+                star.ignoreBulkUpgrade = {
+                    economy: true,
+                    industry: true,
+                    science: true
+                };
+            } else {
+                star.ignoreBulkUpgrade = {
+                    economy: false,
+                    industry: false,
+                    science: false
+                };
+            }
+        }
     }
 
     async _playLastTick(game: Game, player: Player) {
@@ -419,19 +436,26 @@ export default class AIService {
         };
     }
 
-    _otherPlayersBordering(game: Game, player: Player, starsById: Map<string, Star>, sourceStar: string, starsInGlobalRange: StarGraph): Set<string> {
+    _constructBorderStarData(game: Game, player: Player, starsById: Map<string, Star>, sourceStar: string, starsInGlobalRange: StarGraph): BorderStarData {
         const allStarsInRange = starsInGlobalRange.get(sourceStar)!;
         const otherPlayersBordering = new Set<string>();
+
+        let hasHostileBorder = false;
 
         for (const otherStarId of allStarsInRange) {
             const otherStar = starsById.get(otherStarId)!;
 
             if (otherStar.ownedByPlayerId && otherStar.ownedByPlayerId !== player._id) {
                 otherPlayersBordering.add(otherStar.ownedByPlayerId.toString());
+
+                hasHostileBorder = this._isEnemyPlayer(game, player, otherStar.ownedByPlayerId);
             }
         }
 
-        return otherPlayersBordering;
+        return {
+            otherPlayersBordering,
+            hasHostileBorder
+        }
     }
 
     _findBorderStars(game: Game, player: Player, starsById: Map<string, Star>, reachablePlayerStars: StarGraph, starsInGlobalRange: StarGraph): Map<string, BorderStarData> {
@@ -439,9 +463,7 @@ export default class AIService {
 
         for (const [starId, reachables] of reachablePlayerStars) {
             if (reachables.size === 0 || reachables.size === 1) {
-                borderStars.set(starId, {
-                    otherPlayersBordering: this._otherPlayersBordering(game, player, starsById, starId, starsInGlobalRange)
-                });
+                borderStars.set(starId, this._constructBorderStarData(game, player, starsById, starId, starsInGlobalRange));
                 continue;
             }
 
@@ -475,9 +497,7 @@ export default class AIService {
             }
 
             if (largestGap > BORDER_STAR_ANGLE_THRESHOLD_DEGREES) {
-                borderStars.set(starId, {
-                    otherPlayersBordering: this._otherPlayersBordering(game, player, starsById, starId, starsInGlobalRange)
-                });
+                borderStars.set(starId, this._constructBorderStarData(game, player, starsById, starId, starsInGlobalRange));
             }
         }
 
