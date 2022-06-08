@@ -41,7 +41,7 @@ enum AiAction {
     ClaimStar,
     ReinforceStar,
     InvadeStar
-};
+}
 
 interface DefendStarOrder {
     type: AiAction.DefendStar;
@@ -49,31 +49,35 @@ interface DefendStarOrder {
     star: string;
     ticksUntil: number;
     incomingCarriers: Carrier[];
-};
+}
 
 interface ClaimStarOrder {
     type: AiAction.ClaimStar;
     star: string;
     score: number;
-};
+}
 
 interface ReinforceStarOrder {
     type: AiAction.ReinforceStar;
     score: number;
     star: string;
     source: string;
-};
+}
 
 interface InvadeStarOrder {
     type: AiAction.InvadeStar;
     star: string;
     score: number;
-};
+}
 
 interface TracePoint {
     starId: string;
     action?: CarrierWaypointActionType;
-};
+}
+
+interface BorderStarData {
+    otherPlayersBordering: Set<string>;
+}
 
 type Order = DefendStarOrder | ClaimStarOrder | ReinforceStarOrder | InvadeStarOrder;
 
@@ -89,7 +93,7 @@ interface Context {
     freelyReachableStars: StarGraph;
     allCanReachPlayerStars: StarGraph;
     starsInGlobalRange: StarGraph;
-    borderStars: Set<string>;
+    borderStars: Map<string, BorderStarData>;
     carriersOrbiting: Map<string, Carrier[]>;
     carriersById: Map<string, Carrier>;
     attacksByStarId: Map<string, Map<number, Carrier[]>>;
@@ -105,12 +109,12 @@ interface Assignment {
     carriers: Carrier[];
     star: Star;
     totalShips: number;
-};
+}
 
 interface FoundAssignment {
     assignment: Assignment;
     trace: TracePoint[];
-};
+}
 
 // IMPORTANT IMPLEMENTATION NOTES
 // During AI tick, care must be taken to NEVER write any changes to the database.
@@ -283,7 +287,7 @@ export default class AIService {
 
         const playerStarsInLogicalRange = this._computeStarGraph(starsById, game, player, playerStars, playerStars, this._getHyperspaceRangeLogical(game, player));
 
-        const borderStars = this._findBorderStars(game, player, starsById, playerStarsInLogicalRange);
+        const borderStars = this._findBorderStars(game, player, starsById, playerStarsInLogicalRange, starsInGlobalRange);
 
         const playerCarriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id);
 
@@ -377,12 +381,29 @@ export default class AIService {
         };
     }
 
-    _findBorderStars(game: Game, player: Player, starsById: Map<string, Star>, reachablePlayerStars: StarGraph): Set<string> {
-        const borderStars = new Set<string>();
+    _otherPlayersBordering(game: Game, player: Player, starsById: Map<string, Star>, sourceStar: string, starsInGlobalRange: StarGraph): Set<string> {
+        const allStarsInRange = starsInGlobalRange.get(sourceStar)!;
+        const otherPlayersBordering = new Set<string>();
+
+        for (const otherStarId of allStarsInRange) {
+            const otherStar = starsById.get(otherStarId)!;
+
+            if (otherStar.ownedByPlayerId && otherStar.ownedByPlayerId !== player._id) {
+                otherPlayersBordering.add(otherStar.ownedByPlayerId.toString());
+            }
+        }
+
+        return otherPlayersBordering;
+    }
+
+    _findBorderStars(game: Game, player: Player, starsById: Map<string, Star>, reachablePlayerStars: StarGraph, starsInGlobalRange: StarGraph): Map<string, BorderStarData> {
+        const borderStars = new Map<string, BorderStarData>();
 
         for (const [starId, reachables] of reachablePlayerStars) {
             if (reachables.size === 0 || reachables.size === 1) {
-                borderStars.add(starId);
+                borderStars.set(starId, {
+                    otherPlayersBordering: this._otherPlayersBordering(game, player, starsById, starId, starsInGlobalRange)
+                });
                 continue;
             }
 
@@ -416,12 +437,14 @@ export default class AIService {
             }
 
             if (largestGap > BORDER_STAR_ANGLE_THRESHOLD_DEGREES) {
-                borderStars.add(starId);
+                borderStars.set(starId, {
+                    otherPlayersBordering: this._otherPlayersBordering(game, player, starsById, starId, starsInGlobalRange)
+                });
             }
         }
 
         console.log("Border stars:");
-        borderStars.forEach(starId => {
+        borderStars.forEach((_, starId) => {
             console.log(starsById.get(starId)!.name);
         });
 
@@ -1081,7 +1104,7 @@ export default class AIService {
         const hyperspaceRange = this._getGlobalHighestHyperspaceRange(game);
         const borderStarPriorities = new Map<string, number>();
 
-        for (const borderStarId of context.borderStars) {
+        for (const [borderStarId, borderStarData] of context.borderStars) {
             const borderStar = context.starsById.get(borderStarId)!;
             const reachables = context.starsInGlobalRange.get(borderStarId)!;
 
