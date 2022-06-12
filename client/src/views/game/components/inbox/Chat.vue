@@ -185,8 +185,14 @@ export default {
       if (!isLoggedIn || !isInGame) {
         return
       }
+      
+      let menuState = KEYBOARD_SHORTCUTS.all[key]
 
-      let menuState = KEYBOARD_SHORTCUTS.player[key]
+      if (menuState === null && this.isExpanded) {
+        return this.toggle()
+      }
+
+      menuState = KEYBOARD_SHORTCUTS.player[key]
 
       if (!menuState) {
         return
