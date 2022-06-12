@@ -53,6 +53,7 @@ export default {
     })
 
     // TODO: These event names should be global constants
+    eventBus.$on('onMenuChatSidebarRequested', this.toggle)
     eventBus.$on('onCreateNewConversationRequested', this.onCreateNewConversationRequested)
     eventBus.$on('onViewConversationRequested', this.onViewConversationRequested)
     eventBus.$on('onOpenInboxRequested', this.onOpenInboxRequested)
@@ -63,6 +64,7 @@ export default {
 
     this.sockets.unsubscribe('gameMessageSent')
     
+    eventBus.$off('onMenuChatSidebarRequested', this.toggle)
     eventBus.$off('onCreateNewConversationRequested', this.onCreateNewConversationRequested)
     eventBus.$off('onViewConversationRequested', this.onViewConversationRequested)
     eventBus.$off('onOpenInboxRequested', this.onOpenInboxRequested)
