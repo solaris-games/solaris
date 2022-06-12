@@ -34,6 +34,7 @@ import GameEndedEvent from "./types/events/GameEnded";
 import GamePlayerBadgePurchasedEvent from "./types/events/GamePlayerBadgePurchased";
 import GameDiplomacyPeaceDeclaredEvent from "./types/events/GameDiplomacyPeaceDeclared";
 import GameDiplomacyWarDeclaredEvent from "./types/events/GameDiplomacyWarDeclared";
+import ValidationError from "../errors/validation";
 
 const moment = require('moment');
 
@@ -223,64 +224,97 @@ export default class EventService {
         await event.save();
     }
 
-    async getPlayerEvents(gameId: DBObjectId, player: Player, startTick: number = 0) {
-        let events = await this.eventRepo.find({
+    async getPlayerEvents(gameId: DBObjectId, player: Player, page: number, pageSize: number, category: string | null) {
+        const query = {
             gameId: gameId,
-            tick: { $gte: startTick },
             playerId: {
                 $in: [
                     player._id,
                     null
                 ]
             }
-        },
-        null, // All fields
-        {
-            tick: -1, // Sort by tick descending
-            _id: -1
-        });
+        };
 
-        return events;
-    }
-
-    async getPlayerTradeEvents(gameId: DBObjectId, player: Player, startTick: number = 0) {
-        let tradeEvents: GameEvent[] = await this.eventRepo.find({
-            gameId: gameId,
-            tick: { $gte: startTick },
-            playerId: {
-                $in: [
-                    player._id,
-                    null
+        if (category != null && category !== 'all') {
+            const categories = {
+                gameEvents: [
+                    'gamePlayerJoined',
+                    'gamePlayerQuit',
+                    'gamePlayerDefeated',
+                    'gamePlayerAFK',
+                    'gameStarted',
+                    'gameEnded',
+                    'gamePaused',
+                    'gamePlayerBadgePurchased',
+                    'playerRenownReceived',
+                    'playerRenownSent'
+                ],
+                trade: [
+                    'playerTechnologyReceived',
+                    'playerTechnologySent',
+                    'playerCreditsReceived',
+                    'playerCreditsSent',
+                    'playerCreditsSpecialistsReceived',
+                    'playerCreditsSpecialistsSent',
+                    'playerGiftReceived',
+                    'playerGiftSent',
+                    'playerDebtSettled',
+                    'playerDebtForgiven'
+                ],
+                combat: [
+                    'playerCombatStar',
+                    'playerCombatCarrier',
+                    'playerStarAbandoned'
+                ],
+                galacticCycles: [
+                    'playerGalacticCycleComplete'
+                ],
+                research: [
+                    'playerResearchComplete'
+                ],
+                specialists: [
+                    'playerStarSpecialistHired',
+                    'playerCarrierSpecialistHired'
+                ],
+                conversations: [
+                    'playerConversationCreated',
+                    'playerConversationInvited',
+                    'playerConversationLeft'
+                ],
+                diplomacy: [
+                    'playerDiplomacyStatusChanged',
+                    'gameDiplomacyPeaceDeclared',
+                    'gameDiplomacyWarDeclared',
+                    'gameDiplomacyAllianceDeclared'
                 ]
+            };
+
+            const categoryFilter = categories[category!];
+
+            if (!categoryFilter) {
+                throw new ValidationError(`Unsupported category: ${category}`);
+            }
+
+            query['type'] = {
+                $in: categoryFilter
+            };
+        }
+
+        const count = await this.eventRepo.count(query)
+
+        const events = await this.eventRepo.find(query,
+            null, // All fields
+            {
+                tick: -1, // Sort by tick descending
+                _id: -1
             },
-            type: {
-                $in: [
-                    this.EVENT_TYPES.PLAYER_TECHNOLOGY_SENT,
-                    this.EVENT_TYPES.PLAYER_TECHNOLOGY_RECEIVED,
-                    this.EVENT_TYPES.PLAYER_CREDITS_SENT,
-                    this.EVENT_TYPES.PLAYER_CREDITS_RECEIVED,
-                    this.EVENT_TYPES.PLAYER_CREDITS_SPECIALISTS_SENT,
-                    this.EVENT_TYPES.PLAYER_CREDITS_SPECIALISTS_RECEIVED,
-                    this.EVENT_TYPES.PLAYER_RENOWN_SENT,
-                    this.EVENT_TYPES.PLAYER_RENOWN_RECEIVED,
-                    this.EVENT_TYPES.PLAYER_GIFT_SENT,
-                    this.EVENT_TYPES.PLAYER_GIFT_RECEIVED
-                ]
-            }
-        },
-        null, // All fields
-        {
-            tick: -1, // Sort by tick descending
-            _id: -1
-        });
+            pageSize,
+            page * pageSize);
 
-        // Calculate when the event was created.
-        // TODO: Is this more efficient than storing the UTC in the document itself?
-        tradeEvents.forEach(t => {
-            t.date = moment(t._id.getTimestamp())
-        });
-
-        return tradeEvents;
+        return {
+            count,
+            events
+        };
     }
 
     async markAllEventsAsRead(game: Game, playerId: DBObjectId) {

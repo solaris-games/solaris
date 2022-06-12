@@ -9,7 +9,7 @@
         <button class="btn btn-sm btn-success ms-1" @click="markAllRead"><i class="fas fa-check"></i> Read All</button>
       </div>
       <div class="col-auto">
-        <select class="form-control form-control-sm" v-model="selectedFilter" @change="onSelectedFilterChanged">
+        <select class="form-control form-control-sm" v-model="selectedFilter" @change="loadPage(0)">
           <option value="all">All Events</option>
           <option value="gameEvents">Game Events</option>
           <option value="galacticCycles">Galactic Cycles</option>
@@ -22,21 +22,51 @@
         </select>
       </div>
     </div>
-    <div class="row">
+
+    <div class="row mt-2">
+      <div class="col-auto">
+        <!-- <p class="mb-0"><small>Click on an event to mark it as read.</small></p> -->
+      </div>
       <div class="col">
-        <p class="mb-0"><small>Click on an event to mark it as read.</small></p>
+        <nav aria-label="Events pagination">
+          <ul class="pagination justify-content-end mb-0">
+            <li class="page-item" :class="{'disabled': page <= 0}">
+              <a class="page-link" href="javascript:;" @click="loadPage(0)">
+                <i class="fas fa-angle-double-left"></i>
+              </a>
+            </li>
+            <li class="page-item" :class="{'disabled': page <= 0}">
+              <a class="page-link" href="javascript:;" @click="loadPage(page - 1)">
+                <i class="fas fa-angle-left"></i>
+              </a>
+            </li>
+            <li class="page-item" v-for="pageNumber of pageNumbers" :key="pageNumber" :class="{'active': page === pageNumber}">
+              <a class="page-link" href="javascript:;" @click="loadPage(pageNumber)">{{pageNumber + 1}}</a>
+            </li>
+            <li class="page-item" :class="{'disabled': page >= pageMax}">
+              <a class="page-link" href="javascript:;" @click="loadPage(page + 1)">
+                <i class="fas fa-angle-right"></i>
+              </a>
+            </li>
+            <li class="page-item" :class="{'disabled': page >= pageMax}">
+              <a class="page-link" href="javascript:;" @click="loadPage(pageMax)">
+                <i class="fas fa-angle-double-right"></i>
+              </a>
+            </li>
+          </ul>
+        </nav>
       </div>
     </div>
   </div>
 
-  <div class="mt-2 events-container container" v-if="filteredEvents && filteredEvents.length">
-      <events-list-item v-for="event in filteredEvents" :key="event._id" :event="event"
+  <div class="mt-2 events-container container" v-if="events && events.length">
+      <events-list-item v-for="event in events" :key="event._id" :event="event"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
   </div>
 
-  <div class="text-center pt-3 pb-3" v-if="filteredEvents && !filteredEvents.length">
+  <div class="text-center pt-3 pb-3" v-if="events && !events.length">
       No Events.
   </div>
 </div>
@@ -55,7 +85,11 @@ export default {
   data: function () {
     return {
       events: null,
-      filteredEvents: null,
+      count: 0,
+      page: 0,
+      pageSize: 30,
+      pageMax: 0,
+      pageCurrent: 0,
       selectedFilter: 'all'
     }
   },
@@ -63,21 +97,35 @@ export default {
     this.loadEvents()
   },
   methods: {
+    onOpenPlayerDetailRequested (e) {
+      this.$emit('onOpenPlayerDetailRequested', e)
+    },
+    onOpenStarDetailRequested (e) {
+      this.$emit('onOpenStarDetailRequested', e)
+    },
+    onOpenCarrierDetailRequested (e) {
+      this.$emit('onOpenCarrierDetailRequested', e)
+    },
+    loadPage (pageNumber) {
+      if (pageNumber >= 0 && pageNumber <= this.pageMax) {
+        this.page = pageNumber
+
+        this.loadEvents()
+      }
+    },
     async loadEvents () {
       this.events = null
 
       let game = this.$store.state.game
 
       try {
-        // 10 cycles ago
-        let startTick = Math.max(0, this.$store.state.tick - (game.settings.galaxy.productionTicks * 10))
-
-        let response = await EventApiService.getEvents(game._id, startTick)
+        let response = await EventApiService.getEvents(game._id, this.page, this.pageSize, this.selectedFilter)
 
         if (response.status === 200) {
-          this.events = response.data
+          this.count = response.data.count
+          this.events = response.data.events
 
-          this.onSelectedFilterChanged()
+          this.pageMax = Math.floor(this.count / this.pageSize)
         }
       } catch (err) {
         console.error(err)
@@ -97,77 +145,26 @@ export default {
       } catch (err) {
         console.error(err)
       }
-    },
-    onOpenPlayerDetailRequested (e) {
-      this.$emit('onOpenPlayerDetailRequested', e)
-    },
-    onOpenStarDetailRequested (e) {
-      this.$emit('onOpenStarDetailRequested', e)
-    },
-    onOpenCarrierDetailRequested (e) {
-      this.$emit('onOpenCarrierDetailRequested', e)
-    },
-    onSelectedFilterChanged (e) {
-      const categories = {
-        gameEvents: [
-          'gamePlayerJoined',
-          'gamePlayerQuit',
-          'gamePlayerDefeated',
-          'gamePlayerAFK',
-          'gameStarted',
-          'gameEnded',
-          'gamePaused',
-          'gamePlayerBadgePurchased',
-          'playerRenownReceived',
-          'playerRenownSent'
-        ],
-        trade: [
-          'playerTechnologyReceived',
-          'playerTechnologySent',
-          'playerCreditsReceived',
-          'playerCreditsSent',
-          'playerCreditsSpecialistsReceived',
-          'playerCreditsSpecialistsSent',
-          'playerGiftReceived',
-          'playerGiftSent',
-          'playerDebtSettled',
-          'playerDebtForgiven'
-        ],
-        combat: [
-          'playerCombatStar',
-          'playerCombatCarrier',
-          'playerStarAbandoned'
-        ],
-        galacticCycles: [
-          'playerGalacticCycleComplete'
-        ],
-        research: [
-          'playerResearchComplete'
-        ],
-        specialists: [
-          'playerStarSpecialistHired',
-          'playerCarrierSpecialistHired'
-        ],
-        conversations: [
-          'playerConversationCreated',
-          'playerConversationInvited',
-          'playerConversationLeft'
-        ],
-        diplomacy: [
-          'playerDiplomacyStatusChanged',
-          'gameDiplomacyPeaceDeclared',
-          'gameDiplomacyWarDeclared',
-          'gameDiplomacyAllianceDeclared'
-        ]
+    }
+  },
+  computed: {
+    pageNumbers () {
+      const pages = []
+      const depth = 2
+
+      for (let i = this.page - depth; i < this.page; i++) {
+        if (i >= 0 && i <= this.pageMax) {
+          pages.push(i)
+        }
       }
 
-      if (this.selectedFilter === 'all') {
-        this.filteredEvents = this.events
-      } else {
-        this.filteredEvents = this.events.filter(ev => {
-          return categories[this.selectedFilter].indexOf(ev.type) > -1
-        })
+      for (let i = this.page; i < this.page + depth; i++) {
+        if (i <= this.pageMax) {
+          pages.push(i)
+        }
       }
+
+      return pages
     }
   }
 }

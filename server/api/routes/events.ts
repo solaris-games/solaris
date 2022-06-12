@@ -28,19 +28,6 @@ export default (router: Router, io, container: DependencyContainer) => {
         controller.list,
         mwCore.handleError);
 
-    router.get('/api/game/:gameId/events/trade',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
-            lean: true,
-            settings: true,
-            state: true,
-            galaxy: true,
-            constants: true
-        }),
-        mwPlayer.loadPlayer,
-        controller.listTrade,
-        mwCore.handleError);
-
     router.patch('/api/game/:gameId/events/markAsRead',
         mwAuth.authenticate(),
         mwGame.loadGame({

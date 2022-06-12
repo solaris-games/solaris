@@ -3,13 +3,10 @@ import BaseApiService from './base'
 
 class EventService extends BaseApiService {
   
-  getEvents (gameId, startTick = 0) {
-    return axios.get(this.BASE_URL + 'game/' + gameId + '/events?startTick=' + startTick.toString(),
-      { withCredentials: true })
-  }
-
-  getTradeEvents (gameId, startTick = 0) {
-    return axios.get(this.BASE_URL + 'game/' + gameId + '/events/trade?startTick=' + startTick.toString(),
+  getEvents (gameId, page, pageSize, category) {
+    const url = `${this.BASE_URL}game/${gameId}/events?page=${page}&pageSize=${pageSize}&category=${category}`
+    
+    return axios.get(url,
       { withCredentials: true })
   }
 
