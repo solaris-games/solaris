@@ -189,6 +189,11 @@ export interface User {
             defaultAction: CarrierWaypointActionType;
             defaultAmount: number;
             confirmBuildCarrier: SettingEnabledDisabled;
+        },
+        star: {
+            confirmBuildEconomy: SettingEnabledDisabled;
+            confirmBuildIndustry: SettingEnabledDisabled;
+            confirmBuildScience: SettingEnabledDisabled;
         }
     },
     avatars: number[];

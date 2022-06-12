@@ -382,10 +382,42 @@
       </div>
     </div>
     
+    <h5 class="pt-2">Confirmations</h5>
+
     <div class="row pt-1 pb-1">
       <label for="confirmBuildCarrier" class="col-12 col-sm-6 col-form-label">Confirm Build Carrier</label>
       <div class="col-12 col-sm-6">
         <select class="form-control" id="confirmBuildCarrier" v-model="settings.carrier.confirmBuildCarrier" :disabled="isSavingSettings">
+          <option value="disabled">Disabled</option>
+          <option value="enabled">Enabled</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row pt-1 pb-1">
+      <label for="confirmBuildEconomy" class="col-12 col-sm-6 col-form-label">Confirm Upgrade Economy</label>
+      <div class="col-12 col-sm-6">
+        <select class="form-control" id="confirmBuildEconomy" v-model="settings.star.confirmBuildEconomy" :disabled="isSavingSettings">
+          <option value="disabled">Disabled</option>
+          <option value="enabled">Enabled</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row pt-1 pb-1">
+      <label for="confirmBuildIndustry" class="col-12 col-sm-6 col-form-label">Confirm Upgrade Industry</label>
+      <div class="col-12 col-sm-6">
+        <select class="form-control" id="confirmBuildIndustry" v-model="settings.star.confirmBuildIndustry" :disabled="isSavingSettings">
+          <option value="disabled">Disabled</option>
+          <option value="enabled">Enabled</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row pt-1 pb-1">
+      <label for="confirmBuildScience" class="col-12 col-sm-6 col-form-label">Confirm Upgrade Science</label>
+      <div class="col-12 col-sm-6">
+        <select class="form-control" id="confirmBuildScience" v-model="settings.star.confirmBuildScience" :disabled="isSavingSettings">
           <option value="disabled">Disabled</option>
           <option value="enabled">Enabled</option>
         </select>
