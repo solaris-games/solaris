@@ -42,7 +42,7 @@ export default class BattleRoyaleService {
 
     getStarsToDestroy(game: Game) {
         // Don't do anything for X number of turns for peace time.
-        const peaceCycles = 3;
+        const peaceCycles = 3; // TODO: This needs to be a game setting.
 
         if (game.state.productionTick < peaceCycles) {
             return [];
@@ -50,7 +50,7 @@ export default class BattleRoyaleService {
 
         // Calculate which stars need to be destroyed.
         let galaxyCenter = this.mapService.getGalaxyCenter(game.galaxy.stars.map(s => s.location));
-        let starCountToDestroy = game.settings.general.playerLimit;
+        let starCountToDestroy = game.settings.general.playerLimit; // TODO: This needs to be a game setting?
 
         // There must be at least 1 star left in the galaxy.
         if (game.galaxy.stars.length - starCountToDestroy < 1) {

@@ -28,7 +28,7 @@ In **official games**, 3 specialists are banned from each pool (star and carrier
 | <img src="https://raw.githubusercontent.com/solaris-games/solaris/master/client/src/assets/specialists/techno-heart.svg" width="60">      | **World Builder**        | Adds 1 to the Star's natural resources every tick, -3 Scanning, -5 Weapons. | 10 | $1000
 | <img src="https://raw.githubusercontent.com/solaris-games/solaris/master/client/src/assets/specialists/ringed-planet.svg" width="60">     | **Trade Port**           | The Star's Economy infrastructure contributes x2 to economy production. -5 Terraforming, -3 Weapons, +1 Scanning. | 10 | $1000
 | <img src="https://raw.githubusercontent.com/solaris-games/solaris/master/client/src/assets/specialists/double-ringed-orb.svg" width="60"> | **Financial Analyst**    | The star produces 2 credits per tick for each point of science on the star. | 10 | $1000
-| <img src="https://raw.githubusercontent.com/solaris-games/solaris/master/client/src/assets/specialists/cryo-chamber.svg" width="60">      | **Cryo Chamber**         | When a Carrier is built at this Star, a Lieutenant Carrier Specialist is automatically assigned to the Carrier. | 15 | $1500
+| <img src="https://raw.githubusercontent.com/solaris-games/solaris/master/client/src/assets/specialists/cryo-chamber.svg" width="60">      | **Cryo Chamber**         | When a Carrier is built at this Star, a General Carrier Specialist is automatically assigned to the Carrier. | 15 | $1500
  
 ## Carrier Specialists
 
