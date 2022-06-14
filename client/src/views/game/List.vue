@@ -32,10 +32,10 @@
                       {{games.featured.settings.general.name}}
                     </span>
                   </h4>
-                  <h6 class="card-title card-subtitle">
+                  <p class="card-title card-subtitle">
                     {{getGameTypeFriendlyText(games.featured)}}
                     ({{games.featured.state.players}}/{{games.featured.settings.general.playerLimit}})
-                  </h6>
+                  </p>
                 </div>
               </div>
             </div>
@@ -63,10 +63,10 @@
                     <i class="fas fa-user-graduate"></i>
                     <span class="ms-2">{{getGameTypeFriendlyText(games.newPlayerRT)}}</span>
                   </h5>
-                  <h6 class="card-title card-subtitle new-player-card-subtitle">
+                  <p class="card-title card-subtitle new-player-card-subtitle">
                     {{games.newPlayerRT.settings.general.name}}
                     ({{games.newPlayerRT.state.players}}/{{games.newPlayerRT.settings.general.playerLimit}})
-                  </h6>
+                  </p>
                 </div>
                 <div class="card-arrow">
                   <div class="card-arrow-top-left"></div>
@@ -95,11 +95,11 @@
                     }"></i>
                     <span class="ms-2">{{games.special.settings.general.name}}</span>
                   </h5>
-                  <h6 class="card-title card-subtitle special-card-subtitle">
+                  <p class="card-title card-subtitle special-card-subtitle">
                     {{getGameTypeFriendlyText(games.special)}}
                     ({{games.special.state.players}}/{{games.special.settings.general.playerLimit}}) -
                     <strong>x2 Rank</strong>
-                  </h6>
+                  </p>
                 </div>
                 <div class="card-arrow">
                   <div class="card-arrow-top-left"></div>
@@ -211,10 +211,10 @@
                     <i class="fas fa-users"></i>
                     <span class="ms-2">{{games.thirtyTwoPlayerRT.settings.general.name}}</span>
                   </h5>
-                  <h6 class="card-title card-subtitle">
+                  <p class="card-title card-subtitle">
                     {{getGameTypeFriendlyText(games.thirtyTwoPlayerRT)}}
                     ({{games.thirtyTwoPlayerRT.state.players}}/{{games.thirtyTwoPlayerRT.settings.general.playerLimit}})
-                  </h6>
+                  </p>
                 </div>
                 <div class="card-arrow">
                   <div class="card-arrow-top-left"></div>
@@ -540,10 +540,6 @@ export default {
   left: 0;
   margin: 8px;
   background-color: #3498DB;
-}
-
-p.card-subtitle {
-  font-size: 10px;
 }
 
 .new-player-card-subtitle {

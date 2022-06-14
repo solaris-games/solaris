@@ -9,9 +9,9 @@
                             <i class="fas fa-user-graduate"></i>
                             <span class="ms-2">Tutorial</span>
                         </h5>
-                        <h6 class="card-title card-subtitle">
+                        <p class="card-title card-subtitle">
                             Learn to Play
-                        </h6>
+                        </p>
                     </div>
                     <div class="card-arrow">
                         <div class="card-arrow-top-left"></div>
@@ -101,7 +101,6 @@ export default {
 }
 
 .card-subtitle {
-  font-size: 12px;
   position: absolute;
   bottom: 0;
   left: 0;

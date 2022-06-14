@@ -2,11 +2,6 @@
   <view-container>
     <view-title title="Main Menu" :hideHomeButton="true" :showSocialLinks="true"/>
 
-    <div class="alert alert-danger" role="alert">
-      <i class="fas fa-warning" style="font-size:20px"></i>
-      We're aware of a number of issues with the <strong>Steam version</strong> of Solaris, please bare with us while we work to resolve them. In the meantime you can play Solaris at <a href="https://solaris.games" class="alert-link">https://solaris.games</a>.
-    </div>
-
     <div class="row pb-0 achievements">
       <div class="col-sm-12 col-md-6 col-lg-5">
         <p class="mb-1">A space strategy game filled with conquest, betrayal and subterfuge.</p>
