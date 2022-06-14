@@ -1050,30 +1050,32 @@ export default class AIService {
     }
 
     _gatherInvasionOrders(game: Game, player: Player, context: Context): Order[] {
-        const orders: Order[] = [];
-        const visited = new Set<string>();
+        const orders = new Map<string, Order>();
 
         for (const [fromId, reachables] of context.allReachableFromPlayerStars) {
             for (const reachable of reachables) {
-                if (!visited.has(reachable)) {
-                    visited.add(reachable);
+                const star = context.starsById.get(reachable)!;
 
-                    const star = context.starsById.get(reachable)!;
+                if (this._isEnemyStar(game, player, context, star)) {
+                    const score = this._getStarScore(star);
 
-                    if (this._isEnemyStar(game, player, context, star)) {
-                        const score = this._getStarScore(star);
-
-                        orders.push({
+                    let order = orders.get(reachable);
+                    if (order) {
+                        order.score = Math.max(score, order.score);
+                    } else {
+                        order = {
                             type: AiAction.InvadeStar,
                             star: reachable,
                             score
-                        });
+                        };
                     }
+
+                    orders.set(reachable, order);
                 }
             }
         }
 
-        return orders;
+        return Array.from(orders.values());
     }
 
     _claimInProgress(player: Player, starId: string): boolean {
