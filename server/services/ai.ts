@@ -229,13 +229,21 @@ export default class AIService {
 
     async _handleBulkUpgradeStates(game: Game, player: Player, context: Context) {
         for (const star of context.playerStars) {
+            if (context.attackedStarIds.has(star._id.toString())) {
+                star.ignoreBulkUpgrade = {
+                    economy: true,
+                    industry: true,
+                    science: true
+                };
+            }
+
             const borderStarData = context.borderStars.get(star._id.toString());
 
             if (borderStarData && borderStarData.hasHostileBorder) {
                 star.ignoreBulkUpgrade = {
                     economy: true,
-                    industry: true,
-                    science: true
+                    industry: false,
+                    science: false
                 };
             } else {
                 star.ignoreBulkUpgrade = {
