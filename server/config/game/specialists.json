@@ -527,7 +527,7 @@
             "oneShot": false,
             "modifiers": {
                 "special": {
-                    "autoCarrierSpecialistAssign": 5
+                    "autoCarrierSpecialistAssign": 4
                 }
             }
         }
