@@ -1051,13 +1051,21 @@ export default class AIService {
 
     _gatherInvasionOrders(game: Game, player: Player, context: Context): Order[] {
         const orders = new Map<string, Order>();
+        const hyperspaceRange = this._getHyperspaceRangeInternal(game, player);
 
         for (const [fromId, reachables] of context.allReachableFromPlayerStars) {
+            const fromStar = context.starsById.get(fromId)!;
+
             for (const reachable of reachables) {
                 const star = context.starsById.get(reachable)!;
 
                 if (this._isEnemyStar(game, player, context, star)) {
-                    const score = this._getStarScore(star);
+                    // We adjust the stores by distance, so closer stars end up with a higher score.
+                    // This stops the AI from jumping behind the enemies frontlines too often and leaving closer stars uninvaded and open for counter attacks.
+                    const starScore = this._getStarScore(star);
+                    const distance = this.distanceService.getDistanceBetweenLocations(fromStar.location, star.location);
+                    const relativeDistance = hyperspaceRange / distance;
+                    const score = starScore * relativeDistance;
 
                     let order = orders.get(reachable);
                     if (order) {
