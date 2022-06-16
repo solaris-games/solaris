@@ -53,4 +53,14 @@ export default {
 option {
   background: rgba(29,40,53,.98);
 }
+
+/* For some reason the box shadow on cards displays on top of the card */
+.card::after {
+  z-index: -10 !important;
+}
+
+/* Prevent card arrow from receiving pointer events */
+.card-arrow {
+  pointer-events: none;
+}
 </style>

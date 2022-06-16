@@ -21,6 +21,12 @@
       </router-link>
     </div>
     <div class="menu-item dropdown dropdown-mobile-full">
+      <router-link :to="{ name: 'avatars'}" class="menu-link">
+        <div class="menu-icon"><i class="fas fa-shopping-basket"></i></div>
+        <div class="menu-text d-sm-block d-none ms-1">Shop</div>
+      </router-link>
+    </div>
+    <div class="menu-item dropdown dropdown-mobile-full">
       <a href="#" data-bs-toggle="dropdown" data-bs-display="static" class="menu-link">
         <!-- <div class="menu-img online">
           <img src="assets/img/user/profile.jpg" alt="Profile" height="60">
