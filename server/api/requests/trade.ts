@@ -31,7 +31,7 @@ export const mapToTradeSendToPlayerRequest = (body: any, userId: any): TradeSend
         throw new ValidationError(errors);
     }
 
-    body.amount = +body.amount;
+    body.amount = Math.floor(+body.amount);
 
     return {
         toPlayerId: body.toPlayerId,
@@ -59,12 +59,16 @@ export const mapToTradeSendTechnologyToPlayerRequest = (body: any): TradeSendTec
     if (!keyHasNumberValue(body, 'level')) {
         errors.push('Level is required.');
     }
+    
+    if (body.level != null && body.level <= 0) {
+        errors.push('Level must be greater than 0.');
+    }
 
     if (errors.length) {
         throw new ValidationError(errors);
     }
 
-    body.level = +body.level;
+    body.level = Math.floor(+body.level);
 
     return {
         toPlayerId: body.toPlayerId,

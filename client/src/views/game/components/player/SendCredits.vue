@@ -55,6 +55,7 @@ export default {
     async confirmSendCredits () {
       this.errors = []
       this.isSendingCredits = true
+      this.amount = Math.floor(this.amount)
 
       try {
         let response = await tradeService.sendCredits(this.$store.state.game._id, this.player._id, this.amount)
