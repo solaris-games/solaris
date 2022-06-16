@@ -27,8 +27,8 @@
                 <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Leaderboard (Q)"><i class="fas fa-users me-2"></i>Leaderboard</a>
                 <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GALAXY)" title="Galaxy (G)"><i class="fas fa-sun me-2"></i>Galaxy</a>
                 <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.RESEARCH)" title="Research (R)"><i class="fas fa-flask me-2"></i>Research</a>
-                <a class="dropdown-item d-lg-none" v-on:click="setMenuState(MENU_STATES.INBOX)" title="Inbox (M)"><i class="fas fa-comments me-2"></i>Inbox</a>
-                <a class="dropdown-item d-none d-lg-inline-block" v-on:click="onMenuChatSidebarRequested()" title="Inbox (M)"><i class="fas fa-comments me-2"></i>Inbox</a>
+                <a class="dropdown-item d-lg-none" v-on:click="setMenuState(MENU_STATES.INBOX)" title="Inbox (M)" v-if="!isTutorialGame"><i class="fas fa-comments me-2"></i>Inbox</a>
+                <a class="dropdown-item d-none d-lg-inline-block" v-on:click="onMenuChatSidebarRequested()" title="Inbox (M)" v-if="!isTutorialGame"><i class="fas fa-comments me-2"></i>Inbox</a>
                 <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.DIPLOMACY)" title="Diplomacy (D)" v-if="isFormalAlliancesEnabled"><i class="fas fa-globe-americas me-2"></i>Diplomacy</a>
                 <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEDGER)" title="Ledger (L)" v-if="isTradeEnabled"><i class="fas fa-file-invoice-dollar me-2"></i>Ledger</a>
                 <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GAME_NOTES)" title="Notes (N)"><i class="fas fa-book-open me-2"></i>Notes</a>
@@ -133,6 +133,9 @@ export default {
     },
     isTradeEnabled () {
       return GameHelper.isTradeEnabled(this.$store.state.game)
+    },
+    isTutorialGame () {
+      return GameHelper.isTutorialGame(this.$store.state.game)
     }
   }
 }
