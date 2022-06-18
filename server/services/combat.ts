@@ -78,20 +78,36 @@ export default class CombatService extends EventEmitter {
             defenderShipsRemaining = defender.ships - (defenderTurns - defenderAdditionalTurns) * attackPower;
 
             if (calculateNeeded) {
-                needed = {
-                    defender: 0,
-                    attacker: attackerTurns * defendPower + 1
-                };
+                if(attackPower !== attackPowerBase) {
+                    needed = {
+                        defender: 0,
+                        // We use the PowerBase here as the normal power has been reduced to 1, meaning this calculation is otherwise borked.
+                            attacker: Math.ceil(defender.ships / attackPowerBase) * defendPowerBase + 1
+                    };
+                } else {
+                    needed = {
+                        defender: 0,
+                        attacker: attackerTurns * defendPower + 1
+                    };
+                }
             }
         } else {
             defenderShipsRemaining = 0;
             attackerShipsRemaining = attacker.ships - attackerTurns * defendPower;
 
             if (calculateNeeded) {
-                needed = {
-                    attacker: 0,
-                    defender: (defenderTurns - defenderAdditionalTurns) * attackPower + defenderAdditionalTurns
-                };
+                if(defendPower !== defendPowerBase) {
+                    needed = {
+                        attacker: 0,
+                        // We use the PowerBase here as the normal power has been reduced to 1, meaning this calculation is otherwise borked.
+                        defender: (Math.ceil(attacker.ships / defendPowerBase) - defenderAdditionalTurns) * attackPowerBase + 1
+                    };
+                } else {
+                    needed = {
+                        attacker: 0,
+                        defender: (defenderTurns - defenderAdditionalTurns) * attackPower + 1
+                    };
+                }
             }
         }
 
