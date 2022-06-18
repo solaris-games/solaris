@@ -1,10 +1,10 @@
-import { DBObjectId } from "../types/DBObjectId";
-import { Conversation } from "../types/Conversation";
-import { ConversationMessageSentResult } from "../types/ConversationMessage";
-import { Game } from "../types/Game";
-import { Player } from "../types/Player";
-import { DiplomaticStatus } from "../types/Diplomacy";
-import { TradeEventTechnology } from "../types/Trade";
+import { DBObjectId } from "./types/DBObjectId";
+import { Conversation } from "./types/Conversation";
+import { ConversationMessageSentResult } from "./types/ConversationMessage";
+import { Game } from "./types/Game";
+import { Player } from "./types/Player";
+import { DiplomaticStatus } from "./types/Diplomacy";
+import { TradeEventTechnology } from "./types/Trade";
 
 
 export default class BroadcastService {

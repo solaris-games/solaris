@@ -1,20 +1,21 @@
-import { DBObjectId } from '../types/DBObjectId';
+import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Badge, UserBadge } from '../types/Badge';
-import { Game } from '../types/Game';
-import { User } from '../types/User';
+import Repository from './repository';
+import { Badge, UserBadge } from './types/Badge';
+import { Game } from './types/Game';
+import { User } from './types/User';
 import PlayerService from './player';
 import UserService from './user';
+import GamePlayerBadgePurchasedEvent from './types/events/GamePlayerBadgePurchased';
 const EventEmitter = require('events');
 
 export default class BadgeService extends EventEmitter {
-    userRepo: DatabaseRepository<User>;
+    userRepo: Repository<User>;
     userService: UserService;
     playerService: PlayerService;
 
     constructor(
-        userRepo: DatabaseRepository<User>,
+        userRepo: Repository<User>,
         userService: UserService,
         playerService: PlayerService
     ) {
@@ -67,6 +68,11 @@ export default class BadgeService extends EventEmitter {
             return null;
         }
 
+        // Do not reveal badges for anon games.
+        if (game.settings.general.anonymity === 'extra') {
+            return []
+        }
+
         return await this.listBadgesByUser(player.userId);
     }
 
@@ -88,7 +94,7 @@ export default class BadgeService extends EventEmitter {
         }
 
         // Check if the buyer can afford the badge.
-        const creditsOwned = await this.userService.getUserCredits(purchasedByUserId);
+        const creditsOwned = await this.userService.getCredits(purchasedByUserId);
 
         if (!creditsOwned || creditsOwned < badge.price) {
             throw new ValidationError(`You cannot afford to purchase this badge.`);
@@ -124,7 +130,7 @@ export default class BadgeService extends EventEmitter {
 
         const badge = await this.purchaseBadgeForUser(purchasedByUserId, recipient.userId, badgeKey);
 
-        this.emit('onGamePlayerBadgePurchased', {
+        let e: GamePlayerBadgePurchasedEvent = {
             gameId: game._id,
             gameTick: game.state.tick,
             purchasedByPlayerId: buyer._id,
@@ -133,7 +139,9 @@ export default class BadgeService extends EventEmitter {
             purchasedForPlayerAlias: recipient.alias,
             badgeKey,
             badgeName: badge.name
-        });
+        };
+
+        this.emit('onGamePlayerBadgePurchased', e);
     }
 
     awardBadgeForUser(user: User, badgeKey: string): void {

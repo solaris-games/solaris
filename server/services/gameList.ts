@@ -1,6 +1,6 @@
-import { DBObjectId } from "../types/DBObjectId";
-import DatabaseRepository from "../models/DatabaseRepository";
-import { Game, GameUserNotification } from "../types/Game";
+import { DBObjectId } from "./types/DBObjectId";
+import Repository from "./repository";
+import { Game, GameUserNotification } from "./types/Game";
 import ConversationService from "./conversation";
 import EventService from "./event";
 import GameService from "./game";
@@ -9,14 +9,14 @@ import GameTypeService from "./gameType";
 const moment = require('moment');
 
 export default class GameListService {
-    gameRepo: DatabaseRepository<Game>;
+    gameRepo: Repository<Game>;
     gameService: GameService;
     conversationService: ConversationService;
     eventService: EventService;
     gameTypeService: GameTypeService;
     
     constructor(
-        gameRepo: DatabaseRepository<Game>,
+        gameRepo: Repository<Game>,
         gameService: GameService,
         conversationService: ConversationService,
         eventService: EventService,
@@ -42,7 +42,7 @@ export default class GameListService {
         });
     }
 
-    async listUserGames(select?) {
+    async listCustomGames(select?) {
         select = select || {
             'settings.general.type': 1,
             'settings.general.featured': 1,
@@ -236,13 +236,13 @@ export default class GameListService {
             'settings.general.type': 1,
             'settings.general.playerLimit': 1,
             state: 1,
-            'galaxy.players.afk': 1
+            'galaxy.players.isOpenSlot': 1
         }, {
             'state.startDate': -1
         });
 
         for (let game of games) {
-            game.state.afkSlots = game.galaxy.players.filter(p => p.afk).length;
+            game.state.openSlots = game.galaxy.players.filter(p => p.isOpenSlot).length;
 
             delete (game as any).galaxy;
         }

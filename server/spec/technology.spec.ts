@@ -162,7 +162,7 @@ describe('technology', () => {
         expect(bonus).toBe(0);
     });
 
-    it('should get x2 defender bonus if star is asteroid field', () => {
+    it('should get +1 defender bonus if star is asteroid field', () => {
         const game = {
             settings: {
                 specialGalaxy: {
@@ -182,7 +182,7 @@ describe('technology', () => {
         expect(bonus).toBe(2);
     });
 
-    it('should get 0 defender bonus for asteroid field if disabled', () => {
+    it('should get 1 defender bonus for asteroid field if disabled', () => {
         const game = {
             settings: {
                 specialGalaxy: {
@@ -199,7 +199,63 @@ describe('technology', () => {
 
         const bonus = service.getDefenderBonus(game, star);
 
-        expect(bonus).toBe(0);
+        expect(bonus).toBe(1);
+    });
+
+    it('should get 2 defender bonus for defender bonus specialist and defender bonus is enabled', () => {
+        const game = {
+            settings: {
+                specialGalaxy: {
+                    defenderBonus: 'enabled'
+                }
+            }
+        };
+
+        const star = {
+            specialistId: 1
+        };
+
+        const specialist = {
+            modifiers: {
+                special: {
+                    defenderBonus: 1
+                }
+            }
+        };
+
+        setup(specialist);
+
+        const bonus = service.getDefenderBonus(game, star);
+
+        expect(bonus).toBe(2);
+    });
+
+    it('should get 1 defender bonus for defender bonus specialist and defender bonus is disabled', () => {
+        const game = {
+            settings: {
+                specialGalaxy: {
+                    defenderBonus: 'disabled'
+                }
+            }
+        };
+
+        const star = {
+            specialistId: 1
+        };
+
+        const specialist = {
+            modifiers: {
+                special: {
+                    defenderBonus: 1
+                }
+            }
+        };
+
+        setup(specialist);
+
+        const bonus = service.getDefenderBonus(game, star);
+
+        expect(bonus).toBe(1);
     });
 
     /* EFFECTIVE WEAPON LEVELS */

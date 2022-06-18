@@ -132,7 +132,7 @@ class Carrier extends EventEmitter {
 
       let shipsText = totalShips.toString()
 
-      let bitmapFont = {fontName: "space-mono-bold", fontSize: 4}
+      let bitmapFont = {fontName: "chakrapetch", fontSize: 4}
       this.text_ships = new PIXI.BitmapText(shipsText, bitmapFont)
 
       this.text_ships.x = -(this.text_ships.width / 2.0)
@@ -141,7 +141,7 @@ class Carrier extends EventEmitter {
       this.container.addChild(this.text_ships)
       if( this.data.isGift ) {
         let style = new PIXI.TextStyle({
-          fontFamily: `'Space Mono', monospace`,
+          fontFamily: `Chakra Petch,sans-serif;`,
           fill: 0xFFFFFF,
           padding: 3,
           fontSize: 4,
@@ -157,18 +157,23 @@ class Carrier extends EventEmitter {
   }
 
   drawSpecialist () {
+    if (this.specialistSprite) {
+      this.container.removeChild(this.specialistSprite)
+      this.specialistSprite = null
+    }
+
     if (!this.hasSpecialist() || this.data.orbiting) {
       return
     }
 
     let specialistTexture = TextureService.getSpecialistTexture(this.data.specialist.key)
-    let specialistSprite = new PIXI.Sprite(specialistTexture)
-    specialistSprite.width = 6
-    specialistSprite.height = 6
-    specialistSprite.x = -3
-    specialistSprite.y = -3
+    this.specialistSprite = new PIXI.Sprite(specialistTexture)
+    this.specialistSprite.width = 6
+    this.specialistSprite.height = 6
+    this.specialistSprite.x = -3
+    this.specialistSprite.y = -3
 
-    this.container.addChild(specialistSprite)
+    this.container.addChild(this.specialistSprite)
   }
 
   hasSpecialist () {
@@ -333,13 +338,13 @@ class Carrier extends EventEmitter {
   onMouseOver (e) {
     this.isMouseOver = true
 
-    this.emit('onCarrierMouseOver', this.data)
+    this.emit('onCarrierMouseOver', this)
   }
 
   onMouseOut (e) {
     this.isMouseOver = false
 
-    this.emit('onCarrierMouseOut', this.data)
+    this.emit('onCarrierMouseOut', this)
   }
 
   refreshZoom (zoomPercent) {

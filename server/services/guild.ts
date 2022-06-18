@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
-import { DBObjectId } from '../types/DBObjectId';
+import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Guild, GuildLeaderboard, GuildRank, GuildUserApplication, GuildWithUsers } from '../types/Guild';
-import { User } from '../types/User';
+import Repository from './repository';
+import { Guild, GuildLeaderboard, GuildRank, GuildUserApplication, GuildWithUsers } from './types/Guild';
+import { User } from './types/User';
 import UserService from './user';
 
 function toProperCase(string: string) {
@@ -19,14 +19,14 @@ export default class GuildService {
     RENAME_GUILD_CREDITS_COST = 1
 
     guildModel;
-    guildRepo: DatabaseRepository<Guild>;
-    userRepo: DatabaseRepository<User>;
+    guildRepo: Repository<Guild>;
+    userRepo: Repository<User>;
     userService: UserService;
     
     constructor(
         guildModel,
-        guildRepo: DatabaseRepository<Guild>,
-        userRepo: DatabaseRepository<User>,
+        guildRepo: Repository<Guild>,
+        userRepo: Repository<User>,
         userService: UserService
     ) {
         this.guildModel = guildModel;
@@ -194,7 +194,7 @@ export default class GuildService {
             throw new ValidationError(`Cannot create a guild if you are already a member in another guild.`);
         }
 
-        let userCredits = await this.userService.getUserCredits(userId);
+        let userCredits = await this.userService.getCredits(userId);
 
         if (userCredits < this.CREATE_GUILD_CREDITS_COST) {
             throw new ValidationError(`You do not have enough credits to found a guild. The cost is ${this.CREATE_GUILD_CREDITS_COST} credits, you have ${userCredits}.`);
@@ -257,7 +257,7 @@ export default class GuildService {
             throw new ValidationError('Only guild leaders can rename their guild.');
         }
 
-        let userCredits = await this.userService.getUserCredits(userId);
+        let userCredits = await this.userService.getCredits(userId);
 
         if (userCredits < this.RENAME_GUILD_CREDITS_COST) {
             throw new ValidationError(`You do not have enough credits to rename your guild. The cost is ${this.RENAME_GUILD_CREDITS_COST} credits, you have ${userCredits}.`);

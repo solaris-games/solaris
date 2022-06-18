@@ -1,5 +1,5 @@
-import { Game } from "../types/Game";
-import { Player } from "../types/Player";
+import { Game } from "./types/Game";
+import { Player } from "./types/Player";
 
 const moment = require('moment');
 

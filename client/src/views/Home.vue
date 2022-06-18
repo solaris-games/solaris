@@ -1,4 +1,5 @@
 <template>
+<div class="full-container">
   <view-container :hideTopBar="true">
     <view-title title="Welcome to Solaris" :hideHomeButton="true" :showSocialLinks="true" />
 
@@ -18,25 +19,9 @@
       </div>
     </div>
 
-    <div class="row bg-primary">
+    <div class="row bg-dark">
       <div class="col text-center">
-        <p class="mb-2 mt-2">Play <span class="text-warning">Solaris</span> on <a href="https://solaris.games" target="_blank" title="Web">Web</a>, <a href="https://store.steampowered.com/app/1623930/Solaris/" target="_blank" title="Steam">Steam</a> and <a href="https://play.google.com/store/apps/details?id=com.voxel.solaris_android" target="_blank" title="Android">Android</a>.</p>
-      </div>
-    </div>
-
-    <div class="row mb-3">
-      <div class="carousel slide w-100" data-ride="carousel">
-        <div class="carousel-inner">
-          <div class="carousel-item active">
-              <img :src="require('../assets/screenshots/game-carousel-1.png')" alt="Solaris" class="d-block w-100"/>
-          </div>
-          <div class="carousel-item">
-              <img :src="require('../assets/screenshots/game-carousel-2.png')" alt="Solaris" class="d-block w-100"/>
-          </div>
-          <div class="carousel-item">
-              <img :src="require('../assets/screenshots/game-carousel-3.png')" alt="Solaris" class="d-block w-100"/>
-          </div>
-        </div>
+        <p class="mb-2 mt-2">Play <span class="text-warning">Solaris</span> on <a href="https://solaris.games" target="_blank" title="Web"><i class="fab fa-chrome me-1"></i>Web</a>, <a href="https://store.steampowered.com/app/1623930/Solaris/" target="_blank" title="Steam"><i class="fab fa-steam me-1"></i>Steam</a> and <a href="https://play.google.com/store/apps/details?id=com.voxel.solaris_android" target="_blank" title="Android"><i class="fab fa-google-play me-1"></i>Android</a>.</p>
       </div>
     </div>
 
@@ -49,16 +34,20 @@
       </div>
     </div> -->
   </view-container>
+  
+  <parallax />
+</div>
 </template>
 
 <script>
-import ViewContainer from '../components/ViewContainer'
-import ViewTitle from '../components/ViewTitle'
-import AccountLoginVue from './AccountLogin'
+import ViewContainer from './components/ViewContainer'
+import ViewTitle from './components/ViewTitle'
+import AccountLoginVue from './account/components/Login'
 import ApiAuthService from '../services/api/auth'
 import router from '../router'
-import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
-import RecentDonationsVue from '../components/game/donate/RecentDonations.vue'
+import LoadingSpinnerVue from './components/LoadingSpinner.vue'
+import RecentDonationsVue from './game/components/donate/RecentDonations.vue'
+import ParallaxVue from './components/Parallax'
 
 export default {
   components: {
@@ -66,7 +55,8 @@ export default {
     'view-title': ViewTitle,
     'account-login': AccountLoginVue,
     'loading-spinner': LoadingSpinnerVue,
-    'recent-donations': RecentDonationsVue
+    'recent-donations': RecentDonationsVue,
+    'parallax': ParallaxVue
   },
   data () {
     return {
@@ -104,7 +94,7 @@ export default {
 </script>
 
 <style scoped>
-img {
-  object-fit: cover;
+.full-container {
+  background-color: black !important;
 }
 </style>

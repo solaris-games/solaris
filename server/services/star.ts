@@ -1,16 +1,15 @@
 const EventEmitter = require('events');
 const mongoose = require('mongoose');
-import { DBObjectId } from '../types/DBObjectId';
+import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Carrier } from '../types/Carrier';
-import { Game, GameSettings } from '../types/Game';
-import { Location } from '../types/Location';
-import { MapObject } from '../types/Map';
-import { Player } from '../types/Player';
-import { InfrastructureType, NaturalResources, Star, StarCaptureResult, TerraformedResources } from '../types/Star';
-import { User } from '../types/User';
-import DiplomacyService from './diplomacy';
+import Repository from './repository';
+import { Carrier } from './types/Carrier';
+import { Game, GameSettings } from './types/Game';
+import { Location } from './types/Location';
+import { MapObject } from './types/Map';
+import { Player } from './types/Player';
+import { InfrastructureType, NaturalResources, Star, StarCaptureResult, TerraformedResources } from './types/Star';
+import { User } from './types/User';
 import DistanceService from './distance';
 import GameStateService from './gameState';
 import GameTypeService from './gameType';
@@ -23,7 +22,7 @@ import UserService from './user';
 
 export default class StarService extends EventEmitter {
 
-    gameRepo: DatabaseRepository<Game>;
+    gameRepo: Repository<Game>;
     randomService: RandomService;
     nameService: NameService;
     distanceService: DistanceService;
@@ -35,7 +34,7 @@ export default class StarService extends EventEmitter {
     gameStateService: GameStateService;
 
     constructor(
-        gameRepo: DatabaseRepository<Game>,
+        gameRepo: Repository<Game>,
         randomService: RandomService,
         nameService: NameService,
         distanceService: DistanceService,
@@ -160,7 +159,7 @@ export default class StarService extends EventEmitter {
     }
 
     getPlayerHomeStar(stars: Star[], player: Player) {
-        return this.listStarsOwnedByPlayer(stars, player._id).find(s => s._id.toString() === player.homeStarId.toString());
+        return this.listStarsOwnedByPlayer(stars, player._id).find(s => s._id.toString() === player.homeStarId!.toString());
     }
 
     listStarsOwnedByPlayer(stars: Star[], playerId: DBObjectId) {
@@ -408,8 +407,10 @@ export default class StarService extends EventEmitter {
     }
 
     isStarPairWormHole(sourceStar: Star, destinationStar: Star) {
-        return sourceStar.wormHoleToStarId 
-            && destinationStar.wormHoleToStarId 
+        return sourceStar
+            && destinationStar
+            && sourceStar.wormHoleToStarId
+            && destinationStar.wormHoleToStarId
             && sourceStar.wormHoleToStarId.toString() === destinationStar._id.toString()
             && destinationStar.wormHoleToStarId.toString() === sourceStar._id.toString();
     }
@@ -665,10 +666,19 @@ export default class StarService extends EventEmitter {
             star.warpGate = false;
         }
 
-        let closestPlayerId = attackerCarriers.sort((a, b) => (a.distanceToDestination || 0) - (b.distanceToDestination || 0))[0].ownedByPlayerId!;
+        // If multiple players are capturing the star, then the player who owns the carrier with the most
+        // ships will capture it, otherwise the closest carrier gets it.
+        let capturePlayerId = attackerCarriers.sort((a, b) => {
+            // Sort by ship count (highest ships first)
+            if (a.ships! > b.ships!) return -1;
+            if (a.ships! < b.ships!) return 1;
+
+            // Then by distance (closest carrier first)
+            return (a.distanceToDestination || 0) - (b.distanceToDestination || 0);
+        })[0].ownedByPlayerId!;
 
         // Capture the star.
-        let newStarPlayer = attackers.find(p => p._id.toString() === closestPlayerId.toString())!;
+        let newStarPlayer = attackers.find(p => p._id.toString() === capturePlayerId.toString())!;
         let newStarUser = attackerUsers.find(u => newStarPlayer.userId && u._id.toString() === newStarPlayer.userId.toString());
         let newStarPlayerCarriers = attackerCarriers.filter(c => c.ownedByPlayerId!.toString() === newStarPlayer._id.toString());
 

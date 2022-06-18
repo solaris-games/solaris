@@ -1,11 +1,13 @@
+import {Carrier} from "./types/Carrier";
+
 const EventEmitter = require('events');
-import { DBObjectId } from '../types/DBObjectId';
+import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
-import DatabaseRepository from '../models/DatabaseRepository';
-import { BulkUpgradeReport, InfrastructureUpgradeCosts, InfrastructureUpgradeReport } from '../types/InfrastructureUpgrade';
-import { Game, GameInfrastructureExpenseMultiplier } from '../types/Game';
-import { Player } from '../types/Player';
-import { InfrastructureType, NaturalResources, Star, TerraformedResources } from '../types/Star';
+import Repository from './repository';
+import { BulkUpgradeReport, InfrastructureUpgradeCosts, InfrastructureUpgradeReport } from './types/InfrastructureUpgrade';
+import { Game, GameInfrastructureExpenseMultiplier } from './types/Game';
+import { Player } from './types/Player';
+import { InfrastructureType, NaturalResources, Star, TerraformedResources } from './types/Star';
 import AchievementService from './achievement';
 import CarrierService from './carrier';
 import GameTypeService from './gameType';
@@ -16,7 +18,7 @@ import PlayerCreditsService from './playerCredits';
 const Heap = require('qheap');
 
 export default class StarUpgradeService extends EventEmitter {
-    gameRepo: DatabaseRepository<Game>;
+    gameRepo: Repository<Game>;
     starService: StarService;
     carrierService: CarrierService;
     achievementService: AchievementService;
@@ -26,7 +28,7 @@ export default class StarUpgradeService extends EventEmitter {
     gameTypeService: GameTypeService;
 
     constructor(
-        gameRepo: DatabaseRepository<Game>,
+        gameRepo: Repository<Game>,
         starService: StarService,
         carrierService: CarrierService,
         achievementService: AchievementService,
@@ -121,7 +123,7 @@ export default class StarUpgradeService extends EventEmitter {
         }
     }
 
-    async buildCarrier(game: Game, player: Player, starId: DBObjectId, ships: number) {
+    async buildCarrier(game: Game, player: Player, starId: DBObjectId, ships: number, writeToDB: boolean = true): Promise<{carrier: Carrier, starShips: number}> {
         ships = ships || 1;
 
         if (ships < 1) {
@@ -154,39 +156,41 @@ export default class StarUpgradeService extends EventEmitter {
         // Create a carrier at the star.
         let carrier = this.carrierService.createAtStar(star, game.galaxy.carriers, ships);
 
-        game.galaxy.carriers.push(carrier as any);
+        game.galaxy.carriers.push(carrier);
 
         // Deduct the cost of the carrier from the player's credits.
         player.credits -= cost;
 
         // Update the DB.
-        await this.gameRepo.bulkWrite([
-            await this._getDeductPlayerCreditsDBWrite(game, player, cost),
-            {
-                updateOne: {
-                    filter: {
-                        _id: game._id,
-                        'galaxy.stars._id': star._id
-                    },
-                    update: {
-                        'galaxy.stars.$.shipsActual': star.shipsActual,
-                        'galaxy.stars.$.ships': star.ships
+        if (writeToDB) {
+            await this.gameRepo.bulkWrite([
+                await this._getDeductPlayerCreditsDBWrite(game, player, cost),
+                {
+                    updateOne: {
+                        filter: {
+                            _id: game._id,
+                            'galaxy.stars._id': star._id
+                        },
+                        update: {
+                            'galaxy.stars.$.shipsActual': star.shipsActual,
+                            'galaxy.stars.$.ships': star.ships
+                        }
                     }
-                }
-            },
-            {
-                updateOne: {
-                    filter: {
-                        _id: game._id
-                    },
-                    update: {
-                        $push: {
-                            'galaxy.carriers': carrier
+                },
+                {
+                    updateOne: {
+                        filter: {
+                            _id: game._id
+                        },
+                        update: {
+                            $push: {
+                                'galaxy.carriers': carrier
+                            }
                         }
                     }
                 }
-            }
-        ]);
+            ]);
+        }
 
         if (player.userId && !player.defeated && !this.gameTypeService.isTutorialGame(game)) {
             await this.achievementService.incrementCarriersBuilt(player.userId);
@@ -194,7 +198,7 @@ export default class StarUpgradeService extends EventEmitter {
 
         return {
             carrier,
-            starShips: star.ships
+            starShips: star.ships || 0
         };
     }
 

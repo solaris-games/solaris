@@ -65,6 +65,9 @@ class Star extends EventEmitter {
     this.container.on('mouseover', this.onMouseOver.bind(this))
     this.container.on('mouseout', this.onMouseOut.bind(this))
 
+    this.planets = null
+    this.handleOrbitPlanetsStep = null
+
     this.isSelected = false
     this.isMouseOver = false
     this.isInScanningRange = false // Default to false to  initial redraw
@@ -331,12 +334,15 @@ class Star extends EventEmitter {
   drawPlanets () {
     if (this.userSettings.map.naturalResources !== 'planets') {
       if (this.container_planets) {
+        this.unsubscribeToEvents()
         this.container.removeChild(this.container_planets)
         this.container_planets = null
+        this.planets = null
       }
 
       return
     }
+
     if (!this.container_planets) {
       this.container_planets = new PIXI.Container()
 
@@ -352,6 +358,8 @@ class Star extends EventEmitter {
 
       let rotationDirection = this._getPlanetOrbitDirection()
       let rotationSpeedModifier = this._getPlanetOrbitSpeed()
+
+      this.planets = []
 
       for (let i = 0; i < planetCount; i++) {
         let planetContainer = new PIXI.Container()
@@ -380,19 +388,33 @@ class Star extends EventEmitter {
 
         let rotationSpeed = (planetCount - i) / rotationSpeedModifier
 
-        this.app.ticker.add((delta) => {
-          //TODO maybe check if visible? no need to rotate planets outside viewport
-          if (rotationDirection) {
-            planetContainer.rotation += rotationSpeed * delta
-          } else {
-            planetContainer.rotation -= rotationSpeed * delta
-          }
-        })
-
         this.container_planets.addChild(planetContainer)
+
+        this.planets.push({
+          index: i,
+          container: planetContainer,
+          rotationSpeed,
+          rotationDirection
+        })
       }
 
+      this.subscribeToEvents()
+
       this.container.addChild(this.container_planets)
+    }
+  }
+
+  orbitPlanentsStep (delta) {
+    if (!this.planets) {
+      return
+    }
+    
+    for (let planet of this.planets) {
+      if (planet.rotationDirection) {
+        planet.container.rotation += planet.rotationSpeed * delta
+      } else {
+        planet.container.rotation -= planet.rotationSpeed * delta
+      }
     }
   }
 
@@ -488,7 +510,7 @@ class Star extends EventEmitter {
 
   drawName () {
     if (!this.text_name) {
-      let bitmapFont = {fontName: "space-mono", fontSize: Star.nameSize}
+      let bitmapFont = {fontName: "chakrapetch", fontSize: Star.nameSize}
       this.text_name = new PIXI.BitmapText(this.data.name, bitmapFont)
       this.text_name.x = 5
 
@@ -552,7 +574,7 @@ class Star extends EventEmitter {
 
     if (shipsText) {
       if (!this.text_ships_small) {
-        let bitmapFont = {fontName: "space-mono", fontSize: Star.shipsSmallSize}
+        let bitmapFont = {fontName: "chakrapetch", fontSize: Star.shipsSmallSize}
         this.text_ships_small = new PIXI.BitmapText(this.data.name, bitmapFont)
         this.container.addChild(this.text_ships_small)
         this.text_ships_small.x = 5
@@ -560,7 +582,7 @@ class Star extends EventEmitter {
       }
 
       if (!this.text_ships_big) {
-        let bitmapFont = {fontName: "space-mono", fontSize: Star.shipsBigSize}
+        let bitmapFont = {fontName: "chakrapetch", fontSize: Star.shipsBigSize}
         this.text_ships_big = new PIXI.BitmapText(this.data.name, bitmapFont)
         this.container.addChild(this.text_ships_big)
         this.text_ships_big.x = 5
@@ -585,7 +607,7 @@ class Star extends EventEmitter {
       if (this.data.ownedByPlayerId && this._isInScanningRange()) {
         let displayInfrastructure = `${this.data.infrastructure.economy} ${this.data.infrastructure.industry} ${this.data.infrastructure.science}`
 
-        let bitmapFont = {fontName: "space-mono", fontSize: 4}
+        let bitmapFont = {fontName: "chakrapetch", fontSize: 4}
         this.text_infrastructure = new PIXI.BitmapText(displayInfrastructure, bitmapFont);
         this.text_infrastructure.x = -(this.text_infrastructure.width / 2.0)
         this.text_infrastructure.y = -15
@@ -609,7 +631,7 @@ class Star extends EventEmitter {
     if (!this.text_infrastructureBulkIgnored) {
       let displayInfrastructure = `${this.data.ignoreBulkUpgrade.economy ? ' ' : 'E'} ${this.data.ignoreBulkUpgrade.industry ? ' ' : 'I'} ${this.data.ignoreBulkUpgrade.science ? ' ' : 'S'}`
 
-      let bitmapFont = {fontName: "space-mono", fontSize: 8}
+      let bitmapFont = {fontName: "chakrapetch", fontSize: 8}
       this.text_infrastructureBulkIgnored = new PIXI.BitmapText(displayInfrastructure, bitmapFont);
       this.text_infrastructureBulkIgnored.x = -(this.text_infrastructureBulkIgnored.width / 2.0)
       this.text_infrastructureBulkIgnored.y = 12
@@ -645,7 +667,7 @@ class Star extends EventEmitter {
 
     let radius = ((techLevel || 1) + 1) * this.lightYearDistance
 
-    this.graphics_scanningRange.lineStyle(1, player.colour.value, 0.2)
+    this.graphics_scanningRange.lineStyle(1, 0xFFFFFF, 0.2)
     this.graphics_scanningRange.beginFill(player.colour.value, 0.075)
     this.graphics_scanningRange.drawCircle(0, 0, radius)
     this.graphics_scanningRange.endFill()
@@ -680,7 +702,7 @@ class Star extends EventEmitter {
 
     let radius = ((techLevel || 1) + 1.5) * this.lightYearDistance
 
-    this.graphics_hyperspaceRange.lineStyle(1, player.colour.value, 0.2)
+    this.graphics_hyperspaceRange.lineStyle(1, 0xFFFFFF, 0.2)
     this.graphics_hyperspaceRange.beginFill(player.colour.value, 0.075)
     this.graphics_hyperspaceRange.drawStar(0, 0, radius, radius, radius - 3)
     this.graphics_hyperspaceRange.endFill()
@@ -804,7 +826,6 @@ class Star extends EventEmitter {
       }
     }
 
-
     if (this.text_name) this.text_name.visible = this.isSelected || this.zoomPercent >= Star.zoomLevelDefinitions.name
     if (this.container_planets) this.container_planets.visible = this._isInScanningRange() && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources
     if (this.text_infrastructure) this.text_infrastructure.visible = this.isSelected || this.zoomPercent >= Star.zoomLevelDefinitions.infrastructure
@@ -827,6 +848,20 @@ class Star extends EventEmitter {
     // this.baseScale = this.isSelected ? 1.5 : 1
   }
 
+  subscribeToEvents () {
+    if (this.container_planets) {
+      this.handleOrbitPlanetsStep = this.orbitPlanentsStep.bind(this)
+      this.app.ticker.add(this.handleOrbitPlanetsStep)
+    }
+  }
+
+  unsubscribeToEvents () {
+    if (this.container_planets) {
+      this.app.ticker.remove(this.handleOrbitPlanetsStep)
+      this.handleOrbitPlanetsStep = null
+    }
+  }
+
   deselectAllText () {
     if (window.getSelection) {window.getSelection().removeAllRanges();}
     else if (document.selection) {document.selection.empty();}
@@ -835,13 +870,13 @@ class Star extends EventEmitter {
   onMouseOver (e) {
     this.isMouseOver = true
 
-    this.emit('onStarMouseOver', this.data)
+    this.emit('onStarMouseOver', this)
   }
 
   onMouseOut (e) {
     this.isMouseOver = false
 
-    this.emit('onStarMouseOut', this.data)
+    this.emit('onStarMouseOut', this)
   }
 
   //This could in the future be a setter function on ZoomPercent

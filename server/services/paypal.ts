@@ -1,8 +1,9 @@
-import { DBObjectId } from "../types/DBObjectId";
-import DatabaseRepository from "../models/DatabaseRepository";
-import { Payment } from "../types/Payment";
+import { DBObjectId } from "./types/DBObjectId";
+import Repository from "./repository";
+import { Payment } from "./types/Payment";
 import CacheService from "./cache";
 import UserService from "./user";
+import { Config } from "../config/types/Config";
 
 const axios = require('axios');
 
@@ -10,8 +11,9 @@ const CURRENCY = 'GBP';
 const CACHE_KEY_TOKEN = 'paypalToken';
 
 export default class PaypalService {
-    PaymentModel;
-    paymentRepo: DatabaseRepository<Payment>;
+    PaymentModel: any;
+    config: Config;
+    paymentRepo: Repository<Payment>;
     userService: UserService;
     cacheService: CacheService;
 
@@ -32,11 +34,13 @@ export default class PaypalService {
 
     constructor (
         PaymentModel,
-        paymentRepo: DatabaseRepository<Payment>,
+        config: Config,
+        paymentRepo: Repository<Payment>,
         userService: UserService,
         cacheService: CacheService
     ) {
         this.PaymentModel= PaymentModel;
+        this.config = config;
         this.paymentRepo = paymentRepo;
         this.userService = userService;
         this.cacheService = cacheService;
@@ -49,7 +53,7 @@ export default class PaypalService {
             return cached;
         }
 
-        const environment = process.env.PAYPAL_ENVIRONMENT!;
+        const environment = this.config.paypal.environment;
 
         const params = new URLSearchParams()
         params.append('grant_type', 'client_credentials')
@@ -59,8 +63,8 @@ export default class PaypalService {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             auth: {
-                username: process.env.PAYPAL_CLIENT_ID,
-                password: process.env.PAYPAL_CLIENT_SECRET
+                username: this.config.paypal.clientId,
+                password: this.config.paypal.clientSecret
             }
         });
 
@@ -72,7 +76,7 @@ export default class PaypalService {
     }
 
     async authorizePayment(userId: DBObjectId, totalQuantity: number, totalCost: number, unitCost: number, returnUrl: string, cancelUrl: string) {
-        const environment = process.env.PAYPAL_ENVIRONMENT!;
+        const environment = this.config.paypal.environment;
 
         // Get a token from PayPal
         let token = await this.authorize();
@@ -132,7 +136,7 @@ export default class PaypalService {
     }
 
     async processPayment(paymentId: string, payerId: string) {
-        const environment = process.env.PAYPAL_ENVIRONMENT!;
+        const environment = this.config.paypal.environment;
         
         // Get the payment from the DB to verify transaction.
         const payment = await this.paymentRepo.findOne({

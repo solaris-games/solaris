@@ -9,7 +9,9 @@
     "playerType": "establishedPlayers",
     "anonymity": "normal",
     "playerOnlineStatus": "visible",
-    "timeMachine": "enabled"
+    "timeMachine": "enabled",
+    "fluxEnabled": "disabled",
+    "advancedAI": "disabled"
   },
   "galaxy": {
     "galaxyType": "circular-balanced",
@@ -98,6 +100,7 @@
       "specialists": "standard"
     },
     "bankingReward": "standard",
+    "experimentationReward": "standard",
     "specialistTokenReward": "standard"
   },
   "gameTime": {

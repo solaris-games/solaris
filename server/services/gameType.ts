@@ -1,4 +1,4 @@
-import { Game } from "../types/Game";
+import { Game } from "./types/Game";
 
 export default class GameTypeService {
 
@@ -89,19 +89,14 @@ export default class GameTypeService {
     }
 
     isFluxGame(game: Game) {
-        return [
-            'standard_rt',
-            'standard_tb',
-            '32_player_rt',
-            'special_dark',
-            'special_ultraDark',
-            'special_orbital',
-            'special_battleRoyale',
-            'special_homeStar',
-            'special_anonymous',
-            'special_kingOfTheHill',
-            'special_tinyGalaxy'
-        ].includes(game.settings.general.type)
+        return game.settings.general.fluxEnabled === 'enabled'
+    }
+
+    isRankedGame(game: Game) {
+        // Official games are either not user created or featured (featured games can be user created)
+        return !this.isTutorialGame(game) &&
+                !this.isNewPlayerGame(game) &&
+                (!this.isCustomGame(game) || this.isFeaturedGame(game));
     }
 
 }

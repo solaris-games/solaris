@@ -1,9 +1,9 @@
-import { DBObjectId } from "../types/DBObjectId";
-import { Game } from "../types/Game";
-import { Location } from "../types/Location";
-import { MapObject } from "../types/Map";
-import { Player } from "../types/Player";
-import { Star } from "../types/Star";
+import { DBObjectId } from "./types/DBObjectId";
+import { Game } from "./types/Game";
+import { Location } from "./types/Location";
+import { MapObject } from "./types/Map";
+import { Player } from "./types/Player";
+import { Star } from "./types/Star";
 import DistanceService from "./distance";
 
 export default class StarDistanceService {

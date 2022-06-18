@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
 const moment = require('moment');
 const EventEmitter = require('events');
-import DatabaseRepository from '../models/DatabaseRepository';
-import { DBObjectId } from '../types/DBObjectId';
-import { Game } from '../types/Game';
-import { Location } from '../types/Location';
-import { Player, PlayerColour, PlayerColourShapeCombination, PlayerShape } from '../types/Player';
-import { Star } from '../types/Star';
+import Repository from './repository';
+import { DBObjectId } from './types/DBObjectId';
+import { Game } from './types/Game';
+import { Location } from './types/Location';
+import { Player, PlayerColour, PlayerColourShapeCombination, PlayerShape, ResearchTypeNotRandom } from './types/Player';
+import { Star } from './types/Star';
 import CarrierService from './carrier';
 import GameTypeService from './gameType';
 import MapService from './map';
@@ -16,9 +16,10 @@ import SpecialistService from './specialist';
 import StarService from './star';
 import StarDistanceService from './starDistance';
 import TechnologyService from './technology';
+import ValidationError from '../errors/validation';
 
 export default class PlayerService extends EventEmitter {
-    gameRepo: DatabaseRepository<Game>;
+    gameRepo: Repository<Game>;
     randomService: RandomService;
     mapService: MapService;
     starService: StarService;
@@ -30,7 +31,7 @@ export default class PlayerService extends EventEmitter {
     playerReadyService: PlayerReadyService;
 
     constructor(
-        gameRepo: DatabaseRepository<Game>,
+        gameRepo: Repository<Game>,
         randomService: RandomService,
         mapService: MapService,
         starService: StarService,
@@ -96,17 +97,36 @@ export default class PlayerService extends EventEmitter {
             .find(p => p._id.toString() === targetPlayer._id.toString()) != null;
     }
 
-    createEmptyPlayer(game: Game, colour: PlayerColour, shape: PlayerShape) {
-        let player = {
+    createEmptyPlayer(game: Game, colour: PlayerColour, shape: PlayerShape): Player {
+        let researchingNow: ResearchTypeNotRandom = 'terraforming';
+        let researchingNext: ResearchTypeNotRandom = 'terraforming';
+
+        let player: Player = {
             _id: mongoose.Types.ObjectId(),
             userId: null,
+            homeStarId: null,
             alias: 'Empty Slot',
+            avatar: null,
+            notes: null,
             colour: colour,
             shape: shape,
+            lastSeen: null,
+            lastSeenIP: null,
+            researchingNow,
+            researchingNext,
             credits: game.settings.player.startingCredits,
             creditsSpecialists: game.settings.player.startingCreditsSpecialists,
+            isOpenSlot: true,
+            defeated: false,
+            defeatedDate: null,
+            afk: false,
             renownToGive: game.settings.general.playerLimit,
-            carriers: [],
+            ready: false,
+            readyToCycle: false,
+            readyToQuit: false,
+            missedTurns: 0,
+            hasSentTurnReminder: false,
+            hasFilledAfkSlot: false,
             research: {
                 terraforming: { level: game.settings.technology.startingTechnologyLevel.terraforming },
                 experimentation: { level: game.settings.technology.startingTechnologyLevel.experimentation },
@@ -116,7 +136,10 @@ export default class PlayerService extends EventEmitter {
                 banking: { level: game.settings.technology.startingTechnologyLevel.banking },
                 weapons: { level: game.settings.technology.startingTechnologyLevel.weapons },
                 specialists: { level: game.settings.technology.startingTechnologyLevel.specialists }
-            }
+            },
+            ledger: [],
+            reputations: [],
+            diplomacy: []
         };
 
         this._setDefaultResearchTechnology(game, player as any);
@@ -125,7 +148,7 @@ export default class PlayerService extends EventEmitter {
     }
 
     createEmptyPlayers(game: Game) {
-        let players: any[] = [];
+        let players: Player[] = [];
 
         let shapeColours = this._generatePlayerColourShapeList(game.settings.general.playerLimit);
 
@@ -266,7 +289,7 @@ export default class PlayerService extends EventEmitter {
 
         while (starsToDistribute--) {
             for (let player of players) {
-                let homeStar = this.starService.getById(game, player.homeStarId);
+                let homeStar = this.starService.getById(game, player.homeStarId!);
 
                 // Get X closest stars to the home star and also give those to the player.
                 let s = this.starDistanceService.getClosestUnownedStar(homeStar, game.galaxy.stars);
@@ -279,7 +302,7 @@ export default class PlayerService extends EventEmitter {
 
     // TODO: Shouldn't this be in the starService?
     setupStarForGameStart(game: Game, star: Star, player: Player, resetWarpGates: boolean) {
-        if (player.homeStarId.toString() === star._id.toString()) {
+        if (player.homeStarId!.toString() === star._id.toString()) {
             this.starService.setupHomeStar(game, star, player, game.settings);
         } else {
             star.ownedByPlayerId = player._id;
@@ -309,6 +332,7 @@ export default class PlayerService extends EventEmitter {
         player.ready = false;
         player.readyToCycle = false;
         player.readyToQuit = false;
+        player.isOpenSlot = true;
 
         // Reset the player's research
         this._setDefaultResearchTechnology(game, player);
@@ -470,6 +494,10 @@ export default class PlayerService extends EventEmitter {
     }
 
     async updateGameNotes(game: Game, player: Player, notes: string) {
+        if (notes.length > 2000) {
+            throw new ValidationError('Notes cannot exceed 2000 characters.');
+        }
+
         player.notes = notes;
 
         await this.gameRepo.updateOne({
@@ -499,7 +527,7 @@ export default class PlayerService extends EventEmitter {
                 let carriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id); // Note: This logic looks a bit weird, but its more performant.
 
                 if (carriers.length === 0) {
-                    this.setPlayerAsDefeated(game, player);
+                    this.setPlayerAsDefeated(game, player, false);
                 }
             }
         }
@@ -546,9 +574,11 @@ export default class PlayerService extends EventEmitter {
         return lastSeenMoreThanXSecondsAgo;
     }
 
-    setPlayerAsDefeated(game: Game, player: Player) {
+    setPlayerAsDefeated(game: Game, player: Player, openSlot: boolean) {
+        player.isOpenSlot = openSlot;
         player.defeated = true;
         player.defeatedDate = moment().utc();
+
         player.researchingNext = 'random'; // Set up the AI for random research.
 
         // Auto-ready the player so they don't hold up the game.
@@ -557,7 +587,7 @@ export default class PlayerService extends EventEmitter {
         }
 
         // Make sure all stars are marked as not ignored - This is so the AI can bulk upgrade them.
-        let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+        const playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
         for (let star of playerStars) {
             this.starService.resetIgnoreBulkUpgradeStatuses(star);
@@ -568,8 +598,9 @@ export default class PlayerService extends EventEmitter {
     }
 
     setPlayerAsAfk(game: Game, player: Player) {
-        this.setPlayerAsDefeated(game, player);
+        this.setPlayerAsDefeated(game, player, true);
 
+        player.isOpenSlot = true; // AFK players will always have their slots open.
         player.afk = true;
     }
 

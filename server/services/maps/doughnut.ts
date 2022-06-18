@@ -1,6 +1,6 @@
 import ValidationError from '../../errors/validation';
-import { GameResourceDistribution } from '../../types/Game';
-import { Location } from '../../types/Location';
+import { GameResourceDistribution } from '../types/Game';
+import { Location } from '../types/Location';
 import DistanceService from '../distance';
 import GameTypeService from '../gameType';
 import RandomService from '../random';

@@ -1,21 +1,21 @@
 const cache = require('memory-cache');
-import { DBObjectId } from '../types/DBObjectId';
+import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Game } from '../types/Game';
-import { GameHistory, GameHistoryCarrier } from '../types/GameHistory';
+import Repository from './repository';
+import { Game } from './types/Game';
+import { GameHistory, GameHistoryCarrier } from './types/GameHistory';
 import GameService from './game';
 import PlayerService from './player';
 import PlayerStatisticsService from './playerStatistics';
 
 export default class HistoryService {
-    historyRepo: DatabaseRepository<GameHistory>;
+    historyRepo: Repository<GameHistory>;
     playerService: PlayerService;
     gameService: GameService;
     playerStatisticsService: PlayerStatisticsService;
 
     constructor(
-        historyRepo: DatabaseRepository<GameHistory>,
+        historyRepo: Repository<GameHistory>,
         playerService: PlayerService,
         gameService: GameService,
         playerStatisticsService: PlayerStatisticsService
@@ -130,6 +130,7 @@ export default class HistoryService {
                 researchingNext: player.researchingNext,
                 credits: player.credits,
                 creditsSpecialists: player.creditsSpecialists,
+                isOpenSlot: player.isOpenSlot,
                 defeated: player.defeated,
                 defeatedDate: player.defeatedDate,
                 afk: player.afk,

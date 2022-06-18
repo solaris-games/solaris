@@ -1,6 +1,6 @@
-import { Game } from "../types/Game";
-import { Location } from "../types/Location";
-import { Star } from "../types/Star";
+import { Game } from "./types/Game";
+import { Location } from "./types/Location";
+import { Star } from "./types/Star";
 import GameTypeService from "./gameType";
 import CircularMapService from "./maps/circular";
 import CircularBalancedMapService from "./maps/circularBalanced";
@@ -12,8 +12,7 @@ import NameService from "./name";
 import RandomService from "./random";
 import StarService from "./star";
 import StarDistanceService from "./starDistance";
-
-const ValidationError = require("../errors/validation");
+import ValidationError from "../errors/validation";
 
 export default class MapService {
     randomService: RandomService;

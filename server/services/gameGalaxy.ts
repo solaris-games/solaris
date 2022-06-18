@@ -1,7 +1,7 @@
-import { DBObjectId } from '../types/DBObjectId';
+import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
-import { Game } from '../types/Game';
-import { Player, PlayerDiplomaticState, PlayerReputation, PlayerResearch } from '../types/Player';
+import { Game } from './types/Game';
+import { Player, PlayerDiplomaticState, PlayerReputation, PlayerResearch } from './types/Player';
 import BattleRoyaleService from './battleRoyale';
 import BroadcastService from './broadcast';
 import CacheService from './cache';
@@ -24,10 +24,10 @@ import StarDistanceService from './starDistance';
 import StarUpgradeService from './starUpgrade';
 import TechnologyService from './technology';
 import WaypointService from './waypoint';
-import { Star } from '../types/Star';
-import { Guild, GuildUserWithTag } from '../types/Guild';
-import { CarrierWaypoint } from '../types/CarrierWaypoint';
-import { Carrier } from '../types/Carrier';
+import { Star } from './types/Star';
+import { Guild, GuildUserWithTag } from './types/Guild';
+import { CarrierWaypoint } from './types/CarrierWaypoint';
+import { Carrier } from './types/Carrier';
 import AvatarService from './avatar';
 import PlayerStatisticsService from './playerStatistics';
 import GameFluxService from './gameFlux';
@@ -521,6 +521,8 @@ export default class GameGalaxyService {
                 delete p.notes; // Don't need to send this back.
                 delete p.lastSeenIP; // Super sensitive data.
 
+                p.isRealUser = true;
+                
                 return p;
             }
 
@@ -582,11 +584,12 @@ export default class GameGalaxyService {
             // Return a subset of the user, key info only.
             return {
                 _id: p._id,
+                isRealUser: p.userId != null,
                 homeStarId: p.homeStarId,
                 colour: p.colour,
                 shape: p.shape,
                 research,
-                isEmptySlot: p.userId == null, // Do not send the user ID back to the client.
+                isOpenSlot: p.isOpenSlot,
                 isInScanningRange: p.isInScanningRange,
                 defeated: p.defeated,
                 defeatedDate: p.defeatedDate,
@@ -675,6 +678,7 @@ export default class GameGalaxyService {
                     gamePlayer.researchingNext = historyPlayer.researchingNext;
                     gamePlayer.credits = historyPlayer.credits;
                     gamePlayer.creditsSpecialists = historyPlayer.creditsSpecialists;
+                    gamePlayer.isOpenSlot = historyPlayer.isOpenSlot;
                     gamePlayer.defeated = historyPlayer.defeated;
                     gamePlayer.defeatedDate = historyPlayer.defeatedDate;
                     gamePlayer.afk = historyPlayer.afk;

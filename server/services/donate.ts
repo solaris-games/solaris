@@ -1,15 +1,19 @@
+import { Config } from "../config/types/Config";
 import CacheService from "./cache";
 
 const axios = require('axios');
 
 export default class DonateService {
+    config: Config;
     cacheService: CacheService;
 
     CACHE_KEY_RECENT_DONATIONS = 'listRecentDonations';
 
     constructor(
+        config: Config,
         cacheService: CacheService
     ) {
+        this.config = config;
         this.cacheService = cacheService;
     }
 
@@ -22,7 +26,7 @@ export default class DonateService {
             return cached;
         }
 
-        if (!process.env.BUYMEACOFFEE_ACCESS_TOKEN) {
+        if (!this.config.buymeacoffee.accessToken) {
             throw new Error('Buy Me a Coffee Access Token is required.');
         }
 
@@ -31,7 +35,7 @@ export default class DonateService {
         try {
             let response = await axios.get(url, {
                 headers: {
-                    'Authorization': `Bearer ${process.env.BUYMEACOFFEE_ACCESS_TOKEN}`
+                    'Authorization': `Bearer ${this.config.buymeacoffee.accessToken}`
                 }
             });
 

@@ -345,13 +345,13 @@
             "id": 4,
             "key": "defense-satellite",
             "name": "Orbital Cannon",
-            "description": "Grants +1 Weapons to the Star.",
+            "description": "Grants +1 Defender Bonus to the Star.",
             "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 2,
             "oneShot": false,
             "modifiers": {
-                "local": {
-                    "weapons": 1
+                "special": {
+                    "defenderBonus": 1
                 }
             }
         },
@@ -359,7 +359,7 @@
             "id": 5,
             "key": "habitat-dome",
             "name": "Warp Scrambler",
-            "description": "Locks the Warp Gate at the Star to prevent enemy players from using it. Weapons -1.",
+            "description": "Locks the Warp Gate at the Star to prevent non-allied players from using it. Weapons -1.",
             "baseCostCredits": 300,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
@@ -521,13 +521,13 @@
             "id": 15,
             "key": "cryo-chamber",
             "name": "Cryo Chamber",
-            "description": "When a Carrier is built at this Star, a Lieutenant Carrier Specialist is automatically assigned to the Carrier.",
+            "description": "When a Carrier is built at this Star, a General Carrier Specialist is automatically assigned to the Carrier.",
             "baseCostCredits": 1500,
             "baseCostCreditsSpecialists": 15,
             "oneShot": false,
             "modifiers": {
                 "special": {
-                    "autoCarrierSpecialistAssign": 2
+                    "autoCarrierSpecialistAssign": 4
                 }
             }
         }

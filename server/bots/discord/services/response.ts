@@ -1,5 +1,5 @@
-import { Game } from "../../../types/Game";
-import { User } from "../../../types/User";
+import { Game } from "../../../services/types/Game";
+import { User } from "../../../services/types/User";
 
 const Discord = require('discord.js');
 
@@ -9,7 +9,7 @@ export default class ReponseService {
         const response = new Discord.MessageEmbed()
             .setColor(`#2d139d`)
             .setURL(`https://solaris.games/`)
-            .setAuthor(`Solaris`, `https://i.imgur.com/u9fOv2B.png?1`, `https://github.com/mike-eason/solaris/graphs/contributors`)
+            .setAuthor(`Solaris`, `https://i.imgur.com/u9fOv2B.png?1`, `https://github.com/solaris-games/solaris/graphs/contributors`)
             .setThumbnail(`https://i.imgur.com/INmYa7P.png?1`)
             .setTimestamp()
             .setFooter('Sponsored by Solaris', 'https://i.imgur.com/INmYa7P.png?1');

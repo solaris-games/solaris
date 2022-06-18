@@ -1,8 +1,8 @@
-import { DBObjectId } from "../types/DBObjectId";
-import DatabaseRepository from "../models/DatabaseRepository";
-import { Game } from "../types/Game";
-import { Player } from "../types/Player";
-import { Specialist } from "../types/Specialist";
+import { DBObjectId } from "./types/DBObjectId";
+import Repository from "./repository";
+import { Game } from "./types/Game";
+import { Player } from "./types/Player";
+import { Specialist } from "./types/Specialist";
 import AchievementService from "./achievement";
 import GameTypeService from "./gameType";
 import SpecialistService from "./specialist";
@@ -14,7 +14,7 @@ import SpecialistBanService from "./specialistBan";
 import PlayerCreditsService from "./playerCredits";
 
 export default class SpecialistHireService {
-    gameRepo: DatabaseRepository<Game>;
+    gameRepo: Repository<Game>;
     specialistService: SpecialistService;
     achievementService: AchievementService;
     waypointService: WaypointService;
@@ -24,7 +24,7 @@ export default class SpecialistHireService {
     specialistBanService: SpecialistBanService;
 
     constructor(
-        gameRepo: DatabaseRepository<Game>,
+        gameRepo: Repository<Game>,
         specialistService: SpecialistService,
         achievementService: AchievementService,
         waypointService: WaypointService,

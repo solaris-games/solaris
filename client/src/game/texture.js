@@ -1,5 +1,4 @@
 import * as PIXI from 'pixi.js-legacy'
-import gameHelper from '../services/gameHelper'
 import seededRandom from 'random-seed'
 
 class TextureService {
@@ -25,20 +24,20 @@ class TextureService {
 
       this.CARRIER_TEXTURE = new PIXI.Texture(PIXI.BaseTexture.from(require('../assets/map-objects/128x128_carrier.svg')))
       this.DEFAULT_FONT_STYLE = new PIXI.TextStyle({
-        fontFamily: `'Space Mono', monospace`,
+        fontFamily: `Chakra Petch,sans-serif;`,
         fill: 0xFFFFFF,
         padding: 3
       })
 
       this.DEFAULT_FONT_STYLE_BOLD = new PIXI.TextStyle({
-        fontFamily: `'Space Mono', monospace`,
+        fontFamily: `Chakra Petch,sans-serif;`,
         fill: 0xFFFFFF,
         fontWeight: "bold",
         padding: 3
       })
 
       this.DEFAULT_FONT_BITMAP = PIXI.BitmapFont.from(
-        "space-mono",
+        "chakrapetch",
         this.DEFAULT_FONT_STYLE,
         {
           chars: PIXI.BitmapFont.ASCII,
@@ -50,7 +49,7 @@ class TextureService {
       this.DEFAULT_FONT_BITMAP.pageTextures[1].baseTexture.mipmap = 0
 
       this.DEFAULT_FONT_BOLD_BITMAP = PIXI.BitmapFont.from(
-        "space-mono-bold",
+        "chakrapetch",
         this.DEFAULT_FONT_STYLE_BOLD,
         {
           chars: PIXI.BitmapFont.ASCII,

@@ -113,7 +113,6 @@ class GameContainer {
     // Add a new map to the viewport
     this.map = new Map(this.app, this.store, this)
     this.viewport.addChild(this.map.container)
-
   }
 
   destroy () {
@@ -185,7 +184,7 @@ class GameContainer {
     this.map.draw()
 
     if ( process.env.NODE_ENV == 'development' && true) {
-      let bitmapFont = { fontName: "space-mono", fontSize: 16 }
+      let bitmapFont = {fontName: "chakrapetch", fontSize: 16}
       let left = 64
       let top = 32
 

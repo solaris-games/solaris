@@ -1,16 +1,18 @@
-import { DBObjectId } from '../types/DBObjectId';
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Game } from '../types/Game';
-import { User } from '../types/User';
+import { DBObjectId } from './types/DBObjectId';
+import Repository from './repository';
+import { Game } from './types/Game';
+import { User } from './types/User';
+
+const moment = require('moment');
 
 export default class AdminService {
     
-    userRepo: DatabaseRepository<User>;
-    gameRepo: DatabaseRepository<Game>;
+    userRepo: Repository<User>;
+    gameRepo: Repository<Game>;
 
     constructor(
-        userRepo: DatabaseRepository<User>, 
-        gameRepo: DatabaseRepository<Game>
+        userRepo: Repository<User>, 
+        gameRepo: Repository<Game>
     ) {
         this.userRepo = userRepo;
         this.gameRepo = gameRepo;
@@ -180,7 +182,7 @@ export default class AdminService {
         });
     }
 
-    async setGameTimeMachine(gameId: DBObjectId, enabled: boolean) {
+    async setGameTimeMachine(gameId: DBObjectId, enabled: string) {
         await this.gameRepo.updateOne({
             _id: gameId
         }, {
@@ -188,4 +190,76 @@ export default class AdminService {
         });
     }
 
+    async getInsights() {
+        const oneDayAgo = moment().utc().add(-1, 'days').toDate();
+        const twoDaysAgo = moment().utc().add(-2, 'days').toDate();
+        const oneWeekAgo = moment().utc().add(-7, 'days').toDate();
+        const twoWeeksAgo = moment().utc().add(-14, 'days').toDate();
+
+        const oneDayAgoId = this.userRepo.objectIdFromDate(oneDayAgo);
+        const twoDaysAgoId = this.userRepo.objectIdFromDate(twoDaysAgo);
+        const oneWeekAgoId = this.userRepo.objectIdFromDate(oneWeekAgo);
+        const twoWeeksAgoId = this.userRepo.objectIdFromDate(twoWeeksAgo);
+
+        // Registrations
+        const registrations1d = await this.userRepo.count({
+            _id: { $gt: oneDayAgoId }
+        });
+
+        const registrations2d = await this.userRepo.count({
+            _id: { $gt: twoDaysAgoId }
+        });
+
+        const registrations7d = await this.userRepo.count({
+            _id: { $gt: oneWeekAgoId }
+        });
+
+        const registrations14d = await this.userRepo.count({
+            _id: { $gt: twoWeeksAgoId }
+        });
+
+        // Last seen
+        const lastSeen1d = await this.userRepo.count({
+            lastSeen: { $gt: oneDayAgo }
+        });
+
+        const lastSeen2d = await this.userRepo.count({
+            lastSeen: { $gt: twoDaysAgo }
+        });
+
+        const lastSeen7d = await this.userRepo.count({
+            lastSeen: { $gt: oneWeekAgo }
+        });
+
+        const lastSeen14d = await this.userRepo.count({
+            lastSeen: { $gt: twoWeeksAgo }
+        });
+
+        // TODO: AFKs
+        // TODO: Joins
+        // TODO: Quits
+        // TODO: Games started
+        // TODO: Games ended
+        // TODO: Badges purchased
+        // TODO: Credits purchased
+        // TODO: Tutorials started
+        // TODO: Tutorials finished
+
+        return [
+            {
+                name: 'Registrations',
+                d1: registrations1d,
+                d2: registrations2d,
+                d7: registrations7d,
+                d14: registrations14d
+            },
+            {
+                name: 'Last Seen',
+                d1: lastSeen1d,
+                d2: lastSeen2d,
+                d7: lastSeen7d,
+                d14: lastSeen14d
+            }
+        ];
+    }
 };

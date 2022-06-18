@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import VuexPersist from 'vuex-persist'
+import eventBus from './eventBus'
 import GameHelper from './services/gameHelper'
 import MentionHelper from './services/mentionHelper'
 import GameContainer from './game/container'
@@ -39,10 +40,17 @@ export default new Vuex.Store({
         state.menuArguments = menuState.args
         state.menuState = menuState.state
       }
+
+      eventBus.$emit('onMenuRequested', menuState)
     },
     clearMenuState (state) {
       state.menuState = null
       state.menuArguments = null
+
+      eventBus.$emit('onMenuRequested', {
+        state: null,
+        args: null
+      })
     },
 
     setMenuStateChat (state, menuState) {
@@ -55,6 +63,15 @@ export default new Vuex.Store({
     clearMenuStateChat (state) {
       state.menuStateChat = null
       state.menuArgumentsChat = null
+    },
+    // -------
+
+    // TUTORIAL
+    setTutorialPage (state, page) {
+      state.tutorialPage = page || 0
+    },
+    clearTutorialPage (state) {
+      state.tutorialPage = 0
     },
     // -------
 
@@ -184,7 +201,7 @@ export default new Vuex.Store({
     gamePlayerJoined (state, data) {
       let player = GameHelper.getPlayerById(state.game, data.playerId)
 
-      player.isEmptySlot = false
+      player.isOpenSlot = false
       player.alias = data.alias
       player.avatar = data.avatar
       player.defeated = false
@@ -195,7 +212,7 @@ export default new Vuex.Store({
     gamePlayerQuit (state, data) {
       let player = GameHelper.getPlayerById(state.game, data.playerId)
 
-      player.isEmptySlot = true
+      player.isOpenSlot = true
       player.alias = 'Empty Slot'
       player.avatar = null
     },
@@ -417,9 +434,9 @@ export default new Vuex.Store({
       commit('setStarSpecialists', responses[1].data)
     },
     async confirm ({ commit, state }, data) {
-      const modal = window.$('#confirmModal')
+      const modal = new bootstrap.Modal(window.$('#confirmModal'), {})
       const close = async () => {
-        modal.modal('toggle')
+        modal.toggle()
         await new Promise((resolve, reject) => setTimeout(resolve, 400));
       }
       return new Promise((resolve, reject) => {
@@ -427,6 +444,7 @@ export default new Vuex.Store({
           confirmText: data.confirmText || 'Yes',
           cancelText: data.cancelText || 'No',
           hideCancelButton: Boolean(data.hideCancelButton),
+          cover: Boolean(data.cover),
           titleText: data.titleText,
           text: data.text,
           onConfirm: async () => {
@@ -439,7 +457,7 @@ export default new Vuex.Store({
           }
         }
         commit('setConfirmationDialogSettings', settings)
-        modal.modal('toggle')
+        modal.toggle()
       })
     }
   },

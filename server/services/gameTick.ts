@@ -1,7 +1,7 @@
-import { DBObjectId } from "../types/DBObjectId";
-import { Carrier, CarrierPosition } from "../types/Carrier";
-import { Game } from "../types/Game";
-import { User } from "../types/User";
+import { DBObjectId } from "./types/DBObjectId";
+import { Carrier, CarrierPosition } from "./types/Carrier";
+import { Game } from "./types/Game";
+import { User } from "./types/User";
 import AIService from "./ai";
 import BattleRoyaleService from "./battleRoyale";
 import CarrierService from "./carrier";
@@ -24,15 +24,19 @@ import StarUpgradeService from "./starUpgrade";
 import TechnologyService from "./technology";
 import UserService from "./user";
 import WaypointService from "./waypoint";
-import { CarrierActionWaypoint } from "../types/GameTick";
-import { Star } from "../types/Star";
-import { GameRankingResult } from "../types/Rating";
+import { CarrierActionWaypoint } from "./types/GameTick";
+import { Star } from "./types/Star";
+import { GameRankingResult } from "./types/Rating";
 import DiplomacyUpkeepService from "./diplomacyUpkeep";
 import CarrierGiftService from "./carrierGift";
 import CarrierMovementService from "./carrierMovement";
 import PlayerCycleRewardsService from "./playerCycleRewards";
 import StarContestedService from "./starContested";
 import PlayerReadyService from "./playerReady";
+import PlayerGalacticCycleCompletedEvent from "./types/events/PlayerGalacticCycleComplete"
+import GamePlayerDefeatedEvent from "./types/events/GamePlayerDefeated";
+import GamePlayerAFKEvent from "./types/events/GamePlayerAFK";
+import GameEndedEvent from "./types/events/GameEnded";
 
 const EventEmitter = require('events');
 const moment = require('moment');
@@ -648,7 +652,19 @@ export default class GameTickService extends EventEmitter {
             carriersInTransit.push(carrier);
         }
 
-        carriersInTransit = carriersInTransit.sort((a, b) => a.distanceToDestination! - b.distanceToDestination!);
+        // Carriers in transit will prioritize carriers with the most ships first.
+        // This is to ensure that capturing of unclaimed stars uses this priority.
+        // TODO: This is more of a bodge to get around the unclaimed stars thing, it would
+        // be better to refactor the capturing of unclaimed stars to occur after all movements
+        // have taken place.
+        carriersInTransit = carriersInTransit.sort((a, b) => {
+            // Sort by ship count (highest ships first)
+            if (a.ships! > b.ships!) return -1;
+            if (a.ships! < b.ships!) return 1;
+
+            // Then by distance (closest carrier first)
+            return (a.distanceToDestination || 0) - (b.distanceToDestination || 0);
+        });
 
         // 2. Iterate through each carrier, move it, then check for combat.
         // (DO NOT do any combat yet as we have to wait for all of the carriers to move)
@@ -776,15 +792,15 @@ export default class GameTickService extends EventEmitter {
                 if (this.diplomacyUpkeepService.isAllianceUpkeepEnabled(game)) {
                     let allianceCount = this.diplomacyService.getAlliesOfPlayer(game, player).length;
                     
-                    allianceUpkeepResult = this.diplomacyUpkeepService.deductTotalUpkeep(game, player, creditsResult.creditsFromBanking, allianceCount); // TODO: creditsTotal?
+                    allianceUpkeepResult = this.diplomacyUpkeepService.deductTotalUpkeep(game, player, creditsResult.creditsTotal, allianceCount); 
                 }
 
                 // Raise an event if the player isn't defeated, AI doesn't care about events.
                 if (!player.defeated) {
-                    this.emit('onPlayerGalacticCycleCompleted', {
+                    let e: PlayerGalacticCycleCompletedEvent = {
                         gameId: game._id,
                         gameTick: game.state.tick,
-                        player, 
+                        playerId: player._id,
                         creditsEconomy: creditsResult.creditsFromEconomy, 
                         creditsBanking: creditsResult.creditsFromBanking,
                         creditsSpecialists: creditsResult.creditsFromSpecialistsTechnology,
@@ -795,7 +811,9 @@ export default class GameTickService extends EventEmitter {
                         experimentResearchingNext: experimentResult.researchingNext,
                         carrierUpkeep: carrierUpkeepResult,
                         allianceUpkeep: allianceUpkeepResult
-                    });
+                    };
+
+                    this.emit('onPlayerGalacticCycleCompleted', e);
                 }
             }
 
@@ -839,28 +857,33 @@ export default class GameTickService extends EventEmitter {
                         game.afkers.push(player.userId);
                     }
             
-                    // AFK counts as a defeat as well.
                     if (user && !isTutorialGame) {
-                        user.achievements.defeated++;
                         user.achievements.afk++;
                     }
 
-                    this.emit('onPlayerAfk', {
+                    let e: GamePlayerAFKEvent = {
                         gameId: game._id,
                         gameTick: game.state.tick,
-                        player
-                    });
+                        playerId: player._id,
+                        playerAlias: player.alias
+                    };
+
+                    this.emit('onPlayerAfk', e);
                 }
                 else {
                     if (user && !isTutorialGame) {
                         user.achievements.defeated++;
                     }
 
-                    this.emit('onPlayerDefeated', {
+                    let e: GamePlayerDefeatedEvent = {
                         gameId: game._id,
                         gameTick: game.state.tick,
-                        player
-                    });
+                        playerId: player._id,
+                        playerAlias: player.alias,
+                        openSlot: false
+                    };
+                    
+                    this.emit('onPlayerDefeated', e);
                 }
             }
         }
@@ -869,40 +892,37 @@ export default class GameTickService extends EventEmitter {
     }
 
     async _gameWinCheck(game: Game, gameUsers: User[]) {
-        let isTutorialGame = this.gameTypeService.isTutorialGame(game);
+        const isTutorialGame = this.gameTypeService.isTutorialGame(game);
 
         let winner = this.leaderboardService.getGameWinner(game);
 
         if (winner) {
             this.gameStateService.finishGame(game, winner);
 
+            for (const player of game.galaxy.players) {
+                if (this.aiService.isAIControlled(player)) {
+                    this.aiService.cleanupState(player);
+                }
+            }
+
             if (!isTutorialGame) {
                 let rankingResult: GameRankingResult | null = null;
-    
-                // There must have been at least X production ticks in order for
-                // rankings to be added to players. This is to slow down players
-                // should they wish to cheat the system.
-                let productionTickCap = this.gameTypeService.is1v1Game(game) ? 1 : 2;
 
-                if (game.state.productionTick > productionTickCap) {
-                    let leaderboard = this.leaderboardService.getLeaderboardRankings(game).leaderboard;
-                    
-                    rankingResult = await this.leaderboardService.addGameRankings(game, gameUsers, leaderboard);
+                if (this.gameTypeService.isRankedGame(game)) {
+                    rankingResult = this._awardEndGameRank(game, gameUsers, true);
                 }
 
                 // Mark all players as established regardless of game length.
                 this.leaderboardService.markNonAFKPlayersAsEstablishedPlayers(game, gameUsers);
-
-                // If the game is anonymous, then ranking results should be omitted from the game ended event.
-                if (this.gameTypeService.isAnonymousGame(game)) {
-                    rankingResult = null;
-                }
-                
-                this.emit('onGameEnded', {
+                this.leaderboardService.incrementPlayersCompletedAchievement(game, gameUsers);
+    
+                let e: GameEndedEvent = {
                     gameId: game._id,
                     gameTick: game.state.tick,
                     rankingResult
-                });
+                };
+
+                this.emit('onGameEnded', e);
             }
 
             return true;
@@ -911,8 +931,33 @@ export default class GameTickService extends EventEmitter {
         return false;
     }
 
+    _awardEndGameRank(game: Game, gameUsers: User[], awardCredits: boolean) {
+        let rankingResult: GameRankingResult | null = null;
+    
+        // There must have been at least X production ticks in order for
+        // rankings to be added to players. This is to slow down players
+        // should they wish to cheat the system.
+        let productionTickCap = this.gameTypeService.is1v1Game(game) ? 1 : 2;
+        let canAwardRank = this.gameTypeService.isRankedGame(game) && game.state.productionTick > productionTickCap;
+
+        if (canAwardRank) {
+            let leaderboard = this.leaderboardService.getLeaderboardRankings(game).leaderboard;
+
+            rankingResult = this.leaderboardService.addGameRankings(game, gameUsers, leaderboard);
+
+            this.leaderboardService.incrementGameWinnerAchievements(game, gameUsers, leaderboard[0].player, awardCredits);
+        }
+
+        // If the game is anonymous, then ranking results should be omitted from the game ended event.
+        if (this.gameTypeService.isAnonymousGame(game)) {
+            rankingResult = null;
+        }
+        
+        return rankingResult;
+    }
+
     async _playAI(game: Game) {
-        for (let player of game.galaxy.players.filter(p => p.defeated)) {
+        for (let player of game.galaxy.players.filter(p => this.aiService.isAIControlled(p))) {
             await this.aiService.play(game, player);
         }
     }

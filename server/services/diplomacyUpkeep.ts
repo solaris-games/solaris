@@ -1,6 +1,6 @@
 import ValidationError from "../errors/validation";
-import { Game } from "../types/Game";
-import { Player } from "../types/Player";
+import { Game } from "./types/Game";
+import { Player } from "./types/Player";
 import PlayerCreditsService from "./playerCredits";
 import PlayerCycleRewardsService from "./playerCycleRewards";
 
@@ -28,7 +28,7 @@ export default class DiplomacyUpkeepService {
 
         const cycleRewards = this.playerCycleRewardsService.calculatePlayerCreditsEndOfCycleRewards(game, player);
 
-        let upkeep = this.getUpkeepCost(game, cycleRewards.creditsFromEconomy, allianceCount);
+        let upkeep = this.getUpkeepCost(game, cycleRewards.creditsTotal, allianceCount);
 
         if (!upkeep) {
             return null;
@@ -49,12 +49,12 @@ export default class DiplomacyUpkeepService {
         return upkeep;
     }
 
-    deductTotalUpkeep(game: Game, player: Player, creditsFromEconomy: number, allianceCount: number) {
+    deductTotalUpkeep(game: Game, player: Player, creditsTotal: number, allianceCount: number) {
         if (!this.isAllianceUpkeepEnabled(game)) {
             throw new Error(`Alliance upkeep is not enabled in this game`);
         }
 
-        let upkeep = this.getUpkeepCost(game, creditsFromEconomy, allianceCount);
+        let upkeep = this.getUpkeepCost(game, creditsTotal, allianceCount);
 
         if (!upkeep) {
             return null;
@@ -65,14 +65,14 @@ export default class DiplomacyUpkeepService {
         return upkeep;
     }
     
-    getUpkeepCost(game: Game, creditsFromEconomy: number, allianceCount: number) {
+    getUpkeepCost(game: Game, creditsTotal: number, allianceCount: number) {
         let costPerAlly = game.constants.diplomacy.upkeepExpenseMultipliers[game.settings.diplomacy.upkeepCost];
 
         if (costPerAlly === 0) {
             return null;
         }
 
-        let totalCost = Math.round(allianceCount * costPerAlly * creditsFromEconomy);
+        let totalCost = Math.round(allianceCount * costPerAlly * creditsTotal);
         
         return {
             allianceCount,

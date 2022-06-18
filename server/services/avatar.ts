@@ -1,16 +1,16 @@
-import { DBObjectId } from '../types/DBObjectId';
+import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Avatar, UserAvatar } from '../types/Avatar';
-import { User } from '../types/User';
+import Repository from './repository';
+import { Avatar, UserAvatar } from './types/Avatar';
+import { User } from './types/User';
 import UserService from './user';
 
 export default class AvatarService {
-    userRepo: DatabaseRepository<User>;
+    userRepo: Repository<User>;
     userService: UserService;
 
     constructor(
-        userRepo: DatabaseRepository<User>,
+        userRepo: Repository<User>,
         userService: UserService
     ) {
         this.userRepo = userRepo;
@@ -19,6 +19,14 @@ export default class AvatarService {
 
     listAllAvatars(): Avatar[] {
         return require('../config/game/avatars').slice();
+    }
+
+    listAllSolarisAvatars(): Avatar[] {
+        return this.listAllAvatars().filter(a => !a.isPatronAvatar);
+    }
+
+    listAllAliases(): string[] {
+        return require('../config/game/aliases').slice();
     }
 
     async listUserAvatars(userId: DBObjectId): Promise<UserAvatar[]> {
@@ -44,7 +52,7 @@ export default class AvatarService {
     }
 
     async purchaseAvatar(userId: DBObjectId, avatarId: number) {
-        let userCredits = await this.userService.getUserCredits(userId);
+        let userCredits = await this.userService.getCredits(userId);
         let avatar = await this.getUserAvatar(userId, avatarId);
 
         if (avatar.purchased) {

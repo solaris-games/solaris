@@ -1,7 +1,7 @@
-import { Carrier } from "../types/Carrier";
-import { Game } from "../types/Game";
-import { Location } from "../types/Location";
-import { Star } from "../types/Star";
+import { Carrier } from "./types/Carrier";
+import { Game } from "./types/Game";
+import { Location } from "./types/Location";
+import { Star } from "./types/Star";
 import MapService from "./map";
 
 export default class OrbitalMechanicsService {

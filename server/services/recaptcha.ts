@@ -1,14 +1,24 @@
+import { Config } from "../config/types/Config";
+
 const Recaptcha = require('recaptcha-v2').Recaptcha;
 
 export default class RecaptchaService {
 
+    config: Config;
+
+    constructor (
+        config: Config
+    ) {
+        this.config = config;
+    }
+
     isEnabled() {
-        return process.env.GOOGLE_RECAPTCHA_ENABLED === 'true';
+        return this.config.google.recaptcha.enabled;
     }
 
     verify(ipAddress: string, token: string): Promise<void> {
-        let siteKey = process.env.GOOGLE_RECAPTCHA_SITE_KEY;
-        let secretKey = process.env.GOOGLE_RECAPTCHA_SECRET_KEY;
+        let siteKey = this.config.google.recaptcha.siteKey;
+        let secretKey = this.config.google.recaptcha.secretKey;
     
         return new Promise((resolve, reject) => {
             if (!this.isEnabled()) {

@@ -8,7 +8,7 @@ extra_css: [
     _styles/style.css
 ]
 
-repo_url: 'https://github.com/mike-eason/solaris'
+repo_url: 'https://github.com/solaris-games/solaris'
 
 nav:
   - Home: 'index.md'
@@ -24,10 +24,11 @@ nav:
   - Territories: 'territories.md'
   - Combat: 'combat.md'
   - 'Game Types': 'gameTypes.md'
-  - 'Game Flux': 'flux.md'
+  - 'Game Flux': 'gameFlux.md'
   - 'Game Tick Events': 'gameTick.md'
   - Rankings: 'rankings.md'
   - Achievements: 'achievements.md'
   - 'Custom Galaxies': 'customGalaxies.md'
   - 'AFK Rules': 'afkRules.md'
   - 'Keyboard Shortcuts': 'keyboardShortcuts.md'
+  - 'Performance': 'performance.md'

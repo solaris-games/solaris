@@ -12,6 +12,7 @@ import AnimationService from './animation'
 import PathManager from './PathManager'
 import OrbitalLocationLayer from './orbital'
 import WormHoleLayer from './wormHole'
+import TooltipLayer from './tooltip'
 
 class Map extends EventEmitter {
   static chunkSize = 256
@@ -54,6 +55,7 @@ class Map extends EventEmitter {
     this.waypointContainer = new PIXI.Container()
     this.rulerPointContainer = new PIXI.Container()
     this.highlightLocationsContainer = new PIXI.Container()
+    this.tooltipContainer = new PIXI.Container()
 
     this.container.addChild(this.backgroundContainer)
     this.container.addChild(this.territoryContainer)
@@ -67,7 +69,7 @@ class Map extends EventEmitter {
     this.container.addChild(this.carrierContainer)
     this.container.addChild(this.highlightLocationsContainer)
     this.container.addChild(this.playerNamesContainer)
-
+    this.container.addChild(this.tooltipContainer)
   }
 
   setup (game, userSettings) {
@@ -169,6 +171,8 @@ class Map extends EventEmitter {
     // Setup Chunks
     this._setupChunks()
 
+    this.tooltipLayer = new TooltipLayer(this.game)
+    this.tooltipContainer.addChild(this.tooltipLayer.container)
   }
 
   setupStar (game, userSettings, starData) {
@@ -182,6 +186,8 @@ class Map extends EventEmitter {
 
       star.on('onStarClicked', this.onStarClicked.bind(this))
       star.on('onStarRightClicked', this.onStarRightClicked.bind(this))
+      star.on('onStarMouseOver', this.onStarMouseOver.bind(this))
+      star.on('onStarMouseOut', this.onStarMouseOut.bind(this))
       star.on('onSelected', this.onStarSelected.bind(this))
       star.on('onUnselected', this.onStarUnselected.bind(this))
     }
@@ -669,8 +675,11 @@ class Map extends EventEmitter {
 
     let viewportXRadius = viewportWidth / 2.0
     let viewportYRadius = viewportHeight / 2.0
-
+    
     let viewportCenter = this.gameContainer.viewport.center
+
+    this.lastViewportCenter = this.currentViewportCenter || null
+    this.currentViewportCenter = this.gameContainer.viewport.center
 
     this.zoomPercent = (this.gameContainer.viewport.screenWidth/viewportWidth) * 100
 
@@ -688,7 +697,13 @@ class Map extends EventEmitter {
     let lastX = Math.floor(this.gameContainer.viewport.right/Map.chunkSize)
     let lastY = Math.floor(this.gameContainer.viewport.bottom/Map.chunkSize)
 
+    let positionChanging = this.lastViewportCenter == null || this.currentViewportCenter.x !== this.lastViewportCenter.x || this.currentViewportCenter.y !== this.lastViewportCenter.y
     let zoomChanging = Math.abs(this.zoomPercent-this.lastZoomPercent) > (1.0/128.0)
+
+    if (!positionChanging && !zoomChanging) {
+      return
+    }
+
     for(let ix=0; ix<this.numof_chunkX; ix++) {
       for(let iy=0; iy<this.numof_chunkY; iy++) {
         if(
@@ -838,19 +853,31 @@ class Map extends EventEmitter {
   onCarrierMouseOver (e) {
     // If the carrier is orbiting something then send the mouse over event
     // to the star.
-    if (e.orbiting) {
-      let star = this.stars.find(s => s.data._id === e.orbiting)
+    if (e.data.orbiting) {
+      let star = this.stars.find(s => s.data._id === e.data.orbiting)
       star.onMouseOver()
     }
+
+    this.tooltipLayer.drawTooltipCarrier(e.data)
   }
 
   onCarrierMouseOut (e) {
     // If the carrier is orbiting something then send the mouse over event
     // to the star.
-    if (e.orbiting) {
-      let star = this.stars.find(s => s.data._id === e.orbiting)
+    if (e.data.orbiting) {
+      let star = this.stars.find(s => s.data._id === e.data.orbiting)
       star.onMouseOut()
     }
+
+    this.tooltipLayer.clear()
+  }
+
+  onStarMouseOver (e) {
+    this.tooltipLayer.drawTooltipStar(e.data)
+  }
+
+  onStarMouseOut (e) {
+    this.tooltipLayer.clear()
   }
 
   onWaypointCreated (e) {

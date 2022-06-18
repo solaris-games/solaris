@@ -1,4 +1,4 @@
-import { Game } from '../types/Game';
+import { Game } from './types/Game';
 import DiplomacyService from './diplomacy';
 
 export default class StarContestedService {

@@ -1,15 +1,15 @@
-import { DBObjectId } from "../types/DBObjectId";
-import DatabaseRepository from "../models/DatabaseRepository";
-import { User } from "../types/User";
+import { DBObjectId } from "./types/DBObjectId";
+import Repository from "./repository";
+import { User } from "./types/User";
 import GuildService from "./guild";
-import { GuildUserWithTag } from "../types/Guild";
+import { GuildUserWithTag } from "./types/Guild";
 
 export default class UserGuildService {
-    userRepo: DatabaseRepository<User>;
+    userRepo: Repository<User>;
     guildService: GuildService;
     
     constructor(
-        userRepo: DatabaseRepository<User>,
+        userRepo: Repository<User>,
         guildService: GuildService
     ) {
         this.userRepo = userRepo;

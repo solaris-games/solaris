@@ -1,6 +1,5 @@
 import RandomService from "./random";
 
-
 export default class NameService {
     gameNames: string[];
     starNames: string[];

@@ -5,7 +5,7 @@
     <loading-spinner :loading="isLoading"/>
 
     <div v-if="!isLoading && guild" class="mb-4">
-      <p class="float-right">Total Rank: <span class="text-warning">{{guild.totalRank}}</span></p>
+      <p class="float-end">Total Rank: <span class="text-warning">{{guild.totalRank}}</span></p>
 
       <h5 class="mb-0">Guild Roster</h5>
 
@@ -75,15 +75,15 @@
 </template>
 
 <script>
-import ViewContainer from '../../components/ViewContainer'
-import ViewTitle from '../../components/ViewTitle'
-import LoadingSpinner from '../../components/LoadingSpinner'
+import ViewContainer from '../components/ViewContainer'
+import ViewTitle from '../components/ViewTitle'
+import LoadingSpinner from '../components/LoadingSpinner'
 import GuildApiService from '../../services/api/guild'
-import GuildNewInvite from './GuildNewInvite'
-import GuildInvite from './GuildInvite'
-import GuildApplication from './GuildApplication'
-import GuildMember from './GuildMember'
-import GuildMemberList from './GuildMemberList'
+import GuildNewInvite from './components/NewInvite'
+import GuildInvite from './components/Invite'
+import GuildApplication from './components/Application'
+import GuildMember from './components/Member'
+import GuildMemberList from './components/MemberList'
 
 export default {
   components: {

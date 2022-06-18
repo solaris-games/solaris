@@ -1,14 +1,14 @@
-import { DBObjectId } from "../types/DBObjectId";
-import DatabaseRepository from "../models/DatabaseRepository";
-import { User } from "../types/User";
+import { DBObjectId } from "./types/DBObjectId";
+import Repository from "./repository";
+import { User } from "./types/User";
 import GuildService from "./guild";
 
 export default class AchievementService {
     
-    userRepo: DatabaseRepository<User>;
+    userRepo: Repository<User>;
     guildService: GuildService;
 
-    constructor(userRepo: DatabaseRepository<User>, guildService: GuildService) {
+    constructor(userRepo: Repository<User>, guildService: GuildService) {
         this.userRepo = userRepo;
         this.guildService = guildService;
     }

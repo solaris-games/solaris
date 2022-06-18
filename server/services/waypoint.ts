@@ -1,11 +1,11 @@
-import { DBObjectId } from '../types/DBObjectId';
+import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Carrier } from '../types/Carrier';
-import { CarrierWaypoint, CarrierWaypointActionType } from '../types/CarrierWaypoint';
-import { Game } from '../types/Game';
-import { Player } from '../types/Player';
-import { Star } from '../types/Star';
+import Repository from './repository';
+import { Carrier } from './types/Carrier';
+import { CarrierWaypoint, CarrierWaypointActionType, CarrierWaypointBase } from './types/CarrierWaypoint';
+import { Game } from './types/Game';
+import { Player } from './types/Player';
+import { Star } from './types/Star';
 import CarrierService from './carrier';
 import DistanceService from './distance';
 import GameService from './game';
@@ -13,13 +13,13 @@ import PlayerService from './player';
 import StarService from './star';
 import StarDistanceService from './starDistance';
 import TechnologyService from './technology';
-import { CarrierActionWaypoint } from '../types/GameTick';
+import { CarrierActionWaypoint } from './types/GameTick';
 import CarrierMovementService from './carrierMovement';
 
 const mongoose = require('mongoose');
 
 export default class WaypointService {
-    gameRepo: DatabaseRepository<Game>;
+    gameRepo: Repository<Game>;
     carrierService: CarrierService;
     starService: StarService;
     distanceService: DistanceService;
@@ -30,7 +30,7 @@ export default class WaypointService {
     carrierMovementService: CarrierMovementService;
 
     constructor(
-        gameRepo: DatabaseRepository<Game>,
+        gameRepo: Repository<Game>,
         carrierService: CarrierService,
         starService: StarService,
         distanceService: DistanceService,
@@ -51,12 +51,15 @@ export default class WaypointService {
         this.carrierMovementService = carrierMovementService;
     }
 
-    async saveWaypoints(game: Game, player: Player, carrierId: DBObjectId, waypoints: CarrierWaypoint[], looped: boolean) {
+    async saveWaypoints(game: Game, player: Player, carrierId: DBObjectId, waypoints: CarrierWaypointBase[], looped: boolean) {
+        let carrier = this.carrierService.getById(game, carrierId);
+        return await this.saveWaypointsForCarrier(game, player, carrier, waypoints, looped);
+    }
+
+    async saveWaypointsForCarrier(game: Game, player: Player, carrier: Carrier, waypoints: CarrierWaypointBase[], looped: boolean, writeToDB: boolean = true) {
         if (looped == null) {
             looped = false;
         }
-        
-        let carrier = this.carrierService.getById(game, carrierId);
         
         if (carrier.ownedByPlayerId!.toString() !== player._id.toString()) {
             throw new ValidationError('The player does not own this carrier.');
@@ -128,7 +131,16 @@ export default class WaypointService {
             }
         }
         
-        carrier.waypoints = waypoints;
+        carrier.waypoints = waypoints.map(w => {
+            return {
+                _id: new mongoose.Types.ObjectId(),
+                source: w.source,
+                destination: w.destination,
+                action: w.action,
+                actionShips: w.actionShips,
+                delayTicks: w.delayTicks
+            }
+        });
 
         // If the waypoints are not a valid loop then throw an error.
         if (looped && !this.canLoop(game, player, carrier)) {
@@ -138,19 +150,21 @@ export default class WaypointService {
         carrier.waypointsLooped = looped;
 
         // Update the DB.
-        await this.gameRepo.updateOne({
-            _id: game._id,
-            'galaxy.carriers._id': carrier._id
-        }, {
-            $set: {
-                'galaxy.carriers.$.waypoints': waypoints,
-                'galaxy.carriers.$.waypointsLooped': looped,
-            }
-        })
+        if (writeToDB) {
+            await this.gameRepo.updateOne({
+                _id: game._id,
+                'galaxy.carriers._id': carrier._id
+            }, {
+                $set: {
+                    'galaxy.carriers.$.waypoints': waypoints,
+                    'galaxy.carriers.$.waypointsLooped': looped,
+                }
+            });
+        }
 
         // Send back the eta ticks of the waypoints so that
         // the UI can be updated.
-        let reportCarrier = carrier.toObject(); // TODO: Is this needed?
+        const reportCarrier = Boolean(carrier.toObject) ? carrier.toObject() : carrier;
 
         this.populateCarrierWaypointEta(game, reportCarrier);
 
@@ -161,7 +175,7 @@ export default class WaypointService {
         };
     }
 
-    _waypointRouteIsWithinHyperspaceRange(game: Game, carrier: Carrier, waypoint: CarrierWaypoint) {
+    _waypointRouteIsWithinHyperspaceRange(game: Game, carrier: Carrier, waypoint: CarrierWaypointBase) {
         let sourceStar = this.starService.getById(game, waypoint.source);
         let destinationStar = this.starService.getById(game, waypoint.destination);
 
@@ -183,7 +197,7 @@ export default class WaypointService {
         return distanceBetweenStars <= hyperspaceDistance;
     }
 
-    _waypointRouteIsBetweenWormHoles(game: Game, waypoint: CarrierWaypoint) {
+    _waypointRouteIsBetweenWormHoles(game: Game, waypoint: CarrierWaypointBase) {
         let sourceStar = this.starService.getById(game, waypoint.source);
         let destinationStar = this.starService.getById(game, waypoint.destination);
 

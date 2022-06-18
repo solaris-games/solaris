@@ -1,9 +1,9 @@
-import { Carrier } from "../types/Carrier";
-import { Attacker, CombatCarrier, CombatPart, CombatResult, CombatResultShips, CombatStar, Defender } from "../types/Combat";
-import { Game } from "../types/Game";
-import { Player } from "../types/Player";
-import { Star, StarCaptureResult } from "../types/Star";
-import { User } from "../types/User";
+import { Carrier } from "./types/Carrier";
+import { Attacker, CombatCarrier, CombatPart, CombatResult, CombatResultShips, CombatStar, Defender } from "./types/Combat";
+import { Game } from "./types/Game";
+import { Player } from "./types/Player";
+import { Star, StarCaptureResult } from "./types/Star";
+import { User } from "./types/User";
 import DiplomacyService from "./diplomacy";
 import GameTypeService from "./gameType";
 import PlayerService from "./player";
@@ -43,7 +43,7 @@ export default class CombatService extends EventEmitter {
         this.gameTypeService = gameTypeService;
     }
 
-    calculate(defender: Defender, attacker: Attacker, isTurnBased: boolean = true, calculateNeeded: boolean = false): CombatResultShips {    
+    calculate(defender: Defender, attacker: Attacker, isTurnBased: boolean = true, calculateNeeded: boolean = false): CombatResultShips {
         let defenderShipsRemaining = defender.ships;
         let attackerShipsRemaining = attacker.ships;
 
@@ -126,7 +126,7 @@ export default class CombatService extends EventEmitter {
         return result;
     }
 
-    calculateStar(game: Game, star: Star, defenders: Player[], attackers: Player[], defenderCarriers: Carrier[], attackerCarriers: Carrier[]) {
+    calculateStar(game: Game, star: Star, defenders: Player[], attackers: Player[], defenderCarriers: Carrier[], attackerCarriers: Carrier[], calculateNeeded: boolean = false) {
         let combatWeapons = this._calculateEffectiveWeaponsLevels(game, star, defenders, attackers, defenderCarriers, attackerCarriers);
 
         let combatResult = this.calculate({
@@ -135,7 +135,7 @@ export default class CombatService extends EventEmitter {
         }, {
             weaponsLevel: combatWeapons.attackerWeaponsTechLevel,
             ships: combatWeapons.totalAttackers
-        }, true);
+        }, true, calculateNeeded);
 
         return combatResult;
     }

@@ -1,10 +1,10 @@
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Carrier } from '../types/Carrier';
-import { CarrierWaypoint } from '../types/CarrierWaypoint';
-import { Game } from '../types/Game';
-import { Player } from '../types/Player';
-import { Star } from '../types/Star';
-import { User } from '../types/User';
+import Repository from './repository';
+import { Carrier } from './types/Carrier';
+import { CarrierWaypoint } from './types/CarrierWaypoint';
+import { Game } from './types/Game';
+import { Player } from './types/Player';
+import { Star } from './types/Star';
+import { User } from './types/User';
 import CarrierGiftService from './carrierGift';
 import DiplomacyService from './diplomacy';
 import DistanceService from './distance';
@@ -12,7 +12,7 @@ import SpecialistService from './specialist';
 import StarService from './star';
 
 export default class CarrierMovementService {
-    gameRepo: DatabaseRepository<Game>;
+    gameRepo: Repository<Game>;
     distanceService: DistanceService;
     starService: StarService;
     specialistService: SpecialistService;
@@ -20,7 +20,7 @@ export default class CarrierMovementService {
     carrierGiftService: CarrierGiftService;
 
     constructor(
-        gameRepo: DatabaseRepository<Game>,
+        gameRepo: Repository<Game>,
         distanceService: DistanceService,
         starService: StarService,
         specialistService: SpecialistService,
@@ -78,6 +78,8 @@ export default class CarrierMovementService {
         }
 
         // If the star is unclaimed, then claim it.
+        // TODO: Move this logic out of this function so that carrier movement will correctly
+        // take into account multiple players arriving at an unclaimed star at the same time.
         if (destinationStar.ownedByPlayerId == null) {
             await this.starService.claimUnownedStar(game, gameUsers, destinationStar, carrier);
         }

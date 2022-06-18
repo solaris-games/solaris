@@ -1,11 +1,38 @@
-import { Game } from "../types/Game";
-import { Location } from "../types/Location";
+import { Game } from "./types/Game";
+import { Location } from "./types/Location";
 
 export default class DistanceService {  
 
-    getDistanceBetweenLocations(loc1: Location, loc2: Location): number {
-        // Math.hypot returns the root of the squared values of its variables. So this is sqrt( (x2 - x1)^2 + (y2 - y1)^2 ), much shorter than the older version
+    getDistanceBetweenLocations(loc1: Location, loc2: Location) {
         return Math.hypot(loc2.x - loc1.x, loc2.y - loc1.y);
+    }
+
+    getDistanceAlongLocationList(locations: Location[]) {
+        if (!locations || locations.length < 2) {
+            return 0;
+        }
+
+        let distance = 0;
+        let last = locations[0];
+
+        for (let i = 1; i < locations.length; i++) {
+            const current = locations[i];
+            distance += this.getDistanceBetweenLocations(last, current);
+            last = current;
+        }
+
+        return distance;
+    }
+
+    getDistanceSquaredBetweenLocations(loc1: Location, loc2: Location)
+    {
+        let xs = loc2.x - loc1.x,
+            ys = loc2.y - loc1.y;
+
+        xs *= xs;
+        ys *= ys;
+
+        return xs + ys;
     }
 
     getClosestLocations(loc: Location, locs: Location[], amount: number): Location[] {

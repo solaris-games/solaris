@@ -103,6 +103,9 @@ class AdminService extends BaseApiService {
     { withCredentials: true })
   }
 
+  getInsights () {
+    return axios.get(this.BASE_URL + 'admin/insights', { withCredentials: true })
+  }
 }
 
 export default new AdminService()

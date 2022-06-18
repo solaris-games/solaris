@@ -30,6 +30,14 @@ class UserService extends BaseApiService {
     return axios.put(this.BASE_URL + 'user/settings', settings, { withCredentials: true })
   }
 
+  getSubscriptions () {
+    return axios.get(this.BASE_URL + 'user/subscriptions', { withCredentials: true })
+  }
+
+  saveSubscriptions (subscriptions) {
+    return axios.put(this.BASE_URL + 'user/subscriptions', subscriptions, { withCredentials: true })
+  }
+
   createUser (email, username, password, recaptchaToken) {
     return axios.post(this.BASE_URL + 'user', {
       email: email,
@@ -41,6 +49,13 @@ class UserService extends BaseApiService {
 
   toggleEmailNotifications (enabled) {
     return axios.put(this.BASE_URL + 'user/changeEmailPreference', {
+      enabled
+    },
+      { withCredentials: true })
+  }
+
+  toggleEmailOtherNotifications (enabled) {
+    return axios.put(this.BASE_URL + 'user/changeEmailOtherPreference', {
       enabled
     },
       { withCredentials: true })

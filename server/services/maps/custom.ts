@@ -1,4 +1,4 @@
-import { Location } from "../../types/Location";
+import { Location } from "../types/Location";
 
 const mongoose = require('mongoose');
 import ValidationError from "../../errors/validation";

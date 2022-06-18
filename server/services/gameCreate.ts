@@ -1,5 +1,5 @@
 import ValidationError from '../errors/validation';
-import { Game, GameSettings } from '../types/Game';
+import { Game, GameSettings } from './types/Game';
 import AchievementService from './achievement';
 import ConversationService from './conversation';
 import GameService from './game';
@@ -14,12 +14,13 @@ import PasswordService from './password';
 import PlayerService from './player';
 import SpecialistBanService from './specialistBan';
 import UserService from './user';
+import GameJoinService from './gameJoin';
 
 const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
 export default class GameCreateService {
     gameModel;
-    gameService: GameService;
+    gameJoinService: GameJoinService;
     gameListService: GameListService;
     nameService: NameService;
     mapService: MapService;
@@ -36,7 +37,7 @@ export default class GameCreateService {
 
     constructor(
         gameModel,
-        gameService: GameService,
+        gameJoinService: GameJoinService,
         gameListService: GameListService,
         nameService: NameService, 
         mapService: MapService,
@@ -49,10 +50,10 @@ export default class GameCreateService {
         gameCreateValidationService: GameCreateValidationService,
         gameFluxService: GameFluxService,
         specialistBanService: SpecialistBanService,
-        gameTypeService: GameTypeService
+        gameTypeService: GameTypeService,
     ) {
         this.gameModel = gameModel;
-        this.gameService = gameService;
+        this.gameJoinService = gameJoinService;
         this.gameListService = gameListService;
         this.nameService = nameService;
         this.mapService = mapService;
@@ -179,12 +180,12 @@ export default class GameCreateService {
         }
 
         // Apply spec bans if applicable.
-        if (game.settings.specialGalaxy.specialistCost !== 'none') {
+        if (game.settings.specialGalaxy.specialistCost !== 'none' && isOfficialGame && !isNewPlayerGame && !isTutorial) {
             const banAmount = game.constants.specialists.monthlyBanAmount; // Random X specs of each type.
 
             game.settings.specialGalaxy.specialistBans = {
-                star: this.specialistBanService.getCurrentMonthStarBans(banAmount),
-                carrier: this.specialistBanService.getCurrentMonthCarrierBans(banAmount)
+                star: this.specialistBanService.getCurrentMonthStarBans(banAmount).map(s => s.id),
+                carrier: this.specialistBanService.getCurrentMonthCarrierBans(banAmount).map(s => s.id)
             };
         }
 
@@ -260,12 +261,7 @@ export default class GameCreateService {
 
     _setupTutorialPlayers(game: Game) {
         // Dump the player who created the game straight into the first slot and set the other slots to AI.
-        this.gameService.assignPlayerToUser(game, game.galaxy.players[0], game.settings.general.createdByUserId!, `Player`, 0);
-        
-        for (let i = 1; i < game.galaxy.players.length; i++) {
-            const ai = game.galaxy.players[i];
-
-            this.gameService.assignPlayerToUser(game, ai, null, `Opponent ${i}`, i);
-        }
+        this.gameJoinService.assignPlayerToUser(game, game.galaxy.players[0], game.settings.general.createdByUserId!, `Player`, 0);
+        this.gameJoinService.assignNonUserPlayersToAI(game);
     }
 }

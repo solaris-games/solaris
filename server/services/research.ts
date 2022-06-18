@@ -1,9 +1,9 @@
 const EventEmitter = require('events');
 import ValidationError from '../errors/validation';
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Game } from '../types/Game';
-import { Player, ResearchType, ResearchTypeNotRandom } from '../types/Player';
-import { User } from '../types/User';
+import Repository from './repository';
+import { Game } from './types/Game';
+import { Player, ResearchType, ResearchTypeNotRandom } from './types/Player';
+import { User } from './types/User';
 import GameTypeService from './gameType';
 import PlayerStatisticsService from './playerStatistics';
 import RandomService from './random';
@@ -12,7 +12,7 @@ import TechnologyService from './technology';
 import UserService from './user';
 
 export default class ResearchService extends EventEmitter {
-    gameRepo: DatabaseRepository<Game>;
+    gameRepo: Repository<Game>;
     technologyService: TechnologyService;
     randomService: RandomService;
     playerStatisticsService: PlayerStatisticsService;
@@ -21,7 +21,7 @@ export default class ResearchService extends EventEmitter {
     gameTypeService: GameTypeService;
 
     constructor(
-        gameRepo: DatabaseRepository<Game>,
+        gameRepo: Repository<Game>,
         technologyService: TechnologyService,
         randomService: RandomService,
         playerStatisticsService: PlayerStatisticsService,
@@ -101,12 +101,13 @@ export default class ResearchService extends EventEmitter {
 
         let totalScience = this.playerStatisticsService.calculateTotalScience(playerStars);
         let multiplier = game.constants.research.sciencePointMultiplier;
+        let progressIncrease = Math.floor(totalScience * multiplier);
 
-        tech.progress! += totalScience * multiplier;
+        tech.progress! += progressIncrease;
 
         // If the player isn't being controlled by AI then increment achievements.
         if (user && !player.defeated && !this.gameTypeService.isTutorialGame(game)) {
-            user.achievements.research[techKey] += totalScience;
+            user.achievements.research[techKey] += progressIncrease;
         }
 
         // If the current progress is greater than the required progress
@@ -197,9 +198,24 @@ export default class ResearchService extends EventEmitter {
         if (!tech) {
             return noExperimentation;
         }
+        
+        let techLevel = player.research.experimentation.level;
+        let progressMultiplier = game.constants.research.progressMultiplier;
+        let experimentationMultiplier = game.constants.research.experimentationMultiplier;
+        let researchAmount;
 
-        let researchAmount = player.research.experimentation.level * (game.constants.research.progressMultiplier * game.constants.research.experimentationMultiplier);
-
+        switch (game.settings.technology.experimentationReward) {
+            case 'standard':
+                researchAmount = Math.floor(techLevel * (progressMultiplier * experimentationMultiplier));
+                break;
+            case 'experimental':
+                let totalScience = this.playerStatisticsService.calculateTotalScience(playerStars);
+                researchAmount = Math.floor((techLevel * (progressMultiplier * experimentationMultiplier)) + (0.15 * techLevel * totalScience));
+                break;
+            default:
+                throw new Error(`Unsupported experimentation reward ${game.settings.technology.experimentationReward}`);
+        }
+        
         tech.technology.progress! += researchAmount;
 
         // If the current progress is greater than the required progress

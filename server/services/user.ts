@@ -1,9 +1,9 @@
 const EventEmitter = require('events');
-import { DBObjectId } from '../types/DBObjectId';
+import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Game } from '../types/Game';
-import { User } from '../types/User';
+import Repository from './repository';
+import { Game } from './types/Game';
+import { User, UserSubscriptions } from './types/User';
 import PasswordService from './password';
 const moment = require('moment');
 
@@ -16,12 +16,12 @@ function uuidv4(): string {
 
 export default class UserService extends EventEmitter {
     userModel;
-    userRepo: DatabaseRepository<User>;
+    userRepo: Repository<User>;
     passwordService: PasswordService;
     
     constructor(
         userModel,
-        userRepo: DatabaseRepository<User>,
+        userRepo: Repository<User>,
         passwordService: PasswordService
     ) {
         super();
@@ -39,7 +39,8 @@ export default class UserService extends EventEmitter {
             premiumEndDate: 0,
             banned: 0,
             lastSeen: 0,
-            lastSeenIP: 0
+            lastSeenIP: 0,
+            'oauth.discord.token': 0,
         });
     }
 
@@ -87,7 +88,8 @@ export default class UserService extends EventEmitter {
             username: 0,
             gameSettings: 0,
             lastSeen: 0,
-            lastSeenIP: 0
+            lastSeenIP: 0,
+            oauth: 0,
         });
     }
 
@@ -104,7 +106,8 @@ export default class UserService extends EventEmitter {
             username: 0,
             gameSettings: 0,
             lastSeen: 0,
-            lastSeenIP: 0
+            lastSeenIP: 0,
+            oauth: 0,
         };
 
         return await this.userRepo.findById(id, select);
@@ -257,11 +260,19 @@ export default class UserService extends EventEmitter {
         return user != null;
     }
 
-    async updateEmailPreference(id: DBObjectId, preference: string) {
+    async updateEmailPreference(id: DBObjectId, preference: boolean) {
         await this.userRepo.updateOne({
             _id: id
         }, {
             emailEnabled: preference
+        });
+    }
+
+    async updateEmailOtherPreference(id: DBObjectId, preference: boolean) {
+        await this.userRepo.updateOne({
+            _id: id
+        }, {
+            emailOtherEnabled: preference
         });
     }
 
@@ -397,6 +408,36 @@ export default class UserService extends EventEmitter {
         });
     }
 
+    async getSubscriptions(userId: DBObjectId) {
+        let user = await this.getMe(userId);
+
+        return user!.subscriptions;
+    }
+
+    async saveSubscriptions(userId: DBObjectId, subscriptions: any) {
+        let obj: UserSubscriptions = {};
+
+        if (subscriptions.discord) {
+            obj.discord = {
+                gameEnded: subscriptions.discord.gameEnded || false,
+                gameStarted: subscriptions.discord.gameStarted || false,
+                playerCreditsReceived: subscriptions.discord.playerCreditsReceived || false,
+                playerCreditsSpecialistsReceived: subscriptions.discord.playerCreditsSpecialistsReceived || false,
+                playerGalacticCycleComplete: subscriptions.discord.playerGalacticCycleComplete || false,
+                playerRenownReceived: subscriptions.discord.playerRenownReceived || false,
+                playerResearchComplete: subscriptions.discord.playerResearchComplete || false,
+                playerTechnologyReceived: subscriptions.discord.playerTechnologyReceived || false,
+                conversationMessageSent: subscriptions.discord.conversationMessageSent || false
+            }
+        }
+
+        await this.userRepo.updateOne({
+            _id: userId
+        }, {
+            subscriptions: obj
+        });
+    }
+
     async updateLastSeen(userId: DBObjectId, ipAddress: string) {
         await this.userRepo.updateOne({
             _id: userId
@@ -438,7 +479,7 @@ export default class UserService extends EventEmitter {
         }, select);
     }
 
-    async getUserCredits(userId: DBObjectId) {
+    async getCredits(userId: DBObjectId) {
         let userCredits = await this.userRepo.findById(userId, {
             credits: 1
         });
@@ -485,6 +526,35 @@ export default class UserService extends EventEmitter {
         });
 
         return user?.isEstablishedPlayer || false;
+    }
+
+    async listUsersEligibleForReviewReminder(limit: number) {
+        const date = moment().utc().add(-30, 'days').toDate();
+        const ltId = this.userRepo.objectIdFromDate(date);
+
+        return await this.userRepo.find({
+            _id: { $lte: ltId },
+            emailOtherEnabled: true,
+            hasSentReviewReminder: false
+        }, {
+            _id: 1,
+            username: 1,
+            email: 1,
+            emailOtherEnabled: 1
+        }, {
+            _id: 1
+        },
+        limit);
+    }
+
+    async setReviewReminderEmailSent(userId: DBObjectId, sent: boolean) {
+        await this.userRepo.updateOne({
+            _id: userId
+        }, {
+            $set: {
+                hasSentReviewReminder: sent
+            }
+        });
     }
 
 };

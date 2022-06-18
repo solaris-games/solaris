@@ -20,8 +20,7 @@ class DiplomacyHelper {
     return game.settings.diplomacy.upkeepCost !== 'none'
   }
 
-  getAllianceUpkeepCost (game, player, allianceCount) {
-    const cycleCredits = player.stats.totalEconomy * 10 // this.calculateIncomeMinusUpkeep(game, player)
+  getAllianceUpkeepCost (game, player, cycleCredits, allianceCount) {
     const costPerAlly = game.constants.diplomacy.upkeepExpenseMultipliers[game.settings.diplomacy.upkeepCost];
     const upkeep = Math.round(allianceCount * costPerAlly * cycleCredits)
 
@@ -62,7 +61,7 @@ class DiplomacyHelper {
     let playerBDiplo = playerB.diplomacy.find(x => x.playerId.toString() === playerA._id.toString())
 
     let statusTo = playerADiplo == null ? 'neutral' : playerADiplo.status
-    let statusFrom = playerBDiplo == null ? 'neutral' : playerADiplo.status
+    let statusFrom = playerBDiplo == null ? 'neutral' : playerBDiplo.status
 
     let actualStatus
 

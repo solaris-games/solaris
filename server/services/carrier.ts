@@ -1,13 +1,13 @@
 const mongoose = require('mongoose');
-import { DBObjectId } from '../types/DBObjectId';
+import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
-import DatabaseRepository from '../models/DatabaseRepository';
-import { Carrier } from '../types/Carrier';
-import { CarrierWaypoint } from '../types/CarrierWaypoint';
-import { Game } from '../types/Game';
-import { MapObject } from '../types/Map';
-import { Player } from '../types/Player';
-import { Star } from '../types/Star';
+import Repository from './repository';
+import { Carrier } from './types/Carrier';
+import { CarrierWaypoint } from './types/CarrierWaypoint';
+import { Game } from './types/Game';
+import { MapObject } from './types/Map';
+import { Player } from './types/Player';
+import { Star } from './types/Star';
 import DistanceService from './distance';
 import SpecialistService from './specialist';
 import StarService from './star';
@@ -15,14 +15,14 @@ import TechnologyService from './technology';
 const EventEmitter = require('events');
 
 export default class CarrierService extends EventEmitter {
-    gameRepo: DatabaseRepository<Game>;
+    gameRepo: Repository<Game>;
     distanceService: DistanceService;
     starService: StarService;
     technologyService: TechnologyService;
     specialistService: SpecialistService;
 
     constructor(
-        gameRepo: DatabaseRepository<Game>,
+        gameRepo: Repository<Game>,
         distanceService: DistanceService,
         starService: StarService,
         technologyService: TechnologyService,
@@ -70,7 +70,7 @@ export default class CarrierService extends EventEmitter {
       return game.galaxy.carriers.filter(carrier => carrier.orbiting && carrier.orbiting.toString() === starId.toString())
     }
 
-    createAtStar(star: Star, carriers: Carrier[], ships: number = 1) {
+    createAtStar(star: Star, carriers: Carrier[], ships: number = 1): Carrier {
         if (!Math.floor(star.shipsActual!)) {
             throw new ValidationError('Star must have at least 1 ship to build a carrier.');
         }
@@ -79,7 +79,7 @@ export default class CarrierService extends EventEmitter {
         // this name isn't already taken by another carrier.
         let name = this.generateCarrierName(star, carriers);
 
-        let carrier = {
+        let carrier: Carrier = {
             _id: mongoose.Types.ObjectId(),
             ownedByPlayerId: star.ownedByPlayerId,
             ships: ships,
@@ -89,7 +89,12 @@ export default class CarrierService extends EventEmitter {
             waypoints: [],
             waypointsLooped: false,
             specialistId: null,
-            specialist: null
+            specialist: null,
+            isGift: false,
+            locationNext: null,
+            toObject(): Carrier {
+                return this
+            }
         };
 
         // Reduce the star ships by how many we have added to the carrier.

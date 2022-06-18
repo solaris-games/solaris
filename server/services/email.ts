@@ -1,7 +1,7 @@
-import { DBObjectId } from "../types/DBObjectId";
-import { Config } from "../types/Config";
-import { EmailTemplate } from "../types/Email";
-import { User } from "../types/User";
+import { DBObjectId } from "./types/DBObjectId";
+import { Config } from "../config/types/Config";
+import { EmailTemplate } from "./types/Email";
+import { User } from "./types/User";
 import GameService from "./game";
 import GameStateService from "./gameState";
 import GameTickService from "./gameTick";
@@ -9,7 +9,9 @@ import GameTypeService from "./gameType";
 import LeaderboardService from "./leaderboard";
 import PlayerService from "./player";
 import UserService from "./user";
-import { Player } from "../types/Player";
+import { Player } from "./types/Player";
+import GamePlayerAFKEvent from "./types/events/GamePlayerAFK";
+import { BaseGameEvent } from "./types/events/BaseGameEvent";
 
 const nodemailer = require('nodemailer');
 const fs = require('fs');
@@ -18,11 +20,9 @@ const path = require('path');
 function getFakeTransport() {
     return {
         async sendMail(message) {
-            console.log('-----');
-            console.log(`SMTP DISABLED - Attempted to send email to [${message.to}] from [${message.from}]`);
+            console.log(`SMTP DISABLED`);
             // console.log(message.text);
             // console.log(message.html);
-            console.log('-----');
         }
     };
 }
@@ -75,6 +75,10 @@ export default class EmailService {
         GAME_PLAYER_AFK: {
             fileName: 'gamePlayerAfk.html',
             subject: 'Solaris - You\'ve gone AFK'
+        },
+        REVIEW_REMINDER_30_DAYS: {
+            fileName: 'reviewReminder.html',
+            subject: 'Solaris - How did we do?'
         }
     };
 
@@ -106,19 +110,23 @@ export default class EmailService {
         this.gameStateService = gameStateService;
         this.gameTickService = gameTickService;
 
-        this.gameService.on('onGameStarted', (data) => this.sendGameStartedEmail(data.gameId));
+        this.gameService.on('onGameStarted', this.sendGameStartedEmail.bind(this));
         this.userService.on('onUserCreated', (user) => this.sendWelcomeEmail(user));
         this.playerService.on('onGamePlayerReady', (data) => this.trySendLastPlayerTurnReminder(data.gameId));
 
-        this.gameTickService.on('onPlayerAfk', (args) => this.sendGamePlayerAfkEmail(args.gameId, args.player._id));
+        this.gameTickService.on('onPlayerAfk', this.sendGamePlayerAfkEmail.bind(this));
         this.gameTickService.on('onGameEnded', (args) => this.sendGameFinishedEmail(args.gameId));
         this.gameTickService.on('onGameCycleEnded', (args) => this.sendGameCycleSummaryEmail(args.gameId));
+    }
+
+    isEnabled() {
+        return this.config.smtp.enabled
     }
 
     _getTransport() {
         // If emails are disabled, return a fake transport which
         //outputs the message to the console.
-        if (this.config.smtp.enabled) {
+        if (this.isEnabled()) {
             return nodemailer.createTransport({
                 host: this.config.smtp.host,
                 port: this.config.smtp.port,
@@ -141,6 +149,8 @@ export default class EmailService {
             text
         };
         
+        console.log(`EMAIL: [${message.from}] -> [${message.to}] - ${subject}`);
+
         return await transport.sendMail(message);
     }
 
@@ -154,21 +164,23 @@ export default class EmailService {
             html
         };
         
+        console.log(`EMAIL HTML: [${message.from}] -> [${message.to}] - ${subject}`);
+
         return await transport.sendMail(message);
     }
 
     async sendTemplate(toEmail: string, template: EmailTemplate, parameters) {
         parameters = parameters || [];
 
-        const filePath = path.join(__dirname, '../templates/', template.fileName);
+        const filePath = path.join(__dirname, './emailTemplates/', template.fileName);
         let html = fs.readFileSync(filePath, { encoding: 'UTF8' });
 
         // Replace the default parameters in the file
         // TODO: These should be environment variables.
-        html = html.replace('[{solaris_url}]', process.env.CLIENT_URL);
-        html = html.replace('[{solaris_url_gamelist}]', `${process.env.CLIENT_URL}/#/game/list`);
-        html = html.replace('[{solaris_url_resetpassword}]', `${process.env.CLIENT_URL}/#/account/reset-password-external`);
-        html = html.replace('[{source_code_url}]', 'https://github.com/mike-eason/solaris');
+        html = html.replace('[{solaris_url}]', this.config.clientUrl);
+        html = html.replace('[{solaris_url_gamelist}]', `${this.config.clientUrl}/#/game/list`);
+        html = html.replace('[{solaris_url_resetpassword}]', `${this.config.clientUrl}/#/account/reset-password-external`);
+        html = html.replace('[{source_code_url}]', 'https://github.com/solaris-games/solaris');
 
         // Replace the parameters in the file
         for (let i = 0; i < parameters.length; i++) {
@@ -188,9 +200,19 @@ export default class EmailService {
         }
     }
 
-    async sendGameStartedEmail(gameId: DBObjectId) {
-        let game = await this.gameService.getById(gameId);
-        let gameUrl = `${process.env.CLIENT_URL}/#/game?id=${game._id}`;
+    async sendReviewReminderEmail(user: User) {
+        if (!user.emailOtherEnabled) {
+            throw new Error(`The user is not subscribed to review reminder emails.`);
+        }
+
+        await this.sendTemplate(user.email, this.TEMPLATES.REVIEW_REMINDER_30_DAYS, [
+            user.username
+        ]);
+    }
+
+    async sendGameStartedEmail(args: BaseGameEvent) {
+        let game = await this.gameService.getById(args.gameId);
+        let gameUrl = `${this.config.clientUrl}/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
 
         for (let player of game.galaxy.players) {
@@ -211,7 +233,7 @@ export default class EmailService {
 
     async sendGameFinishedEmail(gameId: DBObjectId) {
         let game = await this.gameService.getById(gameId);
-        let gameUrl = `${process.env.CLIENT_URL}/#/game?id=${game._id}`;
+        let gameUrl = `${this.config.clientUrl}/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
 
         for (let player of game.galaxy.players) {
@@ -250,7 +272,7 @@ export default class EmailService {
             .join('');
         }
 
-        let gameUrl = `${process.env.CLIENT_URL}/#/game?id=${game._id}`;
+        let gameUrl = `${this.config.clientUrl}/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
 
         // Send the email only to undefeated players.
@@ -321,7 +343,7 @@ export default class EmailService {
 
             await this.playerService.setHasSentTurnReminder(game, player, true);
 
-            let gameUrl = `${process.env.CLIENT_URL}/#/game?id=${game._id}`;
+            let gameUrl = `${this.config.clientUrl}/#/game?id=${game._id}`;
             let gameName = game.settings.general.name;
 
             let user = await this.userService.getEmailById(player.userId);
@@ -358,11 +380,11 @@ export default class EmailService {
         }
     }
 
-    async sendGamePlayerAfkEmail(gameId: DBObjectId, playerId: DBObjectId) {
-        let game = await this.gameService.getById(gameId);
-        let gameUrl = `${process.env.CLIENT_URL}/#/game?id=${game._id}`;
+    async sendGamePlayerAfkEmail(args: GamePlayerAFKEvent) {
+        let game = await this.gameService.getById(args.gameId);
+        let gameUrl = `${this.config.clientUrl}/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
-        let player = this.playerService.getById(game, playerId);
+        let player = this.playerService.getById(game, args.playerId!);
         
         if (player && player.userId) {
             let user = await this.userService.getEmailById(player.userId);
