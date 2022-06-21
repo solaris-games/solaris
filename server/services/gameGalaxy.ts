@@ -704,7 +704,7 @@ export default class GameGalaxyService {
             if (historyStar) {
                 // If the player has abandoned the star in the current tick, then display that representation of the star
                 // instead of the historical version.
-                if (userPlayer && historyStar.ownedByPlayerId && gameStar.ownedByPlayerId == null && historyStar.ownedByPlayerId.toString() === userPlayer._id.toString()) {
+                if (!isHistorical && userPlayer && historyStar.ownedByPlayerId && gameStar.ownedByPlayerId == null && historyStar.ownedByPlayerId.toString() === userPlayer._id.toString()) {
                     continue;
                 }
 
@@ -755,6 +755,20 @@ export default class GameGalaxyService {
         // destroyed carriers.
         if (isHistorical) {
             for (let historyCarrier of history.carriers) {
+                let gameCarrier = game.galaxy.carriers.find(x => x._id.toString() === historyCarrier.carrierId.toString());
+                
+                if (!gameCarrier) {
+                    game.galaxy.carriers.push(historyCarrier as any);
+                }
+            }
+        }
+
+        // Add any carriers that were destroyed in orbit in the current tick.
+        // This is to account for abandoned stars where carriers are destroyed.
+        if (!isHistorical) {
+            const carrierInOrbitToAdd = history.carriers.filter(c => c.orbiting && (!userPlayer || c.ownedByPlayerId!.toString() !== userPlayer._id.toString()))
+
+            for (let historyCarrier of carrierInOrbitToAdd) {
                 let gameCarrier = game.galaxy.carriers.find(x => x._id.toString() === historyCarrier.carrierId.toString());
                 
                 if (!gameCarrier) {
