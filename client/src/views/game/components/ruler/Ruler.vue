@@ -217,10 +217,9 @@ export default {
     },
     recalculateETAs () {
       let game = this.$store.state.game
-      let locations = this.points.map(p => p.location)
 
-      let totalTicks = GameHelper.getTicksBetweenLocations(game, null, locations, this.speedModifier)
-      let totalTicksWarp = GameHelper.getTicksBetweenLocations(game, null, locations, game.constants.distances.warpSpeedMultiplier * this.speedModifier)
+      let totalTicks = GameHelper.getTicksBetweenLocations(game, null, this.points, this.speedModifier)
+      let totalTicksWarp = GameHelper.getTicksBetweenLocations(game, null, this.points, game.constants.distances.warpSpeedMultiplier * this.speedModifier)
 
       let totalTimeString = GameHelper.getCountdownTimeStringByTicks(game, totalTicks, true)
       let totalTimeWarpString = GameHelper.getCountdownTimeStringByTicks(game, totalTicksWarp, true)

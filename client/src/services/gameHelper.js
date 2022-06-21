@@ -163,7 +163,6 @@ class GameHelper {
     let tickDistance = game.settings.specialGalaxy.carrierSpeed * tickDistanceModifier
 
     // Factor in any local speed modifers
-    // TODO: Global speed modifiers.
     if (carrier && carrier.specialist && carrier.specialist.modifiers.local) {
       tickDistance *= carrier.specialist.modifiers.local.speed || 1
     }
@@ -171,10 +170,17 @@ class GameHelper {
     for (let i = 1; i < locs.length; i++) {
       let prevLoc = locs[i - 1]
       let currLoc = locs[i]
+      let distance = this.getDistanceBetweenLocations(prevLoc.location, currLoc.location)
 
-      let distance = this.getDistanceBetweenLocations(prevLoc, currLoc)
+      let ticks
 
-      let ticks = Math.ceil(distance / tickDistance)
+      // Check for worm holes
+      if (prevLoc.type === 'star' && currLoc.type === 'star' && 
+        prevLoc.object.wormHoleToStarId === currLoc.object._id && currLoc.object.wormHoleToStarId === prevLoc.object._id) {
+        ticks = 1
+      } else {
+        ticks = Math.ceil(distance / tickDistance)
+      }
 
       totalTicks += ticks
     }
