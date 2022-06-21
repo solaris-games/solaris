@@ -171,7 +171,8 @@ class Map extends EventEmitter {
     // Setup Chunks
     this._setupChunks()
 
-    this.tooltipLayer = new TooltipLayer(this.game)
+    this.tooltipLayer = new TooltipLayer()
+    this.tooltipLayer.setup(this.game)
     this.tooltipContainer.addChild(this.tooltipLayer.container)
   }
 
@@ -425,6 +426,7 @@ class Map extends EventEmitter {
     this.background.draw(game, userSettings)
 
     this.waypoints.setup(game)
+    this.tooltipLayer.setup(game)
 
     this._setupChunks()
   }
