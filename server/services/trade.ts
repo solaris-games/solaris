@@ -104,7 +104,7 @@ export default class TradeService extends EventEmitter {
         this._tradeScanningCheck(game, fromPlayer, toPlayer);
 
         if (fromPlayer.credits < amount) {
-            throw new ValidationError(`You not own ${amount} credits.`);
+            throw new ValidationError(`You do not own ${amount} credits.`);
         }
 
         let dbWrites = [
@@ -327,7 +327,7 @@ export default class TradeService extends EventEmitter {
         }
 
         if (fromPlayer.credits < tradeTech.cost) {
-            throw new ValidationError('You cannot afford to trade this technology.');
+            throw new ValidationError(`You cannot afford to trade this technology.`);
         }
 
         let levelDifference = tradeTech.level - toPlayerTech.level;
