@@ -18,6 +18,7 @@ class PlayerNames {
   }
 
   draw () {
+    
     this.container.removeChildren()
 
     let style = new PIXI.TextStyle({
@@ -52,8 +53,9 @@ class PlayerNames {
       });
     }
 
+    
     // Here we create a horizontal grid so we can give each name a place on this grid. That way we prevent all forms of vertical clashing
-    let barCount = Math.ceil((top_text - low_text) / (text_height * 1.2));
+    let barCount = Math.ceil((top_text - low_text) / (text_height * 1.2))+1; //Somehow we need this amount of bars, breaks at one less which is weird.
     let bars = Array.from({length:barCount}, () => []);
 
     // Now we place each name in the grid
@@ -63,7 +65,6 @@ class PlayerNames {
       bars[index].push(name);
     }
 
-    // TODO: This loop is somehow broken. The act of looping through the different bars (arrays) seems to merge them. Which I cannot explain
     let toDraw = []
     for (let bar of bars) {
       if(bar.length > 1) {
@@ -92,7 +93,7 @@ class PlayerNames {
       this.container.addChild(text_name)
     }
 
-    this.refreshZoom(this.zoomPercent || 0)
+    this.refreshZoom(this.zoomPercent || 0) 
   }
 
   hasBarOverlap(bar) {
@@ -105,7 +106,7 @@ class PlayerNames {
   }
 
   hasOverlap(entryA, entryB) {
-    return (entryA.player.empireCenter.x + (entryA.text_name.height + 40) / 2) > ((entryB.player.empireCenter.x - (entryB.text_name.height + 40) / 2));
+    return (entryA.player.empireCenter.x + (entryA.text_name.width + 40) / 2) > ((entryB.player.empireCenter.x - (entryB.text_name.width + 40) / 2));
   }
 
   spaceOut(bar) {
