@@ -54,7 +54,7 @@ class PlayerNames {
 
     // Here we create a horizontal grid so we can give each name a place on this grid. That way we prevent all forms of vertical clashing
     let barCount = Math.ceil((top_text - low_text) / (text_height * 1.2));
-    let bars = new Array(barCount).fill([]);
+    let bars = Array.from({length:barCount}, () => []);
 
     // Now we place each name in the grid
     for (let name of names) {
