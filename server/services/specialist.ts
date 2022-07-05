@@ -67,7 +67,7 @@ export default class SpecialistService {
             throw new ValidationError('The game settings has disabled the hiring of specialists.');
         }
         
-        let specs = specialistsList[type];
+        let specs = specialistsList[type].filter(s => s.active);
 
         if (game) {
             for (let spec of specs) {
@@ -163,7 +163,11 @@ export default class SpecialistService {
     }
 
     getReigniteDeadStarNaturalResources(carrier: Carrier) {
-        return this._getCarrierSpecialValue(carrier, 'reigniteDeadStarNaturalResources', 1);
+        return this._getCarrierSpecialValue(carrier, 'reigniteDeadStarNaturalResources', {
+            economy: 25,
+            industry: 25,
+            science: 25
+        });
     }
 
     getStarHideShips(star: Star) {

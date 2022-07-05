@@ -75,7 +75,7 @@ export default class SpecialistHireService {
         const specialist = this.specialistService.getByIdCarrier(specialistId);
 
         if (!specialist) {
-            throw new ValidationError(`A specialist with ID ${specialistId} does not exist.`);
+            throw new ValidationError(`A specialist with ID ${specialistId} does not exist or is disabled.`);
         }
 
         if (carrier.specialistId && carrier.specialistId === specialist.id) {
@@ -156,7 +156,7 @@ export default class SpecialistHireService {
         const specialist = this.specialistService.getByIdStar(specialistId);
 
         if (!specialist) {
-            throw new ValidationError(`A specialist with ID ${specialistId} does not exist.`);
+            throw new ValidationError(`A specialist with ID ${specialistId} does not exist or is disabled.`);
         }
 
         if (star.specialistId && star.specialistId === specialist.id) {

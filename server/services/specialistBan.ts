@@ -60,12 +60,6 @@ export default class SpecialistBanService {
         const ids = specs.map((s: Specialist) => s.id);
         const bans = this._getCurrentMonthBans(ids, amount);
 
-        // Ban jokers by default.
-        // TODO: This is a bodge, either improve the joker or delete it.
-        if (!bans.includes(18)) {
-            bans.push(18);
-        }
-
         return specs.filter((s: Specialist) => bans.includes(s.id));
     }
 
