@@ -113,4 +113,20 @@ export default class DiscordService {
         
         await this.sendMessageByUserId(user.oauth.discord.userId, messageTemplate);
     }
+
+    async sendMessageByChannel(channelId: string, messageTemplate: any) {
+        const channel = await this.client.channels.fetch(channelId);
+
+        if (!channel) {
+            return;
+        }
+
+        try {
+            await channel.send({
+                embed: messageTemplate
+            });
+        } catch (err) {
+            console.error(err);
+        }
+    }
 }
