@@ -288,6 +288,7 @@ export interface Game {
 	},
 	quitters: DBObjectId[],
 	afkers: DBObjectId[],
+	spectators?: DBObjectId[],
 	userNotifications?: GameUserNotification;
 
 	save(): Promise<Game>;

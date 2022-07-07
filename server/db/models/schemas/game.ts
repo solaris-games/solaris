@@ -239,7 +239,8 @@ const schema = new Schema({
 		}
 	},
 	quitters: [{ type: Types.ObjectId, required: false }],
-	afkers: [{ type: Types.ObjectId, required: false }]
+	afkers: [{ type: Types.ObjectId, required: false }],
+	spectators: [{ type: Types.ObjectId, required: false }]
 });
 
 export default schema;

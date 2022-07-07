@@ -148,9 +148,13 @@ export default class GameGalaxyService {
         // Check if the user is playing in this game.
         let userPlayer = this._getUserPlayer(game, userId);
 
+        // If the user is a spectator then they are allowed to see the entire galaxy.
+        const isSpectator = userPlayer == null && game.spectators!.find(s => s.toString() === userId!.toString()) != null;
+
         // Remove who created the game.
         delete game.settings.general.createdByUserId;
         delete game.settings.general.password; // Don't really need to explain why this is removed.
+        delete game.spectators; // Don't want to pass back user ids of spectators
 
         await this._maskGalaxy(game, userPlayer, isHistorical, tick);
 
@@ -164,24 +168,25 @@ export default class GameGalaxyService {
             this._appendStarsPendingDestructionFlag(game);
         }
 
-        // if the user isn't playing this game, then only return
-        // basic data about the stars, exclude any important info like ships.
-        // If the game has finished then everyone should be able to view the full game.
-        if (!userPlayer && !this.gameStateService.isFinished(game)) {
-            this._setStarInfoBasic(game);
+        if (!isSpectator) {
+            // if the user isn't playing this game, then only return
+            // basic data about the stars, exclude any important info like ships.
+            // If the game has finished then everyone should be able to view the full game.
+            if (!userPlayer && !this.gameStateService.isFinished(game)) {
+                this._setStarInfoBasic(game);
 
-            // Also remove all carriers from players.
-            this._clearPlayerCarriers(game);
-
-            // We still need to filter the player data so that it's basic info.
-            await this._setPlayerInfoBasic(game, null);
-        } else {
-            // Populate the rest of the details about stars,
-            // carriers and players providing that they are in scanning range.
-            this._setCarrierInfoDetailed(game, userPlayer!);
-            this._setStarInfoDetailed(game, userPlayer!);
-            await this._setPlayerInfoBasic(game, userPlayer!);
+                // Also remove all carriers from players.
+                this._clearPlayerCarriers(game);
+            } else {
+                // Populate the rest of the details about stars,
+                // carriers and players providing that they are in scanning range.
+                this._setCarrierInfoDetailed(game, userPlayer!);
+                this._setStarInfoDetailed(game, userPlayer!);
+            }
         }
+
+        // We need to filter the player data so that it's basic info.
+        await this._setPlayerInfoBasic(game, userPlayer);
 
         // For extra dark mode games, overwrite the player stats as by this stage
         // scanning range will have kicked in and filtered out stars and carriers the player

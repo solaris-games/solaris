@@ -101,7 +101,8 @@ export default class GameService extends EventEmitter {
             settings: 1,
             state: 1,
             galaxy: 1,
-            constants: 1
+            constants: 1,
+            spectators: 1
         });
     }
 
