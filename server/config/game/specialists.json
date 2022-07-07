@@ -563,6 +563,21 @@
                     "autoCarrierSpecialistAssign": 4
                 }
             }
+        },
+        {
+            "id": 16,
+            "key": "stellar-engine",
+            "name": "Stellar Engine",
+            "description": "When the Stellar Engine is activated, it slowly moves this star towards the selected star.",
+            "active": true,
+            "baseCostCredits": 500,
+            "baseCostCreditsSpecialists": 5,
+            "oneShot": false,
+            "modifiers": {
+                "special": {
+                    "starMovementPerTick": 0.2
+                }
+            }
         }
     ]
 }

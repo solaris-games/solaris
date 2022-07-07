@@ -177,5 +177,9 @@ export default class SpecialistService {
     getCarrierHideShips(carrier: Carrier) {
         return this._getCarrierSpecialValue(carrier, 'hideShips', false);
     }
+
+    getStarMovementPerTick(carrier: Carrier) {
+        return this._getCarrierSpecialValue(carrier, 'starMovementPerTick', 0.2);
+    }
     
 };
