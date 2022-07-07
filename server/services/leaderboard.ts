@@ -738,7 +738,8 @@ export default class LeaderboardService {
 
         user.achievements.victories++; // Increase the winner's victory count
 
-        if (this.gameTypeService.is32PlayerOfficialGame(game)) {
+        // Note: We don't really care if its official or not, award a badge for any 32p games.
+        if (this.gameTypeService.is32PlayerGame(game)) {
             this.badgeService.awardBadgeForUser(user, 'victor32');
         }
 
