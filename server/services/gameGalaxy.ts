@@ -14,7 +14,7 @@ import GameTypeService from './gameType';
 import UserGuildService from './guildUser';
 import HistoryService from './history';
 import MapService from './map';
-import OrbitalMechanicsService from './orbitalMechanics';
+import StarMovementService from './starMovement';
 import PlayerService from './player';
 import ReputationService from './reputation';
 import ResearchService from './research';
@@ -51,7 +51,7 @@ export default class GameGalaxyService {
     guildUserService: UserGuildService;
     historyService: HistoryService;
     battleRoyaleService: BattleRoyaleService;
-    orbitalMechanicsService: OrbitalMechanicsService;
+    starMovementService: StarMovementService;
     gameTypeService: GameTypeService;
     gameStateService: GameStateService;
     diplomacyService: DiplomacyService;
@@ -78,7 +78,7 @@ export default class GameGalaxyService {
         guildUserService: UserGuildService,
         historyService: HistoryService,
         battleRoyaleService: BattleRoyaleService,
-        orbitalMechanicsService: OrbitalMechanicsService,
+        starMovementService: StarMovementService,
         gameTypeService: GameTypeService,
         gameStateService: GameStateService,
         diplomacyService: DiplomacyService,
@@ -104,7 +104,7 @@ export default class GameGalaxyService {
         this.guildUserService = guildUserService;
         this.historyService = historyService;
         this.battleRoyaleService = battleRoyaleService;
-        this.orbitalMechanicsService = orbitalMechanicsService;
+        this.starMovementService = starMovementService;
         this.gameTypeService = gameTypeService;
         this.gameStateService = gameStateService;
         this.diplomacyService = diplomacyService;
@@ -356,7 +356,7 @@ export default class GameGalaxyService {
                 s.naturalResources = this.starService.calculateActualNaturalResources(s);
 
                 if (isOrbital) {
-                    s.locationNext = this.orbitalMechanicsService.getNextLocation(doc, s);
+                    s.locationNext = this.starMovementService.getNextLocation(doc, s);
                 }
 
                 // If the star is dead then it has no infrastructure.
@@ -456,7 +456,7 @@ export default class GameGalaxyService {
                 }
 
                 if (isOrbital) {
-                    c.locationNext = this.orbitalMechanicsService.getNextLocation(doc, c);
+                    c.locationNext = this.starMovementService.getNextLocation(doc, c);
                 }
             });
     }

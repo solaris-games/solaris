@@ -111,6 +111,8 @@ class TextureService {
       this._loadSpecialistTexture('energy-tank')
       this._loadSpecialistTexture('cryo-chamber')
       this._loadSpecialistTexture('vintage-robot')
+      this._loadSpecialistTexture('targeting')
+      this._loadSpecialistTexture('rocket-thruster')
     }
 
     _loadSpecialistTexture(name) {

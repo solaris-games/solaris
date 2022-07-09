@@ -178,8 +178,16 @@ export default class SpecialistService {
         return this._getCarrierSpecialValue(carrier, 'hideShips', false);
     }
 
-    getStarMovementPerTick(carrier: Carrier) {
-        return this._getCarrierSpecialValue(carrier, 'starMovementPerTick', 0.2);
+    getStarMovement(star: Star) {
+        return this._getStarSpecialValue(star, 'moveStar', false);
     }
-    
+
+    getStarMovementPerTick(star: Star) {
+        return this._getStarSpecialValue(star, 'starMovementPerTick', 0.2);
+    }
+
+    getStarAttract(star: Star) {
+        return this._getStarSpecialValue(star, 'attractStar', false);
+    }
+
 };

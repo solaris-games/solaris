@@ -13,7 +13,7 @@ import GameStateService from "./gameState";
 import GameTypeService from "./gameType";
 import HistoryService from "./history";
 import LeaderboardService from "./leaderboard";
-import OrbitalMechanicsService from "./orbitalMechanics";
+import StarMovementService from "./starMovement";
 import PlayerService from "./player";
 import ReputationService from "./reputation";
 import ResearchService from "./research";
@@ -58,7 +58,7 @@ export default class GameTickService extends EventEmitter {
     reputationService: ReputationService;
     aiService: AIService;
     battleRoyaleService: BattleRoyaleService;
-    orbitalMechanicsService: OrbitalMechanicsService;
+    starMovementService: StarMovementService;
     diplomacyService: DiplomacyService;
     gameTypeService: GameTypeService;
     gameStateService: GameStateService;
@@ -87,7 +87,7 @@ export default class GameTickService extends EventEmitter {
         reputationService: ReputationService,
         aiService: AIService,
         battleRoyaleService: BattleRoyaleService,
-        orbitalMechanicsService: OrbitalMechanicsService,
+        starMovementService: StarMovementService,
         diplomacyService: DiplomacyService,
         gameTypeService: GameTypeService,
         gameStateService: GameStateService,
@@ -117,7 +117,7 @@ export default class GameTickService extends EventEmitter {
         this.reputationService = reputationService;
         this.aiService = aiService;
         this.battleRoyaleService = battleRoyaleService;
-        this.orbitalMechanicsService = orbitalMechanicsService;
+        this.starMovementService = starMovementService;
         this.diplomacyService = diplomacyService;
         this.gameTypeService = gameTypeService;
         this.gameStateService = gameStateService;
@@ -211,11 +211,11 @@ export default class GameTickService extends EventEmitter {
             await this.researchService.conductResearchAll(game, gameUsers);
             logTime('Conduct research');
 
-            this._awardCreditsPerTick(game);
-            logTime('Award tick credits from specialists');
-
             this._orbitGalaxy(game);
             logTime('Orbital mechanics');
+
+            this._oneTickSpecialists(game);
+            logTime('Award tick credits from specialists');
 
             this._countdownToEndCheck(game);
             logTime('Countdown to end check');
@@ -801,27 +801,19 @@ export default class GameTickService extends EventEmitter {
         }
     }
 
-    _awardCreditsPerTick(game: Game) {
-        for (let player of game.galaxy.players) {
-            let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id)
-                                .filter(s => !this.starService.isDeadStar(s));
-
-            for (let star of playerStars) {
-                let creditsByScience = this.specialistService.getCreditsPerTickByScience(star);
-
-                player.credits += creditsByScience * star.infrastructure.science!;
-            }
-        }
+    _oneTickSpecialists(game: Game) {
+        this.playerCycleRewardsService.giveFinancialAnalystCredits(game);
+        this.starMovementService.moveStellarEngines(game);
     }
 
     _orbitGalaxy(game: Game) {
         if (this.gameTypeService.isOrbitalMode(game)) {
             for (let star of game.galaxy.stars) {
-                this.orbitalMechanicsService.orbitStar(game, star);
+                this.starMovementService.orbitStar(game, star);
             }
 
             for (let carrier of game.galaxy.carriers) {
-                this.orbitalMechanicsService.orbitCarrier(game, carrier);
+                this.starMovementService.orbitCarrier(game, carrier);
             }
 
             for (let carrier of game.galaxy.carriers) {

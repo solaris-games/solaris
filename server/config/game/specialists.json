@@ -566,7 +566,7 @@
         },
         {
             "id": 16,
-            "key": "stellar-engine",
+            "key": "rocket-thruster",
             "name": "Stellar Engine",
             "description": "When the Stellar Engine is activated, it slowly moves this star towards the selected star.",
             "active": true,
@@ -575,7 +575,23 @@
             "oneShot": false,
             "modifiers": {
                 "special": {
-                    "starMovementPerTick": 0.2
+                    "moveStar": true,
+                    "starMovementPerTick": 0.25
+                }
+            }
+        },
+        {
+            "id": 17,
+            "key": "targeting",
+            "name": "Stellar Beacon",
+            "description": "The Stellar Beacon helps nearby Stellar Engines navigate, a Stellar Engine moves towards the closest Stellar Beacon.",
+            "active": true,
+            "baseCostCredits": 300,
+            "baseCostCreditsSpecialists": 3,
+            "oneShot": false,
+            "modifiers": {
+                "special": {
+                    "attractStar": true
                 }
             }
         }
