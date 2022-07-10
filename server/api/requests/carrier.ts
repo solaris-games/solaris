@@ -41,6 +41,9 @@ export const mapToCarrierSaveWaypointsRequest = (body: any): CarrierSaveWaypoint
                 errors.push('Action is required.');
             }
 
+if (waypoint.actionShips == null) waypoint.actionShips = 0;
+if (waypoint.delayTicks == null) waypoint.delayTicks = 0;
+
             if (!keyHasNumberValue(waypoint, 'actionShips')) {
                 errors.push('Action Ships is required.');
             }
