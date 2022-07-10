@@ -78,14 +78,14 @@ export default class ReponseService {
             .setTitle(`General Settings of ${game_name}`)
             .addFields(
                 { name: "General", value: "\u200B" },
-                { name: "Type", value: game.settings.general.type, inline: true },
-                { name: "Mode", value: game.settings.general.mode, inline: true },
-                { name: "Featured", value: game.settings.general.featured ? "true" : "false", inline: true },//next line
-                { name: "Star % for Victory", value: game.settings.conquest.victoryPercentage, inline: true },
-                { name: "Maximum Players", value: game.settings.general.playerLimit, inline: true },
-                { name: "Anonymity", value: game.settings.general.anonymity, inline: true },//next line
-                { name: "Online Status", value: game.settings.general.playerOnlineStatus, inline: true },
-                { name: "Time Machine", value: game.settings.general.timeMachine, inline: true },
+                { name: "Type", value: this.getFriendlyText(game.settings.general.type), inline: true },
+                { name: "Mode", value: this.getFriendlyText(game.settings.general.mode), inline: true },
+                { name: "Featured", value: this.getFriendlyText(game.settings.general.featured) ? "true" : "false", inline: true },//next line
+                { name: "Star % for Victory", value: this.getFriendlyText(game.settings.conquest.victoryPercentage), inline: true },
+                { name: "Maximum Players", value: this.getFriendlyText(game.settings.general.playerLimit), inline: true },
+                { name: "Anonymity", value: this.getFriendlyText(game.settings.general.anonymity), inline: true },//next line
+                { name: "Online Status", value: this.getFriendlyText(game.settings.general.playerOnlineStatus), inline: true },
+                { name: "Time Machine", value: this.getFriendlyText(game.settings.general.timeMachine), inline: true },
                 { name: "\u200B", value: "\u200B", inline: true }
             );
         return response;
@@ -105,22 +105,22 @@ export default class ReponseService {
             .setTitle(`Galaxy Settings of ${game_name}`)
             .addFields(
                 { name: "Galaxy", value: "\u200B" },
-                { name: "Galaxy Type", value: game.settings.galaxy.galaxyType, inline: true },
-                { name: "Stars per Player", value: game.settings.galaxy.starsPerPlayer, inline: true },
-                { name: "Ticks per Cycle", value: game.settings.galaxy.productionTicks, inline: true }, //next line
-                { name: "Carrier Cost", value: game.settings.specialGalaxy.carrierCost, inline: true },
-                { name: "Carrier Upkeep", value: game.settings.specialGalaxy.carrierUpkeepCost, inline: true },
-                { name: "Carrier Speed", value: game.settings.specialGalaxy.carrierSpeed, inline: true },//next line
-                { name: "Warpgate Cost", value: game.settings.specialGalaxy.warpgateCost, inline: true },
-                { name: "Random Warpgates (%)", value: game.settings.specialGalaxy.randomWarpGates, inline: true },
-                { name: "Specialist Cost", value: game.settings.specialGalaxy.specialistCost, inline: true },//next line
-                { name: "Specialist Currency", value: game.settings.specialGalaxy.specialistsCurrency, inline: true },
-                { name: "Dark Galaxy", value: game.settings.specialGalaxy.darkGalaxy, inline: true },
-                { name: "Defender Bonus", value: game.settings.specialGalaxy.defenderBonus, inline: true },//next line
-                { name: "Carrier to Carrier Combat", value: game.settings.specialGalaxy.carrierToCarrierCombat, inline: true },
-                { name: "Resource Distribution", value: game.settings.specialGalaxy.resourceDistribution, inline: true },
-                { name: "Player Distribution", value: game.settings.specialGalaxy.playerDistribution, inline: true },
-                { name: "Formal Alliances", value: game.settings.diplomacy.enabled, inline: true }
+                { name: "Galaxy Type", value: this.getFriendlyText(game.settings.galaxy.galaxyType), inline: true },
+                { name: "Stars per Player", value: this.getFriendlyText(game.settings.galaxy.starsPerPlayer), inline: true },
+                { name: "Ticks per Cycle", value: this.getFriendlyText(game.settings.galaxy.productionTicks), inline: true }, //next line
+                { name: "Carrier Cost", value: this.getFriendlyText(game.settings.specialGalaxy.carrierCost), inline: true },
+                { name: "Carrier Upkeep", value: this.getFriendlyText(game.settings.specialGalaxy.carrierUpkeepCost), inline: true },
+                { name: "Carrier Speed (ly/tick)", value: this.getFriendlyText(game.settings.specialGalaxy.carrierSpeed/50), inline: true },//next line
+                { name: "Warpgate Cost", value: this.getFriendlyText(game.settings.specialGalaxy.warpgateCost), inline: true },
+                { name: "Random Warpgates (%)", value: this.getFriendlyText(game.settings.specialGalaxy.randomWarpGates), inline: true },
+                { name: "Specialist Cost", value: this.getFriendlyText(game.settings.specialGalaxy.specialistCost), inline: true },//next line
+                { name: "Specialist Currency", value: this.getFriendlyText(game.settings.specialGalaxy.specialistsCurrency), inline: true },
+                { name: "Dark Galaxy", value: this.getFriendlyText(game.settings.specialGalaxy.darkGalaxy), inline: true },
+                { name: "Defender Bonus", value: this.getFriendlyText(game.settings.specialGalaxy.defenderBonus), inline: true },//next line
+                { name: "Carrier to Carrier Combat", value: this.getFriendlyText(game.settings.specialGalaxy.carrierToCarrierCombat), inline: true },
+                { name: "Resource Distribution", value: this.getFriendlyText(game.settings.specialGalaxy.resourceDistribution), inline: true },
+                { name: "Player Distribution", value: this.getFriendlyText(game.settings.specialGalaxy.playerDistribution), inline: true },
+                { name: "Formal Alliances", value: this.getFriendlyText(game.settings.diplomacy.enabled), inline: true }
             );
         return response;
     }
@@ -139,21 +139,21 @@ export default class ReponseService {
             .setTitle(`Player Settings of ${game_name}`)
             .addFields(
                 { name: "Player", value: "\u200B" },
-                { name: "Starting Stars", value: game.settings.player.startingStars, inline: true },
-                { name: "Starting Ships", value: game.settings.player.startingShips, inline: true },
+                { name: "Starting Stars", value: this.getFriendlyText(game.settings.player.startingStars), inline: true },
+                { name: "Starting Ships", value: this.getFriendlyText(game.settings.player.startingShips), inline: true },
                 { name: "\u200B", value: "\u200B", inline: true },//next line
-                { name: "Starting Economy", value: game.settings.player.startingInfrastructure.economy, inline: true },
-                { name: "Starting Industry", value: game.settings.player.startingInfrastructure.industry, inline: true },
-                { name: "Starting Science", value: game.settings.player.startingInfrastructure.science, inline: true },//next line
-                { name: "Economy Cost", value: game.settings.player.developmentCost.economy, inline: true },
-                { name: "Industry Cost", value: game.settings.player.developmentCost.industry, inline: true },
-                { name: "Science Cost", value: game.settings.player.developmentCost.science, inline: true },//next line
-                { name: "Starting Credits", value: game.settings.player.startingCredits, inline: true },
-                { name: "Starting Specialist Tokens", value: game.settings.player.startingCreditsSpecialists, inline: true },
-                { name: "Trade Scanning", value: game.settings.player.tradeScanning, inline: true },//next line
-                { name: "Trade Credits", value: game.settings.player.tradeCredits ? "true" : "false", inline: true },
-                { name: "Trade Specialist Tokens", value: game.settings.player.tradeCreditsSpecialists ? "true" : "false", inline: true },
-                { name: "Trade Technology Cost", value: game.settings.player.tradeCost, inline: true }
+                { name: "Starting Economy", value: this.getFriendlyText(game.settings.player.startingInfrastructure.economy), inline: true },
+                { name: "Starting Industry", value: this.getFriendlyText(game.settings.player.startingInfrastructure.industry), inline: true },
+                { name: "Starting Science", value: this.getFriendlyText(game.settings.player.startingInfrastructure.science), inline: true },//next line
+                { name: "Economy Cost", value: this.getFriendlyText(game.settings.player.developmentCost.economy), inline: true },
+                { name: "Industry Cost", value: this.getFriendlyText(game.settings.player.developmentCost.industry), inline: true },
+                { name: "Science Cost", value: this.getFriendlyText(game.settings.player.developmentCost.science), inline: true },//next line
+                { name: "Starting Credits", value: this.getFriendlyText(game.settings.player.startingCredits), inline: true },
+                { name: "Starting Specialist Tokens", value: this.getFriendlyText(game.settings.player.startingCreditsSpecialists), inline: true },
+                { name: "Trade Scanning", value: this.getFriendlyText(game.settings.player.tradeScanning), inline: true },//next line
+                { name: "Trade Credits", value: this.getFriendlyText(game.settings.player.tradeCredits) ? "true" : "false", inline: true },
+                { name: "Trade Specialist Tokens", value: this.getFriendlyText(game.settings.player.tradeCreditsSpecialists) ? "true" : "false", inline: true },
+                { name: "Trade Technology Cost", value: this.getFriendlyText(game.settings.player.tradeCost), inline: true }
             );
         return response;
     }
@@ -172,24 +172,24 @@ export default class ReponseService {
             .setTitle(`Technology Settings of ${game_name}`)
             .addFields(
                 { name: "Technology", value: "\u200B" },
-                { name: "Scanning", value: game.settings.technology.startingTechnologyLevel.scanning, inline: true },
-                { name: "Hyperspace Range", value: game.settings.technology.startingTechnologyLevel.hyperspace, inline: true },
-                { name: "Terraforming", value: game.settings.technology.startingTechnologyLevel.terraforming, inline: true },//next line
-                { name: "Experimentation", value: game.settings.technology.startingTechnologyLevel.experimentation, inline: true },
-                { name: "Weapons", value: game.settings.technology.startingTechnologyLevel.weapons, inline: true },
-                { name: "Banking", value: game.settings.technology.startingTechnologyLevel.banking, inline: true },//next line
-                { name: "Manufacturing", value: game.settings.technology.startingTechnologyLevel.manufacturing, inline: true },
-                { name: "Specialists", value: game.settings.technology.startingTechnologyLevel.specialists, inline: true },
+                { name: "Scanning", value: this.getFriendlyText(game.settings.technology.startingTechnologyLevel.scanning), inline: true },
+                { name: "Hyperspace Range", value: this.getFriendlyText(game.settings.technology.startingTechnologyLevel.hyperspace), inline: true },
+                { name: "Terraforming", value: this.getFriendlyText(game.settings.technology.startingTechnologyLevel.terraforming), inline: true },//next line
+                { name: "Experimentation", value: this.getFriendlyText(game.settings.technology.startingTechnologyLevel.experimentation), inline: true },
+                { name: "Weapons", value: this.getFriendlyText(game.settings.technology.startingTechnologyLevel.weapons), inline: true },
+                { name: "Banking", value: this.getFriendlyText(game.settings.technology.startingTechnologyLevel.banking), inline: true },//next line
+                { name: "Manufacturing", value: this.getFriendlyText(game.settings.technology.startingTechnologyLevel.manufacturing), inline: true },
+                { name: "Specialists", value: this.getFriendlyText(game.settings.technology.startingTechnologyLevel.specialists), inline: true },
                 { name: "\u200B", value: "\u200B", inline: true },//next line
-                { name: "Scanning", value: game.settings.technology.researchCosts.scanning, inline: true },
-                { name: "Hyperspace Range", value: game.settings.technology.researchCosts.hyperspace, inline: true },
-                { name: "Terraforming", value: game.settings.technology.researchCosts.terraforming, inline: true },//next line
-                { name: "Experimentation", value: game.settings.technology.researchCosts.experimentation, inline: true },
-                { name: "Weapons", value: game.settings.technology.researchCosts.weapons, inline: true },
-                { name: "Banking", value: game.settings.technology.researchCosts.banking, inline: true },//next line
-                { name: "Manufacturing", value: game.settings.technology.researchCosts.manufacturing, inline: true },
-                { name: "Specialists", value: game.settings.technology.researchCosts.specialists, inline: true },
-                { name: "Banking Reward", value: game.settings.technology.bankingReward, inline: true }//next line
+                { name: "Scanning", value: this.getFriendlyText(game.settings.technology.researchCosts.scanning), inline: true },
+                { name: "Hyperspace Range", value: this.getFriendlyText(game.settings.technology.researchCosts.hyperspace), inline: true },
+                { name: "Terraforming", value: this.getFriendlyText(game.settings.technology.researchCosts.terraforming), inline: true },//next line
+                { name: "Experimentation", value: this.getFriendlyText(game.settings.technology.researchCosts.experimentation), inline: true },
+                { name: "Weapons", value: this.getFriendlyText(game.settings.technology.researchCosts.weapons), inline: true },
+                { name: "Banking", value: this.getFriendlyText(game.settings.technology.researchCosts.banking), inline: true },//next line
+                { name: "Manufacturing", value: this.getFriendlyText(game.settings.technology.researchCosts.manufacturing), inline: true },
+                { name: "Specialists", value: this.getFriendlyText(game.settings.technology.researchCosts.specialists), inline: true },
+                { name: "Banking Reward", value: this.getFriendlyText(game.settings.technology.bankingReward), inline: true }//next line
             );
         return response;
     }
@@ -208,8 +208,8 @@ export default class ReponseService {
             .setTitle(`Time Settings of ${game_name}`)
             .addFields(
                 { name: "Time", value: "\u200B" },
-                { name: "Time Type", value: game.settings.gameTime.gameType, inline: true },
-                { name: "Start Delay", value: game.settings.gameTime.startDelay, inline: true }
+                { name: "Time Type", value: this.getFriendlyText(game.settings.gameTime.gameType), inline: true },
+                { name: "Start Delay", value: this.getFriendlyText(game.settings.gameTime.startDelay), inline: true }
             );
         if (game.settings.gameTime.gameType == 'realTime') {
             response = response.addFields(
@@ -217,9 +217,9 @@ export default class ReponseService {
             );
         } else {
             response = response.addFields(
-                { name: "Ticks per Turn", value: game.settings.gameTime.turnJumps, inline: true },//next line
-                { name: "Maximum Time per Turn", value: game.settings.gameTime.maxTurnWait, inline: true },
-                { name: "AFK Missed Turn Limit", value: game.settings.gameTime.afk.turnTimeout, inline: true },
+                { name: "Ticks per Turn", value: this.getFriendlyText(game.settings.gameTime.turnJumps), inline: true },//next line
+                { name: "Maximum Time per Turn", value: this.getFriendlyText(game.settings.gameTime.maxTurnWait), inline: true },
+                { name: "AFK Missed Turn Limit", value: this.getFriendlyText(game.settings.gameTime.afk.turnTimeout), inline: true },
                 { name: "\u200B", value: "\u200B", inline: true }//next line
             );
         }
@@ -232,25 +232,25 @@ export default class ReponseService {
             .setTitle(`Please join ${game.settings.general.name}`)
             .setURL(`https://solaris.games/#/game?id=${game._id}`)
             .addFields(
-                { name: "Gamemode", value: game.settings.general.mode, inline: true },
-                { name: "Anonymity", value: game.settings.general.anonymity, inline: true },
-                { name: "Dark Galaxy", value: game.settings.specialGalaxy.darkGalaxy, inline: true },//next line
-                { name: "Player count", value: game.settings.general.playerLimit, inline: true },
-                { name: "Stars Per Player", value: game.settings.galaxy.starsPerPlayer, inline: true },
-                { name: "Galaxy Type", value: game.settings.galaxy.galaxyType, inline: true },//next line
-                { name: "Specialist Currency", value: game.settings.specialGalaxy.specialistsCurrency, inline: true },
-                { name: "Trade Credits", value: game.settings.player.tradeCredits, inline: true },
-                { name: "Trade Technologies", value: game.settings.player.tradeScanning, inline: true },//next line
-                { name: "Time Setting", value: game.settings.gameTime.gameType, inline: true },
-                { name: "Ticks per Cycle", value: game.settings.galaxy.productionTicks, inline: true }
+                { name: "Gamemode", value: this.getFriendlyText(game.settings.general.mode), inline: true },
+                { name: "Anonymity", value: this.getFriendlyText(game.settings.general.anonymity), inline: true },
+                { name: "Dark Galaxy", value: this.getFriendlyText(game.settings.specialGalaxy.darkGalaxy), inline: true },//next line
+                { name: "Player count", value: this.getFriendlyText(game.settings.general.playerLimit), inline: true },
+                { name: "Stars Per Player", value: this.getFriendlyText(game.settings.galaxy.starsPerPlayer), inline: true },
+                { name: "Galaxy Type", value: this.getFriendlyText(game.settings.galaxy.galaxyType), inline: true },//next line
+                { name: "Specialist Currency", value: this.getFriendlyText(game.settings.specialGalaxy.specialistsCurrency), inline: true },
+                { name: "Trade Credits", value: this.getFriendlyText(game.settings.player.tradeCredits), inline: true },
+                { name: "Trade Technologies", value: this.getFriendlyText(game.settings.player.tradeScanning), inline: true },//next line
+                { name: "Time Setting", value: this.getFriendlyText(game.settings.gameTime.gameType), inline: true },
+                { name: "Ticks per Cycle", value: this.getFriendlyText(game.settings.galaxy.productionTicks), inline: true }
             );
         if (game.settings.gameTime.gameType == 'realTime') {
             response = response.addFields(
-                { name: "Time per Tick", value: game.settings.gameTime.speed / 60 + "minutes", inline: true }//next line
+                { name: "Time per Tick", value: game.settings.gameTime.speed / 60 + " minutes", inline: true }//next line
             );
         } else {
             response = response.addFields(
-                { name: "Time per Turn", value: game.settings.gameTime.turnJumps + "hours", inline: true }//next line
+                { name: "Time per Turn", value: game.settings.gameTime.turnJumps + " hours", inline: true }//next line
             );
         }
         if (game.settings.general.description) {
@@ -265,12 +265,12 @@ export default class ReponseService {
         let upperLimit = (page + 1) * 20;
         let response = this.baseResponse();
         response = response
-            .setTitle(`Top ${lowerLimit}-${upperLimit} for ${sortingKey}`)
+            .setTitle(`Top ${lowerLimit}-${upperLimit} for ${this.getFriendlyText(sortingKey)}`)
             .setURL(`https://solaris.games/#/leaderboard`)
             .addFields(
                 { name: "Position", value: position_list, inline: true },
                 { name: "Name", value: username_list, inline: true },
-                { name: sortingKey, value: sortingKey_list, inline: true }
+                { name: this.getFriendlyText(sortingKey), value: sortingKey_list, inline: true }
             );
         return response;
     }
@@ -280,10 +280,10 @@ export default class ReponseService {
         let upperLimit = (page + 1) * 20;
         let response = this.baseResponse();
         response = response
-            .setTitle(`Top ${lowerLimit}-${upperLimit} for ${sortingKey}`)
+            .setTitle(`Top ${lowerLimit}-${upperLimit} for ${this.getFriendlyText(sortingKey)}`)
             .setURL(`https://solaris.games/#/leaderboard`)
             .addFields(
-                { name: `position / ${sortingKey} / username`, value: data_list }
+                { name: `position / ${this.getFriendlyText(sortingKey)} / username`, value: data_list }
             );
         return response;
     }
@@ -291,13 +291,13 @@ export default class ReponseService {
     leaderboard_localPC(gameId: string, tick: number, sortingKey: string, position_list: string, username_list: string, sortingKey_list: string) {
         let response = this.baseResponse();
         response = response
-            .setTitle(`Leaderboard for ${sortingKey}`)
+            .setTitle(`Leaderboard for ${this.getFriendlyText(sortingKey)}`)
             .setURL(`https://solaris.games/#/game?id=${gameId}`)
             .setDescription(`Currently at tick ${tick}`)
             .addFields(
                 { name: "Position", value: position_list, inline: true },
                 { name: "Name", value: username_list, inline: true },
-                { name: sortingKey, value: sortingKey_list, inline: true }
+                { name: this.getFriendlyText(sortingKey), value: sortingKey_list, inline: true }
             );
         return response;
     }
@@ -305,11 +305,11 @@ export default class ReponseService {
     leaderboard_localMobile(gameId: string, tick: number, sortingKey: string, data_list: string) {
         let response = this.baseResponse();
         response = response
-            .setTitle(`Leaderboard for ${sortingKey}`)
+            .setTitle(`Leaderboard for ${this.getFriendlyText(sortingKey)}`)
             .setURL(`https://solaris.games/#/game?id=${gameId}`)
             .setDescription(`Currently at tick ${tick}`)
             .addFields(
-                { name: `position / ${sortingKey} / username`, value: data_list },
+                { name: `position / ${this.getFriendlyText(sortingKey)} / username`, value: data_list },
             );
         return response;
     }
@@ -542,5 +542,80 @@ export default class ReponseService {
         }
         response += '\nIf you believe this is a bug, contact Tristanvds';
         return response;
+    }
+
+    getFriendlyText(key) {
+        let friendlyText = this.friendlyObject[key];
+        if(!friendlyText) {
+            return key;
+        }
+        return friendlyText;
+    }
+
+    friendlyObject = {
+        'tutorial': 'Tutorial',
+        'new_player_rt': 'New Players',
+        'standard_rt': 'Standard',
+        'standard_tb': 'Standard - TB',
+        '1v1_rt': '1 vs. 1',
+        '1v1_tb': '1 vs. 1 - TB',
+        '32_player_rt': '32 Players',
+        'custom': 'Custom',
+        'special_dark': 'Dark Galaxy',
+        'special_ultraDark': 'Ultra Dark Galaxy',
+        'special_orbital': 'Orbital',
+        'special_battleRoyale': 'Battle Royale',
+        'special_homeStar': 'Capital Stars',
+        'special_anonymous': 'Anonymous',
+        'special_kingOfTheHill': 'King Of The Hill',
+        'special_tinyGalaxy': 'Tiny Galaxy',
+        'scanning': 'Scanning',
+        'hyperspace': 'Hyperspace Range',
+        'terraforming': 'Terraforming',
+        'experimentation': 'Experimentation',
+        'weapons': 'Weapons',
+        'banking': 'Banking',
+        'manufacturing': 'Manufacturing',
+        'specialists': 'Specialists',
+        'all': 'All',
+        'premium': 'Premium',
+        'cheap': 'Cheap',
+        'standard': 'Standard',
+        'expensive': 'Expensive',
+        'veryExpensive': 'Very Expensive',
+        'crazyExpensive': 'Crazy Expensive',
+        'none': 'None',
+        'rare': 'Rare',
+        'common': 'Common',
+        'disabled': 'Disabled',
+        'enabled': 'Enabled',
+        'start': 'Start Only',
+        'scanned': 'Scanned Only',
+        'realTime': 'Real Time',
+        'turnBased': 'Turn Based',
+        'random': 'Random',
+        'weightedCenter': 'Weighted (Center)',
+        'irregular': 'Irregular',
+        'circular': 'Circular',
+        'spiral': 'Spiral',
+        'doughnut': 'Doughnut',
+        'circular-balanced': 'Circular Balanced',
+        'normal': 'Normal',
+        'extra': 'Extra',
+        'hidden': 'Hidden',
+        'visible': 'Visible',
+        'experimental': 'Experimental',
+        'credits': 'Credits',
+        'creditsSpecialists': 'Specialist Tokens',
+        'conquest': 'Conquest',
+        'battleRoyale': 'Battle Royale',
+        'establishedPlayers': 'Established Players Only',
+        'galacticCenter': 'Galactic Center',
+        'galacticCenterOfMass': 'Galactic Center of Mass',
+        'starPercentage': 'Star Percentage',
+        'homeStarPercentage': 'Capital Star Percentage',
+        'kingOfTheHill': 'King Of The Hill',
+        'true': 'Enabled',
+        'false': 'Disabled'
     }
 }
