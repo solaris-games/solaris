@@ -5,6 +5,7 @@ import { Star } from "./types/Star";
 import MapService from "./map";
 import StarDistanceService from "./starDistance";
 import SpecialistService from "./specialist";
+import { throws } from "assert";
 
 export default class starMovementService {
     mapService: MapService;
@@ -86,15 +87,41 @@ export default class starMovementService {
             return s;
         });
 
-        // This function should make sure that all star engines keep a proper distance from the other stars.
-        // TODO: The function
-        this.maintainDistance(engineStars, game.galaxy.stars.filter(s => !this.specialistService.getStarMovement(s)))
+        this.maintainDistance(game, engineStars, game.galaxy.stars.filter(s => !this.specialistService.getStarMovement(s)))
     }
 
-    maintainDistance(movedStars: Star[], stars: Star[]) {
-        // Comparing all movedStars to their closest star, checking if it isn't too close.
+    maintainDistance(game: Game, movedStars: Star[], stars: Star[]) {
+        for(let star of movedStars) {
+            let nearbyStars = this.starDistanceService.getStarsWithinRadiusOfStar(star, stars, game.constants.distances.minDistanceBetweenStars);
+            let tooCloseStars = this.starDistanceService.getStarsWithinRadiusOfStar(star, stars, 0.49 * game.constants.distances.minDistanceBetweenStars);
+
+            // Check if something has to be done
+            if(tooCloseStars.length === 0) {
+                continue;
+            }
+
+            let k: number = 0
+            while(tooCloseStars.length !== 0 && k<50) {
+                let closestStar = this.starDistanceService.getClosestStar(star, tooCloseStars);
+                this.shiftAway(star, closestStar, (0.501-k*0.01)*game.constants.distances.minDistanceBetweenStars);
+                tooCloseStars = this.starDistanceService.getStarsWithinRadiusOfStar(star, nearbyStars, (0.49 - k*0.01) * game.constants.distances.minDistanceBetweenStars);
+                k++;
+            }
+
+
+        }
     }
+
+    shiftAway(movingStar: Star, stationaryStar: Star, range: number) {
+        let shift = this.starDistanceService.getDistanceBetweenStars(movingStar, stationaryStar) - range;
+        this.moveStarTowardsLocation(movingStar, stationaryStar.location, shift);
+    }
+
     moveStarTowardsLocation(star: Star, location: Location, speed: number) {
+        // This function is used to move a star either towards a location with positive speed, or shift it away with negative speed.
+        if(star.location === location) {
+            return;
+        }
         let dx = location.x - star.location.x,
             dy = location.y - star.location.y;
         let mag = Math.hypot(dx, dy)

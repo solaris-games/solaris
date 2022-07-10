@@ -568,7 +568,7 @@
             "id": 16,
             "key": "rocket-thruster",
             "name": "Stellar Engine",
-            "description": "When the Stellar Engine is activated, it slowly moves this star towards the selected star.",
+            "description": "When the Stellar Engine is activated, it slowly moves this star towards the selected star at x0.25 speed. ",
             "active": true,
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
