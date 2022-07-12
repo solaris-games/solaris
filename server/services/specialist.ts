@@ -3,10 +3,17 @@ import { Game } from "./types/Game";
 import { Specialist, SpecialistType } from "./types/Specialist";
 import { Star } from "./types/Star";
 import ValidationError from "../errors/validation";
+import GameTypeService from "./gameType";
 
 const specialists = require('../config/game/specialists.json');
 
 export default class SpecialistService {
+
+    gameTypeService: GameTypeService
+
+    constructor(gameTypeService: GameTypeService) {
+        this.gameTypeService = gameTypeService;
+    }
 
     getById(id: number, type: SpecialistType) {
         return specialists[type].find((x) => x.id === id);
@@ -67,7 +74,15 @@ export default class SpecialistService {
             throw new ValidationError('The game settings has disabled the hiring of specialists.');
         }
         
-        let specs = specialistsList[type].filter(s => s.active);
+        let specs = specialistsList[type];
+
+        // If in the context of a game, filter out specialists that aren't active.
+        if (game) {
+            const isOfficialGame = this.gameTypeService.isOfficialGame(game)
+            const isCustomGame = this.gameTypeService.isCustomGame(game)
+
+            specs = specs.filter(s => (s.active.official && isOfficialGame) || (s.active.custom && isCustomGame))
+        }
 
         if (game) {
             for (let spec of specs) {

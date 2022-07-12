@@ -5,7 +5,10 @@ export interface Specialist {
     key: string;
     name: string;
     description: string;
-    active: boolean;
+    active: {
+        official: boolean;
+        custom: boolean;
+    },
     baseCostCredits: number;
     baseCostCreditsSpecialists: number;
     oneShot: boolean;
