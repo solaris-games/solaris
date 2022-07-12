@@ -307,7 +307,7 @@
             "name": "Stellar Bomb",
             "description": "Reignites a dead star with 25 Natural Resources (x2 for Binary Stars), the Stellar Bomb will be destroyed but the carrier will survive. x0.5 Speed.",
             "active": {
-                "official": false,
+                "official": true,
                 "custom": true
             },
             "baseCostCredits": 300,
@@ -669,7 +669,7 @@
             "name": "Stellar Engine",
             "description": "When the Stellar Engine is activated, the star slowly moves towards the nearest Stellar Beacon at x0.25 speed.",
             "active": {
-                "official": true,
+                "official": false,
                 "custom": true
             },
             "baseCostCredits": 500,
