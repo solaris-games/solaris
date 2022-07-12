@@ -1,0 +1,10 @@
+db.games.updateMany({
+    'state.endDate': { $eq: null },
+    'settings.specialGalaxy.specialistBans.star': { $ne: null }
+}, {
+    $addToSet: { 
+        'settings.specialGalaxy.specialistBans.star': { 
+            $each: [ 16, 17 ] 
+        } 
+    }
+});
