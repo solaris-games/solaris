@@ -5,6 +5,7 @@ import { MapObject } from "./types/Map";
 import { Player } from "./types/Player";
 import { Star } from "./types/Star";
 import DistanceService from "./distance";
+import game from "../api/middleware/game";
 
 export default class StarDistanceService {
     distanceService: DistanceService;
@@ -106,6 +107,13 @@ export default class StarDistanceService {
 
     getClosestUnownedStarFromLocation(location: Location, stars: Star[]) {
         return this.getClosestUnownedStarsFromLocation(location, stars, 1)[0];
+    }
+
+    getStarsWithinRadiusOfStar(star: Star, stars: Star[], radius: number) {
+        let nearby = stars
+            .filter(s => (s._id !== star._id) && (this.getDistanceBetweenStars(star, s) <= radius))
+        
+        return nearby;
     }
 
     isStarTooClose(game: Game, star: Star, otherStar: Star) {

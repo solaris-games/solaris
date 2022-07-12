@@ -36,7 +36,7 @@ import LeaderboardService from "../leaderboard";
 import LedgerService from "../ledger";
 import MapService from "../map";
 import NameService from "../name";
-import OrbitalMechanicsService from "../orbitalMechanics";
+import StarMovementService from "../starMovement";
 import PasswordService from "../password";
 import PaypalService from "../paypal";
 import PlayerService from "../player";
@@ -113,7 +113,7 @@ export interface DependencyContainer {
     reputationService: ReputationService,
     aiService: AIService,
     battleRoyaleService: BattleRoyaleService,
-    orbitalMechanicsService: OrbitalMechanicsService,
+    starMovementService: StarMovementService,
     cacheService: CacheService,
     recaptchaService: RecaptchaService,
     ratingService: RatingService,

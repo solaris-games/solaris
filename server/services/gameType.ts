@@ -10,6 +10,10 @@ export default class GameTypeService {
         return game.settings.general.type === 'tutorial';
     }
 
+    isOfficialGame(game: Game) {
+        return game.settings.general.createdByUserId == null;
+    }
+
     isCustomGame(game: Game) {
         return game.settings.general.type === 'custom';
     }

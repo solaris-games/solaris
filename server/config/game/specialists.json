@@ -5,7 +5,10 @@
             "key": "mecha-head",
             "name": "Admiral",
             "description": "Grants x1.5 Speed, -1 Weapons, -2 Hyperspace Range to the carrier.",
-            "active": true,
+            "active": {
+                "official": true,
+                "custom": true
+            },
             "baseCostCredits": 300,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
@@ -22,7 +25,10 @@
             "key": "mecha-mask",
             "name": "Lieutenant",
             "description": "Grants +1 Weapons, -1 Hyperspace Range to the carrier.",
-            "active": true,
+            "active": {
+                "official": true,
+                "custom": true
+            },
             "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 2,
             "oneShot": false,
@@ -38,7 +44,10 @@
             "key": "android-mask",
             "name": "Colonel",
             "description": "Grants +2 Weapons, -1 Hyperspace Range, x0.75 Speed to the carrier.",
-            "active": true,
+            "active": {
+                "official": true,
+                "custom": true
+            },
             "baseCostCredits": 300,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
@@ -55,7 +64,10 @@
             "key": "hazmat-suit",
             "name": "General",
             "description": "Grants +3 Weapons, -1 Hyperspace Range, x0.5 Speed to the carrier.",
-            "active": true,
+            "active": {
+                "official": true,
+                "custom": true
+            },
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
             "oneShot": false,
@@ -72,7 +84,10 @@
             "key": "cyborg-face",
             "name": "Smuggler",
             "description": "Grants x2 Speed, -1 Hyperspace Range, -1 Weapons to the carrier.",
-            "active": true,
+            "active": {
+                "official": true,
+                "custom": true
+            },
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
             "oneShot": false,
@@ -89,7 +104,10 @@
             "key": "lunar-module",
             "name": "Explorer",
             "description": "Grants +3 Hyperspace Range, x1.5 Speed, -3 Weapons to the carrier.",
-            "active": true,
+            "active": {
+                "official": true,
+                "custom": true
+            },
             "baseCostCredits": 300,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
@@ -106,7 +124,10 @@
             "key": "spaceship",
             "name": "Destroyer",
             "description": "Grants +5 Weapons, -3 Hyperspace Range, x0.5 Speed to the carrier.",
-            "active": true,
+            "active": {
+                "official": true,
+                "custom": true
+            },
             "baseCostCredits": 1000,
             "baseCostCreditsSpecialists": 10,
             "oneShot": false,
@@ -123,7 +144,10 @@
             "key": "power-generator",
             "name": "Scrambler",
             "description": "Prevents other players from seeing how many ships the carrier has.",
-            "active": true,
+            "active": {
+                "official": true,
+                "custom": true
+            },
             "baseCostCredits": 300,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
@@ -138,7 +162,10 @@
             "key": "energise",
             "name": "Infiltrator",
             "description": "When participating in combat, the enemy fights with -1 Weapons.",
-            "active": true,
+            "active": {
+                "official": true,
+                "custom": true
+            },
             "baseCostCredits": 300,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
@@ -153,7 +180,10 @@
             "key": "afterburn",
             "name": "Warp Stabilizer",
             "description": "Warp Scramblers do not affect the carrier.",
-            "active": true,
+            "active": {
+                "official": true,
+                "custom": true
+            },
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
             "oneShot": false,
@@ -168,7 +198,10 @@
             "key": "strafe",
             "name": "Raider",
             "description": "Carrier travels at x2 Speed, -2 Weapons. The carrier is awarded x2 star capture rewards for destroying infrastructure.",
-            "active": true,
+            "active": {
+                "official": true,
+                "custom": true
+            },
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
             "oneShot": false,
@@ -187,7 +220,10 @@
             "key": "alien-stare",
             "name": "Coward",
             "description": "The carrier does not participate in carrier-to-carrier combat. x2 Speed.",
-            "active": true,
+            "active": {
+                "official": true,
+                "custom": true
+            },
             "baseCostCredits": 1000,
             "baseCostCreditsSpecialists": 10,
             "oneShot": false,
@@ -205,7 +241,10 @@
             "key": "pirate",
             "name": "Pirate",
             "description": "Grants +3 Weapons in carrier-to-carrier combat, -2 Weapons in carrier-to-star combat and x1.5 Speed.",
-            "active": true,
+            "active": {
+                "official": true,
+                "custom": true
+            },
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
             "oneShot": false,
@@ -226,7 +265,10 @@
             "key": "spoutnik",
             "name": "Pathfinder",
             "description": "Grants +1 Hyperspace Range to the carrier.",
-            "active": true,
+            "active": {
+                "official": true,
+                "custom": true
+            },
             "baseCostCredits": 100,
             "baseCostCreditsSpecialists": 1,
             "oneShot": false,
@@ -241,7 +283,10 @@
             "key": "starfighter",
             "name": "Marauder",
             "description": "The carrier does not participate in carrier-to-carrier combat. x1.5 Speed, -2 Hyperspace Range, -1 Weapons.",
-            "active": true,
+            "active": {
+                "official": true,
+                "custom": true
+            },
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
             "oneShot": false,
@@ -261,7 +306,10 @@
             "key": "rocket",
             "name": "Stellar Bomb",
             "description": "Reignites a dead star with 25 Natural Resources (x2 for Binary Stars), the Stellar Bomb will be destroyed but the carrier will survive. x0.5 Speed.",
-            "active": true,
+            "active": {
+                "official": false,
+                "custom": true
+            },
             "baseCostCredits": 300,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
@@ -284,7 +332,10 @@
             "key": "ray-gun",
             "name": "Saboteur",
             "description": "When participating in combat, the enemy fights with -3 Weapons. The Saboteur has -2 Hyperspace Range and x0.75 Speed.",
-            "active": true,
+            "active": {
+                "official": true,
+                "custom": true
+            },
             "baseCostCredits": 1000,
             "baseCostCreditsSpecialists": 10,
             "oneShot": false,
@@ -303,7 +354,10 @@
             "key": "vintage-robot",
             "name": "Joker",
             "description": "When attacking a Star or in Carrier-to-Carrier combat, the calculated weapons technology levels are swapped between the two sides unless both sides have a Joker.",
-            "active": false,
+            "active": {
+                "official": false,
+                "custom": false
+            },
             "baseCostCredits": 1000,
             "baseCostCreditsSpecialists": 10,
             "oneShot": false,
@@ -320,7 +374,10 @@
             "key": "sattelite",
             "name": "Orbital Array",
             "description": "Grants +1 Scanning Range to the Star.",
-            "active": true,
+            "active": {
+                "official": true,
+                "custom": true
+            },
             "baseCostCredits": 100,
             "baseCostCreditsSpecialists": 1,
             "oneShot": false,
@@ -335,7 +392,10 @@
             "key": "airtight-hatch",
             "name": "Space Dock",
             "description": "Grants +2 Manufacturing, -1 Terraforming to the Star.",
-            "active": true,
+            "active": {
+                "official": true,
+                "custom": true
+            },
             "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 2,
             "oneShot": false,
@@ -351,7 +411,10 @@
             "key": "cannister",
             "name": "Atmosphere Processor",
             "description": "Grants +3 Terraforming, -1 Scanning to the Star.",
-            "active": true,
+            "active": {
+                "official": true,
+                "custom": true
+            },
             "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 2,
             "oneShot": false,
@@ -367,7 +430,10 @@
             "key": "defense-satellite",
             "name": "Orbital Cannon",
             "description": "Grants +1 Defender Bonus to the Star.",
-            "active": true,
+            "active": {
+                "official": true,
+                "custom": true
+            },
             "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 2,
             "oneShot": false,
@@ -382,7 +448,10 @@
             "key": "habitat-dome",
             "name": "Warp Scrambler",
             "description": "Locks the Warp Gate at the Star to prevent non-allied players from using it. Weapons -1.",
-            "active": true,
+            "active": {
+                "official": true,
+                "custom": true
+            },
             "baseCostCredits": 300,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
@@ -400,7 +469,10 @@
             "key": "techno-heart",
             "name": "World Builder",
             "description": "Adds 1 to the Star's natural resources every tick, -3 Scanning, -5 Weapons.",
-            "active": true,
+            "active": {
+                "official": true,
+                "custom": true
+            },
             "baseCostCredits": 1000,
             "baseCostCreditsSpecialists": 10,
             "oneShot": false,
@@ -419,7 +491,10 @@
             "key": "missile-pod",
             "name": "War Machine",
             "description": "Deducts 1 from the Star's natural resources every tick, +5 Manufacturing, +5 Weapons. When the star reaches 0 natural resources, the star dies and the specialist retires.",
-            "active": true,
+            "active": {
+                "official": true,
+                "custom": true
+            },
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
             "oneShot": true,
@@ -438,7 +513,10 @@
             "key": "power-generator",
             "name": "Scrambler",
             "description": "Prevents other players from seeing how many ships are garrisoned at the Star.",
-            "active": true,
+            "active": {
+                "official": true,
+                "custom": true
+            },
             "baseCostCredits": 300,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
@@ -453,7 +531,10 @@
             "key": "space-suit",
             "name": "Demolition Controller",
             "description": "If the Star is captured, all infrastructure is destroyed.",
-            "active": true,
+            "active": {
+                "official": true,
+                "custom": true
+            },
             "baseCostCredits": 300,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
@@ -468,7 +549,10 @@
             "key": "ringed-planet",
             "name": "Trade Port",
             "description": "The Star's Economy infrastructure contributes x2 to economy production. -5 Terraforming, -3 Weapons, +1 Scanning.",
-            "active": true,
+            "active": {
+                "official": true,
+                "custom": true
+            },
             "baseCostCredits": 1000,
             "baseCostCreditsSpecialists": 10,
             "oneShot": false,
@@ -488,7 +572,10 @@
             "key": "observatory",
             "name": "Research Station",
             "description": "The Star's Science infrastructure contributes x2 to research. -3 Terraforming, -3 Weapons, +1 Scanning.",
-            "active": true,
+            "active": {
+                "official": true,
+                "custom": true
+            },
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
             "oneShot": false,
@@ -508,7 +595,10 @@
             "key": "double-ringed-orb",
             "name": "Financial Analyst",
             "description": "The star produces 2 credits per tick for each point of science on the star.",
-            "active": true,
+            "active": {
+                "official": true,
+                "custom": true
+            },
             "baseCostCredits": 1000,
             "baseCostCreditsSpecialists": 10,
             "oneShot": false,
@@ -523,7 +613,10 @@
             "key": "radar-dish",
             "name": "Telescope Array",
             "description": "Grants +3 Scanning Range, -3 Weapons to the Star.",
-            "active": true,
+            "active": {
+                "official": true,
+                "custom": true
+            },
             "baseCostCredits": 600,
             "baseCostCreditsSpecialists": 6,
             "oneShot": false,
@@ -539,7 +632,10 @@
             "key": "energy-tank",
             "name": "Mineral Extractor",
             "description": "Grants +2 Terraforming to the Star.",
-            "active": true,
+            "active": {
+                "official": true,
+                "custom": true
+            },
             "baseCostCredits": 100,
             "baseCostCreditsSpecialists": 1,
             "oneShot": false,
@@ -554,13 +650,53 @@
             "key": "cryo-chamber",
             "name": "Cryo Chamber",
             "description": "When a Carrier is built at this Star, a General Carrier Specialist is automatically assigned to the Carrier.",
-            "active": true,
+            "active": {
+                "official": true,
+                "custom": true
+            },
             "baseCostCredits": 1500,
             "baseCostCreditsSpecialists": 15,
             "oneShot": false,
             "modifiers": {
                 "special": {
                     "autoCarrierSpecialistAssign": 4
+                }
+            }
+        },
+        {
+            "id": 16,
+            "key": "rocket-thruster",
+            "name": "Stellar Engine",
+            "description": "When the Stellar Engine is activated, the star slowly moves towards the nearest Stellar Beacon at x0.25 speed.",
+            "active": {
+                "official": true,
+                "custom": true
+            },
+            "baseCostCredits": 500,
+            "baseCostCreditsSpecialists": 5,
+            "oneShot": false,
+            "modifiers": {
+                "special": {
+                    "moveStar": true,
+                    "starMovementPerTick": 0.25
+                }
+            }
+        },
+        {
+            "id": 17,
+            "key": "targeting",
+            "name": "Stellar Beacon",
+            "description": "The Stellar Beacon helps nearby Stellar Engines navigate, a Stellar Engine moves towards the nearest Stellar Beacon.",
+            "active": {
+                "official": false,
+                "custom": true
+            },
+            "baseCostCredits": 300,
+            "baseCostCreditsSpecialists": 3,
+            "oneShot": false,
+            "modifiers": {
+                "special": {
+                    "attractStar": true
                 }
             }
         }
