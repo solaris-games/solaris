@@ -113,7 +113,7 @@ export default class StarDistanceService {
         let nearby = stars
             .filter(s => (s._id !== star._id) && (this.getDistanceBetweenStars(star, s) <= radius))
         
-        return nearby; // Returns all stars within a certain radius of the star.
+        return nearby;
     }
 
     isStarTooClose(game: Game, star: Star, otherStar: Star) {

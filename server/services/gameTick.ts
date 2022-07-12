@@ -808,17 +808,7 @@ export default class GameTickService extends EventEmitter {
 
     _orbitGalaxy(game: Game) {
         if (this.gameTypeService.isOrbitalMode(game)) {
-            for (let star of game.galaxy.stars) {
-                this.starMovementService.orbitStar(game, star);
-            }
-
-            for (let carrier of game.galaxy.carriers) {
-                this.starMovementService.orbitCarrier(game, carrier);
-            }
-
-            for (let carrier of game.galaxy.carriers) {
-                this.waypointService.cullWaypointsByHyperspaceRange(game, carrier);
-            }
+            this.starMovementService.orbitGalaxy(game);
         }
     }
 
