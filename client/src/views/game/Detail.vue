@@ -2,8 +2,6 @@
   <view-container>
     <view-title title="Game Settings" navigation="main-menu"/>
 
-    <flux-bar class="mb-2" v-if="!isLoadingGame && isFluxGame"/>
-
     <loading-spinner :loading="isLoadingGame"/>
 
     <div v-if="!isLoadingGame">
@@ -51,8 +49,7 @@ export default {
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'view-subtitle': ViewSubtitle,
-    'game-settings': GameSettings,
-    'flux-bar': FluxBar
+    'game-settings': GameSettings
   },
   data () {
     return {
