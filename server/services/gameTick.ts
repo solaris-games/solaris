@@ -215,7 +215,7 @@ export default class GameTickService extends EventEmitter {
             logTime('Orbital mechanics');
 
             this._oneTickSpecialists(game);
-            logTime('Award tick credits from specialists');
+            logTime('Apply effects of onetick specialists');
 
             this._countdownToEndCheck(game);
             logTime('Countdown to end check');
