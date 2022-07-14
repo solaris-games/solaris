@@ -149,7 +149,7 @@ export default class PublicCommandService {
             // Getting all the actual detailed information from the global leaderboard
             let limit = 20;
             let skip = 20 * page; // Page 0 is the first page
-            let result = await this.leaderboardService.getLeaderboard(limit, key, skip);
+            let result = await this.leaderboardService.getUserLeaderboard(limit, key, skip);
             let leaderboard = result.leaderboard;
             if (isPC) {
                 // Generates the response if the response has to be in a format optimised for PC users
@@ -219,7 +219,7 @@ export default class PublicCommandService {
             let isPC = responseData.isPC;
 
             // Generating a leaderboard in the official format
-            let leaderboardReturn = this.leaderboardService.getLeaderboardRankings(game, sortingKey);
+            let leaderboardReturn = this.leaderboardService.getGameLeaderboard(game, sortingKey);
             let leaderboard = leaderboardReturn.leaderboard;
             let fullKey = leaderboardReturn.fullKey;
 
@@ -290,15 +290,15 @@ export default class PublicCommandService {
 
         // Generating the local leaderboards for the requested game
         let leaderboardData = {
-            stars: this.leaderboardService.getLeaderboardRankings(game, 'stars'),
-            ships: this.leaderboardService.getLeaderboardRankings(game, 'ships'),
-            newShips: this.leaderboardService.getLeaderboardRankings(game, 'newShips'),
-            economy: this.leaderboardService.getLeaderboardRankings(game, 'economy'),
-            industry: this.leaderboardService.getLeaderboardRankings(game, 'industry'),
-            science: this.leaderboardService.getLeaderboardRankings(game, 'science'),
-            weapons: this.leaderboardService.getLeaderboardRankings(game, 'weapons'),
-            manufacturing: this.leaderboardService.getLeaderboardRankings(game, 'manufacturing'),
-            specialists: this.leaderboardService.getLeaderboardRankings(game, 'specialists')
+            stars: this.leaderboardService.getGameLeaderboard(game, 'stars'),
+            ships: this.leaderboardService.getGameLeaderboard(game, 'ships'),
+            newShips: this.leaderboardService.getGameLeaderboard(game, 'newShips'),
+            economy: this.leaderboardService.getGameLeaderboard(game, 'economy'),
+            industry: this.leaderboardService.getGameLeaderboard(game, 'industry'),
+            science: this.leaderboardService.getGameLeaderboard(game, 'science'),
+            weapons: this.leaderboardService.getGameLeaderboard(game, 'weapons'),
+            manufacturing: this.leaderboardService.getGameLeaderboard(game, 'manufacturing'),
+            specialists: this.leaderboardService.getGameLeaderboard(game, 'specialists')
         };
 
         // Calculating the count of living players

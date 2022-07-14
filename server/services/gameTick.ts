@@ -780,7 +780,7 @@ export default class GameTickService extends EventEmitter {
         let canAwardRank = this.gameTypeService.isRankedGame(game) && game.state.productionTick > productionTickCap;
 
         if (canAwardRank) {
-            let leaderboard = this.leaderboardService.getLeaderboardRankings(game).leaderboard;
+            let leaderboard = this.leaderboardService.getGameLeaderboard(game).leaderboard;
 
             rankingResult = this.leaderboardService.addGameRankings(game, gameUsers, leaderboard);
 

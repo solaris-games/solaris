@@ -200,6 +200,7 @@ export interface GameUserNotification {
 	turnWaiting: boolean | null;
 	defeated: boolean | null;
 	afk: boolean | null;
+	position: number | null;
 };
 
 export interface Game {

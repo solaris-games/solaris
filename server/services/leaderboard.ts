@@ -531,7 +531,7 @@ export default class LeaderboardService {
         this.playerStatisticsService = playerStatisticsService;
     }
 
-    async getLeaderboard(limit: number | null, sortingKey: string, skip: number = 0) {
+    async getUserLeaderboard(limit: number | null, sortingKey: string, skip: number = 0) {
         const sorter = LeaderboardService.GLOBALSORTERS[sortingKey] || LeaderboardService.GLOBALSORTERS['rank'];
 
         let leaderboard = await this.userRepo
@@ -570,7 +570,7 @@ export default class LeaderboardService {
         };
     }
 
-    getLeaderboardRankings(game: Game, sortingKey?: string): Leaderboard {
+    getGameLeaderboard(game: Game, sortingKey?: string): Leaderboard {
         let SORTERS = LeaderboardService.LOCALSORTERS;
 
         let kingOfTheHillPlayer: Player | null = null;
@@ -653,6 +653,12 @@ export default class LeaderboardService {
             leaderboard,
             fullKey: sortingKey ? SORTERS[sortingKey] : null
         };
+    }
+
+    getGameLeaderboardPosition(game: Game, player: Player) {
+        const gameLeaderboard = this.getGameLeaderboard(game)
+        
+        return gameLeaderboard.leaderboard.findIndex(l => l.player._id.toString() === player._id.toString()) + 1;
     }
 
     addGameRankings(game: Game, gameUsers: User[], leaderboard: LeaderboardPlayer[]): GameRankingResult {
@@ -825,7 +831,7 @@ export default class LeaderboardService {
         // the number of stars required at the same time.
         // In this case we pick the player who has the most ships.
         // If that's equal, then pick the player who has the most carriers.
-        let leaderboard = this.getLeaderboardRankings(game).leaderboard;
+        let leaderboard = this.getGameLeaderboard(game).leaderboard;
 
         // If conquest and home star percentage then use the totalHomeStars as the sort
         // All other cases use totalStars
@@ -862,7 +868,7 @@ export default class LeaderboardService {
     }
 
     getFirstPlacePlayer(game: Game): Player {
-        let leaderboard = this.getLeaderboardRankings(game).leaderboard;
+        let leaderboard = this.getGameLeaderboard(game).leaderboard;
 
         return leaderboard[0].player;
     }

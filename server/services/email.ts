@@ -254,7 +254,7 @@ export default class EmailService {
 
     async sendGameCycleSummaryEmail(gameId: DBObjectId) {      
         let game = await this.gameService.getById(gameId);
-        let leaderboard = this.leaderboardService.getLeaderboardRankings(game).leaderboard;
+        let leaderboard = this.leaderboardService.getGameLeaderboard(game).leaderboard;
 
         let leaderboardHtml = '';
 

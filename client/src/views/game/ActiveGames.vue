@@ -33,15 +33,15 @@
           <tbody>
               <tr v-for="game in filteredActiveGames" v-bind:key="game._id">
                   <td class="col-6">
-                    <router-link :to="{ path: '/game/detail', query: { id: game._id } }">{{game.settings.general.name}}</router-link>
+                    <router-link :to="{ path: '/game/detail', query: { id: game._id } }" class="me-1">{{game.settings.general.name}}</router-link>
                     <br/>
                     <small>{{getGameTypeFriendlyText(game)}}</small>
                     <br/>
-                    <span v-if="game.userNotifications.defeated && !game.userNotifications.afk" class="ms-1 badge bg-danger">Defeated</span>
-                    <span v-if="!game.userNotifications.defeated && game.userNotifications.turnWaiting" class="ms-1 badge bg-danger">Turn Waiting</span>
-                    <span v-if="!game.userNotifications.defeated && game.userNotifications.unreadEvents" class="ms-1 badge bg-warning">{{game.userNotifications.unreadEvents}} Events</span>
-                    <span v-if="game.userNotifications.unreadConversations" class="ms-1 badge bg-info">{{game.userNotifications.unreadConversations}} Messages</span>
-                    <span v-if="game.userNotifications.afk" class="ms-1 badge bg-warning">AFK</span>
+                    <span v-if="game.userNotifications.defeated && !game.userNotifications.afk" class="me-1 badge bg-danger">Defeated</span>
+                    <span v-if="!game.userNotifications.defeated && game.userNotifications.turnWaiting" class="me-1 badge bg-danger">Turn Waiting</span>
+                    <span v-if="!game.userNotifications.defeated && game.userNotifications.unreadEvents" class="me-1 badge bg-warning">{{game.userNotifications.unreadEvents}} Events</span>
+                    <span v-if="game.userNotifications.afk" class="me-1 badge bg-warning">AFK</span>
+                    <span v-if="game.userNotifications.unreadConversations" class="me-1 badge bg-info">{{game.userNotifications.unreadConversations}} Messages</span>
 
                     <div class="d-md-none text-info">
                       <small>
@@ -108,10 +108,14 @@
         <tbody>
             <tr v-for="game in completedGames" v-bind:key="game._id">
                 <td>
-                  <router-link :to="{ path: '/game/detail', query: { id: game._id } }">{{game.settings.general.name}}</router-link>
-                  <span v-if="game.userNotifications.unreadConversations" class="ms-1 badge bg-info">{{game.userNotifications.unreadConversations}} Messages</span>
+                  <span v-if="game.userNotifications.position === 1" class="me-1"><i class="fas fa-medal gold"></i></span>
+                  <span v-if="game.userNotifications.position === 2" class="me-1"><i class="fas fa-medal silver"></i></span>
+                  <span v-if="game.userNotifications.position === 3" class="me-1"><i class="fas fa-medal bronze"></i></span>
+                  <router-link :to="{ path: '/game/detail', query: { id: game._id } }" class="me-1">{{game.settings.general.name}}</router-link>
                   <br/>
                   <small>{{getGameTypeFriendlyText(game)}}</small>
+                  <br/>
+                  <span v-if="game.userNotifications.unreadConversations" class="me-1 badge bg-info">{{game.userNotifications.unreadConversations}} Messages</span>
                 </td>
                 <td class="d-none d-sm-table-cell text-end">{{getEndDateFromNow(game)}}</td>
                 <td>
@@ -229,4 +233,15 @@ export default {
 </script>
 
 <style scoped>
+.gold {
+  color: gold;
+}
+
+.silver {
+  color: silver;
+}
+
+.bronze {
+  color: #b08d57;
+}
 </style>
