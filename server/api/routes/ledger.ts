@@ -15,7 +15,7 @@ export default (router: Router, io, container: DependencyContainer) => {
 
     const controller = LedgerController(container, io);
 
-    router.get('/api/game/:gameId/ledger',
+    router.get('/api/game/:gameId/ledger/credits',
         mwAuth.authenticate(),
         mwGame.loadGame({
             lean: true,
@@ -25,10 +25,10 @@ export default (router: Router, io, container: DependencyContainer) => {
             constants: true
         }),
         mwPlayer.loadPlayer,
-        controller.detail,
+        controller.detailCredits,
         mwCore.handleError);
 
-    router.put('/api/game/:gameId/ledger/forgive/:playerId',
+    router.put('/api/game/:gameId/ledger/credits/forgive/:playerId',
         mwAuth.authenticate(),
         mwGame.loadGame({
             lean: false,
@@ -43,10 +43,10 @@ export default (router: Router, io, container: DependencyContainer) => {
         }),
         mwPlayer.loadPlayer,
         mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
-        controller.forgive,
+        controller.forgiveCredits,
         mwCore.handleError);
 
-    router.put('/api/game/:gameId/ledger/settle/:playerId',
+    router.put('/api/game/:gameId/ledger/credits/settle/:playerId',
         mwAuth.authenticate(),
         mwGame.loadGame({
             lean: false,
@@ -61,8 +61,57 @@ export default (router: Router, io, container: DependencyContainer) => {
         }),
         mwPlayer.loadPlayer,
         mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
-        controller.settle,
+        controller.settleCredits,
         mwCore.handleError);
+
+        router.get('/api/game/:gameId/ledger/creditsSpecialists',
+            mwAuth.authenticate(),
+            mwGame.loadGame({
+                lean: true,
+                settings: true,
+                state: true,
+                galaxy: true,
+                constants: true
+            }),
+            mwPlayer.loadPlayer,
+            controller.detailCreditsSpecialists,
+            mwCore.handleError);
+    
+        router.put('/api/game/:gameId/ledger/creditsSpecialists/forgive/:playerId',
+            mwAuth.authenticate(),
+            mwGame.loadGame({
+                lean: false,
+                settings: true,
+                state: true,
+                galaxy: true,
+                constants: true
+            }),
+            mwGame.validateGameState({
+                isUnlocked: true,
+                isNotFinished: true
+            }),
+            mwPlayer.loadPlayer,
+            mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+            controller.forgiveCreditsSpecialists,
+            mwCore.handleError);
+    
+        router.put('/api/game/:gameId/ledger/creditsSpecialists/settle/:playerId',
+            mwAuth.authenticate(),
+            mwGame.loadGame({
+                lean: false,
+                settings: true,
+                state: true,
+                galaxy: true,
+                constants: true
+            }),
+            mwGame.validateGameState({
+                isUnlocked: true,
+                isNotFinished: true
+            }),
+            mwPlayer.loadPlayer,
+            mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+            controller.settleCreditsSpecialists,
+            mwCore.handleError);
 
     return router;
 }

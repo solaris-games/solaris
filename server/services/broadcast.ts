@@ -5,6 +5,7 @@ import { Game } from "./types/Game";
 import { Player } from "./types/Player";
 import { DiplomaticStatus } from "./types/Diplomacy";
 import { TradeEventTechnology } from "./types/Trade";
+import { LedgerType } from "./ledger";
 
 
 export default class BroadcastService {
@@ -168,33 +169,36 @@ export default class BroadcastService {
         });
     }
 
-    gamePlayerDebtAdded(debtorPlayerId: DBObjectId, creditorPlayerId: DBObjectId, amount: number) {
+    gamePlayerDebtAdded(debtorPlayerId: DBObjectId, creditorPlayerId: DBObjectId, amount: number, ledgerType: LedgerType) {
         let data = {
             debtorPlayerId,
             creditorPlayerId,
-            amount
+            amount,
+            ledgerType
         };
 
         this.io.to(debtorPlayerId).emit('playerDebtAdded', data);
         this.io.to(creditorPlayerId).emit('playerDebtAdded', data);
     }
 
-    gamePlayerDebtForgiven(debtorPlayerId: DBObjectId, creditorPlayerId: DBObjectId, amount: number) {
+    gamePlayerDebtForgiven(debtorPlayerId: DBObjectId, creditorPlayerId: DBObjectId, amount: number, ledgerType: LedgerType) {
         let data = {
             debtorPlayerId,
             creditorPlayerId,
-            amount
+            amount,
+            ledgerType
         };
 
         this.io.to(debtorPlayerId).emit('playerDebtForgiven', data);
         this.io.to(creditorPlayerId).emit('playerDebtForgiven', data);
     }
 
-    gamePlayerDebtSettled(debtorPlayerId: DBObjectId, creditorPlayerId: DBObjectId, amount: number) {
+    gamePlayerDebtSettled(debtorPlayerId: DBObjectId, creditorPlayerId: DBObjectId, amount: number, ledgerType: LedgerType) {
         let data = {
             debtorPlayerId,
             creditorPlayerId,
-            amount
+            amount,
+            ledgerType
         };
 
         this.io.to(debtorPlayerId).emit('playerDebtSettled', data);

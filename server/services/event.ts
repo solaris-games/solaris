@@ -14,7 +14,7 @@ import CombatService from "./combat";
 import ConversationService from "./conversation";
 import GameService from "./game";
 import GameTickService from "./gameTick";
-import LedgerService from "./ledger";
+import LedgerService, { LedgerType } from "./ledger";
 import ResearchService from "./research";
 import SpecialistService from "./specialist";
 import StarService from "./star";
@@ -169,9 +169,9 @@ export default class EventService {
         this.carrierGiftService.on('onPlayerGiftReceived', (args) => this.createGiftReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.carrier, args.star));
         this.carrierGiftService.on('onPlayerGiftSent', (args) => this.createGiftSentEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.carrier, args.star));
 
-        this.ledgerService.on('onDebtAdded', (args) => this.createDebtAddedEvent(args.gameId, args.gameTick, args.debtor, args.creditor, args.amount));
-        this.ledgerService.on('onDebtSettled', (args) => this.createDebtSettledEvent(args.gameId, args.gameTick, args.debtor, args.creditor, args.amount));
-        this.ledgerService.on('onDebtForgiven', (args) => this.createDebtForgivenEvent(args.gameId, args.gameTick, args.debtor, args.creditor, args.amount));
+        this.ledgerService.on('onDebtAdded', (args) => this.createDebtAddedEvent(args.gameId, args.gameTick, args.debtor, args.creditor, args.amount, args.ledgerType));
+        this.ledgerService.on('onDebtSettled', (args) => this.createDebtSettledEvent(args.gameId, args.gameTick, args.debtor, args.creditor, args.amount, args.ledgerType));
+        this.ledgerService.on('onDebtForgiven', (args) => this.createDebtForgivenEvent(args.gameId, args.gameTick, args.debtor, args.creditor, args.amount, args.ledgerType));
 
         this.conversationService.on('onConversationCreated', (args) => this.createPlayerConversationCreated(args.gameId, args.gameTick, args.convo));
         this.conversationService.on('onConversationInvited', (args) => this.createPlayerConversationInvited(args.gameId, args.gameTick, args.convo, args.playerId));
@@ -600,37 +600,39 @@ export default class EventService {
         return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_BULK_INFRASTRUCTURE_UPGRADED, data, true);
     }
 
-    async createDebtAddedEvent(gameId: DBObjectId, gameTick: number, debtorPlayerId: DBObjectId, creditorPlayerId: DBObjectId, amount: number) {
+    async createDebtAddedEvent(gameId: DBObjectId, gameTick: number, debtorPlayerId: DBObjectId, creditorPlayerId: DBObjectId, amount: number, ledgerType: LedgerType) {
         // Debt added event is superfluous as we already have other events for when trades occur.
         // Just broadcast the event instead.
 
-        this.broadcastService.gamePlayerDebtAdded(debtorPlayerId, creditorPlayerId, amount);
+        this.broadcastService.gamePlayerDebtAdded(debtorPlayerId, creditorPlayerId, amount, ledgerType);
     }
 
-    async createDebtSettledEvent(gameId: DBObjectId, gameTick: number, debtorPlayerId: DBObjectId, creditorPlayerId: DBObjectId, amount: number) {
+    async createDebtSettledEvent(gameId: DBObjectId, gameTick: number, debtorPlayerId: DBObjectId, creditorPlayerId: DBObjectId, amount: number, ledgerType: LedgerType) {
         let data = {
             debtorPlayerId,
             creditorPlayerId,
-            amount
+            amount,
+            ledgerType
         };
 
         await this.createPlayerEvent(gameId, gameTick, debtorPlayerId, this.EVENT_TYPES.PLAYER_DEBT_SETTLED, data, true);
         await this.createPlayerEvent(gameId, gameTick, creditorPlayerId, this.EVENT_TYPES.PLAYER_DEBT_SETTLED, data, false);
 
-        this.broadcastService.gamePlayerDebtSettled(debtorPlayerId, creditorPlayerId, amount);
+        this.broadcastService.gamePlayerDebtSettled(debtorPlayerId, creditorPlayerId, amount, ledgerType);
     }
 
-    async createDebtForgivenEvent(gameId: DBObjectId, gameTick: number, debtorPlayerId: DBObjectId, creditorPlayerId: DBObjectId, amount: number) {
+    async createDebtForgivenEvent(gameId: DBObjectId, gameTick: number, debtorPlayerId: DBObjectId, creditorPlayerId: DBObjectId, amount: number, ledgerType: LedgerType) {
         let data = {
             debtorPlayerId,
             creditorPlayerId,
-            amount
+            amount,
+            ledgerType
         };
 
         await this.createPlayerEvent(gameId, gameTick, debtorPlayerId, this.EVENT_TYPES.PLAYER_DEBT_FORGIVEN, data, false);
         await this.createPlayerEvent(gameId, gameTick, creditorPlayerId, this.EVENT_TYPES.PLAYER_DEBT_FORGIVEN, data, true);
 
-        this.broadcastService.gamePlayerDebtForgiven(debtorPlayerId, creditorPlayerId, amount);
+        this.broadcastService.gamePlayerDebtForgiven(debtorPlayerId, creditorPlayerId, amount, ledgerType);
     }
 
     async createPlayerStarSpecialistHired(gameId: DBObjectId, gameTick: number, player: Player, star: Star, specialist: Specialist) {

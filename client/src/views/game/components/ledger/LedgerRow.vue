@@ -27,7 +27,8 @@ export default {
     'player-avatar': PlayerAvatarVue
   },
   props: {
-    'ledger': Object
+    'ledger': Object,
+    'ledgerType': String // TODO: Implement
   },
   methods: {
     getPlayer (playerId) {
@@ -45,11 +46,12 @@ export default {
     async forgiveDebt (ledger) {
       let playerAlias = this.getPlayerAlias(ledger.playerId)
 
+      // TODO: Remove $ if ledgerType is creditsSpecialists
       if (await this.$confirm('Forgive debt', `Are you sure you want to forgive the debt of $${ledger.debt} that ${playerAlias} owes you?`)) {
         try {
           ledger.isForgivingDebt = true
 
-          let response = await LedgerApiService.forgiveDebt(this.$store.state.game._id, ledger.playerId)
+          let response = await LedgerApiService.forgiveDebtCredits(this.$store.state.game._id, ledger.playerId)
 
           if (response.status === 200) {
             this.$toasted.show(`The debt ${playerAlias} owes you has been forgiven.`, { type: 'success' })
@@ -66,11 +68,12 @@ export default {
     async settleDebt (ledger) {
       let playerAlias = this.getPlayerAlias(ledger.playerId)
 
+      // TODO: Remove $ if ledgerType is creditsSpecialists
       if (await this.$confirm('Settle debt', `Are you sure you want to settle the debt of $${ledger.debt} that you owe to ${playerAlias}?`)) {
         try {
           ledger.isSettlingDebt = true
 
-          let response = await LedgerApiService.settleDebt(this.$store.state.game._id, ledger.playerId)
+          let response = await LedgerApiService.settleDebtCredits(this.$store.state.game._id, ledger.playerId)
 
           if (response.status === 200) {
             this.$toasted.show(`You have paid off debt that you owe to ${playerAlias}.`, { type: 'success' })

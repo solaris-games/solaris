@@ -8,6 +8,8 @@
 
     <loading-spinner :loading="isLoadingLedger"/>
 
+    <!-- TODO: Convert this into a table component with a ledgerType property -->
+    <!-- TODO: Display in tabs? Credits | Tokens -->
     <div v-if="!isLoadingLedger" class="row">
       <div class="table-responsive p-0" v-if="ledgers.length">
         <table class="table table-sm table-striped mb-0">
@@ -45,7 +47,7 @@ export default {
     }
   },
   mounted () {
-    this.loadLedger()
+    this.loadLedgerCredits()
   },
   created () {
     this.sockets.subscribe('playerDebtAdded', this.onPlayerDebtAdded)
@@ -61,11 +63,11 @@ export default {
     onOpenPlayerDetailRequested(playerId) {
       this.$emit('onOpenPlayerDetailRequested', playerId)
     },
-    async loadLedger () {
+    async loadLedgerCredits () {
       try {
         this.isLoadingLedger = true
 
-        let response = await LedgerApiService.getLedger(this.$store.state.game._id)
+        let response = await LedgerApiService.getLedgerCredits(this.$store.state.game._id)
 
         if (response.status === 200) {
           this.ledgers = response.data
@@ -81,13 +83,14 @@ export default {
     },
     // Below: Fuck it.
     onPlayerDebtAdded (e) {
-      this.loadLedger()
+      // TODO: Check ledgerType here.
+      this.loadLedgerCredits()
     },
     onPlayerDebtForgiven (e) {
-      this.loadLedger()
+      this.loadLedgerCredits()
     },
     onPlayerDebtSettled (e) {
-      this.loadLedger()
+      this.loadLedgerCredits()
     }
   }
 }

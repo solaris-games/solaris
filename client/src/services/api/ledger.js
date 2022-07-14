@@ -2,18 +2,33 @@ import axios from 'axios'
 import BaseApiService from './base'
 
 class LedgerService extends BaseApiService {
-  getLedger (gameId) {
-    return axios.get(this.BASE_URL + 'game/' + gameId + '/ledger',
+  getLedgerCredits (gameId) {
+    return axios.get(this.BASE_URL + 'game/' + gameId + '/ledger/credits',
       { withCredentials: true })
   }
   
-  forgiveDebt (gameId, playerId) {
-    return axios.put(this.BASE_URL + 'game/' + gameId + '/ledger/forgive/' + playerId, {},
+  forgiveDebtCredits (gameId, playerId) {
+    return axios.put(this.BASE_URL + 'game/' + gameId + '/ledger/credits/forgive/' + playerId, {},
       { withCredentials: true })
   }
 
-  settleDebt (gameId, playerId) {
-    return axios.put(this.BASE_URL + 'game/' + gameId + '/ledger/settle/' + playerId, {},
+  settleDebtCredits (gameId, playerId) {
+    return axios.put(this.BASE_URL + 'game/' + gameId + '/ledger/credits/settle/' + playerId, {},
+      { withCredentials: true })
+  }
+
+  getLedgerCreditsSpecialists (gameId) {
+    return axios.get(this.BASE_URL + 'game/' + gameId + '/ledger/creditsSpecialists',
+      { withCredentials: true })
+  }
+  
+  forgiveDebtCreditsSpecialists (gameId, playerId) {
+    return axios.put(this.BASE_URL + 'game/' + gameId + '/ledger/creditsSpecialists/forgive/' + playerId, {},
+      { withCredentials: true })
+  }
+
+  settleDebtCreditsSpecialists (gameId, playerId) {
+    return axios.put(this.BASE_URL + 'game/' + gameId + '/ledger/creditsSpecialists/settle/' + playerId, {},
       { withCredentials: true })
   }
 }

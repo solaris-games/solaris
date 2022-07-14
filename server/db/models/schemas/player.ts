@@ -67,7 +67,13 @@ const schema = new Schema({
             progress: { type: Types.Number, required: true, default: 0  },
         }
     },
-    ledger: [
+    ledgerCredits: [
+        {
+            playerId: { type: Types.ObjectId, required: true },
+            debt: { type: Types.Number, required: true, default: 0  }
+        }
+    ],
+    ledgerCreditsSpecialists: [
         {
             playerId: { type: Types.ObjectId, required: true },
             debt: { type: Types.Number, required: true, default: 0  }
