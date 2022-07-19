@@ -93,7 +93,7 @@ export default {
         return
       }
 
-      if (!(await this.$confirm(`Purchase Avatar`, `Are you sure you want to purchase this avatar for ${avatar.price} credit(s)?`))) {
+      if (!(await this.$confirm(`Purchase Avatar`, `Are you sure you want to purchase this avatar for ${avatar.price} credits?`))) {
         return
       }
 

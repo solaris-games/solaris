@@ -1,7 +1,7 @@
 <template>
 <div v-if="player">
   <p>
-      You have sent <span class="text-warning">${{event.data.credits}}</span> credits to <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{player.alias}}</a>.
+      You have sent <span class="text-warning">${{event.data.credits}} credits</span> to <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{player.alias}}</a>.
   </p>
 </div>
 </template>

@@ -10,7 +10,7 @@ import { TradeEvent, TradeEventTechnology, TradeTechnology } from './types/Trade
 import AchievementService from './achievement';
 import GameTypeService from './gameType';
 import DiplomacyService from './diplomacy';
-import LedgerService from './ledger';
+import LedgerService, { LedgerType } from './ledger';
 import PlayerService from './player';
 import ReputationService from './reputation';
 import UserService from './user';
@@ -114,7 +114,7 @@ export default class TradeService extends EventEmitter {
 
         await this.gameRepo.bulkWrite(dbWrites);
 
-        await this.ledgerService.addDebt(game, fromPlayer, toPlayer, amount);
+        await this.ledgerService.addDebt(game, fromPlayer, toPlayer, amount, LedgerType.Credits);
 
         if (!this.gameTypeService.isTutorialGame(game)) {
             if (fromPlayer.userId && !fromPlayer.defeated) {
@@ -186,6 +186,8 @@ export default class TradeService extends EventEmitter {
         ];
 
         await this.gameRepo.bulkWrite(dbWrites);
+
+        await this.ledgerService.addDebt(game, fromPlayer, toPlayer, amount, LedgerType.CreditsSpecialists);
 
         if (!this.gameTypeService.isTutorialGame(game)) {
             if (fromPlayer.userId && !fromPlayer.defeated) {
@@ -355,7 +357,7 @@ export default class TradeService extends EventEmitter {
 
         await this.gameRepo.bulkWrite(dbWrites);
 
-        await this.ledgerService.addDebt(game, fromPlayer, toPlayer, tradeTech.cost);
+        await this.ledgerService.addDebt(game, fromPlayer, toPlayer, tradeTech.cost, LedgerType.Credits);
 
         if (!this.gameTypeService.isTutorialGame(game)) {
             // Need to assert that the trading players aren't controlled by AI

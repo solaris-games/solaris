@@ -137,7 +137,10 @@ export default class PlayerService extends EventEmitter {
                 weapons: { level: game.settings.technology.startingTechnologyLevel.weapons },
                 specialists: { level: game.settings.technology.startingTechnologyLevel.specialists }
             },
-            ledger: [],
+            ledger: {
+                credits: [],
+                creditsSpecialists: [],
+            },
             reputations: [],
             diplomacy: []
         };

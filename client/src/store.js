@@ -383,7 +383,11 @@ export default new Vuex.Store({
       let player = GameHelper.getUserPlayer(state.game)
 
       if (data.creditorPlayerId === player._id) {
-        player.credits += data.amount
+        if (data.ledgerType === 'credits') {
+          player.credits += data.amount
+        } else {
+          player.creditsSpecialists += data.amount
+        }
       }
     },
     starSpecialistHired (state, data) {
