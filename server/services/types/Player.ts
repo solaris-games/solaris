@@ -12,7 +12,13 @@ export interface PlayerColour {
     value: string;
 };
 
+
 export interface PlayerLedger {
+    credits: PlayerLedgerDebt[];
+    creditsSpecialists: PlayerLedgerDebt[];
+}
+
+export interface PlayerLedgerDebt {
     playerId: DBObjectId;
     debt: number;
 };
@@ -87,7 +93,7 @@ export interface Player {
     hasSentTurnReminder: boolean;
     hasFilledAfkSlot: boolean;
     research: PlayerResearch,
-    ledger: PlayerLedger[],
+    ledger: PlayerLedger,
     reputations: PlayerReputation[],
     diplomacy: PlayerDiplomaticState[],
     stats?: PlayerStatistics;

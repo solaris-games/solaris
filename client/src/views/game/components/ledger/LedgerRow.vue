@@ -8,11 +8,11 @@
     <h5 class="alias-title">{{getPlayerAlias(ledger.playerId)}}</h5>
   </td>
   <td class="fit pt-3 pe-4">
-    <h5 :class="{'text-success':ledger.debt>0,'text-danger':ledger.debt<0}">${{ledger.debt}}</h5>
+    <h5 :class="{'text-success':ledger.debt>0,'text-danger':ledger.debt<0}">{{getFormattedDebtValue()}}</h5>
   </td>
   <td class="fit pt-2 pb-2 pe-2">
-    <button class="btn btn-danger" :disabled="ledger.debt >= 0 || ledger.isSettlingDebt || isGameFinished" @click="settleDebt(ledger)" title="Settle your debt to this player"><i class="fas fa-money-check-alt"></i></button>
-    <button class="btn btn-success ms-1" :disabled="ledger.debt <= 0 || ledger.isForgivingDebt || isGameFinished" @click="forgiveDebt(ledger)" title="Forgive this player's debt to you"><i class="fas fa-hands-helping"></i></button>
+    <button class="btn btn-danger" :class="{'btn-outline-danger':!canSettleDebt}" :disabled="!canSettleDebt" @click="settleDebt(ledger)" title="Settle your debt to this player"><i class="fas fa-money-check-alt"></i></button>
+    <button class="btn btn-success ms-1" :class="{'btn-outline-success':!canForgiveDebt}" :disabled="!canForgiveDebt" @click="forgiveDebt(ledger)" title="Forgive this player's debt to you"><i class="fas fa-hands-helping"></i></button>
   </td>
 </tr>
 </template>
@@ -28,7 +28,7 @@ export default {
   },
   props: {
     'ledger': Object,
-    'ledgerType': String // TODO: Implement
+    'ledgerType': String
   },
   methods: {
     getPlayer (playerId) {
@@ -46,12 +46,13 @@ export default {
     async forgiveDebt (ledger) {
       let playerAlias = this.getPlayerAlias(ledger.playerId)
 
-      // TODO: Remove $ if ledgerType is creditsSpecialists
-      if (await this.$confirm('Forgive debt', `Are you sure you want to forgive the debt of $${ledger.debt} that ${playerAlias} owes you?`)) {
+      if (await this.$confirm('Forgive debt', `Are you sure you want to forgive the debt of ${this.getFormattedDebtValue(true)} that ${playerAlias} owes you?`)) {
         try {
           ledger.isForgivingDebt = true
 
-          let response = await LedgerApiService.forgiveDebtCredits(this.$store.state.game._id, ledger.playerId)
+          let response = this.ledgerType === 'credits' ?
+            await LedgerApiService.forgiveDebtCredits(this.$store.state.game._id, ledger.playerId) :
+            await LedgerApiService.forgiveDebtCreditsSpecialists(this.$store.state.game._id, ledger.playerId)
 
           if (response.status === 200) {
             this.$toasted.show(`The debt ${playerAlias} owes you has been forgiven.`, { type: 'success' })
@@ -68,18 +69,25 @@ export default {
     async settleDebt (ledger) {
       let playerAlias = this.getPlayerAlias(ledger.playerId)
 
-      // TODO: Remove $ if ledgerType is creditsSpecialists
-      if (await this.$confirm('Settle debt', `Are you sure you want to settle the debt of $${ledger.debt} that you owe to ${playerAlias}?`)) {
+      if (await this.$confirm('Settle debt', `Are you sure you want to settle the debt of ${this.getFormattedDebtValue(true)} that you owe to ${playerAlias}?`)) {
         try {
           ledger.isSettlingDebt = true
 
-          let response = await LedgerApiService.settleDebtCredits(this.$store.state.game._id, ledger.playerId)
+          const isCredits = this.ledgerType === 'credits'
+
+          let response = isCredits ?
+            await LedgerApiService.settleDebtCredits(this.$store.state.game._id, ledger.playerId) :
+            await LedgerApiService.settleDebtCreditsSpecialists(this.$store.state.game._id, ledger.playerId)
 
           if (response.status === 200) {
             this.$toasted.show(`You have paid off debt that you owe to ${playerAlias}.`, { type: 'success' })
           }
 
-          gameHelper.getUserPlayer(this.$store.state.game).credits -= Math.abs(ledger.debt)
+          if (isCredits) {
+            gameHelper.getUserPlayer(this.$store.state.game).ledger.credits -= Math.abs(ledger.debt)
+          } else {
+            gameHelper.getUserPlayer(this.$store.state.game).ledger.creditsSpecialists -= Math.abs(ledger.debt)
+          }
 
           ledger.debt = response.data.debt
         } catch (err) {
@@ -88,11 +96,24 @@ export default {
 
         ledger.isSettlingDebt = false
       }
+    },
+    getFormattedDebtValue(withText = false) {
+      if (this.ledgerType === 'credits') {
+        return `$${this.ledger.debt}`
+      }
+
+      return `${this.ledger.debt}${withText ? ' specialist token(s)' : ''}`
     }
   },
   computed: {
     isGameFinished: function () {
       return gameHelper.isGameFinished(this.$store.state.game)
+    },
+    canSettleDebt () {
+      return this.ledger.debt < 0 && !this.ledger.isSettlingDebt && !this.isGameFinished
+    },
+    canForgiveDebt () {
+      return this.ledger.debt > 0 && !this.ledger.isForgivingDebt && !this.isGameFinished
     }
   }
 }

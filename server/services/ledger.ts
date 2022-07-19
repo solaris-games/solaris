@@ -1,7 +1,7 @@
 import { DBObjectId } from "./types/DBObjectId";
 import Repository from "./repository";
 import { Game } from "./types/Game";
-import { Player, PlayerLedger } from "./types/Player";
+import { Player, PlayerLedgerDebt } from "./types/Player";
 import PlayerService from "./player";
 import PlayerCreditsService from "./playerCredits";
 import ValidationError from "../errors/validation";
@@ -9,8 +9,8 @@ import ValidationError from "../errors/validation";
 const EventEmitter = require('events');
 
 export enum LedgerType {
-    Credits = 'ledgerCredits',
-    CreditsSpecialists = 'ledgerCreditsSpecialists'
+    Credits = 'credits',
+    CreditsSpecialists = 'creditsSpecialists'
 }
 
 export default class LedgerService extends EventEmitter {
@@ -31,14 +31,14 @@ export default class LedgerService extends EventEmitter {
     }
 
     getLedger(player: Player, type: LedgerType) {
-        return player[type];
+        return player.ledger[type];
     }
 
     getLedgerForPlayer(player: Player, playerId: DBObjectId, type: LedgerType) {
         let fullLedger = this.getLedger(player, type);
 
         // Get the ledger between the two players.
-        let playerLedger: PlayerLedger = fullLedger.find(l => l.playerId.toString() === playerId.toString())!;
+        let playerLedger: PlayerLedgerDebt = fullLedger.find(l => l.playerId.toString() === playerId.toString())!;
         let isNew: boolean = false;
 
         // If no ledger exists, create one.
@@ -48,7 +48,7 @@ export default class LedgerService extends EventEmitter {
                 debt: 0,
             };
 
-            player.ledger.push(playerLedger);
+            player.ledger[type].push(playerLedger);
             isNew = true;
         }
 
@@ -106,8 +106,15 @@ export default class LedgerService extends EventEmitter {
         ledgerDebtor.ledger.debt += debtAmount;
         ledgerCreditor.ledger.debt -= debtAmount;
 
-        await this.playerCreditsService.addCredits(game, debtor, -debtAmount);
-        await this.playerCreditsService.addCredits(game, creditor, debtAmount);
+        if (type === LedgerType.Credits) {
+            await this.playerCreditsService.addCredits(game, debtor, -debtAmount);
+            await this.playerCreditsService.addCredits(game, creditor, debtAmount);
+        } else if (type === LedgerType.CreditsSpecialists) {
+            await this.playerCreditsService.addCreditsSpecialists(game, debtor, -debtAmount);
+            await this.playerCreditsService.addCreditsSpecialists(game, creditor, debtAmount);
+        } else {
+            throw new Error(`Unsupported ledger type: ${type}`);
+        }
 
         await this._updateLedger(game, debtor, ledgerDebtor.ledger, ledgerDebtor.isNew, type);
         await this._updateLedger(game, creditor, ledgerCreditor.ledger, ledgerCreditor.isNew, type);
@@ -155,7 +162,7 @@ export default class LedgerService extends EventEmitter {
         return ledgerCreditor;
     }
 
-    async _updateLedger(game: Game, player: Player, ledger: PlayerLedger, isNew: boolean, type: LedgerType) {
+    async _updateLedger(game: Game, player: Player, ledger: PlayerLedgerDebt, isNew: boolean, type: LedgerType) {
         let dbWrites: any[] = [];
 
         if (isNew) {
@@ -164,7 +171,7 @@ export default class LedgerService extends EventEmitter {
             };
 
             // Funky string manipulation
-            updateObject.$push[`galaxy.players.$[p].${type}.$[l].debt`] = {
+            updateObject.$push[`galaxy.players.$[p].ledger.${type}`] = {
                 playerId: ledger.playerId,
                 debt: ledger.debt
             };
@@ -175,14 +182,17 @@ export default class LedgerService extends EventEmitter {
                         _id: game._id,
                         'galaxy.players._id': player._id
                     },
-                    update: updateObject
+                    update: updateObject,
+                    arrayFilters: [
+                        { 'p._id': player._id }
+                    ]
                 }
             });
         } else {
             const updateObject = {};
 
             // Funky string manipulation
-            updateObject[`galaxy.players.$[p].${type}.$[l].debt`] = ledger.debt;
+            updateObject[`galaxy.players.$[p].ledger.${type}.$[l].debt`] = ledger.debt;
 
             dbWrites.push({
                 updateOne: {

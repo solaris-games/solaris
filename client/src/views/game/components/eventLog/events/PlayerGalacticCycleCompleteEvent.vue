@@ -5,12 +5,12 @@
   </p>
 
   <p v-if="event.data.creditsEconomy || event.data.creditsBanking">
-    You have received <span class="text-success">${{event.data.creditsEconomy}}</span> from your
+    You have received <span class="text-success">${{event.data.creditsEconomy}} credits</span> from your
     economic infrastructure and <span class="text-success">${{event.data.creditsBanking}}</span> from your banking technology.
   </p>
 
   <p v-if="event.data.creditsSpecialists">
-    You have received <strong><span class="text-success">{{event.data.creditsSpecialists}}</span> specialist token(s)</strong> from your
+    You have received <strong><span class="text-success">{{event.data.creditsSpecialists}} specialist token(s)</span></strong> from your
     specialists technology.
   </p>
 

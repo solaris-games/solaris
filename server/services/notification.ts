@@ -257,7 +257,7 @@ export default class NotificationService {
         // Send the credits received notification for Discord subscription to the player.
         await this._trySendNotifications(gameId, [toPlayer._id.toString()], 'discord', 'playerCreditsReceived', 
             async (game: Game, user: User) => {
-                const template = this._generateBaseDiscordMessageTemplate(game, 'Credits Received', `You have received **$${amount}** credit(s) from **${fromPlayer.alias}**.`);
+                const template = this._generateBaseDiscordMessageTemplate(game, 'Credits Received', `You have received **$${amount}** credits from **${fromPlayer.alias}**.`);
 
                 await this.discordService.sendMessageOAuth(user, template);
             });

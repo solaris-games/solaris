@@ -2,8 +2,8 @@ use solaris;
 
 db.games.find({
     'galaxy.players.ledger': { $ne: null },
-    'galaxy.players.ledgerCredits': { $eq: null },
-    'galaxy.players.ledgerCreditsSpecialists': { $eq: null }
+    'galaxy.players.ledger.credits': { $eq: null },
+    'galaxy.players.ledger.creditsSpecialists': { $eq: null }
 }).forEach(game => {
     for (let player of game.galaxy.players) {
         db.games.updateOne({
@@ -11,11 +11,10 @@ db.games.find({
             'galaxy.players._id': player._id
         }, {
             $set: {
-                'galaxy.players.$.ledgerCredits': player.ledger,
-                'galaxy.players.$.ledgerCreditsSpecialists': []
-            },
-            $unset: {
-                'galaxy.players.$.ledger': ''
+                'galaxy.players.$.ledger': {
+                    credits: player.ledger,
+                    creditsSpecialists: []
+                }
             }
         })
     }
@@ -28,6 +27,6 @@ db.gameevents.updateMany({
     'data.ledgerType': { $eq: null }
 }, {
     $set: {
-        'data.ledgerType': 'ledgerCredits'
+        'data.ledgerType': 'credits'
     }
 });

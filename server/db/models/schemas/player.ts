@@ -67,18 +67,20 @@ const schema = new Schema({
             progress: { type: Types.Number, required: true, default: 0  },
         }
     },
-    ledgerCredits: [
-        {
-            playerId: { type: Types.ObjectId, required: true },
-            debt: { type: Types.Number, required: true, default: 0  }
-        }
-    ],
-    ledgerCreditsSpecialists: [
-        {
-            playerId: { type: Types.ObjectId, required: true },
-            debt: { type: Types.Number, required: true, default: 0  }
-        }
-    ],
+    ledger: {
+        credits: [
+            {
+                playerId: { type: Types.ObjectId, required: true },
+                debt: { type: Types.Number, required: true, default: 0  }
+            }
+        ],
+        creditsSpecialists: [
+            {
+                playerId: { type: Types.ObjectId, required: true },
+                debt: { type: Types.Number, required: true, default: 0  }
+            }
+        ],
+    },
     reputations: [
         {
             playerId: { type: Types.ObjectId, required: true },

@@ -1,7 +1,7 @@
 <template>
 <div v-if="player">
   <p>
-      You have sent <span class="text-warning">{{event.data.creditsSpecialists}}</span> specialist token(s) to <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{player.alias}}</a>.
+      You have sent <span class="text-warning">{{event.data.creditsSpecialists}} specialist token(s)</span> to <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{player.alias}}</a>.
   </p>
 </div>
 </template>
