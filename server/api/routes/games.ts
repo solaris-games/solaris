@@ -77,10 +77,6 @@ export default (router: Router, io, container: DependencyContainer) => {
         controller.listSummary,
         mwCore.handleError);
 
-    router.get('/api/game/list/summary/user',
-        controller.listMySummary,
-        mwCore.handleError);
-
     router.get('/api/game/list/official',
         controller.listOfficial,
         mwCore.handleError);

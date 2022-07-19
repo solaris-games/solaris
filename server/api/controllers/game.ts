@@ -79,31 +79,18 @@ export default (container: DependencyContainer, io) => {
         },
         listSummary: async (req, res, next) => {
             try {
-                let official = await container.gameListService.listOfficialGames();
-                let user = await container.gameListService.listCustomGames();
-                let inProgress = await container.gameListService.listInProgressGames();
-                let completed = await container.gameListService.listRecentlyCompletedGames();
-    
+                const games = await Promise.all([
+                    container.gameListService.listOfficialGames(),
+                    container.gameListService.listCustomGames(),
+                    container.gameListService.listInProgressGames(),
+                    container.gameListService.listRecentlyCompletedGames()
+                ])
+                
                 let result = {
-                    official,
-                    user,
-                    inProgress,
-                    completed
-                };
-    
-                return res.status(200).json(result);
-            } catch (err) {
-                return next(err);
-            }
-        },
-        listMySummary: async (req, res, next) => {
-            try {
-                let active = await container.gameListService.listActiveGames(req.session.userId);
-                let completed = await container.gameListService.listUserCompletedGames(req.session.userId);
-    
-                let result = {
-                    active,
-                    completed
+                    official: games[0],
+                    user: games[1],
+                    inProgress: games[2],
+                    completed: games[3]
                 };
     
                 return res.status(200).json(result);
