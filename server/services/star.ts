@@ -170,12 +170,8 @@ export default class StarService extends EventEmitter {
         return star.ownedByPlayerId && star.ownedByPlayerId.toString() === player._id.toString();
     }
 
-    isAlive(star: Star) {
-        return !this.isDeadStar(star) || star.isBlackHole;
-    }
-
     listStarsAliveOwnedByPlayer(stars: Star[], playerId: DBObjectId) {
-        return this.listStarsOwnedByPlayer(stars, playerId).filter(s => this.isAlive(s));
+        return this.listStarsOwnedByPlayer(stars, playerId).filter(s => !this.isDeadStar(s));
     }
 
     listStarIdsWithPlayerCarriersInOrbit(game: Game, playerId: DBObjectId): string[] {
@@ -195,7 +191,7 @@ export default class StarService extends EventEmitter {
 
         return starIds
             .map(id => this.getById(game, id))
-            .filter(s => this.isAlive(s));
+            .filter(s => !this.isDeadStar(s));
     }
 
     listStarsOwnedOrInOrbitByPlayer(game: Game, playerId: DBObjectId): Star[] {
@@ -241,7 +237,7 @@ export default class StarService extends EventEmitter {
         // Stars may have different scanning ranges independently so we need to check
         // each star to check what is within its scanning range.
         let starsOwnedOrInOrbit = this.listStarsOwnedOrInOrbitByPlayer(game, player._id);
-        let starsWithScanning = starsOwnedOrInOrbit.filter(s => this.isAlive(s));
+        let starsWithScanning = starsOwnedOrInOrbit.filter(s => !this.isDeadStar(s));
 
         // Seed the stars that are in range to be the stars owned or are in orbit of.
         let starsInRange: MapObject[] = starsOwnedOrInOrbit.map(s => {

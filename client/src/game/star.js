@@ -648,7 +648,7 @@ class Star extends EventEmitter {
     let player = this._getStarPlayer()
 
     // Dead stars do not have scanning range unless they are black holes
-    if (!player || (this._isDeadStar() && !this.hasBlackHole())) { return }
+    if (!player || this._isDeadStar()) { return }
 
     if (!player.research) { return }
 
