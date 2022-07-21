@@ -129,20 +129,8 @@ export default class GameListService {
                 { 'afkers': { $in: [userId] } }
             ]
         }, {
-            'settings.general.name': 1,
-            'settings.general.type': 1,
-            'settings.general.playerLimit': 1,
-            'settings.gametime.speed': 1,
-            'settings.gametime.gameType': 1,
-            'settings.gameTime': 1,
-            'settings.galaxy.productionTicks': 1,
-            'galaxy.players._id': 1,
-            'galaxy.players.userId': 1,
-            'galaxy.players.ready': 1,
-            'galaxy.players.defeated': 1,
-            'galaxy.players.afk': 1,
-            'galaxy.stars': 1,
-            'galaxy.carriers': 1,
+            'settings': 1,
+            'galaxy': 1,
             'conversations.participants': 1,
             'conversations.messages.readBy': 1,
             state: 1
@@ -182,6 +170,7 @@ export default class GameListService {
 
             totalUnread = (unreadConversations || 0) + (unreadEvents || 0);
 
+            // TODO: Position should be stored against the game state instead of recalculated every time this function is called.
             if (includePosition) {
                 position = this.leaderboardService.getGameLeaderboardPosition(game, player);
             }
