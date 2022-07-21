@@ -86,13 +86,13 @@ export default class NotificationService {
             '_id': 1,
             'settings.general.name': 1,
             'galaxy.players._id': 1,
-            'galaxy.players.userId': 1
+            'galaxy.players.userId': 1,
+            'galaxy.players.defeated': 1
         }))!;
 
         // Filter to get the user ids for the players in this context.
-        const userIds = game?.galaxy.players
-            .filter(p => !playerIds || playerIds.includes(p._id.toString()))
-            .map(p => p.userId);
+        const players = game.galaxy.players.filter(p => !playerIds || playerIds.includes(p._id.toString()))
+        const userIds = players.map(p => p.userId);
 
         // Get the user profiles for the filtered users in the context
         const users = await this.userRepo.find({
@@ -109,6 +109,7 @@ export default class NotificationService {
 
         return {
             game,
+            players,
             users
         };
     }
@@ -119,9 +120,14 @@ export default class NotificationService {
 
         // Try to send a notification to each user in the context
         for (let user of context.users) {
-            if (
-                !user.subscriptions[type] || !user.subscriptions[type]![event]  // User doesn't have subscriptions for the type or no subscriptions for the given event
-            ) {
+            // User doesn't have subscriptions for the type or no subscriptions for the given event
+            if (!user.subscriptions[type] || !user.subscriptions[type]![event]) {
+                continue;
+            }
+
+            // Check for if the user does not want to be notified if they are defeated.
+            if (user.subscriptions.settings.notifyActiveGamesOnly &&
+                context.players.find(p => p.userId!.toString() === user._id.toString())!.defeated) {
                 continue;
             }
 

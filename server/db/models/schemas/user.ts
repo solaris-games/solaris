@@ -174,6 +174,9 @@ const schema = new Schema({
         }
     },
     subscriptions: {
+        settings: {
+            notifyActiveGamesOnly: { type: Types.Boolean, required: false, default: false } // Send notifications only if the user isn't defeated
+        },
         discord: {
             gameStarted: { type: Types.Boolean, required: false, default: true },
             gameEnded: { type: Types.Boolean, required: false, default: true },

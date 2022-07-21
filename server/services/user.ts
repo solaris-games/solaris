@@ -415,7 +415,11 @@ export default class UserService extends EventEmitter {
     }
 
     async saveSubscriptions(userId: DBObjectId, subscriptions: any) {
-        let obj: UserSubscriptions = {};
+        let obj: UserSubscriptions = {
+            settings: {
+                notifyActiveGamesOnly: subscriptions.settings?.notifyActiveGamesOnly || false
+            }
+        };
 
         if (subscriptions.discord) {
             obj.discord = {

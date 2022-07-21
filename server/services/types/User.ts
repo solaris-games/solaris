@@ -32,6 +32,9 @@ export interface UserOAuth {
 };
 
 export interface UserSubscriptions {
+    settings: {
+        notifyActiveGamesOnly: boolean;
+    },
     discord?: {
         gameStarted: boolean;
         gameEnded: boolean;
