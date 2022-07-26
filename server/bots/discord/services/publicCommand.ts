@@ -5,6 +5,8 @@ import GameService from '../../../services/game';
 import LeaderboardService from '../../../services/leaderboard';
 import UserService from '../../../services/user';
 import GameTypeService from '../../../services/gameType';
+import SpecialistBanService from "../../../services/specialistBan";
+import GameFluxService from "../../../services/gameFlux";
 
 export default class PublicCommandService {
     botResponseService: ResponseService;
@@ -14,6 +16,8 @@ export default class PublicCommandService {
     leaderboardService: LeaderboardService;
     userService: UserService;
     gameTypeService: GameTypeService;
+    gameFluxService: GameFluxService;
+    specialistBanService: SpecialistBanService;
 
     constructor(
         botResponseService: ResponseService,
@@ -22,7 +26,9 @@ export default class PublicCommandService {
         gameService: GameService,
         leaderboardService: LeaderboardService,
         userService: UserService,
-        gameTypeService: GameTypeService
+        gameTypeService: GameTypeService,
+        gameFluxService: GameFluxService,
+        specialistBanService: SpecialistBanService
     ) {
         this.botResponseService = botResponseService;
         this.botHelperService = botHelperService;
@@ -31,6 +37,8 @@ export default class PublicCommandService {
         this.leaderboardService = leaderboardService;
         this.userService = userService;
         this.gameTypeService = gameTypeService;
+        this.gameFluxService = gameFluxService;
+        this.specialistBanService = specialistBanService;
     }
 
     async gameinfo(msg, directions: string[]) {
@@ -383,5 +391,20 @@ export default class PublicCommandService {
         // Sending the message, and activating the multiPage function, as the userinfo has 5 looping pages
         msg.channel.send(await responseFunction(responseData))
             .then(async (message) => this.botHelperService.multiPage(message, msg, pageCount, true, responseFunction, responseData, true));
+    }
+
+    async bans(msg, directions: string[]) {
+        //$bans
+        let authorId = msg.author.id;
+
+        const amount = this.gameFluxService.getThisMonthSpecialistBanAmount();
+        const bans = this.specialistBanService.getCurrentMonthBans(amount);
+
+        const starBans = bans.star.map(s => `- ${s.name}\n`);
+        const carrBans = bans.carrier.map(s => `- ${s.name}\n`);
+
+        let response = `Hey <@${authorId}>,\n\nThis month's specialist bans are as follows.\n\nStar specialists:\n${starBans}\n\nCarrier specialists:\n${carrBans}\n\nThe specialist ban list affects official games only and changes on the 1st of every month, for information see the wiki.`;
+
+        return msg.channel.send(response);
     }
 }
