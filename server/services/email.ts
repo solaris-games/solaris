@@ -211,12 +211,12 @@ export default class EmailService {
     }
 
     async sendGameStartedEmail(args: BaseGameEvent) {
-        let game = await this.gameService.getById(args.gameId);
+        let game = (await this.gameService.getById(args.gameId))!;
         let gameUrl = `${this.config.clientUrl}/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
 
-        for (let player of game.galaxy.players) {
-            let user = await this.userService.getEmailById(player.userId);
+        for (let player of game.galaxy.players.filter(p => p.userId)) {
+            let user = await this.userService.getEmailById(player.userId!);
             
             if (user && user.emailEnabled) {
                 try {
@@ -232,12 +232,12 @@ export default class EmailService {
     }
 
     async sendGameFinishedEmail(gameId: DBObjectId) {
-        let game = await this.gameService.getById(gameId);
+        let game = (await this.gameService.getById(gameId))!;
         let gameUrl = `${this.config.clientUrl}/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
 
-        for (let player of game.galaxy.players) {
-            let user = await this.userService.getEmailById(player.userId);
+        for (let player of game.galaxy.players.filter(p => p.userId)) {
+            let user = await this.userService.getEmailById(player.userId!);
             
             if (user && user.emailEnabled) {
                 try {
@@ -253,7 +253,7 @@ export default class EmailService {
     }
 
     async sendGameCycleSummaryEmail(gameId: DBObjectId) {      
-        let game = await this.gameService.getById(gameId);
+        let game = (await this.gameService.getById(gameId))!;
         let leaderboard = this.leaderboardService.getGameLeaderboard(game).leaderboard;
 
         let leaderboardHtml = '';
@@ -276,7 +276,7 @@ export default class EmailService {
         let gameName = game.settings.general.name;
 
         // Send the email only to undefeated players.
-        let undefeatedPlayers = game.galaxy.players.filter((p: Player) => !p.defeated);
+        let undefeatedPlayers = game.galaxy.players.filter((p: Player) => !p.defeated && p.userId);
         let winConditionText = '';
 
         switch (game.settings.general.mode) {
@@ -301,7 +301,7 @@ export default class EmailService {
         }
 
         for (let player of undefeatedPlayers) {
-            let user = await this.userService.getEmailById(player.userId);
+            let user = await this.userService.getEmailById(player.userId!);
             
             if (user && user.emailEnabled) {
                 try {
@@ -319,7 +319,7 @@ export default class EmailService {
     }
 
     async trySendLastPlayerTurnReminder(gameId: DBObjectId) {
-        let game = await this.gameService.getById(gameId);
+        let game = (await this.gameService.getById(gameId))!;
 
         if (!this.gameTypeService.isTurnBasedGame(game)) {
             throw new Error('Cannot send a last turn reminder for non turn based games.');
@@ -329,7 +329,7 @@ export default class EmailService {
             return;
         }
 
-        let undefeatedPlayers = game.galaxy.players.filter((p: Player) => !p.defeated && !p.ready);
+        let undefeatedPlayers = game.galaxy.players.filter((p: Player) => !p.defeated && !p.ready && p.userId);
 
         if (undefeatedPlayers.length === 1) {
             let player = undefeatedPlayers[0];
@@ -346,7 +346,7 @@ export default class EmailService {
             let gameUrl = `${this.config.clientUrl}/#/game?id=${game._id}`;
             let gameName = game.settings.general.name;
 
-            let user = await this.userService.getEmailById(player.userId);
+            let user = await this.userService.getEmailById(player.userId!);
             
             if (user && user.emailEnabled) {
                 try {                    
@@ -362,11 +362,11 @@ export default class EmailService {
     }
 
     async sendGameTimedOutEmail(gameId: DBObjectId) {
-        let game = await this.gameService.getById(gameId);
+        let game = (await this.gameService.getById(gameId))!;
         let gameName = game.settings.general.name;
 
-        for (let player of game.galaxy.players) {
-            let user = await this.userService.getEmailById(player.userId);
+        for (let player of game.galaxy.players.filter(p => p.userId)) {
+            let user = await this.userService.getEmailById(player.userId!);
             
             if (user && user.emailEnabled) {
                 try {
@@ -381,7 +381,13 @@ export default class EmailService {
     }
 
     async sendGamePlayerAfkEmail(args: GamePlayerAFKEvent) {
-        let game = await this.gameService.getById(args.gameId);
+        let game = (await this.gameService.getById(args.gameId))!;
+
+        // Don't bother sending AFK emails for tutorials.
+        if (this.gameTypeService.isTutorialGame(game)) {
+            return;
+        }
+
         let gameUrl = `${this.config.clientUrl}/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
         let player = this.playerService.getById(game, args.playerId!);

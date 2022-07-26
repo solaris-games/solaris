@@ -65,15 +65,15 @@ export default class GameService extends EventEmitter {
         this.playerReadyService = playerReadyService;
     }
 
-    async getByIdAll(id: DBObjectId) {
+    async getByIdAll(id: DBObjectId): Promise<Game | null> {
         return await this.gameRepo.findByIdAsModel(id);
     }
 
-    async getByIdAllLean(id: DBObjectId) {
+    async getByIdAllLean(id: DBObjectId): Promise<Game | null> {
         return await this.gameRepo.findById(id);
     }
 
-    async getById(id: DBObjectId, select?) {
+    async getById(id: DBObjectId, select?: any): Promise<Game | null> {
         return await this.gameRepo.findByIdAsModel(id, select);
     }
 
