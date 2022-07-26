@@ -107,15 +107,6 @@
     <tutorial-game />
 
     <hr/>
-
-    <!-- <div class="row">
-      <div class="col-12 col-lg-6">
-        <recent-donations :maxLength="null" />
-      </div>
-      <div class="d-none d-lg-block col-6">
-        <iframe src="https://discord.com/widget?id=686524791943069734&theme=dark" style="width:100%;height:100%" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
-      </div>
-    </div> -->
   </view-container>
 </template>
 
@@ -127,7 +118,6 @@ import userService from '../services/api/user'
 import ViewContainer from './components/ViewContainer'
 import ViewTitle from './components/ViewTitle'
 import Achievements from './game/components/player/Achievements'
-import RecentDonations from './game/components/donate/RecentDonations.vue'
 import TutorialGame from './game/components/menu/TutorialGame'
 
 export default {
@@ -136,7 +126,6 @@ export default {
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'achievements': Achievements,
-    'recent-donations': RecentDonations,
     'tutorial-game': TutorialGame
   },
   data () {

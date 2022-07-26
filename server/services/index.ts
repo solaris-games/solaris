@@ -57,7 +57,6 @@ import StarMovementService from './starMovement';
 import CacheService from './cache';
 import RecaptchaService from './recaptcha';
 import RatingService from './rating';
-import DonateService from './donate';
 import DiplomacyService from './diplomacy';
 import AvatarService from './avatar';
 import PaypalService from './paypal';
@@ -176,7 +175,6 @@ export default (config, io): DependencyContainer => {
     const gameGalaxyService = new GameGalaxyService(cacheService, broadcastService, gameService, mapService, playerService, starService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, specialistService, technologyService, reputationService, guildUserService, historyService, battleRoyaleService, starMovementService, gameTypeService, gameStateService, diplomacyService, avatarService, playerStatisticsService, gameFluxService);
     const gameTickService = new GameTickService(distanceService, starService, carrierService, researchService, playerService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService, specialistService, starUpgradeService, reputationService, aiService, battleRoyaleService, starMovementService, diplomacyService, gameTypeService, gameStateService, playerCycleRewardsService, diplomacyUpkeepService, carrierMovementService, carrierGiftService, starContestedService, playerReadyService);
     const emailService = new EmailService(config, gameService, userService, leaderboardService, playerService, gameTypeService, gameStateService, gameTickService);
-    const donateService = new DonateService(config, cacheService);
     const eventService = new EventService(EventModel, eventRepository, broadcastService, gameService, gameTickService, researchService, starService, starUpgradeService, tradeService,
         ledgerService, conversationService, combatService, specialistService, badgeService, carrierGiftService, diplomacyService);
 
@@ -240,7 +238,6 @@ export default (config, io): DependencyContainer => {
         cacheService,
         recaptchaService,
         ratingService,
-        donateService,
         diplomacyService,
         avatarService,
         paypalService,

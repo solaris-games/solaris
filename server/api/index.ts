@@ -19,9 +19,6 @@ async function startServer() {
 
   await expressLoader(config, app, io, container);
 
-  // await container.donateService.listRecentDonations();
-  // console.log('Loaded recent donations to cache');
-
   server.listen(config.port, (err) => {
     if (err) {
       console.log(err);

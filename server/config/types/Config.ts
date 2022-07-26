@@ -24,9 +24,6 @@ export interface Config {
         clientId?: string;
         clientSecret?: string;
     },
-    buymeacoffee: {
-        accessToken?: string;
-    },
     discord: {
         serverId?: string;
         clientId?: string;

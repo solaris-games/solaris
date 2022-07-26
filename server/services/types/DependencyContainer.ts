@@ -16,7 +16,6 @@ import ConversationService from "../conversation";
 import DiplomacyService from "../diplomacy";
 import DiplomacyUpkeepService from "../diplomacyUpkeep";
 import DistanceService from "../distance";
-import DonateService from "../donate";
 import EmailService from "../email";
 import EventService from "../event";
 import GameService from "../game";
@@ -117,7 +116,6 @@ export interface DependencyContainer {
     cacheService: CacheService,
     recaptchaService: RecaptchaService,
     ratingService: RatingService,
-    donateService: DonateService,
     diplomacyService: DiplomacyService,
     avatarService: AvatarService,
     paypalService: PaypalService,

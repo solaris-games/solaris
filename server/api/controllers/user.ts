@@ -272,15 +272,6 @@ export default (container: DependencyContainer, io) => {
             } catch (err) {
                 return next(err);
             }
-        },
-        listRecentDonations: async (req, res, next) => {
-            try {
-                let result = await container.donateService.listRecentDonations();
-    
-                return res.status(200).json(result);
-            } catch (err) {
-                return next(err);
-            }
         }
     }
 };

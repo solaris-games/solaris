@@ -108,9 +108,5 @@ export default (router: Router, io, container: DependencyContainer) => {
         controller.delete,
         mwCore.handleError);
 
-    router.get('/api/user/donations/recent',
-        controller.listRecentDonations,
-        mwCore.handleError);
-
     return router;
 }
