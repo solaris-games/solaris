@@ -43,6 +43,13 @@
               {{ opt }}% of <span v-if="settings.conquest.victoryCondition === 'homeStarPercentage'">Capital</span> Stars
             </option>
           </select>
+
+          <label for="conquestCapitalStarElimination" class="col-form-label">Capital Star Elimination <help-tooltip tooltip="Determines whether players become defeated if they lose control of their capital star"/></label>
+          <select class="form-control" id="conquestCapitalStarElimination" v-model="settings.conquest.capitalStarElimination" :disabled="isCreatingGame">
+            <option v-for="opt in options.conquest.capitalStarElimination" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
         </div>
 
         <div class="mb-2" v-if="settings.general.mode === 'kingOfTheHill'">

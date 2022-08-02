@@ -44,7 +44,8 @@
   },
   "conquest": {
     "victoryCondition": "starPercentage",
-    "victoryPercentage": 100
+    "victoryPercentage": 100,
+    "capitalStarElimination": "disabled"
   },
   "orbitalMechanics": {
     "enabled": "disabled"

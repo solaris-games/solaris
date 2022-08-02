@@ -533,7 +533,18 @@ export default class PlayerService extends EventEmitter {
                     this.setPlayerAsDefeated(game, player, false);
                 }
             }
+
+            // For capital star elimination games, if the player doesn't own their original home star then they are defeated.
+            if (this.gameTypeService.isCapitalStarEliminationMode(game) && !this.ownsOriginalHomeStar(game, player)) {
+                this.setPlayerAsDefeated(game, player, false);
+            }
         }
+    }
+
+    ownsOriginalHomeStar(game: Game, player: Player) {
+        const stars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+
+        return stars.find(s => s._id.toString() === player.homeStarId!.toString()) != null;
     }
 
     incrementMissedTurns(game: Game) {

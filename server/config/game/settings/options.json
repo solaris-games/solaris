@@ -322,6 +322,16 @@
           75,
           90,
           100
+       ],
+       "capitalStarElimination": [
+         {
+            "value":"enabled",
+            "text":"Enabled"
+         },
+         {
+            "value":"disabled",
+            "text":"Disabled"
+         }
        ]
     },
     "orbitalMechanics":{

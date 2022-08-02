@@ -27,6 +27,12 @@
             :value="game.settings.conquest.victoryPercentage"
             :compareValue="compareSettings.conquest.victoryPercentage"
             v-if="game.settings.general.mode === 'conquest'"/>
+          <game-setting-value title="Capital Star Elimination"
+            tooltip="Determines whether players become defeated if they lose control of their capital star"
+            :valueText="getFriendlyText(game.settings.conquest.capitalStarElimination)"
+            :value="game.settings.conquest.capitalStarElimination"
+            :compareValue="compareSettings.conquest.capitalStarElimination"
+            v-if="game.settings.general.mode === 'conquest'"/>
           <game-setting-value title="Countdown Cycles"
             tooltip="How long the countdown is to the end of the game in production cycles when the center star is captured"
             :valueText="game.settings.kingOfTheHill.productionCycles"

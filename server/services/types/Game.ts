@@ -117,6 +117,7 @@ export interface GameSettings {
 	conquest: {
 		victoryCondition: GameVictoryCondition;
 		victoryPercentage: GameVictoryPercentage;
+		capitalStarElimination: GameSettingEnabledDisabled;
 	},
 	kingOfTheHill: {
 		productionCycles: number;
