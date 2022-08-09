@@ -33,6 +33,27 @@ export default class GameListService {
         this.leaderboardService = leaderboardService;
     }
 
+    async listJoinableGames() {
+        const games = await this.gameRepo.find({
+            'state.startDate': { $eq: null },
+            'settings.general.type': { $ne: 'tutorial' }
+        }, {
+            'settings.general.type': 1,
+            'settings.general.featured': 1,
+            'settings.general.name': 1,
+            'settings.general.playerLimit': 1,
+            state: 1
+        });
+
+        const official = games.filter(g => g.settings.general.type !== 'custom');
+        const custom = games.filter(g => g.settings.general.type === 'custom');
+
+        return {
+            official,
+            custom
+        };
+    }
+
     async listOfficialGames() {
         return await this.gameRepo.find({
             'settings.general.type': { $nin: ['custom', 'tutorial'] },
@@ -46,19 +67,17 @@ export default class GameListService {
         });
     }
 
-    async listCustomGames(select?) {
-        select = select || {
+    async listCustomGames() {
+        return await this.gameRepo.find({
+            'settings.general.type': { $eq: 'custom' },
+            'state.startDate': { $eq: null }
+        }, {
             'settings.general.type': 1,
             'settings.general.featured': 1,
             'settings.general.name': 1,
             'settings.general.playerLimit': 1,
             state: 1
-        };
-
-        return await this.gameRepo.find({
-            'settings.general.type': { $eq: 'custom' },
-            'state.startDate': { $eq: null }
-        }, select);
+        });
     }
 
     async listActiveGames(userId: DBObjectId) {
@@ -101,20 +120,18 @@ export default class GameListService {
         }));
     }
 
-    async listRecentlyCompletedGames(select: any | null = null, limit: number = 20) {
-        select = select || {
+    async listRecentlyCompletedGames(limit: number = 20) {
+        return await this.gameRepo.find({
+            'state.endDate': { $ne: null }, // Game is finished
+            'settings.general.type': { $ne: 'tutorial'}
+        },
+        {
             'settings.general.type': 1,
             'settings.general.featured': 1,
             'settings.general.name': 1,
             'settings.general.playerLimit': 1,
             state: 1
-        };
-
-        return await this.gameRepo.find({
-            'state.endDate': { $ne: null }, // Game is finished
-            'settings.general.type': { $ne: 'tutorial'}
         },
-        select,
         { 'state.endDate': -1 },
         limit);
     }
