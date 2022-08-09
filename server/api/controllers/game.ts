@@ -80,17 +80,16 @@ export default (container: DependencyContainer, io) => {
         listSummary: async (req, res, next) => {
             try {
                 const games = await Promise.all([
-                    container.gameListService.listOfficialGames(),
-                    container.gameListService.listCustomGames(),
+                    container.gameListService.listJoinableGames(),
                     container.gameListService.listInProgressGames(),
                     container.gameListService.listRecentlyCompletedGames()
                 ])
                 
                 let result = {
-                    official: games[0],
-                    user: games[1],
-                    inProgress: games[2],
-                    completed: games[3]
+                    official: games[0].official,
+                    user: games[0].custom,
+                    inProgress: games[1],
+                    completed: games[2]
                 };
     
                 return res.status(200).json(result);
