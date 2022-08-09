@@ -71,6 +71,7 @@ export default {
       this.$store.commit('clearUsername')
       this.$store.commit('clearRoles')
       this.$store.commit('clearUserCredits')
+      this.$store.commit('clearUserIsEstablishedPlayer')
 
       this.isLoggingOut = false
 

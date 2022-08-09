@@ -110,6 +110,13 @@ export default new Vuex.Store({
       state.userCredits = null
     },
 
+    setUserIsEstablishedPlayer (state, isEstablishedPlayer) {
+      state.userIsEstablishedPlayer = isEstablishedPlayer
+    },
+    clearUserIsEstablishedPlayer (state) {
+      state.userIsEstablishedPlayer = null
+    },
+
     setTick (state, tick) {
       state.tick = tick
     },
