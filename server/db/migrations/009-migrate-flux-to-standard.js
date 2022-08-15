@@ -21,6 +21,7 @@ module.exports = {
                     'special_orbital',
                     'special_battleRoyale',
                     'special_homeStar',
+                    'special_homeStarElimination',
                     'special_anonymous',
                     'special_kingOfTheHill',
                     'special_tinyGalaxy'

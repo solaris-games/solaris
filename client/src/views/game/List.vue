@@ -96,6 +96,7 @@
                       'fa-drumstick-bite': games.special.settings.general.type === 'special_battleRoyale',
                       'fa-satellite': games.special.settings.general.type === 'special_orbital',
                       'fa-home': games.special.settings.general.type === 'special_homeStar',
+                      'fa-gun': games.special.settings.general.type === 'special_homeStarElimination',
                       'fa-user-secret': games.special.settings.general.type === 'special_anonymous',
                       'fa-crown': games.special.settings.general.type === 'special_kingOfTheHill',
                       'fa-search': games.special.settings.general.type === 'special_tinyGalaxy'
@@ -475,6 +476,7 @@ export default {
         'special_orbital',
         'special_battleRoyale',
         'special_homeStar',
+        'special_homeStarElimination',
         'special_anonymous',
         'special_kingOfTheHill',
         'special_tinyGalaxy'

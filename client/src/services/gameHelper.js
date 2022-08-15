@@ -1023,6 +1023,7 @@ class GameHelper {
       'special_orbital': 'Orbital',
       'special_battleRoyale': 'Battle Royale',
       'special_homeStar': 'Capital Stars',
+      'special_homeStarElimination': 'Elimination',
       'special_anonymous': 'Anonymous',
       'special_kingOfTheHill': 'King Of The Hill',
       'special_tinyGalaxy': 'Tiny Galaxy'
