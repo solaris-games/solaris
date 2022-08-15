@@ -4,7 +4,7 @@
             "id": 1,
             "key": "mecha-head",
             "name": "Admiral",
-            "description": "Grants x1.5 Speed, -1 Weapons, -2 Hyperspace Range to the carrier.",
+            "description": "Increases carrier speed by x1.5. Deducts -1 Weapons from your side in combat and -2 Hyperspace Range to the carrier.",
             "active": {
                 "official": true,
                 "custom": true
@@ -24,7 +24,7 @@
             "id": 2,
             "key": "mecha-mask",
             "name": "Lieutenant",
-            "description": "Grants +1 Weapons, -1 Hyperspace Range to the carrier.",
+            "description": "Adds +1 Weapons to your side in combat. Deducts -1 Hyperspace Range from the carrier.",
             "active": {
                 "official": true,
                 "custom": true
@@ -43,7 +43,7 @@
             "id": 3,
             "key": "android-mask",
             "name": "Colonel",
-            "description": "Grants +2 Weapons, -1 Hyperspace Range, x0.75 Speed to the carrier.",
+            "description": "Adds +2 Weapons to your side in combat. Deducts -1 Hyperspace Range from the carrier and decreases carrier speed to x0.75.",
             "active": {
                 "official": true,
                 "custom": true
@@ -63,7 +63,7 @@
             "id": 4,
             "key": "hazmat-suit",
             "name": "General",
-            "description": "Grants +3 Weapons, -1 Hyperspace Range, x0.5 Speed to the carrier.",
+            "description": "Adds +3 Weapons to your side in combat. Deducts -1 Hyperspace Range from the carrier and decreases carrier speed to x0.5.",
             "active": {
                 "official": true,
                 "custom": true
@@ -83,7 +83,7 @@
             "id": 5,
             "key": "cyborg-face",
             "name": "Smuggler",
-            "description": "Grants x2 Speed, -1 Hyperspace Range, -1 Weapons to the carrier.",
+            "description": "Increased carrier speed by x2. Deducts -1 Weapons from your side in combat and -1 Hyperspace Range from the carrier.",
             "active": {
                 "official": true,
                 "custom": true
@@ -103,7 +103,7 @@
             "id": 6,
             "key": "lunar-module",
             "name": "Explorer",
-            "description": "Grants +3 Hyperspace Range, x1.5 Speed, -3 Weapons to the carrier.",
+            "description": "Adds +3 Hyperspace Range and increases carrier speed by x1.5. Deducts -3 Weapons from your side in combat.",
             "active": {
                 "official": true,
                 "custom": true
@@ -123,7 +123,7 @@
             "id": 7,
             "key": "spaceship",
             "name": "Destroyer",
-            "description": "Grants +5 Weapons, -3 Hyperspace Range, x0.5 Speed to the carrier.",
+            "description": "Adds +5 Weapons to your side in combat. Deducts -3 Hyperspace Range from the carrier and decreases carrier speed to x0.5.",
             "active": {
                 "official": true,
                 "custom": true
@@ -161,7 +161,7 @@
             "id": 9,
             "key": "energise",
             "name": "Infiltrator",
-            "description": "When participating in combat, the enemy fights with -1 Weapons.",
+            "description": "When participating in combat, deducts -1 Weapons from the opposing side.",
             "active": {
                 "official": true,
                 "custom": true
@@ -197,7 +197,7 @@
             "id": 11,
             "key": "strafe",
             "name": "Raider",
-            "description": "Carrier travels at x2 Speed, -2 Weapons. The carrier is awarded x2 star capture rewards for destroying infrastructure.",
+            "description": "Increases carrier speed by x2 and grants x2 star capture rewards for destroying infrastructure in combat. Deducts -2 Weapons from your side in combat.",
             "active": {
                 "official": true,
                 "custom": true
@@ -219,7 +219,7 @@
             "id": 12,
             "key": "alien-stare",
             "name": "Coward",
-            "description": "The carrier does not participate in carrier-to-carrier combat. x2 Speed.",
+            "description": "Increases Speed by x2 and the carrier does not participate in carrier-to-carrier combat.",
             "active": {
                 "official": true,
                 "custom": true
@@ -240,7 +240,7 @@
             "id": 13,
             "key": "pirate",
             "name": "Pirate",
-            "description": "Grants +3 Weapons in carrier-to-carrier combat, -2 Weapons in carrier-to-star combat and x1.5 Speed.",
+            "description": "Adds +3 Weapons to your side in carrier-to-carrier combat and increases carrier speed by x1.5. Deducts -2 Weapons from your side in carrier-to-star combat.",
             "active": {
                 "official": true,
                 "custom": true
@@ -264,7 +264,7 @@
             "id": 14,
             "key": "spoutnik",
             "name": "Pathfinder",
-            "description": "Grants +1 Hyperspace Range to the carrier.",
+            "description": "Adds +1 Hyperspace Range to the carrier.",
             "active": {
                 "official": true,
                 "custom": true
@@ -282,7 +282,7 @@
             "id": 15,
             "key": "starfighter",
             "name": "Marauder",
-            "description": "The carrier does not participate in carrier-to-carrier combat. x1.5 Speed, -2 Hyperspace Range, -1 Weapons.",
+            "description": "Increases carrier speed by x1.5 and the carrier does not participate in carrier-to-carrier combat. Deducts -1 Weapons to your side in combat and -2 Hyperspace Range from the carrier.",
             "active": {
                 "official": true,
                 "custom": true
@@ -305,7 +305,7 @@
             "id": 16,
             "key": "rocket",
             "name": "Stellar Bomb",
-            "description": "Reignites a dead star with 25 Natural Resources (x2 for Binary Stars), the Stellar Bomb will be destroyed but the carrier will survive. x0.5 Speed.",
+            "description": "Reignites a dead star with 25 Natural Resources (x2 for Binary Stars), the Stellar Bomb will be destroyed but the carrier will survive. Decreases carrier speed to x0.5.",
             "active": {
                 "official": true,
                 "custom": true
@@ -331,7 +331,7 @@
             "id": 17,
             "key": "ray-gun",
             "name": "Saboteur",
-            "description": "When participating in combat, the enemy fights with -3 Weapons. The Saboteur has -2 Hyperspace Range and x0.75 Speed.",
+            "description": "When participating in combat, deducts -3 Weapons from the opposing side. Deducts -2 Hyperspace Range from the carrier and decreases carrier speed to x0.75.",
             "active": {
                 "official": true,
                 "custom": true
@@ -353,7 +353,7 @@
             "id": 18,
             "key": "vintage-robot",
             "name": "Joker",
-            "description": "When attacking a Star or in Carrier-to-Carrier combat, the calculated weapons technology levels are swapped between the two sides unless both sides have a Joker.",
+            "description": "When attacking a star or in carrier-to-carrier combat, the calculated weapons technology levels are swapped between the two sides unless both sides have a Joker.",
             "active": {
                 "official": false,
                 "custom": false
@@ -373,7 +373,7 @@
             "id": 1,
             "key": "sattelite",
             "name": "Orbital Array",
-            "description": "Grants +1 Scanning Range to the Star.",
+            "description": "Adds +1 Scanning Range to the star.",
             "active": {
                 "official": true,
                 "custom": true
@@ -391,7 +391,7 @@
             "id": 2,
             "key": "airtight-hatch",
             "name": "Space Dock",
-            "description": "Grants +2 Manufacturing, -1 Terraforming to the Star.",
+            "description": "Adds +2 Manufacturing to the star. Deducts -1 Terraforming from the star.",
             "active": {
                 "official": true,
                 "custom": true
@@ -410,7 +410,7 @@
             "id": 3,
             "key": "cannister",
             "name": "Atmosphere Processor",
-            "description": "Grants +3 Terraforming, -1 Scanning to the Star.",
+            "description": "Adds +3 Terraforming to the star. Deducts -1 Scanning from the star.",
             "active": {
                 "official": true,
                 "custom": true
@@ -429,7 +429,7 @@
             "id": 4,
             "key": "defense-satellite",
             "name": "Orbital Cannon",
-            "description": "Grants +1 Defender Bonus to the Star.",
+            "description": "Adds +1 Defender Bonus to the star.",
             "active": {
                 "official": true,
                 "custom": true
@@ -447,7 +447,7 @@
             "id": 5,
             "key": "habitat-dome",
             "name": "Warp Scrambler",
-            "description": "Locks the Warp Gate at the Star to prevent non-allied players from using it. Weapons -1.",
+            "description": "Locks the Warp Gate at the star to prevent non-allied players from using it. Deducts -1 Weapons from your side in combat.",
             "active": {
                 "official": true,
                 "custom": true
@@ -468,7 +468,7 @@
             "id": 6,
             "key": "techno-heart",
             "name": "World Builder",
-            "description": "Adds 1 to the Star's natural resources every tick, -3 Scanning, -5 Weapons.",
+            "description": "Adds +1 to the star's natural resources every tick. Deducts -1 Weapons from your side in combat and -3 Scanning from the star.",
             "active": {
                 "official": true,
                 "custom": true
@@ -490,7 +490,7 @@
             "id": 7,
             "key": "missile-pod",
             "name": "War Machine",
-            "description": "Deducts 1 from the Star's natural resources every tick, +5 Manufacturing, +5 Weapons. When the star reaches 0 natural resources, the star dies and the specialist retires.",
+            "description": "Adds +5 Weapons to your side in combat and +5 Manufacturing to the star. Deducts -1 from the star's natural resources every tick, when the star reaches 0 natural resources, the star dies and the specialist retires.",
             "active": {
                 "official": true,
                 "custom": true
@@ -512,7 +512,7 @@
             "id": 8,
             "key": "power-generator",
             "name": "Scrambler",
-            "description": "Prevents other players from seeing how many ships are garrisoned at the Star.",
+            "description": "Prevents other players from seeing how many ships are garrisoned at the star.",
             "active": {
                 "official": true,
                 "custom": true
@@ -530,7 +530,7 @@
             "id": 9,
             "key": "space-suit",
             "name": "Demolition Controller",
-            "description": "If the Star is captured, all infrastructure is destroyed.",
+            "description": "If the star is captured, all infrastructure is destroyed.",
             "active": {
                 "official": true,
                 "custom": true
@@ -548,7 +548,7 @@
             "id": 10,
             "key": "ringed-planet",
             "name": "Trade Port",
-            "description": "The Star's Economy infrastructure contributes x2 to economy production. -5 Terraforming, -3 Weapons, +1 Scanning.",
+            "description": "The star's economic infrastructure contributes x2 to economy production and adds +1 Scanning to the star. Deducts -3 Weapons from your side in combat and -5 Terraforming from the star.",
             "active": {
                 "official": true,
                 "custom": true
@@ -571,7 +571,7 @@
             "id": 11,
             "key": "observatory",
             "name": "Research Station",
-            "description": "The Star's Science infrastructure contributes x2 to research. -3 Terraforming, -3 Weapons, +1 Scanning.",
+            "description": "The star's scientific infrastructure contributes x2 to research and adds +1 Scanning to the star. Deducts -3 Weapons from your side in combat and -3 Terraforming from the star.",
             "active": {
                 "official": true,
                 "custom": true
@@ -594,7 +594,7 @@
             "id": 12,
             "key": "double-ringed-orb",
             "name": "Financial Analyst",
-            "description": "The star produces 2 credits per tick for each point of science on the star.",
+            "description": "The star produces +2 credits per tick for each point of science on the star.",
             "active": {
                 "official": true,
                 "custom": true
@@ -612,7 +612,7 @@
             "id": 13,
             "key": "radar-dish",
             "name": "Telescope Array",
-            "description": "Grants +3 Scanning Range, -3 Weapons to the Star.",
+            "description": "Adds +3 Scanning Range to the star. Deducts -3 Weapons from your side in combat.",
             "active": {
                 "official": true,
                 "custom": true
@@ -631,7 +631,7 @@
             "id": 14,
             "key": "energy-tank",
             "name": "Mineral Extractor",
-            "description": "Grants +2 Terraforming to the Star.",
+            "description": "Adds +2 Terraforming to the star.",
             "active": {
                 "official": true,
                 "custom": true
@@ -649,7 +649,7 @@
             "id": 15,
             "key": "cryo-chamber",
             "name": "Cryo Chamber",
-            "description": "When a Carrier is built at this Star, a General Carrier Specialist is automatically assigned to the Carrier.",
+            "description": "When a carrier is built at this star, a General carrier specialist is automatically assigned to the carrier.",
             "active": {
                 "official": true,
                 "custom": true
@@ -667,7 +667,7 @@
             "id": 16,
             "key": "rocket-thruster",
             "name": "Stellar Engine",
-            "description": "When the Stellar Engine is activated, the star slowly moves towards the nearest Stellar Beacon at x0.25 speed.",
+            "description": "When the Stellar Engine is activated, the star slowly moves towards the nearest Stellar Beacon at x0.25 carrier speed.",
             "active": {
                 "official": false,
                 "custom": true

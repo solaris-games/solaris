@@ -45,7 +45,7 @@ export default class CarrierMovementService {
         if (carrier.specialistId) {
             let specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
 
-            if (specialist.modifiers.local) {
+            if (specialist && specialist.modifiers.local) {
                 distanceModifier *= (specialist.modifiers.local.speed || 1);
             }
         }
@@ -242,7 +242,7 @@ export default class CarrierMovementService {
             if (carrier.specialistId) {
                 let carrierSpecialist = this.specialistService.getByIdCarrier(carrier.specialistId);
 
-                if (carrierSpecialist.modifiers.special && carrierSpecialist.modifiers.special.unlockWarpGates) {
+                if (carrierSpecialist && carrierSpecialist.modifiers.special && carrierSpecialist.modifiers.special.unlockWarpGates) {
                     return true;
                 }
             }
@@ -252,7 +252,7 @@ export default class CarrierMovementService {
             if (!sourceAllied && sourceStar.specialistId) {
                 let specialist = this.specialistService.getByIdStar(sourceStar.specialistId);
 
-                if (specialist.modifiers.special && specialist.modifiers.special.lockWarpGates) {
+                if (specialist && specialist.modifiers.special && specialist.modifiers.special.lockWarpGates) {
                     return false;
                 }
             }
@@ -260,7 +260,7 @@ export default class CarrierMovementService {
             if (!desinationAllied && destinationStar.specialistId) {
                 let specialist = this.specialistService.getByIdStar(destinationStar.specialistId);
 
-                if (specialist.modifiers.special && specialist.modifiers.special.lockWarpGates) {
+                if (specialist && specialist.modifiers.special && specialist.modifiers.special.lockWarpGates) {
                     return false;
                 }
             }

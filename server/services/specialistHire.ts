@@ -92,7 +92,7 @@ export default class SpecialistHireService {
         if (carrier.specialistId) {
             let carrierSpecialist = this.specialistService.getByIdCarrier(carrier.specialistId);
 
-            if (carrierSpecialist.oneShot) {
+            if (carrierSpecialist && carrierSpecialist.oneShot) {
                 throw new ValidationError(`The current specialist cannot be replaced.`);
             }
         }
@@ -173,7 +173,7 @@ export default class SpecialistHireService {
         if (star.specialistId) {
             let starSpecialist = this.specialistService.getByIdStar(star.specialistId);
 
-            if (starSpecialist.oneShot) {
+            if (starSpecialist && starSpecialist.oneShot) {
                 throw new ValidationError(`The current specialist cannot be replaced.`);
             }
         }

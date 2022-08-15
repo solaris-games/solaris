@@ -100,7 +100,7 @@ export default class TechnologyService {
         if (star.specialistId) {
             let specialist = this.specialistService.getByIdStar(star.specialistId);
 
-            if (specialist.modifiers.local != null) {
+            if (specialist && specialist.modifiers.local != null) {
                 this._applyTechModifiers(techs, specialist.modifiers.local, sanitize);
             }
         }
@@ -120,7 +120,7 @@ export default class TechnologyService {
         if (carrier.specialistId) {
             let specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
 
-            if (specialist.modifiers.local != null) {
+            if (specialist && specialist.modifiers.local != null) {
                 this._applyTechModifiers(techs, specialist.modifiers.local, sanitize);
 
                 if (isCarrierToStarCombat === true && specialist.modifiers.local.carrierToStarCombat != null) {
@@ -140,7 +140,7 @@ export default class TechnologyService {
         if (star.specialistId) {
             let specialist = this.specialistService.getByIdStar(star.specialistId);
 
-            if (specialist.modifiers.local != null) {
+            if (specialist && specialist.modifiers.local != null) {
                 return specialist.modifiers.local.weapons || 0;
             }
         }
@@ -152,7 +152,7 @@ export default class TechnologyService {
         if (carrier.specialistId) {
             let specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
 
-            if (specialist.modifiers.local != null) {
+            if (specialist && specialist.modifiers.local != null) {
                 if (isCarrierToStarCombat && specialist.modifiers.local.carrierToStarCombat != null) {
                     return specialist.modifiers.local.carrierToStarCombat.weapons || 0;
                 } else if (!isCarrierToStarCombat && specialist.modifiers.local.carrierToCarrierCombat != null) {
@@ -237,7 +237,7 @@ export default class TechnologyService {
         if (star.specialistId) {
             let specialist = this.specialistService.getByIdStar(star.specialistId);
 
-            if (specialist.modifiers.special?.defenderBonus) {
+            if (specialist && specialist.modifiers.special?.defenderBonus) {
                 bonus += specialist.modifiers.special.defenderBonus;
             }
         }

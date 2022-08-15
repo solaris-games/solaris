@@ -344,7 +344,7 @@ export default class CarrierService extends EventEmitter {
 
             // If the carrier has a hideShips spec and is not owned by the given player
             // then that player cannot see the carrier's ships.
-            if (specialist.modifiers.special && specialist.modifiers.special.hideShips) {
+            if (specialist && specialist.modifiers.special && specialist.modifiers.special.hideShips) {
                 return false;
             }
         }

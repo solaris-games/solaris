@@ -428,7 +428,7 @@ export default class StarService extends EventEmitter {
 
             // If the star has a hideShips spec and is not owned by the given player
             // then that player cannot see the carrier's ships.
-            if (specialist.modifiers.special && specialist.modifiers.special.hideShips) {
+            if (specialist && specialist.modifiers.special && specialist.modifiers.special.hideShips) {
                 return false;
             }
         }
@@ -472,7 +472,7 @@ export default class StarService extends EventEmitter {
                 if (star.specialistId) {
                     let specialist = this.specialistService.getByIdStar(star.specialistId);
 
-                    if (specialist.modifiers.special) {
+                    if (specialist && specialist.modifiers.special) {
                         if (specialist.modifiers.special.addNaturalResourcesOnTick) {
                             this.addNaturalResources(game, star, specialist.modifiers.special.addNaturalResourcesOnTick);
                         }

@@ -5,7 +5,7 @@ import { Star } from "./types/Star";
 import ValidationError from "../errors/validation";
 import GameTypeService from "./gameType";
 
-const specialists = require('../config/game/specialists.json');
+const specialists = require('../config/game/specialists.json') as Specialist[];
 
 export default class SpecialistService {
 
@@ -15,7 +15,7 @@ export default class SpecialistService {
         this.gameTypeService = gameTypeService;
     }
 
-    getById(id: number, type: SpecialistType) {
+    getById(id: number, type: SpecialistType): Specialist {
         return specialists[type].find((x) => x.id === id);
     }
 
@@ -36,7 +36,7 @@ export default class SpecialistService {
                 key: spec.key,
                 name: spec.name,
                 description: spec.description
-            };
+            } as Specialist;
         }
 
         return spec;
@@ -59,7 +59,7 @@ export default class SpecialistService {
                 key: spec.key,
                 name: spec.name,
                 description: spec.description
-            };
+            } as Specialist;
         }
 
         return spec;
@@ -126,7 +126,7 @@ export default class SpecialistService {
 
         let specialist = this.getByIdCarrier(carrier.specialistId);
 
-        if (!specialist.modifiers.special) {
+        if (specialist == null || !specialist.modifiers.special) {
             return defaultValue;
         }
 
@@ -142,7 +142,7 @@ export default class SpecialistService {
 
         let specialist = this.getByIdStar(star.specialistId);
 
-        if (!specialist.modifiers.special) {
+        if (specialist == null || !specialist.modifiers.special) {
             return defaultValue;
         }
 

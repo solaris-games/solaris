@@ -20,6 +20,12 @@ export interface Specialist {
             scanning?: number;
             manufacturing?: number;
             terraforming?: number;
+            carrierToCarrierCombat?: {
+                weapons: number;
+            },
+            carrierToStarCombat?: {
+                weapons: number;
+            }
         },
         special?: {
             hideShips?: boolean;
@@ -42,12 +48,6 @@ export interface Specialist {
             autoCarrierSpecialistAssign?: number;
             combatSwapWeaponsTechnology?: boolean;
             defenderBonus: number;
-        },
-        carrierToCarrierCombat?: {
-            weapons: number;
-        },
-        carrierToStarCombat?: {
-            weapons: number;
         }
     }
 };

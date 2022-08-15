@@ -46,7 +46,7 @@ export interface Star extends MapObject {
     infrastructure: Infrastructure;
     isKingOfTheHillStar?: boolean;
     locationNext?: Location;
-    specialist?: Specialist;
+    specialist?: Specialist | null;
     targeted?: boolean;
     upgradeCosts?: InfrastructureUpgradeCosts;
     manufacturing?: number;
