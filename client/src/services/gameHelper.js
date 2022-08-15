@@ -1026,7 +1026,8 @@ class GameHelper {
       'special_homeStarElimination': 'Elimination',
       'special_anonymous': 'Anonymous',
       'special_kingOfTheHill': 'King Of The Hill',
-      'special_tinyGalaxy': 'Tiny Galaxy'
+      'special_tinyGalaxy': 'Tiny Galaxy',
+      'special_freeForAll': 'Free For All'
     }[game.settings.general.type]
   }
 

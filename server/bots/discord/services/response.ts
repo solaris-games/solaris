@@ -570,6 +570,7 @@ export default class ReponseService {
         'special_anonymous': 'Anonymous',
         'special_kingOfTheHill': 'King Of The Hill',
         'special_tinyGalaxy': 'Tiny Galaxy',
+        'special_freeForAll': 'Free For All',
         'scanning': 'Scanning',
         'hyperspace': 'Hyperspace Range',
         'terraforming': 'Terraforming',

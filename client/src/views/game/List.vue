@@ -99,7 +99,8 @@
                       'fa-gun': games.special.settings.general.type === 'special_homeStarElimination',
                       'fa-user-secret': games.special.settings.general.type === 'special_anonymous',
                       'fa-crown': games.special.settings.general.type === 'special_kingOfTheHill',
-                      'fa-search': games.special.settings.general.type === 'special_tinyGalaxy'
+                      'fa-search': games.special.settings.general.type === 'special_tinyGalaxy',
+                      'fa-user-secret': games.special.settings.general.type === 'special_freeForAll'
                     }"></i>
                     <span class="ms-2">{{games.special.settings.general.name}}</span>
                   </h5>
@@ -479,7 +480,8 @@ export default {
         'special_homeStarElimination',
         'special_anonymous',
         'special_kingOfTheHill',
-        'special_tinyGalaxy'
+        'special_tinyGalaxy',
+        'special_freeForAll'
       ]
       
       return this.serverGames.find(x => types.includes(x.settings.general.type))

@@ -32,7 +32,8 @@ const schema = new Schema({
 				'special_homeStarElimination',
 				'special_anonymous',
 				'special_kingOfTheHill',
-				'special_tinyGalaxy'
+				'special_tinyGalaxy',
+				'special_freeForAll'
 			], default: 'custom' },
 			mode: { type: Types.String, required: true, enum: [
 				'conquest', 'battleRoyale', 'kingOfTheHill'

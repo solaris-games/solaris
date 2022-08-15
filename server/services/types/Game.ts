@@ -22,7 +22,8 @@ export type GameType = 'tutorial'|
 'special_homeStarElimination' |
 'special_anonymous'|
 'special_kingOfTheHill'|
-'special_tinyGalaxy';
+'special_tinyGalaxy'|
+'special_freeForAll';
 
 export type GameMode = 'conquest'|'battleRoyale'|'kingOfTheHill';
 export type GamePlayerType = 'all'|'establishedPlayers';

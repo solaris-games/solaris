@@ -32,7 +32,8 @@ export default class GameTypeService {
             'special_homeStarElimination',
             'special_anonymous',
             'special_kingOfTheHill',
-            'special_tinyGalaxy'
+            'special_tinyGalaxy',
+            'special_freeForAll'
         ].includes(game.settings.general.type);
     }
 

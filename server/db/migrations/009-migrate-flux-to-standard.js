@@ -24,7 +24,8 @@ module.exports = {
                     'special_homeStarElimination',
                     'special_anonymous',
                     'special_kingOfTheHill',
-                    'special_tinyGalaxy'
+                    'special_tinyGalaxy',
+                    'special_freeForAll'
                 ]
             },
             'state.startDate': { $eq: null },
