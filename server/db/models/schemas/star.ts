@@ -19,6 +19,7 @@ const schema = new Schema({
     isAsteroidField: { type: Types.Boolean, required: true, default: false },
     isBinaryStar: { type: Types.Boolean, required: true, default: false },
     isBlackHole: { type: Types.Boolean, required: true, default: false },
+    isPulsar: { type: Types.Boolean, required: true, default: false },
     wormHoleToStarId: { type: Types.ObjectId, required: false, default: null },
     ignoreBulkUpgrade: {
         economy: { type: Types.Boolean, required: false, default: false },

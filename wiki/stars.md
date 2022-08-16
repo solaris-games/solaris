@@ -45,6 +45,7 @@ Some stars are different and grant special buffs and abilities, the possible sta
 - **Asteroid Fields** - Asteroid Fields have `+1` Defender Bonus in combat.
 - **Binary Stars** - Binary Star systems start with additional natural resources.
 - **Worm Holes** - Stars with Worm Holes come in pairs, travel between connected worm holes takes `1 tick`.
+- **Pulsars** - Pulsars are always visible to all players in the game.
 
 ## Infrastructure
 

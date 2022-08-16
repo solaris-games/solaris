@@ -330,6 +330,16 @@
           <div class="col">
             <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomBlackHoles" v-model="settings.specialGalaxy.randomBlackHoles" :disabled="isCreatingGame">
           </div>
+        </div>
+
+        <div class="mb-2" v-if="settings.galaxy.galaxyType !== 'custom'">
+          <label for="randomPulsars" class="col-form-label">Random Pulsars (<span class="text-warning">{{settings.specialGalaxy.randomPulsars}}%</span>) <help-tooltip tooltip="The percentage of random pulsars are generated in the galaxy - Pulsars are always visible to all players in the game"/></label>
+          <div class="col">
+            <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomPulsars" v-model="settings.specialGalaxy.randomPulsars" :disabled="isCreatingGame">
+          </div>
+        </div>
+
+        <div class="mb-2" v-if="settings.galaxy.galaxyType !== 'custom'">
 
           <div class="mb-2">
             <label for="darkGalaxy" class="col-form-label">Dark Galaxy <help-tooltip tooltip="Dark galaxies hide stars outside of player scanning ranges - Extra dark galaxies hide player statistics so that players only know what other players have based on what they can see in their scanning range"/></label>

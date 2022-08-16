@@ -300,6 +300,7 @@ export default class GameGalaxyService {
                 isAsteroidField: false,
                 isBinaryStar: false,
                 isBlackHole: false,
+                isPulsar: false,
                 wormHoleToStarId: null
             } as Star;
 
@@ -425,6 +426,7 @@ export default class GameGalaxyService {
                         isAsteroidField: false, // Hide asteroid fields outside of scanning range
                         isBinaryStar: false, // Hide outside of scanning range
                         isBlackHole: false, // Hide outside of scanning range
+                        isPulsar: false, // Hide outside of scanning range
                         wormHoleToStarId: s.wormHoleToStarId,
                         isKingOfTheHillStar: s.isKingOfTheHillStar
                     }

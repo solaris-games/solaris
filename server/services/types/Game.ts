@@ -103,6 +103,7 @@ export interface GameSettings {
 		randomAsteroidFields: number;
 		randomBlackHoles: number;
 		randomBinaryStars: number;
+		randomPulsars: number;
 		darkGalaxy: GameDarkGalaxyMode;
 		giftCarriers: GameSettingEnabledDisabled;
 		defenderBonus: GameSettingEnabledDisabled;

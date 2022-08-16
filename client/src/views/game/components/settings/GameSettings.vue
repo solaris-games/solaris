@@ -227,6 +227,12 @@
             :value="game.settings.specialGalaxy.randomBlackHoles"
             :compareValue="compareSettings.specialGalaxy.randomBlackHoles"
             v-if="game.settings.galaxy.galaxyType !== 'custom'"/>
+          <game-setting-value title="Random Pulsars"
+            tooltip="The percentage of random pulsars are generated in the galaxy - Pulsars are always visible to all players in the game"
+            :valueText="getFriendlyText(game.settings.specialGalaxy.randomPulsars)+'%'"
+            :value="game.settings.specialGalaxy.randomPulsars"
+            :compareValue="compareSettings.specialGalaxy.randomPulsars"
+            v-if="game.settings.galaxy.galaxyType !== 'custom'"/>
           <game-setting-value title="Dark Galaxy"
             tooltip="Dark galaxies hide stars outside of player scanning ranges - Extra dark galaxies hide player statistics so that players only know what other players have based on what they can see in their scanning range"
             :valueText="getFriendlyText(game.settings.specialGalaxy.darkGalaxy)"

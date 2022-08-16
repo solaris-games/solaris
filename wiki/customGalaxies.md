@@ -27,6 +27,7 @@ To define the custom map, you will need to set up a **JSON Object** containing t
             "isAsteroidField": boolean | null,
             "isBinaryStar": boolean | null,
             "isBlackHole": boolean | null,
+            "isPulsar": boolean | null,
             "wormHoleToStarId": number | null,
             "specialistId": number | null
         },

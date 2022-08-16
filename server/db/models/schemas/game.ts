@@ -67,6 +67,7 @@ const schema = new Schema({
 			randomAsteroidFields: { type: Types.Number, min: 0, max: 50, default: 0 },
 			randomBinaryStars: { type: Types.Number, min: 0, max: 50, default: 0 },
 			randomBlackHoles: { type: Types.Number, min: 0, max: 50, default: 0 },
+			randomPulsars: { type: Types.Number, min: 0, max: 50, default: 0 },
 			darkGalaxy: { type: Types.String, required: true, enum: ['disabled', 'standard', 'extra', 'start'], default: 'start' },
 			giftCarriers: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },
 			defenderBonus: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },

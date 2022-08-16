@@ -140,6 +140,7 @@ class Star extends EventEmitter {
 
     this.drawKingOfTheHillCircle()
     this.drawWormHole()
+    this.drawPulsar()
     this.drawNebula()
     this.drawAsteroidField()
     this.drawTarget()
@@ -198,6 +199,36 @@ class Star extends EventEmitter {
     this.graphics_star.height = 24.0/2.0
 
     this.container.addChild(this.graphics_star)
+  }
+
+  drawPulsar () {
+    if(!this.isPulsar()) {
+      return
+    }
+
+    if (this.pulsarGraphics) {
+      this.container.removeChild(this.pulsarGraphics)
+      this.pulsarGraphics = null
+    }
+
+    let seed = this.data._id
+    Star.seededRNG.seed(seed)
+
+    let player = this._getStarPlayer()
+    let playerColour = player ? player.colour.value : 0xFFFFFF
+
+    this.pulsarGraphics = new PIXI.Graphics()
+    this.pulsarGraphics.zIndex = -1
+    this.pulsarGraphics.lineStyle(0.5, playerColour, 0.5)
+    this.pulsarGraphics.moveTo(0, -20)
+    this.pulsarGraphics.lineTo(0, 20)
+    this.pulsarGraphics.drawEllipse(-5, 0, 5, 5)
+    this.pulsarGraphics.drawEllipse(5, 0, 5, 5)
+    this.pulsarGraphics.drawEllipse(-8, 0, 8, 8)
+    this.pulsarGraphics.drawEllipse(8, 0, 8, 8)
+    this.pulsarGraphics.rotation = Star.seededRNG.random()*Math.PI*2.0
+
+    this.container.addChild(this.pulsarGraphics)
   }
 
   drawNebula () {
@@ -325,6 +356,10 @@ class Star extends EventEmitter {
 
   isBinaryStar () {
     return this.data.isBinaryStar
+  }
+
+  isPulsar () {
+    return this.data.isPulsar
   }
 
   hasSpecialist () {

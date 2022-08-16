@@ -163,6 +163,7 @@ export default class GameCreateService {
             game.settings.specialGalaxy.randomAsteroidFields = 0;
             game.settings.specialGalaxy.randomBinaryStars = 0;
             game.settings.specialGalaxy.randomBlackHoles = 0;
+            game.settings.specialGalaxy.randomPulsars = 0;
         }
 
         // Clamp max alliances if its invalid (minimum of 1)

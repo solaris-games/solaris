@@ -170,6 +170,11 @@ export default class MapService {
         if (game.settings.specialGalaxy.randomBlackHoles) {
             this.generateBlackHoles(game, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomBlackHoles);
         }
+
+        // If pulsars are enabled, assign random pulsars to start
+        if (game.settings.specialGalaxy.randomPulsars) {
+            this.generatePulsars(game, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomPulsars);
+        }
     }
 
     generateGates(stars: Star[], playerCount: number, percentage: number) {
@@ -302,6 +307,21 @@ export default class MapService {
                 star.naturalResources.economy = Math.ceil(star.naturalResources.economy * 0.2);
                 star.naturalResources.industry = Math.ceil(star.naturalResources.industry * 0.2);
                 star.naturalResources.science = Math.ceil(star.naturalResources.science * 0.2);
+            }
+        } while (count--);
+    }
+
+    generatePulsars(game: Game, stars: Star[], playerCount: number, percentage: number) {
+        let count = Math.floor((stars.length - playerCount) / 100 * percentage);
+
+        // Pick stars at random and set them to be pulsars
+        do {
+            let star = stars[this.randomService.getRandomNumberBetween(0, stars.length - 1)];
+
+            if (star.homeStar || star.isPulsar) {
+                count++; // Increment because the while loop will decrement.
+            } else {
+                star.isPulsar = true;
             }
         } while (count--);
     }

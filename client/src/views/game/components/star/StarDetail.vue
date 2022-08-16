@@ -51,6 +51,11 @@
           <p class="mb-0" v-if="star.isBlackHole">This star is a <span class="text-warning">Black Hole <i class="far fa-circle"></i></span>.</p>
           <p class="mb-2 text-info" v-if="star.isBlackHole"><small><i>Black Holes have +3 Scanning Range but have reduced natural resources.</i></small></p>
         </div>
+        <div v-if="(!isCompactUIStyle || !star.ownedByPlayerId) && star.isPulsar">
+          <hr/>
+          <p class="mb-0" v-if="star.isPulsar">This star is a <span class="text-warning">Pulsar <i class="fas fa-certificate"></i></span>.</p>
+          <p class="mb-2 text-info" v-if="star.isPulsar"><small><i>Pulsars are always visible to all players in the game.</i></small></p>
+        </div>
       </div>
     </div>
     <div v-if="isCompactUIStyle && star.infrastructure">
@@ -73,6 +78,9 @@
           </span>
           <span v-if="star.isBlackHole" title="Black Hole - The star has +3 scanning range but reduced natural resources">
             <i class="far fa-circle ms-1"></i>
+          </span>
+          <span v-if="star.isPulsar" title="Pulsar - The star is always visible to all players in the game">
+            <i class="fas fa-certificate ms-1"></i>
           </span>
           <span :title="star.warpGate ? 'Warp Gate - Carriers travel faster between active warp gates':'No Warp Gate'" :class="{'no-warp-gate':!star.warpGate}">
             <i class="fas fa-dungeon ms-2"></i>
