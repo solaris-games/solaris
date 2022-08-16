@@ -366,6 +366,27 @@
                     "combatSwapWeaponsTechnology": true
                 }
             }
+        },
+        {
+            "id": 19,
+            "key": "megabot",
+            "name": "War Hero",
+            "description": "When attacking a star, adds +2 Weapons for each player on your side in combat. Decreases carrier speed to x0.75.",
+            "active": {
+                "official": true,
+                "custom": true
+            },
+            "baseCostCredits": 400,
+            "baseCostCreditsSpecialists": 4,
+            "oneShot": false,
+            "modifiers": {
+                "local": {
+                    "speed": 0.75,
+                    "carrierToStarCombat": {
+                        "weaponsPerAlly": 2
+                    }
+                }
+            }
         }
     ],
     "star": [
@@ -697,24 +718,6 @@
             "modifiers": {
                 "special": {
                     "attractStar": true
-                }
-            }
-        },
-        {
-            "id": 18,
-            "key": "megabot",
-            "name": "War Hero",
-            "description": "Adds +2 Weapons for each player on your side in combat.",
-            "active": {
-                "official": true,
-                "custom": true
-            },
-            "baseCostCredits": 400,
-            "baseCostCreditsSpecialists": 4,
-            "oneShot": false,
-            "modifiers": {
-                "special": {
-                    "addWeaponsPerPlayer": 2
                 }
             }
         }

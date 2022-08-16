@@ -136,19 +136,11 @@ export default class TechnologyService {
         return techs;
     }
 
-    getStarWeaponsBuff(star: Star, playerCount: number) {
+    getStarWeaponsBuff(star: Star) {
         if (star.specialistId) {
             let specialist = this.specialistService.getByIdStar(star.specialistId);
 
-            if (!specialist) {
-                return 0;
-            }
-
-            if (specialist.modifiers.special && specialist.modifiers.special.addWeaponsPerPlayer) {
-                return specialist.modifiers.special.addWeaponsPerPlayer * playerCount;
-            }
-
-            if (specialist.modifiers.local != null) {
+            if (specialist && specialist.modifiers.local != null) {
                 return specialist.modifiers.local.weapons || 0;
             }
         }
@@ -156,22 +148,38 @@ export default class TechnologyService {
         return 0;
     }
 
-    getCarrierWeaponsBuff(carrier: Carrier, isCarrierToStarCombat: boolean) {
+    getCarrierWeaponsBuff(carrier: Carrier, isCarrierToStarCombat: boolean, allyCount: number) {
+        const buffs = [0];
+
         if (carrier.specialistId) {
             let specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
 
-            if (specialist && specialist.modifiers.local != null) {
-                if (isCarrierToStarCombat && specialist.modifiers.local.carrierToStarCombat != null) {
-                    return specialist.modifiers.local.carrierToStarCombat.weapons || 0;
-                } else if (!isCarrierToStarCombat && specialist.modifiers.local.carrierToCarrierCombat != null) {
-                    return specialist.modifiers.local.carrierToCarrierCombat.weapons || 0;
-                } else {
-                    return specialist.modifiers.local.weapons || 0;
+            if (!specialist) {
+                return 0;
+            }
+            
+            if (specialist.modifiers.local) {
+                if (isCarrierToStarCombat && specialist.modifiers.local.carrierToStarCombat) {
+                    if (specialist.modifiers.local.carrierToStarCombat.weapons) {
+                        buffs.push(specialist.modifiers.local.carrierToStarCombat.weapons);
+                    }
+
+                    if (specialist.modifiers.local.carrierToStarCombat.weaponsPerAlly) {
+                        buffs.push(specialist.modifiers.local.carrierToStarCombat.weaponsPerAlly * allyCount);
+                    }
+                }
+
+                if (!isCarrierToStarCombat && specialist.modifiers.local.carrierToCarrierCombat && specialist.modifiers.local.carrierToCarrierCombat.weapons) {
+                    buffs.push(specialist.modifiers.local.carrierToCarrierCombat.weapons);
+                }
+                
+                if (specialist.modifiers.local.weapons) {
+                    buffs.push(specialist.modifiers.local.weapons);
                 }
             }
         }
 
-        return 0;
+        return buffs.sort((a, b) => b - a)[0];
     }
 
     getCarriersWeaponsDebuff(carriersToCheck: Carrier[]) {
@@ -199,17 +207,17 @@ export default class TechnologyService {
         return deduction || 0;
     }
 
-    getStarEffectiveWeaponsLevel(game: Game, players: Player[], star: Star, carriersInOrbit: Carrier[]) {
-        let weapons = players.sort((a, b) => b.research.weapons.level - a.research.weapons.level)[0].research.weapons.level;
+    getStarEffectiveWeaponsLevel(game: Game, defenders: Player[], star: Star, carriersInOrbit: Carrier[]) {
+        let weapons = defenders.sort((a, b) => b.research.weapons.level - a.research.weapons.level)[0].research.weapons.level;
         let defenderBonus = this.getDefenderBonus(game, star);
 
         let buffs: number[] = [];
 
         if (carriersInOrbit.length) {
-            buffs = carriersInOrbit.map(c => this.getCarrierWeaponsBuff(c, true));
+            buffs = carriersInOrbit.map(c => this.getCarrierWeaponsBuff(c, true, defenders.length));
         }
 
-        buffs.push(this.getStarWeaponsBuff(star, players.length));
+        buffs.push(this.getStarWeaponsBuff(star));
 
         return this._calculateActualWeaponsBuff(weapons, buffs, defenderBonus);
     }
@@ -221,7 +229,7 @@ export default class TechnologyService {
             return weapons;
         }
 
-        let buffs = carriers.map(c => this.getCarrierWeaponsBuff(c, isCarrierToStarCombat));
+        let buffs = carriers.map(c => this.getCarrierWeaponsBuff(c, isCarrierToStarCombat, players.length));
 
         return this._calculateActualWeaponsBuff(weapons, buffs, 0);
     }

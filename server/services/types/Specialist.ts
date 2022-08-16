@@ -21,10 +21,11 @@ export interface Specialist {
             manufacturing?: number;
             terraforming?: number;
             carrierToCarrierCombat?: {
-                weapons: number;
+                weapons?: number;
             },
             carrierToStarCombat?: {
-                weapons: number;
+                weapons?: number;
+                weaponsPerAlly?: number;
             }
         },
         special?: {
@@ -48,7 +49,6 @@ export interface Specialist {
             autoCarrierSpecialistAssign?: number;
             combatSwapWeaponsTechnology?: boolean;
             defenderBonus?: number;
-            addWeaponsPerPlayer?: number;
         }
     }
 };
