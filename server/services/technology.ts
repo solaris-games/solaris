@@ -149,7 +149,7 @@ export default class TechnologyService {
     }
 
     getCarrierWeaponsBuff(carrier: Carrier, isCarrierToStarCombat: boolean, allyCount: number) {
-        const buffs = [0];
+        const buffs: number[] = [];
 
         if (carrier.specialistId) {
             let specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
@@ -177,6 +177,10 @@ export default class TechnologyService {
                     buffs.push(specialist.modifiers.local.weapons);
                 }
             }
+        }
+
+        if (!buffs.length) {
+            return 0;
         }
 
         return buffs.sort((a, b) => b - a)[0];
