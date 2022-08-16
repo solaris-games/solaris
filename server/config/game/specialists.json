@@ -219,7 +219,7 @@
             "id": 12,
             "key": "alien-stare",
             "name": "Coward",
-            "description": "Increases Speed by x2 and the carrier does not participate in carrier-to-carrier combat.",
+            "description": "Increases carrier speed by x2 and the carrier does not participate in carrier-to-carrier combat.",
             "active": {
                 "official": true,
                 "custom": true
