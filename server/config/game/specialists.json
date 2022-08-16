@@ -699,6 +699,24 @@
                     "attractStar": true
                 }
             }
+        },
+        {
+            "id": 18,
+            "key": "megabot",
+            "name": "War Hero",
+            "description": "Adds +2 Weapons for each player on your side in combat.",
+            "active": {
+                "official": true,
+                "custom": true
+            },
+            "baseCostCredits": 400,
+            "baseCostCreditsSpecialists": 4,
+            "oneShot": false,
+            "modifiers": {
+                "special": {
+                    "addWeaponsPerPlayer": 2
+                }
+            }
         }
     ]
 }

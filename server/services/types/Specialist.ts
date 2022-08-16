@@ -47,7 +47,8 @@ export interface Specialist {
             creditsPerTickByScience?: number;
             autoCarrierSpecialistAssign?: number;
             combatSwapWeaponsTechnology?: boolean;
-            defenderBonus: number;
+            defenderBonus?: number;
+            addWeaponsPerPlayer?: number;
         }
     }
 };
