@@ -675,6 +675,51 @@ describe('technology', () => {
         expect(weapons).toBe(2);
     });
 
+    it('should calculate carrier effective weapons level - Multi player - Single carrier - Carrier to star combat - Weapons per player', () => {
+        const game = { };
+
+        const players = [
+            {
+                research: {
+                    weapons: {
+                        level: 1
+                    }
+                }
+            },
+            {
+                research: {
+                    weapons: {
+                        level: 2
+                    }
+                }
+            }
+        ];
+
+        const carriers = [
+            {
+                specialistId: 1
+            }
+        ];
+
+        const isCarrierToStarCombat = true;
+
+        const specialist = {
+            modifiers: {
+                local: {
+                    carrierToStarCombat: {
+                        weaponsPerAlly: 2
+                    }
+                }
+            }
+        };
+
+        setup(null, specialist);
+
+        const weapons = service.getCarriersEffectiveWeaponsLevel(game, players, carriers, isCarrierToStarCombat);
+
+        expect(weapons).toBe(6);
+    });
+
     /* CARRIER DEBUFFS */
 
     it('should calculate carrier debuff - No carriers', () => {
