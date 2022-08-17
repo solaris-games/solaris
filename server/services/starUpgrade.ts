@@ -17,6 +17,10 @@ import TechnologyService from './technology';
 import PlayerCreditsService from './playerCredits';
 const Heap = require('qheap');
 
+export const StarUpgradeServiceEvents = {
+    onPlayerInfrastructureBulkUpgraded: 'onPlayerInfrastructureBulkUpgraded'
+};
+
 export default class StarUpgradeService extends EventEmitter {
     gameRepo: Repository<Game>;
     starService: StarService;
@@ -482,7 +486,7 @@ export default class StarUpgradeService extends EventEmitter {
 
         player.credits -= upgradeSummary.cost;
 
-        this.emit('onPlayerInfrastructureBulkUpgraded', {
+        this.emit(StarUpgradeServiceEvents.onPlayerInfrastructureBulkUpgraded, {
             gameId: game._id,
             gameTick: game.state.tick,
             player,

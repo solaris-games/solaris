@@ -14,6 +14,11 @@ import TechnologyService from "./technology";
 
 const EventEmitter = require('events');
 
+export const CombatServiceEvents = {
+    onPlayerCombatStar: 'onPlayerCombatStar',
+    onPlayerCombatCarrier: 'onPlayerCombatCarrier'
+}
+
 export default class CombatService extends EventEmitter {
     technologyService: TechnologyService;
     specialistService: SpecialistService;
@@ -378,7 +383,7 @@ export default class CombatService extends EventEmitter {
 
         // Log the combat event
         if (star) {
-            this.emit('onPlayerCombatStar', {
+            this.emit(CombatServiceEvents.onPlayerCombatStar, {
                 gameId: game._id,
                 gameTick: game.state.tick,
                 owner: defender,
@@ -389,7 +394,7 @@ export default class CombatService extends EventEmitter {
                 captureResult
             });
         } else {
-            this.emit('onPlayerCombatCarrier', {
+            this.emit(CombatServiceEvents.onPlayerCombatCarrier, {
                 gameId: game._id,
                 gameTick: game.state.tick,
                 defenders,

@@ -18,6 +18,17 @@ import { User } from './types/User';
 import RandomService from './random';
 import PlayerCreditsService from './playerCredits';
 
+export const TradeServiceEvents = {
+    onPlayerCreditsReceived: 'onPlayerCreditsReceived',
+    onPlayerCreditsSent: 'onPlayerCreditsSent',
+    onPlayerCreditsSpecialistsReceived: 'onPlayerCreditsSpecialistsReceived',
+    onPlayerCreditsSpecialistsSent: 'onPlayerCreditsSpecialistsSent',
+    onPlayerRenownReceived: 'onPlayerRenownReceived',
+    onPlayerRenownSent: 'onPlayerRenownSent',
+    onPlayerTechnologyReceived: 'onPlayerTechnologyReceived',
+    onPlayerTechnologySent: 'onPlayerTechnologySent'
+}
+
 export default class TradeService extends EventEmitter {
     gameRepo: Repository<Game>;
     eventRepo: Repository<GameEvent>;
@@ -142,8 +153,8 @@ export default class TradeService extends EventEmitter {
             date: moment().utc()
         };
 
-        this.emit('onPlayerCreditsReceived', eventObject);
-        this.emit('onPlayerCreditsSent', eventObject);
+        this.emit(TradeServiceEvents.onPlayerCreditsReceived, eventObject);
+        this.emit(TradeServiceEvents.onPlayerCreditsSent, eventObject);
 
         return eventObject;
     }
@@ -215,8 +226,8 @@ export default class TradeService extends EventEmitter {
             date: moment().utc()
         };
 
-        this.emit('onPlayerCreditsSpecialistsReceived', eventObject);
-        this.emit('onPlayerCreditsSpecialistsSent', eventObject);
+        this.emit(TradeServiceEvents.onPlayerCreditsSpecialistsReceived, eventObject);
+        this.emit(TradeServiceEvents.onPlayerCreditsSpecialistsSent, eventObject);
 
         return eventObject;
     }
@@ -289,8 +300,8 @@ export default class TradeService extends EventEmitter {
             date: moment().utc()
         };
 
-        this.emit('onPlayerRenownReceived', eventObject);
-        this.emit('onPlayerRenownSent', eventObject);
+        this.emit(TradeServiceEvents.onPlayerRenownReceived, eventObject);
+        this.emit(TradeServiceEvents.onPlayerRenownSent, eventObject);
 
         return eventObject;
     }
@@ -393,8 +404,8 @@ export default class TradeService extends EventEmitter {
             date: moment().utc()
         };
 
-        this.emit('onPlayerTechnologyReceived', eventObject);
-        this.emit('onPlayerTechnologySent', eventObject);
+        this.emit(TradeServiceEvents.onPlayerTechnologyReceived, eventObject);
+        this.emit(TradeServiceEvents.onPlayerTechnologySent, eventObject);
 
         return eventObject;
     }

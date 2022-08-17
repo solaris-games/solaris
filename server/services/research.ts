@@ -11,6 +11,10 @@ import StarService from './star';
 import TechnologyService from './technology';
 import UserService from './user';
 
+export const ResearchServiceEvents = {
+    onPlayerResearchCompleted: 'onPlayerResearchCompleted'
+}
+
 export default class ResearchService extends EventEmitter {
     gameRepo: Repository<Game>;
     technologyService: TechnologyService;
@@ -127,7 +131,7 @@ export default class ResearchService extends EventEmitter {
         if (levelUp) {
             this._setNextResearch(game, player);
 
-            this.emit('onPlayerResearchCompleted', {
+            this.emit(ResearchServiceEvents.onPlayerResearchCompleted, {
                 gameId: game._id,
                 gameTick: game.state.tick,
                 playerId: player._id,

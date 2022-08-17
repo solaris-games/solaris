@@ -66,6 +66,13 @@ function getNewConversation(game: Game, playerId: DBObjectId | null, name: strin
     return newConvo;
 }
 
+export const ConversationServiceEvents = {
+    onConversationCreated: 'onConversationCreated',
+    onConversationInvited: 'onConversationInvited',
+    onConversationMessageSent: 'onConversationMessageSent',
+    onConversationLeft: 'onConversationLeft'
+}
+
 export default class ConversationService extends EventEmitter {
     gameRepo: Repository<Game>;
     tradeService: TradeService;
@@ -95,7 +102,7 @@ export default class ConversationService extends EventEmitter {
             }
         });
 
-        this.emit('onConversationCreated', {
+        this.emit(ConversationServiceEvents.onConversationCreated, {
             gameId: game._id,
             gameTick: game.state.tick,
             convo: newConvo,
@@ -103,7 +110,7 @@ export default class ConversationService extends EventEmitter {
         });
 
         for (let i = 1; i < newConvo.participants.length; i++) {
-            this.emit('onConversationInvited', {
+            this.emit(ConversationServiceEvents.onConversationInvited, {
                 gameId: game._id,
                 gameTick: game.state.tick,
                 convo: newConvo,
@@ -285,7 +292,7 @@ export default class ConversationService extends EventEmitter {
             sentMessageResult
         };
 
-        this.emit('onConversationMessageSent', e);
+        this.emit(ConversationServiceEvents.onConversationMessageSent, e);
 
         return sentMessageResult;
     }
@@ -335,7 +342,7 @@ export default class ConversationService extends EventEmitter {
 
         // TODO: Delete the conversation if no longer any participants?
 
-        this.emit('onConversationLeft', {
+        this.emit(ConversationServiceEvents.onConversationLeft, {
             gameId: game._id,
             gameTick: game.state.tick,
             convo,

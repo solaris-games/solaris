@@ -5,15 +5,16 @@ import { Game } from './types/Game';
 import { Player } from './types/Player';
 import { User } from './types/User';
 import DiscordService from './discord';
-import ConversationService from './conversation';
+import ConversationService, { ConversationServiceEvents } from './conversation';
 import GameService from './game';
-import GameTickService from './gameTick';
-import ResearchService from './research';
-import TradeService from './trade';
+import GameTickService, { GameTickServiceEvents } from './gameTick';
+import ResearchService, { ResearchServiceEvents } from './research';
+import TradeService, { TradeServiceEvents } from './trade';
 import PlayerGalacticCycleCompletedEvent from './types/events/PlayerGalacticCycleComplete';
 import { BaseGameEvent } from './types/events/BaseGameEvent';
 import GameEndedEvent from './types/events/GameEnded';
 import ConversationMessageSentEvent from './types/events/ConversationMessageSent';
+import GameJoinService, { GameJoinServiceEvents } from './gameJoin';
 
 // Note: We only support discord subscriptions at this point, if any new ones are added
 // this class will need to be refactored to use something like the strategy pattern.
@@ -35,6 +36,7 @@ export default class NotificationService {
     discordService: DiscordService;
     conversationService: ConversationService;
     gameService: GameService;
+    gameJoinService: GameJoinService;
     gameTickService: GameTickService;
     researchService: ResearchService;
     tradeService: TradeService;
@@ -46,6 +48,7 @@ export default class NotificationService {
         discordService: DiscordService,
         conversationService: ConversationService,
         gameService: GameService,
+        gameJoinService: GameJoinService,
         gameTickService: GameTickService,
         researchService: ResearchService,
         tradeService: TradeService
@@ -56,6 +59,7 @@ export default class NotificationService {
         this.discordService = discordService;
         this.conversationService = conversationService;
         this.gameService = gameService;
+        this.gameJoinService = gameJoinService;
         this.gameTickService = gameTickService;
         this.researchService = researchService;
         this.tradeService = tradeService;
@@ -63,16 +67,16 @@ export default class NotificationService {
 
     initialize() {
         if (this.discordService.isConnected()) { // Don't initialize the notification service if there's no token configured.
-            this.conversationService.on('onConversationMessageSent', this.onConversationMessageSent.bind(this));
+            this.conversationService.on(ConversationServiceEvents.onConversationMessageSent, (args) => this.onConversationMessageSent(args));
 
-            this.gameService.on('onGameStarted', this.onGameStarted.bind(this));
-            this.gameTickService.on('onGameEnded', this.onGameEnded.bind(this));
-            this.gameTickService.on('onPlayerGalacticCycleCompleted', this.onPlayerGalacticCycleCompleted.bind(this));
-            this.researchService.on('onPlayerResearchCompleted', (args) => this.onPlayerResearchCompleted(args.gameId, args.playerId, args.technologyKey, args.technologyLevel, args.technologyKeyNext, args.technologyLevelNext));
-            this.tradeService.on('onPlayerCreditsReceived', (args) => this.onPlayerCreditsReceived(args.gameId, args.fromPlayer, args.toPlayer, args.amount));
-            this.tradeService.on('onPlayerCreditsSpecialistsReceived', (args) => this.onPlayerCreditsSpecialistsReceived(args.gameId, args.fromPlayer, args.toPlayer, args.amount));
-            this.tradeService.on('onPlayerRenownReceived', (args) => this.onPlayerRenownReceived(args.gameId, args.fromPlayer, args.toPlayer, args.amount));
-            this.tradeService.on('onPlayerTechnologyReceived', (args) => this.onPlayerTechnologyReceived(args.gameId, args.fromPlayer, args.toPlayer, args.technology));
+            this.gameJoinService.on(GameJoinServiceEvents.onGameStarted, (args) => this.onGameStarted(args));
+            this.gameTickService.on(GameTickServiceEvents.onGameEnded, (args) => this.onGameEnded(args));
+            this.gameTickService.on(GameTickServiceEvents.onPlayerGalacticCycleCompleted, (args) => this.onPlayerGalacticCycleCompleted(args));
+            this.researchService.on(ResearchServiceEvents.onPlayerResearchCompleted, (args) => this.onPlayerResearchCompleted(args.gameId, args.playerId, args.technologyKey, args.technologyLevel, args.technologyKeyNext, args.technologyLevelNext));
+            this.tradeService.on(TradeServiceEvents.onPlayerCreditsReceived, (args) => this.onPlayerCreditsReceived(args.gameId, args.fromPlayer, args.toPlayer, args.amount));
+            this.tradeService.on(TradeServiceEvents.onPlayerCreditsSpecialistsReceived, (args) => this.onPlayerCreditsSpecialistsReceived(args.gameId, args.fromPlayer, args.toPlayer, args.amount));
+            this.tradeService.on(TradeServiceEvents.onPlayerRenownReceived, (args) => this.onPlayerRenownReceived(args.gameId, args.fromPlayer, args.toPlayer, args.amount));
+            this.tradeService.on(TradeServiceEvents.onPlayerTechnologyReceived, (args) => this.onPlayerTechnologyReceived(args.gameId, args.fromPlayer, args.toPlayer, args.technology));
 
             console.log('Notifications Initialized')
         }

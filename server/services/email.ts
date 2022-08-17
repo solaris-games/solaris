@@ -4,14 +4,16 @@ import { EmailTemplate } from "./types/Email";
 import { User } from "./types/User";
 import GameService from "./game";
 import GameStateService from "./gameState";
-import GameTickService from "./gameTick";
+import GameTickService, { GameTickServiceEvents } from "./gameTick";
 import GameTypeService from "./gameType";
 import LeaderboardService from "./leaderboard";
 import PlayerService from "./player";
-import UserService from "./user";
+import UserService, { UserServiceEvents } from "./user";
 import { Player } from "./types/Player";
 import GamePlayerAFKEvent from "./types/events/GamePlayerAFK";
 import { BaseGameEvent } from "./types/events/BaseGameEvent";
+import GameJoinService, { GameJoinServiceEvents } from "./gameJoin";
+import PlayerReadyService, { PlayerReadyServiceEvents } from "./playerReady";
 
 const nodemailer = require('nodemailer');
 const fs = require('fs');
@@ -84,9 +86,11 @@ export default class EmailService {
 
     config: Config;
     gameService: GameService;
+    gameJoinService: GameJoinService;
     userService: UserService;
     leaderboardService: LeaderboardService;
     playerService: PlayerService;
+    playerReadyService: PlayerReadyService;
     gameTypeService: GameTypeService;
     gameStateService: GameStateService;
     gameTickService: GameTickService;
@@ -94,29 +98,33 @@ export default class EmailService {
     constructor(
         config: Config,
         gameService: GameService,
+        gameJoinService: GameJoinService,
         userService: UserService,
         leaderboardService: LeaderboardService,
         playerService: PlayerService,
+        playerReadyService: PlayerReadyService,
         gameTypeService: GameTypeService,
         gameStateService: GameStateService,
         gameTickService: GameTickService
     ) {
         this.config = config;
         this.gameService = gameService;
+        this.gameJoinService = gameJoinService;
         this.userService = userService;
         this.leaderboardService = leaderboardService;
         this.playerService = playerService;
+        this.playerReadyService = playerReadyService;
         this.gameTypeService = gameTypeService;
         this.gameStateService = gameStateService;
         this.gameTickService = gameTickService;
 
-        this.gameService.on('onGameStarted', this.sendGameStartedEmail.bind(this));
-        this.userService.on('onUserCreated', (user) => this.sendWelcomeEmail(user));
-        this.playerService.on('onGamePlayerReady', (data) => this.trySendLastPlayerTurnReminder(data.gameId));
+        this.gameJoinService.on(GameJoinServiceEvents.onGameStarted, (args) => this.sendGameStartedEmail(args));
+        this.userService.on(UserServiceEvents.onUserCreated, (user) => this.sendWelcomeEmail(user));
+        this.playerReadyService.on(PlayerReadyServiceEvents.onGamePlayerReady, (data) => this.trySendLastPlayerTurnReminder(data.gameId));
 
-        this.gameTickService.on('onPlayerAfk', this.sendGamePlayerAfkEmail.bind(this));
-        this.gameTickService.on('onGameEnded', (args) => this.sendGameFinishedEmail(args.gameId));
-        this.gameTickService.on('onGameCycleEnded', (args) => this.sendGameCycleSummaryEmail(args.gameId));
+        this.gameTickService.on(GameTickServiceEvents.onPlayerAfk, (args) => this.sendGamePlayerAfkEmail(args));
+        this.gameTickService.on(GameTickServiceEvents.onGameEnded, (args) => this.sendGameFinishedEmail(args.gameId));
+        this.gameTickService.on(GameTickServiceEvents.onGameCycleEnded, (args) => this.sendGameCycleSummaryEmail(args.gameId));
     }
 
     isEnabled() {

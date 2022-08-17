@@ -13,6 +13,12 @@ export enum LedgerType {
     CreditsSpecialists = 'creditsSpecialists'
 }
 
+export const LedgerServiceEvents = {
+    onDebtAdded: 'onDebtAdded',
+    onDebtSettled: 'onDebtSettled',
+    onDebtForgiven: 'onDebtForgiven'
+}
+
 export default class LedgerService extends EventEmitter {
     gameRepo: Repository<Game>;
     playerService: PlayerService;
@@ -71,7 +77,7 @@ export default class LedgerService extends EventEmitter {
         await this._updateLedger(game, creditor, ledgerCreditor.ledger, ledgerCreditor.isNew, type);
         await this._updateLedger(game, debtor, ledgerDebtor.ledger, ledgerDebtor.isNew, type);
         
-        this.emit('onDebtAdded', {
+        this.emit(LedgerServiceEvents.onDebtAdded, {
             gameId: game._id,
             gameTick: game.state.tick,
             debtor: debtor._id,
@@ -119,7 +125,7 @@ export default class LedgerService extends EventEmitter {
         await this._updateLedger(game, debtor, ledgerDebtor.ledger, ledgerDebtor.isNew, type);
         await this._updateLedger(game, creditor, ledgerCreditor.ledger, ledgerCreditor.isNew, type);
 
-        this.emit('onDebtSettled', {
+        this.emit(LedgerServiceEvents.onDebtSettled, {
             gameId: game._id,
             gameTick: game.state.tick,
             debtor: debtor._id,
@@ -150,7 +156,7 @@ export default class LedgerService extends EventEmitter {
         await this._updateLedger(game, creditor, ledgerCreditor.ledger, ledgerCreditor.isNew, type);
         await this._updateLedger(game, debtor, ledgerDebtor.ledger, ledgerDebtor.isNew, type);
 
-        this.emit('onDebtForgiven', {
+        this.emit(LedgerServiceEvents.onDebtForgiven, {
             gameId: game._id,
             gameTick: game.state.tick,
             debtor: debtor._id,

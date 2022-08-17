@@ -17,6 +17,11 @@ import GamePlayerJoinedEvent from './types/events/GamePlayerJoined';
 import { BaseGameEvent } from './types/events/BaseGameEvent';
 import RandomService from './random';
 
+export const GameJoinServiceEvents = {
+    onPlayerJoined: 'onPlayerJoined',
+    onGameStarted: 'onGameStarted'
+}
+
 export default class GameJoinService extends EventEmitter {
     userService: UserService;
     starService: StarService;
@@ -175,7 +180,7 @@ export default class GameJoinService extends EventEmitter {
             playerAlias: player.alias
         };
 
-        this.emit('onPlayerJoined', playerJoinedEvent);
+        this.emit(GameJoinServiceEvents.onPlayerJoined, playerJoinedEvent);
 
         if (gameIsFull) {
             let e: BaseGameEvent = {
@@ -183,7 +188,7 @@ export default class GameJoinService extends EventEmitter {
                 gameTick: game.state.tick
             };
 
-            this.emit('onGameStarted', e);
+            this.emit(GameJoinServiceEvents.onGameStarted, e);
         }
 
         return gameIsFull; // Return whether the game is now full, the calling API endpoint can broadcast it.

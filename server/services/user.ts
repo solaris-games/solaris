@@ -14,7 +14,12 @@ function uuidv4(): string {
     });
 }
 
+export const UserServiceEvents = {
+    onUserCreated: 'onUserCreated'
+}
+
 export default class UserService extends EventEmitter {
+
     userModel;
     userRepo: Repository<User>;
     passwordService: PasswordService;
@@ -219,7 +224,7 @@ export default class UserService extends EventEmitter {
 
         let doc = await newUser.save();
 
-        this.emit('onUserCreated', doc);
+        this.emit(UserServiceEvents.onUserCreated, doc);
 
         return doc._id;
     }

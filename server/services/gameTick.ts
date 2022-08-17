@@ -40,6 +40,14 @@ import GameEndedEvent from "./types/events/GameEnded";
 const EventEmitter = require('events');
 const moment = require('moment');
 
+export const GameTickServiceEvents = {
+    onPlayerGalacticCycleCompleted: 'onPlayerGalacticCycleCompleted',
+    onGameCycleEnded: 'onGameCycleEnded',
+    onPlayerAfk: 'onPlayerAfk',
+    onPlayerDefeated: 'onPlayerDefeated',
+    onGameEnded: 'onGameEnded'
+}
+
 export default class GameTickService extends EventEmitter {
     distanceService: DistanceService;
     starService: StarService;
@@ -652,7 +660,7 @@ export default class GameTickService extends EventEmitter {
                         allianceUpkeep: allianceUpkeepResult
                     };
 
-                    this.emit('onPlayerGalacticCycleCompleted', e);
+                    this.emit(GameTickServiceEvents.onPlayerGalacticCycleCompleted, e);
                 }
             }
 
@@ -661,7 +669,7 @@ export default class GameTickService extends EventEmitter {
                 this.battleRoyaleService.performBattleRoyaleTick(game);
             }
 
-            this.emit('onGameCycleEnded', {
+            this.emit(GameTickServiceEvents.onGameCycleEnded, {
                 gameId: game._id
             });
         }
@@ -707,7 +715,7 @@ export default class GameTickService extends EventEmitter {
                         playerAlias: player.alias
                     };
 
-                    this.emit('onPlayerAfk', e);
+                    this.emit(GameTickServiceEvents.onPlayerAfk, e);
                 }
                 else {
                     if (user && !isTutorialGame) {
@@ -722,7 +730,7 @@ export default class GameTickService extends EventEmitter {
                         openSlot: false
                     };
                     
-                    this.emit('onPlayerDefeated', e);
+                    this.emit(GameTickServiceEvents.onPlayerDefeated, e);
                 }
             }
         }
@@ -761,7 +769,7 @@ export default class GameTickService extends EventEmitter {
                     rankingResult
                 };
 
-                this.emit('onGameEnded', e);
+                this.emit(GameTickServiceEvents.onGameEnded, e);
             }
 
             return true;

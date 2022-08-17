@@ -5,6 +5,10 @@ import { Game } from './types/Game';
 import { Player } from './types/Player';
 import GameTypeService from './gameType';
 
+export const PlayerReadyServiceEvents = {
+    onGamePlayerReady: 'onGamePlayerReady'
+}
+
 export default class PlayerReadyService extends EventEmitter {
     gameRepo: Repository<Game>;
     gameTypeService: GameTypeService;
@@ -31,7 +35,7 @@ export default class PlayerReadyService extends EventEmitter {
             }
         });
 
-        this.emit('onGamePlayerReady', {
+        this.emit(PlayerReadyServiceEvents.onGamePlayerReady, {
             gameId: game._id,
             gameTick: game.state.tick,
         });
@@ -51,7 +55,7 @@ export default class PlayerReadyService extends EventEmitter {
             }
         });
 
-        this.emit('onGamePlayerReady', {
+        this.emit(PlayerReadyServiceEvents.onGamePlayerReady, {
             gameId: game._id,
             gameTick: game.state.tick,
         });

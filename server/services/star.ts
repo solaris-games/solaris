@@ -20,6 +20,12 @@ import StarDistanceService from './starDistance';
 import TechnologyService from './technology';
 import UserService from './user';
 
+export const StarServiceEvents = {
+    onPlayerStarAbandoned: 'onPlayerStarAbandoned',
+    onPlayerStarDied: 'onPlayerStarDied',
+    onPlayerStarReignited: 'onPlayerStarReignited'
+}
+
 export default class StarService extends EventEmitter {
 
     gameRepo: Repository<Game>;
@@ -401,7 +407,7 @@ export default class StarService extends EventEmitter {
 
         await game.save();
 
-        this.emit('onPlayerStarAbandoned', {
+        this.emit(StarServiceEvents.onPlayerStarAbandoned, {
             gameId: game._id,
             gameTick: game.state.tick,
             player,
@@ -530,7 +536,7 @@ export default class StarService extends EventEmitter {
             star.infrastructure.science = 0;
 
             if (star.ownedByPlayerId) {
-                this.emit('onPlayerStarDied', {
+                this.emit(StarServiceEvents.onPlayerStarDied, {
                     gameId: game._id,
                     gameTick: game.state.tick,
                     playerId: star.ownedByPlayerId,
@@ -541,7 +547,7 @@ export default class StarService extends EventEmitter {
         }
         // If it was a dead star but is now not a dead star then it has been reignited.
         else if (wasDeadStar && star.ownedByPlayerId) {
-            this.emit('onPlayerStarReignited', {
+            this.emit(StarServiceEvents.onPlayerStarReignited, {
                 gameId: game._id,
                 gameTick: game.state.tick,
                 playerId: star.ownedByPlayerId,
@@ -559,7 +565,7 @@ export default class StarService extends EventEmitter {
         star.naturalResources = naturalResources;
 
         if (star.ownedByPlayerId) {
-            this.emit('onPlayerStarReignited', {
+            this.emit(StarServiceEvents.onPlayerStarReignited, {
                 gameId: game._id,
                 gameTick: game.state.tick,
                 playerId: star.ownedByPlayerId,

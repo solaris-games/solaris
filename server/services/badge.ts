@@ -9,6 +9,10 @@ import UserService from './user';
 import GamePlayerBadgePurchasedEvent from './types/events/GamePlayerBadgePurchased';
 const EventEmitter = require('events');
 
+export const BadgeServiceEvents = {
+    onGamePlayerBadgePurchased: 'onGamePlayerBadgePurchased'
+}
+
 export default class BadgeService extends EventEmitter {
     userRepo: Repository<User>;
     userService: UserService;
@@ -141,7 +145,7 @@ export default class BadgeService extends EventEmitter {
             badgeName: badge.name
         };
 
-        this.emit('onGamePlayerBadgePurchased', e);
+        this.emit(BadgeServiceEvents.onGamePlayerBadgePurchased, e);
     }
 
     awardBadgeForUser(user: User, badgeKey: string): void {
