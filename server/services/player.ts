@@ -560,6 +560,10 @@ export default class PlayerService extends EventEmitter {
         }
     }
 
+    isAIControlled(player: Player) {
+        return player.defeated || !player.userId; // Note: Null user IDs is considered AI as there is not a user controlling it.
+    }
+
     isAfk(game: Game, player: Player, isTurnBasedGame: boolean) {
         // The player is afk if:
         // 1. They haven't been seen for X days.
@@ -568,6 +572,11 @@ export default class PlayerService extends EventEmitter {
 
         // Note: In tutorial games, only legit players can be considered afk.
         if (this.gameTypeService.isTutorialGame(game) && !player.userId) {
+            return false;
+        }
+
+        // If the player is AI controlled, then they are not AFK.
+        if (this.isAIControlled(player)) {
             return false;
         }
 

@@ -157,12 +157,8 @@ export default class AIService {
         this.playerStatisticsService = playerStatisticsService;
     }
 
-    isAIControlled(player: Player) {
-        return player.defeated || !player.userId; // Note: Null user IDs is considered AI as there is not a user controlling it.
-    }
-
     async play(game: Game, player: Player) {
-        if (!this.isAIControlled(player)) {
+        if (!this.playerService.isAIControlled(player)) {
             throw new Error('The player is not under AI control.');
         }
 
