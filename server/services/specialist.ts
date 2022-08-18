@@ -66,15 +66,16 @@ export default class SpecialistService {
     }
 
     list(game: Game | null, type: SpecialistType) {
-        // Clone the existing list otherwise could run into issues with multiple requests
-        // as the specs are being loaded from a file.
-        let specialistsList = JSON.parse(JSON.stringify(specialists));
-
         if (game && game.settings.specialGalaxy.specialistCost === 'none') {
             throw new ValidationError('The game settings has disabled the hiring of specialists.');
         }
-        
-        let specs = specialistsList[type];
+
+        // Clone the existing list otherwise could run into issues with multiple requests
+        // as the specs are being loaded from a file.
+        let specialistsList = JSON.parse(JSON.stringify(specialists)) as Specialist[];
+
+        let specs = specialistsList[type]
+            .filter(s => s.active.official || s.active.custom);
 
         // If in the context of a game, filter out specialists that aren't active.
         if (game) {
