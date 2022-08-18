@@ -13,6 +13,7 @@ import TradeService, { TradeServiceEvents } from './trade';
 import PlayerGalacticCycleCompletedEvent from './types/events/PlayerGalacticCycleComplete';
 import { BaseGameEvent } from './types/events/BaseGameEvent';
 import GameEndedEvent from './types/events/GameEnded';
+import GameTurnEndedEvent from './types/events/GameTurnEnded';
 import ConversationMessageSentEvent from './types/events/ConversationMessageSent';
 import GameJoinService, { GameJoinServiceEvents } from './gameJoin';
 
@@ -21,6 +22,7 @@ import GameJoinService, { GameJoinServiceEvents } from './gameJoin';
 type SubscriptionType = 'discord';
 type SubscriptionEvent = 'gameStarted'|
     'gameEnded'|
+    'gameTurnEnded'|
     'playerGalacticCycleComplete'|
     'playerResearchComplete'|
     'playerTechnologyReceived'|
@@ -71,6 +73,7 @@ export default class NotificationService {
 
             this.gameJoinService.on(GameJoinServiceEvents.onGameStarted, (args) => this.onGameStarted(args));
             this.gameTickService.on(GameTickServiceEvents.onGameEnded, (args) => this.onGameEnded(args));
+            this.gameTickService.on(GameTickServiceEvents.onGameTurnEnded, (args) => this.onGameTurnEnded(args));
             this.gameTickService.on(GameTickServiceEvents.onPlayerGalacticCycleCompleted, (args) => this.onPlayerGalacticCycleCompleted(args));
             this.researchService.on(ResearchServiceEvents.onPlayerResearchCompleted, (args) => this.onPlayerResearchCompleted(args.gameId, args.playerId, args.technologyKey, args.technologyLevel, args.technologyKeyNext, args.technologyLevelNext));
             this.tradeService.on(TradeServiceEvents.onPlayerCreditsReceived, (args) => this.onPlayerCreditsReceived(args.gameId, args.fromPlayer, args.toPlayer, args.amount));
@@ -170,6 +173,16 @@ export default class NotificationService {
         await this._trySendNotifications(args.gameId, null, 'discord', 'gameEnded', 
             async (game: Game, user: User) => {
                 const template = this._generateBaseDiscordMessageTemplate(game, 'Game Ended', 'The game has ended.');
+
+                await this.discordService.sendMessageOAuth(user, template);
+            });
+    }
+
+    async onGameTurnEnded(args: GameTurnEndedEvent) {
+        // Send the game turn ended notification for Discord subscription to all players.
+        await this._trySendNotifications(args.gameId, null, 'discord', 'gameTurnEnded', 
+            async (game: Game, user: User) => {
+                const template = this._generateBaseDiscordMessageTemplate(game, 'Game Turn Ended', 'A turn has finished, it\'s your turn to play!');
 
                 await this.discordService.sendMessageOAuth(user, template);
             });

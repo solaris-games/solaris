@@ -430,6 +430,7 @@ export default class UserService extends EventEmitter {
             obj.discord = {
                 gameEnded: subscriptions.discord.gameEnded || false,
                 gameStarted: subscriptions.discord.gameStarted || false,
+                gameTurnEnded: subscriptions.discord.gameTurnEnded || false,
                 playerCreditsReceived: subscriptions.discord.playerCreditsReceived || false,
                 playerCreditsSpecialistsReceived: subscriptions.discord.playerCreditsSpecialistsReceived || false,
                 playerGalacticCycleComplete: subscriptions.discord.playerGalacticCycleComplete || false,

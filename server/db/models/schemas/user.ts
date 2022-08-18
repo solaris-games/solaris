@@ -180,6 +180,7 @@ const schema = new Schema({
         discord: {
             gameStarted: { type: Types.Boolean, required: false, default: true },
             gameEnded: { type: Types.Boolean, required: false, default: true },
+            gameTurnEnded: { type: Types.Boolean, required: false, default: true },
             playerGalacticCycleComplete: { type: Types.Boolean, required: false, default: true },
             playerResearchComplete: { type: Types.Boolean, required: false, default: true },
             playerTechnologyReceived: { type: Types.Boolean, required: false, default: true },

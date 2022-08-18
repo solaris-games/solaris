@@ -45,7 +45,8 @@ export const GameTickServiceEvents = {
     onGameCycleEnded: 'onGameCycleEnded',
     onPlayerAfk: 'onPlayerAfk',
     onPlayerDefeated: 'onPlayerDefeated',
-    onGameEnded: 'onGameEnded'
+    onGameEnded: 'onGameEnded',
+    onGameTurnEnded: 'onGameTurnEnded'
 }
 
 export default class GameTickService extends EventEmitter {
@@ -250,6 +251,8 @@ export default class GameTickService extends EventEmitter {
         }
 
         logTime('Save users');
+
+        this._emitEvents(game);
 
         let endTime = process.hrtime(startTime);
 
@@ -836,6 +839,14 @@ export default class GameTickService extends EventEmitter {
             const star = this.starService.getById(game, carrier.orbiting!);
 
             this.carrierGiftService.transferGift(game, gameUsers, star, carrier);
+        }
+    }
+
+    _emitEvents(game: Game) {
+        if (this.gameTypeService.isTurnBasedGame(game)) {
+            this.emit(GameTickServiceEvents.onGameTurnEnded, {
+                gameId: game._id
+            });
         }
     }
 }

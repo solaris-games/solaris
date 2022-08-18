@@ -70,6 +70,10 @@ export default class EmailService {
             fileName: 'yourTurnReminder.html',
             subject: 'Solaris - It\'s your turn to play!'
         },
+        NEXT_TURN_REMINDER: {
+            fileName: 'nextTurnReminder.html',
+            subject: 'Solaris - Turn finished, it\'s your turn to play!'
+        },
         GAME_TIMED_OUT: {
             fileName: 'gameTimedOut.html',
             subject: 'Solaris - Your game did not start'
@@ -122,6 +126,7 @@ export default class EmailService {
         this.userService.on(UserServiceEvents.onUserCreated, (user) => this.sendWelcomeEmail(user));
         this.playerReadyService.on(PlayerReadyServiceEvents.onGamePlayerReady, (data) => this.trySendLastPlayerTurnReminder(data.gameId));
 
+        this.gameTickService.on(GameTickServiceEvents.onGameTurnEnded, (args) => this.trySendNextTurnReminder(args.gameId));
         this.gameTickService.on(GameTickServiceEvents.onPlayerAfk, (args) => this.sendGamePlayerAfkEmail(args));
         this.gameTickService.on(GameTickServiceEvents.onGameEnded, (args) => this.sendGameFinishedEmail(args.gameId));
         this.gameTickService.on(GameTickServiceEvents.onGameCycleEnded, (args) => this.sendGameCycleSummaryEmail(args.gameId));
@@ -181,6 +186,11 @@ export default class EmailService {
         parameters = parameters || [];
 
         const filePath = path.join(__dirname, './emailTemplates/', template.fileName);
+
+        if (!fs.existsSync(filePath)) {
+            throw new Error(`Could not find email template with path: ${filePath}`);
+        }
+
         let html = fs.readFileSync(filePath, { encoding: 'UTF8' });
 
         // Replace the default parameters in the file
@@ -224,18 +234,10 @@ export default class EmailService {
         let gameName = game.settings.general.name;
 
         for (let player of game.galaxy.players.filter(p => p.userId)) {
-            let user = await this.userService.getEmailById(player.userId!);
-            
-            if (user && user.emailEnabled) {
-                try {
-                    await this.sendTemplate(user.email, this.TEMPLATES.GAME_WELCOME, [
-                        gameName,
-                        gameUrl
-                    ]);
-                } catch (err) {
-                    console.error(err);
-                }
-            }
+            await this._trySendEmailToPlayer(player, this.TEMPLATES.GAME_WELCOME, [
+                gameName,
+                gameUrl
+            ]);
         }
     }
 
@@ -245,18 +247,10 @@ export default class EmailService {
         let gameName = game.settings.general.name;
 
         for (let player of game.galaxy.players.filter(p => p.userId)) {
-            let user = await this.userService.getEmailById(player.userId!);
-            
-            if (user && user.emailEnabled) {
-                try {
-                    await this.sendTemplate(user.email, this.TEMPLATES.GAME_FINISHED, [
-                        gameName,
-                        gameUrl
-                    ]);
-                } catch (err) {
-                    console.error(err);
-                }
-            }
+            await this._trySendEmailToPlayer(player, this.TEMPLATES.GAME_FINISHED, [
+                gameName,
+                gameUrl
+            ]);
         }
     }
 
@@ -309,20 +303,12 @@ export default class EmailService {
         }
 
         for (let player of undefeatedPlayers) {
-            let user = await this.userService.getEmailById(player.userId!);
-            
-            if (user && user.emailEnabled) {
-                try {
-                    await this.sendTemplate(user.email, this.TEMPLATES.GAME_CYCLE_SUMMARY, [
-                        gameName,
-                        gameUrl,
-                        winConditionText,
-                        leaderboardHtml
-                    ]);
-                } catch (err) {
-                    console.error(err);
-                }
-            }
+            await this._trySendEmailToPlayer(player, this.TEMPLATES.GAME_CYCLE_SUMMARY, [
+                gameName,
+                gameUrl,
+                winConditionText,
+                leaderboardHtml
+            ]);
         }
     }
 
@@ -354,18 +340,35 @@ export default class EmailService {
             let gameUrl = `${this.config.clientUrl}/#/game?id=${game._id}`;
             let gameName = game.settings.general.name;
 
-            let user = await this.userService.getEmailById(player.userId!);
-            
-            if (user && user.emailEnabled) {
-                try {                    
-                    await this.sendTemplate(user.email, this.TEMPLATES.YOUR_TURN_REMINDER, [
-                        gameName,
-                        gameUrl
-                    ]);
-                } catch (err) {
-                    console.error(err);
-                }
-            }
+            await this._trySendEmailToPlayer(player, this.TEMPLATES.YOUR_TURN_REMINDER, [
+                gameName,
+                gameUrl
+            ]);
+        }
+    }
+
+    async trySendNextTurnReminder(gameId: DBObjectId) {
+        let game = (await this.gameService.getById(gameId))!;
+
+        // Only send the next turn reminder in TB games and if the game is in progress.
+        if (!this.gameTypeService.isTurnBasedGame(game)) {
+            return;
+        }
+
+        if (!this.gameStateService.isInProgress(game)) {
+            return;
+        }
+        
+        let undefeatedPlayers = game.galaxy.players.filter((p: Player) => !p.defeated && !p.ready && p.userId);
+
+        let gameUrl = `${this.config.clientUrl}/#/game?id=${game._id}`;
+        let gameName = game.settings.general.name;
+
+        for (let player of undefeatedPlayers) {
+            await this._trySendEmailToPlayer(player, this.TEMPLATES.NEXT_TURN_REMINDER, [
+                gameName,
+                gameUrl
+            ]);
         }
     }
 
@@ -374,17 +377,9 @@ export default class EmailService {
         let gameName = game.settings.general.name;
 
         for (let player of game.galaxy.players.filter(p => p.userId)) {
-            let user = await this.userService.getEmailById(player.userId!);
-            
-            if (user && user.emailEnabled) {
-                try {
-                    await this.sendTemplate(user.email, this.TEMPLATES.GAME_TIMED_OUT, [
-                        gameName
-                    ]);
-                } catch (err) {
-                    console.error(err);
-                }
-            }
+            await this._trySendEmailToPlayer(player, this.TEMPLATES.GAME_TIMED_OUT, [
+                gameName
+            ]);
         }
     }
 
@@ -396,22 +391,31 @@ export default class EmailService {
             return;
         }
 
-        let gameUrl = `${this.config.clientUrl}/#/game?id=${game._id}`;
-        let gameName = game.settings.general.name;
         let player = this.playerService.getById(game, args.playerId!);
         
         if (player && player.userId) {
-            let user = await this.userService.getEmailById(player.userId);
+            let gameUrl = `${this.config.clientUrl}/#/game?id=${game._id}`;
+            let gameName = game.settings.general.name;
+
+            await this._trySendEmailToPlayer(player, this.TEMPLATES.GAME_PLAYER_AFK, [
+                gameName,
+                gameUrl
+            ]);
+        }
+    }
+
+    async _trySendEmailToPlayer(player: Player, template: EmailTemplate, args: string[]) {
+        if (!player.userId) {
+            throw new Error(`Cannot send an email to an unknown player.`)
+        }
+
+        let user = await this.userService.getEmailById(player.userId!);
             
-            if (user && user.emailEnabled) {
-                try {
-                    await this.sendTemplate(user.email, this.TEMPLATES.GAME_PLAYER_AFK, [
-                        gameName,
-                        gameUrl
-                    ]);
-                } catch (err) {
-                    console.error(err);
-                }
+        if (user && user.emailEnabled) {
+            try {
+                await this.sendTemplate(user.email, template, args);
+            } catch (err) {
+                console.error(err);
             }
         }
     }

@@ -47,6 +47,16 @@
                 </div>
                 
                 <div class="row pt-1 pb-1">
+                    <label for="gameTurnEnded" class="col-12 col-sm-6 col-form-label">Game - Turn Ended</label>
+                    <div class="col-12 col-sm-6">
+                        <select class="form-control" id="gameTurnEnded" v-model="subscriptions.discord.gameTurnEnded" :disabled="isSaving">
+                            <option :value="true">Enabled</option>
+                            <option :value="false">Disabled</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="row pt-1 pb-1">
                     <label for="playerGalacticCycleComplete" class="col-12 col-sm-6 col-form-label">Game - Galactic Cycle Completed</label>
                     <div class="col-12 col-sm-6">
                         <select class="form-control" id="playerGalacticCycleComplete" v-model="subscriptions.discord.playerGalacticCycleComplete" :disabled="isSaving">

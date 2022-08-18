@@ -38,6 +38,7 @@ export interface UserSubscriptions {
     discord?: {
         gameStarted: boolean;
         gameEnded: boolean;
+        gameTurnEnded: boolean;
         playerGalacticCycleComplete: boolean;
         playerResearchComplete: boolean;
         playerTechnologyReceived: boolean;
