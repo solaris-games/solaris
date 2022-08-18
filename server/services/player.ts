@@ -514,11 +514,17 @@ export default class PlayerService extends EventEmitter {
     }
 
     performDefeatedOrAfkCheck(game: Game, player: Player, isTurnBasedGame: boolean) {
-        // Check if the player has been AFK.
-        let isAfk = this.isAfk(game, player, isTurnBasedGame);
+        if (player.defeated) {
+            throw new Error(`Cannot perform a defeated check on an already defeated player.`);
+        }
 
-        if (isAfk) {
-            this.setPlayerAsAfk(game, player);
+        if (!player.afk) {
+            // Check if the player has been AFK.
+            let isAfk = this.isAfkCheck(game, player, isTurnBasedGame);
+    
+            if (isAfk) {
+                this.setPlayerAsAfk(game, player);
+            }
         }
 
         // Check if the player has been defeated by conquest.
@@ -564,16 +570,15 @@ export default class PlayerService extends EventEmitter {
         return player.defeated || !player.userId; // Note: Null user IDs is considered AI as there is not a user controlling it.
     }
 
-    isAfk(game: Game, player: Player, isTurnBasedGame: boolean) {
+    isAfkCheck(game: Game, player: Player, isTurnBasedGame: boolean) {
+        if (player.afk) {
+            throw new Error(`Cannot perform an AFK check on an already AFK player.`);
+        }
+
         // The player is afk if:
         // 1. They haven't been seen for X days.
         // 2. They missed the turn limit in a turn based game.
         // 3. They missed X cycles in a real time game (minimum of 12 hours)
-
-        // Note: In tutorial games, only legit players can be considered afk.
-        if (this.gameTypeService.isTutorialGame(game) && !player.userId) {
-            return false;
-        }
 
         // If the player is AI controlled, then they are not AFK.
         if (this.isAIControlled(player)) {
