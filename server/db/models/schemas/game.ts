@@ -180,6 +180,7 @@ const schema = new Schema({
 		players: { type: Types.Number, required: true, default: 0 },
 		winner: { type: Types.ObjectId, required: false, default: null },
 		cleaned: { type: Types.Boolean, required: false, default: false }, // Represents if the events and history have been deleted.
+		leaderboard: [{ type: Types.ObjectId, required: false }]
 	},
 	constants: {
 		distances: {

@@ -158,7 +158,11 @@ export default class BadgeService extends EventEmitter {
         user.achievements.badges[badgeKey]++;
     }
 
-    awardBadgeForUserVictor32(user: User): void {
+    awardBadgeForUserVictor32PlayerGame(user: User): void {
         this.awardBadgeForUser(user, 'victor32');
+    }
+
+    awardBadgeForUserVictorySpecialGame(user: User, game: Game): void {
+        this.awardBadgeForUser(user, game.settings.general.type);
     }
 };
