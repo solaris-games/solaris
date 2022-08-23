@@ -489,7 +489,7 @@
             "id": 6,
             "key": "techno-heart",
             "name": "World Builder",
-            "description": "Adds +1 to the star's natural resources every tick. Deducts -1 Weapons from your side in combat and -3 Scanning from the star.",
+            "description": "Adds +1 to the star's natural resources every tick. Deducts -5 Weapons from your side in combat and -3 Scanning from the star.",
             "active": {
                 "official": true,
                 "custom": true
