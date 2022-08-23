@@ -6,6 +6,7 @@ import CarrierService from './carrier';
 import SpecialistService from './specialist';
 import StarService from './star';
 import TechnologyService from './technology';
+import { PlayerStatistics } from './types/Leaderboard';
 
 export default class PlayerStatisticsService {
     starService: StarService;
@@ -25,7 +26,7 @@ export default class PlayerStatisticsService {
         this.specialistService = specialistService;
     }
 
-    getStats(game: Game, player: Player) {
+    getStats(game: Game, player: Player): PlayerStatistics {
         let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
         let playerCarriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id);
 

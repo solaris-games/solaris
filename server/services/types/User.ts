@@ -134,6 +134,17 @@ export interface User {
             roleplay: number;
             dauntless: number;
             sleepless: number;
+            victor32: number;
+            special_dark: number;
+            special_ultraDark: number;
+            special_orbital: number;
+            special_battleRoyale: number;
+            special_homeStar: number;
+            special_homeStarElimination: number;
+            special_anonymous: number;
+            special_kingOfTheHill: number;
+            special_tinyGalaxy: number;
+            special_freeForAll: number;
         }
     },
     gameSettings: {

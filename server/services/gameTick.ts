@@ -744,7 +744,13 @@ export default class GameTickService extends EventEmitter {
     async _gameWinCheck(game: Game, gameUsers: User[]) {
         const isTutorialGame = this.gameTypeService.isTutorialGame(game);
 
-        let winner = this.leaderboardService.getGameWinner(game);
+        // Update the leaderboard state here so we can keep track of positions
+        // without having to actually calculate it.
+        let leaderboard = this.leaderboardService.getGameLeaderboard(game).leaderboard;
+
+        game.state.leaderboard = leaderboard.map(l => l.player._id);
+
+        let winner = this.leaderboardService.getGameWinner(game, leaderboard);
 
         if (winner) {
             this.gameStateService.finishGame(game, winner);

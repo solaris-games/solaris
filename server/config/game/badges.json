@@ -46,5 +46,65 @@
         "name": "Victor (32 Players)",
         "description": "Awarded to players who have won a 32 player official game. This player has proven themselves to be a formiddable player.",
         "price": null
+    },
+    {
+        "key": "special_dark",
+        "name": "Victor (Dark Mode)",
+        "description": "Awarded to players who have won a dark mode official game.",
+        "price": null
+    },
+    {
+        "key": "special_ultraDark",
+        "name": "Victor (Ultra Dark Mode)",
+        "description": "Awarded to players who have won a ultra dark mode official game.",
+        "price": null
+    },
+    {
+        "key": "special_orbital",
+        "name": "Victor (Orbital Mode)",
+        "description": "Awarded to players who have won a orbital mode official game.",
+        "price": null
+    },
+    {
+        "key": "special_battleRoyale",
+        "name": "Victor (Battle Royale Mode)",
+        "description": "Awarded to players who have won a battle royale mode official game.",
+        "price": null
+    },
+    {
+        "key": "special_homeStar",
+        "name": "Victor (Capital Star Mode)",
+        "description": "Awarded to players who have won a capital star mode official game.",
+        "price": null
+    },
+    {
+        "key": "special_homeStarElimination",
+        "name": "Victor (Elimination Mode)",
+        "description": "Awarded to players who have won a elimination mode official game.",
+        "price": null
+    },
+    {
+        "key": "special_anonymous",
+        "name": "Victor (Anonymous Mode)",
+        "description": "Awarded to players who have won a anonymous mode official game.",
+        "price": null
+    },
+    {
+        "key": "special_kingOfTheHill",
+        "name": "Victor (King of the Hill Mode)",
+        "description": "Awarded to players who have won a king of the hill mode official game.",
+        "price": null
+    },
+    {
+        "key": "special_tinyGalaxy",
+        "name": "Victor (Tiny Galaxy Mode)",
+        "description": "Awarded to players who have won a tiny galaxy mode official game.",
+        "price": null
+    },
+    {
+        "key": "special_freeForAll",
+        "name": "Victor (Free for All Mode)",
+        "description": "Awarded to players who have won a free for all mode official game.",
+        "price": null
     }
 ]

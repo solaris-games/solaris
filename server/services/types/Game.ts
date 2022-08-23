@@ -231,6 +231,7 @@ export interface Game {
 		starsForVictory: number;
 		players: number;
 		winner: DBObjectId | null;
+		leaderboard: DBObjectId[] | null;
 		cleaned: boolean;
 		openSlots?: number;
 	},

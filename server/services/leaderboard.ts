@@ -656,9 +656,11 @@ export default class LeaderboardService {
     }
 
     getGameLeaderboardPosition(game: Game, player: Player) {
-        const gameLeaderboard = this.getGameLeaderboard(game)
-        
-        return gameLeaderboard.leaderboard.findIndex(l => l.player._id.toString() === player._id.toString()) + 1;
+        if (game.state.leaderboard == null) {
+            return null;
+        }
+
+        return game.state.leaderboard.findIndex(l => l.toString() === player._id.toString()) + 1;
     }
 
     addGameRankings(game: Game, gameUsers: User[], leaderboard: LeaderboardPlayer[]): GameRankingResult {
@@ -746,7 +748,11 @@ export default class LeaderboardService {
 
         // Note: We don't really care if its official or not, award a badge for any 32p games.
         if (this.gameTypeService.is32PlayerGame(game)) {
-            this.badgeService.awardBadgeForUser(user, 'victor32');
+            this.badgeService.awardBadgeForUserVictor32PlayerGame(user);
+        }
+
+        if (this.gameTypeService.isSpecialGameMode(game)) {
+            this.badgeService.awardBadgeForUserVictorySpecialGame(user, game);
         }
 
         // Give the winner a galactic credit providing it isn't a 1v1.
@@ -793,20 +799,20 @@ export default class LeaderboardService {
         };
     }
 
-    getGameWinner(game: Game): Player | null {
+    getGameWinner(game: Game, leaderboard: LeaderboardPlayer[]): Player | null {
         let isKingOfTheHillMode = this.gameTypeService.isKingOfTheHillMode(game);
         let isAllUndefeatedPlayersReadyToQuit = this.gameService.isAllUndefeatedPlayersReadyToQuit(game);
 
         if (isAllUndefeatedPlayersReadyToQuit) {
             if (isKingOfTheHillMode) {
-                return this.playerService.getKingOfTheHillPlayer(game) || this.getFirstPlacePlayer(game);
+                return this.playerService.getKingOfTheHillPlayer(game) || this.getFirstPlacePlayer(leaderboard);
             }
 
-            return this.getFirstPlacePlayer(game);
+            return this.getFirstPlacePlayer(leaderboard);
         }
 
         if (this.gameTypeService.isConquestMode(game)) {
-            let starWinner = this.getStarCountWinner(game);
+            let starWinner = this.getStarCountWinner(game, leaderboard);
 
             if (starWinner) {
                 return starWinner;
@@ -814,10 +820,10 @@ export default class LeaderboardService {
         }
 
         if (isKingOfTheHillMode && this.gameStateService.isCountingDownToEnd(game) && this.gameStateService.hasReachedCountdownEnd(game)) {
-            return this.playerService.getKingOfTheHillPlayer(game) || this.getFirstPlacePlayer(game);
+            return this.playerService.getKingOfTheHillPlayer(game) || this.getFirstPlacePlayer(leaderboard);
         }
 
-        let lastManStanding = this.getLastManStanding(game);
+        let lastManStanding = this.getLastManStanding(game, leaderboard);
 
         if (lastManStanding) {
             return lastManStanding;
@@ -826,12 +832,11 @@ export default class LeaderboardService {
         return null;
     }
 
-    getStarCountWinner(game: Game): Player | null {
+    getStarCountWinner(game: Game, leaderboard: LeaderboardPlayer[]): Player | null {
         // There could be more than one player who has reached
         // the number of stars required at the same time.
         // In this case we pick the player who has the most ships.
         // If that's equal, then pick the player who has the most carriers.
-        let leaderboard = this.getGameLeaderboard(game).leaderboard;
 
         // If conquest and home star percentage then use the totalHomeStars as the sort
         // All other cases use totalStars
@@ -849,7 +854,7 @@ export default class LeaderboardService {
         return null;
     }
 
-    getLastManStanding(game: Game): Player | null {
+    getLastManStanding(game: Game, leaderboard: LeaderboardPlayer[]): Player | null {
         let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated);
 
         if (undefeatedPlayers.length === 1) {
@@ -861,15 +866,20 @@ export default class LeaderboardService {
         let defeatedPlayers = game.galaxy.players.filter(p => p.defeated);
 
         if (defeatedPlayers.length === game.settings.general.playerLimit) {
-            return this.getFirstPlacePlayer(game);
+            return this.getFirstPlacePlayer(leaderboard);
+        }
+
+        // If the remaining players alive are all AI then pick the player in 1st.
+        let undefeatedAI = undefeatedPlayers.filter(p => this.playerService.isAIControlled(p));
+        
+        if (undefeatedAI.length === undefeatedPlayers.length) {
+            return this.getFirstPlacePlayer(leaderboard);
         }
 
         return null;
     }
 
-    getFirstPlacePlayer(game: Game): Player {
-        let leaderboard = this.getGameLeaderboard(game).leaderboard;
-
+    getFirstPlacePlayer(leaderboard: LeaderboardPlayer[]): Player {
         return leaderboard[0].player;
     }
 
