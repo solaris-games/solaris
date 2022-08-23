@@ -10,6 +10,7 @@
       <p v-if="game.settings.general.description">{{game.settings.general.description}}</p>
 
       <p v-if="isNewPlayerGame" class="text-warning">New Player Games do not affect Rank or Victories.</p>
+      <p v-if="isCustomFeaturedGame" class="text-warning">This is a featured game and will award rank points.</p>
 
       <div class="row mb-1 bg-dark pt-2 pb-2">
         <div class="col">
@@ -106,6 +107,9 @@ export default {
     },
     isFluxGame () {
       return GameHelper.isFluxGame(this.game)
+    },
+    isCustomFeaturedGame () {
+      return GameHelper.isCustomGame(this.game) && GameHelper.isFeaturedGame(this.game)
     }
   }
 }

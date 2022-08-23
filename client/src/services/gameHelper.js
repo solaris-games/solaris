@@ -1035,8 +1035,16 @@ class GameHelper {
     return ['new_player_rt', 'new_player_tb'].includes(game.settings.general.type)
   }
 
+  isCustomGame (game) {
+    return game.settings.general.type === 'custom'
+  }
+
   isFluxGame (game) {
     return game.settings.general.fluxEnabled === 'enabled'
+  }
+
+  isFeaturedGame (game) {
+    return game.settings.general.featured === true
   }
 
   getLedgerGameEventPlayerSummary (game, gameEvent) {
