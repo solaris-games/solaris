@@ -219,7 +219,7 @@ class Star extends EventEmitter {
 
     this.pulsarGraphics = new PIXI.Graphics()
     this.pulsarGraphics.zIndex = -1
-    this.pulsarGraphics.lineStyle(0.5, playerColour, 0.5)
+    this.pulsarGraphics.lineStyle(1, playerColour, 0.5)
     this.pulsarGraphics.moveTo(0, -20)
     this.pulsarGraphics.lineTo(0, 20)
     this.pulsarGraphics.drawEllipse(-5, 0, 5, 5)
