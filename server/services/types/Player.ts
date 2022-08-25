@@ -64,6 +64,7 @@ export interface Player {
     _id: DBObjectId;
     userId: DBObjectId | null;
     isRealUser?: boolean;
+    isAIControlled?: boolean;
     homeStarId: DBObjectId | null;
     alias: string;
     avatar: string | null;

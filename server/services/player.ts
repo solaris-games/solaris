@@ -513,40 +513,6 @@ export default class PlayerService extends EventEmitter {
         });
     }
 
-    performDefeatedOrAfkCheck(game: Game, player: Player, isTurnBasedGame: boolean) {
-        if (player.defeated) {
-            throw new Error(`Cannot perform a defeated check on an already defeated player.`);
-        }
-
-        if (!player.afk) {
-            // Check if the player has been AFK.
-            let isAfk = this.isAfkCheck(game, player, isTurnBasedGame);
-    
-            if (isAfk) {
-                this.setPlayerAsAfk(game, player);
-            }
-        }
-
-        // Check if the player has been defeated by conquest.
-        if (!player.defeated) {
-            let stars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
-
-            // If there are no stars and there are no carriers then the player is defeated.
-            if (stars.length === 0) {
-                let carriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id); // Note: This logic looks a bit weird, but its more performant.
-
-                if (carriers.length === 0) {
-                    this.setPlayerAsDefeated(game, player, false);
-                }
-            }
-
-            // For capital star elimination games, if the player doesn't own their original home star then they are defeated.
-            if (this.gameTypeService.isCapitalStarEliminationMode(game) && !this.ownsOriginalHomeStar(game, player)) {
-                this.setPlayerAsDefeated(game, player, false);
-            }
-        }
-    }
-
     ownsOriginalHomeStar(game: Game, player: Player) {
         const stars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
@@ -564,42 +530,6 @@ export default class PlayerService extends EventEmitter {
                 player.missedTurns = 0;
             }
         }
-    }
-
-    isAIControlled(player: Player) {
-        return player.defeated || !player.userId; // Note: Null user IDs is considered AI as there is not a user controlling it.
-    }
-
-    isAfkCheck(game: Game, player: Player, isTurnBasedGame: boolean) {
-        if (player.afk) {
-            throw new Error(`Cannot perform an AFK check on an already AFK player.`);
-        }
-
-        // The player is afk if:
-        // 1. They haven't been seen for X days.
-        // 2. They missed the turn limit in a turn based game.
-        // 3. They missed X cycles in a real time game (minimum of 12 hours)
-
-        // If the player is AI controlled, then they are not AFK.
-        if (this.isAIControlled(player)) {
-            return false;
-        }
-
-        let lastSeenMoreThanXDaysAgo = moment(player.lastSeen).utc() < moment().utc().subtract(game.settings.gameTime.afk.lastSeenTimeout, 'days');
-
-        if (lastSeenMoreThanXDaysAgo) {
-            return true;
-        }
-
-        if (isTurnBasedGame) {
-            return player.missedTurns >= game.settings.gameTime.afk.turnTimeout;
-        }
-
-        let secondsXCycles = game.settings.galaxy.productionTicks * game.settings.gameTime.speed * game.settings.gameTime.afk.cycleTimeout;
-        let secondsToAfk = Math.max(secondsXCycles, 43200); // Minimum of 12 hours.
-        let lastSeenMoreThanXSecondsAgo = moment(player.lastSeen).utc() < moment().utc().subtract(secondsToAfk, 'seconds');
-
-        return lastSeenMoreThanXSecondsAgo;
     }
 
     setPlayerAsDefeated(game: Game, player: Player, openSlot: boolean) {

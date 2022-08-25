@@ -36,6 +36,7 @@ import PlayerGalacticCycleCompletedEvent from "./types/events/PlayerGalacticCycl
 import GamePlayerDefeatedEvent from "./types/events/GamePlayerDefeated";
 import GamePlayerAFKEvent from "./types/events/GamePlayerAFK";
 import GameEndedEvent from "./types/events/GameEnded";
+import PlayerAfkService from "./playerAfk";
 
 const EventEmitter = require('events');
 const moment = require('moment');
@@ -55,6 +56,7 @@ export default class GameTickService extends EventEmitter {
     carrierService: CarrierService;
     researchService: ResearchService;
     playerService: PlayerService;
+    playerAfkService: PlayerAfkService;
     historyService: HistoryService;
     waypointService: WaypointService;
     combatService: CombatService;
@@ -84,6 +86,7 @@ export default class GameTickService extends EventEmitter {
         carrierService: CarrierService,
         researchService: ResearchService,
         playerService: PlayerService,
+        playerAfkService: PlayerAfkService,
         historyService: HistoryService,
         waypointService: WaypointService,
         combatService: CombatService,
@@ -114,6 +117,7 @@ export default class GameTickService extends EventEmitter {
         this.carrierService = carrierService;
         this.researchService = researchService;
         this.playerService = playerService;
+        this.playerAfkService = playerAfkService;
         this.historyService = historyService;
         this.waypointService = waypointService;
         this.combatService = combatService;
@@ -694,7 +698,7 @@ export default class GameTickService extends EventEmitter {
         for (let i = 0; i < undefeatedPlayers.length; i++) {
             let player = undefeatedPlayers[i];
 
-            this.playerService.performDefeatedOrAfkCheck(game, player, isTurnBasedGame);
+            this.playerAfkService.performDefeatedOrAfkCheck(game, player);
 
             if (player.defeated) {
                 game.state.players--; // Deduct number of active players from the game.
@@ -756,7 +760,7 @@ export default class GameTickService extends EventEmitter {
             this.gameStateService.finishGame(game, winner);
 
             for (const player of game.galaxy.players) {
-                if (this.playerService.isAIControlled(player)) {
+                if (this.playerAfkService.isAIControlled(game, player, true)) {
                     this.aiService.cleanupState(player);
                 }
             }
@@ -813,7 +817,7 @@ export default class GameTickService extends EventEmitter {
     }
 
     async _playAI(game: Game) {
-        for (let player of game.galaxy.players.filter(p => this.playerService.isAIControlled(p))) {
+        for (let player of game.galaxy.players.filter(p => this.playerAfkService.isAIControlled(game, p, true))) {
             await this.aiService.play(game, player);
         }
     }

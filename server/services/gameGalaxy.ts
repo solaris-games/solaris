@@ -31,6 +31,7 @@ import { Carrier } from './types/Carrier';
 import AvatarService from './avatar';
 import PlayerStatisticsService from './playerStatistics';
 import GameFluxService from './gameFlux';
+import PlayerAfkService from './playerAfk';
 
 export default class GameGalaxyService {
     cacheService: CacheService;
@@ -38,6 +39,7 @@ export default class GameGalaxyService {
     gameService: GameService;
     mapService: MapService;
     playerService: PlayerService;
+    playerAfkService: PlayerAfkService;
     starService: StarService;
     distanceService: DistanceService;
     starDistanceService: StarDistanceService;
@@ -65,6 +67,7 @@ export default class GameGalaxyService {
         gameService: GameService,
         mapService: MapService,
         playerService: PlayerService,
+        playerAfkService: PlayerAfkService,
         starService: StarService,
         distanceService: DistanceService, 
         starDistanceService: StarDistanceService,
@@ -91,6 +94,7 @@ export default class GameGalaxyService {
         this.gameService = gameService;
         this.mapService = mapService;
         this.playerService = playerService;
+        this.playerAfkService = playerAfkService;
         this.starService = starService;
         this.distanceService = distanceService;
         this.starDistanceService = starDistanceService;
@@ -515,6 +519,10 @@ export default class GameGalaxyService {
                 }
             }
 
+            // Calculate whether the user is AI controlled or not. If they are the current user
+            // then do not include psuedo afk. We only want to check that for other players.
+            p.isAIControlled = this.playerAfkService.isAIControlled(doc, p, !isCurrentUserPlayer);
+
             p.isInScanningRange = playersInRange.find(x => x._id.toString() === p._id.toString()) != null;
             p.shape = p.shape || 'circle'; // TODO: I don't know why the shape isn't being returned by mongoose defaults.
             p.avatar = p.avatar ? avatars.find(a => a.id.toString() === p.avatar!.toString())!.file : null; // TODO: We should made the ID a number and not a string as it is an ID.
@@ -592,6 +600,7 @@ export default class GameGalaxyService {
             return {
                 _id: p._id,
                 isRealUser: p.userId != null,
+                isAIControlled: p.isAIControlled,
                 homeStarId: p.homeStarId,
                 colour: p.colour,
                 shape: p.shape,

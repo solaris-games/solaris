@@ -13,12 +13,14 @@ import BadgeService from '../services/badge';
 import PlayerStatisticsService from '../services/playerStatistics';
 import { Player } from '../services/types/Player';
 import { LeaderboardPlayer } from '../services/types/Leaderboard';
+import PlayerAfkService from '../services/playerAfk';
 const mongoose = require('mongoose');
 
 describe('Leaderboard - Last man standing', () => {
     let userRepo: Repository<User>;
     let userService: UserService;
     let playerService: PlayerService;
+    let playerAfkService: PlayerAfkService;
     let guildUserService: UserGuildService;
     let ratingService: RatingService;
     let gameService: GameService;
@@ -32,11 +34,11 @@ describe('Leaderboard - Last man standing', () => {
     let leaderboard: LeaderboardPlayer[];
 
     beforeEach(() => {
-        playerService = {
-            isAIControlled: (player: Player) => {
+        playerAfkService = {
+            isAIControlled: (game: Game, player: Player, includePseudoAfk: boolean) => {
                 return false;
             }
-        } as PlayerService;
+        } as PlayerAfkService;
 
         gameTypeService = {
             isKingOfTheHillMode: (game: Game) => { return false; }
@@ -61,7 +63,7 @@ describe('Leaderboard - Last man standing', () => {
             }
         } as PlayerStatisticsService;
 
-        service = new LeaderboardService(userRepo, userService, playerService, guildUserService, ratingService, gameService, gameTypeService, gameStateService, badgeService, playerStatisticsService);
+        service = new LeaderboardService(userRepo, userService, playerService, playerAfkService, guildUserService, ratingService, gameService, gameTypeService, gameStateService, badgeService, playerStatisticsService);
 
         game = {
             settings: {
@@ -135,7 +137,7 @@ describe('Leaderboard - Last man standing', () => {
         game.galaxy.players[1].userId = null;
         game.galaxy.players[2].userId = null;
 
-        playerService.isAIControlled = (player: Player) => { return player._id.toString() !== game.galaxy.players[0]._id.toString(); }
+        playerAfkService.isAIControlled = (game: Game, player: Player, includePseudoAfk: boolean) => { return player._id.toString() !== game.galaxy.players[0]._id.toString(); }
 
         const result = service.getLastManStanding(game, leaderboard);
 
@@ -147,7 +149,7 @@ describe('Leaderboard - Last man standing', () => {
         game.galaxy.players[1].userId = null;
         game.galaxy.players[2].userId = null;
 
-        playerService.isAIControlled = (player: Player) => { return true; }
+        playerAfkService.isAIControlled = (game: Game, player: Player, includePseudoAfk: boolean) => { return true; }
 
         const result = service.getLastManStanding(game, leaderboard);
 

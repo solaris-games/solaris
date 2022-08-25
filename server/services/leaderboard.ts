@@ -13,6 +13,7 @@ import PlayerService from "./player";
 import PlayerStatisticsService from "./playerStatistics";
 import RatingService from "./rating";
 import UserService from "./user";
+import PlayerAfkService from "./playerAfk";
 
 const moment = require('moment');
 
@@ -499,6 +500,7 @@ export default class LeaderboardService {
     userRepo: Repository<User>;
     userService: UserService;
     playerService: PlayerService;
+    playerAfkService: PlayerAfkService;
     guildUserService: UserGuildService;
     ratingService: RatingService;
     gameService: GameService;
@@ -511,6 +513,7 @@ export default class LeaderboardService {
         userRepo: Repository<User>,
         userService: UserService,
         playerService: PlayerService,
+        playerAfkService: PlayerAfkService,
         guildUserService: UserGuildService,
         ratingService: RatingService,
         gameService: GameService,
@@ -522,6 +525,7 @@ export default class LeaderboardService {
         this.userRepo = userRepo;
         this.userService = userService;
         this.playerService = playerService;
+        this.playerAfkService = playerAfkService;
         this.guildUserService = guildUserService;
         this.ratingService = ratingService;
         this.gameService = gameService;
@@ -870,7 +874,8 @@ export default class LeaderboardService {
         }
 
         // If the remaining players alive are all AI then pick the player in 1st.
-        let undefeatedAI = undefeatedPlayers.filter(p => this.playerService.isAIControlled(p));
+        // Note: Don't include pseudo afk, only legit actual afk players.
+        let undefeatedAI = undefeatedPlayers.filter(p => this.playerAfkService.isAIControlled(game, p, false));
         
         if (undefeatedAI.length === undefeatedPlayers.length) {
             return this.getFirstPlacePlayer(leaderboard);

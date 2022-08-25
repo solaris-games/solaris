@@ -18,6 +18,7 @@ import ReputationService from "./reputation";
 import DiplomacyService from "./diplomacy";
 import PlayerStatisticsService from "./playerStatistics";
 import {DBObjectId} from "./types/DBObjectId";
+import PlayerAfkService from "./playerAfk";
 
 const Heap = require('qheap');
 const mongoose = require("mongoose");
@@ -125,6 +126,7 @@ export default class AIService {
     shipTransferService: ShipTransferService;
     technologyService: TechnologyService;
     playerService: PlayerService;
+    playerAfkService: PlayerAfkService;
     reputationService: ReputationService;
     diplomacyService: DiplomacyService;
     playerStatisticsService: PlayerStatisticsService;
@@ -139,6 +141,7 @@ export default class AIService {
         shipTransferService: ShipTransferService,
         technologyService: TechnologyService,
         playerService: PlayerService,
+        playerAfkService: PlayerAfkService,
         reputationService: ReputationService,
         diplomacyService: DiplomacyService,
         playerStatisticsService: PlayerStatisticsService
@@ -152,13 +155,14 @@ export default class AIService {
         this.shipTransferService = shipTransferService;
         this.technologyService = technologyService;
         this.playerService = playerService;
+        this.playerAfkService = playerAfkService;
         this.reputationService = reputationService;
         this.diplomacyService = diplomacyService;
         this.playerStatisticsService = playerStatisticsService;
     }
 
     async play(game: Game, player: Player) {
-        if (!this.playerService.isAIControlled(player)) {
+        if (!this.playerAfkService.isAIControlled(game, player, true)) {
             throw new Error('The player is not under AI control.');
         }
 

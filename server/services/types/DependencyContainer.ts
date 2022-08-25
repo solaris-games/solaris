@@ -39,6 +39,7 @@ import StarMovementService from "../starMovement";
 import PasswordService from "../password";
 import PaypalService from "../paypal";
 import PlayerService from "../player";
+import PlayerAfkService from '../playerAfk'
 import PlayerCreditsService from "../playerCredits";
 import PlayerCycleRewardsService from "../playerCycleRewards";
 import PlayerReadyService from "../playerReady";
@@ -90,6 +91,7 @@ export interface DependencyContainer {
     guildUserService: UserGuildService,
     mapService: MapService,
     playerService: PlayerService,
+    playerAfkService: PlayerAfkService,
     playerReadyService: PlayerReadyService,
     randomService: RandomService,
     researchService: ResearchService,
