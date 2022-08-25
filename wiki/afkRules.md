@@ -16,3 +16,8 @@ If a player goes AFK, you can **fill the AFK slot** (as long as you aren't alrea
 There is a key difference between a player who has **conceded defeat** and a player who has been kicked for being AFK, a player who has conceded has purposefully resigned from the game.
 
 Slots for players who have conceded defeat **cannot be filled** by other players wishing to join the game, only AFK slots can be filled.
+
+## AI Takeover
+If a player has not been seen for **12 hours** after the game has started, the AI will take over their slot. The slot is reserved for that player until the player actually goes AFK (the slot opens) or the player returns before the AFK timeout.
+
+Players who are AI controlled will have a little robot icon on their player profile.
