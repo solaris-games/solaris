@@ -101,6 +101,11 @@ export default class ResearchService extends EventEmitter {
         let techKey = player.researchingNow;
         let tech = player.research[techKey];
 
+        if (!this.technologyService.isTechnologyEnabled(game, techKey) || 
+            !this.technologyService.isTechnologyResearchable(game, techKey)) {
+            return null;
+        }
+
         let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
         let totalScience = this.playerStatisticsService.calculateTotalScience(playerStars);
@@ -182,9 +187,6 @@ export default class ResearchService extends EventEmitter {
         // Check if experimentation is enabled.
         let isExperimentationEnabled = this.technologyService.isTechnologyEnabled(game, 'experimentation');
         
-        // NOTE: Players must own stars in order to have experiments.
-        let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
-
         const noExperimentation = {
             technology: null,
             level: null,
@@ -193,7 +195,14 @@ export default class ResearchService extends EventEmitter {
             researchingNext: null
         };
 
-        if (!isExperimentationEnabled || !playerStars.length) {
+        if (!isExperimentationEnabled) {
+            return noExperimentation;
+        }
+
+        // NOTE: Players must own stars in order to have experiments.
+        let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+
+        if (!playerStars.length) {
             return noExperimentation;
         }
 
