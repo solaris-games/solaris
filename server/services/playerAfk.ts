@@ -90,7 +90,7 @@ export default class PlayerAfkService extends EventEmitter {
         }
         
         let startDate = moment(game.state.startDate).utc();
-        let startDatePlus12h = startDate.add(12, 'hours');
+        let startDatePlus12h = moment(game.state.startDate).add(12, 'hours');
         let now = moment().utc();
 
         // We want to give players at least a 12h from the start of the game.
