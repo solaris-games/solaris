@@ -14,6 +14,7 @@ import PlayerStatisticsService from "./playerStatistics";
 import RatingService from "./rating";
 import UserService from "./user";
 import PlayerAfkService from "./playerAfk";
+import UserLevelService from "./userLevel";
 
 const moment = require('moment');
 
@@ -33,6 +34,7 @@ export default class LeaderboardService {
                 'roles.developer': 1,
                 'roles.communityManager': 1,
                 'roles.gameMaster': 1,
+                'achievements.level': 1,
                 'achievements.rank': 1,
                 'achievements.victories': 1,
                 'achievements.renown': 1,
@@ -53,6 +55,7 @@ export default class LeaderboardService {
                 'roles.developer': 1,
                 'roles.communityManager': 1,
                 'roles.gameMaster': 1,
+                'achievements.level': 1,
                 'achievements.rank': 1,
                 'achievements.victories': 1,
                 'achievements.renown': 1,
@@ -73,6 +76,7 @@ export default class LeaderboardService {
                 'roles.developer': 1,
                 'roles.communityManager': 1,
                 'roles.gameMaster': 1,
+                'achievements.level': 1,
                 'achievements.rank': 1,
                 'achievements.victories': 1,
                 'achievements.renown': 1,
@@ -467,6 +471,7 @@ export default class LeaderboardService {
                 'roles.developer': 1,
                 'roles.communityManager': 1,
                 'roles.gameMaster': 1,
+                'achievements.level': 1,
                 'achievements.rank': 1,
                 'achievements.victories': 1,
                 'achievements.renown': 1,
@@ -501,6 +506,7 @@ export default class LeaderboardService {
     userService: UserService;
     playerService: PlayerService;
     playerAfkService: PlayerAfkService;
+    userLevelService: UserLevelService;
     guildUserService: UserGuildService;
     ratingService: RatingService;
     gameService: GameService;
@@ -514,6 +520,7 @@ export default class LeaderboardService {
         userService: UserService,
         playerService: PlayerService,
         playerAfkService: PlayerAfkService,
+        userLevelService: UserLevelService,
         guildUserService: UserGuildService,
         ratingService: RatingService,
         gameService: GameService,
@@ -526,6 +533,7 @@ export default class LeaderboardService {
         this.userService = userService;
         this.playerService = playerService;
         this.playerAfkService = playerAfkService;
+        this.userLevelService = userLevelService;
         this.guildUserService = guildUserService;
         this.ratingService = ratingService;
         this.gameService = gameService;
@@ -726,6 +734,7 @@ export default class LeaderboardService {
             let newRank = Math.max(user.achievements.rank + rankIncrease, 0); // Cannot go less than 0.
 
             user.achievements.rank = newRank;
+            user.achievements.level = this.userLevelService.getByRankPoints(newRank).id;
 
             // Append the rank adjustment to the results.
             result.ranks.push({

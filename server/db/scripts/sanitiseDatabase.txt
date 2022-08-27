@@ -21,6 +21,7 @@ db.users.updateMany({}, {
         },
         achievements: {
             victories: 0,
+            level: 1,
             rank: 0,
             eloRating: null,
             renown: 0,

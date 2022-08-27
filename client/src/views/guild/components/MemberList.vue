@@ -1,12 +1,12 @@
 <template>
   <sortable-leaderboard :leaderboard="members" :sortingKey="sortingKey" @sortingRequested="sortMemberList">
     <template v-slot:header="actions">
-      <th style="width: 40%">Player</th>
+      <th style="width: 35%">Player</th>
       <th style="width: 15%" class="sortable-header" title="Role" @click="actions.sort('role')" :class="actions.getColumnClass('role')">
         Role
         <i v-if="actions.isActive('role')" class="fas fa-chevron-down"></i>
       </th>
-      <th style="width: 10%" class="text-end sortable-header" title="Rank" @click="actions.sort('rank')" :class="actions.getColumnClass('rank')">
+      <th style="width: 15%" class="text-end sortable-header" title="Rank" @click="actions.sort('rank')" :class="actions.getColumnClass('rank')">
         <i v-if="actions.isActive('rank')" class="fas fa-chevron-down"></i>
         <i class="fas fa-star text-info"></i>
       </th>

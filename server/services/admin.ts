@@ -119,6 +119,7 @@ export default class AdminService {
             _id: userId
         }, {
             'achievements.victories': 0,
+            'achievements.level': 0,
             'achievements.rank': 0,
             'achievements.eloRating': null,
             'achievements.renown': 0,

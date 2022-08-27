@@ -10,7 +10,10 @@
       'text-success': playerIsApplicant,
       ...getColumnClass('role')
     }">{{roleName}}</td>
-    <td align="right" :class="getColumnClass('rank')">{{player.achievements.rank}}</td>
+    <td align="right" :class="getColumnClass('rank')">
+      {{player.achievements.rank}}
+      <img class="user-level-icon" :src="require(`../../../assets/levels/${player.achievements.level}.png`)">
+    </td>
     <td align="right" :class="getColumnClass('victories')">{{player.achievements.victories}}</td>
     <td align="right" :class="getColumnClass('renown')">{{player.achievements.renown}}</td>
     <td class="text-end">
@@ -308,5 +311,7 @@ export default {
 </script>
 
 <style scoped>
-
+.user-level-icon {
+  height: 28px;
+}
 </style>

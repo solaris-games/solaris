@@ -266,6 +266,7 @@ export default class GameService extends EventEmitter {
         let player = game.galaxy.players.find(p => p._id.toString() === playerId.toString())!;
 
         return await this.userService.getInfoByIdLean(player.userId!, {
+            'achievements.level': 1,
             'achievements.rank': 1,
             'achievements.renown': 1,
             'achievements.victories': 1,

@@ -45,6 +45,7 @@ async function startup() {
     console.log(`Resetting users...`);
     await container.userService.userRepo.updateMany({}, {
         $set: {
+            'achievements.level': 1,
             'achievements.rank': 0,
             'achievements.eloRating': null,
             'achievements.victories': 0,
@@ -161,6 +162,7 @@ async function startup() {
                     _id: user._id
                 },
                 update: {
+                    'achievements.level': user.achievements.level,
                     'achievements.rank': user.achievements.rank,
                     'achievements.eloRating': user.achievements.eloRating,
                     'achievements.victories': user.achievements.victories,

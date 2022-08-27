@@ -135,6 +135,7 @@ export default class GuildService {
 
         let userSelectObject = {
             username: 1,
+            'achievements.level': 1,
             'achievements.rank': 1,
             'achievements.victories': 1,
             'achievements.renown': 1
@@ -309,6 +310,7 @@ export default class GuildService {
     async invite(username: string, guildId: DBObjectId, invitedByUserId: DBObjectId) {
         let user = await this.userService.getByUsername(username, {
             username: 1,
+            'achievements.level': 1,
             'achievements.rank': 1,
             'achievements.victories': 1,
             'achievements.renown': 1

@@ -64,6 +64,7 @@ import UserService from "../user";
 import WaypointService from "../waypoint";
 import NotificationService from "../notification";
 import DiscordService from "../discord";
+import UserLevelService from "../userLevel";
 
 export interface DependencyContainer {
     config: Config,
@@ -92,6 +93,7 @@ export interface DependencyContainer {
     mapService: MapService,
     playerService: PlayerService,
     playerAfkService: PlayerAfkService,
+    userLevelService: UserLevelService,
     playerReadyService: PlayerReadyService,
     randomService: RandomService,
     researchService: ResearchService,

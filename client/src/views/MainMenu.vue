@@ -9,7 +9,11 @@
       </div>
       <div class="col-sm-12 col-md-6 col-lg-7">
         <!-- player quick stats -->
-        <achievements v-if="achievements" v-bind:victories="achievements.victories" v-bind:rank="achievements.rank" v-bind:renown="achievements.renown"/>
+        <achievements v-if="achievements"
+          :level="achievements.level"
+          :victories="achievements.victories"
+          :rank="achievements.rank"
+          :renown="achievements.renown"/>
         <loading-spinner :loading="!achievements"></loading-spinner>
       </div>
     </div>

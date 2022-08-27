@@ -10,7 +10,7 @@ A player is considered to be AFK if:
 ## AFK Slots
 A player who has been kicked for being AFK can **rejoin** their own slot at any time, providing it has not been filled by another player.
 
-If a player goes AFK, you can **fill the AFK slot** (as long as you aren't already playing). At the end of the game, **extra rank is awarded** at `1.5x` normal rank (minimum of 0 rank). See [Rankings](./rankings.md) for more details.
+If a player goes AFK, you can **fill the AFK slot** (as long as you aren't already playing). At the end of the game, **extra rank is awarded** at `1.5x` normal rank (minimum of 0 rank points). See [Rankings](./rankings.md) for more details.
 
 ## AFK vs. Conceded Defeat
 There is a key difference between a player who has **conceded defeat** and a player who has been kicked for being AFK, a player who has conceded has purposefully resigned from the game.

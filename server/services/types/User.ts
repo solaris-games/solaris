@@ -1,5 +1,6 @@
 import { CarrierWaypointActionType } from "./CarrierWaypoint";
 import { DBObjectId } from "./DBObjectId";
+import { UserLevel } from "./UserLevel";
 
 export type SettingEnabledDisabled = 'enabled'|'disabled';
 export type SettingUIType = 'standard'|'compact';
@@ -66,8 +67,10 @@ export interface User {
     isEstablishedPlayer: boolean;
     hasSentReviewReminder: boolean;
     roles: UserRoles,
+    level?: UserLevel,
     achievements: {
         victories: number;
+        level: number;
         rank: number;
         eloRating: number | null;
         renown: number;

@@ -58,13 +58,13 @@ export default class PlayerAfkService extends EventEmitter {
                 let carriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id); // Note: This logic looks a bit weird, but its more performant.
 
                 if (carriers.length === 0) {
-                    this.setPlayerAsDefeated(game, player, false);
+                    this.playerService.setPlayerAsDefeated(game, player, false);
                 }
             }
 
             // For capital star elimination games, if the player doesn't own their original home star then they are defeated.
             if (this.gameTypeService.isCapitalStarEliminationMode(game) && !this.ownsOriginalHomeStar(game, player)) {
-                this.setPlayerAsDefeated(game, player, false);
+                this.playerService.setPlayerAsDefeated(game, player, false);
             }
         }
     }

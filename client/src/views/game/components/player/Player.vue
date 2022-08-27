@@ -33,7 +33,9 @@
 
     <h4 class="mt-2" v-if="canViewAchievements">Achievements</h4>
 
-    <achievements v-if="canViewAchievements" :victories="user.achievements.victories"
+    <achievements v-if="canViewAchievements"
+                    :level="user.achievements.level"
+                    :victories="user.achievements.victories"
                     :rank="user.achievements.rank"
                     :renown="user.achievements.renown"/>
 

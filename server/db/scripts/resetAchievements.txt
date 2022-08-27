@@ -5,6 +5,7 @@ db.users.updateOne({
 }, {
     $set: {
         'achievements.victories': 0,
+        'achievements.level': 1,
         'achievements.rank': 0,
         'achievements.eloRating': null,
         'achievements.renown': 0,

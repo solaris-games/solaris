@@ -21,4 +21,4 @@ Flux affects games in interesting ways that mix up the metagame from month to mo
 | September | Production Cycles are shorter by 6 ticks.                    |                                                                                            |
 | October   | The number of specialist bans this month has increased.      | Increased from 3 to 6 bans.                                                                |
 | November  | Increased starting credits and specialist tokens.            | Credits are increased by x2 (max 3000) and Specialist Tokens are increased by x2 (max 100) |
-| December  | Gain more rank from playing games.                           | Rank rewards are increased by x2 on top of any other multipliers (special games grant x2). |
+| December  | Gain more rank points from playing games.                    | Rank rewards are increased by x2 on top of any other multipliers (special games grant x2). |
