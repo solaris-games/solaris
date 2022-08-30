@@ -55,7 +55,7 @@
       </ul>
 
       <p class="pb-2">
-        See the <a href="https://solaris4x.readthedocs.io/en/latest/diplomacy/#diplomatic-statuses" target="_blank">wiki</a> for more details.
+        See the <a href="https://solaris-games.github.io/solaris-docs/diplomacy#diplomatic-statuses" target="_blank">wiki</a> for more details.
       </p>
     </div>
 </div>
