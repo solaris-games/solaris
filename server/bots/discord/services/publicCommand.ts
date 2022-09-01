@@ -414,7 +414,7 @@ export default class PublicCommandService {
 
         const flux = this.gameFluxService.getCurrentFlux()!;
 
-        let response = `Hey <@${authorId}>,\n\nThis month's flux is **${flux.name}**.\n\n*${flux.description}*\n\nFlux changes on the 1st of every month, for information see the wiki.`;
+        let response = `Hey <@${authorId}>,\n\nThis month's flux is:\n\n*${flux.description}*\n\nFlux changes on the 1st of every month, for information see the wiki.`;
 
         return msg.channel.send(response);
     }
