@@ -83,7 +83,7 @@ export interface GameSettings {
 		fluxEnabled: GameSettingEnabledDisabled;
 		isGameAdmin?: boolean;
 		advancedAI: GameSettingEnabledDisabled;
-		flux?: GameFlux;
+		flux?: GameFlux | null;
 	},
 	galaxy: {
 		galaxyType: GameGalaxyType;
