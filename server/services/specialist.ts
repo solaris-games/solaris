@@ -65,7 +65,7 @@ export default class SpecialistService {
         return spec;
     }
 
-    list(game: Game | null, type: SpecialistType) {
+    list(game: Game | null, type: SpecialistType): Specialist[] {
         if (game && game.settings.specialGalaxy.specialistCost === 'none') {
             throw new ValidationError('The game settings has disabled the hiring of specialists.');
         }
@@ -98,11 +98,11 @@ export default class SpecialistService {
         return specs.sort((a, b) => a.name - b.name);
     }
 
-    listCarrier(game: Game | null) {
+    listCarrier(game: Game | null): Specialist[] {
         return this.list(game, 'carrier');
     }
 
-    listStar(game: Game | null) {
+    listStar(game: Game | null): Specialist[] {
         return this.list(game, 'star');
     }
 
