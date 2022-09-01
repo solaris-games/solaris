@@ -407,4 +407,15 @@ export default class PublicCommandService {
 
         return msg.channel.send(response);
     }
+
+    async flux(msg, directions: string[]) {
+        //$flux
+        let authorId = msg.author.id;
+
+        const flux = this.gameFluxService.getCurrentFlux()!;
+
+        let response = `Hey <@${authorId}>,\n\nThis month's flux is **${flux.name}**.\n\n*${flux.description}*\n\nFlux changes on the 1st of every month, for information see the wiki.`;
+
+        return msg.channel.send(response);
+    }
 }
