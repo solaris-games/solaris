@@ -88,7 +88,7 @@ export default class GameFluxService {
 
     applySepFlux(game: Game) {
         // Faster production cycles
-        game.settings.galaxy.productionTicks -= Math.max(14, game.settings.galaxy.productionTicks - 6);
+        game.settings.galaxy.productionTicks = Math.max(14, game.settings.galaxy.productionTicks - 6);
     }
 
     applyOctFlux(game: Game) {
