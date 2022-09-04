@@ -59,6 +59,13 @@ export default {
   },
   mounted () {
     this.tableData = this.getTableData()
+    
+    this.sortBy = localStorage.getItem('galaxy_carriers_sortBy') || null
+    this.sortDirection = localStorage.getItem('galaxy_carriers_sortDirection') == 'true' || false
+  },
+  destroyed () {
+    localStorage.setItem('galaxy_carriers_sortBy', this.sortBy)
+    localStorage.setItem('galaxy_carriers_sortDirection', this.sortDirection)
   },
   methods: {
     getUserPlayer () {
@@ -96,6 +103,10 @@ export default {
     sortedTableData () {
       // here be dragons
       const getNestedObject = (nestedObj, pathArr) => {
+        if (!Array.isArray(pathArr)) {
+          pathArr = pathArr.split(',')
+        }
+
         return pathArr.reduce((obj, key) =>
           (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
       }

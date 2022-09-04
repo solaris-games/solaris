@@ -61,6 +61,13 @@ export default {
   },
   mounted () {
     this.tableData = this.getTableData()
+    
+    this.sortBy = localStorage.getItem('galaxy_capitals_sortBy') || null
+    this.sortDirection = localStorage.getItem('galaxy_capitals_sortDirection') == 'true' || false
+  },
+  destroyed () {
+    localStorage.setItem('galaxy_capitals_sortBy', this.sortBy)
+    localStorage.setItem('galaxy_capitals_sortDirection', this.sortDirection)
   },
   methods: {
     getUserPlayer () {
@@ -69,7 +76,7 @@ export default {
     toggleShowAll () {
       this.showAll = !this.showAll
 
-      this.tableData = this.getTableData()
+      this.tableData = this.getTableData()``
     },
     getTableData () {
       let sorter = (a, b) => a.name.localeCompare(b.name)
@@ -98,6 +105,10 @@ export default {
     sortedTableData () {
       // here be dragons
       const getNestedObject = (nestedObj, pathArr) => {
+        if (!Array.isArray(pathArr)) {
+          pathArr = pathArr.split(',')
+        }
+
         return pathArr.reduce((obj, key) =>
           (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
       }

@@ -76,6 +76,13 @@ export default {
     this.tableData = this.getTableData()
 
     this.allowUpgrades = this.$store.state.settings.interface.galaxyScreenUpgrades === 'enabled' && !this.isGameFinished
+    
+    this.sortBy = localStorage.getItem('galaxy_stars_sortBy') || null
+    this.sortDirection = localStorage.getItem('galaxy_stars_sortDirection') == 'true' || false
+  },
+  destroyed () {
+    localStorage.setItem('galaxy_stars_sortBy', this.sortBy)
+    localStorage.setItem('galaxy_stars_sortDirection', this.sortDirection)
   },
   methods: {
     getUserPlayer () {
@@ -113,6 +120,10 @@ export default {
     sortedTableData () {
       // here be dragons
       const getNestedObject = (nestedObj, pathArr) => {
+        if (!Array.isArray(pathArr)) {
+          pathArr = pathArr.split(',')
+        }
+
         return pathArr.reduce((obj, key) =>
           (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
       }

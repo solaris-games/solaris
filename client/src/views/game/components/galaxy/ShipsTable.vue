@@ -57,6 +57,13 @@ export default {
   },
   mounted () {
     this.tableData = this.getTableData()
+    
+    this.sortBy = localStorage.getItem('galaxy_ships_sortBy') || null
+    this.sortDirection = localStorage.getItem('galaxy_ships_sortDirection') == 'true' || false
+  },
+  destroyed () {
+    localStorage.setItem('galaxy_ships_sortBy', this.sortBy)
+    localStorage.setItem('galaxy_ships_sortDirection', this.sortDirection)
   },
   methods: {
     getUserPlayer () {
