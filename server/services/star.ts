@@ -221,7 +221,8 @@ export default class StarService extends EventEmitter {
 
     isStarWithinScanningRangeOfStars(game: Game, star: Star, stars: Star[]) {
         // Pulsars are considered to be always in scanning range.
-        if (star.isPulsar) {
+        // Note: They are not visible until the game starts to prevent pre-teaming.
+        if (star.isPulsar && this.gameStateService.isStarted(game)) {
             return true;
         }
 
