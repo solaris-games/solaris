@@ -101,6 +101,7 @@ import MenuTitle from '../MenuTitle'
 import FormErrorList from '../../../components/FormErrorList'
 import GameHelper from '../../../../services/gameHelper'
 import CarrierApiService from '../../../../services/api/carrier'
+import GameContainer from '../../../../game/container'
 
 export default {
   components: {
@@ -143,6 +144,9 @@ export default {
   },
   methods: {
     onCloseRequested (e) {
+      GameContainer.map.unselectAllStars()
+      GameContainer.map.unselectAllCarriers()
+
       this.$emit('onCloseRequested', e)
     },
     swapValues () {
