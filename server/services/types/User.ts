@@ -70,6 +70,7 @@ export interface User {
     level?: UserLevel,
     achievements: {
         victories: number;
+        victories1v1: number;
         level: number;
         rank: number;
         eloRating: number | null;
@@ -78,6 +79,7 @@ export interface User {
         completed: number;
         quit: number;
         defeated: number;
+        defeated1v1: number;
         afk: number;
         combat: {
             kills: {

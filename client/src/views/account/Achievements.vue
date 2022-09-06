@@ -44,6 +44,10 @@
             <td>Victories</td>
             <td class="text-end">{{ user.achievements.victories }}</td>
           </tr>
+          <tr>
+            <td>Victories (1 vs. 1)</td>
+            <td class="text-end">{{ user.achievements.victories1v1 }}</td>
+          </tr>
         </tbody>
       </table>
       </div>
@@ -65,6 +69,10 @@
           <tr>
             <td>Defeated</td>
             <td class="text-end">{{ user.achievements.defeated }}</td>
+          </tr>
+          <tr>
+            <td>Defeated (1 vs. 1)</td>
+            <td class="text-end">{{ user.achievements.defeated1v1 }}</td>
           </tr>
           <tr>
             <td>Quit</td>

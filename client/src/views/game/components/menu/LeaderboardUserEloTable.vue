@@ -7,9 +7,10 @@
     <table class="table table-striped table-hover leaderboard-table">
       <thead class="table-dark">
         <th style="width: 5%">#</th>
-        <th style="width: 30%">Player</th>
-        <th style="width: 30%" class="d-none d-md-table-cell">Guild</th>
-        <th style="width: 10%" class="text-end sortable-header col">ELO</th>
+        <th style="width: 25%">Player</th>
+        <th style="width: 25%" class="d-none d-md-table-cell">Guild</th>
+        <th style="width: 10%" class="text-end col">W/L</th>
+        <th style="width: 10%" class="text-end col">ELO</th>
       </thead>
       <tbody>
         <tr v-for="player of leaderboard" :key="player._id" :class="{'bg-primary':$store.state.userId === player._id}">
@@ -28,6 +29,7 @@
               <span>{{player.guild.name}} [{{player.guild.tag}}]</span>
             </router-link>
           </td>
+          <td align="right">{{player.achievements.victories1v1}}/{{player.achievements.defeated1v1}}</td>
           <td align="right">{{player.achievements.eloRating}}</td>
         </tr>
       </tbody>

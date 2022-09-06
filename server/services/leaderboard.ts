@@ -461,7 +461,7 @@ export default class LeaderboardService {
             sort: {
                 'achievements.eloRating': -1,
                 'achievements.rank': -1,
-                'achievements.victories': -1,
+                'achievements.victories1v1': -1,
                 'achievements.renown': -1
             },
             select: {
@@ -474,6 +474,8 @@ export default class LeaderboardService {
                 'achievements.level': 1,
                 'achievements.rank': 1,
                 'achievements.victories': 1,
+                'achievements.victories1v1': 1,
+                'achievements.defeated1v1': 1,
                 'achievements.renown': 1,
                 'achievements.eloRating': 1
             }
@@ -758,7 +760,7 @@ export default class LeaderboardService {
         }
 
         user.achievements.victories++; // Increase the winner's victory count
-
+        
         // Note: We don't really care if its official or not, award a badge for any 32p games.
         if (this.gameTypeService.is32PlayerGame(game)) {
             this.badgeService.awardBadgeForUserVictor32PlayerGame(user);
@@ -790,10 +792,14 @@ export default class LeaderboardService {
 
         if (winningUser) {
             winningUserOldRating = winningUser.achievements.eloRating || 1200;
+
+            winningUser.achievements.victories1v1++;
         }
 
         if (losingUser) {
             losingUserOldRating = losingUser.achievements.eloRating || 1200;
+
+            losingUser.achievements.defeated1v1++;
         }
 
         this.ratingService.recalculateEloRating(winningUser, losingUser, true);

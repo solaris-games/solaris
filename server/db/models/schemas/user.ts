@@ -26,6 +26,7 @@ const schema = new Schema({
     },
     achievements: {
         victories: { type: Types.Number, default: 0 },
+        victories1v1: { type: Types.Number, default: 0 },
         level: { type: Types.Number, default: 1 },
         rank: { type: Types.Number, default: 0 },
         eloRating: { type: Types.Number, default: null },
@@ -34,6 +35,7 @@ const schema = new Schema({
         completed: { type: Types.Number, default: 0 },
         quit: { type: Types.Number, default: 0 },
         defeated: { type: Types.Number, default: 0 },
+        defeated1v1: { type: Types.Number, default: 0 },
         afk: { type: Types.Number, default: 0 },
         combat: {
             kills: {

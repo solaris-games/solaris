@@ -727,6 +727,10 @@ export default class GameTickService extends EventEmitter {
                 else {
                     if (user && !isTutorialGame) {
                         user.achievements.defeated++;
+
+                        if (this.gameTypeService.is1v1Game(game)) {
+                            user.achievements.defeated1v1++;
+                        }
                     }
 
                     let e: GamePlayerDefeatedEvent = {
