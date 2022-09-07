@@ -7,6 +7,7 @@ import UserService from '../../../services/user';
 import GameTypeService from '../../../services/gameType';
 import SpecialistBanService from "../../../services/specialistBan";
 import GameFluxService from "../../../services/gameFlux";
+import SpecialStarBanService from "../../../services/specialStarBan";
 
 export default class PublicCommandService {
     botResponseService: ResponseService;
@@ -18,6 +19,7 @@ export default class PublicCommandService {
     gameTypeService: GameTypeService;
     gameFluxService: GameFluxService;
     specialistBanService: SpecialistBanService;
+    specialStarBanService: SpecialStarBanService;
 
     constructor(
         botResponseService: ResponseService,
@@ -28,7 +30,8 @@ export default class PublicCommandService {
         userService: UserService,
         gameTypeService: GameTypeService,
         gameFluxService: GameFluxService,
-        specialistBanService: SpecialistBanService
+        specialistBanService: SpecialistBanService,
+        specialStarBanService: SpecialStarBanService
     ) {
         this.botResponseService = botResponseService;
         this.botHelperService = botHelperService;
@@ -39,6 +42,7 @@ export default class PublicCommandService {
         this.gameTypeService = gameTypeService;
         this.gameFluxService = gameFluxService;
         this.specialistBanService = specialistBanService;
+        this.specialStarBanService = specialStarBanService;
     }
 
     async gameinfo(msg, directions: string[]) {
@@ -398,12 +402,14 @@ export default class PublicCommandService {
         let authorId = msg.author.id;
 
         const amount = this.gameFluxService.getThisMonthSpecialistBanAmount();
-        const bans = this.specialistBanService.getCurrentMonthBans(amount);
+        const specialistBans = this.specialistBanService.getCurrentMonthBans(amount);
+        const specialStarBans = this.specialStarBanService.getCurrentMonthBans();
 
-        const starBans = bans.star.map(s => `- ${s.name}\n`);
-        const carrBans = bans.carrier.map(s => `- ${s.name}\n`);
+        const starBans = specialistBans.star.map(s => `- ${s.name}\n`).join('');
+        const carrBans = specialistBans.carrier.map(s => `- ${s.name}\n`).join('');
+        const specStarBans = specialStarBans.specialStar.map(s => `- ${s.name}\n`).join('');
 
-        let response = `Hey <@${authorId}>,\n\nThis month's specialist bans are as follows.\n\nStar specialists:\n${starBans}\n\nCarrier specialists:\n${carrBans}\n\nThe specialist ban list affects official games only and changes on the 1st of every month, for information see the wiki.`;
+        let response = `Hey <@${authorId}>,\n\nThis month's bans are as follows.\n\nStar specialists:\n${starBans}\n\nCarrier specialists:\n${carrBans}\n\Special stars:\n${specStarBans}\n\nThe ban list affects official games only and changes on the 1st of every month, for information see the wiki.`;
 
         return msg.channel.send(response);
     }

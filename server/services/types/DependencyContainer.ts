@@ -65,6 +65,7 @@ import WaypointService from "../waypoint";
 import NotificationService from "../notification";
 import DiscordService from "../discord";
 import UserLevelService from "../userLevel";
+import SpecialStarBanService from "../specialStarBan";
 
 export interface DependencyContainer {
     config: Config,
@@ -111,6 +112,7 @@ export interface DependencyContainer {
     specialistService: SpecialistService,
     specialistBanService: SpecialistBanService,
     specialistHireService: SpecialistHireService,
+    specialStarBanService: SpecialStarBanService;
     achievementService: AchievementService,
     conversationService: ConversationService,
     reputationService: ReputationService,

@@ -1,0 +1,26 @@
+[
+    {
+        "id": "randomWormHoles",
+        "name": "Worm Holes"
+    },
+    {
+        "id": "randomNebulas",
+        "name": "Nebulas"
+    },
+    {
+        "id": "randomAsteroidFields",
+        "name": "Asteroid Fields"
+    },
+    {
+        "id": "randomBlackHoles",
+        "name": "Black Holes"
+    },
+    {
+        "id": "randomBinaryStars",
+        "name": "Binary Stars"
+    },
+    {
+        "id": "randomPulsars",
+        "name": "Pulsars"
+    }
+]

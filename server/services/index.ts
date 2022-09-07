@@ -49,6 +49,7 @@ import LedgerService from './ledger';
 import SpecialistService from './specialist';
 import SpecialistBanService from './specialistBan';
 import SpecialistHireService from './specialistHire';
+import SpecialStarBanService from './specialStarBan';
 import AchievementService from './achievement';
 import ConversationService from './conversation';
 import ReputationService from './reputation';
@@ -116,6 +117,7 @@ export default (config, io): DependencyContainer => {
     const userService = new UserService(UserModel, userRepository, passwordService);
     const adminService = new AdminService(userRepository, gameRepository);
     const recaptchaService = new RecaptchaService(config);
+    const specialStarBanService = new SpecialStarBanService();
 
     const guildService = new GuildService(GuildModel, guildRepository, userRepository, userService);
     const guildUserService = new GuildUserService(userRepository, guildService);
@@ -184,7 +186,7 @@ export default (config, io): DependencyContainer => {
 
     const gameListService = new GameListService(gameRepository, gameService, conversationService, eventService, gameTypeService, leaderboardService);
     const gameCreateValidationService = new GameCreateValidationService(playerService, starService, carrierService, specialistService, gameTypeService);
-    const gameCreateService = new GameCreateService(GameModel, gameJoinService, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService, gameCreateValidationService, gameFluxService, specialistBanService, gameTypeService);
+    const gameCreateService = new GameCreateService(GameModel, gameJoinService, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService, gameCreateValidationService, gameFluxService, specialistBanService, specialStarBanService, gameTypeService);
 
     const notificationService = new NotificationService(config, userRepository, gameRepository, discordService, conversationService, gameService, gameJoinService, gameTickService, researchService, tradeService);
 
@@ -235,6 +237,7 @@ export default (config, io): DependencyContainer => {
         specialistService,
         specialistBanService,
         specialistHireService,
+        specialStarBanService,
         achievementService,
         conversationService,
         reputationService,

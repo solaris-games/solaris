@@ -6,7 +6,13 @@ export default (container: DependencyContainer, io) => {
         listBans: async (req, res, next) => {
             try {
                 const amount = container.gameFluxService.getThisMonthSpecialistBanAmount();
-                const bans = container.specialistBanService.getCurrentMonthBans(amount);
+                const specialistBans = container.specialistBanService.getCurrentMonthBans(amount);
+                const specialStarBans = container.specialStarBanService.getCurrentMonthBans();
+
+                const bans = {
+                    ...specialistBans,
+                    ...specialStarBans
+                }
     
                 return res.status(200).json(bans);
             } catch (err) {

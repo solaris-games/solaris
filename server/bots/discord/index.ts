@@ -87,7 +87,7 @@ async function startup() {
         botResponseService, botHelperService,
         container.gameGalaxyService, container.gameService,
         container.leaderboardService, container.userService, container.gameTypeService,
-        container.gameFluxService, container.specialistBanService);
+        container.gameFluxService, container.specialistBanService, container.specialStarBanService);
     privateCommandService = new PrivateCommandService();
 
     console.log('Discord Dependency Container Initialized');

@@ -2,7 +2,6 @@ import ValidationError from '../errors/validation';
 import { Game, GameSettings } from './types/Game';
 import AchievementService from './achievement';
 import ConversationService from './conversation';
-import GameService from './game';
 import GameCreateValidationService from './gameCreateValidation';
 import GameFluxService from './gameFlux';
 import GameListService from './gameList';
@@ -15,6 +14,7 @@ import PlayerService from './player';
 import SpecialistBanService from './specialistBan';
 import UserService from './user';
 import GameJoinService from './gameJoin';
+import SpecialStarBanService from './specialStarBan';
 
 const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
@@ -33,6 +33,7 @@ export default class GameCreateService {
     gameCreateValidationService: GameCreateValidationService;
     gameFluxService: GameFluxService;
     specialistBanService: SpecialistBanService;
+    specialStarBanService: SpecialStarBanService;
     gameTypeService: GameTypeService;
 
     constructor(
@@ -50,6 +51,7 @@ export default class GameCreateService {
         gameCreateValidationService: GameCreateValidationService,
         gameFluxService: GameFluxService,
         specialistBanService: SpecialistBanService,
+        specialStarBanService: SpecialStarBanService,
         gameTypeService: GameTypeService,
     ) {
         this.gameModel = gameModel;
@@ -66,6 +68,7 @@ export default class GameCreateService {
         this.gameCreateValidationService = gameCreateValidationService;
         this.gameFluxService = gameFluxService;
         this.specialistBanService = specialistBanService;
+        this.specialStarBanService = specialStarBanService;
         this.gameTypeService = gameTypeService;
     }
 
@@ -180,14 +183,27 @@ export default class GameCreateService {
             this.gameFluxService.applyCurrentFlux(game);
         }
 
-        // Apply spec bans if applicable.
-        if (game.settings.specialGalaxy.specialistCost !== 'none' && isOfficialGame && !isNewPlayerGame && !isTutorial) {
-            const banAmount = game.constants.specialists.monthlyBanAmount; // Random X specs of each type.
+        const canApplyBans = isOfficialGame && !isNewPlayerGame && !isTutorial;
 
-            game.settings.specialGalaxy.specialistBans = {
-                star: this.specialistBanService.getCurrentMonthStarBans(banAmount).map(s => s.id),
-                carrier: this.specialistBanService.getCurrentMonthCarrierBans(banAmount).map(s => s.id)
-            };
+        if (canApplyBans) {
+            // Apply spec bans if applicable.
+            if (game.settings.specialGalaxy.specialistCost !== 'none') {
+                const banAmount = game.constants.specialists.monthlyBanAmount; // Random X specs of each type.
+
+                game.settings.specialGalaxy.specialistBans = {
+                    star: this.specialistBanService.getCurrentMonthStarBans(banAmount).map(s => s.id),
+                    carrier: this.specialistBanService.getCurrentMonthCarrierBans(banAmount).map(s => s.id)
+                };
+            }
+
+            // Apply special star bans
+            const specialStarBans = this.specialStarBanService.getCurrentMonthBans().specialStar;
+
+            for (let specialStarBan of specialStarBans) {
+                if (game.settings.specialGalaxy[specialStarBan.id] != null) {
+                    game.settings.specialGalaxy[specialStarBan.id] = 0;
+                }
+            }
         }
 
         // Create all of the stars required.
