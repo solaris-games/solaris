@@ -838,8 +838,12 @@ export default class LeaderboardService {
             }
         }
 
-        if (isKingOfTheHillMode && this.gameStateService.isCountingDownToEnd(game) && this.gameStateService.hasReachedCountdownEnd(game)) {
-            return this.playerService.getKingOfTheHillPlayer(game) || this.getFirstPlacePlayer(leaderboard);
+        if (this.gameStateService.isCountingDownToEnd(game) && this.gameStateService.hasReachedCountdownEnd(game)) {
+            if (isKingOfTheHillMode) {
+                return this.playerService.getKingOfTheHillPlayer(game) || this.getFirstPlacePlayer(leaderboard);
+            }
+
+            return this.getFirstPlacePlayer(leaderboard);
         }
 
         let lastManStanding = this.getLastManStanding(game, leaderboard);
