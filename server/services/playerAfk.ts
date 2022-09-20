@@ -63,7 +63,7 @@ export default class PlayerAfkService extends EventEmitter {
             }
 
             // For capital star elimination games, if the player doesn't own their original home star then they are defeated.
-            if (this.gameTypeService.isCapitalStarEliminationMode(game) && !this.ownsOriginalHomeStar(game, player)) {
+            if (this.gameTypeService.isCapitalStarEliminationMode(game) && !this.playerService.ownsOriginalHomeStar(game, player)) {
                 this.playerService.setPlayerAsDefeated(game, player, false);
             }
         }
