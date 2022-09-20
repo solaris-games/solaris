@@ -42,13 +42,8 @@ export default async (config: Config, app, io, container: DependencyContainer) =
 
     // ---------------
     // Enable CORS
-    const allowedUrls = config.clientUrl!.split(','); // Allow multiple clients (i.e solaris.games and itch.io)
-
     app.use((req, res, next) => {
-        if (allowedUrls.includes(req.headers.origin)) {
-            res.header("Access-Control-Allow-Origin", req.headers.origin);
-        }
-
+        res.header("Access-Control-Allow-Origin", config.clientUrl);
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         res.header('Access-Control-Allow-Headers', 'Content-Type');
         res.header('Access-Control-Allow-Credentials', 'true');
