@@ -76,10 +76,11 @@ const schema = new Schema({
 			resourceDistribution: { type: Types.String, required: true, enum: ['random','weightedCenter'], default: 'random' },
 			playerDistribution: { type: Types.String, required: true, enum: ['circular','random'], default: 'circular' },
 			carrierSpeed: { type: Types.Number, required: true, min: 1, max: 25, default: 5 },
+			starCaptureReward: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'enabled' },
 			specialistBans: {
 				star: [{ type: Types.Number, required: false }],
 				carrier: [{ type: Types.Number, required: false }]
-			},
+			}
         },
 		conquest: {
 			victoryCondition: { type: Types.String, required: true, enum: ['starPercentage', 'homeStarPercentage'], default: 'starPercentage' },
@@ -104,14 +105,16 @@ const schema = new Schema({
 				science: { type: Types.Number, required: true, min: 0, max: 5, default: 1 }
 			},
 			developmentCost: {
-				economy: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' },
-				industry: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' },
-				science: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' }
+				// Note: 'none' means that players cannot build the infrastructure
+				economy: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'standard' },
+				industry: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'standard' },
+				science: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'standard' }
 			},
 			tradeCredits: { type: Types.Boolean, required: false, default: true },
 			tradeCreditsSpecialists: { type: Types.Boolean, required: false, default: true },
 			tradeCost: { type: Types.Number, required: true, enum: [0, 5, 15, 25, 50, 100], default: 15 }, // TODO: This could be renamed.
-			tradeScanning: { type: Types.String, required: true, enum: ['all', 'scanned'], default: 'all' }
+			tradeScanning: { type: Types.String, required: true, enum: ['all', 'scanned'], default: 'all' },
+			populationCap: { type: Types.String, required: true, enum: ['none', 'low', 'medium', 'high'], default: 'none' }
 		},
 		diplomacy: {
 			enabled: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
@@ -237,7 +240,12 @@ const schema = new Schema({
 		},
 		player: {
 			rankRewardMultiplier: { type: Types.Number, required: true, default: 1 },
-			bankingCycleRewardMultiplier: { type: Types.Number, required: true, default: 75 }
+			bankingCycleRewardMultiplier: { type: Types.Number, required: true, default: 75 },
+			populationCapMultiplier: {
+				low: { type: Types.Number, required: true, default: 250 },
+				medium: { type: Types.Number, required: true, default: 500 },
+				high: { type: Types.Number, required: true, default: 1000 }
+			}
 		},
 		specialists: {
 			monthlyBanAmount: { type: Types.Number, required: true, default: 3 }

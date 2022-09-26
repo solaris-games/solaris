@@ -9,17 +9,17 @@
       <span v-if="star.infrastructure" class="text-warning me-2" title="Industrial infrastructure - Contributes to ship production">{{star.infrastructure.industry}}</span>
       <span v-if="star.infrastructure" class="text-info" title="Scientific infrastructure - Contributes to technology research">{{star.infrastructure.science}}</span>
     </td>
-    <td class="text-end">
+    <td class="text-end" v-if="isEconomyEnabled">
       <span v-if="hasEconomyCost && !canUpgradeEconomy">${{star.upgradeCosts.economy}}</span>
       <a href="javascript:;" v-if="hasEconomyCost && canUpgradeEconomy"
         @click="upgradeEconomy()" :disabled="$isHistoricalMode()">${{star.upgradeCosts.economy}}</a>
     </td>
-    <td class="text-end">
+    <td class="text-end" v-if="isIndustryEnabled">
       <span v-if="hasIndustryCost && !canUpgradeIndustry">${{star.upgradeCosts.industry}}</span>
       <a href="javascript:;" v-if="hasIndustryCost && canUpgradeIndustry"
         @click="upgradeIndustry()" :disabled="$isHistoricalMode()">${{star.upgradeCosts.industry}}</a>
     </td>
-    <td class="text-end">
+    <td class="text-end" v-if="isScienceEnabled">
       <span v-if="hasScienceCost && !canUpgradeScience">${{star.upgradeCosts.science}}</span>
       <a href="javascript:;" v-if="hasScienceCost && canUpgradeScience"
         @click="upgradeScience()" :disabled="$isHistoricalMode()">${{star.upgradeCosts.science}}</a>
@@ -143,6 +143,15 @@ export default {
     },
     hasScienceCost () {
       return this.star.upgradeCosts && this.star.upgradeCosts.science
+    },
+    isEconomyEnabled: function () {
+      return this.$store.state.game.settings.player.developmentCost.economy !== 'none'
+    },
+    isIndustryEnabled: function () {
+      return this.$store.state.game.settings.player.developmentCost.industry !== 'none'
+    },
+    isScienceEnabled: function () {
+      return this.$store.state.game.settings.player.developmentCost.science !== 'none'
     },
     canUpgradeEconomy () {
       return this.allowUpgrades && this.star.upgradeCosts && this.star.upgradeCosts.economy && !this.isUpgradingEconomy && gameHelper.getUserPlayer(this.$store.state.game).credits >= this.star.upgradeCosts.economy

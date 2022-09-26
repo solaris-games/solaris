@@ -39,6 +39,7 @@
     "resourceDistribution": "random",
     "playerDistribution": "circular",
     "carrierSpeed": 10,
+    "starCaptureReward": "enabled",
     "specialistBans": {
       "star": [],
       "carrier": []
@@ -71,7 +72,8 @@
     "tradeCredits": false,
     "tradeCreditsSpecialists": false,
     "tradeCost": 0,
-    "tradeScanning": "all"
+    "tradeScanning": "all",
+    "populationCap": "none"
   },
   "diplomacy": {
     "enabled": "disabled",

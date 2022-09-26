@@ -1,9 +1,9 @@
 {
   "general": {
     "name": "[[[RANDOM]]]",
-    "description": "Fight for and hold the galactic center in this tense game. Who will be crowned king?",
-    "type": "special_kingOfTheHill",
-    "mode": "kingOfTheHill",
+    "description": "Stars in this galaxy cannot be upgraded and ship population is limited, this mode requires cunning tactics to win.",
+    "type": "special_arcade",
+    "mode": "arcade",
     "password": null,
     "playerLimit": 8,
     "playerType": "establishedPlayers",
@@ -14,8 +14,8 @@
     "advancedAI": "enabled"
   },
   "galaxy": {
-    "galaxyType": "circular",
-    "starsPerPlayer": 10,
+    "galaxyType": "irregular",
+    "starsPerPlayer": 20,
     "productionTicks": 20
   },
   "specialGalaxy": {
@@ -36,10 +36,10 @@
     "defenderBonus": "enabled",
     "carrierToCarrierCombat": "enabled",
     "splitResources": "disabled",
-    "resourceDistribution": "weightedCenter",
+    "resourceDistribution": "random",
     "playerDistribution": "circular",
     "carrierSpeed": 10,
-    "starCaptureReward": "enabled",
+    "starCaptureReward": "disabled",
     "specialistBans": {
       "star": [],
       "carrier": []
@@ -47,33 +47,36 @@
   },
   "conquest": {
     "victoryCondition": "starPercentage",
-    "victoryPercentage": 100,
+    "victoryPercentage": 50,
     "capitalStarElimination": "disabled"
+  },
+  "kingOfTheHill": {
+    "productionCycles": 10
   },
   "orbitalMechanics": {
     "enabled": "disabled",
     "orbitSpeed": 3
   },
   "player": {
-    "startingStars": 3,
-    "startingCredits": 500,
+    "startingStars": 6,
+    "startingCredits": 100,
     "startingCreditsSpecialists": 5,
     "startingShips": 10,
     "startingInfrastructure": {
       "economy": 5,
-      "industry": 5,
+      "industry": 3,
       "science": 1
     },
     "developmentCost": {
-      "economy": "standard",
-      "industry": "standard",
-      "science": "standard"
+      "economy": "none",
+      "industry": "none",
+      "science": "none"
     },
     "tradeCredits": true,
     "tradeCreditsSpecialists": true,
     "tradeCost": 15,
     "tradeScanning": "scanned",
-    "populationCap": "none"
+    "populationCap": "medium"
   },
   "diplomacy": {
     "enabled": "enabled",
@@ -111,7 +114,10 @@
     "gameType": "realTime",
     "speed": 1800,
     "isTickLimited": "disabled",
+    "tickLimit": 1000,
     "startDelay": 240,
+    "turnJumps":6,
+    "maxTurnWait":1440,
     "afk": {
       "lastSeenTimeout": 2,
       "cycleTimeout": 3,

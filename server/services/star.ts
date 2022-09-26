@@ -19,6 +19,7 @@ import SpecialistService from './specialist';
 import StarDistanceService from './starDistance';
 import TechnologyService from './technology';
 import UserService from './user';
+const RNG = require('random-seed');
 
 export const StarServiceEvents = {
     onPlayerStarAbandoned: 'onPlayerStarAbandoned',
@@ -159,7 +160,7 @@ export default class StarService extends EventEmitter {
             homeStar.naturalResources.science = game.constants.star.resources.maxNaturalResources;
         }
 
-        // ONLY the home star gets the starting infrastructure.
+        // Seed the home star with the starting infrastructure.
         homeStar.infrastructure.economy = gameSettings.player.startingInfrastructure.economy;
         homeStar.infrastructure.industry = gameSettings.player.startingInfrastructure.industry;
         homeStar.infrastructure.science = gameSettings.player.startingInfrastructure.science;
@@ -371,11 +372,6 @@ export default class StarService extends EventEmitter {
 
     calculateTerraformedResource(naturalResource: number, terraforming: number) {        
         return Math.floor(naturalResource + (5 * terraforming));
-    }
-
-    calculateStarShipsByTicks(techLevel: number, industryLevel: number, ticks: number = 1, productionTicks: number = 24) {
-        // A star produces Y*(X+5) ships every 24 ticks where X is your manufacturing tech level and Y is the amount of industry at a star.
-        return +((industryLevel * (techLevel + 5) / productionTicks) * ticks).toFixed(2);
     }
 
     async abandonStar(game: Game, player: Player, starId: DBObjectId) {
@@ -606,22 +602,6 @@ export default class StarService extends EventEmitter {
         }
     }
 
-    produceShips(game: Game) {
-        let starsToProduce = game.galaxy.stars.filter(s => s.infrastructure.industry! > 0);
-
-        for (let i = 0; i < starsToProduce.length; i++) {
-            let star = starsToProduce[i];
-
-            if (star.ownedByPlayerId) {
-                let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
-
-                // Increase the number of ships garrisoned by how many are manufactured this tick.
-                star.shipsActual! += this.calculateStarShipsByTicks(effectiveTechs.manufacturing, star.infrastructure.industry!, 1, game.settings.galaxy.productionTicks);
-                star.ships = Math.floor(star.shipsActual!);
-            }
-        }
-    }
-
     async toggleIgnoreBulkUpgrade(game: Game, player: Player, starId: DBObjectId, infrastructureType: InfrastructureType) {
         let star = this.getById(game, starId);
 
@@ -692,18 +672,26 @@ export default class StarService extends EventEmitter {
         let newStarUser = attackerUsers.find(u => newStarPlayer.userId && u._id.toString() === newStarPlayer.userId.toString());
         let newStarPlayerCarriers = attackerCarriers.filter(c => c.ownedByPlayerId!.toString() === newStarPlayer._id.toString());
 
-        let captureReward = star.infrastructure.economy! * game.constants.star.captureRewardMultiplier; // Attacker gets X credits for every eco destroyed.
-
-        // Check to see whether to double the capture reward.
-        let captureRewardMultiplier = this.specialistService.hasAwardDoubleCaptureRewardSpecialist(newStarPlayerCarriers);
-
-        captureReward *= captureRewardMultiplier;
-
         star.ownedByPlayerId = newStarPlayer._id;
-        newStarPlayer.credits += captureReward;
-        star.infrastructure.economy = 0;
         star.shipsActual = 0;
         star.ships = 0;
+
+        // If star capture reward is enabled, destroy the economic infrastructure
+        // and add the capture amount to the attacker
+        let captureReward = 0;
+
+        if (game.settings.specialGalaxy.starCaptureReward === 'enabled') {
+            captureReward = star.infrastructure.economy! * game.constants.star.captureRewardMultiplier; // Attacker gets X credits for every eco destroyed.
+    
+            // Check to see whether to double the capture reward.
+            let captureRewardMultiplier = this.specialistService.hasAwardDoubleCaptureRewardSpecialist(newStarPlayerCarriers);
+    
+            captureReward *= captureRewardMultiplier;
+
+            newStarPlayer.credits += captureReward;
+
+            star.infrastructure.economy = 0;
+        }
 
         // Reset the ignore bulk upgrade statuses as it has been captured by a new player.
         this.resetIgnoreBulkUpgradeStatuses(star);
@@ -767,4 +755,58 @@ export default class StarService extends EventEmitter {
         return star.location.x === center.x && star.location.y === center.y;
     }
 
+    setupPlayerStarForGameStart(game: Game, star: Star, player: Player, resetWarpGates: boolean) {
+        if (player.homeStarId!.toString() === star._id.toString()) {
+            this.starService.setupHomeStar(game, star, player, game.settings);
+        } else {
+            star.ownedByPlayerId = player._id;
+            star.shipsActual = game.settings.player.startingShips;
+            star.ships = star.shipsActual;
+
+            star.warpGate = star.warpGate ?? false;
+            star.specialistId = star.specialistId ?? null;
+            star.infrastructure.economy = star.infrastructure.economy ?? 0;
+            star.infrastructure.industry = star.infrastructure.industry ?? 0;
+            star.infrastructure.science = star.infrastructure.science ?? 0;
+
+            if (resetWarpGates) {
+                star.warpGate = false;
+            }
+
+            this.resetIgnoreBulkUpgradeStatuses(star);
+        }
+    }
+
+    setupStarsForGameStart(game: Game) {
+        // If any of the development costs are set to null then we need to randomly
+        // assign a portion of stars for each type to be seeded with the starting infrastructure.
+        // For example, if eco is disabled then each star in the galaxy will have a 1 in 3 chance of being seeded with eco.
+        // Note that we will not allow a mix of seeds, a star can only be seeded with one infrastructure type.
+        if (game.settings.player.developmentCost.economy !== 'none' &&
+            game.settings.player.developmentCost.industry !== 'none' &&
+            game.settings.player.developmentCost.science !== 'none') {
+                return
+            }
+        
+        // Note: Because each setting is independent, we only want to seed the
+        // ones where the development cost is set to none.
+        const types: (InfrastructureType | null)[] = [
+            game.settings.player.developmentCost.economy === 'none' ? 'economy' : null,
+            game.settings.player.developmentCost.industry === 'none' ? 'industry' : null,
+            game.settings.player.developmentCost.science === 'none' ? 'science' : null,
+        ]
+
+        const rng = RNG.create(game._id.toString());
+
+        for (let star of game.galaxy.stars) {
+            const i = rng(types.length);
+            const type = types[i];
+
+            if (type == null) {
+                continue;
+            }
+
+            star.infrastructure[type] = game.settings.player.startingInfrastructure[type];
+        }
+    }
 }

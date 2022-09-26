@@ -43,8 +43,8 @@ export type GameResourceDistribution = 'random'|'weightedCenter';
 export type GamePlayerDistribution = 'circular'|'random';
 export type GameVictoryCondition = 'starPercentage'|'homeStarPercentage';
 export type GameVictoryPercentage = 25|33|50|66|75|90|100;
-export type GameInfrastructureCost = 'cheap'|'standard'|'expensive';
-export type GameInfrastructureExpenseMultiplier = 'cheap'|'standard'|'expensive'|'crazyExpensive';
+export type GameInfrastructureCost = 'none'|'cheap'|'standard'|'expensive';
+export type GameInfrastructureExpenseMultiplier = 'none'|'cheap'|'standard'|'expensive'|'crazyExpensive';
 export type GameTradeCost = 0|5|15|25|50|100;
 export type GameTradeScanning = 'all'|'scanned';
 export type GameResearchCost = 'none'|'cheap'|'standard'|'expensive'|'veryExpensive'|'crazyExpensive';
@@ -55,6 +55,7 @@ export type GameTimeType = 'realTime'|'turnBased';
 export type GameTimeSpeed = 30|60|300|600|1800|3600|7200;
 export type GameTimeStartDelay = 0|1|5|10|30|60|120|240|360|480|600|720|1440;
 export type GameTimeMaxTurnWait = 1|5|10|30|60|360|480|600|720|1080|1440|2880;
+export type GameSettingPopulationCap = 'none'|'low'|'medium'|'high';
 
 export interface GameFlux {
 	id: number;
@@ -112,6 +113,7 @@ export interface GameSettings {
 		resourceDistribution: GameResourceDistribution;
 		playerDistribution: GamePlayerDistribution;
 		carrierSpeed: number;
+		starCaptureReward: GameSettingEnabledDisabled;
 		specialistBans: {
 			star: number[];
 			carrier: number[];
@@ -148,6 +150,7 @@ export interface GameSettings {
 		tradeCreditsSpecialists: boolean;
 		tradeCost: GameTradeCost;
 		tradeScanning: GameTradeScanning;
+		populationCap: GameSettingPopulationCap;
   	},
 	diplomacy: {
 		enabled: GameSettingEnabledDisabled;
@@ -287,6 +290,11 @@ export interface Game {
 		player: {
 			rankRewardMultiplier: number;
 			bankingCycleRewardMultiplier: number;
+			populationCapMultiplier: {
+				low: number;
+				medium: number;
+				high: number;
+			}
 		},
 		specialists: {
 			monthlyBanAmount: number;

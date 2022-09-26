@@ -412,6 +412,15 @@
               </option>
             </select>
           </div>
+
+          <div class="mb-2">
+            <label for="starCaptureReward" class="col-form-label">Star Capture Rewards <help-tooltip tooltip="Determines whether economic infrastructure is destroyed on star capture and if the attacker is awarded cash for destroying them"/></label>
+            <select class="form-control" id="starCaptureReward" v-model="settings.specialGalaxy.starCaptureReward" :disabled="isCreatingGame">
+              <option v-for="opt in options.specialGalaxy.starCaptureReward" v-bind:key="opt.value" v-bind:value="opt.value">
+                {{ opt.text }}
+              </option>
+            </select>
+          </div>
         </div>
       </view-collapse-panel>
 
@@ -502,6 +511,15 @@
             </option>
           </select>
         </div>
+
+        <div class="mb-2">
+          <label for="populationCap" class="col-form-label">Ship Population Cap <help-tooltip tooltip="If enabled, the maximum ship population per player will be restricted"/></label>
+          <select class="form-control" id="populationCap" v-model="settings.player.populationCap" :disabled="isCreatingGame">
+            <option v-for="opt in options.player.populationCap" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
       </view-collapse-panel>
 
       <view-collapse-panel title="Formal Alliances">
@@ -568,7 +586,7 @@
         </div>
 
         <div class="mb-2">
-          <label for="economyCost" class="col-form-label">Development Cost <help-tooltip tooltip="Determines how expensive infrastructure costs to build"/></label>
+          <label for="economyCost" class="col-form-label">Development Cost <help-tooltip tooltip="Determines how expensive infrastructure costs to build. If disabled, then one third of all stars will start with the starting infrastructure"/></label>
           <select class="form-control" id="economyCost" v-model="settings.player.developmentCost.economy" :disabled="isCreatingGame">
             <option v-for="opt in options.player.developmentCost" v-bind:key="opt.value" v-bind:value="opt.value">
               {{ opt.text }} Economy

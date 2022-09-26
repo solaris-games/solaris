@@ -15,6 +15,7 @@ import SpecialistBanService from './specialistBan';
 import UserService from './user';
 import GameJoinService from './gameJoin';
 import SpecialStarBanService from './specialStarBan';
+import StarService from './star';
 
 const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
@@ -35,6 +36,7 @@ export default class GameCreateService {
     specialistBanService: SpecialistBanService;
     specialStarBanService: SpecialStarBanService;
     gameTypeService: GameTypeService;
+    starService: StarService;
 
     constructor(
         gameModel,
@@ -53,6 +55,7 @@ export default class GameCreateService {
         specialistBanService: SpecialistBanService,
         specialStarBanService: SpecialStarBanService,
         gameTypeService: GameTypeService,
+        starService: StarService
     ) {
         this.gameModel = gameModel;
         this.gameJoinService = gameJoinService;
@@ -70,6 +73,7 @@ export default class GameCreateService {
         this.specialistBanService = specialistBanService;
         this.specialStarBanService = specialStarBanService;
         this.gameTypeService = gameTypeService;
+        this.starService = starService;
     }
 
     async create(settings: GameSettings) {
@@ -190,9 +194,13 @@ export default class GameCreateService {
             if (game.settings.specialGalaxy.specialistCost !== 'none') {
                 const banAmount = game.constants.specialists.monthlyBanAmount; // Random X specs of each type.
 
+                const starBans = this.specialistBanService.getCurrentMonthStarBans(banAmount).map(s => s.id);
+                const carrierBans = this.specialistBanService.getCurrentMonthCarrierBans(banAmount).map(s => s.id);
+
+                // Append bans to any existing ones configured.
                 game.settings.specialGalaxy.specialistBans = {
-                    star: this.specialistBanService.getCurrentMonthStarBans(banAmount).map(s => s.id),
-                    carrier: this.specialistBanService.getCurrentMonthCarrierBans(banAmount).map(s => s.id)
+                    star: [...new Set(game.settings.specialGalaxy.specialistBans.star.concat(starBans))],
+                    carrier: [...new Set(game.settings.specialGalaxy.specialistBans.carrier.concat(carrierBans))]
                 };
             }
 
@@ -220,6 +228,8 @@ export default class GameCreateService {
         game.galaxy.stars = starGeneration.stars;
         game.galaxy.homeStars = starGeneration.homeStars;
         game.galaxy.linkedStars = starGeneration.linkedStars;
+
+        this.starService.setupStarsForGameStart(game);
         
         // Setup players and assign to their starting positions.
         game.galaxy.players = this.playerService.createEmptyPlayers(game);

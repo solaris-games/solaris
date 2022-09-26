@@ -37,9 +37,9 @@
                   <!-- <td class="text-end"><a href="javascript:;" @click="sort(['infrastructure','economy'])"><i class="fas fa-money-bill-wave"></i></a></td>
                   <td class="text-end"><a href="javascript:;" @click="sort(['infrastructure','industry'])"><i class="fas fa-tools"></i></a></td>
                   <td class="text-end"><a href="javascript:;" @click="sort(['infrastructure','science'])"><i class="fas fa-flask"></i></a></td> -->
-                  <td class="text-end"><a href="javascript:;" @click="sort(['upgradeCosts','economy'])">$E</a></td>
-                  <td class="text-end"><a href="javascript:;" @click="sort(['upgradeCosts','industry'])">$I</a></td>
-                  <td class="text-end"><a href="javascript:;" @click="sort(['upgradeCosts','science'])">$S</a></td>
+                  <td class="text-end" v-if="isEconomyEnabled"><a href="javascript:;" @click="sort(['upgradeCosts','economy'])">$E</a></td>
+                  <td class="text-end" v-if="isIndustryEnabled"><a href="javascript:;" @click="sort(['upgradeCosts','industry'])">$I</a></td>
+                  <td class="text-end" v-if="isScienceEnabled"><a href="javascript:;" @click="sort(['upgradeCosts','science'])">$S</a></td>
               </tr>
           </thead>
           <tbody>
@@ -160,6 +160,15 @@ export default {
               return ao < bo ? 1 : -1;
           }
         })
+    },
+    isEconomyEnabled: function () {
+      return this.$store.state.game.settings.player.developmentCost.economy !== 'none'
+    },
+    isIndustryEnabled: function () {
+      return this.$store.state.game.settings.player.developmentCost.industry !== 'none'
+    },
+    isScienceEnabled: function () {
+      return this.$store.state.game.settings.player.developmentCost.science !== 'none'
     },
     isGameFinished: function () {
       return GameHelper.isGameFinished(this.$store.state.game)

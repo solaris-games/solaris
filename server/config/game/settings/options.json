@@ -273,6 +273,16 @@
              "value":25,
              "text":"Crazy Fast"
           }
+       ],
+       "starCaptureReward": [
+         {
+            "value":"enabled",
+            "text":"Enabled"
+         },
+         {
+            "value":"disabled",
+            "text":"Disabled"
+         }
        ]
     },
     "galaxy":{
@@ -363,6 +373,10 @@
     "player":{
        "developmentCost":[
           {
+            "value":"none",
+            "text":"Disabled"
+          },
+          {
              "value":"cheap",
              "text":"Cheap"
           },
@@ -430,6 +444,24 @@
              "value":"scanned",
              "text":"Trade with scanned players only"
           }
+       ],
+       "populationCap": [
+         {
+            "value":"none",
+            "text":"None"
+         },
+         {
+            "value":"low",
+            "text":"Low"
+         },
+         {
+            "value":"medium",
+            "text":"Medium"
+         },
+         {
+            "value":"high",
+            "text":"High"
+         }
        ]
     },
     "diplomacy":{

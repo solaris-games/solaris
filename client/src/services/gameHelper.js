@@ -1075,6 +1075,10 @@ class GameHelper {
 
     return result
   }
+
+  isPopulationCapped(game) {
+    return game.settings.player.populationCap !== 'none'
+  }
 }
 
 export default new GameHelper()

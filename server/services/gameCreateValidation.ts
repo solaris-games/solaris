@@ -144,14 +144,6 @@ export default class GameCreateValidationService {
                 throw new ValidationError(`All capital stars must start with valid starting infrastructure.`);
             }
 
-            if (!star.homeStar && (
-                star.infrastructure.economy! > 0
-                || star.infrastructure.industry! > 0
-                || star.infrastructure.science! > 0
-            )) {
-                throw new ValidationError(`All non capital stars must start with 0 starting infrastructure.`);
-            }
-
             // Assert that dead stars have valid infrastructure
             if (this.starService.isDeadStar(star)
                 && (

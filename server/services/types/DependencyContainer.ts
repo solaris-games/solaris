@@ -66,6 +66,7 @@ import NotificationService from "../notification";
 import DiscordService from "../discord";
 import UserLevelService from "../userLevel";
 import SpecialStarBanService from "../specialStarBan";
+import StarShipService from "../starShip";
 
 export interface DependencyContainer {
     config: Config,
@@ -136,4 +137,5 @@ export interface DependencyContainer {
     starContestedService: StarContestedService,
     gameFluxService: GameFluxService,
     notificationService: NotificationService,
+    starShipService: StarShipService,
 };

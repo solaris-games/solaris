@@ -278,7 +278,7 @@ export default class PlayerService extends EventEmitter {
             for (let starId of linkedStars) {
                 let star = this.starService.getById(game, starId);
 
-                this.setupStarForGameStart(game, star, player, false);
+                this.starService.setupPlayerStarForGameStart(game, star, player, false);
             }
         }
     }
@@ -298,31 +298,8 @@ export default class PlayerService extends EventEmitter {
                 let s = this.starDistanceService.getClosestUnownedStar(homeStar, game.galaxy.stars);
 
                 // Set up the closest star.
-                this.setupStarForGameStart(game, s, player, false);
+                this.starService.setupPlayerStarForGameStart(game, s, player, false);
             }
-        }
-    }
-
-    // TODO: Shouldn't this be in the starService?
-    setupStarForGameStart(game: Game, star: Star, player: Player, resetWarpGates: boolean) {
-        if (player.homeStarId!.toString() === star._id.toString()) {
-            this.starService.setupHomeStar(game, star, player, game.settings);
-        } else {
-            star.ownedByPlayerId = player._id;
-            star.shipsActual = game.settings.player.startingShips;
-            star.ships = star.shipsActual;
-
-            star.warpGate = star.warpGate ?? false;
-            star.specialistId = star.specialistId ?? null;
-            star.infrastructure.economy = star.infrastructure.economy ?? 0;
-            star.infrastructure.industry = star.infrastructure.industry ?? 0;
-            star.infrastructure.science = star.infrastructure.science ?? 0;
-
-            if (resetWarpGates) {
-                star.warpGate = false;
-            }
-
-            this.starService.resetIgnoreBulkUpgradeStatuses(star);
         }
     }
 
@@ -344,7 +321,7 @@ export default class PlayerService extends EventEmitter {
         let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
         for (let star of playerStars) {
-            this.setupStarForGameStart(game, star, player, true);
+            this.starService.setupPlayerStarForGameStart(game, star, player, true);
         }
 
         // Reset the player's carriers

@@ -7,23 +7,27 @@ import SpecialistService from './specialist';
 import StarService from './star';
 import TechnologyService from './technology';
 import { PlayerStatistics } from './types/Leaderboard';
+import StarShipService from './starShip';
 
 export default class PlayerStatisticsService {
     starService: StarService;
     carrierService: CarrierService;
     technologyService: TechnologyService;
     specialistService: SpecialistService;
+    starShipService: StarShipService;
 
     constructor(
         starService: StarService,
         carrierService: CarrierService,
         technologyService: TechnologyService,
-        specialistService: SpecialistService
+        specialistService: SpecialistService,
+        starShipService: StarShipService
     ) {
         this.starService = starService;
         this.carrierService = carrierService;
         this.technologyService = technologyService;
         this.specialistService = specialistService;
+        this.starShipService = starShipService;
     }
 
     getStats(game: Game, player: Player): PlayerStatistics {
@@ -46,6 +50,7 @@ export default class PlayerStatisticsService {
             totalHomeStars: totalHomeStars,
             totalCarriers: playerCarriers.length,
             totalShips: this.calculateTotalShips(playerStars, playerCarriers),
+            totalShipsMax: this.starShipService.calculatePopulationCap(game, playerStars),
             totalEconomy: this.calculateTotalEconomy(playerStars),
             totalIndustry: this.calculateTotalIndustry(playerStars),
             totalScience: this.calculateTotalScience(playerStars),
@@ -110,7 +115,7 @@ export default class PlayerStatisticsService {
             let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, s);
             let ind = s.infrastructure?.industry ?? 0;
 
-            s.manufacturing = this.starService.calculateStarShipsByTicks(effectiveTechs.manufacturing, ind, 1, game.settings.galaxy.productionTicks)
+            s.manufacturing = this.starShipService.calculateStarShipsByTicks(effectiveTechs.manufacturing, ind, 1, game.settings.galaxy.productionTicks);
         });
 
         let totalManufacturing = playerStars.reduce((sum, s) => sum + s.manufacturing!, 0);

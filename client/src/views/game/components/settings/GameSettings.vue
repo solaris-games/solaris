@@ -276,6 +276,11 @@
             :valueText="(game.settings.specialGalaxy.carrierSpeed / game.constants.distances.lightYear)+'/ly tick'"
             :value="game.settings.specialGalaxy.carrierSpeed"
             :compareValue="compareSettings.specialGalaxy.carrierSpeed"/>
+          <game-setting-value title="Star Capture Rewards"
+            tooltip="Determines whether economic infrastructure is destroyed on star capture and if the attacker is awarded cash for destroying them"
+            :valueText="getFriendlyText(game.settings.specialGalaxy.starCaptureReward)"
+            :value="game.settings.specialGalaxy.starCaptureReward"
+            :compareValue="compareSettings.specialGalaxy.starCaptureReward"/>
         </tbody>
       </table>
     </div>
@@ -340,17 +345,17 @@
             :value="game.settings.player.startingInfrastructure.science"
             :compareValue="compareSettings.player.startingInfrastructure.science"/>
           <game-setting-value title="Economy Cost"
-            tooltip="Determines how expensive infrastructure costs to build"
+            tooltip="Determines how expensive infrastructure costs to build. If disabled, then one third of all stars will start with the starting economic infrastructure"
             :valueText="getFriendlyText(game.settings.player.developmentCost.economy)"
             :value="game.settings.player.developmentCost.economy"
             :compareValue="compareSettings.player.developmentCost.economy"/>
           <game-setting-value title="Industry Cost"
-            tooltip="Determines how expensive infrastructure costs to build"
+            tooltip="Determines how expensive infrastructure costs to build. If disabled, then one third of all stars will start with the starting industry infrastructure"
             :valueText="getFriendlyText(game.settings.player.developmentCost.industry)"
             :value="game.settings.player.developmentCost.industry"
             :compareValue="compareSettings.player.developmentCost.industry"/>
           <game-setting-value title="Science Cost"
-            tooltip="Determines how expensive infrastructure costs to build"
+            tooltip="Determines how expensive infrastructure costs to build. If disabled, then one third of all stars will start with the starting science infrastructure"
             :valueText="getFriendlyText(game.settings.player.developmentCost.science)"
             :value="game.settings.player.developmentCost.science"
             :compareValue="compareSettings.player.developmentCost.science"/>
@@ -376,6 +381,11 @@
             :value="game.settings.player.tradeScanning"
             :compareValue="compareSettings.player.tradeScanning"
             v-if="game.settings.player.tradeCost > 0"/>
+          <game-setting-value title="Ship Population Cap"
+            tooltip="If enabled, the maximum ship population per player will be restricted"
+            :valueText="getFriendlyText(game.settings.player.populationCap)"
+            :value="game.settings.player.populationCap"
+            :compareValue="compareSettings.player.populationCap"/>
         </tbody>
       </table>
     </div>
@@ -600,7 +610,10 @@ export default {
         'galacticCenterOfMass': 'Galactic Center of Mass',
         'starPercentage': 'Star Percentage',
         'homeStarPercentage': 'Capital Star Percentage',
-        'kingOfTheHill': 'King Of The Hill'
+        'kingOfTheHill': 'King Of The Hill',
+        'low': 'Low',
+        'medium': 'Medium',
+        'high': 'High'
       }[option]
 
       return text || option

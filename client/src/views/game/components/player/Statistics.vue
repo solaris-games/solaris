@@ -39,7 +39,7 @@
           </tr>
           <tr>
               <td>Ships</td>
-              <td class="text-end">{{player.stats.totalShips}}</td>
+              <td class="text-end">{{player.stats.totalShips}}<span v-if="player.stats.totalShipsMax">/{{player.stats.totalShipsMax}}</span></td>
               <td class="text-end" v-if="userIsInGame() && !isUserPlayer()"
                 :class="{'text-danger': player.stats.totalShips > userPlayer.stats.totalShips,
                           'text-success': player.stats.totalShips < userPlayer.stats.totalShips}">{{userPlayer.stats.totalShips}}</td>
