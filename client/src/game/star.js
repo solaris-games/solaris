@@ -851,7 +851,7 @@ class Star extends EventEmitter {
       }
     }
 
-    this.graphics_star.visible = !this.hasSpecialist() || this.hasBlackHole()
+    this.graphics_star.visible = !this.hasSpecialist() //|| this.hasBlackHole()
     this.graphics_hyperspaceRange.visible = this.isSelected
     this.graphics_scanningRange.visible = this.isSelected
 
