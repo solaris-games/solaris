@@ -33,7 +33,8 @@ const schema = new Schema({
 				'special_anonymous',
 				'special_kingOfTheHill',
 				'special_tinyGalaxy',
-				'special_freeForAll'
+				'special_freeForAll',
+				'special_arcade'
 			], default: 'custom' },
 			mode: { type: Types.String, required: true, enum: [
 				'conquest', 'battleRoyale', 'kingOfTheHill'

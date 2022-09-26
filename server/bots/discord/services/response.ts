@@ -571,6 +571,7 @@ export default class ReponseService {
         'special_kingOfTheHill': 'King Of The Hill',
         'special_tinyGalaxy': 'Tiny Galaxy',
         'special_freeForAll': 'Free For All',
+        'special_arcade': 'Arcade',
         'scanning': 'Scanning',
         'hyperspace': 'Hyperspace Range',
         'terraforming': 'Terraforming',

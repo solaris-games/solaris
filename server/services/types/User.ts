@@ -150,6 +150,7 @@ export interface User {
             special_kingOfTheHill: number;
             special_tinyGalaxy: number;
             special_freeForAll: number;
+            special_arcade: number;
         }
     },
     gameSettings: {

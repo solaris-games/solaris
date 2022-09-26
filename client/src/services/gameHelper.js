@@ -1027,7 +1027,8 @@ class GameHelper {
       'special_anonymous': 'Anonymous',
       'special_kingOfTheHill': 'King Of The Hill',
       'special_tinyGalaxy': 'Tiny Galaxy',
-      'special_freeForAll': 'Free For All'
+      'special_freeForAll': 'Free For All',
+      'special_arcade': 'Arcade'
     }[game.settings.general.type]
   }
 

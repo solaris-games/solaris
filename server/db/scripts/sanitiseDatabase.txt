@@ -98,7 +98,8 @@ db.users.updateMany({}, {
                 special_anonymous: 0,
                 special_kingOfTheHill: 0,
                 special_tinyGalaxy: 0,
-                special_freeForAll: 0
+                special_freeForAll: 0,
+                special_arcade: 0
             }
         }
     }

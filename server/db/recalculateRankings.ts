@@ -66,7 +66,8 @@ async function startup() {
             'achievements.badges.special_anonymous': 0,
             'achievements.badges.special_kingOfTheHill': 0,
             'achievements.badges.special_tinyGalaxy': 0,
-            'achievements.badges.special_freeForAll': 0
+            'achievements.badges.special_freeForAll': 0,
+            'achievements.badges.special_arcade': 0,
         }
     });
     console.log(`Done.`);
@@ -185,7 +186,8 @@ async function startup() {
                     'achievements.badges.special_anonymous': user.achievements.badges.special_anonymous,
                     'achievements.badges.special_kingOfTheHill': user.achievements.badges.special_kingOfTheHill,
                     'achievements.badges.special_tinyGalaxy': user.achievements.badges.special_tinyGalaxy,
-                    'achievements.badges.special_freeForAll': user.achievements.badges.special_freeForAll
+                    'achievements.badges.special_freeForAll': user.achievements.badges.special_freeForAll,
+                    'achievements.badges.special_arcade': user.achievements.badges.special_arcade,
                 }
             }
         }

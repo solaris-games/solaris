@@ -23,7 +23,8 @@ export type GameType = 'tutorial'|
 'special_anonymous'|
 'special_kingOfTheHill'|
 'special_tinyGalaxy'|
-'special_freeForAll';
+'special_freeForAll'|
+'special_arcade';
 
 export type GameMode = 'conquest'|'battleRoyale'|'kingOfTheHill';
 export type GamePlayerType = 'all'|'establishedPlayers';

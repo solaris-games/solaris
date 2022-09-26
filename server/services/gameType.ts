@@ -33,7 +33,8 @@ export default class GameTypeService {
             'special_anonymous',
             'special_kingOfTheHill',
             'special_tinyGalaxy',
-            'special_freeForAll'
+            'special_freeForAll',
+            'special_arcade'
         ].includes(game.settings.general.type);
     }
 

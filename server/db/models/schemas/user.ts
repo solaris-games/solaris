@@ -105,7 +105,8 @@ const schema = new Schema({
             special_anonymous: { type: Types.Number, default: 0 },
             special_kingOfTheHill: { type: Types.Number, default: 0 },
             special_tinyGalaxy: { type: Types.Number, default: 0 },
-            special_freeForAll: { type: Types.Number, default: 0 }
+            special_freeForAll: { type: Types.Number, default: 0 },
+            special_arcade: { type: Types.Number, default: 0 }
         }
     },
     gameSettings: {

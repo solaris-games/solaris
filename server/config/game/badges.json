@@ -106,5 +106,11 @@
         "name": "Victor (Free for All Mode)",
         "description": "Awarded to players who have won a free for all mode official game.",
         "price": null
+    },
+    {
+        "key": "special_arcade",
+        "name": "Victor (Arcade Mode)",
+        "description": "Awarded to players who have won a arcade mode official game.",
+        "price": null
     }
 ]
