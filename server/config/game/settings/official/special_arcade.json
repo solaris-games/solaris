@@ -15,7 +15,7 @@
   },
   "galaxy": {
     "galaxyType": "irregular",
-    "starsPerPlayer": 20,
+    "starsPerPlayer": 10,
     "productionTicks": 20
   },
   "specialGalaxy": {
@@ -38,10 +38,10 @@
     "splitResources": "disabled",
     "resourceDistribution": "random",
     "playerDistribution": "circular",
-    "carrierSpeed": 10,
+    "carrierSpeed": 20,
     "starCaptureReward": "disabled",
     "specialistBans": {
-      "star": [],
+      "star": [9],
       "carrier": []
     }
   },
@@ -58,13 +58,13 @@
     "orbitSpeed": 3
   },
   "player": {
-    "startingStars": 6,
+    "startingStars": 4,
     "startingCredits": 100,
     "startingCreditsSpecialists": 5,
     "startingShips": 10,
     "startingInfrastructure": {
-      "economy": 5,
-      "industry": 3,
+      "economy": 4,
+      "industry": 2,
       "science": 1
     },
     "developmentCost": {
@@ -76,7 +76,10 @@
     "tradeCreditsSpecialists": true,
     "tradeCost": 15,
     "tradeScanning": "scanned",
-    "populationCap": "medium"
+    "populationCap": {
+      "enabled": "disabled",
+      "shipsPerStar": 100
+    }
   },
   "diplomacy": {
     "enabled": "enabled",

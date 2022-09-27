@@ -56,7 +56,6 @@ export type GameTimeType = 'realTime'|'turnBased';
 export type GameTimeSpeed = 30|60|300|600|1800|3600|7200;
 export type GameTimeStartDelay = 0|1|5|10|30|60|120|240|360|480|600|720|1440;
 export type GameTimeMaxTurnWait = 1|5|10|30|60|360|480|600|720|1080|1440|2880;
-export type GameSettingPopulationCap = 'none'|'low'|'medium'|'high';
 
 export interface GameFlux {
 	id: number;
@@ -151,7 +150,10 @@ export interface GameSettings {
 		tradeCreditsSpecialists: boolean;
 		tradeCost: GameTradeCost;
 		tradeScanning: GameTradeScanning;
-		populationCap: GameSettingPopulationCap;
+		populationCap: {
+			enabled: GameSettingEnabledDisabled;
+			shipsPerStar: number;
+		}
   	},
 	diplomacy: {
 		enabled: GameSettingEnabledDisabled;
@@ -291,11 +293,6 @@ export interface Game {
 		player: {
 			rankRewardMultiplier: number;
 			bankingCycleRewardMultiplier: number;
-			populationCapMultiplier: {
-				low: number;
-				medium: number;
-				high: number;
-			}
 		},
 		specialists: {
 			monthlyBanAmount: number;

@@ -19,7 +19,7 @@ import DiplomacyService from "./diplomacy";
 import PlayerStatisticsService from "./playerStatistics";
 import {DBObjectId} from "./types/DBObjectId";
 import PlayerAfkService from "./playerAfk";
-import StarShipService from "./starShip";
+import ShipService from "./ship";
 
 const Heap = require('qheap');
 const mongoose = require("mongoose");
@@ -131,7 +131,7 @@ export default class AIService {
     reputationService: ReputationService;
     diplomacyService: DiplomacyService;
     playerStatisticsService: PlayerStatisticsService;
-    starShipService: StarShipService;
+    shipService: ShipService;
 
     constructor(
         starUpgradeService: StarUpgradeService,
@@ -147,7 +147,7 @@ export default class AIService {
         reputationService: ReputationService,
         diplomacyService: DiplomacyService,
         playerStatisticsService: PlayerStatisticsService,
-        starShipService: StarShipService
+        shipService: ShipService
     ) {
         this.starUpgradeService = starUpgradeService;
         this.carrierService = carrierService;
@@ -162,7 +162,7 @@ export default class AIService {
         this.reputationService = reputationService;
         this.diplomacyService = diplomacyService;
         this.playerStatisticsService = playerStatisticsService;
-        this.starShipService = starShipService;
+        this.shipService = shipService;
     }
 
     async play(game: Game, player: Player) {
@@ -804,7 +804,7 @@ export default class AIService {
 
         const techLevel = this.technologyService.getStarEffectiveTechnologyLevels(game, starToInvade, false);
         const shipsOnCarriers = defendingCarriers.reduce((sum, c) => sum + (c.ships || 0), 0);
-        const shipsProduced = this.starShipService.calculateStarShipsByTicks(techLevel.manufacturing, starToInvade.infrastructure.industry || 0, ticksToArrival, game.settings.galaxy.productionTicks);
+        const shipsProduced = this.shipService.calculateStarShipsByTicks(techLevel.manufacturing, starToInvade.infrastructure.industry || 0, ticksToArrival, game.settings.galaxy.productionTicks);
         const shipsAtArrival = (starToInvade.shipsActual || 0) + shipsOnCarriers + shipsProduced;
 
         const defender = {

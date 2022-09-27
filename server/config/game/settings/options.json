@@ -445,24 +445,18 @@
              "text":"Trade with scanned players only"
           }
        ],
-       "populationCap": [
-         {
-            "value":"none",
-            "text":"None"
-         },
-         {
-            "value":"low",
-            "text":"Low"
-         },
-         {
-            "value":"medium",
-            "text":"Medium"
-         },
-         {
-            "value":"high",
-            "text":"High"
-         }
-       ]
+       "populationCap":{
+         "enabled": [
+           {
+              "value":"enabled",
+              "text":"Enabled"
+           },
+           {
+              "value":"disabled",
+              "text":"Disabled"
+           }
+         ]
+       }
     },
     "diplomacy":{
        "enabled": [

@@ -37,7 +37,7 @@ import GamePlayerDefeatedEvent from "./types/events/GamePlayerDefeated";
 import GamePlayerAFKEvent from "./types/events/GamePlayerAFK";
 import GameEndedEvent from "./types/events/GameEnded";
 import PlayerAfkService from "./playerAfk";
-import StarShipService from "./starShip";
+import ShipService from "./ship";
 
 const EventEmitter = require('events');
 const moment = require('moment');
@@ -80,7 +80,7 @@ export default class GameTickService extends EventEmitter {
     carrierGiftService: CarrierGiftService;
     starContestedService: StarContestedService;
     playerReadyService: PlayerReadyService;
-    starShipService: StarShipService;
+    shipService: ShipService;
     
     constructor(
         distanceService: DistanceService,
@@ -111,7 +111,7 @@ export default class GameTickService extends EventEmitter {
         carrierGiftService: CarrierGiftService,
         starContestedService: StarContestedService,
         playerReadyService: PlayerReadyService,
-        starShipService: StarShipService
+        shipService: ShipService
     ) {
         super();
             
@@ -143,7 +143,7 @@ export default class GameTickService extends EventEmitter {
         this.carrierGiftService = carrierGiftService;
         this.starContestedService = starContestedService;
         this.playerReadyService = playerReadyService;
-        this.starShipService = starShipService;
+        this.shipService = shipService;
     }
 
     async tick(gameId: DBObjectId) {
@@ -575,7 +575,7 @@ export default class GameTickService extends EventEmitter {
 
         // 4b. Build ships at star.
         this.starService.applyStarSpecialistSpecialModifiers(game);
-        this.starShipService.produceShips(game);
+        this.shipService.produceShips(game);
 
         // 4c. Do the rest of the waypoint actions.
         this.waypointService.performWaypointActionsCollects(game, actionWaypoints);

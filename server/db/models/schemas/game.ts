@@ -115,7 +115,10 @@ const schema = new Schema({
 			tradeCreditsSpecialists: { type: Types.Boolean, required: false, default: true },
 			tradeCost: { type: Types.Number, required: true, enum: [0, 5, 15, 25, 50, 100], default: 15 }, // TODO: This could be renamed.
 			tradeScanning: { type: Types.String, required: true, enum: ['all', 'scanned'], default: 'all' },
-			populationCap: { type: Types.String, required: true, enum: ['none', 'low', 'medium', 'high'], default: 'none' }
+			populationCap: {
+				enabled: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
+				shipsPerStar: { type: Types.Number, required: true, min: 50, max: 1000, default: 100 }
+			}
 		},
 		diplomacy: {
 			enabled: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
@@ -241,12 +244,7 @@ const schema = new Schema({
 		},
 		player: {
 			rankRewardMultiplier: { type: Types.Number, required: true, default: 1 },
-			bankingCycleRewardMultiplier: { type: Types.Number, required: true, default: 75 },
-			populationCapMultiplier: {
-				low: { type: Types.Number, required: true, default: 250 },
-				medium: { type: Types.Number, required: true, default: 500 },
-				high: { type: Types.Number, required: true, default: 1000 }
-			}
+			bankingCycleRewardMultiplier: { type: Types.Number, required: true, default: 75 }
 		},
 		specialists: {
 			monthlyBanAmount: { type: Types.Number, required: true, default: 3 }

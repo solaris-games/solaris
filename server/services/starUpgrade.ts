@@ -15,7 +15,7 @@ import ResearchService from './research';
 import StarService from './star';
 import TechnologyService from './technology';
 import PlayerCreditsService from './playerCredits';
-import StarShipService from "./starShip";
+import ShipService from "./ship";
 const Heap = require('qheap');
 
 export const StarUpgradeServiceEvents = {
@@ -31,7 +31,7 @@ export default class StarUpgradeService extends EventEmitter {
     technologyService: TechnologyService;
     playerCreditsService: PlayerCreditsService;
     gameTypeService: GameTypeService;
-    starShipService: StarShipService;
+    shipService: ShipService;
 
     constructor(
         gameRepo: Repository<Game>,
@@ -42,7 +42,7 @@ export default class StarUpgradeService extends EventEmitter {
         technologyService: TechnologyService,
         playerCreditsService: PlayerCreditsService,
         gameTypeService: GameTypeService,
-        starShipService: StarShipService
+        shipService: ShipService
     ) {
         super();
 
@@ -54,7 +54,7 @@ export default class StarUpgradeService extends EventEmitter {
         this.technologyService = technologyService;
         this.playerCreditsService = playerCreditsService;
         this.gameTypeService = gameTypeService;
-        this.starShipService = starShipService;
+        this.shipService = shipService;
     }
 
     async buildWarpGate(game: Game, player: Player, starId: DBObjectId) {
@@ -342,7 +342,7 @@ export default class StarUpgradeService extends EventEmitter {
         let star = this.starService.getById(game, starId);
         let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
 
-        report.manufacturing = this.starShipService.calculateStarShipsByTicks(effectiveTechs.manufacturing, report.infrastructure, 1, game.settings.galaxy.productionTicks);
+        report.manufacturing = this.shipService.calculateStarShipsByTicks(effectiveTechs.manufacturing, report.infrastructure, 1, game.settings.galaxy.productionTicks);
 
         return report;
     }

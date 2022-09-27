@@ -1078,7 +1078,7 @@ class GameHelper {
   }
 
   isPopulationCapped(game) {
-    return game.settings.player.populationCap !== 'none'
+    return game.settings.player.populationCap.enabled === 'enabled'
   }
 }
 

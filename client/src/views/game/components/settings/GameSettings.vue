@@ -381,11 +381,24 @@
             :value="game.settings.player.tradeScanning"
             :compareValue="compareSettings.player.tradeScanning"
             v-if="game.settings.player.tradeCost > 0"/>
-          <game-setting-value title="Ship Population Cap"
+        </tbody>
+      </table>
+    </div>
+
+    <view-subtitle title="Ship Population Cap"/>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <tbody>
+          <game-setting-value title="Enabled"
             tooltip="If enabled, the maximum ship population per player will be restricted"
-            :valueText="getFriendlyText(game.settings.player.populationCap)"
-            :value="game.settings.player.populationCap"
-            :compareValue="compareSettings.player.populationCap"/>
+            :valueText="getFriendlyText(game.settings.player.populationCap.enabled)"
+            :value="game.settings.player.populationCap.enabled"
+            :compareValue="compareSettings.player.populationCap.enabled"/>
+          <game-setting-value title="Ships Per Star"
+            tooltip="Determines the max population of ships per star"
+            :valueText="game.settings.player.populationCap.shipsPerStar"
+            :value="game.settings.player.populationCap.shipsPerStar"
+            :compareValue="compareSettings.player.populationCap.shipsPerStar"/>
         </tbody>
       </table>
     </div>

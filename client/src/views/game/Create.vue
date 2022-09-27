@@ -511,14 +511,23 @@
             </option>
           </select>
         </div>
+      </view-collapse-panel>
 
+      <view-collapse-panel title="Ship Population Cap">
         <div class="mb-2">
-          <label for="populationCap" class="col-form-label">Ship Population Cap <help-tooltip tooltip="If enabled, the maximum ship population per player will be restricted"/></label>
-          <select class="form-control" id="populationCap" v-model="settings.player.populationCap" :disabled="isCreatingGame">
-            <option v-for="opt in options.player.populationCap" v-bind:key="opt.value" v-bind:value="opt.value">
+          <label for="populationCapEnabled" class="col-form-label">Enabled <help-tooltip tooltip="If enabled, the maximum ship population per player will be restricted"/></label>
+          <select class="form-control" id="populationCapEnabled" v-model="settings.player.populationCap.enabled" :disabled="isCreatingGame">
+            <option v-for="opt in options.player.populationCap.enabled" v-bind:key="opt.value" v-bind:value="opt.value">
               {{ opt.text }}
             </option>
           </select>
+        </div>
+
+        <div class="mb-2" v-if="settings.player.populationCap.enabled === 'enabled'">
+          <label for="populationCapShipsPerStar" class="col-form-label">Ships Per Star (<span class="text-warning">{{settings.player.populationCap.shipsPerStar}} Ships</span>) <help-tooltip tooltip="Determines the max population of ships per star"/></label>
+          <div class="col">
+            <input type="range" min="50" max="1000" step="50" class="form-range w-100" id="startingTechLevelSpecialists" v-model="settings.player.populationCap.shipsPerStar" :disabled="isCreatingGame">
+          </div>
         </div>
       </view-collapse-panel>
 

@@ -73,7 +73,10 @@
     "tradeCreditsSpecialists": false,
     "tradeCost": 15,
     "tradeScanning": "scanned",
-    "populationCap": "none"
+    "populationCap": {
+      "enabled": "disabled",
+      "shipsPerStar": 100
+    }
   },
   "diplomacy": {
     "enabled": "disabled",
