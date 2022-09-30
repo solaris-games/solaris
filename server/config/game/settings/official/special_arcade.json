@@ -83,7 +83,7 @@
   },
   "diplomacy": {
     "enabled": "enabled",
-    "upkeepCost": "none",
+    "upkeepCost": "standard",
     "tradeRestricted": "disabled", 
     "maxAlliances": 7, 
     "globalEvents": "disabled"
