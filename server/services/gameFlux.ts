@@ -93,7 +93,8 @@ export default class GameFluxService {
 
     applyOctFlux(game: Game) {
         // Increased spec bans
-        game.constants.specialists.monthlyBanAmount = this.SPECIALIST_BANS_FLUX;
+        // TODO: Why is this broken?
+        game.constants.specialists.monthlyBanAmount = 6; //this.SPECIALIST_BANS_FLUX;
     }
 
     applyNovFlux(game: Game) {
