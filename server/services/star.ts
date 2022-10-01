@@ -757,7 +757,7 @@ export default class StarService extends EventEmitter {
 
     setupPlayerStarForGameStart(game: Game, star: Star, player: Player, resetWarpGates: boolean) {
         if (player.homeStarId!.toString() === star._id.toString()) {
-            this.starService.setupHomeStar(game, star, player, game.settings);
+            this.setupHomeStar(game, star, player, game.settings);
         } else {
             star.ownedByPlayerId = player._id;
             star.shipsActual = game.settings.player.startingShips;
