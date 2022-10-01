@@ -53,6 +53,11 @@ export default class WaypointService {
 
     async saveWaypoints(game: Game, player: Player, carrierId: DBObjectId, waypoints: CarrierWaypointBase[], looped: boolean) {
         let carrier = this.carrierService.getById(game, carrierId);
+
+        if (!carrier) {
+            throw new ValidationError(`Could not find carrier with id ${carrierId}`);
+        }
+        
         return await this.saveWaypointsForCarrier(game, player, carrier, waypoints, looped);
     }
 
