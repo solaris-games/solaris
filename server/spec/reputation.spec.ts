@@ -13,7 +13,7 @@ describe('reputation', () => {
     let service: ReputationService;
 
     beforeEach(() => {
-        service = new ReputationService(fakeGameRepo, fakePlayerStatisticsService, fakeDiplomacyService);
+        service = new ReputationService(fakeGameRepo, fakePlayerStatisticsService, fakeDiplomacyService, null as any); // TODO: fake this
     });
 
     const _playerIdA: any = 1;
