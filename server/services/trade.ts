@@ -17,6 +17,7 @@ import UserService from './user';
 import { User } from './types/User';
 import RandomService from './random';
 import PlayerCreditsService from './playerCredits';
+import PlayerAfkService from './playerAfk';
 
 export const TradeServiceEvents = {
     onPlayerCreditsReceived: 'onPlayerCreditsReceived',
@@ -41,6 +42,7 @@ export default class TradeService extends EventEmitter {
     gameTypeService: GameTypeService;
     randomService: RandomService;
     playerCreditsService: PlayerCreditsService;
+    playerAfkService: PlayerAfkService;
 
     constructor(
         gameRepo: Repository<Game>,
@@ -53,7 +55,8 @@ export default class TradeService extends EventEmitter {
         reputationService: ReputationService,
         gameTypeService: GameTypeService,
         randomService: RandomService,
-        playerCreditsService: PlayerCreditsService
+        playerCreditsService: PlayerCreditsService,
+        playerAfkService: PlayerAfkService
     ) {
         super();
 
@@ -68,6 +71,7 @@ export default class TradeService extends EventEmitter {
         this.gameTypeService = gameTypeService;
         this.randomService = randomService;
         this.playerCreditsService = playerCreditsService;
+        this.playerAfkService = playerAfkService;
     }
 
     isTradingCreditsDisabled(game: Game) {
@@ -508,7 +512,7 @@ export default class TradeService extends EventEmitter {
 
     async tryTradeBack(game: Game, fromPlayer: Player, toPlayer: Player, reputation: PlayerReputation) {
         // Note: Trade backs can only occur from AI to player
-        if (!fromPlayer.defeated) {
+        if (!this.playerAfkService.isAIControlled(game, fromPlayer, true)) {
             return;
         }
 

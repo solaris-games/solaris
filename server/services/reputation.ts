@@ -3,6 +3,7 @@ import { Game } from "./types/Game";
 import { Player, PlayerReputation } from "./types/Player";
 import DiplomacyService from "./diplomacy";
 import PlayerStatisticsService from "./playerStatistics";
+import PlayerAfkService from "./playerAfk";
 
 const EventEmitter = require('events');
 
@@ -17,17 +18,20 @@ export default class ReputationService extends EventEmitter {
     gameRepo: Repository<Game>;
     playerStatisticsService: PlayerStatisticsService;
     diplomacyService: DiplomacyService;
+    playerAfkService: PlayerAfkService;
 
     constructor(
         gameRepo: Repository<Game>,
         playerStatisticsService: PlayerStatisticsService,
         diplomacyService: DiplomacyService,
+        playerAfkService: PlayerAfkService
     ) {
         super();
         
         this.gameRepo = gameRepo;
         this.playerStatisticsService = playerStatisticsService;
         this.diplomacyService = diplomacyService;
+        this.playerAfkService = playerAfkService;
     }
 
     getReputation(fromPlayer: Player, toPlayer: Player) {
@@ -73,7 +77,7 @@ export default class ReputationService extends EventEmitter {
             await this._updateReputation(game, fromPlayer, toPlayer, rep.reputation, rep.isNew);
         }
 
-        if (fromPlayer.defeated) {
+        if (this.playerAfkService.isAIControlled(game, fromPlayer, true)) {
             await this.recalculateDiplomaticStatus(game, fromPlayer, toPlayer, rep.reputation, updateDatabase);
         }
 
@@ -96,9 +100,10 @@ export default class ReputationService extends EventEmitter {
             await this._updateReputation(game, fromPlayer, toPlayer, rep.reputation, rep.isNew);
         }
 
-        if (fromPlayer.defeated) {
+        if (this.playerAfkService.isAIControlled(game, fromPlayer, true)) {
             await this.recalculateDiplomaticStatus(game, fromPlayer, toPlayer, rep.reputation, updateDatabase);
         }
+
         // For ACTIVE players, any decrease in reputation is considered an act of war.
         // Note: Players who are allied can fight eachother in certain scenarios
         // so it is imperitive that declarations of war do not affect alliances.
@@ -179,7 +184,7 @@ export default class ReputationService extends EventEmitter {
     }
 
     async recalculateDiplomaticStatus(game: Game, fromPlayer: Player, toPlayer: Player, reputation: PlayerReputation, updateDatabase: boolean) {
-        if (!fromPlayer.defeated) {
+        if (!this.playerAfkService.isAIControlled(game, fromPlayer, true)) {
             throw new Error(`Automatic diplomatic statuses are reserved for AI players only.`);
         }
 
