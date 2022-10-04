@@ -23,7 +23,7 @@
     "carrierUpkeepCost": "none",
     "warpgateCost": "standard",
     "specialistCost": "standard",
-    "specialistsCurrency": "creditsSpecialists",
+    "specialistsCurrency": "credits",
     "randomWarpGates": 10,
     "randomWormHoles": 5,
     "randomNebulas": 15,
@@ -60,7 +60,7 @@
   "player": {
     "startingStars": 4,
     "startingCredits": 100,
-    "startingCreditsSpecialists": 5,
+    "startingCreditsSpecialists": 0,
     "startingShips": 10,
     "startingInfrastructure": {
       "economy": 4,
@@ -73,7 +73,7 @@
       "science": "none"
     },
     "tradeCredits": true,
-    "tradeCreditsSpecialists": true,
+    "tradeCreditsSpecialists": false,
     "tradeCost": 15,
     "tradeScanning": "scanned",
     "populationCap": {
@@ -107,7 +107,7 @@
       "manufacturing": "standard",
       "banking": "standard",
       "weapons": "standard",
-      "specialists": "standard"
+      "specialists": "none"
     },
     "bankingReward": "standard",
     "experimentationReward": "standard",
