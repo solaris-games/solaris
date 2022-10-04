@@ -1,4 +1,5 @@
 import ValidationError from '../../errors/validation';
+import { ExpressJoiError } from 'express-joi-validation';
 
 export default () => {
     return {
@@ -17,6 +18,15 @@ export default () => {
                 return res.status(err.statusCode).json({
                     errors
                 });
+            }
+
+            // If its a Joi error then return the error messages only.
+            if (err.type && ['body','query','headers','fields','params'].includes(err.type)) {
+                const jerr = err as ExpressJoiError;
+
+                return res.status(400).json({
+                    errors: jerr.error!.details.map(d => d.message)
+                })
             }
 
             console.error(err.stack);
