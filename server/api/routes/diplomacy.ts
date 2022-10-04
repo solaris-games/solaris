@@ -44,7 +44,7 @@ export default (router: Router, io, container: DependencyContainer) => {
     router.put('/api/game/:gameId/diplomacy/ally/:playerId',
         mwAuth.authenticate(),
         mwGame.loadGame({
-            lean: false,
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
@@ -62,7 +62,7 @@ export default (router: Router, io, container: DependencyContainer) => {
     router.put('/api/game/:gameId/diplomacy/enemy/:playerId',
         mwAuth.authenticate(),
         mwGame.loadGame({
-            lean: false,
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
@@ -80,7 +80,7 @@ export default (router: Router, io, container: DependencyContainer) => {
     router.put('/api/game/:gameId/diplomacy/neutral/:playerId',
         mwAuth.authenticate(),
         mwGame.loadGame({
-            lean: false,
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,

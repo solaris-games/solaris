@@ -31,7 +31,7 @@ export default (router: Router, io, container: DependencyContainer) => {
     router.put('/api/game/:gameId/ledger/credits/forgive/:playerId',
         mwAuth.authenticate(),
         mwGame.loadGame({
-            lean: false,
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
@@ -49,7 +49,7 @@ export default (router: Router, io, container: DependencyContainer) => {
     router.put('/api/game/:gameId/ledger/credits/settle/:playerId',
         mwAuth.authenticate(),
         mwGame.loadGame({
-            lean: false,
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
@@ -80,7 +80,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         router.put('/api/game/:gameId/ledger/creditsSpecialists/forgive/:playerId',
             mwAuth.authenticate(),
             mwGame.loadGame({
-                lean: false,
+                lean: true,
                 settings: true,
                 state: true,
                 galaxy: true,
@@ -98,7 +98,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         router.put('/api/game/:gameId/ledger/creditsSpecialists/settle/:playerId',
             mwAuth.authenticate(),
             mwGame.loadGame({
-                lean: false,
+                lean: true,
                 settings: true,
                 state: true,
                 galaxy: true,

@@ -18,7 +18,7 @@ export default (router: Router, io, container: DependencyContainer) => {
     router.put('/api/game/:gameId/carrier/:carrierId/waypoints',
         mwAuth.authenticate(),
         mwGame.loadGame({
-            lean: false,
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
@@ -36,7 +36,7 @@ export default (router: Router, io, container: DependencyContainer) => {
     router.put('/api/game/:gameId/carrier/:carrierId/waypoints/loop',
         mwAuth.authenticate(),
         mwGame.loadGame({
-            lean: false,
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
@@ -54,7 +54,7 @@ export default (router: Router, io, container: DependencyContainer) => {
     router.put('/api/game/:gameId/carrier/:carrierId/transfer',
         mwAuth.authenticate(),
         mwGame.loadGame({
-            lean: false,
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
@@ -72,7 +72,7 @@ export default (router: Router, io, container: DependencyContainer) => {
     router.put('/api/game/:gameId/carrier/:carrierId/gift',
         mwAuth.authenticate(),
         mwGame.loadGame({
-            lean: false,
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
@@ -90,7 +90,7 @@ export default (router: Router, io, container: DependencyContainer) => {
     router.patch('/api/game/:gameId/carrier/:carrierId/rename',
         mwAuth.authenticate(),
         mwGame.loadGame({
-            lean: false,
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
@@ -108,7 +108,7 @@ export default (router: Router, io, container: DependencyContainer) => {
     router.delete('/api/game/:gameId/carrier/:carrierId/scuttle',
         mwAuth.authenticate(),
         mwGame.loadGame({
-            lean: false,
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
