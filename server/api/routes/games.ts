@@ -169,7 +169,7 @@ export default (router: Router, io, container: DependencyContainer) => {
     router.put('/api/game/:gameId/ready',
         mwAuth.authenticate(),
         mwGame.loadGame({
-            lean: false,
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
@@ -186,7 +186,7 @@ export default (router: Router, io, container: DependencyContainer) => {
     router.put('/api/game/:gameId/readytocycle',
         mwAuth.authenticate(),
         mwGame.loadGame({
-            lean: false,
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
@@ -203,7 +203,7 @@ export default (router: Router, io, container: DependencyContainer) => {
     router.put('/api/game/:gameId/notready',
         mwAuth.authenticate(),
         mwGame.loadGame({
-            lean: false,
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
@@ -220,7 +220,7 @@ export default (router: Router, io, container: DependencyContainer) => {
     router.put('/api/game/:gameId/readyToQuit',
         mwAuth.authenticate(),
         mwGame.loadGame({
-            lean: false,
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
@@ -237,7 +237,7 @@ export default (router: Router, io, container: DependencyContainer) => {
     router.put('/api/game/:gameId/notReadyToQuit',
         mwAuth.authenticate(),
         mwGame.loadGame({
-            lean: false,
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
@@ -283,7 +283,7 @@ export default (router: Router, io, container: DependencyContainer) => {
     router.delete('/api/game/:gameId',
         mwAuth.authenticate(),
         mwGame.loadGame({
-            lean: false,
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,

@@ -18,7 +18,7 @@ export default (router: Router, io, container: DependencyContainer) => {
     router.put('/api/game/:gameId/trade/credits',
         mwAuth.authenticate(),
         mwGame.loadGame({
-            lean: false,
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
@@ -36,7 +36,7 @@ export default (router: Router, io, container: DependencyContainer) => {
     router.put('/api/game/:gameId/trade/creditsSpecialists',
         mwAuth.authenticate(),
         mwGame.loadGame({
-            lean: false,
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
@@ -54,7 +54,7 @@ export default (router: Router, io, container: DependencyContainer) => {
     router.put('/api/game/:gameId/trade/renown',
         mwAuth.authenticate(),
         mwGame.loadGame({
-            lean: false,
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
@@ -71,7 +71,7 @@ export default (router: Router, io, container: DependencyContainer) => {
     router.put('/api/game/:gameId/trade/tech',
         mwAuth.authenticate(),
         mwGame.loadGame({
-            lean: false,
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,

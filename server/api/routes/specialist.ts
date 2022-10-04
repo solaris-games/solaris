@@ -52,7 +52,7 @@ export default (router: Router, io, container: DependencyContainer) => {
     router.put('/api/game/:gameId/carrier/:carrierId/hire/:specialistId',
         mwAuth.authenticate(),
         mwGame.loadGame({
-            lean: false,
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
@@ -69,7 +69,7 @@ export default (router: Router, io, container: DependencyContainer) => {
     router.put('/api/game/:gameId/star/:starId/hire/:specialistId',
         mwAuth.authenticate(),
         mwGame.loadGame({
-            lean: false,
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,

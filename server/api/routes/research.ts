@@ -18,7 +18,7 @@ export default (router: Router, io, container: DependencyContainer) => {
     router.put('/api/game/:gameId/research/now',
         mwAuth.authenticate(),
         mwGame.loadGame({
-            lean: false,
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
@@ -35,7 +35,7 @@ export default (router: Router, io, container: DependencyContainer) => {
     router.put('/api/game/:gameId/research/next',
         mwAuth.authenticate(),
         mwGame.loadGame({
-            lean: false,
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
