@@ -1,6 +1,6 @@
 const socketio = require('socket.io');
 
-export default (config, server) => {
+export default (server) => {
 
     const io = socketio(server);
 
@@ -36,7 +36,7 @@ export default (config, server) => {
         });
     });
 
-    console.log('Sockets Initialized');
+    console.log('Sockets initialized.');
     
     return io;
 };

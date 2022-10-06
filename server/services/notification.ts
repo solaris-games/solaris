@@ -81,7 +81,7 @@ export default class NotificationService {
             this.tradeService.on(TradeServiceEvents.onPlayerRenownReceived, (args) => this.onPlayerRenownReceived(args.gameId, args.fromPlayer, args.toPlayer, args.amount));
             this.tradeService.on(TradeServiceEvents.onPlayerTechnologyReceived, (args) => this.onPlayerTechnologyReceived(args.gameId, args.fromPlayer, args.toPlayer, args.technology));
 
-            console.log('Notifications Initialized')
+            console.log('Notifications initialized.')
         }
     }
 

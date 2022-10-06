@@ -192,7 +192,7 @@ export default (config, io): DependencyContainer => {
 
     const notificationService = new NotificationService(config, userRepository, gameRepository, discordService, conversationService, gameService, gameJoinService, gameTickService, researchService, tradeService);
 
-    console.log('Dependency Container Initialized');
+    console.log('Dependency container initialized.');
     
     return {
         config,

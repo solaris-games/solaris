@@ -14,14 +14,14 @@ async function startServer() {
   const app = express();
   const server = http.createServer(app);
   
-  const io = socketLoader(config, server);
+  const io = socketLoader(server);
   const container = containerLoader(config, io);
 
-  await expressLoader(config, app, io, container);
+  await expressLoader(config, app, container);
 
   server.listen(config.port, (err) => {
     if (err) {
-      console.log(err);
+      console.error(err);
       return;
     }
 

@@ -9,7 +9,7 @@ import registerRoutes from './routes';
 import { DependencyContainer } from '../services/types/DependencyContainer';
 import { Config } from '../config/types/Config';
 
-export default async (config: Config, app, io, container: DependencyContainer) => {
+export default async (config: Config, app, container: DependencyContainer) => {
 
     app.use(require('body-parser').json({
         limit: '1000kb' // Note: This allows large custom galaxies to be uploaded.
@@ -84,7 +84,7 @@ export default async (config: Config, app, io, container: DependencyContainer) =
 
     app.use(router);
 
-    console.log('Express Intialized');
+    console.log('Express intialized.');
     
     return app;
 };

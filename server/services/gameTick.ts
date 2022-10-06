@@ -164,7 +164,7 @@ export default class GameTickService extends EventEmitter {
         */
 
         let startTime = process.hrtime();
-        console.info(`[${game.settings.general.name}] - Game tick started.`);
+        console.log(`[${game.settings.general.name}] - Game tick started at ${new Date().toISOString()}`);
 
         game.state.lastTickDate = moment().utc();
 
@@ -174,7 +174,7 @@ export default class GameTickService extends EventEmitter {
         let logTime = (taskName: string) => {
             taskTimeEnd = process.hrtime(taskTime);
             taskTime = process.hrtime();
-            console.info(`[${game.settings.general.name}] - ${taskName}: %ds %dms'`, taskTimeEnd[0], taskTimeEnd[1] / 1000000);
+            console.log(`[${game.settings.general.name}] - ${taskName}: %ds %dms'`, taskTimeEnd[0], taskTimeEnd[1] / 1000000);
         };
 
         let gameUsers = await this.userService.getGameUsers(game);
@@ -264,7 +264,7 @@ export default class GameTickService extends EventEmitter {
 
         let endTime = process.hrtime(startTime);
 
-        console.info(`[${game.settings.general.name}] - Game tick ended: %ds %dms'`, endTime[0], endTime[1] / 1000000);
+        console.log(`[${game.settings.general.name}] - Game tick ended: %ds %dms'`, endTime[0], endTime[1] / 1000000);
     }
 
     canTick(game: Game) {
