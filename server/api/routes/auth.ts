@@ -5,8 +5,8 @@ import AuthController from '../controllers/auth';
 import { MiddlewareContainer } from "../middleware";
 import { authLoginRequestSchema } from "../requests/auth";
 
-export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, io, container: DependencyContainer) => {
-    const controller = AuthController(container, io);
+export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
+    const controller = AuthController(container);
 
     router.post('/api/auth/login',
         validator.body(authLoginRequestSchema),

@@ -1,7 +1,7 @@
 import { LedgerType } from '../../services/ledger';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
 
-export default (container: DependencyContainer, io) => {
+export default (container: DependencyContainer) => {
     return {
         detailCredits: async (req, res, next) => {
             try {

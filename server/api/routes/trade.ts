@@ -4,8 +4,8 @@ import { DependencyContainer } from "../../services/types/DependencyContainer";
 import TradeController from '../controllers/trade';
 import { MiddlewareContainer } from "../middleware";
 
-export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, io, container: DependencyContainer) => {
-    const controller = TradeController(container, io);
+export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
+    const controller = TradeController(container);
 
     router.put('/api/game/:gameId/trade/credits',
         mw.auth.authenticate(),

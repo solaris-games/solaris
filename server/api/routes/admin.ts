@@ -5,8 +5,8 @@ import AdminController from '../controllers/admin';
 import { MiddlewareContainer } from "../middleware";
 import { adminSetGameFeaturedRequestSchema, adminSetGameTimeMachineRequestSchema, adminSetUserCreditsRequestSchema, adminSetUserRoleRequestSchema } from "../requests/admin";
 
-export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, io, container: DependencyContainer) => {
-    const controller = AdminController(container, io);
+export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
+    const controller = AdminController(container);
     
     router.get('/api/admin/insights',
         mw.auth.authenticate({ admin: true }),

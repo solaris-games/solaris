@@ -4,8 +4,8 @@ import { DependencyContainer } from "../../services/types/DependencyContainer";
 import GameController from '../controllers/game';
 import { MiddlewareContainer } from "../middleware";
 
-export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, io, container: DependencyContainer) => {
-    const controller = GameController(container, io);
+export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
+    const controller = GameController(container);
 
     router.get('/api/game/defaultSettings',
         mw.auth.authenticate(),

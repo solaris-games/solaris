@@ -4,8 +4,8 @@ import { DependencyContainer } from "../../services/types/DependencyContainer";
 import ShopController from '../controllers/shop';
 import { MiddlewareContainer } from "../middleware";
 
-export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, io, container: DependencyContainer) => {
-    const controller = ShopController(container, io);
+export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
+    const controller = ShopController(container);
 
     router.get('/api/shop/galacticcredits/purchase',
         mw.auth.authenticate(),

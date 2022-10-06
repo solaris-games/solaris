@@ -80,7 +80,7 @@ export default async (config: Config, app, io, container: DependencyContainer) =
     // ---------------
     // Register routes
 
-    registerRoutes(router, io, container);
+    registerRoutes(router, container);
 
     app.use(router);
 

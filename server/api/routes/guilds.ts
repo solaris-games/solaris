@@ -4,8 +4,8 @@ import { DependencyContainer } from "../../services/types/DependencyContainer";
 import GuildController from '../controllers/guild';
 import { MiddlewareContainer } from "../middleware";
 
-export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, io, container: DependencyContainer) => {
-    const controller = GuildController(container, io);
+export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
+    const controller = GuildController(container);
 
     router.get('/api/guild/list',
         mw.auth.authenticate(),

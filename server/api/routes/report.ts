@@ -4,8 +4,8 @@ import { DependencyContainer } from "../../services/types/DependencyContainer";
 import ReportController from '../controllers/report';
 import { MiddlewareContainer } from "../middleware";
 
-export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, io, container: DependencyContainer) => {
-    const controller = ReportController(container, io);
+export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
+    const controller = ReportController(container);
 
     router.post('/api/game/:gameId/report',
         mw.auth.authenticate(),

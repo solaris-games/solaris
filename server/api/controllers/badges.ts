@@ -1,6 +1,6 @@
 import { DependencyContainer } from '../../services/types/DependencyContainer';
 
-export default (container: DependencyContainer, io) => {
+export default (container: DependencyContainer) => {
     return {
         listAll: async (req, res, next) => {
             try {

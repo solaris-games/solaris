@@ -5,8 +5,8 @@ import BadgeController from '../controllers/badges';
 import { MiddlewareContainer } from "../middleware";
 import { badgesPurchaseBadgeRequestSchema } from "../requests/badges";
 
-export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, io, container: DependencyContainer) => {
-    const controller = BadgeController(container, io);
+export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
+    const controller = BadgeController(container);
 
     router.get('/api/badges',
         mw.auth.authenticate(),

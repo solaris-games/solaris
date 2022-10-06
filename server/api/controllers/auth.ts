@@ -1,7 +1,7 @@
 import { DependencyContainer } from '../../services/types/DependencyContainer';
 const axios = require('axios');
 
-export default (container: DependencyContainer, io) => {
+export default (container: DependencyContainer) => {
     return {
         login: async (req, res, next) => {        
             try {

@@ -3,7 +3,7 @@ import { DependencyContainer } from '../../services/types/DependencyContainer';
 
 const COST_PER_TOKEN = 1;
 
-export default (container: DependencyContainer, io) => {
+export default (container: DependencyContainer) => {
     return {
         purchase: async (req, res, next) => {
             try {

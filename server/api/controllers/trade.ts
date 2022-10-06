@@ -3,7 +3,7 @@ import { mapToTradeSendTechnologyToPlayerRequest, mapToTradeSendToPlayerRequest 
 
 const mongoose = require('mongoose');
 
-export default (container: DependencyContainer, io) => {
+export default (container: DependencyContainer) => {
     return {
         sendCredits: async (req, res, next) => {
             try {

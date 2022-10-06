@@ -21,27 +21,27 @@ import registerStarRoutes from './star';
 import registerTradeRoutes from './trade';
 import registerUserRoutes from './user';
 
-export default (router: Router, io, container: DependencyContainer) => {
+export default (router: Router, container: DependencyContainer) => {
     const middleware = Middleware(container);
     const validator = createValidator({ passError: true });
 
-    registerAdminRoutes(router, middleware, validator, io, container);
-    registerAuthRoutes(router, middleware, validator, io, container);
-    registerBadgeRoutes(router, middleware, validator, io, container);
-    registerCarrierRoutes(router, middleware, validator, io, container);
-    registerConversationRoutes(router, middleware, validator, io, container);
-    registerDiplomacyRoutes(router, middleware, validator, io, container);
-    registerEventRoutes(router, middleware, validator, io, container);
-    registerGameRoutes(router, middleware, validator, io, container);
-    registerGuildRoutes(router, middleware, validator, io, container);
-    registerLedgerRoutes(router, middleware, validator, io, container);
-    registerReportRoutes(router, middleware, validator, io, container);
-    registerResearchRoutes(router, middleware, validator, io, container);
-    registerShopRoutes(router, middleware, validator, io, container);
-    registerSpecialistRoutes(router, middleware, validator, io, container);
-    registerStarRoutes(router, middleware, validator, io, container);
-    registerTradeRoutes(router, middleware, validator, io, container);
-    registerUserRoutes(router, middleware, validator, io, container);
+    registerAdminRoutes(router, middleware, validator, container);
+    registerAuthRoutes(router, middleware, validator, container);
+    registerBadgeRoutes(router, middleware, validator, container);
+    registerCarrierRoutes(router, middleware, validator, container);
+    registerConversationRoutes(router, middleware, validator, container);
+    registerDiplomacyRoutes(router, middleware, validator, container);
+    registerEventRoutes(router, middleware, validator, container);
+    registerGameRoutes(router, middleware, validator, container);
+    registerGuildRoutes(router, middleware, validator, container);
+    registerLedgerRoutes(router, middleware, validator, container);
+    registerReportRoutes(router, middleware, validator, container);
+    registerResearchRoutes(router, middleware, validator, container);
+    registerShopRoutes(router, middleware, validator, container);
+    registerSpecialistRoutes(router, middleware, validator, container);
+    registerStarRoutes(router, middleware, validator, container);
+    registerTradeRoutes(router, middleware, validator, container);
+    registerUserRoutes(router, middleware, validator, container);
 
     return router;
 }
