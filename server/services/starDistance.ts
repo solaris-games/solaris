@@ -5,7 +5,6 @@ import { MapObject } from "./types/Map";
 import { Player } from "./types/Player";
 import { Star } from "./types/Star";
 import DistanceService from "./distance";
-import game from "../api/middleware/game";
 
 export default class StarDistanceService {
     distanceService: DistanceService;

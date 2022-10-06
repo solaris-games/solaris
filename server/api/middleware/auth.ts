@@ -1,13 +1,17 @@
 import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
 
+export interface AuthMiddleware {
+    authenticate: (options?: AuthenticationOptions | undefined) => (req: any, res: any, next: any) => Promise<any>;
+}
+
 export interface AuthenticationOptions {
     admin?: boolean;
     subAdmin?: boolean;
     communityManager?: boolean;
 };
 
-export default (container: DependencyContainer) => {
+export const middleware = (container: DependencyContainer): AuthMiddleware => {
     return {
         authenticate: (options?: AuthenticationOptions) => {
             return async (req, res, next) => {

@@ -1,11 +1,16 @@
 import ValidationError from "../../errors/validation";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 
+export interface PlayerMiddleware {
+    loadPlayer: (req: any, res: any, next: any) => void;
+    validatePlayerState: (options: PlayerStateValidationOptions) => (req: any, res: any, next: any) => void;
+}
+
 export interface PlayerStateValidationOptions {
     isPlayerUndefeated?: boolean;
 }
 
-export default (container: DependencyContainer) => {
+export const middleware = (container: DependencyContainer): PlayerMiddleware => {
     return {
         loadPlayer: (req, res, next) => {
             try {

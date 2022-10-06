@@ -1,5 +1,7 @@
 import { Router } from "express";
+import { createValidator } from "express-joi-validation";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
+import Middleware from '../middleware';
 
 import registerAdminRoutes from './admin';
 import registerAuthRoutes from './auth';
@@ -20,24 +22,26 @@ import registerTradeRoutes from './trade';
 import registerUserRoutes from './user';
 
 export default (router: Router, io, container: DependencyContainer) => {
+    const middleware = Middleware(container);
+    const validator = createValidator({ passError: true });
 
-    registerAdminRoutes(router, io, container);
-    registerAuthRoutes(router, io, container);
-    registerBadgeRoutes(router, io, container);
-    registerCarrierRoutes(router, io, container);
-    registerConversationRoutes(router, io, container);
-    registerDiplomacyRoutes(router, io, container);
-    registerEventRoutes(router, io, container);
-    registerGameRoutes(router, io, container);
-    registerGuildRoutes(router, io, container);
-    registerLedgerRoutes(router, io, container);
-    registerReportRoutes(router, io, container);
-    registerResearchRoutes(router, io, container);
-    registerShopRoutes(router, io, container);
-    registerSpecialistRoutes(router, io, container);
-    registerStarRoutes(router, io, container);
-    registerTradeRoutes(router, io, container);
-    registerUserRoutes(router, io, container);
+    registerAdminRoutes(router, middleware, validator, io, container);
+    registerAuthRoutes(router, middleware, validator, io, container);
+    registerBadgeRoutes(router, middleware, validator, io, container);
+    registerCarrierRoutes(router, middleware, validator, io, container);
+    registerConversationRoutes(router, middleware, validator, io, container);
+    registerDiplomacyRoutes(router, middleware, validator, io, container);
+    registerEventRoutes(router, middleware, validator, io, container);
+    registerGameRoutes(router, middleware, validator, io, container);
+    registerGuildRoutes(router, middleware, validator, io, container);
+    registerLedgerRoutes(router, middleware, validator, io, container);
+    registerReportRoutes(router, middleware, validator, io, container);
+    registerResearchRoutes(router, middleware, validator, io, container);
+    registerShopRoutes(router, middleware, validator, io, container);
+    registerSpecialistRoutes(router, middleware, validator, io, container);
+    registerStarRoutes(router, middleware, validator, io, container);
+    registerTradeRoutes(router, middleware, validator, io, container);
+    registerUserRoutes(router, middleware, validator, io, container);
 
     return router;
 }

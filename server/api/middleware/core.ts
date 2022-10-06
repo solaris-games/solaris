@@ -1,7 +1,12 @@
 import ValidationError from '../../errors/validation';
 import { ExpressJoiError } from 'express-joi-validation';
+import { NextFunction, Request, Response } from 'express';
 
-export default () => {
+export interface CoreMiddleware {
+    handleError(err: any, req: Request, res: Response, next: NextFunction);
+};
+
+export const middleware = (): CoreMiddleware => {
     return {
         handleError(err, req, res, next) {
             // If there is an error in the pipleline
