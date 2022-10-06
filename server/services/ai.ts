@@ -871,20 +871,21 @@ export default class AIService {
 
         for (const playerStar of context.playerStars) {
             const carriersHere = context.carriersOrbiting.get(playerStar._id.toString()) || [];
+            const carriersOwned = carriersHere.filter(c => c.ownedByPlayerId!.toString() === player._id.toString());
 
-            for (const carrier of carriersHere) {
+            for (const carrier of carriersOwned) {
                 if (carrier.ships! > 1) {
                     const newStarShips = playerStar.ships! + carrier.ships! - 1;
                     await this.shipTransferService.transfer(game, player, carrier._id, 1, playerStar._id, newStarShips, false);
                 }
             }
 
-            if (playerStar.ships! < 1 && carriersHere.length === 0) {
+            if (playerStar.ships! < 1 && carriersOwned.length === 0) {
                 continue;
             }
 
             assignments.set(playerStar._id.toString(), {
-                carriers: carriersHere,
+                carriers: carriersOwned,
                 star: playerStar,
                 totalShips: playerStar.ships!
             });
