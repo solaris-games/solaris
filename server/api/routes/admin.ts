@@ -1,15 +1,18 @@
 import { Router } from "express";
+import { createValidator } from "express-joi-validation";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import AdminController from '../controllers/admin';
 
 import AuthMiddleware from '../middleware/auth';
 import CoreMiddleware from '../middleware/core';
 import GameMiddleware from '../middleware/game';
+import { adminSetGameFeaturedRequestSchema, adminSetGameTimeMachineRequestSchema, adminSetUserCreditsRequestSchema, adminSetUserRoleRequestSchema } from "../requests/admin";
 
 export default (router: Router, io, container: DependencyContainer) => {
     const mwCore = CoreMiddleware();
     const mwAuth = AuthMiddleware(container);
     const mwGame = GameMiddleware(container);
+    const validator = createValidator({ passError: true });
 
     const controller = AdminController(container, io);
     
@@ -40,26 +43,31 @@ export default (router: Router, io, container: DependencyContainer) => {
 
     router.patch('/api/admin/user/:userId/contributor',
         mwAuth.authenticate({ admin: true }),
+        validator.body(adminSetUserRoleRequestSchema),
         controller.setRoleContributor,
         mwCore.handleError);
         
     router.patch('/api/admin/user/:userId/developer',
         mwAuth.authenticate({ admin: true }),
+        validator.body(adminSetUserRoleRequestSchema),
         controller.setRoleDeveloper,
         mwCore.handleError);
 
     router.patch('/api/admin/user/:userId/communityManager',
         mwAuth.authenticate({ admin: true }),
+        validator.body(adminSetUserRoleRequestSchema),
         controller.setRoleCommunityManager,
         mwCore.handleError);
 
     router.patch('/api/admin/user/:userId/gameMaster',
         mwAuth.authenticate({ admin: true }),
+        validator.body(adminSetUserRoleRequestSchema),
         controller.setRoleGameMaster,
         mwCore.handleError);
 
     router.patch('/api/admin/user/:userId/credits',
         mwAuth.authenticate({ admin: true }),
+        validator.body(adminSetUserCreditsRequestSchema),
         controller.setCredits,
         mwCore.handleError);
 
@@ -95,11 +103,13 @@ export default (router: Router, io, container: DependencyContainer) => {
 
     router.patch('/api/admin/game/:gameId/featured',
         mwAuth.authenticate({ subAdmin: true }),
+        validator.body(adminSetGameFeaturedRequestSchema),
         controller.setGameFeatured,
         mwCore.handleError);
 
     router.patch('/api/admin/game/:gameId/timeMachine',
         mwAuth.authenticate({ admin: true }),
+        validator.body(adminSetGameTimeMachineRequestSchema),
         controller.setGameTimeMachine,
         mwCore.handleError);
 
