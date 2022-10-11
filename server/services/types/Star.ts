@@ -51,6 +51,7 @@ export interface Star extends MapObject {
     targeted?: boolean;
     upgradeCosts?: InfrastructureUpgradeCosts;
     manufacturing?: number;
+    isInScanningRange?: boolean;
 };
 
 export interface StarCaptureResult {

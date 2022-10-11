@@ -106,9 +106,7 @@ export default class CarrierService extends EventEmitter {
             let starSpecialist = this.specialistService.getByIdStar(star.specialistId);
     
             if (starSpecialist?.modifiers.special?.autoCarrierSpecialistAssign) {
-                // @ts-ignore
                 carrier.specialistId = starSpecialist.modifiers.special!.autoCarrierSpecialistAssign!;
-                // @ts-ignore
                 carrier.specialist = this.specialistService.getByIdCarrier(carrier.specialistId)
             }
         }
