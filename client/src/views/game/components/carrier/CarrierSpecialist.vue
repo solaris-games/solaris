@@ -13,6 +13,7 @@
         <div class="col-12 mt-2">
             <p v-if="carrier.specialist">{{carrier.specialist.description}}</p>
             <p v-if="carrier.specialist && carrier.specialist.oneShot" class="text-warning"><small>This specialist cannot be replaced.</small></p>
+            <p v-if="carrier.specialist && carrier.specialistExpireTick" class="text-warning"><small>This specialist expires on tick {{carrier.specialistExpireTick}}.</small></p>
             <p class="mb-2" v-if="!carrier.specialistId">
               <small><i>This carrier does not have a specialist assigned.</i></small>
             </p>

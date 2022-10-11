@@ -12,6 +12,7 @@ export interface Specialist {
     baseCostCredits: number;
     baseCostCreditsSpecialists: number;
     oneShot: boolean;
+    expireTicks: number | null;
     modifiers: {
         local?: {
             speed?: number;

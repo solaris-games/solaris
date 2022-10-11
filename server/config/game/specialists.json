@@ -12,6 +12,7 @@
             "baseCostCredits": 300,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "local": {
                     "speed": 1.5,
@@ -32,6 +33,7 @@
             "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 2,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "local": {
                     "weapons": 1,
@@ -51,6 +53,7 @@
             "baseCostCredits": 300,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "local": {
                     "weapons": 2,
@@ -71,6 +74,7 @@
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "local": {
                     "weapons": 3,
@@ -91,6 +95,7 @@
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "local": {
                     "speed": 2,
@@ -111,6 +116,7 @@
             "baseCostCredits": 300,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "local": {
                     "speed": 1.5,
@@ -131,6 +137,7 @@
             "baseCostCredits": 1000,
             "baseCostCreditsSpecialists": 10,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "local": {
                     "hyperspace": -3,
@@ -151,6 +158,7 @@
             "baseCostCredits": 300,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "special": {
                     "hideShips": true
@@ -169,6 +177,7 @@
             "baseCostCredits": 300,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "special": {
                     "deductEnemyWeapons": 1
@@ -187,6 +196,7 @@
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "special": {
                     "unlockWarpGates": true
@@ -205,6 +215,7 @@
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "local": {
                     "speed": 2,
@@ -227,6 +238,7 @@
             "baseCostCredits": 1000,
             "baseCostCreditsSpecialists": 10,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "local": {
                     "speed": 2
@@ -248,6 +260,7 @@
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "local": {
                     "speed": 1.5,
@@ -272,6 +285,7 @@
             "baseCostCredits": 100,
             "baseCostCreditsSpecialists": 1,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "local": {
                     "hyperspace": 1
@@ -290,6 +304,7 @@
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "local": {
                     "speed": 1.5,
@@ -313,6 +328,7 @@
             "baseCostCredits": 300,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "local": {
                     "speed": 0.5
@@ -339,6 +355,7 @@
             "baseCostCredits": 1000,
             "baseCostCreditsSpecialists": 10,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "local": {
                     "hyperspace": -2,
@@ -361,6 +378,7 @@
             "baseCostCredits": 1000,
             "baseCostCreditsSpecialists": 10,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "special": {
                     "combatSwapWeaponsTechnology": true
@@ -379,6 +397,7 @@
             "baseCostCredits": 400,
             "baseCostCreditsSpecialists": 4,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "local": {
                     "speed": 0.75,
@@ -402,6 +421,7 @@
             "baseCostCredits": 100,
             "baseCostCreditsSpecialists": 1,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "local": {
                     "scanning": 1
@@ -420,6 +440,7 @@
             "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 2,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "local": {
                     "manufacturing": 2,
@@ -439,6 +460,7 @@
             "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 2,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "local": {
                     "terraforming": 3,
@@ -458,6 +480,7 @@
             "baseCostCredits": 200,
             "baseCostCreditsSpecialists": 2,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "special": {
                     "defenderBonus": 1
@@ -476,6 +499,7 @@
             "baseCostCredits": 300,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "local": {
                     "weapons": -1
@@ -497,6 +521,7 @@
             "baseCostCredits": 1000,
             "baseCostCreditsSpecialists": 10,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "special": {
                     "addNaturalResourcesOnTick": 1
@@ -519,6 +544,7 @@
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
             "oneShot": true,
+            "expireTicks": null,
             "modifiers": {
                 "special": {
                     "addNaturalResourcesOnTick": -1
@@ -541,6 +567,7 @@
             "baseCostCredits": 300,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "special": {
                     "hideShips": true
@@ -559,6 +586,7 @@
             "baseCostCredits": 300,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "special": {
                     "destroyInfrastructureOnLoss": true
@@ -577,6 +605,7 @@
             "baseCostCredits": 1000,
             "baseCostCreditsSpecialists": 10,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "local": {
                     "terraforming": -5,
@@ -600,6 +629,7 @@
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "local": {
                     "terraforming": -3,
@@ -623,6 +653,7 @@
             "baseCostCredits": 1000,
             "baseCostCreditsSpecialists": 10,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "special": {
                     "creditsPerTickByScience": 2
@@ -641,6 +672,7 @@
             "baseCostCredits": 600,
             "baseCostCreditsSpecialists": 6,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "local": {
                     "scanning": 3,
@@ -660,6 +692,7 @@
             "baseCostCredits": 100,
             "baseCostCreditsSpecialists": 1,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "local": {
                     "terraforming": 2
@@ -678,6 +711,7 @@
             "baseCostCredits": 1500,
             "baseCostCreditsSpecialists": 15,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "special": {
                     "autoCarrierSpecialistAssign": 4
@@ -696,6 +730,7 @@
             "baseCostCredits": 500,
             "baseCostCreditsSpecialists": 5,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "special": {
                     "moveStar": true,
@@ -715,6 +750,7 @@
             "baseCostCredits": 300,
             "baseCostCreditsSpecialists": 3,
             "oneShot": false,
+            "expireTicks": null,
             "modifiers": {
                 "special": {
                     "attractStar": true

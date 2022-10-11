@@ -234,6 +234,9 @@ export default class GameTickService extends EventEmitter {
             this._oneTickSpecialists(game);
             logTime('Apply effects of onetick specialists');
 
+            this._clearExpiredSpecialists(game);
+            logTime('Clear expired specialists')
+
             this._countdownToEndCheck(game);
             logTime('Countdown to end check');
 
@@ -833,6 +836,10 @@ export default class GameTickService extends EventEmitter {
     _oneTickSpecialists(game: Game) {
         this.playerCycleRewardsService.giveFinancialAnalystCredits(game);
         this.starMovementService.moveStellarEngines(game);
+    }
+
+    _clearExpiredSpecialists(game: Game) {
+        this.specialistService.clearExpiredSpecialists(game);
     }
 
     _orbitGalaxy(game: Game) {
