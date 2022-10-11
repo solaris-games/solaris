@@ -1,15 +1,11 @@
-import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
-import { mapToAuthLoginRequest } from '../requests/auth';
 const axios = require('axios');
 
-export default (container: DependencyContainer, io) => {
+export default (container: DependencyContainer) => {
     return {
         login: async (req, res, next) => {        
             try {
-                const reqObj = mapToAuthLoginRequest(req.body);
-                
-                let user = await container.authService.login(reqObj.email, reqObj.password);
+                let user = await container.authService.login(req.body.email, req.body.password);
         
                 // Store the user id in the session.
                 req.session.userId = user._id;

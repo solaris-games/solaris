@@ -106,15 +106,10 @@ export default class PlayerStatisticsService {
 
     calculateTotalManufacturing(game: Game, playerStars: Star[]) {
         // Calculate the manufacturing level for all of the stars the player owns.
-        playerStars.forEach(s => {
-            let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, s);
-            let ind = s.infrastructure?.industry ?? 0;
-
-            s.manufacturing = this.shipService.calculateStarShipsByTicks(effectiveTechs.manufacturing, ind, 1, game.settings.galaxy.productionTicks);
-        });
-
-        let totalManufacturing = playerStars.reduce((sum, s) => sum + s.manufacturing!, 0);
-
+        const totalManufacturing = playerStars.reduce((sum, s) => {
+            return sum + this.shipService.calculateStarManufacturing(game, s);
+        }, 0);
+        
         return Math.round((totalManufacturing + Number.EPSILON) * 100) / 100
     }
 

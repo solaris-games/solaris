@@ -66,7 +66,7 @@
         "id": 10,
         "name": "Unnamed",
         "month": "October",
-        "description": "The number of specialist bans this month has increased.",
+        "description": "The number of specialist bans is increased.",
         "tooltip": "Increased from 3 to 6 bans."
     },
     {

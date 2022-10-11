@@ -1,7 +1,7 @@
 import { DependencyContainer } from '../../services/types/DependencyContainer';
 import { mapToReportCreateReportRequest } from '../requests/report';
 
-export default (container: DependencyContainer, io) => {
+export default (container: DependencyContainer) => {
     return {
         create: async (req, res, next) => {
             try {

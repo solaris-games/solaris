@@ -98,6 +98,7 @@ export default class SpecialistHireService {
         }
 
         carrier.specialistId = specialist.id;
+        carrier.specialistExpireTick = specialist.expireTicks ? game.state.tick + specialist.expireTicks : null;
 
         // Update the DB.
         await this.gameRepo.bulkWrite([
@@ -109,7 +110,8 @@ export default class SpecialistHireService {
                         'galaxy.carriers._id': carrier._id
                     },
                     update: {
-                        'galaxy.carriers.$.specialistId': carrier.specialistId
+                        'galaxy.carriers.$.specialistId': carrier.specialistId,
+                        'galaxy.carriers.$.specialistExpireTick': carrier.specialistExpireTick
                     }
                 }
             }
@@ -179,6 +181,7 @@ export default class SpecialistHireService {
         }
 
         star.specialistId = specialist.id;
+        star.specialistExpireTick = specialist.expireTicks ? game.state.tick + specialist.expireTicks : null;
 
         // Update the DB.
         await this.gameRepo.bulkWrite([
@@ -190,7 +193,8 @@ export default class SpecialistHireService {
                         'galaxy.stars._id': star._id
                     },
                     update: {
-                        'galaxy.stars.$.specialistId': star.specialistId
+                        'galaxy.stars.$.specialistId': star.specialistId,
+                        'galaxy.stars.$.specialistExpireTick': star.specialistExpireTick
                     }
                 }
             }

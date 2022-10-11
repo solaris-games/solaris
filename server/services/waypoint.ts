@@ -194,7 +194,7 @@ export default class WaypointService {
             return true;
         }
 
-        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, false, true);
+        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, true);
         let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, effectiveTechs.hyperspace);
 
         let distanceBetweenStars = this.starDistanceService.getDistanceBetweenStars(sourceStar, destinationStar);
@@ -305,7 +305,7 @@ export default class WaypointService {
             return false;
         }
 
-        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, false, true);
+        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, true);
 
         // Check whether the last waypoint is in range of the first waypoint.
         let firstWaypoint = carrier.waypoints[0];
@@ -624,41 +624,6 @@ export default class WaypointService {
                 break;
             }
         }
-    }
-
-    rerouteToNearestFriendlyStarFromStar(game: Game, carrier: Carrier) {
-        if (!carrier.orbiting) {
-            throw new ValidationError(`Star must be in orbit for it to be rerouted from a star.`);
-        }
-
-        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, false, true);
-        let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, effectiveTechs.hyperspace);
-
-        // Find the nearest friendly star, if there is none then we cannot reroute.
-        let nearestStar = this.starDistanceService.getClosestPlayerOwnedStarsFromLocationWithinDistance(
-            carrier.location,
-            game.galaxy.stars,
-            carrier.ownedByPlayerId!,
-            hyperspaceDistance
-        )[0];
-
-        if (!nearestStar) {
-            return null;
-        }
-
-        carrier.waypoints = [{
-            _id: new mongoose.Types.ObjectId(),
-            source: carrier.orbiting,
-            destination: nearestStar._id,
-            action: 'nothing',
-            actionShips: 0,
-            delayTicks: 0
-        }];
-
-        carrier.waypointsLooped = false;
-        carrier.orbiting = null;
-
-        return nearestStar;
     }
 
 };

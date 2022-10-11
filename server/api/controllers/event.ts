@@ -1,7 +1,7 @@
 import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
 
-export default (container: DependencyContainer, io) => {
+export default (container: DependencyContainer) => {
     return {
         list: async (req, res, next) => {
             let page = +req.query.page || 0;

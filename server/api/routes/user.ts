@@ -1,112 +1,108 @@
 import { Router } from "express";
+import { ExpressJoiInstance } from "express-joi-validation";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import UserController from '../controllers/user';
+import { MiddlewareContainer } from "../middleware";
 
-import AuthMiddleware from '../middleware/auth';
-import CoreMiddleware from '../middleware/core';
-
-export default (router: Router, io, container: DependencyContainer) => {
-    const mwCore = CoreMiddleware();
-    const mwAuth = AuthMiddleware(container);
-
-    const controller = UserController(container, io);
+export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
+    const controller = UserController(container);
 
     router.get('/api/user/leaderboard',
         controller.listLeaderboard,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.post('/api/user/',
         controller.create,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/user/settings',
         controller.getSettings,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.put('/api/user/settings',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.saveSettings,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/user/subscriptions',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.getSubscriptions,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.put('/api/user/subscriptions',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.saveSubscriptions,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/user/credits',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.getCredits,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/user/',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.detailMe,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/user/avatars',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.listMyAvatars,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.post('/api/user/avatars/:avatarId/purchase',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.purchaseAvatar,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/user/:id',
         controller.detail,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/user/achievements/:id',
         controller.getAchievements,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.put('/api/user/changeEmailPreference',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.updateEmailPreference,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.put('/api/user/changeEmailOtherPreference',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.updateEmailOtherPreference,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.put('/api/user/changeUsername',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.updateUsername,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.put('/api/user/changeEmailAddress',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.updateEmailAddress,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.put('/api/user/changePassword',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.updatePassword,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.post('/api/user/requestResetPassword',
         controller.requestPasswordReset,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.post('/api/user/resetPassword',
         controller.resetPassword,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.post('/api/user/requestUsername',
         controller.requestUsername,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.delete('/api/user/closeaccount',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.delete,
-        mwCore.handleError);
+        mw.core.handleError);
 
     return router;
 }

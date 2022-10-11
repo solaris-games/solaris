@@ -2,7 +2,7 @@ import { DependencyContainer } from '../../services/types/DependencyContainer';
 import { ResearchType, ResearchTypeNotRandom } from '../../services/types/Player';
 import { mapToResearchUpdateNextRequest, mapToResearchUpdateNowRequest } from '../requests/research';
 
-export default (container: DependencyContainer, io) => {
+export default (container: DependencyContainer) => {
     return {
         updateNow: async (req, res, next) => {
             try {

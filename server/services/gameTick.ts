@@ -164,7 +164,7 @@ export default class GameTickService extends EventEmitter {
         */
 
         let startTime = process.hrtime();
-        console.info(`[${game.settings.general.name}] - Game tick started.`);
+        console.log(`[${game.settings.general.name}] - Game tick started at ${new Date().toISOString()}`);
 
         game.state.lastTickDate = moment().utc();
 
@@ -174,7 +174,7 @@ export default class GameTickService extends EventEmitter {
         let logTime = (taskName: string) => {
             taskTimeEnd = process.hrtime(taskTime);
             taskTime = process.hrtime();
-            console.info(`[${game.settings.general.name}] - ${taskName}: %ds %dms'`, taskTimeEnd[0], taskTimeEnd[1] / 1000000);
+            console.log(`[${game.settings.general.name}] - ${taskName}: %ds %dms'`, taskTimeEnd[0], taskTimeEnd[1] / 1000000);
         };
 
         let gameUsers = await this.userService.getGameUsers(game);
@@ -234,6 +234,9 @@ export default class GameTickService extends EventEmitter {
             this._oneTickSpecialists(game);
             logTime('Apply effects of onetick specialists');
 
+            this._clearExpiredSpecialists(game);
+            logTime('Clear expired specialists')
+
             this._countdownToEndCheck(game);
             logTime('Countdown to end check');
 
@@ -264,7 +267,7 @@ export default class GameTickService extends EventEmitter {
 
         let endTime = process.hrtime(startTime);
 
-        console.info(`[${game.settings.general.name}] - Game tick ended: %ds %dms'`, endTime[0], endTime[1] / 1000000);
+        console.log(`[${game.settings.general.name}] - Game tick ended: %ds %dms'`, endTime[0], endTime[1] / 1000000);
     }
 
     canTick(game: Game) {
@@ -833,6 +836,10 @@ export default class GameTickService extends EventEmitter {
     _oneTickSpecialists(game: Game) {
         this.playerCycleRewardsService.giveFinancialAnalystCredits(game);
         this.starMovementService.moveStellarEngines(game);
+    }
+
+    _clearExpiredSpecialists(game: Game) {
+        this.specialistService.clearExpiredSpecialists(game);
     }
 
     _orbitGalaxy(game: Game) {

@@ -20,7 +20,7 @@
         <div v-if="(!isCompactUIStyle || !star.ownedByPlayerId) && star.isNebula">
           <hr/>
           <p class="mb-0">This star is hidden inside a <span class="text-warning">Nebula <i class="fas fa-eye-slash"></i></span>.</p>
-          <p class="mb-2 text-info"><small><i>Ships inside a Nebula are hidden from all other players.</i></small></p>
+          <p class="mb-2 text-info"><small><i>Nebulas hide stars from all other players.</i></small></p>
         </div>
 
         <div v-if="(!isCompactUIStyle || !star.ownedByPlayerId) && star.isAsteroidField">
@@ -58,7 +58,7 @@
         </div>
       </div>
     </div>
-    <div v-if="isCompactUIStyle && star.infrastructure">
+    <div v-if="isCompactUIStyle && star.isInScanningRange">
       <div class="row mt-2" v-if="!isDeadStar">
         <div class="col">
             <star-resources :resources="star.naturalResources" :compareResources="star.terraformedResources" :iconAlignLeft="true" />
@@ -101,13 +101,13 @@
           </span>
         </div>
         <div class="col-auto">
-          <span title="Total known garrison" v-if="star.ownedByPlayerId && star.infrastructure">
+          <span title="Total known garrison" v-if="star.ownedByPlayerId">
             {{star.ships == null ? '???' : star.ships}} <i class="fas fa-rocket ms-1"></i>
           </span>
         </div>
       </div>
 
-      <div class="row pb-2" v-if="canShowSpecialist || (star.ownedByPlayerId && star.manufacturing != null)">
+      <div class="row pb-2" v-if="canShowSpecialist || star.ownedByPlayerId">
         <div class="col">
           <span v-if="canShowSpecialist && isOwnedByUserPlayer && canHireSpecialist">
             <specialist-icon :type="'star'" :defaultIcon="'user-astronaut'" :specialist="star.specialist"></specialist-icon>
@@ -115,18 +115,18 @@
               <span class="ms-1" v-if="star.specialistId" :title="star.specialist.description">{{star.specialist.name}}</span>
               <span v-if="!star.specialistId">No Specialist</span>
             </a>
+            <span v-if="star.specialistId && star.specialistExpireTick" class="badge bg-warning ms-1"><i class="fas fa-stopwatch"></i> Expires Tick {{star.specialistExpireTick}}</span>
           </span>
           <span v-if="canShowSpecialist && (!isOwnedByUserPlayer || !canHireSpecialist)">
             <specialist-icon :type="'star'" :defaultIcon="'user-astronaut'" :specialist="star.specialist"></specialist-icon>
-            <span v-if="star.specialist">
-              {{star.specialist.name}}
-            </span>
+            <span v-if="star.specialist" class="ms-1">{{star.specialist.name}}</span>
+            <span v-if="star.specialistId && star.specialistExpireTick" class="badge bg-warning ms-1"><i class="fas fa-stopwatch"></i> Expires Tick {{star.specialistExpireTick}}</span>
             <span v-if="!star.specialist">No Specialist</span>
           </span>
         </div>
         <div class="col-auto">
-          <span v-if="star.ownedByPlayerId && star.manufacturing != null && !isDeadStar" title="Ship production per tick">
-            {{star.manufacturing}} <i class="fas fa-wrench ms-1"></i>
+          <span v-if="star.ownedByPlayerId && !isDeadStar" title="Ship production per tick">
+            {{star.manufacturing || '???'}} <i class="fas fa-wrench ms-1"></i>
           </span>
         </div>
       </div>
@@ -150,8 +150,8 @@
       </div>
     </div>
 
-    <div v-if="isStandardUIStyle">
-      <div v-if="star.ownedByPlayerId && star.infrastructure" class="row mb-0 pt-3 pb-3 bg-primary">
+    <div v-if="isStandardUIStyle && star.isInScanningRange">
+      <div v-if="star.ownedByPlayerId" class="row mb-0 pt-3 pb-3 bg-primary">
           <div class="col">
               Ships
           </div>
@@ -161,7 +161,7 @@
           </div>
       </div>
 
-      <div v-if="star.infrastructure && !isDeadStar" class="row pt-1 pb-1 bg-dark">
+      <div v-if="!isDeadStar" class="row pt-1 pb-1 bg-dark">
           <div class="col">
               Natural Resources
           </div>
@@ -170,7 +170,7 @@
           </div>
       </div>
 
-      <div v-if="star.ownedByPlayerId && star.infrastructure && !isDeadStar" class="row pt-1 pb-1 bg-dark">
+      <div v-if="!isDeadStar" class="row pt-1 pb-1 bg-dark">
           <div class="col">
               Terraformed Resources
           </div>
@@ -179,12 +179,12 @@
           </div>
       </div>
 
-      <div v-if="star.ownedByPlayerId && star.manufacturing != null" class="row pt-1 pb-1 bg-dark">
+      <div v-if="star.ownedByPlayerId" class="row pt-1 pb-1 bg-dark">
           <div class="col">
               Ship Production
           </div>
           <div class="col text-end" title="Ship production per tick">
-            <span>{{star.manufacturing}}</span>
+            <span>{{star.manufacturing || '???'}}</span>
             <i class="fas fa-wrench ms-2"></i>
           </div>
       </div>

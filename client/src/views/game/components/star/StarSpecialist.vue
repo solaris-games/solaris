@@ -13,6 +13,7 @@
         <div class="col-12 mt-2">
             <p v-if="star.specialist">{{star.specialist.description}}</p>
             <p v-if="star.specialist && star.specialist.oneShot" class="text-warning"><small>This specialist cannot be replaced.</small></p>
+            <p v-if="star.specialist && star.specialistExpireTick" class="text-warning"><small>This specialist expires on tick {{star.specialistExpireTick}}.</small></p>
             <p class="mb-2" v-if="!star.specialistId">
               <small><i>This star does not have a specialist assigned.</i></small>
             </p>

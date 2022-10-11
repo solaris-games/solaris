@@ -110,4 +110,13 @@ export default class ShipService {
         return +((industryLevel * (techLevel + 5) / productionTicks) * ticks).toFixed(2);
     }
 
+    calculateStarManufacturing(game: Game, star: Star) {
+        let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
+        let ind = star.infrastructure?.industry ?? 0;
+
+        let manufacturing = this.calculateStarShipsByTicks(effectiveTechs.manufacturing, ind, 1, game.settings.galaxy.productionTicks);
+
+        return manufacturing;
+    }
+
 };

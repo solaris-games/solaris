@@ -2,7 +2,7 @@ import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
 import { mapToUserCreateUserRequest, mapToUserRequestPasswordResetRequest, mapToUserRequestUsernameRequest, mapToUserResetPasswordResetRequest, mapToUserUpdateEmailPreferenceRequest, mapToUserUpdateEmailRequest, mapToUserUpdatePasswordRequest, mapToUserUpdateUsernameRequest } from '../requests/user';
 
-export default (container: DependencyContainer, io) => {
+export default (container: DependencyContainer) => {
     return {
         listLeaderboard: async (req, res, next) => {
             try {

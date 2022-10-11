@@ -162,7 +162,7 @@ export default class EmailService {
             text
         };
         
-        console.log(`EMAIL: [${message.from}] -> [${message.to}] - ${subject}`);
+        console.log(`EMAIL: [${message.to}] - ${subject}`);
 
         return await transport.sendMail(message);
     }
@@ -177,7 +177,7 @@ export default class EmailService {
             html
         };
         
-        console.log(`EMAIL HTML: [${message.from}] -> [${message.to}] - ${subject}`);
+        console.log(`EMAIL HTML: [${message.to}] - ${subject}`);
 
         return await transport.sendMail(message);
     }

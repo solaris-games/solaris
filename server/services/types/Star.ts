@@ -35,6 +35,7 @@ export interface Star extends MapObject {
     ships: number | null;
     shipsActual?: number;
     specialistId: number | null;
+    specialistExpireTick: number | null;
     homeStar: boolean;
     warpGate: boolean;
     isNebula: boolean;
@@ -51,6 +52,7 @@ export interface Star extends MapObject {
     targeted?: boolean;
     upgradeCosts?: InfrastructureUpgradeCosts;
     manufacturing?: number;
+    isInScanningRange?: boolean;
 };
 
 export interface StarCaptureResult {

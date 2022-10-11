@@ -26,7 +26,7 @@ let mongo,
     privateCommandService: PrivateCommandService;
 
 client.once('ready', () => {
-    console.log('-----------------------\nBanning Hyperi0n!\n-----------------------');
+    console.log('Discord connection established.');
 });
 
 client.on('message', async (msg) => {
@@ -90,8 +90,6 @@ async function startup() {
         container.gameFluxService, container.specialistBanService, container.specialStarBanService);
     privateCommandService = new PrivateCommandService();
 
-    console.log('Discord Dependency Container Initialized');
-
     mongo = await mongooseLoader({
         connectionString: process.env.CONNECTION_STRING
     }, {
@@ -100,7 +98,7 @@ async function startup() {
 
     client.login(process.env.BOT_TOKEN);
 
-    console.log('Discord Initialized');
+    console.log('Discord initialized.');
 }
 
 process.on('SIGINT', async () => {

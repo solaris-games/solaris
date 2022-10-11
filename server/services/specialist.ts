@@ -206,4 +206,20 @@ export default class SpecialistService {
         return this._getStarSpecialValue(star, 'attractStar', false);
     }
 
+    clearExpiredSpecialists(game: Game) {
+        const stars = game.galaxy.stars.filter(s => s.specialistId && s.specialistExpireTick != null && s.specialistExpireTick < game.state.tick);
+
+        for (const star of stars) {
+            star.specialistId = null;
+            star.specialistExpireTick = null;
+        }
+
+        const carriers = game.galaxy.carriers.filter(c => c.specialistId && c.specialistExpireTick != null && c.specialistExpireTick < game.state.tick);
+
+        for (const carrier of carriers) {
+            carrier.specialistId = null;
+            carrier.specialistExpireTick = null;
+        }
+    }
+
 };

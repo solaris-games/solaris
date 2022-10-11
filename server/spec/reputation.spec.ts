@@ -9,11 +9,14 @@ describe('reputation', () => {
         getDiplomaticStatusToPlayer() { },
         declareEnemy() { },
     };
+    const fakePlayerAfkService: any = {
+        isAIControlled() { return true }
+    };
 
     let service: ReputationService;
 
     beforeEach(() => {
-        service = new ReputationService(fakeGameRepo, fakePlayerStatisticsService, fakeDiplomacyService, null as any); // TODO: fake this
+        service = new ReputationService(fakeGameRepo, fakePlayerStatisticsService, fakeDiplomacyService, fakePlayerAfkService);
     });
 
     const _playerIdA: any = 1;

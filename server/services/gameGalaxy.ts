@@ -32,6 +32,7 @@ import AvatarService from './avatar';
 import PlayerStatisticsService from './playerStatistics';
 import GameFluxService from './gameFlux';
 import PlayerAfkService from './playerAfk';
+import ShipService from './ship';
 
 export default class GameGalaxyService {
     cacheService: CacheService;
@@ -41,6 +42,7 @@ export default class GameGalaxyService {
     playerService: PlayerService;
     playerAfkService: PlayerAfkService;
     starService: StarService;
+    shipService: ShipService;
     distanceService: DistanceService;
     starDistanceService: StarDistanceService;
     starUpgradeService: StarUpgradeService;
@@ -69,6 +71,7 @@ export default class GameGalaxyService {
         playerService: PlayerService,
         playerAfkService: PlayerAfkService,
         starService: StarService,
+        shipService: ShipService,
         distanceService: DistanceService, 
         starDistanceService: StarDistanceService,
         starUpgradeService: StarUpgradeService,
@@ -96,6 +99,7 @@ export default class GameGalaxyService {
         this.playerService = playerService;
         this.playerAfkService = playerAfkService;
         this.starService = starService;
+        this.shipService = shipService;
         this.distanceService = distanceService;
         this.starDistanceService = starDistanceService;
         this.starUpgradeService = starUpgradeService;
@@ -351,7 +355,7 @@ export default class GameGalaxyService {
         }
 
         // Work out which ones are not in scanning range and clear their data.
-        doc.galaxy.stars = doc.galaxy.stars
+        doc.galaxy.stars = (doc.galaxy.stars as any[]) // TODO: Doing this to get around the whacky TS errors when deleting fields from the model
             .map(s => {
                 delete s.shipsActual; // Don't need to send this back.
 
@@ -364,6 +368,7 @@ export default class GameGalaxyService {
 
                 // Round the Natural Resources
                 s.naturalResources = this.starService.calculateActualNaturalResources(s);
+                s.manufacturing = this.shipService.calculateStarManufacturing(doc, s);
 
                 if (isOrbital) {
                     s.locationNext = this.starMovementService.getNextLocation(doc, s);
@@ -371,9 +376,7 @@ export default class GameGalaxyService {
 
                 // If the star is dead then it has no infrastructure.
                 if (this.starService.isDeadStar(s)) {
-                    s.infrastructure.economy = null;
-                    s.infrastructure.industry = null;
-                    s.infrastructure.science = null;
+                    delete s.infrastructure;
                 }
 
                 if (isKingOfTheHillMode) {
@@ -392,6 +395,7 @@ export default class GameGalaxyService {
                     }
 
                     s.ignoreBulkUpgrade = (s.ignoreBulkUpgrade || null) || this.starService.resetIgnoreBulkUpgradeStatuses(s);
+                    s.isInScanningRange = true;
 
                     return s;
                 } else {
@@ -399,19 +403,29 @@ export default class GameGalaxyService {
                     delete s.ignoreBulkUpgrade;
                 }
 
-                // Get the closest player star to this star.
-                let inRange = isFinished ||                                                                 // The game is finished
+                s.isInScanningRange = isFinished ||                                                         // The game is finished
                     this.starService.isStarWithinScanningRangeOfStars(doc, s, playerScanningStars) ||       // The star is within scanning range
                     playerCarriersInOrbit.find(c => c.orbiting!.toString() === s._id.toString()) != null;   // The star has a friendly carrier in orbit
 
                 // If its in range then its all good, send the star back as is.
                 // Otherwise only return a subset of the data.
-                if (inRange) {
+                if (s.isInScanningRange) {
                     if (s.specialistId) {
                         s.specialist = this.specialistService.getByIdStar(s.specialistId);
                     }
 
-                    let canSeeStarShips = isFinished || (player && this.starService.canPlayerSeeStarShips(player, s));
+                    if (isFinished) {
+                        return s;
+                    }
+
+                    if (s.isNebula) {
+                        delete s.infrastructure;
+                        delete s.naturalResources;
+                        delete s.terraformedResources;
+                        delete s.manufacturing;
+                    }
+
+                    let canSeeStarShips = player && this.starService.canPlayerSeeStarShips(player, s);
 
                     if (!canSeeStarShips) {
                         s.ships = null;
@@ -432,7 +446,8 @@ export default class GameGalaxyService {
                         isBlackHole: false, // Hide outside of scanning range
                         isPulsar: false, // Hide outside of scanning range
                         wormHoleToStarId: s.wormHoleToStarId,
-                        isKingOfTheHillStar: s.isKingOfTheHillStar
+                        isKingOfTheHillStar: s.isKingOfTheHillStar,
+                        isInScanningRange: s.isInScanningRange
                     }
                 };
             }) as any;

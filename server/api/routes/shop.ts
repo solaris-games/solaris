@@ -1,25 +1,21 @@
 import { Router } from "express";
+import { ExpressJoiInstance } from "express-joi-validation";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import ShopController from '../controllers/shop';
+import { MiddlewareContainer } from "../middleware";
 
-import AuthMiddleware from '../middleware/auth';
-import CoreMiddleware from '../middleware/core';
-
-export default (router: Router, io, container: DependencyContainer) => {
-    const mwCore = CoreMiddleware();
-    const mwAuth = AuthMiddleware(container);
-
-    const controller = ShopController(container, io);
+export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
+    const controller = ShopController(container);
 
     router.get('/api/shop/galacticcredits/purchase',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.purchase,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/shop/galacticcredits/purchase/process',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.process,
-        mwCore.handleError);
+        mw.core.handleError);
 
     return router;
 }

@@ -12,6 +12,7 @@ export interface Specialist {
     baseCostCredits: number;
     baseCostCreditsSpecialists: number;
     oneShot: boolean;
+    expireTicks: number | null;
     modifiers: {
         local?: {
             speed?: number;
@@ -22,10 +23,15 @@ export interface Specialist {
             terraforming?: number;
             carrierToCarrierCombat?: {
                 weapons?: number;
-            },
+            }
             carrierToStarCombat?: {
-                weapons?: number;
-                weaponsPerAlly?: number;
+                attacker: {
+                    weapons?: number;
+                    weaponsPerAlly?: number;
+                }
+                defender: {
+                    weapons?: number;
+                }
             }
         },
         special?: {

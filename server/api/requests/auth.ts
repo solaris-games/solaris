@@ -1,28 +1,8 @@
-import ValidationError from "../../errors/validation";
-import { keyHasStringValue } from "./helpers";
+import * as Joi from 'joi';
 
-export interface AuthLoginRequest {
-    email: string;
-    password: string;
-};
-
-export const mapToAuthLoginRequest = (body: any): AuthLoginRequest => {
-    let errors: string[] = [];
-    
-    if (!keyHasStringValue(body, 'email')) {
-        errors.push('Email is required.');
-    }
-
-    if (!keyHasStringValue(body, 'password')) {
-        errors.push('Password is required.');
-    }
-    
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    return {
-        email: body.email,
-        password: body.password
-    }
-};
+export const authLoginRequestSchema = Joi.object({
+  email: Joi.string().required().email().message('Email is required and must be a valid email address.'),
+  password: Joi.string().required().messages({
+    'string.empty': 'Password is required.'
+  })
+});

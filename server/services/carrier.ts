@@ -89,6 +89,7 @@ export default class CarrierService extends EventEmitter {
             waypoints: [],
             waypointsLooped: false,
             specialistId: null,
+            specialistExpireTick: null,
             specialist: null,
             isGift: false,
             locationNext: null,
@@ -106,9 +107,7 @@ export default class CarrierService extends EventEmitter {
             let starSpecialist = this.specialistService.getByIdStar(star.specialistId);
     
             if (starSpecialist?.modifiers.special?.autoCarrierSpecialistAssign) {
-                // @ts-ignore
                 carrier.specialistId = starSpecialist.modifiers.special!.autoCarrierSpecialistAssign!;
-                // @ts-ignore
                 carrier.specialist = this.specialistService.getByIdCarrier(carrier.specialistId)
             }
         }
@@ -215,6 +214,7 @@ export default class CarrierService extends EventEmitter {
                 waypoints: c.waypoints,
                 isGift: c.isGift,
                 specialistId: c.specialistId,
+                specialistExpireTick: c.specialistExpireTick,
                 specialist: null
             };
 

@@ -47,12 +47,12 @@
               <span class="ms-1" v-if="carrier.specialistId" :title="carrier.specialist.description">{{carrier.specialist.name}}</span>
               <span v-if="!carrier.specialistId">No Specialist</span>
             </a>
+            <span v-if="carrier.specialistId && carrier.specialistExpireTick" class="badge bg-warning ms-1"><i class="fas fa-stopwatch"></i> Expires Tick {{carrier.specialistExpireTick}}</span>
           </span>
           <span v-if="canShowSpecialist && (!isOwnedByUserPlayer || !canHireSpecialist)">
             <specialist-icon :type="'carrier'" :defaultIcon="'user-astronaut'" :specialist="carrier.specialist"></specialist-icon>
-            <span v-if="carrier.specialist">
-              {{carrier.specialist.name}}
-            </span>
+            <span v-if="carrier.specialist" class="ms-1">{{carrier.specialist.name}}</span>
+            <span v-if="carrier.specialistId && carrier.specialistExpireTick" class="badge bg-warning ms-1"><i class="fas fa-stopwatch"></i> Expires Tick {{carrier.specialistExpireTick}}</span>
             <span v-if="!carrier.specialist">No Specialist</span>
           </span>
         </div>

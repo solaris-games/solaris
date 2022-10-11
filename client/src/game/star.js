@@ -70,7 +70,6 @@ class Star extends EventEmitter {
 
     this.isSelected = false
     this.isMouseOver = false
-    this.isInScanningRange = false // Default to false to  initial redraw
     this.zoomPercent = 100
     this.showIgnoreBulkUpgradeInfrastructure = false
 
@@ -102,11 +101,6 @@ class Star extends EventEmitter {
 
   _getStarCarrierShips () {
     return this._getStarCarriers().reduce((sum, c) => sum + (c.ships || 0), 0)
-  }
-
-  _isInScanningRange () {
-    // These may be undefined, if so it means that they are out of scanning range.
-    return !(typeof this.data.infrastructure === 'undefined')
   }
 
   setup (game, data, userSettings, players, carriers, lightYearDistance) {
@@ -157,17 +151,13 @@ class Star extends EventEmitter {
     this.drawInfrastructure()
     this.drawInfrastructureBulkIgnored()
     this.drawDepth()
-
-    this.isInScanningRange = this._isInScanningRange()
   }
 
 
   drawStar () {
     this.container.removeChild(this.graphics_star)
 
-    let isInScanningRange = this._isInScanningRange()
-
-    if (isInScanningRange) {
+    if (this.data.isInScanningRange) {
       // ---- Binary stars ----
       if (this.isBinaryStar()) {
         if (this.hasBlackHole()) {
@@ -413,7 +403,7 @@ class Star extends EventEmitter {
         planetGraphics.drawCircle(planetSize / 2, 0, planetSize)
         planetGraphics.endFill()
 
-        if (!this._isInScanningRange()) {
+        if (!this.data.isInScanningRange) {
           planetGraphics.alpha = 0.3
         }
 
@@ -540,7 +530,7 @@ class Star extends EventEmitter {
       let carriersOrbiting = this._getStarCarriers()
       let scramblers = carriersOrbiting.reduce( (sum, c ) => sum + (c.ships==null), 0 )
       let scrambler = this.data.ships == null
-      return ( (scramblers || scrambler) && this._isInScanningRange() )
+      return ((scramblers || scrambler) && this.data.isInScanningRange)
   }
 
   drawName () {
@@ -639,7 +629,7 @@ class Star extends EventEmitter {
     }
 
     if (!this.text_infrastructure) {
-      if (this.data.ownedByPlayerId && this._isInScanningRange()) {
+      if (this.data.ownedByPlayerId && this.data.infrastructure) {
         let displayInfrastructure = `${this.data.infrastructure.economy} ${this.data.infrastructure.industry} ${this.data.infrastructure.science}`
 
         let bitmapFont = {fontName: "chakrapetch", fontSize: 4}
@@ -857,16 +847,16 @@ class Star extends EventEmitter {
 
     if (this.userSettings.map.naturalResources !== 'planets') {
       if (this.graphics_natural_resources_ring[lod]) {
-        this.graphics_natural_resources_ring[lod].visible = this._isInScanningRange() && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources
+        this.graphics_natural_resources_ring[lod].visible = this.data.isInScanningRange && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources
       }
     }
 
     if (this.text_name) this.text_name.visible = this.isSelected || this.zoomPercent >= Star.zoomLevelDefinitions.name
-    if (this.container_planets) this.container_planets.visible = this._isInScanningRange() && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources
+    if (this.container_planets) this.container_planets.visible = this.data.isInScanningRange && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources
     if (this.text_infrastructure) this.text_infrastructure.visible = this.isSelected || this.zoomPercent >= Star.zoomLevelDefinitions.infrastructure
 
     let small_ships = this.zoomPercent >= Star.zoomLevelDefinitions.name || this.isSelected
-    let visible_ships = !!(this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomPercent >= Star.zoomLevelDefinitions.shipCount))
+    let visible_ships = !!(this.data.isInScanningRange && (this.isSelected || this.isMouseOver || this.zoomPercent >= Star.zoomLevelDefinitions.shipCount))
 
     if (this.text_ships_small) this.text_ships_small.visible = small_ships && visible_ships
     if (this.text_ships_big) this.text_ships_big.visible = !small_ships && visible_ships

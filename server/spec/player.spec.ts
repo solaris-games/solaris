@@ -117,23 +117,6 @@ function assertNewPlayer(newPlayer, colour) {
     }
 }
 
-function printStars(allStars) {
-    console.log();
-    
-    for(let y = 0; y < 100; y += 10) {
-        let starsOnY = allStars.filter((x) => x.location.y == y);
-
-        console.log(starsOnY.map((p) => {
-            if (p.ownedByPlayerId) {
-                let key = p.ownedByPlayerId.toString();
-                return key[key.length - 1] + ' ';
-            }
-
-            return '. ';
-        }).join(''));
-    }
-}
-
 describe('player', () => {
 
     let randomService;
@@ -201,8 +184,6 @@ describe('player', () => {
             
             expect(homeStar.ships).toEqual(game.settings.player.startingShips);
         }
-
-        //printStars(allStars);
     });
 
 });

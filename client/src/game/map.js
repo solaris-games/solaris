@@ -269,7 +269,6 @@ class Map extends EventEmitter {
 
   _setupChunks() {
     if(this.chunksContainer) {
-      console.log('resetting chunks')
       this.chunksContainer.removeChildren()
     }
 

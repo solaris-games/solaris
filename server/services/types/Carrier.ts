@@ -10,6 +10,7 @@ export interface Carrier extends MapObject {
     name: string;
     ships: number | null;
     specialistId: number | null;
+    specialistExpireTick: number | null;
     specialist: Specialist | null;
     isGift: boolean;
     waypoints: CarrierWaypoint[];

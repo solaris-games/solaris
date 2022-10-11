@@ -1,7 +1,7 @@
 import { DependencyContainer } from '../../services/types/DependencyContainer';
 import { mapToConversationCreateConversationRequest, mapToConversationSendMessageRequest } from '../requests/conversation';
 
-export default (container: DependencyContainer, io) => {
+export default (container: DependencyContainer) => {
     return {
         list: async (req, res, next) => {
             try {
