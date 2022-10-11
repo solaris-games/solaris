@@ -493,6 +493,10 @@ export default class StarService extends EventEmitter {
     }
 
     isDeadStar(star: Star) {
+        if (!star.naturalResources) {
+            return true;
+        }
+        
         return star.naturalResources.economy <= 0 && star.naturalResources.industry <= 0 && star.naturalResources.science <= 0;
     }
 
