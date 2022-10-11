@@ -451,7 +451,7 @@ describe('technology', () => {
 
         setup();
 
-        const buff = service.getCarrierWeaponsBuff(carrier, isCarrierToStarCombat);
+        const buff = service.getCarrierWeaponsBuff(carrier, isCarrierToStarCombat, true);
 
         expect(buff).toBe(0);
     });
@@ -473,7 +473,7 @@ describe('technology', () => {
 
         setup(null, specialist);
 
-        const buff = service.getCarrierWeaponsBuff(carrier, isCarrierToStarCombat);
+        const buff = service.getCarrierWeaponsBuff(carrier, isCarrierToStarCombat, true);
 
         expect(buff).toBe(1);
     });
@@ -489,7 +489,9 @@ describe('technology', () => {
             modifiers: {
                 local: {
                     carrierToStarCombat: {
-                        weapons: 5
+                        attacker: {
+                            weapons: 5
+                        }
                     }
                 }
             }
@@ -497,7 +499,7 @@ describe('technology', () => {
 
         setup(null, specialist);
 
-        const buff = service.getCarrierWeaponsBuff(carrier, isCarrierToStarCombat);
+        const buff = service.getCarrierWeaponsBuff(carrier, isCarrierToStarCombat, true);
 
         expect(buff).toBe(5);
     });
@@ -513,7 +515,9 @@ describe('technology', () => {
             modifiers: {
                 local: {
                     carrierToStarCombat: {
-                        weapons: 5
+                        attacker: {
+                            weapons: 5
+                        }
                     }
                 }
             }
@@ -521,7 +525,7 @@ describe('technology', () => {
 
         setup(null, specialist);
 
-        const buff = service.getCarrierWeaponsBuff(carrier, isCarrierToStarCombat);
+        const buff = service.getCarrierWeaponsBuff(carrier, isCarrierToStarCombat, true);
 
         expect(buff).toBe(0);
     });
@@ -545,7 +549,7 @@ describe('technology', () => {
 
         setup(null, specialist);
 
-        const buff = service.getCarrierWeaponsBuff(carrier, isCarrierToStarCombat);
+        const buff = service.getCarrierWeaponsBuff(carrier, isCarrierToStarCombat, true);
 
         expect(buff).toBe(5);
     });
@@ -569,7 +573,7 @@ describe('technology', () => {
 
         setup(null, specialist);
 
-        const buff = service.getCarrierWeaponsBuff(carrier, isCarrierToStarCombat);
+        const buff = service.getCarrierWeaponsBuff(carrier, isCarrierToStarCombat, true);
 
         expect(buff).toBe(0);
     });
@@ -707,7 +711,9 @@ describe('technology', () => {
             modifiers: {
                 local: {
                     carrierToStarCombat: {
-                        weaponsPerAlly: 2
+                        attacker: {
+                            weaponsPerAlly: 2
+                        }
                     }
                 }
             }
@@ -715,7 +721,7 @@ describe('technology', () => {
 
         setup(null, specialist);
 
-        const weapons = service.getCarriersEffectiveWeaponsLevel(game, players, carriers, isCarrierToStarCombat);
+        const weapons = service.getCarriersEffectiveWeaponsLevel(game, players, carriers, isCarrierToStarCombat, true);
 
         expect(weapons).toBe(6);
     });
@@ -989,13 +995,7 @@ describe('technology', () => {
                     weapons: 5,
                     banking: 6,
                     manufacturing: 7,
-                    specialists: 8,
-                    carrierToStarCombat: {
-                        weapons: 5
-                    },
-                    carrierToCarrierCombat: {
-                        weapons: 5
-                    }
+                    specialists: 8
                 }
             }
         };
@@ -1040,13 +1040,7 @@ describe('technology', () => {
                     weapons: 5,
                     banking: 6,
                     manufacturing: 7,
-                    specialists: 8,
-                    carrierToStarCombat: {
-                        weapons: 5
-                    },
-                    carrierToCarrierCombat: {
-                        weapons: 5
-                    }
+                    specialists: 8
                 }
             }
         };
@@ -1063,78 +1057,6 @@ describe('technology', () => {
         expect(tech.banking).toBe(7);
         expect(tech.manufacturing).toBe(8);
         expect(tech.specialists).toBe(9);
-    });
-
-    it('should calculate carrier effective technology levels - Specialist modifiers - Carrier to star combat', () => {
-        const game = {
-            galaxy: {
-                players: [
-                    {
-                        _id: playerId
-                    }
-                ]
-            }
-        };
-
-        const carrier = {
-            ownedByPlayerId: playerId,
-            specialistId: 1
-        };
-
-        const specialist = {
-            modifiers: {
-                local: {
-                    carrierToStarCombat: {
-                        weapons: 1
-                    },
-                    carrierToCarrierCombat: {
-                        weapons: 10
-                    }
-                }
-            }
-        };
-
-        setup(null, specialist);
-
-        const tech = service.getCarrierEffectiveTechnologyLevels(game, carrier, true);
-
-        expect(tech.weapons).toBe(2);
-    });
-
-    it('should calculate carrier effective technology levels - Specialist modifiers - Carrier to carrier combat', () => {
-        const game = {
-            galaxy: {
-                players: [
-                    {
-                        _id: playerId
-                    }
-                ]
-            }
-        };
-
-        const carrier = {
-            ownedByPlayerId: playerId,
-            specialistId: 1
-        };
-
-        const specialist = {
-            modifiers: {
-                local: {
-                    carrierToStarCombat: {
-                        weapons: 10
-                    },
-                    carrierToCarrierCombat: {
-                        weapons: 1
-                    }
-                }
-            }
-        };
-
-        setup(null, specialist);
-
-        const tech = service.getCarrierEffectiveTechnologyLevels(game, carrier, false);
-
-        expect(tech.weapons).toBe(2);
     });
 
 })

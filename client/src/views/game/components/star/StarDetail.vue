@@ -119,7 +119,7 @@
           </span>
           <span v-if="canShowSpecialist && (!isOwnedByUserPlayer || !canHireSpecialist)">
             <specialist-icon :type="'star'" :defaultIcon="'user-astronaut'" :specialist="star.specialist"></specialist-icon>
-            <span v-if="star.specialist">{{star.specialist.name}}</span>
+            <span v-if="star.specialist" class="ms-1">{{star.specialist.name}}</span>
             <span v-if="star.specialistId && star.specialistExpireTick" class="badge bg-warning ms-1"><i class="fas fa-stopwatch"></i> Expires Tick {{star.specialistExpireTick}}</span>
             <span v-if="!star.specialist">No Specialist</span>
           </span>

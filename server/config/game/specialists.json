@@ -268,7 +268,12 @@
                         "weapons": 3
                     },
                     "carrierToStarCombat": {
-                        "weapons": -2
+                        "attacker": {
+                            "weapons": -2
+                        },
+                        "defender": {
+                            "weapons": -2
+                        }
                     }
                 }
             }
@@ -402,8 +407,36 @@
                 "local": {
                     "speed": 0.75,
                     "carrierToStarCombat": {
-                        "weaponsPerAlly": 2
+                        "attacker": {
+                            "weaponsPerAlly": 2
+                        }
                     }
+                }
+            }
+        },
+        {
+            "id": 20,
+            "key": "forward-field",
+            "name": "Siege Breaker",
+            "description": "When attacking a star, adds +4 Weapons to your side in combat. Does not participate in carrier-to-carrier combat.",
+            "active": {
+                "official": true,
+                "custom": true
+            },
+            "baseCostCredits": 300,
+            "baseCostCreditsSpecialists": 3,
+            "oneShot": false,
+            "expireTicks": 15,
+            "modifiers": {
+                "local": {
+                    "carrierToStarCombat": {
+                        "attacker": {
+                            "weapons": 4
+                        }
+                    }
+                },
+                "special": {
+                    "avoidCombatCarrierToCarrier": true
                 }
             }
         }

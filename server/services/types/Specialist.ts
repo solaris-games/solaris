@@ -23,10 +23,15 @@ export interface Specialist {
             terraforming?: number;
             carrierToCarrierCombat?: {
                 weapons?: number;
-            },
+            }
             carrierToStarCombat?: {
-                weapons?: number;
-                weaponsPerAlly?: number;
+                attacker: {
+                    weapons?: number;
+                    weaponsPerAlly?: number;
+                }
+                defender: {
+                    weapons?: number;
+                }
             }
         },
         special?: {

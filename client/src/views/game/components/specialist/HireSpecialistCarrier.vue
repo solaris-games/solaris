@@ -108,6 +108,7 @@ export default {
                 let currency = this.$store.state.game.settings.specialGalaxy.specialistsCurrency
 
                 this.carrier.specialistId = specialist.id
+                this.carrier.specialistExpireTick = specialist.expireTicks ? this.$store.state.game.state.tick + specialist.expireTicks : null
                 this.carrier.specialist = specialist
                 this.userPlayer[currency] -= specialist.cost[currency]
 

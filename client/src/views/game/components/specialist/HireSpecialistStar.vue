@@ -103,6 +103,7 @@ export default {
                 let currency = this.$store.state.game.settings.specialGalaxy.specialistsCurrency
 
                 this.star.specialistId = specialist.id
+                this.star.specialistExpireTick = specialist.expireTicks ? this.$store.state.game.state.tick + specialist.expireTicks : null
                 this.star.specialist = specialist
                 this.userPlayer[currency] -= specialist.cost[currency]
 

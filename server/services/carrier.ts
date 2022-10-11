@@ -214,6 +214,7 @@ export default class CarrierService extends EventEmitter {
                 waypoints: c.waypoints,
                 isGift: c.isGift,
                 specialistId: c.specialistId,
+                specialistExpireTick: c.specialistExpireTick,
                 specialist: null
             };
 
