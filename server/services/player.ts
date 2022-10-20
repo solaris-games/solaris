@@ -278,7 +278,7 @@ export default class PlayerService extends EventEmitter {
             for (let starId of linkedStars) {
                 let star = this.starService.getById(game, starId);
 
-                this.starService.setupPlayerStarForGameStart(game, star, player, false);
+                this.starService.setupPlayerStarForGameStart(game, star, player);
             }
         }
     }
@@ -298,7 +298,7 @@ export default class PlayerService extends EventEmitter {
                 let s = this.starDistanceService.getClosestUnownedStar(homeStar, game.galaxy.stars);
 
                 // Set up the closest star.
-                this.starService.setupPlayerStarForGameStart(game, s, player, false);
+                this.starService.setupPlayerStarForGameStart(game, s, player);
             }
         }
     }
@@ -321,7 +321,7 @@ export default class PlayerService extends EventEmitter {
         let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
         for (let star of playerStars) {
-            this.starService.setupPlayerStarForGameStart(game, star, player, true);
+            this.starService.setupPlayerStarForGameStart(game, star, player);
         }
 
         // Reset the player's carriers
