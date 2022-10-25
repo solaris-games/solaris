@@ -77,26 +77,6 @@
             "name": "Attach to Recalc Ranks",
             "port": 9234,
             "restart": true
-        },
-
-        // Bots
-        // Discord
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Launch Discord Bot",
-            "protocol": "inspector",
-            "cwd": "${workspaceFolder}/server",
-            "runtimeExecutable": "npm",
-            "runtimeArgs": ["run-script", "start-discord-bot:dev"],
-            "envFile": ".env"
-        },
-        {
-            "type": "node",
-            "request": "attach",
-            "name": "Attach to Discord Bot",
-            "port": 9232,
-            "restart": true
         }
     ]
 }

@@ -18,7 +18,6 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
         mw.core.handleError);
 
     router.get('/api/guild/leaderboard',
-        mw.auth.authenticate(),
         controller.listLeaderboard,
         mw.core.handleError);
 

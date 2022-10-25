@@ -13,7 +13,6 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
         mw.core.handleError);
 
     router.get('/api/game/flux',
-        mw.auth.authenticate(),
         controller.getFlux,
         mw.core.handleError);
 
