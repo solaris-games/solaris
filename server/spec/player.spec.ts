@@ -26,6 +26,11 @@ const game = {
                 economy: 5,
                 industry: 5,
                 science: 1
+            },
+            developmentCost: {
+                economy: 'standard',
+                industry: 'standard',
+                science: 'standard'
             }
         },
         technology: {
