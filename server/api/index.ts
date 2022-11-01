@@ -8,6 +8,8 @@ import containerLoader from '../services';
 
 let mongo;
 
+console.log(`Node ${process.version}`);
+
 async function startServer() {
   mongo = await mongooseLoader(config, {});
 
