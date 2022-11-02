@@ -37,7 +37,7 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
         (req, res, next) => {
             try {
                 if (req.game.settings.general.createdByUserId) {
-                    req.game.settings.general.isGameAdmin = req.game.settings.general.createdByUserId.toString() === req.session.userId.toString();
+                    req.game.settings.general.isGameAdmin = req.game.settings.general.createdByUserId.toString() === req.session.userId?.toString();
                 } else {
                     req.game.settings.general.isGameAdmin = false;
                 }
