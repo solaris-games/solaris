@@ -836,6 +836,7 @@ export default class GameTickService extends EventEmitter {
     _oneTickSpecialists(game: Game) {
         this.playerCycleRewardsService.giveFinancialAnalystCredits(game);
         this.starMovementService.moveStellarEngines(game);
+        this.starService.pairWormHoleConstructors(game);
     }
 
     _clearExpiredSpecialists(game: Game) {

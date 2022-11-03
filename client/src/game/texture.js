@@ -115,6 +115,7 @@ class TextureService {
       this._loadSpecialistTexture('rocket-thruster')
       this._loadSpecialistTexture('megabot')
       this._loadSpecialistTexture('forward-field')
+      this._loadSpecialistTexture('star-gate')
     }
 
     _loadSpecialistTexture(name) {

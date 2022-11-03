@@ -55,6 +55,7 @@ export interface Specialist {
             autoCarrierSpecialistAssign?: number;
             combatSwapWeaponsTechnology?: boolean;
             defenderBonus?: number;
+            wormHoleConstructor?: boolean;
         }
     }
 };

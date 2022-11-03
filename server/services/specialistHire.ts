@@ -180,6 +180,11 @@ export default class SpecialistHireService {
             }
         }
 
+        // If the spec hired is one that builds worm holes, validate that the star isn't already a worm hole.
+        if (star.wormHoleToStarId && specialist.modifiers.special?.wormHoleConstructor) {
+            throw new ValidationError(`The star already has a worm hole connected to another star.`);
+        }
+
         star.specialistId = specialist.id;
         star.specialistExpireTick = specialist.expireTicks ? game.state.tick + specialist.expireTicks : null;
 

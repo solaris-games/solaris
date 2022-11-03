@@ -789,6 +789,25 @@
                     "attractStar": true
                 }
             }
+        },
+        {
+            "id": 18,
+            "key": "star-gate",
+            "name": "Stargate",
+            "description": "This star will form a wormhole with the next star where a Stargate is hired and the specialist will retire.",
+            "active": {
+                "official": true,
+                "custom": true
+            },
+            "baseCostCredits": 2500,
+            "baseCostCreditsSpecialists": 25,
+            "oneShot": false,
+            "expireTicks": null,
+            "modifiers": {
+                "special": {
+                    "wormHoleConstructor": true
+                }
+            }
         }
     ]
 }

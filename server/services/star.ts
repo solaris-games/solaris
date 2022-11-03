@@ -817,4 +817,31 @@ export default class StarService extends EventEmitter {
             star.infrastructure[type] = game.settings.player.startingInfrastructure[type];
         }
     }
+
+    pairWormHoleConstructors(game: Game) {
+        const constructors = game.galaxy.stars
+            .filter(s => s.specialistId && this.specialistService.getByIdStar(s.specialistId)?.modifiers.special?.wormHoleConstructor);
+
+        let pairs = Math.floor(constructors.length / 2);
+
+        if (pairs < 1) {
+            return;
+        }
+
+        while (pairs--) {
+            const starA = constructors[this.randomService.getRandomNumber(constructors.length - 1)];
+            const starB = constructors[this.randomService.getRandomNumber(constructors.length - 1)];
+
+            if (starA._id.toString() === starB._id.toString() || starA.wormHoleToStarId || starB.wormHoleToStarId) {
+                pairs++;
+                continue;
+            }
+
+            starA.wormHoleToStarId = starB._id;
+            starB.wormHoleToStarId = starA._id;
+
+            starA.specialistId = null;
+            starB.specialistId = null;
+        }
+    }
 }
