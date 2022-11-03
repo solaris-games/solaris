@@ -20,7 +20,7 @@
         <div v-if="(!isCompactUIStyle || !star.ownedByPlayerId) && star.isNebula">
           <hr/>
           <p class="mb-0">This star is hidden inside a <span class="text-warning">Nebula <i class="fas fa-eye-slash"></i></span>.</p>
-          <p class="mb-2 text-info"><small><i>Nebulas hide stars from all other players.</i></small></p>
+          <p class="mb-2 text-info"><small><i>Nebulas conceal the infrastructure and ship counts at the star from all other players.</i></small></p>
         </div>
 
         <div v-if="(!isCompactUIStyle || !star.ownedByPlayerId) && star.isAsteroidField">

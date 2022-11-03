@@ -305,7 +305,7 @@
         </div>
 
         <div class="mb-2" v-if="settings.galaxy.galaxyType !== 'custom'">
-          <label for="randomNebulas" class="col-form-label">Random Nebulas (<span class="text-warning">{{settings.specialGalaxy.randomNebulas}}%</span>) <help-tooltip tooltip="The percentage of random nebulas are generated in the galaxy - Nebulas hide stars from all other players"/></label>
+          <label for="randomNebulas" class="col-form-label">Random Nebulas (<span class="text-warning">{{settings.specialGalaxy.randomNebulas}}%</span>) <help-tooltip tooltip="The percentage of random nebulas are generated in the galaxy - Nebulas conceal the infrastructure and ship counts at the star from all other players"/></label>
           <div class="col">
             <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomNebulas" v-model="settings.specialGalaxy.randomNebulas" :disabled="isCreatingGame">
           </div>
