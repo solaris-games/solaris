@@ -690,7 +690,7 @@ export default class StarService extends EventEmitter {
             // Check to see whether to double the capture reward.
             let captureRewardMultiplier = this.specialistService.hasAwardDoubleCaptureRewardSpecialist(newStarPlayerCarriers);
     
-            captureReward *= captureRewardMultiplier;
+            captureReward = Math.floor(captureReward * captureRewardMultiplier);
 
             newStarPlayer.credits += captureReward;
 

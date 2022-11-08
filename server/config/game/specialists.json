@@ -439,6 +439,25 @@
                     "avoidCombatCarrierToCarrier": true
                 }
             }
+        },
+        {
+            "id": 21,
+            "key": "bolter-gun",
+            "name": "Plunderer",
+            "description": "Grants x1.5 star capture rewards for destroying infrastructure in combat.",
+            "active": {
+                "official": true,
+                "custom": true
+            },
+            "baseCostCredits": 200,
+            "baseCostCreditsSpecialists": 2,
+            "oneShot": false,
+            "expireTicks": null,
+            "modifiers": {
+                "special": {
+                    "starCaptureRewardMultiplier": 1.5
+                }
+            }
         }
     ],
     "star": [
