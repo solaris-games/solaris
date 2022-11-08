@@ -141,6 +141,7 @@ export interface User {
             sleepless: number;
             victor32: number;
             special_dark: number;
+            special_fog: number;
             special_ultraDark: number;
             special_orbital: number;
             special_battleRoyale: number;

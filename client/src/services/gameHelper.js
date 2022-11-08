@@ -1019,6 +1019,7 @@ class GameHelper {
       '32_player_rt': '32 Players',
       'custom': 'Custom',
       'special_dark': 'Dark Galaxy',
+      'special_fog': 'Fogged Galaxy',
       'special_ultraDark': 'Ultra Dark Galaxy',
       'special_orbital': 'Orbital',
       'special_battleRoyale': 'Battle Royale',

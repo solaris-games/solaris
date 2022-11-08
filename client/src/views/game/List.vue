@@ -92,6 +92,7 @@
                   <h5 class="card-title special-card-title">
                     <i class="fas" :class="{
                       'fa-moon': games.special.settings.general.type === 'special_dark',
+                      'fa-moon': games.special.settings.general.type === 'special_fog',
                       'fa-moon': games.special.settings.general.type === 'special_ultraDark',
                       'fa-drumstick-bite': games.special.settings.general.type === 'special_battleRoyale',
                       'fa-satellite': games.special.settings.general.type === 'special_orbital',
@@ -476,6 +477,7 @@ export default {
     getSpecialGame () {
       const types = [
         'special_dark',
+        'special_fog',
         'special_ultraDark',
         'special_orbital',
         'special_battleRoyale',

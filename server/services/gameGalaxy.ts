@@ -324,6 +324,7 @@ export default class GameGalaxyService {
         const isFinished = this.gameStateService.isFinished(doc);
         const isDarkStart = this.gameTypeService.isDarkStart(doc);
         const isDarkMode = this.gameTypeService.isDarkMode(doc);
+        const isDarkFogged = this.gameTypeService.isDarkFogged(doc);
         const isOrbital = this.gameTypeService.isOrbitalMode(doc);
         const isKingOfTheHillMode = this.gameTypeService.isKingOfTheHillMode(doc);
 
@@ -433,7 +434,7 @@ export default class GameGalaxyService {
 
                     return s;
                 } else {
-                    return {
+                    const mappedStar = {
                         _id: s._id,
                         name: s.name,
                         ownedByPlayerId: s.ownedByPlayerId,
@@ -449,6 +450,12 @@ export default class GameGalaxyService {
                         isKingOfTheHillStar: s.isKingOfTheHillStar,
                         isInScanningRange: s.isInScanningRange
                     }
+
+                    if (isDarkFogged && !s.isInScanningRange) {
+                        mappedStar.ownedByPlayerId = null;
+                    }
+                    
+                    return mappedStar;
                 };
             }) as any;
     }

@@ -172,12 +172,16 @@
              "text":"Disabled"
           },
           {
+            "value":"fog",
+            "text":"Fogged"
+          },
+          {
              "value":"standard",
-             "text":"Standard"
+             "text":"Dark"
           },
           {
              "value":"extra",
-             "text":"Extra"
+             "text":"Extra Dark"
           },
           {
              "value":"start",

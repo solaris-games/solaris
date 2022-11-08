@@ -90,6 +90,7 @@ db.users.updateMany({}, {
                 sleepless: 0,
                 victor32: 0,
                 special_dark: 0,
+                special_fog: 0,
                 special_ultraDark: 0,
                 special_orbital: 0,
                 special_battleRoyale: 0,

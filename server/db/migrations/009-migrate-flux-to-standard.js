@@ -17,6 +17,7 @@ module.exports = {
                     'standard_tb',
                     '32_player_rt',
                     'special_dark',
+                    'special_fog',
                     'special_ultraDark',
                     'special_orbital',
                     'special_battleRoyale',

@@ -11,6 +11,7 @@ const officialGameSettings = [
 
 const specialGameSettings = [
     require('../config/game/settings/official/special_dark'),
+    require('../config/game/settings/official/special_fog'),
     require('../config/game/settings/official/special_battleRoyale'),
     require('../config/game/settings/official/special_orbital'),
     require('../config/game/settings/official/special_ultraDark'),
