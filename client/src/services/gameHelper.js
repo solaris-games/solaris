@@ -516,6 +516,10 @@ class GameHelper {
           (game.settings.specialGalaxy.darkGalaxy === 'start' && game.state.startDate == null)
   }
 
+  isDarkFogged (game) {
+    return game.settings.specialGalaxy.darkGalaxy === 'fog'
+  }
+
   isTradeEnabled (game) {
     return game.settings.player.tradeCredits || game.settings.player.tradeCreditsSpecialists || game.settings.player.tradeCost
   }

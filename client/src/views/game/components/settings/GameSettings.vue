@@ -626,7 +626,8 @@ export default {
         'kingOfTheHill': 'King Of The Hill',
         'low': 'Low',
         'medium': 'Medium',
-        'high': 'High'
+        'high': 'High',
+        'fog': 'Fogged'
       }[option]
 
       return text || option

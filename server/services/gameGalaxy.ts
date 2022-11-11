@@ -283,6 +283,7 @@ export default class GameGalaxyService {
         // OR if its "start only" and the game has not yet started.
         const isDarkStart = this.gameTypeService.isDarkStart(doc);
         const isDarkMode = this.gameTypeService.isDarkMode(doc);
+        const isDarkFogged = this.gameTypeService.isDarkFogged(doc);
         const isKingOfTheHillMode = this.gameTypeService.isKingOfTheHillMode(doc);
 
         let kingOfTheHillStar: Star | null = null;
@@ -292,7 +293,7 @@ export default class GameGalaxyService {
         }
 
         // If its a dark galaxy start then return no stars.
-        if (isDarkMode || (isDarkStart && !doc.state.startDate)) {
+        if (isDarkMode || isDarkFogged || (isDarkStart && !doc.state.startDate)) {
             doc.galaxy.stars = [];
         }
 
