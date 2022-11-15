@@ -20,6 +20,7 @@ import registerSpecialistRoutes from './specialist';
 import registerStarRoutes from './star';
 import registerTradeRoutes from './trade';
 import registerUserRoutes from './user';
+import registerSpectatorRoutes from './spectator';
 
 export default (router: Router, container: DependencyContainer) => {
     const middleware = Middleware(container);
@@ -42,6 +43,7 @@ export default (router: Router, container: DependencyContainer) => {
     registerStarRoutes(router, middleware, validator, container);
     registerTradeRoutes(router, middleware, validator, container);
     registerUserRoutes(router, middleware, validator, container);
+    registerSpectatorRoutes(router, middleware, validator, container);
 
     return router;
 }

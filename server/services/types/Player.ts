@@ -103,6 +103,7 @@ export interface Player {
     currentResearchTicksEta?: number | null;
     nextResearchTicksEta?: number | null;
     aiState?: AiState | null;
+    spectators: DBObjectId[];
 };
 
 export interface PlayerColourShapeCombination {

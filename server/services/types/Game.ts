@@ -85,6 +85,7 @@ export interface GameSettings {
 		fluxEnabled: GameSettingEnabledDisabled;
 		isGameAdmin?: boolean;
 		advancedAI: GameSettingEnabledDisabled;
+		spectators: GameSettingEnabledDisabled;
 		flux?: GameFlux | null;
 	},
 	galaxy: {
@@ -214,6 +215,11 @@ export interface GameUserNotification {
 	position: number | null;
 };
 
+export interface GameSpectator {
+	_id: DBObjectId;
+	username: string;
+}
+
 export interface Game {
     _id: DBObjectId;
     settings: GameSettings,
@@ -301,7 +307,6 @@ export interface Game {
 	},
 	quitters: DBObjectId[],
 	afkers: DBObjectId[],
-	spectators?: DBObjectId[],
 	userNotifications?: GameUserNotification;
 
 	save(): Promise<Game>;

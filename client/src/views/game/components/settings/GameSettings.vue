@@ -69,6 +69,11 @@
             :valueText="getFriendlyText(game.settings.general.advancedAI)"
             :value="game.settings.general.advancedAI"
             :compareValue="game.settings.general.advancedAI"/>
+          <game-setting-value title="Allow Spectators"
+            tooltip="Allow players to invite users to spectate the game"
+            :valueText="getFriendlyText(game.settings.general.spectators)"
+            :value="game.settings.general.spectators"
+            :compareValue="game.settings.general.spectators"/>
         </tbody>
       </table>
     </div>

@@ -174,6 +174,12 @@ export default class StarService extends EventEmitter {
         return stars.filter(s => s.ownedByPlayerId && s.ownedByPlayerId.toString() === playerId.toString());
     }
 
+    listStarsOwnedByPlayers(stars: Star[], playerIds: DBObjectId[]) {
+        const ids = playerIds.map(p => p.toString());
+
+        return stars.filter(s => s.ownedByPlayerId && ids.includes(s.ownedByPlayerId.toString()));
+    }
+
     isOwnedByPlayer(star: Star, player: Player) {
         return star.ownedByPlayerId && star.ownedByPlayerId.toString() === player._id.toString();
     }
@@ -184,7 +190,17 @@ export default class StarService extends EventEmitter {
 
     listStarIdsWithPlayerCarriersInOrbit(game: Game, playerId: DBObjectId): string[] {
         return game.galaxy.carriers
-            .filter(c => c.ownedByPlayerId!.toString() === playerId.toString() && c.orbiting)
+            .filter(c => c.orbiting)
+            .filter(c => c.ownedByPlayerId!.toString() === playerId.toString())
+            .map(c => c.orbiting!.toString());
+    }
+
+    listStarIdsWithPlayersCarriersInOrbit(game: Game, playerIds: DBObjectId[]): string[] {
+        const ids = playerIds.map(p => p.toString());
+
+        return game.galaxy.carriers
+            .filter(c => c.orbiting)
+            .filter(c => ids.includes(c.ownedByPlayerId!.toString()))
             .map(c => c.orbiting!.toString());
     }
 
@@ -202,11 +218,25 @@ export default class StarService extends EventEmitter {
             .filter(s => !this.isDeadStar(s));
     }
 
-    listStarsOwnedOrInOrbitByPlayer(game: Game, playerId: DBObjectId): Star[] {
-        let starIds: string[] = this.listStarsOwnedByPlayer(game.galaxy.stars, playerId).map(s => s._id.toString());
+    listStarsWithScanningRangeByPlayers(game: Game, playerIds: DBObjectId[]): Star[] {
+        let starIds: string[] = this.listStarsOwnedByPlayers(game.galaxy.stars, playerIds).map(s => s._id.toString());
+
+        if (game.settings.diplomacy.enabled === 'enabled') { // This never occurs when alliances is disabled.
+            starIds = starIds.concat(this.listStarIdsWithPlayersCarriersInOrbit(game, playerIds));
+        }
+
+        starIds = [...new Set(starIds)];
+
+        return starIds
+            .map(id => this.getById(game, id))
+            .filter(s => !this.isDeadStar(s));
+    }
+
+    listStarsOwnedOrInOrbitByPlayers(game: Game, playerIds: DBObjectId[]): Star[] {
+        let starIds: string[] = this.listStarsOwnedByPlayers(game.galaxy.stars, playerIds).map(s => s._id.toString());
 
         if (game.settings.diplomacy.enabled === 'enabled') { // Don't need to check in orbit carriers if alliances is disabled
-            starIds = starIds.concat(this.listStarIdsWithPlayerCarriersInOrbit(game, playerId));
+            starIds = starIds.concat(this.listStarIdsWithPlayersCarriersInOrbit(game, playerIds));
         }
 
         starIds = [...new Set(starIds)];
@@ -247,10 +277,10 @@ export default class StarService extends EventEmitter {
         return false;
     }
 
-    filterStarsByScanningRange(game: Game, player: Player) {
+    filterStarsByScanningRange(game: Game, playerIds: DBObjectId[]) {
         // Stars may have different scanning ranges independently so we need to check
         // each star to check what is within its scanning range.
-        let starsOwnedOrInOrbit = this.listStarsOwnedOrInOrbitByPlayer(game, player._id);
+        let starsOwnedOrInOrbit = this.listStarsOwnedOrInOrbitByPlayers(game, playerIds);
         let starsWithScanning = starsOwnedOrInOrbit.filter(s => !this.isDeadStar(s));
 
         // Seed the stars that are in range to be the stars owned or are in orbit of.
@@ -316,14 +346,17 @@ export default class StarService extends EventEmitter {
         return starsInRange.map(s => this.getById(game, s._id));
     }
 
-    filterStarsByScanningRangeAndWaypointDestinations(game: Game, player: Player) {
+    filterStarsByScanningRangeAndWaypointDestinations(game: Game, playerIds: DBObjectId[]) {
         // Get all stars within the player's normal scanning vision.
-        let starsInScanningRange = this.filterStarsByScanningRange(game, player);
+        let starsInScanningRange = this.filterStarsByScanningRange(game, playerIds);
+
+        const ids = playerIds.map(p => p.toString());
 
         // If in dark mode then we need to also include any stars that are 
         // being travelled to by carriers in transit for the current player.
         let inTransitStars = game.galaxy.carriers
-            .filter(c => c.ownedByPlayerId!.toString() === player._id.toString() && !c.orbiting)
+            .filter(c => !c.orbiting)
+            .filter(c => ids.includes(c.ownedByPlayerId!.toString()))
             .map(c => c.waypoints[0].destination)
             .map(d => this.getById(game, d));
 
@@ -421,8 +454,9 @@ export default class StarService extends EventEmitter {
             && destinationStar.wormHoleToStarId.toString() === sourceStar._id.toString();
     }
 
-    canPlayerSeeStarShips(player: Player, star: Star) {
-        const isOwnedByPlayer = (star.ownedByPlayerId || '').toString() === player._id.toString();
+    canPlayersSeeStarShips(star: Star, playerIds: DBObjectId[]) {
+        const ids = playerIds.map(p => p.toString());
+        const isOwnedByPlayer = ids.includes((star.ownedByPlayerId || '').toString());
 
         if (isOwnedByPlayer) {
             return true;

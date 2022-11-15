@@ -134,6 +134,8 @@
         :playerId="menuArguments"
         @onCloseRequested="onCloseRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+      <spectators v-if="menuState == MENU_STATES.SPECTATORS"
+        @onCloseRequested="onCloseRequested"/>
     </div>
 
     <div class="spacing-footer d-block d-sm-none"></div>
@@ -186,6 +188,7 @@ import NotLoggedInBarVue from './NotLoggedInBar'
 import DarkModeWarningBarVue from './DarkModeWarningBar.vue'
 import PlayerBadgeShopVue from '../badges/PlayerBadgeShop.vue'
 import ReportPlayerVue from '../report/ReportPlayer.vue'
+import SpectatorVue from '../spectators/Spectators.vue'
 
 export default {
   components: {
@@ -226,7 +229,8 @@ export default {
     'not-logged-in-bar': NotLoggedInBarVue,
     'dark-mode-warning-bar': DarkModeWarningBarVue,
     'player-badge-shop': PlayerBadgeShopVue,
-    'report-player': ReportPlayerVue
+    'report-player': ReportPlayerVue,
+    'spectators': SpectatorVue
   },
   data () {
     return {

@@ -173,6 +173,21 @@ export default class GameListService {
         }));
     }
 
+    async listSpectating(userId: DBObjectId) {
+        return await this.gameRepo.find({
+            'state.endDate': { $eq: null }, // Game is in progress
+            'galaxy.players.spectators': { $elemMatch: { userId } } // User is spectating at least one player.
+        },
+        {
+            'settings.general.type': 1,
+            'settings.general.featured': 1,
+            'settings.general.name': 1,
+            'settings.general.playerLimit': 1,
+            state: 1
+        },
+        { 'state.endDate': -1 });
+    }
+
     async getUserPlayerNotifications(game: Game, userId: DBObjectId, 
         includeTurnWaiting: boolean = true,
         includeUnreadEvents: boolean = true,

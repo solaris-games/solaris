@@ -142,7 +142,8 @@ export default class PlayerService extends EventEmitter {
                 creditsSpecialists: [],
             },
             reputations: [],
-            diplomacy: []
+            diplomacy: [],
+            spectators: [],
         };
 
         this._setDefaultResearchTechnology(game, player as any);
@@ -313,6 +314,7 @@ export default class PlayerService extends EventEmitter {
         player.readyToCycle = false;
         player.readyToQuit = false;
         player.isOpenSlot = true;
+        player.spectators = [];
 
         // Reset the player's research
         this._setDefaultResearchTechnology(game, player);

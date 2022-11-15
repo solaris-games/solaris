@@ -544,6 +544,10 @@ class GameHelper {
     return game.settings.general.type === 'tutorial'
   }
 
+  isSpectatingEnabled (game) {
+    return game.settings.general.spectators === 'enabled'
+  }
+
   getGameStatusText (game) {
     if (this.isGamePendingStart(game)) {
       return 'Waiting to start'

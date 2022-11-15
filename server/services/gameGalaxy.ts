@@ -33,6 +33,7 @@ import PlayerStatisticsService from './playerStatistics';
 import GameFluxService from './gameFlux';
 import PlayerAfkService from './playerAfk';
 import ShipService from './ship';
+import SpectatorService from './spectator';
 
 export default class GameGalaxyService {
     cacheService: CacheService;
@@ -62,6 +63,7 @@ export default class GameGalaxyService {
     avatarService: AvatarService;
     playerStatisticsService: PlayerStatisticsService;
     gameFluxService: GameFluxService;
+    spectatorService: SpectatorService;
 
     constructor(
         cacheService: CacheService,
@@ -90,7 +92,8 @@ export default class GameGalaxyService {
         diplomacyService: DiplomacyService,
         avatarService: AvatarService,
         playerStatisticsService: PlayerStatisticsService,
-        gameFluxService: GameFluxService
+        gameFluxService: GameFluxService,
+        spectatorService: SpectatorService
     ) {
         this.cacheService = cacheService;
         this.broadcastService = broadcastService;
@@ -119,6 +122,7 @@ export default class GameGalaxyService {
         this.avatarService = avatarService;
         this.playerStatisticsService = playerStatisticsService;
         this.gameFluxService = gameFluxService;
+        this.spectatorService = spectatorService;
     }
 
     async getGalaxy(gameId: DBObjectId, userId: DBObjectId | null, tick: number | null) {
@@ -156,13 +160,9 @@ export default class GameGalaxyService {
         // Check if the user is playing in this game.
         let userPlayer = this._getUserPlayer(game, userId);
 
-        // If the user is a spectator then they are allowed to see the entire galaxy.
-        const isSpectator = userPlayer == null && game.spectators!.find(s => s.toString() === userId!.toString()) != null;
-
         // Remove who created the game.
         delete game.settings.general.createdByUserId;
         delete game.settings.general.password; // Don't really need to explain why this is removed.
-        delete game.spectators; // Don't want to pass back user ids of spectators
 
         await this._maskGalaxy(game, userPlayer, isHistorical, tick);
 
@@ -176,31 +176,28 @@ export default class GameGalaxyService {
             this._appendStarsPendingDestructionFlag(game);
         }
 
-        if (!isSpectator) {
-            // if the user isn't playing this game, then only return
-            // basic data about the stars, exclude any important info like ships.
-            // If the game has finished then everyone should be able to view the full game.
-            if (!userPlayer && !this.gameStateService.isFinished(game)) {
-                this._setStarInfoBasic(game);
+        // Calculate what perspectives the user can see, i.e which players the user is spectating.
+        const perspectives = this._getPlayerPerspectives(game, userId);
 
-                // Also remove all carriers from players.
-                this._clearPlayerCarriers(game);
-            } else {
-                // Populate the rest of the details about stars,
-                // carriers and players providing that they are in scanning range.
-                this._setCarrierInfoDetailed(game, userPlayer!);
-                this._setStarInfoDetailed(game, userPlayer!);
-            }
+        // if the user isn't playing this game or spectating, then only return
+        // basic data about the stars, exclude any important info like ships.
+        // If the game has finished then everyone should be able to view the full game.
+        if (!perspectives && !this.gameStateService.isFinished(game)) {
+            this._setStarInfoBasic(game);
+            this._clearPlayerCarriers(game);
+        } else {
+            this._setCarrierInfoDetailed(game, perspectives!);
+            this._setStarInfoDetailed(game, perspectives!);
         }
 
-        // We need to filter the player data so that it's basic info.
+        // We always need to filter the player data so that it's basic info only.
         await this._setPlayerInfoBasic(game, userPlayer);
 
         // For extra dark mode games, overwrite the player stats as by this stage
         // scanning range will have kicked in and filtered out stars and carriers the player
         // can't see and therefore global stats should display what the current player can see
         // instead of their actual values.
-        // TODO: Better to not overwrite, but just not do it above in the first place.
+        // TODO: Better to not overwrite, but just not do it above in the first place?
         if (this.gameTypeService.isDarkModeExtra(game)) {
             this._setPlayerStats(game);
         }
@@ -321,7 +318,7 @@ export default class GameGalaxyService {
         });
     }
 
-    _setStarInfoDetailed(doc: Game, player: Player) { 
+    _setStarInfoDetailed(doc: Game, perspectivePlayerIds: DBObjectId[]) { 
         const isFinished = this.gameStateService.isFinished(doc);
         const isDarkStart = this.gameTypeService.isDarkStart(doc);
         const isDarkMode = this.gameTypeService.isDarkMode(doc);
@@ -339,9 +336,9 @@ export default class GameGalaxyService {
         // any stars the player cannot see in scanning range.
         if (!isFinished && (isDarkMode || (isDarkStart && !doc.state.startDate))) {
             if (isDarkMode) {
-                doc.galaxy.stars = this.starService.filterStarsByScanningRangeAndWaypointDestinations(doc, player);
+                doc.galaxy.stars = this.starService.filterStarsByScanningRangeAndWaypointDestinations(doc, perspectivePlayerIds);
             } else {
-                doc.galaxy.stars = this.starService.filterStarsByScanningRange(doc, player);
+                doc.galaxy.stars = this.starService.filterStarsByScanningRange(doc, perspectivePlayerIds);
             }
         }
 
@@ -350,10 +347,10 @@ export default class GameGalaxyService {
         let playerScanningStars: Star[] = [];
         let playerCarriersInOrbit: Carrier[] = [];
 
-        if (player) {
-            playerStars = this.starService.listStarsOwnedByPlayer(doc.galaxy.stars, player._id);
-            playerScanningStars = this.starService.listStarsWithScanningRangeByPlayer(doc, player._id);
-            playerCarriersInOrbit = this.carrierService.listCarriersOwnedByPlayerInOrbit(doc.galaxy.carriers, player._id);
+        if (perspectivePlayerIds?.length) {
+            playerStars = this.starService.listStarsOwnedByPlayers(doc.galaxy.stars, perspectivePlayerIds);
+            playerScanningStars = this.starService.listStarsWithScanningRangeByPlayers(doc, perspectivePlayerIds);
+            playerCarriersInOrbit = this.carrierService.listCarriersOwnedByPlayersInOrbit(doc.galaxy.carriers, perspectivePlayerIds);
         }
 
         // Work out which ones are not in scanning range and clear their data.
@@ -427,7 +424,7 @@ export default class GameGalaxyService {
                         delete s.manufacturing;
                     }
 
-                    let canSeeStarShips = player && this.starService.canPlayerSeeStarShips(player, s);
+                    let canSeeStarShips = perspectivePlayerIds?.length && this.starService.canPlayersSeeStarShips(s, perspectivePlayerIds);
 
                     if (!canSeeStarShips) {
                         s.ships = null;
@@ -461,17 +458,17 @@ export default class GameGalaxyService {
             }) as any;
     }
 
-    _setCarrierInfoDetailed(doc: Game, userPlayer: Player) {
+    _setCarrierInfoDetailed(doc: Game, perspectivePlayerIds: DBObjectId[]) {
         const isFinished = this.gameStateService.isFinished(doc);
         const isOrbital = this.gameTypeService.isOrbitalMode(doc);
 
         // If the game hasn't finished we need to filter and sanitize carriers.
         if (!this.gameStateService.isFinished(doc)) {
-            doc.galaxy.carriers = this.carrierService.filterCarriersByScanningRange(doc, userPlayer);
+            doc.galaxy.carriers = this.carrierService.filterCarriersByScanningRange(doc, perspectivePlayerIds);
 
             // Remove all waypoints (except those in transit) for all carriers that do not belong
             // to the player.
-            doc.galaxy.carriers = this.carrierService.sanitizeCarriersByPlayer(doc, userPlayer) as any;
+            doc.galaxy.carriers = this.carrierService.sanitizeCarriersByPlayers(doc, perspectivePlayerIds) as any;
         }
 
         // Populate the number of ticks it will take for all waypoints.
@@ -483,7 +480,7 @@ export default class GameGalaxyService {
                     c.specialist = this.specialistService.getByIdCarrier(c.specialistId)
                 }
 
-                let canSeeCarrierShips = isFinished || (userPlayer && this.carrierService.canPlayerSeeCarrierShips(doc, userPlayer, c));
+                let canSeeCarrierShips = isFinished || (perspectivePlayerIds?.length && this.carrierService.canPlayersSeeCarrierShips(doc, perspectivePlayerIds, c));
 
                 if (!canSeeCarrierShips) {
                     c.ships = null;
@@ -649,6 +646,26 @@ export default class GameGalaxyService {
                 diplomacy
             };
         }) as any;
+    }
+
+    _getPlayerPerspectives(game: Game, userId: DBObjectId | null) {
+        // Check if the user is playing in this game, if so they can only see from
+        // their own perspective.
+        let userPlayer = this._getUserPlayer(game, userId);
+
+        if (userPlayer) {
+            return [userPlayer._id];
+        }
+
+        // If the user is spectating then they can see from the perspectives of all
+        // players who they are spectating.
+        if (userId && this.spectatorService.isSpectatingEnabled(game)) {
+            let spectating = this.spectatorService.listSpectatingPlayers(game, userId);
+
+            return spectating.map(p => p._id);
+        }
+
+        return null;
     }
 
     _populatePlayerHasDuplicateIPs(game: Game) {

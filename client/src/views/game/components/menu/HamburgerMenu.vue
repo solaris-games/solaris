@@ -34,6 +34,7 @@
                 <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GAME_NOTES)" title="Notes (N)"><i class="fas fa-book-open me-2"></i>Notes</a>
             </div>
             <a v-if="isLoggedIn && !isDarkModeExtra && !isDataCleaned && (gameIsInProgress || gameIsFinished)" class="dropdown-item" v-on:click="setMenuState(MENU_STATES.INTEL)" title="Intel (I)"><i class="fas fa-chart-line me-2"></i>Intel</a>
+            <a v-if="isLoggedIn && isSpectatingEnabled" class="dropdown-item" v-on:click="setMenuState(MENU_STATES.SPECTATORS)" title="Spectators"><i class="fas fa-user-alien me-2"></i>Spectators</a>
             <a v-if="isLoggedIn" class="dropdown-item" v-on:click="setMenuState(MENU_STATES.OPTIONS)" title="Options (O)"><i class="fas fa-cog me-2"></i>Options</a>
             <a :href="documentationUrl" class="dropdown-item" target="_blank"><i class="far fa-question-circle me-2"></i>How to Play</a>
             <router-link v-if="isLoggedIn" to="/game/active-games" class="dropdown-item"><i class="fas fa-dice me-2"></i>My Games</router-link>
@@ -136,6 +137,9 @@ export default {
     },
     isTutorialGame () {
       return GameHelper.isTutorialGame(this.$store.state.game)
+    },
+    isSpectatingEnabled () {
+      return GameHelper.isSpectatingEnabled(this.$store.state.game)
     }
   }
 }

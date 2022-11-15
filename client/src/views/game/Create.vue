@@ -111,6 +111,15 @@
             </option>
           </select>
         </div>
+
+        <div class="mb-2">
+          <label for="spectators" class="col-form-label">Allow Spectators <help-tooltip tooltip="Allow players to invite users to spectate the game"></help-tooltip></label>
+          <select class="form-control" id="spectators" v-model="settings.general.spectators" :disabled="isCreatingGame">
+            <option v-for="opt in options.general.spectators" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
       </view-collapse-panel>
 
       <view-collapse-panel title="Game Time Settings" :startsOpened="true">

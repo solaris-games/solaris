@@ -95,6 +95,11 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
         controller.listMyActiveGames,
         mw.core.handleError);
 
+    router.get('/api/game/list/spectating',
+        mw.auth.authenticate(),
+        controller.listSpectating,
+        mw.core.handleError);
+
     router.get('/api/game/:gameId/intel',
         mw.auth.authenticate(),
         controller.getIntel,

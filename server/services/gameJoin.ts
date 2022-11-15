@@ -16,6 +16,7 @@ import ConversationService from './conversation';
 import GamePlayerJoinedEvent from './types/events/GamePlayerJoined';
 import { BaseGameEvent } from './types/events/BaseGameEvent';
 import RandomService from './random';
+import SpectatorService from './spectator';
 
 export const GameJoinServiceEvents = {
     onPlayerJoined: 'onPlayerJoined',
@@ -33,6 +34,7 @@ export default class GameJoinService extends EventEmitter {
     gameStateService: GameStateService;
     conversationService: ConversationService;
     randomService: RandomService;
+    spectatorService: SpectatorService;
 
     constructor(
         userService: UserService,
@@ -44,7 +46,8 @@ export default class GameJoinService extends EventEmitter {
         gameTypeService: GameTypeService,
         gameStateService: GameStateService,
         conversationService: ConversationService,
-        randomService: RandomService
+        randomService: RandomService,
+        spectatorService: SpectatorService
     ) {
         super();
         
@@ -58,6 +61,7 @@ export default class GameJoinService extends EventEmitter {
         this.gameStateService = gameStateService;
         this.conversationService = conversationService;
         this.randomService = randomService;
+        this.spectatorService = spectatorService;
     }
 
     async join(game: Game, userId: DBObjectId, playerId: DBObjectId, alias: string, avatar: number, password: string) {
@@ -208,6 +212,7 @@ export default class GameJoinService extends EventEmitter {
         player.userId = userId;
         player.alias = alias;
         player.avatar = avatar.toString();
+        player.spectators = [];
 
         // Reset the defeated and afk status as the user may be filling
         // an afk slot.
@@ -221,6 +226,11 @@ export default class GameJoinService extends EventEmitter {
 
         if (!player.userId) {
             player.ready = true;
+        }
+
+        if (userId) {
+            // Clear out any players the user may be spectating.
+            this.spectatorService.clearSpectating(game, userId);
         }
 
         // If the max player count is reached then start the game.

@@ -31,6 +31,7 @@ const schema = new Schema({
     missedTurns: { type: Types.Number, required: false, default: 0 },
     hasSentTurnReminder: { type: Types.Boolean, required: false, default: false },
     hasFilledAfkSlot: { type: Types.Boolean, required: false, default: false },
+    spectators: [{ type: Types.ObjectId, required: false, default: [] }], // User ids
     research: {
         // TODO: This would be arguably better if it was just progress points and remove level
         // and then we can calculate the level before sending it to the client.

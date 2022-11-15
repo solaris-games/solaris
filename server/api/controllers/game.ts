@@ -151,6 +151,15 @@ export default (container: DependencyContainer) => {
                 return next(err);
             }
         },
+        listSpectating: async (req, res, next) => {
+            try {
+                let games = await container.gameListService.listSpectating(req.session.userId);
+    
+                return res.status(200).json(games);
+            } catch (err) {
+                return next(err);
+            }
+        },
         getIntel: async (req, res, next) => {
             try {
                 let startTick = +req.query.startTick || 0;

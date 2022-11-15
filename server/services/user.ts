@@ -235,6 +235,18 @@ export default class UserService extends EventEmitter {
 
         let user = await this.userRepo.findOne({
             email
+        }, {
+            _id: 1
+        });
+
+        return user != null;
+    }
+
+    async userIdExists(id: DBObjectId) {
+        let user = await this.userRepo.findOne({
+            _id: id
+        }, {
+            _id: 1
         });
 
         return user != null;
