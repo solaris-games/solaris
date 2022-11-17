@@ -399,7 +399,7 @@
             :valueText="getFriendlyText(game.settings.player.populationCap.enabled)"
             :value="game.settings.player.populationCap.enabled"
             :compareValue="compareSettings.player.populationCap.enabled"/>
-          <game-setting-value title="Ships Per Star"
+          <game-setting-value title="Ships Per Star" v-if="game.settings.player.populationCap.enabled === 'enabled'"
             tooltip="Determines the max population of ships per star"
             :valueText="game.settings.player.populationCap.shipsPerStar"
             :value="game.settings.player.populationCap.shipsPerStar"
