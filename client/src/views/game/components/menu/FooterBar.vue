@@ -16,7 +16,7 @@
             <i class="fas fa-flask"></i>
           </button>
         </div>
-        <div class="col" v-if="userPlayer">
+        <div class="col">
           <button class="btn" v-on:click="setMenuState(MENU_STATES.GALAXY)">
             <i class="fas fa-sun"></i>
           </button>

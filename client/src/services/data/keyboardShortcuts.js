@@ -13,14 +13,14 @@ export default {
     'v': MENU_STATES.RULER,
     'i': MENU_STATES.INTEL,
     'o': MENU_STATES.OPTIONS,
+    'g': `${MENU_STATES.GALAXY}|stars`,
+    'f': `${MENU_STATES.GALAXY}|carriers`,
+    's': `${MENU_STATES.GALAXY}|ships`,
   },
   player: {
     'h': 'HOME_STAR',
     ' ': 'HOME_STAR', // Space
     'r': MENU_STATES.RESEARCH,
-    'g': `${MENU_STATES.GALAXY}|stars`,
-    'f': `${MENU_STATES.GALAXY}|carriers`,
-    's': `${MENU_STATES.GALAXY}|ships`,
     'm': MENU_STATES.INBOX,
     'e': MENU_STATES.EVENT_LOG,
     'n': MENU_STATES.GAME_NOTES,

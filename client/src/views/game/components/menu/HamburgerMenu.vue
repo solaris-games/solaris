@@ -23,9 +23,9 @@
             <div v-if="!userPlayer && !gameIsJoinable">
                 <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Leaderboard (Q)"><i class="fas fa-users me-2"></i>Leaderboard</a>
             </div>
+            <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GALAXY)" title="Galaxy (G)"><i class="fas fa-sun me-2"></i>Galaxy</a>
             <div v-if="userPlayer">
                 <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Leaderboard (Q)"><i class="fas fa-users me-2"></i>Leaderboard</a>
-                <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GALAXY)" title="Galaxy (G)"><i class="fas fa-sun me-2"></i>Galaxy</a>
                 <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.RESEARCH)" title="Research (R)"><i class="fas fa-flask me-2"></i>Research</a>
                 <a class="dropdown-item d-lg-none" v-on:click="setMenuState(MENU_STATES.INBOX)" title="Inbox (M)" v-if="!isTutorialGame"><i class="fas fa-comments me-2"></i>Inbox</a>
                 <a class="dropdown-item d-none d-lg-inline-block" v-on:click="onMenuChatSidebarRequested()" title="Inbox (M)" v-if="!isTutorialGame"><i class="fas fa-comments me-2"></i>Inbox</a>

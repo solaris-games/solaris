@@ -2,7 +2,7 @@
 <div class="container">
   <div class="row mb-2 g-0">
     <div class="col-auto">
-      <button class="btn btn-sm" :class="{ 'btn-danger': !showAll, 'btn-success': showAll }" @click="toggleShowAll">
+      <button class="btn btn-sm" :class="{ 'btn-danger': !showAll, 'btn-success': showAll }" @click="toggleShowAll" v-if="getUserPlayer()">
         <span v-if="!showAll">Show All</span>
         <span v-if="showAll">Show Yours</span>
       </button>
@@ -38,7 +38,7 @@
     </div>
   </div>
 
-  <p v-if="!tableData.length" class="text-center mt-2 mb-2">You have no stars.</p>
+  <p v-if="!tableData.length" class="text-center mt-2 mb-2">No stars to display.</p>
 </div>
 </template>
 
@@ -60,6 +60,7 @@ export default {
     }
   },
   mounted () {
+    this.showAll = this.getUserPlayer() == null
     this.tableData = this.getTableData()
     
     this.sortBy = localStorage.getItem('galaxy_naturalResources_sortBy') || null
@@ -81,7 +82,7 @@ export default {
     getTableData () {
       let sorter = (a, b) => a.name.localeCompare(b.name)
 
-      if (this.showAll) {
+      if (this.showAll || !this.getUserPlayer()) {
         return this.$store.state.game.galaxy.stars.sort(sorter)
       } else {
         return this.$store.state.game.galaxy.stars.sort(sorter).filter(x => x.ownedByPlayerId === this.getUserPlayer()._id)
