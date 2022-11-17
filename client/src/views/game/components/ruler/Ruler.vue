@@ -14,7 +14,7 @@
       </div>
       <div class="col-3 text-center">
           <span title="Total distance (ly)">
-            <i class="fas fa-sun"></i> {{distanceLightYears.toFixed(3)}}
+            <i class="fas fa-ruler"></i> {{distanceLightYears}}
           </span>
       </div>
       <div class="col-3 text-center">
@@ -46,7 +46,7 @@
     </div>
   </div>
 
-  <div class="row pt-2 pb-2">
+  <div class="row pt-2 pb-2 bg-dark mt-1">
     <div class="col-6">
     Speed Modifier
     </div>
@@ -76,7 +76,7 @@
           </div>
           <div class="col-6 text-end">
               <span title="Total distance (ly)">
-                <i class="fas fa-sun"></i> {{distanceLightYears}}
+                <i class="fas fa-ruler"></i> {{distanceLightYears}}
               </span>
           </div>
       </div>
@@ -125,6 +125,45 @@
           </div>
         </div>
     </div>
+
+    <table class="table table-sm table-striped mb-2 mt-2" v-if="points.length > 1">
+      <thead>
+        <tr>
+          <td>Start</td>
+          <td></td>
+          <td>End</td>
+          <td>Distance (ly)</td>
+          <td>Total</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="point in points" :key="point.object._id">
+          <template v-if="getNextPoint(point)">
+            <td>
+              <span>
+                <i class="fas" :class="{'fa-star':point.type=='star','fa-rocket':point.type=='carrier'}"></i>
+                {{point.object.name}}
+              </span>
+            </td>
+            <td>
+              <i v-if="getNextPoint(point)" class="fas fa-arrow-right ms-2 me-2"></i>
+            </td>
+            <td>
+              <span v-if="getNextPoint(point)">
+                <i class="fas" :class="{'fa-star':getNextPoint(point).type=='star','fa-rocket':getNextPoint(point).type=='carrier'}"></i>
+                {{getNextPoint(point).object.name}}
+              </span>
+            </td>
+            <td>
+              <span v-if="getNextPoint(point)">{{getNextPointDistance(point)}}</span>
+            </td>
+            <td>
+              <span>{{getDistanceRunningTotal(point)}}</span>
+            </td>
+          </template>
+        </tr>
+      </tbody>
+    </table>
 
     <div class="row bg-dark" v-if="warpGateCost">
       <div class="col">
@@ -258,6 +297,7 @@ export default {
     },
     recalculateDistanceLightYears () {
       this.distanceLightYears = 0
+
       if (this.points.length < 2) {
         return
       }
@@ -267,7 +307,37 @@ export default {
       for (let i = 0; i < this.points.length - 1; i++) {
         this.distanceLightYears += GameHelper.getDistanceBetweenLocations(this.points[i].location, this.points[i + 1].location)
       }
-      this.distanceLightYears = Math.round(this.distanceLightYears / game.constants.distances.lightYear * 100.0) / 100.0
+
+      this.distanceLightYears = (Math.round(this.distanceLightYears / game.constants.distances.lightYear * 100.0) / 100.0).toFixed(2)
+    },
+    getNextPoint (point) {
+      let i = this.points.indexOf(point)
+
+      return this.points[i+1] || null
+    },
+    getNextPointDistance (point) {
+      let i = this.points.indexOf(point)
+
+      let distance = GameHelper.getDistanceBetweenLocations(this.points[i].location, this.points[i + 1].location)
+
+      distance = Math.round(distance / this.$store.state.game.constants.distances.lightYear * 100.0) / 100.0
+
+      return distance.toFixed(2)
+    },
+    getDistanceRunningTotal (point) {
+      let index = this.points.indexOf(point)
+
+      let distance = 0
+      
+      for (let i = 0; i < index + 1; i++) {
+        if (this.points[i + 1]) {
+          distance += GameHelper.getDistanceBetweenLocations(this.points[i].location, this.points[i + 1].location)
+        }
+      }
+
+      distance = Math.round(distance / this.$store.state.game.constants.distances.lightYear * 100.0) / 100.0
+
+      return distance.toFixed(2)
     }
   },
   computed: {
