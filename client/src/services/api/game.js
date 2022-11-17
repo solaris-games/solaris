@@ -88,6 +88,11 @@ class GameService extends BaseApiService {
       { withCredentials: true })
   }
 
+  listSpectatingGames () {
+    return axios.get(this.BASE_URL + 'game/list/spectating',
+      { withCredentials: true })
+  }
+
   joinGame (gameId, playerId, alias, avatar, password) {
     return axios.put(this.BASE_URL + 'game/' + gameId + '/join', {
       playerId, alias, avatar, password

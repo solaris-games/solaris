@@ -176,7 +176,11 @@ export default class GameListService {
     async listSpectating(userId: DBObjectId) {
         return await this.gameRepo.find({
             'state.endDate': { $eq: null }, // Game is in progress
-            'galaxy.players.spectators': { $elemMatch: { userId } } // User is spectating at least one player.
+            'galaxy.players.spectators': { // User is spectating at least one player.
+                $elemMatch: {
+                    $in: [userId]
+                }
+            }
         },
         {
             'settings.general.type': 1,

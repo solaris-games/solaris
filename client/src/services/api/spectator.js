@@ -7,8 +7,10 @@ class SpectatorService extends BaseApiService {
     { withCredentials: true })
   }
 
-  invite (gameId, userId) {
-    return axios.put(`${this.BASE_URL}game/${gameId}/spectators/invite/${userId}`, {},
+  invite (gameId, username) {
+    return axios.put(`${this.BASE_URL}game/${gameId}/spectators/invite`, {
+      username
+    },
     { withCredentials: true })
   }
 

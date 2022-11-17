@@ -3,6 +3,7 @@ import { ExpressJoiInstance } from "express-joi-validation";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import SpectatorController from '../controllers/spectator';
 import { MiddlewareContainer } from "../middleware";
+import { spectatorInviteSpectatorRequestSchema } from "../requests/spectator";
 
 export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
     const controller = SpectatorController(container);
@@ -24,8 +25,9 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
         controller.list,
         mw.core.handleError);
 
-    router.put('/api/game/:gameId/spectators/invite/:userId',
+    router.put('/api/game/:gameId/spectators/invite',
         mw.auth.authenticate(),
+        validator.body(spectatorInviteSpectatorRequestSchema),
         mw.game.loadGame({
             lean: true,
             settings: true,

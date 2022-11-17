@@ -6,6 +6,7 @@
       <player-icon :playerId="player._id"/>
     </span>
     <i v-if="player.userId" class="userIcon fas fa-user"></i>
+    <i v-if="hasPerspective()" class="userIcon fas fa-eye"></i>
     <i v-if="showMedals && isFirstPlace()" class="medalIcon gold fas fa-medal"></i>
     <i v-if="showMedals && isSecondPlace()" class="medalIcon silver fas fa-medal"></i>
     <i v-if="showMedals && isThirdPlace()" class="medalIcon bronze fas fa-medal"></i>
@@ -61,6 +62,13 @@ export default {
     canShowShapeIcon () {
       // return gameHelper.getGamePlayerShapesCount(this.$store.state.game) > 1
       return true
+    },
+    hasPerspective () {
+      if (gameHelper.getUserPlayer(this.$store.state.game)) {
+        return false
+      }
+
+      return this.player.hasPerspective || false
     },
     onClick () {
       this.$emit('onClick')

@@ -191,7 +191,7 @@ export default class GameGalaxyService {
         }
 
         // We always need to filter the player data so that it's basic info only.
-        await this._setPlayerInfoBasic(game, userPlayer);
+        await this._setPlayerInfoBasic(game, userPlayer, perspectives);
 
         // For extra dark mode games, overwrite the player stats as by this stage
         // scanning range will have kicked in and filtered out stars and carriers the player
@@ -492,7 +492,7 @@ export default class GameGalaxyService {
             });
     }
 
-    async _setPlayerInfoBasic(doc: Game, userPlayer: Player | null) {
+    async _setPlayerInfoBasic(doc: Game, userPlayer: Player | null, perspectivePlayerIds: DBObjectId[] | null) {
         const avatars = this.avatarService.listAllAvatars();
 
         const isFinished = this.gameStateService.isFinished(doc);
@@ -523,6 +523,9 @@ export default class GameGalaxyService {
         // We don't want players snooping on others via api responses containing sensitive info.
         doc.galaxy.players = doc.galaxy.players.map(p => {
             let isCurrentUserPlayer = userPlayer && p._id.toString() === userPlayer._id.toString();
+
+            // Set whether the user has the perspective of this player. This is used on the UI for spectator view.
+            p.hasPerspective = perspectivePlayerIds?.find(i => i.toString() === p._id.toString()) != null;
 
             // Append the guild tag to the player alias.
             let playerGuild: Guild | null = null;
@@ -643,7 +646,8 @@ export default class GameGalaxyService {
                 hasDuplicateIP: p.hasDuplicateIP,
                 hasFilledAfkSlot: p.hasFilledAfkSlot,
                 isKingOfTheHill: p.isKingOfTheHill,
-                diplomacy
+                hasPerspective: p.hasPerspective,
+                diplomacy,
             };
         }) as any;
     }

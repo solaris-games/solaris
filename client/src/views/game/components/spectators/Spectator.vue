@@ -1,11 +1,11 @@
 <template>
   <div class="row">
     <div class="col">
-        <h5>{{spectator.username}}</h5>
+        <h5><i class="fas fa-user me-1"></i>{{spectator.username}}</h5>
         <ul>
             <li v-for="player in players" :key="player._id">
                 <span>{{player.alias}}</span>
-                <i class="fas fa-times text-danger ms-1 pointer"
+                <i class="fas fa-times text-danger ms-1 pointer" title="Remove spectator"
                     v-if="!isLoading && userPlayer && userPlayer._id === player._id"
                     @click="uninvite"></i>
                 <i class="fas fa-sync ms-1" v-if="isLoading"/>

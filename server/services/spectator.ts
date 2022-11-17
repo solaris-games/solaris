@@ -22,15 +22,17 @@ export default class SpectatorService {
         return game.settings.general.spectators === 'enabled';
     }
 
-    async invite(game: Game, player: Player, userId: DBObjectId) {
+    async invite(game: Game, player: Player, username: string) {
         if (!this.isSpectatingEnabled(game)) {
             throw new ValidationError(`Spectating is not enabled in this game.`);
         }
 
-        const userExists = await this.userService.userIdExists(userId);
-
-        if (!userExists) {
-            throw new ValidationError(`User with ID: ${userId} does not exist.`);
+        let user = await this.userService.getByUsername(username, {
+            _id: 1
+        });
+        
+        if (!user) {
+            throw new ValidationError(`A player with the username ${username} does not exist.`);
         }
 
         await this.gameRepo.updateOne({
@@ -38,7 +40,7 @@ export default class SpectatorService {
             'galaxy.players._id': player._id
         }, {
             $addToSet: {
-                'galaxy.players.$.spectators': userId
+                'galaxy.players.$.spectators': user._id
             }
         });
     }

@@ -7,7 +7,7 @@ export default (container: DependencyContainer) => {
                 await container.spectatorService.invite(
                     req.game,
                     req.player,
-                    req.params.userId);
+                    req.body.username);
                 
                 res.sendStatus(200);
             } catch (err) {

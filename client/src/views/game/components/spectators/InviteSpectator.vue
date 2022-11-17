@@ -9,7 +9,7 @@
     <form @submit="handleSubmit">
         <div class="row g-0">
             <div class="col">
-                <input type="text" required="required" class="form-control" name="username" v-model="username" :disabled="isLoading" placeholder="Enter Player Name...">
+                <input type="text" required="required" class="form-control" name="username" v-model="username" :disabled="isLoading" placeholder="Enter Player Name..." minlength="3" maxlength="24">
             </div>
             <div class="col-auto ms-2">
                 <button type="submit" class="btn btn-success" :disabled="isLoading">

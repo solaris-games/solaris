@@ -104,6 +104,7 @@ export interface Player {
     nextResearchTicksEta?: number | null;
     aiState?: AiState | null;
     spectators: DBObjectId[];
+    hasPerspective?: boolean;
 };
 
 export interface PlayerColourShapeCombination {
