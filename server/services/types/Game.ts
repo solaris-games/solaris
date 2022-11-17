@@ -218,6 +218,7 @@ export interface GameUserNotification {
 export interface GameSpectator {
 	_id: DBObjectId;
 	username: string;
+	playerIds: DBObjectId[];
 }
 
 export interface Game {

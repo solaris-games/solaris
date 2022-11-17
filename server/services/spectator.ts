@@ -1,20 +1,24 @@
 import user from "../api/controllers/user";
 import ValidationError from "../errors/validation";
+import PlayerService from "./player";
 import Repository from "./repository";
 import { DBObjectId } from "./types/DBObjectId";
-import { Game } from "./types/Game";
+import { Game, GameSpectator } from "./types/Game";
 import { Player } from "./types/Player";
 import UserService from "./user";
 
 export default class SpectatorService {
     gameRepo: Repository<Game>;
+    playerService: PlayerService;
     userService: UserService;
 
     constructor(
         gameRepo: Repository<Game>,
+        playerService: PlayerService,
         userService: UserService
     ) {
         this.gameRepo = gameRepo;
+        this.playerService = playerService;
         this.userService = userService;
     }
 
@@ -33,6 +37,13 @@ export default class SpectatorService {
         
         if (!user) {
             throw new ValidationError(`A player with the username ${username} does not exist.`);
+        }
+
+        // Make sure the user isn't already playing in the game.
+        const existingPlayer = this.playerService.getByUserId(game, user._id);
+
+        if (existingPlayer) {
+            throw new ValidationError(`The user ${username} is already playing in this game, they cannot be invited to spectate.`);
         }
 
         await this.gameRepo.updateOne({
@@ -75,7 +86,7 @@ export default class SpectatorService {
         });
     }
 
-    async listSpectators(game: Game) {
+    async listSpectators(game: Game): Promise<GameSpectator[] | null> {
         if (!this.isSpectatingEnabled(game)) {
             return null;
         }

@@ -187,7 +187,7 @@ export default class GameGalaxyService {
             this._clearPlayerCarriers(game);
         } else {
             this._setCarrierInfoDetailed(game, perspectives!);
-            this._setStarInfoDetailed(game, perspectives!);
+            this._setStarInfoDetailed(game, userPlayer, perspectives!);
         }
 
         // We always need to filter the player data so that it's basic info only.
@@ -318,7 +318,7 @@ export default class GameGalaxyService {
         });
     }
 
-    _setStarInfoDetailed(doc: Game, perspectivePlayerIds: DBObjectId[]) { 
+    _setStarInfoDetailed(doc: Game, userPlayer: Player | null, perspectivePlayerIds: DBObjectId[]) { 
         const isFinished = this.gameStateService.isFinished(doc);
         const isDarkStart = this.gameTypeService.isDarkStart(doc);
         const isDarkMode = this.gameTypeService.isDarkMode(doc);
@@ -393,12 +393,19 @@ export default class GameGalaxyService {
                         s.specialist = this.specialistService.getByIdStar(s.specialistId);
                     }
 
-                    s.ignoreBulkUpgrade = (s.ignoreBulkUpgrade || null) || this.starService.resetIgnoreBulkUpgradeStatuses(s);
+                    // The player may be being spectated, so the ignore bulk upgrade stuff is only
+                    // relevant for the user player.
+                    if (userPlayer) {
+                        s.ignoreBulkUpgrade = (s.ignoreBulkUpgrade || null) || this.starService.resetIgnoreBulkUpgradeStatuses(s);
+                    } else {
+                        delete s.ignoreBulkUpgrade;
+                    }
+                    
                     s.isInScanningRange = true;
 
                     return s;
                 } else {
-                    // Remove fields that the user player shouldn't see.
+                    // Remove fields that other users shouldn't see.
                     delete s.ignoreBulkUpgrade;
                 }
 
@@ -666,7 +673,9 @@ export default class GameGalaxyService {
         if (userId && this.spectatorService.isSpectatingEnabled(game)) {
             let spectating = this.spectatorService.listSpectatingPlayers(game, userId);
 
-            return spectating.map(p => p._id);
+            if (spectating.length) {
+                return spectating.map(p => p._id);
+            }
         }
 
         return null;

@@ -97,13 +97,13 @@ export interface Player {
     ledger: PlayerLedger,
     reputations: PlayerReputation[],
     diplomacy: PlayerDiplomaticState[],
+    spectators: DBObjectId[];
     stats?: PlayerStatistics;
     isKingOfTheHill?: boolean;
     isInScanningRange?: boolean;
     currentResearchTicksEta?: number | null;
     nextResearchTicksEta?: number | null;
     aiState?: AiState | null;
-    spectators: DBObjectId[];
     hasPerspective?: boolean;
 };
 

@@ -51,6 +51,10 @@ export default {
 
       if (this.errors.length) return
 
+      if (!(await this.$confirm('Invite Spectator', `Are you sure you want to invite ${this.username} to spectate? They will be able to view the galaxy from your perspective.`))) {
+        return
+      }
+
       try {
         this.isLoading = true
 
