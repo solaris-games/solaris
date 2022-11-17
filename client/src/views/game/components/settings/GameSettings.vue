@@ -68,12 +68,12 @@
             tooltip="Use the advanced AI to replace defeated players"
             :valueText="getFriendlyText(game.settings.general.advancedAI)"
             :value="game.settings.general.advancedAI"
-            :compareValue="game.settings.general.advancedAI"/>
+            :compareValue="compareSettings.general.advancedAI"/>
           <game-setting-value title="Allow Spectators"
             tooltip="Allow players to invite users to spectate the game"
             :valueText="getFriendlyText(game.settings.general.spectators)"
             :value="game.settings.general.spectators"
-            :compareValue="game.settings.general.spectators"/>
+            :compareValue="compareSettings.general.spectators"/>
         </tbody>
       </table>
     </div>
