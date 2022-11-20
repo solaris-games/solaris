@@ -858,7 +858,7 @@ export default class StarService extends EventEmitter {
 
         let pairs = Math.floor(constructors.length / 2);
 
-        if (pairs < 1) {
+        if (pairs < 2) {
             return;
         }
 
