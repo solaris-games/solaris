@@ -858,13 +858,13 @@ export default class StarService extends EventEmitter {
 
         let pairs = Math.floor(constructors.length / 2);
 
-        if (pairs < 2) {
+        if (pairs < 1) {
             return;
         }
 
         while (pairs--) {
-            const starA = constructors[this.randomService.getRandomNumber(constructors.length - 1)];
-            const starB = constructors[this.randomService.getRandomNumber(constructors.length - 1)];
+            const starA = constructors[this.randomService.getRandomNumber(constructors.length)];
+            const starB = constructors[this.randomService.getRandomNumber(constructors.length)];
 
             if (starA._id.toString() === starB._id.toString() || starA.wormHoleToStarId || starB.wormHoleToStarId) {
                 pairs++;
