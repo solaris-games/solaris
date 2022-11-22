@@ -115,7 +115,7 @@
     "gameType": "realTime",
     "speed": 1800,
     "isTickLimited": "disabled",
-    "startDelay": 60,
+    "startDelay": 240,
     "afk": {
       "lastSeenTimeout": 2,
       "cycleTimeout": 3,
