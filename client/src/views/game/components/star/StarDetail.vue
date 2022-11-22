@@ -101,6 +101,16 @@
           </span>
         </div>
         <div class="col-auto">
+          <span title="Scanning range" v-if="star.ownedByPlayerId">
+            {{star.effectiveTechs.scanning}} <i class="fas fa-binoculars ms-1"></i>
+          </span>
+        </div>
+        <div class="col-auto">
+          <span title="Terraforming" v-if="star.ownedByPlayerId">
+            {{star.effectiveTechs.terraforming}} <i class="fas fa-globe-europe ms-1"></i>
+          </span>
+        </div>
+        <div class="col-auto">
           <span title="Total known garrison" v-if="star.ownedByPlayerId">
             {{star.ships == null ? '???' : star.ships}} <i class="fas fa-rocket ms-1"></i>
           </span>
@@ -122,6 +132,16 @@
             <span v-if="star.specialist" class="ms-1">{{star.specialist.name}}</span>
             <span v-if="star.specialistId && star.specialistExpireTick" class="badge bg-warning ms-1"><i class="fas fa-stopwatch"></i> Expires Tick {{star.specialistExpireTick}}</span>
             <span v-if="!star.specialist">No Specialist</span>
+          </span>
+        </div>
+        <div class="col-auto">
+          <span title="Weapons" v-if="star.ownedByPlayerId">
+            {{star.effectiveTechs.weapons}} <i class="fas fa-gun ms-1"></i>
+          </span>
+        </div>
+        <div class="col-auto">
+          <span v-if="star.ownedByPlayerId && !isDeadStar" title="Manufacturing">
+            {{star.effectiveTechs.manufacturing}} <i class="fas fa-industry ms-1"></i>
           </span>
         </div>
         <div class="col-auto">
@@ -151,7 +171,7 @@
     </div>
 
     <div v-if="isStandardUIStyle && star.isInScanningRange">
-      <div v-if="star.ownedByPlayerId" class="row mb-0 pt-3 pb-3 bg-primary">
+      <div v-if="star.ownedByPlayerId" class="row mb-0 pt-2 pb-2 bg-primary">
           <div class="col">
               Ships
           </div>
@@ -161,7 +181,7 @@
           </div>
       </div>
 
-      <div v-if="!isDeadStar" class="row pt-1 pb-1 bg-dark">
+      <div v-if="!isDeadStar" class="row pt-1 pb-1">
           <div class="col">
               Natural Resources
           </div>
@@ -179,7 +199,47 @@
           </div>
       </div>
 
+      <div v-if="star.ownedByPlayerId" class="row pt-1 pb-1">
+          <div class="col">
+              Weapons
+          </div>
+          <div class="col text-end" title="Weapons">
+            <span>{{star.effectiveTechs.weapons}}</span>
+            <i class="fas fa-gun ms-2"></i>
+          </div>
+      </div>
+
       <div v-if="star.ownedByPlayerId" class="row pt-1 pb-1 bg-dark">
+          <div class="col">
+              Scanning
+          </div>
+          <div class="col text-end" title="Scanning">
+            <span>{{star.effectiveTechs.scanning}}</span>
+            <i class="fas fa-binoculars ms-2"></i>
+          </div>
+      </div>
+
+      <div v-if="star.ownedByPlayerId" class="row pt-1 pb-1">
+          <div class="col">
+              Terraforming
+          </div>
+          <div class="col text-end" title="Terraforming">
+            <span>{{star.effectiveTechs.terraforming}}</span>
+            <i class="fas fa-globe-europe ms-2"></i>
+          </div>
+      </div>
+
+      <div v-if="star.ownedByPlayerId && !isDeadStar" class="row pt-1 pb-1 bg-dark">
+          <div class="col">
+              Manufacturing
+          </div>
+          <div class="col text-end" title="Manufacturing">
+            <span>{{star.effectiveTechs.manufacturing}}</span>
+            <i class="fas fa-industry ms-2"></i>
+          </div>
+      </div>
+
+      <div v-if="star.ownedByPlayerId && !isDeadStar" class="row pt-1 pb-1">
           <div class="col">
               Ship Production
           </div>
@@ -196,9 +256,13 @@
           <h4>Carriers</h4>
         </div>
         <div class="col-auto">
-          <button title="Transfer all ships to the star" v-if="isOwnedByUserPlayer" type="button" class="btn btn-sm btn-outline-primary" @click="transferAllToStar()">
-            <i class="fas fa-chevron-up"></i>
-            Garrison All
+          <button title="Distribute ships evenly to carriers" v-if="isOwnedByUserPlayer" type="button" class="btn btn-sm btn-outline-secondary" @click="distributeAllShips()">
+            <i class="fas fa-arrow-down-wide-short"></i>
+            Distribute
+          </button>
+          <button title="Transfer all ships to the star" v-if="isOwnedByUserPlayer" type="button" class="btn btn-sm btn-outline-primary ms-1" @click="transferAllToStar()">
+            <i class="fas fa-arrow-up-wide-short"></i>
+            Garrison
           </button>
         </div>
       </div>
@@ -479,6 +543,26 @@ export default {
           this.star.ships = response.data.star.ships
 
           this.$toasted.show(`All ships transfered to ${this.star.name}.`)
+        }
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    async distributeAllShips() {
+      try {
+        let response = await starService.distributeAllShips(this.$store.state.game._id, this.star._id)
+        
+        if (response.status === 200) {
+          let carriers = response.data.carriers
+
+          carriers.forEach(responseCarrier => {
+            let mapObjectCarrier = gameHelper.getCarrierById(this.$store.state.game, responseCarrier._id) 
+            mapObjectCarrier.ships = responseCarrier.ships
+          })
+
+          this.star.ships = response.data.star.ships
+
+          this.$toasted.show(`All ships at ${this.star.name} distributed to carriers in orbit.`)
         }
       } catch (err) {
         console.log(err)

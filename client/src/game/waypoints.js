@@ -91,16 +91,7 @@ class Waypoints extends EventEmitter {
     let lastLocationStar = this._getLastLocationStar()
     let player = this.game.galaxy.players.find(p => p.userId)
 
-    // TODO: Use the game helper instead?
-    let techLevel = player.research.hyperspace.level
-    
-    if (this.carrier.specialist && this.carrier.specialist.modifiers.local) {
-      techLevel += this.carrier.specialist.modifiers.local.hyperspace || 0
-    }
-
-    techLevel = Math.max(1, techLevel)
-
-    let radius = ((techLevel || 1) + 1.5) * this.lightYearDistance
+    let radius = ((lastLocationStar.effectiveTechs.hyperspace || 1) + 1.5) * this.lightYearDistance
 
     graphics.lineStyle(1, player.colour.value, 0.2)
     graphics.beginFill(player.colour.value, 0.15)

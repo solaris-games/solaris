@@ -204,6 +204,8 @@ export default class StarUpgradeService extends EventEmitter {
             await this.achievementService.incrementCarriersBuilt(player.userId);
         }
 
+        carrier.effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, true);
+
         return {
             carrier,
             starShips: star.ships || 0

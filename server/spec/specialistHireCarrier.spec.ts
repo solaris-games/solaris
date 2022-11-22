@@ -13,6 +13,9 @@ describe('specialistHire - Carrier', () => {
                 bulkWrite: () => {}
             },
             specialistService: {} as any,
+            technologyService: {
+                getCarrierEffectiveTechnologyLevels: () => {}
+            },
             achievementService: {
                 incrementSpecialistsHired: () => {}
             },
@@ -62,7 +65,7 @@ describe('specialistHire - Carrier', () => {
         obj.player._id = obj.playerId;
 
         // @ts-ignore
-        obj.service = new SpecialistHireService(obj.gameRepo, obj.specialistService, obj.achievementService, obj.waypointService, obj.playerCreditsService, obj.starService, obj.gameTypeService, obj.specialistBanService);
+        obj.service = new SpecialistHireService(obj.gameRepo, obj.specialistService, obj.achievementService, obj.waypointService, obj.playerCreditsService, obj.starService, obj.gameTypeService, obj.specialistBanService, obj.technologyService);
 
         return obj;
     }

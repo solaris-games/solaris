@@ -310,6 +310,8 @@ export default class GameGalaxyService {
                 wormHoleToStarId: null
             } as Star;
 
+            star.effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(doc, star);
+
             if (isKingOfTheHillMode) {
                 star.isKingOfTheHillStar = kingOfTheHillStar != null && kingOfTheHillStar._id.toString() === s._id.toString();
             }
@@ -358,11 +360,11 @@ export default class GameGalaxyService {
             .map(s => {
                 delete s.shipsActual; // Don't need to send this back.
 
+                s.effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(doc, s);
+
                 // Calculate the star's terraformed resources.
                 if (s.ownedByPlayerId) {
-                    let owningPlayerEffectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(doc, s);
-
-                    s.terraformedResources = this.starService.calculateTerraformedResources(s, owningPlayerEffectiveTechs.terraforming);
+                    s.terraformedResources = this.starService.calculateTerraformedResources(s, s.effectiveTechs.terraforming);
                 }
 
                 // Round the Natural Resources
@@ -453,7 +455,8 @@ export default class GameGalaxyService {
                         isPulsar: false, // Hide outside of scanning range
                         wormHoleToStarId: s.wormHoleToStarId,
                         isKingOfTheHillStar: s.isKingOfTheHillStar,
-                        isInScanningRange: s.isInScanningRange
+                        isInScanningRange: s.isInScanningRange,
+                        effectiveTechs: s.effectiveTechs
                     }
 
                     if (isDarkFogged && !s.isInScanningRange) {
@@ -481,6 +484,8 @@ export default class GameGalaxyService {
         // Populate the number of ticks it will take for all waypoints.
         doc.galaxy.carriers
             .forEach(c => {
+                c.effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(doc, c);
+
                 this.waypointService.populateCarrierWaypointEta(doc, c);
 
                 if (c.specialistId) {

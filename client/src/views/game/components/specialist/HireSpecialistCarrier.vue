@@ -110,6 +110,7 @@ export default {
                 this.carrier.specialistId = specialist.id
                 this.carrier.specialistExpireTick = specialist.expireTicks ? this.$store.state.game.state.tick + specialist.expireTicks : null
                 this.carrier.specialist = specialist
+                this.carrier.effectiveTechs = response.data.carrier.effectiveTechs
                 this.userPlayer[currency] -= specialist.cost[currency]
 
                 if (response.data.waypoints) {

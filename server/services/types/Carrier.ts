@@ -3,6 +3,7 @@ import { CarrierWaypoint } from "./CarrierWaypoint";
 import { MapObject } from "./Map";
 import { DBObjectId } from "./DBObjectId";
 import { Specialist } from "./Specialist";
+import { PlayerTechnologyLevels } from "./Player";
 
 export interface Carrier extends MapObject {
     orbiting: DBObjectId | null;
@@ -18,6 +19,7 @@ export interface Carrier extends MapObject {
     ticksEtaTotal?: number | null;
     locationNext: Location | null;
     distanceToDestination?: number;
+    effectiveTechs?: PlayerTechnologyLevels;
 
     toObject(): Carrier;
 };

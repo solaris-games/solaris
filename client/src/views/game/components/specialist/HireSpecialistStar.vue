@@ -105,6 +105,7 @@ export default {
                 this.star.specialistId = specialist.id
                 this.star.specialistExpireTick = specialist.expireTicks ? this.$store.state.game.state.tick + specialist.expireTicks : null
                 this.star.specialist = specialist
+                this.star.effectiveTechs = response.data.effectiveTechs
                 this.userPlayer[currency] -= specialist.cost[currency]
 
                 this.userPlayer.stats.totalStarSpecialists++

@@ -2,6 +2,7 @@ import { DBObjectId } from "./DBObjectId";
 import { InfrastructureUpgradeCosts } from "./InfrastructureUpgrade";
 import { Location } from "./Location";
 import { MapObject } from "./Map";
+import { PlayerTechnologyLevels } from "./Player";
 import { Specialist } from "./Specialist";
 
 export interface NaturalResources {
@@ -53,6 +54,7 @@ export interface Star extends MapObject {
     upgradeCosts?: InfrastructureUpgradeCosts;
     manufacturing?: number;
     isInScanningRange?: boolean;
+    effectiveTechs?: PlayerTechnologyLevels;
 };
 
 export interface StarCaptureResult {

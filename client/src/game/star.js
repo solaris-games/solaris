@@ -675,22 +675,7 @@ class Star extends EventEmitter {
     // Dead stars do not have scanning range
     if (!player || this._isDeadStar()) { return }
 
-    if (!player.research) { return }
-
-    // TODO: Use the game helper instead?
-    let techLevel = player.research.scanning.level
-
-    if (this.data.specialist && this.data.specialist.modifiers.local) {
-      techLevel += this.data.specialist.modifiers.local.scanning || 0
-    }
-
-    if (this.hasBlackHole()) {
-      techLevel += 3
-    }
-
-    techLevel = Math.max(1, techLevel)
-
-    let radius = ((techLevel || 1) + 1) * this.lightYearDistance
+    let radius = ((this.data.effectiveTechs.scanning || 1) + 1) * this.lightYearDistance
 
     this.graphics_scanningRange.lineStyle(1, 0xFFFFFF, 0.2)
     this.graphics_scanningRange.beginFill(player.colour.value, 0.075)
@@ -713,19 +698,8 @@ class Star extends EventEmitter {
     let player = this._getStarPlayer()
 
     if (!player) { return }
-
-    if (!player.research) { return }
     
-    // TODO: Use the game helper instead?
-    let techLevel = player.research.hyperspace.level
-
-    if (this.data.specialist && this.data.specialist.modifiers.local) {
-      techLevel += this.data.specialist.modifiers.local.hyperspace || 0
-    }
-
-    techLevel = Math.max(1, techLevel)
-
-    let radius = ((techLevel || 1) + 1.5) * this.lightYearDistance
+    let radius = ((this.data.effectiveTechs.hyperspace || 1) + 1.5) * this.lightYearDistance
 
     this.graphics_hyperspaceRange.lineStyle(1, 0xFFFFFF, 0.2)
     this.graphics_hyperspaceRange.beginFill(player.colour.value, 0.075)

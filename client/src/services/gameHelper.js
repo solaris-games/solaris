@@ -84,15 +84,7 @@ class GameHelper {
   }
 
   getHyperspaceDistance (game, player, carrier) {
-    let techLevel = player.research.hyperspace.level
-
-    if (carrier.specialist && carrier.specialist.modifiers.local) {
-      techLevel += carrier.specialist.modifiers.local.hyperspace || 0
-    }
-
-    techLevel = Math.max(1, techLevel)
-
-    return ((techLevel || 1) + 1.5) * game.constants.distances.lightYear
+    return ((carrier.effectiveTechs.hyperspace || 1) + 1.5) * game.constants.distances.lightYear
   }
 
   getScanningLevelByDistance (game, distance) {
