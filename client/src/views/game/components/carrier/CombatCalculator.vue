@@ -9,7 +9,7 @@
             <form class="col-12" @submit="calculate">
                 <div class="mb-2 row">
                     <label for="defenderWeaponTech" class="col-8 col-form-label">
-                      <i class="fas" :class="{'fa-fighter-jet':!defender.player,'fa-user':defender.player}"></i> 
+                      <i class="fas" :class="{'fa-gun':!defender.player,'fa-user':defender.player}"></i> 
                       <span class="text-success ms-2">{{defender.player ? defender.player.alias : 'Defender'}}</span> Weapons
                     </label>
                     <div class="col-4">
@@ -52,7 +52,7 @@
 
                 <div class="mb-2 row">
                     <label for="attackerWeaponTech" class="col-8 col-form-label">
-                      <i class="fas" :class="{'fa-fighter-jet':!attacker.player,'fa-user':attacker.player}"></i> 
+                      <i class="fas" :class="{'fa-gun':!attacker.player,'fa-user':attacker.player}"></i> 
                       <span class="text-danger ms-2">{{attacker.player ? attacker.player.alias : 'Attacker'}}</span> Weapons
                     </label>
                     <div class="col-4">

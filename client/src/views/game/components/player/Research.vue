@@ -47,7 +47,7 @@
             <research-row
               v-if="isTechnologyEnabled('weapons')"
               research="weapons"
-              iconClass="fa-fighter-jet"
+              iconClass="fa-gun"
               title="Weapons"
               :player="player"
               :userPlayer="userPlayer"

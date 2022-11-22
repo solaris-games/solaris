@@ -41,7 +41,7 @@ class TechnologyHelper {
         case 'experimentation':
           return 'microscope'
         case 'weapons':
-          return 'fighter-jet'
+          return 'gun'
         case 'banking':
           return 'money-bill-alt'
         case 'manufacturing':
