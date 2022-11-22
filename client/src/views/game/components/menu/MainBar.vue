@@ -88,7 +88,8 @@
         :tab="menuArguments"
         @onCloseRequested="onCloseRequested"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
-        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
+        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
       <bulk-infrastructure-upgrade v-if="menuState == MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE" 
         @onCloseRequested="onCloseRequested"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
