@@ -268,6 +268,12 @@ export default class WaypointService {
         return null;
     }
 
+    cullAllWaypointsByHyperspaceRange(game: Game) {
+        for (let carrier of game.galaxy.carriers) {
+            this.cullWaypointsByHyperspaceRange(game, carrier);
+        }
+    }
+
     async loopWaypoints(game: Game, player: Player, carrierId: DBObjectId, loop: boolean) {
         let carrier = this.carrierService.getById(game, carrierId);
         

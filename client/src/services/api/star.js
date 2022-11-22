@@ -71,9 +71,12 @@ class StarService extends BaseApiService {
   }
 
   transferAllToStar(gameId, starId) {
-    return axios.put(this.BASE_URL + 'game/' + gameId + '/star/transferall', {
-      starId
-    },
+    return axios.put(this.BASE_URL + 'game/' + gameId + '/star/' + starId + '/transferall', { },
+    { withCredentials: true })
+  }
+
+  distributeAllShips(gameId, starId) {
+    return axios.put(this.BASE_URL + 'game/' + gameId + '/star/' + starId + '/distributeall', { },
     { withCredentials: true })
   }
   

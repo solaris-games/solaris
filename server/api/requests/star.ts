@@ -109,26 +109,6 @@ export const mapToStarBuildCarrierRequest = (body: any): StarBuildCarrierRequest
     }
 };
 
-export interface StarGarrisonAllShipsRequest {
-    starId: DBObjectId;
-};
-
-export const mapToStarGarrisonAllShipsRequest = (body: any): StarGarrisonAllShipsRequest => {
-    let errors: string[] = [];
-
-    if (!keyHasStringValue(body, 'starId')) {
-        errors.push('Star ID is required.');
-    }
-
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    return {
-        starId: body.starId
-    }
-};
-
 export interface StarAbandonStarRequest {
     starId: DBObjectId;
 };

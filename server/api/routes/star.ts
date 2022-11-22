@@ -152,7 +152,7 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
         controller.buildCarrier,
         mw.core.handleError);
 
-    router.put('/api/game/:gameId/star/transferall',
+    router.put('/api/game/:gameId/star/:starId/transferall',
         mw.auth.authenticate(),
         mw.game.loadGame({
             lean: true,
@@ -168,6 +168,24 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
         mw.player.loadPlayer,
         mw.player.validatePlayerState({ isPlayerUndefeated: true }),
         controller.garrisonAllShips,
+        mw.core.handleError);
+
+    router.put('/api/game/:gameId/star/:starId/distributeall',
+        mw.auth.authenticate(),
+        mw.game.loadGame({
+            lean: true,
+            settings: true,
+            state: true,
+            galaxy: true,
+            constants: true
+        }),
+        mw.game.validateGameState({
+            isUnlocked: true,
+            isNotFinished: true
+        }),
+        mw.player.loadPlayer,
+        mw.player.validatePlayerState({ isPlayerUndefeated: true }),
+        controller.distributeAllShips,
         mw.core.handleError);
 
     router.put('/api/game/:gameId/star/abandon',
