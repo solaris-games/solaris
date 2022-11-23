@@ -91,7 +91,7 @@ class Waypoints extends EventEmitter {
     let lastLocationStar = this._getLastLocationStar()
     let player = this.game.galaxy.players.find(p => p.userId)
 
-    let radius = ((lastLocationStar.effectiveTechs.hyperspace || 1) + 1.5) * this.lightYearDistance
+    let radius = ((this.carrier.effectiveTechs.hyperspace || 1) + 1.5) * this.lightYearDistance
 
     graphics.lineStyle(1, player.colour.value, 0.2)
     graphics.beginFill(player.colour.value, 0.15)
