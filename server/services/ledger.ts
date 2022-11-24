@@ -101,7 +101,7 @@ export default class LedgerService extends EventEmitter {
         }
 
         let debtAmount = Math.abs(ledgerDebtor.ledger.debt);
-        let debtorCredits = LedgerType.Credits ? debtor.credits : debtor.creditsSpecialists
+        let debtorCredits = type === LedgerType.Credits ? debtor.credits : debtor.creditsSpecialists
 
         // If the debtor cannot fully settle the debt then only
         // pay what they can (their total credits)
