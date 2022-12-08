@@ -180,6 +180,27 @@ class GameHelper {
     return totalTicks
   }
 
+  getActualTicksBetweenLocations (game, player, carrier, sourceStar, destinationStar, hyperspaceDistance) {
+    const instantSpeed = this.isStarPairWormHole(sourceStar, destinationStar)
+
+    if (instantSpeed) {
+      return 1 // 1 tick for worm hole pairs
+    }
+
+    // If the carrier is within hyperspace range and can travel at warp speed, then return the warp speed ticks
+    // otherwise return the normal speed
+    const distanceBetweenStars = this.getDistanceBetweenLocations(sourceStar.location, destinationStar.location)
+
+    const isInHyperspaceRange = distanceBetweenStars <= hyperspaceDistance
+    const canWarpSpeed = this.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar)
+    
+    if (isInHyperspaceRange && canWarpSpeed) {
+      return this.getTicksBetweenLocations(game, carrier, [sourceStar, destinationStar], game.constants.distances.warpSpeedMultiplier)
+    }
+
+    return this.getTicksBetweenLocations(game, carrier, [sourceStar, destinationStar])
+  }
+
   getTicksToProduction (game, currentTick, currentProductionTick) {
     let productionTicks = game.settings.galaxy.productionTicks
 

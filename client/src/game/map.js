@@ -109,6 +109,7 @@ class Map extends EventEmitter {
     this.waypoints = new Waypoints()
     this.waypoints.setup(game)
     this.waypoints.onWaypointCreatedHandler = this.waypoints.on('onWaypointCreated', this.onWaypointCreated.bind(this))
+    this.waypoints.onWaypointOutOfRangeHandler = this.waypoints.on('onWaypointOutOfRange', this.onWaypointOutOfRange.bind(this))
 
     this.waypointContainer.addChild(this.waypoints.container)
 
@@ -883,6 +884,10 @@ class Map extends EventEmitter {
 
   onWaypointCreated (e) {
     this.emit('onWaypointCreated', e)
+  }
+
+  onWaypointOutOfRange (e) {
+    this.emit('onWaypointOutOfRange', e)
   }
 
   onRulerPointCreated (e) {
