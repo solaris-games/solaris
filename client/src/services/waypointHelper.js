@@ -76,10 +76,10 @@ class WaypointHelper {
 
                     // Calculate the running cost and estimated cost to the end. Ideally we want
                     // to head in the direction of the end goal using manhattan distance.
-                    neighbor.costFromStart = nextCost
-                    neighbor.estimatedCostToEnd = GameHelper.getActualTicksBetweenLocations(game, player, carrier, neighbor, end, hyperspaceDistance)
+                    neighbor.totalCost = nextCost
+                    // neighbor.estimatedCostToEnd = GameHelper.getActualTicksBetweenLocations(game, player, carrier, neighbor, end, hyperspaceDistance)
                     // neighbor.estimatedCostToEnd = GameHelper.getTicksBetweenLocations(game, carrier, [neighbor, end])
-                    neighbor.totalCost = neighbor.costFromStart + neighbor.estimatedCostToEnd
+                    // neighbor.totalCost = neighbor.costFromStart + neighbor.estimatedCostToEnd
                     neighbor.parent = current
                 }
             }
