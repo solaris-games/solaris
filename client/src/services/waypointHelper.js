@@ -10,8 +10,6 @@ class WaypointHelper {
                 ...s,
                 cost: 0,
                 totalCost: 0,
-                costFromStart: 0,
-                estimatedCostToEnd: 0,
                 neighbors: null,
                 parent: null
             }
@@ -63,23 +61,20 @@ class WaypointHelper {
 
                     // Calculate what the next cost will be, we don't want to check
                     // any paths that lead us to more cost.
-                    let nextCost = current.costFromStart + neighbor.cost;
+                    let nextCost = current.totalCost + neighbor.cost;
 
                     // But if we haven't tried this path, enqueue it.
                     const isOpen = openSet.find(n => n._id === neighbor._id) != null;
 
                     if (!isOpen) {
                         openSet.push(neighbor);
-                    } else if (nextCost >= neighbor.costFromStart) {
+                    } else if (nextCost >= neighbor.totalCost) {
                         continue;
                     }
 
                     // Calculate the running cost and estimated cost to the end. Ideally we want
                     // to head in the direction of the end goal using manhattan distance.
                     neighbor.totalCost = nextCost
-                    // neighbor.estimatedCostToEnd = GameHelper.getActualTicksBetweenLocations(game, player, carrier, neighbor, end, hyperspaceDistance)
-                    // neighbor.estimatedCostToEnd = GameHelper.getTicksBetweenLocations(game, carrier, [neighbor, end])
-                    // neighbor.totalCost = neighbor.costFromStart + neighbor.estimatedCostToEnd
                     neighbor.parent = current
                 }
             }
