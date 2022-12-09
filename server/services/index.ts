@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+const bcryptjs = require('bcryptjs');
 
 import GameModel from '../db/models/Game';
 import UserModel from '../db/models/User';
@@ -111,7 +111,7 @@ export default (config, io): DependencyContainer => {
 
     // Poor man's dependency injection.
 
-    const passwordService = new PasswordService(bcrypt);
+    const passwordService = new PasswordService(bcryptjs);
 
     const userLevelService = new UserLevelService();
     const authService = new AuthService(userRepository, passwordService);

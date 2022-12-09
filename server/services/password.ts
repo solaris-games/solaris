@@ -1,17 +1,17 @@
 export default class PasswordService {
-    bcrypt;
+    bcryptjs;
 
     constructor(
-        bcrypt
+        bcryptjs
     ) {
-        this.bcrypt = bcrypt;
+        this.bcryptjs = bcryptjs;
     }
 
     async hash(password: string, length: number = 10) {
-        return await this.bcrypt.hash(password, length);
+        return await this.bcryptjs.hash(password, length);
     }
 
     async compare(password1: string, password2: string) {
-        return await this.bcrypt.compare(password1, password2);
+        return await this.bcryptjs.compare(password1, password2);
     }
 };
