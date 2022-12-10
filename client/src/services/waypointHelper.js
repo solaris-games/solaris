@@ -42,16 +42,16 @@ class WaypointHelper {
             // If we've found the end, return the reversed path.
             if (current._id === end._id) {
                 let temp = current;
-
+        
                 const path = [];
 
                 path.push(temp);
-
+        
                 while (temp.parent) {
                     path.push(temp.parent);
                     temp = temp.parent;
                 }
-                
+        
                 return path.reverse();
             }
 
