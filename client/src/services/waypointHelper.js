@@ -38,7 +38,7 @@ class WaypointHelper {
             const current = openSet.shift();
 
             closedSet.push(current); // We're evaluating, so might as well close it.
-
+            
             // If we've found the end, return the reversed path.
             if (current._id === end._id) {
                 let temp = current;
@@ -51,7 +51,7 @@ class WaypointHelper {
                     path.push(temp.parent);
                     temp = temp.parent;
                 }
-
+                
                 return path.reverse();
             }
 
