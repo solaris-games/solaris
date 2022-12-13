@@ -9,9 +9,7 @@ class WaypointHelper {
             return {
                 ...s,
                 cost: 0,
-                totalCost: 0,
                 costFromStart: 0,
-                estimatedCostToEnd: 0,
                 neighbors: null,
                 parent: null
             }
@@ -28,7 +26,15 @@ class WaypointHelper {
         let closedSet = []
 
         while (openSet.length) {
-            openSet.sort((a, b) => a.totalCost - b.totalCost); // Ensure we start with the node that has the lowest total cost
+            // This sort makes us look at the nodes where we can get the quickest first.
+            // This guarantees that all nodes that already have a calculated route (which may not be the quickest)
+            // will have their quickest route found. This in turn guarantees that the final fastest route can be found.
+
+            // Note from Tristanvds: Unfortunately we cannot also take into account a sorting system where we look at the
+            // distance to the end star. This kind of sorting system would favour going in a direct line towards that star
+            // instead of going for wormholes. Therefore we have to take a (computationally) slower approach by sorting
+            // based on the distance from the start.
+            openSet.sort((a, b) => a.costFromStart - b.costFromStart); // Ensure we start with the node that has the lowest total cost
             const current = openSet.shift();
 
             closedSet.push(current); // We're evaluating, so might as well close it.
@@ -74,12 +80,9 @@ class WaypointHelper {
                         continue;
                     }
 
-                    // Calculate the running cost and estimated cost to the end. Ideally we want
-                    // to head in the direction of the end goal using manhattan distance.
+                    // Calculate the final cost from the start to the end
+                    // while updating the path taken.
                     neighbor.costFromStart = nextCost
-                    neighbor.estimatedCostToEnd = GameHelper.getActualTicksBetweenLocations(game, player, carrier, neighbor, end, hyperspaceDistance)
-                    // neighbor.estimatedCostToEnd = GameHelper.getTicksBetweenLocations(game, carrier, [neighbor, end])
-                    neighbor.totalCost = neighbor.costFromStart + neighbor.estimatedCostToEnd
                     neighbor.parent = current
                 }
             }
