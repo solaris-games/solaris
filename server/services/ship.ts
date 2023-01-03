@@ -60,28 +60,20 @@ export default class ShipService {
     }
 
     produceShips(game: Game) {
-        const playerPopulationCaps = game.galaxy.players.map(p => {
-            const cap = this.calculatePopulationCap(game, p._id);
-
-            return {
-                playerId: p._id,
-                cap
-            }
-        });
-
         const starsToProduce = game.galaxy.stars.filter(s => s.infrastructure.industry! > 0);
 
         for (let i = 0; i < starsToProduce.length; i++) {
             let star = starsToProduce[i];
 
             if (star.ownedByPlayerId) {
-                const populationCap = playerPopulationCaps.find(p => p.playerId.toString() === star.ownedByPlayerId!.toString())!;
+                // Note: We recalculate the pop cap every time we produce ships so that it is always up to date.
+                const cap = this.calculatePopulationCap(game, star.ownedByPlayerId!);
 
-                if (populationCap.cap?.isPopulationCapped) {
+                if (cap?.isPopulationCapped) {
                     continue;
                 }
 
-                const productionShips = this.calculateStarShipProduction(game, star, populationCap.cap);
+                const productionShips = this.calculateStarShipProduction(game, star, cap);
 
                 // Increase the number of ships garrisoned by how many are manufactured this tick.
                 star.shipsActual! += productionShips;
