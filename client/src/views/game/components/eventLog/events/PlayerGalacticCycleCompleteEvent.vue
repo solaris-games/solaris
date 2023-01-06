@@ -5,7 +5,7 @@
   </p>
 
   <p v-if="event.data.creditsEconomy || event.data.creditsBanking">
-    You have received <span class="text-success">${{event.data.creditsEconomy}} credits</span> from your
+    You have received <span class="text-success">${{event.data.creditsEconomy}}</span> from your
     economic infrastructure and <span class="text-success">${{event.data.creditsBanking}}</span> from your banking technology.
   </p>
 
@@ -14,12 +14,16 @@
     specialists technology.
   </p>
 
-  <p v-if="event.data.experimentTechnology">
+  <p v-if="event.data.experimentTechnology && !event.data.experimentLevelUp">
     Your experimental scientists have stumbled across a new discovery which has unlocked
     <span class="text-warning">{{event.data.experimentAmount}} points</span> of research in the field of <span class="text-info">{{getTechnologyFriendlyName(event.data.experimentTechnology)}}</span>.
   </p>
 
   <p v-if="event.data.experimentLevelUp">
+    The <span class="text-warning">{{event.data.experimentAmount}} points</span> of research discovered by your experimental scientists caused a <span class="text-warning">breakthrough</span> in the field of <span class="text-info">{{getTechnologyFriendlyName(event.data.experimentTechnology)}}</span>!
+  </p>
+  
+  <p v-if="event.data.experimentResearchingNext">
     Your scientists are now researching <span class="text-info">{{getTechnologyFriendlyName(event.data.experimentResearchingNext)}}</span>.
   </p>
 
