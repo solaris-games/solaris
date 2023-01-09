@@ -92,9 +92,7 @@ export default class TechnologyService {
     }
 
     getStarEffectiveTechnologyLevels(game: Game, star: Star, sanitize: boolean = true): PlayerTechnologyLevels {
-        let player = star.ownedByPlayerId ?
-            game.galaxy.players.find(x => x._id.toString() === star.ownedByPlayerId!.toString()) || null : null;
-
+        let player = star.ownedByPlayerId ? game.galaxy.players.find(x => x._id.toString() === star.ownedByPlayerId!.toString()) || null : null;
         let techs = this.getPlayerEffectiveTechnologyLevels(game, player, false);
 
         if (star.specialistId) {
@@ -113,19 +111,8 @@ export default class TechnologyService {
     }
 
     getCarrierEffectiveTechnologyLevels(game: Game, carrier: Carrier, sanitize: boolean = true) {
-        let techs: PlayerTechnologyLevels | null = null;
-
-        // If the carrier is in orbit, then base the tech levels on the star it is in orbit of.
-        // Otherwise, the carrier is in space so the tech levels should be based on the player who owns the carrier.
-        if (carrier.orbiting) {
-            let star = game.galaxy.stars.find(x => x._id.toString() === carrier.orbiting!.toString())!;
-
-            techs = this.getStarEffectiveTechnologyLevels(game, star, false);
-        } else {
-            let player = game.galaxy.players.find(x => x._id.toString() === carrier.ownedByPlayerId!.toString()) || null;
-
-            techs = this.getPlayerEffectiveTechnologyLevels(game, player, false);
-        }
+        let player = game.galaxy.players.find(x => x._id.toString() === carrier.ownedByPlayerId!.toString()) || null;
+        let techs = this.getPlayerEffectiveTechnologyLevels(game, player, false);
 
         // Apply any specialist tech modifiers.
         if (carrier.specialistId) {

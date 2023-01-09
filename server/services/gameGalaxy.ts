@@ -456,8 +456,10 @@ export default class GameGalaxyService {
                         wormHoleToStarId: s.wormHoleToStarId,
                         isKingOfTheHillStar: s.isKingOfTheHillStar,
                         isInScanningRange: s.isInScanningRange,
-                        effectiveTechs: s.effectiveTechs
-                    }
+                        effectiveTechs: null
+                    } as any
+
+                    mappedStar.effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(doc, mappedStar); // Redo effective techs
 
                     if (isDarkFogged && !s.isInScanningRange) {
                         mappedStar.ownedByPlayerId = null;

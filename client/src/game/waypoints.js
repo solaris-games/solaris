@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js-legacy'
 import EventEmitter from 'events'
 import GameHelper from '../services/gameHelper'
+import WaypointHelper from '../services/waypointHelper'
 
 class Waypoints extends EventEmitter {
   constructor () {
@@ -52,7 +53,9 @@ class Waypoints extends EventEmitter {
       let distance = GameHelper.getDistanceBetweenLocations(lastLocation, s.location)
 
       if (distance <= hyperspaceDistance) {
-        this._highlightLocation(s.location, 0.3)
+        this._highlightLocation(s.location, 0.5)
+      } else {
+        this._highlightLocation(s.location, 0.2)
       }
     }
   }
@@ -91,7 +94,7 @@ class Waypoints extends EventEmitter {
     let lastLocationStar = this._getLastLocationStar()
     let player = this.game.galaxy.players.find(p => p.userId)
 
-    let radius = ((lastLocationStar.effectiveTechs.hyperspace || 1) + 1.5) * this.lightYearDistance
+    let radius = ((this.carrier.effectiveTechs.hyperspace || 1) + 1.5) * this.lightYearDistance
 
     graphics.lineStyle(1, player.colour.value, 0.2)
     graphics.beginFill(player.colour.value, 0.15)
@@ -116,55 +119,71 @@ class Waypoints extends EventEmitter {
       return
     }
 
-    this._createWaypoint(e.location, e._id)
-  }
-
-  _createWaypoint (desiredLocation, starId) {
-    // If the star that was clicked is within hyperspace range then append
-    // a new waypoint to this star.
-    let userPlayer = this.game.galaxy.players.find(p => p.userId)
-
+    // If the selected star is inside of hyperspace range then
+    // simply create a waypoint to it. Otherwise try to calculate the
+    // shortest route to it.
+    const userPlayer = this.game.galaxy.players.find(p => p.userId)
     const hyperspaceDistance = GameHelper.getHyperspaceDistance(this.game, userPlayer, this.carrier)
-    
+
     const lastLocationStar = this._getLastLocationStar()
     const lastLocation = lastLocationStar == null ? null : lastLocationStar.location
-    const distance = GameHelper.getDistanceBetweenLocations(lastLocation, desiredLocation)
+    const distance = GameHelper.getDistanceBetweenLocations(lastLocation, e.location)
 
     let canCreateWaypoint = distance <= hyperspaceDistance
 
     if (!canCreateWaypoint && lastLocationStar && lastLocationStar.wormHoleToStarId) {
       const wormHolePairStar = GameHelper.getStarById(this.game, lastLocationStar.wormHoleToStarId)
 
-      canCreateWaypoint = wormHolePairStar && wormHolePairStar._id === starId
+      canCreateWaypoint = wormHolePairStar && wormHolePairStar._id === e._id
     }
 
     if (canCreateWaypoint) {
-      let newWaypoint = {
-        destination: starId,
-        action: 'collectAll',
-        actionShips: 0,
-        delayTicks: 0
+      this._createWaypoint(e._id)
+    } else {
+      this._createWaypointRoute(lastLocationStar._id, e._id)
+    }
+  }
+
+  _createWaypoint (destinationStarId) {
+    let newWaypoint = {
+      destination: destinationStarId,
+      action: 'collectAll',
+      actionShips: 0,
+      delayTicks: 0
+    }
+
+    // If the carrier has waypoints, create a new waypoint from the last destination.
+    if (this.carrier.waypoints.length) {
+      const lastWaypoint = this._getLastWaypoint()
+
+      // // The waypoint cannot be the same as the previous waypoint.
+      // if (newWaypoint.destination === lastWaypoint.destination) {
+      //   return
+      // }
+
+      newWaypoint.source = lastWaypoint.destination
+    } else { // Otherwise use the current orbiting star
+      newWaypoint.source = this.carrier.orbiting
+    }
+
+    this.carrier.waypoints.push(newWaypoint)
+
+    this.draw(this.carrier)
+
+    this.emit('onWaypointCreated', newWaypoint)
+  }
+
+  _createWaypointRoute (sourceStarId, destinStarId) {
+    const route = WaypointHelper.calculateShortestRoute(this.game, this.carrier, sourceStarId, destinStarId)
+
+    if (route.length > 1) {
+      for (let i = 1; i < route.length; i++) {
+        let waypointStar = route[i]
+        
+        this._createWaypoint(waypointStar._id)
       }
-
-      // If the carrier has waypoints, create a new waypoint from the last destination.
-      if (this.carrier.waypoints.length) {
-        const lastWaypoint = this._getLastWaypoint()
-
-        // // The waypoint cannot be the same as the previous waypoint.
-        // if (newWaypoint.destination === lastWaypoint.destination) {
-        //   return
-        // }
-
-        newWaypoint.source = lastWaypoint.destination
-      } else { // Otherwise use the current orbiting star
-        newWaypoint.source = this.carrier.orbiting
-      }
-
-      this.carrier.waypoints.push(newWaypoint)
-
-      this.draw(this.carrier)
-
-      this.emit('onWaypointCreated', newWaypoint)
+    } else {
+      this.emit('onWaypointOutOfRange', null)
     }
   }
 

@@ -157,16 +157,16 @@ class GameContainer {
       })
       .decelerate({ friction: 0.9 })
       .clamp({
-        left: this.starFieldLeft * 2,
-        right: this.starFieldRight * 2,
-        top: this.starFieldTop * 2,
-        bottom: this.starFieldBottom * 2
+        left: this.starFieldLeft,
+        right: this.starFieldRight,
+        top: this.starFieldTop,
+        bottom: this.starFieldBottom
       })
       .clampZoom({
         minWidth: 50,
         minHeight: 50,
-        maxWidth: (Math.abs(this.starFieldLeft) + Math.abs(this.starFieldRight)) * 2,
-        maxHeight: (Math.abs(this.starFieldBottom) + Math.abs(this.starFieldTop)) * 2
+        maxWidth: (Math.abs(this.starFieldLeft) + Math.abs(this.starFieldRight)),
+        maxHeight: (Math.abs(this.starFieldBottom) + Math.abs(this.starFieldTop))
       })
 
     this.viewport.on('zoomed-end', this.onViewportZoomed.bind(this))

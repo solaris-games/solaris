@@ -103,6 +103,7 @@ export default {
       oldWaypointsLooped: false,
       totalEtaTimeString: null,
       waypointCreatedHandler: null,
+      waypointOutOfRangeHandler: null,
       isStandardUIStyle: false,
       isCompactUIStyle: false,
       errors: [],
@@ -121,6 +122,9 @@ export default {
     this.waypointCreatedHandler = this.onWaypointCreated.bind(this)
     	GameContainer.map.on('onWaypointCreated', this.waypointCreatedHandler)
 
+    this.waypointOutOfRangeHandler = this.onWaypointOutOfRange.bind(this)
+    	GameContainer.map.on('onWaypointOutOfRange', this.waypointOutOfRangeHandler)
+
     this.oldWaypoints = this.carrier.waypoints.slice(0)
     this.oldWaypointsLooped = this.carrier.waypointsLooped
 
@@ -134,6 +138,7 @@ export default {
     GameContainer.resetMode()
 
     GameContainer.map.off('onWaypointCreated', this.waypointCreatedHandler)
+    GameContainer.map.off('onWaypointOutOfRange', this.waypointOutOfRangeHandler)
   },
   methods: {
     toggleCarrierWaypointsDisplay () {
@@ -197,6 +202,9 @@ export default {
 
       this.recalculateTotalEta()
       this.recalculateLooped()
+    },
+    onWaypointOutOfRange (e) {
+      this.$toasted.show(`This waypoint is out of hyperspace range.`, { type: 'error' })
     },
     recalculateTotalEta () {
       let totalTicksEta = GameHelper.calculateWaypointTicksEta(this.$store.state.game, this.carrier,

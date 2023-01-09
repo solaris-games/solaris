@@ -231,6 +231,9 @@ export default class GameTickService extends EventEmitter {
             this._orbitGalaxy(game);
             logTime('Orbital mechanics');
 
+            this.waypointService.cullAllWaypointsByHyperspaceRange(game);
+            logTime('Sanitise all carrier waypoints');
+
             this._oneTickSpecialists(game);
             logTime('Apply effects of onetick specialists');
 

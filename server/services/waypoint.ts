@@ -233,6 +233,10 @@ export default class WaypointService {
     }
 
     cullWaypointsByHyperspaceRange(game: Game, carrier: Carrier) {
+        if (!carrier.waypoints.length) {
+            return;
+        }
+        
         let player = this.playerService.getById(game, carrier.ownedByPlayerId!)!;
 
         // Iterate through all waypoints the carrier has one by one and
