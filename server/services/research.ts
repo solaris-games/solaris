@@ -236,6 +236,7 @@ export default class ResearchService extends EventEmitter {
         let requiredProgress = this.getRequiredResearchProgress(game, tech.key, tech.technology.level);
 
         let levelUp = false;
+        let researchingNext;
 
         while (tech.technology.progress! >= requiredProgress) {
             tech.technology.level++;
@@ -248,6 +249,7 @@ export default class ResearchService extends EventEmitter {
         // to the next desired research technology.
         if (levelUp && tech.key === player.researchingNow) {
             this._setNextResearch(game, player);
+            researchingNext = player.researchingNext
         }
 
         return {
@@ -255,7 +257,7 @@ export default class ResearchService extends EventEmitter {
             level: tech.technology.level,
             amount: researchAmount,
             levelUp,
-            researchingNext: player.researchingNext
+            researchingNext 
         };
     }
 
