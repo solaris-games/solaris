@@ -296,6 +296,7 @@ export interface Game {
 				cheap: number;
 				standard: number;
 				expensive: number;
+				crazyExpensive: number;
 			}
 		},
 		player: {
