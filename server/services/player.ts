@@ -334,6 +334,35 @@ export default class PlayerService extends EventEmitter {
         game.galaxy.carriers.push(homeCarrier as any);
     }
 
+    resetInfrastructure(game: Game, player: Player) { 
+        let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+
+        //total cost of specialists
+        let unrefundableSpecs = {
+            credits: 0,
+            creditsSpecialists: 0
+        };
+
+        // Reset the player's stars
+        for (let star of playerStars) {
+            let result = this.starService.resetStarExcludingSpecs(game, star, player);
+            unrefundableSpecs.credits += result.credits;
+            unrefundableSpecs.creditsSpecialists += result.creditsSpecialists;
+        }
+
+        // Reset the player's carriers
+        this.carrierService.clearPlayerCarriers(game, player);
+
+        let homeCarrier = this.createHomeStarCarrier(game, player);
+
+        game.galaxy.carriers.push(homeCarrier as any);
+
+        //Reset Credits & Tokens but deduct cost for specialists
+        player.creditsSpecialists = game.settings.player.startingCreditsSpecialists;
+        player.credits = game.settings.player.startingCredits;
+        player[game.settings.specialGalaxy.specialistsCurrency] -= unrefundableSpecs[game.settings.specialGalaxy.specialistsCurrency];
+    }
+
     _getNewPlayerHomeStar(game: Game, starLocations: Location[], galaxyCenter: Location, distanceFromCenter: number, radians: number[]) {
         switch (game.settings.specialGalaxy.playerDistribution) {
             case 'circular':

@@ -130,7 +130,7 @@ export default class GameService extends EventEmitter {
     }
     
     async resetPurchases(game: Game, player: Player){
-        this.playerService.resetAllExcludingSpecs(game, player);
+        this.playerService.resetInfrastructure(game, player);
 
         await game.save();
     }
