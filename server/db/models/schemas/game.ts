@@ -98,7 +98,7 @@ const schema = new Schema({
 			orbitSpeed: { type: Types.Number, required: false, min: 1, max: 5, default: 3 }
 		},
         player: {
-			startingStars: { type: Types.Number, required: true, min: 1, max: 10, default: 6 },
+			startingStars: { type: Types.Number, required: true, min: 1, max: 30, default: 6 },
 			startingCredits: { type: Types.Number, required: true, min: 25, max: 3000, default: 500 },
 			startingCreditsSpecialists: { type: Types.Number, required: true, min: 0, max: 100, default: 5 },
 			startingShips: { type: Types.Number, required: true, min: 0, max: 100, default: 10 },
