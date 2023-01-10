@@ -142,6 +142,23 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
         mw.player.validatePlayerState({ isPlayerUndefeated: true }),
         controller.quit,
         mw.core.handleError);
+        
+    router.put('/api/game/:gameId/resetpurchases',
+        mw.auth.authenticate(),
+        mw.game.loadGame({
+            lean: false,
+            settings: true,
+            galaxy: true,
+            state: true,
+            constants: true,
+        }),
+        mw.game.validateGameState({
+            isUnlocked: true
+        }),
+        mw.player.loadPlayer,
+        mw.player.validatePlayerState({ isPlayerUndefeated: true }),
+        controller.resetPurchases,
+        mw.core.handleError);
 
     router.put('/api/game/:gameId/concedeDefeat',
         mw.auth.authenticate(),

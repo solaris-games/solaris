@@ -84,7 +84,7 @@ class GameService extends BaseApiService {
   }
 
   listMyCompletedGames () {
-    return axios.get(this.BASE_URL + 'game/list/completed/user',
+    return axios.get(this.BASE_URL + 'game/list/completed/user',  
       { withCredentials: true })
   }
 
@@ -102,6 +102,11 @@ class GameService extends BaseApiService {
 
   quitGame (gameId) {
     return axios.put(this.BASE_URL + 'game/' + gameId + '/quit', null,
+      { withCredentials: true })
+  }
+
+  resetPurchases (gameId) {
+    return axios.put(this.BASE_URL + 'game/' + gameId + '/resetpurchases', null,
       { withCredentials: true })
   }
 

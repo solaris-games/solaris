@@ -114,6 +114,9 @@
 
     <div class="row" v-if="getUserPlayer() != null && !game.state.endDate">
       <div class="col text-end pe-2">
+          <modalButton v-if="!game.state.startDate" :disabled="isQuittingGame" modalName="resetPurchasesModal" classText="btn btn-sm btn-success">
+            Reset Purchases
+          </modalButton>
           <modalButton v-if="!game.state.startDate" :disabled="isQuittingGame" modalName="quitGameModal" classText="btn btn-sm btn-danger">
             <i class="fas fa-sign-out-alt"></i> Quit Game
           </modalButton>
@@ -130,6 +133,10 @@
     <!-- Modals -->
     <dialogModal modalName="quitGameModal" titleText="Quit Game" cancelText="No" confirmText="Yes" @onConfirm="quitGame">
       <p>Are you sure you want to quit this game? Your position will be opened again and you will <b>not</b> be able to rejoin.</p>
+    </dialogModal>
+    <dialogModal modalName="resetPurchasesModal" titleText="Reset Purchases" cancelText="No" confirmText="Yes" @onConfirm="resetPurchases">
+      <p>Are you sure you want to reset your purchases? </p>
+      <p>Note: Specialists will not be refunded.</p>
     </dialogModal>
 </div>
 </template>
@@ -233,6 +240,18 @@ export default {
       }
 
       this.isQuittingGame = false
+    },
+    async resetPurchases (e) {
+      try {
+        let response = await gameService.resetPurchases(this.$store.state.game._id)
+        location.reload()        
+        if (response.status === 200) {
+          this.$toasted.show(`Successfully Reset Purchases!`, { type: 'success' })
+        }
+
+      } catch (err) {
+        console.error(err)
+      }
     },
     async confirmReady (player) {
       if (!await this.$confirm('End Turn', 'Are you sure you want to end your turn?')) {

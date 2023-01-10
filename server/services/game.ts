@@ -128,6 +128,12 @@ export default class GameService extends EventEmitter {
 
         return game?.settings;
     }
+    
+    async resetPurchases(game: Game, player: Player){
+        this.playerService.resetAllExcludingSpecs(game, player);
+
+        await game.save();
+    }
 
     async quit(game: Game, player: Player) {    
         if (game.state.startDate) {

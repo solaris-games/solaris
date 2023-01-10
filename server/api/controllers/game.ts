@@ -210,6 +210,18 @@ export default (container: DependencyContainer) => {
                 return next(err);
             }
         },
+        resetPurchases: async (req, res, next) => {
+            try {
+                await container.gameService.resetPurchases(
+                    req.game,
+                    req.player);
+    
+                res.sendStatus(200);
+                    
+            } catch (err) {
+                return next(err);
+            }
+        },
         concede: async (req, res, next) => {
             try {
                 const reqObj = mapToGameConcedeDefeatRequest(req.body);
