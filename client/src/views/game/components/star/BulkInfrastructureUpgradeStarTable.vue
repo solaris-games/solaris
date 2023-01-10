@@ -14,6 +14,7 @@
                   <td><a href="javascript:;" @click="sort(['ships'])">Name</a></td>
                   <td></td>
                   <td></td>
+                  <td class="text-end">Resources</td>
                   <td class="text-end">
                     <span class="infrastructure-filters">
                       <a href="javascript:;" @click="sort(['infrastructure','economy'])"><i class="fas fa-money-bill-wave me-2"></i></a>

@@ -3,6 +3,7 @@
     <td><a href="javascript:;" @click="clickStar">{{star.name}}</a></td>
     <td class="no-padding"><a href="javascript:;" @click="goToStar"><i class="far fa-eye"></i></a></td>
     <td class="sm-padding"><specialist-icon :type="'star'" :specialist="star.specialist" :hideDefaultIcon="true"></specialist-icon></td>
+    <td class="sm-padding text-end"><star-resources :resources="star.naturalResources" :compareResources="star.terraformedResources" :displayIcon="false"/></td>
     <td class="text-end">
       <span v-if="star.infrastructure" class="text-success me-2" title="Economic infrastructure - Contributes to credits earned at the end of a cycle">{{star.infrastructure.economy}}</span>
       <span v-if="star.infrastructure" class="text-warning me-2" title="Industrial infrastructure - Contributes to ship production">{{star.infrastructure.industry}}</span>
@@ -18,11 +19,13 @@
 import gameContainer from '../../../../game/container'
 import SpecialistIcon from '../specialist/SpecialistIcon'
 import IgnoreBulkUpgradeVue from './IgnoreBulkUpgrade'
+import StarResourcesVue from './StarResources'
 
 export default {
   components: {
     'specialist-icon': SpecialistIcon,
-    'ignore-bulk-upgrade': IgnoreBulkUpgradeVue
+    'ignore-bulk-upgrade': IgnoreBulkUpgradeVue,
+    'star-resources': StarResourcesVue
   },
   props: {
     star: Object,
@@ -43,9 +46,6 @@ export default {
     goToStar (e) {
       gameContainer.map.panToStar(this.star)
     }
-  },
-  computed: {
-
   }
 }
 </script>
