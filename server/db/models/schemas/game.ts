@@ -241,7 +241,7 @@ const schema = new Schema({
 				cheap: { type: Types.Number, required: true, default: 0.05 },
 				standard: { type: Types.Number, required: true, default: 0.10 },
 				expensive: { type: Types.Number, required: true, default: 0.15 },
-        crazyExpensive: { type: Types.Number, required: true, default: 0.25 }
+        		crazyExpensive: { type: Types.Number, required: true, default: 0.25 }
 			}
 		},
 		player: {
