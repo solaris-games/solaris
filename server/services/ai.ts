@@ -21,6 +21,7 @@ import PlayerStatisticsService from "./playerStatistics";
 import {DBObjectId} from "./types/DBObjectId";
 import PlayerAfkService from "./playerAfk";
 import ShipService from "./ship";
+import doSpecialLogic from "./aiSpecial";
 
 const Heap = require('qheap');
 const mongoose = require("mongoose");
@@ -172,10 +173,7 @@ export default class AIService {
 
     async play(game: Game, player: Player | NonPlayer) {
         if (!isPlayer(player)) {
-            await this._doSpecialLogic(
-                game,
-                player
-            )
+            await doSpecialLogic(game, player)
         } else {
           if (!this.playerAfkService.isAIControlled(game, player, true)) {
             throw new Error("The player is not under AI control.");
@@ -243,15 +241,6 @@ export default class AIService {
         // Mongoose method that cannot be typechecked
         // @ts-ignore
         player.markModified('aiState');
-    }
-
-    async _doSpecialLogic(game: Game, player: NonPlayer) {
-        switch (player.type) {
-            case 'Dragon':
-                break;
-            case 'Trader':
-                break;
-        }
     }
 
     _setInitialState(game: Game, player: Player): void {

@@ -13,6 +13,7 @@ export interface NonPlayerDiplomaticState {
 export interface NonPlayer {
     _id: DBObjectId;
     aiState: AiState;
+    stars: DBObjectId[];
     defeated: boolean;
     defeatedDate: Date | null;
 
