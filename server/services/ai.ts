@@ -1,5 +1,6 @@
 import {Game} from "./types/Game";
 import {Player} from "./types/Player";
+import { NonPlayer } from './types/NonPlayer';
 import {KnownAttack} from "./types/Ai";
 import CarrierService from "./carrier";
 import CombatService from "./combat";
@@ -117,6 +118,10 @@ interface FoundAssignment {
 // This is performed automatically by mongoose (when calling game.save()).
 // Use the writeToDB parameters to skip (or introduce them where needed).
 // Otherwise, changes will get duplicated.
+function isPlayer(player: Player | NonPlayer): player is Player {
+    return Object.prototype.hasOwnProperty.call(player, 'userId')
+}
+
 export default class AIService {
     starUpgradeService: StarUpgradeService;
     carrierService: CarrierService;
@@ -165,24 +170,44 @@ export default class AIService {
         this.shipService = shipService;
     }
 
-    async play(game: Game, player: Player) {
-        if (!this.playerAfkService.isAIControlled(game, player, true)) {
-            throw new Error('The player is not under AI control.');
-        }
+    async play(game: Game, player: Player | NonPlayer) {
+        if (!isPlayer(player)) {
+            await this._doSpecialLogic(
+                game,
+                player
+            )
+        } else {
+          if (!this.playerAfkService.isAIControlled(game, player, true)) {
+            throw new Error("The player is not under AI control.");
+          }
 
-        const isFirstTickOfCycle = game.state.tick % game.settings.galaxy.productionTicks === 1;
-        const isLastTickOfCycle = game.state.tick % game.settings.galaxy.productionTicks === game.settings.galaxy.productionTicks - 1;
+          const isFirstTickOfCycle =
+            game.state.tick % game.settings.galaxy.productionTicks === 1;
+          const isLastTickOfCycle =
+            game.state.tick % game.settings.galaxy.productionTicks ===
+            game.settings.galaxy.productionTicks - 1;
 
-        // Considering the growing complexity of AI logic,
-        // it's better to catch any possible errors and have the game continue with disfunctional AI than to break the game tick logic.
-        try {
-            if (game.settings.general.advancedAI === 'enabled') {
-                await this._doAdvancedLogic(game, player, isFirstTickOfCycle, isLastTickOfCycle);
+          // Considering the growing complexity of AI logic,
+          // it's better to catch any possible errors and have the game continue with disfunctional AI than to break the game tick logic.
+          try {
+            if (game.settings.general.advancedAI === "enabled") {
+              await this._doAdvancedLogic(
+                game,
+                { markModified: (x) => {}, ...player },
+                isFirstTickOfCycle,
+                isLastTickOfCycle
+              );
             }
 
-            await this._doBasicLogic(game, player, isFirstTickOfCycle, isLastTickOfCycle);
-        } catch (e) {
+            await this._doBasicLogic(
+              game,
+              player,
+              isFirstTickOfCycle,
+              isLastTickOfCycle
+            );
+          } catch (e) {
             console.error(e);
+          }
         }
     }
 
@@ -199,7 +224,7 @@ export default class AIService {
         player.credits = Math.max(0, player.credits);
     }
 
-    async _doAdvancedLogic(game: Game, player: Player, isFirstTickOfCycle: boolean, isLastTickOfCycle: boolean) {
+    async _doAdvancedLogic(game: Game, player: Player & {markModified: (value:string) => void}, isFirstTickOfCycle: boolean, isLastTickOfCycle: boolean) {
         const context = this._createContext(game, player);
 
         if (context == null) {
@@ -219,8 +244,16 @@ export default class AIService {
         await this._evaluateOrders(game, player, context, orders, assignments);
 
         // Mongoose method that cannot be typechecked
-        // @ts-ignore
         player.markModified('aiState');
+    }
+
+    async _doSpecialLogic(game: Game, player: NonPlayer) {
+        switch (player.type) {
+            case 'Dragon':
+                break;
+            case 'Trader':
+                break;
+        }
     }
 
     _setInitialState(game: Game, player: Player): void {
@@ -388,7 +421,7 @@ export default class AIService {
     }
 
     async _evaluateOrders(game: Game, player: Player, context: Context, orders: Order[], assignments: Map<string, Assignment>) {
-        const sorter = (o1, o2) => {
+        const sorter = (o1: Order, o2: Order) => {
             const categoryPriority = this.priorityFromOrderCategory(o1.type) - this.priorityFromOrderCategory(o2.type);
             if (categoryPriority !== 0) {
                 return categoryPriority;
@@ -436,7 +469,7 @@ export default class AIService {
                         continue;
                     }
 
-                    let shipsUsed;
+                    let shipsUsed: number;
 
                     if (shipsNeeded <= assignment.totalShips) {
                         shipsUsed = shipsNeeded;
@@ -663,8 +696,8 @@ export default class AIService {
 
     _searchAssignments(context: Context, starGraph: StarGraph, assignments: Map<string, Assignment>, nextFilter: (trace: TracePoint[], nextStarId: string) => boolean, onAssignment: (assignment: Assignment, trace: TracePoint[]) => boolean, startStarId: string) {
         const queue = new Heap({
-            comparBefore: (b1, b2) => b1.totalDistance > b2.totalDistance,
-            compar: (b1, b2) => b2.totalDistance - b1.totalDistance
+            comparBefore: (b1: {totalDistance: number}, b2: {totalDistance: number}) => b1.totalDistance > b2.totalDistance,
+            compar: (b1: {totalDistance: number}, b2: {totalDistance: number}) => b2.totalDistance - b1.totalDistance
         });
 
         const init = {
