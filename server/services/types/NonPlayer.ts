@@ -1,8 +1,14 @@
 import { AiState } from './Ai';
 import { DBObjectId } from "./DBObjectId";
-import { PlayerDiplomaticState, PlayerShape } from './Player';
+import { PlayerShape } from './Player';
 
+export type DiplomaticState = 'hostile' | 'neutral' | 'passive';
 export type NonPlayerType = 'Dragon' | 'Trader'
+
+export interface NonPlayerDiplomaticState { 
+    playerId: DBObjectId;
+    status: DiplomaticState;
+}
 
 export interface NonPlayer {
     _id: DBObjectId;
@@ -19,6 +25,7 @@ export interface NonPlayer {
 
     type: NonPlayerType;
 
-    diplomacy: PlayerDiplomaticState[];
+    diplomacy: NonPlayerDiplomaticState[];
     alwaysAgressive: boolean;
+    canDestroyInfrastructure: boolean;
 }
