@@ -106,7 +106,7 @@ export default class starMovementService {
             // This line makes sure the Stellar Engine never moves too close to the target star
             starSpeed = distanceToClosestStar - starSpeed <= 0.5 * game.constants.distances.minDistanceBetweenStars ? distanceToClosestStar - 0.5 * game.constants.distances.minDistanceBetweenStars : starSpeed;
 
-            this.moveStarTowardsLocation(star, closestStar.location, starSpeed);
+            this.moveStarTowardsLocation(game, star, closestStar.location, starSpeed);
         }
 
         const nonEngineStars = game.galaxy.stars.filter(s => !this.specialistService.getStarMovement(s));
@@ -128,7 +128,7 @@ export default class starMovementService {
             while(tooCloseStars.length !== 0 && k < 50) {
                 let closestStar = this.starDistanceService.getClosestStar(star, tooCloseStars);
 
-                this.shiftAway(star, closestStar, (0.501-k*0.01)*game.constants.distances.minDistanceBetweenStars);
+                this.shiftAway(game, star, closestStar, (0.501-k*0.01)*game.constants.distances.minDistanceBetweenStars);
 
                 tooCloseStars = this.starDistanceService.getStarsWithinRadiusOfStar(star, nearbyStars, (0.49 - k*0.01) * game.constants.distances.minDistanceBetweenStars);
 
@@ -137,13 +137,13 @@ export default class starMovementService {
         }
     }
 
-    shiftAway(movingStar: Star, stationaryStar: Star, range: number) {
+    shiftAway(game: Game, movingStar: Star, stationaryStar: Star, range: number) {
         let shift = this.starDistanceService.getDistanceBetweenStars(movingStar, stationaryStar) - range;
 
-        this.moveStarTowardsLocation(movingStar, stationaryStar.location, shift);
+        this.moveStarTowardsLocation(game, movingStar, stationaryStar.location, shift);
     }
 
-    moveStarTowardsLocation(star: Star, location: Location, speed: number) {
+    moveStarTowardsLocation(game: Game, star: Star, location: Location, speed: number) {
         // This function is used to move a star either towards a location with positive speed, or shift it away with negative speed.
         if (star.location === location) {
             return;
@@ -161,6 +161,13 @@ export default class starMovementService {
 
         star.location.x += delta.x;
         star.location.y += delta.y;
+
+        // Move all carriers that are in orbit of that star to the same location.
+        const carriersInOrbit = game.galaxy.carriers.filter(c => c.orbiting && c.orbiting.toString() === star._id.toString());
+
+        for (let carrier of carriersInOrbit) {
+            carrier.location = star.location;
+        }
     }
     
 };
