@@ -86,6 +86,7 @@ export default class GameCreateService {
         if (settings.general.createdByUserId && !isTutorial) {
             settings.general.type = 'custom'; // All user games MUST be custom type.
             settings.general.timeMachine = 'disabled'; // Time machine is disabled for user created games.
+            settings.general.featured = false // Stop any tricksters.
 
             // Prevent players from being able to create more than 1 game.
             let openGames = await this.gameListService.listOpenGamesCreatedByUser(settings.general.createdByUserId);
