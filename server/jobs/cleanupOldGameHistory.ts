@@ -3,9 +3,9 @@ import { DependencyContainer } from "../services/types/DependencyContainer";
 export default (container: DependencyContainer) => {
 
     /*
-        Delete game history for games that completed more than 1 month ago.
+        Delete game history for games that completed more than 3 months ago.
     */
-    const months = 1;
+    const months = 3;
 
     return {
 
