@@ -1,9 +1,9 @@
 <template>
-    <div class="btn-group" v-if="canIgnoreEconomy || canIgnoreIndustry || canIgnoreScience">
+    <div class="position-static btn-group" v-if="canIgnoreEconomy || canIgnoreIndustry || canIgnoreScience">
         <button class="btn btn-sm dropdown-toggle"
             :class="{'btn-danger':highlightIgnoredInfrastructure && getInfrastructureIgnoreStatus(highlightIgnoredInfrastructure),
                      'btn-outline-success':highlightIgnoredInfrastructure && !getInfrastructureIgnoreStatus(highlightIgnoredInfrastructure)}"
-            type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            type="button" data-bs-toggle="dropdown" data-boundary="viewport" aria-haspopup="true" aria-expanded="false">
             <i class="fas me-1" :class="{'fa-ban':isAllIgnored,'fa-check-double':isAllIncluded,'fa-check':!isAllIgnored && !isAllIncluded}"></i>
         </button>
         <div class="dropdown-menu">
