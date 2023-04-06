@@ -1,4 +1,1 @@
-<svg id="svg3882" version="1.1" viewBox="0 0 33.866666 33.866668" height="128" width="128" xmlns="http://www.w3.org/2000/svg">
-  <circle style="fill: rgb(0, 0, 0); stroke: rgb(255, 255, 255); stroke-width:20;" transform="matrix(0.029474, 0, 0, 0.029625, 0.036172, 2.786772)" cx="719" cy="345" r="190"></circle>
-  <circle style="fill: rgb(0, 0, 0); stroke: rgb(255, 255, 255); stroke-width:20;" transform="matrix(0.029474, 0, 0, 0.029625, -8.652227, 11.15796)" cx="719" cy="345" r="190"></circle>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 33.867 33.867"><circle cx="719" cy="345" r="190" style="fill:#000;stroke:#fff;stroke-width:20" transform="matrix(.02947 0 0 .02962 .036 2.787)"/><circle cx="719" cy="345" r="190" style="fill:#000;stroke:#fff;stroke-width:20" transform="matrix(.02947 0 0 .02962 -8.652 11.158)"/></svg>
