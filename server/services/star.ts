@@ -322,7 +322,7 @@ export default class StarService extends EventEmitter {
 
         // If worm holes are present, then ensure that any owned star OR star in orbit
         // also has its paired star visible.
-        if (game.settings.specialGalaxy.randomWormHoles) {
+        //if (game.settings.specialGalaxy.randomWormHoles) {
             let wormHoleStars = starsOwnedOrInOrbit
                 .filter(s => s.wormHoleToStarId)
                 .map(s => {
@@ -341,7 +341,7 @@ export default class StarService extends EventEmitter {
                     });
                 }
             }
-        }
+        //}
 
         return starsInRange.map(s => this.getById(game, s._id));
     }
