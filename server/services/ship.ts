@@ -34,8 +34,8 @@ export default class ShipService {
     }
 
     calculateTotalShips(ownedStars: Star[], ownedCarriers: Carrier[]) {
-        return ownedStars.reduce((sum, s) => sum + s.ships!, 0)
-            + ownedCarriers.reduce((sum, c) => sum + c.ships!, 0);
+        return ownedStars.filter(s => s.ships != null).reduce((sum, s) => sum + s.ships!, 0)
+            + ownedCarriers.filter(c => c.ships != null).reduce((sum, c) => sum + c.ships!, 0);
     }
 
     calculatePopulationCap(game: Game, playerId: DBObjectId): IPlayerPopulationCap | null {
