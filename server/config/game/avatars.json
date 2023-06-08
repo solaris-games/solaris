@@ -358,5 +358,13 @@
         "description": "Born from within the stars, the marshmallow people of The FAB Federation have emerged in the name of diplomacy. Their willingness to sue for peace should not be mistaken for weakness though, as their silver tongued elected council is only in place to protect you from the wrath of their god @Nhilas.",
         "price": 10,
         "isPatronAvatar": true
+    },
+    {
+        "id": 45,
+        "file": "ape.png",
+        "name": "A Stoned Ape",
+        "description": "A Stoned Ape and his crew of Stoned Apes travel the universe in search of superior psychedelic enlightenment. Beware, they will destroy any civilization who stands in their way.",
+        "price": 10,
+        "isPatronAvatar": true
     }
 ]
