@@ -74,6 +74,11 @@
             :valueText="getFriendlyText(game.settings.general.spectators)"
             :value="game.settings.general.spectators"
             :compareValue="compareSettings.general.spectators"/>
+          <game-setting-value title="Allow Ready To Quit"
+            tooltip="Allow players to 'Ready To Quit' to finish games early"
+            :valueText="getFriendlyText(game.settings.general.readyToQuit)"
+            :value="game.settings.general.readyToQuit"
+            :compareValue="compareSettings.general.readyToQuit"/>
         </tbody>
       </table>
     </div>

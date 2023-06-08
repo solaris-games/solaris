@@ -51,7 +51,8 @@ const schema = new Schema({
 			awardRankTo: { type: Types.String, required: false, enum: ['all', 'winner'], default: 'all' },
 			fluxEnabled: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
 			advancedAI: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'disabled' },
-			spectators: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'disabled' }
+			spectators: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'disabled' },
+			readyToQuit: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'enabled' }
         },
         galaxy: {
 			galaxyType: { type: Types.String, required: true, enum: ['circular', 'spiral', 'doughnut','circular-balanced', 'irregular', 'custom'], default: 'circular' },

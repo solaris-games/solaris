@@ -91,7 +91,17 @@
              "value":"disabled",
              "text":"Disabled"
           }
-       ]
+       ],
+       "readyToQuit": [
+         {
+            "value": "enabled",
+            "text": "Enabled"
+         },
+         {
+            "value": "disabled",
+            "text": "Disabled"
+         }
+      ]
     },
     "specialGalaxy":{
        "carrierCost":[

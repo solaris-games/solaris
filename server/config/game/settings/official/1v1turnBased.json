@@ -12,7 +12,8 @@
     "timeMachine": "enabled",
     "fluxEnabled": "disabled",
     "advancedAI": "disabled",
-    "spectators": "enabled"
+    "spectators": "enabled",
+    "readyToQuit": "enabled"
   },
   "galaxy": {
     "galaxyType": "circular-balanced",

@@ -120,6 +120,15 @@
             </option>
           </select>
         </div>
+
+        <div class="mb-2">
+          <label for="readyToQuit" class="col-form-label">Allow Ready To Quit <help-tooltip tooltip="Allow players to 'Ready To Quit' to finish games early"></help-tooltip></label>
+          <select class="form-control" id="readyToQuit" v-model="settings.general.readyToQuit" :disabled="isCreatingGame">
+            <option v-for="opt in options.general.readyToQuit" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
       </view-collapse-panel>
 
       <view-collapse-panel title="Game Time Settings" :startsOpened="true">

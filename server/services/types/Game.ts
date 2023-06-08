@@ -87,6 +87,7 @@ export interface GameSettings {
 		advancedAI: GameSettingEnabledDisabled;
 		spectators: GameSettingEnabledDisabled;
 		flux?: GameFlux | null;
+		readyToQuit: GameSettingEnabledDisabled;
 	},
 	galaxy: {
 		galaxyType: GameGalaxyType;
