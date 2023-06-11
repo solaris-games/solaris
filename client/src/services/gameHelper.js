@@ -60,7 +60,7 @@ class GameHelper {
   }
 
   getCarrierOrbitingStar (game, carrier) {
-    return game.galaxy.stars.find(x => x._id === carrier.orbiting)
+    return game.galaxy.stars.find(x => x._id === carrier.orbiting) || null
   }
 
   getCarriersOrbitingStar (game, star) {
