@@ -73,7 +73,7 @@
     },
     "tradeCredits": false,
     "tradeCreditsSpecialists": false,
-    "tradeCost": 15,
+    "tradeCost": 0,
     "tradeScanning": "scanned",
     "populationCap": {
       "enabled": "disabled",
