@@ -42,6 +42,7 @@ export default class GameListService {
             'settings.general.featured': 1,
             'settings.general.name': 1,
             'settings.general.playerLimit': 1,
+            'settings.general.playerType': 1,
             state: 1
         });
 
@@ -128,6 +129,7 @@ export default class GameListService {
             'settings.general.featured': 1,
             'settings.general.name': 1,
             'settings.general.playerLimit': 1,
+            'settings.general.playerType': 1,
             state: 1
         },
         { 'state.endDate': -1 },
@@ -295,6 +297,7 @@ export default class GameListService {
             'settings.general.name': 1,
             'settings.general.type': 1,
             'settings.general.playerLimit': 1,
+            'settings.general.playerType': 1,
             state: 1,
             'galaxy.players.isOpenSlot': 1
         }, {

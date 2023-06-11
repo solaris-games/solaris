@@ -6,7 +6,7 @@
     "mode": "conquest",
     "password": null,
     "playerLimit": 8,
-    "playerType": "establishedPlayers",
+    "playerType": "all",
     "anonymity": "extra",
     "playerOnlineStatus": "hidden",
     "timeMachine": "enabled",

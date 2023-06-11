@@ -37,7 +37,7 @@
                     ({{games.featured.state.players}}/{{games.featured.settings.general.playerLimit}})
                   </p>
                 </div>
-                <locked-game-overlay />
+                <locked-game-overlay :game="games.featured"/>
                 <div class="card-arrow">
                   <div class="card-arrow-top-left"></div>
                   <div class="card-arrow-top-right"></div>
@@ -112,7 +112,7 @@
                     <strong>x2 Rank Points</strong>
                   </p>
                 </div>
-                <locked-game-overlay />
+                <locked-game-overlay :game="games.special"/>
                 <div class="card-arrow">
                   <div class="card-arrow-top-left"></div>
                   <div class="card-arrow-top-right"></div>
@@ -136,7 +136,7 @@
                     ({{games.standardRT.state.players}}/{{games.standardRT.settings.general.playerLimit}})
                   </p>
                 </div>
-                <locked-game-overlay />
+                <locked-game-overlay :game="games.standardRT"/>
                 <div class="card-arrow">
                   <div class="card-arrow-top-left"></div>
                   <div class="card-arrow-top-right"></div>
@@ -160,7 +160,7 @@
                     ({{games.standardTB.state.players}}/{{games.standardTB.settings.general.playerLimit}})
                   </p>
                 </div>
-                <locked-game-overlay />
+                <locked-game-overlay :game="games.standardTB"/>
                 <div class="card-arrow">
                   <div class="card-arrow-top-left"></div>
                   <div class="card-arrow-top-right"></div>
@@ -184,7 +184,7 @@
                     ({{games.oneVsOneRT.state.players}}/{{games.oneVsOneRT.settings.general.playerLimit}})
                   </p>
                 </div>
-                <locked-game-overlay />
+                <locked-game-overlay :game="games.oneVsOneRT"/>
                 <div class="card-arrow">
                   <div class="card-arrow-top-left"></div>
                   <div class="card-arrow-top-right"></div>
@@ -208,7 +208,7 @@
                     ({{games.oneVsOneTB.state.players}}/{{games.oneVsOneTB.settings.general.playerLimit}})
                   </p>
                 </div>
-                <locked-game-overlay />
+                <locked-game-overlay :game="games.oneVsOneTB"/>
                 <div class="card-arrow">
                   <div class="card-arrow-top-left"></div>
                   <div class="card-arrow-top-right"></div>
@@ -232,7 +232,7 @@
                     ({{games.thirtyTwoPlayerRT.state.players}}/{{games.thirtyTwoPlayerRT.settings.general.playerLimit}})
                   </p>
                 </div>
-                <locked-game-overlay />
+                <locked-game-overlay :game="games.thirtyTwoPlayerRT"/>
                 <div class="card-arrow">
                   <div class="card-arrow-top-left"></div>
                   <div class="card-arrow-top-right"></div>

@@ -6,7 +6,7 @@
     "mode": "battleRoyale",
     "password": null,
     "playerLimit": 8,
-    "playerType": "establishedPlayers",
+    "playerType": "all",
     "anonymity": "normal",
     "playerOnlineStatus": "hidden",
     "timeMachine": "enabled",

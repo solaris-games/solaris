@@ -1,5 +1,5 @@
 <template>
-    <div class="locked-game-overlay" v-if="!userIsEstablishedPlayer" title="Finish a New Player Game to unlock this game">
+    <div class="locked-game-overlay" v-if="!userCanJoinGame" title="Finish a 'New Player Game' to unlock this game mode">
         <div class="locked-game-overlay-container text-center">
             <i class="fas fa-lock"></i>
             <p class="lock-text ps-2 pe-2 pt-3"><small>Finish a New Player Game to unlock</small></p>
@@ -9,9 +9,15 @@
 
 <script>
 export default {
+    props: {
+        game: Object
+    },
   computed: {
+    userCanJoinGame () {
+        return this.userIsEstablishedPlayer || this.game.settings.general.playerType === 'all'
+    },
     userIsEstablishedPlayer () {
-      return this.$store.state.userIsEstablishedPlayer == null ? true : this.$store.state.userIsEstablishedPlayer
+        return this.$store.state.userIsEstablishedPlayer == null ? true : this.$store.state.userIsEstablishedPlayer
     }
   }
 }
