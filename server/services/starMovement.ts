@@ -58,28 +58,29 @@ export default class starMovementService {
 
         let galaxyCenter = game.constants.distances.galaxyCenterLocation!; // TODO: Refresh this constant(?) on rotation?
 
-        let speed = game.settings.orbitalMechanics.orbitSpeed;
+        let speedSetting = game.settings.orbitalMechanics.orbitSpeed;
         let direction = 1; // TODO: Fuck it, clockwise everything.
 
         // Much shorter function that does the same thing, calculate the distance to (0,0)
         let r = Math.hypot(galaxyCenter.x - objectWithLocation.location.x, galaxyCenter.y - objectWithLocation.location.y);
         
-        let arcLength = 0;
+        const speedConstant = 5/12;
+        let arcLength = speedSetting * speedConstant * Math.sqrt(r);
+        let angle = arcLength/r
 
-        if (r !== 0) {
-            arcLength = speed / r * 100;
+        if(objectWithLocation.name === 'Reva') {
+            console.log(r, arcLength, speedSetting, angle)
         }
         
         return this.rotate(
             galaxyCenter.x, galaxyCenter.y,
             objectWithLocation.location.x, objectWithLocation.location.y, 
-            arcLength);
+            angle);
     }
 
     rotate(cx: number, cy: number, x: number, y: number, angle: number): Location {
-        let radians = (Math.PI / 180) * angle,
-            cos = Math.cos(radians),
-            sin = Math.sin(radians),
+        let cos = Math.cos(angle),
+            sin = Math.sin(angle),
             nx = (cos * (x - cx)) + (sin * (y - cy)) + cx,
             ny = (cos * (y - cy)) - (sin * (x - cx)) + cy;
 
