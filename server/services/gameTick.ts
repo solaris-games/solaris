@@ -254,6 +254,10 @@ export default class GameTickService extends EventEmitter {
             }
         }
 
+        // TODO: This has been moved out of _moveCarriers, see comment in there.
+        this._sanitiseDarkModeCarrierWaypoints(game);
+        logTime('Sanitise dark mode carrier waypoints');
+
         this.playerReadyService.resetReadyStatuses(game, hasProductionTicked);
 
         await game.save();
@@ -508,7 +512,7 @@ export default class GameTickService extends EventEmitter {
                 continue;
             }
 
-            let destinationStar = game.galaxy.stars.find(s => s._id.toString() === waypoint.destination.toString())!;
+            let destinationStar = this.starService.getById(game, waypoint.destination)!;
 
             // Save the distance travelled so it can be used later for combat.
             carrier.distanceToDestination = this.distanceService.getDistanceBetweenLocations(carrier.location, destinationStar.location);
@@ -587,7 +591,11 @@ export default class GameTickService extends EventEmitter {
         this.waypointService.performWaypointActionsCollects(game, actionWaypoints);
         this.waypointService.performWaypointActionsGarrisons(game, actionWaypoints);
 
-        this._sanitiseDarkModeCarrierWaypoints(game);
+        // TODO: This is incredibly inefficient in large turn based games; moved it outside the main tick loop
+        // for performance reasons because it needs to calculate the scanning ranges of all players.
+        // Moving it out of here technically introduces a bug where carriers may travel to stars they cannot see _within_ a turn (rare occurrence).
+        // Performance gain outweighs the risk of encountering this issue.
+        // this._sanitiseDarkModeCarrierWaypoints(game);
     }
 
     async _combatContestedStars(game: Game, gameUsers: User[]) {
