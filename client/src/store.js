@@ -154,7 +154,7 @@ export default new Vuex.Store({
     openConversation (state, data) {
       state.currentConversation = {
         id: data,
-        text: state.cachedConversationComposeMessages[data]
+        text: state.cachedConversationComposeMessages[data] || ''
       }
     },
     closeConversation (state) {
