@@ -45,8 +45,18 @@ export default {
     this.loadGameNotes()
   },
   methods: {
-    onSetMessageElement (el) {
-      this.$store.commit('setMentionReceivingElement', el)
+    onSetMessageElement (element) {
+      this.$store.commit('setMentions', {
+        element,
+        callbacks: {
+          player: (player) => {
+
+          },
+          star: (star) => {
+
+          }
+        }
+      })
     },
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)

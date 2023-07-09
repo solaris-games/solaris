@@ -25,6 +25,9 @@ export default {
   props: {
     conversationId: String,
   },
+  destroyed() {
+    this.$store.commit('resetMentions')
+  },
   data () {
     return {
       isSendingMessage: false,
@@ -33,14 +36,24 @@ export default {
     }
   },
   methods: {
-    onSetMessageElement: function (el) {
-      this.$store.commit('setMentionReceivingElement', el)
+    onSetMessageElement (element) {
+      this.$store.commit('setMentions', {
+        element,
+        callbacks: {
+          player: (player) => {
+            this.$store.commit('updateCurrentConversationText', MentionHelper.addMention(this.$store.state.currentConversation.text, this.$store.state.mentionReceivingElement, 'player', player.alias))
+          },
+          star: (star) => {
+            this.$store.commit('updateCurrentConversationText', MentionHelper.addMention(this.$store.state.currentConversation.text, this.$store.state.mentionReceivingElement, 'star', star.name))
+          }
+        }
+      })
     },
     onMessageChange (e) {
       this.$store.commit('updateCurrentConversationText', e)
     },
     onReplaceInMessage (data) {
-      this.$store.commit('replaceInConversationText', data)
+      this.$store.commit('updateCurrentConversationText', MentionHelper.useSuggestion(this.$store.state.currentConversation.text, this.$store.state.mentionReceivingElement, data))
     },
     async send () {
       let messageText = ''

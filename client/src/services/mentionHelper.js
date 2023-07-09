@@ -7,19 +7,15 @@ class MentionHelper {
   static STAR_MENTION_CHARACTER = '#'
   static PLAYER_MENTION_CHARACTER = '@'
 
-  addMention(conversation, element, type, name) {
-    const text = conversation.text || ''
-
+  addMention(text, element, type, name) {
     //Do not use and for property access here because a selection start of 0 would be false
     const insertionStart = element ? element.selectionStart : (text.length - 1)
     const insertionEnd = element ? element.selectionEnd : text.length
 
-    this.addMentionFromTo(conversation, element, type, name, insertionStart, insertionEnd)
+    return this.addMentionFromTo(text, element, type, name, insertionStart, insertionEnd)
   }
 
-  addMentionFromTo (conversation, element, type, name, start, end) {
-    const text = conversation.text || ''
-
+  addMentionFromTo (text, element, type, name, start, end) {
     const character = this.getMentionCharacter(type)
     let mention
     if (name.match(/[^\w\[\]]/)) {
@@ -28,12 +24,14 @@ class MentionHelper {
       mention = `${character}${name}`
     }
 
-    conversation.text = text.substring(0, start) + mention + text.substring(end)
+    const newText = text.substring(0, start) + mention + text.substring(end)
 
     if (element) {
       element.setSelectionRange(start, start + mention.length)
       element.focus()
     }
+
+    return newText
   }
 
   makeMentionsStatic(game, originalText) {
@@ -230,12 +228,8 @@ class MentionHelper {
     return suggestionNames.sort().slice(0, 3)
   }
 
-  useSuggestion (conversation, element, data) {
-    if (!conversation || !data) {
-      return
-    }
-    const { mention, text } = data
-    this.addMentionFromTo(conversation, element, mention.type, text, mention.from, mention.to)
+  useSuggestion (text, element, data) {
+    return this.addMentionFromTo(text, element, data.mention.type, data.text, data.mention.from, data.mention.to)
   }
 }
 

@@ -3,7 +3,6 @@ import Vuex from 'vuex'
 import VuexPersist from 'vuex-persist'
 import eventBus from './eventBus'
 import GameHelper from './services/gameHelper'
-import MentionHelper from './services/mentionHelper'
 import GameContainer from './game/container'
 import SpecialistService from './services/api/specialist';
 
@@ -22,6 +21,7 @@ export default new Vuex.Store({
     cachedConversationComposeMessages: {},
     currentConversation: null,
     mentionReceivingElement: null,
+    mentionCallbacks: null,
     starSpecialists: null,
     carrierSpecialists: null,
     settings: null,
@@ -170,32 +170,34 @@ export default new Vuex.Store({
     resetCurrentConversationText (state, data) {
       state.currentConversation.text = ''
     },
-    setMentionReceivingElement (state, data) {
-      state.mentionReceivingElement = data;
+    setMentions (state, data) {
+      state.mentionReceivingElement = data.element;
+      state.mentionCallbacks = data.callbacks;
+    },
+    resetMentions (state) {
+      state.mentionReceivingElement = null;
+      state.mentionCallbacks = null;
     },
     playerClicked (state, data) {
-      if (state.currentConversation) {
-        MentionHelper.addMention(state.currentConversation, state.mentionReceivingElement, 'player', data.player.alias)
+      if (state.mentionCallbacks && state.mentionCallbacks.player) {
+        state.mentionCallbacks.player(data.player)
       } else {
         data.permitCallback(data.player)
       }
     },
     starClicked (state, data) {
-      if (state.currentConversation) {
-        MentionHelper.addMention(state.currentConversation, state.mentionReceivingElement, 'star', data.star.name)
+      if (state.mentionCallbacks && state.mentionCallbacks.star) {
+        state.mentionCallbacks.star(data.star)
       } else {
         data.permitCallback(data.star)
       }
     },
     starRightClicked (state, data) {
-      if (state.currentConversation && data.player) {
-        MentionHelper.addMention(state.currentConversation, state.mentionReceivingElement, 'player', data.player.alias)
+      if (state.mentionCallbacks && state.mentionCallbacks.player) {
+        state.mentionCallbacks.player(data.player)
       } else {
         data.permitCallback(data.star)
       }
-    },
-    replaceInConversationText (state, data) {
-      MentionHelper.useSuggestion(state.currentConversation, state.mentionReceivingElement, data)
     },
 
     // ----------------
