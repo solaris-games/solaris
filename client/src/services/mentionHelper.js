@@ -108,6 +108,10 @@ class MentionHelper {
     }
   }
 
+  resetMessageElement(element) {
+    element.innerHTML = ''
+  }
+
   renderMessageWithMentionsAndLinks(element, message, onStarClickedCallback, onPlayerClickedCallback) {
     try {
       let lastMentionEnd = 0

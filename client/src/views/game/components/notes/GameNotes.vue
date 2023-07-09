@@ -4,9 +4,9 @@
 
   <loading-spinner :loading="isLoadingNotes"/>
 
-  <div class="row" v-if="!isLoadingNotes">
+  <div class="row" v-show="!isLoadingNotes">
     <div class="col-12">
-      <p v-if="!isEditing" class="notes-readonly">{{ readonlyNotes }}</p>
+      <p v-show="!isEditing" ref="notesReadonlyElement" class="notes-readonly"></p>
       <mention-box v-if="isEditing" placeholder="Write your notes here" :rows="15" v-model="notes" @onSetMessageElement="onSetMessageElement" @onReplaceInMessage="onReplaceInMessage" @onFinish="updateGameNotes" />
     </div>
 
@@ -81,7 +81,7 @@ export default {
         let response = await GameApiService.getGameNotes(this.$store.state.game._id)
 
         if (response.status === 200) {
-          this.readonlyNotes = response.data.notes
+          this.setReadonlyNotes(response.data.notes)
         }
       } catch (err) {
         console.error(err)
@@ -97,10 +97,11 @@ export default {
         this.isEditing = false
         this.isSavingNotes = true
 
-        let response = await GameApiService.updateGameNotes(this.$store.state.game._id, this.notes)
+        const newNotes = MentionHelper.makeMentionsStatic(this.$store.state.game, this.notes)
+        let response = await GameApiService.updateGameNotes(this.$store.state.game._id, newNotes)
 
         if (response.status === 200) {
-          this.readonlyNotes = this.notes
+          this.setReadonlyNotes(newNotes)
           this.$toasted.show(`Game notes updated.`, { type: 'success' })
         }
       } catch (err) {
@@ -108,6 +109,15 @@ export default {
       }
 
       this.isSavingNotes = false
+    },
+    setReadonlyNotes(notes) {
+      MentionHelper.resetMessageElement(this.$refs.notesReadonlyElement)
+      this.readonlyNotes = notes
+      MentionHelper.renderMessageWithMentionsAndLinks(this.$refs.notesReadonlyElement, notes, () => {
+        console.warn('TODO')
+      }, () => {
+        console.warn('TODO')
+      });
     }
   },
   computed: {
