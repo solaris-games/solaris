@@ -7,20 +7,18 @@ class MentionHelper {
   static STAR_MENTION_CHARACTER = '#'
   static PLAYER_MENTION_CHARACTER = '@'
 
-  addMention(conversation, type, name) {
+  addMention(conversation, element, type, name) {
     const text = conversation.text || ''
-    const element = conversation.element
 
     //Do not use and for property access here because a selection start of 0 would be false
     const insertionStart = element ? element.selectionStart : (text.length - 1)
     const insertionEnd = element ? element.selectionEnd : text.length
 
-    this.addMentionFromTo(conversation, type, name, insertionStart, insertionEnd)
+    this.addMentionFromTo(conversation, element, type, name, insertionStart, insertionEnd)
   }
 
-  addMentionFromTo (conversation, type, name, start, end) {
+  addMentionFromTo (conversation, element, type, name, start, end) {
     const text = conversation.text || ''
-    const element = conversation.element
 
     const character = this.getMentionCharacter(type)
     let mention
@@ -30,9 +28,7 @@ class MentionHelper {
       mention = `${character}${name}`
     }
 
-    const newText = text.substring(0, start) + mention + text.substring(end)
-
-    conversation.text = newText
+    conversation.text = text.substring(0, start) + mention + text.substring(end)
 
     if (element) {
       element.setSelectionRange(start, start + mention.length)
@@ -147,29 +143,29 @@ class MentionHelper {
   }
 
   createHyperlinkElement(url) {
-    const node = document.createElement("a")
-    node.setAttribute("href", url)
+    const node = document.createElement('a')
+    node.setAttribute('href', url)
     node.text = url
-    node.setAttribute("target", "_blank")
+    node.setAttribute('target', '_blank')
     return node
   }
 
   createMentionLinkElement(type, id, name, onStarClickedCallback, onPlayerClickedCallback) {
-    const node = document.createElement("a")
+    const node = document.createElement('a')
 
     //Set href attribute so styles are applied properly
-    node.setAttribute("href", "javascript:void(0)")
+    node.setAttribute('href', 'javascript:void(0)')
     node.text = name
 
     switch (type) {
       case 's':
         node.onclick = () => {
-          onStarClickedCallback(id) 
+          onStarClickedCallback(id)
         }
         break
       case 'p':
-        node.onclick = () => { 
-          onPlayerClickedCallback(id) 
+        node.onclick = () => {
+          onPlayerClickedCallback(id)
         }
         break
     }
@@ -223,13 +219,6 @@ class MentionHelper {
     })
   }
 
-  getToCursor (conversation, from) {
-    const element = conversation.element
-    const text = conversation.text || ''
-    const cursorPos = element ? element.selectionEnd : text.length
-    return text.substring(from, cursorPos)
-  }
-  
   findSuggestions (game, mentionType, mentionText) {
     let suggestionNames = []
     const mentionStart = mentionText.toLowerCase()
@@ -241,12 +230,12 @@ class MentionHelper {
     return suggestionNames.sort().slice(0, 3)
   }
 
-  useSuggestion (conversation, data) {
+  useSuggestion (conversation, element, data) {
     if (!conversation || !data) {
       return
     }
     const { mention, text } = data
-    this.addMentionFromTo(conversation, mention.type, text, mention.from, mention.to)
+    this.addMentionFromTo(conversation, element, mention.type, text, mention.from, mention.to)
   }
 }
 

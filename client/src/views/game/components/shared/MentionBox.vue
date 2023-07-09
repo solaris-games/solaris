@@ -89,7 +89,6 @@ export default {
     },
     onMessageChange (e) {
       this.$emit('input', e.target.value)
-      this.$emit('onUpdateMessage', e.target.value)
     },
   },
   computed: {

@@ -6,7 +6,7 @@
 
     <div class="row" v-if="!isLoadingNotes">
         <div class="col-12">
-            <textarea v-model="notes" class="form-control" rows="15" placeholder="Write your notes here..."></textarea>
+          <mention-box placeholder="Write your notes here" :rows="15" v-model="notes" @onSetMessageElement="onSetMessageElement" @onReplaceInMessage="onReplaceInMessage" />
         </div>
 
         <div class="col">
@@ -25,9 +25,12 @@
 import MenuTitle from '../MenuTitle'
 import LoadingSpinner from '../../../components/LoadingSpinner'
 import GameApiService from '../../../../services/api/game'
+import MentionBox from '../shared/MentionBox'
+import MentionHelper from '@/services/mentionHelper';
 
 export default {
   components: {
+    'mention-box': MentionBox,
     'menu-title': MenuTitle,
     'loading-spinner': LoadingSpinner
   },
@@ -42,6 +45,9 @@ export default {
     this.loadGameNotes()
   },
   methods: {
+    onSetMessageElement (el) {
+      this.$store.commit('setMentionReceivingElement', el)
+    },
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
     },
@@ -60,20 +66,25 @@ export default {
 
       this.isLoadingNotes = false
     },
+    onReplaceInMessage (data) {
+      MentionHelper.useSuggestion({
+        text: this.notes,
+      }, this.$store.state.mentionReceivingElement, data)
+    },
     async updateGameNotes () {
-        try {
-          this.isSavingNotes = true
+      try {
+        this.isSavingNotes = true
 
-          let response = await GameApiService.updateGameNotes(this.$store.state.game._id, this.notes)
+        let response = await GameApiService.updateGameNotes(this.$store.state.game._id, this.notes)
 
-          if (response.status === 200) {
-            this.$toasted.show(`Game notes updated.`, { type: 'success' })
-          }
-        } catch (err) {
-          console.error(err)
+        if (response.status === 200) {
+          this.$toasted.show(`Game notes updated.`, { type: 'success' })
         }
+      } catch (err) {
+        console.error(err)
+      }
 
-        this.isSavingNotes = false
+      this.isSavingNotes = false
     }
   },
   computed: {
@@ -81,7 +92,7 @@ export default {
       if (this.notes == null) {
         return 0
       }
-      
+
       return this.notes.length
     },
     isExceededMaxLength () {

@@ -21,6 +21,7 @@ export default new Vuex.Store({
     tick: 0,
     cachedConversationComposeMessages: {},
     currentConversation: null,
+    mentionReceivingElement: null,
     starSpecialists: null,
     carrierSpecialists: null,
     settings: null,
@@ -153,7 +154,6 @@ export default new Vuex.Store({
     openConversation (state, data) {
       state.currentConversation = {
         id: data,
-        element: null,
         text: state.cachedConversationComposeMessages[data]
       }
     },
@@ -170,32 +170,32 @@ export default new Vuex.Store({
     resetCurrentConversationText (state, data) {
       state.currentConversation.text = ''
     },
-    setConversationElement (state, data) {
-      state.currentConversation.element = data
+    setMentionReceivingElement (state, data) {
+      state.mentionReceivingElement = data;
     },
     playerClicked (state, data) {
       if (state.currentConversation) {
-        MentionHelper.addMention(state.currentConversation, 'player', data.player.alias)
+        MentionHelper.addMention(state.currentConversation, state.mentionReceivingElement, 'player', data.player.alias)
       } else {
         data.permitCallback(data.player)
       }
     },
     starClicked (state, data) {
       if (state.currentConversation) {
-        MentionHelper.addMention(state.currentConversation, 'star', data.star.name)
+        MentionHelper.addMention(state.currentConversation, state.mentionReceivingElement, 'star', data.star.name)
       } else {
         data.permitCallback(data.star)
       }
     },
     starRightClicked (state, data) {
       if (state.currentConversation && data.player) {
-        MentionHelper.addMention(state.currentConversation, 'player', data.player.alias)
+        MentionHelper.addMention(state.currentConversation, state.mentionReceivingElement, 'player', data.player.alias)
       } else {
         data.permitCallback(data.star)
       }
     },
     replaceInConversationText (state, data) {
-      MentionHelper.useSuggestion(state.currentConversation, data)
+      MentionHelper.useSuggestion(state.currentConversation, state.mentionReceivingElement, data)
     },
 
     // ----------------
@@ -275,11 +275,11 @@ export default new Vuex.Store({
       if (data.currentResearchTicksEta) {
         player.currentResearchTicksEta = data.currentResearchTicksEta
       }
-      
+
       if (data.nextResearchTicksEta) {
         player.nextResearchTicksEta = data.nextResearchTicksEta
       }
-      
+
       // Update player total stats.
       switch (data.infrastructureType) {
         case 'economy':
