@@ -6,7 +6,7 @@
 
     <div class="row" v-if="!isLoadingNotes">
         <div class="col-12">
-          <mention-box placeholder="Write your notes here" :rows="15" v-model="notes" @onSetMessageElement="onSetMessageElement" @onReplaceInMessage="onReplaceInMessage" />
+          <mention-box placeholder="Write your notes here" :rows="15" v-model="notes" @onSetMessageElement="onSetMessageElement" @onReplaceInMessage="onReplaceInMessage" @onFinish="updateGameNotes" />
         </div>
 
         <div class="col">
@@ -44,16 +44,19 @@ export default {
   mounted () {
     this.loadGameNotes()
   },
+  destroyed() {
+    this.$store.commit('resetMentions')
+  },
   methods: {
     onSetMessageElement (element) {
       this.$store.commit('setMentions', {
         element,
         callbacks: {
           player: (player) => {
-
+            this.notes = MentionHelper.addMention(this.notes, this.$store.state.mentionReceivingElement, 'player', player.alias)
           },
           star: (star) => {
-
+            this.notes = MentionHelper.addMention(this.notes, this.$store.state.mentionReceivingElement, 'star', star.name)
           }
         }
       })
@@ -77,9 +80,7 @@ export default {
       this.isLoadingNotes = false
     },
     onReplaceInMessage (data) {
-      MentionHelper.useSuggestion({
-        text: this.notes,
-      }, this.$store.state.mentionReceivingElement, data)
+      this.notes = MentionHelper.useSuggestion(this.notes, this.$store.state.mentionReceivingElement, data)
     },
     async updateGameNotes () {
       try {
