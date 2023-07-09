@@ -229,6 +229,8 @@ export default class AIService {
             startedClaims: [],
             invasionsInProgress: []
         };
+
+        this.reputationService.initializeReputationForAlliedPlayers(game, player);
     }
 
     _sanitizeState(game: Game, player: Player, context: Context) {
