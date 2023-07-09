@@ -44,6 +44,9 @@ export default {
         })
       }
     },
+    onMessageChange (e) {
+      this.$emit('input', e.target.value)
+    },
     setSelectedSuggestion (newSelected) {
       const suggestions = this.currentMention.suggestions.length
       //Modulo instead of remainder so instead of -1 we get the last suggestion
@@ -54,7 +57,8 @@ export default {
 
       if (isEnterTabKey && (e.ctrlKey || e.metaKey)) {
         e.preventDefault()
-        await this.send()
+        this.currentMention = null;
+        this.$emit('onFinish')
       } else if (this.suggestMentions && this.currentMention) {
         if (isEnterTabKey && this.selectedSuggestion !== null && this.selectedSuggestion !== undefined) {
           e.preventDefault()
@@ -86,9 +90,6 @@ export default {
           this.setSelectedSuggestion(this.selectedSuggestion)
         }
       }
-    },
-    onMessageChange (e) {
-      this.$emit('input', e.target.value)
     },
   },
   computed: {
