@@ -6,7 +6,7 @@
       </ul>
     </div>
     <div class="mb-2 mb-2">
-      <textarea class="form-control" id="txtMessage" :rows="rows" :placeholder="placeholderText" ref="messageElement" :value="value" @input="onMessageChange" @keydown="onKeyDown" @keyup="updateSuggestions" @select="updateSuggestions" @focus="updateSuggestions"></textarea>
+      <textarea class="form-control" id="txtMessage" :rows="rows" :placeholder="placeholderText" ref="messageElement" :value="value" @input="onMessageChange" @keydown="onKeyDown" @keyup="updateSuggestions" @select="updateSuggestions" @focus="onFocus"></textarea>
     </div>
   </div>
 </template>
@@ -72,6 +72,9 @@ export default {
         }
       }
     },
+    onFocus (e) {
+      this.$emit('onSetMessageElement', e.target)
+    },
     updateSuggestions () {
       if (this.suggestMentions) {
         const oldMention = this.currentMention
@@ -95,6 +98,13 @@ export default {
   computed: {
     placeholderText: function () {
       return !this.suggestMentions ? `${this.placeholder}...` : `${this.placeholder}. Use @ for players and # for stars.`
+    }
+  },
+  watch: {
+    value: function (v) {
+      if (!v || v === '') {
+        this.currentMention = null
+      }
     }
   }
 }
