@@ -1,23 +1,27 @@
 <template>
 <div class="menu-page container">
-    <menu-title title="Notes" @onCloseRequested="onCloseRequested"/>
+  <menu-title title="Notes" @onCloseRequested="onCloseRequested"/>
 
-    <loading-spinner :loading="isLoadingNotes"/>
+  <loading-spinner :loading="isLoadingNotes"/>
 
-    <div class="row" v-if="!isLoadingNotes">
-        <div class="col-12">
-          <mention-box placeholder="Write your notes here" :rows="15" v-model="notes" @onSetMessageElement="onSetMessageElement" @onReplaceInMessage="onReplaceInMessage" @onFinish="updateGameNotes" />
-        </div>
-
-        <div class="col">
-          <span :class="{'text-danger':isExceededMaxLength}">{{ noteLength }}/2000</span>
-        </div>
-        <div class="col-auto mt-2 mb-2">
-            <button class="btn btn-success" :disabled="isSavingNotes || isExceededMaxLength" @click="updateGameNotes">
-                <i class="fas fa-save"></i> Save Notes
-            </button>
-        </div>
+  <div class="row" v-if="!isLoadingNotes">
+    <div class="col-12">
+      <p v-if="!isEditing" class="notes-readonly">{{ readonlyNotes }}</p>
+      <mention-box v-if="isEditing" placeholder="Write your notes here" :rows="15" v-model="notes" @onSetMessageElement="onSetMessageElement" @onReplaceInMessage="onReplaceInMessage" @onFinish="updateGameNotes" />
     </div>
+
+    <div class="col">
+      <span v-if="isEditing" :class="{'text-danger':isExceededMaxLength}">{{ noteLength }}/2000</span>
+    </div>
+    <div class="col-auto mt-2 mb-2">
+      <button v-if="!isEditing" class="btn btn-primary" @click="beginEditing">
+        <i class="fas fa-edit"></i> Edit Notes
+      </button>
+      <button v-if="isEditing" class="btn btn-success" :disabled="isSavingNotes || isExceededMaxLength" @click="updateGameNotes">
+          <i class="fas fa-save"></i> Save Notes
+      </button>
+    </div>
+  </div>
 </div>
 </template>
 
@@ -38,6 +42,8 @@ export default {
     return {
       isLoadingNotes: false,
       isSavingNotes: false,
+      isEditing: false,
+      readonlyNotes: '',
       notes: ''
     }
   },
@@ -48,6 +54,10 @@ export default {
     this.$store.commit('resetMentions')
   },
   methods: {
+    beginEditing () {
+      this.isEditing = true
+      this.notes = this.readonlyNotes
+    },
     onSetMessageElement (element) {
       this.$store.commit('setMentions', {
         element,
@@ -71,7 +81,7 @@ export default {
         let response = await GameApiService.getGameNotes(this.$store.state.game._id)
 
         if (response.status === 200) {
-          this.notes = response.data.notes
+          this.readonlyNotes = response.data.notes
         }
       } catch (err) {
         console.error(err)
@@ -84,11 +94,13 @@ export default {
     },
     async updateGameNotes () {
       try {
+        this.isEditing = false
         this.isSavingNotes = true
 
         let response = await GameApiService.updateGameNotes(this.$store.state.game._id, this.notes)
 
         if (response.status === 200) {
+          this.readonlyNotes = this.notes
           this.$toasted.show(`Game notes updated.`, { type: 'success' })
         }
       } catch (err) {
@@ -114,4 +126,9 @@ export default {
 </script>
 
 <style scoped>
+.notes-readonly {
+  padding: 6px 12px;
+  letter-spacing: normal;
+  white-space: pre-wrap;
+}
 </style>
