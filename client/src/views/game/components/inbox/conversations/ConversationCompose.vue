@@ -26,7 +26,7 @@ import AudioService from '../../../../../game/audio'
 
 export default {
   components: {
-    
+
   },
   props: {
     conversationId: String,
@@ -48,7 +48,7 @@ export default {
     useSuggestion (suggestion) {
       if (this.suggestMentions && this.currentMention) {
         this.selectedSuggestion = null
-        
+
         this.$store.commit('replaceInConversationText', {
           mention: this.currentMention.mention,
           text: suggestion
@@ -61,19 +61,19 @@ export default {
       this.selectedSuggestion = ((newSelected % suggestions) + suggestions) % suggestions
     },
     async onKeyDown (e) {
-      const isEnterTabKey = e.key === "Enter" || e.key === "Tab"
+      const isEnterTabKey = e.key === 'Enter' || e.key === 'Tab'
 
       if (isEnterTabKey && (e.ctrlKey || e.metaKey)) {
-          e.preventDefault()
-          await this.send()
+        e.preventDefault()
+        await this.send()
       } else if (this.suggestMentions && this.currentMention) {
         if (isEnterTabKey && this.selectedSuggestion !== null && this.selectedSuggestion !== undefined) {
           e.preventDefault()
           this.useSuggestion(this.currentMention.suggestions[this.selectedSuggestion])
-        } else if (e.key === "ArrowDown" || e.key === "Tab") {
+        } else if (e.key === 'ArrowDown' || e.key === 'Tab') {
           e.preventDefault()
           this.setSelectedSuggestion(this.selectedSuggestion + 1)
-        } else if (e.key === "ArrowUp") {
+        } else if (e.key === 'ArrowUp') {
           e.preventDefault()
           this.setSelectedSuggestion(this.selectedSuggestion - 1)
         }
