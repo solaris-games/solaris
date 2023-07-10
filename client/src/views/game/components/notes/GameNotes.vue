@@ -1,28 +1,31 @@
 <template>
-<div class="menu-page container">
-  <menu-title title="Notes" @onCloseRequested="onCloseRequested"/>
+  <div class="menu-page container">
+    <menu-title title="Notes" @onCloseRequested="onCloseRequested"/>
 
-  <loading-spinner :loading="isLoadingNotes"/>
+    <loading-spinner :loading="isLoadingNotes"/>
 
-  <div class="row" v-show="!isLoadingNotes">
-    <div class="col-12">
-      <p v-show="!isEditing" ref="notesReadonlyElement" class="notes-readonly"></p>
-      <mention-box v-if="isEditing" placeholder="Write your notes here" :rows="15" v-model="notes" @onSetMessageElement="onSetMessageElement" @onReplaceInMessage="onReplaceInMessage" @onFinish="updateGameNotes" />
-    </div>
+    <div class="row" v-show="!isLoadingNotes">
+      <div class="col-12">
+        <p v-show="!isEditing" ref="notesReadonlyElement" class="notes-readonly"></p>
+        <mention-box v-if="isEditing" placeholder="Write your notes here" :rows="15" v-model="notes"
+                     @onSetMessageElement="onSetMessageElement" @onReplaceInMessage="onReplaceInMessage"
+                     @onFinish="updateGameNotes"/>
+      </div>
 
-    <div class="col">
-      <span v-if="isEditing" :class="{'text-danger':isExceededMaxLength}">{{ noteLength }}/2000</span>
-    </div>
-    <div class="col-auto mt-2 mb-2">
-      <button v-if="!isEditing" class="btn btn-primary" @click="beginEditing">
-        <i class="fas fa-edit"></i> Edit Notes
-      </button>
-      <button v-if="isEditing" class="btn btn-success" :disabled="isSavingNotes || isExceededMaxLength" @click="updateGameNotes">
+      <div class="col">
+        <span v-if="isEditing" :class="{'text-danger':isExceededMaxLength}">{{ noteLength }}/2000</span>
+      </div>
+      <div class="col-auto mt-2 mb-2">
+        <button v-if="!isEditing" class="btn btn-primary" @click="beginEditing">
+          <i class="fas fa-edit"></i> Edit Notes
+        </button>
+        <button v-if="isEditing" class="btn btn-success" :disabled="isSavingNotes || isExceededMaxLength"
+                @click="updateGameNotes">
           <i class="fas fa-save"></i> Save Notes
-      </button>
+        </button>
+      </div>
     </div>
   </div>
-</div>
 </template>
 
 <script>
@@ -31,6 +34,8 @@ import LoadingSpinner from '../../../components/LoadingSpinner'
 import GameApiService from '../../../../services/api/game'
 import MentionBox from '../shared/MentionBox'
 import MentionHelper from '@/services/mentionHelper';
+import GameHelper from "@/services/gameHelper";
+import GameContainer from "@/game/container";
 
 export default {
   components: {
@@ -38,7 +43,7 @@ export default {
     'menu-title': MenuTitle,
     'loading-spinner': LoadingSpinner
   },
-  data () {
+  data() {
     return {
       isLoadingNotes: false,
       isSavingNotes: false,
@@ -47,18 +52,18 @@ export default {
       notes: ''
     }
   },
-  mounted () {
+  mounted() {
     this.loadGameNotes()
   },
   destroyed() {
     this.$store.commit('resetMentions')
   },
   methods: {
-    beginEditing () {
+    beginEditing() {
       this.isEditing = true
       this.notes = MentionHelper.makeMentionsEditable(this.$store.state.game, this.readonlyNotes);
     },
-    onSetMessageElement (element) {
+    onSetMessageElement(element) {
       this.$store.commit('setMentions', {
         element,
         callbacks: {
@@ -71,10 +76,10 @@ export default {
         }
       })
     },
-    onCloseRequested (e) {
+    onCloseRequested(e) {
       this.$emit('onCloseRequested', e)
     },
-    async loadGameNotes () {
+    async loadGameNotes() {
       try {
         this.isLoadingNotes = true
 
@@ -89,10 +94,10 @@ export default {
 
       this.isLoadingNotes = false
     },
-    onReplaceInMessage (data) {
+    onReplaceInMessage(data) {
       this.notes = MentionHelper.useSuggestion(this.notes, this.$store.state.mentionReceivingElement, data)
     },
-    async updateGameNotes () {
+    async updateGameNotes() {
       try {
         this.isEditing = false
         this.isSavingNotes = true
@@ -102,7 +107,7 @@ export default {
 
         if (response.status === 200) {
           this.setReadonlyNotes(newNotes)
-          this.$toasted.show(`Game notes updated.`, { type: 'success' })
+          this.$toasted.show(`Game notes updated.`, {type: 'success'})
         }
       } catch (err) {
         console.error(err)
@@ -113,15 +118,26 @@ export default {
     setReadonlyNotes(notes) {
       MentionHelper.resetMessageElement(this.$refs.notesReadonlyElement)
       this.readonlyNotes = notes || ''
-      MentionHelper.renderMessageWithMentionsAndLinks(this.$refs.notesReadonlyElement, this.readonlyNotes, () => {
-        console.warn('TODO')
-      }, () => {
-        console.warn('TODO')
-      });
+      MentionHelper.renderMessageWithMentionsAndLinks(this.$refs.notesReadonlyElement, this.readonlyNotes, this.onStarClicked, this.onPlayerClicked);
+    },
+    panToStar (id) {
+      const star = GameHelper.getStarById(this.$store.state.game, id)
+
+      if (star) {
+        GameContainer.map.panToStar(star)
+      } else {
+        this.$toasted.show(`The location of the star is unknown.`, { type: 'error' })
+      }
+    },
+    onStarClicked(id) {
+      this.panToStar(id)
+    },
+    onPlayerClicked(id) {
+      this.$emit('onOpenPlayerDetailRequested', id)
     }
   },
   computed: {
-    noteLength () {
+    noteLength() {
       if (this.notes == null) {
         return 0
       }
@@ -130,7 +146,7 @@ export default {
 
       return staticText.length
     },
-    isExceededMaxLength () {
+    isExceededMaxLength() {
       return this.noteLength > 2000
     }
   }

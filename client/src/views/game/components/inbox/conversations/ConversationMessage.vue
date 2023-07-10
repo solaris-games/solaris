@@ -74,7 +74,7 @@ export default {
       this.message.pinned = false
     },
     panToStar (id) {
-      const star = gameHelper.getStarById(this.$store.state.game, id)
+      const star = GameHelper.getStarById(this.$store.state.game, id)
 
       if (star) {
         GameContainer.map.panToStar(star)
