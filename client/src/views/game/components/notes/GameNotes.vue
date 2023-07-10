@@ -56,7 +56,7 @@ export default {
   methods: {
     beginEditing () {
       this.isEditing = true
-      this.notes = this.readonlyNotes
+      this.notes = MentionHelper.makeMentionsEditable(this.$store.state.game, this.readonlyNotes);
     },
     onSetMessageElement (element) {
       this.$store.commit('setMentions', {
@@ -112,8 +112,8 @@ export default {
     },
     setReadonlyNotes(notes) {
       MentionHelper.resetMessageElement(this.$refs.notesReadonlyElement)
-      this.readonlyNotes = notes
-      MentionHelper.renderMessageWithMentionsAndLinks(this.$refs.notesReadonlyElement, notes, () => {
+      this.readonlyNotes = notes || ''
+      MentionHelper.renderMessageWithMentionsAndLinks(this.$refs.notesReadonlyElement, this.readonlyNotes, () => {
         console.warn('TODO')
       }, () => {
         console.warn('TODO')

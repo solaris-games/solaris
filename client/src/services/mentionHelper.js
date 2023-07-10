@@ -235,6 +235,20 @@ class MentionHelper {
   useSuggestion (text, element, data) {
     return this.addMentionFromTo(text, element, data.mention.type, data.text, data.mention.from, data.mention.to)
   }
+  
+  makeMentionsEditable (game, text) {
+    return text.replace(MentionHelper.INTERNAL_MENTION_REGEX, (_match, type, _id, name) => {
+      let mentionChar = ''
+
+      if (type === 's') {
+        mentionChar = '#'
+      } else if (type === 'p') {
+        mentionChar = '@'
+      }
+
+      return mentionChar + name
+    })
+  }
 }
 
 export default new MentionHelper()
