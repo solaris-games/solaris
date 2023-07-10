@@ -126,7 +126,9 @@ export default {
         return 0
       }
 
-      return this.notes.length
+      const staticText = MentionHelper.makeMentionsStatic(this.$store.state.game, this.notes)
+
+      return staticText.length
     },
     isExceededMaxLength () {
       return this.noteLength > 2000
