@@ -68,6 +68,7 @@ import UserLevelService from "../userLevel";
 import SpecialStarBanService from "../specialStarBan";
 import ShipService from "../ship";
 import SpectatorService from "../spectator";
+import BasicAIService from "../basicAi";
 
 export interface DependencyContainer {
     config: Config,
@@ -119,6 +120,7 @@ export interface DependencyContainer {
     conversationService: ConversationService,
     reputationService: ReputationService,
     aiService: AIService,
+    basicAIService: BasicAIService,
     battleRoyaleService: BattleRoyaleService,
     starMovementService: StarMovementService,
     cacheService: CacheService,

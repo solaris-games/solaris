@@ -189,7 +189,7 @@ export default class AIService {
         const isLastTickOfCycle = game.state.tick % game.settings.galaxy.productionTicks === game.settings.galaxy.productionTicks - 1;
 
         // Considering the growing complexity of AI logic,
-        // it's better to catch any possible errors and have the game continue with disfunctional AI than to break the game tick logic.
+        // it's better to catch any possible errors and have the game continue with dysfunctional AI than to break the game tick logic.
         try {
             if (game.settings.general.advancedAI === 'enabled') {
                 await this._doAdvancedLogic(game, player, isFirstTickOfCycle, isLastTickOfCycle);

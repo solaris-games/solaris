@@ -53,6 +53,7 @@ import SpecialStarBanService from './specialStarBan';
 import AchievementService from './achievement';
 import ConversationService from './conversation';
 import ReputationService from './reputation';
+import BasicAIService from "./basicAi";
 import AIService from './ai';
 import GuildService from './guild';
 import GuildUserService from './guildUser';
@@ -178,7 +179,8 @@ export default (config, io): DependencyContainer => {
     const specialistHireService = new SpecialistHireService(gameRepository, specialistService, achievementService, waypointService, playerCreditsService, starService, gameTypeService, specialistBanService, technologyService);
     const starUpgradeService = new StarUpgradeService(gameRepository, starService, carrierService, achievementService, researchService, technologyService, playerCreditsService, gameTypeService, shipService);
     const shipTransferService = new ShipTransferService(gameRepository, carrierService, starService);
-    const aiService = new AIService(starUpgradeService, carrierService, starService, distanceService, waypointService, combatService, shipTransferService, technologyService, playerService, playerAfkService, reputationService, diplomacyService, playerStatisticsService, shipService);
+    const basicAIService = new BasicAIService(starUpgradeService);
+    const aiService = new AIService(starUpgradeService, carrierService, starService, distanceService, waypointService, combatService, shipTransferService, technologyService, playerService, playerAfkService, reputationService, diplomacyService, shipService, playerStatisticsService, basicAIService);
     const historyService = new HistoryService(historyRepository, playerService, gameService, playerStatisticsService);
     const battleRoyaleService = new BattleRoyaleService(starService, carrierService, mapService, starDistanceService, waypointService, carrierMovementService);
     const starMovementService = new StarMovementService(mapService, starDistanceService, specialistService, waypointService);
@@ -245,6 +247,7 @@ export default (config, io): DependencyContainer => {
         achievementService,
         conversationService,
         reputationService,
+        basicAIService,
         aiService,
         battleRoyaleService,
         starMovementService,
