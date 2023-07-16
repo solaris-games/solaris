@@ -78,9 +78,15 @@ interface TracePoint {
     action?: CarrierWaypointActionType;
 }
 
+enum BorderStarType {
+    EmptySpace,
+    FreeStars,
+    HostileBorder
+}
+
 interface BorderStarData {
     otherPlayersBordering: Set<string>;
-    hasHostileBorder: boolean;
+    type: BorderStarType;
 }
 
 type Order = DefendStarOrder | ClaimStarOrder | ReinforceStarOrder | InvadeStarOrder;
@@ -247,7 +253,7 @@ export default class AIService {
 
             const borderStarData = context.borderStars.get(star._id.toString());
 
-            if (borderStarData && borderStarData.hasHostileBorder) {
+            if (borderStarData && borderStarData.type === BorderStarType.HostileBorder) {
                 star.ignoreBulkUpgrade = {
                     economy: true,
                     industry: false,
@@ -456,7 +462,7 @@ export default class AIService {
         const allStarsInRange = starsInGlobalRange.get(sourceStar)!;
         const otherPlayersBordering = new Set<string>();
 
-        let hasHostileBorder = false;
+        let type = BorderStarType.EmptySpace;
 
         for (const otherStarId of allStarsInRange) {
             const otherStar = starsById.get(otherStarId)!;
@@ -464,13 +470,19 @@ export default class AIService {
             if (otherStar.ownedByPlayerId && otherStar.ownedByPlayerId !== player._id) {
                 otherPlayersBordering.add(otherStar.ownedByPlayerId.toString());
 
-                hasHostileBorder = this._isEnemyPlayer(game, player, otherStar.ownedByPlayerId);
+                if (this._isEnemyPlayer(game, player, otherStar.ownedByPlayerId)) {
+                    type = BorderStarType.HostileBorder;
+                }
+            }
+
+            if (type !== BorderStarType.HostileBorder) {
+                type = BorderStarType.FreeStars;
             }
         }
 
         return {
             otherPlayersBordering,
-            hasHostileBorder
+            type
         }
     }
 
@@ -518,8 +530,9 @@ export default class AIService {
         }
 
         console.log("Border stars:");
-        borderStars.forEach((_, starId) => {
+        borderStars.forEach((data, starId) => {
             console.log(starsById.get(starId)!.name);
+            console.log(JSON.stringify(data,   (_key, value) => (value instanceof Set ? [...value] : value), 2));
         });
 
         return borderStars;
@@ -1042,8 +1055,12 @@ export default class AIService {
     }
 
     _isEnemyPlayer(game: Game, player: Player, otherPlayerId: DBObjectId): boolean {
-        return player._id !== otherPlayerId
-            && this.diplomacyService.getDiplomaticStatusToPlayer(game, player._id, otherPlayerId).actualStatus !== 'allies';
+        if (this.diplomacyService.isFormalAlliancesEnabled(game)) {
+            return player._id !== otherPlayerId
+                && this.diplomacyService.getDiplomaticStatusToPlayer(game, player._id, otherPlayerId).actualStatus !== 'allies';
+        }
+
+        return true;
     }
 
     _isEnemyStar(game: Game, player: Player, context: Context, star: Star): boolean {
@@ -1242,6 +1259,10 @@ export default class AIService {
                 break;
             }
         }
+
+        const dbgPrios = new Array(...starPriorities.entries());
+        dbgPrios.sort((a, b) => b[1] - a[1]);
+        dbgPrios.forEach(p => console.log(this.getStarName(context, p[0]), p[1]));
 
         return starPriorities;
     }
