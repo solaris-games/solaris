@@ -41,6 +41,7 @@
             <div class="col-12 mt-2">
                 <p>{{specialist.description}}</p>
                 <p v-if="specialist.oneShot" class="text-warning"><small>This specialist cannot be replaced.</small></p>
+                <p v-if="specialist.expireTicks" class="text-warning"><small>This specialist expires after {{specialist.expireTicks}} ticks.</small></p>
             </div>
         </div>
     </div>
@@ -107,7 +108,9 @@ export default {
                 let currency = this.$store.state.game.settings.specialGalaxy.specialistsCurrency
 
                 this.carrier.specialistId = specialist.id
+                this.carrier.specialistExpireTick = specialist.expireTicks ? this.$store.state.game.state.tick + specialist.expireTicks : null
                 this.carrier.specialist = specialist
+                this.carrier.effectiveTechs = response.data.effectiveTechs
                 this.userPlayer[currency] -= specialist.cost[currency]
 
                 if (response.data.waypoints) {

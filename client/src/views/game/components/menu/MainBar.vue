@@ -7,7 +7,7 @@
 
   <div class="menu">
     <not-logged-in-bar v-if="!isLoggedIn"/>
-    <dark-mode-warning-bar v-if="isSpectatingDarkMode"/>
+    <spectating-warning-bar/>
 
     <player-list @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 
@@ -88,7 +88,8 @@
         :tab="menuArguments"
         @onCloseRequested="onCloseRequested"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
-        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
+        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
       <bulk-infrastructure-upgrade v-if="menuState == MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE" 
         @onCloseRequested="onCloseRequested"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
@@ -134,6 +135,8 @@
         :playerId="menuArguments"
         @onCloseRequested="onCloseRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+      <spectators v-if="menuState == MENU_STATES.SPECTATORS"
+        @onCloseRequested="onCloseRequested"/>
     </div>
 
     <div class="spacing-footer d-block d-sm-none"></div>
@@ -183,9 +186,10 @@ import ConversationCreateVue from '../inbox/conversations/ConversationCreate.vue
 import ConversationDetailVue from '../inbox/conversations/ConversationDetail.vue'
 import FooterBarVue from './FooterBar.vue'
 import NotLoggedInBarVue from './NotLoggedInBar'
-import DarkModeWarningBarVue from './DarkModeWarningBar.vue'
+import SpectatingWarningBarVue from './SpectatingWarningBar.vue'
 import PlayerBadgeShopVue from '../badges/PlayerBadgeShop.vue'
 import ReportPlayerVue from '../report/ReportPlayer.vue'
+import SpectatorVue from '../spectators/Spectators.vue'
 
 export default {
   components: {
@@ -224,9 +228,10 @@ export default {
     'create-conversation': ConversationCreateVue,
     'conversation': ConversationDetailVue,
     'not-logged-in-bar': NotLoggedInBarVue,
-    'dark-mode-warning-bar': DarkModeWarningBarVue,
+    'spectating-warning-bar': SpectatingWarningBarVue,
     'player-badge-shop': PlayerBadgeShopVue,
-    'report-player': ReportPlayerVue
+    'report-player': ReportPlayerVue,
+    'spectators': SpectatorVue
   },
   data () {
     return {
@@ -357,9 +362,6 @@ export default {
     },
     isLoggedIn () {
       return this.$store.state.userId != null
-    },
-    isSpectatingDarkMode () {
-      return GameHelper.isUserSpectatingGame(this.game) && GameHelper.isDarkMode(this.game)
     }
   }
 }

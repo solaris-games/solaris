@@ -40,5 +40,6 @@ export default {
   CREATE_CONVERSATION: 'createConversation',
   CONVERSATION: 'conversation',
   PLAYER_BADGE_SHOP: 'playerBadgeShop',
-  REPORT_PLAYER: 'reportPlayer'
+  REPORT_PLAYER: 'reportPlayer',
+  SPECTATORS: 'spectators'
 }

@@ -1,0 +1,25 @@
+// EXAMPLE CARRIER BAN
+db.games.updateMany({
+    'state.endDate': { $eq: null },
+    'settings.specialGalaxy.specialistBans.carrier': { $ne: null }
+}, {
+    $addToSet: { 
+        'settings.specialGalaxy.specialistBans.carrier': { 
+            $each: [ 19 ] 
+        } 
+    }
+});
+
+
+
+// EXAMPLE STAR BAN
+db.games.updateMany({
+    'state.endDate': { $eq: null },
+    'settings.specialGalaxy.specialistBans.star': { $ne: null }
+}, {
+    $addToSet: { 
+        'settings.specialGalaxy.specialistBans.star': { 
+            $each: [ 18 ] 
+        } 
+    }
+});

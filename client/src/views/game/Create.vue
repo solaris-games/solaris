@@ -43,6 +43,13 @@
               {{ opt }}% of <span v-if="settings.conquest.victoryCondition === 'homeStarPercentage'">Capital</span> Stars
             </option>
           </select>
+
+          <label for="conquestCapitalStarElimination" class="col-form-label">Capital Star Elimination <help-tooltip tooltip="Determines whether players become defeated if they lose control of their capital star"/></label>
+          <select class="form-control" id="conquestCapitalStarElimination" v-model="settings.conquest.capitalStarElimination" :disabled="isCreatingGame">
+            <option v-for="opt in options.conquest.capitalStarElimination" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
         </div>
 
         <div class="mb-2" v-if="settings.general.mode === 'kingOfTheHill'">
@@ -100,6 +107,24 @@
           <label for="advancedAI" class="col-form-label">Advanced AI <help-tooltip tooltip="Use the advanced AI to replace defeated players"></help-tooltip></label>
           <select class="form-control" id="advancedAI" v-model="settings.general.advancedAI" :disabled="isCreatingGame">
             <option v-for="opt in options.general.advancedAI" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-2">
+          <label for="spectators" class="col-form-label">Allow Spectators <help-tooltip tooltip="Allow players to invite users to spectate the game"></help-tooltip></label>
+          <select class="form-control" id="spectators" v-model="settings.general.spectators" :disabled="isCreatingGame">
+            <option v-for="opt in options.general.spectators" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-2">
+          <label for="readyToQuit" class="col-form-label">Allow Ready To Quit <help-tooltip tooltip="Allow players to 'Ready To Quit' to finish games early"></help-tooltip></label>
+          <select class="form-control" id="readyToQuit" v-model="settings.general.readyToQuit" :disabled="isCreatingGame">
+            <option v-for="opt in options.general.readyToQuit" v-bind:key="opt.value" v-bind:value="opt.value">
               {{ opt.text }}
             </option>
           </select>
@@ -298,7 +323,7 @@
         </div>
 
         <div class="mb-2" v-if="settings.galaxy.galaxyType !== 'custom'">
-          <label for="randomNebulas" class="col-form-label">Random Nebulas (<span class="text-warning">{{settings.specialGalaxy.randomNebulas}}%</span>) <help-tooltip tooltip="The percentage of random nebulas are generated in the galaxy - Nebulas hide ships at stars"/></label>
+          <label for="randomNebulas" class="col-form-label">Random Nebulas (<span class="text-warning">{{settings.specialGalaxy.randomNebulas}}%</span>) <help-tooltip tooltip="The percentage of random nebulas are generated in the galaxy - Nebulas conceal the infrastructure and ship counts at the star from all other players"/></label>
           <div class="col">
             <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomNebulas" v-model="settings.specialGalaxy.randomNebulas" :disabled="isCreatingGame">
           </div>
@@ -323,6 +348,16 @@
           <div class="col">
             <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomBlackHoles" v-model="settings.specialGalaxy.randomBlackHoles" :disabled="isCreatingGame">
           </div>
+        </div>
+
+        <div class="mb-2" v-if="settings.galaxy.galaxyType !== 'custom'">
+          <label for="randomPulsars" class="col-form-label">Random Pulsars (<span class="text-warning">{{settings.specialGalaxy.randomPulsars}}%</span>) <help-tooltip tooltip="The percentage of random pulsars are generated in the galaxy - Pulsars are always visible to all players in the game"/></label>
+          <div class="col">
+            <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomPulsars" v-model="settings.specialGalaxy.randomPulsars" :disabled="isCreatingGame">
+          </div>
+        </div>
+
+        <div class="mb-2" v-if="settings.galaxy.galaxyType !== 'custom'">
 
           <div class="mb-2">
             <label for="darkGalaxy" class="col-form-label">Dark Galaxy <help-tooltip tooltip="Dark galaxies hide stars outside of player scanning ranges - Extra dark galaxies hide player statistics so that players only know what other players have based on what they can see in their scanning range"/></label>
@@ -395,10 +430,21 @@
               </option>
             </select>
           </div>
+
+          <div class="mb-2">
+            <label for="starCaptureReward" class="col-form-label">Star Capture Rewards <help-tooltip tooltip="Determines whether economic infrastructure is destroyed on star capture and if the attacker is awarded cash for destroying them"/></label>
+            <select class="form-control" id="starCaptureReward" v-model="settings.specialGalaxy.starCaptureReward" :disabled="isCreatingGame">
+              <option v-for="opt in options.specialGalaxy.starCaptureReward" v-bind:key="opt.value" v-bind:value="opt.value">
+                {{ opt.text }}
+              </option>
+            </select>
+          </div>
         </div>
       </view-collapse-panel>
 
       <view-collapse-panel title="Orbital Mechanics">
+        <p class="mb-1 text-warning" v-if="settings.orbitalMechanics.enabled === 'enabled'">Warning: carrier-to-carrier combat is auto-disabled in orbital games.</p>
+        
         <div class="mb-2">
           <label for="orbitalMechanicsEnabled" class="col-form-label">Galaxy Rotation <help-tooltip tooltip="If enabled, orbits stars and carriers around the center of the galaxy every tick"/></label>
           <select class="form-control" id="orbitalMechanicsEnabled" v-model="settings.orbitalMechanics.enabled" :disabled="isCreatingGame">
@@ -422,7 +468,7 @@
         <div class="mb-2">
           <label for="startingStars" class="col-form-label">Starting Stars (<span class="text-warning">{{settings.player.startingStars}} stars</span>) <help-tooltip tooltip="Determines how many stars each player is allocated at the start of the game"/></label>
           <div class="col">
-            <input type="range" min="1" max="10" step="1" class="form-range w-100" id="startingStars" v-model="settings.player.startingStars" :disabled="isCreatingGame">
+            <input type="range" min="1" max="30" step="1" class="form-range w-100" id="startingStars" v-model="settings.player.startingStars" :disabled="isCreatingGame">
           </div>
         </div>
 
@@ -482,6 +528,24 @@
               {{ opt.text }}
             </option>
           </select>
+        </div>
+      </view-collapse-panel>
+
+      <view-collapse-panel title="Ship Population Cap">
+        <div class="mb-2">
+          <label for="populationCapEnabled" class="col-form-label">Enabled <help-tooltip tooltip="If enabled, the maximum ship population per player will be restricted"/></label>
+          <select class="form-control" id="populationCapEnabled" v-model="settings.player.populationCap.enabled" :disabled="isCreatingGame">
+            <option v-for="opt in options.player.populationCap.enabled" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-2" v-if="settings.player.populationCap.enabled === 'enabled'">
+          <label for="populationCapShipsPerStar" class="col-form-label">Ships Per Star (<span class="text-warning">{{settings.player.populationCap.shipsPerStar}} Ships</span>) <help-tooltip tooltip="Determines the max population of ships per star"/></label>
+          <div class="col">
+            <input type="range" min="50" max="1000" step="50" class="form-range w-100" id="startingTechLevelSpecialists" v-model="settings.player.populationCap.shipsPerStar" :disabled="isCreatingGame">
+          </div>
         </div>
       </view-collapse-panel>
 
@@ -549,7 +613,7 @@
         </div>
 
         <div class="mb-2">
-          <label for="economyCost" class="col-form-label">Development Cost <help-tooltip tooltip="Determines how expensive infrastructure costs to build"/></label>
+          <label for="economyCost" class="col-form-label">Development Cost <help-tooltip tooltip="Determines how expensive infrastructure costs to build. If disabled, then one third of all stars will start with the starting infrastructure"/></label>
           <select class="form-control" id="economyCost" v-model="settings.player.developmentCost.economy" :disabled="isCreatingGame">
             <option v-for="opt in options.player.developmentCost" v-bind:key="opt.value" v-bind:value="opt.value">
               {{ opt.text }} Economy

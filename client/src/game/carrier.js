@@ -157,18 +157,23 @@ class Carrier extends EventEmitter {
   }
 
   drawSpecialist () {
+    if (this.specialistSprite) {
+      this.container.removeChild(this.specialistSprite)
+      this.specialistSprite = null
+    }
+
     if (!this.hasSpecialist() || this.data.orbiting) {
       return
     }
 
     let specialistTexture = TextureService.getSpecialistTexture(this.data.specialist.key)
-    let specialistSprite = new PIXI.Sprite(specialistTexture)
-    specialistSprite.width = 6
-    specialistSprite.height = 6
-    specialistSprite.x = -3
-    specialistSprite.y = -3
+    this.specialistSprite = new PIXI.Sprite(specialistTexture)
+    this.specialistSprite.width = 6
+    this.specialistSprite.height = 6
+    this.specialistSprite.x = -3
+    this.specialistSprite.y = -3
 
-    this.container.addChild(specialistSprite)
+    this.container.addChild(this.specialistSprite)
   }
 
   hasSpecialist () {

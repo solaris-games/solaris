@@ -8,23 +8,56 @@
 
     <user-guild-info :user="user" />
 
-    <achievements v-if="user" v-bind:victories="user.achievements.victories" v-bind:rank="user.achievements.rank" v-bind:renown="user.achievements.renown"/>
+    <achievements v-if="user"
+          :level="user.achievements.level"
+          :victories="user.achievements.victories"
+          :rank="user.achievements.rank"
+          :renown="user.achievements.renown"/>
 
     <user-badges :userId="userId"/>
+
+    <view-subtitle title="Rank" class="mt-2"/>
+    <div class="row" v-if="user">
+      <div class="col-12 table-responsive">
+      <table class="table table-striped table-hover">
+        <tbody>
+          <tr>
+            <td>Rank</td>
+            <td class="text-end">
+              <img class="user-level-icon" :src="require(`../../assets/levels/${user.achievements.level}.png`)">
+              {{ user.level.name }}
+            </td>
+          </tr>
+          <tr>
+            <td>Rank Points</td>
+            <td class="text-end">{{ user.achievements.rank }}</td>
+          </tr>
+          <tr v-if="user.level.rankPointsNext != null">
+            <td>Next Rank Points</td>
+            <td class="text-end">{{ user.level.rankPointsNext }}</td>
+          </tr>
+          <tr>
+            <td>ELO <i class="fas fa-question-circle" title="Improve your ELO by participating in 1v1's"></i></td>
+            <td class="text-end">{{ user.achievements.eloRating || 1200 }}</td>
+          </tr>
+          <tr>
+            <td>Victories</td>
+            <td class="text-end">{{ user.achievements.victories }}</td>
+          </tr>
+          <tr>
+            <td>Victories (1 vs. 1)</td>
+            <td class="text-end">{{ user.achievements.victories1v1 }}</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
 
     <view-subtitle title="Games" class="mt-2"/>
     <div class="row" v-if="user">
       <div class="col-sm-12 col-md-8 table-responsive">
       <table class="table table-striped table-hover">
         <tbody>
-          <tr>
-            <td>Victories</td>
-            <td class="text-end">{{ user.achievements.victories }}</td>
-          </tr>
-          <tr>
-            <td>ELO <i class="fas fa-question-circle" title="Improve your ELO by participating in 1v1's"></i></td>
-            <td class="text-end">{{ user.achievements.eloRating || 1200 }}</td>
-          </tr>
           <tr>
             <td>Joined</td>
             <td class="text-end">{{ user.achievements.joined }}</td>
@@ -36,6 +69,10 @@
           <tr>
             <td>Defeated</td>
             <td class="text-end">{{ user.achievements.defeated }}</td>
+          </tr>
+          <tr>
+            <td>Defeated (1 vs. 1)</td>
+            <td class="text-end">{{ user.achievements.defeated1v1 }}</td>
           </tr>
           <tr>
             <td>Quit</td>
@@ -564,4 +601,7 @@ export default {
 </script>
 
 <style scoped>
+.user-level-icon {
+  height: 28px;
+}
 </style>

@@ -1,8 +1,7 @@
 import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
-import { mapToAdminSetGameFeaturedRequest, mapToAdminSetGameTimeMachineRequest, mapToAdminSetUserCreditsRequest, mapToAdminSetUserRoleRequest } from '../requests/admin';
 
-export default (container: DependencyContainer, io) => {
+export default (container: DependencyContainer) => {
     return {
         getInsights: async (req, res, next) => {
             try {
@@ -52,9 +51,7 @@ export default (container: DependencyContainer, io) => {
 
         setRoleContributor: async (req, res, next) => {
             try {
-                const reqObj = mapToAdminSetUserRoleRequest(req.body);
-
-                await container.adminService.setRoleContributor(req.params.userId, reqObj.enabled);
+                await container.adminService.setRoleContributor(req.params.userId, req.body.enabled);
     
                 return res.sendStatus(200);
             } catch (err) {
@@ -63,9 +60,7 @@ export default (container: DependencyContainer, io) => {
         },
         setRoleDeveloper: async (req, res, next) => {
             try {
-                const reqObj = mapToAdminSetUserRoleRequest(req.body);
-
-                await container.adminService.setRoleDeveloper(req.params.userId, reqObj.enabled);
+                await container.adminService.setRoleDeveloper(req.params.userId, req.body.enabled);
     
                 return res.sendStatus(200);
             } catch (err) {
@@ -74,9 +69,7 @@ export default (container: DependencyContainer, io) => {
         },
         setRoleGameMaster: async (req, res, next) => {
             try {
-                const reqObj = mapToAdminSetUserRoleRequest(req.body);
-
-                await container.adminService.setRoleGameMaster(req.params.userId, reqObj.enabled);
+                await container.adminService.setRoleGameMaster(req.params.userId, req.body.enabled);
     
                 return res.sendStatus(200);
             } catch (err) {
@@ -85,9 +78,7 @@ export default (container: DependencyContainer, io) => {
         },
         setRoleCommunityManager: async (req, res, next) => {
             try {
-                const reqObj = mapToAdminSetUserRoleRequest(req.body);
-
-                await container.adminService.setRoleCommunityManager(req.params.userId, reqObj.enabled);
+                await container.adminService.setRoleCommunityManager(req.params.userId, req.body.enabled);
     
                 return res.sendStatus(200);
             } catch (err) {
@@ -96,9 +87,7 @@ export default (container: DependencyContainer, io) => {
         },
         setCredits: async (req, res, next) => {
             try {
-                const reqObj = mapToAdminSetUserCreditsRequest(req.body);
-
-                await container.userService.setCredits(req.params.userId, +reqObj.credits);
+                await container.userService.setCredits(req.params.userId, req.body.credits);
     
                 return res.sendStatus(200);
             } catch (err) {
@@ -176,9 +165,7 @@ export default (container: DependencyContainer, io) => {
         },
         setGameFeatured: async (req, res, next) => {
             try {
-                const reqObj = mapToAdminSetGameFeaturedRequest(req.body);
-
-                await container.adminService.setGameFeatured(req.params.gameId, reqObj.featured);
+                await container.adminService.setGameFeatured(req.params.gameId, req.body.featured);
     
                 return res.sendStatus(200);
             } catch (err) {
@@ -187,9 +174,7 @@ export default (container: DependencyContainer, io) => {
         },
         setGameTimeMachine: async (req, res, next) => {
             try {
-                const reqObj = mapToAdminSetGameTimeMachineRequest(req.body);
-
-                await container.adminService.setGameTimeMachine(req.params.gameId, reqObj.timeMachine);
+                await container.adminService.setGameTimeMachine(req.params.gameId, req.body.timeMachine);
     
                 return res.sendStatus(200);
             } catch (err) {

@@ -160,16 +160,24 @@ export default class PaypalService {
             payer_id: payerId
         }, requestOptions);
 
+        if (executeResponse.status !== 200) {
+            throw new Error(`Execute payment request failed: ${paymentId}`);
+        }
+
         for (let transaction of executeResponse.data.transactions) {
             const authorizationId = transaction.related_resources.find((r) => r.authorization != null).authorization.id;
 
             // Capture the payment.
-            await axios.post(this.API[environment].capture(authorizationId), {
+            const authResponse = await axios.post(this.API[environment].capture(authorizationId), {
                 amount: {
                     total: parseFloat(transaction.amount.total).toFixed(2),
                     currency: transaction.amount.currency
                 }
             }, requestOptions);
+
+            if (authResponse.status !== 201) {
+                throw new Error(`Authorize payment request failed: ${authorizationId}`);
+            }
         }
 
         // Add credits to the users account.

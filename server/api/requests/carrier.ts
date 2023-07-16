@@ -41,6 +41,9 @@ export const mapToCarrierSaveWaypointsRequest = (body: any): CarrierSaveWaypoint
                 errors.push('Action is required.');
             }
 
+if (waypoint.actionShips == null) waypoint.actionShips = 0;
+if (waypoint.delayTicks == null) waypoint.delayTicks = 0;
+
             if (!keyHasNumberValue(waypoint, 'actionShips')) {
                 errors.push('Action Ships is required.');
             }
@@ -166,16 +169,24 @@ export const mapToCarrierCalculateCombatRequest = (body: any): CarrierCalculateC
             errors.push('Defender Ships is required.');
         }
         
-        if (body.defender.ships && +body.defender.ships < 0) {
+        if (body.defender.ships != null && +body.defender.ships < 0) {
             errors.push('Defender Ships must be greater than or equal to 0.');
+        }
+
+        if (body.defender.ships != null && +body.defender.ships % 1 != 0) {
+            errors.push('Defender Ships must be an integer.');
         }
 
         if (!keyHasNumberValue(body.defender, 'weaponsLevel')) {
             errors.push('Defender Weapons Level is required.');
         }
 
-        if (body.defender.weaponsLevel && +body.defender.weaponsLevel <= 0) {
+        if (body.defender.weaponsLevel != null && +body.defender.weaponsLevel <= 0) {
             errors.push('Defender Weapons Level must be greater than 0.');
+        }
+
+        if (body.defender.weaponsLevel != null && +body.defender.weaponsLevel % 1 != 0) {
+            errors.push('Defender Weapons Level must be an integer.');
         }
 
         body.defender.ships = +body.defender.ships;
@@ -191,16 +202,24 @@ export const mapToCarrierCalculateCombatRequest = (body: any): CarrierCalculateC
             errors.push('Attacker Ships is required.');
         }
         
-        if (body.attacker.ships && +body.attacker.ships < 0) {
+        if (body.attacker.ships != null && +body.attacker.ships < 0) {
             errors.push('Attacker Ships must be greater than or equal to 0.');
+        }
+
+        if (body.attacker.ships != null && +body.attacker.ships % 1 != 0) {
+            errors.push('Attacker Ships must be an integer.');
         }
 
         if (!keyHasNumberValue(body.attacker, 'weaponsLevel')) {
             errors.push('Attacker Weapons Level is required.');
         }
 
-        if (body.attacker.weaponsLevel && +body.attacker.weaponsLevel <= 0) {
+        if (body.attacker.weaponsLevel != null && +body.attacker.weaponsLevel <= 0) {
             errors.push('Attacker Weapons Level must be greater than 0.');
+        }
+
+        if (body.attacker.weaponsLevel != null && +body.attacker.weaponsLevel % 1 != 0) {
+            errors.push('Attacker Weapons Level must be an integer.');
         }
 
         body.attacker.ships = +body.attacker.ships;

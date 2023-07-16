@@ -13,6 +13,8 @@ import PlayerService from "./player";
 import PlayerStatisticsService from "./playerStatistics";
 import RatingService from "./rating";
 import UserService from "./user";
+import PlayerAfkService from "./playerAfk";
+import UserLevelService from "./userLevel";
 
 const moment = require('moment');
 
@@ -32,6 +34,7 @@ export default class LeaderboardService {
                 'roles.developer': 1,
                 'roles.communityManager': 1,
                 'roles.gameMaster': 1,
+                'achievements.level': 1,
                 'achievements.rank': 1,
                 'achievements.victories': 1,
                 'achievements.renown': 1,
@@ -52,6 +55,7 @@ export default class LeaderboardService {
                 'roles.developer': 1,
                 'roles.communityManager': 1,
                 'roles.gameMaster': 1,
+                'achievements.level': 1,
                 'achievements.rank': 1,
                 'achievements.victories': 1,
                 'achievements.renown': 1,
@@ -72,6 +76,7 @@ export default class LeaderboardService {
                 'roles.developer': 1,
                 'roles.communityManager': 1,
                 'roles.gameMaster': 1,
+                'achievements.level': 1,
                 'achievements.rank': 1,
                 'achievements.victories': 1,
                 'achievements.renown': 1,
@@ -456,7 +461,7 @@ export default class LeaderboardService {
             sort: {
                 'achievements.eloRating': -1,
                 'achievements.rank': -1,
-                'achievements.victories': -1,
+                'achievements.victories1v1': -1,
                 'achievements.renown': -1
             },
             select: {
@@ -466,8 +471,11 @@ export default class LeaderboardService {
                 'roles.developer': 1,
                 'roles.communityManager': 1,
                 'roles.gameMaster': 1,
+                'achievements.level': 1,
                 'achievements.rank': 1,
                 'achievements.victories': 1,
+                'achievements.victories1v1': 1,
+                'achievements.defeated1v1': 1,
                 'achievements.renown': 1,
                 'achievements.eloRating': 1
             }
@@ -499,6 +507,8 @@ export default class LeaderboardService {
     userRepo: Repository<User>;
     userService: UserService;
     playerService: PlayerService;
+    playerAfkService: PlayerAfkService;
+    userLevelService: UserLevelService;
     guildUserService: UserGuildService;
     ratingService: RatingService;
     gameService: GameService;
@@ -511,6 +521,8 @@ export default class LeaderboardService {
         userRepo: Repository<User>,
         userService: UserService,
         playerService: PlayerService,
+        playerAfkService: PlayerAfkService,
+        userLevelService: UserLevelService,
         guildUserService: UserGuildService,
         ratingService: RatingService,
         gameService: GameService,
@@ -522,6 +534,8 @@ export default class LeaderboardService {
         this.userRepo = userRepo;
         this.userService = userService;
         this.playerService = playerService;
+        this.playerAfkService = playerAfkService;
+        this.userLevelService = userLevelService;
         this.guildUserService = guildUserService;
         this.ratingService = ratingService;
         this.gameService = gameService;
@@ -531,7 +545,7 @@ export default class LeaderboardService {
         this.playerStatisticsService = playerStatisticsService;
     }
 
-    async getLeaderboard(limit: number | null, sortingKey: string, skip: number = 0) {
+    async getUserLeaderboard(limit: number | null, sortingKey: string, skip: number = 0) {
         const sorter = LeaderboardService.GLOBALSORTERS[sortingKey] || LeaderboardService.GLOBALSORTERS['rank'];
 
         let leaderboard = await this.userRepo
@@ -570,7 +584,7 @@ export default class LeaderboardService {
         };
     }
 
-    getLeaderboardRankings(game: Game, sortingKey?: string): Leaderboard {
+    getGameLeaderboard(game: Game, sortingKey?: string): Leaderboard {
         let SORTERS = LeaderboardService.LOCALSORTERS;
 
         let kingOfTheHillPlayer: Player | null = null;
@@ -655,6 +669,14 @@ export default class LeaderboardService {
         };
     }
 
+    getGameLeaderboardPosition(game: Game, player: Player) {
+        if (game.state.leaderboard == null) {
+            return null;
+        }
+
+        return game.state.leaderboard.findIndex(l => l.toString() === player._id.toString()) + 1;
+    }
+
     addGameRankings(game: Game, gameUsers: User[], leaderboard: LeaderboardPlayer[]): GameRankingResult {
         let result: GameRankingResult = {
             ranks: [],
@@ -714,6 +736,7 @@ export default class LeaderboardService {
             let newRank = Math.max(user.achievements.rank + rankIncrease, 0); // Cannot go less than 0.
 
             user.achievements.rank = newRank;
+            user.achievements.level = this.userLevelService.getByRankPoints(newRank).id;
 
             // Append the rank adjustment to the results.
             result.ranks.push({
@@ -737,9 +760,14 @@ export default class LeaderboardService {
         }
 
         user.achievements.victories++; // Increase the winner's victory count
+        
+        // Note: We don't really care if its official or not, award a badge for any 32p games.
+        if (this.gameTypeService.is32PlayerGame(game)) {
+            this.badgeService.awardBadgeForUserVictor32PlayerGame(user);
+        }
 
-        if (this.gameTypeService.is32PlayerOfficialGame(game)) {
-            this.badgeService.awardBadgeForUser(user, 'victor32');
+        if (this.gameTypeService.isSpecialGameMode(game)) {
+            this.badgeService.awardBadgeForUserVictorySpecialGame(user, game);
         }
 
         // Give the winner a galactic credit providing it isn't a 1v1.
@@ -764,10 +792,14 @@ export default class LeaderboardService {
 
         if (winningUser) {
             winningUserOldRating = winningUser.achievements.eloRating || 1200;
+
+            winningUser.achievements.victories1v1++;
         }
 
         if (losingUser) {
             losingUserOldRating = losingUser.achievements.eloRating || 1200;
+
+            losingUser.achievements.defeated1v1++;
         }
 
         this.ratingService.recalculateEloRating(winningUser, losingUser, true);
@@ -786,45 +818,50 @@ export default class LeaderboardService {
         };
     }
 
-    getGameWinner(game: Game): Player | null {
+    getGameWinner(game: Game, leaderboard: LeaderboardPlayer[]): Player | null {
         let isKingOfTheHillMode = this.gameTypeService.isKingOfTheHillMode(game);
         let isAllUndefeatedPlayersReadyToQuit = this.gameService.isAllUndefeatedPlayersReadyToQuit(game);
 
         if (isAllUndefeatedPlayersReadyToQuit) {
             if (isKingOfTheHillMode) {
-                return this.playerService.getKingOfTheHillPlayer(game) || this.getFirstPlacePlayer(game);
+                return this.playerService.getKingOfTheHillPlayer(game) || this.getFirstPlacePlayer(leaderboard);
             }
 
-            return this.getFirstPlacePlayer(game);
+            return this.getFirstPlacePlayer(leaderboard);
         }
 
         if (this.gameTypeService.isConquestMode(game)) {
-            let starWinner = this.getStarCountWinner(game);
+            let starWinner = this.getStarCountWinner(game, leaderboard);
 
             if (starWinner) {
                 return starWinner;
             }
         }
 
-        if (isKingOfTheHillMode && this.gameStateService.isCountingDownToEnd(game) && this.gameStateService.hasReachedCountdownEnd(game)) {
-            return this.playerService.getKingOfTheHillPlayer(game) || this.getFirstPlacePlayer(game);
+        if (this.gameStateService.isCountingDownToEnd(game) && this.gameStateService.hasReachedCountdownEnd(game)) {
+            if (isKingOfTheHillMode) {
+                return this.playerService.getKingOfTheHillPlayer(game) || this.getFirstPlacePlayer(leaderboard);
+            }
+
+            return this.getFirstPlacePlayer(leaderboard);
         }
 
-        let lastManStanding = this.getLastManStanding(game);
+        let lastManStanding = this.getLastManStanding(game, leaderboard);
 
         if (lastManStanding) {
             return lastManStanding;
         }
 
+        // TODO: Hardcoded limit to games, 10000 ticks?
+
         return null;
     }
 
-    getStarCountWinner(game: Game): Player | null {
+    getStarCountWinner(game: Game, leaderboard: LeaderboardPlayer[]): Player | null {
         // There could be more than one player who has reached
         // the number of stars required at the same time.
         // In this case we pick the player who has the most ships.
         // If that's equal, then pick the player who has the most carriers.
-        let leaderboard = this.getLeaderboardRankings(game).leaderboard;
 
         // If conquest and home star percentage then use the totalHomeStars as the sort
         // All other cases use totalStars
@@ -842,7 +879,7 @@ export default class LeaderboardService {
         return null;
     }
 
-    getLastManStanding(game: Game): Player | null {
+    getLastManStanding(game: Game, leaderboard: LeaderboardPlayer[]): Player | null {
         let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated);
 
         if (undefeatedPlayers.length === 1) {
@@ -854,15 +891,21 @@ export default class LeaderboardService {
         let defeatedPlayers = game.galaxy.players.filter(p => p.defeated);
 
         if (defeatedPlayers.length === game.settings.general.playerLimit) {
-            return this.getFirstPlacePlayer(game);
+            return this.getFirstPlacePlayer(leaderboard);
+        }
+
+        // If the remaining players alive are all AI then pick the player in 1st.
+        // Note: Don't include pseudo afk, only legit actual afk players.
+        let undefeatedAI = undefeatedPlayers.filter(p => this.playerAfkService.isAIControlled(game, p, false));
+        
+        if (undefeatedAI.length === undefeatedPlayers.length) {
+            return this.getFirstPlacePlayer(leaderboard);
         }
 
         return null;
     }
 
-    getFirstPlacePlayer(game: Game): Player {
-        let leaderboard = this.getLeaderboardRankings(game).leaderboard;
-
+    getFirstPlacePlayer(leaderboard: LeaderboardPlayer[]): Player {
         return leaderboard[0].player;
     }
 

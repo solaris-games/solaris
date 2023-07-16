@@ -1,42 +1,33 @@
 import { Router } from "express";
+import { ExpressJoiInstance } from "express-joi-validation";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import GameController from '../controllers/game';
+import { MiddlewareContainer } from "../middleware";
 
-import AuthMiddleware from '../middleware/auth';
-import CoreMiddleware from '../middleware/core';
-import GameMiddleware from '../middleware/game';
-import PlayerMiddleware from '../middleware/player';
-
-export default (router: Router, io, container: DependencyContainer) => {
-    const mwCore = CoreMiddleware();
-    const mwAuth = AuthMiddleware(container);
-    const mwGame = GameMiddleware(container);
-    const mwPlayer = PlayerMiddleware(container);
-
-    const controller = GameController(container, io);
+export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
+    const controller = GameController(container);
 
     router.get('/api/game/defaultSettings',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.getDefaultSettings,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/game/flux',
-        mwAuth.authenticate(),
         controller.getFlux,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.post('/api/game/',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.create,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.post('/api/game/tutorial',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.createTutorial,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/game/:gameId/info',
-        mwGame.loadGame({
+        mw.game.loadGame({
             lean: true,
             settings: true,
             state: true,
@@ -46,7 +37,7 @@ export default (router: Router, io, container: DependencyContainer) => {
         (req, res, next) => {
             try {
                 if (req.game.settings.general.createdByUserId) {
-                    req.game.settings.general.isGameAdmin = req.game.settings.general.createdByUserId.toString() === req.session.userId.toString();
+                    req.game.settings.general.isGameAdmin = req.game.settings.general.createdByUserId.toString() === req.session.userId?.toString();
                 } else {
                     req.game.settings.general.isGameAdmin = false;
                 }
@@ -59,63 +50,64 @@ export default (router: Router, io, container: DependencyContainer) => {
             }
         },
         controller.detailInfo,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/game/:gameId/state',
-        mwGame.loadGame({
+        mw.game.loadGame({
             lean: true,
             state: true
         }),
         controller.detailState,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/game/:gameId/galaxy',
         controller.detailGalaxy,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/game/list/summary',
         controller.listSummary,
-        mwCore.handleError);
-
-    router.get('/api/game/list/summary/user',
-        controller.listMySummary,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/game/list/official',
         controller.listOfficial,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/game/list/custom',
         controller.listCustom,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/game/list/inprogress',
         controller.listInProgress,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/game/list/completed',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.listRecentlyCompleted,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/game/list/completed/user',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.listMyCompleted,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/game/list/active',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.listMyActiveGames,
-        mwCore.handleError);
+        mw.core.handleError);
+
+    router.get('/api/game/list/spectating',
+        mw.auth.authenticate(),
+        controller.listSpectating,
+        mw.core.handleError);
 
     router.get('/api/game/:gameId/intel',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.getIntel,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.put('/api/game/:gameId/join',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
+        mw.auth.authenticate(),
+        mw.game.loadGame({
             lean: false,
             settings: true,
             galaxy: true,
@@ -125,15 +117,15 @@ export default (router: Router, io, container: DependencyContainer) => {
             quitters: true,
             afkers: true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true
         }),
         controller.join,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.put('/api/game/:gameId/quit',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
+        mw.auth.authenticate(),
+        mw.game.loadGame({
             lean: false,
             settings: true,
             galaxy: true,
@@ -143,17 +135,17 @@ export default (router: Router, io, container: DependencyContainer) => {
             quitters: true,
             afkers: true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true
         }),
-        mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        mw.player.loadPlayer,
+        mw.player.validatePlayerState({ isPlayerUndefeated: true }),
         controller.quit,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.put('/api/game/:gameId/concedeDefeat',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
+        mw.auth.authenticate(),
+        mw.game.loadGame({
             lean: false,
             settings: true,
             state: true,
@@ -161,157 +153,157 @@ export default (router: Router, io, container: DependencyContainer) => {
             constants: true,
             quitters: true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true,
             isInProgress: true
         }),
-        mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        mw.player.loadPlayer,
+        mw.player.validatePlayerState({ isPlayerUndefeated: true }),
         controller.concede,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.put('/api/game/:gameId/ready',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
-            lean: false,
+        mw.auth.authenticate(),
+        mw.game.loadGame({
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
             constants: true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true
         }),
-        mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        mw.player.loadPlayer,
+        mw.player.validatePlayerState({ isPlayerUndefeated: true }),
         controller.ready,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.put('/api/game/:gameId/readytocycle',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
-            lean: false,
+        mw.auth.authenticate(),
+        mw.game.loadGame({
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
             constants: true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true
         }),
-        mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        mw.player.loadPlayer,
+        mw.player.validatePlayerState({ isPlayerUndefeated: true }),
         controller.readyToCycle,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.put('/api/game/:gameId/notready',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
-            lean: false,
+        mw.auth.authenticate(),
+        mw.game.loadGame({
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
             constants: true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true
         }),
-        mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        mw.player.loadPlayer,
+        mw.player.validatePlayerState({ isPlayerUndefeated: true }),
         controller.unready,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.put('/api/game/:gameId/readyToQuit',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
-            lean: false,
+        mw.auth.authenticate(),
+        mw.game.loadGame({
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
             constants: true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true
         }),
-        mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        mw.player.loadPlayer,
+        mw.player.validatePlayerState({ isPlayerUndefeated: true }),
         controller.readyToQuit,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.put('/api/game/:gameId/notReadyToQuit',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
-            lean: false,
+        mw.auth.authenticate(),
+        mw.game.loadGame({
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
             constants: true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true
         }),
-        mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        mw.player.loadPlayer,
+        mw.player.validatePlayerState({ isPlayerUndefeated: true }),
         controller.unreadyToQuit,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/game/:gameId/notes',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
+        mw.auth.authenticate(),
+        mw.game.loadGame({
             lean: true,
             settings: false,
             state: false,
             galaxy: true,
             constants: false
         }),
-        mwPlayer.loadPlayer,
+        mw.player.loadPlayer,
         controller.getNotes,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.put('/api/game/:gameId/notes',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
+        mw.auth.authenticate(),
+        mw.game.loadGame({
             lean: true,
             settings: false,
             state: true,
             galaxy: true,
             constants: false
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true
         }),
-        mwPlayer.loadPlayer,
+        mw.player.loadPlayer,
         controller.saveNotes,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.delete('/api/game/:gameId',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
-            lean: false,
+        mw.auth.authenticate(),
+        mw.game.loadGame({
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
             constants: true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true
         }),
         controller.delete,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/game/:gameId/player/:playerId',
-        mwGame.loadGame({
+        mw.game.loadGame({
             lean: true,
             settings: true,
             'galaxy.players': true
         }),
         controller.getPlayerUser,
-        mwCore.handleError);
+        mw.core.handleError);
         
     router.patch('/api/game/:gameId/player/touch',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.touch,
-        mwCore.handleError);
+        mw.core.handleError);
 
     return router;
 }

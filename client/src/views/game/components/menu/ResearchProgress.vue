@@ -1,5 +1,5 @@
 <template>
-<span v-if="userPlayer" @click="onViewResearchRequested">
+<span v-if="userPlayer && isTechnologyEnabled && isTechnologyResearchable" @click="onViewResearchRequested">
     <i :class="getIcon()"></i> {{researchProgress}}%
 </span>
 </template>
@@ -20,6 +20,12 @@ export default {
   computed: {
     userPlayer () {
       return GameHelper.getUserPlayer(this.$store.state.game)
+    },
+    isTechnologyEnabled () {
+      return TechnologyHelper.isTechnologyEnabled(this.$store.state.game, this.userPlayer.researchingNow)
+    },
+    isTechnologyResearchable () {
+      return TechnologyHelper.isTechnologyResearchable(this.$store.state.game, this.userPlayer.researchingNow)
     },
     researchProgress () {
       let tech = this.userPlayer.research[this.userPlayer.researchingNow]

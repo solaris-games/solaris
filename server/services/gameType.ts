@@ -10,6 +10,10 @@ export default class GameTypeService {
         return game.settings.general.type === 'tutorial';
     }
 
+    isOfficialGame(game: Game) {
+        return game.settings.general.createdByUserId == null;
+    }
+
     isCustomGame(game: Game) {
         return game.settings.general.type === 'custom';
     }
@@ -21,18 +25,22 @@ export default class GameTypeService {
     isSpecialGameMode(game: Game) {
         return [
             'special_dark',
+            'special_fog',
             'special_ultraDark',
             'special_orbital',
             'special_battleRoyale',
             'special_homeStar',
+            'special_homeStarElimination',
             'special_anonymous',
             'special_kingOfTheHill',
-            'special_tinyGalaxy'
+            'special_tinyGalaxy',
+            'special_freeForAll',
+            'special_arcade'
         ].includes(game.settings.general.type);
     }
 
-    is32PlayerOfficialGame(game: Game) {
-        return game.settings.general.type === '32_player_rt';
+    is32PlayerGame(game: Game) {
+        return game.settings.general.playerLimit === 32;
     }
 
     isConquestMode(game: Game) {
@@ -68,8 +76,13 @@ export default class GameTypeService {
             || game.settings.specialGalaxy.darkGalaxy === 'extra';
     }
 
+    isDarkFogged(game: Game) {
+        return game.settings.specialGalaxy.darkGalaxy === 'fog';
+    }
+
     isDarkStart(game: Game) {
-        return game.settings.specialGalaxy.darkGalaxy === 'start';
+        return game.settings.specialGalaxy.darkGalaxy === 'start'
+            || this.isDarkFogged(game);
     }
 
     isTurnBasedGame(game: Game) {
@@ -99,4 +112,7 @@ export default class GameTypeService {
                 (!this.isCustomGame(game) || this.isFeaturedGame(game));
     }
 
+    isCapitalStarEliminationMode(game: Game) {
+        return this.isConquestMode(game) && game.settings.conquest.capitalStarElimination === 'enabled';
+    }
 }

@@ -1,6 +1,6 @@
 <template>
     <div v-if="isTradeAllowed">
-      <reputation v-if="player.defeated" :playerId="player._id"/>
+      <reputation v-if="player.isAIControlled" :playerId="player._id"/>
 
       <div v-if="isTradePossibleByScanning && isTradePossibleByDiplomacy">
         <sendCredits v-if="tradeCreditsIsEnabled" :player="player" :userPlayer="userPlayer"/>

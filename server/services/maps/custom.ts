@@ -29,6 +29,7 @@ export default class CustomMapService {
           star.isAsteroidField = star.isAsteroidField == null ? false : star.isAsteroidField;
           star.isBinaryStar = star.isBinaryStar == null ? false : star.isBinaryStar;
           star.isBlackHole = star.isBlackHole == null ? false : star.isBlackHole;
+          star.isPulsar = star.isPulsar == null ? false : star.isPulsar;
           star.wormHoleToStarId = star.wormHoleToStarId == null ? null : +star.wormHoleToStarId;
           star.specialistId = star.specialistId == null ? null : +star.specialistId;
 
@@ -45,6 +46,7 @@ export default class CustomMapService {
           this._checkStarProperty(star, 'isAsteroidField', 'boolean', true);
           this._checkStarProperty(star, 'isBinaryStar', 'boolean', true);
           this._checkStarProperty(star, 'isBlackHole', 'boolean', true);
+          this._checkStarProperty(star, 'isPulsar', 'boolean', true);
           this._checkStarProperty(star, 'wormHoleToStarId', 'number', true);
           this._checkStarProperty(star, 'homeStar', 'boolean', true);
           this._checkStarProperty(star, 'specialistId', 'number', true);
@@ -60,6 +62,7 @@ export default class CustomMapService {
             isAsteroidField: star.isAsteroidField,
             isBinaryStar: star.isBinaryStar,
             isBlackHole: star.isBlackHole,
+            isPulsar: star.isPulsar,
             wormHoleToStarId: star.wormHoleToStarId,
             specialistId: star.specialistId,
             location: {

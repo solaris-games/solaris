@@ -5,6 +5,9 @@
 
         <ul class="nav nav-tabs">
             <li class="nav-item">
+                <a class="nav-link" :class="{'active':activeTab=== 'empires'}" data-bs-toggle="tab" href="#empires">Empires</a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" :class="{'active':activeTab=== 'stars'}" data-bs-toggle="tab" href="#stars">Stars</a>
             </li>
             <li class="nav-item">
@@ -19,10 +22,17 @@
             <li class="nav-item">
                 <a class="nav-link" :class="{'active':activeTab === 'naturalResources'}" data-bs-toggle="tab" href="#naturalResources">Resources</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" :class="{'active':activeTab === 'technology'}" data-bs-toggle="tab" href="#technology">Technology</a>
+            </li>
         </ul>
     </div>
 
     <div class="tab-content pt-2 pb-2">
+        <div class="tab-pane fade" :class="{'show active':activeTab=== 'empires'}" id="empires">
+            <empires-table
+              @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        </div>
         <div class="tab-pane fade" :class="{'show active':activeTab=== 'stars'}" id="stars">
             <stars-table
               @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
@@ -44,6 +54,10 @@
             <natural-resources-table
               @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
         </div>
+        <div class="tab-pane fade" :class="{'show active':activeTab=== 'technology'}" id="technology">
+            <technology-table
+              @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        </div>
     </div>
 </div>
 </template>
@@ -55,6 +69,8 @@ import CarriersTableVue from './CarriersTable'
 import ShipsTableVue from './ShipsTable'
 import CapitalsTableVue from './CapitalsTable'
 import NaturalResourcesTableVue from './NaturalResourcesTable'
+import EmpiresTableVue from './EmpiresTable'
+import TechnologyTableVue from './TechnologyTable'
 
 export default {
   components: {
@@ -63,7 +79,9 @@ export default {
     'carriers-table': CarriersTableVue,
     'ships-table': ShipsTableVue,
     'capitals-table': CapitalsTableVue,
-    'natural-resources-table': NaturalResourcesTableVue
+    'natural-resources-table': NaturalResourcesTableVue,
+    'empires-table': EmpiresTableVue,
+    'technology-table': TechnologyTableVue
   },
   props: {
     'tab': String
@@ -74,7 +92,7 @@ export default {
     }
   },
   mounted () {
-    this.activeTab = this.tab || 'stars'
+    this.activeTab = this.tab || 'empires'
   },
   methods: {
     onCloseRequested (e) {
@@ -85,6 +103,9 @@ export default {
     },
     onOpenCarrierDetailRequested (e) {
       this.$emit('onOpenCarrierDetailRequested', e)
+    },
+    onOpenPlayerDetailRequested (e) {
+      this.$emit('onOpenPlayerDetailRequested', e)
     }
   }
 }

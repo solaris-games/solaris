@@ -2,15 +2,18 @@ import { DBObjectId } from "./types/DBObjectId";
 import Repository from "./repository";
 import { User } from "./types/User";
 import GuildService from "./guild";
+import UserLevelService from "./userLevel";
 
 export default class AchievementService {
     
     userRepo: Repository<User>;
     guildService: GuildService;
+    userLevelService: UserLevelService;
 
-    constructor(userRepo: Repository<User>, guildService: GuildService) {
+    constructor(userRepo: Repository<User>, guildService: GuildService, userLevelService: UserLevelService) {
         this.userRepo = userRepo;
         this.guildService = guildService;
+        this.userLevelService = userLevelService;
     }
 
     async getAchievements(id: DBObjectId) {
@@ -24,6 +27,10 @@ export default class AchievementService {
             'roles.communityManager': 1,
             'roles.gameMaster': 1
         });
+
+        if (user) {
+            user.level = this.userLevelService.getByRankPoints(user.achievements.rank);
+        }
 
         if (user && user.guildId) {
             return {

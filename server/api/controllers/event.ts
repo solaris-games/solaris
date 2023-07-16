@@ -1,31 +1,20 @@
 import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
 
-export default (container: DependencyContainer, io) => {
+export default (container: DependencyContainer) => {
     return {
         list: async (req, res, next) => {
-            let startTick = +req.query.startTick || 0;
+            let page = +req.query.page || 0;
+            let pageSize = +req.query.pageSize ?? 10;
+            let category = req.query.category || 'all';
             
             try {
                 let events = await container.eventService.getPlayerEvents(
                     req.game._id,
                     req.player,
-                    startTick
-                );
-    
-                return res.status(200).json(events);
-            } catch (err) {
-                return next(err);
-            }
-        },
-        listTrade: async (req, res, next) => {
-            let startTick = +req.query.startTick || 0;
-            
-            try {
-                let events = await container.eventService.getPlayerTradeEvents(
-                    req.game,
-                    req.player,
-                    startTick
+                    page,
+                    pageSize,
+                    category
                 );
     
                 return res.status(200).json(events);

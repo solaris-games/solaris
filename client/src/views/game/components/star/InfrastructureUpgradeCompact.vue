@@ -1,21 +1,21 @@
 <template>
   <div class="row bg-dark pt-2 pb-2" v-if="userPlayer">
     <div class="col pe-0">
-      <button class="btn btn-sm me-1"
+      <button class="btn btn-sm me-1" v-if="economy != null"
               :class="{'btn-success': availableCredits >= economy, 'btn-primary': availableCredits < economy}"
               :disabled="$isHistoricalMode() || isUpgradingEconomy || availableCredits < economy || isGameFinished"
               @click="upgradeEconomy"
               title="Upgrade economic infrastructure">
         <i class="fas fa-money-bill-wave me-1"></i>${{economy}}
       </button>
-      <button class="btn btn-sm me-1"
+      <button class="btn btn-sm me-1" v-if="industry != null"
               :class="{'btn-success': availableCredits >= industry, 'btn-primary': availableCredits < industry}"
               :disabled="$isHistoricalMode() || isUpgradingIndustry || availableCredits < industry || isGameFinished"
               @click="upgradeIndustry"
               title="Upgrade industrial infrastructure">
         <i class="fas fa-tools me-1"></i>${{industry}}
       </button>
-      <button class="btn btn-sm"
+      <button class="btn btn-sm" v-if="science != null"
               :class="{'btn-success': availableCredits >= science, 'btn-primary': availableCredits < science}"
               :disabled="$isHistoricalMode() || isUpgradingScience || availableCredits < science || isGameFinished"
               @click="upgradeScience"
@@ -71,6 +71,11 @@ export default {
       this.$emit('onBuildCarrierRequested', this.star._id)
     },
     async upgradeEconomy (e) {
+      if (this.$store.state.settings.star.confirmBuildEconomy === 'enabled' 
+        && !await this.$confirm('Upgrade Economy', `Are you sure you want to upgrade Economy at ${this.star.name} for $${this.star.upgradeCosts.economy} credits?`)) {
+        return
+      }
+
       try {
         this.isUpgradingEconomy = true
 
@@ -90,6 +95,11 @@ export default {
       this.isUpgradingEconomy = false
     },
     async upgradeIndustry (e) {
+      if (this.$store.state.settings.star.confirmBuildIndustry === 'enabled' 
+        && !await this.$confirm('Upgrade Industry', `Are you sure you want to upgrade Industry at ${this.star.name} for $${this.star.upgradeCosts.industry} credits?`)) {
+        return
+      }
+
       try {
         this.isUpgradingIndustry = true
 
@@ -109,6 +119,11 @@ export default {
       this.isUpgradingIndustry = false
     },
     async upgradeScience (e) {
+      if (this.$store.state.settings.star.confirmBuildScience === 'enabled' 
+        && !await this.$confirm('Upgrade Science', `Are you sure you want to upgrade Science at ${this.star.name} for $${this.star.upgradeCosts.science} credits?`)) {
+        return
+      }
+
       try {
         this.isUpgradingScience = true
 

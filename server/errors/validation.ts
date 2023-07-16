@@ -1,5 +1,5 @@
 export default class ValidationError extends Error {
-    statusCode: Number;
+    statusCode: number;
 
     constructor(err: string | string[], statusCode?: number) {
         super(err as any);

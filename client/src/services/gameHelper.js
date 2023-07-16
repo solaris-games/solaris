@@ -60,7 +60,7 @@ class GameHelper {
   }
 
   getCarrierOrbitingStar (game, carrier) {
-    return game.galaxy.stars.find(x => x._id === carrier.orbiting)
+    return game.galaxy.stars.find(x => x._id === carrier.orbiting) || null
   }
 
   getCarriersOrbitingStar (game, star) {
@@ -84,15 +84,7 @@ class GameHelper {
   }
 
   getHyperspaceDistance (game, player, carrier) {
-    let techLevel = player.research.hyperspace.level
-
-    if (carrier.specialist && carrier.specialist.modifiers.local) {
-      techLevel += carrier.specialist.modifiers.local.hyperspace || 0
-    }
-
-    techLevel = Math.max(1, techLevel)
-
-    return ((techLevel || 1) + 1.5) * game.constants.distances.lightYear
+    return ((carrier.effectiveTechs.hyperspace || 1) + 1.5) * game.constants.distances.lightYear
   }
 
   getScanningLevelByDistance (game, distance) {
@@ -163,7 +155,6 @@ class GameHelper {
     let tickDistance = game.settings.specialGalaxy.carrierSpeed * tickDistanceModifier
 
     // Factor in any local speed modifers
-    // TODO: Global speed modifiers.
     if (carrier && carrier.specialist && carrier.specialist.modifiers.local) {
       tickDistance *= carrier.specialist.modifiers.local.speed || 1
     }
@@ -171,15 +162,43 @@ class GameHelper {
     for (let i = 1; i < locs.length; i++) {
       let prevLoc = locs[i - 1]
       let currLoc = locs[i]
+      let distance = this.getDistanceBetweenLocations(prevLoc.location, currLoc.location)
 
-      let distance = this.getDistanceBetweenLocations(prevLoc, currLoc)
+      let ticks
 
-      let ticks = Math.ceil(distance / tickDistance)
+      // Check for worm holes
+      if (prevLoc.type === 'star' && currLoc.type === 'star' && 
+        prevLoc.object.wormHoleToStarId === currLoc.object._id && currLoc.object.wormHoleToStarId === prevLoc.object._id) {
+        ticks = 1
+      } else {
+        ticks = Math.ceil(distance / tickDistance)
+      }
 
       totalTicks += ticks
     }
 
     return totalTicks
+  }
+
+  getActualTicksBetweenLocations (game, player, carrier, sourceStar, destinationStar, hyperspaceDistance) {
+    const instantSpeed = this.isStarPairWormHole(sourceStar, destinationStar)
+
+    if (instantSpeed) {
+      return 1 // 1 tick for worm hole pairs
+    }
+
+    // If the carrier is within hyperspace range and can travel at warp speed, then return the warp speed ticks
+    // otherwise return the normal speed
+    const distanceBetweenStars = this.getDistanceBetweenLocations(sourceStar.location, destinationStar.location)
+
+    const isInHyperspaceRange = distanceBetweenStars <= hyperspaceDistance
+    const canWarpSpeed = this.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar)
+    
+    if (isInHyperspaceRange && canWarpSpeed) {
+      return this.getTicksBetweenLocations(game, carrier, [sourceStar, destinationStar], game.constants.distances.warpSpeedMultiplier)
+    }
+
+    return this.getTicksBetweenLocations(game, carrier, [sourceStar, destinationStar])
   }
 
   getTicksToProduction (game, currentTick, currentProductionTick) {
@@ -510,6 +529,10 @@ class GameHelper {
           (game.settings.specialGalaxy.darkGalaxy === 'start' && game.state.startDate == null)
   }
 
+  isDarkFogged (game) {
+    return game.settings.specialGalaxy.darkGalaxy === 'fog'
+  }
+
   isTradeEnabled (game) {
     return game.settings.player.tradeCredits || game.settings.player.tradeCreditsSpecialists || game.settings.player.tradeCost
   }
@@ -532,6 +555,10 @@ class GameHelper {
 
   isTutorialGame (game) {
     return game.settings.general.type === 'tutorial'
+  }
+
+  isSpectatingEnabled (game) {
+    return game.settings.general.spectators === 'enabled'
   }
 
   getGameStatusText (game) {
@@ -1013,13 +1040,17 @@ class GameHelper {
       '32_player_rt': '32 Players',
       'custom': 'Custom',
       'special_dark': 'Dark Galaxy',
+      'special_fog': 'Fogged Galaxy',
       'special_ultraDark': 'Ultra Dark Galaxy',
       'special_orbital': 'Orbital',
       'special_battleRoyale': 'Battle Royale',
       'special_homeStar': 'Capital Stars',
+      'special_homeStarElimination': 'Elimination',
       'special_anonymous': 'Anonymous',
       'special_kingOfTheHill': 'King Of The Hill',
-      'special_tinyGalaxy': 'Tiny Galaxy'
+      'special_tinyGalaxy': 'Tiny Galaxy',
+      'special_freeForAll': 'Free For All',
+      'special_arcade': 'Arcade'
     }[game.settings.general.type]
   }
 
@@ -1027,8 +1058,16 @@ class GameHelper {
     return ['new_player_rt', 'new_player_tb'].includes(game.settings.general.type)
   }
 
+  isCustomGame (game) {
+    return game.settings.general.type === 'custom'
+  }
+
   isFluxGame (game) {
     return game.settings.general.fluxEnabled === 'enabled'
+  }
+
+  isFeaturedGame (game) {
+    return game.settings.general.featured === true
   }
 
   getLedgerGameEventPlayerSummary (game, gameEvent) {
@@ -1058,6 +1097,10 @@ class GameHelper {
     }
 
     return result
+  }
+
+  isPopulationCapped(game) {
+    return game.settings.player.populationCap.enabled === 'enabled'
   }
 }
 

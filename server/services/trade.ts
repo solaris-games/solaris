@@ -10,13 +10,25 @@ import { TradeEvent, TradeEventTechnology, TradeTechnology } from './types/Trade
 import AchievementService from './achievement';
 import GameTypeService from './gameType';
 import DiplomacyService from './diplomacy';
-import LedgerService from './ledger';
+import LedgerService, { LedgerType } from './ledger';
 import PlayerService from './player';
 import ReputationService from './reputation';
 import UserService from './user';
 import { User } from './types/User';
 import RandomService from './random';
 import PlayerCreditsService from './playerCredits';
+import PlayerAfkService from './playerAfk';
+
+export const TradeServiceEvents = {
+    onPlayerCreditsReceived: 'onPlayerCreditsReceived',
+    onPlayerCreditsSent: 'onPlayerCreditsSent',
+    onPlayerCreditsSpecialistsReceived: 'onPlayerCreditsSpecialistsReceived',
+    onPlayerCreditsSpecialistsSent: 'onPlayerCreditsSpecialistsSent',
+    onPlayerRenownReceived: 'onPlayerRenownReceived',
+    onPlayerRenownSent: 'onPlayerRenownSent',
+    onPlayerTechnologyReceived: 'onPlayerTechnologyReceived',
+    onPlayerTechnologySent: 'onPlayerTechnologySent'
+}
 
 export default class TradeService extends EventEmitter {
     gameRepo: Repository<Game>;
@@ -30,6 +42,7 @@ export default class TradeService extends EventEmitter {
     gameTypeService: GameTypeService;
     randomService: RandomService;
     playerCreditsService: PlayerCreditsService;
+    playerAfkService: PlayerAfkService;
 
     constructor(
         gameRepo: Repository<Game>,
@@ -42,7 +55,8 @@ export default class TradeService extends EventEmitter {
         reputationService: ReputationService,
         gameTypeService: GameTypeService,
         randomService: RandomService,
-        playerCreditsService: PlayerCreditsService
+        playerCreditsService: PlayerCreditsService,
+        playerAfkService: PlayerAfkService
     ) {
         super();
 
@@ -57,6 +71,7 @@ export default class TradeService extends EventEmitter {
         this.gameTypeService = gameTypeService;
         this.randomService = randomService;
         this.playerCreditsService = playerCreditsService;
+        this.playerAfkService = playerAfkService;
     }
 
     isTradingCreditsDisabled(game: Game) {
@@ -104,7 +119,7 @@ export default class TradeService extends EventEmitter {
         this._tradeScanningCheck(game, fromPlayer, toPlayer);
 
         if (fromPlayer.credits < amount) {
-            throw new ValidationError(`You not own ${amount} credits.`);
+            throw new ValidationError(`You do not own ${amount} credits.`);
         }
 
         let dbWrites = [
@@ -114,7 +129,7 @@ export default class TradeService extends EventEmitter {
 
         await this.gameRepo.bulkWrite(dbWrites);
 
-        await this.ledgerService.addDebt(game, fromPlayer, toPlayer, amount);
+        await this.ledgerService.addDebt(game, fromPlayer, toPlayer, amount, LedgerType.Credits);
 
         if (!this.gameTypeService.isTutorialGame(game)) {
             if (fromPlayer.userId && !fromPlayer.defeated) {
@@ -142,8 +157,8 @@ export default class TradeService extends EventEmitter {
             date: moment().utc()
         };
 
-        this.emit('onPlayerCreditsReceived', eventObject);
-        this.emit('onPlayerCreditsSent', eventObject);
+        this.emit(TradeServiceEvents.onPlayerCreditsReceived, eventObject);
+        this.emit(TradeServiceEvents.onPlayerCreditsSent, eventObject);
 
         return eventObject;
     }
@@ -187,6 +202,8 @@ export default class TradeService extends EventEmitter {
 
         await this.gameRepo.bulkWrite(dbWrites);
 
+        await this.ledgerService.addDebt(game, fromPlayer, toPlayer, amount, LedgerType.CreditsSpecialists);
+
         if (!this.gameTypeService.isTutorialGame(game)) {
             if (fromPlayer.userId && !fromPlayer.defeated) {
                 await this.achievementService.incrementTradeCreditsSpecialistsSent(fromPlayer.userId, amount);
@@ -213,8 +230,8 @@ export default class TradeService extends EventEmitter {
             date: moment().utc()
         };
 
-        this.emit('onPlayerCreditsSpecialistsReceived', eventObject);
-        this.emit('onPlayerCreditsSpecialistsSent', eventObject);
+        this.emit(TradeServiceEvents.onPlayerCreditsSpecialistsReceived, eventObject);
+        this.emit(TradeServiceEvents.onPlayerCreditsSpecialistsSent, eventObject);
 
         return eventObject;
     }
@@ -287,8 +304,8 @@ export default class TradeService extends EventEmitter {
             date: moment().utc()
         };
 
-        this.emit('onPlayerRenownReceived', eventObject);
-        this.emit('onPlayerRenownSent', eventObject);
+        this.emit(TradeServiceEvents.onPlayerRenownReceived, eventObject);
+        this.emit(TradeServiceEvents.onPlayerRenownSent, eventObject);
 
         return eventObject;
     }
@@ -327,7 +344,7 @@ export default class TradeService extends EventEmitter {
         }
 
         if (fromPlayer.credits < tradeTech.cost) {
-            throw new ValidationError('You cannot afford to trade this technology.');
+            throw new ValidationError(`You cannot afford to trade this technology.`);
         }
 
         let levelDifference = tradeTech.level - toPlayerTech.level;
@@ -355,7 +372,7 @@ export default class TradeService extends EventEmitter {
 
         await this.gameRepo.bulkWrite(dbWrites);
 
-        await this.ledgerService.addDebt(game, fromPlayer, toPlayer, tradeTech.cost);
+        await this.ledgerService.addDebt(game, fromPlayer, toPlayer, tradeTech.cost, LedgerType.Credits);
 
         if (!this.gameTypeService.isTutorialGame(game)) {
             // Need to assert that the trading players aren't controlled by AI
@@ -391,8 +408,8 @@ export default class TradeService extends EventEmitter {
             date: moment().utc()
         };
 
-        this.emit('onPlayerTechnologyReceived', eventObject);
-        this.emit('onPlayerTechnologySent', eventObject);
+        this.emit(TradeServiceEvents.onPlayerTechnologyReceived, eventObject);
+        this.emit(TradeServiceEvents.onPlayerTechnologySent, eventObject);
 
         return eventObject;
     }
@@ -495,7 +512,7 @@ export default class TradeService extends EventEmitter {
 
     async tryTradeBack(game: Game, fromPlayer: Player, toPlayer: Player, reputation: PlayerReputation) {
         // Note: Trade backs can only occur from AI to player
-        if (!fromPlayer.defeated) {
+        if (!this.playerAfkService.isAIControlled(game, fromPlayer, true)) {
             return;
         }
 

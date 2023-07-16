@@ -5,9 +5,14 @@ export interface Specialist {
     key: string;
     name: string;
     description: string;
+    active: {
+        official: boolean;
+        custom: boolean;
+    },
     baseCostCredits: number;
     baseCostCreditsSpecialists: number;
     oneShot: boolean;
+    expireTicks: number | null;
     modifiers: {
         local?: {
             speed?: number;
@@ -16,6 +21,18 @@ export interface Specialist {
             scanning?: number;
             manufacturing?: number;
             terraforming?: number;
+            carrierToCarrierCombat?: {
+                weapons?: number;
+            }
+            carrierToStarCombat?: {
+                attacker: {
+                    weapons?: number;
+                    weaponsPerAlly?: number;
+                }
+                defender: {
+                    weapons?: number;
+                }
+            }
         },
         special?: {
             hideShips?: boolean;
@@ -37,13 +54,8 @@ export interface Specialist {
             creditsPerTickByScience?: number;
             autoCarrierSpecialistAssign?: number;
             combatSwapWeaponsTechnology?: boolean;
-            defenderBonus: number;
-        },
-        carrierToCarrierCombat?: {
-            weapons: number;
-        },
-        carrierToStarCombat?: {
-            weapons: number;
+            defenderBonus?: number;
+            wormHoleConstructor?: boolean;
         }
     }
 };

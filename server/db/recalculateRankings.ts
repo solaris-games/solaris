@@ -45,15 +45,30 @@ async function startup() {
     console.log(`Resetting users...`);
     await container.userService.userRepo.updateMany({}, {
         $set: {
+            'achievements.level': 1,
             'achievements.rank': 0,
             'achievements.eloRating': null,
             'achievements.victories': 0,
+            'achievements.victories1v1': 0,
             'achievements.completed': 0,
             'achievements.quit': 0,
             'achievements.afk': 0,
             'achievements.defeated': 0,
+            'achievements.defeated1v1': 0,
             'achievements.joined': 0,
-            'achievements.badges.victor32': 0
+            'achievements.badges.victor32': 0,
+            'achievements.badges.special_dark': 0,
+            'achievements.badges.special_fog': 0,
+            'achievements.badges.special_ultraDark': 0,
+            'achievements.badges.special_orbital': 0,
+            'achievements.badges.special_battleRoyale': 0,
+            'achievements.badges.special_homeStar': 0,
+            'achievements.badges.special_homeStarElimination': 0,
+            'achievements.badges.special_anonymous': 0,
+            'achievements.badges.special_kingOfTheHill': 0,
+            'achievements.badges.special_tinyGalaxy': 0,
+            'achievements.badges.special_freeForAll': 0,
+            'achievements.badges.special_arcade': 0,
         }
     });
     console.log(`Done.`);
@@ -113,9 +128,29 @@ async function startup() {
             completedUserIds.forEach(c => incAchievement(c, 'completed'));
             defeatedUserIds.forEach(d => incAchievement(d, 'defeated'));
 
+            // Recalculate the final leaderboard state.
+            let leaderboard = container.leaderboardService.getGameLeaderboard(game).leaderboard;
+
+            game.state.leaderboard = leaderboard.map(l => l.player._id);
+
             // Recalculate rank and victories
             container.gameTickService._awardEndGameRank(game, users, false);
         }
+
+        let leaderboardWrites = games.map(game => {
+            return {
+                updateOne: {
+                    filter: {
+                        _id: game._id
+                    },
+                    update: {
+                        'state.leaderboard': game.state.leaderboard
+                    }
+                }
+            }
+        });
+
+        await container.gameService.gameRepo.bulkWrite(leaderboardWrites);
 
         page++;
 
@@ -131,15 +166,30 @@ async function startup() {
                     _id: user._id
                 },
                 update: {
+                    'achievements.level': user.achievements.level,
                     'achievements.rank': user.achievements.rank,
                     'achievements.eloRating': user.achievements.eloRating,
                     'achievements.victories': user.achievements.victories,
+                    'achievements.victories1v1': user.achievements.victories1v1,
                     'achievements.completed': user.achievements.completed,
                     'achievements.quit': user.achievements.quit,
                     'achievements.afk': user.achievements.afk,
                     'achievements.defeated': user.achievements.defeated,
+                    'achievements.defeated1v1': user.achievements.defeated1v1,
                     'achievements.joined': user.achievements.joined,
-                    'achievements.badges.victor32': user.achievements.badges['victor32']
+                    'achievements.badges.victor32': user.achievements.badges.victor32,
+                    'achievements.badges.special_dark': user.achievements.badges.special_dark,
+                    'achievements.badges.special_fog': user.achievements.badges.special_fog,
+                    'achievements.badges.special_ultraDark': user.achievements.badges.special_ultraDark,
+                    'achievements.badges.special_orbital': user.achievements.badges.special_orbital,
+                    'achievements.badges.special_battleRoyale': user.achievements.badges.special_battleRoyale,
+                    'achievements.badges.special_homeStar': user.achievements.badges.special_homeStar,
+                    'achievements.badges.special_homeStarElimination': user.achievements.badges.special_homeStarElimination,
+                    'achievements.badges.special_anonymous': user.achievements.badges.special_anonymous,
+                    'achievements.badges.special_kingOfTheHill': user.achievements.badges.special_kingOfTheHill,
+                    'achievements.badges.special_tinyGalaxy': user.achievements.badges.special_tinyGalaxy,
+                    'achievements.badges.special_freeForAll': user.achievements.badges.special_freeForAll,
+                    'achievements.badges.special_arcade': user.achievements.badges.special_arcade,
                 }
             }
         }

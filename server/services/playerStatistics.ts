@@ -6,26 +6,31 @@ import CarrierService from './carrier';
 import SpecialistService from './specialist';
 import StarService from './star';
 import TechnologyService from './technology';
+import { PlayerStatistics } from './types/Leaderboard';
+import ShipService from './ship';
 
 export default class PlayerStatisticsService {
     starService: StarService;
     carrierService: CarrierService;
     technologyService: TechnologyService;
     specialistService: SpecialistService;
+    shipService: ShipService;
 
     constructor(
         starService: StarService,
         carrierService: CarrierService,
         technologyService: TechnologyService,
-        specialistService: SpecialistService
+        specialistService: SpecialistService,
+        shipService: ShipService
     ) {
         this.starService = starService;
         this.carrierService = carrierService;
         this.technologyService = technologyService;
         this.specialistService = specialistService;
+        this.shipService = shipService;
     }
 
-    getStats(game: Game, player: Player) {
+    getStats(game: Game, player: Player): PlayerStatistics {
         let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
         let playerCarriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id);
 
@@ -44,7 +49,8 @@ export default class PlayerStatisticsService {
             totalStars: totalStars,
             totalHomeStars: totalHomeStars,
             totalCarriers: playerCarriers.length,
-            totalShips: this.calculateTotalShips(playerStars, playerCarriers),
+            totalShips: this.shipService.calculateTotalShips(playerStars, playerCarriers),
+            totalShipsMax: this.shipService.calculatePopulationCap(game, player._id)?.shipsMaximum || null,
             totalEconomy: this.calculateTotalEconomy(playerStars),
             totalIndustry: this.calculateTotalIndustry(playerStars),
             totalScience: this.calculateTotalScience(playerStars),
@@ -64,11 +70,6 @@ export default class PlayerStatisticsService {
 
     calculateTotalHomeStars(playerStars: Star[]) {
         return playerStars.filter(s => s.homeStar).length;
-    }
-
-    calculateTotalShips(ownedStars: Star[], ownedCarriers: Carrier[]) {
-        return ownedStars.reduce((sum, s) => sum + s.ships!, 0)
-            + ownedCarriers.reduce((sum, c) => sum + c.ships!, 0);
     }
 
     calculateTotalEconomy(playerStars: Star[]) {
@@ -105,15 +106,10 @@ export default class PlayerStatisticsService {
 
     calculateTotalManufacturing(game: Game, playerStars: Star[]) {
         // Calculate the manufacturing level for all of the stars the player owns.
-        playerStars.forEach(s => {
-            let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, s);
-            let ind = s.infrastructure?.industry ?? 0;
-
-            s.manufacturing = this.starService.calculateStarShipsByTicks(effectiveTechs.manufacturing, ind, 1, game.settings.galaxy.productionTicks)
-        });
-
-        let totalManufacturing = playerStars.reduce((sum, s) => sum + s.manufacturing!, 0);
-
+        const totalManufacturing = playerStars.reduce((sum, s) => {
+            return sum + this.shipService.calculateStarManufacturing(game, s);
+        }, 0);
+        
         return Math.round((totalManufacturing + Number.EPSILON) * 100) / 100
     }
 

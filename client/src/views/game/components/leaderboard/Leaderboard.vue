@@ -380,7 +380,7 @@ export default {
       return GameHelper.isTutorialGame(this.$store.state.game)
     },
     canReadyToQuit () {
-      return !GameHelper.isTutorialGame(this.$store.state.game)
+      return this.$store.state.game.settings.general.readyToQuit === 'enabled'
         && this.$store.state.game.state.startDate 
         && this.$store.state.game.state.productionTick
     }

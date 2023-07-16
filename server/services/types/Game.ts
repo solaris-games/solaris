@@ -15,13 +15,17 @@ export type GameType = 'tutorial'|
 'new_player_tb'|
 '32_player_rt'|
 'special_dark'|
+'special_fog'|
 'special_ultraDark'|
 'special_orbital'|
 'special_battleRoyale'|
 'special_homeStar'|
+'special_homeStarElimination' |
 'special_anonymous'|
 'special_kingOfTheHill'|
-'special_tinyGalaxy';
+'special_tinyGalaxy'|
+'special_freeForAll'|
+'special_arcade';
 
 export type GameMode = 'conquest'|'battleRoyale'|'kingOfTheHill';
 export type GamePlayerType = 'all'|'establishedPlayers';
@@ -36,13 +40,13 @@ export type GameAllianceUpkeepCost = 'none'|'cheap'|'standard'|'expensive';
 export type GameWarpgateCost = 'none'|'cheap'|'standard'|'expensive';
 export type GameSpecialistCost = 'none'|'standard'|'expensive'|'veryExpensive'|'crazyExpensive';
 export type GameSpecialistCurrency = 'credits'|'creditsSpecialists';
-export type GameDarkGalaxyMode = 'disabled'|'standard'|'extra'|'start';
+export type GameDarkGalaxyMode = 'disabled'|'fog'|'standard'|'extra'|'start';
 export type GameResourceDistribution = 'random'|'weightedCenter';
 export type GamePlayerDistribution = 'circular'|'random';
 export type GameVictoryCondition = 'starPercentage'|'homeStarPercentage';
 export type GameVictoryPercentage = 25|33|50|66|75|90|100;
-export type GameInfrastructureCost = 'cheap'|'standard'|'expensive';
-export type GameInfrastructureExpenseMultiplier = 'cheap'|'standard'|'expensive'|'crazyExpensive';
+export type GameInfrastructureCost = 'none'|'cheap'|'standard'|'expensive';
+export type GameInfrastructureExpenseMultiplier = 'none'|'cheap'|'standard'|'expensive'|'crazyExpensive';
 export type GameTradeCost = 0|5|15|25|50|100;
 export type GameTradeScanning = 'all'|'scanned';
 export type GameResearchCost = 'none'|'cheap'|'standard'|'expensive'|'veryExpensive'|'crazyExpensive';
@@ -81,7 +85,9 @@ export interface GameSettings {
 		fluxEnabled: GameSettingEnabledDisabled;
 		isGameAdmin?: boolean;
 		advancedAI: GameSettingEnabledDisabled;
-		flux?: GameFlux;
+		spectators: GameSettingEnabledDisabled;
+		flux?: GameFlux | null;
+		readyToQuit: GameSettingEnabledDisabled;
 	},
 	galaxy: {
 		galaxyType: GameGalaxyType;
@@ -101,6 +107,7 @@ export interface GameSettings {
 		randomAsteroidFields: number;
 		randomBlackHoles: number;
 		randomBinaryStars: number;
+		randomPulsars: number;
 		darkGalaxy: GameDarkGalaxyMode;
 		giftCarriers: GameSettingEnabledDisabled;
 		defenderBonus: GameSettingEnabledDisabled;
@@ -109,6 +116,7 @@ export interface GameSettings {
 		resourceDistribution: GameResourceDistribution;
 		playerDistribution: GamePlayerDistribution;
 		carrierSpeed: number;
+		starCaptureReward: GameSettingEnabledDisabled;
 		specialistBans: {
 			star: number[];
 			carrier: number[];
@@ -117,6 +125,7 @@ export interface GameSettings {
 	conquest: {
 		victoryCondition: GameVictoryCondition;
 		victoryPercentage: GameVictoryPercentage;
+		capitalStarElimination: GameSettingEnabledDisabled;
 	},
 	kingOfTheHill: {
 		productionCycles: number;
@@ -144,6 +153,10 @@ export interface GameSettings {
 		tradeCreditsSpecialists: boolean;
 		tradeCost: GameTradeCost;
 		tradeScanning: GameTradeScanning;
+		populationCap: {
+			enabled: GameSettingEnabledDisabled;
+			shipsPerStar: number;
+		}
   	},
 	diplomacy: {
 		enabled: GameSettingEnabledDisabled;
@@ -200,7 +213,14 @@ export interface GameUserNotification {
 	turnWaiting: boolean | null;
 	defeated: boolean | null;
 	afk: boolean | null;
+	position: number | null;
 };
+
+export interface GameSpectator {
+	_id: DBObjectId;
+	username: string;
+	playerIds: DBObjectId[];
+}
 
 export interface Game {
     _id: DBObjectId;
@@ -226,6 +246,7 @@ export interface Game {
 		starsForVictory: number;
 		players: number;
 		winner: DBObjectId | null;
+		leaderboard: DBObjectId[] | null;
 		cleaned: boolean;
 		openSlots?: number;
 	},
@@ -276,6 +297,7 @@ export interface Game {
 				cheap: number;
 				standard: number;
 				expensive: number;
+				crazyExpensive: number;
 			}
 		},
 		player: {

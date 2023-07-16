@@ -12,7 +12,13 @@ export interface PlayerColour {
     value: string;
 };
 
+
 export interface PlayerLedger {
+    credits: PlayerLedgerDebt[];
+    creditsSpecialists: PlayerLedgerDebt[];
+}
+
+export interface PlayerLedgerDebt {
     playerId: DBObjectId;
     debt: number;
 };
@@ -58,6 +64,7 @@ export interface Player {
     _id: DBObjectId;
     userId: DBObjectId | null;
     isRealUser?: boolean;
+    isAIControlled?: boolean;
     homeStarId: DBObjectId | null;
     alias: string;
     avatar: string | null;
@@ -87,15 +94,17 @@ export interface Player {
     hasSentTurnReminder: boolean;
     hasFilledAfkSlot: boolean;
     research: PlayerResearch,
-    ledger: PlayerLedger[],
+    ledger: PlayerLedger,
     reputations: PlayerReputation[],
     diplomacy: PlayerDiplomaticState[],
+    spectators: DBObjectId[];
     stats?: PlayerStatistics;
     isKingOfTheHill?: boolean;
     isInScanningRange?: boolean;
     currentResearchTicksEta?: number | null;
     nextResearchTicksEta?: number | null;
     aiState?: AiState | null;
+    hasPerspective?: boolean;
 };
 
 export interface PlayerColourShapeCombination {

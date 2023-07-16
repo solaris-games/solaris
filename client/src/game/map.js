@@ -109,6 +109,7 @@ class Map extends EventEmitter {
     this.waypoints = new Waypoints()
     this.waypoints.setup(game)
     this.waypoints.onWaypointCreatedHandler = this.waypoints.on('onWaypointCreated', this.onWaypointCreated.bind(this))
+    this.waypoints.onWaypointOutOfRangeHandler = this.waypoints.on('onWaypointOutOfRange', this.onWaypointOutOfRange.bind(this))
 
     this.waypointContainer.addChild(this.waypoints.container)
 
@@ -171,7 +172,8 @@ class Map extends EventEmitter {
     // Setup Chunks
     this._setupChunks()
 
-    this.tooltipLayer = new TooltipLayer(this.game)
+    this.tooltipLayer = new TooltipLayer()
+    this.tooltipLayer.setup(this.game)
     this.tooltipContainer.addChild(this.tooltipLayer.container)
   }
 
@@ -268,7 +270,6 @@ class Map extends EventEmitter {
 
   _setupChunks() {
     if(this.chunksContainer) {
-      console.log('resetting chunks')
       this.chunksContainer.removeChildren()
     }
 
@@ -425,6 +426,7 @@ class Map extends EventEmitter {
     this.background.draw(game, userSettings)
 
     this.waypoints.setup(game)
+    this.tooltipLayer.setup(game)
 
     this._setupChunks()
   }
@@ -882,6 +884,10 @@ class Map extends EventEmitter {
 
   onWaypointCreated (e) {
     this.emit('onWaypointCreated', e)
+  }
+
+  onWaypointOutOfRange (e) {
+    this.emit('onWaypointOutOfRange', e)
   }
 
   onRulerPointCreated (e) {

@@ -1,0 +1,52 @@
+[
+    {
+        "id": 1,
+        "name": "Ensign",
+        "rankPoints": 0
+    },
+    {
+        "id": 2,
+        "name": "Junior Lieutenant",
+        "rankPoints": 5
+    },
+    {
+        "id": 3,
+        "name": "Lieutenant",
+        "rankPoints": 10
+    },
+    {
+        "id": 4,
+        "name": "Lieutenant Commander",
+        "rankPoints": 20
+    },
+    {
+        "id": 5,
+        "name": "Commander",
+        "rankPoints": 40
+    },
+    {
+        "id": 6,
+        "name": "Captain",
+        "rankPoints": 80
+    },
+    {
+        "id": 7,
+        "name": "Lower Rear Admiral",
+        "rankPoints": 160
+    },
+    {
+        "id": 8,
+        "name": "Upper Rear Admiral",
+        "rankPoints": 320
+    },
+    {
+        "id": 9,
+        "name": "Vice Admiral",
+        "rankPoints": 640
+    },
+    {
+        "id": 10,
+        "name": "Admiral",
+        "rankPoints": 1280
+    }
+]

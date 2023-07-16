@@ -1,0 +1,30 @@
+use solaris;
+
+db.games.find({
+    'state.endDate': { $eq: null }
+}).forEach(game => {
+    for (let player of game.galaxy.players) {
+        let shouldUpdate = false;
+        if (player.credits % 1 != 0) {
+            player.credits = Math.floor(player.credits);
+            shouldUpdate = true;
+        }
+
+        if (player.creditsSpecialists % 1 != 0) {
+            player.creditsSpecialists = Math.floor(player.creditsSpecialists);
+            shouldUpdate = true;
+        }
+
+        if (shouldUpdate) {
+            db.games.updateOne({
+                _id: game._id,
+                'galaxy.players._id': player._id
+            }, {
+                $set: {
+                    'galaxy.players.$.credits': player.credits,
+                    'galaxy.players.$.creditsSpecialists': player.creditsSpecialists
+                }
+            })
+        }
+    }
+});

@@ -10,8 +10,8 @@
       <div class="col-auto">
         <h4 class="pt-2">
           <player-diplomatic-status-icon v-if="isFormalAlliancesEnabled" :toPlayerId="player._id" class="ms-2"/>
-          <i v-if="player.hasFilledAfkSlot && !player.afk" class="fas fa-user-friends ms-2" title="This player has filled an AFK slot and will be awarded 1.5x additional rank (minimum 1) when the game ends"></i>
-          <i class="fas fa-robot ms-2" v-if="player.defeated || !player.isRealUser" title="This player is AI Controlled"></i>
+          <i v-if="player.hasFilledAfkSlot && !player.afk" class="fas fa-user-friends ms-2" title="This player has filled an AFK slot and will be awarded 1.5x additional rank points (minimum 1) when the game ends"></i>
+          <i class="fas fa-robot ms-2" v-if="player.isAIControlled" title="This player is AI Controlled"></i>
           <span v-if="player.defeated" :title="getPlayerStatus(player)">
             <i v-if="!player.afk" class="fas fa-skull-crossbones ms-2" title="This player has been defeated"></i>
             <i v-if="player.afk" class="fas fa-user-clock ms-2" title="This player is AFK"></i>

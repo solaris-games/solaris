@@ -7,9 +7,9 @@
       <div v-if="!userPlayer && !gameIsJoinable">
         <sidebar-menu-item :menuState="MENU_STATES.LEADERBOARD" tooltip="Leaderboard (Q)" iconClass="fas fa-users" />
       </div>
+      <sidebar-menu-item :menuState="MENU_STATES.GALAXY" tooltip="Galaxy (G)" iconClass="fas fa-sun" />
       <div v-if="userPlayer">
         <sidebar-menu-item :menuState="MENU_STATES.LEADERBOARD" tooltip="Leaderboard (Q)" iconClass="fas fa-users" />
-        <sidebar-menu-item :menuState="MENU_STATES.GALAXY" tooltip="Galaxy (G)" iconClass="fas fa-sun" />
         <sidebar-menu-item :menuState="MENU_STATES.RESEARCH" tooltip="Research (R)" iconClass="fas fa-flask" />
         <sidebar-menu-item :menuState="MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE" tooltip="Bulk Upgrade (B)" iconClass="fas fa-money-bill" />
         <sidebar-menu-item v-if="isFormalAlliancesEnabled" :menuState="MENU_STATES.DIPLOMACY" tooltip="Diplomacy (D)" iconClass="fas fa-globe-americas" />

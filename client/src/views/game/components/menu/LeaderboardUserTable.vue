@@ -7,9 +7,9 @@
     <sortable-leaderboard v-if="leaderboard && !isLoading" class="mt-2" :leaderboard="leaderboard" :sortingKey="sortingKey" @sortingRequested="sortLeaderboard">
       <template v-slot:header="actions">
         <th style="width: 5%">#</th>
-        <th style="width: 30%">Player</th>
-        <th style="width: 30%" class="d-none d-md-table-cell">Guild</th>
-        <th style="width: 10%" class="text-end sortable-header col" :class="actions.getColumnClass('rank')" title="Total rank" @click="actions.sort('rank')">
+        <th style="width: 25%">Player</th>
+        <th style="width: 25%" class="d-none d-md-table-cell">Guild</th>
+        <th style="width: 20%" class="text-end sortable-header col" :class="actions.getColumnClass('rank')" title="Total rank" @click="actions.sort('rank')">
           <i v-if="actions.isActive('rank')" class="fas fa-chevron-down"></i>
           <i class="fas fa-star text-info"></i>
         </th>
@@ -39,7 +39,10 @@
               <span>{{player.guild.name}} [{{player.guild.tag}}]</span>
             </router-link>
           </td>
-          <td align="right" :class="getColumnClass('rank')">{{player.achievements.rank}}</td>
+          <td align="right" :class="getColumnClass('rank')">
+            {{player.achievements.rank}}
+            <img class="user-level-icon" :src="require(`../../../../assets/levels/${player.achievements.level}.png`)">
+          </td>
           <td align="right" :class="getColumnClass('victories')">{{player.achievements.victories}}</td>
           <td align="right" :class="getColumnClass('renown')">{{player.achievements.renown}}</td>
         </tr>
@@ -104,4 +107,7 @@ export default {
 </script>
 
 <style scoped>
+.user-level-icon {
+  height: 28px;
+}
 </style>

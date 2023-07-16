@@ -9,9 +9,9 @@
                             <i class="fas fa-user-graduate"></i>
                             <span class="ms-2">Tutorial</span>
                         </h5>
-                        <h6 class="card-title card-subtitle">
+                        <p class="card-title card-subtitle">
                             Learn to Play
-                        </h6>
+                        </p>
                     </div>
                     <div class="card-arrow">
                         <div class="card-arrow-top-left"></div>
@@ -33,11 +33,14 @@
                         <div class="row">
                             <div class="col"></div>
                             <div class="col-auto">
-                                <a href="https://discord.com/invite/v7PD33d" target="_blank" title="Discord" class="btn btn-success me-2">
+                                <a href="https://steamcommunity.com/app/1623930/discussions/" target="_blank" title="Forum" class="btn btn-info me-2 mb-1 float-end">
+                                    <i class="far fa-comments"></i>
+                                </a>
+                                <a href="https://discord.com/invite/v7PD33d" target="_blank" title="Discord" class="btn btn-success me-2 mb-1 float-end">
                                     <i class="fab fa-discord"></i> Discord
                                 </a>
-                                <a href="https://steamcommunity.com/app/1623930/discussions/" target="_blank" title="Forum" class="btn btn-info me-2">
-                                    <i class="far fa-comments"></i> Forum
+                                <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=2828060521" target="_blank" title="Getting Started" class="btn btn-outline-warning me-2 mb-1 float-end">
+                                    <i class="fas fa-handshake-angle"></i> Getting Started
                                 </a>
                             </div>
                         </div>
@@ -101,7 +104,6 @@ export default {
 }
 
 .card-subtitle {
-  font-size: 12px;
   position: absolute;
   bottom: 0;
   left: 0;

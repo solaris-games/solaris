@@ -2,7 +2,6 @@ import ValidationError from '../errors/validation';
 import { Game, GameSettings } from './types/Game';
 import AchievementService from './achievement';
 import ConversationService from './conversation';
-import GameService from './game';
 import GameCreateValidationService from './gameCreateValidation';
 import GameFluxService from './gameFlux';
 import GameListService from './gameList';
@@ -15,6 +14,8 @@ import PlayerService from './player';
 import SpecialistBanService from './specialistBan';
 import UserService from './user';
 import GameJoinService from './gameJoin';
+import SpecialStarBanService from './specialStarBan';
+import StarService from './star';
 
 const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
@@ -33,7 +34,9 @@ export default class GameCreateService {
     gameCreateValidationService: GameCreateValidationService;
     gameFluxService: GameFluxService;
     specialistBanService: SpecialistBanService;
+    specialStarBanService: SpecialStarBanService;
     gameTypeService: GameTypeService;
+    starService: StarService;
 
     constructor(
         gameModel,
@@ -50,7 +53,9 @@ export default class GameCreateService {
         gameCreateValidationService: GameCreateValidationService,
         gameFluxService: GameFluxService,
         specialistBanService: SpecialistBanService,
+        specialStarBanService: SpecialStarBanService,
         gameTypeService: GameTypeService,
+        starService: StarService
     ) {
         this.gameModel = gameModel;
         this.gameJoinService = gameJoinService;
@@ -66,7 +71,9 @@ export default class GameCreateService {
         this.gameCreateValidationService = gameCreateValidationService;
         this.gameFluxService = gameFluxService;
         this.specialistBanService = specialistBanService;
+        this.specialStarBanService = specialStarBanService;
         this.gameTypeService = gameTypeService;
+        this.starService = starService;
     }
 
     async create(settings: GameSettings) {
@@ -79,6 +86,7 @@ export default class GameCreateService {
         if (settings.general.createdByUserId && !isTutorial) {
             settings.general.type = 'custom'; // All user games MUST be custom type.
             settings.general.timeMachine = 'disabled'; // Time machine is disabled for user created games.
+            settings.general.featured = false // Stop any tricksters.
 
             // Prevent players from being able to create more than 1 game.
             let openGames = await this.gameListService.listOpenGamesCreatedByUser(settings.general.createdByUserId);
@@ -163,6 +171,7 @@ export default class GameCreateService {
             game.settings.specialGalaxy.randomAsteroidFields = 0;
             game.settings.specialGalaxy.randomBinaryStars = 0;
             game.settings.specialGalaxy.randomBlackHoles = 0;
+            game.settings.specialGalaxy.randomPulsars = 0;
         }
 
         // Clamp max alliances if its invalid (minimum of 1)
@@ -179,14 +188,31 @@ export default class GameCreateService {
             this.gameFluxService.applyCurrentFlux(game);
         }
 
-        // Apply spec bans if applicable.
-        if (game.settings.specialGalaxy.specialistCost !== 'none' && isOfficialGame && !isNewPlayerGame && !isTutorial) {
-            const banAmount = game.constants.specialists.monthlyBanAmount; // Random X specs of each type.
+        const canApplyBans = isOfficialGame && !isNewPlayerGame && !isTutorial;
 
-            game.settings.specialGalaxy.specialistBans = {
-                star: this.specialistBanService.getCurrentMonthStarBans(banAmount).map(s => s.id),
-                carrier: this.specialistBanService.getCurrentMonthCarrierBans(banAmount).map(s => s.id)
-            };
+        if (canApplyBans) {
+            // Apply spec bans if applicable.
+            if (game.settings.specialGalaxy.specialistCost !== 'none') {
+                const banAmount = game.constants.specialists.monthlyBanAmount; // Random X specs of each type.
+
+                const starBans = this.specialistBanService.getCurrentMonthStarBans(banAmount).map(s => s.id);
+                const carrierBans = this.specialistBanService.getCurrentMonthCarrierBans(banAmount).map(s => s.id);
+
+                // Append bans to any existing ones configured.
+                game.settings.specialGalaxy.specialistBans = {
+                    star: [...new Set(game.settings.specialGalaxy.specialistBans.star.concat(starBans))],
+                    carrier: [...new Set(game.settings.specialGalaxy.specialistBans.carrier.concat(carrierBans))]
+                };
+            }
+
+            // Apply special star bans
+            const specialStarBans = this.specialStarBanService.getCurrentMonthBans().specialStar;
+
+            for (let specialStarBan of specialStarBans) {
+                if (game.settings.specialGalaxy[specialStarBan.id] != null) {
+                    game.settings.specialGalaxy[specialStarBan.id] = 0;
+                }
+            }
         }
 
         // Create all of the stars required.
@@ -203,6 +229,8 @@ export default class GameCreateService {
         game.galaxy.stars = starGeneration.stars;
         game.galaxy.homeStars = starGeneration.homeStars;
         game.galaxy.linkedStars = starGeneration.linkedStars;
+
+        this.starService.setupStarsForGameStart(game);
         
         // Setup players and assign to their starting positions.
         game.galaxy.players = this.playerService.createEmptyPlayers(game);

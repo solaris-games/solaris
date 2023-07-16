@@ -1,7 +1,7 @@
 import { DependencyContainer } from '../../services/types/DependencyContainer';
-import { mapToStarAbandonStarRequest, mapToStarBuildCarrierRequest, mapToStarDestroyInfrastructureRequest, mapToStarGarrisonAllShipsRequest, mapToStarSetBulkIgnoreAllStatusRequest, mapToStarToggleBulkIgnoreStatusRequest, mapToStarUpgradeInfrastructureBulkRequest, mapToStarUpgradeInfrastructureRequest, StarUpgradeInfrastructureRequest } from '../requests/star';
+import { mapToStarAbandonStarRequest, mapToStarBuildCarrierRequest, mapToStarDestroyInfrastructureRequest, mapToStarSetBulkIgnoreAllStatusRequest, mapToStarToggleBulkIgnoreStatusRequest, mapToStarUpgradeInfrastructureBulkRequest, mapToStarUpgradeInfrastructureRequest, StarUpgradeInfrastructureRequest } from '../requests/star';
 
-export default (container: DependencyContainer, io) => {
+export default (container: DependencyContainer) => {
     return {
         upgradeEconomy: async (req, res, next) => {
             try {
@@ -122,12 +122,22 @@ export default (container: DependencyContainer, io) => {
         },
         garrisonAllShips: async (req, res, next) => {
             try {
-                const reqObj = mapToStarGarrisonAllShipsRequest(req.body);
-                
                 let report = await container.shipTransferService.garrisonAllShips(
                     req.game,
                     req.player,
-                    reqObj.starId);
+                    req.params.starId);
+    
+                return res.status(200).json(report);
+            } catch (err) {
+                return next(err);
+            }
+        },
+        distributeAllShips: async (req, res, next) => {
+            try {                
+                let report = await container.shipTransferService.distributeAllShips(
+                    req.game,
+                    req.player,
+                    req.params.starId);
     
                 return res.status(200).json(report);
             } catch (err) {

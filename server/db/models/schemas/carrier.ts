@@ -11,6 +11,7 @@ const schema = new Schema({
     name: { type: Types.String, required: true },
     ships: { type: Types.Number, required: true },
     specialistId: { type: Types.Number, required: false, default: null },
+    specialistExpireTick: { type: Types.Number, required: false, default: null },
     isGift: { type: Types.Boolean, required: false, default: false },
     location: {
         x: { type: Types.Number, required: true },

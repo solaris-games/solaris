@@ -1,7 +1,8 @@
 use solaris;
 
 let userId = db.games.findOne({
-    'galaxy.players._id': ObjectId('<player id>')
+    _id: ObjectId(''),
+    'galaxy.players.alias': ''
 }, {
     'galaxy.players.$': 1
 }).galaxy.players[0].userId;

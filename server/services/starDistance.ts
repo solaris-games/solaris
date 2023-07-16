@@ -108,6 +108,13 @@ export default class StarDistanceService {
         return this.getClosestUnownedStarsFromLocation(location, stars, 1)[0];
     }
 
+    getStarsWithinRadiusOfStar(star: Star, stars: Star[], radius: number) {
+        let nearby = stars
+            .filter(s => (s._id !== star._id) && (this.getDistanceBetweenStars(star, s) <= radius))
+        
+        return nearby;
+    }
+
     isStarTooClose(game: Game, star: Star, otherStar: Star) {
         return this.isStarLocationTooClose(game, star.location, otherStar);
     }

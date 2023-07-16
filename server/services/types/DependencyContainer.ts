@@ -16,7 +16,6 @@ import ConversationService from "../conversation";
 import DiplomacyService from "../diplomacy";
 import DiplomacyUpkeepService from "../diplomacyUpkeep";
 import DistanceService from "../distance";
-import DonateService from "../donate";
 import EmailService from "../email";
 import EventService from "../event";
 import GameService from "../game";
@@ -36,10 +35,11 @@ import LeaderboardService from "../leaderboard";
 import LedgerService from "../ledger";
 import MapService from "../map";
 import NameService from "../name";
-import OrbitalMechanicsService from "../orbitalMechanics";
+import StarMovementService from "../starMovement";
 import PasswordService from "../password";
 import PaypalService from "../paypal";
 import PlayerService from "../player";
+import PlayerAfkService from '../playerAfk'
 import PlayerCreditsService from "../playerCredits";
 import PlayerCycleRewardsService from "../playerCycleRewards";
 import PlayerReadyService from "../playerReady";
@@ -64,7 +64,10 @@ import UserService from "../user";
 import WaypointService from "../waypoint";
 import NotificationService from "../notification";
 import DiscordService from "../discord";
-import BasicAIService from "../basicAi";
+import UserLevelService from "../userLevel";
+import SpecialStarBanService from "../specialStarBan";
+import ShipService from "../ship";
+import SpectatorService from "../spectator";
 
 export interface DependencyContainer {
     config: Config,
@@ -92,6 +95,8 @@ export interface DependencyContainer {
     guildUserService: UserGuildService,
     mapService: MapService,
     playerService: PlayerService,
+    playerAfkService: PlayerAfkService,
+    userLevelService: UserLevelService,
     playerReadyService: PlayerReadyService,
     randomService: RandomService,
     researchService: ResearchService,
@@ -109,17 +114,16 @@ export interface DependencyContainer {
     specialistService: SpecialistService,
     specialistBanService: SpecialistBanService,
     specialistHireService: SpecialistHireService,
+    specialStarBanService: SpecialStarBanService;
     achievementService: AchievementService,
     conversationService: ConversationService,
     reputationService: ReputationService,
-    basicAiService: BasicAIService,
     aiService: AIService,
     battleRoyaleService: BattleRoyaleService,
-    orbitalMechanicsService: OrbitalMechanicsService,
+    starMovementService: StarMovementService,
     cacheService: CacheService,
     recaptchaService: RecaptchaService,
     ratingService: RatingService,
-    donateService: DonateService,
     diplomacyService: DiplomacyService,
     avatarService: AvatarService,
     paypalService: PaypalService,
@@ -134,4 +138,6 @@ export interface DependencyContainer {
     starContestedService: StarContestedService,
     gameFluxService: GameFluxService,
     notificationService: NotificationService,
+    shipService: ShipService,
+    spectatorService: SpectatorService,
 };

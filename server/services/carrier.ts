@@ -89,6 +89,7 @@ export default class CarrierService extends EventEmitter {
             waypoints: [],
             waypointsLooped: false,
             specialistId: null,
+            specialistExpireTick: null,
             specialist: null,
             isGift: false,
             locationNext: null,
@@ -106,9 +107,7 @@ export default class CarrierService extends EventEmitter {
             let starSpecialist = this.specialistService.getByIdStar(star.specialistId);
     
             if (starSpecialist?.modifiers.special?.autoCarrierSpecialistAssign) {
-                // @ts-ignore
                 carrier.specialistId = starSpecialist.modifiers.special!.autoCarrierSpecialistAssign!;
-                // @ts-ignore
                 carrier.specialist = this.specialistService.getByIdCarrier(carrier.specialistId)
             }
         }
@@ -120,8 +119,18 @@ export default class CarrierService extends EventEmitter {
         return carriers.filter(s => s.ownedByPlayerId && s.ownedByPlayerId.toString() === playerId.toString());
     }
 
+    listCarriersOwnedByPlayers(carriers: Carrier[], playerIds: DBObjectId[]) {
+        const ids = playerIds.map(p => p.toString());
+
+        return carriers.filter(s => s.ownedByPlayerId && ids.includes(s.ownedByPlayerId.toString()));
+    }
+
     listCarriersOwnedByPlayerInOrbit(carriers: Carrier[], playerId: DBObjectId) {
         return this.listCarriersOwnedByPlayer(carriers, playerId).filter(c => c.orbiting);
+    }
+
+    listCarriersOwnedByPlayersInOrbit(carriers: Carrier[], playerIds: DBObjectId[]) {
+        return this.listCarriersOwnedByPlayers(carriers, playerIds).filter(c => c.orbiting);
     }
 
     generateCarrierName(star: Star, carriers: Carrier[]) {
@@ -153,20 +162,22 @@ export default class CarrierService extends EventEmitter {
         return carriersInRange;
     }
 
-    filterCarriersByScanningRange(game: Game, player: Player) {
+    filterCarriersByScanningRange(game: Game, playerIds: DBObjectId[]) {
+        const ids = playerIds.map(p => p.toString());
+
         // Stars may have different scanning ranges independently so we need to check
         // each star to check what is within its scanning range.
-        let playerStars = this.starService.listStarsWithScanningRangeByPlayer(game, player._id);
+        let playerStars = this.starService.listStarsWithScanningRangeByPlayers(game, playerIds);
 
         // Start with all of the carriers that the player owns as
         // the player can always see those carriers.
         let carriersInRange: DBObjectId[] = game.galaxy.carriers
-            .filter(c => c.ownedByPlayerId!.toString() === player._id.toString())
+            .filter(c => ids.includes(c.ownedByPlayerId!.toString()))
             .map(c => c._id);
 
         // We need to check all carriers NOT owned by the player.
         let carriersToCheck = game.galaxy.carriers
-            .filter(c => c.ownedByPlayerId!.toString() !== player._id.toString())
+            .filter(c => !ids.includes(c.ownedByPlayerId!.toString()))
             .map(c => {
                 return {
                     _id: c._id,
@@ -194,12 +205,14 @@ export default class CarrierService extends EventEmitter {
         return carriersInRange.map(c => this.getById(game, c));
     }
 
-    sanitizeCarriersByPlayer(game: Game, player: Player) {
+    sanitizeCarriersByPlayers(game: Game, playerIds: DBObjectId[]) {
+        const ids = playerIds.map(p => p.toString());
+
         // Filter all waypoints (except those in transit) for all carriers that do not belong
         // to the player.
         return game.galaxy.carriers
         .map(c => {
-            if (c.ownedByPlayerId!.toString() === player._id.toString()) {
+            if (ids.includes(c.ownedByPlayerId!.toString())) {
                 return c;
             }
 
@@ -215,6 +228,7 @@ export default class CarrierService extends EventEmitter {
                 waypoints: c.waypoints,
                 isGift: c.isGift,
                 specialistId: c.specialistId,
+                specialistExpireTick: c.specialistExpireTick,
                 specialist: null
             };
 
@@ -327,8 +341,9 @@ export default class CarrierService extends EventEmitter {
         // TODO: Event?
     }
 
-    canPlayerSeeCarrierShips(game: Game, player: Player, carrier: Carrier) {
-        const isOwnedByPlayer = carrier.ownedByPlayerId!.toString() === player._id.toString();
+    canPlayersSeeCarrierShips(game: Game, playerIds: DBObjectId[], carrier: Carrier) {
+        const ids = playerIds.map(p => p.toString());
+        const isOwnedByPlayer = ids.includes(carrier.ownedByPlayerId!.toString());
 
         if (isOwnedByPlayer) {
             return true;
@@ -344,7 +359,7 @@ export default class CarrierService extends EventEmitter {
 
             // If the carrier has a hideShips spec and is not owned by the given player
             // then that player cannot see the carrier's ships.
-            if (specialist.modifiers.special && specialist.modifiers.special.hideShips) {
+            if (specialist && specialist.modifiers.special && specialist.modifiers.special.hideShips) {
                 return false;
             }
         }

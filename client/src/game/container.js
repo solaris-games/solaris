@@ -165,8 +165,8 @@ class GameContainer {
       .clampZoom({
         minWidth: 50,
         minHeight: 50,
-        maxWidth: Math.abs(this.starFieldLeft) + Math.abs(this.starFieldRight),
-        maxHeight: Math.abs(this.starFieldBottom) + Math.abs(this.starFieldTop)
+        maxWidth: (Math.abs(this.starFieldLeft) + Math.abs(this.starFieldRight)),
+        maxHeight: (Math.abs(this.starFieldBottom) + Math.abs(this.starFieldTop))
       })
 
     this.viewport.on('zoomed-end', this.onViewportZoomed.bind(this))

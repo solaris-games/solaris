@@ -1,11 +1,11 @@
 <template>
   <form @submit.prevent="handleSubmit">
     <div class="mb-2" v-if="!isLoading">
-        <input type="text" required="required" class="form-control" placeholder="Email" v-model="email" :disabled="isLoading"/>
+        <input id="email" ref="email" type="text" required="required" class="form-control" placeholder="Email" v-model="email" :disabled="isLoading"/>
     </div>
 
     <div class="mb-2" v-if="!isLoading">
-        <input type="password" required="required" class="form-control" placeholder="Password" v-model="password"  :disabled="isLoading"/>
+        <input id="password" ref="password" type="password" required="required" class="form-control" placeholder="Password" v-model="password"  :disabled="isLoading"/>
     </div>
 
     <loading-spinner :loading="isLoading"/>
@@ -77,8 +77,18 @@ export default {
       try {
         this.isLoading = true
 
+        // NOTE: This is a bodge to get around reported issues
+        // of the login form not working correctly, where the server
+        // responds with "Email address is required". Suspicion is that
+        // the v-model bindings aren't working correctly so falling back to $refs
+        const emailElem = this.$refs.email
+        const passwElem = this.$refs.password
+
+        let emailAddress = this.email || emailElem.value
+        let password = this.password || passwElem.value
+        
         // Call the login API endpoint
-        let response = await authService.login(this.email, this.password)
+        let response = await authService.login(emailAddress, password)
 
         if (response.status === 200) {
           this.$store.commit('setUserId', response.data._id)

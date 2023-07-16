@@ -1,7 +1,8 @@
+import { Flux } from "./types/Flux";
 import { Game } from "./types/Game";
 
 const moment = require('moment');
-const fluxes = require('../config/game/flux.json');
+const fluxes = require('../config/game/flux.json') as Flux[];
 
 export default class GameFluxService {
 
@@ -23,16 +24,16 @@ export default class GameFluxService {
         this.applyDecFlux
     ];
 
-    getCurrentFlux() {
+    getCurrentFlux(): Flux | null {
         return this.getFluxById(moment().utc().month() + 1);
     }
 
-    getFluxById(fluxId: number | null) {
+    getFluxById(fluxId: number | null): Flux | null {
         if (fluxId == null) {
             return null;
         }
 
-        return fluxes.find(f => f.id === fluxId);
+        return fluxes.find(f => f.id === fluxId)!;
     }
 
     applyCurrentFlux(game: Game) {
@@ -87,12 +88,13 @@ export default class GameFluxService {
 
     applySepFlux(game: Game) {
         // Faster production cycles
-        game.settings.galaxy.productionTicks -= Math.max(14, game.settings.galaxy.productionTicks - 6);
+        game.settings.galaxy.productionTicks = Math.max(14, game.settings.galaxy.productionTicks - 6);
     }
 
     applyOctFlux(game: Game) {
         // Increased spec bans
-        game.constants.specialists.monthlyBanAmount = this.SPECIALIST_BANS_FLUX;
+        // TODO: Why is this broken?
+        game.constants.specialists.monthlyBanAmount = 6; //this.SPECIALIST_BANS_FLUX;
     }
 
     applyNovFlux(game: Game) {

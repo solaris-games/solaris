@@ -70,7 +70,6 @@ class Star extends EventEmitter {
 
     this.isSelected = false
     this.isMouseOver = false
-    this.isInScanningRange = false // Default to false to  initial redraw
     this.zoomPercent = 100
     this.showIgnoreBulkUpgradeInfrastructure = false
 
@@ -104,11 +103,6 @@ class Star extends EventEmitter {
     return this._getStarCarriers().reduce((sum, c) => sum + (c.ships || 0), 0)
   }
 
-  _isInScanningRange () {
-    // These may be undefined, if so it means that they are out of scanning range.
-    return !(typeof this.data.infrastructure === 'undefined')
-  }
-
   setup (game, data, userSettings, players, carriers, lightYearDistance) {
     this.game = game
     this.data = data
@@ -140,6 +134,7 @@ class Star extends EventEmitter {
 
     this.drawKingOfTheHillCircle()
     this.drawWormHole()
+    this.drawPulsar()
     this.drawNebula()
     this.drawAsteroidField()
     this.drawTarget()
@@ -156,17 +151,13 @@ class Star extends EventEmitter {
     this.drawInfrastructure()
     this.drawInfrastructureBulkIgnored()
     this.drawDepth()
-
-    this.isInScanningRange = this._isInScanningRange()
   }
 
 
   drawStar () {
     this.container.removeChild(this.graphics_star)
 
-    let isInScanningRange = this._isInScanningRange()
-
-    if (isInScanningRange) {
+    if (this.data.isInScanningRange) {
       // ---- Binary stars ----
       if (this.isBinaryStar()) {
         if (this.hasBlackHole()) {
@@ -198,6 +189,36 @@ class Star extends EventEmitter {
     this.graphics_star.height = 24.0/2.0
 
     this.container.addChild(this.graphics_star)
+  }
+
+  drawPulsar () {
+    if(!this.isPulsar()) {
+      return
+    }
+
+    if (this.pulsarGraphics) {
+      this.container.removeChild(this.pulsarGraphics)
+      this.pulsarGraphics = null
+    }
+
+    let seed = this.data._id
+    Star.seededRNG.seed(seed)
+
+    let player = this._getStarPlayer()
+    let playerColour = player ? player.colour.value : 0xFFFFFF
+
+    this.pulsarGraphics = new PIXI.Graphics()
+    this.pulsarGraphics.zIndex = -1
+    this.pulsarGraphics.lineStyle(1, playerColour, 0.5)
+    this.pulsarGraphics.moveTo(0, -20)
+    this.pulsarGraphics.lineTo(0, 20)
+    this.pulsarGraphics.drawEllipse(-5, 0, 5, 5)
+    this.pulsarGraphics.drawEllipse(5, 0, 5, 5)
+    this.pulsarGraphics.drawEllipse(-8, 0, 8, 8)
+    this.pulsarGraphics.drawEllipse(8, 0, 8, 8)
+    this.pulsarGraphics.rotation = Star.seededRNG.random()*Math.PI*2.0
+
+    this.container.addChild(this.pulsarGraphics)
   }
 
   drawNebula () {
@@ -327,6 +348,10 @@ class Star extends EventEmitter {
     return this.data.isBinaryStar
   }
 
+  isPulsar () {
+    return this.data.isPulsar
+  }
+
   hasSpecialist () {
     return this.data.specialistId && this.data.specialistId > 0 && this.data.specialist
   }
@@ -378,7 +403,7 @@ class Star extends EventEmitter {
         planetGraphics.drawCircle(planetSize / 2, 0, planetSize)
         planetGraphics.endFill()
 
-        if (!this._isInScanningRange()) {
+        if (!this.data.isInScanningRange) {
           planetGraphics.alpha = 0.3
         }
 
@@ -505,7 +530,7 @@ class Star extends EventEmitter {
       let carriersOrbiting = this._getStarCarriers()
       let scramblers = carriersOrbiting.reduce( (sum, c ) => sum + (c.ships==null), 0 )
       let scrambler = this.data.ships == null
-      return ( (scramblers || scrambler) && this._isInScanningRange() )
+      return ((scramblers || scrambler) && this.data.isInScanningRange)
   }
 
   drawName () {
@@ -604,7 +629,7 @@ class Star extends EventEmitter {
     }
 
     if (!this.text_infrastructure) {
-      if (this.data.ownedByPlayerId && this._isInScanningRange()) {
+      if (this.data.ownedByPlayerId && this.data.infrastructure) {
         let displayInfrastructure = `${this.data.infrastructure.economy} ${this.data.infrastructure.industry} ${this.data.infrastructure.science}`
 
         let bitmapFont = {fontName: "chakrapetch", fontSize: 4}
@@ -647,25 +672,10 @@ class Star extends EventEmitter {
     // Get the player who owns the star.
     let player = this._getStarPlayer()
 
-    // Dead stars do not have scanning range unless they are black holes
-    if (!player || (this._isDeadStar() && !this.hasBlackHole())) { return }
+    // Dead stars do not have scanning range
+    if (!player || this._isDeadStar()) { return }
 
-    if (!player.research) { return }
-
-    // TODO: Use the game helper instead?
-    let techLevel = player.research.scanning.level
-
-    if (this.data.specialist && this.data.specialist.modifiers.local) {
-      techLevel += this.data.specialist.modifiers.local.scanning || 0
-    }
-
-    if (this.hasBlackHole()) {
-      techLevel += 3
-    }
-
-    techLevel = Math.max(1, techLevel)
-
-    let radius = ((techLevel || 1) + 1) * this.lightYearDistance
+    let radius = ((this.data.effectiveTechs.scanning || 1) + 1) * this.lightYearDistance
 
     this.graphics_scanningRange.lineStyle(1, 0xFFFFFF, 0.2)
     this.graphics_scanningRange.beginFill(player.colour.value, 0.075)
@@ -688,19 +698,8 @@ class Star extends EventEmitter {
     let player = this._getStarPlayer()
 
     if (!player) { return }
-
-    if (!player.research) { return }
     
-    // TODO: Use the game helper instead?
-    let techLevel = player.research.hyperspace.level
-
-    if (this.data.specialist && this.data.specialist.modifiers.local) {
-      techLevel += this.data.specialist.modifiers.local.hyperspace || 0
-    }
-
-    techLevel = Math.max(1, techLevel)
-
-    let radius = ((techLevel || 1) + 1.5) * this.lightYearDistance
+    let radius = ((this.data.effectiveTechs.hyperspace || 1) + 1.5) * this.lightYearDistance
 
     this.graphics_hyperspaceRange.lineStyle(1, 0xFFFFFF, 0.2)
     this.graphics_hyperspaceRange.beginFill(player.colour.value, 0.075)
@@ -816,22 +815,22 @@ class Star extends EventEmitter {
       }
     }
 
-    this.graphics_star.visible = !this.hasSpecialist() || this.hasBlackHole()
+    this.graphics_star.visible = !this.hasSpecialist() //|| this.hasBlackHole()
     this.graphics_hyperspaceRange.visible = this.isSelected
     this.graphics_scanningRange.visible = this.isSelected
 
     if (this.userSettings.map.naturalResources !== 'planets') {
       if (this.graphics_natural_resources_ring[lod]) {
-        this.graphics_natural_resources_ring[lod].visible = this._isInScanningRange() && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources
+        this.graphics_natural_resources_ring[lod].visible = this.data.isInScanningRange && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources
       }
     }
 
     if (this.text_name) this.text_name.visible = this.isSelected || this.zoomPercent >= Star.zoomLevelDefinitions.name
-    if (this.container_planets) this.container_planets.visible = this._isInScanningRange() && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources
+    if (this.container_planets) this.container_planets.visible = this.data.isInScanningRange && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources
     if (this.text_infrastructure) this.text_infrastructure.visible = this.isSelected || this.zoomPercent >= Star.zoomLevelDefinitions.infrastructure
 
     let small_ships = this.zoomPercent >= Star.zoomLevelDefinitions.name || this.isSelected
-    let visible_ships = !!(this.data.infrastructure && (this.isSelected || this.isMouseOver || this.zoomPercent >= Star.zoomLevelDefinitions.shipCount))
+    let visible_ships = !!(this.data.isInScanningRange && (this.isSelected || this.isMouseOver || this.zoomPercent >= Star.zoomLevelDefinitions.shipCount))
 
     if (this.text_ships_small) this.text_ships_small.visible = small_ships && visible_ships
     if (this.text_ships_big) this.text_ships_big.visible = !small_ships && visible_ships

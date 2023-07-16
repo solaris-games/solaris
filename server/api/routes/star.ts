@@ -1,234 +1,244 @@
 import { Router } from "express";
+import { ExpressJoiInstance } from "express-joi-validation";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import StarController from '../controllers/star';
+import { MiddlewareContainer } from "../middleware";
 
-import AuthMiddleware from '../middleware/auth';
-import CoreMiddleware from '../middleware/core';
-import GameMiddleware from '../middleware/game';
-import PlayerMiddleware from '../middleware/player';
-
-export default (router: Router, io, container: DependencyContainer) => {
-    const mwCore = CoreMiddleware();
-    const mwAuth = AuthMiddleware(container);
-    const mwGame = GameMiddleware(container);
-    const mwPlayer = PlayerMiddleware(container);
-
-    const controller = StarController(container, io);
+export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
+    const controller = StarController(container);
 
     router.put('/api/game/:gameId/star/upgrade/economy',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
+        mw.auth.authenticate(),
+        mw.game.loadGame({
             lean: true,
             settings: true,
             state: true,
             galaxy: true,
             constants: true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true,
             isNotFinished: true
         }),
-        mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        mw.player.loadPlayer,
+        mw.player.validatePlayerState({ isPlayerUndefeated: true }),
         controller.upgradeEconomy,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.put('/api/game/:gameId/star/upgrade/industry',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
+        mw.auth.authenticate(),
+        mw.game.loadGame({
             lean: true,
             settings: true,
             state: true,
             galaxy: true,
             constants: true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true,
             isNotFinished: true
         }),
-        mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        mw.player.loadPlayer,
+        mw.player.validatePlayerState({ isPlayerUndefeated: true }),
         controller.upgradeIndustry,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.put('/api/game/:gameId/star/upgrade/science',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
+        mw.auth.authenticate(),
+        mw.game.loadGame({
             lean: true,
             settings: true,
             state: true,
             galaxy: true,
             constants: true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true,
             isNotFinished: true
         }),
-        mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        mw.player.loadPlayer,
+        mw.player.validatePlayerState({ isPlayerUndefeated: true }),
         controller.upgradeScience,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.put('/api/game/:gameId/star/upgrade/bulk',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
+        mw.auth.authenticate(),
+        mw.game.loadGame({
             lean: true,
             settings: true,
             state: true,
             galaxy: true,
             constants: true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true,
             isNotFinished: true
         }),
-        mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        mw.player.loadPlayer,
+        mw.player.validatePlayerState({ isPlayerUndefeated: true }),
         controller.upgradeBulk,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.put('/api/game/:gameId/star/upgrade/bulkCheck',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
+        mw.auth.authenticate(),
+        mw.game.loadGame({
             lean: true,
             settings: true,
             state: true,
             galaxy: true,
             constants: true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true,
             isNotFinished: true
         }),
-        mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        mw.player.loadPlayer,
+        mw.player.validatePlayerState({ isPlayerUndefeated: true }),
         controller.upgradeBulkCheck,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.put('/api/game/:gameId/star/build/warpgate',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
+        mw.auth.authenticate(),
+        mw.game.loadGame({
             lean: true,
             settings: true,
             state: true,
             galaxy: true,
             constants: true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true,
             isNotFinished: true
         }),
-        mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        mw.player.loadPlayer,
+        mw.player.validatePlayerState({ isPlayerUndefeated: true }),
         controller.buildWarpGate,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.put('/api/game/:gameId/star/destroy/warpgate',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
+        mw.auth.authenticate(),
+        mw.game.loadGame({
             lean: true,
             settings: true,
             state: true,
             galaxy: true,
             constants: true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true,
             isNotFinished: true,
             isStarted: true
         }),
-        mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        mw.player.loadPlayer,
+        mw.player.validatePlayerState({ isPlayerUndefeated: true }),
         controller.destroyWarpGate,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.put('/api/game/:gameId/star/build/carrier',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
+        mw.auth.authenticate(),
+        mw.game.loadGame({
             lean: true,
             settings: true,
             state: true,
             galaxy: true,
             constants: true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true,
             isNotFinished: true
         }),
-        mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        mw.player.loadPlayer,
+        mw.player.validatePlayerState({ isPlayerUndefeated: true }),
         controller.buildCarrier,
-        mwCore.handleError);
+        mw.core.handleError);
 
-    router.put('/api/game/:gameId/star/transferall',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
+    router.put('/api/game/:gameId/star/:starId/transferall',
+        mw.auth.authenticate(),
+        mw.game.loadGame({
             lean: true,
             settings: true,
             state: true,
             galaxy: true,
             constants: true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true,
             isNotFinished: true
         }),
-        mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        mw.player.loadPlayer,
+        mw.player.validatePlayerState({ isPlayerUndefeated: true }),
         controller.garrisonAllShips,
-        mwCore.handleError);
+        mw.core.handleError);
+
+    router.put('/api/game/:gameId/star/:starId/distributeall',
+        mw.auth.authenticate(),
+        mw.game.loadGame({
+            lean: true,
+            settings: true,
+            state: true,
+            galaxy: true,
+            constants: true
+        }),
+        mw.game.validateGameState({
+            isUnlocked: true,
+            isNotFinished: true
+        }),
+        mw.player.loadPlayer,
+        mw.player.validatePlayerState({ isPlayerUndefeated: true }),
+        controller.distributeAllShips,
+        mw.core.handleError);
 
     router.put('/api/game/:gameId/star/abandon',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
+        mw.auth.authenticate(),
+        mw.game.loadGame({
             lean: false,
             settings: true,
             state: true,
             galaxy: true,
             constants: true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true,
             isInProgress: true
         }),
-        mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        mw.player.loadPlayer,
+        mw.player.validatePlayerState({ isPlayerUndefeated: true }),
         controller.abandon,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.put('/api/game/:gameId/star/toggleignorebulkupgrade',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
+        mw.auth.authenticate(),
+        mw.game.loadGame({
             lean: true,
             settings: true,
             state: true,
             galaxy: true,
             constants: true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true
         }),
-        mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        mw.player.loadPlayer,
+        mw.player.validatePlayerState({ isPlayerUndefeated: true }),
         controller.toggleBulkIgnore,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.put('/api/game/:gameId/star/toggleignorebulkupgradeall',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
+        mw.auth.authenticate(),
+        mw.game.loadGame({
             lean: true,
             settings: true,
             state: true,
             galaxy: true,
             constants: true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true
         }),
-        mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        mw.player.loadPlayer,
+        mw.player.validatePlayerState({ isPlayerUndefeated: true }),
         controller.toggleBulkIgnoreAll,
-        mwCore.handleError);
+        mw.core.handleError);
 
     return router;
 }

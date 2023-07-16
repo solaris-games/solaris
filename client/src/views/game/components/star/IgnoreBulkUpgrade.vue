@@ -1,22 +1,22 @@
 <template>
-    <div class="btn-group">
+    <div class="position-static btn-group" v-if="canIgnoreEconomy || canIgnoreIndustry || canIgnoreScience">
         <button class="btn btn-sm dropdown-toggle"
             :class="{'btn-danger':highlightIgnoredInfrastructure && getInfrastructureIgnoreStatus(highlightIgnoredInfrastructure),
                      'btn-outline-success':highlightIgnoredInfrastructure && !getInfrastructureIgnoreStatus(highlightIgnoredInfrastructure)}"
-            type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            type="button" data-bs-toggle="dropdown" data-boundary="viewport" aria-haspopup="true" aria-expanded="false">
             <i class="fas me-1" :class="{'fa-ban':isAllIgnored,'fa-check-double':isAllIncluded,'fa-check':!isAllIgnored && !isAllIncluded}"></i>
         </button>
         <div class="dropdown-menu">
             <h6 class="dropdown-header">Bulk Upgrade</h6>
-            <a class="dropdown-item" href="javascript:;" @click="toggleBulkIgnore('economy')">
+            <a class="dropdown-item" href="javascript:;" @click="toggleBulkIgnore('economy')" v-if="canIgnoreEconomy">
                 <i class="fas me-1" :class="{'fa-ban': getInfrastructureIgnoreStatus('economy'), 'fa-check': !getInfrastructureIgnoreStatus('economy')}"></i>
                 Economy
             </a>
-            <a class="dropdown-item" href="javascript:;" @click="toggleBulkIgnore('industry')">
+            <a class="dropdown-item" href="javascript:;" @click="toggleBulkIgnore('industry')" v-if="canIgnoreIndustry">
                 <i class="fas me-1" :class="{'fa-ban': getInfrastructureIgnoreStatus('industry'), 'fa-check': !getInfrastructureIgnoreStatus('industry')}"></i>
                 Industry
             </a>
-            <a class="dropdown-item" href="javascript:;" @click="toggleBulkIgnore('science')">
+            <a class="dropdown-item" href="javascript:;" @click="toggleBulkIgnore('science')" v-if="canIgnoreScience">
                 <i class="fas me-1" :class="{'fa-ban': getInfrastructureIgnoreStatus('science'), 'fa-check': !getInfrastructureIgnoreStatus('science')}"></i>
                 Science
             </a>
@@ -102,15 +102,24 @@ export default {
     star: function () {
       return GameHelper.getStarById(this.$store.state.game, this.starId)
     },
+    canIgnoreEconomy: function () {
+      return this.$store.state.game.settings.player.developmentCost.economy !== 'none'
+    },
+    canIgnoreIndustry: function () {
+      return this.$store.state.game.settings.player.developmentCost.industry !== 'none'
+    },
+    canIgnoreScience: function () {
+      return this.$store.state.game.settings.player.developmentCost.science !== 'none'
+    },
     isAllIgnored: function () {
-        return this.getInfrastructureIgnoreStatus('economy')
-            && this.getInfrastructureIgnoreStatus('industry')
-            && this.getInfrastructureIgnoreStatus('science')
+        return (!this.canIgnoreEconomy || this.getInfrastructureIgnoreStatus('economy'))
+            && (!this.canIgnoreIndustry || this.getInfrastructureIgnoreStatus('industry'))
+            && (!this.canIgnoreScience || this.getInfrastructureIgnoreStatus('science'))
     },
     isAllIncluded: function () {
-        return !this.getInfrastructureIgnoreStatus('economy')
-            && !this.getInfrastructureIgnoreStatus('industry')
-            && !this.getInfrastructureIgnoreStatus('science')
+        return (!this.canIgnoreEconomy || !this.getInfrastructureIgnoreStatus('economy'))
+            && (!this.canIgnoreIndustry || !this.getInfrastructureIgnoreStatus('industry'))
+            && (!this.canIgnoreScience || !this.getInfrastructureIgnoreStatus('science'))
     }
   }
 }

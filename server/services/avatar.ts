@@ -55,6 +55,10 @@ export default class AvatarService {
         let userCredits = await this.userService.getCredits(userId);
         let avatar = await this.getUserAvatar(userId, avatarId);
 
+        if (!avatar) {
+            throw new ValidationError(`Avatar ${avatarId} does not exist.`);
+        }
+
         if (avatar.purchased) {
             throw new ValidationError(`You have already purchased this avatar.`);
         }

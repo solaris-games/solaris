@@ -2,7 +2,7 @@
 <div class="container">
   <div class="row mb-2 g-0">
     <div class="col-auto">
-      <button class="btn btn-sm" :class="{ 'btn-danger': !showAll, 'btn-success': showAll }" @click="toggleShowAll">
+      <button class="btn btn-sm" :class="{ 'btn-danger': !showAll, 'btn-success': showAll }" @click="toggleShowAll" v-if="getUserPlayer()">
         <span v-if="!showAll">Show All</span>
         <span v-if="showAll">Show Yours</span>
       </button>
@@ -10,7 +10,7 @@
     <div class="col ms-2 me-2">
       <input type="text" class="form-control form-control-sm" v-model="searchFilter" placeholder="Search...">
     </div>
-    <div class="col-auto pt-1" v-if="!isGameFinished">
+    <div class="col-auto pt-1" v-if="!isGameFinished && getUserPlayer()">
       <input class="me-1" type="checkbox" v-model="allowUpgrades" id="chkEnableUpgrades">
       <label for="chkEnableUpgrades">
         Upgrades
@@ -37,9 +37,9 @@
                   <!-- <td class="text-end"><a href="javascript:;" @click="sort(['infrastructure','economy'])"><i class="fas fa-money-bill-wave"></i></a></td>
                   <td class="text-end"><a href="javascript:;" @click="sort(['infrastructure','industry'])"><i class="fas fa-tools"></i></a></td>
                   <td class="text-end"><a href="javascript:;" @click="sort(['infrastructure','science'])"><i class="fas fa-flask"></i></a></td> -->
-                  <td class="text-end"><a href="javascript:;" @click="sort(['upgradeCosts','economy'])">$E</a></td>
-                  <td class="text-end"><a href="javascript:;" @click="sort(['upgradeCosts','industry'])">$I</a></td>
-                  <td class="text-end"><a href="javascript:;" @click="sort(['upgradeCosts','science'])">$S</a></td>
+                  <td class="text-end" v-if="isEconomyEnabled"><a href="javascript:;" @click="sort(['upgradeCosts','economy'])">$E</a></td>
+                  <td class="text-end" v-if="isIndustryEnabled"><a href="javascript:;" @click="sort(['upgradeCosts','industry'])">$I</a></td>
+                  <td class="text-end" v-if="isScienceEnabled"><a href="javascript:;" @click="sort(['upgradeCosts','science'])">$S</a></td>
               </tr>
           </thead>
           <tbody>
@@ -50,7 +50,7 @@
     </div>
   </div>
 
-  <p v-if="!tableData.length" class="text-center mt-2 mb-2">You have no stars.</p>
+  <p v-if="!tableData.length" class="text-center mt-2 mb-2">No stars to display.</p>
 </div>
 </template>
 
@@ -73,9 +73,17 @@ export default {
     }
   },
   mounted () {
+    this.showAll = this.getUserPlayer() == null
     this.tableData = this.getTableData()
 
     this.allowUpgrades = this.$store.state.settings.interface.galaxyScreenUpgrades === 'enabled' && !this.isGameFinished
+    
+    this.sortBy = localStorage.getItem('galaxy_stars_sortBy') || null
+    this.sortDirection = localStorage.getItem('galaxy_stars_sortDirection') == 'true' || false
+  },
+  destroyed () {
+    localStorage.setItem('galaxy_stars_sortBy', this.sortBy)
+    localStorage.setItem('galaxy_stars_sortDirection', this.sortDirection)
   },
   methods: {
     getUserPlayer () {
@@ -89,7 +97,7 @@ export default {
     getTableData () {
       let sorter = (a, b) => a.name.localeCompare(b.name)
 
-      if (this.showAll) {
+      if (this.showAll || !this.getUserPlayer()) {
         return this.$store.state.game.galaxy.stars.sort(sorter)
       } else {
         return this.$store.state.game.galaxy.stars.sort(sorter).filter(x => x.ownedByPlayerId === this.getUserPlayer()._id)
@@ -113,6 +121,10 @@ export default {
     sortedTableData () {
       // here be dragons
       const getNestedObject = (nestedObj, pathArr) => {
+        if (!Array.isArray(pathArr)) {
+          pathArr = pathArr.split(',')
+        }
+
         return pathArr.reduce((obj, key) =>
           (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
       }
@@ -149,6 +161,15 @@ export default {
               return ao < bo ? 1 : -1;
           }
         })
+    },
+    isEconomyEnabled: function () {
+      return this.$store.state.game.settings.player.developmentCost.economy !== 'none'
+    },
+    isIndustryEnabled: function () {
+      return this.$store.state.game.settings.player.developmentCost.industry !== 'none'
+    },
+    isScienceEnabled: function () {
+      return this.$store.state.game.settings.player.developmentCost.science !== 'none'
     },
     isGameFinished: function () {
       return GameHelper.isGameFinished(this.$store.state.game)

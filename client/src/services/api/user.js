@@ -116,11 +116,6 @@ class UserService extends BaseApiService {
     return axios.delete(this.BASE_URL + 'user/closeAccount',
       { withCredentials: true })
   }
-
-  listRecentDonations() {
-    return axios.get(this.BASE_URL + 'user/donations/recent',
-      { withCredentials: true })
-  }
 }
 
 export default new UserService()

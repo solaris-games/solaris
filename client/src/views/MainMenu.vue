@@ -9,7 +9,11 @@
       </div>
       <div class="col-sm-12 col-md-6 col-lg-7">
         <!-- player quick stats -->
-        <achievements v-if="achievements" v-bind:victories="achievements.victories" v-bind:rank="achievements.rank" v-bind:renown="achievements.renown"/>
+        <achievements v-if="achievements"
+          :level="achievements.level"
+          :victories="achievements.victories"
+          :rank="achievements.rank"
+          :renown="achievements.renown"/>
         <loading-spinner :loading="!achievements"></loading-spinner>
       </div>
     </div>
@@ -107,15 +111,6 @@
     <tutorial-game />
 
     <hr/>
-
-    <!-- <div class="row">
-      <div class="col-12 col-lg-6">
-        <recent-donations :maxLength="null" />
-      </div>
-      <div class="d-none d-lg-block col-6">
-        <iframe src="https://discord.com/widget?id=686524791943069734&theme=dark" style="width:100%;height:100%" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
-      </div>
-    </div> -->
   </view-container>
 </template>
 
@@ -127,7 +122,6 @@ import userService from '../services/api/user'
 import ViewContainer from './components/ViewContainer'
 import ViewTitle from './components/ViewTitle'
 import Achievements from './game/components/player/Achievements'
-import RecentDonations from './game/components/donate/RecentDonations.vue'
 import TutorialGame from './game/components/menu/TutorialGame'
 
 export default {
@@ -136,7 +130,6 @@ export default {
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'achievements': Achievements,
-    'recent-donations': RecentDonations,
     'tutorial-game': TutorialGame
   },
   data () {
@@ -159,6 +152,7 @@ export default {
       this.$store.commit('clearUsername')
       this.$store.commit('clearRoles')
       this.$store.commit('clearUserCredits')
+      this.$store.commit('clearUserIsEstablishedPlayer')
 
       this.isLoggingOut = false
 
@@ -172,6 +166,7 @@ export default {
         this.achievements = response.data.achievements
 
         this.$store.commit('setUserCredits', response.data.credits)
+        this.$store.commit('setUserIsEstablishedPlayer', response.data.isEstablishedPlayer)
       } catch (err) {
         console.error(err)
       }

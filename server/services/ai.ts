@@ -19,6 +19,8 @@ import DiplomacyService from "./diplomacy";
 import PlayerStatisticsService from "./playerStatistics";
 import {DBObjectId} from "./types/DBObjectId";
 import BasicAIService from "./basicAi";
+import PlayerAfkService from "./playerAfk";
+import ShipService from "./ship";
 
 const Heap = require('qheap');
 const mongoose = require("mongoose");
@@ -133,9 +135,11 @@ export default class AIService {
     shipTransferService: ShipTransferService;
     technologyService: TechnologyService;
     playerService: PlayerService;
+    playerAfkService: PlayerAfkService;
     reputationService: ReputationService;
     diplomacyService: DiplomacyService;
     playerStatisticsService: PlayerStatisticsService;
+    shipService: ShipService;
     basicAIService: BasicAIService;
 
     constructor(
@@ -148,8 +152,10 @@ export default class AIService {
         shipTransferService: ShipTransferService,
         technologyService: TechnologyService,
         playerService: PlayerService,
+        playerAfkService: PlayerAfkService,
         reputationService: ReputationService,
         diplomacyService: DiplomacyService,
+        shipService: ShipService,
         playerStatisticsService: PlayerStatisticsService,
         basicAIService: BasicAIService
     ) {
@@ -162,9 +168,11 @@ export default class AIService {
         this.shipTransferService = shipTransferService;
         this.technologyService = technologyService;
         this.playerService = playerService;
+        this.playerAfkService = playerAfkService;
         this.reputationService = reputationService;
         this.diplomacyService = diplomacyService;
         this.playerStatisticsService = playerStatisticsService;
+        this.shipService = shipService;
         this.basicAIService = basicAIService;
     }
 
@@ -173,7 +181,7 @@ export default class AIService {
     }
 
     async play(game: Game, player: Player) {
-        if (!this.isAIControlled(player)) {
+        if (!this.playerAfkService.isAIControlled(game, player, true)) {
             throw new Error('The player is not under AI control.');
         }
 
@@ -205,7 +213,7 @@ export default class AIService {
             this._setInitialState(game, player);
         }
 
-        this._updateState(game, player, context);
+        this._sanitizeState(game, player, context);
 
         if (isFirstTickOfCycle) {
             await this._handleBulkUpgradeStates(game, player, context);
@@ -296,7 +304,7 @@ export default class AIService {
         };
     }
 
-    _updateState(game: Game, player: Player, context: Context) {
+    _sanitizeState(game: Game, player: Player, context: Context) {
         if (!player.aiState) {
             return;
         }
@@ -934,7 +942,7 @@ export default class AIService {
 
         const techLevel = this.technologyService.getStarEffectiveTechnologyLevels(game, starToInvade, false);
         const shipsOnCarriers = defendingCarriers.reduce((sum, c) => sum + (c.ships || 0), 0);
-        const shipsProduced = this.starService.calculateStarShipsByTicks(techLevel.manufacturing, starToInvade.infrastructure.industry || 0, ticksToArrival, game.settings.galaxy.productionTicks);
+        const shipsProduced = this.shipService.calculateStarShipsByTicks(techLevel.manufacturing, starToInvade.infrastructure.industry || 0, ticksToArrival, game.settings.galaxy.productionTicks);
         const shipsAtArrival = (starToInvade.shipsActual || 0) + shipsOnCarriers + shipsProduced;
 
         const defender = {
@@ -1001,20 +1009,21 @@ export default class AIService {
 
         for (const playerStar of context.playerStars) {
             const carriersHere = context.carriersOrbiting.get(playerStar._id.toString()) || [];
+            const carriersOwned = carriersHere.filter(c => c.ownedByPlayerId!.toString() === player._id.toString());
 
-            for (const carrier of carriersHere) {
+            for (const carrier of carriersOwned) {
                 if (carrier.ships! > 1) {
                     const newStarShips = playerStar.ships! + carrier.ships! - 1;
                     await this.shipTransferService.transfer(game, player, carrier._id, 1, playerStar._id, newStarShips, false);
                 }
             }
 
-            if (playerStar.ships! < 1 && carriersHere.length === 0) {
+            if (playerStar.ships! < 1 && carriersOwned.length === 0) {
                 continue;
             }
 
             assignments.set(playerStar._id.toString(), {
-                carriers: carriersHere,
+                carriers: carriersOwned,
                 star: playerStar,
                 totalShips: playerStar.ships!
             });

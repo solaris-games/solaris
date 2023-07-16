@@ -26,6 +26,8 @@ const schema = new Schema({
     },
     achievements: {
         victories: { type: Types.Number, default: 0 },
+        victories1v1: { type: Types.Number, default: 0 },
+        level: { type: Types.Number, default: 1 },
         rank: { type: Types.Number, default: 0 },
         eloRating: { type: Types.Number, default: null },
         renown: { type: Types.Number, default: 0 },
@@ -33,6 +35,7 @@ const schema = new Schema({
         completed: { type: Types.Number, default: 0 },
         quit: { type: Types.Number, default: 0 },
         defeated: { type: Types.Number, default: 0 },
+        defeated1v1: { type: Types.Number, default: 0 },
         afk: { type: Types.Number, default: 0 },
         combat: {
             kills: {
@@ -92,7 +95,19 @@ const schema = new Schema({
             roleplay: { type: Types.Number, default: 0 },
             dauntless: { type: Types.Number, default: 0 },
             sleepless: { type: Types.Number, default: 0 },
-            victor32: { type: Types.Number, default: 0 }
+            victor32: { type: Types.Number, default: 0 },
+            special_dark: { type: Types.Number, default: 0 },
+            special_fog: { type: Types.Number, default: 0 },
+            special_ultraDark: { type: Types.Number, default: 0 },
+            special_orbital: { type: Types.Number, default: 0 },
+            special_battleRoyale: { type: Types.Number, default: 0 },
+            special_homeStar: { type: Types.Number, default: 0 },
+            special_homeStarElimination: { type: Types.Number, default: 0 },
+            special_anonymous: { type: Types.Number, default: 0 },
+            special_kingOfTheHill: { type: Types.Number, default: 0 },
+            special_tinyGalaxy: { type: Types.Number, default: 0 },
+            special_freeForAll: { type: Types.Number, default: 0 },
+            special_arcade: { type: Types.Number, default: 0 }
         }
     },
     gameSettings: {
@@ -153,6 +168,11 @@ const schema = new Schema({
             defaultAction: { type: Types.String, required: false, enum: ['nothing', 'collectAll', 'dropAll', 'collect', 'drop', 'collectAllBut', 'dropAllBut', 'garrison', 'collectPercentage', 'dropPercentage'], default: 'collectAll' },
             defaultAmount: { type: Types.Number, required: false, default: 0 },
             confirmBuildCarrier: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'enabled' },
+        },
+        star: {
+            confirmBuildEconomy: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'disabled' },
+            confirmBuildIndustry: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'disabled' },
+            confirmBuildScience: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'disabled' },
         }
     },
     avatars: [{ type: Types.Number, required: false }],
@@ -169,9 +189,13 @@ const schema = new Schema({
         }
     },
     subscriptions: {
+        settings: {
+            notifyActiveGamesOnly: { type: Types.Boolean, required: false, default: false } // Send notifications only if the user isn't defeated
+        },
         discord: {
             gameStarted: { type: Types.Boolean, required: false, default: true },
             gameEnded: { type: Types.Boolean, required: false, default: true },
+            gameTurnEnded: { type: Types.Boolean, required: false, default: true },
             playerGalacticCycleComplete: { type: Types.Boolean, required: false, default: true },
             playerResearchComplete: { type: Types.Boolean, required: false, default: true },
             playerTechnologyReceived: { type: Types.Boolean, required: false, default: true },

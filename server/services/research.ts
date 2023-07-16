@@ -11,6 +11,10 @@ import StarService from './star';
 import TechnologyService from './technology';
 import UserService from './user';
 
+export const ResearchServiceEvents = {
+    onPlayerResearchCompleted: 'onPlayerResearchCompleted'
+}
+
 export default class ResearchService extends EventEmitter {
     gameRepo: Repository<Game>;
     technologyService: TechnologyService;
@@ -97,6 +101,11 @@ export default class ResearchService extends EventEmitter {
         let techKey = player.researchingNow;
         let tech = player.research[techKey];
 
+        if (!this.technologyService.isTechnologyEnabled(game, techKey) || 
+            !this.technologyService.isTechnologyResearchable(game, techKey)) {
+            return null;
+        }
+
         let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
         let totalScience = this.playerStatisticsService.calculateTotalScience(playerStars);
@@ -127,7 +136,7 @@ export default class ResearchService extends EventEmitter {
         if (levelUp) {
             this._setNextResearch(game, player);
 
-            this.emit('onPlayerResearchCompleted', {
+            this.emit(ResearchServiceEvents.onPlayerResearchCompleted, {
                 gameId: game._id,
                 gameTick: game.state.tick,
                 playerId: player._id,
@@ -178,9 +187,6 @@ export default class ResearchService extends EventEmitter {
         // Check if experimentation is enabled.
         let isExperimentationEnabled = this.technologyService.isTechnologyEnabled(game, 'experimentation');
         
-        // NOTE: Players must own stars in order to have experiments.
-        let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
-
         const noExperimentation = {
             technology: null,
             level: null,
@@ -189,7 +195,14 @@ export default class ResearchService extends EventEmitter {
             researchingNext: null
         };
 
-        if (!isExperimentationEnabled || !playerStars.length) {
+        if (!isExperimentationEnabled) {
+            return noExperimentation;
+        }
+
+        // NOTE: Players must own stars in order to have experiments.
+        let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+
+        if (!playerStars.length) {
             return noExperimentation;
         }
 
@@ -223,6 +236,7 @@ export default class ResearchService extends EventEmitter {
         let requiredProgress = this.getRequiredResearchProgress(game, tech.key, tech.technology.level);
 
         let levelUp = false;
+        let researchingNext;
 
         while (tech.technology.progress! >= requiredProgress) {
             tech.technology.level++;
@@ -235,6 +249,7 @@ export default class ResearchService extends EventEmitter {
         // to the next desired research technology.
         if (levelUp && tech.key === player.researchingNow) {
             this._setNextResearch(game, player);
+            researchingNext = player.researchingNext
         }
 
         return {
@@ -242,7 +257,7 @@ export default class ResearchService extends EventEmitter {
             level: tech.technology.level,
             amount: researchAmount,
             levelUp,
-            researchingNext: player.researchingNext
+            researchingNext 
         };
     }
 

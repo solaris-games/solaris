@@ -53,6 +53,11 @@ export default class WaypointService {
 
     async saveWaypoints(game: Game, player: Player, carrierId: DBObjectId, waypoints: CarrierWaypointBase[], looped: boolean) {
         let carrier = this.carrierService.getById(game, carrierId);
+
+        if (!carrier) {
+            throw new ValidationError(`Could not find carrier with id ${carrierId}`);
+        }
+        
         return await this.saveWaypointsForCarrier(game, player, carrier, waypoints, looped);
     }
 
@@ -189,7 +194,7 @@ export default class WaypointService {
             return true;
         }
 
-        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, false, true);
+        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, true);
         let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, effectiveTechs.hyperspace);
 
         let distanceBetweenStars = this.starDistanceService.getDistanceBetweenStars(sourceStar, destinationStar);
@@ -228,6 +233,10 @@ export default class WaypointService {
     }
 
     cullWaypointsByHyperspaceRange(game: Game, carrier: Carrier) {
+        if (!carrier.waypoints.length) {
+            return;
+        }
+        
         let player = this.playerService.getById(game, carrier.ownedByPlayerId!)!;
 
         // Iterate through all waypoints the carrier has one by one and
@@ -261,6 +270,12 @@ export default class WaypointService {
         }
 
         return null;
+    }
+
+    cullAllWaypointsByHyperspaceRange(game: Game) {
+        for (let carrier of game.galaxy.carriers) {
+            this.cullWaypointsByHyperspaceRange(game, carrier);
+        }
     }
 
     async loopWaypoints(game: Game, player: Player, carrierId: DBObjectId, loop: boolean) {
@@ -300,7 +315,7 @@ export default class WaypointService {
             return false;
         }
 
-        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, false, true);
+        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, true);
 
         // Check whether the last waypoint is in range of the first waypoint.
         let firstWaypoint = carrier.waypoints[0];
@@ -574,7 +589,7 @@ export default class WaypointService {
             .map(p => {
                 return {
                     player: p,
-                    stars: this.starService.filterStarsByScanningRange(game, p)
+                    stars: this.starService.filterStarsByScanningRange(game, [p._id])
                 }
             });
 
@@ -619,41 +634,6 @@ export default class WaypointService {
                 break;
             }
         }
-    }
-
-    rerouteToNearestFriendlyStarFromStar(game: Game, carrier: Carrier) {
-        if (!carrier.orbiting) {
-            throw new ValidationError(`Star must be in orbit for it to be rerouted from a star.`);
-        }
-
-        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, false, true);
-        let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, effectiveTechs.hyperspace);
-
-        // Find the nearest friendly star, if there is none then we cannot reroute.
-        let nearestStar = this.starDistanceService.getClosestPlayerOwnedStarsFromLocationWithinDistance(
-            carrier.location,
-            game.galaxy.stars,
-            carrier.ownedByPlayerId!,
-            hyperspaceDistance
-        )[0];
-
-        if (!nearestStar) {
-            return null;
-        }
-
-        carrier.waypoints = [{
-            _id: new mongoose.Types.ObjectId(),
-            source: carrier.orbiting,
-            destination: nearestStar._id,
-            action: 'nothing',
-            actionShips: 0,
-            delayTicks: 0
-        }];
-
-        carrier.waypointsLooped = false;
-        carrier.orbiting = null;
-
-        return nearestStar;
     }
 
 };

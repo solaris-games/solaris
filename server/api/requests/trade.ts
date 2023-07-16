@@ -23,8 +23,12 @@ export const mapToTradeSendToPlayerRequest = (body: any, userId: any): TradeSend
         errors.push('amount is required.');
     }
     
-    if (body.amount != null && body.amount <= 0) {
+    if (body.amount != null && +body.amount <= 0) {
         errors.push('amount must be greater than 0.');
+    }
+
+    if (body.amount != null && +body.amount % 1 != 0) {
+        errors.push('amount must be an integer.');
     }
 
     if (errors.length) {
@@ -58,6 +62,14 @@ export const mapToTradeSendTechnologyToPlayerRequest = (body: any): TradeSendTec
 
     if (!keyHasNumberValue(body, 'level')) {
         errors.push('Level is required.');
+    }
+    
+    if (body.level != null && body.level <= 0) {
+        errors.push('Level must be greater than 0.');
+    }
+
+    if (body.level != null && +body.level % 1 != 0) {
+        errors.push('level must be an integer.');
     }
 
     if (errors.length) {

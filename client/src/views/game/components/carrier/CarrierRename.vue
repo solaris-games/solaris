@@ -59,6 +59,8 @@ export default {
   },
   methods: {
     onCloseRequested (e) {
+      GameContainer.map.unselectAllCarriers()
+      
       this.$emit('onCloseRequested', e)
     },
     onOpenCarrierDetailRequested (e) {

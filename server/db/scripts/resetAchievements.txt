@@ -5,6 +5,8 @@ db.users.updateOne({
 }, {
     $set: {
         'achievements.victories': 0,
+        'achievements.victories1v1': 0,
+        'achievements.level': 1,
         'achievements.rank': 0,
         'achievements.eloRating': null,
         'achievements.renown': 0,
@@ -12,6 +14,7 @@ db.users.updateOne({
         'achievements.completed': 0,
         'achievements.quit': 0,
         'achievements.defeated': 0,
+        'achievements.defeated1v1': 0,
         'achievements.afk': 0,
         'achievements.combat.kills.ships': 0,
         'achievements.combat.kills.carriers': 0,

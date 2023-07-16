@@ -32,10 +32,17 @@
                       {{games.featured.settings.general.name}}
                     </span>
                   </h4>
-                  <h6 class="card-title card-subtitle">
+                  <p class="card-title card-subtitle">
                     {{getGameTypeFriendlyText(games.featured)}}
                     ({{games.featured.state.players}}/{{games.featured.settings.general.playerLimit}})
-                  </h6>
+                  </p>
+                </div>
+                <locked-game-overlay :game="games.featured"/>
+                <div class="card-arrow">
+                  <div class="card-arrow-top-left"></div>
+                  <div class="card-arrow-top-right"></div>
+                  <div class="card-arrow-bottom-left"></div>
+                  <div class="card-arrow-bottom-right"></div>
                 </div>
               </div>
             </div>
@@ -45,7 +52,7 @@
 
           <h4>Standard Games</h4>
 
-          <p>These are official games and award rank.<help-tooltip class="ms-1" tooltip="Note: New Player games do not award rank - 1v1 games do not award galactic credits"/></p>
+          <p>These are official games and award rank points.<help-tooltip class="ms-1" tooltip="Note: New Player games do not award rank points - 1v1 games do not award galactic credits"/></p>
 
           <loading-spinner :loading="isLoading"/>
 
@@ -63,10 +70,10 @@
                     <i class="fas fa-user-graduate"></i>
                     <span class="ms-2">{{getGameTypeFriendlyText(games.newPlayerRT)}}</span>
                   </h5>
-                  <h6 class="card-title card-subtitle new-player-card-subtitle">
+                  <p class="card-title card-subtitle new-player-card-subtitle">
                     {{games.newPlayerRT.settings.general.name}}
                     ({{games.newPlayerRT.state.players}}/{{games.newPlayerRT.settings.general.playerLimit}})
-                  </h6>
+                  </p>
                 </div>
                 <div class="card-arrow">
                   <div class="card-arrow-top-left"></div>
@@ -85,22 +92,27 @@
                   <h5 class="card-title special-card-title">
                     <i class="fas" :class="{
                       'fa-moon': games.special.settings.general.type === 'special_dark',
+                      'fa-moon': games.special.settings.general.type === 'special_fog',
                       'fa-moon': games.special.settings.general.type === 'special_ultraDark',
                       'fa-drumstick-bite': games.special.settings.general.type === 'special_battleRoyale',
                       'fa-satellite': games.special.settings.general.type === 'special_orbital',
                       'fa-home': games.special.settings.general.type === 'special_homeStar',
+                      'fa-gun': games.special.settings.general.type === 'special_homeStarElimination',
                       'fa-user-secret': games.special.settings.general.type === 'special_anonymous',
                       'fa-crown': games.special.settings.general.type === 'special_kingOfTheHill',
-                      'fa-search': games.special.settings.general.type === 'special_tinyGalaxy'
+                      'fa-search': games.special.settings.general.type === 'special_tinyGalaxy',
+                      'fa-user-secret': games.special.settings.general.type === 'special_freeForAll',
+                      'fa-gamepad': games.special.settings.general.type === 'special_arcade'
                     }"></i>
                     <span class="ms-2">{{games.special.settings.general.name}}</span>
                   </h5>
-                  <h6 class="card-title card-subtitle special-card-subtitle">
+                  <p class="card-title card-subtitle special-card-subtitle">
                     {{getGameTypeFriendlyText(games.special)}}
                     ({{games.special.state.players}}/{{games.special.settings.general.playerLimit}}) -
-                    <strong>x2 Rank</strong>
-                  </h6>
+                    <strong>x2 Rank Points</strong>
+                  </p>
                 </div>
+                <locked-game-overlay :game="games.special"/>
                 <div class="card-arrow">
                   <div class="card-arrow-top-left"></div>
                   <div class="card-arrow-top-right"></div>
@@ -124,6 +136,7 @@
                     ({{games.standardRT.state.players}}/{{games.standardRT.settings.general.playerLimit}})
                   </p>
                 </div>
+                <locked-game-overlay :game="games.standardRT"/>
                 <div class="card-arrow">
                   <div class="card-arrow-top-left"></div>
                   <div class="card-arrow-top-right"></div>
@@ -147,6 +160,7 @@
                     ({{games.standardTB.state.players}}/{{games.standardTB.settings.general.playerLimit}})
                   </p>
                 </div>
+                <locked-game-overlay :game="games.standardTB"/>
                 <div class="card-arrow">
                   <div class="card-arrow-top-left"></div>
                   <div class="card-arrow-top-right"></div>
@@ -170,6 +184,7 @@
                     ({{games.oneVsOneRT.state.players}}/{{games.oneVsOneRT.settings.general.playerLimit}})
                   </p>
                 </div>
+                <locked-game-overlay :game="games.oneVsOneRT"/>
                 <div class="card-arrow">
                   <div class="card-arrow-top-left"></div>
                   <div class="card-arrow-top-right"></div>
@@ -193,6 +208,7 @@
                     ({{games.oneVsOneTB.state.players}}/{{games.oneVsOneTB.settings.general.playerLimit}})
                   </p>
                 </div>
+                <locked-game-overlay :game="games.oneVsOneTB"/>
                 <div class="card-arrow">
                   <div class="card-arrow-top-left"></div>
                   <div class="card-arrow-top-right"></div>
@@ -211,11 +227,12 @@
                     <i class="fas fa-users"></i>
                     <span class="ms-2">{{games.thirtyTwoPlayerRT.settings.general.name}}</span>
                   </h5>
-                  <h6 class="card-title card-subtitle">
+                  <p class="card-title card-subtitle">
                     {{getGameTypeFriendlyText(games.thirtyTwoPlayerRT)}}
                     ({{games.thirtyTwoPlayerRT.state.players}}/{{games.thirtyTwoPlayerRT.settings.general.playerLimit}})
-                  </h6>
+                  </p>
                 </div>
+                <locked-game-overlay :game="games.thirtyTwoPlayerRT"/>
                 <div class="card-arrow">
                   <div class="card-arrow-top-left"></div>
                   <div class="card-arrow-top-right"></div>
@@ -240,6 +257,8 @@
           <h4 class="mb-0">User Created Games</h4>
 
           <p class="mb-2"><small class="text-warning" v-if="userGames.length">Total Games: {{userGames.length}}</small></p>
+
+          <p>These are custom games. <strong>Featured games</strong> will award rank points.</p>
 
           <loading-spinner :loading="isLoading"/>
 
@@ -283,7 +302,7 @@
         <div class="tab-pane fade" id="inProgressGames">
           <h4>In Progress Games</h4>
 
-          <p class="mb-1">These games are in progress, you can join games with open slots. <b>Fill slots to earn additional rank!</b> <help-tooltip class="ms-1" tooltip="Players who fill an AFK slot and will be awarded 1.5x additional rank (minimum 1) when the game ends"/></p>
+          <p class="mb-1">These games are in progress, you can join games with open slots. <b>Fill slots to earn additional rank points!</b> <help-tooltip class="ms-1" tooltip="Players who fill an AFK slot and will be awarded 1.5x additional rank (minimum 1) when the game ends"/></p>
 
           <p class="mb-2"><small class="text-warning" v-if="inProgressGames.length">Total Games: {{inProgressGames.length}}</small></p>
 
@@ -389,6 +408,7 @@ import GameHelper from '../../services/gameHelper'
 import RandomHelper from '../../services/randomHelper'
 import HelpTooltip from '../components/HelpTooltip'
 import FluxBar from './components/menu/FluxBar'
+import LockedGameOverlay from './components/menu/LockedGameOverlay'
 import * as moment from 'moment'
 
 export default {
@@ -398,7 +418,8 @@ export default {
     'view-title': ViewTitle,
     'tutorial-game': TutorialGame,
     'help-tooltip': HelpTooltip,
-    'flux-bar': FluxBar
+    'flux-bar': FluxBar,
+    'locked-game-overlay': LockedGameOverlay
   },
   data () {
     return {
@@ -456,13 +477,17 @@ export default {
     getSpecialGame () {
       const types = [
         'special_dark',
+        'special_fog',
         'special_ultraDark',
         'special_orbital',
         'special_battleRoyale',
         'special_homeStar',
+        'special_homeStarElimination',
         'special_anonymous',
         'special_kingOfTheHill',
-        'special_tinyGalaxy'
+        'special_tinyGalaxy',
+        'special_freeForAll',
+        'special_arcade'
       ]
       
       return this.serverGames.find(x => types.includes(x.settings.general.type))
@@ -540,10 +565,6 @@ export default {
   left: 0;
   margin: 8px;
   background-color: #3498DB;
-}
-
-p.card-subtitle {
-  font-size: 10px;
 }
 
 .new-player-card-subtitle {

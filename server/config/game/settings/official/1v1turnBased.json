@@ -6,12 +6,14 @@
     "mode": "conquest",
     "password": null,
     "playerLimit": 2,
-    "playerType": "establishedPlayers",
+    "playerType": "all",
     "anonymity": "normal",
     "playerOnlineStatus": "visible",
     "timeMachine": "enabled",
     "fluxEnabled": "disabled",
-    "advancedAI": "disabled"
+    "advancedAI": "disabled",
+    "spectators": "enabled",
+    "readyToQuit": "enabled"
   },
   "galaxy": {
     "galaxyType": "circular-balanced",
@@ -30,6 +32,7 @@
     "randomAsteroidFields": 0,
     "randomBinaryStars": 0,
     "randomBlackHoles": 0,
+    "randomPulsars": 0,
     "darkGalaxy": "disabled",
     "giftCarriers": "disabled",
     "defenderBonus": "enabled",
@@ -38,6 +41,7 @@
     "resourceDistribution": "random",
     "playerDistribution": "circular",
     "carrierSpeed": 10,
+    "starCaptureReward": "enabled",
     "specialistBans": {
       "star": [],
       "carrier": []
@@ -45,7 +49,8 @@
   },
   "conquest": {
     "victoryCondition": "starPercentage",
-    "victoryPercentage": 66
+    "victoryPercentage": 66,
+    "capitalStarElimination": "disabled"
   },
   "orbitalMechanics": {
     "enabled": "disabled",
@@ -69,7 +74,11 @@
     "tradeCredits": false,
     "tradeCreditsSpecialists": false,
     "tradeCost": 0,
-    "tradeScanning": "all"
+    "tradeScanning": "all",
+    "populationCap": {
+      "enabled": "disabled",
+      "shipsPerStar": 100
+    }
   },
   "diplomacy": {
     "enabled": "disabled",
@@ -86,7 +95,7 @@
       "hyperspace": 1,
       "manufacturing": 1,
       "banking": 1,
-      "weapons": 3,
+      "weapons": 5,
       "specialists": 3
     },
     "researchCosts": {

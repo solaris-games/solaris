@@ -2,8 +2,6 @@
   <view-container>
     <view-title title="Game Settings" navigation="main-menu"/>
 
-    <flux-bar class="mb-2" v-if="!isLoadingGame && isFluxGame"/>
-
     <loading-spinner :loading="isLoadingGame"/>
 
     <div v-if="!isLoadingGame">
@@ -12,6 +10,7 @@
       <p v-if="game.settings.general.description">{{game.settings.general.description}}</p>
 
       <p v-if="isNewPlayerGame" class="text-warning">New Player Games do not affect Rank or Victories.</p>
+      <p v-if="isCustomFeaturedGame" class="text-warning">This is a featured game and will award rank points.</p>
 
       <div class="row mb-1 bg-dark pt-2 pb-2">
         <div class="col">
@@ -51,8 +50,7 @@ export default {
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'view-subtitle': ViewSubtitle,
-    'game-settings': GameSettings,
-    'flux-bar': FluxBar
+    'game-settings': GameSettings
   },
   data () {
     return {
@@ -109,6 +107,9 @@ export default {
     },
     isFluxGame () {
       return GameHelper.isFluxGame(this.game)
+    },
+    isCustomFeaturedGame () {
+      return GameHelper.isCustomGame(this.game) && GameHelper.isFeaturedGame(this.game)
     }
   }
 }

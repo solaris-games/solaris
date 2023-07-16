@@ -5,7 +5,7 @@
     <loading-spinner :loading="isLoading"/>
 
     <div v-if="!isLoading && guild" class="mb-4">
-      <p class="float-end">Total Rank: <span class="text-warning">{{guild.totalRank}}</span></p>
+      <p class="float-end">Total Rank Points: <span class="text-warning">{{guild.totalRank}}</span></p>
 
       <h5 class="mb-0">Guild Roster</h5>
 

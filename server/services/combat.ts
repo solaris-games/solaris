@@ -14,6 +14,11 @@ import TechnologyService from "./technology";
 
 const EventEmitter = require('events');
 
+export const CombatServiceEvents = {
+    onPlayerCombatStar: 'onPlayerCombatStar',
+    onPlayerCombatCarrier: 'onPlayerCombatCarrier'
+}
+
 export default class CombatService extends EventEmitter {
     technologyService: TechnologyService;
     specialistService: SpecialistService;
@@ -173,11 +178,11 @@ export default class CombatService extends EventEmitter {
         if (isCarrierToStarCombat) {
             defenderWeaponsTechLevel = this.technologyService.getStarEffectiveWeaponsLevel(game, defenders, star!, defenderCarriers);
         } else {
-            defenderWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, defenders, defenderCarriers, isCarrierToStarCombat);
+            defenderWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, defenders, defenderCarriers, isCarrierToStarCombat, false);
         }
         
         // Calculate the weapons tech level for the attacker
-        let attackerWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, attackers, attackerCarriers, isCarrierToStarCombat);
+        let attackerWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, attackers, attackerCarriers, isCarrierToStarCombat, true);
 
         // Check for deductions to weapons to either side
         let defenderWeaponsDeduction = this.technologyService.getCarriersWeaponsDebuff(attackerCarriers);
@@ -378,7 +383,7 @@ export default class CombatService extends EventEmitter {
 
         // Log the combat event
         if (star) {
-            this.emit('onPlayerCombatStar', {
+            this.emit(CombatServiceEvents.onPlayerCombatStar, {
                 gameId: game._id,
                 gameTick: game.state.tick,
                 owner: defender,
@@ -389,7 +394,7 @@ export default class CombatService extends EventEmitter {
                 captureResult
             });
         } else {
-            this.emit('onPlayerCombatCarrier', {
+            this.emit(CombatServiceEvents.onPlayerCombatCarrier, {
                 gameId: game._id,
                 gameTick: game.state.tick,
                 defenders,

@@ -25,13 +25,17 @@ const schema = new Schema({
 				'new_player_tb',
 				'32_player_rt',
 				'special_dark',
+				'special_fog',
 				'special_ultraDark',
 				'special_orbital',
 				'special_battleRoyale',
 				'special_homeStar',
+				'special_homeStarElimination',
 				'special_anonymous',
 				'special_kingOfTheHill',
-				'special_tinyGalaxy'
+				'special_tinyGalaxy',
+				'special_freeForAll',
+				'special_arcade'
 			], default: 'custom' },
 			mode: { type: Types.String, required: true, enum: [
 				'conquest', 'battleRoyale', 'kingOfTheHill'
@@ -46,12 +50,14 @@ const schema = new Schema({
 			timeMachine: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
 			awardRankTo: { type: Types.String, required: false, enum: ['all', 'winner'], default: 'all' },
 			fluxEnabled: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
-			advancedAI: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'disabled' }
+			advancedAI: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'disabled' },
+			spectators: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'disabled' },
+			readyToQuit: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'enabled' }
         },
         galaxy: {
 			galaxyType: { type: Types.String, required: true, enum: ['circular', 'spiral', 'doughnut','circular-balanced', 'irregular', 'custom'], default: 'circular' },
 			starsPerPlayer: { type: Types.Number, required: true, min: 3, max: 50, default: 20 },
-			productionTicks: { type: Types.Number, required: true, min: 10, max: 36, default: 24 }
+			productionTicks: { type: Types.Number, required: true, min: 6, max: 36, default: 24 }
         },
         specialGalaxy: {
 			carrierCost: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' },
@@ -65,7 +71,8 @@ const schema = new Schema({
 			randomAsteroidFields: { type: Types.Number, min: 0, max: 50, default: 0 },
 			randomBinaryStars: { type: Types.Number, min: 0, max: 50, default: 0 },
 			randomBlackHoles: { type: Types.Number, min: 0, max: 50, default: 0 },
-			darkGalaxy: { type: Types.String, required: true, enum: ['disabled', 'standard', 'extra', 'start'], default: 'start' },
+			randomPulsars: { type: Types.Number, min: 0, max: 50, default: 0 },
+			darkGalaxy: { type: Types.String, required: true, enum: ['disabled', 'fog', 'standard', 'extra', 'start'], default: 'start' },
 			giftCarriers: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },
 			defenderBonus: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },
 			carrierToCarrierCombat: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
@@ -73,14 +80,16 @@ const schema = new Schema({
 			resourceDistribution: { type: Types.String, required: true, enum: ['random','weightedCenter'], default: 'random' },
 			playerDistribution: { type: Types.String, required: true, enum: ['circular','random'], default: 'circular' },
 			carrierSpeed: { type: Types.Number, required: true, min: 1, max: 25, default: 5 },
+			starCaptureReward: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'enabled' },
 			specialistBans: {
 				star: [{ type: Types.Number, required: false }],
 				carrier: [{ type: Types.Number, required: false }]
-			},
+			}
         },
 		conquest: {
 			victoryCondition: { type: Types.String, required: true, enum: ['starPercentage', 'homeStarPercentage'], default: 'starPercentage' },
 			victoryPercentage: { type: Types.Number, required: true, enum: [25, 33, 50, 66, 75, 90, 100], default: 50 },
+			capitalStarElimination: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' }
 		},
 		kingOfTheHill: {
 			productionCycles: { type: Types.Number, required: false, min: 1, max: 25, default: 10 }
@@ -90,7 +99,7 @@ const schema = new Schema({
 			orbitSpeed: { type: Types.Number, required: false, min: 1, max: 5, default: 3 }
 		},
         player: {
-			startingStars: { type: Types.Number, required: true, min: 1, max: 10, default: 6 },
+			startingStars: { type: Types.Number, required: true, min: 1, max: 30, default: 6 },
 			startingCredits: { type: Types.Number, required: true, min: 25, max: 3000, default: 500 },
 			startingCreditsSpecialists: { type: Types.Number, required: true, min: 0, max: 100, default: 5 },
 			startingShips: { type: Types.Number, required: true, min: 0, max: 100, default: 10 },
@@ -100,20 +109,25 @@ const schema = new Schema({
 				science: { type: Types.Number, required: true, min: 0, max: 5, default: 1 }
 			},
 			developmentCost: {
-				economy: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' },
-				industry: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' },
-				science: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' }
+				// Note: 'none' means that players cannot build the infrastructure
+				economy: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'standard' },
+				industry: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'standard' },
+				science: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'standard' }
 			},
 			tradeCredits: { type: Types.Boolean, required: false, default: true },
 			tradeCreditsSpecialists: { type: Types.Boolean, required: false, default: true },
 			tradeCost: { type: Types.Number, required: true, enum: [0, 5, 15, 25, 50, 100], default: 15 }, // TODO: This could be renamed.
-			tradeScanning: { type: Types.String, required: true, enum: ['all', 'scanned'], default: 'all' }
+			tradeScanning: { type: Types.String, required: true, enum: ['all', 'scanned'], default: 'all' },
+			populationCap: {
+				enabled: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
+				shipsPerStar: { type: Types.Number, required: true, min: 50, max: 1000, default: 100 }
+			}
 		},
 		diplomacy: {
 			enabled: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
 			tradeRestricted: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
 			maxAlliances: { type: Types.Number, required: true, min: 1, max: 31, default: 31 },
-			upkeepCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'none' },
+			upkeepCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'crazyExpensive'], default: 'none' },
 			globalEvents: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' }
 		},
 		technology: {
@@ -176,6 +190,7 @@ const schema = new Schema({
 		players: { type: Types.Number, required: true, default: 0 },
 		winner: { type: Types.ObjectId, required: false, default: null },
 		cleaned: { type: Types.Boolean, required: false, default: false }, // Represents if the events and history have been deleted.
+		leaderboard: [{ type: Types.ObjectId, required: false }]
 	},
 	constants: {
 		distances: {
@@ -227,7 +242,7 @@ const schema = new Schema({
 				cheap: { type: Types.Number, required: true, default: 0.05 },
 				standard: { type: Types.Number, required: true, default: 0.10 },
 				expensive: { type: Types.Number, required: true, default: 0.15 },
-        crazyExpensive: { type: Types.Number, required: true, default: 0.25 }
+        		crazyExpensive: { type: Types.Number, required: true, default: 0.25 }
 			}
 		},
 		player: {
@@ -239,7 +254,8 @@ const schema = new Schema({
 		}
 	},
 	quitters: [{ type: Types.ObjectId, required: false }],
-	afkers: [{ type: Types.ObjectId, required: false }]
+	afkers: [{ type: Types.ObjectId, required: false }],
+	spectators: [{ type: Types.ObjectId, required: false }]
 });
 
 export default schema;

@@ -1,99 +1,91 @@
 import { Router } from "express";
+import { ExpressJoiInstance } from "express-joi-validation";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import DiplomacyController from '../controllers/diplomacy';
+import { MiddlewareContainer } from "../middleware";
 
-import AuthMiddleware from '../middleware/auth';
-import CoreMiddleware from '../middleware/core';
-import GameMiddleware from '../middleware/game';
-import PlayerMiddleware from '../middleware/player';
-
-export default (router: Router, io, container: DependencyContainer) => {
-    const mwCore = CoreMiddleware();
-    const mwAuth = AuthMiddleware(container);
-    const mwGame = GameMiddleware(container);
-    const mwPlayer = PlayerMiddleware(container);
-
-    const controller = DiplomacyController(container, io);
+export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
+    const controller = DiplomacyController(container);
 
     router.get('/api/game/:gameId/diplomacy',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
+        mw.auth.authenticate(),
+        mw.game.loadGame({
             lean: true,
             'galaxy.players': true
             // 'galaxy.players._id': 1,
             // 'galaxy.players.userId': 1,
             // 'galaxy.players.diplomacy': 1
         }),
-        mwPlayer.loadPlayer,
+        mw.player.loadPlayer,
         controller.list,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/game/:gameId/diplomacy/:toPlayerId',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
+        mw.auth.authenticate(),
+        mw.game.loadGame({
             lean: true,
             'galaxy.players': true
             // 'galaxy.players._id': 1,
             // 'galaxy.players.userId': 1,
             // 'galaxy.players.diplomacy': 1
         }),
-        mwPlayer.loadPlayer,
+        mw.player.loadPlayer,
         controller.detail,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.put('/api/game/:gameId/diplomacy/ally/:playerId',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
-            lean: false,
+        mw.auth.authenticate(),
+        mw.game.loadGame({
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
             constants: true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true,
             isNotFinished: true
         }),
-        mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        mw.player.loadPlayer,
+        mw.player.validatePlayerState({ isPlayerUndefeated: true }),
         controller.declareAlly,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.put('/api/game/:gameId/diplomacy/enemy/:playerId',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
-            lean: false,
+        mw.auth.authenticate(),
+        mw.game.loadGame({
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
             constants: true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true,
             isNotFinished: true
         }),
-        mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        mw.player.loadPlayer,
+        mw.player.validatePlayerState({ isPlayerUndefeated: true }),
         controller.declareEnemy,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.put('/api/game/:gameId/diplomacy/neutral/:playerId',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
-            lean: false,
+        mw.auth.authenticate(),
+        mw.game.loadGame({
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
             constants: true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true,
             isNotFinished: true
         }),
-        mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }),
+        mw.player.loadPlayer,
+        mw.player.validatePlayerState({ isPlayerUndefeated: true }),
         controller.declareNeutral,
-        mwCore.handleError);
+        mw.core.handleError);
 
     return router;
 }

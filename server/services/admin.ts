@@ -119,6 +119,8 @@ export default class AdminService {
             _id: userId
         }, {
             'achievements.victories': 0,
+            'achievements.victories1v1': 0,
+            'achievements.level': 0,
             'achievements.rank': 0,
             'achievements.eloRating': null,
             'achievements.renown': 0,
@@ -126,6 +128,7 @@ export default class AdminService {
             'achievements.completed': 0,
             'achievements.quit': 0,
             'achievements.defeated': 0,
+            'achievements.defeated1v1': 0,
             'achievements.afk': 0,
             'achievements.combat.kills.ships': 0,
             'achievements.combat.kills.carriers': 0,

@@ -7,6 +7,7 @@ export interface PlayerStatistics {
     totalHomeStars: number;
     totalCarriers: number;
     totalShips: number;
+    totalShipsMax: number | null;
     totalEconomy: number;
     totalIndustry: number;
     totalScience: number;

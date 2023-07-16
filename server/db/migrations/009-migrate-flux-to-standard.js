@@ -17,13 +17,17 @@ module.exports = {
                     'standard_tb',
                     '32_player_rt',
                     'special_dark',
+                    'special_fog',
                     'special_ultraDark',
                     'special_orbital',
                     'special_battleRoyale',
                     'special_homeStar',
+                    'special_homeStarElimination',
                     'special_anonymous',
                     'special_kingOfTheHill',
-                    'special_tinyGalaxy'
+                    'special_tinyGalaxy',
+                    'special_freeForAll',
+                    'special_arcade'
                 ]
             },
             'state.startDate': { $eq: null },

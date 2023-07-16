@@ -13,7 +13,7 @@
     <thead class="table-dark">
       <tr>
         <td><small>Player</small></td>
-        <td class="text-end"><small>Rank Change</small></td>
+        <td class="text-end"><small>Rank Points</small></td>
       </tr>
     </thead>
     <tbody>

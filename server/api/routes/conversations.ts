@@ -1,187 +1,179 @@
 import { Router } from "express";
+import { ExpressJoiInstance } from "express-joi-validation";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import ConversationController from '../controllers/conversation';
+import { MiddlewareContainer } from "../middleware";
 
-import AuthMiddleware from '../middleware/auth';
-import CoreMiddleware from '../middleware/core';
-import GameMiddleware from '../middleware/game';
-import PlayerMiddleware from '../middleware/player';
-
-export default (router: Router, io, container: DependencyContainer) => {
-    const mwCore = CoreMiddleware();
-    const mwAuth = AuthMiddleware(container);
-    const mwGame = GameMiddleware(container);
-    const mwPlayer = PlayerMiddleware(container);
-
-    const controller = ConversationController(container, io);
+export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
+    const controller = ConversationController(container);
 
     router.get('/api/game/:gameId/conversations',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
+        mw.auth.authenticate(),
+        mw.game.loadGame({
             lean: true,
             state: true,
             conversations: true,
             'galaxy.players': true
         }),
-        mwPlayer.loadPlayer,
+        mw.player.loadPlayer,
         controller.list,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/game/:gameId/conversations/private/:withPlayerId',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
+        mw.auth.authenticate(),
+        mw.game.loadGame({
             lean: true,
             state: true,
             conversations: true,
             'galaxy.players': true
         }),
-        mwPlayer.loadPlayer,
+        mw.player.loadPlayer,
         controller.listPrivate,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/game/:gameId/conversations/unread',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
+        mw.auth.authenticate(),
+        mw.game.loadGame({
             lean: true,
             state: true,
             conversations: true,
             'galaxy.players': true
         }),
-        mwPlayer.loadPlayer,
+        mw.player.loadPlayer,
         controller.getUnreadCount,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/game/:gameId/conversations/:conversationId',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
+        mw.auth.authenticate(),
+        mw.game.loadGame({
             lean: true,
             state: true,
             conversations: true,
             'galaxy.players': true
         }),
-        mwPlayer.loadPlayer,
+        mw.player.loadPlayer,
         controller.detail,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.post('/api/game/:gameId/conversations',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
+        mw.auth.authenticate(),
+        mw.game.loadGame({
             lean: true,
             state: true,
             conversations: true,
             'galaxy.players': true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true
         }),
-        mwPlayer.loadPlayer,
+        mw.player.loadPlayer,
         controller.create,
-        mwCore.handleError);
+        mw.core.handleError);
         
     router.patch('/api/game/:gameId/conversations/:conversationId/send',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
+        mw.auth.authenticate(),
+        mw.game.loadGame({
             lean: true,
             state: true,
             conversations: true,
             'galaxy.players': true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true
         }),
-        mwPlayer.loadPlayer,
+        mw.player.loadPlayer,
         controller.sendMessage,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.patch('/api/game/:gameId/conversations/:conversationId/markAsRead',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
+        mw.auth.authenticate(),
+        mw.game.loadGame({
             lean: true,
             state: true,
             conversations: true,
             'galaxy.players': true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true
         }),
-        mwPlayer.loadPlayer,
+        mw.player.loadPlayer,
         controller.markAsRead,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.patch('/api/game/:gameId/conversations/:conversationId/mute',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
+        mw.auth.authenticate(),
+        mw.game.loadGame({
             lean: true,
             state: true,
             conversations: true,
             'galaxy.players': true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true
         }),
-        mwPlayer.loadPlayer,
+        mw.player.loadPlayer,
         controller.mute,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.patch('/api/game/:gameId/conversations/:conversationId/unmute',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
+        mw.auth.authenticate(),
+        mw.game.loadGame({
             lean: true,
             state: true,
             conversations: true,
             'galaxy.players': true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true
         }),
-        mwPlayer.loadPlayer,
+        mw.player.loadPlayer,
         controller.unmute,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.patch('/api/game/:gameId/conversations/:conversationId/leave',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
+        mw.auth.authenticate(),
+        mw.game.loadGame({
             lean: true,
             state: true,
             conversations: true,
             'galaxy.players': true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true
         }),
-        mwPlayer.loadPlayer,
+        mw.player.loadPlayer,
         controller.leave,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.patch('/api/game/:gameId/conversations/:conversationId/pin/:messageId',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
+        mw.auth.authenticate(),
+        mw.game.loadGame({
             lean: true,
             state: true,
             conversations: true,
             'galaxy.players': true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true
         }),
-        mwPlayer.loadPlayer,
+        mw.player.loadPlayer,
         controller.pinMessage,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.patch('/api/game/:gameId/conversations/:conversationId/unpin/:messageId',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
+        mw.auth.authenticate(),
+        mw.game.loadGame({
             lean: true,
             state: true,
             conversations: true,
             'galaxy.players': true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true
         }),
-        mwPlayer.loadPlayer,
+        mw.player.loadPlayer,
         controller.unpinMessage,
-        mwCore.handleError);
+        mw.core.handleError);
 
     return router;
 }

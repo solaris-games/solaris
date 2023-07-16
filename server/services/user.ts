@@ -14,7 +14,12 @@ function uuidv4(): string {
     });
 }
 
+export const UserServiceEvents = {
+    onUserCreated: 'onUserCreated'
+}
+
 export default class UserService extends EventEmitter {
+
     userModel;
     userRepo: Repository<User>;
     passwordService: PasswordService;
@@ -219,7 +224,7 @@ export default class UserService extends EventEmitter {
 
         let doc = await newUser.save();
 
-        this.emit('onUserCreated', doc);
+        this.emit(UserServiceEvents.onUserCreated, doc);
 
         return doc._id;
     }
@@ -230,6 +235,18 @@ export default class UserService extends EventEmitter {
 
         let user = await this.userRepo.findOne({
             email
+        }, {
+            _id: 1
+        });
+
+        return user != null;
+    }
+
+    async userIdExists(id: DBObjectId) {
+        let user = await this.userRepo.findOne({
+            _id: id
+        }, {
+            _id: 1
         });
 
         return user != null;
@@ -415,12 +432,17 @@ export default class UserService extends EventEmitter {
     }
 
     async saveSubscriptions(userId: DBObjectId, subscriptions: any) {
-        let obj: UserSubscriptions = {};
+        let obj: UserSubscriptions = {
+            settings: {
+                notifyActiveGamesOnly: subscriptions.settings?.notifyActiveGamesOnly || false
+            }
+        };
 
         if (subscriptions.discord) {
             obj.discord = {
                 gameEnded: subscriptions.discord.gameEnded || false,
                 gameStarted: subscriptions.discord.gameStarted || false,
+                gameTurnEnded: subscriptions.discord.gameTurnEnded || false,
                 playerCreditsReceived: subscriptions.discord.playerCreditsReceived || false,
                 playerCreditsSpecialistsReceived: subscriptions.discord.playerCreditsSpecialistsReceived || false,
                 playerGalacticCycleComplete: subscriptions.discord.playerGalacticCycleComplete || false,

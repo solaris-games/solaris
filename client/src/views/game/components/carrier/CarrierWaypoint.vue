@@ -259,7 +259,8 @@ export default {
       for (let i = 0; i <= index; i++) {
         let wp = this.waypoints[i]
 
-        totalTicks += wp.ticks + +wp.delayTicks
+        // wp.ticks includes delayTicks
+        totalTicks += wp.ticks
       }
 
       this.waypointEta = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, totalTicks)

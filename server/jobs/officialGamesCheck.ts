@@ -11,13 +11,17 @@ const officialGameSettings = [
 
 const specialGameSettings = [
     require('../config/game/settings/official/special_dark'),
+    require('../config/game/settings/official/special_fog'),
     require('../config/game/settings/official/special_battleRoyale'),
     require('../config/game/settings/official/special_orbital'),
     require('../config/game/settings/official/special_ultraDark'),
     require('../config/game/settings/official/special_homeStar'),
+    require('../config/game/settings/official/special_homeStarElimination'),
     require('../config/game/settings/official/special_anonymous'),
     require('../config/game/settings/official/special_kingOfTheHill'),
     require('../config/game/settings/official/special_tinyGalaxy'),
+    require('../config/game/settings/official/special_freeForAll'),
+    require('../config/game/settings/official/special_arcade')
 ];
 
 export default (container: DependencyContainer) => {

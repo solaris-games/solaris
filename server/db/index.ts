@@ -71,7 +71,7 @@ export default async (config, options) => {
         await unlockAgendaJobs(db);
     }
 
-    console.log('MongoDB Intialized');
+    console.log('MongoDB intialized.');
 
     return db;
 };

@@ -45,7 +45,7 @@ export default class CarrierMovementService {
         if (carrier.specialistId) {
             let specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
 
-            if (specialist.modifiers.local) {
+            if (specialist && specialist.modifiers.local) {
                 distanceModifier *= (specialist.modifiers.local.speed || 1);
             }
         }
@@ -87,14 +87,15 @@ export default class CarrierMovementService {
         // Reignite dead stars if applicable
         // Note: Black holes cannot be reignited.
         if (!carrier.isGift && this.starService.isDeadStar(destinationStar) && this.specialistService.getReigniteDeadStar(carrier)) {
-            let reigniteNaturalResources = this.specialistService.getReigniteDeadStarNaturalResources(carrier);
+            let reigniteSpecialistNaturalResources = this.specialistService.getReigniteDeadStarNaturalResources(carrier);
 
-            // Double resources for binary stars.
-            if (destinationStar.isBinaryStar) {
-                reigniteNaturalResources.economy *= 2;
-                reigniteNaturalResources.industry *= 2;
-                reigniteNaturalResources.science *= 2;
-            }
+            // Double resourches for binary stars.
+            let modifier = destinationStar.isBinaryStar ? 2 : 1
+            let reigniteNaturalResources = {
+                economy: reigniteSpecialistNaturalResources.economy * modifier,
+                industry: reigniteSpecialistNaturalResources.industry * modifier,
+                science: reigniteSpecialistNaturalResources.science * modifier
+            };
             
             this.starService.reigniteDeadStar(game, destinationStar, reigniteNaturalResources);
 
@@ -241,7 +242,7 @@ export default class CarrierMovementService {
             if (carrier.specialistId) {
                 let carrierSpecialist = this.specialistService.getByIdCarrier(carrier.specialistId);
 
-                if (carrierSpecialist.modifiers.special && carrierSpecialist.modifiers.special.unlockWarpGates) {
+                if (carrierSpecialist && carrierSpecialist.modifiers.special && carrierSpecialist.modifiers.special.unlockWarpGates) {
                     return true;
                 }
             }
@@ -251,7 +252,7 @@ export default class CarrierMovementService {
             if (!sourceAllied && sourceStar.specialistId) {
                 let specialist = this.specialistService.getByIdStar(sourceStar.specialistId);
 
-                if (specialist.modifiers.special && specialist.modifiers.special.lockWarpGates) {
+                if (specialist && specialist.modifiers.special && specialist.modifiers.special.lockWarpGates) {
                     return false;
                 }
             }
@@ -259,7 +260,7 @@ export default class CarrierMovementService {
             if (!desinationAllied && destinationStar.specialistId) {
                 let specialist = this.specialistService.getByIdStar(destinationStar.specialistId);
 
-                if (specialist.modifiers.special && specialist.modifiers.special.lockWarpGates) {
+                if (specialist && specialist.modifiers.special && specialist.modifiers.special.lockWarpGates) {
                     return false;
                 }
             }

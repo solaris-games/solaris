@@ -8,23 +8,22 @@ import containerLoader from '../services';
 
 let mongo;
 
+console.log(`Node ${process.version}`);
+
 async function startServer() {
   mongo = await mongooseLoader(config, {});
 
   const app = express();
   const server = http.createServer(app);
   
-  const io = socketLoader(config, server);
+  const io = socketLoader(server);
   const container = containerLoader(config, io);
 
-  await expressLoader(config, app, io, container);
-
-  // await container.donateService.listRecentDonations();
-  // console.log('Loaded recent donations to cache');
+  await expressLoader(config, app, container);
 
   server.listen(config.port, (err) => {
     if (err) {
-      console.log(err);
+      console.error(err);
       return;
     }
 

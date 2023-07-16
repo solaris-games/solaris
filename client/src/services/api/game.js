@@ -58,11 +58,6 @@ class GameService extends BaseApiService {
       { withCredentials: true })
   }
 
-  listActiveGamesSummary () {
-    return axios.get(this.BASE_URL + 'game/list/summary/user',
-      { withCredentials: true })
-  }
-
   listOfficialGames () {
     return axios.get(this.BASE_URL + 'game/list/official',
       { withCredentials: true })
@@ -90,6 +85,11 @@ class GameService extends BaseApiService {
 
   listMyCompletedGames () {
     return axios.get(this.BASE_URL + 'game/list/completed/user',
+      { withCredentials: true })
+  }
+
+  listSpectatingGames () {
+    return axios.get(this.BASE_URL + 'game/list/spectating',
       { withCredentials: true })
   }
 

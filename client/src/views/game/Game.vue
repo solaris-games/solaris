@@ -48,7 +48,10 @@ export default {
     return {
       audio: null,
       MENU_STATES: MENU_STATES,
-      polling: null
+      polling: null,
+      // We use this to track whether we are making a request to the API to get the next tick.
+      // It is used to prevent spamming the API if the app gets suspended and is re-opened after a very long time.
+      ticking: false
     }
   },
   async created () {
@@ -345,7 +348,7 @@ export default {
       player.isOnline = false
     },
     async reloadGameCheck () {
-      if (!this.isLoggedIn) {
+      if (!this.isLoggedIn || this.ticking) {
         return
       }
 
@@ -354,6 +357,8 @@ export default {
       let canTick = this.$store.state.game.settings.gameTime.speed <= 10 || gameHelper.canTick(this.$store.state.game)
 
       if (canTick) {
+        this.ticking = true
+
         try {
           let response = await GameApiService.getGameState(this.$store.state.game._id)
           
@@ -376,6 +381,8 @@ export default {
         } catch (e) {
           console.error(e)
         }
+
+        this.ticking = false
       }
     }
   },

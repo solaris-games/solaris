@@ -33,8 +33,13 @@
           </span>
         </div>
         <div class="col-auto">
+          <span title="The weapons level of this carrier">
+            {{carrier.effectiveTechs.weapons}} <i class="fas fa-gun ms-1"></i>
+          </span>
+        </div>
+        <div class="col-auto">
           <span title="The total number of ships the carrier has">
-            {{carrier.ships == null ? '???' : carrier.ships}} <i class="fas fa-rocket ms-1"></i>
+            {{carrier.ships == null ? '???' : carrier.ships}} <i class="fas fa-rocket"></i>
           </span>
         </div>
       </div>
@@ -47,13 +52,18 @@
               <span class="ms-1" v-if="carrier.specialistId" :title="carrier.specialist.description">{{carrier.specialist.name}}</span>
               <span v-if="!carrier.specialistId">No Specialist</span>
             </a>
+            <span v-if="carrier.specialistId && carrier.specialistExpireTick" class="badge bg-warning ms-1"><i class="fas fa-stopwatch"></i> Expires Tick {{carrier.specialistExpireTick}}</span>
           </span>
           <span v-if="canShowSpecialist && (!isOwnedByUserPlayer || !canHireSpecialist)">
             <specialist-icon :type="'carrier'" :defaultIcon="'user-astronaut'" :specialist="carrier.specialist"></specialist-icon>
-            <span v-if="carrier.specialist">
-              {{carrier.specialist.name}}
-            </span>
+            <span v-if="carrier.specialist" class="ms-1">{{carrier.specialist.name}}</span>
+            <span v-if="carrier.specialistId && carrier.specialistExpireTick" class="badge bg-warning ms-1"><i class="fas fa-stopwatch"></i> Expires Tick {{carrier.specialistExpireTick}}</span>
             <span v-if="!carrier.specialist">No Specialist</span>
+          </span>
+        </div>
+        <div class="col-auto">
+          <span title="The hyperspace range of this carrier">
+            {{carrier.effectiveTechs.hyperspace}} <i class="fas fa-gas-pump ms-1"></i>
           </span>
         </div>
         <div class="col-auto">
@@ -99,12 +109,28 @@
 
     <div v-if="isStandardUIStyle" class="mb-2">
       <!-- TODO: This should be a component -->
-      <div class="row mb-0 pt-3 pb-3 bg-primary">
+      <div class="row mb-0 pt-2 pb-2 bg-primary">
           <div class="col">
               Ships
           </div>
           <div class="col text-end">
               {{carrier.ships == null ? '???' : carrier.ships}} <i class="fas fa-rocket ms-1"></i>
+          </div>
+      </div>
+      <div class="row mb-0 pt-1 pb-1">
+          <div class="col">
+              Weapons
+          </div>
+          <div class="col text-end">
+              {{carrier.effectiveTechs.weapons}} <i class="fas fa-gun ms-1"></i>
+          </div>
+      </div>
+      <div class="row mb-0 pt-1 pb-1 bg-dark">
+          <div class="col">
+              Hyperspace Range
+          </div>
+          <div class="col text-end">
+              {{carrier.effectiveTechs.hyperspace}} <i class="fas fa-gas-pump ms-1"></i>
           </div>
       </div>
     </div>
@@ -251,6 +277,8 @@ export default {
   },
   methods: {
     onCloseRequested (e) {
+      GameContainer.map.unselectAllCarriers()
+      
       this.$emit('onCloseRequested', e)
     },
     onViewCompareIntelRequested (e) {
@@ -441,7 +469,7 @@ export default {
       return this.carrier && this.userPlayer && this.carrier.ownedByPlayerId == this.userPlayer._id
     },
     isNotUserPlayerCarrier: function () {
-      return this.carrier && !this.userPlayer || this.carrier.ownedByPlayerId != this.userPlayer._id
+      return (this.carrier && !this.userPlayer) || (this.carrier.ownedByPlayerId != this.userPlayer._id)
     },
     hasWaypoints: function () {
       return this.carrier.waypoints && this.carrier.waypoints.length

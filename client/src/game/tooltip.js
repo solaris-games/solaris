@@ -2,12 +2,14 @@ import * as PIXI from 'pixi.js-legacy'
 import GameHelper from '../services/gameHelper'
 
 export default class {
-    constructor(game) {
-        this.game = game
-        
+    constructor() {
         this.container = new PIXI.Container()
         this.container.interactive = false
         this.container.buttonMode = false
+    }
+
+    setup (game) {
+        this.game = game
     }
 
     clear () {

@@ -9,6 +9,20 @@
         <loading-spinner :loading="!subscriptions"/>
 
         <form @submit.prevent="handleSubmit" v-if="subscriptions" class="pb-2">
+            <div>
+                <h5 class="pt-2">Settings</h5>
+                
+                <div class="row pt-1 pb-1">
+                    <label for="notifyActiveGamesOnly" class="col-12 col-sm-6 col-form-label">Notify Active Games Only <help-tooltip tooltip="If enabled, you will receive notifications for games where you are not defeated."/></label>
+                    <div class="col-12 col-sm-6">
+                        <select class="form-control" id="notifyActiveGamesOnly" v-model="subscriptions.settings.notifyActiveGamesOnly" :disabled="isSaving">
+                            <option :value="true">Enabled</option>
+                            <option :value="false">Disabled</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
             <div v-if="subscriptions.discord">
                 <h5 class="pt-2">Discord</h5>
                 
@@ -26,6 +40,16 @@
                     <label for="gameEnded" class="col-12 col-sm-6 col-form-label">Game - Finished</label>
                     <div class="col-12 col-sm-6">
                         <select class="form-control" id="gameEnded" v-model="subscriptions.discord.gameEnded" :disabled="isSaving">
+                            <option :value="true">Enabled</option>
+                            <option :value="false">Disabled</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="row pt-1 pb-1">
+                    <label for="gameTurnEnded" class="col-12 col-sm-6 col-form-label">Game - Turn Ended</label>
+                    <div class="col-12 col-sm-6">
+                        <select class="form-control" id="gameTurnEnded" v-model="subscriptions.discord.gameTurnEnded" :disabled="isSaving">
                             <option :value="true">Enabled</option>
                             <option :value="false">Disabled</option>
                         </select>
@@ -119,11 +143,13 @@
 import ViewSubtitleVue from '../../components/ViewSubtitle'
 import UserApiService from '../../../services/api/user'
 import LoadingSpinner from '../../components/LoadingSpinner'
+import HelpTooltip from '../../components/HelpTooltip'
 
 export default {
     components: {
         'loading-spinner': LoadingSpinner,
         'view-subtitle': ViewSubtitleVue,
+        'help-tooltip': HelpTooltip
     },
     data () {
         return {

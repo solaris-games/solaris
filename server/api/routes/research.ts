@@ -1,53 +1,45 @@
 import { Router } from "express";
+import { ExpressJoiInstance } from "express-joi-validation";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import ResearchController from '../controllers/research';
+import { MiddlewareContainer } from "../middleware";
 
-import AuthMiddleware from '../middleware/auth';
-import CoreMiddleware from '../middleware/core';
-import GameMiddleware from '../middleware/game';
-import PlayerMiddleware from '../middleware/player';
-
-export default (router: Router, io, container: DependencyContainer) => {
-    const mwCore = CoreMiddleware();
-    const mwAuth = AuthMiddleware(container);
-    const mwGame = GameMiddleware(container);
-    const mwPlayer = PlayerMiddleware(container);
-
-    const controller = ResearchController(container, io);
+export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
+    const controller = ResearchController(container);
 
     router.put('/api/game/:gameId/research/now',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
-            lean: false,
+        mw.auth.authenticate(),
+        mw.game.loadGame({
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
             constants: true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true,
             isNotFinished: true
         }),
-        mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }), controller.updateNow,
-        mwCore.handleError);
+        mw.player.loadPlayer,
+        mw.player.validatePlayerState({ isPlayerUndefeated: true }), controller.updateNow,
+        mw.core.handleError);
 
     router.put('/api/game/:gameId/research/next',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
-            lean: false,
+        mw.auth.authenticate(),
+        mw.game.loadGame({
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
             constants: true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true,
             isNotFinished: true
         }),
-        mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }), controller.updateNext,
-        mwCore.handleError);
+        mw.player.loadPlayer,
+        mw.player.validatePlayerState({ isPlayerUndefeated: true }), controller.updateNext,
+        mw.core.handleError);
 
     return router;
 }

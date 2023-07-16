@@ -1,23 +1,21 @@
 import { Router } from "express";
+import { ExpressJoiInstance } from "express-joi-validation";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import AuthController from '../controllers/auth';
+import { MiddlewareContainer } from "../middleware";
+import { authLoginRequestSchema } from "../requests/auth";
 
-import AuthMiddleware from '../middleware/auth';
-import CoreMiddleware from '../middleware/core';
-
-export default (router: Router, io, container: DependencyContainer) => {
-    const mwCore = CoreMiddleware();
-    const mwAuth = AuthMiddleware(container);
-
-    const controller = AuthController(container, io);
+export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
+    const controller = AuthController(container);
 
     router.post('/api/auth/login',
+        validator.body(authLoginRequestSchema),
         controller.login,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.post('/api/auth/logout',
         controller.logout,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.post('/api/auth/verify',
         controller.verify);
@@ -26,9 +24,9 @@ export default (router: Router, io, container: DependencyContainer) => {
         controller.authoriseDiscord); // TODO: This should be in another api file. oauth.js?
         
     router.delete('/api/auth/discord',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.unauthoriseDiscord,
-        mwCore.handleError);
+        mw.core.handleError);
 
     return router;
 }

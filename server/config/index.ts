@@ -28,9 +28,6 @@ const config: Config = {
         clientId: process.env.PAYPAL_CLIENT_ID,
         clientSecret: process.env.PAYPAL_CLIENT_SECRET
     },
-    buymeacoffee: {
-        accessToken: process.env.BUYMEACOFFEE_ACCESS_TOKEN
-    },
     discord: {
         serverId: process.env.DISCORD_SERVERID,
         clientId: process.env.DISCORD_CLIENTID,

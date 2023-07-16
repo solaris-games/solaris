@@ -2,6 +2,7 @@ import { DBObjectId } from "./DBObjectId";
 import { InfrastructureUpgradeCosts } from "./InfrastructureUpgrade";
 import { Location } from "./Location";
 import { MapObject } from "./Map";
+import { PlayerTechnologyLevels } from "./Player";
 import { Specialist } from "./Specialist";
 
 export interface NaturalResources {
@@ -35,21 +36,25 @@ export interface Star extends MapObject {
     ships: number | null;
     shipsActual?: number;
     specialistId: number | null;
+    specialistExpireTick: number | null;
     homeStar: boolean;
     warpGate: boolean;
     isNebula: boolean;
     isAsteroidField: boolean;
     isBinaryStar: boolean;
     isBlackHole: boolean;
+    isPulsar: boolean;
     wormHoleToStarId: DBObjectId | null;
     ignoreBulkUpgrade?: IgnoreBulkUpgrade;
     infrastructure: Infrastructure;
     isKingOfTheHillStar?: boolean;
     locationNext?: Location;
-    specialist?: Specialist;
+    specialist?: Specialist | null;
     targeted?: boolean;
     upgradeCosts?: InfrastructureUpgradeCosts;
     manufacturing?: number;
+    isInScanningRange?: boolean;
+    effectiveTechs?: PlayerTechnologyLevels;
 };
 
 export interface StarCaptureResult {

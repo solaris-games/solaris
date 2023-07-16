@@ -10,6 +10,11 @@ import { User } from './types/User';
 import DiplomacyService from './diplomacy';
 const EventEmitter = require('events');
 
+export const CarrierGiftServiceEvents = {
+    onPlayerGiftReceived: 'onPlayerGiftReceived',
+    onPlayerGiftSent: 'onPlayerGiftSent'
+}
+
 export default class CarrierGiftService extends EventEmitter {
     gameRepo: Repository<Game>;
     diplomacyService: DiplomacyService;
@@ -93,8 +98,8 @@ export default class CarrierGiftService extends EventEmitter {
                 star
             };
     
-            this.emit('onPlayerGiftReceived', eventObject);
-            this.emit('onPlayerGiftSent', eventObject);
+            this.emit(CarrierGiftServiceEvents.onPlayerGiftReceived, eventObject);
+            this.emit(CarrierGiftServiceEvents.onPlayerGiftSent, eventObject);
 
             carrier.isGift = false;
         } else if (!carrier.waypoints.length) {

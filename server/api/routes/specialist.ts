@@ -1,34 +1,26 @@
 import { Router } from "express";
+import { ExpressJoiInstance } from "express-joi-validation";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import SpecialistController from '../controllers/specialist';
+import { MiddlewareContainer } from "../middleware";
 
-import AuthMiddleware from '../middleware/auth';
-import CoreMiddleware from '../middleware/core';
-import GameMiddleware from '../middleware/game';
-import PlayerMiddleware from '../middleware/player';
-
-export default (router: Router, io, container: DependencyContainer) => {
-    const mwCore = CoreMiddleware();
-    const mwAuth = AuthMiddleware(container);
-    const mwGame = GameMiddleware(container);
-    const mwPlayer = PlayerMiddleware(container);
-
-    const controller = SpecialistController(container, io);
+export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
+    const controller = SpecialistController(container);
 
     router.get('/api/game/specialists/bans',
         controller.listBans,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/game/specialists/carrier',
         controller.listCarrier,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/game/specialists/star',
         controller.listStar,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/game/:gameId/specialists/carrier',
-        mwGame.loadGame({
+        mw.game.loadGame({
             lean: true,
             settings: true,
             state: true,
@@ -36,10 +28,10 @@ export default (router: Router, io, container: DependencyContainer) => {
             constants: true
         }),
         controller.listCarrierForGame,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/game/:gameId/specialists/star',
-        mwGame.loadGame({
+        mw.game.loadGame({
             lean: true,
             settings: true,
             state: true,
@@ -47,41 +39,41 @@ export default (router: Router, io, container: DependencyContainer) => {
             constants: true
         }),
         controller.listStarForGame,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.put('/api/game/:gameId/carrier/:carrierId/hire/:specialistId',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
-            lean: false,
+        mw.auth.authenticate(),
+        mw.game.loadGame({
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
             constants: true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true,
             isNotFinished: true
         }),
-        mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }), controller.hireCarrier,
-        mwCore.handleError);
+        mw.player.loadPlayer,
+        mw.player.validatePlayerState({ isPlayerUndefeated: true }), controller.hireCarrier,
+        mw.core.handleError);
 
     router.put('/api/game/:gameId/star/:starId/hire/:specialistId',
-        mwAuth.authenticate(),
-        mwGame.loadGame({
-            lean: false,
+        mw.auth.authenticate(),
+        mw.game.loadGame({
+            lean: true,
             settings: true,
             state: true,
             galaxy: true,
             constants: true
         }),
-        mwGame.validateGameState({
+        mw.game.validateGameState({
             isUnlocked: true,
             isNotFinished: true
         }),
-        mwPlayer.loadPlayer,
-        mwPlayer.validatePlayerState({ isPlayerUndefeated: true }), controller.hireStar,
-        mwCore.handleError);
+        mw.player.loadPlayer,
+        mw.player.validatePlayerState({ isPlayerUndefeated: true }), controller.hireStar,
+        mw.core.handleError);
 
     return router;
 }

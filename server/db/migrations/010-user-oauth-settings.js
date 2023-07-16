@@ -20,6 +20,7 @@ module.exports = {
                     'discord': {
                         'gameStarted': true,
                         'gameEnded': true,
+                        'gameTurnEnded': true,
                         'playerGalacticCycleComplete': true,
                         'playerResearchComplete': true,
                         'playerTechnologyReceived': true,

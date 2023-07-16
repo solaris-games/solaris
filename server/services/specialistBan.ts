@@ -48,7 +48,7 @@ export default class SpecialistBanService {
     }
 
     getCurrentMonthStarBans(amount: number): Specialist[] {
-        const specs = this.specialistService.listStar(null);
+        const specs = this.specialistService.listStar(null).filter(s => s.active.official);
         const ids = specs.map((s: Specialist) => s.id);
         const bans = this._getCurrentMonthBans(ids, amount);
 
@@ -56,7 +56,7 @@ export default class SpecialistBanService {
     }
 
     getCurrentMonthCarrierBans(amount: number): Specialist[] {
-        const specs = this.specialistService.listCarrier(null);
+        const specs = this.specialistService.listCarrier(null).filter(s => s.active.official);
         const ids = specs.map((s: Specialist) => s.id);
         const bans = this._getCurrentMonthBans(ids, amount);
 

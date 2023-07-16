@@ -1,35 +1,72 @@
-import ValidationError from '../../errors/validation';
+import { LedgerType } from '../../services/ledger';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
 
-export default (container: DependencyContainer, io) => {
+export default (container: DependencyContainer) => {
     return {
-        detail: async (req, res, next) => {
+        detailCredits: async (req, res, next) => {
             try {
-                let ledger = await container.ledgerService.getLedger(req.player);
+                let ledger = await container.ledgerService.getLedger(req.player, LedgerType.Credits);
     
                 return res.status(200).json(ledger);
             } catch (err) {
                 return next(err);
             }
         },
-        forgive: async (req, res, next) => {
+        forgiveCredits: async (req, res, next) => {
             try {
                 let newLedger = await container.ledgerService.forgiveDebt(
                     req.game,
                     req.player,
-                    req.params.playerId);
+                    req.params.playerId,
+                    LedgerType.Credits);
     
                 return res.status(200).json(newLedger);
             } catch (err) {
                 return next(err);
             }
         },
-        settle: async (req, res, next) => {
+        settleCredits: async (req, res, next) => {
             try {
                 let newLedger = await container.ledgerService.settleDebt(
                     req.game,
                     req.player,
-                    req.params.playerId);
+                    req.params.playerId,
+                    LedgerType.Credits);
+    
+                return res.status(200).json(newLedger);
+            } catch (err) {
+                return next(err);
+            }
+        },
+        detailCreditsSpecialists: async (req, res, next) => {
+            try {
+                let ledger = await container.ledgerService.getLedger(req.player, LedgerType.CreditsSpecialists);
+    
+                return res.status(200).json(ledger);
+            } catch (err) {
+                return next(err);
+            }
+        },
+        forgiveCreditsSpecialists: async (req, res, next) => {
+            try {
+                let newLedger = await container.ledgerService.forgiveDebt(
+                    req.game,
+                    req.player,
+                    req.params.playerId,
+                    LedgerType.CreditsSpecialists);
+    
+                return res.status(200).json(newLedger);
+            } catch (err) {
+                return next(err);
+            }
+        },
+        settleCreditsSpecialists: async (req, res, next) => {
+            try {
+                let newLedger = await container.ledgerService.settleDebt(
+                    req.game,
+                    req.player,
+                    req.params.playerId,
+                    LedgerType.CreditsSpecialists);
     
                 return res.status(200).json(newLedger);
             } catch (err) {

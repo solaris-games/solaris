@@ -1,120 +1,115 @@
 import { Router } from "express";
+import { ExpressJoiInstance } from "express-joi-validation";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import GuildController from '../controllers/guild';
+import { MiddlewareContainer } from "../middleware";
 
-import AuthMiddleware from '../middleware/auth';
-import CoreMiddleware from '../middleware/core';
-
-export default (router: Router, io, container: DependencyContainer) => {
-    const mwCore = CoreMiddleware();
-    const mwAuth = AuthMiddleware(container);
-
-    const controller = GuildController(container, io);
+export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
+    const controller = GuildController(container);
 
     router.get('/api/guild/list',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.list,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/guild',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.detailMine,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/guild/leaderboard',
-        mwAuth.authenticate(),
         controller.listLeaderboard,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/guild/invites',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.listMyInvites,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/guild/applications',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.listMyApplications,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.get('/api/guild/:guildId',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.detail,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.post('/api/guild',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.create,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.patch('/api/guild',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.rename,
-        mwCore.handleError);
+        mw.core.handleError);
         
     router.delete('/api/guild/:guildId',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.delete,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.put('/api/guild/:guildId/invite',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.invite,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.patch('/api/guild/:guildId/uninvite/:userId',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.uninvite,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.patch('/api/guild/:guildId/accept/:userId',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.acceptInviteForApplicant,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.patch('/api/guild/:guildId/accept',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.acceptInvite,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.patch('/api/guild/:guildId/decline',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.declineInvite,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.put('/api/guild/:guildId/apply',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.apply,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.patch('/api/guild/:guildId/withdraw',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.withdraw,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.patch('/api/guild/:guildId/reject/:userId',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.reject,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.patch('/api/guild/:guildId/leave',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.leave,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.patch('/api/guild/:guildId/promote/:userId',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.promote,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.patch('/api/guild/:guildId/demote/:userId',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.demote,
-        mwCore.handleError);
+        mw.core.handleError);
 
     router.patch('/api/guild/:guildId/kick/:userId',
-        mwAuth.authenticate(),
+        mw.auth.authenticate(),
         controller.kick,
-        mwCore.handleError);
+        mw.core.handleError);
 
     return router;
 }

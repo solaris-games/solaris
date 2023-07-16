@@ -11,6 +11,12 @@ import GameDiplomacyPeaceDeclaredEvent from "./types/events/GameDiplomacyPeaceDe
 import GameDiplomacyWarDeclaredEvent from "./types/events/GameDiplomacyWarDeclared";
 import { GameEvent } from "./types/GameEvent";
 
+export const DiplomacyServiceEvents = {
+    onDiplomacyStatusChanged: 'onDiplomacyStatusChanged',
+    onDiplomacyPeaceDeclared: 'onDiplomacyPeaceDeclared',
+    onDiplomacyWarDeclared: 'onDiplomacyWarDeclared'
+}
+
 export default class DiplomacyService extends EventEmitter {
 
     gameRepo: Repository<Game>;
@@ -264,7 +270,7 @@ export default class DiplomacyService extends EventEmitter {
         let isAllied = newStatus.actualStatus === 'allies';
         let isFriendly = isAllied || newStatus.actualStatus === 'neutral';
 
-        this.emit('onDiplomacyStatusChanged', {
+        this.emit(DiplomacyServiceEvents.onDiplomacyStatusChanged, {
             gameId: game._id,
             gameTick: game.state.tick,
             status: newStatus
@@ -278,7 +284,7 @@ export default class DiplomacyService extends EventEmitter {
                 status: newStatus
             };
 
-            this.emit('onDiplomacyPeaceDeclared', e);
+            this.emit(DiplomacyServiceEvents.onDiplomacyPeaceDeclared, e);
         }
 
         return newStatus;
@@ -299,7 +305,7 @@ export default class DiplomacyService extends EventEmitter {
 
         let newStatus = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
 
-        this.emit('onDiplomacyStatusChanged', {
+        this.emit(DiplomacyServiceEvents.onDiplomacyStatusChanged, {
             gameId: game._id,
             gameTick: game.state.tick,
             status: newStatus
@@ -313,7 +319,7 @@ export default class DiplomacyService extends EventEmitter {
                 status: newStatus
             };
             
-            this.emit('onDiplomacyWarDeclared', e);
+            this.emit(DiplomacyServiceEvents.onDiplomacyWarDeclared, e);
         }
 
         return newStatus;
@@ -340,7 +346,7 @@ export default class DiplomacyService extends EventEmitter {
 
         let isNeutral = newStatus.actualStatus === 'neutral';
 
-        this.emit('onDiplomacyStatusChanged', {
+        this.emit(DiplomacyServiceEvents.onDiplomacyStatusChanged, {
             gameId: game._id,
             gameTick: game.state.tick,
             status: newStatus
@@ -354,7 +360,7 @@ export default class DiplomacyService extends EventEmitter {
                 status: newStatus
             };
 
-            this.emit('onDiplomacyPeaceDeclared', e);
+            this.emit(DiplomacyServiceEvents.onDiplomacyPeaceDeclared, e);
         }
 
         return newStatus;

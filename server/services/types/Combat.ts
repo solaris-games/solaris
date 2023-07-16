@@ -26,7 +26,7 @@ export interface CombatPart {
 export interface CombatStar {
     _id: DBObjectId;
     ownedByPlayerId: DBObjectId | null;
-    specialist: Specialist;
+    specialist: Specialist | null;
     before: number;
     lost: number;
     after: number;
@@ -37,7 +37,7 @@ export interface CombatCarrier {
     _id: DBObjectId;
     name: string;
     ownedByPlayerId: DBObjectId;
-    specialist: Specialist;
+    specialist: Specialist | null;
     before: number | string;
     lost: number | string;
     after: number | string;

@@ -6,7 +6,7 @@
             <label class="col-form-label">{{player.stats.totalScience}} <i class="fas fa-flask"></i></label>
         </div>
     </div>
-    <div class="mb-2 row pt-2 pb-2 mb-0 " v-if="!player.defeated">
+    <div class="mb-2 row pt-2 pb-2 mb-0 " v-if="!player.defeated && optionsNow.length">
         <label class="col-5 col-form-label">Researching:</label>
         <div class="col-7">
             <select class="form-control" v-model="player.researchingNow" v-on:change="updateResearchNow" v-if="!loadingNow" :disabled="$isHistoricalMode() || isGameFinished">
@@ -18,13 +18,13 @@
             <label v-if="loadingNow" class="col-form-label">Loading...</label>
         </div>
     </div>
-    <div class="mb-2 row mb-0 bg-dark" v-if="!player.defeated">
+    <div class="mb-2 row mb-0 bg-dark" v-if="!player.defeated && optionsNow.length">
         <label class="col col-form-label" title="Current research ETA">ETA:</label>
         <div class="col text-end">
             <label class="col-form-label">{{timeRemainingEta}}</label>
         </div>
     </div>
-    <div class="mb-2 row pt-2 pb-2 mb-0  mt-1" v-if="!player.defeated">
+    <div class="mb-2 row pt-2 pb-2 mb-0  mt-1" v-if="!player.defeated && optionsNext.length > 1">
         <label class="col-5 col-form-label">Next:</label>
         <div class="col-7">
             <select class="form-control" v-model="player.researchingNext" v-on:change="updateResearchNext" v-if="!loadingNext" :disabled="$isHistoricalMode() || isGameFinished">
@@ -36,7 +36,7 @@
             <label v-if="loadingNext" class="col-form-label">Loading...</label>
         </div>
     </div>
-    <div class="mb-2 row mb-2 bg-dark" v-if="!player.defeated && timeNextRemainingEta">
+    <div class="mb-2 row mb-2 bg-dark" v-if="!player.defeated && optionsNext.length > 1 && timeNextRemainingEta">
         <label class="col col-form-label" title="Next research ETA">ETA:</label>
         <div class="col text-end">
             <label class="col-form-label">{{timeNextRemainingEta}}</label>

@@ -72,6 +72,16 @@
              "text": "Disabled"
           }
        ],
+       "spectators": [
+          {
+             "value": "enabled",
+             "text": "Enabled"
+          },
+          {
+             "value": "disabled",
+             "text": "Disabled"
+          }
+       ],
        "fluxEnabled":[
           {
              "value":"enabled",
@@ -81,7 +91,17 @@
              "value":"disabled",
              "text":"Disabled"
           }
-       ]
+       ],
+       "readyToQuit": [
+         {
+            "value": "enabled",
+            "text": "Enabled"
+         },
+         {
+            "value": "disabled",
+            "text": "Disabled"
+         }
+      ]
     },
     "specialGalaxy":{
        "carrierCost":[
@@ -172,12 +192,16 @@
              "text":"Disabled"
           },
           {
+            "value":"fog",
+            "text":"Fogged"
+          },
+          {
              "value":"standard",
-             "text":"Standard"
+             "text":"Dark"
           },
           {
              "value":"extra",
-             "text":"Extra"
+             "text":"Extra Dark"
           },
           {
              "value":"start",
@@ -273,6 +297,16 @@
              "value":25,
              "text":"Crazy Fast"
           }
+       ],
+       "starCaptureReward": [
+         {
+            "value":"enabled",
+            "text":"Enabled"
+         },
+         {
+            "value":"disabled",
+            "text":"Disabled"
+         }
        ]
     },
     "galaxy":{
@@ -322,6 +356,16 @@
           75,
           90,
           100
+       ],
+       "capitalStarElimination": [
+         {
+            "value":"enabled",
+            "text":"Enabled"
+         },
+         {
+            "value":"disabled",
+            "text":"Disabled"
+         }
        ]
     },
     "orbitalMechanics":{
@@ -352,6 +396,10 @@
     },
     "player":{
        "developmentCost":[
+          {
+            "value":"none",
+            "text":"Disabled"
+          },
           {
              "value":"cheap",
              "text":"Cheap"
@@ -420,7 +468,19 @@
              "value":"scanned",
              "text":"Trade with scanned players only"
           }
-       ]
+       ],
+       "populationCap":{
+         "enabled": [
+           {
+              "value":"enabled",
+              "text":"Enabled"
+           },
+           {
+              "value":"disabled",
+              "text":"Disabled"
+           }
+         ]
+       }
     },
     "diplomacy":{
        "enabled": [

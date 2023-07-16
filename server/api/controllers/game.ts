@@ -2,7 +2,7 @@ import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
 import { mapToGameConcedeDefeatRequest, mapToGameJoinGameRequest, mapToGameSaveNotesRequest } from '../requests/game';
 
-export default (container: DependencyContainer, io) => {
+export default (container: DependencyContainer) => {
     return {
         getDefaultSettings: (req, res, next) => {
             return res.status(200).json({
@@ -79,31 +79,17 @@ export default (container: DependencyContainer, io) => {
         },
         listSummary: async (req, res, next) => {
             try {
-                let official = await container.gameListService.listOfficialGames();
-                let user = await container.gameListService.listCustomGames();
-                let inProgress = await container.gameListService.listInProgressGames();
-                let completed = await container.gameListService.listRecentlyCompletedGames();
-    
+                const games = await Promise.all([
+                    container.gameListService.listJoinableGames(),
+                    container.gameListService.listInProgressGames(),
+                    container.gameListService.listRecentlyCompletedGames()
+                ])
+                
                 let result = {
-                    official,
-                    user,
-                    inProgress,
-                    completed
-                };
-    
-                return res.status(200).json(result);
-            } catch (err) {
-                return next(err);
-            }
-        },
-        listMySummary: async (req, res, next) => {
-            try {
-                let active = await container.gameListService.listActiveGames(req.session.userId);
-                let completed = await container.gameListService.listUserCompletedGames(req.session.userId);
-    
-                let result = {
-                    active,
-                    completed
+                    official: games[0].official,
+                    user: games[0].custom,
+                    inProgress: games[1],
+                    completed: games[2]
                 };
     
                 return res.status(200).json(result);
@@ -159,6 +145,15 @@ export default (container: DependencyContainer, io) => {
         listMyActiveGames: async (req, res, next) => {
             try {
                 let games = await container.gameListService.listActiveGames(req.session.userId);
+    
+                return res.status(200).json(games);
+            } catch (err) {
+                return next(err);
+            }
+        },
+        listSpectating: async (req, res, next) => {
+            try {
+                let games = await container.gameListService.listSpectating(req.session.userId);
     
                 return res.status(200).json(games);
             } catch (err) {

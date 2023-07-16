@@ -137,9 +137,13 @@ export default class PlayerService extends EventEmitter {
                 weapons: { level: game.settings.technology.startingTechnologyLevel.weapons },
                 specialists: { level: game.settings.technology.startingTechnologyLevel.specialists }
             },
-            ledger: [],
+            ledger: {
+                credits: [],
+                creditsSpecialists: [],
+            },
             reputations: [],
-            diplomacy: []
+            diplomacy: [],
+            spectators: [],
         };
 
         this._setDefaultResearchTechnology(game, player as any);
@@ -275,7 +279,7 @@ export default class PlayerService extends EventEmitter {
             for (let starId of linkedStars) {
                 let star = this.starService.getById(game, starId);
 
-                this.setupStarForGameStart(game, star, player, false);
+                this.starService.setupPlayerStarForGameStart(game, star, player);
             }
         }
     }
@@ -295,31 +299,8 @@ export default class PlayerService extends EventEmitter {
                 let s = this.starDistanceService.getClosestUnownedStar(homeStar, game.galaxy.stars);
 
                 // Set up the closest star.
-                this.setupStarForGameStart(game, s, player, false);
+                this.starService.setupPlayerStarForGameStart(game, s, player);
             }
-        }
-    }
-
-    // TODO: Shouldn't this be in the starService?
-    setupStarForGameStart(game: Game, star: Star, player: Player, resetWarpGates: boolean) {
-        if (player.homeStarId!.toString() === star._id.toString()) {
-            this.starService.setupHomeStar(game, star, player, game.settings);
-        } else {
-            star.ownedByPlayerId = player._id;
-            star.shipsActual = game.settings.player.startingShips;
-            star.ships = star.shipsActual;
-
-            star.warpGate = star.warpGate ?? false;
-            star.specialistId = star.specialistId ?? null;
-            star.infrastructure.economy = star.infrastructure.economy ?? 0;
-            star.infrastructure.industry = star.infrastructure.industry ?? 0;
-            star.infrastructure.science = star.infrastructure.science ?? 0;
-
-            if (resetWarpGates) {
-                star.warpGate = false;
-            }
-
-            this.starService.resetIgnoreBulkUpgradeStatuses(star);
         }
     }
 
@@ -333,6 +314,7 @@ export default class PlayerService extends EventEmitter {
         player.readyToCycle = false;
         player.readyToQuit = false;
         player.isOpenSlot = true;
+        player.spectators = [];
 
         // Reset the player's research
         this._setDefaultResearchTechnology(game, player);
@@ -341,7 +323,7 @@ export default class PlayerService extends EventEmitter {
         let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
         for (let star of playerStars) {
-            this.setupStarForGameStart(game, star, player, true);
+            this.starService.setupPlayerStarForGameStart(game, star, player);
         }
 
         // Reset the player's carriers
@@ -510,27 +492,10 @@ export default class PlayerService extends EventEmitter {
         });
     }
 
-    performDefeatedOrAfkCheck(game: Game, player: Player, isTurnBasedGame: boolean) {
-        // Check if the player has been AFK.
-        let isAfk = this.isAfk(game, player, isTurnBasedGame);
+    ownsOriginalHomeStar(game: Game, player: Player) {
+        const stars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
-        if (isAfk) {
-            this.setPlayerAsAfk(game, player);
-        }
-
-        // Check if the player has been defeated by conquest.
-        if (!player.defeated) {
-            let stars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
-
-            // If there are no stars and there are no carriers then the player is defeated.
-            if (stars.length === 0) {
-                let carriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id); // Note: This logic looks a bit weird, but its more performant.
-
-                if (carriers.length === 0) {
-                    this.setPlayerAsDefeated(game, player, false);
-                }
-            }
-        }
+        return stars.find(s => s._id.toString() === player.homeStarId!.toString()) != null;
     }
 
     incrementMissedTurns(game: Game) {
@@ -544,34 +509,6 @@ export default class PlayerService extends EventEmitter {
                 player.missedTurns = 0;
             }
         }
-    }
-
-    isAfk(game: Game, player: Player, isTurnBasedGame: boolean) {
-        // The player is afk if:
-        // 1. They haven't been seen for X days.
-        // 2. They missed the turn limit in a turn based game.
-        // 3. They missed X cycles in a real time game (minimum of 12 hours)
-
-        // Note: In tutorial games, only legit players can be considered afk.
-        if (this.gameTypeService.isTutorialGame(game) && !player.userId) {
-            return false;
-        }
-
-        let lastSeenMoreThanXDaysAgo = moment(player.lastSeen).utc() < moment().utc().subtract(game.settings.gameTime.afk.lastSeenTimeout, 'days');
-
-        if (lastSeenMoreThanXDaysAgo) {
-            return true;
-        }
-
-        if (isTurnBasedGame) {
-            return player.missedTurns >= game.settings.gameTime.afk.turnTimeout;
-        }
-
-        let secondsXCycles = game.settings.galaxy.productionTicks * game.settings.gameTime.speed * game.settings.gameTime.afk.cycleTimeout;
-        let secondsToAfk = Math.max(secondsXCycles, 43200); // Minimum of 12 hours.
-        let lastSeenMoreThanXSecondsAgo = moment(player.lastSeen).utc() < moment().utc().subtract(secondsToAfk, 'seconds');
-
-        return lastSeenMoreThanXSecondsAgo;
     }
 
     setPlayerAsDefeated(game: Game, player: Player, openSlot: boolean) {

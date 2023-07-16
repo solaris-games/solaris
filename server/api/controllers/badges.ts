@@ -1,7 +1,6 @@
 import { DependencyContainer } from '../../services/types/DependencyContainer';
-import { mapToBadgesPurchaseBadgeRequest } from '../requests/badges';
 
-export default (container: DependencyContainer, io) => {
+export default (container: DependencyContainer) => {
     return {
         listAll: async (req, res, next) => {
             try {
@@ -32,9 +31,7 @@ export default (container: DependencyContainer, io) => {
         },
         purchaseForUser: async (req, res, next) => {
             try {
-                const reqObj = mapToBadgesPurchaseBadgeRequest(req.body);
-                
-                await container.badgeService.purchaseBadgeForUser(req.session.userId, req.params.userId, reqObj.badgeKey);
+                await container.badgeService.purchaseBadgeForUser(req.session.userId, req.params.userId, req.body.badgeKey);
                 
                 return res.sendStatus(200);
             } catch (err) {
@@ -43,9 +40,7 @@ export default (container: DependencyContainer, io) => {
         },
         purchaseForPlayer: async (req, res, next) => {
             try {
-                const reqObj = mapToBadgesPurchaseBadgeRequest(req.body);
-                
-                await container.badgeService.purchaseBadgeForPlayer(req.game, req.session.userId, req.params.playerId, reqObj.badgeKey);
+                await container.badgeService.purchaseBadgeForPlayer(req.game, req.session.userId, req.params.playerId, req.body.badgeKey);
                 
                 return res.sendStatus(200);
             } catch (err) {

@@ -4,20 +4,24 @@ import { Star } from './types/Star';
 import PlayerStatisticsService from './playerStatistics';
 import StarService from './star';
 import TechnologyService from './technology';
+import SpecialistService from './specialist';
 
 export default class PlayerCycleRewardsService {
     starService: StarService;
     technologyService: TechnologyService;
     playerStatisticsService: PlayerStatisticsService;
+    specialistService: SpecialistService;
 
     constructor(
         starService: StarService,
         technologyService: TechnologyService,
-        playerStatisticsService: PlayerStatisticsService
+        playerStatisticsService: PlayerStatisticsService,
+        specialistService: SpecialistService
     ) {
         this.starService = starService;
         this.technologyService = technologyService;
         this.playerStatisticsService = playerStatisticsService;
+        this.specialistService = specialistService
     }
 
     calculatePlayerCreditsEndOfCycleRewards(game: Game, player: Player) {
@@ -90,6 +94,19 @@ export default class PlayerCycleRewardsService {
         }
 
         throw new Error(`Unsupported specialist reward type: ${game.settings.technology.specialistTokenReward}.`);
+    }
+
+    giveFinancialAnalystCredits(game: Game) {
+        for (let player of game.galaxy.players) {
+            let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id)
+                                .filter(s => !this.starService.isDeadStar(s));
+
+            for (let star of playerStars) {
+                let creditsByScience = this.specialistService.getCreditsPerTickByScience(star);
+
+                player.credits += creditsByScience * star.infrastructure.science!;
+            }
+        }
     }
 
 }

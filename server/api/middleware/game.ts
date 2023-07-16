@@ -1,6 +1,11 @@
 import ValidationError from "../../errors/validation";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 
+export interface GameMiddleware {
+    loadGame: (options: GameLoadOptions) => (req: any, res: any, next: any) => Promise<any>;
+    validateGameState: (options: GameStateValidationOptions) => (req: any, res: any, next: any) => void;
+}
+
 export interface GameLoadOptions {
     lean: boolean;
     settings?: boolean;
@@ -20,7 +25,7 @@ export interface GameStateValidationOptions {
     isNotFinished?: boolean;
 };
 
-export default (container: DependencyContainer) => {
+export const middleware = (container: DependencyContainer): GameMiddleware => {
     return {
         loadGame: (options: GameLoadOptions) => {
             return async (req, res, next) => {

@@ -1,7 +1,7 @@
 import { DependencyContainer } from '../../services/types/DependencyContainer';
 import { mapToCarrierCalculateCombatRequest, mapToCarrierLoopWaypointsRequest, mapToCarrierRenameCarrierRequest, mapToCarrierSaveWaypointsRequest, mapToCarrierTransferShipsRequest } from '../requests/carrier';
 
-export default (container: DependencyContainer, io) => {
+export default (container: DependencyContainer) => {
     return {
         saveWaypoints: async (req, res, next) => {
             try {
