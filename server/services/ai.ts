@@ -461,16 +461,19 @@ export default class AIService {
     _constructBorderStarData(game: Game, player: Player, starsById: Map<string, Star>, sourceStar: string, starsInGlobalRange: StarGraph): BorderStarData {
         const allStarsInRange = starsInGlobalRange.get(sourceStar)!;
         const otherPlayersBordering = new Set<string>();
+        const playerId = player._id.toString();
 
         let type = BorderStarType.EmptySpace;
 
         for (const otherStarId of allStarsInRange) {
             const otherStar = starsById.get(otherStarId)!;
 
-            if (otherStar.ownedByPlayerId && otherStar.ownedByPlayerId !== player._id) {
-                otherPlayersBordering.add(otherStar.ownedByPlayerId.toString());
+            const otherPlayerId = otherStar.ownedByPlayerId?.toString();
 
-                if (this._isEnemyPlayer(game, player, otherStar.ownedByPlayerId)) {
+            if (otherPlayerId && otherPlayerId !== playerId) {
+                otherPlayersBordering.add(otherPlayerId);
+
+                if (this._isEnemyPlayer(game, player, otherStar.ownedByPlayerId!)) {
                     type = BorderStarType.HostileBorder;
                 }
             }
