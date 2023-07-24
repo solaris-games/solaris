@@ -24,6 +24,7 @@ export default class Repository<T> {
         .skip(skip)
         .limit(limit)
         .lean({ defaults: true })
+        .allowDiskUse(true)
         .exec();
     }
 
