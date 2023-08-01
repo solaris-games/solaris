@@ -9,7 +9,7 @@
     "playerType": "all",
     "anonymity": "normal",
     "playerOnlineStatus": "hidden",
-    "timeMachine": "disabled",
+    "timeMachine": "enabled",
     "fluxEnabled": "enabled",
     "advancedAI": "enabled",
     "spectators": "enabled",
