@@ -86,6 +86,7 @@ enum BorderStarType {
 
 interface BorderStarData {
     otherPlayersBordering: Set<string>;
+    starsInRange: Set<string>;
     type: BorderStarType;
 }
 
@@ -111,6 +112,7 @@ interface Context {
     playerEconomy: number;
     playerIndustry: number;
     playerScience: number;
+    playerShips: number;
     transitFromCarriers: Map<string, Carrier[]>,
     arrivingAtCarriers: Map<string, Carrier[]>
 }
@@ -453,6 +455,7 @@ export default class AIService {
             playerEconomy: this.playerStatisticsService.calculateTotalEconomy(playerStars),
             playerIndustry: this.playerStatisticsService.calculateTotalIndustry(playerStars),
             playerScience: this.playerStatisticsService.calculateTotalScience(playerStars),
+            playerShips: this.shipService.calculateTotalShips(playerStars, playerCarriers),
             transitFromCarriers,
             arrivingAtCarriers
         };
@@ -463,7 +466,15 @@ export default class AIService {
         const otherPlayersBordering = new Set<string>();
         const playerId = player._id.toString();
 
-        let type = BorderStarType.EmptySpace;
+        if (allStarsInRange.size === 0) {
+            return {
+                otherPlayersBordering,
+                starsInRange: new Set(),
+                type: BorderStarType.EmptySpace
+            };
+        }
+
+        let type = BorderStarType.FreeStars;
 
         for (const otherStarId of allStarsInRange) {
             const otherStar = starsById.get(otherStarId)!;
@@ -477,14 +488,11 @@ export default class AIService {
                     type = BorderStarType.HostileBorder;
                 }
             }
-
-            if (type !== BorderStarType.HostileBorder) {
-                type = BorderStarType.FreeStars;
-            }
         }
 
         return {
             otherPlayersBordering,
+            starsInRange: allStarsInRange,
             type
         }
     }
@@ -1207,65 +1215,42 @@ export default class AIService {
 
     _computeStarPriorities(game: Game, player: Player, context: Context): Map<string, number> {
         const hyperspaceRange = this._getGlobalHighestHyperspaceRange(game);
-        const borderStarPriorities = new Map<string, number>();
+
+        const starsForExpansion = new Array<[string, BorderStarData]>();
+        const starsWithHostileBorder = new Array<[string, BorderStarData]>();
 
         for (const [borderStarId, borderStarData] of context.borderStars) {
-            const borderStar = context.starsById.get(borderStarId)!;
-            const reachables = context.starsInGlobalRange.get(borderStarId)!;
-
-            let score = 0;
-
-            for (const reachableId of reachables) {
-                const reachableStar = context.starsById.get(reachableId)!;
-
-                if (!reachableStar.ownedByPlayerId) {
-                    const distance = this.distanceService.getDistanceBetweenLocations(borderStar.location, reachableStar.location);
-                    const distanceScore = (distance / hyperspaceRange) * EMPTY_STAR_SCORE_MULTIPLIER;
-
-                    score += distanceScore;
-                } else if (reachableStar.ownedByPlayerId.toString() !== player._id.toString()) {
-                    const distance = this.distanceService.getDistanceBetweenLocations(borderStar.location, reachableStar.location);
-                    const distanceScore = distance / hyperspaceRange * ENEMY_STAR_SCORE_MULTIPLIER;
-
-                    score += distanceScore;
-                }
-            }
-
-            borderStarPriorities.set(borderStarId, score);
-        }
-
-        const visited = new Set();
-        const starPriorities = new Map(borderStarPriorities);
-
-        while (true) {
-            let changed = false;
-
-            for (const [starId, priority] of starPriorities) {
-                if (!visited.has(starId)) {
-                    visited.add(starId);
-
-                    const reachables = context.reachablePlayerStars.get(starId)!;
-
-                    for (const reachableId of reachables) {
-                        const oldPriority = starPriorities.get(reachableId) || 0;
-                        const transitivePriority = priority * 0.5;
-                        const newPriority = Math.max(oldPriority, transitivePriority);
-
-                        starPriorities.set(reachableId, newPriority);
-
-                        changed = true;
-                    }
-                }
-            }
-
-            if (!changed) {
-                break;
+            if (borderStarData.type === BorderStarType.FreeStars) {
+                starsForExpansion.push([borderStarId, borderStarData]);
+            } else if (borderStarData.type === BorderStarType.HostileBorder) {
+                starsWithHostileBorder.push([borderStarId, borderStarData]);
             }
         }
 
-        const dbgPrios = new Array(...starPriorities.entries());
-        dbgPrios.sort((a, b) => b[1] - a[1]);
-        dbgPrios.forEach(p => console.log(this.getStarName(context, p[0]), p[1]));
+        const starPriorities = new Map<string, number>();
+
+        for (const [starId, borderStarData] of starsForExpansion) {
+            starPriorities.set(starId, 1);
+        }
+
+        const playerId = player._id.toString();
+
+        for (const [starId, borderStarData] of starsWithHostileBorder) {
+            const reachedByHostiles = new Array(...borderStarData.starsInRange).map(starId => context.starsById.get(starId)!).filter(star => {
+                const otherPlayerId = star.ownedByPlayerId;
+                return otherPlayerId && otherPlayerId.toString() !== playerId;
+            });
+
+            let priority = 0;
+
+            for (const star of reachedByHostiles) {
+                priority += star.ships || 0;
+            }
+
+            starPriorities.set(starId, priority);
+        }
+
+        const allShips = context.playerShips;
 
         return starPriorities;
     }
