@@ -1187,35 +1187,6 @@ export default class AIService {
     }
 
     _gatherMovementOrders(game: Game, player: Player, context: Context): Order[] {
-        const orders: Order[] = [];
-        const starPriorities = this._computeStarPriorities(game, player, context);
-
-        for (const [starId, priority] of starPriorities) {
-
-            const neighbors = context.reachablePlayerStars.get(starId)!;
-            for (const neighbor of neighbors) {
-                if (this._isUnderAttack(context, neighbor)) {
-                    continue;
-                }
-
-                const neighborPriority = starPriorities.get(neighbor)!;
-                if (neighborPriority * REINFORCEMENT_MIN_FACTOR < priority) {
-                    orders.push({
-                        type: AiAction.ReinforceStar,
-                        score: priority - neighborPriority,
-                        star: starId,
-                        source: neighbor
-                    });
-                }
-            }
-        }
-
-        return orders;
-    }
-
-    _computeStarPriorities(game: Game, player: Player, context: Context): Map<string, number> {
-        const hyperspaceRange = this._getGlobalHighestHyperspaceRange(game);
-
         const starsForExpansion = new Array<[string, BorderStarData]>();
         const starsWithHostileBorder = new Array<[string, BorderStarData]>();
 
@@ -1250,9 +1221,39 @@ export default class AIService {
             starPriorities.set(starId, priority);
         }
 
-        const allShips = context.playerShips;
+        const orders: Order[] = [];
 
-        return starPriorities;
+        const nonBorderStars = context.playerStars.filter(star => !context.borderStars.has(star._id.toString()));
+
+        for (const star of nonBorderStars) {
+            let highestTarget: Star | null = null;
+            let highestScore = 0;
+
+            for (const [possibleTargetId, priority] of starPriorities) {
+                const possibleTargetStar = context.starsById.get(possibleTargetId)!;
+                const distance = this.distanceService.getDistanceBetweenLocations(star.location, possibleTargetStar.location);
+
+                const score = priority / distance;
+
+                if (score > highestScore) {
+                    highestScore = score;
+                    highestTarget = possibleTargetStar;
+                }
+            }
+
+            if (highestTarget) {
+                const movementScore = highestScore * (highestTarget.ships || 0);
+
+                orders.push({
+                    type: AiAction.ReinforceStar,
+                    star: highestTarget._id.toString(),
+                    score: movementScore,
+                    source: star._id.toString()
+                });
+            }
+        }
+
+        return orders;
     }
 
     _getGlobalHighestHyperspaceRange(game: Game): number {
