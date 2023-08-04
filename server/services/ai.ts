@@ -42,7 +42,6 @@ const BORDER_STAR_ANGLE_THRESHOLD_DEGREES = 120;
 enum AiAction {
     DefendStar,
     ClaimStar,
-    ReinforceStar,
     InvadeStar
 }
 
@@ -58,13 +57,6 @@ interface ClaimStarOrder {
     type: AiAction.ClaimStar;
     star: string;
     score: number;
-}
-
-interface ReinforceStarOrder {
-    type: AiAction.ReinforceStar;
-    score: number;
-    star: string;
-    source: string;
 }
 
 interface InvadeStarOrder {
@@ -90,7 +82,7 @@ interface BorderStarData {
     type: BorderStarType;
 }
 
-type Order = DefendStarOrder | ClaimStarOrder | ReinforceStarOrder | InvadeStarOrder;
+type Order = DefendStarOrder | ClaimStarOrder | InvadeStarOrder;
 
 type StarGraph = Map<string, Set<string>>;
 
@@ -237,6 +229,8 @@ export default class AIService {
         const assignments = await this._gatherAssignments(game, player, context);
 
         await this._evaluateOrders(game, player, context, orders, assignments);
+
+        await this._performLogistics(context, game, player);
 
         // Mongoose method that cannot be typechecked
         // @ts-ignore
@@ -665,52 +659,6 @@ export default class AIService {
                 for (const visitedStar of found.trace) {
                     newClaimedStars.add(visitedStar.starId);
                 }
-            } else if (order.type === AiAction.ReinforceStar) {
-                const assignment = assignments.get(order.source);
-
-                if (!assignment || assignment.totalShips <= 1) {
-                    continue;
-                }
-
-                const hasIdleCarrier = assignment.carriers && assignment.carriers.length > 0;
-
-                const reinforce = async () => {
-                    const waypoints: CarrierWaypoint[] = [
-                        {
-                            _id: new mongoose.Types.ObjectId(),
-                            source: new mongoose.Types.ObjectId(order.source),
-                            destination: new mongoose.Types.ObjectId(order.star),
-                            action: 'dropAll',
-                            actionShips: 0,
-                            delayTicks: 0
-                        },
-                        {
-                            _id: new mongoose.Types.ObjectId(),
-                            source: new mongoose.Types.ObjectId(order.star),
-                            destination: new mongoose.Types.ObjectId(order.source),
-                            action: 'nothing',
-                            actionShips: 0,
-                            delayTicks: 0
-                        }
-                    ];
-
-                    await this._useAssignment(context, game, player, assignments, assignment, waypoints, assignment.totalShips);
-                }
-
-                if (hasIdleCarrier) {
-                    // Since a carrier is standing around, we might as well use it
-                    await reinforce();
-                } else if (this._canAffordCarrier(context, game, player, false)) {
-                    const routeCarrier = this._logisticRouteExists(context, order.source, order.star);
-
-                    // Only allow one carrier per route
-                    if (!routeCarrier) {
-                        const nextReturning = this._nextArrivingCarrierIn(context, game, order.source);
-                        if (!nextReturning)  {
-                            await reinforce();
-                        }
-                    }
-                }
             }
         }
 
@@ -1021,8 +969,6 @@ export default class AIService {
                 return 3
             case AiAction.ClaimStar:
                 return 2;
-            case AiAction.ReinforceStar:
-                return 1;
             default:
                 return 0;
         }
@@ -1060,9 +1006,8 @@ export default class AIService {
         const defenseOrders = this._gatherDefenseOrders(game, player, context);
         const invasionOrders = this._gatherInvasionOrders(game, player, context);
         const expansionOrders = this._gatherExpansionOrders(game, player, context);
-        const movementOrders = this._gatherMovementOrders(game, player, context);
 
-        return defenseOrders.concat(invasionOrders, expansionOrders, movementOrders);
+        return defenseOrders.concat(invasionOrders, expansionOrders);
     }
 
     _isEnemyPlayer(game: Game, player: Player, otherPlayerId: DBObjectId): boolean {
@@ -1186,7 +1131,7 @@ export default class AIService {
         return context.attackedStarIds.has(starId);
     }
 
-    _gatherMovementOrders(game: Game, player: Player, context: Context): Order[] {
+    _performLogistics(context: Context, game: Game, player: Player) {
         const starsForExpansion = new Array<[string, BorderStarData]>();
         const starsWithHostileBorder = new Array<[string, BorderStarData]>();
 
@@ -1221,7 +1166,7 @@ export default class AIService {
             starPriorities.set(starId, priority);
         }
 
-        const orders: Order[] = [];
+        const movements: {from: Star, to: Star, score: number}[] = [];
 
         const nonBorderStars = context.playerStars.filter(star => !context.borderStars.has(star._id.toString()));
 
@@ -1244,16 +1189,17 @@ export default class AIService {
             if (highestTarget) {
                 const movementScore = highestScore * (highestTarget.ships || 0);
 
-                orders.push({
-                    type: AiAction.ReinforceStar,
-                    star: highestTarget._id.toString(),
-                    score: movementScore,
-                    source: star._id.toString()
+                movements.push({
+                    from: star,
+                    to: highestTarget,
+                    score: movementScore
                 });
             }
         }
 
-        return orders;
+        movements.sort((a, b) => b.score - a.score);
+
+        // TODO: Execute movements depending on score and carrier states
     }
 
     _getGlobalHighestHyperspaceRange(game: Game): number {
