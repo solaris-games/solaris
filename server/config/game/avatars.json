@@ -366,5 +366,13 @@
         "description": "A Stoned Ape and his Friends travel the universe in search of superior psychedelic enlightenment. All are welcome to join them on their journey. But beware, they will destroy anyone who stands in their way.",
         "price": 10,
         "isPatronAvatar": true
+    },
+    {
+        "id": 46,
+        "file": "red.png",
+        "name": "Red Things",
+        "description": "A mysterious collective of wandering entities, drifting eternally through galactic matter. They remain the subject of great speculation.",
+        "price": 9,
+        "isPatronAvatar": true
     }
 ]
