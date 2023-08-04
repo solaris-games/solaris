@@ -372,7 +372,7 @@
         "file": "red.png",
         "name": "Red Things",
         "description": "A mysterious collective of wandering entities, drifting eternally through galactic matter. They remain the subject of great speculation.",
-        "price": 9,
+        "price": 10,
         "isPatronAvatar": true
     }
 ]
