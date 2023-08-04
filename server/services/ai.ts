@@ -824,6 +824,61 @@ export default class AIService {
         }
     }
 
+    _findPath(context: Context, starGraph: StarGraph, from: Star, to: Star): { trace: TracePoint[], distance: number } | undefined {
+        const queue = new Heap({
+            comparBefore: (b1, b2) => b1.totalDistance > b2.totalDistance,
+            compar: (b1, b2) => b2.totalDistance - b1.totalDistance
+        });
+
+        const startStarId = from._id.toString();
+
+        const init = {
+            trace: [{starId: startStarId}],
+            starId: startStarId,
+            totalDistance: 0
+        };
+
+        queue.push(init);
+
+        const visited = new Set();
+
+        while (queue.length > 0) {
+            const {starId, trace, totalDistance} = queue.shift();
+
+            if (starId === to._id.toString()) {
+                return {
+                    trace,
+                    distance: totalDistance
+                };
+            }
+
+            visited.add(starId);
+
+            const nextCandidates = starGraph.get(starId);
+
+            if (nextCandidates) {
+                const star = context.starsById.get(starId)!;
+
+                for (const nextCandidate of nextCandidates) {
+                    if (!visited.has(nextCandidate)) {
+                        visited.add(nextCandidate);
+
+                        const distToNext = this._calculateTravelDistance(star, context.starsById.get(nextCandidate)!)
+                        const newTotalDist = totalDistance + distToNext;
+
+                        queue.push({
+                            starId: nextCandidate,
+                            trace: [{starId: nextCandidate}].concat(trace),
+                            totalDistance: newTotalDist
+                        });
+                    }
+                }
+            }
+        }
+
+        return undefined;
+    }
+
     _filterAssignmentByCarrierPurchase(assignment: Assignment, allowCarrierPurchase: boolean) {
         const hasCarriers = assignment.carriers && assignment.carriers.length > 0;
 
@@ -1199,7 +1254,13 @@ export default class AIService {
 
         movements.sort((a, b) => b.score - a.score);
 
-        // TODO: Execute movements depending on score and carrier states
+        for (const movement of movements) {
+            const path = this._findPath(context, context.freelyReachableStars, movement.from, movement.to);
+
+            if (path) {
+                // TODO: Follow path
+            }
+        }
     }
 
     _getGlobalHighestHyperspaceRange(game: Game): number {
