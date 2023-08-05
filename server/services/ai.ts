@@ -1226,6 +1226,10 @@ export default class AIService {
         const nonBorderStars = context.playerStars.filter(star => !context.borderStars.has(star._id.toString()));
 
         for (const star of nonBorderStars) {
+            if (!star.shipsActual || Math.floor(star.shipsActual) === 0) {
+                continue;
+            }
+
             let highestTarget: Star | null = null;
             let highestScore = 0;
 
