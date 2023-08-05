@@ -1217,9 +1217,13 @@ export default class AIService {
 
         const movements: {from: Star, to: Star, score: number}[] = [];
 
-        const nonBorderStars = context.playerStars.filter(star => !context.borderStars.has(star._id.toString()));
+        const nonImportantBorderStars = context.playerStars.filter(star => {
+            const borderStarData = context.borderStars.get(star._id.toString());
 
-        for (const star of nonBorderStars) {
+            return borderStarData && borderStarData.type === BorderStarType.FreeStars;
+        });
+
+        for (const star of nonImportantBorderStars) {
             if (!star.shipsActual || Math.floor(star.shipsActual) === 0) {
                 continue;
             }
