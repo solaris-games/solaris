@@ -1186,7 +1186,7 @@ export default class AIService {
         return context.attackedStarIds.has(starId);
     }
 
-    _performLogistics(context: Context, game: Game, player: Player) {
+    async _performLogistics(context: Context, game: Game, player: Player) {
         const starsForExpansion = new Array<[string, BorderStarData]>();
         const starsWithHostileBorder = new Array<[string, BorderStarData]>();
 
@@ -1258,7 +1258,22 @@ export default class AIService {
             const path = this._findPath(context, context.freelyReachableStars, movement.from, movement.to);
 
             if (path) {
-                // TODO: Follow path
+                let carrier: Carrier | null = null;
+                const carriersAtSource = this.carrierService.getCarriersAtStar(game, movement.from._id);
+
+                if (!carriersAtSource.length) {
+                    // TODO: Can we build a carrier?
+                } else {
+                    carrier = carriersAtSource[0];
+                }
+
+                if (!carrier) {
+                    continue;
+                }
+
+                const waypoints = this._createWaypointsDropAndReturn(path.trace);
+
+                const carrierResult = await this.waypointService.saveWaypointsForCarrier(game, player, carrier, waypoints, false, false);
             }
         }
     }
