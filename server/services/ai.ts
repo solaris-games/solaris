@@ -534,12 +534,6 @@ export default class AIService {
             }
         }
 
-        console.log("Border stars:");
-        borderStars.forEach((data, starId) => {
-            console.log(starsById.get(starId)!.name);
-            console.log(JSON.stringify(data,   (_key, value) => (value instanceof Set ? [...value] : value), 2));
-        });
-
         return borderStars;
     }
 
@@ -1186,7 +1180,7 @@ export default class AIService {
         return context.attackedStarIds.has(starId);
     }
 
-    async _performLogistics(context: Context, game: Game, player: Player) {
+    _computeLogisticsMovements(context: Context, game: Game, player: Player): {from: Star, to: Star, score: number}[] {
         const starsForExpansion = new Array<[string, BorderStarData]>();
         const starsWithHostileBorder = new Array<[string, BorderStarData]>();
 
@@ -1257,6 +1251,19 @@ export default class AIService {
         }
 
         movements.sort((a, b) => b.score - a.score);
+
+        movements.forEach(m => {
+            const fromName = m.from.name;
+            const toName = m.to.name;
+
+            console.log(`Movement from ${fromName} to ${toName} with score ${m.score}`)
+        })
+
+        return movements;
+    }
+
+    async _performLogistics(context: Context, game: Game, player: Player) {
+        const movements = this._computeLogisticsMovements(context, game, player);
 
         const scoreSum = movements.map(m => m.score).reduce((a, b) => a + b, 0);
         const scoreAvg = scoreSum / movements.length;
