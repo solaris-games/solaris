@@ -1265,7 +1265,9 @@ export default class AIService {
                 const carriersAtSource = this.carrierService.getCarriersAtStar(game, movement.from._id);
 
                 if (!carriersAtSource.length) {
-                    if (this._canAffordCarrier(context, game, player, false)) {
+                    const isUnimportantLogistics = movement.score < (scoreAvg * 0.5);
+
+                    if (!isUnimportantLogistics && this._canAffordCarrier(context, game, player, false)) {
                         const buildResult = await this.starUpgradeService.buildCarrier(game, player, movement.from._id, 1, false);
                         // Get the carrier again since the above-returned is not tracked by the db
                         carrier = this.carrierService.getById(game, buildResult.carrier._id);
