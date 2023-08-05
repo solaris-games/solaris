@@ -1275,9 +1275,6 @@ export default class AIService {
         for (const movement of movements) {
             const path = this._findPath(context, context.freelyReachableStars, movement.from, movement.to);
 
-            const pathSpec = path ? path.trace.map(star => this.getStarName(context, star.starId)).join(' -> ') : 'none';
-            console.log(`Path from ${movement.from.name} to ${movement.to.name}: ${pathSpec}`);
-
             if (path) {
                 let carrier: Carrier | null = null;
                 const carriersAtSource = this.carrierService.getCarriersAtStar(game, movement.from._id);
