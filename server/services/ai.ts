@@ -1220,7 +1220,7 @@ export default class AIService {
         const nonImportantBorderStars = context.playerStars.filter(star => {
             const borderStarData = context.borderStars.get(star._id.toString());
 
-            return borderStarData && borderStarData.type === BorderStarType.FreeStars;
+            return !borderStarData || borderStarData.type === BorderStarType.EmptySpace;
         });
 
         for (const star of nonImportantBorderStars) {
