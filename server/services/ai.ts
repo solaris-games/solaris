@@ -1284,7 +1284,7 @@ export default class AIService {
 
             if (path) {
                 let carrier: Carrier | null = null;
-                const carriersAtSource = this.carrierService.getCarriersAtStar(game, movement.from._id);
+                const carriersAtSource = this.carrierService.getCarriersAtStar(game, movement.from._id).filter(carrier => carrier.waypoints.length === 0);
 
                 if (!carriersAtSource.length) {
                     const productionPerTick = this.shipService.calculateStarShipProduction(game, movement.from, productionCap);
