@@ -29,7 +29,7 @@ export default class PathfindingService {
         this.waypointService = waypointService;
     }
 
-    calculateShortestRoute(game: Game, player: Player, carrier: Carrier, sourceStarId: DBObjectId, destinStarId: DBObjectId) {
+    calculateShortestRoute(game: Game, player: Player, carrier: Carrier, sourceStarId: DBObjectId, destinStarId: DBObjectId): Star[] {
         const hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, player.research.hyperspace.level);
 
         const graph: Node[] = game.galaxy.stars.map(star => {
@@ -79,7 +79,7 @@ export default class PathfindingService {
                     temp = temp.parent;
                 }
 
-                return path.reverse();
+                return path.reverse().map(node => node.star);
             }
 
             // Dynamically load neighbors as its more efficient

@@ -826,61 +826,6 @@ export default class AIService {
         }
     }
 
-    _findPath(context: Context, starGraph: StarGraph, from: Star, to: Star): { trace: TracePoint[], distance: number } | undefined {
-        const queue = new Heap({
-            comparBefore: (b1, b2) => b1.totalDistance > b2.totalDistance,
-            compar: (b1, b2) => b2.totalDistance - b1.totalDistance
-        });
-
-        const startStarId = from._id.toString();
-
-        const init = {
-            trace: [{starId: startStarId}],
-            starId: startStarId,
-            totalDistance: 0
-        };
-
-        queue.push(init);
-
-        const visited = new Set();
-
-        while (queue.length > 0) {
-            const {starId, trace, totalDistance} = queue.shift();
-
-            if (starId === to._id.toString()) {
-                return {
-                    trace,
-                    distance: totalDistance
-                };
-            }
-
-            visited.add(starId);
-
-            const nextCandidates = starGraph.get(starId);
-
-            if (nextCandidates) {
-                const star = context.starsById.get(starId)!;
-
-                for (const nextCandidate of nextCandidates) {
-                    if (!visited.has(nextCandidate)) {
-                        visited.add(nextCandidate);
-
-                        const distToNext = this._calculateTravelDistance(star, context.starsById.get(nextCandidate)!)
-                        const newTotalDist = totalDistance + distToNext;
-
-                        queue.push({
-                            starId: nextCandidate,
-                            trace: trace.concat([{starId: nextCandidate}]),
-                            totalDistance: newTotalDist
-                        });
-                    }
-                }
-            }
-        }
-
-        return undefined;
-    }
-
     _filterAssignmentByCarrierPurchase(assignment: Assignment, allowCarrierPurchase: boolean) {
         const hasCarriers = assignment.carriers && assignment.carriers.length > 0;
 
@@ -1284,39 +1229,46 @@ export default class AIService {
         const productionCap = this.shipService.calculatePopulationCap(game, player._id);
 
         for (const movement of movements) {
-            const path = this._findPath(context, context.freelyReachableStars, movement.from, movement.to);
+            let carrier: Carrier | null = null;
+            const carriersAtSource = this.carrierService.getCarriersAtStar(game, movement.from._id).filter(carrier => carrier.waypoints.length === 0);
 
-            if (path) {
-                let carrier: Carrier | null = null;
-                const carriersAtSource = this.carrierService.getCarriersAtStar(game, movement.from._id).filter(carrier => carrier.waypoints.length === 0);
+            if (!carriersAtSource.length) {
+                const productionPerTick = this.shipService.calculateStarShipProduction(game, movement.from, productionCap);
+                const ticksStockpile = (movement.from.ships || 0) / productionPerTick;
+                const isUnimportantLogistics = ticksStockpile < (game.settings.galaxy.productionTicks * 0.7);
 
-                if (!carriersAtSource.length) {
-                    const productionPerTick = this.shipService.calculateStarShipProduction(game, movement.from, productionCap);
-                    const ticksStockpile = (movement.from.ships || 0) / productionPerTick;
-                    const isUnimportantLogistics = ticksStockpile < (game.settings.galaxy.productionTicks * 0.7);
-
-                    if (!isUnimportantLogistics && this._canAffordCarrier(context, game, player, false)) {
-                        const buildResult = await this.starUpgradeService.buildCarrier(game, player, movement.from._id, 1, false);
-                        // Get the carrier again since the above-returned is not tracked by the db
-                        carrier = this.carrierService.getById(game, buildResult.carrier._id);
-                    }
-                } else {
-                    carrier = carriersAtSource[0];
+                if (!isUnimportantLogistics && this._canAffordCarrier(context, game, player, false)) {
+                    const buildResult = await this.starUpgradeService.buildCarrier(game, player, movement.from._id, 1, false);
+                    // Get the carrier again since the above-returned is not tracked by the db
+                    carrier = this.carrierService.getById(game, buildResult.carrier._id);
                 }
-
-                if (!carrier) {
-                    continue;
-                }
-
-                const carrierInitialShips = carrier.ships || 0;
-                const transferShips = movement.from.ships || 0;
-
-                await this.shipTransferService.transfer(game, player, carrier._id, carrierInitialShips + transferShips, movement.from._id, 0, false);
-
-                const waypoints = this._createWaypointsDropAndReturn(path.trace);
-
-                await this.waypointService.saveWaypointsForCarrier(game, player, carrier, waypoints, false, false);
+            } else {
+                carrier = carriersAtSource[0];
             }
+
+            if (!carrier) {
+                continue;
+            }
+
+            const path = this.pathfindingService.calculateShortestRoute(game, player, carrier, movement.from._id, movement.to._id);
+
+            if (path.length === 0) {
+                continue;
+            }
+
+            const carrierInitialShips = carrier.ships || 0;
+            const transferShips = movement.from.ships || 0;
+
+            await this.shipTransferService.transfer(game, player, carrier._id, carrierInitialShips + transferShips, movement.from._id, 0, false);
+
+            const waypoints = this._createWaypointsDropAndReturn(path.map(star => {
+                return {
+                    starId: star._id.toString(),
+                    action: "nothing"
+                };
+            }));
+
+            await this.waypointService.saveWaypointsForCarrier(game, player, carrier, waypoints, false, false);
         }
     }
 
