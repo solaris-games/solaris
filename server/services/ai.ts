@@ -1014,7 +1014,7 @@ export default class AIService {
 
     _isEnemyPlayer(game: Game, player: Player, otherPlayerId: DBObjectId): boolean {
         if (this.diplomacyService.isFormalAlliancesEnabled(game)) {
-            return player._id !== otherPlayerId
+            return player._id.toString() !== otherPlayerId.toString()
                 && this.diplomacyService.getDiplomaticStatusToPlayer(game, player._id, otherPlayerId).actualStatus !== 'allies';
         }
 
@@ -1300,7 +1300,7 @@ export default class AIService {
             const reachableFromPlayerStars = new Set<string>();
 
             reachStars.forEach(otherStar => {
-                if (star._id !== otherStar._id && this._calculateTravelDistance(star, otherStar) <= hyperspaceRange) {
+                if (star._id.toString() !== otherStar._id.toString() && this._calculateTravelDistance(star, otherStar) <= hyperspaceRange) {
                     reachableFromPlayerStars.add(otherStar._id.toString());
                 }
             });

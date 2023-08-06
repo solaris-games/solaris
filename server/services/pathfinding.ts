@@ -43,7 +43,7 @@ export default class PathfindingService {
         })
 
         const getNeighbors = (node: Node) => graph
-            .filter(s => s.star._id !== node.star._id)
+            .filter(s => s.star._id.toString() !== node.star._id.toString())
             .filter(s => this.distanceService.getDistanceBetweenLocations(s.star.location, node.star.location) <= hyperspaceDistance || this.starService.isStarPairWormHole(s.star, node.star));
 
         const start = graph.find(s => s.star._id.toString() === sourceStarId)!;
