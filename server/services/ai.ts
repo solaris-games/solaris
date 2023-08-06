@@ -1289,7 +1289,7 @@ export default class AIService {
                 if (!carriersAtSource.length) {
                     const productionPerTick = this.shipService.calculateStarShipProduction(game, movement.from, productionCap);
                     const ticksStockpile = (movement.from.ships || 0) / productionPerTick;
-                    const isUnimportantLogistics = ticksStockpile < (game.settings.galaxy.productionTicks * 0.5);
+                    const isUnimportantLogistics = ticksStockpile < (game.settings.galaxy.productionTicks * 0.7);
 
                     if (!isUnimportantLogistics && this._canAffordCarrier(context, game, player, false)) {
                         const buildResult = await this.starUpgradeService.buildCarrier(game, player, movement.from._id, 1, false);
