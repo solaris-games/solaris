@@ -69,6 +69,7 @@ import SpecialStarBanService from "../specialStarBan";
 import ShipService from "../ship";
 import SpectatorService from "../spectator";
 import BasicAIService from "../basicAi";
+import PathfindingService from "../pathfinding";
 
 export interface DependencyContainer {
     config: Config,
@@ -142,4 +143,5 @@ export interface DependencyContainer {
     notificationService: NotificationService,
     shipService: ShipService,
     spectatorService: SpectatorService,
+    pathfindingService: PathfindingService,
 };

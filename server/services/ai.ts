@@ -21,6 +21,7 @@ import {DBObjectId} from "./types/DBObjectId";
 import BasicAIService from "./basicAi";
 import PlayerAfkService from "./playerAfk";
 import ShipService from "./ship";
+import PathfindingService from "./pathfinding";
 
 const Heap = require('qheap');
 const mongoose = require("mongoose");
@@ -141,6 +142,7 @@ export default class AIService {
     playerStatisticsService: PlayerStatisticsService;
     shipService: ShipService;
     basicAIService: BasicAIService;
+    pathfindingService: PathfindingService;
 
     constructor(
         starUpgradeService: StarUpgradeService,
@@ -157,7 +159,8 @@ export default class AIService {
         diplomacyService: DiplomacyService,
         shipService: ShipService,
         playerStatisticsService: PlayerStatisticsService,
-        basicAIService: BasicAIService
+        basicAIService: BasicAIService,
+        pathfindingService: PathfindingService
     ) {
         this.starUpgradeService = starUpgradeService;
         this.carrierService = carrierService;
@@ -174,6 +177,7 @@ export default class AIService {
         this.playerStatisticsService = playerStatisticsService;
         this.shipService = shipService;
         this.basicAIService = basicAIService;
+        this.pathfindingService = pathfindingService;
     }
 
     isAIControlled(player: Player) {

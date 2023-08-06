@@ -338,6 +338,19 @@ export default class WaypointService {
         return distanceBetweenStars <= hyperspaceDistance
     }
 
+    calculateTicksForDistance(game: Game, player: Player, carrier: Carrier, sourceStar: Star, destinationStar: Star): number {
+        const distance = this.distanceService.getDistanceBetweenLocations(sourceStar.location, destinationStar.location);
+        const warpSpeed = this.carrierMovementService.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar);
+
+        let tickDistance = this.carrierMovementService.getCarrierDistancePerTick(game, carrier, warpSpeed, false);
+
+        if (tickDistance) {
+            return Math.ceil(distance / tickDistance);
+        }
+
+        return 1;
+    }
+
     calculateWaypointTicks(game: Game, carrier: Carrier, waypoint: CarrierWaypoint) {
         const delayTicks = waypoint.delayTicks || 0;
 
