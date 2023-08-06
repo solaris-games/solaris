@@ -1269,8 +1269,11 @@ export default class AIService {
     async _performLogistics(context: Context, game: Game, player: Player) {
         const movements = this._computeLogisticsMovements(context, game, player);
 
-        const scoreSum = movements.map(m => m.score).reduce((a, b) => a + b, 0);
-        const scoreAvg = scoreSum / movements.length;
+        if (!movements.length) {
+            return;
+        }
+
+        const productionCap = this.shipService.calculatePopulationCap(game, player._id);
 
         for (const movement of movements) {
             const path = this._findPath(context, context.freelyReachableStars, movement.from, movement.to);
@@ -1280,7 +1283,9 @@ export default class AIService {
                 const carriersAtSource = this.carrierService.getCarriersAtStar(game, movement.from._id);
 
                 if (!carriersAtSource.length) {
-                    const isUnimportantLogistics = movement.score < (scoreAvg * 0.5);
+                    const productionPerTick = this.shipService.calculateStarShipProduction(game, movement.from, productionCap);
+                    const ticksStockpile = (movement.from.ships || 0) / productionPerTick;
+                    const isUnimportantLogistics = ticksStockpile < (game.settings.galaxy.productionTicks * 0.5);
 
                     if (!isUnimportantLogistics && this._canAffordCarrier(context, game, player, false)) {
                         const buildResult = await this.starUpgradeService.buildCarrier(game, player, movement.from._id, 1, false);
