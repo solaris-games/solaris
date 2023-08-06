@@ -1239,7 +1239,7 @@ export default class AIService {
                 const possibleTargetStar = context.starsById.get(possibleTargetId)!;
                 const distance = this.distanceService.getDistanceBetweenLocations(star.location, possibleTargetStar.location);
 
-                const score = priority / distance;
+                const score = (priority * priority * 10) / distance;
 
                 if (score > highestScore) {
                     highestScore = score;
