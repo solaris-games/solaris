@@ -1209,13 +1209,6 @@ export default class AIService {
 
         movements.sort((a, b) => b.score - a.score);
 
-        movements.forEach(m => {
-            const fromName = m.from.name;
-            const toName = m.to.name;
-
-            console.log(`Movement from ${fromName} to ${toName} with score ${m.score}`)
-        })
-
         return movements;
     }
 
@@ -1229,6 +1222,8 @@ export default class AIService {
         const productionCap = this.shipService.calculatePopulationCap(game, player._id);
 
         for (const movement of movements) {
+            console.log(`Movement from ${movement.from.name} to ${movement.to.name} with score ${movement.score}`)
+
             let carrier: Carrier | null = null;
             const carriersAtSource = this.carrierService.getCarriersAtStar(game, movement.from._id).filter(carrier => carrier.waypoints.length === 0);
 
@@ -1241,18 +1236,22 @@ export default class AIService {
                     const buildResult = await this.starUpgradeService.buildCarrier(game, player, movement.from._id, 1, false);
                     // Get the carrier again since the above-returned is not tracked by the db
                     carrier = this.carrierService.getById(game, buildResult.carrier._id);
+                } else {
+                    console.log(`Skipping movement because it is unimportant or a carrier cannot be bought`);
                 }
             } else {
                 carrier = carriersAtSource[0];
             }
 
             if (!carrier) {
+                console.log("Skipping movement");
                 continue;
             }
 
-            const path = this.pathfindingService.calculateShortestRoute(game, player, carrier, movement.from._id, movement.to._id);
+            const path = this.pathfindingService.calculateShortestRoute(game, player, carrier, movement.from._id.toString(), movement.to._id.toString());
 
             if (path.length === 0) {
+                console.log("No path found");
                 continue;
             }
 

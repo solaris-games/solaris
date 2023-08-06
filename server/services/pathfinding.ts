@@ -29,7 +29,7 @@ export default class PathfindingService {
         this.waypointService = waypointService;
     }
 
-    calculateShortestRoute(game: Game, player: Player, carrier: Carrier, sourceStarId: DBObjectId, destinStarId: DBObjectId): Star[] {
+    calculateShortestRoute(game: Game, player: Player, carrier: Carrier, sourceStarId: string, destinStarId: string): Star[] {
         const hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, player.research.hyperspace.level);
 
         const graph: Node[] = game.galaxy.stars.map(star => {
@@ -46,11 +46,11 @@ export default class PathfindingService {
             .filter(s => s.star._id !== node.star._id)
             .filter(s => this.distanceService.getDistanceBetweenLocations(s.star.location, node.star.location) <= hyperspaceDistance || this.starService.isStarPairWormHole(s.star, node.star));
 
-        let start = graph.find(s => s.star._id === sourceStarId)!;
-        let end = graph.find(s => s.star._id === destinStarId)!;
+        const start = graph.find(s => s.star._id.toString() === sourceStarId)!;
+        const end = graph.find(s => s.star._id.toString() === destinStarId)!;
 
-        let openSet: Node[] = [start]
-        let closedSet: Node[] = []
+        const openSet: Node[] = [start]
+        const closedSet: Node[] = []
 
         while (openSet.length) {
             // This sort makes us look at the nodes where we can get the quickest first.
