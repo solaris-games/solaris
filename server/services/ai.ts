@@ -468,19 +468,23 @@ export default class AIService {
             };
         }
 
-        let type = BorderStarType.FreeStars;
+        let type = BorderStarType.EmptySpace;
 
         for (const otherStarId of allStarsInRange) {
             const otherStar = starsById.get(otherStarId)!;
 
             const otherPlayerId = otherStar.ownedByPlayerId?.toString();
 
-            if (otherPlayerId && otherPlayerId !== playerId) {
-                otherPlayersBordering.add(otherPlayerId);
+            if (otherPlayerId) {
+                if (otherPlayerId !== playerId) {
+                    otherPlayersBordering.add(otherPlayerId);
 
-                if (this._isEnemyPlayer(game, player, otherStar.ownedByPlayerId!)) {
-                    type = BorderStarType.HostileBorder;
+                    if (this._isEnemyPlayer(game, player, otherStar.ownedByPlayerId!)) {
+                        type = BorderStarType.HostileBorder;
+                    }
                 }
+            } else {
+                type = BorderStarType.FreeStars;
             }
         }
 
