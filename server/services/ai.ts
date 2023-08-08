@@ -1186,9 +1186,9 @@ export default class AIService {
 
             for (const [possibleTargetId, priority] of starPriorities) {
                 const possibleTargetStar = context.starsById.get(possibleTargetId)!;
-                const distance = this.distanceService.getDistanceBetweenLocations(star.location, possibleTargetStar.location);
+                const distanceSq = this.distanceService.getDistanceSquaredBetweenLocations(star.location, possibleTargetStar.location);
 
-                const score = (priority * priority * 10) / distance;
+                const score = (priority * 10000) / distanceSq;
 
                 if (score > highestScore) {
                     highestScore = score;
