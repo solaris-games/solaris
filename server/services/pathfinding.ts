@@ -13,7 +13,7 @@ import WaypointService from "./waypoint";
 interface Node {
     cost: number;
     costFromStart: number;
-    neighbors: Node[];
+    neighbors: Node[] | null;
     parent: Node | null;
     star: Star;
 }
@@ -37,7 +37,7 @@ export default class PathfindingService {
                 star,
                 cost: 0,
                 costFromStart: 0,
-                neighbors: [],
+                neighbors: null,
                 parent: null
             }
         })
