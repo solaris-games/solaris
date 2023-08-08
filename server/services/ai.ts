@@ -1213,6 +1213,7 @@ export default class AIService {
     }
 
     async _performLogistics(context: Context, game: Game, player: Player) {
+        // TODO: Remove movements where an incoming carrier with a collect order is close
         const movements = this._computeLogisticsMovements(context, game, player);
 
         if (!movements.length) {
@@ -1249,6 +1250,10 @@ export default class AIService {
             }
 
             const path = this.pathfindingService.calculateShortestRoute(game, player, carrier, movement.from._id.toString(), movement.to._id.toString());
+
+            // TODO: Collect all waypoints that will be reached within a certain time
+            // then, find movements that move from these waypoints to the same destination as the current movement
+            // delete those movements and set the affected waypoints to collect
 
             if (path.length === 0) {
                 console.log("No path found");
