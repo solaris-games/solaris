@@ -123,6 +123,12 @@ interface FoundAssignment {
     trace: TracePoint[];
 }
 
+interface Movement {
+    from: Star;
+    to: Star;
+    score: number;
+}
+
 // IMPORTANT IMPLEMENTATION NOTES
 // During AI tick, care must be taken to NEVER write any changes to the database.
 // This is performed automatically by mongoose (when calling game.save()).
@@ -1173,7 +1179,7 @@ export default class AIService {
         return starPriorities;
     }
 
-    _computeLogisticsMovements(context: Context, game: Game, player: Player): {from: Star, to: Star, score: number}[] {
+    _computeLogisticsMovements(context: Context, game: Game, player: Player): Movement[] {
         const starPriorities = this._computeStarPriorities(context, game, player);
 
         const movements: {from: Star, to: Star, score: number}[] = [];
@@ -1244,6 +1250,8 @@ export default class AIService {
         const ticksStockpileAllowed = game.settings.galaxy.productionTicks * LOGISTIC_STOCKPILE_CYCLES;
         const productionCap = this.shipService.calculatePopulationCap(game, player._id);
 
+        const discardedMovements: Movement[] = [];
+
         while (!(movements.length === 0)) {
             const movement = movements.shift()!;
 
@@ -1270,6 +1278,7 @@ export default class AIService {
 
             if (!carrier) {
                 console.log("Skipping movement");
+                discardedMovements.push(movement);
                 continue;
             }
 
@@ -1280,16 +1289,28 @@ export default class AIService {
                 continue;
             }
 
-            // TODO: Collect all waypoints that will be reached within a certain time
-            // then, find movements that move from these waypoints to the same destination as the current movement
-            // delete those movements and set the affected waypoints to collect
+            const waypointsReached = path.filter(node => true);//node.costFromStart <= ticksStockpileAllowed);
+            const starsVisitedDuringMovement = waypointsReached.map(node => node.star._id.toString());
 
-            const waypointsReached = path.filter(node => node.costFromStart <= ticksStockpileAllowed);
-            const starsCollectedDuringMovement = waypointsReached.map(node => node.star._id.toString());
+            starsVisitedDuringMovement.forEach(starId => {
+                console.log(`Star ${this.getStarName(context, starId)} will be collected during movement`);
+            })
 
-            const movementsForRemoval = movements.filter(mov2 => {
-                return starsCollectedDuringMovement.find(starId => mov2.from._id.toString() === starId) &&
+            const checkForVisit = (mov2: Movement) => {
+                return starsVisitedDuringMovement.find(starId => mov2.from._id.toString() === starId) &&
                     mov2.to._id.toString() === movement.to._id.toString();
+            };
+
+            const movementsForRemoval = movements.filter(checkForVisit);
+
+            const revisitedMovements = discardedMovements.filter(checkForVisit);
+
+            console.log(`Revisiting ${revisitedMovements.length} movements.`);
+
+            console.log(`Removing ${movementsForRemoval.length} movements:`);
+
+            movementsForRemoval.forEach(mov => {
+                console.log(`Removing movement from ${mov.from.name} to ${mov.to.name} with score ${mov.score}`);
             });
 
             movements = movements.filter(otherMovement => {
@@ -1297,7 +1318,9 @@ export default class AIService {
             });
 
             const waypoints = this._createWaypointsDropAndReturn(path.map(node => {
-                const action = movementsForRemoval.find(mv => mv.from._id.toString() === node.star._id.toString()) ? "collectAll" : "nothing";
+                const pickupHere = movementsForRemoval.find(mv => mv.from._id.toString() === node.star._id.toString())
+                                                        || revisitedMovements.find(mv => mv.from._id.toString() === node.star._id.toString());
+                const action = pickupHere ? "collectAll" : "nothing";
 
                 return {
                     starId: node.star._id.toString(),
