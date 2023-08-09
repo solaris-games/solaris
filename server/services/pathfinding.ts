@@ -79,7 +79,7 @@ export default class PathfindingService {
                     temp = temp.parent;
                 }
 
-                return path.reverse().map(node => node.star);
+                return path.reverse();
             }
 
             // Dynamically load neighbors as its more efficient
