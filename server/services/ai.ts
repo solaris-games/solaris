@@ -1182,6 +1182,16 @@ export default class AIService {
             return !borderStarData || borderStarData.type === BorderStarType.EmptySpace;
         });
 
+        const willBeCollectedSoon = (star: Star, target: Star): Boolean => {
+            return Boolean(context.playerCarriers.find(carrier => {
+                return carrier.waypoints &&
+                    carrier.waypoints.length > 1 &&
+                    carrier.waypoints[0].destination.toString() === star._id.toString() &&
+                    carrier.waypoints[0].action === "collectAll" &&
+                    carrier.waypoints.find(wp => wp.destination.toString() === target._id.toString() && wp.action === "dropAll")
+            }));
+        }
+        
         for (const star of nonImportantBorderStars) {
             if (!star.shipsActual || Math.floor(star.shipsActual) === 0) {
                 continue;
@@ -1205,6 +1215,10 @@ export default class AIService {
             if (highestTarget) {
                 const movementScore = highestScore * (highestTarget.ships || 0);
 
+                if (willBeCollectedSoon(star, highestTarget)) {
+                    continue;
+                }
+
                 movements.push({
                     from: star,
                     to: highestTarget,
@@ -1219,7 +1233,6 @@ export default class AIService {
     }
 
     async _performLogistics(context: Context, game: Game, player: Player) {
-        // TODO: Remove movements where an incoming carrier with a collect order is close
         const movements = this._computeLogisticsMovements(context, game, player);
 
         if (!movements.length) {
