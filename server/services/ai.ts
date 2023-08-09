@@ -1297,7 +1297,7 @@ export default class AIService {
             });
 
             const waypoints = this._createWaypointsDropAndReturn(path.map(node => {
-                const action = movements.find(mv => mv.from._id.toString() === node.star._id.toString()) ? "collectAll" : "nothing";
+                const action = movementsForRemoval.find(mv => mv.from._id.toString() === node.star._id.toString()) ? "collectAll" : "nothing";
 
                 return {
                     starId: node.star._id.toString(),
