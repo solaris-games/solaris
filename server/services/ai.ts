@@ -40,6 +40,8 @@ const INVASION_ATTACK_FACTOR = 1.5;
 
 const BORDER_STAR_ANGLE_THRESHOLD_DEGREES = 120;
 
+const LOGISTIC_STOCKPILE_CYCLES = 0.7;
+
 enum AiAction {
     DefendStar,
     ClaimStar,
@@ -1191,7 +1193,7 @@ export default class AIService {
                     carrier.waypoints.find(wp => wp.destination.toString() === target._id.toString() && wp.action === "dropAll")
             }));
         }
-        
+
         for (const star of nonImportantBorderStars) {
             if (!star.shipsActual || Math.floor(star.shipsActual) === 0) {
                 continue;
@@ -1233,15 +1235,18 @@ export default class AIService {
     }
 
     async _performLogistics(context: Context, game: Game, player: Player) {
-        const movements = this._computeLogisticsMovements(context, game, player);
+        let movements = this._computeLogisticsMovements(context, game, player);
 
         if (!movements.length) {
             return;
         }
 
+        const ticksStockpileAllowed = game.settings.galaxy.productionTicks * LOGISTIC_STOCKPILE_CYCLES;
         const productionCap = this.shipService.calculatePopulationCap(game, player._id);
 
-        for (const movement of movements) {
+        while (!(movements.length === 0)) {
+            const movement = movements.shift()!;
+
             console.log(`Movement from ${movement.from.name} to ${movement.to.name} with score ${movement.score}`)
 
             let carrier: Carrier | null = null;
@@ -1250,7 +1255,7 @@ export default class AIService {
             if (!carriersAtSource.length) {
                 const productionPerTick = this.shipService.calculateStarShipProduction(game, movement.from, productionCap);
                 const ticksStockpile = (movement.from.ships || 0) / productionPerTick;
-                const isUnimportantLogistics = ticksStockpile < (game.settings.galaxy.productionTicks * 0.7);
+                const isUnimportantLogistics = ticksStockpile < ticksStockpileAllowed;
 
                 if (!isUnimportantLogistics && this._canAffordCarrier(context, game, player, false)) {
                     const buildResult = await this.starUpgradeService.buildCarrier(game, player, movement.from._id, 1, false);
@@ -1270,26 +1275,40 @@ export default class AIService {
 
             const path = this.pathfindingService.calculateShortestRoute(game, player, carrier, movement.from._id.toString(), movement.to._id.toString());
 
-            // TODO: Collect all waypoints that will be reached within a certain time
-            // then, find movements that move from these waypoints to the same destination as the current movement
-            // delete those movements and set the affected waypoints to collect
-
             if (path.length === 0) {
                 console.log("No path found");
                 continue;
             }
 
+            // TODO: Collect all waypoints that will be reached within a certain time
+            // then, find movements that move from these waypoints to the same destination as the current movement
+            // delete those movements and set the affected waypoints to collect
+
+            const waypointsReached = path.filter(node => node.costFromStart <= ticksStockpileAllowed);
+            const starsCollectedDuringMovement = waypointsReached.map(node => node.star._id.toString());
+
+            const movementsForRemoval = movements.filter(mov2 => {
+                return starsCollectedDuringMovement.find(starId => mov2.from._id.toString() === starId) &&
+                    mov2.to._id.toString() === movement.to._id.toString();
+            });
+
+            movements = movements.filter(otherMovement => {
+                return movementsForRemoval.indexOf(otherMovement) === -1;
+            });
+
+            const waypoints = this._createWaypointsDropAndReturn(path.map(node => {
+                const action = movements.find(mv => mv.from._id.toString() === node.star._id.toString()) ? "collectAll" : "nothing";
+
+                return {
+                    starId: node.star._id.toString(),
+                    action
+                };
+            }));
+
             const carrierInitialShips = carrier.ships || 0;
             const transferShips = movement.from.ships || 0;
 
             await this.shipTransferService.transfer(game, player, carrier._id, carrierInitialShips + transferShips, movement.from._id, 0, false);
-
-            const waypoints = this._createWaypointsDropAndReturn(path.map(star => {
-                return {
-                    starId: star._id.toString(),
-                    action: "nothing"
-                };
-            }));
 
             await this.waypointService.saveWaypointsForCarrier(game, player, carrier, waypoints, false, false);
         }

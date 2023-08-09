@@ -29,7 +29,7 @@ export default class PathfindingService {
         this.waypointService = waypointService;
     }
 
-    calculateShortestRoute(game: Game, player: Player, carrier: Carrier, sourceStarId: string, destinStarId: string): Star[] {
+    calculateShortestRoute(game: Game, player: Player, carrier: Carrier, sourceStarId: string, destinStarId: string): Node[] {
         const hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, player.research.hyperspace.level);
 
         const graph: Node[] = game.galaxy.stars.map(star => {
