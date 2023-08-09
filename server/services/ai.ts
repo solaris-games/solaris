@@ -1133,7 +1133,7 @@ export default class AIService {
         return context.attackedStarIds.has(starId);
     }
 
-    _computeLogisticsMovements(context: Context, game: Game, player: Player): {from: Star, to: Star, score: number}[] {
+    _computeStarPriorities(context: Context, game: Game, player: Player): Map<string, number> {
         const starsForExpansion = new Array<[string, BorderStarData]>();
         const starsWithHostileBorder = new Array<[string, BorderStarData]>();
 
@@ -1167,6 +1167,12 @@ export default class AIService {
 
             starPriorities.set(starId, priority);
         }
+
+        return starPriorities;
+    }
+
+    _computeLogisticsMovements(context: Context, game: Game, player: Player): {from: Star, to: Star, score: number}[] {
+        const starPriorities = this._computeStarPriorities(context, game, player);
 
         const movements: {from: Star, to: Star, score: number}[] = [];
 
