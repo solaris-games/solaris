@@ -104,7 +104,7 @@ async function startup() {
 
     do {
         let games = await container.gameService.gameRepo.find(dbQuery, {},
-        { _id: 1 },
+        { 'state.endDate': 1 },
         pageSize,
         pageSize * page);
 
