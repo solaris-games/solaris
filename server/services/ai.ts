@@ -726,7 +726,7 @@ export default class AIService {
         return carrierResult;
     }
 
-    _createWaypointsDropAndReturn(trace: TracePoint[]): CarrierWaypoint[] {
+    _createWaypointsDropAndReturn(trace: TracePoint[], baseAction: CarrierWaypointActionType = "nothing"): CarrierWaypoint[] {
         const newTrace: TracePoint[] = trace.slice(0, trace.length - 1);
 
         newTrace.push({
@@ -734,7 +734,12 @@ export default class AIService {
             action: "dropAll"
         });
 
-        const backTrace = (trace.slice(0, trace.length - 1).reverse());
+        const backTrace = (trace.slice(0, trace.length - 1).reverse()).map(t => {
+            return {
+                ...t,
+                action: baseAction,
+            }
+        });
 
         return this._createWaypointsFromTrace(newTrace.concat(backTrace));
     }
@@ -1327,6 +1332,8 @@ export default class AIService {
                     action
                 };
             }));
+
+            console.log(`Found ${waypoints.filter(wp => wp.action === "collectAll").length} collectAll waypoints`);
 
             const carrierInitialShips = carrier.ships || 0;
             const transferShips = movement.from.ships || 0;
