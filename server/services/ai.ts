@@ -1260,8 +1260,6 @@ export default class AIService {
         while (!(movements.length === 0)) {
             const movement = movements.shift()!;
 
-            console.log(`Movement from ${movement.from.name} to ${movement.to.name} with score ${movement.score}`)
-
             let carrier: Carrier | null = null;
             const carriersAtSource = this.carrierService.getCarriersAtStar(game, movement.from._id).filter(carrier => carrier.waypoints.length === 0);
 
@@ -1274,15 +1272,12 @@ export default class AIService {
                     const buildResult = await this.starUpgradeService.buildCarrier(game, player, movement.from._id, 1, false);
                     // Get the carrier again since the above-returned is not tracked by the db
                     carrier = this.carrierService.getById(game, buildResult.carrier._id);
-                } else {
-                    console.log(`Skipping movement because it is unimportant or a carrier cannot be bought`);
                 }
             } else {
                 carrier = carriersAtSource[0];
             }
 
             if (!carrier) {
-                console.log("Skipping movement");
                 discardedMovements.push(movement);
                 continue;
             }
@@ -1290,16 +1285,11 @@ export default class AIService {
             const path = this.pathfindingService.calculateShortestRoute(game, player, carrier, movement.from._id.toString(), movement.to._id.toString());
 
             if (path.length === 0) {
-                console.log("No path found");
                 continue;
             }
 
             const waypointsReached = path.filter(node => true);//node.costFromStart <= ticksStockpileAllowed);
             const starsVisitedDuringMovement = waypointsReached.map(node => node.star._id.toString());
-
-            starsVisitedDuringMovement.forEach(starId => {
-                console.log(`Star ${this.getStarName(context, starId)} will be collected during movement`);
-            })
 
             const checkForVisit = (mov2: Movement) => {
                 return starsVisitedDuringMovement.find(starId => mov2.from._id.toString() === starId) &&
@@ -1309,14 +1299,6 @@ export default class AIService {
             const movementsForRemoval = movements.filter(checkForVisit);
 
             const revisitedMovements = discardedMovements.filter(checkForVisit);
-
-            console.log(`Revisiting ${revisitedMovements.length} movements.`);
-
-            console.log(`Removing ${movementsForRemoval.length} movements:`);
-
-            movementsForRemoval.forEach(mov => {
-                console.log(`Removing movement from ${mov.from.name} to ${mov.to.name} with score ${mov.score}`);
-            });
 
             movements = movements.filter(otherMovement => {
                 return movementsForRemoval.indexOf(otherMovement) === -1;
@@ -1332,8 +1314,6 @@ export default class AIService {
                     action
                 };
             }));
-
-            console.log(`Found ${waypoints.filter(wp => wp.action === "collectAll").length} collectAll waypoints`);
 
             const carrierInitialShips = carrier.ships || 0;
             const transferShips = movement.from.ships || 0;
