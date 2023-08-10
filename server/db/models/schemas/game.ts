@@ -258,4 +258,6 @@ const schema = new Schema({
 	spectators: [{ type: Types.ObjectId, required: false }]
 });
 
+schema.index({'state.endDate': 1}, {unique: false});
+
 export default schema;
