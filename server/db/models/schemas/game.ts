@@ -121,7 +121,8 @@ const schema = new Schema({
 			populationCap: {
 				enabled: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
 				shipsPerStar: { type: Types.Number, required: true, min: 50, max: 1000, default: 100 }
-			}
+			},
+			allowAbandonStars: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'enabled' }
 		},
 		diplomacy: {
 			enabled: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },

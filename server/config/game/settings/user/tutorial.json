@@ -76,7 +76,8 @@
     "populationCap": {
       "enabled": "disabled",
       "shipsPerStar": 100
-    }
+    },
+    "allowAbandonStars": "enabled"
   },
   "diplomacy": {
     "enabled": "disabled",

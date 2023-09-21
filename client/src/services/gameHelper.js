@@ -1102,6 +1102,10 @@ class GameHelper {
   isPopulationCapped(game) {
     return game.settings.player.populationCap.enabled === 'enabled'
   }
+
+  isGameAllowAbandonStars(game) {
+    return game.settings.player.allowAbandonStars === 'enabled'
+  }
 }
 
 export default new GameHelper()

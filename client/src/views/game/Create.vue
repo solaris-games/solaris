@@ -129,6 +129,15 @@
             </option>
           </select>
         </div>
+
+        <div class="mb-2">
+          <label for="allowAbandonStars" class="col-form-label">Allow Abandon Stars <help-tooltip tooltip="Determines whether players are allowed to abandon stars"/></label>
+          <select class="form-control" id="allowAbandonStars" v-model="settings.player.allowAbandonStars" :disabled="isCreatingGame">
+            <option v-for="opt in options.player.allowAbandonStars" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
       </view-collapse-panel>
 
       <view-collapse-panel title="Game Time Settings" :startsOpened="true">

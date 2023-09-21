@@ -412,6 +412,10 @@ export default class StarService extends EventEmitter {
     }
 
     async abandonStar(game: Game, player: Player, starId: DBObjectId) {
+        if (game.settings.player.allowAbandonStars === 'disabled') {
+            throw new ValidationError(`Abandoning stars has been disabled in this game.`);
+        }
+
         // Get the star.
         let star = game.galaxy.stars.find(x => x._id.toString() === starId.toString())!;
 

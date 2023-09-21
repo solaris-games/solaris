@@ -156,7 +156,8 @@ export interface GameSettings {
 		populationCap: {
 			enabled: GameSettingEnabledDisabled;
 			shipsPerStar: number;
-		}
+		},
+		allowAbandonStars: GameSettingEnabledDisabled;
   	},
 	diplomacy: {
 		enabled: GameSettingEnabledDisabled;

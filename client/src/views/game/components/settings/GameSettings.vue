@@ -79,6 +79,11 @@
             :valueText="getFriendlyText(game.settings.general.readyToQuit)"
             :value="game.settings.general.readyToQuit"
             :compareValue="compareSettings.general.readyToQuit"/>
+          <game-setting-value title="Allow Abandon Stars"
+            tooltip="Allow players to abandon their stars"
+            :valueText="getFriendlyText(game.settings.player.allowAbandonStars)"
+            :value="game.settings.player.allowAbandonStars"
+            :compareValue="compareSettings.player.allowAbandonStars"/>
         </tbody>
       </table>
     </div>
