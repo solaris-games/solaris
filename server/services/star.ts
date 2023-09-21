@@ -250,10 +250,14 @@ export default class StarService extends EventEmitter {
             .filter(s => s.ignoreBulkUpgrade![infrastructureType]);
     }
 
+    isStarAlwaysVisible(star: Star) {
+        return star.isPulsar || star.specialistId === 10 // Trade port
+    }
+
     isStarWithinScanningRangeOfStars(game: Game, star: Star, stars: Star[]) {
         // Pulsars are considered to be always in scanning range.
         // Note: They are not visible until the game starts to prevent pre-teaming.
-        if (star.isPulsar && this.gameStateService.isStarted(game)) {
+        if (this.isStarAlwaysVisible(star) && this.gameStateService.isStarted(game)) {
             return true;
         }
 
@@ -300,7 +304,7 @@ export default class StarService extends EventEmitter {
                     _id: s._id,
                     location: s.location,
                     ownedByPlayerId: s.ownedByPlayerId,
-                    isAlwaysVisible: s.isPulsar
+                    isAlwaysVisible: this.isStarAlwaysVisible(s)
                 }
             });
 
