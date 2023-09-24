@@ -515,6 +515,16 @@
            "text":"Disabled"
          }
         ],
+       "lockedAlliances":[
+         { 
+           "value":"enabled",
+           "text":"Enabled"
+         },
+         {
+           "value":"disabled",
+           "text":"Disabled"
+         }
+        ],
        "globalEvents": [
          {
             "value":"enabled",

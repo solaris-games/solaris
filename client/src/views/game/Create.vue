@@ -572,6 +572,14 @@
           </select>
         </div>
         <div class="mb-2" v-if="settings.diplomacy.enabled === 'enabled'">
+          <label for="alliancesLocked" class="col-form-label">Locked Alliances<help-tooltip tooltip="If enabled, alliances cannot be canceled."/></label>
+           <select class="form-control" id="alliancesLocked" v-model="settings.diplomacy.lockedAlliances" :disabled="isCreatingGame">
+            <option v-for="opt in options.diplomacy.lockedAlliances" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+        <div class="mb-2" v-if="settings.diplomacy.enabled === 'enabled'">
           <label for="alliancesGlobalEvents" class="col-form-label">Global Events <help-tooltip tooltip="If enabled, global events will be displayed when players declare war or make peace"/></label>
           <select class="form-control" id="alliancesGlobalEvents" v-model="settings.diplomacy.globalEvents" :disabled="isCreatingGame">
             <option v-for="opt in options.diplomacy.globalEvents" v-bind:key="opt.value" v-bind:value="opt.value">

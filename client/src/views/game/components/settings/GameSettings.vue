@@ -435,6 +435,12 @@
             :value="game.settings.diplomacy.tradeRestricted"
             :compareValue="compareSettings.diplomacy.tradeRestricted"
             v-if="game.settings.diplomacy.enabled === 'enabled'"/>
+          <game-setting-value title="Locked Alliances"
+            tooltip="If enabled, alliances cannot be canceled."
+            :valueText="getFriendlyText(game.settings.diplomacy.lockedAlliances)"
+            :value="game.settings.diplomacy.lockedAlliances"
+            :compareValue="compareSettings.diplomacy.lockedAlliances"
+            v-if="game.settings.diplomacy.enabled === 'enabled'"/>
           <game-setting-value title="Global Events"
             tooltip="If enabled, global events will be displayed when players declare war or make peace"
             :valueText="getFriendlyText(game.settings.diplomacy.globalEvents)"
