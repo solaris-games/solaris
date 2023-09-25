@@ -483,6 +483,16 @@
             "text":"Disabled"
          }
        ],
+       "lockedAlliances":[
+         {
+           "value":"enabled",
+           "text":"Enabled"
+         },
+         {
+           "value":"disabled",
+           "text":"Disabled"
+         }
+        ],
        "upkeepCost":[
          {
            "value":"none",
@@ -506,16 +516,6 @@
          }
        ],
        "tradeRestricted":[
-         { 
-           "value":"enabled",
-           "text":"Enabled"
-         },
-         {
-           "value":"disabled",
-           "text":"Disabled"
-         }
-        ],
-       "lockedAlliances":[
          { 
            "value":"enabled",
            "text":"Enabled"

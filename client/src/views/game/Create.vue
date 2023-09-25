@@ -550,6 +550,14 @@
           </select>
         </div>
         <div class="mb-2" v-if="settings.diplomacy.enabled === 'enabled'">
+          <label for="alliancesLocked" class="col-form-label">Locked Alliances<help-tooltip tooltip="If enabled, alliances cannot be canceled."/></label>
+           <select class="form-control" id="alliancesLocked" v-model="settings.diplomacy.lockedAlliances" :disabled="isCreatingGame"  @change="onMaxAllianceTriggerChanged">
+             <option v-for="opt in options.diplomacy.lockedAlliances.filter(o => !(o.value === 'enabled' && settings.general.playerLimit <= 2))" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+        <div class="mb-2" v-if="settings.diplomacy.enabled === 'enabled'">
           <label for="maxAlliances" class="col-form-label">Max Number of Alliances (<span class="text-warning">{{settings.diplomacy.maxAlliances}} Allies</span>) <help-tooltip tooltip="Determines how many formal alliance each player may have at once."/></label>
           <div class="col">
             <input type="range" min="1" :max="calcMaxAllianceLimit()" step="1" class="form-range w-100" id="maxAlliances" v-model="settings.diplomacy.maxAlliances" :disabled="isCreatingGame">
@@ -567,14 +575,6 @@
           <label for="allianceTradeRestricted" class="col-form-label">Alliance Only Trading <help-tooltip tooltip="If enabled, only allies can trade with eachother."/></label>
            <select class="form-control" id="allianceTradeRestricted" v-model="settings.diplomacy.tradeRestricted" :disabled="isCreatingGame">
             <option v-for="opt in options.diplomacy.tradeRestricted" v-bind:key="opt.value" v-bind:value="opt.value">
-              {{ opt.text }}
-            </option>
-          </select>
-        </div>
-        <div class="mb-2" v-if="settings.diplomacy.enabled === 'enabled'">
-          <label for="alliancesLocked" class="col-form-label">Locked Alliances<help-tooltip tooltip="If enabled, alliances cannot be canceled."/></label>
-           <select class="form-control" id="alliancesLocked" v-model="settings.diplomacy.lockedAlliances" :disabled="isCreatingGame"  @change="onMaxAllianceTriggerChanged">
-             <option v-for="opt in options.diplomacy.lockedAlliances.filter(o => !(o.value === 'enabled' && settings.general.playerLimit <= 2))" v-bind:key="opt.value" v-bind:value="opt.value">
               {{ opt.text }}
             </option>
           </select>
