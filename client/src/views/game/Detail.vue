@@ -2,9 +2,9 @@
   <view-container>
     <view-title title="Game Settings" navigation="main-menu"/>
 
-    <loading-spinner :loading="isLoadingGame"/>
+    <loading-spinner :loading="isLoading"/>
 
-    <div v-if="!isLoadingGame">
+    <div v-if="!isLoading">
       <view-subtitle v-bind:title="game.settings.general.name" class="mt-2"/>
 
       <p v-if="game.settings.general.description">{{game.settings.general.description}}</p>
@@ -55,7 +55,7 @@ export default {
   },
   data () {
     return {
-      isLoadingGame: true,
+      isLoading: true,
       game: {
         _id: null,
         settings: {
@@ -71,7 +71,7 @@ export default {
     this.game._id = this.$route.query.id
   },
   async mounted () {
-    this.isLoadingGame = true
+    this.isLoading = true
 
     try {
       let response = await gameService.getGameInfo(this.game._id)
@@ -81,7 +81,7 @@ export default {
       console.error(err)
     }
 
-    this.isLoadingGame = false
+    this.isLoading = false
   },
   methods: {
     async pauseGame () {
@@ -92,7 +92,7 @@ export default {
     },
     async deleteGame () {
       if (await this.$confirm('Delete game', 'Are you sure you want to delete this game?')) {
-        this.isDeletingGame = true
+        this.isLoading = true
 
         try {
           let response = await gameService.delete(this.game._id)
@@ -104,7 +104,7 @@ export default {
           console.error(err)
         }
 
-        this.isDeletingGame = false
+        this.isLoading = false
       }
     }
   },
