@@ -18,6 +18,8 @@
         </div>
         <div class="col-auto">
           <button class="btn btn-danger" v-if="!game.state.startDate && game.settings.general.isGameAdmin" @click="deleteGame">Delete Game</button>
+          <button class="btn btn-warning" v-if="game.state.startDate && !game.state.paused && game.settings.general.isGameAdmin" @click="pauseGame">Pause Game</button>
+          <button class="btn btn-success" v-if="game.state.startDate && game.state.paused && game.settings.general.isGameAdmin" @click="resumeGame">Resume Game</button>
           <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success ms-1">Open Game <i class="fas fa-arrow-right"></i></router-link>
         </div>
       </div>
@@ -39,7 +41,6 @@ import ViewTitle from '../components/ViewTitle'
 import ViewSubtitle from '../components/ViewSubtitle'
 import ViewContainer from '../components/ViewContainer'
 import GameSettings from './components/settings/GameSettings'
-import FluxBar from './components/menu/FluxBar'
 import gameService from '../../services/api/game'
 import router from '../../router'
 import GameHelper from '../../services/gameHelper'
@@ -83,6 +84,12 @@ export default {
     this.isLoadingGame = false
   },
   methods: {
+    async pauseGame () {
+
+    },
+    async resumeGame () {
+
+    },
     async deleteGame () {
       if (await this.$confirm('Delete game', 'Are you sure you want to delete this game?')) {
         this.isDeletingGame = true
