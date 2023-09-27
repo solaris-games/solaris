@@ -71,24 +71,49 @@ export default {
     this.game._id = this.$route.query.id
   },
   async mounted () {
-    this.isLoading = true
-
-    try {
-      let response = await gameService.getGameInfo(this.game._id)
-
-      this.game = response.data
-    } catch (err) {
-      console.error(err)
-    }
-
-    this.isLoading = false
+    await this.loadGame()
   },
   methods: {
-    async pauseGame () {
+    async loadGame () {
+      this.isLoading = true
 
+      try {
+        let response = await gameService.getGameInfo(this.game._id)
+
+        this.game = response.data
+      } catch (err) {
+        console.error(err)
+      }
+
+      this.isLoading = false
+    },
+    async pauseGame () {
+      if (await this.$confirm('Pause game', 'Are you sure you want to pause this game?')) {
+        this.isLoading = true
+
+        try {
+          await gameService.pause(this.game._id)
+          await this.loadGame()
+        } catch (err) {
+          console.error(err)
+        }
+
+        this.isLoading = false
+      }
     },
     async resumeGame () {
+      if (await this.$confirm('Resume game', 'Are you sure you want to resume this game?')) {
+        this.isLoading = true
 
+        try {
+          await gameService.resume(this.game._id)
+          await this.loadGame()
+        } catch (err) {
+          console.error(err)
+        }
+
+        this.isLoading = false
+      }
     },
     async deleteGame () {
       if (await this.$confirm('Delete game', 'Are you sure you want to delete this game?')) {
@@ -98,7 +123,7 @@ export default {
           let response = await gameService.delete(this.game._id)
 
           if (response.status === 200) {
-            router.push({ name: 'main-menu' })
+            router.push({name: 'main-menu'})
           }
         } catch (err) {
           console.error(err)
