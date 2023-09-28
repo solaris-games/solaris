@@ -226,6 +226,31 @@ export default class GameService extends EventEmitter {
         this.emit(GameServiceEvents.onPlayerDefeated, e);
     }
 
+    async setPauseState(game: Game, pauseState: boolean, pausingUser: DBObjectId) {
+        const gameCreator = game.settings.general.createdByUserId;
+
+        if (!gameCreator || gameCreator.toString() !== pausingUser.toString()) {
+            throw new ValidationError('Only the game creator can pause the game.');
+        }
+
+        if (game.state.endDate) {
+            throw new ValidationError('Cannot pause a game that has finished.');
+        }
+
+        if (game.state.startDate == null) {
+            throw new ValidationError('Cannot pause a game that has not yet started.');
+        }
+        
+        await this.gameRepo.updateOne({
+            _id: game._id
+        }, {
+            $set: {
+                'state.paused': pauseState
+            }
+        });
+    }
+
+
     async delete(game: Game, deletedByUserId?: DBObjectId) {
         // If being deleted by a legit user then do some validation.
         if (deletedByUserId && game.state.startDate) {
