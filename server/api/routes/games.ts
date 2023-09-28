@@ -291,6 +291,20 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
         controller.delete,
         mw.core.handleError);
 
+    router.put('/api/game/:gameId/pause',
+        mw.auth.authenticate(),
+        mw.game.loadGame({
+            lean: true,
+            settings: true,
+            state: true,
+        }),
+        mw.game.validateGameState({
+            isUnlocked: true,
+            isInProgress: true
+        }),
+        controller.pause,
+        mw.core.handleError);
+
     router.get('/api/game/:gameId/player/:playerId',
         mw.game.loadGame({
             lean: true,

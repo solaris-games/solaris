@@ -325,6 +325,15 @@ export default (container: DependencyContainer) => {
                 return next(err);
             }
         },
+        pause: async (req, res, next) => {
+            const doPause = req.body?.pause;
+
+            if (doPause === null || doPause === undefined) {
+                return next(new ValidationError('Pause parameter is required.'));
+            }
+            
+            return res.sendStatus(200)
+        },
         getPlayerUser: async (req, res, next) => {
             try {
                 let user = await container.gameService.getPlayerUser(

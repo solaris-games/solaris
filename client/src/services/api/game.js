@@ -118,13 +118,17 @@ class GameService extends BaseApiService {
   }
 
   pause (gameId) {
-    return axios.put(this.BASE_URL + 'game/' + gameId + '/pause', null,
-      { withCredentials: true })
+    return axios.put(this.BASE_URL + 'game/' + gameId + '/pause', {
+      pause: true
+    },
+    { withCredentials: true })
   }
 
   resume (gameId) {
-    return axios.put(this.BASE_URL + 'game/' + gameId + '/resume', null,
-      { withCredentials: true })
+    return axios.put(this.BASE_URL + 'game/' + gameId + '/pause', {
+      pause: false
+    },
+    { withCredentials: true })
   }
 
   confirmReady (gameId) {
