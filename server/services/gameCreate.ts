@@ -175,7 +175,9 @@ export default class GameCreateService {
         }
 
         // Clamp max alliances if its invalid (minimum of 1)
-        game.settings.diplomacy.maxAlliances = Math.max(1, Math.min(game.settings.diplomacy.maxAlliances, game.settings.general.playerLimit - 1));
+        let lockedAllianceMod = game.settings.diplomacy.lockedAlliances === 'enabled'
+            && game.settings.general.playerLimit >= 3 ? 1 : 0;
+        game.settings.diplomacy.maxAlliances = Math.max(1, Math.min(game.settings.diplomacy.maxAlliances, game.settings.general.playerLimit - 1 - lockedAllianceMod));
         
         // If the game name contains a special string, then replace it with a random name.
         if (game.settings.general.name.indexOf(RANDOM_NAME_STRING) > -1) {

@@ -518,6 +518,16 @@
             "text":"Disabled"
          }
        ],
+       "lockedAlliances":[
+         {
+           "value":"enabled",
+           "text":"Enabled"
+         },
+         {
+           "value":"disabled",
+           "text":"Disabled"
+         }
+        ],
        "upkeepCost":[
          {
            "value":"none",
