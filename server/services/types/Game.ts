@@ -166,6 +166,7 @@ export interface GameSettings {
 		maxAlliances: number;
 		upkeepCost: GameAllianceUpkeepCost;
 		globalEvents: GameSettingEnabledDisabled;
+		lockedAlliances: GameSettingEnabledDisabled;
 	},
 	technology: {
 		startingTechnologyLevel: {
