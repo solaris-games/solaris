@@ -857,6 +857,10 @@ export default {
         this.errors.push('Game name required.')
       }
 
+      if (!this.areTeamSettingsValid()) {
+        this.errors.push('Team settings not valid.')
+      }
+
       e.preventDefault()
 
       if (this.errors.length) return
@@ -892,6 +896,16 @@ export default {
         this.settings.diplomacy.lockedAlliances = 'disabled';
       }
       this.onMaxAllianceTriggerChanged(e);
+    },
+    areTeamSettingsValid () {
+      if (this.settings.general.mode !== 'teamConquest') {
+        return true;
+      }
+
+      const players = this.settings.general.playerLimit;
+      const teams = this.settings.conquest.teamsCount;
+
+      return players >= 4 && players % teams === 0;
     }
   },
   computed: {
