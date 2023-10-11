@@ -38,7 +38,7 @@ const schema = new Schema({
 				'special_arcade'
 			], default: 'custom' },
 			mode: { type: Types.String, required: true, enum: [
-				'conquest', 'battleRoyale', 'kingOfTheHill'
+				'conquest', 'battleRoyale', 'kingOfTheHill', 'teamConquest'
 			], default: 'conquest' },
 			featured: { type: Types.Boolean, required: false, default: false },
 			password: { type: Types.String, required: false, default: null },
@@ -89,7 +89,8 @@ const schema = new Schema({
 		conquest: {
 			victoryCondition: { type: Types.String, required: true, enum: ['starPercentage', 'homeStarPercentage'], default: 'starPercentage' },
 			victoryPercentage: { type: Types.Number, required: true, enum: [25, 33, 50, 66, 75, 90, 100], default: 50 },
-			capitalStarElimination: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' }
+			capitalStarElimination: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
+			teamsCount: { type: Types.Number, required: false, default: null }
 		},
 		kingOfTheHill: {
 			productionCycles: { type: Types.Number, required: false, min: 1, max: 25, default: 10 }

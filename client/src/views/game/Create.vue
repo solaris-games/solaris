@@ -27,7 +27,7 @@
           </select>
         </div>
 
-        <div class="mb-2" v-if="settings.general.mode === 'conquest'">
+        <div class="mb-2" v-if="(settings.general.mode === 'conquest') || (settings.general.mode === 'teamConquest')">
           <label for="conquestVictoryCondition" class="col-form-label">Victory Condition <help-tooltip tooltip="The victory condition in which a Conquest game will be decided."/></label>
           <select class="form-control" id="conquestVictoryCondition" v-model="settings.conquest.victoryCondition" :disabled="isCreatingGame">
             <option v-for="opt in options.conquest.victoryCondition" v-bind:key="opt.value" v-bind:value="opt.value">
@@ -36,7 +36,7 @@
           </select>
         </div>
 
-        <div class="mb-2" v-if="settings.general.mode === 'conquest'">
+        <div class="mb-2" v-if="(settings.general.mode === 'conquest') || (settings.general.mode === 'teamConquest')">
           <label for="conquestVictoryPercentage" class="col-form-label">Stars For Victory <help-tooltip tooltip="How many stars are needed for a player to win the game"/></label>
           <select class="form-control" id="conquestVictoryPercentage" v-model="settings.conquest.victoryPercentage" :disabled="isCreatingGame">
             <option v-for="opt in options.conquest.victoryPercentage" v-bind:key="opt" v-bind:value="opt">
@@ -48,6 +48,18 @@
           <select class="form-control" id="conquestCapitalStarElimination" v-model="settings.conquest.capitalStarElimination" :disabled="isCreatingGame">
             <option v-for="opt in options.conquest.capitalStarElimination" v-bind:key="opt.value" v-bind:value="opt.value">
               {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-2" v-if="settings.general.mode === 'teamConquest'">
+          <label for="teamConquestTeamCount" class="col-form-label">Number of teams <help-tooltip tooltip="Determines how many teams the players will be split into" /></label>
+
+          <p class="mb-1 text-warning" v-if="!(possibleTeamCounts.length || 0)">Warning: It's not possible to form equally sized teams with your current number of player slots.</p>
+
+          <select v-if="(possibleTeamCounts.length || 0) > 0" class="form-control" id="teamConquestTeamCount" v-model="settings.conquest.teamsCount" :disabled="isCreatingGame">
+            <option v-for="opt in possibleTeamCounts" v-bind:key="opt" v-bind:value="opt">
+              {{ opt }}
             </option>
           </select>
         </div>
@@ -453,7 +465,7 @@
 
       <view-collapse-panel title="Orbital Mechanics">
         <p class="mb-1 text-warning" v-if="settings.orbitalMechanics.enabled === 'enabled'">Warning: carrier-to-carrier combat is auto-disabled in orbital games.</p>
-        
+
         <div class="mb-2">
           <label for="orbitalMechanicsEnabled" class="col-form-label">Galaxy Rotation <help-tooltip tooltip="If enabled, orbits stars and carriers around the center of the galaxy every tick"/></label>
           <select class="form-control" id="orbitalMechanicsEnabled" v-model="settings.orbitalMechanics.enabled" :disabled="isCreatingGame">
@@ -880,6 +892,18 @@ export default {
         this.settings.diplomacy.lockedAlliances = 'disabled';
       }
       this.onMaxAllianceTriggerChanged(e);
+    }
+  },
+  computed: {
+    possibleTeamCounts () {
+      const players = this.settings.general.playerLimit;
+
+      // TODO: Support different team counts than 2
+      if (players <= 2 || players % 2 !== 0) {
+        return [];
+      } else {
+        return [2];
+      }
     }
   }
 }

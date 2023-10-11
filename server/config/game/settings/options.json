@@ -1,6 +1,6 @@
 {
     "general":{
-       "mode":[
+       "mode": [
           {
              "value":"conquest",
              "text":"Conquest"
@@ -12,6 +12,10 @@
           {
              "value":"kingOfTheHill",
              "text":"King Of The Hill"
+          },
+          {
+             "value": "teamConquest",
+             "text": "Team Conquest"
           }
        ],
        "playerLimit":[

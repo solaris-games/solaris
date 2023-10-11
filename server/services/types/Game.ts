@@ -27,7 +27,7 @@ export type GameType = 'tutorial'|
 'special_freeForAll'|
 'special_arcade';
 
-export type GameMode = 'conquest'|'battleRoyale'|'kingOfTheHill';
+export type GameMode = 'conquest'|'battleRoyale'|'kingOfTheHill'|'teamConquest';
 export type GamePlayerType = 'all'|'establishedPlayers';
 export type GamePlayerAnonymity = 'normal'|'extra';
 export type GamePlayerOnlineStatus = 'hidden'|'visible';
@@ -126,6 +126,7 @@ export interface GameSettings {
 		victoryCondition: GameVictoryCondition;
 		victoryPercentage: GameVictoryPercentage;
 		capitalStarElimination: GameSettingEnabledDisabled;
+		teamsCount: number;
 	},
 	kingOfTheHill: {
 		productionCycles: number;
