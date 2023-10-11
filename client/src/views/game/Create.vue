@@ -898,12 +898,20 @@ export default {
     possibleTeamCounts () {
       const players = this.settings.general.playerLimit;
 
-      // TODO: Support different team counts than 2
-      if (players <= 2 || players % 2 !== 0) {
+      if (players < 4) {
         return [];
-      } else {
-        return [2];
       }
+
+      const upperBound = Math.ceil(players / 2);
+      const teams = [];
+
+      for (let i = 2; i <= upperBound; i++) {
+        if (players % i === 0) {
+          teams.push(i);
+        }
+      }
+
+      return teams;
     }
   }
 }
