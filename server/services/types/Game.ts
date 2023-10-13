@@ -126,7 +126,7 @@ export interface GameSettings {
 		victoryCondition: GameVictoryCondition;
 		victoryPercentage: GameVictoryPercentage;
 		capitalStarElimination: GameSettingEnabledDisabled;
-		teamsCount: number;
+		teamsCount?: number;
 	},
 	kingOfTheHill: {
 		productionCycles: number;

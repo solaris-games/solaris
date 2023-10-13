@@ -905,7 +905,7 @@ export default {
       const players = this.settings.general.playerLimit;
       const teams = this.settings.conquest.teamsCount;
 
-      return players >= 4 && players % teams === 0;
+      return players && teams && players >= 4 && players % teams === 0;
     }
   },
   computed: {

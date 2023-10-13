@@ -122,6 +122,17 @@ export default class GameCreateService {
             settings.general.passwordRequired = true;
         }
 
+        // Validate team conquest settings
+        if (settings.general.mode === 'teamConquest') {
+            const valid = Boolean(settings.conquest.teamsCount &&
+                settings.general.playerLimit >= 4 &&
+                settings.general.playerLimit % settings.conquest.teamsCount === 0);
+
+            if (!valid) {
+                throw new ValidationError(`Team conquest requires a player limit that is a multiple of the team count.`);
+            }
+        }
+
         let game = new this.gameModel({
             settings
         }) as Game;
