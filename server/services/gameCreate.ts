@@ -257,6 +257,8 @@ export default class GameCreateService {
 
         this._setGalaxyCenter(game);
 
+        this._setupTeams(game);
+
         if (isTutorial) {
             this._setupTutorialPlayers(game);
         } else {
@@ -280,6 +282,34 @@ export default class GameCreateService {
         const starLocations = game.galaxy.stars.map(s => s.location);
 
         game.constants.distances.galaxyCenterLocation = this.mapService.getGalaxyCenter(starLocations);
+    }
+
+    _setupTeams(game: Game) {
+        if (game.settings.general.mode !== 'teamConquest') {
+            return;
+        }
+
+        game.galaxy.teams = [];
+
+        const teamsNumber = game.settings.conquest.teamsCount;
+
+        if (!teamsNumber) {
+            throw new ValidationError("Team count not provided");
+        }
+
+        // TODO: Support different orders
+        const players = game.galaxy.players.slice();
+
+        const playersPerTeam = players.length / teamsNumber;
+
+        for (let ti = 0; ti < teamsNumber; ti++) {
+            const playersForTeam = players.slice(ti * playersPerTeam, (ti + 1) * playersPerTeam);
+
+            game.galaxy.teams.push({
+                name: `Team ${ti + 1}`,
+                players: playersForTeam.map(p => p._id)
+            });
+        }
     }
 
     _calculateStarsForVictory(game: Game) {

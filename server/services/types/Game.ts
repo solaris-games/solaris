@@ -225,15 +225,21 @@ export interface GameSpectator {
 	playerIds: DBObjectId[];
 }
 
+export interface Team {
+	name: string;
+	players: DBObjectId[];
+}
+
 export interface Game {
     _id: DBObjectId;
-    settings: GameSettings,
+    settings: GameSettings;
     galaxy: {
-        players: Player[]
+        players: Player[],
 		stars: Star[],
 		carriers: Carrier[],
 		homeStars?: DBObjectId[],
-		linkedStars: DBObjectId[][]
+		linkedStars: DBObjectId[][],
+		teams?: Team[],
 	},
 	conversations: Conversation[]
 	state: {
