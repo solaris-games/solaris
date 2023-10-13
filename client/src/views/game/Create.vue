@@ -19,8 +19,8 @@
         </div>
 
         <div class="mb-2">
-          <label for="mode" class="col-form-label">Mode <help-tooltip tooltip="The game mode Conquest is victory by stars, Battle Royale is last man standing in a constantly shrinking galaxy and King of the Hill is a fight for a key star"/></label>
-          <select class="form-control" id="mode" v-model="settings.general.mode" :disabled="isCreatingGame">
+          <label for="mode" class="col-form-label">Mode <help-tooltip tooltip="The game mode Conquest is victory by stars, Battle Royale is last man standing in a constantly shrinking galaxy, King of the Hill is a fight for a key star, Team conquest is conquest, but with teams"/></label>
+          <select class="form-control" id="mode" v-model="settings.general.mode" :disabled="isCreatingGame" @change="onModeChanged">
             <option v-for="opt in options.general.mode" v-bind:key="opt.value" v-bind:value="opt.value">
               {{ opt.text }}
             </option>
@@ -894,6 +894,13 @@ export default {
         this.settings.diplomacy.lockedAlliances = 'disabled';
       }
       this.onMaxAllianceTriggerChanged(e);
+    },
+    onModeChanged (e) {
+      if (this.settings.general.mode === 'teamConquest') {
+        this.settings.diplomacy.enabled = 'enabled';
+        this.settings.diplomacy.lockedAlliances = 'enabled';
+        this.settings.diplomacy.maxAlliances = this.settings.general.playerLimit - 1;
+      }
     },
     validateTeamSettings (errors) {
       if (this.settings.general.mode !== 'teamConquest') {
