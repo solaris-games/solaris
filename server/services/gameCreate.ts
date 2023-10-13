@@ -16,6 +16,7 @@ import UserService from './user';
 import GameJoinService from './gameJoin';
 import SpecialStarBanService from './specialStarBan';
 import StarService from './star';
+import DiplomacyService from "./diplomacy";
 
 const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
@@ -37,6 +38,7 @@ export default class GameCreateService {
     specialStarBanService: SpecialStarBanService;
     gameTypeService: GameTypeService;
     starService: StarService;
+    diplomacyService: DiplomacyService;
 
     constructor(
         gameModel,
@@ -55,7 +57,8 @@ export default class GameCreateService {
         specialistBanService: SpecialistBanService,
         specialStarBanService: SpecialStarBanService,
         gameTypeService: GameTypeService,
-        starService: StarService
+        starService: StarService,
+        diplomacyService: DiplomacyService
     ) {
         this.gameModel = gameModel;
         this.gameJoinService = gameJoinService;
@@ -74,6 +77,7 @@ export default class GameCreateService {
         this.specialStarBanService = specialStarBanService;
         this.gameTypeService = gameTypeService;
         this.starService = starService;
+        this.diplomacyService = diplomacyService;
     }
 
     async create(settings: GameSettings) {
@@ -275,7 +279,7 @@ export default class GameCreateService {
 
         this._setGalaxyCenter(game);
 
-        this._setupTeams(game);
+        await this._setupTeams(game);
 
         if (isTutorial) {
             this._setupTutorialPlayers(game);
@@ -302,7 +306,7 @@ export default class GameCreateService {
         game.constants.distances.galaxyCenterLocation = this.mapService.getGalaxyCenter(starLocations);
     }
 
-    _setupTeams(game: Game) {
+    async _setupTeams(game: Game) {
         if (game.settings.general.mode !== 'teamConquest') {
             return;
         }
@@ -327,6 +331,17 @@ export default class GameCreateService {
                 name: `Team ${ti + 1}`,
                 players: playersForTeam.map(p => p._id)
             });
+
+            // Setup diplomacy states
+            for (let pi1 = 0; pi1 < playersForTeam.length; pi1++) {
+                for (let pi2 = 0; pi2 < playersForTeam.length; pi2++) {
+                    if (pi1 === pi2) {
+                        continue;
+                    }
+
+                    await this.diplomacyService.declareAlly(game, playersForTeam[pi1]._id, playersForTeam[pi2]._id, false);
+                }
+            }
         }
     }
 
