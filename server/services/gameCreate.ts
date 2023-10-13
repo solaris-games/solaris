@@ -124,12 +124,30 @@ export default class GameCreateService {
 
         // Validate team conquest settings
         if (settings.general.mode === 'teamConquest') {
-            const valid = Boolean(settings.conquest.teamsCount &&
+            const teamsCount = settings.conquest?.teamsCount;
+
+            if (!teamsCount) {
+                throw new ValidationError("Team count not provided");
+            }
+
+            const valid = Boolean(teamsCount &&
                 settings.general.playerLimit >= 4 &&
-                settings.general.playerLimit % settings.conquest.teamsCount === 0);
+                settings.general.playerLimit % teamsCount === 0);
 
             if (!valid) {
-                throw new ValidationError(`Team conquest requires a player limit that is a multiple of the team count.`);
+                throw new ValidationError(`The number of players must be larger than 3 and divisible by the number of teams.`);
+            }
+
+            if (settings.diplomacy?.enabled !== 'enabled') {
+                throw new ValidationError('Diplomacy needs to be enabled for a team game.');
+            }
+
+            if (settings.diplomacy?.lockedAlliances !== 'enabled') {
+                throw new ValidationError('Locked alliances needs to be enabled for a team game.');
+            }
+
+            if (settings.diplomacy?.maxAlliances < (settings.general.playerLimit / teamsCount) - 1) {
+                throw new ValidationError('Alliance limit too low for team size.');
             }
         }
 

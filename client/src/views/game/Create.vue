@@ -851,17 +851,15 @@ export default {
   },
   methods: {
     async handleSubmit (e) {
+      e.preventDefault()
+
       this.errors = []
 
       if (!this.settings.general.name) {
         this.errors.push('Game name required.')
       }
 
-      if (!this.areTeamSettingsValid()) {
-        this.errors.push('Team settings not valid.')
-      }
-
-      e.preventDefault()
+      this.validateTeamSettings(errors);
 
       if (this.errors.length) return
 
@@ -897,15 +895,33 @@ export default {
       }
       this.onMaxAllianceTriggerChanged(e);
     },
-    areTeamSettingsValid () {
+    validateTeamSettings (errors) {
       if (this.settings.general.mode !== 'teamConquest') {
-        return true;
+        return;
       }
 
       const players = this.settings.general.playerLimit;
       const teams = this.settings.conquest.teamsCount;
+      const playersPerTeam = players / teams;
 
-      return players && teams && players >= 4 && players % teams === 0;
+      const numberValid = players && teams && players >= 4 && players % teams === 0;
+
+      if (!numberValid) {
+        errors.push('The number of players must be larger than 3 and divisible by the number of teams.');
+      }
+
+      if (this.settings.diplomacy?.enabled !== 'enabled') {
+        errors.push('Diplomacy needs to be enabled for a team game.');
+        return;
+      }
+
+      if (this.settings.diplomacy?.lockedAlliances !== 'enabled') {
+        errors.push('Locked alliances needs to be enabled for a team game.');
+      }
+
+      if (this.settings.diplomacy?.maxAlliances < playersPerTeam - 1) {
+        errors.push('Alliance limit too low for team size.');
+      }
     }
   },
   computed: {
