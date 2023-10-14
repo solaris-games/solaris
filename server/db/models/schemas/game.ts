@@ -1,3 +1,5 @@
+import {Team} from "../../../services/types/Game";
+
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const Types = Schema.Types;
@@ -176,7 +178,13 @@ const schema = new Schema({
     galaxy: {
         players: [PlayerSchema],
 		stars: [StarSchema],
-		carriers: [CarrierSchema]
+		carriers: [CarrierSchema],
+		teams: [
+			{
+				name: { type: Types.String, required: true },
+				players: [{ type: Types.ObjectId, required: true }],
+			}
+		],
 	},
 	conversations: [ConversationSchema],
 	state: {
