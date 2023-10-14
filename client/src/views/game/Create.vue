@@ -859,7 +859,7 @@ export default {
         this.errors.push('Game name required.')
       }
 
-      this.validateTeamSettings(errors);
+      this.validateTeamSettings(this.errors);
 
       if (this.errors.length) return
 
