@@ -917,16 +917,16 @@ export default {
         errors.push('The number of players must be larger than 3 and divisible by the number of teams.');
       }
 
-      if (this.settings.diplomacy?.enabled !== 'enabled') {
+      if (!this.settings.diplomacy || this.settings.diplomacy.enabled !== 'enabled') {
         errors.push('Diplomacy needs to be enabled for a team game.');
         return;
       }
 
-      if (this.settings.diplomacy?.lockedAlliances !== 'enabled') {
+      if (this.settings.diplomacy.lockedAlliances !== 'enabled') {
         errors.push('Locked alliances needs to be enabled for a team game.');
       }
 
-      if (this.settings.diplomacy?.maxAlliances < playersPerTeam - 1) {
+      if (this.settings.diplomacy.maxAlliances < playersPerTeam - 1) {
         errors.push('Alliance limit too low for team size.');
       }
     }
