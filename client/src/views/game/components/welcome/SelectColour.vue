@@ -18,6 +18,7 @@
                     <td class="ps-2 pt-3 pb-2">
                         <h5 class="alias-title" style="vertical-align: middle;">
                           {{player.alias}}
+                          <team-name :player-id="player._id" />
                           <span v-if="player.defeated" :title="getPlayerStatus(player)">
                             <i v-if="!player.afk" class="fas fa-skull-crossbones" title="This player has been defeated"></i>
                             <i v-if="player.afk" class="fas fa-user-clock" title="This player is AFK"></i>
@@ -40,9 +41,11 @@
 import gameContainer from '../../../../game/container'
 import gameHelper from '../../../../services/gameHelper'
 import PlayerAvatarVue from '../menu/PlayerAvatar'
+import TeamName from '../shared/TeamName';
 
 export default {
   components: {
+    'team-name': TeamName,
     'player-avatar': PlayerAvatarVue
   },
   data () {
@@ -76,7 +79,7 @@ export default {
         return require(`../../../../assets/avatars/${player.avatar.file}`)
       } catch (err) {
         console.error(err)
-        
+
         return null
       }
     },

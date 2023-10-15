@@ -62,6 +62,7 @@
                           <!-- Text styling for defeated players? -->
                           <h5 class="alias-title">
                             {{player.alias}}
+                            <team-name :player-id="player._id" />
                             <span v-if="isKingOfTheHillMode && player.isKingOfTheHill" title="This player is the king of the hill">
                               <i class="fas fa-crown"></i>
                             </span>
@@ -80,7 +81,7 @@
                         </span>
                         <span class="d-none d-sm-block">
                           {{player.stats.totalStars}} Star<span v-if="player.stats.totalStars !== 1">s</span>
-                        </span> 
+                        </span>
                       </td>
                       <td class="fit pt-3 pe-2" v-if="isConquestHomeStars">
                         <span class="d-xs-block d-sm-none">
@@ -88,7 +89,7 @@
                         </span>
                         <span class="d-none d-sm-block">
                           {{player.stats.totalHomeStars}}({{player.stats.totalStars}}) Star<span v-if="player.stats.totalStars !== 1">s</span>
-                        </span> 
+                        </span>
                       </td>
                       <td class="fit pt-2 pb-2 pe-1 text-center" v-if="isTurnBasedGame && canEndTurn">
                         <h5 v-if="player.ready && !isUserPlayer(player)" class="pt-2 pe-2 ps-2">
@@ -137,11 +138,10 @@
 <script>
 import router from '../../../../router'
 import gameService from '../../../../services/api/game'
-import GameHelper from '../../../../services/gameHelper'
 import gameContainer from '../../../../game/container'
 import ModalButton from '../../../components/modal/ModalButton'
 import DialogModal from '../../../components/modal/DialogModal'
-import gameHelper from '../../../../services/gameHelper'
+import GameHelper from '../../../../services/gameHelper'
 import MenuTitle from '../MenuTitle'
 import AudioService from '../../../../game/audio'
 import NewPlayerMessageVue from '../welcome/NewPlayerMessage'
@@ -150,9 +150,11 @@ import PlayerAvatarVue from '../menu/PlayerAvatar'
 import HelpTooltip from '../../../components/HelpTooltip'
 import ReadyStatusButtonVue from '../menu/ReadyStatusButton'
 import ConcedeDefeatButton from './ConcedeDefeatButton'
+import TeamName from '../shared/TeamName';
 
 export default {
   components: {
+    'team-name': TeamName,
     'menu-title': MenuTitle,
     'modalButton': ModalButton,
     'dialogModal': DialogModal,
@@ -203,7 +205,7 @@ export default {
       return GameHelper.getUserPlayer(this.$store.state.game)
     },
     getFriendlyColour (colour) {
-      return gameHelper.getFriendlyColour(colour)
+      return GameHelper.getFriendlyColour(colour)
     },
     isUserPlayer (player) {
       let userPlayer = this.getUserPlayer()
@@ -211,10 +213,10 @@ export default {
       return userPlayer && userPlayer._id === player._id
     },
     recalculateTimeRemaining () {
-      if (gameHelper.isRealTimeGame(this.$store.state.game)) {
-        this.timeRemaining = `Next tick: ${gameHelper.getCountdownTimeStringByTicks(this.$store.state.game, 1)}`
-      } else if (gameHelper.isTurnBasedGame(this.$store.state.game)) {
-        this.timeRemaining = `Next turn: ${gameHelper.getCountdownTimeStringForTurnTimeout(this.$store.state.game)}`
+      if (GameHelper.isRealTimeGame(this.$store.state.game)) {
+        this.timeRemaining = `Next tick: ${GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, 1)}`
+      } else if (GameHelper.isTurnBasedGame(this.$store.state.game)) {
+        this.timeRemaining = `Next turn: ${GameHelper.getCountdownTimeStringForTurnTimeout(this.$store.state.game)}`
       }
     },
     async quitGame () {
@@ -238,7 +240,7 @@ export default {
       if (!await this.$confirm('End Turn', 'Are you sure you want to end your turn?')) {
         return
       }
-      
+
       try {
         let response = await gameService.confirmReady(this.$store.state.game._id)
 
@@ -248,7 +250,7 @@ export default {
           } else {
             this.$toasted.show(`You have confirmed your move, once all players are ready the game will progress automatically.`, { type: 'success' })
           }
-          
+
           player.ready = true
         }
       } catch (err) {
@@ -259,7 +261,7 @@ export default {
       if (!await this.$confirm('End Cycle', 'Are you sure you want to end your turn up to the end of the current galactic cycle?')) {
         return
       }
-      
+
       try {
         let response = await gameService.confirmReadyToCycle(this.$store.state.game._id)
 
@@ -269,7 +271,7 @@ export default {
           } else {
             this.$toasted.show(`You have confirmed your move, once all players are ready the game will progress automatically.`, { type: 'success' })
           }
-          
+
           player.ready = true
           player.readyToCycle = true
         }
@@ -297,11 +299,11 @@ export default {
       if (!this.isUserPlayer(player) || this.$isHistoricalMode()) {
         return
       }
-      
+
       if (!await this.$confirm('Ready to Quit?', 'Are you sure you want declare that you are ready to quit? If all active players declare ready to quit then the game will end early.')) {
         return
       }
-      
+
       try {
         let response = await gameService.confirmReadyToQuit(this.$store.state.game._id)
 
@@ -329,9 +331,6 @@ export default {
         console.error(err)
       }
     },
-    onCloseRequested (e) {
-      this.$emit('onCloseRequested', e)
-    },
     getWinnerAlias () {
       let winnerPlayer = GameHelper.getPlayerById(this.$store.state.game, this.$store.state.game.state.winner)
 
@@ -342,10 +341,10 @@ export default {
     },
     getAvatarImage (player) {
       try {
-      return require(`../../../../assets/avatars/${player.avatar}`)
+        return require(`../../../../assets/avatars/${player.avatar}`)
       } catch (err) {
         console.error(err)
-        
+
         return null
       }
     }
@@ -362,16 +361,16 @@ export default {
       return this.$store.state.game.settings.gameTime.gameType === 'turnBased'
     },
     isDarkModeExtra () {
-      return gameHelper.isDarkModeExtra(this.$store.state.game)
+      return GameHelper.isDarkModeExtra(this.$store.state.game)
     },
     isConquestAllStars () {
-      return gameHelper.isConquestAllStars(this.$store.state.game)
+      return GameHelper.isConquestAllStars(this.$store.state.game)
     },
     isConquestHomeStars () {
-      return gameHelper.isConquestHomeStars(this.$store.state.game)
+      return GameHelper.isConquestHomeStars(this.$store.state.game)
     },
     isKingOfTheHillMode () {
-      return gameHelper.isKingOfTheHillMode(this.$store.state.game)
+      return GameHelper.isKingOfTheHillMode(this.$store.state.game)
     },
     canEndTurn () {
       return !GameHelper.isGameFinished(this.$store.state.game)
@@ -381,7 +380,7 @@ export default {
     },
     canReadyToQuit () {
       return this.$store.state.game.settings.general.readyToQuit === 'enabled'
-        && this.$store.state.game.state.startDate 
+        && this.$store.state.game.state.startDate
         && this.$store.state.game.state.productionTick
     }
   }

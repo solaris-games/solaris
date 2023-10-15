@@ -1106,6 +1106,14 @@ class GameHelper {
   isGameAllowAbandonStars(game) {
     return game.settings.player.allowAbandonStars === 'enabled'
   }
+
+  getTeamByPlayer(game, player) {
+    if (!game.galaxy.teams) {
+      return null;
+    }
+
+    return game.galaxy.teams.find(t => t.players.includes(player._id));
+  }
 }
 
 export default new GameHelper()
