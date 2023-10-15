@@ -47,6 +47,10 @@ export default class DiplomacyService extends EventEmitter {
         return game.settings.diplomacy.lockedAlliances === 'enabled';
     }
 
+    isTeamGame(game: Game): boolean {
+        return game.settings.general.mode === 'teamConquest';
+    }
+
     isMaxAlliancesEnabled(game: Game): boolean {
         return game.settings.diplomacy.maxAlliances < game.settings.general.playerLimit - 1
     }
@@ -248,6 +252,10 @@ export default class DiplomacyService extends EventEmitter {
 
         if (oldStatus.statusTo === "allies") {
             throw new ValidationError(`The player has already been declared as allies`);
+        }
+
+        if (this.isTeamGame(game)) {
+            throw new ValidationError("Changing alliances is not allowed in team games.");
         }
 
         if (this.isMaxAlliancesEnabled(game)) {
