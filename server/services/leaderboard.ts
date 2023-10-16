@@ -1,5 +1,5 @@
 import Repository from "./repository";
-import { Game } from "./types/Game";
+import {Game, Team} from "./types/Game";
 import { Leaderboard, LeaderboardPlayer, LeaderboardUser } from "./types/Leaderboard";
 import { Player } from "./types/Player";
 import { EloRatingChangeResult, GameRankingResult } from "./types/Rating";
@@ -17,6 +17,37 @@ import PlayerAfkService from "./playerAfk";
 import UserLevelService from "./userLevel";
 
 const moment = require('moment');
+
+enum GameWinnerKind {
+    Player = 'player',
+    Team = 'team'
+}
+
+type GameWinnerPlayer = {
+    kind: GameWinnerKind.Player,
+    player: Player
+}
+
+type GameWinnerTeam = {
+    kind: GameWinnerKind.Team,
+    team: Team
+}
+
+type GameWinner = GameWinnerPlayer | GameWinnerTeam;
+
+const playerWinner = (player: Player): GameWinner => {
+    return {
+        kind: GameWinnerKind.Player,
+        player
+    };
+}
+
+const teamWinner = (team: Team): GameWinner => {
+    return  {
+        kind: GameWinnerKind.Team,
+        team
+    }
+}
 
 export default class LeaderboardService {
     static GLOBALSORTERS = {
@@ -818,38 +849,38 @@ export default class LeaderboardService {
         };
     }
 
-    getGameWinner(game: Game, leaderboard: LeaderboardPlayer[]): Player | null {
+    getGameWinner(game: Game, leaderboard: LeaderboardPlayer[]): GameWinner | null {
         let isKingOfTheHillMode = this.gameTypeService.isKingOfTheHillMode(game);
         let isAllUndefeatedPlayersReadyToQuit = this.gameService.isAllUndefeatedPlayersReadyToQuit(game);
 
         if (isAllUndefeatedPlayersReadyToQuit) {
             if (isKingOfTheHillMode) {
-                return this.playerService.getKingOfTheHillPlayer(game) || this.getFirstPlacePlayer(leaderboard);
+                return playerWinner(this.playerService.getKingOfTheHillPlayer(game) || this.getFirstPlacePlayer(leaderboard));
             }
 
-            return this.getFirstPlacePlayer(leaderboard);
+            return playerWinner(this.getFirstPlacePlayer(leaderboard));
         }
 
         if (this.gameTypeService.isConquestMode(game)) {
             let starWinner = this.getStarCountWinner(game, leaderboard);
 
             if (starWinner) {
-                return starWinner;
+                return playerWinner(starWinner);
             }
         }
 
         if (this.gameStateService.isCountingDownToEnd(game) && this.gameStateService.hasReachedCountdownEnd(game)) {
             if (isKingOfTheHillMode) {
-                return this.playerService.getKingOfTheHillPlayer(game) || this.getFirstPlacePlayer(leaderboard);
+                return playerWinner(this.playerService.getKingOfTheHillPlayer(game) || this.getFirstPlacePlayer(leaderboard));
             }
 
-            return this.getFirstPlacePlayer(leaderboard);
+            return playerWinner(this.getFirstPlacePlayer(leaderboard));
         }
 
         let lastManStanding = this.getLastManStanding(game, leaderboard);
 
         if (lastManStanding) {
-            return lastManStanding;
+            return playerWinner(lastManStanding);
         }
 
         // TODO: Hardcoded limit to games, 10000 ticks?

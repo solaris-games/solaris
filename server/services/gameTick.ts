@@ -772,14 +772,14 @@ export default class GameTickService extends EventEmitter {
 
         // Update the leaderboard state here so we can keep track of positions
         // without having to actually calculate it.
-        let leaderboard = this.leaderboardService.getGameLeaderboard(game).leaderboard;
+        const leaderboard = this.leaderboardService.getGameLeaderboard(game).leaderboard;
 
         game.state.leaderboard = leaderboard.map(l => l.player._id);
 
-        let winner = this.leaderboardService.getGameWinner(game, leaderboard);
+        const winner = this.leaderboardService.getGameWinner(game, leaderboard);
 
-        if (winner) {
-            this.gameStateService.finishGame(game, winner);
+        if (winner?.kind === 'player') {
+            this.gameStateService.finishGame(game, winner.player);
 
             for (const player of game.galaxy.players) {
                 if (this.playerAfkService.isAIControlled(game, player, true)) {
