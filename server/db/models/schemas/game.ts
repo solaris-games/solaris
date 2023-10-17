@@ -200,6 +200,10 @@ const schema = new Schema({
 		starsForVictory: { type: Types.Number, required: true },
 		players: { type: Types.Number, required: true, default: 0 },
 		winner: { type: Types.ObjectId, required: false, default: null },
+		winningTeam: {
+			name: { type: Types.String, required: true },
+			players: [{ type: Types.ObjectId, required: true }],
+		},
 		cleaned: { type: Types.Boolean, required: false, default: false }, // Represents if the events and history have been deleted.
 		leaderboard: [{ type: Types.ObjectId, required: false }]
 	},

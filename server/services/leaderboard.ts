@@ -18,22 +18,22 @@ import UserLevelService from "./userLevel";
 
 const moment = require('moment');
 
-enum GameWinnerKind {
+export enum GameWinnerKind {
     Player = 'player',
     Team = 'team'
 }
 
-type GameWinnerPlayer = {
+export type GameWinnerPlayer = {
     kind: GameWinnerKind.Player,
     player: Player
 }
 
-type GameWinnerTeam = {
+export type GameWinnerTeam = {
     kind: GameWinnerKind.Team,
     team: Team
 }
 
-type GameWinner = GameWinnerPlayer | GameWinnerTeam;
+export type GameWinner = GameWinnerPlayer | GameWinnerTeam;
 
 const playerWinner = (player: Player): GameWinner => {
     return {

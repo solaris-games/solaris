@@ -255,6 +255,7 @@ export interface Game {
 		starsForVictory: number;
 		players: number;
 		winner: DBObjectId | null;
+		winningTeam: Team | null;
 		leaderboard: DBObjectId[] | null;
 		cleaned: boolean;
 		openSlots?: number;

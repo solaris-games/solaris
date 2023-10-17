@@ -778,8 +778,8 @@ export default class GameTickService extends EventEmitter {
 
         const winner = this.leaderboardService.getGameWinner(game, leaderboard);
 
-        if (winner?.kind === 'player') {
-            this.gameStateService.finishGame(game, winner.player);
+        if (winner) {
+            this.gameStateService.finishGame(game, winner);
 
             for (const player of game.galaxy.players) {
                 if (this.playerAfkService.isAIControlled(game, player, true)) {
@@ -797,7 +797,7 @@ export default class GameTickService extends EventEmitter {
                 // Mark all players as established regardless of game length.
                 this.leaderboardService.markNonAFKPlayersAsEstablishedPlayers(game, gameUsers);
                 this.leaderboardService.incrementPlayersCompletedAchievement(game, gameUsers);
-    
+
                 let e: GameEndedEvent = {
                     gameId: game._id,
                     gameTick: game.state.tick,
