@@ -814,6 +814,11 @@ export default class GameTickService extends EventEmitter {
     }
 
     _awardEndGameRank(game: Game, gameUsers: User[], awardCredits: boolean) {
+        // TODO: Rank for team games
+        if (game.settings.general.mode === 'teamConquest') {
+            return null;
+        }
+
         let rankingResult: GameRankingResult | null = null;
     
         // There must have been at least X production ticks in order for
