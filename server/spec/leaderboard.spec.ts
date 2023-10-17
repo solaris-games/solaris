@@ -18,12 +18,9 @@ import UserLevelService from '../services/userLevel';
 const mongoose = require('mongoose');
 
 describe('Leaderboard - Last man standing', () => {
-    let userRepo: Repository<User>;
-    let userService: UserService;
     let playerService: PlayerService;
     let playerAfkService: PlayerAfkService;
     let userLevelService: UserLevelService;
-    let guildUserService: UserGuildService;
     let ratingService: RatingService;
     let gameService: GameService;
     let gameTypeService: GameTypeService;
@@ -65,7 +62,7 @@ describe('Leaderboard - Last man standing', () => {
             }
         } as PlayerStatisticsService;
 
-        service = new LeaderboardService(userRepo, userService, playerService, playerAfkService, userLevelService, guildUserService, ratingService, gameService, gameTypeService, gameStateService, badgeService, playerStatisticsService);
+        service = new LeaderboardService(playerService, playerAfkService, userLevelService, ratingService, gameService, gameTypeService, gameStateService, badgeService, playerStatisticsService);
 
         game = {
             settings: {

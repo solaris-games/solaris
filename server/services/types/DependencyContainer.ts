@@ -68,6 +68,7 @@ import UserLevelService from "../userLevel";
 import SpecialStarBanService from "../specialStarBan";
 import ShipService from "../ship";
 import SpectatorService from "../spectator";
+import UserLeaderboardService from "../userLeaderboard";
 
 export interface DependencyContainer {
     config: Config,
@@ -82,6 +83,7 @@ export interface DependencyContainer {
     emailService: EmailService,
     eventService: EventService,
     leaderboardService: LeaderboardService,
+    userLeaderboardService: UserLeaderboardService,
     gameService: GameService,
     gameJoinService: GameJoinService,
     gameCreateValidationService: GameCreateValidationService,
