@@ -226,6 +226,7 @@ export interface GameSpectator {
 }
 
 export interface Team {
+	_id: DBObjectId;
 	name: string;
 	players: DBObjectId[];
 }
@@ -255,7 +256,7 @@ export interface Game {
 		starsForVictory: number;
 		players: number;
 		winner: DBObjectId | null;
-		winningTeam: Team | null;
+		winningTeam: DBObjectId | null;
 		leaderboard: DBObjectId[] | null;
 		cleaned: boolean;
 		openSlots?: number;

@@ -97,6 +97,7 @@ import { GameEvent } from './types/GameEvent';
 import { Guild } from './types/Guild';
 import { Payment } from './types/Payment';
 import { Report } from './types/Report';
+import TeamService from "./team";
 
 const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
@@ -169,6 +170,7 @@ export default (config, io): DependencyContainer => {
     const ledgerService = new LedgerService(gameRepository, playerService, playerCreditsService);
     const reputationService = new ReputationService(gameRepository, playerStatisticsService, diplomacyService, playerAfkService);
     const tradeService = new TradeService(gameRepository, eventRepository, userService, playerService, diplomacyService, ledgerService, achievementService, reputationService, gameTypeService, randomService, playerCreditsService, playerAfkService);
+    const teamService = new TeamService();
     const conversationService = new ConversationService(gameRepository, tradeService, diplomacyService);
     const gameService = new GameService(gameRepository, userService, starService, carrierService, playerService, passwordService, achievementService, avatarService, gameTypeService, gameStateService, conversationService, playerReadyService);
     const gameJoinService = new GameJoinService(userService, starService, playerService, passwordService, achievementService, avatarService, gameTypeService, gameStateService, conversationService, randomService, spectatorService);
@@ -271,5 +273,6 @@ export default (config, io): DependencyContainer => {
         notificationService,
         shipService,
         spectatorService,
+        teamService,
     };
 };

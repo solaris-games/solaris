@@ -1,5 +1,5 @@
 import ValidationError from '../errors/validation';
-import { Game, GameSettings } from './types/Game';
+import {Game, GameSettings, Team} from './types/Game';
 import AchievementService from './achievement';
 import ConversationService from './conversation';
 import GameCreateValidationService from './gameCreateValidation';
@@ -17,6 +17,8 @@ import GameJoinService from './gameJoin';
 import SpecialStarBanService from './specialStarBan';
 import StarService from './star';
 import DiplomacyService from "./diplomacy";
+import mongoose from "mongoose";
+import {DBObjectId} from "./types/DBObjectId";
 
 const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
@@ -327,10 +329,13 @@ export default class GameCreateService {
         for (let ti = 0; ti < teamsNumber; ti++) {
             const playersForTeam = players.slice(ti * playersPerTeam, (ti + 1) * playersPerTeam);
 
-            game.galaxy.teams.push({
+            const team: Team = {
+                _id: new mongoose.Types.ObjectId() as any,
                 name: `Team ${ti + 1}`,
                 players: playersForTeam.map(p => p._id)
-            });
+            };
+
+            game.galaxy.teams.push(team);
 
             // Setup diplomacy states
             for (let pi1 = 0; pi1 < playersForTeam.length; pi1++) {

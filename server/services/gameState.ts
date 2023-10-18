@@ -37,7 +37,7 @@ export default class GameStateService {
         if (winner.kind === 'player') {
             game.state.winner = winner.player._id;
         } else if (winner.kind === 'team') {
-            game.state.winningTeam = winner.team;
+            game.state.winningTeam = winner.team._id;
         }
     }
 

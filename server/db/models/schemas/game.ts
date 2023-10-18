@@ -8,6 +8,7 @@ import PlayerSchema from './player';
 import StarSchema from './star';
 import CarrierSchema from './carrier';
 import ConversationSchema from './conversation';
+import TeamSchema from './team';
 
 const schema = new Schema({
     settings: {
@@ -179,12 +180,7 @@ const schema = new Schema({
         players: [PlayerSchema],
 		stars: [StarSchema],
 		carriers: [CarrierSchema],
-		teams: [
-			{
-				name: { type: Types.String, required: true },
-				players: [{ type: Types.ObjectId, required: true }],
-			}
-		],
+		teams: [TeamSchema],
 	},
 	conversations: [ConversationSchema],
 	state: {
@@ -200,10 +196,7 @@ const schema = new Schema({
 		starsForVictory: { type: Types.Number, required: true },
 		players: { type: Types.Number, required: true, default: 0 },
 		winner: { type: Types.ObjectId, required: false, default: null },
-		winningTeam: {
-			name: { type: Types.String, required: true },
-			players: [{ type: Types.ObjectId, required: true }],
-		},
+		winningTeam: { type: Types.ObjectId, required: false, default: null },
 		cleaned: { type: Types.Boolean, required: false, default: false }, // Represents if the events and history have been deleted.
 		leaderboard: [{ type: Types.ObjectId, required: false }]
 	},
