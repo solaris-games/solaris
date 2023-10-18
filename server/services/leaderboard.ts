@@ -1,5 +1,5 @@
 import {Game, Team} from "./types/Game";
-import { Leaderboard, LeaderboardPlayer } from "./types/Leaderboard";
+import {PlayerLeaderboard, LeaderboardPlayer, TeamLeaderboard} from "./types/Leaderboard";
 import { Player } from "./types/Player";
 import { EloRatingChangeResult, GameRankingResult } from "./types/Rating";
 import { User } from "./types/User";
@@ -101,7 +101,7 @@ export default class LeaderboardService {
         this.playerStatisticsService = playerStatisticsService;
     }
 
-    getGameLeaderboard(game: Game, sortingKey?: string): Leaderboard {
+    getGameLeaderboard(game: Game, sortingKey?: string): PlayerLeaderboard {
         let SORTERS = LeaderboardService.LOCALSORTERS;
 
         let kingOfTheHillPlayer: Player | null = null;
@@ -192,6 +192,44 @@ export default class LeaderboardService {
         }
 
         return game.state.leaderboard.findIndex(l => l.toString() === player._id.toString()) + 1;
+    }
+
+    getTeamLeaderboard(game: Game): TeamLeaderboard | null {
+        if (game.settings.general.mode !== 'teamConquest' || !game.galaxy.teams) {
+            return null;
+        }
+
+        // TODO: Support capitals?
+
+        const leaderboard = game.galaxy.teams.map(t => {
+            const starCount = t.players.map(pId => {
+                const player = this.playerService.getById(game, pId);
+
+                if (!player) {
+                    return 0;
+                }
+
+                const stats = player.stats || this.playerStatisticsService.getStats(game, player);
+
+                return stats.totalStars;
+            }).reduce((a, b) => a + b, 0);
+
+            return {
+                team: t,
+                starCount
+            }
+        });
+
+        leaderboard.sort((a, b) => {
+            if (a.starCount > b.starCount) return -1;
+            if (a.starCount < b.starCount) return 1;
+
+            return 0;
+        });
+
+        return {
+            leaderboard
+        };
     }
 
     addGameRankings(game: Game, gameUsers: User[], leaderboard: LeaderboardPlayer[]): GameRankingResult {
