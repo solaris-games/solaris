@@ -639,6 +639,7 @@ export default {
         'creditsSpecialists': 'Specialist Tokens',
         'conquest': 'Conquest',
         'battleRoyale': 'Battle Royale',
+        'teamConquest': 'Team Conquest',
         'establishedPlayers': 'Established Players Only',
         'galacticCenter': 'Galactic Center',
         'galacticCenterOfMass': 'Galactic Center of Mass',
