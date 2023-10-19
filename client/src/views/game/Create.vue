@@ -57,7 +57,7 @@
 
           <p class="mb-1 text-warning" v-if="!(possibleTeamCounts.length || 0)">Warning: It's not possible to form equally sized teams with your current number of player slots.</p>
 
-          <select v-if="(possibleTeamCounts.length || 0) > 0" class="form-control" id="teamConquestTeamCount" v-model="settings.conquest.teamsCount" :disabled="isCreatingGame">
+          <select v-if="(possibleTeamCounts.length || 0) > 0" class="form-control" id="teamConquestTeamCount" v-model="settings.conquest.teamsCount" @change="onMaxAllianceTriggerChanged" :disabled="isCreatingGame">
             <option v-for="opt in possibleTeamCounts" v-bind:key="opt" v-bind:value="opt">
               {{ opt }}
             </option>
@@ -571,7 +571,8 @@
       </view-collapse-panel>
 
       <view-collapse-panel title="Formal Alliances">
-        <div class="mb-2">
+        <p class="mb-2 text-warning" v-if="settings.general.mode === 'teamConquest'">Some diplomacy settings are unavailable because Team Conquest is selected as a game mode.</p>
+        <div class="mb-2" v-if="settings.general.mode !== 'teamConquest'">
           <label for="diplomacy" class="col-form-label">Enabled <help-tooltip tooltip="If enabled, players can change their diplomatic status to allied or enemies - Allied players can orbit eachother's stars and support eachother in combat"/></label>
           <select class="form-control" id="diplomacy" v-model="settings.diplomacy.enabled" :disabled="isCreatingGame">
             <option v-for="opt in options.diplomacy.enabled" v-bind:key="opt.value" v-bind:value="opt.value">
@@ -579,7 +580,7 @@
             </option>
           </select>
         </div>
-        <div class="mb-2" v-if="settings.diplomacy.enabled === 'enabled'">
+        <div class="mb-2" v-if="settings.diplomacy.enabled === 'enabled' && settings.general.mode !== 'teamConquest'">
           <label for="alliancesLocked" class="col-form-label">Locked Alliances<help-tooltip tooltip="If enabled, alliances cannot be canceled."/></label>
            <select class="form-control" id="alliancesLocked" v-model="settings.diplomacy.lockedAlliances" :disabled="isCreatingGame"  @change="onMaxAllianceTriggerChanged">
              <option v-for="opt in options.diplomacy.lockedAlliances.filter(o => !(o.value === 'enabled' && settings.general.playerLimit <= 2))" v-bind:key="opt.value" v-bind:value="opt.value">
@@ -587,7 +588,7 @@
             </option>
           </select>
         </div>
-        <div class="mb-2" v-if="settings.diplomacy.enabled === 'enabled'">
+        <div class="mb-2" v-if="settings.diplomacy.enabled === 'enabled' && settings.general.mode !== 'teamConquest'">
           <label for="maxAlliances" class="col-form-label">Max Number of Alliances (<span class="text-warning">{{settings.diplomacy.maxAlliances}} Allies</span>) <help-tooltip tooltip="Determines how many formal alliance each player may have at once."/></label>
           <div class="col">
             <input type="range" min="1" :max="calcMaxAllianceLimit()" step="1" class="form-range w-100" id="maxAlliances" v-model="settings.diplomacy.maxAlliances" :disabled="isCreatingGame">
@@ -609,7 +610,7 @@
             </option>
           </select>
         </div>
-        <div class="mb-2" v-if="settings.diplomacy.enabled === 'enabled'">
+        <div class="mb-2" v-if="settings.diplomacy.enabled === 'enabled' && settings.general.mode !== 'teamConquest'">
           <label for="alliancesGlobalEvents" class="col-form-label">Global Events <help-tooltip tooltip="If enabled, global events will be displayed when players declare war or make peace"/></label>
           <select class="form-control" id="alliancesGlobalEvents" v-model="settings.diplomacy.globalEvents" :disabled="isCreatingGame">
             <option v-for="opt in options.diplomacy.globalEvents" v-bind:key="opt.value" v-bind:value="opt.value">
@@ -887,6 +888,11 @@ export default {
       this.settings.diplomacy.maxAlliances = this.calcMaxAllianceLimit();
     },
     calcMaxAllianceLimit () {
+      if (this.settings.general.mode === 'teamConquest') {
+        const playersPerTeam = this.settings.general.playerLimit / this.settings.conquest.teamsCount;
+        return playersPerTeam - 1;
+      }
+
       return this.settings.general.playerLimit - 1 - (this.settings.diplomacy.lockedAlliances === 'enabled' ? 1 : 0)
     },
     onPlayerLimitChanged (e) {
@@ -899,7 +905,7 @@ export default {
       if (this.settings.general.mode === 'teamConquest') {
         this.settings.diplomacy.enabled = 'enabled';
         this.settings.diplomacy.lockedAlliances = 'enabled';
-        this.settings.diplomacy.maxAlliances = this.settings.general.playerLimit - 1;
+        this.onMaxAllianceTriggerChanged(e);
       }
     },
     validateTeamSettings (errors) {
@@ -909,25 +915,11 @@ export default {
 
       const players = this.settings.general.playerLimit;
       const teams = this.settings.conquest.teamsCount;
-      const playersPerTeam = players / teams;
 
       const numberValid = players && teams && players >= 4 && players % teams === 0;
 
       if (!numberValid) {
         errors.push('The number of players must be larger than 3 and divisible by the number of teams.');
-      }
-
-      if (!this.settings.diplomacy || this.settings.diplomacy.enabled !== 'enabled') {
-        errors.push('Diplomacy needs to be enabled for a team game.');
-        return;
-      }
-
-      if (this.settings.diplomacy.lockedAlliances !== 'enabled') {
-        errors.push('Locked alliances needs to be enabled for a team game.');
-      }
-
-      if (this.settings.diplomacy.maxAlliances < playersPerTeam - 1) {
-        errors.push('Alliance limit too low for team size.');
       }
     }
   },

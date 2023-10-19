@@ -152,7 +152,7 @@ export default class GameCreateService {
                 throw new ValidationError('Locked alliances needs to be enabled for a team game.');
             }
 
-            if (settings.diplomacy?.maxAlliances < (settings.general.playerLimit / teamsCount) - 1) {
+            if (settings.diplomacy?.maxAlliances !== (settings.general.playerLimit / teamsCount) - 1) {
                 throw new ValidationError('Alliance limit too low for team size.');
             }
         }
