@@ -254,10 +254,6 @@ export default class DiplomacyService extends EventEmitter {
             throw new ValidationError(`The player has already been declared as allies`);
         }
 
-        if (this.isTeamGame(game)) {
-            throw new ValidationError("Changing alliances is not allowed in team games.");
-        }
-
         if (this.isMaxAlliancesEnabled(game)) {
             let player = game.galaxy.players.find(p => p._id.toString() === playerId.toString())!;
     
