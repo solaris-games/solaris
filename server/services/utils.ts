@@ -42,3 +42,15 @@ export function reverseSort<A>(sorter: (a: A, b: A) => number): (a: A, b: A) => 
 export function notNull<T>(val: T | null): val is T {
     return val !== null;
 }
+
+export function sorterByProperty<T>(prop: string): (a: T, b: T) => number {
+    return (a, b) => {
+        if (a[prop] < b[prop]) {
+            return -1;
+        } else if (a[prop] > b[prop]) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+}

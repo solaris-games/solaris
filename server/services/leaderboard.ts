@@ -12,6 +12,7 @@ import PlayerStatisticsService from "./playerStatistics";
 import RatingService from "./rating";
 import PlayerAfkService from "./playerAfk";
 import UserLevelService from "./userLevel";
+import {sorterByProperty} from "./utils";
 
 const moment = require('moment');
 
@@ -199,33 +200,31 @@ export default class LeaderboardService {
             return null;
         }
 
-        // TODO: Support capitals?
-
         const leaderboard = game.galaxy.teams.map(t => {
-            const starCount = t.players.map(pId => {
+            let starCount = 0;
+            let capitalCount = 0;
+
+            for (const pId of t.players) {
                 const player = this.playerService.getById(game, pId);
 
                 if (!player) {
-                    return 0;
+                    continue;
                 }
 
                 const stats = player.stats || this.playerStatisticsService.getStats(game, player);
-
-                return stats.totalStars;
-            }).reduce((a, b) => a + b, 0);
+                starCount += stats.totalStars;
+                capitalCount += stats.totalHomeStars;
+            }
 
             return {
                 team: t,
-                starCount
+                starCount,
+                capitalCount
             }
         });
 
-        leaderboard.sort((a, b) => {
-            if (a.starCount > b.starCount) return -1;
-            if (a.starCount < b.starCount) return 1;
-
-            return 0;
-        });
+        const sorterProperty = game.settings.conquest.victoryCondition === 'homeStarPercentage' ? 'capitalCount' : 'starCount';
+        leaderboard.sort(sorterByProperty(sorterProperty));
 
         return {
             leaderboard

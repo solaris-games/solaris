@@ -37,6 +37,7 @@ export interface TeamLeaderboard {
 export interface LeaderboardTeam {
     team: Team;
     starCount: number;
+    capitalCount: number;
 }
 
 export interface LeaderboardUser {
