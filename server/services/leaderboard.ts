@@ -12,7 +12,7 @@ import PlayerStatisticsService from "./playerStatistics";
 import RatingService from "./rating";
 import PlayerAfkService from "./playerAfk";
 import UserLevelService from "./userLevel";
-import {sorterByProperty} from "./utils";
+import {maxBy, sorterByProperty} from "./utils";
 
 const moment = require('moment');
 
@@ -373,7 +373,24 @@ export default class LeaderboardService {
     }
 
     getGameWinnerTeam(game: Game, leaderboard: LeaderboardTeam[]): GameWinner | null {
-        // TODO: Win condition for team games
+        let isAllUndefeatedPlayersReadyToQuit = this.gameService.isAllUndefeatedPlayersReadyToQuit(game);
+
+        let key = game.settings.conquest.victoryCondition === 'starPercentage' ? 'starCount' : 'capitalCount';
+        leaderboard.sort(sorterByProperty(key));
+
+        if (isAllUndefeatedPlayersReadyToQuit) {
+            return teamWinner(leaderboard[0].team);
+        }
+
+        if (this.gameStateService.isCountingDownToEnd(game) && this.gameStateService.hasReachedCountdownEnd(game)) {
+            return teamWinner(leaderboard[0].team);
+        }
+
+        const winningTeams = leaderboard.filter(t => t[key] >= game.state.starsForVictory);
+
+        if (winningTeams.length) {
+            return teamWinner(winningTeams[0].team); // First team in array must have the highest count
+        }
 
         return null;
     }
