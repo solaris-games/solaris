@@ -782,7 +782,7 @@ export default class GameTickService extends EventEmitter {
         if (this.gameTypeService.isTeamConquestGame(game)) {
             const teamLeaderboard = this.leaderboardService.getTeamLeaderboard(game)!.leaderboard;
 
-            // TODO: Assign team leaderboard in state
+            game.state.teamLeaderboard = teamLeaderboard.map(t => t.team._id);
 
             winner = this.leaderboardService.getGameWinnerTeam(game, teamLeaderboard);
         } else {

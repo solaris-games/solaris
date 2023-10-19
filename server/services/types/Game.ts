@@ -258,6 +258,7 @@ export interface Game {
 		winner: DBObjectId | null;
 		winningTeam: DBObjectId | null;
 		leaderboard: DBObjectId[] | null;
+		teamLeaderboard: DBObjectId[] | null;
 		cleaned: boolean;
 		openSlots?: number;
 	},
