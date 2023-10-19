@@ -48,64 +48,7 @@
         </div>
     </div>
 
-    <div class="row">
-        <div class="table-responsive p-0">
-          <table class="table table-sm table-striped">
-              <tbody>
-                  <!--  v-bind:style="{'opacity':player.defeated ? 0.5: 1}" -->
-                  <tr v-for="player in sortedPlayers" :key="player._id">
-                      <td :style="{'width': '8px', 'background-color': getFriendlyColour(player.colour.value)}"></td>
-                      <td class="col-avatar" :title="player.colour.alias + ' ' + player.shape">
-                          <player-avatar :player="player" @onClick="onOpenPlayerDetailRequested(player)"/>
-                      </td>
-                      <td class="ps-2 pt-3 pb-2">
-                          <!-- Text styling for defeated players? -->
-                          <h5 class="alias-title">
-                            {{player.alias}}
-                            <team-name :player-id="player._id" />
-                            <span v-if="isKingOfTheHillMode && player.isKingOfTheHill" title="This player is the king of the hill">
-                              <i class="fas fa-crown"></i>
-                            </span>
-                            <span v-if="player.defeated" :title="getPlayerStatus(player)">
-                              <i v-if="!player.afk" class="fas fa-skull-crossbones" title="This player has been defeated"></i>
-                              <i v-if="player.afk" class="fas fa-user-clock" title="This player is AFK"></i>
-                            </span>
-                            <span v-if="canReadyToQuit && player.readyToQuit" @click="unconfirmReadyToQuit(player)">
-                              <i class="fas fa-check text-warning" title="This player is ready to quit - Ends the game early if all active players are ready to quit"></i>
-                            </span>
-                          </h5>
-                      </td>
-                      <td class="fit pt-3 pe-2" v-if="isConquestAllStars || isKingOfTheHillMode">
-                        <span class="d-xs-block d-sm-none">
-                          <i class="fas fa-star me-0"></i> {{player.stats.totalStars}}
-                        </span>
-                        <span class="d-none d-sm-block">
-                          {{player.stats.totalStars}} Star<span v-if="player.stats.totalStars !== 1">s</span>
-                        </span>
-                      </td>
-                      <td class="fit pt-3 pe-2" v-if="isConquestHomeStars">
-                        <span class="d-xs-block d-sm-none">
-                          <i class="fas fa-star me-0"></i> {{player.stats.totalHomeStars}}({{player.stats.totalStars}})
-                        </span>
-                        <span class="d-none d-sm-block">
-                          {{player.stats.totalHomeStars}}({{player.stats.totalStars}}) Star<span v-if="player.stats.totalStars !== 1">s</span>
-                        </span>
-                      </td>
-                      <td class="fit pt-2 pb-2 pe-1 text-center" v-if="isTurnBasedGame && canEndTurn">
-                        <h5 v-if="player.ready && !isUserPlayer(player)" class="pt-2 pe-2 ps-2">
-                          <i class="fas fa-check text-success" title="This player has completed their turn"></i>
-                        </h5>
-
-                        <ready-status-button v-if="!$isHistoricalMode() && getUserPlayer() && isUserPlayer(player) && !getUserPlayer().defeated" />
-                      </td>
-                      <td class="fit pt-2 pb-2 pe-2">
-                          <button class="btn btn-outline-info" @click="panToPlayer(player)"><i class="fas fa-eye"></i></button>
-                      </td>
-                  </tr>
-              </tbody>
-          </table>
-        </div>
-    </div>
+    <player-leaderboard @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested" />
 
     <new-player-message />
 
@@ -138,7 +81,6 @@
 <script>
 import router from '../../../../router'
 import gameService from '../../../../services/api/game'
-import gameContainer from '../../../../game/container'
 import ModalButton from '../../../components/modal/ModalButton'
 import DialogModal from '../../../components/modal/DialogModal'
 import GameHelper from '../../../../services/gameHelper'
@@ -146,23 +88,19 @@ import MenuTitle from '../MenuTitle'
 import AudioService from '../../../../game/audio'
 import NewPlayerMessageVue from '../welcome/NewPlayerMessage'
 import ShareLinkVue from '../welcome/ShareLink'
-import PlayerAvatarVue from '../menu/PlayerAvatar'
 import HelpTooltip from '../../../components/HelpTooltip'
-import ReadyStatusButtonVue from '../menu/ReadyStatusButton'
 import ConcedeDefeatButton from './ConcedeDefeatButton'
-import TeamName from '../shared/TeamName';
+import PlayerLeaderboard from './PlayerLeaderboard';
 
 export default {
   components: {
-    'team-name': TeamName,
+    'player-leaderboard': PlayerLeaderboard,
     'menu-title': MenuTitle,
     'modalButton': ModalButton,
     'dialogModal': DialogModal,
     'new-player-message': NewPlayerMessageVue,
     'share-link': ShareLinkVue,
-    'player-avatar': PlayerAvatarVue,
     'help-tooltip': HelpTooltip,
-    'ready-status-button': ReadyStatusButtonVue,
     'concede-defeat-button': ConcedeDefeatButton
   },
 
@@ -197,15 +135,8 @@ export default {
     onViewSettingsRequested (e) {
       this.$emit('onViewSettingsRequested', e)
     },
-    panToPlayer (player) {
-      gameContainer.map.panToPlayer(this.$store.state.game, player)
-      this.onOpenPlayerDetailRequested(player)
-    },
     getUserPlayer () {
       return GameHelper.getUserPlayer(this.$store.state.game)
-    },
-    getFriendlyColour (colour) {
-      return GameHelper.getFriendlyColour(colour)
     },
     isUserPlayer (player) {
       let userPlayer = this.getUserPlayer()
@@ -235,65 +166,6 @@ export default {
       }
 
       this.isQuittingGame = false
-    },
-    async confirmReady (player) {
-      if (!await this.$confirm('End Turn', 'Are you sure you want to end your turn?')) {
-        return
-      }
-
-      try {
-        let response = await gameService.confirmReady(this.$store.state.game._id)
-
-        if (response.status === 200) {
-          if (this.isTutorialGame) {
-            this.$toasted.show(`You have confirmed your move, please wait while the game processes the tick.`, { type: 'success' })
-          } else {
-            this.$toasted.show(`You have confirmed your move, once all players are ready the game will progress automatically.`, { type: 'success' })
-          }
-
-          player.ready = true
-        }
-      } catch (err) {
-        console.error(err)
-      }
-    },
-    async confirmReadyToCycle (player) {
-      if (!await this.$confirm('End Cycle', 'Are you sure you want to end your turn up to the end of the current galactic cycle?')) {
-        return
-      }
-
-      try {
-        let response = await gameService.confirmReadyToCycle(this.$store.state.game._id)
-
-        if (response.status === 200) {
-          if (this.isTutorialGame) {
-            this.$toasted.show(`You have confirmed your move, please wait while the game processes the tick.`, { type: 'success' })
-          } else {
-            this.$toasted.show(`You have confirmed your move, once all players are ready the game will progress automatically.`, { type: 'success' })
-          }
-
-          player.ready = true
-          player.readyToCycle = true
-        }
-      } catch (err) {
-        console.error(err)
-      }
-    },
-    async unconfirmReady (player) {
-      if (!this.isUserPlayer(player)) {
-        return
-      }
-
-      try {
-        let response = await gameService.unconfirmReady(this.$store.state.game._id)
-
-        if (response.status === 200) {
-          player.ready = false
-          player.readyToCycle = false
-        }
-      } catch (err) {
-        console.error(err)
-      }
     },
     async confirmReadyToQuit (player) {
       if (!this.isUserPlayer(player) || this.$isHistoricalMode()) {
@@ -335,27 +207,12 @@ export default {
       let winnerPlayer = GameHelper.getPlayerById(this.$store.state.game, this.$store.state.game.state.winner)
 
       return winnerPlayer.alias
-    },
-    getPlayerStatus (player) {
-      return GameHelper.getPlayerStatus(player)
-    },
-    getAvatarImage (player) {
-      try {
-        return require(`../../../../assets/avatars/${player.avatar}`)
-      } catch (err) {
-        console.error(err)
-
-        return null
-      }
     }
   },
 
   computed: {
     game () {
       return this.$store.state.game
-    },
-    sortedPlayers () {
-      return GameHelper.getSortedLeaderboardPlayerList(this.$store.state.game)
     },
     isTurnBasedGame () {
       return this.$store.state.game.settings.gameTime.gameType === 'turnBased'
@@ -372,12 +229,6 @@ export default {
     isKingOfTheHillMode () {
       return GameHelper.isKingOfTheHillMode(this.$store.state.game)
     },
-    canEndTurn () {
-      return !GameHelper.isGameFinished(this.$store.state.game)
-    },
-    isTutorialGame () {
-      return GameHelper.isTutorialGame(this.$store.state.game)
-    },
     canReadyToQuit () {
       return this.$store.state.game.settings.general.readyToQuit === 'enabled'
         && this.$store.state.game.state.startDate
@@ -388,57 +239,4 @@ export default {
 </script>
 
 <style scoped>
-.col-avatar {
-  position:absolute;
-  width: 59px;
-  height: 59px;
-  cursor: pointer;
-  padding: 0;
-}
-
-.alias-title {
-  padding-left: 59px;
-}
-
-table tr {
-  height: 59px;
-}
-
-.table-sm td {
-  padding: 0;
-}
-
-.table td.fit,
-.table th.fit {
-    white-space: nowrap;
-    width: 1%;
-}
-
-.fa-check {
-  cursor: pointer;
-}
-
-@media screen and (max-width: 576px) {
-  table tr {
-    height: 45px;
-  }
-
-  .alias-title {
-    padding-left: 45px;
-  }
-
-  .col-avatar {
-    width: 45px;
-  }
-}
-
-.pulse {
-  animation: blinker 1.5s linear infinite;
-}
-
-@keyframes blinker {
-  50% {
-    opacity: 0.3;
-  }
-}
 </style>
