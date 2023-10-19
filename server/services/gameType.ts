@@ -1,6 +1,9 @@
 import { Game } from "./types/Game";
 
 export default class GameTypeService {
+    isTeamConquestGame(game: Game) {
+        return game.settings.general.mode === 'teamConquest';
+    }
 
     isNewPlayerGame(game: Game) {
         return ['new_player_rt', 'new_player_tb'].includes(game.settings.general.type);

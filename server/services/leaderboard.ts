@@ -1,5 +1,5 @@
 import {Game, Team} from "./types/Game";
-import {PlayerLeaderboard, LeaderboardPlayer, TeamLeaderboard} from "./types/Leaderboard";
+import {PlayerLeaderboard, LeaderboardPlayer, TeamLeaderboard, LeaderboardTeam} from "./types/Leaderboard";
 import { Player } from "./types/Player";
 import { EloRatingChangeResult, GameRankingResult } from "./types/Rating";
 import { User } from "./types/User";
@@ -196,7 +196,7 @@ export default class LeaderboardService {
     }
 
     getTeamLeaderboard(game: Game): TeamLeaderboard | null {
-        if (game.settings.general.mode !== 'teamConquest' || !game.galaxy.teams) {
+        if (!this.gameTypeService.isTeamConquestGame(game) || !game.galaxy.teams) {
             return null;
         }
 
@@ -372,9 +372,13 @@ export default class LeaderboardService {
         };
     }
 
-    getGameWinner(game: Game, leaderboard: LeaderboardPlayer[]): GameWinner | null {
+    getGameWinnerTeam(game: Game, leaderboard: LeaderboardTeam[]): GameWinner | null {
         // TODO: Win condition for team games
 
+        return null;
+    }
+
+    getGameWinner(game: Game, leaderboard: LeaderboardPlayer[]): GameWinner | null {
         let isKingOfTheHillMode = this.gameTypeService.isKingOfTheHillMode(game);
         let isAllUndefeatedPlayersReadyToQuit = this.gameService.isAllUndefeatedPlayersReadyToQuit(game);
 
