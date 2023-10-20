@@ -60,7 +60,7 @@
 
       <div class="tab-content pt-2 pb-2">
         <div class="tab-pane fade" :class="{'show active':activeTab=== 'team'}" id="team">
-          <team-leaderboard />
+          <team-leaderboard @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested" />
         </div>
         <div class="tab-pane fade" :class="{'show active':activeTab=== 'player'}" id="player">
           <player-leaderboard @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested" />
@@ -155,7 +155,7 @@ export default {
       this.$emit('onCloseRequested', e)
     },
     onOpenPlayerDetailRequested (e) {
-      this.$emit('onOpenPlayerDetailRequested', e._id)
+      this.$emit('onOpenPlayerDetailRequested', e)
     },
     onViewSettingsRequested (e) {
       this.$emit('onViewSettingsRequested', e)

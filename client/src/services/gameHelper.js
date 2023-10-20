@@ -650,25 +650,25 @@ class GameHelper {
 
   getSortedLeaderboardTeamList (game) {
     const teamsWithData = game.galaxy.teams.map(team => {
-      const teamPlayers = team.players.map(playerId => this.getPlayerById(game, playerId))
+      const players = team.players.map(playerId => this.getPlayerById(game, playerId))
 
       let totalStars = 0;
-      let totalCapitals = 0;
+      let totalHomeStars = 0;
 
-      for (const player of teamPlayers) {
+      for (const player of players) {
         if (!player.stats) {
           continue;
         }
 
         totalStars += player.stats.totalStars || 0;
-        totalCapitals += player.stats.totalHomeStars || 0;
+        totalHomeStars += player.stats.totalHomeStars || 0;
       }
 
       return {
         team,
-        teamPlayers,
+        players,
         totalStars,
-        totalCapitals
+        totalHomeStars
       }
     });
 
