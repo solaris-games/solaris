@@ -640,6 +640,42 @@ class GameHelper {
     return 'Unknown'
   }
 
+  getSortedLeaderboardTeamList (game) {
+    const teamsWithData = game.galaxy.teams.map(team => {
+      const teamPlayers = team.players.map(playerId => this.getPlayerById(game, playerId))
+
+      let totalStars = 0;
+      let totalCapitals = 0;
+
+      for (const player of teamPlayers) {
+        if (!player.stats) {
+          continue;
+        }
+
+        totalStars += player.stats.totalStars || 0;
+        totalCapitals += player.stats.totalHomeStars || 0;
+      }
+
+      return {
+        team,
+        teamPlayers,
+        totalStars,
+        totalCapitals
+      }
+    });
+
+    const sortingKey = game.settings.conquest.victoryCondition === 'starPercentage' ? 'totalStars' : 'totalCapitals';
+
+    teamsWithData.sort((a, b) => {
+      if (a[sortingKey] > b[sortingKey]) return -1;
+      if (a[sortingKey] < b[sortingKey]) return 1;
+
+      return 0;
+    });
+
+    return teamsWithData;
+  }
+
   getSortedLeaderboardPlayerList (game) {
     // Sort by total number of stars, then by total ships, then by total carriers.
     // Note that this sorting is different from the server side sorting as
