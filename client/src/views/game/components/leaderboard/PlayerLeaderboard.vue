@@ -25,7 +25,7 @@
                             </span>
             </h5>
           </td>
-          <td class="fit pt-3 pe-2" v-if="isConquestAllStars || isKingOfTheHillMode">
+          <td class="fit pt-3 pe-2" v-if="isStarCountWinCondition || isKingOfTheHillMode">
                         <span class="d-xs-block d-sm-none">
                           <i class="fas fa-star me-0"></i> {{player.stats.totalStars}}
                         </span>
@@ -33,7 +33,7 @@
                           {{player.stats.totalStars}} Star<span v-if="player.stats.totalStars !== 1">s</span>
                         </span>
           </td>
-          <td class="fit pt-3 pe-2" v-if="isConquestHomeStars">
+          <td class="fit pt-3 pe-2" v-if="isHomeStarsWinCondition">
                         <span class="d-xs-block d-sm-none">
                           <i class="fas fa-star me-0"></i> {{player.stats.totalHomeStars}}({{player.stats.totalStars}})
                         </span>
@@ -129,6 +129,12 @@ export default {
     },
     isTurnBasedGame () {
       return this.$store.state.game.settings.gameTime.gameType === 'turnBased'
+    },
+    isHomeStarsWinCondition () {
+      return GameHelper.isWinConditionHomeStars(this.$store.state.game)
+    },
+    isStarCountWinCondition () {
+      return GameHelper.isWinConditionStarCount(this.$store.state.game)
     },
     isConquestAllStars () {
       return GameHelper.isConquestAllStars(this.$store.state.game)

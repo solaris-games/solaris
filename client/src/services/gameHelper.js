@@ -545,6 +545,14 @@ class GameHelper {
     return game.settings.general.mode === 'conquest' && game.settings.conquest.victoryCondition === 'starPercentage'
   }
 
+  isWinConditionHomeStars (game) {
+    return game.settings.conquest.victoryCondition === 'homeStarPercentage';
+  }
+
+  isWinConditionStarCount (game) {
+    return game.settings.conquest.victoryCondition === 'starPercentage';
+  }
+
   isConquestHomeStars (game) {
     return game.settings.general.mode === 'conquest' && game.settings.conquest.victoryCondition === 'homeStarPercentage'
   }
