@@ -48,7 +48,27 @@
         </div>
     </div>
 
-    <player-leaderboard @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested" />
+    <div v-if="isTeamConquest">
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a class="nav-link" :class="{'active':activeTab=== 'team'}" data-bs-toggle="tab" href="#team">Team</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" :class="{'active':activeTab=== 'player'}" data-bs-toggle="tab" href="#player">Player</a>
+        </li>
+      </ul>
+
+      <div class="tab-content pt-2 pb-2">
+        <div class="tab-pane fade" :class="{'show active':activeTab=== 'team'}" id="team">
+          <team-leaderboard />
+        </div>
+        <div class="tab-pane fade" :class="{'show active':activeTab=== 'player'}" id="player">
+          <player-leaderboard @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested" />
+        </div>
+      </div>
+    </div>
+
+    <player-leaderboard v-if="!isTeamConquest" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested" />
 
     <new-player-message />
 
@@ -91,9 +111,11 @@ import ShareLinkVue from '../welcome/ShareLink'
 import HelpTooltip from '../../../components/HelpTooltip'
 import ConcedeDefeatButton from './ConcedeDefeatButton'
 import PlayerLeaderboard from './PlayerLeaderboard';
+import TeamLeaderboard from './TeamLeaderboard';
 
 export default {
   components: {
+    'team-leaderboard': TeamLeaderboard,
     'player-leaderboard': PlayerLeaderboard,
     'menu-title': MenuTitle,
     'modalButton': ModalButton,
@@ -106,6 +128,7 @@ export default {
 
   data () {
     return {
+      activeTab: null,
       audio: null,
       players: [],
       timeRemaining: null,
@@ -113,6 +136,8 @@ export default {
     }
   },
   mounted () {
+    this.activeTab = this.isTeamConquest ? 'team' : 'player'
+
     this.players = this.$store.state.game.galaxy.players
 
     this.recalculateTimeRemaining()
@@ -228,6 +253,9 @@ export default {
     },
     isKingOfTheHillMode () {
       return GameHelper.isKingOfTheHillMode(this.$store.state.game)
+    },
+    isTeamConquest () {
+      return GameHelper.isTeamConquest(this.$store.state.game)
     },
     canReadyToQuit () {
       return this.$store.state.game.settings.general.readyToQuit === 'enabled'

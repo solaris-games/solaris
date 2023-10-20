@@ -561,6 +561,9 @@ class GameHelper {
     return game.settings.general.spectators === 'enabled'
   }
 
+  isTeamConquest (game) {
+    return Boolean(game.settings.general.mode === 'teamConquest' && game.galaxy.teams)
+  }
   getGameStatusText (game) {
     if (this.isGamePendingStart(game)) {
       return 'Waiting to start'
