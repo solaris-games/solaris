@@ -6,9 +6,11 @@
           {{team.team.name}}
         </span>
         <span v-if="isHomeStarsWinCondition" class="team-score">
+          <i class="fas fa-star me-0"></i>
           {{team.totalHomeStars}}
         </span>
         <span v-if="isStarCountWinCondition" class="team-score">
+          <i class="fas fa-star me-0"></i>
           {{team.totalStars}}
         </span>
       </p>
@@ -31,7 +33,6 @@ export default {
       this.$emit('onOpenPlayerDetailRequested', e._id)
     },
     panToPlayer (player) {
-      console.log(player)
       gameContainer.map.panToPlayer(this.$store.state.game, player)
       this.onOpenPlayerDetailRequested(player)
     },
@@ -51,5 +52,13 @@ export default {
 </script>
 
 <style scoped>
+.team-player-link {
+  cursor: pointer;
+  text-decoration: underline;
+  color: var(--bs-theme);
+}
 
+.team-player-link:hover {
+  color: rgba(var(--bs-theme-rgb),.75);
+}
 </style>
