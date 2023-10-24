@@ -21,6 +21,8 @@
         <div class="col text-center pt-2">
             <p class="mb-0 text-warning" v-if="isConquestAllStars">Be the first to capture {{game.state.starsForVictory}} of {{game.state.stars}} stars</p>
             <p class="mb-0 text-warning" v-if="isConquestHomeStars">Be the first to capture {{game.state.starsForVictory}} of {{game.settings.general.playerLimit}} capital stars</p>
+            <p class="mb-0 text-warning" v-if="isTeamConquest && isStarCountWin">Be the first team to capture {{game.state.starsForVictory}} of {{game.state.stars}} stars</p>
+            <p class="mb-0 text-warning" v-if="isTeamConquest && isHomeStarCountWinCondition">Be the first team to capture {{game.state.starsForVictory}} of {{game.settings.general.playerLimit}} capital stars</p>
             <p class="mb-0 text-warning" v-if="isKingOfTheHillMode">Capture and hold the center star to win</p>
             <p class="mb-0" v-if="game.settings.general.mode === 'battleRoyale'">Battle Royale - {{game.state.stars}} Stars Remaining</p>
             <p class="mb-0" v-if="isKingOfTheHillMode && game.state.ticksToEnd == null"><small>The countdown begins when the center star is captured</small></p>
@@ -256,6 +258,12 @@ export default {
     },
     isTeamConquest () {
       return GameHelper.isTeamConquest(this.$store.state.game)
+    },
+    isStarCountWin () {
+      return GameHelper.isWinConditionStarCount(this.$store.state.game)
+    },
+    isHomeStarCountWinCondition () {
+      return GameHelper.isWinConditionHomeStars(this.$store.state.game)
     },
     canReadyToQuit () {
       return this.$store.state.game.settings.general.readyToQuit === 'enabled'
