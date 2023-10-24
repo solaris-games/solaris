@@ -1,19 +1,27 @@
 <template>
   <div class="row">
     <div class="team-row" v-for="team in sortedTeams" :key="team.team.name">
-      <p class="team-info">
-        <span class="team-name">
+      <div class="team-info">
+        <h5 class="team-name">
           {{team.team.name}}
-        </span>
+        </h5>
         <span v-if="isHomeStarsWinCondition" class="team-score">
-          <i class="fas fa-star me-0"></i>
-          {{team.totalHomeStars}}
+          <span class="d-xs-block d-sm-none">
+            <i class="fas fa-star me-0"></i> {{team.totalHomeStars}}
+          </span>
+           <span class="d-none d-sm-block">
+             {{team.totalHomeStars}} Star<span v-if="team.totalHomeStars !== 1">s</span>
+           </span>
         </span>
         <span v-if="isStarCountWinCondition" class="team-score">
-          <i class="fas fa-star me-0"></i>
-          {{team.totalStars}}
+          <span class="d-xs-block d-sm-none">
+            <i class="fas fa-star me-0"></i> {{team.totalStars}}
+          </span>
+           <span class="d-none d-sm-block">
+             {{team.totalStars}} Star<span v-if="team.totalStars !== 1">s</span>
+           </span>
         </span>
-      </p>
+      </div>
       <p class="team-members">
         <span class="team-player-link" v-for="player in team.players" :key="player._id" @click="panToPlayer(player)">
           {{player.alias}}
@@ -52,10 +60,31 @@ export default {
 </script>
 
 <style scoped>
+.team-row {
+  display: flex;
+  flex-direction: column;
+}
+
+.team-info {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.team-name {
+  display: inline;
+  color: #4e9cff;
+}
+
+.team-score {
+  font-size: 16px;
+}
+
 .team-player-link {
   cursor: pointer;
   text-decoration: underline;
   color: var(--bs-theme);
+  margin-right: 8px;
 }
 
 .team-player-link:hover {
