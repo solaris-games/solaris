@@ -351,7 +351,7 @@ export default class GameCreateService {
     }
 
     _calculateStarsForVictory(game: Game) {
-        if (game.settings.general.mode === 'conquest') {
+        if (game.settings.general.mode === 'conquest' || game.settings.general.mode === 'teamConquest') {
             // TODO: Find a better place for this as its shared in the star service.
             switch (game.settings.conquest.victoryCondition) {
                 case 'starPercentage':
