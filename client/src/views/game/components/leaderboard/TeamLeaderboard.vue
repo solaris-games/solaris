@@ -4,6 +4,7 @@
       <div class="team-info">
         <h5 class="team-name">
           {{team.team.name}}
+          <i v-if="isPlayerTeam(team)" class="userIcon fas fa-user"></i>
         </h5>
         <span v-if="isHomeStarsWinCondition" class="team-score">
           <span class="d-xs-block d-sm-none">
@@ -44,6 +45,11 @@ export default {
       gameContainer.map.panToPlayer(this.$store.state.game, player)
       this.onOpenPlayerDetailRequested(player)
     },
+    isPlayerTeam (team) {
+      const userPlayer = GameHelper.getUserPlayer(this.$store.state.game);
+
+      return userPlayer && team.players.some(p => p._id.toString() === userPlayer._id.toString())
+    },
   },
   computed: {
     sortedTeams() {
@@ -54,7 +60,7 @@ export default {
     },
     isStarCountWinCondition () {
       return GameHelper.isWinConditionStarCount(this.$store.state.game)
-    },
+    }
   }
 }
 </script>
