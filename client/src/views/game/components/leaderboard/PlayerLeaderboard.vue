@@ -29,7 +29,7 @@ export default {
   },
   methods: {
     onOpenPlayerDetailRequested (e) {
-      this.$emit('onOpenPlayerDetailRequested', e._id)
+      this.$emit('onOpenPlayerDetailRequested', e)
     }
   },
 
