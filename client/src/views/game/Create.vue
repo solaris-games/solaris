@@ -19,7 +19,7 @@
         </div>
 
         <div class="mb-2">
-          <label for="mode" class="col-form-label">Mode <help-tooltip tooltip="The game mode Conquest is victory by stars, Battle Royale is last man standing in a constantly shrinking galaxy, King of the Hill is a fight for a key star, Team conquest is conquest, but with teams"/></label>
+          <label for="mode" class="col-form-label">Mode <help-tooltip tooltip="The game mode Conquest is victory by stars, Battle Royale is last man standing in a constantly shrinking galaxy, King of the Hill is a fight for a key star, Team Conquest is conquest, but with teams"/></label>
           <select class="form-control" id="mode" v-model="settings.general.mode" :disabled="isCreatingGame" @change="onModeChanged">
             <option v-for="opt in options.general.mode" v-bind:key="opt.value" v-bind:value="opt.value">
               {{ opt.text }}
