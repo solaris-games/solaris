@@ -649,8 +649,19 @@ class GameHelper {
   }
 
   getSortedLeaderboardTeamList (game) {
+    const sortingKey = game.settings.conquest.victoryCondition === 'starPercentage' ? 'totalStars' : 'totalHomeStars';
+
     const teamsWithData = game.galaxy.teams.map(team => {
       const players = team.players.map(playerId => this.getPlayerById(game, playerId))
+
+      players.sort((a, b) => {
+        const aStars = a.stats && a.stats[sortingKey];
+        const bStars = b.stats && b.stats[sortingKey];
+
+        if (aStars > bStars) return -1;
+        if (aStars < bStars) return 1;
+        return 0;
+      });
 
       let totalStars = 0;
       let totalHomeStars = 0;
@@ -671,8 +682,6 @@ class GameHelper {
         totalHomeStars
       }
     });
-
-    const sortingKey = game.settings.conquest.victoryCondition === 'starPercentage' ? 'totalStars' : 'totalCapitals';
 
     teamsWithData.sort((a, b) => {
       if (a[sortingKey] > b[sortingKey]) return -1;
