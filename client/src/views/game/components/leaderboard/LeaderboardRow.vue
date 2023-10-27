@@ -19,7 +19,7 @@
           <i class="fas fa-check text-warning"
              title="This player is ready to quit - Ends the game early if all active players are ready to quit"></i>
         </span>
-        <team-name v-if="showTeamNames" :player-id="player._id"/>
+        <team-name v-if="shouldShowTeamNames" :player-id="player._id"/>
       </h5>
     </td>
     <td class="fit pt-3 pe-2" v-if="isStarCountWinCondition || isKingOfTheHillMode">
@@ -131,7 +131,10 @@ export default {
     },
     canEndTurn() {
       return !GameHelper.isGameFinished(this.$store.state.game)
-    }
+    },
+    shouldShowTeamNames () {
+      return this.showTeamNames && GameHelper.isTeamConquest(this.$store.state.game)
+    },
   }
 }
 </script>
