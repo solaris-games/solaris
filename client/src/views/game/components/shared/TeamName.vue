@@ -1,5 +1,5 @@
 <template>
-  <span class="team-name" v-if="team">({{team.name}})</span>
+  <p class="team-name" v-if="team">({{team.name}})</p>
 </template>
 
 <script>
@@ -22,5 +22,6 @@ export default {
 <style scoped>
 .team-name {
   color: #4e9cff;
+  font-size: 14px;
 }
 </style>

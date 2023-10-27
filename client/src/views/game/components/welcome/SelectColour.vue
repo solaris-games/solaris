@@ -18,11 +18,11 @@
                     <td class="ps-2 pt-3 pb-2">
                         <h5 class="alias-title" style="vertical-align: middle;">
                           {{player.alias}}
-                          <team-name :player-id="player._id" />
                           <span v-if="player.defeated" :title="getPlayerStatus(player)">
                             <i v-if="!player.afk" class="fas fa-skull-crossbones" title="This player has been defeated"></i>
                             <i v-if="player.afk" class="fas fa-user-clock" title="This player is AFK"></i>
                           </span>
+                          <team-name :player-id="player._id" />
                         </h5>
                     </td>
                     <td class="fit ps-2 pt-2 pb-2 pe-2">
