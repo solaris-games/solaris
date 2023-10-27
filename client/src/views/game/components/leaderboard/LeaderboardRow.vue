@@ -4,10 +4,11 @@
     <td class="col-avatar" :title="player.colour.alias + ' ' + player.shape">
       <player-avatar :player="player" @onClick="onOpenPlayerDetailRequested(player)"/>
     </td>
-    <td class="ps-2 pt-2 pb-2">
+    <td class="ps-2 pt-3 pb-0">
       <!-- Text styling for defeated players? -->
       <h5 class="alias-title">
         {{ player.alias }}
+        <team-name v-if="shouldShowTeamNames" :player-id="player._id"/>
         <span v-if="isKingOfTheHillMode && player.isKingOfTheHill" title="This player is the king of the hill">
           <i class="fas fa-crown"></i>
         </span>
@@ -19,25 +20,23 @@
           <i class="fas fa-check text-warning"
              title="This player is ready to quit - Ends the game early if all active players are ready to quit"></i>
         </span>
-        <team-name v-if="shouldShowTeamNames" :player-id="player._id"/>
       </h5>
     </td>
     <td class="fit pt-3 pe-2" v-if="isStarCountWinCondition || isKingOfTheHillMode">
-            <span class="d-xs-block d-sm-none">
-              <i class="fas fa-star me-0"></i> {{ player.stats.totalStars }}
-            </span>
+      <span class="d-xs-block d-sm-none">
+        <i class="fas fa-star me-0"></i> {{ player.stats.totalStars }}
+      </span>
       <span class="d-none d-sm-block">
-              {{ player.stats.totalStars }} Star<span v-if="player.stats.totalStars !== 1">s</span>
-            </span>
+        {{ player.stats.totalStars }} Star<span v-if="player.stats.totalStars !== 1">s</span>
+      </span>
     </td>
     <td class="fit pt-3 pe-2" v-if="isHomeStarsWinCondition">
-            <span class="d-xs-block d-sm-none">
-              <i class="fas fa-star me-0"></i> {{ player.stats.totalHomeStars }}({{ player.stats.totalStars }})
-            </span>
+      <span class="d-xs-block d-sm-none">
+        <i class="fas fa-star me-0"></i> {{ player.stats.totalHomeStars }}({{ player.stats.totalStars }})
+      </span>
       <span class="d-none d-sm-block">
-              {{ player.stats.totalHomeStars }}({{ player.stats.totalStars }}) Star<span
-        v-if="player.stats.totalStars !== 1">s</span>
-            </span>
+        {{ player.stats.totalHomeStars }}({{ player.stats.totalStars }}) Star<span v-if="player.stats.totalStars !== 1">s</span>
+      </span>
     </td>
     <td class="fit pt-2 pb-2 pe-1 text-center" v-if="isTurnBasedGame && canEndTurn">
       <h5 v-if="player.ready && !isUserPlayer(player)" class="pt-2 pe-2 ps-2">
@@ -171,7 +170,8 @@ export default {
   }
 
   .col-avatar {
-    width: 45px;
+    width: 35px;
+    height: 35px;
   }
 }
 </style>
