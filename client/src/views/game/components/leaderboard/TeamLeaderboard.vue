@@ -23,11 +23,13 @@
            </span>
         </span>
       </div>
-      <p class="team-members">
-        <span class="team-player-link" v-for="player in team.players" :key="player._id" @click="panToPlayer(player)">
-          {{player.alias}}
-        </span>
-      </p>
+      <div class="table-responsive p-0">
+        <table class="table table-sm table-striped">
+          <tbody>
+            <leaderboard-row v-for="player in team.players" :key="player._id" :player="player" :show-team-names="false" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested" />
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>
@@ -35,11 +37,15 @@
 <script>
 import GameHelper from '@/services/gameHelper';
 import gameContainer from '@/game/container';
+import LeaderboardRow from '@/views/game/components/leaderboard/LeaderboardRow.vue';
 
 export default {
+  components: {
+    'leaderboard-row': LeaderboardRow
+  },
   methods: {
     onOpenPlayerDetailRequested (e) {
-      this.$emit('onOpenPlayerDetailRequested', e._id)
+      this.$emit('onOpenPlayerDetailRequested', e)
     },
     panToPlayer (player) {
       gameContainer.map.panToPlayer(this.$store.state.game, player)
@@ -69,12 +75,16 @@ export default {
 .team-row {
   display: flex;
   flex-direction: column;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .team-info {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  padding-left: 2px;
+  padding-right: 2px;
 }
 
 .team-name {

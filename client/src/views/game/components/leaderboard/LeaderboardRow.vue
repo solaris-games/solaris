@@ -38,7 +38,7 @@
         {{ player.stats.totalHomeStars }}({{ player.stats.totalStars }}) Star<span v-if="player.stats.totalStars !== 1">s</span>
       </span>
     </td>
-    <td class="fit pt-2 pb-2 pe-1 text-center" v-if="isTurnBasedGame && canEndTurn">
+    <td class="pt-2 pb-2 pe-1 text-center turn-status" v-if="isTurnBasedGame && canEndTurn">
       <h5 v-if="player.ready && !isUserPlayer(player)" class="pt-2 pe-2 ps-2">
         <i class="fas fa-check text-success" title="This player has completed their turn"></i>
       </h5>
@@ -152,7 +152,11 @@ export default {
   padding-left: 59px;
 }
 
-.table-sm td {
+tr {
+  height: 59px;
+}
+
+td {
   padding: 0;
 }
 
@@ -160,13 +164,17 @@ export default {
   cursor: pointer;
 }
 
+.turn-status {
+  width: 70px;
+}
+
 @media screen and (max-width: 576px) {
-  table tr {
+  tr {
     height: 45px;
   }
 
   .alias-title {
-    padding-left: 45px;
+    padding-left: 40px;
   }
 
   .col-avatar {
