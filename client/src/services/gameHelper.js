@@ -1170,6 +1170,14 @@ class GameHelper {
 
     return game.galaxy.teams.find(t => t.players.includes(player._id));
   }
+
+  getTeamById(game, teamId) {
+    if (!game.galaxy.teams) {
+      return null;
+    }
+
+    return game.galaxy.teams.find(t => t._id === teamId);
+  }
 }
 
 export default new GameHelper()
