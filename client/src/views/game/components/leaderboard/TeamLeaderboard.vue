@@ -75,6 +75,7 @@ export default {
 .team-row {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   padding-left: 0;
   padding-right: 0;
 }
@@ -83,13 +84,14 @@ export default {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-left: 4px;
+  padding-right: 4px;
 }
 
 .team-name {
   display: inline;
   color: #4e9cff;
+  font-size: 20px;
 }
 
 .team-score {
