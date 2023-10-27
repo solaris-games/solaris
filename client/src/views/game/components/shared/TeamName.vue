@@ -23,5 +23,6 @@ export default {
 .team-name {
   color: #4e9cff;
   font-size: 14px;
+  margin-bottom: 0;
 }
 </style>

@@ -4,7 +4,7 @@
     <td class="col-avatar" :title="player.colour.alias + ' ' + player.shape">
       <player-avatar :player="player" @onClick="onOpenPlayerDetailRequested(player)"/>
     </td>
-    <td class="ps-2 pt-3 pb-2">
+    <td class="ps-2 pt-2 pb-2">
       <!-- Text styling for defeated players? -->
       <h5 class="alias-title">
         {{ player.alias }}
