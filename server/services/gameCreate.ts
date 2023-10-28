@@ -19,6 +19,7 @@ import StarService from './star';
 import DiplomacyService from "./diplomacy";
 import mongoose from "mongoose";
 import {DBObjectId} from "./types/DBObjectId";
+import {shuffle} from "./utils";
 
 const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
@@ -321,8 +322,8 @@ export default class GameCreateService {
             throw new ValidationError("Team count not provided");
         }
 
-        // TODO: Support different orders
         const players = game.galaxy.players.slice();
+        shuffle(players);
 
         const playersPerTeam = players.length / teamsNumber;
 
