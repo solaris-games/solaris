@@ -60,7 +60,8 @@
     <div class="row bg-success" v-if="game.state.endDate">
       <div class="col text-center pt-2">
         <h3>Game Over</h3>
-        <p>The winner is <b>{{ getWinnerAlias() }}</b>!</p>
+        <p v-if="!isTeamGame">The winner is <b>{{ getWinnerAlias() }}</b>!</p>
+        <p v-if="isTeamGame">The winning team is <b>{{ getWinningTeamName() }}</b></p>
       </div>
     </div>
 
@@ -254,7 +255,13 @@ export default {
       let winnerPlayer = GameHelper.getPlayerById(this.$store.state.game, this.$store.state.game.state.winner)
 
       return winnerPlayer.alias
-    }
+    },
+    getWinningTeam () {
+      return GameHelper.getTeamById(this.$store.state.game, this.$store.state.game.state.winningTeam)
+    },
+    getWinningTeamName () {
+      return this.getWinningTeam().name
+    },
   },
 
   computed: {
@@ -289,7 +296,10 @@ export default {
       return this.$store.state.game.settings.general.readyToQuit === 'enabled'
         && this.$store.state.game.state.startDate
         && this.$store.state.game.state.productionTick
-    }
+    },
+    isTeamGame () {
+      return GameHelper.isTeamConquest(this.$store.state.game)
+    },
   }
 }
 </script>
