@@ -41,6 +41,7 @@
         <player-gift-sent :event="event" v-if="event.type === 'playerGiftSent'"
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
         <player-galactic-cycle-complete :event="event" v-if="event.type === 'playerGalacticCycleComplete'"/>
+        <player-inbound-attacks :event="event" v-if="event.type === 'playerInboundAttacks'"/>
         <player-renown-received :event="event" v-if="event.type === 'playerRenownReceived'"
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
         <player-renown-sent :event="event" v-if="event.type === 'playerRenownSent'"
@@ -88,6 +89,7 @@ import PlayerCreditsSpecialistsSentVue from './PlayerCreditsSpecialistsSent'
 import PlayerGiftReceivedVue from './PlayerGiftReceived'
 import PlayerGiftSentVue from './PlayerGiftSent'
 import PlayerGalacticCycleCompleteEventVue from './PlayerGalacticCycleCompleteEvent'
+import PlayerInboundAttacksEventVue from './PlayerInboundAttacksEvent'
 import PlayerRenownReceivedVue from './PlayerRenownReceived'
 import PlayerRenownSentVue from './PlayerRenownSent'
 import PlayerResearchCompleteVue from './PlayerResearchComplete'
@@ -130,6 +132,8 @@ export default {
     'player-gift-received': PlayerGiftReceivedVue,
     'player-gift-sent': PlayerGiftSentVue,
     'player-galactic-cycle-complete': PlayerGalacticCycleCompleteEventVue,
+    'player-inbound-attacks': PlayerInboundAttacksEventVue,
+
     'player-renown-received': PlayerRenownReceivedVue,
     'player-renown-sent': PlayerRenownSentVue,
     'player-research-complete': PlayerResearchCompleteVue,

@@ -886,4 +886,36 @@ export default class StarService extends EventEmitter {
             starB.specialistId = null;
         }
     }
+
+    async addInboundAttackNotified(game: Game, star: Star, carrierId: DBObjectId) {
+        
+        if(star.inboundAttacksNotified?.some(c => c.toString() === carrierId.toString())) {
+            // Should not happen
+            console.log('addInboundAttackNotified this star already notified this carrier attack')
+            return;
+        }
+
+        await this.gameRepo.updateOne({
+            _id: game._id,
+            'galaxy.stars._id': star._id
+        }, {
+            $set: {
+                'galaxy.stars.$.inboundAttacksNotified': [...star.inboundAttacksNotified!, carrierId],
+            }
+        });
+
+    }
+
+    async removeInboundAttackNotified(game: Game, star: Star, carrierId: DBObjectId) {
+        if (!star.inboundAttacksNotified) return
+        let inboundAttacksNotified = star.inboundAttacksNotified.filter((c) => c !== carrierId);
+        await this.gameRepo.updateOne({
+            _id: game._id,
+            'galaxy.stars._id': star._id
+        }, {
+            $set: {
+                'galaxy.stars.$.inboundAttacksNotified': inboundAttacksNotified
+            }
+        });
+    }
 }
