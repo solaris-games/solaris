@@ -73,7 +73,7 @@ export default {
           carrier: attacker,
           star: item.star,
         }
-      })).sort((a,b) => b.carrier.ships - a.carrier.ships);
+      })).sort((a, b) => b.carrier.ships - a.carrier.ships);
 
     const flattenedCarrierIds = this.flattenedAttacks.map(a => a.carrier._id)
 
@@ -107,6 +107,7 @@ export default {
     recalculateTimeRemaining() {
       for (let timerData of this.carrierTimers) {
         let carrier = timerData.carrier
+        if (!carrier) return
         if (carrier.ticksEta) {
           let timeString = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, carrier.ticksEta)
           timerData.timeRemainingEta = timeString
@@ -115,9 +116,6 @@ export default {
       }
     },
     onOpenPlayerDetailRequested(e) {
-      console.log(`onOpenPlayerDetailRequested ${JSON.stringify(e)}`)
-      //this works which shows that e is a valid player id
-      console.log(this.getPlayerById(e).alias)
       this.$emit('onOpenPlayerDetailRequested', e)
     },
     onOpenCarrierDetailRequested(e) {

@@ -41,7 +41,9 @@
         <player-gift-sent :event="event" v-if="event.type === 'playerGiftSent'"
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
         <player-galactic-cycle-complete :event="event" v-if="event.type === 'playerGalacticCycleComplete'"/>
-        <player-inbound-attacks :event="event" v-if="event.type === 'playerInboundAttacks'"/>
+        <player-inbound-attacks :event="event" v-if="event.type === 'playerInboundAttacks'" 
+            @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+            @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
         <player-renown-received :event="event" v-if="event.type === 'playerRenownReceived'"
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
         <player-renown-sent :event="event" v-if="event.type === 'playerRenownSent'"
@@ -157,6 +159,9 @@ export default {
   methods: {
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', e)
+    },
+    onOpenCarrierDetailRequested (e) {
+      this.$emit('onOpenCarrierDetailRequested', e)
     },
     async markAsRead () {
         if (this.isRead) {
