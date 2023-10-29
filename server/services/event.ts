@@ -36,6 +36,8 @@ import GameDiplomacyPeaceDeclaredEvent from "./types/events/GameDiplomacyPeaceDe
 import GameDiplomacyWarDeclaredEvent from "./types/events/GameDiplomacyWarDeclared";
 import ValidationError from "../errors/validation";
 import GameJoinService, { GameJoinServiceEvents } from "./gameJoin";
+import PlayerInboundAttacksEvent from "./types/events/PlayerInboundAttacksEvent";
+import InboundAttacksService, { InboundAttacksServiceEvents } from "./inboundAttacks";
 
 const moment = require('moment');
 
@@ -54,6 +56,7 @@ export default class EventService {
 
         // TODO: Need event types for the ones below, see ./types/events directory
         PLAYER_GALACTIC_CYCLE_COMPLETE: 'playerGalacticCycleComplete',
+        PLAYER_INBOUND_ATTACKS: 'playerInboundAttacks',
         PLAYER_COMBAT_STAR: 'playerCombatStar',
         PLAYER_COMBAT_CARRIER: 'playerCombatCarrier',
         PLAYER_RESEARCH_COMPLETE: 'playerResearchComplete',
@@ -98,6 +101,7 @@ export default class EventService {
     badgeService: BadgeService;
     carrierGiftService: CarrierGiftService;
     diplomacyService: DiplomacyService;
+    inboundAttacksService: InboundAttacksService;
 
     constructor(
         eventModel,
@@ -116,7 +120,8 @@ export default class EventService {
         specialistService: SpecialistService,
         badgeService: BadgeService,
         carrierGiftService: CarrierGiftService,
-        diplomacyService: DiplomacyService
+        diplomacyService: DiplomacyService,
+        inboundAttacksService: InboundAttacksService
     ) {
         this.eventModel = eventModel;
         this.eventRepo = eventRepo;
@@ -135,20 +140,24 @@ export default class EventService {
         this.badgeService = badgeService;
         this.carrierGiftService = carrierGiftService;
         this.diplomacyService = diplomacyService;
+        this.inboundAttacksService = inboundAttacksService;
 
         this.gameJoinService.on(GameJoinServiceEvents.onPlayerJoined, (args) => this.createPlayerJoinedEvent(args));
         this.gameJoinService.on(GameJoinServiceEvents.onGameStarted, (args) => this.createGameStartedEvent(args));
-        
+
         this.gameService.on(GameServiceEvents.onGameDeleted, (args) => this.deleteByGameId(args.gameId));
         this.gameService.on(GameServiceEvents.onPlayerQuit, (args) => this.createPlayerQuitEvent(args));
         this.gameService.on(GameServiceEvents.onPlayerDefeated, (args) => this.createPlayerDefeatedEvent(args));
-        
+
         this.combatService.on(CombatServiceEvents.onPlayerCombatStar, (args) => this.createPlayerCombatStarEvent(
             args.gameId, args.gameTick, args.owner, args.defenders, args.attackers, args.star, args.combatResult, args.captureResult));
         this.combatService.on(CombatServiceEvents.onPlayerCombatCarrier, (args) => this.createPlayerCombatCarrierEvent(
             args.gameId, args.gameTick, args.defenders, args.attackers, args.combatResult));
-        
+
         this.gameTickService.on(GameTickServiceEvents.onPlayerGalacticCycleCompleted, (args) => this.createPlayerGalacticCycleCompleteEvent(args));
+
+        this.inboundAttacksService.on(InboundAttacksServiceEvents.onPlayerInboundAttacks, (args) => this.createPlayerInboundAttacksEvent(args));
+
         this.gameTickService.on(GameTickServiceEvents.onPlayerAfk, (args) => this.createPlayerAfkEvent(args));
         this.gameTickService.on(GameTickServiceEvents.onPlayerDefeated, (args) => this.createPlayerDefeatedEvent(args));
         this.gameTickService.on(GameTickServiceEvents.onGameEnded, (args) => this.createGameEndedEvent(args));
@@ -415,6 +424,21 @@ export default class EventService {
 
     async createPlayerGalacticCycleCompleteEvent(data: PlayerGalacticCycleCompletedEvent) {
         return await this.createPlayerEvent(data.gameId, data.gameTick, data.playerId!, this.EVENT_TYPES.PLAYER_GALACTIC_CYCLE_COMPLETE, data);
+    }
+
+    async createPlayerInboundAttacksEvent(data: PlayerInboundAttacksEvent) {
+        let playerEvent = await this.createPlayerEvent(data.gameId, data.gameTick, data.playerId!, this.EVENT_TYPES.PLAYER_INBOUND_ATTACKS, data);
+
+        console.log(`createPlayerInboundAttacksEvent ${JSON.stringify(data)}`)
+
+        // Save carrier->star events sent
+        let game = await this.gameService.getById(data.gameId)
+        for (let starUnderAttack of data.inboundAttacks.starsUnderAttack) {
+            for (let carrier of starUnderAttack.attackers) {
+                await this.inboundAttacksService.setNotificationFlag(game!, carrier)
+            }
+        }
+        return playerEvent
     }
 
     async createPlayerCombatStarEvent(gameId: DBObjectId, gameTick: number, owner: Player, defenders: Player[], attackers: Player[], star: Star, combatResult: CombatResult, captureResult: StarCaptureResult) {
