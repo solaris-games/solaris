@@ -92,7 +92,7 @@ export default class GameCreateService {
             let openGames = await this.gameListService.listOpenGamesCreatedByUser(settings.general.createdByUserId);
             let userIsGameMaster = await this.userService.getUserIsGameMaster(settings.general.createdByUserId);
 
-            if (openGames.length && !userIsGameMaster && false) {
+            if (openGames.length && !userIsGameMaster) {
                 throw new ValidationError('Cannot create game, you already have another game waiting for players.');
             }
 
