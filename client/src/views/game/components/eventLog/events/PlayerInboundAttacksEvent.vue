@@ -25,16 +25,13 @@
                 <span class="player-icon">
                   <player-icon-shape :filled="true" :iconColour="getPlayerColor(attack.attackingPlayerId)"
                     :shape="getPlayerShape(attack.attackingPlayerId)" />
-                </span>
-
-                {{ getPlayerById(attack.attackingPlayerId).alias }}
+                </span>{{ getPlayerById(attack.attackingPlayerId).alias }}
               </a>
             </td>
             <td>
               <specialist-icon :type="'carrier'" :defaultIcon="'rocket'"
                 :specialist="attack.specialist"></specialist-icon>
-              <a href="javascript:;" @click="onOpenCarrierDetailRequested(attack.carrierId)">
-                {{ attack.ships ? attack.ships : "???" }}
+              <a href="javascript:;" @click="onOpenCarrierDetailRequested(attack.carrierId)">{{ attack.ships ? attack.ships : "???" }}
               </a>
             </td>
             <td class="text-end">
