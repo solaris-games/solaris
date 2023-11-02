@@ -31,11 +31,14 @@
             <td>
               <specialist-icon :type="'carrier'" :defaultIcon="'rocket'"
                 :specialist="attack.specialist"></specialist-icon>
-              <a href="javascript:;" @click="onOpenCarrierDetailRequested(attack.carrierId)">{{ attack.ships ? attack.ships : "???" }}
+              <a href="javascript:;" @click="onOpenCarrierDetailRequested(attack.carrierId)">{{ attack.ships ?
+                attack.ships : "???" }}
               </a>
             </td>
             <td class="text-end">
-              {{ carrierTimers.find(t => t.carrier._id === attack.carrierId).timeRemainingEta }}
+              <span v-if="carrierTimers.some(t => t.carrier._id === attack.carrierId)">
+                {{ carrierTimers.find(t => t.carrier._id === attack.carrierId).timeRemainingEta }}
+              </span>
             </td>
 
           </tr>
@@ -76,30 +79,27 @@ export default {
 
     this.carrierTimers = this.event.data.attacks.map(attack => {
       let c = GameHelper.getCarrierById(this.$store.state.game, attack.carrierId)
+      if (!c) return null
 
       return {
         carrier: c,
         timeRemainingEta: '',
       }
-    })
+    }).filter(t => t)
 
     this.recalculateTimeRemaining()
 
     this.sortedAttacks = this.event.data.attacks.sort((a, b) => {
       // First, compare by time in ascending order
-      let aCarrier = this.carrierTimers.find(t => t.carrier && (t.carrier._id === a.carrierId)).carrier
-      let bCarrier = this.carrierTimers.find(t => t.carrier && (t.carrier._id === b.carrierId)).carrier
 
-      if (aCarrier && bCarrier) {
-        let aTicks = aCarrier.waypoints[0].ticksEta
-        let bTicks = bCarrier.waypoints[0].ticksEta
+      let aTicks = this.getCarrierTicksEtaFromTimers(a.carrierId)
+      let bTicks = this.getCarrierTicksEtaFromTimers(b.carrierId)
 
-        if (aTicks && bTicks) {
-          if (aTicks < bTicks) {
-            return -1;
-          } else if (aTicks > bTicks) {
-            return 1;
-          }
+      if (aTicks && bTicks) {
+        if (aTicks < bTicks) {
+          return -1;
+        } else if (aTicks > bTicks) {
+          return 1;
         }
       }
 
@@ -158,13 +158,37 @@ export default {
 
       }
     },
+    getCarrierTicksEtaFromTimers(carrierId) {
+      // vue doesn't like question mark?, manually check each reference?
+      if (!carrierId) return 0
+
+      let timerEntry = this.carrierTimers.find(t => {
+        if (t.carrier === undefined) return false
+        return t.carrier._id === carrierId
+      })
+      if (!timerEntry) return 0
+
+      let carrier = timerEntry.carrier
+      if (!carrier) return 0
+
+      let waypoints = carrier.waypoints
+      if (!waypoints) return 0
+
+      let nextWaypoint = waypoints[0]
+      if (!nextWaypoint) return 0
+
+      return nextWaypoint.ticksEta
+    },
     onOpenPlayerDetailRequested(e) {
       this.$emit('onOpenPlayerDetailRequested', e)
     },
     onOpenCarrierDetailRequested(e) {
-      this.$emit('onOpenCarrierDetailRequested', e)
+      //check that the carrier is still visible, maybe show some error?
+      if (GameHelper.getCarrierById(this.$store.state.game, e)) {
+        this.$emit('onOpenCarrierDetailRequested', e)
+      }
     },
-  }
+  },
 }
 </script>
 

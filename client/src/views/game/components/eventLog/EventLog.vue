@@ -43,7 +43,6 @@ export default {
       this.$emit('onOpenPlayerDetailRequested', e)
     },
     onOpenCarrierDetailRequested(e) {
-      console.log('eventLog')
       this.$emit('onOpenCarrierDetailRequested', e)
     },
     async checkForUnreadEvents () {
