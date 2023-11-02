@@ -887,20 +887,14 @@ export default class StarService extends EventEmitter {
         }
     }
 
-    async addInboundAttackNotified(game: Game, star: Star, carrierId: DBObjectId) {
+    async addInboundAttackNotified(game: Game, starId: DBObjectId, carrierId: DBObjectId) {
         
-        if(star.inboundAttacksNotified?.some(c => c.toString() === carrierId.toString())) {
-            // Should not happen
-            console.log('addInboundAttackNotified this star already notified this carrier attack')
-            return;
-        }
-
         await this.gameRepo.updateOne({
             _id: game._id,
-            'galaxy.stars._id': star._id
+            'galaxy.stars._id': starId
         }, {
-            $set: {
-                'galaxy.stars.$.inboundAttacksNotified': [...star.inboundAttacksNotified!, carrierId],
+            $addToSet: {
+                'galaxy.stars.$.inboundAttacksNotified': [carrierId],
             }
         });
 

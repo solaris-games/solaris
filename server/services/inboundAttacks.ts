@@ -6,15 +6,15 @@ import { Carrier } from "./types/Carrier";
 import { DBObjectId } from "./types/DBObjectId";
 import { Game } from "./types/Game";
 import { Star } from "./types/Star";
-import PlayerInboundAttacksEvent from "./types/events/PlayerInboundAttacksEvent";
 import StarService from "./star";
 import SpecialistService from "./specialist";
+import { PlayerInboundAttacksEvent } from "./types/events/PlayerInboundAttacksEvent";
 
 export const InboundAttacksServiceEvents = {
     onPlayerInboundAttacks: 'onPlayerInboundAttacks',
 }
 
-export interface InboundAttacks {
+interface _InboundAttacks {
     playerId: DBObjectId,
     starsUnderAttack: {
         star: Star,
@@ -44,25 +44,40 @@ export default class InboundAttacksService extends EventEmitter {
 
     notifyInboundAttacks(game: Game) {
 
-        let inboundAttacks: InboundAttacks[] = this._getInboundAttacks(game);
+        let inboundAttacks: _InboundAttacks[] = this._getInboundAttacks(game);
 
-        for (let playerUnderAttack of inboundAttacks) {
+        // Convert Player/Star/Carrier structure into something flatter for client
+        for (let inboundAttack of inboundAttacks) {
+            let playerId = inboundAttack.playerId;
             let e: PlayerInboundAttacksEvent = {
                 gameId: game._id,
                 gameTick: game.state.tick,
-                playerId: playerUnderAttack.playerId,
-                inboundAttacks: playerUnderAttack
+                playerId: playerId,
+                attacks: inboundAttack.starsUnderAttack
+                    .flatMap(starUnderAttack =>
+                        starUnderAttack.attackers.map((attacker: Carrier) => {
+                            let hideShips = attacker.specialist?.modifiers.special?.hideShips
+                            return {
+                                playerId: playerId!,
+                                starId: starUnderAttack.star._id!,
+                                attackingPlayerId: attacker.ownedByPlayerId!,
+                                carrierId: attacker._id!,
+                                ships: hideShips ? null : attacker.ships!,
+                                specialist: attacker.specialist!
+                            }
+                        })
+                    )
             }
             this.emit(InboundAttacksServiceEvents.onPlayerInboundAttacks, e);
         }
+
     }
 
     // Sets carrier->star notification flag
     // Don't do this directly from notifyInboundAttacks, let notificationService do it after success
-    async setNotificationFlag(game: Game, carrier: Carrier) {
-        let destinationStar = this._getCarrierDestination(game, carrier)
-        if (!destinationStar) return
-        await this.starService.addInboundAttackNotified(game, destinationStar, carrier._id)
+    async setNotificationFlag(game: Game, starId: DBObjectId, carrierId: DBObjectId) {
+        if (!starId || !carrierId) return
+        await this.starService.addInboundAttackNotified(game, starId, carrierId)
     }
 
     // Unsets carrier->star notification flag
@@ -73,14 +88,14 @@ export default class InboundAttacksService extends EventEmitter {
         await this.starService.removeInboundAttackNotified(game, destinationStar, carrier._id)
     }
 
-    _getInboundAttacks(game: Game): InboundAttacks[] {
+    _getInboundAttacks(game: Game): _InboundAttacks[] {
         let movingCarriers = game.galaxy.carriers.filter(c => c.waypoints.length);
 
         let attackingCarriers = movingCarriers
             .filter(c => this._checkForVisibleAttack(game, c))
             .filter(c => !this._checkForAlreadyNotified(game, c))
 
-        let inboundAttacks: InboundAttacks[] = []
+        let inboundAttacks: _InboundAttacks[] = []
         // Build inboundAttacks struct
         for (let carrier of attackingCarriers) {
 
@@ -140,7 +155,7 @@ export default class InboundAttacksService extends EventEmitter {
         if (carrier.isGift) return false
 
         // Check if the carrier hasn't left yet
-        if(carrier.orbiting) return false
+        if (carrier.orbiting) return false
 
         // Check if the players are allied
         if (this.diplomacyService.isDiplomaticStatusBetweenPlayersAllied(game, [carrierOwner!, destinationOwner!])) return false

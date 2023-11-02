@@ -16,9 +16,9 @@ import GameEndedEvent from './types/events/GameEnded';
 import GameTurnEndedEvent from './types/events/GameTurnEnded';
 import ConversationMessageSentEvent from './types/events/ConversationMessageSent';
 import GameJoinService, { GameJoinServiceEvents } from './gameJoin';
-import PlayerInboundAttacksEvent from './types/events/PlayerInboundAttacksEvent';
 import StarService from './star';
 import InboundAttacksService, { InboundAttacksServiceEvents } from './inboundAttacks';
+import { PlayerInboundAttacksEvent } from './types/events/PlayerInboundAttacksEvent';
 
 // Note: We only support discord subscriptions at this point, if any new ones are added
 // this class will need to be refactored to use something like the strategy pattern.
@@ -272,8 +272,7 @@ export default class NotificationService {
 
                 //TODO build a real discord message, this is a placeholder
 
-                let starNames = args.inboundAttacks.starsUnderAttack.map(a => a.star.name)
-                const template = this._generateBaseDiscordMessageTemplate(game, 'Incoming Attack', `Some (${starNames.length}) of your stars are under attack! ${starNames}` );
+                const template = this._generateBaseDiscordMessageTemplate(game, 'Incoming Attack', `Some (${args.attacks.length}) of your stars are under attack!` );
 
 
                 await this.discordService.sendMessageOAuth(user, template);

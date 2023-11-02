@@ -36,8 +36,8 @@ import GameDiplomacyPeaceDeclaredEvent from "./types/events/GameDiplomacyPeaceDe
 import GameDiplomacyWarDeclaredEvent from "./types/events/GameDiplomacyWarDeclared";
 import ValidationError from "../errors/validation";
 import GameJoinService, { GameJoinServiceEvents } from "./gameJoin";
-import PlayerInboundAttacksEvent from "./types/events/PlayerInboundAttacksEvent";
 import InboundAttacksService, { InboundAttacksServiceEvents } from "./inboundAttacks";
+import { PlayerInboundAttacksEvent } from "./types/events/PlayerInboundAttacksEvent";
 
 const moment = require('moment');
 
@@ -83,7 +83,7 @@ export default class EventService {
         PLAYER_CONVERSATION_LEFT: 'playerConversationLeft',
         PLAYER_DIPLOMACY_STATUS_CHANGED: 'playerDiplomacyStatusChanged',
     }
-    
+
     eventModel;
     eventRepo: Repository<GameEvent>;
     broadcastService: BroadcastService;
@@ -167,7 +167,7 @@ export default class EventService {
         this.starService.on(StarServiceEvents.onPlayerStarAbandoned, (args) => this.createStarAbandonedEvent(args.gameId, args.gameTick, args.player, args.star));
         this.starService.on(StarServiceEvents.onPlayerStarDied, (args) => this.createStarDiedEvent(args.gameId, args.gameTick, args.playerId, args.starId, args.starName));
         this.starService.on(StarServiceEvents.onPlayerStarReignited, (args) => this.createStarReignitedEvent(args.gameId, args.gameTick, args.playerId, args.starId, args.starName));
-        
+
         this.starUpgradeService.on(StarUpgradeServiceEvents.onPlayerInfrastructureBulkUpgraded, (args) => this.createInfrastructureBulkUpgraded(args.gameId, args.gameTick, args.player, args.upgradeSummary));
 
         this.tradeService.on(TradeServiceEvents.onPlayerCreditsReceived, (args) => this.createCreditsReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.amount));
@@ -427,16 +427,14 @@ export default class EventService {
     }
 
     async createPlayerInboundAttacksEvent(data: PlayerInboundAttacksEvent) {
-        let playerEvent = await this.createPlayerEvent(data.gameId, data.gameTick, data.playerId!, this.EVENT_TYPES.PLAYER_INBOUND_ATTACKS, data);
 
-        console.log(`createPlayerInboundAttacksEvent ${JSON.stringify(data)}`)
+        let playerEvent = await this.createPlayerEvent(data.gameId, data.gameTick, data.playerId!, this.EVENT_TYPES.PLAYER_INBOUND_ATTACKS, data);
 
         // Save carrier->star events sent
         let game = await this.gameService.getById(data.gameId)
-        for (let starUnderAttack of data.inboundAttacks.starsUnderAttack) {
-            for (let carrier of starUnderAttack.attackers) {
-                await this.inboundAttacksService.setNotificationFlag(game!, carrier)
-            }
+        for (let attack of data.attacks) {
+            await this.inboundAttacksService.setNotificationFlag(game!, attack.starId, attack.carrierId)
+
         }
         return playerEvent
     }
@@ -473,7 +471,7 @@ export default class EventService {
 
         for (let defender of defenders) {
             let defenderCombatResult: CombatResult = this.combatService.sanitiseCombatResult(combatResult, defender);
-            
+
             await this.createPlayerEvent(gameId, gameTick, defender._id, this.EVENT_TYPES.PLAYER_COMBAT_CARRIER, { ...data, combatResult: defenderCombatResult });
         }
 
@@ -739,16 +737,16 @@ export default class EventService {
             tick: gameTick,
             type: {
                 $in: [
-                    this.EVENT_TYPES.GAME_DIPLOMACY_PEACE_DECLARED, 
+                    this.EVENT_TYPES.GAME_DIPLOMACY_PEACE_DECLARED,
                     this.EVENT_TYPES.GAME_DIPLOMACY_WAR_DECLARED
                 ]
             },
             $or: [
-                { 
+                {
                     'data.playerIdFrom': status.playerIdFrom,
                     'data.playerIdTo': status.playerIdTo
                 },
-                { 
+                {
                     'data.playerIdFrom': status.playerIdTo,
                     'data.playerIdTo': status.playerIdFrom
                 }
