@@ -825,11 +825,6 @@ export default class GameTickService extends EventEmitter {
     }
 
     _awardEndGameRank(game: Game, gameUsers: User[], awardCredits: boolean) {
-        // TODO: Rank for team games
-        if (this.gameTypeService.isTeamConquestGame(game)) {
-            return null;
-        }
-
         let rankingResult: GameRankingResult | null = null;
     
         // There must have been at least X production ticks in order for
@@ -839,11 +834,18 @@ export default class GameTickService extends EventEmitter {
         let canAwardRank = this.gameTypeService.isRankedGame(game) && game.state.productionTick > productionTickCap;
 
         if (canAwardRank) {
-            let leaderboard = this.leaderboardService.getGameLeaderboard(game).leaderboard;
+            if (this.gameTypeService.isTeamConquestGame(game)) {
+                let teamLeaderboard = this.leaderboardService.getTeamLeaderboard(game)!.leaderboard;
 
-            rankingResult = this.leaderboardService.addGameRankings(game, gameUsers, leaderboard);
+                rankingResult = this.leaderboardService.addTeamRankings(game, gameUsers, teamLeaderboard);
 
-            this.leaderboardService.incrementGameWinnerAchievements(game, gameUsers, leaderboard[0].player, awardCredits);
+                // TODO: What kind of awards do we want for team games?
+            } else {
+                let leaderboard = this.leaderboardService.getGameLeaderboard(game).leaderboard;
+
+                rankingResult = this.leaderboardService.addGameRankings(game, gameUsers, leaderboard);
+                this.leaderboardService.incrementGameWinnerAchievements(game, gameUsers, leaderboard[0].player, awardCredits);
+            }
         }
 
         // If the game is anonymous, then ranking results should be omitted from the game ended event.
