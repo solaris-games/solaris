@@ -12,7 +12,7 @@ import PlayerStatisticsService from "./playerStatistics";
 import RatingService from "./rating";
 import PlayerAfkService from "./playerAfk";
 import UserLevelService from "./userLevel";
-import {maxBy, sorterByProperty} from "./utils";
+import {maxBy, reverseSort, sorterByProperty} from "./utils";
 
 const moment = require('moment');
 
@@ -224,10 +224,50 @@ export default class LeaderboardService {
         });
 
         const sorterProperty = game.settings.conquest.victoryCondition === 'homeStarPercentage' ? 'capitalCount' : 'starCount';
-        leaderboard.sort(sorterByProperty(sorterProperty));
+        leaderboard.sort(reverseSort(sorterByProperty(sorterProperty)));
 
         return {
             leaderboard
+        };
+    }
+
+    addTeamRankings(game: Game, gameUsers: User[], leaderboard: LeaderboardTeam[]): GameRankingResult {
+        const leadingTeam = leaderboard[0];
+
+        const nonAfkInLeadingTeam = leadingTeam.team.players
+            .flatMap(pId => {
+                const player = this.playerService.getById(game, pId);
+                if (player && !player.afk) {
+                    return [player];
+                } else {
+                    return [];
+                }
+            });
+
+        const rankToAward = game.settings.general.playerLimit;
+        const rankPerPlayer = Math.floor(rankToAward / nonAfkInLeadingTeam.length);
+
+        const ranks = nonAfkInLeadingTeam.flatMap(player => {
+            const user = gameUsers.find(u => player.userId && u._id.toString() === player.userId.toString());
+
+            if (!user) {
+                return [];
+            }
+
+            const currentRank = user.achievements.rank;
+            const newRank = currentRank + rankPerPlayer;
+
+            return [{
+                playerId: player._id,
+                current: currentRank,
+                new: newRank
+            }];
+        });
+
+
+        return {
+            ranks,
+            eloRating: null
         };
     }
 
