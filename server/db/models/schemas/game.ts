@@ -198,7 +198,8 @@ const schema = new Schema({
 		winner: { type: Types.ObjectId, required: false, default: null },
 		winningTeam: { type: Types.ObjectId, required: false, default: null },
 		cleaned: { type: Types.Boolean, required: false, default: false }, // Represents if the events and history have been deleted.
-		leaderboard: [{ type: Types.ObjectId, required: false }]
+		leaderboard: [{ type: Types.ObjectId, required: false }],
+		teamLeaderboard: [{ type: Types.ObjectId, required: false }],
 	},
 	constants: {
 		distances: {
