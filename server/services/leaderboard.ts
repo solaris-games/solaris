@@ -13,6 +13,7 @@ import RatingService from "./rating";
 import PlayerAfkService from "./playerAfk";
 import UserLevelService from "./userLevel";
 import {maxBy, reverseSort, sorterByProperty} from "./utils";
+import TeamService from "./team";
 
 const moment = require('moment');
 
@@ -79,6 +80,7 @@ export default class LeaderboardService {
     gameStateService: GameStateService;
     badgeService: BadgeService;
     playerStatisticsService: PlayerStatisticsService;
+    teamService: TeamService;
 
     constructor(
         playerService: PlayerService,
@@ -89,7 +91,8 @@ export default class LeaderboardService {
         gameTypeService: GameTypeService,
         gameStateService: GameStateService,
         badgeService: BadgeService,
-        playerStatisticsService: PlayerStatisticsService
+        playerStatisticsService: PlayerStatisticsService,
+        teamService: TeamService
     ) {
         this.playerService = playerService;
         this.playerAfkService = playerAfkService;
@@ -100,6 +103,7 @@ export default class LeaderboardService {
         this.gameStateService = gameStateService;
         this.badgeService = badgeService;
         this.playerStatisticsService = playerStatisticsService;
+        this.teamService = teamService;
     }
 
     getGameLeaderboard(game: Game, sortingKey?: string): PlayerLeaderboard {
@@ -185,6 +189,22 @@ export default class LeaderboardService {
             leaderboard,
             fullKey: sortingKey ? SORTERS[sortingKey] : null
         };
+    }
+
+    getTeamLeaderboardPosition(game: Game, player: Player) {
+        if (game.state.teamLeaderboard == null) {
+            return null;
+        }
+
+        const playerId = player._id.toString();
+
+        console.log(playerId);
+
+        return game.state.teamLeaderboard.findIndex(tId => {
+            const team = this.teamService.getById(game, tId);
+
+            return team && team.players.find(pId => pId.toString() === playerId);
+        }) + 1;
     }
 
     getGameLeaderboardPosition(game: Game, player: Player) {
