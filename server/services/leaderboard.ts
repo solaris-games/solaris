@@ -452,6 +452,12 @@ export default class LeaderboardService {
             return teamWinner(winningTeams[0].team); // First team in array must have the highest count
         }
 
+        const lastTeamStanding = this.getLastTeamStanding(game, leaderboard);
+
+        if (lastTeamStanding) {
+            return teamWinner(lastTeamStanding);
+        }
+
         return null;
     }
 
@@ -511,6 +517,29 @@ export default class LeaderboardService {
         // If someone has reached the star limit then pick the first player who is not defeated.
         if (starWinners.length) {
             return leaderboard.filter(p => !p.player.defeated).map(p => p.player)[0];
+        }
+
+        return null;
+    }
+
+    getLastTeamStanding(game: Game, leaderboard: LeaderboardTeam[]): Team | null {
+        if (!game.galaxy.teams) {
+            return null;
+        }
+
+        const undefeatedTeams = game.galaxy.teams.filter(t => {
+            return t.players.some(pId => {
+                const player = this.playerService.getById(game, pId);
+                return player && !player.defeated;
+            });
+        });
+
+        if (undefeatedTeams.length === 1) {
+            return undefeatedTeams[0];
+        }
+
+        if (undefeatedTeams.length === 0) {
+            return leaderboard[0].team;
         }
 
         return null;
