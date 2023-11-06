@@ -570,7 +570,7 @@ class GameHelper {
   }
 
   isTeamConquest (game) {
-    return Boolean(game.settings.general.mode === 'teamConquest' && game.galaxy.teams)
+    return Boolean(game.settings.general.mode === 'teamConquest')
   }
   getGameStatusText (game) {
     if (this.isGamePendingStart(game)) {

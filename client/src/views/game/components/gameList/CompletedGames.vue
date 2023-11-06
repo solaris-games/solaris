@@ -22,6 +22,7 @@
                   <span v-if="game.userNotifications.position === 1" class="me-1"><i class="fas fa-medal gold"></i></span>
                   <span v-if="game.userNotifications.position === 2" class="me-1"><i class="fas fa-medal silver"></i></span>
                   <span v-if="game.userNotifications.position === 3" class="me-1"><i class="fas fa-medal bronze"></i></span>
+                  <span v-if="isTeamGame(game)" class="me-1"><i class="fas fa-users"></i></span>
                   <router-link :to="{ path: '/game/detail', query: { id: game._id } }" class="me-1">{{game.settings.general.name}}</router-link>
                   <br/>
                   <small>{{getGameTypeFriendlyText(game)}}</small>
@@ -84,6 +85,9 @@ export default {
     },
     getGameTypeFriendlyText (game) {
       return GameHelper.getGameTypeFriendlyText(game)
+    },
+    isTeamGame (game) {
+      return GameHelper.isTeamConquest(game)
     }
   }
 }
