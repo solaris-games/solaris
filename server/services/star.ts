@@ -195,6 +195,14 @@ export default class StarService extends EventEmitter {
             .map(c => c.orbiting!.toString());
     }
 
+    hasPlayerCarrierInOrbit(game: Game, star: Star, playerId: DBObjectId): boolean {
+        return game.galaxy.carriers
+            .filter(c => c.orbiting)
+            .filter(c => c.ownedByPlayerId!.toString() === playerId.toString())
+            .length >= 1
+
+    }
+
     listStarIdsWithPlayersCarriersInOrbit(game: Game, playerIds: DBObjectId[]): string[] {
         const ids = playerIds.map(p => p.toString());
 
@@ -887,13 +895,32 @@ export default class StarService extends EventEmitter {
         }
     }
 
-    async giftStar(game: Game, star: Star, receivingPlayer: Player) {
-        if (!star.ownedByPlayerId) {
-            throw new ValidationError(`Cannot transfer ownership of this star, no player owns this star.`);
+    async giftStar(game: Game, player: Player, starId: DBObjectId, recipientId: DBObjectId) {
+        // Alliance game only
+        if (game.settings.diplomacy.enabled === 'enabled') {
+            throw new ValidationError(`Cannot Gift Stars in Non-Alliance Games`)
         }
-        star.ownedByPlayerId = receivingPlayer._id;
-        star.shipsActual = 0;
-        star.ships = 0;
+        
+        // Get the star.
+        let star = game.galaxy.stars.find(x => x._id.toString() === starId.toString())!;
+
+        // Check the recipient.
+        if (this.hasPlayerCarrierInOrbit(game, star, recipientId))
+            {
+                throw new ValidationError(`Recipient needs to have a carrier present to take star`)
+        }
+
+
+        // Check whether the star is owned by the player
+        if (this.isOwnedByPlayer(star, player)) {
+            throw new ValidationError(`Cannot gift a star that is not owned by the player.`);
+        }
+
+        star.ownedByPlayerId = recipientId;
+        // Do we want to reset ships or transfer them too?
+        // I would assume we would want to transfer them
+        // star.shipsActual = 0;
+        // star.ships = 0;
 
         // Reset the ignore bulk upgrade statuses as it has been captured by a new player.
         this.resetIgnoreBulkUpgradeStatuses(star);

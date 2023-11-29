@@ -1,5 +1,5 @@
 import { DependencyContainer } from '../../services/types/DependencyContainer';
-import { mapToStarAbandonStarRequest, mapToStarBuildCarrierRequest, mapToStarDestroyInfrastructureRequest, mapToStarSetBulkIgnoreAllStatusRequest, mapToStarToggleBulkIgnoreStatusRequest, mapToStarUpgradeInfrastructureBulkRequest, mapToStarUpgradeInfrastructureRequest, StarUpgradeInfrastructureRequest } from '../requests/star';
+import { mapToStarAbandonStarRequest, mapToStarBuildCarrierRequest, mapToStarDestroyInfrastructureRequest, mapToStarGiftStarRequest, mapToStarSetBulkIgnoreAllStatusRequest, mapToStarToggleBulkIgnoreStatusRequest, mapToStarUpgradeInfrastructureBulkRequest, mapToStarUpgradeInfrastructureRequest, StarUpgradeInfrastructureRequest } from '../requests/star';
 
 export default (container: DependencyContainer) => {
     return {
@@ -153,6 +153,21 @@ export default (container: DependencyContainer) => {
                     req.player,
                     reqObj.starId);
     
+                return res.sendStatus(200);
+            } catch (err) {
+                return next(err);
+            }
+        },
+        gift: async (req, res, next) => {
+            try {
+                const reqObj = mapToStarGiftStarRequest(req.body);
+
+                await container.starService.giftStar(
+                    req.game,
+                    req.player,
+                    reqObj.starId,
+                    reqObj.recipientId);
+                
                 return res.sendStatus(200);
             } catch (err) {
                 return next(err);
