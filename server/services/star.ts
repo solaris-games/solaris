@@ -886,4 +886,23 @@ export default class StarService extends EventEmitter {
             starB.specialistId = null;
         }
     }
+
+    async giftStar(game: Game, star: Star, receivingPlayer: Player) {
+        if (!star.ownedByPlayerId) {
+            throw new ValidationError(`Cannot transfer ownership of this star, no player owns this star.`);
+        }
+        star.ownedByPlayerId = receivingPlayer._id;
+        star.shipsActual = 0;
+        star.ships = 0;
+
+        // Reset the ignore bulk upgrade statuses as it has been captured by a new player.
+        this.resetIgnoreBulkUpgradeStatuses(star);
+
+        // Make sure king of the hill resets properly
+        if (this.gameTypeService.isKingOfTheHillMode(game) && 
+        this.gameStateService.isCountingDownToEndInLastCycle(game) &&
+        this.isKingOfTheHillStar(star)) {
+        this.gameStateService.setCountdownToEndToOneCycle(game);
+    }
+    }
 }
