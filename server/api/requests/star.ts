@@ -113,6 +113,11 @@ export interface StarAbandonStarRequest {
     starId: DBObjectId;
 };
 
+export interface StarGiftStarRequest {
+    starId: DBObjectId;
+    recipientId: DBObjectId;
+}
+
 export const mapToStarAbandonStarRequest = (body: any): StarAbandonStarRequest => {
     let errors: string[] = [];
 
@@ -128,6 +133,27 @@ export const mapToStarAbandonStarRequest = (body: any): StarAbandonStarRequest =
         starId: body.starId
     }
 };
+
+export const mapToStarGiftStarRequest = (body: any): StarGiftStarRequest => {
+    let errors: string[] = [];
+
+    if (!keyHasStringValue(body, 'starId')) {
+        errors.push('Star ID is required.');
+    }
+
+    if (!keyHasStringValue(body, 'recipientPlayerId')) {
+        errors.push('Recipient Player ID required.')
+    }
+
+    if (errors.length) {
+        throw new ValidationError(errors);
+    }
+
+    return {
+        starId: body.starId,
+        recipientId: body.recipientPlayerId
+    }
+}
 
 export interface StarToggleBulkIgnoreStatusRequest {
     starId: DBObjectId;
