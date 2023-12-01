@@ -135,6 +135,10 @@ export default class GameCreateService {
             throw new ValidationError(`Cannot create a galaxy of ${desiredStarCount} stars with ${game.settings.player.startingStars} stars per player.`);
         }
 
+        if (desiredStarCount > 1000) {
+            throw new ValidationError(`Galaxy size cannot exceed 1000 stars.`);
+        }
+
         // Ensure that c2c combat is disabled for orbital games.
         if (game.settings.orbitalMechanics.enabled === 'enabled' && game.settings.specialGalaxy.carrierToCarrierCombat === 'enabled') {
             game.settings.specialGalaxy.carrierToCarrierCombat = 'disabled';
