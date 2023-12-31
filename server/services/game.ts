@@ -1,3 +1,5 @@
+import moment from "moment/moment";
+
 const EventEmitter = require('events');
 import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
@@ -239,6 +241,29 @@ export default class GameService extends EventEmitter {
 
         if (game.state.startDate == null) {
             throw new ValidationError('Cannot pause a game that has not yet started.');
+        }
+
+        if (!pauseState) {
+            // Reset afk timers
+            for (const player of game.galaxy.players) {
+                if (player.afk) {
+                    continue;
+                }
+
+                const userId = player.userId;
+
+                if (!userId) {
+                    continue;
+                }
+
+                await this.userRepo.updateOne({
+                    _id: userId
+                }, {
+                    $set: {
+                        'lastSeen': moment().utc(),
+                    }
+                });
+            }
         }
         
         await this.gameRepo.updateOne({
