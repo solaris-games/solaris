@@ -68,6 +68,7 @@ import UserLevelService from "../userLevel";
 import SpecialStarBanService from "../specialStarBan";
 import ShipService from "../ship";
 import SpectatorService from "../spectator";
+import ScheduleBuyService from "../scheduleBuy"
 
 export interface DependencyContainer {
     config: Config,
@@ -140,4 +141,5 @@ export interface DependencyContainer {
     notificationService: NotificationService,
     shipService: ShipService,
     spectatorService: SpectatorService,
+    scheduleBuyService: ScheduleBuyService,
 };

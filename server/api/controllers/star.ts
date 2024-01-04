@@ -1,5 +1,5 @@
 import { DependencyContainer } from '../../services/types/DependencyContainer';
-import { mapToStarAbandonStarRequest, mapToStarBuildCarrierRequest, mapToStarDestroyInfrastructureRequest, mapToStarSetBulkIgnoreAllStatusRequest, mapToStarToggleBulkIgnoreStatusRequest, mapToStarUpgradeInfrastructureBulkRequest, mapToStarUpgradeInfrastructureRequest, StarUpgradeInfrastructureRequest } from '../requests/star';
+import { mapToStarAbandonStarRequest, mapToStarBuildCarrierRequest, mapToStarDestroyInfrastructureRequest, mapToStarSetBulkIgnoreAllStatusRequest, mapToStarToggleBulkIgnoreStatusRequest, mapToStarUpgradeInfrastructureBulkRequest, mapToScheduledStarUpgradeInfrastructureBulkRequest, mapToScheduledStarUpgradeToggleRepeat, mapToStarUpgradeInfrastructureRequest, StarUpgradeInfrastructureRequest } from '../requests/star';
 
 export default (container: DependencyContainer) => {
     return {
@@ -73,6 +73,39 @@ export default (container: DependencyContainer) => {
                     +reqObj.amount);
     
                 return res.status(200).json(summary);
+            } catch (err) {
+                return next(err);
+            }
+        },
+        scheduleBulk: async (req, res, next) => {
+            console.log('show me that this works')
+            try {
+                const reqObj = mapToScheduledStarUpgradeInfrastructureBulkRequest(req.body);
+                
+                let summary = await container.scheduleBuyService.addScheduledBuy(
+                    req.game,
+                    req.player,
+                    reqObj.infrastructureType,
+                    reqObj.buyType,
+                    reqObj.amount,
+                    reqObj.repeat,
+                    reqObj.tick); 
+
+                return res.status(200).json(summary);
+            } catch (err) {
+                return next(err);
+            }
+        },
+        toggleBulkRepeat: async (req, res, next) => {
+            try {
+                const reqObj = mapToScheduledStarUpgradeToggleRepeat(req.body);
+
+                await container.scheduleBuyService.toggleBulkRepeat(
+                    req.game,
+                    req.player,
+                    reqObj._id);
+    
+                return res.sendStatus(200);
             } catch (err) {
                 return next(err);
             }
