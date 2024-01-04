@@ -144,6 +144,7 @@ export default class PlayerService extends EventEmitter {
             reputations: [],
             diplomacy: [],
             spectators: [],
+            scheduledActions: []
         };
 
         this._setDefaultResearchTechnology(game, player as any);

@@ -19,15 +19,17 @@
             </span>
             <select class="form-select" id="strategyType" v-on:change="resetPreview" v-model="selectedUpgradeStrategy" :disabled="isChecking || isUpgrading">
               <option value="totalCredits">Spend credits</option>
+              <option value="percentageOfCredits">Spend percentage of credits</option>
               <option value="infrastructureAmount">Buy infrastructure amount</option>
               <option value="belowPrice">Buy below price</option>
             </select>
           </div>
         </div>
         <div class="row">
-          <div class="mb-2 input-group col pe-1">
+          <div class="mb-2 input-group col">
             <span class="input-group-text">
               <i class="fas fa-dollar-sign" v-if="selectedUpgradeStrategy === 'totalCredits'"></i>
+              <i class="fas fa-percent" v-if="selectedUpgradeStrategy === 'percentageOfCredits'"></i>
               <i class="fas fa-dollar-sign" v-if="selectedUpgradeStrategy === 'belowPrice'"></i>
               <i class="fas fa-industry" v-if="selectedUpgradeStrategy === 'infrastructureAmount'"></i>
             </span>
@@ -40,8 +42,8 @@
               :disabled="isChecking || isUpgrading"
             />
           </div>
-          <div class="mb-2 col ps-0 pe-0">
-            <select class="form-control" id="infrastructureType" v-on:change="resetPreview" v-model="selectedType" :disabled="isChecking || isUpgrading">
+          <div class="mb-2 col">
+            <select class="form-select" id="infrastructureType" v-on:change="resetPreview" v-model="selectedType" :disabled="isChecking || isUpgrading">
               <option
                 v-for="opt in types"
                 v-bind:key="opt.key"
@@ -49,8 +51,51 @@
               >{{ opt.name }}</option>
             </select>
           </div>
-          <div class="mb-2 col-4 ps-1">
-            <div class="d-grid gap-2">
+        </div>
+        <div class="row">
+          <div class="mb-2 input-group col">
+            <span class="input-group-text">
+              <i class="fas fa-hourglass"></i>
+            </span>
+            <select class="form-select" id="scheduleType" v-on:change="resetPreview" v-model="selectedScheduleStrategy" :disabled="isChecking || isUpgrading">
+              <option value="now">Now</option>
+              <option value="future">Future</option>
+            </select>
+          </div>
+        </div>
+        <div class="row" v-if="selectedScheduleStrategy === 'future'">
+          <div class="mb-2 input-group col">
+            <span class="input-group-text">
+              <i class="fas fa-clock"></i>
+            </span>
+            <input v-on:input="resetHasChecked"
+              class="form-control"
+              id="tick"
+              v-model="tick"
+              type="number"
+              required="required"
+              :disabled="isChecking || isUpgrading"
+            />
+          </div>
+          <div class="mb-2 input-group col">
+            <span class="input-group-text">
+              <i class="fas fa-sync"></i>
+            </span>
+            <select class="form-select" id="repeat" v-on:change="resetPreview" v-model="repeat" :disabled="isChecking || isUpgrading">
+              <option value="false">One time only</option>
+              <option value="true">Repeat every cycle</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          {{ this.$store.state.game._id }}
+        </div>
+        <div class="row">
+          {{ selectedUpgradeStrategy + selectedScheduleStrategy + amount + selectedType + tick + repeat }}
+        </div>
+        <div class="row">
+          <div class="mb-2 col">
+            <div class="d-grid">
               <button class="btn btn-outline-info" v-on:click="check"
                 :disabled="$isHistoricalMode() || isUpgrading || isChecking || gameIsFinished()" ><i class="fas fa-hammer me-1"></i>Check</button>
             </div>
@@ -107,6 +152,11 @@
         </table>
       </div>
 
+      <div v-if="true">
+        <h4 class="mt-2">Scheduled Buy Actions</h4>
+
+        <scheduled-table @bulkIgnoreChanged="resetPreview" :highlightIgnoredInfrastructure="selectedType"/>
+      </div>
       <h4 class="mt-2">Bulk Ignore Stars</h4>
 
       <star-table @onOpenStarDetailRequested="onOpenStarDetailRequested" @bulkIgnoreChanged="resetPreview" :highlightIgnoredInfrastructure="selectedType"/>
@@ -121,6 +171,7 @@ import starService from '../../../../services/api/star'
 import GameHelper from '../../../../services/gameHelper'
 import AudioService from '../../../../game/audio'
 import GameContainer from '../../../../game/container'
+import BulkInfrastructureUpgradeScheduleTable from './BulkInfrastructureUpgradeScheduleTable'
 import BulkInfrastructureUpgradeStarTableVue from './BulkInfrastructureUpgradeStarTable'
 import LoadingSpinner from '../../../components/LoadingSpinner'
 
@@ -128,6 +179,7 @@ export default {
   components: {
     'menu-title': MenuTitle,
     'form-error-list': FormErrorList,
+    'scheduled-table': BulkInfrastructureUpgradeScheduleTable,
     'star-table': BulkInfrastructureUpgradeStarTableVue,
     'loading-spinner': LoadingSpinner
   },
@@ -146,6 +198,9 @@ export default {
       ignoredCount: 0,
       selectedType: 'economy',
       selectedUpgradeStrategy: 'totalCredits',
+      selectedScheduleStrategy: 'now',
+      repeat: false,
+      tick: this.$store.state.game.state.tick,
       types: []
     }
   },
@@ -210,34 +265,63 @@ export default {
     async check () {
       this.errors = []
       this.upgradePreview = null
-
-      if (this.amount <= 0) {
+      if (this.amount <= 0 || ( this.selectedUpgradeStrategy === 'percentageOfCredits' && this.amount > 100)) {
+        // We cannot spend 0 or fewer credits and we cannot spend more than 100 percent of what we have.
         return
       }
 
-      try {
-        this.upgradeAvailable = 0
-        this.cost = 0
-        this.isChecking = true
-        let response = await starService.checkBulkUpgradedAmount(
+      if (this.selectedScheduleStrategy === 'future' && this.tick < this.$store.state.game.state.tick) {
+        // We cannot schedule actions to happen in the past.
+        return
+      }
+
+      this.isChecking = true
+      if(this.selectedScheduleStrategy === 'future') {
+        // When actions are scheduled in the future, they get added to the TODO list.
+        try {
+          let response = await starService.scheduleBulkInfrastructureUpgrade(
           this.$store.state.game._id,
           this.selectedUpgradeStrategy,
           this.selectedType,
-          this.amount
-        )
-        if (response.status === 200) {
-          AudioService.join()
-          this.upgradePreview = response.data
-          this.upgradeAvailable = response.data.upgraded
-          this.cost = response.data.cost
-          this.previewAmount = response.data.budget
-          this.ignoredCount = response.data.ignoredCount
+          this.amount,
+          this.repeat,
+          this.tick
+          )
+          if (response.status === 200) {
+              AudioService.join()
+              /*this.upgradePreview = response.data
+              this.upgradeAvailable = response.data.upgraded
+              this.cost = response.data.cost
+              this.previewAmount = response.data.budget
+              this.ignoredCount = response.data.ignoredCount*/
+            }
+        } catch (err) {
+          this.errors = err.response.data.errors || []
         }
-      } catch (err) {
+      } else {
+        try {
+          this.upgradeAvailable = 0
+          this.cost = 0
+          let response = await starService.checkBulkUpgradedAmount(
+            this.$store.state.game._id,
+            this.selectedUpgradeStrategy,
+            this.selectedType,
+            this.amount
+          )
+          if (response.status === 200) {
+            AudioService.join()
+            this.upgradePreview = response.data
+            this.upgradeAvailable = response.data.upgraded
+            this.cost = response.data.cost
+            this.previewAmount = response.data.budget
+            this.ignoredCount = response.data.ignoredCount
+            this.hasChecked = true
+          }
+        } catch (err) {
         this.errors = err.response.data.errors || []
+        }
       }
       this.isChecking = false
-      this.hasChecked = true
     },
     async upgrade () {
       this.errors = []
