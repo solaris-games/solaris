@@ -325,9 +325,8 @@ export default (container: DependencyContainer) => {
                 return next(err);
             }
         },
-        pause: async (req, res, next) => {
+        togglePaused: async (req, res, next) => {
             try {
-
                 const doPause = req.body?.pause;
 
                 if (doPause === null || doPause === undefined) {

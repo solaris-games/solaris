@@ -302,7 +302,7 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
             isUnlocked: true,
             isInProgress: true
         }),
-        controller.pause,
+        controller.togglePaused,
         mw.core.handleError);
 
     router.get('/api/game/:gameId/player/:playerId',

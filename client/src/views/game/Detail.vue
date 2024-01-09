@@ -75,7 +75,10 @@ export default {
   },
   methods: {
     canModifyPauseState () {
-      return this.game.state.startDate && this.game.settings.general.isGameAdmin && !GameHelper.isGamePendingStart(this.game);
+      return this.game.settings.general.isGameAdmin
+        && GameHelper.isGameStarted(this.game)
+        && !GameHelper.isGamePendingStart(this.game)
+        && !GameHelper.isGameFinished(this.game);
     },
     async loadGame () {
       this.isLoading = true
@@ -96,6 +99,9 @@ export default {
 
         try {
           await gameService.pause(this.game._id)
+
+          this.$toasted.show(`The game has been paused. Please notify the players.`, { type: 'success' })
+
           await this.loadGame()
         } catch (err) {
           console.error(err)
@@ -110,6 +116,9 @@ export default {
 
         try {
           await gameService.resume(this.game._id)
+
+          this.$toasted.show(`The game has been resumed. Please notify the players.`, { type: 'success' })
+
           await this.loadGame()
         } catch (err) {
           console.error(err)

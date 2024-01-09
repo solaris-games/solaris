@@ -228,42 +228,30 @@ export default class GameService extends EventEmitter {
         this.emit(GameServiceEvents.onPlayerDefeated, e);
     }
 
-    async setPauseState(game: Game, pauseState: boolean, pausingUser: DBObjectId) {
-        const gameCreator = game.settings.general.createdByUserId;
+    async setPauseState(game: Game, pauseState: boolean, pausingUserId: DBObjectId) {
+        const gameCreatorId = game.settings.general.createdByUserId;
 
-        if (!gameCreator || gameCreator.toString() !== pausingUser.toString()) {
+        if (!gameCreatorId || gameCreatorId.toString() !== pausingUserId.toString()) {
             throw new ValidationError('Only the game creator can pause the game.');
         }
 
-        if (game.state.endDate) {
-            throw new ValidationError('Cannot pause a game that has finished.');
-        }
-
-        if (game.state.startDate == null) {
-            throw new ValidationError('Cannot pause a game that has not yet started.');
+        if (!this.gameStateService.isInProgress(game)) {
+            throw new ValidationError('Cannot pause a game that is not in progress.');
         }
 
         if (!pauseState) {
-            // Reset afk timers
-            for (const player of game.galaxy.players) {
-                if (player.afk) {
-                    continue;
+            // Reset afk timers of the players
+            // Note: We do not want to update last seen of users as those
+            // are separate from the game afk logic.
+            await this.gameRepo.updateOne({
+                _id: game._id,
+                'galaxy.players.$.afk': false,
+                'galaxy.players.$.defeated': false
+            }, {
+                $set: {
+                    'galaxy.players.$.lastSeen': moment().utc(),
                 }
-
-                const userId = player.userId;
-
-                if (!userId) {
-                    continue;
-                }
-
-                await this.userRepo.updateOne({
-                    _id: userId
-                }, {
-                    $set: {
-                        'lastSeen': moment().utc(),
-                    }
-                });
-            }
+            });
         }
         
         await this.gameRepo.updateOne({
@@ -274,7 +262,6 @@ export default class GameService extends EventEmitter {
             }
         });
     }
-
 
     async delete(game: Game, deletedByUserId?: DBObjectId) {
         // If being deleted by a legit user then do some validation.
