@@ -1,3 +1,5 @@
+import moment from "moment/moment";
+
 const EventEmitter = require('events');
 import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
@@ -224,6 +226,41 @@ export default class GameService extends EventEmitter {
         };
 
         this.emit(GameServiceEvents.onPlayerDefeated, e);
+    }
+
+    async setPauseState(game: Game, pauseState: boolean, pausingUserId: DBObjectId) {
+        const gameCreatorId = game.settings.general.createdByUserId;
+
+        if (!gameCreatorId || gameCreatorId.toString() !== pausingUserId.toString()) {
+            throw new ValidationError('Only the game creator can pause the game.');
+        }
+
+        if (!this.gameStateService.isInProgress(game)) {
+            throw new ValidationError('Cannot pause a game that is not in progress.');
+        }
+
+        if (!pauseState) {
+            // Reset afk timers of the players
+            // Note: We do not want to update last seen of users as those
+            // are separate from the game afk logic.
+            await this.gameRepo.updateOne({
+                _id: game._id,
+                'galaxy.players.$.afk': false,
+                'galaxy.players.$.defeated': false
+            }, {
+                $set: {
+                    'galaxy.players.$.lastSeen': moment().utc(),
+                }
+            });
+        }
+        
+        await this.gameRepo.updateOne({
+            _id: game._id
+        }, {
+            $set: {
+                'state.paused': pauseState
+            }
+        });
     }
 
     async delete(game: Game, deletedByUserId?: DBObjectId) {
