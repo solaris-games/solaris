@@ -97,24 +97,23 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
         controller.upgradeBulkCheck,
         mw.core.handleError);
 
-    router.put('api/game/:gameId/star/upgrade/scheduleBulk',
-    mw.auth.authenticate(),
-    mw.game.loadGame({
-        lean: true,
-        settings: true,
-        state: true,
-        galaxy: true,
-        constants: true
-    }),
-    mw.game.validateGameState({
-        isUnlocked: true,
-        isNotFinished: true
-    }),
-    mw.player.loadPlayer,
-    mw.player.validatePlayerState({ isPlayerUndefeated: true }),
-    controller.scheduleBulk,
-    mw.core.handleError
-    )
+    router.put('/api/game/:gameId/star/upgrade/scheduleBulk',
+        mw.auth.authenticate(),
+        mw.game.loadGame({
+            lean: true,
+            settings: true,
+            state: true,
+            galaxy: true,
+            constants: true
+        }),
+        mw.game.validateGameState({
+            isUnlocked: true,
+            isNotFinished: true
+        }),
+        mw.player.loadPlayer,
+        mw.player.validatePlayerState({ isPlayerUndefeated: true }),
+        controller.scheduleBulk,
+        mw.core.handleError);
 
     router.put('api/game/:gameId/star/upgrade/toggleBulkRepeat',
     mw.auth.authenticate(),

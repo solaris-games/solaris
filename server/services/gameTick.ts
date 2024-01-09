@@ -202,8 +202,8 @@ export default class GameTickService extends EventEmitter {
 
             logTime(`Tick ${game.state.tick}`);
 
-            await this.scheduleBuyService._buyScheduledInfrastructure(game);
-            logTime('Buy scheduled infrastructure')
+            // await this.scheduleBuyService._buyScheduledInfrastructure(game);
+            // logTime('Buy scheduled infrastructure')
 
             await this._captureAbandonedStars(game, gameUsers);
             logTime('Capture abandoned stars');
