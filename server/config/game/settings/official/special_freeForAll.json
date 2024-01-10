@@ -79,7 +79,7 @@
       "enabled": "disabled",
       "shipsPerStar": 100
     },
-    "allowAbandonStars": "enabled"
+    "allowAbandonStars": "disabled"
   },
   "diplomacy": {
     "enabled": "disabled",

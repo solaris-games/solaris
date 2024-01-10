@@ -39,6 +39,7 @@ import GameEndedEvent from "./types/events/GameEnded";
 import PlayerAfkService from "./playerAfk";
 import ShipService from "./ship";
 import ScheduleBuyService from "./scheduleBuy";
+import ScheduleBuyService from "./scheduleBuy";
 
 const EventEmitter = require('events');
 const moment = require('moment');
@@ -83,6 +84,7 @@ export default class GameTickService extends EventEmitter {
     playerReadyService: PlayerReadyService;
     shipService: ShipService;
     scheduleBuyService: ScheduleBuyService;
+    scheduleBuyService: ScheduleBuyService;
     
     constructor(
         distanceService: DistanceService,
@@ -114,6 +116,7 @@ export default class GameTickService extends EventEmitter {
         starContestedService: StarContestedService,
         playerReadyService: PlayerReadyService,
         shipService: ShipService,
+        scheduleBuyService: ScheduleBuyService,
         scheduleBuyService: ScheduleBuyService
     ) {
         super();
@@ -147,6 +150,7 @@ export default class GameTickService extends EventEmitter {
         this.starContestedService = starContestedService;
         this.playerReadyService = playerReadyService;
         this.shipService = shipService;
+        this.scheduleBuyService = scheduleBuyService;
         this.scheduleBuyService = scheduleBuyService;
     }
 
@@ -204,6 +208,9 @@ export default class GameTickService extends EventEmitter {
 
             await this.scheduleBuyService._buyScheduledInfrastructure(game);
             logTime('Buy scheduled infrastructure')
+
+            // await this.scheduleBuyService._buyScheduledInfrastructure(game);
+            // logTime('Buy scheduled infrastructure')
 
             await this._captureAbandonedStars(game, gameUsers);
             logTime('Capture abandoned stars');

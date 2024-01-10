@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import VueSocketio from 'vue-socket.io' // NOTE: There is an issue with >3.0.7 so forced to use 3.0.7, see here: https://stackoverflow.com/questions/61769716/vue-socket-connection-not-triggered
-import VueGtag from 'vue-gtag'
 import Toasted from 'vue-toasted'
 import App from './App.vue'
 import router from './router'
@@ -29,14 +28,6 @@ Vue.use(new VueSocketio({
     mutationPrefix: 'SOCKET_'
   }
 }))
-
-let trackingCode = process.env.VUE_APP_GOOGLE_ANALYTICS_TRACKING_CODE
-
-if (trackingCode) {
-  Vue.use(VueGtag, {
-    config: { id: trackingCode }
-  }, router)
-}
 
 Vue.use(Toasted, {
   position: 'bottom-right',
