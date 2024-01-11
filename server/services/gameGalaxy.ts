@@ -198,8 +198,11 @@ export default class GameGalaxyService {
         // can't see and therefore global stats should display what the current player can see
         // instead of their actual values.
         // TODO: Better to not overwrite, but just not do it above in the first place?
+        // Also, remove the leaderboard, since it should not be visible to players in extra
+        // dark mode games.
         if (this.gameTypeService.isDarkModeExtra(game)) {
             this._setPlayerStats(game);
+            delete game.state.leaderboard;
         }
 
         // If any kind of dark mode, remove the galaxy center from the constants.
