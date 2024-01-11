@@ -41,10 +41,10 @@ class StarService extends BaseApiService {
       { withCredentials: true })
   }
 
-  scheduleBulkInfrastructureUpgrade (gameId, infrastructureType, buyType, amount, repeat, tick) {
+  scheduleBulkInfrastructureUpgrade (gameId, buyType, infrastructureType, amount, repeat, tick) {
     return axios.put(this.BASE_URL + 'game/' + gameId + '/star/upgrade/scheduleBulk', {
-      infrastructureType,
       buyType,
+      infrastructureType,
       amount,
       repeat,
       tick
@@ -53,7 +53,14 @@ class StarService extends BaseApiService {
   }
 
   bulkScheduleRepeatChanged (gameId, actionId) {
-    return axios.put(this.BASE_URL + 'game/' + gameId + '/star/toggleBulkRepeat', {
+    return axios.put(this.BASE_URL + 'game/' + gameId + '/star/upgrade/toggleBulkRepeat', {
+      actionId
+    },
+    { withCredentials: true })
+  }
+
+  trashScheduledUpgrade (gameId, actionId) {
+    return axios.put(this.BASE_URL + 'game/' + gameId + '/star/upgrade/trashBulk', {
       actionId
     },
     { withCredentials: true })

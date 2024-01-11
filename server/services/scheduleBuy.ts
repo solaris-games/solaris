@@ -1,16 +1,23 @@
 const mongoose = require('mongoose');
 
-import { DBObjectId } from "./types/DBObjectId";
+import ValidationError from '../errors/validation';
+import Repository from './repository';
 import { Game } from "./types/Game";
 import { Player, PlayerScheduledActions } from "./types/Player";
 import { ObjectId } from "mongoose";
 
 const EventEmitter = require('events');
 
-export default class ResearchService extends EventEmitter {
+export default class ScheduleBuyService extends EventEmitter {
+    gameRepo: Repository<Game>;
+
+
     constructor(
+        gameRepo: Repository<Game>
     ) {
         super();
+
+        this.gameRepo = gameRepo;
     }
 
     _buyScheduledInfrastructure(game: Game) {
@@ -55,8 +62,7 @@ export default class ResearchService extends EventEmitter {
 
     }
 
-    addScheduledBuy(game: Game, player: Player, infrastructureType: string, buyType:string, amount:number, repeat: boolean, tick:number) {
-        console.log('addScheduledBuy')
+    async addScheduledBuy(game: Game, player: Player, buyType: string, infrastructureType:string, amount:number, repeat: boolean, tick:number) {
         let action: PlayerScheduledActions = {
             _id: mongoose.Types.ObjectId(),
             infrastructureType,
@@ -66,18 +72,53 @@ export default class ResearchService extends EventEmitter {
             tick
         }
 
-        // This need some sort of special database write.. However, currently this isnt executed anyway....
-        player.scheduledActions.push(action)
-        return 'succes'
+        await this.gameRepo.updateOne({
+            _id: game._id,
+            'galaxy.players._id': player._id
+        }, {
+            $push: {
+                'galaxy.players.$.scheduledActions': action
+            }
+        });
+        return action;
     }
 
-    toggleBulkRepeat(game: Game, player: Player, actionId: ObjectId) {
+    async toggleBulkRepeat(game: Game, player: Player, actionId: ObjectId) {
         let action = player.scheduledActions.find(a => a._id == actionId);
         if(!action) {
-            // TODO: Code error for this, it means that the client has a different set of actionids than the player?!?
-            return
+            throw new ValidationError('Action does not exist');
         }
-        
         action.repeat = !action.repeat
+
+        await this.gameRepo.updateOne({
+            _id: game._id,
+            'galaxy.players._id': player._id,
+            'galaxy.players.scheduledActions._id': actionId
+            
+        }, {
+            $set: {
+                'galaxy.players.$.scheduledActions.$[].repeat': action.repeat
+            }
+        });
+        return action;
+    }
+
+    async trashAction(game: Game, player: Player, actionId: ObjectId) {
+        let action = player.scheduledActions.find(a => a._id == actionId);
+        if(!action) {
+            throw new ValidationError('Action does not exist');
+        }
+
+        await this.gameRepo.updateOne({
+            _id: game._id,
+            'galaxy.players._id': player._id,
+        }, {
+            $pull: {
+                'galaxy.players.$.scheduledActions': {
+                    _id: actionId
+                }
+            }
+        })
+        // TODO: Event?
     }
 }

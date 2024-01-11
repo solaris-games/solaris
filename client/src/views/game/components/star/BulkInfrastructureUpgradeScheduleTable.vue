@@ -1,11 +1,5 @@
 <template>
 <div class="container">
-  <div class="row mb-2" v-if="tableData.length">
-    <div class="col-6 ps-0">
-      <input type="text" class="form-control form-control-sm" v-model="searchFilter" placeholder="Search...">
-    </div>
-  </div>
-  
   <div class="row"> <!-- v-if=" .length" -->
     <div class="table-responsive ps-0 pe-0">
       <table class="table table-striped table-hover mb-0">
@@ -21,8 +15,7 @@
           </thead>
           <tbody>
               <schedule-row v-for="action in sortedTableData" v-bind:key="action._id" :action="action"
-                @repeatChanged="onRepeatChanged"
-                @trashAction="onTrashAction"/>
+                @bulkScheduleTrashed="onTrashed"/>
           </tbody>
       </table>
     </div>
@@ -44,28 +37,23 @@ export default {
   data: function () {
     return {
       tableData: [],
-      sortBy: 'tick',
+      sortBy: null,
       sortDirection: true,
-      searchFilter: ''
     }
   },
   mounted () {
     this.tableData = this.getTableData()
   },
   methods: {
-    onRepeatChanged (e) {
-      this.$emit('bulkScheduleRepeatChanged', e);
-    },
-    onRepeatChanged (e) {
-      this.$emit('bulkScheduleTrash', e);
+    onTrashed () {
+      this.$emit('bulkScheduleTrashed')
+      this.tableData = this.getTableData() // Refresh the table data
     },
     getUserPlayer () {
       return GameHelper.getUserPlayer(this.$store.state.game)
     },
     getTableData () {
-      let sorter = (a, b) => a.tick - b.tick
-
-        return this.getUserPlayer().scheduledActions.sort(sorter)
+      return this.getUserPlayer().scheduledActions
     },
     sort (columnName) {
       // If sorting by a new column, reset the sort.

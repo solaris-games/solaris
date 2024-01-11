@@ -42,6 +42,10 @@ export interface ScheduledStarUpgradeToggleRepeat {
     _id: DBObjectId;
 };
 
+export interface ScheduledStarUpgradeTrash {
+    _id: DBObjectId;
+}
+
 export const mapToStarUpgradeInfrastructureBulkRequest = (body: any): StarUpgradeInfrastructureBulkRequest => {
     let errors: string[] = [];
 
@@ -74,7 +78,6 @@ export const mapToStarUpgradeInfrastructureBulkRequest = (body: any): StarUpgrad
 export const mapToScheduledStarUpgradeInfrastructureBulkRequest = (body: any): ScheduledStarUpgradeInfrastructureBulkRequest => {
     let errors: string[] = [];
 
-    console.log('scheduled values checks')
     if (!keyHasStringValue(body, 'infrastructureType')) {
         errors.push('Infrastructure is required.');
     }
@@ -100,6 +103,7 @@ export const mapToScheduledStarUpgradeInfrastructureBulkRequest = (body: any): S
     }
 
     body.amount = +body.amount;
+    body.tick = +body.tick;
 
     return {
         infrastructureType: body.infrastructureType,
@@ -113,7 +117,7 @@ export const mapToScheduledStarUpgradeInfrastructureBulkRequest = (body: any): S
 export const mapToScheduledStarUpgradeToggleRepeat = (body: any): ScheduledStarUpgradeToggleRepeat => {
     let errors: string[] = [];
 
-    if (!keyHasStringValue(body, '_id')) {
+    if (!keyHasStringValue(body, 'actionId')) {
         errors.push('ObjectId is required.');
     }
 
@@ -121,12 +125,26 @@ export const mapToScheduledStarUpgradeToggleRepeat = (body: any): ScheduledStarU
         throw new ValidationError(errors);
     }
 
-    body.amount = +body.amount;
-
     return {
-        _id: body._id
+        _id: body.actionId
     }
 };
+
+export const mapToScheduledStarUpgradeTrash = (body: any): ScheduledStarUpgradeTrash => {
+    let errors: string[] = [];
+
+    if (!keyHasStringValue(body, 'actionId')) {
+        errors.push('ObjectId is required.');
+    }
+
+    if (errors.length) {
+        throw new ValidationError(errors);
+    }
+
+    return {
+        _id: body.actionId
+    }
+}
 
 export interface StarDestroyInfrastructureRequest {
     starId: DBObjectId;

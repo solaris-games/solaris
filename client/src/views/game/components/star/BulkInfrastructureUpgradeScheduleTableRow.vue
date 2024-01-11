@@ -1,23 +1,27 @@
 <template>
 <tr>
-    <td class="sm-padding text-end">{{action.tick}}</td>
-    <td class="sm-padding text-end">{{action.infrastructureType}}</td>
+    <td class="sm-padding text-auto">{{action.tick}}</td>
+    <td class="sm-padding text">{{action.infrastructureType}}</td>
     <td class="sm-padding text-end">{{action.buyType}}</td>
     <td class="sm-padding text-end">{{action.amount}}</td>
     <td class="sm-padding text-end">
-      <repeat-bulk-upgrade :action="action" @bulkScheduleRepeatChanged="onRepeatChanged"/>
+      <repeat-bulk-upgrade :action="action"/>
     </td>
-    <td class="last">{{ action.repeat }}    </td>
+    <td class="sm-padding text-end">
+      <trash-bulk-upgrade :action="action" @bulkScheduleTrashed="onTrashed"/>
+    </td>
 </tr>
 </template>
 
 <script>
 import gameContainer from '../../../../game/container'
 import RepeatBulkUpgrade from './RepeatBulkUpgrade'
+import TrashBulkUpgade from './TrashBulkUpgrade'
 
 export default {
   components: {
-    'repeat-bulk-upgrade': RepeatBulkUpgrade
+    'repeat-bulk-upgrade': RepeatBulkUpgrade,
+    'trash-bulk-upgrade': TrashBulkUpgade
   },
   props: {
     action: Object,
@@ -28,14 +32,8 @@ export default {
     }
   },
   methods: {
-    onRepeatChanged (e) {
-      this.$emit('bulkScheduleRepeatChanged', e);
-    },
-    clickStar (e) {
-      this.$emit('onOpenStarDetailRequested', this.star._id)
-    },
-    goToStar (e) {
-      gameContainer.map.panToStar(this.star)
+    onTrashed (e) {
+      this.$emit('bulkScheduleTrashed', e)
     }
   }
 }

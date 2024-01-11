@@ -37,8 +37,9 @@ class GameHelper {
     return game.galaxy.carriers.find(x => x._id === carrierId)
   }
 
-  getActionById (game, playerId, actionId) {
-    return game.galaxy.players.find(p => p._id === playerId).scheduledActions.find(a => a._id === actionId);
+  getActionById (game, actionId) {
+    let player = this.getUserPlayer(game)
+    return player.scheduledActions.find(a => a._id === actionId);
   }
 
   getStarOwningPlayer (game, star) {

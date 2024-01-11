@@ -88,12 +88,6 @@
           </div>
         </div>
         <div class="row">
-          {{ this.$store.state.game._id }}
-        </div>
-        <div class="row">
-          {{ selectedUpgradeStrategy + selectedScheduleStrategy + amount + selectedType + tick + repeat }}
-        </div>
-        <div class="row">
           <div class="mb-2 col">
             <div class="d-grid">
               <button class="btn btn-outline-info" v-on:click="check"
@@ -152,10 +146,10 @@
         </table>
       </div>
 
-      <div v-if="true">
+      <div v-if="actionCount>0">
         <h4 class="mt-2">Scheduled Buy Actions</h4>
 
-        <scheduled-table @bulkIgnoreChanged="resetPreview" :highlightIgnoredInfrastructure="selectedType"/>
+        <scheduled-table @bulkScheduleTrashed="onTrashed"/>
       </div>
       <h4 class="mt-2">Bulk Ignore Stars</h4>
 
@@ -201,13 +195,16 @@ export default {
       selectedScheduleStrategy: 'now',
       repeat: false,
       tick: this.$store.state.game.state.tick,
-      types: []
+      types: [],
+      actionCount: 0
     }
   },
   mounted () {
     GameContainer.map.showIgnoreBulkUpgrade()
 
     this.amount = GameHelper.getUserPlayer(this.$store.state.game).credits
+
+    this.actionCount = GameHelper.getUserPlayer(this.$store.state.game).scheduledActions.length
 
     this.setupInfrastructureTypes()
   },
@@ -251,6 +248,9 @@ export default {
       this.hasChecked = false
       this.upgradePreview = null
     },
+    onTrashed() {
+      this.actionCount--
+    },
     panToStar (starId) {
       let star = this.getStar(starId)
 
@@ -284,16 +284,17 @@ export default {
           this.selectedUpgradeStrategy,
           this.selectedType,
           this.amount,
-          this.repeat,
+          (this.repeat == 'true'),
           this.tick
           )
           if (response.status === 200) {
               AudioService.join()
-              /*this.upgradePreview = response.data
-              this.upgradeAvailable = response.data.upgraded
-              this.cost = response.data.cost
-              this.previewAmount = response.data.budget
-              this.ignoredCount = response.data.ignoredCount*/
+
+              this.$store.commit('gameBulkActionAdded', response.data);
+
+              this.actionCount++
+
+              this.$toasted.show(`Action scheduled. Action will be executed on tick ${response.data.tick}.`, { type: 'success' })
             }
         } catch (err) {
           this.errors = err.response.data.errors || []
