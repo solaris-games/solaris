@@ -412,7 +412,6 @@ export default class StarUpgradeService extends EventEmitter {
     }
 
     async upgradeBulk(game: Game, player: Player, upgradeStrategy: string, infrastructureType: InfrastructureType, amount: number, writeToDB: boolean = true) {
-        console.log('upgradeBulk (standard)')
         if (!amount || amount <= 0) {
             throw new ValidationError(`Invalid upgrade amount given`);
         }

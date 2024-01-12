@@ -3,6 +3,7 @@ import { DiplomaticState } from "./Diplomacy";
 import { PlayerStatistics } from "./Leaderboard";
 import { AiState } from "./Ai";
 import { ObjectId } from "mongoose";
+import { InfrastructureType } from "./Star";
 
 export type PlayerShape = 'circle'|'square'|'diamond'|'hexagon';
 export type ResearchType = 'scanning'|'hyperspace'|'terraforming'|'experimentation'|'weapons'|'banking'|'manufacturing'|'specialists'|'random';
@@ -63,7 +64,7 @@ export interface PlayerDiplomaticState {
 
 export interface PlayerScheduledActions {
     _id: ObjectId;
-    infrastructureType: string;
+    infrastructureType: InfrastructureType;
     buyType: string;
     amount: number;
     repeat: boolean;

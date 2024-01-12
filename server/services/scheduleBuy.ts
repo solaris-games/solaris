@@ -2,67 +2,93 @@ const mongoose = require('mongoose');
 
 import ValidationError from '../errors/validation';
 import Repository from './repository';
+import StarUpgradeService from './starUpgrade';
+
 import { Game } from "./types/Game";
 import { Player, PlayerScheduledActions } from "./types/Player";
+import { InfrastructureType } from './types/Star';
 import { ObjectId } from "mongoose";
+
+
+const buyTypeToPriority = {
+    totalCredits: 0,
+    belowPrice: 1,
+    infrastructureAmount: 2,
+    percentageOfCredits: 3
+}
 
 const EventEmitter = require('events');
 
 export default class ScheduleBuyService extends EventEmitter {
     gameRepo: Repository<Game>;
-
-
+    starUpgradeService: StarUpgradeService
     constructor(
-        gameRepo: Repository<Game>
+        gameRepo: Repository<Game>,
+        starUpgradeService: StarUpgradeService
     ) {
         super();
 
         this.gameRepo = gameRepo;
+        this.starUpgradeService = starUpgradeService
     }
 
-    _buyScheduledInfrastructure(game: Game) {
-        /*for(let player of game.galaxy.players) {
+    async buyScheduledInfrastructure(game: Game) {
+        for(let player of game.galaxy.players) {
+            if ( player.scheduledActions.length == 0 ) continue;
             let currentActions = player.scheduledActions
-                .filter(a => a.tick == game.state.tick - 1)
-            let priorityPartition: PlayerScheduledActions[][] = Array(11).map(x => []); // One index for each possible priority
-            currentActions.forEach(action => {
-                priorityPartition[action.priority].push(action);
-            });
-            for(let actionList of priorityPartition) {
-                this._executePriority(game, player, actionList);
+                .filter(a => a.tick == game.state.tick - 1) // Tick number that we just finished
+                .sort((a, b) => {
+                    // Take the defined priorities
+                    // We sort in the order totalCredits, belowPrice, infrastructureAmount, percentageOfCredits
+                    const valA = buyTypeToPriority[a.buyType]; 
+                    const valB = buyTypeToPriority[b.buyType]; 
+                    return valA - valB // Sort ascending (0 goes first, this is totalCredits)
+                  });
+
+            // We do not have to do anything if there is no action to be executed this tick.
+            if(currentActions.length === 0) continue;
+
+            // Loop through all actions to execute them.
+            for(let action of currentActions) {
+                if (action.buyType === 'percentageOfCredits') break; // As this is sorted, all next ones will also be of this type
+                if (action.buyType === 'totalCredits' && action.amount > player.credits) {
+                    // When players schedule actions to spend more credits than they have, we spend all their credits
+                    action.amount = player.credits
+                }; 
+                let upgradeSummary = await this.starUpgradeService.upgradeBulk(game, player, action.buyType, action.infrastructureType, action.amount, false)
             }
-        }*/
+            
+            // We want to make sure that all percentage actions are dealt with with the same starting value.
+            let percentageActions = currentActions.filter(a => a.buyType == 'percentageOfCredits');
+            let totalPercentage = percentageActions.reduce((total, cur) => total + cur.amount, 0);
+            await this._executePercentageAction(game, player, percentageActions, totalPercentage);
+
+            // Run the code to remove all actions that have been executed or add a cycle of ticks to them.
+            await this._repeatOrRemoveAction(game, currentActions)
+        }
     }
 
-    _executePriority(game: Game, player: Player, actionList: PlayerScheduledActions[]) {
-        // This function is used to determine the priority between two actions that are done in the same tick.
-        /*let percentageList = actionList.filter(action => action.buyType == 'percentage');
-        let creditAmountList = actionList.filter(action => action.buyType == 'creditAmount');
-        let infrastructureAmountList = actionList.filter(action => action.buyType == 'infrastructureAmount');
-        let buyBelowPriceList = actionList.filter(action => action.buyType == 'buyBelowPrice')
-        this._executePercentageAction(game, player, percentageList);
-        this._executeCreditAction(game, player, creditAmountList);
-        this._executeInfrastructureAction(game, player, infrastructureAmountList);
-        this._executeBelowPriceAction(game, player, buyBelowPriceList);*/
+    async _executePercentageAction(game: Game, player: Player, percentageActions: PlayerScheduledActions[], totalPercentage) {
+        for(let action of percentageActions) {
+            let percentageToCredits = Math.floor((action.amount/Math.max(totalPercentage, 100))*player.credits)
+            let upgradeSummary = await this.starUpgradeService.upgradeBulk(game, player, 'totalCredits', action.infrastructureType, percentageToCredits, false)
+        }
     }
 
-    _executePercentageAction(game: Game, player: Player, actionList: PlayerScheduledActions[]) {
-
+    async _repeatOrRemoveAction(game: Game, actions: PlayerScheduledActions[]) {
+        for(let i = 0; i < actions.length ; i++) {
+            let action = actions[i]
+            // Repeat the action next cycle or remove the action
+            if(action.repeat) {
+                action.tick += game.settings.galaxy.productionTicks;
+            } else {
+                actions.splice(i, 1);
+                i--;
+            }
+        }
     }
 
-    _executeCreditAction(game: Game, player: Player, actionList: PlayerScheduledActions[]) {
-
-    }
-
-    _executeInfrastructureAction(game: Game, player: Player, actionList: PlayerScheduledActions[]) {
-
-    }
-
-    _executeBelowPriceAction(game: Game, player: Player, actionList: PlayerScheduledActions[]) {
-
-    }
-
-    async addScheduledBuy(game: Game, player: Player, buyType: string, infrastructureType:string, amount:number, repeat: boolean, tick:number) {
+    async addScheduledBuy(game: Game, player: Player, buyType: string, infrastructureType: InfrastructureType, amount:number, repeat: boolean, tick:number) {
         let action: PlayerScheduledActions = {
             _id: mongoose.Types.ObjectId(),
             infrastructureType,
