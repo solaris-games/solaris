@@ -247,7 +247,7 @@ export default class ConversationService extends EventEmitter {
             throw new ValidationError(`The conversation requested does not exist.`);
         }
 
-        if (convo.participants.find(p => p.toString() === player._id.toString() == null)) {
+        if (convo.participants.find(p => p.toString() === player._id.toString()) == null) {
             throw new ValidationError(`You are not participating in this conversation.`);
         }
 
