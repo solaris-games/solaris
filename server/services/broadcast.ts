@@ -9,9 +9,9 @@ import { LedgerType } from "./ledger";
 
 
 export default class BroadcastService {
-    io;
+    io: any;
 
-    constructor(io) {
+    setIOController(io) {
         this.io = io;
     }
 
