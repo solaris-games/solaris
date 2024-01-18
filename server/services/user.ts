@@ -446,6 +446,7 @@ export default class UserService extends EventEmitter {
                 playerCreditsReceived: subscriptions.discord.playerCreditsReceived || false,
                 playerCreditsSpecialistsReceived: subscriptions.discord.playerCreditsSpecialistsReceived || false,
                 playerGalacticCycleComplete: subscriptions.discord.playerGalacticCycleComplete || false,
+                playerInboundAttack: subscriptions.discord.playerInboundAttack || false,
                 playerRenownReceived: subscriptions.discord.playerRenownReceived || false,
                 playerResearchComplete: subscriptions.discord.playerResearchComplete || false,
                 playerTechnologyReceived: subscriptions.discord.playerTechnologyReceived || false,

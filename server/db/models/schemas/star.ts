@@ -35,7 +35,8 @@ const schema = new Schema({
     location: {
         x: { type: Types.Number, required: true, default: 0 },
         y: { type: Types.Number, required: true, default: 0 }
-    }
+    },
+    inboundAttacksNotified: [{ type: Types.ObjectId, required: false, default: [] }], // carrier ids
 });
 
 export default schema;

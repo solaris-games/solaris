@@ -55,6 +55,7 @@ export interface Star extends MapObject {
     manufacturing?: number;
     isInScanningRange?: boolean;
     effectiveTechs?: PlayerTechnologyLevels;
+    inboundAttacksNotified?: DBObjectId[];
 };
 
 export interface StarCaptureResult {

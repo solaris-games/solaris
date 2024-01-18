@@ -65,6 +65,16 @@
                         </select>
                     </div>
                 </div>
+
+                <div class="row pt-1 pb-1">
+                    <label for="playerInboundAttacks" class="col-12 col-sm-6 col-form-label">Game - Incoming Attacks</label>
+                    <div class="col-12 col-sm-6">
+                        <select class="form-control" id="playerInboundAttacks" v-model="subscriptions.discord.playerInboundAttacks" :disabled="isSaving">
+                            <option :value="true">Enabled</option>
+                            <option :value="false">Disabled</option>
+                        </select>
+                    </div>
+                </div>
                 
                 <div class="row pt-1 pb-1">
                     <label for="playerRenownReceived" class="col-12 col-sm-6 col-form-label">Game - Renown Received</label>

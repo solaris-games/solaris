@@ -41,6 +41,7 @@ export interface UserSubscriptions {
         gameEnded: boolean;
         gameTurnEnded: boolean;
         playerGalacticCycleComplete: boolean;
+        playerInboundAttack: boolean;
         playerResearchComplete: boolean;
         playerTechnologyReceived: boolean;
         playerCreditsReceived: boolean;

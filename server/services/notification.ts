@@ -16,19 +16,23 @@ import GameEndedEvent from './types/events/GameEnded';
 import GameTurnEndedEvent from './types/events/GameTurnEnded';
 import ConversationMessageSentEvent from './types/events/ConversationMessageSent';
 import GameJoinService, { GameJoinServiceEvents } from './gameJoin';
+import StarService from './star';
+import InboundAttacksService, { InboundAttacksServiceEvents } from './inboundAttacks';
+import { PlayerInboundAttacksEvent } from './types/events/PlayerInboundAttacksEvent';
 
 // Note: We only support discord subscriptions at this point, if any new ones are added
 // this class will need to be refactored to use something like the strategy pattern.
 type SubscriptionType = 'discord';
-type SubscriptionEvent = 'gameStarted'|
-    'gameEnded'|
-    'gameTurnEnded'|
-    'playerGalacticCycleComplete'|
-    'playerResearchComplete'|
-    'playerTechnologyReceived'|
-    'playerCreditsReceived'|
-    'playerCreditsSpecialistsReceived'|
-    'playerRenownReceived'|
+type SubscriptionEvent = 'gameStarted' |
+    'gameEnded' |
+    'gameTurnEnded' |
+    'playerGalacticCycleComplete' |
+    'playerInboundAttacks' |
+    'playerResearchComplete' |
+    'playerTechnologyReceived' |
+    'playerCreditsReceived' |
+    'playerCreditsSpecialistsReceived' |
+    'playerRenownReceived' |
     'conversationMessageSent';
 
 export default class NotificationService {
@@ -42,6 +46,8 @@ export default class NotificationService {
     gameTickService: GameTickService;
     researchService: ResearchService;
     tradeService: TradeService;
+    starService: StarService;
+    inboundAttacksService: InboundAttacksService;
 
     constructor(
         config: Config,
@@ -53,7 +59,9 @@ export default class NotificationService {
         gameJoinService: GameJoinService,
         gameTickService: GameTickService,
         researchService: ResearchService,
-        tradeService: TradeService
+        tradeService: TradeService,
+        starService: StarService,
+        inboundAttacksService: InboundAttacksService
     ) {
         this.config = config;
         this.userRepo = userRepo;
@@ -65,6 +73,8 @@ export default class NotificationService {
         this.gameTickService = gameTickService;
         this.researchService = researchService;
         this.tradeService = tradeService;
+        this.starService = starService;
+        this.inboundAttacksService = inboundAttacksService
     }
 
     initialize() {
@@ -80,6 +90,7 @@ export default class NotificationService {
             this.tradeService.on(TradeServiceEvents.onPlayerCreditsSpecialistsReceived, (args) => this.onPlayerCreditsSpecialistsReceived(args.gameId, args.fromPlayer, args.toPlayer, args.amount));
             this.tradeService.on(TradeServiceEvents.onPlayerRenownReceived, (args) => this.onPlayerRenownReceived(args.gameId, args.fromPlayer, args.toPlayer, args.amount));
             this.tradeService.on(TradeServiceEvents.onPlayerTechnologyReceived, (args) => this.onPlayerTechnologyReceived(args.gameId, args.fromPlayer, args.toPlayer, args.technology));
+            this.inboundAttacksService.on(InboundAttacksServiceEvents.onPlayerInboundAttacks, (args) => this.onPlayerInboundAttacks(args));
 
             console.log('Notifications initialized.')
         }
@@ -254,9 +265,23 @@ export default class NotificationService {
             });
     }
 
+    async onPlayerInboundAttacks(args: PlayerInboundAttacksEvent) {
+        // Send the inbound attacks notification for Discord subscription to the player.
+        await this._trySendNotifications(args.gameId, [args.playerId!.toString()], 'discord', 'playerInboundAttacks',
+            async (game: Game, user: User) => {
+
+                //TODO build a real discord message, this is a placeholder
+
+                const template = this._generateBaseDiscordMessageTemplate(game, 'Incoming Attack', `Some (${args.attacks.length}) of your stars are under attack!` );
+
+
+                await this.discordService.sendMessageOAuth(user, template);
+            });
+    }
+
     async onPlayerResearchCompleted(gameId: DBObjectId, playerId: DBObjectId, technologyKey: string, technologyLevel: number, technologyKeyNext: string, technologyLevelNext: number) {
         // Send the research completed notification for Discord subscription to the player.
-        await this._trySendNotifications(gameId, [playerId.toString()], 'discord', 'playerResearchComplete', 
+        await this._trySendNotifications(gameId, [playerId.toString()], 'discord', 'playerResearchComplete',
             async (game: Game, user: User) => {
                 const template = this._generateBaseDiscordMessageTemplate(game, 'Research Complete', 'You have finished researching a technology.');
 
