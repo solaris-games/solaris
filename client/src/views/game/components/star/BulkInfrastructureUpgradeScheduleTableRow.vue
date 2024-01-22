@@ -1,20 +1,19 @@
 <template>
 <tr>
-    <td class="sm-padding text-auto">{{action.tick}}</td>
-    <td class="sm-padding text">{{action.infrastructureType}}</td>
-    <td class="sm-padding text-end">{{action.buyType}}</td>
-    <td class="sm-padding text-end">{{action.amount}}</td>
-    <td class="sm-padding text-end">
+    <td class="sm-padding text-center">{{action.tick}}</td>
+    <td class="sm-padding">{{getFriendlyText(action.infrastructureType)}}</td>
+    <td class="sm-padding">{{getFriendlyText(action.buyType)}}</td>
+    <td class="sm-padding">{{action.amount}}</td>
+    <td class="sm-padding">
       <repeat-bulk-upgrade :action="action"/>
     </td>
-    <td class="sm-padding text-end">
+    <td class="last">
       <trash-bulk-upgrade :action="action" @bulkScheduleTrashed="onTrashed"/>
     </td>
 </tr>
 </template>
 
 <script>
-import gameContainer from '../../../../game/container'
 import RepeatBulkUpgrade from './RepeatBulkUpgrade'
 import TrashBulkUpgade from './TrashBulkUpgrade'
 
@@ -26,14 +25,30 @@ export default {
   props: {
     action: Object,
   },
-  data () {
-    return {
-      audio: null
-    }
-  },
+  data () {},
   methods: {
     onTrashed (e) {
       this.$emit('bulkScheduleTrashed', e)
+    },
+    getFriendlyText(string) {
+      switch (string) {
+        case 'economy':
+          return 'Economy';
+        case 'industry':
+          return 'Industry';
+        case 'science':
+          return 'Science';
+        case 'totalCredits':
+          return 'Total Credits';
+        case 'percentageOfCredits':
+          return 'Percentage';
+        case 'infrastructureAmount':
+          return 'Infrastructure Amount';
+        case 'belowPrice':
+          return 'Below Price';
+        default:
+          return ''
+      }
     }
   }
 }

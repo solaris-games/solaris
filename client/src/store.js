@@ -300,17 +300,6 @@ export default new Vuex.Store({
     gameBulkActionTrashed(state, data) {
       let player = GameHelper.getUserPlayer(state.game)
       player.scheduledActions = player.scheduledActions.filter(a => a._id != data._id)
-      //state.game.galaxy.players[0].scheduledActions = state.game.galaxy.players.find(p => p.userId).scheduledActions.filter(a => a._id != data._id)
-      //let actions = GameHelper.getUserPlayer(state.game).scheduledActions;
-      //actions = actions.filter(action => action._id != data._id);
-      /*player.scheduledActions.push({
-        _id: '37',
-        infrastructureType: 'economy',
-        buyType: 'totalCredits',
-        amount: 37,
-        repeat: true,
-        tick: 37
-      });*/
     },
     gameStarWarpGateBuilt (state, data) {
       let star = GameHelper.getStarById(state.game, data.starId)

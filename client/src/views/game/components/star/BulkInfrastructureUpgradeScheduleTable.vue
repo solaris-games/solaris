@@ -112,7 +112,7 @@ export default {
 
 <style scoped>
 td {
-  padding: 12px 6px !important;
+  padding: 20px 6px !important;
 }
 
 .infrastructure-filters {
