@@ -146,7 +146,7 @@
         </table>
       </div>
 
-      <div v-if="hasActions">
+      <div v-if="actionCount > 0">
         <h4 class="mt-2">Scheduled Buy Actions</h4>
 
         <scheduled-table @bulkScheduleTrashed="onTrashed"/>
@@ -197,7 +197,6 @@ export default {
       tick: this.$store.state.game.state.tick,
       types: [],
       actionCount: 0,
-      hasActions: false
     }
   },
   mounted () {
@@ -206,7 +205,6 @@ export default {
     this.amount = GameHelper.getUserPlayer(this.$store.state.game).credits
 
     this.actionCount = GameHelper.getUserPlayer(this.$store.state.game).scheduledActions.length
-    this.hasActions = (this.actionCount > 0);
 
     this.setupInfrastructureTypes()
   },
@@ -296,7 +294,6 @@ export default {
               this.$store.commit('gameBulkActionAdded', response.data);
 
               this.actionCount = GameHelper.getUserPlayer(this.$store.state.game).scheduledActions.length
-              this.hasActions = (this.actionCount > 0)
 
               this.$toasted.show(`Action scheduled. Action will be executed on tick ${response.data.tick}.`, { type: 'success' })
             }
