@@ -25,7 +25,9 @@ export default {
   props: {
     action: Object,
   },
-  data () {},
+    data() {
+      return {}
+},
   methods: {
     onTrashed (e) {
       this.$emit('bulkScheduleTrashed', e)
