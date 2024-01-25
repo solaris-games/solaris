@@ -281,6 +281,119 @@ export default class StarService extends EventEmitter {
         return false;
     }
 
+    getAllPlayersScanningRange(game: Game) {
+        // These two functions allow us to chunk all stars in boxes, a 2d array.
+        // The index of a star in this array can be derived directly from its coordinates.
+
+        // This function gives us a 2d empty array, where we can associate each coordinate to an element of this array.
+        // This function now puts all the stars in the chunks, giving us some sort of 2d sorted array
+        // TODO: See if we can dynamically create chunks as stars appear in them to safe time and space.
+        let chunkData = this.generateGalaxyChunks(game);
+        this.fillChunks(game, chunkData)
+
+
+        for(let player of game.galaxy.players) {
+            let starsOwnedOrInOrbit = this.listStarsOwnedOrInOrbitByPlayers(game, [player._id]);
+            let starsWithScanning = starsOwnedOrInOrbit.filter(s => !this.isDeadStar(s));
+
+            let playerChunks = chunkData.chunks
+
+            // We now create an object where each star we can see will be entered in, with its _id as the key.
+            // By using this smart object, we prevent having to look through the array every time to check whether the star has already been included.
+            let starsInScanRange: Object = {}
+
+            // We can immediately fill the object with the stars where we are at, the ones we own and/or are present at.
+            starsOwnedOrInOrbit.forEach(star => {
+                starsInScanRange[star._id.toString()] = star
+                this.removeFromChunk(chunkData, playerChunks, star)
+
+                // TODO: Check if they have a wormhole too
+            })
+
+            // TODO: Immediately add pulsars to the list too
+
+            starsWithScanning.forEach(star => {
+                let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star, true);
+                let scanningRangeDistance = this.distanceService.getScanningDistance(game, effectiveTechs.scanning);
+
+                let chunkIndex = this.getChunkIndexes(star.location, chunkData);
+                let deltaXIndex = Math.ceil(scanningRangeDistance/chunkData.chunkWidth);
+                let deltaYIndex = Math.ceil(scanningRangeDistance/chunkData.chunkHeight);
+
+                // The max and min are there to make sure we do not go out of array bounds.
+                let [leftBound, rightBound, lowerBound, upperBound]: number[] = [
+                    Math.max(0, chunkIndex.x - deltaXIndex),
+                    Math.min(chunkData.dimensions[0] - 1, chunkIndex.x + deltaXIndex),
+                    Math.max(0, chunkIndex.y - deltaYIndex),
+                    Math.min(chunkData.dimensions[1] - 1, chunkIndex.y + deltaYIndex)
+                ]
+
+                for (let i = leftBound; i <= rightBound; i++) {
+                    for (let j = lowerBound; j <= upperBound; j++) {
+                        for (let star of Object.values(playerChunks[i][j])) {
+                            // TODO check whether star is in scan range and then add it.
+                        }
+                    }
+                }
+            })
+        }
+    }
+
+    removeFromChunk(chunkData, chunks, star: Star) {
+        let index = this.getChunkIndexes(star.location, chunkData)
+        delete chunks[index.x][index.y][star._id.toString()]
+    }
+
+    fillChunks(game: Game, chunkData) {
+        game.galaxy.stars.forEach(star => {
+            let index = this.getChunkIndexes(star.location, chunkData);
+            chunkData.chunks[index.x][index.y][star._id.toString()] = star
+        });
+        return chunkData.chunks; 
+    }
+
+    getChunkIndexes(location, chunkData) {
+        return {
+            x: Math.floor((location.x-chunkData.minX)/chunkData.chunkWidth),
+            y: Math.floor((location.y-chunkData.minY)/chunkData.chunkHeight)
+        }
+    }
+
+    generateGalaxyChunks(game: Game) {
+        let [minX, maxX, minY, maxY] = game.galaxy.stars
+            .reduce(
+                (total: number[], star) => {
+                    // These are respectively the minX, maxX, minY and maxY values.
+                    // We add/substract 1 to make those values strictly smaller/larger than the true minima and maxima
+                    return [
+                        Math.min(total[0], star.location.x - 1),
+                        Math.max(total[1], star.location.x + 1),
+                        Math.min(total[2], star.location.y - 1),
+                        Math.max(total[3], star.location.y + 1)
+                    ]
+                }, [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY])
+        
+        // Here we make chunks, we want to have chunks that are at most the size of 2ly by 2ly.
+        // This might break in games that are one dimensional on an axis (minX == maxX or minY == maxY).
+        let dimensions = [
+            Math.ceil((maxX-minX)/100),
+            Math.ceil((maxY-minY)/100)
+        ]
+        let [chunkWidth, chunkHeight] = [(maxX-minX)/dimensions[0], (maxY-minY)/dimensions[1]]
+        let chunks: Object[][] = new Array(dimensions[0]).fill(new Array(dimensions[1])).fill({})
+
+        return {
+            chunks,
+            dimensions,
+            chunkWidth,
+            chunkHeight,
+            minX,
+            maxX,
+            minY,
+            maxY
+        }
+    }
+
     filterStarsByScanningRange(game: Game, playerIds: DBObjectId[]) {
         // Stars may have different scanning ranges independently so we need to check
         // each star to check what is within its scanning range.
