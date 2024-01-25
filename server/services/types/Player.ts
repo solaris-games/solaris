@@ -2,6 +2,8 @@ import { DBObjectId } from "./DBObjectId";
 import { DiplomaticState } from "./Diplomacy";
 import { PlayerStatistics } from "./Leaderboard";
 import { AiState } from "./Ai";
+import { ObjectId } from "mongoose";
+import { InfrastructureType } from "./Star";
 
 export type PlayerShape = 'circle'|'square'|'diamond'|'hexagon';
 export type ResearchType = 'scanning'|'hyperspace'|'terraforming'|'experimentation'|'weapons'|'banking'|'manufacturing'|'specialists'|'random';
@@ -60,6 +62,15 @@ export interface PlayerDiplomaticState {
     status: DiplomaticState;
 };
 
+export interface PlayerScheduledActions {
+    _id: ObjectId;
+    infrastructureType: InfrastructureType;
+    buyType: string;
+    amount: number;
+    repeat: boolean;
+    tick: number;
+}
+
 export interface Player {
     _id: DBObjectId;
     userId: DBObjectId | null;
@@ -97,6 +108,7 @@ export interface Player {
     ledger: PlayerLedger,
     reputations: PlayerReputation[],
     diplomacy: PlayerDiplomaticState[],
+    scheduledActions: PlayerScheduledActions[],
     spectators: DBObjectId[];
     stats?: PlayerStatistics;
     isKingOfTheHill?: boolean;

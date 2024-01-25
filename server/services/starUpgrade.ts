@@ -519,6 +519,8 @@ export default class StarUpgradeService extends EventEmitter {
         // Get all of the player stars and what the next upgrade cost will be.
         if (upgradeStrategy === 'totalCredits') {
             return await this.generateUpgradeBulkReportTotalCredits(game, player, infrastructureType, amount)
+        } else if (upgradeStrategy === 'percentageOfCredits') {
+            return await this.generateUpgradeBulkReportPercentageOfCredits(game, player, infrastructureType, amount)
         } else if (upgradeStrategy === 'infrastructureAmount') {
             return await this.generateUpgradeBulkReportInfrastructureAmount(game, player, infrastructureType, amount)
         } else if (upgradeStrategy === 'belowPrice') {
@@ -681,7 +683,11 @@ export default class StarUpgradeService extends EventEmitter {
         return upgradeSummary;
     }
 
-
+    async generateUpgradeBulkReportPercentageOfCredits(game: Game, player: Player, infrastructureType: InfrastructureType, percentage: number): Promise<BulkUpgradeReport> {
+        percentage = Math.min(100, Math.max(0, percentage));
+        let budget = Math.ceil(player.credits*percentage/100);
+        return await this.generateUpgradeBulkReportTotalCredits(game, player, infrastructureType, budget);
+    }
 
     calculateAverageTerraformedResources(terraformedResources: TerraformedResources){
         return Math.floor((terraformedResources.economy + terraformedResources.industry + terraformedResources.science) / 3);

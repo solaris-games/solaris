@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const Types = Schema.Types;
 
+import ActionSchema from './action';
+
 const schema = new Schema({
     userId: { type: Types.ObjectId, required: false, default: null },
     homeStarId: { type: Types.ObjectId, required: true },
@@ -93,7 +95,8 @@ const schema = new Schema({
             playerId: { type: Types.ObjectId, required: true },
             status: { type: Types.String, required: true }
         }
-    ]
+    ],
+    scheduledActions: [ActionSchema]
 });
 
 export default schema;
