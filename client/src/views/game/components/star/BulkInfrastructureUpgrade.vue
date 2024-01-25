@@ -296,7 +296,7 @@ export default {
               this.$store.commit('gameBulkActionAdded', response.data);
 
               this.actionCount = GameHelper.getUserPlayer(this.$store.state.game).scheduledActions.length
-              this.hasActions = (actionCount > 0)
+              this.hasActions = (this.actionCount > 0)
 
               this.$toasted.show(`Action scheduled. Action will be executed on tick ${response.data.tick}.`, { type: 'success' })
             }
