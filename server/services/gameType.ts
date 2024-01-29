@@ -44,11 +44,15 @@ const carouselGames = (name: string, configPaths: string[]): CarouselGame => {
 const officialGameSettings = [
     standardGame('../config/game/settings/official/newPlayer'),
     standardGame('../config/game/settings/official/standard'),
-    standardGame('../config/game/settings/official/32player'), // 32 player games are reserved only for official games.
     standardGame('../config/game/settings/official/turnBased'),
     standardGame('../config/game/settings/official/1v1'),
     standardGame('../config/game/settings/official/1v1turnBased'),
 ];
+
+const largeGameSettings = carouselGames("32 Player", [
+    '../config/game/settings/official/32player_ultradark',
+    '../config/game/settings/official/32player_normal',
+])
 
 const specialGameSettings = carouselGames("Special", [
     '../config/game/settings/official/special_dark',
@@ -68,6 +72,7 @@ const specialGameSettings = carouselGames("Special", [
 
 const gameSettings: OfficialGameCategory[] = [
     specialGameSettings,
+    largeGameSettings,
     ...officialGameSettings,
 ]
 
