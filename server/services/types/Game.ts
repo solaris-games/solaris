@@ -69,6 +69,7 @@ export interface GameSettings {
 	general: {
 		fluxId: number | null;
 		createdByUserId?: DBObjectId | null;
+		createdFromTemplate?: string | null;
 		name: string;
 		description: string | null;
 		type: GameType;

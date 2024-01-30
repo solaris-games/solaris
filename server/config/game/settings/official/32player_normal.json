@@ -2,6 +2,7 @@
   "general": {
     "name": "[[[RANDOM]]]",
     "description": "This game has 32 players, expect big alliances and epic battles in this huge galaxy!",
+    "createdFromTemplate": "32_player_normal",
     "type": "32_player_rt",
     "mode": "conquest",
     "password": null,

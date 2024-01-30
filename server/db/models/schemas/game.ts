@@ -12,6 +12,7 @@ const schema = new Schema({
         general: {
 			fluxId: { type: Types.Number, required: false, default: null },
             createdByUserId: { type: Types.ObjectId, required: false, default: null },
+			createdFromTemplate: { type: Types.String, required: false, default: null },
             name: { type: Types.String, required: true },
             description: { type: Types.String, required: false, default: null },
 			type: { type: Types.String, required: true, enum: [
