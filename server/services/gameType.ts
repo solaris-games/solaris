@@ -1,80 +1,7 @@
 import {Game, GameType} from "./types/Game";
 
 import {GameSettings} from "./types/Game";
-
-export enum OfficialGameKind {
-    Standard = 'Standard',
-    Carousel = 'Carousel',
-}
-
-export type StandardGame = {
-    kind: OfficialGameKind.Standard;
-    settings: GameSettings;
-}
-
-export type CarouselGame = {
-    kind: OfficialGameKind.Carousel;
-    rotation: GameSettings[];
-    name: string;
-}
-
-export type OfficialGameCategory =
-    | StandardGame
-    | CarouselGame
-
-const standardGame = (configPath: string): StandardGame => {
-    const settings = require(configPath) as GameSettings;
-
-    return {
-        kind: OfficialGameKind.Standard,
-        settings,
-    };
-}
-
-const carouselGames = (name: string, configPaths: string[]): CarouselGame => {
-    const rotation = configPaths.map(path => require(path) as GameSettings);
-
-    return {
-        kind: OfficialGameKind.Carousel,
-        rotation,
-        name
-    };
-}
-
-const officialGameSettings = [
-    standardGame('../config/game/settings/official/newPlayer'),
-    standardGame('../config/game/settings/official/standard'),
-    standardGame('../config/game/settings/official/turnBased'),
-    standardGame('../config/game/settings/official/1v1'),
-    standardGame('../config/game/settings/official/1v1turnBased'),
-];
-
-const largeGameSettings = carouselGames("32 Player", [
-    '../config/game/settings/official/32player_ultradark',
-    '../config/game/settings/official/32player_normal',
-])
-
-const specialGameSettings = carouselGames("Special", [
-    '../config/game/settings/official/special_dark',
-    '../config/game/settings/official/special_fog',
-    '../config/game/settings/official/special_battleRoyale',
-    '../config/game/settings/official/special_orbital',
-    '../config/game/settings/official/special_ultraDark',
-    '../config/game/settings/official/special_homeStar',
-    '../config/game/settings/official/special_homeStarElimination',
-    '../config/game/settings/official/special_anonymous',
-    '../config/game/settings/official/special_kingOfTheHill',
-    '../config/game/settings/official/special_tinyGalaxy',
-    '../config/game/settings/official/special_freeForAll',
-    '../config/game/settings/official/special_arcade',
-]);
-
-
-const gameSettings: OfficialGameCategory[] = [
-    specialGameSettings,
-    largeGameSettings,
-    ...officialGameSettings,
-]
+import {gameSettings, OfficialGameCategory, OfficialGameKind, specialGameTypes} from "../config/officialGames";
 
 export default class GameTypeService {
     getOfficialGameCategoryName(officialGame: OfficialGameCategory) {
@@ -110,7 +37,7 @@ export default class GameTypeService {
     }
 
     isSpecialGameMode(game: Game) {
-        return Boolean(specialGameSettings.rotation.find(settings => settings.general.type === game.settings.general.type));
+        return Boolean(specialGameTypes.includes(game.settings.general.type));
     }
 
     is32PlayerGame(game: Game) {

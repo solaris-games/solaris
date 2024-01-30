@@ -1,6 +1,6 @@
 import {DependencyContainer} from "../services/types/DependencyContainer";
-import {OfficialGameCategory, OfficialGameKind} from "../services/gameType";
 import {GameSettings} from "../services/types/Game";
+import {OfficialGameCategory, OfficialGameKind} from "../config/officialGames";
 
 const chooseSetting = (container: DependencyContainer, category: OfficialGameCategory): GameSettings => {
     if (category.kind === OfficialGameKind.Standard) {
