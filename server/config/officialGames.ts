@@ -42,31 +42,31 @@ const carouselGames = (name: string, distribution: 'random' | 'sequential', conf
 }
 
 const officialGameSettings = [
-    standardGame('game/settings/official/newPlayer'),
-    standardGame('game/settings/official/standard'),
-    standardGame('game/settings/official/turnBased'),
-    standardGame('game/settings/official/1v1'),
-    standardGame('game/settings/official/1v1turnBased'),
+    standardGame('./game/settings/official/newPlayer'),
+    standardGame('./game/settings/official/standard'),
+    standardGame('./game/settings/official/turnBased'),
+    standardGame('./game/settings/official/1v1'),
+    standardGame('./game/settings/official/1v1turnBased'),
 ];
 
 const largeGameSettings = carouselGames("32 Player", "sequential", [
-    'game/settings/official/32player_ultradark',
-    'game/settings/official/32player_normal',
+    './game/settings/official/32player_ultradark',
+    './game/settings/official/32player_normal',
 ])
 
 const specialGameSettings = carouselGames("Special", "random", [
-    'game/settings/official/special_dark',
-    'game/settings/official/special_fog',
-    'game/settings/official/special_battleRoyale',
-    'game/settings/official/special_orbital',
-    'game/settings/official/special_ultraDark',
-    'game/settings/official/special_homeStar',
-    'game/settings/official/special_homeStarElimination',
-    'game/settings/official/special_anonymous',
-    'game/settings/official/special_kingOfTheHill',
-    'game/settings/official/special_tinyGalaxy',
-    'game/settings/official/special_freeForAll',
-    'game/settings/official/special_arcade',
+    './game/settings/official/special_dark',
+    './game/settings/official/special_fog',
+    './game/settings/official/special_battleRoyale',
+    './game/settings/official/special_orbital',
+    './game/settings/official/special_ultraDark',
+    './game/settings/official/special_homeStar',
+    './game/settings/official/special_homeStarElimination',
+    './game/settings/official/special_anonymous',
+    './game/settings/official/special_kingOfTheHill',
+    './game/settings/official/special_tinyGalaxy',
+    './game/settings/official/special_freeForAll',
+    './game/settings/official/special_arcade',
 ]);
 
 export const specialGameTypes = specialGameSettings.rotation.map(settings => settings.general.type);
