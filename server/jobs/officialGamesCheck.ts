@@ -37,22 +37,22 @@ export default (container: DependencyContainer) => {
                 if (!existingOpen) {
                     console.log(`Could not find game [${container.gameTypeService.getOfficialGameCategoryName(category)}], creating it now...`);
 
-                    let setting;
-                    const existingRunning = findExistingGame(setting, runningGames);
+                    const existingRunning = findExistingGame(category, runningGames);
                     const existingTemplate = existingRunning?.settings.general.createdFromTemplate;
-                    
+
+                    let newSetting;
                     if (existingRunning && existingTemplate && category.kind === OfficialGameKind.Carousel && category.distribution === 'sequential') {
                         const index = category.rotation.findIndex(x => x.general.createdFromTemplate && x.general.createdFromTemplate === existingTemplate);
                         const nextIndex = (index + 1) % category.rotation.length;
-                        setting = category.rotation[nextIndex];
+                        newSetting = category.rotation[nextIndex];
                     } else {
-                        setting = chooseSetting(container, setting);
+                        newSetting = chooseSetting(container, category);
                     }
 
                     try {
-                        const newGame = await container.gameCreateService.create(setting);
+                        const newGame = await container.gameCreateService.create(newSetting);
 
-                        console.log(`[${newGame.settings.general.name}] game created.`);
+                        console.log(`${newGame.settings.general.type} game created: ${newGame.settings.general.name}`);
                     } catch (e) {
                         console.error(e);
                     }

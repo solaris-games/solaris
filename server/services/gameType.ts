@@ -6,7 +6,7 @@ import {gameSettings, OfficialGameCategory, OfficialGameKind, specialGameTypes} 
 export default class GameTypeService {
     getOfficialGameCategoryName(officialGame: OfficialGameCategory) {
         if (officialGame.kind === OfficialGameKind.Standard) {
-            return officialGame.settings.general.name;
+            return officialGame.settings.general.type;
         } else if (officialGame.kind === OfficialGameKind.Carousel) {
             return officialGame.name;
         }
