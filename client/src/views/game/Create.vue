@@ -130,6 +130,25 @@
           </select>
         </div>
 
+        <div v-if="settings.general.readyToQuit === 'enabled'" class="mb-2">
+          <label for="readyToQuitFraction" class="col-form-label">Fraction of stars for RTQ <help-tooltip tooltip="Fraction of stars for triggering RTQ condition"></help-tooltip></label>
+          <select class="form-control" id="readyToQuitFraction" v-model="settings.general.readyToQuitFraction" :disabled="isCreatingGame">
+            <option v-for="opt in options.general.readyToQuitFraction" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div v-if="settings.general.readyToQuit === 'enabled'" class="mb-2">
+          <label for="readyToQuitTimerCycles" class="col-form-label">Timer for RTQ <help-tooltip tooltip="Time until game finishes after RTQ"></help-tooltip></label>
+          <select class="form-control" id="readyToQuitTimerCycles" v-model="settings.general.readyToQuitTimerCycles" :disabled="isCreatingGame">
+            <option v-for="opt in options.general.readyToQuitTimerCycles" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+
         <div class="mb-2">
           <label for="allowAbandonStars" class="col-form-label">Allow Abandon Stars <help-tooltip tooltip="Determines whether players are allowed to abandon stars"/></label>
           <select class="form-control" id="allowAbandonStars" v-model="settings.player.allowAbandonStars" :disabled="isCreatingGame">
@@ -453,7 +472,7 @@
 
       <view-collapse-panel title="Orbital Mechanics">
         <p class="mb-1 text-warning" v-if="settings.orbitalMechanics.enabled === 'enabled'">Warning: carrier-to-carrier combat is auto-disabled in orbital games.</p>
-        
+
         <div class="mb-2">
           <label for="orbitalMechanicsEnabled" class="col-form-label">Galaxy Rotation <help-tooltip tooltip="If enabled, orbits stars and carriers around the center of the galaxy every tick"/></label>
           <select class="form-control" id="orbitalMechanicsEnabled" v-model="settings.orbitalMechanics.enabled" :disabled="isCreatingGame">
