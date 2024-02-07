@@ -19,6 +19,7 @@ import ConversationService from './conversation';
 import PlayerReadyService from './playerReady';
 import GamePlayerQuitEvent from './types/events/GamePlayerQuit';
 import GamePlayerDefeatedEvent from './types/events/GamePlayerDefeated';
+import {LeaderboardPlayer} from "./types/Leaderboard";
 
 export const GameServiceEvents = {
     onPlayerQuit: 'onPlayerQuit',
@@ -348,10 +349,26 @@ export default class GameService extends EventEmitter {
         return undefeatedPlayers.filter(x => x.ready).length === undefeatedPlayers.length;
     }
 
-    isAllUndefeatedPlayersReadyToQuit(game: Game) {
-        let undefeatedPlayers = this.listAllUndefeatedPlayers(game);
+    isReadyToQuitImmediateEnd(game: Game) {
+        const undefeatedPlayers = this.listAllUndefeatedPlayers(game);
 
-        return undefeatedPlayers.filter(x => x.readyToQuit).length === undefeatedPlayers.length;
+        return undefeatedPlayers.every(x => x.readyToQuit);
+    }
+
+    checkReadyToQuit(game: Game, leaderboard: LeaderboardPlayer[]) {
+        const undefeatedPlayers = this.listAllUndefeatedPlayers(game);
+
+        const rtqFraction = game.settings?.general?.readyToQuitFraction || 1.0;
+        const starsForEnd = rtqFraction * game.state.stars;
+
+        let rtqStarsSum = 0;
+        for (const player of undefeatedPlayers) {
+            if (player.readyToQuit) {
+                rtqStarsSum += leaderboard.find(x => x.player._id.toString() === player._id.toString())?.stats?.totalStars || 0;
+            }
+        }
+
+        return rtqStarsSum >= starsForEnd;
     }
 
     async forceEndGame(game: Game) {

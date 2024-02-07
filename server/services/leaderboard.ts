@@ -820,15 +820,6 @@ export default class LeaderboardService {
 
     getGameWinner(game: Game, leaderboard: LeaderboardPlayer[]): Player | null {
         let isKingOfTheHillMode = this.gameTypeService.isKingOfTheHillMode(game);
-        let isAllUndefeatedPlayersReadyToQuit = this.gameService.isAllUndefeatedPlayersReadyToQuit(game);
-
-        if (isAllUndefeatedPlayersReadyToQuit) {
-            if (isKingOfTheHillMode) {
-                return this.playerService.getKingOfTheHillPlayer(game) || this.getFirstPlacePlayer(leaderboard);
-            }
-
-            return this.getFirstPlacePlayer(leaderboard);
-        }
 
         if (this.gameTypeService.isConquestMode(game)) {
             let starWinner = this.getStarCountWinner(game, leaderboard);
