@@ -79,6 +79,18 @@
             :valueText="getFriendlyText(game.settings.general.readyToQuit)"
             :value="game.settings.general.readyToQuit"
             :compareValue="compareSettings.general.readyToQuit"/>
+          <game-setting-value title="Fraction of stars for RTQ"
+            v-if="game.settings.general.readyToQuit === 'enabled'"
+            tooltip="Fraction of stars for triggering RTQ condition"
+            :valueText="game.settings.general.readyToQuitFraction"
+            :value="game.settings.general.readyToQuitFraction"
+            :compareValue="compareSettings.general.readyToQuitFraction"/>
+          <game-setting-value title="Timer for RTQ"
+            v-if="game.settings.general.readyToQuit === 'enabled'"
+            tooltip="Time until game finishes after RTQ"
+            :valueText="game.settings.general.readyToQuitTimerCycles"
+            :value="game.settings.general.readyToQuitTimerCycles"
+            :compareValue="compareSettings.general.readyToQuitTimerCycles"/>
           <game-setting-value title="Allow Abandon Stars"
             tooltip="Allow players to abandon their stars"
             :valueText="getFriendlyText(game.settings.player.allowAbandonStars)"
