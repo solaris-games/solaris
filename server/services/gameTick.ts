@@ -779,7 +779,7 @@ export default class GameTickService extends EventEmitter {
 
         if (this.gameService.checkReadyToQuit(game, leaderboard)) {
             const ticksRemaining = (game.settings.general.readyToQuitTimerCycles || 0) * game.settings.galaxy.productionTicks;
-            if (game.state.ticksToEnd) {
+            if (game.state.ticksToEnd || game.state.ticksToEnd === 0) {
                 game.state.ticksToEnd = Math.min(ticksRemaining, game.state.ticksToEnd);
             } else {
                 game.state.ticksToEnd = ticksRemaining;
