@@ -362,13 +362,17 @@ export default class GameService extends EventEmitter {
         const starsForEnd = rtqFraction * game.state.stars;
 
         let rtqStarsSum = 0;
+        let allUndefeatedHaveRTQed = true;
+
         for (const player of undefeatedPlayers) {
             if (player.readyToQuit) {
                 rtqStarsSum += leaderboard.find(x => x.player._id.toString() === player._id.toString())?.stats?.totalStars || 0;
+            } else {
+                allUndefeatedHaveRTQed = false;
             }
         }
 
-        return rtqStarsSum >= starsForEnd;
+        return allUndefeatedHaveRTQed || rtqStarsSum >= starsForEnd;
     }
 
     async forceEndGame(game: Game) {
