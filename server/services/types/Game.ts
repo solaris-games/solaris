@@ -58,6 +58,17 @@ export type GameTimeSpeed = 30|60|300|600|1800|3600|7200;
 export type GameTimeStartDelay = 0|1|5|10|30|60|120|240|360|480|600|720|1440;
 export type GameTimeMaxTurnWait = 1|5|10|30|60|360|480|600|720|1080|1440|2880;
 
+export type GameResearchProgressionStandard = {
+	progression: 'standard',
+}
+
+export type GameResearchProgressionExponential = {
+	progression: 'exponential',
+	growthFactor: 'soft'|'medium'|'hard',
+}
+
+export type GameResearchProgression = GameResearchProgressionStandard | GameResearchProgressionExponential;
+
 export interface GameFlux {
 	id: number;
 	name: string;
@@ -187,6 +198,7 @@ export interface GameSettings {
 			weapons: GameResearchCost;
 			specialists: GameResearchCost;
 		},
+		researchCostProgression: GameResearchProgression;
 		bankingReward: GameBankingReward;
 		experimentationReward: GameExperimentationReward;
 		specialistTokenReward: GameSpecialistTokenReward;

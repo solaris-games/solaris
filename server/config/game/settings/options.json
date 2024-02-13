@@ -557,7 +557,7 @@
          }
        ],
        "tradeRestricted":[
-         { 
+         {
            "value":"enabled",
            "text":"Enabled"
          },
@@ -602,6 +602,30 @@
           {
              "value":"crazyExpensive",
              "text":"Crazy Expensive"
+          }
+       ],
+       "researchCostProgression": [
+          {
+              "value":"standard",
+              "text":"Standard"
+          },
+          {
+              "value":"exponential",
+              "text":"Exponential"
+          }
+       ],
+       "researchCostProgressionGrowthFactor": [
+          {
+             "value": "soft",
+             "text": "Soft"
+          },
+          {
+               "value": "medium",
+               "text": "Medium"
+          },
+          {
+               "value": "hard",
+               "text": "Hard"
           }
        ],
        "bankingReward":[

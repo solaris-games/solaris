@@ -152,6 +152,10 @@ const schema = new Schema({
 				weapons: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
 				specialists: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' }
 			},
+			researchCostProgression: {
+				progression: { type: Types.String, required: false, enum: ['standard', 'exponential'], default: 'standard' },
+				growthFactor: { type: Types.String, required: false, enum: ['soft', 'medium', 'hard'], default: null },
+			},
 			bankingReward: { type: Types.String, required: true, enum: ['standard', 'legacy'], default: 'standard' },
 			experimentationReward: { type: Types.String, required: true, enum: ['standard', 'experimental'], default: 'standard' },
 			specialistTokenReward: { type: Types.String, required: true, enum: ['standard', 'experimental'], default: 'standard' }

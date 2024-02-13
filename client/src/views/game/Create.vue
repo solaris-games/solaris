@@ -453,7 +453,7 @@
 
       <view-collapse-panel title="Orbital Mechanics">
         <p class="mb-1 text-warning" v-if="settings.orbitalMechanics.enabled === 'enabled'">Warning: carrier-to-carrier combat is auto-disabled in orbital games.</p>
-        
+
         <div class="mb-2">
           <label for="orbitalMechanicsEnabled" class="col-form-label">Galaxy Rotation <help-tooltip tooltip="If enabled, orbits stars and carriers around the center of the galaxy every tick"/></label>
           <select class="form-control" id="orbitalMechanicsEnabled" v-model="settings.orbitalMechanics.enabled" :disabled="isCreatingGame">
@@ -738,6 +738,24 @@
           <select class="form-control" id="researchCostsTechSpecialists" v-model="settings.technology.researchCosts.specialists" :disabled="isCreatingGame" v-if="settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'">
             <option v-for="opt in options.technology.researchCosts" v-bind:key="opt.value" v-bind:value="opt.value">
               {{ opt.text }} Specialists Research
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-2">
+          <label for="researchProgression" class="col-form-label">Research Cost Progression <help-tooltip tooltip="Determines the growth of research points needed for the next level of technology"/></label>
+          <select class="form-control" id="researchProgression" v-model="settings.technology.researchCostProgression.progression" :disabled="isCreatingGame">
+            <option v-for="opt in options.technology.researchCostProgression" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-2" v-if="settings.technology.researchCostProgression && settings.technology.researchCostProgression.progression === 'exponential'">
+          <label for="researchProgression" class="col-form-label">Exponential growth factor <help-tooltip tooltip="Determines the speed of exponential growth"/></label>
+          <select class="form-control" id="researchProgression" v-model="settings.technology.researchCostProgression.growthFactor" :disabled="isCreatingGame">
+            <option v-for="opt in options.technology.researchCostProgressionGrowthFactor" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
             </option>
           </select>
         </div>
