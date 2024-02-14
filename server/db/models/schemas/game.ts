@@ -211,7 +211,12 @@ const schema = new Schema({
 		research: {
 			progressMultiplier: { type: Types.Number, required: true, default: 50 },
 			sciencePointMultiplier: { type: Types.Number, required: true, default: 1 },
-			experimentationMultiplier: { type: Types.Number, required: true, default: 1 }
+			experimentationMultiplier: { type: Types.Number, required: true, default: 1 },
+			exponentialGrowthFactors: {
+				soft: { type: Types.Number, required: true, default: 1.25 },
+				medium: { type: Types.Number, required: true, default: 1.5 },
+				hard: { type: Types.Number, required: true, default: 1.75 }
+			}
 		},
 		star: {
 			resources: {

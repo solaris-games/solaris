@@ -275,6 +275,11 @@ export interface Game {
 			progressMultiplier: number;
 			sciencePointMultiplier: number;
 			experimentationMultiplier: number;
+			exponentialGrowthFactors: {
+				soft: number;
+				medium: number;
+				hard: number;
+			}
 		},
 		star: {
 			resources: {
