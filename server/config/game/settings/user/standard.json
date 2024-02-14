@@ -114,6 +114,10 @@
           "weapons":"standard",
           "specialists":"standard"
        },
+       "researchCostProgression": {
+          "progression": "standard",
+          "growthFactor": "medium"
+       },
        "bankingReward":"standard",
        "experimentationReward": "standard",
        "specialistTokenReward":"standard"

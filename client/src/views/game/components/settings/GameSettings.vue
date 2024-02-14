@@ -557,6 +557,18 @@
             :valueText="getFriendlyText(game.settings.technology.bankingReward)"
             :value="game.settings.technology.bankingReward"
             :compareValue="compareSettings.technology.bankingReward"/>
+          <game-setting-value v-if="game.settings.technology.researchCostProgression"
+            title="Research Cost Progression"
+            tooltip="Determines the growth of research points needed for the next level of technology"
+            :valueText="getFriendlyText(game.settings.technology.researchCostProgression.progression)"
+            :value="game.settings.technology.researchCostProgression.progression"
+            :compareValue="compareSettings.technology.researchCostProgression.progression"/>
+          <game-setting-value v-if="game.settings.technology.researchCostProgression && game.settings.technology.researchCostProgression.progression === 'exponential'"
+            title="Exponential growth factor"
+            tooltip="Determines the speed of exponential growth"
+            :valueText="getFriendlyText(game.settings.technology.researchCostProgression.growthFactor)"
+            :value="game.settings.technology.researchCostProgression.growthFactor"
+            :compareValue="compareSettings.technology.researchCostProgression.growthFactor"/>
           <game-setting-value title="Experimentation Reward"
             tooltip="Determines the amount of research points awarded for the experimentation technology at the end of a galactic cycle"
             :valueText="getFriendlyText(game.settings.technology.experimentationReward)"
@@ -654,7 +666,10 @@ export default {
         'low': 'Low',
         'medium': 'Medium',
         'high': 'High',
-        'fog': 'Fogged'
+        'fog': 'Fogged',
+        'soft': 'Soft',
+        'hard': 'Hard',
+        'exponential': 'Exponential'
       }[option]
 
       return text || option

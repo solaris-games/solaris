@@ -160,6 +160,26 @@ export default class GameCreateService {
             };
         }
 
+        // Validate research costs
+        if (game.settings.technology.researchCostProgression?.progression === 'standard') {
+            game.settings.technology.researchCostProgression = {
+                progression: 'standard',
+            };
+        } else if (game.settings.technology.researchCostProgression?.progression === 'exponential') {
+            const growthFactor = game.settings.technology.researchCostProgression.growthFactor;
+
+            if (growthFactor && growthFactor === 'soft' || growthFactor === 'medium' || growthFactor === 'hard') {
+                game.settings.technology.researchCostProgression = {
+                    progression: 'exponential',
+                    growthFactor: growthFactor
+                };
+            } else {
+                throw new ValidationError('Invalid growth factor for research cost progression.');
+            }
+        } else {
+            throw new ValidationError('Invalid research cost progression.');
+        }
+
         // Ensure that tick limited games have their ticks to end state preset
         if (game.settings.gameTime.isTickLimited === 'enabled') {
             game.state.ticksToEnd = game.settings.gameTime.tickLimit;

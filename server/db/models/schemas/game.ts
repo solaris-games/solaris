@@ -155,6 +155,10 @@ const schema = new Schema({
 				weapons: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
 				specialists: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' }
 			},
+			researchCostProgression: {
+				progression: { type: Types.String, required: false, enum: ['standard', 'exponential'], default: 'standard' },
+				growthFactor: { type: Types.String, required: false, enum: ['soft', 'medium', 'hard'], default: null },
+			},
 			bankingReward: { type: Types.String, required: true, enum: ['standard', 'legacy'], default: 'standard' },
 			experimentationReward: { type: Types.String, required: true, enum: ['standard', 'experimental'], default: 'standard' },
 			specialistTokenReward: { type: Types.String, required: true, enum: ['standard', 'experimental'], default: 'standard' }
@@ -210,7 +214,12 @@ const schema = new Schema({
 		research: {
 			progressMultiplier: { type: Types.Number, required: true, default: 50 },
 			sciencePointMultiplier: { type: Types.Number, required: true, default: 1 },
-			experimentationMultiplier: { type: Types.Number, required: true, default: 1 }
+			experimentationMultiplier: { type: Types.Number, required: true, default: 1 },
+			exponentialGrowthFactors: {
+				soft: { type: Types.Number, required: true, default: 1.25 },
+				medium: { type: Types.Number, required: true, default: 1.5 },
+				hard: { type: Types.Number, required: true, default: 1.75 }
+			}
 		},
 		star: {
 			resources: {

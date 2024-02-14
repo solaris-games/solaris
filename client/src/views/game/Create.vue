@@ -762,6 +762,24 @@
         </div>
 
         <div class="mb-2">
+          <label for="researchProgression" class="col-form-label">Research Cost Progression <help-tooltip tooltip="Determines the growth of research points needed for the next level of technology"/></label>
+          <select class="form-control" id="researchProgression" v-model="settings.technology.researchCostProgression.progression" :disabled="isCreatingGame">
+            <option v-for="opt in options.technology.researchCostProgression" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-2" v-if="settings.technology.researchCostProgression && settings.technology.researchCostProgression.progression === 'exponential'">
+          <label for="researchProgression" class="col-form-label">Exponential growth factor <help-tooltip tooltip="Determines the speed of exponential growth"/></label>
+          <select class="form-control" id="researchProgression" v-model="settings.technology.researchCostProgression.growthFactor" :disabled="isCreatingGame">
+            <option v-for="opt in options.technology.researchCostProgressionGrowthFactor" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-2">
           <label for="bankingReward" class="col-form-label">Banking Reward <help-tooltip tooltip="Determines the amount of credits awarded for the banking technology at the end of a galactic cycle"/></label>
           <select class="form-control" id="bankingReward" v-model="settings.technology.bankingReward" :disabled="isCreatingGame">
             <option v-for="opt in options.technology.bankingReward" v-bind:key="opt.value" v-bind:value="opt.value">
