@@ -181,7 +181,7 @@ export default class ResearchService extends EventEmitter {
 
         if (game.settings.technology.researchCostProgression.progression === "exponential") {
             const growthFactor = game.constants.research.exponentialGrowthFactors[game.settings.technology.researchCostProgression.growthFactor];
-            return progressMultiplierConfig * Math.pow(growthFactor, technologyLevel);
+            return Math.floor(progressMultiplierConfig * Math.pow(growthFactor, technologyLevel));
         } else {
             return technologyLevel * progressMultiplierConfig;
         }

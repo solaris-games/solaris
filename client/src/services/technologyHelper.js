@@ -27,7 +27,12 @@ class TechnologyHelper {
       const expenseCostConfig = game.constants.star.infrastructureExpenseMultipliers[researchCostConfig]
       const progressMultiplierConfig = expenseCostConfig * game.constants.research.progressMultiplier
 
-      return technologyLevel * progressMultiplierConfig
+      if (game.settings.technology.researchCostProgression.progression === 'exponential') {
+        const growthFactor = game.constants.research.exponentialGrowthFactors[game.settings.technology.researchCostProgression.growthFactor];
+        return Math.floor(progressMultiplierConfig * Math.pow(growthFactor, technologyLevel));
+      } else {
+        return technologyLevel * progressMultiplierConfig;
+      }
     }
 
     getIcon (technologyKey) {
