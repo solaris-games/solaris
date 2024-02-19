@@ -534,13 +534,6 @@ export default class PlayerService extends EventEmitter {
         this.carrierService.clearPlayerCarrierWaypointsLooped(game, player);
     }
 
-    setPlayerAsAfk(game: Game, player: Player) {
-        this.setPlayerAsDefeated(game, player, true);
-
-        player.isOpenSlot = true; // AFK players will always have their slots open.
-        player.afk = true;
-    }
-
     hasDuplicateLastSeenIP(game: Game, player: Player) {
         if (!player.lastSeenIP) {
             return false;
