@@ -288,7 +288,7 @@
             v-if="game.settings.galaxy.galaxyType !== 'custom'"/>
           <game-setting-value title="Carrier Speed"
             tooltip="Carriers go brrr"
-            :valueText="(game.settings.specialGalaxy.carrierSpeed / game.constants.distances.lightYear)+'/ly tick'"
+            :valueText="(game.settings.specialGalaxy.carrierSpeed / game.constants.distances.lightYear)+' ly/tick'"
             :value="game.settings.specialGalaxy.carrierSpeed"
             :compareValue="compareSettings.specialGalaxy.carrierSpeed"/>
           <game-setting-value title="Star Capture Rewards"

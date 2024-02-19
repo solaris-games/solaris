@@ -13,7 +13,7 @@ import SendReviewRemindersJob from './sendReviewReminders';
 let mongo;
 
 async function startup() {
-    const container = containerLoader(config, null);
+    const container = containerLoader(config);
 
     mongo = await mongooseLoader(config, {
         unlockJobs: true,

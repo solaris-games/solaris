@@ -302,8 +302,8 @@ export default class IrregularMapService {
         const NOISE_SPREAD = NOISE_BASE_SPREAD * ( (STARS_PER_PLAYER+20)/9.0 )
        
         //the amount of rings must produce about 30% more stars then requested. this way they can be pruned latter with noise to produce nice gap
-        const STAR_COUNT_MULTIPLYER = 1.3;
-        const RING_COUNT = this._getRingCount(STARS_PER_PLAYER, (STARS_PER_PLAYER*STAR_COUNT_MULTIPLYER));
+        const STAR_COUNT_MULTIPLIER = 1.3;
+        const RING_COUNT = this._getRingCount(STARS_PER_PLAYER, (STARS_PER_PLAYER*STAR_COUNT_MULTIPLIER));
         const STAR_DISTANCE = MINIMUM_STAR_DISTANCE*SPREAD;
         const STAR_DISLOCATION_THRESHOLD = MINIMUM_STAR_DISTANCE*((SPREAD-1.0)/2.0);
         const PIVOT_DISTANCE = RING_COUNT*STAR_DISTANCE;
