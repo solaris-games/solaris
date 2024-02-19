@@ -74,7 +74,7 @@
             </button>
           </div>
         </div>
-        <div class="col-auto ps-0">
+        <div class="col-auto ps-0" v-if="canEditWaypoints">
             <button type="button" class="btn btn-outline-primary" @click="onEditWaypointsRequested"><i class="fas fa-map-marker-alt"></i></button>
         </div>
     </div>
@@ -98,17 +98,22 @@ export default {
   },
   data () {
     return {
+      userPlayer: null,
+      carrierOwningPlayer: null,
       carrier: null,
       star: null,
       starShips: 0,
       carrierShips: 0,
       isTransferringShips: false,
-      carrierWaypointDestination: null
+      carrierWaypointDestination: null,
+      canEditWaypoints: false
     }
   },
   mounted () {
+    this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
     this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
     this.star = GameHelper.getStarById(this.$store.state.game, this.carrier.orbiting)
+    this.carrierOwningPlayer = GameHelper.getCarrierOwningPlayer(this.$store.state.game, this.carrier)
 
     this.starShips = this.star.ships
     this.carrierShips = this.carrier.ships
@@ -116,6 +121,8 @@ export default {
     if (this.carrier.waypoints && this.carrier.waypoints.length) {
       this.carrierWaypointDestination = this.carrier.waypoints[0].destination
     }
+
+    this.canEditWaypoints = this.userPlayer && this.carrierOwningPlayer == this.userPlayer && this.carrier && !this.userPlayer.defeated && !this.carrier.isGift && !GameHelper.isGameFinished(this.$store.state.game)
   },
   methods: {
     onCloseRequested (e) {

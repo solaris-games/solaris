@@ -508,6 +508,10 @@ class GameHelper {
     return !game.state.startDate
   }
 
+  isGameStarted (game) {
+    return game.state.startDate != null
+  }
+
   isGameInProgress (game) {
     return !this.isGameWaitingForPlayers(game) && !this.isGamePaused(game) && game.state.startDate != null && moment().utc().diff(game.state.startDate) >= 0 && !game.state.endDate
   }
@@ -1101,6 +1105,10 @@ class GameHelper {
 
   isPopulationCapped(game) {
     return game.settings.player.populationCap.enabled === 'enabled'
+  }
+
+  isGameAllowAbandonStars(game) {
+    return game.settings.player.allowAbandonStars === 'enabled'
   }
 }
 

@@ -76,7 +76,7 @@ export default {
         && (this.tradeTechnologyIsEnabled || this.tradeCreditsIsEnabled || this.tradeCreditsSpecialistsIsEnabled)
     },
     isTradePossibleByScanning: function () {
-      return this.player.stats.totalStars > 0 
+      return (this.player.stats.totalStars > 0 || GameHelper.isDarkModeExtra(this.$store.state.game))
         && (this.$store.state.game.settings.player.tradeScanning === 'all' || (this.player && this.player.isInScanningRange))
     },
     isTradePossibleByDiplomacy: function () {

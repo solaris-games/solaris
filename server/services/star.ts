@@ -250,10 +250,14 @@ export default class StarService extends EventEmitter {
             .filter(s => s.ignoreBulkUpgrade![infrastructureType]);
     }
 
+    isStarAlwaysVisible(star: Star) {
+        return star.isPulsar || star.specialistId === 10 // Trade port
+    }
+
     isStarWithinScanningRangeOfStars(game: Game, star: Star, stars: Star[]) {
         // Pulsars are considered to be always in scanning range.
         // Note: They are not visible until the game starts to prevent pre-teaming.
-        if (star.isPulsar && this.gameStateService.isStarted(game)) {
+        if (this.isStarAlwaysVisible(star) && this.gameStateService.isStarted(game)) {
             return true;
         }
 
@@ -300,7 +304,7 @@ export default class StarService extends EventEmitter {
                     _id: s._id,
                     location: s.location,
                     ownedByPlayerId: s.ownedByPlayerId,
-                    isAlwaysVisible: s.isPulsar
+                    isAlwaysVisible: this.isStarAlwaysVisible(s)
                 }
             });
 
@@ -408,6 +412,10 @@ export default class StarService extends EventEmitter {
     }
 
     async abandonStar(game: Game, player: Player, starId: DBObjectId) {
+        if (game.settings.player.allowAbandonStars === 'disabled') {
+            throw new ValidationError(`Abandoning stars has been disabled in this game.`);
+        }
+
         // Get the star.
         let star = game.galaxy.stars.find(x => x._id.toString() === starId.toString())!;
 
@@ -784,7 +792,19 @@ export default class StarService extends EventEmitter {
     getKingOfTheHillStar(game: Game) {
         const center = this.starDistanceService.getGalacticCenter();
 
-        return game.galaxy.stars.find(s => s.location.x === center.x && s.location.y === center.y)!;
+        // Note: We have to get the closest one to the center as its possible
+        // to move the center star by using a stellar engine so we can't assume
+        // the center star will always be at 0,0
+        const closestToCenter = game.galaxy.stars.map(star => {
+            const distance = this.distanceService.getDistanceBetweenLocations(center, star.location);
+
+            return {
+                star,
+                distance
+            }
+        }).sort((a, b) => a.distance - b.distance)[0].star;
+
+        return closestToCenter;
     }
 
     isKingOfTheHillStar(star: Star) {

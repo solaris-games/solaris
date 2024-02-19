@@ -318,22 +318,24 @@ class Territories {
       // let sanitizedPoints = points
       let sanitizedPoints = points.map(getPoint)
 
-      // Draw the graphic
-      let territoryGraphic = new PIXI.Graphics()
-      territoryGraphic.lineStyle(borderWidth, colour, 1)
-      territoryGraphic.beginFill(colour, 0.3)
-      territoryGraphic.moveTo(sanitizedPoints[0].x, sanitizedPoints[0].y)
+      if (sanitizedPoints.length) {
+        // Draw the graphic
+        let territoryGraphic = new PIXI.Graphics()
+        territoryGraphic.lineStyle(borderWidth, colour, 1)
+        territoryGraphic.beginFill(colour, 0.3)
+        territoryGraphic.moveTo(sanitizedPoints[0].x, sanitizedPoints[0].y)
 
-      for (let point of sanitizedPoints) {
-        territoryGraphic.lineTo(point.x, point.y)
+        for (let point of sanitizedPoints) {
+          territoryGraphic.lineTo(point.x, point.y)
+        }
+
+        // Draw another line back to the origin.
+        territoryGraphic.lineTo(sanitizedPoints[0].x, sanitizedPoints[0].y)
+
+        territoryGraphic.endFill()
+
+        this.container.addChild(territoryGraphic)
       }
-
-      // Draw another line back to the origin.
-      territoryGraphic.lineTo(sanitizedPoints[0].x, sanitizedPoints[0].y)
-
-      territoryGraphic.endFill()
-
-      this.container.addChild(territoryGraphic)
     }
     // ----------
 

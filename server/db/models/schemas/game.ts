@@ -43,7 +43,7 @@ const schema = new Schema({
 			featured: { type: Types.Boolean, required: false, default: false },
 			password: { type: Types.String, required: false, default: null },
 			passwordRequired: { type: Types.Boolean, required: false, default: false },
-			playerLimit: { type: Types.Number, required: true, default: 8, min: 2, max: 32 },
+			playerLimit: { type: Types.Number, required: true, default: 8, min: 2, max: 48 },
 			playerType: { type: Types.String, required: true, enum: ['all', 'establishedPlayers'], default: 'all' },
 			anonymity: { type: Types.String, required: true, enum: ['normal', 'extra'], default: 'normal' },
 			playerOnlineStatus: { type: Types.String, required: true, enum: ['hidden', 'visible'], default: 'hidden' },
@@ -121,12 +121,13 @@ const schema = new Schema({
 			populationCap: {
 				enabled: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
 				shipsPerStar: { type: Types.Number, required: true, min: 50, max: 1000, default: 100 }
-			}
+			},
+			allowAbandonStars: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'enabled' }
 		},
 		diplomacy: {
 			enabled: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
 			tradeRestricted: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
-			maxAlliances: { type: Types.Number, required: true, min: 1, max: 31, default: 31 },
+			maxAlliances: { type: Types.Number, required: true, min: 1, max: 47, default: 47 },
 			upkeepCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'crazyExpensive'], default: 'none' },
 			globalEvents: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' }
 		},

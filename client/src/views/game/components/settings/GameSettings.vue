@@ -79,6 +79,11 @@
             :valueText="getFriendlyText(game.settings.general.readyToQuit)"
             :value="game.settings.general.readyToQuit"
             :compareValue="compareSettings.general.readyToQuit"/>
+          <game-setting-value title="Allow Abandon Stars"
+            tooltip="Allow players to abandon their stars"
+            :valueText="getFriendlyText(game.settings.player.allowAbandonStars)"
+            :value="game.settings.player.allowAbandonStars"
+            :compareValue="compareSettings.player.allowAbandonStars"/>
         </tbody>
       </table>
     </div>
@@ -283,7 +288,7 @@
             v-if="game.settings.galaxy.galaxyType !== 'custom'"/>
           <game-setting-value title="Carrier Speed"
             tooltip="Carriers go brrr"
-            :valueText="(game.settings.specialGalaxy.carrierSpeed / game.constants.distances.lightYear)+'/ly tick'"
+            :valueText="(game.settings.specialGalaxy.carrierSpeed / game.constants.distances.lightYear)+' ly/tick'"
             :value="game.settings.specialGalaxy.carrierSpeed"
             :compareValue="compareSettings.specialGalaxy.carrierSpeed"/>
           <game-setting-value title="Star Capture Rewards"
