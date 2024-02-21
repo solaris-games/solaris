@@ -91,6 +91,18 @@
             :valueText="game.settings.general.readyToQuitTimerCycles"
             :value="game.settings.general.readyToQuitTimerCycles"
             :compareValue="compareSettings.general.readyToQuitTimerCycles"/>
+          <game-setting-value title="Players that will receive rank"
+            tooltip="Players that will receive rank"
+            :valueText="getFriendlyText(game.settings.general.awardRankTo)"
+            :value="game.settings.general.awardRankTo"
+            :compareValue="compareSettings.general.awardRankTo"
+          />
+          <game-setting-value title="Number of top/bottom players for rank distribution"
+            tooltip="Top N players will receive rank, and bottom N players will lose rank"
+            :valueText="game.settings.general.awardRankToTopN"
+            :value="game.settings.general.awardRankToTopN"
+            :compareValue="compareSettings.general.awardRankToTopN"
+          />
           <game-setting-value title="Allow Abandon Stars"
             tooltip="Allow players to abandon their stars"
             :valueText="getFriendlyText(game.settings.player.allowAbandonStars)"
@@ -669,7 +681,9 @@ export default {
         'fog': 'Fogged',
         'soft': 'Soft',
         'hard': 'Hard',
-        'exponential': 'Exponential'
+        'exponential': 'Exponential',
+        'winner': 'Winner',
+        'top_n': 'Top N',
       }[option]
 
       return text || option
