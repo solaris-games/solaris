@@ -158,7 +158,7 @@
         </div>
 
         <div class="mb-2" v-if="settings.general.awardRankTo === 'top_n'">
-          <label for="awardRankToTopN" class="col-form-label">Number of top/bottom players for rank distribution (<span class="text-warning">{{settings.general.awardRankToTopN}} players</span>) <help-tooltip tooltip="Top N players will receive rank, and bottom N players will lose rank"/></label>
+          <label for="awardRankToTopN" class="col-form-label">Top/bottom <span class="text-warning">{{settings.general.awardRankToTopN}} players</span> will receive/lose rank <help-tooltip tooltip="Top N players will receive rank, and bottom N players will lose rank"/></label>
           <div class="col">
             <input type="range" min="1" :max="settings.general.playerLimit" step="1" class="form-range w-50" id="awardRankToTopN" v-model="settings.general.awardRankToTopN" :disabled="isCreatingGame">
           </div>
