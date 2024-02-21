@@ -22,7 +22,7 @@ export default (config: Config, server, sessionStore) => {
                     sessionStore.get(sidParsed, (err, session) => {
                         if (err) return reject(err);
     
-                        if (session.userId) {
+                        if (session?.userId) {
                             resolve(session.userId.toString())
                         } else {
                             resolve(null);
