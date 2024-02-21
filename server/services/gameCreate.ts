@@ -213,7 +213,16 @@ export default class GameCreateService {
 
         // Clamp max alliances if its invalid (minimum of 1)
         game.settings.diplomacy.maxAlliances = Math.max(1, Math.min(game.settings.diplomacy.maxAlliances, game.settings.general.playerLimit - 1));
-        
+
+        const awardRankTo = game.settings.general.awardRankTo;
+        const awardRankToTopN = game.settings.general.awardRankToTopN;
+
+        if (awardRankTo === 'top_n' && (!awardRankToTopN || awardRankToTopN < 1 || awardRankToTopN > Math.floor(game.settings.general.playerLimit / 2))) {
+            throw new ValidationError('Invalid top N value for awarding rank.');
+        } else if (!['all', 'winner', 'top_n'].includes(awardRankTo)) {
+            throw new ValidationError('Invalid award rank to setting.');
+        }
+
         // If the game name contains a special string, then replace it with a random name.
         if (game.settings.general.name.indexOf(RANDOM_NAME_STRING) > -1) {
             let randomGameName = this.nameService.getRandomGameName();

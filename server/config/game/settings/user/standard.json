@@ -15,7 +15,9 @@
        "spectators": "enabled",
        "readyToQuit": "enabled",
        "readyToQuitFraction": 1.0,
-       "readyToQuitTimerCycles": 0
+       "readyToQuitTimerCycles": 0,
+       "awardRankTo": "all",
+       "awardRankToTopN": 1
     },
     "galaxy":{
        "galaxyType":"irregular",

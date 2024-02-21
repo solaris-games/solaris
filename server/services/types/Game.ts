@@ -32,7 +32,7 @@ export type GamePlayerType = 'all'|'establishedPlayers';
 export type GamePlayerAnonymity = 'normal'|'extra';
 export type GamePlayerOnlineStatus = 'hidden'|'visible';
 export type GameSettingEnabledDisabled = 'disabled'|'enabled';
-export type GameAwardRankTo = 'all'|'winner';
+export type GameAwardRankTo = 'all'|'winner'|'top_n';
 export type GameGalaxyType = 'circular'|'spiral'|'doughnut'|'circular-balanced'|'irregular'|'custom';
 export type GameCarrierCost = 'cheap'|'standard'|'expensive';
 export type GameCarrierUpkeepCost = 'none'|'cheap'|'standard'|'expensive';
@@ -96,6 +96,7 @@ export interface GameSettings {
 		playerOnlineStatus: GamePlayerOnlineStatus;
 		timeMachine: GameSettingEnabledDisabled;
 		awardRankTo: GameAwardRankTo;
+		awardRankToTopN?: number;
 		fluxEnabled: GameSettingEnabledDisabled;
 		isGameAdmin?: boolean;
 		advancedAI: GameSettingEnabledDisabled;

@@ -172,6 +172,20 @@
            "value": 3,
            "text": "3 Cycles"
          }
+       ],
+       "awardRankTo": [
+          {
+             "value": "all",
+             "text": "All Players"
+          },
+          {
+            "value": "winners",
+            "text": "Winner"
+          },
+          {
+             "value": "top_n",
+             "text": "Top N"
+          }
        ]
     },
     "specialGalaxy":{

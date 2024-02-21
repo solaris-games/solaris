@@ -50,6 +50,7 @@ const schema = new Schema({
 			playerOnlineStatus: { type: Types.String, required: true, enum: ['hidden', 'visible'], default: 'hidden' },
 			timeMachine: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
 			awardRankTo: { type: Types.String, required: false, enum: ['all', 'winner'], default: 'all' },
+			awardRankToTopN: { type: Types.Number, required: false, min: 1, default: null },
 			fluxEnabled: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
 			advancedAI: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'disabled' },
 			spectators: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'disabled' },

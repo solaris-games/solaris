@@ -148,6 +148,21 @@
           </select>
         </div>
 
+        <div class="mb-2">
+          <label for="awardRankTo" class="col-form-label">Players that will receive rank <help-tooltip tooltip="How rank will be distributed at the end of the game" /></label>
+          <select class="form-control" id="awardRankTo" v-model="settings.general.awardRankTo" :disabled="isCreatingGame">
+            <option v-for="opt in options.general.awardRankTo" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-2" v-if="settings.general.awardRankTo === 'top_n'">
+          <label for="awardRankToTopN" class="col-form-label">Number of top/bottom players for rank distribution (<span class="text-warning">{{settings.general.awardRankToTopN}} players</span>) <help-tooltip tooltip="Top N players will receive rank, and bottom N players will lose rank"/></label>
+          <div class="col">
+            <input type="range" min="1" :max="settings.general.playerLimit" step="1" class="form-range w-50" id="awardRankToTopN" v-model="settings.general.awardRankToTopN" :disabled="isCreatingGame">
+          </div>
+        </div>
 
         <div class="mb-2">
           <label for="allowAbandonStars" class="col-form-label">Allow Abandon Stars <help-tooltip tooltip="Determines whether players are allowed to abandon stars"/></label>
