@@ -707,9 +707,15 @@ export default class LeaderboardService {
 
             if (i == 0) {
                 rankIncrease = leaderboard.length; // Note: Using leaderboard length as this includes ALL players (including afk)
-            }
-            else if (game.settings.general.awardRankTo === 'all') {
-                rankIncrease = Math.round(leaderboard.length / 2 - i);
+            } else {
+                if (game.settings.general.awardRankTo === 'all') {
+                    rankIncrease = Math.round(leaderboard.length / 2 - i);
+                } else if (game.settings.general.awardRankTo === 'top_n') {
+                    const topN = game.settings.general.awardRankToTopN || 1;
+                    if (i < topN || i >= leaderboard.length - topN) {
+                        rankIncrease = Math.round(leaderboard.length / 2 - i);
+                    }
+                }
             }
 
             // For AFK players, do not award any positive rank
