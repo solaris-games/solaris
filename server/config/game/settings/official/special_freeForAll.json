@@ -3,6 +3,7 @@
     "name": "[[[RANDOM]]]",
     "description": "You vs. the universe. Trading, formal alliances and gifting is not present in this game mode, raw diplomacy and perfect strategy is what's needed to win.",
     "type": "special_freeForAll",
+    "createdFromTemplate": "special_freeForAll",
     "mode": "conquest",
     "password": null,
     "playerLimit": 10,

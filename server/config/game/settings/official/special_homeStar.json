@@ -3,6 +3,7 @@
     "name": "[[[RANDOM]]]",
     "description": "Capital Stars are the targets in this mode, capture enemy capitals to win and protect your own.",
     "type": "special_homeStar",
+    "createdFromTemplate": "special_homeStar",
     "mode": "conquest",
     "password": null,
     "playerLimit": 10,

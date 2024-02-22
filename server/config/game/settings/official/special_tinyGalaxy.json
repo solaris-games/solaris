@@ -3,6 +3,7 @@
     "name": "[[[RANDOM]]]",
     "description": "Fight for space in this claustrophobic galaxy.",
     "type": "special_tinyGalaxy",
+    "createdFromTemplate": "special_tinyGalaxy",
     "mode": "conquest",
     "password": null,
     "playerLimit": 10,

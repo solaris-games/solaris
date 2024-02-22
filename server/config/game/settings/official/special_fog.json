@@ -3,6 +3,7 @@
     "name": "[[[RANDOM]]]",
     "description": "You aren't alone in this galaxy, although it may appear so, who knows what is beyond the horizon.",
     "type": "special_fog",
+    "createdFromTemplate": "special_fog",
     "mode": "conquest",
     "password": null,
     "playerLimit": 10,

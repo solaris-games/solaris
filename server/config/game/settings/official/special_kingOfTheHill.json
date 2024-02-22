@@ -3,6 +3,7 @@
     "name": "[[[RANDOM]]]",
     "description": "Fight for and hold the galactic center in this tense game. Who will be crowned king?",
     "type": "special_kingOfTheHill",
+    "createdFromTemplate": "special_kingOfTheHill",
     "mode": "kingOfTheHill",
     "password": null,
     "playerLimit": 10,

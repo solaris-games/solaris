@@ -3,6 +3,7 @@
     "name": "[[[RANDOM]]]",
     "description": "Stars in this galaxy are in orbit, embrace the chaos and use it to your advantage!",
     "type": "special_orbital",
+    "createdFromTemplate": "special_orbital",
     "mode": "conquest",
     "password": null,
     "playerLimit": 10,

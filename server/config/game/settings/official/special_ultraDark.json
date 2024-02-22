@@ -3,6 +3,7 @@
     "name": "[[[RANDOM]]]",
     "description": "Information is vital in an ultra dark galaxy. Can you be sure your ally has as many stars as they say they have?",
     "type": "special_ultraDark",
+    "createdFromTemplate": "special_ultraDark",
     "mode": "conquest",
     "password": null,
     "playerLimit": 10,

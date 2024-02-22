@@ -3,6 +3,7 @@
     "name": "[[[RANDOM]]]",
     "description": "Stars in this galaxy cannot be upgraded and ship population is limited, this mode requires cunning tactics to win.",
     "type": "special_arcade",
+    "createdFromTemplate": "special_arcade",
     "mode": "conquest",
     "password": null,
     "playerLimit": 10,

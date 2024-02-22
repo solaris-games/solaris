@@ -3,6 +3,7 @@
     "name": "[[[RANDOM]]]",
     "description": "All players are anonymous in this mode, prepare for a game of who's who with no repercussions, trust no-one and watch your back.",
     "type": "special_anonymous",
+    "createdFromTemplate": "special_anonymous",
     "mode": "conquest",
     "password": null,
     "playerLimit": 10,
