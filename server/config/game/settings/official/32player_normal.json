@@ -14,7 +14,10 @@
     "fluxEnabled": "enabled",
     "advancedAI": "enabled",
     "spectators": "enabled",
-    "readyToQuit": "enabled"
+    "readyToQuit": "enabled",
+    "readyToQuitFraction": 0.9,
+    "awardRankTo": "top_n",
+    "awardRankToTopN": 6
   },
   "galaxy": {
     "galaxyType": "irregular",
@@ -107,12 +110,16 @@
       "hyperspace": "standard",
       "manufacturing": "standard",
       "banking": "standard",
-      "weapons": "standard",
+      "weapons": "expensive",
       "specialists": "standard"
     },
     "bankingReward": "standard",
     "experimentationReward": "standard",
-    "specialistTokenReward": "experimental"
+    "specialistTokenReward": "experimental",
+    "researchCostProgression": {
+      "progression": "exponential",
+      "growthFactor": "medium"
+    }
   },
   "gameTime": {
     "gameType": "realTime",
