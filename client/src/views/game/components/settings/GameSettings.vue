@@ -97,7 +97,8 @@
             :value="game.settings.general.awardRankTo"
             :compareValue="compareSettings.general.awardRankTo"
           />
-          <game-setting-value title="Number of top/bottom players for rank distribution"
+          <game-setting-value v-if="game.settings.general.awardRankTo === 'top_n'"
+            title="Number of top/bottom players for rank distribution"
             tooltip="Top N players will receive rank, and bottom N players will lose rank"
             :valueText="game.settings.general.awardRankToTopN"
             :value="game.settings.general.awardRankToTopN"
