@@ -54,7 +54,7 @@ const largeGameSettings = carouselGames("32 Player", "sequential", [
     './game/settings/official/32player_ultradark'
 ])
 
-const specialGameSettings = carouselGames("Special", "random", [
+const specialGameSettings = carouselGames("Special", "sequential", [
     './game/settings/official/special_dark',
     './game/settings/official/special_fog',
     './game/settings/official/special_battleRoyale',
