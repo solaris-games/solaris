@@ -5,7 +5,7 @@
     "type": "special_dark",
     "mode": "conquest",
     "password": null,
-    "playerLimit": 8,
+    "playerLimit": 10,
     "playerType": "all",
     "anonymity": "normal",
     "playerOnlineStatus": "hidden",

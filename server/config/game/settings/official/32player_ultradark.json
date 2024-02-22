@@ -14,7 +14,7 @@
     "fluxEnabled": "enabled",
     "advancedAI": "enabled",
     "spectators": "enabled",
-    "readyToQuit": "disabled"
+    "readyToQuit": "enabled"
   },
   "galaxy": {
     "galaxyType": "irregular",

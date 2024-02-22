@@ -5,7 +5,7 @@
     "type": "standard_rt",
     "mode": "conquest",
     "password": null,
-    "playerLimit": 8,
+    "playerLimit": 10,
     "playerType": "all",
     "anonymity": "normal",
     "playerOnlineStatus": "hidden",
