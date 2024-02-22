@@ -297,6 +297,7 @@ export default class GameListService {
             'settings.general.type': 1,
             'settings.general.playerLimit': 1,
             'settings.general.playerType': 1,
+            'settings.general.createdFromTemplate': 1,
             state: 1,
             'galaxy.players.isOpenSlot': 1
         }, {

@@ -7,11 +7,17 @@ import StarSchema from './star';
 import CarrierSchema from './carrier';
 import ConversationSchema from './conversation';
 
+const validateNullableEnum = (enumValues: string[]) => (s: string | null) => {
+	if (s === null) return true;
+	return enumValues.includes(s);
+}
+
 const schema = new Schema({
     settings: {
         general: {
 			fluxId: { type: Types.Number, required: false, default: null },
             createdByUserId: { type: Types.ObjectId, required: false, default: null },
+			createdFromTemplate: { type: Types.String, required: false, default: null },
             name: { type: Types.String, required: true },
             description: { type: Types.String, required: false, default: null },
 			type: { type: Types.String, required: true, enum: [
@@ -48,11 +54,14 @@ const schema = new Schema({
 			anonymity: { type: Types.String, required: true, enum: ['normal', 'extra'], default: 'normal' },
 			playerOnlineStatus: { type: Types.String, required: true, enum: ['hidden', 'visible'], default: 'hidden' },
 			timeMachine: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
-			awardRankTo: { type: Types.String, required: false, enum: ['all', 'winner'], default: 'all' },
+			awardRankTo: { type: Types.String, required: false, enum: ['all', 'winner', 'top_n'], default: 'all' },
+			awardRankToTopN: { type: Types.Number, required: false, min: 1, default: null },
 			fluxEnabled: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
 			advancedAI: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'disabled' },
 			spectators: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'disabled' },
-			readyToQuit: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'enabled' }
+			readyToQuit: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'enabled' },
+			readyToQuitFraction: { type: Types.Number, required: false, min: 0.5, max: 1.0, default: 1.0 },
+			readyToQuitTimerCycles: { type: Types.Number, required: false, min: 0, max: 3, default: 0 },
         },
         galaxy: {
 			galaxyType: { type: Types.String, required: true, enum: ['circular', 'spiral', 'doughnut','circular-balanced', 'irregular', 'custom'], default: 'circular' },
@@ -152,6 +161,10 @@ const schema = new Schema({
 				weapons: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
 				specialists: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' }
 			},
+			researchCostProgression: {
+				progression: { type: Types.String, required: false, enum: ['standard', 'exponential'], default: 'standard' },
+				growthFactor: { type: Types.String, required: false, validate: validateNullableEnum(['soft', 'medium', 'hard']), default: null },
+			},
 			bankingReward: { type: Types.String, required: true, enum: ['standard', 'legacy'], default: 'standard' },
 			experimentationReward: { type: Types.String, required: true, enum: ['standard', 'experimental'], default: 'standard' },
 			specialistTokenReward: { type: Types.String, required: true, enum: ['standard', 'experimental'], default: 'standard' }
@@ -207,7 +220,12 @@ const schema = new Schema({
 		research: {
 			progressMultiplier: { type: Types.Number, required: true, default: 50 },
 			sciencePointMultiplier: { type: Types.Number, required: true, default: 1 },
-			experimentationMultiplier: { type: Types.Number, required: true, default: 1 }
+			experimentationMultiplier: { type: Types.Number, required: true, default: 1 },
+			exponentialGrowthFactors: {
+				soft: { type: Types.Number, required: true, default: 1.25 },
+				medium: { type: Types.Number, required: true, default: 1.5 },
+				hard: { type: Types.Number, required: true, default: 1.75 }
+			}
 		},
 		star: {
 			resources: {
