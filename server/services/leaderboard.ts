@@ -707,9 +707,15 @@ export default class LeaderboardService {
 
             if (i == 0) {
                 rankIncrease = leaderboard.length; // Note: Using leaderboard length as this includes ALL players (including afk)
-            }
-            else if (game.settings.general.awardRankTo === 'all') {
-                rankIncrease = Math.round(leaderboard.length / 2 - i);
+            } else {
+                if (game.settings.general.awardRankTo === 'all') {
+                    rankIncrease = Math.round(leaderboard.length / 2 - i);
+                } else if (game.settings.general.awardRankTo === 'top_n') {
+                    const topN = game.settings.general.awardRankToTopN || 1;
+                    if (i < topN || i >= leaderboard.length - topN) {
+                        rankIncrease = Math.round(leaderboard.length / 2 - i);
+                    }
+                }
             }
 
             // For AFK players, do not award any positive rank
@@ -820,15 +826,6 @@ export default class LeaderboardService {
 
     getGameWinner(game: Game, leaderboard: LeaderboardPlayer[]): Player | null {
         let isKingOfTheHillMode = this.gameTypeService.isKingOfTheHillMode(game);
-        let isAllUndefeatedPlayersReadyToQuit = this.gameService.isAllUndefeatedPlayersReadyToQuit(game);
-
-        if (isAllUndefeatedPlayersReadyToQuit) {
-            if (isKingOfTheHillMode) {
-                return this.playerService.getKingOfTheHillPlayer(game) || this.getFirstPlacePlayer(leaderboard);
-            }
-
-            return this.getFirstPlacePlayer(leaderboard);
-        }
 
         if (this.gameTypeService.isConquestMode(game)) {
             let starWinner = this.getStarCountWinner(game, leaderboard);

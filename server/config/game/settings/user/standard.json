@@ -13,7 +13,11 @@
        "fluxEnabled": "enabled",
        "advancedAI": "enabled",
        "spectators": "enabled",
-       "readyToQuit": "enabled"
+       "readyToQuit": "enabled",
+       "readyToQuitFraction": 1.0,
+       "readyToQuitTimerCycles": 0,
+       "awardRankTo": "all",
+       "awardRankToTopN": 1
     },
     "galaxy":{
        "galaxyType":"irregular",
@@ -111,6 +115,10 @@
           "banking":"standard",
           "weapons":"standard",
           "specialists":"standard"
+       },
+       "researchCostProgression": {
+          "progression": "standard",
+          "growthFactor": "medium"
        },
        "bankingReward":"standard",
        "experimentationReward": "standard",

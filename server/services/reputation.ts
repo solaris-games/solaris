@@ -146,7 +146,7 @@ export default class ReputationService extends EventEmitter {
     }
 
     async tryIncreaseReputationCredits(game: Game, fromPlayer: Player, toPlayer: Player, amount: number) {
-        let playerStats = this.playerStatisticsService.getStats(game, toPlayer);
+        let playerStats = this.playerStatisticsService.getStats(game, fromPlayer);
         let creditsRequired = playerStats.totalEconomy * 10 / 2;
         let increased = amount >= creditsRequired;
 
@@ -161,7 +161,7 @@ export default class ReputationService extends EventEmitter {
     }
 
     async tryIncreaseReputationCreditsSpecialists(game: Game, fromPlayer: Player, toPlayer: Player, amount: number) {
-        let creditsRequired = Math.round(toPlayer.research.specialists.level / 2);
+        let creditsRequired = Math.round(fromPlayer.research.specialists.level / 2);
         let increased = amount >= creditsRequired;
 
         if (increased) {

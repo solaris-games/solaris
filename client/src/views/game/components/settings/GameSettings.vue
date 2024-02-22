@@ -79,6 +79,31 @@
             :valueText="getFriendlyText(game.settings.general.readyToQuit)"
             :value="game.settings.general.readyToQuit"
             :compareValue="compareSettings.general.readyToQuit"/>
+          <game-setting-value title="Fraction of stars for RTQ"
+            v-if="game.settings.general.readyToQuit === 'enabled'"
+            tooltip="Fraction of stars for triggering RTQ condition"
+            :valueText="game.settings.general.readyToQuitFraction"
+            :value="game.settings.general.readyToQuitFraction"
+            :compareValue="compareSettings.general.readyToQuitFraction"/>
+          <game-setting-value title="Timer for RTQ"
+            v-if="game.settings.general.readyToQuit === 'enabled'"
+            tooltip="Time until game finishes after RTQ"
+            :valueText="game.settings.general.readyToQuitTimerCycles"
+            :value="game.settings.general.readyToQuitTimerCycles"
+            :compareValue="compareSettings.general.readyToQuitTimerCycles"/>
+          <game-setting-value title="Players that will receive rank"
+            tooltip="Players that will receive rank"
+            :valueText="getFriendlyText(game.settings.general.awardRankTo)"
+            :value="game.settings.general.awardRankTo"
+            :compareValue="compareSettings.general.awardRankTo"
+          />
+          <game-setting-value v-if="game.settings.general.awardRankTo === 'top_n'"
+            title="Number of top/bottom players for rank distribution"
+            tooltip="Top N players will receive rank, and bottom N players will lose rank"
+            :valueText="game.settings.general.awardRankToTopN"
+            :value="game.settings.general.awardRankToTopN"
+            :compareValue="compareSettings.general.awardRankToTopN"
+          />
           <game-setting-value title="Allow Abandon Stars"
             tooltip="Allow players to abandon their stars"
             :valueText="getFriendlyText(game.settings.player.allowAbandonStars)"
@@ -545,6 +570,18 @@
             :valueText="getFriendlyText(game.settings.technology.bankingReward)"
             :value="game.settings.technology.bankingReward"
             :compareValue="compareSettings.technology.bankingReward"/>
+          <game-setting-value v-if="game.settings.technology.researchCostProgression"
+            title="Research Cost Progression"
+            tooltip="Determines the growth of research points needed for the next level of technology"
+            :valueText="getFriendlyText(game.settings.technology.researchCostProgression.progression)"
+            :value="game.settings.technology.researchCostProgression.progression"
+            :compareValue="compareSettings.technology.researchCostProgression.progression"/>
+          <game-setting-value v-if="game.settings.technology.researchCostProgression && game.settings.technology.researchCostProgression.progression === 'exponential'"
+            title="Exponential growth factor"
+            tooltip="Determines the speed of exponential growth"
+            :valueText="getFriendlyText(game.settings.technology.researchCostProgression.growthFactor)"
+            :value="game.settings.technology.researchCostProgression.growthFactor"
+            :compareValue="compareSettings.technology.researchCostProgression.growthFactor"/>
           <game-setting-value title="Experimentation Reward"
             tooltip="Determines the amount of research points awarded for the experimentation technology at the end of a galactic cycle"
             :valueText="getFriendlyText(game.settings.technology.experimentationReward)"
@@ -642,7 +679,12 @@ export default {
         'low': 'Low',
         'medium': 'Medium',
         'high': 'High',
-        'fog': 'Fogged'
+        'fog': 'Fogged',
+        'soft': 'Soft',
+        'hard': 'Hard',
+        'exponential': 'Exponential',
+        'winner': 'Winner',
+        'top_n': 'Top N',
       }[option]
 
       return text || option

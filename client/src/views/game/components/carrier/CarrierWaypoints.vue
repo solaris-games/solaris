@@ -3,7 +3,7 @@
     <menu-title :title="carrier.name" @onCloseRequested="onCloseRequested">
       <span class="me-2" title="Hyperspace technology level" v-if="userPlayer"><i class="fas fa-gas-pump me-1"></i>{{userPlayer.research.hyperspace.level}}</span>
       <span class="me-2"><i class="fas fa-rocket me-1"></i>{{carrier.ships == null ? '???' : carrier.ships}}</span>
-    	<button class="btn btn-sm btn-outline-info" @click="toggleCarrierWaypointsDisplay" title="Toggle taypoints display">
+    	<button class="btn btn-sm btn-outline-info" @click="toggleCarrierWaypointsDisplay" title="Toggle waypoints display">
         <i class="fas" :class="{'fa-eye-slash':!display,'fa-eye':display}"></i>
       </button>
     </menu-title>
