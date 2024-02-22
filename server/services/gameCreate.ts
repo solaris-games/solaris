@@ -201,14 +201,6 @@ export default class GameCreateService {
         if (game.settings.general.readyToQuit === "enabled") {
             game.settings.general.readyToQuitFraction = game.settings.general.readyToQuitFraction || 1.0;
             game.settings.general.readyToQuitTimerCycles = game.settings.general.readyToQuitTimerCycles || 0;
-        } else {
-            if (game.settings.general.readyToQuitFraction) {
-                throw new ValidationError('Cannot set ready to quit fraction without enabling ready to quit.');
-            }
-
-            if (game.settings.general.readyToQuitTimerCycles) {
-                throw new ValidationError('Cannot set ready to quit timer cycles without enabling ready to quit.');
-            }
         }
 
         // Clamp max alliances if its invalid (minimum of 1)
