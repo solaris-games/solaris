@@ -933,12 +933,16 @@ class Map extends EventEmitter {
     // Combine the arrays and order by closest first.
     let closeObjects = closeStars.concat(closeCarriers)
       .sort((a, b) => {
-        if (a.type.localeCompare(b.type)) { // Sort the star first
-          return 1
+        if (a.type !== b.type) { // Sort stars first
+          return b.type.localeCompare(a.type);
         }
 
-        return a.distance < b.distance // Then distance ascending.
-      })
+        if (a.distance === b.distance) {
+          return a.data.name.localeCompare(b.data.name); // If the distances are identical, sort by name ascending.
+        }
+
+        return a.distance < b.distance ? -1 : 1; // Finally, sort by distance ascending.
+      });
 
     if (closeObjects.length > 1) {
       let star = closeObjects.find(co => co.type === 'star')
