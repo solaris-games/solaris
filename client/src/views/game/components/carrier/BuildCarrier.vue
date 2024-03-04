@@ -19,10 +19,10 @@
 
     <div class="row mb-1">
         <div class="col">
-            <input v-model.lazy="starShips" type="number" class="form-control" @change="onStarShipsChanged">
+            <input v-model="starShips" type="number" class="form-control" @input="onStarShipsChanged">
         </div>
         <div class="col">
-            <input v-model.lazy="carrierShips" type="number" class="form-control" @change="onCarrierShipsChanged">
+            <input v-model="carrierShips" type="number" class="form-control" @input="onCarrierShipsChanged">
         </div>
     </div>
 
@@ -67,7 +67,7 @@
         </div>
         <div class="col-auto">
           <div class="d-grid gap-2">
-            <button type="button" class="btn btn-info" :disabled="$isHistoricalMode() || isBuildingCarrier || starShips < 0 || carrierShips < 0" @click="saveTransfer">
+            <button type="button" class="btn btn-info" :disabled="$isHistoricalMode() || isBuildingCarrier || starShips < 0 || carrierShips < 1" @click="saveTransfer">
                 <i class="fas fa-rocket"></i>
                 Build for ${{star.upgradeCosts.carriers}}
             </button>
@@ -108,12 +108,24 @@ export default {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
     },
-    onStarShipsChanged (e) {
-      let difference = parseInt(this.starShips) - this.star.ships
+    onStarShipsChanged(e) {
+      this.starShips = parseInt(this.starShips);
+
+      if (isNaN(this.starShips)) {
+        this.starShips = 0;
+      }
+
+      let difference = this.starShips - this.star.ships
       this.carrierShips = Math.abs(difference)
     },
-    onCarrierShipsChanged (e) {
-      let difference = parseInt(this.carrierShips)
+    onCarrierShipsChanged(e) {
+      this.carrierShips = parseInt(this.carrierShips);
+
+      if (isNaN(this.carrierShips)) {
+        this.carrierShips = 1;
+      }
+
+      let difference = this.carrierShips;
       this.starShips = this.star.ships - difference
     },
     onMinShipsClicked (e) {
