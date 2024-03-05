@@ -985,12 +985,13 @@ class GameHelper {
     }
 
     const bankingLevel = player.research.banking.level
+    const multiplier = game.constants.player.bankingCycleRewardMultiplier
 
     switch (game.settings.technology.bankingReward) {
       case 'standard':
-          return Math.round((bankingLevel * 75) + (0.15 * bankingLevel * player.stats.totalEconomy))
+          return Math.round((bankingLevel * multiplier) + (0.15 * bankingLevel * player.stats.totalEconomy))
       case 'legacy':
-          return bankingLevel * 75
+          return bankingLevel * multiplier
     }
   }
 
