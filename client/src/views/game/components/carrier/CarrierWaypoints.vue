@@ -42,7 +42,7 @@
           <!--Yes, that key-property depending on the current date is there for a reason. Otherwise, under certain circumstances, the text is not updated on screen on iOS Safari.-->
           <!-- https://stackoverflow.com/questions/55008261/my-react-component-does-not-update-in-the-safari-browser -->
           <!-- Seriously, what is wrong with you, Safari? -->
-		  		<p class="mb-0" :key="(new Date()).getTime().toString()" v-if="totalEtaTimeString && carrier.waypoints.length">ETA<orbital-mechanics-eta-warning />: {{totalEtaTimeString}}</p>
+		  		<p class="mb-0" :key="(new Date()).getTime().toString()" v-if="totalEtaTimeString && carrier.waypoints.length">{{totalEtaTimeString}}<orbital-mechanics-eta-warning /></p>
 		  	</div>
       </div>
 
@@ -66,7 +66,7 @@
             <span class="ms-1">Save</span>
           </button>
 		  		<button class="btn btn-sm btn-success ms-1" @click="saveWaypoints(true)" :disabled="isSavingWaypoints">
-            <i class="fas fa-edit"></i> 
+            <i class="fas fa-edit"></i>
             <span class="ms-1 d-none d-sm-inline-block">Save &amp; Edit</span>
           </button>
 		  	</div>
@@ -210,7 +210,11 @@ export default {
       let totalTicksEta = GameHelper.calculateWaypointTicksEta(this.$store.state.game, this.carrier,
         this.carrier.waypoints[this.carrier.waypoints.length - 1])
 
-      this.totalEtaTimeString = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, totalTicksEta)
+      const relativeTime = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, totalTicksEta)
+
+      const absoluteTick = this.$store.state.game.state.tick + totalTicksEta;
+
+      this.totalEtaTimeString = `${relativeTime} - ETA: Tick ${absoluteTick}`
     },
     recalculateLooped () {
       if (this.carrier.waypointsLooped) {
@@ -242,7 +246,7 @@ export default {
           this.$toasted.show(`${this.carrier.name} waypoints updated.`)
 
           GameContainer.reloadCarrier(this.carrier)
-          
+
           if (saveAndEdit) {
             if (this.carrier.waypoints.length) {
               this.$emit('onEditWaypointRequested', {
