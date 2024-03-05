@@ -3,9 +3,10 @@
     "name": "[[[RANDOM]]]",
     "description": "Fight for space in this claustrophobic galaxy.",
     "type": "special_tinyGalaxy",
+    "createdFromTemplate": "special_tinyGalaxy",
     "mode": "conquest",
     "password": null,
-    "playerLimit": 8,
+    "playerLimit": 10,
     "playerType": "all",
     "anonymity": "normal",
     "playerOnlineStatus": "hidden",
@@ -78,7 +79,8 @@
     "populationCap": {
       "enabled": "disabled",
       "shipsPerStar": 100
-    }
+    },
+    "allowAbandonStars": "disabled"
   },
   "diplomacy": {
     "enabled": "enabled",

@@ -135,6 +135,10 @@ export default class GameCreateService {
             throw new ValidationError(`Cannot create a galaxy of ${desiredStarCount} stars with ${game.settings.player.startingStars} stars per player.`);
         }
 
+        if (desiredStarCount > 1000) {
+            throw new ValidationError(`Galaxy size cannot exceed 1000 stars.`);
+        }
+
         // Ensure that c2c combat is disabled for orbital games.
         if (game.settings.orbitalMechanics.enabled === 'enabled' && game.settings.specialGalaxy.carrierToCarrierCombat === 'enabled') {
             game.settings.specialGalaxy.carrierToCarrierCombat = 'disabled';
@@ -156,6 +160,26 @@ export default class GameCreateService {
             };
         }
 
+        // Validate research costs
+        if (game.settings.technology.researchCostProgression?.progression === 'standard') {
+            game.settings.technology.researchCostProgression = {
+                progression: 'standard',
+            };
+        } else if (game.settings.technology.researchCostProgression?.progression === 'exponential') {
+            const growthFactor = game.settings.technology.researchCostProgression.growthFactor;
+
+            if (growthFactor && growthFactor === 'soft' || growthFactor === 'medium' || growthFactor === 'hard') {
+                game.settings.technology.researchCostProgression = {
+                    progression: 'exponential',
+                    growthFactor: growthFactor
+                };
+            } else {
+                throw new ValidationError('Invalid growth factor for research cost progression.');
+            }
+        } else {
+            throw new ValidationError('Invalid research cost progression.');
+        }
+
         // Ensure that tick limited games have their ticks to end state preset
         if (game.settings.gameTime.isTickLimited === 'enabled') {
             game.state.ticksToEnd = game.settings.gameTime.tickLimit;
@@ -174,9 +198,23 @@ export default class GameCreateService {
             game.settings.specialGalaxy.randomPulsars = 0;
         }
 
+        if (game.settings.general.readyToQuit === "enabled") {
+            game.settings.general.readyToQuitFraction = game.settings.general.readyToQuitFraction || 1.0;
+            game.settings.general.readyToQuitTimerCycles = game.settings.general.readyToQuitTimerCycles || 0;
+        }
+
         // Clamp max alliances if its invalid (minimum of 1)
         game.settings.diplomacy.maxAlliances = Math.max(1, Math.min(game.settings.diplomacy.maxAlliances, game.settings.general.playerLimit - 1));
-        
+
+        const awardRankTo = game.settings.general.awardRankTo;
+        const awardRankToTopN = game.settings.general.awardRankToTopN;
+
+        if (awardRankTo === 'top_n' && (!awardRankToTopN || awardRankToTopN < 1 || awardRankToTopN > Math.floor(game.settings.general.playerLimit / 2))) {
+            throw new ValidationError('Invalid top N value for awarding rank.');
+        } else if (!['all', 'winner', 'top_n'].includes(awardRankTo)) {
+            throw new ValidationError('Invalid award rank to setting.');
+        }
+
         // If the game name contains a special string, then replace it with a random name.
         if (game.settings.general.name.indexOf(RANDOM_NAME_STRING) > -1) {
             let randomGameName = this.nameService.getRandomGameName();

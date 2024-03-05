@@ -291,13 +291,13 @@ export default class GameListService {
         let games = await this.gameRepo.find({
             'settings.general.type': { $nin: ['tutorial'] },
             'state.startDate': { $ne: null },
-            'state.endDate': { $eq: null },
-            'state.paused': { $eq: false }
+            'state.endDate': { $eq: null }
         }, {
             'settings.general.name': 1,
             'settings.general.type': 1,
             'settings.general.playerLimit': 1,
             'settings.general.playerType': 1,
+            'settings.general.createdFromTemplate': 1,
             state: 1,
             'galaxy.players.isOpenSlot': 1
         }, {

@@ -129,6 +129,49 @@
             </option>
           </select>
         </div>
+
+        <div v-if="settings.general.readyToQuit === 'enabled'" class="mb-2">
+          <label for="readyToQuitFraction" class="col-form-label">Fraction of stars for RTQ <help-tooltip tooltip="Fraction of stars for triggering RTQ condition"></help-tooltip></label>
+          <select class="form-control" id="readyToQuitFraction" v-model="settings.general.readyToQuitFraction" :disabled="isCreatingGame">
+            <option v-for="opt in options.general.readyToQuitFraction" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div v-if="settings.general.readyToQuit === 'enabled'" class="mb-2">
+          <label for="readyToQuitTimerCycles" class="col-form-label">Timer for RTQ <help-tooltip tooltip="Time until game finishes after RTQ"></help-tooltip></label>
+          <select class="form-control" id="readyToQuitTimerCycles" v-model="settings.general.readyToQuitTimerCycles" :disabled="isCreatingGame">
+            <option v-for="opt in options.general.readyToQuitTimerCycles" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-2">
+          <label for="awardRankTo" class="col-form-label">Players that will receive rank <help-tooltip tooltip="c" /></label>
+          <select class="form-control" id="awardRankTo" v-model="settings.general.awardRankTo" :disabled="isCreatingGame">
+            <option v-for="opt in options.general.awardRankTo" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-2" v-if="settings.general.awardRankTo === 'top_n'">
+          <label for="awardRankToTopN" class="col-form-label">Top/bottom <span class="text-warning">{{settings.general.awardRankToTopN}} players</span> will receive/lose rank <help-tooltip tooltip="Top N players will receive rank, and bottom N players will lose rank"/></label>
+          <div class="col">
+            <input type="range" min="1" :max="Math.floor(settings.general.playerLimit / 2)" step="1" class="form-range w-50" id="awardRankToTopN" v-model="settings.general.awardRankToTopN" :disabled="isCreatingGame">
+          </div>
+        </div>
+
+        <div class="mb-2">
+          <label for="allowAbandonStars" class="col-form-label">Allow Abandon Stars <help-tooltip tooltip="Determines whether players are allowed to abandon stars"/></label>
+          <select class="form-control" id="allowAbandonStars" v-model="settings.player.allowAbandonStars" :disabled="isCreatingGame">
+            <option v-for="opt in options.player.allowAbandonStars" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
       </view-collapse-panel>
 
       <view-collapse-panel title="Game Time Settings" :startsOpened="true">
@@ -357,7 +400,7 @@
           </div>
         </div>
 
-        <div class="mb-2" v-if="settings.galaxy.galaxyType !== 'custom'">
+        <div class="mb-2">
 
           <div class="mb-2">
             <label for="darkGalaxy" class="col-form-label">Dark Galaxy <help-tooltip tooltip="Dark galaxies hide stars outside of player scanning ranges - Extra dark galaxies hide player statistics so that players only know what other players have based on what they can see in their scanning range"/></label>
@@ -444,7 +487,7 @@
 
       <view-collapse-panel title="Orbital Mechanics">
         <p class="mb-1 text-warning" v-if="settings.orbitalMechanics.enabled === 'enabled'">Warning: carrier-to-carrier combat is auto-disabled in orbital games.</p>
-        
+
         <div class="mb-2">
           <label for="orbitalMechanicsEnabled" class="col-form-label">Galaxy Rotation <help-tooltip tooltip="If enabled, orbits stars and carriers around the center of the galaxy every tick"/></label>
           <select class="form-control" id="orbitalMechanicsEnabled" v-model="settings.orbitalMechanics.enabled" :disabled="isCreatingGame">
@@ -729,6 +772,24 @@
           <select class="form-control" id="researchCostsTechSpecialists" v-model="settings.technology.researchCosts.specialists" :disabled="isCreatingGame" v-if="settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'">
             <option v-for="opt in options.technology.researchCosts" v-bind:key="opt.value" v-bind:value="opt.value">
               {{ opt.text }} Specialists Research
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-2">
+          <label for="researchProgression" class="col-form-label">Research Cost Progression <help-tooltip tooltip="Determines the growth of research points needed for the next level of technology"/></label>
+          <select class="form-control" id="researchProgression" v-model="settings.technology.researchCostProgression.progression" :disabled="isCreatingGame">
+            <option v-for="opt in options.technology.researchCostProgression" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-2" v-if="settings.technology.researchCostProgression && settings.technology.researchCostProgression.progression === 'exponential'">
+          <label for="researchProgression" class="col-form-label">Exponential growth factor <help-tooltip tooltip="Determines the speed of exponential growth"/></label>
+          <select class="form-control" id="researchProgression" v-model="settings.technology.researchCostProgression.growthFactor" :disabled="isCreatingGame">
+            <option v-for="opt in options.technology.researchCostProgressionGrowthFactor" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
             </option>
           </select>
         </div>

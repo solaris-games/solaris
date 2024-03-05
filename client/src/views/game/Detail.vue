@@ -2,9 +2,9 @@
   <view-container>
     <view-title title="Game Settings" navigation="main-menu"/>
 
-    <loading-spinner :loading="isLoadingGame"/>
+    <loading-spinner :loading="isLoading"/>
 
-    <div v-if="!isLoadingGame">
+    <div v-if="!isLoading">
       <view-subtitle v-bind:title="game.settings.general.name" class="mt-2"/>
 
       <p v-if="game.settings.general.description">{{game.settings.general.description}}</p>
@@ -18,6 +18,8 @@
         </div>
         <div class="col-auto">
           <button class="btn btn-danger" v-if="!game.state.startDate && game.settings.general.isGameAdmin" @click="deleteGame">Delete Game</button>
+          <button class="btn btn-warning" v-if="canModifyPauseState() && !game.state.paused" @click="pauseGame">Pause Game</button>
+          <button class="btn btn-warning" v-if="canModifyPauseState() && game.state.paused" @click="resumeGame">Resume Game</button>
           <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success ms-1">Open Game <i class="fas fa-arrow-right"></i></router-link>
         </div>
       </div>
@@ -39,7 +41,6 @@ import ViewTitle from '../components/ViewTitle'
 import ViewSubtitle from '../components/ViewSubtitle'
 import ViewContainer from '../components/ViewContainer'
 import GameSettings from './components/settings/GameSettings'
-import FluxBar from './components/menu/FluxBar'
 import gameService from '../../services/api/game'
 import router from '../../router'
 import GameHelper from '../../services/gameHelper'
@@ -54,7 +55,7 @@ export default {
   },
   data () {
     return {
-      isLoadingGame: true,
+      isLoading: true,
       game: {
         _id: null,
         settings: {
@@ -70,34 +71,77 @@ export default {
     this.game._id = this.$route.query.id
   },
   async mounted () {
-    this.isLoadingGame = true
-
-    try {
-      let response = await gameService.getGameInfo(this.game._id)
-
-      this.game = response.data
-    } catch (err) {
-      console.error(err)
-    }
-
-    this.isLoadingGame = false
+    await this.loadGame()
   },
   methods: {
+    canModifyPauseState () {
+      return this.game.settings.general.isGameAdmin
+        && GameHelper.isGameStarted(this.game)
+        && !GameHelper.isGamePendingStart(this.game)
+        && !GameHelper.isGameFinished(this.game);
+    },
+    async loadGame () {
+      this.isLoading = true
+
+      try {
+        let response = await gameService.getGameInfo(this.game._id)
+
+        this.game = response.data
+      } catch (err) {
+        console.error(err)
+      }
+
+      this.isLoading = false
+    },
+    async pauseGame () {
+      if (await this.$confirm('Pause game', 'Are you sure you want to pause this game?')) {
+        this.isLoading = true
+
+        try {
+          await gameService.pause(this.game._id)
+
+          this.$toasted.show(`The game has been paused. Please notify the players.`, { type: 'success' })
+
+          await this.loadGame()
+        } catch (err) {
+          console.error(err)
+        }
+
+        this.isLoading = false
+      }
+    },
+    async resumeGame () {
+      if (await this.$confirm('Resume game', 'Are you sure you want to resume this game?')) {
+        this.isLoading = true
+
+        try {
+          await gameService.resume(this.game._id)
+
+          this.$toasted.show(`The game has been resumed. Please notify the players.`, { type: 'success' })
+
+          await this.loadGame()
+        } catch (err) {
+          console.error(err)
+        }
+
+        this.isLoading = false
+      }
+    },
     async deleteGame () {
       if (await this.$confirm('Delete game', 'Are you sure you want to delete this game?')) {
-        this.isDeletingGame = true
+        this.isLoading = true
 
         try {
           let response = await gameService.delete(this.game._id)
 
           if (response.status === 200) {
-            router.push({ name: 'main-menu' })
+            router.push({name: 'main-menu'})
           }
         } catch (err) {
           console.error(err)
         }
 
-        this.isDeletingGame = false
+        this.isLoading = false
       }
     }
   },

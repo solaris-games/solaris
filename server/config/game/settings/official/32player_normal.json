@@ -1,12 +1,12 @@
 {
   "general": {
     "name": "[[[RANDOM]]]",
-    "description": "Capital Stars are the targets in this mode, capture enemy capitals to win and protect your own.",
-    "type": "special_homeStar",
-    "createdFromTemplate": "special_homeStar",
+    "description": "This game has 32 players, expect big alliances and epic battles in this huge galaxy!",
+    "createdFromTemplate": "32_player_normal",
+    "type": "32_player_rt",
     "mode": "conquest",
     "password": null,
-    "playerLimit": 10,
+    "playerLimit": 32,
     "playerType": "all",
     "anonymity": "normal",
     "playerOnlineStatus": "hidden",
@@ -14,7 +14,10 @@
     "fluxEnabled": "enabled",
     "advancedAI": "enabled",
     "spectators": "enabled",
-    "readyToQuit": "enabled"
+    "readyToQuit": "enabled",
+    "readyToQuitFraction": 0.9,
+    "awardRankTo": "top_n",
+    "awardRankToTopN": 6
   },
   "galaxy": {
     "galaxyType": "irregular",
@@ -23,7 +26,7 @@
   },
   "specialGalaxy": {
     "carrierCost": "standard",
-    "carrierUpkeepCost": "none",
+    "carrierUpkeepCost": "standard",
     "warpgateCost": "standard",
     "specialistCost": "standard",
     "specialistsCurrency": "creditsSpecialists",
@@ -41,7 +44,7 @@
     "splitResources": "disabled",
     "resourceDistribution": "random",
     "playerDistribution": "circular",
-    "carrierSpeed": 10,
+    "carrierSpeed": 20,
     "starCaptureReward": "enabled",
     "specialistBans": {
       "star": [],
@@ -49,8 +52,8 @@
     }
   },
   "conquest": {
-    "victoryCondition": "homeStarPercentage",
-    "victoryPercentage": 50,
+    "victoryCondition": "starPercentage",
+    "victoryPercentage": 33,
     "capitalStarElimination": "disabled"
   },
   "orbitalMechanics": {
@@ -59,8 +62,8 @@
   },
   "player": {
     "startingStars": 6,
-    "startingCredits": 500,
-    "startingCreditsSpecialists": 5,
+    "startingCredits": 1000,
+    "startingCreditsSpecialists": 10,
     "startingShips": 10,
     "startingInfrastructure": {
       "economy": 10,
@@ -85,16 +88,16 @@
   "diplomacy": {
     "enabled": "enabled",
     "upkeepCost": "none",
-    "tradeRestricted": "disabled", 
-    "maxAlliances": 7, 
+    "tradeRestricted": "disabled",
+    "maxAlliances": 31,
     "globalEvents": "disabled"
   },
   "technology": {
     "startingTechnologyLevel": {
       "terraforming": 1,
       "experimentation": 1,
-      "scanning": 1,
-      "hyperspace": 1,
+      "scanning": 3,
+      "hyperspace": 2,
       "manufacturing": 1,
       "banking": 1,
       "weapons": 1,
@@ -107,18 +110,22 @@
       "hyperspace": "standard",
       "manufacturing": "standard",
       "banking": "standard",
-      "weapons": "standard",
+      "weapons": "expensive",
       "specialists": "standard"
     },
     "bankingReward": "standard",
     "experimentationReward": "standard",
-    "specialistTokenReward": "standard"
+    "specialistTokenReward": "experimental",
+    "researchCostProgression": {
+      "progression": "exponential",
+      "growthFactor": "medium"
+    }
   },
   "gameTime": {
     "gameType": "realTime",
-    "speed": 1800,
+    "speed": 3600,
     "isTickLimited": "disabled",
-    "startDelay": 240,
+    "startDelay": 360,
     "afk": {
       "lastSeenTimeout": 2,
       "cycleTimeout": 3,

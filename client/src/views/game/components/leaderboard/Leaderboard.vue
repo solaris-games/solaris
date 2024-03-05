@@ -80,7 +80,7 @@
                         </span>
                         <span class="d-none d-sm-block">
                           {{player.stats.totalStars}} Star<span v-if="player.stats.totalStars !== 1">s</span>
-                        </span> 
+                        </span>
                       </td>
                       <td class="fit pt-3 pe-2" v-if="isConquestHomeStars">
                         <span class="d-xs-block d-sm-none">
@@ -88,7 +88,7 @@
                         </span>
                         <span class="d-none d-sm-block">
                           {{player.stats.totalHomeStars}}({{player.stats.totalStars}}) Star<span v-if="player.stats.totalStars !== 1">s</span>
-                        </span> 
+                        </span>
                       </td>
                       <td class="fit pt-2 pb-2 pe-1 text-center" v-if="isTurnBasedGame && canEndTurn">
                         <h5 v-if="player.ready && !isUserPlayer(player)" class="pt-2 pe-2 ps-2">
@@ -238,7 +238,7 @@ export default {
       if (!await this.$confirm('End Turn', 'Are you sure you want to end your turn?')) {
         return
       }
-      
+
       try {
         let response = await gameService.confirmReady(this.$store.state.game._id)
 
@@ -248,7 +248,7 @@ export default {
           } else {
             this.$toasted.show(`You have confirmed your move, once all players are ready the game will progress automatically.`, { type: 'success' })
           }
-          
+
           player.ready = true
         }
       } catch (err) {
@@ -259,7 +259,7 @@ export default {
       if (!await this.$confirm('End Cycle', 'Are you sure you want to end your turn up to the end of the current galactic cycle?')) {
         return
       }
-      
+
       try {
         let response = await gameService.confirmReadyToCycle(this.$store.state.game._id)
 
@@ -269,7 +269,7 @@ export default {
           } else {
             this.$toasted.show(`You have confirmed your move, once all players are ready the game will progress automatically.`, { type: 'success' })
           }
-          
+
           player.ready = true
           player.readyToCycle = true
         }
@@ -297,11 +297,17 @@ export default {
       if (!this.isUserPlayer(player) || this.$isHistoricalMode()) {
         return
       }
-      
-      if (!await this.$confirm('Ready to Quit?', 'Are you sure you want declare that you are ready to quit? If all active players declare ready to quit then the game will end early.')) {
+
+      let rtqFractionMessage = '';
+      if (this.$store.state.game.settings.general.readyToQuitFraction) {
+        const percent = this.$store.state.game.settings.general.readyToQuitFraction * 100;
+        rtqFractionMessage = ` (or ${percent}% by star count out of all stars)`;
+      }
+
+      if (!await this.$confirm('Ready to Quit?', `Are you sure you want declare that you are ready to quit? If all active players${rtqFractionMessage} declare ready to quit then the game will end early.`)) {
         return
       }
-      
+
       try {
         let response = await gameService.confirmReadyToQuit(this.$store.state.game._id)
 
@@ -345,7 +351,7 @@ export default {
       return require(`../../../../assets/avatars/${player.avatar}`)
       } catch (err) {
         console.error(err)
-        
+
         return null
       }
     }
@@ -381,7 +387,7 @@ export default {
     },
     canReadyToQuit () {
       return this.$store.state.game.settings.general.readyToQuit === 'enabled'
-        && this.$store.state.game.state.startDate 
+        && this.$store.state.game.state.startDate
         && this.$store.state.game.state.productionTick
     }
   }

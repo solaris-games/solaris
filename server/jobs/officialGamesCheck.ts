@@ -1,71 +1,61 @@
-import { DependencyContainer } from "../services/types/DependencyContainer";
+import {DependencyContainer} from "../services/types/DependencyContainer";
+import {Game, GameSettings} from "../services/types/Game";
+import {OfficialGameCategory, OfficialGameKind} from "../config/officialGames";
 
-const officialGameSettings = [
-    require('../config/game/settings/official/newPlayer'),
-    require('../config/game/settings/official/standard'),
-    require('../config/game/settings/official/32player'), // 32 player games are reserved only for official games.
-    require('../config/game/settings/official/turnBased'),
-    require('../config/game/settings/official/1v1'),
-    require('../config/game/settings/official/1v1turnBased'),
-];
+const chooseSetting = (container: DependencyContainer, category: OfficialGameCategory): GameSettings => {
+    if (category.kind === OfficialGameKind.Standard) {
+        return category.settings;
+    } else if (category.kind === OfficialGameKind.Carousel) {
+        return category.rotation[container.randomService.getRandomNumber(category.rotation.length - 1)];
+    } else {
+        throw new Error(`Unknown official game kind`);
+    }
+}
 
-const specialGameSettings = [
-    require('../config/game/settings/official/special_dark'),
-    require('../config/game/settings/official/special_fog'),
-    require('../config/game/settings/official/special_battleRoyale'),
-    require('../config/game/settings/official/special_orbital'),
-    require('../config/game/settings/official/special_ultraDark'),
-    require('../config/game/settings/official/special_homeStar'),
-    require('../config/game/settings/official/special_homeStarElimination'),
-    require('../config/game/settings/official/special_anonymous'),
-    require('../config/game/settings/official/special_kingOfTheHill'),
-    require('../config/game/settings/official/special_tinyGalaxy'),
-    require('../config/game/settings/official/special_freeForAll'),
-    require('../config/game/settings/official/special_arcade')
-];
+const findExistingGame = (setting: OfficialGameCategory, games: Game[]) => {
+    if (setting.kind === OfficialGameKind.Standard) {
+        return games.find(x => x.settings.general.type === setting.settings.general.type);
+    } else if (setting.kind === OfficialGameKind.Carousel) {
+        const types = setting.rotation.map(x => x.general.type);
+        return games.find(x => types.includes(x.settings.general.type));
+    }
+}
 
 export default (container: DependencyContainer) => {
-
     return {
-
         async handler(job, done) {
             // Check if there is an official game with the settings game name which
             // is currently waiting for players.
-            let games = await container.gameListService.listOfficialGames();
+            const openGames = await container.gameListService.listOfficialGames();
+            const runningGames = await container.gameListService.listInProgressGames();
 
-            for (let i = 0; i < officialGameSettings.length; i++) {
-                let settings = officialGameSettings[i];
-                let existing = games.find(x => x.settings.general.type === settings.general.type);
+            const settings = container.gameTypeService.getOfficialGameSettings();
 
-                if (!existing) {
-                    console.log(`Could not find game [${settings.general.type}], creating it now...`);
-            
+            for (const category of settings) {
+                const existingOpen = findExistingGame(category, openGames);
+
+                if (!existingOpen) {
+                    console.log(`Could not find game [${container.gameTypeService.getOfficialGameCategoryName(category)}], creating it now...`);
+
+                    const existingRunning = findExistingGame(category, runningGames);
+                    const existingTemplate = existingRunning?.settings.general.createdFromTemplate;
+
+                    let newSetting;
+                    if (existingRunning && existingTemplate && category.kind === OfficialGameKind.Carousel && category.distribution === 'sequential') {
+                        const index = category.rotation.findIndex(x => x.general.createdFromTemplate && x.general.createdFromTemplate === existingTemplate);
+                        const nextIndex = (index + 1) % category.rotation.length;
+                        newSetting = category.rotation[nextIndex];
+                    } else {
+                        newSetting = chooseSetting(container, category);
+                    }
+
                     try {
-                        let newGame = await container.gameCreateService.create(settings);
-        
-                        console.log(`[${newGame.settings.general.name}] game created.`);
+                        const newGame = await container.gameCreateService.create(newSetting);
+
+                        console.log(`${newGame.settings.general.type} game created: ${newGame.settings.general.name}`);
                     } catch (e) {
                         console.error(e);
                     }
-                }
-            }
-
-            // Check to see if there is at least 1 special game.
-            // If there isn't one active, then pick a random one and create it.
-            const specialGameTypes = specialGameSettings.map(x => x.general.type);
-            const hasSpecialGame = games.find(x => specialGameTypes.includes(x.settings.general.type)) != null;
-
-            if (!hasSpecialGame) {
-                console.log(`Could not find special game, creating one now...`);
-
-                let settings = specialGameSettings[container.randomService.getRandomNumber(specialGameSettings.length - 1)];
-
-                try {
-                    let newGame = await container.gameCreateService.create(settings);
-    
-                    console.log(`[${newGame.settings.general.name}] special game created.`);
-                } catch (e) {
-                    console.error(e);
                 }
             }
 

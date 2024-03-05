@@ -3,9 +3,10 @@
     "name": "[[[RANDOM]]]",
     "description": "Information is vital in an ultra dark galaxy. Can you be sure your ally has as many stars as they say they have?",
     "type": "special_ultraDark",
+    "createdFromTemplate": "special_ultraDark",
     "mode": "conquest",
     "password": null,
-    "playerLimit": 8,
+    "playerLimit": 10,
     "playerType": "all",
     "anonymity": "extra",
     "playerOnlineStatus": "hidden",
@@ -78,7 +79,8 @@
     "populationCap": {
       "enabled": "disabled",
       "shipsPerStar": 100
-    }
+    },
+    "allowAbandonStars": "disabled"
   },
   "diplomacy": {
     "enabled": "enabled",
