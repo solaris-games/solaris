@@ -189,7 +189,7 @@ export default class DiplomacyService extends EventEmitter {
     }
 
     getFilteredDiplomacy(player: Player, forPlayer: Player): PlayerDiplomaticState[] {
-        return player.diplomacy.filter(a => a.toString() === forPlayer._id.toString());
+        return player.diplomacy.filter(a => a.playerId.toString() === forPlayer._id.toString());
     }
 
     async _declareStatus(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId, state: DiplomaticState, saveToDB: boolean = true) {
