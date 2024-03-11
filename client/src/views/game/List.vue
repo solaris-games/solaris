@@ -9,6 +9,9 @@
           <a class="nav-link active" data-bs-toggle="tab" href="#newGames">New Games</a>
       </li>
       <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="tab" href="#tutorials">Tutorials</a>
+      </li>
+      <li class="nav-item">
           <a class="nav-link" data-bs-toggle="tab" href="#inProgressGames">In Progress</a>
       </li>
       <li class="nav-item">
@@ -299,6 +302,49 @@
           </div>
         </div>
         
+        <div class="tab-pane fade" id="tutorials">
+          <h4>Tutorials</h4>
+
+          <p class="mb-1">These tutorial games help you learn to play Solaris.</p>
+
+          <loading-spinner :loading="isLoading"/>
+
+          <p v-if="!isLoading && !tutorialGames.length" class="text-danger mb-2">
+            There are no tutorial games currently available.
+          </p>
+
+          <table v-if="!isLoading && tutorialGames.length" class="table table-striped table-hover">
+              <thead class="table-dark">
+                  <tr>
+                      <th>Name</th>
+                      <th class="text-center">Level</th>
+                      <th class="text-center">Completed</th>
+                      <th></th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr v-for="tutorial in tutorialGames" v-bind:key="tutorial.id">
+                      <td>
+                        {{tutorial.name}}
+                      </td>
+                      <td class="d-none d-sm-table-cell text-center">{{tutorial.level}}</td>
+                      <td class="d-none d-sm-table-cell text-center"><i v-if="tutorial.completed" class="fas fa-check"></i></td>
+                      <td class="">
+                        <div v-if="tutorial.file">
+                          <button v-if="!tutorial.completed" @click="startTutorial(tutorial.id)" class="btn btn-warning float-end"><i class="fas fa-graduation-cap"></i> Start Tutorial</button>
+                          <button v-if="tutorial.completed" @click="startTutorial(tutorial.id)" class="btn btn-info float-end"><i class="fas fa-graduation-cap"></i> Restart Tutorial</button>
+                        </div>
+                      </td>
+                  </tr>
+              </tbody>
+          </table>
+
+          <div class="text-end" v-if="!isLoading">
+            <router-link to="/game/create" tag="button" class="btn btn-info me-1"><i class="fas fa-gamepad"></i> Create Game</router-link>
+            <router-link to="/game/active-games" tag="button" class="btn btn-success ms-1"><i class="fas fa-dice"></i> View My Games</router-link>
+          </div>
+        </div>
+
         <div class="tab-pane fade" id="inProgressGames">
           <h4>In Progress Games</h4>
 
@@ -427,6 +473,7 @@ export default {
       userGames: [],
       inProgressGames: [],
       recentlyCompletedGames: [],
+      tutorialGames: [],
       isLoading: true,
       games: {
         featured: null,
@@ -460,6 +507,16 @@ export default {
         this.games.oneVsOneTB = this.getOfficialGame('1v1_tb')
         this.games.thirtyTwoPlayerRT = this.getOfficialGame('32_player_rt')
         this.games.special = this.getSpecialGame()
+      }
+    } catch (err) {
+      console.error(err)
+    }
+
+    try {
+      let response = await gameService.listTutorialGames()
+
+      if (response.status === 200) {
+        this.tutorialGames = response.data
       }
     } catch (err) {
       console.error(err)
@@ -506,6 +563,17 @@ export default {
     },
     getFriendlyDate(date) {
       return moment(date).utc().fromNow()
+    },
+    async startTutorial (tutorialId) {
+      try {
+          let response = await gameService.createTutorialGame(tutorialId)
+
+          if (response.status === 201) {
+              router.push({ name: 'game', query: { id: response.data } })
+          }
+      } catch (err) {
+          console.error(err)
+      }
     }
   }
 }

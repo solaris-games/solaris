@@ -1,0 +1,67 @@
+[
+    {
+        "id": 0,
+        "key": "standard",
+        "file": "tutorial.json",
+        "name": "Tutorial",
+        "description": "Learn to Play.",
+        "level": "Beginner"
+    },
+    {
+        "id": 1,
+        "key": "fleet-movement",
+        "file": "tutorial_fleet_movement.json",
+        "name": "Tutorial - Fleet Movement",
+        "description": "Buy a carrier, capture an unclaimed star to win.",
+        "level": "Beginner"
+    },
+    {
+        "id": 2,
+        "key": "infrastructure",
+        "name": "Tutorial - Infrastructure",
+        "description": "Same as fleet movement, but no starting industry or ships and cheap economy/expensive industry purchases. Guide the player to buy economy to start getting income up, then Industry to start building ships before they can finally take the unclaimed star.",
+        "level": "Beginner"
+    },
+    {
+        "id": 3,
+        "key": "technology",
+        "name": "Tutorial - Technology",
+        "description": "Same as fleet movement, but the player needs to research hyperspace range in order to get to the unclaimed star.",
+        "level": "Beginner"
+    },
+    {
+        "id": 4,
+        "key": "combat-basics",
+        "name": "Tutorial - Combat Basics",
+        "description": "Basically the current tutorial just with deeper explanation of things like the defender bonus, no specialist tokens yet.",
+        "level": "Beginner"
+    },
+    {
+        "id": 5,
+        "key": "special-star-types",
+        "name": "Tutorial - Special Star Types",
+        "description": "[Non-combat] Scenario where the player needs to get a black hole to see far enough to spot a wormhole that lets them hit the star count, etc.",
+        "level": "Intermediate"
+    },
+    {
+        "id": 6,
+        "key": "star-specialists",
+        "name": "Tutorial - Star Specialists",
+        "description": "[Non-combat] Same as the black hole example, but the player must build a telescope array to see an unclaimed star.",
+        "level": "Intermediate"
+    },
+    {
+        "id": 7,
+        "key": "carrier-specialists",
+        "name": "Tutorial - Carrier Specialists",
+        "description": "[Non-combat] An explorer to bridge a gap.",
+        "level": "Intermediate"
+    },
+    {
+        "id": 8,
+        "key": "combat-intermediate",
+        "name": "Tutorial - Combat Intermediate",
+        "description": "Simple 1v1 map, but now with specialists enabled, guide the player to buy a Colonel and an Orbital Cannon at the beginning, enemy has a nebula, etc.",
+        "level": "Intermediate"
+    }
+]

@@ -21,8 +21,11 @@ class GameService extends BaseApiService {
       { withCredentials: true })
   }
 
-  createTutorialGame () {
-    return axios.post(this.BASE_URL + 'game/tutorial', null,
+  createTutorialGame (tutorialId = null) {
+    let path = 'game/tutorial'
+    if (tutorialId)
+      path += '/' + tutorialId
+    return axios.post(this.BASE_URL + path, null,
       { withCredentials: true })
   }
 
@@ -90,6 +93,11 @@ class GameService extends BaseApiService {
 
   listSpectatingGames () {
     return axios.get(this.BASE_URL + 'game/list/spectating',
+      { withCredentials: true })
+  }
+
+  listTutorialGames () {
+    return axios.get(this.BASE_URL + 'game/tutorial/list',
       { withCredentials: true })
   }
 

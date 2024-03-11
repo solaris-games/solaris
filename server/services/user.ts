@@ -579,4 +579,14 @@ export default class UserService extends EventEmitter {
         });
     }
 
+    async listTutorialsCompleted(userId: DBObjectId) {
+        let user = await this.userRepo.findOne({
+            _id: userId
+        }, {
+            'tutorials.completed': 1
+        });
+
+        return user?.tutorials?.completed || []
+    }
+
 };

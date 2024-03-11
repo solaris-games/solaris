@@ -33,17 +33,21 @@ export default (container: DependencyContainer) => {
         },
         createTutorial: async (req, res, next) => {
             try {
-                let tutorial = await container.gameListService.getUserTutorial(req.session.userId);
+                const id = parseInt(req.params.tutorialId || 0);
+                const tutorial = container.tutorialService.getById(id);
+                let game = await container.gameListService.getUserTutorial(req.session.userId, tutorial.key);
     
-                if (!tutorial) {
-                    const settings = require('../../config/game/settings/user/tutorial.json');
+                if (!game) {
+                    const path = '../../config/game/settings/user/' + tutorial.file;
+                    const settings = require(path);
                     
-                    settings.general.createdByUserId = req.session.userId
+                    settings.general.createdByUserId = req.session.userId;
+                    settings.general.createdFromTemplate = tutorial.key;
     
-                    tutorial = await container.gameCreateService.create(settings);
+                    game = await container.gameCreateService.create(settings);
                 }
     
-                return res.status(201).json(tutorial._id);
+                return res.status(201).json(game._id);
             } catch (err) {
                 return next(err);
             }
@@ -156,6 +160,18 @@ export default (container: DependencyContainer) => {
                 let games = await container.gameListService.listSpectating(req.session.userId);
     
                 return res.status(200).json(games);
+            } catch (err) {
+                return next(err);
+            }
+        },
+        listTutorials: async (req, res, next) => {
+            try {
+                const tutorials = container.tutorialService.listAllTutorials();
+                const completed = await container.userService.listTutorialsCompleted(req.session.userId);
+                tutorials.forEach(t => {
+                    t.completed = completed.includes(t.key)
+                })
+                return res.status(200).json(tutorials);
             } catch (err) {
                 return next(err);
             }

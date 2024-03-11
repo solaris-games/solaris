@@ -98,6 +98,7 @@ import { Guild } from './types/Guild';
 import { Payment } from './types/Payment';
 import { Report } from './types/Report';
 import TeamService from "./team";
+import TutorialService from './tutorial';
 
 const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
@@ -198,6 +199,7 @@ export default (config): DependencyContainer => {
     const gameCreateService = new GameCreateService(GameModel, gameJoinService, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService, gameCreateValidationService, gameFluxService, specialistBanService, specialStarBanService, gameTypeService, starService, diplomacyService, teamService);
 
     const notificationService = new NotificationService(config, userRepository, gameRepository, discordService, conversationService, gameService, gameJoinService, gameTickService, researchService, tradeService);
+    const tutorialService = new TutorialService(userService);
 
     console.log('Dependency container initialized.');
     
@@ -273,6 +275,10 @@ export default (config): DependencyContainer => {
         notificationService,
         shipService,
         spectatorService,
+<<<<<<< HEAD
         teamService,
+=======
+        tutorialService,
+>>>>>>> 19d561b3 (Tutorial selection WIP)
     };
 };
