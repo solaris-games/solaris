@@ -826,6 +826,23 @@ export default class GameTickService extends EventEmitter {
                 };
 
                 this.emit(GameTickServiceEvents.onGameEnded, e);
+            } else {
+                const user = gameUsers.find(u => winner!.userId && u._id.toString() === winner!.userId.toString());
+                const tutorialKey = game.settings.general.createdFromTemplate;
+
+                if (user && tutorialKey) {
+                    console.log("XXX TUTORIAL_COMPLETED", user._id, tutorialKey)
+                    // await this.userService.setTutorialCompleted(user._id, tutorialKey)
+
+                    if (!user.tutorials) {
+                        user.tutorials = {
+                            completed: []
+                        };
+                    }
+                    if (!user.tutorials.completed.includes(tutorialKey)) {
+                        user.tutorials.completed.push(tutorialKey);
+                    }
+                }
             }
 
             return true;
