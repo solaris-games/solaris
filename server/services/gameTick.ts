@@ -831,16 +831,11 @@ export default class GameTickService extends EventEmitter {
                 const tutorialKey = game.settings.general.createdFromTemplate;
 
                 if (user && tutorialKey) {
-                    console.log("XXX TUTORIAL_COMPLETED", user._id, tutorialKey)
-                    // await this.userService.setTutorialCompleted(user._id, tutorialKey)
-
-                    if (!user.tutorials) {
-                        user.tutorials = {
-                            completed: []
-                        };
+                    if (!user.tutorialsCompleted) {
+                        user.tutorialsCompleted = [];
                     }
-                    if (!user.tutorials.completed.includes(tutorialKey)) {
-                        user.tutorials.completed.push(tutorialKey);
+                    if (!user.tutorialsCompleted.includes(tutorialKey)) {
+                        user.tutorialsCompleted.push(tutorialKey);
                     }
                 }
             }

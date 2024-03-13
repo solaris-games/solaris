@@ -204,7 +204,8 @@ const schema = new Schema({
             playerRenownReceived: { type: Types.Boolean, required: false, default: true },
             conversationMessageSent: { type: Types.Boolean, required: false, default: true }
         }
-    }
+    },
+    tutorialsCompleted: [{ type: Types.String, required: false }],
 });
 
 export default schema;
