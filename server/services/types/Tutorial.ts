@@ -1,7 +1,6 @@
 export type TutorialLevel = 'beginner' | 'intermediate' | 'advanced';
 
 export interface Tutorial {
-    id: number;
     key: string;
     file: string;
     name: string;

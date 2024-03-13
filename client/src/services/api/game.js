@@ -21,10 +21,10 @@ class GameService extends BaseApiService {
       { withCredentials: true })
   }
 
-  createTutorialGame (tutorialId = null) {
+  createTutorialGame (tutorialKey = null) {
     let path = 'game/tutorial'
-    if (tutorialId)
-      path += '/' + tutorialId
+    if (tutorialKey)
+      path += '/' + tutorialKey
     return axios.post(this.BASE_URL + path, null,
       { withCredentials: true })
   }

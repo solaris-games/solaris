@@ -33,8 +33,7 @@ export default (container: DependencyContainer) => {
         },
         createTutorial: async (req, res, next) => {
             try {
-                const id = parseInt(req.params.tutorialId || 0);
-                const tutorial = container.tutorialService.getById(id);
+                const tutorial = container.tutorialService.getByKey(req.params.tutorialKey);
                 let game = await container.gameListService.getUserTutorial(req.session.userId, tutorial.key);
     
                 if (!game) {
@@ -49,6 +48,7 @@ export default (container: DependencyContainer) => {
     
                 return res.status(201).json(game._id);
             } catch (err) {
+                console.error(err);
                 return next(err);
             }
         },

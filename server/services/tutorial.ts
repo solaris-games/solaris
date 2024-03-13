@@ -4,6 +4,7 @@ import UserService from './user';
 import ValidationError from "../errors/validation";
 
 const tutorials = require('../config/game/tutorials.json') as Tutorial[];
+const defaultTutorialKey = "standard"
 
 export default class TutorialService {
     userService: UserService;
@@ -14,14 +15,9 @@ export default class TutorialService {
         this.userService = userService;
     }
 
-    getById(id: number): Tutorial {
-        const tutorial = tutorials.find((x) => x.id === id);
-        if (!tutorial)
-            throw new ValidationError(`Tutorial does not exist.`);
-        return tutorial;
-    }
-
     getByKey(key: string): Tutorial {
+        if (!key)
+            key = defaultTutorialKey
         const tutorial = tutorials.find((x) => x.key === key);
         if (!tutorial)
             throw new ValidationError(`Tutorial does not exist.`);

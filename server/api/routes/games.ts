@@ -21,7 +21,7 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
         controller.create,
         mw.core.handleError);
 
-    router.post('/api/game/tutorial/:tutorialId?',
+    router.post('/api/game/tutorial/:tutorialKey?',
         mw.auth.authenticate(),
         controller.createTutorial,
         mw.core.handleError);

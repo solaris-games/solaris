@@ -323,7 +323,7 @@
                   </tr>
               </thead>
               <tbody>
-                  <tr v-for="tutorial in tutorialGames" v-bind:key="tutorial.id">
+                  <tr v-for="tutorial in tutorialGames" v-bind:key="tutorial.key">
                       <td>
                         {{tutorial.name}}
                       </td>
@@ -331,8 +331,8 @@
                       <td class="d-none d-sm-table-cell text-center"><i v-if="tutorial.completed" class="fas fa-check"></i></td>
                       <td class="">
                         <div v-if="tutorial.file">
-                          <button v-if="!tutorial.completed" @click="startTutorial(tutorial.id)" class="btn btn-warning float-end"><i class="fas fa-graduation-cap"></i> Start Tutorial</button>
-                          <button v-if="tutorial.completed" @click="startTutorial(tutorial.id)" class="btn btn-info float-end"><i class="fas fa-graduation-cap"></i> Restart Tutorial</button>
+                          <button v-if="!tutorial.completed" @click="startTutorial(tutorial.key)" class="btn btn-warning float-end"><i class="fas fa-graduation-cap"></i> Start Tutorial</button>
+                          <button v-if="tutorial.completed" @click="startTutorial(tutorial.key)" class="btn btn-info float-end"><i class="fas fa-graduation-cap"></i> Restart Tutorial</button>
                         </div>
                       </td>
                   </tr>
@@ -564,9 +564,9 @@ export default {
     getFriendlyDate(date) {
       return moment(date).utc().fromNow()
     },
-    async startTutorial (tutorialId) {
+    async startTutorial (tutorialKey) {
       try {
-          let response = await gameService.createTutorialGame(tutorialId)
+          let response = await gameService.createTutorialGame(tutorialKey)
 
           if (response.status === 201) {
               router.push({ name: 'game', query: { id: response.data } })
