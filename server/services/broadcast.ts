@@ -9,9 +9,9 @@ import { LedgerType } from "./ledger";
 
 
 export default class BroadcastService {
-    io;
+    io: any;
 
-    constructor(io) {
+    setIOController(io) {
         this.io = io;
     }
 
@@ -72,7 +72,14 @@ export default class BroadcastService {
     }
 
     gameMessageSent(game: Game, message: ConversationMessageSentResult) {
-        message.toPlayerIds.forEach(p => this.io.to(p).emit('gameMessageSent', message));
+        // Note: We need to ensure we send to the users' socket, not the players as the player one
+        // can be spoofed.
+        const toUserIds = game.galaxy.players
+            .filter(p => message.toPlayerIds.find(m => m.toString() === p._id.toString()) != null)
+            .filter(p => p.userId != null)
+            .map(p => p.userId!);
+
+        toUserIds.forEach(p => this.io.to(p.toString()).emit('gameMessageSent', message));
     }
 
     gameConversationRead(game: Game, conversation: Conversation, readByPlayerId: DBObjectId) {

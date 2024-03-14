@@ -39,15 +39,15 @@ class GameContainer {
 
     if(this.frames==31) {
       let ma32FPS = 1000.0/ma32DT
-      
+
       if (this.fpsMAText) {
         this.fpsMAText.text =  ( 'fpsMA: ' + movingAverageFPS.toFixed(0) )
       }
-      
+
       if (this.fpsMA32Text) {
         this.fpsMA32Text.text = ( 'fpsMA32: ' + ma32FPS.toFixed(0) )
       }
-      
+
       if (this.jitterText) {
         this.jitterText.text = ( 'jitter: ' + (movingAverageFPS-this.lowest).toFixed(0) )
       }
@@ -103,8 +103,8 @@ class GameContainer {
       stopPropagation: true,
       passiveWheel: true,
 
-      interaction: this.app.renderer.plugins.interaction, // the interaction module is important for wheel() to work properly when renderer.view is placed or scaled
-      disableOnContextMenu: true
+      disableOnContextMenu: true,
+      events: this.app.renderer.events
     })
 
     // add the viewport to the stage
@@ -116,6 +116,11 @@ class GameContainer {
   }
 
   destroy () {
+    if (this.viewport) {
+      this.viewport.destroy()
+      this.viewport = null
+    }
+    
     // Cleanup if the app already exists.
     if (this.app) {
       this.app.destroy(false, {
@@ -123,11 +128,6 @@ class GameContainer {
       })
 
       this.app = null
-    }
-
-    if (this.viewport) {
-      this.viewport.destroy()
-      this.viewport = null
     }
   }
 

@@ -49,7 +49,23 @@
           29,
           30,
           31,
-          32
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48
        ],
        "playerType":[
           {
@@ -120,7 +136,61 @@
             "value": "disabled",
             "text": "Disabled"
          }
-      ]
+      ],
+       "readyToQuitFraction": [
+          {
+              "value": 0.5,
+              "text": "50%"
+          },
+          {
+              "value": 0.66,
+              "text": "66%"
+          },
+          {
+              "value": 0.75,
+              "text": "75%"
+          },
+          {
+              "value": 0.9,
+              "text": "90%"
+          },
+          {
+             "value": 1.0,
+             "text": "100%"
+          }
+       ],
+       "readyToQuitTimerCycles": [
+         {
+           "value": 0,
+           "text": "Immediately"
+         },
+         {
+           "value": 1,
+           "text": "1 Cycle"
+         },
+         {
+           "value": 2,
+           "text": "2 Cycles"
+         },
+         {
+           "value": 3,
+           "text": "3 Cycles"
+         }
+       ],
+       "awardRankTo": [
+          {
+             "value": "all",
+             "text": "All Players"
+          },
+          {
+            "value": "winners",
+            "text": "Winner"
+          },
+          {
+             "value": "top_n",
+             "text": "Top N"
+          }
+       ]
     },
     "specialGalaxy":{
        "carrierCost":[
@@ -555,7 +625,7 @@
          }
        ],
        "tradeRestricted":[
-         { 
+         {
            "value":"enabled",
            "text":"Enabled"
          },
@@ -600,6 +670,30 @@
           {
              "value":"crazyExpensive",
              "text":"Crazy Expensive"
+          }
+       ],
+       "researchCostProgression": [
+          {
+              "value":"standard",
+              "text":"Standard"
+          },
+          {
+              "value":"exponential",
+              "text":"Exponential"
+          }
+       ],
+       "researchCostProgressionGrowthFactor": [
+          {
+             "value": "soft",
+             "text": "Soft"
+          },
+          {
+               "value": "medium",
+               "text": "Medium"
+          },
+          {
+               "value": "hard",
+               "text": "Hard"
           }
        ],
        "bankingReward":[

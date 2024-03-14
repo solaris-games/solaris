@@ -508,6 +508,10 @@ class GameHelper {
     return !game.state.startDate
   }
 
+  isGameStarted (game) {
+    return game.state.startDate != null
+  }
+
   isGameInProgress (game) {
     return !this.isGameWaitingForPlayers(game) && !this.isGamePaused(game) && game.state.startDate != null && moment().utc().diff(game.state.startDate) >= 0 && !game.state.endDate
   }
@@ -1037,12 +1041,13 @@ class GameHelper {
     }
 
     const bankingLevel = player.research.banking.level
+    const multiplier = game.constants.player.bankingCycleRewardMultiplier
 
     switch (game.settings.technology.bankingReward) {
       case 'standard':
-        return Math.round((bankingLevel * 75) + (0.15 * bankingLevel * player.stats.totalEconomy))
+          return Math.round((bankingLevel * multiplier) + (0.15 * bankingLevel * player.stats.totalEconomy))
       case 'legacy':
-        return bankingLevel * 75
+          return bankingLevel * multiplier
     }
   }
 

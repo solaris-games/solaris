@@ -1,8 +1,22 @@
-import { Game } from "./types/Game";
+import {Game, GameType} from "./types/Game";
+
+import {GameSettings} from "./types/Game";
+import {gameSettings, OfficialGameCategory, OfficialGameKind, specialGameTypes} from "../config/officialGames";
 
 export default class GameTypeService {
     isTeamConquestGame(game: Game) {
         return game.settings.general.mode === 'teamConquest';
+    }
+    getOfficialGameCategoryName(officialGame: OfficialGameCategory) {
+        if (officialGame.kind === OfficialGameKind.Standard) {
+            return officialGame.settings.general.type;
+        } else if (officialGame.kind === OfficialGameKind.Carousel) {
+            return officialGame.name;
+        }
+    }
+
+    getOfficialGameSettings(): OfficialGameCategory[] {
+        return gameSettings;
     }
 
     isNewPlayerGame(game: Game) {
@@ -26,20 +40,7 @@ export default class GameTypeService {
     }
 
     isSpecialGameMode(game: Game) {
-        return [
-            'special_dark',
-            'special_fog',
-            'special_ultraDark',
-            'special_orbital',
-            'special_battleRoyale',
-            'special_homeStar',
-            'special_homeStarElimination',
-            'special_anonymous',
-            'special_kingOfTheHill',
-            'special_tinyGalaxy',
-            'special_freeForAll',
-            'special_arcade'
-        ].includes(game.settings.general.type);
+        return Boolean(specialGameTypes.includes(game.settings.general.type));
     }
 
     is32PlayerGame(game: Game) {

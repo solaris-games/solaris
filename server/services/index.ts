@@ -110,7 +110,7 @@ const guildRepository = new Repository<Guild>(GuildModel);
 const paymentRepository = new Repository<Payment>(PaymentModel);
 const reportRepository = new Repository<Report>(ReportModel);
 
-export default (config, io): DependencyContainer => {
+export default (config): DependencyContainer => {
 
     // Poor man's dependency injection.
 
@@ -127,7 +127,7 @@ export default (config, io): DependencyContainer => {
     const guildService = new GuildService(GuildModel, guildRepository, userRepository, userService);
     const guildUserService = new GuildUserService(userRepository, guildService);
 
-    const broadcastService = new BroadcastService(io);
+    const broadcastService = new BroadcastService();
     const distanceService = new DistanceService();
     const randomService = new RandomService();
     const cacheService = new CacheService(config);

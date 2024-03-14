@@ -17,13 +17,13 @@ export default async (config: Config, app, container: DependencyContainer) => {
 
     // ---------------
     // Set up MongoDB session store
-    let store = new MongoDBStore({
+    let sessionStorage = new MongoDBStore({
         uri: config.connectionString,
         collection: 'sessions'
     });
 
     // Catch session store errors
-    store.on('error', function(err) {
+    sessionStorage.on('error', function(err) {
         console.error(err);
     });
 
@@ -37,7 +37,7 @@ export default async (config: Config, app, container: DependencyContainer) => {
             secure: config.sessionSecureCookies, // Requires HTTPS
             maxAge: 1000 * 60 * 60 * 24 * 365 // 1 Year
         },
-        store
+        store: sessionStorage
     }));
 
     // ---------------
@@ -86,5 +86,8 @@ export default async (config: Config, app, container: DependencyContainer) => {
 
     console.log('Express intialized.');
     
-    return app;
+    return {
+        app,
+        sessionStorage
+    };
 };

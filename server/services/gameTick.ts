@@ -38,6 +38,7 @@ import GamePlayerAFKEvent from "./types/events/GamePlayerAFK";
 import GameEndedEvent from "./types/events/GameEnded";
 import PlayerAfkService from "./playerAfk";
 import ShipService from "./ship";
+import {Moment} from "moment";
 
 const EventEmitter = require('events');
 const moment = require('moment');
@@ -288,12 +289,12 @@ export default class GameTickService extends EventEmitter {
             return false;
         }
 
-        if (this.gameService.isAllUndefeatedPlayersReadyToQuit(game)) {
+        if (this.gameService.isReadyToQuitImmediateEnd(game)) {
             return true;
         }
 
         let lastTick = moment(game.state.lastTickDate).utc();
-        let nextTick;
+        let nextTick: Moment;
         
         if (this.gameTypeService.isRealTimeGame(game)) {
             // If in real time mode, then calculate when the next tick will be and work out if we have reached that tick.
@@ -776,6 +777,15 @@ export default class GameTickService extends EventEmitter {
         const leaderboard = this.leaderboardService.getGameLeaderboard(game).leaderboard;
 
         game.state.leaderboard = leaderboard.map(l => l.player._id);
+
+        if (game.settings.general.readyToQuit === 'enabled' && this.gameService.checkReadyToQuit(game, leaderboard)) {
+            const ticksRemaining = (game.settings.general.readyToQuitTimerCycles || 0) * game.settings.galaxy.productionTicks;
+            if (game.state.ticksToEnd || game.state.ticksToEnd === 0) {
+                game.state.ticksToEnd = Math.min(ticksRemaining, game.state.ticksToEnd);
+            } else {
+                game.state.ticksToEnd = ticksRemaining;
+            }
+        }
 
         let winner: GameWinner | null;
 

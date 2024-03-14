@@ -13,7 +13,11 @@
        "fluxEnabled": "enabled",
        "advancedAI": "enabled",
        "spectators": "enabled",
-       "readyToQuit": "enabled"
+       "readyToQuit": "enabled",
+       "readyToQuitFraction": 1.0,
+       "readyToQuitTimerCycles": 0,
+       "awardRankTo": "all",
+       "awardRankToTopN": 1
     },
     "galaxy":{
        "galaxyType":"irregular",
@@ -82,7 +86,7 @@
          "enabled": "disabled",
          "shipsPerStar": 100
        },
-       "allowAbandonStars": "enabled"
+       "allowAbandonStars": "disabled"
     },
    "diplomacy": {
       "enabled": "enabled",
@@ -112,6 +116,10 @@
           "banking":"standard",
           "weapons":"standard",
           "specialists":"standard"
+       },
+       "researchCostProgression": {
+          "progression": "standard",
+          "growthFactor": "medium"
        },
        "bankingReward":"standard",
        "experimentationReward": "standard",

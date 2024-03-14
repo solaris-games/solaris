@@ -45,7 +45,7 @@ export default class PlayerAfkService extends EventEmitter {
             let isAfk = this.isAfk(game, player);
     
             if (isAfk) {
-                this.playerService.setPlayerAsAfk(game, player);
+                this.setPlayerAsAfk(game, player);
             }
         }
 
@@ -68,6 +68,14 @@ export default class PlayerAfkService extends EventEmitter {
             }
         }
     }
+
+    setPlayerAsAfk(game: Game, player: Player) {
+        this.playerService.setPlayerAsDefeated(game, player, true);
+
+        player.isOpenSlot = true; // AFK players will always have their slots open.
+        player.afk = true;
+    }
+
 
     isAIControlled(game: Game, player: Player, includePseudoAfk: boolean) {
         // Defeated players or players not controlled by a user are controlled by AI.

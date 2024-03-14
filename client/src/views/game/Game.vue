@@ -70,8 +70,7 @@ export default {
     let player = GameHelper.getUserPlayer(this.$store.state.game)
 
     let socketData = {
-      gameId: this.$store.state.game._id,
-      userId: this.$store.state.userId
+      gameId: this.$store.state.game._id
     }
 
     if (player) {
@@ -111,8 +110,7 @@ export default {
     this.unsubscribeToSockets()
     
     let socketData = {
-      gameId: this.$store.state.game._id,
-      userId: this.$store.state.userId
+      gameId: this.$store.state.game._id
     }
 
     let player = GameHelper.getUserPlayer(this.$store.state.game)

@@ -215,12 +215,77 @@ export default {
 
       this.isQuittingGame = false
     },
-    async confirmReadyToQuit(player) {
+    async confirmReady (player) {
+      if (!await this.$confirm('End Turn', 'Are you sure you want to end your turn?')) {
+        return
+      }
+
+      try {
+        let response = await gameService.confirmReady(this.$store.state.game._id)
+
+        if (response.status === 200) {
+          if (this.isTutorialGame) {
+            this.$toasted.show(`You have confirmed your move, please wait while the game processes the tick.`, { type: 'success' })
+          } else {
+            this.$toasted.show(`You have confirmed your move, once all players are ready the game will progress automatically.`, { type: 'success' })
+          }
+
+          player.ready = true
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    async confirmReadyToCycle (player) {
+      if (!await this.$confirm('End Cycle', 'Are you sure you want to end your turn up to the end of the current galactic cycle?')) {
+        return
+      }
+
+      try {
+        let response = await gameService.confirmReadyToCycle(this.$store.state.game._id)
+
+        if (response.status === 200) {
+          if (this.isTutorialGame) {
+            this.$toasted.show(`You have confirmed your move, please wait while the game processes the tick.`, { type: 'success' })
+          } else {
+            this.$toasted.show(`You have confirmed your move, once all players are ready the game will progress automatically.`, { type: 'success' })
+          }
+
+          player.ready = true
+          player.readyToCycle = true
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    async unconfirmReady (player) {
+      if (!this.isUserPlayer(player)) {
+        return
+      }
+
+      try {
+        let response = await gameService.unconfirmReady(this.$store.state.game._id)
+
+        if (response.status === 200) {
+          player.ready = false
+          player.readyToCycle = false
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    async confirmReadyToQuit (player) {
       if (!this.isUserPlayer(player) || this.$isHistoricalMode()) {
         return
       }
 
-      if (!await this.$confirm('Ready to Quit?', 'Are you sure you want declare that you are ready to quit? If all active players declare ready to quit then the game will end early.')) {
+      let rtqFractionMessage = '';
+      if (this.$store.state.game.settings.general.readyToQuitFraction) {
+        const percent = this.$store.state.game.settings.general.readyToQuitFraction * 100;
+        rtqFractionMessage = ` (or ${percent}% by star count out of all stars)`;
+      }
+
+      if (!await this.$confirm('Ready to Quit?', `Are you sure you want declare that you are ready to quit? If all active players${rtqFractionMessage} declare ready to quit then the game will end early.`)) {
         return
       }
 
@@ -262,6 +327,15 @@ export default {
     getWinningTeamName () {
       return this.getWinningTeam().name
     },
+    getAvatarImage (player) {
+      try {
+      return require(`../../../../assets/avatars/${player.avatar}`)
+      } catch (err) {
+        console.error(err)
+
+        return null
+      }
+    }
   },
 
   computed: {
