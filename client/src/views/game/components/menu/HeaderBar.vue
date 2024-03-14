@@ -55,7 +55,7 @@
             </button>
 
             <hamburger-menu class="ms-1 d-none d-sm-inline-block" :buttonClass="'btn-sm btn-info'" :dropType="'dropleft'" />
-            
+
             <button class="btn btn-sm btn-info ms-1 d-none d-sm-inline-block" type="button" @click="goToMyGames()">
                 <i class="fas fa-chevron-left"></i>
             </button>
@@ -65,7 +65,6 @@
 </template>
 
 <script>
-import { setInterval } from 'timers'
 import GameHelper from '../../../../services/gameHelper'
 import router from '../../../../router'
 import MENU_STATES from '../../../../services/data/menuStates'
@@ -213,7 +212,7 @@ export default {
       if (!this.$store.state.game) {
         return
       }
-      
+
       if (GameHelper.isGamePendingStart(this.$store.state.game)) {
         this.timeRemaining = GameHelper.getCountdownTimeString(this.$store.state.game, this.$store.state.game.state.startDate)
       } else {
@@ -299,7 +298,7 @@ export default {
       if (menuState === MENU_STATES.INTEL && GameHelper.isDarkModeExtra(this.$store.state.game)) {
         return
       }
-      
+
       switch (menuState) {
         case null:
           this.setMenuState(null, null)
