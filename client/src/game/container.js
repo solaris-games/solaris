@@ -116,6 +116,11 @@ class GameContainer {
   }
 
   destroy () {
+    if (this.viewport) {
+      this.viewport.destroy()
+      this.viewport = null
+    }
+    
     // Cleanup if the app already exists.
     if (this.app) {
       this.app.destroy(false, {
@@ -123,11 +128,6 @@ class GameContainer {
       })
 
       this.app = null
-    }
-
-    if (this.viewport) {
-      this.viewport.destroy()
-      this.viewport = null
     }
   }
 

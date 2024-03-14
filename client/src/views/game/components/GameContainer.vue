@@ -58,7 +58,9 @@ export default {
     this.tryShowDonateModal()
   },
 
-  destroyed () {
+  beforeDestroy () {
+    window.removeEventListener('resize', this.handleResize)
+
     this.gameContainer.map.off('onStarClicked', this.onStarClickedHandler)
     this.gameContainer.map.off('onStarRightClicked', this.onStarRightClickedHandler)
     this.gameContainer.map.off('onCarrierClicked', this.onCarrierClickedHandler)
@@ -67,10 +69,6 @@ export default {
     this.gameContainer.map.off('onObjectsClicked', this.onObjectsClickedHandler)
 
     this.gameContainer.destroy()
-  },
-
-  beforeDestroy () {
-    window.removeEventListener('resize', this.handleResize)
 
     clearInterval(this.polling)
   },
@@ -121,8 +119,8 @@ export default {
     async tryShowDonateModal () {
       let chance = Math.floor(Math.random() * (20 - 0 + 1) + 0); // 1 in 20
 
-      if (chance === 0 && 
-        await this.$confirm('Support The Project', 
+      if (chance === 0 &&
+        await this.$confirm('Support The Project',
           `Hello there,
 
 Solaris is free, open source and does not have ads. Please consider donating or purchasing Galactic Credits to support the continued development of the project.
