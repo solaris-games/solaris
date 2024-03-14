@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@pixi/graphics-extras": "^7.4.0",
     "@popperjs/core": "^2.11.5",
     "axios": "^0.18.1",
     "bootstrap": "^5.1.3",
