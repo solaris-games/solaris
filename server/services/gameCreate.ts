@@ -244,6 +244,17 @@ export default class GameCreateService {
             && game.settings.general.playerLimit >= 3 ? 1 : 0;
         game.settings.diplomacy.maxAlliances = Math.max(1, Math.min(game.settings.diplomacy.maxAlliances, game.settings.general.playerLimit - 1 - lockedAllianceMod));
 
+        if (game.settings.general.mode === 'teamConquest') {
+            const teamsNumber = game.settings.conquest.teamsCount;
+
+            if (!teamsNumber) {
+                throw new ValidationError("Team count not provided");
+            }
+
+            game.settings.general.awardRankTo = 'teams';
+            game.settings.general.awardRankToTopN = undefined;
+        }
+
         const awardRankTo = game.settings.general.awardRankTo;
         const awardRankToTopN = game.settings.general.awardRankToTopN;
 

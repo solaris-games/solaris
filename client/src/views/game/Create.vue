@@ -160,7 +160,7 @@
           </select>
         </div>
 
-        <div class="mb-2">
+        <div class="mb-2" v-if="settings.general.mode !== 'teamConquest'">
           <label for="awardRankTo" class="col-form-label">Players that will receive rank <help-tooltip tooltip="c" /></label>
           <select class="form-control" id="awardRankTo" v-model="settings.general.awardRankTo" :disabled="isCreatingGame">
             <option v-for="opt in options.general.awardRankTo" v-bind:key="opt.value" v-bind:value="opt.value">

@@ -1,5 +1,3 @@
-import {Team} from "../../../services/types/Game";
-
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const Types = Schema.Types;
@@ -57,7 +55,7 @@ const schema = new Schema({
 			anonymity: { type: Types.String, required: true, enum: ['normal', 'extra'], default: 'normal' },
 			playerOnlineStatus: { type: Types.String, required: true, enum: ['hidden', 'visible'], default: 'hidden' },
 			timeMachine: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
-			awardRankTo: { type: Types.String, required: false, enum: ['all', 'winner', 'top_n'], default: 'all' },
+			awardRankTo: { type: Types.String, required: false, enum: ['all', 'winner', 'top_n', 'teams'], default: 'all' },
 			awardRankToTopN: { type: Types.Number, required: false, min: 1, default: null },
 			fluxEnabled: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
 			advancedAI: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'disabled' },
