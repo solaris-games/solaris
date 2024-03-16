@@ -40,12 +40,10 @@ export default async (config: Config, app, container: DependencyContainer) => {
         store: sessionStorage
     }));
 
-    const clientURLs = (config.clientUrl || 'https://solaris.games').split(',');
-
     // ---------------
     // Enable CORS
     app.use((req, res, next) => {
-        if (clientURLs.includes(req.headers.origin)) {
+        if (config.corsUrls.includes(req.headers.origin)) {
             res.header("Access-Control-Allow-Origin", req.headers.origin);
             res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
             res.header('Access-Control-Allow-Headers', 'Content-Type');
