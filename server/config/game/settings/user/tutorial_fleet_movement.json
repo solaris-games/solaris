@@ -2,7 +2,7 @@
   "general": {
     "name": "Fleet Movement",
     "description": "Buy a carrier, capture an unclaimed star to win.",
-    "createdFromTemplate": "tutorial_fleet_movement",
+    "createdFromTemplate": "fleet-movement",
     "type": "tutorial",
     "mode": "conquest",
     "password": null,

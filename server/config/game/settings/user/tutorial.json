@@ -2,6 +2,7 @@
   "general": {
     "name": "Tutorial - Learn to Play",
     "description": "Learn how to build carriers and capture stars to win the game.",
+    "createdFromTemplate": "original",
     "type": "tutorial",
     "mode": "conquest",
     "password": null,

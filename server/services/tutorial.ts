@@ -4,7 +4,7 @@ import UserService from './user';
 import ValidationError from "../errors/validation";
 
 const tutorials = require('../config/game/tutorials.json') as Tutorial[];
-const defaultTutorialKey = "standard"
+const defaultTutorialKey = "original"
 
 export default class TutorialService {
     userService: UserService;
