@@ -172,6 +172,7 @@ class GameContainer {
         maxHeight: (Math.abs(this.starFieldBottom) + Math.abs(this.starFieldTop))
       })
 
+    this.viewport.on('drag-end', this.onViewportDragged.bind(this))
     this.viewport.on('zoomed-end', this.onViewportZoomed.bind(this))
     this.viewport.on('pointerdown', this.map.onViewportPointerDown.bind(this.map))
   }
@@ -257,6 +258,10 @@ class GameContainer {
 
   onTick (deltaTime) {
     this.map.onTick(deltaTime)
+  }
+
+  onViewportDragged (e) {
+    LearningHelper.conceptUsed(LearningHelper.concept.CAMERA_PAN)
   }
 
   onViewportZoomed (e) {

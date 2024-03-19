@@ -4,6 +4,15 @@ import MENU_STATES from './menuStates'
 
 export default [
     {
+        id: LearningHelper.concept.CAMERA_PAN,
+        title: "Camera pan",
+        text: "Move across the map by clicking and dragging with any MOUSE BUTTON.\nPress the <code>h</code> or <code>space</code> keyboard shortcut to return to your Home star.",
+        priority: 10,
+        onConceptUsed: function (self) {
+            this.markLearned(self, 20)
+        }
+    },
+    {
         id: LearningHelper.concept.CAMERA_ZOOM,
         title: "Camera zoom",
         text: "Zoom in and out with the MOUSE WHEEL or <code>+</code> and <code>-</code> keys.",

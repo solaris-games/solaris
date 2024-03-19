@@ -8,6 +8,7 @@ import Territories from './territories'
 import PlayerNames from './playerNames'
 import EventEmitter from 'events'
 import gameHelper from '../services/gameHelper'
+import LearningHelper from '../services/learningHelper'
 import AnimationService from './animation'
 import PathManager from './PathManager'
 import OrbitalLocationLayer from './orbital'
@@ -605,6 +606,7 @@ class Map extends EventEmitter {
     }
 
     this.panToPlayer(game, player)
+    LearningHelper.conceptUsed(LearningHelper.concept.CAMERA_PAN)
   }
 
   panToStar (star) {
