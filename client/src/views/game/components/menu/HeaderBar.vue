@@ -42,12 +42,6 @@
               <span class="d-none d-md-inline-block ms-1">Tutorial</span>
             </button>
 
-            <!-- TODO toggle Adaptive Tutor on Mobile -->
-            <button class="btn btn-sm btn-warning">
-              <i class="fas fa-lightbulb"></i>
-              <span class="d-none d-md-inline-block ms-1">3</span>
-            </button>
-
             <button class="btn btn-sm btn-success ms-1" v-if="!userPlayer && gameIsJoinable" @click="setMenuState(MENU_STATES.WELCOME)">Join Now</button>
 
             <ready-status-button :smallButtons="true" v-if="!$isHistoricalMode() && userPlayer && isTurnBasedGame && canEndTurn && !userPlayer.defeated" class="ms-1" />

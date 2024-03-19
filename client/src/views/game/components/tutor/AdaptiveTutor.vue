@@ -1,5 +1,5 @@
 <template>
-  <div class="d-none d-lg-block" v-if="isUserInGame">
+  <div class="d-none d-lg-block" v-if="isUserInGame && !isTutorialGame">
     <div id="conceptList" class="header-bar-bg container pt-1">
       <div class="row">
         <div class="col pt-2">
@@ -71,10 +71,12 @@ export default {
   },
   mounted () {
     // TODO: These event names should be global constants
+    eventBus.$on('onConceptUsed', this.onConceptUsed)
     eventBus.$on('onMenuRequested', this.onMenuRequested)
     eventBus.$on('onZoom', this.onZoom)
   },
   destroyed () {
+    eventBus.$off('onConceptUsed', this.onConceptUsed)
     eventBus.$off('onMenuRequested', this.onMenuRequested)
     eventBus.$off('onZoom', this.onZoom)
   },
@@ -118,6 +120,13 @@ export default {
     },
     onMarkLearned () {
       this.markLearned(this.activeConcept)
+    },
+    onConceptUsed (conceptId) {
+      for (const concept of this.CONCEPTS) {
+        if (concept.id === conceptId && !concept.learned && concept.onConceptUsed) {
+          concept.onConceptUsed.call(this, concept)
+        }
+      }
     },
     onMenuRequested (menuState) {
       for (const concept of this.CONCEPTS) {
