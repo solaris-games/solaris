@@ -19,7 +19,7 @@
       </div>
       <div>
         <ul class="list-unstyled">
-          <li v-for="(concept, index) in filteredConcepts"  class="concept-item" :class="{'selected': concept === activeConcept && isSelectedConcept, 'learned': concept.learned}"
+          <li v-for="(concept, index) in filteredConcepts" role="button" class="concept-item" :class="{'selected': concept === activeConcept && isSelectedConcept, 'learned': concept.learned}"
             @click="selectConcept(concept);" @mouseenter="focusConcept(concept);" @mouseleave="unfocusConcept();">
             <p class="small lh-sm m-0 p-1">
               {{ concept.title }}<span class="text-muted" v-if="!concept.learned && concept.progress"> ({{ concept.progress }}%)</span>
@@ -51,9 +51,14 @@
 
 <script>
 import eventBus from '../../../../eventBus'
+import AudioService from '../../../../game/audio'
 import GameHelper from '../../../../services/gameHelper'
 import MenuTitle from '../MenuTitle'
+import MENU_STATES from '../../../../services/data/menuStates'
 import CONCEPTS from '../../../../services/data/concepts'
+
+const MAX_VISIBLE_CONCEPTS = 5
+const NEXT_CONCEPT_DELAY = 5000
 
 export default {
   components: {
@@ -61,22 +66,27 @@ export default {
   },
   data () {
     return {
-      CONCEPTS: CONCEPTS,
+      CONCEPTS: CONCEPTS.sort((a, b) => a.title.localeCompare(b.title)),
       activeConcept: null,
+      learnedConceptIds: [],
       filter: "",
       isExpanded: false,
       isFocusedConcept: false,
       isSelectedConcept: false,
+      interval: null,
+      lastDistraction: 0,
     }
   },
   mounted () {
     // TODO: These event names should be global constants
     eventBus.$on('onConceptUsed', this.onConceptUsed)
     eventBus.$on('onMenuRequested', this.onMenuRequested)
+    this.interval = setInterval(this.updateVisibleConcepts, 2000)
   },
   destroyed () {
     eventBus.$off('onConceptUsed', this.onConceptUsed)
     eventBus.$off('onMenuRequested', this.onMenuRequested)
+    clearInterval(this.interval)
   },
   methods: {
     toggle () {
@@ -101,20 +111,83 @@ export default {
         this.isFocusedConcept = false
       }
     },
+    updateVisibleConcepts () {
+      if (Date.now() - this.lastDistraction < NEXT_CONCEPT_DELAY)
+        return
+
+      if (this.visibleConcepts.length >= MAX_VISIBLE_CONCEPTS)
+        return
+
+      if (this.$store.state.menuState !== MENU_STATES.NONE)
+        return
+
+      if (this.isExpanded)
+        return
+
+      const concept = this.findNextConcept()
+      if (concept === null) {
+        return
+      }
+      this.$set(concept, 'visible', Date.now())
+      this.trackDistraction()
+      AudioService.click()
+    },
+    findNextConcept () {
+      let bestPriority = -1
+      let candidates = []
+      for (const c of this.CONCEPTS) {
+        if (this.isCandidate(c)) {
+          if (c.priority < bestPriority || bestPriority === -1) {
+            bestPriority = c.priority
+            candidates = [c]
+          } else if (c.priority === bestPriority) {
+            candidates.push(c)
+          }
+        }
+      }
+      if (candidates.length) {
+        return candidates[candidates.length * Math.random() | 0]
+      }
+      return null
+    },
+    isCandidate (concept) {
+      if (concept.learned)
+        return false
+      if (concept.visible)
+        return false
+      if (concept.pre) {
+        for (const id of concept.pre) {
+          if (!this.learnedConceptIds.includes(id))
+            return false
+        }
+      }
+      return true
+    },
     markLearned (concept, progress=null) {
       if (progress) {
         this.$set(concept, 'progress', Math.min((concept.progress || 0) + progress, 100))
       }
       if (!progress || concept.progress === 100) {
         this.$set(concept, 'learned', true)
+        if (concept.visible) {
+          AudioService.backspace()
+          this.trackDistraction()
+          this.$set(concept, 'visible', false)
+        }
+        this.$delete(concept, 'progress')
+        this.learnedConceptIds.push(concept.id)
       }
       if (this.isSelectedConcept && concept.learned) {
         this.onCloseDetail()
       }
     },
+    trackDistraction () {
+      this.lastDistraction = Date.now()
+    },
     onCloseDetail () {
       this.activeConcept = null
       this.isSelectedConcept = false
+      this.trackDistraction()
     },
     onMarkLearned () {
       this.markLearned(this.activeConcept)
@@ -123,6 +196,7 @@ export default {
       for (const concept of this.CONCEPTS) {
         if (concept.id === conceptId && !concept.learned && concept.onConceptUsed) {
           concept.onConceptUsed.call(this, concept)
+          this.trackDistraction()
         }
       }
     },
@@ -132,9 +206,13 @@ export default {
           concept.onMenuRequested.call(this, concept, menuState)
         }
       }
+      this.trackDistraction()
     },
   },
   computed: {
+    visibleConcepts () {
+      return this.CONCEPTS.filter(c => c.visible).sort(function (a, b) { return a.visible - b.visible })
+    },
     filteredConcepts () {
       if (this.isExpanded) {
         if (this.filter) {
@@ -143,7 +221,7 @@ export default {
           return this.CONCEPTS
         }
       } else {
-        return this.CONCEPTS.filter(c => !c.learned)
+        return this.visibleConcepts
       }
     },
     isUserInGame () {
