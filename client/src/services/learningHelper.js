@@ -9,7 +9,7 @@ const CONCEPT_IDS = {
 }
 
 class LearningHelper {
-  id = CONCEPT_IDS
+  concept = CONCEPT_IDS
 
   conceptUsed(conceptId) {
     eventBus.$emit('onConceptUsed', conceptId)

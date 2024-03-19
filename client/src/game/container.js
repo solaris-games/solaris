@@ -1,8 +1,8 @@
 import * as PIXI from 'pixi.js-legacy'
 import { Viewport } from 'pixi-viewport'
 import Map from './map'
-import eventBus from '../eventBus'
 import gameHelper from '../services/gameHelper'
+import LearningHelper from '../services/learningHelper'
 import textureService from './texture'
 
 class GameContainer {
@@ -134,12 +134,12 @@ class GameContainer {
 
   zoomIn () {
     this.viewport.zoomPercent(0.5, true)
-    eventBus.$emit('onZoom')
+    LearningHelper.conceptUsed(LearningHelper.concept.CAMERA_ZOOM)
   }
 
   zoomOut () {
     this.viewport.zoomPercent(-0.3, true)
-    eventBus.$emit('onZoom')
+    LearningHelper.conceptUsed(LearningHelper.concept.CAMERA_ZOOM)
   }
 
   setupViewport (game) {
@@ -263,7 +263,7 @@ class GameContainer {
     let zoomPercent = this.getViewportZoomPercentage()
 
     this.map.refreshZoom(zoomPercent)
-    eventBus.$emit('onZoom')
+    LearningHelper.conceptUsed(LearningHelper.concept.CAMERA_ZOOM)
   }
 
   setMode (mode, args) {

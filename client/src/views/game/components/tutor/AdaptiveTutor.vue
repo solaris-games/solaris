@@ -73,12 +73,10 @@ export default {
     // TODO: These event names should be global constants
     eventBus.$on('onConceptUsed', this.onConceptUsed)
     eventBus.$on('onMenuRequested', this.onMenuRequested)
-    eventBus.$on('onZoom', this.onZoom)
   },
   destroyed () {
     eventBus.$off('onConceptUsed', this.onConceptUsed)
     eventBus.$off('onMenuRequested', this.onMenuRequested)
-    eventBus.$off('onZoom', this.onZoom)
   },
   methods: {
     toggle () {
@@ -135,13 +133,6 @@ export default {
         }
       }
     },
-    onZoom () {
-      for (const concept of this.CONCEPTS) {
-        if (!concept.learned && concept.onZoom) {
-          concept.onZoom.call(this, concept)
-        }
-      }
-    }
   },
   computed: {
     filteredConcepts () {
