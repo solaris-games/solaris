@@ -253,15 +253,16 @@ export default class GameCreateService {
 
             game.settings.general.awardRankTo = 'teams';
             game.settings.general.awardRankToTopN = undefined;
-        }
+        } else {
+            // No reason to check rank awarding for team games.
+            const awardRankTo = game.settings.general.awardRankTo;
+            const awardRankToTopN = game.settings.general.awardRankToTopN;
 
-        const awardRankTo = game.settings.general.awardRankTo;
-        const awardRankToTopN = game.settings.general.awardRankToTopN;
-
-        if (awardRankTo === 'top_n' && (!awardRankToTopN || awardRankToTopN < 1 || awardRankToTopN > Math.floor(game.settings.general.playerLimit / 2))) {
-            throw new ValidationError('Invalid top N value for awarding rank.');
-        } else if (!['all', 'winner', 'top_n'].includes(awardRankTo)) {
-            throw new ValidationError('Invalid award rank to setting.');
+            if (awardRankTo === 'top_n' && (!awardRankToTopN || awardRankToTopN < 1 || awardRankToTopN > Math.floor(game.settings.general.playerLimit / 2))) {
+                throw new ValidationError('Invalid top N value for awarding rank.');
+            } else if (!['all', 'winner', 'top_n'].includes(awardRankTo)) {
+                throw new ValidationError('Invalid award rank to setting.');
+            }
         }
 
         // If the game name contains a special string, then replace it with a random name.
