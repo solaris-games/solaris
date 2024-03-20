@@ -80,13 +80,14 @@ class GameContainer {
       backgroundColor: 0x000000, // black hexadecimal
       resolution: window.devicePixelRatio || 1,
       antialias: antialiasing,
-      autoResize: true
+      autoResize: true,
+      autoDensity: true,
     })
 
     this.app.ticker.add(this.onTick.bind(this))
     this.app.ticker.maxFPS = 0
 
-    if ( process.env.NODE_ENV == 'development') {
+    if (process.env.NODE_ENV == 'development') {
       this.app.ticker.add(this.calcFPS.bind(this))
     }
 
