@@ -9,7 +9,7 @@ class GameContainer {
 
   constructor () {
     PIXI.settings.SORTABLE_CHILDREN = true
-    PIXI.GRAPHICS_CURVES.minSegments = 20 // Smooth arcs
+    PIXI.Graphics.curves.minSegments = 20 // Smooth arcs
 
     this.frames = 0
     this.dtAccum = 33.0*16
