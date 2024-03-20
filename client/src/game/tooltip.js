@@ -4,8 +4,8 @@ import GameHelper from '../services/gameHelper'
 export default class {
     constructor() {
         this.container = new PIXI.Container()
-        this.container.interactive = false
-        this.container.buttonMode = false
+        this.container.eventMode = 'passive'
+        this.container.cursor = null
     }
 
     setup (game) {
@@ -34,7 +34,7 @@ export default class {
         const internalContainer = new PIXI.Container()
         internalContainer.x = paddingX
         internalContainer.y = paddingY
-    
+
         let textStyle = new PIXI.TextStyle({
             fontFamily: `Chakra Petch,sans-serif;`,
             fill: 0xFFFFFF,
@@ -63,7 +63,7 @@ export default class {
         graphics.drawRoundedRect(0, 0, internalContainer.width + (paddingX*2), internalContainer.height + (paddingY*2), 1)
         graphics.endFill()
 
-        this.container.addChild(graphics)    
+        this.container.addChild(graphics)
         this.container.addChild(internalContainer)
 
         if (tooltipData.offset.relative) {
@@ -82,15 +82,15 @@ export default class {
         // for carrier ETAs in real time.
         const redraw = () => {
             const isOwnedByUserPlayer = GameHelper.isOwnedByUserPlayer(this.game, carrier)
-    
+
             const detail = [
                 `⏱️ ` + GameHelper.getCountdownTimeStringByTicks(this.game, carrier.ticksEta)
             ]
-    
+
             if (isOwnedByUserPlayer) {
                 detail.push(`${carrier.waypointsLooped ? '🔄' : '📍'} ${carrier.waypoints.length} waypoint${carrier.waypoints.length !== 1 ? 's' : ''}`)
             }
-    
+
             this._drawTooltip({
                 playerId: carrier.ownedByPlayerId,
                 location: carrier.location,
@@ -109,7 +109,7 @@ export default class {
 
     drawTooltipStar (star) {
         this.clear()
-        
+
         const carriers = GameHelper.getCarriersOrbitingStar(this.game, star)
 
         if (!carriers.length) {

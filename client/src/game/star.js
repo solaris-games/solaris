@@ -31,11 +31,14 @@ class Star extends EventEmitter {
     super()
 
     this.app = app
-    this.container = new PIXI.Container()
     this.fixedContainer = new PIXI.Container() // this container isnt affected by culling or user setting scalling
-    this.container.interactive = true
+    this.fixedContainer.interactiveChildren = false
+    this.fixedContainer.eventMode = 'none'
+    this.container = new PIXI.Container()
     this.container.interactiveChildren = false
-    this.container.buttonMode = true
+    this.container.cursor = 'pointer'
+    this.container.eventMode = 'static';
+    this.container.interactiveChildren = false;
 
     this.graphics_shape_part = new PIXI.Graphics()
     this.graphics_shape_full = new PIXI.Graphics()
