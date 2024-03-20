@@ -36,7 +36,7 @@ class Star extends EventEmitter {
     this.fixedContainer.eventMode = 'none'
     this.container = new PIXI.Container()
     this.container.interactiveChildren = false
-    this.container.buttonMode = true
+    this.container.cursor = 'pointer'
     this.container.eventMode = 'static';
     this.container.interactiveChildren = false;
 

@@ -5,7 +5,7 @@ export default class {
     constructor() {
         this.container = new PIXI.Container()
         this.container.eventMode = 'passive'
-        this.container.buttonMode = false
+        this.container.cursor = null
     }
 
     setup (game) {

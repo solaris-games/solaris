@@ -16,7 +16,7 @@ class Carrier extends EventEmitter {
     this.container = new PIXI.Container()
     this.container.eventMode = 'static'
     this.container.interactiveChildren = false
-    this.container.buttonMode = true
+    this.container.cursor = 'pointer'
 
     this.graphics_colour = new PIXI.Sprite()
     this.graphics_selected = new PIXI.Graphics()
@@ -273,16 +273,16 @@ class Carrier extends EventEmitter {
     // Can only be interactive if its in transit
     if (!this.data.orbiting) {
       this.container.eventMode = 'static'
-      this.container.buttonMode = true
+      this.container.cursor = 'pointer'
     } else {
       this.container.eventMode = 'passive'
-      this.container.buttonMode = false
+      this.container.cursor = null
     }
   }
 
   disableInteractivity() {
     this.container.eventMode = 'passive'
-    this.container.buttonMode = false
+    this.container.cursor = null
   }
 
   onZoomChanging(zoomPercent) {
