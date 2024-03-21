@@ -126,8 +126,8 @@ export default {
 Solaris is free, open source and does not have ads. Please consider donating or purchasing Galactic Credits to support the continued development of the project.
 
 Thank you,
-Hyperi0n`, 'Donate', 'Dismiss', false, true)) {
-        window.open("https://www.buymeacoffee.com/hyperi0n", '_blank').focus();
+LimitingFactor`, 'Donate', 'Dismiss', false, true)) {
+        window.open("https://www.buymeacoffee.com/limitingfactor", '_blank').focus();
       }
     }
   },
