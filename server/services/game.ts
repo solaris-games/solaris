@@ -271,7 +271,7 @@ export default class GameService extends EventEmitter {
         }
 
         const isAdmin = deletedByUserId && await this.userService.getUserIsAdmin(deletedByUserId);
-        const isCreator = deletedByUserId && game.settings.general.createdByUserId && game.settings.general.createdByUserId.toString() !== deletedByUserId.toString();
+        const isCreator = deletedByUserId && game.settings.general.createdByUserId && game.settings.general.createdByUserId.toString() === deletedByUserId.toString();
 
         if (deletedByUserId && !isAdmin && !isCreator) {
             throw new ValidationError('Cannot delete this game, you did not create it.');
