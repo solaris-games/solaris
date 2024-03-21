@@ -212,8 +212,6 @@ export default class PlayerService extends EventEmitter {
             }
         }
 
-        game.galaxy.players = players;
-
         if (game.galaxy.homeStars && game.galaxy.homeStars.length) {
             this._distributePlayerLinkedHomeStars(game, players);
         } else {
@@ -226,6 +224,8 @@ export default class PlayerService extends EventEmitter {
         else {
             this._distributePlayerStartingStars(game, players);
         }
+
+        game.galaxy.players = players;
     }
 
     _generateTeamColourShapeList(teamCount: number, playersPerTeam: number): Record<number, PlayerColourShapeCombination[]> {
