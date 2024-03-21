@@ -1,9 +1,11 @@
+import DiplomacyService from "./diplomacy";
+
 const mongoose = require('mongoose');
 const moment = require('moment');
 const EventEmitter = require('events');
 import Repository from './repository';
 import { DBObjectId } from './types/DBObjectId';
-import { Game } from './types/Game';
+import {Game, Team} from './types/Game';
 import { Location } from './types/Location';
 import { Player, PlayerColour, PlayerColourShapeCombination, PlayerShape, ResearchTypeNotRandom } from './types/Player';
 import { Star } from './types/Star';
@@ -16,7 +18,11 @@ import SpecialistService from './specialist';
 import StarService from './star';
 import StarDistanceService from './starDistance';
 import TechnologyService from './technology';
+import TeamService from "./team";
 import ValidationError from '../errors/validation';
+
+const SHAPES: PlayerShape[] = ['circle', 'square', 'diamond', 'hexagon'];
+const COLOURS: PlayerColour[] = require('../config/game/colours').slice();
 
 export default class PlayerService extends EventEmitter {
     gameRepo: Repository<Game>;
@@ -29,6 +35,7 @@ export default class PlayerService extends EventEmitter {
     specialistService: SpecialistService;
     gameTypeService: GameTypeService;
     playerReadyService: PlayerReadyService;
+    teamService: TeamService;
 
     constructor(
         gameRepo: Repository<Game>,
@@ -40,7 +47,8 @@ export default class PlayerService extends EventEmitter {
         technologyService: TechnologyService,
         specialistService: SpecialistService,
         gameTypeService: GameTypeService,
-        playerReadyService: PlayerReadyService
+        playerReadyService: PlayerReadyService,
+        teamService: TeamService,
     ) {
         super();
 
@@ -54,6 +62,7 @@ export default class PlayerService extends EventEmitter {
         this.specialistService = specialistService;
         this.gameTypeService = gameTypeService;
         this.playerReadyService = playerReadyService;
+        this.teamService = teamService;
     }
 
     getById(game: Game, playerId: DBObjectId) {
@@ -151,15 +160,56 @@ export default class PlayerService extends EventEmitter {
         return player;
     }
 
-    createEmptyPlayers(game: Game) {
-        let players: Player[] = [];
+    setupEmptyPlayers(game: Game) {
+        const players: Player[] = [];
 
-        let shapeColours = this._generatePlayerColourShapeList(game.settings.general.playerLimit);
+        if (game.settings.general.mode === 'teamConquest') {
+            const teams: Team[] = [];
 
-        for (let i = 0; i < game.settings.general.playerLimit; i++) {
-            let shapeColour = shapeColours[i];
+            const teamsNumber = game.settings.conquest.teamsCount;
 
-            players.push(this.createEmptyPlayer(game, shapeColour.colour, shapeColour.shape));
+            if (!teamsNumber) {
+                throw new ValidationError("Team count not provided");
+            }
+
+            const playersPerTeam = game.settings.general.playerLimit / teamsNumber;
+            const teamColourShapeList = this._generateTeamColourShapeList(teamsNumber, playersPerTeam);
+
+            for (let ti = 0; ti < teamsNumber; ti++) {
+                const team: Team = {
+                    _id: new mongoose.Types.ObjectId() as any,
+                    name: `Team ${ti + 1}`,
+                    players: []
+                };
+
+                teams.push(team);
+            }
+
+            const teamAssignments = this.teamService.generateTeamAssignments(game.settings.general.playerLimit, teamsNumber);
+
+            for (let i = 0; i < game.settings.general.playerLimit; i++) {
+                const teamNumber = teamAssignments[i];
+                const team = teams[teamNumber];
+
+                const shapeColour = teamColourShapeList[teamNumber][team.players.length];
+
+                const player = this.createEmptyPlayer(game, shapeColour.colour, shapeColour.shape);
+
+                players.push(player);
+
+                team.players.push(player._id);
+            }
+
+            game.galaxy.teams = teams;
+        } else {
+            const shapeColours = this._generatePlayerColourShapeList(game.settings.general.playerLimit);
+
+            for (let i = 0; i < game.settings.general.playerLimit; i++) {
+                const shapeColour = shapeColours[i];
+                const player = this.createEmptyPlayer(game, shapeColour.colour, shapeColour.shape);
+
+                players.push(player);
+            }
         }
 
         if (game.galaxy.homeStars && game.galaxy.homeStars.length) {
@@ -175,17 +225,52 @@ export default class PlayerService extends EventEmitter {
             this._distributePlayerStartingStars(game, players);
         }
 
-        return players;
+        game.galaxy.players = players;
     }
 
-    _generatePlayerColourShapeList(playerCount: number) {
-        let shapes: PlayerShape[] = ['circle', 'square', 'diamond', 'hexagon'];
-        let colours = require('../config/game/colours').slice();
+    _generateTeamColourShapeList(teamCount: number, playersPerTeam: number): Record<number, PlayerColourShapeCombination[]> {
+        const shapesCount = SHAPES.length;
+        const coloursCount = COLOURS.length;
 
-        let combinations: PlayerColourShapeCombination[] = [];
+        const available = {};
 
-        for (let shape of shapes) {
-            for (let colour of colours) {
+        for (const colour of COLOURS) {
+            available[colour.alias] = SHAPES.slice();
+        }
+
+        let colourIdx = 0;
+        const result: Record<number, PlayerColourShapeCombination[]> = {};
+
+        for (let ti = 0; ti < teamCount; ti++) {
+            let fulfilled = 0;
+            const combinations: PlayerColourShapeCombination[] = [];
+
+            while (fulfilled < playersPerTeam) {
+                const teamColour = COLOURS[colourIdx % coloursCount];
+
+                const availableShapes = available[teamColour.alias];
+
+                if (!availableShapes.length) {
+                    colourIdx++;
+                    continue;
+                }
+
+                const shape = availableShapes.pop()!;
+                combinations.push({ shape, colour: teamColour });
+                fulfilled++;
+            }
+
+            result[ti] = combinations;
+        }
+
+        return result;
+    }
+
+    _generatePlayerColourShapeList(playerCount: number): PlayerColourShapeCombination[] {
+        const combinations: PlayerColourShapeCombination[] = [];
+
+        for (let shape of SHAPES) {
+            for (let colour of COLOURS) {
                 combinations.push({
                     shape,
                     colour
@@ -193,7 +278,7 @@ export default class PlayerService extends EventEmitter {
             }
         }
 
-        let result: PlayerColourShapeCombination[] = [];
+        const result: PlayerColourShapeCombination[] = [];
 
         const maxAttempts: number = 2;
         let attempts: number = 0;
@@ -337,7 +422,9 @@ export default class PlayerService extends EventEmitter {
     _getNewPlayerHomeStar(game: Game, starLocations: Location[], galaxyCenter: Location, distanceFromCenter: number, radians: number[]) {
         switch (game.settings.specialGalaxy.playerDistribution) {
             case 'circular':
-                return this._getNewPlayerHomeStarCircular(game, starLocations, galaxyCenter, distanceFromCenter, radians);
+                return this._getNewPlayerHomeStarCircular(game, starLocations, galaxyCenter, distanceFromCenter, radians, true);
+            case 'circularSequential':
+                return this._getNewPlayerHomeStarCircular(game, starLocations, galaxyCenter, distanceFromCenter, radians, false);
             case 'random':
                 return this._getNewPlayerHomeStarRandom(game);
         }
@@ -345,9 +432,9 @@ export default class PlayerService extends EventEmitter {
         throw new Error(`Unsupported player distribution setting: ${game.settings.specialGalaxy.playerDistribution}`);
     }
 
-    _getNewPlayerHomeStarCircular(game: Game, starLocations: Location[], galaxyCenter: Location, distanceFromCenter: number, radians: number[]) {
+    _getNewPlayerHomeStarCircular(game: Game, starLocations: Location[], galaxyCenter: Location, distanceFromCenter: number, radians: number[], random: boolean) {
         // Get the player's starting location.
-        let startingLocation = this._getPlayerStartingLocation(radians, galaxyCenter, distanceFromCenter);
+        let startingLocation = this._getPlayerStartingLocation(radians, galaxyCenter, distanceFromCenter, random);
 
         // Find the star that is closest to this location, that will be the player's home star.
         let homeStar = this.starDistanceService.getClosestUnownedStarFromLocation(startingLocation, game.galaxy.stars);
@@ -378,15 +465,21 @@ export default class PlayerService extends EventEmitter {
         return radians;
     }
 
-    _getPlayerStartingLocation(radians: number[], galaxyCenter: Location, distanceFromCenter: number) {
-        // Pick a random radian for the player's starting position.
-        let radianIndex = this.randomService.getRandomNumber(radians.length);
-        let currentRadians = radians.splice(radianIndex, 1)[0];
+    _getPlayerStartingLocation(radians: number[], galaxyCenter: Location, distanceFromCenter: number, random: boolean) {
+        let currentRadian: number;
+
+        if (random) {
+            // Pick a random radian for the player's starting position.
+            let radianIndex = this.randomService.getRandomNumber(radians.length);
+            currentRadian = radians.splice(radianIndex, 1)[0];
+        } else {
+            currentRadian = radians.pop()!;
+        }
 
         // Get the desired player starting location.
         let startingLocation = {
-            x: distanceFromCenter * Math.cos(currentRadians),
-            y: distanceFromCenter * Math.sin(currentRadians)
+            x: distanceFromCenter * Math.cos(currentRadian),
+            y: distanceFromCenter * Math.sin(currentRadian)
         };
 
         // Add the galaxy center x and y so that the desired location is relative to the center.

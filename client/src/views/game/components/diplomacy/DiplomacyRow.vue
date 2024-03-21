@@ -65,6 +65,12 @@ export default {
         }
       }
 
+      if (this.$store.state.game.settings.diplomacy.lockedAlliances === 'enabled') {
+        if (!await this.$confirm('Permanent Alliance', 'If you form an alliance in this game, you will not be able to cancel it.')) {
+          return
+        }
+      }
+
       if (await this.$confirm('Declare Allies', `Are you sure you want to change your diplomatic status to ${playerAlias} to allied?`)) {
         try {
           let response = await DiplomacyApiService.declareAlly(this.$store.state.game._id, diplomaticStatus.playerIdTo)

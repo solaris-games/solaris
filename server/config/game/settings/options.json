@@ -1,6 +1,6 @@
 {
     "general":{
-       "mode":[
+       "mode": [
           {
              "value":"conquest",
              "text":"Conquest"
@@ -12,6 +12,10 @@
           {
              "value":"kingOfTheHill",
              "text":"King Of The Hill"
+          },
+          {
+             "value": "teamConquest",
+             "text": "Team Conquest"
           }
        ],
        "playerLimit":[
@@ -351,6 +355,10 @@
           {
              "value":"random",
              "text":"Random"
+          },
+          {
+             "value": "circularSequential",
+             "text": "Circular (Sequential)"
           }
        ],
        "carrierSpeed":[
@@ -588,6 +596,16 @@
             "text":"Disabled"
          }
        ],
+       "lockedAlliances":[
+         {
+           "value":"enabled",
+           "text":"Enabled"
+         },
+         {
+           "value":"disabled",
+           "text":"Disabled"
+         }
+        ],
        "upkeepCost":[
          {
            "value":"none",

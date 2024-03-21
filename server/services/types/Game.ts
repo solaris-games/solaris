@@ -27,12 +27,12 @@ export type GameType = 'tutorial'|
 'special_freeForAll'|
 'special_arcade';
 
-export type GameMode = 'conquest'|'battleRoyale'|'kingOfTheHill';
+export type GameMode = 'conquest'|'battleRoyale'|'kingOfTheHill'|'teamConquest';
 export type GamePlayerType = 'all'|'establishedPlayers';
 export type GamePlayerAnonymity = 'normal'|'extra';
 export type GamePlayerOnlineStatus = 'hidden'|'visible';
 export type GameSettingEnabledDisabled = 'disabled'|'enabled';
-export type GameAwardRankTo = 'all'|'winner'|'top_n';
+export type GameAwardRankTo = 'all'|'winner'|'top_n'|'teams';
 export type GameGalaxyType = 'circular'|'spiral'|'doughnut'|'circular-balanced'|'irregular'|'custom';
 export type GameCarrierCost = 'cheap'|'standard'|'expensive';
 export type GameCarrierUpkeepCost = 'none'|'cheap'|'standard'|'expensive';
@@ -42,7 +42,7 @@ export type GameSpecialistCost = 'none'|'standard'|'expensive'|'veryExpensive'|'
 export type GameSpecialistCurrency = 'credits'|'creditsSpecialists';
 export type GameDarkGalaxyMode = 'disabled'|'fog'|'standard'|'extra'|'start';
 export type GameResourceDistribution = 'random'|'weightedCenter';
-export type GamePlayerDistribution = 'circular'|'random';
+export type GamePlayerDistribution = 'circular'|'random'|'circularSequential';
 export type GameVictoryCondition = 'starPercentage'|'homeStarPercentage';
 export type GameVictoryPercentage = 25|33|50|66|75|90|100;
 export type GameInfrastructureCost = 'none'|'cheap'|'standard'|'expensive';
@@ -143,6 +143,7 @@ export interface GameSettings {
 		victoryCondition: GameVictoryCondition;
 		victoryPercentage: GameVictoryPercentage;
 		capitalStarElimination: GameSettingEnabledDisabled;
+		teamsCount?: number;
 	},
 	kingOfTheHill: {
 		productionCycles: number;
@@ -182,6 +183,7 @@ export interface GameSettings {
 		maxAlliances: number;
 		upkeepCost: GameAllianceUpkeepCost;
 		globalEvents: GameSettingEnabledDisabled;
+		lockedAlliances: GameSettingEnabledDisabled;
 	},
 	technology: {
 		startingTechnologyLevel: {
@@ -241,15 +243,22 @@ export interface GameSpectator {
 	playerIds: DBObjectId[];
 }
 
+export interface Team {
+	_id: DBObjectId;
+	name: string;
+	players: DBObjectId[];
+}
+
 export interface Game {
     _id: DBObjectId;
-    settings: GameSettings,
+    settings: GameSettings;
     galaxy: {
-        players: Player[]
+        players: Player[],
 		stars: Star[],
 		carriers: Carrier[],
 		homeStars?: DBObjectId[],
-		linkedStars: DBObjectId[][]
+		linkedStars: DBObjectId[][],
+		teams?: Team[],
 	},
 	conversations: Conversation[]
 	state: {
@@ -265,7 +274,9 @@ export interface Game {
 		starsForVictory: number;
 		players: number;
 		winner: DBObjectId | null;
+		winningTeam: DBObjectId | null;
 		leaderboard: DBObjectId[] | null;
+		teamLeaderboard: DBObjectId[] | null;
 		cleaned: boolean;
 		openSlots?: number;
 	},

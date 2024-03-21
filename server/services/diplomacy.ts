@@ -43,6 +43,14 @@ export default class DiplomacyService extends EventEmitter {
         return game.settings.diplomacy.tradeRestricted === 'enabled';
     }
 
+    isAllianceLocked(game: Game): boolean {
+        return game.settings.diplomacy.lockedAlliances === 'enabled';
+    }
+
+    isTeamGame(game: Game): boolean {
+        return game.settings.general.mode === 'teamConquest';
+    }
+
     isMaxAlliancesEnabled(game: Game): boolean {
         return game.settings.diplomacy.maxAlliances < game.settings.general.playerLimit - 1
     }
@@ -293,6 +301,10 @@ export default class DiplomacyService extends EventEmitter {
     async declareEnemy(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId, saveToDB: boolean = true) {
         let oldStatus = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
 
+        if (this.isAllianceLocked(game) && oldStatus.actualStatus === 'allies') {
+            throw new ValidationError(`Alliances cannot be changed in this game.`);
+        }
+
         if (oldStatus.statusTo === "enemies") {
             throw new ValidationError(`The player has already been declared as enemies`);
         }
@@ -327,6 +339,10 @@ export default class DiplomacyService extends EventEmitter {
 
     async declareNeutral(game: Game, playerId: DBObjectId, playerIdTarget: DBObjectId, saveToDB: boolean = true) {
         let oldStatus = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
+
+        if (this.isAllianceLocked(game) && oldStatus.actualStatus === 'allies') {
+            throw new ValidationError(`Alliances cannot be changed in this game.`);
+        }
 
         if (oldStatus.statusTo === "neutral") {
             throw new ValidationError(`The player has already been declared as neutral`);
