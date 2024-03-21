@@ -11,7 +11,7 @@
       <table class="table table-striped table-hover">
         <tbody>
           <game-setting-value title="Mode"
-            tooltip="The game mode Conquest is victory by stars, Battle Royale is last man standing in a constantly shrinking galaxy and King of the Hill is a fight for a key star"
+            tooltip="The game mode Conquest is victory by stars, Battle Royale is last man standing in a constantly shrinking galaxy, King of the Hill is a fight for a key star, Team conquest is Conquest, but with teams"
             :valueText="getFriendlyText(game.settings.general.mode)"
             :value="game.settings.general.mode"
             :compareValue="compareSettings.general.mode"/>
@@ -20,19 +20,25 @@
             :valueText="getFriendlyText(game.settings.conquest.victoryCondition)"
             :value="game.settings.conquest.victoryCondition"
             :compareValue="compareSettings.conquest.victoryCondition"
-            v-if="game.settings.general.mode === 'conquest'"/>
+            v-if="game.settings.general.mode === 'conquest' || game.settings.general.mode === 'teamConquest'"/>
           <game-setting-value title="Stars For Victory"
             tooltip="How many stars are needed for a player to win the game"
             :valueText="game.settings.conquest.victoryPercentage + '%'"
             :value="game.settings.conquest.victoryPercentage"
             :compareValue="compareSettings.conquest.victoryPercentage"
-            v-if="game.settings.general.mode === 'conquest'"/>
+            v-if="game.settings.general.mode === 'conquest' || game.settings.general.mode === 'teamConquest'"/>
           <game-setting-value title="Capital Star Elimination"
             tooltip="Determines whether players become defeated if they lose control of their capital star"
             :valueText="getFriendlyText(game.settings.conquest.capitalStarElimination)"
             :value="game.settings.conquest.capitalStarElimination"
             :compareValue="compareSettings.conquest.capitalStarElimination"
-            v-if="game.settings.general.mode === 'conquest'"/>
+            v-if="game.settings.general.mode === 'conquest' || game.settings.general.mode === 'teamConquest'"/>
+          <game-setting-value title="Number of teams"
+            tooltip="The number of teams in the game"
+            :valueText="game.settings.conquest.teamsCount"
+            :value="game.settings.conquest.teamsCount"
+            :compare-value="0"
+            v-if="game.settings.general.mode === 'teamConquest'" />
           <game-setting-value title="Countdown Cycles"
             tooltip="How long the countdown is to the end of the game in production cycles when the center star is captured"
             :valueText="game.settings.kingOfTheHill.productionCycles"
@@ -452,6 +458,12 @@
             :valueText="getFriendlyText(game.settings.diplomacy.enabled)"
             :value="game.settings.diplomacy.enabled"
             :compareValue="compareSettings.diplomacy.enabled"/>
+          <game-setting-value title="Locked Alliances"
+            tooltip="If enabled, alliances cannot be canceled."
+            :valueText="getFriendlyText(game.settings.diplomacy.lockedAlliances)"
+            :value="game.settings.diplomacy.lockedAlliances"
+            :compareValue="compareSettings.diplomacy.lockedAlliances"
+            v-if="game.settings.diplomacy.enabled === 'enabled'"/>
           <game-setting-value title="Max Number of Alliances"
             tooltip="Determines how many formal alliance each player may have at once"
             :valueText="getFriendlyText(game.settings.diplomacy.maxAlliances)"
@@ -658,6 +670,7 @@ export default {
         'weightedCenter': 'Weighted (Center)',
         'irregular': 'Irregular',
         'circular': 'Circular',
+        'circularSequential': 'Circular (Sequential)',
         'spiral': 'Spiral',
         'doughnut': 'Doughnut',
         'circular-balanced': 'Circular Balanced',
@@ -670,6 +683,7 @@ export default {
         'creditsSpecialists': 'Specialist Tokens',
         'conquest': 'Conquest',
         'battleRoyale': 'Battle Royale',
+        'teamConquest': 'Team Conquest',
         'establishedPlayers': 'Established Players Only',
         'galacticCenter': 'Galactic Center',
         'galacticCenterOfMass': 'Galactic Center of Mass',

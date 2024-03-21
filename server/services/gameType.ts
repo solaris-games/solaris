@@ -4,6 +4,9 @@ import {GameSettings} from "./types/Game";
 import {gameSettings, OfficialGameCategory, OfficialGameKind, specialGameTypes} from "../config/officialGames";
 
 export default class GameTypeService {
+    isTeamConquestGame(game: Game) {
+        return game.settings.general.mode === 'teamConquest';
+    }
     getOfficialGameCategoryName(officialGame: OfficialGameCategory) {
         if (officialGame.kind === OfficialGameKind.Standard) {
             return officialGame.settings.general.type;
