@@ -15,6 +15,7 @@ import { Player } from '../services/types/Player';
 import { LeaderboardPlayer } from '../services/types/Leaderboard';
 import PlayerAfkService from '../services/playerAfk';
 import UserLevelService from '../services/userLevel';
+import TeamService from "../services/team";
 const mongoose = require('mongoose');
 
 describe('Leaderboard - Last man standing', () => {
@@ -27,12 +28,16 @@ describe('Leaderboard - Last man standing', () => {
     let gameStateService: GameStateService;
     let badgeService: BadgeService;
     let playerStatisticsService: PlayerStatisticsService;
+    let teamService: TeamService;
 
     let service: LeaderboardService;
     let game: Game;
     let leaderboard: LeaderboardPlayer[];
 
     beforeEach(() => {
+        teamService = {
+
+        } as TeamService;
         playerAfkService = {
             isAIControlled: (game: Game, player: Player, includePseudoAfk: boolean) => {
                 return false;
@@ -62,7 +67,7 @@ describe('Leaderboard - Last man standing', () => {
             }
         } as PlayerStatisticsService;
 
-        service = new LeaderboardService(playerService, playerAfkService, userLevelService, ratingService, gameService, gameTypeService, gameStateService, badgeService, playerStatisticsService);
+        service = new LeaderboardService(playerService, playerAfkService, userLevelService, ratingService, gameService, gameTypeService, gameStateService, badgeService, playerStatisticsService, teamService);
 
         game = {
             settings: {
