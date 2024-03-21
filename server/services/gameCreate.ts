@@ -321,7 +321,7 @@ export default class GameCreateService {
         this.starService.setupStarsForGameStart(game);
         
         // Setup players and assign to their starting positions.
-        game.galaxy.players = this.playerService.createEmptyPlayers(game);
+        await this.playerService.setupEmptyPlayers(game);
         game.galaxy.carriers = this.playerService.createHomeStarCarriers(game);
 
         this.mapService.generateTerrain(game);
@@ -331,8 +331,6 @@ export default class GameCreateService {
         game.state.starsForVictory = this._calculateStarsForVictory(game);
 
         this._setGalaxyCenter(game);
-
-        await this._setupTeams(game);
 
         if (isTutorial) {
             this._setupTutorialPlayers(game);
@@ -357,48 +355,6 @@ export default class GameCreateService {
         const starLocations = game.galaxy.stars.map(s => s.location);
 
         game.constants.distances.galaxyCenterLocation = this.mapService.getGalaxyCenter(starLocations);
-    }
-
-    async _setupTeams(game: Game) {
-        if (game.settings.general.mode !== 'teamConquest') {
-            return;
-        }
-
-        game.galaxy.teams = [];
-
-        const teamsNumber = game.settings.conquest.teamsCount;
-
-        if (!teamsNumber) {
-            throw new ValidationError("Team count not provided");
-        }
-
-        const players = game.galaxy.players.slice();
-        shuffle(players);
-
-        const playersPerTeam = players.length / teamsNumber;
-
-        for (let ti = 0; ti < teamsNumber; ti++) {
-            const playersForTeam = players.slice(ti * playersPerTeam, (ti + 1) * playersPerTeam);
-
-            const team: Team = {
-                _id: new mongoose.Types.ObjectId() as any,
-                name: `Team ${ti + 1}`,
-                players: playersForTeam.map(p => p._id)
-            };
-
-            game.galaxy.teams.push(team);
-
-            // Setup diplomacy states
-            for (let pi1 = 0; pi1 < playersForTeam.length; pi1++) {
-                for (let pi2 = 0; pi2 < playersForTeam.length; pi2++) {
-                    if (pi1 === pi2) {
-                        continue;
-                    }
-
-                    await this.diplomacyService.declareAlly(game, playersForTeam[pi1]._id, playersForTeam[pi2]._id, false);
-                }
-            }
-        }
     }
 
     _calculateStarsForVictory(game: Game) {

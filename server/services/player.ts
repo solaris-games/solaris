@@ -3,7 +3,7 @@ const moment = require('moment');
 const EventEmitter = require('events');
 import Repository from './repository';
 import { DBObjectId } from './types/DBObjectId';
-import { Game } from './types/Game';
+import {Game, Team} from './types/Game';
 import { Location } from './types/Location';
 import { Player, PlayerColour, PlayerColourShapeCombination, PlayerShape, ResearchTypeNotRandom } from './types/Player';
 import { Star } from './types/Star';
@@ -16,7 +16,11 @@ import SpecialistService from './specialist';
 import StarService from './star';
 import StarDistanceService from './starDistance';
 import TechnologyService from './technology';
+import TeamService from "./team";
 import ValidationError from '../errors/validation';
+
+const SHAPES: PlayerShape[] = ['circle', 'square', 'diamond', 'hexagon'];
+const COLOURS: PlayerColour[] = require('../config/game/colours').slice();
 
 export default class PlayerService extends EventEmitter {
     gameRepo: Repository<Game>;
@@ -29,6 +33,7 @@ export default class PlayerService extends EventEmitter {
     specialistService: SpecialistService;
     gameTypeService: GameTypeService;
     playerReadyService: PlayerReadyService;
+    teamService: TeamService;
 
     constructor(
         gameRepo: Repository<Game>,
@@ -40,7 +45,8 @@ export default class PlayerService extends EventEmitter {
         technologyService: TechnologyService,
         specialistService: SpecialistService,
         gameTypeService: GameTypeService,
-        playerReadyService: PlayerReadyService
+        playerReadyService: PlayerReadyService,
+        teamService: TeamService,
     ) {
         super();
 
@@ -54,6 +60,7 @@ export default class PlayerService extends EventEmitter {
         this.specialistService = specialistService;
         this.gameTypeService = gameTypeService;
         this.playerReadyService = playerReadyService;
+        this.teamService = teamService;
     }
 
     getById(game: Game, playerId: DBObjectId) {
@@ -151,16 +158,74 @@ export default class PlayerService extends EventEmitter {
         return player;
     }
 
-    createEmptyPlayers(game: Game) {
-        let players: Player[] = [];
+    async setupEmptyPlayers(game: Game) {
+        const players: Player[] = [];
 
-        let shapeColours = this._generatePlayerColourShapeList(game.settings.general.playerLimit);
+        if (game.settings.general.mode === 'teamConquest') {
+            const teams: Team[] = [];
 
-        for (let i = 0; i < game.settings.general.playerLimit; i++) {
-            let shapeColour = shapeColours[i];
+            const teamsNumber = game.settings.conquest.teamsCount;
 
-            players.push(this.createEmptyPlayer(game, shapeColour.colour, shapeColour.shape));
+            if (!teamsNumber) {
+                throw new ValidationError("Team count not provided");
+            }
+
+            const playersPerTeam = game.settings.general.playerLimit / teamsNumber;
+            const teamColourShapeList = this._generateTeamColourShapeList(teamsNumber, playersPerTeam);
+
+            for (let ti = 0; ti < teamsNumber; ti++) {
+                const team: Team = {
+                    _id: new mongoose.Types.ObjectId() as any,
+                    name: `Team ${ti + 1}`,
+                    players: []
+                };
+
+                teams.push(team);
+            }
+
+            const teamAssignments = this.teamService.generateTeamAssignments(game.settings.general.playerLimit, teamsNumber);
+
+            for (let i = 0; i < game.settings.general.playerLimit; i++) {
+                const teamNumber = teamAssignments[i];
+                const team = teams[teamNumber];
+
+                const shapeColour = teamColourShapeList[teamNumber];
+
+                const player = this.createEmptyPlayer(game, shapeColour.colour, shapeColour.shape);
+
+                players.push(player);
+
+                team.players.push(player._id);
+            }
+
+            for (let ti = 0; ti < teamsNumber; ti++) {
+                const team = teams[ti];
+                const playersForTeam = team.players.map(pid => players.find(p => p._id.toString() === pid.toString())!);
+
+                for (let pi1 = 0; pi1 < playersForTeam.length; pi1++) {
+                    for (let pi2 = 0; pi2 < playersForTeam.length; pi2++) {
+                        if (pi1 === pi2) {
+                            continue;
+                        }
+
+                        await this.diplomacyService.declareAlly(game, playersForTeam[pi1]._id, playersForTeam[pi2]._id, false);
+                    }
+                }
+            }
+
+            game.galaxy.teams = teams;
+        } else {
+            const shapeColours = this._generatePlayerColourShapeList(game.settings.general.playerLimit);
+
+            for (let i = 0; i < game.settings.general.playerLimit; i++) {
+                const shapeColour = shapeColours[i];
+                const player = this.createEmptyPlayer(game, shapeColour.colour, shapeColour.shape);
+
+                players.push(player);
+            }
         }
+
+        game.galaxy.players = players;
 
         if (game.galaxy.homeStars && game.galaxy.homeStars.length) {
             this._distributePlayerLinkedHomeStars(game, players);
@@ -174,18 +239,17 @@ export default class PlayerService extends EventEmitter {
         else {
             this._distributePlayerStartingStars(game, players);
         }
-
-        return players;
     }
 
-    _generatePlayerColourShapeList(playerCount: number) {
-        let shapes: PlayerShape[] = ['circle', 'square', 'diamond', 'hexagon'];
-        let colours = require('../config/game/colours').slice();
+    _generateTeamColourShapeList(teamCount: number, playersPerTeam: number): Record<number, PlayerColourShapeCombination[]> {
+        return {};
+    }
 
-        let combinations: PlayerColourShapeCombination[] = [];
+    _generatePlayerColourShapeList(playerCount: number): PlayerColourShapeCombination[] {
+        const combinations: PlayerColourShapeCombination[] = [];
 
-        for (let shape of shapes) {
-            for (let colour of colours) {
+        for (let shape of SHAPES) {
+            for (let colour of COLOURS) {
                 combinations.push({
                     shape,
                     colour
@@ -193,7 +257,7 @@ export default class PlayerService extends EventEmitter {
             }
         }
 
-        let result: PlayerColourShapeCombination[] = [];
+        const result: PlayerColourShapeCombination[] = [];
 
         const maxAttempts: number = 2;
         let attempts: number = 0;
