@@ -88,7 +88,7 @@ const schema = new Schema({
 			carrierToCarrierCombat: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
 			splitResources: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'disabled' },
 			resourceDistribution: { type: Types.String, required: true, enum: ['random','weightedCenter'], default: 'random' },
-			playerDistribution: { type: Types.String, required: true, enum: ['circular','random'], default: 'circular' },
+			playerDistribution: { type: Types.String, required: true, enum: ['circular','random', 'circularSequential'], default: 'circular' },
 			carrierSpeed: { type: Types.Number, required: true, min: 1, max: 25, default: 5 },
 			starCaptureReward: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'enabled' },
 			specialistBans: {

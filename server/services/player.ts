@@ -422,7 +422,9 @@ export default class PlayerService extends EventEmitter {
     _getNewPlayerHomeStar(game: Game, starLocations: Location[], galaxyCenter: Location, distanceFromCenter: number, radians: number[]) {
         switch (game.settings.specialGalaxy.playerDistribution) {
             case 'circular':
-                return this._getNewPlayerHomeStarCircular(game, starLocations, galaxyCenter, distanceFromCenter, radians);
+                return this._getNewPlayerHomeStarCircular(game, starLocations, galaxyCenter, distanceFromCenter, radians, true);
+            case 'circularSequential':
+                return this._getNewPlayerHomeStarCircular(game, starLocations, galaxyCenter, distanceFromCenter, radians, false);
             case 'random':
                 return this._getNewPlayerHomeStarRandom(game);
         }
@@ -430,9 +432,9 @@ export default class PlayerService extends EventEmitter {
         throw new Error(`Unsupported player distribution setting: ${game.settings.specialGalaxy.playerDistribution}`);
     }
 
-    _getNewPlayerHomeStarCircular(game: Game, starLocations: Location[], galaxyCenter: Location, distanceFromCenter: number, radians: number[]) {
+    _getNewPlayerHomeStarCircular(game: Game, starLocations: Location[], galaxyCenter: Location, distanceFromCenter: number, radians: number[], random: boolean) {
         // Get the player's starting location.
-        let startingLocation = this._getPlayerStartingLocation(radians, galaxyCenter, distanceFromCenter);
+        let startingLocation = this._getPlayerStartingLocation(radians, galaxyCenter, distanceFromCenter, random);
 
         // Find the star that is closest to this location, that will be the player's home star.
         let homeStar = this.starDistanceService.getClosestUnownedStarFromLocation(startingLocation, game.galaxy.stars);
@@ -463,15 +465,21 @@ export default class PlayerService extends EventEmitter {
         return radians;
     }
 
-    _getPlayerStartingLocation(radians: number[], galaxyCenter: Location, distanceFromCenter: number) {
-        // Pick a random radian for the player's starting position.
-        let radianIndex = this.randomService.getRandomNumber(radians.length);
-        let currentRadians = radians.splice(radianIndex, 1)[0];
+    _getPlayerStartingLocation(radians: number[], galaxyCenter: Location, distanceFromCenter: number, random: boolean) {
+        let currentRadian: number;
+
+        if (random) {
+            // Pick a random radian for the player's starting position.
+            let radianIndex = this.randomService.getRandomNumber(radians.length);
+            currentRadian = radians.splice(radianIndex, 1)[0];
+        } else {
+            currentRadian = radians.pop()!;
+        }
 
         // Get the desired player starting location.
         let startingLocation = {
-            x: distanceFromCenter * Math.cos(currentRadians),
-            y: distanceFromCenter * Math.sin(currentRadians)
+            x: distanceFromCenter * Math.cos(currentRadian),
+            y: distanceFromCenter * Math.sin(currentRadian)
         };
 
         // Add the galaxy center x and y so that the desired location is relative to the center.

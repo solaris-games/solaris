@@ -355,6 +355,10 @@
           {
              "value":"random",
              "text":"Random"
+          },
+          {
+             "value": "circularSequential",
+             "text": "Circular (Sequential)"
           }
        ],
        "carrierSpeed":[

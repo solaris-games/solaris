@@ -670,6 +670,7 @@ export default {
         'weightedCenter': 'Weighted (Center)',
         'irregular': 'Irregular',
         'circular': 'Circular',
+        'circularSequential': 'Circular (Sequential)',
         'spiral': 'Spiral',
         'doughnut': 'Doughnut',
         'circular-balanced': 'Circular Balanced',
