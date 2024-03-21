@@ -70,7 +70,6 @@ export default {
     return {
       CONCEPTS: CONCEPTS.sort((a, b) => a.title.localeCompare(b.title)),
       activeConcept: null,
-      learnedConceptIds: [],
       filter: "",
       isExpanded: false,
       isFocusedConcept: false,
@@ -88,6 +87,7 @@ export default {
       this.interval = setInterval(this.updateVisibleConcepts, 1000)
       this.clearVisible()
     }
+    this.loadKnowledge()
   },
   destroyed () {
     eventBus.$off('onConceptUsed', this.onConceptUsed)
@@ -107,12 +107,17 @@ export default {
         this.$delete(c, 'visible')
       }
     },
+    loadKnowledge () {
+      for (const c of this.CONCEPTS) {
+        this.$set(c, 'learned', c.id in this.learnedConcepts)
+      }
+    },
     resetKnowledge () {
       for (const c of this.CONCEPTS) {
         this.$set(c, 'learned', false)
         this.$delete(c, 'progress')
-        this.learnedConceptIds = []
       }
+      this.$store.commit('clearLearnedConcepts')
     },
     selectConcept (concept) {
       this.activeConcept = concept
@@ -175,7 +180,7 @@ export default {
         return false
       if (concept.pre) {
         for (const id of concept.pre) {
-          if (!this.learnedConceptIds.includes(id))
+          if (!(id in this.learnedConcepts))
             return false
         }
       }
@@ -185,13 +190,13 @@ export default {
     },
     markLearned (concept) {
       this.$set(concept, 'learned', true)
+      this.$store.commit('setLearnedConcept', concept.id)
       if (concept.visible) {
         AudioService.backspace()
         this.trackDistraction()
         this.$set(concept, 'visible', false)
       }
       this.$delete(concept, 'progress')
-      this.learnedConceptIds.push(concept.id)
       if (this.isSelectedConcept) {
         this.onCloseDetail()
       }
@@ -244,6 +249,9 @@ export default {
       } else {
         return this.visibleConcepts
       }
+    },
+    learnedConcepts () {
+      return this.$store.state.learnedConcepts || {}
     },
     isGameInProgress () {
       return GameHelper.isGameInProgress(this.$store.state.game)
