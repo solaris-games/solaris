@@ -1,3 +1,5 @@
+import DiplomacyService from "./diplomacy";
+
 const mongoose = require('mongoose');
 const moment = require('moment');
 const EventEmitter = require('events');
@@ -158,7 +160,7 @@ export default class PlayerService extends EventEmitter {
         return player;
     }
 
-    async setupEmptyPlayers(game: Game) {
+    setupEmptyPlayers(game: Game) {
         const players: Player[] = [];
 
         if (game.settings.general.mode === 'teamConquest') {
@@ -189,28 +191,13 @@ export default class PlayerService extends EventEmitter {
                 const teamNumber = teamAssignments[i];
                 const team = teams[teamNumber];
 
-                const shapeColour = teamColourShapeList[teamNumber];
+                const shapeColour = teamColourShapeList[teamNumber][team.players.length];
 
                 const player = this.createEmptyPlayer(game, shapeColour.colour, shapeColour.shape);
 
                 players.push(player);
 
                 team.players.push(player._id);
-            }
-
-            for (let ti = 0; ti < teamsNumber; ti++) {
-                const team = teams[ti];
-                const playersForTeam = team.players.map(pid => players.find(p => p._id.toString() === pid.toString())!);
-
-                for (let pi1 = 0; pi1 < playersForTeam.length; pi1++) {
-                    for (let pi2 = 0; pi2 < playersForTeam.length; pi2++) {
-                        if (pi1 === pi2) {
-                            continue;
-                        }
-
-                        await this.diplomacyService.declareAlly(game, playersForTeam[pi1]._id, playersForTeam[pi2]._id, false);
-                    }
-                }
             }
 
             game.galaxy.teams = teams;
@@ -242,7 +229,41 @@ export default class PlayerService extends EventEmitter {
     }
 
     _generateTeamColourShapeList(teamCount: number, playersPerTeam: number): Record<number, PlayerColourShapeCombination[]> {
-        return {};
+        const shapesCount = SHAPES.length;
+        const coloursCount = COLOURS.length;
+
+        const available = {};
+
+        for (const colour of COLOURS) {
+            available[colour.alias] = SHAPES.slice();
+        }
+
+        let colourIdx = 0;
+        const result: Record<number, PlayerColourShapeCombination[]> = {};
+
+        for (let ti = 0; ti < teamCount; ti++) {
+            let fulfilled = 0;
+            const combinations: PlayerColourShapeCombination[] = [];
+
+            while (fulfilled < playersPerTeam) {
+                const teamColour = COLOURS[colourIdx % coloursCount];
+
+                const availableShapes = available[teamColour.alias];
+
+                if (!availableShapes.length) {
+                    colourIdx++;
+                    continue;
+                }
+
+                const shape = availableShapes.pop()!;
+                combinations.push({ shape, colour: teamColour });
+                fulfilled++;
+            }
+
+            result[ti] = combinations;
+        }
+
+        return result;
     }
 
     _generatePlayerColourShapeList(playerCount: number): PlayerColourShapeCombination[] {

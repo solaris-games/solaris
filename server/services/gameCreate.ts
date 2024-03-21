@@ -20,6 +20,7 @@ import DiplomacyService from "./diplomacy";
 import mongoose from "mongoose";
 import {DBObjectId} from "./types/DBObjectId";
 import {shuffle} from "./utils";
+import TeamService from "./team";
 
 const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
@@ -42,6 +43,7 @@ export default class GameCreateService {
     gameTypeService: GameTypeService;
     starService: StarService;
     diplomacyService: DiplomacyService;
+    teamService: TeamService;
 
     constructor(
         gameModel,
@@ -61,7 +63,8 @@ export default class GameCreateService {
         specialStarBanService: SpecialStarBanService,
         gameTypeService: GameTypeService,
         starService: StarService,
-        diplomacyService: DiplomacyService
+        diplomacyService: DiplomacyService,
+        teamService: TeamService,
     ) {
         this.gameModel = gameModel;
         this.gameJoinService = gameJoinService;
@@ -81,6 +84,7 @@ export default class GameCreateService {
         this.gameTypeService = gameTypeService;
         this.starService = starService;
         this.diplomacyService = diplomacyService;
+        this.teamService = teamService;
     }
 
     async create(settings: GameSettings) {
@@ -321,7 +325,7 @@ export default class GameCreateService {
         this.starService.setupStarsForGameStart(game);
         
         // Setup players and assign to their starting positions.
-        await this.playerService.setupEmptyPlayers(game);
+        this.playerService.setupEmptyPlayers(game);
         game.galaxy.carriers = this.playerService.createHomeStarCarriers(game);
 
         this.mapService.generateTerrain(game);
@@ -337,6 +341,8 @@ export default class GameCreateService {
         } else {
             this.conversationService.createConversationAllPlayers(game);
         }
+
+        await this.teamService.setDiplomacyStates(game);
 
         this.gameCreateValidationService.validate(game);
 
