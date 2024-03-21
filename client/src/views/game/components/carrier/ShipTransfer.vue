@@ -25,10 +25,10 @@
 
     <div class="row mb-1">
         <div class="col">
-            <input v-model="starShips" type="number" class="form-control" @input="onStarShipsChanged">
+            <input v-model="starShips" type="number" class="form-control" @input="onStarShipsChanged" @blur="onStarShipsBlur">
         </div>
         <div class="col">
-            <input v-model="carrierShips" type="number" class="form-control" @input="onCarrierShipsChanged">
+            <input v-model="carrierShips" type="number" class="form-control" @input="onCarrierShipsChanged" @blur="onCarrierShipsBlur">
         </div>
     </div>
 
@@ -151,24 +151,18 @@ export default {
       }
     },
     onStarShipsChanged(e) {
-      this.starShips = parseInt(this.starShips);
-
-      if (isNaN(this.starShips)) {
-        this.starShips = 0;
-      }
-
-      let difference = this.starShips - this.star.ships
-      this.carrierShips = this.carrier.ships - difference
+      let difference = this.ensureInt(this.starShips) - this.star.ships;
+      this.carrierShips = this.carrier.ships - difference;
+    },
+    onStarShipsBlur(e) {
+      this.starShips = this.ensureInt(this.starShips);
     },
     onCarrierShipsChanged(e) {
-      this.carrierShips = parseInt(this.carrierShips);
-
-      if (isNaN(this.carrierShips)) {
-        this.carrierShips = 1;
-      }
-
-      let difference = this.carrierShips - this.carrier.ships
-      this.starShips = this.star.ships - difference
+      let difference = this.ensureInt(this.carrierShips) - this.carrier.ships;
+      this.starShips = this.star.ships - difference;
+    },
+    onCarrierShipsBlur(e) {
+      this.carrierShips = this.ensureInt(this.carrierShips);
     },
     onMinShipsClicked (e) {
       this.carrierShips = 1
@@ -178,13 +172,22 @@ export default {
       this.starShips = 0
       this.carrierShips = this.carrier.ships + this.star.ships
     },
-    onTransferLeftClicked (e) {
+    onTransferLeftClicked(e) {
       this.starShips+=e
       this.carrierShips-=e
     },
-    onTransferRightClicked (e) {
+    onTransferRightClicked(e) {
       this.carrierShips+=e
       this.starShips-=e
+    },
+    ensureInt(v) {
+      v = parseInt(v);
+
+      if (isNaN(v)) {
+        v = 0;
+      }
+
+      return v;
     },
     async saveTransfer (e) {
       let result = await this.performSaveTransfer()
