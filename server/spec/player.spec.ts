@@ -1,3 +1,5 @@
+import {Player} from "../services/types/Player";
+
 const mongoose = require('mongoose');
 
 import DistanceService from '../services/distance';
@@ -77,7 +79,8 @@ const game = {
         }
     },
     galaxy: {
-        stars: []
+        stars: [],
+        players: []
     }
 }
 
@@ -165,7 +168,8 @@ describe('player', () => {
         const allStars: any[] = generateStarGrid();
         // @ts-ignore
         game.galaxy.stars = allStars;
-        const players = playerService.createEmptyPlayers(game);
+        playerService.setupEmptyPlayers(game);
+        const players: Player[] = game.galaxy.players;
 
         expect(players.length).toEqual(game.settings.general.playerLimit);
 
