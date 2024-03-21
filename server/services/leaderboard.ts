@@ -439,7 +439,7 @@ export default class LeaderboardService {
     }
 
     getGameWinnerTeam(game: Game, leaderboard: LeaderboardTeam[]): GameWinner | null {
-        let isAllUndefeatedPlayersReadyToQuit = this.gameService.isAllUndefeatedPlayersReadyToQuit(game);
+        let isAllUndefeatedPlayersReadyToQuit = this.gameService.isReadyToQuitImmediateEnd(game);
 
         let key = game.settings.conquest.victoryCondition === 'starPercentage' ? 'starCount' : 'capitalCount';
         leaderboard.sort(sorterByProperty(key));
@@ -469,7 +469,7 @@ export default class LeaderboardService {
 
     getGameWinner(game: Game, leaderboard: LeaderboardPlayer[]): GameWinner | null {
         let isKingOfTheHillMode = this.gameTypeService.isKingOfTheHillMode(game);
-        let isAllUndefeatedPlayersReadyToQuit = this.gameService.isAllUndefeatedPlayersReadyToQuit(game);
+        let isAllUndefeatedPlayersReadyToQuit = this.gameService.isReadyToQuitImmediateEnd(game);
 
         if (isAllUndefeatedPlayersReadyToQuit) {
             if (isKingOfTheHillMode) {
