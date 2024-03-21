@@ -9,7 +9,7 @@ export default [
         text: "Move across the map by clicking and dragging with any MOUSE BUTTON.\nPress the <code>h</code> or <code>space</code> keyboard shortcut to return to your Home star.",
         priority: 10,
         onConceptUsed: function (self) {
-            this.markLearned(self, 20)
+            this.markProgress(self, 30)
         }
     },
     {
@@ -18,7 +18,7 @@ export default [
         text: "Zoom in and out with the MOUSE WHEEL or <code>+</code> and <code>-</code> keys.",
         priority: 10,
         onConceptUsed: function (self) {
-            this.markLearned(self, 20)
+            this.markProgress(self, 20)
         }
     },
     {
@@ -29,7 +29,7 @@ export default [
         pre: [LearningHelper.concept.CAMERA_ZOOM],
         onMenuRequested: function (self, menuState) {
             if (menuState.state === MENU_STATES.CARRIER_DETAIL) {
-                this.markLearned(self, 40)
+                this.markLearned(self)
             }
         }
     },
@@ -54,7 +54,10 @@ export default [
         title: "Bulk Upgrade",
         text: "Improve your infrastructure by spending your budget on the cheapest expansions first.\nAccess Bulk Upgrade <i class='fas fa-money-bill'></i> from the menu / sidebar or using the <code>b</code> keyboard shortcut.",
         priority: 100,
-        pre: [LearningHelper.concept.CARRIERS],
+        pre: [],
+        isAvailable: function (self) {
+            return this.isGameInProgress
+        },
         onConceptUsed: function (self) {
             this.markLearned(self)
         }
@@ -65,6 +68,9 @@ export default [
         text: "Use this handy tool to predict the outcome of combat based on the weapon levels and numbers of the Attacker and Defender.\nAccess the Combat Calculator <i class='fas fa-calculator'></i> from the menu / sidebar, using the <code>c</code> keyboard shortcut or from the Carrier detail window.",
         priority: 100,
         pre: [LearningHelper.concept.CARRIERS],
+        isAvailable: function (self) {
+            return this.isGameInProgress
+        },
         onConceptUsed: function (self) {
             this.markLearned(self)
         }

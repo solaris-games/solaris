@@ -4,6 +4,7 @@
       <div class="row">
         <div class="col pt-2">
           <h6>Learning Helper</h6>
+          <code v-if="isDevelopment">DEBUG R={{ this.relaxDesire }}</code>
         </div>
         <div class="col-auto">
             <slot></slot>
@@ -15,6 +16,8 @@
         <input v-model="filter" class="form-control form-control-sm" placeholder="Filter..."/>
         <div class="input-group-append">
           <button @click="clearFilter" class="btn btn-outline-secondary btn-sm" type="button"><i class="fas fa-times"></i></button>
+          <button @click="resetKnowledge" class="btn btn-outline-danger btn-sm" type="button"><i class="fas fa-eraser"></i></button>
+
         </div>
       </div>
       <div>
@@ -54,11 +57,10 @@ import eventBus from '../../../../eventBus'
 import AudioService from '../../../../game/audio'
 import GameHelper from '../../../../services/gameHelper'
 import MenuTitle from '../MenuTitle'
-import MENU_STATES from '../../../../services/data/menuStates'
 import CONCEPTS from '../../../../services/data/concepts'
 
 const MAX_VISIBLE_CONCEPTS = 5
-const NEXT_CONCEPT_DELAY = 5000
+const DEFAULT_RELAX_DESIRE = 5
 
 export default {
   components: {
@@ -74,14 +76,18 @@ export default {
       isFocusedConcept: false,
       isSelectedConcept: false,
       interval: null,
-      lastDistraction: 0,
+      relaxDesire: 0,
+      isDevelopment: process.env.NODE_ENV == 'development'
     }
   },
   mounted () {
     // TODO: These event names should be global constants
     eventBus.$on('onConceptUsed', this.onConceptUsed)
     eventBus.$on('onMenuRequested', this.onMenuRequested)
-    this.interval = setInterval(this.updateVisibleConcepts, 2000)
+    if (this.isUserInGame && !this.isTutorialGame) {
+      this.interval = setInterval(this.updateVisibleConcepts, 1000)
+      this.clearVisible()
+    }
   },
   destroyed () {
     eventBus.$off('onConceptUsed', this.onConceptUsed)
@@ -91,13 +97,27 @@ export default {
   methods: {
     toggle () {
       this.isExpanded = !this.isExpanded
+      this.trackDistraction()
     },
     clearFilter () {
       this.filter = ""
     },
+    clearVisible () {
+      for (const c of this.CONCEPTS) {
+        this.$delete(c, 'visible')
+      }
+    },
+    resetKnowledge () {
+      for (const c of this.CONCEPTS) {
+        this.$set(c, 'learned', false)
+        this.$delete(c, 'progress')
+        this.learnedConceptIds = []
+      }
+    },
     selectConcept (concept) {
       this.activeConcept = concept
       this.isSelectedConcept = true
+      this.trackDistraction()
     },
     focusConcept (concept) {
       if (!this.isSelectedConcept) {
@@ -112,25 +132,23 @@ export default {
       }
     },
     updateVisibleConcepts () {
-      if (Date.now() - this.lastDistraction < NEXT_CONCEPT_DELAY)
-        return
-
       if (this.visibleConcepts.length >= MAX_VISIBLE_CONCEPTS)
-        return
-
-      if (this.$store.state.menuState !== MENU_STATES.NONE)
         return
 
       if (this.isExpanded)
         return
 
-      const concept = this.findNextConcept()
-      if (concept === null) {
-        return
+      this.relaxDesire = Math.max(this.relaxDesire - 1, 0)
+
+      if (this.relaxDesire <= 0) {
+        const concept = this.findNextConcept()
+        if (concept === null) {
+          return
+        }
+        this.$set(concept, 'visible', Date.now())
+        this.trackDistraction(DEFAULT_RELAX_DESIRE + this.visibleConcepts.length * DEFAULT_RELAX_DESIRE)
+        AudioService.click()
       }
-      this.$set(concept, 'visible', Date.now())
-      this.trackDistraction()
-      AudioService.click()
     },
     findNextConcept () {
       let bestPriority = -1
@@ -161,28 +179,31 @@ export default {
             return false
         }
       }
+      if (concept.isAvailable && !concept.isAvailable.call(this, concept))
+        return false
       return true
     },
-    markLearned (concept, progress=null) {
-      if (progress) {
-        this.$set(concept, 'progress', Math.min((concept.progress || 0) + progress, 100))
+    markLearned (concept) {
+      this.$set(concept, 'learned', true)
+      if (concept.visible) {
+        AudioService.backspace()
+        this.trackDistraction()
+        this.$set(concept, 'visible', false)
       }
-      if (!progress || concept.progress === 100) {
-        this.$set(concept, 'learned', true)
-        if (concept.visible) {
-          AudioService.backspace()
-          this.trackDistraction()
-          this.$set(concept, 'visible', false)
-        }
-        this.$delete(concept, 'progress')
-        this.learnedConceptIds.push(concept.id)
-      }
-      if (this.isSelectedConcept && concept.learned) {
+      this.$delete(concept, 'progress')
+      this.learnedConceptIds.push(concept.id)
+      if (this.isSelectedConcept) {
         this.onCloseDetail()
       }
     },
-    trackDistraction () {
-      this.lastDistraction = Date.now()
+    markProgress(concept, progress=10) {
+      this.$set(concept, 'progress', Math.min((concept.progress || 0) + progress, 100))
+      if (concept.progress >= 100) {
+        this.markLearned(concept)
+      }
+    },
+    trackDistraction (weight = DEFAULT_RELAX_DESIRE) {
+      this.relaxDesire = Math.max(this.relaxDesire, weight)
     },
     onCloseDetail () {
       this.activeConcept = null
@@ -223,6 +244,9 @@ export default {
       } else {
         return this.visibleConcepts
       }
+    },
+    isGameInProgress () {
+      return GameHelper.isGameInProgress(this.$store.state.game)
     },
     isUserInGame () {
       return GameHelper.getUserPlayer(this.$store.state.game) != null
