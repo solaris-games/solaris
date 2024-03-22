@@ -289,4 +289,3 @@ export default {
 
 <style scoped>
 </style>
-../../../../services/data/learningHelper
