@@ -10,7 +10,7 @@ class GameContainer {
 
   constructor () {
     PIXI.settings.SORTABLE_CHILDREN = true
-    PIXI.GRAPHICS_CURVES.minSegments = 20 // Smooth arcs
+    PIXI.Graphics.curves.minSegments = 20 // Smooth arcs
 
     this.frames = 0
     this.dtAccum = 33.0*16
@@ -40,15 +40,15 @@ class GameContainer {
 
     if(this.frames==31) {
       let ma32FPS = 1000.0/ma32DT
-      
+
       if (this.fpsMAText) {
         this.fpsMAText.text =  ( 'fpsMA: ' + movingAverageFPS.toFixed(0) )
       }
-      
+
       if (this.fpsMA32Text) {
         this.fpsMA32Text.text = ( 'fpsMA32: ' + ma32FPS.toFixed(0) )
       }
-      
+
       if (this.jitterText) {
         this.jitterText.text = ( 'jitter: ' + (movingAverageFPS-this.lowest).toFixed(0) )
       }
@@ -81,13 +81,14 @@ class GameContainer {
       backgroundColor: 0x000000, // black hexadecimal
       resolution: window.devicePixelRatio || 1,
       antialias: antialiasing,
-      autoResize: true
+      autoResize: true,
+      autoDensity: true,
     })
 
     this.app.ticker.add(this.onTick.bind(this))
     this.app.ticker.maxFPS = 0
 
-    if ( process.env.NODE_ENV == 'development') {
+    if (process.env.NODE_ENV == 'development') {
       this.app.ticker.add(this.calcFPS.bind(this))
     }
 
@@ -104,8 +105,8 @@ class GameContainer {
       stopPropagation: true,
       passiveWheel: true,
 
-      interaction: this.app.renderer.plugins.interaction, // the interaction module is important for wheel() to work properly when renderer.view is placed or scaled
-      disableOnContextMenu: true
+      disableOnContextMenu: true,
+      events: this.app.renderer.events
     })
 
     // add the viewport to the stage
@@ -117,6 +118,11 @@ class GameContainer {
   }
 
   destroy () {
+    if (this.viewport) {
+      this.viewport.destroy()
+      this.viewport = null
+    }
+
     // Cleanup if the app already exists.
     if (this.app) {
       this.app.destroy(false, {
@@ -124,11 +130,6 @@ class GameContainer {
       })
 
       this.app = null
-    }
-
-    if (this.viewport) {
-      this.viewport.destroy()
-      this.viewport = null
     }
   }
 
@@ -150,6 +151,11 @@ class GameContainer {
     this.starFieldTop = gameHelper.calculateMinStarY(game) - 750
     this.starFieldBottom = gameHelper.calculateMaxStarY(game) + 750
 
+    const maxWidth = Math.abs(this.starFieldLeft) + Math.abs(this.starFieldRight);
+    const maxHeight = Math.abs(this.starFieldBottom) + Math.abs(this.starFieldTop);
+
+    this.viewport.resize(window.innerWidth, window.innerHeight, maxWidth, maxHeight)
+
     // activate plugins
     this.viewport
       .drag()
@@ -160,16 +166,17 @@ class GameContainer {
       })
       .decelerate({ friction: 0.9 })
       .clamp({
-        left: this.starFieldLeft,
-        right: this.starFieldRight,
-        top: this.starFieldTop,
-        bottom: this.starFieldBottom
+        left: this.starFieldLeft * 2,
+        right: this.starFieldRight * 2,
+        top: this.starFieldTop * 2,
+        bottom: this.starFieldBottom * 2,
+        underflow: 'none',
       })
       .clampZoom({
         minWidth: 50,
         minHeight: 50,
-        maxWidth: (Math.abs(this.starFieldLeft) + Math.abs(this.starFieldRight)),
-        maxHeight: (Math.abs(this.starFieldBottom) + Math.abs(this.starFieldTop))
+        maxWidth,
+        maxHeight,
       })
 
     this.viewport.on('drag-end', this.onViewportDragged.bind(this))

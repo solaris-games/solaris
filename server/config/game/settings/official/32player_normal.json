@@ -8,7 +8,7 @@
     "password": null,
     "playerLimit": 32,
     "playerType": "all",
-    "anonymity": "normal",
+    "anonymity": "extra",
     "playerOnlineStatus": "hidden",
     "timeMachine": "enabled",
     "fluxEnabled": "enabled",
@@ -37,7 +37,7 @@
     "randomBinaryStars": 10,
     "randomBlackHoles": 5,
     "randomPulsars": 1,
-    "darkGalaxy": "start",
+    "darkGalaxy": "fog",
     "giftCarriers": "enabled",
     "defenderBonus": "enabled",
     "carrierToCarrierCombat": "enabled",
@@ -66,9 +66,9 @@
     "startingCreditsSpecialists": 10,
     "startingShips": 10,
     "startingInfrastructure": {
-      "economy": 10,
-      "industry": 10,
-      "science": 3
+      "economy": 5,
+      "industry": 5,
+      "science": 2
     },
     "developmentCost": {
       "economy": "standard",
@@ -104,21 +104,21 @@
       "specialists": 1
     },
     "researchCosts": {
-      "terraforming": "standard",
-      "experimentation": "standard",
-      "scanning": "standard",
-      "hyperspace": "standard",
-      "manufacturing": "standard",
-      "banking": "standard",
-      "weapons": "expensive",
-      "specialists": "standard"
+      "terraforming": "expensive",
+      "experimentation": "expensive",
+      "scanning": "expensive",
+      "hyperspace": "expensive",
+      "manufacturing": "expensive",
+      "banking": "expensive",
+      "weapons": "veryExpensive",
+      "specialists": "expensive"
     },
     "bankingReward": "standard",
     "experimentationReward": "standard",
     "specialistTokenReward": "experimental",
     "researchCostProgression": {
       "progression": "exponential",
-      "growthFactor": "medium"
+      "growthFactor": "soft"
     }
   },
   "gameTime": {

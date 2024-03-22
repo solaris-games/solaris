@@ -633,7 +633,7 @@ export default class StarService extends EventEmitter {
         }
 
         // Recalculate how many stars are needed for victory in conquest mode.
-        if (game.settings.general.mode === 'conquest') {
+        if (game.settings.general.mode === 'conquest' || game.settings.general.mode === 'teamConquest') {
             // TODO: Find a better place for this as its shared in the gameCreate service.
             switch (game.settings.conquest.victoryCondition) {
                 case 'starPercentage':

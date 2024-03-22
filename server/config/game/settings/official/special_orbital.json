@@ -86,7 +86,7 @@
     "enabled": "enabled",
     "upkeepCost": "none",
     "tradeRestricted": "disabled", 
-    "maxAlliances": 7, 
+    "maxAlliances": 9,
     "globalEvents": "disabled"
   },
   "technology": {

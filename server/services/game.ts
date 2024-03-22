@@ -270,7 +270,10 @@ export default class GameService extends EventEmitter {
             throw new ValidationError('Cannot delete games that are in progress or completed.');
         }
 
-        if (deletedByUserId && game.settings.general.createdByUserId && game.settings.general.createdByUserId.toString() !== deletedByUserId.toString()) {
+        const isAdmin = deletedByUserId && await this.userService.getUserIsAdmin(deletedByUserId);
+        const isCreator = deletedByUserId && game.settings.general.createdByUserId && game.settings.general.createdByUserId.toString() === deletedByUserId.toString();
+
+        if (deletedByUserId && !isAdmin && !isCreator) {
             throw new ValidationError('Cannot delete this game, you did not create it.');
         }
 

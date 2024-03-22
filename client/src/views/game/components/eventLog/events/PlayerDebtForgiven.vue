@@ -2,10 +2,10 @@
 <div v-if="debtor && creditor">
   <p v-if="isCreditor">
       You have forgiven <span class="text-warning">{{getFormattedDebtValue()}}</span> of debt owed to you by
-      <a href="javascript:;" @click="onOpenPlayerDetailRequested(creditor)">{{debtor.alias}}</a>.
+      <a href="javascript:;" @click="onOpenPlayerDetailRequested(debtor)">{{debtor.alias}}</a>.
   </p>
   <p v-if="!isCreditor">
-    <a href="javascript:;" @click="onOpenPlayerDetailRequested(debtor)">{{creditor.alias}}</a> has forgiven
+    <a href="javascript:;" @click="onOpenPlayerDetailRequested(creditor)">{{creditor.alias}}</a> has forgiven
     <span class="text-warning">{{getFormattedDebtValue()}}</span> of debt you owed to them.
   </p>
 </div>
