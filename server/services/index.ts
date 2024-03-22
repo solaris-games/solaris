@@ -275,10 +275,7 @@ export default (config): DependencyContainer => {
         notificationService,
         shipService,
         spectatorService,
-<<<<<<< HEAD
         teamService,
-=======
         tutorialService,
->>>>>>> 19d561b3 (Tutorial selection WIP)
     };
 };
