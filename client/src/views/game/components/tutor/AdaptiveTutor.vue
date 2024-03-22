@@ -1,5 +1,5 @@
 <template>
-  <div class="d-none d-lg-block" v-if="isUserInGame && !isTutorialGame">
+  <div v-if="isVisible">
     <concept-list id="conceptList" :activeConcept="activeConcept" :filter="filter" :filteredConcepts="filteredConcepts"
       :isExpanded="isExpanded" :isSelectedConcept="isSelectedConcept" :relaxDesire="relaxDesire"
       @selectConcept="selectConcept" @focusConcept="focusConcept" @unfocusConcept="unfocusConcept"
@@ -13,12 +13,14 @@
 import eventBus from '../../../../eventBus'
 import AudioService from '../../../../game/audio'
 import GameHelper from '../../../../services/gameHelper'
+import MENU_STATES from '../../../../services/data/menuStates'
 import CONCEPTS from '../../../../services/data/concepts'
 import ConceptDetail from './ConceptDetail.vue'
 import ConceptList from './ConceptList.vue'
 
 const MAX_VISIBLE_CONCEPTS = 5
 const DEFAULT_RELAX_DESIRE = 5
+const OVERLAY_WIDTH = 992
 
 export default {
   components: {
@@ -31,16 +33,20 @@ export default {
       activeConcept: null,
       filter: "",
       isExpanded: false,
+      isVisible: false,
       isSelectedConcept: false,
       interval: null,
       relaxDesire: 0,
     }
   },
   mounted() {
+    window.addEventListener('resize', this.updateVisible)
+
     // TODO: These event names should be global constants
     eventBus.$on('onConceptUsed', this.onConceptUsed)
     eventBus.$on('onMenuRequested', this.onMenuRequested)
     if (this.isUserInGame && !this.isTutorialGame) {
+      this.updateVisible()
       this.interval = setInterval(this.updateVisibleConcepts, 1000)
       this.clearVisible()
     }
@@ -49,6 +55,7 @@ export default {
   destroyed() {
     eventBus.$off('onConceptUsed', this.onConceptUsed)
     eventBus.$off('onMenuRequested', this.onMenuRequested)
+    window.removeEventListener('resize', this.updateVisible)
     clearInterval(this.interval)
   },
   methods: {
@@ -189,12 +196,20 @@ export default {
       }
     },
     onMenuRequested(menuState) {
+      this.updateVisible()
       for (const concept of this.CONCEPTS) {
         if (!concept.learned && concept.onMenuRequested) {
           concept.onMenuRequested.call(this, concept, menuState)
         }
       }
       this.trackDistraction()
+    },
+    updateVisible () {
+      this.isVisible = this.isUserInGame && !this.isTutorialGame && (this.isOverlay() || this.$store.state.menuState == MENU_STATES.NONE)
+    },
+    isOverlay (e) {
+      console.log("width", window.innerWidth)
+      return window.innerWidth >= OVERLAY_WIDTH
     },
   },
   computed: {
@@ -247,5 +262,23 @@ export default {
   overflow: auto;
   overflow-x: hidden;
   scrollbar-width: none;
+}
+
+@media screen and (max-width: 992px) {
+  #conceptDetail {
+    top: 130px;
+  }
+}
+
+@media screen and (max-width: 654px) {
+  #conceptDetail, #conceptList {
+    top: 130px;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  #conceptDetail, #conceptList {
+    top: 100px;
+  }
 }
 </style>

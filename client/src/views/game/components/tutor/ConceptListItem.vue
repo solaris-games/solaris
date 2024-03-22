@@ -61,7 +61,7 @@ export default {
   }
 
   50% {
-    background-color: yellow;
+    background-color: #F2A33C;
   }
 
   100% {
