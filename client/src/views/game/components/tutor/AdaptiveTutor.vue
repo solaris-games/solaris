@@ -77,8 +77,10 @@ export default {
         for (const c of this.CONCEPTS) {
           this.$set(c, 'learned', false)
           this.$delete(c, 'progress')
+          this.$delete(c, 'visible')
         }
         this.$store.commit('clearLearnedConcepts')
+        this.relaxDesire = DEFAULT_RELAX_DESIRE
       }
     },
     selectConcept(concept) {

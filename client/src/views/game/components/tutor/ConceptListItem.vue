@@ -1,5 +1,5 @@
 <template>
-  <li role="button" class="concept-item" :class="{ 'selected': isSelected, 'learned': concept.learned }"
+  <li role="button" class="concept-item" :class="{ 'selected': isSelected, 'learned': concept.learned, 'blink': isNew }"
     @click="selectConcept(concept);" @mouseenter="focusConcept(concept);" @mouseleave="unfocusConcept();">
     <p class="small lh-sm m-0 p-1">
       {{ concept.title }}<span class="text-muted" v-if="!concept.learned && concept.progress"> ({{ concept.progress
@@ -26,6 +26,11 @@ export default {
       this.$emit('unfocusConcept')
     },
   },
+  computed: {
+    isNew() {
+      return this.concept.visible && ((Date.now() - this.concept.visible) < 1000)
+    }
+  }
 }
 </script>
 
@@ -46,7 +51,7 @@ export default {
   background-color: darkslategray;
 }
 
-.highlight-enter-active {
+.concept-item.blink {
   animation: blinker 500ms linear;
 }
 
