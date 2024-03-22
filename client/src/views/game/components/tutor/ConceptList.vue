@@ -24,7 +24,7 @@
     </div>
     <div>
       <ul class="list-unstyled">
-        <concept-list-item v-for="concept in filteredConcepts" :concept="concept"
+        <concept-list-item v-for="concept in filteredConcepts" v-bind:key="concept.id" :concept="concept"
           :isSelected="concept === activeConcept && isSelectedConcept" @selectConcept="selectConcept"
           @focusConcept="focusConcept" @unfocusConcept="unfocusConcept" />
       </ul>
