@@ -208,7 +208,6 @@ export default {
       this.isVisible = this.isUserInGame && !this.isTutorialGame && (this.isOverlay() || this.$store.state.menuState == MENU_STATES.NONE)
     },
     isOverlay (e) {
-      console.log("width", window.innerWidth)
       return window.innerWidth >= OVERLAY_WIDTH
     },
   },
