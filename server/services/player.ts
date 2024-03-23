@@ -261,6 +261,7 @@ export default class PlayerService extends EventEmitter {
             }
 
             result[ti] = combinations;
+            colourIdx++;
         }
 
         return result;
