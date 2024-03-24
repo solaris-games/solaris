@@ -86,7 +86,8 @@
 import MenuTitle from '../MenuTitle'
 import GameHelper from '../../../../services/gameHelper'
 import GameContainer from '../../../../game/container'
-import CarrierApiService from '../../../../services/api/carrier'
+  import CarrierApiService from '../../../../services/api/carrier'
+  import AudioService from '../../../../game/audio'
 import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning'
 
 export default {
@@ -225,11 +226,15 @@ export default {
         let response = await CarrierApiService.saveWaypoints(this.$store.state.game._id, this.carrier._id, this.waypoints, this.carrier.waypointsLooped)
 
         if (response.status === 200) {
+          AudioService.join()
+
           this.carrier.ticksEta = response.data.ticksEta
           this.carrier.ticksEtaTotal = response.data.ticksEtaTotal
           this.carrier.waypoints = response.data.waypoints
 
           this.$toasted.show(`${this.carrier.name} waypoints updated.`)
+
+          GameContainer.reloadCarrier(this.carrier);
 
           if (saveAndEdit) {
             this.$emit('onOpenCarrierDetailRequested', this.carrier._id)

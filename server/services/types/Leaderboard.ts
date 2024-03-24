@@ -1,6 +1,7 @@
 import { DBObjectId } from "./DBObjectId";
 import { Guild } from "./Guild";
 import { Player } from "./Player";
+import {Team} from "./Game";
 
 export interface PlayerStatistics {
     totalStars: number;
@@ -24,10 +25,20 @@ export interface LeaderboardPlayer {
     isKingOfTheHill?: boolean;
 };
 
-export interface Leaderboard {
+export interface PlayerLeaderboard {
     leaderboard: LeaderboardPlayer[];
     fullKey: string;
 };
+
+export interface TeamLeaderboard {
+    leaderboard: LeaderboardTeam[];
+}
+
+export interface LeaderboardTeam {
+    team: Team;
+    starCount: number;
+    capitalCount: number;
+}
 
 export interface LeaderboardUser {
     _id: DBObjectId,

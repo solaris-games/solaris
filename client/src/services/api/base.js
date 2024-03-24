@@ -9,7 +9,7 @@ class BaseApiService {
       response => {
         return response
       }, error => {
-        // If any Unathorized responses come back, redirect to login page.
+        // If any Unauthorized responses come back, redirect to login page.
         if (error.response.status === 401) {
           router.push({ name: 'home' })
         }

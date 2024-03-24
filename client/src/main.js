@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import VueSocketio from 'vue-socket.io' // NOTE: There is an issue with >3.0.7 so forced to use 3.0.7, see here: https://stackoverflow.com/questions/61769716/vue-socket-connection-not-triggered
-import VueGtag from 'vue-gtag'
 import Toasted from 'vue-toasted'
 import App from './App.vue'
 import router from './router'
@@ -9,10 +8,11 @@ import store from './store'
 import $ from 'jquery'
 import 'pixi.js-legacy'
 import 'pixi-viewport'
+import '@pixi/graphics-extras';
 
 // Note: This was done to get around an issue where the Steam client
 // had bootstrap as undefined. This also affects the UI template we're using,
-// we are forced to bring in Bootstrap and FontAwesome manually as a dependency 
+// we are forced to bring in Bootstrap and FontAwesome manually as a dependency
 // instead of using the vendor files provided by the template.
 window.bootstrap = require('bootstrap/dist/js/bootstrap.bundle.js');
 require('../public/assets/js/app.min.js')
@@ -29,14 +29,6 @@ Vue.use(new VueSocketio({
     mutationPrefix: 'SOCKET_'
   }
 }))
-
-let trackingCode = process.env.VUE_APP_GOOGLE_ANALYTICS_TRACKING_CODE
-
-if (trackingCode) {
-  Vue.use(VueGtag, {
-    config: { id: trackingCode }
-  }, router)
-}
 
 Vue.use(Toasted, {
   position: 'bottom-right',

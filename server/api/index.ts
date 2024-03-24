@@ -16,10 +16,12 @@ async function startServer() {
   const app = express();
   const server = http.createServer(app);
   
-  const io = socketLoader(server);
-  const container = containerLoader(config, io);
+  const container = containerLoader(config);
 
-  await expressLoader(config, app, container);
+  const { sessionStorage } = await expressLoader(config, app, container);
+
+  const io = socketLoader(config, server, sessionStorage);
+  container.broadcastService.setIOController(io);
 
   server.listen(config.port, (err) => {
     if (err) {

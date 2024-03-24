@@ -34,12 +34,15 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
             constants: true
         }),
         // TODO: This needs to utilise a response middleware function to map the game object to a response object.
-        (req, res, next) => {
+        async (req, res, next) => {
             try {
+                const isAdmin = await container.userService.getUserIsAdmin(req.session.userId);
+
                 if (req.game.settings.general.createdByUserId) {
-                    req.game.settings.general.isGameAdmin = req.game.settings.general.createdByUserId.toString() === req.session.userId?.toString();
+                    const isCreator = req.game.settings.general.createdByUserId.toString() === req.session.userId?.toString();
+                    req.game.settings.general.isGameAdmin = isCreator || isAdmin;
                 } else {
-                    req.game.settings.general.isGameAdmin = false;
+                    req.game.settings.general.isGameAdmin = isAdmin;
                 }
 
                 delete req.game.settings.general.password;
@@ -289,6 +292,20 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
             isUnlocked: true
         }),
         controller.delete,
+        mw.core.handleError);
+
+    router.put('/api/game/:gameId/pause',
+        mw.auth.authenticate(),
+        mw.game.loadGame({
+            lean: true,
+            settings: true,
+            state: true,
+        }),
+        mw.game.validateGameState({
+            isUnlocked: true,
+            isInProgress: true
+        }),
+        controller.togglePaused,
         mw.core.handleError);
 
     router.get('/api/game/:gameId/player/:playerId',

@@ -38,7 +38,7 @@ async function startup() {
         poolSize: 1
     });
 
-    container = containerLoader(config, null);
+    container = containerLoader(config);
     
     console.log('Recalculating all player ranks...');
 

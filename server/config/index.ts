@@ -9,6 +9,7 @@ const config: Config = {
     connectionString: process.env.CONNECTION_STRING,
     serverUrl: process.env.SERVER_URL,
     clientUrl: process.env.CLIENT_URL,
+    corsUrls: process.env.CORS_URLS?.split(",") || [ process.env.CLIENT_URL || "https://solaris.games" ],
     cacheEnabled: process.env.CACHE_ENABLED == "true",
     smtp: {
         enabled: process.env.SMTP_ENABLED == "true",

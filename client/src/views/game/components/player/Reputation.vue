@@ -8,6 +8,13 @@
           </i>
         </small>
       </p>
+      <p v-if="isExtraDark" class="mb-1 text-warning">
+        <small>
+          <i>
+            Warning: since this game is extra dark, these values are estimates based on your current scanning range.
+          </i>
+        </small>
+      </p>
       <p class="mb-1">
         <small>
           <i>
@@ -55,6 +62,9 @@ export default {
     },
     isFormalAlliancesEnabled () {
       return DiplomacyHelper.isFormalAlliancesEnabled(this.$store.state.game)
+    },
+    isExtraDark () {
+      return this.$store.state.game.settings.specialGalaxy.darkGalaxy === 'extra'
     }
   }
 }

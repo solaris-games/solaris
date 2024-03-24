@@ -475,7 +475,7 @@ export default {
       return this.carrier.waypoints && this.carrier.waypoints.length
     },
     canEditWaypoints: function () {
-      return this.userPlayer && this.carrierOwningPlayer == this.userPlayer && this.carrier && !this.userPlayer.defeated && !GameHelper.isGameFinished(this.$store.state.game)
+      return this.userPlayer && this.carrierOwningPlayer == this.userPlayer && this.carrier && !this.userPlayer.defeated && !this.carrier.isGift && !GameHelper.isGameFinished(this.$store.state.game)
     },
     canTransferShips: function () {
       return this.isUserPlayerCarrier && this.carrier.orbiting && !this.userPlayer.defeated && !GameHelper.isGameFinished(this.$store.state.game)

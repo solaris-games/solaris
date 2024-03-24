@@ -19,15 +19,15 @@
         </div>
 
         <div class="mb-2">
-          <label for="mode" class="col-form-label">Mode <help-tooltip tooltip="The game mode Conquest is victory by stars, Battle Royale is last man standing in a constantly shrinking galaxy and King of the Hill is a fight for a key star"/></label>
-          <select class="form-control" id="mode" v-model="settings.general.mode" :disabled="isCreatingGame">
+          <label for="mode" class="col-form-label">Mode <help-tooltip tooltip="The game mode Conquest is victory by stars, Battle Royale is last man standing in a constantly shrinking galaxy, King of the Hill is a fight for a key star, Team Conquest is conquest, but with teams"/></label>
+          <select class="form-control" id="mode" v-model="settings.general.mode" :disabled="isCreatingGame" @change="onModeChanged">
             <option v-for="opt in options.general.mode" v-bind:key="opt.value" v-bind:value="opt.value">
               {{ opt.text }}
             </option>
           </select>
         </div>
 
-        <div class="mb-2" v-if="settings.general.mode === 'conquest'">
+        <div class="mb-2" v-if="(settings.general.mode === 'conquest') || (settings.general.mode === 'teamConquest')">
           <label for="conquestVictoryCondition" class="col-form-label">Victory Condition <help-tooltip tooltip="The victory condition in which a Conquest game will be decided."/></label>
           <select class="form-control" id="conquestVictoryCondition" v-model="settings.conquest.victoryCondition" :disabled="isCreatingGame">
             <option v-for="opt in options.conquest.victoryCondition" v-bind:key="opt.value" v-bind:value="opt.value">
@@ -36,7 +36,7 @@
           </select>
         </div>
 
-        <div class="mb-2" v-if="settings.general.mode === 'conquest'">
+        <div class="mb-2" v-if="(settings.general.mode === 'conquest') || (settings.general.mode === 'teamConquest')">
           <label for="conquestVictoryPercentage" class="col-form-label">Stars For Victory <help-tooltip tooltip="How many stars are needed for a player to win the game"/></label>
           <select class="form-control" id="conquestVictoryPercentage" v-model="settings.conquest.victoryPercentage" :disabled="isCreatingGame">
             <option v-for="opt in options.conquest.victoryPercentage" v-bind:key="opt" v-bind:value="opt">
@@ -48,6 +48,18 @@
           <select class="form-control" id="conquestCapitalStarElimination" v-model="settings.conquest.capitalStarElimination" :disabled="isCreatingGame">
             <option v-for="opt in options.conquest.capitalStarElimination" v-bind:key="opt.value" v-bind:value="opt.value">
               {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-2" v-if="settings.general.mode === 'teamConquest'">
+          <label for="teamConquestTeamCount" class="col-form-label">Number of teams <help-tooltip tooltip="Determines how many teams the players will be split into" /></label>
+
+          <p class="mb-1 text-warning" v-if="!(possibleTeamCounts.length || 0)">Warning: It's not possible to form equally sized teams with your current number of player slots.</p>
+
+          <select v-if="(possibleTeamCounts.length || 0) > 0" class="form-control" id="teamConquestTeamCount" v-model="settings.conquest.teamsCount" @change="onMaxAllianceTriggerChanged" :disabled="isCreatingGame">
+            <option v-for="opt in possibleTeamCounts" v-bind:key="opt" v-bind:value="opt">
+              {{ opt }}
             </option>
           </select>
         </div>
@@ -125,6 +137,49 @@
           <label for="readyToQuit" class="col-form-label">Allow Ready To Quit <help-tooltip tooltip="Allow players to 'Ready To Quit' to finish games early"></help-tooltip></label>
           <select class="form-control" id="readyToQuit" v-model="settings.general.readyToQuit" :disabled="isCreatingGame">
             <option v-for="opt in options.general.readyToQuit" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div v-if="settings.general.readyToQuit === 'enabled'" class="mb-2">
+          <label for="readyToQuitFraction" class="col-form-label">Fraction of stars for RTQ <help-tooltip tooltip="Fraction of stars for triggering RTQ condition"></help-tooltip></label>
+          <select class="form-control" id="readyToQuitFraction" v-model="settings.general.readyToQuitFraction" :disabled="isCreatingGame">
+            <option v-for="opt in options.general.readyToQuitFraction" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div v-if="settings.general.readyToQuit === 'enabled'" class="mb-2">
+          <label for="readyToQuitTimerCycles" class="col-form-label">Timer for RTQ <help-tooltip tooltip="Time until game finishes after RTQ"></help-tooltip></label>
+          <select class="form-control" id="readyToQuitTimerCycles" v-model="settings.general.readyToQuitTimerCycles" :disabled="isCreatingGame">
+            <option v-for="opt in options.general.readyToQuitTimerCycles" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-2" v-if="settings.general.mode !== 'teamConquest'">
+          <label for="awardRankTo" class="col-form-label">Players that will receive rank <help-tooltip tooltip="c" /></label>
+          <select class="form-control" id="awardRankTo" v-model="settings.general.awardRankTo" :disabled="isCreatingGame">
+            <option v-for="opt in options.general.awardRankTo" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-2" v-if="settings.general.awardRankTo === 'top_n'">
+          <label for="awardRankToTopN" class="col-form-label">Top/bottom <span class="text-warning">{{settings.general.awardRankToTopN}} players</span> will receive/lose rank <help-tooltip tooltip="Top N players will receive rank, and bottom N players will lose rank"/></label>
+          <div class="col">
+            <input type="range" min="1" :max="Math.floor(settings.general.playerLimit / 2)" step="1" class="form-range w-50" id="awardRankToTopN" v-model="settings.general.awardRankToTopN" :disabled="isCreatingGame">
+          </div>
+        </div>
+
+        <div class="mb-2">
+          <label for="allowAbandonStars" class="col-form-label">Allow Abandon Stars <help-tooltip tooltip="Determines whether players are allowed to abandon stars"/></label>
+          <select class="form-control" id="allowAbandonStars" v-model="settings.player.allowAbandonStars" :disabled="isCreatingGame">
+            <option v-for="opt in options.player.allowAbandonStars" v-bind:key="opt.value" v-bind:value="opt.value">
               {{ opt.text }}
             </option>
           </select>
@@ -357,7 +412,7 @@
           </div>
         </div>
 
-        <div class="mb-2" v-if="settings.galaxy.galaxyType !== 'custom'">
+        <div class="mb-2">
 
           <div class="mb-2">
             <label for="darkGalaxy" class="col-form-label">Dark Galaxy <help-tooltip tooltip="Dark galaxies hide stars outside of player scanning ranges - Extra dark galaxies hide player statistics so that players only know what other players have based on what they can see in their scanning range"/></label>
@@ -444,7 +499,7 @@
 
       <view-collapse-panel title="Orbital Mechanics">
         <p class="mb-1 text-warning" v-if="settings.orbitalMechanics.enabled === 'enabled'">Warning: carrier-to-carrier combat is auto-disabled in orbital games.</p>
-        
+
         <div class="mb-2">
           <label for="orbitalMechanicsEnabled" class="col-form-label">Galaxy Rotation <help-tooltip tooltip="If enabled, orbits stars and carriers around the center of the galaxy every tick"/></label>
           <select class="form-control" id="orbitalMechanicsEnabled" v-model="settings.orbitalMechanics.enabled" :disabled="isCreatingGame">
@@ -550,7 +605,8 @@
       </view-collapse-panel>
 
       <view-collapse-panel title="Formal Alliances">
-        <div class="mb-2">
+        <p class="mb-2 text-warning" v-if="settings.general.mode === 'teamConquest'">Some diplomacy settings are unavailable because Team Conquest is selected as a game mode.</p>
+        <div class="mb-2" v-if="settings.general.mode !== 'teamConquest'">
           <label for="diplomacy" class="col-form-label">Enabled <help-tooltip tooltip="If enabled, players can change their diplomatic status to allied or enemies - Allied players can orbit eachother's stars and support eachother in combat"/></label>
           <select class="form-control" id="diplomacy" v-model="settings.diplomacy.enabled" :disabled="isCreatingGame">
             <option v-for="opt in options.diplomacy.enabled" v-bind:key="opt.value" v-bind:value="opt.value">
@@ -558,10 +614,18 @@
             </option>
           </select>
         </div>
-        <div class="mb-2" v-if="settings.diplomacy.enabled === 'enabled'">
+        <div class="mb-2" v-if="settings.diplomacy.enabled === 'enabled' && settings.general.mode !== 'teamConquest'">
+          <label for="alliancesLocked" class="col-form-label">Locked Alliances<help-tooltip tooltip="If enabled, alliances cannot be canceled."/></label>
+           <select class="form-control" id="alliancesLocked" v-model="settings.diplomacy.lockedAlliances" :disabled="isCreatingGame"  @change="onMaxAllianceTriggerChanged">
+             <option v-for="opt in options.diplomacy.lockedAlliances.filter(o => !(o.value === 'enabled' && settings.general.playerLimit <= 2))" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+        <div class="mb-2" v-if="settings.diplomacy.enabled === 'enabled' && settings.general.mode !== 'teamConquest'">
           <label for="maxAlliances" class="col-form-label">Max Number of Alliances (<span class="text-warning">{{settings.diplomacy.maxAlliances}} Allies</span>) <help-tooltip tooltip="Determines how many formal alliance each player may have at once."/></label>
           <div class="col">
-            <input type="range" min="1" :max="settings.general.playerLimit-1" step="1" class="form-range w-100" id="maxAlliances" v-model="settings.diplomacy.maxAlliances" :disabled="isCreatingGame">
+            <input type="range" min="1" :max="calcMaxAllianceLimit()" step="1" class="form-range w-100" id="maxAlliances" v-model="settings.diplomacy.maxAlliances" :disabled="isCreatingGame">
           </div>
         </div>
         <div class="mb-2" v-if="settings.diplomacy.enabled === 'enabled'">
@@ -580,7 +644,7 @@
             </option>
           </select>
         </div>
-        <div class="mb-2" v-if="settings.diplomacy.enabled === 'enabled'">
+        <div class="mb-2" v-if="settings.diplomacy.enabled === 'enabled' && settings.general.mode !== 'teamConquest'">
           <label for="alliancesGlobalEvents" class="col-form-label">Global Events <help-tooltip tooltip="If enabled, global events will be displayed when players declare war or make peace"/></label>
           <select class="form-control" id="alliancesGlobalEvents" v-model="settings.diplomacy.globalEvents" :disabled="isCreatingGame">
             <option v-for="opt in options.diplomacy.globalEvents" v-bind:key="opt.value" v-bind:value="opt.value">
@@ -734,6 +798,24 @@
         </div>
 
         <div class="mb-2">
+          <label for="researchProgression" class="col-form-label">Research Cost Progression <help-tooltip tooltip="Determines the growth of research points needed for the next level of technology"/></label>
+          <select class="form-control" id="researchProgression" v-model="settings.technology.researchCostProgression.progression" :disabled="isCreatingGame">
+            <option v-for="opt in options.technology.researchCostProgression" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-2" v-if="settings.technology.researchCostProgression && settings.technology.researchCostProgression.progression === 'exponential'">
+          <label for="researchProgression" class="col-form-label">Exponential growth factor <help-tooltip tooltip="Determines the speed of exponential growth"/></label>
+          <select class="form-control" id="researchProgression" v-model="settings.technology.researchCostProgression.growthFactor" :disabled="isCreatingGame">
+            <option v-for="opt in options.technology.researchCostProgressionGrowthFactor" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-2">
           <label for="bankingReward" class="col-form-label">Banking Reward <help-tooltip tooltip="Determines the amount of credits awarded for the banking technology at the end of a galactic cycle"/></label>
           <select class="form-control" id="bankingReward" v-model="settings.technology.bankingReward" :disabled="isCreatingGame">
             <option v-for="opt in options.technology.bankingReward" v-bind:key="opt.value" v-bind:value="opt.value">
@@ -822,13 +904,15 @@ export default {
   },
   methods: {
     async handleSubmit (e) {
+      e.preventDefault()
+
       this.errors = []
 
       if (!this.settings.general.name) {
         this.errors.push('Game name required.')
       }
 
-      e.preventDefault()
+      this.validateTeamSettings(this.errors);
 
       if (this.errors.length) return
 
@@ -852,8 +936,63 @@ export default {
     onSpecialistBanSelectionChanged (e) {
       this.settings.specialGalaxy.specialistBans = e
     },
+    onMaxAllianceTriggerChanged (e) {
+      this.settings.diplomacy.maxAlliances = this.calcMaxAllianceLimit();
+    },
+    calcMaxAllianceLimit () {
+      if (this.settings.general.mode === 'teamConquest') {
+        const playersPerTeam = this.settings.general.playerLimit / this.settings.conquest.teamsCount;
+        return playersPerTeam - 1;
+      }
+
+      return this.settings.general.playerLimit - 1 - (this.settings.diplomacy.lockedAlliances === 'enabled' ? 1 : 0)
+    },
     onPlayerLimitChanged (e) {
-      this.settings.diplomacy.maxAlliances = this.settings.general.playerLimit - 1;
+      if (this.settings.general.playerLimit <= 2) {
+        this.settings.diplomacy.lockedAlliances = 'disabled';
+      }
+      this.onMaxAllianceTriggerChanged(e);
+    },
+    onModeChanged (e) {
+      if (this.settings.general.mode === 'teamConquest') {
+        this.settings.diplomacy.enabled = 'enabled';
+        this.settings.diplomacy.lockedAlliances = 'enabled';
+        this.onMaxAllianceTriggerChanged(e);
+      }
+    },
+    validateTeamSettings (errors) {
+      if (this.settings.general.mode !== 'teamConquest') {
+        return;
+      }
+
+      const players = this.settings.general.playerLimit;
+      const teams = this.settings.conquest.teamsCount;
+
+      const numberValid = players && teams && players >= 4 && players % teams === 0;
+
+      if (!numberValid) {
+        errors.push('The number of players must be larger than 3 and divisible by the number of teams.');
+      }
+    }
+  },
+  computed: {
+    possibleTeamCounts () {
+      const players = this.settings.general.playerLimit;
+
+      if (players < 4) {
+        return [];
+      }
+
+      const upperBound = Math.ceil(players / 2);
+      const teams = [];
+
+      for (let i = 2; i <= upperBound; i++) {
+        if (players % i === 0) {
+          teams.push(i);
+        }
+      }
+
+      return teams;
     }
   }
 }
