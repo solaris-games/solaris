@@ -102,6 +102,7 @@ export default {
     this.player = GameHelper.getPlayerById(this.$store.state.game, this.playerId)
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
     this.playerIndex = this.$store.state.game.galaxy.players.indexOf(this.player)
+    this.leaderboard = GameHelper.getSortedLeaderboardPlayerList(this.$store.state.game)
 
     // If there is a legit user associated with this user then get the
     // user info so we can show more info like achievements.
@@ -139,26 +140,28 @@ export default {
       GameContainer.map.panToPlayer(this.$store.state.game, this.player)
     },
     onOpenPrevPlayerDetailRequested (e) {
-      let prevIndex = this.playerIndex - 1
+      let prevLeaderboardIndex = this.leaderboard.indexOf(this.player) - 1;
 
-      if (prevIndex < 0) {
-        prevIndex = this.$store.state.game.galaxy.players.length - 1
+      if (prevLeaderboardIndex < 0) {
+        prevLeaderboardIndex = this.leaderboard.length - 1;
       }
 
-      this.onOpenPlayerDetailRequested(prevIndex)
+      let prevPlayer = this.leaderboard[prevLeaderboardIndex];
+
+      this.onOpenPlayerDetailRequested(prevPlayer);
     },
     onOpenNextPlayerDetailRequested (e) {
-      let nextIndex = this.playerIndex + 1
+      let nextLeaderboardIndex = this.leaderboard.indexOf(this.player) + 1;
 
-      if (nextIndex > this.$store.state.game.galaxy.players.length - 1) {
-        nextIndex = 0
+      if (nextLeaderboardIndex > this.leaderboard.length - 1) {
+        nextLeaderboardIndex = 0;
       }
 
-      this.onOpenPlayerDetailRequested(nextIndex)
-    },
-    onOpenPlayerDetailRequested (e) {
-      let player = this.$store.state.game.galaxy.players[e]
+      let nextPlayer = this.leaderboard[nextLeaderboardIndex];
 
+      this.onOpenPlayerDetailRequested(nextPlayer);
+    },
+    onOpenPlayerDetailRequested (player) {
       this.$emit('onOpenPlayerDetailRequested', player._id)
     },
     onRenownSent (e) {
