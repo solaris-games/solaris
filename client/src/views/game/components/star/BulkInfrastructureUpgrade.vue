@@ -119,6 +119,7 @@ import MenuTitle from '../MenuTitle'
 import FormErrorList from '../../../components/FormErrorList'
 import starService from '../../../../services/api/star'
 import GameHelper from '../../../../services/gameHelper'
+import LearningHelper from '../../../../services/learningHelper'
 import AudioService from '../../../../game/audio'
 import GameContainer from '../../../../game/container'
 import BulkInfrastructureUpgradeStarTableVue from './BulkInfrastructureUpgradeStarTable'
@@ -275,6 +276,7 @@ export default {
         this.errors = err.response.data.errors || []
       }
 
+      LearningHelper.conceptUsed(LearningHelper.concept.BULK_UPGRADE)
       this.hasChecked = false
       this.isUpgrading = false
     },

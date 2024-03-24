@@ -100,6 +100,7 @@ import LoadingSpinnerVue from '../../../components/LoadingSpinner'
 import MenuTitle from '../MenuTitle'
 import FormErrorList from '../../../components/FormErrorList'
 import GameHelper from '../../../../services/gameHelper'
+import LearningHelper from '../../../../services/learningHelper'
 import CarrierApiService from '../../../../services/api/carrier'
 import GameContainer from '../../../../game/container'
 
@@ -232,6 +233,7 @@ export default {
         console.error(err)
       }
 
+      LearningHelper.conceptUsed(LearningHelper.concept.COMBAT_CALCULATOR)
       this.isLoading = false
     }
   }

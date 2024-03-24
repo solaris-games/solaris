@@ -16,6 +16,7 @@
         <main-bar @onPlayerSelected="onPlayerSelected"
                   @onReloadGameRequested="reloadGame"/>
 
+        <adaptive-tutor/>
         <chat @onOpenPlayerDetailRequested="onPlayerSelected"/>
     </div>
   </div>
@@ -28,6 +29,7 @@ import GameContainer from './components/GameContainer.vue'
 import MENU_STATES from '../../services/data/menuStates'
 import MainBar from './components/menu/MainBar.vue'
 import Chat from './components/inbox/Chat.vue'
+import AdaptiveTutor from './components/tutor/AdaptiveTutor.vue'
 import GameApiService from '../../services/api/game'
 import UserApiService from '../../services/api/user'
 import GameHelper from '../../services/gameHelper'
@@ -42,7 +44,8 @@ export default {
     'loading-spinner': LoadingSpinnerVue,
     'game-container': GameContainer,
     'main-bar': MainBar,
-    'chat': Chat
+    'adaptive-tutor': AdaptiveTutor,
+    'chat': Chat,
   },
   data () {
     return {
