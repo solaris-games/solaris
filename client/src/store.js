@@ -289,7 +289,7 @@ export default new Vuex.Store({
           player.stats.totalIndustry += data.upgraded
           break;
         case 'science':
-          player.stats.totalScience += data.upgraded
+          player.stats.totalScience += (data.upgraded * state.game.constants.research.sciencePointMultiplier)
           break;
       }
     },
