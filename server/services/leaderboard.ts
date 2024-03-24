@@ -264,7 +264,7 @@ export default class LeaderboardService {
                 }
             });
 
-        const rankToAward = game.settings.general.playerLimit;
+        const rankToAward = game.settings.general.playerLimit * 2;
         const rankPerPlayer = Math.floor(rankToAward / nonAfkInLeadingTeam.length);
 
         const ranks = nonAfkInLeadingTeam.flatMap(player => {
