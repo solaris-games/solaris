@@ -383,7 +383,7 @@ export default class AIService {
             attackedStarIds,
             playerEconomy: this.playerStatisticsService.calculateTotalEconomy(playerStars),
             playerIndustry: this.playerStatisticsService.calculateTotalIndustry(playerStars),
-            playerScience: this.playerStatisticsService.calculateTotalScience(playerStars),
+            playerScience: this.playerStatisticsService.calculateTotalScience(game, playerStars),
             transitFromCarriers,
             arrivingAtCarriers
         };

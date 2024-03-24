@@ -1008,7 +1008,7 @@ class GameHelper {
         userPlayer.stats.totalIndustry++
         break;
       case 'science':
-        userPlayer.stats.totalScience++
+        userPlayer.stats.totalScience += game.constants.research.sciencePointMultiplier
         break;
     }
 
