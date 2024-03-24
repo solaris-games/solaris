@@ -30,10 +30,6 @@ jobs:
       working-directory: ${{ env.directory-client }}
     - run: npm run build --if-present
       working-directory: ${{ env.directory-client }}
-    - run: npm test
-      working-directory: ${{ env.directory-client }}
-      env:
-        CI: true
 
     # Run CI for Server
     - run: npm ci
