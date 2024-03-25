@@ -26,13 +26,13 @@
             <research-progress class="d-none d-lg-inline-block me-2" v-if="userPlayer" @onViewResearchRequested="onViewResearchRequested"/>
         </div>
         <div class="col-auto text-end pointer pt-1" v-if="userPlayer" @click="onViewBulkUpgradeRequested">
-            <span class="d-none d-lg-inline-block me-2">
+            <span class="d-none d-lg-inline-block me-2" title="Total economy">
                 <i class="fas fa-money-bill-wave text-success"></i> {{userPlayer.stats.totalEconomy}}
             </span>
-            <span class="d-none d-lg-inline-block me-2">
+            <span class="d-none d-lg-inline-block me-2" title="Total industry">
                 <i class="fas fa-tools text-warning"></i> {{userPlayer.stats.totalIndustry}}
             </span>
-            <span class="d-none d-lg-inline-block me-2">
+            <span class="d-none d-lg-inline-block me-2" title="Total science">
                 <i class="fas fa-flask text-info"></i> {{userPlayer.stats.totalScience}}
             </span>
         </div>

@@ -1,5 +1,5 @@
 <template>
-<span v-if="userPlayer && isTechnologyEnabled && isTechnologyResearchable" @click="onViewResearchRequested">
+<span v-if="userPlayer && isTechnologyEnabled && isTechnologyResearchable" @click="onViewResearchRequested" :title="researchTooltip">
     <i :class="getIcon()"></i> {{researchProgress}}%
 </span>
 </template>
@@ -32,6 +32,10 @@ export default {
       let requiredProgress = TechnologyHelper.getRequiredResearchProgress(this.$store.state.game, this.userPlayer.researchingNow, tech.level)
 
       return Math.floor(tech.progress / requiredProgress * 100)
+    },
+    researchTooltip () {
+      let name = TechnologyHelper.getFriendlyName(this.userPlayer.researchingNow)
+      return `Researching ${name}`
     }
   }
 }

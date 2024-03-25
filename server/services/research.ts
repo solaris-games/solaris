@@ -108,9 +108,8 @@ export default class ResearchService extends EventEmitter {
 
         let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
-        let totalScience = this.playerStatisticsService.calculateTotalScience(playerStars);
-        let multiplier = game.constants.research.sciencePointMultiplier;
-        let progressIncrease = Math.floor(totalScience * multiplier);
+        let totalScience = this.playerStatisticsService.calculateTotalScience(game, playerStars);
+        let progressIncrease = totalScience;
 
         tech.progress! += progressIncrease;
 
@@ -227,7 +226,7 @@ export default class ResearchService extends EventEmitter {
                 researchAmount = Math.floor(techLevel * (progressMultiplier * experimentationMultiplier));
                 break;
             case 'experimental':
-                let totalScience = this.playerStatisticsService.calculateTotalScience(playerStars);
+                let totalScience = this.playerStatisticsService.calculateTotalScience(game, playerStars);
                 researchAmount = Math.floor((techLevel * (progressMultiplier * experimentationMultiplier)) + (0.15 * techLevel * totalScience));
                 break;
             default:
@@ -355,7 +354,7 @@ export default class ResearchService extends EventEmitter {
 
     _calculateResearchETAInTicksByRemainingPoints(game: Game, player: Player, remainingPoints: number) {
         let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
-        let totalScience = this.playerStatisticsService.calculateTotalScience(playerStars);
+        let totalScience = this.playerStatisticsService.calculateTotalScience(game, playerStars);
         
         // If there is no science then there cannot be an end date to the research.
         if (totalScience === 0) {
