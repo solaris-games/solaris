@@ -62,6 +62,14 @@ class StarService extends BaseApiService {
     { withCredentials: true })
   }
 
+  giftStar (gameId, starId, recipientPlayerId) {
+    return axios.put(this.BASE_URL + 'game/' + gameId + '/star/gift', {
+      starId, recipientPlayerId
+    },
+    { withCredentials: true})
+
+  }
+
   buildCarrier (gameId, starId, ships = 1) {
     return axios.put(this.BASE_URL + 'game/' + gameId + '/star/build/carrier', {
       starId,
