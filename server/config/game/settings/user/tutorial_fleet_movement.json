@@ -12,7 +12,7 @@
     "playerOnlineStatus": "hidden",
     "timeMachine": "disabled",
     "fluxEnabled": "disabled",
-    "advancedAI": "enabled",
+    "advancedAI": "disabled",
     "spectators": "disabled",
     "readyToQuit": "disabled"
   },
@@ -49,7 +49,7 @@
   },
   "conquest": {
     "victoryCondition": "starPercentage",
-    "victoryPercentage": 100,
+    "victoryPercentage": 50,
     "capitalStarElimination": "disabled"
   },
   "orbitalMechanics": {

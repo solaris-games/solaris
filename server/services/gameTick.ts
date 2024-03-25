@@ -826,8 +826,9 @@ export default class GameTickService extends EventEmitter {
                 };
 
                 this.emit(GameTickServiceEvents.onGameEnded, e);
-            } else {
-                const user = gameUsers.find(u => winner!.userId && u._id.toString() === winner!.userId.toString());
+            } else if (winner.kind === 'player') {
+                const userId = winner.player.userId
+                const user = gameUsers.find(u => userId && u._id.toString() === userId.toString());
                 const tutorialKey = game.settings.general.createdFromTemplate;
 
                 if (user && tutorialKey) {
