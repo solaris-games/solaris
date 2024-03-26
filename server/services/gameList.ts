@@ -342,9 +342,10 @@ export default class GameListService {
         });
     }
 
-    async getUserTutorial(userId: DBObjectId) {
+    async getUserTutorial(userId: DBObjectId, tutorialKey: string) {
         const tutorial = await this.gameRepo.findOne({
             'settings.general.type': 'tutorial',
+            'settings.general.createdFromTemplate': tutorialKey,
             'state.endDate': { $eq: null }, // Game is in progress
             'galaxy.players': { 
                 $elemMatch: { 

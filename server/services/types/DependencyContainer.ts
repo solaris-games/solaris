@@ -70,6 +70,7 @@ import ShipService from "../ship";
 import SpectatorService from "../spectator";
 import UserLeaderboardService from "../userLeaderboard";
 import TeamService from "../team";
+import TutorialService from "../tutorial";
 
 export interface DependencyContainer {
     config: Config,
@@ -144,4 +145,5 @@ export interface DependencyContainer {
     shipService: ShipService,
     spectatorService: SpectatorService,
     teamService: TeamService,
+    tutorialService: TutorialService,
 };

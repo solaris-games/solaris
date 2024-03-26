@@ -46,6 +46,7 @@ export default class UserService extends EventEmitter {
             lastSeen: 0,
             lastSeenIP: 0,
             'oauth.discord.token': 0,
+            tutorialsCompleted: 0,
         });
     }
 
@@ -95,6 +96,7 @@ export default class UserService extends EventEmitter {
             lastSeen: 0,
             lastSeenIP: 0,
             oauth: 0,
+            tutorialsCompleted: 0,
         });
     }
 
@@ -113,6 +115,7 @@ export default class UserService extends EventEmitter {
             lastSeen: 0,
             lastSeenIP: 0,
             oauth: 0,
+            tutorialsCompleted: 0,
         };
 
         return await this.userRepo.findById(id, select);
@@ -577,6 +580,16 @@ export default class UserService extends EventEmitter {
                 hasSentReviewReminder: sent
             }
         });
+    }
+
+    async listTutorialsCompleted(userId: DBObjectId) {
+        let user = await this.userRepo.findOne({
+            _id: userId
+        }, {
+            tutorialsCompleted: 1
+        });
+
+        return user?.tutorialsCompleted || []
     }
 
 };

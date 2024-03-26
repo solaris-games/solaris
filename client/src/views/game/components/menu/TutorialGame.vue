@@ -39,6 +39,7 @@
                                 <a href="https://discord.com/invite/v7PD33d" target="_blank" title="Discord" class="btn btn-success me-2 mb-1 float-end">
                                     <i class="fab fa-discord"></i> Discord
                                 </a>
+
                                 <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=2828060521" target="_blank" title="Getting Started" class="btn btn-outline-warning me-2 mb-1 float-end">
                                     <i class="fas fa-handshake-angle"></i> Getting Started
                                 </a>
