@@ -9,10 +9,10 @@
     },
     {
         "id": 1,
-        "key": "fleet-movement",
-        "file": "tutorial_fleet_movement.json",
-        "name": "Tutorial - Fleet Movement",
-        "description": "Buy a carrier, capture an unclaimed star to win.",
+        "key": "stars-and-carriers",
+        "file": "tutorial_stars_and_carriers.json",
+        "name": "Tutorial - Stars and Carriers",
+        "description": "Learn how to purchase a carrier, move the carrier and capture neutral stars.",
         "level": "Beginner"
     },
     {

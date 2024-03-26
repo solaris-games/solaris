@@ -569,6 +569,7 @@ export default {
           let response = await gameService.createTutorialGame(tutorialKey)
 
           if (response.status === 201) {
+              this.$store.commit('clearTutorialPage')
               router.push({ name: 'game', query: { id: response.data } })
           }
       } catch (err) {

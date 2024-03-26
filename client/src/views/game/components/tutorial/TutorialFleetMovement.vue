@@ -161,6 +161,13 @@
             Keep producing ships, building carriers and plotting waypoints. Eliminate your opponent and capture the <strong>entire map</strong> to win this tutorial.
         </p>
     </div>
+
+    <div v-if="isTutorialCompleted">
+        <h5>Victory!</h5>
+        <p>
+            Congratulation, you have completed your first Tutorial. Are you ready for more?
+        </p>
+    </div>
 </div>
 </template>
 
@@ -170,6 +177,17 @@ export default {
     mixins: [tutorialMixin],
     mounted: function () {
         this.setTutorial("Tutorial - Fleet Movement", 7)
+        if (this.gameIsFinished) {
+            console.log("FINISHED")
+            this.setTutorialCompleted()
+        }
+    },
+    watch: {
+        game (newGame, _oldGame) {
+            console.log("GAME UPDATE", newGame)
+            if (this.gameIsFinished)
+                this.setTutorialCompleted()
+        }
     }
 }
 </script>

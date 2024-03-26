@@ -43,9 +43,6 @@
                                 <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=2828060521" target="_blank" title="Getting Started" class="btn btn-outline-warning me-2 mb-1 float-end">
                                     <i class="fas fa-handshake-angle"></i> Getting Started
                                 </a>
-                                <a @href="routeToPath('/game/list')" title="Getting Started" class="btn btn-outline-info me-2 mb-1 float-end">
-                                    <i class="fas fa-graduation-cap"></i> More Tutorials
-                                </a>
                             </div>
                         </div>
                     </div>

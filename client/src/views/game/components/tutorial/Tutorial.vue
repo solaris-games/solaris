@@ -7,7 +7,7 @@
             <button type="button" title="Next" class="btn btn-primary" @click="prevPage()" v-if="page > 0"><i class="fas fa-arrow-left me-1"></i>Previous</button>
         </div>
         <div class="col-auto">
-            <button type="button" title="Next" class="btn btn-success" @click="nextPage()" v-if="page < maxPage">Next<i class="fas fa-arrow-right ms-1"></i></button>
+            <button type="button" title="Next" class="btn btn-success" @click="nextPage()" v-if="page >= 0 && page < maxPage">Next<i class="fas fa-arrow-right ms-1"></i></button>
         </div>
     </div>
 
@@ -19,6 +19,7 @@
 <script>
 import MenuTitle from '../MenuTitle'
 import TutorialOriginal from './TutorialOriginal.vue'
+import TutorialStarsAndCarriers from './TutorialStarsAndCarriers.vue'
 import TutorialFleetMovement from './TutorialFleetMovement.vue'
 
 const defaultTutorialKey = "original"
@@ -30,7 +31,8 @@ export default {
         // these component names correspondent to the tutorials in server/config/game/tutorials.json
         // and the createdFromTemplate value in the game settings JSON under server/config/game/settings/user
         'tutorial-original': TutorialOriginal,
-        'tutorial-fleet-movement': TutorialFleetMovement
+        'tutorial-fleet-movement': TutorialFleetMovement,
+        'tutorial-stars-and-carriers': TutorialStarsAndCarriers,
     },
     data() {
         return {
@@ -40,8 +42,10 @@ export default {
             maxPage: 0
         }
     },
-    mounted() {
+    created() {
         this.tutorialKey = this.$store.state.game.settings.general.createdFromTemplate || defaultTutorialKey
+    },
+    mounted() {
         this.page = this.$store.state.tutorialPage || 0
         if (typeof this.page === 'string') {
             if (this.page.split('|')[0] !== this.tutorialKey) {
@@ -57,18 +61,25 @@ export default {
         },
         nextPage() {
             this.page++
-
             this.$store.commit('setTutorialPage', this.tutorialKey + '|' + this.page)
         },
         prevPage() {
             this.page = Math.max(this.page - 1, 0)
-
             this.$store.commit('setTutorialPage', this.tutorialKey + '|' + this.page)
+        },
+        setTutorialCompleted() {
+            this.page = -1
+            this.$store.commit('setTutorialPage', this.tutorialKey + '|' + this.page)
+            // TODO check why this doesn't always work
+            // this.onOpenTutorialRequested()
         }
     },
     computed: {
         currentTutorialComponent() {
             return 'tutorial-' + this.$store.state.game.settings.general.createdFromTemplate || defaultTutorialKey
+        },
+        isTutorialCompleted() {
+            return this.page === -1
         }
     }
 }
