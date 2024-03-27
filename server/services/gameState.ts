@@ -1,5 +1,6 @@
 import { Game } from "./types/Game";
 import { Player } from "./types/Player";
+import {GameWinner} from "./leaderboard";
 
 const moment = require('moment');
 
@@ -29,10 +30,15 @@ export default class GameStateService {
         }
     }
 
-    finishGame(game: Game, winnerPlayer: Player) {
+    finishGame(game: Game, winner: GameWinner) {
         game.state.paused = true;
         game.state.endDate = moment().utc();
-        game.state.winner = winnerPlayer._id;
+
+        if (winner.kind === 'player') {
+            game.state.winner = winner.player._id;
+        } else if (winner.kind === 'team') {
+            game.state.winningTeam = winner.team._id;
+        }
     }
 
     isCountingDownToEnd(game: Game) {

@@ -2,7 +2,7 @@
 <div class="menu-page container" v-if="star">
     <menu-title :title="star.name + (star.homeStar ? ' - Capital': '')" @onCloseRequested="onCloseRequested">
       <ignore-bulk-upgrade v-if="star.ignoreBulkUpgrade && isOwnedByUserPlayer" :starId="star._id" class="me-1"/>
-      <modalButton modalName="abandonStarModal" v-if="!$isHistoricalMode() && isOwnedByUserPlayer && !userPlayer.defeated && isGameInProgress()" classText="btn btn-sm btn-outline-danger">
+      <modalButton modalName="abandonStarModal" v-if="!$isHistoricalMode() && isOwnedByUserPlayer && !userPlayer.defeated && isGameInProgress() && isGameAllowAbandonStars()" classText="btn btn-sm btn-outline-danger">
         <i class="fas fa-star"></i> <i class="fas fa-trash ms-1"></i>
       </modalButton>
       <button @click="viewOnMap(star)" class="btn btn-sm btn-outline-info ms-1"><i class="fas fa-eye"></i></button>
@@ -345,7 +345,7 @@
           </div>
         </div>
 
-        <div class="row bg-dark pt-2 pb-0 mb-1" v-if="isGameInProgress()">
+        <div class="row bg-dark pt-2 pb-0 mb-1" v-if="isGameInProgress() && isGameAllowAbandonStars()">
           <div class="col-8">
             <p class="mb-2">Abandon this star for another player to claim.</p>
           </div>
@@ -463,6 +463,9 @@ export default {
     },
     isGameInProgress () {
       return GameHelper.isGameInProgress(this.$store.state.game)
+    },
+    isGameAllowAbandonStars () {
+      return GameHelper.isGameAllowAbandonStars(this.$store.state.game)
     },
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', this.star.ownedByPlayerId)

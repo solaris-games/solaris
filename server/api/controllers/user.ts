@@ -7,7 +7,7 @@ export default (container: DependencyContainer) => {
         listLeaderboard: async (req, res, next) => {
             try {
                 const limit = +req.query.limit || null;
-                const result = await container.leaderboardService.getUserLeaderboard(limit, req.query.sortingKey);
+                const result = await container.userLeaderboardService.getUserLeaderboard(limit, req.query.sortingKey);
     
                 return res.status(200).json(result);
             } catch (err) {

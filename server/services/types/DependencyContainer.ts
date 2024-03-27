@@ -70,6 +70,8 @@ import ShipService from "../ship";
 import SpectatorService from "../spectator";
 import BasicAIService from "../basicAi";
 import PathfindingService from "../pathfinding";
+import UserLeaderboardService from "../userLeaderboard";
+import TeamService from "../team";
 
 export interface DependencyContainer {
     config: Config,
@@ -84,6 +86,7 @@ export interface DependencyContainer {
     emailService: EmailService,
     eventService: EventService,
     leaderboardService: LeaderboardService,
+    userLeaderboardService: UserLeaderboardService,
     gameService: GameService,
     gameJoinService: GameJoinService,
     gameCreateValidationService: GameCreateValidationService,
@@ -143,5 +146,6 @@ export interface DependencyContainer {
     notificationService: NotificationService,
     shipService: ShipService,
     spectatorService: SpectatorService,
+    teamService: TeamService,
     pathfindingService: PathfindingService,
 };

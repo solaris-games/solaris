@@ -100,7 +100,7 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
         mw.core.handleError);
 
     router.patch('/api/admin/game/:gameId/timeMachine',
-        mw.auth.authenticate({ admin: true }),
+        mw.auth.authenticate({ subAdmin: true }),
         validator.body(adminSetGameTimeMachineRequestSchema),
         controller.setGameTimeMachine,
         mw.core.handleError);

@@ -1,3 +1,5 @@
+import moment from "moment/moment";
+
 const EventEmitter = require('events');
 import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
@@ -17,6 +19,7 @@ import ConversationService from './conversation';
 import PlayerReadyService from './playerReady';
 import GamePlayerQuitEvent from './types/events/GamePlayerQuit';
 import GamePlayerDefeatedEvent from './types/events/GamePlayerDefeated';
+import {LeaderboardPlayer} from "./types/Leaderboard";
 
 export const GameServiceEvents = {
     onPlayerQuit: 'onPlayerQuit',
@@ -226,13 +229,51 @@ export default class GameService extends EventEmitter {
         this.emit(GameServiceEvents.onPlayerDefeated, e);
     }
 
+    async setPauseState(game: Game, pauseState: boolean, pausingUserId: DBObjectId) {
+        const gameCreatorId = game.settings.general.createdByUserId;
+
+        if (!gameCreatorId || gameCreatorId.toString() !== pausingUserId.toString()) {
+            throw new ValidationError('Only the game creator can pause the game.');
+        }
+
+        if (!this.gameStateService.isInProgress(game)) {
+            throw new ValidationError('Cannot pause a game that is not in progress.');
+        }
+
+        if (!pauseState) {
+            // Reset afk timers of the players
+            // Note: We do not want to update last seen of users as those
+            // are separate from the game afk logic.
+            await this.gameRepo.updateOne({
+                _id: game._id,
+                'galaxy.players.$.afk': false,
+                'galaxy.players.$.defeated': false
+            }, {
+                $set: {
+                    'galaxy.players.$.lastSeen': moment().utc(),
+                }
+            });
+        }
+        
+        await this.gameRepo.updateOne({
+            _id: game._id
+        }, {
+            $set: {
+                'state.paused': pauseState
+            }
+        });
+    }
+
     async delete(game: Game, deletedByUserId?: DBObjectId) {
         // If being deleted by a legit user then do some validation.
         if (deletedByUserId && game.state.startDate) {
             throw new ValidationError('Cannot delete games that are in progress or completed.');
         }
 
-        if (deletedByUserId && game.settings.general.createdByUserId && game.settings.general.createdByUserId.toString() !== deletedByUserId.toString()) {
+        const isAdmin = deletedByUserId && await this.userService.getUserIsAdmin(deletedByUserId);
+        const isCreator = deletedByUserId && game.settings.general.createdByUserId && game.settings.general.createdByUserId.toString() === deletedByUserId.toString();
+
+        if (deletedByUserId && !isAdmin && !isCreator) {
             throw new ValidationError('Cannot delete this game, you did not create it.');
         }
 
@@ -311,10 +352,30 @@ export default class GameService extends EventEmitter {
         return undefeatedPlayers.filter(x => x.ready).length === undefeatedPlayers.length;
     }
 
-    isAllUndefeatedPlayersReadyToQuit(game: Game) {
-        let undefeatedPlayers = this.listAllUndefeatedPlayers(game);
+    isReadyToQuitImmediateEnd(game: Game) {
+        const undefeatedPlayers = this.listAllUndefeatedPlayers(game);
 
-        return undefeatedPlayers.filter(x => x.readyToQuit).length === undefeatedPlayers.length;
+        return undefeatedPlayers.every(x => x.readyToQuit);
+    }
+
+    checkReadyToQuit(game: Game, leaderboard: LeaderboardPlayer[]) {
+        const undefeatedPlayers = this.listAllUndefeatedPlayers(game);
+
+        const rtqFraction = game.settings?.general?.readyToQuitFraction || 1.0;
+        const starsForEnd = rtqFraction * game.state.stars;
+
+        let rtqStarsSum = 0;
+        let allUndefeatedHaveRTQed = true;
+
+        for (const player of undefeatedPlayers) {
+            if (player.readyToQuit) {
+                rtqStarsSum += leaderboard.find(x => x.player._id.toString() === player._id.toString())?.stats?.totalStars || 0;
+            } else {
+                allUndefeatedHaveRTQed = false;
+            }
+        }
+
+        return allUndefeatedHaveRTQed || rtqStarsSum >= starsForEnd;
     }
 
     async forceEndGame(game: Game) {

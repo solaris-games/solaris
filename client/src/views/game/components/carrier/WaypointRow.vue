@@ -88,7 +88,7 @@ export default {
         GameHelper.getCarrierOwningPlayer(this.$store.state.game, this.carrier)._id === GameHelper.getUserPlayer(this.$store.state.game)._id
     },
     canEditWaypoints: function () {
-      return !GameHelper.isGameFinished(this.$store.state.game) && this.userPlayerOwnsCarrier
+      return !GameHelper.isGameFinished(this.$store.state.game) && this.userPlayerOwnsCarrier && !this.carrier.isGift
     },
     isInTransit () {
       return !this.carrier.orbiting

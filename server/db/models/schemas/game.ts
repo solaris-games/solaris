@@ -6,12 +6,19 @@ import PlayerSchema from './player';
 import StarSchema from './star';
 import CarrierSchema from './carrier';
 import ConversationSchema from './conversation';
+import TeamSchema from './team';
+
+const validateNullableEnum = (enumValues: string[]) => (s: string | null) => {
+	if (s === null) return true;
+	return enumValues.includes(s);
+}
 
 const schema = new Schema({
     settings: {
         general: {
 			fluxId: { type: Types.Number, required: false, default: null },
             createdByUserId: { type: Types.ObjectId, required: false, default: null },
+			createdFromTemplate: { type: Types.String, required: false, default: null },
             name: { type: Types.String, required: true },
             description: { type: Types.String, required: false, default: null },
 			type: { type: Types.String, required: true, enum: [
@@ -38,21 +45,24 @@ const schema = new Schema({
 				'special_arcade'
 			], default: 'custom' },
 			mode: { type: Types.String, required: true, enum: [
-				'conquest', 'battleRoyale', 'kingOfTheHill'
+				'conquest', 'battleRoyale', 'kingOfTheHill', 'teamConquest'
 			], default: 'conquest' },
 			featured: { type: Types.Boolean, required: false, default: false },
 			password: { type: Types.String, required: false, default: null },
 			passwordRequired: { type: Types.Boolean, required: false, default: false },
-			playerLimit: { type: Types.Number, required: true, default: 8, min: 2, max: 32 },
+			playerLimit: { type: Types.Number, required: true, default: 8, min: 2, max: 48 },
 			playerType: { type: Types.String, required: true, enum: ['all', 'establishedPlayers'], default: 'all' },
 			anonymity: { type: Types.String, required: true, enum: ['normal', 'extra'], default: 'normal' },
 			playerOnlineStatus: { type: Types.String, required: true, enum: ['hidden', 'visible'], default: 'hidden' },
 			timeMachine: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
-			awardRankTo: { type: Types.String, required: false, enum: ['all', 'winner'], default: 'all' },
+			awardRankTo: { type: Types.String, required: false, enum: ['all', 'winner', 'top_n', 'teams'], default: 'all' },
+			awardRankToTopN: { type: Types.Number, required: false, min: 1, default: null },
 			fluxEnabled: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
 			advancedAI: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'disabled' },
 			spectators: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'disabled' },
-			readyToQuit: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'enabled' }
+			readyToQuit: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'enabled' },
+			readyToQuitFraction: { type: Types.Number, required: false, min: 0.5, max: 1.0, default: 1.0 },
+			readyToQuitTimerCycles: { type: Types.Number, required: false, min: 0, max: 3, default: 0 },
         },
         galaxy: {
 			galaxyType: { type: Types.String, required: true, enum: ['circular', 'spiral', 'doughnut','circular-balanced', 'irregular', 'custom'], default: 'circular' },
@@ -78,7 +88,7 @@ const schema = new Schema({
 			carrierToCarrierCombat: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
 			splitResources: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'disabled' },
 			resourceDistribution: { type: Types.String, required: true, enum: ['random','weightedCenter'], default: 'random' },
-			playerDistribution: { type: Types.String, required: true, enum: ['circular','random'], default: 'circular' },
+			playerDistribution: { type: Types.String, required: true, enum: ['circular','random', 'circularSequential'], default: 'circular' },
 			carrierSpeed: { type: Types.Number, required: true, min: 1, max: 25, default: 5 },
 			starCaptureReward: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'enabled' },
 			specialistBans: {
@@ -89,7 +99,8 @@ const schema = new Schema({
 		conquest: {
 			victoryCondition: { type: Types.String, required: true, enum: ['starPercentage', 'homeStarPercentage'], default: 'starPercentage' },
 			victoryPercentage: { type: Types.Number, required: true, enum: [25, 33, 50, 66, 75, 90, 100], default: 50 },
-			capitalStarElimination: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' }
+			capitalStarElimination: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
+			teamsCount: { type: Types.Number, required: false, default: null }
 		},
 		kingOfTheHill: {
 			productionCycles: { type: Types.Number, required: false, min: 1, max: 25, default: 10 }
@@ -121,12 +132,14 @@ const schema = new Schema({
 			populationCap: {
 				enabled: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
 				shipsPerStar: { type: Types.Number, required: true, min: 50, max: 1000, default: 100 }
-			}
+			},
+			allowAbandonStars: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'enabled' }
 		},
 		diplomacy: {
 			enabled: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
 			tradeRestricted: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
-			maxAlliances: { type: Types.Number, required: true, min: 1, max: 31, default: 31 },
+			lockedAlliances: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
+			maxAlliances: { type: Types.Number, required: true, min: 1, max: 47, default: 47 },
 			upkeepCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'crazyExpensive'], default: 'none' },
 			globalEvents: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' }
 		},
@@ -151,6 +164,10 @@ const schema = new Schema({
 				weapons: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
 				specialists: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' }
 			},
+			researchCostProgression: {
+				progression: { type: Types.String, required: false, enum: ['standard', 'exponential'], default: 'standard' },
+				growthFactor: { type: Types.String, required: false, validate: validateNullableEnum(['soft', 'medium', 'hard']), default: null },
+			},
 			bankingReward: { type: Types.String, required: true, enum: ['standard', 'legacy'], default: 'standard' },
 			experimentationReward: { type: Types.String, required: true, enum: ['standard', 'experimental'], default: 'standard' },
 			specialistTokenReward: { type: Types.String, required: true, enum: ['standard', 'experimental'], default: 'standard' }
@@ -173,7 +190,8 @@ const schema = new Schema({
     galaxy: {
         players: [PlayerSchema],
 		stars: [StarSchema],
-		carriers: [CarrierSchema]
+		carriers: [CarrierSchema],
+		teams: [TeamSchema],
 	},
 	conversations: [ConversationSchema],
 	state: {
@@ -189,8 +207,10 @@ const schema = new Schema({
 		starsForVictory: { type: Types.Number, required: true },
 		players: { type: Types.Number, required: true, default: 0 },
 		winner: { type: Types.ObjectId, required: false, default: null },
+		winningTeam: { type: Types.ObjectId, required: false, default: null },
 		cleaned: { type: Types.Boolean, required: false, default: false }, // Represents if the events and history have been deleted.
-		leaderboard: [{ type: Types.ObjectId, required: false }]
+		leaderboard: [{ type: Types.ObjectId, required: false }],
+		teamLeaderboard: [{ type: Types.ObjectId, required: false }],
 	},
 	constants: {
 		distances: {
@@ -206,7 +226,12 @@ const schema = new Schema({
 		research: {
 			progressMultiplier: { type: Types.Number, required: true, default: 50 },
 			sciencePointMultiplier: { type: Types.Number, required: true, default: 1 },
-			experimentationMultiplier: { type: Types.Number, required: true, default: 1 }
+			experimentationMultiplier: { type: Types.Number, required: true, default: 1 },
+			exponentialGrowthFactors: {
+				soft: { type: Types.Number, required: true, default: 1.25 },
+				medium: { type: Types.Number, required: true, default: 1.5 },
+				hard: { type: Types.Number, required: true, default: 1.75 }
+			}
 		},
 		star: {
 			resources: {

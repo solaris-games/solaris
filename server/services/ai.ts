@@ -316,6 +316,8 @@ export default class AIService {
             startedClaims: [],
             invasionsInProgress: []
         };
+
+        this.reputationService.initializeReputationForAlliedPlayers(game, player);
     }
 
     _sanitizeState(game: Game, player: Player, context: Context) {
@@ -460,7 +462,7 @@ export default class AIService {
             attackedStarIds,
             playerEconomy: this.playerStatisticsService.calculateTotalEconomy(playerStars),
             playerIndustry: this.playerStatisticsService.calculateTotalIndustry(playerStars),
-            playerScience: this.playerStatisticsService.calculateTotalScience(playerStars),
+            playerScience: this.playerStatisticsService.calculateTotalScience(game, playerStars),
             playerShips: this.shipService.calculateTotalShips(playerStars, playerCarriers),
             transitFromCarriers,
             arrivingAtCarriers

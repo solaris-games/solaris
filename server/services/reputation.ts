@@ -146,7 +146,7 @@ export default class ReputationService extends EventEmitter {
     }
 
     async tryIncreaseReputationCredits(game: Game, fromPlayer: Player, toPlayer: Player, amount: number) {
-        let playerStats = this.playerStatisticsService.getStats(game, toPlayer);
+        let playerStats = this.playerStatisticsService.getStats(game, fromPlayer);
         let creditsRequired = playerStats.totalEconomy * 10 / 2;
         let increased = amount >= creditsRequired;
 
@@ -161,7 +161,7 @@ export default class ReputationService extends EventEmitter {
     }
 
     async tryIncreaseReputationCreditsSpecialists(game: Game, fromPlayer: Player, toPlayer: Player, amount: number) {
-        let creditsRequired = Math.round(toPlayer.research.specialists.level / 2);
+        let creditsRequired = Math.round(fromPlayer.research.specialists.level / 2);
         let increased = amount >= creditsRequired;
 
         if (increased) {
@@ -197,14 +197,29 @@ export default class ReputationService extends EventEmitter {
         const status = this.diplomacyService.getDiplomaticStatusToPlayer(game, fromPlayer._id, toPlayer._id);
 
         if (reputation.score >= ALLY_REPUTATION_THRESHOLD && status.statusTo !== "allies") {
-            this.diplomacyService.declareAlly(game, fromPlayer._id, toPlayer._id, updateDatabase);
+            await this.diplomacyService.declareAlly(game, fromPlayer._id, toPlayer._id, updateDatabase);
         }
         else if (reputation.score <= ENEMY_REPUTATION_THRESHOLD && status.statusTo !== "enemies") {
-            this.diplomacyService.declareEnemy(game, fromPlayer._id, toPlayer._id, updateDatabase);
+            await this.diplomacyService.declareEnemy(game, fromPlayer._id, toPlayer._id, updateDatabase);
         }
         else if (reputation.score > ENEMY_REPUTATION_THRESHOLD && reputation.score < ALLY_REPUTATION_THRESHOLD && status.statusTo !== "neutral") {
-            this.diplomacyService.declareNeutral(game, fromPlayer._id, toPlayer._id, updateDatabase);
+            await this.diplomacyService.declareNeutral(game, fromPlayer._id, toPlayer._id, updateDatabase);
         }
     }
 
+    initializeReputationForAlliedPlayers(game: Game, player: Player) {
+        const isFormalAlliancesEnabled = this.diplomacyService.isFormalAlliancesEnabled(game);
+
+        if (!isFormalAlliancesEnabled) {
+            return;
+        }
+
+        const alliedPlayers = this.diplomacyService.getAlliesOfPlayer(game, player);
+
+        for (let alliedPlayer of alliedPlayers) {
+            const reputation = this.getReputation(player, alliedPlayer);
+
+            reputation.reputation.score = ALLY_REPUTATION_THRESHOLD;
+        }
+    }
 };

@@ -649,7 +649,7 @@
             "id": 10,
             "key": "ringed-planet",
             "name": "Trade Port",
-            "description": "The star's economic infrastructure contributes x2 to economy production and adds +1 Scanning to the star. Deducts -3 Weapons from your side in combat and -5 Terraforming from the star.",
+            "description": "The star's economic infrastructure contributes x2 to economy production and adds +1 Scanning to the star. Deducts -3 Weapons from your side in combat and -5 Terraforming from the star. This star becomes visible to all players in the galaxy.",
             "active": {
                 "official": true,
                 "custom": true

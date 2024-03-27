@@ -27,12 +27,12 @@ export type GameType = 'tutorial'|
 'special_freeForAll'|
 'special_arcade';
 
-export type GameMode = 'conquest'|'battleRoyale'|'kingOfTheHill';
+export type GameMode = 'conquest'|'battleRoyale'|'kingOfTheHill'|'teamConquest';
 export type GamePlayerType = 'all'|'establishedPlayers';
 export type GamePlayerAnonymity = 'normal'|'extra';
 export type GamePlayerOnlineStatus = 'hidden'|'visible';
 export type GameSettingEnabledDisabled = 'disabled'|'enabled';
-export type GameAwardRankTo = 'all'|'winner';
+export type GameAwardRankTo = 'all'|'winner'|'top_n'|'teams';
 export type GameGalaxyType = 'circular'|'spiral'|'doughnut'|'circular-balanced'|'irregular'|'custom';
 export type GameCarrierCost = 'cheap'|'standard'|'expensive';
 export type GameCarrierUpkeepCost = 'none'|'cheap'|'standard'|'expensive';
@@ -42,7 +42,7 @@ export type GameSpecialistCost = 'none'|'standard'|'expensive'|'veryExpensive'|'
 export type GameSpecialistCurrency = 'credits'|'creditsSpecialists';
 export type GameDarkGalaxyMode = 'disabled'|'fog'|'standard'|'extra'|'start';
 export type GameResourceDistribution = 'random'|'weightedCenter';
-export type GamePlayerDistribution = 'circular'|'random';
+export type GamePlayerDistribution = 'circular'|'random'|'circularSequential';
 export type GameVictoryCondition = 'starPercentage'|'homeStarPercentage';
 export type GameVictoryPercentage = 25|33|50|66|75|90|100;
 export type GameInfrastructureCost = 'none'|'cheap'|'standard'|'expensive';
@@ -57,6 +57,19 @@ export type GameTimeType = 'realTime'|'turnBased';
 export type GameTimeSpeed = 30|60|300|600|1800|3600|7200;
 export type GameTimeStartDelay = 0|1|5|10|30|60|120|240|360|480|600|720|1440;
 export type GameTimeMaxTurnWait = 1|5|10|30|60|360|480|600|720|1080|1440|2880;
+export type ReadyToQuitFraction = 0.5|0.66|0.75|0.9|1.0;
+export type ReadyToQuitTimerCycles = 0|1|2|3;
+
+export type GameResearchProgressionStandard = {
+	progression: 'standard',
+}
+
+export type GameResearchProgressionExponential = {
+	progression: 'exponential',
+	growthFactor: 'soft'|'medium'|'hard',
+}
+
+export type GameResearchProgression = GameResearchProgressionStandard | GameResearchProgressionExponential;
 
 export interface GameFlux {
 	id: number;
@@ -69,6 +82,7 @@ export interface GameSettings {
 	general: {
 		fluxId: number | null;
 		createdByUserId?: DBObjectId | null;
+		createdFromTemplate?: string | null;
 		name: string;
 		description: string | null;
 		type: GameType;
@@ -82,12 +96,15 @@ export interface GameSettings {
 		playerOnlineStatus: GamePlayerOnlineStatus;
 		timeMachine: GameSettingEnabledDisabled;
 		awardRankTo: GameAwardRankTo;
+		awardRankToTopN?: number;
 		fluxEnabled: GameSettingEnabledDisabled;
 		isGameAdmin?: boolean;
 		advancedAI: GameSettingEnabledDisabled;
 		spectators: GameSettingEnabledDisabled;
 		flux?: GameFlux | null;
 		readyToQuit: GameSettingEnabledDisabled;
+		readyToQuitFraction?: ReadyToQuitFraction;
+		readyToQuitTimerCycles?: ReadyToQuitTimerCycles;
 	},
 	galaxy: {
 		galaxyType: GameGalaxyType;
@@ -126,6 +143,7 @@ export interface GameSettings {
 		victoryCondition: GameVictoryCondition;
 		victoryPercentage: GameVictoryPercentage;
 		capitalStarElimination: GameSettingEnabledDisabled;
+		teamsCount?: number;
 	},
 	kingOfTheHill: {
 		productionCycles: number;
@@ -156,7 +174,8 @@ export interface GameSettings {
 		populationCap: {
 			enabled: GameSettingEnabledDisabled;
 			shipsPerStar: number;
-		}
+		},
+		allowAbandonStars: GameSettingEnabledDisabled;
   	},
 	diplomacy: {
 		enabled: GameSettingEnabledDisabled;
@@ -164,6 +183,7 @@ export interface GameSettings {
 		maxAlliances: number;
 		upkeepCost: GameAllianceUpkeepCost;
 		globalEvents: GameSettingEnabledDisabled;
+		lockedAlliances: GameSettingEnabledDisabled;
 	},
 	technology: {
 		startingTechnologyLevel: {
@@ -186,6 +206,7 @@ export interface GameSettings {
 			weapons: GameResearchCost;
 			specialists: GameResearchCost;
 		},
+		researchCostProgression: GameResearchProgression;
 		bankingReward: GameBankingReward;
 		experimentationReward: GameExperimentationReward;
 		specialistTokenReward: GameSpecialistTokenReward;
@@ -222,15 +243,22 @@ export interface GameSpectator {
 	playerIds: DBObjectId[];
 }
 
+export interface Team {
+	_id: DBObjectId;
+	name: string;
+	players: DBObjectId[];
+}
+
 export interface Game {
     _id: DBObjectId;
-    settings: GameSettings,
+    settings: GameSettings;
     galaxy: {
-        players: Player[]
+        players: Player[],
 		stars: Star[],
 		carriers: Carrier[],
 		homeStars?: DBObjectId[],
-		linkedStars: DBObjectId[][]
+		linkedStars: DBObjectId[][],
+		teams?: Team[],
 	},
 	conversations: Conversation[]
 	state: {
@@ -246,7 +274,9 @@ export interface Game {
 		starsForVictory: number;
 		players: number;
 		winner: DBObjectId | null;
+		winningTeam: DBObjectId | null;
 		leaderboard: DBObjectId[] | null;
+		teamLeaderboard: DBObjectId[] | null;
 		cleaned: boolean;
 		openSlots?: number;
 	},
@@ -262,6 +292,11 @@ export interface Game {
 			progressMultiplier: number;
 			sciencePointMultiplier: number;
 			experimentationMultiplier: number;
+			exponentialGrowthFactors: {
+				soft: number;
+				medium: number;
+				hard: number;
+			}
 		},
 		star: {
 			resources: {

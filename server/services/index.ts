@@ -1,5 +1,3 @@
-import PathfindingService from "./pathfinding";
-
 const bcrypt = require('bcrypt');
 
 import GameModel from '../db/models/Game';
@@ -87,6 +85,7 @@ import NotificationService from './notification';
 import DiscordService from './discord';
 import ShipService from './ship';
 import SpectatorService from './spectator';
+import PathfindingService from "./pathfinding";
 
 import { DependencyContainer } from './types/DependencyContainer';
 
@@ -98,6 +97,8 @@ import { GameEvent } from './types/GameEvent';
 import { Guild } from './types/Guild';
 import { Payment } from './types/Payment';
 import { Report } from './types/Report';
+import TeamService from "./team";
+import UserLeaderboardService from './userLeaderboard';
 
 const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
@@ -110,7 +111,7 @@ const guildRepository = new Repository<Guild>(GuildModel);
 const paymentRepository = new Repository<Payment>(PaymentModel);
 const reportRepository = new Repository<Report>(ReportModel);
 
-export default (config, io): DependencyContainer => {
+export default (config): DependencyContainer => {
 
     // Poor man's dependency injection.
 
@@ -127,7 +128,7 @@ export default (config, io): DependencyContainer => {
     const guildService = new GuildService(GuildModel, guildRepository, userRepository, userService);
     const guildUserService = new GuildUserService(userRepository, guildService);
 
-    const broadcastService = new BroadcastService(io);
+    const broadcastService = new BroadcastService();
     const distanceService = new DistanceService();
     const randomService = new RandomService();
     const cacheService = new CacheService(config);
@@ -162,7 +163,8 @@ export default (config, io): DependencyContainer => {
     const customMapService = new CustomMapService();
     const mapService = new MapService(randomService, starService, starDistanceService, nameService, circularMapService, spiralMapService, doughnutMapService, circularBalancedMapService, irregularMapService, gameTypeService, customMapService);
     const playerReadyService = new PlayerReadyService(gameRepository, gameTypeService);
-    const playerService = new PlayerService(gameRepository, randomService, mapService, starService, carrierService, starDistanceService, technologyService, specialistService, gameTypeService, playerReadyService);
+    const teamService = new TeamService(diplomacyService);
+    const playerService = new PlayerService(gameRepository, randomService, mapService, starService, carrierService, starDistanceService, technologyService, specialistService, gameTypeService, playerReadyService, teamService);
     const spectatorService = new SpectatorService(gameRepository, playerService, userService);
     const playerAfkService = new PlayerAfkService(gameRepository, playerService, starService, carrierService, gameTypeService, gameStateService);
     const badgeService = new BadgeService(userRepository, userService, playerService);
@@ -173,7 +175,8 @@ export default (config, io): DependencyContainer => {
     const conversationService = new ConversationService(gameRepository, tradeService, diplomacyService);
     const gameService = new GameService(gameRepository, userService, starService, carrierService, playerService, passwordService, achievementService, avatarService, gameTypeService, gameStateService, conversationService, playerReadyService);
     const gameJoinService = new GameJoinService(userService, starService, playerService, passwordService, achievementService, avatarService, gameTypeService, gameStateService, conversationService, randomService, spectatorService);
-    const leaderboardService = new LeaderboardService(userRepository, userService, playerService, playerAfkService, userLevelService, guildUserService, ratingService, gameService, gameTypeService, gameStateService, badgeService, playerStatisticsService);
+    const leaderboardService = new LeaderboardService(playerService, playerAfkService, userLevelService, ratingService, gameService, gameTypeService, gameStateService, badgeService, playerStatisticsService, teamService);
+    const userLeaderboardService = new UserLeaderboardService(userRepository, guildUserService);
     const researchService = new ResearchService(gameRepository, technologyService, randomService, playerStatisticsService, starService, userService, gameTypeService);
     const combatService = new CombatService(technologyService, specialistService, playerService, starService, reputationService, diplomacyService, gameTypeService);
     const waypointService = new WaypointService(gameRepository, carrierService, starService, distanceService, starDistanceService, technologyService, gameService, playerService, carrierMovementService);
@@ -195,7 +198,7 @@ export default (config, io): DependencyContainer => {
 
     const gameListService = new GameListService(gameRepository, gameService, conversationService, eventService, gameTypeService, leaderboardService);
     const gameCreateValidationService = new GameCreateValidationService(playerService, starService, carrierService, specialistService, gameTypeService);
-    const gameCreateService = new GameCreateService(GameModel, gameJoinService, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService, gameCreateValidationService, gameFluxService, specialistBanService, specialStarBanService, gameTypeService, starService);
+    const gameCreateService = new GameCreateService(GameModel, gameJoinService, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService, gameCreateValidationService, gameFluxService, specialistBanService, specialStarBanService, gameTypeService, starService, diplomacyService, teamService);
 
     const notificationService = new NotificationService(config, userRepository, gameRepository, discordService, conversationService, gameService, gameJoinService, gameTickService, researchService, tradeService);
 
@@ -214,6 +217,7 @@ export default (config, io): DependencyContainer => {
         emailService,
         eventService,
         leaderboardService,
+        userLeaderboardService,
         gameService,
         gameJoinService,
         gameCreateValidationService,
@@ -273,6 +277,7 @@ export default (config, io): DependencyContainer => {
         notificationService,
         shipService,
         spectatorService,
+        teamService,
         pathfindingService,
     };
 };

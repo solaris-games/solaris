@@ -55,7 +55,7 @@
                   <i class="clickable fas" :class="{'fa-star text-success':game.settings.general.featured,'fa-star text-danger':!game.settings.general.featured}"
                     @click="toggleFeaturedGame(game)" title="Featured"></i>
                   <i class="clickable ms-1 fas" :class="{'fa-clock text-success':game.settings.general.timeMachine === 'enabled','fa-clock text-danger':game.settings.general.timeMachine === 'disabled'}"
-                    @click="toggleTimeMachineGame(game)" v-if="isAdministrator" title="Time Machine"></i>
+                    @click="toggleTimeMachineGame(game)" v-if="isGameMaster" title="Time Machine"></i>
                 </td>
                 <td><i class="fas" :class="{'fa-check text-success':game.state.startDate,'fa-times text-danger':!game.state.startDate}" :title="game.state.startDate"></i></td>
                 <td>
@@ -232,19 +232,19 @@ export default {
       }
 
       let responses = await Promise.all(requests)
-      
+
       if (responses[0].status === 200) {
         this.games = responses[0].data
       }
-      
+
       if (responses[1] && responses[1].status === 200) {
         this.users = responses[1].data
       }
-      
+
       if (responses[2] && responses[2].status === 200) {
         this.passwordResets = responses[2].data
       }
-      
+
       if (responses[3] && responses[3].status === 200) {
         this.reports = responses[3].data
       }
@@ -348,7 +348,7 @@ export default {
     async impersonate (userId) {
       try {
         let response = await AdminApiService.impersonate(userId)
-        
+
         if (response.status === 200) {
           this.$store.commit('setUserId', response.data._id)
           this.$store.commit('setUsername', response.data.username)
@@ -423,6 +423,9 @@ export default {
     },
     isCommunityManager () {
       return this.isAdministrator || this.$store.state.roles.communityManager
+    },
+    isGameMaster () {
+      return this.isAdministrator || this.$store.state.roles.gameMaster
     }
   }
 }

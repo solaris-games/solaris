@@ -10,7 +10,7 @@
         <div class="col">
             <form @submit.prevent>
                 <div class="mb-2 mt-3">
-                    <input class="form-control" required="required" placeholder="Password" type="password" v-model="password" v-on:keyup="onPasswordChanged">
+                    <input class="form-control" required="required" placeholder="Password" type="password" v-model="password" @change="onPasswordChanged">
                 </div>
             </form>
         </div>

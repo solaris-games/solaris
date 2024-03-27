@@ -17,13 +17,13 @@ export default async (config: Config, app, container: DependencyContainer) => {
 
     // ---------------
     // Set up MongoDB session store
-    let store = new MongoDBStore({
+    let sessionStorage = new MongoDBStore({
         uri: config.connectionString,
         collection: 'sessions'
     });
 
     // Catch session store errors
-    store.on('error', function(err) {
+    sessionStorage.on('error', function(err) {
         console.error(err);
     });
 
@@ -37,17 +37,20 @@ export default async (config: Config, app, container: DependencyContainer) => {
             secure: config.sessionSecureCookies, // Requires HTTPS
             maxAge: 1000 * 60 * 60 * 24 * 365 // 1 Year
         },
-        store
+        store: sessionStorage
     }));
 
     // ---------------
     // Enable CORS
     app.use((req, res, next) => {
-        res.header("Access-Control-Allow-Origin", config.clientUrl);
-        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        res.header('Access-Control-Allow-Headers', 'Content-Type');
-        res.header('Access-Control-Allow-Credentials', 'true');
-        res.header('Access-Control-Allow-Methods', 'POST, PUT, PATCH, GET, DELETE, OPTIONS');
+        if (config.corsUrls.includes(req.headers.origin)) {
+            res.header("Access-Control-Allow-Origin", req.headers.origin);
+            res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+            res.header('Access-Control-Allow-Headers', 'Content-Type');
+            res.header('Access-Control-Allow-Credentials', 'true');
+            res.header('Access-Control-Allow-Methods', 'POST, PUT, PATCH, GET, DELETE, OPTIONS');
+        }
+
         next();
     });
 
@@ -86,5 +89,8 @@ export default async (config: Config, app, container: DependencyContainer) => {
 
     console.log('Express intialized.');
     
-    return app;
+    return {
+        app,
+        sessionStorage
+    };
 };

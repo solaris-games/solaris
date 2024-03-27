@@ -74,6 +74,10 @@ export default class WaypointService {
             throw new ValidationError('Cannot plot more than 30 waypoints.');
         }
 
+        if (carrier.isGift) {
+            throw new ValidationError('Cannot alter waypoints for a gifted carrier.');
+        }
+
         // If the carrier is currently in transit then double check that the first waypoint
         // matches the source and destination.
         if (!carrier.orbiting) {

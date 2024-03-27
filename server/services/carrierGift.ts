@@ -48,6 +48,14 @@ export default class CarrierGiftService extends EventEmitter {
         carrier.isGift = true;
         carrier.waypointsLooped = false;
 
+        let firstWaypoint = carrier.waypoints[0];
+
+        firstWaypoint.action = 'nothing';
+        firstWaypoint.actionShips = 0;
+        firstWaypoint.delayTicks = 0;
+
+        carrier.waypoints = [firstWaypoint];
+
         await this.gameRepo.updateOne({
             _id: game._id,
             'galaxy.carriers._id': carrier._id
@@ -55,6 +63,7 @@ export default class CarrierGiftService extends EventEmitter {
             $set: {
                 'galaxy.carriers.$.isGift': true,
                 'galaxy.carriers.$.waypointsLooped': false,
+                'galaxy.carriers.$.waypoints': carrier.waypoints
             }
         });
     }

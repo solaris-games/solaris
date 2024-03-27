@@ -382,7 +382,7 @@ export default class CarrierService extends EventEmitter {
     }
     
     listGiftCarriersInOrbit(game: Game) {
-        return game.galaxy.carriers.filter(c => c.isGift && c.orbiting);
+        return game.galaxy.carriers.filter(c => c.isGift && c.orbiting && c.waypoints.length === 0);
     }
 
 };
