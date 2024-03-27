@@ -1,5 +1,3 @@
-import UserLeaderboardService from "./userLeaderboard";
-
 const bcrypt = require('bcrypt');
 
 import GameModel from '../db/models/Game';
@@ -55,6 +53,7 @@ import SpecialStarBanService from './specialStarBan';
 import AchievementService from './achievement';
 import ConversationService from './conversation';
 import ReputationService from './reputation';
+import BasicAIService from "./basicAi";
 import AIService from './ai';
 import GuildService from './guild';
 import GuildUserService from './guildUser';
@@ -86,6 +85,7 @@ import NotificationService from './notification';
 import DiscordService from './discord';
 import ShipService from './ship';
 import SpectatorService from './spectator';
+import PathfindingService from "./pathfinding";
 
 import { DependencyContainer } from './types/DependencyContainer';
 
@@ -98,6 +98,7 @@ import { Guild } from './types/Guild';
 import { Payment } from './types/Payment';
 import { Report } from './types/Report';
 import TeamService from "./team";
+import UserLeaderboardService from './userLeaderboard';
 
 const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
@@ -183,7 +184,9 @@ export default (config): DependencyContainer => {
     const specialistHireService = new SpecialistHireService(gameRepository, specialistService, achievementService, waypointService, playerCreditsService, starService, gameTypeService, specialistBanService, technologyService);
     const starUpgradeService = new StarUpgradeService(gameRepository, starService, carrierService, achievementService, researchService, technologyService, playerCreditsService, gameTypeService, shipService);
     const shipTransferService = new ShipTransferService(gameRepository, carrierService, starService);
-    const aiService = new AIService(starUpgradeService, carrierService, starService, distanceService, waypointService, combatService, shipTransferService, technologyService, playerService, playerAfkService, reputationService, diplomacyService, playerStatisticsService, shipService);
+    const pathfindingService = new PathfindingService(distanceService, starService, waypointService);
+    const basicAIService = new BasicAIService(starUpgradeService);
+    const aiService = new AIService(starUpgradeService, carrierService, starService, distanceService, waypointService, combatService, shipTransferService, technologyService, playerService, playerAfkService, reputationService, diplomacyService, shipService, playerStatisticsService, basicAIService, pathfindingService);
     const historyService = new HistoryService(historyRepository, playerService, gameService, playerStatisticsService);
     const battleRoyaleService = new BattleRoyaleService(starService, carrierService, mapService, starDistanceService, waypointService, carrierMovementService);
     const starMovementService = new StarMovementService(mapService, starDistanceService, specialistService, waypointService);
@@ -251,6 +254,7 @@ export default (config): DependencyContainer => {
         achievementService,
         conversationService,
         reputationService,
+        basicAIService,
         aiService,
         battleRoyaleService,
         starMovementService,
@@ -274,5 +278,6 @@ export default (config): DependencyContainer => {
         shipService,
         spectatorService,
         teamService,
+        pathfindingService,
     };
 };
