@@ -189,6 +189,15 @@ export default (container: DependencyContainer) => {
             } catch (err) {
                 return next(err);
             }
+        },
+        resetQuitters: async (req, res, next) => {
+            try {
+                await container.gameService.resetQuitters(req.game);
+
+                return res.sendStatus(200);
+            } catch (err) {
+                return next(err);
+            }
         }
     }
 };

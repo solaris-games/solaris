@@ -177,7 +177,7 @@ const schema = new Schema({
 			speed: { type: Types.Number, required: true, enum: [30, 60, 300, 600, 1800, 3600, 7200], default: 1800 }, // Time in seconds
 			startDelay: { type: Types.Number, required: true, enum: [0, 1, 5, 10, 30, 60, 120, 240, 360, 480, 600, 720, 1440], default: 240 },	// Time in minutes
 			turnJumps: { type: Types.Number, required: true, min: 1, max: 24, default: 8 },
-			maxTurnWait: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60, 360, 480, 600, 720, 1080, 1440, 2880], default: 1440 },	// Time in minutes
+			maxTurnWait: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60, 120, 240, 360, 480, 600, 720, 1080, 1440, 2880], default: 1440 },	// Time in minutes
 			isTickLimited: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'disabled' },
 			tickLimit: { type: Types.Number, required: false, min: 200, max: 2000, default: null },
 			afk: {
