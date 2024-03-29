@@ -327,6 +327,18 @@ export default class GameService extends EventEmitter {
         });
     }
 
+    async resetQuitters(game: Game) {
+        game.quitters = [];
+
+        await this.gameRepo.updateOne({
+            _id: game._id
+        }, {
+            $set: {
+                quitters: []
+            }
+        });
+    }
+
     // TODO: Move to a gameLockService
     async lockAll(locked: boolean = true) {
         await this.gameRepo.updateMany({

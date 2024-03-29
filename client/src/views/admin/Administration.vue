@@ -39,6 +39,7 @@
                 <th>Ended</th>
                 <th>Tick</th>
                 <th></th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -64,7 +65,10 @@
                 </td>
                 <td :class="{'text-warning':gameNeedsAttention(game)}">{{game.state.tick}}</td>
                 <td>
-                  <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-outline-success">View</router-link>
+                  <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-outline-success btn-sm">View</router-link>
+                </td>
+                <td>
+                  <button v-if="isAdministrator" class="btn btn-outline-warning btn-sm" @click="resetQuitters(game)">Reset quitters</button>
                 </td>
               </tr>
             </tbody>
@@ -357,6 +361,13 @@ export default {
         }
 
         router.push({ name: 'home' })
+      } catch (err) {
+        console.error(err)
+      }
+    },
+    async resetQuitters (game) {
+      try {
+        await AdminApiService.resetQuitters(game._id);
       } catch (err) {
         console.error(err)
       }
