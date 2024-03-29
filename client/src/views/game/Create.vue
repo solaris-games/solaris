@@ -992,6 +992,10 @@ export default {
         }
       }
 
+      if (teams.length) {
+        this.settings.conquest.teamsCount = teams[0];
+      }
+
       return teams;
     }
   }
