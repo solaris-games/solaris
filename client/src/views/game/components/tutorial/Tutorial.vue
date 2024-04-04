@@ -20,6 +20,11 @@
 import MenuTitle from '../MenuTitle'
 import TutorialOriginal from './TutorialOriginal.vue'
 import TutorialStarsAndCarriers from './TutorialStarsAndCarriers.vue'
+import TutorialInfrastructureAndExpansion from './TutorialInfrastructureAndExpansion.vue'
+import TutorialScienceAndResearch from './TutorialScienceAndResearch.vue'
+import TutorialCombatBasics from './TutorialCombatBasics.vue'
+import TutorialSpecialStarTypes from './TutorialSpecialStarTypes.vue'
+
 import TutorialFleetMovement from './TutorialFleetMovement.vue'
 
 const defaultTutorialKey = "original"
@@ -33,6 +38,10 @@ export default {
         'tutorial-original': TutorialOriginal,
         'tutorial-fleet-movement': TutorialFleetMovement,
         'tutorial-stars-and-carriers': TutorialStarsAndCarriers,
+        'tutorial-infrastructure-and-expansion': TutorialInfrastructureAndExpansion,
+        'tutorial-science-and-research': TutorialScienceAndResearch,
+        'tutorial-combat-basics': TutorialCombatBasics,
+        'tutorial-special-star-types': TutorialSpecialStarTypes,
     },
     data() {
         return {

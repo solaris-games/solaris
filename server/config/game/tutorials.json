@@ -3,7 +3,7 @@
         "id": 0,
         "key": "original",
         "file": "tutorial.json",
-        "name": "Tutorial",
+        "name": "Tutorial - Original",
         "description": "Learn to Play.",
         "level": "Beginner"
     },
@@ -17,30 +17,34 @@
     },
     {
         "id": 2,
-        "key": "infrastructure",
-        "name": "Tutorial - Infrastructure",
-        "description": "Same as fleet movement, but no starting industry or ships and cheap economy/expensive industry purchases. Guide the player to buy economy to start getting income up, then Industry to start building ships before they can finally take the unclaimed star.",
+        "key": "infrastructure-and-expansion",
+        "file": "tutorial_infrastructure_and_expansion.json",
+        "name": "Tutorial - Infrastructure and Expansion",
+        "description": "Effectively build and utilize Economy and Industry infrastructure to generate ships and capture a neutral star.",
         "level": "Beginner"
     },
     {
         "id": 3,
-        "key": "technology",
-        "name": "Tutorial - Technology",
-        "description": "Same as fleet movement, but the player needs to research hyperspace range in order to get to the unclaimed star.",
+        "key": "science-and-research",
+        "file": "tutorial_science_and_research.json",
+        "name": "Tutorial - Science and Research",
+        "description": "Utilize science infrastructure for research, scan surrounding stars for enemy presence, understand hyperspace travel ranges, and apply these skills to capture a neutral star in the game Solaris.",
         "level": "Beginner"
     },
     {
         "id": 4,
         "key": "combat-basics",
+        "file": "tutorial_combat_basics.json",
         "name": "Tutorial - Combat Basics",
-        "description": "Basically the current tutorial just with deeper explanation of things like the defender bonus, no specialist tokens yet.",
+        "description": "Your ultimate test is here: capture the enemy's home star!",
         "level": "Beginner"
     },
     {
         "id": 5,
         "key": "special-star-types",
+        "file": "tutorial_special_star_types.json",
         "name": "Tutorial - Special Star Types",
-        "description": "[Non-combat] Scenario where the player needs to get a black hole to see far enough to spot a wormhole that lets them hit the star count, etc.",
+        "description": "Learn about the strategic advantages and disadvantages of Special Stars and the benefits of building Warp Gates.",
         "level": "Intermediate"
     },
     {
