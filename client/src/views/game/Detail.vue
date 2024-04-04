@@ -20,6 +20,7 @@
           <button class="btn btn-danger" v-if="!game.state.startDate && game.settings.general.isGameAdmin" @click="deleteGame">Delete Game</button>
           <button class="btn btn-warning" v-if="canModifyPauseState() && !game.state.paused" @click="pauseGame">Pause Game</button>
           <button class="btn btn-warning" v-if="canModifyPauseState() && game.state.paused" @click="resumeGame">Resume Game</button>
+          <button class="btn btn-danger" v-if="!game.state.startDate && game.settings.general.isGameAdmin" @click="forceStartGame">Force start Game</button>
           <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success ms-1">Open Game <i class="fas fa-arrow-right"></i></router-link>
         </div>
       </div>
@@ -101,6 +102,23 @@ export default {
           await gameService.pause(this.game._id)
 
           this.$toasted.show(`The game has been paused. Please notify the players.`, { type: 'success' })
+
+          await this.loadGame()
+        } catch (err) {
+          console.error(err)
+        }
+
+        this.isLoading = false
+      }
+    },
+    async forceStartGame () {
+      if (await this.$confirm('Force start game', 'All open slots will be filled with bots. Are you sure you want to force start this game?')) {
+        this.isLoading = true
+
+        try {
+          await gameService.forceStart(this.game._id)
+
+          this.$toasted.show(`The game has been force started. Please notify the players.`, { type: 'success' })
 
           await this.loadGame()
         } catch (err) {
