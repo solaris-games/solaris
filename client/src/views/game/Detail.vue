@@ -20,7 +20,7 @@
           <button class="btn btn-danger" v-if="!game.state.startDate && game.settings.general.isGameAdmin" @click="deleteGame">Delete Game</button>
           <button class="btn btn-warning" v-if="canModifyPauseState() && !game.state.paused" @click="pauseGame">Pause Game</button>
           <button class="btn btn-warning" v-if="canModifyPauseState() && game.state.paused" @click="resumeGame">Resume Game</button>
-          <button class="btn btn-danger" v-if="!game.state.startDate && game.settings.general.isGameAdmin" @click="forceStartGame">Force start Game</button>
+          <button class="btn btn-danger ms-1" v-if="!game.state.startDate && game.settings.general.isGameAdmin" @click="forceStartGame">Force start Game</button>
           <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success ms-1">Open Game <i class="fas fa-arrow-right"></i></router-link>
         </div>
       </div>

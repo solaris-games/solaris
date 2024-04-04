@@ -36,7 +36,7 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
         // TODO: This needs to utilise a response middleware function to map the game object to a response object.
         async (req, res, next) => {
             try {
-                req.game.settings.general.isGameAdmin = await container.gameAuthService.isGameAdmin(req.game, req.user._id);
+                req.game.settings.general.isGameAdmin = await container.gameAuthService.isGameAdmin(req.game, req.session.userId);
 
                 delete req.game.settings.general.password;
 

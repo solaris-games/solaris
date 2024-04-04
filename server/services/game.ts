@@ -242,6 +242,12 @@ export default class GameService extends EventEmitter {
             throw new ValidationError('You do not have permission to force start this game.');
         }
 
+        // TODO: Validate at least one non-open slot
+
+        // TODO: Prevent slots from being filled
+
+        // TODO: Prevent game from ending
+
         this.gameJoinService.assignNonUserPlayersToAI(game);
 
         await game.save();
