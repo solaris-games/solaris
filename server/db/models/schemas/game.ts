@@ -63,6 +63,7 @@ const schema = new Schema({
 			readyToQuit: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'enabled' },
 			readyToQuitFraction: { type: Types.Number, required: false, min: 0.5, max: 1.0, default: 1.0 },
 			readyToQuitTimerCycles: { type: Types.Number, required: false, min: 0, max: 3, default: 0 },
+			allowBotWin: { type: Types.Boolean, required: false, default: false },
         },
         galaxy: {
 			galaxyType: { type: Types.String, required: true, enum: ['circular', 'spiral', 'doughnut','circular-balanced', 'irregular', 'custom'], default: 'circular' },

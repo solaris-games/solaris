@@ -769,6 +769,8 @@ export default class GameTickService extends EventEmitter {
     }
 
     async _gameWinCheck(game: Game, gameUsers: User[]) {
+        // TODO: Modify for bot win case
+
         const isTutorialGame = this.gameTypeService.isTutorialGame(game);
 
 
