@@ -242,13 +242,18 @@ export default class GameService extends EventEmitter {
             throw new ValidationError('You do not have permission to force start this game.');
         }
 
-        // TODO: Validate at least one non-open slot
+        const players = game.settings.general.playerLimit;
+        const filledSlots = game.galaxy.players.filter(p => !p.isOpenSlot).length;
 
-        // TODO: Prevent slots from being filled
+        if (filledSlots === players) {
+            throw new ValidationError('Cannot force start a game that is already full.');
+        }
+
+        this.gameJoinService.assignNonUserPlayersToAI(game, false);
+
+        this.gameJoinService.startGame(game);
 
         // TODO: Prevent game from ending
-
-        this.gameJoinService.assignNonUserPlayersToAI(game);
 
         await game.save();
     }
