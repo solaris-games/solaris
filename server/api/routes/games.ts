@@ -308,7 +308,7 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
         }),
         mw.game.validateGameState({
             isUnlocked: true,
-            isInProgress: true
+            isInProgress: false
         }),
         controller.forceStart,
         mw.core.handleError);
