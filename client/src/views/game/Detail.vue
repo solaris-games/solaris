@@ -12,6 +12,8 @@
       <p v-if="isNewPlayerGame" class="text-warning">New Player Games do not affect Rank or Victories.</p>
       <p v-if="isCustomFeaturedGame" class="text-warning">This is a featured game and will award rank points.</p>
 
+      <p v-for="error of errors" class="text-danger">{{error}}</p>
+
       <div class="row mb-1 bg-dark pt-2 pb-2">
         <div class="col">
           <router-link to="/game/list" tag="button" class="btn btn-primary"><i class="fas fa-arrow-left"></i> Return to List</router-link>
@@ -57,6 +59,7 @@ export default {
   data () {
     return {
       isLoading: true,
+      errors: [],
       game: {
         _id: null,
         settings: {
@@ -89,6 +92,7 @@ export default {
 
         this.game = response.data
       } catch (err) {
+        this.errors = err.response.data.errors;
         console.error(err)
       }
 
@@ -105,6 +109,7 @@ export default {
 
           await this.loadGame()
         } catch (err) {
+          this.errors = err.response.data.errors;
           console.error(err)
         }
 
@@ -122,6 +127,8 @@ export default {
 
           await this.loadGame()
         } catch (err) {
+          this.errors = err.response.data.errors;
+          console.error(this.error);
           console.error(err)
         }
 
@@ -139,6 +146,7 @@ export default {
 
           await this.loadGame()
         } catch (err) {
+          this.errors = err.response.data.errors;
           console.error(err)
         }
 
@@ -156,6 +164,7 @@ export default {
             router.push({name: 'main-menu'})
           }
         } catch (err) {
+          this.errors = err.response.data.errors;
           console.error(err)
         }
 
