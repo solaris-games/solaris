@@ -249,6 +249,10 @@ export default class GameService extends EventEmitter {
             throw new ValidationError('Cannot force start a game that is already full.');
         }
 
+        if (filledSlots === 0) {
+            throw new ValidationError('Cannot force start game: at least one human player is needed');
+        }
+
         this.gameJoinService.assignNonUserPlayersToAI(game, false);
 
         this.gameJoinService.startGame(game);
