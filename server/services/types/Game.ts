@@ -105,7 +105,6 @@ export interface GameSettings {
 		readyToQuit: GameSettingEnabledDisabled;
 		readyToQuitFraction?: ReadyToQuitFraction;
 		readyToQuitTimerCycles?: ReadyToQuitTimerCycles;
-		allowBotWin: boolean;
 	},
 	galaxy: {
 		galaxyType: GameGalaxyType;

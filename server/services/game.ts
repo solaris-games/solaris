@@ -257,7 +257,7 @@ export default class GameService extends EventEmitter {
 
         this.gameJoinService.startGame(game);
 
-        game.settings.general.allowBotWin = true;
+        // TODO: Prevent game from ending
 
         await game.save();
     }
