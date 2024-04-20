@@ -41,7 +41,11 @@ class GameHelper {
     return game.galaxy.players.find(x => x._id === star.ownedByPlayerId)
   }
 
-  getStarsOwnedByPlayer (player, stars) {
+  getStarsOwnedByPlayer(player, stars) {
+    if (player == null) {
+      return [];
+    }
+
     return stars.filter(s => s.ownedByPlayerId && s.ownedByPlayerId === player._id)
   }
 
@@ -1077,6 +1081,12 @@ class GameHelper {
     const fromEconomy = player.stats.totalEconomy * 10
     const upkeep = this._getUpkeepCosts(game, player);
     return fromEconomy - upkeep  + this._getBankingCredits(game, player);
+  }
+
+  calculateTickIncome(game, player) {
+    let stars = this.getStarsOwnedByPlayer(player, game.galaxy.stars).filter(s => s.specialistId === 12); // Financial Analyst
+
+    return stars.reduce((totalScience, star) => totalScience + star.infrastructure.science, 0) * game.constants.research.sciencePointMultiplier;
   }
 
   isStarHasMultiplePlayersInOrbit (game, star) {
