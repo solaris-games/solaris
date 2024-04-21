@@ -72,6 +72,7 @@ import BasicAIService from "../basicAi";
 import PathfindingService from "../pathfinding";
 import UserLeaderboardService from "../userLeaderboard";
 import TeamService from "../team";
+import GameAuthService from "../gameAuth";
 
 export interface DependencyContainer {
     config: Config,
@@ -88,6 +89,7 @@ export interface DependencyContainer {
     leaderboardService: LeaderboardService,
     userLeaderboardService: UserLeaderboardService,
     gameService: GameService,
+    gameAuthService: GameAuthService,
     gameJoinService: GameJoinService,
     gameCreateValidationService: GameCreateValidationService,
     gameCreateService: GameCreateService,

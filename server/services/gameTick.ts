@@ -634,7 +634,7 @@ export default class GameTickService extends EventEmitter {
             let carrier = contestedStar.carriersInOrbit
                 .sort((a: Carrier, b: Carrier) => b.ships! - a.ships!)[0];
 
-            this.starService.claimUnownedStar(game, gameUsers, contestedStar.star, carrier);
+            await this.starService.claimUnownedStar(game, gameUsers, contestedStar.star, carrier);
         }
     }
 

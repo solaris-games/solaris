@@ -20,6 +20,8 @@ import PlayerReadyService from './playerReady';
 import GamePlayerQuitEvent from './types/events/GamePlayerQuit';
 import GamePlayerDefeatedEvent from './types/events/GamePlayerDefeated';
 import {LeaderboardPlayer} from "./types/Leaderboard";
+import GameJoinService from "./gameJoin";
+import GameAuthService from "./gameAuth";
 
 export const GameServiceEvents = {
     onPlayerQuit: 'onPlayerQuit',
@@ -40,6 +42,8 @@ export default class GameService extends EventEmitter {
     gameStateService: GameStateService;
     conversationService: ConversationService;
     playerReadyService: PlayerReadyService;
+    gameJoinService: GameJoinService;
+    gameAuthService: GameAuthService;
 
     constructor(
         gameRepo: Repository<Game>,
@@ -53,7 +57,9 @@ export default class GameService extends EventEmitter {
         gameTypeService: GameTypeService,
         gameStateService: GameStateService,
         conversationService: ConversationService,
-        playerReadyService: PlayerReadyService
+        playerReadyService: PlayerReadyService,
+        gameJoinService: GameJoinService,
+        gameAuthService: GameAuthService,
     ) {
         super();
         
@@ -69,6 +75,8 @@ export default class GameService extends EventEmitter {
         this.gameStateService = gameStateService;
         this.conversationService = conversationService;
         this.playerReadyService = playerReadyService;
+        this.gameJoinService = gameJoinService;
+        this.gameAuthService = gameAuthService;
     }
 
     async getByIdAll(id: DBObjectId): Promise<Game | null> {
@@ -229,11 +237,34 @@ export default class GameService extends EventEmitter {
         this.emit(GameServiceEvents.onPlayerDefeated, e);
     }
 
-    async setPauseState(game: Game, pauseState: boolean, pausingUserId: DBObjectId) {
-        const gameCreatorId = game.settings.general.createdByUserId;
+    async forceStart(game: Game, forceStartingUserId: DBObjectId) {
+        if (!await this.gameAuthService.isGameAdmin(game, forceStartingUserId)) {
+            throw new ValidationError('You do not have permission to force start this game.');
+        }
 
-        if (!gameCreatorId || gameCreatorId.toString() !== pausingUserId.toString()) {
-            throw new ValidationError('Only the game creator can pause the game.');
+        const players = game.settings.general.playerLimit;
+        const filledSlots = game.galaxy.players.filter(p => !p.isOpenSlot).length;
+
+        if (filledSlots === players) {
+            throw new ValidationError('Cannot force start a game that is already full.');
+        }
+
+        if (filledSlots === 0) {
+            throw new ValidationError('Cannot force start game: at least one human player is needed');
+        }
+
+        this.gameJoinService.assignNonUserPlayersToAI(game, false);
+
+        this.gameJoinService.startGame(game);
+
+        // TODO: Prevent game from ending
+
+        await game.save();
+    }
+
+    async setPauseState(game: Game, pauseState: boolean, pausingUserId: DBObjectId) {
+        if (!await this.gameAuthService.isGameAdmin(game, pausingUserId)) {
+            throw new ValidationError('You do not have permission to pause/unpause this game.');
         }
 
         if (!this.gameStateService.isInProgress(game)) {

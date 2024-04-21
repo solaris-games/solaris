@@ -12,6 +12,8 @@
       <p v-if="isNewPlayerGame" class="text-warning">New Player Games do not affect Rank or Victories.</p>
       <p v-if="isCustomFeaturedGame" class="text-warning">This is a featured game and will award rank points.</p>
 
+      <p v-for="error of errors" class="text-danger">{{error}}</p>
+
       <div class="row mb-1 bg-dark pt-2 pb-2">
         <div class="col">
           <router-link to="/game/list" tag="button" class="btn btn-primary"><i class="fas fa-arrow-left"></i> Return to List</router-link>
@@ -20,6 +22,7 @@
           <button class="btn btn-danger" v-if="!game.state.startDate && game.settings.general.isGameAdmin" @click="deleteGame">Delete Game</button>
           <button class="btn btn-warning" v-if="canModifyPauseState() && !game.state.paused" @click="pauseGame">Pause Game</button>
           <button class="btn btn-warning" v-if="canModifyPauseState() && game.state.paused" @click="resumeGame">Resume Game</button>
+          <button class="btn btn-danger ms-1" v-if="!game.state.startDate && game.settings.general.isGameAdmin" @click="forceStartGame">Force start Game</button>
           <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success ms-1">Open Game <i class="fas fa-arrow-right"></i></router-link>
         </div>
       </div>
@@ -56,6 +59,7 @@ export default {
   data () {
     return {
       isLoading: true,
+      errors: [],
       game: {
         _id: null,
         settings: {
@@ -88,6 +92,7 @@ export default {
 
         this.game = response.data
       } catch (err) {
+        this.errors = err.response.data.errors;
         console.error(err)
       }
 
@@ -104,6 +109,26 @@ export default {
 
           await this.loadGame()
         } catch (err) {
+          this.errors = err.response.data.errors;
+          console.error(err)
+        }
+
+        this.isLoading = false
+      }
+    },
+    async forceStartGame () {
+      if (await this.$confirm('Force start game', 'All open slots will be filled with bots. Are you sure you want to force start this game?')) {
+        this.isLoading = true
+
+        try {
+          await gameService.forceStart(this.game._id)
+
+          this.$toasted.show(`The game has been force started. Please notify the players.`, { type: 'success' })
+
+          await this.loadGame()
+        } catch (err) {
+          this.errors = err.response.data.errors;
+          console.error(this.error);
           console.error(err)
         }
 
@@ -121,6 +146,7 @@ export default {
 
           await this.loadGame()
         } catch (err) {
+          this.errors = err.response.data.errors;
           console.error(err)
         }
 
@@ -138,6 +164,7 @@ export default {
             router.push({name: 'main-menu'})
           }
         } catch (err) {
+          this.errors = err.response.data.errors;
           console.error(err)
         }
 
