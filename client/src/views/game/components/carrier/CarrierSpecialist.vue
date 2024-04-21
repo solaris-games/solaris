@@ -34,36 +34,34 @@ export default {
   },
   data () {
     return {
-      userPlayer: null,
       carrier: null,
       canHireSpecialist: false
     }
   },
   mounted () {
-    this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
     this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
 
-    this.canHireSpecialist = this.userPlayer
-      && this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none'
-      && this.userPlayer._id === this.carrier.ownedByPlayerId
-      && this.carrier.orbiting
-      && !this.isDeadStar
-      && (!this.carrier.specialistId || !this.carrier.specialist.oneShot)
+    if (this.carrier.orbiting) {
+      let userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
+      let star = GameHelper.getCarrierOrbitingStar(this.$store.state.game, this.carrier)
+      let isDeadStar = GameHelper.isDeadStar(star)
+
+      this.canHireSpecialist = userPlayer
+        && this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none'  // Specs are enabled
+        && userPlayer._id === this.carrier.ownedByPlayerId                     // User owns the carrier
+        && star.ownedByPlayerId === this.carrier.ownedByPlayerId               // User owns the star
+        && !isDeadStar                                                         // Star isn't dead
+        && (!this.carrier.specialistId || !this.carrier.specialist.oneShot)         // Carrier doesn't already have a spec on it
+    }
   },
   methods: {
     onViewHireCarrierSpecialistRequested() {
         this.$emit('onViewHireCarrierSpecialistRequested', this.carrierId)
-    },
-    getCarrierOrbitingStar () {
-      return GameHelper.getCarrierOrbitingStar(this.$store.state.game, this.carrier)
     }
   },
   computed: {
     isGameFinished: function () {
       return GameHelper.isGameFinished(this.$store.state.game)
-    },
-    isDeadStar: function () {
-      return GameHelper.isDeadStar(this.getCarrierOrbitingStar())
     }
   }
 }

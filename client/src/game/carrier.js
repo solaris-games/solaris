@@ -12,11 +12,11 @@ class Carrier extends EventEmitter {
   constructor ( pathManager ) {
     super()
 
-    this.container = new PIXI.Container()
     this.fixedContainer = new PIXI.Container() // this container isnt affected by culling or user setting scalling
-    this.container.interactive = true
+    this.container = new PIXI.Container()
+    this.container.eventMode = 'static'
     this.container.interactiveChildren = false
-    this.container.buttonMode = true
+    this.container.cursor = 'pointer'
 
     this.graphics_colour = new PIXI.Sprite()
     this.graphics_selected = new PIXI.Graphics()
@@ -101,7 +101,7 @@ class Carrier extends EventEmitter {
       this.container.removeChild(this.graphics_colour)
       this.graphics_colour = null
     }
-    
+
     if (!this.data.orbiting) {
       this.drawShape();
     }
@@ -272,17 +272,17 @@ class Carrier extends EventEmitter {
   enableInteractivity() {
     // Can only be interactive if its in transit
     if (!this.data.orbiting) {
-      this.container.interactive = true
-      this.container.buttonMode = true
+      this.container.eventMode = 'static'
+      this.container.cursor = 'pointer'
     } else {
-      this.container.interactive = false
-      this.container.buttonMode = false
+      this.container.eventMode = 'passive'
+      this.container.cursor = null
     }
   }
 
   disableInteractivity() {
-    this.container.interactive = false
-    this.container.buttonMode = false
+    this.container.eventMode = 'passive'
+    this.container.cursor = null
   }
 
   onZoomChanging(zoomPercent) {

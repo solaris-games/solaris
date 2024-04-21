@@ -19,10 +19,10 @@
 
     <div class="row mb-1">
         <div class="col">
-            <input v-model.lazy="starShips" type="number" class="form-control" @change="onStarShipsChanged">
+            <input v-model="starShips" type="number" class="form-control" @input="onStarShipsChanged" @blur="onStarShipsBlur">
         </div>
         <div class="col">
-            <input v-model.lazy="carrierShips" type="number" class="form-control" @change="onCarrierShipsChanged">
+            <input v-model="carrierShips" type="number" class="form-control" @input="onCarrierShipsChanged" @blur="onCarrierShipsBlur">
         </div>
     </div>
 
@@ -67,7 +67,7 @@
         </div>
         <div class="col-auto">
           <div class="d-grid gap-2">
-            <button type="button" class="btn btn-info" :disabled="$isHistoricalMode() || isBuildingCarrier || starShips < 0 || carrierShips < 0" @click="saveTransfer">
+            <button type="button" class="btn btn-info" :disabled="$isHistoricalMode() || isBuildingCarrier || starShips < 0 || carrierShips < 1" @click="saveTransfer">
                 <i class="fas fa-rocket"></i>
                 Build for ${{star.upgradeCosts.carriers}}
             </button>
@@ -108,13 +108,19 @@ export default {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
     },
-    onStarShipsChanged (e) {
-      let difference = parseInt(this.starShips) - this.star.ships
+    onStarShipsChanged(e) {
+      let difference = this.ensureInt(this.starShips) - this.star.ships
       this.carrierShips = Math.abs(difference)
     },
-    onCarrierShipsChanged (e) {
-      let difference = parseInt(this.carrierShips)
+    onStarShipsBlur(e) {
+      this.starShips = this.ensureInt(this.starShips);
+    },
+    onCarrierShipsChanged(e) {
+      let difference = this.ensureInt(this.carrierShips);
       this.starShips = this.star.ships - difference
+    },
+    onCarrierShipsBlur(e) {
+      this.carrierShips = this.ensureInt(this.carrierShips);
     },
     onMinShipsClicked (e) {
       this.carrierShips = 1
@@ -131,6 +137,15 @@ export default {
     onTransferRightClicked (e) {
       this.carrierShips+=e
       this.starShips-=e
+    },
+    ensureInt(v) {
+      v = parseInt(v);
+
+      if (isNaN(v)) {
+        v = 0;
+      }
+
+      return v;
     },
     onOpenStarDetailRequested (e) {
         this.$emit('onOpenStarDetailRequested', this.star._id)

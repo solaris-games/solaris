@@ -248,20 +248,7 @@ export default class GameJoinService extends EventEmitter {
                 (this.gameTypeService.isTutorialGame(game) && game.state.players > 0);
     
             if (shouldStartGame) {
-                let startDate = moment().utc();
-    
-                if (this.gameTypeService.isRealTimeGame(game)) {
-                    // Add the start delay to the start date.
-                    startDate.add(game.settings.gameTime.startDelay, 'minute');
-                }
-    
-                game.state.paused = false;
-                game.state.startDate = startDate;
-                game.state.lastTickDate = startDate;
-    
-                for (let player of game.galaxy.players) {
-                    this.playerService.updateLastSeen(game, player, startDate);
-                }
+                this.startGame(game);
             }
         } else {
             this.playerService.updateLastSeen(game, player);
@@ -276,7 +263,24 @@ export default class GameJoinService extends EventEmitter {
         return shouldStartGame;
     }
 
-    assignNonUserPlayersToAI(game: Game) {
+    startGame(game: Game) {
+        let startDate = moment().utc();
+
+        if (this.gameTypeService.isRealTimeGame(game)) {
+            // Add the start delay to the start date.
+            startDate.add(game.settings.gameTime.startDelay, 'minute');
+        }
+
+        game.state.paused = false;
+        game.state.startDate = startDate;
+        game.state.lastTickDate = startDate;
+
+        for (let player of game.galaxy.players) {
+            this.playerService.updateLastSeen(game, player, startDate);
+        }
+    }
+
+    assignNonUserPlayersToAI(game: Game, slotsOpen: boolean | undefined = undefined) {
         // For all AI, assign a random alias and an avatar.
         const players = game.galaxy.players.filter(p => p.userId == null);
 
@@ -307,9 +311,13 @@ export default class GameJoinService extends EventEmitter {
             if (this.gameTypeService.isTurnBasedGame(game)) {
                 player.ready = true;
             }
-            
-            // If its a tutorial game we want to keep the slot closed.
-            player.isOpenSlot = !this.gameTypeService.isTutorialGame(game);
+
+            if (slotsOpen === undefined) {
+                // If it's a tutorial game we want to keep the slot closed.
+                player.isOpenSlot = !this.gameTypeService.isTutorialGame(game);
+            } else {
+                player.isOpenSlot = slotsOpen;
+            }
         }
     }
 

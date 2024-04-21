@@ -1,21 +1,14 @@
 <template>
 <form class="pb-1 conversation">
-    <div class="mention-overlay bg-dark mb-1" v-if="suggestMentions && currentMention && currentMention.suggestions && currentMention.suggestions.length">
-      <ul>
-        <li v-for="(suggestion, index) in currentMention.suggestions" :class="{ selected: index === selectedSuggestion }" :key="suggestion" @click="() => useSuggestion(suggestion)">{{suggestion}}</li>
-      </ul>
+  <mention-box placeholder="Compose a message" :rows="3" v-model="$store.state.currentConversation.text" @input="onMessageChange" @onSetMessageElement="onSetMessageElement" @onReplaceInMessage="onReplaceInMessage" @onFinish="send"></mention-box>
+  <div class="mb-2 text-end">
+    <div class="d-grid gap-2">
+      <button type="button" class="btn btn-success" @click="send" :disabled="isSendingMessage">
+        <i class="fas fa-paper-plane"></i>
+        Send Message
+      </button>
     </div>
-    <div class="mb-2 mb-2">
-        <textarea class="form-control" id="txtMessage" rows="3" :placeholder="placeholderText" ref="messageElement" :value="this.$store.state.currentConversation.text" @input="onMessageChange" @keydown="onKeyDown" @keyup="updateSuggestions" @select="updateSuggestions" @focus="updateSuggestions"></textarea>
-    </div>
-    <div class="mb-2 text-end">
-      <div class="d-grid gap-2">
-        <button type="button" class="btn btn-success" @click="send" :disabled="isSendingMessage">
-          <i class="fas fa-paper-plane"></i>
-          Send Message
-        </button>
-      </div>
-    </div>
+  </div>
 </form>
 </template>
 
@@ -23,83 +16,44 @@
 import MentionHelper from '../../../../../services/mentionHelper';
 import ConversationApiService from '../../../../../services/api/conversation'
 import AudioService from '../../../../../game/audio'
+import MentionBox from '../../shared/MentionBox';
 
 export default {
   components: {
-    
+    'mention-box': MentionBox
   },
   props: {
     conversationId: String,
   },
+  destroyed() {
+    this.$store.commit('resetMentions')
+  },
   data () {
     return {
       isSendingMessage: false,
-      focused: false,
-      suggestMentions: false,
       currentMention: null,
       selectedSuggestion: null
     }
   },
-  mounted () {
-    this.$store.commit('setConversationElement', this.$refs.messageElement)
-    this.suggestMentions = this.$store.state.settings.interface.suggestMentions === 'enabled'
-  },
   methods: {
-    useSuggestion (suggestion) {
-      if (this.suggestMentions && this.currentMention) {
-        this.selectedSuggestion = null
-        
-        this.$store.commit('replaceInConversationText', {
-          mention: this.currentMention.mention,
-          text: suggestion
-        })
-      }
-    },
-    setSelectedSuggestion (newSelected) {
-      const suggestions = this.currentMention.suggestions.length
-      //Modulo instead of remainder so instead of -1 we get the last suggestion
-      this.selectedSuggestion = ((newSelected % suggestions) + suggestions) % suggestions
-    },
-    async onKeyDown (e) {
-      const isEnterTabKey = e.key === "Enter" || e.key === "Tab"
-
-      if (isEnterTabKey && (e.ctrlKey || e.metaKey)) {
-          e.preventDefault()
-          await this.send()
-      } else if (this.suggestMentions && this.currentMention) {
-        if (isEnterTabKey && this.selectedSuggestion !== null && this.selectedSuggestion !== undefined) {
-          e.preventDefault()
-          this.useSuggestion(this.currentMention.suggestions[this.selectedSuggestion])
-        } else if (e.key === "ArrowDown" || e.key === "Tab") {
-          e.preventDefault()
-          this.setSelectedSuggestion(this.selectedSuggestion + 1)
-        } else if (e.key === "ArrowUp") {
-          e.preventDefault()
-          this.setSelectedSuggestion(this.selectedSuggestion - 1)
+    onSetMessageElement (element) {
+      this.$store.commit('setMentions', {
+        element,
+        callbacks: {
+          player: (player) => {
+            this.$store.commit('updateCurrentConversationText', MentionHelper.addMention(this.$store.state.currentConversation.text, this.$store.state.mentionReceivingElement, 'player', player.alias))
+          },
+          star: (star) => {
+            this.$store.commit('updateCurrentConversationText', MentionHelper.addMention(this.$store.state.currentConversation.text, this.$store.state.mentionReceivingElement, 'star', star.name))
+          }
         }
-      }
-    },
-    updateSuggestions () {
-      if (this.suggestMentions) {
-        const oldMention = this.currentMention
-
-        this.currentMention = MentionHelper.getCurrentMention(this.$store.state.game, this.$refs.messageElement)
-        const newSuggestions = this.currentMention && this.currentMention.suggestions && this.currentMention.suggestions.length
-
-        if (oldMention && !this.currentMention) {
-          this.selectedSuggestion = null //Mention was left
-        } else if ((!oldMention || !oldMention.suggestions || !oldMention.suggestions.length) && newSuggestions) {
-          this.selectedSuggestion = 0 //Mention was started
-        }
-
-        if (this.currentMention && this.selectedSuggestion != null) {
-          //When the number of new suggestions is smaller, the selection might not get displayed otherwise
-          this.setSelectedSuggestion(this.selectedSuggestion)
-        }
-      }
+      })
     },
     onMessageChange (e) {
-      this.$store.commit('updateCurrentConversationText', e.target.value)
+      this.$store.commit('updateCurrentConversationText', e)
+    },
+    onReplaceInMessage (data) {
+      this.$store.commit('updateCurrentConversationText', MentionHelper.useSuggestion(this.$store.state.currentConversation.text, this.$store.state.mentionReceivingElement, data))
     },
     async send () {
       let messageText = ''
@@ -134,11 +88,6 @@ export default {
       this.isSendingMessage = false
     }
   },
-  computed: {
-    placeholderText: function () {
-      return !this.suggestMentions ? 'Compose a message...' : 'Compose a message. Use @ for players and # for stars.'
-    }
-  }
 }
 </script>
 

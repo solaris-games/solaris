@@ -74,6 +74,10 @@ export default class WaypointService {
             throw new ValidationError('Cannot plot more than 30 waypoints.');
         }
 
+        if (carrier.isGift) {
+            throw new ValidationError('Cannot alter waypoints for a gifted carrier.');
+        }
+
         // If the carrier is currently in transit then double check that the first waypoint
         // matches the source and destination.
         if (!carrier.orbiting) {
@@ -336,6 +340,19 @@ export default class WaypointService {
         let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, effectiveTechs.hyperspace);
 
         return distanceBetweenStars <= hyperspaceDistance
+    }
+
+    calculateTicksForDistance(game: Game, player: Player, carrier: Carrier, sourceStar: Star, destinationStar: Star): number {
+        const distance = this.distanceService.getDistanceBetweenLocations(sourceStar.location, destinationStar.location);
+        const warpSpeed = this.carrierMovementService.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar);
+
+        let tickDistance = this.carrierMovementService.getCarrierDistancePerTick(game, carrier, warpSpeed, false);
+
+        if (tickDistance) {
+            return Math.ceil(distance / tickDistance);
+        }
+
+        return 1;
     }
 
     calculateWaypointTicks(game: Game, carrier: Carrier, waypoint: CarrierWaypoint) {

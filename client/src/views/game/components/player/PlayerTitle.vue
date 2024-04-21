@@ -5,6 +5,7 @@
           <h4 class="pt-2">
             <player-icon :playerId="player._id" class="me-1"/>
             {{player.alias}}
+            <team-name :player-id="player._id" />
           </h4>
       </div>
       <div class="col-auto">
@@ -36,9 +37,11 @@ import PlayerOpenSlotStatusVue from './PlayerOpenSlotStatus'
 import PlayerOnlineStatusVue from './PlayerOnlineStatus'
 import PlayerMissedTurnsVue from './PlayerMissedTurns'
 import PlayerDiplomaticStatusIcon from './PlayerDiplomaticStatusIcon'
+import TeamName from '../shared/TeamName';
 
 export default {
   components: {
+    'team-name': TeamName,
     'player-icon': PlayerIconVue,
     'player-open-slot-status': PlayerOpenSlotStatusVue,
     'player-online-status': PlayerOnlineStatusVue,
@@ -59,7 +62,7 @@ export default {
   methods: {
     getFriendlyColour (colour) {
       return GameHelper.getFriendlyColour(colour)
-    },  
+    },
     getPlayerStatus () {
       return GameHelper.getPlayerStatus(this.player)
     }

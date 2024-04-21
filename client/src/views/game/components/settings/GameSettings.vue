@@ -11,7 +11,7 @@
       <table class="table table-striped table-hover">
         <tbody>
           <game-setting-value title="Mode"
-            tooltip="The game mode Conquest is victory by stars, Battle Royale is last man standing in a constantly shrinking galaxy and King of the Hill is a fight for a key star"
+            tooltip="The game mode Conquest is victory by stars, Battle Royale is last man standing in a constantly shrinking galaxy, King of the Hill is a fight for a key star, Team conquest is Conquest, but with teams"
             :valueText="getFriendlyText(game.settings.general.mode)"
             :value="game.settings.general.mode"
             :compareValue="compareSettings.general.mode"/>
@@ -20,19 +20,25 @@
             :valueText="getFriendlyText(game.settings.conquest.victoryCondition)"
             :value="game.settings.conquest.victoryCondition"
             :compareValue="compareSettings.conquest.victoryCondition"
-            v-if="game.settings.general.mode === 'conquest'"/>
+            v-if="game.settings.general.mode === 'conquest' || game.settings.general.mode === 'teamConquest'"/>
           <game-setting-value title="Stars For Victory"
             tooltip="How many stars are needed for a player to win the game"
             :valueText="game.settings.conquest.victoryPercentage + '%'"
             :value="game.settings.conquest.victoryPercentage"
             :compareValue="compareSettings.conquest.victoryPercentage"
-            v-if="game.settings.general.mode === 'conquest'"/>
+            v-if="game.settings.general.mode === 'conquest' || game.settings.general.mode === 'teamConquest'"/>
           <game-setting-value title="Capital Star Elimination"
             tooltip="Determines whether players become defeated if they lose control of their capital star"
             :valueText="getFriendlyText(game.settings.conquest.capitalStarElimination)"
             :value="game.settings.conquest.capitalStarElimination"
             :compareValue="compareSettings.conquest.capitalStarElimination"
-            v-if="game.settings.general.mode === 'conquest'"/>
+            v-if="game.settings.general.mode === 'conquest' || game.settings.general.mode === 'teamConquest'"/>
+          <game-setting-value title="Number of teams"
+            tooltip="The number of teams in the game"
+            :valueText="game.settings.conquest.teamsCount"
+            :value="game.settings.conquest.teamsCount"
+            :compare-value="0"
+            v-if="game.settings.general.mode === 'teamConquest'" />
           <game-setting-value title="Countdown Cycles"
             tooltip="How long the countdown is to the end of the game in production cycles when the center star is captured"
             :valueText="game.settings.kingOfTheHill.productionCycles"
@@ -74,6 +80,41 @@
             :valueText="getFriendlyText(game.settings.general.spectators)"
             :value="game.settings.general.spectators"
             :compareValue="compareSettings.general.spectators"/>
+          <game-setting-value title="Allow Ready To Quit"
+            tooltip="Allow players to 'Ready To Quit' to finish games early"
+            :valueText="getFriendlyText(game.settings.general.readyToQuit)"
+            :value="game.settings.general.readyToQuit"
+            :compareValue="compareSettings.general.readyToQuit"/>
+          <game-setting-value title="Fraction of stars for RTQ"
+            v-if="game.settings.general.readyToQuit === 'enabled'"
+            tooltip="Fraction of stars for triggering RTQ condition"
+            :valueText="game.settings.general.readyToQuitFraction"
+            :value="game.settings.general.readyToQuitFraction"
+            :compareValue="compareSettings.general.readyToQuitFraction"/>
+          <game-setting-value title="Timer for RTQ"
+            v-if="game.settings.general.readyToQuit === 'enabled'"
+            tooltip="Time until game finishes after RTQ"
+            :valueText="game.settings.general.readyToQuitTimerCycles"
+            :value="game.settings.general.readyToQuitTimerCycles"
+            :compareValue="compareSettings.general.readyToQuitTimerCycles"/>
+          <game-setting-value title="Players that will receive rank"
+            tooltip="Players that will receive rank"
+            :valueText="getFriendlyText(game.settings.general.awardRankTo)"
+            :value="game.settings.general.awardRankTo"
+            :compareValue="compareSettings.general.awardRankTo"
+          />
+          <game-setting-value v-if="game.settings.general.awardRankTo === 'top_n'"
+            title="Number of top/bottom players for rank distribution"
+            tooltip="Top N players will receive rank, and bottom N players will lose rank"
+            :valueText="game.settings.general.awardRankToTopN"
+            :value="game.settings.general.awardRankToTopN"
+            :compareValue="compareSettings.general.awardRankToTopN"
+          />
+          <game-setting-value title="Allow Abandon Stars"
+            tooltip="Allow players to abandon their stars"
+            :valueText="getFriendlyText(game.settings.player.allowAbandonStars)"
+            :value="game.settings.player.allowAbandonStars"
+            :compareValue="compareSettings.player.allowAbandonStars"/>
         </tbody>
       </table>
     </div>
@@ -278,7 +319,7 @@
             v-if="game.settings.galaxy.galaxyType !== 'custom'"/>
           <game-setting-value title="Carrier Speed"
             tooltip="Carriers go brrr"
-            :valueText="(game.settings.specialGalaxy.carrierSpeed / game.constants.distances.lightYear)+'/ly tick'"
+            :valueText="(game.settings.specialGalaxy.carrierSpeed / game.constants.distances.lightYear)+' ly/tick'"
             :value="game.settings.specialGalaxy.carrierSpeed"
             :compareValue="compareSettings.specialGalaxy.carrierSpeed"/>
           <game-setting-value title="Star Capture Rewards"
@@ -417,6 +458,12 @@
             :valueText="getFriendlyText(game.settings.diplomacy.enabled)"
             :value="game.settings.diplomacy.enabled"
             :compareValue="compareSettings.diplomacy.enabled"/>
+          <game-setting-value title="Locked Alliances"
+            tooltip="If enabled, alliances cannot be canceled."
+            :valueText="getFriendlyText(game.settings.diplomacy.lockedAlliances)"
+            :value="game.settings.diplomacy.lockedAlliances"
+            :compareValue="compareSettings.diplomacy.lockedAlliances"
+            v-if="game.settings.diplomacy.enabled === 'enabled'"/>
           <game-setting-value title="Max Number of Alliances"
             tooltip="Determines how many formal alliance each player may have at once"
             :valueText="getFriendlyText(game.settings.diplomacy.maxAlliances)"
@@ -535,6 +582,18 @@
             :valueText="getFriendlyText(game.settings.technology.bankingReward)"
             :value="game.settings.technology.bankingReward"
             :compareValue="compareSettings.technology.bankingReward"/>
+          <game-setting-value v-if="game.settings.technology.researchCostProgression"
+            title="Research Cost Progression"
+            tooltip="Determines the growth of research points needed for the next level of technology"
+            :valueText="getFriendlyText(game.settings.technology.researchCostProgression.progression)"
+            :value="game.settings.technology.researchCostProgression.progression"
+            :compareValue="compareSettings.technology.researchCostProgression.progression"/>
+          <game-setting-value v-if="game.settings.technology.researchCostProgression && game.settings.technology.researchCostProgression.progression === 'exponential'"
+            title="Exponential growth factor"
+            tooltip="Determines the speed of exponential growth"
+            :valueText="getFriendlyText(game.settings.technology.researchCostProgression.growthFactor)"
+            :value="game.settings.technology.researchCostProgression.growthFactor"
+            :compareValue="compareSettings.technology.researchCostProgression.growthFactor"/>
           <game-setting-value title="Experimentation Reward"
             tooltip="Determines the amount of research points awarded for the experimentation technology at the end of a galactic cycle"
             :valueText="getFriendlyText(game.settings.technology.experimentationReward)"
@@ -611,6 +670,7 @@ export default {
         'weightedCenter': 'Weighted (Center)',
         'irregular': 'Irregular',
         'circular': 'Circular',
+        'circularSequential': 'Circular (Sequential)',
         'spiral': 'Spiral',
         'doughnut': 'Doughnut',
         'circular-balanced': 'Circular Balanced',
@@ -623,6 +683,7 @@ export default {
         'creditsSpecialists': 'Specialist Tokens',
         'conquest': 'Conquest',
         'battleRoyale': 'Battle Royale',
+        'teamConquest': 'Team Conquest',
         'establishedPlayers': 'Established Players Only',
         'galacticCenter': 'Galactic Center',
         'galacticCenterOfMass': 'Galactic Center of Mass',
@@ -632,7 +693,12 @@ export default {
         'low': 'Low',
         'medium': 'Medium',
         'high': 'High',
-        'fog': 'Fogged'
+        'fog': 'Fogged',
+        'soft': 'Soft',
+        'hard': 'Hard',
+        'exponential': 'Exponential',
+        'winner': 'Winner',
+        'top_n': 'Top N',
       }[option]
 
       return text || option

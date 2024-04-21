@@ -3,16 +3,18 @@
     "name": "[[[RANDOM]]]",
     "description": "Stars in this galaxy are in orbit, embrace the chaos and use it to your advantage!",
     "type": "special_orbital",
+    "createdFromTemplate": "special_orbital",
     "mode": "conquest",
     "password": null,
-    "playerLimit": 8,
-    "playerType": "establishedPlayers",
+    "playerLimit": 10,
+    "playerType": "all",
     "anonymity": "normal",
     "playerOnlineStatus": "hidden",
     "timeMachine": "enabled",
     "fluxEnabled": "enabled",
     "advancedAI": "enabled",
-    "spectators": "disabled"
+    "spectators": "enabled",
+    "readyToQuit": "enabled"
   },
   "galaxy": {
     "galaxyType": "circular",
@@ -77,13 +79,14 @@
     "populationCap": {
       "enabled": "disabled",
       "shipsPerStar": 100
-    }
+    },
+    "allowAbandonStars": "disabled"
   },
   "diplomacy": {
     "enabled": "enabled",
     "upkeepCost": "none",
     "tradeRestricted": "disabled", 
-    "maxAlliances": 7, 
+    "maxAlliances": 9,
     "globalEvents": "disabled"
   },
   "technology": {
@@ -109,7 +112,7 @@
     },
     "bankingReward": "standard",
     "experimentationReward": "standard",
-    "specialistTokenReward": "standard"
+    "specialistTokenReward": "experimental"
   },
   "gameTime": {
     "gameType": "realTime",

@@ -81,8 +81,8 @@ export default class PlayerReadyService extends EventEmitter {
             throw new ValidationError('Cannot declare ready to quit until at least 1 production cycle has completed.');
         }
 
-        if (!force && this.gameTypeService.isTutorialGame(game)) {
-            throw new ValidationError('Cannot declare ready to quit in a tutorial.');
+        if (!force && game.settings.general.readyToQuit === 'disabled') {
+            throw new ValidationError('Cannot declare ready to quit in this game.');
         }
 
         player.readyToQuit = true;

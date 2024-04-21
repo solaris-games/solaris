@@ -1,5 +1,5 @@
 import ValidationError from '../errors/validation';
-import { Game, GameSettings } from './types/Game';
+import {Game, GameSettings, Team} from './types/Game';
 import AchievementService from './achievement';
 import ConversationService from './conversation';
 import GameCreateValidationService from './gameCreateValidation';
@@ -16,6 +16,11 @@ import UserService from './user';
 import GameJoinService from './gameJoin';
 import SpecialStarBanService from './specialStarBan';
 import StarService from './star';
+import DiplomacyService from "./diplomacy";
+import mongoose from "mongoose";
+import {DBObjectId} from "./types/DBObjectId";
+import {shuffle} from "./utils";
+import TeamService from "./team";
 
 const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
@@ -37,6 +42,8 @@ export default class GameCreateService {
     specialStarBanService: SpecialStarBanService;
     gameTypeService: GameTypeService;
     starService: StarService;
+    diplomacyService: DiplomacyService;
+    teamService: TeamService;
 
     constructor(
         gameModel,
@@ -55,7 +62,9 @@ export default class GameCreateService {
         specialistBanService: SpecialistBanService,
         specialStarBanService: SpecialStarBanService,
         gameTypeService: GameTypeService,
-        starService: StarService
+        starService: StarService,
+        diplomacyService: DiplomacyService,
+        teamService: TeamService,
     ) {
         this.gameModel = gameModel;
         this.gameJoinService = gameJoinService;
@@ -74,6 +83,8 @@ export default class GameCreateService {
         this.specialStarBanService = specialStarBanService;
         this.gameTypeService = gameTypeService;
         this.starService = starService;
+        this.diplomacyService = diplomacyService;
+        this.teamService = teamService;
     }
 
     async create(settings: GameSettings) {
@@ -122,6 +133,35 @@ export default class GameCreateService {
             settings.general.passwordRequired = true;
         }
 
+        // Validate team conquest settings
+        if (settings.general.mode === 'teamConquest') {
+            const teamsCount = settings.conquest?.teamsCount;
+
+            if (!teamsCount) {
+                throw new ValidationError("Team count not provided");
+            }
+
+            const valid = Boolean(teamsCount &&
+                settings.general.playerLimit >= 4 &&
+                settings.general.playerLimit % teamsCount === 0);
+
+            if (!valid) {
+                throw new ValidationError(`The number of players must be larger than 3 and divisible by the number of teams.`);
+            }
+
+            if (settings.diplomacy?.enabled !== 'enabled') {
+                throw new ValidationError('Diplomacy needs to be enabled for a team game.');
+            }
+
+            if (settings.diplomacy?.lockedAlliances !== 'enabled') {
+                throw new ValidationError('Locked alliances needs to be enabled for a team game.');
+            }
+
+            if (settings.diplomacy?.maxAlliances !== (settings.general.playerLimit / teamsCount) - 1) {
+                throw new ValidationError('Alliance limit too low for team size.');
+            }
+        }
+
         let game = new this.gameModel({
             settings
         }) as Game;
@@ -133,6 +173,10 @@ export default class GameCreateService {
 
         if (desiredPlayerStarCount > desiredStarCount) {
             throw new ValidationError(`Cannot create a galaxy of ${desiredStarCount} stars with ${game.settings.player.startingStars} stars per player.`);
+        }
+
+        if (desiredStarCount > 1000) {
+            throw new ValidationError(`Galaxy size cannot exceed 1000 stars.`);
         }
 
         // Ensure that c2c combat is disabled for orbital games.
@@ -156,6 +200,26 @@ export default class GameCreateService {
             };
         }
 
+        // Validate research costs
+        if (game.settings.technology.researchCostProgression?.progression === 'standard') {
+            game.settings.technology.researchCostProgression = {
+                progression: 'standard',
+            };
+        } else if (game.settings.technology.researchCostProgression?.progression === 'exponential') {
+            const growthFactor = game.settings.technology.researchCostProgression.growthFactor;
+
+            if (growthFactor && growthFactor === 'soft' || growthFactor === 'medium' || growthFactor === 'hard') {
+                game.settings.technology.researchCostProgression = {
+                    progression: 'exponential',
+                    growthFactor: growthFactor
+                };
+            } else {
+                throw new ValidationError('Invalid growth factor for research cost progression.');
+            }
+        } else {
+            throw new ValidationError('Invalid research cost progression.');
+        }
+
         // Ensure that tick limited games have their ticks to end state preset
         if (game.settings.gameTime.isTickLimited === 'enabled') {
             game.state.ticksToEnd = game.settings.gameTime.tickLimit;
@@ -174,9 +238,37 @@ export default class GameCreateService {
             game.settings.specialGalaxy.randomPulsars = 0;
         }
 
+        if (game.settings.general.readyToQuit === "enabled") {
+            game.settings.general.readyToQuitFraction = game.settings.general.readyToQuitFraction || 1.0;
+            game.settings.general.readyToQuitTimerCycles = game.settings.general.readyToQuitTimerCycles || 0;
+        }
+
         // Clamp max alliances if its invalid (minimum of 1)
-        game.settings.diplomacy.maxAlliances = Math.max(1, Math.min(game.settings.diplomacy.maxAlliances, game.settings.general.playerLimit - 1));
-        
+        let lockedAllianceMod = game.settings.diplomacy.lockedAlliances === 'enabled'
+            && game.settings.general.playerLimit >= 3 ? 1 : 0;
+        game.settings.diplomacy.maxAlliances = Math.max(1, Math.min(game.settings.diplomacy.maxAlliances, game.settings.general.playerLimit - 1 - lockedAllianceMod));
+
+        if (game.settings.general.mode === 'teamConquest') {
+            const teamsNumber = game.settings.conquest.teamsCount;
+
+            if (!teamsNumber) {
+                throw new ValidationError("Team count not provided");
+            }
+
+            game.settings.general.awardRankTo = 'teams';
+            game.settings.general.awardRankToTopN = undefined;
+        } else {
+            // No reason to check rank awarding for team games.
+            const awardRankTo = game.settings.general.awardRankTo;
+            const awardRankToTopN = game.settings.general.awardRankToTopN;
+
+            if (awardRankTo === 'top_n' && (!awardRankToTopN || awardRankToTopN < 1 || awardRankToTopN > Math.floor(game.settings.general.playerLimit / 2))) {
+                throw new ValidationError('Invalid top N value for awarding rank.');
+            } else if (!['all', 'winner', 'top_n'].includes(awardRankTo)) {
+                throw new ValidationError('Invalid award rank to setting.');
+            }
+        }
+
         // If the game name contains a special string, then replace it with a random name.
         if (game.settings.general.name.indexOf(RANDOM_NAME_STRING) > -1) {
             let randomGameName = this.nameService.getRandomGameName();
@@ -233,7 +325,7 @@ export default class GameCreateService {
         this.starService.setupStarsForGameStart(game);
         
         // Setup players and assign to their starting positions.
-        game.galaxy.players = this.playerService.createEmptyPlayers(game);
+        this.playerService.setupEmptyPlayers(game);
         game.galaxy.carriers = this.playerService.createHomeStarCarriers(game);
 
         this.mapService.generateTerrain(game);
@@ -249,6 +341,8 @@ export default class GameCreateService {
         } else {
             this.conversationService.createConversationAllPlayers(game);
         }
+
+        await this.teamService.setDiplomacyStates(game);
 
         this.gameCreateValidationService.validate(game);
 
@@ -270,7 +364,7 @@ export default class GameCreateService {
     }
 
     _calculateStarsForVictory(game: Game) {
-        if (game.settings.general.mode === 'conquest') {
+        if (game.settings.general.mode === 'conquest' || game.settings.general.mode === 'teamConquest') {
             // TODO: Find a better place for this as its shared in the star service.
             switch (game.settings.conquest.victoryCondition) {
                 case 'starPercentage':

@@ -1,6 +1,6 @@
 <template>
 <div>
-  <header-bar class="header-bar" 
+  <header-bar class="header-bar"
     @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 
   <sidebar-menu />
@@ -26,7 +26,7 @@
         @onOpenTradeRequested="onOpenTradeRequested"
         @onOpenPurchasePlayerBadgeRequested="onOpenPurchasePlayerBadgeRequested"
         @onOpenReportPlayerRequested="onOpenReportPlayerRequested"/>
-      <trade v-if="menuState == MENU_STATES.TRADE" 
+      <trade v-if="menuState == MENU_STATES.TRADE"
         @onCloseRequested="onCloseRequested" :playerId="menuArguments" :key="menuArguments"
         @onOpenTradeRequested="onOpenTradeRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
@@ -40,7 +40,7 @@
         @onViewHireStarSpecialistRequested="onViewHireStarSpecialistRequested"
         @onBuildCarrierRequested="onBuildCarrierRequested"
         @onShipTransferRequested="onShipTransferRequested"/>
-      <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL" 
+      <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL"
         @onCloseRequested="onCloseRequested" :carrierId="menuArguments" :key="menuArguments"
         @onShipTransferRequested="onShipTransferRequested"
         @onEditWaypointsRequested="onEditWaypointsRequested"
@@ -49,7 +49,7 @@
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onViewCompareIntelRequested="onViewCompareIntelRequested"
         @onViewHireCarrierSpecialistRequested="onViewHireCarrierSpecialistRequested"
-        @onCarrierRenameRequested="onCarrierRenameRequested" 
+        @onCarrierRenameRequested="onCarrierRenameRequested"
         @onViewCarrierCombatCalculatorRequested="onViewCarrierCombatCalculatorRequested"/>
       <carrier-waypoints v-if="menuState == MENU_STATES.CARRIER_WAYPOINTS"
         @onCloseRequested="onCloseRequested" :carrierId="menuArguments"
@@ -64,13 +64,13 @@
         @onCloseRequested="onCloseRequested"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
         :carrierId="menuArguments" />
-      <combat-calculator v-if="menuState == MENU_STATES.COMBAT_CALCULATOR" 
+      <combat-calculator v-if="menuState == MENU_STATES.COMBAT_CALCULATOR"
         :carrierId="menuArguments"
         @onCloseRequested="onCloseRequested"/>
-      <ship-transfer v-if="menuState == MENU_STATES.SHIP_TRANSFER" 
-        @onCloseRequested="onCloseRequested" 
-        :carrierId="menuArguments" 
-        @onShipsTransferred="onShipsTransferred" 
+      <ship-transfer v-if="menuState == MENU_STATES.SHIP_TRANSFER"
+        @onCloseRequested="onCloseRequested"
+        :carrierId="menuArguments"
+        @onShipsTransferred="onShipsTransferred"
         @onEditWaypointsRequested="onEditWaypointsRequested"/>
       <build-carrier v-if="menuState == MENU_STATES.BUILD_CARRIER"
         :starId="menuArguments"
@@ -90,15 +90,15 @@
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
-      <bulk-infrastructure-upgrade v-if="menuState == MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE" 
+      <bulk-infrastructure-upgrade v-if="menuState == MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE"
         @onCloseRequested="onCloseRequested"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
-      <map-object-selector v-if="menuState == MENU_STATES.MAP_OBJECT_SELECTOR" 
-        @onCloseRequested="onCloseRequested" 
-        :mapObjects="menuArguments" 
-        @onOpenStarDetailRequested="onOpenStarDetailRequested" 
-        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested" 
-        @onEditWaypointsRequested="onEditWaypointsRequested" 
+      <map-object-selector v-if="menuState == MENU_STATES.MAP_OBJECT_SELECTOR"
+        @onCloseRequested="onCloseRequested"
+        :mapObjects="menuArguments"
+        @onOpenStarDetailRequested="onOpenStarDetailRequested"
+        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
+        @onEditWaypointsRequested="onEditWaypointsRequested"
         @onShipTransferRequested="onShipTransferRequested"
         @onBuildCarrierRequested="onBuildCarrierRequested"/>
       <ruler v-if="menuState == MENU_STATES.RULER" @onCloseRequested="onCloseRequested"/>
@@ -114,7 +114,8 @@
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
         @onReloadGameRequested="onReloadGameRequested"/>
       <game-notes v-if="menuState == MENU_STATES.GAME_NOTES"
-        @onCloseRequested="onCloseRequested"/>
+        @onCloseRequested="onCloseRequested"
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
       <options v-if="menuState == MENU_STATES.OPTIONS"
         @onCloseRequested="onCloseRequested"/>
       <settings v-if="menuState == MENU_STATES.SETTINGS"
@@ -142,7 +143,7 @@
     <div class="spacing-footer d-block d-sm-none"></div>
   </div>
 
-  <footer-bar class="footer-bar d-xs-block d-sm-none" 
+  <footer-bar class="footer-bar d-xs-block d-sm-none"
     @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 </div>
 </template>

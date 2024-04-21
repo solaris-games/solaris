@@ -176,6 +176,14 @@ export default class SpecialistHireService {
             throw new ValidationError(`You cannot afford to buy this specialist.`);
         }
 
+        // // If the specialist is one that destroys stars and the target star is a worm hole, we cannot allow
+        // // this due to an exploit where worm holes become effectively one way since a player may go through a worm hole
+        // // but cannot see any nearby stars due to no scanning range. This is only really a problem when stellar bombs are banned.
+        // // TODO: Find a more effective solution to this exploit, ideally we want to allow war machines on worm holes.
+        // if (specialist.modifiers.special && (specialist.modifiers.special.addNaturalResourcesOnTick || 0) < 0 && star.wormHoleToStarId != null) {
+        //     throw new ValidationError(`Cannot hire a War Machine on a Worm Hole star.`);
+        // }
+
         let cost = this.specialistService.getSpecialistActualCost(game, specialist);
 
         if (star.specialistId) {

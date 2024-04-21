@@ -3,16 +3,18 @@
     "name": "[[[RANDOM]]]",
     "description": "Fight for space in this claustrophobic galaxy.",
     "type": "special_tinyGalaxy",
+    "createdFromTemplate": "special_tinyGalaxy",
     "mode": "conquest",
     "password": null,
-    "playerLimit": 8,
-    "playerType": "establishedPlayers",
+    "playerLimit": 10,
+    "playerType": "all",
     "anonymity": "normal",
     "playerOnlineStatus": "hidden",
     "timeMachine": "enabled",
     "fluxEnabled": "enabled",
     "advancedAI": "enabled",
-    "spectators": "disabled"
+    "spectators": "enabled",
+    "readyToQuit": "enabled"
   },
   "galaxy": {
     "galaxyType": "irregular",
@@ -29,8 +31,8 @@
     "randomWormHoles": 5,
     "randomNebulas": 15,
     "randomAsteroidFields": 10,
-    "randomBinaryStars": 10,
-    "randomBlackHoles": 5,
+    "randomBinaryStars": 5,
+    "randomBlackHoles": 0,
     "randomPulsars": 1,
     "darkGalaxy": "standard",
     "giftCarriers": "enabled",
@@ -77,13 +79,14 @@
     "populationCap": {
       "enabled": "disabled",
       "shipsPerStar": 100
-    }
+    },
+    "allowAbandonStars": "disabled"
   },
   "diplomacy": {
     "enabled": "enabled",
     "upkeepCost": "none",
     "tradeRestricted": "disabled", 
-    "maxAlliances": 7, 
+    "maxAlliances": 9,
     "globalEvents": "disabled"
   },
  "technology": {
@@ -109,7 +112,7 @@
     },
     "bankingReward": "standard",
     "experimentationReward": "standard",
-    "specialistTokenReward": "standard"
+    "specialistTokenReward": "experimental"
   },
   "gameTime": {
     "gameType": "realTime",

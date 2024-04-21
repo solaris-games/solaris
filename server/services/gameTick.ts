@@ -12,7 +12,7 @@ import GameService from "./game";
 import GameStateService from "./gameState";
 import GameTypeService from "./gameType";
 import HistoryService from "./history";
-import LeaderboardService from "./leaderboard";
+import LeaderboardService, {GameWinner} from "./leaderboard";
 import StarMovementService from "./starMovement";
 import PlayerService from "./player";
 import ReputationService from "./reputation";
@@ -38,6 +38,7 @@ import GamePlayerAFKEvent from "./types/events/GamePlayerAFK";
 import GameEndedEvent from "./types/events/GameEnded";
 import PlayerAfkService from "./playerAfk";
 import ShipService from "./ship";
+import {Moment} from "moment";
 
 const EventEmitter = require('events');
 const moment = require('moment');
@@ -197,6 +198,9 @@ export default class GameTickService extends EventEmitter {
 
             logTime(`Tick ${game.state.tick}`);
 
+            await this._playAI(game);
+            logTime('AI controlled players turn');
+
             await this._captureAbandonedStars(game, gameUsers);
             logTime('Capture abandoned stars');
 
@@ -221,9 +225,6 @@ export default class GameTickService extends EventEmitter {
 
             await this._gameLoseCheck(game, gameUsers);
             logTime('Game lose check');
-
-            await this._playAI(game);
-            logTime('AI controlled players turn');
             
             await this.researchService.conductResearchAll(game, gameUsers);
             logTime('Conduct research');
@@ -253,6 +254,10 @@ export default class GameTickService extends EventEmitter {
                 break;
             }
         }
+
+        // TODO: This has been moved out of _moveCarriers, see comment in there.
+        this._sanitiseDarkModeCarrierWaypoints(game);
+        logTime('Sanitise dark mode carrier waypoints');
 
         this.playerReadyService.resetReadyStatuses(game, hasProductionTicked);
 
@@ -284,12 +289,12 @@ export default class GameTickService extends EventEmitter {
             return false;
         }
 
-        if (this.gameService.isAllUndefeatedPlayersReadyToQuit(game)) {
+        if (this.gameService.isReadyToQuitImmediateEnd(game)) {
             return true;
         }
 
         let lastTick = moment(game.state.lastTickDate).utc();
-        let nextTick;
+        let nextTick: Moment;
         
         if (this.gameTypeService.isRealTimeGame(game)) {
             // If in real time mode, then calculate when the next tick will be and work out if we have reached that tick.
@@ -508,7 +513,7 @@ export default class GameTickService extends EventEmitter {
                 continue;
             }
 
-            let destinationStar = game.galaxy.stars.find(s => s._id.toString() === waypoint.destination.toString())!;
+            let destinationStar = this.starService.getById(game, waypoint.destination)!;
 
             // Save the distance travelled so it can be used later for combat.
             carrier.distanceToDestination = this.distanceService.getDistanceBetweenLocations(carrier.location, destinationStar.location);
@@ -587,7 +592,11 @@ export default class GameTickService extends EventEmitter {
         this.waypointService.performWaypointActionsCollects(game, actionWaypoints);
         this.waypointService.performWaypointActionsGarrisons(game, actionWaypoints);
 
-        this._sanitiseDarkModeCarrierWaypoints(game);
+        // TODO: This is incredibly inefficient in large turn based games; moved it outside the main tick loop
+        // for performance reasons because it needs to calculate the scanning ranges of all players.
+        // Moving it out of here technically introduces a bug where carriers may travel to stars they cannot see _within_ a turn (rare occurrence).
+        // Performance gain outweighs the risk of encountering this issue.
+        // this._sanitiseDarkModeCarrierWaypoints(game);
     }
 
     async _combatContestedStars(game: Game, gameUsers: User[]) {
@@ -625,7 +634,7 @@ export default class GameTickService extends EventEmitter {
             let carrier = contestedStar.carriersInOrbit
                 .sort((a: Carrier, b: Carrier) => b.ships! - a.ships!)[0];
 
-            this.starService.claimUnownedStar(game, gameUsers, contestedStar.star, carrier);
+            await this.starService.claimUnownedStar(game, gameUsers, contestedStar.star, carrier);
         }
     }
 
@@ -762,13 +771,33 @@ export default class GameTickService extends EventEmitter {
     async _gameWinCheck(game: Game, gameUsers: User[]) {
         const isTutorialGame = this.gameTypeService.isTutorialGame(game);
 
+
         // Update the leaderboard state here so we can keep track of positions
         // without having to actually calculate it.
-        let leaderboard = this.leaderboardService.getGameLeaderboard(game).leaderboard;
+        const leaderboard = this.leaderboardService.getGameLeaderboard(game).leaderboard;
 
         game.state.leaderboard = leaderboard.map(l => l.player._id);
 
-        let winner = this.leaderboardService.getGameWinner(game, leaderboard);
+        if (game.settings.general.readyToQuit === 'enabled' && this.gameService.checkReadyToQuit(game, leaderboard)) {
+            const ticksRemaining = (game.settings.general.readyToQuitTimerCycles || 0) * game.settings.galaxy.productionTicks;
+            if (game.state.ticksToEnd || game.state.ticksToEnd === 0) {
+                game.state.ticksToEnd = Math.min(ticksRemaining, game.state.ticksToEnd);
+            } else {
+                game.state.ticksToEnd = ticksRemaining;
+            }
+        }
+
+        let winner: GameWinner | null;
+
+        if (this.gameTypeService.isTeamConquestGame(game)) {
+            const teamLeaderboard = this.leaderboardService.getTeamLeaderboard(game)!.leaderboard;
+
+            game.state.teamLeaderboard = teamLeaderboard.map(t => t.team._id);
+
+            winner = this.leaderboardService.getGameWinnerTeam(game, teamLeaderboard);
+        } else {
+            winner = this.leaderboardService.getGameWinner(game, leaderboard);
+        }
 
         if (winner) {
             this.gameStateService.finishGame(game, winner);
@@ -789,7 +818,7 @@ export default class GameTickService extends EventEmitter {
                 // Mark all players as established regardless of game length.
                 this.leaderboardService.markNonAFKPlayersAsEstablishedPlayers(game, gameUsers);
                 this.leaderboardService.incrementPlayersCompletedAchievement(game, gameUsers);
-    
+
                 let e: GameEndedEvent = {
                     gameId: game._id,
                     gameTick: game.state.tick,
@@ -815,11 +844,18 @@ export default class GameTickService extends EventEmitter {
         let canAwardRank = this.gameTypeService.isRankedGame(game) && game.state.productionTick > productionTickCap;
 
         if (canAwardRank) {
-            let leaderboard = this.leaderboardService.getGameLeaderboard(game).leaderboard;
+            if (this.gameTypeService.isTeamConquestGame(game)) {
+                let teamLeaderboard = this.leaderboardService.getTeamLeaderboard(game)!.leaderboard;
 
-            rankingResult = this.leaderboardService.addGameRankings(game, gameUsers, leaderboard);
+                rankingResult = this.leaderboardService.addTeamRankings(game, gameUsers, teamLeaderboard);
 
-            this.leaderboardService.incrementGameWinnerAchievements(game, gameUsers, leaderboard[0].player, awardCredits);
+                // TODO: What kind of awards do we want for team games?
+            } else {
+                let leaderboard = this.leaderboardService.getGameLeaderboard(game).leaderboard;
+
+                rankingResult = this.leaderboardService.addGameRankings(game, gameUsers, leaderboard);
+                this.leaderboardService.incrementGameWinnerAchievements(game, gameUsers, leaderboard[0].player, awardCredits);
+            }
         }
 
         // If the game is anonymous, then ranking results should be omitted from the game ended event.

@@ -133,7 +133,7 @@ const schema = new Schema({
             voronoiTerritoryBorderWidth: { type: Types.Number, required: false, default: 4, min: 0, max: 8 },
             objectsScaling: { type: Types.String, required: false, enum: ['default', 'clamped'], default: 'default' },
             objectsMinimumScale: { type: Types.Number, required: false, default: 8, min: 0, max: 32 },
-            objectsMaximumScale: { type: Types.Number, required: false, default: 16, min: 12, max: 128 },
+            objectsMaximumScale: { type: Types.Number, required: false, default: 16, min: 8, max: 128 },
             objectsDepth: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'disabled' },
             antiAliasing: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'enabled' },
             background:{

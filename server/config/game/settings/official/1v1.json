@@ -6,13 +6,14 @@
     "mode": "conquest",
     "password": null,
     "playerLimit": 2,
-    "playerType": "establishedPlayers",
+    "playerType": "all",
     "anonymity": "normal",
     "playerOnlineStatus": "hidden",
     "timeMachine": "enabled",
     "fluxEnabled": "disabled",
     "advancedAI": "disabled",
-    "spectators": "enabled"
+    "spectators": "enabled",
+    "readyToQuit": "enabled"
   },
   "galaxy": {
     "galaxyType": "circular-balanced",
@@ -77,7 +78,8 @@
     "populationCap": {
       "enabled": "disabled",
       "shipsPerStar": 100
-    }
+    },
+    "allowAbandonStars": "disabled"
   },
   "diplomacy": {
     "enabled": "disabled",
@@ -109,7 +111,7 @@
     },
     "bankingReward": "standard",
     "experimentationReward": "standard",
-    "specialistTokenReward": "standard"
+    "specialistTokenReward": "experimental"
   },
   "gameTime": {
     "gameType": "realTime",

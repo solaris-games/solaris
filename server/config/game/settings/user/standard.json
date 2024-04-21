@@ -12,7 +12,12 @@
        "timeMachine":"disabled",
        "fluxEnabled": "enabled",
        "advancedAI": "enabled",
-       "spectators": "disabled"
+       "spectators": "enabled",
+       "readyToQuit": "enabled",
+       "readyToQuitFraction": 1.0,
+       "readyToQuitTimerCycles": 0,
+       "awardRankTo": "all",
+       "awardRankToTopN": 1
     },
     "galaxy":{
        "galaxyType":"irregular",
@@ -80,13 +85,15 @@
        "populationCap": {
          "enabled": "disabled",
          "shipsPerStar": 100
-       }
+       },
+       "allowAbandonStars": "disabled"
     },
    "diplomacy": {
       "enabled": "enabled",
       "upkeepCost": "none",
       "tradeRestricted": "disabled", 
-      "maxAlliances": 7, 
+      "maxAlliances": 7,
+      "lockedAlliances": "disabled",
       "globalEvents": "disabled"
     },
     "technology":{
@@ -110,9 +117,13 @@
           "weapons":"standard",
           "specialists":"standard"
        },
+       "researchCostProgression": {
+          "progression": "standard",
+          "growthFactor": "medium"
+       },
        "bankingReward":"standard",
        "experimentationReward": "standard",
-       "specialistTokenReward":"standard"
+       "specialistTokenReward":"experimental"
     },
     "gameTime":{
        "gameType":"realTime",

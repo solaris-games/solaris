@@ -3,16 +3,18 @@
     "name": "[[[RANDOM]]]",
     "description": "You aren't alone in this galaxy, although it may appear so, who knows what is beyond the horizon.",
     "type": "special_fog",
+    "createdFromTemplate": "special_fog",
     "mode": "conquest",
     "password": null,
-    "playerLimit": 8,
-    "playerType": "establishedPlayers",
+    "playerLimit": 10,
+    "playerType": "all",
     "anonymity": "normal",
     "playerOnlineStatus": "hidden",
     "timeMachine": "enabled",
     "fluxEnabled": "enabled",
     "advancedAI": "enabled",
-    "spectators": "disabled"
+    "spectators": "enabled",
+    "readyToQuit": "enabled"
   },
   "galaxy": {
     "galaxyType": "irregular",
@@ -77,13 +79,14 @@
     "populationCap": {
       "enabled": "disabled",
       "shipsPerStar": 100
-    }
+    },
+    "allowAbandonStars": "disabled"
   },
   "diplomacy": {
     "enabled": "enabled",
     "upkeepCost": "none",
     "tradeRestricted": "disabled", 
-    "maxAlliances": 7, 
+    "maxAlliances": 9,
     "globalEvents": "disabled"
   },
   "technology": {
@@ -109,7 +112,7 @@
     },
     "bankingReward": "standard",
     "experimentationReward": "standard",
-    "specialistTokenReward": "standard"
+    "specialistTokenReward": "experimental"
   },
   "gameTime": {
     "gameType": "realTime",

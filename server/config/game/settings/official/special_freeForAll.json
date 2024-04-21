@@ -3,16 +3,18 @@
     "name": "[[[RANDOM]]]",
     "description": "You vs. the universe. Trading, formal alliances and gifting is not present in this game mode, raw diplomacy and perfect strategy is what's needed to win.",
     "type": "special_freeForAll",
+    "createdFromTemplate": "special_freeForAll",
     "mode": "conquest",
     "password": null,
-    "playerLimit": 8,
-    "playerType": "establishedPlayers",
+    "playerLimit": 10,
+    "playerType": "all",
     "anonymity": "extra",
     "playerOnlineStatus": "hidden",
     "timeMachine": "enabled",
     "fluxEnabled": "enabled",
     "advancedAI": "enabled",
-    "spectators": "disabled"
+    "spectators": "enabled",
+    "readyToQuit": "enabled"
   },
   "galaxy": {
     "galaxyType": "irregular",
@@ -72,18 +74,19 @@
     },
     "tradeCredits": false,
     "tradeCreditsSpecialists": false,
-    "tradeCost": 15,
+    "tradeCost": 0,
     "tradeScanning": "scanned",
     "populationCap": {
       "enabled": "disabled",
       "shipsPerStar": 100
-    }
+    },
+    "allowAbandonStars": "disabled"
   },
   "diplomacy": {
     "enabled": "disabled",
     "upkeepCost": "none",
     "tradeRestricted": "disabled", 
-    "maxAlliances": 7, 
+    "maxAlliances": 9,
     "globalEvents": "disabled"
   },
  "technology": {
@@ -109,7 +112,7 @@
     },
     "bankingReward": "standard",
     "experimentationReward": "standard",
-    "specialistTokenReward": "standard"
+    "specialistTokenReward": "experimental"
   },
   "gameTime": {
     "gameType": "realTime",
