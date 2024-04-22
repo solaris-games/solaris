@@ -680,8 +680,9 @@ export default class GameGalaxyService {
 
         // If the user is spectating then they can see from the perspectives of all
         // players who they are spectating.
+        // If they are a player themselves, the spectator perspective is ignored
         if (userId && this.spectatorService.isSpectatingEnabled(game)) {
-            let spectating = this.spectatorService.listSpectatingPlayers(game, userId);
+            const spectating = this.spectatorService.listSpectatingPlayers(game, userId);
 
             if (spectating.length) {
                 return spectating.map(p => p._id);
