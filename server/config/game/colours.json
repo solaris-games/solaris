@@ -1,66 +1,146 @@
 [
     {
         "alias": "Aqua",
-        "value": "0x00FFFF"
+        "shades": [
+            "#00ffff",
+            "#2dffff",
+            "#00eaea",
+            "#00d5d6"
+        ]
     },
     {
         "alias": "Blue",
-        "value": "0x0000FF"
+        "shades": [
+            "#0000ff",
+            "#2c13ff",
+            "#0000ea",
+            "#6337ff"
+        ]
     },
     {
         "alias": "Fuchsia",
-        "value": "0xFF00FF"
+        "shades": [
+            "#ff00ff",
+            "#ff25ff",
+            "#e900ea",
+            "#ff56ff"
+        ]
     },
     {
         "alias": "Gray",
-        "value": "0x808080"
+        "shades": [
+            "#808080",
+            "#898989",
+            "#777777",
+            "#867e80"
+        ]
     },
     {
         "alias": "Green",
-        "value": "0x008000"
+        "shades": [
+            "#008000",
+            "#198a10",
+            "#007700",
+            "#40a731"
+        ]
     },
     {
         "alias": "Lime",
-        "value": "0x00FF00"
+        "shades": [
+            "#00ff00",
+            "#2cff1e",
+            "#00ea00",
+            "#00d500"
+        ]
     },
     {
         "alias": "Maroon",
-        "value": "0x800000"
+        "shades": [
+            "#800000",
+            "#8b110a",
+            "#ab3322",
+            "#c24732"
+        ]
     },
     {
-        "alias": "Navy",
-        "value": "0x000080"
+        "alias": "Turquoise",
+        "shades": [
+            "#005080",
+            "#165889",
+            "#004877",
+            "#3c73a6"
+        ]
     },
     {
         "alias": "Olive",
-        "value": "0x808000"
+        "shades": [
+            "#808000",
+            "#8a8911",
+            "#767700",
+            "#a8a533"
+        ]
     },
     {
         "alias": "Purple",
-        "value": "0x800080"
+        "shades": [
+            "#800080",
+            "#760077",
+            "#a838a6",
+            "#bd4dba"
+        ]
     },
     {
         "alias": "Red",
-        "value": "0xFF0000"
+        "shades": [
+            "#ff0000",
+            "#ff200d",
+            "#e60000",
+            "#ff4e2c"
+        ]
     },
     {
         "alias": "Silver",
-        "value": "0xe0e0e0"
+        "shades": [
+            "#e0e0e0",
+            "#f5f5f5",
+            "#e7dee0",
+            "#fcd7e1"
+        ]
     },
     {
         "alias": "Teal",
-        "value": "0x008080"
+        "shades": [
+            "#008080",
+            "#198989",
+            "#007777",
+            "#377d7d"
+        ]
     },
     {
         "alias": "Yellow",
-        "value": "0xFFFF00"
+        "shades": [
+            "#ffff00",
+            "#ffff20",
+            "#e9ea00",
+            "#d2d600"
+        ]
     },
     {
         "alias": "Pink",
-        "value": "0xffb6c1"
+        "shades": [
+            "#ffb6c1",
+            "#ffc0cb",
+            "#f4acb7",
+            "#d58f9a"
+        ]
     },
     {
         "alias": "Orange",
-        "value": "0xff7a2a"
+        "shades": [
+            "#ff7a2a",
+            "#ff8434",
+            "#f37020",
+            "#ffa150"
+        ]
     }
 ]
