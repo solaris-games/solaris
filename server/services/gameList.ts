@@ -178,15 +178,23 @@ export default class GameListService {
     }
 
     async listSpectating(userId: DBObjectId) {
-        // TODO: Verify user is not a player themselves
-
         return await this.gameRepo.find({
             'state.endDate': { $eq: null }, // Game is in progress
-            'galaxy.players.spectators': { // User is spectating at least one player.
-                $elemMatch: {
-                    $in: [userId]
+            $and: [{
+                    'galaxy.players.spectators': { // User is spectating at least one player.
+                        $elemMatch: {
+                            $in: [userId]
+                        }
+                    }
+                },
+                {
+                    'galaxy.players': {
+                        $not: {
+                            $elemMatch: { userId }
+                        }
+                    }
                 }
-            }
+            ]
         },
         {
             'settings.general.type': 1,
