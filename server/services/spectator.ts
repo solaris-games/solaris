@@ -1,4 +1,3 @@
-import user from "../api/controllers/user";
 import ValidationError from "../errors/validation";
 import PlayerService from "./player";
 import Repository from "./repository";
@@ -37,13 +36,6 @@ export default class SpectatorService {
         
         if (!user) {
             throw new ValidationError(`A player with the username ${username} does not exist.`);
-        }
-
-        // Make sure the user isn't already playing in the game.
-        const existingPlayer = this.playerService.getByUserId(game, user._id);
-
-        if (existingPlayer) {
-            throw new ValidationError(`The user ${username} is already playing in this game, they cannot be invited to spectate.`);
         }
 
         await this.gameRepo.updateOne({
