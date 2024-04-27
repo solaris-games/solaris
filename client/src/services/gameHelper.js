@@ -1183,6 +1183,23 @@ class GameHelper {
 
     return game.galaxy.teams.find(t => t._id === teamId);
   }
+
+  calculateTicksToNextShip(shipsActual, manufacturing) {
+    if (manufacturing <= 0) {
+      return null
+    }
+
+    const next = Math.floor(shipsActual + 1);
+    let current = shipsActual;
+    let count = 0;
+
+    while (current < next) {
+      count++;
+      current += manufacturing;
+    }
+
+    return count;
+  }
 }
 
 export default new GameHelper()

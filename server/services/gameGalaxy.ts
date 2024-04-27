@@ -361,8 +361,6 @@ export default class GameGalaxyService {
         // Work out which ones are not in scanning range and clear their data.
         doc.galaxy.stars = (doc.galaxy.stars as any[]) // TODO: Doing this to get around the whacky TS errors when deleting fields from the model
             .map(s => {
-                delete s.shipsActual; // Don't need to send this back.
-
                 s.effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(doc, s);
 
                 // Calculate the star's terraformed resources.
@@ -412,6 +410,7 @@ export default class GameGalaxyService {
                 } else {
                     // Remove fields that other users shouldn't see.
                     delete s.ignoreBulkUpgrade;
+                    delete s.shipsActual;
                 }
 
                 s.isInScanningRange = isFinished ||                                                         // The game is finished
