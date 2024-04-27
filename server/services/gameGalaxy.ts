@@ -179,6 +179,9 @@ export default class GameGalaxyService {
         // Calculate what perspectives the user can see, i.e which players the user is spectating.
         const perspectives = this._getPlayerPerspectives(game, userId);
 
+        // We always need to filter the player data so that it's basic info only.
+        await this._setPlayerInfoBasic(game, userPlayer, perspectives);
+
         // if the user isn't playing this game or spectating, then only return
         // basic data about the stars, exclude any important info like ships.
         // If the game has finished then everyone should be able to view the full game.
@@ -189,9 +192,6 @@ export default class GameGalaxyService {
             this._setCarrierInfoDetailed(game, perspectives!);
             this._setStarInfoDetailed(game, userPlayer, perspectives!);
         }
-
-        // We always need to filter the player data so that it's basic info only.
-        await this._setPlayerInfoBasic(game, userPlayer, perspectives);
 
         // For extra dark mode games, overwrite the player stats as by this stage
         // scanning range will have kicked in and filtered out stars and carriers the player
@@ -430,6 +430,9 @@ export default class GameGalaxyService {
 
                     if (s.isNebula) {
                         delete s.infrastructure;
+                        // NOTE: From this point, this star will be considered "dead", as star.isDeadStar(s)
+                        // looks for the existence and thruthness of the naturalResources field.
+                        // This had caused issues when a carrier orbiting allies nebula could not get tech scanning.
                         delete s.naturalResources;
                         delete s.terraformedResources;
                         delete s.manufacturing;
