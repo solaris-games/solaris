@@ -468,8 +468,8 @@ export default class LeaderboardService {
     }
 
     getGameWinner(game: Game, leaderboard: LeaderboardPlayer[]): GameWinner | null {
-        let isKingOfTheHillMode = this.gameTypeService.isKingOfTheHillMode(game);
-        let isAllUndefeatedPlayersReadyToQuit = this.gameService.isReadyToQuitImmediateEnd(game);
+        const isKingOfTheHillMode = this.gameTypeService.isKingOfTheHillMode(game);
+        const isAllUndefeatedPlayersReadyToQuit = this.gameService.isReadyToQuitImmediateEnd(game);
 
         if (isAllUndefeatedPlayersReadyToQuit) {
             if (isKingOfTheHillMode) {

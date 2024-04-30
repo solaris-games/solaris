@@ -111,7 +111,7 @@
     },
     "bankingReward": "standard",
     "experimentationReward": "standard",
-    "specialistTokenReward": "standard"
+    "specialistTokenReward": "experimental"
   },
   "gameTime": {
     "gameType": "turnBased",

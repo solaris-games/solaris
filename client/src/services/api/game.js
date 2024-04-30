@@ -131,6 +131,10 @@ class GameService extends BaseApiService {
     { withCredentials: true })
   }
 
+  forceStart(gameId) {
+    return axios.post(this.BASE_URL + 'game/' + gameId + '/forcestart', {}, { withCredentials: true })
+  }
+
   confirmReady (gameId) {
     return axios.put(this.BASE_URL + 'game/' + gameId + '/ready', null,
       { withCredentials: true })

@@ -34,7 +34,6 @@ import GameContainer from '../../../../../game/container'
 import PlayerIconVue from '../../player/PlayerIcon'
 import ConversationMessagePinVue from './ConversationMessagePin'
 import mentionHelper from '../../../../../services/mentionHelper'
-import gameHelper from '../../../../../services/gameHelper'
 
 export default {
   components: {
@@ -55,7 +54,7 @@ export default {
     }
 
     let onPlayerClicked = (id) => this.$emit('onOpenPlayerDetailRequested', id)
-    
+
     mentionHelper.renderMessageWithMentionsAndLinks(this.$refs.messageElement, this.message.message, onStarClicked, onPlayerClicked)
   },
   methods: {
@@ -75,7 +74,7 @@ export default {
       this.message.pinned = false
     },
     panToStar (id) {
-      const star = gameHelper.getStarById(this.$store.state.game, id)
+      const star = GameHelper.getStarById(this.$store.state.game, id)
 
       if (star) {
         GameContainer.map.panToStar(star)

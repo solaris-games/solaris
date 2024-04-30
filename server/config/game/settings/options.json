@@ -880,6 +880,14 @@
              "text":"1 Hour"
           },
           {
+             "value": 120,
+             "text": "2 Hours"
+          },
+          {
+             "value": 240,
+             "text": "4 Hours"
+          },
+          {
              "value":360,
              "text":"6 Hours"
           },

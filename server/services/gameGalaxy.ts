@@ -179,6 +179,9 @@ export default class GameGalaxyService {
         // Calculate what perspectives the user can see, i.e which players the user is spectating.
         const perspectives = this._getPlayerPerspectives(game, userId);
 
+        // We always need to filter the player data so that it's basic info only.
+        await this._setPlayerInfoBasic(game, userPlayer, perspectives);
+
         // if the user isn't playing this game or spectating, then only return
         // basic data about the stars, exclude any important info like ships.
         // If the game has finished then everyone should be able to view the full game.
@@ -189,9 +192,6 @@ export default class GameGalaxyService {
             this._setCarrierInfoDetailed(game, perspectives!);
             this._setStarInfoDetailed(game, userPlayer, perspectives!);
         }
-
-        // We always need to filter the player data so that it's basic info only.
-        await this._setPlayerInfoBasic(game, userPlayer, perspectives);
 
         // For extra dark mode games, overwrite the player stats as by this stage
         // scanning range will have kicked in and filtered out stars and carriers the player
@@ -361,8 +361,6 @@ export default class GameGalaxyService {
         // Work out which ones are not in scanning range and clear their data.
         doc.galaxy.stars = (doc.galaxy.stars as any[]) // TODO: Doing this to get around the whacky TS errors when deleting fields from the model
             .map(s => {
-                delete s.shipsActual; // Don't need to send this back.
-
                 s.effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(doc, s);
 
                 // Calculate the star's terraformed resources.
@@ -412,6 +410,7 @@ export default class GameGalaxyService {
                 } else {
                     // Remove fields that other users shouldn't see.
                     delete s.ignoreBulkUpgrade;
+                    delete s.shipsActual;
                 }
 
                 s.isInScanningRange = isFinished ||                                                         // The game is finished
@@ -431,6 +430,9 @@ export default class GameGalaxyService {
 
                     if (s.isNebula) {
                         delete s.infrastructure;
+                        // NOTE: From this point, this star will be considered "dead", as star.isDeadStar(s)
+                        // looks for the existence and thruthness of the naturalResources field.
+                        // This had caused issues when a carrier orbiting allies nebula could not get tech scanning.
                         delete s.naturalResources;
                         delete s.terraformedResources;
                         delete s.manufacturing;
@@ -680,8 +682,9 @@ export default class GameGalaxyService {
 
         // If the user is spectating then they can see from the perspectives of all
         // players who they are spectating.
+        // If they are a player themselves, the spectator perspective is ignored
         if (userId && this.spectatorService.isSpectatingEnabled(game)) {
-            let spectating = this.spectatorService.listSpectatingPlayers(game, userId);
+            const spectating = this.spectatorService.listSpectatingPlayers(game, userId);
 
             if (spectating.length) {
                 return spectating.map(p => p._id);

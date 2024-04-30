@@ -120,5 +120,16 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
         controller.forceEndGame,
         mw.core.handleError);
 
+    router.delete('/api/admin/game/:gameId/quitters',
+        mw.auth.authenticate({ admin: true }),
+        mw.game.loadGame({
+            lean: true,
+            settings: true,
+            state: true,
+            'galaxy.players': true
+        }),
+        controller.resetQuitters,
+        mw.core.handleError);
+
     return router;
 }

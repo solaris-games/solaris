@@ -106,6 +106,10 @@ class AdminService extends BaseApiService {
   getInsights () {
     return axios.get(this.BASE_URL + 'admin/insights', { withCredentials: true })
   }
+
+  resetQuitters (gameId) {
+    return axios.delete(`${this.BASE_URL}admin/game/${gameId}/quitters`, { withCredentials: true })
+  }
 }
 
 export default new AdminService()

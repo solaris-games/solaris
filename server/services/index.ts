@@ -1,3 +1,5 @@
+import GameAuthService from "./gameAuth";
+
 const bcrypt = require('bcrypt');
 
 import GameModel from '../db/models/Game';
@@ -173,8 +175,9 @@ export default (config): DependencyContainer => {
     const reputationService = new ReputationService(gameRepository, playerStatisticsService, diplomacyService, playerAfkService);
     const tradeService = new TradeService(gameRepository, eventRepository, userService, playerService, diplomacyService, ledgerService, achievementService, reputationService, gameTypeService, randomService, playerCreditsService, playerAfkService);
     const conversationService = new ConversationService(gameRepository, tradeService, diplomacyService);
-    const gameService = new GameService(gameRepository, userService, starService, carrierService, playerService, passwordService, achievementService, avatarService, gameTypeService, gameStateService, conversationService, playerReadyService);
+    const gameAuthService = new GameAuthService(userService);
     const gameJoinService = new GameJoinService(userService, starService, playerService, passwordService, achievementService, avatarService, gameTypeService, gameStateService, conversationService, randomService, spectatorService);
+    const gameService = new GameService(gameRepository, userService, starService, carrierService, playerService, passwordService, achievementService, avatarService, gameTypeService, gameStateService, conversationService, playerReadyService, gameJoinService, gameAuthService);
     const leaderboardService = new LeaderboardService(playerService, playerAfkService, userLevelService, ratingService, gameService, gameTypeService, gameStateService, badgeService, playerStatisticsService, teamService);
     const userLeaderboardService = new UserLeaderboardService(userRepository, guildUserService);
     const researchService = new ResearchService(gameRepository, technologyService, randomService, playerStatisticsService, starService, userService, gameTypeService);
@@ -219,6 +222,7 @@ export default (config): DependencyContainer => {
         leaderboardService,
         userLeaderboardService,
         gameService,
+        gameAuthService,
         gameJoinService,
         gameCreateValidationService,
         gameCreateService,

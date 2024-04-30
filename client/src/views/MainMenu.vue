@@ -19,12 +19,16 @@
     </div>
 
     <div class="row pb-0 pt-3">
+      <poll></poll>
+    </div>
+
+    <div class="row pb-0 pt-3">
       <div class="col-sm-12 col-md-6 col-lg-6">
         <div class="card bg-dark text-white p-1" @click="routeToPath('/game/active-games')">
           <img class="card-img" :src="require('../assets/screenshots/home-1.png')" alt="View my games">
           <div class="card-img-overlay">
             <h5 class="card-title">
-              <i class="fas fa-user"></i> 
+              <i class="fas fa-user"></i>
               <span class="ms-2">My Games</span>
             </h5>
           </div>
@@ -107,7 +111,7 @@
     </div>
 
     <hr/>
-    
+
     <tutorial-game />
 
     <hr/>
@@ -123,6 +127,7 @@ import ViewContainer from './components/ViewContainer'
 import ViewTitle from './components/ViewTitle'
 import Achievements from './game/components/player/Achievements'
 import TutorialGame from './game/components/menu/TutorialGame'
+import Poll from "./components/Poll.vue";
 
 export default {
   components: {
@@ -130,7 +135,8 @@ export default {
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'achievements': Achievements,
-    'tutorial-game': TutorialGame
+    'tutorial-game': TutorialGame,
+    'poll': Poll
   },
   data () {
     return {
@@ -193,7 +199,7 @@ export default {
 .card-img {
   object-fit: cover;
   max-height: 150px;
-  min-height: 100%; 
+  min-height: 100%;
   width: auto;
 }
 

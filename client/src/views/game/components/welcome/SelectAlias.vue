@@ -23,6 +23,10 @@
                       <input name="alias" class="form-control" required="required" placeholder="Enter your alias here" type="text" minlength="3" maxlength="24" v-model="alias" @change="onAliasChanged">
                     </div>
 
+                    <div v-if="isAnonymousGame" class="alert alert-warning">
+                      <p>This game is anonymous, you might want to hide your identity!</p>
+                    </div>
+
                     <!-- <div class="mb-2 text-center small">
                         <p>Your alias must be between 3 and 24 characters.</p>
                     </div> -->
@@ -42,13 +46,20 @@ export default {
   components: {
     'select-avatar': SelectAvatarVue
   },
+  props: {
+    isAnonymousGame: Boolean,
+  },
   data () {
     return {
       alias: null,
-      avatar: null
+      avatar: null,
     }
   },
   async mounted () {
+    console.log({
+      isAnonymousGame: this.isAnonymousGame
+    });
+
     try {
       let response = await UserService.getMyUserInfo()
 
