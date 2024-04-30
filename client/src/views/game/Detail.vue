@@ -7,7 +7,7 @@
     <div v-if="!isLoading">
       <view-subtitle v-bind:title="game.settings.general.name" class="mt-2"/>
 
-      <p v-if="game.settings.general.description">{{game.settings.general.description}}</p>
+      <p class="description" v-if="game.settings.general.description">{{game.settings.general.description}}</p>
 
       <p v-if="isNewPlayerGame" class="text-warning">New Player Games do not affect Rank or Victories.</p>
       <p v-if="isCustomFeaturedGame" class="text-warning">This is a featured game and will award rank points.</p>
@@ -187,4 +187,7 @@ export default {
 </script>
 
 <style scoped>
+.description {
+  white-space: pre-wrap;
+}
 </style>
