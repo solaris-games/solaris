@@ -312,17 +312,23 @@ class Carrier extends EventEmitter {
     }
   }
 
-  onClicked (e) {
-    if (e && e.data && e.data.originalEvent && e.data.originalEvent.button === 2) {
-      this.emit('onCarrierRightClicked', this.data)
-    } else {
-      let eventData = e ? e.data : null
+  onClicked(e, tryMultiSelect) {
+    setTimeout(() => {
+      if (e && e.data && e.data.originalEvent && e.data.originalEvent.button === 2) {
+        this.emit('onCarrierRightClicked', this.data)
+      } else {
+        let eventData = e ? e.data : null
 
-      this.emit('onCarrierClicked', {carrierData: this.data, eventData})
+        this.emit('onCarrierClicked', {
+          carrierData: this.data,
+          eventData,
+          tryMultiSelect
+        })
 
-      // Need to do this otherwise sometimes text gets highlighted.
-      this.deselectAllText()
-    }
+        // Need to do this otherwise sometimes text gets highlighted.
+        this.deselectAllText()
+      }
+    }, 25)
   }
 
   updateVisibility() {
