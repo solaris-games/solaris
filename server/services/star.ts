@@ -764,7 +764,7 @@ export default class StarService extends EventEmitter {
 
         if (this.gameTypeService.isKingOfTheHillMode(game) && 
             this.gameStateService.isCountingDownToEndInLastCycle(game) &&
-            this.isKingOfTheHillStar(star)) {
+            this.isKingOfTheHillStar(game, star)) {
             this.gameStateService.setCountdownToEndToOneCycle(game);
         }
 
@@ -807,10 +807,8 @@ export default class StarService extends EventEmitter {
         return closestToCenter;
     }
 
-    isKingOfTheHillStar(star: Star) {
-        const center = this.starDistanceService.getGalacticCenter();
-
-        return star.location.x === center.x && star.location.y === center.y;
+    isKingOfTheHillStar(game: Game, star: Star) {
+        return star._id.toString() === this.getKingOfTheHillStar(game)._id.toString();
     }
 
     setupPlayerStarForGameStart(game: Game, star: Star, player: Player) {
