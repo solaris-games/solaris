@@ -189,8 +189,9 @@ export default class GameGalaxyService {
             this._setStarInfoBasic(game);
             this._clearPlayerCarriers(game);
         } else {
-            this._setCarrierInfoDetailed(game, perspectives!);
-            this._setStarInfoDetailed(game, userPlayer, perspectives!);
+            const perspectiveIds = perspectives!.map(x => x._id);
+            this._setCarrierInfoDetailed(game, perspectiveIds);
+            this._setStarInfoDetailed(game, userPlayer, perspectiveIds);
         }
 
         // For extra dark mode games, overwrite the player stats as by this stage
@@ -511,7 +512,7 @@ export default class GameGalaxyService {
             });
     }
 
-    async _setPlayerInfoBasic(doc: Game, userPlayer: Player | null, perspectivePlayerIds: DBObjectId[] | null) {
+    async _setPlayerInfoBasic(doc: Game, userPlayer: Player | null, perspectivePlayers: Player[] | null) {
         const avatars = this.avatarService.listAllAvatars();
 
         const isFinished = this.gameStateService.isFinished(doc);
@@ -532,6 +533,17 @@ export default class GameGalaxyService {
 
         if (userPlayer) {
             playersInRange = this.playerService.getPlayersWithinScanningRangeOfPlayer(doc, doc.galaxy.players, userPlayer);
+        } else if (perspectivePlayers) {
+            playersInRange = perspectivePlayers;
+
+            const visited = new Set<string>();
+            perspectivePlayers.forEach(p => visited.add(p._id.toString()))
+
+            for (const player of perspectivePlayers) {
+                const inRangeOfPlayer = this.playerService.getPlayersWithinScanningRangeOfPlayer(doc, doc.galaxy.players, player).filter(x => !visited.has(x._id.toString()));
+                inRangeOfPlayer.forEach(p => visited.add(p._id.toString()));
+                playersInRange = playersInRange.concat(inRangeOfPlayer);
+            }
         }
 
         let displayOnlineStatus = doc.settings.general.playerOnlineStatus === 'visible';
@@ -544,7 +556,7 @@ export default class GameGalaxyService {
             let isCurrentUserPlayer = userPlayer && p._id.toString() === userPlayer._id.toString();
 
             // Set whether the user has the perspective of this player. This is used on the UI for spectator view.
-            p.hasPerspective = perspectivePlayerIds?.find(i => i.toString() === p._id.toString()) != null;
+            p.hasPerspective = Boolean(perspectivePlayers?.find(otherPlayer => otherPlayer._id.toString() === p._id.toString()));
 
             // Append the guild tag to the player alias.
             let playerGuild: Guild | null = null;
@@ -671,13 +683,13 @@ export default class GameGalaxyService {
         }) as any;
     }
 
-    _getPlayerPerspectives(game: Game, userId: DBObjectId | null) {
+    _getPlayerPerspectives(game: Game, userId: DBObjectId | null): Player[] | null {
         // Check if the user is playing in this game, if so they can only see from
         // their own perspective.
         let userPlayer = this._getUserPlayer(game, userId);
 
         if (userPlayer) {
-            return [userPlayer._id];
+            return [userPlayer];
         }
 
         // If the user is spectating then they can see from the perspectives of all
@@ -687,7 +699,7 @@ export default class GameGalaxyService {
             const spectating = this.spectatorService.listSpectatingPlayers(game, userId);
 
             if (spectating.length) {
-                return spectating.map(p => p._id);
+                return spectating;
             }
         }
 
