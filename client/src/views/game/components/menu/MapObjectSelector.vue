@@ -170,12 +170,10 @@ export default {
     onViewObjectRequested (mapObject) {
       switch (mapObject.type) {
         case 'star':
-          gameContainer.map.clickStar(mapObject.data._id)
-          this.$emit('onOpenStarDetailRequested', mapObject.data._id)
+          gameContainer.map.clickStar(mapObject.data._id);
           break
         case 'carrier':
-          gameContainer.map.clickCarrier(mapObject.data._id)
-          this.$emit('onOpenCarrierDetailRequested', mapObject.data._id)
+          gameContainer.map.clickCarrier(mapObject.data._id);
           break
       }
     },

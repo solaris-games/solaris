@@ -96,8 +96,6 @@
       <map-object-selector v-if="menuState == MENU_STATES.MAP_OBJECT_SELECTOR"
         @onCloseRequested="onCloseRequested"
         :mapObjects="menuArguments"
-        @onOpenStarDetailRequested="onOpenStarDetailRequested"
-        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
         @onEditWaypointsRequested="onEditWaypointsRequested"
         @onShipTransferRequested="onShipTransferRequested"
         @onBuildCarrierRequested="onBuildCarrierRequested"/>

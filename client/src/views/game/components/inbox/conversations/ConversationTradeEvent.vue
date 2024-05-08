@@ -29,10 +29,10 @@
             <em>Sent <span class="text-warning">{{event.data.carrierShips}} ships</span>.</em>
         </p>
         <p v-if="event.type === 'playerDebtSettled'" class="mb-1">
-          <em>Paid off <span class="text-warning">{{event.data.amount}} credits</span> of debt.</em>
+          <em>Paid off <span class="text-warning">{{getFormattedDebtValue(event.data.amount)}}</span> of debt.</em>
         </p>
         <p v-if="event.type === 'playerDebtForgiven'" class="mb-1">
-          <em>Forgave <span class="text-warning">{{event.data.amount}} credits</span> of debt.</em>
+          <em>Forgave <span class="text-warning">{{getFormattedDebtValue(event.data.amount)}}</span> of debt.</em>
         </p>
         <p v-if="event.type === 'playerDiplomacyStatusChanged'" class="mb-1">
           <em><strong>Diplomatic status changed</strong>:</em>
@@ -101,6 +101,13 @@ export default {
     },
     getFromPlayerColour () {
       return GameHelper.getPlayerColour(this.$store.state.game, this.getFromPlayer()._id)
+    },
+    getFormattedDebtValue(withText = false) {
+      if (this.event.data.ledgerType === 'credits') {
+        return `$${this.event.data.amount} credits`
+      }
+
+      return `${this.event.data.amount} specialist token(s)`
     }
   },
   computed: {
