@@ -622,14 +622,14 @@ class Map extends EventEmitter {
   clickStar (starId) {
     let star = this.stars.find(s => s.data._id === starId)
 
-    star.onClicked()
+    star.onClicked(null, false)
     star.select()
   }
 
   clickCarrier (carrierId) {
     let carrier = this.carriers.find(s => s.data._id === carrierId)
 
-    carrier.onClicked()
+    carrier.onClicked(null, false)
     carrier.select()
   }
 
@@ -777,7 +777,7 @@ class Map extends EventEmitter {
           this.unselectAllCarriers()
           this.unselectAllStarsExcept(selectedStar)
 
-          if (!this.tryMultiSelect(e.location)) {
+          if (!dic.tryMultiSelect || !this.tryMultiSelect(e.location)) {
             selectedStar.toggleSelected()
             this.emit('onStarClicked', e)
           }
@@ -819,13 +819,6 @@ class Map extends EventEmitter {
     let e = dic.carrierData
     // Clicking carriers should only raise events to the UI if in galaxy mode.
     if (this.mode === 'galaxy') {
-      // If the carrier is in orbit, pass the click over to the star instead.
-      if (e.orbiting) {
-        let star = this.stars.find(x => x.data._id === e.orbiting)
-        let eventData = dic ? dic.eventData : null
-
-        return this.onStarClicked({starData: star.data, eventData})
-      }
 
       let selectedCarrier = this.carriers.find(x => x.data._id === e._id)
 
@@ -834,7 +827,7 @@ class Map extends EventEmitter {
 
       selectedCarrier.toggleSelected()
 
-      if (!this.tryMultiSelect(e.location)) {
+      if (!dic.tryMultiSelect || !this.tryMultiSelect(e.location)) {
         this.emit('onCarrierClicked', e)
       } else {
         selectedCarrier.unselect()

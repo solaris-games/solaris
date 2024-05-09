@@ -37,7 +37,7 @@
     "randomBinaryStars": 10,
     "randomBlackHoles": 5,
     "randomPulsars": 1,
-    "darkGalaxy": "fog",
+    "darkGalaxy": "extra",
     "giftCarriers": "enabled",
     "defenderBonus": "enabled",
     "carrierToCarrierCombat": "enabled",
@@ -47,14 +47,16 @@
     "carrierSpeed": 20,
     "starCaptureReward": "enabled",
     "specialistBans": {
-      "star": [],
+      "star": [
+        15
+      ],
       "carrier": []
     }
   },
   "conquest": {
     "victoryCondition": "starPercentage",
     "victoryPercentage": 33,
-    "capitalStarElimination": "disabled"
+    "capitalStarElimination": "enabled"
   },
   "orbitalMechanics": {
     "enabled": "disabled",
@@ -76,7 +78,7 @@
       "science": "standard"
     },
     "tradeCredits": true,
-    "tradeCreditsSpecialists": true,
+    "tradeCreditsSpecialists": false,
     "tradeCost": 15,
     "tradeScanning": "scanned",
     "populationCap": {
@@ -104,21 +106,21 @@
       "specialists": 1
     },
     "researchCosts": {
-      "terraforming": "expensive",
-      "experimentation": "expensive",
-      "scanning": "expensive",
-      "hyperspace": "expensive",
-      "manufacturing": "expensive",
-      "banking": "expensive",
-      "weapons": "veryExpensive",
+      "terraforming": "standard",
+      "experimentation": "cheap",
+      "scanning": "cheap",
+      "hyperspace": "cheap",
+      "manufacturing": "standard",
+      "banking": "cheap",
+      "weapons": "expensive",
       "specialists": "expensive"
     },
     "bankingReward": "standard",
-    "experimentationReward": "standard",
+    "experimentationReward": "experimental",
     "specialistTokenReward": "experimental",
     "researchCostProgression": {
       "progression": "exponential",
-      "growthFactor": "soft"
+      "growthFactor": "medium"
     }
   },
   "gameTime": {

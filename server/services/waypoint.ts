@@ -606,7 +606,7 @@ export default class WaypointService {
             .map(p => {
                 return {
                     player: p,
-                    stars: this.starService.filterStarsByScanningRange(game, [p._id])
+                    stars: this.starService.filterStarsByScanningRange(game, [p])
                 }
             });
 

@@ -1,15 +1,15 @@
 const EventEmitter = require('events');
 const mongoose = require('mongoose');
-import { DBObjectId } from './types/DBObjectId';
+import {DBObjectId} from './types/DBObjectId';
 import ValidationError from '../errors/validation';
 import Repository from './repository';
-import { Carrier } from './types/Carrier';
-import { Game, GameSettings } from './types/Game';
-import { Location } from './types/Location';
-import { MapObject, MapObjectWithVisibility } from './types/Map';
-import { Player } from './types/Player';
-import { InfrastructureType, NaturalResources, Star, StarCaptureResult, TerraformedResources } from './types/Star';
-import { User } from './types/User';
+import {Carrier} from './types/Carrier';
+import {Game, GameSettings} from './types/Game';
+import {Location} from './types/Location';
+import {MapObjectWithVisibility} from './types/Map';
+import {Player} from './types/Player';
+import {InfrastructureType, NaturalResources, Star, StarCaptureResult, TerraformedResources} from './types/Star';
+import {User} from './types/User';
 import DistanceService from './distance';
 import GameStateService from './gameState';
 import GameTypeService from './gameType';
@@ -19,6 +19,7 @@ import SpecialistService from './specialist';
 import StarDistanceService from './starDistance';
 import TechnologyService from './technology';
 import UserService from './user';
+
 const RNG = require('random-seed');
 
 export const StarServiceEvents = {
@@ -281,11 +282,11 @@ export default class StarService extends EventEmitter {
         return false;
     }
 
-    filterStarsByScanningRange(game: Game, playerIds: DBObjectId[]) {
+    filterStarsByScanningRange(game: Game, players: Player[]) {
         // Stars may have different scanning ranges independently so we need to check
         // each star to check what is within its scanning range.
-        let starsOwnedOrInOrbit = this.listStarsOwnedOrInOrbitByPlayers(game, playerIds);
-        let starsWithScanning = starsOwnedOrInOrbit.filter(s => !this.isDeadStar(s));
+        const starsOwnedOrInOrbit = this.listStarsOwnedOrInOrbitByPlayers(game, players.map(p => p._id));
+        const starsWithScanning = starsOwnedOrInOrbit.filter(s => !this.isDeadStar(s));
 
         // Seed the stars that are in range to be the stars owned or are in orbit of.
         let starsInRange: MapObjectWithVisibility[] = starsOwnedOrInOrbit.map(s => {
@@ -350,15 +351,16 @@ export default class StarService extends EventEmitter {
         return starsInRange.map(s => this.getById(game, s._id));
     }
 
-    filterStarsByScanningRangeAndWaypointDestinations(game: Game, playerIds: DBObjectId[]) {
+    filterStarsByScanningRangeAndWaypointDestinations(game: Game, players: Player[]) {
+        const playerIds = players.map(p => p._id);
         // Get all stars within the player's normal scanning vision.
-        let starsInScanningRange = this.filterStarsByScanningRange(game, playerIds);
+        let starsInScanningRange = this.filterStarsByScanningRange(game, players);
 
         const ids = playerIds.map(p => p.toString());
 
         // If in dark mode then we need to also include any stars that are 
         // being travelled to by carriers in transit for the current player.
-        let inTransitStars = game.galaxy.carriers
+        const inTransitStars = game.galaxy.carriers
             .filter(c => !c.orbiting)
             .filter(c => ids.includes(c.ownedByPlayerId!.toString()))
             .map(c => c.waypoints[0].destination)
@@ -384,11 +386,9 @@ export default class StarService extends EventEmitter {
         let scanningRangeDistance = this.distanceService.getScanningDistance(game, effectiveTechs.scanning);
 
         // Go through all stars and find each star that is in scanning range.
-        let starsInRange = stars.filter(s => {
+        return stars.filter(s => {
             return s.isAlwaysVisible || this.starDistanceService.getDistanceBetweenStars(s, star) <= scanningRangeDistance;
         });
-
-        return starsInRange;
     }
 
     calculateActualNaturalResources(star: Star): NaturalResources {
@@ -764,7 +764,7 @@ export default class StarService extends EventEmitter {
 
         if (this.gameTypeService.isKingOfTheHillMode(game) && 
             this.gameStateService.isCountingDownToEndInLastCycle(game) &&
-            this.isKingOfTheHillStar(star)) {
+            this.isKingOfTheHillStar(game, star)) {
             this.gameStateService.setCountdownToEndToOneCycle(game);
         }
 
@@ -807,10 +807,8 @@ export default class StarService extends EventEmitter {
         return closestToCenter;
     }
 
-    isKingOfTheHillStar(star: Star) {
-        const center = this.starDistanceService.getGalacticCenter();
-
-        return star.location.x === center.x && star.location.y === center.y;
+    isKingOfTheHillStar(game: Game, star: Star) {
+        return star._id.toString() === this.getKingOfTheHillStar(game)._id.toString();
     }
 
     setupPlayerStarForGameStart(game: Game, star: Star, player: Player) {

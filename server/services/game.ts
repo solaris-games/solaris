@@ -244,6 +244,7 @@ export default class GameService extends EventEmitter {
 
         const players = game.settings.general.playerLimit;
         const filledSlots = game.galaxy.players.filter(p => !p.isOpenSlot).length;
+        const aiSlots = players - filledSlots;
 
         if (filledSlots === players) {
             throw new ValidationError('Cannot force start a game that is already full.');
@@ -251,6 +252,10 @@ export default class GameService extends EventEmitter {
 
         if (filledSlots === 0) {
             throw new ValidationError('Cannot force start game: at least one human player is needed');
+        }
+
+        if (aiSlots > 3) {
+            throw new ValidationError('Cannot force start game: only 3 AI players are allowed');
         }
 
         this.gameJoinService.assignNonUserPlayersToAI(game, false);

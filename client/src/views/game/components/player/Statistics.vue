@@ -9,55 +9,61 @@
           </tr>
       </thead>
       <tbody>
-          <tr>
-              <td>Stars</td>
-              <td class="text-end">{{player.stats.totalStars}}</td>
-              <td class="text-end" v-if="userIsInGame() && !isUserPlayer()"
-                :class="{'text-danger': player.stats.totalStars > userPlayer.stats.totalStars,
-                          'text-success': player.stats.totalStars < userPlayer.stats.totalStars}">{{userPlayer.stats.totalStars}}</td>
-          </tr>
-          <tr v-if="isConquestHomeStars">
-              <td>Capitals</td>
-              <td class="text-end">{{player.stats.totalHomeStars}}</td>
-              <td class="text-end" v-if="userIsInGame() && !isUserPlayer()"
-                :class="{'text-danger': player.stats.totalHomeStars > userPlayer.stats.totalHomeStars,
-                          'text-success': player.stats.totalHomeStars < userPlayer.stats.totalHomeStars}">{{userPlayer.stats.totalHomeStars}}</td>
-          </tr>
-          <tr>
-              <td>Carriers</td>
-              <td class="text-end">{{player.stats.totalCarriers}}</td>
-              <td class="text-end" v-if="userIsInGame() && !isUserPlayer()"
-                :class="{'text-danger': player.stats.totalCarriers > userPlayer.stats.totalCarriers,
-                          'text-success': player.stats.totalCarriers < userPlayer.stats.totalCarriers}">{{userPlayer.stats.totalCarriers}}</td>
-          </tr>
-          <tr v-if="isSpecialistsEnabled">
-              <td>Specialists</td>
-              <td class="text-end">{{player.stats.totalSpecialists}}</td>
-              <td class="text-end" v-if="userIsInGame() && !isUserPlayer()"
-                :class="{'text-danger': player.stats.totalSpecialists > userPlayer.stats.totalSpecialists,
-                          'text-success': player.stats.totalSpecialists < userPlayer.stats.totalSpecialists}">{{userPlayer.stats.totalSpecialists}}</td>
-          </tr>
-          <tr>
-              <td>Ships</td>
-              <td class="text-end">{{player.stats.totalShips}}<span v-if="player.stats.totalShipsMax">/{{player.stats.totalShipsMax}}</span></td>
-              <td class="text-end" v-if="userIsInGame() && !isUserPlayer()"
-                :class="{'text-danger': player.stats.totalShips > userPlayer.stats.totalShips,
-                          'text-success': player.stats.totalShips < userPlayer.stats.totalShips}">{{userPlayer.stats.totalShips}}<span v-if="userPlayer.stats.totalShipsMax">/{{userPlayer.stats.totalShipsMax}}</span></td>
-          </tr>
-          <tr>
-              <td>New Ships</td>
-              <td class="text-end">{{player.stats.newShips}}</td>
-              <td class="text-end" v-if="userIsInGame() && !isUserPlayer()"
-                :class="{'text-danger': player.stats.newShips > userPlayer.stats.newShips,
-                          'text-success': player.stats.newShips < userPlayer.stats.newShips}">{{userPlayer.stats.newShips}}</td>
-          </tr>
-          <tr>
-            <td>Cycle Income</td>
-            <td class="text-end">${{playerIncome}}</td>
-            <td class="text-end" v-if="userIsInGame() && !isUserPlayer()"
-              :class="{'text-danger': playerIncome > userPlayerIncome,
-                        'text-success': playerIncome < userPlayerIncome}">${{userPlayerIncome}}</td>
-          </tr>
+          <statistic-row :playerId="playerId"
+                         header="Stars"
+                         scanningRangeTooltip="This figure is based on the stars in your scanning range."
+                         :playerStat="player.stats.totalStars"
+                         :userPlayerStat="userPlayer?.stats.totalStars">
+          </statistic-row>
+          <statistic-row v-if="isConquestHomeStars"
+                         :playerId="playerId"
+                         header="Capitals"
+                         scanningRangeTooltip="This figure is based on the capitals in your scanning range."
+                         :playerStat="player.stats.totalHomeStars"
+                         :userPlayerStat="userPlayer?.stats.totalHomeStars">
+          </statistic-row>
+          <statistic-row :playerId="playerId"
+                         header="Carriers"
+                         scanningRangeTooltip="This figure is based on the carriers in your scanning range."
+                         :playerStat="player.stats.totalCarriers"
+                         :userPlayerStat="userPlayer?.stats.totalCarriers">
+          </statistic-row>
+          <statistic-row  v-if="isSpecialistsEnabled"
+                         :playerId="playerId"
+                         header="Specialists"
+                         scanningRangeTooltip="This figure is based on the specialists in your scanning range."
+                         :playerStat="player.stats.totalSpecialists"
+                         :userPlayerStat="userPlayer?.stats.totalSpecialists">
+          </statistic-row>
+          <statistic-row :playerId="playerId"
+                         header="Ships"
+                         scanningRangeTooltip="This figure is based on the ships in your scanning range."
+                         :playerStat="player.stats.totalShips"
+                         :userPlayerStat="userPlayer?.stats.totalShips"
+                         :formatFunction="formatTotalShipsValue">
+          </statistic-row>
+          <statistic-row :playerId="playerId"
+                         header="New Ships"
+                         scanningRangeTooltip="This figure is based on the stars in your scanning range."
+                         :playerStat="player.stats.newShips"
+                         :userPlayerStat="userPlayer?.stats.newShips">
+          </statistic-row>
+          <statistic-row :playerId="playerId"
+                         header="Cycle Income"
+                         scanningRangeTooltip="This figure is based on the stars in your scanning range."
+                         :playerStat="playerIncome"
+                         :userPlayerStat="userPlayerIncome"
+                         :formatFunction="formatCreditsValue">
+          </statistic-row>
+          <statistic-row v-if="playerTickIncome > 0 || userPlayerTickIncome > 0"
+                         :playerId="playerId"
+                         header="Tick Income"
+                         scanningRangeTooltip="This figure is based on the Financial Analysts in your scanning range."
+                         :playerStat="playerTickIncome"
+                         :userPlayerStat="userPlayerTickIncome"
+                         :formatFunction="formatCreditsValue"
+                         :isPlayerStatAlwaysUncertain="true">
+          </statistic-row>
       </tbody>
   </table>
 
@@ -67,8 +73,12 @@
 
 <script>
 import GameHelper from '../../../../services/gameHelper'
+import StatisticRow from './StatisticRow'
 
 export default {
+  components: {
+    'statistic-row': StatisticRow,
+  },
   props: {
     playerId: String
   },
@@ -81,6 +91,16 @@ export default {
     },
     userIsInGame () {
       return this.userPlayer != null
+    },
+    formatCreditsValue: function (player, value) {
+      return `$${value}`;
+    },
+    formatTotalShipsValue: function (player, value) {
+      if (player.stats.totalShipsMax != null) {
+        return `${value}/${player.stats.totalShipsMax}`
+      }
+
+      return value;
     }
   },
   computed: {
@@ -103,14 +123,23 @@ export default {
       return GameHelper.calculateIncome(this.$store.state.game, this.player)
     },
     userPlayerIncome () {
-      return GameHelper.calculateIncome(this.$store.state.game, this.userPlayer)
+      return this.userPlayer != null ? GameHelper.calculateIncome(this.$store.state.game, this.userPlayer) : null
+    },
+    playerTickIncome() {
+      return GameHelper.calculateTickIncome(this.$store.state.game, this.player)
+    },
+    userPlayerTickIncome() {
+      return this.userPlayer != null ? GameHelper.calculateTickIncome(this.$store.state.game, this.userPlayer) : null;
+    },
+    isDarkModeExtra() {
+      return GameHelper.isDarkModeExtra(this.$store.state.game);
     }
   }
 }
 </script>
 
 <style scoped>
-.table-sm td, .table-sm th {
+.table-sm th {
   padding: 0;
 }
 </style>
