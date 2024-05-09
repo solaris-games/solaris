@@ -228,12 +228,12 @@ export default class AIService {
         this._sanitizeState(game, player, context);
 
         if (isFirstTickOfCycle) {
-            await this._handleBulkUpgradeStates(game, player, context);
+            this._handleBulkUpgradeStates(game, player, context);
             await this._playFirstTick(game, player);
         }
 
         if (isLastTickOfCycle) {
-            await this._handleBulkUpgradeStates(game, player, context);
+            this._handleBulkUpgradeStates(game, player, context);
             await this._playLastTick(game, player);
         }
 
@@ -249,7 +249,7 @@ export default class AIService {
         player.markModified('aiState');
     }
 
-    async _handleBulkUpgradeStates(game: Game, player: Player, context: Context) {
+    _handleBulkUpgradeStates(game: Game, player: Player, context: Context) {
         for (const star of context.playerStars) {
             if (context.attackedStarIds.has(star._id.toString())) {
                 star.ignoreBulkUpgrade = {
