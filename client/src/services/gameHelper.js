@@ -243,14 +243,12 @@ class GameHelper {
       return ''
     }
 
-    if (game.settings.gameTime.gameType === 'realTime') {
-      let date = useNowDate ? moment().utc() : game.state.lastTickDate
+    if (game.settings.gameTime.gameType === 'realTime' && !this.isGameFinished(game)) {
+      const date = useNowDate ? moment().utc() : game.state.lastTickDate
 
-      let timeRemainingEtaDate = this.calculateTimeByTicks(ticks, game.settings.gameTime.speed, date)
+      const timeRemainingEtaDate = this.calculateTimeByTicks(ticks, game.settings.gameTime.speed, date)
 
-      let timeRemainingEta = this.getCountdownTimeString(game, timeRemainingEtaDate, largestUnitOnly)
-
-      return timeRemainingEta
+      return this.getCountdownTimeString(game, timeRemainingEtaDate, largestUnitOnly)
     }
 
     return `${ticks} ticks`
