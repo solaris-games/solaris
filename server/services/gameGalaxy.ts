@@ -698,6 +698,12 @@ export default class GameGalaxyService {
     }
 
     _getViewpoint(game: Game, userId: DBObjectId | null): Viewpoint {
+        if (this.gameStateService.isFinished(game)) {
+            return {
+                kind: ViewpointKind.Finished
+            };
+        }
+
         // Check if the user is playing in this game, if so they can only see from
         // their own perspective.
         let userPlayer = this._getUserPlayer(game, userId);
@@ -723,11 +729,7 @@ export default class GameGalaxyService {
             }
         }
 
-        if (this.gameStateService.isFinished(game)) {
-            return {
-                kind: ViewpointKind.Finished
-            };
-        }
+
 
         return {
             kind: ViewpointKind.Basic
