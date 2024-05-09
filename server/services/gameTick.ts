@@ -198,9 +198,6 @@ export default class GameTickService extends EventEmitter {
 
             logTime(`Tick ${game.state.tick}`);
 
-            await this._playAI(game);
-            logTime('AI controlled players turn');
-
             await this._captureAbandonedStars(game, gameUsers);
             logTime('Capture abandoned stars');
 
@@ -225,6 +222,9 @@ export default class GameTickService extends EventEmitter {
 
             await this._gameLoseCheck(game, gameUsers);
             logTime('Game lose check');
+
+            await this._playAI(game);
+            logTime('AI controlled players turn');
             
             await this.researchService.conductResearchAll(game, gameUsers);
             logTime('Conduct research');
