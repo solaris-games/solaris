@@ -1084,7 +1084,9 @@ class GameHelper {
   calculateTickIncome(game, player) {
     let stars = this.getStarsOwnedByPlayer(player, game.galaxy.stars).filter(s => s.specialistId === 12); // Financial Analyst
 
-    return stars.reduce((totalScience, star) => totalScience + star.infrastructure.science, 0) * game.constants.research.sciencePointMultiplier;
+    let creditsPerTickByScience = stars[0]?.specialist.modifiers.special.creditsPerTickByScience ?? 0;
+
+    return (stars.reduce((totalScience, star) => totalScience + star.infrastructure.science, 0) * game.constants.research.sciencePointMultiplier) * creditsPerTickByScience;
   }
 
   isStarHasMultiplePlayersInOrbit (game, star) {
