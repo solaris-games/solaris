@@ -148,7 +148,12 @@ export default class GameTickService extends EventEmitter {
     }
 
     async tick(gameId: DBObjectId) {
-        let game = (await this.gameService.getByIdAll(gameId))!;
+        const game = (await this.gameService.getByIdAll(gameId));
+
+        if (!game) {
+            console.error(`Game not found: ${gameId}`);
+            return;
+        }
 
         // Double check the game isn't locked.
         if (!this.gameStateService.isLocked(game)) {
