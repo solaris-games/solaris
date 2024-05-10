@@ -312,7 +312,7 @@ class Carrier extends EventEmitter {
     }
   }
 
-  onClicked(e, tryMultiSelect) {
+  onClicked(e, tryMultiSelect = true) {
     setTimeout(() => {
       if (e && e.data && e.data.originalEvent && e.data.originalEvent.button === 2) {
         this.emit('onCarrierRightClicked', this.data)
