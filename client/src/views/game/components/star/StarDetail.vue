@@ -364,6 +364,20 @@
             </div>
           </div>
         </div>
+
+        <div class="row bg-dark pt-2 pb-0 mb-1" v-if="isGameInProgress() && isGameAllowAbandonStars()">
+          <div class="col-8">
+            <p class="mb-2">Abandon this star for another player to claim.</p>
+          </div>
+          <div class="col-4">
+            <div class="d-grid gap-2">
+              <modalButton modalName="giftStarModal" classText="btn btn-outline-danger mb-2" :disabled="$isHistoricalMode()">
+                <i class="fas fa-trash"></i>
+                Gift Star
+              </modalButton>
+            </div>
+          </div>
+        </div>
       </div>
 
       <h4 class="pt-2" v-if="canShowSpecialist">Specialist</h4>
@@ -385,6 +399,10 @@
     <dialogModal modalName="abandonStarModal" titleText="Abandon Star" cancelText="No" confirmText="Yes" @onConfirm="confirmAbandonStar">
       <p>Are you sure you want to abandon <b>{{star.name}}</b>?</p>
       <p>Its Economy, Industry and Science will remain, but all ships and carriers at this star will be destroyed.</p>
+    </dialogModal>
+
+    <dialogModal modalName="giftStarModal" titleText="Gift Star" cancelText="No" confirmText="Yes" @onConfirm="confirmGiftStar">
+      <p>Are you sure you want to gift <b>{{star.name}}</b>?</p>
     </dialogModal>
 </div>
 </template>
@@ -503,6 +521,23 @@ export default {
         }
       } catch (err) {
         console.error(err)
+      }
+    },
+    async confirmGiftStar(e) {
+      try {
+        let response = await starService.giftStar(this.$store.state.game._id, this.star._id)
+
+        if (response.status === 200) {
+          this.$toasted.show(`${this.star.name} has been gifted.`)
+
+          this.$store.commit('gameStarGifted', {
+            starId: this.star._id
+          })
+
+          AudioService.leave()
+        } catch (err) {
+          console.error(err)
+        }
       }
     },
     async confirmBuildWarpGate (e) {
