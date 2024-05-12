@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 import ValidationError from '../errors/validation';
 import {Game, GameSettings, Team} from './types/Game';
 import AchievementService from './achievement';
@@ -17,7 +18,6 @@ import GameJoinService from './gameJoin';
 import SpecialStarBanService from './specialStarBan';
 import StarService from './star';
 import DiplomacyService from "./diplomacy";
-import mongoose from "mongoose";
 import {DBObjectId} from "./types/DBObjectId";
 import {shuffle} from "./utils";
 import TeamService from "./team";
