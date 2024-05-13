@@ -12,7 +12,7 @@ import { Config } from '../config/types/Config';
 export default async (config: Config, app, container: DependencyContainer) => {
 
     app.use(require('body-parser').json({
-        limit: '1000kb' // Note: This allows large custom galaxies to be uploaded.
+        limit: '2000kb' // Note: This allows large custom galaxies to be uploaded.
     }));
 
     // ---------------
