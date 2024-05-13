@@ -48,13 +48,15 @@ export default class CarrierGiftService extends EventEmitter {
         carrier.isGift = true;
         carrier.waypointsLooped = false;
 
-        let firstWaypoint = carrier.waypoints[0];
+        if (carrier.waypoints?.length) {
+            const firstWaypoint = carrier.waypoints[0];
 
-        firstWaypoint.action = 'nothing';
-        firstWaypoint.actionShips = 0;
-        firstWaypoint.delayTicks = 0;
+            firstWaypoint.action = 'nothing';
+            firstWaypoint.actionShips = 0;
+            firstWaypoint.delayTicks = 0;
 
-        carrier.waypoints = [firstWaypoint];
+            carrier.waypoints = [firstWaypoint];
+        }
 
         await this.gameRepo.updateOne({
             _id: game._id,
