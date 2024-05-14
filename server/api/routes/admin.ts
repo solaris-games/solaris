@@ -100,7 +100,7 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
         mw.core.handleError);
 
     router.patch('/api/admin/game/:gameId/timeMachine',
-        mw.auth.authenticate({ admin: true }),
+        mw.auth.authenticate({ subAdmin: true }),
         validator.body(adminSetGameTimeMachineRequestSchema),
         controller.setGameTimeMachine,
         mw.core.handleError);
@@ -118,6 +118,17 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
             isInProgress: true
         }),
         controller.forceEndGame,
+        mw.core.handleError);
+
+    router.delete('/api/admin/game/:gameId/quitters',
+        mw.auth.authenticate({ admin: true }),
+        mw.game.loadGame({
+            lean: true,
+            settings: true,
+            state: true,
+            'galaxy.players': true
+        }),
+        controller.resetQuitters,
         mw.core.handleError);
 
     return router;

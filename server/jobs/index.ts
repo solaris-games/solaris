@@ -13,7 +13,7 @@ import SendReviewRemindersJob from './sendReviewReminders';
 let mongo;
 
 async function startup() {
-    const container = containerLoader(config, null);
+    const container = containerLoader(config);
 
     mongo = await mongooseLoader(config, {
         unlockJobs: true,
@@ -99,17 +99,19 @@ async function startup() {
     agendajs.every('1 day', 'cleanup-old-game-history');
     agendajs.every('1 day', 'cleanup-old-tutorials');
     agendajs.every('10 seconds', 'send-review-reminders'); // TODO: Every 10 seconds until we've gone through all backlogged users.
+
+    process.on('SIGINT', async () => {
+        console.log('Shutting down...');
+
+        await agendajs.stop();
+
+        await mongo.disconnect();
+
+        console.log('Shutdown complete.');
+
+        process.exit(0);
+    });
 }
-
-process.on('SIGINT', async () => {
-    console.log('Shutting down...');
-
-    await mongo.disconnect();
-
-    console.log('Shutdown complete.');
-
-    process.exit();
-});
 
 startup().then(() => {
     console.log('Jobs started.');

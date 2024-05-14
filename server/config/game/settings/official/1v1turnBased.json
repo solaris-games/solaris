@@ -79,7 +79,7 @@
       "enabled": "disabled",
       "shipsPerStar": 100
     },
-    "allowAbandonStars": "enabled"
+    "allowAbandonStars": "disabled"
   },
   "diplomacy": {
     "enabled": "disabled",
@@ -111,7 +111,7 @@
     },
     "bankingReward": "standard",
     "experimentationReward": "standard",
-    "specialistTokenReward": "standard"
+    "specialistTokenReward": "experimental"
   },
   "gameTime": {
     "gameType": "turnBased",

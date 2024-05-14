@@ -11,7 +11,7 @@
       </div>
     </div>
 
-    <select-alias v-on:onAliasChanged="onAliasChanged" v-on:onAvatarChanged="onAvatarChanged"/>
+    <select-alias v-on:onAliasChanged="onAliasChanged" v-on:onAvatarChanged="onAvatarChanged" :isAnonymousGame="isAnonymousGame" />
 
     <enter-password v-if="isPasswordRequired" v-on:onPasswordChanged="onPasswordChanged"/>
 
@@ -37,6 +37,8 @@ import EnterPasswordVue from './EnterPassword.vue'
 import SelectColourVue from './SelectColour.vue'
 import NewPlayerMessageVue from './NewPlayerMessage'
 import ShareLinkVue from './ShareLink.vue'
+import HelpTooltip from "../../../components/HelpTooltip.vue"
+import gameHelper from "@/services/gameHelper";
 
 export default {
   components: {
@@ -47,7 +49,8 @@ export default {
     'enter-password': EnterPasswordVue,
     'select-colour': SelectColourVue,
     'new-player-message': NewPlayerMessageVue,
-    'share-link': ShareLinkVue
+    'share-link': ShareLinkVue,
+    'help-tooltip': HelpTooltip,
   },
   data () {
     return {
@@ -124,6 +127,9 @@ export default {
   computed: {
     game () {
       return this.$store.state.game
+    },
+    isAnonymousGame() {
+      return gameHelper.isExtraAnonymity(this.game);
     }
   }
 }

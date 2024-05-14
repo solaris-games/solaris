@@ -18,8 +18,10 @@ import ReputationService from "./reputation";
 import DiplomacyService from "./diplomacy";
 import PlayerStatisticsService from "./playerStatistics";
 import {DBObjectId} from "./types/DBObjectId";
+import BasicAIService from "./basicAi";
 import PlayerAfkService from "./playerAfk";
 import ShipService from "./ship";
+import PathfindingService from "./pathfinding";
 
 const Heap = require('qheap');
 const mongoose = require("mongoose");
@@ -36,12 +38,15 @@ const REINFORCEMENT_MIN_FACTOR = 1.4;
 
 const INVASION_ATTACK_FACTOR = 1.5;
 
+const BORDER_STAR_ANGLE_THRESHOLD_DEGREES = 120;
+
+const LOGISTIC_STOCKPILE_CYCLES = 0.7;
+
 enum AiAction {
     DefendStar,
     ClaimStar,
-    ReinforceStar,
     InvadeStar
-};
+}
 
 interface DefendStarOrder {
     type: AiAction.DefendStar;
@@ -49,33 +54,38 @@ interface DefendStarOrder {
     star: string;
     ticksUntil: number;
     incomingCarriers: Carrier[];
-};
+}
 
 interface ClaimStarOrder {
     type: AiAction.ClaimStar;
     star: string;
     score: number;
-};
-
-interface ReinforceStarOrder {
-    type: AiAction.ReinforceStar;
-    score: number;
-    star: string;
-    source: string;
-};
+}
 
 interface InvadeStarOrder {
     type: AiAction.InvadeStar;
     star: string;
     score: number;
-};
+}
 
 interface TracePoint {
     starId: string;
     action?: CarrierWaypointActionType;
-};
+}
 
-type Order = DefendStarOrder | ClaimStarOrder | ReinforceStarOrder | InvadeStarOrder;
+enum BorderStarType {
+    EmptySpace,
+    FreeStars,
+    HostileBorder
+}
+
+interface BorderStarData {
+    otherPlayersBordering: Set<string>;
+    starsInRange: Set<string>;
+    type: BorderStarType;
+}
+
+type Order = DefendStarOrder | ClaimStarOrder | InvadeStarOrder;
 
 type StarGraph = Map<string, Set<string>>;
 
@@ -89,7 +99,7 @@ interface Context {
     freelyReachableStars: StarGraph;
     allCanReachPlayerStars: StarGraph;
     starsInGlobalRange: StarGraph;
-    borderStars: Set<string>;
+    borderStars: Map<string, BorderStarData>;
     carriersOrbiting: Map<string, Carrier[]>;
     carriersById: Map<string, Carrier>;
     attacksByStarId: Map<string, Map<number, Carrier[]>>;
@@ -97,6 +107,7 @@ interface Context {
     playerEconomy: number;
     playerIndustry: number;
     playerScience: number;
+    playerShips: number;
     transitFromCarriers: Map<string, Carrier[]>,
     arrivingAtCarriers: Map<string, Carrier[]>
 }
@@ -105,12 +116,18 @@ interface Assignment {
     carriers: Carrier[];
     star: Star;
     totalShips: number;
-};
+}
 
 interface FoundAssignment {
     assignment: Assignment;
     trace: TracePoint[];
-};
+}
+
+interface Movement {
+    from: Star;
+    to: Star;
+    score: number;
+}
 
 // IMPORTANT IMPLEMENTATION NOTES
 // During AI tick, care must be taken to NEVER write any changes to the database.
@@ -132,6 +149,8 @@ export default class AIService {
     diplomacyService: DiplomacyService;
     playerStatisticsService: PlayerStatisticsService;
     shipService: ShipService;
+    basicAIService: BasicAIService;
+    pathfindingService: PathfindingService;
 
     constructor(
         starUpgradeService: StarUpgradeService,
@@ -146,8 +165,10 @@ export default class AIService {
         playerAfkService: PlayerAfkService,
         reputationService: ReputationService,
         diplomacyService: DiplomacyService,
+        shipService: ShipService,
         playerStatisticsService: PlayerStatisticsService,
-        shipService: ShipService
+        basicAIService: BasicAIService,
+        pathfindingService: PathfindingService
     ) {
         this.starUpgradeService = starUpgradeService;
         this.carrierService = carrierService;
@@ -163,6 +184,12 @@ export default class AIService {
         this.diplomacyService = diplomacyService;
         this.playerStatisticsService = playerStatisticsService;
         this.shipService = shipService;
+        this.basicAIService = basicAIService;
+        this.pathfindingService = pathfindingService;
+    }
+
+    isAIControlled(player: Player) {
+        return player.defeated || !player.userId; // Note: Null user IDs is considered AI as there is not a user controlling it.
     }
 
     async play(game: Game, player: Player) {
@@ -174,29 +201,16 @@ export default class AIService {
         const isLastTickOfCycle = game.state.tick % game.settings.galaxy.productionTicks === game.settings.galaxy.productionTicks - 1;
 
         // Considering the growing complexity of AI logic,
-        // it's better to catch any possible errors and have the game continue with disfunctional AI than to break the game tick logic.
+        // it's better to catch any possible errors and have the game continue with dysfunctional AI than to break the game tick logic.
         try {
             if (game.settings.general.advancedAI === 'enabled') {
                 await this._doAdvancedLogic(game, player, isFirstTickOfCycle, isLastTickOfCycle);
+            } else {
+                await this.basicAIService._doBasicLogic(game, player, isFirstTickOfCycle, isLastTickOfCycle);
             }
-
-            await this._doBasicLogic(game, player, isFirstTickOfCycle, isLastTickOfCycle);
         } catch (e) {
             console.error(e);
         }
-    }
-
-    async _doBasicLogic(game: Game, player: Player, isFirstTickOfCycle: boolean, isLastTickOfCycle: boolean) {
-        if (isFirstTickOfCycle) {
-            await this._playFirstTick(game, player);
-        } else if (isLastTickOfCycle) {
-            await this._playLastTick(game, player);
-        }
-
-        // TODO: Not sure if this is an issue but there was an occassion during debugging
-        // where the player credits amount was less than 0, I assume its the AI spending too much somehow
-        // so adding this here just in case but need to investigate.
-        player.credits = Math.max(0, player.credits);
     }
 
     async _doAdvancedLogic(game: Game, player: Player, isFirstTickOfCycle: boolean, isLastTickOfCycle: boolean) {
@@ -213,14 +227,87 @@ export default class AIService {
 
         this._sanitizeState(game, player, context);
 
+        if (isFirstTickOfCycle) {
+            this._handleBulkUpgradeStates(game, player, context);
+            await this._playFirstTick(game, player);
+        }
+
+        if (isLastTickOfCycle) {
+            this._handleBulkUpgradeStates(game, player, context);
+            await this._playLastTick(game, player);
+        }
+
         const orders = this._gatherOrders(game, player, context);
         const assignments = await this._gatherAssignments(game, player, context);
 
         await this._evaluateOrders(game, player, context, orders, assignments);
 
+        await this._performLogistics(context, game, player);
+
         // Mongoose method that cannot be typechecked
         // @ts-ignore
         player.markModified('aiState');
+    }
+
+    _handleBulkUpgradeStates(game: Game, player: Player, context: Context) {
+        for (const star of context.playerStars) {
+            if (context.attackedStarIds.has(star._id.toString())) {
+                star.ignoreBulkUpgrade = {
+                    economy: true,
+                    industry: true,
+                    science: true
+                };
+            }
+
+            const borderStarData = context.borderStars.get(star._id.toString());
+
+            if (borderStarData && borderStarData.type === BorderStarType.HostileBorder) {
+                star.ignoreBulkUpgrade = {
+                    economy: true,
+                    industry: false,
+                    science: false
+                };
+            } else {
+                star.ignoreBulkUpgrade = {
+                    economy: false,
+                    industry: false,
+                    science: false
+                };
+            }
+        }
+    }
+
+    async _playLastTick(game: Game, player: Player) {
+        if (!player.credits || player.credits <= 0) {
+            return
+        }
+
+        // On the last tick of the cycle:
+        // 1. Spend remaining credits upgrading economy.
+        let creditsToSpendEco = Math.floor(player.credits / 100 * LAST_TICK_BULK_UPGRADE_ECO_PERCENTAGE);
+
+        if (creditsToSpendEco) {
+            await this.starUpgradeService.upgradeBulk(game, player, 'totalCredits', 'economy', creditsToSpendEco, false);
+        }
+    }
+
+    async _playFirstTick(game: Game, player: Player) {
+        if (!player.credits || player.credits < 0) {
+            return
+        }
+
+        // On the first tick after production:
+        // 1. Bulk upgrade X% of credits to ind and sci.
+        let creditsToSpendSci = Math.floor(player.credits / 100 * FIRST_TICK_BULK_UPGRADE_SCI_PERCENTAGE);
+        let creditsToSpendInd = Math.floor(player.credits / 100 * FIRST_TICK_BULK_UPGRADE_IND_PERCENTAGE);
+
+        if (creditsToSpendSci) {
+            await this.starUpgradeService.upgradeBulk(game, player, 'totalCredits', 'science', creditsToSpendSci, false);
+        }
+
+        if (creditsToSpendInd) {
+            await this.starUpgradeService.upgradeBulk(game, player, 'totalCredits', 'industry', creditsToSpendInd, false);
+        }
     }
 
     _setInitialState(game: Game, player: Player): void {
@@ -229,6 +316,8 @@ export default class AIService {
             startedClaims: [],
             invasionsInProgress: []
         };
+
+        this.reputationService.initializeReputationForAlliedPlayers(game, player);
     }
 
     _sanitizeState(game: Game, player: Player, context: Context) {
@@ -283,17 +372,9 @@ export default class AIService {
         // All stars that can be reached from player stars with globally highest range tech
         const starsInGlobalRange = this._computeStarGraph(starsById, game, player, playerStars, game.galaxy.stars, this._getGlobalHighestHyperspaceRange(game));
 
-        const borderStars = new Set<string>();
+        const playerStarsInLogicalRange = this._computeStarGraph(starsById, game, player, playerStars, playerStars, this._getHyperspaceRangeLogical(game, player));
 
-        for (const [from, reachables] of starsInGlobalRange) {
-            for (const reachableId of reachables) {
-                const reachable = starsById.get(reachableId)!;
-
-                if (!reachable.ownedByPlayerId || reachable.ownedByPlayerId.toString() !== playerId) {
-                    borderStars.add(from);
-                }
-            }
-        }
+        const borderStars = this._findBorderStars(game, player, starsById, playerStarsInLogicalRange, starsInGlobalRange);
 
         const playerCarriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id);
 
@@ -381,10 +462,97 @@ export default class AIService {
             attackedStarIds,
             playerEconomy: this.playerStatisticsService.calculateTotalEconomy(playerStars),
             playerIndustry: this.playerStatisticsService.calculateTotalIndustry(playerStars),
-            playerScience: this.playerStatisticsService.calculateTotalScience(playerStars),
+            playerScience: this.playerStatisticsService.calculateTotalScience(game, playerStars),
+            playerShips: this.shipService.calculateTotalShips(playerStars, playerCarriers),
             transitFromCarriers,
             arrivingAtCarriers
         };
+    }
+
+    _constructBorderStarData(game: Game, player: Player, starsById: Map<string, Star>, sourceStar: string, starsInGlobalRange: StarGraph): BorderStarData {
+        const allStarsInRange = starsInGlobalRange.get(sourceStar)!;
+        const otherPlayersBordering = new Set<string>();
+        const playerId = player._id.toString();
+
+        if (allStarsInRange.size === 0) {
+            return {
+                otherPlayersBordering,
+                starsInRange: new Set(),
+                type: BorderStarType.EmptySpace
+            };
+        }
+
+        let type = BorderStarType.EmptySpace;
+
+        for (const otherStarId of allStarsInRange) {
+            const otherStar = starsById.get(otherStarId)!;
+
+            const otherPlayerId = otherStar.ownedByPlayerId?.toString();
+
+            if (otherPlayerId) {
+                if (otherPlayerId !== playerId) {
+                    otherPlayersBordering.add(otherPlayerId);
+
+                    if (this._isEnemyPlayer(game, player, otherStar.ownedByPlayerId!)) {
+                        type = BorderStarType.HostileBorder;
+                    }
+                }
+            } else {
+                type = BorderStarType.FreeStars;
+            }
+        }
+
+        return {
+            otherPlayersBordering,
+            starsInRange: allStarsInRange,
+            type
+        }
+    }
+
+    _findBorderStars(game: Game, player: Player, starsById: Map<string, Star>, reachablePlayerStars: StarGraph, starsInGlobalRange: StarGraph): Map<string, BorderStarData> {
+        const borderStars = new Map<string, BorderStarData>();
+
+        for (const [starId, reachables] of reachablePlayerStars) {
+            if (reachables.size === 0 || reachables.size === 1) {
+                borderStars.set(starId, this._constructBorderStarData(game, player, starsById, starId, starsInGlobalRange));
+                continue;
+            }
+
+            const star = starsById.get(starId)!;
+            const anglesToOtherStars = new Array<number>();
+
+            for (const otherStarId of reachables) {
+                const otherStar = starsById.get(otherStarId)!;
+
+                const dx = otherStar.location.x - star.location.x;
+                const dy = otherStar.location.y - star.location.y;
+                const angleRad = Math.atan2(dy, dx);
+                const angle = (angleRad * (180 / Math.PI)) + 180;
+                anglesToOtherStars.push(angle);
+            }
+
+            anglesToOtherStars.sort((a, b) => a - b);
+            const smallest = anglesToOtherStars[0];
+            anglesToOtherStars.push(360 + smallest); //Push first angle to the back again to compute angles between all stars
+
+            let largestGap = 0;
+
+            for (let i = 0; i < anglesToOtherStars.length - 1; i++) {
+                const angle = anglesToOtherStars[i];
+                let nextAngle = anglesToOtherStars[i + 1];
+
+                const delta = nextAngle - angle;
+                if (delta > largestGap) {
+                    largestGap = delta;
+                }
+            }
+
+            if (largestGap > BORDER_STAR_ANGLE_THRESHOLD_DEGREES) {
+                borderStars.set(starId, this._constructBorderStarData(game, player, starsById, starId, starsInGlobalRange));
+            }
+        }
+
+        return borderStars;
     }
 
     async _evaluateOrders(game: Game, player: Player, context: Context, orders: Order[], assignments: Map<string, Assignment>) {
@@ -503,52 +671,6 @@ export default class AIService {
                 for (const visitedStar of found.trace) {
                     newClaimedStars.add(visitedStar.starId);
                 }
-            } else if (order.type === AiAction.ReinforceStar) {
-                const assignment = assignments.get(order.source);
-
-                if (!assignment || assignment.totalShips <= 1) {
-                    continue;
-                }
-
-                const hasIdleCarrier = assignment.carriers && assignment.carriers.length > 0;
-
-                const reinforce = async () => {
-                    const waypoints: CarrierWaypoint[] = [
-                        {
-                            _id: new mongoose.Types.ObjectId(),
-                            source: new mongoose.Types.ObjectId(order.source),
-                            destination: new mongoose.Types.ObjectId(order.star),
-                            action: 'dropAll',
-                            actionShips: 0,
-                            delayTicks: 0
-                        },
-                        {
-                            _id: new mongoose.Types.ObjectId(),
-                            source: new mongoose.Types.ObjectId(order.star),
-                            destination: new mongoose.Types.ObjectId(order.source),
-                            action: 'nothing',
-                            actionShips: 0,
-                            delayTicks: 0
-                        }
-                    ];
-
-                    await this._useAssignment(context, game, player, assignments, assignment, waypoints, assignment.totalShips);
-                }
-
-                if (hasIdleCarrier) {
-                    // Since a carrier is standing around, we might as well use it
-                    await reinforce();
-                } else if (this._canAffordCarrier(context, game, player, false)) {
-                    const routeCarrier = this._logisticRouteExists(context, order.source, order.star);
-
-                    // Only allow one carrier per route
-                    if (!routeCarrier) {
-                        const nextReturning = this._nextArrivingCarrierIn(context, game, order.source);
-                        if (!nextReturning)  {
-                            await reinforce();
-                        }
-                    }
-                }
             }
         }
 
@@ -606,7 +728,7 @@ export default class AIService {
         return carrierResult;
     }
 
-    _createWaypointsDropAndReturn(trace: TracePoint[]): CarrierWaypoint[] {
+    _createWaypointsDropAndReturn(trace: TracePoint[], baseAction: CarrierWaypointActionType = "nothing"): CarrierWaypoint[] {
         const newTrace: TracePoint[] = trace.slice(0, trace.length - 1);
 
         newTrace.push({
@@ -614,7 +736,12 @@ export default class AIService {
             action: "dropAll"
         });
 
-        const backTrace = (trace.slice(0, trace.length - 1).reverse());
+        const backTrace = (trace.slice(0, trace.length - 1).reverse()).map(t => {
+            return {
+                ...t,
+                action: baseAction,
+            }
+        });
 
         return this._createWaypointsFromTrace(newTrace.concat(backTrace));
     }
@@ -859,8 +986,6 @@ export default class AIService {
                 return 3
             case AiAction.ClaimStar:
                 return 2;
-            case AiAction.ReinforceStar:
-                return 1;
             default:
                 return 0;
         }
@@ -898,14 +1023,17 @@ export default class AIService {
         const defenseOrders = this._gatherDefenseOrders(game, player, context);
         const invasionOrders = this._gatherInvasionOrders(game, player, context);
         const expansionOrders = this._gatherExpansionOrders(game, player, context);
-        const movementOrders = this._gatherMovementOrders(game, player, context);
 
-        return defenseOrders.concat(invasionOrders, expansionOrders, movementOrders);
+        return defenseOrders.concat(invasionOrders, expansionOrders);
     }
 
     _isEnemyPlayer(game: Game, player: Player, otherPlayerId: DBObjectId): boolean {
-        return player._id !== otherPlayerId
-            && this.diplomacyService.getDiplomaticStatusToPlayer(game, player._id, otherPlayerId).actualStatus !== 'allies';
+        if (this.diplomacyService.isFormalAlliancesEnabled(game)) {
+            return player._id.toString() !== otherPlayerId.toString()
+                && this.diplomacyService.getDiplomaticStatusToPlayer(game, player._id, otherPlayerId).actualStatus !== 'allies';
+        }
+
+        return true;
     }
 
     _isEnemyStar(game: Game, player: Player, context: Context, star: Star): boolean {
@@ -921,30 +1049,40 @@ export default class AIService {
     }
 
     _gatherInvasionOrders(game: Game, player: Player, context: Context): Order[] {
-        const orders: Order[] = [];
-        const visited = new Set<string>();
+        const orders = new Map<string, Order>();
+        const hyperspaceRange = this._getHyperspaceRangeInternal(game, player);
 
         for (const [fromId, reachables] of context.allReachableFromPlayerStars) {
+            const fromStar = context.starsById.get(fromId)!;
+
             for (const reachable of reachables) {
-                if (!visited.has(reachable)) {
-                    visited.add(reachable);
+                const star = context.starsById.get(reachable)!;
 
-                    const star = context.starsById.get(reachable)!;
+                if (this._isEnemyStar(game, player, context, star)) {
+                    // We adjust the stores by distance, so closer stars end up with a higher score.
+                    // This stops the AI from jumping behind the enemies frontlines too often and leaving closer stars uninvaded and open for counter attacks.
+                    const starScore = this._getStarScore(star);
+                    const distance = this.distanceService.getDistanceBetweenLocations(fromStar.location, star.location);
+                    const relativeDistance = hyperspaceRange / distance;
+                    const score = starScore * relativeDistance;
 
-                    if (this._isEnemyStar(game, player, context, star)) {
-                        const score = this._getStarScore(star);
-
-                        orders.push({
+                    let order = orders.get(reachable);
+                    if (order) {
+                        order.score = Math.max(score, order.score);
+                    } else {
+                        order = {
                             type: AiAction.InvadeStar,
                             star: reachable,
                             score
-                        });
+                        };
                     }
+
+                    orders.set(reachable, order);
                 }
             }
         }
 
-        return orders;
+        return Array.from(orders.values());
     }
 
     _claimInProgress(player: Player, starId: string): boolean {
@@ -1010,98 +1148,194 @@ export default class AIService {
         return context.attackedStarIds.has(starId);
     }
 
-    _gatherMovementOrders(game: Game, player: Player, context: Context): Order[] {
-        const orders: Order[] = [];
-        const starPriorities = this._computeStarPriorities(game, player, context);
+    _computeStarPriorities(context: Context, game: Game, player: Player): Map<string, number> {
+        const starsForExpansion = new Array<[string, BorderStarData]>();
+        const starsWithHostileBorder = new Array<[string, BorderStarData]>();
 
-        for (const [starId, priority] of starPriorities) {
-
-            const neighbors = context.reachablePlayerStars.get(starId)!;
-            for (const neighbor of neighbors) {
-                if (this._isUnderAttack(context, neighbor)) {
-                    continue;
-                }
-
-                const neighborPriority = starPriorities.get(neighbor)!;
-                if (neighborPriority * REINFORCEMENT_MIN_FACTOR < priority) {
-                    orders.push({
-                        type: AiAction.ReinforceStar,
-                        score: priority - neighborPriority,
-                        star: starId,
-                        source: neighbor
-                    });
-                }
+        for (const [borderStarId, borderStarData] of context.borderStars) {
+            if (borderStarData.type === BorderStarType.FreeStars) {
+                starsForExpansion.push([borderStarId, borderStarData]);
+            } else if (borderStarData.type === BorderStarType.HostileBorder) {
+                starsWithHostileBorder.push([borderStarId, borderStarData]);
             }
         }
 
-        return orders;
-    }
+        const starPriorities = new Map<string, number>();
 
-    _computeStarPriorities(game: Game, player: Player, context: Context): Map<string, number> {
-        const hyperspaceRange = this._getGlobalHighestHyperspaceRange(game);
-        const borderStarPriorities = new Map<string, number>();
-
-        for (const borderStarId of context.borderStars) {
-            const borderStar = context.starsById.get(borderStarId)!;
-            const reachables = context.starsInGlobalRange.get(borderStarId)!;
-
-            let score = 0;
-
-            for (const reachableId of reachables) {
-                const reachableStar = context.starsById.get(reachableId)!;
-
-                if (!reachableStar.ownedByPlayerId) {
-                    const distance = this.distanceService.getDistanceBetweenLocations(borderStar.location, reachableStar.location);
-                    const distanceScore = (distance / hyperspaceRange) * EMPTY_STAR_SCORE_MULTIPLIER;
-
-                    score += distanceScore;
-                } else if (reachableStar.ownedByPlayerId.toString() !== player._id.toString()) {
-                    const distance = this.distanceService.getDistanceBetweenLocations(borderStar.location, reachableStar.location);
-                    const distanceScore = distance / hyperspaceRange * ENEMY_STAR_SCORE_MULTIPLIER;
-
-                    score += distanceScore;
-                }
-            }
-
-            borderStarPriorities.set(borderStarId, score);
+        for (const [starId, borderStarData] of starsForExpansion) {
+            starPriorities.set(starId, 1);
         }
 
-        const visited = new Set();
-        const starPriorities = new Map(borderStarPriorities);
+        const playerId = player._id.toString();
 
-        while (true) {
-            let changed = false;
+        for (const [starId, borderStarData] of starsWithHostileBorder) {
+            const reachedByHostiles = new Array(...borderStarData.starsInRange).map(starId => context.starsById.get(starId)!).filter(star => {
+                const otherPlayerId = star.ownedByPlayerId;
+                return otherPlayerId && otherPlayerId.toString() !== playerId;
+            });
 
-            for (const [starId, priority] of starPriorities) {
-                if (!visited.has(starId)) {
-                    visited.add(starId);
+            let priority = 0;
 
-                    const reachables = context.reachablePlayerStars.get(starId)!;
-
-                    for (const reachableId of reachables) {
-                        const oldPriority = starPriorities.get(reachableId) || 0;
-                        const transitivePriority = priority * 0.5;
-                        const newPriority = Math.max(oldPriority, transitivePriority);
-
-                        starPriorities.set(reachableId, newPriority);
-
-                        changed = true;
-                    }
-                }
+            for (const star of reachedByHostiles) {
+                priority += star.ships || 0;
             }
 
-            if (!changed) {
-                break;
-            }
+            starPriorities.set(starId, priority);
         }
 
         return starPriorities;
+    }
+
+    _computeLogisticsMovements(context: Context, game: Game, player: Player): Movement[] {
+        const starPriorities = this._computeStarPriorities(context, game, player);
+
+        const movements: {from: Star, to: Star, score: number}[] = [];
+
+        const nonImportantBorderStars = context.playerStars.filter(star => {
+            const borderStarData = context.borderStars.get(star._id.toString());
+
+            return !borderStarData || borderStarData.type === BorderStarType.EmptySpace;
+        });
+
+        const willBeCollectedSoon = (star: Star, target: Star): Boolean => {
+            return Boolean(context.playerCarriers.find(carrier => {
+                return carrier.waypoints &&
+                    carrier.waypoints.length > 1 &&
+                    carrier.waypoints[0].destination.toString() === star._id.toString() &&
+                    carrier.waypoints[0].action === "collectAll" &&
+                    carrier.waypoints.find(wp => wp.destination.toString() === target._id.toString() && wp.action === "dropAll")
+            }));
+        }
+
+        for (const star of nonImportantBorderStars) {
+            if (!star.shipsActual || Math.floor(star.shipsActual) === 0) {
+                continue;
+            }
+
+            let highestTarget: Star | null = null;
+            let highestScore = 0;
+
+            for (const [possibleTargetId, priority] of starPriorities) {
+                const possibleTargetStar = context.starsById.get(possibleTargetId)!;
+                const distanceSq = this.distanceService.getDistanceSquaredBetweenLocations(star.location, possibleTargetStar.location);
+
+                const score = (priority * 10000) / distanceSq;
+
+                if (score > highestScore) {
+                    highestScore = score;
+                    highestTarget = possibleTargetStar;
+                }
+            }
+
+            if (highestTarget) {
+                const movementScore = highestScore * (highestTarget.ships || 0);
+
+                if (willBeCollectedSoon(star, highestTarget)) {
+                    continue;
+                }
+
+                movements.push({
+                    from: star,
+                    to: highestTarget,
+                    score: movementScore
+                });
+            }
+        }
+
+        movements.sort((a, b) => b.score - a.score);
+
+        return movements;
+    }
+
+    async _performLogistics(context: Context, game: Game, player: Player) {
+        let movements = this._computeLogisticsMovements(context, game, player);
+
+        if (!movements.length) {
+            return;
+        }
+
+        const ticksStockpileAllowed = game.settings.galaxy.productionTicks * LOGISTIC_STOCKPILE_CYCLES;
+        const productionCap = this.shipService.calculatePopulationCap(game, player._id);
+
+        const discardedMovements: Movement[] = [];
+
+        while (!(movements.length === 0)) {
+            const movement = movements.shift()!;
+
+            let carrier: Carrier | null = null;
+            const carriersAtSource = this.carrierService.getCarriersAtStar(game, movement.from._id).filter(carrier => carrier.waypoints.length === 0);
+
+            if (!carriersAtSource.length) {
+                const productionPerTick = this.shipService.calculateStarShipProduction(game, movement.from, productionCap);
+                const ticksStockpile = (movement.from.ships || 0) / productionPerTick;
+                const isUnimportantLogistics = ticksStockpile < ticksStockpileAllowed;
+
+                if (!isUnimportantLogistics && this._canAffordCarrier(context, game, player, false)) {
+                    const buildResult = await this.starUpgradeService.buildCarrier(game, player, movement.from._id, 1, false);
+                    // Get the carrier again since the above-returned is not tracked by the db
+                    carrier = this.carrierService.getById(game, buildResult.carrier._id);
+                }
+            } else {
+                carrier = carriersAtSource[0];
+            }
+
+            if (!carrier) {
+                discardedMovements.push(movement);
+                continue;
+            }
+
+            const path = this.pathfindingService.calculateShortestRoute(game, player, carrier, movement.from._id.toString(), movement.to._id.toString());
+
+            if (path.length === 0) {
+                continue;
+            }
+
+            const waypointsReached = path.filter(node => true);//node.costFromStart <= ticksStockpileAllowed);
+            const starsVisitedDuringMovement = waypointsReached.map(node => node.star._id.toString());
+
+            const checkForVisit = (mov2: Movement) => {
+                return starsVisitedDuringMovement.find(starId => mov2.from._id.toString() === starId) &&
+                    mov2.to._id.toString() === movement.to._id.toString();
+            };
+
+            const movementsForRemoval = movements.filter(checkForVisit);
+
+            const revisitedMovements = discardedMovements.filter(checkForVisit);
+
+            movements = movements.filter(otherMovement => {
+                return movementsForRemoval.indexOf(otherMovement) === -1;
+            });
+
+            const waypoints = this._createWaypointsDropAndReturn(path.map(node => {
+                const pickupHere = movementsForRemoval.find(mv => mv.from._id.toString() === node.star._id.toString())
+                                                        || revisitedMovements.find(mv => mv.from._id.toString() === node.star._id.toString());
+                const action = pickupHere ? "collectAll" : "nothing";
+
+                return {
+                    starId: node.star._id.toString(),
+                    action
+                };
+            }));
+
+            const carrierInitialShips = carrier.ships || 0;
+            const transferShips = movement.from.ships || 0;
+
+            await this.shipTransferService.transfer(game, player, carrier._id, carrierInitialShips + transferShips, movement.from._id, 0, false);
+
+            await this.waypointService.saveWaypointsForCarrier(game, player, carrier, waypoints, false, false);
+        }
     }
 
     _getGlobalHighestHyperspaceRange(game: Game): number {
         const highestLevel = maxBy((p: Player) => p.research.hyperspace.level, game.galaxy.players);
 
         return this.distanceService.getHyperspaceDistance(game, highestLevel);
+    }
+
+    _getHyperspaceRangeLogical(game: Game, player: Player): number {
+        const scanningRange = this.distanceService.getScanningDistance(game, player.research.scanning.level);
+        const hyperspaceRange = this.distanceService.getHyperspaceDistance(game, player.research.hyperspace.level);
+        return Math.max(scanningRange, hyperspaceRange);
     }
 
     _getHyperspaceRangeExternal(game: Game, player: Player): number {
@@ -1121,7 +1355,7 @@ export default class AIService {
             const reachableFromPlayerStars = new Set<string>();
 
             reachStars.forEach(otherStar => {
-                if (star._id !== otherStar._id && this._calculateTravelDistance(star, otherStar) <= hyperspaceRange) {
+                if (star._id.toString() !== otherStar._id.toString() && this._calculateTravelDistance(star, otherStar) <= hyperspaceRange) {
                     reachableFromPlayerStars.add(otherStar._id.toString());
                 }
             });
@@ -1130,39 +1364,6 @@ export default class AIService {
         });
 
         return starGraph;
-    }
-
-    async _playFirstTick(game: Game, player: Player) {
-        if (!player.credits || player.credits < 0) {
-            return
-        }
-
-        // On the first tick after production:
-        // 1. Bulk upgrade X% of credits to ind and sci.
-        let creditsToSpendSci = Math.floor(player.credits / 100 * FIRST_TICK_BULK_UPGRADE_SCI_PERCENTAGE);
-        let creditsToSpendInd = Math.floor(player.credits / 100 * FIRST_TICK_BULK_UPGRADE_IND_PERCENTAGE);
-
-        if (creditsToSpendSci) {
-            await this.starUpgradeService.upgradeBulk(game, player, 'totalCredits', 'science', creditsToSpendSci, false);
-        }
-
-        if (creditsToSpendInd) {
-            await this.starUpgradeService.upgradeBulk(game, player, 'totalCredits', 'industry', creditsToSpendInd, false);
-        }
-    }
-
-    async _playLastTick(game: Game, player: Player) {
-        if (!player.credits || player.credits <= 0) {
-            return
-        }
-
-        // On the last tick of the cycle:
-        // 1. Spend remaining credits upgrading economy.
-        let creditsToSpendEco = Math.floor(player.credits / 100 * LAST_TICK_BULK_UPGRADE_ECO_PERCENTAGE);
-
-        if (creditsToSpendEco) {
-            await this.starUpgradeService.upgradeBulk(game, player, 'totalCredits', 'economy', creditsToSpendEco, false);
-        }
     }
 
     getStarName(context: Context, starId: string) {

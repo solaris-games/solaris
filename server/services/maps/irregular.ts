@@ -1,5 +1,5 @@
 const randomSeeded = require('random-seed');
-const simplexNoise = require('simplex-noise');
+import { createNoise2D } from 'simplex-noise';
 import ValidationError from '../../errors/validation';
 import { GameResourceDistribution } from '../types/Game';
 import { Location } from '../types/Location';
@@ -9,6 +9,8 @@ import RandomService from '../random';
 import ResourceService from '../resource';
 import StarService from '../star';
 import StarDistanceService from '../starDistance';
+
+const MAX_SEED = Number.MAX_SAFE_INTEGER;
 
 export default class IrregularMapService {
 
@@ -143,7 +145,7 @@ export default class IrregularMapService {
                 }
                 position = this._rotatedLocation(position, rotation);
                 position = this._displacedLocation(position, pivot);
-                position.noiseIntensity = simplexNoiseGenerator.noise2D(position.x/noiseSpread, position.y/noiseSpread);
+                position.noiseIntensity = simplexNoiseGenerator(position.x/noiseSpread, position.y/noiseSpread);
 
                 positionIsValid = true;
                 for( let homeLocation of homeLocations ) {
@@ -249,7 +251,7 @@ export default class IrregularMapService {
 
     _pruneLocationsWithNoise(locations: Location[], desiredLocationCount: number, simplexNoiseGenerator, noiseSpread: number) {
         for( let location of locations ) {
-            (location as any).noiseIntensity = simplexNoiseGenerator.noise2D(location.x/noiseSpread, location.y/noiseSpread);
+            (location as any).noiseIntensity = simplexNoiseGenerator(location.x/noiseSpread, location.y/noiseSpread);
         }
         locations.sort( (loc1, loc2) => {
             return ((loc1 as any).noiseIntensity-(loc2 as any).noiseIntensity);
@@ -286,10 +288,10 @@ export default class IrregularMapService {
             throw new ValidationError(`King of the hill is not supported in irregular maps.`);
         }
 
-        const SEED = ( Math.random()*(10**8) ).toFixed(0);
-        const SPREAD = 2.5
+        const SEED = ( Math.random()* MAX_SEED).toFixed(0);
+        const SPREAD = 2.5;
         const RNG = randomSeeded.create(SEED);
-        const SIMPLEX_NOISE = new simplexNoise(SEED);
+        const SIMPLEX_NOISE = createNoise2D(RNG.rand);
         const NOISE_BASE_SPREAD = 32.0;
         //const NOISE_SPREAD = NOISE_BASE_SPREAD * Math.sqrt(starCount*1.3);// try to make the noise spread with the size of the galaxy. this makes the void gaps also proportional to galaxy size. 
         //const NOISE_SPREAD = 512; //optionally could keep the voids constant in size, no matter the galaxy size
@@ -302,8 +304,8 @@ export default class IrregularMapService {
         const NOISE_SPREAD = NOISE_BASE_SPREAD * ( (STARS_PER_PLAYER+20)/9.0 )
        
         //the amount of rings must produce about 30% more stars then requested. this way they can be pruned latter with noise to produce nice gap
-        const STAR_COUNT_MULTIPLYER = 1.3;
-        const RING_COUNT = this._getRingCount(STARS_PER_PLAYER, (STARS_PER_PLAYER*STAR_COUNT_MULTIPLYER));
+        const STAR_COUNT_MULTIPLIER = 1.3;
+        const RING_COUNT = this._getRingCount(STARS_PER_PLAYER, (STARS_PER_PLAYER*STAR_COUNT_MULTIPLIER));
         const STAR_DISTANCE = MINIMUM_STAR_DISTANCE*SPREAD;
         const STAR_DISLOCATION_THRESHOLD = MINIMUM_STAR_DISTANCE*((SPREAD-1.0)/2.0);
         const PIVOT_DISTANCE = RING_COUNT*STAR_DISTANCE;

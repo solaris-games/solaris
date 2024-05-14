@@ -1,7 +1,19 @@
 <template>
 <div>
-  <p>
+  <p v-if="!isTeamGame">
     The game has ended, <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{getWinnerAlias()}}</a> is the winner!
+  </p>
+
+  <p v-if="isTeamGame">
+    The game has ended. {{getWinningTeamName()}} has won!
+
+    The victorious team members are:
+
+    <ul>
+      <li v-for="player in getWinningTeamMembers()" :key="player._id">
+        <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{player.alias}}</a>
+      </li>
+    </ul>
   </p>
 
   <p>
@@ -61,6 +73,15 @@ export default {
     }
   },
   methods: {
+    getWinningTeam () {
+      return GameHelper.getTeamById(this.$store.state.game, this.$store.state.game.state.winningTeam)
+    },
+    getWinningTeamMembers () {
+      return this.getWinningTeam().players.map(id => GameHelper.getPlayerById(this.$store.state.game, id))
+    },
+    getWinningTeamName () {
+      return this.getWinningTeam().name
+    },
     getWinnerAlias () {
       let winnerPlayer = GameHelper.getPlayerById(this.$store.state.game, this.$store.state.game.state.winner)
 
@@ -74,6 +95,9 @@ export default {
     }
   },
   computed: {
+    isTeamGame () {
+      return GameHelper.isTeamConquest(this.$store.state.game)
+    },
     hasRankResults () {
       return this.event.data && this.event.data.rankingResult && this.event.data.rankingResult.ranks && this.event.data.rankingResult.ranks.length
     },

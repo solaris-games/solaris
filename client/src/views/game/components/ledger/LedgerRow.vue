@@ -58,7 +58,7 @@ export default {
             this.$toasted.show(`The debt ${playerAlias} owes you has been forgiven.`, { type: 'success' })
           }
 
-          ledger.debt = response.data.debt
+          ledger.debt = response.data.ledger.debt
         } catch (err) {
           console.error(err)
         }
@@ -89,7 +89,7 @@ export default {
             gameHelper.getUserPlayer(this.$store.state.game).ledger.creditsSpecialists -= Math.abs(ledger.debt)
           }
 
-          ledger.debt = response.data.debt
+          ledger.debt = response.data.ledger.debt;
         } catch (err) {
           console.error(err)
         }

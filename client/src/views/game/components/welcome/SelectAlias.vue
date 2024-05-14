@@ -14,13 +14,17 @@
                     <select-avatar v-on:onAvatarChanged="onAvatarChanged"/>
                   </div>
                   <div class="col pt-0">
-                    <p v-if="!avatar">Every great story needs both heroes and villians. Which will you be?</p>
+                    <p v-if="!avatar">Every great story needs both heroes and villains. Which will you be?</p>
 
                     <h5 v-if="avatar">{{avatar.name}}</h5>
                     <p v-if="avatar"><small class="linebreaks">{{avatar.description}}</small></p>
 
                     <div class="mb-2">
-                      <input name="alias" class="form-control" required="required" placeholder="Enter your alias here" type="text" minlength="3" maxlength="24" v-model="alias" v-on:keyup="onAliasChanged">
+                      <input name="alias" class="form-control" required="required" placeholder="Enter your alias here" type="text" minlength="3" maxlength="24" v-model="alias" @change="onAliasChanged">
+                    </div>
+
+                    <div v-if="isAnonymousGame" class="alert alert-warning">
+                      <p>This game is anonymous, you might want to hide your identity!</p>
                     </div>
 
                     <!-- <div class="mb-2 text-center small">
@@ -42,13 +46,20 @@ export default {
   components: {
     'select-avatar': SelectAvatarVue
   },
+  props: {
+    isAnonymousGame: Boolean,
+  },
   data () {
     return {
       alias: null,
-      avatar: null
+      avatar: null,
     }
   },
   async mounted () {
+    console.log({
+      isAnonymousGame: this.isAnonymousGame
+    });
+
     try {
       let response = await UserService.getMyUserInfo()
 

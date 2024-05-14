@@ -26,13 +26,13 @@
             <research-progress class="d-none d-lg-inline-block me-2" v-if="userPlayer" @onViewResearchRequested="onViewResearchRequested"/>
         </div>
         <div class="col-auto text-end pointer pt-1" v-if="userPlayer" @click="onViewBulkUpgradeRequested">
-            <span class="d-none d-lg-inline-block me-2">
+            <span class="d-none d-lg-inline-block me-2" title="Total economy">
                 <i class="fas fa-money-bill-wave text-success"></i> {{userPlayer.stats.totalEconomy}}
             </span>
-            <span class="d-none d-lg-inline-block me-2">
+            <span class="d-none d-lg-inline-block me-2" title="Total industry">
                 <i class="fas fa-tools text-warning"></i> {{userPlayer.stats.totalIndustry}}
             </span>
-            <span class="d-none d-lg-inline-block me-2">
+            <span class="d-none d-lg-inline-block me-2" title="Total science">
                 <i class="fas fa-flask text-info"></i> {{userPlayer.stats.totalScience}}
             </span>
         </div>
@@ -55,7 +55,7 @@
             </button>
 
             <hamburger-menu class="ms-1 d-none d-sm-inline-block" :buttonClass="'btn-sm btn-info'" :dropType="'dropleft'" />
-            
+
             <button class="btn btn-sm btn-info ms-1 d-none d-sm-inline-block" type="button" @click="goToMyGames()">
                 <i class="fas fa-chevron-left"></i>
             </button>
@@ -65,7 +65,6 @@
 </template>
 
 <script>
-import { setInterval } from 'timers'
 import GameHelper from '../../../../services/gameHelper'
 import router from '../../../../router'
 import MENU_STATES from '../../../../services/data/menuStates'
@@ -213,7 +212,7 @@ export default {
       if (!this.$store.state.game) {
         return
       }
-      
+
       if (GameHelper.isGamePendingStart(this.$store.state.game)) {
         this.timeRemaining = GameHelper.getCountdownTimeString(this.$store.state.game, this.$store.state.game.state.startDate)
       } else {
@@ -299,7 +298,7 @@ export default {
       if (menuState === MENU_STATES.INTEL && GameHelper.isDarkModeExtra(this.$store.state.game)) {
         return
       }
-      
+
       switch (menuState) {
         case null:
           this.setMenuState(null, null)

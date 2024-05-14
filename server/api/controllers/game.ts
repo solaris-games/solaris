@@ -325,6 +325,33 @@ export default (container: DependencyContainer) => {
                 return next(err);
             }
         },
+        togglePaused: async (req, res, next) => {
+            try {
+                const doPause = req.body?.pause;
+
+                if (doPause === null || doPause === undefined) {
+                    throw new ValidationError('Pause parameter is required.');
+                }
+
+                await container.gameService.setPauseState(
+                    req.game,
+                    doPause,
+                    req.session.userId);
+
+                return res.sendStatus(200);
+            } catch (err) {
+                return next(err);
+            }
+        },
+        forceStart: async (req, res, next) => {
+            try {
+                await container.gameService.forceStart(req.game, req.session.userId);
+
+                return res.sendStatus(200);
+            }  catch (err) {
+                return next(err);
+            }
+        },
         getPlayerUser: async (req, res, next) => {
             try {
                 let user = await container.gameService.getPlayerUser(

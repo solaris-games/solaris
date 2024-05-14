@@ -41,7 +41,11 @@ class GameHelper {
     return game.galaxy.players.find(x => x._id === star.ownedByPlayerId)
   }
 
-  getStarsOwnedByPlayer (player, stars) {
+  getStarsOwnedByPlayer(player, stars) {
+    if (player == null) {
+      return [];
+    }
+
     return stars.filter(s => s.ownedByPlayerId && s.ownedByPlayerId === player._id)
   }
 
@@ -167,7 +171,7 @@ class GameHelper {
       let ticks
 
       // Check for worm holes
-      if (prevLoc.type === 'star' && currLoc.type === 'star' && 
+      if (prevLoc.type === 'star' && currLoc.type === 'star' &&
         prevLoc.object.wormHoleToStarId === currLoc.object._id && currLoc.object.wormHoleToStarId === prevLoc.object._id) {
         ticks = 1
       } else {
@@ -193,7 +197,7 @@ class GameHelper {
 
     const isInHyperspaceRange = distanceBetweenStars <= hyperspaceDistance
     const canWarpSpeed = this.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar)
-    
+
     if (isInHyperspaceRange && canWarpSpeed) {
       return this.getTicksBetweenLocations(game, carrier, [sourceStar, destinationStar], game.constants.distances.warpSpeedMultiplier)
     }
@@ -239,14 +243,12 @@ class GameHelper {
       return ''
     }
 
-    if (game.settings.gameTime.gameType === 'realTime') {
-      let date = useNowDate ? moment().utc() : game.state.lastTickDate
+    if (game.settings.gameTime.gameType === 'realTime' && !this.isGameFinished(game)) {
+      const date = useNowDate ? moment().utc() : game.state.lastTickDate
 
-      let timeRemainingEtaDate = this.calculateTimeByTicks(ticks, game.settings.gameTime.speed, date)
+      const timeRemainingEtaDate = this.calculateTimeByTicks(ticks, game.settings.gameTime.speed, date)
 
-      let timeRemainingEta = this.getCountdownTimeString(game, timeRemainingEtaDate, largestUnitOnly)
-
-      return timeRemainingEta
+      return this.getCountdownTimeString(game, timeRemainingEtaDate, largestUnitOnly)
     }
 
     return `${ticks} ticks`
@@ -321,7 +323,7 @@ class GameHelper {
     // if the waypoint is going to the same star then it is at least 1
     // tick, plus any delay ticks.
     if (waypoint.source === waypoint.destination) {
-        return 1 + delayTicks
+      return 1 + delayTicks
     }
 
     let sourceStar = this.getStarById(game, waypoint.source)
@@ -331,7 +333,7 @@ class GameHelper {
     let instantSpeed = sourceStar && this.isStarPairWormHole(sourceStar, destinationStar)
 
     if (instantSpeed) {
-        return 1 + delayTicks
+      return 1 + delayTicks
     }
 
     let source = sourceStar == null ? carrier.location : sourceStar.location
@@ -340,7 +342,7 @@ class GameHelper {
     // If the carrier is already en-route, then the number of ticks will be relative
     // to where the carrier is currently positioned.
     if (!carrier.orbiting && carrier.waypoints[0]._id === waypoint._id) {
-        source = carrier.location
+      source = carrier.location
     }
 
     let distance = this.getDistanceBetweenLocations(source, destination)
@@ -351,7 +353,7 @@ class GameHelper {
     let ticks = 1
 
     if (tickDistance) {
-        ticks = Math.ceil(distance / tickDistance)
+      ticks = Math.ceil(distance / tickDistance)
     }
 
     ticks += delayTicks // Add any delay ticks the waypoint has.
@@ -363,13 +365,13 @@ class GameHelper {
     let totalTicks = 0
 
     for (let i = 0; i < carrier.waypoints.length; i++) {
-        let cwaypoint = carrier.waypoints[i]
+      let cwaypoint = carrier.waypoints[i]
 
-        totalTicks += this.calculateWaypointTicks(game, carrier, cwaypoint)
+      totalTicks += this.calculateWaypointTicks(game, carrier, cwaypoint)
 
-        if (cwaypoint === waypoint) {
-            break
-        }
+      if (cwaypoint === waypoint) {
+        break
+      }
     }
 
     return totalTicks
@@ -388,53 +390,53 @@ class GameHelper {
   canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar) {
     // Double check for destroyed stars.
     if (sourceStar == null || destinationStar == null) {
-        return false
+      return false
     }
 
     // If both stars have warp gates and they are both owned by players...
     if (sourceStar.warpGate && destinationStar.warpGate && sourceStar.ownedByPlayerId && destinationStar.ownedByPlayerId) {
-        // If both stars are owned by the player or by allies then carriers can always move at warp.
-        let sourceAllied = sourceStar.ownedByPlayerId === carrier.ownedByPlayerId || (DiplomacyHelper.isFormalAlliancesEnabled(game) && DiplomacyHelper.isDiplomaticStatusToPlayersAllied(game, sourceStar.ownedByPlayerId, [carrier.ownedByPlayerId]))
-        let desinationAllied = destinationStar.ownedByPlayerId === carrier.ownedByPlayerId || (DiplomacyHelper.isFormalAlliancesEnabled(game) && DiplomacyHelper.isDiplomaticStatusToPlayersAllied(game, destinationStar.ownedByPlayerId, [carrier.ownedByPlayerId]))
+      // If both stars are owned by the player or by allies then carriers can always move at warp.
+      let sourceAllied = sourceStar.ownedByPlayerId === carrier.ownedByPlayerId || (DiplomacyHelper.isFormalAlliancesEnabled(game) && DiplomacyHelper.isDiplomaticStatusToPlayersAllied(game, sourceStar.ownedByPlayerId, [carrier.ownedByPlayerId]))
+      let desinationAllied = destinationStar.ownedByPlayerId === carrier.ownedByPlayerId || (DiplomacyHelper.isFormalAlliancesEnabled(game) && DiplomacyHelper.isDiplomaticStatusToPlayersAllied(game, destinationStar.ownedByPlayerId, [carrier.ownedByPlayerId]))
 
-        // If both stars are owned by the player then carriers can always move at warp.
-        if (sourceAllied && desinationAllied) {
-            return true
-        }
-
-        // If one of the stars are not owned by the current player then we need to check for
-        // warp scramblers.
-
-        // But if the carrier has the warp stabilizer specialist then it can travel at warp speed no matter
-        // which player it belongs to or whether the stars it is travelling to or from have locked warp gates.
-        if (carrier.specialistId && carrier.specialist) {
-            let carrierSpecialist = carrier.specialist
-
-            if (carrierSpecialist.modifiers.special && carrierSpecialist.modifiers.special.unlockWarpGates) {
-                return true
-            }
-        }
-
-        // If either star has a warp scrambler present then carriers cannot move at warp.
-        // Note that we only need to check for scramblers on stars that do not belong to the player.
-        if (!sourceAllied && sourceStar.specialistId && sourceStar.specialist) {
-            let specialist = sourceStar.specialist
-
-            if (specialist.modifiers.special && specialist.modifiers.special.lockWarpGates) {
-                return false
-            }
-        }
-
-        if (!desinationAllied && destinationStar.specialistId && destinationStar.specialist) {
-            let specialist = destinationStar.specialist
-
-            if (specialist.modifiers.special && specialist.modifiers.special.lockWarpGates) {
-                return false
-            }
-        }
-
-        // If none of the stars have scramblers then warp speed ahead.
+      // If both stars are owned by the player then carriers can always move at warp.
+      if (sourceAllied && desinationAllied) {
         return true
+      }
+
+      // If one of the stars are not owned by the current player then we need to check for
+      // warp scramblers.
+
+      // But if the carrier has the warp stabilizer specialist then it can travel at warp speed no matter
+      // which player it belongs to or whether the stars it is travelling to or from have locked warp gates.
+      if (carrier.specialistId && carrier.specialist) {
+        let carrierSpecialist = carrier.specialist
+
+        if (carrierSpecialist.modifiers.special && carrierSpecialist.modifiers.special.unlockWarpGates) {
+          return true
+        }
+      }
+
+      // If either star has a warp scrambler present then carriers cannot move at warp.
+      // Note that we only need to check for scramblers on stars that do not belong to the player.
+      if (!sourceAllied && sourceStar.specialistId && sourceStar.specialist) {
+        let specialist = sourceStar.specialist
+
+        if (specialist.modifiers.special && specialist.modifiers.special.lockWarpGates) {
+          return false
+        }
+      }
+
+      if (!desinationAllied && destinationStar.specialistId && destinationStar.specialist) {
+        let specialist = destinationStar.specialist
+
+        if (specialist.modifiers.special && specialist.modifiers.special.lockWarpGates) {
+          return false
+        }
+      }
+
+      // If none of the stars have scramblers then warp speed ahead.
+      return true
     }
 
     return false
@@ -442,17 +444,17 @@ class GameHelper {
 
   getCarrierDistancePerTick(game, carrier, warpSpeed = false, instantSpeed = false) {
     if (instantSpeed) {
-        return null
+      return null
     }
 
     let distanceModifier = warpSpeed ? game.constants.distances.warpSpeedMultiplier : 1
 
     if (carrier.specialistId && carrier.specialist) {
-        let specialist = carrier.specialist
+      let specialist = carrier.specialist
 
-        if (specialist.modifiers.local) {
-            distanceModifier *= (specialist.modifiers.local.speed || 1)
-        }
+      if (specialist.modifiers.local) {
+        distanceModifier *= (specialist.modifiers.local.speed || 1)
+      }
     }
 
     return game.settings.specialGalaxy.carrierSpeed * distanceModifier;
@@ -508,6 +510,10 @@ class GameHelper {
     return !game.state.startDate
   }
 
+  isGameStarted (game) {
+    return game.state.startDate != null
+  }
+
   isGameInProgress (game) {
     return !this.isGameWaitingForPlayers(game) && !this.isGamePaused(game) && game.state.startDate != null && moment().utc().diff(game.state.startDate) >= 0 && !game.state.endDate
   }
@@ -545,6 +551,14 @@ class GameHelper {
     return game.settings.general.mode === 'conquest' && game.settings.conquest.victoryCondition === 'starPercentage'
   }
 
+  isWinConditionHomeStars (game) {
+    return game.settings.conquest.victoryCondition === 'homeStarPercentage';
+  }
+
+  isWinConditionStarCount (game) {
+    return game.settings.conquest.victoryCondition === 'starPercentage';
+  }
+
   isConquestHomeStars (game) {
     return game.settings.general.mode === 'conquest' && game.settings.conquest.victoryCondition === 'homeStarPercentage'
   }
@@ -561,6 +575,9 @@ class GameHelper {
     return game.settings.general.spectators === 'enabled'
   }
 
+  isTeamConquest (game) {
+    return Boolean(game.settings.general.mode === 'teamConquest')
+  }
   getGameStatusText (game) {
     if (this.isGamePendingStart(game)) {
       return 'Waiting to start'
@@ -635,6 +652,51 @@ class GameHelper {
     }
 
     return 'Unknown'
+  }
+
+  getSortedLeaderboardTeamList (game) {
+    const sortingKey = game.settings.conquest.victoryCondition === 'starPercentage' ? 'totalStars' : 'totalHomeStars';
+
+    const teamsWithData = game.galaxy.teams.map(team => {
+      const players = team.players.map(playerId => this.getPlayerById(game, playerId))
+
+      players.sort((a, b) => {
+        const aStars = a.stats && a.stats[sortingKey];
+        const bStars = b.stats && b.stats[sortingKey];
+
+        if (aStars > bStars) return -1;
+        if (aStars < bStars) return 1;
+        return 0;
+      });
+
+      let totalStars = 0;
+      let totalHomeStars = 0;
+
+      for (const player of players) {
+        if (!player.stats) {
+          continue;
+        }
+
+        totalStars += player.stats.totalStars || 0;
+        totalHomeStars += player.stats.totalHomeStars || 0;
+      }
+
+      return {
+        team,
+        players,
+        totalStars,
+        totalHomeStars
+      }
+    });
+
+    teamsWithData.sort((a, b) => {
+      if (a[sortingKey] > b[sortingKey]) return -1;
+      if (a[sortingKey] < b[sortingKey]) return 1;
+
+      return 0;
+    });
+
+    return teamsWithData;
   }
 
   getSortedLeaderboardPlayerList (game) {
@@ -871,9 +933,9 @@ class GameHelper {
   }
 
   isAllUndefeatedPlayersReadyToQuit(game) {
-      let undefeatedPlayers = this.listAllUndefeatedPlayers(game)
+    let undefeatedPlayers = this.listAllUndefeatedPlayers(game)
 
-      return undefeatedPlayers.filter(x => x.readyToQuit).length === undefeatedPlayers.length
+    return undefeatedPlayers.filter(x => x.readyToQuit).length === undefeatedPlayers.length
   }
 
   gameHasOpenSlots (game) {
@@ -897,8 +959,8 @@ class GameHelper {
     let nextTick;
 
     if (this.isRealTimeGame(game)) {
-        // If in real time mode, then calculate when the next tick will be and work out if we have reached that tick.
-        nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'seconds');
+      // If in real time mode, then calculate when the next tick will be and work out if we have reached that tick.
+      nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'seconds');
     } else if (this.isTurnBasedGame(game)) {
       let isAllPlayersReady = this.isAllUndefeatedPlayersReady(game)
 
@@ -906,9 +968,9 @@ class GameHelper {
         return true
       }
 
-        nextTick = moment(lastTick).utc().add(game.settings.gameTime.maxTurnWait, 'minutes');
+      nextTick = moment(lastTick).utc().add(game.settings.gameTime.maxTurnWait, 'minutes');
     } else {
-        throw new Error(`Unsupported game type.`);
+      throw new Error(`Unsupported game type.`);
     }
 
     return nextTick.diff(moment().utc(), 'seconds') <= 0;
@@ -948,7 +1010,7 @@ class GameHelper {
         userPlayer.stats.totalIndustry++
         break;
       case 'science':
-        userPlayer.stats.totalScience++
+        userPlayer.stats.totalScience += game.constants.research.sciencePointMultiplier
         break;
     }
 
@@ -981,12 +1043,13 @@ class GameHelper {
     }
 
     const bankingLevel = player.research.banking.level
+    const multiplier = game.constants.player.bankingCycleRewardMultiplier
 
     switch (game.settings.technology.bankingReward) {
       case 'standard':
-          return Math.round((bankingLevel * 75) + (0.15 * bankingLevel * player.stats.totalEconomy))
+          return Math.round((bankingLevel * multiplier) + (0.15 * bankingLevel * player.stats.totalEconomy))
       case 'legacy':
-          return bankingLevel * 75
+          return bankingLevel * multiplier
     }
   }
 
@@ -1001,7 +1064,7 @@ class GameHelper {
     const costPerCarrier = upkeepCosts[game.settings.specialGalaxy.carrierUpkeepCost];
 
     if (!costPerCarrier) {
-        return 0;
+      return 0;
     }
 
     return player.stats.totalCarriers * costPerCarrier;
@@ -1016,6 +1079,14 @@ class GameHelper {
     const fromEconomy = player.stats.totalEconomy * 10
     const upkeep = this._getUpkeepCosts(game, player);
     return fromEconomy - upkeep  + this._getBankingCredits(game, player);
+  }
+
+  calculateTickIncome(game, player) {
+    let stars = this.getStarsOwnedByPlayer(player, game.galaxy.stars).filter(s => s.specialistId === 12); // Financial Analyst
+
+    let creditsPerTickByScience = stars[0]?.specialist.modifiers.special.creditsPerTickByScience ?? 0;
+
+    return (stars.reduce((totalScience, star) => totalScience + star.infrastructure.science, 0) * game.constants.research.sciencePointMultiplier) * creditsPerTickByScience;
   }
 
   isStarHasMultiplePlayersInOrbit (game, star) {
@@ -1085,15 +1156,15 @@ class GameHelper {
   calculateCombatEventShipCount(star, carriers, key) {
     let array = star ? carriers.concat([star]) : carriers //Add the star if we need to
 
-    let unscrambled = array.filter(c => c[key] !== "???")
-    let scrambled = array.filter(c => c[key] === "???")
+    let unscrambled = array.filter(c => c[key] !== '???')
+    let scrambled = array.filter(c => c[key] === '???')
 
-    if (scrambled.length === unscrambled.length) return "???" //If everything is scrambled, the total is scrambled.
-    
+    if (scrambled.length === unscrambled.length) return '???' //If everything is scrambled, the total is scrambled.
+
     let result = unscrambled.reduce((sum, c) => sum + c[key], 0).toString() //Add up all the ships
 
     if (scrambled.length) { //If any carriers are scramled, add a *
-      result += "*"
+      result += '*'
     }
 
     return result
@@ -1105,6 +1176,39 @@ class GameHelper {
 
   isGameAllowAbandonStars(game) {
     return game.settings.player.allowAbandonStars === 'enabled'
+  }
+
+  getTeamByPlayer(game, player) {
+    if (!game.galaxy.teams) {
+      return null;
+    }
+
+    return game.galaxy.teams.find(t => t.players.includes(player._id));
+  }
+
+  getTeamById(game, teamId) {
+    if (!game.galaxy.teams) {
+      return null;
+    }
+
+    return game.galaxy.teams.find(t => t._id === teamId);
+  }
+
+  calculateTicksToNextShip(shipsActual, manufacturing) {
+    if (manufacturing <= 0) {
+      return null
+    }
+
+    const next = Math.floor(shipsActual + 1);
+    let current = shipsActual;
+    let count = 0;
+
+    while (current < next) {
+      count++;
+      current += manufacturing;
+    }
+
+    return count;
   }
 }
 

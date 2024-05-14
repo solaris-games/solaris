@@ -5,6 +5,7 @@ export interface Config {
     connectionString?: string;
     serverUrl?: string;
     clientUrl?: string;
+    corsUrls: string[];
     cacheEnabled: boolean;
     smtp: {
         enabled: boolean;

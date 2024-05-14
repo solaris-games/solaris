@@ -1,3 +1,5 @@
+import moment from "moment/moment";
+
 const EventEmitter = require('events');
 import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
@@ -17,6 +19,9 @@ import ConversationService from './conversation';
 import PlayerReadyService from './playerReady';
 import GamePlayerQuitEvent from './types/events/GamePlayerQuit';
 import GamePlayerDefeatedEvent from './types/events/GamePlayerDefeated';
+import {LeaderboardPlayer} from "./types/Leaderboard";
+import GameJoinService from "./gameJoin";
+import GameAuthService from "./gameAuth";
 
 export const GameServiceEvents = {
     onPlayerQuit: 'onPlayerQuit',
@@ -37,6 +42,8 @@ export default class GameService extends EventEmitter {
     gameStateService: GameStateService;
     conversationService: ConversationService;
     playerReadyService: PlayerReadyService;
+    gameJoinService: GameJoinService;
+    gameAuthService: GameAuthService;
 
     constructor(
         gameRepo: Repository<Game>,
@@ -50,7 +57,9 @@ export default class GameService extends EventEmitter {
         gameTypeService: GameTypeService,
         gameStateService: GameStateService,
         conversationService: ConversationService,
-        playerReadyService: PlayerReadyService
+        playerReadyService: PlayerReadyService,
+        gameJoinService: GameJoinService,
+        gameAuthService: GameAuthService,
     ) {
         super();
         
@@ -66,6 +75,8 @@ export default class GameService extends EventEmitter {
         this.gameStateService = gameStateService;
         this.conversationService = conversationService;
         this.playerReadyService = playerReadyService;
+        this.gameJoinService = gameJoinService;
+        this.gameAuthService = gameAuthService;
     }
 
     async getByIdAll(id: DBObjectId): Promise<Game | null> {
@@ -226,13 +237,79 @@ export default class GameService extends EventEmitter {
         this.emit(GameServiceEvents.onPlayerDefeated, e);
     }
 
+    async forceStart(game: Game, forceStartingUserId: DBObjectId) {
+        if (!await this.gameAuthService.isGameAdmin(game, forceStartingUserId)) {
+            throw new ValidationError('You do not have permission to force start this game.');
+        }
+
+        const players = game.settings.general.playerLimit;
+        const filledSlots = game.galaxy.players.filter(p => !p.isOpenSlot).length;
+        const aiSlots = players - filledSlots;
+
+        if (filledSlots === players) {
+            throw new ValidationError('Cannot force start a game that is already full.');
+        }
+
+        if (filledSlots === 0) {
+            throw new ValidationError('Cannot force start game: at least one human player is needed');
+        }
+
+        if (aiSlots > 3) {
+            throw new ValidationError('Cannot force start game: only 3 AI players are allowed');
+        }
+
+        this.gameJoinService.assignNonUserPlayersToAI(game, false);
+
+        this.gameJoinService.startGame(game);
+
+        // TODO: Prevent game from ending
+
+        await game.save();
+    }
+
+    async setPauseState(game: Game, pauseState: boolean, pausingUserId: DBObjectId) {
+        if (!await this.gameAuthService.isGameAdmin(game, pausingUserId)) {
+            throw new ValidationError('You do not have permission to pause/unpause this game.');
+        }
+
+        if (!this.gameStateService.isInProgress(game)) {
+            throw new ValidationError('Cannot pause a game that is not in progress.');
+        }
+
+        if (!pauseState) {
+            // Reset afk timers of the players
+            // Note: We do not want to update last seen of users as those
+            // are separate from the game afk logic.
+            await this.gameRepo.updateOne({
+                _id: game._id,
+                'galaxy.players.$.afk': false,
+                'galaxy.players.$.defeated': false
+            }, {
+                $set: {
+                    'galaxy.players.$.lastSeen': moment().utc(),
+                }
+            });
+        }
+        
+        await this.gameRepo.updateOne({
+            _id: game._id
+        }, {
+            $set: {
+                'state.paused': pauseState
+            }
+        });
+    }
+
     async delete(game: Game, deletedByUserId?: DBObjectId) {
         // If being deleted by a legit user then do some validation.
         if (deletedByUserId && game.state.startDate) {
             throw new ValidationError('Cannot delete games that are in progress or completed.');
         }
 
-        if (deletedByUserId && game.settings.general.createdByUserId && game.settings.general.createdByUserId.toString() !== deletedByUserId.toString()) {
+        const isAdmin = deletedByUserId && await this.userService.getUserIsAdmin(deletedByUserId);
+        const isCreator = deletedByUserId && game.settings.general.createdByUserId && game.settings.general.createdByUserId.toString() === deletedByUserId.toString();
+
+        if (deletedByUserId && !isAdmin && !isCreator) {
             throw new ValidationError('Cannot delete this game, you did not create it.');
         }
 
@@ -286,6 +363,18 @@ export default class GameService extends EventEmitter {
         });
     }
 
+    async resetQuitters(game: Game) {
+        game.quitters = [];
+
+        await this.gameRepo.updateOne({
+            _id: game._id
+        }, {
+            $set: {
+                quitters: []
+            }
+        });
+    }
+
     // TODO: Move to a gameLockService
     async lockAll(locked: boolean = true) {
         await this.gameRepo.updateMany({
@@ -311,10 +400,30 @@ export default class GameService extends EventEmitter {
         return undefeatedPlayers.filter(x => x.ready).length === undefeatedPlayers.length;
     }
 
-    isAllUndefeatedPlayersReadyToQuit(game: Game) {
-        let undefeatedPlayers = this.listAllUndefeatedPlayers(game);
+    isReadyToQuitImmediateEnd(game: Game) {
+        const undefeatedPlayers = this.listAllUndefeatedPlayers(game);
 
-        return undefeatedPlayers.filter(x => x.readyToQuit).length === undefeatedPlayers.length;
+        return undefeatedPlayers.every(x => x.readyToQuit);
+    }
+
+    checkReadyToQuit(game: Game, leaderboard: LeaderboardPlayer[]) {
+        const undefeatedPlayers = this.listAllUndefeatedPlayers(game);
+
+        const rtqFraction = game.settings?.general?.readyToQuitFraction || 1.0;
+        const starsForEnd = rtqFraction * game.state.stars;
+
+        let rtqStarsSum = 0;
+        let allUndefeatedHaveRTQed = true;
+
+        for (const player of undefeatedPlayers) {
+            if (player.readyToQuit) {
+                rtqStarsSum += leaderboard.find(x => x.player._id.toString() === player._id.toString())?.stats?.totalStars || 0;
+            } else {
+                allUndefeatedHaveRTQed = false;
+            }
+        }
+
+        return allUndefeatedHaveRTQed || rtqStarsSum >= starsForEnd;
     }
 
     async forceEndGame(game: Game) {

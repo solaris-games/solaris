@@ -3,9 +3,10 @@
     "name": "[[[RANDOM]]]",
     "description": "The galaxy is slowly shrinking, capture and hold the center and survive for as long as you can. The winner is the last man standing!",
     "type": "special_battleRoyale",
+    "createdFromTemplate": "special_battleRoyale",
     "mode": "battleRoyale",
     "password": null,
-    "playerLimit": 8,
+    "playerLimit": 10,
     "playerType": "all",
     "anonymity": "normal",
     "playerOnlineStatus": "hidden",
@@ -79,13 +80,13 @@
       "enabled": "disabled",
       "shipsPerStar": 100
     },
-    "allowAbandonStars": "enabled"
+    "allowAbandonStars": "disabled"
   },
   "diplomacy": {
     "enabled": "enabled",
     "upkeepCost": "none",
     "tradeRestricted": "disabled", 
-    "maxAlliances": 7, 
+    "maxAlliances": 9,
     "globalEvents": "disabled"
   },
   "technology": {
@@ -111,7 +112,7 @@
     },
     "bankingReward": "standard",
     "experimentationReward": "standard",
-    "specialistTokenReward": "standard"
+    "specialistTokenReward": "experimental"
   },
   "gameTime": {
     "gameType": "realTime",

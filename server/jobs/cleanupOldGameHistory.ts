@@ -5,7 +5,7 @@ export default (container: DependencyContainer) => {
     /*
         Delete game history for games that completed more than 1 month ago.
     */
-    const months = 1;
+    const months = 6;
 
     return {
 
