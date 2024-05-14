@@ -266,6 +266,10 @@ export default class GameTickService extends EventEmitter {
 
         this.playerReadyService.resetReadyStatuses(game, hasProductionTicked);
 
+        if (!this.gameStateService.isLocked(game)) {
+            throw new Error(`The game was not locked after game processing, concurrency issue?`);
+        }
+
         await game.save();
         logTime('Save game');
 
