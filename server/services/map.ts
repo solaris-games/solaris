@@ -134,7 +134,8 @@ export default class MapService {
         return {
             stars,
             homeStars,
-            linkedStars
+            linkedStars,
+            starLocations
         };
     }
 

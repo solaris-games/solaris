@@ -28,7 +28,7 @@ import { Star } from "./types/Star";
 import { GameRankingResult } from "./types/Rating";
 import DiplomacyUpkeepService from "./diplomacyUpkeep";
 import CarrierGiftService from "./carrierGift";
-import CarrierMovementService from "./carrierMovement";
+import CarrierMovementService, { CarrierMovementReport } from "./carrierMovement";
 import PlayerCycleRewardsService from "./playerCycleRewards";
 import StarContestedService from "./starContested";
 import PlayerReadyService from "./playerReady";
@@ -38,6 +38,8 @@ import GamePlayerAFKEvent from "./types/events/GamePlayerAFK";
 import GameEndedEvent from "./types/events/GameEnded";
 import PlayerAfkService from "./playerAfk";
 import ShipService from "./ship";
+import { Specialist } from "./types/Specialist";
+import InboundAttacksService from "./inboundAttacks";
 import {Moment} from "moment";
 
 const EventEmitter = require('events');
@@ -82,7 +84,8 @@ export default class GameTickService extends EventEmitter {
     starContestedService: StarContestedService;
     playerReadyService: PlayerReadyService;
     shipService: ShipService;
-    
+    inboundAttacksService: InboundAttacksService
+
     constructor(
         distanceService: DistanceService,
         starService: StarService,
@@ -112,10 +115,12 @@ export default class GameTickService extends EventEmitter {
         carrierGiftService: CarrierGiftService,
         starContestedService: StarContestedService,
         playerReadyService: PlayerReadyService,
-        shipService: ShipService
+        shipService: ShipService,
+        inboundAttacksService: InboundAttacksService
+
     ) {
         super();
-            
+
         this.distanceService = distanceService;
         this.starService = starService;
         this.carrierService = carrierService;
@@ -145,6 +150,7 @@ export default class GameTickService extends EventEmitter {
         this.starContestedService = starContestedService;
         this.playerReadyService = playerReadyService;
         this.shipService = shipService;
+        this.inboundAttacksService = inboundAttacksService;
     }
 
     async tick(gameId: DBObjectId) {
@@ -562,6 +568,9 @@ export default class GameTickService extends EventEmitter {
                     star: carrierMovementReport.destinationStar,
                     waypoint: carrierMovementReport.waypoint
                 });
+
+                // Unset inboundAttack notification - if there is ever a way to reroute a carrier mid flight, this will need to be called there too
+                await this.inboundAttacksService.unsetNotificationFlag(game, carrierInTransit)
             }
 
             // Check if combat is required, if so add the destination star to the array of combat stars to check later.
@@ -596,6 +605,9 @@ export default class GameTickService extends EventEmitter {
         // 4c. Do the rest of the waypoint actions.
         this.waypointService.performWaypointActionsCollects(game, actionWaypoints);
         this.waypointService.performWaypointActionsGarrisons(game, actionWaypoints);
+
+        // 5. Send inbound attacks notifications
+        this.inboundAttacksService.notifyInboundAttacks(game);
 
         // TODO: This is incredibly inefficient in large turn based games; moved it outside the main tick loop
         // for performance reasons because it needs to calculate the scanning ranges of all players.

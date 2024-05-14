@@ -82,7 +82,8 @@
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
       <event-log v-if="menuState == MENU_STATES.EVENT_LOG"
         @onCloseRequested="onCloseRequested"
-        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
       <intel v-if="menuState == MENU_STATES.INTEL" @onCloseRequested="onCloseRequested" :compareWithPlayerId="menuArguments"/>
       <galaxy v-if="menuState == MENU_STATES.GALAXY"
         :tab="menuArguments"

@@ -73,7 +73,9 @@ export default class CustomMapService {
               economy: star.naturalResources.economy,
               industry: star.naturalResources.industry,
               science: star.naturalResources.science
-            }
+            },
+            ...(star.shipsActual ? {shipsActual: star.shipsActual} : undefined),
+            ...(star.shipsActual ? {ships: star.shipsActual} : undefined)
           };
 
           if (star?.homeStar) {

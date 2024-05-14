@@ -4,7 +4,8 @@
     <menu-title title="Event Log" @onCloseRequested="onCloseRequested"/>
   </div>
 
-  <events-list class="pt-2" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+  <events-list class="pt-2" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested" 
+  @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
 </div>
 </template>
 
@@ -40,6 +41,9 @@ export default {
     },
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', e)
+    },
+    onOpenCarrierDetailRequested(e) {
+      this.$emit('onOpenCarrierDetailRequested', e)
     },
     async checkForUnreadEvents () {
       try {
