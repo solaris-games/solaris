@@ -162,7 +162,8 @@ const schema = new Schema({
                 nebulas: { type: Types.Number, required: false, default: 100 },
                 stars: { type: Types.Number, required: false, default: 100 }
               }
-            }
+            },
+            naturalResourcesRingOpacity: { type: Types.Number, required: false, default: 0.1, min: 0.0, max: 1.0 },
         },
         carrier: {
             defaultAction: { type: Types.String, required: false, enum: ['nothing', 'collectAll', 'dropAll', 'collect', 'drop', 'collectAllBut', 'dropAllBut', 'garrison', 'collectPercentage', 'dropPercentage'], default: 'collectAll' },

@@ -397,7 +397,7 @@ class Star extends EventEmitter {
 
         let orbitGraphics = new PIXI.Graphics()
         orbitGraphics.lineStyle(0.3, 0xFFFFFF)
-        orbitGraphics.alpha = 0.1
+        orbitGraphics.alpha = this.userSettings.map.naturalResourcesRingOpacity;
         orbitGraphics.drawCircle(0, 0, distanceToStar -(planetSize / 2))
         this.container_planets.addChild(orbitGraphics)
 
@@ -473,7 +473,7 @@ class Star extends EventEmitter {
       ringRadius *= lod+1
       lineWidht *= lod+1
       this.graphics_natural_resources_ring[lod].clear()
-      this.graphics_natural_resources_ring[lod].lineStyle(lineWidht, 0xFFFFFF, 0.1)
+      this.graphics_natural_resources_ring[lod].lineStyle(lineWidht, 0xFFFFFF, this.userSettings.map.naturalResourcesRingOpacity)
       this.graphics_natural_resources_ring[lod].drawCircle(0, 0, ringRadius * 0.75)
       this.graphics_natural_resources_ring[lod].scale.x = 1.0/( (1.0/8.0)*(lod+1) )
       this.graphics_natural_resources_ring[lod].scale.y = 1.0/( (1.0/8.0)*(lod+1) )
