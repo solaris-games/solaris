@@ -73,6 +73,7 @@ import PathfindingService from "../pathfinding";
 import UserLeaderboardService from "../userLeaderboard";
 import TeamService from "../team";
 import GameAuthService from "../gameAuth";
+import GameLockService from "../gameLock";
 
 export interface DependencyContainer {
     config: Config,
@@ -90,6 +91,7 @@ export interface DependencyContainer {
     userLeaderboardService: UserLeaderboardService,
     gameService: GameService,
     gameAuthService: GameAuthService,
+    gameLockService: GameLockService,
     gameJoinService: GameJoinService,
     gameCreateValidationService: GameCreateValidationService,
     gameCreateService: GameCreateService,

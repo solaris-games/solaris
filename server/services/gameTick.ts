@@ -39,6 +39,7 @@ import GameEndedEvent from "./types/events/GameEnded";
 import PlayerAfkService from "./playerAfk";
 import ShipService from "./ship";
 import {Moment} from "moment";
+import GameLockService from "./gameLock";
 
 const EventEmitter = require('events');
 const moment = require('moment');
@@ -82,6 +83,7 @@ export default class GameTickService extends EventEmitter {
     starContestedService: StarContestedService;
     playerReadyService: PlayerReadyService;
     shipService: ShipService;
+    gameLockService: GameLockService;
     
     constructor(
         distanceService: DistanceService,
@@ -112,7 +114,8 @@ export default class GameTickService extends EventEmitter {
         carrierGiftService: CarrierGiftService,
         starContestedService: StarContestedService,
         playerReadyService: PlayerReadyService,
-        shipService: ShipService
+        shipService: ShipService,
+        gameLockService: GameLockService,
     ) {
         super();
             
@@ -145,6 +148,7 @@ export default class GameTickService extends EventEmitter {
         this.starContestedService = starContestedService;
         this.playerReadyService = playerReadyService;
         this.shipService = shipService;
+        this.gameLockService = gameLockService;
     }
 
     async tick(gameId: DBObjectId) {
@@ -156,7 +160,7 @@ export default class GameTickService extends EventEmitter {
         }
 
         // Double check the game isn't locked.
-        if (!this.gameStateService.isLocked(game)) {
+        if (!await this.gameLockService.isLockedInDatabase(game._id)) {
             throw new Error(`The game is not locked.`);
         }
 
@@ -199,6 +203,10 @@ export default class GameTickService extends EventEmitter {
         let hasProductionTicked: boolean = false;
 
         while (iterations--) {
+            if (!await this.gameLockService.isLockedInDatabase(game._id)) {
+                throw new Error(`The game was not locked after game processing, concurrency issue?`);
+            }
+
             game.state.tick++;
 
             logTime(`Tick ${game.state.tick}`);
@@ -266,7 +274,7 @@ export default class GameTickService extends EventEmitter {
 
         this.playerReadyService.resetReadyStatuses(game, hasProductionTicked);
 
-        if (!this.gameStateService.isLocked(game)) {
+        if (!await this.gameLockService.isLockedInDatabase(game._id)) {
             throw new Error(`The game was not locked after game processing, concurrency issue?`);
         }
 
