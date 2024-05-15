@@ -134,7 +134,7 @@ export default class NotificationService {
 
             // Check for if the user does not want to be notified if they are defeated.
             if (user.subscriptions.settings.notifyActiveGamesOnly &&
-                context.players.find(p => p.userId!.toString() === user._id.toString())!.defeated) {
+                context.players.find(p => p.userId && p.userId.toString() === user._id.toString())!.defeated) {
                 continue;
             }
 

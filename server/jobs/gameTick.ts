@@ -12,12 +12,12 @@ export default (container: DependencyContainer) => {
 
                 if (container.gameTickService.canTick(game)) {
                     try {
-                        await container.gameService.lock(game._id, true);
+                        await container.gameLockService.lock(game._id, true);
                         await container.gameTickService.tick(game._id);
                     } catch (e) {
                         console.error(e);
                     } finally {
-                        await container.gameService.lock(game._id, false);
+                        await container.gameLockService.lock(game._id, false);
                     }
                 }
             }

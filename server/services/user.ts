@@ -156,14 +156,14 @@ export default class UserService extends EventEmitter {
         return null;
     }
 
-    async getUserIsAdmin(userId: DBObjectId) {
+    async getUserIsAdmin(userId: DBObjectId): Promise<boolean> {
         let user = await this.userRepo.findOne({
             _id: userId
         }, {
             'roles.administrator': 1
         });
 
-        return user!.roles.administrator;
+        return Boolean(user?.roles.administrator);
     }
 
     async getUserIsSubAdmin(userId: DBObjectId) {

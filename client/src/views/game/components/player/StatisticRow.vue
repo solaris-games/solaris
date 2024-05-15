@@ -1,7 +1,7 @@
 <template>
     <tr>
       <td>{{header}}</td>
-      <td class="text-end" :title="(isPlayerStatAlwaysUncertain || isDarkModeExtra) && !isUserPlayer() ? scanningRangeTooltip : null">{{formatValue(player, playerStat)}}{{ !hasPerspective && (isPlayerStatAlwaysUncertain || isDarkModeExtra) && !isUserPlayer() ? '?' : ''}}</td>
+      <td class="text-end" :title="isPlayerStatUncertain ? scanningRangeTooltip : null">{{formatValue(player, playerStat)}}{{ isPlayerStatUncertain ? '?' : ''}}</td>
       <td class="text-end" v-if="userIsInGame() && !isUserPlayer()"
         :class="{'text-danger': playerStat > userPlayerStat,
                   'text-success': playerStat < userPlayerStat}">{{formatValue(userPlayer, userPlayerStat)}}</td>
@@ -96,6 +96,18 @@ export default {
       }
 
       return this.player.hasPerspective || false;
+    },
+    isPlayerStatUncertain() {
+      // The stat is uncertain if all of the following are true:
+      // * the game is unfinished
+      // * the user does not have perspective of the other player (ie they're not spectating them)
+      //     - (hasPerspective will be false if the user is a player in the game even if the other player has added them as a spectator.)
+      // * the stat is marked to always be uncertain, or we're in extra dark
+      // * the user is not the player.
+      return !GameHelper.isGameFinished(this.$store.state.game)
+        && !this.hasPerspective
+        && (this.isPlayerStatAlwaysUncertain || this.isDarkModeExtra)
+        && !this.isUserPlayer();
     }
   }
 }

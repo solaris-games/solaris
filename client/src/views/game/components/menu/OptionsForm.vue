@@ -4,7 +4,7 @@
 
   <form @submit.prevent="handleSubmit" v-if="settings" class="pb-2">
     <h5 class="pt-2">Interface</h5>
-    
+
     <div class="row pt-1 pb-1">
       <label for="uiStyle" class="col-12 col-sm-6 col-form-label">UI Style</label>
       <div class="col-12 col-sm-6">
@@ -14,7 +14,7 @@
         </select>
       </div>
     </div>
-    
+
     <div class="row pt-1 pb-1">
       <label for="audio" class="col-12 col-sm-6 col-form-label">Audio</label>
       <div class="col-12 col-sm-6">
@@ -46,7 +46,7 @@
     </div>
 
     <h5 class="pt-2">Guild</h5>
-    
+
     <div class="row pt-1 pb-1">
       <label for="displayGuildTag" class="col-12 col-sm-6 col-form-label">Display Guild Tag</label>
       <div class="col-12 col-sm-6">
@@ -143,7 +143,7 @@
           <input type="number" min="12" max="128" class="form-control" id="maximum-scale" v-model="settings.map.objectsMaximumScale" :disabled="isSavingSettings">
         </div>
       </div>
-    
+
     </div>
 
     <div class="row pt-1 pb-1">
@@ -357,6 +357,13 @@
       </div>
     </div>
 
+    <div class="row mb-1 pb-1">
+      <label for="natural-resources-ring-opacity" class="col col-form-label">Natural Resources Ring Opacity</label>
+      <div class="col">
+        <input type="number" max="1" min="0" step="0.05" class="form-control" id="natural-resources-ring-opacity" v-model="settings.map.naturalResourcesRingOpacity" :disabled="isSavingSettings">
+      </div>
+    </div>
+
     <h5 class="pt-2">Carriers</h5>
 
     <div class="row pt-1 pb-1">
@@ -374,14 +381,14 @@
         </select>
       </div>
     </div>
-    
+
     <div class="row pt-1 pb-1">
       <label for="carrierDefaultAmount" class="col-12 col-sm-6 col-form-label">Default Amount</label>
       <div class="col-12 col-sm-6">
         <input type="number" class="form-control" id="carrierDefaultAmount" v-model="settings.carrier.defaultAmount" :disabled="isSavingSettings">
       </div>
     </div>
-    
+
     <h5 class="pt-2">Confirmations</h5>
 
     <div class="row pt-1 pb-1">
@@ -492,13 +499,13 @@ export default {
 
         if (response.status === 200) {
           this.$toasted.show(`Settings saved.`, { type: 'success' })
-          
+
           this.$store.commit('setSettings', this.settings)
 
           if (this.isInGame) {
             GameContainer.reloadGame(this.$store.state.game, this.$store.state.settings)
           }
-          
+
           this.onOptionsSaved()
         }
       } catch (err) {

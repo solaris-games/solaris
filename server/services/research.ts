@@ -97,7 +97,7 @@ export default class ResearchService extends EventEmitter {
         };
     }
 
-    async conductResearch(game: Game, user: User | null, player: Player) {
+    conductResearch(game: Game, user: User | null, player: Player) {
         let techKey = player.researchingNow;
         let tech = player.research[techKey];
 
@@ -161,7 +161,7 @@ export default class ResearchService extends EventEmitter {
         return report;
     }
 
-    async conductResearchAll(game: Game, gameUsers: User[]) {
+    conductResearchAll(game: Game, gameUsers: User[]) {
         // Add the current level of experimentation to the current 
         // tech being researched.
         for (let i = 0; i < game.galaxy.players.length; i++) {
@@ -169,7 +169,7 @@ export default class ResearchService extends EventEmitter {
 
             let user = gameUsers.find(u => player.userId && u._id.toString() === player.userId.toString()) || null;
             
-            await this.conductResearch(game, user, player);
+            this.conductResearch(game, user, player);
         }
     }
 
