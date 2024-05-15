@@ -70,16 +70,16 @@ export default class CarrierGiftService extends EventEmitter {
         });
     }
 
-    async transferGift(game: Game, gameUsers: User[], star: Star, carrier: Carrier) {
+    transferGift(game: Game, gameUsers: User[], star: Star, carrier: Carrier) {
         if (!star.ownedByPlayerId) {
             throw new ValidationError(`Cannot transfer ownership of a gifted carrier to this star, no player owns the star.`);
         }
 
-        let starPlayer = game.galaxy.players.find(p => star.ownedByPlayerId && p._id.toString() === star.ownedByPlayerId.toString())!;
-        let starUser = gameUsers.find(u => starPlayer.userId && u._id.toString() === starPlayer.userId.toString());
+        const starPlayer = game.galaxy.players.find(p => star.ownedByPlayerId && p._id.toString() === star.ownedByPlayerId.toString())!;
+        const starUser = gameUsers.find(u => starPlayer.userId && u._id.toString() === starPlayer.userId.toString());
 
-        let carrierPlayer = game.galaxy.players.find(p => p._id.toString() === carrier.ownedByPlayerId!.toString())!;
-        let carrierUser = gameUsers.find(u => carrierPlayer.userId && u._id.toString() === carrierPlayer.userId.toString());
+        const carrierPlayer = game.galaxy.players.find(p => p._id.toString() === carrier.ownedByPlayerId!.toString())!;
+        const carrierUser = gameUsers.find(u => carrierPlayer.userId && u._id.toString() === carrierPlayer.userId.toString());
 
         const isSamePlayer = starPlayer._id.toString() === carrierPlayer._id.toString();
 
@@ -100,7 +100,7 @@ export default class CarrierGiftService extends EventEmitter {
                 carrier.specialistId = null;
             }
             
-            let eventObject = {
+            const eventObject = {
                 gameId: game._id,
                 gameTick: game.state.tick,
                 fromPlayer: carrierPlayer,
