@@ -205,7 +205,8 @@ export interface User {
                 nebulas: number;
                 stars: number;
               }
-            }
+            },
+            naturalResourcesRingOpacity: number;
         },
         carrier: {
             defaultAction: CarrierWaypointActionType;
