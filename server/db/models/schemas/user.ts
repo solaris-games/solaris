@@ -17,6 +17,10 @@ const schema = new Schema({
     lastSeenIP: { type: Types.String, required: false, default: null },
     isEstablishedPlayer: { type: Types.Boolean, required: true, default: false },
     hasSentReviewReminder: { type: Types.Boolean, required: true, default: false },
+    warnings: [{
+       kind: { type: Types.String, required: true, enum: ['afk', 'cheating', 'abusive', 'other'] },
+       date: { type: Types.Date, required: true }
+    }],
     roles: {
         administrator: { type: Types.Boolean, default: false },
         contributor: { type: Types.Boolean, default: false },
