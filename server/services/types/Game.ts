@@ -51,6 +51,7 @@ export type GameTradeCost = 0|5|15|25|50|100;
 export type GameTradeScanning = 'all'|'scanned';
 export type GameResearchCost = 'none'|'cheap'|'standard'|'expensive'|'veryExpensive'|'crazyExpensive';
 export type GameBankingReward = 'standard'|'legacy';
+export type GameExperimentationDistribution = 'random'|'current_research';
 export type GameExperimentationReward = 'standard'|'experimental';
 export type GameSpecialistTokenReward = 'standard'|'experimental';
 export type GameTimeType = 'realTime'|'turnBased';
@@ -208,6 +209,7 @@ export interface GameSettings {
 		},
 		researchCostProgression: GameResearchProgression;
 		bankingReward: GameBankingReward;
+		experimentationDistribution: GameExperimentationDistribution;
 		experimentationReward: GameExperimentationReward;
 		specialistTokenReward: GameSpecialistTokenReward;
 	},
