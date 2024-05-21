@@ -3,7 +3,13 @@ import { ExpressJoiInstance } from "express-joi-validation";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import AdminController from '../controllers/admin';
 import { MiddlewareContainer } from "../middleware";
-import { adminSetGameFeaturedRequestSchema, adminSetGameTimeMachineRequestSchema, adminSetUserCreditsRequestSchema, adminSetUserRoleRequestSchema } from "../requests/admin";
+import {
+    adminAddWarningRequestSchema,
+    adminSetGameFeaturedRequestSchema,
+    adminSetGameTimeMachineRequestSchema,
+    adminSetUserCreditsRequestSchema,
+    adminSetUserRoleRequestSchema
+} from "../requests/admin";
 
 export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
     const controller = AdminController(container);
@@ -31,6 +37,12 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
     router.patch('/api/admin/reports/:reportId/action',
         mw.auth.authenticate({ admin: true }),
         controller.actionReport,
+        mw.core.handleError);
+
+    router.post('/api/admin/user/:userId/warning',
+        mw.auth.authenticate({ admin: true }),
+        validator.body(adminAddWarningRequestSchema),
+        controller.addWarning,
         mw.core.handleError);
 
     router.patch('/api/admin/user/:userId/contributor',

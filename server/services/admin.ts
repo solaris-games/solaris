@@ -1,7 +1,7 @@
 import { DBObjectId } from './types/DBObjectId';
 import Repository from './repository';
 import { Game } from './types/Game';
-import {User, UserRoles} from './types/User';
+import {User, UserRoles, UserWarningKind} from './types/User';
 import ValidationError from "../errors/validation";
 
 const moment = require('moment');
@@ -18,7 +18,22 @@ export default class AdminService {
         this.userRepo = userRepo;
         this.gameRepo = gameRepo;
     }
-    
+
+    async addWarning(userId: DBObjectId, kind: UserWarningKind) {
+        const newWarning = {
+            kind,
+            date: moment().utc()
+        }
+
+        await this.userRepo.updateOne({
+            _id: userId
+        }, {
+            $push: {
+                warnings: newWarning
+            }
+        });
+    }
+
     async listUsers(roles: UserRoles, limit: number) {
         let select;
 

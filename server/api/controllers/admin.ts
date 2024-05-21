@@ -12,6 +12,15 @@ export default (container: DependencyContainer) => {
                 return next(err);
             }
         },
+        addWarning: async (req, res, next) => {
+           try {
+               const result = await container.adminService.addWarning(req.params.userId, req.body.kind);
+
+               return res.status(200).json(result);
+           } catch (err) {
+               next(err);
+           }
+        },
         listUsers: async (req, res, next) => {
             try {
                 let result = await container.adminService.listUsers(req.session.roles, 300);
