@@ -67,20 +67,10 @@ export default {
     },
     isCommunityManager () {
       return this.isAdministrator || this.$store.state.roles.communityManager
-    },
-    isGameMaster () {
-      return this.isAdministrator || this.$store.state.roles.gameMaster
     }
   }
 }
 </script>
 
 <style scoped>
-.disabled-role {
-  opacity: 0.2
-}
-
-.clickable {
-  cursor: pointer;
-}
 </style>

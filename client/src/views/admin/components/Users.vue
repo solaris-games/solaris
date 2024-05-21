@@ -51,7 +51,7 @@
             <i class="fas fa-user clickable text-info ms-1" @click="impersonate(user._id)"
                title="Impersonate User"></i>
 
-            <add-warning />
+            <add-warning :user-id="user._id" @onUserChanged="getUsers()" />
           </div>
         </div>
       </div>
@@ -79,7 +79,7 @@ export default {
     }
   },
   async mounted() {
-    this.users = await this.getUsers();
+   await this.getUsers();
   },
   methods: {
     async getUsers() {
@@ -88,7 +88,7 @@ export default {
         this.$toasted.error(resp.data);
         return null;
       }
-      return resp.data;
+      this.users = resp.data;
     },
     toDescription(warningKind) {
       switch (warningKind) {
@@ -241,5 +241,13 @@ export default {
   justify-content: flex-start;
   align-items: center;
   align-content: start;
+}
+
+.disabled-role {
+  opacity: 0.2
+}
+
+.clickable {
+  cursor: pointer;
 }
 </style>

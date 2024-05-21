@@ -15,6 +15,13 @@ class AdminService extends BaseApiService {
     return axios.get(this.BASE_URL + 'admin/reports', { withCredentials: true })
   }
 
+  addWarning (userId, kind) {
+    return axios.post(this.BASE_URL + 'admin/user/' + userId + '/warning', {
+      kind
+    },
+    { withCredentials: true })
+  }
+
   setRoleContributor (userId, enabled) {
     return axios.patch(this.BASE_URL + 'admin/user/' + userId + '/contributor', {
       enabled

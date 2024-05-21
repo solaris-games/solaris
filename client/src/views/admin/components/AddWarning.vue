@@ -7,16 +7,34 @@
       <option value="cheating">Cheating</option>
       <option value="other">Other</option>
     </select>
-    <button class="btn btn-default" type="button">Add Warning</button>
+    <button class="btn btn-default btn-sm" type="button" @click="addWarning" :disabled="!this.selectedWarningKind">Add Warning</button>
   </div>
 </template>
 
 <script>
+import AdminApiService from "../../../services/api/admin";
+
 export default {
   name: "AddWarning",
+  props: {
+    userId: String,
+  },
   data () {
     return {
       selectedWarningKind: null
+    }
+  },
+  methods: {
+    async addWarning(e) {
+      e.preventDefault()
+
+      if (!this.selectedWarningKind) {
+        return;
+      }
+
+      await AdminApiService.addWarning(this.userId, this.selectedWarningKind);
+
+      this.$emit("onUserChanged");
     }
   }
 }
@@ -29,5 +47,9 @@ export default {
   gap: 8px;
   flex-grow: 1;
   align-items: center;
+}
+
+.add-warning * {
+  flex-grow: 0;
 }
 </style>
