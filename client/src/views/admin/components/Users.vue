@@ -83,9 +83,9 @@ export default {
       const resp = await AdminApiService.getUsers();
       if (resp.status !== 200) {
         this.$toasted.error(resp.data);
-        return;
+        return null;
       }
-      this.users = resp.data;
+      return resp.data;
     },
     getLastSeenString(lastSeen) {
       if (!lastSeen) {

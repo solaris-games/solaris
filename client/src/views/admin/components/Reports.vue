@@ -63,16 +63,16 @@ export default {
     }
   },
   async mounted() {
-    await this.getReports();
+    this.reports = await this.getReports();
   },
   methods: {
     async getReports() {
       const reports = await AdminApiService.getReports()
       if (reports.status !== 200) {
         this.$toasted.error(reports.data.message);
-        return;
+        return null
       }
-      this.reports = reports.data;
+      return reports.data;
     },
     async impersonate(userId) {
       try {

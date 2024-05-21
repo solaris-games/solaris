@@ -4,7 +4,7 @@
 
     <ul class="nav nav-tabs">
       <li class="nav-item">
-          <a class="nav-link" data-bs-toggle="tab" href="#games">Games</a>
+          <a class="nav-link active" data-bs-toggle="tab" href="#games">Games</a>
       </li>
       <li class="nav-item" v-if="isCommunityManager">
           <a class="nav-link" data-bs-toggle="tab" href="#users">Users</a>

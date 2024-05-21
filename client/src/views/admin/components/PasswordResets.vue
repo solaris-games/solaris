@@ -50,10 +50,10 @@ export default {
 
       if (resp.status !== 200) {
         this.$toasted.error(resp.data.message)
-        return
+        return null
       }
 
-      this.passwordResets = resp.data
+      return resp.data
     }
   }
 }
