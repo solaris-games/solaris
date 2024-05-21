@@ -14,7 +14,7 @@ export default (container: DependencyContainer) => {
         },
         listUsers: async (req, res, next) => {
             try {
-                let result = await container.adminService.listUsers(req.session.roles.administrator, 300);
+                let result = await container.adminService.listUsers(req.session.roles, 300);
                 
                 return res.status(200).json(result);
             } catch (err) {

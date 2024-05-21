@@ -4,57 +4,56 @@
 
     <div v-if="users">
       <h4 class="mb-1">Recent Users</h4>
-      <table class="mt-2 table table-sm table-striped table-responsive">
-        <thead class="table-dark">
-        <tr>
-          <th>Username</th>
-          <th v-if="isAdministrator">Last Seen</th>
-          <th v-if="isAdministrator">Roles</th>
-          <th v-if="isAdministrator">Credits</th>
-          <th v-if="isAdministrator">Email</th>
-          <th>EP</th>
-          <th v-if="isAdministrator"></th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="user of users" :key="user._id">
-          <td :title="user.email">{{ user.username }}</td>
-          <td v-if="isAdministrator" :title="getDuplicateIPs(user)"
-              :class="{'text-warning':getDuplicateIPs(user).length}">{{ getLastSeenString(user.lastSeen) }}
-          </td>
-          <td v-if="isAdministrator">
-            <i class="fas fa-hands-helping clickable" :class="{'disabled-role':!user.roles.contributor}"
-               @click="toggleRole(user, 'contributor')" title="Toggle Contributor Role"></i>
-            <i class="fas fa-code ms-1 clickable" :class="{'disabled-role':!user.roles.developer}"
-               @click="toggleRole(user, 'developer')" title="Toggle Developer Role"></i>
-            <i class="fas fa-user-friends ms-1 clickable" :class="{'disabled-role':!user.roles.communityManager}"
-               @click="toggleRole(user, 'communityManager')" title="Toggle Community Manager Role"></i>
-            <i class="fas fa-dice ms-1 clickable" :class="{'disabled-role':!user.roles.gameMaster}"
-               @click="toggleRole(user, 'gameMaster')" title="Toggle Game Master Role"></i>
-          </td>
-          <td v-if="isAdministrator">
-            <i class="fas fa-minus clickable text-danger" @click="setCredits(user, user.credits - 1)"
-               title="Deduct Credits"></i>
-            {{ user.credits }}
-            <i class="fas fa-plus clickable text-success" @click="setCredits(user, user.credits + 1)"
-               title="Add Credits"></i>
-          </td>
-          <td v-if="isAdministrator"><i class="fas"
-                                        :class="{'fa-check':user.emailEnabled,'fa-times text-danger':!user.emailEnabled}"></i>
-          </td>
-          <td><i class="fas clickable"
-                 :class="{'fa-check':user.isEstablishedPlayer,'fa-times text-danger': !user.isEstablishedPlayer}"
-                 @click="promoteToEstablishedPlayer(user)"></i></td>
-          <td v-if="isAdministrator">
-            <i class="fas fa-hammer clickable text-danger" :class="{'disabled-role':!user.banned}"
-               @click="toggleBan(user)" title="Toggle Banned"></i>
-            <i class="fas fa-eraser clickable text-warning ms-1" @click="resetAchievements(user)"
-               title="Reset Achievements"></i>
-            <i class="fas fa-user clickable text-info ms-1" @click="impersonate(user._id)" title="Impersonate User"></i>
-          </td>
-        </tr>
-        </tbody>
-      </table>
+      <ul>
+        <li v-for="user of users">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">
+                {{ user.username }}
+                <span v-if="isAdministrator">
+                  <i class="fas fa-hands-helping clickable" :class="{'disabled-role':!user.roles.contributor}"
+                     @click="toggleRole(user, 'contributor')" title="Toggle Contributor Role"></i>
+                  <i class="fas fa-code ms-1 clickable" :class="{'disabled-role':!user.roles.developer}"
+                     @click="toggleRole(user, 'developer')" title="Toggle Developer Role"></i>
+                  <i class="fas fa-user-friends ms-1 clickable" :class="{'disabled-role':!user.roles.communityManager}"
+                     @click="toggleRole(user, 'communityManager')" title="Toggle Community Manager Role"></i>
+                  <i class="fas fa-dice ms-1 clickable" :class="{'disabled-role':!user.roles.gameMaster}"
+                      @click="toggleRole(user, 'gameMaster')" title="Toggle Game Master Role"></i>
+                </span>
+              </h3>
+            </div>
+            <div class="panel-body">
+              <p v-if="isAdministrator">Email: {{ user.email }}</p>
+              <p v-if="isAdministrator">Email enabled: {{ user.emailEnabled }}</p>
+              <p v-if="isAdministrator" :class="{'text-warning':getDuplicateIPs(user).length}">Last seen: {{ getLastSeenString(user.lastSeen) }}</p>
+              <p v-if="isAdministrator">Last seen IP: {{ user.lastSeenIP }}</p>
+
+              <p v-if="isAdministrator">
+                <i class="fas fa-minus clickable text-danger" @click="setCredits(user, user.credits - 1)"
+                   title="Deduct Credits"></i>
+                {{ user.credits }}
+                <i class="fas fa-plus clickable text-success" @click="setCredits(user, user.credits + 1)"
+                   title="Add Credits"></i>
+              </p>
+
+              <div v-if="user.warnings && user.warnings.length">
+                <ul class="list-group">
+                  <li v-for="warning of user.warnings">
+                    <p>{{ warning.date }}: {{ toDescription(warning.kind) }}</p>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="panel-footer">
+              <i class="fas fa-hammer clickable text-danger" :class="{'disabled-role':!user.banned}"
+                 @click="toggleBan(user)" title="Toggle Banned"></i>
+              <i class="fas fa-eraser clickable text-warning ms-1" @click="resetAchievements(user)"
+                 title="Reset Achievements"></i>
+              <i class="fas fa-user clickable text-info ms-1" @click="impersonate(user._id)" title="Impersonate User"></i>
+            </div>
+          </div>
+        </li>
+      </ul>
     </div>
   </div>
 </template>
@@ -86,6 +85,18 @@ export default {
         return null;
       }
       return resp.data;
+    },
+    toDescription(warningKind) {
+      switch (warningKind) {
+        case 'afk':
+          return 'frequent inactivity'
+        case 'cheating':
+          return 'cheating'
+        case 'abusive':
+          return 'abusive behaviour'
+        case 'other':
+          return 'other'
+      }
     },
     getLastSeenString(lastSeen) {
       if (!lastSeen) {
