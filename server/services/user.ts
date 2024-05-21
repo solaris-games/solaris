@@ -37,7 +37,7 @@ export default class UserService extends EventEmitter {
     }
 
     async getMe(id: DBObjectId) {
-        return await this.userRepo.findById(id, {
+        const user = await this.userRepo.findById(id, {
             // Remove fields we don't want to send back.
             password: 0,
             resetPasswordToken: 0,
@@ -47,6 +47,14 @@ export default class UserService extends EventEmitter {
             lastSeenIP: 0,
             'oauth.discord.token': 0,
         });
+
+        if (user) {
+            user.warnings = user.warnings.filter(warning => {
+                return moment().diff(warning.date, 'months') < 1;
+            });
+        }
+
+        return user;
     }
 
     async getById(id: DBObjectId, select: any | null = null) {

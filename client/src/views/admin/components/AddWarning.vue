@@ -42,9 +42,10 @@ export default {
 
 <style scoped>
 .add-warning {
+  margin-left: 12px;
   display: flex;
   flex-direction: row;
-  gap: 8px;
+  gap: 4px;
   flex-grow: 1;
   align-items: center;
 }

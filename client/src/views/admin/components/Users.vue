@@ -36,8 +36,8 @@
 
           <div v-if="user.warnings && user.warnings.length">
             <ul class="list-group">
-              <li v-for="warning of user.warnings">
-                <p>{{ warning.date }}: {{ toDescription(warning.kind) }}</p>
+              <li v-for="warning of user.warnings" class="list-group-item">
+                <p class="text-warning">{{ warning.date }}: {{ toDescription(warning.kind) }}</p>
               </li>
             </ul>
           </div>
