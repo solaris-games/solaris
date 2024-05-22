@@ -747,7 +747,7 @@ export default class GameTickService extends EventEmitter {
                     }
             
                     if (user && !isTutorialGame) {
-                        user.achievements.afk++;
+                        this.playerAfkService.incrementAfkCount(user);
                     }
 
                     let e: GamePlayerAFKEvent = {
