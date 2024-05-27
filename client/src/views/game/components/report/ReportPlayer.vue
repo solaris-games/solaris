@@ -70,7 +70,7 @@ export default {
     'menu-title': MenuTitle
   },
   props: {
-      playerId: String
+      args: Object,
   },
   data () {
       return {
@@ -85,7 +85,7 @@ export default {
       this.$emit('onCloseRequested', e)
     },
     onOpenPlayerDetailRequested (e) {
-        this.$emit('onOpenPlayerDetailRequested', this.playerId)
+        this.$emit('onOpenPlayerDetailRequested', this.args.playerId)
     },
     async confirmReportPlayer () {
         if (!await this.$confirm('Report Player', `Are you sure you want to report ${this.player.alias}?`)) {
@@ -93,7 +93,7 @@ export default {
         }
 
         try {
-            await ReportApiService.reportPlayer(this.$store.state.game._id, this.playerId, this.optionAbuse, this.optionSpamming, this.optionMultiboxing, this.optionInappropriateAlias)
+            await ReportApiService.reportPlayer(this.$store.state.game._id, this.args.playerId, this.optionAbuse, this.optionSpamming, this.optionMultiboxing, this.optionInappropriateAlias)
 
             this.$toasted.show(`You have reported ${this.player.alias}. We will investigate and take action if necessary.`, { type: 'success' })
 
@@ -105,7 +105,7 @@ export default {
   },
   computed: {
       player () {
-          return GameHelper.getPlayerById(this.$store.state.game, this.playerId)
+          return GameHelper.getPlayerById(this.$store.state.game, this.args.playerId)
       }
   }
 }

@@ -13,6 +13,9 @@
       <div class="col-auto thumbtack" v-if="conversation.createdBy">
         <conversation-message-pin :conversationId="conversation._id" :messageId="message._id" :pinned="message.pinned" @onPinned="onPinned" @onUnpinned="onUnpinned" />
       </div>
+      <div class="col-auto">
+        <i class="pointer fa-warning" title="Report message" @click="reportMessage"></i>
+      </div>
       <div class="col-12">
         <p class="mt-0 mb-0">
           <i class="fas fa-envelope me-2" v-if="!userPlayerHasReadMessage"></i>
@@ -81,7 +84,14 @@ export default {
       } else {
         this.$toasted.show(`The location of the star is unknown.`, { type: 'error' })
       }
-    }
+    },
+    reportMessage () {
+      this.$emit('onOpenReportPlayerRequested', {
+        playerId: this.message.fromPlayerId,
+        messageId: this.message._id,
+        conversationId: this.conversation._id
+      })
+    },
   },
   computed: {
     isFromUserPlayer: function () {
