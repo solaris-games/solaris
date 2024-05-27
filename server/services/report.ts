@@ -2,33 +2,40 @@ import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
 import Repository from './repository';
 import { Game } from './types/Game';
-import { Report, ReportReasons } from './types/Report';
+import { Report } from './types/Report';
 import PlayerService from './player';
+import ConversationService from "./conversation";
+import {ReportCreateReportRequest} from "../api/requests/report";
 
 export default class ReportService {
     reportModel;
     reportRepo: Repository<Report>;
     playerService: PlayerService;
+    conversationService: ConversationService;
 
     constructor(
         reportModel,
         reportRepo: Repository<Report>,
-        playerService: PlayerService
+        playerService: PlayerService,
+        conversationService: ConversationService
     ) {
         this.reportRepo = reportRepo;
         this.reportModel = reportModel;
         this.playerService = playerService;
+        this.conversationService = conversationService;
     }
 
-    async reportPlayer(game: Game, playerId: DBObjectId, reportedByUserId: DBObjectId, reasons: ReportReasons) {
-        let reportedPlayer = this.playerService.getById(game, playerId)!;
-        let reportedByPlayer = this.playerService.getByUserId(game, reportedByUserId)!;
+    async reportPlayer(game: Game, req: ReportCreateReportRequest, reportedByUserId: DBObjectId) {
+        const reportedPlayer = this.playerService.getById(game, req.playerId);
+        const reportedByPlayer = this.playerService.getByUserId(game, reportedByUserId)!;
 
-        if (!reportedPlayer.userId) {
+        if (!reportedPlayer || !reportedPlayer.userId) {
             throw new ValidationError(`The reported player is not a valid user.`);
         }
 
-        let report = new this.reportModel({
+        const reasons = req.reasons;
+
+        const report = new this.reportModel({
             gameId: game._id,
             reportedPlayerId: reportedPlayer._id,
             reportedUserId: reportedPlayer.userId,
@@ -36,6 +43,8 @@ export default class ReportService {
             reportedByPlayerId: reportedByPlayer._id,
             reportedByUserId: reportedByPlayer.userId,
             reportedByPlayerAlias: reportedByPlayer.alias,
+            reportedMessageId: req.messageId || null,
+            reportedConversationId: req.conversationId || null,
             reasons: {
                 abuse: reasons.abuse || false,
                 spamming: reasons.spamming || false,
