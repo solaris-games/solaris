@@ -1,13 +1,8 @@
 <template>
   <div class="add-warning form-inline">
-    <label for="warning-kind">Warning type</label>
-    <select class="form-control input-sm" id="warning-kind" v-model="selectedWarningKind">
-      <option value="afk">AFK</option>
-      <option value="abusive">Abusive Behaviour</option>
-      <option value="cheating">Cheating</option>
-      <option value="other">Other</option>
-    </select>
-    <button class="btn btn-default btn-sm" type="button" @click="addWarning" :disabled="!this.selectedWarningKind">Add Warning</button>
+    <label for="warning-text">Warning text</label>
+    <input class="form-control" type="text" id="warning-text" v-model="warningText" />
+    <button class="btn btn-default btn-sm" type="button" @click="addWarning" :disabled="!this.warningText">Add Warning</button>
   </div>
 </template>
 
@@ -21,18 +16,18 @@ export default {
   },
   data () {
     return {
-      selectedWarningKind: null
+      warningText: null
     }
   },
   methods: {
     async addWarning(e) {
       e.preventDefault()
 
-      if (!this.selectedWarningKind) {
+      if (!this.warningText) {
         return;
       }
 
-      await AdminApiService.addWarning(this.userId, this.selectedWarningKind);
+      await AdminApiService.addWarning(this.userId, this.warningText);
 
       this.$emit("onUserChanged");
     }

@@ -18,7 +18,7 @@ const schema = new Schema({
     isEstablishedPlayer: { type: Types.Boolean, required: true, default: false },
     hasSentReviewReminder: { type: Types.Boolean, required: true, default: false },
     warnings: [{
-       kind: { type: Types.String, required: true, enum: ['afk', 'cheating', 'abusive', 'other'] },
+       text: { type: Types.String, required: true},
        date: { type: Types.Date, required: true }
     }],
     roles: {

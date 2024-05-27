@@ -19,9 +19,9 @@ export default class AdminService {
         this.gameRepo = gameRepo;
     }
 
-    async addWarning(userId: DBObjectId, kind: UserWarningKind) {
+    async addWarning(userId: DBObjectId, text: string) {
         const newWarning = {
-            kind,
+            text,
             date: moment().utc()
         }
 

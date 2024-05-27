@@ -17,5 +17,5 @@ export const adminSetGameTimeMachineRequestSchema = Joi.object({
 });
 
 export const adminAddWarningRequestSchema = Joi.object({
-    kind: Joi.string().required().valid('afk', 'cheating', 'abusive', 'other')
+    text: Joi.string().required()
 });

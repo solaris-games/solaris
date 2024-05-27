@@ -14,7 +14,7 @@ export default (container: DependencyContainer) => {
         },
         addWarning: async (req, res, next) => {
            try {
-               const result = await container.adminService.addWarning(req.params.userId, req.body.kind);
+               const result = await container.adminService.addWarning(req.params.userId, req.body.text);
 
                return res.status(200).json(result);
            } catch (err) {

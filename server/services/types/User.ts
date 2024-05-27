@@ -50,10 +50,8 @@ export interface UserSubscriptions {
     }
 }
 
-export type UserWarningKind = 'afk'|'cheating'|'abusive'|'other';
-
 export interface UserWarning {
-    kind: UserWarningKind,
+    text: string,
     date: Date,
 }
 

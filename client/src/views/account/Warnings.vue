@@ -1,7 +1,7 @@
 <template>
   <div class="row pb-0 warnings">
     <div v-for="warning of warnings" class="alert alert-warning fade show">
-      <p>{{ formatDate(warning.date) }}: You have received a warning for: <span class="warningDescription">{{ toDescription(warning.kind) }}</span></p>
+      <p>{{ formatDate(warning.date) }}: You have received a warning: <span class="warningDescription">{{ warning.text }}</span></p>
     </div>
   </div>
 </template>
@@ -15,18 +15,6 @@ export default {
   methods: {
     formatDate(date) {
       return GameHelper.getDateString(date)
-    },
-    toDescription(warningKind) {
-      switch (warningKind) {
-        case 'afk':
-          return 'frequent inactivity'
-        case 'cheating':
-          return 'cheating'
-        case 'abusive':
-          return 'abusive behaviour'
-        case 'other':
-          return 'other'
-      }
     }
   }
 }
