@@ -9,6 +9,7 @@
     "playerType": "all",
     "anonymity": "extra",
     "playerOnlineStatus": "hidden",
+    "playerIPWarning": "enabled",
     "timeMachine": "disabled",
     "fluxEnabled": "disabled",
     "advancedAI": "enabled",

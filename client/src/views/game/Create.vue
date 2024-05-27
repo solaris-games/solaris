@@ -116,6 +116,15 @@
         </div>
 
         <div class="mb-2">
+          <label for="playerIPWarning" class="col-form-label">Player IP Warning <help-tooltip tooltip="Show warnings when players use the same IP to prevent multiboxing. Only disable this if you are sure" /></label>
+          <select class="form-control" id="playerIPWarning" v-model="settings.general.playerIPWarning" :disabled="isCreatingGame">
+            <option v-for="opt in options.general.playerIPWarning" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-2">
           <label for="advancedAI" class="col-form-label">Advanced AI <help-tooltip tooltip="Use the advanced AI to replace defeated players"></help-tooltip></label>
           <select class="form-control" id="advancedAI" v-model="settings.general.advancedAI" :disabled="isCreatingGame">
             <option v-for="opt in options.general.advancedAI" v-bind:key="opt.value" v-bind:value="opt.value">

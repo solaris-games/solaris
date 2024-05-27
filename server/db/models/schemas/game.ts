@@ -54,6 +54,7 @@ const schema = new Schema({
 			playerType: { type: Types.String, required: true, enum: ['all', 'establishedPlayers'], default: 'all' },
 			anonymity: { type: Types.String, required: true, enum: ['normal', 'extra'], default: 'normal' },
 			playerOnlineStatus: { type: Types.String, required: true, enum: ['hidden', 'visible'], default: 'hidden' },
+			playerIPWarning: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },
 			timeMachine: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
 			awardRankTo: { type: Types.String, required: false, enum: ['all', 'winner', 'top_n', 'teams'], default: 'all' },
 			awardRankToTopN: { type: Types.Number, required: false, min: 1, default: null },
