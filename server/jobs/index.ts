@@ -52,7 +52,7 @@ async function startup() {
 
     // Game tick
     agendajs.define('game-tick', {
-        priority: 'high', concurrency: 10
+        priority: 'high', concurrency: 1
     },
     gameTickJob.handler); // reference to the handler, but not executing it! 
 

@@ -352,17 +352,6 @@ export default class GameService extends EventEmitter {
         });
     }
 
-    // TODO: Move to a gameLockService
-    async lock(gameId: DBObjectId, locked: boolean = true) {
-        await this.gameRepo.updateOne({
-            _id: gameId
-        }, {
-            $set: {
-                'state.locked': locked
-            }
-        });
-    }
-
     async resetQuitters(game: Game) {
         game.quitters = [];
 
