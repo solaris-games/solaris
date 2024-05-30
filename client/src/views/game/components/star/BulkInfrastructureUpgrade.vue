@@ -193,7 +193,7 @@ export default {
       selectedType: 'economy',
       selectedUpgradeStrategy: 'totalCredits',
       selectedScheduleStrategy: 'now',
-      repeat: false,
+      repeat: 'false',
       tick: this.$store.state.game.state.tick,
       types: [],
       actionCount: 0,
@@ -250,7 +250,6 @@ export default {
     },
     onTrashed() {
       this.actionCount = GameHelper.getUserPlayer(this.$store.state.game)?.scheduledActions?.length || 0;
-      this.hasActions = (this.actionCount > 0)
     },
     panToStar (starId) {
       let star = this.getStar(starId)
@@ -278,14 +277,14 @@ export default {
 
       this.isChecking = true
       if(this.selectedScheduleStrategy === 'future') {
-        // When actions are scheduled in the future, they get added to the TODO list.
+        // When actions are scheduled in the future, they get added to the scheduled list.
         try {
           let response = await starService.scheduleBulkInfrastructureUpgrade(
           this.$store.state.game._id,
           this.selectedUpgradeStrategy,
           this.selectedType,
           this.amount,
-          (this.repeat == 'true'),
+          (this.repeat === 'true'),
           this.tick
           )
           if (response.status === 200) {
