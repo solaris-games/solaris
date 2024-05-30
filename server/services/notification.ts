@@ -134,7 +134,7 @@ export default class NotificationService {
 
             // Check for if the user does not want to be notified if they are defeated.
             if (user.subscriptions.settings.notifyActiveGamesOnly &&
-                context.players.find(p => p.userId!.toString() === user._id.toString())!.defeated) {
+                context.players.find(p => p.userId && p.userId.toString() === user._id.toString())!.defeated) {
                 continue;
             }
 
@@ -329,9 +329,12 @@ export default class NotificationService {
                 // Surround any mentions with square brackets.
                 const formattedMessage = args.sentMessageResult.message.replace(/{{(\w)\/(\w+?)\/(.+?)}}/g, (match, type, id, name) => `{${name}}`);
 
-                const template = this._generateBaseDiscordMessageTemplate(game, 'New Message Received', formattedMessage);
+                const template = this._generateBaseDiscordMessageTemplate(game, `Message from ${args.sentMessageResult.fromPlayerAlias}`, formattedMessage);
 
-                template.author.name = args.sentMessageResult.fromPlayerAlias;
+                template.fields.push({
+                    name: 'Conversation',
+                    value: args.conversation.name,
+                })
 
                 await this.discordService.sendMessageOAuth(user, template);
             });

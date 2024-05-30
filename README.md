@@ -32,7 +32,7 @@ The client uses the following tech:
 
 ## Development Environment Setup
 1. Install the prerequisites.
-    - [Node.js](https://nodejs.org/en/) v14
+    - [Node.js](https://nodejs.org/en/) v20
     - [MongoDB](https://www.mongodb.com/) v5.0
 2. Clone the repository.
 3. Checkout `master`.

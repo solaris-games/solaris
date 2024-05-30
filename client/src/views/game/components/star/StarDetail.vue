@@ -7,7 +7,7 @@
       </modalButton>
       <button @click="viewOnMap(star)" class="btn btn-sm btn-outline-info ms-1"><i class="fas fa-eye"></i></button>
     </menu-title>
-    
+
     <div class="row bg-dark">
       <div class="col text-center pt-2">
         <p class="mb-2" v-if="userPlayer && star.ownedByPlayerId == userPlayer._id">A star under your command.</p>
@@ -34,7 +34,7 @@
           <p class="mb-0" v-if="star.isBinaryStar">This is a <span class="text-warning">Binary Star <i class="fas fa-star"></i></span> system.</p>
           <p class="mb-2 text-info" v-if="star.isBinaryStar"><small><i>Binary Stars start with additional natural resources.</i></small></p>
         </div>
-        
+
         <div v-if="(!isCompactUIStyle || !star.ownedByPlayerId) && star.wormHoleToStarId">
           <hr/>
           <p class="mb-0" v-if="wormHolePairStar">This star is a <span class="text-warning">Worm Hole <i class="far fa-sun"></i></span> to <a href="javascript:;" @click="viewOnMap(wormHolePairStar)"><i class="fas fa-eye me-1"></i>{{wormHolePairStar.name}}</a>.</p>
@@ -87,7 +87,7 @@
           </span>
         </div>
       </div>
-      
+
       <div class="row mt-2 pb-2">
         <div class="col">
           <span v-if="star.infrastructure && !isDeadStar" title="Economic infrastructure">
@@ -149,6 +149,12 @@
             {{star.manufacturing || '???'}} <i class="fas fa-wrench ms-1"></i>
           </span>
         </div>
+
+        <div class="col-auto">
+          <span v-if="star.ownedByPlayerId && !isDeadStar && ticksToNextShip" title="Ticks to next ship">
+            {{ticksToNextShip}} <i class="fas fa-spinner ms-1"></i>
+          </span>
+        </div>
       </div>
 
       <div class="row pb-2" v-if="star.specialist">
@@ -158,7 +164,7 @@
       </div>
 
       <div class="mb-0" v-if="!isDeadStar">
-        <infrastructureUpgradeCompact 
+        <infrastructureUpgradeCompact
           v-if="isOwnedByUserPlayer && !userPlayer.defeated && star.upgradeCosts != null"
           :star="star"
           :availableCredits="userPlayer.credits"
@@ -309,8 +315,8 @@
           </div>
           <div class="col-4">
             <div class="d-grid gap-2">
-              <button :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.carriers || star.ships < 1 || isGameFinished" 
-                class="btn btn-info mb-2" 
+              <button :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.carriers || star.ships < 1 || isGameFinished"
+                class="btn btn-info mb-2"
                 @click="onBuildCarrierRequested">
                 <i class="fas fa-rocket"></i>
                 Build for ${{star.upgradeCosts.carriers}}
@@ -325,17 +331,17 @@
           </div>
           <div class="col-4">
             <div class="d-grid gap-2">
-              <modalButton v-if="canBuildWarpGates && !star.warpGate" 
-                :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished" 
-                modalName="buildWarpGateModal" 
+              <modalButton v-if="canBuildWarpGates && !star.warpGate"
+                :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished"
+                modalName="buildWarpGateModal"
                 classText="btn btn-success mb-2">
                 <i class="fas fa-dungeon"></i>
                 Build for ${{star.upgradeCosts.warpGate}}
               </modalButton>
             </div>
             <div class="d-grid gap-2">
-              <modalButton v-if="canDestroyWarpGates && star.warpGate" 
-                :disabled="$isHistoricalMode() || isGameFinished" 
+              <modalButton v-if="canDestroyWarpGates && star.warpGate"
+                :disabled="$isHistoricalMode() || isGameFinished"
                 modalName="destroyWarpGateModal"
                 classText="btn btn-outline-danger mb-2">
                 <i class="fas fa-trash"></i>
@@ -507,7 +513,7 @@ export default {
           this.$toasted.show(`Warp Gate built at ${this.star.name}.`)
 
           this.$store.commit('gameStarWarpGateBuilt', response.data)
-          
+
           AudioService.join()
         }
       } catch (err) {
@@ -524,7 +530,7 @@ export default {
           this.$store.commit('gameStarWarpGateDestroyed', {
             starId: this.star._id
           })
-          
+
           AudioService.leave()
         }
       } catch (err) {
@@ -534,12 +540,12 @@ export default {
     async transferAllToStar() {
       try {
         let response = await starService.transferAllToStar(this.$store.state.game._id, this.star._id)
-        
+
         if (response.status === 200) {
           let carriers = response.data.carriers
 
           carriers.forEach(responseCarrier => {
-            let mapObjectCarrier = gameHelper.getCarrierById(this.$store.state.game, responseCarrier._id) 
+            let mapObjectCarrier = gameHelper.getCarrierById(this.$store.state.game, responseCarrier._id)
             mapObjectCarrier.ships = responseCarrier.ships
           })
 
@@ -554,12 +560,12 @@ export default {
     async distributeAllShips() {
       try {
         let response = await starService.distributeAllShips(this.$store.state.game._id, this.star._id)
-        
+
         if (response.status === 200) {
           let carriers = response.data.carriers
 
           carriers.forEach(responseCarrier => {
-            let mapObjectCarrier = gameHelper.getCarrierById(this.$store.state.game, responseCarrier._id) 
+            let mapObjectCarrier = gameHelper.getCarrierById(this.$store.state.game, responseCarrier._id)
             mapObjectCarrier.ships = responseCarrier.ships
           })
 
@@ -583,8 +589,8 @@ export default {
       return this.isSpecialistsEnabled && (this.star.specialistId || this.isOwnedByUserPlayer) && !this.isDeadStar
     },
     canHireSpecialist: function () {
-      return this.canShowSpecialist 
-        && !GameHelper.isGameFinished(this.$store.state.game) 
+      return this.canShowSpecialist
+        && !GameHelper.isGameFinished(this.$store.state.game)
         && !this.isDeadStar
         && (!this.star.specialistId || !this.star.specialist.oneShot)
     },
@@ -605,6 +611,9 @@ export default {
       }
 
       return GameHelper.getStarById(this.$store.state.game, this.star.wormHoleToStarId)
+    },
+    ticksToNextShip: function () {
+      return GameHelper.calculateTicksToNextShip(this.star.shipsActual, this.star.manufacturing)
     }
   }
 }

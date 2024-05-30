@@ -7,8 +7,9 @@ import StarService from "../star";
 import StarDistanceService from "../starDistance";
 import { GalaxyDimensions } from '../types/Dimensions';
 import { GameResourceDistribution } from '../types/Game';
+const randomSeeded = require('random-seed');
 
-const simplexNoise = require('simplex-noise');
+import { createNoise2D } from 'simplex-noise';
 
 export default class SpiralMapService {
 
@@ -129,8 +130,9 @@ export default class SpiralMapService {
     }
 
     applyNoise(locations: Location[]): void {
-        let seed = Math.floor(Math.random() * 10000)
-        let simplex = new simplexNoise(seed);
+        let seed = Math.floor(Math.random() * 10000);
+        const random = randomSeeded.create(seed);
+        let simplex = createNoise2D(random.rand);
         
         let DELTA_DISTANCE = 0.01;
         let DISTANCE_CHECKING_DIRECTIONS = 1;
@@ -148,7 +150,7 @@ export default class SpiralMapService {
                 let s_x = location.x * PERLIN_SCALE
                 let s_y = location.y * PERLIN_SCALE
 
-                let val_at_loc = simplex.noise2D(s_x , s_y)
+                let val_at_loc = simplex(s_x , s_y)
 
                 // get gradient in perlin noise
                 for (let d_i = 0; d_i < DISTANCE_CHECKING_DIRECTIONS; d_i ++) { 
@@ -156,7 +158,7 @@ export default class SpiralMapService {
                     let angle = d_i * Math.PI / DISTANCE_CHECKING_DIRECTIONS
                     let av_x = Math.sin(angle)
                     let av_y = Math.cos(angle)
-                    let val_at_offset = simplex.noise2D(s_x + av_x * DELTA_DISTANCE, s_y + av_y * DELTA_DISTANCE)
+                    let val_at_offset = simplex(s_x + av_x * DELTA_DISTANCE, s_y + av_y * DELTA_DISTANCE)
 
                     d_x += (val_at_loc - val_at_offset ) * PERLIN_GRAVITY;
                     d_y += (val_at_loc - val_at_offset ) * PERLIN_GRAVITY;

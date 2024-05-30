@@ -25,10 +25,10 @@
 
     <div class="row mb-1">
         <div class="col">
-            <input v-model.lazy="starShips" type="number" class="form-control" @change="onStarShipsChanged">
+            <input v-model="starShips" type="number" class="form-control" @input="onStarShipsChanged" @blur="onStarShipsBlur">
         </div>
         <div class="col">
-            <input v-model.lazy="carrierShips" type="number" class="form-control" @change="onCarrierShipsChanged">
+            <input v-model="carrierShips" type="number" class="form-control" @input="onCarrierShipsChanged" @blur="onCarrierShipsBlur">
         </div>
     </div>
 
@@ -68,7 +68,7 @@
         <div class="col-6"></div>
         <div class="col pe-0">
           <div class="d-grid gap-2">
-            <button type="button" class="btn btn-success me-1" :disabled="$isHistoricalMode() || isTransferringShips || starShips < 0 || carrierShips < 0" @click="saveTransfer">
+            <button type="button" class="btn btn-success me-1" :disabled="$isHistoricalMode() || isTransferringShips || starShips < 0 || carrierShips < 1" @click="saveTransfer">
               <i class="fas fa-check"></i>
               Transfer
             </button>
@@ -150,13 +150,19 @@ export default {
         this.onStarShipsChanged()
       }
     },
-    onStarShipsChanged (e) {
-      let difference = parseInt(this.starShips) - this.star.ships
-      this.carrierShips = this.carrier.ships - difference
+    onStarShipsChanged(e) {
+      let difference = this.ensureInt(this.starShips) - this.star.ships;
+      this.carrierShips = this.carrier.ships - difference;
     },
-    onCarrierShipsChanged (e) {
-      let difference = parseInt(this.carrierShips) - this.carrier.ships
-      this.starShips = this.star.ships - difference
+    onStarShipsBlur(e) {
+      this.starShips = this.ensureInt(this.starShips);
+    },
+    onCarrierShipsChanged(e) {
+      let difference = this.ensureInt(this.carrierShips) - this.carrier.ships;
+      this.starShips = this.star.ships - difference;
+    },
+    onCarrierShipsBlur(e) {
+      this.carrierShips = this.ensureInt(this.carrierShips);
     },
     onMinShipsClicked (e) {
       this.carrierShips = 1
@@ -166,13 +172,22 @@ export default {
       this.starShips = 0
       this.carrierShips = this.carrier.ships + this.star.ships
     },
-    onTransferLeftClicked (e) {
+    onTransferLeftClicked(e) {
       this.starShips+=e
       this.carrierShips-=e
     },
-    onTransferRightClicked (e) {
+    onTransferRightClicked(e) {
       this.carrierShips+=e
       this.starShips-=e
+    },
+    ensureInt(v) {
+      v = parseInt(v);
+
+      if (isNaN(v)) {
+        v = 0;
+      }
+
+      return v;
     },
     async saveTransfer (e) {
       let result = await this.performSaveTransfer()
@@ -194,8 +209,8 @@ export default {
       try {
         this.isTransferringShips = true
 
-        let cShips = parseInt(this.carrierShips)
-        let sShips = parseInt(this.starShips)
+        let cShips = this.carrierShips;
+        let sShips = this.starShips;
 
         let response = await CarrierApiService.transferShips(
           this.$store.state.game._id,

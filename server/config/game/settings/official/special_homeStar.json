@@ -3,9 +3,10 @@
     "name": "[[[RANDOM]]]",
     "description": "Capital Stars are the targets in this mode, capture enemy capitals to win and protect your own.",
     "type": "special_homeStar",
+    "createdFromTemplate": "special_homeStar",
     "mode": "conquest",
     "password": null,
-    "playerLimit": 8,
+    "playerLimit": 10,
     "playerType": "all",
     "anonymity": "normal",
     "playerOnlineStatus": "hidden",
@@ -85,7 +86,7 @@
     "enabled": "enabled",
     "upkeepCost": "none",
     "tradeRestricted": "disabled", 
-    "maxAlliances": 7, 
+    "maxAlliances": 9,
     "globalEvents": "disabled"
   },
   "technology": {
@@ -111,7 +112,7 @@
     },
     "bankingReward": "standard",
     "experimentationReward": "standard",
-    "specialistTokenReward": "standard"
+    "specialistTokenReward": "experimental"
   },
   "gameTime": {
     "gameType": "realTime",

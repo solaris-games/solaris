@@ -182,13 +182,7 @@ export default {
   },
   methods: {
     getRequiredTotal (technologyKey) {
-      const game = this.$store.state.game
-
-      const researchCostConfig = game.settings.technology.researchCosts[technologyKey]
-      const expenseCostConfig = game.constants.star.infrastructureExpenseMultipliers[researchCostConfig]
-      const progressMultiplierConfig = expenseCostConfig * game.constants.research.progressMultiplier
-
-      return this.research[technologyKey].level * progressMultiplierConfig
+      return TechnologyHelper.getRequiredResearchProgress(this.$store.state.game, technologyKey, this.research[technologyKey].level)
     },
     isTechnologyEnabled (technologyKey) {
       return TechnologyHelper.isTechnologyEnabled(this.$store.state.game, technologyKey)
@@ -213,7 +207,7 @@ export default {
     width: 1%;
 }
 
-@media screen and (max-width: 576px) { 
+@media screen and (max-width: 576px) {
   .level-label {
     display: none;
   }
@@ -223,7 +217,7 @@ export default {
   }
 }
 
-@media screen and (min-width: 577px) { 
+@media screen and (min-width: 577px) {
   .slash-label {
     display: none;
   }

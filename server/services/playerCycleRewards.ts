@@ -90,7 +90,8 @@ export default class PlayerCycleRewardsService {
             case 'standard':
                 return specialists;
             case 'experimental':
-                return Math.ceil(Math.min(starCount * specialists * 0.1, specialists));
+                const factor = 1 / (game.settings.galaxy.starsPerPlayer * 0.5);
+                return Math.ceil(Math.min(starCount * specialists * factor, specialists));
         }
 
         throw new Error(`Unsupported specialist reward type: ${game.settings.technology.specialistTokenReward}.`);

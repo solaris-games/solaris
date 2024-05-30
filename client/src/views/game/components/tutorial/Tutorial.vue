@@ -136,7 +136,7 @@
         </p>
 
         <p class="text-warning">
-            <i>Submit your turn and in a few seconds you will your carriers follow their waypoints and travel to nearby stars.</i>
+            <i>Submit your turn and in a few seconds you will see your carriers follow their waypoints and travel to nearby stars.</i>
         </p>
     </div>
 

@@ -147,6 +147,7 @@ export default class GameListService {
             ]
         }, {
             'settings.general.name': 1,
+            'settings.general.mode': 1,
             'settings.general.type': 1,
             'settings.general.playerLimit': 1,
             'settings.gametime.speed': 1,
@@ -158,6 +159,7 @@ export default class GameListService {
             'galaxy.players.ready': 1,
             'galaxy.players.defeated': 1,
             'galaxy.players.afk': 1,
+            'galaxy.teams': 1,
             'conversations.participants': 1,
             'conversations.messages.readBy': 1,
             state: 1
@@ -178,11 +180,21 @@ export default class GameListService {
     async listSpectating(userId: DBObjectId) {
         return await this.gameRepo.find({
             'state.endDate': { $eq: null }, // Game is in progress
-            'galaxy.players.spectators': { // User is spectating at least one player.
-                $elemMatch: {
-                    $in: [userId]
+            $and: [{
+                    'galaxy.players.spectators': { // User is spectating at least one player.
+                        $elemMatch: {
+                            $in: [userId]
+                        }
+                    }
+                },
+                {
+                    'galaxy.players': {
+                        $not: {
+                            $elemMatch: { userId }
+                        }
+                    }
                 }
-            }
+            ]
         },
         {
             'settings.general.type': 1,
@@ -217,7 +229,11 @@ export default class GameListService {
             totalUnread = (unreadConversations || 0) + (unreadEvents || 0);
 
             if (includePosition) {
-                position = this.leaderboardService.getGameLeaderboardPosition(game, player);
+                if (this.gameTypeService.isTeamConquestGame(game)) {
+                    position = this.leaderboardService.getTeamLeaderboardPosition(game, player);
+                } else {
+                    position = this.leaderboardService.getGameLeaderboardPosition(game, player);
+                }
             }
         }
 
@@ -291,13 +307,13 @@ export default class GameListService {
         let games = await this.gameRepo.find({
             'settings.general.type': { $nin: ['tutorial'] },
             'state.startDate': { $ne: null },
-            'state.endDate': { $eq: null },
-            'state.paused': { $eq: false }
+            'state.endDate': { $eq: null }
         }, {
             'settings.general.name': 1,
             'settings.general.type': 1,
             'settings.general.playerLimit': 1,
             'settings.general.playerType': 1,
+            'settings.general.createdFromTemplate': 1,
             state: 1,
             'galaxy.players.isOpenSlot': 1
         }, {

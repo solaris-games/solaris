@@ -25,7 +25,10 @@ class AnimationService {
 
     setTimeout(() => {
       container.removeChild(graphics)
-      app.ticker.remove(graphics.animation)
+      // When leaving the game, the app can be destroyed
+      if (app?.ticker) {
+        app.ticker.remove(graphics.animation)
+      }
     }, 3000)
 
     container.addChild(graphics)

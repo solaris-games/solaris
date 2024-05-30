@@ -3,9 +3,10 @@
     "name": "[[[RANDOM]]]",
     "description": "Stars in this galaxy cannot be upgraded and ship population is limited, this mode requires cunning tactics to win.",
     "type": "special_arcade",
+    "createdFromTemplate": "special_arcade",
     "mode": "conquest",
     "password": null,
-    "playerLimit": 8,
+    "playerLimit": 10,
     "playerType": "all",
     "anonymity": "normal",
     "playerOnlineStatus": "hidden",
@@ -88,7 +89,7 @@
     "enabled": "enabled",
     "upkeepCost": "standard",
     "tradeRestricted": "disabled", 
-    "maxAlliances": 7, 
+    "maxAlliances": 9,
     "globalEvents": "disabled"
   },
   "technology": {
@@ -114,7 +115,7 @@
     },
     "bankingReward": "standard",
     "experimentationReward": "standard",
-    "specialistTokenReward": "standard"
+    "specialistTokenReward": "experimental"
   },
   "gameTime": {
     "gameType": "realTime",

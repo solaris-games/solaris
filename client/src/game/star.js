@@ -31,11 +31,14 @@ class Star extends EventEmitter {
     super()
 
     this.app = app
-    this.container = new PIXI.Container()
     this.fixedContainer = new PIXI.Container() // this container isnt affected by culling or user setting scalling
-    this.container.interactive = true
+    this.fixedContainer.interactiveChildren = false
+    this.fixedContainer.eventMode = 'none'
+    this.container = new PIXI.Container()
     this.container.interactiveChildren = false
-    this.container.buttonMode = true
+    this.container.cursor = 'pointer'
+    this.container.eventMode = 'static';
+    this.container.interactiveChildren = false;
 
     this.graphics_shape_part = new PIXI.Graphics()
     this.graphics_shape_full = new PIXI.Graphics()
@@ -315,7 +318,7 @@ class Star extends EventEmitter {
       this.container.removeChild(this.specialistSprite)
       this.specialistSprite = null
     }
-    
+
     if (!this.hasSpecialist()) {
       return
     }
@@ -394,7 +397,7 @@ class Star extends EventEmitter {
 
         let orbitGraphics = new PIXI.Graphics()
         orbitGraphics.lineStyle(0.3, 0xFFFFFF)
-        orbitGraphics.alpha = 0.1
+        orbitGraphics.alpha = this.userSettings.map.naturalResourcesRingOpacity;
         orbitGraphics.drawCircle(0, 0, distanceToStar -(planetSize / 2))
         this.container_planets.addChild(orbitGraphics)
 
@@ -433,7 +436,7 @@ class Star extends EventEmitter {
     if (!this.planets) {
       return
     }
-    
+
     for (let planet of this.planets) {
       if (planet.rotationDirection) {
         planet.container.rotation += planet.rotationSpeed * delta
@@ -470,7 +473,7 @@ class Star extends EventEmitter {
       ringRadius *= lod+1
       lineWidht *= lod+1
       this.graphics_natural_resources_ring[lod].clear()
-      this.graphics_natural_resources_ring[lod].lineStyle(lineWidht, 0xFFFFFF, 0.1)
+      this.graphics_natural_resources_ring[lod].lineStyle(lineWidht, 0xFFFFFF, this.userSettings.map.naturalResourcesRingOpacity)
       this.graphics_natural_resources_ring[lod].drawCircle(0, 0, ringRadius * 0.75)
       this.graphics_natural_resources_ring[lod].scale.x = 1.0/( (1.0/8.0)*(lod+1) )
       this.graphics_natural_resources_ring[lod].scale.y = 1.0/( (1.0/8.0)*(lod+1) )
@@ -571,7 +574,7 @@ class Star extends EventEmitter {
 
     if (this.data.ownedByPlayerId || carriersOrbiting) {
       let scramblers = 0
-      
+
       if (carriersOrbiting) {
         scramblers = carriersOrbiting.reduce( (sum, c ) => sum + (c.ships==null), 0 )
       }
@@ -698,7 +701,7 @@ class Star extends EventEmitter {
     let player = this._getStarPlayer()
 
     if (!player) { return }
-    
+
     let radius = ((this.data.effectiveTechs.hyperspace || 1) + 1.5) * this.lightYearDistance
 
     this.graphics_hyperspaceRange.lineStyle(1, 0xFFFFFF, 0.2)
@@ -750,7 +753,7 @@ class Star extends EventEmitter {
     this.container.alpha = depth
     this.baseScale = depth * (this.userSettings.map.objectsDepth === 'disabled' ? 1 : 1.5)
   }
-  
+
   onZoomChanging(zoomPercent) {
     this.zoomPercent = zoomPercent
     this.setScale(zoomPercent)
@@ -778,29 +781,32 @@ class Star extends EventEmitter {
      }
   }
 
-  onClicked (e) {
-    let eventData = e ? e.data : null
-    
-    if (e && e.data && e.data.originalEvent && e.data.originalEvent.button === 2) {
-      this.emit('onStarRightClicked', {
-        starData: this.data,
-        eventData
-      })
-    } else {
-      this.emit('onStarClicked', {
-        starData: this.data,
-        eventData,
-        permitCallback: () => {
-          // Need to do this otherwise sometimes text gets highlighted.
-          this.deselectAllText()
+  onClicked(e, tryMultiSelect = true) {
+    setTimeout(() => {
+      let eventData = e ? e.data : null
 
-          if (this._getStarPlayer()) {
-            this.updateVisibility()
-            // this.setScale()
+      if (e && e.data && e.data.originalEvent && e.data.originalEvent.button === 2) {
+        this.emit('onStarRightClicked', {
+          starData: this.data,
+          eventData
+        })
+      } else {
+        this.emit('onStarClicked', {
+          starData: this.data,
+          tryMultiSelect,
+          eventData,
+          permitCallback: () => {
+            // Need to do this otherwise sometimes text gets highlighted.
+            this.deselectAllText()
+
+            if (this._getStarPlayer()) {
+              this.updateVisibility()
+              // this.setScale()
+            }
           }
-        }
-      })
-    }
+        })
+      }
+    }, 25);
   }
 
   updateVisibility() {
@@ -809,7 +815,7 @@ class Star extends EventEmitter {
     let lod = Math.max(Math.min(Math.floor(aparentScale)-1, Star.maxLod-1), 0.0)
     for(let l = 0; l<Star.maxLod; l+= 1) {
       let ring = this.graphics_natural_resources_ring[l]
-      
+
       if (ring) {
         ring.visible = false
       }

@@ -53,7 +53,7 @@ export default class PlayerStatisticsService {
             totalShipsMax: this.shipService.calculatePopulationCap(game, player._id)?.shipsMaximum || null,
             totalEconomy: this.calculateTotalEconomy(playerStars),
             totalIndustry: this.calculateTotalIndustry(playerStars),
-            totalScience: this.calculateTotalScience(playerStars),
+            totalScience: this.calculateTotalScience(game, playerStars),
             newShips: this.calculateTotalManufacturing(game, playerStars),
             warpgates: this.calculateWarpgates(playerStars),
             totalStarSpecialists,
@@ -93,12 +93,12 @@ export default class PlayerStatisticsService {
         return totalIndustry;
     }
 
-    calculateTotalScience(playerStars: Star[]) {
+    calculateTotalScience(game: Game, playerStars: Star[]) {
         let totalScience = playerStars.reduce((sum, s) => {
-            let multiplier = this.specialistService.getScienceInfrastructureMultiplier(s);
+            let specialistMultiplier = this.specialistService.getScienceInfrastructureMultiplier(s);
             let sci = s.infrastructure?.science ?? 0;
 
-            return sum + (sci * multiplier)
+            return sum + Math.floor(sci * specialistMultiplier * game.constants.research.sciencePointMultiplier)
         }, 0);
 
         return totalScience;

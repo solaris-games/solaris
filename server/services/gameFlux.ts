@@ -46,7 +46,7 @@ export default class GameFluxService {
     }
 
     applyJanFlux(game: Game) {
-        // Banking rewards are increased.
+        // Banking rewards are decreased.
         game.constants.player.bankingCycleRewardMultiplier = 50;
     }
 
