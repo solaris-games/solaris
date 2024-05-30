@@ -169,6 +169,7 @@ const schema = new Schema({
 				growthFactor: { type: Types.String, required: false, validate: validateNullableEnum(['soft', 'medium', 'hard']), default: null },
 			},
 			bankingReward: { type: Types.String, required: true, enum: ['standard', 'legacy'], default: 'standard' },
+			experimentationDistribution: { type: Types.String, required: true, enum: ['random', 'current_research'], default: 'random' },
 			experimentationReward: { type: Types.String, required: true, enum: ['standard', 'experimental'], default: 'standard' },
 			specialistTokenReward: { type: Types.String, required: true, enum: ['standard', 'experimental'], default: 'standard' }
 		},

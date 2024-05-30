@@ -824,7 +824,17 @@
           </select>
         </div>
 
-        <div class="mb-2">
+        <div class="mb-2" v-if="settings.technology.startingTechnologyLevel > 0">
+          <label for="experimentationDistribution" class="col-form-label">Experimentation Distribution <help-tooltip tooltip="Determines to what technologies the experimentation reward gets distributed"/></label>
+
+          <select class="form-control" id="experimentationDistribution" v-model="settings.technology.experimentationDistribution" :disabled="isCreatingGame">
+            <option v-for="opt in options.technology.experimentationDistribution" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-2" v-if="settings.technology.startingTechnologyLevel > 0">
           <label for="experimentationReward" class="col-form-label">Experimentation Reward <help-tooltip tooltip="Determines the amount of research points awarded for the experimentation technology at the end of a galactic cycle"/></label>
           <select class="form-control" id="experimentationReward" v-model="settings.technology.experimentationReward" :disabled="isCreatingGame">
             <option v-for="opt in options.technology.experimentationReward" v-bind:key="opt.value" v-bind:value="opt.value">

@@ -113,6 +113,7 @@
       "weapons": "standard",
       "specialists": "none"
     },
+    "experimentationDistribution": "random",
     "bankingReward": "standard",
     "experimentationReward": "standard",
     "specialistTokenReward": "experimental"
