@@ -25,7 +25,8 @@ export default new Vuex.Store({
     starSpecialists: null,
     carrierSpecialists: null,
     settings: null,
-    confirmationDialog: {}
+    confirmationDialog: {},
+    learnedConcepts: null
   },
   mutations: {
     // Menu
@@ -142,6 +143,15 @@ export default new Vuex.Store({
     },
     setConfirmationDialogSettings (state, settings) {
       state.confirmationDialog = settings
+    },
+
+    setLearnedConcept (state, conceptId) {
+      if (!state.learnedConcepts)
+        state.learnedConcepts = {}
+      state.learnedConcepts[conceptId] = true
+    },
+    clearLearnedConcepts (state) {
+      state.learnedConcepts = null
     },
 
     setUnreadMessages (state, count) {
