@@ -49,7 +49,6 @@ export interface ScheduledStarUpgradeTrash {
 export const mapToStarUpgradeInfrastructureBulkRequest = (body: any): StarUpgradeInfrastructureBulkRequest => {
     let errors: string[] = [];
 
-    console.log('bulk values checks')
     if (!keyHasStringValue(body, 'upgradeStrategy')) {
         errors.push('Upgrade Strategy is required.');
     }
