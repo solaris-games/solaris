@@ -295,6 +295,14 @@ export default new Vuex.Store({
           break;
       }
     },
+    gameBulkActionAdded(state, data) {
+      let player = GameHelper.getUserPlayer(state.game)
+      player.scheduledActions.push(data);
+    },
+    gameBulkActionTrashed(state, data) {
+      let player = GameHelper.getUserPlayer(state.game)
+      player.scheduledActions = player.scheduledActions.filter(a => a._id != data._id)
+    },
     gameStarWarpGateBuilt (state, data) {
       let star = GameHelper.getStarById(state.game, data.starId)
 

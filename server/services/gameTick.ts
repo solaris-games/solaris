@@ -38,6 +38,7 @@ import GamePlayerAFKEvent from "./types/events/GamePlayerAFK";
 import GameEndedEvent from "./types/events/GameEnded";
 import PlayerAfkService from "./playerAfk";
 import ShipService from "./ship";
+import ScheduleBuyService from "./scheduleBuy";
 import {Moment} from "moment";
 import GameLockService from "./gameLock";
 
@@ -83,8 +84,9 @@ export default class GameTickService extends EventEmitter {
     starContestedService: StarContestedService;
     playerReadyService: PlayerReadyService;
     shipService: ShipService;
+    scheduleBuyService: ScheduleBuyService;
     gameLockService: GameLockService;
-    
+
     constructor(
         distanceService: DistanceService,
         starService: StarService,
@@ -115,6 +117,7 @@ export default class GameTickService extends EventEmitter {
         starContestedService: StarContestedService,
         playerReadyService: PlayerReadyService,
         shipService: ShipService,
+        scheduleBuyService: ScheduleBuyService,
         gameLockService: GameLockService,
     ) {
         super();
@@ -149,6 +152,7 @@ export default class GameTickService extends EventEmitter {
         this.playerReadyService = playerReadyService;
         this.shipService = shipService;
         this.gameLockService = gameLockService;
+        this.scheduleBuyService = scheduleBuyService;
     }
 
     async tick(gameId: DBObjectId) {
@@ -165,12 +169,13 @@ export default class GameTickService extends EventEmitter {
         }
 
         /*
-            1. Move all carriers
-            2. Perform combat at stars that have enemy carriers in orbit
-            3. Industry creates new ships
-            4. Players conduct research
-            5. If its the last tick in the galactic cycle, all players earn money and experimentation is done.
-            6. Check to see if anyone has won the game.
+            1. Buy scheduled infrastructure
+            2. Move all carriers
+            3. Perform combat at stars that have enemy carriers in orbit
+            4. Industry creates new ships
+            5. Players conduct research
+            6. If its the last tick in the galactic cycle, all players earn money and experimentation is done.
+            7. Check to see if anyone has won the game.
         */
 
         let startTime = process.hrtime();
@@ -210,6 +215,9 @@ export default class GameTickService extends EventEmitter {
             game.state.tick++;
 
             logTime(`Tick ${game.state.tick}`);
+
+            await this.scheduleBuyService.buyScheduledInfrastructure(game);
+            logTime('Buy scheduled infrastructure')
 
             await this._captureAbandonedStars(game, gameUsers);
             logTime('Capture abandoned stars');

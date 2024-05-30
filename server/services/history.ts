@@ -107,6 +107,7 @@ export default class HistoryService {
         history.players = game.galaxy.players.map(player => {
             let stats = this.playerStatisticsService.getStats(game, player);
 
+            console.log(player.scheduledActions.length)
             return {
                 userId: player.userId,
                 playerId: player._id,
@@ -136,7 +137,8 @@ export default class HistoryService {
                 afk: player.afk,
                 ready: player.ready,
                 readyToQuit: player.readyToQuit,
-                research: player.research
+                research: player.research,
+                scheduledActions: player.scheduledActions
             };
         });
 
