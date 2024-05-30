@@ -99,7 +99,7 @@
             <div class="d-grid">
               <button class="btn btn-outline-info" v-on:click="check"
                       :disabled="$isHistoricalMode() || isUpgrading || isChecking || gameIsFinished()"><i
-                class="fas fa-hammer me-1"></i>Check
+                class="fas fa-hammer me-1"></i>{{checkText}}
               </button>
             </div>
           </div>
@@ -223,6 +223,15 @@ export default {
   },
   destroyed() {
     GameContainer.map.hideIgnoreBulkUpgrade()
+  },
+  computed: {
+    checkText() {
+      if (this.selectedScheduleStrategy === 'future') {
+        return "Schedule"
+      } else {
+        return "Check"
+      }
+    }
   },
   methods: {
     onCloseRequested(e) {
