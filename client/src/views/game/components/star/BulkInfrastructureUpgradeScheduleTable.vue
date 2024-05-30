@@ -36,24 +36,13 @@ export default {
   },
   data: function () {
     return {
-      tableData: [],
       sortBy: null,
       sortDirection: true,
     }
   },
-  mounted () {
-    this.tableData = this.getTableData()
-  },
   methods: {
     onTrashed () {
       this.$emit('bulkScheduleTrashed')
-      this.tableData = this.getTableData() // Refresh the table data
-    },
-    getUserPlayer () {
-      return GameHelper.getUserPlayer(this.$store.state.game)
-    },
-    getTableData () {
-      return this.getUserPlayer().scheduledActions
     },
     sort (columnName) {
       // If sorting by a new column, reset the sort.
@@ -67,6 +56,12 @@ export default {
     },
   },
   computed: {
+    userPlayer () {
+      return GameHelper.getUserPlayer(this.$store.state.game)
+    },
+    tableData () {
+      return this.userPlayer.scheduledActions
+    },
     // TODO: All this stuff should be in a shared service class as it is used also on the galaxy view.
     sortedTableData () {
       // here be dragons
@@ -101,7 +96,7 @@ export default {
               return ao < bo ? -1 : 1;
           }
           // if descending, highest sorts first
-          else { 
+          else {
               return ao < bo ? 1 : -1;
           }
         })
