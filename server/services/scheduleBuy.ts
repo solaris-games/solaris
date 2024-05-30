@@ -54,8 +54,8 @@ export default class ScheduleBuyService extends EventEmitter {
                 if (action.buyType === 'totalCredits' && action.amount > player.credits) {
                     // When players schedule actions to spend more credits than they have, we spend all their credits
                     action.amount = player.credits
-                }; 
-                let upgradeSummary = await this.starUpgradeService.upgradeBulk(game, player, action.buyType, action.infrastructureType, action.amount, false)
+                }
+                await this.starUpgradeService.upgradeBulk(game, player, action.buyType, action.infrastructureType, action.amount, false)
             }
             
             // We want to make sure that all percentage actions are dealt with with the same starting value.
@@ -70,8 +70,8 @@ export default class ScheduleBuyService extends EventEmitter {
 
     async _executePercentageAction(game: Game, player: Player, percentageActions: PlayerScheduledActions[], totalPercentage) {
         for(let action of percentageActions) {
-            let percentageToCredits = Math.floor((action.amount/Math.max(totalPercentage, 100))*player.credits)
-            let upgradeSummary = await this.starUpgradeService.upgradeBulk(game, player, 'totalCredits', action.infrastructureType, percentageToCredits, false)
+            const percentageToCredits = Math.floor((action.amount/Math.max(totalPercentage, 100))*player.credits)
+            await this.starUpgradeService.upgradeBulk(game, player, 'totalCredits', action.infrastructureType, percentageToCredits, false)
         }
     }
 
@@ -79,7 +79,7 @@ export default class ScheduleBuyService extends EventEmitter {
         for(let i = 0; i < actions.length ; i++) {
             let action = actions[i]
             // Repeat the action next cycle or remove the action
-            if(action.repeat) {
+            if (action.repeat) {
                 action.tick += game.settings.galaxy.productionTicks;
             } else {
                 actions.splice(i, 1);
