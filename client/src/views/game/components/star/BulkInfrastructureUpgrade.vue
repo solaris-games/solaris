@@ -204,7 +204,7 @@ export default {
 
     this.amount = GameHelper.getUserPlayer(this.$store.state.game).credits
 
-    this.actionCount = GameHelper.getUserPlayer(this.$store.state.game).scheduledActions.length
+    this.actionCount = GameHelper.getUserPlayer(this.$store.state.game)?.scheduledActions?.length || 0;
 
     this.setupInfrastructureTypes()
   },
@@ -249,7 +249,7 @@ export default {
       this.upgradePreview = null
     },
     onTrashed() {
-      this.actionCount = GameHelper.getUserPlayer(this.$store.state.game).scheduledActions.length
+      this.actionCount = GameHelper.getUserPlayer(this.$store.state.game)?.scheduledActions?.length || 0;
       this.hasActions = (this.actionCount > 0)
     },
     panToStar (starId) {
@@ -293,7 +293,7 @@ export default {
 
               this.$store.commit('gameBulkActionAdded', response.data);
 
-              this.actionCount = GameHelper.getUserPlayer(this.$store.state.game).scheduledActions.length
+              this.actionCount = GameHelper.getUserPlayer(this.$store.state.game)?.scheduledActions?.length || 0;
 
               this.$toasted.show(`Action scheduled. Action will be executed on tick ${response.data.tick}.`, { type: 'success' })
             }
@@ -350,7 +350,7 @@ export default {
           AudioService.join()
 
           this.$store.commit('gameStarBulkUpgraded', response.data)
-          
+
           this.$toasted.show(`Upgrade complete. Purchased ${response.data.upgraded} ${this.selectedType} for ${response.data.cost} credits.`, { type: 'success' })
 
           if (this.selectedUpgradeStrategy === 'totalCredits') {
