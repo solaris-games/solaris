@@ -111,6 +111,7 @@ export interface GameSettings {
 		starsPerPlayer: number;
 		productionTicks: number;
 		customJSON?: string;
+		advancedCustomGalaxyEnabled?: GameSettingEnabledDisabled;
 	},
 	specialGalaxy: {
 		carrierCost: GameCarrierCost;

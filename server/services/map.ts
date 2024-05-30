@@ -185,7 +185,7 @@ export default class MapService {
         do {
             let star = stars[this.randomService.getRandomNumberBetween(0, stars.length - 1)];
 
-            if (star.homeStar || star.warpGate) {
+            if (star.homeStar || star.warpGate || this.starService.isDeadStar(star)) {
                 gateCount++; // Increment because the while loop will decrement.
             } else {
                 star.warpGate = true;
