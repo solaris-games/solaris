@@ -46,8 +46,8 @@ export default class PlayerAfkService extends EventEmitter {
 
         if (hasHighAfkRate && hasJoinedSeveralGames) {
             user.warnings.push({
-                kind: 'afk',
                 date: new Date(),
+                text: 'Frequent AFK'
             });
         }
     }

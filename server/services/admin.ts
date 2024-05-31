@@ -1,7 +1,7 @@
 import { DBObjectId } from './types/DBObjectId';
 import Repository from './repository';
 import { Game } from './types/Game';
-import {User, UserRoles, UserWarningKind} from './types/User';
+import {User, UserRoles} from './types/User';
 import ValidationError from "../errors/validation";
 
 const moment = require('moment');
