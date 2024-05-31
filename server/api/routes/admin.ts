@@ -30,7 +30,7 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
         mw.core.handleError);
 
     router.get('/api/admin/reports',
-        mw.auth.authenticate({ admin: true }),
+        mw.auth.authenticate({ communityManager: true }),
         controller.listReports,
         mw.core.handleError);
 

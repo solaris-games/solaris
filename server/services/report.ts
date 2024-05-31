@@ -6,23 +6,27 @@ import { Report } from './types/Report';
 import PlayerService from './player';
 import ConversationService from "./conversation";
 import {ReportCreateReportRequest} from "../api/requests/report";
+import UserService from "./user";
 
 export default class ReportService {
     reportModel;
     reportRepo: Repository<Report>;
     playerService: PlayerService;
     conversationService: ConversationService;
+    userService: UserService;
 
     constructor(
         reportModel,
         reportRepo: Repository<Report>,
         playerService: PlayerService,
-        conversationService: ConversationService
+        conversationService: ConversationService,
+        userService: UserService
     ) {
         this.reportRepo = reportRepo;
         this.reportModel = reportModel;
         this.playerService = playerService;
         this.conversationService = conversationService;
+        this.userService = userService;
     }
 
     async reportPlayer(game: Game, req: ReportCreateReportRequest, reportedByUserId: DBObjectId) {
@@ -57,8 +61,15 @@ export default class ReportService {
         await report.save();
     }
 
-    async listReports() {
-        return await this.reportRepo.find({
+    async isUserInvolved(report: Report, userId: DBObjectId): Promise<boolean> {
+        return report.reportedByUserId === userId ||
+            report.reportedUserId === userId; // TODO: Check if user is in same game
+    }
+
+    async listReports(userId: DBObjectId): Promise<Report[]> {
+        const isAdmin = await this.userService.getUserIsAdmin(userId);
+
+        const reports = await this.reportRepo.find({
             // All reports
         }, {
             // All fields
@@ -66,6 +77,21 @@ export default class ReportService {
             actioned: 1,    // Non-actioned first
             _id: -1          // Newest first
         });
+
+        if (isAdmin) {
+            return reports;
+        } else {
+            // CM can only see reports that do not involve them/a game they're in
+            const results: Report[] = [];
+
+            for (let report of reports) {
+                if (!await this.isUserInvolved(report, userId)) {
+                    results.push(report);
+                }
+            }
+
+            return results;
+        }
     }
 
     async actionReport(reportId: DBObjectId) {

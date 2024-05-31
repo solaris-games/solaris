@@ -41,7 +41,7 @@ export default (container: DependencyContainer) => {
         },
         listReports: async (req, res, next) => {
             try {
-                let result = await container.reportService.listReports();
+                let result = await container.reportService.listReports(req.session.userId);
                 
                 return res.status(200).json(result);
             } catch (err) {
