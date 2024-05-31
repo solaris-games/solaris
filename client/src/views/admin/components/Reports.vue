@@ -4,7 +4,20 @@
 
     <div v-if="reports">
       <h4 class="mb-1">Recent Reports</h4>
-      <table class="mt-2 table table-sm table-striped table-responsive">
+      <div class="panel panel-default report-element" :class="report.actioned ? 'panel-success' : 'panel.warning'" v-for="report of reports" :key="report._id">
+        <div class="panel-header">
+          <h5 class="panel-title">{{formatReportTitle(report)}}</h5>
+        </div>
+        <div class="panel-body">
+          <p>Reasons:
+            <span v-if="report.reasons.abuse" class="me-2">Abuse</span>
+            <span v-if="report.reasons.spamming" class="me-2">Spamming</span>
+            <span v-if="report.reasons.multiboxing" class="me-2">Multiboxing</span>
+            <span v-if="report.reasons.inappropriateAlias" class="me-2">Inappropriate Alias</span>
+          </p>
+        </div>
+      </div>
+      <!--table class="mt-2 table table-sm table-striped table-responsive">
         <thead class="table-dark">
         <tr>
           <th>Player</th>
@@ -42,7 +55,7 @@
           </td>
         </tr>
         </tbody>
-      </table>
+      </table-->
     </div>
   </div>
 </template>
@@ -66,6 +79,13 @@ export default {
     this.reports = await this.getReports();
   },
   methods: {
+    formatReportTitle(report) {
+      if (report.conversationId) {
+        return `'${report.reportedByPlayerAlias}' reported message from '${report.reportedPlayerAlias}'`
+      } else {
+        return `'${report.reportedByPlayerAlias}' reported '${report.reportedPlayerAlias}'`
+      }
+    },
     async getReports() {
       const reports = await AdminApiService.getReports()
       if (reports.status !== 200) {
