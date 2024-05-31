@@ -13,8 +13,15 @@
       <div class="col-auto thumbtack" v-if="conversation.createdBy">
         <conversation-message-pin :conversationId="conversation._id" :messageId="message._id" :pinned="message.pinned" @onPinned="onPinned" @onUnpinned="onUnpinned" />
       </div>
-      <div class="col-auto">
-        <i class="pointer fa-warning" title="Report message" @click="reportMessage"></i>
+      <div class="col-auto" v-if="message.fromPlayerId && !isFromUserPlayer">
+        <div class="dropdown-container">
+          <button class="btn btn-sm" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fas fa-ellipsis"></i>
+          </button>
+          <div class="dropdown-menu dropdown-menu-right">
+            <button class="btn btn-small dropdown-item" @click="reportMessage">Report</button>
+          </div>
+        </div>
       </div>
       <div class="col-12">
         <p class="mt-0 mb-0">
