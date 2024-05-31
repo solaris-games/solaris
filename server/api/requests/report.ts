@@ -11,6 +11,7 @@ export interface ReportCreateReportRequest {
         inappropriateAlias: boolean;
     }
     conversationId?: DBObjectId;
+    messageId?: DBObjectId;
 };
 
 export const mapToReportCreateReportRequest = (body: any): ReportCreateReportRequest => {
@@ -48,7 +49,14 @@ export const mapToReportCreateReportRequest = (body: any): ReportCreateReportReq
     };
 
     if (body.conversationId) {
-        req.conversationId = body.conversationId;
+        if (body.messageId) {
+            req.conversationId = body.conversationId;
+            req.messageId = body.messageId;
+        } else {
+            errors.push('Message ID is required if conversation ID is provided.');
+        }
+    } else if (body.messageId) {
+        errors.push('Conversation ID is required if message ID is provided.');
     }
 
     if (errors.length) {

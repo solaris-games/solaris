@@ -43,6 +43,7 @@ export default class ReportService {
             reportedByPlayerId: reportedByPlayer._id,
             reportedByUserId: reportedByPlayer.userId,
             reportedByPlayerAlias: reportedByPlayer.alias,
+            reportedMessageId: req.messageId || null,
             reportedConversationId: req.conversationId || null,
             reasons: {
                 abuse: reasons.abuse || false,
