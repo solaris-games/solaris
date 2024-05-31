@@ -47,6 +47,11 @@ export default {
   async mounted() {
     this.reports = await this.getReports();
   },
+  computed: {
+    isMessageReport (report) {
+      return Boolean(report.conversationId)
+    }
+  },
   methods: {
     formatReportTitle(report) {
       if (report.conversationId) {
