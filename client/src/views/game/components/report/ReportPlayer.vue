@@ -95,7 +95,7 @@ export default {
       }
 
       try {
-        await ReportApiService.reportPlayer(this.$store.state.game._id, this.args.playerId, this.args.messageId, this.args.conversationId, this.optionAbuse, this.optionSpamming, this.optionMultiboxing, this.optionInappropriateAlias)
+        await ReportApiService.reportPlayer(this.$store.state.game._id, this.args.playerId, this.args.conversationId, this.optionAbuse, this.optionSpamming, this.optionMultiboxing, this.optionInappropriateAlias)
 
         this.$toasted.show(`You have reported ${this.player.alias}. We will investigate and take action if necessary.`, {type: 'success'})
 
@@ -111,8 +111,8 @@ export default {
     }
     ,
     menuTitle() {
-      if (this.args.messageId) {
-        return 'Report Message'
+      if (this.args.conversationId) {
+        return 'Report Conversation'
       } else {
         return 'Report Player'
       }
