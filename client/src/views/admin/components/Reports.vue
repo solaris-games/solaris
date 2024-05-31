@@ -4,9 +4,9 @@
 
     <div v-if="reports">
       <h4 class="mb-1">Recent Reports</h4>
-      <div class="panel panel-default report-element" :class="report.actioned ? 'panel-success' : 'panel.warning'" v-for="report of reports" :key="report._id">
-        <div class="panel-header">
-          <h5 class="panel-title">{{formatReportTitle(report)}}</h5>
+      <div class="panel report-element" v-for="report of reports" :key="report._id">
+        <div class="panel-heading">
+          <h5 class="panel-title" :class="report.actioned ? 'text-default' : 'text-warning'">{{formatReportTitle(report)}}</h5>
         </div>
         <div class="panel-body">
           <p>Reasons:
@@ -16,46 +16,15 @@
             <span v-if="report.reasons.inappropriateAlias" class="me-2">Inappropriate Alias</span>
           </p>
         </div>
-      </div>
-      <!--table class="mt-2 table table-sm table-striped table-responsive">
-        <thead class="table-dark">
-        <tr>
-          <th>Player</th>
-          <th>Reported By</th>
-          <th>Reasons</th>
-          <th>Game</th>
-          <th></th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="report of reports" :key="report._id">
-          <td>
-            <i class="fas fa-user clickable text-info" @click="impersonate(report.reportedUserId)"
-               title="Impersonate User"></i>
-            {{ report.reportedPlayerAlias }}
-          </td>
-          <td>
-            <i class="fas fa-user clickable text-info" @click="impersonate(report.reportedByUserId)"
-               title="Impersonate User"></i>
-            {{ report.reportedByPlayerAlias }}
-          </td>
-          <td>
-            <span v-if="report.reasons.abuse" class="me-2">Abuse</span>
-            <span v-if="report.reasons.spamming" class="me-2">Spamming</span>
-            <span v-if="report.reasons.multiboxing" class="me-2">Multiboxing</span>
-            <span v-if="report.reasons.inappropriateAlias" class="me-2">Inappropriate Alias</span>
-          </td>
-          <td>
-            <router-link :to="{ path: '/game/detail', query: { id: report.gameId } }">View</router-link>
-          </td>
-          <td>
+        <div class="panel-footer">
+          <router-link tag="button" class="btn btn-small btn-info me-2" :to="{ path: '/game/detail', query: { id: report.gameId } }">View Game</router-link>
+          <button class="btn btn-small" :class="report.actioned ? 'btn-success' : 'btn-danger'">
             <i class="fas clickable"
-               :class="{'fa-check text-success':report.actioned,'fa-times text-danger':!report.actioned}"
+               :class="{'fa-check':report.actioned,'fa-times':!report.actioned}"
                @click="actionReport(report)" title="Action Report"></i>
-          </td>
-        </tr>
-        </tbody>
-      </table-->
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -128,5 +97,10 @@ export default {
 </script>
 
 <style scoped>
-
+.report-element {
+  border-radius: 4px;
+  border: 1px solid rgba(255,255,255,.3);
+  margin: 8px;
+  padding: 8px;
+}
 </style>
