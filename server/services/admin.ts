@@ -54,7 +54,8 @@ export default class AdminService {
             select = {
                 username: 1,
                 isEstablishedPlayer: 1,
-                warnings: 1
+                warnings: 1,
+                banned: 1,
             };
         } else {
             throw new ValidationError("User role insufficient")
