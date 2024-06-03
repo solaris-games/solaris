@@ -1,6 +1,5 @@
 <template>
-  <administration-page>
-    <h4 class="mb-1">Insights</h4>
+  <administration-page title="Insights" name="insights">
     <loading-spinner :loading="!insights"/>
 
     <table class="table table-striped table-hover" v-if="insights">

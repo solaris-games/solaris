@@ -1,9 +1,8 @@
 <template>
-  <administration-page>
+  <administration-page title="Recent games" name="games">
     <loading-spinner :loading="!games"/>
 
     <div v-if="games">
-      <h4 class="mb-1">Recent Games</h4>
       <table class="mt-2 table table-sm table-striped table-responsive">
         <thead class="table-dark">
         <tr>

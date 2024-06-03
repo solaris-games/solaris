@@ -1,9 +1,8 @@
 <template>
-  <administration-page>
+  <administration-page title="Recent Password Resets" name="passwordresets">
     <loading-spinner :loading="!passwordResets"/>
 
     <div v-if="passwordResets">
-      <h4 class="mb-1">Recent Password Resets</h4>
       <table class="mt-2 table table-sm table-striped table-responsive">
         <thead class="table-dark">
         <tr>

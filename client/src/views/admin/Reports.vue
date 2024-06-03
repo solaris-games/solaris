@@ -1,9 +1,8 @@
 <template>
-  <administration-page>
+  <administration-page title="Reports" name="reports">
     <loading-spinner :loading="!reports"/>
 
     <div v-if="reports">
-      <h4 class="mb-1">Recent Reports</h4>
       <div class="panel report-element" v-for="report of reports" :key="report._id">
         <div class="panel-heading">
           <h5 class="panel-title" :class="report.actioned ? 'text-default' : 'text-warning'">{{formatReportTitle(report)}}</h5>

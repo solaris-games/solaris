@@ -1,24 +1,26 @@
 <template>
   <view-container>
-    <view-title title="Administration" />
+    <view-title :title="title" />
 
-    <ul class="nav nav-tabs">
-      <li class="nav-item">
-        <router-link class="nav-link" :to="{ path: '/administration/games' }">Games</router-link>
-      </li>
-      <li class="nav-item" v-if="isCommunityManager">
-        <router-link class="nav-link" :to="{ path: '/administration/users' }">Users</router-link>
-      </li>
-      <li class="nav-item" v-if="isAdministrator">
-        <router-link class="nav-link" :to="{ path: '/administration/passwordResets' }">Password Resets</router-link>
-      </li>
-      <li class="nav-item" v-if="isCommunityManager">
-        <router-link class="nav-link" :to="{ path: '/administration/reports' }">Reports</router-link>
-      </li>
-      <li class="nav-item" v-if="isAdministrator">
-        <router-link class="nav-link" :to="{ path: '/administration/insights' }">Insights</router-link>
-      </li>
-    </ul>
+    <nav>
+      <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="nav-item" :class="name === 'games' ? 'active' : null">
+          <router-link class="nav-link" :class="name === 'games' ? 'active' : null" :to="{ path: '/administration/games' }">Games</router-link>
+        </li>
+        <li role="presentation" class="nav-item" :class="name === 'users' ? 'active' : null" v-if="isCommunityManager">
+          <router-link class="nav-link" :class="name === 'users' ? 'active' : null" :to="{ path: '/administration/users' }">Users</router-link>
+        </li>
+        <li role="presentation" class="nav-item" :class="name === 'passwordresets' ? 'active' : null" v-if="isAdministrator">
+          <router-link class="nav-link" :class="name === 'passwordresets' ? 'active' : null" :to="{ path: '/administration/passwordResets' }">Password Resets</router-link>
+        </li>
+        <li role="presentation" class="nav-item" :class="name === 'reports' ? 'active' : null" v-if="isCommunityManager">
+          <router-link class="nav-link" :class="name === 'reports' ? 'active' : null" :to="{ path: '/administration/reports' }">Reports</router-link>
+        </li>
+        <li role="presentation" class="nav-item" :class="name === 'insights' ? 'active' : null" v-if="isAdministrator">
+          <router-link class="nav-link" :class="name === 'insights' ? 'active' : null" :to="{ path: '/administration/insights' }">Insights</router-link>
+        </li>
+      </ul>
+    </nav>
 
     <slot />
   </view-container>
@@ -34,6 +36,10 @@ export default {
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'loading-spinner': LoadingSpinner
+  },
+  props: {
+    name: String,
+    title: String
   },
   computed: {
     isAdministrator () {

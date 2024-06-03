@@ -1,9 +1,8 @@
 <template>
-  <administration-page>
+  <administration-page title="Recent Users" name="users">
     <loading-spinner :loading="!users"/>
 
     <div v-if="users">
-      <h4 class="mb-1">Recent Users</h4>
       <div class="panel panel-default user-element" v-for="user of users" :key="user.username">
         <div class="panel-heading">
           <h5 class="panel-title">
