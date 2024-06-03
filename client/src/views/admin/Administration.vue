@@ -12,7 +12,7 @@
       <li class="nav-item" v-if="isAdministrator">
           <a class="nav-link" data-bs-toggle="tab" href="#passwordResets">Password Resets</a>
       </li>
-      <li class="nav-item" v-if="isAdministrator">
+      <li class="nav-item" v-if="isCommunityManager">
           <a class="nav-link" data-bs-toggle="tab" href="#reports">Reports</a>
       </li>
       <li class="nav-item" v-if="isAdministrator">
@@ -30,7 +30,7 @@
       <div class="tab-pane fade" id="passwordResets" v-if="isAdministrator">
         <password-resets />
       </div>
-      <div class="tab-pane fade" id="reports" v-if="isAdministrator">
+      <div class="tab-pane fade" id="reports" v-if="isCommunityManager">
         <reports />
       </div>
       <div class="tab-pane fade" id="insights" v-if="isAdministrator">

@@ -43,12 +43,12 @@
           </div>
         </div>
         <div class="panel-footer">
-          <div v-if="isAdministrator" class="actions">
+          <div class="actions">
             <i class="fas fa-hammer clickable text-danger" :class="{'disabled-role':!user.banned}"
                @click="toggleBan(user)" title="Toggle Banned"></i>
-            <i class="fas fa-eraser clickable text-warning ms-1" @click="resetAchievements(user)"
+            <i v-if="isAdministrator" class="fas fa-eraser clickable text-warning ms-1" @click="resetAchievements(user)"
                title="Reset Achievements"></i>
-            <i class="fas fa-user clickable text-info ms-1" @click="impersonate(user._id)"
+            <i v-if="isAdministrator" class="fas fa-user clickable text-info ms-1" @click="impersonate(user._id)"
                title="Impersonate User"></i>
 
             <add-warning :user-id="user._id" @onUserChanged="getUsers()" />

@@ -7,6 +7,7 @@ import PlayerService from './player';
 import ConversationService from "./conversation";
 import {ReportCreateReportRequest} from "../api/requests/report";
 import UserService from "./user";
+import GameListService from "./gameList";
 
 export default class ReportService {
     reportModel;
@@ -14,19 +15,22 @@ export default class ReportService {
     playerService: PlayerService;
     conversationService: ConversationService;
     userService: UserService;
+    gameListService: GameListService;
 
     constructor(
         reportModel,
         reportRepo: Repository<Report>,
         playerService: PlayerService,
         conversationService: ConversationService,
-        userService: UserService
+        userService: UserService,
+        gameListService: GameListService,
     ) {
         this.reportRepo = reportRepo;
         this.reportModel = reportModel;
         this.playerService = playerService;
         this.conversationService = conversationService;
         this.userService = userService;
+        this.gameListService = gameListService;
     }
 
     async reportPlayer(game: Game, req: ReportCreateReportRequest, reportedByUserId: DBObjectId) {
@@ -61,9 +65,10 @@ export default class ReportService {
         await report.save();
     }
 
-    async isUserInvolved(report: Report, userId: DBObjectId): Promise<boolean> {
+    isUserInvolved(report: Report, userId: DBObjectId, userGameIds: string[]): boolean {
         return report.reportedByUserId === userId ||
-            report.reportedUserId === userId; // TODO: Check if user is in same game
+            report.reportedUserId === userId ||
+            userGameIds.includes(report.gameId.toString());
     }
 
     async listReports(userId: DBObjectId): Promise<Report[]> {
@@ -83,9 +88,10 @@ export default class ReportService {
         } else {
             // CM can only see reports that do not involve them/a game they're in
             const results: Report[] = [];
+            const userGameIds = (await this.gameListService.listActiveGames(userId)).concat(await this.gameListService.listUserCompletedGames(userId)).map(game => game._id.toString());
 
             for (let report of reports) {
-                if (!await this.isUserInvolved(report, userId)) {
+                if (!this.isUserInvolved(report, userId, userGameIds)) {
                     results.push(report);
                 }
             }

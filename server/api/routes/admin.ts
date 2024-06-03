@@ -35,12 +35,12 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
         mw.core.handleError);
 
     router.patch('/api/admin/reports/:reportId/action',
-        mw.auth.authenticate({ admin: true }),
+        mw.auth.authenticate({ communityManager: true }),
         controller.actionReport,
         mw.core.handleError);
 
     router.post('/api/admin/user/:userId/warning',
-        mw.auth.authenticate({ admin: true }),
+        mw.auth.authenticate({ communityManager: true }),
         validator.body(adminAddWarningRequestSchema),
         controller.addWarning,
         mw.core.handleError);
@@ -76,12 +76,12 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
         mw.core.handleError);
 
     router.patch('/api/admin/user/:userId/ban',
-        mw.auth.authenticate({ admin: true }),
+        mw.auth.authenticate({ communityManager: true }),
         controller.banUser,
         mw.core.handleError);
 
     router.patch('/api/admin/user/:userId/unban',
-        mw.auth.authenticate({ admin: true }),
+        mw.auth.authenticate({ communityManager: true }),
         controller.unbanUser,
         mw.core.handleError);
 
