@@ -93,8 +93,6 @@ export default {
         return users;
       }
 
-      console.log({ filterUser: this.filterUser })
-
       const filterF = (user) => {
         return user._id === this.filterUser;
       };

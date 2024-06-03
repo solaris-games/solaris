@@ -5,7 +5,11 @@
     <div v-if="reports">
       <div class="panel report-element" v-for="report of reports" :key="report._id">
         <div class="panel-heading">
-          <h5 class="panel-title" :class="report.actioned ? 'text-default' : 'text-warning'">{{formatReportTitle(report)}}</h5>
+          <h5 class="panel-title" :class="report.actioned ? 'text-default' : 'text-warning'">
+            <router-link :to="{ path: '/administration/users/', query: { userId: report.reportedByUserId } }">{{ report.reportedByPlayerAlias }}</router-link>
+            reported
+            <router-link :to="{ path: '/administration/users/', query: { userId: report.reportedUserId } }">{{ report.reportedPlayerAlias }}</router-link>
+          </h5>
         </div>
         <div class="panel-body">
           <p>Reasons:
@@ -16,7 +20,6 @@
           </p>
         </div>
         <div class="panel-footer">
-          <router-link :to="{ path: '/administration/users/', query: { userId: report.reportedUserId } }">Reported User</router-link>
           <router-link tag="button" class="btn btn-small btn-info me-2" :to="{ path: '/game/detail', query: { id: report.gameId } }">View Game</router-link>
           <button class="btn btn-small" :class="report.actioned ? 'btn-success' : 'btn-danger'">
             <i class="fas clickable"
