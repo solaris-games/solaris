@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <administration-page>
     <h4 class="mb-1">Insights</h4>
     <loading-spinner :loading="!insights"/>
 
@@ -23,15 +23,17 @@
       </tr>
       </tbody>
     </table>
-  </div>
+  </administration-page>
 </template>
 
 <script>
 import AdminApiService from '../../../services/api/admin'
 import LoadingSpinner from "../../components/LoadingSpinner.vue";
+import AdministrationPage from "../AdministrationPage.vue";
 
 export default {
   components: {
+    'administration-page': AdministrationPage,
     'loading-spinner': LoadingSpinner
   },
   data() {

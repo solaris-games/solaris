@@ -1,5 +1,5 @@
 <template>
-<div id="header" class="app-header">  
+<div id="header" class="app-header">
   <div class="brand">
     <a href="javascript:;" class="brand-logo" @click="goHome">
       <span class="brand-img"></span>
@@ -9,7 +9,7 @@
 
   <div class="menu" v-if="userId">
     <div class="menu-item dropdown dropdown-mobile-full">
-      <router-link :to="{ name: 'administration'}" v-if="userHasAdminRole" class="menu-link">
+      <router-link :to="{ name: 'administration-games'}" v-if="userHasAdminRole" class="menu-link">
         <div class="menu-icon"><i class="fas fa-users-cog"></i></div>
         <div class="menu-text d-sm-block d-none ms-1">Admin</div>
       </router-link>

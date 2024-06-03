@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <administration-page>
     <loading-spinner :loading="!games"/>
 
     <div v-if="games">
@@ -59,17 +59,19 @@
         </tbody>
       </table>
     </div>
-  </div>
+  </administration-page>
 </template>
 
 <script>
 import LoadingSpinner from "../../components/LoadingSpinner.vue";
 import AdminApiService from "../../../services/api/admin";
 import moment from "moment/moment";
+import AdministrationPage from "../AdministrationPage.vue";
 
 export default {
   name: "Games",
   components: {
+    'administration-page': AdministrationPage,
     'loading-spinner': LoadingSpinner
   },
   data() {

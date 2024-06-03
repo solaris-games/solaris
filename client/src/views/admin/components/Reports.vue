@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <administration-page>
     <loading-spinner :loading="!reports"/>
 
     <div v-if="reports">
@@ -27,17 +27,19 @@
         </div>
       </div>
     </div>
-  </div>
+  </administration-page>
 </template>
 
 <script>
 import AdminApiService from "../../../services/api/admin";
 import router from "../../../router";
 import LoadingSpinner from "../../components/LoadingSpinner.vue";
+import AdministrationPage from "../AdministrationPage.vue";
 
 export default {
   name: "Reports",
   components: {
+    'administration-page': AdministrationPage,
     'loading-spinner': LoadingSpinner
   },
   data() {

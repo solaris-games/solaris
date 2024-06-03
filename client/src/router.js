@@ -22,11 +22,15 @@ import MyGuild from './views/guild/MyGuild.vue'
 import GuildCreate from './views/guild/Create.vue'
 import GuildRename from './views/guild/Rename.vue'
 import GuildDetails from './views/guild/Detail.vue'
-import Administration from './views/admin/Administration.vue'
 import Avatars from './views/shop/Avatars.vue'
 import GalacticCreditsShop from './views/shop/GalacticCredits.vue'
 import ShopPurchaseComplete from './views/shop/PurchaseComplete.vue'
 import ShopPurchaseFailed from './views/shop/PurchaseFailed.vue'
+import Games from "./views/admin/components/Games.vue";
+import Users from "./views/admin/components/Users.vue";
+import Reports from "./views/admin/components/Reports.vue";
+import Insights from "./views/admin/components/Insights.vue";
+import PasswordResets from "./views/admin/components/PasswordResets.vue";
 
 Vue.use(Router)
 
@@ -138,9 +142,29 @@ export default new Router({
       component: GuildDetails
     },
     {
-      path: '/administration',
-      name: 'administration',
-      component: Administration
+      path: '/administration/games',
+      name: 'administration-games',
+      component: Games
+    },
+    {
+      path: '/administration/users',
+      name: 'administration-users',
+      component: Users
+    },
+    {
+      path: '/administration/reports',
+      name: 'administration-reports',
+      component: Reports
+    },
+    {
+      path: '/administration/insights',
+      name: 'administration-insights',
+      component: Insights
+    },
+    {
+      path: '/administration/passwordresets',
+      name: 'administration-password-resets',
+      component: PasswordResets
     },
     {
       path: '/avatars',

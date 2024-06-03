@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <administration-page>
     <loading-spinner :loading="!users"/>
 
     <div v-if="users">
@@ -56,7 +56,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </administration-page>
 </template>
 
 <script>
@@ -65,10 +65,12 @@ import moment from "moment/moment";
 import router from "../../../router";
 import LoadingSpinner from "../../components/LoadingSpinner.vue";
 import AddWarning from "./AddWarning.vue";
+import AdministrationPage from "../AdministrationPage.vue";
 
 export default {
   name: "Users",
   components: {
+    'administration-page': AdministrationPage,
     'loading-spinner': LoadingSpinner,
     'add-warning': AddWarning
   },

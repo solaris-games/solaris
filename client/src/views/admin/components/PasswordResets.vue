@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <administration-page>
     <loading-spinner :loading="!passwordResets"/>
 
     <div v-if="passwordResets">
@@ -24,16 +24,18 @@
         </tbody>
       </table>
     </div>
-  </div>
+  </administration-page>
 </template>
 
 <script>
 import LoadingSpinner from "../../components/LoadingSpinner.vue";
 import AdminApiService from "../../../services/api/admin";
+import AdministrationPage from "../AdministrationPage.vue";
 
 export default {
   name: "PasswordResets",
   components: {
+    'administration-page': AdministrationPage,
     'loading-spinner': LoadingSpinner
   },
   data() {
