@@ -2,7 +2,7 @@
   <administration-page title="Recent Users" name="users">
     <loading-spinner :loading="!users"/>
 
-    <div v-if="users">
+    <div v-if="filteredUsers()">
       <div class="panel panel-default user-element" v-for="user of users" :key="user.username">
         <div class="panel-heading">
           <h5 class="panel-title">
@@ -36,7 +36,7 @@
           <div v-if="user.warnings && user.warnings.length">
             <ul class="list-group">
               <li v-for="warning of user.warnings" class="list-group-item">
-                <p class="text-warning">{{ warning.date }}: {{ toDescription(warning.kind) }}</p>
+                <p class="text-warning">{{ warning.date }}: {{ warning.text }}</p>
               </li>
             </ul>
           </div>
@@ -75,33 +75,40 @@ export default {
   },
   data() {
     return {
+      filterUser: null,
+      filterType: '_id',
       users: null,
       selectedWarningKind: null
     }
   },
   async mounted() {
-   await this.getUsers();
+    this.filterUser = this.$route.query?.userId;
+    this.users = await this.filteredUsers();
   },
   methods: {
+    async filteredUsers () {
+      const users = await this.getUsers();
+
+      if (!this.filterUser || !this.filterType) {
+        return users;
+      }
+
+      console.log({ filterUser: this.filterUser })
+
+      const filterF = (user) => {
+        return user._id === this.filterUser;
+      };
+
+      return users.filter((user) => filterF(user));
+    },
     async getUsers() {
       const resp = await AdminApiService.getUsers();
       if (resp.status !== 200) {
         this.$toasted.error(resp.data);
         return null;
       }
-      this.users = resp.data;
-    },
-    toDescription(warningKind) {
-      switch (warningKind) {
-        case 'afk':
-          return 'frequent inactivity'
-        case 'cheating':
-          return 'cheating'
-        case 'abusive':
-          return 'abusive behaviour'
-        case 'other':
-          return 'other'
-      }
+
+      return resp.data;
     },
     getLastSeenString(lastSeen) {
       if (!lastSeen) {

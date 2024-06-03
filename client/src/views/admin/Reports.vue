@@ -16,7 +16,7 @@
           </p>
         </div>
         <div class="panel-footer">
-          <router-link :to="{ path: `/account/achievements/${report.reportedUserId}` }">Reported User</router-link>
+          <router-link :to="{ path: '/administration/users/', query: { userId: report.reportedUserId } }">Reported User</router-link>
           <router-link tag="button" class="btn btn-small btn-info me-2" :to="{ path: '/game/detail', query: { id: report.gameId } }">View Game</router-link>
           <button class="btn btn-small" :class="report.actioned ? 'btn-success' : 'btn-danger'">
             <i class="fas clickable"
