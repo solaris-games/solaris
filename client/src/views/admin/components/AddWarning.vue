@@ -30,6 +30,8 @@ export default {
       await AdminApiService.addWarning(this.userId, this.warningText);
 
       this.$emit("onUserChanged");
+
+      this.warningText = null;
     }
   }
 }

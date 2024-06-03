@@ -60,7 +60,7 @@
             <i v-if="isAdministrator" class="fas fa-user clickable text-info ms-1" @click="impersonate(user._id)"
                title="Impersonate User"></i>
 
-            <add-warning :user-id="user._id" @onUserChanged="getUsers()"/>
+            <add-warning :user-id="user._id" @onUserChanged="update"/>
           </div>
         </div>
       </div>
@@ -92,10 +92,13 @@ export default {
     }
   },
   async mounted() {
-    this.filterUser = this.$route.query?.userId;
-    this.users = await this.filteredUsers();
+    await this.update();
   },
   methods: {
+    async update () {
+      this.filterUser = this.$route.query?.userId;
+      this.users = await this.filteredUsers();
+    },
     async filteredUsers() {
       const users = await this.getUsers();
 
@@ -140,7 +143,9 @@ export default {
       try {
         user.isEstablishedPlayer = true
 
-        await AdminApiService.promoteToEstablishedPlayer(user._id)
+        await AdminApiService.promoteToEstablishedPlayer(user._id);
+
+        await this.update();
       } catch (err) {
         console.error(err)
       }
@@ -182,7 +187,9 @@ export default {
             break
         }
 
-        await request
+        await request;
+
+        await this.update();
       } catch (err) {
         console.error(err)
       }
