@@ -1,21 +1,31 @@
 <template>
-  <div>
-    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-      Show messages
+  <div v-if="report.reportedMessageId" class="mb-2">
+    <button v-if="!conversation" class="btn btn-primary" type="button" @click="showMessages">
+      Show attached messages
     </button>
-    <div class="collapse" id="collapseExample">
-      <div class="well">
-        ...
-      </div>
+    <div v-if="conversation" class="well report-messages">
+
     </div>
   </div>
 </template>
 
 <script>
+import AdminApiService from "../../../services/api/admin";
+
 export default {
   name: "MessageReport",
   props: {
     report: Object
+  },
+  data () {
+    return {
+      conversation: null
+    }
+  },
+  methods: {
+    async showMessages () {
+      this.conversation = await AdminApiService.getConversationForReport(this.report._id);
+    }
   }
 }
 </script>

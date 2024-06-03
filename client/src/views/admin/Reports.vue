@@ -18,6 +18,8 @@
             <span v-if="report.reasons.multiboxing" class="me-2">Multiboxing</span>
             <span v-if="report.reasons.inappropriateAlias" class="me-2">Inappropriate Alias</span>
           </p>
+
+          <message-report :report="report" />
         </div>
         <div class="panel-footer">
           <router-link tag="button" class="btn btn-small btn-info me-2" :to="{ path: '/game/detail', query: { id: report.gameId } }">View Game</router-link>
@@ -37,12 +39,14 @@ import AdminApiService from "../../services/api/admin";
 import router from "../../router";
 import LoadingSpinner from "../components/LoadingSpinner.vue";
 import AdministrationPage from "./AdministrationPage.vue";
+import MessageReport from "./components/MessageReport.vue";
 
 export default {
   name: "Reports",
   components: {
     'administration-page': AdministrationPage,
-    'loading-spinner': LoadingSpinner
+    'loading-spinner': LoadingSpinner,
+    'message-report': MessageReport
   },
   data() {
     return {
@@ -52,19 +56,7 @@ export default {
   async mounted() {
     this.reports = await this.getReports();
   },
-  computed: {
-    isMessageReport (report) {
-      return Boolean(report.conversationId)
-    }
-  },
   methods: {
-    formatReportTitle(report) {
-      if (report.conversationId) {
-        return `'${report.reportedByPlayerAlias}' reported message from '${report.reportedPlayerAlias}'`
-      } else {
-        return `'${report.reportedByPlayerAlias}' reported '${report.reportedPlayerAlias}'`
-      }
-    },
     async getReports() {
       const reports = await AdminApiService.getReports()
       if (reports.status !== 200) {

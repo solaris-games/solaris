@@ -8,6 +8,8 @@ import ConversationService from "./conversation";
 import {ReportCreateReportRequest} from "../api/requests/report";
 import UserService from "./user";
 import GameListService from "./gameList";
+import GameService from "./game";
+import {Conversation} from "./types/Conversation";
 
 export default class ReportService {
     reportModel;
@@ -16,6 +18,7 @@ export default class ReportService {
     conversationService: ConversationService;
     userService: UserService;
     gameListService: GameListService;
+    gameService: GameService;
 
     constructor(
         reportModel,
@@ -24,6 +27,7 @@ export default class ReportService {
         conversationService: ConversationService,
         userService: UserService,
         gameListService: GameListService,
+        gameService: GameService,
     ) {
         this.reportRepo = reportRepo;
         this.reportModel = reportModel;
@@ -31,6 +35,7 @@ export default class ReportService {
         this.conversationService = conversationService;
         this.userService = userService;
         this.gameListService = gameListService;
+        this.gameService = gameService;
     }
 
     async reportPlayer(game: Game, req: ReportCreateReportRequest, reportedByUserId: DBObjectId) {
@@ -71,9 +76,34 @@ export default class ReportService {
             userGameIds.includes(report.gameId.toString());
     }
 
-    async listReports(userId: DBObjectId): Promise<Report[]> {
-        const isAdmin = await this.userService.getUserIsAdmin(userId);
+    async conversationForReport(reportId: DBObjectId, userId: DBObjectId): Promise<Conversation> {
+        const report = await this.reportRepo.findOne({
+            _id: reportId
+        }, {});
 
+        if (!report) {
+            throw new ValidationError("Report does not exist");
+        }
+
+        if (!report.reportedMessageId || !report.reportedConversationId) {
+            throw new ValidationError("Report does not have a conversation attached");
+        }
+
+        const f = await this._reportFilter(userId);
+        if (!f(report)) {
+            throw new ValidationError("Not permitted");
+        }
+
+        const game = await this.gameService.getByIdLean(report.gameId, {
+            conversations: 1,
+            state: 1,
+            'galaxy.players': 1,
+        });
+
+        return this.conversationService.detail(game!, report.reportedByPlayerId, report.reportedConversationId);
+    }
+
+    async listReports(userId: DBObjectId): Promise<Report[]> {
         const reports = await this.reportRepo.find({
             // All reports
         }, {
@@ -83,20 +113,19 @@ export default class ReportService {
             _id: -1          // Newest first
         });
 
+        const f = await this._reportFilter(userId);
+        return reports.filter(f);
+    }
+
+    async _reportFilter(userId: DBObjectId): Promise<(report: Report) => boolean> {
+        const isAdmin = await this.userService.getUserIsAdmin(userId);
+
         if (isAdmin) {
-            return reports;
+            return () => true;
         } else {
-            // CM can only see reports that do not involve them/a game they're in
-            const results: Report[] = [];
             const userGameIds = (await this.gameListService.listActiveGames(userId)).concat(await this.gameListService.listUserCompletedGames(userId)).map(game => game._id.toString());
 
-            for (let report of reports) {
-                if (!this.isUserInvolved(report, userId, userGameIds)) {
-                    results.push(report);
-                }
-            }
-
-            return results;
+            return (report) => !this.isUserInvolved(report, userId, userGameIds);
         }
     }
 

@@ -29,6 +29,11 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
         controller.listPasswordResets,
         mw.core.handleError);
 
+    router.get('/api/admin/reports/:reportId/conversation',
+        mw.auth.authenticate({ communityManager: true }),
+        controller.conversationForReport,
+        mw.core.handleError);
+
     router.get('/api/admin/reports',
         mw.auth.authenticate({ communityManager: true }),
         controller.listReports,

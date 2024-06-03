@@ -39,6 +39,15 @@ export default (container: DependencyContainer) => {
                 return next(err);
             }
         },
+        conversationForReport: async (req, res, next) => {
+            try {
+                const result = await container.reportService.conversationForReport(req.params.reportId, req.session.userId);
+
+                return res.status(200).json(result);
+            } catch (err) {
+                return next(err);
+            }
+        },
         listReports: async (req, res, next) => {
             try {
                 let result = await container.reportService.listReports(req.session.userId);
