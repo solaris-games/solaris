@@ -4,7 +4,16 @@
       Show attached messages
     </button>
     <div v-if="conversation" class="well report-messages">
-
+      <div v-for="message in messages" :key="message._id" class="panel">
+        <div class="panel-header">
+          <h6 class="panel-title" :class="isReportedMessage(message) ? 'text-danger' : null">
+            {{ message.sentDate }}: {{ message.fromPlayerAlias }}
+          </h6>
+        </div>
+        <div class="panel-body">
+          <p :class="isReportedMessage(message) ? 'text-danger' : null">{{ message.message }}</p>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -19,17 +28,28 @@ export default {
   },
   data () {
     return {
-      conversation: null
+      conversation: null,
+      messages: null
     }
   },
   methods: {
+    isReportedMessage (msg) {
+      return msg._id === this.report.reportedMessageId;
+    },
     async showMessages () {
-      this.conversation = await AdminApiService.getConversationForReport(this.report._id);
+      const resp = await AdminApiService.getConversationForReport(this.report._id);
+
+      this.conversation = resp.data;
+      this.messages = this.conversation.messages.filter(msg => msg.type === 'message');
     }
   }
 }
 </script>
 
 <style scoped>
-
+.report-messages {
+  border: 1px solid rgba(255,255,255,.3);
+  border-radius: 4px;
+  padding: 8px;
+}
 </style>
