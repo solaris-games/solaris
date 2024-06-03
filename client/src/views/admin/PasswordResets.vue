@@ -28,9 +28,9 @@
 </template>
 
 <script>
-import LoadingSpinner from "../../components/LoadingSpinner.vue";
-import AdminApiService from "../../../services/api/admin";
-import AdministrationPage from "../AdministrationPage.vue";
+import LoadingSpinner from "../components/LoadingSpinner.vue";
+import AdminApiService from "../../services/api/admin";
+import AdministrationPage from "./AdministrationPage.vue";
 
 export default {
   name: "PasswordResets",

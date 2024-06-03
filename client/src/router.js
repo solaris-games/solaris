@@ -26,11 +26,11 @@ import Avatars from './views/shop/Avatars.vue'
 import GalacticCreditsShop from './views/shop/GalacticCredits.vue'
 import ShopPurchaseComplete from './views/shop/PurchaseComplete.vue'
 import ShopPurchaseFailed from './views/shop/PurchaseFailed.vue'
-import Games from "./views/admin/components/Games.vue";
-import Users from "./views/admin/components/Users.vue";
-import Reports from "./views/admin/components/Reports.vue";
-import Insights from "./views/admin/components/Insights.vue";
-import PasswordResets from "./views/admin/components/PasswordResets.vue";
+import Games from "./views/admin/Games.vue";
+import Users from "./views/admin/Users.vue";
+import Reports from "./views/admin/Reports.vue";
+import Insights from "./views/admin/Insights.vue";
+import PasswordResets from "./views/admin/PasswordResets.vue";
 
 Vue.use(Router)
 

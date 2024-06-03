@@ -63,10 +63,10 @@
 </template>
 
 <script>
-import LoadingSpinner from "../../components/LoadingSpinner.vue";
-import AdminApiService from "../../../services/api/admin";
+import LoadingSpinner from "../components/LoadingSpinner.vue";
+import AdminApiService from "../../services/api/admin";
 import moment from "moment/moment";
-import AdministrationPage from "../AdministrationPage.vue";
+import AdministrationPage from "./AdministrationPage.vue";
 
 export default {
   name: "Games",

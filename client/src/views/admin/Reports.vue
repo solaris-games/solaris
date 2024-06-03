@@ -31,10 +31,10 @@
 </template>
 
 <script>
-import AdminApiService from "../../../services/api/admin";
-import router from "../../../router";
-import LoadingSpinner from "../../components/LoadingSpinner.vue";
-import AdministrationPage from "../AdministrationPage.vue";
+import AdminApiService from "../../services/api/admin";
+import router from "../../router";
+import LoadingSpinner from "../components/LoadingSpinner.vue";
+import AdministrationPage from "./AdministrationPage.vue";
 
 export default {
   name: "Reports",

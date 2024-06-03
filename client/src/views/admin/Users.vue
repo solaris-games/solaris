@@ -60,12 +60,12 @@
 </template>
 
 <script>
-import AdminApiService from "../../../services/api/admin";
+import AdminApiService from "../../services/api/admin";
 import moment from "moment/moment";
-import router from "../../../router";
-import LoadingSpinner from "../../components/LoadingSpinner.vue";
-import AddWarning from "./AddWarning.vue";
-import AdministrationPage from "../AdministrationPage.vue";
+import router from "../../router";
+import LoadingSpinner from "../components/LoadingSpinner.vue";
+import AddWarning from "./components/AddWarning.vue";
+import AdministrationPage from "./AdministrationPage.vue";
 
 export default {
   name: "Users",
