@@ -173,15 +173,18 @@ export default class GameCreateService {
 
         // For non-custom galaxies we need to check that the player has actually provided
         // enough stars for each player.
-        let desiredStarCount = game.settings.galaxy.starsPerPlayer * game.settings.general.playerLimit;
-        let desiredPlayerStarCount = game.settings.player.startingStars * game.settings.general.playerLimit;
+        let desiredStarCount = 0;
+        if (game.settings.galaxy.galaxyType !== 'custom') {
+            desiredStarCount = game.settings.galaxy.starsPerPlayer * game.settings.general.playerLimit;
+            let desiredPlayerStarCount = game.settings.player.startingStars * game.settings.general.playerLimit;
 
-        if (desiredPlayerStarCount > desiredStarCount) {
-            throw new ValidationError(`Cannot create a galaxy of ${desiredStarCount} stars with ${game.settings.player.startingStars} stars per player.`);
-        }
+            if (desiredPlayerStarCount > desiredStarCount) {
+                throw new ValidationError(`Cannot create a galaxy of ${desiredStarCount} stars with ${game.settings.player.startingStars} stars per player.`);
+            }
 
-        if (desiredStarCount > 1000) {
-            throw new ValidationError(`Galaxy size cannot exceed 1000 stars.`);
+            if (desiredStarCount > 1000) {
+                throw new ValidationError(`Galaxy size cannot exceed 1000 stars.`);
+            }
         }
 
         // Ensure that c2c combat is disabled for orbital games.
@@ -327,20 +330,29 @@ export default class GameCreateService {
         game.galaxy.homeStars = starGeneration.homeStars;
         game.galaxy.linkedStars = starGeneration.linkedStars;
 
+        if (game.galaxy.stars.length % game.settings.general.playerLimit !== 0) {
+            throw new ValidationError(`Cannot create a galaxy with a non-whole number of stars per player.`);
+        } else {
+            game.settings.galaxy.starsPerPlayer = game.galaxy.stars.length / game.settings.general.playerLimit;
+        }
+
         this.starService.setupStarsForGameStart(game);
         
         // Setup players and assign to their starting positions.
         this.playerService.setupEmptyPlayers(game);
 
-        // Create carriers in custom galaxies
-        let isCustomGalaxy = game.settings.galaxy.galaxyType === 'custom';
-        if (isCustomGalaxy) {
-            let carriers: any[] = [];
+        // Create carriers in custom galaxies with the advanced mode enabled.
+        let advancedCustomGalaxyEnabled = game.settings.galaxy?.advancedCustomGalaxyEnabled === 'enabled';
+        let carriers: any[] = [];
+        if (advancedCustomGalaxyEnabled) {
             let json;
             try {
                 json = JSON.parse(settings.galaxy.customJSON!);
             } catch (e) {
                 throw new ValidationError('The custom map JSON is malformed.');
+            }
+            if (!('carriers' in json)) {
+                throw new ValidationError(`Missing property 'carriers' of JSON ${JSON.stringify(json)}.`);
             }
 
             for (const carrier of json.carriers) {
