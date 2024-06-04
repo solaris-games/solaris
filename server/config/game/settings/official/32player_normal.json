@@ -32,7 +32,7 @@
     "specialistCost": "standard",
     "specialistsCurrency": "creditsSpecialists",
     "randomWarpGates": 10,
-    "randomWormHoles": 5,
+    "randomWormHoles": 3,
     "randomNebulas": 15,
     "randomAsteroidFields": 10,
     "randomBinaryStars": 10,
@@ -65,8 +65,8 @@
   },
   "player": {
     "startingStars": 6,
-    "startingCredits": 1000,
-    "startingCreditsSpecialists": 10,
+    "startingCredits": 2000,
+    "startingCreditsSpecialists": 15,
     "startingShips": 10,
     "startingInfrastructure": {
       "economy": 5,
