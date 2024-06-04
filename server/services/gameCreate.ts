@@ -200,7 +200,10 @@ export default class GameCreateService {
                 throw new ValidationError("No stars provided in custom JSON.");
             }
 
-            game.settings.galaxy.starsPerPlayer = json.stars.length / game.settings.general.playerLimit;
+            const starCount = json.stars.length;
+
+            game.settings.galaxy.starsPerPlayer = starCount / game.settings.general.playerLimit;
+            desiredStarCount = starCount;
         }
 
         // Ensure that c2c combat is disabled for orbital games.
