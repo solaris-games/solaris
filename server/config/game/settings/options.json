@@ -428,6 +428,16 @@
         "value": "custom",
         "text": "Custom"
       }
+    ],
+    "advancedCustomGalaxyEnabled": [
+      {
+        "value": "enabled",
+        "text": "Enabled"
+      },
+      {
+        "value": "disabled",
+        "text": "Disabled"
+      }
     ]
   },
   "conquest":{

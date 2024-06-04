@@ -22,7 +22,8 @@
     "galaxy":{
        "galaxyType":"irregular",
        "starsPerPlayer":20,
-       "productionTicks":20
+       "productionTicks":20,
+       "advancedCustomGalaxyEnabled": "disabled"
     },
     "specialGalaxy":{
        "carrierCost":"standard",
