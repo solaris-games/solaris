@@ -185,6 +185,25 @@ export default class GameCreateService {
             if (desiredStarCount > 1000) {
                 throw new ValidationError(`Galaxy size cannot exceed 1000 stars.`);
             }
+        } else {
+            // TODO: Validation needs to be better and in one place. Also, we should provide a schema
+
+            let json;
+
+            try {
+                json = JSON.parse(settings.galaxy.customJSON!);
+            } catch (e) {
+                throw new ValidationError("Failed to parse custom JSON");
+            }
+
+            if (!json?.stars?.length) {
+                throw new ValidationError("No stars provided in custom JSON.");
+            }
+
+            const starCount = json.stars.length;
+
+            game.settings.galaxy.starsPerPlayer = starCount / game.settings.general.playerLimit;
+            desiredStarCount = starCount;
         }
 
         // Ensure that c2c combat is disabled for orbital games.

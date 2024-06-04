@@ -529,7 +529,7 @@
       </view-collapse-panel>
 
       <view-collapse-panel title="Player Start Settings">
-        <div class="mb-2" v-if="settings.galaxy.galaxyType !== 'custom'">
+        <div class="mb-2" v-if="!(settings.galaxy.galaxyType === 'custom' && settings.galaxy.advancedCustomGalaxyEnabled === 'enabled')">
           <label for="startingStars" class="col-form-label">Starting Stars (<span class="text-warning">{{settings.player.startingStars}} stars</span>) <help-tooltip tooltip="Determines how many stars each player is allocated at the start of the game"/></label>
           <div class="col">
             <input type="range" min="1" max="30" step="1" class="form-range w-100" id="startingStars" v-model="settings.player.startingStars" :disabled="isCreatingGame">
