@@ -26,7 +26,7 @@
                     :comparePlayerId="player._id"/>
 
     <h4 v-if="player && player.research" class="mt-2">Technology</h4>
-    
+
     <research v-if="player && player.research" :playerId="player._id"/>
 
     <loading-spinner :loading="player && !player.isOpenSlot && !user"/>
@@ -44,12 +44,12 @@
 
     <h4 class="mt-2" v-if="canAwardBadge">Badges</h4>
 
-    <player-badges v-if="canAwardBadge" 
+    <player-badges v-if="canAwardBadge"
       :playerId="player._id"
       @onOpenPurchasePlayerBadgeRequested="onOpenPurchasePlayerBadgeRequested"/>
 
-    <player-report 
-      v-if="player && player.isRealUser && userPlayer && player != userPlayer"
+    <player-report
+      v-if="player && player.isRealUser && userPlayer && player !== userPlayer"
       :playerId="player._id"
       @onOpenReportPlayerRequested="onOpenReportPlayerRequested"/>
 </div>

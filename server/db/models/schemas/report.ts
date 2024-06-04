@@ -10,6 +10,8 @@ const schema = new Schema({
     reportedByPlayerId: { type: Types.ObjectId, required: true },
     reportedByUserId: { type: Types.ObjectId, required: true },
     reportedByPlayerAlias: { type: Types.String, required: true },
+    reportedConversationId: { type: Types.ObjectId, required: false },
+    reportedMessageId: { type: Types.ObjectId, required: false },
     reasons: {
         abuse: { type: Types.Boolean, required: true },
         spamming: { type: Types.Boolean, required: true },

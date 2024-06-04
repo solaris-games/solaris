@@ -438,6 +438,16 @@
         "value": "custom",
         "text": "Custom"
       }
+    ],
+    "advancedCustomGalaxyEnabled": [
+      {
+        "value": "enabled",
+        "text": "Enabled"
+      },
+      {
+        "value": "disabled",
+        "text": "Disabled"
+      }
     ]
   },
   "conquest": {
@@ -718,6 +728,16 @@
       {
         "value": "legacy",
         "text": "Legacy"
+      }
+    ],
+    "experimentationDistribution": [
+      {
+        "value": "random",
+        "text": "Random"
+      },
+      {
+        "value": "current_research",
+        "text": "Current Research"
       }
     ],
     "experimentationReward": [

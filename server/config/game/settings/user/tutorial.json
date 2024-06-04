@@ -109,6 +109,7 @@
       "specialists": "standard"
     },
     "bankingReward": "standard",
+    "experimentationDistribution": "random",
     "experimentationReward": "standard",
     "specialistTokenReward": "standard"
   },

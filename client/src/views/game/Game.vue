@@ -16,7 +16,8 @@
         <main-bar @onPlayerSelected="onPlayerSelected"
                   @onReloadGameRequested="reloadGame"/>
 
-        <chat @onOpenPlayerDetailRequested="onPlayerSelected"/>
+        <chat @onOpenPlayerDetailRequested="onPlayerSelected"
+              @onOpenReportPlayerRequested="onOpenReportPlayerRequested"/>
     </div>
   </div>
 </template>
@@ -82,7 +83,7 @@ export default {
     // If the user is in the game then display the leaderboard.
     // Otherwise show the welcome screen if there are empty slots.
     let userPlayer = this.getUserPlayer()
-    
+
     if (userPlayer && !userPlayer.defeated) {
       if (GameHelper.isTutorialGame(this.$store.state.game)) {
         this.$store.commit('setMenuState', { state: MENU_STATES.TUTORIAL })
@@ -108,7 +109,7 @@ export default {
   },
   destroyed () {
     this.unsubscribeToSockets()
-    
+
     let socketData = {
       gameId: this.$store.state.game._id
     }
@@ -118,7 +119,7 @@ export default {
     if (player) {
       socketData.playerId = player._id
     }
-    
+
     this.$socket.emit('gameRoomLeft', socketData)
 
     document.title = 'Solaris'
@@ -128,7 +129,7 @@ export default {
       if (this.$store.state.userId) {
         return;
       }
-      
+
       try {
         let response = await authService.verify()
 
@@ -193,6 +194,12 @@ export default {
 
       this.$emit('onPlayerSelected', e)
     },
+    onOpenReportPlayerRequested (e) {
+      this.$store.commit('setMenuState', {
+        state: MENU_STATES.REPORT_PLAYER,
+        args: e
+      });
+    },
     onStarClicked (e) {
       this.$store.commit('setMenuState', {
         state: MENU_STATES.STAR_DETAIL,
@@ -204,7 +211,7 @@ export default {
     onStarRightClicked (e) {
       let star = GameHelper.getStarById(this.$store.state.game, e)
       let owningPlayer = GameHelper.getStarOwningPlayer(this.$store.state.game, star)
-      
+
       if (owningPlayer) {
         this.onPlayerSelected(owningPlayer._id)
       }
@@ -222,7 +229,7 @@ export default {
     onCarrierRightClicked (e) {
       let carrier = GameHelper.getCarrierById(this.$store.state.game, e)
       let owningPlayer = GameHelper.getCarrierOwningPlayer(this.$store.state.game, carrier)
-      
+
       if (owningPlayer) {
         this.onPlayerSelected(owningPlayer._id)
       }
@@ -359,7 +366,7 @@ export default {
 
         try {
           let response = await GameApiService.getGameState(this.$store.state.game._id)
-          
+
           if (response.status === 200) {
             if (this.$store.state.tick < response.data.state.tick) {
               // If the user is currently using the time machine then only set the state variables.

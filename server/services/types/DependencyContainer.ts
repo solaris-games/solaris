@@ -68,6 +68,7 @@ import UserLevelService from "../userLevel";
 import SpecialStarBanService from "../specialStarBan";
 import ShipService from "../ship";
 import SpectatorService from "../spectator";
+import ScheduleBuyService from "../scheduleBuy";
 import BasicAIService from "../basicAi";
 import PathfindingService from "../pathfinding";
 import UserLeaderboardService from "../userLeaderboard";
@@ -152,4 +153,5 @@ export interface DependencyContainer {
     spectatorService: SpectatorService,
     teamService: TeamService,
     pathfindingService: PathfindingService,
+    scheduleBuyService: ScheduleBuyService,
 };

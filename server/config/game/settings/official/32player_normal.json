@@ -116,6 +116,7 @@
       "weapons": "expensive",
       "specialists": "expensive"
     },
+    "experimentationDistribution": "random",
     "bankingReward": "standard",
     "experimentationReward": "experimental",
     "specialistTokenReward": "experimental",

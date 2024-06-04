@@ -50,6 +50,11 @@ export interface UserSubscriptions {
     }
 }
 
+export interface UserWarning {
+    text: string,
+    date: Date,
+}
+
 export interface User {
     _id: DBObjectId;
     username: string;
@@ -68,6 +73,7 @@ export interface User {
     hasSentReviewReminder: boolean;
     roles: UserRoles,
     level?: UserLevel,
+    warnings: UserWarning[];
     achievements: {
         victories: number;
         victories1v1: number;
