@@ -1,7 +1,8 @@
 import { DBObjectId } from './types/DBObjectId';
 import Repository from './repository';
 import { Game } from './types/Game';
-import { User } from './types/User';
+import {User, UserRoles} from './types/User';
+import ValidationError from "../errors/validation";
 
 const moment = require('moment');
 
@@ -18,21 +19,47 @@ export default class AdminService {
         this.gameRepo = gameRepo;
     }
 
-    async listUsers(isAdmin: boolean, limit: number) {
-        let select = isAdmin ? {
-            username: 1,
-            email: 1,
-            credits: 1,
-            banned: 1,
-            roles: 1,
-            emailEnabled: 1,
-            lastSeen: 1,
-            lastSeenIP: 1,
-            isEstablishedPlayer: 1
-        } : {
-            username: 1,
-            isEstablishedPlayer: 1
-        };
+    async addWarning(userId: DBObjectId, text: string) {
+        const newWarning = {
+            text,
+            date: moment().utc()
+        }
+
+        await this.userRepo.updateOne({
+            _id: userId
+        }, {
+            $push: {
+                warnings: newWarning
+            }
+        });
+    }
+
+    async listUsers(roles: UserRoles, limit: number) {
+        let select;
+
+        if (roles.administrator) {
+            select = {
+                username: 1,
+                email: 1,
+                credits: 1,
+                banned: 1,
+                roles: 1,
+                emailEnabled: 1,
+                lastSeen: 1,
+                lastSeenIP: 1,
+                isEstablishedPlayer: 1,
+                warnings: 1
+            };
+        } else if (roles.communityManager) {
+            select = {
+                username: 1,
+                isEstablishedPlayer: 1,
+                warnings: 1,
+                banned: 1,
+            };
+        } else {
+            throw new ValidationError("User role insufficient")
+        }
 
         return await this.userRepo.find({
             // All users

@@ -173,7 +173,6 @@ export default (config): DependencyContainer => {
     const spectatorService = new SpectatorService(gameRepository, playerService, userService);
     const playerAfkService = new PlayerAfkService(gameRepository, playerService, starService, carrierService, gameTypeService, gameStateService);
     const badgeService = new BadgeService(userRepository, userService, playerService);
-    const reportService = new ReportService(ReportModel, reportRepository, playerService);
     const ledgerService = new LedgerService(gameRepository, playerService, playerCreditsService);
     const reputationService = new ReputationService(gameRepository, playerStatisticsService, diplomacyService, playerAfkService);
     const tradeService = new TradeService(gameRepository, eventRepository, userService, playerService, diplomacyService, ledgerService, achievementService, reputationService, gameTypeService, randomService, playerCreditsService, playerAfkService);
@@ -206,6 +205,8 @@ export default (config): DependencyContainer => {
     const gameListService = new GameListService(gameRepository, gameService, conversationService, eventService, gameTypeService, leaderboardService);
     const gameCreateValidationService = new GameCreateValidationService(playerService, starService, carrierService, specialistService, gameTypeService);
     const gameCreateService = new GameCreateService(GameModel, gameJoinService, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService, gameCreateValidationService, gameFluxService, specialistBanService, specialStarBanService, gameTypeService, starService, diplomacyService, teamService, carrierService);
+
+    const reportService = new ReportService(ReportModel, reportRepository, playerService, conversationService, userService, gameListService, gameService);
 
     const notificationService = new NotificationService(config, userRepository, gameRepository, discordService, conversationService, gameService, gameJoinService, gameTickService, researchService, tradeService);
 

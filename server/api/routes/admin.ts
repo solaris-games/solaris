@@ -3,7 +3,13 @@ import { ExpressJoiInstance } from "express-joi-validation";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import AdminController from '../controllers/admin';
 import { MiddlewareContainer } from "../middleware";
-import { adminSetGameFeaturedRequestSchema, adminSetGameTimeMachineRequestSchema, adminSetUserCreditsRequestSchema, adminSetUserRoleRequestSchema } from "../requests/admin";
+import {
+    adminAddWarningRequestSchema,
+    adminSetGameFeaturedRequestSchema,
+    adminSetGameTimeMachineRequestSchema,
+    adminSetUserCreditsRequestSchema,
+    adminSetUserRoleRequestSchema
+} from "../requests/admin";
 
 export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
     const controller = AdminController(container);
@@ -23,14 +29,25 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
         controller.listPasswordResets,
         mw.core.handleError);
 
+    router.get('/api/admin/reports/:reportId/conversation',
+        mw.auth.authenticate({ communityManager: true }),
+        controller.conversationForReport,
+        mw.core.handleError);
+
     router.get('/api/admin/reports',
-        mw.auth.authenticate({ admin: true }),
+        mw.auth.authenticate({ communityManager: true }),
         controller.listReports,
         mw.core.handleError);
 
     router.patch('/api/admin/reports/:reportId/action',
-        mw.auth.authenticate({ admin: true }),
+        mw.auth.authenticate({ communityManager: true }),
         controller.actionReport,
+        mw.core.handleError);
+
+    router.post('/api/admin/user/:userId/warning',
+        mw.auth.authenticate({ communityManager: true }),
+        validator.body(adminAddWarningRequestSchema),
+        controller.addWarning,
         mw.core.handleError);
 
     router.patch('/api/admin/user/:userId/contributor',
@@ -64,12 +81,12 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
         mw.core.handleError);
 
     router.patch('/api/admin/user/:userId/ban',
-        mw.auth.authenticate({ admin: true }),
+        mw.auth.authenticate({ communityManager: true }),
         controller.banUser,
         mw.core.handleError);
 
     router.patch('/api/admin/user/:userId/unban',
-        mw.auth.authenticate({ admin: true }),
+        mw.auth.authenticate({ communityManager: true }),
         controller.unbanUser,
         mw.core.handleError);
 

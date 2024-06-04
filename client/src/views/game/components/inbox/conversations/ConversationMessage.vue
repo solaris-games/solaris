@@ -13,6 +13,7 @@
       <div class="col-auto thumbtack" v-if="conversation.createdBy">
         <conversation-message-pin :conversationId="conversation._id" :messageId="message._id" :pinned="message.pinned" @onPinned="onPinned" @onUnpinned="onUnpinned" />
       </div>
+      <conversation-message-context-menu :conversation="conversation" :message="message" @onOpenReportPlayerRequested="onOpenReportPlayerRequested" :user-player="getUserPlayer()" />
       <div class="col-12">
         <p class="mt-0 mb-0">
           <i class="fas fa-envelope me-2" v-if="!userPlayerHasReadMessage"></i>
@@ -34,9 +35,11 @@ import GameContainer from '../../../../../game/container'
 import PlayerIconVue from '../../player/PlayerIcon'
 import ConversationMessagePinVue from './ConversationMessagePin'
 import mentionHelper from '../../../../../services/mentionHelper'
+import ConversationMessageContextMenu from "./ConversationMessageContextMenu.vue";
 
 export default {
   components: {
+    'conversation-message-context-menu': ConversationMessageContextMenu,
     'player-icon': PlayerIconVue,
     'conversation-message-pin': ConversationMessagePinVue
   },
@@ -58,6 +61,9 @@ export default {
     mentionHelper.renderMessageWithMentionsAndLinks(this.$refs.messageElement, this.message.message, onStarClicked, onPlayerClicked)
   },
   methods: {
+    onOpenReportPlayerRequested (e) {
+      this.$emit('onOpenReportPlayerRequested', e);
+    },
     getUserPlayer () {
       return GameHelper.getUserPlayer(this.$store.state.game)
     },
@@ -81,7 +87,7 @@ export default {
       } else {
         this.$toasted.show(`The location of the star is unknown.`, { type: 'error' })
       }
-    }
+    },
   },
   computed: {
     isFromUserPlayer: function () {

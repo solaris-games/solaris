@@ -13,7 +13,8 @@
         :conversationId="menuArguments"
         :key="menuArguments"
         @onCloseRequested="toggle"
-        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+        @onOpenReportPlayerRequested="onOpenReportPlayerRequested" />
     </div>
   </div>
 </template>
@@ -63,7 +64,7 @@ export default {
     window.removeEventListener('resize', this.handleResize)
 
     this.sockets.unsubscribe('gameMessageSent')
-    
+
     eventBus.$off('onMenuChatSidebarRequested', this.toggle)
     eventBus.$off('onCreateNewConversationRequested', this.onCreateNewConversationRequested)
     eventBus.$off('onViewConversationRequested', this.onViewConversationRequested)
@@ -72,6 +73,9 @@ export default {
   methods: {
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', e)
+    },
+    onOpenReportPlayerRequested (e) {
+      this.$emit('onOpenReportPlayerRequested', e)
     },
     toggle () {
       this.isExpanded = !this.isExpanded;
@@ -104,7 +108,7 @@ export default {
       if (!this.canHandleConversationEvents()) {
         return
       }
-      
+
       this.$store.commit('setMenuStateChat', {
         state: MENU_STATES.INBOX,
         args: null
@@ -116,7 +120,7 @@ export default {
       if (!this.canHandleConversationEvents()) {
         return
       }
-      
+
       this.$store.commit('setMenuStateChat', {
         state: MENU_STATES.CREATE_CONVERSATION,
         args: e.participantIds || null
@@ -178,14 +182,14 @@ export default {
       if (e.altKey || e.shiftKey || e.ctrlKey || e.metaKey) {
         return
       }
-      
+
       let isLoggedIn = this.$store.state.userId != null
       let isInGame = this.isUserInGame
 
       if (!isLoggedIn || !isInGame) {
         return
       }
-      
+
       let menuState = KEYBOARD_SHORTCUTS.all[key]
 
       if (menuState === null && this.isExpanded) {

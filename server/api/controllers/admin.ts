@@ -12,9 +12,18 @@ export default (container: DependencyContainer) => {
                 return next(err);
             }
         },
+        addWarning: async (req, res, next) => {
+           try {
+               const result = await container.adminService.addWarning(req.params.userId, req.body.text);
+
+               return res.status(200).json(result);
+           } catch (err) {
+               next(err);
+           }
+        },
         listUsers: async (req, res, next) => {
             try {
-                let result = await container.adminService.listUsers(req.session.roles.administrator, 300);
+                let result = await container.adminService.listUsers(req.session.roles, 300);
                 
                 return res.status(200).json(result);
             } catch (err) {
@@ -30,9 +39,18 @@ export default (container: DependencyContainer) => {
                 return next(err);
             }
         },
+        conversationForReport: async (req, res, next) => {
+            try {
+                const result = await container.reportService.conversationForReport(req.params.reportId, req.session.userId);
+
+                return res.status(200).json(result);
+            } catch (err) {
+                return next(err);
+            }
+        },
         listReports: async (req, res, next) => {
             try {
-                let result = await container.reportService.listReports();
+                let result = await container.reportService.listReports(req.session.userId);
                 
                 return res.status(200).json(result);
             } catch (err) {
