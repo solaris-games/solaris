@@ -243,7 +243,8 @@ export default class ResearchService extends EventEmitter {
             default:
                 throw new Error(`Unsupported experimentation reward ${game.settings.technology.experimentationReward}`);
         }
-        
+
+        tech.technology.progress = tech.technology.progress || 0;
         tech.technology.progress += researchAmount;
 
         // If the current progress is greater than the required progress
