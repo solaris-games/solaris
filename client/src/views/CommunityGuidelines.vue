@@ -5,8 +5,6 @@
       :showSocialLinks="false"
     />
 
-    <span style="font-weight: bold">Community Guidelines</span>
-
     <ul>
       <li>Treat others online as you would treat them in real life</li>
       <li>Be tolerant towards other’s viewpoints; respectfully disagree when opinions do not align</li>
@@ -26,14 +24,14 @@
       <li> Use offensive characters when roleplaying</li>
     </ul>
 
-    If you see something that violates these guidelines, use the ingame report feature or contact the Project Lead or Community Managers (via Discord).
-    We will take action when these guidelines are violated. Sometimes that just means giving someone a warning; other times it means revoking certain privileges or accounts entirely.
+    <p>If you see something that violates these guidelines, use the ingame report feature or contact the Project Lead or Community Managers (via Discord).</p>
+    <p>We will take action when these guidelines are violated. Sometimes that just means giving someone a warning; other times it means revoking certain privileges or accounts entirely.</p>
 
-    And always keep in mind: Solaris is a game! Betrayal and subterfuge are a core part of the game. Don't make things personal, and treat your opponents with respect.
+    <p>And always keep in mind: Solaris is a game! Betrayal and subterfuge are a core part of the game. Don't make things personal, and treat your opponents with respect.</p>
 
-    <span style="font-weight: bold">Agreement</span>
+    <p style="font-weight: bold">Agreement</p>
 
-    By logging onto the game and any official community channels, you are considered to be in agreement with the terms and conditions listed above.
+    <p>By logging onto the game and any official community channels, you are considered to be in agreement with the terms and conditions listed above.</p>
   </view-container>
 </template>
 
