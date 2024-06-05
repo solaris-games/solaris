@@ -3,14 +3,18 @@ import { Game } from "./types/Game";
 import { Player, PlayerTechnologyLevels, ResearchTypeNotRandom } from "./types/Player";
 import { Star } from "./types/Star";
 import SpecialistService from "./specialist";
+import GameTypeService from "./gameType";
 
 export default class TechnologyService {
     specialistService: SpecialistService;
+    gameTypeService: GameTypeService;
 
     constructor(
-        specialistService: SpecialistService
+        specialistService: SpecialistService,
+        gameTypeService: GameTypeService
     ) {
         this.specialistService = specialistService;
+        this.gameTypeService = gameTypeService;
     }
 
     getEnabledTechnologies(game: Game) {
@@ -249,7 +253,7 @@ export default class TechnologyService {
         }
 
         if (star.specialistId) {
-            let specialist = this.specialistService.getByIdStar(star.specialistId);
+            const specialist = this.specialistService.getByIdStar(star.specialistId);
 
             if (specialist && specialist.modifiers.special?.defenderBonus) {
                 bonus += specialist.modifiers.special.defenderBonus;
@@ -257,7 +261,11 @@ export default class TechnologyService {
         }
 
         if (star.homeStar) {
-            bonus *= game.constants.star.homeStarDefenderBonusMultiplier;
+            if (this.gameTypeService.isCapitalStarEliminationMode(game)) {
+                bonus *= 2;
+            } else {
+                bonus *= game.constants.star.homeStarDefenderBonusMultiplier;
+            }
         }
 
         return bonus;

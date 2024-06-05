@@ -9,9 +9,14 @@
       </span>
     </small>
   </p>
-  <p v-if="!isPartialPlayers && !isOneVsOne" class="text-info mb-1">
-    <i>This conversation is for <strong>all</strong> players.</i>
-  </p>
+  <div v-if="!isPartialPlayers && !isOneVsOne" class="text-info mb-1">
+    <p class="mb-0 mt-1">
+      <i>This conversation is for <strong>all</strong> players.</i>
+    </p>
+    <p>
+      <router-link :to="{ name: 'guidelines' }">Community Guidelines</router-link>
+    </p>
+  </div>
   <!-- {{getPlayersString()}} -->
   <!-- <div v-for="participant in conversation.participants" :key="participant">
     {{getPlayer(participant).alias}}

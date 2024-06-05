@@ -95,6 +95,7 @@ export interface GameSettings {
 		playerType: GamePlayerType;
 		anonymity: GamePlayerAnonymity;
 		playerOnlineStatus: GamePlayerOnlineStatus;
+		playerIPWarning: GameSettingEnabledDisabled;
 		timeMachine: GameSettingEnabledDisabled;
 		awardRankTo: GameAwardRankTo;
 		awardRankToTopN?: number;

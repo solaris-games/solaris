@@ -1,103 +1,104 @@
 <template>
-<div class="full-container">
-  <view-container :hideTopBar="true">
-    <view-title title="Create Account" navigation="home"/>
+  <div class="full-container">
+    <view-container :hideTopBar="true">
+      <view-title title="Create Account" navigation="home"/>
 
-    <div class="row">
-      <div class="col-sm-12 col-md-6">
-        <h4>Sign up to play <span class="text-warning">Solaris</span>!</h4>
-        <p>Discover a space strategy game filled with conquest, betrayal and subterfuge.</p>
-        <p>Build alliances, make enemies and fight your way to victory to <span class="text-danger">galactic domination.</span></p>
-        <p><span class="text-info">Research and improve technologies</span> to gain an edge over your opponents. Trade with allies and build up huge fleets of ships.</p>
-        <p>Will you conquer the galaxy?</p>
-        <hr/>
-        <p>You can play <span class="text-warning">Solaris</span> on any of the following platforms:</p>
-        <p>
-          <a href="https://solaris.games" target="_blank" title="Web" class="me-2">
-            <i class="fab fa-chrome"></i> Web
-          </a>
-          <a href="https://store.steampowered.com/app/1623930/Solaris/" target="_blank" title="Steam" class="me-2">
-            <i class="fab fa-steam"></i> Steam
-          </a>
-          <a href="https://play.google.com/store/apps/details?id=com.voxel.solaris_android" target="_blank" title="Android">
-            <i class="fab fa-google-play"></i> Android
-          </a>
-        </p>
-      </div>
-      <div class="col-sm-12 col-md-6">
-        <form-error-list v-bind:errors="errors"/>
+      <div class="row">
+        <div class="col-sm-12 col-md-6">
+          <h4>Sign up to play <span class="text-warning">Solaris</span>!</h4>
+          <p>Discover a space strategy game filled with conquest, betrayal and subterfuge.</p>
+          <p>Build alliances, make enemies and fight your way to victory to <span class="text-danger">galactic domination.</span>
+          </p>
+          <p><span class="text-info">Research and improve technologies</span> to gain an edge over your opponents. Trade
+            with allies and build up huge fleets of ships.</p>
+          <p>Will you conquer the galaxy?</p>
+          <hr/>
+          <p>You can play <span class="text-warning">Solaris</span> on any of the following platforms:</p>
+          <p>
+            <a href="https://solaris.games" target="_blank" title="Web" class="me-2">
+              <i class="fab fa-chrome"></i> Web
+            </a>
+            <a href="https://store.steampowered.com/app/1623930/Solaris/" target="_blank" title="Steam" class="me-2">
+              <i class="fab fa-steam"></i> Steam
+            </a>
+            <a href="https://play.google.com/store/apps/details?id=com.voxel.solaris_android" target="_blank"
+               title="Android">
+              <i class="fab fa-google-play"></i> Android
+            </a>
+          </p>
+        </div>
+        <div class="col-sm-12 col-md-6">
+          <form-error-list v-bind:errors="errors"/>
 
-        <form @submit="handleSubmit">
-          <div class="mb-2">
-            <label for="email">Email Address</label>
-            <input type="email" required="required" class="form-control" name="email" v-model="email" :disabled="isLoading">
-          </div>
+          <form @submit="handleSubmit">
+            <div class="mb-2">
+              <label for="email">Email Address</label>
+              <input type="email" required="required" class="form-control" name="email" v-model="email"
+                     :disabled="isLoading">
+            </div>
 
-          <div class="mb-2">
-            <label for="username">Username</label>
-            <input type="text" required="required" class="form-control" name="username" minlength="3" maxlength="24" v-model="username" :disabled="isLoading">
-          </div>
+            <div class="mb-2">
+              <label for="username">Username</label>
+              <input type="text" required="required" class="form-control" name="username" minlength="3" maxlength="24"
+                     v-model="username" :disabled="isLoading">
+            </div>
 
-          <div class="mb-2">
-            <label for="password">Password</label>
-            <input type="password" required="required" class="form-control" name="password" v-model="password" :disabled="isLoading">
-          </div>
+            <div class="mb-2">
+              <label for="password">Password</label>
+              <input type="password" required="required" class="form-control" name="password" v-model="password"
+                     :disabled="isLoading">
+            </div>
 
-          <div class="mb-2">
-            <label for="passwordConfirm">Re-enter Password</label>
-            <input type="password" required="required" class="form-control" name="passwordConfirm" v-model="passwordConfirm" :disabled="isLoading">
-          </div>
+            <div class="mb-2">
+              <label for="passwordConfirm">Re-enter Password</label>
+              <input type="password" required="required" class="form-control" name="passwordConfirm"
+                     v-model="passwordConfirm" :disabled="isLoading">
+            </div>
 
-          <div class="mb-2" v-if="recaptchaEnabled">
-            <recaptcha
-              :sitekey="recaptchaSiteKey"
-              @verify="onRecaptchaVerify" 
-              @expired="onRecaptchaExpired">
-            </recaptcha>
-          </div>
+            <div class="checkbox mb-2">
+              <input id="privacyPolicy" type="checkbox" required="required" name="privacyPolicy"
+                     v-model="privacyPolicyAccepted" :disabled="isLoading" class="me-2">
+              <label for="privacyPolicy">Accept
+                <router-link :to="{ name: 'privacy-policy'}" class="me-2" title="Privacy Policy">
+                  Privacy Policy
+                </router-link>
+              </label>
+            </div>
 
-          <div class="mb-2">
-            <div class="row">
-              <div class="col-6">
-                <div class="d-grid gap-2">
-                  <button type="submit" class="btn btn-success" :disabled="isLoading">
-                    <i class="fas fa-sign-in-alt"></i>
-                    Register
-                  </button>
+            <div class="mb-2" v-if="recaptchaEnabled">
+              <recaptcha
+                :sitekey="recaptchaSiteKey"
+                @verify="onRecaptchaVerify"
+                @expired="onRecaptchaExpired">
+              </recaptcha>
+            </div>
+
+            <div class="mb-2">
+              <div class="row">
+                <div class="col-6">
+                  <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-success" :disabled="isLoading">
+                      <i class="fas fa-sign-in-alt"></i>
+                      Register
+                    </button>
+                  </div>
                 </div>
-              </div>
-              <div class="col-6">
-                <div class="d-grid gap-2">
-                  <router-link to="/" tag="button" class="btn btn-outline-danger">Cancel</router-link>
+                <div class="col-6">
+                  <div class="d-grid gap-2">
+                    <router-link to="/" tag="button" class="btn btn-outline-danger">Cancel</router-link>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </form>
+          </form>
 
-        <loading-spinner :loading="isLoading"/>
-      </div>
-    </div>
-
-    <!-- <div class="row mb-3">
-      <div class="carousel slide w-100" data-ride="carousel">
-        <div class="carousel-inner">
-          <div class="carousel-item active">
-              <img :src="require('../../assets/screenshots/game-carousel-1.png')" alt="Solaris" class="d-block w-100"/>
-          </div>
-          <div class="carousel-item">
-              <img :src="require('../../assets/screenshots/game-carousel-2.png')" alt="Solaris" class="d-block w-100"/>
-          </div>
-          <div class="carousel-item">
-              <img :src="require('../../assets/screenshots/game-carousel-3.png')" alt="Solaris" class="d-block w-100"/>
-          </div>
+          <loading-spinner :loading="isLoading"/>
         </div>
       </div>
-    </div> -->
-  </view-container>
+    </view-container>
 
-  <parallax />
-</div>
+    <parallax/>
+  </div>
 </template>
 
 <script>
@@ -119,7 +120,7 @@ export default {
     'recaptcha': VueRecaptcha,
     'parallax': ParallaxVue
   },
-  data () {
+  data() {
     return {
       isLoading: false,
       errors: [],
@@ -127,17 +128,18 @@ export default {
       username: null,
       password: null,
       passwordConfirm: null,
-      recaptchaToken: null
+      recaptchaToken: null,
+      privacyPolicyAccepted: false
     }
   },
   methods: {
-    onRecaptchaVerify (e) {
+    onRecaptchaVerify(e) {
       this.recaptchaToken = e
     },
-    onRecaptchaExpired (e) {
+    onRecaptchaExpired(e) {
       this.recaptchaToken = null
     },
-    async handleSubmit (e) {
+    async handleSubmit(e) {
       this.errors = []
 
       if (!this.email) {
@@ -164,6 +166,10 @@ export default {
         this.errors.push('Please complete the Recaptcha')
       }
 
+      if (!this.privacyPolicyAccepted) {
+        this.errors.push('Privacy policy must be accepted.')
+      }
+
       e.preventDefault()
 
       if (this.errors.length) return
@@ -175,9 +181,9 @@ export default {
         let response = await userService.createUser(this.email, this.username, this.password, this.recaptchaToken)
 
         if (response.status === 201) {
-          this.$toasted.show(`Welcome ${this.username}! You can now log in and play Solaris.`, { type: 'success' })
+          this.$toasted.show(`Welcome ${this.username}! You can now log in and play Solaris.`, {type: 'success'})
 
-          router.push({ name: 'home' })
+          router.push({name: 'home'})
         }
       } catch (err) {
         this.errors = err.response.data.errors || []
@@ -187,10 +193,10 @@ export default {
     }
   },
   computed: {
-    recaptchaEnabled () {
+    recaptchaEnabled() {
       return process.env.VUE_APP_GOOGLE_RECAPTCHA_ENABLED === 'true'
     },
-    recaptchaSiteKey () {
+    recaptchaSiteKey() {
       return process.env.VUE_APP_GOOGLE_RECAPTCHA_SITE_KEY
     }
   }
