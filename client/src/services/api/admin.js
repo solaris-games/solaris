@@ -15,6 +15,13 @@ class AdminService extends BaseApiService {
     return axios.get(this.BASE_URL + 'admin/reports', { withCredentials: true })
   }
 
+  addWarning (userId, text) {
+    return axios.post(this.BASE_URL + 'admin/user/' + userId + '/warning', {
+      text
+    },
+    { withCredentials: true })
+  }
+
   setRoleContributor (userId, enabled) {
     return axios.patch(this.BASE_URL + 'admin/user/' + userId + '/contributor', {
       enabled
@@ -109,6 +116,10 @@ class AdminService extends BaseApiService {
 
   resetQuitters (gameId) {
     return axios.delete(`${this.BASE_URL}admin/game/${gameId}/quitters`, { withCredentials: true })
+  }
+
+  getConversationForReport (reportId) {
+    return axios.get(`${this.BASE_URL}admin/reports/${reportId}/conversation`, { withCredentials: true })
   }
 }
 

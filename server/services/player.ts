@@ -157,6 +157,7 @@ export default class PlayerService extends EventEmitter {
             reputations: [],
             diplomacy: [],
             spectators: [],
+            scheduledActions: []
         };
 
         this._setDefaultResearchTechnology(game, player as any);
@@ -414,6 +415,8 @@ export default class PlayerService extends EventEmitter {
         player.readyToQuit = false;
         player.isOpenSlot = true;
         player.spectators = [];
+
+        // TODO: What to do with custom galaxies?
 
         // Reset the player's research
         this._setDefaultResearchTechnology(game, player);

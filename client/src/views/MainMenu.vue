@@ -2,6 +2,8 @@
   <view-container>
     <view-title title="Main Menu" :hideHomeButton="true" :showSocialLinks="true"/>
 
+    <warnings v-if="user" :warnings="user.warnings" />
+
     <div class="row pb-0 achievements">
       <div class="col-sm-12 col-md-6 col-lg-5">
         <p class="mb-1">A space strategy game filled with conquest, betrayal and subterfuge.</p>
@@ -128,15 +130,18 @@ import ViewTitle from './components/ViewTitle'
 import Achievements from './game/components/player/Achievements'
 import TutorialGame from './game/components/menu/TutorialGame'
 import Poll from "./components/Poll.vue";
+import Warnings from "./account/Warnings.vue";
 
 export default {
   components: {
+    Warnings,
     'loading-spinner': LoadingSpinnerVue,
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'achievements': Achievements,
     'tutorial-game': TutorialGame,
-    'poll': Poll
+    'poll': Poll,
+    'warnings': Warnings
   },
   data () {
     return {

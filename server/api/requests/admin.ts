@@ -15,3 +15,7 @@ export const adminSetGameFeaturedRequestSchema = Joi.object({
 export const adminSetGameTimeMachineRequestSchema = Joi.object({
     timeMachine: Joi.string().required().valid('enabled', 'disabled')
 });
+
+export const adminAddWarningRequestSchema = Joi.object({
+    text: Joi.string().required()
+});

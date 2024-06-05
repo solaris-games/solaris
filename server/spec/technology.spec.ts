@@ -1,4 +1,5 @@
 import TechnologyService from '../services/technology';
+import GameTypeService from "../services/gameType";
 const mongoose = require('mongoose');
 
 let service,
@@ -11,8 +12,9 @@ function setup(starSpecialist?, carrierSpecialist?) {
         getByIdStar: () => { return starSpecialist || null; },
         getByIdCarrier: () => { return carrierSpecialist || null; }
     };
+    let gameTypeService = new GameTypeService();
 
-    service = new TechnologyService(specialistService);
+    service = new TechnologyService(specialistService, gameTypeService);
 }
 
 describe('technology', () => {

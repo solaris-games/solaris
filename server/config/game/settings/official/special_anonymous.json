@@ -10,6 +10,7 @@
     "playerType": "all",
     "anonymity": "extra",
     "playerOnlineStatus": "visible",
+    "playerIPWarning": "enabled",
     "timeMachine": "enabled",
     "fluxEnabled": "enabled",
     "advancedAI": "enabled",
@@ -110,6 +111,7 @@
       "weapons": "standard",
       "specialists": "standard"
     },
+    "experimentationDistribution": "random",
     "bankingReward": "standard",
     "experimentationReward": "standard",
     "specialistTokenReward": "experimental"

@@ -30,8 +30,9 @@ export default class GameCreateValidationService {
     // Note: The reason why this isn't in a unit test is because custom galaxies
     // need to run through this validation.
     validate(game: Game) {
-        // Some checks should not be applied to custom games.
+        // Some checks should not be applied to advanced custom galaxy games.
         let isCustomGalaxy = game.settings.galaxy.galaxyType === 'custom';
+        let advancedCustomGalaxyEnabled = game.settings.galaxy?.advancedCustomGalaxyEnabled === 'enabled';
 
         // Assert that there is the correct number of players.
         if (game.galaxy.players.length !== game.settings.general.playerLimit) {
@@ -42,7 +43,7 @@ export default class GameCreateValidationService {
             // Assert that all players have the correct number of stars.
             let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
-            if (playerStars.length !== game.settings.player.startingStars) {
+            if (playerStars.length !== game.settings.player.startingStars && !advancedCustomGalaxyEnabled) {
                 throw new ValidationError(`All players must have ${game.settings.player.startingStars} stars.`);
             }
 
@@ -61,12 +62,12 @@ export default class GameCreateValidationService {
                 throw new ValidationError(`All players must have a unique colour/shape combination.`);
             }
 
-            // Assert that the player has the correct amount of starting credits
+            // Assert that the player has the correct amount of starting credits.
             if (player.credits !== game.settings.player.startingCredits) {
                 throw new ValidationError(`All players must start with ${game.settings.player.startingCredits} credits.`);
             }
 
-            // Assert that the player has the correct amount of starting tokens
+            // Assert that the player has the correct amount of starting tokens.
             if (player.creditsSpecialists !== game.settings.player.startingCreditsSpecialists) {
                 throw new ValidationError(`All players must start with ${game.settings.player.startingCreditsSpecialists} specialist tokens.`);
             }
@@ -74,7 +75,7 @@ export default class GameCreateValidationService {
             // Assert that all players start with 1 carrier.
             let carriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id);
 
-            if (carriers.length !== 1 && !isCustomGalaxy) {
+            if (carriers.length !== 1 && !advancedCustomGalaxyEnabled) {
                 throw new ValidationError(`All players must have 1 carrier.`);
             }
 
@@ -96,7 +97,7 @@ export default class GameCreateValidationService {
         // Assert that the galaxy has the correct number of stars.
         const noOfStars = game.settings.galaxy.starsPerPlayer * game.settings.general.playerLimit;
 
-        if (game.galaxy.stars.length !== noOfStars) {
+        if (game.galaxy.stars.length !== noOfStars && !isCustomGalaxy) {
             throw new ValidationError(`The galaxy must have a total of ${noOfStars} stars.`);
         }
 
@@ -132,43 +133,49 @@ export default class GameCreateValidationService {
                 throw new ValidationError(`All stars must have equal natural resources for non-split resources.`);
             }
 
-            // Assert that all stars in the galaxy have valid infrastructure
+            // Assert that all stars in the galaxy have valid infrastructure.
             if (star.infrastructure.economy! < 0
                 || star.infrastructure.industry! < 0
                 || star.infrastructure.science! < 0) {
                     throw new ValidationError(`All stars must have valid infrastructure.`);
                 }
 
-            // Could possibly be removed for custom games with asymmetrical starts?
+            // Assert that capital stars have correct infrastructure.
             if (star.homeStar && (
                 star.infrastructure.economy !== game.settings.player.startingInfrastructure.economy
                 || star.infrastructure.industry !== game.settings.player.startingInfrastructure.industry
                 || star.infrastructure.science !== game.settings.player.startingInfrastructure.science
-            )) {
+            ) && !advancedCustomGalaxyEnabled) {
                 throw new ValidationError(`All capital stars must start with valid starting infrastructure.`);
             }
 
-            // Assert that dead stars have valid infrastructure
+            // Assert that dead stars have valid infrastructure.
             if (this.starService.isDeadStar(star)
                 && (
                     star.infrastructure.economy! > 0
                     || star.infrastructure.industry! > 0
                     || star.infrastructure.science! > 0
                     || star.specialistId
-                    // || star.warpGate // TODO: This is a bug, dead stars cannot have warp gates however the map gen sometimes assigns them which is incorrect.
+                    || star.warpGate
                 )) {
                     throw new ValidationError(`All dead stars must have 0 infrastructure, no specialists and no warp gates.`);
                 }
     
-            // Assert that all stars have valid starting ships
+            // Assert that all stars have valid starting ships.
             if (star.ships! < 0 || star.shipsActual! < 0) {
                 throw new ValidationError(`All stars must have 0 or greater ships.`);
             }
 
+            // Assert that all unowned stars have no ships.
+            if (!star.ownedByPlayerId && star.shipsActual !== 0) {
+                throw new ValidationError(`All unowned stars must have 0 ships.`);
+            }
+
+            // Assert that player-owned non capital stars have the correct number of starting ships.
             if (!star.homeStar && star.ownedByPlayerId && (
                 star.ships !== game.settings.player.startingShips
                 || star.shipsActual !== game.settings.player.startingShips
-            ) && !isCustomGalaxy) {
+            ) && !advancedCustomGalaxyEnabled) {
                 throw new ValidationError(`All non capital stars owned by players must have ${game.settings.player.startingShips} ships.`);
             }
     
@@ -177,18 +184,18 @@ export default class GameCreateValidationService {
                 throw new ValidationError(`All stars with specialists must have a valid specialist.`);
             }
 
-            // Assert that home stars have the correct number of starting ships and infrastructure
+            // Assert that home stars have the correct number of starting ships and infrastructure.
             if (star.homeStar && (
                 star.ships !== game.settings.player.startingShips - 1
                 || star.shipsActual !== game.settings.player.startingShips - 1
                 || star.infrastructure.economy !== game.settings.player.startingInfrastructure.economy
                 || star.infrastructure.industry !== game.settings.player.startingInfrastructure.industry
                 || star.infrastructure.science !== game.settings.player.startingInfrastructure.science
-            ) && !isCustomGalaxy) {
+            ) && !advancedCustomGalaxyEnabled) {
                 throw new ValidationError(`All capital stars must start with valid ships and infrastructure.`);
             }
 
-            // Assert that the worm home IDs are valid
+            // Assert that the worm home IDs are valid.
             if (star.wormHoleToStarId && !this.starService.getById(game, star.wormHoleToStarId)) {
                 throw new ValidationError(`All worm holes must be paired with a valid star.`);
             }
@@ -200,7 +207,7 @@ export default class GameCreateValidationService {
                 throw new ValidationError(`All carriers must be owned by a player.`);
             }
 
-            // Assert that all carriers must be in orbit
+            // Assert that all carriers must be in orbit.
             if (!carrier.orbiting) {
                 throw new ValidationError(`All carriers must be in orbit.`);
             }
@@ -211,8 +218,11 @@ export default class GameCreateValidationService {
             }
 
             // Assert that all carriers have valid starting ships.
-            if (carrier.ships !== 1 && !isCustomGalaxy) {
+            // Because this check is only done during game creation, and there is no way to get a carrier with 'null' ships, we can do if(carrier.ships! < 1){...}.
+            if (carrier.ships !== 1 && !advancedCustomGalaxyEnabled) {
                 throw new ValidationError(`All carriers must start with ${game.settings.player.startingShips} ships.`);
+            } else if (carrier.ships! < 1) {
+                throw new ValidationError(`All carriers must have 1 or greater ships.`);
             }
     
             // Assert that all carriers have valid specialists.

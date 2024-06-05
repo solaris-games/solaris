@@ -54,6 +54,7 @@ const schema = new Schema({
 			playerType: { type: Types.String, required: true, enum: ['all', 'establishedPlayers'], default: 'all' },
 			anonymity: { type: Types.String, required: true, enum: ['normal', 'extra'], default: 'normal' },
 			playerOnlineStatus: { type: Types.String, required: true, enum: ['hidden', 'visible'], default: 'hidden' },
+			playerIPWarning: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },
 			timeMachine: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
 			awardRankTo: { type: Types.String, required: false, enum: ['all', 'winner', 'top_n', 'teams'], default: 'all' },
 			awardRankToTopN: { type: Types.Number, required: false, min: 1, default: null },
@@ -67,7 +68,8 @@ const schema = new Schema({
         galaxy: {
 			galaxyType: { type: Types.String, required: true, enum: ['circular', 'spiral', 'doughnut','circular-balanced', 'irregular', 'custom'], default: 'circular' },
 			starsPerPlayer: { type: Types.Number, required: true, min: 3, max: 50, default: 20 },
-			productionTicks: { type: Types.Number, required: true, min: 6, max: 36, default: 24 }
+			productionTicks: { type: Types.Number, required: true, min: 6, max: 36, default: 24 },
+			advancedCustomGalaxyEnabled: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'disabled' },
         },
         specialGalaxy: {
 			carrierCost: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' },
@@ -169,6 +171,7 @@ const schema = new Schema({
 				growthFactor: { type: Types.String, required: false, validate: validateNullableEnum(['soft', 'medium', 'hard']), default: null },
 			},
 			bankingReward: { type: Types.String, required: true, enum: ['standard', 'legacy'], default: 'standard' },
+			experimentationDistribution: { type: Types.String, required: true, enum: ['random', 'current_research'], default: 'random' },
 			experimentationReward: { type: Types.String, required: true, enum: ['standard', 'experimental'], default: 'standard' },
 			specialistTokenReward: { type: Types.String, required: true, enum: ['standard', 'experimental'], default: 'standard' }
 		},

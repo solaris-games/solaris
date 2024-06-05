@@ -131,7 +131,7 @@
         @onCloseRequested="onCloseRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
       <report-player v-if="menuState == MENU_STATES.REPORT_PLAYER"
-        :playerId="menuArguments"
+        :args="menuArguments"
         @onCloseRequested="onCloseRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
       <spectators v-if="menuState == MENU_STATES.SPECTATORS"
