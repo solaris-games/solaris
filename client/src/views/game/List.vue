@@ -2,6 +2,8 @@
   <view-container>
     <view-title title="Join Game" />
 
+    <community-guidelines-bar />
+
     <flux-bar class="mb-2"/>
 
     <ul class="nav nav-tabs">
@@ -59,7 +61,7 @@
           <p v-if="!isLoading && !serverGames.length" class="text-danger mb-2">
             There are no official games available.
           </p>
-          
+
           <div class="row" v-if="!isLoading">
             <!-- New Player -->
             <div class="col-sm-12 col-md-6 col-lg-6" v-if="games.newPlayerRT">
@@ -298,7 +300,7 @@
             <router-link to="/game/active-games" tag="button" class="btn btn-success ms-1"><i class="fas fa-dice"></i> View My Games</router-link>
           </div>
         </div>
-        
+
         <div class="tab-pane fade" id="inProgressGames">
           <h4>In Progress Games</h4>
 
@@ -349,7 +351,7 @@
             <router-link to="/game/active-games" tag="button" class="btn btn-success ms-1"><i class="fas fa-dice"></i> View My Games</router-link>
           </div>
         </div>
-        
+
         <div class="tab-pane fade" id="recentlyCompletedGames">
           <h4>Recently Completed Games</h4>
 
@@ -410,9 +412,12 @@ import HelpTooltip from '../components/HelpTooltip'
 import FluxBar from './components/menu/FluxBar'
 import LockedGameOverlay from './components/menu/LockedGameOverlay'
 import * as moment from 'moment'
+import CommunityGuidelines from "../CommunityGuidelines.vue";
+import CommunityGuidelinesBar from "./components/menu/CommunityGuidelinesBar.vue";
 
 export default {
   components: {
+    'community-guidelines-bar': CommunityGuidelinesBar,
     'loading-spinner': LoadingSpinnerVue,
     'view-container': ViewContainer,
     'view-title': ViewTitle,
@@ -489,12 +494,12 @@ export default {
         'special_freeForAll',
         'special_arcade'
       ]
-      
+
       return this.serverGames.find(x => types.includes(x.settings.general.type))
     },
     getFeaturedGame () {
       let featuredGames = this.serverGames.filter(x => x.settings.general.featured).concat(this.userGames.filter(x => x.settings.general.featured))
-      
+
       if (featuredGames.length) {
         return featuredGames[RandomHelper.getRandomNumberBetween(0, featuredGames.length - 1)]
       }
