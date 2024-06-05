@@ -1,24 +1,24 @@
 {
-  "general":{
+  "general": {
     "mode": [
       {
-        "value":"conquest",
-        "text":"Conquest"
+        "value": "conquest",
+        "text": "Conquest"
       },
       {
-        "value":"battleRoyale",
-        "text":"Battle Royale"
+        "value": "battleRoyale",
+        "text": "Battle Royale"
       },
       {
-        "value":"kingOfTheHill",
-        "text":"King Of The Hill"
+        "value": "kingOfTheHill",
+        "text": "King Of The Hill"
       },
       {
         "value": "teamConquest",
         "text": "Team Conquest"
       }
     ],
-    "playerLimit":[
+    "playerLimit": [
       2,
       3,
       4,
@@ -67,34 +67,44 @@
       47,
       48
     ],
-    "playerType":[
+    "playerType": [
       {
-        "value":"all",
-        "text":"All Players"
+        "value": "all",
+        "text": "All Players"
       },
       {
-        "value":"establishedPlayers",
-        "text":"Established Players Only"
+        "value": "establishedPlayers",
+        "text": "Established Players Only"
       }
     ],
-    "anonymity":[
+    "anonymity": [
       {
-        "value":"normal",
-        "text":"Normal"
+        "value": "normal",
+        "text": "Normal"
       },
       {
-        "value":"extra",
-        "text":"Extra"
+        "value": "extra",
+        "text": "Extra"
       }
     ],
-    "playerOnlineStatus":[
+    "playerOnlineStatus": [
       {
-        "value":"hidden",
-        "text":"Hidden"
+        "value": "hidden",
+        "text": "Hidden"
       },
       {
-        "value":"visible",
-        "text":"Visible"
+        "value": "visible",
+        "text": "Visible"
+      }
+    ],
+    "playerIPWarning": [
+      {
+        "value": "enabled",
+        "text": "Enabled"
+      },
+      {
+        "value": "disabled",
+        "text": "Disabled"
       }
     ],
     "advancedAI": [
@@ -117,14 +127,14 @@
         "text": "Disabled"
       }
     ],
-    "fluxEnabled":[
+    "fluxEnabled": [
       {
-        "value":"enabled",
-        "text":"Enabled"
+        "value": "enabled",
+        "text": "Enabled"
       },
       {
-        "value":"disabled",
-        "text":"Disabled"
+        "value": "disabled",
+        "text": "Disabled"
       }
     ],
     "readyToQuit": [
@@ -192,237 +202,237 @@
       }
     ]
   },
-  "specialGalaxy":{
-    "carrierCost":[
+  "specialGalaxy": {
+    "carrierCost": [
       {
-        "value":"cheap",
-        "text":"Cheap"
+        "value": "cheap",
+        "text": "Cheap"
       },
       {
-        "value":"standard",
-        "text":"Standard"
+        "value": "standard",
+        "text": "Standard"
       },
       {
-        "value":"expensive",
-        "text":"Expensive"
+        "value": "expensive",
+        "text": "Expensive"
       }
     ],
-    "carrierUpkeepCost":[
+    "carrierUpkeepCost": [
       {
-        "value":"none",
-        "text":"None"
+        "value": "none",
+        "text": "None"
       },
       {
-        "value":"cheap",
-        "text":"Cheap"
+        "value": "cheap",
+        "text": "Cheap"
       },
       {
-        "value":"standard",
-        "text":"Standard"
+        "value": "standard",
+        "text": "Standard"
       },
       {
-        "value":"expensive",
-        "text":"Expensive"
+        "value": "expensive",
+        "text": "Expensive"
       }
     ],
-    "warpgateCost":[
+    "warpgateCost": [
       {
-        "value":"none",
-        "text":"No"
+        "value": "none",
+        "text": "No"
       },
       {
-        "value":"cheap",
-        "text":"Cheap"
+        "value": "cheap",
+        "text": "Cheap"
       },
       {
-        "value":"standard",
-        "text":"Standard"
+        "value": "standard",
+        "text": "Standard"
       },
       {
-        "value":"expensive",
-        "text":"Expensive"
+        "value": "expensive",
+        "text": "Expensive"
       }
     ],
-    "specialistCost":[
+    "specialistCost": [
       {
-        "value":"none",
-        "text":"No"
+        "value": "none",
+        "text": "No"
       },
       {
-        "value":"standard",
-        "text":"Standard"
+        "value": "standard",
+        "text": "Standard"
       },
       {
-        "value":"expensive",
-        "text":"Expensive"
+        "value": "expensive",
+        "text": "Expensive"
       },
       {
-        "value":"veryExpensive",
-        "text":"Very Expensive"
+        "value": "veryExpensive",
+        "text": "Very Expensive"
       },
       {
-        "value":"crazyExpensive",
-        "text":"Crazy Expensive"
+        "value": "crazyExpensive",
+        "text": "Crazy Expensive"
       }
     ],
-    "specialistsCurrency":[
+    "specialistsCurrency": [
       {
-        "value":"credits",
-        "text":"Credits"
+        "value": "credits",
+        "text": "Credits"
       },
       {
-        "value":"creditsSpecialists",
-        "text":"Specialist Tokens"
+        "value": "creditsSpecialists",
+        "text": "Specialist Tokens"
       }
     ],
-    "darkGalaxy":[
+    "darkGalaxy": [
       {
-        "value":"disabled",
-        "text":"Disabled"
+        "value": "disabled",
+        "text": "Disabled"
       },
       {
-        "value":"fog",
-        "text":"Fogged"
+        "value": "fog",
+        "text": "Fogged"
       },
       {
-        "value":"standard",
-        "text":"Dark"
+        "value": "standard",
+        "text": "Dark"
       },
       {
-        "value":"extra",
-        "text":"Extra Dark"
+        "value": "extra",
+        "text": "Extra Dark"
       },
       {
-        "value":"start",
-        "text":"Dark Start Only"
+        "value": "start",
+        "text": "Dark Start Only"
       }
     ],
-    "giftCarriers":[
+    "giftCarriers": [
       {
-        "value":"disabled",
-        "text":"Disabled"
+        "value": "disabled",
+        "text": "Disabled"
       },
       {
-        "value":"enabled",
-        "text":"Enabled"
+        "value": "enabled",
+        "text": "Enabled"
       }
     ],
-    "defenderBonus":[
+    "defenderBonus": [
       {
-        "value":"disabled",
-        "text":"Disabled"
+        "value": "disabled",
+        "text": "Disabled"
       },
       {
-        "value":"enabled",
-        "text":"Enabled"
+        "value": "enabled",
+        "text": "Enabled"
       }
     ],
-    "carrierToCarrierCombat":[
+    "carrierToCarrierCombat": [
       {
-        "value":"disabled",
-        "text":"Disabled"
+        "value": "disabled",
+        "text": "Disabled"
       },
       {
-        "value":"enabled",
-        "text":"Enabled"
+        "value": "enabled",
+        "text": "Enabled"
       }
     ],
-    "splitResources":[
+    "splitResources": [
       {
-        "value":"disabled",
-        "text":"Disabled"
+        "value": "disabled",
+        "text": "Disabled"
       },
       {
-        "value":"enabled",
-        "text":"Enabled"
+        "value": "enabled",
+        "text": "Enabled"
       }
     ],
-    "resourceDistribution":[
+    "resourceDistribution": [
       {
-        "value":"random",
-        "text":"Random"
+        "value": "random",
+        "text": "Random"
       },
       {
-        "value":"weightedCenter",
-        "text":"Weighted (Center)"
+        "value": "weightedCenter",
+        "text": "Weighted (Center)"
       }
     ],
-    "playerDistribution":[
+    "playerDistribution": [
       {
-        "value":"circular",
-        "text":"Circular"
+        "value": "circular",
+        "text": "Circular"
       },
       {
-        "value":"random",
-        "text":"Random"
+        "value": "random",
+        "text": "Random"
       },
       {
         "value": "circularSequential",
         "text": "Circular (Sequential)"
       }
     ],
-    "carrierSpeed":[
+    "carrierSpeed": [
       {
-        "value":1,
-        "text":"Crazy Slow"
+        "value": 1,
+        "text": "Crazy Slow"
       },
       {
-        "value":2.5,
-        "text":"Very Slow"
+        "value": 2.5,
+        "text": "Very Slow"
       },
       {
-        "value":5,
-        "text":"Slow"
+        "value": 5,
+        "text": "Slow"
       },
       {
-        "value":10,
-        "text":"Standard"
+        "value": 10,
+        "text": "Standard"
       },
       {
-        "value":15,
-        "text":"Fast"
+        "value": 15,
+        "text": "Fast"
       },
       {
-        "value":20,
-        "text":"Very Fast"
+        "value": 20,
+        "text": "Very Fast"
       },
       {
-        "value":25,
-        "text":"Crazy Fast"
+        "value": 25,
+        "text": "Crazy Fast"
       }
     ],
     "starCaptureReward": [
       {
-        "value":"enabled",
-        "text":"Enabled"
+        "value": "enabled",
+        "text": "Enabled"
       },
       {
-        "value":"disabled",
-        "text":"Disabled"
+        "value": "disabled",
+        "text": "Disabled"
       }
     ]
   },
-  "galaxy":{
-    "galaxyType":[
+  "galaxy": {
+    "galaxyType": [
       {
-        "value":"circular",
-        "text":"Circular"
+        "value": "circular",
+        "text": "Circular"
       },
       {
-        "value":"spiral",
-        "text":"Spiral"
+        "value": "spiral",
+        "text": "Spiral"
       },
       {
-        "value":"doughnut",
-        "text":"Doughnut"
+        "value": "doughnut",
+        "text": "Doughnut"
       },
       {
-        "value":"irregular",
-        "text":"Irregular"
+        "value": "irregular",
+        "text": "Irregular"
       },
       {
-        "value":"circular-balanced",
-        "text":"Circular Balanced"
+        "value": "circular-balanced",
+        "text": "Circular Balanced"
       },
       {
         "value": "custom",
@@ -440,18 +450,18 @@
       }
     ]
   },
-  "conquest":{
-    "victoryCondition":[
+  "conquest": {
+    "victoryCondition": [
       {
-        "value":"starPercentage",
-        "text":"Star Percentage"
+        "value": "starPercentage",
+        "text": "Star Percentage"
       },
       {
-        "value":"homeStarPercentage",
-        "text":"Capital Star Percentage"
+        "value": "homeStarPercentage",
+        "text": "Capital Star Percentage"
       }
     ],
-    "victoryPercentage":[
+    "victoryPercentage": [
       25,
       33,
       50,
@@ -462,238 +472,238 @@
     ],
     "capitalStarElimination": [
       {
-        "value":"enabled",
-        "text":"Enabled"
+        "value": "enabled",
+        "text": "Enabled"
       },
       {
-        "value":"disabled",
-        "text":"Disabled"
+        "value": "disabled",
+        "text": "Disabled"
       }
     ]
   },
-  "orbitalMechanics":{
-    "enabled":[
+  "orbitalMechanics": {
+    "enabled": [
       {
-        "value":"enabled",
-        "text":"Enabled"
+        "value": "enabled",
+        "text": "Enabled"
       },
       {
-        "value":"disabled",
-        "text":"Disabled"
+        "value": "disabled",
+        "text": "Disabled"
       }
     ],
-    "orbitSpeed":[
+    "orbitSpeed": [
       {
-        "value":1,
-        "text":"Slow"
+        "value": 1,
+        "text": "Slow"
       },
       {
-        "value":3,
-        "text":"Standard"
+        "value": 3,
+        "text": "Standard"
       },
       {
-        "value":5,
-        "text":"Fast"
+        "value": 5,
+        "text": "Fast"
       }
     ]
   },
-  "player":{
-    "developmentCost":[
+  "player": {
+    "developmentCost": [
       {
-        "value":"none",
-        "text":"Disabled"
+        "value": "none",
+        "text": "Disabled"
       },
       {
-        "value":"cheap",
-        "text":"Cheap"
+        "value": "cheap",
+        "text": "Cheap"
       },
       {
-        "value":"standard",
-        "text":"Standard"
+        "value": "standard",
+        "text": "Standard"
       },
       {
-        "value":"expensive",
-        "text":"Expensive"
+        "value": "expensive",
+        "text": "Expensive"
       }
     ],
-    "tradeCredits":[
+    "tradeCredits": [
       {
-        "value":false,
-        "text":"Disabled"
+        "value": false,
+        "text": "Disabled"
       },
       {
-        "value":true,
-        "text":"Enabled"
+        "value": true,
+        "text": "Enabled"
       }
     ],
-    "tradeCreditsSpecialists":[
+    "tradeCreditsSpecialists": [
       {
-        "value":false,
-        "text":"Disabled"
+        "value": false,
+        "text": "Disabled"
       },
       {
-        "value":true,
-        "text":"Enabled"
+        "value": true,
+        "text": "Enabled"
       }
     ],
-    "tradeCost":[
+    "tradeCost": [
       {
-        "value":0,
-        "text":"Trading Disabled"
+        "value": 0,
+        "text": "Trading Disabled"
       },
       {
-        "value":5,
-        "text":"Cheap"
+        "value": 5,
+        "text": "Cheap"
       },
       {
-        "value":15,
-        "text":"Standard"
+        "value": 15,
+        "text": "Standard"
       },
       {
-        "value":25,
-        "text":"Expensive"
+        "value": 25,
+        "text": "Expensive"
       },
       {
-        "value":50,
-        "text":"Very Expensive"
+        "value": 50,
+        "text": "Very Expensive"
       },
       {
-        "value":100,
-        "text":"Crazy Expensive"
+        "value": 100,
+        "text": "Crazy Expensive"
       }
     ],
-    "tradeScanning":[
+    "tradeScanning": [
       {
-        "value":"all",
-        "text":"Trade with all players"
+        "value": "all",
+        "text": "Trade with all players"
       },
       {
-        "value":"scanned",
-        "text":"Trade with scanned players only"
+        "value": "scanned",
+        "text": "Trade with scanned players only"
       }
     ],
-    "populationCap":{
+    "populationCap": {
       "enabled": [
         {
-          "value":"enabled",
-          "text":"Enabled"
+          "value": "enabled",
+          "text": "Enabled"
         },
         {
-          "value":"disabled",
-          "text":"Disabled"
+          "value": "disabled",
+          "text": "Disabled"
         }
       ]
     },
     "allowAbandonStars": [
       {
-        "value":"enabled",
-        "text":"Enabled"
+        "value": "enabled",
+        "text": "Enabled"
       },
       {
-        "value":"disabled",
-        "text":"Disabled"
+        "value": "disabled",
+        "text": "Disabled"
       }
     ]
   },
-  "diplomacy":{
+  "diplomacy": {
     "enabled": [
       {
-        "value":"enabled",
-        "text":"Enabled"
+        "value": "enabled",
+        "text": "Enabled"
       },
       {
-        "value":"disabled",
-        "text":"Disabled"
+        "value": "disabled",
+        "text": "Disabled"
       }
     ],
-    "lockedAlliances":[
+    "lockedAlliances": [
       {
-        "value":"enabled",
-        "text":"Enabled"
+        "value": "enabled",
+        "text": "Enabled"
       },
       {
-        "value":"disabled",
-        "text":"Disabled"
+        "value": "disabled",
+        "text": "Disabled"
       }
     ],
-    "upkeepCost":[
+    "upkeepCost": [
       {
-        "value":"none",
-        "text":"None"
+        "value": "none",
+        "text": "None"
       },
       {
-        "value":"cheap",
-        "text":"Cheap"
+        "value": "cheap",
+        "text": "Cheap"
       },
       {
-        "value":"standard",
-        "text":"Standard"
+        "value": "standard",
+        "text": "Standard"
       },
       {
-        "value":"expensive",
-        "text":"Expensive"
+        "value": "expensive",
+        "text": "Expensive"
       },
       {
-        "value":"crazyExpensive",
-        "text":"Crazy Expensive"
+        "value": "crazyExpensive",
+        "text": "Crazy Expensive"
       }
     ],
-    "tradeRestricted":[
+    "tradeRestricted": [
       {
-        "value":"enabled",
-        "text":"Enabled"
+        "value": "enabled",
+        "text": "Enabled"
       },
       {
-        "value":"disabled",
-        "text":"Disabled"
+        "value": "disabled",
+        "text": "Disabled"
       }
     ],
     "globalEvents": [
       {
-        "value":"enabled",
-        "text":"Enabled"
+        "value": "enabled",
+        "text": "Enabled"
       },
       {
-        "value":"disabled",
-        "text":"Disabled"
+        "value": "disabled",
+        "text": "Disabled"
       }
     ]
   },
-  "technology":{
-    "researchCosts":[
+  "technology": {
+    "researchCosts": [
       {
-        "value":"none",
-        "text":"No"
+        "value": "none",
+        "text": "No"
       },
       {
-        "value":"cheap",
-        "text":"Cheap"
+        "value": "cheap",
+        "text": "Cheap"
       },
       {
-        "value":"standard",
-        "text":"Standard"
+        "value": "standard",
+        "text": "Standard"
       },
       {
-        "value":"expensive",
-        "text":"Expensive"
+        "value": "expensive",
+        "text": "Expensive"
       },
       {
-        "value":"veryExpensive",
-        "text":"Very Expensive"
+        "value": "veryExpensive",
+        "text": "Very Expensive"
       },
       {
-        "value":"crazyExpensive",
-        "text":"Crazy Expensive"
+        "value": "crazyExpensive",
+        "text": "Crazy Expensive"
       }
     ],
     "researchCostProgression": [
       {
-        "value":"standard",
-        "text":"Standard"
+        "value": "standard",
+        "text": "Standard"
       },
       {
-        "value":"exponential",
-        "text":"Exponential"
+        "value": "exponential",
+        "text": "Exponential"
       }
     ],
     "researchCostProgressionGrowthFactor": [
@@ -710,14 +720,14 @@
         "text": "Hard"
       }
     ],
-    "bankingReward":[
+    "bankingReward": [
       {
-        "value":"standard",
-        "text":"Standard"
+        "value": "standard",
+        "text": "Standard"
       },
       {
-        "value":"legacy",
-        "text":"Legacy"
+        "value": "legacy",
+        "text": "Legacy"
       }
     ],
     "experimentationDistribution": [
@@ -730,66 +740,66 @@
         "text": "Current Research"
       }
     ],
-    "experimentationReward":[
+    "experimentationReward": [
       {
-        "value":"standard",
-        "text":"Standard"
+        "value": "standard",
+        "text": "Standard"
       },
       {
-        "value":"experimental",
-        "text":"Experimental"
+        "value": "experimental",
+        "text": "Experimental"
       }
     ],
-    "specialistTokenReward":[
+    "specialistTokenReward": [
       {
-        "value":"standard",
-        "text":"Standard"
+        "value": "standard",
+        "text": "Standard"
       },
       {
-        "value":"experimental",
-        "text":"Experimental"
+        "value": "experimental",
+        "text": "Experimental"
       }
     ]
   },
-  "gameTime":{
-    "gameType":[
+  "gameTime": {
+    "gameType": [
       {
-        "value":"realTime",
-        "text":"Real Time"
+        "value": "realTime",
+        "text": "Real Time"
       },
       {
-        "value":"turnBased",
-        "text":"Turn Based"
+        "value": "turnBased",
+        "text": "Turn Based"
       }
     ],
-    "speed":[
+    "speed": [
       {
-        "value":30,
-        "text":"Ultra Fast (1 tick = 30 seconds)"
+        "value": 30,
+        "text": "Ultra Fast (1 tick = 30 seconds)"
       },
       {
-        "value":60,
-        "text":"Crazy Fast (1 tick = 1 minute)"
+        "value": 60,
+        "text": "Crazy Fast (1 tick = 1 minute)"
       },
       {
-        "value":300,
-        "text":"Very Fast (1 tick = 5 minutes)"
+        "value": 300,
+        "text": "Very Fast (1 tick = 5 minutes)"
       },
       {
-        "value":600,
-        "text":"Fast (1 tick = 10 minutes)"
+        "value": 600,
+        "text": "Fast (1 tick = 10 minutes)"
       },
       {
-        "value":1800,
-        "text":"Normal (1 tick = 30 minutes)"
+        "value": 1800,
+        "text": "Normal (1 tick = 30 minutes)"
       },
       {
-        "value":3600,
-        "text":"Slow (1 tick = 1 hour)"
+        "value": 3600,
+        "text": "Slow (1 tick = 1 hour)"
       },
       {
-        "value":7200,
-        "text":"Very Slow (1 tick = 2 hours)"
+        "value": 7200,
+        "text": "Very Slow (1 tick = 2 hours)"
       }
     ],
     "isTickLimited": [
@@ -802,102 +812,26 @@
         "text": "Disabled"
       }
     ],
-    "startDelay":[
+    "startDelay": [
       {
-        "value":1,
-        "text":"1 Minute"
+        "value": 1,
+        "text": "1 Minute"
       },
       {
-        "value":5,
-        "text":"5 Minutes"
+        "value": 5,
+        "text": "5 Minutes"
       },
       {
-        "value":10,
-        "text":"10 Minutes"
+        "value": 10,
+        "text": "10 Minutes"
       },
       {
-        "value":30,
-        "text":"30 Minutes"
+        "value": 30,
+        "text": "30 Minutes"
       },
       {
-        "value":60,
-        "text":"1 Hour"
-      },
-      {
-        "value":120,
-        "text":"2 Hours"
-      },
-      {
-        "value":240,
-        "text":"4 Hours"
-      },
-      {
-        "value":360,
-        "text":"6 Hours"
-      },
-      {
-        "value":480,
-        "text":"8 Hours"
-      },
-      {
-        "value":600,
-        "text":"10 Hours"
-      },
-      {
-        "value":720,
-        "text":"12 Hours"
-      },
-      {
-        "value":1440,
-        "text":"1 Day"
-      }
-    ],
-    "turnJumps":[
-      {
-        "value":1,
-        "text":"1 Tick Jumps"
-      },
-      {
-        "value":4,
-        "text":"4 Tick Jumps"
-      },
-      {
-        "value":6,
-        "text":"6 Tick Jumps"
-      },
-      {
-        "value":8,
-        "text":"8 Tick Jumps"
-      },
-      {
-        "value":12,
-        "text":"12 Tick Jumps"
-      },
-      {
-        "value":24,
-        "text":"24 Tick Jumps"
-      }
-    ],
-    "maxTurnWait":[
-      {
-        "value":1,
-        "text":"1 Minute"
-      },
-      {
-        "value":5,
-        "text":"5 Minutes"
-      },
-      {
-        "value":10,
-        "text":"10 Minutes"
-      },
-      {
-        "value":30,
-        "text":"30 Minutes"
-      },
-      {
-        "value":60,
-        "text":"1 Hour"
+        "value": 60,
+        "text": "1 Hour"
       },
       {
         "value": 120,
@@ -908,32 +842,108 @@
         "text": "4 Hours"
       },
       {
-        "value":360,
-        "text":"6 Hours"
+        "value": 360,
+        "text": "6 Hours"
       },
       {
-        "value":480,
-        "text":"8 Hours"
+        "value": 480,
+        "text": "8 Hours"
       },
       {
-        "value":600,
-        "text":"10 Hours"
+        "value": 600,
+        "text": "10 Hours"
       },
       {
-        "value":720,
-        "text":"12 Hours"
+        "value": 720,
+        "text": "12 Hours"
       },
       {
-        "value":1080,
-        "text":"18 Hours"
+        "value": 1440,
+        "text": "1 Day"
+      }
+    ],
+    "turnJumps": [
+      {
+        "value": 1,
+        "text": "1 Tick Jumps"
       },
       {
-        "value":1440,
-        "text":"24 Hours"
+        "value": 4,
+        "text": "4 Tick Jumps"
       },
       {
-        "value":2880,
-        "text":"48 Hours"
+        "value": 6,
+        "text": "6 Tick Jumps"
+      },
+      {
+        "value": 8,
+        "text": "8 Tick Jumps"
+      },
+      {
+        "value": 12,
+        "text": "12 Tick Jumps"
+      },
+      {
+        "value": 24,
+        "text": "24 Tick Jumps"
+      }
+    ],
+    "maxTurnWait": [
+      {
+        "value": 1,
+        "text": "1 Minute"
+      },
+      {
+        "value": 5,
+        "text": "5 Minutes"
+      },
+      {
+        "value": 10,
+        "text": "10 Minutes"
+      },
+      {
+        "value": 30,
+        "text": "30 Minutes"
+      },
+      {
+        "value": 60,
+        "text": "1 Hour"
+      },
+      {
+        "value": 120,
+        "text": "2 Hours"
+      },
+      {
+        "value": 240,
+        "text": "4 Hours"
+      },
+      {
+        "value": 360,
+        "text": "6 Hours"
+      },
+      {
+        "value": 480,
+        "text": "8 Hours"
+      },
+      {
+        "value": 600,
+        "text": "10 Hours"
+      },
+      {
+        "value": 720,
+        "text": "12 Hours"
+      },
+      {
+        "value": 1080,
+        "text": "18 Hours"
+      },
+      {
+        "value": 1440,
+        "text": "24 Hours"
+      },
+      {
+        "value": 2880,
+        "text": "48 Hours"
       }
     ]
   }

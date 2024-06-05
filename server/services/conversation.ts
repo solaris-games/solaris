@@ -130,7 +130,7 @@ export default class ConversationService extends EventEmitter {
         let newMessage: ConversationMessage = {
             fromPlayerId: null,
             fromPlayerAlias: "Solaris",
-            message: "Welcome to " + name + "!\n\nThis is the global chat. Any messages sent here will be delivered to all players in the game!\n\nGood Luck, Commanders!",
+            message: "Welcome to " + name + "!\n\nThis is the global chat. Any messages sent here will be delivered to all players in the game!\nPlease take a moment to familiarise yourself with our community guidelines.\n\nGood Luck, Commanders!",
             sentDate: moment().utc(),
             sentTick: game.state.tick,
             pinned: false,

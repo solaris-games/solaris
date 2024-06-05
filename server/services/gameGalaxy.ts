@@ -737,6 +737,10 @@ export default class GameGalaxyService {
     }
 
     _populatePlayerHasDuplicateIPs(game: Game) {
+        if (game.settings.general.playerIPWarning === 'disabled') {
+            return;
+        }
+
         for (let player of game.galaxy.players) {
             player.hasDuplicateIP = this.playerService.hasDuplicateLastSeenIP(game, player);
         }

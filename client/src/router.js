@@ -31,6 +31,7 @@ import Users from "./views/admin/Users.vue";
 import Reports from "./views/admin/Reports.vue";
 import Insights from "./views/admin/Insights.vue";
 import PasswordResets from "./views/admin/PasswordResets.vue";
+import CommunityGuidelines from "./views/CommunityGuidelines.vue";
 
 Vue.use(Router)
 
@@ -190,6 +191,11 @@ export default new Router({
       path: '/privacypolicy',
       name: 'privacy-policy',
       component: PrivacyPolicy
+    },
+    {
+      path: '/guidelines',
+      name: 'guidelines',
+      component: CommunityGuidelines
     }
   ]
 })
