@@ -36,7 +36,7 @@ export default class ScheduleBuyService extends EventEmitter {
     async buyScheduledInfrastructure(game: Game) {
         for (let player of game.galaxy.players) {
             if (player.scheduledActions.length == 0) continue;
-            let currentActions = player.scheduledActions
+            const currentActions = player.scheduledActions
                 .filter(a => a.tick == game.state.tick - 1) // Tick number that we just finished
                 .sort((a, b) => {
                     // Take the defined priorities
@@ -51,12 +51,27 @@ export default class ScheduleBuyService extends EventEmitter {
 
             // Loop through all actions to execute them.
             for (let action of currentActions) {
-                if (action.buyType === 'percentageOfCredits') break; // As this is sorted, all next ones will also be of this type
-                if (action.buyType === 'totalCredits' && action.amount > player.credits) {
-                    // When players schedule actions to spend more credits than they have, we spend all their credits
-                    action.amount = player.credits
+                // TODO: Better error handling
+                try {
+                    if (action.buyType === 'percentageOfCredits') {
+                        // As this is sorted, all next ones will also be of this type
+                        break;
+                    } 
+                    if (action.buyType === 'totalCredits' && action.amount > player.credits) {
+                        // When players schedule actions to spend more credits than they have, we spend all their credits
+                        action.amount = player.credits
+                    }
+                    const report = await this.starUpgradeService.generateUpgradeBulkReport(game, player, action.buyType, action.infrastructureType, action.amount);
+                    if (report.cost > player.credits) {
+                        // If the player does not have enough credits, we do not buy anything.
+                        break;
+                    }
+                    await this.starUpgradeService.upgradeBulk(game, player, action.buyType, action.infrastructureType, action.amount, false)
+                } catch (e) {
+                    console.error(e)
                 }
-                await this.starUpgradeService.upgradeBulk(game, player, action.buyType, action.infrastructureType, action.amount, false)
+                
+                
             }
 
             // We want to make sure that all percentage actions are dealt with with the same starting value.
