@@ -7,6 +7,7 @@ import { mapState } from 'vuex'
 import GameContainer from '../../../game/container'
 import GameApiService from '../../../services/api/game'
 import GameHelper from "@/services/gameHelper";
+import {attachEventDeduplication} from "../../../util/eventDeduplication";
 
 export default {
   data () {
@@ -37,6 +38,9 @@ export default {
     this.$el.appendChild(this.gameContainer.app.view) // Add the pixi canvas to the element.
 
     this.drawGame(game)
+
+    const gameRoot = document.getElementById("gameRoot") // Defined in Game component
+    attachEventDeduplication(gameRoot, this.gameContainer.app.view)
 
     // Bind to game events.
     this.onStarClickedHandler = this.onStarClicked.bind(this)
