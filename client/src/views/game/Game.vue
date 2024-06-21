@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="gameRoot">
     <logo v-if="!hasGame"></logo>
 
     <loading-spinner :loading="!hasGame"/>
