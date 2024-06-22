@@ -64,20 +64,22 @@ export default class ScheduleBuyService extends EventEmitter {
                     const report = await this.starUpgradeService.generateUpgradeBulkReport(game, player, action.buyType, action.infrastructureType, action.amount);
                     if (report.cost > player.credits) {
                         // If the player does not have enough credits, we do not buy anything.
-                        break;
+                        continue;
                     }
-                    await this.starUpgradeService.upgradeBulk(game, player, action.buyType, action.infrastructureType, action.amount, false)
+                    await this.starUpgradeService.upgradeBulk(game, player, action.buyType, action.infrastructureType, action.amount, false);
                 } catch (e) {
                     console.error(e)
                 }
-                
-                
             }
 
-            // We want to make sure that all percentage actions are dealt with with the same starting value.
-            let percentageActions = currentActions.filter(a => a.buyType == 'percentageOfCredits');
-            let totalPercentage = percentageActions.reduce((total, cur) => total + cur.amount, 0);
-            await this._executePercentageAction(game, player, percentageActions, totalPercentage);
+            try {
+                // We want to make sure that all percentage actions are dealt with with the same starting value.
+                const percentageActions = currentActions.filter(a => a.buyType == 'percentageOfCredits');
+                const totalPercentage = percentageActions.reduce((total, cur) => total + cur.amount, 0);
+                await this._executePercentageAction(game, player, percentageActions, totalPercentage);
+            } catch (e) {
+                console.error(e)
+            }
 
             // Only keep actions that are repeated or in the future
             this._repeatOrRemoveAction(game, player.scheduledActions)
