@@ -111,7 +111,7 @@ export default class ReportService {
             // All fields
         }, {
             actioned: 1,    // Non-actioned first
-            date: 1,
+            date: -1,
             _id: -1          // Newest first
         });
 
