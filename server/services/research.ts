@@ -45,8 +45,7 @@ export default class ResearchService extends EventEmitter {
     }
 
     async updateResearchNow(game: Game, player: Player, preference: ResearchTypeNotRandom) {
-        if (!this.technologyService.isTechnologyEnabled(game, preference)
-            || !this.technologyService.isTechnologyResearchable(game, preference)) {
+        if (!this.technologyService.isTechnologyResearchable(game, preference)) {
             throw new ValidationError(`Cannot change technology, the chosen tech is not researchable.`);
         }
 
@@ -72,8 +71,7 @@ export default class ResearchService extends EventEmitter {
 
     async updateResearchNext(game: Game, player: Player, preference: ResearchType) {
         if (preference !== 'random' &&
-            (!this.technologyService.isTechnologyEnabled(game, preference) ||
-            !this.technologyService.isTechnologyResearchable(game, preference))) {
+            (!this.technologyService.isTechnologyResearchable(game, preference))) {
             throw new ValidationError(`Cannot change technology, the chosen tech is not researchable.`);
         }
 
@@ -101,8 +99,7 @@ export default class ResearchService extends EventEmitter {
         let techKey = player.researchingNow;
         let tech = player.research[techKey];
 
-        if (!this.technologyService.isTechnologyEnabled(game, techKey) || 
-            !this.technologyService.isTechnologyResearchable(game, techKey)) {
+        if (!this.technologyService.isTechnologyResearchable(game, techKey)) {
             return null;
         }
 
@@ -300,8 +297,7 @@ export default class ResearchService extends EventEmitter {
             return k.match(/^[^_\$]/) != null;
         }) as ResearchTypeNotRandom[];
 
-        techs = techs.filter(t => this.technologyService.isTechnologyEnabled(game, t)
-                                && this.technologyService.isTechnologyResearchable(game, t));
+        techs = techs.filter(t => this.technologyService.isTechnologyResearchable(game, t));
 
         if (!techs.length) {
             return null;
