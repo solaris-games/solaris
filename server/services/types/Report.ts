@@ -20,4 +20,5 @@ export interface Report {
     reportedMessageId: DBObjectId | null;
     reasons: ReportReasons;
     actioned: boolean;
+    date: Date;
 };

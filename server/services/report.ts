@@ -64,7 +64,8 @@ export default class ReportService {
                 multiboxing: reasons.multiboxing || false,
                 inappropriateAlias: reasons.inappropriateAlias || false
             },
-            actioned: false
+            actioned: false,
+            date: new Date()
         });
 
         await report.save();
@@ -110,6 +111,7 @@ export default class ReportService {
             // All fields
         }, {
             actioned: 1,    // Non-actioned first
+            date: 1,
             _id: -1          // Newest first
         });
 
