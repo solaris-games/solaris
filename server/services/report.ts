@@ -131,11 +131,12 @@ export default class ReportService {
         }
     }
 
-    async actionReport(reportId: DBObjectId) {
+    async actionReport(userId: DBObjectId, reportId: DBObjectId) {
         return await this.reportRepo.updateOne({
             _id: reportId
         }, {
-            actioned: true
+            actioned: true,
+            actionedBy: userId
         });
     }
 

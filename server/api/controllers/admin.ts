@@ -59,7 +59,7 @@ export default (container: DependencyContainer) => {
         },
         actionReport: async (req, res, next) => {
             try {
-                await container.reportService.actionReport(req.params.reportId);
+                await container.reportService.actionReport(req.session.userId, req.params.reportId);
     
                 return res.sendStatus(200);
             } catch (err) {
