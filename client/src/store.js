@@ -132,6 +132,8 @@ export default new Vuex.Store({
       state.game = null
       state.cachedConversationComposeMessages = {}
       state.currentConversation = null;
+      state.carrierSpecialists = null;
+      state.starSpecialists = null;
     },
 
     setSettings (state, settings) {
