@@ -226,7 +226,7 @@
         <div class="mb-2" v-if="settings.gameTime.isTickLimited === 'enabled'">
           <label for="tickLimit" class="col-form-label">Time Limit (<span class="text-warning">{{settings.gameTime.tickLimit}} ticks</span>) <help-tooltip tooltip="Determines the maximum number of ticks before the game is automatically concluded"/></label>
           <div class="col">
-            <input type="range" min="200" max="2000" step="100" class="form-range w-100" id="tickLimit" v-model="settings.gameTime.tickLimit" :disabled="isCreatingGame">
+            <input type="range" min="100" max="2000" step="100" class="form-range w-100" id="tickLimit" v-model="settings.gameTime.tickLimit" :disabled="isCreatingGame">
           </div>
         </div>
 
