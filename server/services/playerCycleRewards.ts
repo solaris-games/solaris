@@ -90,7 +90,7 @@ export default class PlayerCycleRewardsService {
             case 'standard':
                 return specialists;
             case 'experimental':
-                const factor = 1 / (game.settings.galaxy.starsPerPlayer * 0.5);
+                const factor = 2 / game.settings.galaxy.starsPerPlayer;
                 return Math.ceil(Math.min(starCount * specialists * factor, specialists));
         }
 
