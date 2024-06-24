@@ -71,6 +71,7 @@ Once configured, you can browse to the site locally (default [http://localhost:8
 2. Create a `.env` file in `server/` (See `.env.example`).
 3. Create a `.env` file in `client/` (See `.env.example`).
 4. Run `docker compose up` in the project folder
+5. Browse to the site locally (default [http://localhost:8080](http://localhost:8080)).
 
 ## Contributing
 See [here](CONTRIBUTING.md).
