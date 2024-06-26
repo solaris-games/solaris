@@ -56,13 +56,16 @@ export default class ScheduleBuyService extends EventEmitter {
                     if (action.buyType === 'percentageOfCredits') {
                         // As this is sorted, all next ones will also be of this type
                         break;
-                    } 
-                    if (action.buyType === 'totalCredits' && action.amount > player.credits) {
-                        // When players schedule actions to spend more credits than they have, we spend all their credits
-                        action.amount = player.credits
                     }
 
-                    const report = await this.starUpgradeService.generateUpgradeBulkReport(game, player, action.buyType, action.infrastructureType, action.amount);
+                    let amount = action.amount;
+
+                    if (action.buyType === 'totalCredits' && action.amount > player.credits) {
+                        // When players schedule actions to spend more credits than they have, we spend all their credits
+                        amount = player.credits
+                    }
+
+                    const report = await this.starUpgradeService.generateUpgradeBulkReport(game, player, action.buyType, action.infrastructureType, amount);
 
                     if (report.cost > player.credits) {
                         continue;
@@ -112,7 +115,7 @@ export default class ScheduleBuyService extends EventEmitter {
     }
 
     async addScheduledBuy(game: Game, player: Player, buyType: string, infrastructureType: InfrastructureType, amount: number, repeat: boolean, tick: number) {
-        let action: PlayerScheduledActions = {
+        const action: PlayerScheduledActions = {
             _id: mongoose.Types.ObjectId(),
             infrastructureType,
             buyType,
