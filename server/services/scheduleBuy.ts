@@ -62,7 +62,13 @@ export default class ScheduleBuyService extends EventEmitter {
                         action.amount = player.credits
                     }
 
-                    await this.starUpgradeService.upgradeBulk(game, player, action.buyType, action.infrastructureType, action.amount, false);
+                    const report = await this.starUpgradeService.generateUpgradeBulkReport(game, player, action.buyType, action.infrastructureType, action.amount);
+
+                    if (report.cost > player.credits) {
+                        continue;
+                    }
+
+                    await this.starUpgradeService.executeBulkUpgradeReport(game, player, report);
                 } catch (e) {
                     console.error(e)
                 }

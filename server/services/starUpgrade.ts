@@ -1,7 +1,7 @@
 import {Carrier} from "./types/Carrier";
 
 const EventEmitter = require('events');
-import { DBObjectId } from './types/DBObjectId';
+import {DBObjectId} from './types/DBObjectId';
 import ValidationError from '../errors/validation';
 import Repository from './repository';
 import {
@@ -10,9 +10,9 @@ import {
     InfrastructureUpgradeReport,
     StarUpgradeReport
 } from './types/InfrastructureUpgrade';
-import { Game, GameInfrastructureExpenseMultiplier } from './types/Game';
-import { Player } from './types/Player';
-import { InfrastructureType, NaturalResources, Star, TerraformedResources } from './types/Star';
+import {Game, GameInfrastructureExpenseMultiplier} from './types/Game';
+import {Player} from './types/Player';
+import {InfrastructureType, NaturalResources, Star, TerraformedResources} from './types/Star';
 import AchievementService from './achievement';
 import CarrierService from './carrier';
 import GameTypeService from './gameType';
@@ -21,6 +21,7 @@ import StarService from './star';
 import TechnologyService from './technology';
 import PlayerCreditsService from './playerCredits';
 import ShipService from "./ship";
+
 const Heap = require('qheap');
 
 type UpgradeStar = {
@@ -148,7 +149,10 @@ export default class StarUpgradeService extends EventEmitter {
         }
     }
 
-    async buildCarrier(game: Game, player: Player, starId: DBObjectId, ships: number, writeToDB: boolean = true): Promise<{carrier: Carrier, starShips: number}> {
+    async buildCarrier(game: Game, player: Player, starId: DBObjectId, ships: number, writeToDB: boolean = true): Promise<{
+        carrier: Carrier,
+        starShips: number
+    }> {
         ships = ships || 1;
 
         if (ships < 1) {
@@ -542,20 +546,52 @@ export default class StarUpgradeService extends EventEmitter {
         return upgradeSummary;
     }
 
-    async generateUpgradeBulkReport(game: Game, player: Player, upgradeStrategy: string, infrastructureType: InfrastructureType, amount: number): Promise<BulkUpgradeReport> {
+    // this does not write directly to db, only for usage in jobs
+    async executeBulkUpgradeReport(game: Game, player: Player, upgradeSummary: BulkUpgradeReport) {
+        upgradeSummary.stars.forEach(starUpgrade => {
+            const star = this.starService.getById(game, starUpgrade.starId);
+            switch (upgradeSummary.infrastructureType) {
+                case 'economy':
+                    star.infrastructure.economy = starUpgrade.infrastructure;
+                    break;
+                case 'industry':
+                    star.infrastructure.industry = starUpgrade.infrastructure;
+                    break;
+                case 'science':
+                    star.infrastructure.science = starUpgrade.infrastructure;
+                    break;
+            }
+
+            player.credits -= starUpgrade.infrastructureCostTotal;
+        });
+
+        // Check for AI control.
+        if (player.userId && !player.defeated && !this.gameTypeService.isTutorialGame(game)) {
+            await this.achievementService.incrementInfrastructureBuilt(upgradeSummary.infrastructureType, player.userId, upgradeSummary.upgraded);
+        }
+
+        this.emit(StarUpgradeServiceEvents.onPlayerInfrastructureBulkUpgraded, {
+            gameId: game._id,
+            gameTick: game.state.tick,
+            player,
+            upgradeSummary
+        });
+    }
+
+    generateUpgradeBulkReport(game: Game, player: Player, upgradeStrategy: string, infrastructureType: InfrastructureType, amount: number): BulkUpgradeReport {
         if (!amount || amount <= 0) {
             throw new ValidationError(`Invalid upgrade amount given`);
         }
 
         // Get all of the player stars and what the next upgrade cost will be.
         if (upgradeStrategy === 'totalCredits') {
-            return await this.generateUpgradeBulkReportTotalCredits(game, player, infrastructureType, amount)
+            return this.generateUpgradeBulkReportTotalCredits(game, player, infrastructureType, amount);
         } else if (upgradeStrategy === 'percentageOfCredits') {
-            return await this.generateUpgradeBulkReportPercentageOfCredits(game, player, infrastructureType, amount)
+            return this.generateUpgradeBulkReportPercentageOfCredits(game, player, infrastructureType, amount);
         } else if (upgradeStrategy === 'infrastructureAmount') {
-            return await this.generateUpgradeBulkReportInfrastructureAmount(game, player, infrastructureType, amount)
+            return this.generateUpgradeBulkReportInfrastructureAmount(game, player, infrastructureType, amount);
         } else if (upgradeStrategy === 'belowPrice') {
-            return await this.generateUpgradeBulkReportBelowPrice(game, player, infrastructureType, amount)
+            return this.generateUpgradeBulkReportBelowPrice(game, player, infrastructureType, amount);
         }
 
         throw new Error(`Unsupported upgrade strategy: ${upgradeStrategy}`);
@@ -710,11 +746,11 @@ export default class StarUpgradeService extends EventEmitter {
 
     generateUpgradeBulkReportPercentageOfCredits(game: Game, player: Player, infrastructureType: InfrastructureType, percentage: number): BulkUpgradeReport {
         percentage = Math.min(100, Math.max(0, percentage));
-        const budget = Math.ceil(player.credits*percentage/100);
+        const budget = Math.ceil(player.credits * percentage / 100);
         return this.generateUpgradeBulkReportTotalCredits(game, player, infrastructureType, budget);
     }
 
-    calculateAverageTerraformedResources(terraformedResources: TerraformedResources){
+    calculateAverageTerraformedResources(terraformedResources: TerraformedResources) {
         return Math.floor((terraformedResources.economy + terraformedResources.industry + terraformedResources.science) / 3);
     }
 
@@ -738,7 +774,7 @@ export default class StarUpgradeService extends EventEmitter {
         if (expenseConfig == null) {
             return null;
         }
-        
+
         return Math.max(1, Math.floor((baseCost * expenseConfig * (current + 1)) / (terraformedResources / 100)));
     }
 
