@@ -61,11 +61,7 @@ export default class ScheduleBuyService extends EventEmitter {
                         // When players schedule actions to spend more credits than they have, we spend all their credits
                         action.amount = player.credits
                     }
-                    const report = await this.starUpgradeService.generateUpgradeBulkReport(game, player, action.buyType, action.infrastructureType, action.amount);
-                    if (report.cost > player.credits) {
-                        // If the player does not have enough credits, we do not buy anything.
-                        continue;
-                    }
+
                     await this.starUpgradeService.upgradeBulk(game, player, action.buyType, action.infrastructureType, action.amount, false);
                 } catch (e) {
                     console.error(e)
