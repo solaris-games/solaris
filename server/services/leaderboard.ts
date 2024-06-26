@@ -198,8 +198,6 @@ export default class LeaderboardService {
 
         const playerId = player._id.toString();
 
-        console.log(playerId);
-
         return game.state.teamLeaderboard.findIndex(tId => {
             const team = this.teamService.getById(game, tId);
 
