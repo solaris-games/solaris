@@ -162,13 +162,6 @@ class GameContainer {
         smooth: 5
       })
       .decelerate({ friction: 0.9 })
-      .clamp({
-        left: this.starFieldLeft * 2,
-        right: this.starFieldRight * 2,
-        top: this.starFieldTop * 2,
-        bottom: this.starFieldBottom * 2,
-        underflow: 'none',
-      })
       .clampZoom({
         minWidth: 50,
         minHeight: 50,
