@@ -917,7 +917,8 @@ export default {
       isCreatingGame: false,
       errors: [],
       settings: null,
-      options: null
+      options: null,
+      possibleTeamCounts: []
     }
   },
   async mounted () {
@@ -966,9 +967,12 @@ export default {
     },
     onMaxAllianceTriggerChanged (e) {
       this.settings.diplomacy.maxAlliances = this.calcMaxAllianceLimit();
+      console.warn("Max alliances changed to: " + this.settings.diplomacy.maxAlliances);
     },
     calcMaxAllianceLimit () {
       if (this.settings.general.mode === 'teamConquest') {
+        this.updatePossibleTeamCounts();
+
         const playersPerTeam = this.settings.general.playerLimit / this.settings.conquest.teamsCount;
         return playersPerTeam - 1;
       }
@@ -985,6 +989,7 @@ export default {
       if (this.settings.general.mode === 'teamConquest') {
         this.settings.diplomacy.enabled = 'enabled';
         this.settings.diplomacy.lockedAlliances = 'enabled';
+        console.warn("Mode changed to team conquest, enabling diplomacy and locked alliances.")
         this.onMaxAllianceTriggerChanged(e);
       }
     },
@@ -1001,10 +1006,8 @@ export default {
       if (!numberValid) {
         errors.push('The number of players must be larger than 3 and divisible by the number of teams.');
       }
-    }
-  },
-  computed: {
-    possibleTeamCounts () {
+    },
+    updatePossibleTeamCounts () {
       const players = this.settings.general.playerLimit;
 
       if (players < 4) {
@@ -1024,9 +1027,9 @@ export default {
         this.settings.conquest.teamsCount = teams[0];
       }
 
-      return teams;
+      this.possibleTeamCounts = teams;
     }
-  }
+  },
 }
 </script>
 
