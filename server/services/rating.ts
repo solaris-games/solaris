@@ -20,23 +20,26 @@ export default class RatingService {
         this.userService = userService;
     }
 
-    recalculateEloRating(userA: User, userB: User, userAIsWinner: boolean) {
-        // Note that some players may no longer have accounts, in which case consider it a win for the
-        // player against the same rank as their own.
-        let userARating = userA == null ? userB.achievements.eloRating : userA.achievements.eloRating;
-        let userBRating = userB == null ? userA.achievements.eloRating : userB.achievements.eloRating;
+    recalculateEloRating(userA: User | undefined, userB: User | undefined, userAIsWinner: boolean) {
+        // Only award rank if one user exists
+        if (userA || userB) {
+            // Note that some players may no longer have accounts, in which case consider it a win for the
+            // player against the same rank as their own.
+            const userARating = !userA ? userB!.achievements.eloRating : userA.achievements.eloRating;
+            const userBRating = !userB ? userA!.achievements.eloRating : userB.achievements.eloRating;
 
-        let eloResult = EloRating.calculate(
-            userARating == null ? 1200 : userARating, 
-            userBRating == null ? 1200 : userBRating, 
-            userAIsWinner);
+            const eloResult = EloRating.calculate(
+                !userARating ? 1200 : userARating,
+                !userBRating ? 1200 : userBRating,
+                userAIsWinner);
 
-        if (userA) {
-            userA.achievements.eloRating = eloResult.playerRating;
-        }
+            if (userA) {
+                userA.achievements.eloRating = eloResult.playerRating;
+            }
 
-        if (userB) {
-            userB.achievements.eloRating = eloResult.opponentRating;
+            if (userB) {
+                userB.achievements.eloRating = eloResult.opponentRating;
+            }
         }
     }
 

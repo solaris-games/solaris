@@ -399,11 +399,11 @@ export default class LeaderboardService {
             return null;
         }
         
-        let winningPlayer: Player = game.galaxy.players.find(p => p._id.toString() === game.state.winner!.toString())!;
-        let losingPlayer: Player = game.galaxy.players.find(p => p._id.toString() !== game.state.winner!.toString())!;
+        const winningPlayer: Player = game.galaxy.players.find(p => p._id.toString() === game.state.winner!.toString())!;
+        const losingPlayer: Player = game.galaxy.players.find(p => p._id.toString() !== game.state.winner!.toString())!;
 
-        let winningUser: User = gameUsers.find(u => winningPlayer.userId && u._id.toString() === winningPlayer.userId.toString())!;
-        let losingUser: User = gameUsers.find(u => losingPlayer.userId && u._id.toString() === losingPlayer.userId.toString())!;
+        const winningUser: User | undefined = gameUsers.find(u => winningPlayer.userId && u._id.toString() === winningPlayer.userId.toString());
+        const losingUser: User | undefined = gameUsers.find(u => losingPlayer.userId && u._id.toString() === losingPlayer.userId.toString());
 
         let winningUserOldRating = 1200;
         let losingUserOldRating = 1200;
