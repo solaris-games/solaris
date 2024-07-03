@@ -869,13 +869,11 @@ export default class GameTickService extends EventEmitter {
 
         if (canAwardRank) {
             if (this.gameTypeService.isTeamConquestGame(game)) {
-                let teamLeaderboard = this.leaderboardService.getTeamLeaderboard(game)!.leaderboard;
+                const teamLeaderboard = this.leaderboardService.getTeamLeaderboard(game)!.leaderboard;
 
                 rankingResult = this.leaderboardService.addTeamRankings(game, gameUsers, teamLeaderboard);
-
-                // TODO: What kind of awards do we want for team games?
             } else {
-                let leaderboard = this.leaderboardService.getGameLeaderboard(game).leaderboard;
+                const leaderboard = this.leaderboardService.getGameLeaderboard(game).leaderboard;
 
                 rankingResult = this.leaderboardService.addGameRankings(game, gameUsers, leaderboard);
                 this.leaderboardService.incrementGameWinnerAchievements(game, gameUsers, leaderboard[0].player, awardCredits);
