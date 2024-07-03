@@ -14,6 +14,7 @@ import PlayerAfkService from "./playerAfk";
 import UserLevelService from "./userLevel";
 import {maxBy, reverseSort, sorterByProperty} from "./utils";
 import TeamService from "./team";
+import {DBObjectId} from "./types/DBObjectId";
 
 const moment = require('moment');
 
@@ -196,9 +197,22 @@ export default class LeaderboardService {
             return null;
         }
 
+        const teamDefeated = (teamId: DBObjectId) => {
+            const team = this.teamService.getById(game, teamId);
+
+            if (!team) {
+                return false;
+            }
+
+            return team.players.every(pId => {
+                const player = this.playerService.getById(game, pId);
+                return player && player.defeated;
+            });
+        }
+
         const playerId = player._id.toString();
 
-        return game.state.teamLeaderboard.findIndex(tId => {
+        return game.state.teamLeaderboard.filter(t => !teamDefeated(t)).findIndex(tId => {
             const team = this.teamService.getById(game, tId);
 
             return team && team.players.find(pId => pId.toString() === playerId);
@@ -210,7 +224,12 @@ export default class LeaderboardService {
             return null;
         }
 
-        return game.state.leaderboard.findIndex(l => l.toString() === player._id.toString()) + 1;
+        const playerDefeated = (pId: DBObjectId) => {
+            const player = this.playerService.getById(game, pId);
+            return player && player.defeated;
+        }
+
+        return game.state.leaderboard.filter(pId => !playerDefeated(pId)).findIndex(l => l.toString() === player._id.toString()) + 1;
     }
 
     getTeamLeaderboard(game: Game): TeamLeaderboard | null {
@@ -250,7 +269,10 @@ export default class LeaderboardService {
     }
 
     addTeamRankings(game: Game, gameUsers: User[], leaderboard: LeaderboardTeam[]): GameRankingResult {
-        const leadingTeam = leaderboard[0];
+        // Get first team that is not defeated
+        const leadingTeam = leaderboard.find(team => {
+            return team.team.players.map(pId => this.playerService.getById(game, pId)!).filter(p => !p.defeated).length > 0;
+        });
 
         const nonAfkInLeadingTeam = leadingTeam.team.players
             .flatMap(pId => {
@@ -281,7 +303,6 @@ export default class LeaderboardService {
                 new: newRank
             }];
         });
-
 
         return {
             ranks,
