@@ -250,7 +250,10 @@ export default class LeaderboardService {
     }
 
     addTeamRankings(game: Game, gameUsers: User[], leaderboard: LeaderboardTeam[]): GameRankingResult {
-        const leadingTeam = leaderboard[0];
+        // Get first team that is not defeated
+        const leadingTeam = leaderboard.find(team => {
+            return team.team.players.map(pId => this.playerService.getById(game, pId)!).filter(p => !p.defeated).length > 0;
+        });
 
         const nonAfkInLeadingTeam = leadingTeam.team.players
             .flatMap(pId => {
