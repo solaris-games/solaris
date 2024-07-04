@@ -274,6 +274,13 @@ export default class LeaderboardService {
             return team.team.players.map(pId => this.playerService.getById(game, pId)!).filter(p => !p.defeated).length > 0;
         });
 
+        if (!leadingTeam) {
+            return {
+                ranks: [],
+                eloRating: null
+            };
+        }
+
         const nonAfkInLeadingTeam = leadingTeam.team.players
             .flatMap(pId => {
                 const player = this.playerService.getById(game, pId);
