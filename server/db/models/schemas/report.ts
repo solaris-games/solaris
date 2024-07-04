@@ -18,7 +18,9 @@ const schema = new Schema({
         multiboxing: { type: Types.Boolean, required: true },
         inappropriateAlias: { type: Types.Boolean, required: true }
     },
-    actioned: { type: Types.Boolean, required: false, default: false }
+    actioned: { type: Types.Boolean, required: false, default: false },
+    actionedBy: { type: Types.ObjectId, required: false },
+    date: { type: Types.Date, required: true, default: () => new Date() }
 });
 
 export default schema;

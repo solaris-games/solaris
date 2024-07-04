@@ -20,6 +20,24 @@ require('../public/assets/js/app.min.js')
 Vue.config.productionTip = false
 window.$ = $;
 
+window._solaris = {
+  errors: []
+};
+
+Vue.config.errorHandler = (err, vm, info) => {
+  window._solaris.errors.push(`Vue error: ${err.message}\n ${err.cause} ${info}\n ${err.stack}`);
+
+  console.error(err);
+};
+
+window.addEventListener("error", (ev) => {
+  window._solaris.errors.push(ev.error + ' ' + ev.message);
+});
+
+window.addEventListener("unhandledrejection", (event) => {
+  window._solaris.errors.push(event.error + ' ' + event.reason);
+});
+
 Vue.use(new VueSocketio({
   debug: true,
   connection: `//${process.env.VUE_APP_SOCKETS_HOST}`,

@@ -23,7 +23,7 @@ describe('technology', () => {
         service = null;
     });
 
-    it('should get enabled technologies', () => {
+    it('should get researchable technologies', () => {
         const game = {
             settings: {
                 technology: {
@@ -43,7 +43,7 @@ describe('technology', () => {
 
         setup();
 
-        const enabledTechs = service.getEnabledTechnologies(game);
+        const enabledTechs = service.getResearchableTechnologies(game);
 
         expect(enabledTechs.length).toBe(2);
         expect(enabledTechs).toContain('scanning');
@@ -56,6 +56,16 @@ describe('technology', () => {
                 technology: {
                     researchCosts: {
                         scanning: 'standard'
+                    },
+                    startingTechnologyLevel: {
+                        scanning: 1,
+                        hyperspace: 1,
+                        weapons: 1,
+                        banking: 1,
+                        manufacturing: 1,
+                        experimentation: 1,
+                        terraforming: 1,
+                        specialists: 1,
                     }
                 }
             }
@@ -68,12 +78,51 @@ describe('technology', () => {
         expect(researchable).toBeTruthy();
     });
 
+    it('should return false for disabled technology', () => {
+        const game = {
+            settings: {
+                technology: {
+                    researchCosts: {
+                        scanning: 'standard',
+                        experimentation: 'standard'
+                    },
+                    startingTechnologyLevel: {
+                        scanning: 1,
+                        hyperspace: 1,
+                        weapons: 1,
+                        banking: 1,
+                        manufacturing: 1,
+                        experimentation: 0,
+                        terraforming: 1,
+                        specialists: 1,
+                    }
+                }
+            }
+        };
+
+        setup();
+
+        const researchable = service.isTechnologyResearchable(game, 'experimentation');
+
+        expect(researchable).toBeFalsy();
+    });
+
     it('should return false for not researchable technology', () => {
         const game = {
             settings: {
                 technology: {
                     researchCosts: {
                         scanning: 'none'
+                    },
+                    startingTechnologyLevel: {
+                        scanning: 1,
+                        hyperspace: 1,
+                        weapons: 1,
+                        banking: 1,
+                        manufacturing: 1,
+                        experimentation: 1,
+                        terraforming: 1,
+                        specialists: 1,
                     }
                 }
             }

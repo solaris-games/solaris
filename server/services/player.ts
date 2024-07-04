@@ -111,8 +111,9 @@ export default class PlayerService extends EventEmitter {
     }
 
     createEmptyPlayer(game: Game, colour: PlayerColour, shape: PlayerShape): Player {
-        let researchingNow: ResearchTypeNotRandom = 'terraforming';
-        let researchingNext: ResearchTypeNotRandom = 'terraforming';
+        const defaultTech = this.technologyService.getDefaultTechnology(game);
+        const researchingNow: ResearchTypeNotRandom = defaultTech;
+        const researchingNext: ResearchTypeNotRandom = defaultTech;
 
         let player: Player = {
             _id: mongoose.Types.ObjectId(),
@@ -159,8 +160,6 @@ export default class PlayerService extends EventEmitter {
             spectators: [],
             scheduledActions: []
         };
-
-        this._setDefaultResearchTechnology(game, player as any);
 
         return player;
     }
@@ -419,10 +418,12 @@ export default class PlayerService extends EventEmitter {
         // TODO: What to do with custom galaxies?
 
         // Reset the player's research
-        this._setDefaultResearchTechnology(game, player);
+        const defaultTech = this.technologyService.getDefaultTechnology(game);
+        player.researchingNow = defaultTech;
+        player.researchingNext = defaultTech;
 
         // Reset the player's stars.
-        let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+        const playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
         for (let star of playerStars) {
             this.starService.setupPlayerStarForGameStart(game, star, player);
@@ -504,13 +505,6 @@ export default class PlayerService extends EventEmitter {
         startingLocation.y += galaxyCenter.y;
 
         return startingLocation;
-    }
-
-    _setDefaultResearchTechnology(game: Game, player: Player) {
-        let enabledTechs = this.technologyService.getEnabledTechnologies(game);
-
-        player.researchingNow = enabledTechs[0] || 'weapons';
-        player.researchingNext = player.researchingNow;
     }
 
     createHomeStarCarriers(game: Game) {

@@ -14,6 +14,7 @@ import PlayerAfkService from "./playerAfk";
 import UserLevelService from "./userLevel";
 import {maxBy, reverseSort, sorterByProperty} from "./utils";
 import TeamService from "./team";
+import {DBObjectId} from "./types/DBObjectId";
 
 const moment = require('moment');
 
@@ -196,11 +197,22 @@ export default class LeaderboardService {
             return null;
         }
 
+        const teamDefeated = (teamId: DBObjectId) => {
+            const team = this.teamService.getById(game, teamId);
+
+            if (!team) {
+                return false;
+            }
+
+            return team.players.every(pId => {
+                const player = this.playerService.getById(game, pId);
+                return player && player.defeated;
+            });
+        }
+
         const playerId = player._id.toString();
 
-        console.log(playerId);
-
-        return game.state.teamLeaderboard.findIndex(tId => {
+        return game.state.teamLeaderboard.filter(t => !teamDefeated(t)).findIndex(tId => {
             const team = this.teamService.getById(game, tId);
 
             return team && team.players.find(pId => pId.toString() === playerId);
@@ -212,7 +224,12 @@ export default class LeaderboardService {
             return null;
         }
 
-        return game.state.leaderboard.findIndex(l => l.toString() === player._id.toString()) + 1;
+        const playerDefeated = (pId: DBObjectId) => {
+            const player = this.playerService.getById(game, pId);
+            return player && player.defeated;
+        }
+
+        return game.state.leaderboard.filter(pId => !playerDefeated(pId)).findIndex(l => l.toString() === player._id.toString()) + 1;
     }
 
     getTeamLeaderboard(game: Game): TeamLeaderboard | null {
@@ -252,7 +269,17 @@ export default class LeaderboardService {
     }
 
     addTeamRankings(game: Game, gameUsers: User[], leaderboard: LeaderboardTeam[]): GameRankingResult {
-        const leadingTeam = leaderboard[0];
+        // Get first team that is not defeated
+        const leadingTeam = leaderboard.find(team => {
+            return team.team.players.map(pId => this.playerService.getById(game, pId)!).filter(p => !p.defeated).length > 0;
+        });
+
+        if (!leadingTeam) {
+            return {
+                ranks: [],
+                eloRating: null
+            };
+        }
 
         const nonAfkInLeadingTeam = leadingTeam.team.players
             .flatMap(pId => {
@@ -283,7 +310,6 @@ export default class LeaderboardService {
                 new: newRank
             }];
         });
-
 
         return {
             ranks,
@@ -401,11 +427,11 @@ export default class LeaderboardService {
             return null;
         }
         
-        let winningPlayer: Player = game.galaxy.players.find(p => p._id.toString() === game.state.winner!.toString())!;
-        let losingPlayer: Player = game.galaxy.players.find(p => p._id.toString() !== game.state.winner!.toString())!;
+        const winningPlayer: Player = game.galaxy.players.find(p => p._id.toString() === game.state.winner!.toString())!;
+        const losingPlayer: Player = game.galaxy.players.find(p => p._id.toString() !== game.state.winner!.toString())!;
 
-        let winningUser: User = gameUsers.find(u => winningPlayer.userId && u._id.toString() === winningPlayer.userId.toString())!;
-        let losingUser: User = gameUsers.find(u => losingPlayer.userId && u._id.toString() === losingPlayer.userId.toString())!;
+        const winningUser: User | undefined = gameUsers.find(u => winningPlayer.userId && u._id.toString() === winningPlayer.userId.toString());
+        const losingUser: User | undefined = gameUsers.find(u => losingPlayer.userId && u._id.toString() === losingPlayer.userId.toString());
 
         let winningUserOldRating = 1200;
         let losingUserOldRating = 1200;

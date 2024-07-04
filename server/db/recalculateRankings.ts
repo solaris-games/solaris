@@ -133,6 +133,12 @@ async function startup() {
 
             game.state.leaderboard = leaderboard.map(l => l.player._id);
 
+            if (container.gameTypeService.isTeamConquestGame(game)) {
+                let teamLeaderboard = container.leaderboardService.getTeamLeaderboard(game)!;
+
+                game.state.teamLeaderboard = teamLeaderboard.leaderboard.map(l => l.team._id);
+            }
+
             // Recalculate rank and victories
             container.gameTickService._awardEndGameRank(game, users, false);
         }
@@ -144,7 +150,8 @@ async function startup() {
                         _id: game._id
                     },
                     update: {
-                        'state.leaderboard': game.state.leaderboard
+                        'state.leaderboard': game.state.leaderboard,
+                        'state.teamLeaderboard': game.state.teamLeaderboard,
                     }
                 }
             }
@@ -152,9 +159,9 @@ async function startup() {
 
         await container.gameService.gameRepo.bulkWrite(leaderboardWrites);
 
-        page++;
-
         console.log(`Page ${page}/${totalPages}`);
+
+        page++;
     } while (page <= totalPages);
 
     console.log(`Done.`);

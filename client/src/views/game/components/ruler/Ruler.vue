@@ -328,7 +328,7 @@ export default {
       let index = this.points.indexOf(point)
 
       let distance = 0
-      
+
       for (let i = 0; i < index + 1; i++) {
         if (this.points[i + 1]) {
           distance += GameHelper.getDistanceBetweenLocations(this.points[i].location, this.points[i + 1].location)
@@ -342,8 +342,8 @@ export default {
   },
   computed: {
     warpGateCost () {
-      let starPoints = this.points.filter(p => p.type === 'star' && !p.object.warpGate && p.object.upgradeCosts)
-      let starIds = [...new Set(starPoints.map(p => p.object._id))]
+      const starPoints = this.points.filter(p => p.type === 'star' && !p.object.warpGate && p.object.upgradeCosts)
+      const starIds = [...new Set(starPoints.map(p => p.object._id))]
 
       let sum = 0
 
@@ -354,7 +354,11 @@ export default {
       return sum
     },
     speeds: function () {
-      let speedSpecialists = this.$store.state.carrierSpecialists.filter(i => i.modifiers && i.modifiers.local && i.modifiers.local.speed)
+      if (!this.$store.state.carrierSpecialists) {
+        return [];
+      }
+
+      const speedSpecialists = this.$store.state.carrierSpecialists.filter(i => i.modifiers && i.modifiers.local && i.modifiers.local.speed)
 
       return [...new Set(speedSpecialists.map(s => s.modifiers.local.speed))].sort()
     }

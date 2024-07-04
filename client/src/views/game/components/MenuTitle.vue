@@ -1,7 +1,7 @@
 <template>
 <div class="row pt-2">
     <div class="col">
-        <h4>{{ title }}</h4>
+        <h4 @click="titleClicked">{{ title }}</h4>
     </div>
     <div class="col-auto">
         <slot></slot>
@@ -18,6 +18,9 @@ export default {
   methods: {
     close () {
       this.$emit('onCloseRequested')
+    },
+    titleClicked () {
+      this.$emit('onTitleClicked')
     }
   }
 }

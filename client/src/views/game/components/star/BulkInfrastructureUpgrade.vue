@@ -66,11 +66,13 @@
                     :disabled="isChecking || isUpgrading">
               <option value="now">Now</option>
               <option value="future">Future</option>
+              <option value="cycle-start">Start of cycle</option>
+              <option value="cycle-end">End of cycle</option>
             </select>
           </div>
         </div>
-        <div class="row" v-if="selectedScheduleStrategy === 'future'">
-          <div class="mb-2 input-group col">
+        <div class="row" v-if="selectedScheduleStrategy === 'future' || selectedScheduleStrategy === 'cycle-end' || selectedScheduleStrategy === 'cycle-start'">
+          <div class="mb-2 input-group col" v-if="selectedScheduleStrategy === 'future'">
             <span class="input-group-text">
               <i class="fas fa-clock"></i>
             </span>
@@ -226,7 +228,7 @@ export default {
   },
   computed: {
     checkText() {
-      if (this.selectedScheduleStrategy === 'future') {
+      if (this.selectedScheduleStrategy === 'future' || this.selectedScheduleStrategy === 'cycle-end' || this.selectedScheduleStrategy === 'cycle-start') {
         return "Schedule"
       } else {
         return "Check"
@@ -298,7 +300,17 @@ export default {
       }
 
       this.isChecking = true
-      if (this.selectedScheduleStrategy === 'future') {
+      if (this.selectedScheduleStrategy === 'future' || this.selectedScheduleStrategy === 'cycle-end' || this.selectedScheduleStrategy === 'cycle-start') {
+        if (this.selectedScheduleStrategy === 'cycle-end') {
+          const cycleTicks = this.$store.state.game.settings.galaxy.productionTicks;
+          const currentTick = this.$store.state.game.state.tick;
+          this.tick = Math.ceil(currentTick / cycleTicks) * cycleTicks - 1;
+        } else if (this.selectedScheduleStrategy === 'cycle-start') {
+          const cycleTicks = this.$store.state.game.settings.galaxy.productionTicks;
+          const currentTick = this.$store.state.game.state.tick;
+          this.tick = Math.ceil(currentTick / cycleTicks) * cycleTicks;
+        }
+
         // When actions are scheduled in the future, they get added to the scheduled list.
         try {
           let response = await starService.scheduleBulkInfrastructureUpgrade(

@@ -5,6 +5,17 @@ import { Star } from "./types/Star";
 import SpecialistService from "./specialist";
 import GameTypeService from "./gameType";
 
+const DEFAULT_TECHNOLOGIES: ResearchTypeNotRandom[] = [
+    'terraforming',
+    'experimentation',
+    'banking',
+    'weapons',
+    'manufacturing',
+    'specialists',
+    'scanning',
+    'hyperspace'
+];
+
 export default class TechnologyService {
     specialistService: SpecialistService;
     gameTypeService: GameTypeService;
@@ -17,20 +28,27 @@ export default class TechnologyService {
         this.gameTypeService = gameTypeService;
     }
 
-    getEnabledTechnologies(game: Game) {
+    getResearchableTechnologies(game: Game) {
         let techs: ResearchTypeNotRandom[] = Object.keys(game.settings.technology.researchCosts).filter(k => {
             return k.match(/^[^_\$]/) != null;
         }) as ResearchTypeNotRandom[];
 
-        return techs.filter(t => this.isTechnologyEnabled(game, t));
+        return techs.filter(t => this.isTechnologyResearchable(game, t));
     }
 
+    // Enabled means: will this technology be in effect? It can be enabled, but not researchable (thereby fixed).
     isTechnologyEnabled(game: Game, techKey: ResearchTypeNotRandom) {
         return game.settings.technology.startingTechnologyLevel[techKey] > 0;
     }
 
     isTechnologyResearchable(game: Game, technologyKey: ResearchTypeNotRandom) {
-      return game.settings.technology.researchCosts[technologyKey] !== 'none'
+      return this.isTechnologyEnabled(game, technologyKey) && game.settings.technology.researchCosts[technologyKey] !== 'none'
+    }
+
+    getDefaultTechnology(game: Game): ResearchTypeNotRandom {
+        const researchableTechnologies = this.getResearchableTechnologies(game);
+
+        return DEFAULT_TECHNOLOGIES.find(t => researchableTechnologies.includes(t)) || 'weapons';
     }
 
     _applyTechModifiers(techs: PlayerTechnologyLevels, modifiers, sanitize: boolean = true) { // TODO: types
