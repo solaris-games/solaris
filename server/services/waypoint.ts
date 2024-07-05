@@ -52,7 +52,7 @@ export default class WaypointService {
     }
 
     async saveWaypoints(game: Game, player: Player, carrierId: DBObjectId, waypoints: CarrierWaypointBase[], looped: boolean) {
-        let carrier = this.carrierService.getById(game, carrierId);
+        const carrier = this.carrierService.getById(game, carrierId);
 
         if (!carrier) {
             throw new ValidationError(`Could not find carrier with id ${carrierId}`);
@@ -61,8 +61,8 @@ export default class WaypointService {
         return await this.saveWaypointsForCarrier(game, player, carrier, waypoints, looped);
     }
 
-    async saveWaypointsForCarrier(game: Game, player: Player, carrier: Carrier, waypoints: CarrierWaypointBase[], looped: boolean, writeToDB: boolean = true) {
-        if (looped == null) {
+    async saveWaypointsForCarrier(game: Game, player: Player, carrier: Carrier, waypoints: CarrierWaypointBase[], looped: boolean | null, writeToDB: boolean = true) {
+        if (looped === null) {
             looped = false;
         }
         
@@ -81,8 +81,8 @@ export default class WaypointService {
         // If the carrier is currently in transit then double check that the first waypoint
         // matches the source and destination.
         if (!carrier.orbiting) {
-            let currentWaypoint = carrier.waypoints[0];
-            let newFirstWaypoint = waypoints[0];
+            const currentWaypoint = carrier.waypoints[0];
+            const newFirstWaypoint = waypoints[0];
 
             if (!newFirstWaypoint 
                 || currentWaypoint.source.toString() !== newFirstWaypoint.source.toString()
@@ -93,16 +93,20 @@ export default class WaypointService {
             if (+newFirstWaypoint.delayTicks) {
                 throw new ValidationError('The first waypoint cannot have delay ticks if mid-flight.');
             }
+        } else {
+            if (carrier.orbiting.toString() !== waypoints[0].source.toString()) {
+                throw new ValidationError('The source star does not match the carrier location.');
+            }
         }
 
         // Validate new waypoints.
         for (let i = 0; i < waypoints.length; i++) {
-            let waypoint = waypoints[i];
+            const waypoint = waypoints[i];
 
-            let sourceStar = this.starService.getById(game, waypoint.source);
-            let destinationStar = this.starService.getById(game, waypoint.destination);
+            const sourceStar = this.starService.getById(game, waypoint.source);
+            const destinationStar = this.starService.getById(game, waypoint.destination);
 
-            let sourceStarName = sourceStar == null ? 'Unknown' : sourceStar.name; // Could be travelling from a destroyed star.
+            const sourceStarName = sourceStar == null ? 'Unknown' : sourceStar.name; // Could be travelling from a destroyed star.
 
             // Make sure the user isn't being a dumbass.
             waypoint.actionShips = waypoint.actionShips || 0;
@@ -185,11 +189,11 @@ export default class WaypointService {
     }
 
     _waypointRouteIsWithinHyperspaceRange(game: Game, carrier: Carrier, waypoint: CarrierWaypointBase) {
-        let sourceStar = this.starService.getById(game, waypoint.source);
-        let destinationStar = this.starService.getById(game, waypoint.destination);
+        const sourceStar = this.starService.getById(game, waypoint.source);
+        const destinationStar = this.starService.getById(game, waypoint.destination);
 
         // Stars may have been destroyed.
-        if (sourceStar == null || destinationStar == null) {
+        if (!sourceStar || !destinationStar) {
             return false;
         }
 
