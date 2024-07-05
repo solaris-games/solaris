@@ -95,7 +95,8 @@ export default class ScheduleBuyService extends EventEmitter {
         for (let action of percentageActions) {
             const percentageToCredits = Math.floor((action.amount / Math.max(totalPercentage, 100)) * player.credits);
 
-            const report = await this.starUpgradeService.generateUpgradeBulkReport(game, player, action.buyType, action.infrastructureType, percentageToCredits);
+            // pass as total credits since percentage was already calculated
+            const report = await this.starUpgradeService.generateUpgradeBulkReport(game, player, 'totalCredits', action.infrastructureType, percentageToCredits);
 
             if (report.cost > player.credits) {
                 continue;
