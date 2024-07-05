@@ -104,6 +104,14 @@ export const mapToScheduledStarUpgradeInfrastructureBulkRequest = (body: any): S
     body.amount = +body.amount;
     body.tick = +body.tick;
 
+    if (body.amount < 0) {
+        errors.push('Amount must be greater than 0.');
+    }
+
+    if (body.tick < 0) {
+        errors.push('Tick must be greater than 0.');
+    }
+
     return {
         infrastructureType: body.infrastructureType,
         buyType: body.buyType,
