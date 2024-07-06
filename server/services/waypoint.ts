@@ -93,7 +93,7 @@ export default class WaypointService {
             if (+newFirstWaypoint.delayTicks) {
                 throw new ValidationError('The first waypoint cannot have delay ticks if mid-flight.');
             }
-        } else {
+        } else if (waypoints?.length > 0) {
             if (carrier.orbiting.toString() !== waypoints[0].source.toString()) {
                 throw new ValidationError('The source star does not match the carrier location.');
             }
