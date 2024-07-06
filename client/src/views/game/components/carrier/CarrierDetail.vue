@@ -5,7 +5,7 @@
       <modalButton modalName="scuttleCarrierModal" v-if="!$isHistoricalMode() && canScuttleCarrier" classText="btn btn-sm btn-outline-danger ms-1">
         <i class="fas fa-rocket"></i> <i class="fas fa-trash ms-1"></i>
       </modalButton>
-      <button v-if="!$isHistoricalMode() && isOwnedByUserPlayer && isGameInProgress" @click="onCarrierRenameRequested" class="btn btn-sm btn-outline-success ms-1"><i class="fas fa-pencil-alt"></i></button>
+      <button v-if="!$isHistoricalMode() && isOwnedByUserPlayer" @click="onCarrierRenameRequested" class="btn btn-sm btn-outline-success ms-1"><i class="fas fa-pencil-alt"></i></button>
       <button @click="viewOnMap" class="btn btn-sm btn-outline-info ms-1"><i class="fas fa-eye"></i></button>
     </menu-title>
 
@@ -68,7 +68,7 @@
         </div>
         <div class="col-auto">
           <span title="The total number of waypoints the carrier has - Plot waypoints to capture stars">
-            {{carrier.waypoints.length}} 
+            {{carrier.waypoints.length}}
             <i class="fas fa-map-marker-alt ms-1" v-if="!carrier.waypointsLooped"></i>
             <i class="fas fa-sync ms-1" v-if="carrier.waypointsLooped"></i>
           </span>
@@ -156,7 +156,7 @@
       </div>
 
       <div v-if="(hasWaypoints && isStandardUIStyle) || (hasWaypoints && isUserPlayerCarrier)" class="row pt-0 pb-0 mb-0">
-        <waypointTable :carrier="carrier" 
+        <waypointTable :carrier="carrier"
           @onEditWaypointRequested="onEditWaypointRequested"
           @onEditWaypointsRequested="editWaypoints"
           @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
@@ -278,7 +278,7 @@ export default {
   methods: {
     onCloseRequested (e) {
       GameContainer.map.unselectAllCarriers()
-      
+
       this.$emit('onCloseRequested', e)
     },
     onViewCompareIntelRequested (e) {
@@ -342,7 +342,7 @@ export default {
       // TODO: Verify that the last waypoint is within hyperspace range of the first waypoint.
       try {
         this.isLoopingWaypoints = true
-        let response = await CarrierApiService.loopWaypoints(this.$store.state.game._id, this.carrier._id, !this.carrier.waypointsLooped)
+        const response = await CarrierApiService.loopWaypoints(this.$store.state.game._id, this.carrier._id, !this.carrier.waypointsLooped)
 
         if (response.status === 200) {
           this.$toasted.show(`${this.carrier.name} waypoints updated.`)
@@ -365,7 +365,7 @@ export default {
       this.isGiftingCarrier = true
 
       try {
-        let response = await CarrierApiService.convertToGift(this.$store.state.game._id, this.carrierId)
+        const response = await CarrierApiService.convertToGift(this.$store.state.game._id, this.carrierId)
 
         if (response.status === 200) {
           // TODO: Maybe better to come from the server instead of repeating
@@ -373,7 +373,7 @@ export default {
           this.carrier.isGift = true
           this.carrier.waypointsLooped = false;
 
-          let firstWaypoint = this.carrier.waypoints[0];
+          const firstWaypoint = this.carrier.waypoints[0];
 
           firstWaypoint.action = 'nothing';
           firstWaypoint.actionShips = 0;
@@ -412,14 +412,14 @@ export default {
       this.onOpenStarDetailRequested(this.getCarrierOrbitingStar()._id)
     },
     onOpenSourceStarDetailRequested (e) {
-      let star = this.getFirstWaypointSource()
+      const star = this.getFirstWaypointSource()
 
       if (star) {
         this.onOpenStarDetailRequested(this.carrier.waypoints[0].source)
       }
     },
     onOpenDestinationStarDetailRequested (e) {
-      let star = this.getFirstWaypointDestination()
+      const star = this.getFirstWaypointDestination()
 
       if (star) {
         this.onOpenStarDetailRequested(this.carrier.waypoints[0].destination)
@@ -436,7 +436,7 @@ export default {
     },
     async confirmScuttleCarrier (e) {
       try {
-        let response = await CarrierApiService.scuttle(this.$store.state.game._id, this.carrier._id)
+        const response = await CarrierApiService.scuttle(this.$store.state.game._id, this.carrier._id)
 
         if (response.status === 200) {
           this.$toasted.show(`${this.carrier.name} has been scuttled. All ships will be destroyed.`)
@@ -456,10 +456,10 @@ export default {
   },
   computed: {
     canGiftCarrier: function () {
-      return this.$store.state.game.settings.specialGalaxy.giftCarriers === 'enabled' 
-        && this.isUserPlayerCarrier 
-        && !this.carrier.isGift 
-        && !this.userPlayer.defeated 
+      return this.$store.state.game.settings.specialGalaxy.giftCarriers === 'enabled'
+        && this.isUserPlayerCarrier
+        && !this.carrier.isGift
+        && !this.userPlayer.defeated
         && !GameHelper.isGameFinished(this.$store.state.game)
     },
     canScuttleCarrier: function () {
@@ -487,17 +487,17 @@ export default {
       return this.canShowSpecialist
         && this.carrier.orbiting
         && this.isStarOwnedByUserPlayer
-        && !GameHelper.isGameFinished(this.$store.state.game) 
+        && !GameHelper.isGameFinished(this.$store.state.game)
         && !this.isDeadStar
         && (!this.carrier.specialistId || !this.carrier.specialist.oneShot)
     },
     isOwnedByUserPlayer: function () {
-      let owner = GameHelper.getCarrierOwningPlayer(this.$store.state.game, this.carrier)
+      const owner = GameHelper.getCarrierOwningPlayer(this.$store.state.game, this.carrier)
 
       return owner && this.userPlayer && owner._id === this.userPlayer._id
     },
     isStarOwnedByUserPlayer: function () {
-      let owner = GameHelper.getStarOwningPlayer(this.$store.state.game, this.getCarrierOrbitingStar())
+      const owner = GameHelper.getStarOwningPlayer(this.$store.state.game, this.getCarrierOrbitingStar())
 
       return owner && this.userPlayer && owner._id === this.userPlayer._id
     },
