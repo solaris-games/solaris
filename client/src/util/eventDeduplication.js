@@ -12,7 +12,7 @@ export const attachEventDeduplication = (topLevel, targetView) => {
   }, true);
 
   topLevel.addEventListener('click', (e) => {
-    if (lastEvent && e.clientX === lastEvent.clientX && e.clientY === lastEvent.clientY && e.timeStamp <= lastEvent.timeStamp + 100) {
+    if (lastEvent && e.timeStamp <= lastEvent.timeStamp + 100) {
       e.stopPropagation();
     }
 
