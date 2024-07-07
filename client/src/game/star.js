@@ -782,28 +782,37 @@ class Star extends EventEmitter {
   }
 
   onClicked(e, tryMultiSelect = true) {
-    let eventData = e ? e.data : null
+    const eventData = e ? e.data : null
 
-    if (e && e.data && e.data.originalEvent && e.data.originalEvent.button === 2) {
-      this.emit('onStarRightClicked', {
-        starData: this.data,
-        eventData
-      })
-    } else {
-      this.emit('onStarClicked', {
-        starData: this.data,
-        tryMultiSelect,
-        eventData,
-        permitCallback: () => {
-          // Need to do this otherwise sometimes text gets highlighted.
-          this.deselectAllText()
+    if (e?.data?.originalEvent) {
+      const button = e.data.originalEvent.button;
 
-          if (this._getStarPlayer()) {
-            this.updateVisibility()
-            // this.setScale()
+      if (button === 2) {
+        this.emit('onStarRightClicked', {
+          starData: this.data,
+          eventData
+        });
+      } else if (button === 1) {
+        this.emit('onStarDefaultClicked', {
+          starData: this.data,
+          eventData
+        });
+      } else {
+        this.emit('onStarClicked', {
+          starData: this.data,
+          tryMultiSelect,
+          eventData,
+          permitCallback: () => {
+            // Need to do this otherwise sometimes text gets highlighted.
+            this.deselectAllText()
+
+            if (this._getStarPlayer()) {
+              this.updateVisibility()
+              // this.setScale()
+            }
           }
-        }
-      })
+        })
+      }
     }
   }
 
