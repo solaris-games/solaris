@@ -97,6 +97,7 @@ export default {
     this.sockets.unsubscribe('playerRenownReceived')
     this.sockets.unsubscribe('playerTechnologyReceived')
 
+    this.$store.commit('resetMentions')
     this.$store.commit('closeConversation')
   },
   async mounted () {

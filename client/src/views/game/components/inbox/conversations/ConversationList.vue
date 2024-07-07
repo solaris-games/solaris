@@ -21,7 +21,7 @@
     </div>
 
     <div class="pt-2">
-        <conversation-preview 
+        <conversation-preview
           v-for="conversation in orderedConversations"
           v-bind:key="conversation._id"
           :conversation="conversation"
