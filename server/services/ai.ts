@@ -30,12 +30,6 @@ const FIRST_TICK_BULK_UPGRADE_SCI_PERCENTAGE = 20;
 const FIRST_TICK_BULK_UPGRADE_IND_PERCENTAGE = 30;
 const LAST_TICK_BULK_UPGRADE_ECO_PERCENTAGE = 100;
 
-const EMPTY_STAR_SCORE_MULTIPLIER = 1;
-const ENEMY_STAR_SCORE_MULTIPLIER = 5;
-
-const REINFORCEMENT_MIN_CYCLES = 1.5;
-const REINFORCEMENT_MIN_FACTOR = 1.4;
-
 const INVASION_ATTACK_FACTOR = 1.5;
 
 const BORDER_STAR_ANGLE_THRESHOLD_DEGREES = 120;
@@ -642,9 +636,13 @@ export default class AIService {
                     if (assignment.totalShips >= requiredShips) {
                         const carrierResult = await this._useAssignment(context, game, player, assignments, assignment, this._createWaypointsFromTrace(trace), requiredShips);
 
+                        if (!carrierResult) {
+                            continue;
+                        }
+
                         player.aiState!.invasionsInProgress.push({
                             star: order.star,
-                            arrivalTick: game.state.tick + carrierResult.ticksEtaTotal!
+                            arrivalTick: game.state.tick + (carrierResult.ticksEtaTotal || 0)
                         });
 
                         break;
@@ -689,11 +687,6 @@ export default class AIService {
         player.aiState!.startedClaims = claimsInProgress;
     }
 
-    _nextArrivingCarrierIn(context: Context, game: Game, starId: string): number | undefined {
-        const carriers = context.arrivingAtCarriers.get(starId);
-        return carriers && minBy(c => this.waypointService.calculateWaypointTicks(game, c, c.waypoints[0]), carriers)
-    }
-
     async _useAssignment(context: Context, game: Game, player: Player, assignments: Map<string, Assignment>, assignment: Assignment, waypoints: CarrierWaypoint[], ships: number, onCarrierUsed: ((Carrier) => void) | null = null) {
         let shipsToTransfer = ships;
         const starId = assignment.star._id;
@@ -701,6 +694,8 @@ export default class AIService {
 
         if (carrier) {
             assignment.carriers.shift();
+        } else if (this.starService.isDeadStar(assignment.star)) {
+            return;
         } else {
             const buildResult = await this.starUpgradeService.buildCarrier(game, player, starId, 1, false);
             carrier = this.carrierService.getById(game, buildResult.carrier._id);
@@ -1144,10 +1139,6 @@ export default class AIService {
         return orders;
     }
 
-    _isUnderAttack(context: Context, starId: string): boolean {
-        return context.attackedStarIds.has(starId);
-    }
-
     _computeStarPriorities(context: Context, game: Game, player: Player): Map<string, number> {
         const starsForExpansion = new Array<[string, BorderStarData]>();
         const starsWithHostileBorder = new Array<[string, BorderStarData]>();
@@ -1263,7 +1254,8 @@ export default class AIService {
             const movement = movements.shift()!;
 
             let carrier: Carrier | null = null;
-            const carriersAtSource = this.carrierService.getCarriersAtStar(game, movement.from._id).filter(carrier => carrier.waypoints.length === 0);
+            const carriersAtSource = this.carrierService.getCarriersAtStar(game, movement.from._id)
+                .filter(carrier => carrier.ownedByPlayerId?.toString() === player._id.toString() && carrier.waypoints.length === 0);
 
             if (!carriersAtSource.length) {
                 const productionPerTick = this.shipService.calculateStarShipProduction(game, movement.from, productionCap);
