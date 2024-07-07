@@ -25,9 +25,6 @@ export default {
   props: {
     conversationId: String,
   },
-  destroyed() {
-    this.$store.commit('resetMentions')
-  },
   data () {
     return {
       isSendingMessage: false,

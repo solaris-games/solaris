@@ -165,10 +165,10 @@ class Map extends EventEmitter {
     if (this._isOrbitalMapEnabled()) {
       this.orbitalLayer = new OrbitalLocationLayer()
       this.orbitalLayer.setup(game)
-  
+
       this.orbitalContainer.addChild(this.orbitalLayer.container)
     }
-    
+
     // Setup Chunks
     this._setupChunks()
 
@@ -188,6 +188,7 @@ class Map extends EventEmitter {
 
       star.on('onStarClicked', this.onStarClicked.bind(this))
       star.on('onStarRightClicked', this.onStarRightClicked.bind(this))
+      star.on('onStarDefaultClicked', this.onStarDefaultClicked.bind(this))
       star.on('onStarMouseOver', this.onStarMouseOver.bind(this))
       star.on('onStarMouseOut', this.onStarMouseOut.bind(this))
       star.on('onSelected', this.onStarSelected.bind(this))
@@ -525,7 +526,7 @@ class Map extends EventEmitter {
     carrier.removeAllListeners()
     carrier.cleanupEventHandlers()
     carrier.clearPaths()
-    
+
     this.carrierContainer.removeChild(carrier.fixedContainer)
 
     this.removeMapObjectFromChunks(carrier, this.chunks)
@@ -677,7 +678,7 @@ class Map extends EventEmitter {
 
     let viewportXRadius = viewportWidth / 2.0
     let viewportYRadius = viewportHeight / 2.0
-    
+
     let viewportCenter = this.gameContainer.viewport.center
 
     this.lastViewportCenter = this.currentViewportCenter || null
@@ -711,7 +712,7 @@ class Map extends EventEmitter {
         if(
         (ix>=(firstX-this.firstChunkX))&&(ix<=(lastX-this.firstChunkX)) &&
         (iy>=(firstY-this.firstChunkY))&&(iy<=(lastY-this.firstChunkY))
-        ) 
+        )
         {
           if( !this.chunks[ix][iy].visible ) {
             this.chunks[ix][iy].visible = true
@@ -770,25 +771,38 @@ class Map extends EventEmitter {
       permitCallback: () => {
         dic.permitCallback && dic.permitCallback()
 
-        // Clicking stars should only raise events to the UI if in galaxy mode.
-        if (this.mode === 'galaxy') {
-          let selectedStar = this.stars.find(x => x.data._id === e._id)
-
-          this.unselectAllCarriers()
-          this.unselectAllStarsExcept(selectedStar)
-
-          if (!dic.tryMultiSelect || !this.tryMultiSelect(e.location)) {
-            selectedStar.toggleSelected()
-            this.emit('onStarClicked', e)
-          }
-        } else if (this.mode === 'waypoints') {
-          this.waypoints.onStarClicked(e)
-        } else if (this.mode === 'ruler') {
-          this.rulerPoints.onStarClicked(e)
-        }
-        AnimationService.drawSelectedCircle(this.app, this.container, e.location)
+        this.selectStar(e, dic);
       }
     })
+  }
+
+  selectStar (e, dic) {
+    // Clicking stars should only raise events to the UI if in galaxy mode.
+    if (this.mode === 'galaxy') {
+      let selectedStar = this.stars.find(x => x.data._id === e._id)
+
+      this.unselectAllCarriers()
+      this.unselectAllStarsExcept(selectedStar)
+
+      if (!dic.tryMultiSelect || !this.tryMultiSelect(e.location)) {
+        selectedStar.toggleSelected()
+        this.emit('onStarClicked', e)
+      }
+    } else if (this.mode === 'waypoints') {
+      this.waypoints.onStarClicked(e)
+    } else if (this.mode === 'ruler') {
+      this.rulerPoints.onStarClicked(e)
+    }
+    AnimationService.drawSelectedCircle(this.app, this.container, e.location)
+  }
+
+  onStarDefaultClicked (dic) {
+    // ignore clicks if its a drag motion
+    let e = dic.starData
+    if (dic.eventData && this.isDragMotion(dic.eventData.global)) { return }
+
+    dic.permitCallback && dic.permitCallback()
+    this.selectStar(e, dic);
   }
 
   onStarRightClicked (dic) {
@@ -804,7 +818,7 @@ class Map extends EventEmitter {
       player: owningPlayer,
       permitCallback: () => {
         dic.permitCallback && dic.permitCallback()
-        
+
         if (this.mode === 'galaxy') {
           this.emit('onStarRightClicked', e)
         }
