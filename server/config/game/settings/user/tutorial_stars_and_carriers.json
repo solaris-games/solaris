@@ -1,8 +1,8 @@
 {
   "general": {
-    "name": "Tutorial - Learn to Play",
-    "description": "Learn how to build carriers and capture stars to win the game.",
-    "createdFromTemplate": "original",
+    "name": "Stars and Carriers",
+    "description": "Purchase a carrier, move the carrier and capture neutral stars.",
+    "createdFromTemplate": "stars-and-carriers",
     "type": "tutorial",
     "mode": "conquest",
     "password": null,
@@ -10,10 +10,9 @@
     "playerType": "all",
     "anonymity": "extra",
     "playerOnlineStatus": "hidden",
-    "playerIPWarning": "enabled",
     "timeMachine": "disabled",
     "fluxEnabled": "disabled",
-    "advancedAI": "enabled",
+    "advancedAI": "disabled",
     "spectators": "disabled",
     "readyToQuit": "disabled"
   },
@@ -50,7 +49,7 @@
   },
   "conquest": {
     "victoryCondition": "starPercentage",
-    "victoryPercentage": 100,
+    "victoryPercentage": 50,
     "capitalStarElimination": "disabled"
   },
   "orbitalMechanics": {
@@ -84,8 +83,8 @@
   "diplomacy": {
     "enabled": "disabled",
     "upkeepCost": "none",
-    "tradeRestricted": "disabled", 
-    "maxAlliances": 1, 
+    "tradeRestricted": "disabled",
+    "maxAlliances": 1,
     "globalEvents": "disabled"
   },
   "technology": {
@@ -110,7 +109,6 @@
       "specialists": "standard"
     },
     "bankingReward": "standard",
-    "experimentationDistribution": "random",
     "experimentationReward": "standard",
     "specialistTokenReward": "standard"
   },

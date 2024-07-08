@@ -103,6 +103,7 @@ import { Report } from './types/Report';
 import TeamService from "./team";
 import UserLeaderboardService from './userLeaderboard';
 import GameLockService from "./gameLock";
+import TutorialService from './tutorial';
 
 const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
@@ -209,6 +210,7 @@ export default (config): DependencyContainer => {
     const reportService = new ReportService(ReportModel, reportRepository, playerService, conversationService, userService, gameListService, gameService);
 
     const notificationService = new NotificationService(config, userRepository, gameRepository, discordService, conversationService, gameService, gameJoinService, gameTickService, researchService, tradeService);
+    const tutorialService = new TutorialService(userService);
 
     console.log('Dependency container initialized.');
     
@@ -289,6 +291,7 @@ export default (config): DependencyContainer => {
         spectatorService,
         scheduleBuyService,
         teamService,
+        tutorialService,
         pathfindingService,
     };
 };

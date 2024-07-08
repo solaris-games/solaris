@@ -75,6 +75,7 @@ import UserLeaderboardService from "../userLeaderboard";
 import TeamService from "../team";
 import GameAuthService from "../gameAuth";
 import GameLockService from "../gameLock";
+import TutorialService from "../tutorial";
 
 export interface DependencyContainer {
     config: Config,
@@ -154,4 +155,5 @@ export interface DependencyContainer {
     teamService: TeamService,
     pathfindingService: PathfindingService,
     scheduleBuyService: ScheduleBuyService,
+    tutorialService: TutorialService,
 };
