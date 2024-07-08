@@ -8,7 +8,6 @@ import { DBObjectId } from './types/DBObjectId';
 import {Game, Team} from './types/Game';
 import { Location } from './types/Location';
 import { Player, PlayerColour, PlayerColourShapeCombination, PlayerShape, ResearchTypeNotRandom } from './types/Player';
-import { Star } from './types/Star';
 import CarrierService from './carrier';
 import GameTypeService from './gameType';
 import MapService from './map';
@@ -21,8 +20,13 @@ import TechnologyService from './technology';
 import TeamService from "./team";
 import ValidationError from '../errors/validation';
 
+type ColourSpec = {
+    alias: string;
+    shades: string[];
+}
+
 const SHAPES: PlayerShape[] = ['circle', 'square', 'diamond', 'hexagon'];
-const COLOURS: PlayerColour[] = require('../config/game/colours').slice();
+const COLOURS: ColourSpec[] = require('../config/game/colours').slice();
 
 export default class PlayerService extends EventEmitter {
     gameRepo: Repository<Game>;
@@ -107,8 +111,9 @@ export default class PlayerService extends EventEmitter {
     }
 
     createEmptyPlayer(game: Game, colour: PlayerColour, shape: PlayerShape): Player {
-        let researchingNow: ResearchTypeNotRandom = 'terraforming';
-        let researchingNext: ResearchTypeNotRandom = 'terraforming';
+        const defaultTech = this.technologyService.getDefaultTechnology(game);
+        const researchingNow: ResearchTypeNotRandom = defaultTech;
+        const researchingNext: ResearchTypeNotRandom = defaultTech;
 
         let player: Player = {
             _id: mongoose.Types.ObjectId(),
@@ -153,9 +158,8 @@ export default class PlayerService extends EventEmitter {
             reputations: [],
             diplomacy: [],
             spectators: [],
+            scheduledActions: []
         };
-
-        this._setDefaultResearchTechnology(game, player as any);
 
         return player;
     }
@@ -229,13 +233,15 @@ export default class PlayerService extends EventEmitter {
     }
 
     _generateTeamColourShapeList(teamCount: number, playersPerTeam: number): Record<number, PlayerColourShapeCombination[]> {
-        const shapesCount = SHAPES.length;
         const coloursCount = COLOURS.length;
 
-        const available = {};
+        const available: Record<string, { shape: PlayerShape, shade: string }[]> = {};
 
-        for (const colour of COLOURS) {
-            available[colour.alias] = SHAPES.slice();
+        for (const cs of COLOURS) {
+            available[cs.alias] = cs.shades.map((shade, idx) => ({
+                shade,
+                shape: SHAPES[idx]
+            }));
         }
 
         let colourIdx = 0;
@@ -246,17 +252,23 @@ export default class PlayerService extends EventEmitter {
             const combinations: PlayerColourShapeCombination[] = [];
 
             while (fulfilled < playersPerTeam) {
-                const teamColour = COLOURS[colourIdx % coloursCount];
+                const teamColourSpec = COLOURS[colourIdx % coloursCount];
 
-                const availableShapes = available[teamColour.alias];
+                const availableShadesAndShapes = available[teamColourSpec.alias];
 
-                if (!availableShapes.length) {
+                if (!availableShadesAndShapes.length) {
                     colourIdx++;
                     continue;
                 }
 
-                const shape = availableShapes.pop()!;
-                combinations.push({ shape, colour: teamColour });
+                const shadeAndShape = availableShadesAndShapes.pop()!;
+                combinations.push({
+                    shape: shadeAndShape.shape,
+                    colour: {
+                        alias: teamColourSpec.alias,
+                        value: shadeAndShape.shade,
+                    }
+                });
                 fulfilled++;
             }
 
@@ -268,16 +280,17 @@ export default class PlayerService extends EventEmitter {
     }
 
     _generatePlayerColourShapeList(playerCount: number): PlayerColourShapeCombination[] {
-        const combinations: PlayerColourShapeCombination[] = [];
-
-        for (let shape of SHAPES) {
-            for (let colour of COLOURS) {
-                combinations.push({
-                    shape,
-                    colour
-                });
-            }
-        }
+        const combinations: PlayerColourShapeCombination[] =
+            COLOURS.flatMap(spec =>
+                spec.shades.map((shade, idx) => {
+                    return {
+                        shape: SHAPES[idx],
+                        colour: {
+                            alias: spec.alias,
+                            value: shade,
+                        }
+                    };
+                }));
 
         const result: PlayerColourShapeCombination[] = [];
 
@@ -402,11 +415,15 @@ export default class PlayerService extends EventEmitter {
         player.isOpenSlot = true;
         player.spectators = [];
 
+        // TODO: What to do with custom galaxies?
+
         // Reset the player's research
-        this._setDefaultResearchTechnology(game, player);
+        const defaultTech = this.technologyService.getDefaultTechnology(game);
+        player.researchingNow = defaultTech;
+        player.researchingNext = defaultTech;
 
         // Reset the player's stars.
-        let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+        const playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
         for (let star of playerStars) {
             this.starService.setupPlayerStarForGameStart(game, star, player);
@@ -488,13 +505,6 @@ export default class PlayerService extends EventEmitter {
         startingLocation.y += galaxyCenter.y;
 
         return startingLocation;
-    }
-
-    _setDefaultResearchTechnology(game: Game, player: Player) {
-        let enabledTechs = this.technologyService.getEnabledTechnologies(game);
-
-        player.researchingNow = enabledTechs[0] || 'weapons';
-        player.researchingNext = player.researchingNow;
     }
 
     createHomeStarCarriers(game: Game) {

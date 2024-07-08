@@ -28,8 +28,9 @@
     <div class="messages-container">
       <div class="pt-0 mb-2 mt-2" v-if="toggleDisplay && filteredMessages.length">
         <div v-for="message in filteredMessages" v-bind:key="message._id" class="mb-1">
-          <conversation-message v-if="message.type === 'message'" :conversation="conversation" :message="message" 
+          <conversation-message v-if="message.type === 'message'" :conversation="conversation" :message="message"
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+            @onOpenReportPlayerRequested="onOpenReportPlayerRequested"
             @onMinimizeConversationRequested="toggleConversationWindow"/>
           <conversation-trade-event v-if="message.type !== 'message'" :event="message"/>
         </div>
@@ -96,6 +97,7 @@ export default {
     this.sockets.unsubscribe('playerRenownReceived')
     this.sockets.unsubscribe('playerTechnologyReceived')
 
+    this.$store.commit('resetMentions')
     this.$store.commit('closeConversation')
   },
   async mounted () {
@@ -109,6 +111,9 @@ export default {
     },
     onOpenInboxRequested (e) {
       eventBus.$emit('onOpenInboxRequested', e)
+    },
+    onOpenReportPlayerRequested (e) {
+      this.$emit('onOpenReportPlayerRequested', e)
     },
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', e)
@@ -213,7 +218,7 @@ export default {
         if (response.status === 200) {
           this.conversation = response.data
           this.$store.commit('openConversation', this.conversationId)
-        
+
           this.scrollToEnd()
         }
       } catch (e) {
@@ -231,7 +236,7 @@ export default {
       if (await this.$confirm('Leave conversation', `Are you sure you want to leave this conversation?`)) {
         try {
           await ConversationApiService.leave(this.$store.state.game._id, this.conversation._id)
-          
+
           this.onOpenInboxRequested()
         } catch (err) {
           console.error(err)
@@ -271,7 +276,7 @@ export default {
     overflow: auto;
   }
 }
-@media screen and (min-width: 992px) { 
+@media screen and (min-width: 992px) {
   .menu-page-header {
     position: fixed;
     z-index: 1;

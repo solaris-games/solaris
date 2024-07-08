@@ -9,6 +9,7 @@
     "playerType": "all",
     "anonymity": "normal",
     "playerOnlineStatus": "visible",
+    "playerIPWarning": "enabled",
     "timeMachine": "enabled",
     "fluxEnabled": "disabled",
     "advancedAI": "disabled",
@@ -109,9 +110,10 @@
       "weapons": "none",
       "specialists": "standard"
     },
+    "experimentationDistribution": "random",
     "bankingReward": "standard",
     "experimentationReward": "standard",
-    "specialistTokenReward": "standard"
+    "specialistTokenReward": "experimental"
   },
   "gameTime": {
     "gameType": "turnBased",

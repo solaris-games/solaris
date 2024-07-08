@@ -359,6 +359,15 @@ export default (container: DependencyContainer) => {
                 return next(err);
             }
         },
+        forceStart: async (req, res, next) => {
+            try {
+                await container.gameService.forceStart(req.game, req.session.userId);
+
+                return res.sendStatus(200);
+            }  catch (err) {
+                return next(err);
+            }
+        },
         getPlayerUser: async (req, res, next) => {
             try {
                 let user = await container.gameService.getPlayerUser(

@@ -35,7 +35,7 @@ export default class StarDistanceService {
 
     getClosestStars(star: Star, stars: Star[], amount: number) {
         let sorted = stars
-            .filter(s => s._id !== star._id) // Exclude the current star.
+            .filter(s => s._id.toString() !== star._id.toString()) // Exclude the current star.
             .sort((a, b) => {
                 return this.getDistanceBetweenStars(star, a)
                     - this.getDistanceBetweenStars(star, b);
@@ -46,7 +46,7 @@ export default class StarDistanceService {
 
     getClosestUnownedStars(star: Star, stars: Star[], amount: number) {
         let sorted = stars
-            .filter(s => s._id !== star._id) // Exclude the current star.
+            .filter(s => s._id.toString() !== star._id.toString()) // Exclude the current star.
             .filter(s => !s.ownedByPlayerId)
             .sort((a, b) => {
                 return this.getDistanceBetweenStars(star, a)
@@ -62,7 +62,7 @@ export default class StarDistanceService {
 
     getClosestOwnedStars(star: Star, stars: Star[]) {
         return stars
-            .filter(s => s._id !== star._id) // Exclude the current star.
+            .filter(s => s._id.toString() !== star._id.toString()) // Exclude the current star.
             .filter(s => s.ownedByPlayerId)
             .sort((a, b) => {
                 return this.getDistanceBetweenStars(star, a)
@@ -110,7 +110,7 @@ export default class StarDistanceService {
 
     getStarsWithinRadiusOfStar(star: Star, stars: Star[], radius: number) {
         let nearby = stars
-            .filter(s => (s._id !== star._id) && (this.getDistanceBetweenStars(star, s) <= radius))
+            .filter(s => (s._id.toString() !== star._id.toString()) && (this.getDistanceBetweenStars(star, s) <= radius))
         
         return nearby;
     }

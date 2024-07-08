@@ -2,7 +2,7 @@ const EventEmitter = require('events');
 import ValidationError from '../errors/validation';
 import Repository from './repository';
 import { Game } from './types/Game';
-import { Player, ResearchType, ResearchTypeNotRandom } from './types/Player';
+import {Player, ResearchProgress, ResearchType, ResearchTypeNotRandom} from './types/Player';
 import { User } from './types/User';
 import GameTypeService from './gameType';
 import PlayerStatisticsService from './playerStatistics';
@@ -45,8 +45,7 @@ export default class ResearchService extends EventEmitter {
     }
 
     async updateResearchNow(game: Game, player: Player, preference: ResearchTypeNotRandom) {
-        if (!this.technologyService.isTechnologyEnabled(game, preference)
-            || !this.technologyService.isTechnologyResearchable(game, preference)) {
+        if (!this.technologyService.isTechnologyResearchable(game, preference)) {
             throw new ValidationError(`Cannot change technology, the chosen tech is not researchable.`);
         }
 
@@ -72,8 +71,7 @@ export default class ResearchService extends EventEmitter {
 
     async updateResearchNext(game: Game, player: Player, preference: ResearchType) {
         if (preference !== 'random' &&
-            (!this.technologyService.isTechnologyEnabled(game, preference) ||
-            !this.technologyService.isTechnologyResearchable(game, preference))) {
+            (!this.technologyService.isTechnologyResearchable(game, preference))) {
             throw new ValidationError(`Cannot change technology, the chosen tech is not researchable.`);
         }
 
@@ -97,12 +95,11 @@ export default class ResearchService extends EventEmitter {
         };
     }
 
-    async conductResearch(game: Game, user: User | null, player: Player) {
+    conductResearch(game: Game, user: User | null, player: Player) {
         let techKey = player.researchingNow;
         let tech = player.research[techKey];
 
-        if (!this.technologyService.isTechnologyEnabled(game, techKey) || 
-            !this.technologyService.isTechnologyResearchable(game, techKey)) {
+        if (!this.technologyService.isTechnologyResearchable(game, techKey)) {
             return null;
         }
 
@@ -161,7 +158,7 @@ export default class ResearchService extends EventEmitter {
         return report;
     }
 
-    async conductResearchAll(game: Game, gameUsers: User[]) {
+    conductResearchAll(game: Game, gameUsers: User[]) {
         // Add the current level of experimentation to the current 
         // tech being researched.
         for (let i = 0; i < game.galaxy.players.length; i++) {
@@ -169,7 +166,7 @@ export default class ResearchService extends EventEmitter {
 
             let user = gameUsers.find(u => player.userId && u._id.toString() === player.userId.toString()) || null;
             
-            await this.conductResearch(game, user, player);
+            this.conductResearch(game, user, player);
         }
     }
 
@@ -189,8 +186,8 @@ export default class ResearchService extends EventEmitter {
     conductExperiments(game: Game, player: Player) {
         // NOTE: Experiments do not count towards player research achievements.
         // Check if experimentation is enabled.
-        let isExperimentationEnabled = this.technologyService.isTechnologyEnabled(game, 'experimentation');
-        
+        const isExperimentationEnabled = this.technologyService.isTechnologyEnabled(game, 'experimentation');
+
         const noExperimentation = {
             technology: null,
             level: null,
@@ -203,14 +200,25 @@ export default class ResearchService extends EventEmitter {
             return noExperimentation;
         }
 
+        const experimentationDistribution = game.settings.technology.experimentationDistribution;
+
         // NOTE: Players must own stars in order to have experiments.
-        let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+        const playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
         if (!playerStars.length) {
             return noExperimentation;
         }
 
-        let tech = this._getRandomTechnology(game, player);
+        let tech: { key: ResearchTypeNotRandom, technology: ResearchProgress } | null = null;
+
+        if (experimentationDistribution === 'random') {
+            tech = this._getRandomTechnology(game, player);
+        } else if (experimentationDistribution === 'current_research') {
+            tech = {
+                key: player.researchingNow,
+                technology: player.research[player.researchingNow]
+            }
+        }
 
         if (!tech) {
             return noExperimentation;
@@ -232,8 +240,9 @@ export default class ResearchService extends EventEmitter {
             default:
                 throw new Error(`Unsupported experimentation reward ${game.settings.technology.experimentationReward}`);
         }
-        
-        tech.technology.progress! += researchAmount;
+
+        tech.technology.progress = tech.technology.progress || 0;
+        tech.technology.progress += researchAmount;
 
         // If the current progress is greater than the required progress
         // then increase the level and carry over the remainder.
@@ -244,7 +253,7 @@ export default class ResearchService extends EventEmitter {
 
         while (tech.technology.progress! >= requiredProgress) {
             tech.technology.level++;
-            tech.technology.progress! -= requiredProgress;
+            tech.technology.progress -= requiredProgress;
             requiredProgress = this.getRequiredResearchProgress(game, tech.key, tech.technology.level);
             levelUp = true;
         }
@@ -283,22 +292,21 @@ export default class ResearchService extends EventEmitter {
         return player.researchingNow;
     }
 
-    _getRandomTechnology(game: Game, player: Player) {
+    _getRandomTechnology(game: Game, player: Player): { key: ResearchTypeNotRandom, technology: ResearchProgress } | null {
         let techs = Object.keys(player.research).filter(k => {
             return k.match(/^[^_\$]/) != null;
         }) as ResearchTypeNotRandom[];
 
-        techs = techs.filter(t => this.technologyService.isTechnologyEnabled(game, t)
-                                && this.technologyService.isTechnologyResearchable(game, t));
+        techs = techs.filter(t => this.technologyService.isTechnologyResearchable(game, t));
 
         if (!techs.length) {
             return null;
         }
 
-        let researchTechsCount = techs.length;
+        const researchTechsCount = techs.length;
 
-        let techKey = techs[this.randomService.getRandomNumber(researchTechsCount - 1)] as ResearchTypeNotRandom;
-        let tech = player.research[techKey];
+        const techKey = techs[this.randomService.getRandomNumber(researchTechsCount - 1)] as ResearchTypeNotRandom;
+        const tech = player.research[techKey];
 
         return {
             key: techKey,

@@ -1,3 +1,5 @@
+import {User} from "./types/User";
+
 const moment = require('moment');
 const EventEmitter = require('events');
 import Repository from './repository';
@@ -33,6 +35,22 @@ export default class PlayerAfkService extends EventEmitter {
         this.carrierService = carrierService;
         this.gameTypeService = gameTypeService;
         this.gameStateService = gameStateService;
+    }
+
+    incrementAfkCount (user: User) {
+        user.achievements.afk++;
+
+        // Even better would be to look only at recent games, but there is no data for that at the moment
+        const hasHighAfkRate = (user.achievements.afk / user.achievements.joined) > 0.4;
+        const hasJoinedSeveralGames = user.achievements.joined > 2;
+        const hasRecentAfkWarning = user.warnings.find(w => w.text === 'Frequent AFK' && moment(w.date).isAfter(moment().subtract(1, 'month')));
+
+        if (hasHighAfkRate && hasJoinedSeveralGames && !hasRecentAfkWarning) {
+            user.warnings.push({
+                date: new Date(),
+                text: 'Frequent AFK'
+            });
+        }
     }
 
     performDefeatedOrAfkCheck(game: Game, player: Player) {

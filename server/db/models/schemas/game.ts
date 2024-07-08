@@ -54,6 +54,7 @@ const schema = new Schema({
 			playerType: { type: Types.String, required: true, enum: ['all', 'establishedPlayers'], default: 'all' },
 			anonymity: { type: Types.String, required: true, enum: ['normal', 'extra'], default: 'normal' },
 			playerOnlineStatus: { type: Types.String, required: true, enum: ['hidden', 'visible'], default: 'hidden' },
+			playerIPWarning: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },
 			timeMachine: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
 			awardRankTo: { type: Types.String, required: false, enum: ['all', 'winner', 'top_n', 'teams'], default: 'all' },
 			awardRankToTopN: { type: Types.Number, required: false, min: 1, default: null },
@@ -67,7 +68,8 @@ const schema = new Schema({
         galaxy: {
 			galaxyType: { type: Types.String, required: true, enum: ['circular', 'spiral', 'doughnut','circular-balanced', 'irregular', 'custom'], default: 'circular' },
 			starsPerPlayer: { type: Types.Number, required: true, min: 3, max: 50, default: 20 },
-			productionTicks: { type: Types.Number, required: true, min: 6, max: 36, default: 24 }
+			productionTicks: { type: Types.Number, required: true, min: 6, max: 36, default: 24 },
+			advancedCustomGalaxyEnabled: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'disabled' },
         },
         specialGalaxy: {
 			carrierCost: { type: Types.String, required: true, enum: ['cheap', 'standard', 'expensive'], default: 'standard' },
@@ -169,6 +171,7 @@ const schema = new Schema({
 				growthFactor: { type: Types.String, required: false, validate: validateNullableEnum(['soft', 'medium', 'hard']), default: null },
 			},
 			bankingReward: { type: Types.String, required: true, enum: ['standard', 'legacy'], default: 'standard' },
+			experimentationDistribution: { type: Types.String, required: true, enum: ['random', 'current_research'], default: 'random' },
 			experimentationReward: { type: Types.String, required: true, enum: ['standard', 'experimental'], default: 'standard' },
 			specialistTokenReward: { type: Types.String, required: true, enum: ['standard', 'experimental'], default: 'standard' }
 		},
@@ -177,9 +180,9 @@ const schema = new Schema({
 			speed: { type: Types.Number, required: true, enum: [30, 60, 300, 600, 1800, 3600, 7200], default: 1800 }, // Time in seconds
 			startDelay: { type: Types.Number, required: true, enum: [0, 1, 5, 10, 30, 60, 120, 240, 360, 480, 600, 720, 1440], default: 240 },	// Time in minutes
 			turnJumps: { type: Types.Number, required: true, min: 1, max: 24, default: 8 },
-			maxTurnWait: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60, 360, 480, 600, 720, 1080, 1440, 2880], default: 1440 },	// Time in minutes
+			maxTurnWait: { type: Types.Number, required: true, enum: [1, 5, 10, 30, 60, 120, 240, 360, 480, 600, 720, 1080, 1440, 2880], default: 1440 },	// Time in minutes
 			isTickLimited: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'disabled' },
-			tickLimit: { type: Types.Number, required: false, min: 200, max: 2000, default: null },
+			tickLimit: { type: Types.Number, required: false, min: 100, max: 2000, default: null },
 			afk: {
 				lastSeenTimeout: { type: Types.Number, required: true, min: 1, max: 7, default: 2}, // Time in days, real time and turn based
 				cycleTimeout: { type: Types.Number, required: true, min: 3, max: 25, default: 3}, // Real time games' production cycle limit

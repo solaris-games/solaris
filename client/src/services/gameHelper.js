@@ -37,11 +37,20 @@ class GameHelper {
     return game.galaxy.carriers.find(x => x._id === carrierId)
   }
 
+  getActionById (game, actionId) {
+    let player = this.getUserPlayer(game)
+    return player.scheduledActions.find(a => a._id === actionId);
+  }
+
   getStarOwningPlayer (game, star) {
     return game.galaxy.players.find(x => x._id === star.ownedByPlayerId)
   }
 
-  getStarsOwnedByPlayer (player, stars) {
+  getStarsOwnedByPlayer(player, stars) {
+    if (player == null) {
+      return [];
+    }
+
     return stars.filter(s => s.ownedByPlayerId && s.ownedByPlayerId === player._id)
   }
 
@@ -239,14 +248,12 @@ class GameHelper {
       return ''
     }
 
-    if (game.settings.gameTime.gameType === 'realTime') {
-      let date = useNowDate ? moment().utc() : game.state.lastTickDate
+    if (game.settings.gameTime.gameType === 'realTime' && !this.isGameFinished(game)) {
+      const date = useNowDate ? moment().utc() : game.state.lastTickDate
 
-      let timeRemainingEtaDate = this.calculateTimeByTicks(ticks, game.settings.gameTime.speed, date)
+      const timeRemainingEtaDate = this.calculateTimeByTicks(ticks, game.settings.gameTime.speed, date)
 
-      let timeRemainingEta = this.getCountdownTimeString(game, timeRemainingEtaDate, largestUnitOnly)
-
-      return timeRemainingEta
+      return this.getCountdownTimeString(game, timeRemainingEtaDate, largestUnitOnly)
     }
 
     return `${ticks} ticks`
@@ -1079,6 +1086,14 @@ class GameHelper {
     return fromEconomy - upkeep  + this._getBankingCredits(game, player);
   }
 
+  calculateTickIncome(game, player) {
+    let stars = this.getStarsOwnedByPlayer(player, game.galaxy.stars).filter(s => s.specialistId === 12); // Financial Analyst
+
+    let creditsPerTickByScience = stars[0]?.specialist.modifiers.special.creditsPerTickByScience ?? 0;
+
+    return (stars.reduce((totalScience, star) => totalScience + (star.infrastructure?.science ?? 0), 0) * game.constants.research.sciencePointMultiplier) * creditsPerTickByScience;
+  }
+
   isStarHasMultiplePlayersInOrbit (game, star) {
     let carriersInOrbit = this.getCarriersOrbitingStar(game, star)
     let playerIds = [...new Set(carriersInOrbit.map(c => c.ownedByPlayerId))]
@@ -1182,6 +1197,23 @@ class GameHelper {
     }
 
     return game.galaxy.teams.find(t => t._id === teamId);
+  }
+
+  calculateTicksToNextShip(shipsActual, manufacturing) {
+    if (manufacturing <= 0) {
+      return null
+    }
+
+    const next = Math.floor(shipsActual + 1);
+    let current = shipsActual;
+    let count = 0;
+
+    while (current < next) {
+      count++;
+      current += manufacturing;
+    }
+
+    return count;
   }
 }
 

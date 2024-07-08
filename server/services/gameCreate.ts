@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 import ValidationError from '../errors/validation';
 import {Game, GameSettings, Team} from './types/Game';
 import AchievementService from './achievement';
@@ -17,10 +18,11 @@ import GameJoinService from './gameJoin';
 import SpecialStarBanService from './specialStarBan';
 import StarService from './star';
 import DiplomacyService from "./diplomacy";
-import mongoose from "mongoose";
 import {DBObjectId} from "./types/DBObjectId";
 import {shuffle} from "./utils";
 import TeamService from "./team";
+import CarrierService from './carrier';
+import { Carrier } from './types/Carrier';
 
 const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
@@ -44,6 +46,7 @@ export default class GameCreateService {
     starService: StarService;
     diplomacyService: DiplomacyService;
     teamService: TeamService;
+    carrierService: CarrierService;
 
     constructor(
         gameModel,
@@ -65,6 +68,7 @@ export default class GameCreateService {
         starService: StarService,
         diplomacyService: DiplomacyService,
         teamService: TeamService,
+        carrierService: CarrierService,
     ) {
         this.gameModel = gameModel;
         this.gameJoinService = gameJoinService;
@@ -85,6 +89,7 @@ export default class GameCreateService {
         this.starService = starService;
         this.diplomacyService = diplomacyService;
         this.teamService = teamService;
+        this.carrierService = carrierService;
     }
 
     async create(settings: GameSettings) {
@@ -168,15 +173,37 @@ export default class GameCreateService {
 
         // For non-custom galaxies we need to check that the player has actually provided
         // enough stars for each player.
-        let desiredStarCount = game.settings.galaxy.starsPerPlayer * game.settings.general.playerLimit;
-        let desiredPlayerStarCount = game.settings.player.startingStars * game.settings.general.playerLimit;
+        let desiredStarCount = 0;
+        if (game.settings.galaxy.galaxyType !== 'custom') {
+            desiredStarCount = game.settings.galaxy.starsPerPlayer * game.settings.general.playerLimit;
+            let desiredPlayerStarCount = game.settings.player.startingStars * game.settings.general.playerLimit;
 
-        if (desiredPlayerStarCount > desiredStarCount) {
-            throw new ValidationError(`Cannot create a galaxy of ${desiredStarCount} stars with ${game.settings.player.startingStars} stars per player.`);
-        }
+            if (desiredPlayerStarCount > desiredStarCount) {
+                throw new ValidationError(`Cannot create a galaxy of ${desiredStarCount} stars with ${game.settings.player.startingStars} stars per player.`);
+            }
 
-        if (desiredStarCount > 1000) {
-            throw new ValidationError(`Galaxy size cannot exceed 1000 stars.`);
+            if (desiredStarCount > 1000) {
+                throw new ValidationError(`Galaxy size cannot exceed 1000 stars.`);
+            }
+        } else {
+            // TODO: Validation needs to be better and in one place. Also, we should provide a schema
+
+            let json;
+
+            try {
+                json = JSON.parse(settings.galaxy.customJSON!);
+            } catch (e) {
+                throw new ValidationError("Failed to parse custom JSON");
+            }
+
+            if (!json?.stars?.length) {
+                throw new ValidationError("No stars provided in custom JSON.");
+            }
+
+            const starCount = json.stars.length;
+
+            game.settings.galaxy.starsPerPlayer = starCount / game.settings.general.playerLimit;
+            desiredStarCount = starCount;
         }
 
         // Ensure that c2c combat is disabled for orbital games.
@@ -322,11 +349,72 @@ export default class GameCreateService {
         game.galaxy.homeStars = starGeneration.homeStars;
         game.galaxy.linkedStars = starGeneration.linkedStars;
 
+        if (game.galaxy.stars.length % game.settings.general.playerLimit !== 0) {
+            throw new ValidationError(`Cannot create a galaxy with a non-whole number of stars per player.`);
+        } else {
+            game.settings.galaxy.starsPerPlayer = game.galaxy.stars.length / game.settings.general.playerLimit;
+        }
+
         this.starService.setupStarsForGameStart(game);
         
         // Setup players and assign to their starting positions.
         this.playerService.setupEmptyPlayers(game);
-        game.galaxy.carriers = this.playerService.createHomeStarCarriers(game);
+
+        // Create carriers in custom galaxies with the advanced mode enabled.
+        let advancedCustomGalaxyEnabled = game.settings.galaxy?.advancedCustomGalaxyEnabled === 'enabled';
+        let carriers: any[] = [];
+        if (advancedCustomGalaxyEnabled) {
+            let json;
+            try {
+                json = JSON.parse(settings.galaxy.customJSON!);
+            } catch (e) {
+                throw new ValidationError('The custom map JSON is malformed.');
+            }
+            if (!('carriers' in json)) {
+                throw new ValidationError(`Missing property 'carriers' of JSON ${JSON.stringify(json)}.`);
+            }
+
+            for (const carrier of json.carriers) {
+                carrier.orbiting = carrier.orbiting == null ? null : +carrier.orbiting;
+                carrier.specialistId = carrier.specialistId == null ? null : +carrier.specialistId;
+                carrier.specialistExpireTick = carrier.specialistExpireTick == null ? null : +carrier.specialistExpireTick;
+                carrier.isGift = carrier.isGift == null ? false : carrier.isGift;
+
+                this._checkCarrierProperty(carrier, 'orbiting', 'number', false);
+                this._checkCarrierProperty(carrier, 'specialistId', 'number', true);
+                this._checkCarrierProperty(carrier, 'specialistExpireTick', 'number', true);
+                this._checkCarrierProperty(carrier, 'isGift', 'boolean', true);
+                this._checkCarrierProperty(carrier, 'ships', 'number', false);
+                this._checkCarrierProperty(carrier, 'specialistId', 'number', true);
+
+                let starId = (starGeneration.starLocations.find((loc) => loc.id === carrier.orbiting))._id;
+                let star = this.starService.getById(game, starId);
+                let name = this.carrierService.generateCarrierName(star, carriers);
+
+                let newCarrier: Carrier = {
+                    _id: mongoose.Types.ObjectId(),
+                    ownedByPlayerId: star.ownedByPlayerId,
+                    orbiting: star._id,
+                    name,
+                    ships: carrier.ships,
+                    specialistId: carrier.specialistId,
+                    specialistExpireTick: carrier.specialistExpireTick,
+                    isGift: carrier.isGift,
+                    waypoints: [],
+                    locationNext: null,
+                    waypointsLooped: false,
+                    specialist: null,
+                    location: star.location,
+                    toObject(): Carrier {
+                        return this;
+                    }
+                };
+                carriers.push(newCarrier);
+            }
+            game.galaxy.carriers = carriers;
+        } else {
+            game.galaxy.carriers = this.playerService.createHomeStarCarriers(game);
+        }
 
         this.mapService.generateTerrain(game);
 
@@ -385,5 +473,18 @@ export default class GameCreateService {
         // Dump the player who created the game straight into the first slot and set the other slots to AI.
         this.gameJoinService.assignPlayerToUser(game, game.galaxy.players[0], game.settings.general.createdByUserId!, `Player`, 0);
         this.gameJoinService.assignNonUserPlayersToAI(game);
+    }
+
+    _checkCarrierProperty(carrier, property: string, type: string, allowNull: boolean): boolean {
+        if (carrier === undefined) throw new ValidationError(`Missing property of carrier ${carrier}`);
+        if (carrier?.[property] === undefined) throw new ValidationError(`Missing property ${property} of carrier ${JSON.stringify(carrier)}`);
+
+        if (allowNull && carrier[property] === null) {
+          return true;
+        }
+
+        if (typeof carrier[property] !== type) throw new ValidationError(`Invalid type property ${property} of carrier ${JSON.stringify(carrier)}`);
+
+        return true;
     }
 }

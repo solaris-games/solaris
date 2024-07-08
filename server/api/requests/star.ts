@@ -1,3 +1,4 @@
+import { ObjectId } from "mongoose";
 import ValidationError from "../../errors/validation";
 import { DBObjectId } from "../../services/types/DBObjectId";
 import { InfrastructureType } from "../../services/types/Star";
@@ -29,6 +30,22 @@ export interface StarUpgradeInfrastructureBulkRequest {
     amount: number;
 };
 
+export interface ScheduledStarUpgradeInfrastructureBulkRequest {
+    infrastructureType: InfrastructureType;
+    buyType: string;
+    amount: number;
+    repeat: boolean;
+    tick: number;
+};
+
+export interface ScheduledStarUpgradeToggleRepeat {
+    _id: DBObjectId;
+};
+
+export interface ScheduledStarUpgradeTrash {
+    _id: DBObjectId;
+}
+
 export const mapToStarUpgradeInfrastructureBulkRequest = (body: any): StarUpgradeInfrastructureBulkRequest => {
     let errors: string[] = [];
 
@@ -56,6 +73,85 @@ export const mapToStarUpgradeInfrastructureBulkRequest = (body: any): StarUpgrad
         amount: body.amount
     }
 };
+
+export const mapToScheduledStarUpgradeInfrastructureBulkRequest = (body: any): ScheduledStarUpgradeInfrastructureBulkRequest => {
+    let errors: string[] = [];
+
+    if (!keyHasStringValue(body, 'infrastructureType')) {
+        errors.push('Infrastructure is required.');
+    }
+
+    if (!keyHasStringValue(body, 'buyType')) {
+        errors.push('Upgrade Strategy is required.');
+    }
+
+    if (!keyHasNumberValue(body, 'amount')) {
+        errors.push('Amount is required.');
+    }
+
+    if (!keyHasBooleanValue(body, 'repeat')) {
+        errors.push('Repeat is required.');
+    }
+
+    if (!keyHasNumberValue(body, 'tick')) {
+        errors.push('Tick is required.');
+    }
+
+    if (errors.length) {
+        throw new ValidationError(errors);
+    }
+
+    body.amount = +body.amount;
+    body.tick = +body.tick;
+
+    if (body.amount < 0) {
+        errors.push('Amount must be greater than 0.');
+    }
+
+    if (body.tick < 0) {
+        errors.push('Tick must be greater than 0.');
+    }
+
+    return {
+        infrastructureType: body.infrastructureType,
+        buyType: body.buyType,
+        amount: body.amount,
+        repeat: body.repeat,
+        tick: body.tick
+    }
+};
+
+export const mapToScheduledStarUpgradeToggleRepeat = (body: any): ScheduledStarUpgradeToggleRepeat => {
+    let errors: string[] = [];
+
+    if (!keyHasStringValue(body, 'actionId')) {
+        errors.push('ObjectId is required.');
+    }
+
+    if (errors.length) {
+        throw new ValidationError(errors);
+    }
+
+    return {
+        _id: body.actionId
+    }
+};
+
+export const mapToScheduledStarUpgradeTrash = (body: any): ScheduledStarUpgradeTrash => {
+    let errors: string[] = [];
+
+    if (!keyHasStringValue(body, 'actionId')) {
+        errors.push('ObjectId is required.');
+    }
+
+    if (errors.length) {
+        throw new ValidationError(errors);
+    }
+
+    return {
+        _id: body.actionId
+    }
+}
 
 export interface StarDestroyInfrastructureRequest {
     starId: DBObjectId;

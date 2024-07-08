@@ -35,6 +35,18 @@ import PlayerAfkService from './playerAfk';
 import ShipService from './ship';
 import SpectatorService from './spectator';
 
+enum ViewpointKind {
+    Basic,
+    Finished,
+    Perspectives,
+}
+
+type Viewpoint =
+    | { kind: ViewpointKind.Basic }
+    | { kind: ViewpointKind.Finished }
+    | { kind: ViewpointKind.Perspectives, perspectives: Player[] };
+
+
 export default class GameGalaxyService {
     cacheService: CacheService;
     broadcastService: BroadcastService;
@@ -177,21 +189,21 @@ export default class GameGalaxyService {
         }
 
         // Calculate what perspectives the user can see, i.e which players the user is spectating.
-        const perspectives = this._getPlayerPerspectives(game, userId);
+        const viewpoint = this._getViewpoint(game, userId);
+
+        // We always need to filter the player data so that it's basic info only.
+        await this._setPlayerInfoBasic(game, userPlayer, viewpoint);
 
         // if the user isn't playing this game or spectating, then only return
         // basic data about the stars, exclude any important info like ships.
         // If the game has finished then everyone should be able to view the full game.
-        if (!perspectives && !this.gameStateService.isFinished(game)) {
+        if (viewpoint.kind === ViewpointKind.Basic) {
             this._setStarInfoBasic(game);
             this._clearPlayerCarriers(game);
         } else {
-            this._setCarrierInfoDetailed(game, perspectives!);
-            this._setStarInfoDetailed(game, userPlayer, perspectives!);
+            this._setCarrierInfoDetailed(game, viewpoint);
+            this._setStarInfoDetailed(game, userPlayer, viewpoint);
         }
-
-        // We always need to filter the player data so that it's basic info only.
-        await this._setPlayerInfoBasic(game, userPlayer, perspectives);
 
         // For extra dark mode games, overwrite the player stats as by this stage
         // scanning range will have kicked in and filtered out stars and carriers the player
@@ -323,7 +335,7 @@ export default class GameGalaxyService {
         });
     }
 
-    _setStarInfoDetailed(doc: Game, userPlayer: Player | null, perspectivePlayerIds: DBObjectId[]) { 
+    _setStarInfoDetailed(doc: Game, userPlayer: Player | null, viewpoint: Viewpoint) {
         const isFinished = this.gameStateService.isFinished(doc);
         const isDarkStart = this.gameTypeService.isDarkStart(doc);
         const isDarkMode = this.gameTypeService.isDarkMode(doc);
@@ -339,11 +351,11 @@ export default class GameGalaxyService {
 
         // If dark start and game hasn't started yet OR is dark mode, then filter out
         // any stars the player cannot see in scanning range.
-        if (!isFinished && (isDarkMode || (isDarkStart && !doc.state.startDate))) {
+        if (viewpoint.kind === ViewpointKind.Perspectives && (isDarkMode || (isDarkStart && !doc.state.startDate))) {
             if (isDarkMode) {
-                doc.galaxy.stars = this.starService.filterStarsByScanningRangeAndWaypointDestinations(doc, perspectivePlayerIds);
+                doc.galaxy.stars = this.starService.filterStarsByScanningRangeAndWaypointDestinations(doc, viewpoint.perspectives);
             } else {
-                doc.galaxy.stars = this.starService.filterStarsByScanningRange(doc, perspectivePlayerIds);
+                doc.galaxy.stars = this.starService.filterStarsByScanningRange(doc, viewpoint.perspectives);
             }
         }
 
@@ -352,7 +364,8 @@ export default class GameGalaxyService {
         let playerScanningStars: Star[] = [];
         let playerCarriersInOrbit: Carrier[] = [];
 
-        if (perspectivePlayerIds?.length) {
+        if (viewpoint.kind === ViewpointKind.Perspectives) {
+            const perspectivePlayerIds = viewpoint.perspectives.map(p => p._id);
             playerStars = this.starService.listStarsOwnedByPlayers(doc.galaxy.stars, perspectivePlayerIds);
             playerScanningStars = this.starService.listStarsWithScanningRangeByPlayers(doc, perspectivePlayerIds);
             playerCarriersInOrbit = this.carrierService.listCarriersOwnedByPlayersInOrbit(doc.galaxy.carriers, perspectivePlayerIds);
@@ -361,8 +374,6 @@ export default class GameGalaxyService {
         // Work out which ones are not in scanning range and clear their data.
         doc.galaxy.stars = (doc.galaxy.stars as any[]) // TODO: Doing this to get around the whacky TS errors when deleting fields from the model
             .map(s => {
-                delete s.shipsActual; // Don't need to send this back.
-
                 s.effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(doc, s);
 
                 // Calculate the star's terraformed resources.
@@ -412,6 +423,7 @@ export default class GameGalaxyService {
                 } else {
                     // Remove fields that other users shouldn't see.
                     delete s.ignoreBulkUpgrade;
+                    delete s.shipsActual;
                 }
 
                 s.isInScanningRange = isFinished ||                                                         // The game is finished
@@ -431,12 +443,15 @@ export default class GameGalaxyService {
 
                     if (s.isNebula) {
                         delete s.infrastructure;
+                        // NOTE: From this point, this star will be considered "dead", as star.isDeadStar(s)
+                        // looks for the existence and thruthness of the naturalResources field.
+                        // This had caused issues when a carrier orbiting allies nebula could not get tech scanning.
                         delete s.naturalResources;
                         delete s.terraformedResources;
                         delete s.manufacturing;
                     }
 
-                    let canSeeStarShips = perspectivePlayerIds?.length && this.starService.canPlayersSeeStarShips(s, perspectivePlayerIds);
+                    let canSeeStarShips = viewpoint.kind === ViewpointKind.Perspectives && this.starService.canPlayersSeeStarShips(s, viewpoint.perspectives.map(p => p._id));
 
                     if (!canSeeStarShips) {
                         s.ships = null;
@@ -473,12 +488,14 @@ export default class GameGalaxyService {
             }) as any;
     }
 
-    _setCarrierInfoDetailed(doc: Game, perspectivePlayerIds: DBObjectId[]) {
-        const isFinished = this.gameStateService.isFinished(doc);
+    _setCarrierInfoDetailed(doc: Game, viewpoint: Viewpoint) {
+        const isFinished = this.gameStateService.isFinished(doc)
         const isOrbital = this.gameTypeService.isOrbitalMode(doc);
 
         // If the game hasn't finished we need to filter and sanitize carriers.
-        if (!this.gameStateService.isFinished(doc)) {
+        if (viewpoint.kind !== ViewpointKind.Finished) {
+            const perspectivePlayerIds = viewpoint.kind === ViewpointKind.Perspectives ? viewpoint.perspectives.map(p => p._id) : [];
+
             doc.galaxy.carriers = this.carrierService.filterCarriersByScanningRange(doc, perspectivePlayerIds);
 
             // Remove all waypoints (except those in transit) for all carriers that do not belong
@@ -497,7 +514,7 @@ export default class GameGalaxyService {
                     c.specialist = this.specialistService.getByIdCarrier(c.specialistId)
                 }
 
-                let canSeeCarrierShips = isFinished || (perspectivePlayerIds?.length && this.carrierService.canPlayersSeeCarrierShips(doc, perspectivePlayerIds, c));
+                let canSeeCarrierShips = isFinished || (viewpoint.kind === ViewpointKind.Perspectives && this.carrierService.canPlayersSeeCarrierShips(doc, viewpoint.perspectives, c));
 
                 if (!canSeeCarrierShips) {
                     c.ships = null;
@@ -509,7 +526,7 @@ export default class GameGalaxyService {
             });
     }
 
-    async _setPlayerInfoBasic(doc: Game, userPlayer: Player | null, perspectivePlayerIds: DBObjectId[] | null) {
+    async _setPlayerInfoBasic(doc: Game, userPlayer: Player | null, viewpoint: Viewpoint) {
         const avatars = this.avatarService.listAllAvatars();
 
         const isFinished = this.gameStateService.isFinished(doc);
@@ -530,6 +547,17 @@ export default class GameGalaxyService {
 
         if (userPlayer) {
             playersInRange = this.playerService.getPlayersWithinScanningRangeOfPlayer(doc, doc.galaxy.players, userPlayer);
+        } else if (viewpoint.kind === ViewpointKind.Perspectives) {
+            playersInRange = viewpoint.perspectives;
+
+            const visited = new Set<string>();
+            viewpoint.perspectives.forEach(p => visited.add(p._id.toString()))
+
+            for (const player of viewpoint.perspectives) {
+                const inRangeOfPlayer = this.playerService.getPlayersWithinScanningRangeOfPlayer(doc, doc.galaxy.players, player).filter(x => !visited.has(x._id.toString()));
+                inRangeOfPlayer.forEach(p => visited.add(p._id.toString()));
+                playersInRange = playersInRange.concat(inRangeOfPlayer);
+            }
         }
 
         let displayOnlineStatus = doc.settings.general.playerOnlineStatus === 'visible';
@@ -542,7 +570,7 @@ export default class GameGalaxyService {
             let isCurrentUserPlayer = userPlayer && p._id.toString() === userPlayer._id.toString();
 
             // Set whether the user has the perspective of this player. This is used on the UI for spectator view.
-            p.hasPerspective = perspectivePlayerIds?.find(i => i.toString() === p._id.toString()) != null;
+            p.hasPerspective = Boolean(viewpoint.kind === ViewpointKind.Perspectives && viewpoint.perspectives.find(otherPlayer => otherPlayer._id.toString() === p._id.toString()));
 
             // Append the guild tag to the player alias.
             let playerGuild: Guild | null = null;
@@ -591,7 +619,7 @@ export default class GameGalaxyService {
                 p.isOnline = isCurrentUserPlayer || onlinePlayers.find(op => op._id.toString() === p._id.toString()) != null;
             }
 
-            let reputation: PlayerReputation | null = null;
+            let reputation: PlayerReputation | undefined = undefined;
 
             if (userPlayer) {
                 reputation = this.reputationService.getReputation(p, userPlayer)?.reputation;
@@ -669,29 +697,50 @@ export default class GameGalaxyService {
         }) as any;
     }
 
-    _getPlayerPerspectives(game: Game, userId: DBObjectId | null) {
+    _getViewpoint(game: Game, userId: DBObjectId | null): Viewpoint {
+        if (this.gameStateService.isFinished(game)) {
+            return {
+                kind: ViewpointKind.Finished
+            };
+        }
+
         // Check if the user is playing in this game, if so they can only see from
         // their own perspective.
         let userPlayer = this._getUserPlayer(game, userId);
 
         if (userPlayer) {
-            return [userPlayer._id];
+            return {
+                kind: ViewpointKind.Perspectives,
+                perspectives: [userPlayer]
+            };
         }
 
         // If the user is spectating then they can see from the perspectives of all
         // players who they are spectating.
+        // If they are a player themselves, the spectator perspective is ignored
         if (userId && this.spectatorService.isSpectatingEnabled(game)) {
-            let spectating = this.spectatorService.listSpectatingPlayers(game, userId);
+            const spectating = this.spectatorService.listSpectatingPlayers(game, userId);
 
             if (spectating.length) {
-                return spectating.map(p => p._id);
+                return {
+                    kind: ViewpointKind.Perspectives,
+                    perspectives: spectating
+                };
             }
         }
 
-        return null;
+
+
+        return {
+            kind: ViewpointKind.Basic
+        };
     }
 
     _populatePlayerHasDuplicateIPs(game: Game) {
+        if (game.settings.general.playerIPWarning === 'disabled') {
+            return;
+        }
+
         for (let player of game.galaxy.players) {
             player.hasDuplicateIP = this.playerService.hasDuplicateLastSeenIP(game, player);
         }

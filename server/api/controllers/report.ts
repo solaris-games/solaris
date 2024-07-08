@@ -7,7 +7,7 @@ export default (container: DependencyContainer) => {
             try {
                 const reqObj = mapToReportCreateReportRequest(req.body);
                 
-                await container.reportService.reportPlayer(req.game, reqObj.playerId, req.session.userId, reqObj.reasons);
+                await container.reportService.reportPlayer(req.game, reqObj, req.session.userId);
                 
                 return res.sendStatus(200);
             } catch (err) {

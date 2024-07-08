@@ -116,6 +116,15 @@
         </div>
 
         <div class="mb-2">
+          <label for="playerIPWarning" class="col-form-label">Player IP Warning <help-tooltip tooltip="Show warnings when players use the same IP to prevent multiboxing. Only disable this if you are sure" /></label>
+          <select class="form-control" id="playerIPWarning" v-model="settings.general.playerIPWarning" :disabled="isCreatingGame">
+            <option v-for="opt in options.general.playerIPWarning" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-2">
           <label for="advancedAI" class="col-form-label">Advanced AI <help-tooltip tooltip="Use the advanced AI to replace defeated players"></help-tooltip></label>
           <select class="form-control" id="advancedAI" v-model="settings.general.advancedAI" :disabled="isCreatingGame">
             <option v-for="opt in options.general.advancedAI" v-bind:key="opt.value" v-bind:value="opt.value">
@@ -161,7 +170,7 @@
         </div>
 
         <div class="mb-2" v-if="settings.general.mode !== 'teamConquest'">
-          <label for="awardRankTo" class="col-form-label">Players that will receive rank <help-tooltip tooltip="c" /></label>
+          <label for="awardRankTo" class="col-form-label">Players that will receive rank <help-tooltip tooltip="Rank distribution scheme to be used" /></label>
           <select class="form-control" id="awardRankTo" v-model="settings.general.awardRankTo" :disabled="isCreatingGame">
             <option v-for="opt in options.general.awardRankTo" v-bind:key="opt.value" v-bind:value="opt.value">
               {{ opt.text }}
@@ -217,7 +226,7 @@
         <div class="mb-2" v-if="settings.gameTime.isTickLimited === 'enabled'">
           <label for="tickLimit" class="col-form-label">Time Limit (<span class="text-warning">{{settings.gameTime.tickLimit}} ticks</span>) <help-tooltip tooltip="Determines the maximum number of ticks before the game is automatically concluded"/></label>
           <div class="col">
-            <input type="range" min="200" max="2000" step="100" class="form-range w-100" id="tickLimit" v-model="settings.gameTime.tickLimit" :disabled="isCreatingGame">
+            <input type="range" min="100" max="2000" step="100" class="form-range w-100" id="tickLimit" v-model="settings.gameTime.tickLimit" :disabled="isCreatingGame">
           </div>
         </div>
 
@@ -296,13 +305,22 @@
           </select>
         </div>
 
-        <div class="mb-2" v-if="settings.galaxy.galaxyType == 'custom'">
+        <div class="mb-2" v-if="settings.galaxy.galaxyType === 'custom'">
           <p class="mb-1">It is recommended to use the community galaxy generation tool which can be found here: <a href="https://kurtzmusch.github.io/solaris-galaxy-editor/" target="_blank">https://kurtzmusch.github.io/solaris-galaxy-editor/</a></p>
           <label for="customJSON" class="col-form-label">Galaxy JSON <help-tooltip tooltip="The JSON document for which represents the galaxy to create"/></label>
           <textarea id='customJSON' class='col' v-model='settings.galaxy.customJSON' rows="10"></textarea>
         </div>
 
-        <div class="mb-2">
+        <div class="mb-2" v-if="settings.galaxy.galaxyType === 'custom'">
+          <label for="advancedCustomGalaxyEnabled" class="col-form-label">Advanced Custom Galaxy <help-tooltip tooltip="If enabled, allows the addition of ships and carriers on player-owned stars, and removes certain validation checks"/></label>
+          <select class="form-control" id="advancedCustomGalaxyEnabled" v-model="settings.galaxy.advancedCustomGalaxyEnabled" :disabled="isCreatingGame">
+            <option v-for="opt in options.galaxy.advancedCustomGalaxyEnabled" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-2" v-if="settings.galaxy.galaxyType !== 'custom'">
           <label for="starsPerPlayer" class="col-form-label">Stars per Player (<span class="text-warning">{{settings.galaxy.starsPerPlayer}} stars</span>) <help-tooltip tooltip="How many stars will be generated per player in the galaxy"/></label>
           <div class="col">
             <input type="range" min="3" max="50" step="1" class="form-range w-100" id="starsPerPlayer" v-model="settings.galaxy.starsPerPlayer" :disabled="isCreatingGame">
@@ -442,7 +460,7 @@
           </div>
 
           <div class="mb-2" v-if="settings.orbitalMechanics.enabled === 'disabled'">
-            <label for="carrierToCarrierCombat" class="col-form-label">Carrier-to-Carrier Combat <help-tooltip tooltip="Determines whether carrier-to-carrier combat is enabled. If disabled, carriers will not fight eachother in space"/></label>
+            <label for="carrierToCarrierCombat" class="col-form-label">Carrier-to-Carrier Combat <help-tooltip tooltip="Determines whether carrier-to-carrier combat is enabled. If disabled, carriers will not fight each other in space"/></label>
             <select class="form-control" id="carrierToCarrierCombat" v-model="settings.specialGalaxy.carrierToCarrierCombat" :disabled="isCreatingGame">
               <option v-for="opt in options.specialGalaxy.carrierToCarrierCombat" v-bind:key="opt.value" v-bind:value="opt.value">
                 {{ opt.text }}
@@ -520,7 +538,7 @@
       </view-collapse-panel>
 
       <view-collapse-panel title="Player Start Settings">
-        <div class="mb-2">
+        <div class="mb-2" v-if="!(settings.galaxy.galaxyType === 'custom' && settings.galaxy.advancedCustomGalaxyEnabled === 'enabled')">
           <label for="startingStars" class="col-form-label">Starting Stars (<span class="text-warning">{{settings.player.startingStars}} stars</span>) <help-tooltip tooltip="Determines how many stars each player is allocated at the start of the game"/></label>
           <div class="col">
             <input type="range" min="1" max="30" step="1" class="form-range w-100" id="startingStars" v-model="settings.player.startingStars" :disabled="isCreatingGame">
@@ -541,7 +559,7 @@
           </div>
         </div>
 
-        <div class="mb-2">
+        <div class="mb-2" v-if="settings.galaxy.advancedCustomGalaxyEnabled !== 'enabled'">
           <label for="startingShips" class="col-form-label">Starting Ships (<span class="text-warning">{{settings.player.startingShips}} ships at each star</span>) <help-tooltip tooltip="Determines how many ships the home star of each player is allocated at the start of the game"/></label>
           <div class="col">
             <input type="range" min="0" max="100" step="1" class="form-range w-100" id="startingShips" v-model="settings.player.startingShips" :disabled="isCreatingGame">
@@ -607,7 +625,7 @@
       <view-collapse-panel title="Formal Alliances">
         <p class="mb-2 text-warning" v-if="settings.general.mode === 'teamConquest'">Some diplomacy settings are unavailable because Team Conquest is selected as a game mode.</p>
         <div class="mb-2" v-if="settings.general.mode !== 'teamConquest'">
-          <label for="diplomacy" class="col-form-label">Enabled <help-tooltip tooltip="If enabled, players can change their diplomatic status to allied or enemies - Allied players can orbit eachother's stars and support eachother in combat"/></label>
+          <label for="diplomacy" class="col-form-label">Enabled <help-tooltip tooltip="If enabled, players can change their diplomatic status to allied or enemies - Allied players can orbit each other's stars and support each other in combat"/></label>
           <select class="form-control" id="diplomacy" v-model="settings.diplomacy.enabled" :disabled="isCreatingGame">
             <option v-for="opt in options.diplomacy.enabled" v-bind:key="opt.value" v-bind:value="opt.value">
               {{ opt.text }}
@@ -637,7 +655,7 @@
           </select>
         </div>
         <div class="mb-2" v-if="settings.diplomacy.enabled === 'enabled'">
-          <label for="allianceTradeRestricted" class="col-form-label">Alliance Only Trading <help-tooltip tooltip="If enabled, only allies can trade with eachother."/></label>
+          <label for="allianceTradeRestricted" class="col-form-label">Alliance Only Trading <help-tooltip tooltip="If enabled, only allies can trade with each other."/></label>
            <select class="form-control" id="allianceTradeRestricted" v-model="settings.diplomacy.tradeRestricted" :disabled="isCreatingGame">
             <option v-for="opt in options.diplomacy.tradeRestricted" v-bind:key="opt.value" v-bind:value="opt.value">
               {{ opt.text }}
@@ -655,21 +673,21 @@
       </view-collapse-panel>
 
       <view-collapse-panel title="Infrastructure Settings">
-        <div class="mb-2">
+        <div class="mb-2" v-if="settings.galaxy.advancedCustomGalaxyEnabled !== 'enabled'">
           <label for="startingInfrastructureEconomy" class="col-form-label">Starting Economic Infrastructure (<span class="text-warning">{{settings.player.startingInfrastructure.economy}} Economy</span>) <help-tooltip tooltip="Determines the infrastructure of the home star of each player at the start of the game"/></label>
           <div class="col">
             <input type="range" min="0" max="30" step="1" class="form-range w-100" id="startingInfrastructureEconomy" v-model="settings.player.startingInfrastructure.economy" :disabled="isCreatingGame">
           </div>
         </div>
 
-        <div class="mb-2">
+        <div class="mb-2" v-if="settings.galaxy.advancedCustomGalaxyEnabled !== 'enabled'">
           <label for="startingInfrastructureIndustry" class="col-form-label">Starting Industrial Infrastructure (<span class="text-warning">{{settings.player.startingInfrastructure.industry}} Industry</span>) <help-tooltip tooltip="Determines the infrastructure of the home star of each player at the start of the game"/></label>
           <div class="col">
             <input type="range" min="0" max="30" step="1" class="form-range w-100" id="startingInfrastructureIndustry" v-model="settings.player.startingInfrastructure.industry" :disabled="isCreatingGame">
           </div>
         </div>
 
-        <div class="mb-2">
+        <div class="mb-2" v-if="settings.galaxy.advancedCustomGalaxyEnabled !== 'enabled'">
           <label for="startingInfrastructureScience" class="col-form-label">Starting Scientific Infrastructure (<span class="text-warning">{{settings.player.startingInfrastructure.science}} Science</span>) <help-tooltip tooltip="Determines the infrastructure of the home star of each player at the start of the game"/></label>
           <div class="col">
             <input type="range" min="0" max="5" step="1" class="form-range w-100" id="startingInfrastructureScience" v-model="settings.player.startingInfrastructure.science" :disabled="isCreatingGame">
@@ -824,7 +842,17 @@
           </select>
         </div>
 
-        <div class="mb-2">
+        <div class="mb-2" v-if="settings.technology.startingTechnologyLevel > 0">
+          <label for="experimentationDistribution" class="col-form-label">Experimentation Distribution <help-tooltip tooltip="Determines to what technologies the experimentation reward gets distributed"/></label>
+
+          <select class="form-control" id="experimentationDistribution" v-model="settings.technology.experimentationDistribution" :disabled="isCreatingGame">
+            <option v-for="opt in options.technology.experimentationDistribution" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-2" v-if="settings.technology.startingTechnologyLevel > 0">
           <label for="experimentationReward" class="col-form-label">Experimentation Reward <help-tooltip tooltip="Determines the amount of research points awarded for the experimentation technology at the end of a galactic cycle"/></label>
           <select class="form-control" id="experimentationReward" v-model="settings.technology.experimentationReward" :disabled="isCreatingGame">
             <option v-for="opt in options.technology.experimentationReward" v-bind:key="opt.value" v-bind:value="opt.value">
@@ -889,7 +917,8 @@ export default {
       isCreatingGame: false,
       errors: [],
       settings: null,
-      options: null
+      options: null,
+      possibleTeamCounts: []
     }
   },
   async mounted () {
@@ -938,9 +967,12 @@ export default {
     },
     onMaxAllianceTriggerChanged (e) {
       this.settings.diplomacy.maxAlliances = this.calcMaxAllianceLimit();
+      console.warn("Max alliances changed to: " + this.settings.diplomacy.maxAlliances);
     },
     calcMaxAllianceLimit () {
       if (this.settings.general.mode === 'teamConquest') {
+        this.updatePossibleTeamCounts();
+
         const playersPerTeam = this.settings.general.playerLimit / this.settings.conquest.teamsCount;
         return playersPerTeam - 1;
       }
@@ -957,6 +989,7 @@ export default {
       if (this.settings.general.mode === 'teamConquest') {
         this.settings.diplomacy.enabled = 'enabled';
         this.settings.diplomacy.lockedAlliances = 'enabled';
+        console.warn("Mode changed to team conquest, enabling diplomacy and locked alliances.")
         this.onMaxAllianceTriggerChanged(e);
       }
     },
@@ -973,10 +1006,8 @@ export default {
       if (!numberValid) {
         errors.push('The number of players must be larger than 3 and divisible by the number of teams.');
       }
-    }
-  },
-  computed: {
-    possibleTeamCounts () {
+    },
+    updatePossibleTeamCounts () {
       const players = this.settings.general.playerLimit;
 
       if (players < 4) {
@@ -992,9 +1023,13 @@ export default {
         }
       }
 
-      return teams;
+      if (teams.length) {
+        this.settings.conquest.teamsCount = teams[0];
+      }
+
+      this.possibleTeamCounts = teams;
     }
-  }
+  },
 }
 </script>
 

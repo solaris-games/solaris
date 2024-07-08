@@ -341,8 +341,8 @@ export default class CarrierService extends EventEmitter {
         // TODO: Event?
     }
 
-    canPlayersSeeCarrierShips(game: Game, playerIds: DBObjectId[], carrier: Carrier) {
-        const ids = playerIds.map(p => p.toString());
+    canPlayersSeeCarrierShips(game: Game, players: Player[], carrier: Carrier) {
+        const ids = players.map(p => p._id.toString());
         const isOwnedByPlayer = ids.includes(carrier.ownedByPlayerId!.toString());
 
         if (isOwnedByPlayer) {

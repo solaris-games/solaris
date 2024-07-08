@@ -9,6 +9,7 @@
     "playerType": "all",
     "anonymity": "normal",
     "playerOnlineStatus": "hidden",
+    "playerIPWarning": "enabled",
     "timeMachine": "enabled",
     "fluxEnabled": "disabled",
     "advancedAI": "enabled",
@@ -109,9 +110,10 @@
       "weapons": "standard",
       "specialists": "standard"
     },
+    "experimentationDistribution": "random",
     "bankingReward": "standard",
     "experimentationReward": "standard",
-    "specialistTokenReward": "standard"
+    "specialistTokenReward": "experimental"
   },
   "gameTime": {
     "gameType": "realTime",

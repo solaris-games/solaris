@@ -68,8 +68,13 @@ import UserLevelService from "../userLevel";
 import SpecialStarBanService from "../specialStarBan";
 import ShipService from "../ship";
 import SpectatorService from "../spectator";
+import ScheduleBuyService from "../scheduleBuy";
+import BasicAIService from "../basicAi";
+import PathfindingService from "../pathfinding";
 import UserLeaderboardService from "../userLeaderboard";
 import TeamService from "../team";
+import GameAuthService from "../gameAuth";
+import GameLockService from "../gameLock";
 import TutorialService from "../tutorial";
 
 export interface DependencyContainer {
@@ -87,6 +92,8 @@ export interface DependencyContainer {
     leaderboardService: LeaderboardService,
     userLeaderboardService: UserLeaderboardService,
     gameService: GameService,
+    gameAuthService: GameAuthService,
+    gameLockService: GameLockService,
     gameJoinService: GameJoinService,
     gameCreateValidationService: GameCreateValidationService,
     gameCreateService: GameCreateService,
@@ -123,6 +130,7 @@ export interface DependencyContainer {
     conversationService: ConversationService,
     reputationService: ReputationService,
     aiService: AIService,
+    basicAIService: BasicAIService,
     battleRoyaleService: BattleRoyaleService,
     starMovementService: StarMovementService,
     cacheService: CacheService,
@@ -145,5 +153,7 @@ export interface DependencyContainer {
     shipService: ShipService,
     spectatorService: SpectatorService,
     teamService: TeamService,
+    pathfindingService: PathfindingService,
+    scheduleBuyService: ScheduleBuyService,
     tutorialService: TutorialService,
 };

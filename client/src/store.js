@@ -3,7 +3,6 @@ import Vuex from 'vuex'
 import VuexPersist from 'vuex-persist'
 import eventBus from './eventBus'
 import GameHelper from './services/gameHelper'
-import MentionHelper from './services/mentionHelper'
 import GameContainer from './game/container'
 import SpecialistService from './services/api/specialist';
 
@@ -21,6 +20,8 @@ export default new Vuex.Store({
     tick: 0,
     cachedConversationComposeMessages: {},
     currentConversation: null,
+    mentionReceivingElement: null,
+    mentionCallbacks: null,
     starSpecialists: null,
     carrierSpecialists: null,
     settings: null,
@@ -131,6 +132,8 @@ export default new Vuex.Store({
       state.game = null
       state.cachedConversationComposeMessages = {}
       state.currentConversation = null;
+      state.carrierSpecialists = null;
+      state.starSpecialists = null;
     },
 
     setSettings (state, settings) {
@@ -153,8 +156,7 @@ export default new Vuex.Store({
     openConversation (state, data) {
       state.currentConversation = {
         id: data,
-        element: null,
-        text: state.cachedConversationComposeMessages[data]
+        text: state.cachedConversationComposeMessages[data] || ''
       }
     },
     closeConversation (state) {
@@ -170,32 +172,34 @@ export default new Vuex.Store({
     resetCurrentConversationText (state, data) {
       state.currentConversation.text = ''
     },
-    setConversationElement (state, data) {
-      state.currentConversation.element = data
+    setMentions (state, data) {
+      state.mentionReceivingElement = data.element;
+      state.mentionCallbacks = data.callbacks;
+    },
+    resetMentions (state) {
+      state.mentionReceivingElement = null;
+      state.mentionCallbacks = null;
     },
     playerClicked (state, data) {
-      if (state.currentConversation) {
-        MentionHelper.addMention(state.currentConversation, 'player', data.player.alias)
+      if (state.mentionCallbacks && state.mentionCallbacks.player) {
+        state.mentionCallbacks.player(data.player)
       } else {
         data.permitCallback(data.player)
       }
     },
     starClicked (state, data) {
-      if (state.currentConversation) {
-        MentionHelper.addMention(state.currentConversation, 'star', data.star.name)
+      if (state.mentionCallbacks && state.mentionCallbacks.star) {
+        state.mentionCallbacks.star(data.star)
       } else {
         data.permitCallback(data.star)
       }
     },
     starRightClicked (state, data) {
-      if (state.currentConversation && data.player) {
-        MentionHelper.addMention(state.currentConversation, 'player', data.player.alias)
+      if (state.mentionCallbacks && state.mentionCallbacks.player) {
+        state.mentionCallbacks.player(data.player)
       } else {
         data.permitCallback(data.star)
       }
-    },
-    replaceInConversationText (state, data) {
-      MentionHelper.useSuggestion(state.currentConversation, data)
     },
 
     // ----------------
@@ -275,11 +279,11 @@ export default new Vuex.Store({
       if (data.currentResearchTicksEta) {
         player.currentResearchTicksEta = data.currentResearchTicksEta
       }
-      
+
       if (data.nextResearchTicksEta) {
         player.nextResearchTicksEta = data.nextResearchTicksEta
       }
-      
+
       // Update player total stats.
       switch (data.infrastructureType) {
         case 'economy':
@@ -292,6 +296,14 @@ export default new Vuex.Store({
           player.stats.totalScience += (data.upgraded * state.game.constants.research.sciencePointMultiplier)
           break;
       }
+    },
+    gameBulkActionAdded(state, data) {
+      let player = GameHelper.getUserPlayer(state.game)
+      player.scheduledActions.push(data);
+    },
+    gameBulkActionTrashed(state, data) {
+      let player = GameHelper.getUserPlayer(state.game)
+      player.scheduledActions = player.scheduledActions.filter(a => a._id != data._id)
     },
     gameStarWarpGateBuilt (state, data) {
       let star = GameHelper.getStarById(state.game, data.starId)

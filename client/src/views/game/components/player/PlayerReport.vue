@@ -15,7 +15,9 @@ export default {
     },
     methods: {
         onOpenReportPlayerRequested (e) {
-            this.$emit('onOpenReportPlayerRequested', this.playerId)
+            this.$emit('onOpenReportPlayerRequested', {
+              playerId: this.playerId
+            })
         }
     }
 }

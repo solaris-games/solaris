@@ -136,7 +136,8 @@ export default class HistoryService {
                 afk: player.afk,
                 ready: player.ready,
                 readyToQuit: player.readyToQuit,
-                research: player.research
+                research: player.research,
+                scheduledActions: player.scheduledActions
             };
         });
 

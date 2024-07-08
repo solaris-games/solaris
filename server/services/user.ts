@@ -37,7 +37,7 @@ export default class UserService extends EventEmitter {
     }
 
     async getMe(id: DBObjectId) {
-        return await this.userRepo.findById(id, {
+        const user = await this.userRepo.findById(id, {
             // Remove fields we don't want to send back.
             password: 0,
             resetPasswordToken: 0,
@@ -48,6 +48,14 @@ export default class UserService extends EventEmitter {
             'oauth.discord.token': 0,
             tutorialsCompleted: 0,
         });
+
+        if (user) {
+            user.warnings = user.warnings.filter(warning => {
+                return moment().diff(warning.date, 'months') < 1;
+            });
+        }
+
+        return user;
     }
 
     async getById(id: DBObjectId, select: any | null = null) {
@@ -159,14 +167,14 @@ export default class UserService extends EventEmitter {
         return null;
     }
 
-    async getUserIsAdmin(userId: DBObjectId) {
+    async getUserIsAdmin(userId: DBObjectId): Promise<boolean> {
         let user = await this.userRepo.findOne({
             _id: userId
         }, {
             'roles.administrator': 1
         });
 
-        return user!.roles.administrator;
+        return Boolean(user?.roles.administrator);
     }
 
     async getUserIsSubAdmin(userId: DBObjectId) {

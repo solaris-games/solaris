@@ -16,6 +16,10 @@ export interface Report {
     reportedByPlayerId: DBObjectId;
     reportedByUserId: DBObjectId;
     reportedByPlayerAlias: string;
-    reasons: ReportReasons,
+    reportedConversationId: DBObjectId | null;
+    reportedMessageId: DBObjectId | null;
+    reasons: ReportReasons;
     actioned: boolean;
+    actionedBy: DBObjectId | null;
+    date: Date;
 };

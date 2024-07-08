@@ -10,6 +10,7 @@
     "playerType": "all",
     "anonymity": "extra",
     "playerOnlineStatus": "hidden",
+    "playerIPWarning": "enabled",
     "timeMachine": "enabled",
     "fluxEnabled": "enabled",
     "advancedAI": "enabled",
@@ -31,13 +32,13 @@
     "specialistCost": "standard",
     "specialistsCurrency": "creditsSpecialists",
     "randomWarpGates": 10,
-    "randomWormHoles": 5,
+    "randomWormHoles": 3,
     "randomNebulas": 15,
     "randomAsteroidFields": 10,
     "randomBinaryStars": 10,
     "randomBlackHoles": 5,
     "randomPulsars": 1,
-    "darkGalaxy": "fog",
+    "darkGalaxy": "extra",
     "giftCarriers": "enabled",
     "defenderBonus": "enabled",
     "carrierToCarrierCombat": "enabled",
@@ -47,14 +48,16 @@
     "carrierSpeed": 20,
     "starCaptureReward": "enabled",
     "specialistBans": {
-      "star": [],
+      "star": [
+        15
+      ],
       "carrier": []
     }
   },
   "conquest": {
     "victoryCondition": "starPercentage",
     "victoryPercentage": 33,
-    "capitalStarElimination": "disabled"
+    "capitalStarElimination": "enabled"
   },
   "orbitalMechanics": {
     "enabled": "disabled",
@@ -62,8 +65,8 @@
   },
   "player": {
     "startingStars": 6,
-    "startingCredits": 1000,
-    "startingCreditsSpecialists": 10,
+    "startingCredits": 2000,
+    "startingCreditsSpecialists": 15,
     "startingShips": 10,
     "startingInfrastructure": {
       "economy": 5,
@@ -76,7 +79,7 @@
       "science": "standard"
     },
     "tradeCredits": true,
-    "tradeCreditsSpecialists": true,
+    "tradeCreditsSpecialists": false,
     "tradeCost": 15,
     "tradeScanning": "scanned",
     "populationCap": {
@@ -104,21 +107,22 @@
       "specialists": 1
     },
     "researchCosts": {
-      "terraforming": "expensive",
-      "experimentation": "expensive",
-      "scanning": "expensive",
-      "hyperspace": "expensive",
-      "manufacturing": "expensive",
-      "banking": "expensive",
-      "weapons": "veryExpensive",
+      "terraforming": "standard",
+      "experimentation": "cheap",
+      "scanning": "cheap",
+      "hyperspace": "cheap",
+      "manufacturing": "standard",
+      "banking": "cheap",
+      "weapons": "expensive",
       "specialists": "expensive"
     },
+    "experimentationDistribution": "random",
     "bankingReward": "standard",
-    "experimentationReward": "standard",
+    "experimentationReward": "experimental",
     "specialistTokenReward": "experimental",
     "researchCostProgression": {
       "progression": "exponential",
-      "growthFactor": "soft"
+      "growthFactor": "medium"
     }
   },
   "gameTime": {

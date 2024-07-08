@@ -6,6 +6,8 @@
 import { mapState } from 'vuex'
 import GameContainer from '../../../game/container'
 import GameApiService from '../../../services/api/game'
+import GameHelper from "@/services/gameHelper";
+import {attachEventDeduplication} from "../../../util/eventDeduplication";
 
 export default {
   data () {
@@ -30,10 +32,15 @@ export default {
   },
 
   mounted () {
+    const game = this.$store.state.game;
+
     // Add the game canvas to the screen.
     this.$el.appendChild(this.gameContainer.app.view) // Add the pixi canvas to the element.
 
-    this.drawGame(this.$store.state.game)
+    this.drawGame(game)
+
+    const gameRoot = document.getElementById("gameRoot") // Defined in Game component
+    attachEventDeduplication(gameRoot, this.gameContainer.app.view)
 
     // Bind to game events.
     this.onStarClickedHandler = this.onStarClicked.bind(this)
@@ -55,7 +62,7 @@ export default {
       this.touchPlayer()
     }
 
-    this.tryShowDonateModal()
+    this.tryShowDonateModal(game)
   },
 
   beforeDestroy () {
@@ -116,7 +123,11 @@ export default {
     onObjectsClicked (e) {
       this.$emit('onObjectsClicked', e)
     },
-    async tryShowDonateModal () {
+    async tryShowDonateModal (game) {
+      if (GameHelper.isTutorialGame(game)) {
+        return;
+      }
+
       let chance = Math.floor(Math.random() * (20 - 0 + 1) + 0); // 1 in 20
 
       if (chance === 0 &&

@@ -10,6 +10,8 @@ export interface ReportCreateReportRequest {
         multiboxing: boolean;
         inappropriateAlias: boolean;
     }
+    conversationId?: DBObjectId;
+    messageId?: DBObjectId;
 };
 
 export const mapToReportCreateReportRequest = (body: any): ReportCreateReportRequest => {
@@ -41,12 +43,25 @@ export const mapToReportCreateReportRequest = (body: any): ReportCreateReportReq
         }
     }
 
+    const req: ReportCreateReportRequest = {
+        playerId: body.playerId,
+        reasons: body.reasons
+    };
+
+    if (body.conversationId) {
+        if (body.messageId) {
+            req.conversationId = body.conversationId;
+            req.messageId = body.messageId;
+        } else {
+            errors.push('Message ID is required if conversation ID is provided.');
+        }
+    } else if (body.messageId) {
+        errors.push('Conversation ID is required if message ID is provided.');
+    }
+
     if (errors.length) {
         throw new ValidationError(errors);
     }
 
-    return {
-        playerId: body.playerId,
-        reasons: body.reasons
-    }
+    return req;
 };

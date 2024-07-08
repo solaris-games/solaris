@@ -1,0 +1,26 @@
+services:
+  client:
+    build: ./client
+    ports:
+      - "8080:8080"
+
+  api:
+    build: ./server
+    command: npm run start-api:prod
+    ports:
+      - "3000:3000"
+    depends_on:
+      - database
+      
+  jobs:
+    build: ./server
+    command: npm run start-jobs:prod
+    depends_on:
+      - database
+
+  database:
+    image: mongo
+    volumes:
+      - ./database_data:/data/db
+    ports:
+      - "27017:27017"

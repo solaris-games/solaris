@@ -38,7 +38,9 @@ import GamePlayerAFKEvent from "./types/events/GamePlayerAFK";
 import GameEndedEvent from "./types/events/GameEnded";
 import PlayerAfkService from "./playerAfk";
 import ShipService from "./ship";
+import ScheduleBuyService from "./scheduleBuy";
 import {Moment} from "moment";
+import GameLockService from "./gameLock";
 
 const EventEmitter = require('events');
 const moment = require('moment');
@@ -82,7 +84,9 @@ export default class GameTickService extends EventEmitter {
     starContestedService: StarContestedService;
     playerReadyService: PlayerReadyService;
     shipService: ShipService;
-    
+    scheduleBuyService: ScheduleBuyService;
+    gameLockService: GameLockService;
+
     constructor(
         distanceService: DistanceService,
         starService: StarService,
@@ -112,7 +116,9 @@ export default class GameTickService extends EventEmitter {
         carrierGiftService: CarrierGiftService,
         starContestedService: StarContestedService,
         playerReadyService: PlayerReadyService,
-        shipService: ShipService
+        shipService: ShipService,
+        scheduleBuyService: ScheduleBuyService,
+        gameLockService: GameLockService,
     ) {
         super();
             
@@ -145,23 +151,31 @@ export default class GameTickService extends EventEmitter {
         this.starContestedService = starContestedService;
         this.playerReadyService = playerReadyService;
         this.shipService = shipService;
+        this.gameLockService = gameLockService;
+        this.scheduleBuyService = scheduleBuyService;
     }
 
     async tick(gameId: DBObjectId) {
-        let game = (await this.gameService.getByIdAll(gameId))!;
+        const game = (await this.gameService.getByIdAll(gameId));
+
+        if (!game) {
+            console.error(`Game not found: ${gameId}`);
+            return;
+        }
 
         // Double check the game isn't locked.
-        if (!this.gameStateService.isLocked(game)) {
+        if (!await this.gameLockService.isLockedInDatabase(game._id)) {
             throw new Error(`The game is not locked.`);
         }
 
         /*
-            1. Move all carriers
-            2. Perform combat at stars that have enemy carriers in orbit
-            3. Industry creates new ships
-            4. Players conduct research
-            5. If its the last tick in the galactic cycle, all players earn money and experimentation is done.
-            6. Check to see if anyone has won the game.
+            1. Buy scheduled infrastructure
+            2. Move all carriers
+            3. Perform combat at stars that have enemy carriers in orbit
+            4. Industry creates new ships
+            5. Players conduct research
+            6. If its the last tick in the galactic cycle, all players earn money and experimentation is done.
+            7. Check to see if anyone has won the game.
         */
 
         let startTime = process.hrtime();
@@ -194,14 +208,21 @@ export default class GameTickService extends EventEmitter {
         let hasProductionTicked: boolean = false;
 
         while (iterations--) {
+            if (!await this.gameLockService.isLockedInDatabase(game._id)) {
+                throw new Error(`The game was not locked after game processing, concurrency issue?`);
+            }
+
             game.state.tick++;
 
             logTime(`Tick ${game.state.tick}`);
 
+            await this.scheduleBuyService.buyScheduledInfrastructure(game);
+            logTime('Buy scheduled infrastructure')
+
             await this._captureAbandonedStars(game, gameUsers);
             logTime('Capture abandoned stars');
 
-            await this._transferGiftsInOrbit(game, gameUsers);
+            this._transferGiftsInOrbit(game, gameUsers);
             logTime('Transfer gifts in orbit');
 
             await this._combatCarriers(game, gameUsers);
@@ -213,20 +234,20 @@ export default class GameTickService extends EventEmitter {
             await this._combatContestedStars(game, gameUsers);
             logTime('Combat at contested stars');
 
-            let ticked: boolean = await this._endOfGalacticCycleCheck(game);
+            const ticked = this._endOfGalacticCycleCheck(game);
             logTime('Galactic cycle check');
 
             if (ticked && !hasProductionTicked) {
                 hasProductionTicked = true;
             }
 
-            await this._gameLoseCheck(game, gameUsers);
+            this._gameLoseCheck(game, gameUsers);
             logTime('Game lose check');
 
             await this._playAI(game);
             logTime('AI controlled players turn');
             
-            await this.researchService.conductResearchAll(game, gameUsers);
+            this.researchService.conductResearchAll(game, gameUsers);
             logTime('Conduct research');
 
             this._orbitGalaxy(game);
@@ -244,7 +265,7 @@ export default class GameTickService extends EventEmitter {
             this._countdownToEndCheck(game);
             logTime('Countdown to end check');
 
-            let hasWinner = await this._gameWinCheck(game, gameUsers);
+            let hasWinner = this._gameWinCheck(game, gameUsers);
             logTime('Game win check');
 
             await this._logHistory(game);
@@ -260,6 +281,10 @@ export default class GameTickService extends EventEmitter {
         logTime('Sanitise dark mode carrier waypoints');
 
         this.playerReadyService.resetReadyStatuses(game, hasProductionTicked);
+
+        if (!await this.gameLockService.isLockedInDatabase(game._id)) {
+            throw new Error(`The game was not locked after game processing, concurrency issue?`);
+        }
 
         await game.save();
         logTime('Save game');
@@ -321,11 +346,11 @@ export default class GameTickService extends EventEmitter {
             return;
         }
 
-        let isAlliancesEnabled = this.diplomacyService.isFormalAlliancesEnabled(game);
+        const isAlliancesEnabled = this.diplomacyService.isFormalAlliancesEnabled(game);
 
         // Get all carriers that are in transit, their current locations
         // and where they will be moving to.
-        let carrierPositions: CarrierPosition[] = game.galaxy.carriers
+        const carrierPositions: CarrierPosition[] = game.galaxy.carriers
             .filter(x => 
                 this.carrierMovementService.isInTransit(x)           // Carrier is already in transit
                 || this.carrierMovementService.isLaunching(x)        // Or the carrier is just about to launch (this prevent carrier from hopping over attackers)
@@ -424,9 +449,9 @@ export default class GameTickService extends EventEmitter {
                     continue;
                 }
 
-                let friendlyPlayer = this.playerService.getById(game, friendlyCarrier.carrier.ownedByPlayerId)!;
+                const friendlyPlayer = this.playerService.getById(game, friendlyCarrier.carrier.ownedByPlayerId)!;
                 
-                let combatCarriers = collisionCarriers
+                const combatCarriers = collisionCarriers
                     .map(c => c.carrier)
                     .filter(c => c.ships! > 0);
 
@@ -634,7 +659,7 @@ export default class GameTickService extends EventEmitter {
             let carrier = contestedStar.carriersInOrbit
                 .sort((a: Carrier, b: Carrier) => b.ships! - a.ships!)[0];
 
-            this.starService.claimUnownedStar(game, gameUsers, contestedStar.star, carrier);
+            await this.starService.claimUnownedStar(game, gameUsers, contestedStar.star, carrier);
         }
     }
 
@@ -644,7 +669,7 @@ export default class GameTickService extends EventEmitter {
         }
     }
 
-    async _endOfGalacticCycleCheck(game: Game) {
+    _endOfGalacticCycleCheck(game: Game): boolean {
         let hasProductionTicked: boolean = game.state.tick % game.settings.galaxy.productionTicks === 0;
 
         // Check if we have reached the production tick.
@@ -707,12 +732,11 @@ export default class GameTickService extends EventEmitter {
         await this.historyService.log(game);
     }
 
-    async _gameLoseCheck(game: Game, gameUsers: User[]) {
+    _gameLoseCheck(game: Game, gameUsers: User[]) {
         // Check to see if anyone has been defeated.
         // A player is defeated if they have no stars and no carriers remaining.
-        let isTutorialGame = this.gameTypeService.isTutorialGame(game);
-        let isTurnBasedGame = this.gameTypeService.isTurnBasedGame(game);
-        let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated);
+        const isTutorialGame = this.gameTypeService.isTutorialGame(game);
+        const undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated);
 
         for (let i = 0; i < undefeatedPlayers.length; i++) {
             let player = undefeatedPlayers[i];
@@ -731,7 +755,7 @@ export default class GameTickService extends EventEmitter {
                     }
             
                     if (user && !isTutorialGame) {
-                        user.achievements.afk++;
+                        this.playerAfkService.incrementAfkCount(user);
                     }
 
                     let e: GamePlayerAFKEvent = {
@@ -768,7 +792,7 @@ export default class GameTickService extends EventEmitter {
         this.gameStateService.updateStatePlayerCount(game);
     }
 
-    async _gameWinCheck(game: Game, gameUsers: User[]) {
+    _gameWinCheck(game: Game, gameUsers: User[]) {
         const isTutorialGame = this.gameTypeService.isTutorialGame(game);
 
 
@@ -858,13 +882,11 @@ export default class GameTickService extends EventEmitter {
 
         if (canAwardRank) {
             if (this.gameTypeService.isTeamConquestGame(game)) {
-                let teamLeaderboard = this.leaderboardService.getTeamLeaderboard(game)!.leaderboard;
+                const teamLeaderboard = this.leaderboardService.getTeamLeaderboard(game)!.leaderboard;
 
                 rankingResult = this.leaderboardService.addTeamRankings(game, gameUsers, teamLeaderboard);
-
-                // TODO: What kind of awards do we want for team games?
             } else {
-                let leaderboard = this.leaderboardService.getGameLeaderboard(game).leaderboard;
+                const leaderboard = this.leaderboardService.getGameLeaderboard(game).leaderboard;
 
                 rankingResult = this.leaderboardService.addGameRankings(game, gameUsers, leaderboard);
                 this.leaderboardService.incrementGameWinnerAchievements(game, gameUsers, leaderboard[0].player, awardCredits);
