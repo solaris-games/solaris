@@ -784,6 +784,23 @@ class Star extends EventEmitter {
   onClicked(e, tryMultiSelect = true) {
     const eventData = e ? e.data : null
 
+    const click = () => {
+      this.emit('onStarClicked', {
+        starData: this.data,
+        tryMultiSelect,
+        eventData,
+        permitCallback: () => {
+          // Need to do this otherwise sometimes text gets highlighted.
+          this.deselectAllText()
+
+          if (this._getStarPlayer()) {
+            this.updateVisibility()
+            // this.setScale()
+          }
+        }
+      })
+    };
+
     if (e?.data?.originalEvent) {
       const button = e.data.originalEvent.button;
 
@@ -798,21 +815,10 @@ class Star extends EventEmitter {
           eventData
         });
       } else {
-        this.emit('onStarClicked', {
-          starData: this.data,
-          tryMultiSelect,
-          eventData,
-          permitCallback: () => {
-            // Need to do this otherwise sometimes text gets highlighted.
-            this.deselectAllText()
-
-            if (this._getStarPlayer()) {
-              this.updateVisibility()
-              // this.setScale()
-            }
-          }
-        })
+        click();
       }
+    } else {
+      click();
     }
   }
 
