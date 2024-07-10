@@ -97,10 +97,6 @@ export const mapToScheduledStarUpgradeInfrastructureBulkRequest = (body: any): S
         errors.push('Tick is required.');
     }
 
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
     body.amount = +body.amount;
     body.tick = +body.tick;
 
@@ -110,6 +106,10 @@ export const mapToScheduledStarUpgradeInfrastructureBulkRequest = (body: any): S
 
     if (body.tick < 0) {
         errors.push('Tick must be greater than 0.');
+    }
+
+    if (errors.length) {
+        throw new ValidationError(errors);
     }
 
     return {
