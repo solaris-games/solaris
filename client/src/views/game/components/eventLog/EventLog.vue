@@ -27,7 +27,7 @@ export default {
     this.sockets.subscribe('playerEventRead', this.checkForUnreadEvents.bind(this))
     this.sockets.subscribe('playerAllEventsRead', this.checkForUnreadEvents.bind(this))
   },
-  destroyed () {
+  unmounted () {
     this.sockets.unsubscribe('playerEventRead')
     this.sockets.unsubscribe('playerAllEventsRead')
   },

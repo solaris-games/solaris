@@ -77,11 +77,11 @@ export default {
     this.tableData = this.getTableData()
 
     this.allowUpgrades = this.$store.state.settings.interface.galaxyScreenUpgrades === 'enabled' && !this.isGameFinished
-    
+
     this.sortBy = localStorage.getItem('galaxy_stars_sortBy') || null
     this.sortDirection = localStorage.getItem('galaxy_stars_sortDirection') == 'true' || false
   },
-  destroyed () {
+  unmounted () {
     localStorage.setItem('galaxy_stars_sortBy', this.sortBy)
     localStorage.setItem('galaxy_stars_sortDirection', this.sortDirection)
   },
@@ -157,7 +157,7 @@ export default {
               return ao < bo ? -1 : 1;
           }
           // if descending, highest sorts first
-          else { 
+          else {
               return ao < bo ? 1 : -1;
           }
         })

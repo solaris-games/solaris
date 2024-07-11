@@ -36,7 +36,7 @@ export default {
         this.recalculateOnlineStatus()
       }
   },
-  destroyed () {
+  unmounted () {
     clearInterval(this.intervalFunction)
   },
   methods: {
@@ -63,7 +63,7 @@ export default {
   margin-right: -6px;
 }
 
-@media screen and (max-width: 576px) { 
+@media screen and (max-width: 576px) {
   .span-container {
     height: 10px;
     width: 10px;

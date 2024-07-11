@@ -55,7 +55,7 @@ export default {
   mounted() {
     this.loadGameNotes()
   },
-  destroyed() {
+  unmounted() {
     this.$store.commit('resetMentions')
   },
   methods: {

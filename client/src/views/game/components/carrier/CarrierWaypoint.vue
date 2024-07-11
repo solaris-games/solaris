@@ -17,7 +17,7 @@
                 <span v-if="currentWaypoint && currentWaypoint.action && isActionRequiresPercentage(currentWaypoint.action)">%</span>
             </div>
         </div>
-        
+
         <div class="row g-0 mb-2" v-if="currentWaypoint">
             <div class="col-2 text-center">
               <input type="number" class="form-control input-sm" v-if="!(isFirstWaypoint(currentWaypoint) && isInTransit)" v-model="currentWaypoint.delayTicks" @change="recalculateWaypointDuration">
@@ -126,7 +126,7 @@ export default {
       this.recalculateWaypointEta()
     }
   },
-  destroyed () {
+  unmounted () {
     GameContainer.map.clearHighlightedLocations()
   },
   methods: {
@@ -210,7 +210,7 @@ export default {
     },
     panToWaypoint () {
       GameContainer.map.clearHighlightedLocations()
-      
+
       let star = this.$store.state.game.galaxy.stars.find(x => x._id === this.currentWaypoint.destination)
 
       GameContainer.map.panToStar(star)
@@ -253,7 +253,7 @@ export default {
         let timeRemainingEtaDate = GameHelper.calculateTimeByTicks(this.currentWaypoint.ticks + +this.currentWaypoint.delayTicks, this.$store.state.game.settings.gameTime.speed, null)
         this.waypointDuration = GameHelper.getCountdownTimeString(this.$store.state.game, timeRemainingEtaDate, true)
       }
-      
+
       this.recalculateWaypointEta()
     },
     recalculateWaypointEta () {

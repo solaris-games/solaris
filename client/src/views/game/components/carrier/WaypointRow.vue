@@ -34,7 +34,7 @@ export default {
       this.recalculateTimeRemaining()
     }
   },
-  destroyed () {
+  unmounted () {
     clearInterval(this.intervalFunction)
   },
   methods: {

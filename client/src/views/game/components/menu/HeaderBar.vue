@@ -116,7 +116,7 @@ export default {
     this.sockets.subscribe('playerCreditsSpecialistsReceived', this.onCreditsSpecialistsReceived)
     this.sockets.subscribe('playerTechnologyReceived', this.onTechnologyReceived)
   },
-  destroyed () {
+  unmounted () {
     document.removeEventListener('keydown', this.handleKeyDown)
 
     clearInterval(this.intervalFunction)

@@ -7,7 +7,7 @@ export default {
     mounted () {
         document.addEventListener("mousemove", this.parallax)
     },
-    destroyed () {
+    unmounted () {
         document.removeEventListener("mousemove", this.parallax)
     },
     methods: {

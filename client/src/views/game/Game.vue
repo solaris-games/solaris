@@ -104,10 +104,10 @@ export default {
 
     this.$store.dispatch('loadSpecialistData');
   },
-  beforeDestroy () {
+  beforeUnmount () {
     clearInterval(this.polling)
   },
-  destroyed () {
+  unmounted () {
     this.unsubscribeToSockets()
 
     let socketData = {

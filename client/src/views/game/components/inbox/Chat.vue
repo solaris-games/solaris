@@ -59,7 +59,7 @@ export default {
     eventBus.$on('onViewConversationRequested', this.onViewConversationRequested)
     eventBus.$on('onOpenInboxRequested', this.onOpenInboxRequested)
   },
-  destroyed () {
+  unmounted () {
     document.removeEventListener('keydown', this.handleKeyDown)
     window.removeEventListener('resize', this.handleResize)
 

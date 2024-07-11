@@ -270,7 +270,7 @@ export default {
       this.recalculateTimeRemaining()
     }
   },
-  destroyed () {
+  unmounted () {
     GameContainer.map.off('onWaypointCreated', this.onWaypointCreatedHandler)
 
     clearInterval(this.intervalFunction)

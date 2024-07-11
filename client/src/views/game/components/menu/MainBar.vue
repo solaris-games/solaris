@@ -246,7 +246,7 @@ export default {
     eventBus.$on('onViewConversationRequested', this.onViewConversationRequested)
     eventBus.$on('onOpenInboxRequested', this.onOpenInboxRequested)
   },
-  destroyed () {
+  unmounted () {
     eventBus.$off('onMenuRequested', this.onMenuRequested)
     eventBus.$off('onCreateNewConversationRequested', this.onCreateNewConversationRequested)
     eventBus.$off('onViewConversationRequested', this.onViewConversationRequested)

@@ -1,14 +1,14 @@
 <template>
 <div>
     <loading-spinner :loading="isLoadingLedger"/>
-    
+
     <div v-if="!isLoadingLedger" class="row">
       <div class="table-responsive p-0" v-if="ledgers.length">
         <table class="table table-sm table-striped mb-0">
           <tbody>
-            <ledger-row 
-              v-for="ledger in ledgers" 
-              :key="ledger.playerId" 
+            <ledger-row
+              v-for="ledger in ledgers"
+              :key="ledger.playerId"
               :ledger="ledger"
               :ledgerType="ledgerType"
               @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
@@ -48,7 +48,7 @@ export default {
     this.sockets.subscribe('playerDebtForgiven', this.onPlayerDebtForgiven)
     this.sockets.subscribe('playerDebtSettled', this.onPlayerDebtSettled)
   },
-  destroyed () {
+  unmounted () {
     this.sockets.unsubscribe('playerDebtAdded')
     this.sockets.unsubscribe('playerDebtForgiven')
     this.sockets.unsubscribe('playerDebtSettled')
@@ -61,8 +61,8 @@ export default {
       try {
         this.isLoadingLedger = true
 
-        let response = this.ledgerType === 'credits' ? 
-          await LedgerApiService.getLedgerCredits(this.$store.state.game._id) : 
+        let response = this.ledgerType === 'credits' ?
+          await LedgerApiService.getLedgerCredits(this.$store.state.game._id) :
           await LedgerApiService.getLedgerCreditsSpecialists(this.$store.state.game._id)
 
         if (response.status === 200) {

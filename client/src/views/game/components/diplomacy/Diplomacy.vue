@@ -30,7 +30,7 @@
 
     <div class="mt-2" v-if="isFormalAlliancesEnabled">
       <hr/>
-      
+
       <h5>Alliance Settings</h5>
 
       <ul>
@@ -89,7 +89,7 @@ export default {
   created () {
     this.sockets.subscribe('playerDiplomaticStatusChanged', this.onPlayerDiplomaticStatusChanged)
   },
-  destroyed () {
+  unmounted () {
     this.sockets.unsubscribe('playerDiplomaticStatusChanged')
   },
   methods: {

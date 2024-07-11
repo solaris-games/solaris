@@ -223,7 +223,7 @@ export default {
 
     this.setupInfrastructureTypes()
   },
-  destroyed() {
+  unmounted() {
     GameContainer.map.hideIgnoreBulkUpgrade()
   },
   computed: {

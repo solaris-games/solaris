@@ -58,11 +58,11 @@ export default {
   mounted () {
     this.showAll = this.getUserPlayer() == null
     this.tableData = this.getTableData()
-    
+
     this.sortBy = localStorage.getItem('galaxy_ships_sortBy') || null
     this.sortDirection = localStorage.getItem('galaxy_ships_sortDirection') == 'true' || false
   },
-  destroyed () {
+  unmounted () {
     localStorage.setItem('galaxy_ships_sortBy', this.sortBy)
     localStorage.setItem('galaxy_ships_sortDirection', this.sortDirection)
   },

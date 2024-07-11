@@ -78,7 +78,7 @@ export default {
   created () {
     this.sockets.subscribe('gameMessageSent', this.onMessageReceived)
   },
-  destroyed () {
+  unmounted () {
     this.sockets.unsubscribe('gameMessageSent')
   },
   methods: {

@@ -21,7 +21,7 @@ export default {
         this.recalculateTime();
         this.intervalFunction = setInterval(this.recalculateTime, 250);
     },
-    destroyed () {
+    unmounted () {
         if (this.intervalFunction) {
             clearInterval(this.intervalFunction);
         }

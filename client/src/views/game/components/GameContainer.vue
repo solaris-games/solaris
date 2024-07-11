@@ -65,7 +65,7 @@ export default {
     this.tryShowDonateModal(game)
   },
 
-  beforeDestroy () {
+  beforeUnmount () {
     window.removeEventListener('resize', this.handleResize)
 
     this.gameContainer.map.off('onStarClicked', this.onStarClickedHandler)

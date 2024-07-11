@@ -88,7 +88,7 @@ export default {
     this.sockets.subscribe('playerRenownReceived', this.onTradeEventReceived)
     this.sockets.subscribe('playerTechnologyReceived', this.onTradeEventReceived)
   },
-  destroyed () {
+  unmounted () {
     this.sockets.unsubscribe('gameMessageSent')
     this.sockets.unsubscribe('gameConversationRead')
     this.sockets.unsubscribe('gameConversationLeft')

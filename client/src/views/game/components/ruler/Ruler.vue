@@ -208,7 +208,7 @@ export default {
     GameContainer.map.on('onRulerPointRemoved', this.onRulerPointRemoved.bind(this))
     GameContainer.map.on('onRulerPointsCleared', this.onRulerPointsCleared.bind(this))
   },
-  destroyed () {
+  unmounted () {
     // Set map to galaxy mode
     GameContainer.resetMode()
   },

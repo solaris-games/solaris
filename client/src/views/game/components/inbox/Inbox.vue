@@ -29,7 +29,7 @@ export default {
     this.sockets.subscribe('gameMessageSent', this.checkForUnreadMessages.bind(this))
     this.sockets.subscribe('gameConversationRead', this.checkForUnreadMessages.bind(this))
   },
-  destroyed () {
+  unmounted () {
     this.sockets.unsubscribe('gameMessageSent')
     this.sockets.unsubscribe('gameConversationRead')
   },

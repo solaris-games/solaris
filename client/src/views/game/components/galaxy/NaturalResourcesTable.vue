@@ -62,11 +62,11 @@ export default {
   mounted () {
     this.showAll = this.getUserPlayer() == null
     this.tableData = this.getTableData()
-    
+
     this.sortBy = localStorage.getItem('galaxy_naturalResources_sortBy') || null
     this.sortDirection = localStorage.getItem('galaxy_naturalResources_sortDirection') == 'true' || false
   },
-  destroyed () {
+  unmounted () {
     localStorage.setItem('galaxy_naturalResources_sortBy', this.sortBy)
     localStorage.setItem('galaxy_naturalResources_sortDirection', this.sortDirection)
   },
@@ -142,7 +142,7 @@ export default {
               return ao < bo ? -1 : 1;
           }
           // if descending, highest sorts first
-          else { 
+          else {
               return ao < bo ? 1 : -1;
           }
         })

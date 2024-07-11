@@ -130,7 +130,7 @@ export default {
 
     this.recalculateTotalEta()
   },
-  destroyed () {
+  unmounted () {
     this.carrier.waypoints = this.oldWaypoints
     this.carrier.waypointsLooped = this.oldWaypointsLooped
     GameContainer.drawWaypoints()

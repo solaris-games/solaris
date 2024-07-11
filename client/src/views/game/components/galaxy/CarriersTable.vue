@@ -60,11 +60,11 @@ export default {
   mounted () {
     this.showAll = this.getUserPlayer() == null
     this.tableData = this.getTableData()
-    
+
     this.sortBy = localStorage.getItem('galaxy_carriers_sortBy') || null
     this.sortDirection = localStorage.getItem('galaxy_carriers_sortDirection') == 'true' || false
   },
-  destroyed () {
+  unmounted () {
     localStorage.setItem('galaxy_carriers_sortBy', this.sortBy)
     localStorage.setItem('galaxy_carriers_sortDirection', this.sortDirection)
   },
