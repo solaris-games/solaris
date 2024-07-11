@@ -1,4 +1,4 @@
-import Vue, {createApp} from 'vue'
+import {createApp} from 'vue'
 import VueSocketio from 'vue-socket.io' // NOTE: There is an issue with >3.0.7 so forced to use 3.0.7, see here: https://stackoverflow.com/questions/61769716/vue-socket-connection-not-triggered
 import Toasted from 'vue-toasted'
 import App from './App.vue'
@@ -23,7 +23,7 @@ window._solaris = {
   errors: []
 };
 
-const app = createApp({});
+const app = createApp(App);
 
 app.config.errorHandler = (err, vm, info) => {
   window._solaris.errors.push(`Vue error: ${err.message}\n ${err.cause} ${info}\n ${err.stack}`);
