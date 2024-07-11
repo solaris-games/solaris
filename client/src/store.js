@@ -1,19 +1,16 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+import { createStore } from 'vuex';
 import VuexPersist from 'vuex-persist'
 import eventBus from './eventBus'
 import GameHelper from './services/gameHelper'
 import GameContainer from './game/container'
 import SpecialistService from './services/api/specialist';
 
-Vue.use(Vuex)
-
 const vuexPersist = new VuexPersist({
   key: 'solaris',
   storage: localStorage
-})
+});
 
-export default new Vuex.Store({
+export default createStore({
   state: {
     userId: null,
     game: null,

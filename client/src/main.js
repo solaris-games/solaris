@@ -1,4 +1,4 @@
-import Vue from 'vue'
+import Vue, {createApp} from 'vue'
 import VueSocketio from 'vue-socket.io' // NOTE: There is an issue with >3.0.7 so forced to use 3.0.7, see here: https://stackoverflow.com/questions/61769716/vue-socket-connection-not-triggered
 import Toasted from 'vue-toasted'
 import App from './App.vue'
@@ -17,14 +17,15 @@ import '@pixi/graphics-extras';
 window.bootstrap = require('bootstrap/dist/js/bootstrap.bundle.js');
 require('../public/assets/js/app.min.js')
 
-Vue.config.productionTip = false
 window.$ = $;
 
 window._solaris = {
   errors: []
 };
 
-Vue.config.errorHandler = (err, vm, info) => {
+const app = createApp({});
+
+app.config.errorHandler = (err, vm, info) => {
   window._solaris.errors.push(`Vue error: ${err.message}\n ${err.cause} ${info}\n ${err.stack}`);
 
   console.error(err);
@@ -38,7 +39,9 @@ window.addEventListener("unhandledrejection", (event) => {
   window._solaris.errors.push(event.error + ' ' + event.reason);
 });
 
-Vue.use(new VueSocketio({
+app.use(store);
+
+app.use(new VueSocketio({
   debug: true,
   connection: `//${process.env.VUE_APP_SOCKETS_HOST}`,
   vuex: {
@@ -46,14 +49,14 @@ Vue.use(new VueSocketio({
     actionPrefix: 'SOCKET_',
     mutationPrefix: 'SOCKET_'
   }
-}))
+}));
 
-Vue.use(Toasted, {
+app.use(Toasted, {
   position: 'bottom-right',
   duration: 2500
-})
+});
 
-Vue.prototype.$confirm = async function(title, text, confirmText = 'Yes', cancelText = 'No', hideCancelButton = false, cover = false) {
+app.config.globalProperties.$confirm = async function(title, text, confirmText = 'Yes', cancelText = 'No', hideCancelButton = false, cover = false) {
   return this.$store.dispatch('confirm', {
     titleText: title,
     text,
@@ -64,15 +67,15 @@ Vue.prototype.$confirm = async function(title, text, confirmText = 'Yes', cancel
   })
 }
 
-Vue.prototype.$isHistoricalMode = function() {
+app.config.globalProperties.$isHistoricalMode = function() {
   return this.$store.state.tick !== this.$store.state.game.state.tick
 }
 
-Vue.prototype.$isMobile = function () {
+app.config.globalProperties.$isMobile = function () {
   return window.matchMedia('only screen and (max-width: 576px)').matches
 }
 
-Vue.directive('tooltip', function(el, binding) {
+app.directive('tooltip', function(el, binding) {
   new bootstrap.Tooltip($(el), {
     title: binding.value,
     placement: binding.arg,
@@ -80,8 +83,6 @@ Vue.directive('tooltip', function(el, binding) {
   })
 })
 
-new Vue({
-  router,
-  store,
-  render: h => h(App)
-}).$mount('#app')
+app.use(router);
+
+app.mount('#app');
