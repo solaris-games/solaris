@@ -205,6 +205,8 @@ export default class GameGalaxyService {
             this._setStarInfoDetailed(game, userPlayer, viewpoint);
         }
 
+        this._filterPlayerHomeStars(game);
+
         // For extra dark mode games, overwrite the player stats as by this stage
         // scanning range will have kicked in and filtered out stars and carriers the player
         // can't see and therefore global stats should display what the current player can see
@@ -230,6 +232,19 @@ export default class GameGalaxyService {
         }
 
         return game;
+    }
+
+    _filterPlayerHomeStars(game: Game) {
+        for (let player of game.galaxy.players) {
+            const homeStarId = player.homeStarId?.toString();
+
+            if (homeStarId) {
+                const homeStar = game.galaxy.stars.find(s => s._id.toString() === homeStarId);
+                if (!homeStar?.isInScanningRange) {
+                    delete player.homeStarId;
+                }
+            }
+        }
     }
 
     _getCachedGalaxy(gameId: DBObjectId, userId: DBObjectId | null, requestedTick: number | null, currentTick: number) {
