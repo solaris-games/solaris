@@ -187,6 +187,10 @@ class Star extends EventEmitter {
       this.graphics_star.tint = 0xa0a0a0
     }
 
+    if (gameHelper.isCapitalElimination(this.game) && gameHelper.isOwnerCapital(this.game, this.data)) {
+      this.graphics_star.tint = 0xFF0000
+    }
+
     this.graphics_star.anchor.set(0.5)
     this.graphics_star.width = 24.0/2.0
     this.graphics_star.height = 24.0/2.0
