@@ -60,6 +60,7 @@ export type GameTimeStartDelay = 0|1|5|10|30|60|120|240|360|480|600|720|1440;
 export type GameTimeMaxTurnWait = 1|5|10|30|60|120|240|360|480|600|720|1080|1440|2880;
 export type ReadyToQuitFraction = 0.5|0.66|0.75|0.9|1.0;
 export type ReadyToQuitTimerCycles = 0|1|2|3;
+export type ReadyToQuitVisibility = 'visible'|'anonymous'|'hidden';
 
 export type GameResearchProgressionStandard = {
 	progression: 'standard',
@@ -107,6 +108,7 @@ export interface GameSettings {
 		readyToQuit: GameSettingEnabledDisabled;
 		readyToQuitFraction?: ReadyToQuitFraction;
 		readyToQuitTimerCycles?: ReadyToQuitTimerCycles;
+		readyToQuitVisibility: ReadyToQuitVisibility;
 	},
 	galaxy: {
 		galaxyType: GameGalaxyType;

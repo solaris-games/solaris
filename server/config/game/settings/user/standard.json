@@ -17,6 +17,7 @@
        "readyToQuit": "enabled",
        "readyToQuitFraction": 1.0,
        "readyToQuitTimerCycles": 0,
+       "readyToQuitVisibility": "visible",
        "awardRankTo": "all",
        "awardRankToTopN": 1
     },
