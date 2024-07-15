@@ -268,6 +268,7 @@ export interface Game {
 	},
 	conversations: Conversation[]
 	state: {
+		readyToQuitCount: number | undefined;
 		locked: boolean;
 		tick: number;
 		paused: boolean;
