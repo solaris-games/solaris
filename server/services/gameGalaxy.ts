@@ -675,6 +675,7 @@ export default class GameGalaxyService {
             }
 
             // Return a subset of the user, key info only.
+            // @ts-ignore
             const resultPlayer = {
                 _id: p._id,
                 isRealUser: p.userId != null,

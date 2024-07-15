@@ -100,7 +100,7 @@ export interface Player {
     renownToGive: number;
     ready: boolean;
     readyToCycle: boolean;
-    readyToQuit: boolean;
+    readyToQuit?: boolean;
     missedTurns: number;
     hasSentTurnReminder: boolean;
     hasFilledAfkSlot: boolean;
