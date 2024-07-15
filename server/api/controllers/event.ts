@@ -1,4 +1,3 @@
-import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
 
 export default (container: DependencyContainer) => {
@@ -17,14 +16,16 @@ export default (container: DependencyContainer) => {
                     category
                 );
     
-                return res.status(200).json(events);
+                res.status(200).json(events);
+                return next();
             } catch (err) {
                 return next(err);
             }
         },
         markAllAsRead: async (req, res, next) => {
             if (req.session.isImpersonating) {
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             }
     
             try {
@@ -32,14 +33,16 @@ export default (container: DependencyContainer) => {
                     req.game,
                     req.player._id);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
         },
         markAsRead: async (req, res, next) => {
             if (req.session.isImpersonating) {
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             }
             
             try {
@@ -48,7 +51,8 @@ export default (container: DependencyContainer) => {
                     req.player._id,
                     req.params.eventId);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -59,9 +63,10 @@ export default (container: DependencyContainer) => {
                     req.game,
                     req.player._id);
     
-                return res.status(200).json({
+                res.status(200).json({
                     unread: result
                 });
+                return next();
             } catch (err) {
                 return next(err);
             }

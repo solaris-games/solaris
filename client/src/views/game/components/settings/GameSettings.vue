@@ -600,7 +600,7 @@
             :value="game.settings.technology.experimentationReward"
             :compareValue="compareSettings.technology.experimentationReward"/>
           <game-setting-value title="Specialist Token Reward"
-            tooltip="Determines the amount of specialist tokens awarded for the banking technology at the end of a galactic cycle"
+            tooltip="Determines the amount of specialist tokens awarded for the specialist technology at the end of a galactic cycle"
             :valueText="getFriendlyText(game.settings.technology.specialistTokenReward)"
             :value="game.settings.technology.specialistTokenReward"
             :compareValue="compareSettings.technology.specialistTokenReward"/>
