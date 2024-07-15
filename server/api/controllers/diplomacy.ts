@@ -9,7 +9,8 @@ export default (container: DependencyContainer) => {
                     req.game,
                     req.player);
     
-                return res.status(200).json(diplomaticStatuses);
+                res.status(200).json(diplomaticStatuses);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -21,7 +22,8 @@ export default (container: DependencyContainer) => {
                     req.player._id,
                     req.params.toPlayerId);
     
-                return res.status(200).json(diplomaticStatus);
+                res.status(200).json(diplomaticStatus);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -35,7 +37,8 @@ export default (container: DependencyContainer) => {
     
                 await container.broadcastService.gamePlayerDiplomaticStatusChanged(req.player._id, req.params.playerId, newStatus);
     
-                return res.status(200).json(newStatus);
+                res.status(200).json(newStatus);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -49,7 +52,8 @@ export default (container: DependencyContainer) => {
     
                 await container.broadcastService.gamePlayerDiplomaticStatusChanged(req.player._id, req.params.playerId, newStatus);
     
-                return res.status(200).json(newStatus);
+                res.status(200).json(newStatus);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -63,7 +67,8 @@ export default (container: DependencyContainer) => {
     
                 await container.broadcastService.gamePlayerDiplomaticStatusChanged(req.player._id, req.params.playerId, newStatus);
     
-                return res.status(200).json(newStatus);
+                res.status(200).json(newStatus);
+                return next();
             } catch (err) {
                 return next(err);
             }

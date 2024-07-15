@@ -24,9 +24,9 @@ export const middleware = (container: DependencyContainer): PlayerMiddleware => 
                     throw new ValidationError('You are not participating in this game.');
                 }
 
-                next();
+                return next();
             } catch (err) {
-                next(err);
+                return next(err);
             }
         },
         validatePlayerState: (options: PlayerStateValidationOptions) => {
@@ -35,7 +35,7 @@ export const middleware = (container: DependencyContainer): PlayerMiddleware => 
                     throw new ValidationError('You cannot participate in this game, you have been defeated.');
                 }
     
-                next();
+                return next();
             }
         }
     }

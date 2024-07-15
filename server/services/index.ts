@@ -103,6 +103,8 @@ import { Report } from './types/Report';
 import TeamService from "./team";
 import UserLeaderboardService from './userLeaderboard';
 import GameLockService from "./gameLock";
+import GamePlayerMutexService from './gamePlayerMutex';
+import GameMutexService from "./gameMutex";
 
 const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
@@ -210,8 +212,12 @@ export default (config): DependencyContainer => {
 
     const notificationService = new NotificationService(config, userRepository, gameRepository, discordService, conversationService, gameService, gameJoinService, gameTickService, researchService, tradeService);
 
+    const gamePlayerMutexService = new GamePlayerMutexService();
+
+    const gameMutexService = new GameMutexService();
+
     console.log('Dependency container initialized.');
-    
+
     return {
         config,
         adminService,
@@ -290,5 +296,7 @@ export default (config): DependencyContainer => {
         scheduleBuyService,
         teamService,
         pathfindingService,
+        gamePlayerMutexService,
+        gameMutexService
     };
 };
