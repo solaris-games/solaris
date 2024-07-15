@@ -17,7 +17,7 @@ export const middleware = (container: DependencyContainer): AuthMiddleware => {
             return async (req, res, next) => {
                 try {
                     if (!req.session.userId) {
-                        return res.sendStatus(401);
+                        throw new ValidationError('Access denied.', 401);
                     }
     
                     // General Auth
@@ -58,9 +58,9 @@ export const middleware = (container: DependencyContainer): AuthMiddleware => {
                         }
                     }
     
-                    next();
+                    return next();
                 } catch(err) {
-                    next(err);
+                    return next(err);
                 }
             };
         }

@@ -14,7 +14,8 @@ export default (container: DependencyContainer) => {
                     reqObj.waypoints,
                     reqObj.looped);
     
-                return res.status(200).json(report);
+                res.status(200).json(report);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -29,7 +30,8 @@ export default (container: DependencyContainer) => {
                     req.params.carrierId,
                     reqObj.loop);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -46,7 +48,8 @@ export default (container: DependencyContainer) => {
                     reqObj.starId,
                     reqObj.starShips);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -58,7 +61,8 @@ export default (container: DependencyContainer) => {
                     req.player,
                     req.params.carrierId);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -73,7 +77,8 @@ export default (container: DependencyContainer) => {
                     req.params.carrierId,
                     reqObj.name);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -85,7 +90,8 @@ export default (container: DependencyContainer) => {
                     req.player,
                     req.params.carrierId);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -100,7 +106,8 @@ export default (container: DependencyContainer) => {
                     reqObj.isTurnBased,
                     true);
     
-                return res.status(200).json(result);
+                res.status(200).json(result);
+                return next();
             } catch (err) {
                 return next(err);
             }

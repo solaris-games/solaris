@@ -60,6 +60,7 @@ export default {
         let response = await userService.updateUsername(this.username)
 
         if (response.status === 200) {
+          this.$store.commit('setUsername', this.username);
           this.$toasted.show(`Username updated.`, { type: 'success' })
           router.push({ name: 'account-settings' })
         } else {
