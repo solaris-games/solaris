@@ -46,9 +46,6 @@ export default class ScheduleBuyService extends EventEmitter {
                     return valA - valB // Sort ascending (0 goes first, this is totalCredits)
                 });
 
-            // We do not have to do anything if there is no action to be executed this tick.
-            if (currentActions.length === 0) continue;
-
             // Loop through all actions to execute them.
             for (let action of currentActions) {
                 // TODO: Better error handling
