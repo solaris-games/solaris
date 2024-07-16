@@ -37,7 +37,7 @@ export default class ScheduleBuyService extends EventEmitter {
         for (let player of game.galaxy.players) {
             if (player.scheduledActions.length == 0) continue;
             const currentActions = player.scheduledActions
-                .filter(a => a.tick == game.state.tick - 1) // Tick number that we just finished
+                .filter(a => a.tick == game.state.tick) // Tick number that we just finished
                 .sort((a, b) => {
                     // Take the defined priorities
                     // We sort in the order totalCredits, belowPrice, infrastructureAmount, percentageOfCredits
@@ -45,9 +45,6 @@ export default class ScheduleBuyService extends EventEmitter {
                     const valB = buyTypeToPriority[b.buyType];
                     return valA - valB // Sort ascending (0 goes first, this is totalCredits)
                 });
-
-            // We do not have to do anything if there is no action to be executed this tick.
-            if (currentActions.length === 0) continue;
 
             // Loop through all actions to execute them.
             for (let action of currentActions) {
@@ -106,7 +103,7 @@ export default class ScheduleBuyService extends EventEmitter {
     }
 
     _repeatOrRemoveAction(game: Game, actions: PlayerScheduledActions[]) {
-        const tick = game.state.tick - 1;
+        const tick = game.state.tick;
 
         for (let i = 0; i < actions.length; i++) {
             const action = actions[i]

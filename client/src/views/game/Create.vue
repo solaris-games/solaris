@@ -862,7 +862,7 @@
         </div>
 
         <div class="mb-2">
-          <label for="specialistTokenReward" class="col-form-label">Specialist Token Reward <help-tooltip tooltip="Determines the amount of specialist tokens awarded for the banking technology at the end of a galactic cycle"/></label>
+          <label for="specialistTokenReward" class="col-form-label">Specialist Token Reward <help-tooltip tooltip="Determines the amount of specialist tokens awarded for the specialist technology at the end of a galactic cycle"/></label>
           <select class="form-control" id="specialistTokenReward" v-model="settings.technology.specialistTokenReward" :disabled="isCreatingGame">
             <option v-for="opt in options.technology.specialistTokenReward" v-bind:key="opt.value" v-bind:value="opt.value">
               {{ opt.text }}
