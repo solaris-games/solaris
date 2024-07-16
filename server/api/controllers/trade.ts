@@ -20,6 +20,7 @@ export default (container: DependencyContainer) => {
                 });
     
                 container.broadcastService.gamePlayerCreditsReceived(req.game, trade.fromPlayer._id, trade.toPlayer._id, trade.amount, trade.date);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -39,6 +40,7 @@ export default (container: DependencyContainer) => {
                 });
     
                 container.broadcastService.gamePlayerCreditsSpecialistsReceived(req.game, trade.fromPlayer._id, trade.toPlayer._id, trade.amount, trade.date);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -59,6 +61,7 @@ export default (container: DependencyContainer) => {
                 res.sendStatus(200);
     
                 container.broadcastService.gamePlayerRenownReceived(req.game, trade.fromPlayer._id, trade.toPlayer._id, trade.amount, trade.date);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -79,6 +82,7 @@ export default (container: DependencyContainer) => {
                 });
                 
                 container.broadcastService.gamePlayerTechnologyReceived(req.game, trade.fromPlayer._id, trade.toPlayer._id, trade.technology, trade.date);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -90,7 +94,8 @@ export default (container: DependencyContainer) => {
                     req.player,
                     req.params.toPlayerId);
     
-                return res.status(200).json(techs);
+                res.status(200).json(techs);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -105,7 +110,8 @@ export default (container: DependencyContainer) => {
                         mongoose.Types.ObjectId(req.params.toPlayerId)
                     ]);
     
-                return res.status(200).json(events);
+                res.status(200).json(events);
+                return next();
             } catch (err) {
                 return next(err);
             }

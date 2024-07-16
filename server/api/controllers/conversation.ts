@@ -9,7 +9,8 @@ export default (container: DependencyContainer) => {
                     req.game,
                     req.player._id);
     
-                return res.status(200).json(result);
+                res.status(200).json(result);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -21,7 +22,8 @@ export default (container: DependencyContainer) => {
                     req.player._id,
                     req.params.withPlayerId);
     
-                return res.status(200).json(result);
+                res.status(200).json(result);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -32,9 +34,10 @@ export default (container: DependencyContainer) => {
                     req.game,
                     req.player._id);
     
-                return res.status(200).json({
+                res.status(200).json({
                     unread: result
                 });
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -46,7 +49,8 @@ export default (container: DependencyContainer) => {
                     req.player._id,
                     req.params.conversationId);
     
-                return res.status(200).json(result);
+                res.status(200).json(result);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -63,7 +67,8 @@ export default (container: DependencyContainer) => {
     
                 // TODO: Broadcast convo created.
     
-                return res.status(200).json(convo);
+                res.status(200).json(convo);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -80,14 +85,16 @@ export default (container: DependencyContainer) => {
     
                 container.broadcastService.gameMessageSent(req.game, message);
     
-                return res.status(200).send(message);
+                res.status(200).send(message);
+                return next();
             } catch (err) {
                 return next(err);
             }
         },
         markAsRead: async (req, res, next) => {
             if (req.session.isImpersonating) {
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             }
     
             try {
@@ -98,7 +105,8 @@ export default (container: DependencyContainer) => {
     
                 container.broadcastService.gameConversationRead(req.game, convo, req.player._id);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -110,7 +118,8 @@ export default (container: DependencyContainer) => {
                     req.player._id,
                     req.params.conversationId);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -122,7 +131,8 @@ export default (container: DependencyContainer) => {
                     req.player._id,
                     req.params.conversationId);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -136,7 +146,8 @@ export default (container: DependencyContainer) => {
     
                 container.broadcastService.gameConversationLeft(req.game, convo, req.player._id);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -155,7 +166,8 @@ export default (container: DependencyContainer) => {
         
                 container.broadcastService.gameConversationMessagePinned(req.game, convo, req.params.messageId);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -174,7 +186,8 @@ export default (container: DependencyContainer) => {
     
                 container.broadcastService.gameConversationMessageUnpinned(req.game, convo, req.params.messageId);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }

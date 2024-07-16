@@ -9,7 +9,8 @@ export default (container: DependencyContainer) => {
                 const limit = +req.query.limit || null;
                 const result = await container.userLeaderboardService.getUserLeaderboard(limit, req.query.sortingKey);
     
-                return res.status(200).json(result);
+                res.status(200).json(result);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -50,7 +51,8 @@ export default (container: DependencyContainer) => {
     
                 let userId = await container.userService.create(email, username, reqObj.password, ip);
     
-                return res.status(201).json({ id: userId });
+                res.status(201).json({ id: userId });
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -59,7 +61,8 @@ export default (container: DependencyContainer) => {
             try {
                 let settings = await container.userService.getGameSettings(req.session.userId);
     
-                return res.status(200).json(settings);
+                res.status(200).json(settings);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -68,7 +71,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.userService.saveGameSettings(req.session.userId, req.body);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -77,7 +81,8 @@ export default (container: DependencyContainer) => {
             try {
                 let subscriptions = await container.userService.getSubscriptions(req.session.userId);
     
-                return res.status(200).json(subscriptions);
+                res.status(200).json(subscriptions);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -86,7 +91,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.userService.saveSubscriptions(req.session.userId, req.body);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -95,9 +101,10 @@ export default (container: DependencyContainer) => {
             try {
                 let credits = await container.userService.getCredits(req.session.userId);
     
-                return res.status(200).json({
+                res.status(200).json({
                     credits
                 });
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -106,7 +113,8 @@ export default (container: DependencyContainer) => {
             try {
                 let user = await container.userService.getMe(req.session.userId);
     
-                return res.status(200).json(user);
+                res.status(200).json(user);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -115,7 +123,8 @@ export default (container: DependencyContainer) => {
             try {
                 let avatars = await container.avatarService.listUserAvatars(req.session.userId);
     
-                return res.status(200).json(avatars);
+                res.status(200).json(avatars);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -124,7 +133,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.avatarService.purchaseAvatar(req.session.userId, parseInt(req.params.avatarId));
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -133,7 +143,8 @@ export default (container: DependencyContainer) => {
             try {
                 let user = await container.userService.getInfoByIdLean(req.params.id);
     
-                return res.status(200).json(user);
+                res.status(200).json(user);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -142,7 +153,8 @@ export default (container: DependencyContainer) => {
             try {
                 let achievements = await container.achievementService.getAchievements(req.params.id);
     
-                return res.status(200).json(achievements);
+                res.status(200).json(achievements);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -153,7 +165,8 @@ export default (container: DependencyContainer) => {
     
                 await container.userService.updateEmailPreference(req.session.userId, reqObj.enabled);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -164,7 +177,8 @@ export default (container: DependencyContainer) => {
     
                 await container.userService.updateEmailOtherPreference(req.session.userId, reqObj.enabled);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -175,7 +189,8 @@ export default (container: DependencyContainer) => {
                 
                 await container.userService.updateUsername(req.session.userId, reqObj.username);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -186,7 +201,8 @@ export default (container: DependencyContainer) => {
                 
                 await container.userService.updateEmailAddress(req.session.userId, reqObj.email);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -200,7 +216,8 @@ export default (container: DependencyContainer) => {
                     reqObj.currentPassword,
                     reqObj.newPassword);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -215,11 +232,11 @@ export default (container: DependencyContainer) => {
                     await container.emailService.sendTemplate(reqObj.email, container.emailService.TEMPLATES.RESET_PASSWORD, [token]);
                 } catch (emailError) {
                     console.error(emailError);
-    
-                    return res.sendStatus(500);
+                    res.sendStatus(500);
+                    return next(emailError);
                 }
-    
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -230,7 +247,8 @@ export default (container: DependencyContainer) => {
                 
                 await container.userService.resetPassword(reqObj.token, reqObj.newPassword);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -246,10 +264,12 @@ export default (container: DependencyContainer) => {
                 } catch (emailError) {
                     console.error(emailError);
     
-                    return res.sendStatus(500);
+                    res.sendStatus(500);
+                    return next(emailError);
                 }
-    
-                return res.sendStatus(200);
+
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -267,7 +287,8 @@ export default (container: DependencyContainer) => {
                         return next(err);
                     }
     
-                    return res.sendStatus(200);
+                    res.sendStatus(200);
+                    return next();
                 });
             } catch (err) {
                 return next(err);

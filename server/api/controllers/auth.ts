@@ -14,14 +14,15 @@ export default (container: DependencyContainer) => {
                 req.session.userCredits = user.credits;
                 req.session.isImpersonating = false;
     
-                return res.status(200).json({
+                res.status(200).json({
                     _id: user._id,
                     username: user.username,
                     roles: user.roles,
                     credits: user.credits
                 });
+                return next();
             } catch (err) {
-                next(err);
+                return next(err);
             }
         },
         logout: (req, res, next) => {
@@ -32,21 +33,24 @@ export default (container: DependencyContainer) => {
                         return next(err);
                     }
         
-                    return res.sendStatus(200);
+                    res.sendStatus(200);
+                    return next();
                 });
             } else {
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             }
         },
         verify: (req, res, next) => {
             const session = (req as any).session;
     
-            return res.status(200).json({
+            res.status(200).json({
                 _id: session.userId,
                 username: session.username,
                 roles: session.roles,
                 credits: session.userCredits
             });
+            return next();
         },
         authoriseDiscord: async (req: any, res, next) => {
             const code = req.query.code;
@@ -81,7 +85,8 @@ export default (container: DependencyContainer) => {
                         if (userResult.status === 200) {
                             await container.discordService.updateOAuth(req.session.userId, userResult.data.id, oauthResult.data);
             
-                            return res.redirect(`${process.env.CLIENT_URL_ACCOUNT_SETTINGS}?discordSuccess=true`);
+                            res.redirect(`${process.env.CLIENT_URL_ACCOUNT_SETTINGS}?discordSuccess=true`);
+                            return next();
                         }
                     }
                 } catch (error) {
@@ -91,15 +96,17 @@ export default (container: DependencyContainer) => {
                 }
             }
     
-            return res.redirect(`${process.env.CLIENT_URL_ACCOUNT_SETTINGS}?discordSuccess=false`);
+            res.redirect(`${process.env.CLIENT_URL_ACCOUNT_SETTINGS}?discordSuccess=false`);
+            return next();
         },
         unauthoriseDiscord: async (req, res, next) => {
             try {
                 await container.discordService.clearOAuth(req.session.userId);
         
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
-                next(err);
+                return next(err);
             }
         }
     }

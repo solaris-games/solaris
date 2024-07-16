@@ -52,9 +52,9 @@ export const middleware = (container: DependencyContainer): GameMiddleware => {
                         throw new ValidationError('Game not found.', 404);
                     }
     
-                    next();
+                    return next();
                 } catch (err) {
-                    next(err);
+                    return next(err);
                 }
             }
         },
@@ -77,9 +77,9 @@ export const middleware = (container: DependencyContainer): GameMiddleware => {
                         throw new ValidationError('You cannot perform this action, the game is not in progress.');
                     }
     
-                    next();
+                    return next();
                 } catch (err) {
-                    next(err);
+                    return next(err);
                 }
             };
         }
