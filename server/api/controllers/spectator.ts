@@ -10,6 +10,7 @@ export default (container: DependencyContainer) => {
                     req.body.username);
                 
                 res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -22,6 +23,7 @@ export default (container: DependencyContainer) => {
                     req.params.userId);
                 
                 res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -33,6 +35,7 @@ export default (container: DependencyContainer) => {
                     req.player);
                 
                 res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -42,6 +45,7 @@ export default (container: DependencyContainer) => {
                 const spectators = await container.spectatorService.listSpectators(req.game);
                 
                 res.status(200).json(spectators);
+                return next();
             } catch (err) {
                 return next(err);
             }

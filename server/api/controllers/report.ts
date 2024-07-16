@@ -9,7 +9,8 @@ export default (container: DependencyContainer) => {
                 
                 await container.reportService.reportPlayer(req.game, reqObj, req.session.userId);
                 
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }

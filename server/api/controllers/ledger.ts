@@ -7,7 +7,8 @@ export default (container: DependencyContainer) => {
             try {
                 let ledger = await container.ledgerService.getLedger(req.player, LedgerType.Credits);
     
-                return res.status(200).json(ledger);
+                res.status(200).json(ledger);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -20,7 +21,8 @@ export default (container: DependencyContainer) => {
                     req.params.playerId,
                     LedgerType.Credits);
     
-                return res.status(200).json(newLedger);
+                res.status(200).json(newLedger);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -33,7 +35,8 @@ export default (container: DependencyContainer) => {
                     req.params.playerId,
                     LedgerType.Credits);
     
-                return res.status(200).json(newLedger);
+                res.status(200).json(newLedger);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -42,7 +45,8 @@ export default (container: DependencyContainer) => {
             try {
                 let ledger = await container.ledgerService.getLedger(req.player, LedgerType.CreditsSpecialists);
     
-                return res.status(200).json(ledger);
+                res.status(200).json(ledger);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -55,7 +59,8 @@ export default (container: DependencyContainer) => {
                     req.params.playerId,
                     LedgerType.CreditsSpecialists);
     
-                return res.status(200).json(newLedger);
+                res.status(200).json(newLedger);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -68,7 +73,8 @@ export default (container: DependencyContainer) => {
                     req.params.playerId,
                     LedgerType.CreditsSpecialists);
     
-                return res.status(200).json(newLedger);
+                res.status(200).json(newLedger);
+                return next();
             } catch (err) {
                 return next(err);
             }

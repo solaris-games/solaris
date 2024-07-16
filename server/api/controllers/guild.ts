@@ -7,7 +7,8 @@ export default (container: DependencyContainer) => {
             try {
                 let result = await container.guildService.list();
                     
-                return res.status(200).json(result);
+                res.status(200).json(result);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -16,7 +17,8 @@ export default (container: DependencyContainer) => {
             try {
                 let result = await container.guildService.detailMyGuild(req.session.userId, true);
                     
-                return res.status(200).json(result);
+                res.status(200).json(result);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -27,7 +29,8 @@ export default (container: DependencyContainer) => {
                 let sortingKey = req.query.sortingKey || null;
                 let result = await container.guildService.getLeaderboard(limit, sortingKey);
                     
-                return res.status(200).json(result);
+                res.status(200).json(result);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -36,7 +39,8 @@ export default (container: DependencyContainer) => {
             try {
                 let result = await container.guildService.listInvitations(req.session.userId);
                     
-                return res.status(200).json(result);
+                res.status(200).json(result);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -45,7 +49,8 @@ export default (container: DependencyContainer) => {
             try {
                 let result = await container.guildService.listApplications(req.session.userId);
                     
-                return res.status(200).json(result);
+                res.status(200).json(result);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -54,7 +59,8 @@ export default (container: DependencyContainer) => {
             try {
                 const result = await container.guildService.detailWithUserInfo(req.params.guildId, false);
     
-                return res.status(200).json(result);
+                res.status(200).json(result);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -65,7 +71,8 @@ export default (container: DependencyContainer) => {
 
                 let result = await container.guildService.create(req.session.userId, reqObj.name, reqObj.tag);
                     
-                return res.status(201).json(result);
+                res.status(201).json(result);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -76,7 +83,8 @@ export default (container: DependencyContainer) => {
                 
                 await container.guildService.rename(req.session.userId, reqObj.name, reqObj.tag);
                     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -85,7 +93,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.guildService.delete(req.session.userId, req.params.guildId);
                     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -96,7 +105,8 @@ export default (container: DependencyContainer) => {
                 
                 let result = await container.guildService.invite(reqObj.username, req.params.guildId, req.session.userId);
                     
-                return res.status(200).json(result);
+                res.status(200).json(result);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -105,7 +115,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.guildService.uninvite(req.params.userId, req.params.guildId, req.session.userId);
                     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -114,7 +125,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.guildService.accept(req.params.userId, req.params.guildId, req.session.userId);
                     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -123,7 +135,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.guildService.join(req.session.userId, req.params.guildId);
                     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -132,7 +145,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.guildService.decline(req.session.userId, req.params.guildId);
                     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -141,7 +155,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.guildService.apply(req.session.userId, req.params.guildId);
                     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -150,7 +165,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.guildService.withdraw(req.session.userId, req.params.guildId);
                     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -159,7 +175,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.guildService.reject(req.params.userId, req.params.guildId, req.session.userId);
                     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -168,7 +185,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.guildService.leave(req.session.userId, req.params.guildId);
                     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -177,7 +195,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.guildService.promote(req.params.userId, req.params.guildId, req.session.userId);
                     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -186,7 +205,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.guildService.demote(req.params.userId, req.params.guildId, req.session.userId);
                     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -195,7 +215,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.guildService.kick(req.params.userId, req.params.guildId, req.session.userId);
                     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
