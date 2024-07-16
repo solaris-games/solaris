@@ -568,6 +568,10 @@ class GameHelper {
     return game.settings.general.mode === 'conquest' && game.settings.conquest.victoryCondition === 'homeStarPercentage'
   }
 
+  isCapitalElimination (game) {
+    return game.settings.conquest.capitalStarElimination === 'enabled';
+  }
+
   isKingOfTheHillMode (game) {
     return game.settings.general.mode === 'kingOfTheHill'
   }
@@ -601,6 +605,18 @@ class GameHelper {
     }
 
     return 'Unknown'
+  }
+
+  isOwnerCapital (game, star) {
+    if (!star.homeStar || !star.ownedByPlayerId) {
+      return false;
+    }
+
+    const ownersHomeStarId = this.getPlayerById(game, star.ownedByPlayerId).homeStarId;
+
+    console.log(ownersHomeStarId, star._id);
+
+    return ownersHomeStarId && ownersHomeStarId === star._id;
   }
 
   playerHasLowestTechLevel (game, techKey, player) {
