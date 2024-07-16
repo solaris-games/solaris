@@ -12,7 +12,8 @@ export default (container: DependencyContainer) => {
                     req.player,
                     reqObj.starId);
     
-                return res.status(200).json(report);
+                res.status(200).json(report);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -26,7 +27,8 @@ export default (container: DependencyContainer) => {
                     req.player,
                     reqObj.starId);
     
-                return res.status(200).json(report);
+                res.status(200).json(report);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -40,7 +42,8 @@ export default (container: DependencyContainer) => {
                     req.player,
                     reqObj.starId);
     
-                return res.status(200).json(report);
+                res.status(200).json(report);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -56,7 +59,8 @@ export default (container: DependencyContainer) => {
                     reqObj.infrastructure,
                     +reqObj.amount);
     
-                return res.status(200).json(summary);
+                res.status(200).json(summary);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -72,7 +76,8 @@ export default (container: DependencyContainer) => {
                     reqObj.infrastructure,
                     +reqObj.amount);
     
-                return res.status(200).json(summary);
+                res.status(200).json(summary);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -90,7 +95,8 @@ export default (container: DependencyContainer) => {
                     reqObj.repeat,
                     reqObj.tick); 
 
-                return res.status(200).json(summary);
+                res.status(200).json(summary);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -104,7 +110,8 @@ export default (container: DependencyContainer) => {
                     req.player,
                     reqObj._id);
 
-                return res.status(200).json(summary);
+                res.status(200).json(summary);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -118,7 +125,8 @@ export default (container: DependencyContainer) => {
                     req.player,
                     reqObj._id
                 )
-                return res.sendStatus(200)
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err)
             }
@@ -132,7 +140,8 @@ export default (container: DependencyContainer) => {
                     req.player,
                     reqObj.starId);
     
-                return res.status(200).json(report);
+                res.status(200).json(report);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -146,7 +155,8 @@ export default (container: DependencyContainer) => {
                     req.player,
                     reqObj.starId);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -161,7 +171,8 @@ export default (container: DependencyContainer) => {
                     reqObj.starId,
                     reqObj.ships);
     
-                return res.status(200).json(report);
+                res.status(200).json(report);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -173,7 +184,8 @@ export default (container: DependencyContainer) => {
                     req.player,
                     req.params.starId);
     
-                return res.status(200).json(report);
+                res.status(200).json(report);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -185,7 +197,8 @@ export default (container: DependencyContainer) => {
                     req.player,
                     req.params.starId);
     
-                return res.status(200).json(report);
+                res.status(200).json(report);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -199,7 +212,8 @@ export default (container: DependencyContainer) => {
                     req.player,
                     reqObj.starId);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -214,7 +228,8 @@ export default (container: DependencyContainer) => {
                     reqObj.starId,
                     reqObj.infrastructureType);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -229,7 +244,8 @@ export default (container: DependencyContainer) => {
                     reqObj.starId,
                     reqObj.ignoreStatus);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }

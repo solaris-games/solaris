@@ -7,7 +7,8 @@ export default (container: DependencyContainer) => {
             try {
                 let result = await container.adminService.getInsights();
                 
-                return res.status(200).json(result);
+                res.status(200).json(result);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -16,16 +17,18 @@ export default (container: DependencyContainer) => {
            try {
                const result = await container.adminService.addWarning(req.params.userId, req.body.text);
 
-               return res.status(200).json(result);
+               res.status(200).json(result);
+               return next();
            } catch (err) {
-               next(err);
+               return next(err);
            }
         },
         listUsers: async (req, res, next) => {
             try {
                 let result = await container.adminService.listUsers(req.session.roles, 300);
                 
-                return res.status(200).json(result);
+                res.status(200).json(result);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -34,7 +37,8 @@ export default (container: DependencyContainer) => {
             try {
                 let result = await container.adminService.listPasswordResets();
                 
-                return res.status(200).json(result);
+                res.status(200).json(result);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -43,7 +47,8 @@ export default (container: DependencyContainer) => {
             try {
                 const result = await container.reportService.conversationForReport(req.params.reportId, req.session.userId);
 
-                return res.status(200).json(result);
+                res.status(200).json(result);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -52,7 +57,8 @@ export default (container: DependencyContainer) => {
             try {
                 let result = await container.reportService.listReports(req.session.userId);
                 
-                return res.status(200).json(result);
+                res.status(200).json(result);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -61,7 +67,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.reportService.actionReport(req.session.userId, req.params.reportId);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -71,7 +78,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.adminService.setRoleContributor(req.params.userId, req.body.enabled);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -80,7 +88,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.adminService.setRoleDeveloper(req.params.userId, req.body.enabled);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -89,7 +98,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.adminService.setRoleGameMaster(req.params.userId, req.body.enabled);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -98,7 +108,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.adminService.setRoleCommunityManager(req.params.userId, req.body.enabled);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -107,7 +118,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.userService.setCredits(req.params.userId, req.body.credits);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -116,7 +128,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.adminService.ban(req.params.userId);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -125,7 +138,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.adminService.unban(req.params.userId);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -134,7 +148,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.adminService.resetAchievements(req.params.userId);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -143,7 +158,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.adminService.promoteToEstablishedPlayer(req.params.userId);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -162,12 +178,13 @@ export default (container: DependencyContainer) => {
                 req.session.userCredits = user.credits;
                 req.session.isImpersonating = true;
     
-                return res.status(200).json({
+                res.status(200).json({
                     _id: user._id,
                     username: user.username,
                     roles: user.roles,
                     credits: user.credits
                 });
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -176,7 +193,8 @@ export default (container: DependencyContainer) => {
             try {
                 let result = await container.adminService.listGames(100);
                 
-                return res.status(200).json(result);
+                res.status(200).json(result);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -185,7 +203,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.adminService.setGameFeatured(req.params.gameId, req.body.featured);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -194,7 +213,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.adminService.setGameTimeMachine(req.params.gameId, req.body.timeMachine);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -203,7 +223,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.gameService.forceEndGame(req.game);
     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -212,7 +233,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.gameService.resetQuitters(req.game);
 
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }

@@ -5,16 +5,19 @@ import { mapToGameConcedeDefeatRequest, mapToGameJoinGameRequest, mapToGameSaveN
 export default (container: DependencyContainer) => {
     return {
         getDefaultSettings: (req, res, next) => {
-            return res.status(200).json({
+            res.status(200).json({
                 settings: require('../../config/game/settings/user/standard.json'),
                 options: require('../../config/game/settings/options.json')
             });
+
+            return next();
         },
         getFlux: async (req, res, next) => {
             try {
                 const flux = container.gameFluxService.getCurrentFlux();
     
-                return res.status(200).json(flux);
+                res.status(200).json(flux);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -26,7 +29,8 @@ export default (container: DependencyContainer) => {
             try {
                 let game = await container.gameCreateService.create(req.body);
     
-                return res.status(201).json(game._id);
+                res.status(201).json(game._id);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -43,21 +47,24 @@ export default (container: DependencyContainer) => {
                     tutorial = await container.gameCreateService.create(settings);
                 }
     
-                return res.status(201).json(tutorial._id);
+                res.status(201).json(tutorial._id);
+                return next();
             } catch (err) {
                 return next(err);
             }
         },
         detailInfo: async (req, res, next) => {
             try {
-                return res.status(200).json(req.game);
+                res.status(200).json(req.game);
+                return next();
             } catch (err) {
                 return next(err);
             }
         },
         detailState: async (req, res, next) => {
             try {
-                return res.status(200).json(req.game);
+                res.status(200).json(req.game);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -72,7 +79,8 @@ export default (container: DependencyContainer) => {
         
                 let game = await container.gameGalaxyService.getGalaxy(req.params.gameId, req.session.userId, tick);
     
-                return res.status(200).json(game);
+                res.status(200).json(game);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -92,7 +100,8 @@ export default (container: DependencyContainer) => {
                     completed: games[2]
                 };
     
-                return res.status(200).json(result);
+                res.status(200).json(result);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -101,7 +110,8 @@ export default (container: DependencyContainer) => {
             try {
                 let games = await container.gameListService.listOfficialGames();
     
-                return res.status(200).json(games);
+                res.status(200).json(games);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -110,7 +120,8 @@ export default (container: DependencyContainer) => {
             try {
                 let games = await container.gameListService.listCustomGames();
     
-                return res.status(200).json(games);
+                res.status(200).json(games);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -119,7 +130,8 @@ export default (container: DependencyContainer) => {
             try {
                 let games = await container.gameListService.listInProgressGames();
     
-                return res.status(200).json(games);
+                res.status(200).json(games);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -128,7 +140,8 @@ export default (container: DependencyContainer) => {
             try {
                 let games = await container.gameListService.listRecentlyCompletedGames();
     
-                return res.status(200).json(games);
+                res.status(200).json(games);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -137,7 +150,8 @@ export default (container: DependencyContainer) => {
             try {
                 let games = await container.gameListService.listUserCompletedGames(req.session.userId);
     
-                return res.status(200).json(games);
+                res.status(200).json(games);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -146,7 +160,8 @@ export default (container: DependencyContainer) => {
             try {
                 let games = await container.gameListService.listActiveGames(req.session.userId);
     
-                return res.status(200).json(games);
+                res.status(200).json(games);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -155,7 +170,8 @@ export default (container: DependencyContainer) => {
             try {
                 let games = await container.gameListService.listSpectating(req.session.userId);
     
-                return res.status(200).json(games);
+                res.status(200).json(games);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -167,7 +183,8 @@ export default (container: DependencyContainer) => {
                 
                 let result = await container.historyService.listIntel(req.params.gameId, startTick, endTick);
     
-                return res.status(200).json(result);
+                res.status(200).json(result);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -191,6 +208,8 @@ export default (container: DependencyContainer) => {
                 if (gameIsFull) {
                     container.broadcastService.gameStarted(req.game);
                 }
+
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -206,6 +225,8 @@ export default (container: DependencyContainer) => {
                 if (player) {
                     container.broadcastService.gamePlayerQuit(req.game, player);
                 }
+
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -219,7 +240,8 @@ export default (container: DependencyContainer) => {
                     req.player,
                     reqObj.openSlot);
                     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -233,6 +255,8 @@ export default (container: DependencyContainer) => {
                 res.sendStatus(200);
     
                 container.broadcastService.gamePlayerReady(req.game, req.player);
+
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -246,6 +270,8 @@ export default (container: DependencyContainer) => {
                 res.sendStatus(200);
     
                 container.broadcastService.gamePlayerReady(req.game, req.player);
+
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -259,6 +285,7 @@ export default (container: DependencyContainer) => {
                 res.sendStatus(200);
                     
                 container.broadcastService.gamePlayerNotReady(req.game, req.player);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -272,6 +299,7 @@ export default (container: DependencyContainer) => {
                 res.sendStatus(200);
     
                 container.broadcastService.gamePlayerReadyToQuit(req.game, req.player);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -285,6 +313,7 @@ export default (container: DependencyContainer) => {
                 res.sendStatus(200);
                     
                 container.broadcastService.gamePlayerNotReadyToQuit(req.game, req.player);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -296,6 +325,7 @@ export default (container: DependencyContainer) => {
                     req.player);
                 
                 res.status(200).json({ notes });
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -310,6 +340,7 @@ export default (container: DependencyContainer) => {
                     reqObj.notes);
                 
                 res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -320,7 +351,8 @@ export default (container: DependencyContainer) => {
                     req.game,
                     req.session.userId);
                     
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -338,7 +370,8 @@ export default (container: DependencyContainer) => {
                     doPause,
                     req.session.userId);
 
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -347,7 +380,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.gameService.forceStart(req.game, req.session.userId);
 
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             }  catch (err) {
                 return next(err);
             }
@@ -359,7 +393,8 @@ export default (container: DependencyContainer) => {
                     req.params.playerId
                 );
     
-                return res.status(200).json(user);
+                res.status(200).json(user);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -372,7 +407,8 @@ export default (container: DependencyContainer) => {
                     await container.playerService.updateLastSeenLean(req.params.gameId, req.session.userId, ip);
                 }
                 
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
