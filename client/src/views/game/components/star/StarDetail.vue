@@ -1,6 +1,6 @@
 <template>
 <div class="menu-page container" v-if="star">
-    <menu-title :title="star.name + (star.homeStar ? ' - Capital': '')" @onCloseRequested="onCloseRequested">
+    <menu-title :title="title" @onCloseRequested="onCloseRequested">
       <ignore-bulk-upgrade v-if="star.ignoreBulkUpgrade && isOwnedByUserPlayer" :starId="star._id" class="me-1"/>
       <modalButton modalName="abandonStarModal" v-if="!$isHistoricalMode() && isOwnedByUserPlayer && !userPlayer.defeated && isGameInProgress() && isGameAllowAbandonStars()" classText="btn btn-sm btn-outline-danger">
         <i class="fas fa-star"></i> <i class="fas fa-trash ms-1"></i>
@@ -579,6 +579,17 @@ export default {
     }
   },
   computed: {
+    title: function () {
+      if (this.star.homeStar) {
+        if (gameHelper.isOwnerCapital(this.$store.state.game, this.star)) {
+          return `${this.star.name} - ${this.starOwningPlayer.alias}'s Capital`;
+        } else {
+          return `${this.star.name} - Capital`;
+        }
+      }
+
+      return this.star.name;
+    },
     star: function () {
       return GameHelper.getStarById(this.$store.state.game, this.starId)
     },

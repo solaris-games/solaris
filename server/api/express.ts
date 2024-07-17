@@ -1,13 +1,13 @@
-const express = require('express');
+import express = require('express');
 const router = express.Router();
-const session = require('express-session');
+import session = require('express-session');
 const compression = require('compression');
 const rateLimit = require("express-rate-limit");
-const MongoDBStore = require('connect-mongodb-session')(session);
-
-import registerRoutes from './routes';
-import { DependencyContainer } from '../services/types/DependencyContainer';
+import MongoDBSession = require('connect-mongodb-session');
+const MongoDBStore = MongoDBSession(session);
 import { Config } from '../config/types/Config';
+import { DependencyContainer } from '../services/types/DependencyContainer';
+import registerRoutes from './routes';
 
 export default async (config: Config, app, container: DependencyContainer) => {
 
@@ -18,7 +18,7 @@ export default async (config: Config, app, container: DependencyContainer) => {
     // ---------------
     // Set up MongoDB session store
     let sessionStorage = new MongoDBStore({
-        uri: config.connectionString,
+        uri: config.connectionString!,
         collection: 'sessions'
     });
 
@@ -30,7 +30,7 @@ export default async (config: Config, app, container: DependencyContainer) => {
     // ---------------
     // Use sessions for tracking logins
     app.use(session({
-        secret: config.sessionSecret,
+        secret: config.sessionSecret!,
         resave: false,
         saveUninitialized: false,
         cookie: { 
@@ -51,7 +51,7 @@ export default async (config: Config, app, container: DependencyContainer) => {
             res.header('Access-Control-Allow-Methods', 'POST, PUT, PATCH, GET, DELETE, OPTIONS');
         }
 
-        next();
+        return next();
     });
 
     // ---------------

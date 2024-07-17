@@ -76,7 +76,7 @@ export interface Player {
     userId: DBObjectId | null;
     isRealUser?: boolean;
     isAIControlled?: boolean;
-    homeStarId: DBObjectId | null;
+    homeStarId?: DBObjectId | null;
     alias: string;
     avatar: string | null;
     notes?: string | null;
@@ -100,7 +100,7 @@ export interface Player {
     renownToGive: number;
     ready: boolean;
     readyToCycle: boolean;
-    readyToQuit: boolean;
+    readyToQuit?: boolean;
     missedTurns: number;
     hasSentTurnReminder: boolean;
     hasFilledAfkSlot: boolean;

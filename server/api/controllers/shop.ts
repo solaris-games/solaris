@@ -38,9 +38,10 @@ export default (container: DependencyContainer) => {
                 let approvalUrl = await container.paypalService.authorizePayment(req.session.userId, totalQuantity, totalCost, unitCost, returnUrl, cancelUrl);
                 
                 // Note: Can't do a redirect here due to CORS
-                return res.status(200).json({
+                res.status(200).json({
                     approvalUrl
                 });
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -49,11 +50,13 @@ export default (container: DependencyContainer) => {
             try {
                 const result = await container.paypalService.processPayment(req.query.paymentId, req.query.PayerID);
     
-                return res.redirect(`${container.config.clientUrl}/#/shop/paymentcomplete?credits=${result.galacticTokens}`);
+                res.redirect(`${container.config.clientUrl}/#/shop/paymentcomplete?credits=${result.galacticTokens}`);
+                return next();
             } catch (err) {
                 console.error(err);
     
-                return res.redirect(`${container.config.clientUrl}/#/shop/paymentfailed`);
+                res.redirect(`${container.config.clientUrl}/#/shop/paymentfailed`);
+                return next();
             }
         }
     }

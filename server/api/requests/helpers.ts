@@ -9,9 +9,9 @@ export const keyHasStringValue = (obj: any, key: string, minLength: number = 1, 
 };
 
 export const keyHasNumberValue = (obj: any, key: string) => {
-    const value = obj[key].toString();
+    const value = obj[key];
 
-    return value != null && !isNaN(value as any) && !isNaN(parseFloat(value));
+    return value != null && !isNaN(value as any) && !isNaN(parseFloat(value.toString()));
 };
 
 export const keyHasBooleanValue = (obj: any, key: string) => {

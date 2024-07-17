@@ -1,4 +1,3 @@
-import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
 
 export default (container: DependencyContainer) => {
@@ -14,7 +13,8 @@ export default (container: DependencyContainer) => {
                     ...specialStarBans
                 }
     
-                return res.status(200).json(bans);
+                res.status(200).json(bans);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -23,7 +23,8 @@ export default (container: DependencyContainer) => {
             try {
                 let specialists = await container.specialistService.listCarrier(null);
     
-                return res.status(200).json(specialists);
+                res.status(200).json(specialists);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -32,7 +33,8 @@ export default (container: DependencyContainer) => {
             try {
                 let specialists = await container.specialistService.listStar(null);
     
-                return res.status(200).json(specialists);
+                res.status(200).json(specialists);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -41,7 +43,8 @@ export default (container: DependencyContainer) => {
             try {
                 let specialists = await container.specialistService.listCarrier(req.game);
     
-                return res.status(200).json(specialists);
+                res.status(200).json(specialists);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -50,7 +53,8 @@ export default (container: DependencyContainer) => {
             try {
                 let specialists = await container.specialistService.listStar(req.game);
     
-                return res.status(200).json(specialists);
+                res.status(200).json(specialists);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -71,10 +75,11 @@ export default (container: DependencyContainer) => {
                     result.specialist
                 );
     
-                return res.status(200).json({
+                res.status(200).json({
                     waypoints: result.waypoints,
                     effectiveTechs: result.carrier.effectiveTechs
                 });
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -95,9 +100,10 @@ export default (container: DependencyContainer) => {
                     result.specialist
                 );
     
-                return res.status(200).json({
+                res.status(200).json({
                     effectiveTechs: result.star.effectiveTechs
                 });
+                return next();
             } catch (err) {
                 return next(err);
             }

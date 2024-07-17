@@ -6,7 +6,8 @@ export default (container: DependencyContainer) => {
             try {
                 const result = container.badgeService.listPurchasableBadges();
                 
-                return res.status(200).json(result);
+                res.status(200).json(result);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -15,7 +16,8 @@ export default (container: DependencyContainer) => {
             try {
                 const result = await container.badgeService.listBadgesByUser(req.params.userId);
                 
-                return res.status(200).json(result);
+                res.status(200).json(result);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -24,7 +26,8 @@ export default (container: DependencyContainer) => {
             try {
                 const result = await container.badgeService.listBadgesByPlayer(req.game, req.params.playerId);
                 
-                return res.status(200).json(result);
+                res.status(200).json(result);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -33,7 +36,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.badgeService.purchaseBadgeForUser(req.session.userId, req.params.userId, req.body.badgeKey);
                 
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
@@ -42,7 +46,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.badgeService.purchaseBadgeForPlayer(req.game, req.session.userId, req.params.playerId, req.body.badgeKey);
                 
-                return res.sendStatus(200);
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }
