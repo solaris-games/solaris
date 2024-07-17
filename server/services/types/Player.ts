@@ -76,7 +76,7 @@ export interface Player {
     userId: DBObjectId | null;
     isRealUser?: boolean;
     isAIControlled?: boolean;
-    homeStarId: DBObjectId | null;
+    homeStarId?: DBObjectId | null;
     alias: string;
     avatar: string | null;
     notes?: string | null;
