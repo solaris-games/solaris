@@ -169,6 +169,16 @@
           </select>
         </div>
 
+        <div v-if="settings.general.readyToQuit === 'enabled'" class="mb-2">
+          <label for="readyToQuitVisibility" class="col-form-label">RTQ visibility <help-tooltip tooltip="Visibility of a player's RTQ state. Anonymous shows the number of RTQ'd players, but not their identity"></help-tooltip></label>
+
+          <select class="form-control" id="readyToQuitVisibility" v-model="settings.general.readyToQuitVisibility" :disabled="isCreatingGame">
+            <option v-for="opt in options.general.readyToQuitVisibility" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
         <div class="mb-2" v-if="settings.general.mode !== 'teamConquest'">
           <label for="awardRankTo" class="col-form-label">Players that will receive rank <help-tooltip tooltip="Rank distribution scheme to be used" /></label>
           <select class="form-control" id="awardRankTo" v-model="settings.general.awardRankTo" :disabled="isCreatingGame">

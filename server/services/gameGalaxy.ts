@@ -1,7 +1,7 @@
-import { DBObjectId } from './types/DBObjectId';
+import {DBObjectId} from './types/DBObjectId';
 import ValidationError from '../errors/validation';
-import { Game } from './types/Game';
-import { Player, PlayerDiplomaticState, PlayerReputation, PlayerResearch } from './types/Player';
+import {Game} from './types/Game';
+import {Player, PlayerDiplomaticState, PlayerReputation, PlayerResearch} from './types/Player';
 import BattleRoyaleService from './battleRoyale';
 import BroadcastService from './broadcast';
 import CacheService from './cache';
@@ -24,10 +24,10 @@ import StarDistanceService from './starDistance';
 import StarUpgradeService from './starUpgrade';
 import TechnologyService from './technology';
 import WaypointService from './waypoint';
-import { Star } from './types/Star';
-import { Guild, GuildUserWithTag } from './types/Guild';
-import { CarrierWaypoint } from './types/CarrierWaypoint';
-import { Carrier } from './types/Carrier';
+import {Star} from './types/Star';
+import {Guild, GuildUserWithTag} from './types/Guild';
+import {CarrierWaypoint} from './types/CarrierWaypoint';
+import {Carrier} from './types/Carrier';
 import AvatarService from './avatar';
 import PlayerStatisticsService from './playerStatistics';
 import GameFluxService from './gameFlux';
@@ -191,6 +191,8 @@ export default class GameGalaxyService {
         // Calculate what perspectives the user can see, i.e which players the user is spectating.
         const viewpoint = this._getViewpoint(game, userId);
 
+        this._setReadyToQuitCount(game);
+
         // We always need to filter the player data so that it's basic info only.
         await this._setPlayerInfoBasic(game, userPlayer, viewpoint);
 
@@ -302,6 +304,14 @@ export default class GameGalaxyService {
                 p.isKingOfTheHill = kingOfTheHillPlayer != null && kingOfTheHillPlayer._id.toString() === p._id.toString();
             }
         });
+    }
+
+    _setReadyToQuitCount(game: Game) {
+        if (game.settings.general.readyToQuitVisibility === 'hidden') {
+            return;
+        }
+
+        game.state.readyToQuitCount = game.galaxy.players.filter(p => p.readyToQuit).length;
     }
 
     _setStarInfoBasic(doc: Game) {
@@ -680,7 +690,8 @@ export default class GameGalaxyService {
             }
 
             // Return a subset of the user, key info only.
-            return {
+            // @ts-ignore
+            const resultPlayer = {
                 _id: p._id,
                 isRealUser: p.userId != null,
                 isAIControlled: p.isAIControlled,
@@ -708,7 +719,11 @@ export default class GameGalaxyService {
                 isKingOfTheHill: p.isKingOfTheHill,
                 hasPerspective: p.hasPerspective,
                 diplomacy,
-            };
+            } as Player;
+
+            this._maskReadyToQuitState(doc, resultPlayer);
+
+            return resultPlayer;
         }) as any;
     }
 
@@ -749,6 +764,12 @@ export default class GameGalaxyService {
         return {
             kind: ViewpointKind.Basic
         };
+    }
+
+    _maskReadyToQuitState(game: Game, player: Player) {
+        if (game.settings.general.readyToQuitVisibility !== 'visible') {
+            delete player.readyToQuit;
+        }
     }
 
     _populatePlayerHasDuplicateIPs(game: Game) {
@@ -829,6 +850,8 @@ export default class GameGalaxyService {
                     gamePlayer.ready = historyPlayer.ready;
                     gamePlayer.readyToQuit = historyPlayer.readyToQuit;
                 }
+
+                this._maskReadyToQuitState(game, gamePlayer);
             }
         }
 

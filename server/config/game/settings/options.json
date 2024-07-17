@@ -187,6 +187,20 @@
         "text": "3 Cycles"
       }
     ],
+    "readyToQuitVisibility": [
+      {
+        "value": "hidden",
+        "text": "Hidden"
+      },
+      {
+        "value": "anonymous",
+        "text": "Anonymous"
+      },
+      {
+        "value": "visible",
+        "text": "Visible"
+      }
+    ],
     "awardRankTo": [
       {
         "value": "all",
