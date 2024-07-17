@@ -1,4 +1,3 @@
-import { Router } from "express";
 import { ExpressJoiInstance } from "express-joi-validation";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import AdminController from '../controllers/admin';
@@ -10,161 +9,124 @@ import {
     adminSetUserCreditsRequestSchema,
     adminSetUserRoleRequestSchema
 } from "../requests/admin";
-import { singleRoute } from "../singleRoute";
+import {SingleRouter} from "../singleRoute";
 
-export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
+export default (router: SingleRouter, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
     const controller = AdminController(container);
 
     router.get('/api/admin/insights',
-        ...singleRoute(
             mw.auth.authenticate({ admin: true }),
-            controller.getInsights,
-            mw.core.handleError)
+            controller.getInsights
     );
 
     router.get('/api/admin/user',
-        ...singleRoute(
             mw.auth.authenticate({ communityManager: true }),
-            controller.listUsers,
-            mw.core.handleError)
+            controller.listUsers
     );
 
     router.get('/api/admin/passwordresets',
-        ...singleRoute(
             mw.auth.authenticate({ admin: true }),
-            controller.listPasswordResets,
-            mw.core.handleError)
+            controller.listPasswordResets
     );
 
     router.get('/api/admin/reports/:reportId/conversation',
-        ...singleRoute(
             mw.auth.authenticate({ communityManager: true }),
-            controller.conversationForReport,
-            mw.core.handleError)
+            controller.conversationForReport
     );
 
     router.get('/api/admin/reports',
-        ...singleRoute(
             mw.auth.authenticate({ communityManager: true }),
-            controller.listReports,
-            mw.core.handleError)
+            controller.listReports
     );
 
     router.patch('/api/admin/reports/:reportId/action',
-        ...singleRoute(
+        
             mw.auth.authenticate({ communityManager: true }),
-            controller.actionReport,
-            mw.core.handleError)
+            controller.actionReport
     );
 
     router.post('/api/admin/user/:userId/warning',
-        ...singleRoute(
             mw.auth.authenticate({ communityManager: true }),
             validator.body(adminAddWarningRequestSchema),
-            controller.addWarning,
-            mw.core.handleError)
+            controller.addWarning
     );
 
     router.patch('/api/admin/user/:userId/contributor',
-        ...singleRoute(
             mw.auth.authenticate({ admin: true }),
             validator.body(adminSetUserRoleRequestSchema),
-            controller.setRoleContributor,
-            mw.core.handleError)
+            controller.setRoleContributor
     );
 
     router.patch('/api/admin/user/:userId/developer',
-        ...singleRoute(
+        
             mw.auth.authenticate({ admin: true }),
             validator.body(adminSetUserRoleRequestSchema),
-            controller.setRoleDeveloper,
-            mw.core.handleError)
+            controller.setRoleDeveloper
     );
 
     router.patch('/api/admin/user/:userId/communityManager',
-        ...singleRoute(
             mw.auth.authenticate({ admin: true }),
             validator.body(adminSetUserRoleRequestSchema),
-            controller.setRoleCommunityManager,
-            mw.core.handleError)
+            controller.setRoleCommunityManager
     );
 
     router.patch('/api/admin/user/:userId/gameMaster',
-        ...singleRoute(
             mw.auth.authenticate({ admin: true }),
             validator.body(adminSetUserRoleRequestSchema),
-            controller.setRoleGameMaster,
-            mw.core.handleError)
+            controller.setRoleGameMaster
     );
 
     router.patch('/api/admin/user/:userId/credits',
-        ...singleRoute(
+        
             mw.auth.authenticate({ admin: true }),
             validator.body(adminSetUserCreditsRequestSchema),
-            controller.setCredits,
-            mw.core.handleError)
+            controller.setCredits
     );
 
     router.patch('/api/admin/user/:userId/ban',
-        ...singleRoute(
             mw.auth.authenticate({ communityManager: true }),
-            controller.banUser,
-            mw.core.handleError)
+            controller.banUser
     );
 
     router.patch('/api/admin/user/:userId/unban',
-        ...singleRoute(
             mw.auth.authenticate({ communityManager: true }),
-            controller.unbanUser,
-            mw.core.handleError)
+            controller.unbanUser
     );
 
     router.patch('/api/admin/user/:userId/resetAchievements',
-        ...singleRoute(
+        
             mw.auth.authenticate({ admin: true }),
-            controller.resetAchievements,
-            mw.core.handleError)
+            controller.resetAchievements
     );
 
     router.patch('/api/admin/user/:userId/promoteToEstablishedPlayer',
-        ...singleRoute(
             mw.auth.authenticate({ communityManager: true }),
-            controller.promoteToEstablishedPlayer,
-            mw.core.handleError)
+            controller.promoteToEstablishedPlayer
     );
 
     router.post('/api/admin/user/:userId/impersonate',
-        ...singleRoute(
             mw.auth.authenticate({ admin: true }),
-            controller.impersonate,
-            mw.core.handleError)
+            controller.impersonate
     );
 
     router.get('/api/admin/game',
-        ...singleRoute(
             mw.auth.authenticate({ subAdmin: true }),
-            controller.listGames,
-            mw.core.handleError)
+            controller.listGames
     );
 
     router.patch('/api/admin/game/:gameId/featured',
-        ...singleRoute(
             mw.auth.authenticate({ subAdmin: true }),
             validator.body(adminSetGameFeaturedRequestSchema),
-            controller.setGameFeatured,
-            mw.core.handleError)
+            controller.setGameFeatured
     );
 
     router.patch('/api/admin/game/:gameId/timeMachine',
-        ...singleRoute(
             mw.auth.authenticate({ subAdmin: true }),
             validator.body(adminSetGameTimeMachineRequestSchema),
-            controller.setGameTimeMachine,
-            mw.core.handleError)
+            controller.setGameTimeMachine
     );
 
     router.patch('/api/admin/game/:gameId/finish',
-        ...singleRoute(
             mw.auth.authenticate({ admin: true }),
             mw.game.loadGame({
                 lean: true,
@@ -176,12 +138,10 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
                 isUnlocked: true,
                 isInProgress: true
             }),
-            controller.forceEndGame,
-            mw.core.handleError)
+            controller.forceEndGame
     );
 
     router.delete('/api/admin/game/:gameId/quitters',
-        ...singleRoute(
             mw.auth.authenticate({ admin: true }),
             mw.game.loadGame({
                 lean: true,
@@ -189,8 +149,7 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
                 state: true,
                 'galaxy.players': true
             }),
-            controller.resetQuitters,
-            mw.core.handleError)
+            controller.resetQuitters
     );
 
     return router;

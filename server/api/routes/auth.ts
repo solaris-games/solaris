@@ -1,42 +1,34 @@
-import { Router } from "express";
 import { ExpressJoiInstance } from "express-joi-validation";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import AuthController from '../controllers/auth';
 import { MiddlewareContainer } from "../middleware";
 import { authLoginRequestSchema } from "../requests/auth";
-import { singleRoute } from "../singleRoute";
+import {SingleRouter} from "../singleRoute";
 
-export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
+export default (router: SingleRouter, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
     const controller = AuthController(container);
 
     router.post('/api/auth/login',
-        ...singleRoute(
             validator.body(authLoginRequestSchema),
-            controller.login,
-            mw.core.handleError)
+            controller.login
     );
 
     router.post('/api/auth/logout',
-        ...singleRoute(
-            controller.logout,
-            mw.core.handleError)
+        
+            controller.logout
     );
 
     router.post('/api/auth/verify',
-        ...singleRoute(
-            controller.verify)
+            controller.verify
     );
 
     router.get('/api/auth/discord',
-        ...singleRoute(
-            controller.authoriseDiscord) // TODO: This should be in another api file. oauth.js?
+            controller.authoriseDiscord // TODO: This should be in another api file. oauth.js?
     );
 
     router.delete('/api/auth/discord',
-        ...singleRoute(
             mw.auth.authenticate(),
-            controller.unauthoriseDiscord,
-            mw.core.handleError)
+            controller.unauthoriseDiscord
     );
 
     return router;

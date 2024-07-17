@@ -1,15 +1,13 @@
-import { Router } from "express";
 import { ExpressJoiInstance } from "express-joi-validation";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import TradeController from '../controllers/trade';
 import { MiddlewareContainer } from "../middleware";
-import { singleRoute } from "../singleRoute";
+import { SingleRouter} from "../singleRoute";
 
-export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
+export default (router: SingleRouter, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
     const controller = TradeController(container);
 
     router.put('/api/game/:gameId/trade/credits',
-        ...singleRoute(
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -26,12 +24,10 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
             mw.player.loadPlayer,
             mw.player.validatePlayerState({ isPlayerUndefeated: true }),
             controller.sendCredits,
-            mw.playerMutex.release(),
-            mw.core.handleError)
+            mw.playerMutex.release()
     );
 
     router.put('/api/game/:gameId/trade/creditsSpecialists',
-        ...singleRoute(
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -48,12 +44,10 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
             mw.player.loadPlayer,
             mw.player.validatePlayerState({ isPlayerUndefeated: true }),
             controller.sendCreditsSpecialists,
-            mw.playerMutex.release(),
-            mw.core.handleError)
+            mw.playerMutex.release()
     );
 
     router.put('/api/game/:gameId/trade/renown',
-        ...singleRoute(
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -69,12 +63,10 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
             }),
             mw.player.loadPlayer,
             controller.sendRenown,
-            mw.playerMutex.release(),
-            mw.core.handleError)
+            mw.playerMutex.release()
     );
 
     router.put('/api/game/:gameId/trade/tech',
-        ...singleRoute(
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -91,12 +83,10 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
             mw.player.loadPlayer,
             mw.player.validatePlayerState({ isPlayerUndefeated: true }),
             controller.sendTechnology,
-            mw.playerMutex.release(),
-            mw.core.handleError)
+            mw.playerMutex.release()
     );
 
     router.get('/api/game/:gameId/trade/tech/:toPlayerId',
-        ...singleRoute(
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -113,12 +103,10 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
             mw.player.loadPlayer,
             mw.player.validatePlayerState({ isPlayerUndefeated: true }),
             controller.listTradeableTechnologies,
-            mw.playerMutex.release(),
-            mw.core.handleError)
+            mw.playerMutex.release()
     );
 
     router.get('/api/game/:gameId/trade/:toPlayerId/events',
-        ...singleRoute(
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -128,8 +116,7 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
             }),
             mw.player.loadPlayer,
             controller.listTradeEvents,
-            mw.playerMutex.release(),
-            mw.core.handleError)
+            mw.playerMutex.release()
     );
 
     return router;

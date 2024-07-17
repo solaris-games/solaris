@@ -8,9 +8,10 @@ const MongoDBStore = MongoDBSession(session);
 import { Config } from '../config/types/Config';
 import { DependencyContainer } from '../services/types/DependencyContainer';
 import registerRoutes from './routes';
+import {SingleRouter} from "./singleRoute";
+import Middleware from "./middleware";
 
 export default async (config: Config, app, container: DependencyContainer) => {
-
     app.use(require('body-parser').json({
         limit: '1000kb' // Note: This allows large custom galaxies to be uploaded.
     }));
@@ -83,9 +84,13 @@ export default async (config: Config, app, container: DependencyContainer) => {
     // ---------------
     // Register routes
 
-    registerRoutes(router, container);
+    const middleware = Middleware(container);
+    const singleRouter = new SingleRouter(router);
+    registerRoutes(singleRouter, container, middleware);
 
     app.use(router);
+
+    app.use(middleware.core.handleError);
 
     console.log('Express intialized.');
     
