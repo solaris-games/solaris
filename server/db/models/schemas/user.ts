@@ -21,6 +21,7 @@ const schema = new Schema({
        text: { type: Types.String, required: true},
        date: { type: Types.Date, required: true }
     }],
+    lastReadAnnouncement: { type: Types.ObjectId, required: false, default: null },
     roles: {
         administrator: { type: Types.Boolean, default: false },
         contributor: { type: Types.Boolean, default: false },
