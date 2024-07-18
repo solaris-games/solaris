@@ -8,25 +8,20 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
     const controller =  AnnouncementController(container);
 
     router.get("/api/announcements/latest",
-        
             controller.getLatestAnnouncement);
 
     router.get("/api/announcements/",
-        
             controller.getAllAnnouncements);
 
     router.get("/api/announcements/unread",
-        
             mw.auth.authenticate(),
             controller.getUnreadAnnouncements);
 
     router.get("/api/announcements/state",
-        
             mw.auth.authenticate(),
             controller.getAnnouncementState);
 
     router.patch("/api/announcements/state/markAsRead",
-        
             mw.auth.authenticate(),
             controller.markAsRead)
 }

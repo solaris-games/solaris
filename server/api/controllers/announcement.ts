@@ -16,6 +16,6 @@ export default (container: DependencyContainer) => {
         },
         getAllAnnouncements: (req, res, next) => {
 
-        }
+        },
     }
 }

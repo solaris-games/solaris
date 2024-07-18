@@ -152,5 +152,13 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             controller.resetQuitters
     );
 
+    router.post("/api/announcements/",
+        mw.auth.authenticate({ admin: true }),
+        controller.createAnnouncement);
+
+    router.delete("/api/announcements/:id",
+        mw.auth.authenticate({ admin: true }),
+        controller.deleteAnnouncement);
+
     return router;
 }

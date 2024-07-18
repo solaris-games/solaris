@@ -2,6 +2,7 @@ import Repository from "./repository";
 import {Announcement} from "./types/Announcement";
 import {DBObjectId} from "./types/DBObjectId";
 import UserService from "./user";
+import ValidationError from "../errors/validation";
 
 export default class AnnouncementService {
     announcementModel;
@@ -32,5 +33,15 @@ export default class AnnouncementService {
 
     async getAllAnnouncements(userId: DBObjectId) {
 
+    }
+
+    async createAnnouncement(title: String, date: Date, content: String) {
+
+    }
+
+    async deleteAnnouncement(announcementId: DBObjectId | undefined) {
+        if (!announcementId) {
+            throw new ValidationError("Announcement ID is required");
+        }
     }
 }

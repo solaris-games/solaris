@@ -238,6 +238,28 @@ export default (container: DependencyContainer) => {
             } catch (err) {
                 return next(err);
             }
+        },
+        createAnnouncement: async (req, res, next) => {
+            // TODO: validation
+
+            try {
+                await container.announcementService.createAnnouncement('', new Date(), '');
+
+                res.sendStatus(200);
+                return next();
+            } catch (err) {
+                return next(err);
+            }
+        },
+        deleteAnnouncement: async (req, res, next) => {
+            try {
+                await container.announcementService.deleteAnnouncement(req.params.announcementId);
+
+                res.sendStatus(200);
+                return next();
+            } catch (err) {
+                return next(err);
+            }
         }
     }
 };
