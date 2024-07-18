@@ -1,5 +1,7 @@
 import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
+import { Value } from '@sinclair/typebox/value';
+import {TAnnouncement} from "../requests/announcements";
 
 export default (container: DependencyContainer) => {
     return {
@@ -240,10 +242,9 @@ export default (container: DependencyContainer) => {
             }
         },
         createAnnouncement: async (req, res, next) => {
-            // TODO: validation
-
             try {
-                await container.announcementService.createAnnouncement('', new Date(), '');
+                const body = Value.Decode(TAnnouncement, req.body);
+                await container.announcementService.createAnnouncement(body.title, body.date, body.content);
 
                 res.sendStatus(200);
                 return next();

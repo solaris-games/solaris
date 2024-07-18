@@ -1,11 +1,12 @@
 import Repository from "./repository";
 import {Announcement} from "./types/Announcement";
-import {DBObjectId} from "./types/DBObjectId";
+import {DBObjectId, objectId} from "./types/DBObjectId";
 import UserService from "./user";
 import ValidationError from "../errors/validation";
+import {Model} from "mongoose";
 
 export default class AnnouncementService {
-    announcementModel;
+    announcementModel: Model<Announcement>;
     announcementRepo: Repository<Announcement>;
     userService: UserService;
 
@@ -15,8 +16,8 @@ export default class AnnouncementService {
         this.userService = userService;
     }
 
-    async getLatestAnnouncement() {
-
+    async getLatestAnnouncement(): Promise<Announcement | null> {
+        return this.announcementModel.findOne({}).sort({ date: 1 }).exec();
     }
 
     async getAnnouncementState(userId: DBObjectId) {
@@ -27,16 +28,13 @@ export default class AnnouncementService {
 
     }
 
-    async getUnreadAnnouncements(userId: DBObjectId) {
-
-    }
-
-    async getAllAnnouncements(userId: DBObjectId) {
-
+    async getAllAnnouncements(): Promise<Announcement[]> {
+        return this.announcementModel.find().sort({ date: 1 }).exec();
     }
 
     async createAnnouncement(title: String, date: Date, content: String) {
-
+        const doc: Announcement = { _id: objectId(), title, date, content };
+        await this.announcementRepo.insertOne(doc);
     }
 
     async deleteAnnouncement(announcementId: DBObjectId | undefined) {

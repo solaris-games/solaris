@@ -13,10 +13,6 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
     router.get("/api/announcements/",
             controller.getAllAnnouncements);
 
-    router.get("/api/announcements/unread",
-            mw.auth.authenticate(),
-            controller.getUnreadAnnouncements);
-
     router.get("/api/announcements/state",
             mw.auth.authenticate(),
             controller.getAnnouncementState);
