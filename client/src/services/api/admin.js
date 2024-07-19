@@ -121,6 +121,14 @@ class AdminService extends BaseApiService {
   getConversationForReport (reportId) {
     return axios.get(`${this.BASE_URL}admin/reports/${reportId}/conversation`, { withCredentials: true })
   }
+
+  createAnnouncement (announcement) {
+    return axios.post(`${this.BASE_URL}announcements/`, announcement, { withCredentials: true })
+  }
+
+  deleteAnnouncement (announcementId) {
+    return axios.delete(`${this.BASE_URL}announcements/${announcementId}`, { withCredentials: true })
+  }
 }
 
 export default new AdminService()
