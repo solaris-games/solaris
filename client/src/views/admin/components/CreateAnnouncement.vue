@@ -7,26 +7,64 @@
       <form>
         <div class="form-group mb-2">
           <label for="announcement-title">Title</label>
-          <input type="text" class="form-control" id="announcement-title" placeholder="Title">
+          <input type="text" class="form-control" id="announcement-title" placeholder="Title" v-model="title" required>
         </div>
         <div class="form-group mb-2">
           <label for="announcement-date">Date (UTC)</label>
-          <input type="datetime-local" class="form-control" id="announcement-date" placeholder="Date">
+          <input type="datetime-local" class="form-control" id="announcement-date" placeholder="Date" v-model="date" required>
         </div>
         <div class="form-group mb-2">
           <label for="announcement-content">Content</label>
-          <textarea class="form-control" id="announcement-content" rows="3" placeholder="Content"></textarea>
+          <textarea class="form-control" id="announcement-content" rows="3" placeholder="Content" v-model="content" required></textarea>
         </div>
 
-        <button type="submit" class="btn btn-default">Create</button>
+        <form-error-list v-bind:errors="errors" />
+
+        <button type="submit" class="btn btn-success" :disabled="!canSubmit" @click="submit">Create</button>
       </form>
     </div>
   </div>
 </template>
 
 <script>
+import FormErrorList from "../../components/FormErrorList.vue";
+import AdminApiService from "../../../services/api/admin";
+
 export default {
-  name: "CreateAnnouncement"
+  name: "CreateAnnouncement",
+  components: {
+    'form-error-list': FormErrorList
+  },
+  data () {
+    return {
+      title: '',
+      date: '',
+      content: '',
+      errors: [],
+    }
+  },
+  methods: {
+    async submit () {
+      const announcement = {
+        title: this.title,
+        date: this.date,
+        content: this.content
+      };
+
+      const resp = await AdminApiService.createAnnouncement(announcement);
+
+      if (resp.status !== 201) {
+        this.errors = resp.data.errors;
+      }
+
+      this.$emit('onAnnouncementCreated')
+    },
+  },
+  computed: {
+    canSubmit () {
+      return Boolean(this.title && this.date && this.content);
+    },
+  }
 }
 </script>
 

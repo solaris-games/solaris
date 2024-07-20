@@ -246,7 +246,7 @@ export default (container: DependencyContainer) => {
                 const body = Value.Decode(TAnnouncement, req.body);
                 await container.announcementService.createAnnouncement(body.title, body.date, body.content);
 
-                res.sendStatus(200);
+                res.sendStatus(201);
                 return next();
             } catch (err) {
                 return next(err);

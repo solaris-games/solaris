@@ -123,11 +123,11 @@ class AdminService extends BaseApiService {
   }
 
   createAnnouncement (announcement) {
-    return axios.post(`${this.BASE_URL}announcements/`, announcement, { withCredentials: true })
+    return axios.post(`${this.BASE_URL}admin/announcements/`, announcement, { withCredentials: true })
   }
 
   deleteAnnouncement (announcementId) {
-    return axios.delete(`${this.BASE_URL}announcements/${announcementId}`, { withCredentials: true })
+    return axios.delete(`${this.BASE_URL}admin/announcements/${announcementId}`, { withCredentials: true })
   }
 }
 

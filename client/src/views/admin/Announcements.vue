@@ -3,7 +3,7 @@
     <loading-spinner :loading="!announcements"/>
 
     <div v-if="announcements">
-      <create-announcement />
+      <create-announcement @onAnnouncementCreated="updateAnnouncements" />
 
       <h4>Announcements</h4>
 
@@ -20,6 +20,7 @@ import LoadingSpinner from "../components/LoadingSpinner.vue";
 import CreateAnnouncement from "./components/CreateAnnouncement.vue";
 import Announcement from "../components/Announcement.vue";
 import AnnouncementsApiService from "../../services/api/announcements";
+import AdminApiService from "../../services/api/admin";
 
 export default {
   name: "Announcements",
@@ -35,9 +36,12 @@ export default {
     }
   },
   async mounted () {
-    this.announcements = await this.getAnnouncements();
+    await this.updateAnnouncements();
   },
   methods: {
+    async updateAnnouncements () {
+      this.announcements = await this.getAnnouncements();
+    },
     async getAnnouncements() {
       const resp = await AnnouncementsApiService.getAnnouncements();
 
@@ -47,8 +51,8 @@ export default {
       }
 
       return resp.data
-    }
-  }
+    },
+  },
 }
 </script>
 
