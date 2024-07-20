@@ -21,7 +21,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@sinclair/typebox": "^0.32.34",
     "agenda": "^3.1.0",
     "axios": "^0.18.1",
     "bcrypt": "^5.1.1",

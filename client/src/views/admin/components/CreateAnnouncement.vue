@@ -20,7 +20,7 @@
 
         <form-error-list v-bind:errors="errors" />
 
-        <button type="submit" class="btn btn-success" :disabled="!canSubmit" @click="submit">Create</button>
+        <button type="button" class="btn btn-success" :disabled="!canSubmit" @click="submit">Create</button>
       </form>
     </div>
   </div>
