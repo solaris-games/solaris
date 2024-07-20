@@ -1,8 +1,8 @@
 <template>
-  <div class="panel panel-default announcement">
+  <div class="panel panel-default announcement mb-2" :class="highlighted ? 'announcement-highlighted' : null">
     <div class="panel-heading announcement-heading">
       <div class="announcement-title">
-        <h5 class="panel-title">{{ announcement.title }}</h5>
+        <h5 class="panel-title text-info">{{ announcement.title }}</h5>
         <p class="text-muted">{{ date }}</p>
       </div>
       <div class="text-right">
@@ -19,7 +19,8 @@
 export default {
   name: "Announcement",
   props: {
-    announcement: Object
+    announcement: Object,
+    highlighted: Boolean
   },
   computed: {
     date () {
@@ -40,5 +41,9 @@ export default {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+}
+
+.announcement-highlighted {
+  border-color: #30beff;
 }
 </style>

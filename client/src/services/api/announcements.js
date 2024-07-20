@@ -9,6 +9,10 @@ class AnnouncementsService extends BaseApiService {
   getLatestAnnouncement () {
     return axios.get(`${this.BASE_URL}announcements/latest/`, { withCredentials: true });
   }
+
+  getAnnouncementState () {
+    return axios.get(`${this.BASE_URL}announcements/state/`, { withCredentials: true });
+  }
 }
 
 export default new AnnouncementsService();

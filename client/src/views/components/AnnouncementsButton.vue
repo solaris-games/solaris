@@ -1,10 +1,36 @@
 <template>
- <button class="btn btn-info"><span class="badge bg-default">2</span> Announcements</button>
+  <div class="m-1">
+    <button class="btn btn-info" type="button" @click="openAnnouncements">
+      <span class="badge bg-default" v-if="announcementState">{{ announcementState.unreadCount }}</span>
+      Announcements
+    </button>
+  </div>
 </template>
 
 <script>
+import AnnouncementsApiService from "../../services/api/announcements";
+
 export default {
-  name: "AnnouncementsButton"
+  name: "AnnouncementsButton",
+  data () {
+    return {
+      announcementState: null
+    }
+  },
+  async mounted () {
+    const resp = await AnnouncementsApiService.getAnnouncementState();
+
+    if (resp.status === 200) {
+      this.announcementState = resp.data;
+    } else {
+      console.error(resp);
+    }
+  },
+  methods: {
+    openAnnouncements () {
+      this.$router.push({ name: 'announcements' })
+    }
+  }
 }
 </script>
 

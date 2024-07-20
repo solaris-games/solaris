@@ -7,6 +7,7 @@ import {Model} from "mongoose";
 
 export type AnnouncementState = {
     lastReadAnnouncement: DBObjectId | null,
+    unreadAnnouncements: DBObjectId[],
     unreadCount: number,
     totalAnnouncements: number
 }
@@ -43,9 +44,12 @@ export default class AnnouncementService {
             unreadCount = announcementIds.length;
         }
 
+        const unreadAnnouncements = announcementIds.slice(0, unreadCount).map(a => a._id);
+
         return {
             lastReadAnnouncement: user.lastReadAnnouncement,
             unreadCount,
+            unreadAnnouncements,
             totalAnnouncements: announcementIds.length
         }
     }
