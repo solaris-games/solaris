@@ -2,7 +2,7 @@
   <div class="panel panel-default announcement mb-2" :class="highlighted ? 'announcement-highlighted' : null">
     <div class="panel-heading announcement-heading">
       <div class="announcement-title">
-        <h5 class="panel-title text-info">{{ announcement.title }}</h5>
+        <h5 class="panel-title">{{ announcement.title }}</h5>
         <p class="text-muted">{{ date }}</p>
       </div>
       <div class="text-right">

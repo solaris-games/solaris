@@ -51,7 +51,7 @@ export default {
       if (resp2.status === 200) {
         this.announcements = resp2.data;
 
-
+        await AnnouncementsApiService.markAsRead();
       } else {
         console.error(resp2);
       }

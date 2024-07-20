@@ -13,6 +13,10 @@ class AnnouncementsService extends BaseApiService {
   getAnnouncementState () {
     return axios.get(`${this.BASE_URL}announcements/state/`, { withCredentials: true });
   }
+
+  markAsRead () {
+    return axios.patch(`${this.BASE_URL}announcements/state/markAsRead/`, {}, { withCredentials: true });
+  }
 }
 
 export default new AnnouncementsService();
