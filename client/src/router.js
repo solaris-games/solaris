@@ -32,6 +32,7 @@ import Reports from "./views/admin/Reports.vue";
 import Insights from "./views/admin/Insights.vue";
 import PasswordResets from "./views/admin/PasswordResets.vue";
 import CommunityGuidelines from "./views/CommunityGuidelines.vue";
+import AdminAnnouncements from './views/admin/Announcements.vue';
 import Announcements from "./views/Announcements.vue";
 
 Vue.use(Router)
@@ -146,7 +147,7 @@ export default new Router({
     {
       path: '/administration/announcements',
       name: 'administration-announcements',
-      component: Announcements
+      component: AdminAnnouncements
     },
     {
       path: '/administration/games',

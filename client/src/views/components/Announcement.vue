@@ -9,13 +9,14 @@
         <slot name="context-actions"></slot>
       </div>
     </div>
-    <div class="panel-body">
-      {{ announcement.content }}
+    <div class="panel-body" v-html="content">
     </div>
   </div>
 </template>
 
 <script>
+import { renderMarkdown } from "../../util/markdown";
+
 export default {
   name: "Announcement",
   props: {
@@ -25,6 +26,9 @@ export default {
   computed: {
     date () {
       return new Date(this.announcement.date).toLocaleString()
+    },
+    content () {
+      return renderMarkdown(this.announcement.content);
     }
   }
 }
