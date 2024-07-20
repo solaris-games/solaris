@@ -1,8 +1,13 @@
 <template>
   <div class="panel panel-default announcement">
-    <div class="panel-heading">
-      <h5 class="panel-title">{{ announcement.title }}</h5>
-      <p class="text-muted">{{ date }}</p>
+    <div class="panel-heading announcement-heading">
+      <div class="announcement-title">
+        <h5 class="panel-title">{{ announcement.title }}</h5>
+        <p class="text-muted">{{ date }}</p>
+      </div>
+      <div class="text-right">
+        <slot name="context-actions"></slot>
+      </div>
     </div>
     <div class="panel-body">
       {{ announcement.content }}
@@ -29,5 +34,11 @@ export default {
   border-radius: 4px;
   border: 1px solid rgba(255, 255, 255, .3);
   padding: 8px;
+}
+
+.announcement-heading {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 </style>

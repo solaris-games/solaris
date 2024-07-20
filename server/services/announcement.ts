@@ -73,5 +73,7 @@ export default class AnnouncementService {
         if (!announcementId) {
             throw new ValidationError("Announcement ID is required");
         }
+
+        await this.announcementRepo.deleteOne({ _id: announcementId });
     }
 }

@@ -8,7 +8,11 @@
       <h4>Announcements</h4>
 
       <div class="announcement-list" v-for="announcement in announcements" :key="announcement._id">
-        <announcement :announcement="announcement" />
+        <announcement :announcement="announcement">
+          <template v-slot:context-actions>
+            <button class="btn btn-outline-danger btn-sm" @click="deleteAnnouncement(announcement)">Delete</button>
+          </template>
+        </announcement>
       </div>
     </div>
   </administration-page>
@@ -42,7 +46,7 @@ export default {
     async updateAnnouncements () {
       this.announcements = await this.getAnnouncements();
     },
-    async getAnnouncements() {
+    async getAnnouncements () {
       const resp = await AnnouncementsApiService.getAnnouncements();
 
       if (resp.status !== 200) {
@@ -52,6 +56,18 @@ export default {
 
       return resp.data
     },
+    async deleteAnnouncement (announcement) {
+      if (await this.$confirm("Delete announcement", `Are you sure you want to delete the announcement "${announcement.title}"?`)) {
+        const resp = await AdminApiService.deleteAnnouncement(announcement._id);
+
+        if (resp.status !== 204) {
+          this.$toasted.error(resp.data.message)
+          return
+        }
+
+        await this.updateAnnouncements();
+      }
+    }
   },
 }
 </script>

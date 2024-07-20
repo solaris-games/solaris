@@ -254,9 +254,9 @@ export default (container: DependencyContainer) => {
         },
         deleteAnnouncement: async (req, res, next) => {
             try {
-                await container.announcementService.deleteAnnouncement(req.params.announcementId);
+                await container.announcementService.deleteAnnouncement(req.params.id);
 
-                res.sendStatus(200);
+                res.sendStatus(204);
                 return next();
             } catch (err) {
                 return next(err);

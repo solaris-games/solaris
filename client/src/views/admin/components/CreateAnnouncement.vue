@@ -51,6 +51,10 @@ export default {
         content: this.content
       };
 
+      this.title = '';
+      this.date = '';
+      this.content = '';
+
       const resp = await AdminApiService.createAnnouncement(announcement);
 
       if (resp.status !== 201) {
