@@ -23,7 +23,7 @@ export default class AnnouncementService {
     }
 
     async getLatestAnnouncement(): Promise<Announcement | null> {
-        return this.announcementModel.findOne({}).sort({ date: 1 }).exec();
+        return this.announcementModel.findOne({ date: { $lte: new Date() } }).sort({ date: -1 }).exec();
     }
 
     async getAnnouncementState(userId: DBObjectId): Promise<AnnouncementState> {
@@ -34,7 +34,7 @@ export default class AnnouncementService {
         }
 
         const lastReadAnnouncement = user.lastReadAnnouncement?.toString();
-        const announcementIds: { _id: DBObjectId }[] = await this.announcementModel.find().sort({ date: 1 }).select({ _id: 1 }).exec();
+        const announcementIds: { _id: DBObjectId }[] = await this.getCurrentAnnouncementsQuery().select({ _id: 1 }).exec();
 
         let unreadCount: number;
         if (lastReadAnnouncement) {
@@ -61,7 +61,15 @@ export default class AnnouncementService {
     }
 
     async getAllAnnouncements(): Promise<Announcement[]> {
-        return this.announcementModel.find().sort({ date: 1 }).exec();
+        return this.announcementModel.find().sort({ date: -1 }).exec();
+    }
+
+    async getCurrentAnnouncements(): Promise<Announcement[]> {
+        return this.getCurrentAnnouncementsQuery().exec();
+    }
+
+    getCurrentAnnouncementsQuery() {
+        return this.announcementModel.find({ date: { $lte: new Date() } }).sort({ date: -1 });
     }
 
     async createAnnouncement(title: String, date: Date, content: String) {

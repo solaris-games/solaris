@@ -261,6 +261,16 @@ export default (container: DependencyContainer) => {
             } catch (err) {
                 return next(err);
             }
+        },
+        getAllAnnouncements: async (req, res, next) => {
+            try {
+                const result = await container.announcementService.getAllAnnouncements();
+
+                res.status(200).json(result);
+                return next();
+            } catch (err) {
+                return next(err);
+            }
         }
     }
 };

@@ -11,7 +11,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             controller.getLatestAnnouncement);
 
     router.get("/api/announcements/",
-            controller.getAllAnnouncements);
+            controller.getCurrentAnnouncements);
 
     router.get("/api/announcements/state",
             mw.auth.authenticate(),

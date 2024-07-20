@@ -23,7 +23,6 @@ import AdministrationPage from "./AdministrationPage.vue";
 import LoadingSpinner from "../components/LoadingSpinner.vue";
 import CreateAnnouncement from "./components/CreateAnnouncement.vue";
 import Announcement from "../components/Announcement.vue";
-import AnnouncementsApiService from "../../services/api/announcements";
 import AdminApiService from "../../services/api/admin";
 
 export default {
@@ -47,7 +46,7 @@ export default {
       this.announcements = await this.getAnnouncements();
     },
     async getAnnouncements () {
-      const resp = await AnnouncementsApiService.getAnnouncements();
+      const resp = await AdminApiService.getAllAnnouncements();
 
       if (resp.status !== 200) {
         this.$toasted.error(resp.data.message)

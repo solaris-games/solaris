@@ -2,7 +2,7 @@ import BaseApiService from "./base";
 import axios from "axios";
 
 class AnnouncementsService extends BaseApiService {
-  getAnnouncements () {
+  getCurrentAnnouncements () {
     return axios.get(`${this.BASE_URL}announcements/`, { withCredentials: true })
   }
 }

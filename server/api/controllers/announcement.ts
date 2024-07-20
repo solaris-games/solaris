@@ -19,8 +19,8 @@ export default (container: DependencyContainer) => {
             res.status(200);
             return next();
         },
-        getAllAnnouncements: async (req, res, next) => {
-            const announcements = await container.announcementService.getAllAnnouncements();
+        getCurrentAnnouncements: async (req, res, next) => {
+            const announcements = await container.announcementService.getCurrentAnnouncements();
             res.status(200).json(announcements);
             return next();
         },

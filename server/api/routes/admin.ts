@@ -160,5 +160,9 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
         mw.auth.authenticate({ admin: true }),
         controller.deleteAnnouncement);
 
+    router.get("/api/admin/announcements/",
+        mw.auth.authenticate({ admin: true }),
+        controller.getAllAnnouncements);
+
     return router;
 }
