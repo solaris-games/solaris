@@ -140,6 +140,7 @@ export default new Router({
       component: MyGuild
     },
     {
+
       path: '/guild/details/:guildId',
       name: 'guild-details',
       component: GuildDetails
