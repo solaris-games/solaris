@@ -24,8 +24,10 @@
         <p class="mb-2 mt-2">Play <span class="text-warning">Solaris</span> on <a href="https://solaris.games" target="_blank" title="Web"><i class="fab fa-chrome me-1"></i>Web</a>, <a href="https://store.steampowered.com/app/1623930/Solaris/" target="_blank" title="Steam"><i class="fab fa-steam me-1"></i>Steam</a> and <a href="https://play.google.com/store/apps/details?id=com.voxel.solaris_android" target="_blank" title="Android"><i class="fab fa-google-play me-1"></i>Android</a>.</p>
       </div>
     </div>
+
+    <latest-announcement />
   </view-container>
-  
+
   <parallax />
 </div>
 </template>
@@ -38,6 +40,7 @@ import ApiAuthService from '../services/api/auth'
 import router from '../router'
 import LoadingSpinnerVue from './components/LoadingSpinner.vue'
 import ParallaxVue from './components/Parallax'
+import LatestAnnouncement from "./components/LatestAnnouncement.vue";
 
 export default {
   components: {
@@ -45,7 +48,8 @@ export default {
     'view-title': ViewTitle,
     'account-login': AccountLoginVue,
     'loading-spinner': LoadingSpinnerVue,
-    'parallax': ParallaxVue
+    'parallax': ParallaxVue,
+    'latest-announcement': LatestAnnouncement
   },
   data () {
     return {
@@ -54,7 +58,7 @@ export default {
   },
   async mounted () {
     this.isAutoLoggingIn = true
-    
+
     try {
       let response = await ApiAuthService.verify()
 

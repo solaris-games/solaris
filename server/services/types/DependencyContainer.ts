@@ -77,6 +77,7 @@ import UserService from "../user";
 import UserLeaderboardService from "../userLeaderboard";
 import UserLevelService from "../userLevel";
 import WaypointService from "../waypoint";
+import AnnouncementService from "../announcement";
 
 export interface DependencyContainer {
     config: Config,
@@ -157,5 +158,6 @@ export interface DependencyContainer {
     pathfindingService: PathfindingService,
     scheduleBuyService: ScheduleBuyService,
     gamePlayerMutexService: GamePlayerMutexService,
-    gameMutexService: GameMutexService
+    gameMutexService: GameMutexService,
+    announcementService: AnnouncementService,
 };

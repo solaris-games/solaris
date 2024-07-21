@@ -1,15 +1,13 @@
-import { Router } from "express";
 import { ExpressJoiInstance } from "express-joi-validation";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import DiplomacyController from '../controllers/diplomacy';
 import { MiddlewareContainer } from "../middleware";
-import { singleRoute } from "../singleRoute";
+import {SingleRouter} from "../singleRoute";
 
-export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
+export default (router: SingleRouter, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
     const controller = DiplomacyController(container);
 
     router.get('/api/game/:gameId/diplomacy',
-        ...singleRoute(
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -21,12 +19,10 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
             }),
             mw.player.loadPlayer,
             controller.list,
-            mw.playerMutex.release(),
-            mw.core.handleError)
+            mw.playerMutex.release()
     );
 
     router.get('/api/game/:gameId/diplomacy/:toPlayerId',
-        ...singleRoute(
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -38,12 +34,10 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
             }),
             mw.player.loadPlayer,
             controller.detail,
-            mw.playerMutex.release(),
-            mw.core.handleError)
+            mw.playerMutex.release()
     );
 
     router.put('/api/game/:gameId/diplomacy/ally/:playerId',
-        ...singleRoute(
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -60,12 +54,10 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
             mw.player.loadPlayer,
             mw.player.validatePlayerState({ isPlayerUndefeated: true }),
             controller.declareAlly,
-            mw.playerMutex.release(),
-            mw.core.handleError)
+            mw.playerMutex.release()
     );
 
     router.put('/api/game/:gameId/diplomacy/enemy/:playerId',
-        ...singleRoute(
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -82,12 +74,10 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
             mw.player.loadPlayer,
             mw.player.validatePlayerState({ isPlayerUndefeated: true }),
             controller.declareEnemy,
-            mw.playerMutex.release(),
-            mw.core.handleError)
+            mw.playerMutex.release()
     );
 
     router.put('/api/game/:gameId/diplomacy/neutral/:playerId',
-        ...singleRoute(
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -104,8 +94,7 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
             mw.player.loadPlayer,
             mw.player.validatePlayerState({ isPlayerUndefeated: true }),
             controller.declareNeutral,
-            mw.playerMutex.release(),
-            mw.core.handleError)
+            mw.playerMutex.release()
     );
 
     return router;

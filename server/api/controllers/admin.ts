@@ -1,5 +1,6 @@
 import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
+import {AnnouncementRequest} from "../requests/announcements";
 
 export default (container: DependencyContainer) => {
     return {
@@ -234,6 +235,38 @@ export default (container: DependencyContainer) => {
                 await container.gameService.resetQuitters(req.game);
 
                 res.sendStatus(200);
+                return next();
+            } catch (err) {
+                return next(err);
+            }
+        },
+        createAnnouncement: async (req, res, next) => {
+            try {
+                // TODO: Validation
+                const body = req.body as AnnouncementRequest;
+                await container.announcementService.createAnnouncement(body.title, new Date(body.date), body.content);
+
+                res.sendStatus(201);
+                return next();
+            } catch (err) {
+                return next(err);
+            }
+        },
+        deleteAnnouncement: async (req, res, next) => {
+            try {
+                await container.announcementService.deleteAnnouncement(req.params.id);
+
+                res.sendStatus(204);
+                return next();
+            } catch (err) {
+                return next(err);
+            }
+        },
+        getAllAnnouncements: async (req, res, next) => {
+            try {
+                const result = await container.announcementService.getAllAnnouncements();
+
+                res.status(200).json(result);
                 return next();
             } catch (err) {
                 return next(err);
