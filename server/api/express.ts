@@ -11,6 +11,8 @@ import registerRoutes from './routes';
 
 export default async (config: Config, app, container: DependencyContainer) => {
 
+    let idempotencyKeyCache: Map<string, number> = new Map<string, number>();
+
     app.use(require('body-parser').json({
         limit: '1000kb' // Note: This allows large custom galaxies to be uploaded.
     }));
@@ -44,11 +46,36 @@ export default async (config: Config, app, container: DependencyContainer) => {
     // Enable CORS
     app.use((req, res, next) => {
         if (config.corsUrls.includes(req.headers.origin)) {
-            res.header("Access-Control-Allow-Origin", req.headers.origin);
-            res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-            res.header('Access-Control-Allow-Headers', 'Content-Type');
+            res.header('Access-Control-Allow-Origin', req.headers.origin);
+            res.header('Access-Control-Allow-Headers', 'Content-Type, Idempotency-Key');
             res.header('Access-Control-Allow-Credentials', 'true');
             res.header('Access-Control-Allow-Methods', 'POST, PUT, PATCH, GET, DELETE, OPTIONS');
+        }
+
+        return next();
+    });
+
+    app.use(async (req, res, next) => {
+        let idempotencyKey: string = req.header('idempotency-key')?.trim() ?? '';
+
+        // Eliminate the expired entries.
+        for (let key of idempotencyKeyCache.keys()) {
+
+            let expiryTimestamp: number | undefined = idempotencyKeyCache.get(key);
+
+            if (expiryTimestamp != null && typeof expiryTimestamp === 'number' && Date.now() > expiryTimestamp) {
+                idempotencyKeyCache.delete(key);
+            }
+        }
+
+        if (idempotencyKey !== '') {
+            if (idempotencyKeyCache.get(idempotencyKey) != null) {
+                res.sendStatus(409);
+                return; // Duplicate request, abort!
+            }
+            else {
+                idempotencyKeyCache.set(idempotencyKey, Date.now() + 300000); // Expire these after 5 minutes.
+            }
         }
 
         return next();
