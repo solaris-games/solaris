@@ -634,6 +634,10 @@ export default class StarUpgradeService extends EventEmitter {
         summaryStar.infrastructureCostTotal += starToUpgrade.infrastructureCost;
         summaryStar.infrastructure = upgradedStar.infrastructureAmount;
 
+        if (infrastructureType === 'industry') {
+            summaryStar.manufacturing = this.shipService.calculateManufacturingForIndustry(game, starToUpgrade.star, summaryStar.infrastructure);
+        }
+
         return upgradedStar;
     }
 
