@@ -1,10 +1,10 @@
 import CarrierService from "./carrier";
 import StarService from "./star";
 import TechnologyService from "./technology";
-import { Carrier } from "./types/Carrier";
-import { DBObjectId } from "./types/DBObjectId";
-import { Game } from "./types/Game";
-import { Star } from "./types/Star";
+import {Carrier} from "./types/Carrier";
+import {DBObjectId} from "./types/DBObjectId";
+import {Game} from "./types/Game";
+import {Star} from "./types/Star";
 
 export interface IPlayerPopulationCap {
     shipsCurrent: number;
@@ -102,13 +102,17 @@ export default class ShipService {
         return +((industryLevel * (techLevel + 5) / productionTicks) * ticks).toFixed(2);
     }
 
+    calculateManufacturingForIndustry(game: Game, star: Star, industry: number) {
+        const effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
+
+        return this.calculateStarShipsByTicks(effectiveTechs.manufacturing, industry, 1, game.settings.galaxy.productionTicks);
+    }
+
     calculateStarManufacturing(game: Game, star: Star) {
-        let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
-        let ind = star.infrastructure?.industry ?? 0;
+        const effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
+        const ind = star.infrastructure?.industry ?? 0;
 
-        let manufacturing = this.calculateStarShipsByTicks(effectiveTechs.manufacturing, ind, 1, game.settings.galaxy.productionTicks);
-
-        return manufacturing;
+        return this.calculateStarShipsByTicks(effectiveTechs.manufacturing, ind, 1, game.settings.galaxy.productionTicks);
     }
 
 };
