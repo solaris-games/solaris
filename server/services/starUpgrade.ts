@@ -524,6 +524,9 @@ export default class StarUpgradeService extends EventEmitter {
             await this.gameRepo.bulkWrite(dbWrites);
         }
 
+        // make sure the game model is up to date for further calculations. This is ok since the game model is lean and these changes will not be committed to the database.
+        await this.executeBulkUpgradeReport(game, player, upgradeSummary);
+
         // Check for AI control.
         if (player.userId && !player.defeated && !this.gameTypeService.isTutorialGame(game)) {
             await this.achievementService.incrementInfrastructureBuilt(infrastructureType, player.userId, upgradeSummary.upgraded);
@@ -546,7 +549,7 @@ export default class StarUpgradeService extends EventEmitter {
         return upgradeSummary;
     }
 
-    // this does not write directly to db, only for usage in jobs
+    // this does not write directly to db
     async executeBulkUpgradeReport(game: Game, player: Player, upgradeSummary: BulkUpgradeReport) {
         upgradeSummary.stars.forEach(starUpgrade => {
             const star = this.starService.getById(game, starUpgrade.starId);
