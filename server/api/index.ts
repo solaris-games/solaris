@@ -10,6 +10,8 @@ let mongo;
 
 console.log(`Node ${process.version}`);
 
+Error.stackTraceLimit = 1000;
+
 async function startServer() {
   mongo = await mongooseLoader(config, {});
 
