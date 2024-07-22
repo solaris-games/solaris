@@ -358,7 +358,7 @@ export default {
       this.isLoopingWaypoints = false
     },
     async onConfirmGiftCarrier (e) {
-      if (!await this.$confirm('Gift a carrier', `Are you sure you want to convert ${this.carrier.name} into a gift? If the carrier has a specialist, it will be retired when it arrives at the destination.`)) {
+      if (!await this.$confirm('Gift a carrier', `Are you sure you want to convert ${this.carrier.name} into a gift? If the carrier has a specialist, and the destination star does not belong to an ally, then it will be retired when it arrives at the destination.`)) {
         return
       }
 

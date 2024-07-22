@@ -19,6 +19,7 @@ import StarDistanceService from './starDistance';
 import TechnologyService from './technology';
 import TeamService from "./team";
 import ValidationError from '../errors/validation';
+import {shuffle} from "./utils";
 import { Carrier } from "./types/Carrier";
 import { Star } from "./types/Star";
 
@@ -326,7 +327,15 @@ export default class PlayerService extends EventEmitter {
     }
 
     _distributePlayerLinkedHomeStars(game: Game, players: Player[]) {
-        for (let player of players) {
+        let playersDistributed: Player[] = [];
+
+        if (game.settings.specialGalaxy.playerDistribution === 'circularSequential') {
+            playersDistributed = players;
+        } else { // circular and random are both kinds of random distributions, but the latter will not work for irregular maps, so we do the same thing and use a random circular distribution
+            playersDistributed = shuffle(players);
+        }
+
+        for (let player of playersDistributed) {
             let homeStarId = game.galaxy.homeStars!.pop()!;
 
             // Set up the home star

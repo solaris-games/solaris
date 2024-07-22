@@ -32,6 +32,8 @@ import Reports from "./views/admin/Reports.vue";
 import Insights from "./views/admin/Insights.vue";
 import PasswordResets from "./views/admin/PasswordResets.vue";
 import CommunityGuidelines from "./views/CommunityGuidelines.vue";
+import AdminAnnouncements from './views/admin/Announcements.vue';
+import Announcements from "./views/Announcements.vue";
 
 Vue.use(Router)
 
@@ -138,9 +140,15 @@ export default new Router({
       component: MyGuild
     },
     {
+
       path: '/guild/details/:guildId',
       name: 'guild-details',
       component: GuildDetails
+    },
+    {
+      path: '/administration/announcements',
+      name: 'administration-announcements',
+      component: AdminAnnouncements
     },
     {
       path: '/administration/games',
@@ -196,6 +204,11 @@ export default new Router({
       path: '/guidelines',
       name: 'guidelines',
       component: CommunityGuidelines
+    },
+    {
+      path: '/announcements',
+      name: 'announcements',
+      component: Announcements
     }
   ]
 })

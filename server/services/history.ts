@@ -135,7 +135,7 @@ export default class HistoryService {
                 defeatedDate: player.defeatedDate,
                 afk: player.afk,
                 ready: player.ready,
-                readyToQuit: player.readyToQuit,
+                readyToQuit: player.readyToQuit || false,
                 research: player.research,
                 scheduledActions: player.scheduledActions
             };

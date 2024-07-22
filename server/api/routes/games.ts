@@ -1,42 +1,32 @@
-import { Router } from "express";
 import { ExpressJoiInstance } from "express-joi-validation";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import GameController from '../controllers/game';
 import { MiddlewareContainer } from "../middleware";
-import { singleRoute } from "../singleRoute";
+import {SingleRouter} from "../singleRoute";
 
-export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
+export default (router: SingleRouter, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
     const controller = GameController(container);
 
     router.get('/api/game/defaultSettings',
-        ...singleRoute(
             mw.auth.authenticate(),
-            controller.getDefaultSettings,
-            mw.core.handleError)
+            controller.getDefaultSettings
     );
 
     router.get('/api/game/flux',
-        ...singleRoute(
-            controller.getFlux,
-            mw.core.handleError)
+            controller.getFlux
     );
 
     router.post('/api/game/',
-        ...singleRoute(
             mw.auth.authenticate(),
-            controller.create,
-            mw.core.handleError)
+            controller.create
     );
 
     router.post('/api/game/tutorial',
-        ...singleRoute(
             mw.auth.authenticate(),
-            controller.createTutorial,
-            mw.core.handleError)
+            controller.createTutorial
     );
 
     router.get('/api/game/:gameId/info',
-        ...singleRoute(
             mw.game.loadGame({
                 lean: true,
                 settings: true,
@@ -46,96 +36,74 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
             // TODO: This needs to utilise a response middleware function to map the game object to a response object.
             async (req, res, next) => {
                 try {
-                    req.game.settings.general.isGameAdmin = await container.gameAuthService.isGameAdmin(req.game, req.session.userId);
+                    if (req?.game?.settings) {
+                        req.game.settings.general.isGameAdmin = await container.gameAuthService.isGameAdmin(req.game, req.session.userId);
 
-                    delete req.game.settings.general.password;
-
+                        delete req.game.settings.general.password;
+                    }
+                    
                     return next();
                 } catch (err) {
                     return next(err);
                 }
             },
-            controller.detailInfo,
-            mw.core.handleError)
+            controller.detailInfo
     );
 
     router.get('/api/game/:gameId/state',
-        ...singleRoute(
             mw.game.loadGame({
                 lean: true,
                 state: true
             }),
-            controller.detailState,
-            mw.core.handleError)
+            controller.detailState
     );
 
     router.get('/api/game/:gameId/galaxy',
-        ...singleRoute(
-            controller.detailGalaxy,
-            mw.core.handleError)
+            controller.detailGalaxy
     );
 
     router.get('/api/game/list/summary',
-        ...singleRoute(
-            controller.listSummary,
-            mw.core.handleError)
+            controller.listSummary
     );
 
     router.get('/api/game/list/official',
-        ...singleRoute(
-            controller.listOfficial,
-            mw.core.handleError)
+            controller.listOfficial
     );
 
     router.get('/api/game/list/custom',
-        ...singleRoute(
-            controller.listCustom,
-            mw.core.handleError)
+            controller.listCustom
     );
 
     router.get('/api/game/list/inprogress',
-        ...singleRoute(
-            controller.listInProgress,
-            mw.core.handleError)
+            controller.listInProgress
     );
 
     router.get('/api/game/list/completed',
-        ...singleRoute(
             mw.auth.authenticate(),
-            controller.listRecentlyCompleted,
-            mw.core.handleError)
+            controller.listRecentlyCompleted
     );
 
     router.get('/api/game/list/completed/user',
-        ...singleRoute(
             mw.auth.authenticate(),
-            controller.listMyCompleted,
-            mw.core.handleError)
+            controller.listMyCompleted
     );
 
     router.get('/api/game/list/active',
-        ...singleRoute(
             mw.auth.authenticate(),
-            controller.listMyActiveGames,
-            mw.core.handleError)
+            controller.listMyActiveGames
     );
 
     router.get('/api/game/list/spectating',
-        ...singleRoute(
             mw.auth.authenticate(),
-            controller.listSpectating,
-            mw.core.handleError)
+            controller.listSpectating
     );
 
     router.get('/api/game/:gameId/intel',
-        ...singleRoute(
             mw.auth.authenticate(),
-            controller.getIntel,
-            mw.core.handleError)
+            controller.getIntel
     );
 
     router.put('/api/game/:gameId/join',
-        ...singleRoute(
             mw.auth.authenticate(),
             mw.game.loadGame({
                 lean: false,
@@ -150,12 +118,10 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
             mw.game.validateGameState({
                 isUnlocked: true
             }),
-            controller.join,
-            mw.core.handleError)
+            controller.join
     );
 
     router.put('/api/game/:gameId/quit',
-        ...singleRoute(
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -174,12 +140,10 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
             mw.player.loadPlayer,
             mw.player.validatePlayerState({ isPlayerUndefeated: true }),
             controller.quit,
-            mw.playerMutex.release(),
-            mw.core.handleError)
+            mw.playerMutex.release()
     );
 
     router.put('/api/game/:gameId/concedeDefeat',
-        ...singleRoute(
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -197,12 +161,10 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
             mw.player.loadPlayer,
             mw.player.validatePlayerState({ isPlayerUndefeated: true }),
             controller.concede,
-            mw.playerMutex.release(),
-            mw.core.handleError)
+            mw.playerMutex.release()
     );
 
     router.put('/api/game/:gameId/ready',
-        ...singleRoute(
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -218,12 +180,10 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
             mw.player.loadPlayer,
             mw.player.validatePlayerState({ isPlayerUndefeated: true }),
             controller.ready,
-            mw.playerMutex.release(),
-            mw.core.handleError)
+            mw.playerMutex.release()
     );
 
     router.put('/api/game/:gameId/readytocycle',
-        ...singleRoute(
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -239,12 +199,10 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
             mw.player.loadPlayer,
             mw.player.validatePlayerState({ isPlayerUndefeated: true }),
             controller.readyToCycle,
-            mw.playerMutex.release(),
-            mw.core.handleError)
+            mw.playerMutex.release()
     );
 
     router.put('/api/game/:gameId/notready',
-        ...singleRoute(
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -260,12 +218,10 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
             mw.player.loadPlayer,
             mw.player.validatePlayerState({ isPlayerUndefeated: true }),
             controller.unready,
-            mw.playerMutex.release(),
-            mw.core.handleError)
+            mw.playerMutex.release()
     );
 
     router.put('/api/game/:gameId/readyToQuit',
-        ...singleRoute(
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -281,12 +237,10 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
             mw.player.loadPlayer,
             mw.player.validatePlayerState({ isPlayerUndefeated: true }),
             controller.readyToQuit,
-            mw.playerMutex.release(),
-            mw.core.handleError)
+            mw.playerMutex.release()
     );
 
     router.put('/api/game/:gameId/notReadyToQuit',
-        ...singleRoute(
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -302,12 +256,10 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
             mw.player.loadPlayer,
             mw.player.validatePlayerState({ isPlayerUndefeated: true }),
             controller.unreadyToQuit,
-            mw.playerMutex.release(),
-            mw.core.handleError)
+            mw.playerMutex.release()
     );
 
     router.get('/api/game/:gameId/notes',
-        ...singleRoute(
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -319,12 +271,10 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
             }),
             mw.player.loadPlayer,
             controller.getNotes,
-            mw.playerMutex.release(),
-            mw.core.handleError)
+            mw.playerMutex.release()
     );
 
     router.put('/api/game/:gameId/notes',
-        ...singleRoute(
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -339,12 +289,10 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
             }),
             mw.player.loadPlayer,
             controller.saveNotes,
-            mw.playerMutex.release(),
-            mw.core.handleError)
+            mw.playerMutex.release()
     );
 
     router.delete('/api/game/:gameId',
-        ...singleRoute(
             mw.auth.authenticate(),
             mw.game.loadGame({
                 lean: true,
@@ -356,12 +304,10 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
             mw.game.validateGameState({
                 isUnlocked: true
             }),
-            controller.delete,
-            mw.core.handleError)
+            controller.delete
     );
 
     router.put('/api/game/:gameId/pause',
-        ...singleRoute(
             mw.auth.authenticate(),
             mw.game.loadGame({
                 lean: true,
@@ -372,12 +318,10 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
                 isUnlocked: true,
                 isInProgress: true
             }),
-            controller.togglePaused,
-            mw.core.handleError)
+            controller.togglePaused
     );
 
     router.post('/api/game/:gameId/forcestart',
-        ...singleRoute(
             mw.auth.authenticate(),
             mw.game.loadGame({
                 lean: false,
@@ -386,26 +330,21 @@ export default (router: Router, mw: MiddlewareContainer, validator: ExpressJoiIn
                 isUnlocked: true,
                 isInProgress: false
             }),
-            controller.forceStart,
-            mw.core.handleError)
+            controller.forceStart
     );
 
     router.get('/api/game/:gameId/player/:playerId',
-        ...singleRoute(
             mw.game.loadGame({
                 lean: true,
                 settings: true,
                 'galaxy.players': true
             }),
-            controller.getPlayerUser,
-            mw.core.handleError)
+            controller.getPlayerUser
     );
 
     router.patch('/api/game/:gameId/player/touch',
-        ...singleRoute(
             mw.auth.authenticate(),
-            controller.touch,
-            mw.core.handleError)
+            controller.touch
     );
 
     return router;

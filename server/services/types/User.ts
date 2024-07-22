@@ -74,6 +74,7 @@ export interface User {
     roles: UserRoles,
     level?: UserLevel,
     warnings: UserWarning[];
+    lastReadAnnouncement: DBObjectId | null;
     achievements: {
         victories: number;
         victories1v1: number;

@@ -52,11 +52,15 @@ export default (container: DependencyContainer) => {
 
     return {
         async handler(job, done) {
-            let gameIds: DBObjectId[] = (await container.gameListService.listInProgressGamesGameTick()).map(g => g._id);
+            try {
+                let gameIds: DBObjectId[] = (await container.gameListService.listInProgressGamesGameTick()).map(g => g._id);
 
-            await Promise.all(gameIds.map(gameId => tryTickGame(gameId)));
+                await Promise.all(gameIds.map(gameId => tryTickGame(gameId)));
 
-            done();
+                done();
+            } catch (e) {
+                console.error("GameTick job threw unhandled: " + e, e);
+            }
         }
 
     };

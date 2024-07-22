@@ -4,6 +4,9 @@
 
     <nav>
       <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="nav-item" :class="name === 'announcements' ? 'active' : null" v-if="isAdministrator">
+          <router-link class="nav-link" :class="name === 'announcements' ? 'active' : null" :to="{ path: '/administration/announcements' }">Announcements</router-link>
+        </li>
         <li role="presentation" class="nav-item" :class="name === 'games' ? 'active' : null">
           <router-link class="nav-link" :class="name === 'games' ? 'active' : null" :to="{ path: '/administration/games' }">Games</router-link>
         </li>

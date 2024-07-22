@@ -579,7 +579,8 @@ export default class CombatService extends EventEmitter {
 
             // If the object lost ships and is now dead, then we need to mask the after value too.
             // Note: Stars can have a 0 ship garrison and be a scrambler so we want to ensure that the 0 ships is still scrambled.
-            if (carrierOrStar.before === 0 || carrierOrStar.after > 0) {
+            // cast is safe here because it can't be a string at this stage
+            if (carrierOrStar.before === 0 || (carrierOrStar.after as number) > 0) {
                 clone.after = '???';
             }
 
