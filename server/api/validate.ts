@@ -79,3 +79,50 @@ export const just = <A>(value: A): Validator<A> => {
         return value;
     }
 }
+
+export const record = <A>(validator: Validator<A>): Validator<Record<string, A>> => {
+    return v => {
+        if (typeof v !== "object") {
+            throw failed("object", v);
+        }
+
+        const res: Record<string, A> = {};
+
+        for (const key in v) {
+            res[key] = validator(v[key]);
+        }
+
+        return res;
+    }
+}
+
+export const array = <A>(validator: Validator<A>): Validator<A[]> => {
+    return v => {
+        if (!Array.isArray(v)) {
+            throw failed("array", v);
+        }
+
+        return v.map(validator);
+    }
+}
+
+export type ObjectValidator<T> = {
+    [Property in keyof T]: Validator<T[Property]>
+}
+
+export const object = <T>(objValidator: ObjectValidator<T>): Validator<T> => {
+    return v => {
+        if (typeof v !== "object") {
+            throw failed("object", v);
+        }
+
+        let n: any = {};
+
+        Object.keys(objValidator).forEach((key) => {
+            const validator: Validator<any> = objValidator[key];
+            n[key] = validator(v[key]);
+        });
+
+        return n;
+    }
+}

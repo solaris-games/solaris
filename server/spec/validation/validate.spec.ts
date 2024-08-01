@@ -1,4 +1,4 @@
-import {anyObject, bigInt, just, number, or, string} from "../../api/validate";
+import {anyObject, array, bigInt, just, number, object, or, record, string} from "../../api/validate";
 
 describe("validate", () => {
     it("validates strings correctly", () => {
@@ -135,5 +135,99 @@ describe("validate", () => {
         expect(() => val(undefined)).toThrow();
 
         expect(() => val(BigInt(2))).toThrow();
+    });
+
+    it("validates records correctly", () => {
+        const val = record(number);
+
+        const res = val({a: 2, b: 3});
+        expect(res).toEqual({a: 2, b: 3});
+
+        expect(val({})).toEqual({});
+    });
+
+    it("does not accept non-record-values", () => {
+        const val = record(number);
+
+        expect(() => val("asdf")).toThrow();
+
+        expect(() => val(2)).toThrow();
+
+        expect(() => val(true)).toThrow();
+
+        expect(() => val({ a: "test" })).toThrow();
+    });
+
+    it("validates arrays correctly", () => {
+        const val = array(string);
+
+        const res = val(["a", "b", "c"]);
+        expect(res).toEqual(["a", "b", "c"]);
+
+        const res2 = val([]);
+        expect(res2).toEqual([]);
+
+        const res3 = val(["a"]);
+        expect(res3).toEqual(["a"]);
+    });
+
+    it("does not accept non-array-values", () => {
+        const val = array(string);
+
+        expect(() => val("asdf")).toThrow();
+
+        expect(() => val(2)).toThrow();
+
+        expect(() => val(true)).toThrow();
+
+        expect(() => val({ a: "test" })).toThrow();
+
+        expect(() => val([12, 43.5])).toThrow();
+
+        expect(() => val(["test", 43.5])).toThrow();
+    });
+
+    it("validates objects correctly", () => {
+        const val = object({
+            a: string,
+            b: number
+        });
+
+        const res = val({a: "test", b: 2});
+        expect(res).toEqual({a: "test", b: 2});
+    });
+
+    it("does not accept non-object-values", () => {
+        const val = object({
+            a: string,
+            b: number
+        });
+
+        expect(() => val("asdf")).toThrow();
+
+        expect(() => val(2)).toThrow();
+
+        expect(() => val(true)).toThrow();
+
+        expect(() => val({ a: "test" })).toThrow();
+
+        expect(() => val([12, 43.5])).toThrow();
+
+        expect(() => val(["test", 43.5])).toThrow();
+
+        expect(() => val({ c: 2 })).toThrow();
+    });
+
+    it("validates nested objects correctly", () => {
+        const val = object({
+            a: string,
+            b: object({
+                c: number,
+                d: string
+            })
+        });
+
+        const res = val({a: "test", b: {c: 2, d: "test"}});
+        expect(res).toEqual({a: "test", b: {c: 2, d: "test"}});
     });
 })
