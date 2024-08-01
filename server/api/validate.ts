@@ -24,6 +24,15 @@ export const bigInt: Validator<BigInt> = primitive("bigint")
 
 export const anyObject: Validator<Object> = primitive("object");
 
+export const date: Validator<Date> = v => {
+    if (typeof v === "string") {
+        return new Date(v);
+    }
+
+    throw failed("date", v);
+}
+
+
 export const map = <A, B>(mapper: (a: A) => B, validator: Validator<A>): Validator<B> => {
     return v => mapper(validator(v));
 }
@@ -118,10 +127,10 @@ export const object = <T>(objValidator: ObjectValidator<T>): Validator<T> => {
 
         let n: any = {};
 
-        Object.keys(objValidator).forEach((key) => {
+        for (const key of Object.keys(objValidator)) {
             const validator: Validator<any> = objValidator[key];
             n[key] = validator(v[key]);
-        });
+        }
 
         return n;
     }
