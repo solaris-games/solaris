@@ -8,6 +8,12 @@
     <loading-spinner v-if="!announcementState || !announcements" />
 
     <div v-else>
+      <p>
+        <a href="https://discord.com/invite/v7PD33d" target="_blank" title="Discord" style="text-decoration: none;">
+          Join the Discord
+        </a>to stay up-to-date, discuss the game and chat with the community!
+      </p>
+
       <announcement
         v-for="announcement in announcements"
         :key="announcement._id"

@@ -8,6 +8,7 @@ export interface StarUpgradeReport {
     infrastructureCurrent: number;
     infrastructureCostTotal: number;
     infrastructure: number;
+    manufacturing?: number;
 }
 
 export interface BulkUpgradeReport {

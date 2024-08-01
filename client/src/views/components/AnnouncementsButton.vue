@@ -1,5 +1,5 @@
 <template>
-  <div class="m-1">
+  <div class="m-1 mb-2">
     <button class="btn btn-info" type="button" @click="openAnnouncements">
       <span class="badge bg-default" v-if="announcementState?.unreadCount">{{ announcementState.unreadCount }}</span>
       Announcements
