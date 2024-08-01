@@ -1,6 +1,6 @@
 import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
-import {AnnouncementRequest} from "../requests/announcements";
+import {AnnouncementRequest, parseAnnouncementRequest} from "../requests/announcements";
 
 export default (container: DependencyContainer) => {
     return {
@@ -242,9 +242,8 @@ export default (container: DependencyContainer) => {
         },
         createAnnouncement: async (req, res, next) => {
             try {
-                // TODO: Validation
-                const body = req.body as AnnouncementRequest;
-                await container.announcementService.createAnnouncement(body.title, new Date(body.date), body.content);
+                const body = parseAnnouncementRequest(req.body);
+                await container.announcementService.createAnnouncement(body.title, body.date, body.content);
 
                 res.sendStatus(201);
                 return next();
