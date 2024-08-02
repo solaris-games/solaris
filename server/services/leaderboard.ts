@@ -468,7 +468,7 @@ export default class LeaderboardService {
         let isAllUndefeatedPlayersReadyToQuit = this.gameService.isReadyToQuitImmediateEnd(game);
 
         let key = game.settings.conquest.victoryCondition === 'starPercentage' ? 'starCount' : 'capitalCount';
-        leaderboard.sort(sorterByProperty(key));
+        leaderboard.sort(reverseSort(sorterByProperty(key)));
 
         if (isAllUndefeatedPlayersReadyToQuit) {
             return teamWinner(leaderboard[0].team);
