@@ -1,8 +1,9 @@
 import config from '../config';
 import mongooseLoader from '.';
 import containerLoader from '../services';
-import { DependencyContainer } from '../services/types/DependencyContainer';
-import { User } from '../services/types/User';
+import {DependencyContainer} from '../services/types/DependencyContainer';
+import {User} from '../services/types/User';
+import {GameWinnerKind} from "../services/leaderboard";
 
 let mongo,
     container: DependencyContainer;
@@ -137,10 +138,26 @@ async function startup() {
                 let teamLeaderboard = container.leaderboardService.getTeamLeaderboard(game)!;
 
                 game.state.teamLeaderboard = teamLeaderboard.leaderboard.map(l => l.team._id);
+
+                const winningTeam = container.leaderboardService.getGameWinnerTeam(game, teamLeaderboard.leaderboard);
+                if (winningTeam?.kind === GameWinnerKind.Team) {
+                    game.state.winningTeam = winningTeam.team._id;
+                } else {
+                    throw new Error('Invalid team game winner');
+                }
+            } else {
+                const winner = container.leaderboardService.getGameWinner(game, leaderboard);
+                if (winner?.kind === GameWinnerKind.Player) {
+                    game.state.winner = winner.player._id;
+                } else {
+                    throw new Error('Invalid game winner');
+                }
             }
 
             // Recalculate rank and victories
-            container.gameTickService._awardEndGameRank(game, users, false);
+            const rankingResult = container.gameTickService._awardEndGameRank(game, users, false);
+
+            // TODO: Fix game end events
         }
 
         let leaderboardWrites = games.map(game => {
@@ -152,6 +169,8 @@ async function startup() {
                     update: {
                         'state.leaderboard': game.state.leaderboard,
                         'state.teamLeaderboard': game.state.teamLeaderboard,
+                        'state.winner': game.state.winner,
+                        'state.winningTeam': game.state.winningTeam,
                     }
                 }
             }
