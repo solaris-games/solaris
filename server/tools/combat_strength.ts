@@ -93,17 +93,27 @@ const calculateCombatWithStrength = (defender: Defender, attacker: Attacker, isT
     let defendPower = defender.weaponsLevel;
     let attackPower = attacker.weaponsLevel;
 
-    const defenderBonusStrength = isTurnBased ? (attackPower * defendPower) : 0;
-    let attackerStrength = attackPower * attacker.ships;
-    let defenderStrength = defendPower * defender.ships + defenderBonusStrength;
+    const defenderBonusStrength = isTurnBased ? ((defender.ships % attackPower) * defendPower) : 0;
+    let attackerStrength = Math.max(attackPower * attacker.ships -  defenderBonusStrength, 0);
+    let defenderStrength = defendPower * defender.ships;
+
+    if (!isTurnBased) {
+        if (defender.ships <= attacker.weaponsLevel) {
+            defenderStrength = 0;
+        }
+    }
+
+    if (attacker.ships <= defender.weaponsLevel) {
+        attackerStrength = 0;
+    }
 
     let resultAttackerStrength = Math.max(0, attackerStrength - defenderStrength);
     let resultDefenderStrength = Math.max(0, defenderStrength - attackerStrength);
 
-    attackerShipsRemaining = Math.floor(resultAttackerStrength / attackPower);
+    attackerShipsRemaining = Math.ceil(resultAttackerStrength / attackPower);
 
     if (isTurnBased) {
-        defenderShipsRemaining = Math.floor(resultDefenderStrength / defendPower);
+        defenderShipsRemaining = Math.ceil(resultDefenderStrength / defendPower);
     } else {
         defenderShipsRemaining = Math.floor(resultDefenderStrength / defendPower);
     }
@@ -165,10 +175,14 @@ const significantDifference = (a, b) => {
     return Math.abs(a - b) > 1;
 }
 
+let i = 0;
+
 for (const shipA of SHIP_COUNTS) {
     for (const shipB of SHIP_COUNTS) {
         for (const weaponsA of WEAPONS_LEVELS) {
             for (const weaponsB of WEAPONS_LEVELS) {
+                i++;
+
                 const result1 = calculateCombatClassic({ships: shipB, weaponsLevel: weaponsB}, {ships: shipA, weaponsLevel: weaponsA}, true, false);
                 const result2 = calculateCombatClassic({ships: shipB, weaponsLevel: weaponsB}, {ships: shipA, weaponsLevel: weaponsA}, false, false);
                 const result3 = calculateCombatWithStrength({ships: shipB, weaponsLevel: weaponsB}, {ships: shipA, weaponsLevel: weaponsA}, true, false);
@@ -211,3 +225,5 @@ for (const result of results) {
 }
 
 fs.writeFileSync('combat_strength.csv', csv);
+
+console.log(`Out of ${i} combinations, ${results.length} had significant differences between classic and strength combat calculations.`);
