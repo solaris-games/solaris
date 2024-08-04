@@ -12,6 +12,7 @@
     "start-db-migrate:prod": "node dist/db/migrate.js",
     "start-db-recalc-ranks:dev": "ts-node-dev --transpile-only --respawn --inspect=9234 db/recalculateRankings.ts",
     "start-db-recalc-ranks:prod": "node dist/db/recalculateRankings.js",
+    "start-combat-strength-simulation": "ts-node-dev --transpile-only --respawn --inspect=9234 tools/combat_strength.ts",
     "prebuild": "rm -rf ./dist",
     "build": "tsc",
     "postbuild": "cp -r services/emailTemplates ./dist/services/emailTemplates && cp .env ./dist | true",
