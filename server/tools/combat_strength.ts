@@ -93,8 +93,9 @@ const calculateCombatWithStrength = (defender: Defender, attacker: Attacker, isT
     let defendPower = defender.weaponsLevel;
     let attackPower = attacker.weaponsLevel;
 
+    const defenderBonusStrength = isTurnBased ? (attackPower * defendPower) : 0;
     let attackerStrength = attackPower * attacker.ships;
-    let defenderStrength = defendPower * defender.ships;
+    let defenderStrength = defendPower * defender.ships + defenderBonusStrength;
 
     let resultAttackerStrength = Math.max(0, attackerStrength - defenderStrength);
     let resultDefenderStrength = Math.max(0, defenderStrength - attackerStrength);
