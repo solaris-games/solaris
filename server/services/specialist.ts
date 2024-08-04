@@ -186,6 +186,10 @@ export default class SpecialistService {
         });
     }
 
+    getAvoidCombatCarrierToCarrier(carrier: Carrier) {
+        return this._getCarrierSpecialValue(carrier, 'avoidCombatCarrierToCarrier', false);
+    }
+
     getStarHideShips(star: Star) {
         return this._getStarSpecialValue(star, 'hideShips', false);
     }

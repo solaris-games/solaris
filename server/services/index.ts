@@ -17,6 +17,7 @@ import AuthService from './auth';
 import BroadcastService from './broadcast';
 import CarrierService from './carrier';
 import CombatService from './combat';
+import CarrierCombatService from "./carrierCombat";
 import DistanceService from './distance';
 import EmailService from './email';
 import EventService from './event';
@@ -192,6 +193,7 @@ export default (config): DependencyContainer => {
     const userLeaderboardService = new UserLeaderboardService(userRepository, guildUserService);
     const researchService = new ResearchService(gameRepository, technologyService, randomService, playerStatisticsService, starService, userService, gameTypeService);
     const combatService = new CombatService(technologyService, specialistService, playerService, starService, reputationService, diplomacyService, gameTypeService);
+    const carrierCombatService = new CarrierCombatService(carrierMovementService, combatService, diplomacyService, distanceService, playerService, specialistService, starService);
     const waypointService = new WaypointService(gameRepository, carrierService, starService, distanceService, starDistanceService, technologyService, gameService, playerService, carrierMovementService);
     const specialistBanService = new SpecialistBanService(specialistService);
     const specialistHireService = new SpecialistHireService(gameRepository, specialistService, achievementService, waypointService, playerCreditsService, starService, gameTypeService, specialistBanService, technologyService);
@@ -205,7 +207,7 @@ export default (config): DependencyContainer => {
     const starMovementService = new StarMovementService(mapService, starDistanceService, specialistService, waypointService);
     const gameGalaxyService = new GameGalaxyService(cacheService, broadcastService, gameService, mapService, playerService, playerAfkService, starService, shipService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, specialistService, technologyService, reputationService, guildUserService, historyService, battleRoyaleService, starMovementService, gameTypeService, gameStateService, diplomacyService, avatarService, playerStatisticsService, gameFluxService, spectatorService);
     const scheduleBuyService = new ScheduleBuyService(gameRepository, starUpgradeService);
-    const gameTickService = new GameTickService(distanceService, starService, carrierService, researchService, playerService, playerAfkService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService, specialistService, starUpgradeService, reputationService, aiService, battleRoyaleService, starMovementService, diplomacyService, gameTypeService, gameStateService, playerCycleRewardsService, diplomacyUpkeepService, carrierMovementService, carrierGiftService, starContestedService, playerReadyService, shipService, scheduleBuyService, gameLockService);
+    const gameTickService = new GameTickService(distanceService, starService, carrierService, researchService, playerService, playerAfkService, historyService, waypointService, combatService, carrierCombatService, leaderboardService, userService, gameService, technologyService, specialistService, starUpgradeService, reputationService, aiService, battleRoyaleService, starMovementService, diplomacyService, gameTypeService, gameStateService, playerCycleRewardsService, diplomacyUpkeepService, carrierMovementService, carrierGiftService, starContestedService, playerReadyService, shipService, scheduleBuyService, gameLockService);
     const emailService = new EmailService(config, gameService, gameJoinService, userService, leaderboardService, playerService, playerReadyService, gameTypeService, gameStateService, gameTickService);
     const eventService = new EventService(EventModel, eventRepository, broadcastService, gameService, gameJoinService, gameTickService, researchService, starService, starUpgradeService, tradeService,
         ledgerService, conversationService, combatService, specialistService, badgeService, carrierGiftService, diplomacyService);

@@ -34,4 +34,5 @@ export interface CarrierPosition {
     distanceToDestinationCurrent: number;
     distanceToSourceNext: number;
     distanceToDestinationNext: number;
+    speed: number;
 };

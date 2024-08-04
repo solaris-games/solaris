@@ -6,6 +6,7 @@ import AIService from "./ai";
 import BattleRoyaleService from "./battleRoyale";
 import CarrierService from "./carrier";
 import CombatService from "./combat";
+import CarrierCombatService from "./carrierCombat";
 import DiplomacyService from "./diplomacy";
 import DistanceService from "./distance";
 import GameService from "./game";
@@ -64,6 +65,7 @@ export default class GameTickService extends EventEmitter {
     historyService: HistoryService;
     waypointService: WaypointService;
     combatService: CombatService;
+    carrierCombatService: CarrierCombatService;
     leaderboardService: LeaderboardService;
     userService: UserService;
     gameService: GameService;
@@ -97,6 +99,7 @@ export default class GameTickService extends EventEmitter {
         historyService: HistoryService,
         waypointService: WaypointService,
         combatService: CombatService,
+        carrierCombatService: CarrierCombatService,
         leaderboardService: LeaderboardService,
         userService: UserService,
         gameService: GameService,
@@ -131,6 +134,7 @@ export default class GameTickService extends EventEmitter {
         this.historyService = historyService;
         this.waypointService = waypointService;
         this.combatService = combatService;
+        this.carrierCombatService = carrierCombatService;
         this.leaderboardService = leaderboardService;
         this.userService = userService;
         this.gameService = gameService;
@@ -346,174 +350,7 @@ export default class GameTickService extends EventEmitter {
             return;
         }
 
-        const isAlliancesEnabled = this.diplomacyService.isFormalAlliancesEnabled(game);
-
-        // Get all carriers that are in transit, their current locations
-        // and where they will be moving to.
-        const carrierPositions: CarrierPosition[] = game.galaxy.carriers
-            .filter(x => 
-                this.carrierMovementService.isInTransit(x)           // Carrier is already in transit
-                || this.carrierMovementService.isLaunching(x)        // Or the carrier is just about to launch (this prevent carrier from hopping over attackers)
-            )
-            .map(c => {
-                let waypoint = c.waypoints[0];
-                let locationNext = this.carrierMovementService.getNextLocationToWaypoint(game, c);
-
-                let sourceStar = this.starService.getById(game, waypoint.source);
-                let destinationStar = this.starService.getById(game, waypoint.destination);
-
-                // Note: There should never be a scenario where a carrier is travelling to a
-                // destroyed star.
-                let distanceToDestinationCurrent = this.distanceService.getDistanceBetweenLocations(c.location, destinationStar.location);
-                let distanceToDestinationNext = this.distanceService.getDistanceBetweenLocations(locationNext.location, destinationStar.location);
-
-                let distanceToSourceCurrent,
-                    distanceToSourceNext;
-
-                // TODO: BUG: Its possible that a carrier is travelling from a star that has been destroyed
-                // and is no longer in the game, this will cause carrier to carrier combat to be actioned.
-                // RESOLUTION: Ideally store the source and destination locations instead of a reference to the stars
-                // and then we still have a reference to the location of the now destroyed star.
-                if (sourceStar) {
-                    distanceToSourceCurrent = this.distanceService.getDistanceBetweenLocations(c.location, sourceStar.location);
-                    distanceToSourceNext = this.distanceService.getDistanceBetweenLocations(locationNext.location, sourceStar.location);
-                } else {
-                    distanceToSourceCurrent = 0;
-                    distanceToSourceNext = distanceToSourceCurrent + locationNext.distance;
-                }
-
-                return {
-                    carrier: c,
-                    source: waypoint.source,
-                    destination: waypoint.destination,
-                    locationCurrent: c.location,
-                    locationNext: locationNext.location,
-                    distanceToSourceCurrent,
-                    distanceToDestinationCurrent,
-                    distanceToSourceNext,
-                    distanceToDestinationNext
-                };
-            });
-
-        const graph = this._getCarrierPositionGraph(carrierPositions);
-
-        for (let carrierPath in graph) {
-            let positions = graph[carrierPath];
-
-            if (positions.length <= 1) {
-                continue;
-            }
-
-            for (let i = 0; i < positions.length; i++) {
-                let friendlyCarrier = positions[i];
-
-                if (friendlyCarrier.carrier.ships <= 0) {
-                    continue;
-                }
-
-                // First up, get all carriers that are heading from the destination and to the source
-                // and are in front of the carrier.
-                let collisionCarriers: CarrierPosition[] = positions
-                    .filter((c: CarrierPosition) => {
-                        return (c.carrier.ships! > 0 && !c.carrier.isGift) // Is still alive and not a gift
-                            && (
-                                // Head to head combat:
-                                (
-                                    c.destination.toString() === friendlyCarrier.source.toString()
-                                    && c.distanceToSourceCurrent <= friendlyCarrier.distanceToDestinationCurrent
-                                    && c.distanceToSourceNext >= friendlyCarrier.distanceToDestinationNext
-                                )
-                                ||
-                                // Combat from behind: 
-                                (
-                                    c.destination.toString() === friendlyCarrier.destination.toString()
-                                    && c.distanceToDestinationCurrent <= friendlyCarrier.distanceToDestinationCurrent
-                                    && c.distanceToDestinationNext >= friendlyCarrier.distanceToDestinationNext
-                                )
-                            )
-                    });
-
-                // Filter any carriers that avoid carrier-to-carrier combat.
-                collisionCarriers = this._filterAvoidCarrierToCarrierCombatCarriers(collisionCarriers);
-
-                if (!collisionCarriers.length) {
-                    continue;
-                }
-
-                // If all of the carriers that have collided are friendly then no need to do combat.
-                let friendlyCarriers = collisionCarriers
-                    .filter(c => c.carrier.ships! > 0 && c.carrier.ownedByPlayerId!.toString() === friendlyCarrier.carrier.ownedByPlayerId.toString());
-
-                // If all other carriers are friendly then skip.
-                if (friendlyCarriers.length === collisionCarriers.length) {
-                    continue;
-                }
-
-                const friendlyPlayer = this.playerService.getById(game, friendlyCarrier.carrier.ownedByPlayerId)!;
-                
-                const combatCarriers = collisionCarriers
-                    .map(c => c.carrier)
-                    .filter(c => c.ships! > 0);
-
-                // Double check that there are carriers that can fight.
-                if (!combatCarriers.length) {
-                    continue;
-                }
-
-                // If alliances is enabled then ensure that only enemies fight.
-                // TODO: Alliance combat here is very complicated when more than 2 players are involved.
-                // For now, we will perform normal combat if any participant is an enemy of the others.
-                if (isAlliancesEnabled) {
-                    const playerIds: DBObjectId[] = [...new Set(combatCarriers.map(x => x.ownedByPlayerId!))];
-
-                    const isAllPlayersAllied = this.diplomacyService.isDiplomaticStatusBetweenPlayersAllied(game, playerIds);
-
-                    if (isAllPlayersAllied) {
-                        continue;
-                    }
-                }
-
-                // TODO: Check for specialists that affect pre-combat.
-
-                await this.combatService.performCombat(game, gameUsers, friendlyPlayer, null, combatCarriers);
-            }
-        }
-    }
-
-    _getCarrierPositionGraph(carrierPositions: CarrierPosition[]) {
-        const graph = {};
-
-        for (let carrierPosition of carrierPositions) {
-            const graphKeyA = carrierPosition.destination.toString() + carrierPosition.source.toString();
-            const graphKeyB = carrierPosition.source.toString() + carrierPosition.destination.toString();
-
-            if (graphKeyA === graphKeyB) {
-                continue;
-            }
-
-            const graphObj = graph[graphKeyA] || graph[graphKeyB];
-            
-            if (graphObj) {
-                graphObj.push(carrierPosition);
-            } else {
-                graph[graphKeyA] = [ carrierPosition ];
-            }
-        }
-
-        return graph;
-    }
-
-    _filterAvoidCarrierToCarrierCombatCarriers(carrierPositions: CarrierPosition[]): CarrierPosition[] {
-        return carrierPositions.filter(c => {
-            let specialist = this.specialistService.getByIdCarrier(c.carrier.specialistId);
-
-            if (specialist && specialist.modifiers && specialist.modifiers.special 
-                && specialist.modifiers.special.avoidCombatCarrierToCarrier) {
-                return false;
-            }
-
-            return true;
-        });
+        this.carrierCombatService.combatCarriers(game, gameUsers);
     }
 
     async _moveCarriers(game: Game, gameUsers: User[]) {
