@@ -155,32 +155,59 @@ const combos = [
     [100, 5, 100, 6]
 ]
 
+const SHIP_COUNTS = [1, 2, 3, 5, 10, 20, 40, 60, 100, 200, 500, 1000, 2000];
+
+const WEAPONS_LEVELS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20];
+
 const results = [];
 
-for (const [shipA, weaponsA, shipB, weaponsB] of combos) {
-    const result1 = calculateCombatClassic({ships: shipB, weaponsLevel: weaponsB}, {ships: shipA, weaponsLevel: weaponsA}, true, false);
-    const result2 = calculateCombatClassic({ships: shipB, weaponsLevel: weaponsB}, {ships: shipA, weaponsLevel: weaponsA}, false, false);
-    const result3 = calculateCombatWithStrength({ships: shipB, weaponsLevel: weaponsB}, {ships: shipA, weaponsLevel: weaponsA}, true, false);
-    const result4 = calculateCombatWithStrength({ships: shipB, weaponsLevel: weaponsB}, {ships: shipA, weaponsLevel: weaponsA}, false, false);
+const significantDifference = (a, b) => {
+    return Math.abs(a - b) > 1;
+}
 
-    const allResult = {
-        shipA,
-        weaponsA,
-        shipB,
-        weaponsB,
-        classicC2S: result1,
-        classicC2C: result2,
-        strengthC2S: result3,
-        strengthC2C: result4
+for (const shipA of SHIP_COUNTS) {
+    for (const shipB of SHIP_COUNTS) {
+        for (const weaponsA of WEAPONS_LEVELS) {
+            for (const weaponsB of WEAPONS_LEVELS) {
+                const result1 = calculateCombatClassic({ships: shipB, weaponsLevel: weaponsB}, {ships: shipA, weaponsLevel: weaponsA}, true, false);
+                const result2 = calculateCombatClassic({ships: shipB, weaponsLevel: weaponsB}, {ships: shipA, weaponsLevel: weaponsA}, false, false);
+                const result3 = calculateCombatWithStrength({ships: shipB, weaponsLevel: weaponsB}, {ships: shipA, weaponsLevel: weaponsA}, true, false);
+                const result4 = calculateCombatWithStrength({ships: shipB, weaponsLevel: weaponsB}, {ships: shipA, weaponsLevel: weaponsA}, false, false);
+
+                const allResult = {
+                    shipA,
+                    weaponsA,
+                    shipB,
+                    weaponsB,
+                    classicC2SAttacker: result1.after.attacker,
+                    classicC2SDefender: result1.after.defender,
+                    classicC2CAttacker: result2.after.attacker,
+                    classicC2CDefender: result2.after.defender,
+                    strengthC2SAttacker: result3.after.attacker,
+                    strengthC2SDefender: result3.after.defender,
+                    strengthC2CAttacker: result4.after.attacker,
+                    strengthC2CDefender: result4.after.defender
+                }
+
+                if (significantDifference(allResult.classicC2CDefender, allResult.strengthC2CDefender) ||
+                    significantDifference(allResult.classicC2CAttacker, allResult.strengthC2CAttacker) ||
+                    significantDifference(allResult.classicC2SDefender, allResult.strengthC2SDefender) ||
+                    significantDifference(allResult.classicC2SAttacker, allResult.strengthC2SAttacker)) {
+                    results.push(allResult);
+                }
+            }
+        }
     }
+}
 
-    results.push(allResult);
+for (const [shipA, weaponsA, shipB, weaponsB] of combos) {
+
 }
 
 let csv = 'Ships A,Weapons A,Ships B,Weapons B,Classic C2S attacker,Classic C2S defender,Classic C2C attacker,Classic C2C defender,Strength C2S attacker,Strength C2S defender,Strength C2C attacker,Strength C2C defender\n';
 
 for (const result of results) {
-    csv += `${result.shipA},${result.weaponsA},${result.shipB},${result.weaponsB},${result.classicC2S.after.attacker},${result.classicC2S.after.defender},${result.classicC2C.after.attacker},${result.classicC2C.after.defender},${result.strengthC2S.after.attacker},${result.strengthC2S.after.defender},${result.strengthC2C.after.attacker},${result.strengthC2C.after.defender}\n`;
+    csv += `${result.shipA},${result.weaponsA},${result.shipB},${result.weaponsB},${result.classicC2SAttacker},${result.classicC2SDefender},${result.classicC2CAttacker},${result.classicC2CDefender},${result.strengthC2SAttacker},${result.strengthC2SDefender},${result.strengthC2CAttacker},${result.strengthC2CDefender}\n`;
 }
 
 fs.writeFileSync('combat_strength.csv', csv);
