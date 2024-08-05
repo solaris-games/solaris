@@ -19,7 +19,7 @@ services:
       - database
 
   database:
-    image: mongo
+    image: mongo:6
     volumes:
       - ./database_data:/data/db
     ports:
