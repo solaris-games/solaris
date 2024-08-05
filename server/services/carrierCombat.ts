@@ -10,8 +10,6 @@ import PlayerService from "./player";
 import StarService from "./star";
 import CombatService from "./combat";
 import SpecialistService from "./specialist";
-import carrier from "../api/controllers/carrier";
-
 
 export default class CarrierCombatService {
 
@@ -105,7 +103,27 @@ export default class CarrierCombatService {
                 continue;
             }
             
-            let collisions: any = this._getCollisionsInPath(positions);
+            let collisions: any = this._getDualCollisionsInPath(positions);
+            this._mergeCollisionsinPath(collisions);
+
+            // A collision will at this point be cleaned up to a list of carriers
+            for(let collision of collisions) {
+                // It could very well be that in a previous collision, carriers were destroyed/reduced to 0 ships.
+                collision.filter(c => c.ships > 0)
+
+                // This gets all the player ids of the players involved, and removes duplicates.
+                let playersIds = [...new Set(collision.map(c => c.ownedByPlayerId.toString()))]
+
+                // Now if we have little carriers remaining due to a previous filter, or if all are owned by the same player,
+                // we quit the process here as no combat has to occur.
+                if(playersIds.length <= 1) continue;
+                if(isAlliancesEnabled) {
+                    // Check if combat has to happen with the players involved
+                }
+
+                // TODO: Code how this works ;D
+                await this._performCarrierCombat(game, gameUsers, collision)
+            }
 
             /*
             for (let i = 0; i < positions.length; i++) {
@@ -219,7 +237,7 @@ export default class CarrierCombatService {
         return graph;
     }
 
-    _getCollisionsInPath(positions: CarrierPosition[]) {
+    _getDualCollisionsInPath(positions: CarrierPosition[]) {
         let collisionList: any = [];
 
         // In order to be able to check if carriers intersect at the same place, we need the distance to a fixed star, which must exist.
@@ -269,31 +287,31 @@ export default class CarrierCombatService {
             }
         }
 
-        this._mergeCollisionsinPath(collisionList)
-
-        // Sort the collisions so that carriers that combat can be performed in the order in which carriers would/should collide.
-        // That way some collisions may never happen as carriers are destroyed in combat.
-        collisionList.sort((a, b) => a.time - b.time)
         return collisionList;
     }
 
     _mergeCollisionsinPath(collisionList) {
-        // If there is just 1 or fewer collisions, there is nothing to merge.
-        if(collisionList.length <= 1) return;
+        // If there is just 1 or fewer collisions, we still need to merge, as the format changes.
         let newCollisionList: any[] = []
+
+        // As long as there are still ungrouped dual collisions, we continue to group.
         while(collisionList.length > 0) {
             // Everything that happens at the same time and place should be merged.
             let toMergeCollision = collisionList.filter(c => (Math.abs(collisionList[0].time - c.time) < 10**-10) && (Math.abs(collisionList[0].location - c.location) < 10**-10));
             let newCollision = this._mergeCollisions(toMergeCollision);
             newCollisionList.push(newCollision);
+
             // Continue with all elements that do not fall under the previous collision, repeat untill all collisions have been checked and removed.
             collisionList = collisionList.filter(c => !((Math.abs(collisionList[0].time - c.time) < 10**-10) && (Math.abs(collisionList[0].location - c.location) < 10**-10)));
         }
-        collisionList = newCollisionList;      
+
+        // Make sure that the combat that should happen first is first in the list.
+        collisionList = newCollisionList.sort((a, b) => a.time - b.time);      
     }
 
     _mergeCollisions(collisionList) {
-        // Here we merge the carriers that will for sure all be at the same time and place together. As these can be many, we do not have a relative speed.
+        // Here we merge the carriers that will for sure all be at the same time and place together.
+        // We cannot simply paste the carrier arrays after one another. This as some carriers can occur in multiple collisions.
         let carrierList: Carrier[] = []
         collisionList.forEach(c => {
             // If no carrier is yet in the list with this id, we still have to add it. This prevents doubles in the collisionlist.
