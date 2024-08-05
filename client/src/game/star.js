@@ -336,6 +336,10 @@ class Star extends EventEmitter {
     this.specialistSprite.x = -5
     this.specialistSprite.y = -5
 
+    if (gameHelper.isCapitalElimination(this.game) && gameHelper.isOwnerCapital(this.game, this.data)) {
+      this.specialistSprite.tint = 0xFF0000
+    }
+
     this.container.addChild(this.specialistSprite)
   }
 
