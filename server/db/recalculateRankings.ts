@@ -103,6 +103,8 @@ async function startup() {
         }
     };
 
+    const eventRepo = container.eventService.eventRepo;
+
     do {
         let games = await container.gameService.gameRepo.find(dbQuery, {},
         { 'state.endDate': 1 },
@@ -149,15 +151,21 @@ async function startup() {
                 const winner = container.leaderboardService.getGameWinner(game, leaderboard);
                 if (winner?.kind === GameWinnerKind.Player) {
                     game.state.winner = winner.player._id;
-                } else {
-                    throw new Error('Invalid game winner');
                 }
             }
 
             // Recalculate rank and victories
             const rankingResult = container.gameTickService._awardEndGameRank(game, users, false);
 
-            // TODO: Fix game end events
+            const gameEndEvent = await eventRepo.findOne({ gameId: game._id, type: container.eventService.EVENT_TYPES.GAME_ENDED });
+
+            if (gameEndEvent) {
+                await eventRepo.updateOne({ _id: gameEndEvent!._id }, {
+                    $set: {
+                        data: rankingResult
+                    }
+                });
+            }
         }
 
         let leaderboardWrites = games.map(game => {
