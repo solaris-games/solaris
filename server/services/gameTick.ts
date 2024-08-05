@@ -212,12 +212,12 @@ export default class GameTickService extends EventEmitter {
                 throw new Error(`The game was not locked after game processing, concurrency issue?`);
             }
 
+            await this.scheduleBuyService.buyScheduledInfrastructure(game);
+            logTime('Buy scheduled infrastructure')
+
             game.state.tick++;
 
             logTime(`Tick ${game.state.tick}`);
-
-            await this.scheduleBuyService.buyScheduledInfrastructure(game);
-            logTime('Buy scheduled infrastructure')
 
             await this._captureAbandonedStars(game, gameUsers);
             logTime('Capture abandoned stars');
@@ -737,6 +737,16 @@ export default class GameTickService extends EventEmitter {
         // A player is defeated if they have no stars and no carriers remaining.
         const isTutorialGame = this.gameTypeService.isTutorialGame(game);
         const undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated);
+
+        // If the player is defeated but the slot is open,
+        // and the player has lost their home star in capital elimination mode, or if they have no stars/carriers, close the slot.
+        const openSlotDefeatedPlayersToClose = game.galaxy.players.filter(p => p.defeated
+                                                                            && p.isOpenSlot
+                                                                            && !this.playerService.canSlotBeOpen(game, p));
+
+        for (let i = 0; i < openSlotDefeatedPlayersToClose.length; i++) {
+            this.playerService.setSlotOpen(openSlotDefeatedPlayersToClose[i], false);
+        }
 
         for (let i = 0; i < undefeatedPlayers.length; i++) {
             let player = undefeatedPlayers[i];

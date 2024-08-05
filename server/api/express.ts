@@ -1,15 +1,18 @@
-const express = require('express');
+import express = require('express');
 const router = express.Router();
-const session = require('express-session');
+import session = require('express-session');
 const compression = require('compression');
 const rateLimit = require("express-rate-limit");
-const MongoDBStore = require('connect-mongodb-session')(session);
-
-import registerRoutes from './routes';
-import { DependencyContainer } from '../services/types/DependencyContainer';
+import MongoDBSession = require('connect-mongodb-session');
+const MongoDBStore = MongoDBSession(session);
 import { Config } from '../config/types/Config';
+import { DependencyContainer } from '../services/types/DependencyContainer';
+import registerRoutes from './routes';
+import {SingleRouter} from "./singleRoute";
+import Middleware from "./middleware";
 
 export default async (config: Config, app, container: DependencyContainer) => {
+    const idempotencyKeyCache: Map<string, number> = new Map<string, number>();
 
     app.use(require('body-parser').json({
         limit: '1000kb' // Note: This allows large custom galaxies to be uploaded.
@@ -17,8 +20,8 @@ export default async (config: Config, app, container: DependencyContainer) => {
 
     // ---------------
     // Set up MongoDB session store
-    let sessionStorage = new MongoDBStore({
-        uri: config.connectionString,
+    const sessionStorage = new MongoDBStore({
+        uri: config.connectionString!,
         collection: 'sessions'
     });
 
@@ -30,7 +33,7 @@ export default async (config: Config, app, container: DependencyContainer) => {
     // ---------------
     // Use sessions for tracking logins
     app.use(session({
-        secret: config.sessionSecret,
+        secret: config.sessionSecret!,
         resave: false,
         saveUninitialized: false,
         cookie: { 
@@ -44,14 +47,41 @@ export default async (config: Config, app, container: DependencyContainer) => {
     // Enable CORS
     app.use((req, res, next) => {
         if (config.corsUrls.includes(req.headers.origin)) {
-            res.header("Access-Control-Allow-Origin", req.headers.origin);
-            res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-            res.header('Access-Control-Allow-Headers', 'Content-Type');
+            res.header('Access-Control-Allow-Origin', req.headers.origin);
+            res.header('Access-Control-Allow-Headers', 'Content-Type, Idempotency-Key');
             res.header('Access-Control-Allow-Credentials', 'true');
             res.header('Access-Control-Allow-Methods', 'POST, PUT, PATCH, GET, DELETE, OPTIONS');
         }
 
-        next();
+        return next();
+    });
+
+    app.use(async (req, res, next) => {
+        let idempotencyKey: string = req.header('idempotency-key')?.trim() ?? '';
+
+        const now = Date.now();
+
+        // Eliminate the expired entries.
+        for (let key of idempotencyKeyCache.keys()) {
+
+            let expiryTimestamp: number | undefined = idempotencyKeyCache.get(key);
+
+            if (expiryTimestamp != null && typeof expiryTimestamp === 'number' && now > expiryTimestamp) {
+                idempotencyKeyCache.delete(key);
+            }
+        }
+
+        if (idempotencyKey !== '') {
+            if (idempotencyKeyCache.get(idempotencyKey) != null) {
+                res.sendStatus(409);
+                return; // Duplicate request, abort!
+            }
+            else {
+                idempotencyKeyCache.set(idempotencyKey, Date.now() + 300000); // Expire these after 5 minutes.
+            }
+        }
+
+        return next();
     });
 
     // ---------------
@@ -83,9 +113,13 @@ export default async (config: Config, app, container: DependencyContainer) => {
     // ---------------
     // Register routes
 
-    registerRoutes(router, container);
+    const middleware = Middleware(container);
+    const singleRouter = new SingleRouter(router);
+    registerRoutes(singleRouter, container, middleware);
 
     app.use(router);
+
+    app.use(middleware.core.handleError);
 
     console.log('Express intialized.');
     

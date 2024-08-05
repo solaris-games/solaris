@@ -56,10 +56,6 @@ export default {
     }
   },
   async mounted () {
-    console.log({
-      isAnonymousGame: this.isAnonymousGame
-    });
-
     try {
       let response = await UserService.getMyUserInfo()
 

@@ -9,6 +9,7 @@ import EventModel from '../db/models/Event';
 import GuildModel from '../db/models/Guild';
 import PaymentModel from '../db/models/Payment';
 import ReportModel from '../db/models/Report';
+import AnnouncementModel from '../db/models/Announcement';
 
 import AdminService from './admin';
 import PasswordService from './password';
@@ -104,6 +105,10 @@ import TeamService from "./team";
 import UserLeaderboardService from './userLeaderboard';
 import GameLockService from "./gameLock";
 import TutorialService from './tutorial';
+import GamePlayerMutexService from './gamePlayerMutex';
+import GameMutexService from "./gameMutex";
+import AnnouncementService from "./announcement";
+import {Announcement} from "./types/Announcement";
 
 const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
@@ -115,6 +120,7 @@ const eventRepository = new Repository<GameEvent>(EventModel);
 const guildRepository = new Repository<Guild>(GuildModel);
 const paymentRepository = new Repository<Payment>(PaymentModel);
 const reportRepository = new Repository<Report>(ReportModel);
+const announcementRepository = new Repository<Announcement>(AnnouncementModel);
 
 export default (config): DependencyContainer => {
 
@@ -132,6 +138,8 @@ export default (config): DependencyContainer => {
 
     const guildService = new GuildService(GuildModel, guildRepository, userRepository, userService);
     const guildUserService = new GuildUserService(userRepository, guildService);
+
+    const announcementService = new AnnouncementService(AnnouncementModel, announcementRepository, userService);
 
     const gameLockService = new GameLockService(gameRepository);
     const broadcastService = new BroadcastService();
@@ -212,10 +220,15 @@ export default (config): DependencyContainer => {
     const notificationService = new NotificationService(config, userRepository, gameRepository, discordService, conversationService, gameService, gameJoinService, gameTickService, researchService, tradeService);
     const tutorialService = new TutorialService(userService);
 
+    const gamePlayerMutexService = new GamePlayerMutexService();
+
+    const gameMutexService = new GameMutexService();
+
     console.log('Dependency container initialized.');
-    
+
     return {
         config,
+        announcementService,
         adminService,
         passwordService,
         authService,
@@ -293,5 +306,7 @@ export default (config): DependencyContainer => {
         teamService,
         tutorialService,
         pathfindingService,
+        gamePlayerMutexService,
+        gameMutexService
     };
 };

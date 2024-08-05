@@ -57,6 +57,12 @@
       </div>
     </div>
 
+    <div class="row" v-if="game.state.readyToQuitCount">
+      <div class="col text-center pt-2">
+        <p>{{game.state.readyToQuitCount}} of {{game.settings.general.playerLimit}} players are ready to quit.</p>
+      </div>
+    </div>
+
     <div class="row bg-success" v-if="game.state.endDate">
       <div class="col text-center pt-2">
         <h3>Game Over</h3>

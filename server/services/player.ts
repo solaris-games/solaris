@@ -19,6 +19,9 @@ import StarDistanceService from './starDistance';
 import TechnologyService from './technology';
 import TeamService from "./team";
 import ValidationError from '../errors/validation';
+import {shuffle} from "./utils";
+import { Carrier } from "./types/Carrier";
+import { Star } from "./types/Star";
 
 type ColourSpec = {
     alias: string;
@@ -75,6 +78,10 @@ export default class PlayerService extends EventEmitter {
 
     getByUserId(game: Game, userId: DBObjectId) {
         return game.galaxy.players.find(p => p.userId && p.userId.toString() === userId.toString());
+    }
+
+    getPlayerIdByUserId(game: Game, userId: DBObjectId): DBObjectId | undefined {
+        return game.galaxy.players.find(p => p.userId && p.userId.toString() === userId.toString())?._id;
     }
 
     getPlayersWithinScanningRangeOfPlayer(game: Game, players: Player[], player: Player) {
@@ -320,7 +327,15 @@ export default class PlayerService extends EventEmitter {
     }
 
     _distributePlayerLinkedHomeStars(game: Game, players: Player[]) {
-        for (let player of players) {
+        let playersDistributed: Player[] = [];
+
+        if (game.settings.specialGalaxy.playerDistribution === 'circularSequential') {
+            playersDistributed = players;
+        } else { // circular and random are both kinds of random distributions, but the latter will not work for irregular maps, so we do the same thing and use a random circular distribution
+            playersDistributed = shuffle(players);
+        }
+
+        for (let player of playersDistributed) {
             let homeStarId = game.galaxy.homeStars!.pop()!;
 
             // Set up the home star
@@ -602,6 +617,23 @@ export default class PlayerService extends EventEmitter {
         return stars.find(s => s._id.toString() === player.homeStarId!.toString()) != null;
     }
 
+    canSlotBeOpen(game: Game, player: Player) {
+
+        if (this.gameTypeService.isCapitalStarEliminationMode(game)) {
+            return this.ownsOriginalHomeStar(game, player);
+        }
+
+        const stars: Star[] = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+
+        if (stars.length > 0) {
+            return true;
+        }
+
+        const carriers: Carrier[] = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id);
+
+        return carriers.length > 0;
+    }
+
     incrementMissedTurns(game: Game) {
         for (let player of game.galaxy.players) {
             // If the player isn't ready, increase their number of missed turns.
@@ -636,6 +668,10 @@ export default class PlayerService extends EventEmitter {
 
         // Clear out any carriers that have looped waypoints.
         this.carrierService.clearPlayerCarrierWaypointsLooped(game, player);
+    }
+
+    setSlotOpen(player: Player, openSlot: boolean) {
+        player.isOpenSlot = openSlot;
     }
 
     hasDuplicateLastSeenIP(game: Game, player: Player) {

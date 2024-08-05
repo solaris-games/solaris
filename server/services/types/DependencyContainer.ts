@@ -5,6 +5,7 @@ import AIService from "../ai";
 import AuthService from "../auth";
 import AvatarService from "../avatar";
 import BadgeService from "../badge";
+import BasicAIService from "../basicAi";
 import BattleRoyaleService from "../battleRoyale";
 import BroadcastService from "../broadcast";
 import CacheService from "../cache";
@@ -15,16 +16,21 @@ import CombatService from "../combat";
 import ConversationService from "../conversation";
 import DiplomacyService from "../diplomacy";
 import DiplomacyUpkeepService from "../diplomacyUpkeep";
+import DiscordService from "../discord";
 import DistanceService from "../distance";
 import EmailService from "../email";
 import EventService from "../event";
 import GameService from "../game";
-import GameJoinService from "../gameJoin";
+import GameAuthService from "../gameAuth";
 import GameCreateService from "../gameCreate";
 import GameCreateValidationService from "../gameCreateValidation";
 import GameFluxService from "../gameFlux";
 import GameGalaxyService from "../gameGalaxy";
+import GameJoinService from "../gameJoin";
 import GameListService from "../gameList";
+import GameLockService from "../gameLock";
+import GameMutexService from "../gameMutex";
+import GamePlayerMutexService from "../gamePlayerMutex";
 import GameStateService from "../gameState";
 import GameTickService from "../gameTick";
 import GameTypeService from "../gameType";
@@ -35,11 +41,12 @@ import LeaderboardService from "../leaderboard";
 import LedgerService from "../ledger";
 import MapService from "../map";
 import NameService from "../name";
-import StarMovementService from "../starMovement";
+import NotificationService from "../notification";
 import PasswordService from "../password";
+import PathfindingService from "../pathfinding";
 import PaypalService from "../paypal";
 import PlayerService from "../player";
-import PlayerAfkService from '../playerAfk'
+import PlayerAfkService from '../playerAfk';
 import PlayerCreditsService from "../playerCredits";
 import PlayerCycleRewardsService from "../playerCycleRewards";
 import PlayerReadyService from "../playerReady";
@@ -50,31 +57,27 @@ import RecaptchaService from "../recaptcha";
 import ReportService from "../report";
 import ReputationService from "../reputation";
 import ResearchService from "../research";
+import ScheduleBuyService from "../scheduleBuy";
+import ShipService from "../ship";
 import ShipTransferService from "../shipTransfer";
+import SpecialStarBanService from "../specialStarBan";
 import SpecialistService from "../specialist";
 import SpecialistBanService from "../specialistBan";
 import SpecialistHireService from "../specialistHire";
+import SpectatorService from "../spectator";
 import StarService from "../star";
 import StarContestedService from "../starContested";
 import StarDistanceService from "../starDistance";
+import StarMovementService from "../starMovement";
 import StarUpgradeService from "../starUpgrade";
+import TeamService from "../team";
 import TechnologyService from "../technology";
 import TradeService from "../trade";
 import UserService from "../user";
-import WaypointService from "../waypoint";
-import NotificationService from "../notification";
-import DiscordService from "../discord";
-import UserLevelService from "../userLevel";
-import SpecialStarBanService from "../specialStarBan";
-import ShipService from "../ship";
-import SpectatorService from "../spectator";
-import ScheduleBuyService from "../scheduleBuy";
-import BasicAIService from "../basicAi";
-import PathfindingService from "../pathfinding";
 import UserLeaderboardService from "../userLeaderboard";
-import TeamService from "../team";
-import GameAuthService from "../gameAuth";
-import GameLockService from "../gameLock";
+import UserLevelService from "../userLevel";
+import WaypointService from "../waypoint";
+import AnnouncementService from "../announcement";
 import TutorialService from "../tutorial";
 
 export interface DependencyContainer {
@@ -155,5 +158,8 @@ export interface DependencyContainer {
     teamService: TeamService,
     pathfindingService: PathfindingService,
     scheduleBuyService: ScheduleBuyService,
+    gamePlayerMutexService: GamePlayerMutexService,
+    gameMutexService: GameMutexService,
+    announcementService: AnnouncementService,
     tutorialService: TutorialService,
 };

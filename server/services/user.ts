@@ -600,4 +600,11 @@ export default class UserService extends EventEmitter {
         return user?.tutorialsCompleted || []
     }
 
+    async updateLastReadAnnouncement(userId: DBObjectId, lastAnnouncementId: DBObjectId) {
+        await this.userRepo.updateOne({
+            _id: userId
+        }, {
+            lastReadAnnouncement: lastAnnouncementId
+        });
+    }
 };

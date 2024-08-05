@@ -304,12 +304,12 @@ export default {
         if (this.selectedScheduleStrategy === 'cycle-end') {
           const cycleTicks = this.$store.state.game.settings.galaxy.productionTicks;
           const currentTick = this.$store.state.game.state.tick;
-          const cycle = Math.ceil(Math.max(currentTick / cycleTicks, 1));
+          const cycle = Math.floor(currentTick / cycleTicks) + 1;
           this.tick = cycle * cycleTicks - 1;
         } else if (this.selectedScheduleStrategy === 'cycle-start') {
           const cycleTicks = this.$store.state.game.settings.galaxy.productionTicks;
           const currentTick = this.$store.state.game.state.tick;
-          const cycle = Math.ceil(Math.max(currentTick / cycleTicks, 1));
+          const cycle = Math.floor(currentTick / cycleTicks) + 1;
           this.tick = cycle * cycleTicks;
         }
 

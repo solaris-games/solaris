@@ -57,7 +57,7 @@
 
           <p class="mb-1 text-warning" v-if="!(possibleTeamCounts.length || 0)">Warning: It's not possible to form equally sized teams with your current number of player slots.</p>
 
-          <select v-if="(possibleTeamCounts.length || 0) > 0" class="form-control" id="teamConquestTeamCount" v-model="settings.conquest.teamsCount" @change="onMaxAllianceTriggerChanged" :disabled="isCreatingGame">
+          <select v-if="(possibleTeamCounts.length || 0) > 0" class="form-control" id="teamConquestTeamCount" v-model="settings.conquest.teamsCount" @change="onTeamCountChanged" :disabled="isCreatingGame">
             <option v-for="opt in possibleTeamCounts" v-bind:key="opt" v-bind:value="opt">
               {{ opt }}
             </option>
@@ -164,6 +164,16 @@
           <label for="readyToQuitTimerCycles" class="col-form-label">Timer for RTQ <help-tooltip tooltip="Time until game finishes after RTQ"></help-tooltip></label>
           <select class="form-control" id="readyToQuitTimerCycles" v-model="settings.general.readyToQuitTimerCycles" :disabled="isCreatingGame">
             <option v-for="opt in options.general.readyToQuitTimerCycles" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div v-if="settings.general.readyToQuit === 'enabled'" class="mb-2">
+          <label for="readyToQuitVisibility" class="col-form-label">RTQ visibility <help-tooltip tooltip="Visibility of a player's RTQ state. Anonymous shows the number of RTQ'd players, but not their identity"></help-tooltip></label>
+
+          <select class="form-control" id="readyToQuitVisibility" v-model="settings.general.readyToQuitVisibility" :disabled="isCreatingGame">
+            <option v-for="opt in options.general.readyToQuitVisibility" v-bind:key="opt.value" v-bind:value="opt.value">
               {{ opt.text }}
             </option>
           </select>
@@ -842,7 +852,7 @@
           </select>
         </div>
 
-        <div class="mb-2" v-if="settings.technology.startingTechnologyLevel > 0">
+        <div class="mb-2" v-if="settings.technology.startingTechnologyLevel.experimentation > 0">
           <label for="experimentationDistribution" class="col-form-label">Experimentation Distribution <help-tooltip tooltip="Determines to what technologies the experimentation reward gets distributed"/></label>
 
           <select class="form-control" id="experimentationDistribution" v-model="settings.technology.experimentationDistribution" :disabled="isCreatingGame">
@@ -852,7 +862,7 @@
           </select>
         </div>
 
-        <div class="mb-2" v-if="settings.technology.startingTechnologyLevel > 0">
+        <div class="mb-2" v-if="settings.technology.startingTechnologyLevel.experimentation > 0">
           <label for="experimentationReward" class="col-form-label">Experimentation Reward <help-tooltip tooltip="Determines the amount of research points awarded for the experimentation technology at the end of a galactic cycle"/></label>
           <select class="form-control" id="experimentationReward" v-model="settings.technology.experimentationReward" :disabled="isCreatingGame">
             <option v-for="opt in options.technology.experimentationReward" v-bind:key="opt.value" v-bind:value="opt.value">
@@ -862,7 +872,7 @@
         </div>
 
         <div class="mb-2">
-          <label for="specialistTokenReward" class="col-form-label">Specialist Token Reward <help-tooltip tooltip="Determines the amount of specialist tokens awarded for the banking technology at the end of a galactic cycle"/></label>
+          <label for="specialistTokenReward" class="col-form-label">Specialist Token Reward <help-tooltip tooltip="Determines the amount of specialist tokens awarded for the specialist technology at the end of a galactic cycle"/></label>
           <select class="form-control" id="specialistTokenReward" v-model="settings.technology.specialistTokenReward" :disabled="isCreatingGame">
             <option v-for="opt in options.technology.specialistTokenReward" v-bind:key="opt.value" v-bind:value="opt.value">
               {{ opt.text }}
@@ -967,12 +977,14 @@ export default {
     },
     onMaxAllianceTriggerChanged (e) {
       this.settings.diplomacy.maxAlliances = this.calcMaxAllianceLimit();
+      this.updatePossibleTeamCounts();
       console.warn("Max alliances changed to: " + this.settings.diplomacy.maxAlliances);
+    },
+    onTeamCountChanged (e) {
+      this.settings.diplomacy.maxAlliances = this.calcMaxAllianceLimit();
     },
     calcMaxAllianceLimit () {
       if (this.settings.general.mode === 'teamConquest') {
-        this.updatePossibleTeamCounts();
-
         const playersPerTeam = this.settings.general.playerLimit / this.settings.conquest.teamsCount;
         return playersPerTeam - 1;
       }
@@ -1008,6 +1020,10 @@ export default {
       }
     },
     updatePossibleTeamCounts () {
+      if (this.settings.general.mode !== 'teamConquest') {
+        return;
+      }
+
       const players = this.settings.general.playerLimit;
 
       if (players < 4) {

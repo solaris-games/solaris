@@ -9,7 +9,7 @@ export default class GameAuthService {
         this.userService = userService;
     }
 
-    async isGameAdmin(game: Game, userId: DBObjectId | null): Promise<boolean> {
+    async isGameAdmin(game: Game, userId: DBObjectId | null | undefined): Promise<boolean> {
         if (!userId) {
             return false;
         }
