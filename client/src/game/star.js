@@ -160,6 +160,10 @@ class Star extends EventEmitter {
   drawStar () {
     this.container.removeChild(this.graphics_star)
 
+    if (this.hasSpecialist()) {
+      return
+    }
+
     if (this.data.isInScanningRange) {
       // ---- Binary stars ----
       if (this.isBinaryStar()) {
@@ -335,6 +339,10 @@ class Star extends EventEmitter {
     this.specialistSprite.height = 10
     this.specialistSprite.x = -5
     this.specialistSprite.y = -5
+
+    if (gameHelper.isCapitalElimination(this.game) && gameHelper.isOwnerCapital(this.game, this.data)) {
+      this.specialistSprite.tint = 0xFF0000
+    }
 
     this.container.addChild(this.specialistSprite)
   }
