@@ -87,7 +87,7 @@ class GameContainer {
     this.app.ticker.add(this.onTick.bind(this))
     this.app.ticker.maxFPS = 0
 
-    if (process.env.NODE_ENV == 'development') {
+    if (import.meta.env.DEV) {
       this.app.ticker.add(this.calcFPS.bind(this))
     }
 
@@ -183,7 +183,7 @@ class GameContainer {
   draw () {
     this.map.draw()
 
-    if ( process.env.NODE_ENV == 'development' && true) {
+    if ( import.meta.env.DEV) {
       let bitmapFont = {fontName: "chakrapetch", fontSize: 16}
       let left = 64
       let top = 32

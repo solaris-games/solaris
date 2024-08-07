@@ -87,7 +87,7 @@ export default {
       return GameHelper.isTradeEnabled(this.$store.state.game)
     },
     documentationUrl () {
-      return process.env.VUE_APP_DOCUMENTATION_URL
+      return import.meta.env.VUE_APP_DOCUMENTATION_URL
     },
     canDisplayBottomBar () {
       return window.innerHeight >= 750

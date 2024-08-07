@@ -20,7 +20,7 @@
           </p>
         </div>
       </div>
-     
+
       <div class="row pt-2 pb-2">
         <div class="col">
           <p>Username</p>
@@ -149,7 +149,7 @@ export default {
     }
 
     let discordSuccess = this.$route.query.discordSuccess
-    
+
     if (discordSuccess === 'true') {
       this.$toasted.show(`Successfully authenticated with Discord!`, { type: 'success' })
     } else if (discordSuccess === 'false') {
@@ -232,7 +232,7 @@ export default {
   },
   computed: {
     discordOauthURL () {
-      return process.env.VUE_APP_DISCORD_OAUTH_URL
+      return import.meta.env.VUE_APP_DISCORD_OAUTH_URL
     },
     isAuthenticatedWithDiscord () {
       return this.info && this.info.oauth && this.info.oauth.discord && this.info.oauth.discord.userId != null

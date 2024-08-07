@@ -43,7 +43,7 @@ app.use(store);
 
 app.use(new VueSocketio({
   debug: true,
-  connection: `//${process.env.VUE_APP_SOCKETS_HOST}`,
+  connection: `//${import.meta.env.VUE_APP_SOCKETS_HOST}`,
   vuex: {
     store,
     actionPrefix: 'SOCKET_',

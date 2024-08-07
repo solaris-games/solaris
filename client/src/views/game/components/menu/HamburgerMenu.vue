@@ -55,7 +55,7 @@ import eventBus from '../../../../eventBus'
 
 export default {
   components: {
-      
+
   },
   props: {
       buttonClass: String,
@@ -127,7 +127,7 @@ export default {
       return this.$store.state.game.state.cleaned
     },
     documentationUrl () {
-      return process.env.VUE_APP_DOCUMENTATION_URL
+      return import.meta.env.VUE_APP_DOCUMENTATION_URL
     },
     isFormalAlliancesEnabled () {
       return DiplomacyHelper.isFormalAlliancesEnabled(this.$store.state.game)

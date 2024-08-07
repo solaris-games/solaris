@@ -194,10 +194,10 @@ export default {
   },
   computed: {
     recaptchaEnabled() {
-      return process.env.VUE_APP_GOOGLE_RECAPTCHA_ENABLED === 'true'
+      return import.meta.env.VUE_APP_GOOGLE_RECAPTCHA_ENABLED === 'true'
     },
     recaptchaSiteKey() {
-      return process.env.VUE_APP_GOOGLE_RECAPTCHA_SITE_KEY
+      return import.meta.env.VUE_APP_GOOGLE_RECAPTCHA_SITE_KEY
     }
   }
 }

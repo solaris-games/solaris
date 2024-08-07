@@ -191,7 +191,7 @@ export default {
   },
   computed: {
     documentationUrl () {
-      return process.env.VUE_APP_DOCUMENTATION_URL
+      return import.meta.env.VUE_APP_DOCUMENTATION_URL
     }
   }
 }
