@@ -41,7 +41,7 @@
 import gameContainer from '../../../../game/container'
 import gameHelper from '../../../../services/gameHelper'
 import PlayerAvatarVue from '../menu/PlayerAvatar.vue'
-import TeamName from '../shared/TeamName';
+import TeamName from '../shared/TeamName.vue';
 
 export default {
   components: {

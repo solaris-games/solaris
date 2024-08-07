@@ -28,7 +28,7 @@ import PlayerAvatarVue from '../menu/PlayerAvatar.vue'
 import DiplomacyApiService from '../../../../services/api/diplomacy'
 import gameHelper from '../../../../services/gameHelper'
 import DiplomacyHelper from '../../../../services/diplomacyHelper'
-import DiplomacyIconsVue from './DiplomacyIcons'
+import DiplomacyIconsVue from './DiplomacyIcons.vue'
 
 export default {
   components: {

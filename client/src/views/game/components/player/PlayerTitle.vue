@@ -32,12 +32,12 @@
 <script>
 import GameHelper from '../../../../services/gameHelper'
 import DiplomacyHelper from '../../../../services/diplomacyHelper'
-import PlayerIconVue from '../player/PlayerIcon'
-import PlayerOpenSlotStatusVue from './PlayerOpenSlotStatus'
-import PlayerOnlineStatusVue from './PlayerOnlineStatus'
-import PlayerMissedTurnsVue from './PlayerMissedTurns'
-import PlayerDiplomaticStatusIcon from './PlayerDiplomaticStatusIcon'
-import TeamName from '../shared/TeamName';
+import PlayerIconVue from '../player/PlayerIcon.vue'
+import PlayerOpenSlotStatusVue from './PlayerOpenSlotStatus.vue'
+import PlayerOnlineStatusVue from './PlayerOnlineStatus.vue'
+import PlayerMissedTurnsVue from './PlayerMissedTurns.vue'
+import PlayerDiplomaticStatusIcon from './PlayerDiplomaticStatusIcon.vue'
+import TeamName from '../shared/TeamName.vue';
 
 export default {
   components: {

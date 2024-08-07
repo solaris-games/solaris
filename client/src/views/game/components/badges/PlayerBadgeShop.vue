@@ -26,7 +26,7 @@ import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import BadgeApiService from '../../../../services/api/badge'
 import UserApiService from '../../../../services/api/user'
 import GameHelper from '../../../../services/gameHelper'
-import BadgeShopList from './BadgeShopList'
+import BadgeShopList from './BadgeShopList.vue'
 
 export default {
   components: {

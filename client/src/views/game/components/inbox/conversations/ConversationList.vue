@@ -37,7 +37,7 @@
 import eventBus from '../../../../../eventBus'
 import LoadingSpinnerVue from '../../../../components/LoadingSpinner.vue'
 import ConversationApiService from '../../../../../services/api/conversation'
-import ConversationPreviewVue from './ConversationPreview'
+import ConversationPreviewVue from './ConversationPreview.vue'
 import gameHelper from '../../../../../services/gameHelper'
 
 export default {

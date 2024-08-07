@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import SortableLeaderboard from './SortableLeaderboard';
+import SortableLeaderboard from './SortableLeaderboard.vue';
 import UserApiService from '../../../../services/api/user';
 import LoadingSpinner from '../../../components/LoadingSpinner.vue';
 

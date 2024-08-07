@@ -130,17 +130,17 @@
 <script>
 import router from '../../../../router'
 import gameService from '../../../../services/api/game'
-import ModalButton from '../../../components/modal/ModalButton'
-import DialogModal from '../../../components/modal/DialogModal'
+import ModalButton from '../../../components/modal/ModalButton.vue'
+import DialogModal from '../../../components/modal/DialogModal.vue'
 import GameHelper from '../../../../services/gameHelper'
 import MenuTitle from '../MenuTitle.vue'
 import AudioService from '../../../../game/audio'
-import NewPlayerMessageVue from '../welcome/NewPlayerMessage'
-import ShareLinkVue from '../welcome/ShareLink'
+import NewPlayerMessageVue from '../welcome/NewPlayerMessage.vue'
+import ShareLinkVue from '../welcome/ShareLink.vue'
 import HelpTooltip from '../../../components/HelpTooltip.vue'
-import ConcedeDefeatButton from './ConcedeDefeatButton'
-import PlayerLeaderboard from './PlayerLeaderboard';
-import TeamLeaderboard from './TeamLeaderboard';
+import ConcedeDefeatButton from './ConcedeDefeatButton.vue'
+import PlayerLeaderboard from './PlayerLeaderboard.vue';
+import TeamLeaderboard from './TeamLeaderboard.vue';
 
 export default {
   components: {

@@ -52,9 +52,9 @@ import GameHelper from '../../../../../services/gameHelper'
 import ConversationApiService from '../../../../../services/api/conversation'
 import LoadingSpinnerVue from '../../../../components/LoadingSpinner.vue'
 import MenuTitle from '../../MenuTitle.vue'
-import ConversationParticipantsVue from './ConversationParticipants'
-import ComposeMessageVue from './ConversationCompose'
-import ConversationMessageVue from './ConversationMessage'
+import ConversationParticipantsVue from './ConversationParticipants.vue'
+import ComposeMessageVue from './ConversationCompose.vue'
+import ConversationMessageVue from './ConversationMessage.vue'
 import ConversationTradeEventVue from './ConversationTradeEvent.vue'
 
 export default {

@@ -64,13 +64,13 @@
 
 <script>
 import MenuTitle from '../MenuTitle.vue'
-import StarsTableVue from './StarsTable'
-import CarriersTableVue from './CarriersTable'
-import ShipsTableVue from './ShipsTable'
-import CapitalsTableVue from './CapitalsTable'
-import NaturalResourcesTableVue from './NaturalResourcesTable'
-import EmpiresTableVue from './EmpiresTable'
-import TechnologyTableVue from './TechnologyTable'
+import StarsTableVue from './StarsTable.vue'
+import CarriersTableVue from './CarriersTable.vue'
+import ShipsTableVue from './ShipsTable.vue'
+import CapitalsTableVue from './CapitalsTable.vue'
+import NaturalResourcesTableVue from './NaturalResourcesTable.vue'
+import EmpiresTableVue from './EmpiresTable.vue'
+import TechnologyTableVue from './TechnologyTable.vue'
 
 export default {
   components: {

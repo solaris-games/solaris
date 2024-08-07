@@ -43,8 +43,8 @@
 <script>
 import eventBus from '../../../../eventBus'
 import MENU_STATES from '../../../../services/data/menuStates'
-import Statistics from './Statistics'
-import PlayerTitleVue from './PlayerTitle'
+import Statistics from './Statistics.vue'
+import PlayerTitleVue from './PlayerTitle.vue'
 import gameHelper from '../../../../services/gameHelper'
 import ConversationApiService from '../../../../services/api/conversation'
 import DiplomacyHelper from '../../../../services/diplomacyHelper'
@@ -111,7 +111,7 @@ export default {
         return require(`../../../../assets/avatars/${this.player.avatar}`)
       } catch (err) {
         console.error(err)
-        
+
         return null
       }
     },

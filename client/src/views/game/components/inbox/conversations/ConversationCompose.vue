@@ -16,7 +16,7 @@
 import MentionHelper from '../../../../../services/mentionHelper';
 import ConversationApiService from '../../../../../services/api/conversation'
 import AudioService from '../../../../../game/audio'
-import MentionBox from '../../shared/MentionBox';
+import MentionBox from '../../shared/MentionBox.vue';
 
 export default {
   components: {

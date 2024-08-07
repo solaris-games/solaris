@@ -25,7 +25,7 @@
 
 <script>
 import GameHelper from '../../../../services/gameHelper'
-import BulkInfrastructureUpgradeScheduleTableRow from './BulkInfrastructureUpgradeScheduleTableRow'
+import BulkInfrastructureUpgradeScheduleTableRow from './BulkInfrastructureUpgradeScheduleTableRow.vue'
 
 export default {
   components: {

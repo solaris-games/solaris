@@ -5,7 +5,7 @@
       <input type="text" class="form-control form-control-sm" v-model="searchFilter" placeholder="Search...">
     </div>
   </div>
-  
+
   <div class="row" v-if="tableData.length">
     <div class="table-responsive ps-0 pe-0">
       <table class="table table-striped table-hover mb-0">
@@ -39,7 +39,7 @@
 
 <script>
 import GameHelper from '../../../../services/gameHelper'
-import BulkInfrastructureUpgradeStarTableRow from './BulkInfrastructureUpgradeStarTableRow'
+import BulkInfrastructureUpgradeStarTableRow from './BulkInfrastructureUpgradeStarTableRow.vue'
 
 export default {
   components: {
@@ -122,7 +122,7 @@ export default {
               return ao < bo ? -1 : 1;
           }
           // if descending, highest sorts first
-          else { 
+          else {
               return ao < bo ? 1 : -1;
           }
         })

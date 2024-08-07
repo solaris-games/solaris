@@ -10,7 +10,7 @@
 
 <script>
 import MenuTitle from '../MenuTitle.vue'
-import ConversationListVue from './conversations/ConversationList'
+import ConversationListVue from './conversations/ConversationList.vue'
 import ConversationApiService from '../../../../services/api/conversation'
 
 export default {

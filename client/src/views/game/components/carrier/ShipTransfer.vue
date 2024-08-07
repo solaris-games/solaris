@@ -86,7 +86,7 @@ import { mapState } from 'vuex'
 import GameHelper from '../../../../services/gameHelper'
 import CarrierApiService from '../../../../services/api/carrier'
 import MenuTitle from '../MenuTitle.vue'
-import StarLabelVue from '../star/StarLabel'
+import StarLabelVue from '../star/StarLabel.vue'
 
 export default {
   components: {

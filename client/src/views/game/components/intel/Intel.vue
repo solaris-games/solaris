@@ -89,7 +89,7 @@
 import LoadingSpinnerVue from '../../../components/LoadingSpinner.vue'
 import MenuTitle from '../MenuTitle.vue'
 import LineChart from './LineChart.js'
-import PlayerIconVue from '../player/PlayerIcon'
+import PlayerIconVue from '../player/PlayerIcon.vue'
 import GameHelper from '../../../../services/gameHelper'
 import GameApiService from '../../../../services/api/game'
 

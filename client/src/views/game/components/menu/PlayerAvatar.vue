@@ -15,7 +15,7 @@
 
 <script>
 import gameHelper from '../../../../services/gameHelper'
-import PlayerIconVue from '../player/PlayerIcon'
+import PlayerIconVue from '../player/PlayerIcon.vue'
 
 export default {
   components: {
@@ -40,7 +40,7 @@ export default {
         return require(`../../../../assets/avatars/${this.player.avatar}`)
       } catch (err) {
         console.error(err)
-        
+
         return null
       }
     },
@@ -112,7 +112,7 @@ export default {
   opacity: 0.3;
 }
 
-@media screen and (max-width: 576px) { 
+@media screen and (max-width: 576px) {
   .player-icon, img {
       height: 35px;
       width: 35px;

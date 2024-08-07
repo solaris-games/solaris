@@ -75,7 +75,7 @@
 <script>
 import EventApiService from '../../../../../services/api/event'
 import LoadingSpinnerVue from '../../../../components/LoadingSpinner.vue'
-import EventsListItemVue from './EventsListItem'
+import EventsListItemVue from './EventsListItem.vue'
 
 export default {
   components: {

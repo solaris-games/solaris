@@ -8,7 +8,7 @@
 
 <script>
 import MenuTitle from '../MenuTitle.vue'
-import GameSettings from './GameSettings'
+import GameSettings from './GameSettings.vue'
 
 export default {
   components: {

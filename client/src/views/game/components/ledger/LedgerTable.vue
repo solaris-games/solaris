@@ -24,7 +24,7 @@
 <script>
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import LedgerApiService from '../../../../services/api/ledger'
-import LedgerRowVue from './LedgerRow'
+import LedgerRowVue from './LedgerRow.vue'
 
 export default {
   components: {

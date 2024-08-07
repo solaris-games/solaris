@@ -32,8 +32,8 @@
 
 <script>
 import tradeService from '../../../../services/api/trade'
-import ModalButton from '../../../components/modal/ModalButton'
-import DialogModal from '../../../components/modal/DialogModal'
+import ModalButton from '../../../components/modal/ModalButton.vue'
+import DialogModal from '../../../components/modal/DialogModal.vue'
 import FormErrorList from '../../../components/FormErrorList.vue'
 
 export default {

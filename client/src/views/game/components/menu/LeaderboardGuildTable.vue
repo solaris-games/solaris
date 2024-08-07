@@ -35,7 +35,7 @@
 
 <script>
 import LoadingSpinner from '../../../components/LoadingSpinner.vue';
-import SortableLeaderboard from './SortableLeaderboard';
+import SortableLeaderboard from './SortableLeaderboard.vue';
 import GuildApiService from '../../../../services/api/guild';
 
 export default {
