@@ -48,8 +48,8 @@
 <script>
 import gameHelper from '../../../../services/gameHelper'
 import gameContainer from '../../../../game/container'
-import MenuTitleVue from '../MenuTitle'
-import SpecialistIconVue from '../specialist/SpecialistIcon'
+import MenuTitleVue from '../MenuTitle.vue'
+import SpecialistIconVue from '../specialist/SpecialistIcon.vue'
 import starService from '../../../../services/api/star'
 
 export default {

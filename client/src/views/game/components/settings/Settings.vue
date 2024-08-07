@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import MenuTitle from '../MenuTitle'
+import MenuTitle from '../MenuTitle.vue'
 import GameSettings from './GameSettings'
 
 export default {

@@ -35,7 +35,7 @@
 
 <script>
 import eventBus from '../../../../../eventBus'
-import LoadingSpinnerVue from '../../../../components/LoadingSpinner'
+import LoadingSpinnerVue from '../../../../components/LoadingSpinner.vue'
 import ConversationApiService from '../../../../../services/api/conversation'
 import ConversationPreviewVue from './ConversationPreview'
 import gameHelper from '../../../../../services/gameHelper'

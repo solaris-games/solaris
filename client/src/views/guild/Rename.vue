@@ -19,7 +19,7 @@
       <form-error-list :errors="errors"/>
 
       <p><span class="text-warning">Warning</span>: Renaming a guild costs <strong class="text-danger">1 Galactic Credit</strong>. <router-link :to="{ name: 'galactic-credits-shop'}"><i class="fas fa-shopping-basket"></i> Purchase Galactic Credits</router-link> or earn credits by winning official games.</p>
-      
+
       <div class="mb-2">
         <div class="row">
           <div class="col">
@@ -42,10 +42,10 @@
 
 <script>
 import router from '../../router'
-import ViewContainer from '../components/ViewContainer'
-import ViewTitle from '../components/ViewTitle'
-import FormErrorList from '../components/FormErrorList'
-import LoadingSpinner from '../components/LoadingSpinner'
+import ViewContainer from '../components/ViewContainer.vue'
+import ViewTitle from '../components/ViewTitle.vue'
+import FormErrorList from '../components/FormErrorList.vue'
+import LoadingSpinner from '../components/LoadingSpinner.vue'
 import GuildApiService from '../../services/api/guild'
 
 export default {

@@ -24,9 +24,9 @@
 </template>
 
 <script>
-import ViewContainer from '../components/ViewContainer'
-import ViewTitle from '../components/ViewTitle'
-import LoadingSpinner from '../components/LoadingSpinner'
+import ViewContainer from '../components/ViewContainer.vue'
+import ViewTitle from '../components/ViewTitle.vue'
+import LoadingSpinner from '../components/LoadingSpinner.vue'
 import LeaderboardUserTable from './components/menu/LeaderboardUserTable'
 import LeaderboardUserEloTable from './components/menu/LeaderboardUserEloTable'
 import LeaderboardGuildTable from './components/menu/LeaderboardGuildTable'

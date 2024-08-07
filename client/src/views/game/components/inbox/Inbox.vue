@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import MenuTitle from '../MenuTitle'
+import MenuTitle from '../MenuTitle.vue'
 import ConversationListVue from './conversations/ConversationList'
 import ConversationApiService from '../../../../services/api/conversation'
 

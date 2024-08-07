@@ -122,14 +122,14 @@
 </template>
 
 <script>
-import LoadingSpinnerVue from './components/LoadingSpinner'
+import LoadingSpinnerVue from './components/LoadingSpinner.vue'
 import router from '../router'
 import authService from '../services/api/auth'
 import userService from '../services/api/user'
-import ViewContainer from './components/ViewContainer'
-import ViewTitle from './components/ViewTitle'
-import Achievements from './game/components/player/Achievements'
-import TutorialGame from './game/components/menu/TutorialGame'
+import ViewContainer from './components/ViewContainer.vue'
+import ViewTitle from './components/ViewTitle.vue'
+import Achievements from './game/components/player/Achievements.vue'
+import TutorialGame from './game/components/menu/TutorialGame.vue'
 import Poll from "./components/Poll.vue";
 import Warnings from "./account/Warnings.vue";
 import AnnouncementsButton from "./components/AnnouncementsButton.vue";

@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import LogoVue from './Logo'
+import LogoVue from './Logo.vue'
 import ViewContainerTopBarVue from './ViewContainerTopBar.vue'
 
 export default {

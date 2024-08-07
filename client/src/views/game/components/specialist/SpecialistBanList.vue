@@ -4,16 +4,16 @@
             <h5>Star Specialists</h5>
 
             <specialist-ban-list-table
-                :specialists="starSpecialists" 
-                :specialistType="'star'" 
+                :specialists="starSpecialists"
+                :specialistType="'star'"
                 :specialistDefaultIcon="'star'"
                 :game="game"/>
 
             <h5>Carrier Specialists</h5>
 
             <specialist-ban-list-table
-                :specialists="carrierSpecialists" 
-                :specialistType="'carrier'" 
+                :specialists="carrierSpecialists"
+                :specialistType="'carrier'"
                 :specialistDefaultIcon="'rocket'"
                 :game="game"/>
         </div>
@@ -25,8 +25,8 @@
 </template>
 
 <script>
-import SpecialistIconVue from '../specialist/SpecialistIcon'
-import SpecialistBanListTable from './SpecialistBanListTable'
+import SpecialistIconVue from '../specialist/SpecialistIcon.vue'
+import SpecialistBanListTable from './SpecialistBanListTable.vue'
 
 export default {
     components: {

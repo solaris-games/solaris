@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import LoadingSpinner from '../../../components/LoadingSpinner'
+import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import Badge from './Badge'
 import BadgeApiService from '../../../../services/api/badge'
 import GameHelper from '../../../../services/gameHelper'

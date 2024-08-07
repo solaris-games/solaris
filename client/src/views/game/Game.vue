@@ -23,8 +23,8 @@
 </template>
 
 <script>
-import LogoVue from '../components/Logo'
-import LoadingSpinnerVue from '../components/LoadingSpinner'
+import LogoVue from '../components/Logo.vue'
+import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
 import GameContainer from './components/GameContainer.vue'
 import MENU_STATES from '../../services/data/menuStates'
 import MainBar from './components/menu/MainBar.vue'

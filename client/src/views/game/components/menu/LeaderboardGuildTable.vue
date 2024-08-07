@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import LoadingSpinner from '../../../components/LoadingSpinner';
+import LoadingSpinner from '../../../components/LoadingSpinner.vue';
 import SortableLeaderboard from './SortableLeaderboard';
 import GuildApiService from '../../../../services/api/guild';
 

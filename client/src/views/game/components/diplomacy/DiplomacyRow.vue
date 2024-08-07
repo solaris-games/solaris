@@ -8,7 +8,7 @@
     <h5 class="alias-title">{{getPlayerAlias(diplomaticStatus.playerIdTo)}}</h5>
   </td>
   <td class="fit pt-3 pe-1">
-    <diplomacy-icons 
+    <diplomacy-icons
       :statusFrom="diplomaticStatus.statusFrom"
       :statusTo="diplomaticStatus.statusTo"
       :actualStatus="diplomaticStatus.actualStatus"/>
@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import PlayerAvatarVue from '../menu/PlayerAvatar'
+import PlayerAvatarVue from '../menu/PlayerAvatar.vue'
 import DiplomacyApiService from '../../../../services/api/diplomacy'
 import gameHelper from '../../../../services/gameHelper'
 import DiplomacyHelper from '../../../../services/diplomacyHelper'
@@ -55,7 +55,7 @@ export default {
       const userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
       let playerAlias = this.getPlayerAlias(diplomaticStatus.playerIdTo)
       let allianceFee = 0
-      let cycleCredits = gameHelper.calculateIncome(this.$store.state.game, userPlayer); 
+      let cycleCredits = gameHelper.calculateIncome(this.$store.state.game, userPlayer);
 
       if (DiplomacyHelper.isAllianceUpkeepEnabled(this.$store.state.game)) {
         allianceFee = DiplomacyHelper.getAllianceUpkeepCost(this.$store.state.game, userPlayer, cycleCredits, 1)

@@ -174,15 +174,15 @@
 </template>
 
 <script>
-import MenuTitle from '../MenuTitle'
-import FormErrorList from '../../../components/FormErrorList'
+import MenuTitle from '../MenuTitle.vue'
+import FormErrorList from '../../../components/FormErrorList.vue'
 import starService from '../../../../services/api/star'
 import GameHelper from '../../../../services/gameHelper'
 import AudioService from '../../../../game/audio'
 import GameContainer from '../../../../game/container'
 import BulkInfrastructureUpgradeScheduleTable from './BulkInfrastructureUpgradeScheduleTable'
 import BulkInfrastructureUpgradeStarTableVue from './BulkInfrastructureUpgradeStarTable'
-import LoadingSpinner from '../../../components/LoadingSpinner'
+import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 
 export default {
   components: {

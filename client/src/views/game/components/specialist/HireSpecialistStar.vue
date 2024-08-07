@@ -47,11 +47,11 @@
 </template>
 
 <script>
-import MenuTitleVue from '../MenuTitle'
+import MenuTitleVue from '../MenuTitle.vue'
 import GameContainer from '../../../../game/container'
 import GameHelper from '../../../../services/gameHelper'
 import SpecialistApiService from '../../../../services/api/specialist'
-import SpecialistIconVue from '../specialist/SpecialistIcon'
+import SpecialistIconVue from '../specialist/SpecialistIcon.vue'
 
 export default {
   components: {
@@ -87,7 +87,7 @@ export default {
         if (this.star.specialistId && !await this.$confirm('Replace specialist', `Are you sure you want to replace the existing specialist ${this.star.specialist.name} for a ${specialist.name}?`)) {
           return
         }
-        
+
         this.isHiringSpecialist = true
 
         // If the specialist hired or existing specialist in any way affects scanning, manufacturing etc then reload the game map. Bit of a bodge but it works.
@@ -119,7 +119,7 @@ export default {
         } catch (err) {
             console.error(err)
         }
-        
+
         this.isHiringSpecialist = false
     },
     getSpecialistActualCost (specialist) {
@@ -142,7 +142,7 @@ export default {
       if (!specialist) {
         return false
       }
-      
+
       const localKeys = [
         'scanning',
         'manufacturing'

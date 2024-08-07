@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import PlayerAvatarVue from '../menu/PlayerAvatar'
+import PlayerAvatarVue from '../menu/PlayerAvatar.vue'
 import LedgerApiService from '../../../../services/api/ledger'
 import gameHelper from '../../../../services/gameHelper'
 

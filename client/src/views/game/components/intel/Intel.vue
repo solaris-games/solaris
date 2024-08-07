@@ -71,9 +71,9 @@
               :class="{'btn-primary': playerFilter.enabled}"
               @click="togglePlayerFilter(playerFilter)"
               :title="playerFilter.alias">
-              <player-icon 
-                :playerId="playerFilter.playerId" 
-                :hideOnlineStatus="true" 
+              <player-icon
+                :playerId="playerFilter.playerId"
+                :hideOnlineStatus="true"
                 :solidGlyphOnly="true"
                 :colour="playerFilter.colour"
                 style="margin-top:0px;margin-right:0px;"/>
@@ -86,8 +86,8 @@
 </template>
 
 <script>
-import LoadingSpinnerVue from '../../../components/LoadingSpinner'
-import MenuTitle from '../MenuTitle'
+import LoadingSpinnerVue from '../../../components/LoadingSpinner.vue'
+import MenuTitle from '../MenuTitle.vue'
 import LineChart from './LineChart.js'
 import PlayerIconVue from '../player/PlayerIcon'
 import GameHelper from '../../../../services/gameHelper'
@@ -186,7 +186,7 @@ export default {
         text: 'All',
         value: 0
       })
-      
+
       this.startTick = this.startTickOptions[this.startTickOptions.length - 2].value
     },
     async reloadData () {

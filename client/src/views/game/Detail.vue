@@ -39,10 +39,10 @@
 </template>
 
 <script>
-import LoadingSpinnerVue from '../components/LoadingSpinner'
-import ViewTitle from '../components/ViewTitle'
-import ViewSubtitle from '../components/ViewSubtitle'
-import ViewContainer from '../components/ViewContainer'
+import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
+import ViewTitle from '../components/ViewTitle.vue'
+import ViewSubtitle from '../components/ViewSubtitle.vue'
+import ViewContainer from '../components/ViewContainer.vue'
 import GameSettings from './components/settings/GameSettings'
 import gameService from '../../services/api/game'
 import router from '../../router'

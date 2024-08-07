@@ -55,7 +55,7 @@
 <script>
 import SortableLeaderboard from './SortableLeaderboard';
 import UserApiService from '../../../../services/api/user';
-import LoadingSpinner from '../../../components/LoadingSpinner';
+import LoadingSpinner from '../../../components/LoadingSpinner.vue';
 
 export default {
   components: {

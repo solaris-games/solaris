@@ -27,8 +27,8 @@
 </template>
 
 <script>
-import MenuTitle from '../MenuTitle'
-import LoadingSpinner from '../../../components/LoadingSpinner'
+import MenuTitle from '../MenuTitle.vue'
+import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import LedgerTableVue from './LedgerTable'
 
 export default {

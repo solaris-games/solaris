@@ -133,11 +133,11 @@ import gameService from '../../../../services/api/game'
 import ModalButton from '../../../components/modal/ModalButton'
 import DialogModal from '../../../components/modal/DialogModal'
 import GameHelper from '../../../../services/gameHelper'
-import MenuTitle from '../MenuTitle'
+import MenuTitle from '../MenuTitle.vue'
 import AudioService from '../../../../game/audio'
 import NewPlayerMessageVue from '../welcome/NewPlayerMessage'
 import ShareLinkVue from '../welcome/ShareLink'
-import HelpTooltip from '../../../components/HelpTooltip'
+import HelpTooltip from '../../../components/HelpTooltip.vue'
 import ConcedeDefeatButton from './ConcedeDefeatButton'
 import PlayerLeaderboard from './PlayerLeaderboard';
 import TeamLeaderboard from './TeamLeaderboard';

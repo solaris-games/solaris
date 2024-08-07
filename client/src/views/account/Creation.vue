@@ -103,13 +103,13 @@
 
 <script>
 import VueRecaptcha from 'vue-recaptcha'
-import LoadingSpinnerVue from '../components/LoadingSpinner'
-import ViewContainer from '../components/ViewContainer'
+import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
+import ViewContainer from '../components/ViewContainer.vue'
 import router from '../../router'
-import ViewTitle from '../components/ViewTitle'
-import FormErrorList from '../components/FormErrorList'
+import ViewTitle from '../components/ViewTitle.vue'
+import FormErrorList from '../components/FormErrorList.vue'
 import userService from '../../services/api/user'
-import ParallaxVue from '../components/Parallax'
+import ParallaxVue from '../components/Parallax.vue'
 
 export default {
   components: {

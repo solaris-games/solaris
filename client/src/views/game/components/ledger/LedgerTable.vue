@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import LoadingSpinner from '../../../components/LoadingSpinner'
+import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import LedgerApiService from '../../../../services/api/ledger'
 import LedgerRowVue from './LedgerRow'
 

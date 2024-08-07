@@ -39,10 +39,10 @@
 </template>
 
 <script>
-import ViewTitle from '../components/ViewTitle'
-import ViewContainer from '../components/ViewContainer'
+import ViewTitle from '../components/ViewTitle.vue'
+import ViewContainer from '../components/ViewContainer.vue'
 import UserApiService from '../../services/api/user'
-import LoadingSpinnerVue from '../components/LoadingSpinner'
+import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
 
 export default {
   components: {

@@ -83,7 +83,7 @@
 </template>
 
 <script>
-import MenuTitle from '../MenuTitle'
+import MenuTitle from '../MenuTitle.vue'
 import GameHelper from '../../../../services/gameHelper'
 import GameContainer from '../../../../game/container'
   import CarrierApiService from '../../../../services/api/carrier'

@@ -281,10 +281,10 @@
 </template>
 
 <script>
-import LoadingSpinnerVue from '../components/LoadingSpinner'
-import ViewContainer from '../components/ViewContainer'
-import ViewTitle from '../components/ViewTitle'
-import ViewSubtitle from '../components/ViewSubtitle'
+import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
+import ViewContainer from '../components/ViewContainer.vue'
+import ViewTitle from '../components/ViewTitle.vue'
+import ViewSubtitle from '../components/ViewSubtitle.vue'
 import Achievements from '../game/components/player/Achievements'
 import PieChart from '../game/components/intel/PieChart.js'
 import PolarArea from '../game/components/intel/PolarAreaChart.js'

@@ -63,7 +63,7 @@
 </template>
 
 <script>
-import MenuTitle from '../MenuTitle'
+import MenuTitle from '../MenuTitle.vue'
 import StarsTableVue from './StarsTable'
 import CarriersTableVue from './CarriersTable'
 import ShipsTableVue from './ShipsTable'

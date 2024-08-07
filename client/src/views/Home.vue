@@ -33,13 +33,13 @@
 </template>
 
 <script>
-import ViewContainer from './components/ViewContainer'
-import ViewTitle from './components/ViewTitle'
-import AccountLoginVue from './account/components/Login'
+import ViewContainer from './components/ViewContainer.vue'
+import ViewTitle from './components/ViewTitle.vue'
+import AccountLoginVue from './account/components/Login.vue'
 import ApiAuthService from '../services/api/auth'
 import router from '../router'
 import LoadingSpinnerVue from './components/LoadingSpinner.vue'
-import ParallaxVue from './components/Parallax'
+import ParallaxVue from './components/Parallax.vue'
 import LatestAnnouncement from "./components/LatestAnnouncement.vue";
 
 export default {

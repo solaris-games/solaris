@@ -29,8 +29,8 @@
 </template>
 
 <script>
-import MenuTitle from '../MenuTitle'
-import LoadingSpinner from '../../../components/LoadingSpinner'
+import MenuTitle from '../MenuTitle.vue'
+import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import GameApiService from '../../../../services/api/game'
 import MentionBox from '../shared/MentionBox'
 import MentionHelper from '@/services/mentionHelper';

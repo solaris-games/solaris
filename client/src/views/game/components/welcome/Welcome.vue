@@ -28,10 +28,10 @@
 </template>
 
 <script>
-import LoadingSpinnerVue from '../../../components/LoadingSpinner'
+import LoadingSpinnerVue from '../../../components/LoadingSpinner.vue'
 import gameService from '../../../../services/api/game'
-import MenuTitle from '../MenuTitle'
-import FormErrorListVue from '../../../components/FormErrorList'
+import MenuTitle from '../MenuTitle.vue'
+import FormErrorListVue from '../../../components/FormErrorList.vue'
 import SelectAliasVue from './SelectAlias.vue'
 import EnterPasswordVue from './EnterPassword.vue'
 import SelectColourVue from './SelectColour.vue'

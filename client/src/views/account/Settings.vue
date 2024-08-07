@@ -113,10 +113,10 @@
 </template>
 
 <script>
-import LoadingSpinnerVue from '../components/LoadingSpinner'
-import ViewContainer from '../components/ViewContainer'
-import ViewTitle from '../components/ViewTitle'
-import ViewSubtitleVue from '../components/ViewSubtitle'
+import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
+import ViewContainer from '../components/ViewContainer.vue'
+import ViewTitle from '../components/ViewTitle.vue'
+import ViewSubtitleVue from '../components/ViewSubtitle.vue'
 import SubscriptionsVue from './components/Subscriptions'
 import OptionsFormVue from '../game/components/menu/OptionsForm'
 import userService from '../../services/api/user'

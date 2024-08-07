@@ -76,8 +76,8 @@
 </template>
 
 <script>
-import MenuTitle from '../MenuTitle'
-import FormErrorList from '../../../components/FormErrorList'
+import MenuTitle from '../MenuTitle.vue'
+import FormErrorList from '../../../components/FormErrorList.vue'
 import GameHelper from '../../../../services/gameHelper'
 import GameContainer from '../../../../game/container'
 import CarrierApiService from '../../../../services/api/carrier'

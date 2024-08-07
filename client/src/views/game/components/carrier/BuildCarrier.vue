@@ -81,7 +81,7 @@
 import starService from '../../../../services/api/star'
 import AudioService from '../../../../game/audio'
 import GameHelper from '../../../../services/gameHelper'
-import MenuTitle from '../MenuTitle'
+import MenuTitle from '../MenuTitle.vue'
 
 export default {
   components: {
@@ -151,7 +151,7 @@ export default {
         this.$emit('onOpenStarDetailRequested', this.star._id)
     },
     async saveTransfer (e) {
-      if (this.$store.state.settings.carrier.confirmBuildCarrier === 'enabled' 
+      if (this.$store.state.settings.carrier.confirmBuildCarrier === 'enabled'
         && !await this.$confirm('Build a carrier', `Are you sure you want to build a Carrier at ${this.star.name}? The carrier will cost $${this.star.upgradeCosts.carriers}.`)) {
         return
       }
@@ -169,7 +169,7 @@ export default {
                 this.$store.commit('gameStarCarrierBuilt', response.data)
 
                 AudioService.join()
-                
+
                 this.$emit('onEditWaypointsRequested', response.data.carrier._id)
             }
         } catch (err) {

@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import MenuTitle from '../MenuTitle'
+import MenuTitle from '../MenuTitle.vue'
 import TutorialOriginal from './TutorialOriginal.vue'
 import TutorialStarsAndCarriers from './TutorialStarsAndCarriers.vue'
 import TutorialInfrastructureAndExpansion from './TutorialInfrastructureAndExpansion.vue'

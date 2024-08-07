@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import MenuTitle from '../MenuTitle'
+import MenuTitle from '../MenuTitle.vue'
 import EventsListVue from './events/EventsList'
 import EventApiService from '../../../../services/api/event'
 

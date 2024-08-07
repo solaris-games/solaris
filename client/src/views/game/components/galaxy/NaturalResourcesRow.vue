@@ -18,7 +18,7 @@
 <script>
 import gameContainer from '../../../../game/container'
 import gameHelper from '../../../../services/gameHelper'
-import SpecialistIcon from '../specialist/SpecialistIcon'
+import SpecialistIcon from '../specialist/SpecialistIcon.vue'
 import StarResourcesVue from '../star/StarResources'
 
 export default {

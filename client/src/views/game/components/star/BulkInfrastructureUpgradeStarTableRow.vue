@@ -17,7 +17,7 @@
 
 <script>
 import gameContainer from '../../../../game/container'
-import SpecialistIcon from '../specialist/SpecialistIcon'
+import SpecialistIcon from '../specialist/SpecialistIcon.vue'
 import IgnoreBulkUpgradeVue from './IgnoreBulkUpgrade'
 import StarResourcesVue from './StarResources'
 

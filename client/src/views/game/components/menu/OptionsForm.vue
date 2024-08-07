@@ -444,8 +444,8 @@
 </template>
 
 <script>
-import LoadingSpinnerVue from '../../../components/LoadingSpinner'
-import FormErrorList from '../../../components/FormErrorList'
+import LoadingSpinnerVue from '../../../components/LoadingSpinner.vue'
+import FormErrorList from '../../../components/FormErrorList.vue'
 import UserApiService from '../../../../services/api/user'
 import GameContainer from '../../../../game/container'
 

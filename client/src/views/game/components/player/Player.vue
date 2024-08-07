@@ -56,8 +56,8 @@
 </template>
 
 <script>
-import LoadingSpinnerVue from '../../../components/LoadingSpinner'
-import MenuTitle from '../MenuTitle'
+import LoadingSpinnerVue from '../../../components/LoadingSpinner.vue'
+import MenuTitle from '../MenuTitle.vue'
 import Overview from './Overview'
 import Infrastructure from '../shared/Infrastructure'
 import YourInfrastructure from './YourInfrastructure'

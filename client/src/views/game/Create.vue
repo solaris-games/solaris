@@ -898,13 +898,13 @@
 </template>
 
 <script>
-import LoadingSpinnerVue from '../components/LoadingSpinner'
-import ViewContainer from '../components/ViewContainer'
+import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
+import ViewContainer from '../components/ViewContainer.vue'
 import ViewCollapsePanel from '../components/ViewCollapsePanel'
-import ViewTitle from '../components/ViewTitle'
-import ViewSubtitle from '../components/ViewSubtitle'
-import FormErrorList from '../components/FormErrorList'
-import HelpTooltip from '../components/HelpTooltip'
+import ViewTitle from '../components/ViewTitle.vue'
+import ViewSubtitle from '../components/ViewSubtitle.vue'
+import FormErrorList from '../components/FormErrorList.vue'
+import HelpTooltip from '../components/HelpTooltip.vue'
 import SpecialistBanListSelection from './components/specialist/SpecialistBanListSelection'
 import FluxBar from './components/menu/FluxBar'
 import gameService from '../../services/api/game'

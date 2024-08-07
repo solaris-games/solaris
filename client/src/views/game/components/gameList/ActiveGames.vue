@@ -88,7 +88,7 @@
 </template>
 
 <script>
-import LoadingSpinnerVue from '../../../components/LoadingSpinner'
+import LoadingSpinnerVue from '../../../components/LoadingSpinner.vue'
 import gameService from '../../../../services/api/game'
 import GameHelper from '../../../../services/gameHelper'
 import CountdownTimer from '../CountdownTimer.vue'
@@ -139,7 +139,7 @@ export default {
       // TODO: This doesn't work, for some reason getCountdownTime returns a number wtf
       // if (GameHelper.isGamePendingStart(game)) {
       //   return GameHelper.getCountdownTime(game, game.state.startDate)
-      // } else 
+      // } else
       if (GameHelper.isRealTimeGame(game)) {
         return GameHelper.getCountdownTimeForProductionCycle(game)
       } else if (GameHelper.isTurnBasedGame(game)) {

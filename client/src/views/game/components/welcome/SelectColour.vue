@@ -40,7 +40,7 @@
 <script>
 import gameContainer from '../../../../game/container'
 import gameHelper from '../../../../services/gameHelper'
-import PlayerAvatarVue from '../menu/PlayerAvatar'
+import PlayerAvatarVue from '../menu/PlayerAvatar.vue'
 import TeamName from '../shared/TeamName';
 
 export default {

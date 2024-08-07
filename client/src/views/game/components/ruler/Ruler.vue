@@ -174,10 +174,10 @@
 </template>
 
 <script>
-import MenuTitleVue from '../MenuTitle'
+import MenuTitleVue from '../MenuTitle.vue'
 import GameContainer from '../../../../game/container'
 import GameHelper from '../../../../services/gameHelper'
-import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning'
+import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning.vue'
 
 export default {
   components: {

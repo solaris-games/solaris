@@ -12,7 +12,7 @@
 
 <script>
 import gameHelper from '../../../../services/gameHelper'
-import PlayerAvatarVue from './PlayerAvatar'
+import PlayerAvatarVue from './PlayerAvatar.vue'
 
 export default {
   components: {
@@ -54,7 +54,7 @@ export default {
     min-height: 8px;
 }
 
-@media screen and (max-width: 576px) { 
+@media screen and (max-width: 576px) {
   .list-group-item {
       height: 40px;
       width: 35px;

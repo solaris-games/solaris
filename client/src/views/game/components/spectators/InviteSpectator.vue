@@ -5,7 +5,7 @@
     <h5>Invite Spectator</h5>
 
     <form-error-list :errors="errors"/>
-      
+
     <form @submit="handleSubmit">
         <div class="row g-0">
             <div class="col">
@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import FormErrorList from '../../../components/FormErrorList'
+import FormErrorList from '../../../components/FormErrorList.vue'
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import SpectatorApiService from '../../../../services/api/spectator'
 

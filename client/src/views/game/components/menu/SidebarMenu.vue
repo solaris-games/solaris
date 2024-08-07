@@ -39,7 +39,7 @@ import GameHelper from '../../../../services/gameHelper'
 import DiplomacyHelper from '../../../../services/diplomacyHelper'
 import router from '../../../../router'
 import MENU_STATES from '../../../../services/data/menuStates'
-import SidebarMenuItem from './SidebarMenuItem'
+import SidebarMenuItem from './SidebarMenuItem.vue'
 
 export default {
   components: {

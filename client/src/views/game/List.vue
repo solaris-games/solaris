@@ -447,14 +447,14 @@
 
 <script>
 import router from '../../router'
-import LoadingSpinnerVue from '../components/LoadingSpinner'
-import ViewTitle from '../components/ViewTitle'
-import ViewContainer from '../components/ViewContainer'
+import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
+import ViewTitle from '../components/ViewTitle.vue'
+import ViewContainer from '../components/ViewContainer.vue'
 import TutorialGame from './components/menu/TutorialGame'
 import gameService from '../../services/api/game'
 import GameHelper from '../../services/gameHelper'
 import RandomHelper from '../../services/randomHelper'
-import HelpTooltip from '../components/HelpTooltip'
+import HelpTooltip from '../components/HelpTooltip.vue'
 import FluxBar from './components/menu/FluxBar'
 import LockedGameOverlay from './components/menu/LockedGameOverlay'
 import * as moment from 'moment'
