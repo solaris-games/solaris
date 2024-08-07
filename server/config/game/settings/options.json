@@ -220,15 +220,15 @@
     "carrierCost": [
       {
         "value": "cheap",
-        "text": "Cheap"
+        "text": "Cheap (15 credits)"
       },
       {
         "value": "standard",
-        "text": "Standard"
+        "text": "Standard (25 credits)"
       },
       {
         "value": "expensive",
-        "text": "Expensive"
+        "text": "Expensive (50 credits)"
       }
     ],
     "carrierUpkeepCost": [
@@ -238,15 +238,15 @@
       },
       {
         "value": "cheap",
-        "text": "Cheap"
+        "text": "Cheap (1 credit)"
       },
       {
         "value": "standard",
-        "text": "Standard"
+        "text": "Standard (3 credits)"
       },
       {
         "value": "expensive",
-        "text": "Expensive"
+        "text": "Expensive (6 credits)"
       }
     ],
     "warpgateCost": [
@@ -270,7 +270,7 @@
     "specialistCost": [
       {
         "value": "none",
-        "text": "No"
+        "text": "No specialists"
       },
       {
         "value": "standard",
@@ -278,15 +278,15 @@
       },
       {
         "value": "expensive",
-        "text": "Expensive"
+        "text": "Expensive (2x cost)"
       },
       {
         "value": "veryExpensive",
-        "text": "Very Expensive"
+        "text": "Very Expensive (4x cost)"
       },
       {
         "value": "crazyExpensive",
-        "text": "Crazy Expensive"
+        "text": "Crazy Expensive (8x cost)"
       }
     ],
     "specialistsCurrency": [
@@ -647,19 +647,19 @@
       },
       {
         "value": "cheap",
-        "text": "Cheap"
+        "text": "Cheap (5% of your income per ally)"
       },
       {
         "value": "standard",
-        "text": "Standard"
+        "text": "Standard (10% of your income per ally)"
       },
       {
         "value": "expensive",
-        "text": "Expensive"
+        "text": "Expensive (15% of your income per ally)"
       },
       {
         "value": "crazyExpensive",
-        "text": "Crazy Expensive"
+        "text": "Crazy Expensive (25% of your income per ally)"
       }
     ],
     "tradeRestricted": [
@@ -687,27 +687,27 @@
     "researchCosts": [
       {
         "value": "none",
-        "text": "No"
+        "text": "No research"
       },
       {
         "value": "cheap",
-        "text": "Cheap"
+        "text": "Cheap (50)"
       },
       {
         "value": "standard",
-        "text": "Standard"
+        "text": "Standard (100)"
       },
       {
         "value": "expensive",
-        "text": "Expensive"
+        "text": "Expensive (200)"
       },
       {
         "value": "veryExpensive",
-        "text": "Very Expensive"
+        "text": "Very Expensive (400)"
       },
       {
         "value": "crazyExpensive",
-        "text": "Crazy Expensive"
+        "text": "Crazy Expensive (800)"
       }
     ],
     "researchCostProgression": [
@@ -723,15 +723,15 @@
     "researchCostProgressionGrowthFactor": [
       {
         "value": "soft",
-        "text": "Soft"
+        "text": "Soft (x1.25 per level)"
       },
       {
         "value": "medium",
-        "text": "Medium"
+        "text": "Medium (x1.5 per level)"
       },
       {
         "value": "hard",
-        "text": "Hard"
+        "text": "Hard (x1.75 per level)"
       }
     ],
     "bankingReward": [

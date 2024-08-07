@@ -57,7 +57,7 @@
 
           <p class="mb-1 text-warning" v-if="!(possibleTeamCounts.length || 0)">Warning: It's not possible to form equally sized teams with your current number of player slots.</p>
 
-          <select v-if="(possibleTeamCounts.length || 0) > 0" class="form-control" id="teamConquestTeamCount" v-model="settings.conquest.teamsCount" @change="onMaxAllianceTriggerChanged" :disabled="isCreatingGame">
+          <select v-if="(possibleTeamCounts.length || 0) > 0" class="form-control" id="teamConquestTeamCount" v-model="settings.conquest.teamsCount" @change="onTeamCountChanged" :disabled="isCreatingGame">
             <option v-for="opt in possibleTeamCounts" v-bind:key="opt" v-bind:value="opt">
               {{ opt }}
             </option>
@@ -977,12 +977,14 @@ export default {
     },
     onMaxAllianceTriggerChanged (e) {
       this.settings.diplomacy.maxAlliances = this.calcMaxAllianceLimit();
+      this.updatePossibleTeamCounts();
       console.warn("Max alliances changed to: " + this.settings.diplomacy.maxAlliances);
+    },
+    onTeamCountChanged (e) {
+      this.settings.diplomacy.maxAlliances = this.calcMaxAllianceLimit();
     },
     calcMaxAllianceLimit () {
       if (this.settings.general.mode === 'teamConquest') {
-        this.updatePossibleTeamCounts();
-
         const playersPerTeam = this.settings.general.playerLimit / this.settings.conquest.teamsCount;
         return playersPerTeam - 1;
       }
@@ -1018,6 +1020,10 @@ export default {
       }
     },
     updatePossibleTeamCounts () {
+      if (this.settings.general.mode !== 'teamConquest') {
+        return;
+      }
+
       const players = this.settings.general.playerLimit;
 
       if (players < 4) {
