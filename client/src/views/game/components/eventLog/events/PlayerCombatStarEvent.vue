@@ -88,7 +88,7 @@
               </tbody>
           </table>
         </div>
-        
+
         <hr class="mt-0"/>
 
         <div v-if="event.data.captureResult">
@@ -107,7 +107,7 @@
 <script>
 import GameHelper from '../../../../../services/gameHelper'
 import PlayerIconShape from '../../player/PlayerIconShape.vue'
-import StarLabelVue from '../../star/StarLabel'
+import StarLabelVue from '../../star/StarLabel.vue'
 
 export default {
   components: {

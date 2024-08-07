@@ -40,7 +40,7 @@
 
 <script>
 import GameHelper from '../../../../services/gameHelper'
-import ShipRowVue from './ShipRow'
+import ShipRowVue from './ShipRow.vue'
 
 export default {
   components: {

@@ -56,7 +56,7 @@
 
 <script>
 import GameHelper from '../../../../services/gameHelper'
-import StarRowVue from './StarRow'
+import StarRowVue from './StarRow.vue'
 
 export default {
   components: {

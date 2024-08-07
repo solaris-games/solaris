@@ -44,7 +44,7 @@
 
 <script>
 import GameHelper from '../../../../services/gameHelper'
-import NaturalResourcesRowVue from './NaturalResourcesRow'
+import NaturalResourcesRowVue from './NaturalResourcesRow.vue'
 
 export default {
   components: {

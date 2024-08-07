@@ -44,7 +44,7 @@
 
 <script>
 import GameHelper from '../../../../services/gameHelper'
-import CapitalRowVue from './CapitalRow'
+import CapitalRowVue from './CapitalRow.vue'
 
 export default {
   components: {

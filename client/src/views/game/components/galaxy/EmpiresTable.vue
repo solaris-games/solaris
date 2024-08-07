@@ -44,7 +44,7 @@
 
 <script>
 import GameHelper from '../../../../services/gameHelper'
-import EmpireRowVue from './EmpireRow'
+import EmpireRowVue from './EmpireRow.vue'
 
 export default {
   components: {

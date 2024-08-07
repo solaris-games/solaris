@@ -7,8 +7,8 @@
 </template>
 
 <script>
-import StarLabelVue from '../../star/StarLabel'
-import CarrierLabelVue from '../../carrier/CarrierLabel'
+import StarLabelVue from '../../star/StarLabel.vue'
+import CarrierLabelVue from '../../carrier/CarrierLabel.vue'
 import GameHelper from '../../../../../services/gameHelper'
 
 export default {

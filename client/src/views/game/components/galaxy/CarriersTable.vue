@@ -42,7 +42,7 @@
 
 <script>
 import GameHelper from '../../../../services/gameHelper'
-import CarrierRowVue from './CarrierRow'
+import CarrierRowVue from './CarrierRow.vue'
 
 export default {
   components: {

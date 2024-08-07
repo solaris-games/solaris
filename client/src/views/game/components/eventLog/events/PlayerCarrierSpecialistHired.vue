@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import CarrierLabelVue from '../../carrier/CarrierLabel'
+import CarrierLabelVue from '../../carrier/CarrierLabel.vue'
 
 export default {
   components: {

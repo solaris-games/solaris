@@ -44,7 +44,7 @@
 
 <script>
 import GameHelper from '../../../../services/gameHelper'
-import TechnologyRowVue from './TechnologyRow'
+import TechnologyRowVue from './TechnologyRow.vue'
 
 export default {
   components: {
