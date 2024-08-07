@@ -37,7 +37,7 @@
 
 <script>
 import ViewContainer from "./components/ViewContainer.vue"
-import ViewTitle from "./components/ViewTitle"
+import ViewTitle from "./components/ViewTitle.vue"
 
 export default {
   components: {

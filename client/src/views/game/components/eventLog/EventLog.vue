@@ -10,7 +10,7 @@
 
 <script>
 import MenuTitle from '../MenuTitle.vue'
-import EventsListVue from './events/EventsList'
+import EventsListVue from './events/EventsList.vue'
 import EventApiService from '../../../../services/api/event'
 
 export default {

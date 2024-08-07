@@ -29,7 +29,7 @@
 <script>
 import MenuTitle from '../MenuTitle.vue'
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
-import LedgerTableVue from './LedgerTable'
+import LedgerTableVue from './LedgerTable.vue'
 
 export default {
   components: {

@@ -285,13 +285,13 @@ import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
 import ViewContainer from '../components/ViewContainer.vue'
 import ViewTitle from '../components/ViewTitle.vue'
 import ViewSubtitle from '../components/ViewSubtitle.vue'
-import Achievements from '../game/components/player/Achievements'
+import Achievements from '../game/components/player/Achievements.vue'
 import PieChart from '../game/components/intel/PieChart.js'
 import PolarArea from '../game/components/intel/PolarAreaChart.js'
 import userService from '../../services/api/user'
-import UserGuildInfoVue from '../guild/components/UserGuildInfo'
-import Roles from '../game/components/player/Roles'
-import UserBadges from '../game/components/badges/UserBadges'
+import UserGuildInfoVue from '../guild/components/UserGuildInfo.vue'
+import Roles from '../game/components/player/Roles.vue'
+import UserBadges from '../game/components/badges/UserBadges.vue'
 
 export default {
   components: {

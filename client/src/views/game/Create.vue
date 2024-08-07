@@ -900,13 +900,13 @@
 <script>
 import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
 import ViewContainer from '../components/ViewContainer.vue'
-import ViewCollapsePanel from '../components/ViewCollapsePanel'
+import ViewCollapsePanel from '../components/ViewCollapsePanel.vue'
 import ViewTitle from '../components/ViewTitle.vue'
 import ViewSubtitle from '../components/ViewSubtitle.vue'
 import FormErrorList from '../components/FormErrorList.vue'
 import HelpTooltip from '../components/HelpTooltip.vue'
-import SpecialistBanListSelection from './components/specialist/SpecialistBanListSelection'
-import FluxBar from './components/menu/FluxBar'
+import SpecialistBanListSelection from './components/specialist/SpecialistBanListSelection.vue'
+import FluxBar from './components/menu/FluxBar.vue'
 import gameService from '../../services/api/game'
 import router from '../../router'
 

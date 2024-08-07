@@ -65,7 +65,7 @@
 import MenuTitle from '../MenuTitle.vue'
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import DiplomacyApiService from '../../../../services/api/diplomacy'
-import DiplomacyRowVue from './DiplomacyRow'
+import DiplomacyRowVue from './DiplomacyRow.vue'
 import DiplomacyHelper from '../../../../services/diplomacyHelper'
 import FormErrorList from '../../../components/FormErrorList.vue'
 

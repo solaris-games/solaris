@@ -22,10 +22,10 @@
 <script>
 import LoadingSpinnerVue from '../../../components/LoadingSpinner.vue'
 import MenuTitle from '../MenuTitle.vue'
-import PlayerTitleVue from './PlayerTitle'
-import Research from './Research'
-import PlayerTradeVue from './PlayerTrade'
-import TradeHistoryVue from './TradeHistory'
+import PlayerTitleVue from './PlayerTitle.vue'
+import Research from './Research.vue'
+import PlayerTradeVue from './PlayerTrade.vue'
+import TradeHistoryVue from './TradeHistory.vue'
 import GameHelper from '../../../../services/gameHelper'
 import GameContainer from '../../../../game/container'
 

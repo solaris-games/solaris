@@ -12,7 +12,7 @@
 
 <script>
 import MenuTitle from '../MenuTitle.vue'
-import OptionsFormVue from './OptionsForm'
+import OptionsFormVue from './OptionsForm.vue'
 import ErrorLog from "./ErrorLog.vue";
 
 export default {

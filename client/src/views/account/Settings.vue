@@ -117,12 +117,12 @@ import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
 import ViewContainer from '../components/ViewContainer.vue'
 import ViewTitle from '../components/ViewTitle.vue'
 import ViewSubtitleVue from '../components/ViewSubtitle.vue'
-import SubscriptionsVue from './components/Subscriptions'
-import OptionsFormVue from '../game/components/menu/OptionsForm'
+import SubscriptionsVue from './components/Subscriptions.vue'
+import OptionsFormVue from '../game/components/menu/OptionsForm.vue'
 import userService from '../../services/api/user'
 import authService from '../../services/api/auth'
 import router from '../../router'
-import Roles from '../game/components/player/Roles'
+import Roles from '../game/components/player/Roles.vue'
 
 export default {
   components: {

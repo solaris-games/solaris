@@ -32,7 +32,7 @@
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import SpecialistService from '../../../../services/api/specialist'
 import SpecialistIconVue from '../specialist/SpecialistIcon.vue'
-import SpecialistBanListTable from './SpecialistBanListTable'
+import SpecialistBanListTable from './SpecialistBanListTable.vue'
 
 export default {
     components: {

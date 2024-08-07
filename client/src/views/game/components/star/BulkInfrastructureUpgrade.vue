@@ -180,8 +180,8 @@ import starService from '../../../../services/api/star'
 import GameHelper from '../../../../services/gameHelper'
 import AudioService from '../../../../game/audio'
 import GameContainer from '../../../../game/container'
-import BulkInfrastructureUpgradeScheduleTable from './BulkInfrastructureUpgradeScheduleTable'
-import BulkInfrastructureUpgradeStarTableVue from './BulkInfrastructureUpgradeStarTable'
+import BulkInfrastructureUpgradeScheduleTable from './BulkInfrastructureUpgradeScheduleTable.vue'
+import BulkInfrastructureUpgradeStarTableVue from './BulkInfrastructureUpgradeStarTable.vue'
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 
 export default {
