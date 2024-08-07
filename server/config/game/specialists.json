@@ -776,7 +776,7 @@
             "name": "Stellar Engine",
             "description": "When the Stellar Engine is activated, the star slowly moves towards the nearest Stellar Beacon at x0.25 carrier speed.",
             "active": {
-                "official": false,
+                "official": true,
                 "custom": true
             },
             "baseCostCredits": 500,
@@ -796,7 +796,7 @@
             "name": "Stellar Beacon",
             "description": "The Stellar Beacon helps nearby Stellar Engines navigate, a Stellar Engine moves towards the nearest Stellar Beacon.",
             "active": {
-                "official": false,
+                "official": true,
                 "custom": true
             },
             "baseCostCredits": 300,
