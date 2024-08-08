@@ -532,15 +532,6 @@ export default class StarUpgradeService extends EventEmitter {
             await this.achievementService.incrementInfrastructureBuilt(infrastructureType, player.userId, upgradeSummary.upgraded);
         }
 
-        player.credits -= upgradeSummary.cost;
-
-        this.emit(StarUpgradeServiceEvents.onPlayerInfrastructureBulkUpgraded, {
-            gameId: game._id,
-            gameTick: game.state.tick,
-            player,
-            upgradeSummary
-        });
-
         if (infrastructureType === 'science') {
             upgradeSummary.currentResearchTicksEta = this.researchService.calculateCurrentResearchETAInTicks(game, player);
             upgradeSummary.nextResearchTicksEta = this.researchService.calculateNextResearchETAInTicks(game, player);

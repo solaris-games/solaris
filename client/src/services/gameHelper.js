@@ -619,6 +619,27 @@ class GameHelper {
     return ownersHomeStarId && ownersHomeStarId === star._id;
   }
 
+  getOriginalOwner (game, star) {
+    return game.galaxy.players.find(player => player.homeStarId == star._id);
+  }
+
+  isRedCapital(game, star) {
+    if (!star.homeStar || !star.ownedByPlayerId) {
+      return false;
+    }
+
+    if (this.isConquestHomeStars(game)) {
+      return true;
+    } 
+
+    const player = this.getPlayerById(game, star.ownedByPlayerId)
+    if (this.isCapitalElimination(game) && this.isOwnerCapital(game, star) && !player.defeated) { 
+      return true;
+    }
+
+    return false;
+  }
+
   playerHasLowestTechLevel (game, techKey, player) {
     const levels = [...new Set(game.galaxy.players
       .filter(p => p.research != null)
