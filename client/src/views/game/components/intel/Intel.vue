@@ -88,7 +88,7 @@
 <script>
 import LoadingSpinnerVue from '../../../components/LoadingSpinner.vue'
 import MenuTitle from '../MenuTitle.vue'
-import LineChart from './LineChart.js'
+import LineChart from './LineChart.vue'
 import PlayerIconVue from '../player/PlayerIcon.vue'
 import GameHelper from '../../../../services/gameHelper'
 import GameApiService from '../../../../services/api/game'

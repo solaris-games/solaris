@@ -458,7 +458,6 @@ import HelpTooltip from '../components/HelpTooltip.vue'
 import FluxBar from './components/menu/FluxBar.vue'
 import LockedGameOverlay from './components/menu/LockedGameOverlay.vue'
 import * as moment from 'moment'
-import CommunityGuidelines from "../CommunityGuidelines.vue";
 import CommunityGuidelinesBar from "./components/menu/CommunityGuidelinesBar.vue";
 
 export default {
