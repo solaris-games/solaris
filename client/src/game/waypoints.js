@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js-legacy'
-import EventEmitter from 'events'
+import EventEmitter from 'mitt'
 import GameHelper from '../services/gameHelper'
 import WaypointHelper from '../services/waypointHelper'
 
@@ -179,7 +179,7 @@ class Waypoints extends EventEmitter {
     if (route.length > 1) {
       for (let i = 1; i < route.length; i++) {
         let waypointStar = route[i]
-        
+
         this._createWaypoint(waypointStar._id)
       }
     } else {

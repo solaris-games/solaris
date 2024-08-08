@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js-legacy'
-import EventEmitter from 'events'
+import EventEmitter from 'mitt'
 import TextureService from './texture'
 import Helpers from './helpers'
 

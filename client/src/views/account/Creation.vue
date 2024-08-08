@@ -102,7 +102,7 @@
 </template>
 
 <script>
-import VueRecaptcha from 'vue-recaptcha'
+import { VueRecaptcha } from 'vue-recaptcha'
 import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
 import ViewContainer from '../components/ViewContainer.vue'
 import router from '../../router'
