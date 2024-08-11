@@ -10,13 +10,13 @@
 
     <div class="row bg-dark">
       <div class="col text-center pt-2">
-        <p class="mb-2" v-if="userPlayer && star.ownedByPlayerId == userPlayer._id">A star under your command.</p>
+        <p class="mb-2" v-if="isOwnedByUserPlayer">A star under your command.</p>
         <p class="mb-2" v-if="star.ownedByPlayerId != null && (!userPlayer || star.ownedByPlayerId != userPlayer._id)">This star is controlled by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{starOwningPlayer.alias}}</a>.</p>
         <p class="mb-2" v-if="star.ownedByPlayerId == null">This star has not been claimed by any faction.<br/>Send a carrier here to claim it for yourself!</p>
         <div v-if="star.ownedByPlayerId != null && star.homeStar ">
-          <p class="mb-2 text-info" v-if="userPlayer && star.ownedByPlayerId == userPlayer._id && star.ownedByPlayerId == originalCapitalOwner._id"><small>This is your capital.</small></p>
-          <p class="mb-2 text-info" v-if="userPlayer && star.ownedByPlayerId != userPlayer._id && star.ownedByPlayerId == originalCapitalOwner._id"><small>This is their capital.</small></p>
-          <p class="mb-2 text-info" v-if="userPlayer && star.ownedByPlayerId != originalCapitalOwner._id"><small>The former capital of <a href="javascript:;" @click="onOpenOriginalCapitalOwner">{{originalCapitalOwner.alias}}</a>.</small></p>
+          <p class="mb-2 text-info" v-if="userPlayer && isOwnedByUserPlayer && star.ownedByPlayerId == originalCapitalOwner._id"><small>This is your capital.</small></p>
+          <p class="mb-2 text-info" v-if="!isOwnedByUserPlayer && star.ownedByPlayerId == originalCapitalOwner._id"><small>This is their capital.</small></p>
+          <p class="mb-2 text-info" v-if="star.ownedByPlayerId != originalCapitalOwner._id"><small>The former capital of <a href="javascript:;" @click="onOpenOriginalCapitalOwner">{{originalCapitalOwner.alias}}</a>.</small></p>
         </div>
         <p class="mb-2 text-danger" v-if="isDeadStar">This is a dead star, infrastructure cannot be built here.</p>
         <p class="mb-2 text-danger" v-if="star.targeted">This star has been targeted for destruction!</p>
