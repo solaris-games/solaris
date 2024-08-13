@@ -174,11 +174,11 @@ class Star extends EventEmitter {
       // ---- Non binary stars ----
       else if (this.hasBlackHole()) {
         this.graphics_star = new PIXI.Sprite(TextureService.STAR_SYMBOLS['black_hole'])
-      } else if (this.data.homeStar) {
-        this.graphics_star = new PIXI.Sprite(TextureService.STAR_SYMBOLS['home'])
       } else if (this._isDeadStar()) {
         this.graphics_star = new PIXI.Sprite(TextureService.STAR_SYMBOLS['unscannable'])
-      } else {
+      } else if (this.data.homeStar) {
+        this.graphics_star = new PIXI.Sprite(TextureService.STAR_SYMBOLS['home'])
+      }  else {
         this.graphics_star = new PIXI.Sprite(TextureService.STAR_SYMBOLS['scannable'])
       }
     }
@@ -187,7 +187,7 @@ class Star extends EventEmitter {
       this.graphics_star.tint = 0xa0a0a0
     }
 
-    if (gameHelper.isCapitalElimination(this.game) && gameHelper.isOwnerCapital(this.game, this.data)) {
+    if (gameHelper.isRedCapital(this.game, this.data)) {
       this.graphics_star.tint = 0xFF0000
     }
 
@@ -335,6 +335,10 @@ class Star extends EventEmitter {
     this.specialistSprite.height = 10
     this.specialistSprite.x = -5
     this.specialistSprite.y = -5
+
+    if (gameHelper.isRedCapital(this.game, this.data)) {
+      this.specialistSprite.tint = 0xFF0000
+    }
 
     this.container.addChild(this.specialistSprite)
   }
@@ -532,6 +536,7 @@ class Star extends EventEmitter {
     this.container.addChild(this.graphics_shape_part)
     this.container.addChild(this.graphics_shape_full)
   }
+  
 
   _hasUnknownShips() {
       let carriersOrbiting = this._getStarCarriers()
