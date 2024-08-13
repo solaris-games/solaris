@@ -143,6 +143,15 @@
         </div>
 
         <div class="mb-2">
+          <label for="afkSlotsOpen" class="col-form-label">AFK slots are open <help-tooltip tooltip="Allow players to join into afk slots"></help-tooltip></label>
+          <select class="form-control" id="afkSlotsOpen" v-model="settings.general.afkSlotsOpen" :disabled="isCreatingGame">
+            <option v-for="opt in options.general.afkSlotsOpen" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-2">
           <label for="readyToQuit" class="col-form-label">Allow Ready To Quit <help-tooltip tooltip="Allow players to 'Ready To Quit' to finish games early"></help-tooltip></label>
           <select class="form-control" id="readyToQuit" v-model="settings.general.readyToQuit" :disabled="isCreatingGame">
             <option v-for="opt in options.general.readyToQuit" v-bind:key="opt.value" v-bind:value="opt.value">

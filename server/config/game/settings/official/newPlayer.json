@@ -14,6 +14,7 @@
     "fluxEnabled": "disabled",
     "advancedAI": "enabled",
     "spectators": "enabled",
+    "afkSlotsOpen": "disabled",
     "readyToQuit": "enabled"
   },
   "galaxy": {
