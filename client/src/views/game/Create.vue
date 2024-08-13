@@ -985,8 +985,8 @@ export default {
       this.settings.specialGalaxy.specialistBans = e
     },
     onMaxAllianceTriggerChanged (e) {
-      this.settings.diplomacy.maxAlliances = this.calcMaxAllianceLimit();
       this.updatePossibleTeamCounts();
+      this.settings.diplomacy.maxAlliances = this.calcMaxAllianceLimit();
       console.warn("Max alliances changed to: " + this.settings.diplomacy.maxAlliances);
     },
     onTeamCountChanged (e) {
