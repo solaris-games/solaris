@@ -108,6 +108,7 @@ import GamePlayerMutexService from './gamePlayerMutex';
 import GameMutexService from "./gameMutex";
 import AnnouncementService from "./announcement";
 import {Announcement} from "./types/Announcement";
+import PlayerColourService from "./playerColour";
 
 const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
@@ -147,6 +148,7 @@ export default (config): DependencyContainer => {
     const cacheService = new CacheService(config);
     const paypalService = new PaypalService(PaymentModel, config, paymentRepository, userService, cacheService);
     const gameTypeService = new GameTypeService();
+    const playerColourService = new PlayerColourService(randomService);
     const specialistService = new SpecialistService(gameTypeService);
     const gameStateService = new GameStateService();
     const gameFluxService = new GameFluxService();
@@ -304,6 +306,7 @@ export default (config): DependencyContainer => {
         teamService,
         pathfindingService,
         gamePlayerMutexService,
-        gameMutexService
+        gameMutexService,
+        playerColourService,
     };
 };
