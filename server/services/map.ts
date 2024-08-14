@@ -209,15 +209,6 @@ export default class MapService {
             } else {
                 starA.wormHoleToStarId = starB._id;
                 starB.wormHoleToStarId = starA._id;
-
-                // Overwrite natural resources if splitResources
-                if (this.gameTypeService.isSplitResources(game)) {
-                    let minResources = game.constants.star.resources.maxNaturalResources * 1.5;
-                    let maxResources = game.constants.star.resources.maxNaturalResources * 3;
-
-                    starA.naturalResources.economy = this.randomService.getRandomNumberBetween(minResources, maxResources);
-                    starB.naturalResources.economy = this.randomService.getRandomNumberBetween(minResources, maxResources);
-                }
             }
         }
     }
@@ -256,6 +247,14 @@ export default class MapService {
                 count++; // Increment because the while loop will decrement.
             } else {
                 star.isAsteroidField = true;
+
+                // Overwrite natural resources if splitResources
+                if (this.gameTypeService.isSplitResources(game)) {
+                    let minResources = game.constants.star.resources.maxNaturalResources * 1.5;
+                    let maxResources = game.constants.star.resources.maxNaturalResources * 3;
+
+                    star.naturalResources.economy = this.randomService.getRandomNumberBetween(minResources, maxResources);
+                }
             }
         } while (count--);
     }

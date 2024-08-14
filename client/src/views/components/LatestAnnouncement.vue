@@ -1,9 +1,13 @@
 <template>
   <loading-spinner v-if="!announcement" />
   <div class="mt-4" v-else>
-    <h4>Latest Updates</h4>
+    <h5 class="latest-update-title">Latest Update: {{date}}</h5>
 
-    <announcement :announcement="announcement" />
+    <details>
+      <summary>More...</summary>
+
+      <announcement :announcement="announcement" />
+    </details>
   </div>
 </template>
 
@@ -31,10 +35,18 @@ export default {
     } else {
       console.error(resp);
     }
+  },
+  computed: {
+    date () {
+      return new Date(this.announcement.date).toLocaleString()
+    }
   }
 }
 </script>
 
 <style scoped>
-
+.latest-update-title {
+  font-size: 1rem;
+  font-weight: normal;
+}
 </style>

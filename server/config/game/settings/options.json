@@ -127,6 +127,16 @@
         "text": "Disabled"
       }
     ],
+    "afkSlotsOpen": [
+      {
+        "value": "enabled",
+        "text": "Enabled"
+      },
+      {
+        "value": "disabled",
+        "text": "Disabled"
+      }
+    ],
     "fluxEnabled": [
       {
         "value": "enabled",

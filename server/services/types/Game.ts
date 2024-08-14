@@ -103,6 +103,7 @@ export interface GameSettings {
 		fluxEnabled: GameSettingEnabledDisabled;
 		isGameAdmin?: boolean;
 		advancedAI: GameSettingEnabledDisabled;
+		afkSlotsOpen: GameSettingEnabledDisabled;
 		spectators: GameSettingEnabledDisabled;
 		flux?: GameFlux | null;
 		readyToQuit: GameSettingEnabledDisabled;

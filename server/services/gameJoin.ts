@@ -163,8 +163,6 @@ export default class GameJoinService extends EventEmitter {
             throw new ValidationError(`The alias '${alias}' is the username of another player.`);
         }
 
-        // TODO: Factor in player type setting. i.e premium players only.
-
         let gameIsFull = this.assignPlayerToUser(game, player, userId, alias, avatar);
 
         if (gameIsFull) {
@@ -202,11 +200,12 @@ export default class GameJoinService extends EventEmitter {
         if (!player.isOpenSlot) {
             throw new ValidationError(`The player slot is not open to be filled`);
         }
-        
-        let isAfker = userId && game.afkers.find(x => x.toString() === userId.toString()) != null;
-        let isFillingAfkSlot = this.gameStateService.isInProgress(game) && player.afk;
-        let isRejoiningOwnAfkSlot = isFillingAfkSlot && isAfker && (userId && player.userId && player.userId.toString() === userId.toString());
-        let hasFilledOtherPlayerAfkSlot = isFillingAfkSlot && !isRejoiningOwnAfkSlot;
+
+        const slotHadPreviousOwner = player.userId && userId && player.userId.toString() !== userId?.toString();
+        const isAfker = userId && Boolean(game.afkers.find(x => x.toString() === userId.toString()));
+        const isFillingAfkSlot = this.gameStateService.isInProgress(game) && player.afk;
+        const isRejoiningOwnAfkSlot = isFillingAfkSlot && isAfker && (userId && player.userId && player.userId.toString() === userId.toString());
+        const hasFilledOtherPlayerAfkSlot = isFillingAfkSlot && !isRejoiningOwnAfkSlot;
 
         // Assign the user to the player.
         player.userId = userId;
@@ -253,9 +252,9 @@ export default class GameJoinService extends EventEmitter {
         } else {
             this.playerService.updateLastSeen(game, player);
 
-            // If the player is joining another player's AFK slot, remove them
+            // If the player is joining another player's slot, remove them
             // from any conversation that the other player was in.
-            if (hasFilledOtherPlayerAfkSlot) {
+            if (slotHadPreviousOwner) {
                 this.conversationService.leaveAll(game, player._id);
             }
         }

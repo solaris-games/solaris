@@ -61,6 +61,7 @@ const schema = new Schema({
 			fluxEnabled: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
 			advancedAI: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'disabled' },
 			spectators: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'disabled' },
+			afkSlotsOpen: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'enabled' },
 			readyToQuit: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'enabled' },
 			readyToQuitFraction: { type: Types.Number, required: false, min: 0.5, max: 1.0, default: 1.0 },
 			readyToQuitTimerCycles: { type: Types.Number, required: false, min: 0, max: 3, default: 0 },
