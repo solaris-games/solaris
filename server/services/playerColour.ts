@@ -1,13 +1,14 @@
-import {PlayerColourShapeCombination, PlayerShape} from "./types/Player";
+import {PlayerColour, PlayerColourShapeCombination, PlayerShape} from "./types/Player";
 import RandomService from "./random";
+import {shuffle} from "./utils";
 
-type ColourSpec = {
-    alias: string;
-    shades: string[];
+type ColourGroup = {
+    group: string;
+    colours: PlayerColour[];
 }
 
 const SHAPES: PlayerShape[] = ['circle', 'square', 'diamond', 'hexagon'];
-const COLOURS: ColourSpec[] = require('../config/game/colours').slice();
+const COLOURS: ColourGroup[] = require('../config/game/colours').slice();
 
 export default class PlayerColourService {
     randomService: RandomService;
@@ -19,11 +20,11 @@ export default class PlayerColourService {
     generateTeamColourShapeList(teamCount: number, playersPerTeam: number): Record<number, PlayerColourShapeCombination[]> {
         const coloursCount = COLOURS.length;
 
-        const available: Record<string, { shape: PlayerShape, shade: string }[]> = {};
+        const available: Record<string, { shape: PlayerShape, colour: PlayerColour }[]> = {};
 
         for (const cs of COLOURS) {
-            available[cs.alias] = cs.shades.map((shade, idx) => ({
-                shade,
+            available[cs.group] = cs.colours.map((colour, idx) => ({
+                colour,
                 shape: SHAPES[idx]
             }));
         }
@@ -38,20 +39,17 @@ export default class PlayerColourService {
             while (fulfilled < playersPerTeam) {
                 const teamColourSpec = COLOURS[colourIdx % coloursCount];
 
-                const availableShadesAndShapes = available[teamColourSpec.alias];
+                const availableShapesAndColours = available[teamColourSpec.group];
 
-                if (!availableShadesAndShapes.length) {
+                if (!availableShapesAndColours.length) {
                     colourIdx++;
                     continue;
                 }
 
-                const shadeAndShape = availableShadesAndShapes.pop()!;
+                const shapeAndColour = availableShapesAndColours.pop()!;
                 combinations.push({
-                    shape: shadeAndShape.shape,
-                    colour: {
-                        alias: teamColourSpec.alias,
-                        value: shadeAndShape.shade,
-                    }
+                    shape: shapeAndColour.shape,
+                    colour: shapeAndColour.colour
                 });
                 fulfilled++;
             }
@@ -66,40 +64,14 @@ export default class PlayerColourService {
     generatePlayerColourShapeList(playerCount: number): PlayerColourShapeCombination[] {
         const combinations: PlayerColourShapeCombination[] =
             COLOURS.flatMap(spec =>
-                spec.shades.map((shade, idx) => {
+                spec.colours.map((colour, idx) => {
                     return {
                         shape: SHAPES[idx],
-                        colour: {
-                            alias: spec.alias,
-                            value: shade,
-                        }
+                        colour
                     };
                 }));
 
-        const result: PlayerColourShapeCombination[] = [];
-
-        const maxAttempts: number = 2;
-        let attempts: number = 0;
-
-        while (result.length !== playerCount) {
-            // Choose a random shape colour combination
-            let shapeColourIndex = this.randomService.getRandomNumber(combinations.length - 1);
-            let shapeColour = combinations[shapeColourIndex];
-
-            // Test if the colour is already in the list,
-            // if it is, try again up to the max attempt limit.
-            // Ideally we do not want to have the same colours often.
-            let existingColour = result.find(r => r.colour.alias === shapeColour.colour.alias);
-
-            if (!existingColour || attempts >= maxAttempts) {
-                combinations.splice(shapeColourIndex, 1);
-                result.push(shapeColour);
-                attempts = 0;
-            } else {
-                attempts++;
-            }
-        }
-
-        return result;
+        shuffle(combinations);
+        return combinations.slice(0, playerCount);
     }
 }
