@@ -1,6 +1,8 @@
-import {PlayerColour, PlayerColourShapeCombination, PlayerShape} from "./types/Player";
+import {Player, PlayerColour, PlayerColourShapeCombination, PlayerShape} from "./types/Player";
 import RandomService from "./random";
 import {shuffle} from "./utils";
+import {Game} from "./types/Game";
+import {DBObjectId} from "./types/DBObjectId";
 
 type ColourGroup = {
     group: string;
@@ -15,6 +17,17 @@ export default class PlayerColourService {
 
     constructor(randomService: RandomService) {
         this.randomService = randomService;
+    }
+
+    getColourList(): PlayerColour[] {
+        return COLOURS.flatMap(spec => spec.colours);
+    }
+
+    async setColourOverride(game: Game, player: Player, overridePlayer: string, colour: PlayerColour): void {
+        player.colourMapping = player.colourMapping || new Map();
+        player.colourMapping.set(overridePlayer, colour);
+
+        await game.save();
     }
 
     generateTeamColourShapeList(teamCount: number, playersPerTeam: number): Record<number, PlayerColourShapeCombination[]> {

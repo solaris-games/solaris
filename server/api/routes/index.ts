@@ -21,6 +21,7 @@ import registerTradeRoutes from './trade';
 import registerUserRoutes from './user';
 import registerSpectatorRoutes from './spectator';
 import registerAnnouncementsRoutes from './announcements';
+import registerColourRoutes from './colour';
 import {SingleRouter} from "../singleRoute";
 
 export default (router: SingleRouter, container: DependencyContainer, middleware: MiddlewareContainer) => {
@@ -45,6 +46,7 @@ export default (router: SingleRouter, container: DependencyContainer, middleware
     registerTradeRoutes(router, middleware, validator, container);
     registerUserRoutes(router, middleware, validator, container);
     registerSpectatorRoutes(router, middleware, validator, container);
+    registerColourRoutes(router, middleware, container);
 
     return router;
 }
