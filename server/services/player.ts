@@ -161,7 +161,8 @@ export default class PlayerService extends EventEmitter {
             reputations: [],
             diplomacy: [],
             spectators: [],
-            scheduledActions: []
+            scheduledActions: [],
+            colourMapping: new Map(),
         };
 
         return player;
