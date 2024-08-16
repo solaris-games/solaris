@@ -4,7 +4,7 @@ import {SingleRouter} from "../singleRoute";
 import ColourController from '../controllers/colour';
 
 export default (router: SingleRouter, mw: MiddlewareContainer, container: DependencyContainer) => {
-    const controller = new ColourController(container);
+    const controller = ColourController(container);
 
     router.put('/api/game/:gameId/colour/override',
         mw.auth.authenticate(),
