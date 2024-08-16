@@ -27,7 +27,7 @@ export default {
     mounted() {
       this.player = GameHelper.getPlayerById(this.$store.state.game, this.playerId)
 
-      this.iconColour = !this.colour ? GameHelper.getFriendlyColour(this.$store.getters.getColourForPlayer(this.playerId)).value : this.colour
+      this.iconColour = !this.colour ? GameHelper.getFriendlyColour(this.$store.getters.getColourForPlayer(this.playerId).value) : this.colour
 
       let isHiddenPlayerOnlineStatus = GameHelper.isHiddenPlayerOnlineStatus(this.$store.state.game)
 

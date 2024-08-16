@@ -5,7 +5,6 @@ import eventBus from './eventBus'
 import GameHelper from './services/gameHelper'
 import GameContainer from './game/container'
 import SpecialistService from './services/api/specialist';
-import gameHelper from "./services/gameHelper";
 
 Vue.use(Vuex)
 
@@ -144,7 +143,7 @@ export default new Vuex.Store({
     },
 
     addColourMapping (state, data) {
-      gameHelper.getColourMapping(state.game).set(data.playerId, data.colour)
+      GameHelper.getColourMapping(state.game).set(data.playerId, data.colour)
     },
 
     setSettings (state, settings) {
@@ -501,9 +500,9 @@ export default new Vuex.Store({
     },
     getColourForPlayer: (state) => (playerId) => {
       if (state.colourOverride) {
-        return gameHelper.getColourMapping(state.game).get(playerId)
+        return GameHelper.getColourMapping(state.game)?.get(playerId) || GameHelper.getPlayerById(state.game, playerId).colour;
       } else {
-        return gameHelper.getPlayerById(state.game, playerId).colour
+        return GameHelper.getPlayerById(state.game, playerId).colour
       }
     }
   },
