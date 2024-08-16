@@ -5,6 +5,7 @@ import eventBus from './eventBus'
 import GameHelper from './services/gameHelper'
 import GameContainer from './game/container'
 import SpecialistService from './services/api/specialist';
+import gameHelper from "./services/gameHelper";
 
 Vue.use(Vuex)
 
@@ -25,7 +26,8 @@ export default new Vuex.Store({
     starSpecialists: null,
     carrierSpecialists: null,
     settings: null,
-    confirmationDialog: {}
+    confirmationDialog: {},
+    colourOverride: true,
   },
   mutations: {
     // Menu
@@ -134,6 +136,15 @@ export default new Vuex.Store({
       state.currentConversation = null;
       state.carrierSpecialists = null;
       state.starSpecialists = null;
+      state.colourOverride = true;
+    },
+
+    setColourOverride (state, value) {
+      state.colourOverride = value
+    },
+
+    addColourMapping (state, data) {
+      gameHelper.getColourMapping(state.game).set(data.playerId, data.colour)
     },
 
     setSettings (state, settings) {
@@ -487,6 +498,13 @@ export default new Vuex.Store({
   getters: {
     getConversationMessage: (state) => (conversationId) => {
       return state.cachedConversationComposeMessages[conversationId] || ''
+    },
+    getColourForPlayer: (state) => (playerId) => {
+      if (state.colourOverride) {
+        return gameHelper.getColourMapping(state.game).get(playerId)
+      } else {
+        return gameHelper.getPlayerById(state.game, playerId).colour
+      }
     }
   },
   plugins: [vuexPersist.plugin]

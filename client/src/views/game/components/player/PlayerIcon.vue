@@ -27,7 +27,7 @@ export default {
     mounted() {
       this.player = GameHelper.getPlayerById(this.$store.state.game, this.playerId)
 
-      this.iconColour = !this.colour ? GameHelper.getFriendlyColour(this.player.colour.value) : this.colour
+      this.iconColour = !this.colour ? GameHelper.getFriendlyColour(this.$store.getters.getColourForPlayer(this.playerId)).value : this.colour
 
       let isHiddenPlayerOnlineStatus = GameHelper.isHiddenPlayerOnlineStatus(this.$store.state.game)
 
@@ -63,7 +63,7 @@ export default {
   margin-right: -6px;
 }
 
-@media screen and (max-width: 576px) { 
+@media screen and (max-width: 576px) {
   .span-container {
     height: 10px;
     width: 10px;

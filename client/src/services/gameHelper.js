@@ -7,6 +7,10 @@ class GameHelper {
     return game.galaxy.players.find(p => p.userId)
   }
 
+  getColourMapping (game) {
+    return this.getUserPlayer(game).colourMapping
+  }
+
   getPlayerByAlias (game, playerName) {
     return game.galaxy.players.find(p => p.alias === playerName)
   }
@@ -630,10 +634,10 @@ class GameHelper {
 
     if (this.isConquestHomeStars(game)) {
       return true;
-    } 
+    }
 
     const player = this.getPlayerById(game, star.ownedByPlayerId)
-    if (this.isCapitalElimination(game) && this.isOwnerCapital(game, star) && !player.defeated) { 
+    if (this.isCapitalElimination(game) && this.isOwnerCapital(game, star) && !player.defeated) {
       return true;
     }
 
