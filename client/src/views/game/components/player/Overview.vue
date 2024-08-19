@@ -4,10 +4,10 @@
 
   <div class="row pt-0">
       <div class="col-auto text-center ps-0 pe-0">
-        <img v-if="player.avatar" :src="getAvatarImage()">
+        <img v-if="player.avatar" :src="getAvatarImage()" :alt="player.alias">
         <i v-if="!player.avatar" class="far fa-user me-2 mt-2 ms-2 mb-2" style="font-size:100px;"></i>
       </div>
-      <div class="col  bg-dark">
+      <div class="col bg-dark">
           <statistics :playerId="playerId"/>
       </div>
   </div>
@@ -25,6 +25,10 @@
       </button>
     </div>
     <div class="col-auto">
+      <button class="btn btn-primary me-1" @click="onViewColourOverrideRequested">
+        <i class="fas fa-paint-brush" />
+        <span class="d-none d-md-inline-block ms-1">Override colour</span>
+      </button>
       <button class="btn btn-success me-1" @click="onViewConversationRequested"
         :class="{'btn-warning': conversation && conversation.unreadCount}"
         v-if="canCreateConversation">
@@ -76,6 +80,9 @@ export default {
     await this.loadConversation()
   },
   methods: {
+    onViewColourOverrideRequested (e) {
+      this.$emit('onViewColourOverrideRequested', this.playerId);
+    },
     onViewConversationRequested (e) {
       if (this.conversation) {
         eventBus.$emit('onViewConversationRequested', {
@@ -111,7 +118,7 @@ export default {
         return require(`../../../../assets/avatars/${this.player.avatar}`)
       } catch (err) {
         console.error(err)
-        
+
         return null
       }
     },

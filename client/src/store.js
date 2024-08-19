@@ -5,6 +5,7 @@ import eventBus from './eventBus'
 import GameHelper from './services/gameHelper'
 import GameContainer from './game/container'
 import SpecialistService from './services/api/specialist';
+import ColourService from './services/api/colour';
 
 Vue.use(Vuex)
 
@@ -27,6 +28,7 @@ export default new Vuex.Store({
     settings: null,
     confirmationDialog: {},
     colourOverride: true,
+    coloursConfig: null,
   },
   mutations: {
     // Menu
@@ -140,10 +142,6 @@ export default new Vuex.Store({
 
     setColourOverride (state, value) {
       state.colourOverride = value
-    },
-
-    addColourMapping (state, data) {
-      GameHelper.getColourMapping(state.game).set(data.playerId, data.colour)
     },
 
     setSettings (state, settings) {
@@ -451,6 +449,13 @@ export default new Vuex.Store({
       let star = GameHelper.starInfrastructureUpgraded(state.game, data)
       GameContainer.reloadStar(star)
     },
+
+    internalAddColourMapping (state, data) {
+      GameHelper.getColourMapping(state.game).set(data.playerId, data.colour)
+    },
+    setColoursConfig (state, data) {
+      state.coloursConfig = data;
+    }
   },
   actions: {
     async loadSpecialistData ({ commit, state }) {
@@ -465,6 +470,11 @@ export default new Vuex.Store({
 
       commit('setCarrierSpecialists', responses[0].data)
       commit('setStarSpecialists', responses[1].data)
+    },
+    async loadColourData ({ commit, state }) {
+      const resp = await ColourService.listColours();
+
+      commit('setColoursConfig', resp.data);
     },
     async confirm ({ commit, state }, data) {
       const modal = new bootstrap.Modal(window.$('#confirmModal'), {})
@@ -492,7 +502,11 @@ export default new Vuex.Store({
         commit('setConfirmationDialogSettings', settings)
         modal.toggle()
       })
-    }
+    },
+    async addColourMapping ({ commit, state }, data) {
+      // TODO: Backend request
+      commit('internalAddColourMapping', data);
+    },
   },
   getters: {
     getConversationMessage: (state) => (conversationId) => {

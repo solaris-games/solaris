@@ -1,0 +1,84 @@
+<template>
+  <div class="modal fade" id="colourOverride" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content" v-if="player">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalLabel">{{ title }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="colour">Colour</label>
+            <span class="override-current-colour" :style="{ 'background-color': toColourValue(currentColour.value) }" />
+            <select v-model="currentColour">
+              <option v-for="colour in $store.state.coloursConfig" :value="colour.alias">{{ colour.alias }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button @click="onCancel" type="button" class="btn btn-outline-danger ps-3 pe-3" data-bs-dismiss="modal">
+            <i class="fas fa-times"></i> Cancel
+          </button>
+          <button @click="onConfirm" type="button" class="btn btn-success ps-3 pe-3" data-bs-dismiss="modal">
+            <i class="fas fa-check"></i> Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import gameHelper from "../../../../services/gameHelper";
+
+export default {
+  name: "ColourOverrideDialog.vue",
+  props: {
+    playerId: String,
+  },
+  data () {
+    return {
+      currentColour: null,
+      player: null,
+      modal: null,
+    }
+  },
+  mounted () {
+    this.modal = new bootstrap.Modal(document.getElementById("colourOverride"));
+    this.modal.toggle();
+    this.player = gameHelper.getPlayerById(this.$store.state.game, this.playerId);
+    this.currentColour = this.player.colour.alias;
+  },
+  methods: {
+    onCancel () {
+
+    },
+    onConfirm () {
+      this.store.dispatch('addColourMapping', {
+        playerId: this.player._id,
+        colour: {
+          alias: this.currentColour,
+          value: this.toColourValue(this.currentColour)
+        }
+      })
+    },
+    toColourValue (alias) {
+      return this.$store.state.coloursConfig.find(colour => colour.alias === alias)?.value
+    }
+  },
+  computed: {
+    title () {
+      return `Override ${this.player.name}'s colour`
+    }
+  }
+}
+</script>
+
+<style scoped>
+.override-current-colour {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-left: 10px;
+}
+</style>
