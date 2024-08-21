@@ -48,19 +48,21 @@ export default {
     this.modal.toggle();
     this.player = gameHelper.getPlayerById(this.$store.state.game, this.playerId);
     this.currentColour = this.player.colour.alias;
+    console.log(this.currentColour);
   },
   methods: {
     onCancel () {
-
+      this.$emit('onColourOverrideCancelled');
     },
     onConfirm () {
-      this.store.dispatch('addColourMapping', {
+      this.$store.dispatch('addColourMapping', {
         playerId: this.player._id,
         colour: {
           alias: this.currentColour,
           value: this.toColourValue(this.currentColour)
         }
-      })
+      });
+      this.$emit('onColourOverrideConfirmed');
     },
     toColourValue (alias) {
       return this.$store.state.coloursConfig.find(colour => colour.alias === alias)?.value
@@ -68,7 +70,7 @@ export default {
   },
   computed: {
     title () {
-      return `Override ${this.player.name}'s colour`
+      return `Override ${this.player.alias}'s colour`
     }
   }
 }

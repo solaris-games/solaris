@@ -8,7 +8,14 @@ class GameHelper {
   }
 
   getColourMapping (game) {
-    return this.getUserPlayer(game).colourMapping
+    const userPlayer = this.getUserPlayer(game);
+
+    if (userPlayer.colourMapping) {
+      return userPlayer.colourMapping;
+    } else {
+      userPlayer.colourMapping = new Map();
+      return userPlayer.colourMapping;
+    }
   }
 
   getPlayerByAlias (game, playerName) {

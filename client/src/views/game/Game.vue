@@ -7,7 +7,7 @@
     <div v-if="hasGame">
         <span class="d-none">{{ gameId }}</span>
 
-      <colour-override-dialog v-if="colourOverride" :playerId="colourOverride.playerId" />
+      <colour-override-dialog v-if="colourOverride" :playerId="colourOverride.playerId" @onColourOverrideCancelled="onColourOverrideCancelled" @onColourOverrideConfirmed="onColourOverrideConfirmed" />
 
       <game-container @onStarClicked="onStarClicked"
                     @onStarRightClicked="onStarRightClicked"
@@ -133,6 +133,12 @@ export default {
     document.title = 'Solaris'
   },
   methods: {
+    onColourOverrideConfirmed (e) {
+      this.colourOverride = null;
+    },
+    onColourOverrideCancelled (e) {
+      this.colourOverride = null;
+    },
     onViewColourOverrideRequested (e) {
       this.colourOverride = {
         playerId: e
