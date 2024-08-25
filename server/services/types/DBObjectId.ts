@@ -7,4 +7,4 @@ export interface DBObjectId extends ObjectId {
     toString(): string;
 };
 
-export const objectId = (): DBObjectId => new mongoose.Types.ObjectId() as any;
+export const objectId = (id?: string | number | MongoObjectId | undefined): DBObjectId => new MongoObjectId(id) as unknown as DBObjectId;

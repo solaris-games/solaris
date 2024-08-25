@@ -1,15 +1,16 @@
-import { DBObjectId } from "./types/DBObjectId";
+import { Carrier, CarrierPosition } from "./types/Carrier";
 import { Game } from "./types/Game";
 import { User } from "./types/User";
-import { Carrier, CarrierPosition } from "./types/Carrier";
 
 import CarrierMovementService from "./carrierMovement";
+import CombatService from "./combat";
+import CombatGroupService from "./combatGroup";
 import DiplomacyService from "./diplomacy";
 import DistanceService from "./distance";
 import PlayerService from "./player";
-import StarService from "./star";
-import CombatService from "./combat";
 import SpecialistService from "./specialist";
+import StarService from "./star";
+import { CarrierCollision } from "./types/CarrierCollision";
 
 export default class CarrierCombatService {
 
@@ -20,16 +21,16 @@ export default class CarrierCombatService {
     playerService: PlayerService;
     specialistService: SpecialistService;
     starService: StarService;
+    combatGroupService: CombatGroupService;
 
-    constructor(
-        carrierMovementService: CarrierMovementService,
-        combatService: CombatService,
-        diplomacyService: DiplomacyService,
-        distanceService: DistanceService,
-        playerService: PlayerService,
-        specialistService: SpecialistService,
-        starService: StarService
-    ) {
+    constructor(carrierMovementService: CarrierMovementService,
+                combatService: CombatService,
+                diplomacyService: DiplomacyService,
+                distanceService: DistanceService,
+                playerService: PlayerService,
+                specialistService: SpecialistService,
+                starService: StarService,
+                combatGroupService: CombatGroupService) {
         this.carrierMovementService = carrierMovementService;
         this.combatService = combatService;
         this.diplomacyService = diplomacyService;
@@ -37,11 +38,10 @@ export default class CarrierCombatService {
         this.playerService = playerService;
         this.specialistService = specialistService;
         this.starService = starService;
+        this.combatGroupService = combatGroupService;
     }
 
-    async combatCarriers(game: Game, gameUsers: User[]) {
-        const isAlliancesEnabled = this.diplomacyService.isFormalAlliancesEnabled(game);
-    
+    async combatCarriers(game: Game, gameUsers: User[]) {    
         // Get all carriers that are in transit, their current locations
         // and where they will be moving to.
         const carrierPositions: CarrierPosition[] = game.galaxy.carriers
@@ -103,23 +103,22 @@ export default class CarrierCombatService {
                 continue;
             }
             
-            let collisions: any = this._getDualCollisionsInPath(positions);
+            let collisions: CarrierCollision[] = this._getDualCollisionsInPath(positions);
             this._mergeCollisionsinPath(collisions);
 
             // A collision will at this point be cleaned up to a list of carriers
             for(let collision of collisions) {
                 // It could very well be that in a previous collision, carriers were destroyed/reduced to 0 ships.
-                collision.filter(c => c.ships > 0)
+                collision.carriers.filter(c => c.ships! > 0)
 
                 // This gets all the player ids of the players involved, and removes duplicates.
-                let playersIds = [...new Set(collision.map(c => c.ownedByPlayerId.toString()))]
+                let playersIds = [...new Set(collision.carriers.map(c => c.ownedByPlayerId!.toString()))]
 
                 // Now if we have little carriers remaining due to a previous filter, or if all are owned by the same player,
                 // we quit the process here as no combat has to occur.
                 if(playersIds.length <= 1) continue;
-                if(isAlliancesEnabled) {
-                    // Check if combat has to happen with the players involved
-                }
+
+                this.combatGroupService.getCombatGroups(game, collision.carriers);
 
                 // TODO: Code how this works ;D
                 await this._performCarrierCombat(game, gameUsers, collision)
@@ -237,8 +236,8 @@ export default class CarrierCombatService {
         return graph;
     }
 
-    _getDualCollisionsInPath(positions: CarrierPosition[]) {
-        let collisionList: any = [];
+    _getDualCollisionsInPath(positions: CarrierPosition[]) : CarrierCollision[] {
+        let collisionList: CarrierCollision[] = [];
 
         // In order to be able to check if carriers intersect at the same place, we need the distance to a fixed star, which must exist.
         // As the source star can be destroyed we need a destination for that. Now the distance to that star can be used to check if carriers are in the same place.
