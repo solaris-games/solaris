@@ -44,7 +44,7 @@
     "carrierSpeed": 10,
     "starCaptureReward": "enabled",
     "specialistBans": {
-      "star": [],
+      "star": [16, 17],
       "carrier": []
     }
   },
@@ -117,7 +117,7 @@
   },
   "gameTime": {
     "gameType": "realTime",
-    "speed": 1800,
+    "speed": 3600,
     "isTickLimited": "disabled",
     "startDelay": 60,
     "afk": {

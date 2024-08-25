@@ -44,7 +44,7 @@
     "carrierSpeed": 10,
     "starCaptureReward": "enabled",
     "specialistBans": {
-      "star": [],
+      "star": [16, 17],
       "carrier": []
     }
   },
@@ -119,11 +119,11 @@
     "gameType": "turnBased",
     "isTickLimited": "disabled",
     "turnJumps": 6,
-    "maxTurnWait": 1440,
+    "maxTurnWait": 720,
     "afk": {
       "lastSeenTimeout": 2,
       "cycleTimeout": 3,
-      "turnTimeout": 3
+      "turnTimeout": 5
     }
   }
 }
