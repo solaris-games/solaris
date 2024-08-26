@@ -182,8 +182,8 @@ export default class GameCreateService {
                 throw new ValidationError(`Cannot create a galaxy of ${desiredStarCount} stars with ${game.settings.player.startingStars} stars per player.`);
             }
 
-            if (desiredStarCount > 1000) {
-                throw new ValidationError(`Galaxy size cannot exceed 1000 stars.`);
+            if (desiredStarCount > 1500) {
+                throw new ValidationError(`Galaxy size cannot exceed 1500 stars.`);
             }
         } else {
             // TODO: Validation needs to be better and in one place. Also, we should provide a schema
