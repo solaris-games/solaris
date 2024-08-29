@@ -86,7 +86,7 @@ export default {
       return gameHelper.getPlayerById(this.$store.state.game, playerId)
     },
     getPlayerColour (playerId) {
-      return gameHelper.getPlayerColour(this.$store.state.game, playerId)
+      return this.$store.getters.getColourForPlayer(playerId).value
     },
     getConversationsHasUnread () {
       if (!this.conversations) {

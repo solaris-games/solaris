@@ -1,7 +1,7 @@
 <template>
   <tr>
-    <td :style="{'width': '8px', 'background-color': getFriendlyColour(player.colour.value)}"></td>
-    <td class="col-avatar" :title="player.colour.alias + ' ' + player.shape">
+    <td :style="{'width': '8px', 'background-color': playerColourSpec.value}"></td>
+    <td class="col-avatar" :title="playerColourSpec.alias + ' ' + player.shape">
       <player-avatar :player="player" @onClick="onOpenPlayerDetailRequested(player)"/>
     </td>
     <td class="ps-2 pt-3 pb-0">
@@ -134,6 +134,9 @@ export default {
     shouldShowTeamNames () {
       return this.showTeamNames && GameHelper.isTeamConquest(this.$store.state.game)
     },
+    playerColourSpec () {
+      return this.$store.getters.getColourForPlayer(this.player._id)
+    }
   }
 }
 </script>

@@ -13,7 +13,7 @@ class GameHelper {
     if (userPlayer.colourMapping) {
       return userPlayer.colourMapping;
     } else {
-      userPlayer.colourMapping = new Map();
+      userPlayer.colourMapping = {};
       return userPlayer.colourMapping;
     }
   }

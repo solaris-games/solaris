@@ -451,7 +451,7 @@ export default new Vuex.Store({
     },
 
     internalAddColourMapping (state, data) {
-      GameHelper.getColourMapping(state.game).set(data.playerId, data.colour)
+      GameHelper.getColourMapping(state.game)[data.playerId] = data.colour;
     },
     setColoursConfig (state, data) {
       state.coloursConfig = data;
@@ -516,7 +516,7 @@ export default new Vuex.Store({
     },
     getColourForPlayer: (state) => (playerId) => {
       if (state.colourOverride) {
-        return GameHelper.getColourMapping(state.game)?.get(playerId) || GameHelper.getPlayerById(state.game, playerId).colour;
+        return GameHelper.getColourMapping(state.game)?.[playerId] || GameHelper.getPlayerById(state.game, playerId).colour;
       } else {
         return GameHelper.getPlayerById(state.game, playerId).colour
       }

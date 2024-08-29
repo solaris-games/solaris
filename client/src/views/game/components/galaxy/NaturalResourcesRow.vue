@@ -31,7 +31,7 @@ export default {
   },
   methods: {
     getColour () {
-      return gameHelper.getPlayerColour(this.$store.state.game, this.star.ownedByPlayerId)
+      return this.$store.getters.getColourForPlayer(this.star.ownedByPlayerId).value
     },
     clickStar (e) {
       this.$emit('onOpenStarDetailRequested', this.star._id)

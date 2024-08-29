@@ -100,7 +100,7 @@ export default {
       }
     },
     getFromPlayerColour () {
-      return GameHelper.getPlayerColour(this.$store.state.game, this.getFromPlayer()._id)
+      return this.$store.getters.getColourForPlayer(this.getFromPlayer()._id).value
     },
     getFormattedDebtValue(withText = false) {
       if (this.event.data.ledgerType === 'credits') {

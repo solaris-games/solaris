@@ -57,7 +57,9 @@ export default {
     }
   },
   mounted () {
-    this.colour = this.getFriendlyColour(this.player.colour.value)
+    this.colour = this.getFriendlyColour(
+      this.$store.getters.getColourForPlayer(this.player._id).value
+    )
   },
   methods: {
     getFriendlyColour (colour) {

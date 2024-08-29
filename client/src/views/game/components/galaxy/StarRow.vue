@@ -52,7 +52,7 @@ export default {
   },
   methods: {
     getColour () {
-      return gameHelper.getPlayerColour(this.$store.state.game, this.star.ownedByPlayerId)
+      return this.$store.getters.getColourForPlayer(this.star.ownedByPlayerId).value
     },
     clickStar (e) {
       this.$emit('onOpenStarDetailRequested', this.star._id)
@@ -61,7 +61,7 @@ export default {
       gameContainer.map.panToStar(this.star)
     },
     async upgradeEconomy (e) {
-      if (this.$store.state.settings.star.confirmBuildEconomy === 'enabled' 
+      if (this.$store.state.settings.star.confirmBuildEconomy === 'enabled'
         && !await this.$confirm('Upgrade Economy', `Are you sure you want to upgrade Economy at ${this.star.name} for $${this.star.upgradeCosts.economy} credits?`)) {
         return
       }
@@ -85,7 +85,7 @@ export default {
       this.isUpgradingEconomy = false
     },
     async upgradeIndustry (e) {
-      if (this.$store.state.settings.star.confirmBuildIndustry === 'enabled' 
+      if (this.$store.state.settings.star.confirmBuildIndustry === 'enabled'
         && !await this.$confirm('Upgrade Industry', `Are you sure you want to upgrade Industry at ${this.star.name} for $${this.star.upgradeCosts.industry} credits?`)) {
         return
       }
@@ -109,7 +109,7 @@ export default {
       this.isUpgradingIndustry = false
     },
     async upgradeScience (e) {
-      if (this.$store.state.settings.star.confirmBuildScience === 'enabled' 
+      if (this.$store.state.settings.star.confirmBuildScience === 'enabled'
         && !await this.$confirm('Upgrade Science', `Are you sure you want to upgrade Science at ${this.star.name} for $${this.star.upgradeCosts.science} credits?`)) {
         return
       }

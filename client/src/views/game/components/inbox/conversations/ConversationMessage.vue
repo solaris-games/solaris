@@ -2,7 +2,7 @@
   <div class="container message-container"
     :class="{'left-message': !isFromUserPlayer, 'right-message': isFromUserPlayer,
             'bg-dark': !message.pinned, 'bg-secondary': message.pinned}">
-    <div class="row mt-0" v-if="fromPlayer" :style="{'background-color': getFriendlyColour(fromPlayer.colour.value)}" style="height:6px;"></div>
+    <div class="row mt-0" v-if="fromPlayer" :style="{'background-color': fromColour}" style="height:6px;"></div>
     <div class="row mt-0" v-if="message">
       <div class="col mt-1 mb-0">
         <span class="pointer" @click="onOpenPlayerDetailRequested">
@@ -106,6 +106,9 @@ export default {
         tick = ` (tick ${this.message.sentTick})`
       }
       return date + tick
+    },
+    fromColour () {
+      return this.$store.getters.getColourForPlayer(this.fromPlayer._id).value
     }
   }
 }

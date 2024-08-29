@@ -26,7 +26,7 @@ export default {
   },
   methods: {
     getColour () {
-      return gameHelper.getPlayerColour(this.$store.state.game, this.ship.ownedByPlayerId)
+      return this.$store.getters.getColourForPlayer(this.ship.ownedByPlayerId).value
     },
     clickShip (e) {
       if (this.ship.type == 0) {

@@ -47,7 +47,7 @@ export default {
   },
   methods: {
     getColour () {
-      return GameHelper.getPlayerColour(this.$store.state.game, this.carrier.ownedByPlayerId)
+      return this.$store.getters.getColourForPlayer(this.carrier.ownedByPlayerId).value
     },
     clickCarrier (e) {
       this.$emit('onOpenCarrierDetailRequested', this.carrier._id)

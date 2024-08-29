@@ -71,9 +71,9 @@
               :class="{'btn-primary': playerFilter.enabled}"
               @click="togglePlayerFilter(playerFilter)"
               :title="playerFilter.alias">
-              <player-icon 
-                :playerId="playerFilter.playerId" 
-                :hideOnlineStatus="true" 
+              <player-icon
+                :playerId="playerFilter.playerId"
+                :hideOnlineStatus="true"
                 :solidGlyphOnly="true"
                 :colour="playerFilter.colour"
                 style="margin-top:0px;margin-right:0px;"/>
@@ -148,7 +148,7 @@ export default {
         alias: p.alias,
         shape: p.shape,
         defeated: p.defeated,
-        colour: isCurrentPlayer ? '#FFFFFF' : GameHelper.getFriendlyColour(p.colour.value) //p.colour // GameHelper.getPlayerColour(this.$store.state.game, p._id)
+        colour: isCurrentPlayer ? '#FFFFFF' : GameHelper.getFriendlyColour(p.colour.value)
       }
     })
 
@@ -186,7 +186,7 @@ export default {
         text: 'All',
         value: 0
       })
-      
+
       this.startTick = this.startTickOptions[this.startTickOptions.length - 2].value
     },
     async reloadData () {
@@ -204,7 +204,7 @@ export default {
       }
     },
     getPlayerColour (player) {
-      return GameHelper.getPlayerColour(this.$store.state.game, player._id)
+      return this.$store.getters.getColourForPlayer(player._id).value
     },
     togglePlayerFilter (playerFilter) {
       playerFilter.enabled = !playerFilter.enabled
@@ -256,7 +256,7 @@ export default {
 
         let dataset = {
           label: player.alias,
-          borderColor: isCurrentPlayer ? '#FFFFFF' : GameHelper.getFriendlyColour(player.colour.value),
+          borderColor: isCurrentPlayer ? '#FFFFFF' : GameHelper.getFriendlyColour(this.$store.getters.getColourForPlayer(player._id).value),
           fill: false,
           pointRadius: 0,
           borderWidth: 3,
