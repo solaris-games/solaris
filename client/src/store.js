@@ -6,6 +6,7 @@ import GameHelper from './services/gameHelper'
 import GameContainer from './game/container'
 import SpecialistService from './services/api/specialist';
 import ColourService from './services/api/colour';
+import gameHelper from "./services/gameHelper";
 
 Vue.use(Vuex)
 
@@ -29,6 +30,7 @@ export default new Vuex.Store({
     confirmationDialog: {},
     colourOverride: true,
     coloursConfig: null,
+    colourMapping: {}
   },
   mutations: {
     // Menu
@@ -130,6 +132,7 @@ export default new Vuex.Store({
 
     setGame (state, game) {
       state.game = game
+      state.colourMapping = {...GameHelper.getColourMapping(game)};
     },
     clearGame (state) {
       state.game = null
@@ -138,6 +141,7 @@ export default new Vuex.Store({
       state.carrierSpecialists = null;
       state.starSpecialists = null;
       state.colourOverride = true;
+      state.colourMapping = {};
     },
 
     setColourOverride (state, value) {
@@ -451,7 +455,12 @@ export default new Vuex.Store({
     },
 
     internalAddColourMapping (state, data) {
-      GameHelper.getColourMapping(state.game)[data.playerId] = data.colour;
+      console.log('internalAddColourMapping', data);
+
+      state.colourMapping = {
+        ...state.colourMapping,
+        [data.playerId]: data.colour
+      };
     },
     setColoursConfig (state, data) {
       state.coloursConfig = data;
@@ -516,7 +525,7 @@ export default new Vuex.Store({
     },
     getColourForPlayer: (state) => (playerId) => {
       if (state.colourOverride) {
-        return GameHelper.getColourMapping(state.game)?.[playerId] || GameHelper.getPlayerById(state.game, playerId).colour;
+        return state.colourMapping?.[playerId] || GameHelper.getPlayerById(state.game, playerId).colour;
       } else {
         return GameHelper.getPlayerById(state.game, playerId).colour
       }
