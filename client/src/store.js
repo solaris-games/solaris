@@ -455,8 +455,6 @@ export default new Vuex.Store({
     },
 
     internalAddColourMapping (state, data) {
-      console.log('internalAddColourMapping', data);
-
       state.colourMapping = {
         ...state.colourMapping,
         [data.playerId]: data.colour

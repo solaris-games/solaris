@@ -203,9 +203,6 @@ export default {
         console.error(err)
       }
     },
-    getPlayerColour (player) {
-      return this.$store.getters.getColourForPlayer(player._id).value
-    },
     togglePlayerFilter (playerFilter) {
       playerFilter.enabled = !playerFilter.enabled
 
@@ -298,7 +295,7 @@ export default {
     isSpecialistsTechnologyEnabled () {
       return GameHelper.isSpecialistsTechnologyEnabled(this.$store.state.game)
     }
-  }
+  },
 }
 </script>
 

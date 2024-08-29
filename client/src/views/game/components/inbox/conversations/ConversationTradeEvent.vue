@@ -2,7 +2,7 @@
 <div class="container bg-dark mb-1"
     v-if="event"
     :class="{'left-message': !isFromUserPlayer, 'right-message': isFromUserPlayer}">
-    <div class="row mt-0" :style="{'background-color': getFromPlayerColour()}" style="height:6px;"></div>
+    <div class="row mt-0" :style="{'background-color': fromPlayerColour }" style="height:6px;"></div>
     <div class="row mt-0 ">
       <div class="col"></div>
       <div class="col-auto">
@@ -99,9 +99,6 @@ export default {
           return GameHelper.getPlayerById(this.$store.state.game, this.event.data.playerIdFrom)
       }
     },
-    getFromPlayerColour () {
-      return this.$store.getters.getColourForPlayer(this.getFromPlayer()._id).value
-    },
     getFormattedDebtValue(withText = false) {
       if (this.event.data.ledgerType === 'credits') {
         return `$${this.event.data.amount} credits`
@@ -121,6 +118,9 @@ export default {
         tick = ` (tick ${this.event.sentTick})`
       }
       return date + tick
+    },
+    fromPlayerColour () {
+      return this.$store.getters.getColourForPlayer(this.getFromPlayer()._id).value
     }
   }
 }

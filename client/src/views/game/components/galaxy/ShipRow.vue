@@ -1,6 +1,6 @@
 <template>
 <tr>
-    <td><i class="fas fa-circle" v-if="ship.ownedByPlayerId" :style="{ 'color': getColour() }"></i></td>
+    <td><i class="fas fa-circle" v-if="ship.ownedByPlayerId" :style="{ 'color': colour }"></i></td>
     <td><a href="javascript:;" @click="clickShip">{{ship.name}}</a></td>
     <td><a href="javascript:;" @click="goToShip"><i class="far fa-eye"></i></a></td>
     <td>
@@ -25,9 +25,6 @@ export default {
     ship: Object
   },
   methods: {
-    getColour () {
-      return this.$store.getters.getColourForPlayer(this.ship.ownedByPlayerId).value
-    },
     clickShip (e) {
       if (this.ship.type == 0) {
         this.$emit('onOpenStarDetailRequested', this.ship._id)
@@ -37,6 +34,11 @@ export default {
     },
     goToShip (e) {
       gameContainer.map.panToLocation(this.ship.location)
+    }
+  },
+  computed: {
+    colour () {
+      return this.$store.getters.getColourForPlayer(this.carrier.ownedByPlayerId).value
     }
   }
 }
