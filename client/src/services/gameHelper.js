@@ -10,6 +10,11 @@ class GameHelper {
   getColourMapping (game) {
     const userPlayer = this.getUserPlayer(game);
 
+    // spectating
+    if (!userPlayer) {
+      return {};
+    }
+
     if (userPlayer.colourMapping) {
       return userPlayer.colourMapping;
     } else {
