@@ -97,8 +97,10 @@ class Waypoints extends EventEmitter {
 
     let radius = ((this.carrier.effectiveTechs.hyperspace || 1) + 1.5) * this.lightYearDistance
 
-    graphics.lineStyle(1, player.colour.value, 0.2)
-    graphics.beginFill(player.colour.value, 0.15)
+    const playerColour = this.context.getPlayerColour(player._id)
+
+    graphics.lineStyle(1, playerColour, 0.2)
+    graphics.beginFill(playerColour, 0.15)
     graphics.drawStar(lastLocationStar.location.x, lastLocationStar.location.y, radius, radius, radius - 3)
     graphics.endFill()
 

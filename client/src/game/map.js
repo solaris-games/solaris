@@ -139,7 +139,7 @@ class Map extends EventEmitter {
     // -----------
     // Setup Player Names
     this.playerNames = new PlayerNames()
-    this.playerNames.setup(game, userSettings)
+    this.playerNames.setup(game, userSettings, this.context)
 
     this.playerNamesContainer.addChild(this.playerNames.container)
     this.playerNames.draw()
@@ -568,7 +568,7 @@ class Map extends EventEmitter {
   }
 
   drawTerritories (userSettings) {
-    this.territories.setup(this.game, userSettings, context)
+    this.territories.setup(this.game, userSettings, this.context)
     this.territories.draw(userSettings)
   }
 
@@ -580,7 +580,7 @@ class Map extends EventEmitter {
   }
 
   drawPlayerNames () {
-    this.playerNames.setup(this.game, this.userSettings)
+    this.playerNames.setup(this.game, this.userSettings, this.context)
     this.playerNames.draw(this.userSettings)
   }
 

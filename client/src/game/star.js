@@ -213,7 +213,7 @@ class Star extends EventEmitter {
     Star.seededRNG.seed(seed)
 
     let player = this._getStarPlayer()
-    let playerColour = player ? player.colour.value : 0xFFFFFF
+    let playerColour = player ? this.context.getPlayerColour(player._id) : 0xFFFFFF
 
     this.pulsarGraphics = new PIXI.Graphics()
     this.pulsarGraphics.zIndex = -1
@@ -249,7 +249,7 @@ class Star extends EventEmitter {
     this.nebulaSprite.rotation = Star.seededRNG.random()*Math.PI*2.0
 
     let player = this._getStarPlayer()
-    let playerColour = player ? player.colour.value : 0xFFFFFF
+    let playerColour = player ? this.context.getPlayerColour(player._id): 0xFFFFFF
     this.nebulaSprite.tint = playerColour
     //this.nebulaSprite.blendMode = PIXI.BLEND_MODES.ADD // for extra punch
 
@@ -284,7 +284,7 @@ class Star extends EventEmitter {
     this.wormHoleSprite.alpha = 0.35
 
     let player = this._getStarPlayer()
-    let playerColour = player ? player.colour.value : 0xFFFFFF
+    let playerColour = player ? this.context.getPlayerColour(player._id) : 0xFFFFFF
     this.wormHoleSprite.tint = playerColour
     //this.asteroidFieldSprite.blendMode = PIXI.BLEND_MODES.ADD // for extra punch
 
@@ -311,7 +311,7 @@ class Star extends EventEmitter {
     this.asteroidFieldSprite.rotation = Star.seededRNG.random()*Math.PI*2.0
 
     let player = this._getStarPlayer()
-    let playerColour = player ? player.colour.value : 0xFFFFFF
+    let playerColour = player ? this.context.getPlayerColour(player._id) : 0xFFFFFF
     this.asteroidFieldSprite.tint = playerColour
     //this.asteroidFieldSprite.blendMode = PIXI.BLEND_MODES.ADD // for extra punch
 
@@ -391,7 +391,7 @@ class Star extends EventEmitter {
       }
 
       let player = this._getStarPlayer()
-      let playerColour = player ? player.colour.value : 0xFFFFFF
+      let playerColour = player ? this.context.getPlayerColour(player._id) : 0xFFFFFF
 
       let rotationDirection = this._getPlanetOrbitDirection()
       let rotationSpeedModifier = this._getPlanetOrbitSpeed()
@@ -526,8 +526,11 @@ class Star extends EventEmitter {
       this.graphics_shape_part = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS[player.shape][2+this.data.warpGate])
       this.graphics_shape_full = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS[player.shape][0+this.data.warpGate])
     }
-    this.graphics_shape_part.tint = player.colour.value
-    this.graphics_shape_full.tint = player.colour.value
+
+    const playerColour = this.context.getPlayerColour(player._id)
+
+    this.graphics_shape_part.tint = playerColour
+    this.graphics_shape_full.tint = playerColour
     this.graphics_shape_part.anchor.set(0.5)
     this.graphics_shape_full.anchor.set(0.5)
     this.graphics_shape_part.width = 28.0
@@ -691,7 +694,7 @@ class Star extends EventEmitter {
     let radius = ((this.data.effectiveTechs.scanning || 1) + 1) * this.lightYearDistance
 
     this.graphics_scanningRange.lineStyle(1, 0xFFFFFF, 0.2)
-    this.graphics_scanningRange.beginFill(player.colour.value, 0.075)
+    this.graphics_scanningRange.beginFill(this.context.getPlayerColour(player._id), 0.075)
     this.graphics_scanningRange.drawCircle(0, 0, radius)
     this.graphics_scanningRange.endFill()
     this.graphics_scanningRange.zIndex = -1
@@ -715,7 +718,7 @@ class Star extends EventEmitter {
     let radius = ((this.data.effectiveTechs.hyperspace || 1) + 1.5) * this.lightYearDistance
 
     this.graphics_hyperspaceRange.lineStyle(1, 0xFFFFFF, 0.2)
-    this.graphics_hyperspaceRange.beginFill(player.colour.value, 0.075)
+    this.graphics_hyperspaceRange.beginFill(this.context.getPlayerColour(player._id), 0.075)
     this.graphics_hyperspaceRange.drawStar(0, 0, radius, radius, radius - 3)
     this.graphics_hyperspaceRange.endFill()
     this.graphics_hyperspaceRange.zIndex = -1

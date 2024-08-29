@@ -11,10 +11,11 @@ class PlayerNames {
     this.zoomPercent = 0
   }
 
-  setup (game, userSettings) {
+  setup (game, userSettings, context) {
     this.game = game
 
     PlayerNames.zoomLevel = userSettings.map.zoomLevels.playerNames
+    this.context = context
   }
 
   draw () {
@@ -41,7 +42,7 @@ class PlayerNames {
       text_name.zIndex = 10
 
       let graphics = new PIXI.Graphics()
-      graphics.beginFill(player.colour.value)
+      graphics.beginFill(this.context.getPlayerColour(player._id))
       graphics.drawRoundedRect(-10, -10, text_name.width + 20, text_name.height + 20, 10)
       graphics.endFill()
       graphics.alpha = 0.7

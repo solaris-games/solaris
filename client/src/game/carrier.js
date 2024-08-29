@@ -43,7 +43,7 @@ class Carrier extends EventEmitter {
     this.stars = stars
     this.player = player
     this.context = context
-    this.colour = player.colour.value
+    this.colour = context.getPlayerColour(player._id)
     this.lightYearDistance = lightYearDistance
 
     this.container.position.x = data.location.x

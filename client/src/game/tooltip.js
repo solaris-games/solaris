@@ -59,7 +59,7 @@ export default class {
         }
 
         let graphics = new PIXI.Graphics()
-        graphics.lineStyle(1, player.colour.value)
+        graphics.lineStyle(1, this.context.getPlayerColour(player._id))
         graphics.beginFill(0x000000)
         graphics.drawRoundedRect(0, 0, internalContainer.width + (paddingX*2), internalContainer.height + (paddingY*2), 1)
         graphics.endFill()

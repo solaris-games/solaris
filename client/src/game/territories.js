@@ -170,7 +170,7 @@ class Territories {
     }
 
     for (let player of this.game.galaxy.players) {
-      let color = player.colour.value
+      let color = this.context.getPlayerColour(player._id)
       let territoryPolygons = new PIXI.Graphics()
       let territoryLines = new PIXI.Graphics()
       this.container.addChild(territoryPolygons)
@@ -305,7 +305,7 @@ class Territories {
       let colour = 0x000000
 
       if (star.ownedByPlayerId) {
-        colour = this.game.galaxy.players.find(p => p._id === star.ownedByPlayerId).colour.value
+        colour = this.context.getPlayerColour(star.ownedByPlayerId)
       }
 
       let points = []
@@ -359,7 +359,7 @@ class Territories {
       let colour = 0x000000
 
       if (border.lSite.playerID) {
-        colour = this.game.galaxy.players.find(p => p._id === border.lSite.playerID).colour.value
+        colour = this.context.getPlayerColour(border.lSite.playerID);
       }
 
       borderGraphics.lineStyle(borderWidth, colour)
@@ -369,7 +369,7 @@ class Territories {
       colour = 0x000000
 
       if (border.rSite.playerID) {
-        colour = this.game.galaxy.players.find(p => p._id === border.rSite.playerID).colour.value
+        colour = this.context.getPlayerColour(border.rSite.playerID)
       }
 
       borderGraphics.lineStyle(borderWidth, colour)

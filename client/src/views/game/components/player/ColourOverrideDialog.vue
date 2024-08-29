@@ -48,7 +48,6 @@ export default {
     this.modal.toggle();
     this.player = gameHelper.getPlayerById(this.$store.state.game, this.playerId);
     this.currentColour = this.$store.getters.getColourForPlayer(this.playerId).alias;
-    console.log(this.currentColour);
   },
   methods: {
     onCancel () {
