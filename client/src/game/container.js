@@ -4,6 +4,16 @@ import Map from './map'
 import gameHelper from '../services/gameHelper'
 import textureService from './texture'
 
+class DrawingContext {
+  constructor (store) {
+    this.store = store;
+  }
+
+  getPlayerColour (playerId) {
+    return this.store.getters.getColourForPlayer(playerId).value
+  }
+}
+
 class GameContainer {
 
 
@@ -68,6 +78,8 @@ class GameContainer {
 
   setupApp (store, userSettings) {
     this.store = store
+
+    this.context = new DrawingContext(store)
 
     // Cleanup if the app already exists.
     this.destroy()
@@ -173,11 +185,11 @@ class GameContainer {
     this.viewport.on('pointerdown', this.map.onViewportPointerDown.bind(this.map))
   }
 
-  setup (game, userSettings) {
+  setup (game, userSettings, context) {
     this.userSettings = userSettings
     textureService.initialize()
 
-    this.map.setup(this.game, userSettings)
+    this.map.setup(this.game, userSettings, context)
   }
 
   draw () {

@@ -106,11 +106,12 @@ class Star extends EventEmitter {
     return this._getStarCarriers().reduce((sum, c) => sum + (c.ships || 0), 0)
   }
 
-  setup (game, data, userSettings, players, carriers, lightYearDistance) {
+  setup (game, data, userSettings, context, players, carriers, lightYearDistance) {
     this.game = game
     this.data = data
     this.players = players
     this.carriers = carriers
+    this.context = context
     this.lightYearDistance = lightYearDistance
     this.container.position.x = this.data.location.x
     this.container.position.y = this.data.location.y
@@ -536,7 +537,7 @@ class Star extends EventEmitter {
     this.container.addChild(this.graphics_shape_part)
     this.container.addChild(this.graphics_shape_full)
   }
-  
+
 
   _hasUnknownShips() {
       let carriersOrbiting = this._getStarCarriers()

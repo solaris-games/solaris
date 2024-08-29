@@ -506,6 +506,8 @@ export default new Vuex.Store({
     async addColourMapping ({ commit, state }, data) {
       // TODO: Backend request
       commit('internalAddColourMapping', data);
+
+      GameContainer.reloadGame(state.game, state.settings);
     },
   },
   getters: {

@@ -47,7 +47,7 @@ export default {
     this.modal = new bootstrap.Modal(document.getElementById("colourOverride"));
     this.modal.toggle();
     this.player = gameHelper.getPlayerById(this.$store.state.game, this.playerId);
-    this.currentColour = this.player.colour.alias;
+    this.currentColour = this.$store.getters.getColourForPlayer(this.playerId).alias;
     console.log(this.currentColour);
   },
   methods: {

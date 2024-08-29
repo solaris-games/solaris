@@ -13,8 +13,9 @@ class Territories {
     this.zoomPercent = 0
   }
 
-  setup(game, userSettings) {
+  setup(game, userSettings, context) {
     this.game = game
+    this.context = context
 
     Territories.zoomLevel = userSettings.map.zoomLevels.territories
   }

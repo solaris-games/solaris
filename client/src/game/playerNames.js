@@ -19,9 +19,9 @@ class PlayerNames {
 
   draw () {
     this.container.removeChildren()
-    
+
     for (let player of this.game.galaxy.players) {
-      let empireCenter = gameHelper.getPlayerEmpireCenter(this.game, player)
+      const empireCenter = gameHelper.getPlayerEmpireCenter(this.game, player)
 
       if (empireCenter == null) {
         continue

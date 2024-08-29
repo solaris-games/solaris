@@ -8,8 +8,9 @@ export default class {
         this.container.cursor = null
     }
 
-    setup (game) {
+    setup (game, context) {
         this.game = game
+        this.context = context
     }
 
     clear () {

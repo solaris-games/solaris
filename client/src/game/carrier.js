@@ -38,10 +38,11 @@ class Carrier extends EventEmitter {
     this.zoomPercent = 100
   }
 
-  setup (data, userSettings, stars, player, lightYearDistance) {
+  setup (data, userSettings, context, stars, player, lightYearDistance) {
     this.data = data
     this.stars = stars
     this.player = player
+    this.context = context
     this.colour = player.colour.value
     this.lightYearDistance = lightYearDistance
 

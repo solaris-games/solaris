@@ -10,8 +10,9 @@ class Waypoints extends EventEmitter {
     this.container = new PIXI.Container()
   }
 
-  setup (game) {
+  setup (game, context) {
     this.game = game
+    this.context = context
     this.lightYearDistance = game.constants.distances.lightYear
   }
 
@@ -179,7 +180,7 @@ class Waypoints extends EventEmitter {
     if (route.length > 1) {
       for (let i = 1; i < route.length; i++) {
         let waypointStar = route[i]
-        
+
         this._createWaypoint(waypointStar._id)
       }
     } else {
