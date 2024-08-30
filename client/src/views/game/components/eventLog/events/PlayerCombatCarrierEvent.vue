@@ -106,7 +106,7 @@ export default {
   },
   methods: {
     getCarrierColour (carrier) {
-      return GameHelper.getPlayerColour(this.$store.state.game, carrier.ownedByPlayerId)
+      return this.$store.getters.getColourForPlayer(carrier.ownedByPlayerId).value
     },
     getCarrierShape (carrier) {
       return GameHelper.getPlayerById(this.$store.state.game, carrier.ownedByPlayerId).shape;

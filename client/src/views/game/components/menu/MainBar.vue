@@ -25,7 +25,9 @@
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onOpenTradeRequested="onOpenTradeRequested"
         @onOpenPurchasePlayerBadgeRequested="onOpenPurchasePlayerBadgeRequested"
-        @onOpenReportPlayerRequested="onOpenReportPlayerRequested"/>
+        @onOpenReportPlayerRequested="onOpenReportPlayerRequested"
+        @onViewColourOverrideRequested="onViewColourOverrideRequested"
+      />
       <trade v-if="menuState == MENU_STATES.TRADE"
         @onCloseRequested="onCloseRequested" :playerId="menuArguments" :key="menuArguments"
         @onOpenTradeRequested="onOpenTradeRequested"
@@ -347,6 +349,9 @@ export default {
     },
     onOpenReportPlayerRequested (e) {
       this.changeMenuState(MENU_STATES.REPORT_PLAYER, e)
+    },
+    onViewColourOverrideRequested (e) {
+      this.$emit('onViewColourOverrideRequested', e)
     },
     canHandleConversationEvents () {
       return window.innerWidth < 992

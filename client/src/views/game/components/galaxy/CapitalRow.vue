@@ -1,6 +1,6 @@
 <template>
 <tr>
-    <td><i class="fas fa-circle" v-if="star.ownedByPlayerId" :style="{ 'color': getColour() }"></i></td>
+    <td><i class="fas fa-circle" v-if="star.ownedByPlayerId" :style="{ 'color': colour }"></i></td>
     <td><a href="javascript:;" @click="clickStar">{{star.name}}</a></td>
     <td class="no-padding"><a href="javascript:;" @click="goToStar"><i class="far fa-eye"></i></a></td>
     <td class="sm-padding"><specialist-icon :type="'star'" :specialist="star.specialist" :hideDefaultIcon="true"></specialist-icon></td>
@@ -25,14 +25,16 @@ export default {
     star: Object
   },
   methods: {
-    getColour () {
-      return gameHelper.getPlayerColour(this.$store.state.game, this.star.ownedByPlayerId)
-    },
     clickStar (e) {
       this.$emit('onOpenStarDetailRequested', this.star._id)
     },
     goToStar (e) {
       gameContainer.map.panToStar(this.star)
+    }
+  },
+  computed: {
+    colour () {
+      return this.$store.getters.getColourForPlayer(this.star.ownedByPlayerId).value
     }
   }
 }

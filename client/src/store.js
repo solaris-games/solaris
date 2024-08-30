@@ -4,6 +4,8 @@ import eventBus from './eventBus'
 import GameHelper from './services/gameHelper'
 import GameContainer from './game/container'
 import SpecialistService from './services/api/specialist';
+import ColourService from './services/api/colour';
+import gameHelper from "./services/gameHelper";
 
 const vuexPersist = new VuexPersist({
   key: 'solaris',
@@ -22,7 +24,10 @@ export default createStore({
     starSpecialists: null,
     carrierSpecialists: null,
     settings: null,
-    confirmationDialog: {}
+    confirmationDialog: {},
+    colourOverride: true,
+    coloursConfig: null,
+    colourMapping: {}
   },
   mutations: {
     // Menu
@@ -124,6 +129,7 @@ export default createStore({
 
     setGame (state, game) {
       state.game = game
+      state.colourMapping = {...GameHelper.getColourMapping(game)};
     },
     clearGame (state) {
       state.game = null
@@ -131,6 +137,14 @@ export default createStore({
       state.currentConversation = null;
       state.carrierSpecialists = null;
       state.starSpecialists = null;
+      state.colourOverride = true;
+      state.colourMapping = {};
+    },
+
+    setColourOverride (state, value) {
+      state.colourOverride = value
+
+      GameContainer.reloadGame(state.game, state.settings);
     },
 
     setSettings (state, settings) {
@@ -438,6 +452,16 @@ export default createStore({
       let star = GameHelper.starInfrastructureUpgraded(state.game, data)
       GameContainer.reloadStar(star)
     },
+
+    internalAddColourMapping (state, data) {
+      state.colourMapping = {
+        ...state.colourMapping,
+        [data.playerId]: data.colour
+      };
+    },
+    setColoursConfig (state, data) {
+      state.coloursConfig = data;
+    }
   },
   actions: {
     async loadSpecialistData ({ commit, state }) {
@@ -452,6 +476,11 @@ export default createStore({
 
       commit('setCarrierSpecialists', responses[0].data)
       commit('setStarSpecialists', responses[1].data)
+    },
+    async loadColourData ({ commit, state }) {
+      const resp = await ColourService.listColours();
+
+      commit('setColoursConfig', resp.data);
     },
     async confirm ({ commit, state }, data) {
       const modal = new bootstrap.Modal(window.$('#confirmModal'), {})
@@ -479,11 +508,24 @@ export default createStore({
         commit('setConfirmationDialogSettings', settings)
         modal.toggle()
       })
-    }
+    },
+    async addColourMapping ({ commit, state }, data) {
+      await ColourService.addColour(state.game._id, data);
+      commit('internalAddColourMapping', data);
+
+      GameContainer.reloadGame(state.game, state.settings);
+    },
   },
   getters: {
     getConversationMessage: (state) => (conversationId) => {
       return state.cachedConversationComposeMessages[conversationId] || ''
+    },
+    getColourForPlayer: (state) => (playerId) => {
+      if (state.colourOverride) {
+        return state.colourMapping?.[playerId] || GameHelper.getPlayerById(state.game, playerId).colour;
+      } else {
+        return GameHelper.getPlayerById(state.game, playerId).colour
+      }
     }
   },
   plugins: [vuexPersist.plugin]

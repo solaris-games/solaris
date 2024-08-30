@@ -109,6 +109,7 @@ import GamePlayerMutexService from './gamePlayerMutex';
 import GameMutexService from "./gameMutex";
 import AnnouncementService from "./announcement";
 import {Announcement} from "./types/Announcement";
+import PlayerColourService from "./playerColour";
 
 const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
@@ -148,6 +149,7 @@ export default (config): DependencyContainer => {
     const cacheService = new CacheService(config);
     const paypalService = new PaypalService(PaymentModel, config, paymentRepository, userService, cacheService);
     const gameTypeService = new GameTypeService();
+    const playerColourService = new PlayerColourService(randomService);
     const specialistService = new SpecialistService(gameTypeService);
     const gameStateService = new GameStateService();
     const gameFluxService = new GameFluxService();
@@ -178,7 +180,7 @@ export default (config): DependencyContainer => {
     const mapService = new MapService(randomService, starService, starDistanceService, nameService, circularMapService, spiralMapService, doughnutMapService, circularBalancedMapService, irregularMapService, gameTypeService, customMapService);
     const playerReadyService = new PlayerReadyService(gameRepository, gameTypeService);
     const teamService = new TeamService(diplomacyService);
-    const playerService = new PlayerService(gameRepository, randomService, mapService, starService, carrierService, starDistanceService, technologyService, specialistService, gameTypeService, playerReadyService, teamService);
+    const playerService = new PlayerService(gameRepository, randomService, mapService, starService, carrierService, starDistanceService, technologyService, specialistService, gameTypeService, playerReadyService, teamService, playerColourService);
     const spectatorService = new SpectatorService(gameRepository, playerService, userService);
     const playerAfkService = new PlayerAfkService(gameRepository, playerService, starService, carrierService, gameTypeService, gameStateService);
     const badgeService = new BadgeService(userRepository, userService, playerService);
@@ -307,6 +309,7 @@ export default (config): DependencyContainer => {
         tutorialService,
         pathfindingService,
         gamePlayerMutexService,
-        gameMutexService
+        gameMutexService,
+        playerColourService,
     };
 };

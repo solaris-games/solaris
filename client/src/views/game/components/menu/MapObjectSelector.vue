@@ -165,7 +165,7 @@ export default {
         return ''
       }
 
-      return gameHelper.getFriendlyColour(owningPlayer.colour.value)
+      return gameHelper.getFriendlyColour(this.$store.getters.getColourForPlayer(owningPlayer._id).value)
     },
     onViewObjectRequested (mapObject) {
       switch (mapObject.type) {

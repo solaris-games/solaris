@@ -51,18 +51,7 @@ export default {
   props: {
     player: Object
   },
-  data () {
-    return {
-      colour: ''
-    }
-  },
-  mounted () {
-    this.colour = this.getFriendlyColour(this.player.colour.value)
-  },
   methods: {
-    getFriendlyColour (colour) {
-      return GameHelper.getFriendlyColour(colour)
-    },
     getPlayerStatus () {
       return GameHelper.getPlayerStatus(this.player)
     }
@@ -70,6 +59,11 @@ export default {
   computed: {
     isFormalAlliancesEnabled () {
       return DiplomacyHelper.isFormalAlliancesEnabled(this.$store.state.game)
+    },
+    colour () {
+      return GameHelper.getFriendlyColour(
+        this.$store.getters.getColourForPlayer(this.player._id).value
+      )
     }
   }
 }

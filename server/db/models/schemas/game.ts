@@ -61,6 +61,7 @@ const schema = new Schema({
 			fluxEnabled: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
 			advancedAI: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'disabled' },
 			spectators: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'disabled' },
+			afkSlotsOpen: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'enabled' },
 			readyToQuit: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'enabled' },
 			readyToQuitFraction: { type: Types.Number, required: false, min: 0.5, max: 1.0, default: 1.0 },
 			readyToQuitTimerCycles: { type: Types.Number, required: false, min: 0, max: 3, default: 0 },
@@ -68,7 +69,7 @@ const schema = new Schema({
         },
         galaxy: {
 			galaxyType: { type: Types.String, required: true, enum: ['circular', 'spiral', 'doughnut','circular-balanced', 'irregular', 'custom'], default: 'circular' },
-			starsPerPlayer: { type: Types.Number, required: true, min: 3, max: 50, default: 20 },
+			starsPerPlayer: { type: Types.Number, required: true, min: 1, max: 50, default: 20 },
 			productionTicks: { type: Types.Number, required: true, min: 6, max: 36, default: 24 },
 			advancedCustomGalaxyEnabled: { type: Types.String, required: false, enum: ['disabled', 'enabled'], default: 'disabled' },
         },

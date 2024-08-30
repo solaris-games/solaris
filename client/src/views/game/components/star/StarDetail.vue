@@ -10,12 +10,17 @@
 
     <div class="row bg-dark">
       <div class="col text-center pt-2">
-        <p class="mb-2" v-if="userPlayer && star.ownedByPlayerId == userPlayer._id">A star under your command.</p>
+        <p class="mb-2" v-if="isOwnedByUserPlayer">A star under your command.</p>
         <p class="mb-2" v-if="star.ownedByPlayerId != null && (!userPlayer || star.ownedByPlayerId != userPlayer._id)">This star is controlled by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{starOwningPlayer.alias}}</a>.</p>
-        <p class="mb-2" v-if="star.ownedByPlayerId == null">This star has not been claimed by any faction. Send a carrier here to claim it for yourself.</p>
+        <p class="mb-2" v-if="star.ownedByPlayerId == null">This star has not been claimed by any faction.<br/>Send a carrier here to claim it for yourself!</p>
+        <div v-if="star.ownedByPlayerId != null && star.homeStar ">
+          <p class="mb-2 text-info" v-if="userPlayer && isOwnedByUserPlayer && star.ownedByPlayerId == originalCapitalOwner._id"><small>This is your capital.</small></p>
+          <p class="mb-2 text-info" v-if="!isOwnedByUserPlayer && star.ownedByPlayerId == originalCapitalOwner._id"><small>This is their capital.</small></p>
+          <p class="mb-2 text-info" v-if="star.ownedByPlayerId != originalCapitalOwner._id"><small>The former capital of <a href="javascript:;" @click="onOpenOriginalCapitalOwner">{{originalCapitalOwner.alias}}</a>.</small></p>
+        </div>
         <p class="mb-2 text-danger" v-if="isDeadStar">This is a dead star, infrastructure cannot be built here.</p>
-        <p class="mb-2 text-danger" v-if="star.targeted">This star has been targeted for destruction.</p>
-        <p class="mb-2 text-danger" v-if="star.isKingOfTheHillStar">Capture and hold this star to win.</p>
+        <p class="mb-2 text-danger" v-if="star.targeted">This star has been targeted for destruction!</p>
+        <p class="mb-2 text-danger" v-if="star.isKingOfTheHillStar">Capture and hold this star to win!</p>
 
         <div v-if="(!isCompactUIStyle || !star.ownedByPlayerId) && star.isNebula">
           <hr/>
@@ -393,18 +398,19 @@
 import starService from '../../../../services/api/star'
 import AudioService from '../../../../game/audio'
 import GameHelper from '../../../../services/gameHelper'
-import MenuTitle from '../MenuTitle.vue'
-import Infrastructure from '../shared/Infrastructure.vue'
-import InfrastructureUpgrade from './InfrastructureUpgrade.vue'
-import InfrastructureUpgradeCompact from './InfrastructureUpgradeCompact.vue'
-import ModalButton from '../../../components/modal/ModalButton.vue'
-import DialogModal from '../../../components/modal/DialogModal.vue'
-import StarSpecialistVue from './StarSpecialist.vue'
-import SpecialistIconVue from '../specialist/SpecialistIcon.vue'
+import MenuTitle from '../MenuTitle'
+import Infrastructure from '../shared/Infrastructure'
+import InfrastructureUpgrade from './InfrastructureUpgrade'
+import InfrastructureUpgradeCompact from './InfrastructureUpgradeCompact'
+import ModalButton from '../../../components/modal/ModalButton'
+import DialogModal from '../../../components/modal/DialogModal'
+import StarSpecialistVue from './StarSpecialist'
+import SpecialistIconVue from '../specialist/SpecialistIcon'
 import GameContainer from '../../../../game/container'
 import gameHelper from '../../../../services/gameHelper'
-import IgnoreBulkUpgradeVue from './IgnoreBulkUpgrade.vue'
-import StarResourcesVue from './StarResources.vue'
+import IgnoreBulkUpgradeVue from './IgnoreBulkUpgrade'
+import StarResourcesVue from './StarResources'
+import user from '../../../../services/api/user'
 
 export default {
   components: {
@@ -475,6 +481,9 @@ export default {
     },
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', this.star.ownedByPlayerId)
+    },
+    onOpenOriginalCapitalOwner (e) {
+      this.$emit('onOpenPlayerDetailRequested', this.originalCapitalOwner._id)
     },
     onOpenCarrierDetailRequested (carrier) {
       this.$emit('onOpenCarrierDetailRequested', carrier._id)
@@ -581,11 +590,7 @@ export default {
   computed: {
     title: function () {
       if (this.star.homeStar) {
-        if (gameHelper.isOwnerCapital(this.$store.state.game, this.star)) {
-          return `${this.star.name} - ${this.starOwningPlayer.alias}'s Capital`;
-        } else {
-          return `${this.star.name} - Capital`;
-        }
+        return `${this.star.name} - Capital`;
       }
 
       return this.star.name;
@@ -595,6 +600,9 @@ export default {
     },
     starOwningPlayer: function () {
       return GameHelper.getStarOwningPlayer(this.$store.state.game, this.star)
+    },
+    originalCapitalOwner: function() {
+      return GameHelper.getOriginalOwner(this.$store.state.game, this.star)
     },
     canShowSpecialist: function () {
       return this.isSpecialistsEnabled && (this.star.specialistId || this.isOwnedByUserPlayer) && !this.isDeadStar

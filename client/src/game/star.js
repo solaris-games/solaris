@@ -106,11 +106,12 @@ class Star extends EventEmitter {
     return this._getStarCarriers().reduce((sum, c) => sum + (c.ships || 0), 0)
   }
 
-  setup (game, data, userSettings, players, carriers, lightYearDistance) {
+  setup (game, data, userSettings, context, players, carriers, lightYearDistance) {
     this.game = game
     this.data = data
     this.players = players
     this.carriers = carriers
+    this.context = context
     this.lightYearDistance = lightYearDistance
     this.container.position.x = this.data.location.x
     this.container.position.y = this.data.location.y
@@ -174,11 +175,11 @@ class Star extends EventEmitter {
       // ---- Non binary stars ----
       else if (this.hasBlackHole()) {
         this.graphics_star = new PIXI.Sprite(TextureService.STAR_SYMBOLS['black_hole'])
-      } else if (this.data.homeStar) {
-        this.graphics_star = new PIXI.Sprite(TextureService.STAR_SYMBOLS['home'])
       } else if (this._isDeadStar()) {
         this.graphics_star = new PIXI.Sprite(TextureService.STAR_SYMBOLS['unscannable'])
-      } else {
+      } else if (this.data.homeStar) {
+        this.graphics_star = new PIXI.Sprite(TextureService.STAR_SYMBOLS['home'])
+      }  else {
         this.graphics_star = new PIXI.Sprite(TextureService.STAR_SYMBOLS['scannable'])
       }
     }
@@ -187,7 +188,7 @@ class Star extends EventEmitter {
       this.graphics_star.tint = 0xa0a0a0
     }
 
-    if (gameHelper.isCapitalElimination(this.game) && gameHelper.isOwnerCapital(this.game, this.data)) {
+    if (gameHelper.isRedCapital(this.game, this.data)) {
       this.graphics_star.tint = 0xFF0000
     }
 
@@ -212,7 +213,7 @@ class Star extends EventEmitter {
     Star.seededRNG.seed(seed)
 
     let player = this._getStarPlayer()
-    let playerColour = player ? player.colour.value : 0xFFFFFF
+    let playerColour = player ? this.context.getPlayerColour(player._id) : 0xFFFFFF
 
     this.pulsarGraphics = new PIXI.Graphics()
     this.pulsarGraphics.zIndex = -1
@@ -248,7 +249,7 @@ class Star extends EventEmitter {
     this.nebulaSprite.rotation = Star.seededRNG.random()*Math.PI*2.0
 
     let player = this._getStarPlayer()
-    let playerColour = player ? player.colour.value : 0xFFFFFF
+    let playerColour = player ? this.context.getPlayerColour(player._id): 0xFFFFFF
     this.nebulaSprite.tint = playerColour
     //this.nebulaSprite.blendMode = PIXI.BLEND_MODES.ADD // for extra punch
 
@@ -283,7 +284,7 @@ class Star extends EventEmitter {
     this.wormHoleSprite.alpha = 0.35
 
     let player = this._getStarPlayer()
-    let playerColour = player ? player.colour.value : 0xFFFFFF
+    let playerColour = player ? this.context.getPlayerColour(player._id) : 0xFFFFFF
     this.wormHoleSprite.tint = playerColour
     //this.asteroidFieldSprite.blendMode = PIXI.BLEND_MODES.ADD // for extra punch
 
@@ -310,7 +311,7 @@ class Star extends EventEmitter {
     this.asteroidFieldSprite.rotation = Star.seededRNG.random()*Math.PI*2.0
 
     let player = this._getStarPlayer()
-    let playerColour = player ? player.colour.value : 0xFFFFFF
+    let playerColour = player ? this.context.getPlayerColour(player._id) : 0xFFFFFF
     this.asteroidFieldSprite.tint = playerColour
     //this.asteroidFieldSprite.blendMode = PIXI.BLEND_MODES.ADD // for extra punch
 
@@ -335,6 +336,10 @@ class Star extends EventEmitter {
     this.specialistSprite.height = 10
     this.specialistSprite.x = -5
     this.specialistSprite.y = -5
+
+    if (gameHelper.isRedCapital(this.game, this.data)) {
+      this.specialistSprite.tint = 0xFF0000
+    }
 
     this.container.addChild(this.specialistSprite)
   }
@@ -386,7 +391,7 @@ class Star extends EventEmitter {
       }
 
       let player = this._getStarPlayer()
-      let playerColour = player ? player.colour.value : 0xFFFFFF
+      let playerColour = player ? this.context.getPlayerColour(player._id) : 0xFFFFFF
 
       let rotationDirection = this._getPlanetOrbitDirection()
       let rotationSpeedModifier = this._getPlanetOrbitSpeed()
@@ -521,8 +526,11 @@ class Star extends EventEmitter {
       this.graphics_shape_part = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS[player.shape][2+this.data.warpGate])
       this.graphics_shape_full = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS[player.shape][0+this.data.warpGate])
     }
-    this.graphics_shape_part.tint = player.colour.value
-    this.graphics_shape_full.tint = player.colour.value
+
+    const playerColour = this.context.getPlayerColour(player._id)
+
+    this.graphics_shape_part.tint = playerColour
+    this.graphics_shape_full.tint = playerColour
     this.graphics_shape_part.anchor.set(0.5)
     this.graphics_shape_full.anchor.set(0.5)
     this.graphics_shape_part.width = 28.0
@@ -532,6 +540,7 @@ class Star extends EventEmitter {
     this.container.addChild(this.graphics_shape_part)
     this.container.addChild(this.graphics_shape_full)
   }
+
 
   _hasUnknownShips() {
       let carriersOrbiting = this._getStarCarriers()
@@ -685,7 +694,7 @@ class Star extends EventEmitter {
     let radius = ((this.data.effectiveTechs.scanning || 1) + 1) * this.lightYearDistance
 
     this.graphics_scanningRange.lineStyle(1, 0xFFFFFF, 0.2)
-    this.graphics_scanningRange.beginFill(player.colour.value, 0.075)
+    this.graphics_scanningRange.beginFill(this.context.getPlayerColour(player._id), 0.075)
     this.graphics_scanningRange.drawCircle(0, 0, radius)
     this.graphics_scanningRange.endFill()
     this.graphics_scanningRange.zIndex = -1
@@ -709,7 +718,7 @@ class Star extends EventEmitter {
     let radius = ((this.data.effectiveTechs.hyperspace || 1) + 1.5) * this.lightYearDistance
 
     this.graphics_hyperspaceRange.lineStyle(1, 0xFFFFFF, 0.2)
-    this.graphics_hyperspaceRange.beginFill(player.colour.value, 0.075)
+    this.graphics_hyperspaceRange.beginFill(this.context.getPlayerColour(player._id), 0.075)
     this.graphics_hyperspaceRange.drawStar(0, 0, radius, radius, radius - 3)
     this.graphics_hyperspaceRange.endFill()
     this.graphics_hyperspaceRange.zIndex = -1
