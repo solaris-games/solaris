@@ -48,9 +48,24 @@ export default {
     this.modal = new bootstrap.Modal(document.getElementById("colourOverride"));
     this.modal.toggle();
     this.player = gameHelper.getPlayerById(this.$store.state.game, this.playerId);
-    this.currentColour = this.$store.getters.getColourForPlayer(this.playerId).alias;
+    this.currentColour = this.ensureExists(this.$store.getters.getColourForPlayer(this.playerId).alias);
   },
   methods: {
+    ensureExists (alias) {
+      const existsA = this.$store.state.coloursConfig.find(colour => colour.alias === alias);
+
+      if (existsA) {
+        return alias;
+      }
+
+      const existsV = this.$store.state.coloursConfig.find(colour => colour.value === this.player.colour.value)?.alias;
+
+      if (existsV) {
+        return existsV;
+      }
+
+      return this.$store.state.coloursConfig[0].alias;
+    },
     onCancel () {
       this.$emit('onColourOverrideCancelled');
     },
@@ -74,7 +89,7 @@ export default {
       return this.$store.state.coloursConfig.find(colour => colour.alias === alias)?.value
     },
     setToDefault () {
-      this.currentColour = this.player.colour.alias;
+      this.currentColour = this.ensureExists(this.player.colour.alias);
     }
   },
   computed: {
