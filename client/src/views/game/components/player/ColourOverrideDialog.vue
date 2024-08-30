@@ -54,15 +54,21 @@ export default {
     onCancel () {
       this.$emit('onColourOverrideCancelled');
     },
-    onConfirm () {
-      this.$store.dispatch('addColourMapping', {
-        playerId: this.player._id,
-        colour: {
-          alias: this.currentColour,
-          value: this.toColourValue(this.currentColour)
-        }
-      });
-      this.$emit('onColourOverrideConfirmed');
+    async onConfirm () {
+      try {
+        await this.$store.dispatch('addColourMapping', {
+          playerId: this.player._id,
+          colour: {
+            alias: this.currentColour,
+            value: this.toColourValue(this.currentColour)
+          }
+        });
+
+        this.$emit('onColourOverrideConfirmed');
+      } catch (e) {
+        console.error(e);
+        this.$toasted.show(`There was a problem saving the custom colour`, { type: 'error' })
+      }
     },
     toColourValue (alias) {
       return this.$store.state.coloursConfig.find(colour => colour.alias === alias)?.value
@@ -73,7 +79,7 @@ export default {
   },
   computed: {
     title () {
-      return `Override ${this.player.alias}'s colour`
+      return `Custom colour for ${this.player.alias}`
     }
   }
 }

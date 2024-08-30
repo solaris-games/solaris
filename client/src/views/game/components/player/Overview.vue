@@ -27,7 +27,7 @@
     <div class="col-auto">
       <button class="btn btn-primary me-1" @click="onViewColourOverrideRequested">
         <i class="fas fa-paint-brush" />
-        <span class="d-none d-md-inline-block ms-1">Override colour</span>
+        <span class="d-none d-md-inline-block ms-1">Customise colour</span>
       </button>
       <button class="btn btn-success me-1" @click="onViewConversationRequested"
         :class="{'btn-warning': conversation && conversation.unreadCount}"
