@@ -7,17 +7,21 @@
     <div v-if="hasGame">
         <span class="d-none">{{ gameId }}</span>
 
-        <game-container @onStarClicked="onStarClicked"
+      <colour-override-dialog v-if="colourOverride" :playerId="colourOverride.playerId" @onColourOverrideCancelled="onColourOverrideCancelled" @onColourOverrideConfirmed="onColourOverrideConfirmed" />
+
+      <game-container @onStarClicked="onStarClicked"
                     @onStarRightClicked="onStarRightClicked"
                     @onCarrierClicked="onCarrierClicked"
                     @onCarrierRightClicked="onCarrierRightClicked"
                     @onObjectsClicked="onObjectsClicked"/>
 
         <main-bar @onPlayerSelected="onPlayerSelected"
-                  @onReloadGameRequested="reloadGame"/>
+                  @onReloadGameRequested="reloadGame"
+                  @onViewColourOverrideRequested="onViewColourOverrideRequested" />
 
         <chat @onOpenPlayerDetailRequested="onPlayerSelected"
               @onOpenReportPlayerRequested="onOpenReportPlayerRequested"/>
+
     </div>
   </div>
 </template>
@@ -36,6 +40,7 @@ import AudioService from '../../game/audio'
 import moment from 'moment'
 import gameHelper from '../../services/gameHelper'
 import authService from '../../services/api/auth'
+import ColourOverrideDialog from "./components/player/ColourOverrideDialog.vue";
 
 export default {
   components: {
@@ -43,7 +48,8 @@ export default {
     'loading-spinner': LoadingSpinnerVue,
     'game-container': GameContainer,
     'main-bar': MainBar,
-    'chat': Chat
+    'chat': Chat,
+    'colour-override-dialog': ColourOverrideDialog,
   },
   data () {
     return {
@@ -52,7 +58,8 @@ export default {
       polling: null,
       // We use this to track whether we are making a request to the API to get the next tick.
       // It is used to prevent spamming the API if the app gets suspended and is re-opened after a very long time.
-      ticking: false
+      ticking: false,
+      colourOverride: null
     }
   },
   async created () {
@@ -102,7 +109,8 @@ export default {
 
     this.polling = setInterval(this.reloadGameCheck, reloadGameCheckInterval)
 
-    this.$store.dispatch('loadSpecialistData');
+    await this.$store.dispatch('loadSpecialistData');
+    await this.$store.dispatch('loadColourData');
   },
   beforeDestroy () {
     clearInterval(this.polling)
@@ -125,6 +133,17 @@ export default {
     document.title = 'Solaris'
   },
   methods: {
+    onColourOverrideConfirmed (e) {
+      this.colourOverride = null;
+    },
+    onColourOverrideCancelled (e) {
+      this.colourOverride = null;
+    },
+    onViewColourOverrideRequested (e) {
+      this.colourOverride = {
+        playerId: e
+      };
+    },
     async attemptLogin () {
       if (this.$store.state.userId) {
         return;

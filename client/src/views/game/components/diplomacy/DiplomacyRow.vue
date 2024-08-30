@@ -8,7 +8,7 @@
     <h5 class="alias-title">{{getPlayerAlias(diplomaticStatus.playerIdTo)}}</h5>
   </td>
   <td class="fit pt-3 pe-1">
-    <diplomacy-icons 
+    <diplomacy-icons
       :statusFrom="diplomaticStatus.statusFrom"
       :statusTo="diplomaticStatus.statusTo"
       :actualStatus="diplomaticStatus.actualStatus"/>
@@ -46,7 +46,7 @@ export default {
       return this.getPlayer(playerId).alias
     },
     getFriendlyColour (playerId) {
-      return gameHelper.getPlayerColour(this.$store.state.game, playerId)
+      return this.$store.getters.getColourForPlayer(playerId).value
     },
     onOpenPlayerDetailRequested(playerId) {
       this.$emit('onOpenPlayerDetailRequested', playerId)
@@ -55,7 +55,7 @@ export default {
       const userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
       let playerAlias = this.getPlayerAlias(diplomaticStatus.playerIdTo)
       let allianceFee = 0
-      let cycleCredits = gameHelper.calculateIncome(this.$store.state.game, userPlayer); 
+      let cycleCredits = gameHelper.calculateIncome(this.$store.state.game, userPlayer);
 
       if (DiplomacyHelper.isAllianceUpkeepEnabled(this.$store.state.game)) {
         allianceFee = DiplomacyHelper.getAllianceUpkeepCost(this.$store.state.game, userPlayer, cycleCredits, 1)

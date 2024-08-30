@@ -2,7 +2,7 @@
   <div @click="onClick" class="player-icon text-center bg-dark">
     <img v-if="player.avatar" :src="getAvatarImage()" :class="{'defeated-player': player.defeated}">
     <i v-if="!player.avatar" class="far fa-user ms-2 me-2 mt-2 mb-2"></i>
-    <span v-if="canShowShapeIcon()" class="shapeIcon">
+    <span class="shapeIcon">
       <player-icon :playerId="player._id"/>
     </span>
     <i v-if="player.userId" class="userIcon fas fa-user"></i>
@@ -40,7 +40,7 @@ export default {
         return require(`../../../../assets/avatars/${this.player.avatar}`)
       } catch (err) {
         console.error(err)
-        
+
         return null
       }
     },
@@ -58,10 +58,6 @@ export default {
       let position = this.leaderboard.indexOf(this.player)
 
       return position === 2
-    },
-    canShowShapeIcon () {
-      // return gameHelper.getGamePlayerShapesCount(this.$store.state.game) > 1
-      return true
     },
     hasPerspective () {
       if (gameHelper.getUserPlayer(this.$store.state.game)) {
@@ -112,7 +108,7 @@ export default {
   opacity: 0.3;
 }
 
-@media screen and (max-width: 576px) { 
+@media screen and (max-width: 576px) {
   .player-icon, img {
       height: 35px;
       width: 35px;

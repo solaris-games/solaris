@@ -1,6 +1,5 @@
 <template>
 <div class="menu-page container">
-    <!-- TODO: Text for premium player and lifetime premium player -->
     <menu-title title="Player" @onCloseRequested="onCloseRequested">
       <span class="me-2" v-if="user && user.roles">
         <i class="fas fa-hands-helping" v-if="user.roles.contributor" title="This player is a contributor"></i>
@@ -16,7 +15,9 @@
 
     <overview v-if="player" :playerId="player._id"
       @onViewCompareIntelRequested="onViewCompareIntelRequested"
-      @onOpenTradeRequested="onOpenTradeRequested"/>
+      @onOpenTradeRequested="onOpenTradeRequested"
+      @onViewColourOverrideRequested="onViewColourOverrideRequested"
+    />
 
     <h4 v-if="player" class="mt-2">Infrastructure</h4>
 
@@ -126,6 +127,9 @@ export default {
     },
     onViewCompareIntelRequested (e) {
       this.$emit('onViewCompareIntelRequested', e)
+    },
+    onViewColourOverrideRequested (e) {
+      this.$emit('onViewColourOverrideRequested', e);
     },
     onOpenTradeRequested (e) {
       this.$emit('onOpenTradeRequested', this.playerId)

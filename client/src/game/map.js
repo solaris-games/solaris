@@ -21,11 +21,12 @@ class Map extends EventEmitter {
   // waypoints - Displays waypoints overlay for a given carrier
   mode = 'galaxy'
 
-  constructor (app, store, gameContainer) {
+  constructor (app, store, gameContainer, context) {
     super()
 
     this.app = app
     this.store = store
+    this.context = context
     this.gameContainer = gameContainer;
     this.container = new PIXI.Container()
     this.container.sortableChildren = true
@@ -107,7 +108,7 @@ class Map extends EventEmitter {
     }
 
     this.waypoints = new Waypoints()
-    this.waypoints.setup(game)
+    this.waypoints.setup(game, this.context)
     this.waypoints.onWaypointCreatedHandler = this.waypoints.on('onWaypointCreated', this.onWaypointCreated.bind(this))
     this.waypoints.onWaypointOutOfRangeHandler = this.waypoints.on('onWaypointOutOfRange', this.onWaypointOutOfRange.bind(this))
 
@@ -130,7 +131,7 @@ class Map extends EventEmitter {
     // -----------
     // Setup Territories
     this.territories = new Territories()
-    this.territories.setup(game, userSettings)
+    this.territories.setup(game, userSettings, this.context)
 
     this.territoryContainer.addChild(this.territories.container)
     this.territories.draw(userSettings)
@@ -138,7 +139,7 @@ class Map extends EventEmitter {
     // -----------
     // Setup Player Names
     this.playerNames = new PlayerNames()
-    this.playerNames.setup(game, userSettings)
+    this.playerNames.setup(game, userSettings, this.context)
 
     this.playerNamesContainer.addChild(this.playerNames.container)
     this.playerNames.draw()
@@ -146,7 +147,7 @@ class Map extends EventEmitter {
     // -----------
     // Setup Background
     this.background = new Background()
-    this.background.setup(game, userSettings)
+    this.background.setup(game, userSettings, this.context)
 
     this.backgroundContainer.addChild(this.background.container)
     this.backgroundContainer.addChild(this.background.starContainer)
@@ -173,7 +174,7 @@ class Map extends EventEmitter {
     this._setupChunks()
 
     this.tooltipLayer = new TooltipLayer()
-    this.tooltipLayer.setup(this.game)
+    this.tooltipLayer.setup(this.game, this.context)
     this.tooltipContainer.addChild(this.tooltipLayer.container)
   }
 
@@ -195,7 +196,7 @@ class Map extends EventEmitter {
       star.on('onUnselected', this.onStarUnselected.bind(this))
     }
 
-    star.setup(this.game, starData, userSettings, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
+    star.setup(this.game, starData, userSettings, this.context, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
 
     return star
   }
@@ -219,7 +220,7 @@ class Map extends EventEmitter {
 
     let player = gameHelper.getPlayerById(game, carrierData.ownedByPlayerId)
 
-    carrier.setup(carrierData, userSettings, this.stars, player, game.constants.distances.lightYear)
+    carrier.setup(carrierData, userSettings, this.context, this.stars, player, game.constants.distances.lightYear)
 
     return carrier
   }
@@ -394,7 +395,7 @@ class Map extends EventEmitter {
       let existing = this.stars.find(x => x.data._id === starData._id)
 
       if (existing) {
-        existing.setup(this.game, starData, userSettings, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
+        existing.setup(this.game, starData, userSettings, this.context, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
       } else {
         existing = this.setupStar(game, userSettings, starData)
       }
@@ -411,7 +412,7 @@ class Map extends EventEmitter {
       if (existing) {
         let player = gameHelper.getPlayerById(game, carrierData.ownedByPlayerId)
 
-        existing.setup(carrierData, userSettings, this.stars, player, game.constants.distances.lightYear)
+        existing.setup(carrierData, userSettings, this.context, this.stars, player, game.constants.distances.lightYear)
       } else {
         existing = this.setupCarrier(game, userSettings, carrierData)
       }
@@ -423,11 +424,11 @@ class Map extends EventEmitter {
     this.drawWormHoles()
     this.drawPlayerNames()
 
-    this.background.setup(game, userSettings)
+    this.background.setup(game, userSettings, this.context)
     this.background.draw(game, userSettings)
 
-    this.waypoints.setup(game)
-    this.tooltipLayer.setup(game)
+    this.waypoints.setup(game, this.context)
+    this.tooltipLayer.setup(game, this.context)
 
     this._setupChunks()
   }
@@ -567,7 +568,7 @@ class Map extends EventEmitter {
   }
 
   drawTerritories (userSettings) {
-    this.territories.setup(this.game, userSettings)
+    this.territories.setup(this.game, userSettings, this.context)
     this.territories.draw(userSettings)
   }
 
@@ -579,7 +580,7 @@ class Map extends EventEmitter {
   }
 
   drawPlayerNames () {
-    this.playerNames.setup(this.game, this.userSettings)
+    this.playerNames.setup(this.game, this.userSettings, this.context)
     this.playerNames.draw(this.userSettings)
   }
 

@@ -117,6 +117,7 @@ export interface Player {
     nextResearchTicksEta?: number | null;
     aiState?: AiState | null;
     hasPerspective?: boolean;
+    colourMapping?: Map<String, PlayerColour>
 };
 
 export interface PlayerColourShapeCombination {

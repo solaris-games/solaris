@@ -38,7 +38,7 @@ export default {
       return this.getPlayer(playerId).alias
     },
     getFriendlyColour (playerId) {
-      return gameHelper.getPlayerColour(this.$store.state.game, playerId)
+      return this.$store.getters.getColourForPlayer(playerId).value
     },
     onOpenPlayerDetailRequested(playerId) {
       this.$emit('onOpenPlayerDetailRequested', playerId)

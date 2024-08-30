@@ -16,8 +16,12 @@
                     <button class="btn btn-primary btn-sm me-1 mb-1" @click="reloadPage" title="Reload Game"><i class="fas fa-sync"></i></button>
                 </div>
             </div>
-            <div class="dropdown-divider"></div>
-            <div v-if="!userPlayer && gameIsJoinable">
+          <div v-if="userPlayer" class="dropdown-divider"></div>
+          <button v-if="userPlayer" class="dropdown-item" :class="isCustomColoursEnabled ? 'active' : null" v-on:click="toggleCustomColours">
+            <i class="fas fa-paint-brush me-2" />Custom colours
+          </button>
+          <div class="dropdown-divider"></div>
+          <div v-if="!userPlayer && gameIsJoinable">
                 <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.WELCOME)"><i class="fas fa-handshake me-2"></i>Welcome</a>
             </div>
             <div v-if="!userPlayer && !gameIsJoinable">
@@ -55,7 +59,7 @@ import eventBus from '../../../../eventBus'
 
 export default {
   components: {
-      
+
   },
   props: {
       buttonClass: String,
@@ -99,6 +103,9 @@ export default {
     },
     reloadPage () {
       location.reload()
+    },
+    toggleCustomColours () {
+      this.$store.commit('setColourOverride', !this.isCustomColoursEnabled)
     }
   },
   computed: {
@@ -140,6 +147,9 @@ export default {
     },
     isSpectatingEnabled () {
       return GameHelper.isSpectatingEnabled(this.$store.state.game)
+    },
+    isCustomColoursEnabled () {
+      return this.$store.state.colourOverride
     }
   }
 }
