@@ -6,6 +6,11 @@ class ColourService extends BaseApiService {
     return axios.get(this.BASE_URL + 'colour/list',
       { withCredentials: true });
   }
+
+  addColour (gameId, data) {
+    return axios.put(`${this.BASE_URL}game/${gameId}/colour/override`, data,
+      { withCredentials: true });
+  }
 }
 
 export default new ColourService();
