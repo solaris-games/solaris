@@ -253,6 +253,16 @@ class GameHelper {
     return this.getDateToString(t, largestUnitOnly)
   }
 
+  getCountdownTimeStringByTicksWithTickETA (game, ticks, useNowDate = false, largestUnitOnly = false) {
+    const str = this.getCountdownTimeStringByTicks(game, ticks, useNowDate, largestUnitOnly);
+
+    if (game.settings.gameTime.gameType === 'realTime') {
+      return `${str} - Tick ${game.state.tick + ticks}`
+    }
+
+    return str
+  }
+
   getCountdownTimeStringByTicks (game, ticks, useNowDate = false, largestUnitOnly = false) {
     if (game == null) {
       return ''

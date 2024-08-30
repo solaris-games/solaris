@@ -87,7 +87,7 @@ export default {
         { text: 'Specialists', value: 'specialists' }
       ]
 
-      this.optionsNow = options.filter(o => TechnologyHelper.isTechnologyEnabled(this.$store.state.game, o.value) 
+      this.optionsNow = options.filter(o => TechnologyHelper.isTechnologyEnabled(this.$store.state.game, o.value)
                                           && TechnologyHelper.isTechnologyResearchable(this.$store.state.game, o.value))
       this.optionsNext = options.filter(o => TechnologyHelper.isTechnologyEnabled(this.$store.state.game, o.value)
                                           && TechnologyHelper.isTechnologyResearchable(this.$store.state.game, o.value))
@@ -133,12 +133,12 @@ export default {
       this.loadingNext = false
     },
     recalculateTimeRemaining () {
-      this.timeRemainingEta = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.player.currentResearchTicksEta)
+      this.timeRemainingEta = GameHelper.getCountdownTimeStringByTicksWithTickETA(this.$store.state.game, this.player.currentResearchTicksEta)
 
       if (this.player.nextResearchTicksEta == null) {
         this.timeNextRemainingEta = null
       } else {
-        this.timeNextRemainingEta = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.player.nextResearchTicksEta)
+        this.timeNextRemainingEta = GameHelper.getCountdownTimeStringByTicksWithTickETA(this.$store.state.game, this.player.nextResearchTicksEta)
       }
     }
   },
