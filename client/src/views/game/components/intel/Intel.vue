@@ -294,8 +294,16 @@ export default {
     },
     isSpecialistsTechnologyEnabled () {
       return GameHelper.isSpecialistsTechnologyEnabled(this.$store.state.game)
+    },
+    colourOverride () {
+      return this.$store.state.colourOverride
     }
   },
+  watch: {
+    colourOverride () {
+      this.fillData()
+    }
+  }
 }
 </script>
 

@@ -146,6 +146,8 @@ export default new Vuex.Store({
 
     setColourOverride (state, value) {
       state.colourOverride = value
+
+      GameContainer.reloadGame(state.game, state.settings);
     },
 
     setSettings (state, settings) {
