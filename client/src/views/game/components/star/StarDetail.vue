@@ -259,6 +259,17 @@
             <i class="fas fa-wrench ms-2"></i>
           </div>
       </div>
+
+
+      <div v-if="star.ownedByPlayerId && !isDeadStar && ticksToNextShip" class="row pt-1 pb-1 bg-dark">
+        <div class="col">
+          Ticks to next ship
+        </div>
+        <div class="col text-end" title="Ticks to next ship">
+          <span>{{ticksToNextShip}}</span>
+          <i class="fas fa-spinner ms-1"></i>
+        </div>
+      </div>
     </div>
 
     <div v-if="getCarriersInOrbit().length">
