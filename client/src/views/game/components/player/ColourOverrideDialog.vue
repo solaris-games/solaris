@@ -7,12 +7,12 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
-          <div class="form-group">
+          <div class="colour-override-controls form-group">
             <label for="colour">Colour</label>
-            <span class="override-current-colour" :style="{ 'background-color': toColourValue(currentColour.value) }" />
             <select v-model="currentColour">
               <option v-for="colour in $store.state.coloursConfig" :value="colour.alias">{{ colour.alias }}</option>
             </select>
+            <span class="override-current-colour" :style="{ 'background-color': toColourValue(currentColour) }" />
           </div>
         </div>
         <div class="modal-footer">
@@ -76,10 +76,15 @@ export default {
 </script>
 
 <style scoped>
+.colour-override-controls {
+  display: flex;
+  gap: 10px;
+}
+
 .override-current-colour {
   display: inline-block;
-  width: 20px;
-  height: 20px;
-  margin-left: 10px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
 }
 </style>
