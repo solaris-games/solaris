@@ -3,12 +3,12 @@
     <div class="col text-center pt-2 pb-1 ps-1 pe-1 card">
         <h6>Rank</h6>
         <h3 v-if="!isSmallHeaders">
-          <img class="user-level-icon" :src="require(`../../../../assets/levels/${level}.png`)">
+          <img class="user-level-icon" :src="'../../../../assets/levels/' + level + '.png'" alt="rank">
           <!-- <i class="fas fa-star text-info me-2"></i> -->
           {{ rank }}
         </h3>
         <h4 v-if="isSmallHeaders">
-          <img class="user-level-icon" :src="require(`../../../../assets/levels/${level}.png`)">
+          <img class="user-level-icon" :src="'../../../../assets/levels/' + level + '.png'" alt="rank">
           <!-- <i class="fas fa-star text-info me-2"></i> -->
           {{ rank }}
         </h4>
