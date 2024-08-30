@@ -13,6 +13,7 @@
               <option v-for="colour in $store.state.coloursConfig" :value="colour.alias">{{ colour.alias }}</option>
             </select>
             <span class="override-current-colour" :style="{ 'background-color': toColourValue(currentColour) }" />
+            <button class="btn btn-default btn-sm" v-on:click="setToDefault">Use default</button>
           </div>
         </div>
         <div class="modal-footer">
@@ -65,6 +66,9 @@ export default {
     },
     toColourValue (alias) {
       return this.$store.state.coloursConfig.find(colour => colour.alias === alias)?.value
+    },
+    setToDefault () {
+      this.currentColour = this.player.colour.alias;
     }
   },
   computed: {
@@ -78,6 +82,7 @@ export default {
 <style scoped>
 .colour-override-controls {
   display: flex;
+  align-items: center;
   gap: 10px;
 }
 
