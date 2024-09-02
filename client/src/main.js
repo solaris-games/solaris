@@ -4,6 +4,7 @@ import Toasted from 'vue-toasted'
 import App from './App.vue'
 import router from './router'
 import store from './store'
+import { init as initSocket } from './socket'
 
 import $ from 'jquery'
 import 'pixi.js-legacy'
@@ -40,6 +41,8 @@ window.addEventListener("unhandledrejection", (event) => {
 });
 
 app.use(store);
+
+app.use(initSocket(store))
 
 app.use(new VueSocketio({
   debug: true,
