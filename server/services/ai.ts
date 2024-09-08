@@ -280,7 +280,7 @@ export default class AIService {
         // 1. Spend remaining credits upgrading economy.
         let creditsToSpendEco = Math.floor(player.credits / 100 * LAST_TICK_BULK_UPGRADE_ECO_PERCENTAGE);
 
-        if (creditsToSpendEco) {
+        if (creditsToSpendEco && game.settings.player.developmentCost.economy !== "none") {
             await this.starUpgradeService.upgradeBulk(game, player, 'totalCredits', 'economy', creditsToSpendEco, false);
         }
     }
@@ -295,11 +295,11 @@ export default class AIService {
         let creditsToSpendSci = Math.floor(player.credits / 100 * FIRST_TICK_BULK_UPGRADE_SCI_PERCENTAGE);
         let creditsToSpendInd = Math.floor(player.credits / 100 * FIRST_TICK_BULK_UPGRADE_IND_PERCENTAGE);
 
-        if (creditsToSpendSci) {
+        if (creditsToSpendSci && game.settings.player.developmentCost.science !== "none") {
             await this.starUpgradeService.upgradeBulk(game, player, 'totalCredits', 'science', creditsToSpendSci, false);
         }
 
-        if (creditsToSpendInd) {
+        if (creditsToSpendInd && game.settings.player.developmentCost.industry !== "none") {
             await this.starUpgradeService.upgradeBulk(game, player, 'totalCredits', 'industry', creditsToSpendInd, false);
         }
     }
