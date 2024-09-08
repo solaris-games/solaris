@@ -451,6 +451,10 @@ export default class StarUpgradeService extends EventEmitter {
             throw new ValidationError(`Invalid upgrade amount given`);
         }
 
+        if (game.settings.player.developmentCost[infrastructureType] === 'none') {
+            throw new ValidationError(`Cannot upgrade ${infrastructureType} as it has been disabled.`);
+        }
+
         const upgradeSummary = await this.generateUpgradeBulkReport(game, player, upgradeStrategy, infrastructureType, amount);
 
         // Check that the amount the player wants to spend isn't more than the amount he has
@@ -575,6 +579,10 @@ export default class StarUpgradeService extends EventEmitter {
     generateUpgradeBulkReport(game: Game, player: Player, upgradeStrategy: string, infrastructureType: InfrastructureType, amount: number): BulkUpgradeReport {
         if (!amount || amount <= 0) {
             throw new ValidationError(`Invalid upgrade amount given`);
+        }
+
+        if (game.settings.player.developmentCost[infrastructureType] === 'none') {
+            throw new ValidationError(`Cannot upgrade ${infrastructureType} as it has been disabled.`);
         }
 
         // Get all of the player stars and what the next upgrade cost will be.

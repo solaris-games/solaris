@@ -23,7 +23,7 @@ export default class PlayerColourService {
         return COLOURS.flatMap(spec => spec.colours);
     }
 
-    async setColourOverride(game: Game, player: Player, overridePlayer: string, colour: PlayerColour): void {
+    async setColourOverride(game: Game, player: Player, overridePlayer: string, colour: PlayerColour) {
         player.colourMapping = player.colourMapping || new Map();
         player.colourMapping.set(overridePlayer, colour);
 
