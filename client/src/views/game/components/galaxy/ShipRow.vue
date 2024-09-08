@@ -38,7 +38,7 @@ export default {
   },
   computed: {
     colour () {
-      return this.$store.getters.getColourForPlayer(this.carrier.ownedByPlayerId).value
+      return this.$store.getters.getColourForPlayer(this.ship.ownedByPlayerId).value
     }
   }
 }
