@@ -1,6 +1,6 @@
 use solaris;
 
-let playerId = ObjectId('...');
+let playerId = ObjectId('66ca28d505b395f625e52f06');
 
 db.games.updateOne({
     'galaxy.players._id': playerId

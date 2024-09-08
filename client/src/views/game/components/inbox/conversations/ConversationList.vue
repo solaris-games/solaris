@@ -82,19 +82,6 @@ export default {
     this.sockets.unsubscribe('gameMessageSent')
   },
   methods: {
-    getPlayer (playerId) {
-      return gameHelper.getPlayerById(this.$store.state.game, playerId)
-    },
-    getPlayerColour (playerId) {
-      return gameHelper.getPlayerColour(this.$store.state.game, playerId)
-    },
-    getConversationsHasUnread () {
-      if (!this.conversations) {
-        return false
-      }
-
-      return this.conversations.find(c => c.unreadCount) != null
-    },
     async refreshList () {
       this.conversations = null
 
@@ -108,19 +95,6 @@ export default {
         console.error(e)
       }
     },
-    // async markAllAsRead (e) {
-    //   this.conversations = null
-
-    //   try {
-    //     let response = await ConversationApiService.markAllConversationsAsRead(this.$store.state.game._id)
-
-    //     if (response.status === 200) {
-    //       this.refreshList()
-    //     }
-    //   } catch (e) {
-    //     console.error(e)
-    //   }
-    // },
     onCreateNewConversationRequested (e) {
       eventBus.$emit('onCreateNewConversationRequested', e)
     },

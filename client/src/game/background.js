@@ -26,8 +26,9 @@ class Background {
     this.time = 0
   }
 
-  setup (game, userSettings) {
+  setup (game, userSettings, context) {
     this.game = game
+    this.context = context
     this.userSettings = userSettings
     this.rng = rng.create(game._id)
     // TODO: This should use the constant?
@@ -124,7 +125,7 @@ class Background {
           let sprite
           let nebulaTextureCount
           let textures
-          
+
           nebulaTextureCount = TextureService.STARLESS_NEBULA_TEXTURES.length
           textures = TextureService.STARLESS_NEBULA_TEXTURES
 

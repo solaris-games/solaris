@@ -14,6 +14,7 @@
        "fluxEnabled": "enabled",
        "advancedAI": "enabled",
        "spectators": "enabled",
+       "afkSlotsOpen": "enabled",
        "readyToQuit": "enabled",
        "readyToQuitFraction": 1.0,
        "readyToQuitTimerCycles": 0,

@@ -4,7 +4,7 @@
           :title="p.colour.alias + ' ' + p.shape + ' - ' + p.alias">
           <player-avatar :player="p"/>
 
-          <div class="colour-bar" v-bind:style="{'background-color':getFriendlyColour(p.colour.value)}">
+          <div class="colour-bar" v-bind:style="{'background-color': getPlayerColour(p)}">
           </div>
         </li>
     </ul>
@@ -28,6 +28,9 @@ export default {
         player,
         permitCallback: () => this.$emit('onOpenPlayerDetailRequested', player._id)
       })
+    },
+    getPlayerColour (player) {
+      return this.$store.getters.getColourForPlayer(player._id).value
     }
   },
   computed: {
@@ -54,7 +57,7 @@ export default {
     min-height: 8px;
 }
 
-@media screen and (max-width: 576px) { 
+@media screen and (max-width: 576px) {
   .list-group-item {
       height: 40px;
       width: 35px;

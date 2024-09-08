@@ -7,18 +7,28 @@ class GameHelper {
     return game.galaxy.players.find(p => p.userId)
   }
 
+  getColourMapping (game) {
+    const userPlayer = this.getUserPlayer(game);
+
+    // spectating
+    if (!userPlayer) {
+      return {};
+    }
+
+    if (userPlayer.colourMapping) {
+      return userPlayer.colourMapping;
+    } else {
+      userPlayer.colourMapping = {};
+      return userPlayer.colourMapping;
+    }
+  }
+
   getPlayerByAlias (game, playerName) {
     return game.galaxy.players.find(p => p.alias === playerName)
   }
 
   getPlayerById (game, playerId) {
     return game.galaxy.players.find(x => x._id === playerId)
-  }
-
-  getPlayerColour (game, playerId) {
-    let player = this.getPlayerById(game, playerId)
-
-    return this.getFriendlyColour(player.colour.value)
   }
 
   getFriendlyColour (colour) {
@@ -241,6 +251,16 @@ class GameHelper {
     let t = this.getCountdownTime(game, date)
 
     return this.getDateToString(t, largestUnitOnly)
+  }
+
+  getCountdownTimeStringByTicksWithTickETA (game, ticks, useNowDate = false, largestUnitOnly = false) {
+    const str = this.getCountdownTimeStringByTicks(game, ticks, useNowDate, largestUnitOnly);
+
+    if (game.settings.gameTime.gameType === 'realTime') {
+      return `${str} - Tick ${game.state.tick + ticks}`
+    }
+
+    return str
   }
 
   getCountdownTimeStringByTicks (game, ticks, useNowDate = false, largestUnitOnly = false) {
@@ -617,6 +637,27 @@ class GameHelper {
     console.log(ownersHomeStarId, star._id);
 
     return ownersHomeStarId && ownersHomeStarId === star._id;
+  }
+
+  getOriginalOwner (game, star) {
+    return game.galaxy.players.find(player => player.homeStarId == star._id);
+  }
+
+  isRedCapital(game, star) {
+    if (!star.homeStar || !star.ownedByPlayerId) {
+      return false;
+    }
+
+    if (this.isConquestHomeStars(game)) {
+      return true;
+    }
+
+    const player = this.getPlayerById(game, star.ownedByPlayerId)
+    if (this.isCapitalElimination(game) && this.isOwnerCapital(game, star) && !player.defeated) {
+      return true;
+    }
+
+    return false;
   }
 
   playerHasLowestTechLevel (game, techKey, player) {

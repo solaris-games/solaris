@@ -15,8 +15,10 @@
     "fluxEnabled": "enabled",
     "advancedAI": "enabled",
     "spectators": "enabled",
+    "afkSlotsOpen": "enabled",
     "readyToQuit": "enabled",
     "readyToQuitFraction": 0.9,
+    "readyToQuitVisibility": "anonymous",
     "awardRankTo": "top_n",
     "awardRankToTopN": 6
   },
@@ -48,14 +50,16 @@
     "carrierSpeed": 20,
     "starCaptureReward": "enabled",
     "specialistBans": {
-      "star": [],
+      "star": [
+        15
+      ],
       "carrier": []
     }
   },
   "conquest": {
     "victoryCondition": "starPercentage",
     "victoryPercentage": 33,
-    "capitalStarElimination": "disabled"
+    "capitalStarElimination": "enabled"
   },
   "orbitalMechanics": {
     "enabled": "disabled",
@@ -63,13 +67,13 @@
   },
   "player": {
     "startingStars": 6,
-    "startingCredits": 1000,
-    "startingCreditsSpecialists": 10,
+    "startingCredits": 2000,
+    "startingCreditsSpecialists": 15,
     "startingShips": 10,
     "startingInfrastructure": {
-      "economy": 10,
-      "industry": 10,
-      "science": 3
+      "economy": 5,
+      "industry": 5,
+      "science": 2
     },
     "developmentCost": {
       "economy": "standard",
@@ -77,7 +81,7 @@
       "science": "standard"
     },
     "tradeCredits": true,
-    "tradeCreditsSpecialists": true,
+    "tradeCreditsSpecialists": false,
     "tradeCost": 15,
     "tradeScanning": "scanned",
     "populationCap": {
@@ -106,18 +110,22 @@
     },
     "researchCosts": {
       "terraforming": "standard",
-      "experimentation": "standard",
-      "scanning": "standard",
-      "hyperspace": "standard",
+      "experimentation": "cheap",
+      "scanning": "cheap",
+      "hyperspace": "cheap",
       "manufacturing": "standard",
-      "banking": "standard",
-      "weapons": "standard",
-      "specialists": "standard"
+      "banking": "cheap",
+      "weapons": "expensive",
+      "specialists": "expensive"
     },
     "experimentationDistribution": "random",
     "bankingReward": "standard",
-    "experimentationReward": "standard",
-    "specialistTokenReward": "experimental"
+    "experimentationReward": "experimental",
+    "specialistTokenReward": "experimental",
+    "researchCostProgression": {
+      "progression": "exponential",
+      "growthFactor": "medium"
+    }
   },
   "gameTime": {
     "gameType": "realTime",

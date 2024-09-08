@@ -20,14 +20,11 @@ export default {
       player: null,
       onlineStatus: '',
       isOnline: false,
-      iconColour: '',
       intervalFunction: null
     }
   },
     mounted() {
       this.player = GameHelper.getPlayerById(this.$store.state.game, this.playerId)
-
-      this.iconColour = !this.colour ? GameHelper.getFriendlyColour(this.player.colour.value) : this.colour
 
       let isHiddenPlayerOnlineStatus = GameHelper.isHiddenPlayerOnlineStatus(this.$store.state.game)
 
@@ -46,9 +43,15 @@ export default {
     }
   },
   computed: {
+    iconColour () {
+      return !this.colour ? GameHelper.getFriendlyColour(this.playerColour) : this.colour
+    },
     iconFilled () {
       const unknownStatus = this.player.isOnline == null;
       return unknownStatus || this.isOnline || this.solidGlyphOnly;
+    },
+    playerColour() {
+      return this.$store.getters.getColourForPlayer(this.playerId).value
     }
   }
 }
@@ -63,7 +66,7 @@ export default {
   margin-right: -6px;
 }
 
-@media screen and (max-width: 576px) { 
+@media screen and (max-width: 576px) {
   .span-container {
     height: 10px;
     width: 10px;

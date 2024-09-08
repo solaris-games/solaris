@@ -41,7 +41,9 @@ async function startup() {
 
     // Set up the agenda instance.
     const agendajs = new Agenda()
-        .database(config.connectionString)
+        .database(config.connectionString, 'agendaJobs', {
+            useUnifiedTopology: true,
+        })
         .processEvery('10 seconds')
         .maxConcurrency(20);
 

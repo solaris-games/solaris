@@ -15,6 +15,7 @@
     "fluxEnabled": "enabled",
     "advancedAI": "enabled",
     "spectators": "enabled",
+    "afkSlotsOpen": "enabled",
     "readyToQuit": "enabled"
   },
   "galaxy": {
@@ -42,7 +43,7 @@
     "splitResources": "disabled",
     "resourceDistribution": "weightedCenter",
     "playerDistribution": "circular",
-    "carrierSpeed": 10,
+    "carrierSpeed": 15,
     "starCaptureReward": "enabled",
     "specialistBans": {
       "star": [16, 17],

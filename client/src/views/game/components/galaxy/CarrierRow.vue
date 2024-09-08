@@ -1,6 +1,6 @@
 <template>
 <tr>
-    <td><i class="fas fa-circle" v-if="carrier.ownedByPlayerId" :style="{ 'color': getColour() }"></i></td>
+    <td><i class="fas fa-circle" v-if="carrier.ownedByPlayerId" :style="{ 'color': colour }"></i></td>
     <td><a href="javascript:;" @click="clickCarrier">{{carrier.name}}</a></td>
     <td><a href="javascript:;" @click="goToCarrier"><i class="far fa-eye"></i></a></td>
     <td><specialist-icon :type="'carrier'" :defaultIcon="'rocket'" :specialist="carrier.specialist" :hideDefaultIcon="true"></specialist-icon></td>
@@ -46,9 +46,6 @@ export default {
     }
   },
   methods: {
-    getColour () {
-      return GameHelper.getPlayerColour(this.$store.state.game, this.carrier.ownedByPlayerId)
-    },
     clickCarrier (e) {
       this.$emit('onOpenCarrierDetailRequested', this.carrier._id)
     },
@@ -60,6 +57,11 @@ export default {
       this.timeRemainingEtaActual = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.carrier.ticksEta, false, false)
       this.timeRemainingEtaTotal = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.carrier.ticksEtaTotal, false, true)
       this.timeRemainingEtaTotalActual = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.carrier.ticksEtaTotal, false, false)
+    }
+  },
+  computed: {
+    colour () {
+      return this.$store.getters.getColourForPlayer(this.carrier.ownedByPlayerId).value
     }
   }
 }

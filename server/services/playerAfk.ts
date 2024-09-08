@@ -88,9 +88,7 @@ export default class PlayerAfkService extends EventEmitter {
     }
 
     setPlayerAsAfk(game: Game, player: Player) {
-        this.playerService.setPlayerAsDefeated(game, player, true);
-
-        player.isOpenSlot = true; // AFK players will always have their slots open.
+        this.playerService.setPlayerAsDefeated(game, player, game.settings.general.afkSlotsOpen === 'enabled');
         player.afk = true;
     }
 

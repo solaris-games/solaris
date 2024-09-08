@@ -21,6 +21,7 @@ export const middleware = (container: DependencyContainer): CoreMiddleware => {
                         errors = [errors];
                     }
 
+                    console.error(errors);
                     res.status(err.statusCode).json({
                         errors
                     });

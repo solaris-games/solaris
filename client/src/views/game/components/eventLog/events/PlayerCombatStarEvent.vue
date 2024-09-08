@@ -88,7 +88,7 @@
               </tbody>
           </table>
         </div>
-        
+
         <hr class="mt-0"/>
 
         <div v-if="event.data.captureResult">
@@ -139,13 +139,13 @@ export default {
       this.$emit('onOpenPlayerDetailRequested', e)
     },
     getCarrierColour (carrier) {
-      return GameHelper.getPlayerColour(this.$store.state.game, carrier.ownedByPlayerId)
+      return this.$store.getters.getColourForPlayer(carrier.ownedByPlayerId).value
     },
     getCarrierShape (carrier) {
       return GameHelper.getPlayerById(this.$store.state.game, carrier.ownedByPlayerId).shape;
     },
     getStarColour () {
-      return GameHelper.getPlayerColour(this.$store.state.game, this.event.data.playerIdOwner)
+      return this.$store.getters.getColourForPlayer(this.event.data.playerIdOwner).value
     },
     getStarShape () {
       return GameHelper.getPlayerById(this.$store.state.game, this.event.data.playerIdOwner).shape;

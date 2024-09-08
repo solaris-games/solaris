@@ -11,6 +11,7 @@ import CarrierService from '../services/carrier';
 import PlayerService from '../services/player';
 import NameService from '../services/name';
 import TechnologyService from '../services/technology';
+import PlayerColourService from "../services/playerColour";
 
 const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
@@ -136,6 +137,7 @@ describe('player', () => {
     let mapService;
     let technologyService;
     let playerService;
+    let playerColourService;
 
     beforeEach(() => {
         // Use real services because I cannot fathom how to fake all this shit.
@@ -153,7 +155,10 @@ describe('player', () => {
         // @ts-ignore
         technologyService = new TechnologyService();
         // @ts-ignore
-        playerService = new PlayerService(null, randomService, mapService, starService, carrierService, starDistanceService, technologyService);
+        playerColourService = new PlayerColourService(randomService);
+        // @ts-ignore
+        playerService = new PlayerService(null, randomService, mapService, starService, carrierService, starDistanceService, technologyService, null, null, null, null, playerColourService);
+
     });
 
     it('should create an empty player', () => {
