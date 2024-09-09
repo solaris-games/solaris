@@ -163,7 +163,7 @@ export default {
       return gameHelper.getUserPlayer(this.$store.state.game).credits
     },
     colour () {
-      return this.$store.getters.getColourForPlayer(this.carrier.ownedByPlayerId).value
+      return this.$store.getters.getColourForPlayer(this.star.ownedByPlayerId).value
     }
   }
 }
