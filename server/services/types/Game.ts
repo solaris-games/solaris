@@ -278,6 +278,7 @@ export interface Game {
 		endDate: Date | null;
 		lastTickDate: Date | null;
 		ticksToEnd: number | null;
+		forceTick: boolean;
 		stars: number;
 		starsForVictory: number;
 		players: number;
