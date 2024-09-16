@@ -246,7 +246,17 @@ export default class GameService extends EventEmitter {
             throw new ValidationError('Cannot fast forward a game that is not in progress.');
         }
 
+        if (game.state.forceTick) {
+            throw new ValidationError('Cannot fast forward a game that is already fast forwarding.');
+        }
 
+        await this.gameRepo.updateOne({
+            _id: game._id
+        }, {
+            $set: {
+                'state.forceTick': true
+            }
+        });
     }
 
     async forceStart(game: Game, forceStartingUserId: DBObjectId) {
