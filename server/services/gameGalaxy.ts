@@ -168,6 +168,9 @@ export default class GameGalaxyService {
         if (isHistorical && game.settings.general.timeMachine === 'disabled') {
             throw new ValidationError(`The time machine is disabled in this game.`);
         }
+        else if (game.settings.general.timeMachine === 'enabled') {
+            game.state.timeMachineMinimumTick = await this.historyService.getHistoryMinimumTick(gameId);
+        }
 
         // Check if the user is playing in this game.
         let userPlayer = this._getUserPlayer(game, userId);
@@ -352,6 +355,10 @@ export default class GameGalaxyService {
 
             star.effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(doc, star);
 
+            if (s.ownedByPlayerId) {
+                s.ownedByPlayer = doc.galaxy.players.find(p => p._id.toString() === s.ownedByPlayerId!.toString())!;
+            }
+
             if (isKingOfTheHillMode) {
                 star.isKingOfTheHillStar = kingOfTheHillStar != null && kingOfTheHillStar._id.toString() === s._id.toString();
             }
@@ -404,6 +411,7 @@ export default class GameGalaxyService {
                 // Calculate the star's terraformed resources.
                 if (s.ownedByPlayerId) {
                     s.terraformedResources = this.starService.calculateTerraformedResources(s, s.effectiveTechs.terraforming);
+                    s.ownedByPlayer = doc.galaxy.players.find(p => p._id.toString() === s.ownedByPlayerId.toString());
                 }
 
                 // Round the Natural Resources
@@ -488,6 +496,7 @@ export default class GameGalaxyService {
                         _id: s._id,
                         name: s.name,
                         ownedByPlayerId: s.ownedByPlayerId,
+                        ownedByPlayer: s.ownedByPlayer,
                         location: s.location,
                         locationNext: s.locationNext,
                         warpGate: false, // Hide warp gates outside of scanning range
@@ -531,6 +540,9 @@ export default class GameGalaxyService {
         // Populate the number of ticks it will take for all waypoints.
         doc.galaxy.carriers
             .forEach(c => {
+
+                c.ownedByPlayer = doc.galaxy.players.find(p => p._id.toString() === c.ownedByPlayerId!.toString())!;
+
                 c.effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(doc, c);
 
                 this.waypointService.populateCarrierWaypointEta(doc, c);

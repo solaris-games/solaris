@@ -154,7 +154,7 @@ export default {
     }
   },
   mounted () {
-    this.loadAchievements()
+    this.loadData()
   },
   methods: {
     async logout () {
@@ -172,13 +172,14 @@ export default {
 
       router.push({ name: 'home' })
     },
-    async loadAchievements () {
+    async loadData () {
       try {
         let response = await userService.getMyUserInfo()
 
         this.user = response.data
         this.achievements = response.data.achievements
 
+        this.$store.commit('setRoles', response.data.roles)
         this.$store.commit('setUserCredits', response.data.credits)
         this.$store.commit('setUserIsEstablishedPlayer', response.data.isEstablishedPlayer)
       } catch (err) {

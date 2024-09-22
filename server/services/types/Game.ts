@@ -272,6 +272,7 @@ export interface Game {
 		readyToQuitCount: number | undefined;
 		locked: boolean;
 		tick: number;
+		timeMachineMinimumTick?: number | null;
 		paused: boolean;
 		productionTick: number;
 		startDate: Date | null;
