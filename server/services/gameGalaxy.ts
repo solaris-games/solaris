@@ -951,7 +951,7 @@ export default class GameGalaxyService {
     }
 
     _appendStarsPendingDestructionFlag(game: Game) {
-        let pendingStars = this.battleRoyaleService.getStarsToDestroy(game);
+        let pendingStars = this.battleRoyaleService.getStarsToDestroyPreview(game);
 
         for (let pendingStar of pendingStars) {
             pendingStar.targeted = true;
