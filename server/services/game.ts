@@ -237,6 +237,28 @@ export default class GameService extends EventEmitter {
         this.emit(GameServiceEvents.onPlayerDefeated, e);
     }
 
+    async fastForward(game: Game, fastForwardUserId: DBObjectId) {
+        if (!await this.gameAuthService.isGameAdmin(game, fastForwardUserId)) {
+            throw new ValidationError('You do not have permission to fast forward this game.');
+        }
+
+        if (!this.gameStateService.isInProgress(game)) {
+            throw new ValidationError('Cannot fast forward a game that is not in progress.');
+        }
+
+        if (game.state.forceTick) {
+            throw new ValidationError('Cannot fast forward a game that is already fast forwarding.');
+        }
+
+        await this.gameRepo.updateOne({
+            _id: game._id
+        }, {
+            $set: {
+                'state.forceTick': true
+            }
+        });
+    }
+
     async forceStart(game: Game, forceStartingUserId: DBObjectId) {
         if (!await this.gameAuthService.isGameAdmin(game, forceStartingUserId)) {
             throw new ValidationError('You do not have permission to force start this game.');

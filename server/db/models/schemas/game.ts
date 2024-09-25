@@ -208,6 +208,7 @@ const schema = new Schema({
 		endDate: { type: Types.Date, required: false, default: null },
 		lastTickDate: { type: Types.Date, required: false, default: null },
 		ticksToEnd: { type: Types.Number, required: false, default: null },
+		forceTick: { type: Types.Boolean, required: false, default: false },
 		stars: { type: Types.Number, required: true },
 		starsForVictory: { type: Types.Number, required: true },
 		players: { type: Types.Number, required: true, default: 0 },
