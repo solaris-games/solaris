@@ -13,6 +13,7 @@
     "start-db-recalc-ranks:dev": "ts-node-dev --transpile-only --respawn --inspect=9234 db/recalculateRankings.ts",
     "start-db-recalc-ranks:prod": "node dist/db/recalculateRankings.js",
     "restore-game": "ts-node-dev --transpile-only db/restoreGame.ts",
+    "analyze-carriers": "ts-node-dev --transpile-only db/analyzeCarrierIds.ts",
     "prebuild": "rm -rf ./dist",
     "build": "tsc",
     "postbuild": "cp -r services/emailTemplates ./dist/services/emailTemplates && cp .env ./dist | true",
