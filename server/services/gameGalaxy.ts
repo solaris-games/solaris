@@ -34,6 +34,7 @@ import GameFluxService from './gameFlux';
 import PlayerAfkService from './playerAfk';
 import ShipService from './ship';
 import SpectatorService from './spectator';
+import {GameHistoryCarrier} from "./types/GameHistory";
 
 enum ViewpointKind {
     Basic,
@@ -790,6 +791,24 @@ export default class GameGalaxyService {
         doc.galaxy.carriers = [];
     }
 
+    _fromHistoryCarrier(historyCarrier: GameHistoryCarrier): Carrier {
+        return {
+            _id: historyCarrier.carrierId,
+            isGift: historyCarrier.isGift,
+            location: historyCarrier.location,
+            locationNext: undefined,
+            name: historyCarrier.name,
+            orbiting: undefined,
+            ownedByPlayerId: undefined,
+            ships: undefined,
+            specialist: undefined,
+            specialistExpireTick: undefined,
+            specialistId: undefined,
+            waypoints: [],
+            waypointsLooped: false,
+        } as Carrier;
+    }
+
     async _maskGalaxy(game: Game, userPlayer: Player | null, isHistorical: boolean, tick: number | null) {
         /*
             Masking of galaxy data occurs here, it prevent players from seeing what other
@@ -924,7 +943,7 @@ export default class GameGalaxyService {
                 let gameCarrier = game.galaxy.carriers.find(x => x._id.toString() === historyCarrier.carrierId.toString());
                 
                 if (!gameCarrier) {
-                    game.galaxy.carriers.push(historyCarrier as any);
+                    game.galaxy.carriers.push(this._fromHistoryCarrier(historyCarrier));
                 }
             }
         }
@@ -938,7 +957,7 @@ export default class GameGalaxyService {
                 let gameCarrier = game.galaxy.carriers.find(x => x._id.toString() === historyCarrier.carrierId.toString());
                 
                 if (!gameCarrier) {
-                    game.galaxy.carriers.push(historyCarrier as any);
+                    game.galaxy.carriers.push(this._fromHistoryCarrier(historyCarrier));
                 }
             }
         }
