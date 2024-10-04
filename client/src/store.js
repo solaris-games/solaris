@@ -513,6 +513,8 @@ export default new Vuex.Store({
       })
     },
     async addColourMapping ({ commit, state }, data) {
+      console.warn('Adding colour mapping', data);
+
       await ColourService.addColour(state.game._id, data);
       commit('internalAddColourMapping', data);
 
