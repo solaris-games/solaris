@@ -400,16 +400,14 @@ export default class GameService extends EventEmitter {
     }
 
     checkReadyToQuit(game: Game, leaderboard: LeaderboardPlayer[]) {
-        const undefeatedPlayers = this.listAllUndefeatedPlayers(game);
-
         const rtqFraction = game.settings?.general?.readyToQuitFraction || 1.0;
         const starsForEnd = rtqFraction * game.state.stars;
 
         let rtqStarsSum = 0;
         let allUndefeatedHaveRTQed = true;
 
-        for (const player of undefeatedPlayers) {
-            if (player.readyToQuit) {
+        for (const player of game.galaxy.players) {
+            if (player.readyToQuit || player.defeated) {
                 rtqStarsSum += leaderboard.find(x => x.player._id.toString() === player._id.toString())?.stats?.totalStars || 0;
             } else {
                 allUndefeatedHaveRTQed = false;
