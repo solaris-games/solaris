@@ -45,8 +45,14 @@ export default {
     }
   },
   mounted () {
-    this.modal = new bootstrap.Modal(document.getElementById("colourOverride"));
-    this.modal.toggle();
+    const modalEl = document.getElementById("colourOverride");
+
+    modalEl.addEventListener('hidden.bs.modal', () => {
+      this.$emit('onColourOverrideCancelled');
+    });
+
+    this.modal = new bootstrap.Modal(modalEl);
+    this.modal.show();
     this.player = gameHelper.getPlayerById(this.$store.state.game, this.playerId);
     this.currentColour = this.ensureExists(this.$store.getters.getColourForPlayer(this.playerId).alias);
   },
