@@ -36,7 +36,7 @@ export default {
       GameContainer.map.panToPlayer(this.$store.state.game, this.technology)
     },
     displayStyle(research) {
-      if (this.technology._id == this.userPlayer._id) {
+      if (this.technology._id == this.userPlayer?._id) {
         return {
           "text-success": this.hasHighestTechLevel(research),
           "text-danger": this.hasLowestTechLevel(research)
