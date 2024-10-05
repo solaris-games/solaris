@@ -81,16 +81,29 @@ export default class AdminService {
         });
     }
 
-    async listGames(limit: number) {
-        return await this.gameRepo.find({
-            'settings.general.type': { $ne: 'tutorial' } // Non tutorial games
+    async listGames(finishedLimit: number) {
+        const unfinishedGames = await this.gameRepo.find({
+            'settings.general.type': { $ne: 'tutorial' }, // Non tutorial games
+            'state.endDate': { $eq: null }, // Game is unfinished
         }, {
             'settings.general': 1,
             'state': 1
         }, {
             _id: -1
+        });
+
+        const finishedGames = await this.gameRepo.find({
+            'settings.general.type': { $ne: 'tutorial' }, // Non tutorial games
+            'state.endDate': { $ne: null }, // Game is finished
+            }, {
+            'settings.general': 1,
+            'state': 1
+        }, {
+            _id: -1
         },
-        limit);
+        finishedLimit);
+
+        return unfinishedGames.concat(finishedGames);
     }
 
     async setRoleContributor(userId: DBObjectId, enabled: boolean = true) {

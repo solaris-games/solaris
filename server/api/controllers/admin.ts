@@ -192,7 +192,7 @@ export default (container: DependencyContainer) => {
         },
         listGames: async (req, res, next) => {
             try {
-                let result = await container.adminService.listGames(100);
+                let result = await container.adminService.listGames(25);
                 
                 res.status(200).json(result);
                 return next();
