@@ -4,7 +4,7 @@ import Toasted from 'vue-toasted'
 import App from './App.vue'
 import router from './router'
 import store from './store'
-
+import { Plugin as FragmentPlugin } from 'vue-fragment'
 import $ from 'jquery'
 import 'pixi.js-legacy'
 import 'pixi-viewport'
@@ -79,6 +79,8 @@ Vue.directive('tooltip', function(el, binding) {
     trigger: 'hover'
   })
 })
+
+Vue.use(FragmentPlugin);
 
 new Vue({
   router,

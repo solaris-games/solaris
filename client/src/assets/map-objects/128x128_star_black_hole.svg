@@ -1,4 +1,11 @@
-<svg id="svg3882" version="1.1" viewBox="0 0 33.866666 33.866668" height="128" width="128" xmlns="http://www.w3.org/2000/svg">
+<svg id="128x128_star_black_hole" version="1.1" viewBox="0 0 33.866666 33.866668" height="128" width="128" xmlns="http://www.w3.org/2000/svg">
   <defs id="defs3876"></defs>
-  <circle style="fill: rgb(0, 0, 0); stroke: rgb(255, 255, 255); stroke-width:20;" transform="matrix(0.056365, 0, 0, 0.056668, -23.627546, -2.415157)" cx="719" cy="345" r="190"></circle>
+    <style>
+      .black-hole {
+        fill: rgb(0, 0, 0);
+        stroke: rgb(255, 255, 255);
+        stroke-width:20;
+      }
+    </style>
+  <circle class="black-hole" transform="matrix(0.056365, 0, 0, 0.056668, -23.627546, -2.415157)" cx="719" cy="345" r="190"></circle>
 </svg>

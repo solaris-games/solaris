@@ -1,6 +1,6 @@
 <template>
 <tr>
-    <td><i class="fas fa-circle" v-if="ship.ownedByPlayerId" :style="{ 'color': colour }"></i></td>
+    <td><player-icon v-if="ship.ownedByPlayerId" :playerId="ship.ownedByPlayerId" /></td>
     <td><a href="javascript:;" @click="clickShip">{{ship.name}}</a></td>
     <td><a href="javascript:;" @click="goToShip"><i class="far fa-eye"></i></a></td>
     <td>
@@ -14,11 +14,12 @@
 
 <script>
 import gameContainer from '../../../../game/container'
-import gameHelper from '../../../../services/gameHelper'
+import PlayerIconVue from '../player/PlayerIcon'
 import SpecialistIcon from '../specialist/SpecialistIcon'
 
 export default {
   components: {
+    'player-icon': PlayerIconVue,
     'specialist-icon': SpecialistIcon
   },
   props: {
@@ -34,11 +35,6 @@ export default {
     },
     goToShip (e) {
       gameContainer.map.panToLocation(this.ship.location)
-    }
-  },
-  computed: {
-    colour () {
-      return this.$store.getters.getColourForPlayer(this.ship.ownedByPlayerId).value
     }
   }
 }
