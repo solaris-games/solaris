@@ -237,6 +237,28 @@ export default class GameService extends EventEmitter {
         this.emit(GameServiceEvents.onPlayerDefeated, e);
     }
 
+    async fastForward(game: Game, fastForwardUserId: DBObjectId) {
+        if (!await this.gameAuthService.isGameAdmin(game, fastForwardUserId)) {
+            throw new ValidationError('You do not have permission to fast forward this game.');
+        }
+
+        if (!this.gameStateService.isInProgress(game)) {
+            throw new ValidationError('Cannot fast forward a game that is not in progress.');
+        }
+
+        if (game.state.forceTick) {
+            throw new ValidationError('Cannot fast forward a game that is already fast forwarding.');
+        }
+
+        await this.gameRepo.updateOne({
+            _id: game._id
+        }, {
+            $set: {
+                'state.forceTick': true
+            }
+        });
+    }
+
     async forceStart(game: Game, forceStartingUserId: DBObjectId) {
         if (!await this.gameAuthService.isGameAdmin(game, forceStartingUserId)) {
             throw new ValidationError('You do not have permission to force start this game.');
@@ -400,16 +422,14 @@ export default class GameService extends EventEmitter {
     }
 
     checkReadyToQuit(game: Game, leaderboard: LeaderboardPlayer[]) {
-        const undefeatedPlayers = this.listAllUndefeatedPlayers(game);
-
         const rtqFraction = game.settings?.general?.readyToQuitFraction || 1.0;
         const starsForEnd = rtqFraction * game.state.stars;
 
         let rtqStarsSum = 0;
         let allUndefeatedHaveRTQed = true;
 
-        for (const player of undefeatedPlayers) {
-            if (player.readyToQuit) {
+        for (const player of game.galaxy.players) {
+            if (player.readyToQuit || player.defeated) {
                 rtqStarsSum += leaderboard.find(x => x.player._id.toString() === player._id.toString())?.stats?.totalStars || 0;
             } else {
                 allUndefeatedHaveRTQed = false;

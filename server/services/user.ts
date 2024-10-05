@@ -78,7 +78,7 @@ export default class UserService extends EventEmitter {
     }
 
     async getUserCount(): Promise<number> {
-        return this.userRepo.countAll();
+        return await this.userRepo.countAll();
     }
 
     async getGameUsers(game: Game) {

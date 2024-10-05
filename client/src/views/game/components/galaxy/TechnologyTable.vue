@@ -2,7 +2,7 @@
 <div class="container">
   <div class="row mb-2 g-0">
     <div class="col-auto">
-      <button class="btn btn-sm" :class="{ 'btn-danger': !showAll, 'btn-success': showAll }" @click="toggleShowAll" v-if="getUserPlayer()">
+      <button class="btn btn-sm" :class="{ 'btn-danger': !showAll, 'btn-success': showAll }" @click="toggleShowAll" v-if="userPlayer != null">
         <span v-if="!showAll">Show All</span>
         <span v-if="showAll">Show You</span>
       </button>
@@ -17,141 +17,128 @@
       <table class="table table-striped table-hover mb-0">
           <thead class="table-dark">
               <tr>
-                  <td><i class="fas fa-user"></i></td>
-                  <td><a href="javascript:;" @click="sort('alias')">Name</a></td>
+                  <td title="Player"><i class="fas fa-user"></i></td>
+                  <td><a href="javascript:;" @click="sort(['alias'], ['_id'] )">Name</a></td>
                   <td></td>
-                  <td class="text-end" title="Scanning"><a href="javascript:;" @click="sort('scanning')"><i class="fas fa-binoculars"></i></a></td>
-                  <td class="text-end" title="Hyperspace"><a href="javascript:;" @click="sort('hyperspace')"><i class="fas fa-gas-pump"></i></a></td>
-                  <td class="text-end" title="Terraforming"><a href="javascript:;" @click="sort('terraforming')"><i class="fas fa-globe-europe"></i></a></td>
-                  <td class="text-end" title="Experimentation"><a href="javascript:;" @click="sort('experimentation')"><i class="fas fa-microscope"></i></a></td>
-                  <td class="text-end" title="Weapons"><a href="javascript:;" @click="sort('weapons')"><i class="fas fa-gun"></i></a></td>
-                  <td class="text-end" title="Banking"><a href="javascript:;" @click="sort('banking')"><i class="fas fa-money-bill-alt"></i></a></td>
-                  <td class="text-end" title="Manufacturing"><a href="javascript:;" @click="sort('manufacturing')"><i class="fas fa-industry"></i></a></td>
-                  <td class="text-end" title="Specialists"><a href="javascript:;" @click="sort('specialists')"><i class="fas fa-user-astronaut"></i></a></td>
+                  <td class="text-end" title="Scanning"><a href="javascript:;" @click="sort(['scanning'])"><i class="fas fa-binoculars"></i></a></td>
+                  <td class="text-end" title="Hyperspace"><a href="javascript:;" @click="sort(['hyperspace'])"><i class="fas fa-gas-pump"></i></a></td>
+                  <td class="text-end" title="Terraforming"><a href="javascript:;" @click="sort(['terraforming'])"><i class="fas fa-globe-europe"></i></a></td>
+                  <td class="text-end" title="Experimentation"><a href="javascript:;" @click="sort(['experimentation'])"><i class="fas fa-microscope"></i></a></td>
+                  <td class="text-end" title="Weapons"><a href="javascript:;" @click="sort(['weapons'])"><i class="fas fa-gun"></i></a></td>
+                  <td class="text-end" title="Banking"><a href="javascript:;" @click="sort(['banking'])"><i class="fas fa-money-bill-alt"></i></a></td>
+                  <td class="text-end" title="Manufacturing"><a href="javascript:;" @click="sort(['manufacturing'])"><i class="fas fa-industry"></i></a></td>
+                  <td class="text-end" title="Specialists"><a href="javascript:;" @click="sort(['specialists'])"><i class="fas fa-user-astronaut"></i></a></td>
               </tr>
           </thead>
           <tbody>
-              <technology-row v-for="technology in sortedTableData" v-bind:key="technology._id" :technology="technology"
-                @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+              <technology-row v-for="technology in sortedFilteredTableData"
+                              v-bind:key="technology._id"
+                              :technology="technology"
+                              :userPlayer="userPlayer"
+                              @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
           </tbody>
       </table>
     </div>
   </div>
 
-  <p v-if="!tableData.length" class="text-center mt-2 mb-2">No empires to display.</p>
+  <p v-if="!sortedFilteredTableData.length" class="text-center mt-2 mb-2">No empires to display.</p>
 </div>
 </template>
 
 <script>
 import GameHelper from '../../../../services/gameHelper'
-import TechnologyRowVue from './TechnologyRow.vue'
+import GridHelper from '../../../../services/gridHelper'
+import SortInfo from '../../../../services/data/sortInfo'
+import TechnologyRowVue from './TechnologyRow'
 
 export default {
   components: {
     'technology-row': TechnologyRowVue
   },
   data: function () {
+    let defaultSortInfo = new SortInfo([['alias']], true);
+
     return {
       showAll: false,
-      tableData: [],
-      sortBy: null,
-      sortDirection: true,
+      defaultSortInfo: defaultSortInfo,
+      sortInfo: new SortInfo(defaultSortInfo.propertyPaths, defaultSortInfo.sortAscending),
+      sortInfoKey: 'galaxy_technology_sortInfo',
       searchFilter: ''
     }
   },
   mounted () {
-    this.showAll = this.getUserPlayer() != null
-    this.tableData = this.getTableData()
-
-    this.sortBy = localStorage.getItem('galaxy_technology_sortBy') || null
-    this.sortDirection = localStorage.getItem('galaxy_technology_sortDirection') == 'true' || false
+    this.showAll = this.userPlayer != null
+    this.sortInfo = SortInfo.fromJSON(localStorage.getItem(this.sortInfoKey), this.defaultSortInfo);
   },
-  unmounted () {
-    localStorage.setItem('galaxy_technology_sortBy', this.sortBy)
-    localStorage.setItem('galaxy_technology_sortDirection', this.sortDirection)
+  destroyed () {
+    localStorage.setItem(this.sortInfoKey, JSON.stringify(this.sortInfo));
   },
   methods: {
-    getUserPlayer () {
-      return GameHelper.getUserPlayer(this.$store.state.game)
-    },
     toggleShowAll () {
       this.showAll = !this.showAll
-
-      this.tableData = this.getTableData()
-    },
-    getTableData () {
-      let sorter = (a, b) => a.alias.localeCompare(b.alias)
-
-      let data = this.$store.state.game.galaxy.players.map(x => {
-        if (x.research) {
-          return {
-            _id: x._id,
-            alias: x.alias,
-            defeated: x.defeated,
-            scanning: x.research.scanning.level,
-            hyperspace: x.research.hyperspace.level,
-            terraforming: x.research.terraforming.level,
-            experimentation: x.research.experimentation.level,
-            weapons: x.research.weapons.level,
-            banking: x.research.banking.level,
-            manufacturing: x.research.manufacturing.level,
-            specialists: x.research.specialists.level
-          }
-        }
-
-        return {
-            _id: x._id,
-            alias: x.alias,
-            defeated: x.defeated,
-            scanning: null,
-            hyperspace: null,
-            terraforming: null,
-            experimentation: null,
-            weapons: null,
-            banking: null,
-            manufacturing: null,
-            specialists: null
-        }
-      })
-
-      if (this.showAll || !this.getUserPlayer()) {
-        return data.sort(sorter)
-      } else {
-        return data.filter(x => x._id === this.getUserPlayer()._id).sort(sorter)
-      }
     },
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', e)
     },
-    sort (columnName) {
-      // If sorting by a new column, reset the sort.
-      if (this.sortBy !== columnName) {
-        this.sortBy = columnName
-        this.sortDirection = true
-      } else {
-        // Otherwise if we are sorting by the same column, flip the sort direction.
-        this.sortDirection = !this.sortDirection
-      }
+    sort(...propertyPaths) {
+      this.sortInfo.swapSort(propertyPaths);
     }
   },
   computed: {
-    sortedTableData () {
-      let filterFunction = a => a.alias.toLowerCase().includes(this.searchFilter.toLowerCase())
+    userPlayer() {
+      return GameHelper.getUserPlayer(this.$store.state.game);
+    },
+    tableData () {
+      let tableData = this.$store.state.game.galaxy.players.map(p => {
+        if (p.research) {
+          return {
+            _id: p._id,
+            alias: p.alias,
+            defeated: p.defeated,
+            scanning: p.research.scanning.level,
+            hyperspace: p.research.hyperspace.level,
+            terraforming: p.research.terraforming.level,
+            experimentation: p.research.experimentation.level,
+            weapons: p.research.weapons.level,
+            banking: p.research.banking.level,
+            manufacturing: p.research.manufacturing.level,
+            specialists: p.research.specialists.level
+          }
+        }
 
-      if (this.sortBy == null) {
-        return this.tableData.filter(filterFunction)
+        return {
+          _id: p._id,
+          alias: p.alias,
+          defeated: p.defeated,
+          scanning: null,
+          hyperspace: null,
+          terraforming: null,
+          experimentation: null,
+          weapons: null,
+          banking: null,
+          manufacturing: null,
+          specialists: null
+        }
+      });
+
+      return tableData;
+    },
+    filteredTableData() {
+      let tableData = this.tableData;
+
+      let isSearchFilterMatch = p => p.alias.toLowerCase().includes(this.searchFilter.toLowerCase());
+
+      if (!this.showAll && this.userPlayer != null) {
+        tableData = tableData.filter(p => p._id === this.userPlayer._id && isSearchFilterMatch(p));
+      }
+      else {
+        tableData = tableData.filter(isSearchFilterMatch);
       }
 
-      return this.tableData
-        .filter(filterFunction)
-        .sort((a, b) => {
-          if (this.sortDirection) { // Ascending
-            return b[this.sortBy] < a[this.sortBy] ? 1 : -1
-          }
-
-          // Descending
-          return a[this.sortBy] <= b[this.sortBy] ? 1 : -1
-        })
+      return tableData;
+    },
+    sortedFilteredTableData () {
+      return GridHelper.dynamicSort(this.filteredTableData, this.sortInfo);
     }
   }
 }

@@ -336,6 +336,18 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             controller.forceStart
     );
 
+    router.post('/api/game/:gameId/fastforward',
+        mw.auth.authenticate(),
+        mw.game.loadGame({
+            lean: false,
+        }),
+        mw.game.validateGameState({
+            isUnlocked: true,
+            isInProgress: false
+        }),
+        controller.fastForward
+    );
+
     router.get('/api/game/:gameId/player/:playerId',
             mw.game.loadGame({
                 lean: true,

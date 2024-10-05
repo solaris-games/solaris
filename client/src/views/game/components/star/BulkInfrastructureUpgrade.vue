@@ -142,7 +142,7 @@
           <!-- TODO: This should be a component -->
           <tr v-for="previewStar in upgradePreview.stars" :key="previewStar.starId">
             <td>
-              <a href="javascript:void;" @click="panToStar(previewStar.starId)">
+              <a href="javascript:;" @click="panToStar(previewStar.starId)">
                 <i class="fas fa-eye"></i>
                 {{ getStar(previewStar.starId).name }}
               </a>

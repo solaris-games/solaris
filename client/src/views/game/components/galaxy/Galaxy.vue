@@ -11,6 +11,9 @@
                 <a class="nav-link" :class="{'active':activeTab=== 'stars'}" data-bs-toggle="tab" href="#stars">Stars</a>
             </li>
             <li class="nav-item">
+                <a class="nav-link" :class="{'active':activeTab=== 'starTypes'}" data-bs-toggle="tab" href="#starTypes">Star Types</a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" :class="{'active':activeTab === 'carriers'}" data-bs-toggle="tab" href="#carriers">Carriers</a>
             </li>
             <li class="nav-item">
@@ -35,6 +38,10 @@
         </div>
         <div class="tab-pane fade" :class="{'show active':activeTab=== 'stars'}" id="stars">
             <stars-table
+              @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
+        </div>
+        <div class="tab-pane fade" :class="{'show active':activeTab=== 'starTypes'}" id="starTypes">
+            <star-types-table
               @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
         </div>
         <div class="tab-pane fade" :class="{'show active':activeTab=== 'carriers'}" id="carriers">
@@ -63,19 +70,21 @@
 </template>
 
 <script>
-import MenuTitle from '../MenuTitle.vue'
-import StarsTableVue from './StarsTable.vue'
-import CarriersTableVue from './CarriersTable.vue'
-import ShipsTableVue from './ShipsTable.vue'
-import CapitalsTableVue from './CapitalsTable.vue'
-import NaturalResourcesTableVue from './NaturalResourcesTable.vue'
-import EmpiresTableVue from './EmpiresTable.vue'
-import TechnologyTableVue from './TechnologyTable.vue'
+import MenuTitle from '../MenuTitle'
+import StarsTableVue from './StarsTable'
+import StarTypesTableVue from './StarTypesTable'
+import CarriersTableVue from './CarriersTable'
+import ShipsTableVue from './ShipsTable'
+import CapitalsTableVue from './CapitalsTable'
+import NaturalResourcesTableVue from './NaturalResourcesTable'
+import EmpiresTableVue from './EmpiresTable'
+import TechnologyTableVue from './TechnologyTable'
 
 export default {
   components: {
     'menu-title': MenuTitle,
     'stars-table': StarsTableVue,
+    'star-types-table': StarTypesTableVue,
     'carriers-table': CarriersTableVue,
     'ships-table': ShipsTableVue,
     'capitals-table': CapitalsTableVue,

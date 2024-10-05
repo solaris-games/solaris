@@ -2,7 +2,7 @@
 <div class="container">
   <div class="row mb-2 g-0">
     <div class="col-auto">
-      <button class="btn btn-sm" :class="{ 'btn-danger': !showAll, 'btn-success': showAll }" @click="toggleShowAll" v-if="getUserPlayer()">
+      <button class="btn btn-sm" :class="{ 'btn-danger': !showAll, 'btn-success': showAll }" @click="toggleShowAll" v-if="userPlayer != null">
         <span v-if="!showAll">Show All</span>
         <span v-if="showAll">Show Yours</span>
       </button>
@@ -17,117 +17,96 @@
         <table class="table table-striped table-hover mb-0">
             <thead class="table-dark">
                 <tr>
-                    <td><i class="fas fa-user"></i></td>
+                    <td title="Player"><a href="javascript:;" @click="sort(['ownedByPlayer','alias'], ['ownedByPlayerId'], ['name'])"><i class="fas fa-user"></i></a></td>
                     <td><a href="javascript:;" @click="sort(['name'])">Name</a></td>
                     <td></td>
-                    <td></td>
-                    <td class="text-end"><a href="javascript:;" @click="sort(['ships'])"><i class="fas fa-rocket"></i></a></td>
-                    <td class="text-end"><a href="javascript:;" @click="sort(['waypoints', 'length'])"><i class="fas fa-map-marker-alt"></i></a></td>
+                    <td title="Specialist">
+                      <a href="javascript:;" @click="sort(['specialist', 'name'], ['name'], ['_id'])"><i class="fas fa-user-astronaut"></i></a>
+                    </td>
+                    <td title="Ships" class="text-end"><a href="javascript:;" @click="sort(['ships'], ['name'], ['_id'])"><i class="fas fa-rocket"></i></a></td>
+                    <td title="Waypoints" class="text-end"><a href="javascript:;" @click="sort(['waypoints', 'length'], ['name'], ['_id'])"><i class="fas fa-map-marker-alt"></i></a></td>
                     <!-- <td></td> -->
-                    <td class="text-end"><a href="javascript:;" @click="sort(['ticksEta'])">ETA</a></td>
-                    <td class="text-end"><a href="javascript:;" @click="sort(['ticksEtaTotal'])">Total</a></td>
+                    <td class="text-end"><a href="javascript:;" @click="sort(['ticksEta'], ['name'], ['_id'])">ETA</a></td>
+                    <td class="text-end"><a href="javascript:;" @click="sort(['ticksEtaTotal'], ['name'], ['_id'])">Total</a></td>
                 </tr>
             </thead>
             <tbody>
-                <carrier-row v-for="carrier in sortedTableData" v-bind:key="carrier._id" :carrier="carrier"
-                  @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
+                <carrier-row v-for="carrier in sortedFilteredTableData"
+                             v-bind:key="carrier._id"
+                             :carrier="carrier"
+                             @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
             </tbody>
         </table>
     </div>
   </div>
 
-  <p v-if="!tableData.length" class="text-center mt-2 mb-2">No carriers to display.</p>
+  <p v-if="!sortedFilteredTableData.length" class="text-center mt-2 mb-2">No carriers to display.</p>
 </div>
 </template>
 
 <script>
 import GameHelper from '../../../../services/gameHelper'
-import CarrierRowVue from './CarrierRow.vue'
+import GridHelper from '../../../../services/gridHelper'
+import CarrierRowVue from './CarrierRow'
+import SortInfo from '../../../../services/data/sortInfo'
 
 export default {
   components: {
     'carrier-row': CarrierRowVue
   },
   data: function () {
+    let defaultSortInfo = new SortInfo([['ticksEta']], true);
+
     return {
       showAll: false,
-      tableData: [],
-      sortBy: ['ticksEta'],
-      sortDirection: true,
+      defaultSortInfo: defaultSortInfo,
+      sortInfo: new SortInfo(defaultSortInfo.propertyPaths, defaultSortInfo.sortAscending),
+      sortInfoKey: 'galaxy_carriers_sortInfo',
       searchFilter: ''
     }
   },
   mounted () {
-    this.showAll = this.getUserPlayer() == null
-    this.tableData = this.getTableData()
-
-    this.sortBy = localStorage.getItem('galaxy_carriers_sortBy') || null
-    this.sortDirection = localStorage.getItem('galaxy_carriers_sortDirection') == 'true' || false
+    this.showAll = this.userPlayer == null;
+    this.sortInfo = SortInfo.fromJSON(localStorage.getItem(this.sortInfoKey), this.defaultSortInfo);
   },
-  unmounted () {
-    localStorage.setItem('galaxy_carriers_sortBy', this.sortBy)
-    localStorage.setItem('galaxy_carriers_sortDirection', this.sortDirection)
+  destroyed () {
+    localStorage.setItem(this.sortInfoKey, JSON.stringify(this.sortInfo));
   },
   methods: {
-    getUserPlayer () {
-      return GameHelper.getUserPlayer(this.$store.state.game)
-    },
     toggleShowAll () {
-      this.showAll = !this.showAll
-
-      this.tableData = this.getTableData()
+      this.showAll = !this.showAll;
     },
-    getTableData () {
-      let sorter = (a, b) => a.name.localeCompare(b.name)
 
-      if (this.showAll || !this.getUserPlayer()) {
-        return this.$store.state.game.galaxy.carriers.sort(sorter)
-      } else {
-        return this.$store.state.game.galaxy.carriers.sort(sorter).filter(x => x.ownedByPlayerId === this.getUserPlayer()._id)
-      }
-    },
     onOpenCarrierDetailRequested (e) {
       this.$emit('onOpenCarrierDetailRequested', e)
     },
-    sort (columnName) {
-      // If sorting by a new column, reset the sort.
-      if (JSON.stringify(this.sortBy) !== JSON.stringify(columnName)) {
-        this.sortBy = columnName
-        this.sortDirection = true
-      } else {
-        // Otherwise if we are sorting by the same column, flip the sort direction.
-        this.sortDirection = !this.sortDirection
-      }
+    sort (...propertyPaths) {
+      this.sortInfo.swapSort(propertyPaths);
     }
   },
   computed: {
-    sortedTableData () {
-      // here be dragons
-      const getNestedObject = (nestedObj, pathArr) => {
-        if (!Array.isArray(pathArr)) {
-          pathArr = pathArr.split(',')
-        }
+    userPlayer () {
+      return GameHelper.getUserPlayer(this.$store.state.game);
+    },
+    tableData () {
+      return this.$store.state.game.galaxy.carriers;
+    },
+    filteredTableData() {
+      let tableData = this.tableData;
 
-        return pathArr.reduce((obj, key) =>
-          (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
+      let isSearchFilterMatch = c => c.name.toLowerCase().includes(this.searchFilter.toLowerCase());
+
+      if (!this.showAll && this.userPlayer != null) {
+        tableData = tableData.filter(c => c.ownedByPlayerId === this.userPlayer._id && isSearchFilterMatch(c));
+      }
+      else {
+        tableData = tableData.filter(isSearchFilterMatch);
       }
 
-      let filterFunction = a => a.name.toLowerCase().includes(this.searchFilter.toLowerCase())
-
-      if (this.sortBy == null) {
-        return this.tableData.filter(filterFunction)
-      }
-
-      return this.tableData
-        .filter(filterFunction)
-        .sort((a, b) => {
-          if (this.sortDirection) { // Ascending
-            return getNestedObject(b, this.sortBy) < getNestedObject(a, this.sortBy) ? 1 : -1
-          }
-
-          // Descending
-          return getNestedObject(a, this.sortBy) <= getNestedObject(b, this.sortBy) ? 1 : -1
-        })
+      return tableData;
+    },
+    sortedFilteredTableData () {
+      return GridHelper.dynamicSort(this.filteredTableData, this.sortInfo);
     }
   }
 }

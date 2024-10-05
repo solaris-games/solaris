@@ -14,8 +14,10 @@
               </tr>
           </thead>
           <tbody>
-              <schedule-row v-for="action in sortedTableData" v-bind:key="action._id" :action="action"
-                @bulkScheduleTrashed="onTrashed"/>
+              <schedule-row v-for="action in sortedTableData"
+                            v-bind:key="action._id"
+                            :action="action"
+                            @bulkScheduleTrashed="onTrashed"/>
           </tbody>
       </table>
     </div>
@@ -24,8 +26,10 @@
 </template>
 
 <script>
+import BulkInfrastructureUpgradeScheduleTableRow from './BulkInfrastructureUpgradeScheduleTableRow'
 import GameHelper from '../../../../services/gameHelper'
-import BulkInfrastructureUpgradeScheduleTableRow from './BulkInfrastructureUpgradeScheduleTableRow.vue'
+import GridHelper from '../../../../services/gridHelper'
+import SortInfo from '../../../../services/data/sortInfo'
 
 export default {
   components: {
@@ -36,23 +40,15 @@ export default {
   },
   data: function () {
     return {
-      sortBy: null,
-      sortDirection: true,
+      sortInfo: new SortInfo(null, true)
     }
   },
   methods: {
     onTrashed () {
       this.$emit('bulkScheduleTrashed')
     },
-    sort (columnName) {
-      // If sorting by a new column, reset the sort.
-      if (JSON.stringify(this.sortBy) !== JSON.stringify(columnName)) {
-        this.sortBy = columnName
-        this.sortDirection = true
-      } else {
-        // Otherwise if we are sorting by the same column, flip the sort direction.
-        this.sortDirection = !this.sortDirection
-      }
+    sort(...propertyPaths) {
+      this.swapSort(propertyPaths);
     },
   },
   computed: {
@@ -62,44 +58,8 @@ export default {
     tableData () {
       return this.userPlayer.scheduledActions
     },
-    // TODO: All this stuff should be in a shared service class as it is used also on the galaxy view.
     sortedTableData () {
-      // here be dragons
-      const getNestedObject = (nestedObj, pathArr) => {
-        return pathArr.reduce((obj, key) =>
-          (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
-      }
-
-
-      if (this.sortBy == null) {
-        return this.tableData
-      }
-
-      return this.tableData
-        .sort((a, b) => {
-          let bo = getNestedObject(b, this.sortBy)
-          let ao = getNestedObject(a, this.sortBy)
-
-          // equal items sort equally
-          if (ao === bo) {
-              return 0;
-          }
-          // nulls sort after anything else
-          else if (ao === null) {
-              return 1;
-          }
-          else if (bo === null) {
-              return -1;
-          }
-          // otherwise, if we're ascending, lowest sorts first
-          else if (this.sortDirection) {
-              return ao < bo ? -1 : 1;
-          }
-          // if descending, highest sorts first
-          else {
-              return ao < bo ? 1 : -1;
-          }
-        })
+      return GridHelper.dynamicSort(this.tableData, this.sortInfo);
     }
   }
 }
@@ -108,10 +68,6 @@ export default {
 <style scoped>
 td {
   padding: 20px 6px !important;
-}
-
-.infrastructure-filters {
-  white-space: pre;
 }
 
 td.last {

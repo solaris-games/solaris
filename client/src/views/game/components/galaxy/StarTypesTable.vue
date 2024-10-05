@@ -10,12 +10,6 @@
     <div class="col ms-2 me-2">
       <input type="text" class="form-control form-control-sm" v-model="searchFilter" placeholder="Search...">
     </div>
-    <div class="col-auto pt-1" v-if="!isGameFinished && userPlayer != null">
-      <input class="me-1" type="checkbox" v-model="allowUpgrades" id="chkEnableUpgrades">
-      <label for="chkEnableUpgrades">
-        Upgrades
-      </label>
-    </div>
   </div>
 
   <div class="row">
@@ -27,31 +21,40 @@
                   <td><a href="javascript:;" @click="sort(['name'])">Name</a></td>
                   <td></td>
                   <td title="Specialist">
-                    <a href="javascript:;" @click="sort(['specialist', 'name'])"><i class="fas fa-user-astronaut"></i></a>
+                    <a href="javascript:;" @click="sort(['specialist', 'name'], ['name'])"><i class="fas fa-user-astronaut"></i></a>
                   </td>
                   <td title="Warp Gate">
-                    <a href="javascript:;" @click="sort(['warpGate'])"><i class="fas fa-dungeon"></i></a>
+                    <a href="javascript:;" @click="sort(['warpGate'], ['name'])"><i class="fas fa-dungeon"></i></a>
                   </td>
-                  <td title="Economy Infrastructure" class="text-end">
-                    <a href="javascript:;" @click="sort(['infrastructure','economy'])"><i class="fas fa-money-bill-wave me-2"></i></a>
+                  <td title="Binary Star">
+                    <a href="javascript:;" @click="sort(['isBinaryStar'], ['name'])"><star-icon :isBinaryStar="true"></star-icon></a>
                   </td>
-                  <td title="Industry Infrastructure" class="text-end">
-                    <a href="javascript:;" @click="sort(['infrastructure','industry'])"><i class="fas fa-tools me-2"></i></a>
+                  <td title="Nebula">
+                    <a href="javascript:;" @click="sort(['isNebula'], ['name'])"><star-icon :isNebula="true"></star-icon></a>
                   </td>
-                  <td title="Science Infrastructure" class="text-end">
-                    <a href="javascript:;" @click="sort(['infrastructure','science'])"><i class="fas fa-flask"></i></a>
+                  <td title="Black Hole">
+                    <a href="javascript:;" @click="sort(['isBlackHole'], ['name'])"><star-icon :isBlackHole="true"></star-icon></a>
                   </td>
-                  <td title="Next Economy Infrastructure Cost" class="text-end" v-if="isEconomyEnabled"><a href="javascript:;" @click="sort(['upgradeCosts','economy'])">$E</a></td>
-                  <td title="Next Industry Infrastructure Cost" class="text-end" v-if="isIndustryEnabled"><a href="javascript:;" @click="sort(['upgradeCosts','industry'])">$I</a></td>
-                  <td title="Next Science Infrastructure Cost" class="text-end" v-if="isScienceEnabled"><a href="javascript:;" @click="sort(['upgradeCosts','science'])">$S</a></td>
+                  <td title="Asteroid Field">
+                    <a href="javascript:;" @click="sort(['isAsteroidField'], ['name'])"><star-icon :isAsteroidField="true"></star-icon></a>
+                  </td>
+                  <td title="Pulsar">
+                    <a href="javascript:;" @click="sort(['isPulsar'], ['name'])"><star-icon :isPulsar="true"></star-icon></a>
+                  </td>
+                  <td title="Wormhole">
+                    <a href="javascript:;" @click="sort(['isWormHole'], ['wormHolePairStar', 'name'])"><star-icon :isWormHole="true"></star-icon></a>
+                  </td>
+                  <td></td>
+                  <td title="Wormhole destination owner"><a href="javascript:;" @click="sort(['wormHolePairStar', 'ownedByPlayer','alias'], ['wormHolePairStar', 'ownedByPlayerId'], ['wormHolePairStar', 'name'])"><i class="fas fa-user"></i></a></td>
+                <!--TODO: Fix time machine bar on tick.-->
               </tr>
           </thead>
           <tbody>
-              <star-row v-for="star in sortedFilteredTableData"
-                        v-bind:key="star._id"
-                        :star="star"
-                        :allowUpgrades="allowUpgrades"
-                        @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
+              <star-types-row v-for="star in sortedFilteredTableData"
+                              v-bind:key="star._id"
+                              :star="star"
+                              :allowUpgrades="allowUpgrades"
+                              @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
           </tbody>
       </table>
     </div>
@@ -65,11 +68,13 @@
 import GameHelper from '../../../../services/gameHelper'
 import GridHelper from '../../../../services/gridHelper'
 import SortInfo from '../../../../services/data/sortInfo'
-import StarRowVue from './StarRow'
+import StarIconVue from '../star/StarIcon'
+import StarTypesRowVue from './StarTypesRow'
 
 export default {
   components: {
-    'star-row': StarRowVue
+    'star-icon': StarIconVue,
+    'star-types-row': StarTypesRowVue
   },
   data: function () {
     let defaultSortInfo = new SortInfo([['name']], true);
@@ -79,7 +84,7 @@ export default {
       allowUpgrades: true,
       defaultSortInfo: defaultSortInfo,
       sortInfo: new SortInfo(defaultSortInfo.propertyPaths, defaultSortInfo.sortAscending),
-      sortInfoKey: 'galaxy_stars_sortInfo',
+      sortInfoKey: 'galaxy_startypes_sortInfo',
       searchFilter: ''
     }
   },
@@ -107,7 +112,15 @@ export default {
       return GameHelper.getUserPlayer(this.$store.state.game)
     },
     tableData () {
-      return this.$store.state.game.galaxy.stars;
+      return this.$store.state.game.galaxy.stars.map(s => {
+
+        let ns = Object.assign({}, s);
+
+        ns.isWormHole = ns.wormHoleToStarId != null;
+        ns.wormHolePairStar = ns.wormHoleToStarId != null ? GameHelper.getStarById(this.$store.state.game, ns.wormHoleToStarId) : null;
+
+        return ns;
+      });
     },
     filteredTableData() {
       let tableData = this.tableData;
@@ -125,18 +138,6 @@ export default {
     },
     sortedFilteredTableData() {
       return GridHelper.dynamicSort(this.filteredTableData, this.sortInfo);
-    },
-    isEconomyEnabled: function () {
-      return this.$store.state.game.settings.player.developmentCost.economy !== 'none'
-    },
-    isIndustryEnabled: function () {
-      return this.$store.state.game.settings.player.developmentCost.industry !== 'none'
-    },
-    isScienceEnabled: function () {
-      return this.$store.state.game.settings.player.developmentCost.science !== 'none'
-    },
-    isGameFinished: function () {
-      return GameHelper.isGameFinished(this.$store.state.game)
     }
   }
 }

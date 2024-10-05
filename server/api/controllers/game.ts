@@ -402,6 +402,16 @@ export default (container: DependencyContainer) => {
                 return next(err);
             }
         },
+        fastForward: async (req, res, next) => {
+            try {
+                await container.gameService.fastForward(req.game, req.session.userId);
+
+                res.sendStatus(200);
+                return next();
+            }  catch (err) {
+                return next(err);
+            }
+        },
         getPlayerUser: async (req, res, next) => {
             try {
                 let user = await container.gameService.getPlayerUser(

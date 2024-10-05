@@ -224,6 +224,9 @@ export interface User {
             confirmBuildEconomy: SettingEnabledDisabled;
             confirmBuildIndustry: SettingEnabledDisabled;
             confirmBuildScience: SettingEnabledDisabled;
+        },
+        technical: {
+            performanceMonitor: SettingEnabledDisabled;
         }
     },
     avatars: number[];

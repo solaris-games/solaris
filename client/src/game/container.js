@@ -99,7 +99,7 @@ class GameContainer {
     this.app.ticker.add(this.onTick.bind(this))
     this.app.ticker.maxFPS = 0
 
-    if (import.meta.env.DEV) {
+    if (import.meta.env.DEV || userSettings?.technical?.performanceMonitor === 'enabled') {
       this.app.ticker.add(this.calcFPS.bind(this))
     }
 

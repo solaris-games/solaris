@@ -264,15 +264,21 @@ export default createStore({
     },
 
     gameStarBulkUpgraded (state, data) {
-      let player = GameHelper.getUserPlayer(state.game)
+      let player = GameHelper.getUserPlayer(state.game);
+
+      let newScience = 0;
 
       data.stars.forEach(s => {
-        let star = GameHelper.getStarById(state.game, s.starId)
+        let star = GameHelper.getStarById(state.game, s.starId);
+
+        if (data.infrastructureType === 'science') {
+          newScience += s.infrastructure * (star.specialistId === 11 ? 2 : 1); // Research Station
+        }
 
         star.infrastructure[data.infrastructureType] = s.infrastructure
 
-        if (star.upgradeCosts && s.infrastructureCost) {
-          star.upgradeCosts[data.infrastructureType] = s.infrastructureCost
+        if (star.upgradeCosts && s.nextInfrastructureCost) {
+          star.upgradeCosts[data.infrastructureType] = s.nextInfrastructureCost
         }
 
         if (s.manufacturing != null) {
@@ -304,7 +310,7 @@ export default createStore({
           player.stats.totalIndustry += data.upgraded
           break;
         case 'science':
-          player.stats.totalScience += (data.upgraded * state.game.constants.research.sciencePointMultiplier)
+          player.stats.totalScience += (newScience * state.game.constants.research.sciencePointMultiplier)
           break;
       }
     },
@@ -510,6 +516,8 @@ export default createStore({
       })
     },
     async addColourMapping ({ commit, state }, data) {
+      console.warn('Adding colour mapping', data);
+
       await ColourService.addColour(state.game._id, data);
       commit('internalAddColourMapping', data);
 

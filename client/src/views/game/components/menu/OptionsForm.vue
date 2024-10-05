@@ -431,6 +431,18 @@
       </div>
     </div>
 
+    <h5 class="pt-2">Technical</h5>
+
+    <div class="row pt-1 pb-1">
+      <label for="confirmBuildScience" class="col-12 col-sm-6 col-form-label">Display Performance Monitor</label>
+      <div class="col-12 col-sm-6">
+        <select class="form-control" id="confirmBuildScience" v-model="settings.technical.performanceMonitor" :disabled="isSavingSettings">
+          <option value="disabled">Disabled</option>
+          <option value="enabled">Enabled</option>
+        </select>
+      </div>
+    </div>
+
     <form-error-list v-bind:errors="errors"/>
 
     <div class="row mt-2">

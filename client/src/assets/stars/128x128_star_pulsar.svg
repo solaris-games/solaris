@@ -1,0 +1,15 @@
+<svg id="128x128_star_pulsar" version="1.1" viewBox="0 0 33.866666 33.866668" height="128" width="128" xmlns="http://www.w3.org/2000/svg" transform="rotate(15)">
+  <defs id="defs3876"></defs>
+  <style>
+    .pulsar {
+      fill: transparent;
+      stroke: white;
+      stroke-width: 2;
+    }
+  </style>
+  <line class="pulsar" x1="-15" y1="-15" x2="15" y2="15" />
+  <ellipse class="pulsar" cx="-5" cy="0" rx="5" ry="5" />
+  <ellipse class="pulsar" cx="5" cy="0" rx="5" ry="5" />
+  <ellipse class="pulsar" cx="-8" cy="0" rx="8" ry="8" />
+  <ellipse class="pulsar" cx="8" cy="0" rx="8" ry="8" />
+</svg>
