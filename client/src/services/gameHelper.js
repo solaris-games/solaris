@@ -1072,7 +1072,7 @@ class GameHelper {
         userPlayer.stats.totalIndustry++
         break;
       case 'science':
-        userPlayer.stats.totalScience += game.constants.research.sciencePointMultiplier
+        userPlayer.stats.totalScience += game.constants.research.sciencePointMultiplier * (star.specialistId === 11 ? 2 : 1); // Research Station
         break;
     }
 
@@ -1256,18 +1256,19 @@ class GameHelper {
     return game.galaxy.teams.find(t => t._id === teamId);
   }
 
-  calculateTicksToNextShip(shipsActual, manufacturing) {
+  calculateTicksToBonusShip(shipsActual, manufacturing) {
     if (manufacturing <= 0) {
       return null
     }
 
-    const next = Math.floor(shipsActual + 1);
-    let current = shipsActual;
+    const next = 1;
+    const partialManufacturing = manufacturing - Math.floor(manufacturing);
+    let current = shipsActual - Math.floor(shipsActual);
     let count = 0;
 
     while (current < next) {
       count++;
-      current += manufacturing;
+      current += partialManufacturing;
     }
 
     return count;
