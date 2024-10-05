@@ -1257,12 +1257,21 @@ class GameHelper {
   }
 
   calculateTicksToBonusShip(shipsActual, manufacturing) {
-    if (manufacturing <= 0) {
+    if (manufacturing < 0) {
       return null
+    }
+
+    if (manufacturing == 0) {
+      return 'n/a';
     }
 
     const next = 1;
     const partialManufacturing = manufacturing - Math.floor(manufacturing);
+
+    if (partialManufacturing == 0) {
+      return 'n/a';
+    }
+
     let current = shipsActual - Math.floor(shipsActual);
     let count = 0;
 
