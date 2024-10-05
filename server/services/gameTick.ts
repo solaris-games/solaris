@@ -182,6 +182,7 @@ export default class GameTickService extends EventEmitter {
         console.log(`[${game.settings.general.name}] - Game tick started at ${new Date().toISOString()}`);
 
         game.state.lastTickDate = moment().utc();
+        game.state.forceTick = false;
 
         let taskTime = process.hrtime();
         let taskTimeEnd: [number, number] | null = null;
@@ -315,6 +316,10 @@ export default class GameTickService extends EventEmitter {
         }
 
         if (this.gameService.isReadyToQuitImmediateEnd(game)) {
+            return true;
+        }
+
+        if (game.state.forceTick) {
             return true;
         }
 

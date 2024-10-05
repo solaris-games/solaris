@@ -7,6 +7,7 @@ export interface StarUpgradeReport {
     naturalResources: NaturalResources;
     infrastructureCurrent: number;
     infrastructureCostTotal: number;
+    nextInfrastructureCost: number;
     infrastructure: number;
     manufacturing?: number;
 }

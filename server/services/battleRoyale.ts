@@ -7,6 +7,8 @@ import StarService from "./star";
 import StarDistanceService from "./starDistance";
 import WaypointService from "./waypoint";
 
+const PEACE_CYCLES = 3;
+
 export default class BattleRoyaleService {
     starService: StarService;
     carrierService: CarrierService;
@@ -33,17 +35,22 @@ export default class BattleRoyaleService {
 
     performBattleRoyaleTick(game: Game) {
         // Calculate which stars need to be destroyed.
-        let starsToDestroy = this.getStarsToDestroy(game);
+        let starsToDestroy = this.getStarsToDestroyNow(game);
 
         for (let star of starsToDestroy) {
             this.destroyStar(game, star);
         }
     }
 
-    getStarsToDestroy(game: Game) {
-        // Don't do anything for X number of turns for peace time.
-        const peaceCycles = 3; // TODO: This needs to be a game setting.
+    getStarsToDestroyPreview(game: Game) {
+        return this.getStarsToDestroy(game, PEACE_CYCLES - 1);
+    }
 
+    getStarsToDestroyNow(game: Game) {
+        return this.getStarsToDestroy(game, PEACE_CYCLES);
+    }
+
+    getStarsToDestroy(game: Game, peaceCycles: number) {
         if (game.state.productionTick < peaceCycles) {
             return [];
         }

@@ -41,6 +41,7 @@ import moment from 'moment'
 import gameHelper from '../../services/gameHelper'
 import authService from '../../services/api/auth'
 import ColourOverrideDialog from "./components/player/ColourOverrideDialog.vue";
+import eventBus from '../../eventBus'
 
 export default {
   components: {
@@ -394,12 +395,14 @@ export default {
                 this.$store.commit('setTick', response.data.state.tick)
                 this.$store.commit('setProductionTick', response.data.state.productionTick)
               } else {
-                await this.reloadGame()
-
-                this.$toasted.show(`The game has ticked. Cycle ${response.data.state.productionTick}, Tick ${response.data.state.tick}.`, { type: 'success' })
-
-                AudioService.download()
+                await this.reloadGame();
               }
+
+              eventBus.$emit('onGameTick');
+              
+              this.$toasted.show(`The game has ticked. Cycle ${response.data.state.productionTick}, Tick ${response.data.state.tick}.`, { type: 'success' });
+
+              AudioService.download();
             }
           }
         } catch (e) {

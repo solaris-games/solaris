@@ -47,6 +47,7 @@
 
 <script>
 import GameApiService from '../../../../services/api/game'
+import eventBus from '../../../../eventBus'
 
 export default {
   data () {
@@ -57,7 +58,8 @@ export default {
     }
   },
   mounted () {
-      this.tick = this.stateTick
+      this.tick = this.stateTick;
+      eventBus.$on('onGameTick', this.onGameTick);
   },
   methods: {
     toggleDisplay () {
@@ -96,6 +98,11 @@ export default {
     async loadNextTick (ticks) {
         this.tick = Math.min(this.stateTick, this.tick + ticks)
         await this.onRequestedTickChanged()
+    },
+    onGameTick(e) {
+      if (this.tick === this.gameTick - 1) {
+        this.tick = this.gameTick;
+      }
     }
   },
   computed: {
@@ -106,10 +113,7 @@ export default {
           return this.$store.state.game.state.tick
       },
       minimumTick: function () {
-          return 1
-          // let min = this.stateTick - 24 // Maximum of 24 ticks ago.
-
-          // return Math.max(1, min)
+          return this.$store.state.game.state.timeMachineMinimumTick ?? 1;
       }
   }
 }

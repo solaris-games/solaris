@@ -34,6 +34,7 @@ import GameFluxService from './gameFlux';
 import PlayerAfkService from './playerAfk';
 import ShipService from './ship';
 import SpectatorService from './spectator';
+import {GameHistoryCarrier} from "./types/GameHistory";
 
 enum ViewpointKind {
     Basic,
@@ -167,6 +168,9 @@ export default class GameGalaxyService {
 
         if (isHistorical && game.settings.general.timeMachine === 'disabled') {
             throw new ValidationError(`The time machine is disabled in this game.`);
+        }
+        else if (game.settings.general.timeMachine === 'enabled') {
+            game.state.timeMachineMinimumTick = await this.historyService.getHistoryMinimumTick(gameId);
         }
 
         // Check if the user is playing in this game.
@@ -352,6 +356,10 @@ export default class GameGalaxyService {
 
             star.effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(doc, star);
 
+            if (s.ownedByPlayerId) {
+                s.ownedByPlayer = doc.galaxy.players.find(p => p._id.toString() === s.ownedByPlayerId!.toString())!;
+            }
+
             if (isKingOfTheHillMode) {
                 star.isKingOfTheHillStar = kingOfTheHillStar != null && kingOfTheHillStar._id.toString() === s._id.toString();
             }
@@ -404,6 +412,7 @@ export default class GameGalaxyService {
                 // Calculate the star's terraformed resources.
                 if (s.ownedByPlayerId) {
                     s.terraformedResources = this.starService.calculateTerraformedResources(s, s.effectiveTechs.terraforming);
+                    s.ownedByPlayer = doc.galaxy.players.find(p => p._id.toString() === s.ownedByPlayerId.toString());
                 }
 
                 // Round the Natural Resources
@@ -488,6 +497,7 @@ export default class GameGalaxyService {
                         _id: s._id,
                         name: s.name,
                         ownedByPlayerId: s.ownedByPlayerId,
+                        ownedByPlayer: s.ownedByPlayer,
                         location: s.location,
                         locationNext: s.locationNext,
                         warpGate: false, // Hide warp gates outside of scanning range
@@ -531,6 +541,9 @@ export default class GameGalaxyService {
         // Populate the number of ticks it will take for all waypoints.
         doc.galaxy.carriers
             .forEach(c => {
+
+                c.ownedByPlayer = doc.galaxy.players.find(p => p._id.toString() === c.ownedByPlayerId!.toString())!;
+
                 c.effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(doc, c);
 
                 this.waypointService.populateCarrierWaypointEta(doc, c);
@@ -790,6 +803,24 @@ export default class GameGalaxyService {
         doc.galaxy.carriers = [];
     }
 
+    _fromHistoryCarrier(historyCarrier: GameHistoryCarrier): Carrier {
+        return {
+            _id: historyCarrier.carrierId,
+            isGift: historyCarrier.isGift,
+            location: historyCarrier.location,
+            locationNext: undefined,
+            name: historyCarrier.name,
+            orbiting: historyCarrier.orbiting,
+            ownedByPlayerId: historyCarrier.ownedByPlayerId,
+            ships: historyCarrier.ships,
+            specialist: historyCarrier.specialistId && this.specialistService.getById(historyCarrier.specialistId, 'carrier'),
+            specialistExpireTick: null,
+            specialistId: historyCarrier.specialistId,
+            waypoints: historyCarrier.waypoints.map(w => this.waypointService.fromHistory(w)),
+            waypointsLooped: false,
+        } as any as Carrier;
+    }
+
     async _maskGalaxy(game: Game, userPlayer: Player | null, isHistorical: boolean, tick: number | null) {
         /*
             Masking of galaxy data occurs here, it prevent players from seeing what other
@@ -924,7 +955,7 @@ export default class GameGalaxyService {
                 let gameCarrier = game.galaxy.carriers.find(x => x._id.toString() === historyCarrier.carrierId.toString());
                 
                 if (!gameCarrier) {
-                    game.galaxy.carriers.push(historyCarrier as any);
+                    game.galaxy.carriers.push(this._fromHistoryCarrier(historyCarrier));
                 }
             }
         }
@@ -938,7 +969,7 @@ export default class GameGalaxyService {
                 let gameCarrier = game.galaxy.carriers.find(x => x._id.toString() === historyCarrier.carrierId.toString());
                 
                 if (!gameCarrier) {
-                    game.galaxy.carriers.push(historyCarrier as any);
+                    game.galaxy.carriers.push(this._fromHistoryCarrier(historyCarrier));
                 }
             }
         }
@@ -951,7 +982,7 @@ export default class GameGalaxyService {
     }
 
     _appendStarsPendingDestructionFlag(game: Game) {
-        let pendingStars = this.battleRoyaleService.getStarsToDestroy(game);
+        let pendingStars = this.battleRoyaleService.getStarsToDestroyPreview(game);
 
         for (let pendingStar of pendingStars) {
             pendingStar.targeted = true;
