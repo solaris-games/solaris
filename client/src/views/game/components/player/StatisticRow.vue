@@ -45,9 +45,6 @@ export default {
     isUserPlayer () {
       return this.userPlayer && this.userPlayer._id === this.player._id
     },
-    getUserPlayer () {
-      return GameHelper.getUserPlayer(this.$store.state.game)
-    },
     userIsInGame () {
       return this.userPlayer != null
     },
@@ -91,7 +88,7 @@ export default {
       return GameHelper.isDarkModeExtra(this.$store.state.game);
     },
     hasPerspective() {
-      if (GameHelper.getUserPlayer(this.$store.state.game)) {
+      if (this.userPlayer) {
         return false
       }
 

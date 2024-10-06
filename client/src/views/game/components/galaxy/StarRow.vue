@@ -139,6 +139,9 @@ export default {
     }
   },
   computed: {
+    userPlayer() {
+      return gameHelper.getUserPlayer(this.$store.state.game);
+    },
     hasEconomyCost () {
       return this.star.upgradeCosts && this.star.upgradeCosts.economy
     },
@@ -158,16 +161,13 @@ export default {
       return this.$store.state.game.settings.player.developmentCost.science !== 'none'
     },
     canUpgradeEconomy () {
-      return this.allowUpgrades && this.star.upgradeCosts && this.star.upgradeCosts.economy && !this.isUpgradingEconomy && gameHelper.getUserPlayer(this.$store.state.game).credits >= this.star.upgradeCosts.economy
+      return this.allowUpgrades && this.star.upgradeCosts && this.star.upgradeCosts.economy && !this.isUpgradingEconomy && this.userPlayer?.credits >= this.star.upgradeCosts.economy
     },
     canUpgradeIndustry () {
-      return this.allowUpgrades && this.star.upgradeCosts && this.star.upgradeCosts.industry && !this.isUpgradingIndustry && gameHelper.getUserPlayer(this.$store.state.game).credits >= this.star.upgradeCosts.industry
+      return this.allowUpgrades && this.star.upgradeCosts && this.star.upgradeCosts.industry && !this.isUpgradingIndustry && this.userPlayer?.credits >= this.star.upgradeCosts.industry
     },
     canUpgradeScience () {
-      return this.allowUpgrades && this.star.upgradeCosts && this.star.upgradeCosts.science && !this.isUpgradingScience && gameHelper.getUserPlayer(this.$store.state.game).credits >= this.star.upgradeCosts.science
-    },
-    availableCredits () {
-      return gameHelper.getUserPlayer(this.$store.state.game).credits
+      return this.allowUpgrades && this.star.upgradeCosts && this.star.upgradeCosts.science && !this.isUpgradingScience && this.userPlayer?.credits >= this.star.upgradeCosts.science
     }
   }
 }
