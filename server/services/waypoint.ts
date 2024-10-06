@@ -15,6 +15,7 @@ import StarDistanceService from './starDistance';
 import TechnologyService from './technology';
 import { CarrierActionWaypoint } from './types/GameTick';
 import CarrierMovementService from './carrierMovement';
+import {GameHistoryCarrierWaypoint} from "./types/GameHistory";
 
 const mongoose = require('mongoose');
 
@@ -59,6 +60,17 @@ export default class WaypointService {
         }
         
         return await this.saveWaypointsForCarrier(game, player, carrier, waypoints, looped);
+    }
+
+    fromHistory(wp: GameHistoryCarrierWaypoint) {
+        return {
+            _id: new mongoose.Types.ObjectId(),
+            source: wp.source,
+            destination: wp.destination,
+            action: 'nothing',
+            actionShips: 0,
+            delayTicks: 0
+        } as CarrierWaypointBase;
     }
 
     async saveWaypointsForCarrier(game: Game, player: Player, carrier: Carrier, waypoints: CarrierWaypointBase[], looped: boolean | null, writeToDB: boolean = true) {

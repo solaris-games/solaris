@@ -810,15 +810,15 @@ export default class GameGalaxyService {
             location: historyCarrier.location,
             locationNext: undefined,
             name: historyCarrier.name,
-            orbiting: undefined,
-            ownedByPlayerId: undefined,
-            ships: undefined,
-            specialist: undefined,
-            specialistExpireTick: undefined,
-            specialistId: undefined,
-            waypoints: [],
+            orbiting: historyCarrier.orbiting,
+            ownedByPlayerId: historyCarrier.ownedByPlayerId,
+            ships: historyCarrier.ships,
+            specialist: historyCarrier.specialistId && this.specialistService.getById(historyCarrier.specialistId, 'carrier'),
+            specialistExpireTick: null,
+            specialistId: historyCarrier.specialistId,
+            waypoints: historyCarrier.waypoints.map(w => this.waypointService.fromHistory(w)),
             waypointsLooped: false,
-        } as Carrier;
+        } as any as Carrier;
     }
 
     async _maskGalaxy(game: Game, userPlayer: Player | null, isHistorical: boolean, tick: number | null) {
