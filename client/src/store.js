@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import VuexPersist from 'vuex-persist'
 import eventBus from './eventBus'
 import GameHelper from './services/gameHelper'
 import GameContainer from './game/container'
@@ -9,11 +8,6 @@ import ColourService from './services/api/colour';
 import gameHelper from "./services/gameHelper";
 
 Vue.use(Vuex)
-
-const vuexPersist = new VuexPersist({
-  key: 'solaris',
-  storage: localStorage
-})
 
 export default new Vuex.Store({
   state: {
@@ -539,5 +533,4 @@ export default new Vuex.Store({
       }
     }
   },
-  plugins: [vuexPersist.plugin]
 })
