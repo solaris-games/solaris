@@ -1,16 +1,10 @@
 import { createStore } from 'vuex';
-import VuexPersist from 'vuex-persist'
 import eventBus from './eventBus'
 import GameHelper from './services/gameHelper'
 import GameContainer from './game/container'
 import SpecialistService from './services/api/specialist';
 import ColourService from './services/api/colour';
 import gameHelper from "./services/gameHelper";
-
-const vuexPersist = new VuexPersist({
-  key: 'solaris',
-  storage: localStorage
-});
 
 export default createStore({
   state: {
@@ -535,6 +529,5 @@ export default createStore({
         return GameHelper.getPlayerById(state.game, playerId).colour
       }
     }
-  },
-  plugins: [vuexPersist.plugin]
+  }
 })
