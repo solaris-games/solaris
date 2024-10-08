@@ -19,9 +19,9 @@
 
 <script>
 import gameContainer from '../../../../game/container'
-import PlayerIconVue from '../player/PlayerIcon'
-import SpecialistIcon from '../specialist/SpecialistIcon'
-import StarResourcesVue from '../star/StarResources'
+import PlayerIconVue from '../player/PlayerIcon.vue'
+import SpecialistIcon from '../specialist/SpecialistIcon.vue'
+import StarResourcesVue from '../star/StarResources.vue'
 
 export default {
   components: {

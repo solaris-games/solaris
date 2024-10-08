@@ -36,7 +36,7 @@
 import gameContainer from '../../../../game/container'
 import AudioService from '../../../../game/audio'
 import gameHelper from '../../../../services/gameHelper'
-import PlayerIconVue from '../player/PlayerIcon'
+import PlayerIconVue from '../player/PlayerIcon.vue'
 import starService from '../../../../services/api/star'
 import SpecialistIcon from '../specialist/SpecialistIcon.vue'
 

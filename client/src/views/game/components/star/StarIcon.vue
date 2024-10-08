@@ -19,10 +19,10 @@
 </template>
 
 <script>
-import SvgWrapperVlue from '../../../components/SvgWrapper'
+import SvgWrapperVue from '../../../components/SvgWrapper.vue'
 export default {
   components: {
-    'svg-wrapper': SvgWrapperVlue
+    'svg-wrapper': SvgWrapperVue
   },
   props: {
     isAsteroidField: false,

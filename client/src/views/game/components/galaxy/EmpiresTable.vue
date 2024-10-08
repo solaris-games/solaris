@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import EmpireRowVue from './EmpireRow'
+import EmpireRowVue from './EmpireRow.vue'
 import GameHelper from '../../../../services/gameHelper'
 import GridHelper from '../../../../services/gridHelper'
 import SortInfo from '../../../../services/data/sortInfo'

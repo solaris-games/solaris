@@ -52,7 +52,7 @@
 <script>
 import GameHelper from '../../../../services/gameHelper'
 import GridHelper from '../../../../services/gridHelper'
-import NaturalResourcesRowVue from './NaturalResourcesRow'
+import NaturalResourcesRowVue from './NaturalResourcesRow.vue'
 import SortInfo from '../../../../services/data/sortInfo'
 
 export default {
