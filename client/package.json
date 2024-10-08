@@ -27,7 +27,6 @@
     "vue-chartjs": "5.3.1",
     "vue-recaptcha": "2.0.3",
     "vue-router": "^4.4.0",
-    "vue-socket.io": "^3.0.10",
     "socket.io-client": "2.5.0",
     "vue-toasted": "^1.1.28",
     "vuex": "^4.1.0"

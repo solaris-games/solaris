@@ -1,5 +1,4 @@
 import {createApp} from 'vue'
-import VueSocketio from 'vue-socket.io' // NOTE: There is an issue with >3.0.7 so forced to use 3.0.7, see here: https://stackoverflow.com/questions/61769716/vue-socket-connection-not-triggered
 import Toasted from 'vue-toasted'
 import App from './App.vue'
 import router from './router'
@@ -42,17 +41,7 @@ window.addEventListener("unhandledrejection", (event) => {
 
 app.use(store);
 
-app.use(initSocket(store))
-
-app.use(new VueSocketio({
-  debug: true,
-  connection: `//${import.meta.env.VUE_APP_SOCKETS_HOST}`,
-  vuex: {
-    store,
-    actionPrefix: 'SOCKET_',
-    mutationPrefix: 'SOCKET_'
-  }
-}));
+app.use(initSocket(store));
 
 app.use(Toasted, {
   position: 'bottom-right',
