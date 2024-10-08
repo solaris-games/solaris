@@ -78,7 +78,7 @@ export default {
         if (response.status === 200) {
           this.$store.commit('gameStarEconomyUpgraded', response.data)
 
-          this.$toasted.show(`Economy upgraded at ${this.star.name}.`)
+          this.$toast.default(`Economy upgraded at ${this.star.name}.`)
 
           AudioService.hover()
         }
@@ -102,7 +102,7 @@ export default {
         if (response.status === 200) {
           this.$store.commit('gameStarIndustryUpgraded', response.data)
 
-          this.$toasted.show(`Industry upgraded at ${this.star.name}.`)
+          this.$toast.default(`Industry upgraded at ${this.star.name}.`)
 
           AudioService.hover()
         }
@@ -126,7 +126,7 @@ export default {
         if (response.status === 200) {
           this.$store.commit('gameStarScienceUpgraded', response.data)
 
-          this.$toasted.show(`Science upgraded at ${this.star.name}.`)
+          this.$toast.default(`Science upgraded at ${this.star.name}.`)
 
           AudioService.hover()
           gameContainer.reloadStar(this.star)

@@ -115,7 +115,7 @@ export default {
     async getUsers() {
       const resp = await AdminApiService.getUsers();
       if (resp.status !== 200) {
-        this.$toasted.error(resp.data);
+        this.$toast.error(resp.data);
         return null;
       }
 

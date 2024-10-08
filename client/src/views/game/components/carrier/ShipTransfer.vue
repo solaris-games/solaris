@@ -220,7 +220,7 @@ export default {
           sShips)
 
         if (response.status === 200) {
-          this.$toasted.show(`Ships transferred between ${this.star.name} and ${this.carrier.name}.`)
+          this.$toast.default(`Ships transferred between ${this.star.name} and ${this.carrier.name}.`)
 
           this.$store.commit('gameStarCarrierShipTransferred', {
             starId: this.star._id,

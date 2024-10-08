@@ -84,10 +84,10 @@ export default {
         let response = await userService.updatePassword(this.currentPassword, this.newPassword)
 
         if (response.status === 200) {
-          this.$toasted.show(`Password updated.`, { type: 'success' })
+          this.$toast.success(`Password updated.`)
           router.push({ name: 'account-settings' })
         } else {
-          this.$toasted.show(`There was a problem updating your password, please try again.`, { type: 'error' })
+          this.$toast.error(`There was a problem updating your password, please try again.`)
         }
       } catch (err) {
         this.errors = err.response.data.errors || []

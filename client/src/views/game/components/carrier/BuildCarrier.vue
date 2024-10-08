@@ -164,7 +164,7 @@ export default {
             let response = await starService.buildCarrier(this.$store.state.game._id, this.star._id, ships)
 
             if (response.status === 200) {
-                this.$toasted.show(`Carrier built at ${this.star.name}.`)
+                this.$toast.default(`Carrier built at ${this.star.name}.`)
 
                 this.$store.commit('gameStarCarrierBuilt', response.data)
 

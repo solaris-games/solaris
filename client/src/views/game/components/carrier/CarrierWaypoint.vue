@@ -232,7 +232,7 @@ export default {
           this.carrier.ticksEtaTotal = response.data.ticksEtaTotal
           this.carrier.waypoints = response.data.waypoints
 
-          this.$toasted.show(`${this.carrier.name} waypoints updated.`)
+          this.$toast.default(`${this.carrier.name} waypoints updated.`)
 
           GameContainer.reloadCarrier(this.carrier);
 

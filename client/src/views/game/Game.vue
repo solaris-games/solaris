@@ -309,29 +309,14 @@ export default {
 
       let fromPlayer = GameHelper.getPlayerById(this.$store.state.game, e.fromPlayerId)
 
-      this.$toasted.show(`New message from ${fromPlayer.alias}.`, {
-        duration: null,
-        type: 'info',
+      this.$toast.info(`New message from ${fromPlayer.alias}.`, {
         duration: 10000,
-        action: [
-          {
-            text: 'Dismiss',
-            onClick: (e, toastObject) => {
-              toastObject.goAway(0)
-            }
-          },
-          {
-            text: 'View',
-            onClick: (e, toastObject) => {
-              this.$store.commit('setMenuState', {
-                state: MENU_STATES.CONVERSATION,
-                args: conversationId
-              })
-
-              toastObject.goAway(0)
-            }
-          }
-        ]
+        onClick: () => {
+          this.$store.commit('setMenuState', {
+            state: MENU_STATES.CONVERSATION,
+            args: conversationId
+          })
+        }
       })
 
       AudioService.join()
@@ -339,26 +324,12 @@ export default {
     onGameStarted (data) {
       this.$store.commit('gameStarted', data)
 
-      this.$toasted.show(`The game is full and will start soon. Reload the game now to view the galaxy.`, {
-        duration: null,
-        type: 'info',
-        action: [
-          {
-            text: 'Dismiss',
-            onClick: (e, toastObject) => {
-              toastObject.goAway(0)
-            }
-          },
-          {
-            text: 'Reload',
-            onClick: (e, toastObject) => {
-              toastObject.goAway(0)
-
-              location.reload()
-            }
-          }
-        ]
-      })
+      this.$toast.info(`The game is full and will start soon. Reload the game now to view the galaxy.`, {
+        duration: 10000,
+        onClick: () => {
+          window.location.reload();
+        }
+      });
     },
     onGamePlayerRoomJoined (data) {
       let player = GameHelper.getPlayerById(this.$store.state.game, data.playerId)
@@ -399,8 +370,8 @@ export default {
               }
 
               eventBus.$emit('onGameTick');
-              
-              this.$toasted.show(`The game has ticked. Cycle ${response.data.state.productionTick}, Tick ${response.data.state.tick}.`, { type: 'success' });
+
+              this.$toast.success(`The game has ticked. Cycle ${response.data.state.productionTick}, Tick ${response.data.state.tick}.`);
 
               AudioService.download();
             }

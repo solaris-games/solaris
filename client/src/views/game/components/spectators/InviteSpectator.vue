@@ -61,7 +61,7 @@ export default {
         let response = await SpectatorApiService.invite(this.$store.state.game._id, this.username)
 
         if (response.status === 200) {
-          this.$toasted.show(`You invited ${this.username} to spectate you in this game.`, { type: 'success' })
+          this.$toast.success(`You invited ${this.username} to spectate you in this game.`)
 
           this.$emit('onSpectatorInvited', response.data)
 

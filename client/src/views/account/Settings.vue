@@ -151,9 +151,9 @@ export default {
     let discordSuccess = this.$route.query.discordSuccess
 
     if (discordSuccess === 'true') {
-      this.$toasted.show(`Successfully authenticated with Discord!`, { type: 'success' })
+      this.$toast.success(`Successfully authenticated with Discord!`)
     } else if (discordSuccess === 'false') {
-      this.$toasted.show(`There was a problem connecting to Discord, please try again.`, { type: 'error' })
+      this.$toast.error(`There was a problem connecting to Discord, please try again.`)
     }
   },
   methods: {
@@ -219,11 +219,11 @@ export default {
         let response = await authService.clearOauthDiscord()
 
         if (response.status === 200) {
-          this.$toasted.show(`Successfully disconnected from Discord`, { type: 'success' })
+          this.$toast.success(`Successfully disconnected from Discord`)
 
           this.info.oauth.discord = null
         } else {
-          this.$toasted.show(`There was a problem disconecting from Discord, please try again.`, { type: 'error' })
+          this.$toast.error(`There was a problem disconnecting from Discord, please try again.`)
         }
       } catch (err) {
         console.error(err)

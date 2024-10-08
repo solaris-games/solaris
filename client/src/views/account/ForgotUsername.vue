@@ -62,9 +62,9 @@ export default {
         let response = await userService.requestUsername(this.email)
 
         if (response.status === 200) {
-          this.$toasted.show(`Your username has been sent to your email address, please check your email inbox.`, { type: 'success' })
+          this.$toast.success(`Your username has been sent to your email address, please check your email inbox.`)
         } else {
-          this.$toasted.show(`There was a problem requesting your username, please check that you entered your email address correctly.`, { type: 'error' })
+          this.$toast.error(`There was a problem requesting your username, please check that you entered your email address correctly.`)
         }
 
         router.push({ name: 'home' })

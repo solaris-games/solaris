@@ -82,7 +82,7 @@ export default {
 
         gameHelper.getCarrierById(this.$store.state.game, this.carrierId).name = this.currentName
 
-        this.$toasted.show(`Carrier renamed to ${this.currentName}.`)
+        this.$toast.default(`Carrier renamed to ${this.currentName}.`)
 
         this.onCloseRequested(e)
       } catch (err) {

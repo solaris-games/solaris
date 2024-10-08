@@ -50,7 +50,7 @@ export default {
   },
   methods: {
     async upgradeEconomy (e) {
-      if (this.$store.state.settings.star.confirmBuildEconomy === 'enabled' 
+      if (this.$store.state.settings.star.confirmBuildEconomy === 'enabled'
         && !await this.$confirm('Upgrade Economy', `Are you sure you want to upgrade Economy at ${this.star.name} for $${this.star.upgradeCosts.economy} credits?`)) {
         return
       }
@@ -61,10 +61,10 @@ export default {
         let response = await starService.upgradeEconomy(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
-          this.$toasted.show(`Economy upgraded at ${this.star.name}.`)
+          this.$toast.default(`Economy upgraded at ${this.star.name}.`)
 
           this.$store.commit('gameStarEconomyUpgraded', response.data)
-          
+
           AudioService.hover()
         }
       } catch (err) {
@@ -74,7 +74,7 @@ export default {
       this.isUpgradingEconomy = false
     },
     async upgradeIndustry (e) {
-      if (this.$store.state.settings.star.confirmBuildIndustry === 'enabled' 
+      if (this.$store.state.settings.star.confirmBuildIndustry === 'enabled'
         && !await this.$confirm('Upgrade Industry', `Are you sure you want to upgrade Industry at ${this.star.name} for $${this.star.upgradeCosts.industry} credits?`)) {
         return
       }
@@ -85,10 +85,10 @@ export default {
         let response = await starService.upgradeIndustry(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
-          this.$toasted.show(`Industry upgraded at ${this.star.name}.`)
+          this.$toast.default(`Industry upgraded at ${this.star.name}.`)
 
           this.$store.commit('gameStarIndustryUpgraded', response.data)
-          
+
           AudioService.hover()
         }
       } catch (err) {
@@ -98,7 +98,7 @@ export default {
       this.isUpgradingIndustry = false
     },
     async upgradeScience (e) {
-      if (this.$store.state.settings.star.confirmBuildScience === 'enabled' 
+      if (this.$store.state.settings.star.confirmBuildScience === 'enabled'
         && !await this.$confirm('Upgrade Science', `Are you sure you want to upgrade Science at ${this.star.name} for $${this.star.upgradeCosts.science} credits?`)) {
         return
       }
@@ -109,10 +109,10 @@ export default {
         let response = await starService.upgradeScience(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
-          this.$toasted.show(`Science upgraded at ${this.star.name}.`)
+          this.$toast.default(`Science upgraded at ${this.star.name}.`)
 
           this.$store.commit('gameStarScienceUpgraded', response.data)
-          
+
           AudioService.hover()
         }
       } catch (err) {

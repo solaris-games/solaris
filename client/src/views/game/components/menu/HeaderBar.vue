@@ -134,7 +134,7 @@ export default {
     gameStarted () {
       this.setupTimer()
 
-      this.$toasted.show(`Get ready, the game will start soon!`, { type: 'success' })
+      this.$toast.success(`Get ready, the game will start soon!`)
       AudioService.download()
     },
     setupTimer () {
@@ -159,7 +159,7 @@ export default {
 
       player.credits += data.data.credits
 
-      this.$toasted.show(`You received $${data.data.credits} from ${fromPlayer.alias}.`, { type: 'info' })
+      this.$toast.info(`You received $${data.data.credits} from ${fromPlayer.alias}.`)
     },
     onCreditsSpecialistsReceived (data) {
       let player = GameHelper.getUserPlayer(this.$store.state.game)
@@ -167,7 +167,7 @@ export default {
 
       player.creditsSpecialists += data.data.creditsSpecialists
 
-      this.$toasted.show(`You received ${data.data.creditsSpecialists} specialist token(s) from ${fromPlayer.alias}.`, { type: 'info' })
+      this.$toast.info(`You received ${data.data.creditsSpecialists} specialist token(s) from ${fromPlayer.alias}.`)
     },
     onTechnologyReceived (data) {
       let player = GameHelper.getUserPlayer(this.$store.state.game)
@@ -176,7 +176,7 @@ export default {
       player.research[data.data.technology.name].level = data.data.technology.level
       player.research[data.data.technology.name].progress = 0
 
-      this.$toasted.show(`You received ${data.data.technology.name} level ${data.data.technology.level} from ${fromPlayer.alias}.`, { type: 'info' })
+      this.$toast.info(`You received ${data.data.technology.name} level ${data.data.technology.level} from ${fromPlayer.alias}.`)
     },
     goToMainMenu () {
       router.push({ name: 'main-menu' })

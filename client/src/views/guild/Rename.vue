@@ -89,7 +89,7 @@ export default {
         let response = await GuildApiService.rename(this.name, this.tag)
 
         if (response.status === 200) {
-          this.$toasted.show(`You have renamed the guild ${this.name} [${this.tag}]!`, { type: 'success' })
+          this.$toast.success(`You have renamed the guild ${this.name} [${this.tag}]!`)
 
           router.push({ name: 'guild' })
         }

@@ -510,7 +510,7 @@ export default {
         let response = await UserApiService.saveGameSettings(this.settings)
 
         if (response.status === 200) {
-          this.$toasted.show(`Settings saved.`, { type: 'success' })
+          this.$toast.success(`Settings saved.`)
 
           this.$store.commit('setSettings', this.settings)
 

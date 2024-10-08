@@ -1,5 +1,4 @@
 import {createApp} from 'vue'
-import Toasted from 'vue-toasted'
 import App from './App.vue'
 import router from './router'
 import store from './store'
@@ -9,6 +8,7 @@ import $ from 'jquery'
 import 'pixi.js-legacy'
 import 'pixi-viewport'
 import '@pixi/graphics-extras';
+import ToastPlugin from "vue-toast-notification";
 
 // Note: This was done to get around an issue where the Steam client
 // had bootstrap as undefined. This also affects the UI template we're using,
@@ -43,10 +43,7 @@ app.use(store);
 
 app.use(initSocket(store));
 
-app.use(Toasted, {
-  position: 'bottom-right',
-  duration: 2500
-});
+app.use(ToastPlugin);
 
 app.config.globalProperties.$confirm = async function(title, text, confirmText = 'Yes', cancelText = 'No', hideCancelButton = false, cover = false) {
   return this.$store.dispatch('confirm', {

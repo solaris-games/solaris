@@ -93,7 +93,7 @@ export default {
         let response = await TradeApiService.sendTechnology(this.$store.state.game._id, this.player._id, this.selectedTechnology.name, this.selectedTechnology.level)
 
         if (response.status === 200) {
-          this.$toasted.show(`Sent ${this.selectedTechnology.name} (level ${this.selectedTechnology.level}) to ${this.player.alias}.`)
+          this.$toast.default(`Sent ${this.selectedTechnology.name} (level ${this.selectedTechnology.level}) to ${this.player.alias}.`)
 
           let playerTech = gameHelper.getPlayerById(this.$store.state.game, this.playerId).research[this.selectedTechnology.name]
 
@@ -103,7 +103,7 @@ export default {
 
           this.player.reputation = response.data.reputation
 
-          this.getTradeableTechnologies()
+          await this.getTradeableTechnologies()
         }
       } catch (err) {
         this.errors = err.response.data.errors || []

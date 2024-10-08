@@ -100,7 +100,7 @@ export default {
         let response = await GuildApiService.create(this.name, this.tag)
 
         if (response.status === 201) {
-          this.$toasted.show(`You have founded the guild ${this.name} [${this.tag}]!`, { type: 'success' })
+          this.$toast.success(`You have founded the guild ${this.name} [${this.tag}]!`)
 
           router.push({ name: 'guild' })
         }

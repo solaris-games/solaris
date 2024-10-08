@@ -85,7 +85,7 @@ export default {
       if (star) {
         GameContainer.map.panToStar(star)
       } else {
-        this.$toasted.show(`The location of the star is unknown.`, { type: 'error' })
+        this.$toast.error(`The location of the star is unknown.`)
       }
     },
   },

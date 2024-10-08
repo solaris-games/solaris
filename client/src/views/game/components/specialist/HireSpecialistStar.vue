@@ -114,7 +114,7 @@ export default {
                 GameContainer.reloadStar(this.star)
               }
 
-              this.$toasted.show(`${specialist.name} has been hired for the star ${this.star.name}.`)
+              this.$toast.default(`${specialist.name} has been hired for the star ${this.star.name}.`)
             }
         } catch (err) {
             console.error(err)

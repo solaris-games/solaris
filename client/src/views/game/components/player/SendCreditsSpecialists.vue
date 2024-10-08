@@ -65,7 +65,7 @@ export default {
         if (response.status === 200) {
           this.$emit('onCreditsSpecialistsSent', this.amount)
 
-          this.$toasted.show(`Sent ${this.amount} specialist token(s) to ${this.player.alias}.`)
+          this.$toast.default(`Sent ${this.amount} specialist token(s) to ${this.player.alias}.`)
 
           this.userPlayer.creditsSpecialists -= this.amount
           this.amount = 0

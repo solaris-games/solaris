@@ -185,7 +185,7 @@ export default {
                 let response = await UserApiService.saveSubscriptions(this.subscriptions)
 
                 if (response.status === 200) {
-                    this.$toasted.show(`Subscriptions saved.`, { type: 'success' })
+                    this.$toast.success(`Subscriptions saved.`)
                 }
             } catch (err) {
                 console.error(err)

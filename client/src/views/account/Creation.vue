@@ -181,7 +181,7 @@ export default {
         let response = await userService.createUser(this.email, this.username, this.password, this.recaptchaToken)
 
         if (response.status === 201) {
-          this.$toasted.show(`Welcome ${this.username}! You can now log in and play Solaris.`, {type: 'success'})
+          this.$toast.success(`Welcome ${this.username}! You can now log in and play Solaris.`)
 
           router.push({name: 'home'})
         }

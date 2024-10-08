@@ -143,31 +143,16 @@ export default {
 
       let fromPlayer = GameHelper.getPlayerById(this.$store.state.game, e.fromPlayerId)
 
-      this.$toasted.show(`New message from ${fromPlayer.alias}.`, {
-        duration: null,
-        type: 'info',
+      this.$toast.info(`New message from ${fromPlayer.alias}.`, {
         duration: 10000,
-        action: [
-          {
-            text: 'Dismiss',
-            onClick: (e, toastObject) => {
-              toastObject.goAway(0)
-            }
-          },
-          {
-            text: 'View',
-            onClick: (e, toastObject) => {
-              this.$store.commit('setMenuStateChat', {
-                state: MENU_STATES.CONVERSATION,
-                args: conversationId
-              })
+        onClick: () => {
+          this.$store.commit('setMenuStateChat', {
+            state: MENU_STATES.CONVERSATION,
+            args: conversationId
+          })
 
-              this.isExpanded = true
-
-              toastObject.goAway(0)
-            }
-          }
-        ]
+          this.isExpanded = true
+        }
       })
 
       AudioService.join()

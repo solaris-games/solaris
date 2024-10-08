@@ -71,7 +71,7 @@ export default {
           const response = await GuildApiService.invite(this.myGuild._id, this.user.username);
 
           if (response.status === 200) {
-            this.$toasted.show(`You invited ${this.user.username} to your guild.`, { type: 'success' })
+            this.$toast.default(`You invited ${this.user.username} to your guild.`, { type: 'success' })
           }
           await this.loadMyGuild();
         } catch (err) {

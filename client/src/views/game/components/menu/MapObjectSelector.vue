@@ -81,7 +81,7 @@ export default {
         let response = await starService.transferAllToStar(this.$store.state.game._id, star.data._id)
 
         if (response.status === 200) {
-          this.$toasted.show(`All ships transfered to ${star.data.name}.`)
+          this.$toast.default(`All ships transfered to ${star.data.name}.`)
 
           this.$store.commit('gameStarAllShipsTransferred', response.data)
         }
@@ -94,7 +94,7 @@ export default {
         let response = await starService.distributeAllShips(this.$store.state.game._id, star.data._id)
 
         if (response.status === 200) {
-          this.$toasted.show(`All ships at ${star.data.name} distributed to carriers in orbit.`)
+          this.$toast.default(`All ships at ${star.data.name} distributed to carriers in orbit.`)
 
           this.$store.commit('gameStarAllShipsTransferred', response.data)
         }

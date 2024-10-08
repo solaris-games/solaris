@@ -61,10 +61,10 @@ export default {
 
         if (response.status === 200) {
           this.$store.commit('setUsername', this.username);
-          this.$toasted.show(`Username updated.`, { type: 'success' })
+          this.$toast.success(`Username updated.`)
           router.push({ name: 'account-settings' })
         } else {
-          this.$toasted.show(`There was a problem updating your username, please try again.`, { type: 'error' })
+          this.$toast.error(`There was a problem updating your username, please try again.`)
         }
       } catch (err) {
         this.errors = err.response.data.errors || []

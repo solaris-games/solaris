@@ -103,7 +103,7 @@ export default {
             let response = await SpecialistApiService.hireCarrierSpecialist(this.$store.state.game._id, this.carrierId, specialist.id)
 
             if (response.status === 200) {
-                this.$toasted.show(`${specialist.name} has been hired for the carrier ${this.carrier.name}.`)
+                this.$toast.default(`${specialist.name} has been hired for the carrier ${this.carrier.name}.`)
 
                 let currency = this.$store.state.game.settings.specialGalaxy.specialistsCurrency
 

@@ -55,7 +55,7 @@ export default {
             await LedgerApiService.forgiveDebtCreditsSpecialists(this.$store.state.game._id, ledger.playerId)
 
           if (response.status === 200) {
-            this.$toasted.show(`The debt ${playerAlias} owes you has been forgiven.`, { type: 'success' })
+            this.$toast.success(`The debt ${playerAlias} owes you has been forgiven.`)
           }
 
           ledger.debt = response.data.ledger.debt
@@ -80,7 +80,7 @@ export default {
             await LedgerApiService.settleDebtCreditsSpecialists(this.$store.state.game._id, ledger.playerId)
 
           if (response.status === 200) {
-            this.$toasted.show(`You have paid off debt that you owe to ${playerAlias}.`, { type: 'success' })
+            this.$toast.success(`You have paid off debt that you owe to ${playerAlias}.`)
           }
 
           if (isCredits) {

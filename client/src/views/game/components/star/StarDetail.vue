@@ -527,7 +527,7 @@ export default {
         let response = await starService.abandonStar(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
-          this.$toasted.show(`${this.star.name} has been abandoned.`)
+          this.$toast.default(`${this.star.name} has been abandoned.`)
 
           this.$store.commit('gameStarAbandoned', {
             starId: this.star._id
@@ -544,7 +544,7 @@ export default {
         let response = await starService.buildWarpGate(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
-          this.$toasted.show(`Warp Gate built at ${this.star.name}.`)
+          this.$toast.default(`Warp Gate built at ${this.star.name}.`)
 
           this.$store.commit('gameStarWarpGateBuilt', response.data)
 
@@ -559,7 +559,7 @@ export default {
         let response = await starService.destroyWarpGate(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
-          this.$toasted.show(`Warp Gate destroyed at ${this.star.name}.`)
+          this.$toast.default(`Warp Gate destroyed at ${this.star.name}.`)
 
           this.$store.commit('gameStarWarpGateDestroyed', {
             starId: this.star._id
@@ -585,7 +585,7 @@ export default {
 
           this.star.ships = response.data.star.ships
 
-          this.$toasted.show(`All ships transfered to ${this.star.name}.`)
+          this.$toast.default(`All ships transfered to ${this.star.name}.`)
         }
       } catch (err) {
         console.log(err)
@@ -605,7 +605,7 @@ export default {
 
           this.star.ships = response.data.star.ships
 
-          this.$toasted.show(`All ships at ${this.star.name} distributed to carriers in orbit.`)
+          this.$toast.default(`All ships at ${this.star.name} distributed to carriers in orbit.`)
         }
       } catch (err) {
         console.log(err)

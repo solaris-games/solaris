@@ -106,7 +106,7 @@ export default {
         try {
           await gameService.pause(this.game._id)
 
-          this.$toasted.show(`The game has been paused. Please notify the players.`, { type: 'success' })
+          this.$toast.success(`The game has been paused. Please notify the players.`)
 
           await this.loadGame()
         } catch (err) {
@@ -124,7 +124,7 @@ export default {
         try {
           await gameService.fastForward(this.game._id)
 
-          this.$toasted.show(`The game has been fast forwarded. Please notify the players.`, { type: 'success' })
+          this.$toast.success(`The game has been fast forwarded. Please notify the players.`)
 
           await this.loadGame()
         } catch (err) {
@@ -142,7 +142,7 @@ export default {
         try {
           await gameService.forceStart(this.game._id)
 
-          this.$toasted.show(`The game has been force started. Please notify the players.`, { type: 'success' })
+          this.$toast.success(`The game has been force started. Please notify the players.`)
 
           await this.loadGame()
         } catch (err) {
@@ -161,7 +161,7 @@ export default {
         try {
           await gameService.resume(this.game._id)
 
-          this.$toasted.show(`The game has been resumed. Please notify the players.`, { type: 'success' })
+          this.$toast.success(`The game has been resumed. Please notify the players.`)
 
           await this.loadGame()
         } catch (err) {

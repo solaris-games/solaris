@@ -345,7 +345,7 @@ export default {
         const response = await CarrierApiService.loopWaypoints(this.$store.state.game._id, this.carrier._id, !this.carrier.waypointsLooped)
 
         if (response.status === 200) {
-          this.$toasted.show(`${this.carrier.name} waypoints updated.`)
+          this.$toast.default(`${this.carrier.name} waypoints updated.`)
 
           this.carrier.waypointsLooped = !this.carrier.waypointsLooped
 
@@ -383,7 +383,7 @@ export default {
 
           GameContainer.reloadCarrier(this.carrier)
 
-          this.$toasted.show(`${this.carrier.name} has been converted into a gift.`)
+          this.$toast.default(`${this.carrier.name} has been converted into a gift.`)
         }
       } catch (err) {
         console.error(err)
@@ -439,7 +439,7 @@ export default {
         const response = await CarrierApiService.scuttle(this.$store.state.game._id, this.carrier._id)
 
         if (response.status === 200) {
-          this.$toasted.show(`${this.carrier.name} has been scuttled. All ships will be destroyed.`)
+          this.$toast.default(`${this.carrier.name} has been scuttled. All ships will be destroyed.`)
 
           this.$store.commit('gameCarrierScuttled', {
             carrierId: this.carrier._id

@@ -212,7 +212,7 @@ export default {
 
         if (response.status === 200) {
           AudioService.quit()
-          this.$toasted.show(`You have quit ${this.$store.state.game.settings.general.name}.`, {type: 'error'})
+          this.$toast.error(`You have quit ${this.$store.state.game.settings.general.name}.`)
           router.push({name: 'main-menu'})
         }
       } catch (err) {
@@ -231,9 +231,9 @@ export default {
 
         if (response.status === 200) {
           if (this.isTutorialGame) {
-            this.$toasted.show(`You have confirmed your move, please wait while the game processes the tick.`, { type: 'success' })
+            this.$toast.success(`You have confirmed your move, please wait while the game processes the tick.`)
           } else {
-            this.$toasted.show(`You have confirmed your move, once all players are ready the game will progress automatically.`, { type: 'success' })
+            this.$toast.success(`You have confirmed your move, once all players are ready the game will progress automatically.`)
           }
 
           player.ready = true
@@ -252,9 +252,9 @@ export default {
 
         if (response.status === 200) {
           if (this.isTutorialGame) {
-            this.$toasted.show(`You have confirmed your move, please wait while the game processes the tick.`, { type: 'success' })
+            this.$toast.success(`You have confirmed your move, please wait while the game processes the tick.`)
           } else {
-            this.$toasted.show(`You have confirmed your move, once all players are ready the game will progress automatically.`, { type: 'success' })
+            this.$toast.success(`You have confirmed your move, once all players are ready the game will progress automatically.`)
           }
 
           player.ready = true
@@ -299,7 +299,7 @@ export default {
         let response = await gameService.confirmReadyToQuit(this.$store.state.game._id)
 
         if (response.status === 200) {
-          this.$toasted.show(`You have confirmed that you are ready to quit.`, {type: 'success'})
+          this.$toast.success(`You have confirmed that you are ready to quit.`)
 
           player.readyToQuit = true
         }

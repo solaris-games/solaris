@@ -107,7 +107,7 @@ export default {
 
         if (response.status === 200) {
           this.setReadonlyNotes(newNotes)
-          this.$toasted.show(`Game notes updated.`, {type: 'success'})
+          this.$toast.success(`Game notes updated.`)
         }
       } catch (err) {
         console.error(err)
@@ -126,7 +126,7 @@ export default {
       if (star) {
         GameContainer.map.panToStar(star)
       } else {
-        this.$toasted.show(`The location of the star is unknown.`, { type: 'error' })
+        this.$toast.error(`The location of the star is unknown.`)
       }
     },
     onStarClicked(id) {

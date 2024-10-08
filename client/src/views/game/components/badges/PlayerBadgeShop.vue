@@ -97,7 +97,7 @@ export default {
             let response = await BadgeApiService.purchaseBadgeForPlayer(this.$store.state.game._id, this.recipientPlayer._id, badge.key)
 
             if (response.status === 200) {
-                this.$toasted.show(`You succesfully purchased the ${badge.name} badge for ${this.recipientPlayer.alias}!`, { type: 'success' })
+                this.$toast.success(`You successfully purchased the ${badge.name} badge for ${this.recipientPlayer.alias}!`)
 
                 this.onOpenPlayerDetailRequested()
             }
