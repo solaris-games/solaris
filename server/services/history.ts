@@ -241,4 +241,9 @@ export default class HistoryService {
         });
     }
 
+    async getHistoryMinimumTick(gameId: DBObjectId): Promise<number | null> {
+        return (await this.historyRepo.findOne({
+            gameId: gameId, stars: { $ne: null }, carriers: { $ne: null }
+        }, null, { sort: { tick: 1 } }))?.tick ?? null;
+    }
 };

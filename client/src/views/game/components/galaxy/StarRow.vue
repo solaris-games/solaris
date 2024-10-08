@@ -1,12 +1,17 @@
 <template>
 <tr>
-    <td><i class="fas fa-circle" v-if="star.ownedByPlayerId" :style="{ 'color': colour }"></i></td>
+    <td><player-icon v-if="star.ownedByPlayerId" :playerId="star.ownedByPlayerId" /></td>
     <td><a href="javascript:;" @click="clickStar">{{star.name}}</a></td>
     <td class="no-padding"><a href="javascript:;" @click="goToStar"><i class="far fa-eye"></i></a></td>
     <td class="sm-padding"><specialist-icon :type="'star'" :specialist="star.specialist" :hideDefaultIcon="true"></specialist-icon></td>
+    <td><i v-if="star.warpGate" class="fas fa-check"></i></td>
     <td class="text-end">
       <span v-if="star.infrastructure" class="text-success me-2" title="Economic infrastructure - Contributes to credits earned at the end of a cycle">{{star.infrastructure.economy}}</span>
+    </td>
+    <td class="text-end">
       <span v-if="star.infrastructure" class="text-warning me-2" title="Industrial infrastructure - Contributes to ship production">{{star.infrastructure.industry}}</span>
+    </td>
+    <td class="text-end">
       <span v-if="star.infrastructure" class="text-info" title="Scientific infrastructure - Contributes to technology research">{{star.infrastructure.science}}</span>
     </td>
     <td class="text-end" v-if="isEconomyEnabled">
@@ -31,11 +36,13 @@
 import gameContainer from '../../../../game/container'
 import AudioService from '../../../../game/audio'
 import gameHelper from '../../../../services/gameHelper'
+import PlayerIconVue from '../player/PlayerIcon'
 import starService from '../../../../services/api/star'
 import SpecialistIcon from '../specialist/SpecialistIcon'
 
 export default {
   components: {
+    'player-icon': PlayerIconVue,
     'specialist-icon': SpecialistIcon
   },
   props: {
@@ -132,6 +139,9 @@ export default {
     }
   },
   computed: {
+    userPlayer() {
+      return gameHelper.getUserPlayer(this.$store.state.game);
+    },
     hasEconomyCost () {
       return this.star.upgradeCosts && this.star.upgradeCosts.economy
     },
@@ -151,19 +161,13 @@ export default {
       return this.$store.state.game.settings.player.developmentCost.science !== 'none'
     },
     canUpgradeEconomy () {
-      return this.allowUpgrades && this.star.upgradeCosts && this.star.upgradeCosts.economy && !this.isUpgradingEconomy && gameHelper.getUserPlayer(this.$store.state.game).credits >= this.star.upgradeCosts.economy
+      return this.allowUpgrades && this.star.upgradeCosts && this.star.upgradeCosts.economy && !this.isUpgradingEconomy && this.userPlayer?.credits >= this.star.upgradeCosts.economy
     },
     canUpgradeIndustry () {
-      return this.allowUpgrades && this.star.upgradeCosts && this.star.upgradeCosts.industry && !this.isUpgradingIndustry && gameHelper.getUserPlayer(this.$store.state.game).credits >= this.star.upgradeCosts.industry
+      return this.allowUpgrades && this.star.upgradeCosts && this.star.upgradeCosts.industry && !this.isUpgradingIndustry && this.userPlayer?.credits >= this.star.upgradeCosts.industry
     },
     canUpgradeScience () {
-      return this.allowUpgrades && this.star.upgradeCosts && this.star.upgradeCosts.science && !this.isUpgradingScience && gameHelper.getUserPlayer(this.$store.state.game).credits >= this.star.upgradeCosts.science
-    },
-    availableCredits () {
-      return gameHelper.getUserPlayer(this.$store.state.game).credits
-    },
-    colour () {
-      return this.$store.getters.getColourForPlayer(this.star.ownedByPlayerId).value
+      return this.allowUpgrades && this.star.upgradeCosts && this.star.upgradeCosts.science && !this.isUpgradingScience && this.userPlayer?.credits >= this.star.upgradeCosts.science
     }
   }
 }

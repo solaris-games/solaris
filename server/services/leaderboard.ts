@@ -1,7 +1,7 @@
 import {Game, Team} from "./types/Game";
 import {PlayerLeaderboard, LeaderboardPlayer, TeamLeaderboard, LeaderboardTeam} from "./types/Leaderboard";
 import { Player } from "./types/Player";
-import { EloRatingChangeResult, GameRankingResult } from "./types/Rating";
+import {EloRatingChangeResult, GameRanking, GameRankingResult} from "./types/Rating";
 import { User } from "./types/User";
 import BadgeService from "./badge";
 import GameService from "./game";
@@ -294,22 +294,28 @@ export default class LeaderboardService {
         const rankToAward = game.settings.general.playerLimit * 2;
         const rankPerPlayer = Math.floor(rankToAward / nonAfkInLeadingTeam.length);
 
-        const ranks = nonAfkInLeadingTeam.flatMap(player => {
+        const ranks: GameRanking[] = [];
+
+        for (let player of nonAfkInLeadingTeam) {
             const user = gameUsers.find(u => player.userId && u._id.toString() === player.userId.toString());
 
             if (!user) {
-                return [];
+                continue;
             }
 
+            const rankIncrease = rankPerPlayer * game.constants.player.rankRewardMultiplier;
             const currentRank = user.achievements.rank;
-            const newRank = currentRank + rankPerPlayer;
+            const newRank = currentRank + rankIncrease;
 
-            return [{
+            user.achievements.rank = newRank;
+            user.achievements.level = this.userLevelService.getByRankPoints(newRank).id;
+
+            ranks.push({
                 playerId: player._id,
                 current: currentRank,
                 new: newRank
-            }];
-        });
+            });
+        }
 
         return {
             ranks,
