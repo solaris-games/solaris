@@ -76,7 +76,7 @@ export default {
     },
     getAvatarImage (player) {
       try {
-        return new URL(`../../../../assets/avatars/${player.avatar.file}`, import.meta.url).href
+        return getAssetPath(`../../../../assets/avatars/${player.avatar.file}`)
       } catch (err) {
         console.error(err)
 

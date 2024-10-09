@@ -1,19 +1,6 @@
-import backspaceFile from '../assets/audio/backspace.mp3'
-import clickFile from '../assets/audio/click.mp3'
-import closeFile from '../assets/audio/close.mp3'
-import dialogOpenFile from '../assets/audio/dialog_open.mp3'
-import downloadFile from '../assets/audio/download.mp3'
-import hoverFile from '../assets/audio/hover.mp3'
-import joinFile from '../assets/audio/join.mp3'
-import leaveFile from '../assets/audio/leave.mp3'
-import loadingFile from '../assets/audio/loading.mp3'
-import openFile from '../assets/audio/open.mp3'
-import quitFile from '../assets/audio/quit.mp3'
-import typeFile from '../assets/audio/type.mp3'
-
 // TODO: This service doesn't really belong in the game folder, should be in the services folder instead.
 class AudioService {
-  
+
   _play (audio) {
     if (this.store && this.store.state.settings.interface.audio === 'disabled') {
       return
@@ -23,18 +10,18 @@ class AudioService {
   }
 
   preload() {
-    this.backspaceAudio = new Audio(backspaceFile)
-    this.clickAudio = new Audio(clickFile)
-    this.closeAudio = new Audio(closeFile)
-    this.dialogOpenAudio = new Audio(dialogOpenFile)
-    this.downloadAudio = new Audio(downloadFile)
-    this.hoverAudio = new Audio(hoverFile)
-    this.joinAudio = new Audio(joinFile)
-    this.leaveAudio = new Audio(leaveFile)
-    this.loadingAudio = new Audio(loadingFile)
-    this.openAudio = new Audio(openFile)
-    this.quitAudio = new Audio(quitFile)
-    this.typeAudio = new Audio(typeFile)
+    this.backspaceAudio = new Audio('audio/backspace.mp3')
+    this.clickAudio = new Audio('audio/click.mp3')
+    this.closeAudio = new Audio('audio/close.mp3')
+    this.dialogOpenAudio = new Audio('audio/dialog_open.mp3')
+    this.downloadAudio = new Audio('audio/download.mp3')
+    this.hoverAudio = new Audio('audio/hover.mp3')
+    this.joinAudio = new Audio('audio/join.mp3')
+    this.leaveAudio = new Audio('audio/leave.mp3')
+    this.loadingAudio = new Audio('audio/loading.mp3')
+    this.openAudio = new Audio('audio/open.mp3')
+    this.quitAudio = new Audio('audio/quit.mp3')
+    this.typeAudio = new Audio('audio/type.mp3')
   }
 
   loadStore (store) {

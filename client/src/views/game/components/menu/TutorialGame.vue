@@ -1,5 +1,5 @@
 <script setup>
-import tutorial from '../../../../assets/screenshots/tutorial.png';
+import {getAssetPath} from "../../../../asset.js";
 </script>
 
 <template>
@@ -7,7 +7,7 @@ import tutorial from '../../../../assets/screenshots/tutorial.png';
         <div class="row">
             <div class="col-sm-12 col-md-6 col-lg-6">
                 <div class="card bg-dark text-white tutorial-game p-1" @click="viewTutorial()">
-                    <img class="card-img" :src="tutorial" alt="View Tutorial">
+                    <img class="card-img" :src="getAssetPath('screenshots/tutorial.png')" alt="View Tutorial">
                     <div class="card-img-overlay">
                         <h5 class="card-title tutorial-card-title">
                             <i class="fas fa-user-graduate"></i>

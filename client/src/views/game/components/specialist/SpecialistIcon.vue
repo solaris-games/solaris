@@ -26,7 +26,7 @@ export default {
             return null
         }
 
-        return new URL(`../../../../assets/specialists/${this.specialist.key}.svg`, import.meta.url).href
+        return getAssetPath(`../../../../assets/specialists/${this.specialist.key}.svg`)
     }
   }
 }

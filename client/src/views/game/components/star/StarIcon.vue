@@ -36,28 +36,28 @@ export default {
     iconSource() {
       // TODO: Combos?
       /*if (this.isBinaryStar && this.isBlackHole) {
-        return new URL('../../../../assets/map-objects/128x128_star_black_hole_binary.svg', import.meta.url).href;
+        return getAssetPath('../../../../assets/map-objects/128x128_star_black_hole_binary.svg');
       }
       else*/ if (this.isBinaryStar) {
-        return new URL('../../../../assets/map-objects/128x128_star_scannable_binary.svg', import.meta.url).href;
+        return getAssetPath('../../../../assets/map-objects/128x128_star_scannable_binary.svg');
       }
       else if (this.isNebula) {
-        return `mask-image: url(${new URL('../../../../assets/nebula/neb0-starless-bright.png')}, import.meta.url).href;`;
+        return `mask-image: url(${getAssetPath('../../../../assets/nebula/neb0-starless-bright.png')});`;
       }
       else if (this.isBlackHole) {
-        return new URL('../../../../assets/map-objects/128x128_star_black_hole.svg', import.meta.url).href;
+        return getAssetPath('../../../../assets/map-objects/128x128_star_black_hole.svg');
       }
       //else if (this.isAsteroidField) {
-      //  return `mask-image: url(${new URL('../../../../assets/stars/star-asteroid-field-2.png')}, import.meta.url).href;`;
+      //  return `mask-image: url(${getAssetPath('../../../../assets/stars/star-asteroid-field-2.png')});`;
       //}
       else if (this.isPulsar) {
-        return new URL('../../../../assets/stars/128x128_star_pulsar.svg', import.meta.url).href;
+        return getAssetPath('../../../../assets/stars/128x128_star_pulsar.svg');
       }
       else if (this.isWormHole) {
-        return `mask-image: url(${new URL('../../../../assets/stars/vortex.png')}, import.meta.url).href;`;
+        return `mask-image: url(${getAssetPath('../../../../assets/stars/vortex.png')});`;
       }
       else {
-        return new URL('../../../../assets/map-objects/128x128_star_scannable.svg', import.meta.url).href;
+        return getAssetPath('../../../../assets/map-objects/128x128_star_scannable.svg');
       }
     }
   }
