@@ -41,7 +41,7 @@
           </td>
           <td align="right" :class="getColumnClass('rank')">
             {{player.achievements.rank}}
-            <img class="user-level-icon" :src="require(`../../../../assets/levels/${player.achievements.level}.png`)">
+            <img class="user-level-icon" :src="`../../../../assets/levels/${player.achievements.level}.png`">
           </td>
           <td align="right" :class="getColumnClass('victories')">{{player.achievements.victories}}</td>
           <td align="right" :class="getColumnClass('renown')">{{player.achievements.renown}}</td>

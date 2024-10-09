@@ -1,6 +1,6 @@
 <template>
     <div class="badge-container" @click="onOpenPurchasePlayerBadgeRequested">
-        <img :src="require(`../../../../assets/badges/${badge.key}.png`)" :title="badge.name"/>
+        <img :src="`../../../../assets/badges/${badge.key}.png`" :title="badge.name"/>
         <span class="badge-label" :title="badge.name">{{badge.awarded}}</span>
     </div>
 </template>

@@ -29,7 +29,7 @@
             <!-- Featured -->
             <div class="col-sm-12 col-md-12 col-lg-12 mb-0" v-if="games.featured">
               <div class="card featured-card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.featured._id })">
-                <img class="card-img" :src="require('../../assets/screenshots/featured.png')" alt="Featured Game">
+                <img class="card-img" :src="'../../assets/screenshots/featured.png'" alt="Featured Game">
                 <div class="card-img-overlay">
                   <h4 class="card-title featured-card-title">
                     <i class="fas fa-star"></i>
@@ -69,7 +69,7 @@
             <!-- New Player -->
             <div class="col-sm-12 col-md-6 col-lg-6" v-if="games.newPlayerRT">
               <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.newPlayerRT._id })">
-                <img class="card-img" :src="require('../../assets/screenshots/new_player_rt.png')" alt="View New Player Game">
+                <img class="card-img" :src="'../../assets/screenshots/new_player_rt.png'" alt="View New Player Game">
                 <div class="card-img-overlay">
                   <h5 class="card-title new-player-card-title">
                     <i class="fas fa-user-graduate"></i>
@@ -92,7 +92,7 @@
             <!-- Special Game -->
             <div class="col-sm-12 col-md-6 col-lg-6" v-if="games.special">
               <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.special._id })">
-                <img class="card-img" :src="require('../../assets/screenshots/' + games.special.settings.general.type + '.png')" alt="Special Game">
+                <img class="card-img" :src="'../../assets/screenshots/' + games.special.settings.general.type + '.png'" alt="Special Game">
                 <div class="card-img-overlay">
                   <h5 class="card-title special-card-title">
                     <i class="fas" :class="{
@@ -130,7 +130,7 @@
             <!-- Standard -->
             <div class="col-sm-12 col-md-3 col-lg-3" v-if="games.standardRT">
               <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.standardRT._id })">
-                <img class="card-img" :src="require('../../assets/screenshots/standard_rt.png')" alt="Standard Game">
+                <img class="card-img" :src="'../../assets/screenshots/standard_rt.png'" alt="Standard Game">
                 <div class="card-img-overlay">
                   <h6 class="card-title standard-card-title">
                     <i class="fas fa-user-astronaut"></i>
@@ -154,7 +154,7 @@
             <!-- Standard TB -->
             <div class="col-sm-12 col-md-3 col-lg-3" v-if="games.standardTB">
               <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.standardTB._id })">
-                <img class="card-img" :src="require('../../assets/screenshots/standard_tb.png')" alt="Standard Turn Based Game">
+                <img class="card-img" :src="'../../assets/screenshots/standard_tb.png'" alt="Standard Turn Based Game">
                 <div class="card-img-overlay">
                   <h6 class="card-title">
                     <i class="fas fa-user-astronaut"></i>
@@ -178,7 +178,7 @@
             <!-- 1v1 -->
             <div class="col-sm-12 col-md-3 col-lg-3" v-if="games.oneVsOneRT">
               <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.oneVsOneRT._id })">
-                <img class="card-img" :src="require('../../assets/screenshots/1v1_rt.png')" alt="1 vs. 1 Game">
+                <img class="card-img" :src="'../../assets/screenshots/1v1_rt.png'" alt="1 vs. 1 Game">
                 <div class="card-img-overlay">
                   <h6 class="card-title">
                     <i class="fas fa-user-friends"></i>
@@ -202,7 +202,7 @@
             <!-- 1v1 TB -->
             <div class="col-sm-12 col-md-3 col-lg-3" v-if="games.oneVsOneTB">
               <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.oneVsOneTB._id })">
-                <img class="card-img" :src="require('../../assets/screenshots/1v1_tb.png')" alt="1 vs. 1 Turn Based Game">
+                <img class="card-img" :src="'../../assets/screenshots/1v1_tb.png'" alt="1 vs. 1 Turn Based Game">
                 <div class="card-img-overlay">
                   <h6 class="card-title">
                     <i class="fas fa-user-friends"></i>
@@ -226,7 +226,7 @@
             <!-- 32 Player -->
             <div class="col-sm-12 col-md-12 col-lg-12" v-if="games.thirtyTwoPlayerRT">
               <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.thirtyTwoPlayerRT._id })">
-                <img class="card-img" :src="require('../../assets/screenshots/32_player.png')" alt="32 Player Game">
+                <img class="card-img" :src="'../../assets/screenshots/32_player.png'" alt="32 Player Game">
                 <div class="card-img-overlay">
                   <h5 class="card-title">
                     <i class="fas fa-users"></i>

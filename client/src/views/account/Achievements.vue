@@ -24,7 +24,7 @@
           <tr>
             <td>Rank</td>
             <td class="text-end">
-              <img class="user-level-icon" :src="require(`../../assets/levels/${user.achievements.level}.png`)">
+              <img class="user-level-icon" :src="`../../assets/levels/${user.achievements.level}.png`">
               {{ user.level.name }}
             </td>
           </tr>

@@ -28,7 +28,7 @@
     <div class="row pb-0 pt-3">
       <div class="col-sm-12 col-md-6 col-lg-6">
         <div class="card bg-dark text-white p-1" @click="routeToPath('/game/active-games')">
-          <img class="card-img" :src="require('../assets/screenshots/home-1.png')" alt="View my games">
+          <img class="card-img" :src="'../assets/screenshots/home-1.png'" alt="View my games">
           <div class="card-img-overlay">
             <h5 class="card-title">
               <i class="fas fa-user"></i>
@@ -45,7 +45,7 @@
       </div>
       <div class="col-sm-12 col-md-6 col-lg-6" @click="routeToPath('/game/list')">
         <div class="card bg-dark text-white p-1">
-          <img class="card-img" :src="require('../assets/screenshots/home-2.png')" alt="Join a game">
+          <img class="card-img" :src="'../assets/screenshots/home-2.png'" alt="Join a game">
           <div class="card-img-overlay">
             <h5 class="card-title">
               <i class="fas fa-gamepad"></i>
@@ -62,7 +62,7 @@
       </div>
       <div class="col-sm-12 col-md-4 col-lg-4">
         <div class="card bg-dark text-white p-1" @click="routeToPath('/leaderboard')">
-          <img class="card-img" :src="require('../assets/screenshots/home-3.png')" alt="Leaderboard">
+          <img class="card-img" :src="'../assets/screenshots/home-3.png'" alt="Leaderboard">
           <div class="card-img-overlay">
             <h5 class="card-title">
               <i class="fas fa-list-ol"></i>
@@ -79,7 +79,7 @@
       </div>
       <div class="col-sm-12 col-md-4 col-lg-4">
         <div class="card bg-dark text-white p-1" @click="routeToPath('/guild')">
-          <img class="card-img" :src="require('../assets/screenshots/home-4.png')" alt="Guilds">
+          <img class="card-img" :src="'../assets/screenshots/home-4.png'" alt="Guilds">
           <div class="card-img-overlay">
             <h5 class="card-title">
               <i class="fas fa-shield-alt"></i>
@@ -96,7 +96,7 @@
       </div>
       <div class="col-sm-12 col-md-4 col-lg-4">
         <div class="card bg-dark text-white p-1" @click="routeToPath('/avatars')">
-          <img class="card-img" :src="require('../assets/screenshots/home-5.png')" alt="Shop">
+          <img class="card-img" :src="'../assets/screenshots/home-5.png'" alt="Shop">
           <div class="card-img-overlay">
             <h5 class="card-title card-title-success">
               <i class="fas fa-shopping-basket"></i>
