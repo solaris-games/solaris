@@ -457,7 +457,7 @@ import RandomHelper from '../../services/randomHelper'
 import HelpTooltip from '../components/HelpTooltip.vue'
 import FluxBar from './components/menu/FluxBar.vue'
 import LockedGameOverlay from './components/menu/LockedGameOverlay.vue'
-import * as moment from 'moment'
+import moment from 'moment'
 import CommunityGuidelinesBar from "./components/menu/CommunityGuidelinesBar.vue";
 
 export default {
