@@ -212,6 +212,10 @@ export default class ShipTransferService {
             throw new ValidationError('The number of carrier ships in the transfer must be 0 or greater.');
         }
 
+        if (carrierShips !== parseInt(carrierShips.toString()) || starShips !== parseInt(starShips.toString())) {
+            throw new ValidationError('The number of ships in the transfer must be a whole number.');
+        }
+
         carrier.ships = carrierShips;
 
         let shipsFraction = star.shipsActual! - star.ships!; // Keep hold of the fractional amount of ships so we can add it back later.

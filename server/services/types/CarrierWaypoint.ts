@@ -1,6 +1,8 @@
 import { DBObjectId } from "./DBObjectId";
 
-export type CarrierWaypointActionType = 'nothing'|'collectAll'|'dropAll'|'collect'|'drop'|'collectAllBut'|'dropAllBut'|'dropPercentage'|'collectPercentage'|'garrison';
+export const CarrierWaypointActionTypes = ['nothing', 'collectAll', 'dropAll', 'collect', 'drop', 'collectAllBut', 'dropAllBut', 'dropPercentage', 'collectPercentage', 'garrison'] as const;
+
+export type CarrierWaypointActionType = typeof CarrierWaypointActionTypes[number];
 
 export interface CarrierWaypointBase {
     source: DBObjectId;
