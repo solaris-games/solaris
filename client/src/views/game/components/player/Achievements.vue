@@ -3,12 +3,12 @@
     <div class="col text-center pt-2 pb-1 ps-1 pe-1 card">
         <h6>Rank</h6>
         <h3 v-if="!isSmallHeaders">
-          <img class="user-level-icon" :src="'../../../../assets/levels/' + level + '.png'" alt="rank">
+          <img class="user-level-icon" :src="levelSrc" alt="rank">
           <!-- <i class="fas fa-star text-info me-2"></i> -->
           {{ rank }}
         </h3>
         <h4 v-if="isSmallHeaders">
-          <img class="user-level-icon" :src="'../../../../assets/levels/' + level + '.png'" alt="rank">
+          <img class="user-level-icon" :src="levelSrc" alt="rank">
           <!-- <i class="fas fa-star text-info me-2"></i> -->
           {{ rank }}
         </h4>
@@ -52,7 +52,12 @@ export default {
     rank: Number,
     renown: Number
   },
+  methods: {
+  },
   computed: {
+    levelSrc () {
+      return new URL('../../../../assets/levels/' + this.level + '.png', import.meta.url).href
+    },
     isSmallHeaders () {
       return this.victories >= 100 || this.rank >= 100 || this.renown >= 100
     }

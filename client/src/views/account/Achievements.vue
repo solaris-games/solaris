@@ -24,7 +24,7 @@
           <tr>
             <td>Rank</td>
             <td class="text-end">
-              <img class="user-level-icon" :src="`../../assets/levels/${user.achievements.level}.png`">
+              <img class="user-level-icon" :src="levelSrc">
               {{ user.level.name }}
             </td>
           </tr>
@@ -595,7 +595,10 @@ export default {
   computed: {
     userId: function () {
       return this.$route.params.userId
-    }
+    },
+    levelSrc () {
+      return new URL('../../assets/levels/' + this.user.achievements.level + '.png', import.meta.url).href
+    },
   }
 }
 </script>
