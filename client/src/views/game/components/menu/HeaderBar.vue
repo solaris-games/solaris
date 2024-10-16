@@ -107,28 +107,28 @@ export default {
   created () {
     document.addEventListener('keydown', this.handleKeyDown)
 
-    this.sockets.subscribe('gameStarted', this.gameStarted.bind(this))
-    this.sockets.subscribe('gameMessageSent', this.checkForUnreadMessages.bind(this))
-    this.sockets.subscribe('gameConversationRead', this.checkForUnreadMessages.bind(this))
-    this.sockets.subscribe('playerEventRead', this.checkForUnreadEvents.bind(this))
-    this.sockets.subscribe('playerAllEventsRead', this.checkForUnreadEvents.bind(this))
-    this.sockets.subscribe('playerCreditsReceived', this.onCreditsReceived)
-    this.sockets.subscribe('playerCreditsSpecialistsReceived', this.onCreditsSpecialistsReceived)
-    this.sockets.subscribe('playerTechnologyReceived', this.onTechnologyReceived)
+    this.$socket.subscribe('gameStarted', this.gameStarted.bind(this))
+    this.$socket.subscribe('gameMessageSent', this.checkForUnreadMessages.bind(this))
+    this.$socket.subscribe('gameConversationRead', this.checkForUnreadMessages.bind(this))
+    this.$socket.subscribe('playerEventRead', this.checkForUnreadEvents.bind(this))
+    this.$socket.subscribe('playerAllEventsRead', this.checkForUnreadEvents.bind(this))
+    this.$socket.subscribe('playerCreditsReceived', this.onCreditsReceived)
+    this.$socket.subscribe('playerCreditsSpecialistsReceived', this.onCreditsSpecialistsReceived)
+    this.$socket.subscribe('playerTechnologyReceived', this.onTechnologyReceived)
   },
   unmounted () {
     document.removeEventListener('keydown', this.handleKeyDown)
 
     clearInterval(this.intervalFunction)
 
-    this.sockets.unsubscribe('gameStarted')
-    this.sockets.unsubscribe('gameMessageSent')
-    this.sockets.unsubscribe('gameConversationRead')
-    this.sockets.unsubscribe('playerEventRead')
-    this.sockets.unsubscribe('playerAllEventsRead')
-    this.sockets.unsubscribe('playerCreditsReceived')
-    this.sockets.unsubscribe('playerCreditsSpecialistsReceived')
-    this.sockets.unsubscribe('playerTechnologyReceived')
+    this.$socket.unsubscribe('gameStarted')
+    this.$socket.unsubscribe('gameMessageSent')
+    this.$socket.unsubscribe('gameConversationRead')
+    this.$socket.unsubscribe('playerEventRead')
+    this.$socket.unsubscribe('playerAllEventsRead')
+    this.$socket.unsubscribe('playerCreditsReceived')
+    this.$socket.unsubscribe('playerCreditsSpecialistsReceived')
+    this.$socket.unsubscribe('playerTechnologyReceived')
   },
   methods: {
     gameStarted () {

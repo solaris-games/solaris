@@ -45,7 +45,7 @@ export default {
     document.addEventListener('keydown', this.handleKeyDown)
     window.addEventListener('resize', this.handleResize)
 
-    this.sockets.subscribe('gameMessageSent', (data) => this.onMessageReceived(data))
+    this.$socket.subscribe('gameMessageSent', (data) => this.onMessageReceived(data))
   },
   mounted () {
     this.$store.commit('setMenuStateChat', {
@@ -63,7 +63,7 @@ export default {
     document.removeEventListener('keydown', this.handleKeyDown)
     window.removeEventListener('resize', this.handleResize)
 
-    this.sockets.unsubscribe('gameMessageSent')
+    this.$socket.unsubscribe('gameMessageSent')
 
     eventBus.$off('onMenuChatSidebarRequested', this.toggle)
     eventBus.$off('onCreateNewConversationRequested', this.onCreateNewConversationRequested)

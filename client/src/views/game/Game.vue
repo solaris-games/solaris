@@ -72,7 +72,7 @@ export default {
     await this.reloadSettings()
     await this.reloadGame()
 
-    this.subscribeToSockets()
+    this.subscribeTo$socket()
 
     // AudioService.download()
 
@@ -117,7 +117,7 @@ export default {
     clearInterval(this.polling)
   },
   unmounted () {
-    this.unsubscribeToSockets()
+    this.unsubscribeTo$socket()
 
     let socketData = {
       gameId: this.$store.state.game._id
@@ -266,34 +266,34 @@ export default {
     },
 
     // --------------------
-    // Sockets
-    subscribeToSockets () {
+    // $socket
+    subscribeTo$socket () {
       // TODO: Move all component subscriptions into the components' socket object.
-      this.sockets.subscribe('gameStarted', (data) => this.onGameStarted(data))
-      this.sockets.subscribe('gamePlayerJoined', (data) => this.$store.commit('gamePlayerJoined', data))
-      this.sockets.subscribe('gamePlayerQuit', (data) => this.$store.commit('gamePlayerQuit', data))
-      this.sockets.subscribe('gamePlayerReady', (data) => this.$store.commit('gamePlayerReady', data))
-      this.sockets.subscribe('gamePlayerNotReady', (data) => this.$store.commit('gamePlayerNotReady', data))
-      this.sockets.subscribe('gamePlayerReadyToQuit', (data) => this.$store.commit('gamePlayerReadyToQuit', data))
-      this.sockets.subscribe('gamePlayerNotReadyToQuit', (data) => this.$store.commit('gamePlayerNotReadyToQuit', data))
-      this.sockets.subscribe('playerDebtSettled', (data) => this.$store.commit('playerDebtSettled', data))
-      this.sockets.subscribe('gameMessageSent', (data) => this.onMessageReceived(data))
+      this.$socket.subscribe('gameStarted', (data) => this.onGameStarted(data))
+      this.$socket.subscribe('gamePlayerJoined', (data) => this.$store.commit('gamePlayerJoined', data))
+      this.$socket.subscribe('gamePlayerQuit', (data) => this.$store.commit('gamePlayerQuit', data))
+      this.$socket.subscribe('gamePlayerReady', (data) => this.$store.commit('gamePlayerReady', data))
+      this.$socket.subscribe('gamePlayerNotReady', (data) => this.$store.commit('gamePlayerNotReady', data))
+      this.$socket.subscribe('gamePlayerReadyToQuit', (data) => this.$store.commit('gamePlayerReadyToQuit', data))
+      this.$socket.subscribe('gamePlayerNotReadyToQuit', (data) => this.$store.commit('gamePlayerNotReadyToQuit', data))
+      this.$socket.subscribe('playerDebtSettled', (data) => this.$store.commit('playerDebtSettled', data))
+      this.$socket.subscribe('gameMessageSent', (data) => this.onMessageReceived(data))
 
       if (!GameHelper.isHiddenPlayerOnlineStatus(this.$store.state.game)) {
-        this.sockets.subscribe('gamePlayerRoomJoined', (data) => this.onGamePlayerRoomJoined(data))
-        this.sockets.subscribe('gamePlayerRoomLeft', (data) => this.onGamePlayerRoomLeft(data))
+        this.$socket.subscribe('gamePlayerRoomJoined', (data) => this.onGamePlayerRoomJoined(data))
+        this.$socket.subscribe('gamePlayerRoomLeft', (data) => this.onGamePlayerRoomLeft(data))
       }
     },
-    unsubscribeToSockets () {
-      this.sockets.unsubscribe('gameStarted')
-      this.sockets.unsubscribe('gamePlayerJoined')
-      this.sockets.unsubscribe('gamePlayerQuit')
-      this.sockets.unsubscribe('gamePlayerReady')
-      this.sockets.unsubscribe('gamePlayerNotReady')
-      this.sockets.unsubscribe('gamePlayerReadyToQuit')
-      this.sockets.unsubscribe('gamePlayerNotReadyToQuit')
-      this.sockets.unsubscribe('playerDebtSettled')
-      this.sockets.unsubscribe('gameMessageSent')
+    unsubscribeTo$socket () {
+      this.$socket.unsubscribe('gameStarted')
+      this.$socket.unsubscribe('gamePlayerJoined')
+      this.$socket.unsubscribe('gamePlayerQuit')
+      this.$socket.unsubscribe('gamePlayerReady')
+      this.$socket.unsubscribe('gamePlayerNotReady')
+      this.$socket.unsubscribe('gamePlayerReadyToQuit')
+      this.$socket.unsubscribe('gamePlayerNotReadyToQuit')
+      this.$socket.unsubscribe('playerDebtSettled')
+      this.$socket.unsubscribe('gameMessageSent')
     },
     onMessageReceived (e) {
       if (window.innerWidth >= 992) { // Don't do this if the window is too large as it gets handled elsewhere
