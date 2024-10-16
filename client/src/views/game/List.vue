@@ -92,7 +92,7 @@
             <!-- Special Game -->
             <div class="col-sm-12 col-md-6 col-lg-6" v-if="games.special">
               <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.special._id })">
-                <img class="card-img" :src="'../../assets/screenshots/' + games.special.settings.general.type + '.png'" alt="Special Game">
+                <img class="card-img" :src="specialGameSrc" alt="Special Game">
                 <div class="card-img-overlay">
                   <h5 class="card-title special-card-title">
                     <i class="fas" :class="{
@@ -527,6 +527,11 @@ export default {
     }
 
     this.isLoading = false
+  },
+  computed: {
+    specialGameSrc () {
+      return new URL('../../assets/screenshots/' + this.games.special.settings.general.type + '.png', import.meta.url).href;
+    }
   },
   methods: {
     routeToPath (path, query) {

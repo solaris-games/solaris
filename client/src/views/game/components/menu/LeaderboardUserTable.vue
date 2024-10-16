@@ -41,7 +41,7 @@
           </td>
           <td align="right" :class="getColumnClass('rank')">
             {{player.achievements.rank}}
-            <img class="user-level-icon" :src="`../../../../assets/levels/${player.achievements.level}.png`">
+            <img class="user-level-icon" :src="getLevelSrc(player)" :alt="player.achievements.level">
           </td>
           <td align="right" :class="getColumnClass('victories')">{{player.achievements.victories}}</td>
           <td align="right" :class="getColumnClass('renown')">{{player.achievements.renown}}</td>
@@ -89,20 +89,23 @@ export default {
       try {
         const response = await UserApiService.getLeaderboard(this.limit, key, 0);
         if (response.status === 200) {
-          this.$set(this.leaderboards, key, response.data.leaderboard);
+          this.leaderboards[key] = response.data.leaderboard;
           this.totalPlayers = response.data.totalPlayers;
         }
       } catch (err) {
         console.error(err);
       }
       this.isLoading = false;
+    },
+    getLevelSrc (player) {
+      return new URL('../../../../assets/levels/' + player.achievements.level + '.png', import.meta.url).href
     }
   },
   computed: {
     leaderboard () {
       return this.leaderboards[this.sortingKey];
-    }
-  }
+    },
+  },
 }
 </script>
 
