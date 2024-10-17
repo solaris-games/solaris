@@ -125,8 +125,6 @@ class GameContainer {
 
     // Add a new map to the viewport
     this.gameMap = new Map(this.app, this.store, this, this.context)
-    console.log(this.gameMap);
-    console.log(this.gameMap.draw);
     this.viewport.addChild(this.gameMap.container)
   }
 
@@ -195,8 +193,6 @@ class GameContainer {
   }
 
   draw () {
-    console.log(this.gameMap);
-    console.log(this.gameMap.draw);
     this.gameMap.draw()
 
     if ( import.meta.env.DEV) {
