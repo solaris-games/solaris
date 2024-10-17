@@ -67,7 +67,7 @@ class GameContainer {
       }
 
       if (this.zoomText) {
-        this.zoomText.text = ( 'zoom%: '+ this.map.zoomPercent.toFixed(0) )
+        this.zoomText.text = ( 'zoom%: '+ this.gameMap.zoomPercent.toFixed(0) )
       }
 
       this.frames = 0
@@ -124,8 +124,10 @@ class GameContainer {
     this.app.stage.addChild(this.viewport)
 
     // Add a new map to the viewport
-    this.map = new Map(this.app, this.store, this, this.context)
-    this.viewport.addChild(this.map.container)
+    this.gameMap = new Map(this.app, this.store, this, this.context)
+    console.log(this.gameMap);
+    console.log(this.gameMap.draw);
+    this.viewport.addChild(this.gameMap.container)
   }
 
   destroy () {
@@ -182,18 +184,20 @@ class GameContainer {
       })
 
     this.viewport.on('zoomed-end', this.onViewportZoomed.bind(this))
-    this.viewport.on('pointerdown', this.map.onViewportPointerDown.bind(this.map))
+    this.viewport.on('pointerdown', this.gameMap.onViewportPointerDown.bind(this.gameMap))
   }
 
   setup (game, userSettings, context) {
     this.userSettings = userSettings
     textureService.initialize()
 
-    this.map.setup(this.game, userSettings, context)
+    this.gameMap.setup(this.game, userSettings, context)
   }
 
   draw () {
-    this.map.draw()
+    console.log(this.gameMap);
+    console.log(this.gameMap.draw);
+    this.gameMap.draw()
 
     if ( import.meta.env.DEV) {
       let bitmapFont = {fontName: "chakrapetch", fontSize: 16}
@@ -228,33 +232,33 @@ class GameContainer {
   }
 
   drawWaypoints () {
-    this.map.drawWaypoints()
+    this.gameMap.drawWaypoints()
   }
 
   reloadGame (game, userSettings) {
     this.game = game
     this.userSettings = userSettings
-    this.map.reloadGame(game, userSettings)
+    this.gameMap.reloadGame(game, userSettings)
   }
 
   reloadTerritories () {
-    this.map.drawTerritories(this.userSettings)
+    this.gameMap.drawTerritories(this.userSettings)
   }
 
   reloadStar (star) {
-    let starObject = this.map.setupStar(this.game, this.userSettings, star)
-    this.map.drawStar(starObject)
-    this.map.addContainerToChunk(starObject, this.map.chunks, this.map.firstChunkX, this.map.firstChunkY)
+    let starObject = this.gameMap.setupStar(this.game, this.userSettings, star)
+    this.gameMap.drawStar(starObject)
+    this.gameMap.addContainerToChunk(starObject, this.gameMap.chunks, this.gameMap.firstChunkX, this.gameMap.firstChunkY)
   }
 
   reloadCarrier (carrier) {
-    let carrierObject = this.map.setupCarrier(this.game, this.userSettings, carrier)
-    this.map.drawCarrier(carrierObject)
-    this.map.addContainerToChunk(carrierObject, this.map.chunks, this.map.firstChunkX, this.map.firstChunkY)
+    let carrierObject = this.gameMap.setupCarrier(this.game, this.userSettings, carrier)
+    this.gameMap.drawCarrier(carrierObject)
+    this.gameMap.addContainerToChunk(carrierObject, this.gameMap.chunks, this.gameMap.firstChunkX, this.gameMap.firstChunkY)
   }
 
   undrawCarrier (carrier) {
-    this.map.undrawCarrier(carrier)
+    this.gameMap.undrawCarrier(carrier)
   }
 
   getViewportZoomPercentage () {
@@ -265,21 +269,21 @@ class GameContainer {
   }
 
   onTick (deltaTime) {
-    this.map.onTick(deltaTime)
+    this.gameMap.onTick(deltaTime)
   }
 
   onViewportZoomed (e) {
     let zoomPercent = this.getViewportZoomPercentage()
 
-    this.map.refreshZoom(zoomPercent)
+    this.gameMap.refreshZoom(zoomPercent)
   }
 
   setMode (mode, args) {
-    this.map.setMode(mode, args)
+    this.gameMap.setMode(mode, args)
   }
 
   resetMode () {
-    this.map.resetMode()
+    this.gameMap.resetMode()
   }
 
   resize () {

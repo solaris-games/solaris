@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js-legacy'
-import EventEmitter from 'mitt'
 import GameHelper from '../services/gameHelper'
 import WaypointHelper from '../services/waypointHelper'
+import {EventEmitter} from "./eventEmitter.js";
 
 class Waypoints extends EventEmitter {
   constructor () {

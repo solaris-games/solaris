@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js-legacy'
-import EventEmitter from 'mitt'
+import {EventEmitter} from "./eventEmitter.js";
 
 class RulerPoints extends EventEmitter {
   constructor () {

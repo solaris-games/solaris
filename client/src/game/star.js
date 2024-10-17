@@ -1,9 +1,9 @@
 import * as PIXI from 'pixi.js-legacy'
-import EventEmitter from 'mitt'
 import TextureService from './texture'
 import gameHelper from '../services/gameHelper'
 import seededRandom from 'random-seed'
 import Helpers from './helpers'
+import {EventEmitter} from "./eventEmitter.js";
 
 class Star extends EventEmitter {
 

@@ -6,13 +6,13 @@ import Waypoints from './waypoints'
 import RulerPoints from './rulerPoints'
 import Territories from './territories'
 import PlayerNames from './playerNames'
-import EventEmitter from 'mitt'
 import gameHelper from '../services/gameHelper'
 import AnimationService from './animation'
 import PathManager from './PathManager'
 import OrbitalLocationLayer from './orbital'
 import WormHoleLayer from './wormHole'
 import TooltipLayer from './tooltip'
+import {EventEmitter} from "./eventEmitter.js";
 
 class Map extends EventEmitter {
   static chunkSize = 256
