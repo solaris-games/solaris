@@ -99,6 +99,8 @@ export default class MapService {
             let star;
             let starName = starNames[starNamesIndex++];
 
+            (starLocation as any).name = starName; // For naming carriers
+
             if (isCustomGalaxy) {
                 star = this.starService.generateCustomGalaxyStar(starName, starLocation);
             }
@@ -114,6 +116,8 @@ export default class MapService {
                 for (let linkedLocation of starLocation.linkedLocations) {
                   let linkedStar;
                   let linkedStarName = starNames[starNamesIndex++];
+
+                  (linkedLocation as any).name = linkedStarName; // For naming carriers
 
                   if (isCustomGalaxy) {
                     linkedStar = this.starService.generateCustomGalaxyStar(linkedStarName, linkedLocation)

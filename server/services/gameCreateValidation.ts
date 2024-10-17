@@ -119,6 +119,9 @@ export default class GameCreateValidationService {
             }
 
             // Assert that all stars in the galaxy have valid natural resources
+            this._checkNumericalProperty(star.naturalResources, 'economy', true);
+            this._checkNumericalProperty(star.naturalResources, 'industry', true);
+            this._checkNumericalProperty(star.naturalResources, 'science', true);
             if (star.naturalResources.economy < 0
                 || star.naturalResources.industry < 0
                 || star.naturalResources.science < 0) {
@@ -134,6 +137,9 @@ export default class GameCreateValidationService {
             }
 
             // Assert that all stars in the galaxy have valid infrastructure.
+            this._checkNumericalProperty(star.infrastructure, 'economy', true);
+            this._checkNumericalProperty(star.infrastructure, 'industry', true);
+            this._checkNumericalProperty(star.infrastructure, 'science', true);
             if (star.infrastructure.economy! < 0
                 || star.infrastructure.industry! < 0
                 || star.infrastructure.science! < 0) {
@@ -152,9 +158,9 @@ export default class GameCreateValidationService {
             // Assert that dead stars have valid infrastructure.
             if (this.starService.isDeadStar(star)
                 && (
-                    star.infrastructure.economy! > 0
-                    || star.infrastructure.industry! > 0
-                    || star.infrastructure.science! > 0
+                    star.infrastructure.economy! !== 0
+                    || star.infrastructure.industry! !== 0
+                    || star.infrastructure.science! !== 0
                     || star.specialistId
                     || star.warpGate
                 )) {
@@ -162,6 +168,8 @@ export default class GameCreateValidationService {
                 }
     
             // Assert that all stars have valid starting ships.
+            this._checkNumericalProperty(star, 'ships', true);
+            this._checkNumericalProperty(star, 'shipsActual', false);
             if (star.ships! < 0 || star.shipsActual! < 0) {
                 throw new ValidationError(`All stars must have 0 or greater ships.`);
             }
@@ -218,11 +226,13 @@ export default class GameCreateValidationService {
             }
 
             // Assert that all carriers have valid starting ships.
-            // Because this check is only done during game creation, and there is no way to get a carrier with 'null' ships, we can do if(carrier.ships! < 1){...}.
             if (carrier.ships !== 1 && !advancedCustomGalaxyEnabled) {
                 throw new ValidationError(`All carriers must start with ${game.settings.player.startingShips} ships.`);
-            } else if (carrier.ships! < 1) {
-                throw new ValidationError(`All carriers must have 1 or greater ships.`);
+            } else {
+                this._checkNumericalProperty(carrier, 'ships', true);
+                if (carrier.ships! < 1) {
+                    throw new ValidationError(`All carriers must have 1 or greater ships.`);
+                }
             }
     
             // Assert that all carriers have valid specialists.
@@ -230,5 +240,23 @@ export default class GameCreateValidationService {
                 throw new ValidationError(`All carriers with specialists must have a valid specialist.`);
             }
         }
+    }
+
+    // TODO: This check could also be used to validate game settings.
+    _checkNumericalProperty(object, property: string, requireInt: boolean): boolean {
+        // Undefined or null properties should not throw a validation error, but are not numerical either.
+        if (object === undefined || object?.[property] === undefined) return false;
+        if (object[property] === null) return false;
+
+        if (typeof object[property] !== 'number') throw new ValidationError(`Property '${property}' of object ${JSON.stringify(object)} must be of type 'number'.`);
+        if (isNaN(object[property]) || !isFinite(object[property])) {
+            throw new ValidationError(`Property '${property}' of object ${JSON.stringify(object)} must be a valid finite number.`);
+        }
+        
+        if (requireInt && (object[property] !== parseInt(object[property].toString()))) {
+            throw new ValidationError(`Property '${property}' of object ${JSON.stringify(object)} must be a whole number.`);
+        }
+
+        return true;
     }
 }

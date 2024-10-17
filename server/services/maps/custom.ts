@@ -1,9 +1,21 @@
 import { Location } from "../types/Location";
+import { Carrier } from "../types/Carrier";
+import { Game } from "../types/Game";
+import CarrierService from '../carrier';
 
 const mongoose = require('mongoose');
 import ValidationError from "../../errors/validation";
+import { Star } from "../types/Star";
 
 export default class CustomMapService {
+    carrierService: CarrierService;
+
+    constructor (
+      carrierService: CarrierService
+    ) {
+      this.carrierService = carrierService;
+    }
+
     generateLocations(customJSON: string, playerLimit: number): Location[] {
         let json;
 
@@ -15,27 +27,41 @@ export default class CustomMapService {
         }
 
         const locations: any[] = [];
-        let playerIds: number[] = [];
+        let playerIds: string[] = [];
         //const nameList = new Set()
         const homeStars: any[] = [];
 
         for (const star of json.stars) {
           // Fill in optional setting values.
-          star.id = star.id == null ? null : +star.id;
+          if (star.id != null) {
+            if (typeof star.id === 'number') star.id = star.id.toString();
+          } else star.id = null; // undefined, null -> null
           star.homeStar = star.homeStar == null ? false : star.homeStar;
-          star.playerId = star.playerId == null ? null : +star.playerId;
+          if (star.playerId != null) {
+            if (typeof star.playerId === 'number') star.playerId = star.playerId.toString();
+          } else star.playerId = null; // undefined, null -> null
           star.warpGate = star.warpGate == null ? false : star.warpGate;
           star.isNebula = star.isNebula == null ? false : star.isNebula;
           star.isAsteroidField = star.isAsteroidField == null ? false : star.isAsteroidField;
           star.isBinaryStar = star.isBinaryStar == null ? false : star.isBinaryStar;
           star.isBlackHole = star.isBlackHole == null ? false : star.isBlackHole;
           star.isPulsar = star.isPulsar == null ? false : star.isPulsar;
-          star.wormHoleToStarId = star.wormHoleToStarId == null ? null : +star.wormHoleToStarId;
-          star.specialistId = star.specialistId == null ? null : +star.specialistId;
+          if (star.wormHoleToStarId != null) {
+            if (typeof star.wormHoleToStarId === 'number') star.wormHoleToStarId = star.wormHoleToStarId.toString();
+          } else star.wormHoleToStarId = null; // undefined, null -> null
+          star.specialistId = star.specialistId == null ? null : star.specialistId;
+          star.shipsActual = star.shipsActual == null ? null : star.shipsActual;
+          star.ships = star.shipsActual == null ? null : Math.floor(star.shipsActual!);
+          if (star.infrastructure != null) {
+            star.infrastructure.economy = star.infrastructure.economy == null ? 0 : star.infrastructure.economy;
+            star.infrastructure.industry = star.infrastructure.industry == null ? 0 : star.infrastructure.industry;
+            star.infrastructure.science = star.infrastructure.science == null ? 0 : star.infrastructure.science;
+          }
 
-          // Dont trust the user as far as you can throw him.
-          this._checkStarProperty(star, 'id', 'number', false);
-          this._checkStarProperty(star, 'playerId', 'number', true);
+          // Validate star properties are of the right type.
+          // id and playerId are later replaced with ObjectIDs, so they can be of any type here.
+          this._checkStarProperty(star, 'id', 'string', false);
+          this._checkStarProperty(star, 'playerId', 'string', true);
           this._checkStarProperty(star?.location, 'x', 'number', false);
           this._checkStarProperty(star?.location, 'y', 'number', false);
           this._checkStarProperty(star?.naturalResources, 'economy', 'number', false);
@@ -47,10 +73,16 @@ export default class CustomMapService {
           this._checkStarProperty(star, 'isBinaryStar', 'boolean', true);
           this._checkStarProperty(star, 'isBlackHole', 'boolean', true);
           this._checkStarProperty(star, 'isPulsar', 'boolean', true);
-          this._checkStarProperty(star, 'wormHoleToStarId', 'number', true);
+          this._checkStarProperty(star, 'wormHoleToStarId', 'string', true);
           this._checkStarProperty(star, 'homeStar', 'boolean', true);
           this._checkStarProperty(star, 'specialistId', 'number', true);
-          // this._checkStarProperty(star, 'ships', 'number');
+          this._checkStarProperty(star, 'shipsActual', 'number', true);
+          this._checkStarProperty(star, 'ships', 'number', true);
+          if (star.infrastructure != null) {
+            this._checkStarProperty(star?.infrastructure, 'economy', 'number', false);
+            this._checkStarProperty(star?.infrastructure, 'industry', 'number', false);
+            this._checkStarProperty(star?.infrastructure, 'science', 'number', false);
+          }
 
           let mappedStar = {
             id: star.id,
@@ -74,8 +106,9 @@ export default class CustomMapService {
               industry: star.naturalResources.industry,
               science: star.naturalResources.science
             },
-            ...(star.shipsActual ? {shipsActual: star.shipsActual} : undefined),
-            ...(star.shipsActual ? {ships: star.shipsActual} : undefined)
+            shipsActual: star.shipsActual,
+            ships: star.ships,
+            ...(star.infrastructure ? {infrastructure: star.infrastructure} : undefined)
           };
 
           if (star?.homeStar) {
@@ -118,15 +151,70 @@ export default class CustomMapService {
         return locations;
     }
 
+    generateCarriers(game: Game, customJSON: string, stars: any[]): Carrier[] {
+      let json;
+
+      try {
+        json = JSON.parse(customJSON)
+      }
+      catch (e) {
+        throw new ValidationError('The custom map JSON is malformed.')
+      }
+
+      let carriers: any[] = [];
+      for (const carrier of json.carriers) {
+        if (carrier.orbiting != null) {
+          if (typeof carrier.orbiting === 'number') carrier.orbiting = carrier.orbiting.toString();
+        } else carrier.orbiting = null; // undefined, null -> null
+        carrier.specialistId = carrier.specialistId == null ? null : carrier.specialistId;
+        carrier.specialistExpireTick = carrier.specialistExpireTick == null ? null : carrier.specialistExpireTick;
+        carrier.isGift = carrier.isGift == null ? false : carrier.isGift;
+
+        this._checkCarrierProperty(carrier, 'orbiting', 'string', false);
+        this._checkCarrierProperty(carrier, 'specialistId', 'number', true);
+        this._checkCarrierProperty(carrier, 'specialistExpireTick', 'number', true);
+        this._checkCarrierProperty(carrier, 'isGift', 'boolean', true);
+        this._checkCarrierProperty(carrier, 'ships', 'number', false);
+
+        let star = stars.find(s => s.id === carrier.orbiting); // star has all fields generated in generateLocations() as well as _id.
+        if (star == null) {
+          throw new ValidationError(`The carrier ${JSON.stringify(carrier)} is orbiting a non-existent star (id ${carrier.orbiting}).`);
+        }
+        let name = this.carrierService.generateCarrierName(star, carriers);
+
+        let newCarrier: Carrier = {
+            _id: mongoose.Types.ObjectId(),
+            ownedByPlayerId: star.ownedByPlayerId,
+            ownedByPlayer: null,
+            orbiting: star._id,
+            name,
+            ships: carrier.ships,
+            specialistId: carrier.specialistId,
+            specialistExpireTick: carrier.specialistExpireTick,
+            isGift: carrier.isGift,
+            waypoints: [],
+            locationNext: null,
+            waypointsLooped: false,
+            specialist: null,
+            location: star.location,
+            toObject(): Carrier {
+                return this;
+            }
+        };
+        carriers.push(newCarrier);
+      }
+      return carriers;
+    }
+
     _checkStarProperty(star, property: string, type: string, allowNull: boolean): boolean {
         if (star === undefined) throw new ValidationError(`Missing property of star ${star}`);
-        if (star?.[property] === undefined) throw new ValidationError(`Missing property ${property} of star ${JSON.stringify(star)}`);
+        if (star?.[property] === undefined) throw new ValidationError(`Missing property '${property}' of star ${JSON.stringify(star)}`);
 
         if (allowNull && star[property] === null) {
           return true;
         }
 
-        if (typeof star[property] !== type) throw new ValidationError(`Invalid type property ${property} of star ${JSON.stringify(star)}`);
+        if (typeof star[property] !== type) throw new ValidationError(`Invalid type property '${property}' of star ${JSON.stringify(star)}`);
 
         return true;
     }
@@ -145,5 +233,18 @@ export default class CustomMapService {
           }
         }
       }
+    }
+
+    _checkCarrierProperty(carrier, property: string, type: string, allowNull: boolean): boolean {
+      if (carrier === undefined) throw new ValidationError(`Missing property of carrier ${carrier}.`);
+      if (carrier?.[property] === undefined) throw new ValidationError(`Missing property '${property}' of carrier ${JSON.stringify(carrier)}`);
+
+      if (allowNull && carrier[property] === null) {
+        return true;
+      }
+
+      if (typeof carrier[property] !== type) throw new ValidationError(`Invalid type property '${property}' of carrier ${JSON.stringify(carrier)}`);
+
+      return true;
     }
 }
