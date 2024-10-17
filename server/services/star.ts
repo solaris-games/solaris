@@ -103,8 +103,9 @@ export default class StarService extends EventEmitter {
         isPulsar: star.isPulsar,
         wormHoleToStarId: star.wormHoleToStarId,
         specialistId: star.specialistId,
-        ...(star.shipsActual ? {shipsActual: star.shipsActual} : undefined),
-        ...(star.shipsActual ? {ships: star.shipsActual} : undefined)
+        shipsActual: star.shipsActual,
+        ships: star.ships,
+        ...(star.infrastructure ? {infrastructure: star.infrastructure} : undefined)
       }
     }
 
