@@ -1,6 +1,6 @@
 <template>
   <div @click="onClick" class="player-icon text-center bg-dark">
-    <img v-if="player.avatar" :src="'../../../../assets/avatars/' + player.avatar" :class="{'defeated-player': player.defeated}">
+    <img v-if="player.avatar" :src="avatarSrc" :class="{'defeated-player': player.defeated}">
     <i v-if="!player.avatar" class="far fa-user ms-2 me-2 mt-2 mb-2"></i>
     <span class="shapeIcon">
       <player-icon :playerId="player._id"/>
@@ -59,6 +59,11 @@ export default {
     },
     onClick () {
       this.$emit('onClick')
+    }
+  },
+  computed: {
+    avatarSrc () {
+      return new URL('../../../../assets/avatars/' + this.player.avatar, import.meta.url).href;
     }
   }
 }

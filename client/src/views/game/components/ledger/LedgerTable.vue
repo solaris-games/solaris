@@ -44,14 +44,14 @@ export default {
     this.loadLedger()
   },
   created () {
-    this.sockets.subscribe('playerDebtAdded', this.onPlayerDebtAdded)
-    this.sockets.subscribe('playerDebtForgiven', this.onPlayerDebtForgiven)
-    this.sockets.subscribe('playerDebtSettled', this.onPlayerDebtSettled)
+    this.$socket.subscribe('playerDebtAdded', this.onPlayerDebtAdded)
+    this.$socket.subscribe('playerDebtForgiven', this.onPlayerDebtForgiven)
+    this.$socket.subscribe('playerDebtSettled', this.onPlayerDebtSettled)
   },
   unmounted () {
-    this.sockets.unsubscribe('playerDebtAdded')
-    this.sockets.unsubscribe('playerDebtForgiven')
-    this.sockets.unsubscribe('playerDebtSettled')
+    this.$socket.unsubscribe('playerDebtAdded')
+    this.$socket.unsubscribe('playerDebtForgiven')
+    this.$socket.unsubscribe('playerDebtSettled')
   },
   methods: {
     onOpenPlayerDetailRequested(playerId) {

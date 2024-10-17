@@ -76,10 +76,10 @@ export default {
     this.refreshList()
   },
   created () {
-    this.sockets.subscribe('gameMessageSent', this.onMessageReceived)
+    this.$socket.subscribe('gameMessageSent', this.onMessageReceived)
   },
   unmounted () {
-    this.sockets.unsubscribe('gameMessageSent')
+    this.$socket.unsubscribe('gameMessageSent')
   },
   methods: {
     async refreshList () {

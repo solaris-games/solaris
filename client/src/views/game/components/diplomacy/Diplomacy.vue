@@ -87,10 +87,10 @@ export default {
     this.loadDiplomaticStatus();
   },
   created () {
-    this.sockets.subscribe('playerDiplomaticStatusChanged', this.onPlayerDiplomaticStatusChanged)
+    this.$socket.subscribe('playerDiplomaticStatusChanged', this.onPlayerDiplomaticStatusChanged)
   },
   unmounted () {
-    this.sockets.unsubscribe('playerDiplomaticStatusChanged')
+    this.$socket.unsubscribe('playerDiplomaticStatusChanged')
   },
   methods: {
     onOpenPlayerDetailRequested(playerId) {

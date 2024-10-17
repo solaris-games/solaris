@@ -24,12 +24,12 @@ export default {
     }
   },
   created () {
-    this.sockets.subscribe('playerEventRead', this.checkForUnreadEvents.bind(this))
-    this.sockets.subscribe('playerAllEventsRead', this.checkForUnreadEvents.bind(this))
+    this.$socket.subscribe('playerEventRead', this.checkForUnreadEvents.bind(this))
+    this.$socket.subscribe('playerAllEventsRead', this.checkForUnreadEvents.bind(this))
   },
   unmounted () {
-    this.sockets.unsubscribe('playerEventRead')
-    this.sockets.unsubscribe('playerAllEventsRead')
+    this.$socket.unsubscribe('playerEventRead')
+    this.$socket.unsubscribe('playerAllEventsRead')
   },
   async mounted () {
     await this.checkForUnreadEvents()

@@ -26,12 +26,12 @@ export default {
   created () {
     // TODO: This is duplicated on the menu header, is it possible to share this logic
     // to save API calls?
-    this.sockets.subscribe('gameMessageSent', this.checkForUnreadMessages.bind(this))
-    this.sockets.subscribe('gameConversationRead', this.checkForUnreadMessages.bind(this))
+    this.$socket.subscribe('gameMessageSent', this.checkForUnreadMessages.bind(this))
+    this.$socket.subscribe('gameConversationRead', this.checkForUnreadMessages.bind(this))
   },
   unmounted () {
-    this.sockets.unsubscribe('gameMessageSent')
-    this.sockets.unsubscribe('gameConversationRead')
+    this.$socket.unsubscribe('gameMessageSent')
+    this.$socket.unsubscribe('gameConversationRead')
   },
   async mounted () {
     await this.checkForUnreadMessages()
