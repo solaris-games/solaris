@@ -32,7 +32,7 @@ class GameHelper {
   }
 
   getFriendlyColour (colour) {
-    return colour.replace('0x', '#')
+    return colour.replace('0x', '#').toLowerCase();
   }
 
   getStarByName (game, starName) {

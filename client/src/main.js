@@ -9,6 +9,7 @@ import $ from 'jquery'
 import 'pixi.js-legacy'
 import 'pixi-viewport'
 import '@pixi/graphics-extras';
+import "@/assets/styles.css";
 
 // Note: This was done to get around an issue where the Steam client
 // had bootstrap as undefined. This also affects the UI template we're using,

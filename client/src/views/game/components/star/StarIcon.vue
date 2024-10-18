@@ -19,10 +19,10 @@
 </template>
 
 <script>
-import SvgWrapperVlue from '../../../components/SvgWrapper'
+import SvgWrapperVue from '../../../components/SvgWrapper'
 export default {
   components: {
-    'svg-wrapper': SvgWrapperVlue
+    'svg-wrapper': SvgWrapperVue
   },
   props: {
     isAsteroidField: false,
@@ -91,6 +91,8 @@ export default {
   .nebulaIcon, .wormHoleIcon {
     width: 18px;
     height: 18px;
+    display: inline-block;
+    vertical-align: bottom;
   }
 
   .nebulaIcon {

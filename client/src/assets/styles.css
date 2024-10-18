@@ -1,0 +1,8 @@
+.bg-info {
+    color: white;
+    /*font-weight: 400;*/
+}
+
+.bg-info .small, .bg-info small {
+    font-size: .925em;
+}

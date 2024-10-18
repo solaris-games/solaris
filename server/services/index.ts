@@ -142,7 +142,6 @@ export default (config): DependencyContainer => {
     const announcementService = new AnnouncementService(AnnouncementModel, announcementRepository, userService);
 
     const gameLockService = new GameLockService(gameRepository);
-    const broadcastService = new BroadcastService();
     const distanceService = new DistanceService();
     const randomService = new RandomService();
     const cacheService = new CacheService(config);
@@ -154,6 +153,7 @@ export default (config): DependencyContainer => {
     const gameFluxService = new GameFluxService();
     const playerCreditsService = new PlayerCreditsService(gameRepository);
     const avatarService = new AvatarService(userRepository, userService);
+    const broadcastService = new BroadcastService(avatarService);
     const achievementService = new AchievementService(userRepository, guildService, userLevelService);
     const ratingService = new RatingService(userRepository, gameRepository, userService);
     const nameService = new NameService(gameNames, starNames, randomService);

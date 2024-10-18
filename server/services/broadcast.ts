@@ -1,15 +1,19 @@
-import { DBObjectId } from "./types/DBObjectId";
+import AvatarService from "./avatar";
+import { LedgerType } from "./ledger";
 import { Conversation } from "./types/Conversation";
 import { ConversationMessageSentResult } from "./types/ConversationMessage";
+import { DBObjectId } from "./types/DBObjectId";
+import { DiplomaticStatus } from "./types/Diplomacy";
 import { Game } from "./types/Game";
 import { Player } from "./types/Player";
-import { DiplomaticStatus } from "./types/Diplomacy";
 import { TradeEventTechnology } from "./types/Trade";
-import { LedgerType } from "./ledger";
 
 
 export default class BroadcastService {
     io: any;
+
+    constructor(private avatarService: AvatarService) {
+    }
 
     setIOController(io) {
         this.io = io;
@@ -34,10 +38,13 @@ export default class BroadcastService {
     }
 
     gamePlayerJoined(game: Game, playerId: DBObjectId, alias: string, avatar: number) {
+
+        const avatars = this.avatarService.listAllAvatars();
+
         this.io.to(game._id).emit('gamePlayerJoined', {
             playerId,
             alias,
-            avatar
+            avatar: avatars.find(a => a.id.toString() === avatar.toString())!.file
         });
     }
 
