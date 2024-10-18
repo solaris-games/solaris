@@ -373,7 +373,8 @@ export default {
 
 <style scoped>
 .header-bar {
-  position:absolute;
+  position:fixed;
+  top: 0;
   height: 45px;
   z-index: 1;
 }

@@ -88,7 +88,7 @@ class GameContainer {
 
     this.app = new PIXI.Application({
       width: window.innerWidth, // window.innerWidth,
-      height: window.innerHeight, // window.innerHeight,
+      height: window.innerHeight - 45, // window.innerHeight,
       backgroundColor: 0x000000, // black hexadecimal
       resolution: window.devicePixelRatio || 1,
       antialias: antialiasing,
