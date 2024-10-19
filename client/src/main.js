@@ -8,6 +8,7 @@ import $ from 'jquery'
 import 'pixi.js-legacy'
 import 'pixi-viewport'
 import '@pixi/graphics-extras';
+import 'vue-toast-notification/dist/theme-bootstrap.css';
 import ToastPlugin from "vue-toast-notification";
 
 // Note: This was done to get around an issue where the Steam client
