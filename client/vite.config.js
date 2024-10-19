@@ -10,7 +10,13 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    target: 'esnext',
+  },
   server: {
+    port: 8080,
+  },
+  preview: {
     port: 8080,
   },
   envPrefix: 'VUE_APP'
