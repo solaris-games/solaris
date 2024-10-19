@@ -55,7 +55,6 @@ export default {
 
 <style scoped>
 #content {
-  position: absolute;
-  top: 0;
+  padding-top: 52px;
 }
 </style>
