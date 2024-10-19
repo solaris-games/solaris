@@ -39,13 +39,6 @@ export const init = (store) => {
   redirect("gamePlayerNotReady");
   redirect("gamePlayerReadyToQuit");
   redirect("gamePlayerNotReadyToQuit");
-  redirect("gameMessageSent");
-  redirect("gameConversationRead");
-  redirect("gameConversationLeft");
-  redirect("gameConversationMessagePinned");
-  redirect("gameConversationMessageUnpinned");
-  redirect("playerEventRead");
-  redirect("playerAllEventsRead");
   redirect("gamePlayerCreditsReceived");
   redirect("gamePlayerCreditsSpecialistsReceived");
   redirect("gamePlayerRenownReceived");
@@ -54,7 +47,6 @@ export const init = (store) => {
   redirect("gamePlayerDebtForgiven");
   redirect("gamePlayerDebtSettled");
   redirect("gamePlayerDiplomaticStatusChanged");
-
 
   return (app, options) => {
     app.config.globalProperties.$socket = socket;
