@@ -15,8 +15,8 @@ import ToastPlugin from "vue-toast-notification";
 // had bootstrap as undefined. This also affects the UI template we're using,
 // we are forced to bring in Bootstrap and FontAwesome manually as a dependency
 // instead of using the vendor files provided by the template.
-window.bootstrap = await import('bootstrap/dist/js/bootstrap.bundle.js');
-await import('../public/assets/js/app.min.js')
+import('bootstrap/dist/js/bootstrap.bundle.js').then((mod) => window.bootstrap = mod);
+import('../public/assets/js/app.min.js')
 
 window.$ = $;
 
