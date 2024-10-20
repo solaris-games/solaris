@@ -1,33 +1,42 @@
-<template>
-  <object type="image/svg+xml" :data="href" v-on:load="onload($event)" />
-</template>
-
 <script>
+let svgCacheMap = new Map();
+
 export default {
   props: {
     href: null
   },
+  render(createElement) {
+    return createElement(this.renderInternal);
+  },
   methods: {
-    onload: function (e) {
-      // Based on information from here: https://stackoverflow.com/questions/22252409/manipulating-external-svg-file-style-properties-with-css/72804140#72804140
-      // Basically we elevate our SVG out of the shadow DOM to the DOM, so that it can then be affected by our CSS classes!
+    async renderInternal() {
+      let svgText = null;
 
-      // Carry over our existing CSS classes to the SVG.
-      e.target.contentDocument.documentElement.classList.add(...e.target.classList);
+      if (svgCacheMap.has(this.href)) {
+        svgText = svgCacheMap.get(this.href);
+      }
+      else {
+        let svgResponse = await fetch(this.href);
 
-      // Copy the data- attributes so the CSS classes will work, etc.
-      for (let attribute of e.target.attributes) {
-        if (attribute.name.startsWith('data-')) {
-          e.target.contentDocument.documentElement.setAttribute(attribute.name, attribute.value);
+        if (svgResponse.ok) {
+          svgText = await svgResponse.text();
+          svgCacheMap.set(this.href, svgText);
         }
       }
 
-      // Trim the space around the actual icon!
-      let svgBoundingBox = this.horribleSvgGetBBox(e.target.contentDocument.documentElement);
-      e.target.contentDocument.documentElement.setAttribute('viewBox', `${svgBoundingBox.x} ${svgBoundingBox.y} ${svgBoundingBox.width} ${svgBoundingBox.height}`);
+      if (svgText != null) {
+        let range = document.createRange();
+        let svgFragment = range.createContextualFragment(svgText);
 
-      // Elevate the SVG element at last!
-      e.target.parentNode.replaceChild(e.target.contentDocument.documentElement, e.target);
+        // Trim the space around the actual icon!
+        let svgBoundingBox = this.horribleSvgGetBBox(svgFragment.firstChild);
+        svgFragment.firstChild.setAttribute('viewBox', `${svgBoundingBox.x} ${svgBoundingBox.y} ${svgBoundingBox.width} ${svgBoundingBox.height}`);
+
+        return { render: (h) => h('svg', { attrs: Object.fromEntries(Array.from(svgFragment.firstChild.attributes).map(v => [v.name, v.value])), domProps: { innerHTML: svgFragment.firstChild.innerHTML } }) };
+      }
+      else {
+        return { render: (h) => h('span') };
+      }
     },
     horribleSvgGetBBox(svg) {
       // This abomination is needed because getBBox() returns all zeroes if the SVG isn't currently "visible".

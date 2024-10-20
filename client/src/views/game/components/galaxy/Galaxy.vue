@@ -121,7 +121,11 @@ export default {
 </script>
 
 <style scoped>
+.nav-item {
+    flex-basis: 25%;
+}
 .nav-link {
-  padding: 0.5rem 1.5rem;
+  padding: 0.5rem 0.2rem;
+  text-align: center;
 }
 </style>

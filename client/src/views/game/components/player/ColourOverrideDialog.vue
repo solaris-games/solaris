@@ -64,7 +64,7 @@ export default {
         return alias;
       }
 
-      const existsV = this.$store.state.coloursConfig.find(colour => colour.value === this.player.colour.value)?.alias;
+      const existsV = this.$store.state.coloursConfig.find(colour => colour.value === gameHelper.getFriendlyColour(this.player.colour.value))?.alias;
 
       if (existsV) {
         return existsV;
