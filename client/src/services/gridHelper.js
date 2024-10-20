@@ -39,10 +39,10 @@ class GridHelper {
       }
       // Sort null values after everything else
       else if (a === null) {
-        return 1;
+        return -1;
       }
       else if (b === null) {
-        return -1;
+        return 1;
       }
       else {
 
