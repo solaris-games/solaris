@@ -540,7 +540,7 @@ export default {
   },
   computed: {
     specialGameSrc () {
-      return new URL('../../assets/screenshots/' + this.games.special.settings.general.type + '.png', import.meta.url).href;
+      return new URL(`../../assets/screenshots/${this.games.special.settings.general.type}.png`, import.meta.url).href;
     }
   },
   methods: {
