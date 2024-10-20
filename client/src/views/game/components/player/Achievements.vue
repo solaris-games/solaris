@@ -56,7 +56,7 @@ export default {
   },
   computed: {
     levelSrc () {
-      return new URL('../../../../assets/levels/' + this.level + '.png', import.meta.url).href
+      return new URL(`../../../../assets/levels/${this.level}.png`, import.meta.url).href
     },
     isSmallHeaders () {
       return this.victories >= 100 || this.rank >= 100 || this.renown >= 100

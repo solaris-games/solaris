@@ -63,7 +63,7 @@ export default {
   },
   computed: {
     avatarSrc () {
-      return new URL('../../../../assets/avatars/' + this.player.avatar, import.meta.url).href;
+      return new URL(`../../../../assets/avatars/${this.player.avatar}`, import.meta.url).href;
     }
   }
 }

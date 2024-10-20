@@ -96,7 +96,7 @@ export default {
     },
     getAvatarImage () {
       try {
-        return new URL('../../../../assets/avatars/' + this.avatar.file, import.meta.url).href
+        return new URL(`../../../../assets/avatars/${this.avatar.file}`, import.meta.url).href
       } catch (err) {
         console.error(err)
 

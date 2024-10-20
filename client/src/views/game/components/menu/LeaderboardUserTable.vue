@@ -98,7 +98,7 @@ export default {
       this.isLoading = false;
     },
     getLevelSrc (player) {
-      return new URL('../../../../assets/levels/' + player.achievements.level + '.png', import.meta.url).href
+      return new URL(`../../../../assets/levels/${player.achievements.level}.png`, import.meta.url).href
     }
   },
   computed: {

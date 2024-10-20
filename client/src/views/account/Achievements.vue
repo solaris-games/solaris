@@ -597,7 +597,7 @@ export default {
       return this.$route.params.userId
     },
     levelSrc () {
-      return new URL('../../assets/levels/' + this.user.achievements.level + '.png', import.meta.url).href
+      return new URL(`../../assets/levels/${this.user.achievements.level}.png`, import.meta.url).href
     },
   }
 }
