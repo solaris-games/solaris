@@ -16,6 +16,8 @@ import TechnologyService from './technology';
 import { CarrierActionWaypoint } from './types/GameTick';
 import CarrierMovementService from './carrierMovement';
 import {GameHistoryCarrierWaypoint} from "./types/GameHistory";
+import GameMaskingService from "./gameMaskingService";
+import HistoryService from "./history";
 
 const mongoose = require('mongoose');
 
@@ -29,6 +31,8 @@ export default class WaypointService {
     gameService: GameService;
     playerService: PlayerService;
     carrierMovementService: CarrierMovementService;
+    gameMaskingService: GameMaskingService;
+    historyService: HistoryService;
 
     constructor(
         gameRepo: Repository<Game>,
@@ -39,7 +43,9 @@ export default class WaypointService {
         technologyService: TechnologyService,
         gameService: GameService,
         playerService: PlayerService,
-        carrierMovementService: CarrierMovementService
+        carrierMovementService: CarrierMovementService,
+        gameMaskingService: GameMaskingService,
+        historyService: HistoryService,
     ) {
         this.gameRepo = gameRepo;
         this.carrierService = carrierService;
@@ -50,6 +56,8 @@ export default class WaypointService {
         this.gameService = gameService;
         this.playerService = playerService;
         this.carrierMovementService = carrierMovementService;
+        this.gameMaskingService = gameMaskingService;
+        this.historyService = historyService;
     }
 
     async saveWaypoints(game: Game, player: Player, carrierId: DBObjectId, waypoints: CarrierWaypointBase[], looped: boolean) {
@@ -190,6 +198,13 @@ export default class WaypointService {
         // Send back the eta ticks of the waypoints so that
         // the UI can be updated.
         const reportCarrier = Boolean(carrier.toObject) ? carrier.toObject() : carrier;
+
+        // This is important, otherwise, info about warp gates could be leaked.
+        // Later on, we probably want to do this on the client
+        const history = await this.historyService.getHistoryByTick(game._id, game.state.tick);
+        if (history) {
+            this.gameMaskingService.maskStars(game, player, history, false);
+        }
 
         this.populateCarrierWaypointEta(game, reportCarrier);
 
