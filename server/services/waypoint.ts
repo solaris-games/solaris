@@ -124,7 +124,7 @@ export default class WaypointService {
             waypoint.actionShips = waypoint.actionShips || 0;
             waypoint.action = waypoint.action || 'nothing';
 
-            if (waypoint.actionShips == null || (waypoint.actionShips as any) == '' || +waypoint.actionShips < 0) {
+            if (waypoint.actionShips == null || (waypoint.actionShips as any) == '' || +waypoint.actionShips < 0 || !this._supportsActionShips(waypoint.action)) {
                 waypoint.actionShips = 0;
             }
 
@@ -198,6 +198,11 @@ export default class WaypointService {
             ticksEtaTotal: reportCarrier.ticksEtaTotal,
             waypoints: reportCarrier.waypoints
         };
+    }
+
+    _supportsActionShips(action: CarrierWaypointActionType) {
+        const actions: CarrierWaypointActionType[] = ['drop', 'collect', 'dropPercentage', 'collectPercentage', 'dropAllBut', 'collectAllBut', 'garrison'];
+        return actions.includes(action);
     }
 
     _waypointRouteIsWithinHyperspaceRange(game: Game, carrier: Carrier, waypoint: CarrierWaypointBase) {
