@@ -1,12 +1,14 @@
 <script>
+import { h } from 'vue'
+
 let svgCacheMap = new Map();
 
 export default {
   props: {
     href: null
   },
-  render(createElement) {
-    return createElement(this.renderInternal);
+  render() {
+    return h(this.renderInternal);
   },
   methods: {
     async renderInternal() {
