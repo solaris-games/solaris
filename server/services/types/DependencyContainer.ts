@@ -78,6 +78,7 @@ import UserLeaderboardService from "../userLeaderboard";
 import UserLevelService from "../userLevel";
 import WaypointService from "../waypoint";
 import AnnouncementService from "../announcement";
+import TutorialService from "../tutorial";
 import PlayerColourService from "../playerColour";
 
 export interface DependencyContainer {
@@ -161,5 +162,6 @@ export interface DependencyContainer {
     gamePlayerMutexService: GamePlayerMutexService,
     gameMutexService: GameMutexService,
     announcementService: AnnouncementService,
+    tutorialService: TutorialService,
     playerColourService: PlayerColourService,
 };

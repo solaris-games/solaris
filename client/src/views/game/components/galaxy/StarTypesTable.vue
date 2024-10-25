@@ -68,8 +68,8 @@
 import GameHelper from '../../../../services/gameHelper'
 import GridHelper from '../../../../services/gridHelper'
 import SortInfo from '../../../../services/data/sortInfo'
-import StarIconVue from '../star/StarIcon'
-import StarTypesRowVue from './StarTypesRow'
+import StarIconVue from '../star/StarIcon.vue'
+import StarTypesRowVue from './StarTypesRow.vue'
 
 export default {
   components: {

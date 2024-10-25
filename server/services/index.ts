@@ -104,6 +104,7 @@ import { Report } from './types/Report';
 import TeamService from "./team";
 import UserLeaderboardService from './userLeaderboard';
 import GameLockService from "./gameLock";
+import TutorialService from './tutorial';
 import GamePlayerMutexService from './gamePlayerMutex';
 import GameMutexService from "./gameMutex";
 import AnnouncementService from "./announcement";
@@ -219,6 +220,7 @@ export default (config): DependencyContainer => {
     const reportService = new ReportService(ReportModel, reportRepository, playerService, conversationService, userService, gameListService, gameService);
 
     const notificationService = new NotificationService(config, userRepository, gameRepository, discordService, conversationService, gameService, gameJoinService, gameTickService, researchService, tradeService);
+    const tutorialService = new TutorialService(userService);
 
     const gamePlayerMutexService = new GamePlayerMutexService();
 
@@ -304,6 +306,7 @@ export default (config): DependencyContainer => {
         spectatorService,
         scheduleBuyService,
         teamService,
+        tutorialService,
         pathfindingService,
         gamePlayerMutexService,
         gameMutexService,

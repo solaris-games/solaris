@@ -20,8 +20,8 @@
 </template>
 
 <script>
-import MenuTitle from '../MenuTitle'
-import LoadingSpinner from '../../../components/LoadingSpinner'
+import MenuTitle from '../MenuTitle.vue'
+import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import InviteSpectator from './InviteSpectator.vue'
 import Spectator from './Spectator.vue'
 import SpectatorApiService from '../../../../services/api/spectator'

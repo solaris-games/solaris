@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import SvgWrapperVue from '../../../components/SvgWrapper'
+import SvgWrapperVue from '../../../components/SvgWrapper.vue'
 export default {
   components: {
     'svg-wrapper': SvgWrapperVue
@@ -36,28 +36,28 @@ export default {
     iconSource() {
       // TODO: Combos?
       /*if (this.isBinaryStar && this.isBlackHole) {
-        return require('../../../../assets/map-objects/128x128_star_black_hole_binary.svg');
+        return new URL('../../../../assets/map-objects/128x128_star_black_hole_binary.svg', import.meta.url).href;
       }
       else*/ if (this.isBinaryStar) {
-        return require('../../../../assets/map-objects/128x128_star_scannable_binary.svg');
+        return new URL('../../../../assets/map-objects/128x128_star_scannable_binary.svg', import.meta.url).href;
       }
       else if (this.isNebula) {
-        return `mask-image: url(${require('../../../../assets/nebula/neb0-starless-bright.png')});`;
+        return `mask-image: url(${new URL('../../../../assets/nebula/neb0-starless-bright.png')}, import.meta.url).href;`;
       }
       else if (this.isBlackHole) {
-        return require('../../../../assets/map-objects/128x128_star_black_hole.svg');
+        return new URL('../../../../assets/map-objects/128x128_star_black_hole.svg', import.meta.url).href;
       }
       //else if (this.isAsteroidField) {
-      //  return `mask-image: url(${require('../../../../assets/stars/star-asteroid-field-2.png')});`;
+      //  return `mask-image: url(${new URL('../../../../assets/stars/star-asteroid-field-2.png')}, import.meta.url).href;`;
       //}
       else if (this.isPulsar) {
-        return require('../../../../assets/stars/128x128_star_pulsar.svg');
+        return new URL('../../../../assets/stars/128x128_star_pulsar.svg', import.meta.url).href;
       }
       else if (this.isWormHole) {
-        return `mask-image: url(${require('../../../../assets/stars/vortex.png')});`;
+        return `mask-image: url(${new URL('../../../../assets/stars/vortex.png')}, import.meta.url).href;`;
       }
       else {
-        return require('../../../../assets/map-objects/128x128_star_scannable.svg');
+        return new URL('../../../../assets/map-objects/128x128_star_scannable.svg', import.meta.url).href;
       }
     }
   }

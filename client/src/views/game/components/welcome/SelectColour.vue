@@ -40,8 +40,8 @@
 <script>
 import gameContainer from '../../../../game/container'
 import gameHelper from '../../../../services/gameHelper'
-import PlayerAvatarVue from '../menu/PlayerAvatar'
-import TeamName from '../shared/TeamName';
+import PlayerAvatarVue from '../menu/PlayerAvatar.vue'
+import TeamName from '../shared/TeamName.vue';
 
 export default {
   components: {
@@ -76,7 +76,7 @@ export default {
     },
     getAvatarImage (player) {
       try {
-        return require(`../../../../assets/avatars/${player.avatar.file}`)
+        return new URL(`../../../../assets/avatars/${player.avatar.file}`, import.meta.url).href
       } catch (err) {
         console.error(err)
 

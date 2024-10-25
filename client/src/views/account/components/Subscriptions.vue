@@ -11,7 +11,7 @@
         <form @submit.prevent="handleSubmit" v-if="subscriptions" class="pb-2">
             <div>
                 <h5 class="pt-2">Settings</h5>
-                
+
                 <div class="row pt-1 pb-1">
                     <label for="notifyActiveGamesOnly" class="col-12 col-sm-6 col-form-label">Notify Active Games Only <help-tooltip tooltip="If enabled, you will receive notifications for games where you are not defeated."/></label>
                     <div class="col-12 col-sm-6">
@@ -25,7 +25,7 @@
 
             <div v-if="subscriptions.discord">
                 <h5 class="pt-2">Discord</h5>
-                
+
                 <div class="row pt-1 pb-1">
                     <label for="gameStarted" class="col-12 col-sm-6 col-form-label">Game - Started</label>
                     <div class="col-12 col-sm-6">
@@ -35,7 +35,7 @@
                         </select>
                     </div>
                 </div>
-                
+
                 <div class="row pt-1 pb-1">
                     <label for="gameEnded" class="col-12 col-sm-6 col-form-label">Game - Finished</label>
                     <div class="col-12 col-sm-6">
@@ -45,7 +45,7 @@
                         </select>
                     </div>
                 </div>
-                
+
                 <div class="row pt-1 pb-1">
                     <label for="gameTurnEnded" class="col-12 col-sm-6 col-form-label">Game - Turn Ended</label>
                     <div class="col-12 col-sm-6">
@@ -55,7 +55,7 @@
                         </select>
                     </div>
                 </div>
-                
+
                 <div class="row pt-1 pb-1">
                     <label for="playerGalacticCycleComplete" class="col-12 col-sm-6 col-form-label">Game - Galactic Cycle Completed</label>
                     <div class="col-12 col-sm-6">
@@ -65,7 +65,7 @@
                         </select>
                     </div>
                 </div>
-                
+
                 <div class="row pt-1 pb-1">
                     <label for="playerRenownReceived" class="col-12 col-sm-6 col-form-label">Game - Renown Received</label>
                     <div class="col-12 col-sm-6">
@@ -75,7 +75,7 @@
                         </select>
                     </div>
                 </div>
-                
+
                 <div class="row pt-1 pb-1">
                     <label for="playerResearchComplete" class="col-12 col-sm-6 col-form-label">Game - Research Completed</label>
                     <div class="col-12 col-sm-6">
@@ -85,7 +85,7 @@
                         </select>
                     </div>
                 </div>
-                
+
                 <div class="row pt-1 pb-1">
                     <label for="playerTechnologyReceived" class="col-12 col-sm-6 col-form-label">Trade - Technology Received</label>
                     <div class="col-12 col-sm-6">
@@ -95,7 +95,7 @@
                         </select>
                     </div>
                 </div>
-                
+
                 <div class="row pt-1 pb-1">
                     <label for="playerCreditsReceived" class="col-12 col-sm-6 col-form-label">Trade - Credits Received</label>
                     <div class="col-12 col-sm-6">
@@ -105,7 +105,7 @@
                         </select>
                     </div>
                 </div>
-                
+
                 <div class="row pt-1 pb-1">
                     <label for="playerCreditsSpecialistsReceived" class="col-12 col-sm-6 col-form-label">Trade - Specialist Tokens Received</label>
                     <div class="col-12 col-sm-6">
@@ -115,7 +115,7 @@
                         </select>
                     </div>
                 </div>
-                
+
                 <div class="row pt-1 pb-1">
                     <label for="conversationMessageSent" class="col-12 col-sm-6 col-form-label">Diplomacy - Message Received</label>
                     <div class="col-12 col-sm-6">
@@ -140,10 +140,10 @@
 </template>
 
 <script>
-import ViewSubtitleVue from '../../components/ViewSubtitle'
+import ViewSubtitleVue from '../../components/ViewSubtitle.vue'
 import UserApiService from '../../../services/api/user'
-import LoadingSpinner from '../../components/LoadingSpinner'
-import HelpTooltip from '../../components/HelpTooltip'
+import LoadingSpinner from '../../components/LoadingSpinner.vue'
+import HelpTooltip from '../../components/HelpTooltip.vue'
 
 export default {
     components: {
@@ -185,7 +185,7 @@ export default {
                 let response = await UserApiService.saveSubscriptions(this.subscriptions)
 
                 if (response.status === 200) {
-                    this.$toasted.show(`Subscriptions saved.`, { type: 'success' })
+                    this.$toast.success(`Subscriptions saved.`)
                 }
             } catch (err) {
                 console.error(err)

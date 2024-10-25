@@ -1,14 +1,14 @@
 <template>
 <div>
     <loading-spinner :loading="isLoadingLedger"/>
-    
+
     <div v-if="!isLoadingLedger" class="row">
       <div class="table-responsive p-0" v-if="ledgers.length">
         <table class="table table-sm table-striped mb-0">
           <tbody>
-            <ledger-row 
-              v-for="ledger in ledgers" 
-              :key="ledger.playerId" 
+            <ledger-row
+              v-for="ledger in ledgers"
+              :key="ledger.playerId"
               :ledger="ledger"
               :ledgerType="ledgerType"
               @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
@@ -22,9 +22,9 @@
 </template>
 
 <script>
-import LoadingSpinner from '../../../components/LoadingSpinner'
+import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import LedgerApiService from '../../../../services/api/ledger'
-import LedgerRowVue from './LedgerRow'
+import LedgerRowVue from './LedgerRow.vue'
 
 export default {
   components: {
@@ -44,14 +44,14 @@ export default {
     this.loadLedger()
   },
   created () {
-    this.sockets.subscribe('playerDebtAdded', this.onPlayerDebtAdded)
-    this.sockets.subscribe('playerDebtForgiven', this.onPlayerDebtForgiven)
-    this.sockets.subscribe('playerDebtSettled', this.onPlayerDebtSettled)
+    this.$socket.subscribe('playerDebtAdded', this.onPlayerDebtAdded)
+    this.$socket.subscribe('playerDebtForgiven', this.onPlayerDebtForgiven)
+    this.$socket.subscribe('playerDebtSettled', this.onPlayerDebtSettled)
   },
-  destroyed () {
-    this.sockets.unsubscribe('playerDebtAdded')
-    this.sockets.unsubscribe('playerDebtForgiven')
-    this.sockets.unsubscribe('playerDebtSettled')
+  unmounted () {
+    this.$socket.unsubscribe('playerDebtAdded')
+    this.$socket.unsubscribe('playerDebtForgiven')
+    this.$socket.unsubscribe('playerDebtSettled')
   },
   methods: {
     onOpenPlayerDetailRequested(playerId) {
@@ -61,8 +61,8 @@ export default {
       try {
         this.isLoadingLedger = true
 
-        let response = this.ledgerType === 'credits' ? 
-          await LedgerApiService.getLedgerCredits(this.$store.state.game._id) : 
+        let response = this.ledgerType === 'credits' ?
+          await LedgerApiService.getLedgerCredits(this.$store.state.game._id) :
           await LedgerApiService.getLedgerCreditsSpecialists(this.$store.state.game._id)
 
         if (response.status === 200) {

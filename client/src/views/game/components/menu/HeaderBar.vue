@@ -70,14 +70,14 @@ import router from '../../../../router'
 import MENU_STATES from '../../../../services/data/menuStates'
 import KEYBOARD_SHORTCUTS from '../../../../services/data/keyboardShortcuts'
 import GameContainer from '../../../../game/container'
-import ServerConnectionStatusVue from './ServerConnectionStatus'
-import ResearchProgressVue from './ResearchProgress'
+import ServerConnectionStatusVue from './ServerConnectionStatus.vue'
+import ResearchProgressVue from './ResearchProgress.vue'
 import AudioService from '../../../../game/audio'
 import ConversationApiService from '../../../../services/api/conversation'
 import EventApiService from '../../../../services/api/event'
-import HamburgerMenuVue from './HamburgerMenu'
-import TickSelectorVue from './TickSelector'
-import ReadyStatusButtonVue from './ReadyStatusButton'
+import HamburgerMenuVue from './HamburgerMenu.vue'
+import TickSelectorVue from './TickSelector.vue'
+import ReadyStatusButtonVue from './ReadyStatusButton.vue'
 
 export default {
   components: {
@@ -107,34 +107,34 @@ export default {
   created () {
     document.addEventListener('keydown', this.handleKeyDown)
 
-    this.sockets.subscribe('gameStarted', this.gameStarted.bind(this))
-    this.sockets.subscribe('gameMessageSent', this.checkForUnreadMessages.bind(this))
-    this.sockets.subscribe('gameConversationRead', this.checkForUnreadMessages.bind(this))
-    this.sockets.subscribe('playerEventRead', this.checkForUnreadEvents.bind(this))
-    this.sockets.subscribe('playerAllEventsRead', this.checkForUnreadEvents.bind(this))
-    this.sockets.subscribe('playerCreditsReceived', this.onCreditsReceived)
-    this.sockets.subscribe('playerCreditsSpecialistsReceived', this.onCreditsSpecialistsReceived)
-    this.sockets.subscribe('playerTechnologyReceived', this.onTechnologyReceived)
+    this.$socket.subscribe('gameStarted', this.gameStarted.bind(this))
+    this.$socket.subscribe('gameMessageSent', this.checkForUnreadMessages.bind(this))
+    this.$socket.subscribe('gameConversationRead', this.checkForUnreadMessages.bind(this))
+    this.$socket.subscribe('playerEventRead', this.checkForUnreadEvents.bind(this))
+    this.$socket.subscribe('playerAllEventsRead', this.checkForUnreadEvents.bind(this))
+    this.$socket.subscribe('playerCreditsReceived', this.onCreditsReceived)
+    this.$socket.subscribe('playerCreditsSpecialistsReceived', this.onCreditsSpecialistsReceived)
+    this.$socket.subscribe('playerTechnologyReceived', this.onTechnologyReceived)
   },
-  destroyed () {
+  unmounted () {
     document.removeEventListener('keydown', this.handleKeyDown)
 
     clearInterval(this.intervalFunction)
 
-    this.sockets.unsubscribe('gameStarted')
-    this.sockets.unsubscribe('gameMessageSent')
-    this.sockets.unsubscribe('gameConversationRead')
-    this.sockets.unsubscribe('playerEventRead')
-    this.sockets.unsubscribe('playerAllEventsRead')
-    this.sockets.unsubscribe('playerCreditsReceived')
-    this.sockets.unsubscribe('playerCreditsSpecialistsReceived')
-    this.sockets.unsubscribe('playerTechnologyReceived')
+    this.$socket.unsubscribe('gameStarted')
+    this.$socket.unsubscribe('gameMessageSent')
+    this.$socket.unsubscribe('gameConversationRead')
+    this.$socket.unsubscribe('playerEventRead')
+    this.$socket.unsubscribe('playerAllEventsRead')
+    this.$socket.unsubscribe('playerCreditsReceived')
+    this.$socket.unsubscribe('playerCreditsSpecialistsReceived')
+    this.$socket.unsubscribe('playerTechnologyReceived')
   },
   methods: {
     gameStarted () {
       this.setupTimer()
 
-      this.$toasted.show(`Get ready, the game will start soon!`, { type: 'success' })
+      this.$toast.success(`Get ready, the game will start soon!`)
       AudioService.download()
     },
     setupTimer () {
@@ -159,7 +159,7 @@ export default {
 
       player.credits += data.data.credits
 
-      this.$toasted.show(`You received $${data.data.credits} from ${fromPlayer.alias}.`, { type: 'info' })
+      this.$toast.info(`You received $${data.data.credits} from ${fromPlayer.alias}.`)
     },
     onCreditsSpecialistsReceived (data) {
       let player = GameHelper.getUserPlayer(this.$store.state.game)
@@ -167,7 +167,7 @@ export default {
 
       player.creditsSpecialists += data.data.creditsSpecialists
 
-      this.$toasted.show(`You received ${data.data.creditsSpecialists} specialist token(s) from ${fromPlayer.alias}.`, { type: 'info' })
+      this.$toast.info(`You received ${data.data.creditsSpecialists} specialist token(s) from ${fromPlayer.alias}.`)
     },
     onTechnologyReceived (data) {
       let player = GameHelper.getUserPlayer(this.$store.state.game)
@@ -176,7 +176,7 @@ export default {
       player.research[data.data.technology.name].level = data.data.technology.level
       player.research[data.data.technology.name].progress = 0
 
-      this.$toasted.show(`You received ${data.data.technology.name} level ${data.data.technology.level} from ${fromPlayer.alias}.`, { type: 'info' })
+      this.$toast.info(`You received ${data.data.technology.name} level ${data.data.technology.level} from ${fromPlayer.alias}.`)
     },
     goToMainMenu () {
       router.push({ name: 'main-menu' })

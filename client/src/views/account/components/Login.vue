@@ -40,9 +40,9 @@
 </template>
 
 <script>
-import LoadingSpinnerVue from '../../components/LoadingSpinner'
+import LoadingSpinnerVue from '../../components/LoadingSpinner.vue'
 import router from '../../../router'
-import FormErrorList from '../../components/FormErrorList'
+import FormErrorList from '../../components/FormErrorList.vue'
 import authService from '../../../services/api/auth'
 
 export default {
@@ -86,7 +86,7 @@ export default {
 
         let emailAddress = this.email || emailElem.value
         let password = this.password || passwElem.value
-        
+
         // Call the login API endpoint
         let response = await authService.login(emailAddress, password)
 

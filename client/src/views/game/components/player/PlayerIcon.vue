@@ -30,7 +30,7 @@ export default {
         this.recalculateOnlineStatus()
       }
   },
-  destroyed () {
+  unmounted () {
     clearInterval(this.intervalFunction)
   },
   methods: {

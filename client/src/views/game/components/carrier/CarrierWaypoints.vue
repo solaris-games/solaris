@@ -76,13 +76,13 @@
 </template>
 
 <script>
-import MenuTitle from '../MenuTitle'
-import FormErrorList from '../../../components/FormErrorList'
+import MenuTitle from '../MenuTitle.vue'
+import FormErrorList from '../../../components/FormErrorList.vue'
 import GameHelper from '../../../../services/gameHelper'
 import GameContainer from '../../../../game/container'
 import CarrierApiService from '../../../../services/api/carrier'
 import AudioService from '../../../../game/audio'
-import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning'
+import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning.vue'
 
 export default {
   components: {
@@ -130,7 +130,7 @@ export default {
 
     this.recalculateTotalEta()
   },
-  destroyed () {
+  unmounted () {
     this.carrier.waypoints = this.oldWaypoints
     this.carrier.waypointsLooped = this.oldWaypointsLooped
     GameContainer.drawWaypoints()
@@ -204,7 +204,7 @@ export default {
       this.recalculateLooped()
     },
     onWaypointOutOfRange (e) {
-      this.$toasted.show(`This waypoint is out of hyperspace range.`, { type: 'error' })
+      this.$toast.error(`This waypoint is out of hyperspace range.`)
     },
     recalculateTotalEta () {
       let totalTicksEta = GameHelper.calculateWaypointTicksEta(this.$store.state.game, this.carrier,
@@ -243,7 +243,7 @@ export default {
           this.oldWaypoints = this.carrier.waypoints
           this.oldWaypointsLooped = this.carrier.waypointsLooped
 
-          this.$toasted.show(`${this.carrier.name} waypoints updated.`)
+          this.$toast.default(`${this.carrier.name} waypoints updated.`)
 
           GameContainer.reloadCarrier(this.carrier)
 

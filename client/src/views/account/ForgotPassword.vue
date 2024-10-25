@@ -23,11 +23,11 @@
 </template>
 
 <script>
-import LoadingSpinnerVue from '../components/LoadingSpinner'
-import ViewContainer from '../components/ViewContainer'
+import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
+import ViewContainer from '../components/ViewContainer.vue'
 import router from '../../router'
-import ViewTitle from '../components/ViewTitle'
-import FormErrorList from '../components/FormErrorList'
+import ViewTitle from '../components/ViewTitle.vue'
+import FormErrorList from '../components/FormErrorList.vue'
 import userService from '../../services/api/user'
 
 export default {
@@ -62,9 +62,9 @@ export default {
         let response = await userService.requestResetPassword(this.email)
 
         if (response.status === 200) {
-          this.$toasted.show(`A password reset email has been sent to the email address, please check your email inbox.`, { type: 'success' })
+          this.$toast.success(`A password reset email has been sent to the email address, please check your email inbox.`)
         } else {
-          this.$toasted.show(`There was a problem resetting your password, please check that you entered your email address correctly.`, { type: 'error' })
+          this.$toast.error(`There was a problem resetting your password, please check that you entered your email address correctly.`)
         }
 
         router.push({ name: 'home' })

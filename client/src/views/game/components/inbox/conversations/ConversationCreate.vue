@@ -38,9 +38,9 @@
 import eventBus from '../../../../../eventBus'
 import GameHelper from '../../../../../services/gameHelper'
 import ConversationApiService from '../../../../../services/api/conversation'
-import MenuTitle from '../../MenuTitle'
-import LoadingSpinnerVue from '../../../../components/LoadingSpinner'
-import FormErrorList from '../../../../components/FormErrorList'
+import MenuTitle from '../../MenuTitle.vue'
+import LoadingSpinnerVue from '../../../../components/LoadingSpinner.vue'
+import FormErrorList from '../../../../components/FormErrorList.vue'
 
 export default {
   components: {

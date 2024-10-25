@@ -51,11 +51,11 @@
 </template>
 
 <script>
-import MenuTitleVue from '../MenuTitle'
+import MenuTitleVue from '../MenuTitle.vue'
 import GameContainer from '../../../../game/container'
 import GameHelper from '../../../../services/gameHelper'
 import SpecialistApiService from '../../../../services/api/specialist'
-import SpecialistIconVue from '../specialist/SpecialistIcon'
+import SpecialistIconVue from '../specialist/SpecialistIcon.vue'
 
 export default {
   components: {
@@ -96,14 +96,14 @@ export default {
         if (this.carrier.specialistId && !await this.$confirm('Replace specialist', `Are you sure you want to replace the existing specialist ${this.carrier.specialist.name} for a ${specialist.name}?`)) {
           return
         }
-        
+
         this.isHiringSpecialist = true
 
         try {
             let response = await SpecialistApiService.hireCarrierSpecialist(this.$store.state.game._id, this.carrierId, specialist.id)
 
             if (response.status === 200) {
-                this.$toasted.show(`${specialist.name} has been hired for the carrier ${this.carrier.name}.`)
+                this.$toast.default(`${specialist.name} has been hired for the carrier ${this.carrier.name}.`)
 
                 let currency = this.$store.state.game.settings.specialGalaxy.specialistsCurrency
 
@@ -126,7 +126,7 @@ export default {
         } catch (err) {
             console.error(err)
         }
-        
+
         this.isHiringSpecialist = false
     },
     getSpecialistActualCost (specialist) {

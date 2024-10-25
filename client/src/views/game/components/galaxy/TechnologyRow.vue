@@ -17,7 +17,7 @@
 <script>
 import GameContainer from '../../../../game/container'
 import GameHelper from '../../../../services/gameHelper'
-import PlayerIconVue from '../player/PlayerIcon'
+import PlayerIconVue from '../player/PlayerIcon.vue'
 
 export default {
   components: {

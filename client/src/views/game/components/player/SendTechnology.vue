@@ -17,7 +17,7 @@
       </div>
       <div class="col-5">
         <div class="d-grid gap-2">
-          <modalButton modalName="shareTechnologyModal" classText="btn btn-success" 
+          <modalButton modalName="shareTechnologyModal" classText="btn btn-success"
             :disabled="$isHistoricalMode() || isSendingTech || !availableTechnologies.length || selectedTechnology.cost > userPlayer.credits"><i class="fas fa-paper-plane"></i> Share</modalButton>
         </div>
       </div>
@@ -31,8 +31,8 @@
 </template>
 
 <script>
-import ModalButton from '../../../components/modal/ModalButton'
-import DialogModal from '../../../components/modal/DialogModal'
+import ModalButton from '../../../components/modal/ModalButton.vue'
+import DialogModal from '../../../components/modal/DialogModal.vue'
 import TradeApiService from '../../../../services/api/trade'
 import TechnologyHelper from '../../../../services/technologyHelper'
 import gameHelper from '../../../../services/gameHelper'
@@ -93,17 +93,17 @@ export default {
         let response = await TradeApiService.sendTechnology(this.$store.state.game._id, this.player._id, this.selectedTechnology.name, this.selectedTechnology.level)
 
         if (response.status === 200) {
-          this.$toasted.show(`Sent ${this.selectedTechnology.name} (level ${this.selectedTechnology.level}) to ${this.player.alias}.`)
+          this.$toast.default(`Sent ${this.selectedTechnology.name} (level ${this.selectedTechnology.level}) to ${this.player.alias}.`)
 
           let playerTech = gameHelper.getPlayerById(this.$store.state.game, this.playerId).research[this.selectedTechnology.name]
 
           playerTech.level = this.selectedTechnology.level
-          
+
           gameHelper.getUserPlayer(this.$store.state.game).credits -= this.selectedTechnology.cost
-          
+
           this.player.reputation = response.data.reputation
 
-          this.getTradeableTechnologies()
+          await this.getTradeableTechnologies()
         }
       } catch (err) {
         this.errors = err.response.data.errors || []

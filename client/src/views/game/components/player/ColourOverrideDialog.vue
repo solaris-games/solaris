@@ -88,7 +88,7 @@ export default {
         this.$emit('onColourOverrideConfirmed');
       } catch (e) {
         console.error(e);
-        this.$toasted.show(`There was a problem saving the custom colour`, { type: 'error' })
+        this.$toast.error(`There was a problem saving the custom colour`)
       }
     },
     toColourValue (alias) {

@@ -66,7 +66,7 @@ export default {
 
           GameContainer.reloadCarrier(this.carrier)
 
-          this.$toasted.show(`${this.carrier.name} has been converted into a gift.`)
+          this.$toast.default(`${this.carrier.name} has been converted into a gift.`)
         }
       } catch (err) {
         console.error(err)

@@ -1,5 +1,4 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+import { createStore } from 'vuex';
 import eventBus from './eventBus'
 import GameHelper from './services/gameHelper'
 import GameContainer from './game/container'
@@ -7,9 +6,7 @@ import SpecialistService from './services/api/specialist';
 import ColourService from './services/api/colour';
 import gameHelper from "./services/gameHelper";
 
-Vue.use(Vuex)
-
-export default new Vuex.Store({
+export default createStore({
   state: {
     userId: null,
     game: null,
@@ -540,5 +537,5 @@ export default new Vuex.Store({
 
       return colour;
     }
-  },
+  }
 })

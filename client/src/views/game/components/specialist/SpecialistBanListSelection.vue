@@ -10,8 +10,8 @@
             <loading-spinner :loading="isLoading"/>
 
             <specialist-ban-list-table v-if="!isLoading"
-                :specialists="starSpecialists" 
-                :specialistType="'star'" 
+                :specialists="starSpecialists"
+                :specialistType="'star'"
                 :specialistDefaultIcon="'star'"
                 @onSpecialistBanSelectionChanged="onSpecialistBanSelectionChanged"/>
 
@@ -20,8 +20,8 @@
             <loading-spinner :loading="isLoading"/>
 
             <specialist-ban-list-table v-if="!isLoading"
-                :specialists="carrierSpecialists" 
-                :specialistType="'carrier'" 
+                :specialists="carrierSpecialists"
+                :specialistType="'carrier'"
                 :specialistDefaultIcon="'rocket'"
                 @onSpecialistBanSelectionChanged="onSpecialistBanSelectionChanged"/>
         </div>
@@ -29,10 +29,10 @@
 </template>
 
 <script>
-import LoadingSpinner from '../../../components/LoadingSpinner'
+import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import SpecialistService from '../../../../services/api/specialist'
-import SpecialistIconVue from '../specialist/SpecialistIcon'
-import SpecialistBanListTable from './SpecialistBanListTable'
+import SpecialistIconVue from '../specialist/SpecialistIcon.vue'
+import SpecialistBanListTable from './SpecialistBanListTable.vue'
 
 export default {
     components: {
@@ -69,7 +69,7 @@ export default {
             ]
 
             const responses = await Promise.all(requests)
-            
+
             this.carrierSpecialists = responses[0].data
             this.starSpecialists = responses[1].data
 

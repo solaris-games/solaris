@@ -617,11 +617,11 @@
 </template>
 
 <script>
-import ViewSubtitle from '../../../components/ViewSubtitle'
-import SpecialistBanList from '../specialist/SpecialistBanList'
+import ViewSubtitle from '../../../components/ViewSubtitle.vue'
+import SpecialistBanList from '../specialist/SpecialistBanList.vue'
 import GameApiService from '../../../../services/api/game'
-import GameSettingValue from './GameSettingValue'
-import LoadingSpinner from '../../../components/LoadingSpinner'
+import GameSettingValue from './GameSettingValue.vue'
+import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 
 export default {
   components: {

@@ -1,3 +1,13 @@
+<script setup>
+import featuredImg from '../../assets/screenshots/featured.png';
+import newPlayerRtImg from '../../assets/screenshots/new_player_rt.png';
+import standardRtImg from '../../assets/screenshots/standard_rt.png';
+import standardTbImg from '../../assets/screenshots/standard_tb.png';
+import duelRtImg from '../../assets/screenshots/1v1_rt.png';
+import duelTbImg from '../../assets/screenshots/1v1_tb.png';
+import large32Img from '../../assets/screenshots/32_player.png';
+</script>
+
 <template>
   <view-container>
     <view-title title="Join Game" />
@@ -9,6 +19,9 @@
     <ul class="nav nav-tabs">
       <li class="nav-item">
           <a class="nav-link active" data-bs-toggle="tab" href="#newGames">New Games</a>
+      </li>
+      <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="tab" href="#tutorials">Tutorials</a>
       </li>
       <li class="nav-item">
           <a class="nav-link" data-bs-toggle="tab" href="#inProgressGames">In Progress</a>
@@ -26,7 +39,7 @@
             <!-- Featured -->
             <div class="col-sm-12 col-md-12 col-lg-12 mb-0" v-if="games.featured">
               <div class="card featured-card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.featured._id })">
-                <img class="card-img" :src="require('../../assets/screenshots/featured.png')" alt="Featured Game">
+                <img class="card-img" :src="featuredImg" alt="Featured Game">
                 <div class="card-img-overlay">
                   <h4 class="card-title featured-card-title">
                     <i class="fas fa-star"></i>
@@ -66,7 +79,7 @@
             <!-- New Player -->
             <div class="col-sm-12 col-md-6 col-lg-6" v-if="games.newPlayerRT">
               <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.newPlayerRT._id })">
-                <img class="card-img" :src="require('../../assets/screenshots/new_player_rt.png')" alt="View New Player Game">
+                <img class="card-img" :src="newPlayerRtImg" alt="View New Player Game">
                 <div class="card-img-overlay">
                   <h5 class="card-title new-player-card-title">
                     <i class="fas fa-user-graduate"></i>
@@ -89,7 +102,7 @@
             <!-- Special Game -->
             <div class="col-sm-12 col-md-6 col-lg-6" v-if="games.special">
               <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.special._id })">
-                <img class="card-img" :src="require('../../assets/screenshots/' + games.special.settings.general.type + '.png')" alt="Special Game">
+                <img class="card-img" :src="specialGameSrc" alt="Special Game">
                 <div class="card-img-overlay">
                   <h5 class="card-title special-card-title">
                     <i class="fas" :class="{
@@ -127,7 +140,7 @@
             <!-- Standard -->
             <div class="col-sm-12 col-md-3 col-lg-3" v-if="games.standardRT">
               <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.standardRT._id })">
-                <img class="card-img" :src="require('../../assets/screenshots/standard_rt.png')" alt="Standard Game">
+                <img class="card-img" :src="standardRtImg" alt="Standard Game">
                 <div class="card-img-overlay">
                   <h6 class="card-title standard-card-title">
                     <i class="fas fa-user-astronaut"></i>
@@ -151,7 +164,7 @@
             <!-- Standard TB -->
             <div class="col-sm-12 col-md-3 col-lg-3" v-if="games.standardTB">
               <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.standardTB._id })">
-                <img class="card-img" :src="require('../../assets/screenshots/standard_tb.png')" alt="Standard Turn Based Game">
+                <img class="card-img" :src="standardTbImg" alt="Standard Turn Based Game">
                 <div class="card-img-overlay">
                   <h6 class="card-title">
                     <i class="fas fa-user-astronaut"></i>
@@ -175,7 +188,7 @@
             <!-- 1v1 -->
             <div class="col-sm-12 col-md-3 col-lg-3" v-if="games.oneVsOneRT">
               <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.oneVsOneRT._id })">
-                <img class="card-img" :src="require('../../assets/screenshots/1v1_rt.png')" alt="1 vs. 1 Game">
+                <img class="card-img" :src="duelRtImg" alt="1 vs. 1 Game">
                 <div class="card-img-overlay">
                   <h6 class="card-title">
                     <i class="fas fa-user-friends"></i>
@@ -199,7 +212,7 @@
             <!-- 1v1 TB -->
             <div class="col-sm-12 col-md-3 col-lg-3" v-if="games.oneVsOneTB">
               <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.oneVsOneTB._id })">
-                <img class="card-img" :src="require('../../assets/screenshots/1v1_tb.png')" alt="1 vs. 1 Turn Based Game">
+                <img class="card-img" :src="duelTbImg" alt="1 vs. 1 Turn Based Game">
                 <div class="card-img-overlay">
                   <h6 class="card-title">
                     <i class="fas fa-user-friends"></i>
@@ -223,7 +236,7 @@
             <!-- 32 Player -->
             <div class="col-sm-12 col-md-12 col-lg-12" v-if="games.thirtyTwoPlayerRT">
               <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.thirtyTwoPlayerRT._id })">
-                <img class="card-img" :src="require('../../assets/screenshots/32_player.png')" alt="32 Player Game">
+                <img class="card-img" :src="large32Img" alt="32 Player Game">
                 <div class="card-img-overlay">
                   <h5 class="card-title">
                     <i class="fas fa-users"></i>
@@ -290,6 +303,49 @@
                               {{game.state.players}}/{{game.settings.general.playerLimit}}
                             </span>
                           </router-link>
+                      </td>
+                  </tr>
+              </tbody>
+          </table>
+
+          <div class="text-end" v-if="!isLoading">
+            <router-link to="/game/create" tag="button" class="btn btn-info me-1"><i class="fas fa-gamepad"></i> Create Game</router-link>
+            <router-link to="/game/active-games" tag="button" class="btn btn-success ms-1"><i class="fas fa-dice"></i> View My Games</router-link>
+          </div>
+        </div>
+
+        <div class="tab-pane fade" id="tutorials">
+          <h4>Tutorials</h4>
+
+          <p class="mb-1">These tutorial games help you learn to play Solaris.</p>
+
+          <loading-spinner :loading="isLoading"/>
+
+          <p v-if="!isLoading && !tutorialGames.length" class="text-danger mb-2">
+            There are no tutorial games currently available.
+          </p>
+
+          <table v-if="!isLoading && tutorialGames.length" class="table table-striped table-hover">
+              <thead class="table-dark">
+                  <tr>
+                      <th>Name</th>
+                      <th class="text-center">Level</th>
+                      <th class="text-center">Completed</th>
+                      <th></th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr v-for="tutorial in tutorialGames" v-bind:key="tutorial.key">
+                      <td>
+                        {{tutorial.name}}
+                      </td>
+                      <td class="d-none d-sm-table-cell text-center">{{tutorial.level}}</td>
+                      <td class="d-none d-sm-table-cell text-center"><i v-if="tutorial.completed" class="fas fa-check"></i></td>
+                      <td class="">
+                        <div v-if="tutorial.file">
+                          <button v-if="!tutorial.completed" @click="startTutorial(tutorial.key)" class="btn btn-warning float-end"><i class="fas fa-graduation-cap"></i> Start Tutorial</button>
+                          <button v-if="tutorial.completed" @click="startTutorial(tutorial.key)" class="btn btn-info float-end"><i class="fas fa-graduation-cap"></i> Restart Tutorial</button>
+                        </div>
                       </td>
                   </tr>
               </tbody>
@@ -401,18 +457,17 @@
 
 <script>
 import router from '../../router'
-import LoadingSpinnerVue from '../components/LoadingSpinner'
-import ViewTitle from '../components/ViewTitle'
-import ViewContainer from '../components/ViewContainer'
-import TutorialGame from './components/menu/TutorialGame'
+import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
+import ViewTitle from '../components/ViewTitle.vue'
+import ViewContainer from '../components/ViewContainer.vue'
+import TutorialGame from './components/menu/TutorialGame.vue'
 import gameService from '../../services/api/game'
 import GameHelper from '../../services/gameHelper'
 import RandomHelper from '../../services/randomHelper'
-import HelpTooltip from '../components/HelpTooltip'
-import FluxBar from './components/menu/FluxBar'
-import LockedGameOverlay from './components/menu/LockedGameOverlay'
-import * as moment from 'moment'
-import CommunityGuidelines from "../CommunityGuidelines.vue";
+import HelpTooltip from '../components/HelpTooltip.vue'
+import FluxBar from './components/menu/FluxBar.vue'
+import LockedGameOverlay from './components/menu/LockedGameOverlay.vue'
+import moment from 'moment'
 import CommunityGuidelinesBar from "./components/menu/CommunityGuidelinesBar.vue";
 
 export default {
@@ -432,6 +487,7 @@ export default {
       userGames: [],
       inProgressGames: [],
       recentlyCompletedGames: [],
+      tutorialGames: [],
       isLoading: true,
       games: {
         featured: null,
@@ -470,7 +526,22 @@ export default {
       console.error(err)
     }
 
+    try {
+      let response = await gameService.listTutorialGames()
+
+      if (response.status === 200) {
+        this.tutorialGames = response.data
+      }
+    } catch (err) {
+      console.error(err)
+    }
+
     this.isLoading = false
+  },
+  computed: {
+    specialGameSrc () {
+      return new URL(`../../assets/screenshots/${this.games.special.settings.general.type}.png`, import.meta.url).href;
+    }
   },
   methods: {
     routeToPath (path, query) {
@@ -511,6 +582,18 @@ export default {
     },
     getFriendlyDate(date) {
       return moment(date).utc().fromNow()
+    },
+    async startTutorial (tutorialKey) {
+      try {
+          let response = await gameService.createTutorialGame(tutorialKey)
+
+          if (response.status === 201) {
+              this.$store.commit('clearTutorialPage')
+              router.push({ name: 'game', query: { id: response.data } })
+          }
+      } catch (err) {
+          console.error(err)
+      }
     }
   }
 }
