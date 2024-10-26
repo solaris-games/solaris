@@ -58,18 +58,18 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
   .star-svg {
     width: 15px;
     height: 15px;
   }
-  .star-svg >>> .star {
+  .star-svg:deep(.star) {
     fill: currentColor;
   }
-  .star-svg >>> .pulsar {
+  .star-svg:deep(.pulsar) {
     stroke: currentColor;
   }
-  .star-svg >>> .black-hole {
+  .star-svg:deep(.black-hole) {
     fill: transparent;
     stroke: currentColor;
   }

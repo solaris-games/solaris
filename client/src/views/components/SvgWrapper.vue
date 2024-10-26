@@ -1,6 +1,6 @@
 <template>
   <Suspense>
-    <SvgWrapperInternal :href="href" />
+    <SvgWrapperInternal :href="href" v-bind="$attrs" />
 
     <template #fallback>
       <span>.</span>

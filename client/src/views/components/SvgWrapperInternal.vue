@@ -13,8 +13,6 @@ const horribleSvgGetBBox = (svg) => {
 
   document.body.appendChild(div);
 
-  console.warn(svgClone);
-
   let bbBox = svgClone.getBBox();
 
   document.body.removeChild(div);
@@ -26,10 +24,8 @@ export default {
   props: {
     href: null
   },
-  async setup(props) {
+  async setup(props, context) {
     let svgText = null;
-    console.warn(props.href);
-
 
     if (svgCacheMap.has(props.href)) {
       svgText = svgCacheMap.get(props.href);
@@ -48,15 +44,13 @@ export default {
       let range = document.createRange();
       let svgFragment = range.createContextualFragment(svgText);
 
-      console.warn(svgFragment.firstChild);
-
       // Trim the space around the actual icon!
       let svgBoundingBox = horribleSvgGetBBox(svgFragment.firstChild);
       svgFragment.firstChild.setAttribute('viewBox', `${svgBoundingBox.x} ${svgBoundingBox.y} ${svgBoundingBox.width} ${svgBoundingBox.height}`);
 
       const attrs = Object.fromEntries(Array.from(svgFragment.firstChild.attributes).map(v => [v.name, v.value]));
 
-      return () => h('svg', { innerHTML: svgFragment.firstChild.innerHTML , ...attrs});
+      return () => h('svg', { innerHTML: svgFragment.firstChild.innerHTML , ...attrs, ...context.attrs});
     }
     else {
       return () => h('span');
