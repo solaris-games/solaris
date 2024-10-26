@@ -195,7 +195,7 @@ class GameContainer {
   draw () {
     this.map.draw()
 
-    if ( import.meta.env.DEV) {
+    if ( import.meta.env.DEV || userSettings?.technical?.performanceMonitor === 'enabled') {
       let bitmapFont = {fontName: "chakrapetch", fontSize: 16}
       let left = 64
       let top = 32
