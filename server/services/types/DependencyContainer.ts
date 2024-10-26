@@ -80,6 +80,7 @@ import WaypointService from "../waypoint";
 import AnnouncementService from "../announcement";
 import TutorialService from "../tutorial";
 import PlayerColourService from "../playerColour";
+import GameMaskingService from "../gameMaskingService";
 
 export interface DependencyContainer {
     config: Config,
@@ -164,4 +165,5 @@ export interface DependencyContainer {
     announcementService: AnnouncementService,
     tutorialService: TutorialService,
     playerColourService: PlayerColourService,
+    gameMaskingService: GameMaskingService,
 };
