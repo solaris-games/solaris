@@ -27,7 +27,7 @@
     <div class="col-auto">
       <button class="btn btn-primary me-1" @click="onViewColourOverrideRequested">
         <i class="fas fa-paint-brush" />
-        <span class="d-none d-md-inline-block ms-1">Customise colour</span>
+        <span v-if="!isCompactUIStyle" class="d-none d-md-inline-block ms-1">Customise colour</span>
       </button>
       <button class="btn btn-success me-1" @click="onViewConversationRequested"
         :class="{'btn-warning': conversation && conversation.unreadCount}"
@@ -36,8 +36,8 @@
         <span v-if="conversation && conversation.unreadCount" class="ms-1">{{conversation.unreadCount}}</span>
       </button>
       <button class="btn btn-info" v-if="!gameHasFinished && isTradeEnabled" @click="onOpenTradeRequested">
-        <i class="fas fa-handshake"></i>
-        Trade
+        <i class="fas fa-handshake" />
+        <span v-if="!isCompactUIStyle" class="d-none d-md-inline-block ms-1">Trade</span>
       </button>
     </div>
   </div>
@@ -149,6 +149,9 @@ export default {
     },
     isFormalAlliancesEnabled () {
       return DiplomacyHelper.isFormalAlliancesEnabled(this.$store.state.game)
+    },
+    isCompactUIStyle () {
+      return this.$store.state.settings.interface.uiStyle === 'compact';
     }
   }
 }
