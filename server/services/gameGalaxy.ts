@@ -319,7 +319,7 @@ export default class GameGalaxyService {
             return;
         }
 
-        game.state.readyToQuitCount = game.galaxy.players.filter(p => p.readyToQuit).length;
+        game.state.readyToQuitCount = game.galaxy.players.filter(this.gameService.isReadyToQuitOrDefeated).length;
     }
 
     _setStarInfoBasic(doc: Game) {
