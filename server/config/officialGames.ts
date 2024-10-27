@@ -52,7 +52,12 @@ const officialGameSettings = [
 const largeGameSettings = carouselGames("32 Player", "sequential", [
     './game/settings/official/32player_normal',
     './game/settings/official/32player_ultradark'
-])
+]);
+
+const relaxedGameSettings = carouselGames("16 Player", "sequential", [
+    './game/settings/official/16player/16player_realTime',
+    './game/settings/official/16player/16player_turnBased',
+]);
 
 const specialGameSettings = carouselGames("Special", "sequential", [
     './game/settings/official/special_dark',
@@ -74,5 +79,6 @@ export const specialGameTypes = specialGameSettings.rotation.map(settings => set
 export const gameSettings: OfficialGameCategory[] = [
     specialGameSettings,
     largeGameSettings,
+    relaxedGameSettings,
     ...officialGameSettings,
 ]

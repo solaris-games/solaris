@@ -6,6 +6,7 @@ import standardTbImg from '../../assets/screenshots/standard_tb.png';
 import duelRtImg from '../../assets/screenshots/1v1_rt.png';
 import duelTbImg from '../../assets/screenshots/1v1_tb.png';
 import large32Img from '../../assets/screenshots/32_player.png';
+import relaxed16Img from '../../assets/screenshots/16_player_relaxed.png';
 </script>
 
 <template>
@@ -256,6 +257,30 @@ import large32Img from '../../assets/screenshots/32_player.png';
                 </div>
               </div>
             </div>
+
+            <!-- 16 player relaxed -->
+            <div class="col-sm-12 col-md-12 col-lg-12" v-if="games.sixteenPlayerRelaxed">
+              <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.sixteenPlayerRelaxed._id })">
+                <img class="card-img" :src="relaxed16Img" alt="16 Player Relaxed Game">
+                <div class="card-img-overlay">
+                  <h5 class="card-title">
+                    <i class="fas fa-users"></i>
+                    <span class="ms-2">{{games.sixteenPlayerRelaxed.settings.general.name}}</span>
+                  </h5>
+                  <p class="card-title card-subtitle">
+                    {{getGameTypeFriendlyText(games.sixteenPlayerRelaxed)}}
+                    ({{games.sixteenPlayerRelaxed.state.players}}/{{games.sixteenPlayerRelaxed.settings.general.playerLimit}})
+                  </p>
+                </div>
+                <locked-game-overlay :game="games.sixteenPlayerRelaxed"/>
+                <div class="card-arrow">
+                  <div class="card-arrow-top-left"></div>
+                  <div class="card-arrow-top-right"></div>
+                  <div class="card-arrow-bottom-left"></div>
+                  <div class="card-arrow-bottom-right"></div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="text-end" v-if="!isLoading">
@@ -497,6 +522,7 @@ export default {
         oneVsOneRT: null,
         oneVsOneTB: null,
         thirtyTwoPlayerRT: null,
+        sixteenPlayerRelaxed: null,
         special: null
       }
     }
@@ -520,6 +546,7 @@ export default {
         this.games.oneVsOneRT = this.getOfficialGame('1v1_rt')
         this.games.oneVsOneTB = this.getOfficialGame('1v1_tb')
         this.games.thirtyTwoPlayerRT = this.getOfficialGame('32_player_rt')
+        this.games.sixteenPlayerRelaxed = this.getOfficialGame('16_player_relaxed')
         this.games.special = this.getSpecialGame()
       }
     } catch (err) {
