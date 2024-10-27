@@ -81,6 +81,7 @@ import AnnouncementService from "../announcement";
 import TutorialService from "../tutorial";
 import PlayerColourService from "../playerColour";
 import GameMaskingService from "../gameMaskingService";
+import SessionService from "../session";
 
 export interface DependencyContainer {
     config: Config,
@@ -166,4 +167,5 @@ export interface DependencyContainer {
     tutorialService: TutorialService,
     playerColourService: PlayerColourService,
     gameMaskingService: GameMaskingService,
+    sessionService: SessionService,
 };

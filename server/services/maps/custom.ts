@@ -185,7 +185,6 @@ export default class CustomMapService {
         let newCarrier: Carrier = {
             _id: mongoose.Types.ObjectId(),
             ownedByPlayerId: star.ownedByPlayerId,
-            ownedByPlayer: null,
             orbiting: star._id,
             name,
             ships: carrier.ships,
