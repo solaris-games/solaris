@@ -2,7 +2,7 @@ import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
 import Repository from './repository';
 import { Carrier } from './types/Carrier';
-import { CarrierWaypoint, CarrierWaypointActionType, CarrierWaypointBase } from './types/CarrierWaypoint';
+import { CarrierWaypoint, CarrierWaypointActionType, CarrierWaypointActionTypes, CarrierWaypointBase } from './types/CarrierWaypoint';
 import { Game } from './types/Game';
 import { Player } from './types/Player';
 import { Star } from './types/Star';
@@ -131,9 +131,17 @@ export default class WaypointService {
             // Make sure the user isn't being a dumbass.
             waypoint.actionShips = waypoint.actionShips || 0;
             waypoint.action = waypoint.action || 'nothing';
-
+          
             if (waypoint.actionShips == null || (waypoint.actionShips as any) == '' || +waypoint.actionShips < 0 || !this._supportsActionShips(waypoint.action)) {
                 waypoint.actionShips = 0;
+            }
+
+            if (+waypoint.actionShips < 0) {
+                throw new ValidationError(`The waypoint action ships cannot be less than 0.`);
+            }
+
+            if (+waypoint.actionShips !== parseInt(waypoint.actionShips.toString())) {
+                throw new ValidationError(`The waypoint action ships value must be a whole number.`);
             }
 
             // Make damn sure there is a delay ticks defined.
