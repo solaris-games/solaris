@@ -50,7 +50,7 @@ export default (container: DependencyContainer) => {
                     game = await container.gameCreateService.create(settings);
                 }
     
-                res.status(201).json(tutorial._id);
+                res.status(201).json(game._id);
                 return next();
             } catch (err) {
                 console.error(err);
