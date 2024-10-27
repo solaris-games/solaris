@@ -109,6 +109,11 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             controller.impersonate
     );
 
+    router.post('/api/admin/endImpersonate',
+        mw.auth.authenticate({ adminImpersonatingAnotherUser: true }),
+        controller.endImpersonate
+    );
+
     router.get('/api/admin/game',
             mw.auth.authenticate({ subAdmin: true }),
             controller.listGames

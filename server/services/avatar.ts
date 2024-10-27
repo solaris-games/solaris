@@ -1,20 +1,16 @@
-import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
 import Repository from './repository';
+import SessionService from './session';
 import { Avatar, UserAvatar } from './types/Avatar';
+import { DBObjectId } from './types/DBObjectId';
 import { User } from './types/User';
 import UserService from './user';
 
 export default class AvatarService {
-    userRepo: Repository<User>;
-    userService: UserService;
 
-    constructor(
-        userRepo: Repository<User>,
-        userService: UserService
-    ) {
-        this.userRepo = userRepo;
-        this.userService = userService;
+    constructor(private userRepo: Repository<User>,
+                private userService: UserService,
+                private sessionService: SessionService) {
     }
 
     listAllAvatars(): Avatar[] {
@@ -76,6 +72,10 @@ export default class AvatarService {
             $addToSet: {
                 avatars: avatarId
             }
+        });
+
+        this.sessionService.updateUserSessions(userId, session => {
+            session.userCredits -= avatar.price;
         });
     }
 

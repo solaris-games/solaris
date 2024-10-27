@@ -109,6 +109,7 @@ import GameMutexService from "./gameMutex";
 import AnnouncementService from "./announcement";
 import {Announcement} from "./types/Announcement";
 import PlayerColourService from "./playerColour";
+import SessionService from "./session";
 
 const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
@@ -131,12 +132,13 @@ export default (config): DependencyContainer => {
     const userLevelService = new UserLevelService();
     const authService = new AuthService(userRepository, passwordService);
     const discordService = new DiscordService(config, userRepository);
-    const userService = new UserService(UserModel, userRepository, passwordService);
-    const adminService = new AdminService(userRepository, gameRepository);
+    const sessionService = new SessionService(userRepository);
+    const userService = new UserService(UserModel, userRepository, passwordService, sessionService);
+    const adminService = new AdminService(userRepository, gameRepository, sessionService);
     const recaptchaService = new RecaptchaService(config);
     const specialStarBanService = new SpecialStarBanService();
 
-    const guildService = new GuildService(GuildModel, guildRepository, userRepository, userService);
+    const guildService = new GuildService(GuildModel, guildRepository, userRepository, userService, sessionService);
     const guildUserService = new GuildUserService(userRepository, guildService);
 
     const announcementService = new AnnouncementService(AnnouncementModel, announcementRepository, userService);
@@ -153,7 +155,7 @@ export default (config): DependencyContainer => {
     const gameStateService = new GameStateService();
     const gameFluxService = new GameFluxService();
     const playerCreditsService = new PlayerCreditsService(gameRepository);
-    const avatarService = new AvatarService(userRepository, userService);
+    const avatarService = new AvatarService(userRepository, userService, sessionService);
     const achievementService = new AchievementService(userRepository, guildService, userLevelService);
     const ratingService = new RatingService(userRepository, gameRepository, userService);
     const nameService = new NameService(gameNames, starNames, randomService);
@@ -308,5 +310,6 @@ export default (config): DependencyContainer => {
         gamePlayerMutexService,
         gameMutexService,
         playerColourService,
+        sessionService
     };
 };

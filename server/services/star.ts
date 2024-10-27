@@ -299,7 +299,6 @@ export default class StarService extends EventEmitter {
                 _id: s._id,
                 location: s.location,
                 ownedByPlayerId: s.ownedByPlayerId,
-                ownedByPlayer: s.ownedByPlayer
             }
         });
 
@@ -311,7 +310,6 @@ export default class StarService extends EventEmitter {
                     _id: s._id,
                     location: s.location,
                     ownedByPlayerId: s.ownedByPlayerId,
-                    ownedByPlayer: s.ownedByPlayer,
                     isAlwaysVisible: this.isStarAlwaysVisible(s)
                 }
             });
@@ -349,8 +347,7 @@ export default class StarService extends EventEmitter {
                     starsInRange.push({
                         _id: wormHoleStar.destination._id,
                         location: wormHoleStar.destination.location,
-                        ownedByPlayerId: wormHoleStar.destination.ownedByPlayerId,
-                        ownedByPlayer: wormHoleStar.destination.ownedByPlayer
+                        ownedByPlayerId: wormHoleStar.destination.ownedByPlayerId
                     });
                 }
             }

@@ -116,6 +116,13 @@ export default new Vuex.Store({
       state.userCredits = null
     },
 
+    setIsImpersonating (state, isImpersonating) {
+      state.isImpersonating = isImpersonating;
+    },
+    clearIsImpersonating (state) {
+      state.isImpersonating = null;
+    },
+
     setUserIsEstablishedPlayer (state, isEstablishedPlayer) {
       state.userIsEstablishedPlayer = isEstablishedPlayer
     },

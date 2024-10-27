@@ -394,7 +394,6 @@ export default class GameCreateService {
                 let newCarrier: Carrier = {
                     _id: mongoose.Types.ObjectId(),
                     ownedByPlayerId: star.ownedByPlayerId,
-                    ownedByPlayer: star.ownedByPlayer,
                     orbiting: star._id,
                     name,
                     ships: carrier.ships,

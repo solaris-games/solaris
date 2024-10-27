@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
-import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
 import Repository from './repository';
+import SessionService from './session';
+import { DBObjectId } from './types/DBObjectId';
 import { Guild, GuildLeaderboard, GuildRank, GuildUserApplication, GuildWithUsers } from './types/Guild';
 import { User } from './types/User';
 import UserService from './user';
@@ -18,22 +19,12 @@ export default class GuildService {
     CREATE_GUILD_CREDITS_COST = 3
     RENAME_GUILD_CREDITS_COST = 1
 
-    guildModel;
-    guildRepo: Repository<Guild>;
-    userRepo: Repository<User>;
-    userService: UserService;
-    
-    constructor(
-        guildModel,
-        guildRepo: Repository<Guild>,
-        userRepo: Repository<User>,
-        userService: UserService
-    ) {
-        this.guildModel = guildModel;
-        this.guildRepo = guildRepo;
-        this.userRepo = userRepo;
-        this.userService = userService;
-    }
+    constructor(private guildModel,
+                private guildRepo: Repository<Guild>,
+                private userRepo: Repository<User>,
+                private userService: UserService,
+                private sessionService: SessionService
+    ) { }
 
     async list() {
         let users = await this.userService.listUsersInGuilds();
@@ -238,6 +229,10 @@ export default class GuildService {
             }
         });
 
+        this.sessionService.updateUserSessions(userId, session => {
+            session.userCredits -= this.CREATE_GUILD_CREDITS_COST;
+        });
+
         return guild;
     }
 
@@ -284,6 +279,10 @@ export default class GuildService {
             $inc: {
                 credits: -this.RENAME_GUILD_CREDITS_COST
             }
+        });
+
+        this.sessionService.updateUserSessions(userId, session => {
+            session.userCredits -= this.RENAME_GUILD_CREDITS_COST;
         });
     }
 
