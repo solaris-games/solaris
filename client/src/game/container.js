@@ -88,7 +88,7 @@ class GameContainer {
 
     this.app = new PIXI.Application({
       width: window.innerWidth, // window.innerWidth,
-      height: window.innerHeight, // window.innerHeight,
+      height: window.innerHeight - 45, // window.innerHeight,
       backgroundColor: 0x000000, // black hexadecimal
       resolution: window.devicePixelRatio || 1,
       antialias: antialiasing,
@@ -99,7 +99,7 @@ class GameContainer {
     this.app.ticker.add(this.onTick.bind(this))
     this.app.ticker.maxFPS = 0
 
-    if (process.env.NODE_ENV == 'development' || userSettings?.technical?.performanceMonitor === 'enabled') {
+    if (import.meta.env.DEV || userSettings?.technical?.performanceMonitor === 'enabled') {
       this.app.ticker.add(this.calcFPS.bind(this))
     }
 
@@ -195,7 +195,7 @@ class GameContainer {
   draw () {
     this.map.draw()
 
-    if ( process.env.NODE_ENV == 'development' && true) {
+    if ( import.meta.env.DEV || userSettings?.technical?.performanceMonitor === 'enabled') {
       let bitmapFont = {fontName: "chakrapetch", fontSize: 16}
       let left = 64
       let top = 32

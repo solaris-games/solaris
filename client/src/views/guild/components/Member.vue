@@ -12,7 +12,7 @@
     }">{{roleName}}</td>
     <td align="right" :class="getColumnClass('rank')">
       {{player.achievements.rank}}
-      <img class="user-level-icon" :src="require(`../../../assets/levels/${player.achievements.level}.png`)">
+      <img class="user-level-icon" :src="levelSrc">
     </td>
     <td align="right" :class="getColumnClass('victories')">{{player.achievements.victories}}</td>
     <td align="right" :class="getColumnClass('renown')">{{player.achievements.renown}}</td>
@@ -79,7 +79,7 @@ export default {
         if (response.status === 200) {
           this.$emit('onPlayerPromoted', this.player._id)
 
-          this.$toasted.show(`${this.player.username} promoted.`)
+          this.$toast.default(`${this.player.username} promoted.`)
         }
       } catch (err) {
         console.error(err)
@@ -100,7 +100,7 @@ export default {
         if (response.status === 200) {
           this.$emit('onPlayerDemoted', this.player._id)
 
-          this.$toasted.show(`${this.player.username} demoted.`)
+          this.$toast.default(`${this.player.username} demoted.`)
         }
       } catch (err) {
         console.error(err)
@@ -121,7 +121,7 @@ export default {
         if (response.status === 200) {
           this.$emit('onPlayerKicked', this.player._id)
 
-          this.$toasted.show(`${this.player.username} kicked.`)
+          this.$toast.default(`${this.player.username} kicked.`)
         }
       } catch (err) {
         console.error(err)
@@ -142,7 +142,7 @@ export default {
         if (response.status === 200) {
           this.$emit('onPlayerUninvited', this.player._id)
 
-          this.$toasted.show(`${this.player.username} uninvited.`)
+          this.$toast.default(`${this.player.username} uninvited.`)
         }
       } catch (err) {
         console.error(err)
@@ -163,7 +163,7 @@ export default {
         if (response.status === 200) {
           this.$emit('onPlayerApplicationAccepted', this.player._id)
 
-          this.$toasted.show(`${this.player.username} application accepted.`)
+          this.$toast.default(`${this.player.username} application accepted.`)
         }
       } catch (err) {
         console.error(err)
@@ -184,7 +184,7 @@ export default {
         if (response.status === 200) {
           this.$emit('onPlayerApplicationRejected', this.player._id)
 
-          this.$toasted.show(`${this.player.username} application rejected.`)
+          this.$toast.default(`${this.player.username} application rejected.`)
         }
       } catch (err) {
         console.error(err)
@@ -203,8 +203,8 @@ export default {
         let response = await GuildApiService.leave(this.guild._id)
 
         if (response.status === 200) {
-          this.$toasted.show(`You have left ${this.guild.name}[${this.guild.tag}].`)
-          
+          this.$toast.default(`You have left ${this.guild.name}[${this.guild.tag}].`)
+
           router.push({ name: 'main-menu' })
         }
       } catch (err) {
@@ -217,7 +217,7 @@ export default {
       if (!await this.$confirm('Disband guild', `Are you sure you want to disband the guild?`)) {
         return
       }
-      
+
       if (!await this.$confirm('Disband guild', `Are you absolutely sure you want to disband the guild? The guild will be deleted and all members kicked, this cannot be undone.`)) {
         return
       }
@@ -228,7 +228,7 @@ export default {
         let response = await GuildApiService.delete(this.guild._id)
 
         if (response.status === 200) {
-          this.$toasted.show(`You have disbanded ${this.guild.name}[${this.guild.tag}].`)
+          this.$toast.default(`You have disbanded ${this.guild.name}[${this.guild.tag}].`)
 
           router.push({ name: 'main-menu' })
         }
@@ -240,6 +240,9 @@ export default {
     }
   },
   computed: {
+    levelSrc () {
+      return new URL(`../../../assets/levels/${this.player.achievements.level}.png`, import.meta.url).href;
+    },
     roleName () {
       return this.role.charAt(0).toUpperCase() + this.role.slice(1);
     },

@@ -24,7 +24,7 @@
           <tr>
             <td>Rank</td>
             <td class="text-end">
-              <img class="user-level-icon" :src="require(`../../assets/levels/${user.achievements.level}.png`)">
+              <img class="user-level-icon" :src="levelSrc">
               {{ user.level.name }}
             </td>
           </tr>
@@ -281,17 +281,17 @@
 </template>
 
 <script>
-import LoadingSpinnerVue from '../components/LoadingSpinner'
-import ViewContainer from '../components/ViewContainer'
-import ViewTitle from '../components/ViewTitle'
-import ViewSubtitle from '../components/ViewSubtitle'
-import Achievements from '../game/components/player/Achievements'
-import PieChart from '../game/components/intel/PieChart.js'
-import PolarArea from '../game/components/intel/PolarAreaChart.js'
+import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
+import ViewContainer from '../components/ViewContainer.vue'
+import ViewTitle from '../components/ViewTitle.vue'
+import ViewSubtitle from '../components/ViewSubtitle.vue'
+import Achievements from '../game/components/player/Achievements.vue'
+import PieChart from '../game/components/intel/PieChart.vue'
+import PolarArea from '../game/components/intel/PolarAreaChart.vue'
 import userService from '../../services/api/user'
-import UserGuildInfoVue from '../guild/components/UserGuildInfo'
-import Roles from '../game/components/player/Roles'
-import UserBadges from '../game/components/badges/UserBadges'
+import UserGuildInfoVue from '../guild/components/UserGuildInfo.vue'
+import Roles from '../game/components/player/Roles.vue'
+import UserBadges from '../game/components/badges/UserBadges.vue'
 
 export default {
   components: {
@@ -595,7 +595,10 @@ export default {
   computed: {
     userId: function () {
       return this.$route.params.userId
-    }
+    },
+    levelSrc () {
+      return new URL(`../../assets/levels/${this.user.achievements.level}.png`, import.meta.url).href
+    },
   }
 }
 </script>

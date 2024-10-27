@@ -30,7 +30,7 @@
 
     <div class="mt-2" v-if="isFormalAlliancesEnabled">
       <hr/>
-      
+
       <h5>Alliance Settings</h5>
 
       <ul>
@@ -62,12 +62,12 @@
 </template>
 
 <script>
-import MenuTitle from '../MenuTitle'
-import LoadingSpinner from '../../../components/LoadingSpinner'
+import MenuTitle from '../MenuTitle.vue'
+import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import DiplomacyApiService from '../../../../services/api/diplomacy'
-import DiplomacyRowVue from './DiplomacyRow'
+import DiplomacyRowVue from './DiplomacyRow.vue'
 import DiplomacyHelper from '../../../../services/diplomacyHelper'
-import FormErrorList from '../../../components/FormErrorList'
+import FormErrorList from '../../../components/FormErrorList.vue'
 
 export default {
   components: {
@@ -87,10 +87,10 @@ export default {
     this.loadDiplomaticStatus();
   },
   created () {
-    this.sockets.subscribe('playerDiplomaticStatusChanged', this.onPlayerDiplomaticStatusChanged)
+    this.$socket.subscribe('playerDiplomaticStatusChanged', this.onPlayerDiplomaticStatusChanged)
   },
-  destroyed () {
-    this.sockets.unsubscribe('playerDiplomaticStatusChanged')
+  unmounted () {
+    this.$socket.unsubscribe('playerDiplomaticStatusChanged')
   },
   methods: {
     onOpenPlayerDetailRequested(playerId) {

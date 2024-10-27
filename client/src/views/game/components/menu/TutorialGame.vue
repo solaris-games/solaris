@@ -1,9 +1,13 @@
+<script setup>
+import tutorial from '../../../../assets/screenshots/tutorial.png';
+</script>
+
 <template>
     <div>
         <div class="row">
             <div class="col-sm-12 col-md-6 col-lg-6">
                 <div class="card bg-dark text-white tutorial-game p-1" @click="viewTutorial()">
-                    <img class="card-img" :src="require('../../../../assets/screenshots/tutorial.png')" alt="View Tutorial">
+                    <img class="card-img" :src="tutorial" alt="View Tutorial">
                     <div class="card-img-overlay">
                         <h5 class="card-title tutorial-card-title">
                             <i class="fas fa-user-graduate"></i>
@@ -39,6 +43,7 @@
                                 <a href="https://discord.com/invite/v7PD33d" target="_blank" title="Discord" class="btn btn-success me-2 mb-1 float-end">
                                     <i class="fab fa-discord"></i> Discord
                                 </a>
+
                                 <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=2828060521" target="_blank" title="Getting Started" class="btn btn-outline-warning me-2 mb-1 float-end">
                                     <i class="fas fa-handshake-angle"></i> Getting Started
                                 </a>
@@ -61,7 +66,7 @@ export default {
             if (!await this.$confirm(`Start Tutorial`, `You are about to start the tutorial, are you sure you want to continue?`)) {
                 return
             }
-            
+
             try {
                 let response = await gameService.createTutorialGame()
 

@@ -36,9 +36,9 @@
 import gameContainer from '../../../../game/container'
 import AudioService from '../../../../game/audio'
 import gameHelper from '../../../../services/gameHelper'
-import PlayerIconVue from '../player/PlayerIcon'
+import PlayerIconVue from '../player/PlayerIcon.vue'
 import starService from '../../../../services/api/star'
-import SpecialistIcon from '../specialist/SpecialistIcon'
+import SpecialistIcon from '../specialist/SpecialistIcon.vue'
 
 export default {
   components: {
@@ -78,7 +78,7 @@ export default {
         if (response.status === 200) {
           this.$store.commit('gameStarEconomyUpgraded', response.data)
 
-          this.$toasted.show(`Economy upgraded at ${this.star.name}.`)
+          this.$toast.default(`Economy upgraded at ${this.star.name}.`)
 
           AudioService.hover()
         }
@@ -102,7 +102,7 @@ export default {
         if (response.status === 200) {
           this.$store.commit('gameStarIndustryUpgraded', response.data)
 
-          this.$toasted.show(`Industry upgraded at ${this.star.name}.`)
+          this.$toast.default(`Industry upgraded at ${this.star.name}.`)
 
           AudioService.hover()
         }
@@ -126,7 +126,7 @@ export default {
         if (response.status === 200) {
           this.$store.commit('gameStarScienceUpgraded', response.data)
 
-          this.$toasted.show(`Science upgraded at ${this.star.name}.`)
+          this.$toast.default(`Science upgraded at ${this.star.name}.`)
 
           AudioService.hover()
           gameContainer.reloadStar(this.star)

@@ -86,7 +86,7 @@
 <script>
 import gameHelper from "../../../../services/gameHelper"
 import TechnologyHelper from "../../../../services/technologyHelper"
-import ResearchRow from "./ResearchRow"
+import ResearchRow from "./ResearchRow.vue"
 
 export default {
   components: {

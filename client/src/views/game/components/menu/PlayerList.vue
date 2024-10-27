@@ -12,7 +12,7 @@
 
 <script>
 import gameHelper from '../../../../services/gameHelper'
-import PlayerAvatarVue from './PlayerAvatar'
+import PlayerAvatarVue from './PlayerAvatar.vue'
 
 export default {
   components: {

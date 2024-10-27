@@ -34,7 +34,8 @@ import GameFluxService from './gameFlux';
 import PlayerAfkService from './playerAfk';
 import ShipService from './ship';
 import SpectatorService from './spectator';
-import {GameHistoryCarrier} from "./types/GameHistory";
+import {GameHistory, GameHistoryCarrier} from "./types/GameHistory";
+import GameMaskingService from "./gameMaskingService";
 
 enum ViewpointKind {
     Basic,
@@ -77,6 +78,7 @@ export default class GameGalaxyService {
     playerStatisticsService: PlayerStatisticsService;
     gameFluxService: GameFluxService;
     spectatorService: SpectatorService;
+    gameMaskingService: GameMaskingService;
 
     constructor(
         cacheService: CacheService,
@@ -106,7 +108,8 @@ export default class GameGalaxyService {
         avatarService: AvatarService,
         playerStatisticsService: PlayerStatisticsService,
         gameFluxService: GameFluxService,
-        spectatorService: SpectatorService
+        spectatorService: SpectatorService,
+        gameMaskingService: GameMaskingService,
     ) {
         this.cacheService = cacheService;
         this.broadcastService = broadcastService;
@@ -136,6 +139,7 @@ export default class GameGalaxyService {
         this.playerStatisticsService = playerStatisticsService;
         this.gameFluxService = gameFluxService;
         this.spectatorService = spectatorService;
+        this.gameMaskingService = gameMaskingService;
     }
 
     async getGalaxy(gameId: DBObjectId, userId: DBObjectId | null, tick: number | null) {
@@ -315,7 +319,7 @@ export default class GameGalaxyService {
             return;
         }
 
-        game.state.readyToQuitCount = game.galaxy.players.filter(p => p.readyToQuit).length;
+        game.state.readyToQuitCount = game.galaxy.players.filter(this.gameService.isReadyToQuitOrDefeated).length;
     }
 
     _setStarInfoBasic(doc: Game) {
@@ -886,37 +890,7 @@ export default class GameGalaxyService {
             }
         }
 
-        // Apply previous tick's data to all STARS the player does not own.
-        // If historical mode, then its all star data in the requested tick.
-        // If not historical mode, then replace non-player owned star data.
-        for (let i = 0; i < game.galaxy.stars.length; i++) {
-            let gameStar = game.galaxy.stars[i];
-
-            if (!isHistorical && userPlayer && gameStar.ownedByPlayerId && gameStar.ownedByPlayerId.toString() === userPlayer._id.toString()) {
-                continue;
-            }
-
-            let historyStar = history.stars.find(x => x.starId.toString() === gameStar._id.toString());
-
-            if (historyStar) {
-                // If the player has abandoned the star in the current tick, then display that representation of the star
-                // instead of the historical version.
-                if (!isHistorical && userPlayer && historyStar.ownedByPlayerId && gameStar.ownedByPlayerId == null && historyStar.ownedByPlayerId.toString() === userPlayer._id.toString()) {
-                    continue;
-                }
-
-                gameStar.ownedByPlayerId = historyStar.ownedByPlayerId;
-                gameStar.naturalResources = historyStar.naturalResources;
-                gameStar.ships = historyStar.ships;
-                gameStar.shipsActual = historyStar.shipsActual;
-                gameStar.specialistId = historyStar.specialistId;
-                gameStar.homeStar = historyStar.homeStar;
-                gameStar.warpGate = historyStar.warpGate;
-                gameStar.ignoreBulkUpgrade = historyStar.ignoreBulkUpgrade;
-                gameStar.infrastructure = historyStar.infrastructure;
-                gameStar.location = historyStar.location == null || (historyStar.location.x == null || historyStar.location.y == null) ? gameStar.location : historyStar.location; // TODO: May not have history for the star (BR Mode). Can delete this in a few months after the history is cleaned.
-            }
-        }
+        this.gameMaskingService.maskStars(game, userPlayer, history, isHistorical);
 
         // Apply previous tick's data to all CARRIERS the player does not own.
         // If historical mode, then its all carrier data in the requested tick.

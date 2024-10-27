@@ -41,7 +41,7 @@
                   <td title="Pulsar">
                     <a href="javascript:;" @click="sort(['isPulsar'], ['name'])"><star-icon :isPulsar="true"></star-icon></a>
                   </td>
-                  <td title="Wormhole">
+                  <td title="Wormhole" style="text-align: center;">
                     <a href="javascript:;" @click="sort(['isWormHole'], ['wormHolePairStar', 'name'])"><star-icon :isWormHole="true"></star-icon></a>
                   </td>
                   <td></td>
@@ -68,8 +68,8 @@
 import GameHelper from '../../../../services/gameHelper'
 import GridHelper from '../../../../services/gridHelper'
 import SortInfo from '../../../../services/data/sortInfo'
-import StarIconVue from '../star/StarIcon'
-import StarTypesRowVue from './StarTypesRow'
+import StarIconVue from '../star/StarIcon.vue'
+import StarTypesRowVue from './StarTypesRow.vue'
 
 export default {
   components: {

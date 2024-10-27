@@ -45,7 +45,7 @@ export default {
         let response = await tradeService.sendRenown(this.$store.state.game._id, this.player._id, this.amount)
 
         if (response.status === 200) {
-          this.$toasted.show(`Sent ${this.amount} renown to ${this.player.alias}.`)
+          this.$toast.default(`Sent ${this.amount} renown to ${this.player.alias}.`)
 
           this.userPlayer.renownToGive -= this.amount
 

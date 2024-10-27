@@ -34,8 +34,8 @@
 </template>
 
 <script>
-import LoadingSpinner from '../../../components/LoadingSpinner';
-import SortableLeaderboard from './SortableLeaderboard';
+import LoadingSpinner from '../../../components/LoadingSpinner.vue';
+import SortableLeaderboard from './SortableLeaderboard.vue';
 import GuildApiService from '../../../../services/api/guild';
 
 export default {
@@ -67,7 +67,7 @@ export default {
       try {
         const response = await GuildApiService.getLeaderboard(100, key);
         if (response.status === 200) {
-          this.$set(this.leaderboards, key, response.data.leaderboard);
+          this.leaderboards[key] = response.data.leaderboard;
           this.totalGuilds = response.data.totalGuilds;
         }
       } catch (err) {

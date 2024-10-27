@@ -27,7 +27,7 @@
     <div class="col-auto">
       <button class="btn btn-primary me-1" @click="onViewColourOverrideRequested">
         <i class="fas fa-paint-brush" />
-        <span class="d-none d-md-inline-block ms-1">Customise colour</span>
+        <span v-if="!isCompactUIStyle" class="d-none d-md-inline-block ms-1">Customise colour</span>
       </button>
       <button class="btn btn-success me-1" @click="onViewConversationRequested"
         :class="{'btn-warning': conversation && conversation.unreadCount}"
@@ -36,8 +36,8 @@
         <span v-if="conversation && conversation.unreadCount" class="ms-1">{{conversation.unreadCount}}</span>
       </button>
       <button class="btn btn-info" v-if="!gameHasFinished && isTradeEnabled" @click="onOpenTradeRequested">
-        <i class="fas fa-handshake"></i>
-        Trade
+        <i class="fas fa-handshake" />
+        <span v-if="!isCompactUIStyle" class="d-none d-md-inline-block ms-1">Trade</span>
       </button>
     </div>
   </div>
@@ -47,8 +47,8 @@
 <script>
 import eventBus from '../../../../eventBus'
 import MENU_STATES from '../../../../services/data/menuStates'
-import Statistics from './Statistics'
-import PlayerTitleVue from './PlayerTitle'
+import Statistics from './Statistics.vue'
+import PlayerTitleVue from './PlayerTitle.vue'
 import gameHelper from '../../../../services/gameHelper'
 import ConversationApiService from '../../../../services/api/conversation'
 import DiplomacyHelper from '../../../../services/diplomacyHelper'
@@ -115,7 +115,7 @@ export default {
     },
     getAvatarImage () {
       try {
-        return require(`../../../../assets/avatars/${this.player.avatar}`)
+        return new URL(`../../../../assets/avatars/${this.player.avatar}`, import.meta.url).href
       } catch (err) {
         console.error(err)
 
@@ -149,6 +149,9 @@ export default {
     },
     isFormalAlliancesEnabled () {
       return DiplomacyHelper.isFormalAlliancesEnabled(this.$store.state.game)
+    },
+    isCompactUIStyle () {
+      return this.$store.state.settings.interface.uiStyle === 'compact';
     }
   }
 }

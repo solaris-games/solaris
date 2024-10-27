@@ -96,10 +96,10 @@ export default {
     },
     getAvatarImage () {
       try {
-        return require('../../../../assets/avatars/' + this.avatar.file)
+        return new URL(`../../../../assets/avatars/${this.avatar.file}`, import.meta.url).href
       } catch (err) {
         console.error(err)
-        
+
         return null
       }
     }

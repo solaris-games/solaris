@@ -7,12 +7,17 @@ npm install
 
 ### Compiles and hot-reloads for development
 ```
-npm run serve
+npm run dev
 ```
 
 ### Compiles and minifies for production
 ```
 npm run build
+```
+
+### Locally runs the production bundle (needs to be compiled first)
+```
+npm run serve
 ```
 
 ### Run your tests

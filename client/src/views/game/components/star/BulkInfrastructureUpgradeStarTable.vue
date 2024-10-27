@@ -5,7 +5,7 @@
       <input type="text" class="form-control form-control-sm" v-model="searchFilter" placeholder="Search...">
     </div>
   </div>
-  
+
   <div class="row" v-if="tableData.length">
     <div class="table-responsive ps-0 pe-0">
       <table class="table table-striped table-hover mb-0">
@@ -49,7 +49,7 @@
 <script>
 import GameHelper from '../../../../services/gameHelper'
 import GridHelper from '../../../../services/gridHelper'
-import BulkInfrastructureUpgradeStarTableRow from './BulkInfrastructureUpgradeStarTableRow'
+import BulkInfrastructureUpgradeStarTableRow from './BulkInfrastructureUpgradeStarTableRow.vue'
 import SortInfo from '../../../../services/data/sortInfo'
 
 export default {

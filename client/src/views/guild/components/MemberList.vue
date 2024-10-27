@@ -26,7 +26,7 @@
   </sortable-leaderboard>
 </template>
 <script>
-import SortableLeaderboard from '../../game/components/menu/SortableLeaderboard';
+import SortableLeaderboard from '../../game/components/menu/SortableLeaderboard.vue';
 import GameHelper from '../../../services/gameHelper';
 
 export default {

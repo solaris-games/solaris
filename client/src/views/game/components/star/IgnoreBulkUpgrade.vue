@@ -48,7 +48,7 @@ export default {
   },
   methods: {
     triggerChanged () {
-      this.$emit("bulkIgnoreChanged", { 
+      this.$emit("bulkIgnoreChanged", {
         starId: this.starId
       });
       const star = GameHelper.getStarById(this.$store.state.game, this.starId);
@@ -57,16 +57,16 @@ export default {
     async toggleBulkIgnore (infrastructureType) {
       try {
         let response = await starService.toggleIgnoreBulkUpgrade(this.$store.state.game._id, this.star._id, infrastructureType)
-        
+
         if (response.status === 200) {
           this.star.ignoreBulkUpgrade[infrastructureType] = !this.star.ignoreBulkUpgrade[infrastructureType]
 
           if (this.star.ignoreBulkUpgrade[infrastructureType]) {
-            this.$toasted.show(`${this.star.name} ${infrastructureType} is now ignored by Bulk Upgrade.`)
+            this.$toast.default(`${this.star.name} ${infrastructureType} is now ignored by Bulk Upgrade.`)
           } else {
-            this.$toasted.show(`${this.star.name} ${infrastructureType} is now included in Bulk Upgrade.`)
+            this.$toast.default(`${this.star.name} ${infrastructureType} is now included in Bulk Upgrade.`)
           }
-          
+
           this.triggerChanged();
         }
       } catch (err) {
@@ -76,16 +76,16 @@ export default {
     async toggleBulkIgnoreAll (ignoreStatus) {
       try {
         let response = await starService.toggleIgnoreBulkUpgradeAll(this.$store.state.game._id, this.star._id, ignoreStatus)
-        
+
         if (response.status === 200) {
           this.star.ignoreBulkUpgrade['economy'] = ignoreStatus
           this.star.ignoreBulkUpgrade['industry'] = ignoreStatus
           this.star.ignoreBulkUpgrade['science'] = ignoreStatus
 
           if (ignoreStatus) {
-            this.$toasted.show(`${this.star.name} is now ignored by Bulk Upgrade.`)
+            this.$toast.default(`${this.star.name} is now ignored by Bulk Upgrade.`)
           } else {
-            this.$toasted.show(`${this.star.name} is now included in Bulk Upgrade.`)
+            this.$toast.default(`${this.star.name} is now included in Bulk Upgrade.`)
           }
 
           this.triggerChanged();

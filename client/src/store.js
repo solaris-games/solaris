@@ -1,6 +1,4 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
-import VuexPersist from 'vuex-persist'
+import { createStore } from 'vuex';
 import eventBus from './eventBus'
 import GameHelper from './services/gameHelper'
 import GameContainer from './game/container'
@@ -8,14 +6,7 @@ import SpecialistService from './services/api/specialist';
 import ColourService from './services/api/colour';
 import gameHelper from "./services/gameHelper";
 
-Vue.use(Vuex)
-
-const vuexPersist = new VuexPersist({
-  key: 'solaris',
-  storage: localStorage
-})
-
-export default new Vuex.Store({
+export default createStore({
   state: {
     userId: null,
     game: null,
@@ -275,7 +266,7 @@ export default new Vuex.Store({
         let star = GameHelper.getStarById(state.game, s.starId);
 
         if (data.infrastructureType === 'science') {
-          newScience += s.infrastructure * (star.specialistId === 11 ? 2 : 1); // Research Station
+          newScience += (s.infrastructure - s.infrastructureCurrent) * (star.specialistId === 11 ? 2 : 1); // Research Station
         }
 
         star.infrastructure[data.infrastructureType] = s.infrastructure
@@ -532,12 +523,19 @@ export default new Vuex.Store({
       return state.cachedConversationComposeMessages[conversationId] || ''
     },
     getColourForPlayer: (state) => (playerId) => {
+      let colour = null;
+
       if (state.colourOverride) {
-        return state.colourMapping?.[playerId] || GameHelper.getPlayerById(state.game, playerId).colour;
+        colour = state.colourMapping?.[playerId] || GameHelper.getPlayerById(state.game, playerId).colour;
       } else {
-        return GameHelper.getPlayerById(state.game, playerId).colour
+        colour = GameHelper.getPlayerById(state.game, playerId).colour
       }
+
+      if (colour != null) {
+        colour.value = GameHelper.getFriendlyColour(colour.value);
+      }
+
+      return colour;
     }
-  },
-  plugins: [vuexPersist.plugin]
+  }
 })

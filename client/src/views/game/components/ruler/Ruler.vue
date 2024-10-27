@@ -174,10 +174,10 @@
 </template>
 
 <script>
-import MenuTitleVue from '../MenuTitle'
+import MenuTitleVue from '../MenuTitle.vue'
 import GameContainer from '../../../../game/container'
 import GameHelper from '../../../../services/gameHelper'
-import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning'
+import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning.vue'
 
 export default {
   components: {
@@ -208,7 +208,7 @@ export default {
     GameContainer.map.on('onRulerPointRemoved', this.onRulerPointRemoved.bind(this))
     GameContainer.map.on('onRulerPointsCleared', this.onRulerPointsCleared.bind(this))
   },
-  destroyed () {
+  unmounted () {
     // Set map to galaxy mode
     GameContainer.resetMode()
   },

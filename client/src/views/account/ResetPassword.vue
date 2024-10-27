@@ -31,11 +31,11 @@
 </template>
 
 <script>
-import LoadingSpinnerVue from '../components/LoadingSpinner'
-import ViewContainer from '../components/ViewContainer'
+import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
+import ViewContainer from '../components/ViewContainer.vue'
 import router from '../../router'
-import ViewTitle from '../components/ViewTitle'
-import FormErrorList from '../components/FormErrorList'
+import ViewTitle from '../components/ViewTitle.vue'
+import FormErrorList from '../components/FormErrorList.vue'
 import userService from '../../services/api/user'
 
 export default {
@@ -84,10 +84,10 @@ export default {
         let response = await userService.updatePassword(this.currentPassword, this.newPassword)
 
         if (response.status === 200) {
-          this.$toasted.show(`Password updated.`, { type: 'success' })
+          this.$toast.success(`Password updated.`)
           router.push({ name: 'account-settings' })
         } else {
-          this.$toasted.show(`There was a problem updating your password, please try again.`, { type: 'error' })
+          this.$toast.error(`There was a problem updating your password, please try again.`)
         }
       } catch (err) {
         this.errors = err.response.data.errors || []

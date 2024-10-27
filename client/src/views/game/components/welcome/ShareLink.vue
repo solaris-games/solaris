@@ -29,7 +29,7 @@ export default {
     async copyToClipboard () {
       await navigator.clipboard.writeText(this.fullRoute)
 
-      this.$toasted.show(`Copied to clipboard.`, { type: 'success' })
+      this.$toast.default(`Copied to clipboard.`, { type: 'success' })
     }
   }
 }

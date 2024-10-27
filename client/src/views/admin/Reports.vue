@@ -61,7 +61,7 @@ export default {
     async getReports() {
       const reports = await AdminApiService.getReports()
       if (reports.status !== 200) {
-        this.$toasted.error(reports.data.message);
+        this.$toast.error(reports.data.message);
         return null
       }
       return reports.data;

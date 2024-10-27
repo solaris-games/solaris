@@ -70,15 +70,15 @@
 </template>
 
 <script>
-import MenuTitle from '../MenuTitle'
-import StarsTableVue from './StarsTable'
-import StarTypesTableVue from './StarTypesTable'
-import CarriersTableVue from './CarriersTable'
-import ShipsTableVue from './ShipsTable'
-import CapitalsTableVue from './CapitalsTable'
-import NaturalResourcesTableVue from './NaturalResourcesTable'
-import EmpiresTableVue from './EmpiresTable'
-import TechnologyTableVue from './TechnologyTable'
+import MenuTitle from '../MenuTitle.vue'
+import StarsTableVue from './StarsTable.vue'
+import StarTypesTableVue from './StarTypesTable.vue'
+import CarriersTableVue from './CarriersTable.vue'
+import ShipsTableVue from './ShipsTable.vue'
+import CapitalsTableVue from './CapitalsTable.vue'
+import NaturalResourcesTableVue from './NaturalResourcesTable.vue'
+import EmpiresTableVue from './EmpiresTable.vue'
+import TechnologyTableVue from './TechnologyTable.vue'
 
 export default {
   components: {
@@ -121,7 +121,11 @@ export default {
 </script>
 
 <style scoped>
+.nav-item {
+    flex-basis: 25%;
+}
 .nav-link {
-  padding: 0.5rem 1.5rem;
+  padding: 0.5rem 0.2rem;
+  text-align: center;
 }
 </style>

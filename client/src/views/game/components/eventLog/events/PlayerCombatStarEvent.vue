@@ -107,7 +107,7 @@
 <script>
 import GameHelper from '../../../../../services/gameHelper'
 import PlayerIconShape from '../../player/PlayerIconShape.vue'
-import StarLabelVue from '../../star/StarLabel'
+import StarLabelVue from '../../star/StarLabel.vue'
 
 export default {
   components: {

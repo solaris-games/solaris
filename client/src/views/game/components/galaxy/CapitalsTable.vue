@@ -49,7 +49,7 @@
 <script>
 import GameHelper from '../../../../services/gameHelper'
 import GridHelper from '../../../../services/gridHelper'
-import CapitalRowVue from './CapitalRow'
+import CapitalRowVue from './CapitalRow.vue'
 import SortInfo from '../../../../services/data/sortInfo'
 
 export default {
