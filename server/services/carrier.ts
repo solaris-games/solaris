@@ -82,7 +82,6 @@ export default class CarrierService extends EventEmitter {
         let carrier: Carrier = {
             _id: mongoose.Types.ObjectId(),
             ownedByPlayerId: star.ownedByPlayerId,
-            ownedByPlayer: star.ownedByPlayer,
             ships: ships,
             orbiting: star._id,
             location: star.location,
@@ -183,7 +182,6 @@ export default class CarrierService extends EventEmitter {
                 return {
                     _id: c._id,
                     ownedByPlayerId: c.ownedByPlayerId,
-                    ownedByPlayer: c.ownedByPlayer,
                     location: c.location
                 };
             });

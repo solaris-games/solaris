@@ -21,6 +21,7 @@ async function startServer() {
   const container = containerLoader(config);
 
   const { sessionStorage } = await expressLoader(config, app, container);
+  container.sessionService.setSessionStorage(sessionStorage);
 
   const io = socketLoader(config, server, sessionStorage);
   container.broadcastService.setIOController(io);

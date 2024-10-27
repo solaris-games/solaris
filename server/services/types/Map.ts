@@ -5,7 +5,6 @@ import { Player } from "./Player";
 export interface MapObject {
     _id: DBObjectId;
     ownedByPlayerId: DBObjectId | null;
-    ownedByPlayer: Player | null;
     location: Location;
 };
 

@@ -1,3 +1,5 @@
+import { SessionData } from 'express-session';
+import { DBObjectId } from '../services/types/DBObjectId';
 import UserService from '../services/user';
 
 const fakeBcrypt = {
@@ -27,12 +29,17 @@ const fakeUserRepo = {
     }
 };
 
+const fakeSessionService = {
+    updateUserSessions(userId: DBObjectId, action: (session: SessionData) => void) {
+    }
+}
+
 describe('user', () => {
     let service;
 
     beforeAll(() => {
         // @ts-ignore
-        service = new UserService(fakeUserModel, fakeUserRepo, fakeBcrypt);
+        service = new UserService(fakeUserModel, fakeUserRepo, fakeBcrypt, fakeSessionService);
 
         userList = [
             {

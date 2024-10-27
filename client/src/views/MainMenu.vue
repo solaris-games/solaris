@@ -167,6 +167,7 @@ export default {
       this.$store.commit('clearRoles')
       this.$store.commit('clearUserCredits')
       this.$store.commit('clearUserIsEstablishedPlayer')
+      this.$store.commit('clearIsImpersonating')
 
       this.isLoggingOut = false
 
