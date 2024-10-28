@@ -9,6 +9,7 @@ import 'pixi.js-legacy'
 import 'pixi-viewport'
 import '@pixi/graphics-extras';
 import ToastPlugin from "vue-toast-notification";
+import 'vue-toast-notification/dist/theme-default.css';
 import "@/assets/styles.css";
 
 // Note: This was done to get around an issue where the Steam client
