@@ -1171,6 +1171,7 @@ class GameHelper {
       '1v1_rt': '1 vs. 1',
       '1v1_tb': '1 vs. 1 - TB',
       '32_player_rt': '32 Players',
+      '16_player_relaxed': '16 Players - Relaxed',
       'custom': 'Custom',
       'special_dark': 'Dark Galaxy',
       'special_fog': 'Fogged Galaxy',
@@ -1183,7 +1184,7 @@ class GameHelper {
       'special_kingOfTheHill': 'King Of The Hill',
       'special_tinyGalaxy': 'Tiny Galaxy',
       'special_freeForAll': 'Free For All',
-      'special_arcade': 'Arcade'
+      'special_arcade': 'Arcade',
     }[game.settings.general.type]
   }
 
