@@ -130,17 +130,17 @@
 <script>
 import router from '../../../../router'
 import gameService from '../../../../services/api/game'
-import ModalButton from '../../../components/modal/ModalButton'
-import DialogModal from '../../../components/modal/DialogModal'
+import ModalButton from '../../../components/modal/ModalButton.vue'
+import DialogModal from '../../../components/modal/DialogModal.vue'
 import GameHelper from '../../../../services/gameHelper'
-import MenuTitle from '../MenuTitle'
+import MenuTitle from '../MenuTitle.vue'
 import AudioService from '../../../../game/audio'
-import NewPlayerMessageVue from '../welcome/NewPlayerMessage'
-import ShareLinkVue from '../welcome/ShareLink'
-import HelpTooltip from '../../../components/HelpTooltip'
-import ConcedeDefeatButton from './ConcedeDefeatButton'
-import PlayerLeaderboard from './PlayerLeaderboard';
-import TeamLeaderboard from './TeamLeaderboard';
+import NewPlayerMessageVue from '../welcome/NewPlayerMessage.vue'
+import ShareLinkVue from '../welcome/ShareLink.vue'
+import HelpTooltip from '../../../components/HelpTooltip.vue'
+import ConcedeDefeatButton from './ConcedeDefeatButton.vue'
+import PlayerLeaderboard from './PlayerLeaderboard.vue';
+import TeamLeaderboard from './TeamLeaderboard.vue';
 
 export default {
   components: {
@@ -176,7 +176,7 @@ export default {
       this.recalculateTimeRemaining()
     }
   },
-  destroyed() {
+  unmounted() {
     clearInterval(this.intervalFunction)
   },
   methods: {
@@ -212,7 +212,7 @@ export default {
 
         if (response.status === 200) {
           AudioService.quit()
-          this.$toasted.show(`You have quit ${this.$store.state.game.settings.general.name}.`, {type: 'error'})
+          this.$toast.error(`You have quit ${this.$store.state.game.settings.general.name}.`)
           router.push({name: 'main-menu'})
         }
       } catch (err) {
@@ -231,9 +231,9 @@ export default {
 
         if (response.status === 200) {
           if (this.isTutorialGame) {
-            this.$toasted.show(`You have confirmed your move, please wait while the game processes the tick.`, { type: 'success' })
+            this.$toast.success(`You have confirmed your move, please wait while the game processes the tick.`)
           } else {
-            this.$toasted.show(`You have confirmed your move, once all players are ready the game will progress automatically.`, { type: 'success' })
+            this.$toast.success(`You have confirmed your move, once all players are ready the game will progress automatically.`)
           }
 
           player.ready = true
@@ -252,9 +252,9 @@ export default {
 
         if (response.status === 200) {
           if (this.isTutorialGame) {
-            this.$toasted.show(`You have confirmed your move, please wait while the game processes the tick.`, { type: 'success' })
+            this.$toast.success(`You have confirmed your move, please wait while the game processes the tick.`)
           } else {
-            this.$toasted.show(`You have confirmed your move, once all players are ready the game will progress automatically.`, { type: 'success' })
+            this.$toast.success(`You have confirmed your move, once all players are ready the game will progress automatically.`)
           }
 
           player.ready = true
@@ -299,7 +299,7 @@ export default {
         let response = await gameService.confirmReadyToQuit(this.$store.state.game._id)
 
         if (response.status === 200) {
-          this.$toasted.show(`You have confirmed that you are ready to quit.`, {type: 'success'})
+          this.$toast.success(`You have confirmed that you are ready to quit.`)
 
           player.readyToQuit = true
         }
@@ -335,7 +335,7 @@ export default {
     },
     getAvatarImage (player) {
       try {
-      return require(`../../../../assets/avatars/${player.avatar}`)
+      return new URL(`../../../../assets/avatars/${player.avatar}`, import.meta.url).href
       } catch (err) {
         console.error(err)
 

@@ -28,11 +28,11 @@
   </view-container>
 </template>
 <script>
-import ViewContainer from '../components/ViewContainer';
-import ViewTitle from '../components/ViewTitle';
-import LoadingSpinner from '../components/LoadingSpinner';
+import ViewContainer from '../components/ViewContainer.vue';
+import ViewTitle from '../components/ViewTitle.vue';
+import LoadingSpinner from '../components/LoadingSpinner.vue';
 import GuildApiService from '../../services/api/guild';
-import GuildMemberList from './components/MemberList';
+import GuildMemberList from './components/MemberList.vue';
 
 export default {
   components: {

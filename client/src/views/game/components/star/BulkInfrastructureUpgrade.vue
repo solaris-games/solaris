@@ -174,15 +174,15 @@
 </template>
 
 <script>
-import MenuTitle from '../MenuTitle'
-import FormErrorList from '../../../components/FormErrorList'
+import MenuTitle from '../MenuTitle.vue'
+import FormErrorList from '../../../components/FormErrorList.vue'
 import starService from '../../../../services/api/star'
 import GameHelper from '../../../../services/gameHelper'
 import AudioService from '../../../../game/audio'
 import GameContainer from '../../../../game/container'
-import BulkInfrastructureUpgradeScheduleTable from './BulkInfrastructureUpgradeScheduleTable'
-import BulkInfrastructureUpgradeStarTableVue from './BulkInfrastructureUpgradeStarTable'
-import LoadingSpinner from '../../../components/LoadingSpinner'
+import BulkInfrastructureUpgradeScheduleTable from './BulkInfrastructureUpgradeScheduleTable.vue'
+import BulkInfrastructureUpgradeStarTableVue from './BulkInfrastructureUpgradeStarTable.vue'
+import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 
 export default {
   components: {
@@ -223,7 +223,7 @@ export default {
 
     this.setupInfrastructureTypes()
   },
-  destroyed() {
+  unmounted() {
     GameContainer.map.hideIgnoreBulkUpgrade()
   },
   computed: {
@@ -330,7 +330,7 @@ export default {
 
             this.actionCount = GameHelper.getUserPlayer(this.$store.state.game)?.scheduledActions?.length || 0;
 
-            this.$toasted.show(`Action scheduled. Action will be executed on tick ${response.data.tick}.`, {type: 'success'})
+            this.$toast.success(`Action scheduled. Action will be executed on tick ${response.data.tick}.`)
           }
         } catch (err) {
           this.errors = err.response.data.errors || []
@@ -386,7 +386,7 @@ export default {
 
           this.$store.commit('gameStarBulkUpgraded', response.data)
 
-          this.$toasted.show(`Upgrade complete. Purchased ${response.data.upgraded} ${this.selectedType} for ${response.data.cost} credits.`, {type: 'success'})
+          this.$toast.success(`Upgrade complete. Purchased ${response.data.upgraded} ${this.selectedType} for ${response.data.cost} credits.`)
 
           if (this.selectedUpgradeStrategy === 'totalCredits') {
             this.amount = GameHelper.getUserPlayer(this.$store.state.game).credits

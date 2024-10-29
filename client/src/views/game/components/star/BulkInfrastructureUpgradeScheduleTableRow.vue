@@ -14,8 +14,8 @@
 </template>
 
 <script>
-import RepeatBulkUpgrade from './RepeatBulkUpgrade'
-import TrashBulkUpgade from './TrashBulkUpgrade'
+import RepeatBulkUpgrade from './RepeatBulkUpgrade.vue'
+import TrashBulkUpgade from './TrashBulkUpgrade.vue'
 
 export default {
   components: {

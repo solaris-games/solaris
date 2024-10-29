@@ -232,4 +232,5 @@ export interface User {
     avatars: number[];
     oauth: UserOAuth;
     subscriptions: UserSubscriptions;
+    tutorialsCompleted?: string[];
 };

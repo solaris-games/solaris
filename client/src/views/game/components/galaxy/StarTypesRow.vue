@@ -18,8 +18,8 @@
 
 <script>
 import gameContainer from '../../../../game/container'
-import PlayerIconVue from '../player/PlayerIcon'
-import SpecialistIcon from '../specialist/SpecialistIcon'
+import PlayerIconVue from '../player/PlayerIcon.vue'
+import SpecialistIcon from '../specialist/SpecialistIcon.vue'
 
 export default {
   components: {

@@ -21,9 +21,9 @@
 
 <script>
 import gameContainer from '../../../../game/container'
-import SpecialistIcon from '../specialist/SpecialistIcon'
-import IgnoreBulkUpgradeVue from './IgnoreBulkUpgrade'
-import StarResourcesVue from './StarResources'
+import SpecialistIcon from '../specialist/SpecialistIcon.vue'
+import IgnoreBulkUpgradeVue from './IgnoreBulkUpgrade.vue'
+import StarResourcesVue from './StarResources.vue'
 
 export default {
   components: {

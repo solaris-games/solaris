@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import LogoVue from './Logo'
+import LogoVue from './Logo.vue'
 import ViewContainerTopBarVue from './ViewContainerTopBar.vue'
 
 export default {
@@ -55,6 +55,6 @@ export default {
 
 <style scoped>
 #content {
-  padding-top: 52px !important;
+  padding-top: 52px;
 }
 </style>

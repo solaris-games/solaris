@@ -25,8 +25,8 @@ export default {
         if (!this.specialist) {
             return null
         }
-        
-        return require(`../../../../assets/specialists/${this.specialist.key}.svg`)
+
+        return new URL(`../../../../assets/specialists/${this.specialist.key}.svg`, import.meta.url).href
     }
   }
 }

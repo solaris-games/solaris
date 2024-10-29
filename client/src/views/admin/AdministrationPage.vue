@@ -30,9 +30,9 @@
 </template>
 
 <script>
-import ViewContainer from '../components/ViewContainer'
-import ViewTitle from '../components/ViewTitle'
-import LoadingSpinner from '../components/LoadingSpinner'
+import ViewContainer from '../components/ViewContainer.vue'
+import ViewTitle from '../components/ViewTitle.vue'
+import LoadingSpinner from '../components/LoadingSpinner.vue'
 
 export default {
   components: {

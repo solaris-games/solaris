@@ -50,7 +50,7 @@ export default {
       const resp = await AdminApiService.getPasswordResets()
 
       if (resp.status !== 200) {
-        this.$toasted.error(resp.data.message)
+        this.$toast.error(resp.data.message)
         return null
       }
 

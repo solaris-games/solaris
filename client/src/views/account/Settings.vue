@@ -20,7 +20,7 @@
           </p>
         </div>
       </div>
-     
+
       <div class="row pt-2 pb-2">
         <div class="col">
           <p>Username</p>
@@ -113,16 +113,16 @@
 </template>
 
 <script>
-import LoadingSpinnerVue from '../components/LoadingSpinner'
-import ViewContainer from '../components/ViewContainer'
-import ViewTitle from '../components/ViewTitle'
-import ViewSubtitleVue from '../components/ViewSubtitle'
-import SubscriptionsVue from './components/Subscriptions'
-import OptionsFormVue from '../game/components/menu/OptionsForm'
+import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
+import ViewContainer from '../components/ViewContainer.vue'
+import ViewTitle from '../components/ViewTitle.vue'
+import ViewSubtitleVue from '../components/ViewSubtitle.vue'
+import SubscriptionsVue from './components/Subscriptions.vue'
+import OptionsFormVue from '../game/components/menu/OptionsForm.vue'
 import userService from '../../services/api/user'
 import authService from '../../services/api/auth'
 import router from '../../router'
-import Roles from '../game/components/player/Roles'
+import Roles from '../game/components/player/Roles.vue'
 
 export default {
   components: {
@@ -149,11 +149,11 @@ export default {
     }
 
     let discordSuccess = this.$route.query.discordSuccess
-    
+
     if (discordSuccess === 'true') {
-      this.$toasted.show(`Successfully authenticated with Discord!`, { type: 'success' })
+      this.$toast.success(`Successfully authenticated with Discord!`)
     } else if (discordSuccess === 'false') {
-      this.$toasted.show(`There was a problem connecting to Discord, please try again.`, { type: 'error' })
+      this.$toast.error(`There was a problem connecting to Discord, please try again.`)
     }
   },
   methods: {
@@ -219,11 +219,11 @@ export default {
         let response = await authService.clearOauthDiscord()
 
         if (response.status === 200) {
-          this.$toasted.show(`Successfully disconnected from Discord`, { type: 'success' })
+          this.$toast.success(`Successfully disconnected from Discord`)
 
           this.info.oauth.discord = null
         } else {
-          this.$toasted.show(`There was a problem disconecting from Discord, please try again.`, { type: 'error' })
+          this.$toast.error(`There was a problem disconnecting from Discord, please try again.`)
         }
       } catch (err) {
         console.error(err)
@@ -232,7 +232,7 @@ export default {
   },
   computed: {
     discordOauthURL () {
-      return process.env.VUE_APP_DISCORD_OAUTH_URL
+      return import.meta.env.VUE_APP_DISCORD_OAUTH_URL
     },
     isAuthenticatedWithDiscord () {
       return this.info && this.info.oauth && this.info.oauth.discord && this.info.oauth.discord.userId != null

@@ -23,14 +23,14 @@ export default {
     async toggleRepeat () {
       try {
         let response = await starService.bulkScheduleRepeatChanged(this.$store.state.game._id, this.action._id)
-        
+
         if (response.status === 200) {
           this.action.repeat = !this.action.repeat
 
           if (this.action.repeat) {
-            this.$toasted.show(`Your Bulk Upgrade will be repeated every cycle.`)
+            this.$toast.default(`Your Bulk Upgrade will be repeated every cycle.`)
           } else {
-            this.$toasted.show(`Your Bulk Upgrade will only be executed on tick ${this.action.tick}.`)
+            this.$toast.default(`Your Bulk Upgrade will only be executed on tick ${this.action.tick}.`)
           }
         }
       } catch (err) {

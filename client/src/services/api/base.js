@@ -4,7 +4,7 @@ import router from '../../router';
 
 class BaseApiService {
   constructor () {
-    this.BASE_URL = process.env.VUE_APP_API_HOST + '/api/'
+    this.BASE_URL = import.meta.env.VUE_APP_API_HOST + '/api/'
 
     axios.interceptors.request.use(config => {
       config.headers['Idempotency-Key'] = this.buildIdempotencyKey();

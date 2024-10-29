@@ -8,6 +8,9 @@
   </div>
 
   <div class="menu" v-if="userId">
+    <button v-if="userIsImpersonated" @click="endImpersonate()" class="btn btn-success">
+      End Impersonation
+    </button>
     <div class="menu-item dropdown dropdown-mobile-full">
       <router-link :to="{ name: 'administration-games'}" v-if="userHasAdminRole" class="menu-link">
         <div class="menu-icon"><i class="fas fa-users-cog"></i></div>
@@ -54,6 +57,7 @@
 <script>
 import router from '../../router'
 import authService from '../../services/api/auth'
+import AdminApiService from '../../services/api/admin'
 
 export default {
   data () {
@@ -72,6 +76,7 @@ export default {
       this.$store.commit('clearRoles')
       this.$store.commit('clearUserCredits')
       this.$store.commit('clearUserIsEstablishedPlayer')
+      this.$store.commit('clearIsImpersonating')
 
       this.isLoggingOut = false
 
@@ -82,6 +87,23 @@ export default {
     },
     goHome () {
       router.push({name: 'home'})
+    },
+    async endImpersonate() {
+      try {
+        let response = await AdminApiService.endImpersonate()
+
+        if (response.status === 200) {
+          this.$store.commit('setUserId', response.data._id)
+          this.$store.commit('setUsername', response.data.username)
+          this.$store.commit('setRoles', response.data.roles)
+          this.$store.commit('setUserCredits', response.data.credits)
+          this.$store.commit('setIsImpersonating', undefined)
+        }
+
+        router.push({name: 'home'})
+      } catch (err) {
+        console.error(err)
+      }
     }
   },
   computed: {
@@ -96,6 +118,9 @@ export default {
     },
     userHasAdminRole () {
       return this.$store.state.roles && (this.$store.state.roles.administrator || this.$store.state.roles.communityManager || this.$store.state.roles.gameMaster)
+    },
+    userIsImpersonated() {
+      return this.$store.state.isImpersonating;
     }
   }
 }

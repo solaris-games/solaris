@@ -26,11 +26,11 @@
 </template>
 
 <script>
-import LoadingSpinnerVue from '../components/LoadingSpinner'
-import ViewContainer from '../components/ViewContainer'
+import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
+import ViewContainer from '../components/ViewContainer.vue'
 import router from '../../router'
-import ViewTitle from '../components/ViewTitle'
-import FormErrorList from '../components/FormErrorList'
+import ViewTitle from '../components/ViewTitle.vue'
+import FormErrorList from '../components/FormErrorList.vue'
 import userService from '../../services/api/user'
 
 export default {
@@ -78,10 +78,10 @@ export default {
         let response = await userService.resetPassword(this.token, this.newPassword)
 
         if (response.status === 200) {
-          this.$toasted.show(`Your password has been reset.`, { type: 'success' })
+          this.$toast.success(`Your password has been reset.`)
           router.push({ name: 'home' })
         } else {
-          this.$toasted.show(`There was a problem resetting your password, please try again.`, { type: 'error' })
+          this.$toast.error(`There was a problem resetting your password, please try again.`)
         }
       } catch (err) {
         console.log(err)

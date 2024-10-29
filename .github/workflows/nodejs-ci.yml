@@ -34,6 +34,8 @@ jobs:
     # Run CI for Server
     - run: npm ci
       working-directory: ${{ env.directory-server }}
+    - run: npm run check
+      working-directory: ${{ env.directory-server }}
     - run: npm run build --if-present
       working-directory: ${{ env.directory-server }}
     - run: npm test

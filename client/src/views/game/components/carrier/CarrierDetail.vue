@@ -211,16 +211,16 @@
 <script>
 import GameHelper from '../../../../services/gameHelper'
 import CarrierApiService from '../../../../services/api/carrier'
-import MenuTitle from '../MenuTitle'
+import MenuTitle from '../MenuTitle.vue'
 import GameContainer from '../../../../game/container'
-import WaypointTable from './WaypointTable'
-import CarrierSpecialistVue from './CarrierSpecialist'
-import GiftCarrierVue from './GiftCarrier'
-import SpecialistIconVue from '../specialist/SpecialistIcon'
-import ModalButton from '../../../components/modal/ModalButton'
-import DialogModal from '../../../components/modal/DialogModal'
+import WaypointTable from './WaypointTable.vue'
+import CarrierSpecialistVue from './CarrierSpecialist.vue'
+import GiftCarrierVue from './GiftCarrier.vue'
+import SpecialistIconVue from '../specialist/SpecialistIcon.vue'
+import ModalButton from '../../../components/modal/ModalButton.vue'
+import DialogModal from '../../../components/modal/DialogModal.vue'
 import AudioService from '../../../../game/audio'
-import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning'
+import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning.vue'
 
 export default {
   components: {
@@ -270,7 +270,7 @@ export default {
       this.recalculateTimeRemaining()
     }
   },
-  destroyed () {
+  unmounted () {
     GameContainer.map.off('onWaypointCreated', this.onWaypointCreatedHandler)
 
     clearInterval(this.intervalFunction)
@@ -345,7 +345,7 @@ export default {
         const response = await CarrierApiService.loopWaypoints(this.$store.state.game._id, this.carrier._id, !this.carrier.waypointsLooped)
 
         if (response.status === 200) {
-          this.$toasted.show(`${this.carrier.name} waypoints updated.`)
+          this.$toast.default(`${this.carrier.name} waypoints updated.`)
 
           this.carrier.waypointsLooped = !this.carrier.waypointsLooped
 
@@ -383,7 +383,7 @@ export default {
 
           GameContainer.reloadCarrier(this.carrier)
 
-          this.$toasted.show(`${this.carrier.name} has been converted into a gift.`)
+          this.$toast.default(`${this.carrier.name} has been converted into a gift.`)
         }
       } catch (err) {
         console.error(err)
@@ -439,7 +439,7 @@ export default {
         const response = await CarrierApiService.scuttle(this.$store.state.game._id, this.carrier._id)
 
         if (response.status === 200) {
-          this.$toasted.show(`${this.carrier.name} has been scuttled. All ships will be destroyed.`)
+          this.$toast.default(`${this.carrier.name} has been scuttled. All ships will be destroyed.`)
 
           this.$store.commit('gameCarrierScuttled', {
             carrierId: this.carrier._id

@@ -18,7 +18,7 @@
 <script>
 import GameApiService from '../../../../services/api/game'
 import SpecialistApiService from '../../../../services/api/specialist'
-import HelpTooltip from '../../../components/HelpTooltip'
+import HelpTooltip from '../../../components/HelpTooltip.vue'
 
 export default {
     components: {
@@ -51,7 +51,7 @@ export default {
                     const bans = response.data
 
                     await this.$confirm(`Ban List`, `This month's bans are as follows.
-            
+
 Star specialists:
 ${bans.star.map(s => s.name).join(', ')}
 

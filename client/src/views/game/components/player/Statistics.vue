@@ -73,7 +73,7 @@
 
 <script>
 import GameHelper from '../../../../services/gameHelper'
-import StatisticRow from './StatisticRow'
+import StatisticRow from './StatisticRow.vue'
 
 export default {
   components: {

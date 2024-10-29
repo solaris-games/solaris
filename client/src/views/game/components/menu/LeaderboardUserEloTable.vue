@@ -39,9 +39,9 @@
 </template>
 
 <script>
-import SortableLeaderboard from './SortableLeaderboard';
+import SortableLeaderboard from './SortableLeaderboard.vue';
 import UserApiService from '../../../../services/api/user';
-import LoadingSpinner from '../../../components/LoadingSpinner';
+import LoadingSpinner from '../../../components/LoadingSpinner.vue';
 
 export default {
   components: {
@@ -75,7 +75,7 @@ export default {
       try {
         const response = await UserApiService.getLeaderboard(this.limit, key, 0);
         if (response.status === 200) {
-          this.$set(this.leaderboards, key, response.data.leaderboard);
+          this.leaderboards[key] = response.data.leaderboard;
           this.totalPlayers = response.data.totalPlayers;
         }
       } catch (err) {

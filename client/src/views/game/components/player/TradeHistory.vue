@@ -61,8 +61,8 @@
 import TradeApiService from '../../../../services/api/trade'
 import GameHelper from '../../../../services/gameHelper'
 import TechnologyHelper from '../../../../services/technologyHelper'
-import LoadingSpinner from '../../../components/LoadingSpinner'
-import * as moment from 'moment'
+import LoadingSpinner from '../../../components/LoadingSpinner.vue'
+import moment from 'moment'
 
 export default {
     components: {

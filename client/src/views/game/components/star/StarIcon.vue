@@ -19,10 +19,10 @@
 </template>
 
 <script>
-import SvgWrapperVlue from '../../../components/SvgWrapper'
+import SvgWrapperVue from '../../../components/SvgWrapper.vue'
 export default {
   components: {
-    'svg-wrapper': SvgWrapperVlue
+    'svg-wrapper': SvgWrapperVue
   },
   props: {
     isAsteroidField: false,
@@ -35,47 +35,41 @@ export default {
   computed: {
     iconSource() {
       // TODO: Combos?
-      /*if (this.isBinaryStar && this.isBlackHole) {
-        return require('../../../../assets/map-objects/128x128_star_black_hole_binary.svg');
-      }
-      else*/ if (this.isBinaryStar) {
-        return require('../../../../assets/map-objects/128x128_star_scannable_binary.svg');
+     if (this.isBinaryStar) {
+        return new URL(`../../../../assets/map-objects/128x128_star_scannable_binary.svg`, import.meta.url).href;
       }
       else if (this.isNebula) {
-        return `mask-image: url(${require('../../../../assets/nebula/neb0-starless-bright.png')});`;
+        return `mask-image: url(${new URL(`../../../../assets/nebula/neb0-starless-bright.png`, import.meta.url)});`;
       }
       else if (this.isBlackHole) {
-        return require('../../../../assets/map-objects/128x128_star_black_hole.svg');
+        return new URL(`../../../../assets/map-objects/128x128_star_black_hole.svg`, import.meta.url).href;
       }
-      //else if (this.isAsteroidField) {
-      //  return `mask-image: url(${require('../../../../assets/stars/star-asteroid-field-2.png')});`;
-      //}
       else if (this.isPulsar) {
-        return require('../../../../assets/stars/128x128_star_pulsar.svg');
+        return new URL(`../../../../assets/stars/128x128_star_pulsar.svg`, import.meta.url).href;
       }
       else if (this.isWormHole) {
-        return `mask-image: url(${require('../../../../assets/stars/vortex.png')});`;
+        return `mask-image: url(${new URL(`../../../../assets/stars/vortex.png`, import.meta.url).href});`;
       }
       else {
-        return require('../../../../assets/map-objects/128x128_star_scannable.svg');
+        return new URL(`../../../../assets/map-objects/128x128_star_scannable.svg`, import.meta.url).href;
       }
     }
   }
 }
 </script>
 
-<style scoped>
+<style>
   .star-svg {
     width: 15px;
     height: 15px;
   }
-  .star-svg >>> .star {
+  .star-svg:deep(.star) {
     fill: currentColor;
   }
-  .star-svg >>> .pulsar {
+  .star-svg:deep(.pulsar) {
     stroke: currentColor;
   }
-  .star-svg >>> .black-hole {
+  .star-svg:deep(.black-hole) {
     fill: transparent;
     stroke: currentColor;
   }
@@ -91,6 +85,8 @@ export default {
   .nebulaIcon, .wormHoleIcon {
     width: 18px;
     height: 18px;
+    display: inline-block;
+    vertical-align: bottom;
   }
 
   .nebulaIcon {

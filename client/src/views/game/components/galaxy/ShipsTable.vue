@@ -51,7 +51,7 @@
 <script>
 import GameHelper from '../../../../services/gameHelper'
 import GridHelper from '../../../../services/gridHelper'
-import ShipRowVue from './ShipRow'
+import ShipRowVue from './ShipRow.vue'
 import SortInfo from '../../../../services/data/sortInfo'
 
 export default {
@@ -88,11 +88,23 @@ export default {
     },
     sort(...propertyPaths) {
       this.sortInfo.swapSort(propertyPaths);
+    },
+    // TODO: Move this method to a base class of the table vue components (eg StarTable.vue) once we move to Vue 3 and can use Typescript.
+    missingPropertyFallbackFunc(obj, key) {
+      switch (key) {
+        case 'ownedByPlayer':
+          return this.playersMap.get(obj.ownedByPlayerId);
+        default:
+          return null;
+      }
     }
   },
   computed: {
     userPlayer() {
       return GameHelper.getUserPlayer(this.$store.state.game);
+    },
+    playersMap() {
+      return new Map(this.$store.state.game.galaxy.players.map(p => [p._id, p]));
     },
     tableData () {
       let starShips = this.$store.state.game.galaxy.stars
@@ -101,7 +113,6 @@ export default {
           return {
             _id: s._id,
             ownedByPlayerId: s.ownedByPlayerId,
-            ownedByPlayer: s.ownedByPlayer,
             name: s.name,
             ships: s.ships,
             type: 0,
@@ -116,7 +127,6 @@ export default {
           return {
             _id: c._id,
             ownedByPlayerId: c.ownedByPlayerId,
-            ownedByPlayer: c.ownedByPlayer,
             name: c.name,
             ships: c.ships,
             type: 1,
@@ -142,7 +152,7 @@ export default {
       return tableData;
     },
     sortedFilteredTableData () {
-      return GridHelper.dynamicSort(this.filteredTableData, this.sortInfo);
+      return GridHelper.dynamicSort(this.filteredTableData, this.sortInfo, this.missingPropertyFallbackFunc);
     }
   }
 }

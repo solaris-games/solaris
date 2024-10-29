@@ -6,7 +6,7 @@
       </ul>
     </div>
     <div class="mb-2 mb-2">
-      <textarea class="form-control" id="txtMessage" :rows="rows" :placeholder="placeholderText" ref="messageElement" :value="value" @input="onMessageChange" @keydown="onKeyDown" @keyup="updateSuggestions" @select="updateSuggestions" @focus="onFocus"></textarea>
+      <textarea class="form-control" id="txtMessage" :rows="rows" :placeholder="placeholderText" ref="messageElement" :value="modelValue" @input="onMessageChange" @keydown="onKeyDown" @keyup="updateSuggestions" @select="updateSuggestions" @focus="onFocus"></textarea>
     </div>
   </div>
 </template>
@@ -19,7 +19,7 @@ export default {
   props: {
     placeholder: String,
     rows: Number,
-    value: String
+    modelValue: String
   },
   data () {
     return {
@@ -45,7 +45,7 @@ export default {
       }
     },
     onMessageChange (e) {
-      this.$emit('input', e.target.value)
+      this.$emit('update:modelValue', e.target.value)
     },
     setSelectedSuggestion (newSelected) {
       const suggestions = this.currentMention.suggestions.length
@@ -101,7 +101,7 @@ export default {
     }
   },
   watch: {
-    value: function (v) {
+    modelValue: function (v) {
       if (!v || v === '') {
         this.currentMention = null
       }
