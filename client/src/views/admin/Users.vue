@@ -29,14 +29,15 @@
           <p>
             Established Player: {{ user.isEstablishedPlayer }}
 
-            <i v-if="!user.isEstablishedPlayer" class="fas fa-user-check clickable text-danger"
+            <i v-if="isCommunityManager && !user.isEstablishedPlayer" class="fas fa-user-check clickable text-danger"
                @click="promoteToEstablishedPlayer(user)" title="Promote to Established Player"></i>
 
             <i v-if="user.isEstablishedPlayer" class="fas fa-user-check clickable text-success"></i>
           </p>
 
           <p v-if="isAdministrator">
-            <i class="fas fa-minus clickable text-danger" @click="setCredits(user, user.credits - 1)"
+            <i :style="[user.credits <= 0 ? { 'visibility': 'hidden' } : { 'visibility': 'unset' }]"
+               class="fas fa-minus clickable text-danger" @click="setCredits(user, user.credits - 1)"
                title="Deduct Credits"></i>
             {{ user.credits }}
             <i class="fas fa-plus clickable text-success" @click="setCredits(user, user.credits + 1)"
@@ -53,14 +54,14 @@
         </div>
         <div class="panel-footer">
           <div class="actions">
-            <i class="fas fa-hammer clickable text-danger" :class="{'disabled-role':!user.banned}"
+            <i v-if="isCommunityManager && user._id !== $store.state.userId" class="fas fa-hammer clickable text-danger" :class="{'disabled-role':!user.banned}"
                @click="toggleBan(user)" title="Toggle Banned"></i>
             <i v-if="isAdministrator" class="fas fa-eraser clickable text-warning ms-1" @click="resetAchievements(user)"
                title="Reset Achievements"></i>
-            <i v-if="isAdministrator" class="fas fa-user clickable text-info ms-1" @click="impersonate(user._id)"
+            <i v-if="isAdministrator && user._id !== $store.state.userId && !$store.state.isImpersonating" class="fas fa-user clickable text-info ms-1" @click="impersonate(user._id)"
                title="Impersonate User"></i>
 
-            <add-warning :user-id="user._id" @onUserChanged="update"/>
+            <add-warning v-if="isCommunityManager" :user-id="user._id" @onUserChanged="update"/>
           </div>
         </div>
       </div>
@@ -115,7 +116,7 @@ export default {
     async getUsers() {
       const resp = await AdminApiService.getUsers();
       if (resp.status !== 200) {
-        this.$toasted.error(resp.data);
+        this.$toast.error(resp.data);
         return null;
       }
 
@@ -159,6 +160,7 @@ export default {
           this.$store.commit('setUsername', response.data.username)
           this.$store.commit('setRoles', response.data.roles)
           this.$store.commit('setUserCredits', response.data.credits)
+          this.$store.commit('setIsImpersonating', response.data.isImpersonating)
         }
 
         router.push({name: 'home'})
@@ -189,6 +191,10 @@ export default {
 
         await request;
 
+        if (user._id === this.$store.state.userId) {
+          this.$store.commit('setRoles', user.roles);
+        }
+
         await this.update();
       } catch (err) {
         console.error(err)
@@ -209,7 +215,11 @@ export default {
       try {
         user.credits = Math.max(credits, 0)
 
-        await AdminApiService.setCredits(user._id, credits)
+        let response = await AdminApiService.setCredits(user._id, credits);
+
+        if (user._id === this.$store.state.userId) {
+          this.$store.commit('setUserCredits', response.data.credits);
+        }
       } catch (err) {
         console.error(err)
       }
@@ -235,6 +245,9 @@ export default {
   computed: {
     isAdministrator() {
       return this.$store.state.roles.administrator
+    },
+    isCommunityManager() {
+      return this.$store.state.roles.communityManager
     },
   }
 }

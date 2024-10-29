@@ -63,7 +63,7 @@
 </template>
 
 <script>
-import MenuTitle from '../MenuTitle'
+import MenuTitle from '../MenuTitle.vue'
 import GameHelper from '../../../../services/gameHelper'
 import ReportApiService from '../../../../services/api/report'
 
@@ -97,7 +97,7 @@ export default {
       try {
         await ReportApiService.reportPlayer(this.$store.state.game._id, this.args.playerId, this.args.messageId, this.args.conversationId, this.optionAbuse, this.optionSpamming, this.optionMultiboxing, this.optionInappropriateAlias)
 
-        this.$toasted.show(`You have reported ${this.player.alias}. We will investigate and take action if necessary.`, {type: 'success'})
+        this.$toast.success(`You have reported ${this.player.alias}. We will investigate and take action if necessary.`)
 
         this.onOpenPlayerDetailRequested()
       } catch (err) {

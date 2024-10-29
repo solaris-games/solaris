@@ -40,7 +40,7 @@ export default {
             if (!await this.$confirm('Concede Defeat', message)) {
                 return
             }
-            
+
             this.isConcedingDefeat = true
 
             try {
@@ -50,7 +50,7 @@ export default {
                     AudioService.quit()
 
                     if (!this.isTutorialGame) {
-                        this.$toasted.show(`You have conceded defeat, better luck next time.`, { type: 'error' })
+                        this.$toast.error(`You have conceded defeat, better luck next time.`)
                     }
 
                     router.push({ name: 'main-menu' })

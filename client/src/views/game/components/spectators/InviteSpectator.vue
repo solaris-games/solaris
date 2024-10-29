@@ -5,7 +5,7 @@
     <h5>Invite Spectator</h5>
 
     <form-error-list :errors="errors"/>
-      
+
     <form @submit="handleSubmit">
         <div class="row g-0">
             <div class="col">
@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import FormErrorList from '../../../components/FormErrorList'
+import FormErrorList from '../../../components/FormErrorList.vue'
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import SpectatorApiService from '../../../../services/api/spectator'
 
@@ -61,7 +61,7 @@ export default {
         let response = await SpectatorApiService.invite(this.$store.state.game._id, this.username)
 
         if (response.status === 200) {
-          this.$toasted.show(`You invited ${this.username} to spectate you in this game.`, { type: 'success' })
+          this.$toast.success(`You invited ${this.username} to spectate you in this game.`)
 
           this.$emit('onSpectatorInvited', response.data)
 

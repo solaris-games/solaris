@@ -25,17 +25,17 @@ export default {
             if (!await this.$confirm('End Turn', 'Are you sure you want to end your turn?')) {
                 return
             }
-            
+
             try {
                 let response = await GameApiService.confirmReady(this.$store.state.game._id)
 
                 if (response.status === 200) {
                     if (this.isTutorialGame) {
-                        this.$toasted.show(`You have confirmed your move, please wait while the game processes the tick.`, { type: 'success' })
+                        this.$toast.success(`You have confirmed your move, please wait while the game processes the tick.`)
                     } else {
-                        this.$toasted.show(`You have confirmed your move, once all players are ready the game will progress automatically.`, { type: 'success' })
+                        this.$toast.success(`You have confirmed your move, once all players are ready the game will progress automatically.`)
                     }
-                    
+
                     this.player.ready = true
                 }
             } catch (err) {
@@ -46,17 +46,17 @@ export default {
             if (!await this.$confirm('End Cycle', 'Are you sure you want to end your turn up to the end of the current galactic cycle?')) {
                 return
             }
-            
+
             try {
                 let response = await GameApiService.confirmReadyToCycle(this.$store.state.game._id)
 
                 if (response.status === 200) {
                     if (this.isTutorialGame) {
-                        this.$toasted.show(`You have confirmed your move, please wait while the game processes the tick.`, { type: 'success' })
+                        this.$toast.success(`You have confirmed your move, please wait while the game processes the tick.`)
                     } else {
-                        this.$toasted.show(`You have confirmed your move, once all players are ready the game will progress automatically.`, { type: 'success' })
+                        this.$toast.success(`You have confirmed your move, once all players are ready the game will progress automatically.`)
                     }
-                    
+
                     this.player.ready = true
                     this.player.readyToCycle = true
                 }

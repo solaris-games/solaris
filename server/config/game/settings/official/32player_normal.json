@@ -1,13 +1,13 @@
 {
   "general": {
     "name": "[[[RANDOM]]]",
-    "description": "This game has 32 players, expect big alliances and epic battles in this huge galaxy!",
+    "description": "Experimental Settings: This game has 32 players, expect big alliances and epic battles in this huge galaxy!",
     "createdFromTemplate": "32_player_normal",
     "type": "32_player_rt",
     "mode": "conquest",
     "password": null,
     "playerLimit": 32,
-    "playerType": "all",
+    "playerType": "establishedPlayers",
     "anonymity": "extra",
     "playerOnlineStatus": "hidden",
     "playerIPWarning": "enabled",
@@ -17,7 +17,7 @@
     "spectators": "enabled",
     "afkSlotsOpen": "enabled",
     "readyToQuit": "enabled",
-    "readyToQuitFraction": 0.9,
+    "readyToQuitFraction": 0.75,
     "readyToQuitVisibility": "anonymous",
     "awardRankTo": "top_n",
     "awardRankToTopN": 6
@@ -67,8 +67,8 @@
   },
   "player": {
     "startingStars": 6,
-    "startingCredits": 2000,
-    "startingCreditsSpecialists": 15,
+    "startingCredits": 1000,
+    "startingCreditsSpecialists": 10,
     "startingShips": 10,
     "startingInfrastructure": {
       "economy": 5,
@@ -82,7 +82,7 @@
     },
     "tradeCredits": true,
     "tradeCreditsSpecialists": false,
-    "tradeCost": 15,
+    "tradeCost": 50,
     "tradeScanning": "scanned",
     "populationCap": {
       "enabled": "disabled",

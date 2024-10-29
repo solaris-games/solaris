@@ -35,9 +35,9 @@
 
 <script>
 import eventBus from '../../../../../eventBus'
-import LoadingSpinnerVue from '../../../../components/LoadingSpinner'
+import LoadingSpinnerVue from '../../../../components/LoadingSpinner.vue'
 import ConversationApiService from '../../../../../services/api/conversation'
-import ConversationPreviewVue from './ConversationPreview'
+import ConversationPreviewVue from './ConversationPreview.vue'
 import gameHelper from '../../../../../services/gameHelper'
 
 export default {
@@ -76,10 +76,10 @@ export default {
     this.refreshList()
   },
   created () {
-    this.sockets.subscribe('gameMessageSent', this.onMessageReceived)
+    this.$socket.subscribe('gameMessageSent', this.onMessageReceived)
   },
-  destroyed () {
-    this.sockets.unsubscribe('gameMessageSent')
+  unmounted () {
+    this.$socket.unsubscribe('gameMessageSent')
   },
   methods: {
     async refreshList () {

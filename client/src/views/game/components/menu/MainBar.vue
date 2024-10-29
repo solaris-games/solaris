@@ -174,8 +174,8 @@ import MapObjectSelectorVue from './MapObjectSelector.vue'
 import GameHelper from '../../../../services/gameHelper'
 import CombatCalculatorVue from '../carrier/CombatCalculator.vue'
 import RulerVue from '../ruler/Ruler.vue'
-import HeaderBarVue from './HeaderBar'
-import SidebarMenuVue from './SidebarMenu'
+import HeaderBarVue from './HeaderBar.vue'
+import SidebarMenuVue from './SidebarMenu.vue'
 import LedgerVue from '../ledger/Ledger.vue'
 import DiplomacyVue from '../diplomacy/Diplomacy.vue'
 import HireSpecialistCarrierVue from '../specialist/HireSpecialistCarrier.vue'
@@ -186,7 +186,7 @@ import SettingsVue from '../settings/Settings.vue'
 import ConversationCreateVue from '../inbox/conversations/ConversationCreate.vue'
 import ConversationDetailVue from '../inbox/conversations/ConversationDetail.vue'
 import FooterBarVue from './FooterBar.vue'
-import NotLoggedInBarVue from './NotLoggedInBar'
+import NotLoggedInBarVue from './NotLoggedInBar.vue'
 import SpectatingWarningBarVue from './SpectatingWarningBar.vue'
 import PlayerBadgeShopVue from '../badges/PlayerBadgeShop.vue'
 import ReportPlayerVue from '../report/ReportPlayer.vue'
@@ -248,7 +248,7 @@ export default {
     eventBus.$on('onViewConversationRequested', this.onViewConversationRequested)
     eventBus.$on('onOpenInboxRequested', this.onOpenInboxRequested)
   },
-  destroyed () {
+  unmounted () {
     eventBus.$off('onMenuRequested', this.onMenuRequested)
     eventBus.$off('onCreateNewConversationRequested', this.onCreateNewConversationRequested)
     eventBus.$off('onViewConversationRequested', this.onViewConversationRequested)
@@ -373,7 +373,8 @@ export default {
 
 <style scoped>
 .header-bar {
-  position:absolute;
+  position:fixed;
+  top: 0;
   height: 45px;
   z-index: 1;
 }

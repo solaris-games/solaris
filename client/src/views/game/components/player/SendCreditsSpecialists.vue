@@ -32,8 +32,8 @@
 
 <script>
 import tradeService from '../../../../services/api/trade'
-import ModalButton from '../../../components/modal/ModalButton'
-import DialogModal from '../../../components/modal/DialogModal'
+import ModalButton from '../../../components/modal/ModalButton.vue'
+import DialogModal from '../../../components/modal/DialogModal.vue'
 import FormErrorList from '../../../components/FormErrorList.vue'
 
 export default {
@@ -65,7 +65,7 @@ export default {
         if (response.status === 200) {
           this.$emit('onCreditsSpecialistsSent', this.amount)
 
-          this.$toasted.show(`Sent ${this.amount} specialist token(s) to ${this.player.alias}.`)
+          this.$toast.default(`Sent ${this.amount} specialist token(s) to ${this.player.alias}.`)
 
           this.userPlayer.creditsSpecialists -= this.amount
           this.amount = 0

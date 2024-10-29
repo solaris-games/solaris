@@ -24,7 +24,7 @@ import eventBus from '../../../../eventBus'
 import MENU_STATES from '../../../../services/data/menuStates'
 import KEYBOARD_SHORTCUTS from '../../../../services/data/keyboardShortcuts'
 import GameHelper from '../../../../services/gameHelper'
-import ConversationListVue from '../inbox/conversations/ConversationList'
+import ConversationListVue from '../inbox/conversations/ConversationList.vue'
 import ConversationCreateVue from './conversations/ConversationCreate.vue'
 import ConversationDetailVue from './conversations/ConversationDetail.vue'
 import AudioService from '../../../../game/audio'
@@ -45,7 +45,7 @@ export default {
     document.addEventListener('keydown', this.handleKeyDown)
     window.addEventListener('resize', this.handleResize)
 
-    this.sockets.subscribe('gameMessageSent', (data) => this.onMessageReceived(data))
+    this.$socket.subscribe('gameMessageSent', (data) => this.onMessageReceived(data))
   },
   mounted () {
     this.$store.commit('setMenuStateChat', {
@@ -59,11 +59,11 @@ export default {
     eventBus.$on('onViewConversationRequested', this.onViewConversationRequested)
     eventBus.$on('onOpenInboxRequested', this.onOpenInboxRequested)
   },
-  destroyed () {
+  unmounted () {
     document.removeEventListener('keydown', this.handleKeyDown)
     window.removeEventListener('resize', this.handleResize)
 
-    this.sockets.unsubscribe('gameMessageSent')
+    this.$socket.unsubscribe('gameMessageSent')
 
     eventBus.$off('onMenuChatSidebarRequested', this.toggle)
     eventBus.$off('onCreateNewConversationRequested', this.onCreateNewConversationRequested)
@@ -143,31 +143,16 @@ export default {
 
       let fromPlayer = GameHelper.getPlayerById(this.$store.state.game, e.fromPlayerId)
 
-      this.$toasted.show(`New message from ${fromPlayer.alias}.`, {
-        duration: null,
-        type: 'info',
+      this.$toast.info(`New message from ${fromPlayer.alias}.`, {
         duration: 10000,
-        action: [
-          {
-            text: 'Dismiss',
-            onClick: (e, toastObject) => {
-              toastObject.goAway(0)
-            }
-          },
-          {
-            text: 'View',
-            onClick: (e, toastObject) => {
-              this.$store.commit('setMenuStateChat', {
-                state: MENU_STATES.CONVERSATION,
-                args: conversationId
-              })
+        onClick: () => {
+          this.$store.commit('setMenuStateChat', {
+            state: MENU_STATES.CONVERSATION,
+            args: conversationId
+          })
 
-              this.isExpanded = true
-
-              toastObject.goAway(0)
-            }
-          }
-        ]
+          this.isExpanded = true
+        }
       })
 
       AudioService.join()

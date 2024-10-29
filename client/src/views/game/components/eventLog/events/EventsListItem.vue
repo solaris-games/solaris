@@ -70,42 +70,42 @@
 
 <script>
 import EventApiService from '../../../../../services/api/event'
-import GameEndedVue from './GameEnded'
-import GamePausedVue from './GamePaused'
-import GamePlayerAFKVue from './GamePlayerAFK'
-import GamePlayerDefeatedVue from './GamePlayerDefeated'
-import GamePlayerBadgePurchasedVue from './GamePlayerBadgePurchased'
-import GamePlayerJoinedVue from './GamePlayerJoined'
-import GamePlayerQuitVue from './GamePlayerQuit'
-import GameStartedVue from './GameStarted'
-import PlayerBulkInfrastructureUpgradedVue from './PlayerBulkInfrastructureUpgraded'
-import PlayerCombatStarEventVue from './PlayerCombatStarEvent'
-import PlayerCombatCarrierEventVue from './PlayerCombatCarrierEvent'
-import PlayerCreditsReceivedVue from './PlayerCreditsReceived'
-import PlayerCreditsSentVue from './PlayerCreditsSent'
-import PlayerCreditsSpecialistsReceivedVue from './PlayerCreditsSpecialistsReceived'
-import PlayerCreditsSpecialistsSentVue from './PlayerCreditsSpecialistsSent'
-import PlayerGiftReceivedVue from './PlayerGiftReceived'
-import PlayerGiftSentVue from './PlayerGiftSent'
-import PlayerGalacticCycleCompleteEventVue from './PlayerGalacticCycleCompleteEvent'
-import PlayerRenownReceivedVue from './PlayerRenownReceived'
-import PlayerRenownSentVue from './PlayerRenownSent'
-import PlayerResearchCompleteVue from './PlayerResearchComplete'
-import PlayerStarAbandonedVue from './PlayerStarAbandoned'
-import PlayerStarDiedVue from './PlayerStarDied'
-import PlayerStarReignitedVue from './PlayerStarReignited'
-import PlayerTechnologyReceivedVue from './PlayerTechnologyReceived'
-import PlayerTechnologySentVue from './PlayerTechnologySent'
-import PlayerDebtForgivenVue from './PlayerDebtForgiven'
-import PlayerDebtSettledVue from './PlayerDebtSettled'
-import PlayerStarSpecialistHiredVue from './PlayerStarSpecialistHired'
-import PlayerCarrierSpecialistHiredVue from './PlayerCarrierSpecialistHired'
-import PlayerConversationCreatedVue from './PlayerConversationCreated'
-import PlayerConversationInvitedVue from './PlayerConversationInvited'
-import PlayerConversationLeftVue from './PlayerConversationLeft'
-import GameDiplomacyPeaceDeclaredVue from './GameDiplomacyPeaceDeclared'
-import GameDiplomacyWarDeclaredVue from './GameDiplomacyWarDeclared'
-import PlayerDiplomacyStatusChangedVue from './PlayerDiplomacyStatusChanged'
+import GameEndedVue from './GameEnded.vue'
+import GamePausedVue from './GamePaused.vue'
+import GamePlayerAFKVue from './GamePlayerAFK.vue'
+import GamePlayerDefeatedVue from './GamePlayerDefeated.vue'
+import GamePlayerBadgePurchasedVue from './GamePlayerBadgePurchased.vue'
+import GamePlayerJoinedVue from './GamePlayerJoined.vue'
+import GamePlayerQuitVue from './GamePlayerQuit.vue'
+import GameStartedVue from './GameStarted.vue'
+import PlayerBulkInfrastructureUpgradedVue from './PlayerBulkInfrastructureUpgraded.vue'
+import PlayerCombatStarEventVue from './PlayerCombatStarEvent.vue'
+import PlayerCombatCarrierEventVue from './PlayerCombatCarrierEvent.vue'
+import PlayerCreditsReceivedVue from './PlayerCreditsReceived.vue'
+import PlayerCreditsSentVue from './PlayerCreditsSent.vue'
+import PlayerCreditsSpecialistsReceivedVue from './PlayerCreditsSpecialistsReceived.vue'
+import PlayerCreditsSpecialistsSentVue from './PlayerCreditsSpecialistsSent.vue'
+import PlayerGiftReceivedVue from './PlayerGiftReceived.vue'
+import PlayerGiftSentVue from './PlayerGiftSent.vue'
+import PlayerGalacticCycleCompleteEventVue from './PlayerGalacticCycleCompleteEvent.vue'
+import PlayerRenownReceivedVue from './PlayerRenownReceived.vue'
+import PlayerRenownSentVue from './PlayerRenownSent.vue'
+import PlayerResearchCompleteVue from './PlayerResearchComplete.vue'
+import PlayerStarAbandonedVue from './PlayerStarAbandoned.vue'
+import PlayerStarDiedVue from './PlayerStarDied.vue'
+import PlayerStarReignitedVue from './PlayerStarReignited.vue'
+import PlayerTechnologyReceivedVue from './PlayerTechnologyReceived.vue'
+import PlayerTechnologySentVue from './PlayerTechnologySent.vue'
+import PlayerDebtForgivenVue from './PlayerDebtForgiven.vue'
+import PlayerDebtSettledVue from './PlayerDebtSettled.vue'
+import PlayerStarSpecialistHiredVue from './PlayerStarSpecialistHired.vue'
+import PlayerCarrierSpecialistHiredVue from './PlayerCarrierSpecialistHired.vue'
+import PlayerConversationCreatedVue from './PlayerConversationCreated.vue'
+import PlayerConversationInvitedVue from './PlayerConversationInvited.vue'
+import PlayerConversationLeftVue from './PlayerConversationLeft.vue'
+import GameDiplomacyPeaceDeclaredVue from './GameDiplomacyPeaceDeclared.vue'
+import GameDiplomacyWarDeclaredVue from './GameDiplomacyWarDeclared.vue'
+import PlayerDiplomacyStatusChangedVue from './PlayerDiplomacyStatusChanged.vue'
 
 export default {
   components: {
@@ -117,7 +117,7 @@ export default {
     'game-player-joined': GamePlayerJoinedVue,
     'game-player-quit': GamePlayerQuitVue,
     'game-started': GameStartedVue,
-    'game-diplomacy-peace-declared': GameDiplomacyPeaceDeclaredVue, 
+    'game-diplomacy-peace-declared': GameDiplomacyPeaceDeclaredVue,
     'game-diplomacy-war-declared': GameDiplomacyWarDeclaredVue,
 
     'player-bulk-infrastructure-upgraded': PlayerBulkInfrastructureUpgradedVue,
@@ -158,7 +158,7 @@ export default {
         if (this.isRead) {
             return
         }
-        
+
       try {
         this.event.read = true
 

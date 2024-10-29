@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import MenuTitle from '../MenuTitle'
+import MenuTitle from '../MenuTitle.vue'
 import CarrierApiService from '../../../../services/api/carrier'
 import gameHelper from '../../../../services/gameHelper'
 import GameContainer from '../../../../game/container'
@@ -60,7 +60,7 @@ export default {
   methods: {
     onCloseRequested (e) {
       GameContainer.map.unselectAllCarriers()
-      
+
       this.$emit('onCloseRequested', e)
     },
     onOpenCarrierDetailRequested (e) {
@@ -82,7 +82,7 @@ export default {
 
         gameHelper.getCarrierById(this.$store.state.game, this.carrierId).name = this.currentName
 
-        this.$toasted.show(`Carrier renamed to ${this.currentName}.`)
+        this.$toast.default(`Carrier renamed to ${this.currentName}.`)
 
         this.onCloseRequested(e)
       } catch (err) {

@@ -415,6 +415,10 @@ export default class GameService extends EventEmitter {
         return undefeatedPlayers.filter(x => x.ready).length === undefeatedPlayers.length;
     }
 
+    isReadyToQuitOrDefeated(player: Player) {
+        return player.readyToQuit || player.defeated;
+    }
+
     isReadyToQuitImmediateEnd(game: Game) {
         const undefeatedPlayers = this.listAllUndefeatedPlayers(game);
 
@@ -429,7 +433,7 @@ export default class GameService extends EventEmitter {
         let allUndefeatedHaveRTQed = true;
 
         for (const player of game.galaxy.players) {
-            if (player.readyToQuit || player.defeated) {
+            if (this.isReadyToQuitOrDefeated(player)) {
                 rtqStarsSum += leaderboard.find(x => x.player._id.toString() === player._id.toString())?.stats?.totalStars || 0;
             } else {
                 allUndefeatedHaveRTQed = false;

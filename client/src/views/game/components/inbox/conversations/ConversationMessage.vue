@@ -32,8 +32,8 @@
 <script>
 import GameHelper from '../../../../../services/gameHelper'
 import GameContainer from '../../../../../game/container'
-import PlayerIconVue from '../../player/PlayerIcon'
-import ConversationMessagePinVue from './ConversationMessagePin'
+import PlayerIconVue from '../../player/PlayerIcon.vue'
+import ConversationMessagePinVue from './ConversationMessagePin.vue'
 import mentionHelper from '../../../../../services/mentionHelper'
 import ConversationMessageContextMenu from "./ConversationMessageContextMenu.vue";
 
@@ -85,7 +85,7 @@ export default {
       if (star) {
         GameContainer.map.panToStar(star)
       } else {
-        this.$toasted.show(`The location of the star is unknown.`, { type: 'error' })
+        this.$toast.error(`The location of the star is unknown.`)
       }
     },
   },

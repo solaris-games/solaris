@@ -64,7 +64,7 @@ export default {
         return alias;
       }
 
-      const existsV = this.$store.state.coloursConfig.find(colour => colour.value === this.player.colour.value)?.alias;
+      const existsV = this.$store.state.coloursConfig.find(colour => colour.value === gameHelper.getFriendlyColour(this.player.colour.value))?.alias;
 
       if (existsV) {
         return existsV;
@@ -88,7 +88,7 @@ export default {
         this.$emit('onColourOverrideConfirmed');
       } catch (e) {
         console.error(e);
-        this.$toasted.show(`There was a problem saving the custom colour`, { type: 'error' })
+        this.$toast.error(`There was a problem saving the custom colour`)
       }
     },
     toColourValue (alias) {

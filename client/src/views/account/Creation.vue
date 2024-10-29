@@ -102,14 +102,14 @@
 </template>
 
 <script>
-import VueRecaptcha from 'vue-recaptcha'
-import LoadingSpinnerVue from '../components/LoadingSpinner'
-import ViewContainer from '../components/ViewContainer'
+import { VueRecaptcha } from 'vue-recaptcha'
+import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
+import ViewContainer from '../components/ViewContainer.vue'
 import router from '../../router'
-import ViewTitle from '../components/ViewTitle'
-import FormErrorList from '../components/FormErrorList'
+import ViewTitle from '../components/ViewTitle.vue'
+import FormErrorList from '../components/FormErrorList.vue'
 import userService from '../../services/api/user'
-import ParallaxVue from '../components/Parallax'
+import ParallaxVue from '../components/Parallax.vue'
 
 export default {
   components: {
@@ -181,7 +181,7 @@ export default {
         let response = await userService.createUser(this.email, this.username, this.password, this.recaptchaToken)
 
         if (response.status === 201) {
-          this.$toasted.show(`Welcome ${this.username}! You can now log in and play Solaris.`, {type: 'success'})
+          this.$toast.success(`Welcome ${this.username}! You can now log in and play Solaris.`)
 
           router.push({name: 'home'})
         }
@@ -194,10 +194,10 @@ export default {
   },
   computed: {
     recaptchaEnabled() {
-      return process.env.VUE_APP_GOOGLE_RECAPTCHA_ENABLED === 'true'
+      return import.meta.env.VUE_APP_GOOGLE_RECAPTCHA_ENABLED === 'true'
     },
     recaptchaSiteKey() {
-      return process.env.VUE_APP_GOOGLE_RECAPTCHA_SITE_KEY
+      return import.meta.env.VUE_APP_GOOGLE_RECAPTCHA_SITE_KEY
     }
   }
 }

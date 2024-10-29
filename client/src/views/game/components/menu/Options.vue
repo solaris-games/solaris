@@ -11,8 +11,8 @@
 </template>
 
 <script>
-import MenuTitle from '../MenuTitle'
-import OptionsFormVue from './OptionsForm'
+import MenuTitle from '../MenuTitle.vue'
+import OptionsFormVue from './OptionsForm.vue'
 import ErrorLog from "./ErrorLog.vue";
 
 export default {

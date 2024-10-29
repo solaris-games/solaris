@@ -21,18 +21,18 @@ export default {
   },
   methods: {
     onTrashed () {
-      this.$emit("bulkScheduleTrashed", { 
+      this.$emit("bulkScheduleTrashed", {
         actionId: this.action._id
       });
     },
     async trash () {
       try {
         let response = await starService.trashScheduledUpgrade(this.$store.state.game._id, this.action._id)
-        
+
         if (response.status === 200) {
           this.$store.commit('gameBulkActionTrashed', this.action)
 
-          this.$toasted.show(`You scheduled Bulk Upgrade has been deleted.`)
+          this.$toast.default(`You scheduled Bulk Upgrade has been deleted.`)
 
           this.onTrashed();
         }

@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import StarLabelVue from '../../star/StarLabel'
+import StarLabelVue from '../../star/StarLabel.vue'
 
 export default {
   components: {

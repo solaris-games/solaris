@@ -1,0 +1,71 @@
+[
+    {
+        "id": 0,
+        "key": "original",
+        "file": "tutorial.json",
+        "name": "Tutorial - Original",
+        "description": "Learn to Play.",
+        "level": "Beginner"
+    },
+    {
+        "id": 1,
+        "key": "stars-and-carriers",
+        "file": "tutorial_stars_and_carriers.json",
+        "name": "Tutorial - Stars and Carriers",
+        "description": "Learn how to purchase a carrier, move the carrier and capture neutral stars.",
+        "level": "Beginner"
+    },
+    {
+        "id": 2,
+        "key": "infrastructure-and-expansion",
+        "file": "tutorial_infrastructure_and_expansion.json",
+        "name": "Tutorial - Infrastructure and Expansion",
+        "description": "Effectively build and utilize Economy and Industry infrastructure to generate ships and capture a neutral star.",
+        "level": "Beginner"
+    },
+    {
+        "id": 3,
+        "key": "science-and-research",
+        "file": "tutorial_science_and_research.json",
+        "name": "Tutorial - Science and Research",
+        "description": "Utilize science infrastructure for research, scan surrounding stars for enemy presence, understand hyperspace travel ranges, and apply these skills to capture a neutral star in the game Solaris.",
+        "level": "Beginner"
+    },
+    {
+        "id": 4,
+        "key": "combat-basics",
+        "file": "tutorial_combat_basics.json",
+        "name": "Tutorial - Combat Basics",
+        "description": "Your ultimate test is here: capture the enemy's home star!",
+        "level": "Beginner"
+    },
+    {
+        "id": 5,
+        "key": "special-star-types",
+        "file": "tutorial_special_star_types.json",
+        "name": "Tutorial - Special Star Types",
+        "description": "Learn about the strategic advantages and disadvantages of Special Stars and the benefits of building Warp Gates.",
+        "level": "Intermediate"
+    },
+    {
+        "id": 6,
+        "key": "star-specialists",
+        "name": "Tutorial - Star Specialists",
+        "description": "[Non-combat] Same as the black hole example, but the player must build a telescope array to see an unclaimed star.",
+        "level": "Intermediate"
+    },
+    {
+        "id": 7,
+        "key": "carrier-specialists",
+        "name": "Tutorial - Carrier Specialists",
+        "description": "[Non-combat] An explorer to bridge a gap.",
+        "level": "Intermediate"
+    },
+    {
+        "id": 8,
+        "key": "combat-intermediate",
+        "name": "Tutorial - Combat Intermediate",
+        "description": "Simple 1v1 map, but now with specialists enabled, guide the player to buy a Colonel and an Orbital Cannon at the beginning, enemy has a nebula, etc.",
+        "level": "Intermediate"
+    }
+]

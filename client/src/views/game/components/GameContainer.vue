@@ -65,7 +65,7 @@ export default {
     this.tryShowDonateModal(game)
   },
 
-  beforeDestroy () {
+  beforeUnmount () {
     window.removeEventListener('resize', this.handleResize)
 
     this.gameContainer.map.off('onStarClicked', this.onStarClickedHandler)
@@ -157,9 +157,9 @@ LimitingFactor`, 'Donate', 'Dismiss', false, true)) {
 #gameContainer {
   position: absolute;
   left: 0;
-  top: 0;
+  top: 45px;
   margin: 0;
-  height: 100%;
+  height: calc(100% - 52px);
   width: 100%;
   overflow: hidden;
 }

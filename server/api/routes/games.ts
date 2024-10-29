@@ -21,10 +21,13 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             controller.create
     );
 
-    router.post('/api/game/tutorial',
+    router.post('/api/game/tutorial/:tutorialKey?',
             mw.auth.authenticate(),
             controller.createTutorial
     );
+
+    router.get('/api/game/tutorial/list',
+        controller.listTutorials);
 
     router.get('/api/game/:gameId/info',
             mw.game.loadGame({
@@ -41,7 +44,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
 
                         delete req.game.settings.general.password;
                     }
-                    
+
                     return next();
                 } catch (err) {
                     return next(err);

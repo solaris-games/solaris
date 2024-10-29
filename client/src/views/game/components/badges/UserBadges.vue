@@ -9,8 +9,8 @@
 </template>
 
 <script>
-import LoadingSpinner from '../../../components/LoadingSpinner'
-import Badge from './Badge'
+import LoadingSpinner from '../../../components/LoadingSpinner.vue'
+import Badge from './Badge.vue'
 import BadgeApiService from '../../../../services/api/badge'
 
 export default {

@@ -31,6 +31,7 @@ const schema = new Schema({
 				'new_player_rt',
 				'new_player_tb',
 				'32_player_rt',
+				'16_player_relaxed',
 				'special_dark',
 				'special_fog',
 				'special_ultraDark',

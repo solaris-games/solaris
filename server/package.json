@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "test": "ts-node node_modules/jasmine/bin/jasmine",
+    "test": "ts-node --files node_modules/jasmine/bin/jasmine",
     "start-jobs:dev": "ts-node-dev --transpile-only --respawn --inspect=9230 jobs/index.ts",
     "start-jobs:prod": "node dist/jobs/index.js",
     "start-api:dev": "ts-node-dev --transpile-only --respawn --inspect=9231 api/index.ts",

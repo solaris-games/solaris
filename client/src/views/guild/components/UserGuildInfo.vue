@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import LoadingSpinnerVue from '../../components/LoadingSpinner'
+import LoadingSpinnerVue from '../../components/LoadingSpinner.vue'
 import GuildApiService from '../../../services/api/guild'
 
 export default {
@@ -60,7 +60,7 @@ export default {
       } catch (err) {
         console.error(err)
       }
-      
+
         this.isLoadingGuild = false
     },
     async inviteUser () {
@@ -71,7 +71,7 @@ export default {
           const response = await GuildApiService.invite(this.myGuild._id, this.user.username);
 
           if (response.status === 200) {
-            this.$toasted.show(`You invited ${this.user.username} to your guild.`, { type: 'success' })
+            this.$toast.default(`You invited ${this.user.username} to your guild.`, { type: 'success' })
           }
           await this.loadMyGuild();
         } catch (err) {
@@ -87,7 +87,7 @@ export default {
       return this.myGuild && this.myGuild.invitees.find(inv => inv._id === this.user._id)
     },
     ownUserCanInvite () {
-      return this.myGuild && 
+      return this.myGuild &&
           (this.myGuild.leader._id === this.$store.state.userId || this.myGuild.officers.find(x => x._id === this.$store.state.userId))
     }
   }

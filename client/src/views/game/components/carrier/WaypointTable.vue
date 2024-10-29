@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import WaypointRow from './WaypointRow'
+import WaypointRow from './WaypointRow.vue'
 import GameHelper from '../../../../services/gameHelper'
 
 export default {

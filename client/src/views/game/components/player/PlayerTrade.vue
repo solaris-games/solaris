@@ -14,10 +14,10 @@
 </template>
 
 <script>
-import SendTechnology from './SendTechnology'
-import SendCredits from './SendCredits'
-import SendCreditsSpecialists from './SendCreditsSpecialists'
-import Reputation from './Reputation'
+import SendTechnology from './SendTechnology.vue'
+import SendCredits from './SendCredits.vue'
+import SendCreditsSpecialists from './SendCreditsSpecialists.vue'
+import Reputation from './Reputation.vue'
 import GameHelper from '../../../../services/gameHelper'
 import DiplomacyHelper from '../../../../services/diplomacyHelper'
 import DiplomacyApiService from '../../../../services/api/diplomacy'
@@ -68,11 +68,11 @@ export default {
       return this.$store.state.game
     },
     isTradeAllowed () {
-      return this.game.state.startDate 
-        && this.userPlayer 
-        && this.player != this.userPlayer 
-        && !this.userPlayer.defeated 
-        && !this.isGameFinished 
+      return this.game.state.startDate
+        && this.userPlayer
+        && this.player != this.userPlayer
+        && !this.userPlayer.defeated
+        && !this.isGameFinished
         && (this.tradeTechnologyIsEnabled || this.tradeCreditsIsEnabled || this.tradeCreditsSpecialistsIsEnabled)
     },
     isTradePossibleByScanning: function () {
@@ -80,8 +80,8 @@ export default {
         && (this.$store.state.game.settings.player.tradeScanning === 'all' || (this.player && this.player.isInScanningRange))
     },
     isTradePossibleByDiplomacy: function () {
-      return !DiplomacyHelper.isFormalAlliancesEnabled(this.$store.state.game) || 
-        !DiplomacyHelper.isTradeRestricted(this.$store.state.game) || 
+      return !DiplomacyHelper.isFormalAlliancesEnabled(this.$store.state.game) ||
+        !DiplomacyHelper.isTradeRestricted(this.$store.state.game) ||
         (this.diplomaticStatus && this.diplomaticStatus.actualStatus == 'allies')
     },
     isGameFinished: function () {

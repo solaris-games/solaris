@@ -17,15 +17,12 @@ export default {
   },
   data () {
     return {
-      player: null,
       onlineStatus: '',
       isOnline: false,
       intervalFunction: null
     }
   },
     mounted() {
-      this.player = GameHelper.getPlayerById(this.$store.state.game, this.playerId)
-
       let isHiddenPlayerOnlineStatus = GameHelper.isHiddenPlayerOnlineStatus(this.$store.state.game)
 
       if (!this.hideOnlineStatus && !isHiddenPlayerOnlineStatus) {
@@ -33,7 +30,7 @@ export default {
         this.recalculateOnlineStatus()
       }
   },
-  destroyed () {
+  unmounted () {
     clearInterval(this.intervalFunction)
   },
   methods: {
@@ -49,6 +46,9 @@ export default {
     iconFilled () {
       const unknownStatus = this.player.isOnline == null;
       return unknownStatus || this.isOnline || this.solidGlyphOnly;
+    },
+    player() {
+      return GameHelper.getPlayerById(this.$store.state.game, this.playerId)
     },
     playerColour() {
       return this.$store.getters.getColourForPlayer(this.playerId).value

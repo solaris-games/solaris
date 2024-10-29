@@ -9,8 +9,8 @@
 </template>
 
 <script>
-import MenuTitle from '../MenuTitle'
-import EventsListVue from './events/EventsList'
+import MenuTitle from '../MenuTitle.vue'
+import EventsListVue from './events/EventsList.vue'
 import EventApiService from '../../../../services/api/event'
 
 export default {
@@ -24,12 +24,12 @@ export default {
     }
   },
   created () {
-    this.sockets.subscribe('playerEventRead', this.checkForUnreadEvents.bind(this))
-    this.sockets.subscribe('playerAllEventsRead', this.checkForUnreadEvents.bind(this))
+    this.$socket.subscribe('playerEventRead', this.checkForUnreadEvents.bind(this))
+    this.$socket.subscribe('playerAllEventsRead', this.checkForUnreadEvents.bind(this))
   },
-  destroyed () {
-    this.sockets.unsubscribe('playerEventRead')
-    this.sockets.unsubscribe('playerAllEventsRead')
+  unmounted () {
+    this.$socket.unsubscribe('playerEventRead')
+    this.$socket.unsubscribe('playerAllEventsRead')
   },
   async mounted () {
     await this.checkForUnreadEvents()

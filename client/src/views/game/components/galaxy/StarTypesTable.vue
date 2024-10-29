@@ -41,7 +41,7 @@
                   <td title="Pulsar">
                     <a href="javascript:;" @click="sort(['isPulsar'], ['name'])"><star-icon :isPulsar="true"></star-icon></a>
                   </td>
-                  <td title="Wormhole">
+                  <td title="Wormhole" style="text-align: center;">
                     <a href="javascript:;" @click="sort(['isWormHole'], ['wormHolePairStar', 'name'])"><star-icon :isWormHole="true"></star-icon></a>
                   </td>
                   <td></td>
@@ -68,8 +68,8 @@
 import GameHelper from '../../../../services/gameHelper'
 import GridHelper from '../../../../services/gridHelper'
 import SortInfo from '../../../../services/data/sortInfo'
-import StarIconVue from '../star/StarIcon'
-import StarTypesRowVue from './StarTypesRow'
+import StarIconVue from '../star/StarIcon.vue'
+import StarTypesRowVue from './StarTypesRow.vue'
 
 export default {
   components: {
@@ -105,11 +105,23 @@ export default {
     },
     onOpenStarDetailRequested (e) {
       this.$emit('onOpenStarDetailRequested', e)
+    },
+    // TODO: Move this method to a base class of the table vue components (eg StarTable.vue) once we move to Vue 3 and can use Typescript.
+    missingPropertyFallbackFunc(obj, key) {
+      switch (key) {
+        case 'ownedByPlayer':
+          return this.playersMap.get(obj.ownedByPlayerId);
+        default:
+          return null;
+      }
     }
   },
   computed: {
     userPlayer () {
       return GameHelper.getUserPlayer(this.$store.state.game)
+    },
+    playersMap() {
+      return new Map(this.$store.state.game.galaxy.players.map(p => [p._id, p]));
     },
     tableData () {
       return this.$store.state.game.galaxy.stars.map(s => {
@@ -137,7 +149,7 @@ export default {
       return tableData;
     },
     sortedFilteredTableData() {
-      return GridHelper.dynamicSort(this.filteredTableData, this.sortInfo);
+      return GridHelper.dynamicSort(this.filteredTableData, this.sortInfo, this.missingPropertyFallbackFunc);
     }
   }
 }

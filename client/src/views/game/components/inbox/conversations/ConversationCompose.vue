@@ -1,6 +1,6 @@
 <template>
 <form class="pb-1 conversation">
-  <mention-box placeholder="Compose a message" :rows="3" v-model="$store.state.currentConversation.text" @input="onMessageChange" @onSetMessageElement="onSetMessageElement" @onReplaceInMessage="onReplaceInMessage" @onFinish="send"></mention-box>
+  <mention-box placeholder="Compose a message" :rows="3" v-model="$store.state.currentConversation.text" @onSetMessageElement="onSetMessageElement" @onReplaceInMessage="onReplaceInMessage" @onFinish="send"></mention-box>
   <div class="mb-2 text-end">
     <div class="d-grid gap-2">
       <button type="button" class="btn btn-success" @click="send" :disabled="isSendingMessage">
@@ -16,7 +16,7 @@
 import MentionHelper from '../../../../../services/mentionHelper';
 import ConversationApiService from '../../../../../services/api/conversation'
 import AudioService from '../../../../../game/audio'
-import MentionBox from '../../shared/MentionBox';
+import MentionBox from '../../shared/MentionBox.vue';
 
 export default {
   components: {
@@ -45,9 +45,6 @@ export default {
           }
         }
       })
-    },
-    onMessageChange (e) {
-      this.$store.commit('updateCurrentConversationText', e)
     },
     onReplaceInMessage (data) {
       this.$store.commit('updateCurrentConversationText', MentionHelper.useSuggestion(this.$store.state.currentConversation.text, this.$store.state.mentionReceivingElement, data))

@@ -159,6 +159,10 @@ export default class StarUpgradeService extends EventEmitter {
             throw new ValidationError(`Carrier must have 1 or more ships.`);
         }
 
+        if (ships !== parseInt(ships.toString())) {
+            throw new ValidationError(`Carrier ships must be a whole number.`);
+        }
+
         // Get the star.
         let star = this.starService.getById(game, starId);
 
