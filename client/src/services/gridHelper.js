@@ -11,7 +11,7 @@ class GridHelper {
 
   dynamicSort(data, sortInfo, missingPropertyFallbackFunc) {
     if (sortInfo?.propertyPaths != null) {
-      data = data.sort((a, b) => this.dynamicCompare(a, b, sortInfo, missingPropertyFallbackFunc));
+      data = [...data].sort((a, b) => this.dynamicCompare(a, b, sortInfo, missingPropertyFallbackFunc));
     }
 
     return data;
