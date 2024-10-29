@@ -522,7 +522,7 @@ export default {
         }
       } catch (err) {
         console.error(err)
-        this.errors = err.response.data.errors || []
+        this.errors = err?.response?.data?.errors || []
       }
 
       this.isSavingSettings = false
