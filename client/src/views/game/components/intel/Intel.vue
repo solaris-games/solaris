@@ -43,7 +43,7 @@
       </div>
     </div>
 
-    <div class="mb-2 mt-2 ms-1 me-1" v-if="datacollection != null">
+    <div class="mb-2 mt-2 ms-1 me-1 intelchart" v-if="datacollection != null">
         <line-chart :chart-data="datacollection" :options="dataoptions" />
     </div>
 
@@ -112,17 +112,14 @@ export default {
       startTickOptions: [],
       datacollection: null,
       dataoptions: {
-        bezierCurve: false,
-        legend: {
-          display: false
+        aspectRatio: 1,
+        plugins: {
+          legend: {
+            display: false,
+          }
         },
+        bezierCurve: false,
         scales: {
-          yAxes: [{
-            ticks: {
-              beginAtZero: true,
-              precision: 0
-            }
-          }]
         },
         elements: {
           line: {
@@ -160,7 +157,7 @@ export default {
     }
 
     this.calculateStartTicks()
-    this.reloadData()
+    await this.reloadData()
   },
   methods: {
     onCloseRequested (e) {
@@ -193,7 +190,7 @@ export default {
       this.history = null
 
       try {
-        let response = await GameApiService.getGameIntel(this.$store.state.game._id, this.startTick, this.$store.state.tick)
+        const response = await GameApiService.getGameIntel(this.$store.state.game._id, this.startTick, this.$store.state.tick)
 
         if (response.status === 200) {
           this.history = response.data
@@ -286,6 +283,7 @@ export default {
       }
 
       this.datacollection = dataCollection
+      console.log(this.dataoptions);
     }
   },
   computed: {
