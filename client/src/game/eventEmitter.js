@@ -17,4 +17,8 @@ export class EventEmitter {
     emit(event, data) {
         this.ev.emit(event, data);
     }
+
+    removeAllListeners() {
+      this.ev.all.clear();
+    }
 }
