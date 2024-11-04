@@ -1,0 +1,17 @@
+const mainDocumentId = ObjectId('');
+const conversationId = ObjectId('');
+const messageId = ObjectId('');
+
+db.games.findOne({
+    _id: mainDocumentId,
+    "conversations._id": conversationId
+})
+
+db.games.updateOne(
+{
+    _id: mainDocumentId,
+    "conversations._id": conversationId
+},
+{
+    $pull: { "conversations.$.messages": { _id: messageId } }
+});

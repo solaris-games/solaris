@@ -1,8 +1,14 @@
 <template>
 <div>
-    <div class="row text-center">
+  <div class="row text-center bg-dark">
+    <div class="col">
+      <p class="mb-0 mt-2 mb-2 small text-warning">Remember to abide by the <router-link class="guidelines-link" :to="{ name: 'guidelines' }">Community Guidelines</router-link></p>
+    </div>
+  </div>
+
+  <div class="row text-center">
         <div class="col">
-            <p class="mb-0 mt-2 mb-2">Select a colour and starting location.</p>
+          <p class="mb-0 mt-2 mb-2">Select a colour and starting location.</p>
         </div>
     </div>
 
