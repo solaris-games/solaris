@@ -14,7 +14,7 @@
 
     <loading-spinner :loading="isLoading"/>
 
-    <div class="pt-3 pb-3" v-if="!isLoading">
+    <div class="pt-3 pb-3" v-if="!isLoading && userCredits">
         <badge-shop-list :badges="badges" :userCredits="userCredits.credits" :recipientName="recipientPlayer.alias" @onPurchaseBadgeConfirmed="onPurchaseBadgeConfirmed" />
     </div>
 </div>

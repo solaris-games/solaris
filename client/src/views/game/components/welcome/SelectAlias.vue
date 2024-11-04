@@ -26,10 +26,6 @@
                     <div v-if="isAnonymousGame" class="alert alert-warning">
                       <p>This game is anonymous, you might want to hide your identity!</p>
                     </div>
-
-                    <!-- <div class="mb-2 text-center small">
-                        <p>Your alias must be between 3 and 24 characters.</p>
-                    </div> -->
                   </div>
                 </div>
             </form>
