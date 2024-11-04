@@ -1,3 +1,5 @@
+import {logger, setupLogging} from "../utils/logging";
+
 const Agenda = require('agenda');
 import config from '../config';
 import mongooseLoader from '../db';
@@ -11,6 +13,10 @@ import CleanupOldTutorialsJob from './cleanupOldTutorials';
 import SendReviewRemindersJob from './sendReviewReminders';
 
 let mongo;
+
+setupLogging(config);
+
+const log = logger();
 
 async function startup() {
     const container = containerLoader(config);
