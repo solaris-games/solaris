@@ -5,14 +5,13 @@
   </main>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import ConfirmationDialog from './views/components/modal/ConfirmationDialog.vue'
 
-export default {
-  components: {
-    'confirmation-dialog': ConfirmationDialog
-  }
-}
+export default defineComponent({
+
+});
 </script>
 
 <style>
