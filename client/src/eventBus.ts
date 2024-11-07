@@ -5,9 +5,9 @@ import mitt from 'mitt'
 const emitter = mitt();
 
 const eventBus = {
-  $on: (...args) => emitter.on(...args),
-  $off: (...args) => emitter.off(...args),
-  $emit: (...args) => emitter.emit(...args)
+  $on: emitter.on,
+  $off: emitter.off,
+  $emit: emitter.emit
 };
 
 export default eventBus;
