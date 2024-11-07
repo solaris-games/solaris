@@ -6,11 +6,16 @@ let transport;
 let baseLogger;
 
 export const setupLogging = (config: Config) => {
-    const loggingT = config.logging || 'stdout';
+    const loggingT = config.logging || 'pretty';
 
-    if (loggingT === 'stdout') {
+    if (loggingT === 'pretty') {
         transport = pino.transport({
             target: 'pino-pretty'
+        });
+    } else if (loggingT === 'stdout') {
+        transport = pino.transport({
+            target: 'pino/file',
+            options: {destination: 1}
         });
     } else {
         throw new Error(`Invalid logging type: ${loggingT}`);
@@ -25,7 +30,7 @@ export const onReady = (callback: () => void) => {
 
 export const logger = (name?: string): Logger => {
     if (name) {
-        return baseLogger.child({ name });
+        return baseLogger.child({name});
     } else {
         return baseLogger;
     }

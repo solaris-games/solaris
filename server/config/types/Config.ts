@@ -1,4 +1,4 @@
-export type LoggingType = 'stdout';
+export type LoggingType = 'pretty' | 'stdout';
 
 export interface Config {
     port?: string;
