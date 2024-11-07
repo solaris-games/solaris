@@ -2,8 +2,11 @@ import config from '../config';
 import mongooseLoader from '.';
 import fs from 'fs';
 import path from 'path';
+import {logger} from "../utils/logging";
 
 let mongo;
+
+const log = logger("Migrations")
 
 async function startup() {
     mongo = await mongooseLoader(config, {
@@ -11,7 +14,7 @@ async function startup() {
         poolSize: 1
     });
     
-    console.log('Running migrations...');
+    log.info('Running migrations...');
 
     const dirPath: string = path.join(__dirname, 'migrations');
 
@@ -20,7 +23,7 @@ async function startup() {
         .sort((a, b) => a.localeCompare(b));
 
     for (let file of files) {
-        console.log(file);
+        log.info(file);
     
         const filePath = path.join(dirPath, file);
         const script = require(filePath);
@@ -28,7 +31,7 @@ async function startup() {
         try {
             await script.migrate(mongo.connection.db);
         } catch (e) {
-            console.error(e);
+            log.error(e);
 
             return Promise.reject(e);
         }
@@ -42,17 +45,17 @@ process.on('SIGINT', async () => {
 });
 
 async function shutdown() {
-    console.log('Shutting down...');
+    log.info('Shutting down...');
 
     await mongo.disconnect();
 
-    console.log('Shutdown complete.');
+    log.info('Shutdown complete.');
     
     process.exit();
 }
 
 startup().then(async () => {
-    console.log('Database migrated.');
+    log.info('Database migrated.');
 
     await shutdown();
 }).catch(async err => {

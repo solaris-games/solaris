@@ -4,9 +4,12 @@ import containerLoader from '../services';
 import {DependencyContainer} from '../services/types/DependencyContainer';
 import {User} from '../services/types/User';
 import {GameWinnerKind} from "../services/leaderboard";
+import {logger} from "../utils/logging";
 
 let mongo,
     container: DependencyContainer;
+
+const log = logger("Recalculate Rankings");
 
 function binarySearchUsers(users: User[], id: string) {
     let start = 0;
@@ -41,9 +44,9 @@ async function startup() {
 
     container = containerLoader(config);
     
-    console.log('Recalculating all player ranks...');
+    log.info('Recalculating all player ranks...');
 
-    console.log(`Resetting users...`);
+    log.info(`Resetting users...`);
     await container.userService.userRepo.updateMany({}, {
         $set: {
             'achievements.level': 1,
@@ -72,7 +75,7 @@ async function startup() {
             'achievements.badges.special_arcade': 0,
         }
     });
-    console.log(`Done.`);
+    log.info(`Done.`);
 
     let users = await container.userService.userRepo.find({}, {
         _id: 1,
@@ -80,7 +83,7 @@ async function startup() {
     },
     { _id: 1 });
 
-    console.log(`Total users: ${users.length}`);
+    log.info(`Total users: ${users.length}`);
 
     let dbQuery = {
         'state.endDate': { $ne: null },
@@ -89,7 +92,7 @@ async function startup() {
 
     let total = (await container.gameService.gameRepo.count(dbQuery));
 
-    console.log(`Recalculating rank for ${total} games...`);
+    log.info(`Recalculating rank for ${total} games...`);
     
     let page = 0;
     let pageSize = 10;
@@ -186,12 +189,12 @@ async function startup() {
 
         await container.gameService.gameRepo.bulkWrite(leaderboardWrites);
 
-        console.log(`Page ${page}/${totalPages}`);
+        log.info(`Page ${page}/${totalPages}`);
 
         page++;
     } while (page <= totalPages);
 
-    console.log(`Done.`);
+    log.info(`Done.`);
 
     let dbWrites = users.map(user => {
         return {
@@ -229,9 +232,9 @@ async function startup() {
         }
     });
 
-    console.log(`Updating users...`);
+    log.info(`Updating users...`);
     await container.userService.userRepo.bulkWrite(dbWrites);
-    console.log(`Users updated.`);
+    log.info(`Users updated.`);
 }
 
 process.on('SIGINT', async () => {
@@ -239,21 +242,21 @@ process.on('SIGINT', async () => {
 });
 
 async function shutdown() {
-    console.log('Shutting down...');
+    log.info('Shutting down...');
 
     await mongo.disconnect();
 
-    console.log('Shutdown complete.');
+    log.info('Shutdown complete.');
     
     process.exit();
 }
 
 startup().then(async () => {
-    console.log('Done.');
+    log.info('Done.');
 
     await shutdown();
 }).catch(async err => {
-    console.error(err);
+    log.error(err);
 
     await shutdown();
 });

@@ -3,6 +3,9 @@ import { DBObjectId } from "../services/types/DBObjectId";
 import { DependencyContainer } from "../services/types/DependencyContainer";
 import { Game } from "../services/types/Game";
 import { GameMutexLock } from "../services/types/GameMutexLock";
+import {logger} from "../utils/logging";
+
+const log = logger("Game Tick Job");
 
 export default (container: DependencyContainer) => {
 
@@ -31,7 +34,7 @@ export default (container: DependencyContainer) => {
                     }
                 }
                 catch (e) {
-                    console.error(`Error in game ${game.settings.general.name} (${game._id})`, e);
+                    log.error(`Error in game ${game.settings.general.name} (${game._id})`, e);
                 }
                 finally {
                     await container.gameLockService.lock(gameId, false);
@@ -39,7 +42,7 @@ export default (container: DependencyContainer) => {
             }
         }
         catch (e) {
-            console.error(e);
+            log.error(e);
         }
         finally {
             //console.log(`tryTickGame() finished!`);
@@ -59,7 +62,7 @@ export default (container: DependencyContainer) => {
 
                 done();
             } catch (e) {
-                console.error("GameTick job threw unhandled: " + e, e);
+                log.error("GameTick job threw unhandled: " + e, e);
             }
         }
 

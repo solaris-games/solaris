@@ -1,6 +1,9 @@
 import {DependencyContainer} from "../services/types/DependencyContainer";
 import {Game, GameSettings} from "../services/types/Game";
 import {OfficialGameCategory, OfficialGameKind} from "../config/officialGames";
+import {logger} from "../utils/logging";
+
+const log = logger("Official Games Check Job");
 
 const chooseSetting = (container: DependencyContainer, category: OfficialGameCategory): GameSettings => {
     if (category.kind === OfficialGameKind.Standard) {
@@ -36,7 +39,7 @@ export default (container: DependencyContainer) => {
                     const existingOpen = findExistingGame(category, openGames);
 
                     if (!existingOpen) {
-                        console.log(`Could not find game [${container.gameTypeService.getOfficialGameCategoryName(category)}], creating it now...`);
+                        log.info(`Could not find game [${container.gameTypeService.getOfficialGameCategoryName(category)}], creating it now...`);
 
                         const existingRunning = findExistingGame(category, runningGames);
                         const existingTemplate = existingRunning?.settings.general.createdFromTemplate;
@@ -53,16 +56,16 @@ export default (container: DependencyContainer) => {
                         try {
                             const newGame = await container.gameCreateService.create(newSetting);
 
-                            console.log(`${newGame.settings.general.type} game created: ${newGame.settings.general.name}`);
+                            log.info(`${newGame.settings.general.type} game created: ${newGame.settings.general.name}`);
                         } catch (e) {
-                            console.error(e);
+                            log.error(e);
                         }
                     }
                 }
 
                 done();
             } catch (e) {
-                console.error("OfficialGamesCheck job threw unhandled: " + e, e);
+                log.error("OfficialGamesCheck job threw unhandled: " + e, e);
             }
         }
 

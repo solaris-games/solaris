@@ -1,7 +1,10 @@
 import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
+import {logger} from "../../utils/logging";
 
 const COST_PER_TOKEN = 1;
+
+const log = logger("Shop Controller");
 
 export default (container: DependencyContainer) => {
     return {
@@ -53,7 +56,7 @@ export default (container: DependencyContainer) => {
                 res.redirect(`${container.config.clientUrl}/#/shop/paymentcomplete?credits=${result.galacticTokens}`);
                 return next();
             } catch (err) {
-                console.error(err);
+                log.error(err);
     
                 res.redirect(`${container.config.clientUrl}/#/shop/paymentfailed`);
                 return next();

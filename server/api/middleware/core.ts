@@ -2,6 +2,9 @@ import { NextFunction, Request, Response } from 'express';
 import { ExpressJoiError } from 'express-joi-validation';
 import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
+import {logger} from "../../utils/logging";
+
+const log = logger("Core Middleware");
 
 export interface CoreMiddleware {
     handleError(err: any, req: Request<unknown>, res: Response, next: NextFunction);
@@ -21,7 +24,7 @@ export const middleware = (container: DependencyContainer): CoreMiddleware => {
                         errors = [errors];
                     }
 
-                    console.error(errors);
+                    log.error(errors);
                     res.status(err.statusCode).json({
                         errors
                     });
@@ -40,7 +43,7 @@ export const middleware = (container: DependencyContainer): CoreMiddleware => {
                     return;
                 }
 
-                console.error(err.stack);
+                log.error(err.stack);
 
                 res.status(500).json({
                     errors: ['Something broke. If the problem persists, please contact a developer.']

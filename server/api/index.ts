@@ -34,7 +34,7 @@ async function startServer() {
 
   server.listen(config.port, (err) => {
     if (err) {
-      console.error(err);
+      log.error(err);
       return;
     }
 

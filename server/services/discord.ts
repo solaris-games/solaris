@@ -2,8 +2,11 @@ import ValidationError from '../errors/validation';
 import Repository from './repository';
 import { Config } from '../config/types/Config';
 import { User } from './types/User';
+import {logger} from "../utils/logging";
 
 const Discord = require('discord.js');
+
+const log = logger("Discord Service");
 
 export default class DiscordService {
     config: Config;
@@ -24,7 +27,7 @@ export default class DiscordService {
             this.client = new Discord.Client()
             await this.client.login(this.config.discord.botToken);
 
-            console.log('Discord Initialized');
+            log.info('Discord Initialized');
         }
     }
 
@@ -102,7 +105,7 @@ export default class DiscordService {
                 embed: messageTemplate
             });
         } catch (err) {
-            console.error(err);
+            log.error(err);
         }
     }
 
@@ -126,7 +129,7 @@ export default class DiscordService {
                 embed: messageTemplate
             });
         } catch (err) {
-            console.error(err);
+            log.error(err);
         }
     }
 }

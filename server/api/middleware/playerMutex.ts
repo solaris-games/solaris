@@ -2,6 +2,9 @@ import { NextFunction, Request, Response } from 'express';
 import ValidationError from "../../errors/validation";
 import { DBObjectId } from "../../services/types/DBObjectId";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
+import {logger} from "../../utils/logging";
+
+const log = logger("Player Mutex Middleware");
 
 export interface PlayerMutexMiddleware {
     wait: () => (req: Request<{ gameId?: DBObjectId }>, res: Response, next: NextFunction) => Promise<any>;
@@ -119,7 +122,7 @@ export const middleware = (container: DependencyContainer): PlayerMutexMiddlewar
 
                     return next();
                 } catch (err) {
-                    console.error("PlayerMutex threw: ", err);
+                    log.error("PlayerMutex threw: ", err);
                     return next(err);
                 }
             }

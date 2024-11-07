@@ -1,4 +1,7 @@
 import { DependencyContainer } from "../services/types/DependencyContainer";
+import {logger} from "../utils/logging";
+
+const log = logger("Cleanup Games Timed Out Job");
 
 export default (container: DependencyContainer) => {
 
@@ -19,13 +22,13 @@ export default (container: DependencyContainer) => {
                         await container.emailService.sendGameTimedOutEmail(game._id);
                         await container.gameService.delete(game);
                     } catch (e) {
-                        console.error(e);
+                        log.error(e);
                     }
                 }
 
                 done();
             } catch (e) {
-                console.error("CleanupGamesTimedOut job threw unhandled: " + e, e);
+                log.error("CleanupGamesTimedOut job threw unhandled: " + e, e);
             }
         }
     };
