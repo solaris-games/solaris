@@ -122,7 +122,10 @@ export const middleware = (container: DependencyContainer): PlayerMutexMiddlewar
 
                     return next();
                 } catch (err) {
-                    log.error("PlayerMutex threw: ", err);
+                    log.error({
+                        error: err,
+                        gameId: req.params.gameId,
+                    }, "PlayerMutex threw: ", err);
                     return next(err);
                 }
             }

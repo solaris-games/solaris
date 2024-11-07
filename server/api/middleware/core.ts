@@ -24,7 +24,10 @@ export const middleware = (container: DependencyContainer): CoreMiddleware => {
                         errors = [errors];
                     }
 
-                    log.error(errors);
+                    log.error({
+                        userId: req.session?.userId,
+                        errors
+                    });
                     res.status(err.statusCode).json({
                         errors
                     });
@@ -43,7 +46,10 @@ export const middleware = (container: DependencyContainer): CoreMiddleware => {
                     return;
                 }
 
-                log.error(err.stack);
+                log.error({
+                    userId: req.session?.userId,
+                    error: err.stack
+                });
 
                 res.status(500).json({
                     errors: ['Something broke. If the problem persists, please contact a developer.']
