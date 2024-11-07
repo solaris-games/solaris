@@ -1,3 +1,5 @@
+import {logger, onReady, setupLogging} from "../utils/logging";
+
 const express = require('express');
 const http = require('http');
 import config from '../config';
@@ -8,7 +10,11 @@ import containerLoader from '../services';
 
 let mongo;
 
-console.log(`Node ${process.version}`);
+setupLogging(config);
+
+const log = logger();
+
+log.info(`Node ${process.version}`);
 
 Error.stackTraceLimit = 1000;
 
@@ -28,11 +34,11 @@ async function startServer() {
 
   server.listen(config.port, (err) => {
     if (err) {
-      console.error(err);
+      log.error(err);
       return;
     }
 
-    console.log(`Server is running on port ${config.port}.`);
+    log.info(`Server is running on port ${config.port}.`);
   });
 
   await container.discordService.initialize();
@@ -40,15 +46,15 @@ async function startServer() {
 }
 
 process.on('SIGINT', async () => {
-  console.log('Shutting down...');
+  log.info('Shutting down...');
 
-  console.log('Disconnecting from MongoDB...');
+  log.info('Disconnecting from MongoDB...');
   await mongo.disconnect();
-  console.log('MongoDB disconnected.');
+  log.info('MongoDB disconnected.');
 
-  console.log('Shutdown complete.');
-  
-  process.exit();
+  log.info('Shutdown complete.');
+
+  onReady(() => process.exit());
 });
 
 startServer();

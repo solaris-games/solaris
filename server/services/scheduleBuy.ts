@@ -1,3 +1,5 @@
+import {logger} from "../utils/logging";
+
 const mongoose = require('mongoose');
 
 import ValidationError from '../errors/validation';
@@ -18,6 +20,8 @@ const buyTypeToPriority = {
 }
 
 const EventEmitter = require('events');
+
+const log = logger("Schedule Buy Service");
 
 export default class ScheduleBuyService extends EventEmitter {
     gameRepo: Repository<Game>;
@@ -70,7 +74,7 @@ export default class ScheduleBuyService extends EventEmitter {
 
                     await this.starUpgradeService.executeBulkUpgradeReport(game, player, report);
                 } catch (e) {
-                    console.error(e)
+                    log.error(e)
                 }
             }
 
@@ -80,7 +84,7 @@ export default class ScheduleBuyService extends EventEmitter {
                 const totalPercentage = percentageActions.reduce((total, cur) => total + cur.amount, 0);
                 await this._executePercentageAction(game, player, percentageActions, totalPercentage);
             } catch (e) {
-                console.error(e)
+                log.error(e)
             }
 
             // Only keep actions that are repeated or in the future

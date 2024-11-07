@@ -1,4 +1,7 @@
 import { DependencyContainer } from "../services/types/DependencyContainer";
+import {logger} from "../utils/logging";
+
+const log = logger("Cleanup Old Game History Job");
 
 export default (container: DependencyContainer) => {
 
@@ -22,22 +25,22 @@ export default (container: DependencyContainer) => {
                         continue
                     }
 
-                    console.log(`Deleting history for old game: ${game._id}`);
+                    log.info(`Deleting history for old game: ${game._id}`);
 
                     try {
                         await container.historyService.deleteByGameId(game._id);
                         await container.eventService.deleteByGameId(game._id);
                         await container.gameService.markAsCleaned(game._id);
                     } catch (e) {
-                        console.error(e);
+                        log.error(e);
                     }
                 }
 
-                console.log('Cleanup completed.');
+                log.info('Cleanup completed.');
 
                 done();
             } catch (e) {
-                console.error("CleanupOldGameHistory job threw unhandled: " + e, e);
+                log.error("CleanupOldGameHistory job threw unhandled: " + e, e);
             }
         }
 

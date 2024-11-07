@@ -1,5 +1,8 @@
 import { DependencyContainer } from '../../services/types/DependencyContainer';
+import {logger} from "../../utils/logging";
 const axios = require('axios');
+
+const log = logger("Auth Controller");
 
 export default (container: DependencyContainer) => {
     return {
@@ -92,7 +95,7 @@ export default (container: DependencyContainer) => {
                 } catch (error) {
                     // NOTE: An unauthorized token will not throw an error;
                     // it will return a 401 Unauthorized response in the try block above
-                    console.error(error);
+                    log.error(error);
                 }
             }
     

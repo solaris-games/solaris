@@ -41,9 +41,12 @@ import ShipService from "./ship";
 import ScheduleBuyService from "./scheduleBuy";
 import {Moment} from "moment";
 import GameLockService from "./gameLock";
+import {logger} from "../utils/logging";
 
 const EventEmitter = require('events');
 const moment = require('moment');
+
+const log = logger("Game Tick Service");
 
 export const GameTickServiceEvents = {
     onPlayerGalacticCycleCompleted: 'onPlayerGalacticCycleCompleted',
@@ -159,7 +162,7 @@ export default class GameTickService extends EventEmitter {
         const game = (await this.gameService.getByIdAll(gameId));
 
         if (!game) {
-            console.error(`Game not found: ${gameId}`);
+            log.error(`Game not found: ${gameId}`);
             return;
         }
 
@@ -179,7 +182,10 @@ export default class GameTickService extends EventEmitter {
         */
 
         let startTime = process.hrtime();
-        console.log(`[${game.settings.general.name}] - Game tick started at ${new Date().toISOString()}`);
+        log.info({
+            gameId: game._id,
+            gameName: game.settings.general.name
+        }, `[${game.settings.general.name}] - Game tick started at ${new Date().toISOString()}`);
 
         game.state.lastTickDate = moment().utc();
         game.state.forceTick = false;
@@ -190,7 +196,10 @@ export default class GameTickService extends EventEmitter {
         let logTime = (taskName: string) => {
             taskTimeEnd = process.hrtime(taskTime);
             taskTime = process.hrtime();
-            console.log(`[${game.settings.general.name}] - ${taskName}: %ds %dms'`, taskTimeEnd[0], taskTimeEnd[1] / 1000000);
+            log.info({
+                gameId: game._id,
+                gameName: game.settings.general.name
+            }, `[${game.settings.general.name}] - ${taskName}: %ds %dms'`, taskTimeEnd[0], taskTimeEnd[1] / 1000000);
         };
 
         let gameUsers = await this.userService.getGameUsers(game);
@@ -301,7 +310,10 @@ export default class GameTickService extends EventEmitter {
 
         let endTime = process.hrtime(startTime);
 
-        console.log(`[${game.settings.general.name}] - Game tick ended: %ds %dms'`, endTime[0], endTime[1] / 1000000);
+        log.info({
+            gameId: game._id,
+            gameName: game.settings.general.name
+        }, `[${game.settings.general.name}] - Game tick ended: %ds %dms'`, endTime[0], endTime[1] / 1000000);
     }
 
     canTick(game: Game) {

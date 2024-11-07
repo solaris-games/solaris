@@ -1,6 +1,9 @@
 import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
 import { mapToGameConcedeDefeatRequest, mapToGameJoinGameRequest, mapToGameSaveNotesRequest } from '../requests/game';
+import {logger} from "../../utils/logging";
+
+const log = logger("Game Controller");
 
 export default (container: DependencyContainer) => {
     return {
@@ -53,7 +56,7 @@ export default (container: DependencyContainer) => {
                 res.status(201).json(game._id);
                 return next();
             } catch (err) {
-                console.error(err);
+                log.error(err);
                 return next(err);
             }
         },

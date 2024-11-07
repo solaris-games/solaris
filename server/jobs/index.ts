@@ -1,3 +1,5 @@
+import {logger, setupLogging} from "../utils/logging";
+
 const Agenda = require('agenda');
 import config from '../config';
 import mongooseLoader from '../db';
@@ -11,6 +13,10 @@ import CleanupOldTutorialsJob from './cleanupOldTutorials';
 import SendReviewRemindersJob from './sendReviewReminders';
 
 let mongo;
+
+setupLogging(config);
+
+const log = logger();
 
 async function startup() {
     const container = containerLoader(config);
@@ -26,9 +32,9 @@ async function startup() {
     // ------------------------------
     // Jobs that run every time the server restarts.
 
-    console.log('Unlock all games...');
+    log.info('Unlock all games...');
     await container.gameService.lockAll(false);
-    console.log('All games unlocked');
+    log.info('All games unlocked');
 
     // ------------------------------
 
@@ -103,20 +109,20 @@ async function startup() {
     agendajs.every('10 seconds', 'send-review-reminders'); // TODO: Every 10 seconds until we've gone through all backlogged users.
 
     process.on('SIGINT', async () => {
-        console.log('Shutting down...');
+        log.info('Shutting down...');
 
         await agendajs.stop();
 
         await mongo.disconnect();
 
-        console.log('Shutdown complete.');
+        log.info('Shutdown complete.');
 
         process.exit(0);
     });
 }
 
 startup().then(() => {
-    console.log('Jobs started.');
+    log.info('Jobs started.');
 });
 
 export {};

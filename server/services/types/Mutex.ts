@@ -1,4 +1,7 @@
 import crypto from 'crypto'
+import {logger} from "../../utils/logging";
+
+const log = logger("Mutex");
 
 export class Mutex {
     static lastMutexId: number = 0;
@@ -30,7 +33,7 @@ export class Mutex {
                         return true;
                     }
                     else {
-                        console.warn(`Cannot unlock Mutex wiht id ${this.id} as lockId does not match.  Expected: ${lockId}, Actual: ${lockIdInput}`);
+                        log.warn(`Cannot unlock Mutex wiht id ${this.id} as lockId does not match.  Expected: ${lockId}, Actual: ${lockIdInput}`);
                     }
 
                     return false;

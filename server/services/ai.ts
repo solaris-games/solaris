@@ -22,6 +22,7 @@ import BasicAIService from "./basicAi";
 import PlayerAfkService from "./playerAfk";
 import ShipService from "./ship";
 import PathfindingService from "./pathfinding";
+import {logger} from "../utils/logging";
 
 const Heap = require('qheap');
 const mongoose = require("mongoose");
@@ -123,6 +124,8 @@ interface Movement {
     score: number;
 }
 
+const log = logger("AI Service");
+
 // IMPORTANT IMPLEMENTATION NOTES
 // During AI tick, care must be taken to NEVER write any changes to the database.
 // This is performed automatically by mongoose (when calling game.save()).
@@ -203,7 +206,7 @@ export default class AIService {
                 await this.basicAIService._doBasicLogic(game, player, isFirstTickOfCycle, isLastTickOfCycle);
             }
         } catch (e) {
-            console.error(e);
+            log.error(e);
         }
     }
 

@@ -1,3 +1,5 @@
+export type LoggingType = 'pretty' | 'stdout';
+
 export interface Config {
     port?: string;
     sessionSecret?: string;
@@ -7,6 +9,7 @@ export interface Config {
     clientUrl?: string;
     corsUrls: string[];
     cacheEnabled: boolean;
+    logging?: LoggingType;
     smtp: {
         enabled: boolean;
         host?: string;
