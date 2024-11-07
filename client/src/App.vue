@@ -1,17 +1,12 @@
 <template>
   <main>
-    <confirmation-dialog :dialogSettings="$store.state.confirmationDialog" />
+    <ConfirmationDialog :dialogSettings="$store.state.confirmationDialog" />
     <router-view/>
   </main>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
-import ConfirmationDialog from './views/components/modal/ConfirmationDialog.vue'
-
-export default defineComponent({
-
-});
+<script setup lang="ts">
+import ConfirmationDialog from './views/components/modal/ConfirmationDialog.vue';
 </script>
 
 <style>
