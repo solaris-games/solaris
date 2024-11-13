@@ -1,11 +1,11 @@
-import {Config} from "../config/types/Config";
 import {Logger} from "pino";
+import config from '../config';
 
 const pino = require('pino');
 let transport;
 let baseLogger;
 
-export const setupLogging = (config: Config) => {
+export const setupLogging = () => {
     const loggingT = config.logging || 'pretty';
 
     if (loggingT === 'pretty') {
@@ -29,6 +29,10 @@ export const onReady = (callback: () => void) => {
 }
 
 export const logger = (name?: string): Logger => {
+    if (!baseLogger) {
+        setupLogging();
+    }
+
     if (name) {
         return baseLogger.child({name});
     } else {

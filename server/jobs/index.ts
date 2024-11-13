@@ -1,4 +1,4 @@
-import {logger, setupLogging} from "../utils/logging";
+import {logger, onReady, setupLogging} from "../utils/logging";
 
 const Agenda = require('agenda');
 import config from '../config';
@@ -13,8 +13,9 @@ import CleanupOldTutorialsJob from './cleanupOldTutorials';
 import SendReviewRemindersJob from './sendReviewReminders';
 
 let mongo;
+Error.stackTraceLimit = 1000;
 
-setupLogging(config);
+setupLogging();
 
 const log = logger();
 
@@ -117,7 +118,7 @@ async function startup() {
 
         log.info('Shutdown complete.');
 
-        process.exit(0);
+        onReady(() => process.exit());
     });
 }
 

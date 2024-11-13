@@ -9,14 +9,13 @@ import socketLoader from './sockets';
 import containerLoader from '../services';
 
 let mongo;
+Error.stackTraceLimit = 1000;
 
-setupLogging(config);
+setupLogging();
 
 const log = logger();
 
 log.info(`Node ${process.version}`);
-
-Error.stackTraceLimit = 1000;
 
 async function startServer() {
   mongo = await mongooseLoader(config, {});
