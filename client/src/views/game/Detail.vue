@@ -19,14 +19,11 @@
           <router-link to="/game/list" tag="button" class="btn btn-primary"><i class="fas fa-arrow-left"></i> Return to List</router-link>
         </div>
         <div class="col-auto">
-          <button class="btn btn-danger" v-if="!game.state.startDate && game.settings.general.isGameAdmin" @click="deleteGame">Delete Game</button>
-          <button class="btn btn-warning" v-if="canModifyPauseState() && !game.state.paused" @click="pauseGame">Pause Game</button>
-          <button class="btn btn-warning" v-if="canModifyPauseState() && game.state.paused" @click="resumeGame">Resume Game</button>
-          <button class="btn btn-danger ms-1" v-if="!game.state.startDate && game.settings.general.isGameAdmin" @click="forceStartGame">Force start Game</button>
-          <button class="btn btn-warning ms-1" v-if="game.state.startDate && !game.state.endDate && !game.state.forceTick && game.settings.general.isGameAdmin" @click="fastForwardGame">Fast Forward Game</button>
           <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-success ms-1">Open Game <i class="fas fa-arrow-right"></i></router-link>
         </div>
       </div>
+
+      <game-control :game="game" />
 
       <div class="row mb-2" v-if="game.settings.general.type === 'new_player_rt' || game.settings.general.type === 'new_player_tb' || game.settings.general.type === 'tutorial'">
         <div class="ratio ratio-16x9">
@@ -45,6 +42,7 @@ import ViewTitle from '../components/ViewTitle.vue'
 import ViewSubtitle from '../components/ViewSubtitle.vue'
 import ViewContainer from '../components/ViewContainer.vue'
 import GameSettings from './components/settings/GameSettings.vue'
+import GameControl from './GameControl.vue'
 import gameService from '../../services/api/game'
 import router from '../../router'
 import GameHelper from '../../services/gameHelper'
@@ -55,7 +53,8 @@ export default {
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'view-subtitle': ViewSubtitle,
-    'game-settings': GameSettings
+    'game-settings': GameSettings,
+    'game-control': GameControl,
   },
   data () {
     return {
@@ -79,12 +78,6 @@ export default {
     await this.loadGame()
   },
   methods: {
-    canModifyPauseState () {
-      return this.game.settings.general.isGameAdmin
-        && GameHelper.isGameStarted(this.game)
-        && !GameHelper.isGamePendingStart(this.game)
-        && !GameHelper.isGameFinished(this.game);
-    },
     async loadGame () {
       this.isLoading = true
 
