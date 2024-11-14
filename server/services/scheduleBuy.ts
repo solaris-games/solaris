@@ -10,6 +10,7 @@ import {Game} from "./types/Game";
 import {Player, PlayerScheduledActions} from "./types/Player";
 import {InfrastructureType} from './types/Star';
 import {ObjectId} from "mongoose";
+import { DBObjectId } from "./types/DBObjectId";
 
 
 const buyTypeToPriority = {
@@ -143,8 +144,8 @@ export default class ScheduleBuyService extends EventEmitter {
         return action;
     }
 
-    async toggleBulkRepeat(game: Game, player: Player, actionId: ObjectId) {
-        let action = player.scheduledActions.find(a => a._id == actionId);
+    async toggleBulkRepeat(game: Game, player: Player, actionId: DBObjectId) {
+        const action = player.scheduledActions.find(a => a._id.toString() == actionId.toString());
         if (!action) {
             throw new ValidationError('Action does not exist');
         }
@@ -163,8 +164,8 @@ export default class ScheduleBuyService extends EventEmitter {
         return action;
     }
 
-    async trashAction(game: Game, player: Player, actionId: ObjectId) {
-        let action = player.scheduledActions.find(a => a._id == actionId);
+    async trashAction(game: Game, player: Player, actionId: DBObjectId) {
+        const action = player.scheduledActions.find(a => a._id.toString() == actionId.toString());
         if (!action) {
             throw new ValidationError('Action does not exist');
         }
