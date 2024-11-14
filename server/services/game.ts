@@ -22,6 +22,7 @@ import GamePlayerDefeatedEvent from './types/events/GamePlayerDefeated';
 import {LeaderboardPlayer} from "./types/Leaderboard";
 import GameJoinService from "./gameJoin";
 import GameAuthService from "./gameAuth";
+import cluster from "cluster";
 
 export const GameServiceEvents = {
     onPlayerQuit: 'onPlayerQuit',
@@ -257,6 +258,29 @@ export default class GameService extends EventEmitter {
                 'state.forceTick': true
             }
         });
+    }
+
+    async kickPlayer(game: Game, kickingUser: DBObjectId, playerToKick: DBObjectId) {
+        if (!await this.gameAuthService.isGameAdmin(game, kickingUser)) {
+            throw new ValidationError('You do not have permission to force start this game.');
+        }
+
+        console.log({
+            kickingUser,
+            playerToKick
+        })
+
+        const player = game.galaxy.players.find(p => p._id.toString() === playerToKick.toString());
+
+        if (!player) {
+            throw new ValidationError('Player not found');
+        }
+
+        if (game.state.startDate) {
+            await this.concedeDefeat(game, player, true);
+        } else {
+            await this.quit(game, player);
+        }
     }
 
     async forceStart(game: Game, forceStartingUserId: DBObjectId) {

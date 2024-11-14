@@ -1,5 +1,6 @@
 import ValidationError from "../../errors/validation";
 import { DBObjectId } from "../../services/types/DBObjectId";
+import { object, Validator, objectId } from "../validate";
 import { keyHasBooleanValue, keyHasNumberValue, keyHasStringValue } from "./helpers";
 
 export interface GameCreateGameRequest {
@@ -83,3 +84,11 @@ export const mapToGameConcedeDefeatRequest = (body: any): GameConcedeDefeatReque
         openSlot: body.openSlot
     }
 }
+
+export type KickPlayerRequest = {
+    playerId: DBObjectId,
+}
+
+export const parseKickPlayerRequest: Validator<KickPlayerRequest> = object({
+    playerId: objectId
+});
