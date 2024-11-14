@@ -1,5 +1,5 @@
 import { DependencyContainer } from '../../services/types/DependencyContainer';
-import { mapToStarAbandonStarRequest, mapToStarBuildCarrierRequest, mapToStarDestroyInfrastructureRequest, mapToStarSetBulkIgnoreAllStatusRequest, mapToStarToggleBulkIgnoreStatusRequest, mapToStarUpgradeInfrastructureBulkRequest, mapToScheduledStarUpgradeInfrastructureBulkRequest, mapToScheduledStarUpgradeToggleRepeat, mapToScheduledStarUpgradeTrash, mapToStarUpgradeInfrastructureRequest, StarUpgradeInfrastructureRequest } from '../requests/star';
+import { mapToStarAbandonStarRequest, mapToStarBuildCarrierRequest, mapToStarDestroyInfrastructureRequest, mapToStarSetBulkIgnoreAllStatusRequest, mapToStarToggleBulkIgnoreStatusRequest, mapToStarUpgradeInfrastructureBulkRequest, mapToScheduledStarUpgradeInfrastructureBulkRequest, mapToStarUpgradeInfrastructureRequest, StarUpgradeInfrastructureRequest, parseScheduledStarUpgradeToggleRepeat, parseScheduledStarUpgradeTrashRepeat } from '../requests/star';
 
 export default (container: DependencyContainer) => {
     return {
@@ -103,12 +103,12 @@ export default (container: DependencyContainer) => {
         },
         toggleBulkRepeat: async (req, res, next) => {
             try {
-                const reqObj = mapToScheduledStarUpgradeToggleRepeat(req.body);
+                const reqObj = parseScheduledStarUpgradeToggleRepeat(req.body);
 
                 let summary = await container.scheduleBuyService.toggleBulkRepeat(
                     req.game,
                     req.player,
-                    reqObj._id);
+                    reqObj.actionId);
 
                 res.status(200).json(summary);
                 return next();
@@ -118,12 +118,12 @@ export default (container: DependencyContainer) => {
         },
         trashBulk: async (req, res, next) => {
             try {
-                const reqObj = mapToScheduledStarUpgradeTrash(req.body);
+                const reqObj = parseScheduledStarUpgradeTrashRepeat(req.body);
 
                 await container.scheduleBuyService.trashAction(
                     req.game,
                     req.player,
-                    reqObj._id
+                    reqObj.actionId
                 )
                 res.sendStatus(200);
                 return next();

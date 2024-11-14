@@ -1,4 +1,5 @@
 import ValidationError from "../errors/validation";
+import { DBObjectId, objectIdFromString } from "../services/types/DBObjectId";
 
 export type Validator<T> = (value: any) => T;
 
@@ -135,3 +136,61 @@ export const object = <T>(objValidator: ObjectValidator<T>): Validator<T> => {
         return n;
     }
 }
+
+export const stringEnumeration = <A extends string, M extends A[]>(members: readonly [any, ...M]): Validator<A> => {
+    return v => {
+        const s = string(v);
+        if (members.includes(s as A)) {
+            return s as A;
+        } else {
+            throw failed(members.join(", "), v)
+        }
+    }
+}
+
+export const objectId: Validator<DBObjectId> = map(objectIdFromString, string);
+
+type NumberValidationProps = {
+    sign?: 'positive' | 'negative',
+    integer?: boolean,
+    range?: {
+        from: number,
+        to: number
+    },
+}
+
+export const numberAdv = (props: NumberValidationProps) => v => {
+    const n = number(v);
+
+    if (props.sign) {
+        const sign = Math.sign(n);
+        if (props.sign === 'positive') {
+            if (sign === -1) {
+                throw failed('positive number', v);
+            }
+        } else if (props.sign === 'negative') {
+            if (sign !== -1) {
+                throw failed('negative number', v);
+            }
+        }
+    }
+
+    if (props.integer) {
+        if (!Number.isInteger(n)) {
+            throw failed('integer', v);
+        }
+    }
+
+    if (props.range) {
+        if (n < props.range.from || n > props.range.to) {
+            throw failed(`number between ${props.range.from} and ${props.range.to}`, v);
+        }
+    }
+
+    return n;
+}
+
+export const positiveInteger = numberAdv({
+    integer: true,
+    sign: 'positive'
+});
