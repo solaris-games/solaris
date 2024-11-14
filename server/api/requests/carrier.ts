@@ -1,93 +1,42 @@
 import ValidationError from "../../errors/validation";
-import { CarrierWaypointActionType } from "../../services/types/CarrierWaypoint";
+import { CarrierWaypointActionType, CarrierWaypointActionTypes } from "../../services/types/CarrierWaypoint";
 import { DBObjectId } from "../../services/types/DBObjectId";
+import { array, boolean, map, number, object, objectId, or, string, stringEnumeration, Validator } from "../validate";
 import { keyHasArrayValue, keyHasBooleanValue, keyHasNumberValue, keyHasObjectValue, keyHasStringValue } from "./helpers";
 
-export interface CarrierSaveWaypointsRequest {
-    waypoints: [
-        {
-            source: DBObjectId;
-            destination: DBObjectId;
-            action: CarrierWaypointActionType;
-            actionShips: number;
-            delayTicks: number;
-        }
-    ];
+type CarrierSaveWaypoint = {
+    source: DBObjectId;
+    destination: DBObjectId;
+    action: CarrierWaypointActionType;
+    actionShips: number;
+    delayTicks: number;
+};
+
+export type CarrierSaveWaypointsRequest = {
+    waypoints: CarrierSaveWaypoint[];
     looped: boolean;
 };
 
-export const mapToCarrierSaveWaypointsRequest = (body: any): CarrierSaveWaypointsRequest => {
-    let errors: string[] = [];
+export const parseCarierSaveWaypointsRequest: Validator<CarrierSaveWaypointsRequest> = object({
+    waypoints: array(object({
+        source: objectId,
+        destination: objectId,
+        action: stringEnumeration<CarrierWaypointActionType, CarrierWaypointActionType[]>(CarrierWaypointActionTypes),
+        actionShips: map((a) => a || 0, number),
+        delayTicks: map((a) => a || 0, number),
+    })),
+    looped: boolean,
+});
 
-    if (!keyHasBooleanValue(body, 'looped')) {
-        errors.push('Looped is required.');
-    }
-
-    if (!keyHasArrayValue(body, 'waypoints')) {
-        errors.push('Waypoints is required.');
-    }
-
-    if (body.waypoints) {
-        for (let waypoint of body.waypoints) {
-            if (!keyHasStringValue(waypoint, 'source')) {
-                errors.push('Source is required.');
-            }
-
-            if (!keyHasStringValue(waypoint, 'destination')) {
-                errors.push('Destination is required.');
-            }
-
-            if (!keyHasStringValue(waypoint, 'action')) {
-                errors.push('Action is required.');
-            }
-
-if (waypoint.actionShips == null) waypoint.actionShips = 0;
-if (waypoint.delayTicks == null) waypoint.delayTicks = 0;
-
-            if (!keyHasNumberValue(waypoint, 'actionShips')) {
-                errors.push('Action Ships is required.');
-            }
-
-            if (!keyHasNumberValue(waypoint, 'delayTicks')) {
-                errors.push('Delay Ticks is required.');
-            }
-
-            waypoint.actionShips = +waypoint.actionShips;
-            waypoint.delayTicks = +waypoint.delayTicks;
-        }
-    }
-
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    return {
-        waypoints: body.waypoints,
-        looped: body.looped
-    }
-};
-
-export interface CarrierLoopWaypointsRequest {
+export type CarrierLoopWaypointsRequest = {
     loop: boolean;
 };
 
-export const mapToCarrierLoopWaypointsRequest = (body: any): CarrierLoopWaypointsRequest => {
-    let errors: string[] = [];
+export const parseCarrierLoopWaypointsRequest: Validator<CarrierLoopWaypointsRequest> = object({
+    loop: boolean,
+});
 
-    if (!keyHasBooleanValue(body, 'loop')) {
-        errors.push('Loop is required.');
-    }
-
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    return {
-        loop: body.loop
-    }
-};
-
-export interface CarrierTransferShipsRequest {
+export type CarrierTransferShipsRequest = {
     carrierShips: number;
     starShips: number;
     starId: DBObjectId;

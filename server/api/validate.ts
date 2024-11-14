@@ -1,4 +1,5 @@
 import ValidationError from "../errors/validation";
+import { DBObjectId, objectIdFromString } from "../services/types/DBObjectId";
 
 export type Validator<T> = (value: any) => T;
 
@@ -135,3 +136,16 @@ export const object = <T>(objValidator: ObjectValidator<T>): Validator<T> => {
         return n;
     }
 }
+
+export const stringEnumeration = <A extends string, M extends A[]>(members: readonly [any, ...M]): Validator<A> => {
+    return v => {
+        const s = string(v);
+        if (members.includes(s as A)) {
+            return s as A;
+        } else {
+            throw failed(members.join(", "), v)
+        }
+    }
+}
+
+export const objectId: Validator<DBObjectId> = map(objectIdFromString, string);

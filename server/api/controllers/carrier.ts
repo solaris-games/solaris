@@ -1,11 +1,11 @@
 import { DependencyContainer } from '../../services/types/DependencyContainer';
-import { mapToCarrierCalculateCombatRequest, mapToCarrierLoopWaypointsRequest, mapToCarrierRenameCarrierRequest, mapToCarrierSaveWaypointsRequest, mapToCarrierTransferShipsRequest } from '../requests/carrier';
+import { mapToCarrierCalculateCombatRequest, parseCarrierLoopWaypointsRequest, mapToCarrierRenameCarrierRequest, mapToCarrierTransferShipsRequest, parseCarierSaveWaypointsRequest } from '../requests/carrier';
 
 export default (container: DependencyContainer) => {
     return {
         saveWaypoints: async (req, res, next) => {
             try {
-                const reqObj = mapToCarrierSaveWaypointsRequest(req.body);
+                const reqObj = parseCarierSaveWaypointsRequest(req.body);
                 
                 let report = await container.waypointService.saveWaypoints(
                     req.game,
@@ -22,7 +22,7 @@ export default (container: DependencyContainer) => {
         },
         loopWaypoints: async (req, res, next) => {    
             try {
-                const reqObj = mapToCarrierLoopWaypointsRequest(req.body);
+                const reqObj = parseCarrierLoopWaypointsRequest(req.body);
                 
                 await container.waypointService.loopWaypoints(
                     req.game,

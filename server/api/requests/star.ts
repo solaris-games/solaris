@@ -3,6 +3,7 @@ import ValidationError from "../../errors/validation";
 import { DBObjectId } from "../../services/types/DBObjectId";
 import { InfrastructureType } from "../../services/types/Star";
 import { keyHasBooleanValue, keyHasNumberValue, keyHasStringValue } from "./helpers";
+import { object, objectId, Validator } from "../validate";
 
 export interface StarUpgradeInfrastructureRequest {
     starId: DBObjectId;
@@ -38,12 +39,12 @@ export interface ScheduledStarUpgradeInfrastructureBulkRequest {
     tick: number;
 };
 
-export interface ScheduledStarUpgradeToggleRepeat {
-    _id: DBObjectId;
+export type ScheduledStarUpgradeToggleRepeat = {
+    actionId: DBObjectId;
 };
 
 export interface ScheduledStarUpgradeTrash {
-    _id: DBObjectId;
+    actionId: DBObjectId;
 }
 
 export const mapToStarUpgradeInfrastructureBulkRequest = (body: any): StarUpgradeInfrastructureBulkRequest => {
@@ -121,37 +122,13 @@ export const mapToScheduledStarUpgradeInfrastructureBulkRequest = (body: any): S
     }
 };
 
-export const mapToScheduledStarUpgradeToggleRepeat = (body: any): ScheduledStarUpgradeToggleRepeat => {
-    let errors: string[] = [];
+export const parseScheduledStarUpgradeToggleRepeat: Validator<ScheduledStarUpgradeToggleRepeat> = object({
+    actionId: objectId
+});
 
-    if (!keyHasStringValue(body, 'actionId')) {
-        errors.push('ObjectId is required.');
-    }
-
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    return {
-        _id: body.actionId
-    }
-};
-
-export const mapToScheduledStarUpgradeTrash = (body: any): ScheduledStarUpgradeTrash => {
-    let errors: string[] = [];
-
-    if (!keyHasStringValue(body, 'actionId')) {
-        errors.push('ObjectId is required.');
-    }
-
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    return {
-        _id: body.actionId
-    }
-}
+export const parseScheduledStarUpgradeTrashRepeat: Validator<ScheduledStarUpgradeToggleRepeat> = object({
+    actionId: objectId
+});
 
 export interface StarDestroyInfrastructureRequest {
     starId: DBObjectId;
