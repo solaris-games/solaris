@@ -1,5 +1,5 @@
 import { DependencyContainer } from '../../services/types/DependencyContainer';
-import { mapToCarrierCalculateCombatRequest, parseCarrierLoopWaypointsRequest, mapToCarrierRenameCarrierRequest, mapToCarrierTransferShipsRequest, parseCarierSaveWaypointsRequest } from '../requests/carrier';
+import { mapToCarrierCalculateCombatRequest, parseCarrierLoopWaypointsRequest, mapToCarrierRenameCarrierRequest, parseCarierSaveWaypointsRequest, parseCarrierTransferShipsRequest } from '../requests/carrier';
 
 export default (container: DependencyContainer) => {
     return {
@@ -38,7 +38,7 @@ export default (container: DependencyContainer) => {
         },
         transferShips: async (req, res, next) => {    
             try {
-                const reqObj = mapToCarrierTransferShipsRequest(req.body);
+                const reqObj = parseCarrierTransferShipsRequest(req.body);
                 
                 await container.shipTransferService.transfer(
                     req.game,

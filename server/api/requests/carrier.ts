@@ -1,7 +1,7 @@
 import ValidationError from "../../errors/validation";
 import { CarrierWaypointActionType, CarrierWaypointActionTypes } from "../../services/types/CarrierWaypoint";
 import { DBObjectId } from "../../services/types/DBObjectId";
-import { array, boolean, map, number, object, objectId, or, string, stringEnumeration, Validator } from "../validate";
+import { array, boolean, map, number, numberAdv, object, objectId, or, positiveInteger, string, stringEnumeration, Validator } from "../validate";
 import { keyHasArrayValue, keyHasBooleanValue, keyHasNumberValue, keyHasObjectValue, keyHasStringValue } from "./helpers";
 
 type CarrierSaveWaypoint = {
@@ -22,8 +22,8 @@ export const parseCarierSaveWaypointsRequest: Validator<CarrierSaveWaypointsRequ
         source: objectId,
         destination: objectId,
         action: stringEnumeration<CarrierWaypointActionType, CarrierWaypointActionType[]>(CarrierWaypointActionTypes),
-        actionShips: map((a) => a || 0, number),
-        delayTicks: map((a) => a || 0, number),
+        actionShips: map((a) => a || 0, positiveInteger),
+        delayTicks: map((a) => a || 0, positiveInteger),
     })),
     looped: boolean,
 });
@@ -42,33 +42,11 @@ export type CarrierTransferShipsRequest = {
     starId: DBObjectId;
 };
 
-export const mapToCarrierTransferShipsRequest = (body: any): CarrierTransferShipsRequest => {
-    let errors: string[] = [];
-
-    if (!keyHasNumberValue(body, 'carrierShips')) {
-        errors.push('Carrier Ships is required.');
-    }
-
-    if (!keyHasNumberValue(body, 'starShips')) {
-        errors.push('Star Ships is required.');
-    }
-
-    if (!keyHasStringValue(body, 'starId')) {
-        errors.push('Star ID is required.');
-    }
-
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    body.starShips = +body.starShips;
-
-    return {
-        carrierShips: body.carrierShips,
-        starShips: body.starShips,
-        starId: body.starId
-    }
-};
+export const parseCarrierTransferShipsRequest = object({
+    carrierShips: positiveInteger,
+    starShips: positiveInteger,
+    starId: objectId,
+});
 
 export interface CarrierRenameCarrierRequest {
     name: string;
