@@ -60,7 +60,7 @@ export default class PlayerAfkService extends EventEmitter {
 
         if (!player.afk) {
             // Check if the player has been AFK.
-            let isAfk = this.isAfk(game, player);
+            const isAfk = this.isAfk(game, player);
     
             if (isAfk) {
                 this.setPlayerAsAfk(game, player);
@@ -69,11 +69,11 @@ export default class PlayerAfkService extends EventEmitter {
 
         // Check if the player has been defeated by conquest.
         if (!player.defeated) {
-            let stars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+            const stars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
             // If there are no stars and there are no carriers then the player is defeated.
             if (stars.length === 0) {
-                let carriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id); // Note: This logic looks a bit weird, but its more performant.
+                const carriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id); // Note: This logic looks a bit weird, but its more performant.
 
                 if (carriers.length === 0) {
                     this.playerService.setPlayerAsDefeated(game, player, false);
@@ -143,6 +143,11 @@ export default class PlayerAfkService extends EventEmitter {
         // If the player is AI controlled, then they are not AFK.
         // Note: Don't include pseudo afk, only legit actual afk players.
         if (this.isAIControlled(game, player, false)) {
+            return false;
+        }
+
+        // if the player is ready for turn/cycle in a TB game, they are not afk
+        if (player.ready) {
             return false;
         }
 
