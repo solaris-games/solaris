@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js-legacy'
-import EventEmitter from 'events'
 import TextureService from './texture'
 import Helpers from './helpers'
+import {EventEmitter} from "./eventEmitter.js";
 
 class Carrier extends EventEmitter {
 

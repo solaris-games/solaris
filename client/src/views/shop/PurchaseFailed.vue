@@ -11,8 +11,8 @@
 </template>
 
 <script>
-import ViewTitle from '../components/ViewTitle'
-import ViewContainer from '../components/ViewContainer'
+import ViewTitle from '../components/ViewTitle.vue'
+import ViewContainer from '../components/ViewContainer.vue'
 
 export default {
   components: {

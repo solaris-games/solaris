@@ -117,6 +117,6 @@ export default class GameTypeService {
     }
 
     isCapitalStarEliminationMode(game: Game) {
-        return this.isConquestMode(game) && game.settings.conquest.capitalStarElimination === 'enabled';
+        return game.settings.conquest.capitalStarElimination === 'enabled';
     }
 }

@@ -1,4 +1,4 @@
-import { Config } from "./types/Config";
+import {Config, LoggingType} from "./types/Config";
 
 require('dotenv').config({path:__dirname + '/../.env'});
 
@@ -11,6 +11,7 @@ const config: Config = {
     clientUrl: process.env.CLIENT_URL,
     corsUrls: process.env.CORS_URLS?.split(",") || [ process.env.CLIENT_URL || "https://solaris.games" ],
     cacheEnabled: process.env.CACHE_ENABLED == "true",
+    logging: process.env.LOGGING_TYPE as LoggingType,
     smtp: {
         enabled: process.env.SMTP_ENABLED == "true",
         host: process.env.SMTP_HOST,

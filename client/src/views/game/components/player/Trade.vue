@@ -12,20 +12,20 @@
     <player-trade :playerId="playerId"/>
 
     <h4 v-if="player && player.research" class="mt-2">Technology</h4>
-    
+
     <research v-if="player && player.research" :playerId="player._id"/>
-    
+
     <trade-history v-if="player" :toPlayerId="player._id"/>
 </div>
 </template>
 
 <script>
-import LoadingSpinnerVue from '../../../components/LoadingSpinner'
-import MenuTitle from '../MenuTitle'
-import PlayerTitleVue from './PlayerTitle'
-import Research from './Research'
-import PlayerTradeVue from './PlayerTrade'
-import TradeHistoryVue from './TradeHistory'
+import LoadingSpinnerVue from '../../../components/LoadingSpinner.vue'
+import MenuTitle from '../MenuTitle.vue'
+import PlayerTitleVue from './PlayerTitle.vue'
+import Research from './Research.vue'
+import PlayerTradeVue from './PlayerTrade.vue'
+import TradeHistoryVue from './TradeHistory.vue'
 import GameHelper from '../../../../services/gameHelper'
 import GameContainer from '../../../../game/container'
 

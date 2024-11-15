@@ -47,7 +47,7 @@
 
       <div class="table-responsive" v-if="invites.length">
           <table class="table table-striped table-hover">
-              <tbody> 
+              <tbody>
                 <guild-invite v-for="invite in invites" :key="invite.guildId"
                   :invite="invite"
                   @onInvitationAccepted="onInvitationAccepted"
@@ -64,8 +64,8 @@
 
       <div class="table-responsive" v-if="applications.length">
           <table class="table table-striped table-hover">
-              <tbody> 
-                <guild-application v-for="application in applications" :key="application.guildId" 
+              <tbody>
+                <guild-application v-for="application in applications" :key="application.guildId"
                   :application="application"/>
               </tbody>
           </table>
@@ -75,15 +75,15 @@
 </template>
 
 <script>
-import ViewContainer from '../components/ViewContainer'
-import ViewTitle from '../components/ViewTitle'
-import LoadingSpinner from '../components/LoadingSpinner'
+import ViewContainer from '../components/ViewContainer.vue'
+import ViewTitle from '../components/ViewTitle.vue'
+import LoadingSpinner from '../components/LoadingSpinner.vue'
 import GuildApiService from '../../services/api/guild'
-import GuildNewInvite from './components/NewInvite'
-import GuildInvite from './components/Invite'
-import GuildApplication from './components/Application'
-import GuildMember from './components/Member'
-import GuildMemberList from './components/MemberList'
+import GuildNewInvite from './components/NewInvite.vue'
+import GuildInvite from './components/Invite.vue'
+import GuildApplication from './components/Application.vue'
+import GuildMember from './components/Member.vue'
+import GuildMemberList from './components/MemberList.vue'
 
 export default {
   components: {
@@ -118,7 +118,7 @@ export default {
         if (response.status === 200) {
           this.guild = response.data
         }
-        
+
         if (!this.guild) {
           response = await GuildApiService.listInvitations()
 

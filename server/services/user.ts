@@ -1,10 +1,11 @@
 const EventEmitter = require('events');
-import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
+import PasswordService from './password';
 import Repository from './repository';
+import SessionService from './session';
+import { DBObjectId } from './types/DBObjectId';
 import { Game } from './types/Game';
 import { User, UserSubscriptions } from './types/User';
-import PasswordService from './password';
 const moment = require('moment');
 
 function uuidv4(): string {
@@ -19,21 +20,14 @@ export const UserServiceEvents = {
 }
 
 export default class UserService extends EventEmitter {
-
-    userModel;
-    userRepo: Repository<User>;
-    passwordService: PasswordService;
     
     constructor(
-        userModel,
-        userRepo: Repository<User>,
-        passwordService: PasswordService
+        private userModel,
+        public userRepo: Repository<User>,
+        private passwordService: PasswordService,
+        private sessionService: SessionService
     ) {
         super();
-
-        this.userModel = userModel;
-        this.userRepo = userRepo;
-        this.passwordService = passwordService;
     }
 
     async getMe(id: DBObjectId) {
@@ -46,6 +40,7 @@ export default class UserService extends EventEmitter {
             lastSeen: 0,
             lastSeenIP: 0,
             'oauth.discord.token': 0,
+            tutorialsCompleted: 0,
         });
 
         if (user) {
@@ -77,7 +72,7 @@ export default class UserService extends EventEmitter {
     }
 
     async getUserCount(): Promise<number> {
-        return this.userRepo.countAll();
+        return await this.userRepo.countAll();
     }
 
     async getGameUsers(game: Game) {
@@ -103,6 +98,7 @@ export default class UserService extends EventEmitter {
             lastSeen: 0,
             lastSeenIP: 0,
             oauth: 0,
+            tutorialsCompleted: 0,
         });
     }
 
@@ -121,6 +117,7 @@ export default class UserService extends EventEmitter {
             lastSeen: 0,
             lastSeenIP: 0,
             oauth: 0,
+            tutorialsCompleted: 0,
         };
 
         return await this.userRepo.findById(id, select);
@@ -332,6 +329,10 @@ export default class UserService extends EventEmitter {
         }, {
             username
         });
+
+        this.sessionService.updateUserSessions(id, session => {
+            session.username = username;
+        });
     }
 
     async updatePassword(id: DBObjectId, currentPassword: string, newPassword: string) {
@@ -525,6 +526,12 @@ export default class UserService extends EventEmitter {
         }, {
             credits
         });
+
+        this.sessionService.updateUserSessions(userId, session => {
+            session.userCredits = credits;
+        });
+
+        return credits;
     }
 
     async incrementCredits(userId: DBObjectId, credits: number) {
@@ -534,6 +541,10 @@ export default class UserService extends EventEmitter {
             $inc: {
                 credits: credits
             }
+        });
+
+        this.sessionService.updateUserSessions(userId, session => {
+            session.userCredits += credits;
         });
     }
 
@@ -547,6 +558,11 @@ export default class UserService extends EventEmitter {
             $inc: {
                 credits: credits
             }
+        });
+
+        this.sessionService.updateUserSessions(userId, session => {
+            session.roles.contributor = true;
+            session.userCredits += credits;
         });
     }
 
@@ -585,6 +601,16 @@ export default class UserService extends EventEmitter {
                 hasSentReviewReminder: sent
             }
         });
+    }
+
+    async listTutorialsCompleted(userId: DBObjectId) {
+        let user = await this.userRepo.findOne({
+            _id: userId
+        }, {
+            tutorialsCompleted: 1
+        });
+
+        return user?.tutorialsCompleted || []
     }
 
     async updateLastReadAnnouncement(userId: DBObjectId, lastAnnouncementId: DBObjectId) {

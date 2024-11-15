@@ -1,6 +1,4 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
-import VuexPersist from 'vuex-persist'
+import { createStore } from 'vuex';
 import eventBus from './eventBus'
 import GameHelper from './services/gameHelper'
 import GameContainer from './game/container'
@@ -8,14 +6,7 @@ import SpecialistService from './services/api/specialist';
 import ColourService from './services/api/colour';
 import gameHelper from "./services/gameHelper";
 
-Vue.use(Vuex)
-
-const vuexPersist = new VuexPersist({
-  key: 'solaris',
-  storage: localStorage
-})
-
-export default new Vuex.Store({
+export default createStore({
   state: {
     userId: null,
     game: null,
@@ -114,6 +105,13 @@ export default new Vuex.Store({
     },
     clearUserCredits (state) {
       state.userCredits = null
+    },
+
+    setIsImpersonating (state, isImpersonating) {
+      state.isImpersonating = isImpersonating;
+    },
+    clearIsImpersonating (state) {
+      state.isImpersonating = null;
     },
 
     setUserIsEstablishedPlayer (state, isEstablishedPlayer) {
@@ -267,15 +265,21 @@ export default new Vuex.Store({
     },
 
     gameStarBulkUpgraded (state, data) {
-      let player = GameHelper.getUserPlayer(state.game)
+      let player = GameHelper.getUserPlayer(state.game);
+
+      let newScience = 0;
 
       data.stars.forEach(s => {
-        let star = GameHelper.getStarById(state.game, s.starId)
+        let star = GameHelper.getStarById(state.game, s.starId);
+
+        if (data.infrastructureType === 'science') {
+          newScience += (s.infrastructure - s.infrastructureCurrent) * (star.specialistId === 11 ? 2 : 1); // Research Station
+        }
 
         star.infrastructure[data.infrastructureType] = s.infrastructure
 
-        if (star.upgradeCosts && s.infrastructureCost) {
-          star.upgradeCosts[data.infrastructureType] = s.infrastructureCost
+        if (star.upgradeCosts && s.nextInfrastructureCost) {
+          star.upgradeCosts[data.infrastructureType] = s.nextInfrastructureCost
         }
 
         if (s.manufacturing != null) {
@@ -307,7 +311,7 @@ export default new Vuex.Store({
           player.stats.totalIndustry += data.upgraded
           break;
         case 'science':
-          player.stats.totalScience += (data.upgraded * state.game.constants.research.sciencePointMultiplier)
+          player.stats.totalScience += (newScience * state.game.constants.research.sciencePointMultiplier)
           break;
       }
     },
@@ -513,6 +517,8 @@ export default new Vuex.Store({
       })
     },
     async addColourMapping ({ commit, state }, data) {
+      console.warn('Adding colour mapping', data);
+
       await ColourService.addColour(state.game._id, data);
       commit('internalAddColourMapping', data);
 
@@ -524,12 +530,19 @@ export default new Vuex.Store({
       return state.cachedConversationComposeMessages[conversationId] || ''
     },
     getColourForPlayer: (state) => (playerId) => {
+      let colour = null;
+
       if (state.colourOverride) {
-        return state.colourMapping?.[playerId] || GameHelper.getPlayerById(state.game, playerId).colour;
+        colour = state.colourMapping?.[playerId] || GameHelper.getPlayerById(state.game, playerId).colour;
       } else {
-        return GameHelper.getPlayerById(state.game, playerId).colour
+        colour = GameHelper.getPlayerById(state.game, playerId).colour
       }
+
+      if (colour != null) {
+        colour.value = GameHelper.getFriendlyColour(colour.value);
+      }
+
+      return colour;
     }
-  },
-  plugins: [vuexPersist.plugin]
+  }
 })

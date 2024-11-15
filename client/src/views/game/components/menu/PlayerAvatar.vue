@@ -1,6 +1,6 @@
 <template>
   <div @click="onClick" class="player-icon text-center bg-dark">
-    <img v-if="player.avatar" :src="getAvatarImage()" :class="{'defeated-player': player.defeated}">
+    <img v-if="player.avatar" :src="avatarSrc" :class="{'defeated-player': player.defeated}">
     <i v-if="!player.avatar" class="far fa-user ms-2 me-2 mt-2 mb-2"></i>
     <span class="shapeIcon">
       <player-icon :playerId="player._id"/>
@@ -15,7 +15,7 @@
 
 <script>
 import gameHelper from '../../../../services/gameHelper'
-import PlayerIconVue from '../player/PlayerIcon'
+import PlayerIconVue from '../player/PlayerIcon.vue'
 
 export default {
   components: {
@@ -35,15 +35,6 @@ export default {
     this.showMedals = gameHelper.isGameInProgress(this.$store.state.game) || gameHelper.isGameFinished(this.$store.state.game)
   },
   methods: {
-    getAvatarImage () {
-      try {
-        return require(`../../../../assets/avatars/${this.player.avatar}`)
-      } catch (err) {
-        console.error(err)
-
-        return null
-      }
-    },
     isFirstPlace () {
       let position = this.leaderboard.indexOf(this.player)
 
@@ -68,6 +59,11 @@ export default {
     },
     onClick () {
       this.$emit('onClick')
+    }
+  },
+  computed: {
+    avatarSrc () {
+      return new URL(`../../../../assets/avatars/${this.player.avatar}`, import.meta.url).href;
     }
   }
 }

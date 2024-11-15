@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import WaypointRow from './WaypointRow'
+import WaypointRow from './WaypointRow.vue'
 import GameHelper from '../../../../services/gameHelper'
 
 export default {
@@ -60,9 +60,12 @@ export default {
     }
   },
   computed: {
+    userPlayer() {
+      return GameHelper.getUserPlayer(this.$store.state.game)
+    },
     userPlayerOwnsCarrier: function () {
-      return GameHelper.getUserPlayer(this.$store.state.game) &&
-        GameHelper.getCarrierOwningPlayer(this.$store.state.game, this.carrier)._id === GameHelper.getUserPlayer(this.$store.state.game)._id
+      return this.userPlayer &&
+        GameHelper.getCarrierOwningPlayer(this.$store.state.game, this.carrier)._id === this.userPlayer._id
     },
     canEditWaypoints: function () {
       return !GameHelper.isGameFinished(this.$store.state.game) && this.userPlayerOwnsCarrier && !this.carrier.isGift

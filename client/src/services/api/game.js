@@ -21,8 +21,11 @@ class GameService extends BaseApiService {
       { withCredentials: true })
   }
 
-  createTutorialGame () {
-    return axios.post(this.BASE_URL + 'game/tutorial', null,
+  createTutorialGame (tutorialKey = null) {
+    let path = 'game/tutorial'
+    if (tutorialKey)
+      path += '/' + tutorialKey
+    return axios.post(this.BASE_URL + path, null,
       { withCredentials: true })
   }
 
@@ -93,6 +96,11 @@ class GameService extends BaseApiService {
       { withCredentials: true })
   }
 
+  listTutorialGames () {
+    return axios.get(this.BASE_URL + 'game/tutorial/list',
+      { withCredentials: true })
+  }
+
   joinGame (gameId, playerId, alias, avatar, password) {
     return axios.put(this.BASE_URL + 'game/' + gameId + '/join', {
       playerId, alias, avatar, password
@@ -137,6 +145,12 @@ class GameService extends BaseApiService {
 
   fastForward(gameId) {
     return axios.post(this.BASE_URL + 'game/' + gameId + '/fastforward', {}, { withCredentials: true })
+  }
+
+  kickPlayer(gameId, playerId) {
+    return axios.post(this.BASE_URL + 'game/' + gameId + '/kick', {
+      playerId
+    }, { withCredentials: true })
   }
 
   confirmReady (gameId) {

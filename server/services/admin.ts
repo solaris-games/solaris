@@ -1,22 +1,17 @@
-import { DBObjectId } from './types/DBObjectId';
-import Repository from './repository';
-import { Game } from './types/Game';
-import {User, UserRoles} from './types/User';
 import ValidationError from "../errors/validation";
+import Repository from './repository';
+import SessionService from './session';
+import { DBObjectId } from './types/DBObjectId';
+import { Game } from './types/Game';
+import { User } from './types/User';
 
 const moment = require('moment');
 
 export default class AdminService {
-    
-    userRepo: Repository<User>;
-    gameRepo: Repository<Game>;
 
-    constructor(
-        userRepo: Repository<User>, 
-        gameRepo: Repository<Game>
-    ) {
-        this.userRepo = userRepo;
-        this.gameRepo = gameRepo;
+    constructor(private userRepo: Repository<User>, 
+                private gameRepo: Repository<Game>,
+                private sessionService: SessionService) {
     }
 
     async addWarning(userId: DBObjectId, text: string) {
@@ -34,10 +29,21 @@ export default class AdminService {
         });
     }
 
-    async listUsers(roles: UserRoles, limit: number) {
+    async listUsers(userId: DBObjectId, limit: number) {
+
+        let user: User | null = await this.userRepo.findOne({
+            _id: userId
+        }, {
+            roles: 1
+        });
+
+        if (user == null) {
+            return;
+        }
+
         let select;
 
-        if (roles.administrator) {
+        if (user.roles.administrator) {
             select = {
                 username: 1,
                 email: 1,
@@ -50,7 +56,7 @@ export default class AdminService {
                 isEstablishedPlayer: 1,
                 warnings: 1
             };
-        } else if (roles.communityManager) {
+        } else if (user.roles.communityManager) {
             select = {
                 username: 1,
                 isEstablishedPlayer: 1,
@@ -81,16 +87,29 @@ export default class AdminService {
         });
     }
 
-    async listGames(limit: number) {
-        return await this.gameRepo.find({
-            'settings.general.type': { $ne: 'tutorial' } // Non tutorial games
+    async listGames(finishedLimit: number) {
+        const unfinishedGames = await this.gameRepo.find({
+            'settings.general.type': { $ne: 'tutorial' }, // Non tutorial games
+            'state.endDate': { $eq: null }, // Game is unfinished
         }, {
             'settings.general': 1,
             'state': 1
         }, {
             _id: -1
+        });
+
+        const finishedGames = await this.gameRepo.find({
+            'settings.general.type': { $ne: 'tutorial' }, // Non tutorial games
+            'state.endDate': { $ne: null }, // Game is finished
+            }, {
+            'settings.general': 1,
+            'state': 1
+        }, {
+            _id: -1
         },
-        limit);
+        finishedLimit);
+
+        return unfinishedGames.concat(finishedGames);
     }
 
     async setRoleContributor(userId: DBObjectId, enabled: boolean = true) {
@@ -98,6 +117,10 @@ export default class AdminService {
             _id: userId
         }, {
             'roles.contributor': enabled
+        });
+
+        this.sessionService.updateUserSessions(userId, session => {
+            session.roles.contributor = enabled;
         });
     }
 
@@ -107,6 +130,10 @@ export default class AdminService {
         }, {
             'roles.developer': enabled
         });
+
+        this.sessionService.updateUserSessions(userId, session => {
+            session.roles.developer = enabled;
+        });
     }
 
     async setRoleCommunityManager(userId: DBObjectId, enabled: boolean = true) {
@@ -115,6 +142,10 @@ export default class AdminService {
         }, {
             'roles.communityManager': enabled
         });
+
+        this.sessionService.updateUserSessions(userId, session => {
+            session.roles.communityManager = enabled;
+        });
     }
 
     async setRoleGameMaster(userId: DBObjectId, enabled: boolean = true) {
@@ -122,6 +153,10 @@ export default class AdminService {
             _id: userId
         }, {
             'roles.gameMaster': enabled
+        });
+
+        this.sessionService.updateUserSessions(userId, session => {
+            session.roles.gameMaster = enabled;
         });
     }
 

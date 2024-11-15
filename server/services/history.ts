@@ -1,3 +1,5 @@
+import GameStateService from "./gameState";
+
 const cache = require('memory-cache');
 import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
@@ -13,30 +15,34 @@ export default class HistoryService {
     playerService: PlayerService;
     gameService: GameService;
     playerStatisticsService: PlayerStatisticsService;
+    gameStateService: GameStateService;
 
     constructor(
         historyRepo: Repository<GameHistory>,
         playerService: PlayerService,
         gameService: GameService,
-        playerStatisticsService: PlayerStatisticsService
+        playerStatisticsService: PlayerStatisticsService,
+        gameStateService: GameStateService,
     ) {
         this.historyRepo = historyRepo;
         this.playerService = playerService;
         this.gameService = gameService;
         this.playerStatisticsService = playerStatisticsService;
+        this.gameStateService = gameStateService;
 
         this.gameService.on('onGameDeleted', (args) => this.deleteByGameId(args.gameId));
     }
 
     async listIntel(gameId: DBObjectId, startTick: number, endTick: number) {
-        let settings = await this.gameService.getGameSettings(gameId);
+        const game = await this.gameService.getById(gameId);
 
-        if (!settings || settings.specialGalaxy.darkGalaxy === 'extra') {
+        // change here
+        if (!game?.settings || (game?.settings.specialGalaxy.darkGalaxy === 'extra' && !this.gameStateService.isFinished(game))) {
             throw new ValidationError('Intel is not available in this game mode.');
         }
 
         startTick = startTick || 0;
-        endTick = endTick || Number.MAX_VALUE;;
+        endTick = endTick || Number.MAX_VALUE;
 
         let cacheKey = `intel_${gameId}_${startTick}_${endTick}`;
         let cached = cache.get(cacheKey);
@@ -241,4 +247,9 @@ export default class HistoryService {
         });
     }
 
+    async getHistoryMinimumTick(gameId: DBObjectId): Promise<number | null> {
+        return (await this.historyRepo.findOne({
+            gameId: gameId, stars: { $ne: null }, carriers: { $ne: null }
+        }, null, { sort: { tick: 1 } }))?.tick ?? null;
+    }
 };

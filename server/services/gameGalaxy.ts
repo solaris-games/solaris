@@ -34,6 +34,8 @@ import GameFluxService from './gameFlux';
 import PlayerAfkService from './playerAfk';
 import ShipService from './ship';
 import SpectatorService from './spectator';
+import {GameHistory, GameHistoryCarrier} from "./types/GameHistory";
+import GameMaskingService from "./gameMaskingService";
 
 enum ViewpointKind {
     Basic,
@@ -76,6 +78,7 @@ export default class GameGalaxyService {
     playerStatisticsService: PlayerStatisticsService;
     gameFluxService: GameFluxService;
     spectatorService: SpectatorService;
+    gameMaskingService: GameMaskingService;
 
     constructor(
         cacheService: CacheService,
@@ -105,7 +108,8 @@ export default class GameGalaxyService {
         avatarService: AvatarService,
         playerStatisticsService: PlayerStatisticsService,
         gameFluxService: GameFluxService,
-        spectatorService: SpectatorService
+        spectatorService: SpectatorService,
+        gameMaskingService: GameMaskingService,
     ) {
         this.cacheService = cacheService;
         this.broadcastService = broadcastService;
@@ -135,6 +139,7 @@ export default class GameGalaxyService {
         this.playerStatisticsService = playerStatisticsService;
         this.gameFluxService = gameFluxService;
         this.spectatorService = spectatorService;
+        this.gameMaskingService = gameMaskingService;
     }
 
     async getGalaxy(gameId: DBObjectId, userId: DBObjectId | null, tick: number | null) {
@@ -167,6 +172,9 @@ export default class GameGalaxyService {
 
         if (isHistorical && game.settings.general.timeMachine === 'disabled') {
             throw new ValidationError(`The time machine is disabled in this game.`);
+        }
+        else if (game.settings.general.timeMachine === 'enabled') {
+            game.state.timeMachineMinimumTick = await this.historyService.getHistoryMinimumTick(gameId);
         }
 
         // Check if the user is playing in this game.
@@ -311,7 +319,7 @@ export default class GameGalaxyService {
             return;
         }
 
-        game.state.readyToQuitCount = game.galaxy.players.filter(p => p.readyToQuit).length;
+        game.state.readyToQuitCount = game.galaxy.players.filter(this.gameService.isReadyToQuitOrDefeated).length;
     }
 
     _setStarInfoBasic(doc: Game) {
@@ -531,6 +539,7 @@ export default class GameGalaxyService {
         // Populate the number of ticks it will take for all waypoints.
         doc.galaxy.carriers
             .forEach(c => {
+
                 c.effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(doc, c);
 
                 this.waypointService.populateCarrierWaypointEta(doc, c);
@@ -790,6 +799,24 @@ export default class GameGalaxyService {
         doc.galaxy.carriers = [];
     }
 
+    _fromHistoryCarrier(historyCarrier: GameHistoryCarrier): Carrier {
+        return {
+            _id: historyCarrier.carrierId,
+            isGift: historyCarrier.isGift,
+            location: historyCarrier.location,
+            locationNext: undefined,
+            name: historyCarrier.name,
+            orbiting: historyCarrier.orbiting,
+            ownedByPlayerId: historyCarrier.ownedByPlayerId,
+            ships: historyCarrier.ships,
+            specialist: historyCarrier.specialistId && this.specialistService.getById(historyCarrier.specialistId, 'carrier'),
+            specialistExpireTick: null,
+            specialistId: historyCarrier.specialistId,
+            waypoints: historyCarrier.waypoints.map(w => this.waypointService.fromHistory(w)),
+            waypointsLooped: false,
+        } as any as Carrier;
+    }
+
     async _maskGalaxy(game: Game, userPlayer: Player | null, isHistorical: boolean, tick: number | null) {
         /*
             Masking of galaxy data occurs here, it prevent players from seeing what other
@@ -855,37 +882,7 @@ export default class GameGalaxyService {
             }
         }
 
-        // Apply previous tick's data to all STARS the player does not own.
-        // If historical mode, then its all star data in the requested tick.
-        // If not historical mode, then replace non-player owned star data.
-        for (let i = 0; i < game.galaxy.stars.length; i++) {
-            let gameStar = game.galaxy.stars[i];
-
-            if (!isHistorical && userPlayer && gameStar.ownedByPlayerId && gameStar.ownedByPlayerId.toString() === userPlayer._id.toString()) {
-                continue;
-            }
-
-            let historyStar = history.stars.find(x => x.starId.toString() === gameStar._id.toString());
-
-            if (historyStar) {
-                // If the player has abandoned the star in the current tick, then display that representation of the star
-                // instead of the historical version.
-                if (!isHistorical && userPlayer && historyStar.ownedByPlayerId && gameStar.ownedByPlayerId == null && historyStar.ownedByPlayerId.toString() === userPlayer._id.toString()) {
-                    continue;
-                }
-
-                gameStar.ownedByPlayerId = historyStar.ownedByPlayerId;
-                gameStar.naturalResources = historyStar.naturalResources;
-                gameStar.ships = historyStar.ships;
-                gameStar.shipsActual = historyStar.shipsActual;
-                gameStar.specialistId = historyStar.specialistId;
-                gameStar.homeStar = historyStar.homeStar;
-                gameStar.warpGate = historyStar.warpGate;
-                gameStar.ignoreBulkUpgrade = historyStar.ignoreBulkUpgrade;
-                gameStar.infrastructure = historyStar.infrastructure;
-                gameStar.location = historyStar.location == null || (historyStar.location.x == null || historyStar.location.y == null) ? gameStar.location : historyStar.location; // TODO: May not have history for the star (BR Mode). Can delete this in a few months after the history is cleaned.
-            }
-        }
+        this.gameMaskingService.maskStars(game, userPlayer, history, isHistorical);
 
         // Apply previous tick's data to all CARRIERS the player does not own.
         // If historical mode, then its all carrier data in the requested tick.
@@ -924,7 +921,7 @@ export default class GameGalaxyService {
                 let gameCarrier = game.galaxy.carriers.find(x => x._id.toString() === historyCarrier.carrierId.toString());
                 
                 if (!gameCarrier) {
-                    game.galaxy.carriers.push(historyCarrier as any);
+                    game.galaxy.carriers.push(this._fromHistoryCarrier(historyCarrier));
                 }
             }
         }
@@ -938,7 +935,7 @@ export default class GameGalaxyService {
                 let gameCarrier = game.galaxy.carriers.find(x => x._id.toString() === historyCarrier.carrierId.toString());
                 
                 if (!gameCarrier) {
-                    game.galaxy.carriers.push(historyCarrier as any);
+                    game.galaxy.carriers.push(this._fromHistoryCarrier(historyCarrier));
                 }
             }
         }

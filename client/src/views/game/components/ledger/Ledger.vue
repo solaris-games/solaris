@@ -8,18 +8,18 @@
 
     <ul class="nav nav-tabs">
       <li class="nav-item">
-          <a class="nav-link active" data-bs-toggle="tab" href="#credits">Credits</a>
+          <a class="nav-link" :class="selectedTab === 'credits' ? 'active show' : null" @click="() => select('credits')" href="javascript:;">Credits</a>
       </li>
       <li class="nav-item">
-          <a class="nav-link" data-bs-toggle="tab" href="#tokens">Tokens</a>
+          <a class="nav-link" :class="selectedTab === 'tokens' ? 'active show' : null" @click="() => select('tokens')" href="javascript:;">Tokens</a>
       </li>
     </ul>
 
     <div class="tab-content pt-2">
-      <div class="tab-pane fade show active" id="credits">
+      <div class="tab-pane" :class="selectedTab === 'credits' ? 'active show' : null" id="credits">
         <ledger-table :ledgerType="'credits'" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested" />
       </div>
-      <div class="tab-pane fade" id="tokens">
+      <div class="tab-pane" :class="selectedTab === 'tokens' ? 'active show' : null" id="tokens">
         <ledger-table :ledgerType="'creditsSpecialists'" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested" />
       </div>
     </div>
@@ -27,9 +27,9 @@
 </template>
 
 <script>
-import MenuTitle from '../MenuTitle'
-import LoadingSpinner from '../../../components/LoadingSpinner'
-import LedgerTableVue from './LedgerTable'
+import MenuTitle from '../MenuTitle.vue'
+import LoadingSpinner from '../../../components/LoadingSpinner.vue'
+import LedgerTableVue from './LedgerTable.vue'
 
 export default {
   components: {
@@ -37,7 +37,15 @@ export default {
     'loading-spinner': LoadingSpinner,
     'ledger-table': LedgerTableVue
   },
+  data () {
+    return {
+      selectedTab: 'credits'
+    }
+  },
   methods: {
+    select(tab) {
+      this.selectedTab = tab
+    },
     onOpenPlayerDetailRequested(playerId) {
       this.$emit('onOpenPlayerDetailRequested', playerId)
     },

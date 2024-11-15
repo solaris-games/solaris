@@ -7,7 +7,7 @@ export default {
     mounted () {
         document.addEventListener("mousemove", this.parallax)
     },
-    destroyed () {
+    unmounted () {
         document.removeEventListener("mousemove", this.parallax)
     },
     methods: {
@@ -35,7 +35,7 @@ export default {
   width: 100%;
   height: 60%;
   background-color: black;
-  background-image: url(~@/assets/parallax/layer3.png), url(~@/assets/parallax/layer2.png), url(~@/assets/parallax/layer1.png);
+  background-image: url(../../assets/parallax/layer3.png), url(../../assets/parallax/layer2.png), url(../../assets/parallax/layer1.png);
   background-repeat: no-repeat;
   background-position: center;
   background-position: 50% 50%;

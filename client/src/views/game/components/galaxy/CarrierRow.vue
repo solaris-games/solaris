@@ -1,6 +1,6 @@
 <template>
 <tr>
-    <td><i class="fas fa-circle" v-if="carrier.ownedByPlayerId" :style="{ 'color': colour }"></i></td>
+    <td><player-icon v-if="carrier.ownedByPlayerId" :playerId="carrier.ownedByPlayerId" /></td>
     <td><a href="javascript:;" @click="clickCarrier">{{carrier.name}}</a></td>
     <td><a href="javascript:;" @click="goToCarrier"><i class="far fa-eye"></i></a></td>
     <td><specialist-icon :type="'carrier'" :defaultIcon="'rocket'" :specialist="carrier.specialist" :hideDefaultIcon="true"></specialist-icon></td>
@@ -19,10 +19,12 @@
 <script>
 import gameContainer from '../../../../game/container'
 import GameHelper from '../../../../services/gameHelper'
-import SpecialistIcon from '../specialist/SpecialistIcon'
+import PlayerIconVue from '../player/PlayerIcon.vue'
+import SpecialistIcon from '../specialist/SpecialistIcon.vue'
 
 export default {
   components: {
+    'player-icon': PlayerIconVue,
     'specialist-icon': SpecialistIcon
   },
   props: {
@@ -57,11 +59,6 @@ export default {
       this.timeRemainingEtaActual = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.carrier.ticksEta, false, false)
       this.timeRemainingEtaTotal = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.carrier.ticksEtaTotal, false, true)
       this.timeRemainingEtaTotalActual = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.carrier.ticksEtaTotal, false, false)
-    }
-  },
-  computed: {
-    colour () {
-      return this.$store.getters.getColourForPlayer(this.carrier.ownedByPlayerId).value
     }
   }
 }

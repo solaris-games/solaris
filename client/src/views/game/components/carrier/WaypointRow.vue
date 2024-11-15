@@ -34,7 +34,7 @@ export default {
       this.recalculateTimeRemaining()
     }
   },
-  destroyed () {
+  unmounted () {
     clearInterval(this.intervalFunction)
   },
   methods: {
@@ -83,9 +83,12 @@ export default {
     }
   },
   computed: {
+    userPlayer() {
+      return GameHelper.getUserPlayer(this.$store.state.game)
+    },
     userPlayerOwnsCarrier: function () {
-      return GameHelper.getUserPlayer(this.$store.state.game) &&
-        GameHelper.getCarrierOwningPlayer(this.$store.state.game, this.carrier)._id === GameHelper.getUserPlayer(this.$store.state.game)._id
+      return this.userPlayer &&
+        GameHelper.getCarrierOwningPlayer(this.$store.state.game, this.carrier)._id === this.userPlayer._id
     },
     canEditWaypoints: function () {
       return !GameHelper.isGameFinished(this.$store.state.game) && this.userPlayerOwnsCarrier && !this.carrier.isGift

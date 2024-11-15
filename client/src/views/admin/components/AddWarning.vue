@@ -2,7 +2,7 @@
   <div class="add-warning form-inline">
     <label for="warning-text">Warning text</label>
     <input class="form-control" type="text" id="warning-text" v-model="warningText" />
-    <button class="btn btn-default btn-sm" type="button" @click="addWarning" :disabled="!this.warningText">Add Warning</button>
+    <button class="btn btn-success btn-sm" type="button" @click="addWarning" :disabled="!this.warningText">Add Warning</button>
   </div>
 </template>
 
@@ -38,16 +38,21 @@ export default {
 </script>
 
 <style scoped>
-.add-warning {
-  margin-left: 12px;
-  display: flex;
-  flex-direction: row;
-  gap: 4px;
-  flex-grow: 1;
-  align-items: center;
-}
+  .add-warning {
+    display: flex;
+    width: 100%;
+    gap: 8px;
+    align-items: center;
+    margin-left: 12px;
+  }
 
-.add-warning * {
-  flex-grow: 0;
-}
+  @media screen and (max-width: 576px) {
+    .add-warning {
+      flex-direction: column;
+    }
+  }
+
+  .add-warning > .form-control {
+      flex: 1;
+  }
 </style>

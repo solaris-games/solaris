@@ -22,6 +22,7 @@ import GamePlayerDefeatedEvent from './types/events/GamePlayerDefeated';
 import {LeaderboardPlayer} from "./types/Leaderboard";
 import GameJoinService from "./gameJoin";
 import GameAuthService from "./gameAuth";
+import cluster from "cluster";
 
 export const GameServiceEvents = {
     onPlayerQuit: 'onPlayerQuit',
@@ -259,6 +260,29 @@ export default class GameService extends EventEmitter {
         });
     }
 
+    async kickPlayer(game: Game, kickingUser: DBObjectId, playerToKick: DBObjectId) {
+        if (!await this.gameAuthService.isGameAdmin(game, kickingUser)) {
+            throw new ValidationError('You do not have permission to force start this game.');
+        }
+
+        console.log({
+            kickingUser,
+            playerToKick
+        })
+
+        const player = game.galaxy.players.find(p => p._id.toString() === playerToKick.toString());
+
+        if (!player) {
+            throw new ValidationError('Player not found');
+        }
+
+        if (game.state.startDate) {
+            await this.concedeDefeat(game, player, true);
+        } else {
+            await this.quit(game, player);
+        }
+    }
+
     async forceStart(game: Game, forceStartingUserId: DBObjectId) {
         if (!await this.gameAuthService.isGameAdmin(game, forceStartingUserId)) {
             throw new ValidationError('You do not have permission to force start this game.');
@@ -415,6 +439,10 @@ export default class GameService extends EventEmitter {
         return undefeatedPlayers.filter(x => x.ready).length === undefeatedPlayers.length;
     }
 
+    isReadyToQuitOrDefeated(player: Player) {
+        return player.readyToQuit || player.defeated;
+    }
+
     isReadyToQuitImmediateEnd(game: Game) {
         const undefeatedPlayers = this.listAllUndefeatedPlayers(game);
 
@@ -422,16 +450,14 @@ export default class GameService extends EventEmitter {
     }
 
     checkReadyToQuit(game: Game, leaderboard: LeaderboardPlayer[]) {
-        const undefeatedPlayers = this.listAllUndefeatedPlayers(game);
-
         const rtqFraction = game.settings?.general?.readyToQuitFraction || 1.0;
         const starsForEnd = rtqFraction * game.state.stars;
 
         let rtqStarsSum = 0;
         let allUndefeatedHaveRTQed = true;
 
-        for (const player of undefeatedPlayers) {
-            if (player.readyToQuit) {
+        for (const player of game.galaxy.players) {
+            if (this.isReadyToQuitOrDefeated(player)) {
                 rtqStarsSum += leaderboard.find(x => x.player._id.toString() === player._id.toString())?.stats?.totalStars || 0;
             } else {
                 allUndefeatedHaveRTQed = false;

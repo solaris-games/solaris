@@ -431,6 +431,18 @@
       </div>
     </div>
 
+    <h5 class="pt-2">Technical</h5>
+
+    <div class="row pt-1 pb-1">
+      <label for="confirmBuildScience" class="col-12 col-sm-6 col-form-label">Display Performance Monitor</label>
+      <div class="col-12 col-sm-6">
+        <select class="form-control" id="confirmBuildScience" v-model="settings.technical.performanceMonitor" :disabled="isSavingSettings">
+          <option value="disabled">Disabled</option>
+          <option value="enabled">Enabled</option>
+        </select>
+      </div>
+    </div>
+
     <form-error-list v-bind:errors="errors"/>
 
     <div class="row mt-2">
@@ -444,8 +456,8 @@
 </template>
 
 <script>
-import LoadingSpinnerVue from '../../../components/LoadingSpinner'
-import FormErrorList from '../../../components/FormErrorList'
+import LoadingSpinnerVue from '../../../components/LoadingSpinner.vue'
+import FormErrorList from '../../../components/FormErrorList.vue'
 import UserApiService from '../../../../services/api/user'
 import GameContainer from '../../../../game/container'
 
@@ -498,7 +510,7 @@ export default {
         let response = await UserApiService.saveGameSettings(this.settings)
 
         if (response.status === 200) {
-          this.$toasted.show(`Settings saved.`, { type: 'success' })
+          this.$toast.success(`Settings saved.`)
 
           this.$store.commit('setSettings', this.settings)
 
@@ -510,7 +522,7 @@ export default {
         }
       } catch (err) {
         console.error(err)
-        this.errors = err.response.data.errors || []
+        this.errors = err?.response?.data?.errors || []
       }
 
       this.isSavingSettings = false

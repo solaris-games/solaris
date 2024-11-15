@@ -32,7 +32,7 @@ class GameHelper {
   }
 
   getFriendlyColour (colour) {
-    return colour.replace('0x', '#')
+    return colour.replace('0x', '#').toLowerCase();
   }
 
   getStarByName (game, starName) {
@@ -1072,7 +1072,7 @@ class GameHelper {
         userPlayer.stats.totalIndustry++
         break;
       case 'science':
-        userPlayer.stats.totalScience += game.constants.research.sciencePointMultiplier
+        userPlayer.stats.totalScience += game.constants.research.sciencePointMultiplier * (star.specialistId === 11 ? 2 : 1); // Research Station
         break;
     }
 
@@ -1171,6 +1171,7 @@ class GameHelper {
       '1v1_rt': '1 vs. 1',
       '1v1_tb': '1 vs. 1 - TB',
       '32_player_rt': '32 Players',
+      '16_player_relaxed': '16 Players - Relaxed',
       'custom': 'Custom',
       'special_dark': 'Dark Galaxy',
       'special_fog': 'Fogged Galaxy',
@@ -1183,7 +1184,7 @@ class GameHelper {
       'special_kingOfTheHill': 'King Of The Hill',
       'special_tinyGalaxy': 'Tiny Galaxy',
       'special_freeForAll': 'Free For All',
-      'special_arcade': 'Arcade'
+      'special_arcade': 'Arcade',
     }[game.settings.general.type]
   }
 
@@ -1256,18 +1257,28 @@ class GameHelper {
     return game.galaxy.teams.find(t => t._id === teamId);
   }
 
-  calculateTicksToNextShip(shipsActual, manufacturing) {
-    if (manufacturing <= 0) {
+  calculateTicksToBonusShip(shipsActual, manufacturing) {
+    if (manufacturing < 0) {
       return null
     }
 
-    const next = Math.floor(shipsActual + 1);
-    let current = shipsActual;
+    if (manufacturing == 0) {
+      return 'n/a';
+    }
+
+    const next = 1;
+    const partialManufacturing = manufacturing - Math.floor(manufacturing);
+
+    if (partialManufacturing == 0) {
+      return 'n/a';
+    }
+
+    let current = shipsActual - Math.floor(shipsActual);
     let count = 0;
 
     while (current < next) {
       count++;
-      current += manufacturing;
+      current += partialManufacturing;
     }
 
     return count;

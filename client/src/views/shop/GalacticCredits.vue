@@ -151,9 +151,9 @@
 </template>
 
 <script>
-import ViewTitle from '../components/ViewTitle'
-import ViewContainer from '../components/ViewContainer'
-import LoadingSpinner from '../components/LoadingSpinner'
+import ViewTitle from '../components/ViewTitle.vue'
+import ViewContainer from '../components/ViewContainer.vue'
+import LoadingSpinner from '../components/LoadingSpinner.vue'
 import ShopApiService from '../../services/api/shop'
 import UserApiService from '../../services/api/user'
 

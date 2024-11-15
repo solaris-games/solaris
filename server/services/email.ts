@@ -14,15 +14,18 @@ import GamePlayerAFKEvent from "./types/events/GamePlayerAFK";
 import { BaseGameEvent } from "./types/events/BaseGameEvent";
 import GameJoinService, { GameJoinServiceEvents } from "./gameJoin";
 import PlayerReadyService, { PlayerReadyServiceEvents } from "./playerReady";
+import {logger} from "../utils/logging";
 
 const nodemailer = require('nodemailer');
 const fs = require('fs');
 const path = require('path');
 
+const log = logger("Email Service");
+
 function getFakeTransport() {
     return {
         async sendMail(message) {
-            console.log(`SMTP DISABLED`);
+            log.info(`SMTP DISABLED`);
             // console.log(message.text);
             // console.log(message.html);
         }
@@ -162,7 +165,7 @@ export default class EmailService {
             text
         };
         
-        console.log(`EMAIL: [${message.to}] - ${subject}`);
+        log.info(`EMAIL: [${message.to}] - ${subject}`);
 
         return await transport.sendMail(message);
     }
@@ -176,8 +179,8 @@ export default class EmailService {
             subject,
             html
         };
-        
-        console.log(`EMAIL HTML: [${message.to}] - ${subject}`);
+
+        log.info(`EMAIL HTML: [${message.to}] - ${subject}`);
 
         return await transport.sendMail(message);
     }
@@ -214,7 +217,7 @@ export default class EmailService {
         try {
             await this.sendTemplate(user.email, this.TEMPLATES.WELCOME, [user.username]);
         } catch (err) {
-            console.error(err);
+            log.error(err);
         }
     }
 
@@ -411,7 +414,7 @@ export default class EmailService {
             try {
                 await this.sendTemplate(user.email, template, args);
             } catch (err) {
-                console.error(err);
+                log.error(err);
             }
         }
     }

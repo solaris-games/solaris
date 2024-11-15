@@ -1,5 +1,4 @@
-import Vue from 'vue'
-import Router from 'vue-router'
+import {createRouter, createWebHashHistory} from 'vue-router'
 import Home from './views/Home.vue'
 import MainMenu from './views/MainMenu.vue'
 import PrivacyPolicy from './views/PrivacyPolicy.vue'
@@ -35,9 +34,8 @@ import CommunityGuidelines from "./views/CommunityGuidelines.vue";
 import AdminAnnouncements from './views/admin/Announcements.vue';
 import Announcements from "./views/Announcements.vue";
 
-Vue.use(Router)
-
-export default new Router({
+export default createRouter({
+  history: createWebHashHistory(),
   routes: [
     {
       path: '/account/achievements/:userId',

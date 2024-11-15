@@ -2,7 +2,7 @@
 <div>
     <div class="row" v-for="badge in badges" :key="badge.key">
         <div class="col-auto">
-            <img :src="require(`../../../../assets/badges/${badge.key}.png`)"/>
+            <img :src="getBadgeSrc(badge)" :alt="badge.name"/>
 
             <div class="d-grid gap-2">
                 <button class="btn btn-sm btn-success" v-if="userCredits >= badge.price" @click="purchaseBadge(badge)">
@@ -37,6 +37,9 @@ export default {
         }
 
         this.$emit('onPurchaseBadgeConfirmed', badge);
+    },
+    getBadgeSrc (badge) {
+      return new URL(`../../../../assets/badges/${badge.key}.png`, import.meta.url);
     }
   }
 }

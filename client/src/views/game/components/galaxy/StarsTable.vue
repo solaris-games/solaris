@@ -2,7 +2,7 @@
 <div class="container">
   <div class="row mb-2 g-0">
     <div class="col-auto">
-      <button class="btn btn-sm" :class="{ 'btn-danger': !showAll, 'btn-success': showAll }" @click="toggleShowAll" v-if="getUserPlayer()">
+      <button class="btn btn-sm" :class="{ 'btn-danger': !showAll, 'btn-success': showAll }" @click="toggleShowAll" v-if="userPlayer != null">
         <span v-if="!showAll">Show All</span>
         <span v-if="showAll">Show Yours</span>
       </button>
@@ -10,7 +10,7 @@
     <div class="col ms-2 me-2">
       <input type="text" class="form-control form-control-sm" v-model="searchFilter" placeholder="Search...">
     </div>
-    <div class="col-auto pt-1" v-if="!isGameFinished && getUserPlayer()">
+    <div class="col-auto pt-1" v-if="!isGameFinished && userPlayer != null">
       <input class="me-1" type="checkbox" v-model="allowUpgrades" id="chkEnableUpgrades">
       <label for="chkEnableUpgrades">
         Upgrades
@@ -23,144 +23,120 @@
       <table class="table table-striped table-hover mb-0">
           <thead class="table-dark">
               <tr>
-                  <td><i class="fas fa-user"></i></td>
-                  <td><a href="javascript:;" @click="sort(['ships'])">Name</a></td>
+                  <td title="Player"><a href="javascript:;" @click="sort(['ownedByPlayer','alias'], ['ownedByPlayerId'], ['name'])"><i class="fas fa-user"></i></a></td>
+                  <td><a href="javascript:;" @click="sort(['name'])">Name</a></td>
                   <td></td>
-                  <td></td>
-                  <td class="text-end">
-                    <span class="infrastructure-filters">
-                      <a href="javascript:;" @click="sort(['infrastructure','economy'])"><i class="fas fa-money-bill-wave me-2"></i></a>
-                      <a href="javascript:;" @click="sort(['infrastructure','industry'])"><i class="fas fa-tools me-2"></i></a>
-                      <a href="javascript:;" @click="sort(['infrastructure','science'])"><i class="fas fa-flask"></i></a>
-                    </span>
+                  <td title="Specialist">
+                    <a href="javascript:;" @click="sort(['specialist', 'name'])"><i class="fas fa-user-astronaut"></i></a>
                   </td>
-                  <!-- <td class="text-end"><a href="javascript:;" @click="sort(['infrastructure','economy'])"><i class="fas fa-money-bill-wave"></i></a></td>
-                  <td class="text-end"><a href="javascript:;" @click="sort(['infrastructure','industry'])"><i class="fas fa-tools"></i></a></td>
-                  <td class="text-end"><a href="javascript:;" @click="sort(['infrastructure','science'])"><i class="fas fa-flask"></i></a></td> -->
-                  <td class="text-end" v-if="isEconomyEnabled"><a href="javascript:;" @click="sort(['upgradeCosts','economy'])">$E</a></td>
-                  <td class="text-end" v-if="isIndustryEnabled"><a href="javascript:;" @click="sort(['upgradeCosts','industry'])">$I</a></td>
-                  <td class="text-end" v-if="isScienceEnabled"><a href="javascript:;" @click="sort(['upgradeCosts','science'])">$S</a></td>
+                  <td title="Warp Gate">
+                    <a href="javascript:;" @click="sort(['warpGate'])"><i class="fas fa-dungeon"></i></a>
+                  </td>
+                  <td title="Economy Infrastructure" class="text-end">
+                    <a href="javascript:;" @click="sort(['infrastructure','economy'])"><i class="fas fa-money-bill-wave me-2"></i></a>
+                  </td>
+                  <td title="Industry Infrastructure" class="text-end">
+                    <a href="javascript:;" @click="sort(['infrastructure','industry'])"><i class="fas fa-tools me-2"></i></a>
+                  </td>
+                  <td title="Science Infrastructure" class="text-end">
+                    <a href="javascript:;" @click="sort(['infrastructure','science'])"><i class="fas fa-flask"></i></a>
+                  </td>
+                  <td title="Next Economy Infrastructure Cost" class="text-end" v-if="isEconomyEnabled"><a href="javascript:;" @click="sort(['upgradeCosts','economy'])">$E</a></td>
+                  <td title="Next Industry Infrastructure Cost" class="text-end" v-if="isIndustryEnabled"><a href="javascript:;" @click="sort(['upgradeCosts','industry'])">$I</a></td>
+                  <td title="Next Science Infrastructure Cost" class="text-end" v-if="isScienceEnabled"><a href="javascript:;" @click="sort(['upgradeCosts','science'])">$S</a></td>
               </tr>
           </thead>
           <tbody>
-              <star-row v-for="star in sortedTableData" v-bind:key="star._id" :star="star" :allowUpgrades="allowUpgrades"
-                @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
+              <star-row v-for="star in sortedFilteredTableData"
+                        v-bind:key="star._id"
+                        :star="star"
+                        :allowUpgrades="allowUpgrades"
+                        @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
           </tbody>
       </table>
     </div>
   </div>
 
-  <p v-if="!tableData.length" class="text-center mt-2 mb-2">No stars to display.</p>
+  <p v-if="!sortedFilteredTableData.length" class="text-center mt-2 mb-2">No stars to display.</p>
 </div>
 </template>
 
 <script>
 import GameHelper from '../../../../services/gameHelper'
-import StarRowVue from './StarRow'
+import GridHelper from '../../../../services/gridHelper'
+import SortInfo from '../../../../services/data/sortInfo'
+import StarRowVue from './StarRow.vue'
 
 export default {
   components: {
     'star-row': StarRowVue
   },
   data: function () {
+    let defaultSortInfo = new SortInfo([['name']], true);
+
     return {
       showAll: false,
       allowUpgrades: true,
-      tableData: [],
-      sortBy: null,
-      sortDirection: true,
+      defaultSortInfo: defaultSortInfo,
+      sortInfo: new SortInfo(defaultSortInfo.propertyPaths, defaultSortInfo.sortAscending),
+      sortInfoKey: 'galaxy_stars_sortInfo',
       searchFilter: ''
     }
   },
   mounted () {
-    this.showAll = this.getUserPlayer() == null
-    this.tableData = this.getTableData()
-
-    this.allowUpgrades = this.$store.state.settings.interface.galaxyScreenUpgrades === 'enabled' && !this.isGameFinished
-    
-    this.sortBy = localStorage.getItem('galaxy_stars_sortBy') || null
-    this.sortDirection = localStorage.getItem('galaxy_stars_sortDirection') == 'true' || false
+    this.showAll = this.userPlayer == null;
+    this.sortInfo = SortInfo.fromJSON(localStorage.getItem(this.sortInfoKey), this.defaultSortInfo);
+    this.allowUpgrades = this.$store.state.settings.interface.galaxyScreenUpgrades === 'enabled' && !this.isGameFinished;
   },
   destroyed () {
-    localStorage.setItem('galaxy_stars_sortBy', this.sortBy)
-    localStorage.setItem('galaxy_stars_sortDirection', this.sortDirection)
+    localStorage.setItem(this.sortInfoKey, JSON.stringify(this.sortInfo));
   },
   methods: {
-    getUserPlayer () {
-      return GameHelper.getUserPlayer(this.$store.state.game)
-    },
     toggleShowAll () {
-      this.showAll = !this.showAll
-
-      this.tableData = this.getTableData()
+      this.showAll = !this.showAll;
     },
-    getTableData () {
-      let sorter = (a, b) => a.name.localeCompare(b.name)
-
-      if (this.showAll || !this.getUserPlayer()) {
-        return this.$store.state.game.galaxy.stars.sort(sorter)
-      } else {
-        return this.$store.state.game.galaxy.stars.sort(sorter).filter(x => x.ownedByPlayerId === this.getUserPlayer()._id)
-      }
-    },
-    sort (columnName) {
-      // If sorting by a new column, reset the sort.
-      if (JSON.stringify(this.sortBy) !== JSON.stringify(columnName)) {
-        this.sortBy = columnName
-        this.sortDirection = true
-      } else {
-        // Otherwise if we are sorting by the same column, flip the sort direction.
-        this.sortDirection = !this.sortDirection
-      }
+    sort (...propertyPaths) {
+      this.sortInfo.swapSort(propertyPaths);
     },
     onOpenStarDetailRequested (e) {
       this.$emit('onOpenStarDetailRequested', e)
+    },
+    // TODO: Move this method to a base class of the table vue components (eg StarTable.vue) once we move to Vue 3 and can use Typescript.
+    missingPropertyFallbackFunc(obj, key) {
+      switch (key) {
+        case 'ownedByPlayer':
+          return this.playersMap.get(obj.ownedByPlayerId);
+        default:
+          return null;
+      }
     }
   },
   computed: {
-    sortedTableData () {
-      // here be dragons
-      const getNestedObject = (nestedObj, pathArr) => {
-        if (!Array.isArray(pathArr)) {
-          pathArr = pathArr.split(',')
-        }
+    userPlayer () {
+      return GameHelper.getUserPlayer(this.$store.state.game)
+    },
+    playersMap() {
+      return new Map(this.$store.state.game.galaxy.players.map(p => [p._id, p]));
+    },
+    tableData () {
+      return this.$store.state.game.galaxy.stars;
+    },
+    filteredTableData() {
+      let tableData = this.tableData;
 
-        return pathArr.reduce((obj, key) =>
-          (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
+      let isSearchFilterMatch = s => s.name.toLowerCase().includes(this.searchFilter.toLowerCase());
+
+      if (!this.showAll && this.userPlayer != null) {
+        tableData = tableData.filter(s => s.ownedByPlayerId === this.userPlayer._id && isSearchFilterMatch(s));
+      }
+      else {
+        tableData = tableData.filter(isSearchFilterMatch);
       }
 
-      let filterFunction = a => a.name.toLowerCase().includes(this.searchFilter.toLowerCase())
-
-      if (this.sortBy == null) {
-        return this.tableData.filter(filterFunction)
-      }
-
-      return this.tableData
-        .filter(filterFunction)
-        .sort((a, b) => {
-          let bo = getNestedObject(b, this.sortBy)
-          let ao = getNestedObject(a, this.sortBy)
-
-          // equal items sort equally
-          if (ao === bo) {
-              return 0;
-          }
-          // nulls sort after anything else
-          else if (ao === null) {
-              return 1;
-          }
-          else if (bo === null) {
-              return -1;
-          }
-          // otherwise, if we're ascending, lowest sorts first
-          else if (this.sortDirection) {
-              return ao < bo ? -1 : 1;
-          }
-          // if descending, highest sorts first
-          else { 
-              return ao < bo ? 1 : -1;
-          }
-        })
+      return tableData;
+    },
+    sortedFilteredTableData() {
+      return GridHelper.dynamicSort(this.filteredTableData, this.sortInfo, this.missingPropertyFallbackFunc);
     },
     isEconomyEnabled: function () {
       return this.$store.state.game.settings.player.developmentCost.economy !== 'none'
@@ -181,9 +157,5 @@ export default {
 <style scoped>
 td {
   padding: 12px 6px !important;
-}
-
-.infrastructure-filters {
-  white-space: pre;
 }
 </style>

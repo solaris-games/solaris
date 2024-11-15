@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js-legacy'
-import * as Voronoi from 'voronoi'
+import Voronoi from '../voronoi/Javascript-Voronoi/rhill-voronoi-core.js';
 import gameHelper from '../services/gameHelper'
 
 class Territories {
@@ -237,7 +237,7 @@ class Territories {
   _drawTerritoriesVoronoi(userSettings) {
     this.container.alpha = 1
 
-    let voronoi = new Voronoi()
+    let voronoi = new Voronoi.Voronoi()
 
     let minX = gameHelper.calculateMinStarX(this.game)
     let minY = gameHelper.calculateMinStarY(this.game)

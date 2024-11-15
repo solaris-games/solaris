@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import HelpTooltip from '../../../components/HelpTooltip'
+import HelpTooltip from '../../../components/HelpTooltip.vue'
 
 export default {
     components: {

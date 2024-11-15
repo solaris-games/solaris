@@ -14,6 +14,7 @@ export type GameType = 'tutorial'|
 'new_player_rt'|
 'new_player_tb'|
 '32_player_rt'|
+'16_player_relaxed'|
 'special_dark'|
 'special_fog'|
 'special_ultraDark'|
@@ -272,6 +273,7 @@ export interface Game {
 		readyToQuitCount: number | undefined;
 		locked: boolean;
 		tick: number;
+		timeMachineMinimumTick?: number | null;
 		paused: boolean;
 		productionTick: number;
 		startDate: Date | null;

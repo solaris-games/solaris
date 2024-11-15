@@ -34,6 +34,7 @@ export default {
   methods: {
     toggle () {
       this.isCollapsed = !this.isCollapsed;
+      this.$emit('onToggle', this.isCollapsed);
     }
   },
   computed: {

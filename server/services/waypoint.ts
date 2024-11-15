@@ -2,7 +2,7 @@ import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
 import Repository from './repository';
 import { Carrier } from './types/Carrier';
-import { CarrierWaypoint, CarrierWaypointActionType, CarrierWaypointBase } from './types/CarrierWaypoint';
+import { CarrierWaypoint, CarrierWaypointActionType, CarrierWaypointActionTypes, CarrierWaypointBase } from './types/CarrierWaypoint';
 import { Game } from './types/Game';
 import { Player } from './types/Player';
 import { Star } from './types/Star';
@@ -15,6 +15,9 @@ import StarDistanceService from './starDistance';
 import TechnologyService from './technology';
 import { CarrierActionWaypoint } from './types/GameTick';
 import CarrierMovementService from './carrierMovement';
+import {GameHistoryCarrierWaypoint} from "./types/GameHistory";
+import GameMaskingService from "./gameMaskingService";
+import HistoryService from "./history";
 
 const mongoose = require('mongoose');
 
@@ -28,6 +31,8 @@ export default class WaypointService {
     gameService: GameService;
     playerService: PlayerService;
     carrierMovementService: CarrierMovementService;
+    gameMaskingService: GameMaskingService;
+    historyService: HistoryService;
 
     constructor(
         gameRepo: Repository<Game>,
@@ -38,7 +43,9 @@ export default class WaypointService {
         technologyService: TechnologyService,
         gameService: GameService,
         playerService: PlayerService,
-        carrierMovementService: CarrierMovementService
+        carrierMovementService: CarrierMovementService,
+        gameMaskingService: GameMaskingService,
+        historyService: HistoryService,
     ) {
         this.gameRepo = gameRepo;
         this.carrierService = carrierService;
@@ -49,6 +56,8 @@ export default class WaypointService {
         this.gameService = gameService;
         this.playerService = playerService;
         this.carrierMovementService = carrierMovementService;
+        this.gameMaskingService = gameMaskingService;
+        this.historyService = historyService;
     }
 
     async saveWaypoints(game: Game, player: Player, carrierId: DBObjectId, waypoints: CarrierWaypointBase[], looped: boolean) {
@@ -59,6 +68,17 @@ export default class WaypointService {
         }
         
         return await this.saveWaypointsForCarrier(game, player, carrier, waypoints, looped);
+    }
+
+    fromHistory(wp: GameHistoryCarrierWaypoint) {
+        return {
+            _id: new mongoose.Types.ObjectId(),
+            source: wp.source,
+            destination: wp.destination,
+            action: 'nothing',
+            actionShips: 0,
+            delayTicks: 0
+        } as CarrierWaypointBase;
     }
 
     async saveWaypointsForCarrier(game: Game, player: Player, carrier: Carrier, waypoints: CarrierWaypointBase[], looped: boolean | null, writeToDB: boolean = true) {
@@ -111,9 +131,17 @@ export default class WaypointService {
             // Make sure the user isn't being a dumbass.
             waypoint.actionShips = waypoint.actionShips || 0;
             waypoint.action = waypoint.action || 'nothing';
-
-            if (waypoint.actionShips == null || (waypoint.actionShips as any) == '' || +waypoint.actionShips < 0) {
+          
+            if (waypoint.actionShips == null || (waypoint.actionShips as any) == '' || +waypoint.actionShips < 0 || !this._supportsActionShips(waypoint.action)) {
                 waypoint.actionShips = 0;
+            }
+
+            if (+waypoint.actionShips < 0) {
+                throw new ValidationError(`The waypoint action ships cannot be less than 0.`);
+            }
+
+            if (+waypoint.actionShips !== parseInt(waypoint.actionShips.toString())) {
+                throw new ValidationError(`The waypoint action ships value must be a whole number.`);
             }
 
             // Make damn sure there is a delay ticks defined.
@@ -179,6 +207,13 @@ export default class WaypointService {
         // the UI can be updated.
         const reportCarrier = Boolean(carrier.toObject) ? carrier.toObject() : carrier;
 
+        // This is important, otherwise, info about warp gates could be leaked.
+        // Later on, we probably want to do this on the client
+        const history = await this.historyService.getHistoryByTick(game._id, game.state.tick);
+        if (history) {
+            this.gameMaskingService.maskStars(game, player, history, false);
+        }
+
         this.populateCarrierWaypointEta(game, reportCarrier);
 
         return {
@@ -186,6 +221,11 @@ export default class WaypointService {
             ticksEtaTotal: reportCarrier.ticksEtaTotal,
             waypoints: reportCarrier.waypoints
         };
+    }
+
+    _supportsActionShips(action: CarrierWaypointActionType) {
+        const actions: CarrierWaypointActionType[] = ['drop', 'collect', 'dropPercentage', 'collectPercentage', 'dropAllBut', 'collectAllBut', 'garrison'];
+        return actions.includes(action);
     }
 
     _waypointRouteIsWithinHyperspaceRange(game: Game, carrier: Carrier, waypoint: CarrierWaypointBase) {

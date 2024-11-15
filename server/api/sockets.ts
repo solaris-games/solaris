@@ -1,8 +1,11 @@
 import { Config } from "../config/types/Config";
+import {logger} from "../utils/logging";
 
 const socketio = require('socket.io');
 const cookieParser = require('cookie-parser');
 const cookie = require('cookie');
+
+const log = logger('sockets');
 
 export default (config: Config, server, sessionStore) => {
 
@@ -79,7 +82,7 @@ export default (config: Config, server, sessionStore) => {
         });
     });
 
-    console.log('Sockets initialized.');
+    log.info('Sockets initialized.');
     
     return io;
 };

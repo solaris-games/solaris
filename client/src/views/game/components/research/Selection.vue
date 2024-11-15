@@ -105,7 +105,7 @@ export default {
           this.player.currentResearchTicksEta = response.data.ticksEta
           this.player.nextResearchTicksEta = response.data.ticksNextEta
           this.recalculateTimeRemaining()
-          this.$toasted.show(`Current research updated.`)
+          this.$toast.default(`Current research updated.`)
         }
       } catch (err) {
         console.error(err)
@@ -124,7 +124,7 @@ export default {
           this.player.currentResearchTicksEta = response.data.ticksEta
           this.player.nextResearchTicksEta = response.data.ticksNextEta
           this.recalculateTimeRemaining()
-          this.$toasted.show(`Next research updated.`)
+          this.$toast.default(`Next research updated.`)
         }
       } catch (err) {
         console.error(err)

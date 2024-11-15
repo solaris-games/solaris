@@ -1,28 +1,31 @@
 <template>
 <tr>
-    <td><i class="fas fa-circle" v-if="star.ownedByPlayerId" :style="{ 'color': colour }"></i></td>
+    <td><player-icon v-if="star.ownedByPlayerId" :playerId="star.ownedByPlayerId" /></td>
     <td><a href="javascript:;" @click="clickStar">{{star.name}}</a></td>
     <td class="no-padding"><a href="javascript:;" @click="goToStar"><i class="far fa-eye"></i></a></td>
     <td class="sm-padding"><specialist-icon :type="'star'" :specialist="star.specialist" :hideDefaultIcon="true"></specialist-icon></td>
     <td class="text-end">
       <span v-if="star.infrastructure" class="text-success me-2" title="Economic infrastructure - Contributes to credits earned at the end of a cycle">{{star.infrastructure.economy}}</span>
-      <span v-if="star.infrastructure" class="text-warning me-2" title="Industrial infrastructure - Contributes to ship production">{{star.infrastructure.industry}}</span>
-      <span v-if="star.infrastructure" class="text-info" title="Scientific infrastructure - Contributes to technology research">{{star.infrastructure.science}}</span>
     </td>
     <td class="text-end">
-      <star-resources :resources="star.naturalResources" :compareResources="star.terraformedResources" :displayIcon="false" />
+      <span v-if="star.infrastructure" class="text-warning me-2" title="Industrial infrastructure - Contributes to ship production">{{star.infrastructure.industry}}</span>
     </td>
+    <td class="text-end">
+      <span v-if="star.infrastructure" class="text-info" title="Scientific infrastructure - Contributes to technology research">{{star.infrastructure.science}}</span>
+    </td>
+    <star-resources :resources="star.naturalResources" :compareResources="star.terraformedResources" :displayIcon="false" />
 </tr>
 </template>
 
 <script>
 import gameContainer from '../../../../game/container'
-import gameHelper from '../../../../services/gameHelper'
-import SpecialistIcon from '../specialist/SpecialistIcon'
-import StarResourcesVue from '../star/StarResources'
+import PlayerIconVue from '../player/PlayerIcon.vue'
+import SpecialistIcon from '../specialist/SpecialistIcon.vue'
+import StarResourcesVue from '../star/StarResources.vue'
 
 export default {
   components: {
+    'player-icon': PlayerIconVue,
     'specialist-icon': SpecialistIcon,
     'star-resources': StarResourcesVue
   },
@@ -35,11 +38,6 @@ export default {
     },
     goToStar (e) {
       gameContainer.map.panToStar(this.star)
-    }
-  },
-  computed: {
-    colour () {
-      return this.$store.getters.getColourForPlayer(this.star.ownedByPlayerId).value
     }
   }
 }

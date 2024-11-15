@@ -29,8 +29,8 @@
 </template>
 
 <script>
-import SpecialistIconVue from '../specialist/SpecialistIcon'
-import HelpTooltip from '../../../components/HelpTooltip'
+import SpecialistIconVue from '../specialist/SpecialistIcon.vue'
+import HelpTooltip from '../../../components/HelpTooltip.vue'
 
 export default {
     components: {

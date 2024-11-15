@@ -27,8 +27,8 @@
 </template>
 
 <script>
-import LogoVue from '../components/Logo'
-import LoadingSpinnerVue from '../components/LoadingSpinner'
+import LogoVue from '../components/Logo.vue'
+import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
 import GameContainer from './components/GameContainer.vue'
 import MENU_STATES from '../../services/data/menuStates'
 import MainBar from './components/menu/MainBar.vue'
@@ -41,6 +41,7 @@ import moment from 'moment'
 import gameHelper from '../../services/gameHelper'
 import authService from '../../services/api/auth'
 import ColourOverrideDialog from "./components/player/ColourOverrideDialog.vue";
+import eventBus from '../../eventBus'
 
 export default {
   components: {
@@ -71,7 +72,7 @@ export default {
     await this.reloadSettings()
     await this.reloadGame()
 
-    this.subscribeToSockets()
+    this.subscribeTo$socket()
 
     // AudioService.download()
 
@@ -112,11 +113,11 @@ export default {
     await this.$store.dispatch('loadSpecialistData');
     await this.$store.dispatch('loadColourData');
   },
-  beforeDestroy () {
+  beforeUnmount () {
     clearInterval(this.polling)
   },
-  destroyed () {
-    this.unsubscribeToSockets()
+  unmounted () {
+    this.unsubscribeTo$socket()
 
     let socketData = {
       gameId: this.$store.state.game._id
@@ -265,34 +266,34 @@ export default {
     },
 
     // --------------------
-    // Sockets
-    subscribeToSockets () {
+    // $socket
+    subscribeTo$socket () {
       // TODO: Move all component subscriptions into the components' socket object.
-      this.sockets.subscribe('gameStarted', (data) => this.onGameStarted(data))
-      this.sockets.subscribe('gamePlayerJoined', (data) => this.$store.commit('gamePlayerJoined', data))
-      this.sockets.subscribe('gamePlayerQuit', (data) => this.$store.commit('gamePlayerQuit', data))
-      this.sockets.subscribe('gamePlayerReady', (data) => this.$store.commit('gamePlayerReady', data))
-      this.sockets.subscribe('gamePlayerNotReady', (data) => this.$store.commit('gamePlayerNotReady', data))
-      this.sockets.subscribe('gamePlayerReadyToQuit', (data) => this.$store.commit('gamePlayerReadyToQuit', data))
-      this.sockets.subscribe('gamePlayerNotReadyToQuit', (data) => this.$store.commit('gamePlayerNotReadyToQuit', data))
-      this.sockets.subscribe('playerDebtSettled', (data) => this.$store.commit('playerDebtSettled', data))
-      this.sockets.subscribe('gameMessageSent', (data) => this.onMessageReceived(data))
+      this.$socket.subscribe('gameStarted', (data) => this.onGameStarted(data))
+      this.$socket.subscribe('gamePlayerJoined', (data) => this.$store.commit('gamePlayerJoined', data))
+      this.$socket.subscribe('gamePlayerQuit', (data) => this.$store.commit('gamePlayerQuit', data))
+      this.$socket.subscribe('gamePlayerReady', (data) => this.$store.commit('gamePlayerReady', data))
+      this.$socket.subscribe('gamePlayerNotReady', (data) => this.$store.commit('gamePlayerNotReady', data))
+      this.$socket.subscribe('gamePlayerReadyToQuit', (data) => this.$store.commit('gamePlayerReadyToQuit', data))
+      this.$socket.subscribe('gamePlayerNotReadyToQuit', (data) => this.$store.commit('gamePlayerNotReadyToQuit', data))
+      this.$socket.subscribe('playerDebtSettled', (data) => this.$store.commit('playerDebtSettled', data))
+      this.$socket.subscribe('gameMessageSent', (data) => this.onMessageReceived(data))
 
       if (!GameHelper.isHiddenPlayerOnlineStatus(this.$store.state.game)) {
-        this.sockets.subscribe('gamePlayerRoomJoined', (data) => this.onGamePlayerRoomJoined(data))
-        this.sockets.subscribe('gamePlayerRoomLeft', (data) => this.onGamePlayerRoomLeft(data))
+        this.$socket.subscribe('gamePlayerRoomJoined', (data) => this.onGamePlayerRoomJoined(data))
+        this.$socket.subscribe('gamePlayerRoomLeft', (data) => this.onGamePlayerRoomLeft(data))
       }
     },
-    unsubscribeToSockets () {
-      this.sockets.unsubscribe('gameStarted')
-      this.sockets.unsubscribe('gamePlayerJoined')
-      this.sockets.unsubscribe('gamePlayerQuit')
-      this.sockets.unsubscribe('gamePlayerReady')
-      this.sockets.unsubscribe('gamePlayerNotReady')
-      this.sockets.unsubscribe('gamePlayerReadyToQuit')
-      this.sockets.unsubscribe('gamePlayerNotReadyToQuit')
-      this.sockets.unsubscribe('playerDebtSettled')
-      this.sockets.unsubscribe('gameMessageSent')
+    unsubscribeTo$socket () {
+      this.$socket.unsubscribe('gameStarted')
+      this.$socket.unsubscribe('gamePlayerJoined')
+      this.$socket.unsubscribe('gamePlayerQuit')
+      this.$socket.unsubscribe('gamePlayerReady')
+      this.$socket.unsubscribe('gamePlayerNotReady')
+      this.$socket.unsubscribe('gamePlayerReadyToQuit')
+      this.$socket.unsubscribe('gamePlayerNotReadyToQuit')
+      this.$socket.unsubscribe('playerDebtSettled')
+      this.$socket.unsubscribe('gameMessageSent')
     },
     onMessageReceived (e) {
       if (window.innerWidth >= 992) { // Don't do this if the window is too large as it gets handled elsewhere
@@ -308,29 +309,14 @@ export default {
 
       let fromPlayer = GameHelper.getPlayerById(this.$store.state.game, e.fromPlayerId)
 
-      this.$toasted.show(`New message from ${fromPlayer.alias}.`, {
-        duration: null,
-        type: 'info',
+      this.$toast.info(`New message from ${fromPlayer.alias}.`, {
         duration: 10000,
-        action: [
-          {
-            text: 'Dismiss',
-            onClick: (e, toastObject) => {
-              toastObject.goAway(0)
-            }
-          },
-          {
-            text: 'View',
-            onClick: (e, toastObject) => {
-              this.$store.commit('setMenuState', {
-                state: MENU_STATES.CONVERSATION,
-                args: conversationId
-              })
-
-              toastObject.goAway(0)
-            }
-          }
-        ]
+        onClick: () => {
+          this.$store.commit('setMenuState', {
+            state: MENU_STATES.CONVERSATION,
+            args: conversationId
+          })
+        }
       })
 
       AudioService.join()
@@ -338,26 +324,12 @@ export default {
     onGameStarted (data) {
       this.$store.commit('gameStarted', data)
 
-      this.$toasted.show(`The game is full and will start soon. Reload the game now to view the galaxy.`, {
-        duration: null,
-        type: 'info',
-        action: [
-          {
-            text: 'Dismiss',
-            onClick: (e, toastObject) => {
-              toastObject.goAway(0)
-            }
-          },
-          {
-            text: 'Reload',
-            onClick: (e, toastObject) => {
-              toastObject.goAway(0)
-
-              location.reload()
-            }
-          }
-        ]
-      })
+      this.$toast.info(`The game is full and will start soon. Reload the game now to view the galaxy.`, {
+        duration: 10000,
+        onClick: () => {
+          window.location.reload();
+        }
+      });
     },
     onGamePlayerRoomJoined (data) {
       let player = GameHelper.getPlayerById(this.$store.state.game, data.playerId)
@@ -394,12 +366,14 @@ export default {
                 this.$store.commit('setTick', response.data.state.tick)
                 this.$store.commit('setProductionTick', response.data.state.productionTick)
               } else {
-                await this.reloadGame()
-
-                this.$toasted.show(`The game has ticked. Cycle ${response.data.state.productionTick}, Tick ${response.data.state.tick}.`, { type: 'success' })
-
-                AudioService.download()
+                await this.reloadGame();
               }
+
+              eventBus.$emit('onGameTick');
+
+              this.$toast.success(`The game has ticked. Cycle ${response.data.state.productionTick}, Tick ${response.data.state.tick}.`);
+
+              AudioService.download();
             }
           }
         } catch (e) {

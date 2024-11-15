@@ -17,7 +17,7 @@
                 <span v-if="currentWaypoint && currentWaypoint.action && isActionRequiresPercentage(currentWaypoint.action)">%</span>
             </div>
         </div>
-        
+
         <div class="row g-0 mb-2" v-if="currentWaypoint">
             <div class="col-2 text-center">
               <input type="number" class="form-control input-sm" v-if="!(isFirstWaypoint(currentWaypoint) && isInTransit)" v-model="currentWaypoint.delayTicks" @change="recalculateWaypointDuration">
@@ -83,12 +83,12 @@
 </template>
 
 <script>
-import MenuTitle from '../MenuTitle'
+import MenuTitle from '../MenuTitle.vue'
 import GameHelper from '../../../../services/gameHelper'
 import GameContainer from '../../../../game/container'
   import CarrierApiService from '../../../../services/api/carrier'
   import AudioService from '../../../../game/audio'
-import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning'
+import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning.vue'
 
 export default {
   components: {
@@ -126,7 +126,7 @@ export default {
       this.recalculateWaypointEta()
     }
   },
-  destroyed () {
+  unmounted () {
     GameContainer.map.clearHighlightedLocations()
   },
   methods: {
@@ -210,7 +210,7 @@ export default {
     },
     panToWaypoint () {
       GameContainer.map.clearHighlightedLocations()
-      
+
       let star = this.$store.state.game.galaxy.stars.find(x => x._id === this.currentWaypoint.destination)
 
       GameContainer.map.panToStar(star)
@@ -232,7 +232,7 @@ export default {
           this.carrier.ticksEtaTotal = response.data.ticksEtaTotal
           this.carrier.waypoints = response.data.waypoints
 
-          this.$toasted.show(`${this.carrier.name} waypoints updated.`)
+          this.$toast.default(`${this.carrier.name} waypoints updated.`)
 
           GameContainer.reloadCarrier(this.carrier);
 
@@ -253,7 +253,7 @@ export default {
         let timeRemainingEtaDate = GameHelper.calculateTimeByTicks(this.currentWaypoint.ticks + +this.currentWaypoint.delayTicks, this.$store.state.game.settings.gameTime.speed, null)
         this.waypointDuration = GameHelper.getCountdownTimeString(this.$store.state.game, timeRemainingEtaDate, true)
       }
-      
+
       this.recalculateWaypointEta()
     },
     recalculateWaypointEta () {

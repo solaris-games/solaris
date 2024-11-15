@@ -36,7 +36,7 @@ export default {
             let response = await SpectatorApiService.uninvite(this.$store.state.game._id, this.spectator._id)
 
             if (response.status === 200) {
-                this.$toasted.show(`You uninvited ${this.spectator.username} from spectating you in this game.`, { type: 'success' })
+                this.$toast.success(`You uninvited ${this.spectator.username} from spectating you in this game.`)
 
                 this.$emit('onSpectatorUninvited', this.spectator)
             }

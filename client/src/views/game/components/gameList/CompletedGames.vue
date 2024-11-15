@@ -45,7 +45,7 @@
 </template>
 
 <script>
-import LoadingSpinnerVue from '../../../components/LoadingSpinner'
+import LoadingSpinnerVue from '../../../components/LoadingSpinner.vue'
 import gameService from '../../../../services/api/game'
 import GameHelper from '../../../../services/gameHelper'
 import moment from 'moment'

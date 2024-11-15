@@ -82,6 +82,11 @@ class AdminService extends BaseApiService {
     { withCredentials: true })
   }
 
+  endImpersonate() {
+    return axios.post(this.BASE_URL + 'admin/endImpersonate', {},
+      { withCredentials: true })
+  }
+
   getGames () {
     return axios.get(this.BASE_URL + 'admin/game', { withCredentials: true })
   }

@@ -1,6 +1,9 @@
 import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
 import { mapToUserCreateUserRequest, mapToUserRequestPasswordResetRequest, mapToUserRequestUsernameRequest, mapToUserResetPasswordResetRequest, mapToUserUpdateEmailPreferenceRequest, mapToUserUpdateEmailRequest, mapToUserUpdatePasswordRequest, mapToUserUpdateUsernameRequest } from '../requests/user';
+import {logger} from "../../utils/logging";
+
+const log = logger("User Controller");
 
 export default (container: DependencyContainer) => {
     return {
@@ -231,7 +234,7 @@ export default (container: DependencyContainer) => {
                 try {
                     await container.emailService.sendTemplate(reqObj.email, container.emailService.TEMPLATES.RESET_PASSWORD, [token]);
                 } catch (emailError) {
-                    console.error(emailError);
+                    log.error(emailError);
                     res.sendStatus(500);
                     return next(emailError);
                 }
@@ -262,7 +265,7 @@ export default (container: DependencyContainer) => {
                 try {
                     await container.emailService.sendTemplate(reqObj.email, container.emailService.TEMPLATES.FORGOT_USERNAME, [username]);
                 } catch (emailError) {
-                    console.error(emailError);
+                    log.error(emailError);
     
                     res.sendStatus(500);
                     return next(emailError);

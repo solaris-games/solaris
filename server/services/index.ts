@@ -104,14 +104,21 @@ import { Report } from './types/Report';
 import TeamService from "./team";
 import UserLeaderboardService from './userLeaderboard';
 import GameLockService from "./gameLock";
+import TutorialService from './tutorial';
 import GamePlayerMutexService from './gamePlayerMutex';
 import GameMutexService from "./gameMutex";
 import AnnouncementService from "./announcement";
 import {Announcement} from "./types/Announcement";
 import PlayerColourService from "./playerColour";
+import GameMaskingService from "./gameMaskingService";
+import SessionService from "./session";
+import starMovementService from "./starMovement";
+import {logger} from "../utils/logging";
 
 const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
+
+const log = logger("Dependency Container");
 
 const gameRepository = new Repository<Game>(GameModel);
 const userRepository = new Repository<User>(UserModel);
@@ -131,18 +138,19 @@ export default (config): DependencyContainer => {
     const userLevelService = new UserLevelService();
     const authService = new AuthService(userRepository, passwordService);
     const discordService = new DiscordService(config, userRepository);
-    const userService = new UserService(UserModel, userRepository, passwordService);
-    const adminService = new AdminService(userRepository, gameRepository);
+    const sessionService = new SessionService(userRepository);
+    const userService = new UserService(UserModel, userRepository, passwordService, sessionService);
+    const adminService = new AdminService(userRepository, gameRepository, sessionService);
     const recaptchaService = new RecaptchaService(config);
     const specialStarBanService = new SpecialStarBanService();
 
-    const guildService = new GuildService(GuildModel, guildRepository, userRepository, userService);
+    const guildService = new GuildService(GuildModel, guildRepository, userRepository, userService, sessionService);
     const guildUserService = new GuildUserService(userRepository, guildService);
 
     const announcementService = new AnnouncementService(AnnouncementModel, announcementRepository, userService);
 
+    const gameMaskingService = new GameMaskingService();
     const gameLockService = new GameLockService(gameRepository);
-    const broadcastService = new BroadcastService();
     const distanceService = new DistanceService();
     const randomService = new RandomService();
     const cacheService = new CacheService(config);
@@ -153,7 +161,8 @@ export default (config): DependencyContainer => {
     const gameStateService = new GameStateService();
     const gameFluxService = new GameFluxService();
     const playerCreditsService = new PlayerCreditsService(gameRepository);
-    const avatarService = new AvatarService(userRepository, userService);
+    const avatarService = new AvatarService(userRepository, userService, sessionService);
+    const broadcastService = new BroadcastService(avatarService);
     const achievementService = new AchievementService(userRepository, guildService, userLevelService);
     const ratingService = new RatingService(userRepository, gameRepository, userService);
     const nameService = new NameService(gameNames, starNames, randomService);
@@ -175,7 +184,7 @@ export default (config): DependencyContainer => {
     const spiralMapService = new SpiralMapService(randomService, starService, starDistanceService, distanceService, resourceService, gameTypeService);
     const doughnutMapService = new DoughnutMapService(randomService, starService, starDistanceService, distanceService, resourceService, gameTypeService);
     const irregularMapService = new IrregularMapService(randomService, starService, starDistanceService, distanceService, resourceService, gameTypeService);
-    const customMapService = new CustomMapService();
+    const customMapService = new CustomMapService(carrierService);
     const mapService = new MapService(randomService, starService, starDistanceService, nameService, circularMapService, spiralMapService, doughnutMapService, circularBalancedMapService, irregularMapService, gameTypeService, customMapService);
     const playerReadyService = new PlayerReadyService(gameRepository, gameTypeService);
     const teamService = new TeamService(diplomacyService);
@@ -194,7 +203,8 @@ export default (config): DependencyContainer => {
     const userLeaderboardService = new UserLeaderboardService(userRepository, guildUserService);
     const researchService = new ResearchService(gameRepository, technologyService, randomService, playerStatisticsService, starService, userService, gameTypeService);
     const combatService = new CombatService(technologyService, specialistService, playerService, starService, reputationService, diplomacyService, gameTypeService);
-    const waypointService = new WaypointService(gameRepository, carrierService, starService, distanceService, starDistanceService, technologyService, gameService, playerService, carrierMovementService);
+    const historyService = new HistoryService(historyRepository, playerService, gameService, playerStatisticsService, gameStateService);
+    const waypointService = new WaypointService(gameRepository, carrierService, starService, distanceService, starDistanceService, technologyService, gameService, playerService, carrierMovementService, gameMaskingService, historyService);
     const specialistBanService = new SpecialistBanService(specialistService);
     const specialistHireService = new SpecialistHireService(gameRepository, specialistService, achievementService, waypointService, playerCreditsService, starService, gameTypeService, specialistBanService, technologyService);
     const starUpgradeService = new StarUpgradeService(gameRepository, starService, carrierService, achievementService, researchService, technologyService, playerCreditsService, gameTypeService, shipService);
@@ -202,10 +212,9 @@ export default (config): DependencyContainer => {
     const pathfindingService = new PathfindingService(distanceService, starService, waypointService);
     const basicAIService = new BasicAIService(starUpgradeService);
     const aiService = new AIService(starUpgradeService, carrierService, starService, distanceService, waypointService, combatService, shipTransferService, technologyService, playerService, playerAfkService, reputationService, diplomacyService, shipService, playerStatisticsService, basicAIService, pathfindingService);
-    const historyService = new HistoryService(historyRepository, playerService, gameService, playerStatisticsService);
     const battleRoyaleService = new BattleRoyaleService(starService, carrierService, mapService, starDistanceService, waypointService, carrierMovementService);
     const starMovementService = new StarMovementService(mapService, starDistanceService, specialistService, waypointService);
-    const gameGalaxyService = new GameGalaxyService(cacheService, broadcastService, gameService, mapService, playerService, playerAfkService, starService, shipService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, specialistService, technologyService, reputationService, guildUserService, historyService, battleRoyaleService, starMovementService, gameTypeService, gameStateService, diplomacyService, avatarService, playerStatisticsService, gameFluxService, spectatorService);
+    const gameGalaxyService = new GameGalaxyService(cacheService, broadcastService, gameService, mapService, playerService, playerAfkService, starService, shipService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, specialistService, technologyService, reputationService, guildUserService, historyService, battleRoyaleService, starMovementService, gameTypeService, gameStateService, diplomacyService, avatarService, playerStatisticsService, gameFluxService, spectatorService, gameMaskingService);
     const scheduleBuyService = new ScheduleBuyService(gameRepository, starUpgradeService);
     const gameTickService = new GameTickService(distanceService, starService, carrierService, researchService, playerService, playerAfkService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService, specialistService, starUpgradeService, reputationService, aiService, battleRoyaleService, starMovementService, diplomacyService, gameTypeService, gameStateService, playerCycleRewardsService, diplomacyUpkeepService, carrierMovementService, carrierGiftService, starContestedService, playerReadyService, shipService, scheduleBuyService, gameLockService);
     const emailService = new EmailService(config, gameService, gameJoinService, userService, leaderboardService, playerService, playerReadyService, gameTypeService, gameStateService, gameTickService);
@@ -214,17 +223,18 @@ export default (config): DependencyContainer => {
 
     const gameListService = new GameListService(gameRepository, gameService, conversationService, eventService, gameTypeService, leaderboardService);
     const gameCreateValidationService = new GameCreateValidationService(playerService, starService, carrierService, specialistService, gameTypeService);
-    const gameCreateService = new GameCreateService(GameModel, gameJoinService, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService, gameCreateValidationService, gameFluxService, specialistBanService, specialStarBanService, gameTypeService, starService, diplomacyService, teamService, carrierService);
+    const gameCreateService = new GameCreateService(GameModel, gameJoinService, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService, gameCreateValidationService, gameFluxService, specialistBanService, specialStarBanService, gameTypeService, starService, diplomacyService, teamService, carrierService, customMapService);
 
     const reportService = new ReportService(ReportModel, reportRepository, playerService, conversationService, userService, gameListService, gameService);
 
     const notificationService = new NotificationService(config, userRepository, gameRepository, discordService, conversationService, gameService, gameJoinService, gameTickService, researchService, tradeService);
+    const tutorialService = new TutorialService(userService);
 
     const gamePlayerMutexService = new GamePlayerMutexService();
 
     const gameMutexService = new GameMutexService();
 
-    console.log('Dependency container initialized.');
+    log.info('Dependency container initialized.');
 
     return {
         config,
@@ -297,6 +307,7 @@ export default (config): DependencyContainer => {
         carrierGiftService,
         carrierMovementService,
         playerCycleRewardsService,
+        gameMaskingService,
         starContestedService,
         gameFluxService,
         notificationService,
@@ -304,9 +315,11 @@ export default (config): DependencyContainer => {
         spectatorService,
         scheduleBuyService,
         teamService,
+        tutorialService,
         pathfindingService,
         gamePlayerMutexService,
         gameMutexService,
         playerColourService,
+        sessionService
     };
 };

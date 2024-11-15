@@ -3,10 +3,14 @@
     <td><a href="javascript:;" @click="clickStar">{{star.name}}</a></td>
     <td class="no-padding"><a href="javascript:;" @click="goToStar"><i class="far fa-eye"></i></a></td>
     <td class="sm-padding"><specialist-icon :type="'star'" :specialist="star.specialist" :hideDefaultIcon="true"></specialist-icon></td>
-    <td class="sm-padding text-end"><star-resources :resources="star.naturalResources" :compareResources="star.terraformedResources" :displayIcon="false"/></td>
+    <star-resources :resources="star.naturalResources" :compareResources="star.terraformedResources" :displayIcon="false"/>
     <td class="text-end">
       <span v-if="star.infrastructure" class="text-success me-2" title="Economic infrastructure - Contributes to credits earned at the end of a cycle">{{star.infrastructure.economy}}</span>
+    </td>
+    <td class="text-end">
       <span v-if="star.infrastructure" class="text-warning me-2" title="Industrial infrastructure - Contributes to ship production">{{star.infrastructure.industry}}</span>
+    </td>
+    <td class="text-end">
       <span v-if="star.infrastructure" class="text-info" title="Scientific infrastructure - Contributes to technology research">{{star.infrastructure.science}}</span>
     </td>
     <td class="last">
@@ -17,9 +21,9 @@
 
 <script>
 import gameContainer from '../../../../game/container'
-import SpecialistIcon from '../specialist/SpecialistIcon'
-import IgnoreBulkUpgradeVue from './IgnoreBulkUpgrade'
-import StarResourcesVue from './StarResources'
+import SpecialistIcon from '../specialist/SpecialistIcon.vue'
+import IgnoreBulkUpgradeVue from './IgnoreBulkUpgrade.vue'
+import StarResourcesVue from './StarResources.vue'
 
 export default {
   components: {

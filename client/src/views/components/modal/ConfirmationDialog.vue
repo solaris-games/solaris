@@ -1,5 +1,5 @@
 <template>
-  <dialog-modal
+  <DialogModal
   v-if="Boolean(dialogSettings)"
   :cancelText="dialogSettings.cancelText"
   :confirmText="dialogSettings.confirmText"
@@ -10,27 +10,19 @@
   @onConfirm="onConfirm"
   @onCancel="onCancel">
     <p style="white-space: pre-wrap">{{dialogSettings.text}}</p>
-  </dialog-modal>
+  </DialogModal>
 </template>
 
-<script>
-import DialogModalVue from './DialogModal.vue'
-export default {
-  components: {
-    'dialog-modal': DialogModalVue
-  },
-  props: {
-    dialogSettings: Object
-  },
-  methods: {
-    onConfirm (e) {
-      this.dialogSettings.onConfirm()
-    },
-    onCancel (e) {
-      this.dialogSettings.onCancel()
-    }
-  }
-}
+<script setup type="ts">
+import DialogModal from './DialogModal.vue'
+
+const props = defineProps({
+  dialogSettings: Object
+});
+
+const onConfirm = (e) => props.dialogSettings.onConfirm();
+
+const onCancel = (e) => props.dialogSettings.onCancel();
 </script>
 
 <style>

@@ -159,6 +159,10 @@ export default class StarUpgradeService extends EventEmitter {
             throw new ValidationError(`Carrier must have 1 or more ships.`);
         }
 
+        if (ships !== parseInt(ships.toString())) {
+            throw new ValidationError(`Carrier ships must be a whole number.`);
+        }
+
         // Get the star.
         let star = this.starService.getById(game, starId);
 
@@ -619,6 +623,7 @@ export default class StarUpgradeService extends EventEmitter {
                 starName: starToUpgrade.star.name,
                 naturalResources: starToUpgrade.star.naturalResources,
                 infrastructureCurrent,
+                nextInfrastructureCost: 0,
                 infrastructureCostTotal: 0,
                 infrastructure: starToUpgrade.infrastructureAmount,
             }
@@ -633,11 +638,29 @@ export default class StarUpgradeService extends EventEmitter {
         summaryStar.infrastructureCostTotal += starToUpgrade.infrastructureCost;
         summaryStar.infrastructure = upgradedStar.infrastructureAmount;
 
+        summaryStar.nextInfrastructureCost = this.calculateNextInfrastructureUpgradeCost(game, upgradedStar, infrastructureType, summaryStar.infrastructure);
+
         if (infrastructureType === 'industry') {
             summaryStar.manufacturing = this.shipService.calculateManufacturingForIndustry(game, starToUpgrade.star, summaryStar.infrastructure);
         }
 
         return upgradedStar;
+    }
+
+    private calculateNextInfrastructureUpgradeCost(game: Game, upgradeStar: UpgradeStar, infrastructureType: InfrastructureType, currentInfrastructureCount: number): number {
+        switch (infrastructureType) {
+            case 'economy': {
+                return this.calculateEconomyCost(game, game.constants.star.infrastructureExpenseMultipliers[game.settings.player.developmentCost.economy], currentInfrastructureCount, upgradeStar.terraformedResources)!;
+            }
+            case 'industry': {
+                return this.calculateIndustryCost(game, game.constants.star.infrastructureExpenseMultipliers[game.settings.player.developmentCost.industry], currentInfrastructureCount, upgradeStar.terraformedResources)!;
+            }
+            case 'science': {
+                return this.calculateScienceCost(game, game.constants.star.infrastructureExpenseMultipliers[game.settings.player.developmentCost.science], currentInfrastructureCount, upgradeStar.terraformedResources)!;
+            }
+            default:
+                throw new ValidationError(`Unknown infrastructureType: ${infrastructureType}`);
+        }
     }
 
     generateUpgradeBulkReportBelowPrice(game: Game, player: Player, infrastructureType: InfrastructureType, amount: number): BulkUpgradeReport {

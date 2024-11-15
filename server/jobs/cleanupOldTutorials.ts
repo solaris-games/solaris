@@ -1,4 +1,7 @@
 import { DependencyContainer } from "../services/types/DependencyContainer";
+import {logger} from "../utils/logging";
+
+const log = logger("Cleanup Old Tutorials Job");
 
 export default (container: DependencyContainer) => {
 
@@ -14,13 +17,13 @@ export default (container: DependencyContainer) => {
                     try {
                         await container.gameService.delete(game);
                     } catch (e) {
-                        console.error(e);
+                        log.error(e);
                     }
                 }
 
                 done();
             } catch (e) {
-                console.error("CleanupOldTutorials job threw unhandled: " + e, e);
+                log.error("CleanupOldTutorials job threw unhandled: " + e, e);
             }
         }
     };

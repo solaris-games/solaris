@@ -15,9 +15,9 @@
 </template>
 
 <script>
-import MenuTitle from '../MenuTitle'
-import Selection from './Selection'
-import ProgressSummary from './ProgressSummary'
+import MenuTitle from '../MenuTitle.vue'
+import Selection from './Selection.vue'
+import ProgressSummary from './ProgressSummary.vue'
 
 export default {
   components: {

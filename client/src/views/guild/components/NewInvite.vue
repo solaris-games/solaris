@@ -5,7 +5,7 @@
     <h5>Invite Player</h5>
 
     <form-error-list :errors="errors"/>
-      
+
     <form @submit="handleSubmit">
         <div class="row g-0">
             <div class="col">
@@ -23,8 +23,8 @@
 </template>
 
 <script>
-import FormErrorList from '../../components/FormErrorList'
-import LoadingSpinner from '../../components/LoadingSpinner'
+import FormErrorList from '../../components/FormErrorList.vue'
+import LoadingSpinner from '../../components/LoadingSpinner.vue'
 import GuildApiService from '../../../services/api/guild'
 
 export default {
@@ -60,7 +60,7 @@ export default {
         let response = await GuildApiService.invite(this.guildId, this.username)
 
         if (response.status === 200) {
-          this.$toasted.show(`You invited ${this.username} to the guild.`, { type: 'success' })
+          this.$toast.default(`You invited ${this.username} to the guild.`, { type: 'success' })
 
           this.$emit('onUserInvited', response.data)
 

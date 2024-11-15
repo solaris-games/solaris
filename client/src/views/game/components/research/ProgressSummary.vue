@@ -172,7 +172,7 @@
 </template>
 
 <script>
-import HelpTooltip from '../../../components/HelpTooltip'
+import HelpTooltip from '../../../components/HelpTooltip.vue'
 import GameHelper from '../../../../services/gameHelper'
 import TechnologyHelper from '../../../../services/technologyHelper'
 

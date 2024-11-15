@@ -8,15 +8,15 @@
     <td class="text-end">{{empire.totalSpecialists}}</td>
     <td class="text-end">{{empire.totalShips}}</td>
     <td class="text-end">{{empire.newShips}}</td>
-    <td class="text-end">{{empire.totalEconomy}}</td>
-    <td class="text-end">{{empire.totalIndustry}}</td>
-    <td class="text-end">{{empire.totalScience}}</td>
+    <td class="text-end text-success">{{empire.totalEconomy}}</td>
+    <td class="text-end text-warning">{{empire.totalIndustry}}</td>
+    <td class="text-end text-info">{{empire.totalScience}}</td>
 </tr>
 </template>
 
 <script>
 import gameContainer from '../../../../game/container'
-import PlayerIconVue from '../player/PlayerIcon'
+import PlayerIconVue from '../player/PlayerIcon.vue'
 
 export default {
   components: {

@@ -1,5 +1,6 @@
 import { DBObjectId } from "./DBObjectId";
 import { Location } from "./Location";
+import { Player } from "./Player";
 
 export interface MapObject {
     _id: DBObjectId;

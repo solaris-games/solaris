@@ -39,7 +39,7 @@ import GameHelper from '../../../../services/gameHelper'
 import DiplomacyHelper from '../../../../services/diplomacyHelper'
 import router from '../../../../router'
 import MENU_STATES from '../../../../services/data/menuStates'
-import SidebarMenuItem from './SidebarMenuItem'
+import SidebarMenuItem from './SidebarMenuItem.vue'
 
 export default {
   components: {
@@ -87,7 +87,7 @@ export default {
       return GameHelper.isTradeEnabled(this.$store.state.game)
     },
     documentationUrl () {
-      return process.env.VUE_APP_DOCUMENTATION_URL
+      return import.meta.env.VUE_APP_DOCUMENTATION_URL
     },
     canDisplayBottomBar () {
       return window.innerHeight >= 750

@@ -36,8 +36,8 @@
 </template>
 
 <script>
-import ViewContainer from "./components/ViewContainer"
-import ViewTitle from "./components/ViewTitle"
+import ViewContainer from "./components/ViewContainer.vue"
+import ViewTitle from "./components/ViewTitle.vue"
 
 export default {
   components: {

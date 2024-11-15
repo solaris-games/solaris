@@ -1,10 +1,13 @@
 import { DependencyContainer } from "../services/types/DependencyContainer";
+import {logger} from "../utils/logging";
 
 function sleep(ms: number) {
     return new Promise((resolve) => {
         setTimeout(resolve, ms);
     });
 }  
+
+const log = logger("Send Review Reminders Job");
 
 export default (container: DependencyContainer) => {
 
@@ -23,7 +26,7 @@ export default (container: DependencyContainer) => {
                     try {
                         await container.emailService.sendReviewReminderEmail(user);
                     } catch (e) {
-                        console.error(e);
+                        log.error(e);
                     } finally {
                         await container.userService.setReviewReminderEmailSent(user._id, true);
                     }
@@ -33,7 +36,7 @@ export default (container: DependencyContainer) => {
 
                 done();
             } catch (e) {
-                console.error("SendReviewReminders job threw unhandled: " + e, e);
+                log.error("SendReviewReminders job threw unhandled: " + e, e);
             }
         }
 

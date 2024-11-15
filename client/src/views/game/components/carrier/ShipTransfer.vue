@@ -85,8 +85,8 @@
 import { mapState } from 'vuex'
 import GameHelper from '../../../../services/gameHelper'
 import CarrierApiService from '../../../../services/api/carrier'
-import MenuTitle from '../MenuTitle'
-import StarLabelVue from '../star/StarLabel'
+import MenuTitle from '../MenuTitle.vue'
+import StarLabelVue from '../star/StarLabel.vue'
 
 export default {
   components: {
@@ -220,7 +220,7 @@ export default {
           sShips)
 
         if (response.status === 200) {
-          this.$toasted.show(`Ships transferred between ${this.star.name} and ${this.carrier.name}.`)
+          this.$toast.default(`Ships transferred between ${this.star.name} and ${this.carrier.name}.`)
 
           this.$store.commit('gameStarCarrierShipTransferred', {
             starId: this.star._id,
