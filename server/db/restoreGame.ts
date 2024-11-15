@@ -136,6 +136,10 @@ const startup = async () => {
     const gameIdS = process.argv[2];
     const tick = Number.parseInt(process.argv[3]);
 
+    if (!gameIdS || !tick) {
+        throw new Error("Invalid arguments. Usage: npm run restore-game <gameId> <tick>");
+    }
+
     const gameId = new mongoose.Types.ObjectId(gameIdS) as DBObjectId;
 
     const hist = await loadHistory(gameId, tick);
