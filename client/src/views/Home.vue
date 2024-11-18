@@ -59,21 +59,8 @@ export default {
   async mounted () {
     this.isAutoLoggingIn = true
 
-    try {
-      let response = await ApiAuthService.verify()
-
-      if (response.status === 200) {
-        if (response.data._id) {
-          this.$store.commit('setUserId', response.data._id)
-          this.$store.commit('setUsername', response.data.username)
-          this.$store.commit('setRoles', response.data.roles)
-          this.$store.commit('setUserCredits', response.data.credits)
-
-          router.push({ name: 'main-menu' })
-        }
-      }
-    } catch (err) {
-      console.error(err)
+    if (await this.$store.dispatch('verify')) {
+      await router.push({ name: 'main-menu' })
     }
 
     this.isAutoLoggingIn = false

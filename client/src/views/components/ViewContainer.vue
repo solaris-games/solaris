@@ -49,6 +49,11 @@ export default {
   components: {
     'logo': LogoVue,
     'view-container-top-bar': ViewContainerTopBarVue
+  },
+  async mounted() {
+    if (!this.$store.state.userId) {
+      await this.$store.dispatch('verify')
+    }
   }
 }
 </script>

@@ -5,6 +5,8 @@ import GameContainer from './game/container'
 import SpecialistService from './services/api/specialist';
 import ColourService from './services/api/colour';
 import gameHelper from "./services/gameHelper";
+import ApiAuthService from "./services/api/auth.js";
+import router from "./router.js";
 
 export default createStore({
   state: {
@@ -524,6 +526,25 @@ export default createStore({
 
       GameContainer.reloadGame(state.game, state.settings);
     },
+    async verify({ commit }) {
+      try {
+        const response = await ApiAuthService.verify()
+
+        if (response.status === 200) {
+          if (response.data._id) {
+            commit('setUserId', response.data._id)
+            commit('setUsername', response.data.username)
+            commit('setRoles', response.data.roles)
+            commit('setUserCredits', response.data.credits)
+          }
+        }
+
+        return true;
+      } catch (err) {
+        console.error(err);
+        return false;
+      }
+    }
   },
   getters: {
     getConversationMessage: (state) => (conversationId) => {
