@@ -198,7 +198,8 @@ export default class GameTickService extends EventEmitter {
             taskTime = process.hrtime();
             log.info({
                 gameId: game._id,
-                gameName: game.settings.general.name
+                gameName: game.settings.general.name,
+                tick: game.state.tick
             }, `[${game.settings.general.name}] - ${taskName}: %ds %dms'`, taskTimeEnd[0], taskTimeEnd[1] / 1000000);
         };
 
@@ -215,9 +216,20 @@ export default class GameTickService extends EventEmitter {
             this.playerService.incrementMissedTurns(game);
         }
 
+        // Check if win condition was reached before the tick (for example due to RTQ)
+        let hasWinnerBeforeTick = this._gameWinCheck(game, gameUsers);
+        if (hasWinnerBeforeTick) {
+            log.info({
+                gameId: game._id,
+                gameName: game.settings.general.name,
+                tick: game.state.tick
+            }, `Game has reached a win condition before the tick. Tick processing will be skipped.`);
+            iterations = 0;
+        }
+
         let hasProductionTicked: boolean = false;
 
-        while (iterations--) {
+        while (iterations > 0) {
             if (!await this.gameLockService.isLockedInDatabase(game._id)) {
                 throw new Error(`The game was not locked after game processing, concurrency issue?`);
             }
@@ -284,6 +296,8 @@ export default class GameTickService extends EventEmitter {
             if (hasWinner) {
                 break;
             }
+
+            iterations--;
         }
 
         // TODO: This has been moved out of _moveCarriers, see comment in there.
