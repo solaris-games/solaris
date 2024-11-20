@@ -4,7 +4,7 @@ import { DBObjectId, objectIdFromString } from "../services/types/DBObjectId";
 export type Validator<T> = (value: any) => T;
 
 const failed = (expected: string, value: any) => {
-    return new ValidationError(`Expected ${expected}, but got: ${typeof value}`);
+    return new ValidationError(`Expected ${expected}, but got: ${value.toString().substring(1000)} ${typeof value}`);
 }
 
 const primitive = (t: string) => (value: any) => {
@@ -129,8 +129,12 @@ export const object = <T>(objValidator: ObjectValidator<T>): Validator<T> => {
         let n: any = {};
 
         for (const key of Object.keys(objValidator)) {
-            const validator: Validator<any> = objValidator[key];
-            n[key] = validator(v[key]);
+            try {
+                const validator: Validator<any> = objValidator[key];
+                n[key] = validator(v[key]);
+            } catch (e) {
+                throw new ValidationError(`Error in field ${key}: ${e.message}`);
+            }
         }
 
         return n;
@@ -194,3 +198,13 @@ export const positiveInteger = numberAdv({
     integer: true,
     sign: 'positive'
 });
+
+export const withDefault = <A>(defaultValue: A, validator: Validator<A>): Validator<A> => {
+    return v => {
+        if (v === undefined || v === null) {
+            return defaultValue;
+        }
+
+        return validator(v);
+    }
+}

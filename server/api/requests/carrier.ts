@@ -1,7 +1,21 @@
 import ValidationError from "../../errors/validation";
 import { CarrierWaypointActionType, CarrierWaypointActionTypes } from "../../services/types/CarrierWaypoint";
 import { DBObjectId } from "../../services/types/DBObjectId";
-import { array, boolean, map, number, numberAdv, object, objectId, or, positiveInteger, string, stringEnumeration, Validator } from "../validate";
+import {
+    array,
+    boolean,
+    map,
+    number,
+    numberAdv,
+    object,
+    objectId,
+    or,
+    positiveInteger,
+    string,
+    stringEnumeration,
+    Validator,
+    withDefault
+} from "../validate";
 import { keyHasArrayValue, keyHasBooleanValue, keyHasNumberValue, keyHasObjectValue, keyHasStringValue } from "./helpers";
 
 type CarrierSaveWaypoint = {
@@ -17,13 +31,13 @@ export type CarrierSaveWaypointsRequest = {
     looped: boolean;
 };
 
-export const parseCarierSaveWaypointsRequest: Validator<CarrierSaveWaypointsRequest> = object({
+export const parseCarrierSaveWaypointsRequest: Validator<CarrierSaveWaypointsRequest> = object({
     waypoints: array(object({
         source: objectId,
         destination: objectId,
         action: stringEnumeration<CarrierWaypointActionType, CarrierWaypointActionType[]>(CarrierWaypointActionTypes),
-        actionShips: map((a) => a || 0, positiveInteger),
-        delayTicks: map((a) => a || 0, positiveInteger),
+        actionShips: withDefault(0, positiveInteger),
+        delayTicks: withDefault(0, positiveInteger),
     })),
     looped: boolean,
 });
