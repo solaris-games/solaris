@@ -113,9 +113,12 @@ import PlayerColourService from "./playerColour";
 import GameMaskingService from "./gameMaskingService";
 import SessionService from "./session";
 import starMovementService from "./starMovement";
+import {logger} from "../utils/logging";
 
 const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
+
+const log = logger("Dependency Container");
 
 const gameRepository = new Repository<Game>(GameModel);
 const userRepository = new Repository<User>(UserModel);
@@ -200,7 +203,7 @@ export default (config): DependencyContainer => {
     const userLeaderboardService = new UserLeaderboardService(userRepository, guildUserService);
     const researchService = new ResearchService(gameRepository, technologyService, randomService, playerStatisticsService, starService, userService, gameTypeService);
     const combatService = new CombatService(technologyService, specialistService, playerService, starService, reputationService, diplomacyService, gameTypeService);
-    const historyService = new HistoryService(historyRepository, playerService, gameService, playerStatisticsService);
+    const historyService = new HistoryService(historyRepository, playerService, gameService, playerStatisticsService, gameStateService);
     const waypointService = new WaypointService(gameRepository, carrierService, starService, distanceService, starDistanceService, technologyService, gameService, playerService, carrierMovementService, gameMaskingService, historyService);
     const specialistBanService = new SpecialistBanService(specialistService);
     const specialistHireService = new SpecialistHireService(gameRepository, specialistService, achievementService, waypointService, playerCreditsService, starService, gameTypeService, specialistBanService, technologyService);
@@ -231,7 +234,7 @@ export default (config): DependencyContainer => {
 
     const gameMutexService = new GameMutexService();
 
-    console.log('Dependency container initialized.');
+    log.info('Dependency container initialized.');
 
     return {
         config,

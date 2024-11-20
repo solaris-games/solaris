@@ -348,6 +348,17 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
         controller.fastForward
     );
 
+    router.post('/api/game/:gameId/kick',
+        mw.auth.authenticate(),
+        mw.game.loadGame({
+            lean: false,
+        }),
+        mw.game.validateGameState({
+            isUnlocked: true,
+        }),
+        controller.kickPlayer
+    );
+
     router.get('/api/game/:gameId/player/:playerId',
             mw.game.loadGame({
                 lean: true,

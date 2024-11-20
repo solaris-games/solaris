@@ -16,6 +16,9 @@ import GameEndedEvent from './types/events/GameEnded';
 import GameTurnEndedEvent from './types/events/GameTurnEnded';
 import ConversationMessageSentEvent from './types/events/ConversationMessageSent';
 import GameJoinService, { GameJoinServiceEvents } from './gameJoin';
+import {logger} from "../utils/logging";
+
+const log = logger("Notification Service");
 
 // Note: We only support discord subscriptions at this point, if any new ones are added
 // this class will need to be refactored to use something like the strategy pattern.
@@ -81,7 +84,7 @@ export default class NotificationService {
             this.tradeService.on(TradeServiceEvents.onPlayerRenownReceived, (args) => this.onPlayerRenownReceived(args.gameId, args.fromPlayer, args.toPlayer, args.amount));
             this.tradeService.on(TradeServiceEvents.onPlayerTechnologyReceived, (args) => this.onPlayerTechnologyReceived(args.gameId, args.fromPlayer, args.toPlayer, args.technology));
 
-            console.log('Notifications initialized.')
+            log.info('Notifications initialized.')
         }
     }
 

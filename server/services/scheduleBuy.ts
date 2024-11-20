@@ -1,3 +1,5 @@
+import {logger} from "../utils/logging";
+
 const mongoose = require('mongoose');
 
 import ValidationError from '../errors/validation';
@@ -8,6 +10,7 @@ import {Game} from "./types/Game";
 import {Player, PlayerScheduledActions} from "./types/Player";
 import {InfrastructureType} from './types/Star';
 import {ObjectId} from "mongoose";
+import { DBObjectId } from "./types/DBObjectId";
 
 
 const buyTypeToPriority = {
@@ -18,6 +21,8 @@ const buyTypeToPriority = {
 }
 
 const EventEmitter = require('events');
+
+const log = logger("Schedule Buy Service");
 
 export default class ScheduleBuyService extends EventEmitter {
     gameRepo: Repository<Game>;
@@ -70,7 +75,7 @@ export default class ScheduleBuyService extends EventEmitter {
 
                     await this.starUpgradeService.executeBulkUpgradeReport(game, player, report);
                 } catch (e) {
-                    console.error(e)
+                    log.error(e)
                 }
             }
 
@@ -80,7 +85,7 @@ export default class ScheduleBuyService extends EventEmitter {
                 const totalPercentage = percentageActions.reduce((total, cur) => total + cur.amount, 0);
                 await this._executePercentageAction(game, player, percentageActions, totalPercentage);
             } catch (e) {
-                console.error(e)
+                log.error(e)
             }
 
             // Only keep actions that are repeated or in the future
@@ -139,8 +144,8 @@ export default class ScheduleBuyService extends EventEmitter {
         return action;
     }
 
-    async toggleBulkRepeat(game: Game, player: Player, actionId: ObjectId) {
-        let action = player.scheduledActions.find(a => a._id == actionId);
+    async toggleBulkRepeat(game: Game, player: Player, actionId: DBObjectId) {
+        const action = player.scheduledActions.find(a => a._id.toString() == actionId.toString());
         if (!action) {
             throw new ValidationError('Action does not exist');
         }
@@ -159,8 +164,8 @@ export default class ScheduleBuyService extends EventEmitter {
         return action;
     }
 
-    async trashAction(game: Game, player: Player, actionId: ObjectId) {
-        let action = player.scheduledActions.find(a => a._id == actionId);
+    async trashAction(game: Game, player: Player, actionId: DBObjectId) {
+        const action = player.scheduledActions.find(a => a._id.toString() == actionId.toString());
         if (!action) {
             throw new ValidationError('Action does not exist');
         }

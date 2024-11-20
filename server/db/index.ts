@@ -1,3 +1,5 @@
+import {logger} from "../utils/logging";
+
 const mongoose = require('mongoose');
 
 import EventModel from './models/Event';
@@ -6,6 +8,8 @@ import GuildModel from './models/Guild';
 import HistoryModel from './models/History';
 import UserModel from './models/User';
 import PaymentModel from './models/Payment';
+
+const log = logger("Database");
 
 export default async (config, options) => {
 
@@ -25,14 +29,14 @@ export default async (config, options) => {
                 $set: { nextRunAt:new Date() }
             });
     
-            console.log(`Unlocked #${numUnlocked.modifiedCount} jobs.`);
+            log.info(`Unlocked #${numUnlocked.modifiedCount} jobs.`);
         } catch (e) {
-            console.error(e);
+            log.error(e);
         }
     }
     
     async function syncIndexes() {
-        console.log('Syncing indexes...');
+        log.info('Syncing indexes...');
         await EventModel.syncIndexes();
         await GameModel.syncIndexes();
         await GuildModel.syncIndexes();
@@ -40,12 +44,12 @@ export default async (config, options) => {
         await UserModel.syncIndexes();
         await PaymentModel.syncIndexes();
         // TODO ReportModel?
-        console.log('Indexes synced.');
+        log.info('Indexes synced.');
     }
     
     const dbConnection = mongoose.connection;
 
-    dbConnection.on('error', console.error.bind(console, 'connection error:'));
+    dbConnection.on('error', log.error.bind(log.error, 'connection error:'));
 
     options = options || {};
     options.connectionString = options.connectionString || config.connectionString;
@@ -53,7 +57,7 @@ export default async (config, options) => {
     options.unlockJobs = options.unlockJobs == null ? false : options.unlockJobs;
     options.poolSize = options.poolSize || 5;
 
-    console.log(`Connecting to database: ${options.connectionString}`);
+    log.info(`Connecting to database: ${options.connectionString}`);
 
     const db = await mongoose.connect(options.connectionString, {
         useUnifiedTopology: true,
@@ -71,7 +75,7 @@ export default async (config, options) => {
         await unlockAgendaJobs(db);
     }
 
-    console.log('MongoDB intialized.');
+    log.info('MongoDB intialized.');
 
     return db;
 };

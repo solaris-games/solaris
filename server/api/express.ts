@@ -10,6 +10,9 @@ import { DependencyContainer } from '../services/types/DependencyContainer';
 import registerRoutes from './routes';
 import {SingleRouter} from "./singleRoute";
 import Middleware from "./middleware";
+import {logger} from "../utils/logging";
+
+const log = logger("express");
 
 export default async (config: Config, app, container: DependencyContainer) => {
     const idempotencyKeyCache: Map<string, number> = new Map<string, number>();
@@ -27,7 +30,7 @@ export default async (config: Config, app, container: DependencyContainer) => {
 
     // Catch session store errors
     sessionStorage.on('error', function(err) {
-        console.error(err);
+        log.error(err);
     });
 
     // ---------------
@@ -121,7 +124,7 @@ export default async (config: Config, app, container: DependencyContainer) => {
 
     app.use(middleware.core.handleError);
 
-    console.log('Express intialized.');
+    log.info('Express intialized.');
     
     return {
         app,

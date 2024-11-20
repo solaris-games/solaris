@@ -1,5 +1,3 @@
-const { Console } = require("console");
-
 module.exports = {
     async migrate(db) {
         const games = db.collection('games');

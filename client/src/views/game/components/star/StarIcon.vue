@@ -39,7 +39,7 @@ export default {
         return new URL(`../../../../assets/map-objects/128x128_star_scannable_binary.svg`, import.meta.url).href;
       }
       else if (this.isNebula) {
-        return `mask-image: url(${new URL(`../../../../assets/nebula/neb0-starless-bright.png`, import.meta.url)});`;
+       return `mask-image: url(${new URL(`../../../../assets/nebula/neb0-starless-bright.png`, import.meta.url)}); -webkit-mask-image: url(${new URL(`../../../../assets/nebula/neb0-starless-bright.png`, import.meta.url)});`;
       }
       else if (this.isBlackHole) {
         return new URL(`../../../../assets/map-objects/128x128_star_black_hole.svg`, import.meta.url).href;
@@ -48,7 +48,7 @@ export default {
         return new URL(`../../../../assets/stars/128x128_star_pulsar.svg`, import.meta.url).href;
       }
       else if (this.isWormHole) {
-        return `mask-image: url(${new URL(`../../../../assets/stars/vortex.png`, import.meta.url).href});`;
+       return `mask-image: url(${new URL(`../../../../assets/stars/vortex.png`, import.meta.url).href}); -webkit-mask-image: url(${new URL(`../../../../assets/stars/vortex.png`, import.meta.url).href});`;
       }
       else {
         return new URL(`../../../../assets/map-objects/128x128_star_scannable.svg`, import.meta.url).href;
@@ -63,13 +63,13 @@ export default {
     width: 15px;
     height: 15px;
   }
-  .star-svg:deep(.star) {
+  .star-svg .star {
     fill: currentColor;
   }
-  .star-svg:deep(.pulsar) {
+  .star-svg .pulsar {
     stroke: currentColor;
   }
-  .star-svg:deep(.black-hole) {
+  .star-svg .black-hole {
     fill: transparent;
     stroke: currentColor;
   }
@@ -80,6 +80,9 @@ export default {
     mask-repeat: no-repeat;
     mask-position: center;
     mask-size: 100%;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    -webkit-mask-size: 100%;
   }
 
   .nebulaIcon, .wormHoleIcon {

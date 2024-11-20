@@ -35,17 +35,17 @@ class GridHelper {
   }
 
   compare(a, b) {
-    if (a === b) {
-      return 0;
-    }
-    // Sort null values after everything else
-    else if (a === null) {
-      return 1;
-    }
-    else if (b === null) {
-      return -1;
-    }
-    else {
+      if (a === b) {
+        return 0;
+      }
+      // Treat null values as smaller than anything else.
+      else if (a === null) {
+        return -1;
+      }
+      else if (b === null) {
+        return 1;
+      }
+      else {
 
       let result = a < b ? -1 : 1;
 

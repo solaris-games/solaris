@@ -145,7 +145,7 @@ export default {
         alias: p.alias,
         shape: p.shape,
         defeated: p.defeated,
-        colour: isCurrentPlayer ? '#FFFFFF' : GameHelper.getFriendlyColour(p.colour.value)
+        colour: isCurrentPlayer ? '#FFFFFF' : this.$store.getters.getColourForPlayer(p._id).value
       }
     })
 

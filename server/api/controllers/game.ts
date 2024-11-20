@@ -1,6 +1,9 @@
 import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
-import { mapToGameConcedeDefeatRequest, mapToGameJoinGameRequest, mapToGameSaveNotesRequest } from '../requests/game';
+import { mapToGameConcedeDefeatRequest, mapToGameJoinGameRequest, mapToGameSaveNotesRequest, parseKickPlayerRequest } from '../requests/game';
+import {logger} from "../../utils/logging";
+
+const log = logger("Game Controller");
 
 export default (container: DependencyContainer) => {
     return {
@@ -53,7 +56,7 @@ export default (container: DependencyContainer) => {
                 res.status(201).json(game._id);
                 return next();
             } catch (err) {
-                console.error(err);
+                log.error(err);
                 return next(err);
             }
         },
@@ -409,6 +412,18 @@ export default (container: DependencyContainer) => {
                 res.sendStatus(200);
                 return next();
             }  catch (err) {
+                return next(err);
+            }
+        },
+        kickPlayer: async (req, res, next) => {
+            try {
+                const params = parseKickPlayerRequest(req.body);
+
+                await container.gameService.kickPlayer(req.game, req.session.userId, params.playerId);
+
+                res.sendStatus(200);
+                return next();
+            } catch (err) {
                 return next(err);
             }
         },
