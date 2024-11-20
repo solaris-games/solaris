@@ -6,7 +6,7 @@ let transport;
 let baseLogger;
 
 export const setupLogging = () => {
-    const loggingT = config.logging || 'pretty';
+    const loggingT = config.logging || 'stdout';
 
     if (loggingT === 'pretty') {
         transport = pino.transport({
