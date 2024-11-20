@@ -198,3 +198,13 @@ export const positiveInteger = numberAdv({
     integer: true,
     sign: 'positive'
 });
+
+export const withDefault = <A>(defaultValue: A, validator: Validator<A>): Validator<A> => {
+    return v => {
+        if (v === undefined || v === null) {
+            return defaultValue;
+        }
+
+        return validator(v);
+    }
+}
