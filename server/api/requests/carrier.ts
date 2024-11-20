@@ -17,7 +17,7 @@ export type CarrierSaveWaypointsRequest = {
     looped: boolean;
 };
 
-export const parseCarierSaveWaypointsRequest: Validator<CarrierSaveWaypointsRequest> = object({
+export const parseCarrierSaveWaypointsRequest: Validator<CarrierSaveWaypointsRequest> = object({
     waypoints: array(object({
         source: objectId,
         destination: objectId,
