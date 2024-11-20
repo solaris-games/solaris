@@ -133,7 +133,8 @@ export const object = <T>(objValidator: ObjectValidator<T>): Validator<T> => {
                 const validator: Validator<any> = objValidator[key];
                 n[key] = validator(v[key]);
             } catch (e) {
-                throw new ValidationError(`Error in field ${key}: ${e.message}`);
+                const err = e as ValidationError;
+                throw new ValidationError(`Error in field ${key}: ${err.message}`);
             }
         }
 
