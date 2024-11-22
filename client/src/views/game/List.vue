@@ -10,7 +10,7 @@ import relaxed16Img from '../../assets/screenshots/16_player_relaxed.png';
 </script>
 
 <template>
-  <view-container>
+  <view-container :is-auth-page="true">
     <view-title title="Join Game" />
 
     <community-guidelines-bar />

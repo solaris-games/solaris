@@ -7,7 +7,7 @@ import home5 from '../assets/screenshots/home-5.png'
 </script>
 
 <template>
-  <view-container>
+  <view-container :is-auth-page="true">
     <view-title title="Main Menu" :hideHomeButton="true" :showSocialLinks="true"/>
 
     <warnings v-if="user" :warnings="user.warnings" />

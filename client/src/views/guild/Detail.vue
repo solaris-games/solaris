@@ -1,5 +1,5 @@
 <template>
-  <view-container>
+  <view-container :is-auth-page="true">
     <view-title :title="guild ? guildFullName : 'Guild'" />
 
     <loading-spinner :loading="isLoading"/>

@@ -1,5 +1,5 @@
 <template>
-  <view-container>
+  <view-container :is-auth-page="true">
     <view-title title="Avatar Shop" />
 
     <p>Unlock new races to play with <strong class="text-warning">Galactic Credits</strong>. <router-link :to="{ name: 'galactic-credits-shop'}"><i class="fas fa-shopping-basket"></i> Purchase Galactic Credits</router-link> or earn credits by winning official games.</p>
