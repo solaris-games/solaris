@@ -1,5 +1,5 @@
 <template>
-  <view-container>
+  <view-container :is-auth-page="true">
     <view-title title="Purchase Complete" />
 
     <p>Thank you for your purchase, it goes a long way to help support continued development of <strong>Solaris</strong>.</p>

@@ -1,5 +1,5 @@
 <template>
-  <view-container>
+  <view-container :is-auth-page="true">
     <view-title title="Purchase Failed" />
 
     <p>There was an problem processing your payment, please contact a developer for support. You may have been charged, please do not try the transaction again.</p>

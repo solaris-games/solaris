@@ -1,5 +1,5 @@
 <template>
-  <view-container :hideTopBar="true">
+  <view-container :hideTopBar="true" :is-auth-page="true">
     <view-title
       title="Announcements"
       :showSocialLinks="true"

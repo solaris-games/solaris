@@ -536,10 +536,11 @@ export default createStore({
             commit('setUsername', response.data.username)
             commit('setRoles', response.data.roles)
             commit('setUserCredits', response.data.credits)
+            return true;
           }
         }
 
-        return true;
+        return false;
       } catch (err) {
         console.error(err);
         return false;

@@ -1,6 +1,6 @@
 <template>
   <view-container>
-    <view-title title="Account" />
+    <view-title title="Account" :is-auth-page="true" />
 
     <loading-spinner :loading="!info"/>
 

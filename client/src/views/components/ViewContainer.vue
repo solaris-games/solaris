@@ -44,6 +44,7 @@ import ViewContainerTopBarVue from './ViewContainerTopBar.vue'
 
 export default {
   props: {
+    isAuthPage: Boolean,
     hideTopBar: Boolean
   },
   components: {
@@ -51,7 +52,7 @@ export default {
     'view-container-top-bar': ViewContainerTopBarVue
   },
   async mounted() {
-    if (!this.$store.state.userId) {
+    if (this.isAuthPage && !this.$store.state.userId) {
       await this.$store.dispatch('verify')
     }
   }
