@@ -1,7 +1,6 @@
 import { DiplomaticState } from "./diplomacy";
 import { PlayerStatistics } from "./leaderboard";
-import { AiState } from "./Ai";
-import { InfrastructureType } from "./Star";
+import { InfrastructureType } from "./star";
 
 export type PlayerShape = 'circle'|'square'|'diamond'|'hexagon';
 export type ResearchType = 'scanning'|'hyperspace'|'terraforming'|'experimentation'|'weapons'|'banking'|'manufacturing'|'specialists'|'random';
@@ -113,7 +112,6 @@ export type Player<ID> = {
     isInScanningRange?: boolean;
     currentResearchTicksEta?: number | null;
     nextResearchTicksEta?: number | null;
-    aiState?: AiState | null;
     hasPerspective?: boolean;
     colourMapping?: Map<String, PlayerColour>
 };

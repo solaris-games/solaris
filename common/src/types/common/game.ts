@@ -1,3 +1,7 @@
+import {Star} from "./star";
+import {Player} from "./player";
+import {Conversation} from "./conversation";
+import {Carrier} from "./carrier";
 
 export type GameType = 'tutorial'|
 'custom'|
@@ -354,14 +358,14 @@ export type Game<ID> = {
     _id: ID;
     settings: GameSettings<ID>;
     galaxy: {
-        players: Player[],
-		stars: Star[],
-		carriers: Carrier[],
+        players: Player<ID>[],
+		stars: Star<ID>[],
+		carriers: Carrier<ID>[],
 		homeStars?: ID[],
 		linkedStars: ID[][],
-		teams?: Team[],
+		teams?: Team<ID>[],
 	},
-	conversations: Conversation[]
+	conversations: Conversation<ID>[]
 	state: GameState<ID>,
 	constants: GameConstants,
 	quitters: ID[],

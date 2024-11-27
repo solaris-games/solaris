@@ -1,9 +1,8 @@
-import { DBObjectId } from "./DBObjectId";
-import { InfrastructureUpgradeCosts } from "./InfrastructureUpgrade";
-import { Location } from "./Location";
-import { MapObject } from "./Map";
-import { PlayerTechnologyLevels } from "./Player";
-import { Specialist } from "./Specialist";
+import { InfrastructureUpgradeCosts } from "./infrastructureUpgrade";
+import { Location } from "./location";
+import { MapObject } from "./map";
+import { PlayerTechnologyLevels } from "./player";
+import { Specialist } from "./specialist";
 
 export interface NaturalResources {
     economy: number;
@@ -29,7 +28,7 @@ export interface IgnoreBulkUpgrade {
     science: boolean;
 };
 
-export interface Star extends MapObject {
+export interface Star<ID> extends MapObject<ID> {
     name: string;
     naturalResources: NaturalResources;
     terraformedResources?: TerraformedResources;
@@ -44,7 +43,7 @@ export interface Star extends MapObject {
     isBinaryStar: boolean;
     isBlackHole: boolean;
     isPulsar: boolean;
-    wormHoleToStarId: DBObjectId | null;
+    wormHoleToStarId: ID | null;
     ignoreBulkUpgrade?: IgnoreBulkUpgrade;
     infrastructure: Infrastructure;
     isKingOfTheHillStar?: boolean;
@@ -57,8 +56,8 @@ export interface Star extends MapObject {
     effectiveTechs?: PlayerTechnologyLevels;
 };
 
-export interface StarCaptureResult {
-    capturedById: DBObjectId;
+export interface StarCaptureResult<ID> {
+    capturedById: ID;
     capturedByAlias: string;
     captureReward: number;
 };
