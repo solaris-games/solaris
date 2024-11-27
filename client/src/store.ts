@@ -1,14 +1,20 @@
 import { createStore } from 'vuex';
 import eventBus from './eventBus'
-import GameHelper from './services/gameHelper'
-import GameContainer from './game/container'
-import SpecialistService from './services/api/specialist';
-import ColourService from './services/api/colour';
-import gameHelper from "./services/gameHelper";
+import GameHelper from './services/gameHelper.js'
+import GameContainer from './game/container.js'
+import SpecialistService from './services/api/specialist.js';
+import ColourService from './services/api/colour.js';
 import ApiAuthService from "./services/api/auth.js";
-import router from "./router.js";
+import type {Game} from "./types/game";
 
-export default createStore({
+export type State = {
+  userId: string | null;
+  game: Game | null;
+  tick: number;
+  cachedConversationComposeMessages: Record<string, string>;
+}
+
+export default createStore<>({
   state: {
     userId: null,
     game: null,
