@@ -5,16 +5,43 @@ import GameContainer from './game/container.js'
 import SpecialistService from './services/api/specialist.js';
 import ColourService from './services/api/colour.js';
 import ApiAuthService from "./services/api/auth.js";
-import type {Game} from "./types/game";
+import type {Game, Player, Star} from "./types/game";
+
+export type MentionCallbacks = {
+  player: (p: Player) => void;
+  star: (s: Star) => void;
+}
 
 export type State = {
   userId: string | null;
   game: Game | null;
   tick: number;
   cachedConversationComposeMessages: Record<string, string>;
+  currentConversation: {id: string, text: string} | null;
+  mentionReceivingElement: HTMLElement | null;
+  mentionCallbacks: MentionCallbacks | null;
+  starSpecialists: any;
+  carrierSpecialists: any;
+  settings: any;
+  confirmationDialog: any;
+  colourOverride: boolean;
+  coloursConfig: any;
+  colourMapping: Record<string, any>;
+  menuState: string | null;
+  menuArguments: any;
+  tutorialPage: number;
+  menuStateChat: string | null;
+  menuArgumentsChat: any;
+  username: string | null;
+  roles: string[] | null;
+  userCredits: number | null;
+  isImpersonating: boolean | null;
+  userIsEstablishedPlayer: boolean | null;
+  productionTick: number | null;
+  unreadMessages: number | null;
 }
 
-export default createStore<>({
+export default createStore<State>({
   state: {
     userId: null,
     game: null,
@@ -29,11 +56,23 @@ export default createStore<>({
     confirmationDialog: {},
     colourOverride: true,
     coloursConfig: null,
-    colourMapping: {}
+    colourMapping: {},
+    menuState: null,
+    menuArguments: null,
+    tutorialPage: 0,
+    menuStateChat: null,
+    menuArgumentsChat: null,
+    username: null,
+    roles: null,
+    userCredits: null,
+    isImpersonating: null,
+    userIsEstablishedPlayer: null,
+    productionTick: null,
+    unreadMessages: null,
   },
   mutations: {
     // Menu
-    setMenuState (state, menuState) {
+    setMenuState (state: State, menuState) {
       menuState.state = menuState.state || null
       menuState.args = menuState.args || null
 
@@ -58,7 +97,7 @@ export default createStore<>({
       })
     },
 
-    setMenuStateChat (state, menuState) {
+    setMenuStateChat (state: State, menuState) {
       menuState.state = menuState.state || null
       menuState.args = menuState.args || null
 
@@ -72,7 +111,7 @@ export default createStore<>({
     // -------
 
     // TUTORIAL
-    setTutorialPage (state, page) {
+    setTutorialPage (state: State, page) {
       state.tutorialPage = page || 0
     },
     clearTutorialPage (state) {
@@ -80,63 +119,63 @@ export default createStore<>({
     },
     // -------
 
-    setCarrierSpecialists (state, carrierSpecialists) {
+    setCarrierSpecialists (state: State, carrierSpecialists) {
       state.carrierSpecialists = carrierSpecialists;
     },
-    setStarSpecialists (state, starSpecialists) {
+    setStarSpecialists (state: State, starSpecialists) {
       state.starSpecialists = starSpecialists;
     },
 
-    setUserId (state, userId) {
+    setUserId (state: State, userId) {
       state.userId = userId
     },
     clearUserId (state) {
       state.userId = null
     },
 
-    setUsername (state, username) {
+    setUsername (state: State, username) {
       state.username = username
     },
     clearUsername (state) {
       state.username = null
     },
 
-    setRoles (state, roles) {
+    setRoles (state: State, roles) {
       state.roles = roles
     },
     clearRoles (state) {
       state.roles = null
     },
 
-    setUserCredits (state, credits) {
+    setUserCredits (state: State, credits) {
       state.userCredits = credits
     },
     clearUserCredits (state) {
       state.userCredits = null
     },
 
-    setIsImpersonating (state, isImpersonating) {
+    setIsImpersonating (state: State, isImpersonating) {
       state.isImpersonating = isImpersonating;
     },
     clearIsImpersonating (state) {
       state.isImpersonating = null;
     },
 
-    setUserIsEstablishedPlayer (state, isEstablishedPlayer) {
+    setUserIsEstablishedPlayer (state: State, isEstablishedPlayer) {
       state.userIsEstablishedPlayer = isEstablishedPlayer
     },
     clearUserIsEstablishedPlayer (state) {
       state.userIsEstablishedPlayer = null
     },
 
-    setTick (state, tick) {
+    setTick (state: State, tick) {
       state.tick = tick
     },
-    setProductionTick (state, tick) {
+    setProductionTick (state: State, tick) {
       state.productionTick = tick
     },
 
-    setGame (state, game) {
+    setGame (state: State, game) {
       state.game = game
       state.colourMapping = {...GameHelper.getColourMapping(game)};
     },
@@ -150,49 +189,49 @@ export default createStore<>({
       state.colourMapping = {};
     },
 
-    setColourOverride (state, value) {
+    setColourOverride (state: State, value) {
       state.colourOverride = value
 
       GameContainer.reloadGame(state.game, state.settings);
     },
 
-    setSettings (state, settings) {
+    setSettings (state: State, settings) {
       state.settings = settings
     },
     clearSettings (state) {
       state.settings = null
     },
-    setConfirmationDialogSettings (state, settings) {
+    setConfirmationDialogSettings (state: State, settings) {
       state.confirmationDialog = settings
     },
 
-    setUnreadMessages (state, count) {
+    setUnreadMessages (state: State, count) {
       state.unreadMessages = count
     },
     clearUnreadMessages (state) {
       state.unreadMessages = null
     },
 
-    openConversation (state, data) {
+    openConversation (state: State, data: string) {
       state.currentConversation = {
         id: data,
         text: state.cachedConversationComposeMessages[data] || ''
       }
     },
-    closeConversation (state) {
+    closeConversation (state: State) {
       if (state.currentConversation) {
         const id = state.currentConversation.id;
         state.cachedConversationComposeMessages[id] = state.currentConversation.text
         state.currentConversation = null
       }
     },
-    updateCurrentConversationText (state, data) {
-      state.currentConversation.text = data
+    updateCurrentConversationText (state: State, data) {
+      state.currentConversation!.text = data
     },
-    resetCurrentConversationText (state, data) {
-      state.currentConversation.text = ''
+    resetCurrentConversationText (state: State, data) {
+      state.currentConversation!.text = ''
     },
-    setMentions (state, data) {
+    setMentions (state: State, data) {
       state.mentionReceivingElement = data.element;
       state.mentionCallbacks = data.callbacks;
     },
@@ -200,21 +239,21 @@ export default createStore<>({
       state.mentionReceivingElement = null;
       state.mentionCallbacks = null;
     },
-    playerClicked (state, data) {
+    playerClicked (state: State, data) {
       if (state.mentionCallbacks && state.mentionCallbacks.player) {
         state.mentionCallbacks.player(data.player)
       } else {
         data.permitCallback(data.player)
       }
     },
-    starClicked (state, data) {
+    starClicked (state: State, data) {
       if (state.mentionCallbacks && state.mentionCallbacks.star) {
         state.mentionCallbacks.star(data.star)
       } else {
         data.permitCallback(data.star)
       }
     },
-    starRightClicked (state, data) {
+    starRightClicked (state: State, data) {
       if (state.mentionCallbacks && state.mentionCallbacks.player) {
         state.mentionCallbacks.player(data.player)
       } else {
@@ -225,11 +264,11 @@ export default createStore<>({
     // ----------------
     // Sockets
 
-    gameStarted (state, data) {
-      state.game.state = data.state
+    gameStarted (state: State, data) {
+      state.game!.state = data.state
     },
 
-    gamePlayerJoined (state, data) {
+    gamePlayerJoined (state: State, data) {
       let player = GameHelper.getPlayerById(state.game, data.playerId)
 
       player.isOpenSlot = false
@@ -240,7 +279,7 @@ export default createStore<>({
       player.afk = false
     },
 
-    gamePlayerQuit (state, data) {
+    gamePlayerQuit (state: State, data) {
       let player = GameHelper.getPlayerById(state.game, data.playerId)
 
       player.isOpenSlot = true
@@ -248,31 +287,31 @@ export default createStore<>({
       player.avatar = null
     },
 
-    gamePlayerReady (state, data) {
+    gamePlayerReady (state: State, data) {
       let player = GameHelper.getPlayerById(state.game, data.playerId)
 
       player.ready = true
     },
 
-    gamePlayerNotReady (state, data) {
+    gamePlayerNotReady (state: State, data) {
       let player = GameHelper.getPlayerById(state.game, data.playerId)
 
       player.ready = false
     },
 
-    gamePlayerReadyToQuit (state, data) {
+    gamePlayerReadyToQuit (state: State, data) {
       let player = GameHelper.getPlayerById(state.game, data.playerId)
 
       player.readyToQuit = true
     },
 
-    gamePlayerNotReadyToQuit (state, data) {
+    gamePlayerNotReadyToQuit (state: State, data) {
       let player = GameHelper.getPlayerById(state.game, data.playerId)
 
       player.readyToQuit = false
     },
 
-    gameStarBulkUpgraded (state, data) {
+    gameStarBulkUpgraded (state: State, data) {
       let player = GameHelper.getUserPlayer(state.game);
 
       let newScience = 0;
@@ -319,19 +358,19 @@ export default createStore<>({
           player.stats.totalIndustry += data.upgraded
           break;
         case 'science':
-          player.stats.totalScience += (newScience * state.game.constants.research.sciencePointMultiplier)
+          player.stats.totalScience += (newScience * state.game!.constants.research.sciencePointMultiplier)
           break;
       }
     },
-    gameBulkActionAdded(state, data) {
+    gameBulkActionAdded(state: State, data) {
       let player = GameHelper.getUserPlayer(state.game)
       player.scheduledActions.push(data);
     },
-    gameBulkActionTrashed(state, data) {
+    gameBulkActionTrashed(state: State, data) {
       let player = GameHelper.getUserPlayer(state.game)
       player.scheduledActions = player.scheduledActions.filter(a => a._id != data._id)
     },
-    gameStarWarpGateBuilt (state, data) {
+    gameStarWarpGateBuilt (state: State, data) {
       let star = GameHelper.getStarById(state.game, data.starId)
 
       star.warpGate = true
@@ -340,18 +379,18 @@ export default createStore<>({
 
       GameContainer.reloadStar(star)
     },
-    gameStarWarpGateDestroyed (state, data) {
+    gameStarWarpGateDestroyed (state: State, data) {
       let star = GameHelper.getStarById(state.game, data.starId)
 
       star.warpGate = false
 
       GameContainer.reloadStar(star)
     },
-    gameStarCarrierBuilt (state, data) {
+    gameStarCarrierBuilt (state: State, data) {
       let carrier = GameHelper.getCarrierById(state.game, data.carrier._id)
 
       if (!carrier) {
-        state.game.galaxy.carriers.push(data.carrier)
+        state.game!.galaxy.carriers.push(data.carrier)
       }
 
       let star = GameHelper.getStarById(state.game, data.carrier.orbiting)
@@ -364,7 +403,7 @@ export default createStore<>({
       GameContainer.reloadStar(star)
       GameContainer.reloadCarrier(data.carrier)
     },
-    gameStarCarrierShipTransferred (state, data) {
+    gameStarCarrierShipTransferred (state: State, data) {
       let star = GameHelper.getStarById(state.game, data.starId)
       let carrier = GameHelper.getCarrierById(state.game, data.carrierId)
 
@@ -374,7 +413,7 @@ export default createStore<>({
       GameContainer.reloadStar(star)
       GameContainer.reloadCarrier(carrier)
     },
-    gameStarAllShipsTransferred (state, data) {
+    gameStarAllShipsTransferred (state: State, data) {
       let star = GameHelper.getStarById(state.game, data.star._id)
 
       star.ships = data.star.ships
@@ -385,7 +424,7 @@ export default createStore<>({
         mapObjectCarrier.ships = carrier.ships
       })
     },
-    gameStarAbandoned (state, data) {
+    gameStarAbandoned (state: State, data) {
       let star = GameHelper.getStarById(state.game, data.starId)
 
       let player = GameHelper.getPlayerById(state.game, star.ownedByPlayerId)
@@ -395,17 +434,17 @@ export default createStore<>({
       star.ships = 0
 
       // Redraw and remove carriers
-      let carriers = state.game.galaxy.carriers.filter(x => x.orbiting && x.orbiting === star._id && x.ownedByPlayerId === player._id)
+      let carriers = state.game!.galaxy.carriers.filter(x => x.orbiting && x.orbiting === star._id && x.ownedByPlayerId === player._id)
 
       carriers.forEach(c => {
         GameContainer.undrawCarrier(c)
-        state.game.galaxy.carriers.splice(state.game.galaxy.carriers.indexOf(c), 1)
+        state.game!.galaxy.carriers.splice(state.game!.galaxy.carriers.indexOf(c), 1)
       })
 
       // Redraw the star
       GameContainer.reloadStar(star)
     },
-    gameCarrierScuttled (state, data) {
+    gameCarrierScuttled (state: State, data) {
       let carrier = GameHelper.getCarrierById(state.game, data.carrierId)
       let star = GameHelper.getStarById(state.game, carrier.orbiting)
       let player = GameHelper.getPlayerById(state.game, carrier.ownedByPlayerId)
@@ -418,13 +457,13 @@ export default createStore<>({
 
       GameContainer.undrawCarrier(carrier)
 
-      state.game.galaxy.carriers.splice(state.game.galaxy.carriers.indexOf(carrier), 1)
+      state.game!.galaxy.carriers.splice(state.game!.galaxy.carriers.indexOf(carrier), 1)
 
       if (star) {
         GameContainer.reloadStar(star)
       }
     },
-    playerDebtSettled (state, data) {
+    playerDebtSettled (state: State, data) {
       let player = GameHelper.getUserPlayer(state.game)
 
       if (data.creditorPlayerId === player._id) {
@@ -435,7 +474,7 @@ export default createStore<>({
         }
       }
     },
-    starSpecialistHired (state, data) {
+    starSpecialistHired (state: State, data) {
       let star = GameHelper.getStarById(state.game, data.starId)
 
       star.specialistId = data.specialist.id
@@ -443,7 +482,7 @@ export default createStore<>({
 
       GameContainer.reloadStar(star)
     },
-    carrierSpecialistHired (state, data) {
+    carrierSpecialistHired (state: State, data) {
       let carrier = GameHelper.getCarrierById(state.game, data.carrierId)
 
       carrier.specialistId = data.specialist.id
@@ -452,29 +491,29 @@ export default createStore<>({
       GameContainer.reloadCarrier(carrier)
     },
 
-    gameStarEconomyUpgraded (state, data) {
+    gameStarEconomyUpgraded (state: State, data) {
       data.type = 'economy'
       let star = GameHelper.starInfrastructureUpgraded(state.game, data)
       GameContainer.reloadStar(star)
     },
-    gameStarIndustryUpgraded (state, data) {
+    gameStarIndustryUpgraded (state: State, data) {
       data.type = 'industry'
       let star = GameHelper.starInfrastructureUpgraded(state.game, data)
       GameContainer.reloadStar(star)
     },
-    gameStarScienceUpgraded (state, data) {
+    gameStarScienceUpgraded (state: State, data) {
       data.type = 'science'
       let star = GameHelper.starInfrastructureUpgraded(state.game, data)
       GameContainer.reloadStar(star)
     },
 
-    internalAddColourMapping (state, data) {
+    internalAddColourMapping (state: State, data) {
       state.colourMapping = {
         ...state.colourMapping,
         [data.playerId]: data.colour
       };
     },
-    setColoursConfig (state, data) {
+    setColoursConfig (state: State, data) {
       state.coloursConfig = data;
     }
   },
@@ -498,6 +537,7 @@ export default createStore<>({
       commit('setColoursConfig', resp.data);
     },
     async confirm ({ commit, state }, data) {
+      /* ts-ignore */
       const modal = new bootstrap.Modal(window.$('#confirmModal'), {})
       const close = async () => {
         modal.toggle()
