@@ -3,8 +3,14 @@ import { Viewport } from 'pixi-viewport'
 import Map from './map'
 import gameHelper from '../services/gameHelper'
 import textureService from './texture'
+import type {Store} from "vuex";
+import type {State} from "../store";
+import type {Application} from "pixi.js-legacy";
+import type {UserGameSettings} from "solaris-common/src";
 
 class DrawingContext {
+  store: Store<State>;
+
   constructor (store) {
     this.store = store;
   }
@@ -15,7 +21,28 @@ class DrawingContext {
 }
 
 class GameContainer {
-
+  frames: number;
+  dtAccum: number;
+  lowest: number;
+  previousDTs: number[];
+  ma32accum: number;
+  app: Application | null;
+  fpsNowText: PIXI.BitmapText;
+  fpsMAText: PIXI.BitmapText;
+  fpsMA32Text: PIXI.BitmapText;
+  jitterText: PIXI.BitmapText;
+  lowestText: PIXI.BitmapText;
+  zoomText: PIXI.BitmapText;
+  map: Map;
+  store: Store<State>;
+  context: DrawingContext;
+  viewport: Viewport;
+  starFieldLeft: number;
+  starFieldRight: number;
+  starFieldTop: number;
+  starFieldBottom: number;
+  userSettings: UserGameSettings;
+  game: any;
 
   constructor () {
     PIXI.settings.SORTABLE_CHILDREN = true
@@ -283,6 +310,10 @@ class GameContainer {
   }
 
   resize () {
+    if (!this.app) {
+      return;
+    }
+
     this.app.renderer.resize(
       window.innerWidth,
       window.innerHeight

@@ -352,8 +352,6 @@ export type GameState<ID> = {
     openSlots?: number;
 };
 
-
-
 export type Game<ID> = {
     _id: ID;
     settings: GameSettings<ID>;
