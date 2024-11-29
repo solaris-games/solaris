@@ -1,7 +1,7 @@
 {
   "general": {
     "name": "[[[RANDOM]]]",
-    "description": "16 Player slow realtime",
+    "description": "16 Player slow turn-based",
     "createdFromTemplate": "16player_realTime",
     "type": "16_player_relaxed",
     "mode": "conquest",
