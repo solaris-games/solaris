@@ -1,13 +1,14 @@
 import seededRandom from 'random-seed'
+import type {Carrier, Star} from "../types/game";
+import * as PIXI from 'pixi.js-legacy'
 
-class Helpers {
-
-    rotateCarrierTowardsWaypoint (carrier, stars, graphics) {
+export class Helpers {
+    rotateCarrierTowardsWaypoint (carrier: Carrier, stars: Star[], graphics: PIXI.Graphics) {
         // If the carrier has waypoints, get the first one and calculate the angle
         // between the carrier's current position and the destination.
         if (carrier.waypoints.length) {
-            let waypoint = carrier.waypoints[0]
-            let starDestination = stars.find(s => s._id === waypoint.destination)
+            const waypoint = carrier.waypoints[0]
+            const starDestination = stars.find(s => s._id === waypoint.destination)
 
             if (!starDestination) {
                 const sourceStar = stars.find(s => s._id === waypoint.source)
@@ -20,18 +21,18 @@ class Helpers {
                 return
             }
 
-            let destination = starDestination.location
+            const destination = starDestination.location
 
-            let angle = this.getAngleTowardsLocation(carrier.location, destination)
+            const angle = this.getAngleTowardsLocation(carrier.location, destination)
 
             graphics.angle = (angle * (180 / Math.PI)) + 90
         }
     }
 
     getAngleTowardsLocation (source, destination) {
-      let deltaX = destination.x - source.x
-      let deltaY = destination.y - source.y
-  
+      const deltaX = destination.x - source.x
+      const deltaY = destination.y - source.y
+
       return Math.atan2(deltaY, deltaX)
     }
 
@@ -46,9 +47,7 @@ class Helpers {
         const seededRNG = seededRandom.create()
         seededRNG.seed(seed)
 
-        const alpha = (Math.floor(seededRNG.random() * (max - min + 1) + min)) / 100
-
-        return alpha
+      return (Math.floor(seededRNG.random() * (max - min + 1) + min)) / 100
     }
 
     calculateDepthModifiers (userSettings, seeds) {
@@ -57,9 +56,7 @@ class Helpers {
         }
 
         const sum = seeds.reduce((a, b) => this.calculateDepthModifier(userSettings, a) + this.calculateDepthModifier(userSettings, b))
-        const avg = sum / seeds.length
-        
-        return avg
+      return sum / seeds.length
     }
 
 }

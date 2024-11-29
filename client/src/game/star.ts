@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js-legacy'
 import TextureService from './texture'
-import gameHelper from '../services/gameHelper'
+import gameHelper from '../services/gameHelper.js'
 import seededRandom from 'random-seed'
 import Helpers from './helpers'
 import {EventEmitter} from "./eventEmitter.js";

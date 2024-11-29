@@ -1,14 +1,14 @@
 import * as PIXI from 'pixi.js-legacy'
 import { Viewport } from 'pixi-viewport'
 import Map from './map'
-import gameHelper from '../services/gameHelper'
+import gameHelper from '../services/gameHelper.js'
 import textureService from './texture'
 import type {Store} from "vuex";
 import type {State} from "../store";
 import type {Application} from "pixi.js-legacy";
 import type {UserGameSettings} from "solaris-common/src";
 
-class DrawingContext {
+export class DrawingContext {
   store: Store<State>;
 
   constructor (store) {
@@ -20,7 +20,7 @@ class DrawingContext {
   }
 }
 
-class GameContainer {
+export class GameContainer {
   frames: number;
   dtAccum: number;
   lowest: number;
