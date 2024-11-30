@@ -1,26 +1,49 @@
-import * as PIXI from 'pixi.js-legacy'
+import { Container, Sprite, Graphics, BitmapText } from 'pixi.js-legacy'
 import TextureService from './texture'
 import Helpers from './helpers'
 import {EventEmitter} from "./eventEmitter.js";
+import type PathManager from "./PathManager";
+import type {UserGameSettings} from "solaris-common/src";
+import type {Carrier as CarrierData, Player as PlayerData} from "../types/game";
+import type Star from "./star";
+import type {DrawingContext} from "./container";
+import type {PlayerColour} from "solaris-common/src/api/types/common/player";
 
 class Carrier extends EventEmitter {
-
-  static culling_margin = 16
-
   static zoomLevel = 140
 
-  constructor ( pathManager ) {
+  container: Container;
+  fixedContainer: Container;
+  graphics_colour: Sprite;
+  graphics_selected: Graphics;
+  graphics_ship: Graphics;
+  text_ships: BitmapText;
+  pathManager: PathManager;
+  sharedPathsIDs: Array<string>;
+  uniquePaths: Array<string>;
+  isMouseOver: boolean;
+  zoomPercent: number;
+  userSettings: UserGameSettings;
+  data: CarrierData;
+  stars: Star[];
+  player: PlayerData;
+  context: DrawingContext;
+  colour: PlayerColour;
+  lightYearDistance: number;
+  clampedScaling: boolean;
+
+  constructor ( pathManager: PathManager ) {
     super()
 
-    this.fixedContainer = new PIXI.Container() // this container isnt affected by culling or user setting scalling
-    this.container = new PIXI.Container()
+    this.fixedContainer = new Container() // this container isnt affected by culling or user setting scalling
+    this.container = new Container()
     this.container.eventMode = 'static'
     this.container.interactiveChildren = false
     this.container.cursor = 'pointer'
 
-    this.graphics_colour = new PIXI.Sprite()
-    this.graphics_selected = new PIXI.Graphics()
-    this.graphics_ship = new PIXI.Graphics()
+    this.graphics_colour = new Sprite()
+    this.graphics_selected = new Graphics()
+    this.graphics_ship = new Graphics()
 
     this.container.addChild(this.graphics_colour)
     this.container.addChild(this.graphics_selected)
@@ -49,7 +72,7 @@ class Carrier extends EventEmitter {
     this.container.position.x = data.location.x
     this.container.position.y = data.location.y
     // Add a larger hit radius so that the star is easily clickable
-    this.container.hitArea = new PIXI.Circle(0, 0, 10)
+    this.container.hitArea = new Circle(0, 0, 10)
 
     this.userSettings = userSettings
 
@@ -85,7 +108,7 @@ class Carrier extends EventEmitter {
     }
 
     if (Object.keys(TextureService.PLAYER_SYMBOLS).includes(this.player.shape)) {
-      this.graphics_colour = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS[this.player.shape][4])
+      this.graphics_colour = new Sprite(TextureService.PLAYER_SYMBOLS[this.player.shape][4])
 
     }
 
@@ -113,7 +136,7 @@ class Carrier extends EventEmitter {
       this.container.removeChild(this.graphics_ship)
     }
 
-    this.graphics_ship = new PIXI.Sprite(TextureService.CARRIER_TEXTURE)
+    this.graphics_ship = new Sprite(TextureService.CARRIER_TEXTURE)
     this.graphics_ship.anchor.set(0.5)
     this.graphics_ship.width = 10
     this.graphics_ship.height = 10
@@ -134,21 +157,21 @@ class Carrier extends EventEmitter {
       let shipsText = totalShips.toString()
 
       let bitmapFont = {fontName: "chakrapetch", fontSize: 4}
-      this.text_ships = new PIXI.BitmapText(shipsText, bitmapFont)
+      this.text_ships = new BitmapText(shipsText, bitmapFont)
 
       this.text_ships.x = -(this.text_ships.width / 2.0)
       this.text_ships.y = 5
 
       this.container.addChild(this.text_ships)
       if( this.data.isGift ) {
-        let style = new PIXI.TextStyle({
+        let style = new TextStyle({
           fontFamily: `Chakra Petch,sans-serif;`,
           fill: 0xFFFFFF,
           padding: 3,
           fontSize: 4,
           fontWeight: 'bold'
         })
-        let giftText = new PIXI.Text('🎁', style)
+        let giftText = new Text('🎁', style)
         giftText.resolution = 12
         giftText.position.x = this.text_ships.width
         giftText.position.y = -1
@@ -168,7 +191,7 @@ class Carrier extends EventEmitter {
     }
 
     let specialistTexture = TextureService.getSpecialistTexture(this.data.specialist.key)
-    this.specialistSprite = new PIXI.Sprite(specialistTexture)
+    this.specialistSprite = new Sprite(specialistTexture)
     this.specialistSprite.width = 6
     this.specialistSprite.height = 6
     this.specialistSprite.x = -3

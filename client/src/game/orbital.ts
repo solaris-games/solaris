@@ -1,7 +1,11 @@
 import * as PIXI from 'pixi.js-legacy'
 import Helpers from './helpers'
+import type {Game} from "../types/game";
+import '@pixi/graphics-extras';
 
 class OrbitalLocationLayer {
+  container: PIXI.Container;
+  game: Game;
 
     constructor () {
         this.container = new PIXI.Container()
@@ -36,7 +40,8 @@ class OrbitalLocationLayer {
             graphics.beginFill(0xFFFFFF, alpha)
         }
 
-        graphics.drawStar(star.locationNext.x, star.locationNext.y, starPoints, radius, radius - 2)
+        // can be assumed to be present, this is a type problem only
+        graphics.drawStar?.(star.locationNext.x, star.locationNext.y, starPoints, radius, radius - 2)
 
         if (fillStar) {
             graphics.endFill()
@@ -51,7 +56,7 @@ class OrbitalLocationLayer {
         }
 
         let graphics = new PIXI.Graphics()
-        
+
         graphics.beginFill(0xFFFFFF, 0.2)
 
         graphics.position.x = carrier.locationNext.x

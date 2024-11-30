@@ -1,5 +1,5 @@
 import moment from 'moment'
-import DiplomacyHelper from './diplomacyHelper'
+import DiplomacyHelper from './diplomacyHelper.js'
 
 class GameHelper {
   getUserPlayer (game) {
@@ -1053,7 +1053,10 @@ class GameHelper {
 
     let star = this.getStarById(game, data.starId)
 
-    star.upgradeCosts[data.type] = data.nextCost
+    if (star.upgradeCosts) {
+      star.upgradeCosts[data.type] = data.nextCost
+    }
+
     star.infrastructure[data.type] = data.infrastructure
 
     if (data.manufacturing) {
