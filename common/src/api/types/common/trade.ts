@@ -1,4 +1,4 @@
-import { ResearchTypeNotRandom } from "./player";
+import type { ResearchTypeNotRandom } from "./player";
 
 export interface TradeTechnology {
     name: ResearchTypeNotRandom;

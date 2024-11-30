@@ -1,5 +1,5 @@
-import { ConversationMessage } from "./conversationMessage";
-import { TradeEvent } from "./trade";
+import type { ConversationMessage } from "./conversationMessage";
+import type { TradeEvent } from "./trade";
 
 export interface Conversation<ID> {
     _id: ID;

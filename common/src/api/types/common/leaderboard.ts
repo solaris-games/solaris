@@ -1,5 +1,5 @@
-import { Player } from "./player";
-import {Team} from "./game";
+import type { Player } from "./player";
+import type { Team } from "./game";
 
 export interface PlayerStatistics {
     totalStars: number;

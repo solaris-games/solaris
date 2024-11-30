@@ -1,8 +1,8 @@
-import { Location } from "./location";
-import { CarrierWaypoint } from "./carrierWaypoint";
-import { MapObject } from "./map";
-import { Specialist } from "./specialist";
-import { PlayerTechnologyLevels } from "./player";
+import type { Location } from "./location";
+import type { CarrierWaypoint } from "./carrierWaypoint";
+import type { MapObject } from "./map";
+import type { Specialist } from "./specialist";
+import type { PlayerTechnologyLevels } from "./player";
 
 export interface Carrier<ID> extends MapObject<ID> {
     orbiting: ID | null;

@@ -1,4 +1,4 @@
-import {InfrastructureType, NaturalResources} from "./star";
+import type {InfrastructureType, NaturalResources} from "./star";
 
 export interface StarUpgradeReport<ID> {
     starId: ID;

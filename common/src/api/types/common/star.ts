@@ -1,8 +1,8 @@
-import { InfrastructureUpgradeCosts } from "./infrastructureUpgrade";
-import { Location } from "./location";
-import { MapObject } from "./map";
-import { PlayerTechnologyLevels } from "./player";
-import { Specialist } from "./specialist";
+import type { InfrastructureUpgradeCosts } from "./infrastructureUpgrade";
+import type { Location } from "./location";
+import type { MapObject } from "./map";
+import type { PlayerTechnologyLevels } from "./player";
+import type { Specialist } from "./specialist";
 
 export interface NaturalResources {
     economy: number;

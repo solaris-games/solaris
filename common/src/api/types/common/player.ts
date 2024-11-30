@@ -1,6 +1,6 @@
-import { DiplomaticState } from "./diplomacy";
-import { PlayerStatistics } from "./leaderboard";
-import { InfrastructureType } from "./star";
+import type { DiplomaticState } from "./diplomacy";
+import type { PlayerStatistics } from "./leaderboard";
+import type { InfrastructureType } from "./star";
 
 export type PlayerShape = 'circle'|'square'|'diamond'|'hexagon';
 export type ResearchType = 'scanning'|'hyperspace'|'terraforming'|'experimentation'|'weapons'|'banking'|'manufacturing'|'specialists'|'random';

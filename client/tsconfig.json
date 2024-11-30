@@ -1,3 +1,6 @@
 {
+    "compilerOptions": {
+        "noImplicitAny": false
+    },
     "extends": "@vue/tsconfig/tsconfig.dom.json"
 }

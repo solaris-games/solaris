@@ -1,7 +1,7 @@
-import {Star} from "./star";
-import {Player} from "./player";
-import {Conversation} from "./conversation";
-import {Carrier} from "./carrier";
+import type {Star} from "./star";
+import type {Player} from "./player";
+import type {Conversation} from "./conversation";
+import type {Carrier} from "./carrier";
 
 export type GameType = 'tutorial'|
 'custom'|

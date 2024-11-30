@@ -1,4 +1,4 @@
-import { Location } from "./location";
+import type { Location } from "./location";
 
 export interface MapObject<ID> {
     _id: ID;

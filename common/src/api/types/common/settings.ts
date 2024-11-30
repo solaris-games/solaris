@@ -1,4 +1,4 @@
-import {CarrierWaypointActionType} from "./carrierWaypoint";
+import type  {CarrierWaypointActionType} from "./carrierWaypoint";
 
 export type SettingEnabledDisabled = 'enabled'|'disabled';
 export type SettingUIType = 'standard'|'compact';
