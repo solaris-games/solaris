@@ -3,7 +3,7 @@ import type {Carrier, Star} from "../types/game";
 import * as PIXI from 'pixi.js-legacy'
 
 export class Helpers {
-    rotateCarrierTowardsWaypoint (carrier: Carrier, stars: Star[], graphics: PIXI.Graphics) {
+    rotateCarrierTowardsWaypoint (carrier: Carrier, stars: Star[], graphics: PIXI.DisplayObject) {
         // If the carrier has waypoints, get the first one and calculate the angle
         // between the carrier's current position and the destination.
         if (carrier.waypoints.length) {
