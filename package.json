@@ -1,5 +1,9 @@
 {
   "name": "solaris",
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "check": "npm run check --workspaces --if-present"
+  },
   "workspaces": [
     "common/",
     "client/",
