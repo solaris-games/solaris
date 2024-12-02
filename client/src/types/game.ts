@@ -1,7 +1,7 @@
-import type { Game as CGame } from "solaris-common/src/api/types/common/game";
-import type { Player as CPlayer } from "solaris-common/src/api/types/common/player";
-import type { Star as CStar } from "solaris-common/src/api/types/common/star";
-import type { Carrier as CCarrier } from "solaris-common/src/api/types/common/carrier";
+import type { Game as CGame } from "@solaris-common";
+import type { Player as CPlayer } from "@solaris-common";
+import type { Star as CStar } from "@solaris-common";
+import type { Carrier as CCarrier } from "@solaris-common";
 
 export type Game = CGame<string>;
 
