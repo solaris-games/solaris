@@ -1,0 +1,8 @@
+{
+  "name": "solaris",
+  "workspaces": [
+    "common/",
+    "client/",
+    "server/"
+  ]
+}
