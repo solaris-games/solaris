@@ -1,7 +1,17 @@
 import * as PIXI from 'pixi.js-legacy'
 import {EventEmitter} from "./eventEmitter.js";
+import type { Game } from '../types/game';
+
+type RulerPoint = {
+  location: Location,
+}
 
 class RulerPoints extends EventEmitter {
+  container: PIXI.Container;
+  game: Game | undefined;
+  rulerPoints: RulerPoint[] = [];
+  lightYearDistance: number = 0;
+
   constructor () {
     super()
 
