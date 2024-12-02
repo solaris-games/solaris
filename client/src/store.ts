@@ -537,7 +537,7 @@ export default createStore<State>({
       commit('setColoursConfig', resp.data);
     },
     async confirm ({ commit, state }, data) {
-      /* ts-ignore */
+      // @ts-ignore
       const modal = new bootstrap.Modal(window.$('#confirmModal'), {})
       const close = async () => {
         modal.toggle()
@@ -598,7 +598,10 @@ export default createStore<State>({
       return state.cachedConversationComposeMessages[conversationId] || ''
     },
     getColourForPlayer: (state) => (playerId) => {
-      let colour = null;
+      let colour: {
+        alias: string;
+        value: string;
+    } | null = null;
 
       if (state.colourOverride) {
         colour = state.colourMapping?.[playerId] || GameHelper.getPlayerById(state.game, playerId).colour;

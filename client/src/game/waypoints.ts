@@ -2,8 +2,17 @@ import * as PIXI from 'pixi.js-legacy'
 import GameHelper from '../services/gameHelper'
 import WaypointHelper from '../services/waypointHelper'
 import {EventEmitter} from "./eventEmitter.js";
+import type { Game, Carrier as CarrierData } from '../types/game';
+import type { DrawingContext } from './container';
+import '@pixi/graphics-extras';
 
 class Waypoints extends EventEmitter {
+  container: PIXI.Container;
+  game: Game;
+  context: DrawingContext | undefined;
+  lightYearDistance: number | undefined;
+  carrier: CarrierData | undefined;
+
   constructor () {
     super()
 
@@ -95,13 +104,13 @@ class Waypoints extends EventEmitter {
     let lastLocationStar = this._getLastLocationStar()
     let player = this.game.galaxy.players.find(p => p.userId)
 
-    let radius = ((this.carrier.effectiveTechs.hyperspace || 1) + 1.5) * this.lightYearDistance
+    let radius = ((this.carrier.effectiveTechs.hyperspace || 1) + 1.5) * this.lightYearDistance!
 
-    const playerColour = this.context.getPlayerColour(player._id)
+    const playerColour = this.context!.getPlayerColour(player._id)
 
     graphics.lineStyle(1, playerColour, 0.2)
     graphics.beginFill(playerColour, 0.15)
-    graphics.drawStar(lastLocationStar.location.x, lastLocationStar.location.y, radius, radius, radius - 3)
+    graphics.drawStar!(lastLocationStar.location.x, lastLocationStar.location.y, radius, radius, radius - 3)
     graphics.endFill()
 
     this.container.addChild(graphics)
@@ -112,7 +121,7 @@ class Waypoints extends EventEmitter {
     let radius = 12
 
     graphics.lineStyle(1, 0xFFFFFF, opacity)
-    graphics.drawStar(location.x, location.y, radius, radius, radius - 3)
+    graphics.drawStar!(location.x, location.y, radius, radius, radius - 3)
 
     this.container.addChild(graphics)
   }
@@ -152,7 +161,8 @@ class Waypoints extends EventEmitter {
       destination: destinationStarId,
       action: 'collectAll',
       actionShips: 0,
-      delayTicks: 0
+      delayTicks: 0,
+      source: undefined,
     }
 
     // If the carrier has waypoints, create a new waypoint from the last destination.

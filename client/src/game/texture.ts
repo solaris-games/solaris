@@ -7,16 +7,20 @@ class TextureService {
     static PARTIAL_STRIDE = 2
     static seededRNG = seededRandom.create()
 
-    DEFAULT_FONT_STYLE = null
-
-    STARLESS_NEBULA_TEXTURES = []
-    STAR_NEBULA_TEXTURES = []
-    STAR_ASTEROID_FIELD_TEXTURES = []
-    STAR_WORMHOLE_TEXTURES = []
+    STARLESS_NEBULA_TEXTURES: PIXI.Texture[] = []
+    STAR_NEBULA_TEXTURES: PIXI.Texture[] = []
     SPECIALIST_TEXTURES = {}
     PLAYER_SYMBOLS = {}
     STAR_SYMBOLS = {}
-    CARRIER_TEXTURE = null
+
+    DEFAULT_FONT_STYLE: PIXI.TextStyle | undefined;
+    DEFAULT_FONT_STYLE_BOLD: PIXI.TextStyle | undefined;
+    CARRIER_TEXTURE: PIXI.Texture | undefined;
+    STAR_WORMHOLE_TEXTURES: PIXI.Texture[] = [];
+    DEFAULT_FONT_BITMAP: PIXI.BitmapFont | undefined;
+    DEFAULT_FONT_BOLD_BITMAP: PIXI.BitmapFont | undefined;
+    STAR_ASTEROID_FIELD_TEXTURES: PIXI.Texture[] = [];
+    STAR_TEXTURE: PIXI.Texture | undefined;
 
     initialize () {
       this._loadPlayerSymbols()

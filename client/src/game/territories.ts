@@ -1,11 +1,22 @@
 import * as PIXI from 'pixi.js-legacy'
 import Voronoi from '../voronoi/Javascript-Voronoi/rhill-voronoi-core.js';
 import gameHelper from '../services/gameHelper'
+import type { Game } from '../types/game.js';
+import type { DrawingContext } from './container.js';
+
+type SamplePoint = {
+
+}
 
 class Territories {
 
   static zoomLevel = 100
   static maxVoronoiDistance = 200
+
+  container: PIXI.Container;
+  game: Game;
+  zoomPercent: number;
+  context: DrawingContext | undefined;
 
   constructor() {
     this.container = new PIXI.Container()
@@ -128,7 +139,7 @@ class Territories {
     let gridWidth = (maxX - minX) / CELL_SIZE
     let gridHeight = (maxY - minY) / CELL_SIZE
 
-    let samplePoints = Array.from(Array(gridWidth + 1), () => new Array(gridHeight + 1));
+    let samplePoints: SamplePoint[][] = Array.from(Array(gridWidth + 1), () => new Array(gridHeight + 1));
 
     const gridToCoord = (ix, iy) => {
       return {
@@ -170,13 +181,15 @@ class Territories {
     }
 
     for (let player of this.game.galaxy.players) {
-      let color = this.context.getPlayerColour(player._id)
+      let color = this.context!.getPlayerColour(player._id)
       let territoryPolygons = new PIXI.Graphics()
       let territoryLines = new PIXI.Graphics()
       this.container.addChild(territoryPolygons)
       this.container.addChild(territoryLines)
       territoryLines.lineStyle(LINE_WIDTH, color, 1)
-      territoryLines._lineStyle.cap = PIXI.LINE_CAP.ROUND
+      territoryLines.lineStyle({
+        cap: PIXI.LINE_CAP.ROUND,
+      });
       territoryPolygons.alpha = 0.333
 
       let combining = false
@@ -369,7 +382,7 @@ class Territories {
       colour = 0x000000
 
       if (border.rSite.playerID) {
-        colour = this.context.getPlayerColour(border.rSite.playerID)
+        colour = this.context!.getPlayerColour(border.rSite.playerID)
       }
 
       borderGraphics.lineStyle(borderWidth, colour)
