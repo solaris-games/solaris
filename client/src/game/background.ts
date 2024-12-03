@@ -6,6 +6,15 @@ import type { Game } from '../types/game'
 import type { DrawingContext } from './container'
 import type { UserGameSettings } from '@solaris-common'
 
+interface BackgroundSprite extends PIXI.Sprite {
+  parallax: number;
+  originX: number;
+  originY: number;
+  baseRotation: number;
+  baseRotationTime: number;
+  baseScaleTime: number;
+}
+
 class Background {
 
   static MAX_PARALLAX = 0.333
@@ -153,7 +162,7 @@ class Background {
               if(NEBULA_DENSITY>2) { if(this.rng.random()<0.5) { continue; } }
               i = Math.round(this.rng.random()*(nebulaTextureCount-1))
               texture = textures[i]
-              sprite = new PIXI.Sprite(texture)
+              sprite = new PIXI.Sprite(texture) as BackgroundSprite;
               sprite.x = (x*CHUNK_SIZE) + (firstChunkX*CHUNK_SIZE) + (CHUNK_SIZE/2.0)
               sprite.x += NEBULA_MAX_OFFSET * Math.round( (this.rng.random()*2.0)-1.0 )
               sprite.y = (y*CHUNK_SIZE) + (firstChunkY*CHUNK_SIZE) + (CHUNK_SIZE/2.0)
@@ -223,7 +232,7 @@ class Background {
     this.time += deltaTime*1000
     let compressedTime = this.time*this.timeScale
     for (let i = 0; i < this.container.children.length; i++) {
-      let child = this.container.children[i] as PIXI.Sprite;
+      let child = this.container.children[i] as BackgroundSprite;
       let deltax = viewportData.center.x-child.originX
       let deltay = viewportData.center.y-child.originY
 
@@ -237,7 +246,7 @@ class Background {
     }
 
     for (let i = 0; i < this.starContainer.children.length; i++) {
-      let child = this.starContainer.children[i]
+      let child = this.starContainer.children[i] as BackgroundSprite;
       let deltax = viewportData.center.x-child.originX
       let deltay = viewportData.center.y-child.originY
 

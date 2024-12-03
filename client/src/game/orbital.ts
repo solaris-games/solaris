@@ -5,7 +5,7 @@ import '@pixi/graphics-extras';
 
 class OrbitalLocationLayer {
   container: PIXI.Container;
-  game: Game;
+  game: Game | undefined;
 
     constructor () {
         this.container = new PIXI.Container()
@@ -76,7 +76,7 @@ class OrbitalLocationLayer {
         graphics.pivot.set(0, 0)
         graphics.scale.set(1)
 
-        Helpers.rotateCarrierTowardsWaypoint(carrier, this.game.galaxy.stars, graphics)
+        Helpers.rotateCarrierTowardsWaypoint(carrier, this.game!.galaxy.stars, graphics)
 
         this.container.addChild(graphics)
     }
