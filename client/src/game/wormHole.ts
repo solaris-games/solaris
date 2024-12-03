@@ -3,7 +3,7 @@ import type { Game } from '../types/game';
 
 class WormHoleLayer {
   container: PIXI.Container;
-  game: Game;
+  game: Game | undefined;
 
   constructor() {
     this.container = new PIXI.Container()
@@ -20,7 +20,7 @@ class WormHoleLayer {
   draw() {
     this.clear()
 
-    const stars = this.game.galaxy.stars.filter(s => s.wormHoleToStarId)
+    const stars = this.game!.galaxy.stars.filter(s => s.wormHoleToStarId)
 
     for (let star of stars) {
       let starPair = stars.find(s => s._id === star.wormHoleToStarId && s.wormHoleToStarId === star._id)

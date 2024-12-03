@@ -2,6 +2,7 @@ import type {Star} from "./star";
 import type {Player} from "./player";
 import type {Conversation} from "./conversation";
 import type {Carrier} from "./carrier";
+import type {Location} from "./location";
 
 export type GameType = 'tutorial'|
 'custom'|

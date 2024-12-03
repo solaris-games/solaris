@@ -6,7 +6,7 @@ import type { DrawingContext } from './container';
 export default class {
 
   container: PIXI.Container;
-  game: Game;
+  game: Game | undefined;
   context: DrawingContext | undefined;
   intervalDraw: number | null = null;
 
