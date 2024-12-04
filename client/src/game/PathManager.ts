@@ -1,10 +1,44 @@
 import * as PIXI from 'pixi.js-legacy'
 import gameHelper from '../services/gameHelper'
 import helpers from './helpers'
+import type { Map } from './map';
+import type {UserGameSettings} from "@solaris-common";
+import type {Game} from "../types/game";
+import type Carrier from "./carrier";
 
-class PathManager {
+interface GraphicsWithChunk extends PIXI.Graphics {
+  chunk: PIXI.Container,
+}
 
-  constructor ( game, userSettings,  map ) {
+type Path = {
+  id: string,
+  carriers: Carrier[],
+  graphics: GraphicsWithChunk,
+}
+
+export class PathManager {
+  map: Map;
+  zoomPercent: number;
+  container: PIXI.Container;
+  chunkSize: number;
+  game: Game | undefined;
+  userSettings: UserGameSettings | undefined;
+  paths: Path[] = [];
+  chunklessContainer: PIXI.Container | undefined;
+  chunksContainer: PIXI.Container | undefined;
+  firstChunkX: number = 0;
+  firstChunkY: number = 0;
+  lastChunkX: number = 0;
+  lastChunkY: number = 0;
+  chunksXlen: number = 0;
+  chunksYlen: number = 0;
+  chunks: PIXI.Container[][] = [];
+  clampedScaling: boolean = false;
+  baseScale: number = 1;
+  minScale: number = 0;
+  maxScale: number = 0;
+
+  constructor ( game: Game, userSettings: UserGameSettings,  map: Map) {
     this.map = map
 
     this.zoomPercent = 100
@@ -16,7 +50,7 @@ class PathManager {
     this.setup(game, userSettings)
   }
 
-  setup(game, userSettings) {
+  setup(game: Game, userSettings: UserGameSettings) {
 
     this.game = game
     this.userSettings = userSettings
@@ -63,30 +97,16 @@ class PathManager {
       for(let y=0; y<this.chunksYlen; y+=1) {
         this.chunks[x][y] = new PIXI.Container()
         this.chunksContainer.addChild(this.chunks[x][y])
-        if(false)
-        {
-        let chunkVisualizer = new PIXI.Graphics()
-        chunkVisualizer.alpha = 0.5
-        chunkVisualizer.lineStyle(4, 0xFF0000, 1);
-        chunkVisualizer.beginFill(0xDE3249);
-        chunkVisualizer.drawRect(
-          (this.firstChunkX+x)*this.chunkSize, (this.firstChunkY+y)*this.chunkSize,
-          this.chunkSize, this.chunkSize
-        );
-        chunkVisualizer.endFill()
-        this.chunksContainer.addChild(chunkVisualizer)
-        this.chunks[x][y].visualizer = chunkVisualizer
-        }
       }
     }
 
   }
 
   _loadSettings() {
-    this.clampedScaling = this.userSettings.map.objectsScaling == 'clamped'
+    this.clampedScaling = this.userSettings!.map.objectsScaling == 'clamped'
     this.baseScale = 1
-    this.minScale = this.userSettings.map.objectsMinimumScale/4.0
-    this.maxScale = this.userSettings.map.objectsMaximumScale/4.0
+    this.minScale = this.userSettings!.map.objectsMinimumScale/4.0
+    this.maxScale = this.userSettings!.map.objectsMaximumScale/4.0
   }
 
   addSharedPath( objectA, objectB, carrierMapObject ) {
@@ -127,7 +147,7 @@ class PathManager {
           pathGraphics.chunk.removeChild(pathGraphics)
         }
         else {
-          this.chunklessContainer.removeChild( pathGraphics )
+          this.chunklessContainer!.removeChild( pathGraphics )
         }
         this.paths.splice(this.paths.indexOf(path), 1)
       }
@@ -135,7 +155,7 @@ class PathManager {
   }
 
   addUniquePath( mapObject, star, looped, colour ) {
-    const PATH_WIDTH = 0.5*this.userSettings.map.carrierPathWidth
+    const PATH_WIDTH = 0.5*this.userSettings!.map.carrierPathWidth
     let objectAlpha = helpers.calculateDepthModifier(this.userSettings, mapObject._id)/2
     let lineAlpha = looped ? objectAlpha / 2 : objectAlpha
     let lineWidth = PATH_WIDTH
@@ -155,7 +175,7 @@ class PathManager {
       path.chunk.removeChild(path)
     }
     else {
-      this.chunklessContainer.removeChild( path )
+      this.chunklessContainer!.removeChild( path )
     }
   }
 
@@ -173,17 +193,17 @@ class PathManager {
       pathGraphics.chunk = this.chunks[ix][iy]
     }
     else {
-      this.chunklessContainer.addChild(pathGraphics)
+      this.chunklessContainer!.addChild(pathGraphics)
     }
     this._updatePathScale(pathGraphics)
   }
 
-  onTick( zoomPercent, viewport, zoomChanging ) {
+  onTick( zoomPercent: number, viewport, zoomChanging: boolean ) {
     this.setScale( zoomPercent, viewport, zoomChanging )
     this.zoomPercent = zoomPercent
   }
 
-  setScale( zoomPercent, viewport, zoomChanging ) {
+  setScale( zoomPercent: number, viewport, zoomChanging: boolean ) {
     let yscale = this.baseScale
     if(this.clampedScaling) {
       let currentScale = zoomPercent/100
@@ -195,7 +215,7 @@ class PathManager {
     }
 
     if( zoomChanging ) {
-      for( let path of this.chunklessContainer.children) {
+      for( let path of this.chunklessContainer!.children) {
         path.scale.y = yscale
       }
     }
@@ -249,12 +269,12 @@ class PathManager {
   }
 
   _createLoopedPathGraphics( objectA, objectB, pathColour ) {
-    const PATH_WIDTH = 0.5*this.userSettings.map.carrierPathWidth
+    const PATH_WIDTH = 0.5*this.userSettings!.map.carrierPathWidth
     let lineAlpha = 0.3
     let lineWidth = PATH_WIDTH
 
     let pathGraphics
-    if( this.userSettings.map.carrierLoopStyle == 'solid' ) {
+    if( this.userSettings!.map.carrierLoopStyle == 'solid' ) {
       pathGraphics = this._createSolidPathGraphics( lineAlpha, lineWidth/3.0, objectA, objectB, pathColour )
     }
     else {
@@ -266,7 +286,7 @@ class PathManager {
   _createDashedPathGraphics( lineAlpha, lineWidth, objectA, objectB, pathColour ) {
     let pointA = objectA.data.location
     let pointB = objectB.data.location
-    const DASH_LENGTH = Math.min( Math.max(1, this.userSettings.map.carrierPathDashLength), 16 )
+    const DASH_LENGTH = Math.min( Math.max(1, this.userSettings!.map.carrierPathDashLength), 16 )
     const VOID_LENGTH = DASH_LENGTH/2.0
     const COMBINED_LENGTH = DASH_LENGTH+VOID_LENGTH
 
@@ -304,28 +324,6 @@ class PathManager {
     path.rotation = Math.atan2(pointB.y-pointA.y,pointB.x-pointA.x)
     path.position = pointA
 
-
-    /*
-    //TODO make line caps optional since they are barely visible and shit performance
-    let cap1 = new PIXI.Graphics()
-    cap1.beginFill(this.colour, lineAlpha)
-    cap1.arc(0, 0, lineWidth, 0, Math.PI)
-    cap1.endFill()
-    cap1.rotation = path.rotation+Math.PI/2.0
-    let cap2 = new PIXI.Graphics()
-    cap2.beginFill(this.colour, lineAlpha)
-    cap2.arc(0, 0, lineWidth, 0, Math.PI)
-    cap2.endFill()
-    cap2.rotation = path.rotation-Math.PI/2.0
-    // keep a list of caps so we can remove them latter
-    cap1.mapObject = objectA
-    cap2.mapObject = objectB
-    this.caps.push(cap1)
-    this.caps.push(cap2)
-    // add line caps to mapObject's container so they can inherit its scalling and be culled
-    objectA.container.addChild(cap1)
-    objectB.container.addChild(cap2)
-    */
     this.addPathToChunk(path, pointA, pointB)
     return path
   }

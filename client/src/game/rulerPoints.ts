@@ -1,14 +1,26 @@
 import * as PIXI from 'pixi.js-legacy'
 import {EventEmitter} from "./eventEmitter.js";
+import type { Game } from '../types/game';
+import type { Location } from '@solaris-common';
 
-class RulerPoints extends EventEmitter {
+type RulerPoint = {
+  location: Location,
+}
+
+export class RulerPoints extends EventEmitter {
+  container: PIXI.Container;
+  game: Game | undefined;
+  rulerPoints: RulerPoint[] = [];
+  lightYearDistance: number = 0;
+  techLevel: number = 0;
+
   constructor () {
     super()
 
     this.container = new PIXI.Container()
   }
 
-  setup (game) {
+  setup (game: Game) {
     this.game = game
 
     this.rulerPoints = []
@@ -21,7 +33,7 @@ class RulerPoints extends EventEmitter {
       this.techLevel = userPlayer.research.hyperspace.level
     }
 
-    this.emit('onRulerPointsCleared')
+    this.emit('onRulerPointsCleared', undefined);
 
     this.clear()
   }
@@ -73,7 +85,7 @@ class RulerPoints extends EventEmitter {
 
     graphics.lineStyle(1, 0xFFFFFF, 0.2)
     graphics.beginFill(0xFFFFFF, 0.075)
-    graphics.drawStar(lastPoint.location.x, lastPoint.location.y, radius, radius, radius - 3)
+    graphics.drawStar!(lastPoint.location.x, lastPoint.location.y, radius, radius, radius - 3)
     graphics.endFill()
     graphics.zIndex = -1
 

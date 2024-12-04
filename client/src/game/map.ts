@@ -1,7 +1,6 @@
 import * as PIXI from 'pixi.js-legacy'
 import Background from './background'
 import Star from './star'
-import Carrier from './carrier'
 import Waypoints from './waypoints'
 import RulerPoints from './rulerPoints'
 import Territories from './territories'
@@ -13,15 +12,75 @@ import OrbitalLocationLayer from './orbital'
 import WormHoleLayer from './wormHole'
 import TooltipLayer from './tooltip'
 import {EventEmitter} from "./eventEmitter.js";
+import type {Store} from "vuex";
+import type {State} from "../store";
+import type {DrawingContext, GameContainer} from "./container";
+import type {Game} from "../types/game";
+import type {Location, UserGameSettings} from "solaris-common/src";
+import Carrier from './carrier'
 
-class Map extends EventEmitter {
-  static chunkSize = 256
+const CHUNK_SIZE = 256
+
+enum Mode {
+  Galaxy = 'galaxy',
+  Waypoints = 'waypoints',
+  Ruler = 'ruler',
+}
+
+export class Map extends EventEmitter {
   // Represents the current game mode, these are as follows:
   // galaxy - Normal galaxy view
   // waypoints - Displays waypoints overlay for a given carrier
-  mode = 'galaxy'
+  mode = Mode.Galaxy;
+  app: PIXI.Application;
+  store: Store<State>;
+  context: DrawingContext;
+  gameContainer: GameContainer;
+  container: PIXI.Container;
+  stars: Star[];
+  carriers: Carrier[];
+  pathManager: PathManager | undefined;
+  zoomPercent: number;
+  lastZoomPercent: number;
+  minMouseChunkX: number;
+  maxMouseChunkX: number;
+  minMouseChunkY: number;
+  maxMouseChunkY: number;
+  chunksContainer: PIXI.Container | undefined;
+  backgroundContainer: PIXI.Container | undefined;
+  territoryContainer: PIXI.Container | undefined;
+  playerNamesContainer: PIXI.Container | undefined;
+  orbitalContainer: PIXI.Container | undefined;
+  wormHoleContainer: PIXI.Container | undefined;
+  starContainer: PIXI.Container | undefined;
+  carrierContainer: PIXI.Container | undefined;
+  waypointContainer: PIXI.Container | undefined;
+  rulerPointContainer: PIXI.Container | undefined;
+  highlightLocationsContainer: PIXI.Container | undefined;
+  tooltipContainer: PIXI.Container | undefined;
+  game: Game | undefined;
+  userSettings: UserGameSettings | undefined;
+  waypoints: Waypoints | undefined;
+  rulerPoints: RulerPoints | undefined;
+  territories: Territories | undefined;
+  playerNames: PlayerNames | undefined;
+  background: Background | undefined;
+  wormHoleLayer: WormHoleLayer | undefined;
+  tooltipLayer: TooltipLayer | undefined;
+  orbitalLayer: OrbitalLocationLayer | undefined;
+  firstChunkX: number = 0;
+  firstChunkY: number = 0;
+  lastChunkX: number = 0;
+  lastChunkY: number = 0;
+  modeArgs: any;
+  lastViewportCenter: PIXI.Point | undefined;
+  currentViewportCenter: PIXI.Point | undefined;
+  numof_chunkX: number = 0;
+  numof_chunkY: number = 0;
+  chunks: any[] = [];
+  lastPointerDownPosition: PIXI.Point | undefined;
 
-  constructor (app, store, gameContainer, context) {
+  constructor (app, store: Store<State>, gameContainer, context: DrawingContext) {
     super()
 
     this.app = app
@@ -32,6 +91,7 @@ class Map extends EventEmitter {
     this.container.sortableChildren = true
 
     this.stars = []
+
     this.carriers = []
 
     this.zoomPercent = 0
@@ -61,7 +121,7 @@ class Map extends EventEmitter {
     this.container.addChild(this.backgroundContainer)
     this.container.addChild(this.territoryContainer)
     this.container.addChild(this.wormHoleContainer)
-    this.container.addChild(this.pathManager.container)
+    this.container.addChild(this.pathManager!.container)
     this.container.addChild(this.rulerPointContainer)
     this.container.addChild(this.waypointContainer)
     this.container.addChild(this.chunksContainer)
@@ -73,7 +133,7 @@ class Map extends EventEmitter {
     this.container.addChild(this.tooltipContainer)
   }
 
-  setup (game, userSettings) {
+  setup (game: Game, userSettings: UserGameSettings) {
     this.userSettings = userSettings
     this.game = game
 
@@ -109,10 +169,10 @@ class Map extends EventEmitter {
 
     this.waypoints = new Waypoints()
     this.waypoints.setup(game, this.context)
-    this.waypoints.onWaypointCreatedHandler = this.waypoints.on('onWaypointCreated', this.onWaypointCreated.bind(this))
-    this.waypoints.onWaypointOutOfRangeHandler = this.waypoints.on('onWaypointOutOfRange', this.onWaypointOutOfRange.bind(this))
+    this.waypoints.on('onWaypointCreated', this.onWaypointCreated.bind(this))
+    this.waypoints.on('onWaypointOutOfRange', this.onWaypointOutOfRange.bind(this))
 
-    this.waypointContainer.addChild(this.waypoints.container)
+    this.waypointContainer!.addChild(this.waypoints.container)
 
     // -----------
     // Setup Ruler Points
@@ -122,18 +182,18 @@ class Map extends EventEmitter {
 
     this.rulerPoints = new RulerPoints()
     this.rulerPoints.setup(game)
-    this.rulerPoints.onRulerPointCreatedHandler = this.rulerPoints.on('onRulerPointCreated', this.onRulerPointCreated.bind(this))
-    this.rulerPoints.onRulerPointsClearedHandler = this.rulerPoints.on('onRulerPointsCleared', this.onRulerPointsCleared.bind(this))
-    this.rulerPoints.onRulerPointRemovedHandler = this.rulerPoints.on('onRulerPointRemoved', this.onRulerPointRemoved.bind(this))
+    this.rulerPoints.on('onRulerPointCreated', this.onRulerPointCreated.bind(this))
+    this.rulerPoints.on('onRulerPointsCleared', this.onRulerPointsCleared.bind(this))
+    this.rulerPoints.on('onRulerPointRemoved', this.onRulerPointRemoved.bind(this))
 
-    this.rulerPointContainer.addChild(this.rulerPoints.container)
+    this.rulerPointContainer!.addChild(this.rulerPoints.container)
 
     // -----------
     // Setup Territories
     this.territories = new Territories()
     this.territories.setup(game, userSettings, this.context)
 
-    this.territoryContainer.addChild(this.territories.container)
+    this.territoryContainer!.addChild(this.territories.container)
     this.territories.draw(userSettings)
 
     // -----------
@@ -141,7 +201,7 @@ class Map extends EventEmitter {
     this.playerNames = new PlayerNames()
     this.playerNames.setup(game, userSettings, this.context)
 
-    this.playerNamesContainer.addChild(this.playerNames.container)
+    this.playerNamesContainer!.addChild(this.playerNames.container)
     this.playerNames.draw()
 
     // -----------
@@ -149,8 +209,8 @@ class Map extends EventEmitter {
     this.background = new Background()
     this.background.setup(game, userSettings, this.context)
 
-    this.backgroundContainer.addChild(this.background.container)
-    this.backgroundContainer.addChild(this.background.starContainer)
+    this.backgroundContainer!.addChild(this.background.container)
+    this.backgroundContainer!.addChild(this.background.starContainer)
     this.background.draw()
 
     // -----------
@@ -158,7 +218,7 @@ class Map extends EventEmitter {
     if (this._isWormHolesEnabled()) {
       this.wormHoleLayer = new WormHoleLayer()
       this.drawWormHoles()
-      this.wormHoleContainer.addChild(this.wormHoleLayer.container)
+      this.wormHoleContainer!.addChild(this.wormHoleLayer.container)
     }
 
     // -----------
@@ -167,7 +227,7 @@ class Map extends EventEmitter {
       this.orbitalLayer = new OrbitalLocationLayer()
       this.orbitalLayer.setup(game)
 
-      this.orbitalContainer.addChild(this.orbitalLayer.container)
+      this.orbitalContainer!.addChild(this.orbitalLayer.container)
     }
 
     // Setup Chunks
@@ -175,7 +235,7 @@ class Map extends EventEmitter {
 
     this.tooltipLayer = new TooltipLayer()
     this.tooltipLayer.setup(this.game, this.context)
-    this.tooltipContainer.addChild(this.tooltipLayer.container)
+    this.tooltipContainer!.addChild(this.tooltipLayer.container)
   }
 
   setupStar (game, userSettings, starData) {
@@ -185,7 +245,7 @@ class Map extends EventEmitter {
       star = new Star(this.app)
       this.stars.push(star)
 
-      this.starContainer.addChild(star.fixedContainer)
+      this.starContainer!.addChild(star.fixedContainer)
 
       star.on('onStarClicked', this.onStarClicked.bind(this))
       star.on('onStarRightClicked', this.onStarRightClicked.bind(this))
@@ -202,13 +262,13 @@ class Map extends EventEmitter {
   }
 
   setupCarrier (game, userSettings, carrierData) {
-    let carrier = this.carriers.find(x => x.data._id === carrierData._id)
+    let carrier = this.carriers.find(x => x.data!._id === carrierData._id)
 
     if (!carrier) {
-      carrier = new Carrier( this.pathManager )
+      carrier = new Carrier( this.pathManager! )
       this.carriers.push(carrier)
 
-      this.carrierContainer.addChild(carrier.fixedContainer)
+      this.carrierContainer!.addChild(carrier.fixedContainer)
 
       carrier.on('onCarrierClicked', this.onCarrierClicked.bind(this))
       carrier.on('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
@@ -245,9 +305,9 @@ class Map extends EventEmitter {
 
   drawGalaxyCenter () {
     // TODO: Is there any need to display the galaxy center for non orbital games?
-    if (this._isOrbitalMapEnabled() && this.game.constants.distances.galaxyCenterLocation) {
+    if (this._isOrbitalMapEnabled() && this.game!.constants.distances.galaxyCenterLocation) {
         let galaxyCenterGraphics = new PIXI.Graphics()
-        let location = this.game.constants.distances.galaxyCenterLocation
+        let location : Location = this.game!.constants.distances.galaxyCenterLocation
         let size = 10
 
         galaxyCenterGraphics.lineStyle(2, 0xFFFFFF, 1)
@@ -257,17 +317,17 @@ class Map extends EventEmitter {
         galaxyCenterGraphics.lineTo(location.x + size, location.y)
         galaxyCenterGraphics.alpha = 0.75
 
-        this.starContainer.addChild(galaxyCenterGraphics)
+        this.starContainer!.addChild(galaxyCenterGraphics)
     }
   }
 
   _isOrbitalMapEnabled () {
-    return this.game.constants.distances.galaxyCenterLocation && this.game.settings.orbitalMechanics.enabled === 'enabled'
+    return this.game!.constants.distances.galaxyCenterLocation && this.game!.settings.orbitalMechanics.enabled === 'enabled'
   }
 
   _isWormHolesEnabled () {
-    return this.game.settings.specialGalaxy.randomWormHoles
-      || this.game.galaxy.stars.find(s => s.wormHoleToStarId)
+    return this.game!.settings.specialGalaxy.randomWormHoles
+      || this.game!.galaxy.stars.find(s => s.wormHoleToStarId)
   }
 
   _setupChunks() {
@@ -290,11 +350,11 @@ class Map extends EventEmitter {
     let maxX = Math.max(carrierMaxX, starMaxX)
     let maxY = Math.max(carrierMaxY, starMaxY)
 
-    this.firstChunkX = Math.floor(minX/Map.chunkSize)
-    this.firstChunkY = Math.floor(minY/Map.chunkSize)
+    this.firstChunkX = Math.floor(minX/CHUNK_SIZE)
+    this.firstChunkY = Math.floor(minY/CHUNK_SIZE)
 
-    this.lastChunkX = Math.floor(maxX/Map.chunkSize)
-    this.lastChunkY = Math.floor(maxY/Map.chunkSize)
+    this.lastChunkX = Math.floor(maxX/CHUNK_SIZE)
+    this.lastChunkY = Math.floor(maxY/CHUNK_SIZE)
 
     this.numof_chunkX = this.lastChunkX-this.firstChunkX+1
     this.numof_chunkY = this.lastChunkY-this.firstChunkY+1
@@ -307,7 +367,7 @@ class Map extends EventEmitter {
     for(let ix=0; ix<this.numof_chunkX; ix++) {
       for(let iy=0; iy<this.numof_chunkY; iy++) {
         this.chunks[ix][iy] = new PIXI.Container()
-        this.chunksContainer.addChild(this.chunks[ix][iy])
+        this.chunksContainer!.addChild(this.chunks[ix][iy])
         this.chunks[ix][iy].mapObjects = Array()
         if(false)
         {
@@ -316,8 +376,8 @@ class Map extends EventEmitter {
         chunkVisualizer.lineStyle(4, 0xFF0000, 1);
         chunkVisualizer.beginFill(0xDE3249);
         chunkVisualizer.drawRect(
-          (this.firstChunkX+ix)*Map.chunkSize, (this.firstChunkY+iy)*Map.chunkSize,
-          Map.chunkSize, Map.chunkSize
+          (this.firstChunkX+ix)*CHUNK_SIZE, (this.firstChunkY+iy)*CHUNK_SIZE,
+          CHUNK_SIZE, CHUNK_SIZE
         );
         chunkVisualizer.endFill();
         this.chunks[ix][iy].addChild(chunkVisualizer)
@@ -331,8 +391,8 @@ class Map extends EventEmitter {
   }
 
   addContainerToChunk (mapObject, chunks, firstX, firstY) { // Star or carrier
-    let chunkX = Math.floor(mapObject.data.location.x/Map.chunkSize)
-    let chunkY = Math.floor(mapObject.data.location.y/Map.chunkSize)
+    let chunkX = Math.floor(mapObject.data.location.x/CHUNK_SIZE)
+    let chunkY = Math.floor(mapObject.data.location.y/CHUNK_SIZE)
     let ix = chunkX-firstX
     let iy = chunkY-firstY
 
@@ -341,8 +401,8 @@ class Map extends EventEmitter {
   }
 
   removeContainerFromChunk (mapObject, chunks, firstX, firstY) {
-    let chunkX = Math.floor(mapObject.data.location.x/Map.chunkSize)
-    let chunkY = Math.floor(mapObject.data.location.y/Map.chunkSize)
+    let chunkX = Math.floor(mapObject.data.location.x/CHUNK_SIZE)
+    let chunkY = Math.floor(mapObject.data.location.y/CHUNK_SIZE)
     let ix = chunkX-firstX
     let iy = chunkY-firstY
 
@@ -365,7 +425,7 @@ class Map extends EventEmitter {
   reloadGame (game, userSettings) {
     this.game = game
 
-    this.pathManager.setup(game, userSettings)
+    this.pathManager!.setup(game, userSettings)
 
     // Check for stars that are no longer in scanning range.
     for (let i = 0; i < this.stars.length; i++) {
@@ -381,7 +441,7 @@ class Map extends EventEmitter {
     // Check for carriers that are no longer in scanning range or have been destroyed.
     for (let i = 0; i < this.carriers.length; i++) {
       let carrier = this.carriers[i]
-      let gameCarrier = gameHelper.getCarrierById(game, carrier.data._id)
+      let gameCarrier = gameHelper.getCarrierById(game, carrier.data!._id)
 
       if (!gameCarrier) {
         this._undrawCarrier(carrier)
@@ -407,7 +467,7 @@ class Map extends EventEmitter {
     for (let i = 0; i < game.galaxy.carriers.length; i++) {
       let carrierData = game.galaxy.carriers[i]
 
-      let existing = this.carriers.find(x => x.data._id === carrierData._id)
+      let existing = this.carriers.find(x => x.data!._id === carrierData._id)
 
       if (existing) {
         let player = gameHelper.getPlayerById(game, carrierData.ownedByPlayerId)
@@ -424,11 +484,11 @@ class Map extends EventEmitter {
     this.drawWormHoles()
     this.drawPlayerNames()
 
-    this.background.setup(game, userSettings, this.context)
-    this.background.draw(game, userSettings)
+    this.background!.setup(game, userSettings, this.context)
+    this.background!.draw()
 
-    this.waypoints.setup(game, this.context)
-    this.tooltipLayer.setup(game, this.context)
+    this.waypoints!.setup(game, this.context)
+    this.tooltipLayer!.setup(game, this.context)
 
     this._setupChunks()
   }
@@ -481,7 +541,7 @@ class Map extends EventEmitter {
   }
 
   removeLastRulerPoint () {
-    this.rulerPoints.removeLastRulerPoint()
+    this.rulerPoints!.removeLastRulerPoint()
   }
 
   drawStars () {
@@ -501,7 +561,7 @@ class Map extends EventEmitter {
     star.off('onStarClicked', this.onStarClicked.bind(this))
     star.off('onStarRightClicked', this.onStarRightClicked.bind(this))
 
-    this.starContainer.removeChild(star.fixedContainer)
+    this.starContainer!.removeChild(star.fixedContainer)
 
     this.removeMapObjectFromChunks(star, this.chunks)
 
@@ -528,7 +588,7 @@ class Map extends EventEmitter {
     carrier.cleanupEventHandlers()
     carrier.clearPaths()
 
-    this.carrierContainer.removeChild(carrier.fixedContainer)
+    this.carrierContainer!.removeChild(carrier.fixedContainer)
 
     this.removeMapObjectFromChunks(carrier, this.chunks)
 
@@ -538,7 +598,7 @@ class Map extends EventEmitter {
   }
 
   undrawCarrier (carrierData) {
-    let existing = this.carriers.find(x => x.data._id === carrierData._id)
+    let existing = this.carriers.find(x => x.data!._id === carrierData._id)
 
     if (existing) {
       this._undrawCarrier(existing)
@@ -546,7 +606,7 @@ class Map extends EventEmitter {
   }
 
   drawWaypoints () {
-    this.waypoints.draw(this.modeArgs)
+    this.waypoints!.draw(this.modeArgs)
 
     for (let i = 0; i < this.carriers.length; i++) {
       let c = this.carriers[i]
@@ -556,32 +616,32 @@ class Map extends EventEmitter {
   }
 
   clearWaypoints () {
-    this.waypoints.clear()
+    this.waypoints!.clear()
   }
 
   drawRulerPoints () {
-    this.rulerPoints.draw(this.modeArgs)
+    this.rulerPoints!.draw()
   }
 
   clearRulerPoints () {
-    this.rulerPoints.setup(this.game)
+    this.rulerPoints!.setup(this.game!)
   }
 
-  drawTerritories (userSettings) {
-    this.territories.setup(this.game, userSettings, this.context)
-    this.territories.draw(userSettings)
+  drawTerritories (userSettings: UserGameSettings) {
+    this.territories!.setup(this.game!, userSettings, this.context)
+    this.territories!.draw(userSettings)
   }
 
   drawWormHoles () {
     if (this._isWormHolesEnabled()) {
-      this.wormHoleLayer.setup(this.game)
-      this.wormHoleLayer.draw()
+      this.wormHoleLayer!.setup(this.game)
+      this.wormHoleLayer!.draw()
     }
   }
 
   drawPlayerNames () {
-    this.playerNames.setup(this.game, this.userSettings, this.context)
-    this.playerNames.draw(this.userSettings)
+    this.playerNames!.setup(this.game, this.userSettings, this.context)
+    this.playerNames!.draw()
   }
 
   panToPlayer (game, player) {
@@ -591,7 +651,7 @@ class Map extends EventEmitter {
       return
     }
 
-    this.gameContainer.viewport.moveCenter(empireCenter.x, empireCenter.y)
+    this.gameContainer.viewport!.moveCenter(empireCenter.x, empireCenter.y)
 
     let zoomPercent = this.gameContainer.getViewportZoomPercentage()
 
@@ -618,21 +678,21 @@ class Map extends EventEmitter {
   }
 
   panToLocation (location) {
-    this.gameContainer.viewport.moveCenter(location.x, location.y)
+    this.gameContainer.viewport!.moveCenter(location.x, location.y)
   }
 
   clickStar (starId) {
     let star = this.stars.find(s => s.data._id === starId)
 
-    star.onClicked(null, false)
-    star.select()
+    star!.onClicked(null, false)
+    star!.select()
   }
 
   clickCarrier (carrierId) {
-    let carrier = this.carriers.find(s => s.data._id === carrierId)
+    let carrier = this.carriers.find(s => s.data!._id === carrierId)
 
-    carrier.onClicked(null, false)
-    carrier.select()
+    carrier!.onClicked(null, false)
+    carrier!.select()
   }
 
   unselectAllStars () {
@@ -664,28 +724,28 @@ class Map extends EventEmitter {
 
   unselectAllCarriersExcept (carrier) {
     this.carriers
-      .filter(c => c.isSelected || c.data._id === carrier.data._id) // Get only stars that are selected or the e star.
+      .filter(c => c.isSelected || c.data!._id === carrier.data._id) // Get only stars that are selected or the e star.
       .forEach(c => {
         // Set all other carriers to unselected.
-        if (c.data._id !== carrier.data._id) {
+        if (c.data!._id !== carrier.data._id) {
           c.unselect()
         }
       })
   }
 
   onTick(deltaTime) {
-    let viewportWidth = this.gameContainer.viewport.right - this.gameContainer.viewport.left
-    let viewportHeight = this.gameContainer.viewport.bottom - this.gameContainer.viewport.top
+    let viewportWidth = this.gameContainer.viewport!.right - this.gameContainer.viewport!.left
+    let viewportHeight = this.gameContainer.viewport!.bottom - this.gameContainer.viewport!.top
 
     let viewportXRadius = viewportWidth / 2.0
     let viewportYRadius = viewportHeight / 2.0
 
-    let viewportCenter = this.gameContainer.viewport.center
+    let viewportCenter = this.gameContainer.viewport!.center
 
-    this.lastViewportCenter = this.currentViewportCenter || null
-    this.currentViewportCenter = this.gameContainer.viewport.center
+    this.lastViewportCenter = this.currentViewportCenter || undefined;
+    this.currentViewportCenter = this.gameContainer.viewport!.center
 
-    this.zoomPercent = (this.gameContainer.viewport.screenWidth/viewportWidth) * 100
+    this.zoomPercent = (this.gameContainer.viewport!.screenWidth/viewportWidth) * 100
 
     let viewportData = {
       center: viewportCenter,
@@ -695,11 +755,11 @@ class Map extends EventEmitter {
 
     //chunk culling
 
-    let firstX = Math.floor(this.gameContainer.viewport.left/Map.chunkSize)
-    let firstY = Math.floor(this.gameContainer.viewport.top/Map.chunkSize)
+    let firstX = Math.floor(this.gameContainer.viewport!.left/CHUNK_SIZE)
+    let firstY = Math.floor(this.gameContainer.viewport!.top/CHUNK_SIZE)
 
-    let lastX = Math.floor(this.gameContainer.viewport.right/Map.chunkSize)
-    let lastY = Math.floor(this.gameContainer.viewport.bottom/Map.chunkSize)
+    let lastX = Math.floor(this.gameContainer.viewport!.right/CHUNK_SIZE)
+    let lastY = Math.floor(this.gameContainer.viewport!.bottom/CHUNK_SIZE)
 
     let positionChanging = this.lastViewportCenter == null || this.currentViewportCenter.x !== this.lastViewportCenter.x || this.currentViewportCenter.y !== this.lastViewportCenter.y
     let zoomChanging = Math.abs(this.zoomPercent-this.lastZoomPercent) > (1.0/128.0)
@@ -739,9 +799,9 @@ class Map extends EventEmitter {
       }
     }
 
-    this.pathManager.onTick(this.zoomPercent, this.gameContainer.viewport, zoomChanging)
-    this.background.onTick(deltaTime, viewportData)
-    this.playerNames.onTick(this.zoomPercent, zoomChanging)
+    this.pathManager!.onTick(this.zoomPercent, this.gameContainer.viewport, zoomChanging)
+    this.background!.onTick(deltaTime, viewportData)
+    this.playerNames!.onTick(this.zoomPercent, zoomChanging)
 
     this.lastZoomPercent = this.zoomPercent
   }
@@ -754,8 +814,8 @@ class Map extends EventEmitter {
   //not sure where to put this func
   isDragMotion(position) {
     let DRAG_THRESHOLD = 8 //max distance in pixels
-    let dxSquared = Math.pow(Math.abs(this.lastPointerDownPosition.x - position.x),2)
-    let dySquared = Math.pow(Math.abs(this.lastPointerDownPosition.y - position.y),2)
+    let dxSquared = Math.pow(Math.abs(this.lastPointerDownPosition!.x - position.x),2)
+    let dySquared = Math.pow(Math.abs(this.lastPointerDownPosition!.y - position.y),2)
     let distance = Math.sqrt(dxSquared+dySquared)
 
     return (distance > DRAG_THRESHOLD)
@@ -786,13 +846,13 @@ class Map extends EventEmitter {
       this.unselectAllStarsExcept(selectedStar)
 
       if (!dic.tryMultiSelect || !this.tryMultiSelect(e.location)) {
-        selectedStar.toggleSelected()
+        selectedStar!.toggleSelected()
         this.emit('onStarClicked', e)
       }
     } else if (this.mode === 'waypoints') {
-      this.waypoints.onStarClicked(e)
+      this.waypoints!.onStarClicked(e)
     } else if (this.mode === 'ruler') {
-      this.rulerPoints.onStarClicked(e)
+      this.rulerPoints!.onStarClicked(e)
     }
     AnimationService.drawSelectedCircle(this.app, this.container, e.location)
   }
@@ -835,20 +895,20 @@ class Map extends EventEmitter {
     // Clicking carriers should only raise events to the UI if in galaxy mode.
     if (this.mode === 'galaxy') {
 
-      let selectedCarrier = this.carriers.find(x => x.data._id === e._id)
+      let selectedCarrier = this.carriers.find(x => x.data!._id === e._id)
 
       this.unselectAllStars()
       this.unselectAllCarriersExcept(selectedCarrier)
 
-      selectedCarrier.toggleSelected()
+      selectedCarrier!.toggleSelected()
 
       if (!dic.tryMultiSelect || !this.tryMultiSelect(e.location)) {
         this.emit('onCarrierClicked', e)
       } else {
-        selectedCarrier.unselect()
+        selectedCarrier!.unselect()
       }
     } else if (this.mode === 'ruler') {
-      this.rulerPoints.onCarrierClicked(e)
+      this.rulerPoints!.onCarrierClicked(e)
     }
 
     AnimationService.drawSelectedCircle(this.app, this.container, e.location)
@@ -865,10 +925,10 @@ class Map extends EventEmitter {
     // to the star.
     if (e.data.orbiting) {
       let star = this.stars.find(s => s.data._id === e.data.orbiting)
-      star.onMouseOver()
+      star!.onMouseOver(undefined)
     }
 
-    this.tooltipLayer.drawTooltipCarrier(e.data)
+    this.tooltipLayer!.drawTooltipCarrier(e.data)
   }
 
   onCarrierMouseOut (e) {
@@ -876,18 +936,18 @@ class Map extends EventEmitter {
     // to the star.
     if (e.data.orbiting) {
       let star = this.stars.find(s => s.data._id === e.data.orbiting)
-      star.onMouseOut()
+      star!.onMouseOut(undefined)
     }
 
-    this.tooltipLayer.clear()
+    this.tooltipLayer!.clear()
   }
 
   onStarMouseOver (e) {
-    this.tooltipLayer.drawTooltipStar(e.data)
+    this.tooltipLayer!.drawTooltipStar(e.data)
   }
 
   onStarMouseOut (e) {
-    this.tooltipLayer.clear()
+    this.tooltipLayer!.clear()
   }
 
   onWaypointCreated (e) {
@@ -916,13 +976,18 @@ class Map extends EventEmitter {
     // objects on the map that are on top of eachother or very close together.
     const distance = 10
 
-    let closeStars = this.stars
+    let closeStars: {
+      type: string;
+      distance: number;
+      ref: any;
+      data: any;
+    }[] = this.stars
       .map(s => {
         return {
           ref: s,
           type: 'star',
           distance: gameHelper.getDistanceBetweenLocations(location, s.data.location),
-          data: s.data
+          data: s.data,
         }
       })
       .filter(s => s.distance <= distance)
@@ -932,7 +997,7 @@ class Map extends EventEmitter {
         return {
           ref: s,
           type: 'carrier',
-          distance: gameHelper.getDistanceBetweenLocations(location, s.data.location),
+          distance: gameHelper.getDistanceBetweenLocations(location, s.data!.location),
           data: s.data
         }
       })
@@ -946,7 +1011,7 @@ class Map extends EventEmitter {
         }
 
         if (a.distance === b.distance) {
-          return a.data.name.localeCompare(b.data.name); // If the distances are identical, sort by name ascending.
+          return a.data!.name.localeCompare(b.data!.name); // If the distances are identical, sort by name ascending.
         }
 
         return a.distance < b.distance ? -1 : 1; // Finally, sort by distance ascending.
@@ -991,13 +1056,13 @@ class Map extends EventEmitter {
     let radius = 12
 
     graphics.lineStyle(1, 0xFFFFFF, opacity)
-    graphics.drawStar(location.x, location.y, radius, radius, radius - 3)
+    graphics!.drawStar!(location.x, location.y, radius, radius, radius - 3)
 
-    this.highlightLocationsContainer.addChild(graphics)
+    this.highlightLocationsContainer!.addChild(graphics)
   }
 
   clearHighlightedLocations () {
-    this.highlightLocationsContainer.removeChildren()
+    this.highlightLocationsContainer!.removeChildren()
   }
 
   showIgnoreBulkUpgrade () {
@@ -1014,25 +1079,25 @@ class Map extends EventEmitter {
 
   onStarSelected (e) {
     if (this._isOrbitalMapEnabled()) {
-      this.orbitalLayer.drawStar(e)
+      this.orbitalLayer!.drawStar(e)
     }
   }
 
   onStarUnselected (e) {
     if (this._isOrbitalMapEnabled()) {
-      this.orbitalLayer.clear()
+      this.orbitalLayer!.clear()
     }
   }
 
   onCarrierSelected (e) {
     if (this._isOrbitalMapEnabled()) {
-      this.orbitalLayer.drawCarrier(e)
+      this.orbitalLayer!.drawCarrier(e)
     }
   }
 
   onCarrierUnselected (e) {
     if (this._isOrbitalMapEnabled()) {
-      this.orbitalLayer.clear()
+      this.orbitalLayer!.clear()
     }
   }
 }

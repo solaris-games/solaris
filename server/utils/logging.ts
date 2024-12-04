@@ -24,10 +24,6 @@ export const setupLogging = () => {
     baseLogger = pino(transport);
 }
 
-export const onReady = (callback: () => void) => {
-    transport.on('ready', callback);
-}
-
 export const logger = (name?: string): Logger => {
     if (!baseLogger) {
         setupLogging();

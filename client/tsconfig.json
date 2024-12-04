@@ -1,3 +1,9 @@
 {
+    "compilerOptions": {
+        "noImplicitAny": false,
+        "paths": {
+            "@solaris-common": ["../common/src/index.ts"]
+        }
+    },
     "extends": "@vue/tsconfig/tsconfig.dom.json"
 }

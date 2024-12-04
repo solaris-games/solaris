@@ -1,11 +1,11 @@
 import * as PIXI from 'pixi.js-legacy'
 import TextureService from './texture'
-import gameHelper from '../services/gameHelper'
+import gameHelper from '../services/gameHelper.js'
 import seededRandom from 'random-seed'
 import Helpers from './helpers'
 import {EventEmitter} from "./eventEmitter.js";
 
-class Star extends EventEmitter {
+export class Star extends EventEmitter {
 
   static culling_margin = 16
   static nameSize = 4
@@ -27,6 +27,50 @@ class Star extends EventEmitter {
     shipCount: 120
   }
 
+  app: PIXI.Application;
+  fixedContainer: PIXI.Container;
+  container: PIXI.Container;
+  graphics_shape_part: PIXI.Sprite;
+  graphics_shape_full: PIXI.Sprite;
+  graphics_shape_part_warp: PIXI.Graphics;
+  graphics_shape_full_warp: PIXI.Graphics;
+  graphics_hyperspaceRange: PIXI.Graphics;
+  graphics_natural_resources_ring: PIXI.Graphics[];
+  graphics_scanningRange: PIXI.Graphics;
+  graphics_star: PIXI.Sprite;
+  graphics_targeted: PIXI.Graphics;
+  graphics_selected: PIXI.Graphics;
+  graphics_kingOfTheHill: PIXI.Graphics;
+  planets: any;
+  handleOrbitPlanetsStep: any;
+  isSelected: boolean;
+  isMouseOver: boolean;
+  zoomPercent: number;
+  showIgnoreBulkUpgradeInfrastructure: boolean;
+  zoomDepth: number;
+  game: any;
+  data: any;
+  players: any[] = [];
+  carriers: any[] = [];
+  context: any;
+  lightYearDistance: number = 0;
+  userSettings: any;
+  clampedScaling: boolean = false;
+  baseScale: number = 0;
+  minScale: number = 0;
+  maxScale: number = 0;
+  pulsarGraphics: PIXI.Graphics | null = null;
+  nebulaSprite: PIXI.Sprite | null = null;
+  wormHoleSprite: PIXI.Sprite | null = null;
+  asteroidFieldSprite: PIXI.Sprite | null = null;
+  specialistSprite: PIXI.Sprite | null = null;
+  container_planets: PIXI.Container | null = null;
+  text_name: PIXI.BitmapText | null = null;
+  text_ships_small: PIXI.BitmapText | null = null;
+  text_ships_big: PIXI.BitmapText | null = null;
+  text_infrastructure: PIXI.BitmapText | null = null;
+  text_infrastructureBulkIgnored: PIXI.BitmapText | null = null;
+
   constructor (app) {
     super()
 
@@ -40,14 +84,14 @@ class Star extends EventEmitter {
     this.container.eventMode = 'static';
     this.container.interactiveChildren = false;
 
-    this.graphics_shape_part = new PIXI.Graphics()
-    this.graphics_shape_full = new PIXI.Graphics()
+    this.graphics_star = new PIXI.Sprite();
+    this.graphics_shape_part = new PIXI.Sprite()
+    this.graphics_shape_full = new PIXI.Sprite()
     this.graphics_shape_part_warp = new PIXI.Graphics()
     this.graphics_shape_full_warp = new PIXI.Graphics()
     this.graphics_hyperspaceRange = new PIXI.Graphics()
     this.graphics_natural_resources_ring = new Array(Star.maxLod)
     this.graphics_scanningRange = new PIXI.Graphics()
-    this.graphics_star = new PIXI.Graphics()
     this.graphics_targeted = new PIXI.Graphics()
     this.graphics_selected = new PIXI.Graphics()
     this.graphics_kingOfTheHill = new PIXI.Graphics()
@@ -719,7 +763,7 @@ class Star extends EventEmitter {
 
     this.graphics_hyperspaceRange.lineStyle(1, 0xFFFFFF, 0.2)
     this.graphics_hyperspaceRange.beginFill(this.context.getPlayerColour(player._id), 0.075)
-    this.graphics_hyperspaceRange.drawStar(0, 0, radius, radius, radius - 3)
+    this.graphics_hyperspaceRange.drawStar!(0, 0, radius, radius, radius - 3)
     this.graphics_hyperspaceRange.endFill()
     this.graphics_hyperspaceRange.zIndex = -1
     this.container.zIndex = -1
@@ -871,7 +915,7 @@ class Star extends EventEmitter {
       || (this.text_ships_small && this.text_ships_small.visible)
       || (this.text_name && this.text_name.visible)
 
-    this.graphics_shape_part.visible = partial_ring
+    this.graphics_shape_part.visible = Boolean(partial_ring)
     this.graphics_shape_full.visible = !partial_ring
     this.graphics_shape_part_warp.visible = partial_ring && this.data.warpGate
     this.graphics_shape_full_warp.visible = !partial_ring && this.data.warpGate
@@ -894,7 +938,9 @@ class Star extends EventEmitter {
   }
 
   deselectAllText () {
+    // @ts-ignore
     if (window.getSelection) {window.getSelection().removeAllRanges();}
+    // @ts-ignore
     else if (document.selection) {document.selection.empty();}
   }
 
@@ -923,7 +969,7 @@ class Star extends EventEmitter {
     this.zoomDepth = 1
     for (let depth in Star.zoomLevelDefinitions) {
       if (Star.zoomLevelDefinitions[depth] < this.zoomPercent) {
-        this.zoomDepth = depth
+        this.zoomDepth = Star.zoomLevelDefinitions[depth]
       }
     }
 

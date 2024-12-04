@@ -1,3 +1,4 @@
+import type { Store } from 'vuex/types/index.js'
 import backspaceFile from '../assets/audio/backspace.mp3'
 import clickFile from '../assets/audio/click.mp3'
 import closeFile from '../assets/audio/close.mp3'
@@ -10,10 +11,24 @@ import loadingFile from '../assets/audio/loading.mp3'
 import openFile from '../assets/audio/open.mp3'
 import quitFile from '../assets/audio/quit.mp3'
 import typeFile from '../assets/audio/type.mp3'
+import type { State } from '../store'
 
 // TODO: This service doesn't really belong in the game folder, should be in the services folder instead.
 class AudioService {
-  
+  store: Store<State> | undefined;
+  backspaceAudio: HTMLAudioElement | undefined;
+  closeAudio: HTMLAudioElement | undefined;
+  clickAudio: HTMLAudioElement | undefined;
+  dialogOpenAudio: HTMLAudioElement | undefined;
+  downloadAudio: HTMLAudioElement | undefined;
+  hoverAudio: HTMLAudioElement | undefined;
+  joinAudio: HTMLAudioElement | undefined;
+  leaveAudio: HTMLAudioElement | undefined;
+  loadingAudio: HTMLAudioElement | undefined;
+  openAudio: HTMLAudioElement | undefined;
+  quitAudio: HTMLAudioElement | undefined;
+  typeAudio: HTMLAudioElement | undefined;
+
   _play (audio) {
     if (this.store && this.store.state.settings.interface.audio === 'disabled') {
       return

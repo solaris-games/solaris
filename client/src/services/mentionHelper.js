@@ -1,4 +1,4 @@
-import gameHelper from './gameHelper.js'
+import gameHelper from './gameHelper'
 
 class MentionHelper {
   static MENTION_REGEX = /(#|@)(?:(?:{(.*?)})|([\w\[\]]+))/g

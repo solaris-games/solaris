@@ -1,14 +1,20 @@
 import * as PIXI from 'pixi.js-legacy'
 import gameHelper from '../services/gameHelper'
+import type {Game} from "../types/game";
+import type {DrawingContext} from "./container";
 
 class PlayerNames {
 
   static zoomLevel = 90
 
+  container: PIXI.Container;
+  zoomPercent = 0;
+
+  game: Game | undefined;
+  context: DrawingContext | undefined;
+
   constructor () {
     this.container = new PIXI.Container()
-
-    this.zoomPercent = 0
   }
 
   setup (game, userSettings, context) {
@@ -21,7 +27,7 @@ class PlayerNames {
   draw () {
     this.container.removeChildren()
 
-    for (let player of this.game.galaxy.players) {
+    for (let player of this.game!.galaxy.players) {
       const empireCenter = gameHelper.getPlayerEmpireCenter(this.game, player)
 
       if (empireCenter == null) {
@@ -42,7 +48,7 @@ class PlayerNames {
       text_name.zIndex = 10
 
       let graphics = new PIXI.Graphics()
-      graphics.beginFill(this.context.getPlayerColour(player._id))
+      graphics.beginFill(this.context!.getPlayerColour(player._id))
       graphics.drawRoundedRect(-10, -10, text_name.width + 20, text_name.height + 20, 10)
       graphics.endFill()
       graphics.alpha = 0.7
@@ -62,7 +68,7 @@ class PlayerNames {
   }
 
   separate () {
-    const rects = this.container.children
+    const rects = this.container.children as PIXI.Container[];
 
     const hasOverlap = (rectA, rectB) => {
       // a left >= b right or b left >= a right

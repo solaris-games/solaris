@@ -5,9 +5,9 @@ class AnimationService {
     // It ain't pretty, but it works.
     let graphics = new PIXI.Graphics()
 
-    graphics.radius = 1
+    let radius = 1
 
-    graphics.animation = (delta) => {
+    const animation = (delta) => {
       if (graphics.alpha <= 0) {
         return
       }
@@ -16,18 +16,18 @@ class AnimationService {
       graphics.lineStyle(1, 0xFFFFFF, 0.3)
 
       graphics.alpha -= 0.02 * delta
-      graphics.radius = graphics.radius + delta
+      radius = radius + delta
 
-      graphics.drawCircle(location.x, location.y, graphics.radius)
+      graphics.drawCircle(location.x, location.y, radius)
     }
 
-    app.ticker.add(graphics.animation)
+    app.ticker.add(animation)
 
     setTimeout(() => {
       container.removeChild(graphics)
       // When leaving the game, the app can be destroyed
       if (app?.ticker) {
-        app.ticker.remove(graphics.animation)
+        app.ticker.remove(animation)
       }
     }, 3000)
 

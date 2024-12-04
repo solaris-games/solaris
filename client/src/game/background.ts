@@ -2,6 +2,18 @@ import * as PIXI from 'pixi.js-legacy'
 import TextureService from './texture'
 import * as rng from 'random-seed'
 import gameHelper from '../services/gameHelper'
+import type { Game } from '../types/game'
+import type { DrawingContext } from './container'
+import type { UserGameSettings } from '@solaris-common'
+
+interface BackgroundSprite extends PIXI.Sprite {
+  parallax: number;
+  originX: number;
+  originY: number;
+  baseRotation: number;
+  baseRotationTime: number;
+  baseScaleTime: number;
+}
 
 class Background {
 
@@ -16,6 +28,20 @@ class Background {
     nebulas: 100,
     stars: 100,
   }
+
+  container: PIXI.Container;
+  starContainer: PIXI.Container;
+  zoomPercent: number;
+  time: number;
+  game: Game | undefined;
+  context: DrawingContext | undefined;
+  userSettings: UserGameSettings | undefined;
+  rng: any;
+  galaxyCenterX: number = 0;
+  galaxyCenterY: number = 0;
+  moveNebulas = false;
+  timeScale = 0;
+  blendMode = PIXI.BLEND_MODES.NORMAL;
 
   constructor () {
     this.container = new PIXI.Container()
@@ -59,8 +85,8 @@ class Background {
 
   drawNebulas () {
 
-    let NEBULA_FREQUENCY = this.userSettings.map.background.nebulaFrequency
-    let NEBULA_DENSITY = this.userSettings.map.background.nebulaDensity
+    let NEBULA_FREQUENCY = this.userSettings!.map.background.nebulaFrequency
+    let NEBULA_DENSITY = this.userSettings!.map.background.nebulaDensity
 
     const FALLBACK_NEBULA_COLOR = 0xffffff
 
@@ -69,9 +95,9 @@ class Background {
     let NEBULA_COLOUR3
 
     try {
-      NEBULA_COLOUR1 = this._getNumberFromHexString(this.userSettings.map.background.nebulaColour1)
-      NEBULA_COLOUR2 = this._getNumberFromHexString(this.userSettings.map.background.nebulaColour2)
-      NEBULA_COLOUR3 = this._getNumberFromHexString(this.userSettings.map.background.nebulaColour3)
+      NEBULA_COLOUR1 = this._getNumberFromHexString(this.userSettings!.map.background.nebulaColour1)
+      NEBULA_COLOUR2 = this._getNumberFromHexString(this.userSettings!.map.background.nebulaColour2)
+      NEBULA_COLOUR3 = this._getNumberFromHexString(this.userSettings!.map.background.nebulaColour3)
     }
     catch(err) {
       NEBULA_COLOUR1 = FALLBACK_NEBULA_COLOR
@@ -108,7 +134,7 @@ class Background {
     }
 
     //add locations to the chunks for quick lookup
-    for(let star of this.game.galaxy.stars) {
+    for(let star of this.game!.galaxy.stars) {
       let cx = Math.floor(star.location.x/CHUNK_SIZE)-firstChunkX
       let cy = Math.floor(star.location.y/CHUNK_SIZE)-firstChunkY
       chunks[cx][cy].push(star.location)
@@ -136,7 +162,7 @@ class Background {
               if(NEBULA_DENSITY>2) { if(this.rng.random()<0.5) { continue; } }
               i = Math.round(this.rng.random()*(nebulaTextureCount-1))
               texture = textures[i]
-              sprite = new PIXI.Sprite(texture)
+              sprite = new PIXI.Sprite(texture) as BackgroundSprite;
               sprite.x = (x*CHUNK_SIZE) + (firstChunkX*CHUNK_SIZE) + (CHUNK_SIZE/2.0)
               sprite.x += NEBULA_MAX_OFFSET * Math.round( (this.rng.random()*2.0)-1.0 )
               sprite.y = (y*CHUNK_SIZE) + (firstChunkY*CHUNK_SIZE) + (CHUNK_SIZE/2.0)
@@ -206,7 +232,7 @@ class Background {
     this.time += deltaTime*1000
     let compressedTime = this.time*this.timeScale
     for (let i = 0; i < this.container.children.length; i++) {
-      let child = this.container.children[i]
+      let child = this.container.children[i] as BackgroundSprite;
       let deltax = viewportData.center.x-child.originX
       let deltay = viewportData.center.y-child.originY
 
@@ -220,7 +246,7 @@ class Background {
     }
 
     for (let i = 0; i < this.starContainer.children.length; i++) {
-      let child = this.starContainer.children[i]
+      let child = this.starContainer.children[i] as BackgroundSprite;
       let deltax = viewportData.center.x-child.originX
       let deltay = viewportData.center.y-child.originY
 

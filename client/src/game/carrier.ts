@@ -1,26 +1,53 @@
-import * as PIXI from 'pixi.js-legacy'
+import { Container, Sprite, Graphics, BitmapText, Circle, TextStyle, Text } from 'pixi.js-legacy'
 import TextureService from './texture'
 import Helpers from './helpers'
 import {EventEmitter} from "./eventEmitter.js";
+import type PathManager from "./PathManager";
+import type {UserGameSettings} from "solaris-common/src";
+import type {Carrier as CarrierData, Player as PlayerData} from "../types/game";
+import type Star from "./star";
+import type {DrawingContext} from "./container";
 
-class Carrier extends EventEmitter {
-
-  static culling_margin = 16
-
+export class Carrier extends EventEmitter {
   static zoomLevel = 140
 
-  constructor ( pathManager ) {
+  container: Container;
+  fixedContainer: Container;
+  graphics_colour: Sprite | null;
+  graphics_selected: Graphics;
+  graphics_ship: Sprite;
+  text_ships: BitmapText | null = null;
+  pathManager: PathManager;
+  sharedPathsIDs: Array<string>;
+  uniquePaths: Array<string>;
+  isMouseOver: boolean;
+  zoomPercent: number;
+  userSettings: UserGameSettings | undefined;
+  data: CarrierData | undefined;
+  stars: Star[] | undefined;
+  player: PlayerData | undefined;
+  context: DrawingContext | undefined;
+  colour: string | undefined;
+  lightYearDistance: number | undefined;
+  clampedScaling: boolean | undefined;
+  baseScale: number = 0;
+  minScale: number = 0;
+  maxScale: number = 0;
+  specialistSprite: Sprite | null = null;
+  isSelected: boolean = false;
+
+  constructor ( pathManager: PathManager ) {
     super()
 
-    this.fixedContainer = new PIXI.Container() // this container isnt affected by culling or user setting scalling
-    this.container = new PIXI.Container()
+    this.fixedContainer = new Container() // this container isnt affected by culling or user setting scalling
+    this.container = new Container()
     this.container.eventMode = 'static'
     this.container.interactiveChildren = false
     this.container.cursor = 'pointer'
 
-    this.graphics_colour = new PIXI.Sprite()
-    this.graphics_selected = new PIXI.Graphics()
-    this.graphics_ship = new PIXI.Graphics()
+    this.graphics_colour = new Sprite()
+    this.graphics_selected = new Graphics()
+    this.graphics_ship = new Sprite()
 
     this.container.addChild(this.graphics_colour)
     this.container.addChild(this.graphics_selected)
@@ -38,7 +65,7 @@ class Carrier extends EventEmitter {
     this.zoomPercent = 100
   }
 
-  setup (data, userSettings, context, stars, player, lightYearDistance) {
+  setup (data, userSettings, context: DrawingContext, stars, player, lightYearDistance) {
     this.data = data
     this.stars = stars
     this.player = player
@@ -49,14 +76,14 @@ class Carrier extends EventEmitter {
     this.container.position.x = data.location.x
     this.container.position.y = data.location.y
     // Add a larger hit radius so that the star is easily clickable
-    this.container.hitArea = new PIXI.Circle(0, 0, 10)
+    this.container.hitArea = new Circle(0, 0, 10)
 
     this.userSettings = userSettings
 
-    this.clampedScaling = this.userSettings.map.objectsScaling == 'clamped'
+    this.clampedScaling = this.userSettings!.map.objectsScaling == 'clamped'
     this.baseScale = 1
-    this.minScale = this.userSettings.map.objectsMinimumScale/4.0
-    this.maxScale = this.userSettings.map.objectsMaximumScale/4.0
+    this.minScale = this.userSettings!.map.objectsMinimumScale/4.0
+    this.maxScale = this.userSettings!.map.objectsMaximumScale/4.0
 
     Carrier.zoomLevel = userSettings.map.zoomLevels.carrierShips
 
@@ -84,17 +111,17 @@ class Carrier extends EventEmitter {
       this.graphics_colour = null
     }
 
-    if (Object.keys(TextureService.PLAYER_SYMBOLS).includes(this.player.shape)) {
-      this.graphics_colour = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS[this.player.shape][4])
+    if (Object.keys(TextureService.PLAYER_SYMBOLS).includes(this.player!.shape)) {
+      this.graphics_colour = new Sprite(TextureService.PLAYER_SYMBOLS[this.player!.shape][4])
 
     }
 
-    this.graphics_colour.anchor.set(0.5)
-    this.graphics_colour.width = 12
-    this.graphics_colour.height = 12
-    this.graphics_colour.tint = this.colour
+    this.graphics_colour!.anchor.set(0.5)
+    this.graphics_colour!.width = 12
+    this.graphics_colour!.height = 12
+    this.graphics_colour!.tint = this.colour || '#FFFFFF'
 
-    this.container.addChild(this.graphics_colour)
+    this.container.addChild(this.graphics_colour!)
   }
 
   drawColour () {
@@ -103,7 +130,7 @@ class Carrier extends EventEmitter {
       this.graphics_colour = null
     }
 
-    if (!this.data.orbiting) {
+    if (!this.data!.orbiting) {
       this.drawShape();
     }
   }
@@ -113,13 +140,13 @@ class Carrier extends EventEmitter {
       this.container.removeChild(this.graphics_ship)
     }
 
-    this.graphics_ship = new PIXI.Sprite(TextureService.CARRIER_TEXTURE)
+    this.graphics_ship = new Sprite(TextureService.CARRIER_TEXTURE)
     this.graphics_ship.anchor.set(0.5)
     this.graphics_ship.width = 10
     this.graphics_ship.height = 10
     this.container.addChild(this.graphics_ship)
 
-    Helpers.rotateCarrierTowardsWaypoint(this.data, this.stars.map(s => s.data), this.graphics_ship)
+    Helpers.rotateCarrierTowardsWaypoint(this.data!, this.stars!.map(s => s.data), this.graphics_ship)
   }
 
   drawShips () {
@@ -129,26 +156,26 @@ class Carrier extends EventEmitter {
     }
 
     if (!this.text_ships) {
-      let totalShips = this.data.ships == null ? '???' : this.data.ships
+      let totalShips = this.data!.ships == null ? '???' : this.data!.ships
 
       let shipsText = totalShips.toString()
 
       let bitmapFont = {fontName: "chakrapetch", fontSize: 4}
-      this.text_ships = new PIXI.BitmapText(shipsText, bitmapFont)
+      this.text_ships = new BitmapText(shipsText, bitmapFont)
 
       this.text_ships.x = -(this.text_ships.width / 2.0)
       this.text_ships.y = 5
 
       this.container.addChild(this.text_ships)
-      if( this.data.isGift ) {
-        let style = new PIXI.TextStyle({
+      if( this.data!.isGift ) {
+        let style = new TextStyle({
           fontFamily: `Chakra Petch,sans-serif;`,
           fill: 0xFFFFFF,
           padding: 3,
           fontSize: 4,
           fontWeight: 'bold'
         })
-        let giftText = new PIXI.Text('🎁', style)
+        let giftText = new Text('🎁', style)
         giftText.resolution = 12
         giftText.position.x = this.text_ships.width
         giftText.position.y = -1
@@ -163,12 +190,12 @@ class Carrier extends EventEmitter {
       this.specialistSprite = null
     }
 
-    if (!this.hasSpecialist() || this.data.orbiting) {
+    if (!this.hasSpecialist() || this.data!.orbiting) {
       return
     }
 
-    let specialistTexture = TextureService.getSpecialistTexture(this.data.specialist.key)
-    this.specialistSprite = new PIXI.Sprite(specialistTexture)
+    let specialistTexture = TextureService.getSpecialistTexture(this.data!.specialist!.key)
+    this.specialistSprite = new Sprite(specialistTexture)
     this.specialistSprite.width = 6
     this.specialistSprite.height = 6
     this.specialistSprite.x = -3
@@ -178,7 +205,7 @@ class Carrier extends EventEmitter {
   }
 
   hasSpecialist () {
-    return this.data.specialistId && this.data.specialistId > 0 && this.data.specialist
+    return this.data!.specialistId && this.data!.specialistId > 0 && this.data!.specialist
   }
 
   clearPaths() {
@@ -193,36 +220,36 @@ class Carrier extends EventEmitter {
   }
 
   _isSourceLastDestination() {
-    let numof_waypoints = this.data.waypoints.length
-    let lastWaypoint = this.data.waypoints[numof_waypoints-1]
+    let numof_waypoints = this.data!.waypoints.length
+    let lastWaypoint = this.data!.waypoints[numof_waypoints-1]
     if (numof_waypoints<2) return false;
-    return (this.data.waypoints[0].source === lastWaypoint.destination)
+    return (this.data!.waypoints[0].source === lastWaypoint.destination)
   }
 
   drawCarrierWaypoints () {
     this.clearPaths()
 
-    const PATH_WIDTH = 0.5*this.userSettings.map.carrierPathWidth
+    const PATH_WIDTH = 0.5 * this.userSettings!.map.carrierPathWidth
 
-    let lineWidth = this.data.waypointsLooped ? PATH_WIDTH : PATH_WIDTH
-    let lineAlpha = this.data.waypointsLooped ? 0.3 : 0.5
-    let lastPoint = this
+    let lineWidth = this.data!.waypointsLooped ? PATH_WIDTH : PATH_WIDTH
+    let lineAlpha = this.data!.waypointsLooped ? 0.3 : 0.5
+    let lastPoint: Carrier | Star = this
     let sourceIsLastDestination = false
     sourceIsLastDestination = this._isSourceLastDestination()
     // if looping and source is last destination, begin drawing path from the star instead of carrier
-    if ( this.data.waypointsLooped ) {
+    if ( this.data!.waypointsLooped ) {
       if (sourceIsLastDestination)  {
-        lastPoint = this.stars.find(s => s.data._id === this.data.waypoints[0].source)
+        lastPoint = this.stars!.find(s => s.data._id === this.data!.waypoints[0].source)!
       }
     }
     let star
-    for (let i = 0; i < this.data.waypoints.length; i++) {
-      let waypoint = this.data.waypoints[i]
+    for (let i = 0; i < this.data!.waypoints.length; i++) {
+      let waypoint = this.data!.waypoints[i]
       // Draw a line to each destination along the waypoints.
-      star = this.stars.find(s => s.data._id === waypoint.destination)
+      star = this.stars!.find(s => s.data._id === waypoint.destination)
       if (!star) { break; }
 
-      if ( this.data.waypointsLooped ) {
+      if ( this.data!.waypointsLooped ) {
         if (lastPoint === this) {
           this.uniquePaths.push( this.pathManager.addUniquePath( lastPoint, star, true, this.colour ) )
         }
@@ -237,9 +264,9 @@ class Carrier extends EventEmitter {
       lastPoint = star
     }
     //draw path back to the first destination
-    if ( this.data.waypointsLooped ) {
-      if (!sourceIsLastDestination && this.data.waypoints && this.data.waypoints.length) {
-        let firstPoint = this.stars.find(s => s.data._id === this.data.waypoints[0].destination)
+    if ( this.data!.waypointsLooped ) {
+      if (!sourceIsLastDestination && this.data!.waypoints && this.data!.waypoints.length) {
+        let firstPoint = this.stars!.find(s => s.data._id === this.data!.waypoints[0].destination)
         if( firstPoint && lastPoint && firstPoint !== lastPoint ) {
           this.sharedPathsIDs.push( this.pathManager.addSharedPath( star, firstPoint, this ) )
         }
@@ -258,13 +285,13 @@ class Carrier extends EventEmitter {
   }
 
   drawDepth () {
-    if (!this.data.orbiting) {
-      const waypoint = this.data.waypoints[0]
+    if (!this.data!.orbiting) {
+      const waypoint = this.data!.waypoints[0]
       const seeds = [waypoint.source, waypoint.destination]
       const depth = Helpers.calculateDepthModifiers(this.userSettings, seeds)
 
       this.container.alpha = depth
-      this.baseScale = depth * (this.userSettings.map.objectsDepth === 'disabled' ? 1 : 1.5)
+      this.baseScale = depth * (this.userSettings!.map.objectsDepth === 'disabled' ? 1 : 1.5)
     } else {
       this.container.alpha = 1
     }
@@ -272,18 +299,18 @@ class Carrier extends EventEmitter {
 
   enableInteractivity() {
     // Can only be interactive if its in transit
-    if (!this.data.orbiting) {
+    if (!this.data!.orbiting) {
       this.container.eventMode = 'static'
       this.container.cursor = 'pointer'
     } else {
       this.container.eventMode = 'passive'
-      this.container.cursor = null
+      this.container.cursor = 'default'
     }
   }
 
   disableInteractivity() {
     this.container.eventMode = 'passive'
-    this.container.cursor = null
+    this.container.cursor = 'default'
   }
 
   onZoomChanging(zoomPercent) {
@@ -331,12 +358,14 @@ class Carrier extends EventEmitter {
   }
 
   updateVisibility() {
-    if (this.graphics_ship) this.graphics_ship.visible = !this.data.orbiting && !this.hasSpecialist()
-    if (this.text_ships) this.text_ships.visible = !this.data.orbiting && (this.zoomPercent >= Carrier.zoomLevel || (this.isSelected && this.zoomPercent > Carrier.zoomLevel ) || (this.isMouseOver && this.zoomPercent > Carrier.zoomLevel))
+    if (this.graphics_ship) this.graphics_ship.visible = !this.data!.orbiting && !this.hasSpecialist()
+    if (this.text_ships) this.text_ships.visible = !this.data!.orbiting && (this.zoomPercent >= Carrier.zoomLevel || (this.isSelected && this.zoomPercent > Carrier.zoomLevel ) || (this.isMouseOver && this.zoomPercent > Carrier.zoomLevel))
   }
 
   deselectAllText () {
+    // @ts-ignore
     if (window.getSelection) {window.getSelection().removeAllRanges();}
+    // @ts-ignore
     else if (document.selection) {document.selection.empty();}
   }
 
