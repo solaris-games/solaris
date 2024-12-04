@@ -1,12 +1,37 @@
 import * as PIXI from 'pixi.js-legacy'
 import Voronoi from '../voronoi/Javascript-Voronoi/rhill-voronoi-core.js';
 import gameHelper from '../services/gameHelper'
-import type { Game } from '../types/game.js';
+import type {Game, Player} from '../types/game.js';
 import type { DrawingContext } from './container.js';
+import type {UserGameSettings} from "@solaris-common";
 
 type SamplePoint = {
-
+  distance: number;
+  owner: Player;
 }
+
+type Site = {
+  x: number;
+  y: number;
+  playerID: string | null;
+}
+
+enum VertexAction {
+  ACTION_COMBINE = 1,
+  ACTION_NEW = 2,
+  ACTION_SKIP = 0,
+}
+
+const ACTION_INDEX = 0;
+const   LINES_INDEX = 1;
+const   POLYGON_INDEX = 2;
+
+type Position = {
+  x: number;
+  y: number;
+}
+
+type VertexSpec = [VertexAction, Position[], Position[]];
 
 class Territories {
 
@@ -14,7 +39,7 @@ class Territories {
   static maxVoronoiDistance = 200
 
   container: PIXI.Container;
-  game: Game;
+  game: Game | undefined;
   zoomPercent: number;
   context: DrawingContext | undefined;
 
@@ -24,17 +49,17 @@ class Territories {
     this.zoomPercent = 0
   }
 
-  setup(game, userSettings, context) {
+  setup(game: Game, userSettings: UserGameSettings, context: DrawingContext) {
     this.game = game
     this.context = context
 
     Territories.zoomLevel = userSettings.map.zoomLevels.territories
   }
 
-  draw(userSettings) {
+  draw(userSettings: UserGameSettings) {
     this.container.removeChildren()
 
-    if (!this.game.galaxy.stars || !this.game.galaxy.stars.length) {
+    if (!this.game!.galaxy.stars || !this.game!.galaxy.stars.length) {
       return; //No territories if we have no stars
     }
 
@@ -50,7 +75,7 @@ class Territories {
     this.refreshZoom(this.zoomPercent || 0)
   }
 
-  _drawTerritoriesMarchingCube(userSettings) {
+  _drawTerritoriesMarchingCube(userSettings: UserGameSettings) {
     this.container.alpha = 1
 
     const CELL_SIZE = 5 * userSettings.map.marchingSquareGridSize
@@ -60,61 +85,55 @@ class Territories {
     const LINE_OFFSET = LINE_PROPORTION / 2
 
     // enum
-    const ACTION_COMBINE = 1
-    const ACTION_NEW = 2
-    const ACTION_SKIP = 0
 
-    const ACTION_INDEX = 0
-    const LINES_INDEX = 1
-    const POLYGON_INEDX = 2
-    const VERTEX_TABLE = [
-      [ACTION_SKIP, [], []],
-      [ACTION_NEW, [{ x: 0, y: 0.5 + LINE_OFFSET }, { x: 0.5 - LINE_OFFSET, y: 1 }],
+    const VERTEX_TABLE: VertexSpec[] = [
+      [VertexAction.ACTION_SKIP, [], []],
+      [VertexAction.ACTION_NEW, [{ x: 0, y: 0.5 + LINE_OFFSET }, { x: 0.5 - LINE_OFFSET, y: 1 }],
         [{ x: 0, y: 0.5 + LINE_OFFSET }, { x: 0.5 - LINE_OFFSET, y: 1 }, { x: 0, y: 1 }]
       ],
-      [ACTION_NEW, [{ x: 1, y: 0.5 + LINE_OFFSET }, { x: 0.5 + LINE_OFFSET, y: 1 }],
+      [VertexAction.ACTION_NEW, [{ x: 1, y: 0.5 + LINE_OFFSET }, { x: 0.5 + LINE_OFFSET, y: 1 }],
         [{ x: 1, y: 0.5 + LINE_OFFSET }, { x: 0.5 + LINE_OFFSET, y: 1 }, { x: 1, y: 1 }]
       ],
-      [ACTION_NEW, [{ x: 1, y: 0.5 + LINE_OFFSET }, { x: 0, y: 0.5 + LINE_OFFSET }],
+      [VertexAction.ACTION_NEW, [{ x: 1, y: 0.5 + LINE_OFFSET }, { x: 0, y: 0.5 + LINE_OFFSET }],
         [{ x: 1, y: 0.5 + LINE_OFFSET }, { x: 0, y: 0.5 + LINE_OFFSET }, { x: 0, y: 1 }, { x: 1, y: 1 }]
       ],
 
-      [ACTION_NEW, [{ x: 0.5 + LINE_OFFSET, y: 0 }, { x: 1, y: 0.5 - LINE_OFFSET }],
+      [VertexAction.ACTION_NEW, [{ x: 0.5 + LINE_OFFSET, y: 0 }, { x: 1, y: 0.5 - LINE_OFFSET }],
         [{ x: 0.5 + LINE_OFFSET, y: 0 }, { x: 1, y: 0.5 - LINE_OFFSET }, { x: 1, y: 0 }]
       ],
-      [ACTION_NEW, [{ x: 0.5 + LINE_OFFSET, y: 0 }, { x: 0, y: 0.5 + LINE_OFFSET }, { x: 1, y: 0.5 - LINE_OFFSET }, { x: 0.5 - LINE_OFFSET, y: 1 }],
+      [VertexAction.ACTION_NEW, [{ x: 0.5 + LINE_OFFSET, y: 0 }, { x: 0, y: 0.5 + LINE_OFFSET }, { x: 1, y: 0.5 - LINE_OFFSET }, { x: 0.5 - LINE_OFFSET, y: 1 }],
         [{ x: 0.5 + LINE_OFFSET, y: 0 }, { x: 0, y: 0.5 + LINE_OFFSET }, { x: 0, y: 1 }, { x: 0.5 - LINE_OFFSET, y: 1 }, { x: 1, y: 0.5 - LINE_OFFSET }, { x: 1, y: 0 }]
       ],
-      [ACTION_NEW, [{ x: 0.5 + LINE_OFFSET, y: 0 }, { x: 0.5 + LINE_OFFSET, y: 1 }],
+      [VertexAction.ACTION_NEW, [{ x: 0.5 + LINE_OFFSET, y: 0 }, { x: 0.5 + LINE_OFFSET, y: 1 }],
         [{ x: 0.5 + LINE_OFFSET, y: 0 }, { x: 0.5 + LINE_OFFSET, y: 1 }, { x: 1, y: 1 }, { x: 1, y: 0 }]
       ],
-      [ACTION_NEW, [{ x: 0.5 + LINE_OFFSET, y: 0 }, { x: 0, y: 0.5 + LINE_OFFSET }],
+      [VertexAction.ACTION_NEW, [{ x: 0.5 + LINE_OFFSET, y: 0 }, { x: 0, y: 0.5 + LINE_OFFSET }],
         [{ x: 0.5 + LINE_OFFSET, y: 0 }, { x: 0, y: 0.5 + LINE_OFFSET }, { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 1, y: 0 }]
       ],
 
-      [ACTION_NEW, [{ x: 0.5 - LINE_OFFSET, y: 0 }, { x: 0, y: 0.5 - LINE_OFFSET }],
+      [VertexAction.ACTION_NEW, [{ x: 0.5 - LINE_OFFSET, y: 0 }, { x: 0, y: 0.5 - LINE_OFFSET }],
         [{ x: 0.5 - LINE_OFFSET, y: 0 }, { x: 0, y: 0.5 - LINE_OFFSET }, { x: 0, y: 0 }]
       ],
-      [ACTION_NEW, [{ x: 0.5 - LINE_OFFSET, y: 0 }, { x: 0.5 - LINE_OFFSET, y: 1 }],
+      [VertexAction.ACTION_NEW, [{ x: 0.5 - LINE_OFFSET, y: 0 }, { x: 0.5 - LINE_OFFSET, y: 1 }],
         [{ x: 0.5 - LINE_OFFSET, y: 0 }, { x: 0.5 - LINE_OFFSET, y: 1 }, { x: 0, y: 1 }, { x: 0, y: 0 }]
       ],
-      [ACTION_NEW, [{ x: 0.5 - LINE_OFFSET, y: 0 }, { x: 1, y: 0.5 + LINE_OFFSET }, { x: 0, y: 0.5 - LINE_OFFSET }, { x: 0.5 + LINE_OFFSET, y: 1 }],
+      [VertexAction.ACTION_NEW, [{ x: 0.5 - LINE_OFFSET, y: 0 }, { x: 1, y: 0.5 + LINE_OFFSET }, { x: 0, y: 0.5 - LINE_OFFSET }, { x: 0.5 + LINE_OFFSET, y: 1 }],
         [{ x: 0.5 - LINE_OFFSET, y: 0 }, { x: 1, y: 0.5 + LINE_OFFSET }, { x: 1, y: 1 }, { x: 0.5 + LINE_OFFSET, y: 1 }, { x: 0, y: 0.5 - LINE_OFFSET }, { x: 0, y: 0 }]
       ],
-      [ACTION_NEW, [{ x: 0.5 - LINE_OFFSET, y: 0 }, { x: 1, y: 0.5 + LINE_OFFSET }],
+      [VertexAction.ACTION_NEW, [{ x: 0.5 - LINE_OFFSET, y: 0 }, { x: 1, y: 0.5 + LINE_OFFSET }],
         [{ x: 0.5 - LINE_OFFSET, y: 0 }, { x: 1, y: 0.5 + LINE_OFFSET }, { x: 1, y: 1 }, { x: 0, y: 1 }, { x: 0, y: 0 }]
       ],
 
-      [ACTION_NEW, [{ x: 0, y: 0.5 - LINE_OFFSET }, { x: 1, y: 0.5 - LINE_OFFSET }],
+      [VertexAction.ACTION_NEW, [{ x: 0, y: 0.5 - LINE_OFFSET }, { x: 1, y: 0.5 - LINE_OFFSET }],
         [{ x: 0, y: 0.5 - LINE_OFFSET }, { x: 1, y: 0.5 - LINE_OFFSET }, { x: 1, y: 0 }, { x: 0, y: 0 }]
       ],
-      [ACTION_NEW, [{ x: 1, y: 0.5 - LINE_OFFSET }, { x: 0.5 - LINE_OFFSET, y: 1 }],
+      [VertexAction.ACTION_NEW, [{ x: 1, y: 0.5 - LINE_OFFSET }, { x: 0.5 - LINE_OFFSET, y: 1 }],
         [{ x: 1, y: 0.5 - LINE_OFFSET }, { x: 0.5 - LINE_OFFSET, y: 1 }, { x: 0, y: 1 }, { x: 0, y: 0 }, { x: 1, y: 0 }]
       ],
-      [ACTION_NEW, [{ x: 0, y: 0.5 - LINE_OFFSET }, { x: 0.5 + LINE_OFFSET, y: 1 }],
+      [VertexAction.ACTION_NEW, [{ x: 0, y: 0.5 - LINE_OFFSET }, { x: 0.5 + LINE_OFFSET, y: 1 }],
         [{ x: 0, y: 0.5 - LINE_OFFSET }, { x: 0.5 + LINE_OFFSET, y: 1 }, { x: 1, y: 1 }, { x: 1, y: 0 }, { x: 0, y: 0 }]
       ],
-      [ACTION_COMBINE, [],
+      [VertexAction.ACTION_COMBINE, [],
         [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 1, y: 1 }, { x: 0, y: 1 }]
       ],
     ]
@@ -149,7 +168,7 @@ class Territories {
     }
 
     let startIX, endIX, startIY, endIY, gridLocation, distance, owner;
-    let stars = this.game.galaxy.stars
+    let stars = this.game!.galaxy.stars
     for (let star of stars) {
       // This loop goes through all stars, and generates the gridPoints that are within the METABALL_RADIUS
       // Those points get the value of this star, or keep their previous value (from another star) if that one was closer
@@ -165,22 +184,26 @@ class Territories {
             // Do nothing, because the grid already has a value from a star that is closer
           } else {
             // Now either the grid doesn't have a value here yet or the star calculated here is closer than the one currently logged in
-            owner = this.game.galaxy.players.find(p => p._id === star.ownedByPlayerId)
+            owner = this.game!.galaxy.players.find(p => p._id === star.ownedByPlayerId)
             samplePoints[ix][iy] = { distance, owner }; // Make this gridPoint the value of the distance from the star so we can compare it with other stars AND make it have the value for the owner (the player)
           }
         }
       }
     }
-    // Loops through all samplePoints, to make the value of the point the owner, instead of {distance, owner} because that is what the next function takes as input.
+
+    const playerSamplePoints: Player[][] = [];
+
     for (let ix = 0; ix < samplePoints.length - 1; ix++) {
+      playerSamplePoints[ix] = [];
+
       for (let iy = 0; iy < samplePoints[ix].length - 1; iy++) {
         if (samplePoints[ix][iy]) {
-          samplePoints[ix][iy] = samplePoints[ix][iy].owner;
+          playerSamplePoints[ix][iy] = samplePoints[ix][iy].owner;
         }
       }
     }
 
-    for (let player of this.game.galaxy.players) {
+    for (let player of this.game!.galaxy.players) {
       let color = this.context!.getPlayerColour(player._id)
       let territoryPolygons = new PIXI.Graphics()
       let territoryLines = new PIXI.Graphics()
@@ -196,11 +219,11 @@ class Territories {
       for (let ix = 0; ix < samplePoints.length - 1; ix++) {
         for (let iy = 0; iy < samplePoints[ix].length - 1; iy++) {
           let lookUpIndex = 0
-          lookUpIndex += (player == samplePoints[ix][iy]) * 8
-          lookUpIndex += (player == samplePoints[ix + 1][iy]) * 4
-          lookUpIndex += (player == samplePoints[ix][iy + 1]) * 1
-          lookUpIndex += (player == samplePoints[ix + 1][iy + 1]) * 2
-          if (VERTEX_TABLE[lookUpIndex][ACTION_INDEX] != ACTION_SKIP) {
+          lookUpIndex += (player == playerSamplePoints[ix][iy] ? 1 : 0) * 8
+          lookUpIndex += (player == playerSamplePoints[ix + 1][iy] ? 1 : 0) * 4
+          lookUpIndex += (player == playerSamplePoints[ix][iy + 1] ? 1 : 0) * 1
+          lookUpIndex += (player == playerSamplePoints[ix + 1][iy + 1] ? 1 : 0) * 2
+          if (VERTEX_TABLE[lookUpIndex][ACTION_INDEX] != VertexAction.ACTION_SKIP) {
             let cellOrigin = { x: ix * CELL_SIZE + minX, y: iy * CELL_SIZE + minY }
             if (VERTEX_TABLE[lookUpIndex][LINES_INDEX].length > 1) {
               //if there are vertices, draw the lines
@@ -212,18 +235,18 @@ class Territories {
               }
             }
 
-            if (VERTEX_TABLE[lookUpIndex][ACTION_INDEX] == ACTION_NEW) {
+            if (VERTEX_TABLE[lookUpIndex][ACTION_INDEX] == VertexAction.ACTION_NEW) {
               if (combining) {
                 //finish combining
-                territoryPolygons.lineTo(VERTEX_TABLE[15][POLYGON_INEDX][1].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[15][POLYGON_INEDX][1].y * CELL_SIZE + cellOrigin.y)
-                territoryPolygons.lineTo(VERTEX_TABLE[15][POLYGON_INEDX][0].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[15][POLYGON_INEDX][0].y * CELL_SIZE + cellOrigin.y)
+                territoryPolygons.lineTo(VERTEX_TABLE[15][POLYGON_INDEX][1].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[15][POLYGON_INDEX][1].y * CELL_SIZE + cellOrigin.y)
+                territoryPolygons.lineTo(VERTEX_TABLE[15][POLYGON_INDEX][0].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[15][POLYGON_INDEX][0].y * CELL_SIZE + cellOrigin.y)
                 territoryPolygons.endFill()
                 combining = false
               }
-              territoryPolygons.moveTo(VERTEX_TABLE[lookUpIndex][POLYGON_INEDX][0].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[lookUpIndex][POLYGON_INEDX][0].y * CELL_SIZE + cellOrigin.y)
+              territoryPolygons.moveTo(VERTEX_TABLE[lookUpIndex][POLYGON_INDEX][0].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[lookUpIndex][POLYGON_INDEX][0].y * CELL_SIZE + cellOrigin.y)
               territoryPolygons.beginFill(color, 1)
               let first = true
-              let vertices = VERTEX_TABLE[lookUpIndex][POLYGON_INEDX]
+              let vertices = VERTEX_TABLE[lookUpIndex][POLYGON_INDEX]
               for (let vertex of vertices) {
                 if (first) { first = false; continue }
                 territoryPolygons.lineTo(vertex.x * CELL_SIZE + cellOrigin.x, vertex.y * CELL_SIZE + cellOrigin.y)
@@ -232,12 +255,12 @@ class Territories {
 
             }
 
-            if (VERTEX_TABLE[lookUpIndex][ACTION_INDEX] == ACTION_COMBINE) {
+            if (VERTEX_TABLE[lookUpIndex][ACTION_INDEX] == VertexAction.ACTION_COMBINE) {
               if (!combining) {
                 //start combining
-                territoryPolygons.moveTo(VERTEX_TABLE[15][POLYGON_INEDX][0].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[15][POLYGON_INEDX][0].y * CELL_SIZE + cellOrigin.y)
+                territoryPolygons.moveTo(VERTEX_TABLE[15][POLYGON_INDEX][0].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[15][POLYGON_INDEX][0].y * CELL_SIZE + cellOrigin.y)
                 territoryPolygons.beginFill(color, 1)
-                territoryPolygons.lineTo(VERTEX_TABLE[15][POLYGON_INEDX][1].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[15][POLYGON_INEDX][1].y * CELL_SIZE + cellOrigin.y)
+                territoryPolygons.lineTo(VERTEX_TABLE[15][POLYGON_INDEX][1].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[15][POLYGON_INDEX][1].y * CELL_SIZE + cellOrigin.y)
                 combining = true
               }
             }
@@ -247,7 +270,7 @@ class Territories {
     }
   }
 
-  _drawTerritoriesVoronoi(userSettings) {
+  _drawTerritoriesVoronoi(userSettings: UserGameSettings) {
     this.container.alpha = 1
 
     let voronoi = new Voronoi.Voronoi()
@@ -264,8 +287,8 @@ class Territories {
       yb: maxY + Territories.maxVoronoiDistance
     }
 
-    let sites = []
-    for (let star of this.game.galaxy.stars) {
+    let sites: Site[] = []
+    for (let star of this.game!.galaxy.stars) {
       sites.push({
         x: star.location.x,
         y: star.location.y,
@@ -275,7 +298,14 @@ class Territories {
 
     let diagram = voronoi.compute(sites, boundingBox)
 
-    let borders = []
+    let borders: {
+      lSite: Site,
+      rSite: Site,
+      va: any,
+      vb: any
+    }[] = [
+    ];
+
     for (let edge of diagram.edges) {
       if (edge.lSite && edge.rSite) {
         if (edge.lSite.playerID !== edge.rSite.playerID) {
@@ -313,15 +343,15 @@ class Territories {
 
     // Draw the cells
     for (let cell of diagram.cells) {
-      let star = this.game.galaxy.stars.find(s => s.location.x === cell.site.x && s.location.y === cell.site.y);
+      let star = this.game!.galaxy.stars.find(s => s.location.x === cell.site.x && s.location.y === cell.site.y)!;
 
       let colour = 0x000000
 
       if (star.ownedByPlayerId) {
-        colour = this.context.getPlayerColour(star.ownedByPlayerId)
+        colour = this.context!.getPlayerColour(star.ownedByPlayerId)
       }
 
-      let points = []
+      let points: Position[] = []
 
       for (let halfedge of cell.halfedges) {
         points.push(halfedge.getStartpoint())
@@ -372,7 +402,7 @@ class Territories {
       let colour = 0x000000
 
       if (border.lSite.playerID) {
-        colour = this.context.getPlayerColour(border.lSite.playerID);
+        colour = this.context!.getPlayerColour(border.lSite.playerID);
       }
 
       borderGraphics.lineStyle(borderWidth, colour)
