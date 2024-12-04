@@ -62,6 +62,7 @@ export type UserGameSettings = {
             }
         },
         naturalResourcesRingOpacity: number;
+        objectsDepth: SettingEnabledDisabled;
     },
     carrier: {
         defaultAction: CarrierWaypointActionType;

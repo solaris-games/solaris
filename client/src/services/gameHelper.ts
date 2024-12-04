@@ -1,5 +1,6 @@
-import moment from 'moment'
+import moment, {type Moment} from 'moment'
 import DiplomacyHelper from './diplomacyHelper.js'
+import type {Game, Player} from "../types/game";
 
 class GameHelper {
   getUserPlayer (game) {
@@ -220,26 +221,23 @@ class GameHelper {
     return this.getTicksBetweenLocations(game, carrier, [sourceStar, destinationStar])
   }
 
-  getTicksToProduction (game, currentTick, currentProductionTick) {
+  getTicksToProduction (game: Game, currentTick, currentProductionTick) {
     let productionTicks = game.settings.galaxy.productionTicks
 
-    let ticksToProduction = ((currentProductionTick + 1) * productionTicks) - currentTick
-
-    return ticksToProduction
+    return ((currentProductionTick + 1) * productionTicks) - currentTick
   }
 
-  getCountdownTime (game, date) {
+  getCountdownTime (game: Game, date) {
     if (date == null) {
       return 'Unknown'
     }
 
     let relativeTo = moment().utc()
-    let t = moment(date).utc() - relativeTo // Deduct the future date from now.
-
-    return t
+     // Deduct the future date from now.
+    return moment(date).utc().clone().diff(relativeTo)
   }
 
-  getCountdownTimeString (game, date, largestUnitOnly = false) {
+  getCountdownTimeString (game: Game, date, largestUnitOnly = false) {
     if (date == null) {
       return 'Unknown'
     }
@@ -253,7 +251,7 @@ class GameHelper {
     return this.getDateToString(t, largestUnitOnly)
   }
 
-  getCountdownTimeStringByTicksWithTickETA (game, ticks, useNowDate = false, largestUnitOnly = false) {
+  getCountdownTimeStringByTicksWithTickETA (game: Game, ticks: number, useNowDate = false, largestUnitOnly = false) {
     const str = this.getCountdownTimeStringByTicks(game, ticks, useNowDate, largestUnitOnly);
 
     if (game.settings.gameTime.gameType === 'realTime') {
@@ -402,7 +400,7 @@ class GameHelper {
     return totalTicks
   }
 
-  calculateTimeByTicks (ticks, speedInSeconds, relativeTo = null) {
+  calculateTimeByTicks (ticks, speedInSeconds, relativeTo: Moment | null = null) {
     if (relativeTo == null) {
       relativeTo = moment().utc()
     } else {
@@ -660,8 +658,8 @@ class GameHelper {
     return false;
   }
 
-  playerHasLowestTechLevel (game, techKey, player) {
-    const levels = [...new Set(game.galaxy.players
+  playerHasLowestTechLevel (game: Game, techKey, player) {
+    const levels: number[] = [...new Set(game.galaxy.players
       .filter(p => p.research != null)
       .map(p => {
         return p.research[techKey].level
@@ -677,8 +675,8 @@ class GameHelper {
     return minLevel === player.research[techKey].level
   }
 
-  playerHasHighestTechLevel (game, techKey, player) {
-    const levels = [...new Set(game.galaxy.players
+  playerHasHighestTechLevel (game: Game, techKey, player) {
+    const levels: number[] = [...new Set(game.galaxy.players
       .filter(p => p.research != null)
       .map(p => {
         return p.research[techKey].level
@@ -694,13 +692,13 @@ class GameHelper {
     return maxLevel === player.research[techKey].level
   }
 
-  userPlayerHasHighestTechLevel (game, techKey) {
+  userPlayerHasHighestTechLevel (game: Game, techKey) {
     const userPlayer = this.getUserPlayer(game)
 
     return this.playerHasHighestTechLevel(game, techKey, userPlayer)
   }
 
-  userPlayerHasLowestTechLevel (game, techKey) {
+  userPlayerHasLowestTechLevel (game: Game, techKey) {
     const userPlayer = this.getUserPlayer(game)
 
     return this.playerHasLowestTechLevel(game, techKey, userPlayer)
@@ -1100,10 +1098,10 @@ class GameHelper {
     return !this.getUserPlayer(game) // If the user isn't in the game then they are spectating
   }
 
-  _getBankingCredits (game, player) {
+  _getBankingCredits (game: Game, player: Player) {
     const bankingEnabled = game.settings.technology.startingTechnologyLevel['banking'] > 0
 
-    if (!bankingEnabled || !player.stats.totalStars || !player.research || !player.research.banking) {
+    if (!bankingEnabled || !player.stats!.totalStars || !player.research || !player.research.banking) {
       return 0
     }
 
@@ -1112,7 +1110,7 @@ class GameHelper {
 
     switch (game.settings.technology.bankingReward) {
       case 'standard':
-          return Math.round((bankingLevel * multiplier) + (0.15 * bankingLevel * player.stats.totalEconomy))
+          return Math.round((bankingLevel * multiplier) + (0.15 * bankingLevel * player.stats!.totalEconomy))
       case 'legacy':
           return bankingLevel * multiplier
     }

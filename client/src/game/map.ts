@@ -1,7 +1,6 @@
 import * as PIXI from 'pixi.js-legacy'
 import Background from './background'
 import Star from './star'
-import Carrier from './carrier'
 import Waypoints from './waypoints'
 import RulerPoints from './rulerPoints'
 import Territories from './territories'
@@ -18,6 +17,7 @@ import type {State} from "../store";
 import type {DrawingContext, GameContainer} from "./container";
 import type {Game} from "../types/game";
 import type {Location, UserGameSettings} from "solaris-common/src";
+import Carrier from './carrier'
 
 const CHUNK_SIZE = 256
 
@@ -624,11 +624,11 @@ export class Map extends EventEmitter {
   }
 
   clearRulerPoints () {
-    this.rulerPoints!.setup(this.game)
+    this.rulerPoints!.setup(this.game!)
   }
 
-  drawTerritories (userSettings) {
-    this.territories!.setup(this.game, userSettings, this.context)
+  drawTerritories (userSettings: UserGameSettings) {
+    this.territories!.setup(this.game!, userSettings, this.context)
     this.territories!.draw(userSettings)
   }
 
@@ -651,7 +651,7 @@ export class Map extends EventEmitter {
       return
     }
 
-    this.gameContainer.viewport.moveCenter(empireCenter.x, empireCenter.y)
+    this.gameContainer.viewport!.moveCenter(empireCenter.x, empireCenter.y)
 
     let zoomPercent = this.gameContainer.getViewportZoomPercentage()
 
@@ -678,7 +678,7 @@ export class Map extends EventEmitter {
   }
 
   panToLocation (location) {
-    this.gameContainer.viewport.moveCenter(location.x, location.y)
+    this.gameContainer.viewport!.moveCenter(location.x, location.y)
   }
 
   clickStar (starId) {
@@ -734,18 +734,18 @@ export class Map extends EventEmitter {
   }
 
   onTick(deltaTime) {
-    let viewportWidth = this.gameContainer.viewport.right - this.gameContainer.viewport.left
-    let viewportHeight = this.gameContainer.viewport.bottom - this.gameContainer.viewport.top
+    let viewportWidth = this.gameContainer.viewport!.right - this.gameContainer.viewport!.left
+    let viewportHeight = this.gameContainer.viewport!.bottom - this.gameContainer.viewport!.top
 
     let viewportXRadius = viewportWidth / 2.0
     let viewportYRadius = viewportHeight / 2.0
 
-    let viewportCenter = this.gameContainer.viewport.center
+    let viewportCenter = this.gameContainer.viewport!.center
 
     this.lastViewportCenter = this.currentViewportCenter || undefined;
-    this.currentViewportCenter = this.gameContainer.viewport.center
+    this.currentViewportCenter = this.gameContainer.viewport!.center
 
-    this.zoomPercent = (this.gameContainer.viewport.screenWidth/viewportWidth) * 100
+    this.zoomPercent = (this.gameContainer.viewport!.screenWidth/viewportWidth) * 100
 
     let viewportData = {
       center: viewportCenter,
@@ -755,11 +755,11 @@ export class Map extends EventEmitter {
 
     //chunk culling
 
-    let firstX = Math.floor(this.gameContainer.viewport.left/CHUNK_SIZE)
-    let firstY = Math.floor(this.gameContainer.viewport.top/CHUNK_SIZE)
+    let firstX = Math.floor(this.gameContainer.viewport!.left/CHUNK_SIZE)
+    let firstY = Math.floor(this.gameContainer.viewport!.top/CHUNK_SIZE)
 
-    let lastX = Math.floor(this.gameContainer.viewport.right/CHUNK_SIZE)
-    let lastY = Math.floor(this.gameContainer.viewport.bottom/CHUNK_SIZE)
+    let lastX = Math.floor(this.gameContainer.viewport!.right/CHUNK_SIZE)
+    let lastY = Math.floor(this.gameContainer.viewport!.bottom/CHUNK_SIZE)
 
     let positionChanging = this.lastViewportCenter == null || this.currentViewportCenter.x !== this.lastViewportCenter.x || this.currentViewportCenter.y !== this.lastViewportCenter.y
     let zoomChanging = Math.abs(this.zoomPercent-this.lastZoomPercent) > (1.0/128.0)

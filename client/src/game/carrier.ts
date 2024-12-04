@@ -8,7 +8,7 @@ import type {Carrier as CarrierData, Player as PlayerData} from "../types/game";
 import type Star from "./star";
 import type {DrawingContext} from "./container";
 
-class Carrier extends EventEmitter {
+export class Carrier extends EventEmitter {
   static zoomLevel = 140
 
   container: Container;
@@ -47,7 +47,7 @@ class Carrier extends EventEmitter {
 
     this.graphics_colour = new Sprite()
     this.graphics_selected = new Graphics()
-    this.graphics_ship = new Graphics()
+    this.graphics_ship = new Sprite()
 
     this.container.addChild(this.graphics_colour)
     this.container.addChild(this.graphics_selected)
@@ -156,7 +156,7 @@ class Carrier extends EventEmitter {
     }
 
     if (!this.text_ships) {
-      let totalShips = this.data!.ships == null ? '???' : this.data.ships
+      let totalShips = this.data!.ships == null ? '???' : this.data!.ships
 
       let shipsText = totalShips.toString()
 
@@ -190,11 +190,11 @@ class Carrier extends EventEmitter {
       this.specialistSprite = null
     }
 
-    if (!this.hasSpecialist() || this.data.orbiting) {
+    if (!this.hasSpecialist() || this.data!.orbiting) {
       return
     }
 
-    let specialistTexture = TextureService.getSpecialistTexture(this.data.specialist.key)
+    let specialistTexture = TextureService.getSpecialistTexture(this.data!.specialist!.key)
     this.specialistSprite = new Sprite(specialistTexture)
     this.specialistSprite.width = 6
     this.specialistSprite.height = 6
@@ -205,7 +205,7 @@ class Carrier extends EventEmitter {
   }
 
   hasSpecialist () {
-    return this.data.specialistId && this.data.specialistId > 0 && this.data.specialist
+    return this.data!.specialistId && this.data!.specialistId > 0 && this.data!.specialist
   }
 
   clearPaths() {
@@ -220,10 +220,10 @@ class Carrier extends EventEmitter {
   }
 
   _isSourceLastDestination() {
-    let numof_waypoints = this.data.waypoints.length
-    let lastWaypoint = this.data.waypoints[numof_waypoints-1]
+    let numof_waypoints = this.data!.waypoints.length
+    let lastWaypoint = this.data!.waypoints[numof_waypoints-1]
     if (numof_waypoints<2) return false;
-    return (this.data.waypoints[0].source === lastWaypoint.destination)
+    return (this.data!.waypoints[0].source === lastWaypoint.destination)
   }
 
   drawCarrierWaypoints () {
@@ -233,13 +233,13 @@ class Carrier extends EventEmitter {
 
     let lineWidth = this.data!.waypointsLooped ? PATH_WIDTH : PATH_WIDTH
     let lineAlpha = this.data!.waypointsLooped ? 0.3 : 0.5
-    let lastPoint = this
+    let lastPoint: Carrier | Star = this
     let sourceIsLastDestination = false
     sourceIsLastDestination = this._isSourceLastDestination()
     // if looping and source is last destination, begin drawing path from the star instead of carrier
     if ( this.data!.waypointsLooped ) {
       if (sourceIsLastDestination)  {
-        lastPoint = this.stars!.find(s => s.data._id === this.data!.waypoints[0].source)
+        lastPoint = this.stars!.find(s => s.data._id === this.data!.waypoints[0].source)!
       }
     }
     let star
@@ -363,7 +363,9 @@ class Carrier extends EventEmitter {
   }
 
   deselectAllText () {
+    // @ts-ignore
     if (window.getSelection) {window.getSelection().removeAllRanges();}
+    // @ts-ignore
     else if (document.selection) {document.selection.empty();}
   }
 

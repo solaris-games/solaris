@@ -7,6 +7,7 @@ import type {Store} from "vuex";
 import type {State} from "../store";
 import type {Application} from "pixi.js-legacy";
 import type {UserGameSettings} from "solaris-common/src";
+import type {Game} from "../types/game";
 
 export class DrawingContext {
   store: Store<State>;
@@ -26,22 +27,22 @@ export class GameContainer {
   lowest: number;
   previousDTs: number[];
   ma32accum: number;
-  app: Application | null;
-  fpsNowText: PIXI.BitmapText;
-  fpsMAText: PIXI.BitmapText;
-  fpsMA32Text: PIXI.BitmapText;
-  jitterText: PIXI.BitmapText;
-  lowestText: PIXI.BitmapText;
-  zoomText: PIXI.BitmapText;
-  map: Map;
-  store: Store<State>;
-  context: DrawingContext;
-  viewport: Viewport;
-  starFieldLeft: number;
-  starFieldRight: number;
-  starFieldTop: number;
-  starFieldBottom: number;
-  userSettings: UserGameSettings;
+  app: Application | null = null;
+  fpsNowText: PIXI.BitmapText | undefined;
+  fpsMAText: PIXI.BitmapText | undefined;
+  fpsMA32Text: PIXI.BitmapText | undefined;
+  jitterText: PIXI.BitmapText | undefined;
+  lowestText: PIXI.BitmapText | undefined;
+  zoomText: PIXI.BitmapText | undefined;
+  map: Map | undefined;
+  store: Store<State> | undefined;
+  context: DrawingContext | undefined;
+  viewport: Viewport | undefined;
+  starFieldLeft: number = 0;
+  starFieldRight: number = 0;
+  starFieldTop: number = 0;
+  starFieldBottom: number = 0;
+  userSettings: UserGameSettings | undefined;
   game: any;
 
   constructor () {
@@ -56,7 +57,7 @@ export class GameContainer {
   }
 
   calcFPS(deltaTime) {
-    let elapsed = this.app.ticker.elapsedMS
+    let elapsed = this.app!.ticker.elapsedMS
     this.frames+=1
     this.previousDTs.pop()
     this.previousDTs.unshift(elapsed)
@@ -94,7 +95,7 @@ export class GameContainer {
       }
 
       if (this.zoomText) {
-        this.zoomText.text = ( 'zoom%: '+ this.map.zoomPercent.toFixed(0) )
+        this.zoomText.text = ( 'zoom%: '+ this.map!.zoomPercent.toFixed(0) )
       }
 
       this.frames = 0
@@ -119,7 +120,6 @@ export class GameContainer {
       backgroundColor: 0x000000, // black hexadecimal
       resolution: window.devicePixelRatio || 1,
       antialias: antialiasing,
-      autoResize: true,
       autoDensity: true,
     })
 
@@ -139,7 +139,6 @@ export class GameContainer {
       worldWidth: Number.MAX_VALUE,
       worldHeight: Number.MAX_VALUE,
 
-      divWheel: this.app.renderer.view, // Ensures that when using the scroll wheel it only takes affect when the mouse is over the canvas (prevents scrolling in overlaying divs from scrolling the canvas)
       stopPropagation: true,
       passiveWheel: true,
 
@@ -158,7 +157,7 @@ export class GameContainer {
   destroy () {
     if (this.viewport) {
       this.viewport.destroy()
-      this.viewport = null
+      this.viewport = undefined
     }
 
     // Cleanup if the app already exists.
@@ -172,11 +171,11 @@ export class GameContainer {
   }
 
   zoomIn () {
-    this.viewport.zoomPercent(0.5, true)
+    this.viewport!.zoomPercent(0.5, true)
   }
 
   zoomOut () {
-    this.viewport.zoomPercent(-0.3, true)
+    this.viewport!.zoomPercent(-0.3, true)
   }
 
   setupViewport (game) {
@@ -190,10 +189,10 @@ export class GameContainer {
     const maxWidth = Math.abs(this.starFieldLeft) + Math.abs(this.starFieldRight);
     const maxHeight = Math.abs(this.starFieldBottom) + Math.abs(this.starFieldTop);
 
-    this.viewport.resize(window.innerWidth, window.innerHeight, maxWidth, maxHeight)
+    this.viewport!.resize(window.innerWidth, window.innerHeight, maxWidth, maxHeight)
 
     // activate plugins
-    this.viewport
+    this.viewport!
       .drag()
       .pinch()
       .wheel({
@@ -208,19 +207,19 @@ export class GameContainer {
         maxHeight,
       })
 
-    this.viewport.on('zoomed-end', this.onViewportZoomed.bind(this))
-    this.viewport.on('pointerdown', this.map.onViewportPointerDown.bind(this.map))
+    this.viewport!.on('zoomed-end', this.onViewportZoomed.bind(this))
+    this.viewport!.on('pointerdown', this.map!.onViewportPointerDown.bind(this.map))
   }
 
-  setup (game, userSettings, context) {
+  setup (game: Game, userSettings: UserGameSettings, context: DrawingContext) {
     this.userSettings = userSettings
     textureService.initialize()
 
-    this.map.setup(this.game, userSettings, context)
+    this.map!.setup(this.game, userSettings)
   }
 
   draw () {
-    this.map.draw()
+    this.map!.draw()
 
     if ( import.meta.env.DEV || this.userSettings?.technical?.performanceMonitor === 'enabled') {
       let bitmapFont = {fontName: "chakrapetch", fontSize: 16}
@@ -245,68 +244,68 @@ export class GameContainer {
       this.lowestText.y = this.jitterText.y +top+2
       this.zoomText.x = left
       this.zoomText.y = this.lowestText.y +top+2
-      this.app.stage.addChild(this.fpsNowText)
-      this.app.stage.addChild(this.jitterText)
-      this.app.stage.addChild(this.lowestText)
-      this.app.stage.addChild(this.fpsMAText)
-      this.app.stage.addChild(this.fpsMA32Text)
-      this.app.stage.addChild(this.zoomText)
+      this.app!.stage.addChild(this.fpsNowText)
+      this.app!.stage.addChild(this.jitterText)
+      this.app!.stage.addChild(this.lowestText)
+      this.app!.stage.addChild(this.fpsMAText)
+      this.app!.stage.addChild(this.fpsMA32Text)
+      this.app!.stage.addChild(this.zoomText)
     }
   }
 
   drawWaypoints () {
-    this.map.drawWaypoints()
+    this.map!.drawWaypoints()
   }
 
   reloadGame (game, userSettings) {
     this.game = game
     this.userSettings = userSettings
-    this.map.reloadGame(game, userSettings)
+    this.map!.reloadGame(game, userSettings)
   }
 
   reloadTerritories () {
-    this.map.drawTerritories(this.userSettings)
+    this.map!.drawTerritories(this.userSettings!)
   }
 
   reloadStar (star) {
-    let starObject = this.map.setupStar(this.game, this.userSettings, star)
-    this.map.drawStar(starObject)
-    this.map.addContainerToChunk(starObject, this.map.chunks, this.map.firstChunkX, this.map.firstChunkY)
+    let starObject = this.map!.setupStar(this.game, this.userSettings, star)
+    this.map!.drawStar(starObject)
+    this.map!.addContainerToChunk(starObject, this.map!.chunks, this.map!.firstChunkX, this.map!.firstChunkY)
   }
 
   reloadCarrier (carrier) {
-    let carrierObject = this.map.setupCarrier(this.game, this.userSettings, carrier)
-    this.map.drawCarrier(carrierObject)
-    this.map.addContainerToChunk(carrierObject, this.map.chunks, this.map.firstChunkX, this.map.firstChunkY)
+    let carrierObject = this.map!.setupCarrier(this.game, this.userSettings, carrier)
+    this.map!.drawCarrier(carrierObject)
+    this.map!.addContainerToChunk(carrierObject, this.map!.chunks, this.map!.firstChunkX, this.map!.firstChunkY)
   }
 
   undrawCarrier (carrier) {
-    this.map.undrawCarrier(carrier)
+    this.map!.undrawCarrier(carrier)
   }
 
   getViewportZoomPercentage () {
-    let viewportWidth = this.viewport.right - this.viewport.left
-    let viewportPercent = (this.viewport.screenWidth / viewportWidth) * 100
+    let viewportWidth = this.viewport!.right - this.viewport!.left
+    let viewportPercent = (this.viewport!.screenWidth / viewportWidth) * 100
 
     return viewportPercent
   }
 
   onTick (deltaTime) {
-    this.map.onTick(deltaTime)
+    this.map!.onTick(deltaTime)
   }
 
   onViewportZoomed (e) {
     let zoomPercent = this.getViewportZoomPercentage()
 
-    this.map.refreshZoom(zoomPercent)
+    this.map!.refreshZoom(zoomPercent)
   }
 
   setMode (mode, args) {
-    this.map.setMode(mode, args)
+    this.map!.setMode(mode, args)
   }
 
   resetMode () {
-    this.map.resetMode()
+    this.map!.resetMode()
   }
 
   resize () {
@@ -319,7 +318,7 @@ export class GameContainer {
       window.innerHeight
     )
 
-    this.viewport.resize(
+    this.viewport!.resize(
       window.innerWidth,
       window.innerHeight,
       Number.MAX_VALUE,
