@@ -494,7 +494,7 @@ export default class StarService extends EventEmitter {
         return true;
     }
 
-    async claimUnownedStar(game: Game, gameUsers: User[], star: Star, carrier: Carrier) {
+    claimUnownedStar(game: Game, gameUsers: User[], star: Star, carrier: Carrier) {
         if (star.ownedByPlayerId) {
             throw new ValidationError(`Cannot claim an owned star`);
         }
