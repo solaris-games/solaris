@@ -164,11 +164,10 @@ export default class WaypointService {
             // Validate waypoint hyperspace range if:
             // The waypoint is not the first waypoint in the array.
             // The carrier isn't in transit to the first waypoint.
-            if (
-                (i > 0 || (i === 0 && !this.carrierMovementService.isInTransit(carrier))) &&                    // Is one of the next waypoints OR is the first waypoint and isn't in transit
-                (sourceStar && (!this._waypointRouteIsBetweenWormHoles(game, waypoint) && !this._waypointRouteIsWithinHyperspaceRange(game, carrier, waypoint)))     // Validation of whether the waypoint is within hyperspace range
-            ) {
-                throw new ValidationError(`The waypoint ${sourceStarName} -> ${destinationStar.name} exceeds hyperspace range.`);
+            if (i > 0 || (i === 0 && carrier.orbiting)) { // Is one of the next waypoints OR is the first waypoint and isn't in transit
+                if (sourceStar && (!this._waypointRouteIsBetweenWormHoles(game, waypoint) && !this._waypointRouteIsWithinHyperspaceRange(game, carrier, waypoint))) {// Validation of whether the waypoint is within hyperspace range
+                    throw new ValidationError(`The waypoint ${sourceStarName} -> ${destinationStar.name} exceeds hyperspace range.`);
+                }
             }
         }
         
