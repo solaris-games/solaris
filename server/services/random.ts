@@ -2,8 +2,9 @@ import { Location } from "./types/Location";
 
 export default class RandomService {
 
+    // max is INCLUSIVE
     getRandomNumber(max: number) {
-        return Math.floor(Math.random() * max);
+        return Math.floor(Math.random() * (max + 1))
     }
 
     // Note that the max is INCLUSIVE
