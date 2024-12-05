@@ -1,3 +1,5 @@
+import {shuffle} from "./utils";
+
 const EventEmitter = require('events');
 const mongoose = require('mongoose');
 import {DBObjectId} from './types/DBObjectId';
@@ -494,7 +496,7 @@ export default class StarService extends EventEmitter {
         return true;
     }
 
-    async claimUnownedStar(game: Game, gameUsers: User[], star: Star, carrier: Carrier) {
+    claimUnownedStar(game: Game, gameUsers: User[], star: Star, carrier: Carrier) {
         if (star.ownedByPlayerId) {
             throw new ValidationError(`Cannot claim an owned star`);
         }
@@ -885,6 +887,8 @@ export default class StarService extends EventEmitter {
         const constructors = game.galaxy.stars
             .filter(s => s.specialistId && this.specialistService.getByIdStar(s.specialistId)?.modifiers.special?.wormHoleConstructor);
 
+        shuffle(constructors);
+
         let pairs = Math.floor(constructors.length / 2);
 
         if (pairs < 1) {
@@ -892,13 +896,8 @@ export default class StarService extends EventEmitter {
         }
 
         while (pairs--) {
-            const starA = constructors[this.randomService.getRandomNumber(constructors.length)];
-            const starB = constructors[this.randomService.getRandomNumber(constructors.length)];
-
-            if (starA._id.toString() === starB._id.toString() || starA.wormHoleToStarId || starB.wormHoleToStarId) {
-                pairs++;
-                continue;
-            }
+            const starA = constructors.pop()!;
+            const starB = constructors.pop()!;
 
             starA.wormHoleToStarId = starB._id;
             starB.wormHoleToStarId = starA._id;
