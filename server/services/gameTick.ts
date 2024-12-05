@@ -605,6 +605,10 @@ export default class GameTickService extends EventEmitter {
         
             const carrierMovementReport = this.carrierMovementService.moveCarrier(game, gameUsers, carrierInTransit);
 
+            if (!carrierMovementReport) {
+                continue;
+            }
+
             // If the carrier has arrived at the star then
             // append the movement waypoint to the array of action waypoints so that we can deal with it after combat.
             if (carrierMovementReport.arrivedAtStar) {
