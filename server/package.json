@@ -60,6 +60,6 @@
     "jasmine": "^3.7.0",
     "ts-node": "^10.4.0",
     "ts-node-dev": "^1.1.8",
-    "typescript": "5.5.3"
+    "typescript": "5.7.2"
   }
 }
