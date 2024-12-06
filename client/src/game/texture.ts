@@ -1,4 +1,4 @@
-import {Texture, TextStyle, BitmapFont} from 'pixi.js'
+import {Texture, TextStyle, BitmapFont, Assets} from 'pixi.js'
 import seededRandom from 'random-seed'
 
 const TEXTURE_URLS = {
@@ -109,6 +109,23 @@ class TextureService {
   STAR_WORMHOLE_TEXTURES: Texture[] = [];
   STAR_ASTEROID_FIELD_TEXTURES: Texture[] = [];
   STAR_TEXTURE: Texture | undefined;
+
+  async loadAssets() {
+    for (let spec of Object.keys(TEXTURE_URLS)) {
+      const val = TEXTURE_URLS[spec];
+      if (Array.isArray(val)) {
+        for (let url of val) {
+          await Assets.load(url);
+        }
+      } else if (typeof val === 'string') {
+        await Assets.load(val);
+      }
+    }
+
+    for (let specTex of SPECIALIST_TEXTURES) {
+      await Assets.load(new URL(`../assets/specialists/${specTex}.svg`, import.meta.url).href);
+    }
+  }
 
   initialize() {
     this._loadPlayerSymbols()

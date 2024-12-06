@@ -1,4 +1,4 @@
-import { Viewport } from 'pixi-viewport'
+import {Viewport} from 'pixi-viewport'
 import Map from './map'
 import gameHelper from '../services/gameHelper.js'
 import textureService from './texture'
@@ -128,6 +128,8 @@ export class GameContainer {
     if (import.meta.env.DEV || userSettings?.technical?.performanceMonitor === 'enabled') {
       this.app!.ticker.add(this.calcFPS.bind(this))
     }
+
+    await textureService.loadAssets();
 
     // create viewport
     this.viewport = new Viewport({
@@ -284,13 +286,13 @@ export class GameContainer {
 
   getViewportZoomPercentage () {
     let viewportWidth = this.viewport!.right - this.viewport!.left
-    let viewportPercent = (this.viewport!.screenWidth / viewportWidth) * 100
-
-    return viewportPercent
+    return (this.viewport!.screenWidth / viewportWidth) * 100
   }
 
   onTick (deltaTime) {
-    this.map!.onTick(deltaTime)
+    if (this.map) {
+      this.map.onTick(deltaTime)
+    }
   }
 
   onViewportZoomed (e) {
