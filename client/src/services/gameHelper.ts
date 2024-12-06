@@ -630,7 +630,7 @@ class GameHelper {
       return false;
     }
 
-    const ownersHomeStarId = this.getPlayerById(game, star.ownedByPlayerId).homeStarId;
+    const ownersHomeStarId = this.getPlayerById(game, star.ownedByPlayerId)!.homeStarId;
 
     console.log(ownersHomeStarId, star._id);
 
@@ -650,7 +650,7 @@ class GameHelper {
       return true;
     }
 
-    const player = this.getPlayerById(game, star.ownedByPlayerId)
+    const player = this.getPlayerById(game, star.ownedByPlayerId)!
     if (this.isCapitalElimination(game) && this.isOwnerCapital(game, star) && !player.defeated) {
       return true;
     }

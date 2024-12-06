@@ -32,7 +32,7 @@ export default class {
   _drawTooltip(tooltipData) {
     this.container.removeChildren()
 
-    const player = GameHelper.getPlayerById(this.game, tooltipData.playerId)
+    const player = GameHelper.getPlayerById(this.game!, tooltipData.playerId)!
 
     const paddingX = 2
     const paddingY = 2

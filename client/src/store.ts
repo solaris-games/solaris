@@ -269,7 +269,7 @@ export default createStore<State>({
     },
 
     gamePlayerJoined (state: State, data) {
-      let player = GameHelper.getPlayerById(state.game, data.playerId)
+      let player = GameHelper.getPlayerById(state.game!, data.playerId)!
 
       player.isOpenSlot = false
       player.alias = data.alias
@@ -280,7 +280,7 @@ export default createStore<State>({
     },
 
     gamePlayerQuit (state: State, data) {
-      let player = GameHelper.getPlayerById(state.game, data.playerId)
+      let player = GameHelper.getPlayerById(state.game!, data.playerId)!
 
       player.isOpenSlot = true
       player.alias = 'Empty Slot'
@@ -288,25 +288,25 @@ export default createStore<State>({
     },
 
     gamePlayerReady (state: State, data) {
-      let player = GameHelper.getPlayerById(state.game, data.playerId)
+      let player = GameHelper.getPlayerById(state.game!, data.playerId)!
 
       player.ready = true
     },
 
     gamePlayerNotReady (state: State, data) {
-      let player = GameHelper.getPlayerById(state.game, data.playerId)
+      let player = GameHelper.getPlayerById(state.game!, data.playerId)!
 
       player.ready = false
     },
 
     gamePlayerReadyToQuit (state: State, data) {
-      let player = GameHelper.getPlayerById(state.game, data.playerId)
+      let player = GameHelper.getPlayerById(state.game!, data.playerId)!
 
       player.readyToQuit = true
     },
 
     gamePlayerNotReadyToQuit (state: State, data) {
-      let player = GameHelper.getPlayerById(state.game, data.playerId)
+      let player = GameHelper.getPlayerById(state.game!, data.playerId)!
 
       player.readyToQuit = false
     },
@@ -427,8 +427,8 @@ export default createStore<State>({
     gameStarAbandoned (state: State, data) {
       let star = GameHelper.getStarById(state.game, data.starId)
 
-      let player = GameHelper.getPlayerById(state.game, star.ownedByPlayerId)
-      player.stats.totalStars--
+      let player = GameHelper.getPlayerById(state.game!, star.ownedByPlayerId)!
+      player.stats!.totalStars--
 
       star.ownedByPlayerId = null
       star.ships = 0
@@ -447,12 +447,12 @@ export default createStore<State>({
     gameCarrierScuttled (state: State, data) {
       let carrier = GameHelper.getCarrierById(state.game, data.carrierId)
       let star = GameHelper.getStarById(state.game, carrier.orbiting)
-      let player = GameHelper.getPlayerById(state.game, carrier.ownedByPlayerId)
+      let player = GameHelper.getPlayerById(state.game!, carrier.ownedByPlayerId)!
 
-      player.stats.totalCarriers--
+      player.stats!.totalCarriers--
 
       if (carrier.specialistId) {
-        player.stats.totalSpecialists--
+        player.stats!.totalSpecialists--
       }
 
       GameContainer.undrawCarrier(carrier)
@@ -604,9 +604,9 @@ export default createStore<State>({
     } | null = null;
 
       if (state.colourOverride) {
-        colour = state.colourMapping?.[playerId] || GameHelper.getPlayerById(state.game, playerId).colour;
+        colour = state.colourMapping?.[playerId] || GameHelper.getPlayerById(state.game, playerId)!.colour;
       } else {
-        colour = GameHelper.getPlayerById(state.game, playerId).colour
+        colour = GameHelper.getPlayerById(state.game, playerId)!.colour
       }
 
       if (colour != null) {
