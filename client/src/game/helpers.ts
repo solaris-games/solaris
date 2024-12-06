@@ -1,9 +1,9 @@
 import seededRandom from 'random-seed'
 import type {Carrier, Star} from "../types/game";
-import * as PIXI from 'pixi.js'
+import {Container} from 'pixi.js'
 
 export class Helpers {
-    rotateCarrierTowardsWaypoint (carrier: Carrier, stars: Star[], graphics: PIXI.DisplayObject) {
+    rotateCarrierTowardsWaypoint (carrier: Carrier, stars: Star[], graphics: Container) {
         // If the carrier has waypoints, get the first one and calculate the angle
         // between the carrier's current position and the destination.
         if (carrier.waypoints.length) {

@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js'
+import { Container, Sprite } from 'pixi.js'
 import TextureService from './texture'
 import * as rng from 'random-seed'
 import gameHelper from '../services/gameHelper'
@@ -6,7 +6,7 @@ import type { Game } from '../types/game'
 import type { DrawingContext } from './container'
 import type { UserGameSettings } from '@solaris-common'
 
-interface BackgroundSprite extends PIXI.Sprite {
+interface BackgroundSprite extends Sprite {
   parallax: number;
   originX: number;
   originY: number;
@@ -29,8 +29,8 @@ class Background {
     stars: 100,
   }
 
-  container: PIXI.Container;
-  starContainer: PIXI.Container;
+  container: Container;
+  starContainer: Container;
   zoomPercent: number;
   time: number;
   game: Game | undefined;
@@ -41,11 +41,11 @@ class Background {
   galaxyCenterY: number = 0;
   moveNebulas = false;
   timeScale = 0;
-  blendMode = PIXI.BLEND_MODES.NORMAL;
+  blendMode = 'normal';
 
   constructor () {
-    this.container = new PIXI.Container()
-    this.starContainer = new PIXI.Container()
+    this.container = new Container()
+    this.starContainer = new Container()
     this.zoomPercent = 0
     this.container.interactiveChildren = false
     this.starContainer.interactiveChildren = false
@@ -68,8 +68,7 @@ class Background {
 
     this.moveNebulas = userSettings.map.background.moveNebulas == 'enabled'
     this.timeScale = (1.0/(2048.0*64.0)) * userSettings.map.background.nebulaMovementSpeed
-    this.blendMode = userSettings.map.background.blendMode == 'ADD' ?
-      PIXI.BLEND_MODES.ADD : PIXI.BLEND_MODES.NORMAL
+    this.blendMode = userSettings.map.background.blendMode == 'ADD' ? 'add' : 'normal';
   }
 
   clear () {
@@ -162,7 +161,7 @@ class Background {
               if(NEBULA_DENSITY>2) { if(this.rng.random()<0.5) { continue; } }
               i = Math.round(this.rng.random()*(nebulaTextureCount-1))
               texture = textures[i]
-              sprite = new PIXI.Sprite(texture) as BackgroundSprite;
+              sprite = new Sprite(texture) as BackgroundSprite;
               sprite.x = (x*CHUNK_SIZE) + (firstChunkX*CHUNK_SIZE) + (CHUNK_SIZE/2.0)
               sprite.x += NEBULA_MAX_OFFSET * Math.round( (this.rng.random()*2.0)-1.0 )
               sprite.y = (y*CHUNK_SIZE) + (firstChunkY*CHUNK_SIZE) + (CHUNK_SIZE/2.0)
@@ -190,7 +189,7 @@ class Background {
               texture = TextureService.STAR_TEXTURE
               while(starCount < Background.STAR_DENSITY) {
                 starCount+=1
-                sprite = new PIXI.Sprite(texture)
+                sprite = new Sprite(texture)
                 sprite.x = (x*CHUNK_SIZE) + (firstChunkX*CHUNK_SIZE) + (CHUNK_SIZE*this.rng.random())
                 sprite.x += NEBULA_MAX_OFFSET * Math.round( (this.rng.random()*2.0)-1.0 )
                 sprite.y = (y*CHUNK_SIZE) + (firstChunkY*CHUNK_SIZE) + (CHUNK_SIZE*this.rng.random())

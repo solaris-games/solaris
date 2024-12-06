@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js'
+import { Container, Graphics } from 'pixi.js'
 import Voronoi from '../voronoi/Javascript-Voronoi/rhill-voronoi-core.js';
 import gameHelper from '../services/gameHelper'
 import type {Game, Player} from '../types/game.js';
@@ -38,13 +38,13 @@ class Territories {
   static zoomLevel = 100
   static maxVoronoiDistance = 200
 
-  container: PIXI.Container;
+  container: Container;
   game: Game | undefined;
   zoomPercent: number;
   context: DrawingContext | undefined;
 
   constructor() {
-    this.container = new PIXI.Container()
+    this.container = new Container()
 
     this.zoomPercent = 0
   }
@@ -205,14 +205,11 @@ class Territories {
 
     for (let player of this.game!.galaxy.players) {
       let color = this.context!.getPlayerColour(player._id)
-      let territoryPolygons = new PIXI.Graphics()
-      let territoryLines = new PIXI.Graphics()
+      let territoryPolygons = new Graphics()
+      let territoryLines = new Graphics()
       this.container.addChild(territoryPolygons)
       this.container.addChild(territoryLines)
       territoryLines.lineStyle(LINE_WIDTH, color, 1)
-      territoryLines.lineStyle({
-        cap: PIXI.LINE_CAP.ROUND,
-      });
       territoryPolygons.alpha = 0.333
 
       let combining = false
@@ -364,7 +361,7 @@ class Territories {
 
       if (sanitizedPoints.length) {
         // Draw the graphic
-        let territoryGraphic = new PIXI.Graphics()
+        let territoryGraphic = new Graphics()
         territoryGraphic.lineStyle(borderWidth, colour, 1)
         territoryGraphic.beginFill(colour, 0.3)
         territoryGraphic.moveTo(sanitizedPoints[0].x, sanitizedPoints[0].y)
@@ -386,7 +383,7 @@ class Territories {
     // Draw the cell territory borders
     borderWidth = +userSettings.map.voronoiTerritoryBorderWidth
 
-    let borderGraphics = new PIXI.Graphics()
+    let borderGraphics = new Graphics()
 
     for (let border of borders) {
       let borderVA = getPoint(border.va)
