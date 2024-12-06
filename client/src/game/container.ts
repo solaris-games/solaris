@@ -100,7 +100,7 @@ export class GameContainer {
     }
   }
 
-  setupApp (store, userSettings) {
+  async setupApp (store, userSettings) {
     this.store = store
 
     this.context = new DrawingContext(store)
@@ -121,38 +121,36 @@ export class GameContainer {
       autoDensity: true,
     };
 
-    (async () => {
-      await this.app!.init(options);
-      this.app!.ticker.add(this.onTick.bind(this))
-      this.app!.ticker.maxFPS = 0
+    await this.app!.init(options);
+    this.app!.ticker.add(this.onTick.bind(this))
+    this.app!.ticker.maxFPS = 0
 
-      if (import.meta.env.DEV || userSettings?.technical?.performanceMonitor === 'enabled') {
-        this.app!.ticker.add(this.calcFPS.bind(this))
-      }
+    if (import.meta.env.DEV || userSettings?.technical?.performanceMonitor === 'enabled') {
+      this.app!.ticker.add(this.calcFPS.bind(this))
+    }
 
-      // create viewport
-      this.viewport = new Viewport({
-        screenWidth: window.innerWidth,
-        screenHeight: window.innerHeight,
+    // create viewport
+    this.viewport = new Viewport({
+      screenWidth: window.innerWidth,
+      screenHeight: window.innerHeight,
 
-        // yolo
-        worldWidth: Number.MAX_VALUE,
-        worldHeight: Number.MAX_VALUE,
+      // yolo
+      worldWidth: Number.MAX_VALUE,
+      worldHeight: Number.MAX_VALUE,
 
-        stopPropagation: true,
-        passiveWheel: true,
+      stopPropagation: true,
+      passiveWheel: true,
 
-        disableOnContextMenu: true,
-        events: this.app!.renderer.events
-      })
+      disableOnContextMenu: true,
+      events: this.app!.renderer.events
+    })
 
-      // add the viewport to the stage
-      this.app!.stage.addChild(this.viewport)
+    // add the viewport to the stage
+    this.app!.stage.addChild(this.viewport)
 
-      // Add a new map to the viewport
-      this.map = new Map(this.app, this.store, this, this.context!)
-      this.viewport.addChild(this.map.container)
-    })()
+    // Add a new map to the viewport
+    this.map = new Map(this.app, this.store, this, this.context!)
+    this.viewport.addChild(this.map.container)
   }
 
   destroy () {

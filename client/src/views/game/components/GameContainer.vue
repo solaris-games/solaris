@@ -25,22 +25,20 @@ export default {
     window.addEventListener('resize', this.handleResize)
   },
 
-  beforeMount () {
-    this.gameContainer = GameContainer
-    this.gameContainer.setupApp(this.$store, this.$store.state.settings)
-    this.loadGame(this.$store.state.game)
-  },
-
-  mounted () {
+  async mounted () {
     const game = this.$store.state.game;
 
+    this.gameContainer = GameContainer
+    await this.gameContainer.setupApp(this.$store, this.$store.state.settings)
+    this.loadGame(this.$store.state.game)
+
     // Add the game canvas to the screen.
-    this.$el.appendChild(this.gameContainer.app.view) // Add the pixi canvas to the element.
+    this.$el.appendChild(this.gameContainer.app.canvas) // Add the pixi canvas to the element.
 
     this.drawGame(game)
 
     const gameRoot = document.getElementById("gameRoot") // Defined in Game component
-    attachEventDeduplication(gameRoot, this.gameContainer.app.view)
+    attachEventDeduplication(gameRoot, this.gameContainer.app.canvas)
 
     // Bind to game events.
     this.onStarClickedHandler = this.onStarClicked.bind(this)
