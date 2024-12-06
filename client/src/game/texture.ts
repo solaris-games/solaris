@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js-legacy'
+import { Texture, TextStyle, BitmapFont } from 'pixi.js'
 import seededRandom from 'random-seed'
 
 class TextureService {
@@ -7,80 +7,54 @@ class TextureService {
     static PARTIAL_STRIDE = 2
     static seededRNG = seededRandom.create()
 
-    STARLESS_NEBULA_TEXTURES: PIXI.Texture[] = []
-    STAR_NEBULA_TEXTURES: PIXI.Texture[] = []
+    STARLESS_NEBULA_TEXTURES: Texture[] = []
+    STAR_NEBULA_TEXTURES: Texture[] = []
     SPECIALIST_TEXTURES = {}
     PLAYER_SYMBOLS = {}
     STAR_SYMBOLS = {}
 
-    DEFAULT_FONT_STYLE: PIXI.TextStyle | undefined;
-    DEFAULT_FONT_STYLE_BOLD: PIXI.TextStyle | undefined;
-    CARRIER_TEXTURE: PIXI.Texture | undefined;
-    STAR_WORMHOLE_TEXTURES: PIXI.Texture[] = [];
-    DEFAULT_FONT_BITMAP: PIXI.BitmapFont | undefined;
-    DEFAULT_FONT_BOLD_BITMAP: PIXI.BitmapFont | undefined;
-    STAR_ASTEROID_FIELD_TEXTURES: PIXI.Texture[] = [];
-    STAR_TEXTURE: PIXI.Texture | undefined;
+    DEFAULT_FONT_STYLE: TextStyle | undefined;
+    DEFAULT_FONT_STYLE_BOLD: TextStyle | undefined;
+    CARRIER_TEXTURE: Texture | undefined;
+    STAR_WORMHOLE_TEXTURES: Texture[] = [];
+    STAR_ASTEROID_FIELD_TEXTURES: Texture[] = [];
+    STAR_TEXTURE: Texture | undefined;
 
     initialize () {
       this._loadPlayerSymbols()
       this._loadStarSymbols()
 
-      this.CARRIER_TEXTURE = new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/map-objects/128x128_carrier.svg', import.meta.url).href))
-      this.DEFAULT_FONT_STYLE = new PIXI.TextStyle({
+      this.CARRIER_TEXTURE = Texture.from(new URL('../assets/map-objects/128x128_carrier.svg', import.meta.url).href)
+      this.DEFAULT_FONT_STYLE = new TextStyle({
         fontFamily: `Chakra Petch,sans-serif;`,
         fill: 0xFFFFFF,
         padding: 3
       })
 
-      this.DEFAULT_FONT_STYLE_BOLD = new PIXI.TextStyle({
+      this.DEFAULT_FONT_STYLE_BOLD = new TextStyle({
         fontFamily: `Chakra Petch,sans-serif;`,
         fill: 0xFFFFFF,
         fontWeight: "bold",
         padding: 3
       })
 
-      this.DEFAULT_FONT_BITMAP = PIXI.BitmapFont.from(
-        "chakrapetch",
-        this.DEFAULT_FONT_STYLE,
-        {
-          chars: PIXI.BitmapFont.ASCII,
-          resolution: 2
-        }
-      )
-      // disable mipmap
-      this.DEFAULT_FONT_BITMAP.pageTextures[0].baseTexture.mipmap = 0
-      this.DEFAULT_FONT_BITMAP.pageTextures[1].baseTexture.mipmap = 0
-
-      this.DEFAULT_FONT_BOLD_BITMAP = PIXI.BitmapFont.from(
-        "chakrapetch",
-        this.DEFAULT_FONT_STYLE_BOLD,
-        {
-          chars: PIXI.BitmapFont.ASCII,
-          resolution: 2
-        }
-      )
-      // disable mipmap
-      this.DEFAULT_FONT_BOLD_BITMAP.pageTextures[0].baseTexture.mipmap = 0
-      this.DEFAULT_FONT_BOLD_BITMAP.pageTextures[1].baseTexture.mipmap = 0
-
-      this.STAR_TEXTURE = new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/stars/star.png', import.meta.url).href))
+      this.STAR_TEXTURE = Texture.from(new URL('../assets/stars/star.png', import.meta.url).href)
 
       // STARLESS NEBULAS
-      this.STARLESS_NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/nebula/neb0-starless.png', import.meta.url).href)))
-      this.STARLESS_NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/nebula/neb1-starless.png', import.meta.url).href)))
+      this.STARLESS_NEBULA_TEXTURES.push(Texture.from(new URL('../assets/nebula/neb0-starless.png', import.meta.url).href))
+      this.STARLESS_NEBULA_TEXTURES.push(Texture.from(new URL('../assets/nebula/neb1-starless.png', import.meta.url).href))
 
       // STAR NEBULAS
-      this.STAR_NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/nebula/star-nebula-0.png', import.meta.url).href)))
-      this.STAR_NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/nebula/star-nebula-1.png', import.meta.url).href)))
-      this.STAR_NEBULA_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/nebula/star-nebula-2.png', import.meta.url).href)))
+      this.STAR_NEBULA_TEXTURES.push(Texture.from(new URL('../assets/nebula/star-nebula-0.png', import.meta.url).href))
+      this.STAR_NEBULA_TEXTURES.push(Texture.from(new URL('../assets/nebula/star-nebula-1.png', import.meta.url).href))
+      this.STAR_NEBULA_TEXTURES.push(Texture.from(new URL('../assets/nebula/star-nebula-2.png', import.meta.url).href))
 
       // STAR ASTEROID FIELDS
-      this.STAR_ASTEROID_FIELD_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/stars/star-asteroid-field-0.png', import.meta.url).href)))
-      this.STAR_ASTEROID_FIELD_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/stars/star-asteroid-field-1.png', import.meta.url).href)))
-      this.STAR_ASTEROID_FIELD_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/stars/star-asteroid-field-2.png', import.meta.url).href)))
+      this.STAR_ASTEROID_FIELD_TEXTURES.push(Texture.from(new URL('../assets/stars/star-asteroid-field-0.png', import.meta.url).href))
+      this.STAR_ASTEROID_FIELD_TEXTURES.push(Texture.from(new URL('../assets/stars/star-asteroid-field-1.png', import.meta.url).href))
+      this.STAR_ASTEROID_FIELD_TEXTURES.push(Texture.from(new URL('../assets/stars/star-asteroid-field-2.png', import.meta.url).href))
 
-      this.STAR_WORMHOLE_TEXTURES.push(new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/stars/vortex.png', import.meta.url).href)))
+      this.STAR_WORMHOLE_TEXTURES.push(Texture.from(new URL('../assets/stars/vortex.png', import.meta.url).href))
 
       // SPECIALISTS
       this._loadSpecialistTexture('mecha-head')
@@ -124,7 +98,7 @@ class TextureService {
     }
 
     _loadSpecialistTexture(name) {
-      this.SPECIALIST_TEXTURES[name] = PIXI.Texture.from(new URL(`../assets/specialists/${name}.svg`, import.meta.url).href)
+      this.SPECIALIST_TEXTURES[name] = Texture.from(new URL(`../assets/specialists/${name}.svg`, import.meta.url).href)
       //disable mipmap
       this.SPECIALIST_TEXTURES[name].baseTexture.mipmap = 0
     }
@@ -135,43 +109,43 @@ class TextureService {
 
     _loadPlayerSymbols() {
       this.PLAYER_SYMBOLS['circle'] = [
-        new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/map-objects/256x256_circle.svg', import.meta.url).href)),
-        new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/map-objects/256x256_circle_warp_gate.svg', import.meta.url).href)),
-        new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/map-objects/256x256_circle_partial.svg', import.meta.url).href)),
-        new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/map-objects/256x256_circle_partial_warp_gate.svg', import.meta.url).href)),
-        new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/map-objects/128x128_circle_carrier.svg', import.meta.url).href))
+        Texture.from(new URL('../assets/map-objects/256x256_circle.svg', import.meta.url).href),
+        Texture.from(new URL('../assets/map-objects/256x256_circle_warp_gate.svg', import.meta.url).href),
+        Texture.from(new URL('../assets/map-objects/256x256_circle_partial.svg', import.meta.url).href),
+        Texture.from(new URL('../assets/map-objects/256x256_circle_partial_warp_gate.svg', import.meta.url).href),
+        Texture.from(new URL('../assets/map-objects/128x128_circle_carrier.svg', import.meta.url).href)
       ]
       this.PLAYER_SYMBOLS['hexagon'] = [
-        new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/map-objects/256x256_hexagon.svg', import.meta.url).href)),
-        new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/map-objects/256x256_hexagon_warp_gate.svg', import.meta.url).href)),
-        new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/map-objects/256x256_hexagon_partial.svg', import.meta.url).href)),
-        new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/map-objects/256x256_hexagon_partial_warp_gate.svg', import.meta.url).href)),
-        new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/map-objects/128x128_hexagon_carrier.svg', import.meta.url).href))
+        Texture.from(new URL('../assets/map-objects/256x256_hexagon.svg', import.meta.url).href),
+        Texture.from(new URL('../assets/map-objects/256x256_hexagon_warp_gate.svg', import.meta.url).href),
+        Texture.from(new URL('../assets/map-objects/256x256_hexagon_partial.svg', import.meta.url).href),
+        Texture.from(new URL('../assets/map-objects/256x256_hexagon_partial_warp_gate.svg', import.meta.url).href),
+        Texture.from(new URL('../assets/map-objects/128x128_hexagon_carrier.svg', import.meta.url).href),
       ]
       this.PLAYER_SYMBOLS['diamond'] = [
-        new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/map-objects/256x256_diamond.svg', import.meta.url).href)),
-        new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/map-objects/256x256_diamond_warp_gate.svg', import.meta.url).href)),
-        new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/map-objects/256x256_diamond_partial.svg', import.meta.url).href)),
-        new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/map-objects/256x256_diamond_partial_warp_gate.svg', import.meta.url).href)),
-        new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/map-objects/128x128_diamond_carrier.svg', import.meta.url).href))
+        Texture.from(new URL('../assets/map-objects/256x256_diamond.svg', import.meta.url).href),
+        Texture.from(new URL('../assets/map-objects/256x256_diamond_warp_gate.svg', import.meta.url).href),
+        Texture.from(new URL('../assets/map-objects/256x256_diamond_partial.svg', import.meta.url).href),
+        Texture.from(new URL('../assets/map-objects/256x256_diamond_partial_warp_gate.svg', import.meta.url).href),
+        Texture.from(new URL('../assets/map-objects/128x128_diamond_carrier.svg', import.meta.url).href),
       ]
       this.PLAYER_SYMBOLS['square'] = [
-        new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/map-objects/256x256_square.svg', import.meta.url).href)),
-        new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/map-objects/256x256_square_warp_gate.svg', import.meta.url).href)),
-        new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/map-objects/256x256_square_partial.svg', import.meta.url).href)),
-        new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/map-objects/256x256_square_partial_warp_gate.svg', import.meta.url).href)),
-        new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/map-objects/128x128_square_carrier.svg', import.meta.url).href))
+        Texture.from(new URL('../assets/map-objects/256x256_square.svg', import.meta.url).href),
+        Texture.from(new URL('../assets/map-objects/256x256_square_warp_gate.svg', import.meta.url).href),
+        Texture.from(new URL('../assets/map-objects/256x256_square_partial.svg', import.meta.url).href),
+        Texture.from(new URL('../assets/map-objects/256x256_square_partial_warp_gate.svg', import.meta.url).href),
+        Texture.from(new URL('../assets/map-objects/128x128_square_carrier.svg', import.meta.url).href)
       ]
     }
 
     _loadStarSymbols() {
-      this.STAR_SYMBOLS['scannable'] = new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/map-objects/128x128_star_scannable.svg', import.meta.url).href))
-      this.STAR_SYMBOLS['unscannable'] = new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/map-objects/128x128_star_unscannable.svg', import.meta.url).href))
-      this.STAR_SYMBOLS['home'] = new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/map-objects/128x128_star_home.svg', import.meta.url).href))
-      this.STAR_SYMBOLS['black_hole'] = new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/map-objects/128x128_star_black_hole.svg', import.meta.url).href))
-      this.STAR_SYMBOLS['black_hole_binary'] = new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/map-objects/128x128_star_black_hole_binary.svg', import.meta.url).href))
-      this.STAR_SYMBOLS['binary_scannable'] = new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/map-objects/128x128_star_scannable_binary.svg', import.meta.url).href))
-      this.STAR_SYMBOLS['binary_unscannable'] = new PIXI.Texture(PIXI.BaseTexture.from(new URL('../assets/map-objects/128x128_star_unscannable_binary.svg', import.meta.url).href))
+      this.STAR_SYMBOLS['scannable'] = Texture.from(new URL('../assets/map-objects/128x128_star_scannable.svg', import.meta.url).href)
+      this.STAR_SYMBOLS['unscannable'] = Texture.from(new URL('../assets/map-objects/128x128_star_unscannable.svg', import.meta.url).href)
+      this.STAR_SYMBOLS['home'] = Texture.from(new URL('../assets/map-objects/128x128_star_home.svg', import.meta.url).href)
+      this.STAR_SYMBOLS['black_hole'] = Texture.from(new URL('../assets/map-objects/128x128_star_black_hole.svg', import.meta.url).href)
+      this.STAR_SYMBOLS['black_hole_binary'] = Texture.from(new URL('../assets/map-objects/128x128_star_black_hole_binary.svg', import.meta.url).href)
+      this.STAR_SYMBOLS['binary_scannable'] = Texture.from(new URL('../assets/map-objects/128x128_star_scannable_binary.svg', import.meta.url).href)
+      this.STAR_SYMBOLS['binary_unscannable'] = Texture.from(new URL('../assets/map-objects/128x128_star_unscannable_binary.svg', import.meta.url).href)
     }
 
     getRandomStarNebulaTexture(seed) {

@@ -139,7 +139,6 @@ export class GameContainer {
         worldWidth: Number.MAX_VALUE,
         worldHeight: Number.MAX_VALUE,
 
-        divWheel: this.app!.renderer.view, // Ensures that when using the scroll wheel it only takes affect when the mouse is over the canvas (prevents scrolling in overlaying divs from scrolling the canvas)
         stopPropagation: true,
         passiveWheel: true,
 
