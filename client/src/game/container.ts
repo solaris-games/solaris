@@ -1,11 +1,10 @@
-import * as PIXI from 'pixi.js-legacy'
 import { Viewport } from 'pixi-viewport'
 import Map from './map'
 import gameHelper from '../services/gameHelper.js'
 import textureService from './texture'
 import type {Store} from "vuex";
 import type {State} from "../store";
-import type {Application} from "pixi.js-legacy";
+import {Application, BitmapText} from "pixi.js";
 import type {UserGameSettings} from "solaris-common/src";
 import type {Game} from "../types/game";
 
@@ -28,12 +27,12 @@ export class GameContainer {
   previousDTs: number[];
   ma32accum: number;
   app: Application | null = null;
-  fpsNowText: PIXI.BitmapText | undefined;
-  fpsMAText: PIXI.BitmapText | undefined;
-  fpsMA32Text: PIXI.BitmapText | undefined;
-  jitterText: PIXI.BitmapText | undefined;
-  lowestText: PIXI.BitmapText | undefined;
-  zoomText: PIXI.BitmapText | undefined;
+  fpsNowText: BitmapText | undefined;
+  fpsMAText: BitmapText | undefined;
+  fpsMA32Text: BitmapText | undefined;
+  jitterText: BitmapText | undefined;
+  lowestText: BitmapText | undefined;
+  zoomText: BitmapText | undefined;
   map: Map | undefined;
   store: Store<State> | undefined;
   context: DrawingContext | undefined;
@@ -46,9 +45,6 @@ export class GameContainer {
   game: any;
 
   constructor () {
-    PIXI.settings.SORTABLE_CHILDREN = true
-    PIXI.Graphics.curves.minSegments = 20 // Smooth arcs
-
     this.frames = 0
     this.dtAccum = 33.0*16
     this.lowest = 1000
@@ -114,44 +110,50 @@ export class GameContainer {
 
     let antialiasing = userSettings.map.antiAliasing === 'enabled';
 
-    this.app = new PIXI.Application({
+    this.app = new Application();
+
+    const options = {
       width: window.innerWidth, // window.innerWidth,
       height: window.innerHeight - 45, // window.innerHeight,
       backgroundColor: 0x000000, // black hexadecimal
       resolution: window.devicePixelRatio || 1,
       antialias: antialiasing,
       autoDensity: true,
-    })
+    };
 
-    this.app.ticker.add(this.onTick.bind(this))
-    this.app.ticker.maxFPS = 0
+    (async () => {
+      await this.app!.init(options);
+      this.app!.ticker.add(this.onTick.bind(this))
+      this.app!.ticker.maxFPS = 0
 
-    if (import.meta.env.DEV || userSettings?.technical?.performanceMonitor === 'enabled') {
-      this.app.ticker.add(this.calcFPS.bind(this))
-    }
+      if (import.meta.env.DEV || userSettings?.technical?.performanceMonitor === 'enabled') {
+        this.app!.ticker.add(this.calcFPS.bind(this))
+      }
 
-    // create viewport
-    this.viewport = new Viewport({
-      screenWidth: window.innerWidth,
-      screenHeight: window.innerHeight,
+      // create viewport
+      this.viewport = new Viewport({
+        screenWidth: window.innerWidth,
+        screenHeight: window.innerHeight,
 
-      // yolo
-      worldWidth: Number.MAX_VALUE,
-      worldHeight: Number.MAX_VALUE,
+        // yolo
+        worldWidth: Number.MAX_VALUE,
+        worldHeight: Number.MAX_VALUE,
 
-      stopPropagation: true,
-      passiveWheel: true,
+        divWheel: this.app!.renderer.view, // Ensures that when using the scroll wheel it only takes affect when the mouse is over the canvas (prevents scrolling in overlaying divs from scrolling the canvas)
+        stopPropagation: true,
+        passiveWheel: true,
 
-      disableOnContextMenu: true,
-      events: this.app.renderer.events
-    })
+        disableOnContextMenu: true,
+        events: this.app!.renderer.events
+      })
 
-    // add the viewport to the stage
-    this.app.stage.addChild(this.viewport)
+      // add the viewport to the stage
+      this.app!.stage.addChild(this.viewport)
 
-    // Add a new map to the viewport
-    this.map = new Map(this.app, this.store, this, this.context)
-    this.viewport.addChild(this.map.container)
+      // Add a new map to the viewport
+      this.map = new Map(this.app, this.store, this, this.context!)
+      this.viewport.addChild(this.map.container)
+    })()
   }
 
   destroy () {
@@ -226,12 +228,12 @@ export class GameContainer {
       let left = 64
       let top = 32
 
-      this.fpsNowText = new PIXI.BitmapText("", bitmapFont)
-      this.fpsMAText = new PIXI.BitmapText("", bitmapFont)
-      this.fpsMA32Text = new PIXI.BitmapText("", bitmapFont)
-      this.jitterText = new PIXI.BitmapText("", bitmapFont)
-      this.lowestText = new PIXI.BitmapText("", bitmapFont)
-      this.zoomText = new PIXI.BitmapText("", bitmapFont)
+      this.fpsNowText = new BitmapText("", bitmapFont)
+      this.fpsMAText = new BitmapText("", bitmapFont)
+      this.fpsMA32Text = new BitmapText("", bitmapFont)
+      this.jitterText = new BitmapText("", bitmapFont)
+      this.lowestText = new BitmapText("", bitmapFont)
+      this.zoomText = new BitmapText("", bitmapFont)
       this.fpsNowText.x = left
       this.fpsNowText.y = 128+16
       this.fpsMAText.x = left

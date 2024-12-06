@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js-legacy'
+import * as PIXI from 'pixi.js'
 import gameHelper from '../services/gameHelper'
 import helpers from './helpers'
 import type { Map } from './map';

@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js-legacy'
+import * as PIXI from 'pixi.js'
 import type { Game } from '../types/game';
 
 class WormHoleLayer {

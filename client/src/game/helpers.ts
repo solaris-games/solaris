@@ -1,6 +1,6 @@
 import seededRandom from 'random-seed'
 import type {Carrier, Star} from "../types/game";
-import * as PIXI from 'pixi.js-legacy'
+import * as PIXI from 'pixi.js'
 
 export class Helpers {
     rotateCarrierTowardsWaypoint (carrier: Carrier, stars: Star[], graphics: PIXI.DisplayObject) {

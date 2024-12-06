@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js-legacy'
+import * as PIXI from 'pixi.js'
 
 class AnimationService {
   drawSelectedCircle (app, container, location) {

@@ -1,4 +1,4 @@
-import { Container, Sprite, Graphics, BitmapText, Circle, TextStyle, Text } from 'pixi.js-legacy'
+import { Container, Sprite, Graphics, BitmapText, Circle, TextStyle, Text } from 'pixi.js'
 import TextureService from './texture'
 import Helpers from './helpers'
 import {EventEmitter} from "./eventEmitter.js";

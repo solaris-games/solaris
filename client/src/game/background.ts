@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js-legacy'
+import * as PIXI from 'pixi.js'
 import TextureService from './texture'
 import * as rng from 'random-seed'
 import gameHelper from '../services/gameHelper'

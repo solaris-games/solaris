@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js-legacy'
+import * as PIXI from 'pixi.js'
 import Background from './background'
 import Star from './star'
 import Waypoints from './waypoints'

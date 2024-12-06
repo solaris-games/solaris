@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js-legacy'
+import * as PIXI from 'pixi.js'
 import GameHelper from '../services/gameHelper'
 import type { Game } from '../types/game';
 import type { DrawingContext } from './container';

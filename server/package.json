@@ -37,6 +37,7 @@
     "express-joi-validation": "^5.0.1",
     "express-rate-limit": "^5.2.6",
     "express-session": "^1.17.3",
+    "is-buffer": "^2.0.5",
     "joi": "^17.6.2",
     "memory-cache": "^0.2.0",
     "moment": "^2.29.1",
