@@ -10,9 +10,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {},
-  "devDependencies": {
-    "typescript": "5.7.2"
-  },
+  "devDependencies": {},
   "files": [
     "/dist"
   ],
