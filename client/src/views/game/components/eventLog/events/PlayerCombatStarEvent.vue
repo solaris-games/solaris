@@ -25,11 +25,11 @@
                               <player-icon-shape :filled="true" :shape="getStarShape()" :iconColour="getStarColour()" />
                               {{event.data.starName}}
                             </span>
-                            <span v-if="event.data.combatResult.star.specialist" :title="event.data.combatResult.star.specialist.description"> ({{event.data.combatResult.star.specialist.name}})</span>
+                            <span v-if="star.specialist" :title="star.specialist.description"> ({{star.specialist.name}})</span>
                         </td>
-                        <td class="text-end">{{event.data.combatResult.star.before}}</td>
-                        <td class="text-end">{{event.data.combatResult.star.lost}}</td>
-                        <td class="text-end">{{event.data.combatResult.star.after}}</td>
+                        <td class="text-end">{{star.before}}</td>
+                        <td class="text-end">{{star.lost}}</td>
+                        <td class="text-end">{{star.after}}</td>
                     </tr>
                     <tr v-for="carrier of defenderCarriers" :key="carrier._id">
                         <td>
@@ -94,84 +94,66 @@
         <div v-if="event.data.captureResult">
           <p>
             The star <star-label :starId="event.data.starId" :starName="event.data.starName"/> has been captured
-            by <a href="javascript:;" @click="onOpenPlayerDetailRequested(event.data.captureResult.capturedById)">{{event.data.captureResult.capturedByAlias}}</a>.
+            by <a href="javascript:;" @click="emit('onOpenPlayerDetailRequested', event.data.captureResult.capturedById)">{{event.data.captureResult.capturedByAlias}}</a>.
           </p>
           <p v-if="event.data.captureResult.captureReward">
-            <a href="javascript:;" @click="onOpenPlayerDetailRequested(event.data.captureResult.capturedById)">{{event.data.captureResult.capturedByAlias}}</a> is awarded
+            <a href="javascript:;" @click="emit('onOpenPlayerDetailRequested', event.data.captureResult.capturedById)">{{event.data.captureResult.capturedByAlias}}</a> is awarded
             <span class="text-warning">${{event.data.captureResult.captureReward}}</span> credits for destroying economic infrastructure.
           </p>
         </div>
     </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { computed } from 'vue';
 import GameHelper from '../../../../../services/gameHelper'
 import PlayerIconShape from '../../player/PlayerIconShape.vue'
-import StarLabelVue from '../../star/StarLabel.vue'
+import StarLabel from '../../star/StarLabel.vue'
+import type {CombatCarrier, PlayerCombatStarEvent} from "@solaris-common";
+import { useStore } from 'vuex';
+import type {Carrier, Game} from "../../../../../types/game";
 
-export default {
-  components: {
-    PlayerIconShape,
-    'star-label': StarLabelVue
-  },
-  props: {
-    event: Object
-  },
-  data () {
-    return {
-      owner: null,
-      defenders: null,
-      attackers: [],
-      defenderCarriers: [],
-      attackerCarriers: []
-    }
-  },
-  mounted () {
-    this.owner = GameHelper.getPlayerById(this.$store.state.game, this.event.data.playerIdOwner)
-    this.defenders = this.event.data.playerIdDefenders.map(id => GameHelper.getPlayerById(this.$store.state.game, id))
-    this.attackers = this.event.data.playerIdAttackers.map(id => GameHelper.getPlayerById(this.$store.state.game, id))
+const props = defineProps<{
+  event: PlayerCombatStarEvent<string>
+}>();
 
-    this.defenderCarriers = this.event.data.combatResult.carriers.filter(c => this.defenders.find(d => d._id === c.ownedByPlayerId) != null)
-    this.attackerCarriers = this.event.data.combatResult.carriers.filter(c => this.attackers.find(a => a._id === c.ownedByPlayerId) != null)
-  },
-  methods: {
-    onOpenPlayerDetailRequested (e) {
-      this.$emit('onOpenPlayerDetailRequested', e)
-    },
-    getCarrierColour (carrier) {
-      return this.$store.getters.getColourForPlayer(carrier.ownedByPlayerId).value
-    },
-    getCarrierShape (carrier) {
-      return GameHelper.getPlayerById(this.$store.state.game, carrier.ownedByPlayerId).shape;
-    },
-    getStarColour () {
-      return this.$store.getters.getColourForPlayer(this.event.data.playerIdOwner).value
-    },
-    getStarShape () {
-      return GameHelper.getPlayerById(this.$store.state.game, this.event.data.playerIdOwner).shape;
-    }
-  },
-  computed: {
-    totalDefenderBefore: function () {
-      return GameHelper.calculateCombatEventShipCount(this.event.data.combatResult.star, this.defenderCarriers, "before")
-    },
-    totalDefenderLost: function () {
-      return GameHelper.calculateCombatEventShipCount(this.event.data.combatResult.star, this.defenderCarriers, "lost")
-    },
-    totalDefenderAfter: function () {
-      return GameHelper.calculateCombatEventShipCount(this.event.data.combatResult.star, this.defenderCarriers, "after")
-    },
-    totalAttackerBefore: function () {
-      return GameHelper.calculateCombatEventShipCount(null, this.attackerCarriers, "before")
-    },
-    totalAttackerLost: function () {
-      return GameHelper.calculateCombatEventShipCount(null, this.attackerCarriers, "lost")
-    },
-    totalAttackerAfter: function () {
-      return GameHelper.calculateCombatEventShipCount(null, this.attackerCarriers, "after")
-    }
-  }
+const emit = defineEmits<{
+  onOpenPlayerDetailRequested: [playerId: string]
+}>();
+
+const store = useStore();
+
+const game = store.state.game as Game;
+const owner = GameHelper.getPlayerById(game, props.event.data.playerIdOwner)!;
+const defenders = computed(() => props.event.data.playerIdDefenders.map(id => GameHelper.getPlayerById(game, id)!));
+const attackers = computed(() => props.event.data.playerIdAttackers.map(id => GameHelper.getPlayerById(game, id)!));
+const defenderCarriers = computed(() => props.event.data.combatResult.carriers.filter(c => defenders.value.find(d => d._id === c.ownedByPlayerId)));
+const attackerCarriers = computed(() => props.event.data.combatResult.carriers.filter(c => attackers.value.find(a => a._id === c.ownedByPlayerId)));
+
+const star = computed(() => props.event.data.combatResult.star!);
+
+const getCarrierColour = (carrier: CombatCarrier<string>) => {
+  return store.getters.getColourForPlayer(carrier.ownedByPlayerId).value
 }
+
+const getCarrierShape = (carrier: CombatCarrier<string>) => {
+  return GameHelper.getPlayerById(store.state.game, carrier.ownedByPlayerId!)!.shape;
+}
+
+const getStarColour = () => {
+  return store.getters.getColourForPlayer(props.event.data.playerIdOwner).value
+}
+
+const getStarShape = () => {
+  return GameHelper.getPlayerById(store.state.game, props.event.data.playerIdOwner)!.shape;
+}
+
+const totalDefenderBefore = computed(() => GameHelper.calculateCombatEventShipCount(props.event.data.combatResult.star, defenderCarriers.value, "before"));
+const totalDefenderLost = computed(() => GameHelper.calculateCombatEventShipCount(props.event.data.combatResult.star, defenderCarriers.value, "lost"));
+const totalDefenderAfter = computed(() => GameHelper.calculateCombatEventShipCount(props.event.data.combatResult.star, defenderCarriers.value, "after"));
+const totalAttackerBefore = computed(() => GameHelper.calculateCombatEventShipCount(null, attackerCarriers.value, "before"));
+const totalAttackerLost = computed(() => GameHelper.calculateCombatEventShipCount(null, attackerCarriers.value, "lost"));
+const totalAttackerAfter = computed(() => GameHelper.calculateCombatEventShipCount(null, attackerCarriers.value, "after"));
 </script>
 
 <style scoped>

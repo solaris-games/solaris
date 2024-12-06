@@ -13,7 +13,7 @@
   </DialogModal>
 </template>
 
-<script setup type="ts">
+<script setup lang="ts">
 import DialogModal from './DialogModal.vue'
 
 const props = defineProps({

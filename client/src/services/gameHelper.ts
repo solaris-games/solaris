@@ -28,7 +28,7 @@ class GameHelper {
     return game.galaxy.players.find(p => p.alias === playerName)
   }
 
-  getPlayerById (game, playerId) {
+  getPlayerById (game: Game, playerId: string) {
     return game.galaxy.players.find(x => x._id === playerId)
   }
 
