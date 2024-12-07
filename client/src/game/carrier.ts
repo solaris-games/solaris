@@ -160,7 +160,7 @@ export class Carrier extends EventEmitter {
 
       let shipsText = totalShips.toString()
 
-      let bitmapFont = {fontName: "chakrapetch", fontSize: 4}
+      let bitmapFont = {fontFamily: "chakrapetch", fontSize: 4}
       this.text_ships = new BitmapText(shipsText, bitmapFont)
 
       this.text_ships.x = -(this.text_ships.width / 2.0)

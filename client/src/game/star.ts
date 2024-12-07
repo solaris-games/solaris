@@ -594,7 +594,7 @@ export class Star extends EventEmitter {
 
   drawName () {
     if (!this.text_name) {
-      const bitmapFont = {fontName: "chakrapetch", fontSize: NAME_SIZE}
+      const bitmapFont = {fontFamily: "chakrapetch", fontSize: NAME_SIZE}
       this.text_name = new BitmapText(this.data.name, bitmapFont)
       this.text_name.x = 5
 
@@ -658,7 +658,7 @@ export class Star extends EventEmitter {
 
     if (shipsText) {
       if (!this.text_ships_small) {
-        let bitmapFont = {fontName: "chakrapetch", fontSize: Star.shipsSmallSize}
+        let bitmapFont = {fontFamily: "chakrapetch", fontSize: Star.shipsSmallSize}
         this.text_ships_small = new BitmapText(this.data.name, bitmapFont)
         this.container.addChild(this.text_ships_small)
         this.text_ships_small.x = 5
@@ -666,7 +666,7 @@ export class Star extends EventEmitter {
       }
 
       if (!this.text_ships_big) {
-        let bitmapFont = {fontName: "chakrapetch", fontSize: Star.shipsBigSize}
+        let bitmapFont = {fontFamily: "chakrapetch", fontSize: Star.shipsBigSize}
         this.text_ships_big = new BitmapText(this.data.name, bitmapFont)
         this.container.addChild(this.text_ships_big)
         this.text_ships_big.x = 5
@@ -691,7 +691,7 @@ export class Star extends EventEmitter {
       if (this.data.ownedByPlayerId && this.data.infrastructure) {
         let displayInfrastructure = `${this.data.infrastructure.economy} ${this.data.infrastructure.industry} ${this.data.infrastructure.science}`
 
-        let bitmapFont = {fontName: "chakrapetch", fontSize: 4}
+        let bitmapFont = {fontFamily: "chakrapetch", fontSize: 4}
         this.text_infrastructure = new BitmapText(displayInfrastructure, bitmapFont);
         this.text_infrastructure.x = -(this.text_infrastructure.width / 2.0)
         this.text_infrastructure.y = -15
@@ -715,7 +715,7 @@ export class Star extends EventEmitter {
     if (!this.text_infrastructureBulkIgnored) {
       let displayInfrastructure = `${this.data.ignoreBulkUpgrade.economy ? ' ' : 'E'} ${this.data.ignoreBulkUpgrade.industry ? ' ' : 'I'} ${this.data.ignoreBulkUpgrade.science ? ' ' : 'S'}`
 
-      let bitmapFont = {fontName: "chakrapetch", fontSize: 8}
+      let bitmapFont = {fontFamily: "chakrapetch", fontSize: 8}
       this.text_infrastructureBulkIgnored = new BitmapText(displayInfrastructure, bitmapFont);
       this.text_infrastructureBulkIgnored.x = -(this.text_infrastructureBulkIgnored.width / 2.0)
       this.text_infrastructureBulkIgnored.y = 12

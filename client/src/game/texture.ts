@@ -133,7 +133,7 @@ class TextureService {
 
     this.CARRIER_TEXTURE = Texture.from(TEXTURE_URLS.CARRIER)
     this.DEFAULT_FONT_STYLE = new TextStyle({
-      fontFamily: `Chakra Petch;`,
+      fontFamily: `Chakra Petch,sans-serif;`,
       fill: 0xFFFFFF,
       padding: 3
     })
