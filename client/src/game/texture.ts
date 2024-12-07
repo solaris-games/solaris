@@ -133,10 +133,15 @@ class TextureService {
 
     this.CARRIER_TEXTURE = Texture.from(TEXTURE_URLS.CARRIER)
     this.DEFAULT_FONT_STYLE = new TextStyle({
-      fontFamily: `Chakra Petch,sans-serif;`,
+      fontFamily: `Chakra Petch;`,
       fill: 0xFFFFFF,
       padding: 3
     })
+
+    BitmapFont.install({
+      name: 'chakrapetch',
+      style: this.DEFAULT_FONT_STYLE
+    });
 
     this.DEFAULT_FONT_STYLE_BOLD = new TextStyle({
       fontFamily: `Chakra Petch,sans-serif;`,

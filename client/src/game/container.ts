@@ -130,6 +130,7 @@ export class GameContainer {
     }
 
     await textureService.loadAssets();
+    textureService.initialize()
 
     // create viewport
     this.viewport = new Viewport({
@@ -214,7 +215,6 @@ export class GameContainer {
 
   setup (game: Game, userSettings: UserGameSettings, context: DrawingContext) {
     this.userSettings = userSettings
-    textureService.initialize()
 
     this.map!.setup(this.game, userSettings)
   }

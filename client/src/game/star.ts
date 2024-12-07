@@ -1,14 +1,15 @@
-import * as PIXI from 'pixi.js'
+import {Application, BitmapText, Circle, Container, Graphics, Sprite, TextStyle} from 'pixi.js';
 import TextureService from './texture'
 import gameHelper from '../services/gameHelper.js'
 import seededRandom from 'random-seed'
 import Helpers from './helpers'
 import {EventEmitter} from "./eventEmitter.js";
 
+const NAME_SIZE = 4
+
 export class Star extends EventEmitter {
 
   static culling_margin = 16
-  static nameSize = 4
   static shipsSmallSize = 6
   static shipsBigSize = 10
   static maxLod = 4
@@ -27,20 +28,20 @@ export class Star extends EventEmitter {
     shipCount: 120
   }
 
-  app: PIXI.Application;
-  fixedContainer: PIXI.Container;
-  container: PIXI.Container;
-  graphics_shape_part: PIXI.Sprite;
-  graphics_shape_full: PIXI.Sprite;
-  graphics_shape_part_warp: PIXI.Graphics;
-  graphics_shape_full_warp: PIXI.Graphics;
-  graphics_hyperspaceRange: PIXI.Graphics;
-  graphics_natural_resources_ring: PIXI.Graphics[];
-  graphics_scanningRange: PIXI.Graphics;
-  graphics_star: PIXI.Sprite;
-  graphics_targeted: PIXI.Graphics;
-  graphics_selected: PIXI.Graphics;
-  graphics_kingOfTheHill: PIXI.Graphics;
+  app: Application;
+  fixedContainer: Container;
+  container: Container;
+  graphics_shape_part: Sprite;
+  graphics_shape_full: Sprite;
+  graphics_shape_part_warp: Graphics;
+  graphics_shape_full_warp: Graphics;
+  graphics_hyperspaceRange: Graphics;
+  graphics_natural_resources_ring: Graphics[];
+  graphics_scanningRange: Graphics;
+  graphics_star: Sprite;
+  graphics_targeted: Graphics;
+  graphics_selected: Graphics;
+  graphics_kingOfTheHill: Graphics;
   planets: any;
   handleOrbitPlanetsStep: any;
   isSelected: boolean;
@@ -59,42 +60,42 @@ export class Star extends EventEmitter {
   baseScale: number = 0;
   minScale: number = 0;
   maxScale: number = 0;
-  pulsarGraphics: PIXI.Graphics | null = null;
-  nebulaSprite: PIXI.Sprite | null = null;
-  wormHoleSprite: PIXI.Sprite | null = null;
-  asteroidFieldSprite: PIXI.Sprite | null = null;
-  specialistSprite: PIXI.Sprite | null = null;
-  container_planets: PIXI.Container | null = null;
-  text_name: PIXI.BitmapText | null = null;
-  text_ships_small: PIXI.BitmapText | null = null;
-  text_ships_big: PIXI.BitmapText | null = null;
-  text_infrastructure: PIXI.BitmapText | null = null;
-  text_infrastructureBulkIgnored: PIXI.BitmapText | null = null;
+  pulsarGraphics: Graphics | null = null;
+  nebulaSprite: Sprite | null = null;
+  wormHoleSprite: Sprite | null = null;
+  asteroidFieldSprite: Sprite | null = null;
+  specialistSprite: Sprite | null = null;
+  container_planets: Container | null = null;
+  text_name: BitmapText | null = null;
+  text_ships_small: BitmapText | null = null;
+  text_ships_big: BitmapText | null = null;
+  text_infrastructure: BitmapText | null = null;
+  text_infrastructureBulkIgnored: BitmapText | null = null;
 
   constructor (app) {
     super()
 
     this.app = app
-    this.fixedContainer = new PIXI.Container() // this container isnt affected by culling or user setting scalling
+    this.fixedContainer = new Container() // this container isnt affected by culling or user setting scalling
     this.fixedContainer.interactiveChildren = false
     this.fixedContainer.eventMode = 'none'
-    this.container = new PIXI.Container()
+    this.container = new Container()
     this.container.interactiveChildren = false
     this.container.cursor = 'pointer'
     this.container.eventMode = 'static';
     this.container.interactiveChildren = false;
 
-    this.graphics_star = new PIXI.Sprite();
-    this.graphics_shape_part = new PIXI.Sprite()
-    this.graphics_shape_full = new PIXI.Sprite()
-    this.graphics_shape_part_warp = new PIXI.Graphics()
-    this.graphics_shape_full_warp = new PIXI.Graphics()
-    this.graphics_hyperspaceRange = new PIXI.Graphics()
+    this.graphics_star = new Sprite();
+    this.graphics_shape_part = new Sprite()
+    this.graphics_shape_full = new Sprite()
+    this.graphics_shape_part_warp = new Graphics()
+    this.graphics_shape_full_warp = new Graphics()
+    this.graphics_hyperspaceRange = new Graphics()
     this.graphics_natural_resources_ring = new Array(Star.maxLod)
-    this.graphics_scanningRange = new PIXI.Graphics()
-    this.graphics_targeted = new PIXI.Graphics()
-    this.graphics_selected = new PIXI.Graphics()
-    this.graphics_kingOfTheHill = new PIXI.Graphics()
+    this.graphics_scanningRange = new Graphics()
+    this.graphics_targeted = new Graphics()
+    this.graphics_selected = new Graphics()
+    this.graphics_kingOfTheHill = new Graphics()
 
     this.container.addChild(this.graphics_star)
     this.container.addChild(this.graphics_shape_part)
@@ -141,9 +142,7 @@ export class Star extends EventEmitter {
   }
 
   _getStarCarriers () {
-    let carriersAtStar = this.carriers.filter(x => x.orbiting === this.data._id)
-
-    return carriersAtStar
+    return this.carriers.filter(x => x.orbiting === this.data._id)
   }
 
   _getStarCarrierShips () {
@@ -161,7 +160,7 @@ export class Star extends EventEmitter {
     this.container.position.y = this.data.location.y
     this.fixedContainer.position.x = this.data.location.x
     this.fixedContainer.position.y = this.data.location.y
-    this.container.hitArea = new PIXI.Circle(0, 0, 15)
+    this.container.hitArea = new Circle(0, 0, 15)
 
     this.userSettings = userSettings
 
@@ -209,26 +208,26 @@ export class Star extends EventEmitter {
       // ---- Binary stars ----
       if (this.isBinaryStar()) {
         if (this.hasBlackHole()) {
-          this.graphics_star = new PIXI.Sprite(TextureService.STAR_SYMBOLS['black_hole_binary'])
+          this.graphics_star = new Sprite(TextureService.STAR_SYMBOLS['black_hole_binary'])
         } else if (this._isDeadStar()) {
-          this.graphics_star = new PIXI.Sprite(TextureService.STAR_SYMBOLS['binary_unscannable'])
+          this.graphics_star = new Sprite(TextureService.STAR_SYMBOLS['binary_unscannable'])
         } else {
-          this.graphics_star = new PIXI.Sprite(TextureService.STAR_SYMBOLS['binary_scannable'])
+          this.graphics_star = new Sprite(TextureService.STAR_SYMBOLS['binary_scannable'])
         }
       }
       // ---- Non binary stars ----
       else if (this.hasBlackHole()) {
-        this.graphics_star = new PIXI.Sprite(TextureService.STAR_SYMBOLS['black_hole'])
+        this.graphics_star = new Sprite(TextureService.STAR_SYMBOLS['black_hole'])
       } else if (this._isDeadStar()) {
-        this.graphics_star = new PIXI.Sprite(TextureService.STAR_SYMBOLS['unscannable'])
+        this.graphics_star = new Sprite(TextureService.STAR_SYMBOLS['unscannable'])
       } else if (this.data.homeStar) {
-        this.graphics_star = new PIXI.Sprite(TextureService.STAR_SYMBOLS['home'])
+        this.graphics_star = new Sprite(TextureService.STAR_SYMBOLS['home'])
       }  else {
-        this.graphics_star = new PIXI.Sprite(TextureService.STAR_SYMBOLS['scannable'])
+        this.graphics_star = new Sprite(TextureService.STAR_SYMBOLS['scannable'])
       }
     }
     else {
-      this.graphics_star = new PIXI.Sprite(TextureService.STAR_SYMBOLS['unscannable'])
+      this.graphics_star = new Sprite(TextureService.STAR_SYMBOLS['unscannable'])
       this.graphics_star.tint = 0xa0a0a0
     }
 
@@ -259,7 +258,7 @@ export class Star extends EventEmitter {
     let player = this._getStarPlayer()
     let playerColour = player ? this.context.getPlayerColour(player._id) : 0xFFFFFF
 
-    this.pulsarGraphics = new PIXI.Graphics()
+    this.pulsarGraphics = new Graphics()
     this.pulsarGraphics.zIndex = -1
     this.pulsarGraphics.lineStyle(1, playerColour, 0.5)
     this.pulsarGraphics.moveTo(0, -20)
@@ -284,7 +283,7 @@ export class Star extends EventEmitter {
     let seed = this.data._id
     Star.seededRNG.seed(seed)
     let nebulaTexture = TextureService.getRandomStarNebulaTexture(seed)
-    this.nebulaSprite = new PIXI.Sprite(nebulaTexture)
+    this.nebulaSprite = new Sprite(nebulaTexture)
 
     let spriteSize = 64
     this.nebulaSprite.width = spriteSize
@@ -295,12 +294,12 @@ export class Star extends EventEmitter {
     let player = this._getStarPlayer()
     let playerColour = player ? this.context.getPlayerColour(player._id): 0xFFFFFF
     this.nebulaSprite.tint = playerColour
-    //this.nebulaSprite.blendMode = PIXI.BLEND_MODES.ADD // for extra punch
+    //this.nebulaSprite.blendMode = BLEND_MODES.ADD // for extra punch
 
-    let blendSprite = new PIXI.Sprite(nebulaTexture)
+    let blendSprite = new Sprite(nebulaTexture)
     blendSprite.anchor.set(0.5)
     blendSprite.rotation = Star.seededRNG.random()*Math.PI*2.0
-    //blendSprite.blendMode = PIXI.BLEND_MODES.ADD
+    //blendSprite.blendMode = BLEND_MODES.ADD
     blendSprite.tint = playerColour
     this.nebulaSprite.addChild(blendSprite)
 
@@ -318,7 +317,7 @@ export class Star extends EventEmitter {
     }
 
     let texture = TextureService.getRandomWormholeTexture()
-    this.wormHoleSprite = new PIXI.Sprite(texture)
+    this.wormHoleSprite = new Sprite(texture)
 
     let spriteSize = 40
     this.wormHoleSprite.width = spriteSize
@@ -330,7 +329,7 @@ export class Star extends EventEmitter {
     let player = this._getStarPlayer()
     let playerColour = player ? this.context.getPlayerColour(player._id) : 0xFFFFFF
     this.wormHoleSprite.tint = playerColour
-    //this.asteroidFieldSprite.blendMode = PIXI.BLEND_MODES.ADD // for extra punch
+    //this.asteroidFieldSprite.blendMode = BLEND_MODES.ADD // for extra punch
 
     this.fixedContainer.addChild(this.wormHoleSprite)
   }
@@ -346,7 +345,7 @@ export class Star extends EventEmitter {
     let seed = this.data._id
     Star.seededRNG.seed(seed)
     let texture = TextureService.getRandomStarAsteroidFieldTexture(seed)
-    this.asteroidFieldSprite = new PIXI.Sprite(texture)
+    this.asteroidFieldSprite = new Sprite(texture)
 
     let spriteSize = 64
     this.asteroidFieldSprite.width = spriteSize
@@ -357,7 +356,7 @@ export class Star extends EventEmitter {
     let player = this._getStarPlayer()
     let playerColour = player ? this.context.getPlayerColour(player._id) : 0xFFFFFF
     this.asteroidFieldSprite.tint = playerColour
-    //this.asteroidFieldSprite.blendMode = PIXI.BLEND_MODES.ADD // for extra punch
+    //this.asteroidFieldSprite.blendMode = BLEND_MODES.ADD // for extra punch
 
     this.fixedContainer.addChild(this.asteroidFieldSprite)
   }
@@ -374,7 +373,7 @@ export class Star extends EventEmitter {
 
     //FIXME potential resource leak, should not create a new sprite every time
     let specialistTexture = TextureService.getSpecialistTexture(this.data.specialist.key)
-    this.specialistSprite = new PIXI.Sprite(specialistTexture)
+    this.specialistSprite = new Sprite(specialistTexture)
 
     this.specialistSprite.width = 10
     this.specialistSprite.height = 10
@@ -425,7 +424,7 @@ export class Star extends EventEmitter {
     }
 
     if (!this.container_planets) {
-      this.container_planets = new PIXI.Container()
+      this.container_planets = new Container()
 
       // The more resources a star has the more planets it has.
       let planetCount = this._getPlanetsCount()
@@ -443,18 +442,18 @@ export class Star extends EventEmitter {
       this.planets = []
 
       for (let i = 0; i < planetCount; i++) {
-        let planetContainer = new PIXI.Container()
+        let planetContainer = new Container()
 
         let distanceToStar = 15 + (5 * i)
         let planetSize = Math.floor(Math.abs(this.data.location.y) + distanceToStar) % 1.5 + 0.5
 
-        let orbitGraphics = new PIXI.Graphics()
+        let orbitGraphics = new Graphics()
         orbitGraphics.lineStyle(0.3, 0xFFFFFF)
         orbitGraphics.alpha = this.userSettings.map.naturalResourcesRingOpacity;
         orbitGraphics.drawCircle(0, 0, distanceToStar -(planetSize / 2))
         this.container_planets.addChild(orbitGraphics)
 
-        let planetGraphics = new PIXI.Graphics()
+        let planetGraphics = new Graphics()
         planetGraphics.beginFill(playerColour)
         planetGraphics.drawCircle(planetSize / 2, 0, planetSize)
         planetGraphics.endFill()
@@ -505,7 +504,7 @@ export class Star extends EventEmitter {
     }
     for(let lod = 0; lod<Star.maxLod; lod+=1) {
       if(!this.graphics_natural_resources_ring[lod]) {
-        this.graphics_natural_resources_ring[lod] = new PIXI.Graphics()
+        this.graphics_natural_resources_ring[lod] = new Graphics()
         this.graphics_natural_resources_ring[lod].alpha = 0.5
         this.graphics_natural_resources_ring[lod].zIndex = -1
       }
@@ -567,8 +566,8 @@ export class Star extends EventEmitter {
       return
     }
     if (Object.keys(TextureService.PLAYER_SYMBOLS).includes(player.shape)) {
-      this.graphics_shape_part = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS[player.shape][2+this.data.warpGate])
-      this.graphics_shape_full = new PIXI.Sprite(TextureService.PLAYER_SYMBOLS[player.shape][0+this.data.warpGate])
+      this.graphics_shape_part = new Sprite(TextureService.PLAYER_SYMBOLS[player.shape][2+this.data.warpGate])
+      this.graphics_shape_full = new Sprite(TextureService.PLAYER_SYMBOLS[player.shape][0+this.data.warpGate])
     }
 
     const playerColour = this.context.getPlayerColour(player._id)
@@ -595,8 +594,8 @@ export class Star extends EventEmitter {
 
   drawName () {
     if (!this.text_name) {
-      let bitmapFont = {fontName: "chakrapetch", fontSize: Star.nameSize}
-      this.text_name = new PIXI.BitmapText(this.data.name, bitmapFont)
+      const bitmapFont = {fontName: "chakrapetch", fontSize: NAME_SIZE}
+      this.text_name = new BitmapText(this.data.name, bitmapFont)
       this.text_name.x = 5
 
       this.container.addChild(this.text_name)
@@ -606,7 +605,7 @@ export class Star extends EventEmitter {
     let carriersOrbiting = this._getStarCarriers()
 
     if ((this.data.ownedByPlayerId || carriersOrbiting) && (totalKnownShips > 0 || carriersOrbiting.length > 0 || this._hasUnknownShips())) {
-      this.text_name.y = ( (Star.nameSize+Star.shipsSmallSize)/2.0 )-Star.nameSize
+      this.text_name.y = ( (NAME_SIZE+Star.shipsSmallSize)/2.0 )-NAME_SIZE
     } else {
       this.text_name.y = -(this.text_name.height / 2)
     }
@@ -660,15 +659,15 @@ export class Star extends EventEmitter {
     if (shipsText) {
       if (!this.text_ships_small) {
         let bitmapFont = {fontName: "chakrapetch", fontSize: Star.shipsSmallSize}
-        this.text_ships_small = new PIXI.BitmapText(this.data.name, bitmapFont)
+        this.text_ships_small = new BitmapText(this.data.name, bitmapFont)
         this.container.addChild(this.text_ships_small)
         this.text_ships_small.x = 5
-        this.text_ships_small.y = (-this.text_ships_small.height) +( ( (Star.nameSize+Star.shipsSmallSize)/2.0 )-Star.nameSize )
+        this.text_ships_small.y = (-this.text_ships_small.height) +( ( (NAME_SIZE + Star.shipsSmallSize) / 2.0) - NAME_SIZE)
       }
 
       if (!this.text_ships_big) {
         let bitmapFont = {fontName: "chakrapetch", fontSize: Star.shipsBigSize}
-        this.text_ships_big = new PIXI.BitmapText(this.data.name, bitmapFont)
+        this.text_ships_big = new BitmapText(this.data.name, bitmapFont)
         this.container.addChild(this.text_ships_big)
         this.text_ships_big.x = 5
         this.text_ships_big.y = -this.text_ships_big.height/2.0
@@ -693,7 +692,7 @@ export class Star extends EventEmitter {
         let displayInfrastructure = `${this.data.infrastructure.economy} ${this.data.infrastructure.industry} ${this.data.infrastructure.science}`
 
         let bitmapFont = {fontName: "chakrapetch", fontSize: 4}
-        this.text_infrastructure = new PIXI.BitmapText(displayInfrastructure, bitmapFont);
+        this.text_infrastructure = new BitmapText(displayInfrastructure, bitmapFont);
         this.text_infrastructure.x = -(this.text_infrastructure.width / 2.0)
         this.text_infrastructure.y = -15
         this.text_infrastructure.alpha = 0.75;
@@ -717,7 +716,7 @@ export class Star extends EventEmitter {
       let displayInfrastructure = `${this.data.ignoreBulkUpgrade.economy ? ' ' : 'E'} ${this.data.ignoreBulkUpgrade.industry ? ' ' : 'I'} ${this.data.ignoreBulkUpgrade.science ? ' ' : 'S'}`
 
       let bitmapFont = {fontName: "chakrapetch", fontSize: 8}
-      this.text_infrastructureBulkIgnored = new PIXI.BitmapText(displayInfrastructure, bitmapFont);
+      this.text_infrastructureBulkIgnored = new BitmapText(displayInfrastructure, bitmapFont);
       this.text_infrastructureBulkIgnored.x = -(this.text_infrastructureBulkIgnored.width / 2.0)
       this.text_infrastructureBulkIgnored.y = 12
       this.text_infrastructureBulkIgnored.visible = this.showIgnoreBulkUpgradeInfrastructure
