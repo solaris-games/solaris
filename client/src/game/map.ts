@@ -753,6 +753,8 @@ export class Map extends EventEmitter {
       yradius: viewportYRadius
     }
 
+    this.background!.onTick(deltaTime, viewportData)
+
     //chunk culling
 
     let firstX = Math.floor(this.gameContainer.viewport!.left/CHUNK_SIZE)
@@ -800,7 +802,6 @@ export class Map extends EventEmitter {
     }
 
     this.pathManager!.onTick(this.zoomPercent, this.gameContainer.viewport, zoomChanging)
-    this.background!.onTick(deltaTime, viewportData)
     this.playerNames!.onTick(this.zoomPercent, zoomChanging)
 
     this.lastZoomPercent = this.zoomPercent

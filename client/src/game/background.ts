@@ -15,7 +15,7 @@ interface BackgroundSprite extends Sprite {
   baseScaleTime: number;
 }
 
-class Background {
+export class Background {
 
   static MAX_PARALLAX = 0.333
   static STAR_DENSITY = 10 // maybe make this into a user setting?

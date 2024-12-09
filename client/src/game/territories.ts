@@ -33,7 +33,7 @@ type Position = {
 
 type VertexSpec = [VertexAction, Position[], Position[]];
 
-class Territories {
+export class Territories {
 
   static zoomLevel = 100
   static maxVoronoiDistance = 200
