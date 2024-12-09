@@ -289,9 +289,9 @@ export class GameContainer {
     return (this.viewport!.screenWidth / viewportWidth) * 100
   }
 
-  onTick (deltaTime) {
+  onTick (ticker) {
     if (this.map) {
-      this.map.onTick(deltaTime)
+      this.map.onTick(ticker.deltaTime)
     }
   }
 
