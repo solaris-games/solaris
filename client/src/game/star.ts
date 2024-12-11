@@ -83,7 +83,6 @@ export class Star extends EventEmitter {
     this.container.interactiveChildren = false
     this.container.cursor = 'pointer'
     this.container.eventMode = 'static';
-    this.container.interactiveChildren = false;
 
     this.graphics_star = new Sprite();
     this.graphics_shape_part = new Sprite()

@@ -106,7 +106,7 @@ export class Map extends EventEmitter {
 
   _setupContainers () {
     this.chunksContainer = new PIXI.Container()
-    this.chunksContainer.zIndex = 4;
+    this.chunksContainer.zIndex = 7;
     this.backgroundContainer = new PIXI.Container()
     this.backgroundContainer.zIndex = 0;
     this.territoryContainer = new PIXI.Container()
@@ -118,17 +118,18 @@ export class Map extends EventEmitter {
     this.wormHoleContainer = new PIXI.Container()
     this.wormHoleContainer.zIndex = 5;
     this.starContainer = new PIXI.Container()
-    this.starContainer.zIndex = 4;
+    this.starContainer.zIndex = 3;
     this.carrierContainer = new PIXI.Container()
     this.carrierContainer.zIndex = 5;
     this.waypointContainer = new PIXI.Container()
-    this.waypointContainer.zIndex = 6;
+    this.waypointContainer.zIndex = 7;
     this.rulerPointContainer = new PIXI.Container()
-    this.rulerPointContainer.zIndex = 6;
+    this.rulerPointContainer.zIndex = 7;
     this.highlightLocationsContainer = new PIXI.Container()
     this.highlightLocationsContainer.zIndex = 6;
     this.tooltipContainer = new PIXI.Container()
     this.tooltipContainer.zIndex = 8;
+    this.pathManager!.container.zIndex = 7;
 
     this.container.addChild(this.backgroundContainer)
     this.container.addChild(this.territoryContainer)
