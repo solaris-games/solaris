@@ -521,14 +521,19 @@ export class Star extends EventEmitter {
       let ringRadius = averageNaturalResources <= 50 ? averageNaturalResources : averageNaturalResources > 400 ? 100 : (12.5 * Math.log2(averageNaturalResources / 50) + 50)
 
       ringRadius /= 8.0
-      let lineWidht = 1.0/8.0
+      let lineWidth = 1.0/8.0
       ringRadius *= lod+1
-      lineWidht *= lod+1
+      lineWidth *= lod+1
       this.graphics_natural_resources_ring[lod].clear()
-      this.graphics_natural_resources_ring[lod].lineStyle(lineWidht, 0xFFFFFF, this.userSettings.map.naturalResourcesRingOpacity)
-      this.graphics_natural_resources_ring[lod].drawCircle(0, 0, ringRadius * 0.75)
+      this.graphics_natural_resources_ring[lod].setStrokeStyle({
+        width: lineWidth,
+        color: 0xFFFFFF,
+        alpha: this.userSettings.map.naturalResourcesRingOpacity
+      })
+      this.graphics_natural_resources_ring[lod].circle(0, 0, ringRadius * 0.75)
       this.graphics_natural_resources_ring[lod].scale.x = 1.0/( (1.0/8.0)*(lod+1) )
       this.graphics_natural_resources_ring[lod].scale.y = 1.0/( (1.0/8.0)*(lod+1) )
+      this.graphics_natural_resources_ring[lod].zIndex = 9
       this.container.addChild(this.graphics_natural_resources_ring[lod])
     }
   }
