@@ -27,6 +27,11 @@ enum Mode {
   Ruler = 'ruler',
 }
 
+interface Chunk extends PIXI.Container {
+  mapObjects: any[],
+  visualizer?: PIXI.Graphics,
+}
+
 export class Map extends EventEmitter {
   // Represents the current game mode, these are as follows:
   // galaxy - Normal galaxy view
@@ -77,7 +82,7 @@ export class Map extends EventEmitter {
   currentViewportCenter: PIXI.Point | undefined;
   numof_chunkX: number = 0;
   numof_chunkY: number = 0;
-  chunks: any[] = [];
+  chunks: Chunk[][] = [];
   lastPointerDownPosition: PIXI.Point | undefined;
 
   constructor (app, store: Store<State>, gameContainer, context: DrawingContext) {
@@ -381,7 +386,8 @@ export class Map extends EventEmitter {
 
     for(let ix=0; ix<this.numof_chunkX; ix++) {
       for(let iy=0; iy<this.numof_chunkY; iy++) {
-        this.chunks[ix][iy] = new PIXI.Container()
+        this.chunks[ix][iy] = new PIXI.Container() as Chunk;
+        this.chunks[ix][iy].sortableChildren = true;
         this.chunksContainer!.addChild(this.chunks[ix][iy])
         this.chunks[ix][iy].mapObjects = Array()
         if(false)
@@ -401,11 +407,11 @@ export class Map extends EventEmitter {
       }
     }
 
-    this.stars.forEach( s => this.addContainerToChunk(s, this.chunks, this.firstChunkX, this.firstChunkY) )
+    this.stars.forEach( s => this.addContainerToChunk(s, this.chunks, this.firstChunkX, this.firstChunkY ) )
     this.carriers.forEach( c => this.addContainerToChunk(c, this.chunks, this.firstChunkX, this.firstChunkY) )
   }
 
-  addContainerToChunk (mapObject, chunks, firstX, firstY) { // Star or carrier
+  addContainerToChunk (mapObject, chunks: Chunk[][], firstX: number, firstY: number) { // Star or carrier
     let chunkX = Math.floor(mapObject.data.location.x/CHUNK_SIZE)
     let chunkY = Math.floor(mapObject.data.location.y/CHUNK_SIZE)
     let ix = chunkX-firstX

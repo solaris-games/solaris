@@ -80,6 +80,7 @@ export class Star extends EventEmitter {
     this.fixedContainer.interactiveChildren = false
     this.fixedContainer.eventMode = 'none'
     this.container = new Container()
+    this.container.zIndex = 0
     this.container.interactiveChildren = false
     this.container.cursor = 'pointer'
     this.container.eventMode = 'static';

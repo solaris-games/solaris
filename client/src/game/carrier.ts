@@ -41,6 +41,7 @@ export class Carrier extends EventEmitter {
 
     this.fixedContainer = new Container() // this container isnt affected by culling or user setting scalling
     this.container = new Container()
+    this.container.zIndex = 1
     this.container.eventMode = 'static'
     this.container.interactiveChildren = false
     this.container.cursor = 'pointer'
