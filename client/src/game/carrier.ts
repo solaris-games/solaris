@@ -279,9 +279,12 @@ export class Carrier extends EventEmitter {
     this.graphics_selected.clear()
 
     if (this.isSelected) {
-      this.graphics_selected.lineStyle(0.5, 0xFFFFFF)
-      this.graphics_selected.alpha = 0.3
-      this.graphics_selected.drawCircle(0, 0, 15)
+      this.graphics_selected.circle(0, 0, 15)
+      this.graphics_selected.stroke({
+        width: 0.5,
+        color: 0xFFFFFF,
+        alpha: 0.3
+      })
     }
   }
 

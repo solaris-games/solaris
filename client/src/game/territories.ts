@@ -209,7 +209,6 @@ export class Territories {
       let territoryLines = new Graphics()
       this.container.addChild(territoryPolygons)
       this.container.addChild(territoryLines)
-      territoryLines.lineStyle(LINE_WIDTH, color, 1)
       territoryPolygons.alpha = 0.333
 
       let combining = false
@@ -237,18 +236,23 @@ export class Territories {
                 //finish combining
                 territoryPolygons.lineTo(VERTEX_TABLE[15][POLYGON_INDEX][1].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[15][POLYGON_INDEX][1].y * CELL_SIZE + cellOrigin.y)
                 territoryPolygons.lineTo(VERTEX_TABLE[15][POLYGON_INDEX][0].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[15][POLYGON_INDEX][0].y * CELL_SIZE + cellOrigin.y)
-                territoryPolygons.endFill()
+                territoryPolygons.fill({
+                  color,
+                  alpha: 0.3
+                  })
                 combining = false
               }
               territoryPolygons.moveTo(VERTEX_TABLE[lookUpIndex][POLYGON_INDEX][0].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[lookUpIndex][POLYGON_INDEX][0].y * CELL_SIZE + cellOrigin.y)
-              territoryPolygons.beginFill(color, 1)
               let first = true
               let vertices = VERTEX_TABLE[lookUpIndex][POLYGON_INDEX]
               for (let vertex of vertices) {
                 if (first) { first = false; continue }
                 territoryPolygons.lineTo(vertex.x * CELL_SIZE + cellOrigin.x, vertex.y * CELL_SIZE + cellOrigin.y)
               }
-              territoryPolygons.endFill()
+              territoryPolygons.fill({
+                color,
+                alpha: 1
+              });
 
             }
 
@@ -256,14 +260,23 @@ export class Territories {
               if (!combining) {
                 //start combining
                 territoryPolygons.moveTo(VERTEX_TABLE[15][POLYGON_INDEX][0].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[15][POLYGON_INDEX][0].y * CELL_SIZE + cellOrigin.y)
-                territoryPolygons.beginFill(color, 1)
                 territoryPolygons.lineTo(VERTEX_TABLE[15][POLYGON_INDEX][1].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[15][POLYGON_INDEX][1].y * CELL_SIZE + cellOrigin.y)
+                territoryPolygons.fill({
+                  color,
+                  alpha: 1
+                });
                 combining = true
               }
             }
           }
         }
       }
+
+      territoryLines.stroke({
+        width: LINE_WIDTH,
+        color,
+        alpha: 1
+      })
     }
   }
 
@@ -362,8 +375,6 @@ export class Territories {
       if (sanitizedPoints.length) {
         // Draw the graphic
         let territoryGraphic = new Graphics()
-        territoryGraphic.lineStyle(borderWidth, colour, 1)
-        territoryGraphic.beginFill(colour, 0.3)
         territoryGraphic.moveTo(sanitizedPoints[0].x, sanitizedPoints[0].y)
 
         for (let point of sanitizedPoints) {
@@ -373,7 +384,10 @@ export class Territories {
         // Draw another line back to the origin.
         territoryGraphic.lineTo(sanitizedPoints[0].x, sanitizedPoints[0].y)
 
-        territoryGraphic.endFill()
+        territoryGraphic.fill({
+          color: colour,
+          alpha: 0.3,
+        });
 
         this.container.addChild(territoryGraphic)
       }
@@ -402,9 +416,12 @@ export class Territories {
         colour = this.context!.getPlayerColour(border.lSite.playerID);
       }
 
-      borderGraphics.lineStyle(borderWidth, colour)
       borderGraphics.moveTo(rightVA.x, rightVA.y)
       borderGraphics.lineTo(rightVB.x, rightVB.y)
+      borderGraphics.stroke({
+        width: borderWidth,
+        color: colour,
+      });
 
       colour = 0x000000
 
@@ -412,9 +429,12 @@ export class Territories {
         colour = this.context!.getPlayerColour(border.rSite.playerID)
       }
 
-      borderGraphics.lineStyle(borderWidth, colour)
       borderGraphics.moveTo(leftVA.x, leftVA.y)
       borderGraphics.lineTo(leftVB.x, leftVB.y)
+      borderGraphics.stroke({
+        width: borderWidth,
+        color: colour,
+      });
     }
 
     this.container.addChild(borderGraphics)
