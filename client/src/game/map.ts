@@ -122,7 +122,8 @@ export class Map extends EventEmitter {
     this.carrierContainer = new PIXI.Container()
     this.carrierContainer.zIndex = 5;
     this.waypointContainer = new PIXI.Container()
-    this.waypointContainer.zIndex = 7;
+    this.waypointContainer.zIndex = 8;
+    this.waypointContainer.eventMode = 'none';
     this.rulerPointContainer = new PIXI.Container()
     this.rulerPointContainer.zIndex = 7;
     this.highlightLocationsContainer = new PIXI.Container()
@@ -136,7 +137,6 @@ export class Map extends EventEmitter {
     this.container.addChild(this.wormHoleContainer)
     this.container.addChild(this.pathManager!.container)
     this.container.addChild(this.rulerPointContainer)
-    this.container.addChild(this.waypointContainer)
     this.container.addChild(this.chunksContainer)
     this.container.addChild(this.orbitalContainer)
     this.container.addChild(this.starContainer)
@@ -144,6 +144,8 @@ export class Map extends EventEmitter {
     this.container.addChild(this.highlightLocationsContainer)
     this.container.addChild(this.playerNamesContainer)
     this.container.addChild(this.tooltipContainer)
+    this.container.addChild(this.waypointContainer)
+    this.container.sortChildren();
   }
 
   setup (game: Game, userSettings: UserGameSettings) {

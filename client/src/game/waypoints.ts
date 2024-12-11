@@ -92,7 +92,6 @@ class Waypoints extends EventEmitter {
     let star
 
     graphics.moveTo(this.carrier!.location.x, this.carrier!.location.y)
-    graphics.lineStyle(1, 0xFFFFFF, 0.8)
 
     // Draw a line to each destination along the waypoints.
     for (let i = 0; i < this.carrier!.waypoints.length; i++) {
@@ -101,6 +100,12 @@ class Waypoints extends EventEmitter {
 
       graphics.lineTo(star.location.x, star.location.y)
     }
+
+    graphics.stroke({
+      width: 1,
+      color: 0xFFFFFF,
+      alpha: 0.8
+    });
 
     this.container.addChild(graphics)
   }
