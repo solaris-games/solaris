@@ -29,15 +29,18 @@ class WormHoleLayer {
         continue
       }
 
-      let graphics = new PIXI.Graphics()
+      const graphics = new PIXI.Graphics()
 
-      let alpha = 0.1
-      let lineWidth = 5
-
-      graphics.lineStyle(lineWidth, 0xFFFFFF, alpha)
+      const alpha = 0.1
+      const lineWidth = 5
 
       graphics.moveTo(star.location.x, star.location.y)
       graphics.lineTo(starPair.location.x, starPair.location.y)
+      graphics.stroke({
+        width: lineWidth,
+        color: 0xFFFFFF,
+        alpha,
+      })
 
       this.container.addChild(graphics)
     }

@@ -86,7 +86,7 @@ class Waypoints extends EventEmitter {
     // Start with the first waypoint's source location and then
     // go through each waypoint draw a line to their destinations.
 
-    let graphics = new PIXI.Graphics()
+    const graphics = new PIXI.Graphics()
 
     // Start the line from where the carrier currently is.
     let star
@@ -120,10 +120,18 @@ class Waypoints extends EventEmitter {
 
     const playerColour = this.context!.getPlayerColour(player!._id)
 
-    graphics.lineStyle(1, playerColour, 0.2)
-    graphics.beginFill(playerColour, 0.15)
-    graphics.drawStar!(lastLocationStar!.location.x, lastLocationStar!.location.y, radius, radius, radius - 3)
-    graphics.endFill()
+    graphics.star(lastLocationStar!.location.x, lastLocationStar!.location.y, radius, radius, radius - 3)
+
+    graphics.fill({
+      color: playerColour,
+      alpha: 0.15
+    });
+
+    graphics.stroke({
+      width: 1,
+      color: playerColour,
+      alpha: 0.2
+    });
 
     this.container.addChild(graphics)
   }
@@ -132,8 +140,12 @@ class Waypoints extends EventEmitter {
     let graphics = new PIXI.Graphics()
     let radius = 12
 
-    graphics.lineStyle(1, 0xFFFFFF, opacity)
-    graphics.drawStar!(location.x, location.y, radius, radius, radius - 3)
+    graphics.star(location.x, location.y, radius, radius, radius - 3)
+    graphics.stroke({
+      width: 1,
+      color: 0xFFFFFF,
+      alpha: opacity,
+    })
 
     this.container.addChild(graphics)
   }

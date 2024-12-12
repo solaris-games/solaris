@@ -330,12 +330,15 @@ export class Map extends EventEmitter {
         let location : Location = this.game!.constants.distances.galaxyCenterLocation
         let size = 10
 
-        galaxyCenterGraphics.lineStyle(2, 0xFFFFFF, 1)
         galaxyCenterGraphics.moveTo(location.x, location.y - size)
         galaxyCenterGraphics.lineTo(location.x, location.y + size)
         galaxyCenterGraphics.moveTo(location.x - size, location.y)
         galaxyCenterGraphics.lineTo(location.x + size, location.y)
-        galaxyCenterGraphics.alpha = 0.75
+        galaxyCenterGraphics.stroke({
+          width: 2,
+          color: 0xFFFFFF,
+          alpha: 0.75,
+        });
 
         this.starContainer!.addChild(galaxyCenterGraphics)
     }
@@ -390,20 +393,6 @@ export class Map extends EventEmitter {
         this.chunks[ix][iy].sortableChildren = true;
         this.chunksContainer!.addChild(this.chunks[ix][iy])
         this.chunks[ix][iy].mapObjects = Array()
-        if(false)
-        {
-        let chunkVisualizer = new PIXI.Graphics()
-        chunkVisualizer.alpha = 0.5
-        chunkVisualizer.lineStyle(4, 0xFF0000, 1);
-        chunkVisualizer.beginFill(0xDE3249);
-        chunkVisualizer.drawRect(
-          (this.firstChunkX+ix)*CHUNK_SIZE, (this.firstChunkY+iy)*CHUNK_SIZE,
-          CHUNK_SIZE, CHUNK_SIZE
-        );
-        chunkVisualizer.endFill();
-        this.chunks[ix][iy].addChild(chunkVisualizer)
-        this.chunks[ix][iy].visualizer = chunkVisualizer
-        }
       }
     }
 
@@ -1077,8 +1066,12 @@ export class Map extends EventEmitter {
     let graphics = new PIXI.Graphics()
     let radius = 12
 
-    graphics.lineStyle(1, 0xFFFFFF, opacity)
-    graphics!.drawStar!(location.x, location.y, radius, radius, radius - 3)
+    graphics.star(location.x, location.y, radius, radius, radius - 3)
+    graphics.stroke({
+      width: 1,
+      color: 0xFFFFFF,
+      alpha: opacity,
+    });
 
     this.highlightLocationsContainer!.addChild(graphics)
   }

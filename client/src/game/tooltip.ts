@@ -63,11 +63,17 @@ export default class {
       internalContainer.addChild(text)
     }
 
-    let graphics = new PIXI.Graphics()
-    graphics.lineStyle(1, this.context!.getPlayerColour(player._id))
-    graphics.beginFill(0x000000)
-    graphics.drawRoundedRect(0, 0, internalContainer.width + (paddingX * 2), internalContainer.height + (paddingY * 2), 1)
-    graphics.endFill()
+    const graphics = new PIXI.Graphics()
+    graphics.roundRect(0, 0, internalContainer.width + (paddingX * 2), internalContainer.height + (paddingY * 2), 1)
+
+    graphics.fill({
+      color: 0x000000,
+    });
+
+    graphics.stroke({
+      width: 1,
+      color: this.context!.getPlayerColour(player._id),
+    });
 
     this.container.addChild(graphics)
     this.container.addChild(internalContainer)

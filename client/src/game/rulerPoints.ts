@@ -58,9 +58,8 @@ export class RulerPoints extends EventEmitter {
     let graphics = new PIXI.Graphics()
 
     // Start the line from where the first point is.
-    let firstPoint = this.rulerPoints[0]
+    const firstPoint = this.rulerPoints[0]
     graphics.moveTo(firstPoint.location.x, firstPoint.location.y)
-    graphics.lineStyle(1, 0xFFFFFF, 0.8)
 
     // Draw a line to each other point
     for (let i = 1; i < this.rulerPoints.length; i++) {
@@ -68,6 +67,12 @@ export class RulerPoints extends EventEmitter {
 
       graphics.lineTo(point.location.x, point.location.y)
     }
+
+    graphics.strike({
+      width: 1,
+      color: 0xFFFFFF,
+      alpha: 0.8
+    })
 
     this.container.addChild(graphics)
   }
@@ -83,10 +88,19 @@ export class RulerPoints extends EventEmitter {
 
     let radius = ((this.techLevel || 1) + 1.5) * this.lightYearDistance
 
-    graphics.lineStyle(1, 0xFFFFFF, 0.2)
-    graphics.beginFill(0xFFFFFF, 0.075)
-    graphics.drawStar!(lastPoint.location.x, lastPoint.location.y, radius, radius, radius - 3)
-    graphics.endFill()
+    graphics.star(lastPoint.location.x, lastPoint.location.y, radius, radius, radius - 3)
+
+    graphics.fill({
+      color: 0xFFFFFF,
+      alpha: 0.075
+    });
+
+    graphics.stroke({
+      width: 1,
+      color: 0xFFFFFF,
+      alpha: 0.2
+    })
+
     graphics.zIndex = -1
 
     this.container.addChild(graphics)

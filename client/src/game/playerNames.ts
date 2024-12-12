@@ -48,10 +48,11 @@ class PlayerNames {
       text_name.zIndex = 10
 
       let graphics = new PIXI.Graphics()
-      graphics.beginFill(this.context!.getPlayerColour(player._id))
-      graphics.drawRoundedRect(-10, -10, text_name.width + 20, text_name.height + 20, 10)
-      graphics.endFill()
-      graphics.alpha = 0.7
+      graphics.roundRect(-10, -10, text_name.width + 20, text_name.height + 20, 10)
+      graphics.fill({
+        color: this.context!.getPlayerColour(player._id),
+        alpha: 0.7
+      });
 
       textContainer.x = empireCenter.x - (text_name.width / 2)
       textContainer.y = empireCenter.y - (text_name.height / 2)

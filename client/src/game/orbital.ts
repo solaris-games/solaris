@@ -33,18 +33,21 @@ class OrbitalLocationLayer {
         let fillStar = !isDeadStar
         let lineWidth = isDeadStar ? 0.5 : 1
 
-        graphics.lineStyle(lineWidth, 0xFFFFFF, alpha)
-
-        if (fillStar) {
-            graphics.beginFill(0xFFFFFF, alpha)
-        }
-
         // can be assumed to be present, this is a type problem only
-        graphics.drawStar?.(star.locationNext.x, star.locationNext.y, starPoints, radius, radius - 2)
+        graphics.star(star.locationNext.x, star.locationNext.y, starPoints, radius, radius - 2)
 
         if (fillStar) {
-            graphics.endFill()
+            graphics.fill({
+              color: 0xFFFFFF,
+              alpha,
+            })
         }
+
+        graphics.stroke({
+          width: lineWidth,
+          color: 0xFFFFFF,
+          alpha,
+        });
 
         this.container.addChild(graphics)
     }
@@ -55,8 +58,6 @@ class OrbitalLocationLayer {
         }
 
         let graphics = new PIXI.Graphics()
-
-        graphics.beginFill(0xFFFFFF, 0.2)
 
         graphics.position.x = carrier.locationNext.x
         graphics.position.y = carrier.locationNext.y
@@ -70,7 +71,10 @@ class OrbitalLocationLayer {
         graphics.lineTo(0 - 3, 0 + 2)
         graphics.lineTo(0 - 1.5, 0 + 1)
         graphics.lineTo(0, 0 - 4)
-        graphics.endFill()
+        graphics.fill({
+          color: 0xFFFFFF,
+          alpha: 0.2
+        })
 
         graphics.pivot.set(0, 0)
         graphics.scale.set(1)

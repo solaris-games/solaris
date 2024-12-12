@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js'
 import gameHelper from '../services/gameHelper'
 import helpers from './helpers'
-import type { Map } from './map';
+import type {Map} from './map';
 import type {UserGameSettings} from "@solaris-common";
 import type {Game} from "../types/game";
 import type Carrier from "./carrier";
@@ -299,27 +299,30 @@ export class PathManager {
     let path = new PIXI.Graphics()
 
     path.moveTo(0, lineWidth)
-    path.beginFill(pathColour)
     path.lineTo(0, -lineWidth)
     path.lineTo(Math.max(initialX-VOID_LENGTH,0), -lineWidth)
     path.lineTo(Math.max(initialX-VOID_LENGTH,0), lineWidth)
-    path.endFill()
+    path.fill({
+      color: pathColour,
+    })
 
     for( let i = 0; i<dashCount; i++ ) {
       path.moveTo(initialX+(i*COMBINED_LENGTH), lineWidth)
-      path.beginFill(pathColour)
       path.lineTo(initialX+(i*COMBINED_LENGTH), -lineWidth)
       path.lineTo(initialX+(i*COMBINED_LENGTH)+DASH_LENGTH, -lineWidth)
       path.lineTo(initialX+(i*COMBINED_LENGTH)+DASH_LENGTH, lineWidth)
-      path.endFill()
+      path.fill({
+        color: pathColour,
+      })
     }
 
     path.moveTo(Math.min(initialX+(dashCount*COMBINED_LENGTH),pathLength), lineWidth)
-    path.beginFill(pathColour)
     path.lineTo(Math.min(initialX+(dashCount*COMBINED_LENGTH),pathLength), -lineWidth)
     path.lineTo(pathLength, -lineWidth)
     path.lineTo(pathLength, lineWidth)
-    path.endFill()
+    path.fill({
+      color: pathColour,
+    })
 
     path.rotation = Math.atan2(pointB.y-pointA.y,pointB.x-pointA.x)
     path.position = pointA
@@ -334,12 +337,13 @@ export class PathManager {
     let pathLength = gameHelper.getDistanceBetweenLocations(pointA,pointB)
 
     let path = new PIXI.Graphics()
-    path.beginFill(pathColour)
     path.moveTo(0, lineWidth)
     path.lineTo(0, -lineWidth)
     path.lineTo(pathLength, -lineWidth)
     path.lineTo(pathLength, lineWidth)
-    path.endFill()
+    path.fill({
+      color: pathColour,
+    });
     path.rotation = Math.atan2(pointB.y-pointA.y,pointB.x-pointA.x)
     path.position = pointA
 
@@ -356,13 +360,11 @@ export class PathManager {
   }
 
   _pathContainsCarrier(carrierMapObject, path) {
-    let carrier = path.carriers.find( c => c.data._id === carrierMapObject.data._id )
-    return carrier
+    return path.carriers.find(c => c.data._id === carrierMapObject.data._id)
   }
 
   _findPath( pathID ) {
-    let path = this.paths.find( p => p.id === pathID )
-    return path
+    return this.paths.find(p => p.id === pathID)
   }
 
 }

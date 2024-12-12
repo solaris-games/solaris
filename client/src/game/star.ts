@@ -33,8 +33,6 @@ export class Star extends EventEmitter {
   container: Container;
   graphics_shape_part: Sprite;
   graphics_shape_full: Sprite;
-  graphics_shape_part_warp: Graphics;
-  graphics_shape_full_warp: Graphics;
   graphics_hyperspaceRange: Graphics;
   graphics_natural_resources_ring: Graphics[];
   graphics_scanningRange: Graphics;
@@ -88,8 +86,6 @@ export class Star extends EventEmitter {
     this.graphics_star = new Sprite();
     this.graphics_shape_part = new Sprite()
     this.graphics_shape_full = new Sprite()
-    this.graphics_shape_part_warp = new Graphics()
-    this.graphics_shape_full_warp = new Graphics()
     this.graphics_hyperspaceRange = new Graphics()
     this.graphics_natural_resources_ring = new Array(Star.maxLod)
     this.graphics_scanningRange = new Graphics()
@@ -100,8 +96,6 @@ export class Star extends EventEmitter {
     this.container.addChild(this.graphics_star)
     this.container.addChild(this.graphics_shape_part)
     this.container.addChild(this.graphics_shape_full)
-    this.container.addChild(this.graphics_shape_part_warp)
-    this.container.addChild(this.graphics_shape_full_warp)
     this.container.addChild(this.graphics_targeted)
     this.container.addChild(this.graphics_selected)
     this.container.addChild(this.graphics_kingOfTheHill)
@@ -255,18 +249,22 @@ export class Star extends EventEmitter {
     let seed = this.data._id
     Star.seededRNG.seed(seed)
 
-    let player = this._getStarPlayer()
-    let playerColour = player ? this.context.getPlayerColour(player._id) : 0xFFFFFF
+    const player = this._getStarPlayer()
+    const playerColour = player ? this.context.getPlayerColour(player._id) : 0xFFFFFF
 
     this.pulsarGraphics = new Graphics()
     this.pulsarGraphics.zIndex = -1
-    this.pulsarGraphics.lineStyle(1, playerColour, 0.5)
     this.pulsarGraphics.moveTo(0, -20)
     this.pulsarGraphics.lineTo(0, 20)
-    this.pulsarGraphics.drawEllipse(-5, 0, 5, 5)
-    this.pulsarGraphics.drawEllipse(5, 0, 5, 5)
-    this.pulsarGraphics.drawEllipse(-8, 0, 8, 8)
-    this.pulsarGraphics.drawEllipse(8, 0, 8, 8)
+    this.pulsarGraphics.ellipse(-5, 0, 5, 5)
+    this.pulsarGraphics.ellipse(5, 0, 5, 5)
+    this.pulsarGraphics.ellipse(-8, 0, 8, 8)
+    this.pulsarGraphics.ellipse(8, 0, 8, 8)
+    this.pulsarGraphics.stroke({
+      width: 1,
+      color: playerColour,
+      alpha: 0.5
+    });
     this.pulsarGraphics.rotation = Star.seededRNG.random()*Math.PI*2.0
 
     this.container.addChild(this.pulsarGraphics)
@@ -448,15 +446,19 @@ export class Star extends EventEmitter {
         let planetSize = Math.floor(Math.abs(this.data.location.y) + distanceToStar) % 1.5 + 0.5
 
         let orbitGraphics = new Graphics()
-        orbitGraphics.lineStyle(0.3, 0xFFFFFF)
-        orbitGraphics.alpha = this.userSettings.map.naturalResourcesRingOpacity;
-        orbitGraphics.drawCircle(0, 0, distanceToStar -(planetSize / 2))
+        orbitGraphics.circle(0, 0, distanceToStar -(planetSize / 2))
+        orbitGraphics.stroke({
+          width: 0.3,
+          color: 0xFFFFFF,
+          alpha: this.userSettings.map.naturalResourcesRingOpacity,
+        })
         this.container_planets.addChild(orbitGraphics)
 
         let planetGraphics = new Graphics()
-        planetGraphics.beginFill(playerColour)
-        planetGraphics.drawCircle(planetSize / 2, 0, planetSize)
-        planetGraphics.endFill()
+        planetGraphics.circle(planetSize / 2, 0, planetSize)
+        planetGraphics.fill({
+          color: playerColour,
+        });
 
         if (!this.data.isInScanningRange) {
           planetGraphics.alpha = 0.3
@@ -525,12 +527,12 @@ export class Star extends EventEmitter {
       ringRadius *= lod+1
       lineWidth *= lod+1
       this.graphics_natural_resources_ring[lod].clear()
-      this.graphics_natural_resources_ring[lod].setStrokeStyle({
+      this.graphics_natural_resources_ring[lod].circle(0, 0, ringRadius * 0.75)
+      this.graphics_natural_resources_ring[lod].stroke({
         width: lineWidth,
         color: 0xFFFFFF,
         alpha: this.userSettings.map.naturalResourcesRingOpacity
-      })
-      this.graphics_natural_resources_ring[lod].circle(0, 0, ringRadius * 0.75)
+      });
       this.graphics_natural_resources_ring[lod].scale.x = 1.0/( (1.0/8.0)*(lod+1) )
       this.graphics_natural_resources_ring[lod].scale.y = 1.0/( (1.0/8.0)*(lod+1) )
       this.graphics_natural_resources_ring[lod].zIndex = 9
@@ -741,10 +743,16 @@ export class Star extends EventEmitter {
 
     let radius = ((this.data.effectiveTechs.scanning || 1) + 1) * this.lightYearDistance
 
-    this.graphics_scanningRange.lineStyle(1, 0xFFFFFF, 0.2)
-    this.graphics_scanningRange.beginFill(this.context.getPlayerColour(player._id), 0.075)
-    this.graphics_scanningRange.drawCircle(0, 0, radius)
-    this.graphics_scanningRange.endFill()
+    this.graphics_scanningRange.circle(0, 0, radius)
+    this.graphics_scanningRange.fill({
+      color: this.context.getPlayerColour(player._id),
+      alpha: 0.075,
+    });
+    this.graphics_scanningRange.stroke({
+      width: 1,
+      color: 0xFFFFFF,
+      alpha: 0.2,
+    });
     this.graphics_scanningRange.zIndex = -1
     this.container.zIndex = -1
 
@@ -765,10 +773,16 @@ export class Star extends EventEmitter {
 
     let radius = ((this.data.effectiveTechs.hyperspace || 1) + 1.5) * this.lightYearDistance
 
-    this.graphics_hyperspaceRange.lineStyle(1, 0xFFFFFF, 0.2)
-    this.graphics_hyperspaceRange.beginFill(this.context.getPlayerColour(player._id), 0.075)
-    this.graphics_hyperspaceRange.drawStar!(0, 0, radius, radius, radius - 3)
-    this.graphics_hyperspaceRange.endFill()
+    this.graphics_hyperspaceRange.star(0, 0, radius, radius, radius - 3)
+    this.graphics_hyperspaceRange.fill({
+      color: this.context.getPlayerColour(player._id),
+      alpha: 0.075
+    })
+    this.graphics_hyperspaceRange.stroke({
+      width: 1,
+      color: 0xFFFFFF,
+      alpha: 0.2,
+    });
     this.graphics_hyperspaceRange.zIndex = -1
     this.container.zIndex = -1
 
@@ -779,12 +793,15 @@ export class Star extends EventEmitter {
     this.graphics_targeted.clear()
 
     if (this.data.targeted) {
-      this.graphics_targeted.lineStyle(2, 0xFF0000)
       this.graphics_targeted.moveTo(9, -9)
       this.graphics_targeted.lineTo(-9, 9)
       this.graphics_targeted.moveTo(-9, -9)
       this.graphics_targeted.lineTo(9, 9)
-      this.graphics_targeted.closePath()
+      this.graphics_targeted.closePath();
+      this.graphics_targeted.stroke({
+        width: 2,
+        color: 0xFF0000,
+      })
     }
   }
 
@@ -792,9 +809,12 @@ export class Star extends EventEmitter {
     this.graphics_selected.clear()
 
     if (this.isSelected) {
-      this.graphics_selected.lineStyle(0.5, 0xFFFFFF)
-      this.graphics_selected.alpha = 0.3
-      this.graphics_selected.drawCircle(0, 0, 20)
+      this.graphics_selected.circle(0, 0, 20)
+      this.graphics_selected.stroke({
+        width: 0.5,
+        color: 0xFFFFFF,
+        alpha: 0.3,
+      });
     }
   }
 
@@ -802,9 +822,12 @@ export class Star extends EventEmitter {
     this.graphics_kingOfTheHill.clear()
 
     if (this.data.isKingOfTheHillStar) {
-      this.graphics_kingOfTheHill.lineStyle(0.5, 0xFFFFFF)
-      this.graphics_kingOfTheHill.alpha = 0.5
-      this.graphics_kingOfTheHill.drawCircle(0, 0, 20)
+      this.graphics_kingOfTheHill.circle(0, 0, 20)
+      this.graphics_kingOfTheHill.stroke({
+        width: 0.5,
+        color: 0xFFFFFF,
+        alpha: 0.5,
+      })
     }
   }
 
@@ -921,9 +944,6 @@ export class Star extends EventEmitter {
 
     this.graphics_shape_part.visible = Boolean(partial_ring)
     this.graphics_shape_full.visible = !partial_ring
-    this.graphics_shape_part_warp.visible = partial_ring && this.data.warpGate
-    this.graphics_shape_full_warp.visible = !partial_ring && this.data.warpGate
-
     // this.baseScale = this.isSelected ? 1.5 : 1
   }
 

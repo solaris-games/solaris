@@ -13,12 +13,15 @@ class AnimationService {
       }
 
       graphics.clear()
-      graphics.lineStyle(1, 0xFFFFFF, 0.3)
 
-      graphics.alpha -= 0.02 * delta
       radius = radius + delta
 
-      graphics.drawCircle(location.x, location.y, radius)
+      graphics.circle(location.x, location.y, radius)
+      graphics.alpha -= 0.02 * delta
+      graphics.stroke({
+        width: 1,
+        color: 0xFFFFFF
+      })
     }
 
     app.ticker.add(animation)
