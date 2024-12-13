@@ -7,7 +7,7 @@ import type {UserGameSettings} from "@solaris-common";
 
 type SamplePoint = {
   distance: number;
-  owner: Player;
+  owner: Player | undefined;
 }
 
 type Site = {
@@ -167,7 +167,7 @@ export class Territories {
       }
     }
 
-    let startIX, endIX, startIY, endIY, gridLocation, distance, owner;
+    let startIX, endIX, startIY, endIY, gridLocation, distance;
     let stars = this.game!.galaxy.stars
     for (let star of stars) {
       // This loop goes through all stars, and generates the gridPoints that are within the METABALL_RADIUS
@@ -184,17 +184,19 @@ export class Territories {
             // Do nothing, because the grid already has a value from a star that is closer
           } else {
             // Now either the grid doesn't have a value here yet or the star calculated here is closer than the one currently logged in
-            owner = this.game!.galaxy.players.find(p => p._id === star.ownedByPlayerId)
+
+            const owner = this.game!.galaxy.players.find(p => p._id === star.ownedByPlayerId)
+
             samplePoints[ix][iy] = { distance, owner }; // Make this gridPoint the value of the distance from the star so we can compare it with other stars AND make it have the value for the owner (the player)
           }
         }
       }
     }
 
-    const playerSamplePoints: Player[][] = [];
+    const playerSamplePoints: (Player | undefined)[][] = new Array(samplePoints.length);
 
     for (let ix = 0; ix < samplePoints.length - 1; ix++) {
-      playerSamplePoints[ix] = [];
+      playerSamplePoints[ix] = new Array(samplePoints[ix].length);
 
       for (let iy = 0; iy < samplePoints[ix].length - 1; iy++) {
         if (samplePoints[ix][iy]) {
@@ -211,14 +213,19 @@ export class Territories {
       this.container.addChild(territoryLines)
       territoryPolygons.alpha = 0.333
 
+      const check = (ix: number, iy: number) => {
+        const point = playerSamplePoints[ix]?.[iy];
+        return point && point === player;
+      }
+
       let combining = false
       for (let ix = 0; ix < samplePoints.length - 1; ix++) {
         for (let iy = 0; iy < samplePoints[ix].length - 1; iy++) {
           let lookUpIndex = 0
-          lookUpIndex += (player == playerSamplePoints[ix][iy] ? 1 : 0) * 8
-          lookUpIndex += (player == playerSamplePoints[ix + 1][iy] ? 1 : 0) * 4
-          lookUpIndex += (player == playerSamplePoints[ix][iy + 1] ? 1 : 0) * 1
-          lookUpIndex += (player == playerSamplePoints[ix + 1][iy + 1] ? 1 : 0) * 2
+          lookUpIndex += (check(ix, iy) ? 1 : 0) * 8
+          lookUpIndex += (check(ix + 1, iy) ? 1 : 0) * 4
+          lookUpIndex += (check(ix, iy + 1) ? 1 : 0) * 1
+          lookUpIndex += (check(ix + 1, iy + 1) ? 1 : 0) * 2
           if (VERTEX_TABLE[lookUpIndex][ACTION_INDEX] != VertexAction.ACTION_SKIP) {
             let cellOrigin = { x: ix * CELL_SIZE + minX, y: iy * CELL_SIZE + minY }
             if (VERTEX_TABLE[lookUpIndex][LINES_INDEX].length > 1) {
