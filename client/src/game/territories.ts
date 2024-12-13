@@ -221,6 +221,8 @@ export class Territories {
       let combining = false
       for (let ix = 0; ix < samplePoints.length - 1; ix++) {
         for (let iy = 0; iy < samplePoints[ix].length - 1; iy++) {
+          let alpha = 0.333333;
+
           let lookUpIndex = 0
           lookUpIndex += (check(ix, iy) ? 1 : 0) * 8
           lookUpIndex += (check(ix + 1, iy) ? 1 : 0) * 4
@@ -245,11 +247,12 @@ export class Territories {
                 territoryPolygons.lineTo(VERTEX_TABLE[15][POLYGON_INDEX][0].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[15][POLYGON_INDEX][0].y * CELL_SIZE + cellOrigin.y)
                 territoryPolygons.fill({
                   color,
-                  alpha: 0.3
+                  alpha,
                   })
                 combining = false
               }
               territoryPolygons.moveTo(VERTEX_TABLE[lookUpIndex][POLYGON_INDEX][0].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[lookUpIndex][POLYGON_INDEX][0].y * CELL_SIZE + cellOrigin.y)
+              alpha = 1;
               let first = true
               let vertices = VERTEX_TABLE[lookUpIndex][POLYGON_INDEX]
               for (let vertex of vertices) {
@@ -258,7 +261,7 @@ export class Territories {
               }
               territoryPolygons.fill({
                 color,
-                alpha: 1
+                alpha,
               });
 
             }
@@ -267,14 +270,16 @@ export class Territories {
               if (!combining) {
                 //start combining
                 territoryPolygons.moveTo(VERTEX_TABLE[15][POLYGON_INDEX][0].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[15][POLYGON_INDEX][0].y * CELL_SIZE + cellOrigin.y)
+                alpha = 1;
                 territoryPolygons.lineTo(VERTEX_TABLE[15][POLYGON_INDEX][1].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[15][POLYGON_INDEX][1].y * CELL_SIZE + cellOrigin.y)
-                territoryPolygons.fill({
-                  color,
-                  alpha: 1
-                });
                 combining = true
               }
             }
+
+            territoryPolygons.fill({
+              color,
+              alpha,
+            });
           }
         }
       }
