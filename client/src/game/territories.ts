@@ -228,15 +228,22 @@ export class Territories {
           lookUpIndex += (check(ix + 1, iy) ? 1 : 0) * 4
           lookUpIndex += (check(ix, iy + 1) ? 1 : 0) * 1
           lookUpIndex += (check(ix + 1, iy + 1) ? 1 : 0) * 2
+
           if (VERTEX_TABLE[lookUpIndex][ACTION_INDEX] != VertexAction.ACTION_SKIP) {
             let cellOrigin = { x: ix * CELL_SIZE + minX, y: iy * CELL_SIZE + minY }
+
+            const getX = (offset: number) => VERTEX_TABLE[lookUpIndex][LINES_INDEX][offset].x * CELL_SIZE + cellOrigin.x;
+            const getY = (offset: number) => VERTEX_TABLE[lookUpIndex][LINES_INDEX][offset].y * CELL_SIZE + cellOrigin.y;
+
+            // skipped for combine
             if (VERTEX_TABLE[lookUpIndex][LINES_INDEX].length > 1) {
               //if there are vertices, draw the lines
-              territoryLines.moveTo(VERTEX_TABLE[lookUpIndex][LINES_INDEX][0].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[lookUpIndex][LINES_INDEX][0].y * CELL_SIZE + cellOrigin.y)
-              territoryLines.lineTo(VERTEX_TABLE[lookUpIndex][LINES_INDEX][1].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[lookUpIndex][LINES_INDEX][1].y * CELL_SIZE + cellOrigin.y)
+              territoryLines.moveTo(getX(0), getY(0));
+              territoryLines.lineTo(getX(1), getY(1));
+
               if (VERTEX_TABLE[lookUpIndex][LINES_INDEX].length > 2) {
-                territoryLines.moveTo(VERTEX_TABLE[lookUpIndex][LINES_INDEX][2].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[lookUpIndex][LINES_INDEX][2].y * CELL_SIZE + cellOrigin.y)
-                territoryLines.lineTo(VERTEX_TABLE[lookUpIndex][LINES_INDEX][3].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[lookUpIndex][LINES_INDEX][3].y * CELL_SIZE + cellOrigin.y)
+                territoryLines.moveTo(getX(2), getY(2));
+                territoryLines.lineTo(getX(3), getY(3));
               }
             }
 
