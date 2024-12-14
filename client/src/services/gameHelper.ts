@@ -868,49 +868,49 @@ class GameHelper {
     return starFieldTop + ((starFieldBottom - starFieldTop) / 2.0)
   }
 
-  calculateMinStarX (game) {
+  calculateMinStarX (game: Game) {
     if (!game.galaxy.stars.length) { return 0 }
 
     return game.galaxy.stars.sort((a, b) => a.location.x - b.location.x)[0].location.x
   }
 
-  calculateMinStarY (game) {
+  calculateMinStarY (game: Game) {
     if (!game.galaxy.stars.length) { return 0 }
 
     return game.galaxy.stars.sort((a, b) => a.location.y - b.location.y)[0].location.y
   }
 
-  calculateMaxStarX (game) {
+  calculateMaxStarX (game: Game) {
     if (!game.galaxy.stars.length) { return 0 }
 
     return game.galaxy.stars.sort((a, b) => b.location.x - a.location.x)[0].location.x
   }
 
-  calculateMaxStarY (game) {
+  calculateMaxStarY (game: Game) {
     if (!game.galaxy.stars.length) { return 0 }
 
     return game.galaxy.stars.sort((a, b) => b.location.y - a.location.y)[0].location.y
   }
 
-  calculateMinCarrierX (game) {
+  calculateMinCarrierX (game: Game) {
     if (!game.galaxy.carriers.length) { return 0 }
 
     return game.galaxy.carriers.sort((a, b) => a.location.x - b.location.x)[0].location.x
   }
 
-  calculateMinCarrierY (game) {
+  calculateMinCarrierY (game: Game) {
     if (!game.galaxy.carriers.length) { return 0 }
 
     return game.galaxy.carriers.sort((a, b) => a.location.y - b.location.y)[0].location.y
   }
 
-  calculateMaxCarrierX (game) {
+  calculateMaxCarrierX (game: Game) {
     if (!game.galaxy.carriers.length) { return 0 }
 
     return game.galaxy.carriers.sort((a, b) => b.location.x - a.location.x)[0].location.x
   }
 
-  calculateMaxCarrierY (game) {
+  calculateMaxCarrierY (game: Game) {
     if (!game.galaxy.carriers.length) { return 0 }
 
     return game.galaxy.carriers.sort((a, b) => b.location.y - a.location.y)[0].location.y

@@ -138,10 +138,10 @@ export class Territories {
       ],
     ]
 
-    let minX = gameHelper.calculateMinStarX(this.game)
-    let minY = gameHelper.calculateMinStarY(this.game)
-    let maxX = gameHelper.calculateMaxStarX(this.game)
-    let maxY = gameHelper.calculateMaxStarY(this.game)
+    let minX = gameHelper.calculateMinStarX(this.game!)
+    let minY = gameHelper.calculateMinStarY(this.game!)
+    let maxX = gameHelper.calculateMaxStarX(this.game!)
+    let maxY = gameHelper.calculateMaxStarY(this.game!)
     minX -= minX % CELL_SIZE
     minX -= Math.floor(METABALL_RADIUS * 1.5 / CELL_SIZE) * CELL_SIZE
     minY -= minY % CELL_SIZE
@@ -218,6 +218,9 @@ export class Territories {
         return point && point === player;
       }
 
+      const getTableX = (idx: number) => (cellOrigin: { x: number, y: number }) => (offset: number) => VERTEX_TABLE[idx][LINES_INDEX][offset].x * CELL_SIZE + cellOrigin.x;
+      const getTableY = (idx: number) => (cellOrigin: { x: number, y: number }) => (offset: number) => VERTEX_TABLE[idx][LINES_INDEX][offset].y * CELL_SIZE + cellOrigin.y;
+
       let combining = false
       for (let ix = 0; ix < samplePoints.length - 1; ix++) {
         for (let iy = 0; iy < samplePoints[ix].length - 1; iy++) {
@@ -230,10 +233,10 @@ export class Territories {
           lookUpIndex += (check(ix + 1, iy + 1) ? 1 : 0) * 2
 
           if (VERTEX_TABLE[lookUpIndex][ACTION_INDEX] != VertexAction.ACTION_SKIP) {
-            let cellOrigin = { x: ix * CELL_SIZE + minX, y: iy * CELL_SIZE + minY }
+            const cellOrigin = { x: ix * CELL_SIZE + minX, y: iy * CELL_SIZE + minY }
 
-            const getX = (offset: number) => VERTEX_TABLE[lookUpIndex][LINES_INDEX][offset].x * CELL_SIZE + cellOrigin.x;
-            const getY = (offset: number) => VERTEX_TABLE[lookUpIndex][LINES_INDEX][offset].y * CELL_SIZE + cellOrigin.y;
+            const getX = getTableX(lookUpIndex)(cellOrigin);
+            const getY = getTableY(lookUpIndex)(cellOrigin);
 
             // skipped for combine
             if (VERTEX_TABLE[lookUpIndex][LINES_INDEX].length > 1) {
