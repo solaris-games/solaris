@@ -218,8 +218,8 @@ export class Territories {
         return point && point === player;
       }
 
-      const getTableX = (idx: number) => (cellOrigin: { x: number, y: number }) => (offset: number) => VERTEX_TABLE[idx][LINES_INDEX][offset].x * CELL_SIZE + cellOrigin.x;
-      const getTableY = (idx: number) => (cellOrigin: { x: number, y: number }) => (offset: number) => VERTEX_TABLE[idx][LINES_INDEX][offset].y * CELL_SIZE + cellOrigin.y;
+      const getLinesX = (idx: number) => (cellOrigin: { x: number, y: number }) => (offset: number) => VERTEX_TABLE[idx][LINES_INDEX][offset].x * CELL_SIZE + cellOrigin.x;
+      const getLinesY = (idx: number) => (cellOrigin: { x: number, y: number }) => (offset: number) => VERTEX_TABLE[idx][LINES_INDEX][offset].y * CELL_SIZE + cellOrigin.y;
 
       let combining = false
       for (let ix = 0; ix < samplePoints.length - 1; ix++) {
@@ -235,8 +235,8 @@ export class Territories {
           if (VERTEX_TABLE[lookUpIndex][ACTION_INDEX] != VertexAction.ACTION_SKIP) {
             const cellOrigin = { x: ix * CELL_SIZE + minX, y: iy * CELL_SIZE + minY }
 
-            const getX = getTableX(lookUpIndex)(cellOrigin);
-            const getY = getTableY(lookUpIndex)(cellOrigin);
+            const getX = getLinesX(lookUpIndex)(cellOrigin);
+            const getY = getLinesY(lookUpIndex)(cellOrigin);
 
             // skipped for combine
             if (VERTEX_TABLE[lookUpIndex][LINES_INDEX].length > 1) {
@@ -255,10 +255,6 @@ export class Territories {
                 //finish combining
                 territoryPolygons.lineTo(VERTEX_TABLE[15][POLYGON_INDEX][1].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[15][POLYGON_INDEX][1].y * CELL_SIZE + cellOrigin.y)
                 territoryPolygons.lineTo(VERTEX_TABLE[15][POLYGON_INDEX][0].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[15][POLYGON_INDEX][0].y * CELL_SIZE + cellOrigin.y)
-                territoryPolygons.fill({
-                  color,
-                  alpha,
-                  })
                 combining = false
               }
               territoryPolygons.moveTo(VERTEX_TABLE[lookUpIndex][POLYGON_INDEX][0].x * CELL_SIZE + cellOrigin.x, VERTEX_TABLE[lookUpIndex][POLYGON_INDEX][0].y * CELL_SIZE + cellOrigin.y)
@@ -285,11 +281,6 @@ export class Territories {
                 combining = true
               }
             }
-
-            territoryPolygons.fill({
-              color,
-              alpha,
-            });
           }
         }
       }
@@ -307,10 +298,10 @@ export class Territories {
 
     let voronoi = new Voronoi.Voronoi()
 
-    let minX = gameHelper.calculateMinStarX(this.game)
-    let minY = gameHelper.calculateMinStarY(this.game)
-    let maxX = gameHelper.calculateMaxStarX(this.game)
-    let maxY = gameHelper.calculateMaxStarY(this.game)
+    let minX = gameHelper.calculateMinStarX(this.game!)
+    let minY = gameHelper.calculateMinStarY(this.game!)
+    let maxX = gameHelper.calculateMaxStarX(this.game!)
+    let maxY = gameHelper.calculateMaxStarY(this.game!)
 
     let boundingBox = {
       xl: minX - Territories.maxVoronoiDistance,

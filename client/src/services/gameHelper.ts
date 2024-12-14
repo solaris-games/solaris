@@ -632,8 +632,6 @@ class GameHelper {
 
     const ownersHomeStarId = this.getPlayerById(game, star.ownedByPlayerId)!.homeStarId;
 
-    console.log(ownersHomeStarId, star._id);
-
     return ownersHomeStarId && ownersHomeStarId === star._id;
   }
 
