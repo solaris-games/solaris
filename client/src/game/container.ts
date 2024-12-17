@@ -188,8 +188,8 @@ export class GameContainer {
     this.starFieldTop = gameHelper.calculateMinStarY(game) - 750
     this.starFieldBottom = gameHelper.calculateMaxStarY(game) + 750
 
-    const maxWidth = Math.abs(this.starFieldLeft) + Math.abs(this.starFieldRight);
-    const maxHeight = Math.abs(this.starFieldBottom) + Math.abs(this.starFieldTop);
+    const maxWidth = 2 * Math.abs(this.starFieldLeft) + Math.abs(this.starFieldRight);
+    const maxHeight = 2 * Math.abs(this.starFieldBottom) + Math.abs(this.starFieldTop);
 
     this.viewport!.resize(window.innerWidth, window.innerHeight, maxWidth, maxHeight)
 
