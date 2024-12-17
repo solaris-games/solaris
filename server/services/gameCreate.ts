@@ -132,6 +132,10 @@ export default class GameCreateService {
                 throw new ValidationError(`You must complete at least one game in order to create a custom game.`);
             }
         }
+
+        if (settings.general.playerLimit > 64) {
+            throw new ValidationError(`Games larger than 64 players are not supported.`);
+        }
         
         if (settings.general.name.trim().length < 3 || settings.general.name.trim().length > 24) {
             throw new ValidationError('Game name must be between 3 and 24 characters.');
