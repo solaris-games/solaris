@@ -29,6 +29,18 @@ export default {
     const game = this.$store.state.game;
 
     this.gameContainer = GameContainer
+    const webGLSupport = this.gameContainer.checkPerformance();
+
+    console.log("WebGL Support", webGLSupport);
+
+    if (!webGLSupport.webgl) {
+      this.$toast.error('WebGL is not supported on your device', { duration: 10000 });
+    }
+
+    if (webGLSupport.webgl && !webGLSupport.performance) {
+      this.$toast.info('Low-performance mode detected. You may consider lowering your graphics settings.', { duration: 10000 });
+    }
+
     await this.gameContainer.setupApp(this.$store, this.$store.state.settings)
     this.loadGame(this.$store.state.game)
 

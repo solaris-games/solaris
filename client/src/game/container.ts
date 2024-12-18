@@ -4,7 +4,7 @@ import gameHelper from '../services/gameHelper.js'
 import textureService from './texture'
 import type {Store} from "vuex";
 import type {State} from "../store";
-import {Application, BitmapText} from "pixi.js";
+import {Application, BitmapText, isWebGLSupported} from "pixi.js";
 import type {UserGameSettings} from "solaris-common/src";
 import type {Game} from "../types/game";
 
@@ -97,6 +97,23 @@ export class GameContainer {
       this.frames = 0
       this.lowest = 1000
       this.ma32accum = 0
+    }
+  }
+
+  checkPerformance(): { webgl: boolean, performance: boolean } {
+    const webgl = isWebGLSupported(false);
+    const performance = isWebGLSupported(true);
+
+    if (!webgl) {
+      return {
+        webgl,
+        performance: false
+      };
+    } else {
+      return {
+        webgl,
+        performance
+      };
     }
   }
 
