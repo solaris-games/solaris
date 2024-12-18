@@ -358,15 +358,15 @@ export class Map extends EventEmitter {
       this.chunksContainer.removeChildren()
     }
 
-    let carrierMinX = gameHelper.calculateMinCarrierX(this.game)
-    let carrierMinY = gameHelper.calculateMinCarrierY(this.game)
-    let carrierMaxX = gameHelper.calculateMaxCarrierX(this.game)
-    let carrierMaxY = gameHelper.calculateMaxCarrierY(this.game)
+    let carrierMinX = gameHelper.calculateMinCarrierX(this.game!)
+    let carrierMinY = gameHelper.calculateMinCarrierY(this.game!)
+    let carrierMaxX = gameHelper.calculateMaxCarrierX(this.game!)
+    let carrierMaxY = gameHelper.calculateMaxCarrierY(this.game!)
 
-    let starMinX = gameHelper.calculateMinStarX(this.game)
-    let starMinY = gameHelper.calculateMinStarY(this.game)
-    let starMaxX = gameHelper.calculateMaxStarX(this.game)
-    let starMaxY = gameHelper.calculateMaxStarY(this.game)
+    let starMinX = gameHelper.calculateMinStarX(this.game!)
+    let starMinY = gameHelper.calculateMinStarY(this.game!)
+    let starMaxX = gameHelper.calculateMaxStarX(this.game!)
+    let starMaxY = gameHelper.calculateMaxStarY(this.game!)
 
     let minX = Math.min(carrierMinX, starMinX)
     let minY = Math.min(carrierMinY, starMinY)

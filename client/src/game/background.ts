@@ -111,10 +111,10 @@ export class Background {
     const MINIMUM_STARS = 2 //chunks must have these many stars to be elegible to host a nebula
     const NEBULA_MAX_OFFSET = CHUNK_SIZE/4.0
 
-    let minX = gameHelper.calculateMinStarX(this.game)
-    let minY = gameHelper.calculateMinStarY(this.game)
-    let maxX = gameHelper.calculateMaxStarX(this.game)
-    let maxY = gameHelper.calculateMaxStarY(this.game)
+    let minX = gameHelper.calculateMinStarX(this.game!)
+    let minY = gameHelper.calculateMinStarY(this.game!)
+    let maxX = gameHelper.calculateMaxStarX(this.game!)
+    let maxY = gameHelper.calculateMaxStarY(this.game!)
 
     let firstChunkX = Math.floor(minX/CHUNK_SIZE)
     let firstChunkY = Math.floor(minY/CHUNK_SIZE)
