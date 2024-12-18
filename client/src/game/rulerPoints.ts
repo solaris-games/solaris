@@ -68,7 +68,7 @@ export class RulerPoints extends EventEmitter {
       graphics.lineTo(point.location.x, point.location.y)
     }
 
-    graphics.strike({
+    graphics.stroke({
       width: 1,
       color: 0xFFFFFF,
       alpha: 0.8
