@@ -1,5 +1,5 @@
 <template>
-  <td>{{ name }}</td>
+  <td class="combat-actor-name">{{ name }}</td>
 </template>
 
 <script setup lang="ts">
