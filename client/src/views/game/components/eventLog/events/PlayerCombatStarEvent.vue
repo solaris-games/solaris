@@ -25,9 +25,8 @@
 import { computed } from 'vue';
 import StarLabel from '../../star/StarLabel.vue'
 import type {PlayerCombatStarEvent} from "@solaris-common";
-import { useStore } from 'vuex';
+import { useStore, type Store } from 'vuex';
 import CombatEventSide from './CombatEventSide.vue';
-import type { Store } from 'vuex/types/index.js';
 import type { State } from '../../../../../store';
 import { createStarAttackerSide, createStarDefenderSide } from '../../../../../types/combat';
 
