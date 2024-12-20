@@ -99,7 +99,21 @@ export const createStarAttackerSide = (game: Game, event: PlayerCombatStarEvent<
     participantsGroups.set(car.ownedByPlayerId, group);
   }
 
-  const participants = Array.from(participantsGroups, ([playerId, actors]) => ({ player: gameHelper.getPlayerById(game, playerId)!, group: actors }));
+  const participants = Array.from(participantsGroups, ([playerId, actors]) => {
+    actors.sort((a, b) => {
+      if (a.object.kind === 'star') {
+        return -1;
+      } else if (b.object.kind === 'star') {
+        return 1;
+      }
+
+      return compareResult(a.before, b.before);
+    });
+
+    return { player: gameHelper.getPlayerById(game, playerId)!, group: actors };
+  });
+
+  participants.sort((a, b) => a.player.alias.localeCompare(b.player.alias));
 
   return {
     participants,

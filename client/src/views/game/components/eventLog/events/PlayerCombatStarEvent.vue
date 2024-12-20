@@ -3,8 +3,8 @@
         <p>
             Your forces have engaged the enemy in <span class="text-warning">carrier-to-star</span> combat at <star-label :starId="event.data.starId" :starName="event.data.starName"/>.
         </p>
-        <CombatEventSide title="Defender" :side="defenderSide" />
-        <CombatEventSide title="Attacker" :side="attackerSide" />
+        <CombatEventSide title="Defender" :side="defenderSide" @onOpenPlayerDetailRequested="requestOpenPlayerDetail" />
+        <CombatEventSide title="Attacker" :side="attackerSide" @onOpenPlayerDetailRequested="requestOpenPlayerDetail" />
 
         <hr class="mt-0"/>
 
@@ -45,6 +45,10 @@ const game = store.state.game!;
 const defenderSide = computed(() => createStarDefenderSide(game, props.event));
 
 const attackerSide = computed(() => createStarAttackerSide(game, props.event));
+
+const requestOpenPlayerDetail = (playerId: string) => {
+  emit('onOpenPlayerDetailRequested', playerId);
+};
 
 </script>
 

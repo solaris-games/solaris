@@ -10,9 +10,11 @@
         </tr>
         <template v-for="participant of side.participants">
           <tr>
-            <td colspan="4" class="participant-alias">
-              <PlayerIcon :player-id="participant.player._id" :solid-glyph-only="true" />
-              <span class="participant-name">{{ participant.player.alias }}</span>
+            <td colspan="4">
+              <button class="btn btn-link participant-alias" @click="requestOpenPlayerDetail(participant.player._id)">
+                <PlayerIcon :player-id="participant.player._id" :solid-glyph-only="true" />
+                <span class="participant-name">{{ participant.player.alias }}</span>
+              </button>
             </td>
           </tr>
           <tr v-for="actor of participant.group">
@@ -40,7 +42,15 @@ const props = defineProps<{
   side: CombatSide,
 }>();
 
+const emit = defineEmits<{
+  onOpenPlayerDetailRequested: [playerId: string]
+}>();
+
 const store = useStore() as Store<State>;
+
+const requestOpenPlayerDetail = (playerId: string) => {
+  emit('onOpenPlayerDetailRequested', playerId);
+};
 
 </script>
 <style scoped>
@@ -49,6 +59,6 @@ const store = useStore() as Store<State>;
 }
 
 .participant-name {
-  margin-left: 4px;
+  margin-left: 8px;
 }
 </style>
