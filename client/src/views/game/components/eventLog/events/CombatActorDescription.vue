@@ -28,5 +28,6 @@ const name = computed(() => props.actor.object.kind === 'star' ? props.actor.obj
 <style scoped>
 .combat-actor-name {
   padding-left: 8px;
+  width: 50%;
 }
 </style>

@@ -83,6 +83,10 @@ export const createStarDefenderSide = (game: Game, event: PlayerCombatStarEvent<
   }
 };
 
+export const getOriginalStarOwner = (game: Game, event: PlayerCombatStarEvent<string>) => {
+  return event.data.combatResult.star?.ownedByPlayerId && gameHelper.getPlayerById(game, event.data.combatResult.star!.ownedByPlayerId!)!;
+}
+
 export const createStarAttackerSide = (game: Game, event: PlayerCombatStarEvent<string>) => {
   const attackers = event.data.playerIdAttackers.map(id => gameHelper.getPlayerById(game, id)!);
 
