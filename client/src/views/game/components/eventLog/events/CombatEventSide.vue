@@ -24,6 +24,12 @@
             <td>{{ actor.after }}</td>
           </tr>
         </template>
+        <tr>
+          <td class="combat-side-total">Total</td>
+          <td class="combat-side-total">{{totals.before}}</td>
+          <td class="combat-side-total">{{totals.lost}}</td>
+          <td class="combat-side-total">{{totals.after}}</td>
+        </tr>
       </table>
     </div>
   </div>
@@ -31,11 +37,12 @@
 
 <script setup lang="ts">
 import { useStore } from 'vuex';
-import { type CombatSide } from '../../../../../types/combat';
+import {type CombatSide, resultToNumber} from '../../../../../types/combat';
 import type { Store } from 'vuex/types/index.js';
 import type { State } from '../../../../../store';
 import CombatActorDescription from './CombatActorDescription.vue';
 import PlayerIcon from "../../../../game/components/player/PlayerIcon.vue";
+import { computed } from 'vue';
 
 const props = defineProps<{
   title: string,
@@ -52,6 +59,22 @@ const requestOpenPlayerDetail = (playerId: string) => {
   emit('onOpenPlayerDetailRequested', playerId);
 };
 
+const totals = computed(() => {
+  return props.side.participants.map(participant => {
+    return participant.group.reduce((acc, actor) => {
+      acc.before += resultToNumber(actor.before);
+      acc.lost += resultToNumber(actor.lost);
+      acc.after += resultToNumber(actor.after);
+      return acc;
+    }, { before: 0, lost: 0, after: 0 });
+  }).reduce((acc, participant) => {
+    acc.before += participant.before;
+    acc.lost += participant.lost;
+    acc.after += participant.after;
+    return acc;
+  }, { before: 0, lost: 0, after: 0 });
+})
+
 </script>
 <style scoped>
 .participant-alias {
@@ -60,5 +83,9 @@ const requestOpenPlayerDetail = (playerId: string) => {
 
 .participant-name {
   margin-left: 8px;
+}
+
+.combat-side-total {
+  font-weight: bold;
 }
 </style>

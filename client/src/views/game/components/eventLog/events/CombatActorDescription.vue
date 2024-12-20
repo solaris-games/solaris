@@ -10,8 +10,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { type CombatActor } from '../../../../../types/combat';
-import { type Store, useStore } from 'vuex';
-import type { State } from '../../../../../store';
 import SpecialistIcon from "../../specialist/SpecialistIcon.vue";
 import type {Specialist} from "@solaris-common";
 
@@ -20,14 +18,13 @@ const props = defineProps<{
   specialist: Specialist | null,
 }>();
 
-const store = useStore() as Store<State>;
-
 const kind = computed(() => props.actor.object.kind);
 const name = computed(() => props.actor.object.kind === 'star' ? props.actor.object.starName : props.actor.object.carrier.name);
+
 </script>
 <style scoped>
 .combat-actor-name {
-  padding-left: 8px;
+  padding-left: 16px;
   width: 50%;
 }
 </style>

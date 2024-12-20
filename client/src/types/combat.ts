@@ -84,7 +84,15 @@ export const createStarDefenderSide = (game: Game, event: PlayerCombatStarEvent<
 };
 
 export const getOriginalStarOwner = (game: Game, event: PlayerCombatStarEvent<string>) => {
-  return event.data.combatResult.star?.ownedByPlayerId && gameHelper.getPlayerById(game, event.data.combatResult.star!.ownedByPlayerId!)!;
+  if ( event.data.combatResult.star?.ownedByPlayerId) {
+    return gameHelper.getPlayerById(game, event.data.combatResult.star!.ownedByPlayerId!)!;
+  }
+
+  return null;
+}
+
+export const resultToNumber = (result: CombatParticipantResult) => {
+  return typeof result === 'number' ? result : 0;
 }
 
 export const createStarAttackerSide = (game: Game, event: PlayerCombatStarEvent<string>) => {
@@ -117,7 +125,12 @@ export const createStarAttackerSide = (game: Game, event: PlayerCombatStarEvent<
     return { player: gameHelper.getPlayerById(game, playerId)!, group: actors };
   });
 
-  participants.sort((a, b) => a.player.alias.localeCompare(b.player.alias));
+  participants.sort((a, b) => {
+    const sumA = a.group.reduce((acc, actor) => acc + resultToNumber(actor.before), 0);
+    const sumB = b.group.reduce((acc, actor) => acc + resultToNumber(actor.before), 0);
+
+    return sumB - sumA;
+  });
 
   return {
     participants,
