@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h6>{{ title }}</h6>
     <div class="table-responsive mt-2">
       <table class="table table-sm">
         <tr>
@@ -13,11 +12,11 @@
           <tr>
             <td colspan="4" class="participant-alias">
               <PlayerIcon :player-id="participant.player._id" :solid-glyph-only="true" />
-              {{ participant.player.alias }}
+              <span class="participant-name">{{ participant.player.alias }}</span>
             </td>
           </tr>
           <tr v-for="actor of participant.group">
-            <CombatActorDescription :actor="actor" />
+            <CombatActorDescription :actor="actor" :specialist="actor.specialist" />
             <td>{{ actor.before }}</td>
             <td>{{ actor.lost }}</td>
             <td>{{ actor.after }}</td>
@@ -31,12 +30,10 @@
 <script setup lang="ts">
 import { useStore } from 'vuex';
 import { type CombatSide } from '../../../../../types/combat';
-import { type Player } from '../../../../../types/game';
 import type { Store } from 'vuex/types/index.js';
 import type { State } from '../../../../../store';
 import CombatActorDescription from './CombatActorDescription.vue';
-import PlayerIconShape from "@/views/game/components/player/PlayerIconShape.vue";
-import PlayerIcon from "@/views/game/components/player/PlayerIcon.vue";
+import PlayerIcon from "../../../../game/components/player/PlayerIcon.vue";
 
 const props = defineProps<{
   title: string,
@@ -49,5 +46,9 @@ const store = useStore() as Store<State>;
 <style scoped>
 .participant-alias {
   font-weight: bold;
+}
+
+.participant-name {
+  margin-left: 4px;
 }
 </style>

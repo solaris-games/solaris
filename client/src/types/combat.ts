@@ -5,7 +5,7 @@ import gameHelper from "../services/gameHelper"
 export type CombatParticipantResult = number | '???';
 
 export type CombatActorObject =
-  | { kind: 'star', star: CombatStar<string> }
+  | { kind: 'star', star: CombatStar<string>, starName: string }
   | { kind: 'carrier', carrier: CombatCarrier<string> }
 
 export type CombatActor = {
@@ -27,10 +27,10 @@ export type CombatSide = {
   baseWeaponsLevel: number,
 }
 
-const starToCombatActor = (star: CombatStar<string>): CombatActor => {
+const starToCombatActor = (event: PlayerCombatStarEvent<string>, star: CombatStar<string>): CombatActor => {
   return {
     specialist: star.specialist,
-    object: { kind: 'star', star },
+    object: { kind: 'star', star, starName: event.data.starName },
     before: star.before,
     after: star.after,
     lost: star.lost,
@@ -66,7 +66,7 @@ export const createStarDefenderSide = (game: Game, event: PlayerCombatStarEvent<
   const participantsGroups = new Map<string, CombatActor[]>();
 
   const star = event.data.combatResult.star!;
-  participantsGroups.set(star.ownedByPlayerId!, [starToCombatActor(star)])
+  participantsGroups.set(star.ownedByPlayerId!, [starToCombatActor(event, star)])
 
   for (const car of defenderCarriers) {
     const group = participantsGroups.get(car.ownedByPlayerId) || [];
