@@ -13,7 +13,7 @@
             The star <star-label :starId="event.data.starId" :starName="event.data.starName"/> has been captured
             by <a href="javascript:;" @click="emit('onOpenPlayerDetailRequested', event.data.captureResult.capturedById)">{{event.data.captureResult.capturedByAlias}}</a>
             <span v-if="getOriginalStarOwner(game, event)">
-              from <a href="javascript:;" @click="emit('onOpenPlayerDetailRequested', getOriginalStarOwner(game, event)!._id)">{{getOriginalStarOwner(game, event).alias}}</a>
+              from <a href="javascript:;" @click="emit('onOpenPlayerDetailRequested', getOriginalStarOwner(game, event)!._id)">{{getOriginalStarOwner(game, event)!.alias}}</a>
             </span>
             .
           </p>

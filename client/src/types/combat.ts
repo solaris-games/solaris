@@ -24,7 +24,6 @@ export type CombatParticipant = {
 export type CombatSide = {
   participants: CombatParticipant[],
   weaponsLevel: number,
-  baseWeaponsLevel: number,
 }
 
 const starToCombatActor = (event: PlayerCombatStarEvent<string>, star: CombatStar<string>): CombatActor => {
@@ -79,7 +78,6 @@ export const createStarDefenderSide = (game: Game, event: PlayerCombatStarEvent<
   return {
     participants,
     weaponsLevel,
-    baseWeaponsLevel,
   }
 };
 
@@ -101,7 +99,6 @@ export const createStarAttackerSide = (game: Game, event: PlayerCombatStarEvent<
   const attackerCarriers = event.data.combatResult.carriers.filter(c => attackers.find(d => d._id === c.ownedByPlayerId));
 
   const weaponsLevel = event.data.combatResult.weapons.attacker;
-  const baseWeaponsLevel = event.data.combatResult.weapons.attackerBase;
 
   const participantsGroups = new Map<string, CombatActor[]>();
 
@@ -135,6 +132,5 @@ export const createStarAttackerSide = (game: Game, event: PlayerCombatStarEvent<
   return {
     participants,
     weaponsLevel,
-    baseWeaponsLevel,
   }
 };

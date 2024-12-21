@@ -8,6 +8,11 @@
           <th>Lost</th>
           <th>After</th>
         </tr>
+        <tr>
+          <td colspan="4" class="weapons-level">
+            Weapons {{side.weaponsLevel}}
+          </td>
+        </tr>
         <template v-for="participant of side.participants">
           <tr>
             <td colspan="4">
@@ -87,5 +92,9 @@ const totals = computed(() => {
 
 .combat-side-total {
   font-weight: bold;
+}
+
+.weapons-level {
+  font-style: italic;
 }
 </style>
