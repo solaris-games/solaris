@@ -276,8 +276,10 @@
     </div>
 
     <div class="mb-1 pb-1">
+      <h6>Map Feature Distance (%)</h6>
+
       <div class="row pt-1 pb-1">
-        <label for="" class="col col-form-label">Zoom Levels(%)</label>
+        <label for="" class="col col-form-label">Zoomed-Out Features</label>
       </div>
 
       <div class="row pt-1 pb-1 ms-1">
@@ -285,6 +287,17 @@
         <div class="col">
           <input type="number" class="form-control" id="territories-zoom" v-model="settings.map.zoomLevels.territories" :disabled="isSavingSettings">
         </div>
+      </div>
+
+      <div class="row pt-1 pb-1 ms-1">
+        <label for="player-names-zoom" class="col col-form-label">Player Names</label>
+        <div class="col">
+          <input type="number" class="form-control" id="player-names-zoom" v-model="settings.map.zoomLevels.playerNames" :disabled="isSavingSettings">
+        </div>
+      </div>
+
+      <div class="row pt-1 pb-1">
+        <label for="" class="col col-form-label">Zoomed-In Features</label>
       </div>
 
       <div class="row pt-1 pb-1 ms-1">
@@ -298,13 +311,6 @@
         <label for="background-stars-zoom" class="col col-form-label">Background Stars</label>
         <div class="col">
           <input type="number" class="form-control" id="background-stars-zoom" v-model="settings.map.zoomLevels.background.stars" :disabled="isSavingSettings">
-        </div>
-      </div>
-
-      <div class="row pt-1 pb-1 ms-1">
-        <label for="player-names-zoom" class="col col-form-label">Player Names</label>
-        <div class="col">
-          <input type="number" class="form-control" id="player-names-zoom" v-model="settings.map.zoomLevels.playerNames" :disabled="isSavingSettings">
         </div>
       </div>
 
@@ -342,7 +348,6 @@
           <input type="number" class="form-control" id="star-infrastructure-zoom" v-model="settings.map.zoomLevels.star.infrastructure" :disabled="isSavingSettings">
         </div>
       </div>
-
     </div>
 
     <div class="mb-1 pb-1">
