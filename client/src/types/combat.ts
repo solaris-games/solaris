@@ -54,13 +54,40 @@ export const compareResult = (a: CombatParticipantResult, b: CombatParticipantRe
   return a - b;
 }
 
+const createSide = (groups: Map<string, CombatActor[]>, game: Game, weaponsLevel: number): CombatSide => {
+  const participants = Array.from(participantsGroups, ([playerId, actors]) => {
+    actors.sort((a, b) => {
+      if (a.object.kind === 'star') {
+        return -1;
+      } else if (b.object.kind === 'star') {
+        return 1;
+      }
+
+      return compareResult(a.before, b.before);
+    });
+
+    return { player: gameHelper.getPlayerById(game, playerId)!, group: actors };
+  });
+
+  participants.sort((a, b) => {
+    const sumA = a.group.reduce((acc, actor) => acc + resultToNumber(actor.before), 0);
+    const sumB = b.group.reduce((acc, actor) => acc + resultToNumber(actor.before), 0);
+
+    return sumB - sumA;
+  });
+
+  return {
+    participants,
+    weaponsLevel,
+  }
+}
+
 export const createStarDefenderSide = (game: Game, event: PlayerCombatStarEvent<string>): CombatSide => {
   const defenders = event.data.playerIdDefenders.map(id => gameHelper.getPlayerById(game, id)!);
 
   const defenderCarriers = event.data.combatResult.carriers.filter(c => defenders.find(d => d._id === c.ownedByPlayerId));
 
   const weaponsLevel = event.data.combatResult.weapons.defender;
-  const baseWeaponsLevel = event.data.combatResult.weapons.defenderBase;
 
   const participantsGroups = new Map<string, CombatActor[]>();
 
@@ -73,12 +100,7 @@ export const createStarDefenderSide = (game: Game, event: PlayerCombatStarEvent<
     participantsGroups.set(car.ownedByPlayerId, group);
   }
 
-  const participants = Array.from(participantsGroups, ([playerId, actors]) => ({ player: gameHelper.getPlayerById(game, playerId)!, group: actors }));
-
-  return {
-    participants,
-    weaponsLevel,
-  }
+  return createSide(participantsGroups, game, weaponsLevel);
 };
 
 export const getOriginalStarOwner = (game: Game, event: PlayerCombatStarEvent<string>) => {
@@ -108,29 +130,5 @@ export const createStarAttackerSide = (game: Game, event: PlayerCombatStarEvent<
     participantsGroups.set(car.ownedByPlayerId, group);
   }
 
-  const participants = Array.from(participantsGroups, ([playerId, actors]) => {
-    actors.sort((a, b) => {
-      if (a.object.kind === 'star') {
-        return -1;
-      } else if (b.object.kind === 'star') {
-        return 1;
-      }
-
-      return compareResult(a.before, b.before);
-    });
-
-    return { player: gameHelper.getPlayerById(game, playerId)!, group: actors };
-  });
-
-  participants.sort((a, b) => {
-    const sumA = a.group.reduce((acc, actor) => acc + resultToNumber(actor.before), 0);
-    const sumB = b.group.reduce((acc, actor) => acc + resultToNumber(actor.before), 0);
-
-    return sumB - sumA;
-  });
-
-  return {
-    participants,
-    weaponsLevel,
-  }
+  return createSide(participantsGroups, game, weaponsLevel);
 };
