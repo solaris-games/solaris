@@ -111,20 +111,16 @@ class TextureService {
   STAR_TEXTURE: Texture | undefined;
 
   async loadAssets() {
-    for (let spec of Object.keys(TEXTURE_URLS)) {
+    await Promise.all(Object.keys(TEXTURE_URLS).map(spec => {
       const val = TEXTURE_URLS[spec];
       if (Array.isArray(val)) {
-        for (let url of val) {
-          await Assets.load(url);
-        }
+        return Promise.all(val.map(url => Assets.load(url)));
       } else if (typeof val === 'string') {
-        await Assets.load(val);
+        return Assets.load(val);
       }
-    }
+    }));
 
-    for (let specTex of SPECIALIST_TEXTURES) {
-      await Assets.load(new URL(`../assets/specialists/${specTex}.svg`, import.meta.url).href);
-    }
+    await Promise.all(SPECIALIST_TEXTURES.map(specTex => Assets.load(new URL(`../assets/specialists/${specTex}.svg`, import.meta.url).href)));
   }
 
   initialize() {
