@@ -10,6 +10,7 @@
 
     <div class="row bg-dark">
       <div class="col text-center pt-2">
+        <p class="mb-2 text-info" style="font-weight: bold">Location: ({{star.location.x.toFixed(3)}}, {{star.location.y.toFixed(3)}})</p>
         <p class="mb-2" v-if="isOwnedByUserPlayer">A star under your command.</p>
         <p class="mb-2" v-if="star.ownedByPlayerId != null && (!userPlayer || star.ownedByPlayerId != userPlayer._id)">This star is controlled by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{starOwningPlayer.alias}}</a>.</p>
         <p class="mb-2" v-if="star.ownedByPlayerId == null">This star has not been claimed by any faction.<br/>Send a carrier here to claim it for yourself!</p>

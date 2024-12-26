@@ -11,6 +11,7 @@
 
     <div class="row bg-dark" :class="{'bg-warning': carrier.isGift}">
       <div class="col text-center pt-2">
+        <p class="mb-2 text-info" style="font-weight: bold">Location: ({{carrier.location.x.toFixed(3)}}, {{carrier.location.y.toFixed(3)}})</p>
         <p class="mb-2" v-if="isUserPlayerCarrier && !carrier.isGift">A carrier under your command.</p>
         <p class="mb-2" v-if="isNotUserPlayerCarrier">This carrier is controlled by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{carrierOwningPlayer.alias}}</a>.</p>
         <p class="mb-2" v-if="carrier.isGift"><strong>This carrier is a gift.</strong></p>
