@@ -538,7 +538,7 @@ export default class GameTickService extends EventEmitter {
         return carrierPositions.filter(c => {
             let specialist = this.specialistService.getByIdCarrier(c.carrier.specialistId);
 
-            if (specialist && specialist.modifiers && specialist.modifiers.special 
+            if (specialist && specialist.modifiers && specialist.modifiers.special
                 && specialist.modifiers.special.avoidCombatCarrierToCarrier) {
                 return false;
             }
@@ -601,9 +601,13 @@ export default class GameTickService extends EventEmitter {
         let actionWaypoints: CarrierActionWaypoint[] = [];
 
         for (let i = 0; i < carriersInTransit.length; i++) {
-            let carrierInTransit = carriersInTransit[i];
+            const carrierInTransit = carriersInTransit[i];
         
-            let carrierMovementReport = await this.carrierMovementService.moveCarrier(game, gameUsers, carrierInTransit);
+            const carrierMovementReport = this.carrierMovementService.moveCarrier(game, gameUsers, carrierInTransit);
+
+            if (!carrierMovementReport) {
+                continue;
+            }
 
             // If the carrier has arrived at the star then
             // append the movement waypoint to the array of action waypoints so that we can deal with it after combat.
@@ -690,7 +694,7 @@ export default class GameTickService extends EventEmitter {
             let carrier = contestedStar.carriersInOrbit
                 .sort((a: Carrier, b: Carrier) => b.ships! - a.ships!)[0];
 
-            await this.starService.claimUnownedStar(game, gameUsers, contestedStar.star, carrier);
+            this.starService.claimUnownedStar(game, gameUsers, contestedStar.star, carrier);
         }
     }
 

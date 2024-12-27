@@ -1,12 +1,15 @@
 <template>
   <main>
-    <ConfirmationDialog :dialogSettings="$store.state.confirmationDialog" />
+    <ConfirmationDialog :dialogSettings="store.state.confirmationDialog" />
     <router-view/>
   </main>
 </template>
 
 <script setup lang="ts">
+import { useStore } from 'vuex';
 import ConfirmationDialog from './views/components/modal/ConfirmationDialog.vue';
+
+const store = useStore();
 </script>
 
 <style>

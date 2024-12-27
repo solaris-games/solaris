@@ -67,6 +67,7 @@ describe('Leaderboard - Last man standing', () => {
             }
         } as PlayerStatisticsService;
 
+        // @ts-ignore
         service = new LeaderboardService(playerService, playerAfkService, userLevelService, ratingService, gameService, gameTypeService, gameStateService, badgeService, playerStatisticsService, teamService);
 
         game = {

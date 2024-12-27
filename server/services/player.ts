@@ -389,7 +389,7 @@ export default class PlayerService extends EventEmitter {
         // Pick a random unowned star.
         let unownedStars = game.galaxy.stars.filter(s => s.ownedByPlayerId == null);
 
-        let rnd = this.randomService.getRandomNumber(unownedStars.length);
+        let rnd = this.randomService.getRandomNumber(unownedStars.length - 1);
 
         return unownedStars[rnd];
     }
@@ -413,7 +413,7 @@ export default class PlayerService extends EventEmitter {
 
         if (random) {
             // Pick a random radian for the player's starting position.
-            let radianIndex = this.randomService.getRandomNumber(radians.length);
+            let radianIndex = this.randomService.getRandomNumber(radians.length - 1);
             currentRadian = radians.splice(radianIndex, 1)[0];
         } else {
             currentRadian = radians.pop()!;

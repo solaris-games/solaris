@@ -41,7 +41,7 @@ The client uses the following tech:
 6. Create a `.env` file in `client/` (See `.env.example`).
 7. `npm run start-jobs:dev` in `server/` to start the automated jobs and setup new games.
 8. `npm run start-api:dev` in `server/` to start the API.
-9. `npm run serve` in `client/` to start the client application.
+9. `npm run dev` in `client/` to start the client application.
 10. Browse to the site locally (default [http://localhost:8080](http://localhost:8080)).
 
 *Note: Development work is to be based on the `dev` branch, for a new feature or bug fix, create a branch from `dev`.*
