@@ -350,7 +350,8 @@ export default class GameCreateService {
             game, 
             desiredStarCount,
             game.settings.general.playerLimit,
-            settings.galaxy.customJSON
+            settings.galaxy.customJSON,
+            settings.galaxy.customSeed,
         );
 
         game.galaxy.stars = starGeneration.stars;

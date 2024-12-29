@@ -1,7 +1,9 @@
+import {logger} from "../../utils/logging";
+
 const randomSeeded = require('random-seed');
 import { createNoise2D } from 'simplex-noise';
 import ValidationError from '../../errors/validation';
-import { GameResourceDistribution } from '../types/Game';
+import {Game, GameResourceDistribution} from '../types/Game';
 import { Location } from '../types/Location';
 import DistanceService from '../distance';
 import GameTypeService from '../gameType';
@@ -9,6 +11,8 @@ import RandomService from '../random';
 import ResourceService from '../resource';
 import StarService from '../star';
 import StarDistanceService from '../starDistance';
+
+const log = logger("Irregular Map Generation Service");
 
 const MAX_SEED = Number.MAX_SAFE_INTEGER;
 
@@ -283,12 +287,15 @@ export default class IrregularMapService {
 
     }
 
-    generateLocations(game, starCount: number, resourceDistribution: GameResourceDistribution, playerCount: number): Location[] {
+    generateLocations(game: Game, starCount: number, resourceDistribution: GameResourceDistribution, playerCount: number, customSeed: string | null | undefined): Location[] {
         if (this.gameTypeService.isKingOfTheHillMode(game)) {
             throw new ValidationError(`King of the hill is not supported in irregular maps.`);
         }
 
-        const SEED = ( Math.random()* MAX_SEED).toFixed(0);
+        const SEED = customSeed || ( Math.random()* MAX_SEED).toFixed(0);
+
+        log.info(`Generating irregular map for ${game.settings.general.name}: ${game.settings.general.playerLimit} players (${game.settings.galaxy.starsPerPlayer} SPP) with seed ${SEED}`);
+
         const SPREAD = 2.5;
         const RNG = randomSeeded.create(SEED);
         const SIMPLEX_NOISE = createNoise2D(RNG.rand);

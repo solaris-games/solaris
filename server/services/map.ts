@@ -28,7 +28,7 @@ export default class MapService {
     customMapService: CustomMapService;
 
     constructor(
-        randomService: RandomService, 
+        randomService: RandomService,
         starService: StarService,
         starDistanceService: StarDistanceService,
         nameService: NameService,
@@ -53,7 +53,7 @@ export default class MapService {
         this.customMapService = customMapService;
     }
 
-    generateStars(game: Game, starCount: number, playerLimit: number, customJSON?: string | null) {
+    generateStars(game: Game, starCount: number, playerLimit: number, customJSON?: string | null, customSeed?: string | null) {
         let stars: Star[] = [];
         let homeStars: any[] = [];
         let linkedStars: any[] = [];
@@ -78,7 +78,7 @@ export default class MapService {
                 starLocations = this.circularBalancedMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution, playerLimit);
                 break;
             case 'irregular':
-                starLocations = this.irregularMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution, playerLimit);
+                starLocations = this.irregularMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution, playerLimit, customSeed);
                 break;
             case 'custom':
                 starLocations = this.customMapService.generateLocations(customJSON!, playerLimit);
