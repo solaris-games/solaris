@@ -177,6 +177,8 @@ export default class GameCreateService {
             }
         }
 
+        const rand = this._createRandomGenerator(settings);
+
         let game = new this.gameModel({
             settings
         }) as Game;
@@ -348,8 +350,6 @@ export default class GameCreateService {
         game.galaxy.homeStars = [];
         game.galaxy.linkedStars = [];
 
-        const rand = this._createRandomGenerator(game);
-
         const starGeneration = this.mapService.generateStars(
             rand,
             game, 
@@ -412,10 +412,10 @@ export default class GameCreateService {
         return gameObject;
     }
 
-    _createRandomGenerator(game: Game) {
-        if (game.settings.galaxy.galaxyType === 'irregular') {
-            const seed = game.settings.galaxy.customSeed || (Math.random() * Number.MAX_SAFE_INTEGER).toFixed(0);
-            log.info(`Generating irregular map for ${game.settings.general.name}: ${game.settings.general.playerLimit} players (${game.settings.galaxy.starsPerPlayer} SPP) with seed ${seed}`);
+    _createRandomGenerator(settings: GameSettings) {
+        if (settings.galaxy.galaxyType === 'irregular') {
+            const seed = settings.galaxy.customSeed || (Math.random() * Number.MAX_SAFE_INTEGER).toFixed(0);
+            log.info(`Generating irregular map for ${settings.general.name}: ${settings.general.playerLimit} players (${settings.galaxy.starsPerPlayer} SPP) with seed ${seed}`);
 
             return new SeededRandomGen(seed);
         } else {
