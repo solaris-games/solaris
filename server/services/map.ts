@@ -14,6 +14,7 @@ import StarService from "./star";
 import StarDistanceService from "./starDistance";
 import ValidationError from "../errors/validation";
 import {RandomGen} from "../utils/randomGen";
+import {shuffle} from "./utils";
 
 export default class MapService {
     randomService: RandomService;
@@ -151,56 +152,54 @@ export default class MapService {
 
         // If warp gates are enabled, assign random stars to start as warp gates.
         if (game.settings.specialGalaxy.randomWarpGates) {
-            this._generateGates(game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomWarpGates);
+            this._generateGates(rand, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomWarpGates);
         }
 
         // If worm holes are enabled, assign random warp gates to start as worm hole pairs
         if (game.settings.specialGalaxy.randomWormHoles) {
-            this._generateWormHoles(game, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomWormHoles);
+            this._generateWormHoles(rand, game, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomWormHoles);
         }
 
         // If nebulas are enabled, assign random nebulas to start
         if (game.settings.specialGalaxy.randomNebulas) {
-            this._generateNebulas(game, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomNebulas);
+            this._generateNebulas(rand, game, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomNebulas);
         }
 
         // If asteroid fields are enabled, assign random asteroid fields to start
         if (game.settings.specialGalaxy.randomAsteroidFields) {
-            this._generateAsteroidFields(game, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomAsteroidFields);
+            this._generateAsteroidFields(rand, game, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomAsteroidFields);
         }
 
         // If binary stars are enabled, assign random binary stars to start
         if (game.settings.specialGalaxy.randomBinaryStars) {
-            this._generateBinaryStars(game, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomBinaryStars);
+            this._generateBinaryStars(rand, game, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomBinaryStars);
         }
 
         // If black holes are enabled, assign random black holes to start
         if (game.settings.specialGalaxy.randomBlackHoles) {
-            this._generateBlackHoles(game, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomBlackHoles);
+            this._generateBlackHoles(rand, game, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomBlackHoles);
         }
 
         // If pulsars are enabled, assign random pulsars to start
         if (game.settings.specialGalaxy.randomPulsars) {
-            this._generatePulsars(game, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomPulsars);
+            this._generatePulsars(rand, game, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomPulsars);
         }
     }
 
-    _generateGates(stars: Star[], playerCount: number, percentage: number) {
+    _generateGates(rand: RandomGen, stars: Star[], playerCount: number, percentage: number) {
         let gateCount = Math.floor((stars.length - playerCount) / 100 * percentage);
 
-        // Pick stars at random and set them to be warp gates.
-        do {
-            let star = stars[this.randomService.getRandomNumberBetween(0, stars.length - 1)];
+        const applicableStars = stars.filter(s => !s.homeStar && !s.warpGate && !this.starService.isDeadStar(s));
+        shuffle(rand, applicableStars);
 
-            if (star.homeStar || star.warpGate || this.starService.isDeadStar(star)) {
-                gateCount++; // Increment because the while loop will decrement.
-            } else {
-                star.warpGate = true;
-            }
-        } while (gateCount--);
+        const warpGateStars = applicableStars.slice(0, gateCount);
+
+        for (let star of warpGateStars) {
+            star.warpGate = true;
+        }
     }
 
-    _generateWormHoles(game: Game, stars: Star[], playerCount: number, percentage: number) {
+    _generateWormHoles(rand: RandomGen, game: Game, stars: Star[], playerCount: number, percentage: number) {
         let wormHoleCount = Math.floor((stars.length - playerCount) / 2 / 100 * percentage); // Wormholes come in pairs so its half of stars
 
         // Pick stars at random and pair them up with another star to create a worm hole.
@@ -220,7 +219,7 @@ export default class MapService {
         }
     }
 
-    _generateNebulas(game: Game, stars: Star[], playerCount: number, percentage: number) {
+    _generateNebulas(rand: RandomGen, game: Game, stars: Star[], playerCount: number, percentage: number) {
         let count = Math.floor((stars.length - playerCount) / 100 * percentage);
 
         // Pick stars at random and set them to be nebulas
@@ -243,7 +242,7 @@ export default class MapService {
         } while (count--);
     }
 
-    _generateAsteroidFields(game: Game, stars: Star[], playerCount: number, percentage: number) {
+    _generateAsteroidFields(rand: RandomGen, game: Game, stars: Star[], playerCount: number, percentage: number) {
         let count = Math.floor((stars.length - playerCount) / 100 * percentage);
 
         // Pick stars at random and set them to be asteroid fields
@@ -266,7 +265,7 @@ export default class MapService {
         } while (count--);
     }
 
-    _generateBinaryStars(game: Game, stars: Star[], playerCount: number, percentage: number) {
+    _generateBinaryStars(rand: RandomGen, game: Game, stars: Star[], playerCount: number, percentage: number) {
         let count = Math.floor((stars.length - playerCount) / 100 * percentage);
 
         // Pick stars at random and set them to be binary stars
@@ -298,7 +297,7 @@ export default class MapService {
         } while (count--);
     }
 
-    _generateBlackHoles(game: Game, stars: Star[], playerCount: number, percentage: number) {
+    _generateBlackHoles(rand: RandomGen, game: Game, stars: Star[], playerCount: number, percentage: number) {
         let count = Math.floor((stars.length - playerCount) / 100 * percentage);
 
         // Pick stars at random and set them to be asteroid fields
@@ -318,7 +317,7 @@ export default class MapService {
         } while (count--);
     }
 
-    _generatePulsars(game: Game, stars: Star[], playerCount: number, percentage: number) {
+    _generatePulsars(rand: RandomGen, game: Game, stars: Star[], playerCount: number, percentage: number) {
         let count = Math.floor((stars.length - playerCount) / 100 * percentage);
 
         // Pick stars at random and set them to be pulsars

@@ -3,6 +3,7 @@ import RandomService from "./random";
 import {shuffle} from "./utils";
 import {Game} from "./types/Game";
 import {DBObjectId} from "./types/DBObjectId";
+import {MathRandomGen} from "../utils/randomGen";
 
 type ColourGroup = {
     group: string;
@@ -84,7 +85,7 @@ export default class PlayerColourService {
                     };
                 }));
 
-        shuffle(combinations);
+        shuffle(new MathRandomGen(), combinations);
         return combinations.slice(0, playerCount);
     }
 }
