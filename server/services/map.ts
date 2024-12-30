@@ -13,6 +13,7 @@ import RandomService from "./random";
 import StarService from "./star";
 import StarDistanceService from "./starDistance";
 import ValidationError from "../errors/validation";
+import {RandomGen} from "../utils/randomGen";
 
 export default class MapService {
     randomService: RandomService;
@@ -53,7 +54,7 @@ export default class MapService {
         this.customMapService = customMapService;
     }
 
-    generateStars(game: Game, starCount: number, playerLimit: number, customJSON?: string | null, customSeed?: string | null) {
+    generateStars(rand: RandomGen, game: Game, starCount: number, playerLimit: number, customJSON?: string | null, customSeed?: string | null) {
         let stars: Star[] = [];
         let homeStars: any[] = [];
         let linkedStars: any[] = [];
@@ -63,6 +64,8 @@ export default class MapService {
 
         // Generate all of the locations for stars.
         let starLocations: any[] = [];
+
+        // TODO: Use randGen for all generators
 
         switch (game.settings.galaxy.galaxyType) {
             case 'circular':
@@ -78,7 +81,7 @@ export default class MapService {
                 starLocations = this.circularBalancedMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution, playerLimit);
                 break;
             case 'irregular':
-                starLocations = this.irregularMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution, playerLimit, customSeed);
+                starLocations = this.irregularMapService.generateLocations(rand, game, starCount, game.settings.specialGalaxy.resourceDistribution, playerLimit, customSeed);
                 break;
             case 'custom':
                 starLocations = this.customMapService.generateLocations(customJSON!, playerLimit);
@@ -143,7 +146,7 @@ export default class MapService {
         };
     }
 
-    generateTerrain(game: Game) {
+    generateTerrain(rand: RandomGen, game: Game) {
         const playerCount = game.settings.general.playerLimit;
 
         // If warp gates are enabled, assign random stars to start as warp gates.

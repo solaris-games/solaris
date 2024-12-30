@@ -1,3 +1,5 @@
+import {MathRandomGen, RandomGen, SeededRandomGen} from "../utils/randomGen";
+
 const mongoose = require('mongoose');
 import ValidationError from '../errors/validation';
 import {Game, GameSettings, Team} from './types/Game';
@@ -18,14 +20,14 @@ import GameJoinService from './gameJoin';
 import SpecialStarBanService from './specialStarBan';
 import StarService from './star';
 import DiplomacyService from "./diplomacy";
-import {DBObjectId} from "./types/DBObjectId";
-import {shuffle} from "./utils";
 import TeamService from "./team";
 import CarrierService from './carrier';
-import { Carrier } from './types/Carrier';
 import CustomMapService from "./maps/custom";
+import {logger} from "../utils/logging";
 
 const RANDOM_NAME_STRING = '[[[RANDOM]]]';
+
+const log = logger("GameCreateService");
 
 export default class GameCreateService {
     gameModel;
@@ -346,7 +348,10 @@ export default class GameCreateService {
         game.galaxy.homeStars = [];
         game.galaxy.linkedStars = [];
 
-        let starGeneration = this.mapService.generateStars(
+        const rand = this._createRandomGenerator(game);
+
+        const starGeneration = this.mapService.generateStars(
+            rand,
             game, 
             desiredStarCount,
             game.settings.general.playerLimit,
@@ -378,7 +383,7 @@ export default class GameCreateService {
             game.galaxy.carriers = this.playerService.createHomeStarCarriers(game);
         }
 
-        this.mapService.generateTerrain(game);
+        this.mapService.generateTerrain(rand, game);
 
         // Calculate how many stars we have and how many are required for victory.
         game.state.stars = game.galaxy.stars.length;
@@ -405,6 +410,17 @@ export default class GameCreateService {
         // ^ Maybe fire an event for the historyService to capture?
         
         return gameObject;
+    }
+
+    _createRandomGenerator(game: Game) {
+        if (game.settings.galaxy.galaxyType === 'irregular') {
+            const seed = game.settings.galaxy.customSeed || (Math.random() * Number.MAX_SAFE_INTEGER).toFixed(0);
+            log.info(`Generating irregular map for ${game.settings.general.name}: ${game.settings.general.playerLimit} players (${game.settings.galaxy.starsPerPlayer} SPP) with seed ${seed}`);
+
+            return new SeededRandomGen(seed);
+        } else {
+            return new MathRandomGen();
+        }
     }
 
     _setGalaxyCenter(game: Game) {
