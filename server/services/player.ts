@@ -23,6 +23,7 @@ import {shuffle} from "./utils";
 import { Carrier } from "./types/Carrier";
 import { Star } from "./types/Star";
 import PlayerColourService from "./playerColour";
+import {MathRandomGen} from "../utils/randomGen";
 
 export default class PlayerService extends EventEmitter {
     gameRepo: Repository<Game>;
@@ -242,7 +243,7 @@ export default class PlayerService extends EventEmitter {
         if (game.settings.specialGalaxy.playerDistribution === 'circularSequential') {
             playersDistributed = players;
         } else { // circular and random are both kinds of random distributions, but the latter will not work for irregular maps, so we do the same thing and use a random circular distribution
-            playersDistributed = shuffle(players);
+            playersDistributed = shuffle(new MathRandomGen(), players);
         }
 
         for (let player of playersDistributed) {

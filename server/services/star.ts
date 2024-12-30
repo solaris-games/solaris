@@ -21,6 +21,7 @@ import SpecialistService from './specialist';
 import StarDistanceService from './starDistance';
 import TechnologyService from './technology';
 import UserService from './user';
+import {MathRandomGen} from "../utils/randomGen";
 
 const RNG = require('random-seed');
 
@@ -887,7 +888,7 @@ export default class StarService extends EventEmitter {
         const constructors = game.galaxy.stars
             .filter(s => s.specialistId && this.specialistService.getByIdStar(s.specialistId)?.modifiers.special?.wormHoleConstructor);
 
-        shuffle(constructors);
+        shuffle(new MathRandomGen(), constructors);
 
         let pairs = Math.floor(constructors.length / 2);
 
