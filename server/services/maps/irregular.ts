@@ -7,7 +7,6 @@ import {Game, GameResourceDistribution} from '../types/Game';
 import { Location } from '../types/Location';
 import DistanceService from '../distance';
 import GameTypeService from '../gameType';
-import RandomService from '../random';
 import ResourceService from '../resource';
 import StarService from '../star';
 import StarDistanceService from '../starDistance';
@@ -17,8 +16,6 @@ const log = logger("Irregular Map Generation Service");
 const MAX_SEED = Number.MAX_SAFE_INTEGER;
 
 export default class IrregularMapService {
-
-    randomService: RandomService;
     starService: StarService;
     starDistanceService: StarDistanceService;
     distanceService: DistanceService;
@@ -26,13 +23,11 @@ export default class IrregularMapService {
     gameTypeService: GameTypeService;
 
     constructor(
-        randomService: RandomService,
         starService: StarService,
         starDistanceService: StarDistanceService,
         distanceService: DistanceService,
         resourceService: ResourceService,
         gameTypeService: GameTypeService) {
-        this.randomService = randomService;
         this.starService = starService;
         this.starDistanceService = starDistanceService;
         this.distanceService = distanceService;
