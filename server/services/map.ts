@@ -187,7 +187,7 @@ export default class MapService {
     }
 
     _generateGates(rand: RandomGen, stars: Star[], playerCount: number, percentage: number) {
-        let gateCount = Math.floor((stars.length - playerCount) / 100 * percentage);
+        const gateCount = Math.floor((stars.length - playerCount) / 100 * percentage);
 
         const applicableStars = stars.filter(s => !s.homeStar && !s.warpGate && !this.starService.isDeadStar(s));
         shuffle(rand, applicableStars);
@@ -200,136 +200,121 @@ export default class MapService {
     }
 
     _generateWormHoles(rand: RandomGen, game: Game, stars: Star[], playerCount: number, percentage: number) {
-        let wormHoleCount = Math.floor((stars.length - playerCount) / 2 / 100 * percentage); // Wormholes come in pairs so its half of stars
+        const wormHoleCount = Math.floor((stars.length - playerCount) / 2 / 100 * percentage); // Wormholes come in pairs so its half of stars
 
-        // Pick stars at random and pair them up with another star to create a worm hole.
-        while (wormHoleCount--) {
-            const remaining = stars.filter(s => !s.wormHoleToStarId);
+        const applicableStars = stars.filter(s => !s.homeStar && !s.wormHoleToStarId && !this.starService.isDeadStar(s));
+        shuffle(rand, applicableStars);
 
-            let starA = remaining[this.randomService.getRandomNumberBetween(0, remaining.length - 1)];
-            let starB = remaining[this.randomService.getRandomNumberBetween(0, remaining.length - 1)];
+        const wormHoleStars = applicableStars.slice(0, wormHoleCount * 2);
 
-            // Check validity of the random selection.
-            if (starA.homeStar || starB.homeStar || starA._id.toString() === starB._id.toString() || starA.wormHoleToStarId || starB.wormHoleToStarId) {
-                wormHoleCount++; // Increment because the while loop will decrement.
-            } else {
-                starA.wormHoleToStarId = starB._id;
-                starB.wormHoleToStarId = starA._id;
-            }
+        for (let i = 0; i < wormHoleCount; i++) {
+            const starA = wormHoleStars[i * 2];
+            const starB = wormHoleStars[i * 2 + 1];
+            starA.wormHoleToStarId = starB._id;
+            starB.wormHoleToStarId = starA._id;
         }
     }
 
     _generateNebulas(rand: RandomGen, game: Game, stars: Star[], playerCount: number, percentage: number) {
-        let count = Math.floor((stars.length - playerCount) / 100 * percentage);
+        const count = Math.floor((stars.length - playerCount) / 100 * percentage);
 
-        // Pick stars at random and set them to be nebulas
-        do {
-            let star = stars[this.randomService.getRandomNumberBetween(0, stars.length - 1)];
+        const applicableStars = stars.filter(s => !s.homeStar && !s.isNebula && !this.starService.isDeadStar(s));
+        shuffle(rand, applicableStars);
 
-            if (star.homeStar || star.isNebula) {
-                count++; // Increment because the while loop will decrement.
-            } else {
-                star.isNebula = true;
+        const nebulaStars = applicableStars.slice(0, count);
 
-                // Overwrite natural resources if splitResources
-                if (this.gameTypeService.isSplitResources(game)) {
-                    let minResources = game.constants.star.resources.maxNaturalResources * 1.5;
-                    let maxResources = game.constants.star.resources.maxNaturalResources * 3;
+        for (let nebulaStar of nebulaStars) {
+            nebulaStar.isNebula = true;
 
-                    star.naturalResources.science = this.randomService.getRandomNumberBetween(minResources, maxResources);
-                }
-            }
-        } while (count--);
-    }
-
-    _generateAsteroidFields(rand: RandomGen, game: Game, stars: Star[], playerCount: number, percentage: number) {
-        let count = Math.floor((stars.length - playerCount) / 100 * percentage);
-
-        // Pick stars at random and set them to be asteroid fields
-        do {
-            let star = stars[this.randomService.getRandomNumberBetween(0, stars.length - 1)];
-
-            if (star.homeStar || star.isAsteroidField) {
-                count++; // Increment because the while loop will decrement.
-            } else {
-                star.isAsteroidField = true;
-
-                // Overwrite natural resources if splitResources
-                if (this.gameTypeService.isSplitResources(game)) {
-                    let minResources = game.constants.star.resources.maxNaturalResources * 1.5;
-                    let maxResources = game.constants.star.resources.maxNaturalResources * 3;
-
-                    star.naturalResources.economy = this.randomService.getRandomNumberBetween(minResources, maxResources);
-                }
-            }
-        } while (count--);
-    }
-
-    _generateBinaryStars(rand: RandomGen, game: Game, stars: Star[], playerCount: number, percentage: number) {
-        let count = Math.floor((stars.length - playerCount) / 100 * percentage);
-
-        // Pick stars at random and set them to be binary stars
-        do {
-            let star = stars[this.randomService.getRandomNumberBetween(0, stars.length - 1)];
-
-            if (star.homeStar || star.isBinaryStar) {
-                count++; // Increment because the while loop will decrement.
-            } else {
-                star.isBinaryStar = true;
-
-                // Overwrite the natural resources
+            // Overwrite natural resources if splitResources
+            if (this.gameTypeService.isSplitResources(game)) {
                 let minResources = game.constants.star.resources.maxNaturalResources * 1.5;
                 let maxResources = game.constants.star.resources.maxNaturalResources * 3;
 
-                // Overwrite natural resources
-                if (this.gameTypeService.isSplitResources(game)) {
-                    star.naturalResources.industry = this.randomService.getRandomNumberBetween(minResources, maxResources);
-                } else {
-                    let resources = this.randomService.getRandomNumberBetween(minResources, maxResources);
-
-                    star.naturalResources = {
-                        economy: resources,
-                        industry: resources,
-                        science: resources
-                    };
-                }
+                nebulaStar.naturalResources.science = this.randomService.getRandomNumberBetween(minResources, maxResources);
             }
-        } while (count--);
+        }
+    }
+
+    _generateAsteroidFields(rand: RandomGen, game: Game, stars: Star[], playerCount: number, percentage: number) {
+        const count = Math.floor((stars.length - playerCount) / 100 * percentage);
+
+        const applicableStars = stars.filter(s => !s.homeStar && !s.isAsteroidField && !this.starService.isDeadStar(s));
+        shuffle(rand, applicableStars);
+
+        const asteroidFieldStars = applicableStars.slice(0, count);
+
+        for (let asteroidFieldStar of asteroidFieldStars) {
+            asteroidFieldStar.isAsteroidField = true;
+
+            // Overwrite natural resources if splitResources
+            if (this.gameTypeService.isSplitResources(game)) {
+                let minResources = game.constants.star.resources.maxNaturalResources * 1.5;
+                let maxResources = game.constants.star.resources.maxNaturalResources * 3;
+
+                asteroidFieldStar.naturalResources.economy = this.randomService.getRandomNumberBetween(minResources, maxResources);
+            }
+        }
+    }
+
+    _generateBinaryStars(rand: RandomGen, game: Game, stars: Star[], playerCount: number, percentage: number) {
+        const minResources = game.constants.star.resources.maxNaturalResources * 1.5;
+        const maxResources = game.constants.star.resources.maxNaturalResources * 3;
+
+        const count = Math.floor((stars.length - playerCount) / 100 * percentage);
+
+        const applicableStars = stars.filter(s => !s.homeStar && !s.isBinaryStar && !this.starService.isDeadStar(s));
+        shuffle(rand, applicableStars);
+
+        const binaryStars = applicableStars.slice(0, count);
+
+        for (let binaryStar of binaryStars) {
+            binaryStar.isBinaryStar = true;
+
+            // Overwrite natural resources
+            if (this.gameTypeService.isSplitResources(game)) {
+                binaryStar.naturalResources.industry = this.randomService.getRandomNumberBetween(minResources, maxResources);
+            } else {
+                let resources = this.randomService.getRandomNumberBetween(minResources, maxResources);
+
+                binaryStar.naturalResources = {
+                    economy: resources,
+                    industry: resources,
+                    science: resources
+                };
+            }
+        }
     }
 
     _generateBlackHoles(rand: RandomGen, game: Game, stars: Star[], playerCount: number, percentage: number) {
-        let count = Math.floor((stars.length - playerCount) / 100 * percentage);
+        const count = Math.floor((stars.length - playerCount) / 100 * percentage);
 
-        // Pick stars at random and set them to be asteroid fields
-        do {
-            let star = stars[this.randomService.getRandomNumberBetween(0, stars.length - 1)];
+        const applicableStars = stars.filter(s => !s.homeStar && !s.isBlackHole && !this.starService.isDeadStar(s));
+        shuffle(rand, applicableStars);
 
-            if (star.homeStar || star.isBlackHole) {
-                count++; // Increment because the while loop will decrement.
-            } else {
-                star.isBlackHole = true;
+        const blackHoleStars = applicableStars.slice(0, count);
 
-                // Overwrite the natural resources
-                star.naturalResources.economy = Math.ceil(star.naturalResources.economy * 0.2);
-                star.naturalResources.industry = Math.ceil(star.naturalResources.industry * 0.2);
-                star.naturalResources.science = Math.ceil(star.naturalResources.science * 0.2);
-            }
-        } while (count--);
+        for (let blackHoleStar of blackHoleStars) {
+            blackHoleStar.isBlackHole = true;
+
+            // Overwrite the natural resources
+            blackHoleStar.naturalResources.economy = Math.ceil(blackHoleStar.naturalResources.economy * 0.2);
+            blackHoleStar.naturalResources.industry = Math.ceil(blackHoleStar.naturalResources.industry * 0.2);
+            blackHoleStar.naturalResources.science = Math.ceil(blackHoleStar.naturalResources.science * 0.2);
+        }
     }
 
     _generatePulsars(rand: RandomGen, game: Game, stars: Star[], playerCount: number, percentage: number) {
-        let count = Math.floor((stars.length - playerCount) / 100 * percentage);
+        const count = Math.floor((stars.length - playerCount) / 100 * percentage);
 
-        // Pick stars at random and set them to be pulsars
-        do {
-            let star = stars[this.randomService.getRandomNumberBetween(0, stars.length - 1)];
+        const applicableStars = stars.filter(s => !s.homeStar && !s.isPulsar && !this.starService.isDeadStar(s));
+        shuffle(rand, applicableStars);
 
-            if (star.homeStar || star.isPulsar) {
-                count++; // Increment because the while loop will decrement.
-            } else {
-                star.isPulsar = true;
-            }
-        } while (count--);
+        const pulsarStars = applicableStars.slice(0, count);
+
+        for (let pulsarStar of pulsarStars) {
+            pulsarStar.isPulsar = true;
+        }
     }
 
     getGalaxyCenter(starLocations: Location[]) {
