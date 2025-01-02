@@ -16,6 +16,8 @@ import ValidationError from "../errors/validation";
 import {RandomGen} from "../utils/randomGen";
 import {shuffle} from "./utils";
 
+const OFFSET = 20000;
+
 export default class MapService {
     randomService: RandomService;
     starService: StarService;
@@ -145,6 +147,20 @@ export default class MapService {
             linkedStars,
             starLocations
         };
+    }
+
+    translateCoordinates(game: Game) {
+        if (game.settings.galaxy.galaxyType === 'custom') {
+            return;
+        }
+
+        const offsetX = this.randomService.getRandomNumberBetween(-OFFSET, OFFSET);
+        const offsetY = this.randomService.getRandomNumberBetween(-OFFSET, OFFSET);
+
+        for (let star of game.galaxy.stars) {
+            star.location.x += offsetX;
+            star.location.y += offsetY;
+        }
     }
 
     generateTerrain(rand: RandomGen, game: Game) {
