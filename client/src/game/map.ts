@@ -658,14 +658,10 @@ export class Map extends EventEmitter {
     const empireCenter = gameHelper.getPlayerEmpireCenter(game, player)
 
     if (empireCenter) {
-      console.log('Pan to empire center', empireCenter.x, empireCenter.y)
-
       this.gameContainer.viewport!.moveCenter(empireCenter.x, empireCenter.y)
     } else {
       const galaxyCenterX = gameHelper.calculateGalaxyCenterX(game)
       const galaxyCenterY = gameHelper.calculateGalaxyCenterY(game)
-
-      console.log('Pan to galaxy center', galaxyCenterX, galaxyCenterY)
 
       this.gameContainer.viewport!.moveCenter(galaxyCenterX, galaxyCenterY)
     }
