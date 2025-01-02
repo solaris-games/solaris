@@ -385,6 +385,8 @@ export default class GameCreateService {
 
         this.mapService.generateTerrain(rand, game);
 
+        this.mapService.translateCoordinates(game);
+
         // Calculate how many stars we have and how many are required for victory.
         game.state.stars = game.galaxy.stars.length;
         game.state.starsForVictory = this._calculateStarsForVictory(game);
