@@ -78,6 +78,7 @@ import EventApiService from '../../../../services/api/event'
 import HamburgerMenuVue from './HamburgerMenu.vue'
 import TickSelectorVue from './TickSelector.vue'
 import ReadyStatusButtonVue from './ReadyStatusButton.vue'
+import gameHelper from "../../../../services/gameHelper";
 
 export default {
   components: {
@@ -191,7 +192,10 @@ export default {
       this.setMenuState(this.MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)
     },
     fitGalaxy () {
-      GameContainer.viewport.moveCenter(0, 0)
+      const galaxyCenterX = gameHelper.calculateGalaxyCenterX(this.$store.state.game)
+      const galaxyCenterY = gameHelper.calculateGalaxyCenterY(this.$store.state.game)
+
+      GameContainer.viewport.moveCenter(galaxyCenterX, galaxyCenterY)
       GameContainer.viewport.fitWorld()
       GameContainer.viewport.zoom(GameContainer.starFieldRight, true)
     },
