@@ -1,4 +1,4 @@
-import {logger, onReady, setupLogging} from "../utils/logging";
+import {logger, setupLogging} from "../utils/logging";
 
 const Agenda = require('agenda');
 import config from '../config';
@@ -118,7 +118,7 @@ async function startup() {
 
         log.info('Shutdown complete.');
 
-        onReady(() => process.exit());
+        process.exit(0);
     });
 }
 

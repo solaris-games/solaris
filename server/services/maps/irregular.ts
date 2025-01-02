@@ -1,20 +1,16 @@
-const randomSeeded = require('random-seed');
 import { createNoise2D } from 'simplex-noise';
 import ValidationError from '../../errors/validation';
-import { GameResourceDistribution } from '../types/Game';
+import {Game, GameResourceDistribution} from '../types/Game';
 import { Location } from '../types/Location';
 import DistanceService from '../distance';
 import GameTypeService from '../gameType';
-import RandomService from '../random';
 import ResourceService from '../resource';
 import StarService from '../star';
 import StarDistanceService from '../starDistance';
+import {RandomGen} from "../../utils/randomGen";
 
-const MAX_SEED = Number.MAX_SAFE_INTEGER;
 
 export default class IrregularMapService {
-
-    randomService: RandomService;
     starService: StarService;
     starDistanceService: StarDistanceService;
     distanceService: DistanceService;
@@ -22,13 +18,11 @@ export default class IrregularMapService {
     gameTypeService: GameTypeService;
 
     constructor(
-        randomService: RandomService,
         starService: StarService,
         starDistanceService: StarDistanceService,
         distanceService: DistanceService,
         resourceService: ResourceService,
         gameTypeService: GameTypeService) {
-        this.randomService = randomService;
         this.starService = starService;
         this.starDistanceService = starDistanceService;
         this.distanceService = distanceService;
@@ -112,7 +106,7 @@ export default class IrregularMapService {
         return ringIndex;
     }
 
-    _generateHomeLocations(pivotDistance: number, playerCount: number, rng, simplexNoiseGenerator, noiseSpread: number) {
+    _generateHomeLocations(pivotDistance: number, playerCount: number, rand: RandomGen, simplexNoiseGenerator, noiseSpread: number) {
         const ONE_SIXTH = 1.0/6.0;
         const TAU = 2.0*Math.PI;
 
@@ -129,15 +123,15 @@ export default class IrregularMapService {
             let positionIsValid = false;
             let attempts = 0;
             while(!positionIsValid) {
-                let baseLocation = homeLocations[rng.range(homeLocations.length)];
+                let baseLocation = homeLocations[rand.getRandomNumber(homeLocations.length - 1)];
                 let pivot = { x: pivotDistance, y: 0.0 };
-                let pivotRotation = ONE_SIXTH*TAU * rng.range(6);
+                let pivotRotation = ONE_SIXTH*TAU * rand.getRandomNumber(5);
                 pivot = this._rotatedLocation(pivot, pivotRotation);
                 pivot = this._displacedLocation(baseLocation, pivot);
                 
                 position = { x: pivotDistance, y: 0.0 };
                 let rotation;
-                if(rng.random()<0.5) {
+                if(rand.random()<0.5) {
                     rotation = pivotRotation - (ONE_SIXTH*TAU);
                 }
                 else{
@@ -234,12 +228,12 @@ export default class IrregularMapService {
         }
     }
 
-    _randomlyDislocateLocations(locations: Location[], threshold: number, rng) {
+    _randomlyDislocateLocations(locations: Location[], threshold: number, rand: RandomGen) {
         const ONE_SIXTH = 1.0/6.0;
         const TAU = 2.0*Math.PI;
         for( let location of locations ) {
-            let amount = (3.0*(threshold/4.0)) + ((rng.random()*threshold)/4.0); // 0.75 to 1.0 times the threshold
-            let rotation = rng.random()*TAU
+            let amount = (3.0*(threshold/4.0)) + ((rand.random()*threshold)/4.0); // 0.75 to 1.0 times the threshold
+            let rotation = rand.random()*TAU
             let dislocation = { x: amount, y: 0.0 };
             dislocation = this._rotatedLocation(dislocation, rotation);
             let newLocation = this._displacedLocation(location, dislocation);
@@ -261,7 +255,7 @@ export default class IrregularMapService {
 
     //removes locations outside the metaball composed of home locations
     //locations have a chance of beeing removed based on the distance from the metaball
-    _pruneLocationsOutsideMetaball(locations: Location[], homeLocations: Location[], homeStarRadius: number, rng) {
+    _pruneLocationsOutsideMetaball(locations: Location[], homeLocations: Location[], homeStarRadius: number, rand: RandomGen) {
         const METABALL_FALLOFF = 8.0; //higher values reduces the spread of the metaball
         // probably better not to remove items while iterating, so add to this array instead
         let toRemove: Location[] = [];
@@ -273,7 +267,7 @@ export default class IrregularMapService {
                 metaballFieldIntensity += Math.pow(distance, METABALL_FALLOFF);
             }
             let chanceToRemove = 1.0-metaballFieldIntensity;
-            if(rng.random()<chanceToRemove) {
+            if(rand.random()<chanceToRemove) {
                 toRemove.push(location);
             }
         }
@@ -283,15 +277,13 @@ export default class IrregularMapService {
 
     }
 
-    generateLocations(game, starCount: number, resourceDistribution: GameResourceDistribution, playerCount: number): Location[] {
+    generateLocations(rand: RandomGen, game: Game, starCount: number, resourceDistribution: GameResourceDistribution, playerCount: number, customSeed: string | null | undefined): Location[] {
         if (this.gameTypeService.isKingOfTheHillMode(game)) {
             throw new ValidationError(`King of the hill is not supported in irregular maps.`);
         }
 
-        const SEED = ( Math.random()* MAX_SEED).toFixed(0);
         const SPREAD = 2.5;
-        const RNG = randomSeeded.create(SEED);
-        const SIMPLEX_NOISE = createNoise2D(RNG.rand);
+        const SIMPLEX_NOISE = createNoise2D(rand.random);
         const NOISE_BASE_SPREAD = 32.0;
         //const NOISE_SPREAD = NOISE_BASE_SPREAD * Math.sqrt(starCount*1.3);// try to make the noise spread with the size of the galaxy. this makes the void gaps also proportional to galaxy size. 
         //const NOISE_SPREAD = 512; //optionally could keep the voids constant in size, no matter the galaxy size
@@ -311,7 +303,7 @@ export default class IrregularMapService {
         const PIVOT_DISTANCE = RING_COUNT*STAR_DISTANCE;
 
         let locations: Location[] = [];
-        let homeLocations = this._generateHomeLocations(PIVOT_DISTANCE, playerCount, RNG, SIMPLEX_NOISE, NOISE_SPREAD);
+        let homeLocations = this._generateHomeLocations(PIVOT_DISTANCE, playerCount, rand, SIMPLEX_NOISE, NOISE_SPREAD);
         let supplementaryHomeLocations = this._generateSupplementaryHomeLocations(PIVOT_DISTANCE, homeLocations);
         let baseLocations = [];
         let supplementaryLocations = [];
@@ -326,8 +318,8 @@ export default class IrregularMapService {
 
         locations = locations.concat(baseLocations, supplementaryLocations);
 
-        this._pruneLocationsOutsideMetaball(locations, homeLocations, PIVOT_DISTANCE, RNG);
-        this._randomlyDislocateLocations(locations, STAR_DISLOCATION_THRESHOLD, RNG);
+        this._pruneLocationsOutsideMetaball(locations, homeLocations, PIVOT_DISTANCE, rand);
+        this._randomlyDislocateLocations(locations, STAR_DISLOCATION_THRESHOLD, rand);
         this._pruneLocationsWithNoise( locations, (starCount-playerCount), SIMPLEX_NOISE, NOISE_SPREAD );
 
         

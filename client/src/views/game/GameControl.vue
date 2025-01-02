@@ -21,6 +21,10 @@
       <view-collapse-panel @onToggle="togglePlayerControl" title="Player Control">
         <game-player-control :game="fullGame" @onGameModified="loadFullGame"/>
       </view-collapse-panel>
+
+      <div v-if="errors" class="alert alert-danger mt-2" role="alert">
+        <p class="text-danger" v-for="error in errors">{{ error }}</p>
+      </div>
     </div>
   </div>
 </template>
@@ -42,6 +46,7 @@ export default {
   data() {
     return {
       fullGame: null,
+      errors: null,
     }
   },
   methods: {

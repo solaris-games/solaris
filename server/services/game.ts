@@ -440,13 +440,12 @@ export default class GameService extends EventEmitter {
     }
 
     isReadyToQuitOrDefeated(player: Player) {
-        return player.readyToQuit || player.defeated;
+        return player.readyToQuit || player.defeated || player.isAIControlled;
     }
 
     isReadyToQuitImmediateEnd(game: Game) {
-        const undefeatedPlayers = this.listAllUndefeatedPlayers(game);
-
-        return undefeatedPlayers.every(x => x.readyToQuit);
+        // every player is defeated, RTQ or AI
+        return game.galaxy.players.every(p => this.isReadyToQuitOrDefeated(p));
     }
 
     checkReadyToQuit(game: Game, leaderboard: LeaderboardPlayer[]) {

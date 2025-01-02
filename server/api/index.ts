@@ -1,4 +1,4 @@
-import {logger, onReady, setupLogging} from "../utils/logging";
+import {logger, setupLogging} from "../utils/logging";
 
 const express = require('express');
 const http = require('http');
@@ -53,7 +53,7 @@ process.on('SIGINT', async () => {
 
   log.info('Shutdown complete.');
 
-  onReady(() => process.exit());
+  process.exit(0);
 });
 
 startServer();

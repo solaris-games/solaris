@@ -10,6 +10,25 @@ import DiplomacyService from './diplomacy';
 import DistanceService from './distance';
 import SpecialistService from './specialist';
 import StarService from './star';
+import WaypointService from "./waypoint";
+import TechnologyService from "./technology";
+import StarDistanceService from "./starDistance";
+import {logger} from "../utils/logging";
+
+type CarrierMovementReport = {
+    carrier: Carrier;
+    sourceStar: Star;
+    destinationStar: Star;
+    carrierOwner: Player;
+    warpSpeed: boolean;
+    instantSpeed: boolean | null;
+    distancePerTick: number | null;
+    waypoint: CarrierWaypoint;
+    combatRequiredStar: boolean;
+    arrivedAtStar: boolean;
+}
+
+const log = logger("Carrier Movement Service");
 
 export default class CarrierMovementService {
     gameRepo: Repository<Game>;
@@ -18,6 +37,8 @@ export default class CarrierMovementService {
     specialistService: SpecialistService;
     diplomacyService: DiplomacyService;
     carrierGiftService: CarrierGiftService;
+    technologyService: TechnologyService;
+    starDistanceService: StarDistanceService;
 
     constructor(
         gameRepo: Repository<Game>,
@@ -25,7 +46,9 @@ export default class CarrierMovementService {
         starService: StarService,
         specialistService: SpecialistService,
         diplomacyService: DiplomacyService,
-        carrierGiftService: CarrierGiftService
+        carrierGiftService: CarrierGiftService,
+        technologyService: TechnologyService,
+        starDistanceService: StarDistanceService,
     ) {
         this.gameRepo = gameRepo;
         this.distanceService = distanceService;
@@ -33,6 +56,8 @@ export default class CarrierMovementService {
         this.specialistService = specialistService;
         this.diplomacyService = diplomacyService;
         this.carrierGiftService = carrierGiftService;
+        this.technologyService = technologyService;
+        this.starDistanceService = starDistanceService;
     }
 
     getCarrierDistancePerTick(game: Game, carrier: Carrier, warpSpeed: boolean = false, instantSpeed: boolean | null = false) {
@@ -59,7 +84,7 @@ export default class CarrierMovementService {
         carrier.location = nextLocation;
     }
 
-    async arriveAtStar(game: Game, gameUsers: User[], carrier: Carrier, destinationStar: Star) {
+    arriveAtStar(game: Game, gameUsers: User[], carrier: Carrier, destinationStar: Star) {
         // Remove the current waypoint as we have arrived at the destination.
         let currentWaypoint = carrier.waypoints.splice(0, 1)[0];
 
@@ -81,7 +106,7 @@ export default class CarrierMovementService {
         // TODO: Move this logic out of this function so that carrier movement will correctly
         // take into account multiple players arriving at an unclaimed star at the same time.
         if (destinationStar.ownedByPlayerId == null) {
-            await this.starService.claimUnownedStar(game, gameUsers, destinationStar, carrier);
+            this.starService.claimUnownedStar(game, gameUsers, destinationStar, carrier);
         }
 
         // Reignite dead stars if applicable
@@ -107,7 +132,7 @@ export default class CarrierMovementService {
             // If the carrier is a gift, then transfer the carrier ownership to the star owning player.
             // Otherwise, perform combat.
             if (carrier.isGift) {
-                await this.carrierGiftService.transferGift(game, gameUsers, destinationStar, carrier);
+                this.carrierGiftService.transferGift(game, gameUsers, destinationStar, carrier);
             } else if (this.diplomacyService.isFormalAlliancesEnabled(game)) {
                 let isAllied = this.diplomacyService.isDiplomaticStatusBetweenPlayersAllied(game, [carrier.ownedByPlayerId!, destinationStar.ownedByPlayerId!]);
 
@@ -123,7 +148,7 @@ export default class CarrierMovementService {
         return report;
     }
 
-    async moveCarrier(game: Game, gameUsers: User[], carrierInTransit: Carrier) {
+    moveCarrier(game: Game, gameUsers: User[], carrierInTransit: Carrier): CarrierMovementReport | null {
         let waypoint: CarrierWaypoint = carrierInTransit.waypoints[0];
 
         if (waypoint.delayTicks) {
@@ -131,22 +156,42 @@ export default class CarrierMovementService {
         }
 
         if (this.isLaunching(carrierInTransit)) {
-            waypoint.source = carrierInTransit.orbiting!; // Make damn sure the waypoint source is correct.
+            const sourceStarId = carrierInTransit.orbiting!;
+            const destinationStarId = waypoint.destination;
+            const sourceStar = game.galaxy.stars.find(s => s._id.toString() === sourceStarId.toString())!;
+            const destinationStar = game.galaxy.stars.find(s => s._id.toString() === destinationStarId.toString())!;
+
+            if (!sourceStar || !destinationStar) {
+                carrierInTransit.waypoints = [];
+                return null;
+            }
+
+            if (!this.isWithinHyperspaceRange(game, carrierInTransit, sourceStar, destinationStar)) {
+                log.warn(`Carrier ${carrierInTransit._id} is trying to launch to a star that is out of hyperspace range.`, {
+                    gameId: game._id.toString(),
+                    carrierId: carrierInTransit._id.toString(),
+                });
+
+                carrierInTransit.waypoints = [];
+                return null;
+            }
+
+            waypoint.source = sourceStarId; // Make damn sure the waypoint source is correct.
 
             // If the destination star is not the current one, then launch the carrier into space.
-            if (carrierInTransit.orbiting!.toString() !== waypoint.destination.toString()) {
+            if (carrierInTransit.orbiting!.toString() !== destinationStarId.toString()) {
                 carrierInTransit.orbiting = null;
             }
         }
 
-        let sourceStar = game.galaxy.stars.find(s => s._id.toString() === waypoint.source.toString())!;
-        let destinationStar = game.galaxy.stars.find(s => s._id.toString() === waypoint.destination.toString())!;
-        let carrierOwner = game.galaxy.players.find(p => p._id.toString() === carrierInTransit.ownedByPlayerId!.toString())!;
-        let warpSpeed = this.canTravelAtWarpSpeed(game, carrierOwner, carrierInTransit, sourceStar, destinationStar);
-        let instantSpeed = this.starService.isStarPairWormHole(sourceStar, destinationStar);
-        let distancePerTick = this.getCarrierDistancePerTick(game, carrierInTransit, warpSpeed, instantSpeed); // Null signifies instant travel
+        const sourceStar = game.galaxy.stars.find(s => s._id.toString() === waypoint.source.toString())!;
+        const destinationStar = game.galaxy.stars.find(s => s._id.toString() === waypoint.destination.toString())!;
+        const carrierOwner = game.galaxy.players.find(p => p._id.toString() === carrierInTransit.ownedByPlayerId!.toString())!;
+        const warpSpeed = this.canTravelAtWarpSpeed(game, carrierOwner, carrierInTransit, sourceStar, destinationStar);
+        const instantSpeed = this.starService.isStarPairWormHole(sourceStar, destinationStar);
+        const distancePerTick = this.getCarrierDistancePerTick(game, carrierInTransit, warpSpeed, instantSpeed); // Null signifies instant travel
 
-        let carrierMovementReport = {
+        const carrierMovementReport = {
             carrier: carrierInTransit,
             sourceStar,
             destinationStar,
@@ -160,7 +205,7 @@ export default class CarrierMovementService {
         };
         
         if (instantSpeed || (distancePerTick && (carrierInTransit.distanceToDestination || 0) <= distancePerTick)) {
-            let starArrivalReport = await this.arriveAtStar(game, gameUsers, carrierInTransit, destinationStar);
+            let starArrivalReport = this.arriveAtStar(game, gameUsers, carrierInTransit, destinationStar);
             
             carrierMovementReport.waypoint = starArrivalReport.waypoint;
             carrierMovementReport.combatRequiredStar = starArrivalReport.combatRequiredStar;
@@ -215,6 +260,20 @@ export default class CarrierMovementService {
             sourceStar,
             destinationStar
         };
+    }
+
+    isWithinHyperspaceRange(game: Game, carrier: Carrier, sourceStar: Star, destinationStar: Star) {
+        // If the stars are a wormhole pair then they are always considered to be in hyperspace range.
+        if (this.starService.isStarPairWormHole(sourceStar, destinationStar)) {
+            return true;
+        }
+
+        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, true);
+        let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, effectiveTechs.hyperspace);
+
+        let distanceBetweenStars = this.starDistanceService.getDistanceBetweenStars(sourceStar, destinationStar);
+
+        return distanceBetweenStars <= hyperspaceDistance;
     }
 
     canTravelAtWarpSpeed(game: Game, player: Player, carrier: Carrier, sourceStar: Star, destinationStar: Star) {

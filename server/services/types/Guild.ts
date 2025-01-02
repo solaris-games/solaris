@@ -1,5 +1,6 @@
+import { SettingVisibility } from "@solaris-common";
 import { DBObjectId } from "./DBObjectId";
-import { SettingVisibility, User } from "./User";
+import { User } from "./User";
 
 export interface Guild {
     _id: DBObjectId;

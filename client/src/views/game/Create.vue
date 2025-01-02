@@ -324,6 +324,11 @@
           </select>
         </div>
 
+        <div class="mb-2" v-if="settings.galaxy.galaxyType === 'irregular'">
+          <label for="irregularGalaxyType" class="col-form-label">Custom seed for irregular galaxy <help-tooltip tooltip="The seed of irregular galaxy that will be generated for the game"/></label>
+          <input type="text" class="form-control" id="mapSeed" v-model="settings.galaxy.customSeed" :disabled="isCreatingGame">
+        </div>
+
         <div class="mb-2" v-if="settings.galaxy.galaxyType === 'custom'">
           <p class="mb-1">It is recommended to use the community galaxy generation tool which can be found here: <a href="https://kurtzmusch.github.io/solaris-galaxy-editor/" target="_blank">https://kurtzmusch.github.io/solaris-galaxy-editor/</a></p>
           <label for="customJSON" class="col-form-label">Galaxy JSON <help-tooltip tooltip="The JSON document for which represents the galaxy to create"/></label>

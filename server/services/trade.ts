@@ -525,7 +525,7 @@ export default class TradeService extends EventEmitter {
         }
 
         let tradeChance = TRADE_CHANCE_BASE + (TRADE_CHANCE_STEP * reputation.score);
-        let tradeRoll = this.randomService.getRandomNumber(100);
+        let tradeRoll = this.randomService.getRandomNumber(99);
         let canPerformTrade = tradeRoll <= tradeChance || true;
 
         if (!canPerformTrade) {

@@ -1,6 +1,6 @@
 import { DependencyContainer } from '../../services/types/DependencyContainer';
 import {logger} from "../../utils/logging";
-const axios = require('axios');
+import axios from "axios";
 
 const log = logger("Auth Controller");
 

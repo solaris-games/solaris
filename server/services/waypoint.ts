@@ -164,11 +164,10 @@ export default class WaypointService {
             // Validate waypoint hyperspace range if:
             // The waypoint is not the first waypoint in the array.
             // The carrier isn't in transit to the first waypoint.
-            if (
-                (i > 0 || (i === 0 && !this.carrierMovementService.isInTransit(carrier))) &&                    // Is one of the next waypoints OR is the first waypoint and isn't in transit
-                (sourceStar && (!this._waypointRouteIsBetweenWormHoles(game, waypoint) && !this._waypointRouteIsWithinHyperspaceRange(game, carrier, waypoint)))     // Validation of whether the waypoint is within hyperspace range
-            ) {
-                throw new ValidationError(`The waypoint ${sourceStarName} -> ${destinationStar.name} exceeds hyperspace range.`);
+            if (i > 0 || (i === 0 && Boolean(carrier.orbiting))) { // Is one of the next waypoints OR is the first waypoint and isn't in transit
+                if (sourceStar && (!this._waypointRouteIsBetweenWormHoles(game, waypoint) && !this._waypointRouteIsWithinHyperspaceRange(game, carrier, waypoint))) {// Validation of whether the waypoint is within hyperspace range
+                    throw new ValidationError(`The waypoint ${sourceStarName} -> ${destinationStar.name} exceeds hyperspace range.`);
+                }
             }
         }
         
@@ -237,17 +236,7 @@ export default class WaypointService {
             return false;
         }
 
-        // If the stars are a wormhole pair then they are always considered to be in hyperspace range.
-        if (this.starService.isStarPairWormHole(sourceStar, destinationStar)) {
-            return true;
-        }
-
-        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, true);
-        let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, effectiveTechs.hyperspace);
-
-        let distanceBetweenStars = this.starDistanceService.getDistanceBetweenStars(sourceStar, destinationStar);
-
-        return distanceBetweenStars <= hyperspaceDistance;
+        return this.carrierMovementService.isWithinHyperspaceRange(game, carrier, sourceStar, destinationStar);
     }
 
     _waypointRouteIsBetweenWormHoles(game: Game, waypoint: CarrierWaypointBase) {

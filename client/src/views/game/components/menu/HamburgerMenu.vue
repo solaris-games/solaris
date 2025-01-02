@@ -56,6 +56,7 @@ import router from '../../../../router'
 import MENU_STATES from '../../../../services/data/menuStates'
 import GameContainer from '../../../../game/container'
 import eventBus from '../../../../eventBus'
+import gameHelper from "../../../../services/gameHelper";
 
 export default {
   components: {
@@ -84,7 +85,10 @@ export default {
       router.push({ name: 'main-menu' })
     },
     fitGalaxy () {
-      GameContainer.viewport.moveCenter(0, 0)
+      const galaxyCenterX = gameHelper.calculateGalaxyCenterX(this.$store.state.game)
+      const galaxyCenterY = gameHelper.calculateGalaxyCenterY(this.$store.state.game)
+
+      GameContainer.viewport.moveCenter(galaxyCenterX, galaxyCenterY)
       GameContainer.viewport.fitWorld()
       GameContainer.viewport.zoom(GameContainer.starFieldRight, true)
     },

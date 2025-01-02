@@ -1,3 +1,5 @@
+import {RandomGen} from "../utils/randomGen";
+
 export function getOrInsert<K, V>(map: Map<K, V>, key: K, defaultFunc: (K) => V): V {
     let value = map.get(key);
     if (!value) {
@@ -55,9 +57,9 @@ export function sorterByProperty<T>(prop: string): (a: T, b: T) => number {
     }
 }
 
-export function shuffle<T>(a: Array<T>) {
+export function shuffle<T>(rand: RandomGen, a: Array<T>) {
     for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
+        const j = Math.floor(rand.random() * (i + 1));
         [a[i], a[j]] = [a[j], a[i]];
     }
     return a;

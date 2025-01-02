@@ -4,7 +4,7 @@ export default (container: DependencyContainer) => {
     return {
         list: async (req, res, next) => {
             let page = +req.query.page || 0;
-            let pageSize = +req.query.pageSize ?? 10;
+            let pageSize = (req.query.pageSize && Number.parseInt(req.query.pageSize)) ?? 10;
             let category = req.query.category || 'all';
             
             try {

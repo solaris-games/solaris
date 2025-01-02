@@ -23,6 +23,7 @@ import {shuffle} from "./utils";
 import { Carrier } from "./types/Carrier";
 import { Star } from "./types/Star";
 import PlayerColourService from "./playerColour";
+import {MathRandomGen} from "../utils/randomGen";
 
 export default class PlayerService extends EventEmitter {
     gameRepo: Repository<Game>;
@@ -242,7 +243,7 @@ export default class PlayerService extends EventEmitter {
         if (game.settings.specialGalaxy.playerDistribution === 'circularSequential') {
             playersDistributed = players;
         } else { // circular and random are both kinds of random distributions, but the latter will not work for irregular maps, so we do the same thing and use a random circular distribution
-            playersDistributed = shuffle(players);
+            playersDistributed = shuffle(new MathRandomGen(), players);
         }
 
         for (let player of playersDistributed) {
@@ -389,7 +390,7 @@ export default class PlayerService extends EventEmitter {
         // Pick a random unowned star.
         let unownedStars = game.galaxy.stars.filter(s => s.ownedByPlayerId == null);
 
-        let rnd = this.randomService.getRandomNumber(unownedStars.length);
+        let rnd = this.randomService.getRandomNumber(unownedStars.length - 1);
 
         return unownedStars[rnd];
     }
@@ -413,7 +414,7 @@ export default class PlayerService extends EventEmitter {
 
         if (random) {
             // Pick a random radian for the player's starting position.
-            let radianIndex = this.randomService.getRandomNumber(radians.length);
+            let radianIndex = this.randomService.getRandomNumber(radians.length - 1);
             currentRadian = radians.splice(radianIndex, 1)[0];
         } else {
             currentRadian = radians.pop()!;

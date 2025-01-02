@@ -118,6 +118,7 @@ export interface GameSettings {
 		productionTicks: number;
 		customJSON?: string;
 		advancedCustomGalaxyEnabled?: GameSettingEnabledDisabled;
+        customSeed?: string;
 	},
 	specialGalaxy: {
 		carrierCost: GameCarrierCost;
