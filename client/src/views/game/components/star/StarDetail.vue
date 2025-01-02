@@ -10,7 +10,10 @@
 
     <div class="row bg-dark">
       <div class="col text-center pt-2">
-        <p class="mb-2 text-info" style="font-weight: bold">Location: ({{star.location.x.toFixed(3)}}, {{star.location.y.toFixed(3)}})</p>
+        <p class="mb-2 text-info">
+          Location: ({{star.location.x.toFixed(3)}}, {{star.location.y.toFixed(3)}})
+          <help-tooltip v-if="isGameDarkMode" tooltip="Coordinates are scrambled because this is a dark mode game."/>
+        </p>
         <p class="mb-2" v-if="isOwnedByUserPlayer">A star under your command.</p>
         <p class="mb-2" v-if="star.ownedByPlayerId != null && (!userPlayer || star.ownedByPlayerId != userPlayer._id)">This star is controlled by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{starOwningPlayer.alias}}</a>.</p>
         <p class="mb-2" v-if="star.ownedByPlayerId == null">This star has not been claimed by any faction.<br/>Send a carrier here to claim it for yourself!</p>
@@ -434,8 +437,8 @@ import GameContainer from '../../../../game/container'
 import gameHelper from '../../../../services/gameHelper'
 import IgnoreBulkUpgradeVue from './IgnoreBulkUpgrade.vue'
 import StarResourcesVue from './StarResources.vue'
-import user from '../../../../services/api/user'
 import StarIconVue from './../star/StarIcon.vue'
+import HelpTooltip from '../../../components/HelpTooltip.vue'
 
 export default {
   components: {
@@ -449,7 +452,8 @@ export default {
     'specialist-icon': SpecialistIconVue,
     'ignore-bulk-upgrade': IgnoreBulkUpgradeVue,
     'star-resources': StarResourcesVue,
-    'star-icon': StarIconVue
+    'star-icon': StarIconVue,
+    'help-tooltip': HelpTooltip,
   },
   props: {
     starId: String
@@ -659,6 +663,9 @@ export default {
     },
     ticksToBonusShip: function () {
       return GameHelper.calculateTicksToBonusShip(this.star.shipsActual, this.star.manufacturing)
+    },
+    isGameDarkMode () {
+      return GameHelper.isDarkMode(this.$store.state.game)
     }
   }
 }

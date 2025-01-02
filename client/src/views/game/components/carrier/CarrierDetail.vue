@@ -11,7 +11,10 @@
 
     <div class="row bg-dark" :class="{'bg-warning': carrier.isGift}">
       <div class="col text-center pt-2">
-        <p class="mb-2 text-info" style="font-weight: bold">Location: ({{carrier.location.x.toFixed(3)}}, {{carrier.location.y.toFixed(3)}})</p>
+        <p class="mb-2 text-info">
+          Location: ({{carrier.location.x.toFixed(3)}}, {{carrier.location.y.toFixed(3)}})
+          <help-tooltip v-if="isGameDarkMode" tooltip="Coordinates are scrambled because this is a dark mode game."/>
+        </p>
         <p class="mb-2" v-if="isUserPlayerCarrier && !carrier.isGift">A carrier under your command.</p>
         <p class="mb-2" v-if="isNotUserPlayerCarrier">This carrier is controlled by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{carrierOwningPlayer.alias}}</a>.</p>
         <p class="mb-2" v-if="carrier.isGift"><strong>This carrier is a gift.</strong></p>
@@ -222,6 +225,7 @@ import ModalButton from '../../../components/modal/ModalButton.vue'
 import DialogModal from '../../../components/modal/DialogModal.vue'
 import AudioService from '../../../../game/audio'
 import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning.vue'
+import HelpTooltip from '../../../components/HelpTooltip.vue'
 
 export default {
   components: {
@@ -232,7 +236,8 @@ export default {
     'specialist-icon': SpecialistIconVue,
     'modalButton': ModalButton,
     'dialogModal': DialogModal,
-    'orbital-mechanics-eta-warning': OrbitalMechanicsETAWarningVue
+    'orbital-mechanics-eta-warning': OrbitalMechanicsETAWarningVue,
+    'help-tooltip': HelpTooltip,
   },
   props: {
     carrierId: String
@@ -507,6 +512,9 @@ export default {
     },
     isGameInProgress () {
       return GameHelper.isGameInProgress(this.$store.state.game)
+    },
+    isGameDarkMode () {
+      return GameHelper.isDarkMode(this.$store.state.game)
     }
   }
 }
