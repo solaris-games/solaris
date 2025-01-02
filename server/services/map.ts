@@ -154,6 +154,10 @@ export default class MapService {
             return;
         }
 
+        if (!this.gameTypeService.isDarkMode(game)) {
+            return;
+        }
+
         const offsetX = this.randomService.getRandomNumberBetween(-OFFSET, OFFSET);
         const offsetY = this.randomService.getRandomNumberBetween(-OFFSET, OFFSET);
 
