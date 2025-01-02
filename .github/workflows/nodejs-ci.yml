@@ -24,21 +24,10 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    
-    # Run CI for Client
-    - run: npm ci
-      working-directory: ${{ env.directory-client }}
-    - run: npm run build --if-present
-      working-directory: ${{ env.directory-client }}
 
-    # Run CI for Server
     - run: npm ci
-      working-directory: ${{ env.directory-server }}
     - run: npm run check
-      working-directory: ${{ env.directory-server }}
     - run: npm run build --if-present
-      working-directory: ${{ env.directory-server }}
     - run: npm test
-      working-directory: ${{ env.directory-server }}
       env:
         CI: true
