@@ -440,8 +440,6 @@ export class Star extends EventEmitter {
       this.planets = []
 
       for (let i = 0; i < planetCount; i++) {
-        let planetContainer = new Container()
-
         let distanceToStar = 15 + (5 * i)
         let planetSize = Math.floor(Math.abs(this.data.location.y) + distanceToStar) % 1.5 + 0.5
 
@@ -454,15 +452,17 @@ export class Star extends EventEmitter {
         })
         this.container_planets.addChild(orbitGraphics)
 
-        let planetGraphics = new Graphics()
+        const planetGraphics = new Graphics()
+
+        const planetAlpha = this.data.isInScanningRange ? 1.0 : 0.3;
+
         planetGraphics.circle(planetSize / 2, 0, planetSize)
         planetGraphics.fill({
           color: playerColour,
+          alpha: planetAlpha
         });
 
-        if (!this.data.isInScanningRange) {
-          planetGraphics.alpha = 0.3
-        }
+        const planetContainer = new Container()
 
         planetContainer.addChild(planetGraphics)
 
@@ -486,10 +486,12 @@ export class Star extends EventEmitter {
     }
   }
 
-  orbitPlanentsStep (delta) {
+  orbitPlanetsStep (ticker) {
     if (!this.planets) {
       return
     }
+
+    const delta = ticker.deltaTime;
 
     for (let planet of this.planets) {
       if (planet.rotationDirection) {
@@ -949,7 +951,7 @@ export class Star extends EventEmitter {
 
   subscribeToEvents () {
     if (this.container_planets) {
-      this.handleOrbitPlanetsStep = this.orbitPlanentsStep.bind(this)
+      this.handleOrbitPlanetsStep = this.orbitPlanetsStep.bind(this)
       this.app.ticker.add(this.handleOrbitPlanetsStep)
     }
   }
