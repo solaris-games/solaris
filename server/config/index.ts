@@ -1,6 +1,6 @@
 import {Config, LoggingType} from "./types/Config";
 
-require('dotenv');
+require('dotenv').config();
 
 const config: Config = {
     port: process.env.PORT,
