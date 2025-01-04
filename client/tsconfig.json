@@ -2,8 +2,13 @@
     "compilerOptions": {
         "noImplicitAny": false,
         "paths": {
-            "@solaris-common": ["../common/src/index.ts"]
-        }
+            "@solaris-common": [ "../common/src/index.ts" ]
+        },
+        "lib": [
+            "es2022",
+            "DOM",
+            "DOM.Iterable"
+        ]
     },
     "extends": "@vue/tsconfig/tsconfig.dom.json"
 }

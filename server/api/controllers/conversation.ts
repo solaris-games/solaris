@@ -82,7 +82,7 @@ export default (container: DependencyContainer) => {
                     req.player,
                     req.params.conversationId,
                     reqObj.message);
-    
+
                 container.broadcastService.gameMessageSent(req.game, message);
     
                 res.status(200).send(message);
@@ -102,7 +102,7 @@ export default (container: DependencyContainer) => {
                     req.game,
                     req.player._id,
                     req.params.conversationId);
-    
+
                 container.broadcastService.gameConversationRead(req.game, convo, req.player._id);
     
                 res.sendStatus(200);

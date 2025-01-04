@@ -46,8 +46,10 @@
 </template>
 
 <script>
+import { eventBusInjectionKey } from '../../../../eventBus'
+import GameEventBusEventNames from '../../../../eventBusEventNames/game'
 import GameApiService from '../../../../services/api/game'
-import eventBus from '../../../../eventBus'
+import { inject } from 'vue'
 
 export default {
   data () {
@@ -57,9 +59,17 @@ export default {
         tick: 0
     }
   },
+  setup() {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
+  },
   mounted () {
       this.tick = this.stateTick;
-      eventBus.$on('onGameTick', this.onGameTick);
+      this.eventBus.on(GameEventBusEventNames.OnGameTick, this.onGameTick);
+  },
+  unmounted () {
+      this.eventBus.off(GameEventBusEventNames.OnGameTick, this.onGameTick);
   },
   methods: {
     toggleDisplay () {

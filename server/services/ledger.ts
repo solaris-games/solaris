@@ -1,17 +1,13 @@
-import { DBObjectId } from "./types/DBObjectId";
-import Repository from "./repository";
-import { Game } from "./types/Game";
-import { Player, PlayerLedgerDebt } from "./types/Player";
+import { LedgerType } from "solaris-common/src/api/types/common/ledger";
+import ValidationError from "../errors/validation";
 import PlayerService from "./player";
 import PlayerCreditsService from "./playerCredits";
-import ValidationError from "../errors/validation";
+import Repository from "./repository";
+import { DBObjectId } from "./types/DBObjectId";
+import { Game } from "./types/Game";
+import { Player, PlayerLedgerDebt } from "./types/Player";
 
 const EventEmitter = require('events');
-
-export enum LedgerType {
-    Credits = 'credits',
-    CreditsSpecialists = 'creditsSpecialists'
-}
 
 export const LedgerServiceEvents = {
     onDebtAdded: 'onDebtAdded',

@@ -68,6 +68,9 @@ import DiplomacyApiService from '../../../../services/api/diplomacy'
 import DiplomacyRowVue from './DiplomacyRow.vue'
 import DiplomacyHelper from '../../../../services/diplomacyHelper'
 import FormErrorList from '../../../components/FormErrorList.vue'
+import { inject } from 'vue'
+import { eventBusInjectionKey } from '../../../../eventBus'
+import DiplomacyEventBusEventNames from '../../../../eventBusEventNames/diplomacy'
 
 export default {
   components: {
@@ -75,6 +78,11 @@ export default {
     'loading-spinner': LoadingSpinner,
     'diplomacy-row': DiplomacyRowVue,
     'form-error-list': FormErrorList
+  },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    };
   },
   data () {
     return {
@@ -85,12 +93,10 @@ export default {
   },
   mounted () {
     this.loadDiplomaticStatus();
-  },
-  created () {
-    this.$socket.subscribe('playerDiplomaticStatusChanged', this.onPlayerDiplomaticStatusChanged)
+    this.eventBus.on(DiplomacyEventBusEventNames.PlayerDiplomaticStatusChanged, this.onPlayerDiplomaticStatusChanged);
   },
   unmounted () {
-    this.$socket.unsubscribe('playerDiplomaticStatusChanged')
+    this.eventBus.off(DiplomacyEventBusEventNames.PlayerDiplomaticStatusChanged, this.onPlayerDiplomaticStatusChanged);
   },
   methods: {
     onOpenPlayerDetailRequested(playerId) {
@@ -125,7 +131,7 @@ export default {
 
       this.isLoading = false
     },
-    onPlayerDiplomaticStatusChanged (e) {
+    onPlayerDiplomaticStatusChanged(e) {
         let diplomaticStatus = this.diplomaticStatuses.find(d => d.playerIdTo === e.diplomaticStatus.playerIdFrom);
 
         if (diplomaticStatus) {

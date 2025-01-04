@@ -15,8 +15,10 @@
 
 <script>
 import gameHelper from "../../../../../services/gameHelper";
-import eventBus from "../../../../../eventBus";
 import ConversationApiService from "../../../../../services/api/conversation";
+import { inject } from "vue";
+import { eventBusInjectionKey } from "../../../../../eventBus";
+import MenuEventBusEventNames from "../../../../../eventBusEventNames/menu";
 
 export default {
   name: "ConversationMessageContextMenu",
@@ -25,21 +27,26 @@ export default {
     conversation: Object,
     userPlayer: Object
   },
+  setup() {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
+  },
   methods: {
     async onViewConversationRequested (playerId) {
       const conversation = await this.loadConversation(playerId);
 
       if (conversation) {
-        eventBus.$emit('onViewConversationRequested', {
+        this.eventBus.emit(MenuEventBusEventNames.OnViewConversationRequested, {
           conversationId: conversation._id
-        })
+        });
       } else {
-        eventBus.$emit('onViewConversationRequested', {
+        this.eventBus.emit(MenuEventBusEventNames.OnViewConversationRequested, {
           participantIds: [
             this.userPlayer._id,
             this.message.fromPlayerId
           ]
-        })
+        });
       }
     },
     async loadConversation (playerId) {

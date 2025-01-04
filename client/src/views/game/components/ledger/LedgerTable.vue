@@ -25,6 +25,9 @@
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import LedgerApiService from '../../../../services/api/ledger'
 import LedgerRowVue from './LedgerRow.vue'
+import { inject } from 'vue'
+import { eventBusInjectionKey } from '../../../../eventBus'
+import PlayerEventBusEventNames from '../../../../eventBusEventNames/player'
 
 export default {
   components: {
@@ -40,18 +43,21 @@ export default {
       ledgers: []
     }
   },
-  mounted () {
-    this.loadLedger()
+  setup() {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
   },
-  created () {
-    this.$socket.subscribe('playerDebtAdded', this.onPlayerDebtAdded)
-    this.$socket.subscribe('playerDebtForgiven', this.onPlayerDebtForgiven)
-    this.$socket.subscribe('playerDebtSettled', this.onPlayerDebtSettled)
+  mounted () {
+    this.loadLedger();
+    this.eventBus.on(PlayerEventBusEventNames.PlayerDebtAdded, this.onPlayerDebtAdded);
+    this.eventBus.on(PlayerEventBusEventNames.PlayerDebtForgiven, this.onPlayerDebtForgiven);
+    this.eventBus.on(PlayerEventBusEventNames.PlayerDebtSettled, this.onPlayerDebtSettled);
   },
   unmounted () {
-    this.$socket.unsubscribe('playerDebtAdded')
-    this.$socket.unsubscribe('playerDebtForgiven')
-    this.$socket.unsubscribe('playerDebtSettled')
+    this.eventBus.off(PlayerEventBusEventNames.PlayerDebtAdded, this.onPlayerDebtAdded);
+    this.eventBus.off(PlayerEventBusEventNames.PlayerDebtForgiven, this.onPlayerDebtForgiven);
+    this.eventBus.off(PlayerEventBusEventNames.PlayerDebtSettled, this.onPlayerDebtSettled);
   },
   methods: {
     onOpenPlayerDetailRequested(playerId) {

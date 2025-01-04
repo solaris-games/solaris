@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import eventBus from '../../../../eventBus'
+import { eventBusInjectionKey } from '../../../../eventBus'
 import MENU_STATES from '../../../../services/data/menuStates'
 import KEYBOARD_SHORTCUTS from '../../../../services/data/keyboardShortcuts'
 import GameHelper from '../../../../services/gameHelper'
@@ -28,6 +28,9 @@ import ConversationListVue from '../inbox/conversations/ConversationList.vue'
 import ConversationCreateVue from './conversations/ConversationCreate.vue'
 import ConversationDetailVue from './conversations/ConversationDetail.vue'
 import AudioService from '../../../../game/audio'
+import { inject } from 'vue'
+import MenuEventBusEventNames from '../../../../eventBusEventNames/menu'
+import PlayerEventBusEventNames from '../../../../eventBusEventNames/player'
 
 export default {
   components: {
@@ -41,11 +44,14 @@ export default {
       isExpanded: false
     }
   },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
+  },
   created () {
     document.addEventListener('keydown', this.handleKeyDown)
     window.addEventListener('resize', this.handleResize)
-
-    this.$socket.subscribe('gameMessageSent', (data) => this.onMessageReceived(data))
   },
   mounted () {
     this.$store.commit('setMenuStateChat', {
@@ -53,22 +59,21 @@ export default {
       args: null
     })
 
-    // TODO: These event names should be global constants
-    eventBus.$on('onMenuChatSidebarRequested', this.toggle)
-    eventBus.$on('onCreateNewConversationRequested', this.onCreateNewConversationRequested)
-    eventBus.$on('onViewConversationRequested', this.onViewConversationRequested)
-    eventBus.$on('onOpenInboxRequested', this.onOpenInboxRequested)
+    this.eventBus.on(PlayerEventBusEventNames.GameMessageSent, this.onMessageReceived);
+    this.eventBus.on(MenuEventBusEventNames.OnMenuChatSidebarRequested, this.toggle);
+    this.eventBus.on(MenuEventBusEventNames.OnCreateNewConversationRequested, this.onCreateNewConversationRequested);
+    this.eventBus.on(MenuEventBusEventNames.OnViewConversationRequested, this.onViewConversationRequested);
+    this.eventBus.on(MenuEventBusEventNames.OnOpenInboxRequested, this.onOpenInboxRequested);
   },
   unmounted () {
     document.removeEventListener('keydown', this.handleKeyDown)
     window.removeEventListener('resize', this.handleResize)
 
-    this.$socket.unsubscribe('gameMessageSent')
-
-    eventBus.$off('onMenuChatSidebarRequested', this.toggle)
-    eventBus.$off('onCreateNewConversationRequested', this.onCreateNewConversationRequested)
-    eventBus.$off('onViewConversationRequested', this.onViewConversationRequested)
-    eventBus.$off('onOpenInboxRequested', this.onOpenInboxRequested)
+    this.eventBus.off(PlayerEventBusEventNames.GameMessageSent, this.onMessageReceived);
+    this.eventBus.off(MenuEventBusEventNames.OnMenuChatSidebarRequested, this.toggle);
+    this.eventBus.off(MenuEventBusEventNames.OnCreateNewConversationRequested, this.onCreateNewConversationRequested);
+    this.eventBus.off(MenuEventBusEventNames.OnViewConversationRequested, this.onViewConversationRequested);
+    this.eventBus.off(MenuEventBusEventNames.OnOpenInboxRequested, this.onOpenInboxRequested);
   },
   methods: {
     onOpenPlayerDetailRequested (e) {

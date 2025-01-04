@@ -79,6 +79,10 @@ import HamburgerMenuVue from './HamburgerMenu.vue'
 import TickSelectorVue from './TickSelector.vue'
 import ReadyStatusButtonVue from './ReadyStatusButton.vue'
 import gameHelper from "../../../../services/gameHelper";
+import { eventBusInjectionKey } from '../../../../eventBus'
+import { inject } from 'vue'
+import GameEventBusEventNames from '../../../../eventBusEventNames/game'
+import PlayerEventBusEventNames from '../../../../eventBusEventNames/player'
 
 export default {
   components: {
@@ -87,6 +91,11 @@ export default {
     'hamburger-menu': HamburgerMenuVue,
     'tick-selector': TickSelectorVue,
     'ready-status-button': ReadyStatusButtonVue
+  },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
   },
   data () {
     return {
@@ -99,44 +108,41 @@ export default {
       unreadEvents: 0
     }
   },
+  created () {
+    document.addEventListener('keydown', this.handleKeyDown);
+  },
   async mounted () {
     this.setupTimer()
 
     await this.checkForUnreadMessages()
     await this.checkForUnreadEvents()
-  },
-  created () {
-    document.addEventListener('keydown', this.handleKeyDown)
 
-    this.$socket.subscribe('gameStarted', this.gameStarted.bind(this))
-    this.$socket.subscribe('gameMessageSent', this.checkForUnreadMessages.bind(this))
-    this.$socket.subscribe('gameConversationRead', this.checkForUnreadMessages.bind(this))
-    this.$socket.subscribe('playerEventRead', this.checkForUnreadEvents.bind(this))
-    this.$socket.subscribe('playerAllEventsRead', this.checkForUnreadEvents.bind(this))
-    this.$socket.subscribe('playerCreditsReceived', this.onCreditsReceived)
-    this.$socket.subscribe('playerCreditsSpecialistsReceived', this.onCreditsSpecialistsReceived)
-    this.$socket.subscribe('playerTechnologyReceived', this.onTechnologyReceived)
+    this.eventBus.on(GameEventBusEventNames.GameStarted, this.gameStarted);
+    this.eventBus.on(PlayerEventBusEventNames.GameMessageSent, this.checkForUnreadMessages);
+    this.eventBus.on(PlayerEventBusEventNames.GameConversationRead, this.checkForUnreadMessages);
+    this.eventBus.on(PlayerEventBusEventNames.PlayerEventRead, this.checkForUnreadEvents);
+    this.eventBus.on(PlayerEventBusEventNames.PlayerAllEventsRead, this.checkForUnreadEvents);
+    this.eventBus.on(PlayerEventBusEventNames.PlayerCreditsReceived, this.onCreditsReceived);
+    this.eventBus.on(PlayerEventBusEventNames.PlayerCreditsSpecialistsReceived, this.onCreditsSpecialistsReceived);
+    this.eventBus.on(PlayerEventBusEventNames.PlayerTechnologyReceived, this.onTechnologyReceived);
   },
   unmounted () {
     document.removeEventListener('keydown', this.handleKeyDown)
 
     clearInterval(this.intervalFunction)
 
-    this.$socket.unsubscribe('gameStarted')
-    this.$socket.unsubscribe('gameMessageSent')
-    this.$socket.unsubscribe('gameConversationRead')
-    this.$socket.unsubscribe('playerEventRead')
-    this.$socket.unsubscribe('playerAllEventsRead')
-    this.$socket.unsubscribe('playerCreditsReceived')
-    this.$socket.unsubscribe('playerCreditsSpecialistsReceived')
-    this.$socket.unsubscribe('playerTechnologyReceived')
+    this.eventBus.off(GameEventBusEventNames.GameStarted, this.gameStarted);
+    this.eventBus.off(PlayerEventBusEventNames.GameMessageSent, this.checkForUnreadMessages);
+    this.eventBus.off(PlayerEventBusEventNames.GameConversationRead, this.checkForUnreadMessages);
+    this.eventBus.off(PlayerEventBusEventNames.PlayerEventRead, this.checkForUnreadEvents);
+    this.eventBus.off(PlayerEventBusEventNames.PlayerAllEventsRead, this.checkForUnreadEvents);
+    this.eventBus.off(PlayerEventBusEventNames.PlayerCreditsReceived, this.onCreditsReceived);
+    this.eventBus.off(PlayerEventBusEventNames.PlayerCreditsSpecialistsReceived, this.onCreditsSpecialistsReceived);
+    this.eventBus.off(PlayerEventBusEventNames.PlayerTechnologyReceived, this.onTechnologyReceived);
   },
   methods: {
     gameStarted () {
       this.setupTimer()
-
-      this.$toast.success(`Get ready, the game will start soon!`)
-      AudioService.download()
     },
     setupTimer () {
       this.recalculateTimeRemaining()
