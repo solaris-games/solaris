@@ -1,13 +1,14 @@
 import AchievementService from '../services/achievement';
+import { DBObjectId, objectIdFromString } from '../services/types/DBObjectId';
 
-const userId = 'abc';
+const userId: DBObjectId = objectIdFromString('abcefghijklm');
 
 describe('achievement', () => {
-    const incrementAchievementTest = async (key: string, incrementAmount: number, incrementFunctionCallback) => {
+    const incrementAchievementTest = async (key: string, incrementAmount: number, incrementFunctionCallback: (service: AchievementService) => void) => {
         let calls = 0;
 
         const fakeUserRepo = {
-            async updateOne(query, update) {
+            async updateOne(query: any, update: any) {
                 if (query._id === userId 
                     && update.$inc[key] == incrementAmount) {
                     calls++;

@@ -1,15 +1,19 @@
-import {DependencyContainer} from "../services/types/DependencyContainer";
-import mongooseLoader from "./index";
+import mongoose from "mongoose";
 import config from "../config";
 import containerLoader from "../services";
-import mongoose, { ObjectId } from "mongoose";
-import {DBObjectId, objectId} from "../services/types/DBObjectId";
-import {GameHistory, GameHistoryCarrier} from "../services/types/GameHistory";
-import {Game} from "../services/types/Game";
-import {Carrier} from "../services/types/Carrier";
+import { Carrier } from "../services/types/Carrier";
+import { DBObjectId, objectId } from "../services/types/DBObjectId";
+import { DependencyContainer } from "../services/types/DependencyContainer";
+import { Game } from "../services/types/Game";
+import { GameHistory, GameHistoryCarrier } from "../services/types/GameHistory";
+import { serverStub } from "../sockets/serverStub";
+import { logger } from "../utils/logging";
+import mongooseLoader from "./index";
 
 let mongo,
     container: DependencyContainer;
+
+const log = logger("Restore Game");
 
 const loadHistory = async (gameId: DBObjectId, tick: number) => {
     const history = await container.historyService.getHistoryByTick(gameId, tick);
@@ -129,7 +133,7 @@ const startup = async () => {
         poolSize: 1
     });
 
-    container = containerLoader(config);
+    container = containerLoader(config, serverStub, log);
 
     console.log("Initialised");
 
@@ -189,4 +193,4 @@ startup().then(async () => {
     await shutdown();
 });
 
-export {};
+export { };

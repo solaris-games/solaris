@@ -1,11 +1,15 @@
 import { createStore } from 'vuex';
-import eventBus from './eventBus'
-import GameHelper from './services/gameHelper.js'
-import GameContainer from './game/container.js'
-import SpecialistService from './services/api/specialist.js';
-import ColourService from './services/api/colour.js';
+import { type EventBus } from './eventBus';
+import MenuEventBusEventNames from './eventBusEventNames/menu';
+import GameContainer from './game/container.js';
+import GameMutationNames from './mutationNames/gameMutationNames';
+import PlayerMutationNames from './mutationNames/playerMutationNames';
 import ApiAuthService from "./services/api/auth.js";
-import type {Game, Player, Star} from "./types/game";
+import ColourService from './services/api/colour.js';
+import SpecialistService from './services/api/specialist.js';
+import GameHelper from './services/gameHelper.js';
+import type { Game, Player, Star } from "./types/game";
+import type { Store } from 'vuex/types/index.js';
 
 export type MentionCallbacks = {
   player: (p: Player) => void;
@@ -41,7 +45,8 @@ export type State = {
   unreadMessages: number | null;
 }
 
-export default createStore<State>({
+export function createSolarisStore(eventBus: EventBus): Store<State> {
+  return createStore<State>({
   state: {
     userId: null,
     game: null,
@@ -85,15 +90,15 @@ export default createStore<State>({
         state.menuState = menuState.state
       }
 
-      eventBus.$emit('onMenuRequested', menuState)
+      eventBus.emit(MenuEventBusEventNames.OnMenuRequested, menuState)
     },
     clearMenuState (state) {
       state.menuState = null
       state.menuArguments = null
 
-      eventBus.$emit('onMenuRequested', {
-        state: null,
-        args: null
+      eventBus.emit(MenuEventBusEventNames.OnMenuRequested, {
+        menuState: null,
+        menuArguments: null as unknown
       })
     },
 
@@ -264,11 +269,11 @@ export default createStore<State>({
     // ----------------
     // Sockets
 
-    gameStarted (state: State, data) {
+    [GameMutationNames.GameStarted] (state: State, data) {
       state.game!.state = data.state
     },
 
-    gamePlayerJoined (state: State, data) {
+    [PlayerMutationNames.GamePlayerJoined] (state: State, data) {
       let player = GameHelper.getPlayerById(state.game!, data.playerId)!
 
       player.isOpenSlot = false
@@ -279,7 +284,7 @@ export default createStore<State>({
       player.afk = false
     },
 
-    gamePlayerQuit (state: State, data) {
+    [PlayerMutationNames.GamePlayerQuit] (state: State, data) {
       let player = GameHelper.getPlayerById(state.game!, data.playerId)!
 
       player.isOpenSlot = true
@@ -287,28 +292,36 @@ export default createStore<State>({
       player.avatar = null
     },
 
-    gamePlayerReady (state: State, data) {
+    [PlayerMutationNames.GamePlayerReady] (state: State, data) {
       let player = GameHelper.getPlayerById(state.game!, data.playerId)!
 
       player.ready = true
     },
 
-    gamePlayerNotReady (state: State, data) {
+    [PlayerMutationNames.GamePlayerNotReady] (state: State, data) {
       let player = GameHelper.getPlayerById(state.game!, data.playerId)!
 
       player.ready = false
     },
 
-    gamePlayerReadyToQuit (state: State, data) {
-      let player = GameHelper.getPlayerById(state.game!, data.playerId)!
+    [PlayerMutationNames.GamePlayerReadyToQuit](state: State, data) {
+      if (data.playerId != null) {
+        let player = GameHelper.getPlayerById(state.game!, data.playerId)!;
 
-      player.readyToQuit = true
+        player.readyToQuit = true
+      }
+
+      state.game!.state.readyToQuitCount = (state.game!.state.readyToQuitCount ?? 0) + 1;
     },
 
-    gamePlayerNotReadyToQuit (state: State, data) {
-      let player = GameHelper.getPlayerById(state.game!, data.playerId)!
+    [PlayerMutationNames.GamePlayerNotReadyToQuit](state: State, data) {
+      if (data.playerId != null) {
+        let player = GameHelper.getPlayerById(state.game!, data.playerId)!;
 
-      player.readyToQuit = false
+        player.readyToQuit = false
+      }
+
+      state.game!.state.readyToQuitCount = (state.game!.state.readyToQuitCount ?? 0) - 1;
     },
 
     gameStarBulkUpgraded (state: State, data) {
@@ -463,7 +476,7 @@ export default createStore<State>({
         GameContainer.reloadStar(star)
       }
     },
-    playerDebtSettled (state: State, data) {
+    [PlayerMutationNames.PlayerDebtSettled] (state: State, data) {
       let player = GameHelper.getUserPlayer(state.game)
 
       if (data.creditorPlayerId === player._id) {
@@ -616,4 +629,5 @@ export default createStore<State>({
       return colour;
     }
   }
-})
+  })
+}

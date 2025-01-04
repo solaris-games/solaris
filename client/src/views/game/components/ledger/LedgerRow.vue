@@ -58,6 +58,7 @@ export default {
             this.$toast.success(`The debt ${playerAlias} owes you has been forgiven.`)
           }
 
+          // This may not be necessary as the entire ledger appears to get reloaded when debt is forgiven.
           ledger.debt = response.data.ledger.debt
         } catch (err) {
           console.error(err)
@@ -80,15 +81,18 @@ export default {
             await LedgerApiService.settleDebtCreditsSpecialists(this.$store.state.game._id, ledger.playerId)
 
           if (response.status === 200) {
-            this.$toast.success(`You have paid off debt that you owe to ${playerAlias}.`)
+            this.$toast.success(`You have paid off ${(response.data.ledger.debt !== 0 ? 'some of the' : 'the')} debt that you owe${(response.data.ledger.debt !== 0 ? '' : 'd')} to ${playerAlias}.`)
           }
+
+          let debtPaidOff = Math.abs(ledger.debt) - Math.abs(response.data.ledger.debt);
 
           if (isCredits) {
-            gameHelper.getUserPlayer(this.$store.state.game).ledger.credits -= Math.abs(ledger.debt)
+            gameHelper.getUserPlayer(this.$store.state.game).credits -= debtPaidOff;
           } else {
-            gameHelper.getUserPlayer(this.$store.state.game).ledger.creditsSpecialists -= Math.abs(ledger.debt)
+            gameHelper.getUserPlayer(this.$store.state.game).creditsSpecialists -= debtPaidOff;
           }
 
+          // This may not be necessary as the entire ledger appears to get reloaded when debt is settled.
           ledger.debt = response.data.ledger.debt;
         } catch (err) {
           console.error(err)
@@ -110,7 +114,7 @@ export default {
       return gameHelper.isGameFinished(this.$store.state.game)
     },
     canSettleDebt () {
-      return this.ledger.debt < 0 && !this.ledger.isSettlingDebt && !this.isGameFinished
+      return this.ledger.debt < 0 && (this.ledgerType === 'credits' ? gameHelper.getUserPlayer(this.$store.state.game).credits : gameHelper.getUserPlayer(this.$store.state.game).creditsSpecialists) > 0 && !this.ledger.isSettlingDebt && !this.isGameFinished
     },
     canForgiveDebt () {
       return this.ledger.debt > 0 && !this.ledger.isForgivingDebt && !this.isGameFinished

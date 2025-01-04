@@ -1,119 +1,110 @@
+import { GameState } from 'solaris-common/src';
+import { ConversationMessageSentResult } from "solaris-common/src/api/types/common/conversationMessage";
+import { DiplomaticStatus } from 'solaris-common/src/api/types/common/diplomacy';
+import { LedgerType } from 'solaris-common/src/api/types/common/ledger';
+import { DiplomacyServerSocketEmitter } from '../sockets/socketEmitters/diplomacy';
+import { GameServerSocketEmitter } from '../sockets/socketEmitters/game';
+import { PlayerServerSocketEmitter } from '../sockets/socketEmitters/player';
 import AvatarService from "./avatar";
-import { LedgerType } from "./ledger";
+import { Avatar } from './types/Avatar';
 import { Conversation } from "./types/Conversation";
-import { ConversationMessageSentResult } from "./types/ConversationMessage";
 import { DBObjectId } from "./types/DBObjectId";
-import { DiplomaticStatus } from "./types/Diplomacy";
 import { Game } from "./types/Game";
 import { Player } from "./types/Player";
 import { TradeEventTechnology } from "./types/Trade";
 
 
 export default class BroadcastService {
-    io: any;
 
-    constructor(private avatarService: AvatarService) {
-    }
-
-    setIOController(io) {
-        this.io = io;
-    }
-
-    roomExists(socketId: DBObjectId) {
-        return this.io && this.io.sockets.adapter.rooms[socketId.toString()] != null;
-    }
-
-    playerRoomExists(player: Player) {
-        return this.io && this.io.sockets.adapter.rooms[player._id.toString()] != null;
-    }
-
-    getOnlinePlayers(game: Game) {
-        return game.galaxy.players.filter(p => this.playerRoomExists(p));
+    constructor(private gameServerSocketEmitter: GameServerSocketEmitter,
+                private playerServerSocketEmitter: PlayerServerSocketEmitter,
+                private diplomacyServerSocketEmitter: DiplomacyServerSocketEmitter,
+                private avatarService: AvatarService) {
     }
 
     gameStarted(game: Game) {
-        this.io.to(game._id).emit('gameStarted', {
-            state: game.state
+        this.gameServerSocketEmitter.emitGameStarted(game._id.toString(), {
+            state: this.mapGameStateObjectIds(game.state)
         });
     }
 
     gamePlayerJoined(game: Game, playerId: DBObjectId, alias: string, avatar: number) {
 
-        const avatars = this.avatarService.listAllAvatars();
+        const avatars: Avatar[] = this.avatarService.listAllAvatars();
 
-        this.io.to(game._id).emit('gamePlayerJoined', {
-            playerId,
+        this.playerServerSocketEmitter.emitGamePlayerJoined(game._id.toString(), {
+            playerId: playerId.toString(),
             alias,
             avatar: avatars.find(a => a.id.toString() === avatar.toString())!.file
         });
     }
 
     gamePlayerQuit(game: Game, player: Player) {
-        this.io.to(game._id).emit('gamePlayerQuit', {
-            playerId: player._id
+        this.playerServerSocketEmitter.emitGamePlayerQuit(game._id.toString(), {
+            playerId: player._id.toString()
         });
     }
 
     gamePlayerReady(game: Game, player: Player) {
-        this.io.to(game._id).emit('gamePlayerReady', {
-            playerId: player._id
+        this.playerServerSocketEmitter.emitGamePlayerReady(game._id.toString(), {
+            playerId: player._id.toString()
         });
     }
 
     gamePlayerNotReady(game: Game, player: Player) {
-        this.io.to(game._id).emit('gamePlayerNotReady', {
-            playerId: player._id
+        this.playerServerSocketEmitter.emitGamePlayerNotReady(game._id.toString(), {
+            playerId: player._id.toString()
         });
     }
 
-    gamePlayerReadyToQuit(game: Game, player: Player) {
-        this.io.to(game._id).emit('gamePlayerReadyToQuit', {
-            playerId: player._id
+    gamePlayerReadyToQuit(game: Game, player: Player | null) {
+        this.playerServerSocketEmitter.emitGamePlayerReadyToQuit(game._id.toString(), {
+            playerId: player?._id.toString()
         });
     }
 
-    gamePlayerNotReadyToQuit(game: Game, player: Player) {
-        this.io.to(game._id).emit('gamePlayerNotReadyToQuit', {
-            playerId: player._id
+    gamePlayerNotReadyToQuit(game: Game, player: Player | null) {
+        this.playerServerSocketEmitter.emitGamePlayerNotReadyToQuit(game._id.toString(), {
+            playerId: player?._id.toString()
         });
     }
 
-    gameMessageSent(game: Game, message: ConversationMessageSentResult) {
-        // Note: We need to ensure we send to the users' socket, not the players as the player one
-        // can be spoofed.
+    gameMessageSent(game: Game, message: ConversationMessageSentResult<DBObjectId>) {
+        // Note: We need to ensure we send to the user's socket,
+        // not the player's, as the player one can be spoofed.
         const toUserIds = game.galaxy.players
             .filter(p => message.toPlayerIds.find(m => m.toString() === p._id.toString()) != null)
             .filter(p => p.userId != null)
             .map(p => p.userId!);
 
-        toUserIds.forEach(p => this.io.to(p.toString()).emit('gameMessageSent', message));
+        toUserIds.forEach(p => this.playerServerSocketEmitter.emitGameMessageSent(p.toString(), this.mapConversationMessageSentResultObjectIds(message)));
     }
 
     gameConversationRead(game: Game, conversation: Conversation, readByPlayerId: DBObjectId) {
-        conversation.participants.forEach(p => this.io.to(p).emit('gameConversationRead', {
-            conversationId: conversation._id,
-            readByPlayerId
+        conversation.participants.forEach(p => this.playerServerSocketEmitter.emitGameConversationRead(p.toString(), {
+            conversationId: conversation._id.toString(),
+            readByPlayerId: readByPlayerId.toString()
         }));
     }
 
     gameConversationLeft(game: Game, conversation: Conversation, playerId: DBObjectId) {
-        conversation.participants.forEach(p => this.io.to(p).emit('gameConversationLeft', {
-            conversationId: conversation._id,
-            playerId
+        conversation.participants.forEach(p => this.playerServerSocketEmitter.emitGameConversationLeft(p.toString(), {
+            conversationId: conversation._id.toString(),
+            playerId: playerId.toString()
         }));
     }
 
     gameConversationMessagePinned(game: Game, conversation: Conversation, messageId: DBObjectId) {
-        conversation.participants.forEach(p => this.io.to(p).emit('gameConversationMessagePinned', {
-            conversationId: conversation._id,
-            messageId: messageId
+        conversation.participants.forEach(p => this.playerServerSocketEmitter.emitGameConversationMessagePinned(p.toString(), {
+            conversationId: conversation._id.toString(),
+            messageId: messageId.toString()
         }));
     }
 
     gameConversationMessageUnpinned(game: Game, conversation: Conversation, messageId: DBObjectId) {
-        conversation.participants.forEach(p => this.io.to(p).emit('gameConversationMessageUnpinned', {
-            conversationId: conversation._id,
-            messageId: messageId
+        conversation.participants.forEach(p => this.playerServerSocketEmitter.emitGameConversationMessageUnpinned(p.toString(), {
+            conversationId: conversation._id.toString(),
+            messageId: messageId.toString()
         }));
     }
 
@@ -122,62 +113,62 @@ export default class BroadcastService {
     // }
 
     playerEventRead(game: Game, playerId: DBObjectId, eventId: DBObjectId) {
-        this.io.to(playerId).emit('playerEventRead', {
-            eventId
-        })
+        this.playerServerSocketEmitter.emitPlayerEventRead(playerId.toString(), {
+            eventId: eventId.toString()
+        });
     }
 
     playerAllEventsRead(game: Game, playerId: DBObjectId) {
-        this.io.to(playerId).emit('playerAllEventsRead', {})
+        this.playerServerSocketEmitter.emitPlayerAllEventsRead(playerId.toString(), {});
     }
 
     gamePlayerCreditsReceived(game: Game, fromPlayerId: DBObjectId, toPlayerId: DBObjectId, credits: number, date: Date) {
-        this.io.to(toPlayerId).emit('playerCreditsReceived', {
-            playerId: toPlayerId,
+        this.playerServerSocketEmitter.emitPlayerCreditsReceived(toPlayerId.toString(), {
+            playerId: toPlayerId.toString(),
             type: 'playerCreditsReceived',
             date,
             data: {
-                fromPlayerId,
-                toPlayerId,
+                fromPlayerId: fromPlayerId.toString(),
+                toPlayerId: toPlayerId.toString(),
                 credits
             }
         });
     }
 
     gamePlayerCreditsSpecialistsReceived(game: Game, fromPlayerId: DBObjectId, toPlayerId: DBObjectId, creditsSpecialists: number, date: Date) {
-        this.io.to(toPlayerId).emit('playerCreditsSpecialistsReceived', {
-            playerId: toPlayerId,
+        this.playerServerSocketEmitter.emitPlayerCreditsSpecialistsReceived(toPlayerId.toString(), {
+            playerId: toPlayerId.toString(),
             type: 'playerCreditsSpecialistsReceived',
             date,
             data: {
-                fromPlayerId,
-                toPlayerId,
+                fromPlayerId: fromPlayerId.toString(),
+                toPlayerId: toPlayerId.toString(),
                 creditsSpecialists
             }
         });
     }
 
     gamePlayerRenownReceived(game: Game, fromPlayerId: DBObjectId, toPlayerId: DBObjectId, renown: number, date: Date) {
-        this.io.to(toPlayerId).emit('playerRenownReceived', {
-            playerId: toPlayerId,
+        this.playerServerSocketEmitter.emitPlayerRenownReceived(toPlayerId.toString(), {
+            playerId: toPlayerId.toString(),
             type: 'playerRenownReceived',
             date,
             data: {
-                fromPlayerId,
-                toPlayerId,
+                fromPlayerId: fromPlayerId.toString(),
+                toPlayerId: toPlayerId.toString(),
                 renown
             }
         });
     }
 
     gamePlayerTechnologyReceived(game: Game, fromPlayerId: DBObjectId, toPlayerId: DBObjectId, technology: TradeEventTechnology, date: Date) {
-        this.io.to(toPlayerId).emit('playerTechnologyReceived', {
-            playerId: toPlayerId,
+        this.playerServerSocketEmitter.emitPlayerTechnologyReceived(toPlayerId.toString(), {
+            playerId: toPlayerId.toString(),
             type: 'playerTechnologyReceived',
             date,
             data: {
-                fromPlayerId,
-                toPlayerId,
+                fromPlayerId: fromPlayerId.toString(),
+                toPlayerId: toPlayerId.toString(),
                 technology
             }
         });
@@ -185,51 +176,88 @@ export default class BroadcastService {
 
     gamePlayerDebtAdded(debtorPlayerId: DBObjectId, creditorPlayerId: DBObjectId, amount: number, ledgerType: LedgerType) {
         let data = {
-            debtorPlayerId,
-            creditorPlayerId,
+            debtorPlayerId: debtorPlayerId.toString(),
+            creditorPlayerId: creditorPlayerId.toString(),
             amount,
             ledgerType
         };
 
-        this.io.to(debtorPlayerId).emit('playerDebtAdded', data);
-        this.io.to(creditorPlayerId).emit('playerDebtAdded', data);
+        this.playerServerSocketEmitter.emitPlayerDebtAdded(debtorPlayerId.toString(), data);
+        this.playerServerSocketEmitter.emitPlayerDebtAdded(creditorPlayerId.toString(), data);
     }
 
     gamePlayerDebtForgiven(debtorPlayerId: DBObjectId, creditorPlayerId: DBObjectId, amount: number, ledgerType: LedgerType) {
         let data = {
-            debtorPlayerId,
-            creditorPlayerId,
+            debtorPlayerId: debtorPlayerId.toString(),
+            creditorPlayerId: creditorPlayerId.toString(),
             amount,
             ledgerType
         };
 
-        this.io.to(debtorPlayerId).emit('playerDebtForgiven', data);
-        this.io.to(creditorPlayerId).emit('playerDebtForgiven', data);
+        this.playerServerSocketEmitter.emitPlayerDebtForgiven(debtorPlayerId.toString(), data);
+        this.playerServerSocketEmitter.emitPlayerDebtForgiven(creditorPlayerId.toString(), data);
     }
 
     gamePlayerDebtSettled(debtorPlayerId: DBObjectId, creditorPlayerId: DBObjectId, amount: number, ledgerType: LedgerType) {
         let data = {
-            debtorPlayerId,
-            creditorPlayerId,
+            debtorPlayerId: debtorPlayerId.toString(),
+            creditorPlayerId: creditorPlayerId.toString(),
             amount,
             ledgerType
         };
 
-        this.io.to(debtorPlayerId).emit('playerDebtSettled', data);
-        this.io.to(creditorPlayerId).emit('playerDebtSettled', data);
+        this.playerServerSocketEmitter.emitPlayerDebtSettled(debtorPlayerId.toString(), data);
+        this.playerServerSocketEmitter.emitPlayerDebtSettled(creditorPlayerId.toString(), data);
     }
 
-    gamePlayerDiplomaticStatusChanged(playerIdFrom: DBObjectId, playerIdTo: DBObjectId, diplomaticStatus: DiplomaticStatus) {
+    gamePlayerDiplomaticStatusChanged(playerIdFrom: DBObjectId, playerIdTo: DBObjectId, diplomaticStatus: DiplomaticStatus<DBObjectId>) {
         let data = {
-            diplomaticStatus
+            diplomaticStatus: this.mapDiplomaticStatusObjectIds(diplomaticStatus)
         };
 
-        this.io.to(playerIdFrom).emit('playerDiplomaticStatusChanged', data);
-        this.io.to(playerIdTo).emit('playerDiplomaticStatusChanged', data);
+        this.diplomacyServerSocketEmitter.emitPlayerDiplomaticStatusChanged(playerIdFrom.toString(), data);
+        this.diplomacyServerSocketEmitter.emitPlayerDiplomaticStatusChanged(playerIdTo.toString(), data);
     }
 
     // userRenownReceived(game, toUserId, renown) {
     //     this.io.to(toUserId).emit('playerRenownReceived', renown); // TODO: Do we have a socket for the user?
     // }
 
+    private mapGameStateObjectIds(gameState: GameState<DBObjectId>): GameState<string> {
+        const { winner, winningTeam, leaderboard, teamLeaderboard, ...gs } = gameState
+
+        const newGameState = gs as GameState<string>;
+
+        newGameState.winner = winner?.toString() ?? null;
+        newGameState.winningTeam = winningTeam?.toString() ?? null;
+        newGameState.leaderboard = leaderboard?.map(id => id.toString()) ?? null;
+        newGameState.teamLeaderboard = teamLeaderboard?.map(id => id.toString()) ?? null;
+
+        return newGameState;
+    }
+
+    mapConversationMessageSentResultObjectIds(conversationMessageSentResult: ConversationMessageSentResult<DBObjectId>): ConversationMessageSentResult<string> {
+        const { _id, fromPlayerId, readBy, conversationId, toPlayerIds, ...cmsr } = conversationMessageSentResult;
+
+        const newConversationMessageSentResult = cmsr as ConversationMessageSentResult<string>;
+
+        newConversationMessageSentResult._id = _id?.toString();
+        newConversationMessageSentResult.fromPlayerId = fromPlayerId?.toString() ?? null;
+        newConversationMessageSentResult.readBy = readBy.map(id => id.toString());
+        newConversationMessageSentResult.conversationId = conversationId.toString();
+        newConversationMessageSentResult.toPlayerIds = toPlayerIds.map(id => id.toString());
+
+        return newConversationMessageSentResult;
+    }
+
+    mapDiplomaticStatusObjectIds(diplomaticStatus: DiplomaticStatus<DBObjectId>): DiplomaticStatus<string> {
+        const { playerIdFrom, playerIdTo, ...ds } = diplomaticStatus
+
+        const newDiplomaticStatus = ds as DiplomaticStatus<string>;
+
+        newDiplomaticStatus.playerIdFrom = playerIdFrom.toString();
+        newDiplomaticStatus.playerIdTo = playerIdTo.toString();
+
+        return newDiplomaticStatus;
+    }
 };

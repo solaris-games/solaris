@@ -1,8 +1,11 @@
-import RandomService from '../services/random';
 import MapService from '../services/map';
 import CircularMapService from '../services/maps/circular';
+import RandomService from '../services/random';
+import { Game } from '../services/types/Game';
+import { Star } from '../services/types/Star';
+import { RandomGen, SeededRandomGen } from '../utils/randomGen';
 
-const game = {
+const game: Game = {
     settings: {
         galaxy: {
             galaxyType: 'circular'
@@ -22,7 +25,7 @@ const game = {
             }
         }
     }
-}
+} as unknown as Game;
 
 const fakeStarService = {
     generateUnownedStar(name: string, location) {
@@ -87,11 +90,13 @@ describe('map', () => {
 
     const starCount = 10;
     const playerCount = 2;
-    let randomService;
-    let mapService;
-    let starMapService;
+    let randGen: RandomGen;
+    let randomService: RandomService;
+    let mapService: MapService;
+    let starMapService: CircularMapService;
 
     beforeEach(() => {
+        randGen = new SeededRandomGen("1");
         // Use a real random service because it would not be easy to fake for these tests.
         randomService = new RandomService();
         // @ts-ignore
@@ -101,17 +106,17 @@ describe('map', () => {
     });
 
     it('should generate a given number of stars', () => {
-        const stars = mapService.generateStars(game, starCount, playerCount).stars;
+        const stars = mapService.generateStars(randGen, game, starCount, playerCount).stars;
         
         expect(stars).toBeTruthy();
         expect(stars.length).toEqual(starCount);
     });
 
     it('should generate stars with no duplicate names.', () => {
-        const stars = mapService.generateStars(game, starCount, playerCount);
-        
+        const stars: Star[] = mapService.generateStars(randGen, game, starCount, playerCount).stars;
+                
         for(let i = 0; i < stars.length; i++) {
-            let star = stars[i];
+            let star: Star = stars[i];
 
             let duplicates = stars.filter((s) => s.name === star.name);
 

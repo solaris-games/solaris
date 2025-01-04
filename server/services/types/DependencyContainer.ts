@@ -1,7 +1,13 @@
 import { Config } from "../../config/types/Config";
+import { DiplomacyServerSocketEmitter } from "../../sockets/socketEmitters/diplomacy";
+import { GameServerSocketEmitter } from "../../sockets/socketEmitters/game";
+import { PlayerServerSocketEmitter } from "../../sockets/socketEmitters/player";
+import { PlayerServerSocketHandler } from "../../sockets/socketHandlers/player";
+import { ServerHandler } from "../../sockets/socketHandlers/serverHandler";
 import AchievementService from "../achievement";
 import AdminService from "../admin";
 import AIService from "../ai";
+import AnnouncementService from "../announcement";
 import AuthService from "../auth";
 import AvatarService from "../avatar";
 import BadgeService from "../badge";
@@ -29,6 +35,7 @@ import GameGalaxyService from "../gameGalaxy";
 import GameJoinService from "../gameJoin";
 import GameListService from "../gameList";
 import GameLockService from "../gameLock";
+import GameMaskingService from "../gameMaskingService";
 import GameMutexService from "../gameMutex";
 import GamePlayerMutexService from "../gamePlayerMutex";
 import GameStateService from "../gameState";
@@ -47,6 +54,7 @@ import PathfindingService from "../pathfinding";
 import PaypalService from "../paypal";
 import PlayerService from "../player";
 import PlayerAfkService from '../playerAfk';
+import PlayerColourService from "../playerColour";
 import PlayerCreditsService from "../playerCredits";
 import PlayerCycleRewardsService from "../playerCycleRewards";
 import PlayerReadyService from "../playerReady";
@@ -58,8 +66,10 @@ import ReportService from "../report";
 import ReputationService from "../reputation";
 import ResearchService from "../research";
 import ScheduleBuyService from "../scheduleBuy";
+import SessionService from "../session";
 import ShipService from "../ship";
 import ShipTransferService from "../shipTransfer";
+import SocketService from "../socket";
 import SpecialStarBanService from "../specialStarBan";
 import SpecialistService from "../specialist";
 import SpecialistBanService from "../specialistBan";
@@ -73,15 +83,11 @@ import StarUpgradeService from "../starUpgrade";
 import TeamService from "../team";
 import TechnologyService from "../technology";
 import TradeService from "../trade";
+import TutorialService from "../tutorial";
 import UserService from "../user";
 import UserLeaderboardService from "../userLeaderboard";
 import UserLevelService from "../userLevel";
 import WaypointService from "../waypoint";
-import AnnouncementService from "../announcement";
-import TutorialService from "../tutorial";
-import PlayerColourService from "../playerColour";
-import GameMaskingService from "../gameMaskingService";
-import SessionService from "../session";
 
 export interface DependencyContainer {
     config: Config,
@@ -90,6 +96,10 @@ export interface DependencyContainer {
     authService: AuthService,
     discordService: DiscordService,
     broadcastService: BroadcastService,
+    socketService: SocketService,
+    gameServerSocketEmitter: GameServerSocketEmitter,
+    playerServerSocketEmitter: PlayerServerSocketEmitter,
+    diplomacyServerSocketEmitter: DiplomacyServerSocketEmitter,
     carrierService: CarrierService,
     combatService: CombatService,
     distanceService: DistanceService,
@@ -98,6 +108,8 @@ export interface DependencyContainer {
     leaderboardService: LeaderboardService,
     userLeaderboardService: UserLeaderboardService,
     gameService: GameService,
+    serverHandler: ServerHandler,
+    playerServerSocketHandler: PlayerServerSocketHandler,
     gameAuthService: GameAuthService,
     gameLockService: GameLockService,
     gameJoinService: GameJoinService,
