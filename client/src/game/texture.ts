@@ -153,7 +153,7 @@ class TextureService {
     BitmapFont.install({
       name: 'chakrapetch',
       style: this.DEFAULT_FONT_STYLE,
-      resolution: 2,
+      resolution: 4,
     });
 
     this.STAR_TEXTURE = Texture.from(TEXTURE_URLS.STAR)
