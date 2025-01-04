@@ -149,7 +149,6 @@
 </template>
 
 <script>
-import eventBus from '../../../../eventBus'
 import MENU_STATES from '../../../../services/data/menuStates'
 import PlayerListVue from './PlayerList.vue'
 import LeaderboardVue from '../leaderboard/Leaderboard.vue'
@@ -191,6 +190,9 @@ import SpectatingWarningBarVue from './SpectatingWarningBar.vue'
 import PlayerBadgeShopVue from '../badges/PlayerBadgeShop.vue'
 import ReportPlayerVue from '../report/ReportPlayer.vue'
 import SpectatorVue from '../spectators/Spectators.vue'
+import { inject } from 'vue'
+import { eventBusInjectionKey } from '../../../../eventBus'
+import MenuEventBusEventNames from '../../../../eventBusEventNames/menu'
 
 export default {
   components: {
@@ -241,18 +243,22 @@ export default {
       menuArguments: null
     }
   },
+  setup() {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
+  },
   mounted () {
-    // TODO: These event names should be global constants
-    eventBus.$on('onMenuRequested', this.onMenuRequested)
-    eventBus.$on('onCreateNewConversationRequested', this.onCreateNewConversationRequested)
-    eventBus.$on('onViewConversationRequested', this.onViewConversationRequested)
-    eventBus.$on('onOpenInboxRequested', this.onOpenInboxRequested)
+    this.eventBus.on(MenuEventBusEventNames.OnMenuRequested, this.onMenuRequested);
+    this.eventBus.on(MenuEventBusEventNames.OnCreateNewConversationRequested, this.onCreateNewConversationRequested);
+    this.eventBus.on(MenuEventBusEventNames.OnViewConversationRequested, this.onViewConversationRequested);
+    this.eventBus.on(MenuEventBusEventNames.OnOpenInboxRequested, this.onOpenInboxRequested);
   },
   unmounted () {
-    eventBus.$off('onMenuRequested', this.onMenuRequested)
-    eventBus.$off('onCreateNewConversationRequested', this.onCreateNewConversationRequested)
-    eventBus.$off('onViewConversationRequested', this.onViewConversationRequested)
-    eventBus.$off('onOpenInboxRequested', this.onOpenInboxRequested)
+    this.eventBus.off(MenuEventBusEventNames.OnMenuRequested, this.onMenuRequested);
+    this.eventBus.off(MenuEventBusEventNames.OnCreateNewConversationRequested, this.onCreateNewConversationRequested);
+    this.eventBus.off(MenuEventBusEventNames.OnViewConversationRequested, this.onViewConversationRequested);
+    this.eventBus.off(MenuEventBusEventNames.OnOpenInboxRequested, this.onOpenInboxRequested);
   },
   methods: {
     onMenuRequested (menuState) {

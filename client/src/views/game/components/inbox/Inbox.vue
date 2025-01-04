@@ -12,6 +12,9 @@
 import MenuTitle from '../MenuTitle.vue'
 import ConversationListVue from './conversations/ConversationList.vue'
 import ConversationApiService from '../../../../services/api/conversation'
+import PlayerEventBusEventNames from '../../../../eventBusEventNames/player'
+import { inject } from 'vue'
+import { eventBusInjectionKey } from '../../../../eventBus'
 
 export default {
   components: {
@@ -23,18 +26,21 @@ export default {
       unreadMessages: 0
     }
   },
-  created () {
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    };
+  },
+  async mounted() {
+    await this.checkForUnreadMessages();
     // TODO: This is duplicated on the menu header, is it possible to share this logic
     // to save API calls?
-    this.$socket.subscribe('gameMessageSent', this.checkForUnreadMessages.bind(this))
-    this.$socket.subscribe('gameConversationRead', this.checkForUnreadMessages.bind(this))
+    this.eventBus.on(PlayerEventBusEventNames.GameMessageSent, this.checkForUnreadMessages);
+    this.eventBus.on(PlayerEventBusEventNames.GameConversationRead, this.checkForUnreadMessages);
   },
   unmounted () {
-    this.$socket.unsubscribe('gameMessageSent')
-    this.$socket.unsubscribe('gameConversationRead')
-  },
-  async mounted () {
-    await this.checkForUnreadMessages()
+    this.eventBus.off(PlayerEventBusEventNames.GameMessageSent, this.checkForUnreadMessages);
+    this.eventBus.off(PlayerEventBusEventNames.GameConversationRead, this.checkForUnreadMessages);
   },
   methods: {
     onCloseRequested (e) {

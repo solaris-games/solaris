@@ -23,10 +23,10 @@
     "pixi-viewport": "6.0.3",
     "pixi.js": "8.6.3",
     "random-seed": "^0.3.0",
-    "socket.io-client": "2.5.0",
+    "socket.io-client": "4.8.1",
     "uuid": "^10.0.0",
     "voronoi": "^1.0.0",
-    "vue": "3.4.31",
+    "vue": "3.5.13",
     "vue-chartjs": "5.3.1",
     "vue-recaptcha": "2.0.3",
     "vue-router": "^4.4.0",
@@ -40,5 +40,8 @@
     "less": "^3.13.1",
     "vite": "^5.4.8",
     "vue-tsc": "^2.1.10"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-win32-x64-msvc": "^4.29.1"
   }
 }

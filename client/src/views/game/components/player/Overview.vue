@@ -45,13 +45,15 @@
 </template>
 
 <script>
-import eventBus from '../../../../eventBus'
+import { eventBusInjectionKey } from '../../../../eventBus'
 import MENU_STATES from '../../../../services/data/menuStates'
 import Statistics from './Statistics.vue'
 import PlayerTitleVue from './PlayerTitle.vue'
 import gameHelper from '../../../../services/gameHelper'
 import ConversationApiService from '../../../../services/api/conversation'
 import DiplomacyHelper from '../../../../services/diplomacyHelper'
+import { inject } from 'vue'
+import MenuEventBusEventNames from '../../../../eventBusEventNames/menu'
 
 export default {
   components: {
@@ -69,6 +71,11 @@ export default {
       gameHasFinished: null,
       conversation: null
     }
+    },
+  setup() {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
   },
   async mounted () {
     this.userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
@@ -85,16 +92,16 @@ export default {
     },
     onViewConversationRequested (e) {
       if (this.conversation) {
-        eventBus.$emit('onViewConversationRequested', {
+        this.eventBus.emit(MenuEventBusEventNames.OnViewConversationRequested, {
           conversationId: this.conversation._id
-        })
+        });
       } else {
-        eventBus.$emit('onViewConversationRequested', {
+        this.eventBus.emit(MenuEventBusEventNames.OnViewConversationRequested, {
           participantIds: [
             this.userPlayer._id,
             this.player._id
           ]
-        })
+        });
       }
     },
     onViewCompareIntelRequested (e) {
