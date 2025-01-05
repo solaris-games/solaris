@@ -1,16 +1,19 @@
-import * as PIXI from 'pixi.js'
+import type { Location } from '@solaris-common';
+import {Application, Ticker, Container, Graphics} from 'pixi.js';
 
 class AnimationService {
-  drawSelectedCircle (app, container, location) {
+  drawSelectedCircle (app: Application, container: Container, location: Location) {
     // It ain't pretty, but it works.
-    let graphics = new PIXI.Graphics()
+    let graphics = new Graphics()
 
     let radius = 1
 
-    const animation = (delta) => {
+    const animation = (ticker: Ticker) => {
       if (graphics.alpha <= 0) {
         return
       }
+
+      const delta = ticker.deltaTime;
 
       graphics.clear()
 

@@ -91,6 +91,15 @@ const SPECIALIST_TEXTURES = [
   'bolter-gun'
 ];
 
+const loadTextureAsset = (url: string) => {
+  return Assets.load({
+    src: url,
+    data: {
+      autoGenerateMipmaps: true
+    }
+  });
+}
+
 class TextureService {
 
   static WARP_GATE_INDEX = 1
@@ -114,13 +123,13 @@ class TextureService {
     await Promise.all(Object.keys(TEXTURE_URLS).map(spec => {
       const val = TEXTURE_URLS[spec];
       if (Array.isArray(val)) {
-        return Promise.all(val.map(url => Assets.load(url)));
+        return Promise.all(val.map(url => loadTextureAsset(url)));
       } else if (typeof val === 'string') {
-        return Assets.load(val);
+        return loadTextureAsset(val);
       }
     }));
 
-    await Promise.all(SPECIALIST_TEXTURES.map(specTex => Assets.load(new URL(`../assets/specialists/${specTex}.svg`, import.meta.url).href)));
+    await Promise.all(SPECIALIST_TEXTURES.map(specTex => loadTextureAsset(new URL(`../assets/specialists/${specTex}.svg`, import.meta.url).href)));
   }
 
   initialize() {
@@ -134,17 +143,18 @@ class TextureService {
       padding: 3
     })
 
-    BitmapFont.install({
-      name: 'chakrapetch',
-      style: this.DEFAULT_FONT_STYLE
-    });
-
     this.DEFAULT_FONT_STYLE_BOLD = new TextStyle({
       fontFamily: `Chakra Petch,sans-serif;`,
       fill: 0xFFFFFF,
-      fontWeight: "bold",
+      fontWeight: 'bold',
       padding: 3
     })
+
+    BitmapFont.install({
+      name: 'chakrapetch',
+      style: this.DEFAULT_FONT_STYLE,
+      resolution: 4,
+    });
 
     this.STAR_TEXTURE = Texture.from(TEXTURE_URLS.STAR)
 

@@ -21,7 +21,7 @@
     "mitt": "^3.0.1",
     "moment": "^2.29.1",
     "pixi-viewport": "6.0.3",
-    "pixi.js": "8.6.3",
+    "pixi.js": "8.6.6",
     "random-seed": "^0.3.0",
     "socket.io-client": "2.5.0",
     "uuid": "^10.0.0",

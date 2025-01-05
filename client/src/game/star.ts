@@ -1,4 +1,4 @@
-import {Application, BitmapText, Circle, Container, Graphics, Sprite, TextStyle} from 'pixi.js';
+import {Application, BitmapText, Circle, Container, Graphics, Sprite} from 'pixi.js';
 import TextureService from './texture'
 import gameHelper from '../services/gameHelper.js'
 import seededRandom from 'random-seed'
