@@ -288,7 +288,8 @@ export class Territories {
       territoryLines.stroke({
         width: LINE_WIDTH,
         color,
-        alpha: 1
+        alpha: 1,
+        cap: 'round',
       })
     }
   }
