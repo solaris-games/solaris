@@ -531,10 +531,11 @@ export default createStore<State>({
       commit('setCarrierSpecialists', responses[0].data)
       commit('setStarSpecialists', responses[1].data)
     },
-    async loadColourData ({ commit, state }) {
-      const resp = await ColourService.listColours();
-
-      commit('setColoursConfig', resp.data);
+    async loadColourData ({ commit, state }: { commit: any, state: State }) {
+      if (state.userId) {
+        const resp = await ColourService.listColours();
+        commit('setColoursConfig', resp.data);
+      }
     },
     async confirm ({ commit, state }, data) {
       // @ts-ignore

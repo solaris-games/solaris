@@ -150,20 +150,7 @@ export default {
         return;
       }
 
-      try {
-        let response = await authService.verify()
-
-        if (response.status === 200) {
-          if (response.data._id) {
-            this.$store.commit('setUserId', response.data._id)
-            this.$store.commit('setUsername', response.data.username)
-            this.$store.commit('setRoles', response.data.roles)
-            this.$store.commit('setUserCredits', response.data.credits)
-          }
-        }
-      } catch (err) {
-        console.error(err)
-      }
+      this.$store.dispatch('verify')
     },
     async reloadGame () {
       // if (this.$isHistoricalMode()) { // Do not reload if in historical mode
