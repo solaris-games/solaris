@@ -41,7 +41,7 @@ export default {
       this.$toast.info('Low-performance mode detected. You may consider lowering your graphics settings.', { duration: 10000 });
     }
 
-    await this.gameContainer.setupApp(this.$store, this.$store.state.settings)
+    await this.gameContainer.setupApp(this.$store, this.$store.state.settings, this.reportGameError)
     this.loadGame(this.$store.state.game)
 
     // Add the game canvas to the screen.
@@ -104,6 +104,9 @@ export default {
       if (panToUser) {
         this.gameContainer.map.panToUser(game)
       }
+    },
+    reportGameError (msg) {
+      this.$toast.error(msg);
     },
     async touchPlayer () {
       try {

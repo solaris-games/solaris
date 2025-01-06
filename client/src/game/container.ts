@@ -44,6 +44,7 @@ export class GameContainer {
   starFieldBottom: number = 0;
   userSettings: UserGameSettings | undefined;
   game: Game | undefined;
+  reportGameError: ((err: string) => void) | undefined;
 
   constructor () {
     this.frames = 0
@@ -118,8 +119,9 @@ export class GameContainer {
     }
   }
 
-  async setupApp (store, userSettings) {
+  async setupApp (store, userSettings, reportGameError) {
     this.store = store
+    this.reportGameError = reportGameError;
 
     this.context = new DrawingContext(store)
 
@@ -196,7 +198,7 @@ export class GameContainer {
     this.map!.clearWaypoints()
     this.map!.clearRulerPoints()
 
-    screenshot(this, this.game!);
+    screenshot(this, this.game!, this.reportGameError!);
   }
 
   zoomIn () {
