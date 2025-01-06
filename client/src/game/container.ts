@@ -191,6 +191,11 @@ export class GameContainer {
   }
 
   downloadMap () {
+    this.map!.unselectAllCarriers()
+    this.map!.unselectAllStars()
+    this.map!.clearWaypoints()
+    this.map!.clearRulerPoints()
+
     screenshot(this, this.game!);
   }
 

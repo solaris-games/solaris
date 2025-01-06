@@ -8,6 +8,6 @@ export const screenshot = (container: GameContainer, game: Game) => {
 
   app.renderer.extract.download({
     filename,
-    target: app.stage
+    target: container.viewport!
   });
 }
