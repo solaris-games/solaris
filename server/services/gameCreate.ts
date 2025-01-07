@@ -369,6 +369,8 @@ export default class GameCreateService {
             game.settings.galaxy.starsPerPlayer = game.galaxy.stars.length / game.settings.general.playerLimit;
         }
 
+        this.mapService.translateCoordinates(game);
+
         this.starService.setupStarsForGameStart(game);
         
         // Setup players and assign to their starting positions.
@@ -384,8 +386,6 @@ export default class GameCreateService {
         }
 
         this.mapService.generateTerrain(rand, game);
-
-        this.mapService.translateCoordinates(game);
 
         // Calculate how many stars we have and how many are required for victory.
         game.state.stars = game.galaxy.stars.length;

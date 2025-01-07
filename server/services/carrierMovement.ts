@@ -180,6 +180,7 @@ export default class CarrierMovementService {
 
             // If the destination star is not the current one, then launch the carrier into space.
             if (carrierInTransit.orbiting!.toString() !== destinationStarId.toString()) {
+                carrierInTransit.location = sourceStar.location;
                 carrierInTransit.orbiting = null;
             }
         }
