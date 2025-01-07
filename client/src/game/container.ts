@@ -7,6 +7,7 @@ import type {State} from "../store";
 import {Application, BitmapText, isWebGLSupported} from "pixi.js";
 import type {UserGameSettings} from "solaris-common/src";
 import type {Game} from "../types/game";
+import { screenshot } from './screenshot';
 
 export class DrawingContext {
   store: Store<State>;
@@ -42,7 +43,8 @@ export class GameContainer {
   starFieldTop: number = 0;
   starFieldBottom: number = 0;
   userSettings: UserGameSettings | undefined;
-  game: any;
+  game: Game | undefined;
+  reportGameError: ((err: string) => void) | undefined;
 
   constructor () {
     this.frames = 0
@@ -117,8 +119,9 @@ export class GameContainer {
     }
   }
 
-  async setupApp (store, userSettings) {
+  async setupApp (store, userSettings, reportGameError) {
     this.store = store
+    this.reportGameError = reportGameError;
 
     this.context = new DrawingContext(store)
 
@@ -189,6 +192,15 @@ export class GameContainer {
     }
   }
 
+  downloadMap () {
+    this.map!.unselectAllCarriers()
+    this.map!.unselectAllStars()
+    this.map!.clearWaypoints()
+    this.map!.clearRulerPoints()
+
+    screenshot(this, this.game!, this.reportGameError!);
+  }
+
   zoomIn () {
     this.viewport!.zoomPercent(0.5, true)
   }
@@ -197,7 +209,7 @@ export class GameContainer {
     this.viewport!.zoomPercent(-0.3, true)
   }
 
-  setupViewport (game) {
+  setupViewport (game: Game) {
     this.game = game
 
     this.starFieldLeft = gameHelper.calculateMinStarX(game) - 1500
@@ -231,9 +243,10 @@ export class GameContainer {
   }
 
   setup (game: Game, userSettings: UserGameSettings, context: DrawingContext) {
+    this.game = game;
     this.userSettings = userSettings
 
-    this.map!.setup(this.game, userSettings)
+    this.map!.setup(this.game!, userSettings)
   }
 
   draw () {
