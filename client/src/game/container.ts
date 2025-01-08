@@ -252,6 +252,10 @@ export class GameContainer {
   draw () {
     this.map!.draw()
 
+    const zoomPercent = this.getViewportZoomPercentage()
+
+    this.map!.refreshZoom(zoomPercent)
+
     if ( import.meta.env.DEV || this.userSettings?.technical?.performanceMonitor === 'enabled') {
       let bitmapFont = {fontFamily: "chakrapetch", fontSize: 16}
       let left = 64
@@ -332,7 +336,7 @@ export class GameContainer {
   }
 
   onViewportZoomed (e) {
-    let zoomPercent = this.getViewportZoomPercentage()
+    const zoomPercent = this.getViewportZoomPercentage()
 
     this.map!.refreshZoom(zoomPercent)
   }
