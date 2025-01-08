@@ -16,7 +16,8 @@
     "advancedAI": "enabled",
     "spectators": "enabled",
     "afkSlotsOpen": "enabled",
-    "readyToQuit": "enabled"
+    "readyToQuit": "enabled",
+    "readyToQuitVisibility": "anonymous"
   },
   "galaxy": {
     "galaxyType": "irregular",
