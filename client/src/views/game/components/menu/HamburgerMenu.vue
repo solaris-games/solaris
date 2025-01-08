@@ -56,8 +56,10 @@ import DiplomacyHelper from '../../../../services/diplomacyHelper'
 import router from '../../../../router'
 import MENU_STATES from '../../../../services/data/menuStates'
 import GameContainer from '../../../../game/container'
-import eventBus from '../../../../eventBus'
 import gameHelper from "../../../../services/gameHelper";
+import MenuEventBusEventNames from '../../../../eventBusEventNames/menu'
+import { inject } from 'vue'
+import { eventBusInjectionKey } from '../../../../eventBus'
 
 export default {
   components: {
@@ -72,6 +74,11 @@ export default {
       MENU_STATES: MENU_STATES
     }
   },
+  setup() {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
+  },
   methods: {
     setMenuState (state, args) {
       this.$store.commit('setMenuState', {
@@ -80,7 +87,7 @@ export default {
       })
     },
     onMenuChatSidebarRequested () {
-      eventBus.$emit('onMenuChatSidebarRequested')
+      this.eventBus.emit(MenuEventBusEventNames.OnMenuChatSidebarRequested);
     },
     goToMainMenu () {
       router.push({ name: 'main-menu' })

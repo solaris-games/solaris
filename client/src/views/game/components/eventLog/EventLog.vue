@@ -12,6 +12,9 @@
 import MenuTitle from '../MenuTitle.vue'
 import EventsListVue from './events/EventsList.vue'
 import EventApiService from '../../../../services/api/event'
+import { inject } from 'vue'
+import { eventBusInjectionKey } from '../../../../eventBus'
+import PlayerEventBusEventNames from '../../../../eventBusEventNames/player'
 
 export default {
   components: {
@@ -23,16 +26,19 @@ export default {
       unreadEvents: 0
     }
   },
-  created () {
-    this.$socket.subscribe('playerEventRead', this.checkForUnreadEvents.bind(this))
-    this.$socket.subscribe('playerAllEventsRead', this.checkForUnreadEvents.bind(this))
-  },
-  unmounted () {
-    this.$socket.unsubscribe('playerEventRead')
-    this.$socket.unsubscribe('playerAllEventsRead')
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
   },
   async mounted () {
-    await this.checkForUnreadEvents()
+    await this.checkForUnreadEvents();
+    this.eventBus.on(PlayerEventBusEventNames.PlayerEventRead, this.checkForUnreadEvents);
+    this.eventBus.on(PlayerEventBusEventNames.PlayerAllEventsRead, this.checkForUnreadEvents);
+  },
+  unmounted () {
+    this.eventBus.off(PlayerEventBusEventNames.PlayerEventRead, this.checkForUnreadEvents);
+    this.eventBus.off(PlayerEventBusEventNames.PlayerAllEventsRead, this.checkForUnreadEvents);
   },
   methods: {
     onCloseRequested (e) {

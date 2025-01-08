@@ -1,13 +1,22 @@
-import mitt from 'mitt'
+import type { InjectionKey } from 'vue';
+import { type EventBusEventName } from './eventBusEventNames/eventBusEventName';
 
-// TODO: Handle stuff without an event bus or find a better typed solution at least
+export const eventBusInjectionKey: InjectionKey<EventBus> = Symbol('EventBus');
 
-const emitter = mitt();
+export interface EventBus {
+  on<TEventBusEventName extends EventBusEventName<TEventBusEventType, TData>,
+     TEventBusEventType,
+     TData>(type: TEventBusEventName, handler: (e: TData) => void): void;
 
-const eventBus = {
-  $on: emitter.on,
-  $off: emitter.off,
-  $emit: emitter.emit
-};
+  off<TEventBusEventName extends EventBusEventName<TEventBusEventType, TData>,
+      TEventBusEventType,
+      TData>(type: TEventBusEventName, handler?: (e: TData) => void): void;
 
-export default eventBus;
+  emit<TEventBusEventName extends EventBusEventName<TEventBusEventType, TData>,
+       TEventBusEventType,
+       TData>(type: TEventBusEventName): void;
+
+  emit<TEventBusEventName extends EventBusEventName<TEventBusEventType, TData>,
+       TEventBusEventType,
+       TData>(type: TEventBusEventName, e: TData): void;
+}

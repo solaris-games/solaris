@@ -34,11 +34,14 @@
 </template>
 
 <script>
-import eventBus from '../../../../../eventBus'
+import { eventBusInjectionKey } from '../../../../../eventBus'
 import LoadingSpinnerVue from '../../../../components/LoadingSpinner.vue'
 import ConversationApiService from '../../../../../services/api/conversation'
 import ConversationPreviewVue from './ConversationPreview.vue'
 import gameHelper from '../../../../../services/gameHelper'
+import { inject } from 'vue'
+import PlayerEventBusEventNames from '../../../../../eventBusEventNames/player'
+import MenuEventBusEventNames from '../../../../../eventBusEventNames/menu'
 
 export default {
   components: {
@@ -48,6 +51,11 @@ export default {
   data () {
     return {
       conversations: null
+    }
+  },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
     }
   },
   computed: {
@@ -74,12 +82,10 @@ export default {
   },
   mounted () {
     this.refreshList()
-  },
-  created () {
-    this.$socket.subscribe('gameMessageSent', this.onMessageReceived)
+    this.eventBus.on(PlayerEventBusEventNames.GameMessageSent, this.onMessageReceived);
   },
   unmounted () {
-    this.$socket.unsubscribe('gameMessageSent')
+    this.eventBus.off(PlayerEventBusEventNames.GameMessageSent, this.onMessageReceived);
   },
   methods: {
     async refreshList () {
@@ -96,7 +102,7 @@ export default {
       }
     },
     onCreateNewConversationRequested (e) {
-      eventBus.$emit('onCreateNewConversationRequested', e)
+      this.eventBus.emit(MenuEventBusEventNames.OnCreateNewConversationRequested, e)
     },
     onRefreshClicked (e) {
       this.refreshList()

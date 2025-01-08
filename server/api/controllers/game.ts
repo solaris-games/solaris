@@ -1,7 +1,8 @@
+import { Request } from 'express';
 import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
+import { logger } from "../../utils/logging";
 import { mapToGameConcedeDefeatRequest, mapToGameJoinGameRequest, mapToGameSaveNotesRequest, parseKickPlayerRequest } from '../requests/game';
-import {logger} from "../../utils/logging";
 
 const log = logger("Game Controller");
 
@@ -309,29 +310,35 @@ export default (container: DependencyContainer) => {
                 return next(err);
             }
         },
-        readyToQuit: async (req, res, next) => {
+        readyToQuit: async (req: Request, res, next) => {
             try {
                 await container.playerReadyService.declareReadyToQuit(
-                    req.game,
-                    req.player);
+                    req.game!,
+                    req.player!);
                 
                 res.sendStatus(200);
-    
-                container.broadcastService.gamePlayerReadyToQuit(req.game, req.player);
+
+                if (req.game!.settings.general.readyToQuitVisibility !== 'hidden') {
+                    container.broadcastService.gamePlayerReadyToQuit(req.game!, req.game!.settings.general.readyToQuitVisibility === 'visible' ? req.player! : null);
+                }
+
                 return next();
             } catch (err) {
                 return next(err);
             }
         },
-        unreadyToQuit: async (req, res, next) => {
+        unreadyToQuit: async (req: Request, res, next) => {
             try {
                 await container.playerReadyService.undeclareReadyToQuit(
-                    req.game,
-                    req.player);
+                    req.game!,
+                    req.player!);
     
                 res.sendStatus(200);
-                    
-                container.broadcastService.gamePlayerNotReadyToQuit(req.game, req.player);
+
+                if (req.game!.settings.general.readyToQuitVisibility !== 'hidden') {
+                    container.broadcastService.gamePlayerNotReadyToQuit(req.game!, req.game!.settings.general.readyToQuitVisibility === 'visible' ? req.player! : null);
+                }
+
                 return next();
             } catch (err) {
                 return next(err);

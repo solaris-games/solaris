@@ -47,7 +47,6 @@
 </template>
 
 <script>
-import eventBus from '../../../../../eventBus'
 import GameHelper from '../../../../../services/gameHelper'
 import ConversationApiService from '../../../../../services/api/conversation'
 import LoadingSpinnerVue from '../../../../components/LoadingSpinner.vue'
@@ -56,6 +55,10 @@ import ConversationParticipantsVue from './ConversationParticipants.vue'
 import ComposeMessageVue from './ConversationCompose.vue'
 import ConversationMessageVue from './ConversationMessage.vue'
 import ConversationTradeEventVue from './ConversationTradeEvent.vue'
+import { inject } from 'vue'
+import { eventBusInjectionKey } from '../../../../../eventBus'
+import PlayerEventBusEventNames from '../../../../../eventBusEventNames/player'
+import MenuEventBusEventNames from '../../../../../eventBusEventNames/menu'
 
 export default {
   components: {
@@ -69,6 +72,11 @@ export default {
   props: {
     conversationId: String,
   },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
+  },
   data () {
     return {
       conversation: null,
@@ -77,40 +85,40 @@ export default {
       pinnedOnly: false
     }
   },
-  created () {
-    this.$socket.subscribe('gameMessageSent', this.onMessageReceived)
-    this.$socket.subscribe('gameConversationRead', this.onConversationRead)
-    this.$socket.subscribe('gameConversationLeft', this.onConversationLeft)
-    this.$socket.subscribe('gameConversationMessagePinned', this.onConversationMessagePinned)
-    this.$socket.subscribe('gameConversationMessageUnpinned', this.onConversationMessageUnpinned)
-    this.$socket.subscribe('playerCreditsReceived', this.onTradeEventReceived)
-    this.$socket.subscribe('playerCreditsSpecialistsReceived', this.onTradeEventReceived)
-    this.$socket.subscribe('playerRenownReceived', this.onTradeEventReceived)
-    this.$socket.subscribe('playerTechnologyReceived', this.onTradeEventReceived)
+  async mounted () {
+    this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game);
+    await this.loadConversation();
+
+    this.eventBus.on(PlayerEventBusEventNames.GameMessageSent, this.onMessageReceived);
+    this.eventBus.on(PlayerEventBusEventNames.GameConversationRead, this.onConversationRead);
+    this.eventBus.on(PlayerEventBusEventNames.GameConversationLeft, this.onConversationLeft);
+    this.eventBus.on(PlayerEventBusEventNames.GameConversationMessagePinned, this.onConversationMessagePinned);
+    this.eventBus.on(PlayerEventBusEventNames.GameConversationMessageUnpinned, this.onConversationMessageUnpinned);
+    this.eventBus.on(PlayerEventBusEventNames.PlayerCreditsReceived, this.onTradeEventReceived);
+    this.eventBus.on(PlayerEventBusEventNames.PlayerCreditsSpecialistsReceived, this.onTradeEventReceived);
+    this.eventBus.on(PlayerEventBusEventNames.PlayerRenownReceived, this.onTradeEventReceived);
+    this.eventBus.on(PlayerEventBusEventNames.PlayerTechnologyReceived, this.onTradeEventReceived);
   },
   unmounted () {
-    this.$socket.unsubscribe('gameMessageSent')
-    this.$socket.unsubscribe('gameConversationRead')
-    this.$socket.unsubscribe('gameConversationLeft')
-    this.$socket.unsubscribe('playerCreditsReceived')
-    this.$socket.unsubscribe('playerCreditsSpecialistsReceived')
-    this.$socket.unsubscribe('playerRenownReceived')
-    this.$socket.unsubscribe('playerTechnologyReceived')
+    this.eventBus.off(PlayerEventBusEventNames.GameMessageSent, this.onMessageReceived);
+    this.eventBus.off(PlayerEventBusEventNames.GameConversationRead, this.onConversationRead);
+    this.eventBus.off(PlayerEventBusEventNames.GameConversationLeft, this.onConversationLeft);
+    this.eventBus.off(PlayerEventBusEventNames.GameConversationMessagePinned, this.onConversationMessagePinned);
+    this.eventBus.off(PlayerEventBusEventNames.GameConversationMessageUnpinned, this.onConversationMessageUnpinned);
+    this.eventBus.off(PlayerEventBusEventNames.PlayerCreditsReceived, this.onTradeEventReceived);
+    this.eventBus.off(PlayerEventBusEventNames.PlayerCreditsSpecialistsReceived, this.onTradeEventReceived);
+    this.eventBus.off(PlayerEventBusEventNames.PlayerRenownReceived, this.onTradeEventReceived);
+    this.eventBus.off(PlayerEventBusEventNames.PlayerTechnologyReceived, this.onTradeEventReceived);
 
     this.$store.commit('resetMentions')
     this.$store.commit('closeConversation')
-  },
-  async mounted () {
-    this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
-
-    await this.loadConversation()
   },
   methods: {
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
     },
     onOpenInboxRequested (e) {
-      eventBus.$emit('onOpenInboxRequested', e)
+      this.eventBus.emit(MenuEventBusEventNames.OnOpenInboxRequested, e);
     },
     onOpenReportPlayerRequested (e) {
       this.$emit('onOpenReportPlayerRequested', e)

@@ -35,12 +35,14 @@
 </template>
 
 <script>
-import eventBus from '../../../../../eventBus'
 import GameHelper from '../../../../../services/gameHelper'
 import ConversationApiService from '../../../../../services/api/conversation'
 import MenuTitle from '../../MenuTitle.vue'
 import LoadingSpinnerVue from '../../../../components/LoadingSpinner.vue'
 import FormErrorList from '../../../../components/FormErrorList.vue'
+import { inject } from 'vue'
+import { eventBusInjectionKey } from '../../../../../eventBus'
+import MenuEventBusEventNames from '../../../../../eventBusEventNames/menu'
 
 export default {
   components: {
@@ -60,6 +62,11 @@ export default {
       possibleParticipants: []
     }
   },
+  setup() {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
+  },
   mounted () {
     let userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
 
@@ -75,7 +82,7 @@ export default {
       this.$emit('onCloseRequested', e)
     },
     onOpenInboxRequested (e) {
-      eventBus.$emit('onOpenInboxRequested', e)
+      this.eventBus.emit(MenuEventBusEventNames.OnOpenInboxRequested, e);
     },
     async createConversation (e) {
       this.errors = []
@@ -98,9 +105,9 @@ export default {
         let response = await ConversationApiService.create(this.$store.state.game._id, this.name, this.participants)
 
         if (response.status === 200) {
-          eventBus.$emit('onViewConversationRequested', {
+          this.eventBus.emit(MenuEventBusEventNames.OnViewConversationRequested, {
             conversationId: response.data._id
-          })
+          });
         }
       } catch (err) {
         console.error(err)
