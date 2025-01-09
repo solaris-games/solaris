@@ -562,12 +562,12 @@ export class Map extends EventEmitter {
     }
   }
 
-  drawStar (star) {
+  drawStar (star: Star) {
     star.draw()
     star.onZoomChanging(this.zoomPercent)
   }
 
-  _undrawStar (star) {
+  _undrawStar (star: Star) {
     star.off('onStarClicked', this.onStarClicked.bind(this))
     star.off('onStarRightClicked', this.onStarRightClicked.bind(this))
 

@@ -410,80 +410,78 @@ export class Star extends EventEmitter {
   }
 
   drawPlanets () {
-    if (this.userSettings.map.naturalResources !== 'planets') {
-      if (this.container_planets) {
-        this.unsubscribeToEvents()
-        this.container.removeChild(this.container_planets)
-        this.container_planets = null
-        this.planets = null
-      }
+    if (this.container_planets) {
+      this.unsubscribeToEvents()
+      this.container.removeChild(this.container_planets)
+      this.container_planets = null
+      this.planets = null
+    }
 
+    if (this.userSettings.map.naturalResources !== 'planets') {
       return
     }
 
-    if (!this.container_planets) {
-      this.container_planets = new Container()
+    this.container_planets = new Container()
 
-      // The more resources a star has the more planets it has.
-      let planetCount = this._getPlanetsCount()
+    // The more resources a star has the more planets it has.
+    let planetCount = this._getPlanetsCount()
 
-      if (planetCount === 0) {
-        return
-      }
-
-      let player = this._getStarPlayer()
-      let playerColour = player ? this.context.getPlayerColour(player._id) : 0xFFFFFF
-
-      let rotationDirection = this._getPlanetOrbitDirection()
-      let rotationSpeedModifier = this._getPlanetOrbitSpeed()
-
-      this.planets = []
-
-      for (let i = 0; i < planetCount; i++) {
-        let distanceToStar = 15 + (5 * i)
-        let planetSize = Math.floor(Math.abs(this.data.location.y) + distanceToStar) % 1.5 + 0.5
-
-        let orbitGraphics = new Graphics()
-        orbitGraphics.circle(0, 0, distanceToStar -(planetSize / 2))
-        orbitGraphics.stroke({
-          width: 0.3,
-          color: 0xFFFFFF,
-          alpha: this.userSettings.map.naturalResourcesRingOpacity,
-        })
-        this.container_planets.addChild(orbitGraphics)
-
-        const planetGraphics = new Graphics()
-
-        const planetAlpha = this.data.isInScanningRange ? 1.0 : 0.3;
-
-        planetGraphics.circle(planetSize / 2, 0, planetSize)
-        planetGraphics.fill({
-          color: playerColour,
-          alpha: planetAlpha
-        });
-
-        const planetContainer = new Container()
-
-        planetContainer.addChild(planetGraphics)
-
-        planetContainer.pivot.set(distanceToStar, 0)
-
-        let rotationSpeed = (planetCount - i) / rotationSpeedModifier
-
-        this.container_planets.addChild(planetContainer)
-
-        this.planets.push({
-          index: i,
-          container: planetContainer,
-          rotationSpeed,
-          rotationDirection
-        })
-      }
-
-      this.subscribeToEvents()
-
-      this.container.addChild(this.container_planets)
+    if (planetCount === 0) {
+      return
     }
+
+    let player = this._getStarPlayer()
+    let playerColour = player ? this.context.getPlayerColour(player._id) : 0xFFFFFF
+
+    let rotationDirection = this._getPlanetOrbitDirection()
+    let rotationSpeedModifier = this._getPlanetOrbitSpeed()
+
+    this.planets = []
+
+    for (let i = 0; i < planetCount; i++) {
+      let distanceToStar = 15 + (5 * i)
+      let planetSize = Math.floor(Math.abs(this.data.location.y) + distanceToStar) % 1.5 + 0.5
+
+      let orbitGraphics = new Graphics()
+      orbitGraphics.circle(0, 0, distanceToStar -(planetSize / 2))
+      orbitGraphics.stroke({
+        width: 0.3,
+        color: 0xFFFFFF,
+        alpha: this.userSettings.map.naturalResourcesRingOpacity,
+      })
+      this.container_planets.addChild(orbitGraphics)
+
+      const planetGraphics = new Graphics()
+
+      const planetAlpha = this.data.isInScanningRange ? 1.0 : 0.3;
+
+      planetGraphics.circle(planetSize / 2, 0, planetSize)
+      planetGraphics.fill({
+        color: playerColour,
+        alpha: planetAlpha
+      });
+
+      const planetContainer = new Container()
+
+      planetContainer.addChild(planetGraphics)
+
+      planetContainer.pivot.set(distanceToStar, 0)
+
+      let rotationSpeed = (planetCount - i) / rotationSpeedModifier
+
+      this.container_planets.addChild(planetContainer)
+
+      this.planets.push({
+        index: i,
+        container: planetContainer,
+        rotationSpeed,
+        rotationDirection
+      })
+    }
+
+    this.subscribeToEvents()
+
+    this.container.addChild(this.container_planets)
   }
 
   orbitPlanetsStep (ticker) {
