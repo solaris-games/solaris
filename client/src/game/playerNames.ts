@@ -1,23 +1,24 @@
-import * as PIXI from 'pixi.js'
+import { Container, Text, TextStyle, Graphics } from 'pixi.js'
 import gameHelper from '../services/gameHelper'
 import type {Game} from "../types/game";
 import type {DrawingContext} from "./container";
+import type {UserGameSettings} from "@solaris-common";
 
 class PlayerNames {
 
   static zoomLevel = 90
 
-  container: PIXI.Container;
+  container: Container;
   zoomPercent = 0;
 
   game: Game | undefined;
   context: DrawingContext | undefined;
 
   constructor () {
-    this.container = new PIXI.Container()
+    this.container = new Container()
   }
 
-  setup (game, userSettings, context) {
+  setup (game: Game, userSettings: UserGameSettings, context: DrawingContext) {
     this.game = game
 
     PlayerNames.zoomLevel = userSettings.map.zoomLevels.playerNames
@@ -34,20 +35,23 @@ class PlayerNames {
         continue
       }
 
-      let style = new PIXI.TextStyle({
+      const style = new TextStyle({
         fontFamily: `Chakra Petch,sans-serif;`,
         fill: 0xFFFFFF,
         padding: 3,
         fontSize: 50
       })
 
-      let textContainer = new PIXI.Container()
+      const textContainer = new Container()
 
-      let text_name = new PIXI.Text(player.alias, style)
+      const text_name = new Text({
+        text: player.alias,
+        style
+      });
       text_name.resolution = 2
       text_name.zIndex = 10
 
-      let graphics = new PIXI.Graphics()
+      let graphics = new Graphics()
       graphics.roundRect(-10, -10, text_name.width + 20, text_name.height + 20, 10)
       graphics.fill({
         color: this.context!.getPlayerColour(player._id),
@@ -69,7 +73,7 @@ class PlayerNames {
   }
 
   separate () {
-    const rects = this.container.children as PIXI.Container[];
+    const rects = this.container.children as Container[];
 
     const hasOverlap = (rectA, rectB) => {
       // a left >= b right or b left >= a right
@@ -168,7 +172,7 @@ class PlayerNames {
     }
   }
 
-  refreshZoom (zoomPercent) {
+  refreshZoom (zoomPercent: number) {
     this.zoomPercent = zoomPercent
 
     if (this.container) {

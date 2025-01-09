@@ -602,7 +602,7 @@ export class Star extends EventEmitter {
   drawName () {
     if (!this.text_name) {
       const bitmapFont = {fontFamily: "chakrapetch", fontSize: NAME_SIZE}
-      this.text_name = new BitmapText(this.data.name, bitmapFont)
+      this.text_name = new BitmapText({ text: this.data.name, style: bitmapFont })
       this.text_name.x = 5
 
       this.container.addChild(this.text_name)
@@ -666,7 +666,7 @@ export class Star extends EventEmitter {
     if (shipsText) {
       if (!this.text_ships_small) {
         let bitmapFont = {fontFamily: "chakrapetch", fontSize: Star.shipsSmallSize}
-        this.text_ships_small = new BitmapText(this.data.name, bitmapFont)
+        this.text_ships_small = new BitmapText({ text: this.data.name, style: bitmapFont })
         this.container.addChild(this.text_ships_small)
         this.text_ships_small.x = 5
         this.text_ships_small.y = (-this.text_ships_small.height) +( ( (NAME_SIZE + Star.shipsSmallSize) / 2.0) - NAME_SIZE)
@@ -674,7 +674,7 @@ export class Star extends EventEmitter {
 
       if (!this.text_ships_big) {
         let bitmapFont = {fontFamily: "chakrapetch", fontSize: Star.shipsBigSize}
-        this.text_ships_big = new BitmapText(this.data.name, bitmapFont)
+        this.text_ships_big = new BitmapText({ text: this.data.name, style: bitmapFont })
         this.container.addChild(this.text_ships_big)
         this.text_ships_big.x = 5
         this.text_ships_big.y = -this.text_ships_big.height/2.0
@@ -699,7 +699,7 @@ export class Star extends EventEmitter {
         let displayInfrastructure = `${this.data.infrastructure.economy} ${this.data.infrastructure.industry} ${this.data.infrastructure.science}`
 
         let bitmapFont = {fontFamily: "chakrapetch", fontSize: 4}
-        this.text_infrastructure = new BitmapText(displayInfrastructure, bitmapFont);
+        this.text_infrastructure = new BitmapText({ text: displayInfrastructure, style: bitmapFont });
         this.text_infrastructure.x = -(this.text_infrastructure.width / 2.0)
         this.text_infrastructure.y = -15
         this.text_infrastructure.alpha = 0.75;
@@ -723,7 +723,7 @@ export class Star extends EventEmitter {
       let displayInfrastructure = `${this.data.ignoreBulkUpgrade.economy ? ' ' : 'E'} ${this.data.ignoreBulkUpgrade.industry ? ' ' : 'I'} ${this.data.ignoreBulkUpgrade.science ? ' ' : 'S'}`
 
       let bitmapFont = {fontFamily: "chakrapetch", fontSize: 8}
-      this.text_infrastructureBulkIgnored = new BitmapText(displayInfrastructure, bitmapFont);
+      this.text_infrastructureBulkIgnored = new BitmapText({ text: displayInfrastructure, style: bitmapFont });
       this.text_infrastructureBulkIgnored.x = -(this.text_infrastructureBulkIgnored.width / 2.0)
       this.text_infrastructureBulkIgnored.y = 12
       this.text_infrastructureBulkIgnored.visible = this.showIgnoreBulkUpgradeInfrastructure

@@ -650,7 +650,7 @@ export class Map extends EventEmitter {
   }
 
   drawPlayerNames () {
-    this.playerNames!.setup(this.game, this.userSettings, this.context)
+    this.playerNames!.setup(this.game!, this.userSettings!, this.context)
     this.playerNames!.draw()
   }
 

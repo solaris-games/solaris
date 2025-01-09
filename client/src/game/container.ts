@@ -261,17 +261,17 @@ export class GameContainer {
       let left = 64
       let top = 32
 
-      this.fpsNowText = new BitmapText("", bitmapFont)
+      this.fpsNowText = new BitmapText({ text: "", style: bitmapFont })
       this.fpsNowText.zIndex = 1000
-      this.fpsMAText = new BitmapText("", bitmapFont)
+      this.fpsMAText = new BitmapText({ text: "", style: bitmapFont })
       this.fpsMAText.zIndex = 1000
-      this.fpsMA32Text = new BitmapText("", bitmapFont)
+      this.fpsMA32Text = new BitmapText({ text: "", style: bitmapFont })
       this.fpsMA32Text.zIndex = 1000
-      this.jitterText = new BitmapText("", bitmapFont)
+      this.jitterText = new BitmapText({ text: "", style: bitmapFont })
       this.jitterText.zIndex = 1000
-      this.lowestText = new BitmapText("", bitmapFont)
+      this.lowestText = new BitmapText({ text: "", style: bitmapFont })
       this.lowestText.zIndex = 1000
-      this.zoomText = new BitmapText("", bitmapFont)
+      this.zoomText = new BitmapText({ text: "", style: bitmapFont })
       this.zoomText.zIndex = 1000
       this.fpsNowText.x = left
       this.fpsNowText.y = 128+16

@@ -182,7 +182,7 @@ class TextureService {
   _loadSpecialistTexture(name: string) {
     this.SPECIALIST_TEXTURES[name] = Texture.from(new URL(`../assets/specialists/${name}.svg`, import.meta.url).href)
     //disable mipmap
-    this.SPECIALIST_TEXTURES[name].baseTexture.mipmap = 0
+    this.SPECIALIST_TEXTURES[name].source.mipmap = 0
   }
 
   getSpecialistTexture(specialistKey: string) {

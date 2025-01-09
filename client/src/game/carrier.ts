@@ -162,7 +162,7 @@ export class Carrier extends EventEmitter {
       let shipsText = totalShips.toString()
 
       let bitmapFont = {fontFamily: "chakrapetch", fontSize: 4}
-      this.text_ships = new BitmapText(shipsText, bitmapFont)
+      this.text_ships = new BitmapText({ text: shipsText, style: bitmapFont })
 
       this.text_ships.x = -(this.text_ships.width / 2.0)
       this.text_ships.y = 5
@@ -176,7 +176,10 @@ export class Carrier extends EventEmitter {
           fontSize: 4,
           fontWeight: 'bold'
         })
-        let giftText = new Text('🎁', style)
+        let giftText = new Text({
+          text: '🎁',
+          style
+        })
         giftText.resolution = 12
         giftText.position.x = this.text_ships.width
         giftText.position.y = -1
