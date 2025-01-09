@@ -24,10 +24,10 @@
       </button>
     </div>
     <div class="col-auto ps-0" v-if="userPlayer">
-      <button v-if="canBuildWarpGates && !star.warpGate" :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished" class="btn btn-sm btn-primary me-1" title="Build a warp gate - Grants x3 speed between warp gates" @click="confirmBuildWarpGate">
+      <button v-if="canBuildWarpGates && !star.warpGate" :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished" class="btn btn-sm btn-primary me-1" title="Build a warp gate - Grants x3 speed between warp gates" @click="buildWarpGate">
         <i class="fas fa-dungeon me-1"></i>${{star.upgradeCosts.warpGate}}
       </button>
-      <button v-if="canDestroyWarpGates && star.warpGate" :disabled="$isHistoricalMode() || isGameFinished" class="btn btn-sm btn-outline-danger me-1" @click="confirmDestroyWarpGate" title="Destroy the warp gate">
+      <button v-if="canDestroyWarpGates && star.warpGate" :disabled="$isHistoricalMode() || isGameFinished" class="btn btn-sm btn-outline-danger me-1" @click="destroyWarpGate" title="Destroy the warp gate">
         <i class="fas fa-dungeon"></i> <i class="fas fa-trash ms-1"></i>
       </button>
       <button :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.carriers || star.ships < 1 || isGameFinished" class="btn btn-sm btn-info" @click="onBuildCarrierRequested">
@@ -127,7 +127,7 @@ export default {
       try {
         this.isUpgradingScience = true
 
-        let response = await starService.upgradeScience(this.$store.state.game._id, this.star._id)
+        const response = await starService.upgradeScience(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
           this.$toast.default(`Science upgraded at ${this.star.name}.`)
@@ -142,13 +142,13 @@ export default {
 
       this.isUpgradingScience = false
     },
-    async confirmBuildWarpGate (e) {
-      if (!await this.$confirm('Build Warp Gate', `Are you sure you want build a Warp Gate at ${this.star.name}? The upgrade will cost $${this.star.upgradeCosts.warpGate}.`)) {
+    async buildWarpGate (e) {
+      if (this.$store.state.settings.star.confirmBuildWarpGate === 'enabled' && !await this.$confirm('Build Warp Gate', `Are you sure you want build a Warp Gate at ${this.star.name}? The upgrade will cost $${this.star.upgradeCosts.warpGate}.`)) {
         return
       }
 
       try {
-        let response = await starService.buildWarpGate(this.$store.state.game._id, this.star._id)
+        const response = await starService.buildWarpGate(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
           this.$toast.default(`Warp Gate built at ${this.star.name}.`)
@@ -161,7 +161,7 @@ export default {
         console.error(err)
       }
     },
-    async confirmDestroyWarpGate (e) {
+    async destroyWarpGate (e) {
       if (!await this.$confirm('Destroy Warp Gate', `Are you sure you want destroy Warp Gate at ${this.star.name}?`)) {
         return
       }
