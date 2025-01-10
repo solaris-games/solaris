@@ -166,6 +166,11 @@ export default class HistoryService {
         });
 
         history.carriers = game.galaxy.carriers.map(c => {
+            // todo fix this properly
+            if (!c.name) {
+                c.name = 'Carrier';
+            }
+
             let x: GameHistoryCarrier = {
                 carrierId: c._id,
                 ownedByPlayerId: c.ownedByPlayerId!,
