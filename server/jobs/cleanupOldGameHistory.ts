@@ -40,7 +40,7 @@ export default (container: DependencyContainer) => {
 
                 done();
             } catch (e) {
-                log.error("CleanupOldGameHistory job threw unhandled: " + e, e);
+                log.error(e, "CleanupOldGameHistory job threw unhandled: " + e);
             }
         }
 

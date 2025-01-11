@@ -23,7 +23,7 @@ export default (container: DependencyContainer) => {
 
                 done();
             } catch (e) {
-                log.error("CleanupOldTutorials job threw unhandled: " + e, e);
+                log.error(e, "CleanupOldTutorials job threw unhandled: " + e);
             }
         }
     };

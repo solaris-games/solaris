@@ -36,7 +36,7 @@ export default (container: DependencyContainer) => {
 
                 done();
             } catch (e) {
-                log.error("SendReviewReminders job threw unhandled: " + e, e);
+                log.error(e, "SendReviewReminders job threw unhandled: " + e);
             }
         }
 

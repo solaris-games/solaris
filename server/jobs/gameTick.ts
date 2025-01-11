@@ -34,7 +34,7 @@ export default (container: DependencyContainer) => {
                     }
                 }
                 catch (e) {
-                    log.error(`Error in game ${game.settings.general.name} (${game._id})`, e);
+                    log.error(e, `Error in game ${game.settings.general.name} (${game._id})`);
                 }
                 finally {
                     await container.gameLockService.lock(gameId, false);
@@ -62,7 +62,7 @@ export default (container: DependencyContainer) => {
 
                 done();
             } catch (e) {
-                log.error("GameTick job threw unhandled: " + e, e);
+                log.error(e, "GameTick job threw unhandled: " + e);
             }
         }
 
