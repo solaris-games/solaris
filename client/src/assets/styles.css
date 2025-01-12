@@ -6,3 +6,15 @@
 .bg-info .small, .bg-info small {
     font-size: .925em;
 }
+
+@font-face {
+    font-family:"Chakra Petch"; /* no space between colon and property or firefox will add warnings for some reason */
+    src: url('fonts/ChakraPetch-Regular.ttf');
+    font-weight: 300;
+}
+
+@font-face {
+    font-family:"Chakra Petch"; /* no space between colon and property or firefox will add warnings for some reason */
+    src: url('fonts/ChakraPetch-Medium.ttf');
+    font-weight: 500;
+}
