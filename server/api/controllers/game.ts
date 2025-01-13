@@ -2,7 +2,12 @@ import { Request } from 'express';
 import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
 import { logger } from "../../utils/logging";
-import { mapToGameConcedeDefeatRequest, mapToGameJoinGameRequest, mapToGameSaveNotesRequest, parseKickPlayerRequest } from '../requests/game';
+import {
+    mapToGameConcedeDefeatRequest,
+    mapToGameSaveNotesRequest,
+    parseGameJoinGameRequest,
+    parseKickPlayerRequest
+} from '../requests/game';
 
 const log = logger("Game Controller");
 
@@ -211,7 +216,7 @@ export default (container: DependencyContainer) => {
         },
         join: async (req, res, next) => {
             try {
-                const reqObj = mapToGameJoinGameRequest(req.body);
+                const reqObj = parseGameJoinGameRequest(req.body);
                 
                 let gameIsFull = await container.gameJoinService.join(
                     req.game,

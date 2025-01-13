@@ -1,6 +1,6 @@
 import ValidationError from "../../errors/validation";
 import { DBObjectId } from "../../services/types/DBObjectId";
-import { object, Validator, objectId } from "../validate";
+import {object, Validator, objectId, stringValue, number, string, or, just} from "../validate";
 import { keyHasBooleanValue, keyHasNumberValue, keyHasStringValue } from "./helpers";
 
 export interface GameCreateGameRequest {
@@ -11,39 +11,18 @@ export interface GameJoinGameRequest {
     playerId: DBObjectId;
     alias: string;
     avatar: number;
-    password: string;
+    password: string | undefined;
 };
 
-export const mapToGameJoinGameRequest = (body: any): GameJoinGameRequest => {
-    let errors: string[] = [];
-
-    if (!keyHasStringValue(body, 'playerId')) {
-        errors.push('Player ID is required.');
-    }
-
-    if (!keyHasStringValue(body, 'alias')) {
-        errors.push('Alias is required.');
-    }
-
-    if (!keyHasNumberValue(body, 'avatar')) {
-        errors.push('Avatar is required.');
-    }
-
-    // TODO: Password?
-
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    body.avatar = +body.avatar;
-    
-    return {
-        playerId: body.playerId,
-        alias: body.alias,
-        avatar: body.avatar,
-        password: body.password
-    }
-};
+export const parseGameJoinGameRequest: Validator<GameJoinGameRequest> = object({
+    playerId: objectId,
+    alias: stringValue({
+        trim: true,
+        nonEmpty: true,
+    }),
+    avatar: number,
+    password: or(string, just(undefined)),
+});
 
 export interface GameSaveNotesRequest {
     notes: string;
