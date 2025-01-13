@@ -227,6 +227,7 @@ export default class GameGalaxyService {
         if (this.gameTypeService.isDarkModeExtra(game)) {
             this._setPlayerStats(game);
             game.state.leaderboard = null;
+            game.state.teamLeaderboard = null;
         }
 
         // If any kind of dark mode, remove the galaxy center from the constants.
