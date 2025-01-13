@@ -15,7 +15,7 @@
                     <button v-if="userPlayer && !userPlayer.defeated" class="btn btn-primary btn-sm me-1 mb-1" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)" title="Bulk Upgrade (B)"><i class="fas fa-money-bill"></i></button>
                     <button class="btn btn-primary btn-sm me-1 mb-1" @click="reloadPage" title="Reload Game"><i class="fas fa-sync"></i></button>
                 </div>
-                <button class="btn btn-primary btn-sm me-1 mb-1" @click="downloadMap" title="Download map image"><i class="fas fa-camera"></i></button>
+                <!-- button class="btn btn-primary btn-sm me-1 mb-1" @click="downloadMap" title="Download map image"><i class="fas fa-camera"></i></button -->
             </div>
           <div v-if="userPlayer" class="dropdown-divider"></div>
           <button v-if="userPlayer" class="dropdown-item" :class="isCustomColoursEnabled ? 'active' : null" v-on:click="toggleCustomColours">
