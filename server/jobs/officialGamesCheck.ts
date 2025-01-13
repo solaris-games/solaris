@@ -65,7 +65,7 @@ export default (container: DependencyContainer) => {
 
                 done();
             } catch (e) {
-                log.error("OfficialGamesCheck job threw unhandled: " + e, e);
+                log.error(e, "OfficialGamesCheck job threw unhandled: " + e);
             }
         }
 

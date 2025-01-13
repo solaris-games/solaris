@@ -1,10 +1,11 @@
-import config from '../config';
 import mongooseLoader from '.';
+import config from '../config';
 import containerLoader from '../services';
-import {DependencyContainer} from '../services/types/DependencyContainer';
-import {User} from '../services/types/User';
-import {GameWinnerKind} from "../services/leaderboard";
-import {logger} from "../utils/logging";
+import { GameWinnerKind } from "../services/leaderboard";
+import { DependencyContainer } from '../services/types/DependencyContainer';
+import { User } from '../services/types/User';
+import { serverStub } from '../sockets/serverStub';
+import { logger } from "../utils/logging";
 
 let mongo,
     container: DependencyContainer;
@@ -42,7 +43,7 @@ async function startup() {
         poolSize: 1
     });
 
-    container = containerLoader(config);
+    container = containerLoader(config, serverStub, log);
     
     log.info('Recalculating all player ranks...');
 
@@ -261,4 +262,4 @@ startup().then(async () => {
     await shutdown();
 });
 
-export {};
+export { };

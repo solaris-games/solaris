@@ -7,6 +7,7 @@ import type {State} from "../store";
 import {Application, BitmapText, isWebGLSupported} from "pixi.js";
 import type {UserGameSettings} from "solaris-common/src";
 import type {Game} from "../types/game";
+import { screenshot } from './screenshot';
 
 export class DrawingContext {
   store: Store<State>;
@@ -42,7 +43,8 @@ export class GameContainer {
   starFieldTop: number = 0;
   starFieldBottom: number = 0;
   userSettings: UserGameSettings | undefined;
-  game: any;
+  game: Game | undefined;
+  reportGameError: ((err: string) => void) | undefined;
 
   constructor () {
     this.frames = 0
@@ -117,8 +119,9 @@ export class GameContainer {
     }
   }
 
-  async setupApp (store, userSettings) {
+  async setupApp (store, userSettings, reportGameError) {
     this.store = store
+    this.reportGameError = reportGameError;
 
     this.context = new DrawingContext(store)
 
@@ -189,6 +192,15 @@ export class GameContainer {
     }
   }
 
+  downloadMap () {
+    this.map!.unselectAllCarriers()
+    this.map!.unselectAllStars()
+    this.map!.clearWaypoints()
+    this.map!.clearRulerPoints()
+
+    screenshot(this, this.game!, this.reportGameError!);
+  }
+
   zoomIn () {
     this.viewport!.zoomPercent(0.5, true)
   }
@@ -197,7 +209,7 @@ export class GameContainer {
     this.viewport!.zoomPercent(-0.3, true)
   }
 
-  setupViewport (game) {
+  setupViewport (game: Game) {
     this.game = game
 
     this.starFieldLeft = gameHelper.calculateMinStarX(game) - 1500
@@ -231,30 +243,35 @@ export class GameContainer {
   }
 
   setup (game: Game, userSettings: UserGameSettings, context: DrawingContext) {
+    this.game = game;
     this.userSettings = userSettings
 
-    this.map!.setup(this.game, userSettings)
+    this.map!.setup(this.game!, userSettings)
   }
 
   draw () {
     this.map!.draw()
+
+    const zoomPercent = this.getViewportZoomPercentage()
+
+    this.map!.refreshZoom(zoomPercent)
 
     if ( import.meta.env.DEV || this.userSettings?.technical?.performanceMonitor === 'enabled') {
       let bitmapFont = {fontFamily: "chakrapetch", fontSize: 16}
       let left = 64
       let top = 32
 
-      this.fpsNowText = new BitmapText("", bitmapFont)
+      this.fpsNowText = new BitmapText({ text: "", style: bitmapFont })
       this.fpsNowText.zIndex = 1000
-      this.fpsMAText = new BitmapText("", bitmapFont)
+      this.fpsMAText = new BitmapText({ text: "", style: bitmapFont })
       this.fpsMAText.zIndex = 1000
-      this.fpsMA32Text = new BitmapText("", bitmapFont)
+      this.fpsMA32Text = new BitmapText({ text: "", style: bitmapFont })
       this.fpsMA32Text.zIndex = 1000
-      this.jitterText = new BitmapText("", bitmapFont)
+      this.jitterText = new BitmapText({ text: "", style: bitmapFont })
       this.jitterText.zIndex = 1000
-      this.lowestText = new BitmapText("", bitmapFont)
+      this.lowestText = new BitmapText({ text: "", style: bitmapFont })
       this.lowestText.zIndex = 1000
-      this.zoomText = new BitmapText("", bitmapFont)
+      this.zoomText = new BitmapText({ text: "", style: bitmapFont })
       this.zoomText.zIndex = 1000
       this.fpsNowText.x = left
       this.fpsNowText.y = 128+16
@@ -319,7 +336,7 @@ export class GameContainer {
   }
 
   onViewportZoomed (e) {
-    let zoomPercent = this.getViewportZoomPercentage()
+    const zoomPercent = this.getViewportZoomPercentage()
 
     this.map!.refreshZoom(zoomPercent)
   }

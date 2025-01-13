@@ -41,7 +41,11 @@ import moment from 'moment'
 import gameHelper from '../../services/gameHelper'
 import authService from '../../services/api/auth'
 import ColourOverrideDialog from "./components/player/ColourOverrideDialog.vue";
-import eventBus from '../../eventBus'
+import { eventBusInjectionKey } from '../../eventBus'
+import { inject } from 'vue';
+import { playerClientSocketEmitterInjectionKey } from '../../sockets/socketEmitters/player'
+import PlayerEventBusEventNames from '../../eventBusEventNames/player'
+import GameEventBusEventNames from '../../eventBusEventNames/game'
 
 export default {
   components: {
@@ -51,6 +55,12 @@ export default {
     'main-bar': MainBar,
     'chat': Chat,
     'colour-override-dialog': ColourOverrideDialog,
+  },
+  setup() {
+    return {
+      eventBus: inject(eventBusInjectionKey),
+      playerClientSocketEmitter: inject(playerClientSocketEmitterInjectionKey)
+    }
   },
   data () {
     return {
@@ -72,21 +82,14 @@ export default {
     await this.reloadSettings()
     await this.reloadGame()
 
-    this.subscribeTo$socket()
-
     // AudioService.download()
 
     let player = GameHelper.getUserPlayer(this.$store.state.game)
 
-    let socketData = {
-      gameId: this.$store.state.game._id
-    }
-
-    if (player) {
-      socketData.playerId = player._id
-    }
-
-    this.$socket.emit('gameRoomJoined', socketData)
+    this.playerClientSocketEmitter.emitGameRoomJoined({
+      gameId: this.$store.state.game._id,
+      playerId: player?._id
+    });
 
     // If the user is in the game then display the leaderboard.
     // Otherwise show the welcome screen if there are empty slots.
@@ -116,20 +119,18 @@ export default {
   beforeUnmount () {
     clearInterval(this.polling)
   },
+  mounted () {
+    this.subscribeToEvents();
+  },
   unmounted () {
-    this.unsubscribeTo$socket()
-
-    let socketData = {
-      gameId: this.$store.state.game._id
-    }
+    this.unsubscribeFromEvents()
 
     let player = GameHelper.getUserPlayer(this.$store.state.game)
 
-    if (player) {
-      socketData.playerId = player._id
-    }
-
-    this.$socket.emit('gameRoomLeft', socketData)
+    this.playerClientSocketEmitter.emitGameRoomLeft({
+      gameId: this.$store.state.game._id,
+      playerId: player?._id
+    });
 
     document.title = 'Solaris'
   },
@@ -150,20 +151,7 @@ export default {
         return;
       }
 
-      try {
-        let response = await authService.verify()
-
-        if (response.status === 200) {
-          if (response.data._id) {
-            this.$store.commit('setUserId', response.data._id)
-            this.$store.commit('setUsername', response.data.username)
-            this.$store.commit('setRoles', response.data.roles)
-            this.$store.commit('setUserCredits', response.data.credits)
-          }
-        }
-      } catch (err) {
-        console.error(err)
-      }
+      this.$store.dispatch('verify')
     },
     async reloadGame () {
       // if (this.$isHistoricalMode()) { // Do not reload if in historical mode
@@ -266,34 +254,12 @@ export default {
     },
 
     // --------------------
-    // $socket
-    subscribeTo$socket () {
-      // TODO: Move all component subscriptions into the components' socket object.
-      this.$socket.subscribe('gameStarted', (data) => this.onGameStarted(data))
-      this.$socket.subscribe('gamePlayerJoined', (data) => this.$store.commit('gamePlayerJoined', data))
-      this.$socket.subscribe('gamePlayerQuit', (data) => this.$store.commit('gamePlayerQuit', data))
-      this.$socket.subscribe('gamePlayerReady', (data) => this.$store.commit('gamePlayerReady', data))
-      this.$socket.subscribe('gamePlayerNotReady', (data) => this.$store.commit('gamePlayerNotReady', data))
-      this.$socket.subscribe('gamePlayerReadyToQuit', (data) => this.$store.commit('gamePlayerReadyToQuit', data))
-      this.$socket.subscribe('gamePlayerNotReadyToQuit', (data) => this.$store.commit('gamePlayerNotReadyToQuit', data))
-      this.$socket.subscribe('playerDebtSettled', (data) => this.$store.commit('playerDebtSettled', data))
-      this.$socket.subscribe('gameMessageSent', (data) => this.onMessageReceived(data))
-
-      if (!GameHelper.isHiddenPlayerOnlineStatus(this.$store.state.game)) {
-        this.$socket.subscribe('gamePlayerRoomJoined', (data) => this.onGamePlayerRoomJoined(data))
-        this.$socket.subscribe('gamePlayerRoomLeft', (data) => this.onGamePlayerRoomLeft(data))
-      }
+    // events
+    subscribeToEvents () {
+      this.eventBus.on(PlayerEventBusEventNames.GameMessageSent, (data) => this.onMessageReceived(data))
     },
-    unsubscribeTo$socket () {
-      this.$socket.unsubscribe('gameStarted')
-      this.$socket.unsubscribe('gamePlayerJoined')
-      this.$socket.unsubscribe('gamePlayerQuit')
-      this.$socket.unsubscribe('gamePlayerReady')
-      this.$socket.unsubscribe('gamePlayerNotReady')
-      this.$socket.unsubscribe('gamePlayerReadyToQuit')
-      this.$socket.unsubscribe('gamePlayerNotReadyToQuit')
-      this.$socket.unsubscribe('playerDebtSettled')
-      this.$socket.unsubscribe('gameMessageSent')
+    unsubscribeFromEvents () {
+      this.eventBus.off(PlayerEventBusEventNames.GameMessageSent);
     },
     onMessageReceived (e) {
       if (window.innerWidth >= 992) { // Don't do this if the window is too large as it gets handled elsewhere
@@ -321,28 +287,6 @@ export default {
 
       AudioService.join()
     },
-    onGameStarted (data) {
-      this.$store.commit('gameStarted', data)
-
-      this.$toast.info(`The game is full and will start soon. Reload the game now to view the galaxy.`, {
-        duration: 10000,
-        onClick: () => {
-          window.location.reload();
-        }
-      });
-    },
-    onGamePlayerRoomJoined (data) {
-      let player = GameHelper.getPlayerById(this.$store.state.game, data.playerId)
-
-      player.lastSeen = moment().utc()
-      player.isOnline = true
-    },
-    onGamePlayerRoomLeft (data) {
-      let player = GameHelper.getPlayerById(this.$store.state.game, data.playerId)
-
-      player.lastSeen = moment().utc()
-      player.isOnline = false
-    },
     async reloadGameCheck () {
       if (!this.isLoggedIn || this.ticking) {
         return
@@ -369,7 +313,7 @@ export default {
                 await this.reloadGame();
               }
 
-              eventBus.$emit('onGameTick');
+              this.eventBus.emit(GameEventBusEventNames.OnGameTick);
 
               this.$toast.success(`The game has ticked. Cycle ${response.data.state.productionTick}, Tick ${response.data.state.tick}.`);
 

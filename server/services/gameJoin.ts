@@ -64,7 +64,7 @@ export default class GameJoinService extends EventEmitter {
         this.spectatorService = spectatorService;
     }
 
-    async join(game: Game, userId: DBObjectId, playerId: DBObjectId, alias: string, avatar: number, password: string) {
+    async join(game: Game, userId: DBObjectId, playerId: DBObjectId, alias: string, avatar: number, password: string | undefined) {
         // The player cannot join the game if:
         // 1. The game has finished.
         // 2. They quit the game before the game started or they conceded defeat.
@@ -82,6 +82,10 @@ export default class GameJoinService extends EventEmitter {
         }
 
         if (game.settings.general.password) {
+            if (!password) {
+                throw new ValidationError("The game requires a password.");
+            }
+
             let passwordMatch = await this.passwordService.compare(password, game.settings.general.password);
 
             if (!passwordMatch) {

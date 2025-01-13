@@ -179,6 +179,7 @@ const schema = new Schema({
             confirmBuildEconomy: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'disabled' },
             confirmBuildIndustry: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'disabled' },
             confirmBuildScience: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'disabled' },
+            confirmBuildWarpGate: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'enabled' },
         },
         technical: {
             performanceMonitor: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'disabled' },

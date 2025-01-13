@@ -410,80 +410,78 @@ export class Star extends EventEmitter {
   }
 
   drawPlanets () {
-    if (this.userSettings.map.naturalResources !== 'planets') {
-      if (this.container_planets) {
-        this.unsubscribeToEvents()
-        this.container.removeChild(this.container_planets)
-        this.container_planets = null
-        this.planets = null
-      }
+    if (this.container_planets) {
+      this.unsubscribeToEvents()
+      this.container.removeChild(this.container_planets)
+      this.container_planets = null
+      this.planets = null
+    }
 
+    if (this.userSettings.map.naturalResources !== 'planets') {
       return
     }
 
-    if (!this.container_planets) {
-      this.container_planets = new Container()
+    this.container_planets = new Container()
 
-      // The more resources a star has the more planets it has.
-      let planetCount = this._getPlanetsCount()
+    // The more resources a star has the more planets it has.
+    let planetCount = this._getPlanetsCount()
 
-      if (planetCount === 0) {
-        return
-      }
-
-      let player = this._getStarPlayer()
-      let playerColour = player ? this.context.getPlayerColour(player._id) : 0xFFFFFF
-
-      let rotationDirection = this._getPlanetOrbitDirection()
-      let rotationSpeedModifier = this._getPlanetOrbitSpeed()
-
-      this.planets = []
-
-      for (let i = 0; i < planetCount; i++) {
-        let distanceToStar = 15 + (5 * i)
-        let planetSize = Math.floor(Math.abs(this.data.location.y) + distanceToStar) % 1.5 + 0.5
-
-        let orbitGraphics = new Graphics()
-        orbitGraphics.circle(0, 0, distanceToStar -(planetSize / 2))
-        orbitGraphics.stroke({
-          width: 0.3,
-          color: 0xFFFFFF,
-          alpha: this.userSettings.map.naturalResourcesRingOpacity,
-        })
-        this.container_planets.addChild(orbitGraphics)
-
-        const planetGraphics = new Graphics()
-
-        const planetAlpha = this.data.isInScanningRange ? 1.0 : 0.3;
-
-        planetGraphics.circle(planetSize / 2, 0, planetSize)
-        planetGraphics.fill({
-          color: playerColour,
-          alpha: planetAlpha
-        });
-
-        const planetContainer = new Container()
-
-        planetContainer.addChild(planetGraphics)
-
-        planetContainer.pivot.set(distanceToStar, 0)
-
-        let rotationSpeed = (planetCount - i) / rotationSpeedModifier
-
-        this.container_planets.addChild(planetContainer)
-
-        this.planets.push({
-          index: i,
-          container: planetContainer,
-          rotationSpeed,
-          rotationDirection
-        })
-      }
-
-      this.subscribeToEvents()
-
-      this.container.addChild(this.container_planets)
+    if (planetCount === 0) {
+      return
     }
+
+    let player = this._getStarPlayer()
+    let playerColour = player ? this.context.getPlayerColour(player._id) : 0xFFFFFF
+
+    let rotationDirection = this._getPlanetOrbitDirection()
+    let rotationSpeedModifier = this._getPlanetOrbitSpeed()
+
+    this.planets = []
+
+    for (let i = 0; i < planetCount; i++) {
+      let distanceToStar = 15 + (5 * i)
+      let planetSize = Math.floor(Math.abs(this.data.location.y) + distanceToStar) % 1.5 + 0.5
+
+      let orbitGraphics = new Graphics()
+      orbitGraphics.circle(0, 0, distanceToStar -(planetSize / 2))
+      orbitGraphics.stroke({
+        width: 0.3,
+        color: 0xFFFFFF,
+        alpha: this.userSettings.map.naturalResourcesRingOpacity,
+      })
+      this.container_planets.addChild(orbitGraphics)
+
+      const planetGraphics = new Graphics()
+
+      const planetAlpha = this.data.isInScanningRange ? 1.0 : 0.3;
+
+      planetGraphics.circle(planetSize / 2, 0, planetSize)
+      planetGraphics.fill({
+        color: playerColour,
+        alpha: planetAlpha
+      });
+
+      const planetContainer = new Container()
+
+      planetContainer.addChild(planetGraphics)
+
+      planetContainer.pivot.set(distanceToStar, 0)
+
+      let rotationSpeed = (planetCount - i) / rotationSpeedModifier
+
+      this.container_planets.addChild(planetContainer)
+
+      this.planets.push({
+        index: i,
+        container: planetContainer,
+        rotationSpeed,
+        rotationDirection
+      })
+    }
+
+    this.subscribeToEvents()
+
+    this.container.addChild(this.container_planets)
   }
 
   orbitPlanetsStep (ticker) {
@@ -604,7 +602,7 @@ export class Star extends EventEmitter {
   drawName () {
     if (!this.text_name) {
       const bitmapFont = {fontFamily: "chakrapetch", fontSize: NAME_SIZE}
-      this.text_name = new BitmapText(this.data.name, bitmapFont)
+      this.text_name = new BitmapText({ text: this.data.name, style: bitmapFont })
       this.text_name.x = 5
 
       this.container.addChild(this.text_name)
@@ -668,7 +666,7 @@ export class Star extends EventEmitter {
     if (shipsText) {
       if (!this.text_ships_small) {
         let bitmapFont = {fontFamily: "chakrapetch", fontSize: Star.shipsSmallSize}
-        this.text_ships_small = new BitmapText(this.data.name, bitmapFont)
+        this.text_ships_small = new BitmapText({ text: this.data.name, style: bitmapFont })
         this.container.addChild(this.text_ships_small)
         this.text_ships_small.x = 5
         this.text_ships_small.y = (-this.text_ships_small.height) +( ( (NAME_SIZE + Star.shipsSmallSize) / 2.0) - NAME_SIZE)
@@ -676,7 +674,7 @@ export class Star extends EventEmitter {
 
       if (!this.text_ships_big) {
         let bitmapFont = {fontFamily: "chakrapetch", fontSize: Star.shipsBigSize}
-        this.text_ships_big = new BitmapText(this.data.name, bitmapFont)
+        this.text_ships_big = new BitmapText({ text: this.data.name, style: bitmapFont })
         this.container.addChild(this.text_ships_big)
         this.text_ships_big.x = 5
         this.text_ships_big.y = -this.text_ships_big.height/2.0
@@ -701,7 +699,7 @@ export class Star extends EventEmitter {
         let displayInfrastructure = `${this.data.infrastructure.economy} ${this.data.infrastructure.industry} ${this.data.infrastructure.science}`
 
         let bitmapFont = {fontFamily: "chakrapetch", fontSize: 4}
-        this.text_infrastructure = new BitmapText(displayInfrastructure, bitmapFont);
+        this.text_infrastructure = new BitmapText({ text: displayInfrastructure, style: bitmapFont });
         this.text_infrastructure.x = -(this.text_infrastructure.width / 2.0)
         this.text_infrastructure.y = -15
         this.text_infrastructure.alpha = 0.75;
@@ -725,7 +723,7 @@ export class Star extends EventEmitter {
       let displayInfrastructure = `${this.data.ignoreBulkUpgrade.economy ? ' ' : 'E'} ${this.data.ignoreBulkUpgrade.industry ? ' ' : 'I'} ${this.data.ignoreBulkUpgrade.science ? ' ' : 'S'}`
 
       let bitmapFont = {fontFamily: "chakrapetch", fontSize: 8}
-      this.text_infrastructureBulkIgnored = new BitmapText(displayInfrastructure, bitmapFont);
+      this.text_infrastructureBulkIgnored = new BitmapText({ text: displayInfrastructure, style: bitmapFont });
       this.text_infrastructureBulkIgnored.x = -(this.text_infrastructureBulkIgnored.width / 2.0)
       this.text_infrastructureBulkIgnored.y = 12
       this.text_infrastructureBulkIgnored.visible = this.showIgnoreBulkUpgradeInfrastructure

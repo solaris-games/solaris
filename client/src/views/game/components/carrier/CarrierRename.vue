@@ -86,6 +86,7 @@ export default {
 
         this.onCloseRequested(e)
       } catch (err) {
+        this.$toast.error('Failed to rename carrier.')
         console.error(err)
       }
 

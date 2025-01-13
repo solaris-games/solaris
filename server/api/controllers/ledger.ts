@@ -1,4 +1,4 @@
-import { LedgerType } from '../../services/ledger';
+import { LedgerType } from 'solaris-common/src/api/types/common/ledger';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
 
 export default (container: DependencyContainer) => {

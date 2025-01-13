@@ -15,6 +15,7 @@
                     <button v-if="userPlayer && !userPlayer.defeated" class="btn btn-primary btn-sm me-1 mb-1" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)" title="Bulk Upgrade (B)"><i class="fas fa-money-bill"></i></button>
                     <button class="btn btn-primary btn-sm me-1 mb-1" @click="reloadPage" title="Reload Game"><i class="fas fa-sync"></i></button>
                 </div>
+                <!-- button class="btn btn-primary btn-sm me-1 mb-1" @click="downloadMap" title="Download map image"><i class="fas fa-camera"></i></button -->
             </div>
           <div v-if="userPlayer" class="dropdown-divider"></div>
           <button v-if="userPlayer" class="dropdown-item" :class="isCustomColoursEnabled ? 'active' : null" v-on:click="toggleCustomColours">
@@ -55,8 +56,10 @@ import DiplomacyHelper from '../../../../services/diplomacyHelper'
 import router from '../../../../router'
 import MENU_STATES from '../../../../services/data/menuStates'
 import GameContainer from '../../../../game/container'
-import eventBus from '../../../../eventBus'
 import gameHelper from "../../../../services/gameHelper";
+import MenuEventBusEventNames from '../../../../eventBusEventNames/menu'
+import { inject } from 'vue'
+import { eventBusInjectionKey } from '../../../../eventBus'
 
 export default {
   components: {
@@ -71,6 +74,11 @@ export default {
       MENU_STATES: MENU_STATES
     }
   },
+  setup() {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
+  },
   methods: {
     setMenuState (state, args) {
       this.$store.commit('setMenuState', {
@@ -79,7 +87,7 @@ export default {
       })
     },
     onMenuChatSidebarRequested () {
-      eventBus.$emit('onMenuChatSidebarRequested')
+      this.eventBus.emit(MenuEventBusEventNames.OnMenuChatSidebarRequested);
     },
     goToMainMenu () {
       router.push({ name: 'main-menu' })
@@ -110,6 +118,9 @@ export default {
     },
     toggleCustomColours () {
       this.$store.commit('setColourOverride', !this.isCustomColoursEnabled)
+    },
+    downloadMap() {
+      GameContainer.downloadMap();
     }
   },
   computed: {

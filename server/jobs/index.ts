@@ -11,6 +11,7 @@ import CleanupGamesTimedOutJob from './cleanupGamesTimedOut';
 import CleanupOldGameHistoryJob from './cleanupOldGameHistory';
 import CleanupOldTutorialsJob from './cleanupOldTutorials';
 import SendReviewRemindersJob from './sendReviewReminders';
+import { serverStub } from "../sockets/serverStub";
 
 let mongo;
 Error.stackTraceLimit = 1000;
@@ -20,7 +21,8 @@ setupLogging();
 const log = logger();
 
 async function startup() {
-    const container = containerLoader(config);
+
+    const container = containerLoader(config, serverStub, log);
 
     mongo = await mongooseLoader(config, {
         unlockJobs: true,

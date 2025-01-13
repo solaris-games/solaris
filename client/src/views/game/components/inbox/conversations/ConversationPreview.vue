@@ -46,10 +46,12 @@
 </template>
 
 <script>
-import eventBus from '../../../../../eventBus'
+import { eventBusInjectionKey } from '../../../../../eventBus'
 import GameHelper from '../../../../../services/gameHelper'
 import PlayerIconVue from '../../player/PlayerIcon.vue'
 import mentionHelper from '../../../../../services/mentionHelper'
+import { inject } from 'vue'
+import MenuEventBusEventNames from '../../../../../eventBusEventNames/menu'
 
 export default {
   components: {
@@ -59,6 +61,11 @@ export default {
     conversation: Object,
     isTruncated: Boolean,
     isFullWidth: Boolean
+  },
+  setup() {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
   },
   methods: {
     getUserPlayer () {
@@ -71,9 +78,9 @@ export default {
       return GameHelper.getFriendlyColour(colour)
     },
     openConversation () {
-      eventBus.$emit('onViewConversationRequested', {
+      this.eventBus.emit(MenuEventBusEventNames.OnViewConversationRequested, {
         conversationId: this.conversation._id
-      })
+      });
     }
   },
   computed: {

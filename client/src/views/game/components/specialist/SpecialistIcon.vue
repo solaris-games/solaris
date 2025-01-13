@@ -2,17 +2,20 @@
     <span>
         <i class="fas" :class="'fa-' + defaultIcon" v-if="!hideDefaultIcon && !source"></i>
 
-        <img :src="source" width="24" height="24" v-if="source" :title="specialist.name">
+        <img :src="source" width="24" height="24" v-if="source" :title="specialist?.name">
     </span>
 </template>
 
-<script>
+<script lang="ts">
+import type { Specialist } from "@solaris-common";
+import { type PropType } from 'vue'
+
 export default {
   props: {
       type: String,
       defaultIcon: String,
       hideDefaultIcon: Boolean,
-      specialist: Object,
+      specialist: Object as PropType<Specialist | null>,
   },
   mounted () {
 

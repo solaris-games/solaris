@@ -28,7 +28,7 @@ export default (container: DependencyContainer) => {
 
                 done();
             } catch (e) {
-                log.error("CleanupGamesTimedOut job threw unhandled: " + e, e);
+                log.error(e, "CleanupGamesTimedOut job threw unhandled: " + e);
             }
         }
     };

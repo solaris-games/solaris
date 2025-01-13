@@ -1,41 +1,41 @@
-import {DBObjectId} from './types/DBObjectId';
 import ValidationError from '../errors/validation';
-import {Game} from './types/Game';
-import {Player, PlayerDiplomaticState, PlayerReputation, PlayerResearch} from './types/Player';
+import AvatarService from './avatar';
 import BattleRoyaleService from './battleRoyale';
-import BroadcastService from './broadcast';
 import CacheService from './cache';
 import CarrierService from './carrier';
 import DiplomacyService from './diplomacy';
 import DistanceService from './distance';
 import GameService from './game';
+import GameFluxService from './gameFlux';
+import GameMaskingService from "./gameMaskingService";
 import GameStateService from './gameState';
 import GameTypeService from './gameType';
 import UserGuildService from './guildUser';
 import HistoryService from './history';
 import MapService from './map';
-import StarMovementService from './starMovement';
 import PlayerService from './player';
+import PlayerAfkService from './playerAfk';
+import PlayerStatisticsService from './playerStatistics';
 import ReputationService from './reputation';
 import ResearchService from './research';
+import ShipService from './ship';
+import SocketService from './socket';
 import SpecialistService from './specialist';
+import SpectatorService from './spectator';
 import StarService from './star';
 import StarDistanceService from './starDistance';
+import StarMovementService from './starMovement';
 import StarUpgradeService from './starUpgrade';
 import TechnologyService from './technology';
+import { Carrier } from './types/Carrier';
+import { CarrierWaypoint } from './types/CarrierWaypoint';
+import { DBObjectId } from './types/DBObjectId';
+import { Game } from './types/Game';
+import { GameHistoryCarrier } from "./types/GameHistory";
+import { Guild, GuildUserWithTag } from './types/Guild';
+import { Player, PlayerDiplomaticState, PlayerReputation, PlayerResearch } from './types/Player';
+import { Star } from './types/Star';
 import WaypointService from './waypoint';
-import {Star} from './types/Star';
-import {Guild, GuildUserWithTag} from './types/Guild';
-import {CarrierWaypoint} from './types/CarrierWaypoint';
-import {Carrier} from './types/Carrier';
-import AvatarService from './avatar';
-import PlayerStatisticsService from './playerStatistics';
-import GameFluxService from './gameFlux';
-import PlayerAfkService from './playerAfk';
-import ShipService from './ship';
-import SpectatorService from './spectator';
-import {GameHistory, GameHistoryCarrier} from "./types/GameHistory";
-import GameMaskingService from "./gameMaskingService";
 
 enum ViewpointKind {
     Basic,
@@ -51,7 +51,7 @@ type Viewpoint =
 
 export default class GameGalaxyService {
     cacheService: CacheService;
-    broadcastService: BroadcastService;
+    socketService: SocketService;
     gameService: GameService;
     mapService: MapService;
     playerService: PlayerService;
@@ -82,7 +82,7 @@ export default class GameGalaxyService {
 
     constructor(
         cacheService: CacheService,
-        broadcastService: BroadcastService,
+        socketService: SocketService,
         gameService: GameService,
         mapService: MapService,
         playerService: PlayerService,
@@ -112,7 +112,7 @@ export default class GameGalaxyService {
         gameMaskingService: GameMaskingService,
     ) {
         this.cacheService = cacheService;
-        this.broadcastService = broadcastService;
+        this.socketService = socketService;
         this.gameService = gameService;
         this.mapService = mapService;
         this.playerService = playerService;
@@ -227,6 +227,7 @@ export default class GameGalaxyService {
         if (this.gameTypeService.isDarkModeExtra(game)) {
             this._setPlayerStats(game);
             game.state.leaderboard = null;
+            game.state.teamLeaderboard = null;
         }
 
         // If any kind of dark mode, remove the galaxy center from the constants.
@@ -566,7 +567,7 @@ export default class GameGalaxyService {
         const isFinished = this.gameStateService.isFinished(doc);
         const isDarkModeExtra = this.gameTypeService.isDarkModeExtra(doc);
 
-        let onlinePlayers = this.broadcastService.getOnlinePlayers(doc); // Need this for later.
+        let onlinePlayers = this.socketService.getOnlinePlayers(doc); // Need this for later.
 
         // Get the list of all guilds associated to players, we'll need this later.
         let guildUsers: GuildUserWithTag[] = [];

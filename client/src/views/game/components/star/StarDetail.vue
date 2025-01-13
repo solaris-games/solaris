@@ -363,22 +363,22 @@
           </div>
           <div class="col-4">
             <div class="d-grid gap-2">
-              <modalButton v-if="canBuildWarpGates && !star.warpGate"
+              <button v-if="canBuildWarpGates && !star.warpGate"
                 :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished"
-                modalName="buildWarpGateModal"
-                classText="btn btn-success mb-2">
+                @click="buildWarpGate"
+                class="btn btn-success mb-2">
                 <i class="fas fa-dungeon"></i>
                 Build for ${{star.upgradeCosts.warpGate}}
-              </modalButton>
+              </button>
             </div>
             <div class="d-grid gap-2">
-              <modalButton v-if="canDestroyWarpGates && star.warpGate"
+              <button v-if="canDestroyWarpGates && star.warpGate"
                 :disabled="$isHistoricalMode() || isGameFinished"
-                modalName="destroyWarpGateModal"
-                classText="btn btn-outline-danger mb-2">
+                @click="destroyWarpGate"
+                class="btn btn-outline-danger mb-2">
                 <i class="fas fa-trash"></i>
                 Destroy Gate
-              </modalButton>
+              </button>
             </div>
           </div>
         </div>
@@ -404,15 +404,6 @@
     </div>
 
     <!-- Modals -->
-
-    <dialogModal v-if="isOwnedByUserPlayer && star.upgradeCosts != null" modalName="buildWarpGateModal" titleText="Build Warp Gate" cancelText="No" confirmText="Yes" @onConfirm="confirmBuildWarpGate">
-      <p>Are you sure you want build a Warp Gate at <b>{{star.name}}</b>?</p>
-      <p>The upgrade will cost ${{star.upgradeCosts.warpGate}}.</p>
-    </dialogModal>
-
-    <dialogModal modalName="destroyWarpGateModal" titleText="Destroy Warp Gate" cancelText="No" confirmText="Yes" @onConfirm="confirmDestroyWarpGate">
-      <p>Are you sure you want destroy Warp Gate at <b>{{star.name}}</b>?</p>
-    </dialogModal>
 
     <dialogModal modalName="abandonStarModal" titleText="Abandon Star" cancelText="No" confirmText="Yes" @onConfirm="confirmAbandonStar">
       <p>Are you sure you want to abandon <b>{{star.name}}</b>?</p>
@@ -544,9 +535,13 @@ export default {
         console.error(err)
       }
     },
-    async confirmBuildWarpGate (e) {
+    async buildWarpGate (e) {
+      if (this.$store.state.settings.star.confirmBuildWarpGate === 'enabled' && !await this.$confirm('Build Warp Gate', `Are you sure you want build a Warp Gate at ${this.star.name}? The upgrade will cost $${this.star.upgradeCosts.warpGate}.`)) {
+        return
+      }
+
       try {
-        let response = await starService.buildWarpGate(this.$store.state.game._id, this.star._id)
+        const response = await starService.buildWarpGate(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
           this.$toast.default(`Warp Gate built at ${this.star.name}.`)
@@ -559,9 +554,13 @@ export default {
         console.error(err)
       }
     },
-    async confirmDestroyWarpGate (e) {
+    async destroyWarpGate (e) {
+      if (!await this.$confirm('Destroy Warp Gate', `Are you sure you want destroy Warp Gate at ${this.star.name}?`)) {
+        return
+      }
+
       try {
-        let response = await starService.destroyWarpGate(this.$store.state.game._id, this.star._id)
+        const response = await starService.destroyWarpGate(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
           this.$toast.default(`Warp Gate destroyed at ${this.star.name}.`)

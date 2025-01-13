@@ -12,7 +12,7 @@ import {
     or,
     positiveInteger,
     string,
-    stringEnumeration,
+    stringEnumeration, stringValue,
     Validator,
     withDefault
 } from "../validate";
@@ -66,21 +66,13 @@ export interface CarrierRenameCarrierRequest {
     name: string;
 };
 
-export const mapToCarrierRenameCarrierRequest = (body: any): CarrierRenameCarrierRequest => {
-    let errors: string[] = [];
-
-    if (!keyHasStringValue(body, 'name')) {
-        errors.push('Name is required.');
-    }
-
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    return {
-        name: body.name
-    }
-};
+export const parseCarrierRenameCarrierRequest: Validator<CarrierRenameCarrierRequest> = object({
+    name: stringValue({
+        nonEmpty: true,
+        trim: true,
+        matches: /^[a-zA-Z0-9 \-.,!?]{1,50}$/,
+    }),
+});
 
 export interface CarrierCalculateCombatRequest {
     defender: {
