@@ -164,7 +164,7 @@ type NumberValidationProps = {
     },
 }
 
-export const numberAdv = (props: NumberValidationProps) => v => {
+export const numberAdv = (props: NumberValidationProps) => (v: any) => {
     const n = number(v);
 
     if (props.sign) {
@@ -208,4 +208,28 @@ export const withDefault = <A>(defaultValue: A, validator: Validator<A>): Valida
 
         return validator(v);
     }
+}
+
+type StringValidationProps = {
+    nonEmpty?: boolean,
+    trim?: boolean,
+    matches?: RegExp,
+}
+
+export const stringValue = (props: StringValidationProps) => (v: any) => {
+    let s = string(v);
+
+    if (props.trim) {
+        s = s.trim();
+    }
+
+    if (props.nonEmpty && s.length === 0) {
+        throw failed('non-empty string', v);
+    }
+
+    if (props.matches && !props.matches.test(s)) {
+        throw failed(`string matching ${props.matches}`, v);
+    }
+
+    return s
 }
