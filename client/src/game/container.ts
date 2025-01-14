@@ -5,7 +5,7 @@ import textureService from './texture'
 import type {Store} from "vuex";
 import type {State} from "../store";
 import {Application, BitmapText, isWebGLSupported} from "pixi.js";
-import type {UserGameSettings} from "solaris-common/src";
+import type {UserGameSettings} from "@solaris-common";
 import type {Game} from "../types/game";
 import { screenshot } from './screenshot';
 

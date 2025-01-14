@@ -1,4 +1,4 @@
-import { type SocketEventName } from "solaris-common/src/sockets/socketEventNames/socketEventName";
+import { type SocketEventName } from "./socketEventNames/socketEventName";
 
 export abstract class SocketEmitter<TSocketEventType> {
     protected socketEventType?: TSocketEventType;

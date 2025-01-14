@@ -1,5 +1,5 @@
 import type { Socket } from "socket.io-client";
-import PlayerSocketEventNames, { type PlayerSocketEventType } from "solaris-common/src/sockets/socketEventNames/player";
+import { PlayerSocketEventNames, type PlayerSocketEventType } from "@solaris-common";
 import type { InjectionKey } from "vue";
 import { ClientSocketEmitter } from "./clientSocketEmitter";
 

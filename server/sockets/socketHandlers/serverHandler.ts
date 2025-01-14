@@ -1,6 +1,6 @@
 import { Logger } from "pino";
 import type { Server, Socket } from "socket.io";
-import { SocketEventName } from "solaris-common/src/sockets/socketEventNames/socketEventName";
+import { SocketEventName } from "@solaris-common";
 import { EventEmitter } from "stream";
 import ServerSocketEventNames, { ServerSocketEventType } from "../socketEventNames/server";
 

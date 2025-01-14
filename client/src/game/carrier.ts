@@ -3,7 +3,7 @@ import TextureService from './texture'
 import Helpers from './helpers'
 import {EventEmitter} from "./eventEmitter.js";
 import type PathManager from "./PathManager";
-import type {UserGameSettings} from "solaris-common/src";
+import type {UserGameSettings} from "@solaris-common";
 import type {Carrier as CarrierData, Player as PlayerData} from "../types/game";
 import type Star from "./star";
 import type {DrawingContext} from "./container";

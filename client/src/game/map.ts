@@ -16,7 +16,7 @@ import type {Store} from "vuex";
 import type {State} from "../store";
 import type {DrawingContext, GameContainer} from "./container";
 import type {Game} from "../types/game";
-import type {Location, UserGameSettings} from "solaris-common/src";
+import type {Location, UserGameSettings} from "@solaris-common";
 import Carrier from './carrier'
 
 const CHUNK_SIZE = 256

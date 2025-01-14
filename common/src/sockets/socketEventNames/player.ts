@@ -1,6 +1,6 @@
-import { type ConversationMessageSentResult } from "solaris-common/src/api/types/common/conversationMessage";
-import { LedgerType } from "solaris-common/src/api/types/common/ledger";
-import { makeCastFunc } from "solaris-common/src/utilities/cast";
+import { type ConversationMessageSentResult } from "../../api/types/common/conversationMessage";
+import { LedgerType } from "../../api/types/common/ledger";
+import { makeCastFunc } from "../../utilities/cast";
 import { type TradeEventTechnology } from "../../api/types/common/trade";
 import { type SocketEventName } from "./socketEventName";
 
@@ -9,7 +9,7 @@ export type PlayerSocketEventName<TData> = SocketEventName<PlayerSocketEventType
 
 const toEventName: <TData>(value: string) => PlayerSocketEventName<TData> = makeCastFunc();
 
-export default class PlayerSocketEventNames {
+export class PlayerSocketEventNames {
     private constructor() { };
 
     public static readonly GamePlayerJoined: PlayerSocketEventName<{ playerId: string, alias: string, avatar: string }> = toEventName('gamePlayerJoined');

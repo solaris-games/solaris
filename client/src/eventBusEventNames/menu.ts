@@ -1,4 +1,4 @@
-import { makeCastFunc } from "solaris-common/src/utilities/cast";
+import { makeCastFunc } from "@solaris-common";
 import MENU_STATES from '../services/data/menuStates';
 import type { EventBusEventName } from "./eventBusEventName";
 

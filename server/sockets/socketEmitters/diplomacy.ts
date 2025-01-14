@@ -1,6 +1,6 @@
 import { Server } from "socket.io";
-import { DiplomaticStatus } from "solaris-common/src/api/types/common/diplomacy";
-import DiplomacySocketEventNames, { DiplomacySocketEventType } from "solaris-common/src/sockets/socketEventNames/diplomacy";
+import { DiplomaticStatus } from "@solaris-common";
+import { DiplomacySocketEventNames, DiplomacySocketEventType } from "@solaris-common";
 import { ServerSocketEmitter } from "./serverSocketEmitter";
 
 export class DiplomacyServerSocketEmitter extends ServerSocketEmitter<DiplomacySocketEventType> {
