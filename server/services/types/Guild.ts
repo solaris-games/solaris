@@ -1,4 +1,4 @@
-import { SettingVisibility } from "@solaris-common";
+import { SettingVisibility } from "solaris-common";
 import { DBObjectId } from "./DBObjectId";
 import { User } from "./User";
 

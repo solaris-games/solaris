@@ -1,10 +1,10 @@
 import moment from "moment";
 import type { Socket } from "socket.io-client";
-import type { Player } from "solaris-common/src";
-import type { ConversationMessageSentResult } from "solaris-common/src/api/types/common/conversationMessage";
-import type { LedgerType } from "solaris-common/src/api/types/common/ledger";
-import type { TradeEventTechnology } from "solaris-common/src/api/types/common/trade";
-import PlayerSocketEventNames, { type PlayerSocketEventType } from 'solaris-common/src/sockets/socketEventNames/player';
+import type { Player } from "@solaris-common";
+import type { ConversationMessageSentResult } from "@solaris-common";
+import type { LedgerType } from "@solaris-common";
+import type { TradeEventTechnology } from "@solaris-common";
+import { PlayerSocketEventNames, type PlayerSocketEventType } from '@solaris-common';
 import type { Store } from "vuex/types/index.js";
 import type { EventBus } from "../../eventBus";
 import PlayerEventBusEventNames from "../../eventBusEventNames/player";

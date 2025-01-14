@@ -1,7 +1,7 @@
-import { GameState } from 'solaris-common/src';
-import { ConversationMessageSentResult } from "solaris-common/src/api/types/common/conversationMessage";
-import { DiplomaticStatus } from 'solaris-common/src/api/types/common/diplomacy';
-import { LedgerType } from 'solaris-common/src/api/types/common/ledger';
+import { GameState } from 'solaris-common';
+import { ConversationMessageSentResult } from "solaris-common";
+import { DiplomaticStatus } from 'solaris-common';
+import { LedgerType } from 'solaris-common';
 import { DiplomacyServerSocketEmitter } from '../sockets/socketEmitters/diplomacy';
 import { GameServerSocketEmitter } from '../sockets/socketEmitters/game';
 import { PlayerServerSocketEmitter } from '../sockets/socketEmitters/player';

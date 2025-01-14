@@ -1,6 +1,6 @@
 import type { Socket } from "socket.io-client";
-import { SocketEmitter } from "solaris-common/src/sockets/socketEmitter";
-import { type SocketEventName } from "solaris-common/src/sockets/socketEventNames/socketEventName";
+import { SocketEmitter } from "@solaris-common";
+import { type SocketEventName } from "@solaris-common";
 
 export abstract class ClientSocketEmitter<TSocketEventType> extends SocketEmitter<TSocketEventType> {
 

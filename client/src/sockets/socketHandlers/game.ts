@@ -1,6 +1,6 @@
 import type { Socket } from "socket.io-client";
-import type { GameState } from "solaris-common/src";
-import GameSocketEventNames, { type GameSocketEventType } from 'solaris-common/src/sockets/socketEventNames/game';
+import type { GameState } from "@solaris-common";
+import { GameSocketEventNames, type GameSocketEventType } from '@solaris-common';
 import type { ToastPluginApi } from "vue-toast-notification";
 import type { Store } from "vuex/types/index.js";
 import type { EventBus } from "../../eventBus";

@@ -1,8 +1,8 @@
 import { Server } from "socket.io";
-import { ConversationMessageSentResult } from "solaris-common/src/api/types/common/conversationMessage";
-import { LedgerType } from "solaris-common/src/api/types/common/ledger";
-import { TradeEventTechnology } from "solaris-common/src/api/types/common/trade";
-import PlayerSocketEventNames, { PlayerSocketEventType } from "solaris-common/src/sockets/socketEventNames/player";
+import { ConversationMessageSentResult } from "solaris-common";
+import { LedgerType } from "solaris-common";
+import { TradeEventTechnology } from "solaris-common";
+import { PlayerSocketEventNames, PlayerSocketEventType } from "solaris-common";
 import { ServerSocketEmitter } from "./serverSocketEmitter";
 
 export class PlayerServerSocketEmitter extends ServerSocketEmitter<PlayerSocketEventType> {

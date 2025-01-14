@@ -1,6 +1,6 @@
 import { DBObjectId } from "./DBObjectId";
 import { UserLevel } from "./UserLevel";
-import type { UserGameSettings } from "@solaris-common";
+import type { UserGameSettings } from "solaris-common";
 
 export interface UserRoles {
     administrator: boolean;

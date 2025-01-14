@@ -7,7 +7,7 @@ export type GameSocketEventName<TData> = SocketEventName<GameSocketEventType, TD
 
 const toEventName: <TData>(value: string) => GameSocketEventName<TData> = makeCastFunc();
 
-export default class GameSocketEventNames {
+export class GameSocketEventNames {
     private constructor() { };
 
     public static readonly GameStarted: GameSocketEventName<{ state: GameState<string> }> = toEventName('gameStarted');

@@ -1,7 +1,7 @@
-import { type ConversationMessageSentResult } from "solaris-common/src/api/types/common/conversationMessage";
-import type { LedgerType } from "solaris-common/src/api/types/common/ledger";
-import type { TradeEventTechnology } from "solaris-common/src/api/types/common/trade";
-import { makeCastFunc } from "solaris-common/src/utilities/cast";
+import { type ConversationMessageSentResult } from "@solaris-common";
+import type { LedgerType } from "@solaris-common";
+import type { TradeEventTechnology } from "@solaris-common";
+import { makeCastFunc } from "@solaris-common";
 import { type EventBusEventName } from "./eventBusEventName";
 
 export type PlayerEventBusEventType = { playerEventBusEventType: 'playerEventBusEventType' };

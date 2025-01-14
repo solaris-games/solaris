@@ -1,6 +1,6 @@
 import { Emitter, type DefaultEventsMap } from '@socket.io/component-emitter';
 import { Socket } from 'socket.io-client';
-import type { SocketEventName } from 'solaris-common/src/sockets/socketEventNames/socketEventName';
+import type { SocketEventName } from 'solaris-common';
 import type { Store } from 'vuex/types/index.js';
 import GameHelper from '../../services/gameHelper';
 import type { PlayerClientSocketEmitter } from '../socketEmitters/player';
