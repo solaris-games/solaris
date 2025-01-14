@@ -1,6 +1,6 @@
 import { Socket } from "socket.io";
-import { type SocketEventName } from "@solaris-common";
-import { makeCastFunc } from "@solaris-common";
+import { type SocketEventName } from "solaris-common";
+import { makeCastFunc } from "solaris-common";
 
 export type ServerSocketEventType = { serverSocketEventType: 'serverSocketEventType' };
 export type ServerSocketEventName<TData> = SocketEventName<ServerSocketEventType, TData> & { serverSocketEventName: 'serverSocketEventName' };

@@ -1,4 +1,4 @@
-import { LedgerType } from 'solaris-common/src/api/types/common/ledger';
+import { LedgerType } from 'solaris-common';
 import ValidationError from "../errors/validation";
 import BadgeService, { BadgeServiceEvents } from "./badge";
 import BroadcastService from "./broadcast";

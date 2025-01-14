@@ -1,4 +1,4 @@
-import { LedgerType } from "@solaris-common";
+import { LedgerType } from "solaris-common";
 import ValidationError from "../errors/validation";
 import PlayerService from "./player";
 import PlayerCreditsService from "./playerCredits";
