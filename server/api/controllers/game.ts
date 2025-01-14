@@ -68,7 +68,7 @@ export default (container: DependencyContainer) => {
         },
         detailInfo: async (req, res, next) => {
             try {
-                res.status(200).json(req.game);
+                res.status(200).json(container.gameService.getDetailInfo(req.game));
                 return next();
             } catch (err) {
                 return next(err);
@@ -76,7 +76,7 @@ export default (container: DependencyContainer) => {
         },
         detailState: async (req, res, next) => {
             try {
-                res.status(200).json(req.game);
+                res.status(200).json(container.gameService.getState(req.game));
                 return next();
             } catch (err) {
                 return next(err);

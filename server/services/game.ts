@@ -121,6 +121,18 @@ export default class GameService extends EventEmitter {
         });
     }
 
+    getState(game: Game) {
+        game.state.leaderboard = null;
+        game.state.teamLeaderboard = null;
+        return game;
+    }
+
+    getDetailInfo(game: Game) {
+        game.state.teamLeaderboard = null;
+        game.state.leaderboard = null;
+        return game;
+    }
+
     async getGameStateTick(id: DBObjectId) {
         let game = await this.getByIdLean(id, {
             'state.tick': 1
