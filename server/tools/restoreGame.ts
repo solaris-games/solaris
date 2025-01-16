@@ -1,21 +1,12 @@
 import mongoose from "mongoose";
-import config from "../config";
-import containerLoader from "../services";
 import { Carrier } from "../services/types/Carrier";
 import { DBObjectId, objectId } from "../services/types/DBObjectId";
-import { DependencyContainer } from "../services/types/DependencyContainer";
 import { Game } from "../services/types/Game";
 import { GameHistory, GameHistoryCarrier } from "../services/types/GameHistory";
-import { serverStub } from "../sockets/serverStub";
-import { logger } from "../utils/logging";
-import mongooseLoader from "../db/index";
+import { JobParameters, makeJob } from "./tool";
+import { DependencyContainer } from "../services/types/DependencyContainer";
 
-let mongo,
-    container: DependencyContainer;
-
-const log = logger("Restore Game");
-
-const loadHistory = async (gameId: DBObjectId, tick: number) => {
+const loadHistory = async (container: DependencyContainer, gameId: DBObjectId, tick: number) => {
     const history = await container.historyService.getHistoryByTick(gameId, tick);
 
     return history;
@@ -127,16 +118,7 @@ const applyHistory = (game: Game, history: GameHistory) => {
     applyCarriers(game, history);
 }
 
-const startup = async () => {
-    mongo = await mongooseLoader(config, {
-        syncIndexes: true,
-        poolSize: 1
-    });
-
-    container = containerLoader(config, serverStub, log);
-
-    console.log("Initialised");
-
+const job = makeJob('Restore game', async ({ log, container, mongo }: JobParameters) => {
     const gameIdS = process.argv[2];
     const tick = Number.parseInt(process.argv[3]);
 
@@ -146,7 +128,7 @@ const startup = async () => {
 
     const gameId = mongoose.Types.ObjectId(gameIdS) as DBObjectId;
 
-    const hist = await loadHistory(gameId, tick);
+    const hist = await loadHistory(container, gameId, tick);
     if (!hist) {
         throw new Error("History not found");
     }
@@ -158,39 +140,17 @@ const startup = async () => {
         throw new Error("Game not found");
     }
 
-    console.log("Loaded current game state");
+    log.info("Loaded current game state");
 
     applyHistory(currentState, hist);
 
-    console.log("History applied");
+    log.info("History applied");
 
     await currentState.save();
 
-    console.log("Game state saved");
-}
-
-process.on('SIGINT', async () => {
-    await shutdown();
+    log.info("Game state saved");
 });
 
-const shutdown = async () =>{
-    console.log('Shutting down...');
-
-    await mongo.disconnect();
-
-    console.log('Shutdown complete.');
-
-    process.exit();
-}
-
-startup().then(async () => {
-    console.log('Done.');
-
-    await shutdown();
-}).catch(async err => {
-    console.error(err);
-
-    await shutdown();
-});
+job();
 
 export { };
