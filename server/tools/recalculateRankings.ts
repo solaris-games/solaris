@@ -1,4 +1,4 @@
-import mongooseLoader from '.';
+import mongooseLoader from '../db/index';
 import config from '../config';
 import containerLoader from '../services';
 import { GameWinnerKind } from "../services/leaderboard";

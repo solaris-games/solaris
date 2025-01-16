@@ -8,7 +8,7 @@ import { Game } from "../services/types/Game";
 import { GameHistory, GameHistoryCarrier } from "../services/types/GameHistory";
 import { serverStub } from "../sockets/serverStub";
 import { logger } from "../utils/logging";
-import mongooseLoader from "./index";
+import mongooseLoader from "../db/index";
 
 let mongo,
     container: DependencyContainer;
