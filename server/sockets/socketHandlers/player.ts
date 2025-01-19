@@ -1,5 +1,5 @@
+import { PlayerSocketEventNames, type PlayerSocketEventType } from '@solaris-common';
 import type { Socket } from "socket.io";
-import { PlayerSocketEventNames, type PlayerSocketEventType } from 'solaris-common';
 import GameService from "../../services/game";
 import SocketService from "../../services/socket";
 import { objectIdFromString } from "../../services/types/DBObjectId";
