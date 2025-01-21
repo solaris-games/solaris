@@ -11,7 +11,7 @@
     <div class="row bg-dark">
       <div class="col text-center pt-2">
         <p class="mb-2 text-info">
-          Location: ({{star.location.x.toFixed(3)}}, {{star.location.y.toFixed(3)}})
+          Location: ({{(star.location.x/50).toFixed(2)}}, {{(star.location.y/50).toFixed(2)}})
           <help-tooltip v-if="isGameDarkMode" tooltip="Coordinates are scrambled because this is a dark mode game."/>
         </p>
         <p class="mb-2" v-if="isOwnedByUserPlayer">A star under your command.</p>

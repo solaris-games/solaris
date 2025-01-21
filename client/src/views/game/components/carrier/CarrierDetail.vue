@@ -12,7 +12,7 @@
     <div class="row bg-dark" :class="{'bg-warning': carrier.isGift}">
       <div class="col text-center pt-2">
         <p class="mb-2 text-info">
-          Location: ({{carrier.location.x.toFixed(3)}}, {{carrier.location.y.toFixed(3)}})
+          Location: ({{(carrier.location.x/50).toFixed(2)}}, {{(carrier.location.y/50).toFixed(2)}})
           <help-tooltip v-if="isGameDarkMode" tooltip="Coordinates are scrambled because this is a dark mode game."/>
         </p>
         <p class="mb-2" v-if="isUserPlayerCarrier && !carrier.isGift">A carrier under your command.</p>
