@@ -213,7 +213,7 @@ export default (config: Config,
     const conversationService = new ConversationService(gameRepository, tradeService, diplomacyService);
     const gameAuthService = new GameAuthService(userService);
     const gameJoinService = new GameJoinService(userService, starService, playerService, passwordService, achievementService, avatarService, gameTypeService, gameStateService, conversationService, randomService, spectatorService);
-    const gameService = new GameService(gameRepository, userService, starService, carrierService, playerService, passwordService, achievementService, avatarService, gameTypeService, gameStateService, conversationService, playerReadyService, gameJoinService, gameAuthService);
+    const gameService = new GameService(gameRepository, userService, starService, carrierService, playerService, passwordService, achievementService, avatarService, gameTypeService, gameStateService, conversationService, playerReadyService, gameJoinService, gameAuthService, playerAfkService);
     const serverHandler = new ServerHandler(socketServer, logger);
     const playerServerSocketHandler = new PlayerServerSocketHandler(socketService, gameService, serverHandler);
     const leaderboardService = new LeaderboardService(playerService, playerAfkService, userLevelService, ratingService, gameService, gameTypeService, gameStateService, badgeService, playerStatisticsService, teamService);
