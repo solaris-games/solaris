@@ -71,9 +71,11 @@
       <div class="row mt-2" v-if="!isDeadStar">
         <div class="col">
           <table class="star-resources-table">
-            <tr>
-              <star-resources :resources="star.naturalResources" :compareResources="star.terraformedResources" :iconAlignLeft="true" />
-            </tr>
+            <tbody>
+              <tr>
+                <star-resources :resources="star.naturalResources" :compareResources="star.terraformedResources" :iconAlignLeft="true" />
+              </tr>
+            </tbody>
           </table>
         </div>
         <div class="col-auto">
@@ -206,9 +208,11 @@
           </div>
           <div class="col text-end">
               <table class="star-resources-table">
-                  <tr>
+                  <tbody>
+                    <tr>
                       <star-resources :resources="star.naturalResources" :iconAlignLeft="false" />
-                  </tr>
+                    </tr>
+                  </tbody>
               </table>
           </div>
       </div>
@@ -219,9 +223,11 @@
           </div>
           <div class="col text-end">
               <table class="star-resources-table">
-                  <tr>
+                  <tbody>
+                    <tr>
                       <star-resources :resources="star.terraformedResources" :iconAlignLeft="false" />
-                  </tr>
+                    </tr>
+                  </tbody>
               </table>
           </div>
       </div>

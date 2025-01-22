@@ -42,6 +42,7 @@
     "vue-tsc": "^2.1.10"
   },
   "optionalDependencies": {
-    "@rollup/rollup-win32-x64-msvc": "^4.29.1"
+    "@rollup/rollup-win32-x64-msvc": "^4.29.1",
+    "@esbuild/darwin-arm64": "^0.24.2"
   }
 }
