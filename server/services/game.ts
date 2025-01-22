@@ -216,6 +216,8 @@ export default class GameService extends EventEmitter {
             throw new ValidationError('Cannot concede defeat in a game that has finished.');
         }
 
+        const wasAI = this.playerAfkService.isAIControlled(game, player, false);
+
         // If its a tutorial game then straight up delete it.
         if (this.gameTypeService.isTutorialGame(game)) {
             return this.delete(game);
@@ -225,7 +227,9 @@ export default class GameService extends EventEmitter {
 
         this.playerService.setPlayerAsDefeated(game, player, openSlot);
 
-        game.state.players--; // Deduct number of active players from the game.
+        if (!wasAI) {
+            game.state.players--; // Deduct number of active players from the game.
+        }
 
         // NOTE: The game will check for a winner on each tick so no need to 
         // repeat that here.
