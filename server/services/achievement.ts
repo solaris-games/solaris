@@ -3,6 +3,7 @@ import Repository from "./repository";
 import { User } from "./types/User";
 import GuildService from "./guild";
 import UserLevelService from "./userLevel";
+import {nullObject} from "./utils";
 
 export default class AchievementService {
     
@@ -30,6 +31,19 @@ export default class AchievementService {
 
         if (user) {
             user.level = this.userLevelService.getByRankPoints(user.achievements.rank);
+        }
+
+        // TODO: Fix this properly
+
+        if (user?.achievements) {
+            nullObject(user.achievements.combat.kills);
+            nullObject(user.achievements.combat.homeStars);
+            nullObject(user.achievements.combat.losses);
+            nullObject(user.achievements.combat.stars);
+            nullObject(user.achievements.badges);
+            nullObject(user.achievements.infrastructure);
+            nullObject(user.achievements.trade);
+            nullObject(user.achievements.research);
         }
 
         if (user && user.guildId) {
