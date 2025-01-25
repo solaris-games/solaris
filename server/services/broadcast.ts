@@ -81,10 +81,10 @@ export default class BroadcastService {
     }
 
     gameConversationRead(game: Game, conversation: Conversation, readByPlayerId: DBObjectId) {
-        conversation.participants.forEach(p => this.playerServerSocketEmitter.emitGameConversationRead(p.toString(), {
+        this.playerServerSocketEmitter.emitGameConversationRead(readByPlayerId.toString(), {
             conversationId: conversation._id.toString(),
             readByPlayerId: readByPlayerId.toString()
-        }));
+        });
     }
 
     gameConversationLeft(game: Game, conversation: Conversation, playerId: DBObjectId) {

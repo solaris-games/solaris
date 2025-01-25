@@ -197,6 +197,15 @@ export default class ConversationService extends EventEmitter {
             throw new ValidationError(`You are not participating in this conversation.`);
         }
 
+        convo.messages.forEach(cm => {
+            cm = <ConversationMessage>cm;
+            cm.readBy = cm.readBy.filter(pid => pid.toString() === playerId.toString());
+        })
+
+        if (convo.lastMessage != null) {
+            convo.lastMessage.readBy = convo.lastMessage.readBy.filter(pid => pid.toString() === playerId.toString());
+        }
+
         return convo;
     }
 
