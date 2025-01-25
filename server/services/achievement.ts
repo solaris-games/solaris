@@ -44,6 +44,7 @@ export default class AchievementService {
             nullObject(user.achievements.infrastructure);
             nullObject(user.achievements.trade);
             nullObject(user.achievements.research);
+            user.achievements.renown = 0;
         }
 
         if (user && user.guildId) {
