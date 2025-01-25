@@ -488,6 +488,13 @@ export default class UserLeaderboardService {
                 skip
             );
 
+        // TODO: Fix this properly
+        for (let user of leaderboard) {
+            if (user.achievements) {
+                user.achievements.renown = 0;
+            }
+        }
+
         let userIds = leaderboard.map(x => x._id);
         let guildUsers = await this.guildUserService.listUsersWithGuildTags(userIds);
 
