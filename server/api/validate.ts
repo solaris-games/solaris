@@ -211,7 +211,8 @@ export const withDefault = <A>(defaultValue: A, validator: Validator<A>): Valida
 }
 
 type StringValidationProps = {
-    nonEmpty?: boolean,
+    minLength?: number,
+    maxLength?: number,
     trim?: boolean,
     matches?: RegExp,
 }
@@ -223,8 +224,12 @@ export const stringValue = (props: StringValidationProps) => (v: any) => {
         s = s.trim();
     }
 
-    if (props.nonEmpty && s.length === 0) {
-        throw failed('non-empty string', v);
+    if (props.minLength && s.length < props.minLength) {
+        throw failed(`string with length at least ${props.minLength}`, v);
+    }
+
+    if (props.maxLength && s.length > props.maxLength) {
+        throw failed(`string with length at most ${props.maxLength}`, v);
     }
 
     if (props.matches && !props.matches.test(s)) {

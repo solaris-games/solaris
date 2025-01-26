@@ -18,7 +18,8 @@ export const parseGameJoinGameRequest: Validator<GameJoinGameRequest> = object({
     playerId: objectId,
     alias: stringValue({
         trim: true,
-        nonEmpty: true,
+        minLength: 1,
+        maxLength: 24,
     }),
     avatar: number,
     password: or(string, just(undefined)),

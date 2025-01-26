@@ -6,7 +6,7 @@
 
   <form @submit="doRename">
     <div class="mb-2">
-      <input type="text" class="form-control" id="name" placeholder="Enter a new carrier name" v-model="currentName" minlength="4" maxlength="30" @change="onNameChanged">
+      <input type="text" class="form-control" id="name" placeholder="Enter a new carrier name" v-model="currentName" minlength="3" maxlength="30" @change="onNameChanged">
     </div>
     <div class="mb-2 row pb-2 pt-2 ">
       <div class="col">
