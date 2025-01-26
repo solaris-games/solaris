@@ -33,7 +33,7 @@ export class Mutex {
                         return true;
                     }
                     else {
-                        log.warn(`Cannot unlock Mutex wiht id ${this.id} as lockId does not match.  Expected: ${lockId}, Actual: ${lockIdInput}`);
+                        log.warn(`Cannot unlock Mutex with id ${this.id} as lockId does not match.  Expected: ${lockId}, Actual: ${lockIdInput}`);
                     }
 
                     return false;

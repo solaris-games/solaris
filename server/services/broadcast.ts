@@ -1,7 +1,4 @@
-import { GameState } from 'solaris-common';
-import { ConversationMessageSentResult } from "solaris-common";
-import { DiplomaticStatus } from 'solaris-common';
-import { LedgerType } from 'solaris-common';
+import { ConversationMessageSentResult, DiplomaticStatus, GameState, LedgerType } from '@solaris-common';
 import { DiplomacyServerSocketEmitter } from '../sockets/socketEmitters/diplomacy';
 import { GameServerSocketEmitter } from '../sockets/socketEmitters/game';
 import { PlayerServerSocketEmitter } from '../sockets/socketEmitters/player';

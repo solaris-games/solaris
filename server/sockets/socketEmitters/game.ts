@@ -1,6 +1,5 @@
+import { GameSocketEventNames, GameSocketEventType, GameState } from "@solaris-common";
 import { Server } from "socket.io";
-import { GameState } from "solaris-common";
-import { GameSocketEventNames, GameSocketEventType } from "solaris-common";
 import { ServerSocketEmitter } from "./serverSocketEmitter";
 
 export class GameServerSocketEmitter extends ServerSocketEmitter<GameSocketEventType> {
