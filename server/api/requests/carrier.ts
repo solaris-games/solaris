@@ -12,7 +12,7 @@ import {
     or,
     positiveInteger,
     string,
-    stringEnumeration, stringValue,
+    stringEnumeration, stringValue, UNICODE_INVISIBLE_CHARACTERS, UNICODE_PRINTABLE_CHARACTERS_WITH_WHITESPACE,
     Validator,
     withDefault
 } from "../validate";
@@ -71,7 +71,8 @@ export const parseCarrierRenameCarrierRequest: Validator<CarrierRenameCarrierReq
         minLength: 3,
         maxLength: 30,
         trim: true,
-        matches: /^[a-zA-Z0-9 \-.,!?]{1,50}$/,
+        matches: UNICODE_PRINTABLE_CHARACTERS_WITH_WHITESPACE,
+        ignoreForLengthCheck: UNICODE_INVISIBLE_CHARACTERS,
     }),
 });
 

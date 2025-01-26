@@ -214,6 +214,7 @@ type StringValidationProps = {
     minLength?: number,
     maxLength?: number,
     trim?: boolean,
+    ignoreForLengthCheck?: RegExp,
     matches?: RegExp,
 }
 
@@ -224,11 +225,17 @@ export const stringValue = (props: StringValidationProps) => (v: any) => {
         s = s.trim();
     }
 
-    if (props.minLength && s.length < props.minLength) {
+    let sForLengthCheck = s;
+
+    if (props.ignoreForLengthCheck) {
+        sForLengthCheck = sForLengthCheck.replace(props.ignoreForLengthCheck, '');
+    }
+
+    if (props.minLength && sForLengthCheck.length < props.minLength) {
         throw failed(`string with length at least ${props.minLength}`, v);
     }
 
-    if (props.maxLength && s.length > props.maxLength) {
+    if (props.maxLength && sForLengthCheck.length > props.maxLength) {
         throw failed(`string with length at most ${props.maxLength}`, v);
     }
 
@@ -238,3 +245,9 @@ export const stringValue = (props: StringValidationProps) => (v: any) => {
 
     return s
 }
+
+export const UNICODE_PRINTABLE_CHARACTERS_NON_WHITESPACE =  /^[\p{L}\p{N}\p{M}\p{S}\p{P}]+$/u;
+
+export const UNICODE_PRINTABLE_CHARACTERS_WITH_WHITESPACE = /^[\p{L}\p{N}\p{M}\p{S}\p{P}\p{Z}]+$/u;
+
+export const UNICODE_INVISIBLE_CHARACTERS = /[\p{C}\p{Mn}\p{Me}]+/u;
