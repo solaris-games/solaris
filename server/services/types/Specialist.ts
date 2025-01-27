@@ -27,7 +27,10 @@ export interface Specialist {
             carrierToStarCombat?: {
                 attacker: {
                     weapons?: number;
-                    weaponsPerAlly?: number;
+                    perAlly?: {
+                        weapons: number,
+                        maxAllies: number,
+                    };
                 }
                 defender: {
                     weapons?: number;

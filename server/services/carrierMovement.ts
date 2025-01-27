@@ -114,7 +114,7 @@ export default class CarrierMovementService {
         if (!carrier.isGift && this.starService.isDeadStar(destinationStar) && this.specialistService.getReigniteDeadStar(carrier)) {
             let reigniteSpecialistNaturalResources = this.specialistService.getReigniteDeadStarNaturalResources(carrier);
 
-            // Double resourches for binary stars.
+            // Double resources for binary stars.
             let modifier = destinationStar.isBinaryStar ? 2 : 1
             let reigniteNaturalResources = {
                 economy: reigniteSpecialistNaturalResources.economy * modifier,

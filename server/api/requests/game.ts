@@ -1,6 +1,18 @@
 import ValidationError from "../../errors/validation";
 import { DBObjectId } from "../../services/types/DBObjectId";
-import {object, Validator, objectId, stringValue, number, string, or, just} from "../validate";
+import {
+    object,
+    Validator,
+    objectId,
+    stringValue,
+    number,
+    string,
+    or,
+    just,
+    UNICODE_INVISIBLE_CHARACTERS,
+    UNICODE_PRINTABLE_CHARACTERS_NON_WHITESPACE,
+    UNICODE_PRINTABLE_CHARACTERS_WITH_WHITESPACE
+} from "../validate";
 import { keyHasBooleanValue, keyHasNumberValue, keyHasStringValue } from "./helpers";
 
 export interface GameCreateGameRequest {
@@ -18,7 +30,10 @@ export const parseGameJoinGameRequest: Validator<GameJoinGameRequest> = object({
     playerId: objectId,
     alias: stringValue({
         trim: true,
-        nonEmpty: true,
+        minLength: 1,
+        maxLength: 24,
+        matches: UNICODE_PRINTABLE_CHARACTERS_WITH_WHITESPACE,
+        ignoreForLengthCheck: UNICODE_INVISIBLE_CHARACTERS,
     }),
     avatar: number,
     password: or(string, just(undefined)),

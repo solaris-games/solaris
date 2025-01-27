@@ -1,10 +1,12 @@
 <template>
     <table class="table table-sm table-striped">
         <thead class="table-dark">
+          <tr>
             <th class="col-1"></th>
             <th class="col-8">Name</th>
             <th class="col-1"></th>
             <th class="col-auto text-end">Banned</th>
+          </tr>
         </thead>
         <tbody>
             <tr v-for="specialist in specialists" :key="specialist.id">

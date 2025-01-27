@@ -206,7 +206,7 @@ export default class AIService {
                 await this.basicAIService._doBasicLogic(game, player, isFirstTickOfCycle, isLastTickOfCycle);
             }
         } catch (e) {
-            log.error(e);
+            log.error(e, `Error in game ${game.settings.general.name} (${game._id.toString()})`);
         }
     }
 

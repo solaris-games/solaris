@@ -23,6 +23,7 @@ import {LeaderboardPlayer} from "./types/Leaderboard";
 import GameJoinService from "./gameJoin";
 import GameAuthService from "./gameAuth";
 import cluster from "cluster";
+import PlayerAfkService from "./playerAfk";
 
 export const GameServiceEvents = {
     onPlayerQuit: 'onPlayerQuit',
@@ -45,6 +46,7 @@ export default class GameService extends EventEmitter {
     playerReadyService: PlayerReadyService;
     gameJoinService: GameJoinService;
     gameAuthService: GameAuthService;
+    playerAfkService: PlayerAfkService;
 
     constructor(
         gameRepo: Repository<Game>,
@@ -61,6 +63,7 @@ export default class GameService extends EventEmitter {
         playerReadyService: PlayerReadyService,
         gameJoinService: GameJoinService,
         gameAuthService: GameAuthService,
+        playerAfkService: PlayerAfkService,
     ) {
         super();
         
@@ -78,6 +81,7 @@ export default class GameService extends EventEmitter {
         this.playerReadyService = playerReadyService;
         this.gameJoinService = gameJoinService;
         this.gameAuthService = gameAuthService;
+        this.playerAfkService = playerAfkService;
     }
 
     async getByIdAll(id: DBObjectId): Promise<Game | null> {
@@ -212,6 +216,8 @@ export default class GameService extends EventEmitter {
             throw new ValidationError('Cannot concede defeat in a game that has finished.');
         }
 
+        const wasAI = this.playerAfkService.isAIControlled(game, player, false);
+
         // If its a tutorial game then straight up delete it.
         if (this.gameTypeService.isTutorialGame(game)) {
             return this.delete(game);
@@ -221,7 +227,9 @@ export default class GameService extends EventEmitter {
 
         this.playerService.setPlayerAsDefeated(game, player, openSlot);
 
-        game.state.players--; // Deduct number of active players from the game.
+        if (!wasAI) {
+            game.state.players--; // Deduct number of active players from the game.
+        }
 
         // NOTE: The game will check for a winner on each tick so no need to 
         // repeat that here.
@@ -451,13 +459,13 @@ export default class GameService extends EventEmitter {
         return undefeatedPlayers.filter(x => x.ready).length === undefeatedPlayers.length;
     }
 
-    isReadyToQuitOrDefeated(player: Player) {
-        return player.readyToQuit || player.defeated || player.isAIControlled;
+    isReadyToQuitOrDefeated(game: Game, player: Player) {
+        return player.readyToQuit || player.defeated || this.playerAfkService.isAIControlled(game, player, true);
     }
 
     isReadyToQuitImmediateEnd(game: Game) {
         // every player is defeated, RTQ or AI
-        return game.galaxy.players.every(p => this.isReadyToQuitOrDefeated(p));
+        return game.galaxy.players.every(p => this.isReadyToQuitOrDefeated(game, p));
     }
 
     checkReadyToQuit(game: Game, leaderboard: LeaderboardPlayer[]) {
@@ -468,7 +476,7 @@ export default class GameService extends EventEmitter {
         let allUndefeatedHaveRTQed = true;
 
         for (const player of game.galaxy.players) {
-            if (this.isReadyToQuitOrDefeated(player)) {
+            if (this.isReadyToQuitOrDefeated(game, player)) {
                 rtqStarsSum += leaderboard.find(x => x.player._id.toString() === player._id.toString())?.stats?.totalStars || 0;
             } else {
                 allUndefeatedHaveRTQed = false;

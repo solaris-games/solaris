@@ -289,26 +289,20 @@ export default class CarrierService extends EventEmitter {
             throw new ValidationError('Carrier does not exist');
         }
 
-        if (!name) {
+        if (!name || name.trim().length === 0) {
             throw new ValidationError('Name is required.');
-        }
-
-        if (name.length < 4 || name.length > 30) {
-            throw new ValidationError('Name must be between greater than 3 and less than or equal to 30 characters long.');
         }
 
         if (carrier.ownedByPlayerId!.toString() !== player._id.toString()) {
             throw new ValidationError(`Cannot rename carrier, you are not its owner.`);
         }
 
-        let carrierName = name.trim().replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-        
         await this.gameRepo.updateOne({
             _id: game._id,
             'galaxy.carriers._id': carrierId
         }, {
             $set: {
-                'galaxy.carriers.$.name': carrierName
+                'galaxy.carriers.$.name': name
             }
         });
     }

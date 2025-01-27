@@ -6,11 +6,13 @@
   <div class="table-responsive mt-2">
     <table class="table table-striped table-hover leaderboard-table">
       <thead class="table-dark">
-        <th style="width: 5%">#</th>
-        <th style="width: 25%">Player</th>
-        <th style="width: 25%" class="d-none d-md-table-cell">Guild</th>
-        <th style="width: 10%" class="text-end col">W/L</th>
-        <th style="width: 10%" class="text-end col">ELO</th>
+        <tr>
+          <th style="width: 5%">#</th>
+          <th style="width: 25%">Player</th>
+          <th style="width: 25%" class="d-none d-md-table-cell">Guild</th>
+          <th style="width: 10%" class="text-end col">W/L</th>
+          <th style="width: 10%" class="text-end col">ELO</th>
+        </tr>
       </thead>
       <tbody>
         <tr v-for="player of leaderboard" :key="player._id" :class="{'bg-primary':$store.state.userId === player._id}">

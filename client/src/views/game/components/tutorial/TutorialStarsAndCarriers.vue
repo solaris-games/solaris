@@ -2,7 +2,7 @@
     <div>
         <div v-if="page === 0">
             <h5>Introduction</h5>
-            <p>
+            <div>
                 In this tutorial, you will learn how to purchase a carrier, move the carrier and capture neutral stars.
                 The tutorial window may close - you can return to your place in the tutorial at any time by pressing the
                 yellow tutorial button on the upper right of the window.
@@ -12,9 +12,9 @@
                         <span class="d-none d-md-inline-block ms-1">Tutorial</span>
                     </div>
                 </div>
-            </p>
+              </div>
 
-            <p>
+            <div>
                 <span class="text-warning">Important:</span> While Solaris has 30 minute turns (Ticks) and is played over a long period of real-time, this
                 tutorial is turn based. Use the green check at the top right to end your turn.
                 <div class="ms-4">
@@ -25,7 +25,7 @@
                         </button>
                     </div>
                 </div>
-            </p>
+              </div>
 
             <p>
                 Currently displayed is the game map, it features both Stars and Carriers belonging to you and your

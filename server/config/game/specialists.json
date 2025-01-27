@@ -408,7 +408,10 @@
                     "speed": 0.75,
                     "carrierToStarCombat": {
                         "attacker": {
-                            "weaponsPerAlly": 2
+                            "perAlly": {
+                                "weapons": 2,
+                                "maxAllies": 3
+                            }
                         }
                     }
                 }

@@ -763,7 +763,10 @@ describe('technology', () => {
                 local: {
                     carrierToStarCombat: {
                         attacker: {
-                            weaponsPerAlly: 2
+                            perAlly: {
+                                weapons: 2,
+                                maxAllies: 3
+                            }
                         }
                     }
                 }

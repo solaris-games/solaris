@@ -180,8 +180,9 @@ export default class TechnologyService {
                         buffs.push(specialist.modifiers.local.carrierToStarCombat.defender.weapons);
                     }
 
-                    if (isAttacker && specialist.modifiers.local.carrierToStarCombat.attacker?.weaponsPerAlly) {
-                        buffs.push(specialist.modifiers.local.carrierToStarCombat.attacker.weaponsPerAlly * allyCount);
+                    if (isAttacker && specialist.modifiers.local.carrierToStarCombat.attacker?.perAlly) {
+                        const adjustedAllyCount = Math.min(allyCount, specialist.modifiers.local.carrierToStarCombat.attacker.perAlly.maxAllies);
+                        buffs.push(specialist.modifiers.local.carrierToStarCombat.attacker.perAlly.weapons * adjustedAllyCount);
                     }
                 }
 
