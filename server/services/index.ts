@@ -123,6 +123,7 @@ import { ServerHandler } from "../sockets/socketHandlers/serverHandler";
 import { PlayerServerSocketHandler } from "../sockets/socketHandlers/player";
 import { Logger } from "pino";
 import SocketService from "./socket";
+import StarCaptureService from "./starCapture";
 
 const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
@@ -189,7 +190,8 @@ export default (config: Config,
     const playerStatisticsService = new PlayerStatisticsService(starService, carrierService, technologyService, specialistService, shipService);
     const playerCycleRewardsService = new PlayerCycleRewardsService(starService, technologyService, playerStatisticsService, specialistService);
     const diplomacyUpkeepService = new DiplomacyUpkeepService(playerCreditsService, playerCycleRewardsService);
-    const diplomacyService = new DiplomacyService(gameRepository, eventRepository, diplomacyUpkeepService);
+    const diplomacyService = new DiplomacyService(gameRepository, eventRepository, diplomacyUpkeepService)
+    const starCaptureService = new StarCaptureService(specialistService, starService, gameTypeService, gameStateService, diplomacyService);
     const starContestedService = new StarContestedService(diplomacyService);
     const carrierGiftService = new CarrierGiftService(gameRepository, diplomacyService);
     const carrierMovementService = new CarrierMovementService(gameRepository, distanceService, starService, specialistService, diplomacyService, carrierGiftService, technologyService, starDistanceService);
@@ -219,7 +221,7 @@ export default (config: Config,
     const leaderboardService = new LeaderboardService(playerService, playerAfkService, userLevelService, ratingService, gameService, gameTypeService, gameStateService, badgeService, playerStatisticsService, teamService);
     const userLeaderboardService = new UserLeaderboardService(userRepository, guildUserService);
     const researchService = new ResearchService(gameRepository, technologyService, randomService, playerStatisticsService, starService, userService, gameTypeService);
-    const combatService = new CombatService(technologyService, specialistService, playerService, starService, reputationService, diplomacyService, gameTypeService);
+    const combatService = new CombatService(technologyService, specialistService, playerService, starService, reputationService, diplomacyService, gameTypeService, starCaptureService);
     const historyService = new HistoryService(historyRepository, playerService, gameService, playerStatisticsService, gameStateService);
     const waypointService = new WaypointService(gameRepository, carrierService, starService, distanceService, starDistanceService, technologyService, gameService, playerService, carrierMovementService, gameMaskingService, historyService);
     const specialistBanService = new SpecialistBanService(specialistService);
@@ -343,6 +345,7 @@ export default (config: Config,
         gamePlayerMutexService,
         gameMutexService,
         playerColourService,
-        sessionService
+        sessionService,
+        starCaptureService,
     };
 };
