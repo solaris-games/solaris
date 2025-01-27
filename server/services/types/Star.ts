@@ -61,4 +61,5 @@ export interface StarCaptureResult {
     capturedById: DBObjectId;
     capturedByAlias: string;
     captureReward: number;
+    specialistDestroyed?: boolean;
 };

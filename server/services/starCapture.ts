@@ -77,7 +77,10 @@ export default class StarCaptureService {
         star.shipsActual = 0;
         star.ships = 0;
 
-        if (hostileAttackersRemaining) {
+        let specialistDestroyed = false;
+
+        if (hostileAttackersRemaining && star.specialistId) {
+            specialistDestroyed = true;
             star.specialistId = null;
         }
 
@@ -130,7 +133,8 @@ export default class StarCaptureService {
         return {
             capturedById: newStarPlayer._id,
             capturedByAlias: newStarPlayer.alias!,
-            captureReward
+            captureReward,
+            specialistDestroyed,
         };
     }
 }
