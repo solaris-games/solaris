@@ -5,6 +5,7 @@ import { Game } from "../services/types/Game";
 import { GameHistory, GameHistoryCarrier } from "../services/types/GameHistory";
 import { JobParameters, makeJob } from "./tool";
 import { DependencyContainer } from "../services/types/DependencyContainer";
+import {Specialist} from "@solaris-common";
 
 const loadHistory = async (container: DependencyContainer, gameId: DBObjectId, tick: number) => {
     const history = await container.historyService.getHistoryByTick(gameId, tick);
@@ -42,6 +43,8 @@ const applyPlayers = (game: Game, history: GameHistory) => {
         player.ready = histPlayer.ready;
         player.readyToQuit = histPlayer.readyToQuit;
         player.research = histPlayer.research;
+        player.ready = false; // reset turn based states to ensure the game stays in that tick
+        player.readyToCycle = false;
     });
 }
 
@@ -85,7 +88,7 @@ const applyWaypoints = (carrier: Carrier, histCarrier: GameHistoryCarrier) => {
     }];
 }
 
-const applyCarriers = (game: Game, history: GameHistory) => {
+const applyCarriers = (container: DependencyContainer, game: Game, history: GameHistory) => {
     const removeCarriers = new Array<DBObjectId>();
 
     game.galaxy.carriers.forEach(carrier => {
@@ -108,14 +111,49 @@ const applyCarriers = (game: Game, history: GameHistory) => {
         applyWaypoints(carrier, histCarrier);
     });
 
-    game.galaxy.carriers = game.galaxy.carriers.filter(c => !removeCarriers.includes(c._id));
+    const addCarriers = new Array<Carrier>();
+
+    for (let carrier of history.carriers) {
+        const currentCarrier = game.galaxy.carriers.find(c => c._id.toString() === carrier.carrierId.toString());
+
+        // other case already handled above
+        if (!currentCarrier) {
+            let specialist: Specialist | null = null;
+
+            if (carrier.specialistId) {
+                specialist = container.specialistService.getById(carrier.specialistId, 'carrier');
+            }
+
+            const newCarrier: Carrier = {
+                _id: carrier.carrierId,
+                ships: carrier.ships,
+                specialistId: carrier.specialistId,
+                ownedByPlayerId: carrier.ownedByPlayerId,
+                name: carrier.name,
+                location: carrier.location,
+                isGift: carrier.isGift,
+                orbiting: carrier.orbiting,
+                waypoints: [], // filled in below
+                waypointsLooped: false,
+                specialist,
+                specialistExpireTick: specialist && game.state.tick + (specialist?.expireTicks ?? 0),
+                locationNext: null,
+            } as unknown as Carrier;
+
+            applyWaypoints(newCarrier, carrier)
+
+            addCarriers.push(newCarrier);
+        }
+    }
+
+    game.galaxy.carriers = addCarriers.concat(game.galaxy.carriers.filter(c => !removeCarriers.includes(c._id)));
 }
 
-const applyHistory = (game: Game, history: GameHistory) => {
+const applyHistory = (container: DependencyContainer, game: Game, history: GameHistory) => {
     applyGameState(game, history);
     applyPlayers(game, history);
     applyStars(game, history);
-    applyCarriers(game, history);
+    applyCarriers(container, game, history);
 }
 
 const job = makeJob('Restore game', async ({ log, container, mongo }: JobParameters) => {
@@ -142,7 +180,7 @@ const job = makeJob('Restore game', async ({ log, container, mongo }: JobParamet
 
     log.info("Loaded current game state");
 
-    applyHistory(currentState, hist);
+    applyHistory(container, currentState, hist);
 
     log.info("History applied");
 
