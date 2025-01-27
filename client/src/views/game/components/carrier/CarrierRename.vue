@@ -6,7 +6,7 @@
 
   <form @submit="doRename">
     <div class="mb-2">
-      <input type="text" class="form-control" id="name" placeholder="Enter a new carrier name" v-model="currentName" minlength="4" maxlength="30" @change="onNameChanged">
+      <input type="text" class="form-control" id="name" placeholder="Enter a new carrier name" v-model="currentName" minlength="3" maxlength="30">
     </div>
     <div class="mb-2 row pb-2 pt-2 ">
       <div class="col">
@@ -54,7 +54,7 @@ export default {
     isNameInvalid () {
       const trimmed = this.currentName.trim()
 
-      return trimmed.length < 4 || trimmed.length > 30
+      return trimmed.length < 3 || trimmed.length > 30
     }
   },
   methods: {
@@ -65,9 +65,6 @@ export default {
     },
     onOpenCarrierDetailRequested (e) {
       this.$emit('onOpenCarrierDetailRequested', this.carrierId)
-    },
-    onNameChanged (e) {
-      this.currentName = this.currentName.trim().replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();})
     },
     viewOnMap (e) {
       GameContainer.map.panToCarrier(this.carrier)

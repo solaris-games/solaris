@@ -1,21 +1,13 @@
 import mongoose from "mongoose";
-import config from "../config";
-import containerLoader from "../services";
 import { Carrier } from "../services/types/Carrier";
 import { DBObjectId, objectId } from "../services/types/DBObjectId";
-import { DependencyContainer } from "../services/types/DependencyContainer";
 import { Game } from "../services/types/Game";
 import { GameHistory, GameHistoryCarrier } from "../services/types/GameHistory";
-import { serverStub } from "../sockets/serverStub";
-import { logger } from "../utils/logging";
-import mongooseLoader from "../db/index";
+import { JobParameters, makeJob } from "./tool";
+import { DependencyContainer } from "../services/types/DependencyContainer";
+import {Specialist} from "@solaris-common";
 
-let mongo,
-    container: DependencyContainer;
-
-const log = logger("Restore Game");
-
-const loadHistory = async (gameId: DBObjectId, tick: number) => {
+const loadHistory = async (container: DependencyContainer, gameId: DBObjectId, tick: number) => {
     const history = await container.historyService.getHistoryByTick(gameId, tick);
 
     return history;
@@ -51,6 +43,8 @@ const applyPlayers = (game: Game, history: GameHistory) => {
         player.ready = histPlayer.ready;
         player.readyToQuit = histPlayer.readyToQuit;
         player.research = histPlayer.research;
+        player.ready = false; // reset turn based states to ensure the game stays in that tick
+        player.readyToCycle = false;
     });
 }
 
@@ -94,7 +88,7 @@ const applyWaypoints = (carrier: Carrier, histCarrier: GameHistoryCarrier) => {
     }];
 }
 
-const applyCarriers = (game: Game, history: GameHistory) => {
+const applyCarriers = (container: DependencyContainer, game: Game, history: GameHistory) => {
     const removeCarriers = new Array<DBObjectId>();
 
     game.galaxy.carriers.forEach(carrier => {
@@ -117,26 +111,52 @@ const applyCarriers = (game: Game, history: GameHistory) => {
         applyWaypoints(carrier, histCarrier);
     });
 
-    game.galaxy.carriers = game.galaxy.carriers.filter(c => !removeCarriers.includes(c._id));
+    const addCarriers = new Array<Carrier>();
+
+    for (let carrier of history.carriers) {
+        const currentCarrier = game.galaxy.carriers.find(c => c._id.toString() === carrier.carrierId.toString());
+
+        // other case already handled above
+        if (!currentCarrier) {
+            let specialist: Specialist | null = null;
+
+            if (carrier.specialistId) {
+                specialist = container.specialistService.getById(carrier.specialistId, 'carrier');
+            }
+
+            const newCarrier: Carrier = {
+                _id: carrier.carrierId,
+                ships: carrier.ships,
+                specialistId: carrier.specialistId,
+                ownedByPlayerId: carrier.ownedByPlayerId,
+                name: carrier.name,
+                location: carrier.location,
+                isGift: carrier.isGift,
+                orbiting: carrier.orbiting,
+                waypoints: [], // filled in below
+                waypointsLooped: false,
+                specialist,
+                specialistExpireTick: specialist && game.state.tick + (specialist?.expireTicks ?? 0),
+                locationNext: null,
+            } as unknown as Carrier;
+
+            applyWaypoints(newCarrier, carrier)
+
+            addCarriers.push(newCarrier);
+        }
+    }
+
+    game.galaxy.carriers = addCarriers.concat(game.galaxy.carriers.filter(c => !removeCarriers.includes(c._id)));
 }
 
-const applyHistory = (game: Game, history: GameHistory) => {
+const applyHistory = (container: DependencyContainer, game: Game, history: GameHistory) => {
     applyGameState(game, history);
     applyPlayers(game, history);
     applyStars(game, history);
-    applyCarriers(game, history);
+    applyCarriers(container, game, history);
 }
 
-const startup = async () => {
-    mongo = await mongooseLoader(config, {
-        syncIndexes: true,
-        poolSize: 1
-    });
-
-    container = containerLoader(config, serverStub, log);
-
-    console.log("Initialised");
-
+const job = makeJob('Restore game', async ({ log, container, mongo }: JobParameters) => {
     const gameIdS = process.argv[2];
     const tick = Number.parseInt(process.argv[3]);
 
@@ -146,7 +166,7 @@ const startup = async () => {
 
     const gameId = mongoose.Types.ObjectId(gameIdS) as DBObjectId;
 
-    const hist = await loadHistory(gameId, tick);
+    const hist = await loadHistory(container, gameId, tick);
     if (!hist) {
         throw new Error("History not found");
     }
@@ -158,39 +178,17 @@ const startup = async () => {
         throw new Error("Game not found");
     }
 
-    console.log("Loaded current game state");
+    log.info("Loaded current game state");
 
-    applyHistory(currentState, hist);
+    applyHistory(container, currentState, hist);
 
-    console.log("History applied");
+    log.info("History applied");
 
     await currentState.save();
 
-    console.log("Game state saved");
-}
-
-process.on('SIGINT', async () => {
-    await shutdown();
+    log.info("Game state saved");
 });
 
-const shutdown = async () =>{
-    console.log('Shutting down...');
-
-    await mongo.disconnect();
-
-    console.log('Shutdown complete.');
-
-    process.exit();
-}
-
-startup().then(async () => {
-    console.log('Done.');
-
-    await shutdown();
-}).catch(async err => {
-    console.error(err);
-
-    await shutdown();
-});
+job();
 
 export { };

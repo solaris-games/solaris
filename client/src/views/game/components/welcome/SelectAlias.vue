@@ -20,7 +20,7 @@
                     <p v-if="avatar"><small class="linebreaks">{{avatar.description}}</small></p>
 
                     <div class="mb-2">
-                      <input name="alias" class="form-control" required="required" placeholder="Enter your alias here" type="text" minlength="3" maxlength="24" v-model="alias" @change="onAliasChanged">
+                      <input name="alias" class="form-control" required="required" placeholder="Enter your alias here" type="text" minlength="1" maxlength="24" v-model="alias" @change="onAliasChanged">
                     </div>
 
                     <div v-if="isAnonymousGame" class="alert alert-warning">

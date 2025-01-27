@@ -28,7 +28,7 @@ export default (container: DependencyContainer) => {
 
             if (game != null && container.gameTickService.canTick(game)) {
                 try {
-                    if (game != null) {
+                    if (game != null && game._id.toString() === '6796cb1df2fdca5305fd8285') {
                         await container.gameLockService.lock(gameId, true);
                         await container.gameTickService.tick(gameId);
                     }

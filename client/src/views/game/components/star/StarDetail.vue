@@ -11,7 +11,7 @@
     <div class="row bg-dark">
       <div class="col text-center pt-2">
         <p class="mb-2 text-info">
-          Location: ({{star.location.x.toFixed(3)}}, {{star.location.y.toFixed(3)}})
+          Location: {{formatLocation(star.location)}}
           <help-tooltip v-if="isGameDarkMode" tooltip="Coordinates are scrambled because this is a dark mode game."/>
         </p>
         <p class="mb-2" v-if="isOwnedByUserPlayer">A star under your command.</p>
@@ -71,9 +71,11 @@
       <div class="row mt-2" v-if="!isDeadStar">
         <div class="col">
           <table class="star-resources-table">
-            <tr>
-              <star-resources :resources="star.naturalResources" :compareResources="star.terraformedResources" :iconAlignLeft="true" />
-            </tr>
+            <tbody>
+              <tr>
+                <star-resources :resources="star.naturalResources" :compareResources="star.terraformedResources" :iconAlignLeft="true" />
+              </tr>
+            </tbody>
           </table>
         </div>
         <div class="col-auto">
@@ -206,9 +208,11 @@
           </div>
           <div class="col text-end">
               <table class="star-resources-table">
-                  <tr>
+                  <tbody>
+                    <tr>
                       <star-resources :resources="star.naturalResources" :iconAlignLeft="false" />
-                  </tr>
+                    </tr>
+                  </tbody>
               </table>
           </div>
       </div>
@@ -219,9 +223,11 @@
           </div>
           <div class="col text-end">
               <table class="star-resources-table">
-                  <tr>
+                  <tbody>
+                    <tr>
                       <star-resources :resources="star.terraformedResources" :iconAlignLeft="false" />
-                  </tr>
+                    </tr>
+                  </tbody>
               </table>
           </div>
       </div>
@@ -430,6 +436,7 @@ import IgnoreBulkUpgradeVue from './IgnoreBulkUpgrade.vue'
 import StarResourcesVue from './StarResources.vue'
 import StarIconVue from './../star/StarIcon.vue'
 import HelpTooltip from '../../../components/HelpTooltip.vue'
+import {formatLocation} from "client/src/util/format";
 
 export default {
   components: {
@@ -477,6 +484,7 @@ export default {
     this.isSpecialistsEnabled = this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none'
   },
   methods: {
+    formatLocation,
     onCloseRequested (e) {
       this.$emit('onCloseRequested', e)
     },

@@ -1,18 +1,8 @@
-import mongooseLoader from '../db/index';
-import config from '../config';
-import containerLoader from '../services';
 import { GameWinnerKind } from "../services/leaderboard";
-import { DependencyContainer } from '../services/types/DependencyContainer';
 import { User } from '../services/types/User';
-import { serverStub } from '../sockets/serverStub';
-import { logger } from "../utils/logging";
+import { JobParameters, makeJob } from './tool';
 
-let mongo,
-    container: DependencyContainer;
-
-const log = logger("Recalculate Rankings");
-
-function binarySearchUsers(users: User[], id: string) {
+const binarySearchUsers = (users: User[], id: string) => {
     let start = 0;
     let end = users.length - 1;
 
@@ -37,14 +27,7 @@ function binarySearchUsers(users: User[], id: string) {
     return users.find(s => s._id.toString() === id.toString())!;
 }
 
-async function startup() {
-    mongo = await mongooseLoader(config, {
-        syncIndexes: true,
-        poolSize: 1
-    });
-
-    container = containerLoader(config, serverStub, log);
-    
+const job = makeJob('Recalculate rankings', async ({ log, container, mongo }: JobParameters) => {
     log.info('Recalculating all player ranks...');
 
     log.info(`Resetting users...`);
@@ -236,30 +219,8 @@ async function startup() {
     log.info(`Updating users...`);
     await container.userService.userRepo.bulkWrite(dbWrites);
     log.info(`Users updated.`);
-}
-
-process.on('SIGINT', async () => {
-    await shutdown();
 });
 
-async function shutdown() {
-    log.info('Shutting down...');
-
-    await mongo.disconnect();
-
-    log.info('Shutdown complete.');
-    
-    process.exit();
-}
-
-startup().then(async () => {
-    log.info('Done.');
-
-    await shutdown();
-}).catch(async err => {
-    log.error(err);
-
-    await shutdown();
-});
+job();
 
 export { };

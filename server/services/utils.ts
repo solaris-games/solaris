@@ -64,3 +64,9 @@ export function shuffle<T>(rand: RandomGen, a: Array<T>) {
     }
     return a;
 }
+
+export const nullObject = (obj: Object) => {
+    for (let key of Object.keys(obj)) {
+        obj[key] = 0;
+    }
+}

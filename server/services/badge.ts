@@ -39,6 +39,9 @@ export default class BadgeService extends EventEmitter {
     }
 
     async listBadgesByUser(userId: DBObjectId): Promise<UserBadge[]> {
+        return [];
+
+        /*
         const badges = this.listBadges();
 
         const user = await this.userService.getById(userId, {
@@ -58,10 +61,13 @@ export default class BadgeService extends EventEmitter {
             });
         }
 
-        return userBadges.filter(b => b.awarded);
+        return userBadges.filter(b => b.awarded);*/
     }
 
     async listBadgesByPlayer(game: Game, playerId: DBObjectId) {
+        return [];
+
+        /*
         let player = this.playerService.getById(game, playerId);
 
         if (!player) {
@@ -78,6 +84,8 @@ export default class BadgeService extends EventEmitter {
         }
 
         return await this.listBadgesByUser(player.userId);
+
+         */
     }
 
     async purchaseBadgeForUser(purchasedByUserId: DBObjectId, purchasedForUserId: DBObjectId, badgeKey: string) {

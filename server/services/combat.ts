@@ -11,6 +11,7 @@ import ReputationService from "./reputation";
 import SpecialistService from "./specialist";
 import StarService from "./star";
 import TechnologyService from "./technology";
+import StarCaptureService from "./starCapture";
 
 const EventEmitter = require('events');
 
@@ -27,6 +28,7 @@ export default class CombatService extends EventEmitter {
     reputationService: ReputationService;
     diplomacyService: DiplomacyService;
     gameTypeService: GameTypeService;
+    starCaptureService: StarCaptureService;
     
     constructor(
         technologyService: TechnologyService,
@@ -35,7 +37,8 @@ export default class CombatService extends EventEmitter {
         starService: StarService,
         reputationService: ReputationService,
         diplomacyService: DiplomacyService,
-        gameTypeService: GameTypeService
+        gameTypeService: GameTypeService,
+        starCaptureService: StarCaptureService,
     ) {
         super();
 
@@ -46,6 +49,7 @@ export default class CombatService extends EventEmitter {
         this.reputationService = reputationService;
         this.diplomacyService = diplomacyService;
         this.gameTypeService = gameTypeService;
+        this.starCaptureService = starCaptureService;
     }
 
     calculate(defender: Defender, attacker: Attacker, isTurnBased: boolean = true, calculateNeeded: boolean = false): CombatResultShips {
@@ -426,7 +430,7 @@ export default class CombatService extends EventEmitter {
         let hasCapturedStar = starDefenderDefeated && hasAttackersRemaining;
 
         if (hasCapturedStar) {
-            return this.starService.captureStar(game, star, owner, defenders, defenderUsers, attackers, attackerUsers, attackerCarriers);
+            return this.starCaptureService.captureStar(game, star, owner, defenders, defenderUsers, attackers, attackerUsers, attackerCarriers);
         }
 
         return null;

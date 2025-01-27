@@ -17,11 +17,20 @@
             </span>
             .
           </p>
-          <p v-if="event.data.captureResult.captureReward">
+          <p v-if="event.data.captureResult?.specialistDestroyed">
+            The specialist at <star-label :starId="event.data.starId" :starName="event.data.starName"/> was destroyed due to the intense combat.
+          </p>
+          <p v-if="event.data.captureResult?.captureReward">
             <a href="javascript:;" @click="emit('onOpenPlayerDetailRequested', event.data.captureResult.capturedById)">{{event.data.captureResult.capturedByAlias}}</a> is awarded
             <span class="text-warning">${{event.data.captureResult.captureReward}}</span> credits for destroying economic infrastructure.
           </p>
         </div>
+      <div v-if="!event.data.captureResult">
+        <p>
+          The star <star-label :starId="event.data.starId" :starName="event.data.starName"/> remains under the control of
+          <a href="javascript:;" @click="emit('onOpenPlayerDetailRequested', gameHelper.getStarById(game, event.data.starId)?.ownedByPlayerId)">{{gameHelper.getPlayerById(game, gameHelper.getStarById(game, event.data.starId)?.ownedByPlayerId)!.alias}}</a>.
+        </p>
+      </div>
     </div>
 </template>
 
@@ -33,6 +42,8 @@ import { useStore, type Store } from 'vuex';
 import CombatEventSide from './CombatEventSide.vue';
 import type { State } from '../../../../../store';
 import {createStarAttackerSide, createStarDefenderSide, getOriginalStarOwner} from '../../../../../types/combat';
+import gameHelper from '../../../../../services/gameHelper';
+import type {Game} from "../../../../../types/game";
 
 const props = defineProps<{
   event: PlayerCombatStarEvent<string>
@@ -44,7 +55,7 @@ const emit = defineEmits<{
 
 const store: Store<State> = useStore();
 
-const game = store.state.game!;
+const game: Game = store.state.game!;
 
 const defenderSide = computed(() => createStarDefenderSide(game, props.event));
 

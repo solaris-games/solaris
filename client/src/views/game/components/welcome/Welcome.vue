@@ -95,14 +95,6 @@ export default {
         this.errors.push('Please select an avatar.')
       }
 
-      if (this.alias && this.alias.length < 3) {
-        this.errors.push('Alias must be 3 characters or more.')
-      }
-
-      if (this.alias && this.alias.length > 24) {
-        this.errors.push('Alias must less than 24 characters.')
-      }
-
       if (this.errors.length) return
 
       try {
