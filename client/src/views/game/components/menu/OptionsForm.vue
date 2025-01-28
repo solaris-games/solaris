@@ -107,6 +107,12 @@
         </div>
       </div>
 
+      <div class="row mb-1 pb-1">
+        <label for="territory-opacity" class="col col-form-label">Territory Opacity</label>
+        <div class="col">
+          <input type="number" max="1" min="0" step="0.05" class="form-control" id="territory-opacity" v-model="settings.map.territoryOpacity" :disabled="isSavingSettings">
+        </div>
+      </div>
     </div>
 
     <div class="mb-1 pb-1">
