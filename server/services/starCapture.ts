@@ -80,8 +80,12 @@ export default class StarCaptureService {
         let specialistDestroyed = false;
 
         if (hostileAttackersRemaining && star.specialistId) {
-            specialistDestroyed = true;
-            star.specialistId = null;
+            const specialist = this.specialistService.getById(star.specialistId, 'star');
+
+            if (!specialist.oneShot) {
+                specialistDestroyed = true;
+                star.specialistId = null;
+            }
         }
 
         // If star capture reward is enabled, destroy the economic infrastructure
