@@ -659,16 +659,12 @@ export class Map extends EventEmitter {
 
     if (empireCenter) {
       this.gameContainer.viewport!.moveCenter(empireCenter.x, empireCenter.y)
-    } else {
-      const galaxyCenterX = gameHelper.calculateGalaxyCenterX(game)
-      const galaxyCenterY = gameHelper.calculateGalaxyCenterY(game)
 
-      this.gameContainer.viewport!.moveCenter(galaxyCenterX, galaxyCenterY)
+
+      const zoomPercent = this.gameContainer.getViewportZoomPercentage()
+
+      this.refreshZoom(zoomPercent)
     }
-
-    const zoomPercent = this.gameContainer.getViewportZoomPercentage()
-
-    this.refreshZoom(zoomPercent)
   }
 
   panToUser (game) {
