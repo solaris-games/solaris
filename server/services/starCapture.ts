@@ -9,6 +9,8 @@ import StarService from "./star";
 import SpecialistService from "./specialist";
 import GameStateService from "./gameState";
 import DiplomacyService from "./diplomacy";
+import TechnologyService from "./technology";
+import StarUpgradeService from "./starUpgrade";
 
 export default class StarCaptureService {
     specialistService: SpecialistService;
@@ -16,6 +18,8 @@ export default class StarCaptureService {
     gameTypeService: GameTypeService;
     gameStateService: GameStateService;
     diplomacyService: DiplomacyService;
+    technologyService: TechnologyService;
+    starUpgradeService: StarUpgradeService;
 
     constructor(
         specialistService: SpecialistService,
@@ -23,12 +27,16 @@ export default class StarCaptureService {
         gameTypeService: GameTypeService,
         gameStateService: GameStateService,
         diplomacyService: DiplomacyService,
+        technologyService: TechnologyService,
+        starUpgradeService: StarUpgradeService,
     ) {
         this.specialistService = specialistService;
         this.starService = starService;
         this.gameTypeService = gameTypeService;
         this.gameStateService = gameStateService;
         this.diplomacyService = diplomacyService;
+        this.technologyService = technologyService;
+        this.starUpgradeService = starUpgradeService;
     }
 
     captureStar(game: Game, star: Star, owner: Player, defenders: Player[], defenderUsers: User[], attackers: Player[], attackerUsers: User[], attackerCarriers: Carrier[]): StarCaptureResult {
@@ -73,33 +81,30 @@ export default class StarCaptureService {
         const newStarUser = attackerUsers.find(u => newStarPlayer.userId && u._id.toString() === newStarPlayer.userId.toString());
         const newStarPlayerCarriers = attackerCarriers.filter(c => c.ownedByPlayerId!.toString() === newStarPlayer._id.toString());
 
-        star.ownedByPlayerId = newStarPlayer._id;
-        star.shipsActual = 0;
-        star.ships = 0;
+        const captureReward = this.calculateCaptureReward(game, star, newStarPlayerCarriers);
+
+        if (captureReward !== null) {
+            star.infrastructure.economy = 0;
+
+            if (captureReward > 0) {
+                newStarPlayer.credits += captureReward;
+            }
+        }
 
         let specialistDestroyed = false;
 
         if (hostileAttackersRemaining && star.specialistId) {
-            specialistDestroyed = true;
-            star.specialistId = null;
+            const specialist = this.specialistService.getById(star.specialistId, 'star');
+
+            if (!specialist.oneShot) {
+                specialistDestroyed = true;
+                star.specialistId = null;
+            }
         }
 
-        // If star capture reward is enabled, destroy the economic infrastructure
-        // and add the capture amount to the attacker
-        let captureReward = 0;
-
-        if (game.settings.specialGalaxy.starCaptureReward === 'enabled') {
-            captureReward = star.infrastructure.economy! * game.constants.star.captureRewardMultiplier; // Attacker gets X credits for every eco destroyed.
-
-            // Check to see whether to double the capture reward.
-            let captureRewardMultiplier = this.specialistService.hasAwardDoubleCaptureRewardSpecialist(newStarPlayerCarriers);
-
-            captureReward = Math.floor(captureReward * captureRewardMultiplier);
-
-            newStarPlayer.credits += captureReward;
-
-            star.infrastructure.economy = 0;
-        }
+        star.ownedByPlayerId = newStarPlayer._id;
+        star.shipsActual = 0;
+        star.ships = 0;
 
         // Reset the ignore bulk upgrade statuses as it has been captured by a new player.
         this.starService.resetIgnoreBulkUpgradeStatuses(star);
@@ -133,8 +138,44 @@ export default class StarCaptureService {
         return {
             capturedById: newStarPlayer._id,
             capturedByAlias: newStarPlayer.alias!,
-            captureReward,
+            captureReward: captureReward || 0,
             specialistDestroyed,
         };
+    }
+
+    _calculateEconomyCostSum(game: Game, economy: number, resources: number) {
+        let sum = 0;
+
+        const expenseConfig = game.constants.star.infrastructureExpenseMultipliers[game.settings.player.developmentCost.economy]
+
+        for (let i = 0; i < economy; i++) {
+            // calculates for the next level of economy, therefore i < economy is correct since the last iteration is the price for the economy-th economy
+            sum += this.starUpgradeService.calculateEconomyCost(game, expenseConfig, i, resources) || 0;
+        }
+
+        return sum;
+    }
+
+    calculateCaptureReward(game: Game, star: Star, newStarPlayerCarriers: Carrier[]): number | null {
+        // If star capture reward is enabled, destroy the economic infrastructure
+        // and add the capture amount to the attacker
+
+        if (game.settings.specialGalaxy.starCaptureReward === 'enabled') {
+            const starEconomy = star.infrastructure.economy || 0;
+            const baseReward = starEconomy * game.constants.star.captureRewardMultiplier; // Attacker gets X credits for every eco destroyed.
+
+            // Check to see whether to double the capture reward.
+            let captureRewardMultiplier = this.specialistService.hasAwardDoubleCaptureRewardSpecialist(newStarPlayerCarriers);
+
+            const finalReward = Math.floor(baseReward * captureRewardMultiplier);
+
+            const effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
+
+            const rewardLimit = this._calculateEconomyCostSum(game, starEconomy, this.starService.calculateTerraformedResource(star.naturalResources.economy, effectiveTechs.terraforming));
+
+            return Math.min(finalReward, rewardLimit);
+        }
+
+        return null;
     }
 }
