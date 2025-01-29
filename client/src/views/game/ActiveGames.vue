@@ -38,7 +38,7 @@ export default {
   },
   data () {
     return {
-      showDonationBanner: true
+      showDonationBanner: Math.random() < 0.05
     }
   },
   methods: {
