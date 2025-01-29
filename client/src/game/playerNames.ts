@@ -29,7 +29,7 @@ class PlayerNames {
     this.container.removeChildren()
 
     for (let player of this.game!.galaxy.players) {
-      const empireCenter = gameHelper.getPlayerEmpireCenter(this.game!, player)
+      const empireCenter = gameHelper.getPlayerTerritoryCenter(this.game!, player)
 
       if (empireCenter == null) {
         continue

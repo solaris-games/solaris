@@ -939,6 +939,19 @@ class GameHelper {
     return `${dayOfWeek[date.getDay()]} ${date.getDate()} ${monthOfYear[date.getMonth()]} ${date.getHours() < 10 ? '0' + date.getHours() : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}`
   }
 
+  getPlayerTerritoryCenter(game: Game, player: Player) {
+    const playerStars = this.getStarsOwnedByPlayer(player, game.galaxy.stars)
+
+    if (!playerStars.length) {
+      return null
+    }
+
+    // Work out the center point of all stars
+    const centerX = playerStars.reduce((sum, s) => sum + s.location.x, 0) / playerStars.length
+    const centerY = playerStars.reduce((sum, s) => sum + s.location.y, 0) / playerStars.length
+    return { x: centerX, y: centerY }
+  }
+
   getPlayerEmpireCenter (game: Game, player: Player) {
     // Get all of the player's stars.
     const playerStars = this.getStarsOwnedByPlayer(player, game.galaxy.stars)
