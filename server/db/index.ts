@@ -49,7 +49,9 @@ export default async (config, options) => {
     
     const dbConnection = mongoose.connection;
 
-    dbConnection.on('error', log.error.bind(log.error, 'connection error:'));
+    dbConnection.on('error', (e) => {
+        log.error(e, 'connection error:')
+    });
 
     options = options || {};
     options.connectionString = options.connectionString || config.connectionString;
