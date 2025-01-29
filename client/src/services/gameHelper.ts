@@ -1,6 +1,6 @@
 import moment, {type Moment} from 'moment'
 import DiplomacyHelper from './diplomacyHelper.js'
-import type {Game, Player} from "../types/game";
+import type {Game, Player, Star} from "../types/game";
 
 class GameHelper {
   getUserPlayer (game) {
@@ -57,7 +57,7 @@ class GameHelper {
     return game.galaxy.players.find(x => x._id === star.ownedByPlayerId)
   }
 
-  getStarsOwnedByPlayer(player, stars) {
+  getStarsOwnedByPlayer(player: Player, stars: Star[]) {
     if (player == null) {
       return [];
     }
@@ -939,17 +939,26 @@ class GameHelper {
     return `${dayOfWeek[date.getDay()]} ${date.getDate()} ${monthOfYear[date.getMonth()]} ${date.getHours() < 10 ? '0' + date.getHours() : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}`
   }
 
-  getPlayerEmpireCenter (game, player) {
+  getPlayerEmpireCenter (game: Game, player: Player) {
     // Get all of the player's stars.
-    let playerStars = this.getStarsOwnedByPlayer(player, game.galaxy.stars)
+    const playerStars = this.getStarsOwnedByPlayer(player, game.galaxy.stars)
 
     if (!playerStars.length) {
-      return null
+      const playerCarriers = game.galaxy.carriers.filter(car => car.ownedByPlayerId === player._id);
+
+      if (playerCarriers.length === 0) {
+        return null;
+      }
+
+      const centerX = playerCarriers.reduce((sum, c) => sum + c.location.x, 0) / playerCarriers.length
+      const centerY = playerCarriers.reduce((sum, c) => sum + c.location.y, 0) / playerCarriers.length
+
+      return { x: centerX, y: centerY };
     }
 
     // Work out the center point of all stars
-    let centerX = playerStars.reduce((sum, s) => sum + s.location.x, 0) / playerStars.length
-    let centerY = playerStars.reduce((sum, s) => sum + s.location.y, 0) / playerStars.length
+    const centerX = playerStars.reduce((sum, s) => sum + s.location.x, 0) / playerStars.length
+    const centerY = playerStars.reduce((sum, s) => sum + s.location.y, 0) / playerStars.length
 
     let closestStar = this.getClosestPlayerStar(game.galaxy.stars, { x: centerX, y: centerY }, player)
 
@@ -1145,7 +1154,7 @@ class GameHelper {
   calculateTickIncome(game, player) {
     let stars = this.getStarsOwnedByPlayer(player, game.galaxy.stars).filter(s => s.specialistId === 12); // Financial Analyst
 
-    let creditsPerTickByScience = stars[0]?.specialist.modifiers.special.creditsPerTickByScience ?? 0;
+    let creditsPerTickByScience = stars[0]?.specialist?.modifiers?.special?.creditsPerTickByScience ?? 0;
 
     return (stars.reduce((totalScience, star) => totalScience + (star.infrastructure?.science ?? 0), 0) * game.constants.research.sciencePointMultiplier) * creditsPerTickByScience;
   }

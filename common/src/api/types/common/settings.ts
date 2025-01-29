@@ -25,6 +25,7 @@ export type UserGameSettings = {
         carrierPathWidth: number;
         carrierPathDashLength: number;
         territoryStyle: SettingTerritoryStyle;
+        territoryOpacity: number;
         marchingSquareGridSize: number;
         marchingSquareTerritorySize: number;
         marchingSquareBorderWidth: number;

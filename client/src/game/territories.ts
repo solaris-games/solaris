@@ -211,7 +211,7 @@ export class Territories {
       let territoryLines = new Graphics()
       this.container.addChild(territoryPolygons)
       this.container.addChild(territoryLines)
-      territoryPolygons.alpha = 0.333
+      territoryPolygons.alpha = userSettings.map.territoryOpacity;
 
       const check = (ix: number, iy: number) => {
         const point = playerSamplePoints[ix]?.[iy];
@@ -224,7 +224,7 @@ export class Territories {
       let combining = false
       for (let ix = 0; ix < samplePoints.length - 1; ix++) {
         for (let iy = 0; iy < samplePoints[ix].length - 1; iy++) {
-          let alpha = 0.333333;
+          let alpha = userSettings.map.territoryOpacity;
 
           let lookUpIndex = 0
           lookUpIndex += (check(ix, iy) ? 1 : 0) * 8

@@ -44,12 +44,12 @@ function getNewConversation(game: Game, playerId: DBObjectId | null, name: strin
     }
 
     // Validate that another conversation doesn't already exist with the same participants.
-    let existingConvo = game.conversations
+    const existingConvo = game.conversations
         .filter(c => c.participants.length === participantIds.length)
-        .find(c => arrayIsEqual(c.participants.map(p => p.toString()), participantIds));
+        .find(c => arrayIsEqual(c.participants.map(p => p.toString()), participantIds.map(pid => pid.toString())));
 
-    if (existingConvo) {
-        throw new ValidationError(`A conversation already exists with the selected participants named [${existingConvo.name}].`);
+    if (existingConvo && existingConvo.name === name) {
+        throw new ValidationError(`A conversation already exists with the same participants and name.`);
     }
 
     let convoId = new mongoose.Types.ObjectId();
