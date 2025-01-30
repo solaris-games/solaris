@@ -158,8 +158,8 @@ export default class CarrierMovementService {
         if (this.isLaunching(carrierInTransit)) {
             const sourceStarId = carrierInTransit.orbiting!;
             const destinationStarId = waypoint.destination;
-            const sourceStar = game.galaxy.stars.find(s => s._id.toString() === sourceStarId.toString())!;
-            const destinationStar = game.galaxy.stars.find(s => s._id.toString() === destinationStarId.toString())!;
+            const sourceStar = this.starService.getByIdBS(game, sourceStarId);
+            const destinationStar = this.starService.getByIdBS(game, destinationStarId);
 
             if (!sourceStar || !destinationStar) {
                 carrierInTransit.waypoints = [];
@@ -185,8 +185,8 @@ export default class CarrierMovementService {
             }
         }
 
-        const sourceStar = game.galaxy.stars.find(s => s._id.toString() === waypoint.source.toString())!;
-        const destinationStar = game.galaxy.stars.find(s => s._id.toString() === waypoint.destination.toString())!;
+        const sourceStar = this.starService.getByIdBS(game, waypoint.source);
+        const destinationStar = this.starService.getByIdBS(game, waypoint.destination);
         const carrierOwner = game.galaxy.players.find(p => p._id.toString() === carrierInTransit.ownedByPlayerId!.toString())!;
         const warpSpeed = this.canTravelAtWarpSpeed(game, carrierOwner, carrierInTransit, sourceStar, destinationStar);
         const instantSpeed = this.starService.isStarPairWormHole(sourceStar, destinationStar);
@@ -222,8 +222,8 @@ export default class CarrierMovementService {
 
     getNextLocationToWaypoint(game: Game, carrier: Carrier) {
         let waypoint = carrier.waypoints[0];
-        let sourceStar = game.galaxy.stars.find(s => s._id.toString() === waypoint.source.toString())!;
-        let destinationStar = game.galaxy.stars.find(s => s._id.toString() === waypoint.destination.toString())!;
+        let sourceStar = this.starService.getByIdBS(game, waypoint.source);
+        let destinationStar = this.starService.getByIdBS(game, waypoint.destination);
         let carrierOwner = game.galaxy.players.find(p => p._id.toString() === carrier.ownedByPlayerId!.toString())!;
 
         let warpSpeed = false;
@@ -359,7 +359,7 @@ export default class CarrierMovementService {
         // If the carrier has a waypoint then check if the
         // current destination exists.
         if (carrier.waypoints.length) {
-            return game.galaxy.stars.find(s => s._id.toString() === carrier.waypoints[0].destination.toString()) == null;
+            return this.starService.getByIdBS(game, carrier.waypoints[0].destination) == null;
         }
 
         // If there are no waypoints and they are in transit then must be lost, otherwise all good.

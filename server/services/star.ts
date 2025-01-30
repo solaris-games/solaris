@@ -125,12 +125,16 @@ export default class StarService extends EventEmitter {
     }
 
     getByIdBS(game: Game, id: DBObjectId | string) {
+        return this.getByIdBSForStars<Star>(game.galaxy.stars, id);
+    }
+
+    getByIdBSForStars<T extends { _id: DBObjectId | string }>(stars: T[], id: DBObjectId | string): T  {
         let start = 0;
-        let end = game.galaxy.stars.length - 1;
+        let end = stars.length - 1;
 
         while (start <= end) {
             let middle = Math.floor((start + end) / 2);
-            let star = game.galaxy.stars[middle];
+            let star = stars[middle];
 
             if (star._id.toString() === id.toString()) {
                 // found the id
@@ -146,7 +150,7 @@ export default class StarService extends EventEmitter {
 
         // id wasn't found
         // Return the old way
-        return game.galaxy.stars.find(s => s._id.toString() === id.toString())!;
+        return stars.find(s => s._id.toString() === id.toString())!;
     }
 
     setupHomeStar(game: Game, homeStar: Star, player: Player, gameSettings: GameSettings) {
@@ -322,7 +326,7 @@ export default class StarService extends EventEmitter {
             let starIds = this.getStarsWithinScanningRangeOfStarByStarIds(game, star, starsToCheck);
 
             for (let starId of starIds) {
-                if (starsInRange.find(x => x._id.toString() === starId._id.toString()) == null) {
+                if (this.getByIdBSForStars(starsInRange, starId._id) == null) {
                     starsInRange.push(starId);
                     starsToCheck.splice(starsToCheck.indexOf(starId), 1);
                 }
@@ -347,7 +351,7 @@ export default class StarService extends EventEmitter {
                 });
                 
             for (let wormHoleStar of wormHoleStars) {
-                if (starsInRange.find(s => s._id.toString() === wormHoleStar.destination._id.toString()) == null) {
+                if (this.getByIdBSForStars(starsInRange, wormHoleStar.destination._id) == null) {
                     starsInRange.push({
                         _id: wormHoleStar.destination._id,
                         location: wormHoleStar.destination.location,
