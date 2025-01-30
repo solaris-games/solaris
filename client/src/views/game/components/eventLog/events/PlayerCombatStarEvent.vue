@@ -28,7 +28,7 @@
       <div v-if="!event.data.captureResult">
         <p>
           The star <star-label :starId="event.data.starId" :starName="event.data.starName"/> remains under the control of
-          <a href="javascript:;" @click="emit('onOpenPlayerDetailRequested', gameHelper.getStarById(game, event.data.starId)?.ownedByPlayerId)">{{gameHelper.getPlayerById(game, gameHelper.getStarById(game, event.data.starId)?.ownedByPlayerId)!.alias}}</a>.
+          <a href="javascript:;" @click="() => originalOwnerId && emit('onOpenPlayerDetailRequested', originalOwnerId)">{{originalOwnerId ? gameHelper.getPlayerById(game, originalOwnerId)!.alias : '???'}}</a>.
         </p>
       </div>
     </div>
@@ -60,6 +60,8 @@ const game: Game = store.state.game!;
 const defenderSide = computed(() => createStarDefenderSide(game, props.event));
 
 const attackerSide = computed(() => createStarAttackerSide(game, props.event));
+
+const originalOwnerId = computed(() => props.event.data.combatResult.star?.ownedByPlayerId);
 
 const requestOpenPlayerDetail = (playerId: string) => {
   emit('onOpenPlayerDetailRequested', playerId);
