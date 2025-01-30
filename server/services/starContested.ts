@@ -12,11 +12,13 @@ export default class StarContestedService {
     }
 
     listContestedStars(game: Game) {
+        const cInOrbit = game.galaxy.carriers.filter(c => c.orbiting)
+
         return game.galaxy.stars
             .filter(s => s.ownedByPlayerId)
             .map(s => {
                 // Calculate other players in orbit of the star
-                let carriersInOrbit = game.galaxy.carriers.filter(c => c.orbiting && c.orbiting.toString() === s._id.toString());
+                let carriersInOrbit = cInOrbit.filter(c => c.orbiting!.toString() === s._id.toString());
                 let otherPlayerIdsInOrbit = [...new Set(carriersInOrbit.map(c => c.ownedByPlayerId!))];
 
                 if (otherPlayerIdsInOrbit.indexOf(s.ownedByPlayerId!) > -1) {
