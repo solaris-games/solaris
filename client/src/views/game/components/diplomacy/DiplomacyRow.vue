@@ -1,5 +1,5 @@
 <template>
-<tr>
+<tr :class="{'allies' : diplomaticStatus.actualStatus==='allies', 'enemies' : diplomaticStatus.actualStatus==='enemies'}">
   <td :style="{'width': '8px', 'background-color': getFriendlyColour(diplomaticStatus.playerIdTo)}"></td>
   <td class="col-avatar" :title="getPlayerAlias(diplomaticStatus.playerIdTo)">
     <player-avatar @onClick="onOpenPlayerDetailRequested(diplomaticStatus.playerIdTo)" :player="getPlayer(diplomaticStatus.playerIdTo)"/>
@@ -181,6 +181,15 @@ td {
     white-space: nowrap;
     width: 1%;
 }
+
+.allies {
+  background: linear-gradient(to left, black 40%, green 95%);
+}
+
+.enemies {
+  background: linear-gradient(to left, black 40%, #DD0000  95%);
+}
+
 
 @media screen and (max-width: 576px) {
   tr {
