@@ -96,6 +96,11 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             controller.listMyActiveGames
     );
 
+    router.get('/api/game/list/open',
+        mw.auth.authenticate(),
+        controller.listMyOpenGames
+    );
+
     router.get('/api/game/list/spectating',
             mw.auth.authenticate(),
             controller.listSpectating
