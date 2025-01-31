@@ -2,7 +2,11 @@
   <LoadingSpinner :loading="isLoading"/>
 
   <div v-if="games?.length">
-    <h4>Open Games</h4>
+    <h4>
+      Open Games
+
+      <HelpTooltip tooltip="Games that you have created, but not joined yet, and are still waiting to start."/>
+    </h4>
     <table class="table table-striped table-hover">
       <thead class="table-dark">
       <tr>
@@ -32,8 +36,9 @@
 import { type Ref, ref, onMounted } from 'vue';
 import LoadingSpinner from "../../../components/LoadingSpinner.vue";
 import type { Game } from "../../../../types/game";
-import GameHelper from "client/src/services/gameHelper";
+import GameHelper from "../../../../services/gameHelper";
 import gameService from '../../../../services/api/game'
+import HelpTooltip from "../../../components/HelpTooltip.vue";
 
 const isLoading = ref(true);
 
