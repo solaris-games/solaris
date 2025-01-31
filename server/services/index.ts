@@ -214,7 +214,7 @@ export default (config: Config,
     const ledgerService = new LedgerService(gameRepository, playerService, playerCreditsService);
     const reputationService = new ReputationService(gameRepository, playerStatisticsService, diplomacyService, playerAfkService);
     const tradeService = new TradeService(gameRepository, eventRepository, userService, playerService, diplomacyService, ledgerService, achievementService, reputationService, gameTypeService, randomService, playerCreditsService, playerAfkService);
-    const conversationService = new ConversationService(gameRepository, tradeService, diplomacyService);
+    const conversationService = new ConversationService(gameRepository, tradeService, diplomacyService, broadcastService);
     const gameAuthService = new GameAuthService(userService);
     const gameJoinService = new GameJoinService(userService, starService, playerService, passwordService, achievementService, avatarService, gameTypeService, gameStateService, conversationService, randomService, spectatorService);
     const gameService = new GameService(gameRepository, userService, starService, carrierService, playerService, passwordService, achievementService, avatarService, gameTypeService, gameStateService, conversationService, playerReadyService, gameJoinService, gameAuthService, playerAfkService);

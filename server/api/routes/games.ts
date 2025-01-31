@@ -321,6 +321,8 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
                 lean: true,
                 settings: true,
                 state: true,
+                conversations: true,
+                'galaxy.players': true,
             }),
             mw.game.validateGameState({
                 isUnlocked: true,
