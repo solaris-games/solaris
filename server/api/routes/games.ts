@@ -96,6 +96,11 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             controller.listMyActiveGames
     );
 
+    router.get('/api/game/list/open',
+        mw.auth.authenticate(),
+        controller.listMyOpenGames
+    );
+
     router.get('/api/game/list/spectating',
             mw.auth.authenticate(),
             controller.listSpectating
@@ -316,6 +321,8 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
                 lean: true,
                 settings: true,
                 state: true,
+                conversations: true,
+                'galaxy.players': true,
             }),
             mw.game.validateGameState({
                 isUnlocked: true,

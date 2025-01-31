@@ -179,6 +179,16 @@ export default (container: DependencyContainer) => {
                 return next(err);
             }
         },
+        listMyOpenGames: async (req, res, next) => {
+            try {
+                let games = await container.gameListService.listOpenGames(req.session.userId);
+
+                res.status(200).json(games);
+                return next();
+            } catch (err) {
+                return next(err);
+            }
+        },
         listSpectating: async (req, res, next) => {
             try {
                 let games = await container.gameListService.listSpectating(req.session.userId);

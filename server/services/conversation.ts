@@ -1,3 +1,5 @@
+import BroadcastService from "./broadcast";
+
 const moment = require('moment');
 import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
@@ -77,17 +79,20 @@ export default class ConversationService extends EventEmitter {
     gameRepo: Repository<Game>;
     tradeService: TradeService;
     diplomacyService: DiplomacyService;
+    broadcastService: BroadcastService;
 
     constructor(
         gameRepo: Repository<Game>,
         tradeService: TradeService,
-        diplomacyService: DiplomacyService
+        diplomacyService: DiplomacyService,
+        broadcastService: BroadcastService,
     ) {
         super();
 
         this.gameRepo = gameRepo;
         this.tradeService = tradeService;
         this.diplomacyService = diplomacyService;
+        this.broadcastService = broadcastService;
     }
 
     async create(game: Game, playerId: DBObjectId, name: string, participantIds: DBObjectId[]): Promise<Conversation> {
@@ -140,6 +145,10 @@ export default class ConversationService extends EventEmitter {
         
         game.conversations.push(newConvo);
 
+    }
+
+    getGeneralConversation(game: Game): Conversation | undefined {
+        return game.conversations.find(c => c.createdBy == null);
     }
 
     async list(game: Game, playerId: DBObjectId) {
@@ -242,6 +251,24 @@ export default class ConversationService extends EventEmitter {
         return convo;
     }
 
+    async sendSystemMessage(game: Game, conversation: Conversation, message: string): Promise<ConversationMessageSentResult> {
+        message = message.trim()
+
+        const newMessage: ConversationMessage = {
+            fromPlayerId: null,
+            fromPlayerAlias: "Solaris",
+            message: message,
+            sentDate: moment().utc(),
+            sentTick: game.state.tick,
+            pinned: false,
+            readBy: [],
+        }
+
+        const toPlayerIds = conversation.participants;
+
+        return await this._pushMessage(game, conversation, toPlayerIds, newMessage);
+    }
+
     async send(game: Game, player: Player, conversationId: DBObjectId, message: string): Promise<ConversationMessageSentResult> {
         message = message.trim()
 
@@ -275,33 +302,40 @@ export default class ConversationService extends EventEmitter {
             newMessage.readBy.push(player._id);
         }
 
+        const toPlayerIds = convo.participants.filter(p => p.toString() !== player._id.toString());
+
+        return await this._pushMessage(game, convo, toPlayerIds, newMessage);
+    }
+
+    async _pushMessage(game: Game, conversation: Conversation, toPlayerIds: DBObjectId[], newMessage: ConversationMessage) {
         // Push a new message into the conversation messages array.
         await this.gameRepo.updateOne({
             _id: game._id,
-            'conversations._id': conversationId
+            'conversations._id': conversation._id,
         }, {
             $push: {
                 'conversations.$.messages': newMessage
             }
         });
 
-        const toPlayerIds = convo.participants.filter(p => p.toString() !== player._id.toString());
 
         const sentMessageResult: ConversationMessageSentResult = {
             ...newMessage,
-            conversationId,
+            conversationId: conversation._id,
             type: 'message',
             toPlayerIds
         }
-        
+
         let e: ConversationMessageSentEvent = {
             gameId: game._id,
             gameTick: game.state.tick,
-            conversation: convo,
+            conversation,
             sentMessageResult
         };
 
         this.emit(ConversationServiceEvents.onConversationMessageSent, e);
+
+        this.broadcastService.gameMessageSent(game, sentMessageResult);
 
         return sentMessageResult;
     }

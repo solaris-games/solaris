@@ -83,8 +83,6 @@ export default (container: DependencyContainer) => {
                     req.params.conversationId,
                     reqObj.message);
 
-                container.broadcastService.gameMessageSent(req.game, message);
-    
                 res.status(200).send(message);
                 return next();
             } catch (err) {

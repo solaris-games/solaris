@@ -134,7 +134,15 @@ export default class DiplomacyService extends EventEmitter {
                 continue;
             }
 
-            diplomaticStatuses.push(this.getDiplomaticStatusToPlayer(game, player._id, otherPlayer._id));
+
+            //Put alive players on top of defeated ones
+            if (!otherPlayer.defeated) {
+                diplomaticStatuses.unshift(this.getDiplomaticStatusToPlayer(game, player._id, otherPlayer._id));
+            }
+            else {
+                diplomaticStatuses.push(this.getDiplomaticStatusToPlayer(game, player._id, otherPlayer._id));
+
+            }
         }
 
         return diplomaticStatuses;

@@ -525,7 +525,7 @@ export default class PlayerService extends EventEmitter {
     ownsOriginalHomeStar(game: Game, player: Player) {
         const stars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
-        return stars.find(s => s._id.toString() === player.homeStarId!.toString()) != null;
+        return this.starService.getByIdBSForStars(stars, player.homeStarId!) != null;
     }
 
     canSlotBeOpen(game: Game, player: Player) {

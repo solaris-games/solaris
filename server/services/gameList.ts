@@ -81,6 +81,26 @@ export default class GameListService {
         });
     }
 
+    async listOpenGames(userId: DBObjectId) {
+        return await this.gameRepo.find({
+                'settings.general.createdByUserId': { $eq: userId },
+                'state.startDate': { $eq: null },
+                'state.endDate': { $eq: null }, // Game is in progress
+                'galaxy.players': {
+                    $not: {
+                        $elemMatch: { userId }
+                    }
+                }
+            },
+            {
+                'settings.general.type': 1,
+                'settings.general.featured': 1,
+                'settings.general.name': 1,
+                'settings.general.playerLimit': 1,
+                state: 1
+            });
+    }
+
     async listActiveGames(userId: DBObjectId) {
         const games = await this.gameRepo.find({
             'state.endDate': { $eq: null }, // Game is in progress

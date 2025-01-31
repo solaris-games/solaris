@@ -672,7 +672,7 @@ export default class WaypointService {
             let waypoint = carrier.waypoints[i];
 
             // If the destination is not within scanning range of the player, remove it and all subsequent waypoints.
-            let inRange = ownerScannedStars.find(s => s._id.toString() === waypoint.destination.toString()) != null;
+            let inRange = this.starService.getByIdBSForStars(ownerScannedStars, waypoint.destination) != null
 
             if (!inRange) {
                 carrier.waypoints.splice(i);

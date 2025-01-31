@@ -949,7 +949,10 @@ class GameHelper {
     // Work out the center point of all stars
     const centerX = playerStars.reduce((sum, s) => sum + s.location.x, 0) / playerStars.length
     const centerY = playerStars.reduce((sum, s) => sum + s.location.y, 0) / playerStars.length
-    return { x: centerX, y: centerY }
+
+    let closestStar = this.getClosestPlayerStar(game.galaxy.stars, { x: centerX, y: centerY }, player)
+
+    return closestStar.location
   }
 
   getPlayerEmpireCenter (game: Game, player: Player) {

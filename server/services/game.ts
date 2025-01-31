@@ -364,6 +364,12 @@ export default class GameService extends EventEmitter {
                 'state.paused': pauseState
             }
         });
+
+        const generalChat = this.conversationService.getGeneralConversation(game);
+
+        if (generalChat) {
+            await this.conversationService.sendSystemMessage(game, generalChat, `The game has been ${pauseState ? 'paused' : 'resumed'}.`);
+        }
     }
 
     async delete(game: Game, deletedByUserId?: DBObjectId) {

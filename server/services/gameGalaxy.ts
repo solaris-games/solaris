@@ -250,7 +250,7 @@ export default class GameGalaxyService {
             const homeStarId = player.homeStarId?.toString();
 
             if (homeStarId) {
-                const homeStar = game.galaxy.stars.find(s => s._id.toString() === homeStarId);
+                const homeStar = this.starService.getByIdBS(game, homeStarId);
                 if (!homeStar?.isInScanningRange) {
                     delete player.homeStarId;
                 }
@@ -433,7 +433,7 @@ export default class GameGalaxyService {
                 }
 
                 // Ignore stars the player owns, they will always be visible.
-                let isOwnedByCurrentPlayer = playerStars.find(y => y._id.toString() === s._id.toString());
+                let isOwnedByCurrentPlayer = this.starService.getByIdBSForStars(playerStars, s._id);
 
                 if (isOwnedByCurrentPlayer) {
                     // Calculate infrastructure upgrades for the star.
