@@ -146,9 +146,7 @@ export default {
         return
       }
 
-      let fromPlayer = GameHelper.getPlayerById(this.$store.state.game, e.fromPlayerId)
-
-      this.$toast.info(`New message from ${fromPlayer.alias}.`, {
+      this.$toast.info(`New message from ${e.fromPlayerAlias}.`, {
         duration: 10000,
         onClick: () => {
           this.$store.commit('setMenuStateChat', {
