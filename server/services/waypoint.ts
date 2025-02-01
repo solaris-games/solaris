@@ -641,18 +641,20 @@ export default class WaypointService {
     }
 
     sanitiseAllCarrierWaypointsByScanningRange(game: Game) {
-        const scanningRanges = game.galaxy.players
-            .map(p => {
-                return {
+        const scanningRanges = new Map<string, { player: Player, stars: Star[] }>();
+
+        game.galaxy.players
+            .forEach(p => {
+                scanningRanges.set(p._id.toString(), {
                     player: p,
                     stars: this.starService.filterStarsByScanningRange(game, [p]).sort((a, b) => a._id.toString() < b._id.toString() ? -1 : 1)
-                }
+                });
             });
-
+        
         game.galaxy.carriers
             .filter(c => c.waypoints.length)
             .map(c => {
-                let scanningRangePlayer = scanningRanges.find(s => s.player._id.toString() === c.ownedByPlayerId!.toString())!;
+                let scanningRangePlayer = scanningRanges.get(c.ownedByPlayerId!.toString())!;
 
                 return {
                     carrier: c,
