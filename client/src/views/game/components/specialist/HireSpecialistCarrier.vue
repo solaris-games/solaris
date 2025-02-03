@@ -89,7 +89,7 @@ export default {
       this.$emit('onOpenCarrierDetailRequested', carrier._id)
     },
     async hireSpecialist (specialist) {
-        if (!await this.$confirm('Hire specialist', `Are you sure you want to hire a ${specialist.name} for ${this.getSpecialistActualCostString(specialist)}?`)) {
+        if (!await this.$confirm('Hire specialist', `Are you sure you want to hire a ${specialist.name} for ${this.getSpecialistActualCostString(specialist)} on Carrier ${this.carrier.name}?`)) {
           return
         }
 
