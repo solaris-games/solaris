@@ -48,8 +48,12 @@ export interface UserWarning {
 
 export type Badge = {
     badge: string;
-    awardedBy: string;
-    awardedInGame: string;
+    awardedBy: DBObjectId | null;
+    awardedByName: string | null;
+    awardedInGame: DBObjectId | null;
+    awardedInGameName: string | null;
+    playerAwarded: boolean;
+    time: Date | null;
 }
 
 export interface User {
