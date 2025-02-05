@@ -46,7 +46,7 @@ export interface UserWarning {
     date: Date,
 }
 
-export type Badge = {
+export type AwardedBadge = {
     badge: string;
     awardedBy: DBObjectId | null;
     awardedByName: string | null;
@@ -139,7 +139,7 @@ export interface User {
             giftsReceived: number;
             renownSent: number;
         },
-        badges: Badge[];
+        badges: AwardedBadge[];
     },
     gameSettings: UserGameSettings,
     avatars: number[];

@@ -1,6 +1,6 @@
 import {JobParameters} from "../tool";
 import Repository from "../../services/repository";
-import {Badge, User} from "../../services/types/User";
+import {AwardedBadge, User} from "../../services/types/User";
 import UserModel from "../../db/models/User";
 import { Logger } from "pino";
 
@@ -37,8 +37,8 @@ const PLAYER_AWARDED_BADGES_KEYS = [
     'sleepless',
 ];
 
-const mapBadges = (badges: LegacyBadges): Badge[] => {
-    const newBadges: Badge[] = [];
+const mapBadges = (badges: LegacyBadges): AwardedBadge[] => {
+    const newBadges: AwardedBadge[] = [];
 
     for (const playerAwardedKey of PLAYER_AWARDED_BADGES_KEYS) {
         const val = badges[playerAwardedKey];
@@ -68,7 +68,7 @@ const migrateBadgesForUser = (log: Logger, user: User) => {
 
     const badges = badgesO as unknown as LegacyBadges; // this is fine because the model has changed
 
-    const newBadges: Badge[] = mapBadges(badges);
+    const newBadges: AwardedBadge[] = mapBadges(badges);
 
     return {
         updateOne: {
