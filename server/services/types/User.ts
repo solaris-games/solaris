@@ -46,6 +46,12 @@ export interface UserWarning {
     date: Date,
 }
 
+export type Badge = {
+    badge: string;
+    awardedBy: string;
+    awardedInGame: string;
+}
+
 export interface User {
     _id: DBObjectId;
     username: string;
@@ -129,28 +135,7 @@ export interface User {
             giftsReceived: number;
             renownSent: number;
         },
-        badges: {
-            ally: number;
-            enemy: number;
-            diplomat: number;
-            strategist: number;
-            roleplay: number;
-            dauntless: number;
-            sleepless: number;
-            victor32: number;
-            special_dark: number;
-            special_fog: number;
-            special_ultraDark: number;
-            special_orbital: number;
-            special_battleRoyale: number;
-            special_homeStar: number;
-            special_homeStarElimination: number;
-            special_anonymous: number;
-            special_kingOfTheHill: number;
-            special_tinyGalaxy: number;
-            special_freeForAll: number;
-            special_arcade: number;
-        }
+        badges: Badge[];
     },
     gameSettings: UserGameSettings,
     avatars: number[];
