@@ -128,26 +128,36 @@ export default class StarService extends EventEmitter {
         return this.getByIdBSForStars<Star>(game.galaxy.stars, id);
     }
 
-    getByIdBSForStars<T extends { _id: DBObjectId | string }>(stars: T[], id: DBObjectId | string): T  {
-        let start = 0;
-        let end = stars.length - 1;
+    _binarySearchIndex<T extends { _id: DBObjectId | string }>(stars: T[], id: DBObjectId | string) {
+        let low = 0,
+        high = stars.length;
 
-        while (start <= end) {
-            let middle = Math.floor((start + end) / 2);
-            let star = stars[middle];
-
-            if (star._id.toString() === id.toString()) {
-                // found the id
-                return star;
-            } else if (star._id.toString() < id.toString()) {
-                // continue searching to the right
-                start = middle + 1;
-            } else {
-                // search searching to the left
-                end = middle - 1;
-            }
+        while (low < high) {
+            // the midpoint is both the lower and upper bounds of the search area bit shifted one bit to the right to divide by 2
+            let mid = (low + high) >>> 1;
+            // if the midpoint is less than the target, then the target is in the upper half of the search area
+            if (stars[mid]._id.toString() < id.toString()) low = mid + 1;
+            // otherwise the target is in the lower half of the search area
+            else high = mid;
         }
+        // return the index of the found value (or where it would be if it were there)
+        return low;
+    }
 
+    binarySearchStars<T extends { _id: DBObjectId | string }>(stars: T[], id: DBObjectId | string): T | undefined  {
+        const index = this._binarySearchIndex(stars, id.toString());
+        if(stars[index] && stars[index]._id.toString() === id.toString()) {
+            return stars[index];
+        }
+        // id wasn't found, return undefined to match how array.find handles not finding an item
+        return undefined;
+    }
+
+    getByIdBSForStars<T extends { _id: DBObjectId | string }>(stars: T[], id: DBObjectId | string): T  {
+        let star = this.binarySearchStars(stars, id);
+        if (star) {
+            return star;
+        }
         // id wasn't found
         // Return the old way
         return stars.find(s => s._id.toString() === id.toString())!;
@@ -295,6 +305,11 @@ export default class StarService extends EventEmitter {
         return false;
     }
 
+    _insertIntoSortedMapObjectsArray(mapObjects: MapObjectWithVisibility[], mapObject: MapObjectWithVisibility) {
+        let index = this._binarySearchIndex(mapObjects, mapObject._id.toString());
+        mapObjects.splice(index, 0, mapObject);
+    }
+
     filterStarsByScanningRange(game: Game, players: Player[]) {
         // Stars may have different scanning ranges independently so we need to check
         // each star to check what is within its scanning range.
@@ -308,7 +323,8 @@ export default class StarService extends EventEmitter {
                 location: s.location,
                 ownedByPlayerId: s.ownedByPlayerId,
             }
-        });
+        })
+        .sort((a, b) => a._id.toString() < b._id.toString() ? -1 : 1);
 
         // Calculate which stars need to be checked excluding the ones that the player can definitely see.
         let starsToCheck: MapObjectWithVisibility[] = game.galaxy.stars
@@ -326,8 +342,8 @@ export default class StarService extends EventEmitter {
             let starIds = this.getStarsWithinScanningRangeOfStarByStarIds(game, star, starsToCheck);
 
             for (let starId of starIds) {
-                if (this.getByIdBSForStars(starsInRange, starId._id) == null) {
-                    starsInRange.push(starId);
+                if (this.binarySearchStars(starsInRange, starId._id) == null) {
+                    this._insertIntoSortedMapObjectsArray(starsInRange, starId);
                     starsToCheck.splice(starsToCheck.indexOf(starId), 1);
                 }
             }
@@ -351,8 +367,8 @@ export default class StarService extends EventEmitter {
                 });
                 
             for (let wormHoleStar of wormHoleStars) {
-                if (this.getByIdBSForStars(starsInRange, wormHoleStar.destination._id) == null) {
-                    starsInRange.push({
+                if (this.binarySearchStars(starsInRange, wormHoleStar.destination._id) == null) {
+                    this._insertIntoSortedMapObjectsArray(starsInRange, {
                         _id: wormHoleStar.destination._id,
                         location: wormHoleStar.destination.location,
                         ownedByPlayerId: wormHoleStar.destination.ownedByPlayerId
@@ -360,7 +376,6 @@ export default class StarService extends EventEmitter {
                 }
             }
         //}
-
         return starsInRange.map(s => this.getById(game, s._id));
     }
 
