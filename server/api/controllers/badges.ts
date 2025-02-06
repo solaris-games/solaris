@@ -32,16 +32,6 @@ export default (container: DependencyContainer) => {
                 return next(err);
             }
         },
-        purchaseForUser: async (req, res, next) => {
-            try {
-                await container.badgeService.purchaseBadgeForUser(req.session.userId, req.params.userId, req.body.badgeKey);
-                
-                res.sendStatus(200);
-                return next();
-            } catch (err) {
-                return next(err);
-            }
-        },
         purchaseForPlayer: async (req, res, next) => {
             try {
                 await container.badgeService.purchaseBadgeForPlayer(req.game, req.session.userId, req.params.playerId, req.body.badgeKey);

@@ -3,7 +3,7 @@ import ValidationError from '../errors/validation';
 import Repository from './repository';
 import { Badge, UserBadge } from './types/Badge';
 import { Game } from './types/Game';
-import { User } from './types/User';
+import {AwardedBadge, User} from './types/User';
 import PlayerService from './player';
 import UserService from './user';
 import GamePlayerBadgePurchasedEvent from './types/events/GamePlayerBadgePurchased';
@@ -88,7 +88,20 @@ export default class BadgeService extends EventEmitter {
          */
     }
 
-    async purchaseBadgeForUser(purchasedByUserId: DBObjectId, purchasedForUserId: DBObjectId, badgeKey: string) {
+    async purchaseBadgeForPlayer(game: Game, purchasedByUserId: DBObjectId, purchasedForPlayerId: DBObjectId, badgeKey: string) {
+        let buyer = this.playerService.getByUserId(game, purchasedByUserId)!;
+        let recipient = this.playerService.getById(game, purchasedForPlayerId);
+
+        if (!recipient) {
+            throw new ValidationError(`Could not find the player in this game.`);
+        }
+
+        if (!recipient.userId) {
+            throw new ValidationError(`The player slot has not been filled by a user.`);
+        }
+
+        const purchasedForUserId = recipient.userId;
+
         if (purchasedByUserId.toString() === purchasedForUserId.toString()) {
             throw new ValidationError(`Cannot purchased a badge for yourself.`);
         }
@@ -99,9 +112,9 @@ export default class BadgeService extends EventEmitter {
             throw new ValidationError(`Badge ${badgeKey} does not exist.`);
         }
 
-        const recipient = await this.userService.getById(purchasedForUserId, { _id: 1 });
-        
-        if (!recipient) {
+        const recipientUser = await this.userService.getById(purchasedForUserId, {_id: 1});
+
+        if (!recipientUser) {
             throw new ValidationError(`Recipient user ${purchasedForUserId} does not exist.`);
         }
 
@@ -115,32 +128,23 @@ export default class BadgeService extends EventEmitter {
         // TODO: This would be better in a bulk update.
         await this.userService.incrementCredits(purchasedByUserId, -1);
 
-        let updateQuery = {
-            $inc: {}
-        };
-
-        updateQuery.$inc['achievements.badges.' + badgeKey] = 1;
+        const awardedBadge: AwardedBadge = {
+            badge: badgeKey,
+            awardedBy: buyer._id,
+            awardedByName: buyer.alias,
+            awardedInGame: game._id,
+            awardedInGameName: game.settings.general.name,
+            playerAwarded: true,
+            time: new Date()
+        }
 
         await this.userRepo.updateOne({
             _id: purchasedForUserId
-        }, updateQuery);
-
-        return badge;
-    }
-
-    async purchaseBadgeForPlayer(game: Game, purchasedByUserId: DBObjectId, purchasedForPlayerId: DBObjectId, badgeKey: string) {
-        let buyer = this.playerService.getByUserId(game, purchasedByUserId)!;
-        let recipient = this.playerService.getById(game, purchasedForPlayerId);
-
-        if (!recipient) {
-            throw new ValidationError(`Could not find the player in this game.`);
-        }
-
-        if (!recipient.userId) {
-            throw new ValidationError(`The player slot has not been filled by a user.`);
-        }
-
-        const badge = await this.purchaseBadgeForUser(purchasedByUserId, recipient.userId, badgeKey);
+        }, {
+            $push: {
+                'achievements.badges': awardedBadge,
+            }
+        });
 
         let e: GamePlayerBadgePurchasedEvent = {
             gameId: game._id,
@@ -156,21 +160,31 @@ export default class BadgeService extends EventEmitter {
         this.emit(BadgeServiceEvents.onGamePlayerBadgePurchased, e);
     }
 
-    awardBadgeForUser(user: User, badgeKey: string): void {
+    awardBadgeForUser(user: User, badgeKey: string, game: Game): void {
         const badge = this.listBadges().find(b => b.key === badgeKey);
 
         if (!badge) {
             throw new ValidationError(`Badge ${badgeKey} does not exist.`);
         }
 
-        user.achievements.badges[badgeKey]++;
+        const awardedBadge: AwardedBadge = {
+            badge: badgeKey,
+            awardedBy: null,
+            awardedByName: null,
+            awardedInGame: game._id,
+            awardedInGameName: game.settings.general.name,
+            playerAwarded: false,
+            time: new Date()
+        }
+
+        user.achievements.badges.push(awardedBadge);
     }
 
-    awardBadgeForUserVictor32PlayerGame(user: User): void {
-        this.awardBadgeForUser(user, 'victor32');
+    awardBadgeForUserVictor32PlayerGame(user: User, game: Game): void {
+        this.awardBadgeForUser(user, 'victor32', game);
     }
 
     awardBadgeForUserVictorySpecialGame(user: User, game: Game): void {
-        this.awardBadgeForUser(user, game.settings.general.type);
+        this.awardBadgeForUser(user, game.settings.general.type, game);
     }
 };
