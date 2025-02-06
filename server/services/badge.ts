@@ -1,7 +1,7 @@
 import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
 import Repository from './repository';
-import { Badge, UserBadge } from './types/Badge';
+import { Badge } from './types/Badge';
 import { Game } from './types/Game';
 import {AwardedBadge, User} from './types/User';
 import PlayerService from './player';
@@ -38,37 +38,20 @@ export default class BadgeService extends EventEmitter {
         return this.listBadges().filter(b => b.price);
     }
 
-    async listBadgesByUser(userId: DBObjectId): Promise<UserBadge[]> {
-        return [];
-
-        /*
-        const badges = this.listBadges();
-
+    async listBadgesByUser(userId: DBObjectId): Promise<AwardedBadge[]> {
         const user = await this.userService.getById(userId, {
             'achievements.badges': 1
         });
 
-        if (!user) {
+        if (!user?.achievements?.badges) {
             return [];
         }
 
-        const userBadges: UserBadge[] = [];
-
-        for (let badge of badges) {
-            userBadges.push({
-                ...badge,
-                awarded: user.achievements.badges[badge.key] || 0
-            });
-        }
-
-        return userBadges.filter(b => b.awarded);*/
+        return user.achievements.badges;
     }
 
     async listBadgesByPlayer(game: Game, playerId: DBObjectId) {
-        return [];
-
-        /*
-        let player = this.playerService.getById(game, playerId);
+        const player = this.playerService.getById(game, playerId);
 
         if (!player) {
             throw new ValidationError(`Could not find the player in this game.`);
@@ -84,8 +67,6 @@ export default class BadgeService extends EventEmitter {
         }
 
         return await this.listBadgesByUser(player.userId);
-
-         */
     }
 
     async purchaseBadgeForPlayer(game: Game, purchasedByUserId: DBObjectId, purchasedForPlayerId: DBObjectId, badgeKey: string) {

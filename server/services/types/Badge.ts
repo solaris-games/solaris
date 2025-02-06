@@ -4,7 +4,3 @@ export interface Badge {
     description: string;
     price: number;
 };
-
-export interface UserBadge extends Badge {
-    awarded: number;
-};
