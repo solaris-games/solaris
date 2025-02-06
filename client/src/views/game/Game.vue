@@ -46,6 +46,7 @@ import { inject } from 'vue';
 import { playerClientSocketEmitterInjectionKey } from '../../sockets/socketEmitters/player'
 import PlayerEventBusEventNames from '../../eventBusEventNames/player'
 import GameEventBusEventNames from '../../eventBusEventNames/game'
+import router from '../../router'
 
 export default {
   components: {
@@ -172,6 +173,10 @@ export default {
         }
       } catch (err) {
         console.error(err)
+
+        this.$toast.error('Game failed to load');
+
+        await router.push({ name: 'main-menu' })
       }
     },
     async reloadSettings () {
