@@ -721,6 +721,7 @@ export class Map extends EventEmitter {
 
       c.unselect()
     }
+    this.clearCarrierHighlights();
   }
 
   unselectAllStarsExcept (star) {
@@ -743,6 +744,11 @@ export class Map extends EventEmitter {
           c.unselect()
         }
       })
+      this.clearCarrierHighlights();
+  }
+
+  clearCarrierHighlights() {
+    this.waypoints!.clear();
   }
 
   onTick(deltaTime) {
@@ -914,6 +920,14 @@ export class Map extends EventEmitter {
       this.unselectAllCarriersExcept(selectedCarrier)
 
       selectedCarrier!.toggleSelected()
+
+      //highlight carrier path if selected
+      if (selectedCarrier?.isSelected) {
+        this.waypoints!.draw(selectedCarrier!.data, false);
+      }
+      else {
+        this.waypoints!.clear();
+      }
 
       if (!dic.tryMultiSelect || !this.tryMultiSelect(e.location)) {
         this.emit('onCarrierClicked', e)
