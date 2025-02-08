@@ -11,3 +11,5 @@ export class GetRoute<Resp> extends Route<null, Resp> {};
 export class PatchRoute<Req, Resp> extends Route<Req, Resp> {};
 
 export class PostRoute<Req, Resp> extends Route<Req, Resp> {};
+
+export class DeleteRoute<Req, Resp> extends Route<Req, Resp> {};
