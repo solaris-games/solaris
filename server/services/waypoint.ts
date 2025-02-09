@@ -639,6 +639,60 @@ export default class WaypointService {
             this.performWaypointAction(actionWaypoint.carrier, actionWaypoint.star, actionWaypoint.waypoint);
         }
     }
+    //==========================================================================================================================
+    NewSanitiseAllCarrierWaypointsByScanningRange(game: Game) {
+        const players = this._getPlayersWithOwnedOrInOrbitStars(game);
+        game.galaxy.carriers
+            .filter(c => c.waypoints.length)
+            .forEach(c => {
+                this._checkCarrierRoute(game, c, players.get(c.ownedByPlayerId!.toString())!);
+            });
+    }
+
+    _checkCarrierRoute(game: Game, carrier: Carrier, player: { player: Player, stars: Star[], inRange: string[] }) {
+        let startIndex = this.carrierMovementService.isInTransit(carrier) ? 1 : 0;
+        for (let index = startIndex; index < carrier.waypoints.length; index++) {
+            const waypoint = carrier.waypoints[index];
+            if(waypoint.destination.toString() in player.inRange) continue;
+            const waypointStar = this.starService.getById(game, waypoint.destination);
+            if(this._checkWaypointStarInRange(game, waypointStar, player)){
+                player.inRange.push(waypoint.destination.toString());
+            }else{
+                carrier.waypoints.splice(index);
+
+                if (carrier.waypointsLooped) {
+                    carrier.waypointsLooped = this.canLoop(game, player.player, carrier);
+                }
+
+                break;
+            }
+        }
+    }
+
+    _checkWaypointStarInRange(game: Game, waypoint: Star, player: { player: Player, stars: Star[], inRange: string[] }) {
+        for (let index = 0; index < player.stars.length; index++) {
+            const star = player.stars[index];
+            if(this.starService.getStarsWithinScanningRangeOfStarByStarIds(game, star, [waypoint]).length) return true;
+        }
+        return false;
+    }
+
+    _getPlayersWithOwnedOrInOrbitStars(game: Game) {
+        const results = new Map<string, { player: Player, stars: Star[], inRange: string[] }>();
+        game.galaxy.players
+            .forEach(p => {
+                const starsOwnedOrInOrbit = this.starService.listStarsOwnedOrInOrbitByPlayers(game, [p._id]);
+                const starsWithScanning = starsOwnedOrInOrbit.filter(s => !this.starService.isDeadStar(s));
+                results.set(p._id.toString(), {
+                    player: p,
+                    stars: starsWithScanning,
+                    inRange: starsOwnedOrInOrbit.map(s => s._id.toString())
+                });
+            });
+        return results;
+    }
+
+    //==========================================================================================================================
 
     sanitiseAllCarrierWaypointsByScanningRange(game: Game) {
         const scanningRanges = new Map<string, { player: Player, stars: Star[] }>();
