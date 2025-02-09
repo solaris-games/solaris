@@ -683,6 +683,10 @@ export default class WaypointService {
             .forEach(p => {
                 const starsOwnedOrInOrbit = this.starService.listStarsOwnedOrInOrbitByPlayers(game, [p._id]);
                 const starsWithScanning = starsOwnedOrInOrbit.filter(s => !this.starService.isDeadStar(s));
+                let wormHoleStars = starsOwnedOrInOrbit.filter(s => s.wormHoleToStarId)
+                wormHoleStars.forEach(s => {
+                    starsOwnedOrInOrbit.push(s, this.starService.getById(game, s.wormHoleToStarId!))
+                });
                 results.set(p._id.toString(), {
                     player: p,
                     stars: starsWithScanning,
