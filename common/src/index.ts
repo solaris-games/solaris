@@ -20,3 +20,4 @@ export * from "./sockets/socketEventNames/diplomacy";
 export * from "./sockets/socketHandler";
 export * from "./sockets/socketEmitter";
 export * from "./api/controllers";
+export * from "./api/controllers/admin";
