@@ -1,4 +1,4 @@
-import { type Route, type GetRoute } from "@solaris-common";
+import { type Route, type GetRoute, type PostRoute, type PatchRoute, type DeleteRoute, type PutRoute } from "@solaris-common";
 import { type Axios, type AxiosRequestConfig, isAxiosError } from "axios";
 
 export type ReqOptions = AxiosRequestConfig;
@@ -64,11 +64,73 @@ const mapError = <T>(e: unknown, path: string): ResponseResult<T> => {
   }
 }
 
-export const get = <PathParams extends Object, Resp>(axios: Axios) => async (route: GetRoute<PathParams, Resp>, args: PathParams, options?: ReqOptions): Promise<ResponseResult<Resp>> => {
+export const doGet = <PathParams extends Object, Resp>(axios: Axios) => async (route: GetRoute<PathParams, Resp>, args: PathParams, options?: ReqOptions): Promise<ResponseResult<Resp>> => {
   const path = pathReplacement(route, args);
 
   try {
     const response = await axios.get<Resp>(path, options);
+
+    return {
+      kind: ResponseResultKind.Ok,
+      data: response.data,
+    }
+  } catch (e) {
+    return mapError(e, path);
+  }
+}
+
+
+export const doPost = <PathParams extends Object, Req, Resp>(axios: Axios) => async (route: PostRoute<PathParams, Req, Resp>, args: PathParams, req: Req, options?: ReqOptions): Promise<ResponseResult<Resp>> => {
+  const path = pathReplacement(route, args);
+
+  try {
+    const response = await axios.post<Resp>(path, req, options);
+
+    return {
+      kind: ResponseResultKind.Ok,
+      data: response.data,
+    }
+  } catch (e) {
+    return mapError(e, path);
+  }
+}
+
+export const doPatch = <PathParams extends Object, Req, Resp>(axios: Axios) => async (route: PatchRoute<PathParams, Req, Resp>, args: PathParams, req: Req, options?: ReqOptions): Promise<ResponseResult<Resp>> => {
+  const path = pathReplacement(route, args);
+
+  try {
+    const response = await axios.patch<Resp>(path, req, options);
+
+    return {
+      kind: ResponseResultKind.Ok,
+      data: response.data,
+    }
+  } catch (e) {
+    return mapError(e, path);
+  }
+}
+
+export const doDelete = <PathParams extends Object, Req, Resp>(axios: Axios) => async (route: DeleteRoute<PathParams, Resp>, args: PathParams, req: Req, options?: ReqOptions): Promise<ResponseResult<Resp>> => {
+  const path = pathReplacement(route, args);
+
+  try {
+    const response = await axios.delete<Resp>(path, options);
+
+    return {
+      kind: ResponseResultKind.Ok,
+      data: response.data,
+    }
+  } catch (e) {
+    return mapError(e, path);
+  }
+}
+
+
+export const doPut = <PathParams extends Object, Req, Resp>(axios: Axios) => async (route: PutRoute<PathParams, Req, Resp>, args: PathParams, req: Req, options?: ReqOptions): Promise<ResponseResult<Resp>> => {
+  const path = pathReplacement(route, args);
+
+  try {
+    const response = await axios.put<Resp>(path, req, options);
 
     return {
       kind: ResponseResultKind.Ok,
