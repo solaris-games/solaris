@@ -1,5 +1,6 @@
 import { type Route, type GetRoute, type PostRoute, type PatchRoute, type DeleteRoute, type PutRoute } from "@solaris-common";
 import { type Axios, type AxiosRequestConfig, isAxiosError } from "axios";
+import type { InjectionKey } from "vue";
 
 export type ReqOptions = AxiosRequestConfig;
 
@@ -125,7 +126,6 @@ export const doDelete = <PathParams extends Object, Req, Resp>(axios: Axios) => 
   }
 }
 
-
 export const doPut = <PathParams extends Object, Req, Resp>(axios: Axios) => async (route: PutRoute<PathParams, Req, Resp>, args: PathParams, req: Req, options?: ReqOptions): Promise<ResponseResult<Resp>> => {
   const path = pathReplacement(route, args);
 
@@ -140,3 +140,5 @@ export const doPut = <PathParams extends Object, Req, Resp>(axios: Axios) => asy
     return mapError(e, path);
   }
 }
+
+export const httpInjectionKey: InjectionKey<Axios> = Symbol('httpClient');
