@@ -18,7 +18,7 @@ import { GameClientSocketHandler } from './sockets/socketHandlers/game'
 import { PlayerClientSocketHandler } from "./sockets/socketHandlers/player"
 import { createSolarisStore, type State } from './store'
 import { httpInjectionKey } from "./services/typedapi"
-import axios from "axios"
+import {createHttpClient} from "./util/http";
 
 // Note: This was done to get around an issue where the Steam client
 // had bootstrap as undefined. This also affects the UI template we're using,
@@ -77,7 +77,7 @@ const playerClientSocketEmitter: PlayerClientSocketEmitter = new PlayerClientSoc
 app.provide(playerClientSocketEmitterInjectionKey, playerClientSocketEmitter);
 app.provide(eventBusInjectionKey, eventBus);
 
-const httpClient = axios.create();
+const httpClient = createHttpClient();
 
 app.provide(httpInjectionKey, httpClient);
 
