@@ -37,9 +37,7 @@ import GameApiService from '../../services/api/game'
 import UserApiService from '../../services/api/user'
 import GameHelper from '../../services/gameHelper'
 import AudioService from '../../game/audio'
-import moment from 'moment'
 import gameHelper from '../../services/gameHelper'
-import authService from '../../services/api/auth'
 import ColourOverrideDialog from "./components/player/ColourOverrideDialog.vue";
 import { eventBusInjectionKey } from '../../eventBus'
 import { inject } from 'vue';
