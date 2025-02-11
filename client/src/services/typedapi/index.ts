@@ -81,7 +81,7 @@ export const doGet = (axios: Axios) => async <PathParams extends Object, Resp>(r
 }
 
 
-export const doPost = <PathParams extends Object, Req, Resp>(axios: Axios) => async (route: PostRoute<PathParams, Req, Resp>, args: PathParams, req: Req, options?: ReqOptions): Promise<ResponseResult<Resp>> => {
+export const doPost = (axios: Axios) => async <PathParams extends Object, Req, Resp>(route: PostRoute<PathParams, Req, Resp>, args: PathParams, req: Req, options?: ReqOptions): Promise<ResponseResult<Resp>> => {
   const path = pathReplacement(route, args);
 
   try {
@@ -96,7 +96,7 @@ export const doPost = <PathParams extends Object, Req, Resp>(axios: Axios) => as
   }
 }
 
-export const doPatch = <PathParams extends Object, Req, Resp>(axios: Axios) => async (route: PatchRoute<PathParams, Req, Resp>, args: PathParams, req: Req, options?: ReqOptions): Promise<ResponseResult<Resp>> => {
+export const doPatch = (axios: Axios) => async <PathParams extends Object, Req, Resp>(route: PatchRoute<PathParams, Req, Resp>, args: PathParams, req: Req, options?: ReqOptions): Promise<ResponseResult<Resp>> => {
   const path = pathReplacement(route, args);
 
   try {
@@ -111,7 +111,7 @@ export const doPatch = <PathParams extends Object, Req, Resp>(axios: Axios) => a
   }
 }
 
-export const doDelete = <PathParams extends Object, Req, Resp>(axios: Axios) => async (route: DeleteRoute<PathParams, Resp>, args: PathParams, req: Req, options?: ReqOptions): Promise<ResponseResult<Resp>> => {
+export const doDelete = (axios: Axios) => async <PathParams extends Object, Req, Resp>(route: DeleteRoute<PathParams, Resp>, args: PathParams, req: Req, options?: ReqOptions): Promise<ResponseResult<Resp>> => {
   const path = pathReplacement(route, args);
 
   try {
@@ -126,7 +126,7 @@ export const doDelete = <PathParams extends Object, Req, Resp>(axios: Axios) => 
   }
 }
 
-export const doPut = <PathParams extends Object, Req, Resp>(axios: Axios) => async (route: PutRoute<PathParams, Req, Resp>, args: PathParams, req: Req, options?: ReqOptions): Promise<ResponseResult<Resp>> => {
+export const doPut = (axios: Axios) => async <PathParams extends Object, Req, Resp>(route: PutRoute<PathParams, Req, Resp>, args: PathParams, req: Req, options?: ReqOptions): Promise<ResponseResult<Resp>> => {
   const path = pathReplacement(route, args);
 
   try {
