@@ -40,7 +40,6 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
     );
 
     router.patch('/api/admin/reports/:reportId/action',
-        
             mw.auth.authenticate({ communityManager: true }),
             controller.actionReport
     );
@@ -94,7 +93,6 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
     );
 
     router.patch('/api/admin/user/:userId/resetAchievements',
-        
             mw.auth.authenticate({ admin: true }),
             controller.resetAchievements
     );
