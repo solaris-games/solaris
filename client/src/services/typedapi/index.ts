@@ -65,7 +65,7 @@ const mapError = <T>(e: unknown, path: string): ResponseResult<T> => {
   }
 }
 
-export const doGet = <PathParams extends Object, Resp>(axios: Axios) => async (route: GetRoute<PathParams, Resp>, args: PathParams, options?: ReqOptions): Promise<ResponseResult<Resp>> => {
+export const doGet = (axios: Axios) => async <PathParams extends Object, Resp>(route: GetRoute<PathParams, Resp>, args: PathParams, options?: ReqOptions): Promise<ResponseResult<Resp>> => {
   const path = pathReplacement(route, args);
 
   try {

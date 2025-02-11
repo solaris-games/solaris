@@ -12,6 +12,7 @@ export * from "./api/types/common/conversation";
 export * from "./api/types/common/diplomacy";
 export * from "./api/types/common/ledger";
 export * from "./api/types/common/trade";
+export * from "./api/types/common/announcement";
 export * from "./utilities/cast";
 export * from "./sockets/socketEventNames/socketEventName";
 export * from "./sockets/socketEventNames/player";

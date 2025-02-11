@@ -1,10 +1,10 @@
-import { Announcement } from '../types/common/announcement';
-import { GameSettingsGeneral, GameState } from '../types/common/game';
-import { SettingEnabledDisabled } from '../types/common/settings';
-import { UserRoles, UserWarning } from '../types/common/user';
+import type { Announcement } from '../types/common/announcement';
+import type { GameSettingsGeneral, GameState } from '../types/common/game';
+import type { SettingEnabledDisabled } from '../types/common/settings';
+import type { UserRoles, UserWarning } from '../types/common/user';
 import { GetRoute, PatchRoute, PostRoute, DeleteRoute } from './index';
 
-type GetInsight = {
+export type GetInsight = {
     name: string,
     d1: number,
     d2: number,
@@ -12,7 +12,7 @@ type GetInsight = {
     d14: number,
 }
 
-type RoleSpecificUserInfo =
+export type RoleSpecificUserInfo =
     | { adminRole: 'communityManager' }
     | { 
         adminRole: 'admin',
@@ -24,7 +24,7 @@ type RoleSpecificUserInfo =
         lastSeenIP: string,
     };
 
-type ListUser<ID> = {
+export type ListUser<ID> = {
     _id: ID,
     username: string,
     banned: boolean,
@@ -32,41 +32,41 @@ type ListUser<ID> = {
     warnings: UserWarning[],
 } & RoleSpecificUserInfo;
 
-type ListPasswordReset<ID> = {
+export type ListPasswordReset<ID> = {
     _id: ID,
     username: string,
     email: string,
     resetPasswordToken: string,
 };
 
-type AddWarningReq = {
+export type AddWarningReq = {
     text: string,
 }
 
-type SetRoleReq = {
+export type SetRoleReq = {
     enabled: boolean,
 }
 
-type SetCreditsReq = {
+export type SetCreditsReq = {
     credits: number,
 }
 
-type ListGame<ID> = {
+export type ListGame<ID> = {
     settings: {
         general: GameSettingsGeneral<ID>,
     },
     state: GameState<ID>,
 };
 
-type SetFeaturedReq = {
+export type SetFeaturedReq = {
     featured: boolean,
 };
 
-type SetTimeMachineReq = {
+export type SetTimeMachineReq = {
     timeMachine: SettingEnabledDisabled,
 };
 
-type CreateAnnouncementReq = {
+export type CreateAnnouncementReq = {
     title: string,
     content: string,
     date: Date,
