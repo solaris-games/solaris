@@ -157,6 +157,8 @@ export class Map extends EventEmitter {
     this.userSettings = userSettings
     this.game = game
 
+    this.app.ticker.maxFPS = userSettings.technical.fpsLimit || 60;
+
     this.pathManager = new PathManager( game, userSettings, this )
 
 
@@ -432,7 +434,9 @@ export class Map extends EventEmitter {
     }
   }
 
-  reloadGame (game, userSettings) {
+  reloadGame (game: Game, userSettings: UserGameSettings) {
+    this.app.ticker.maxFPS = userSettings.technical.fpsLimit;
+
     this.game = game
 
     this.pathManager!.setup(game, userSettings)

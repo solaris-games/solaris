@@ -78,5 +78,6 @@ export type UserGameSettings = {
     },
     technical: {
         performanceMonitor: SettingEnabledDisabled;
+        fpsLimit: number;
     }
 };
