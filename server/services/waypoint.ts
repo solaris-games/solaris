@@ -643,7 +643,7 @@ export default class WaypointService {
     sanitiseAllCarrierWaypointsByScanningRange(game: Game) {
         const players = this._getPlayersWithOwnedOrInOrbitStars(game);
         game.galaxy.carriers
-            .filter(c => c.waypoints.length)
+            .filter(c => c.waypoints.length && c.ownedByPlayerId)
             .forEach(c => {
                 this._checkCarrierRoute(game, c, players.get(c.ownedByPlayerId!.toString())!);
             });
