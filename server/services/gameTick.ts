@@ -301,10 +301,8 @@ export default class GameTickService extends EventEmitter {
         }
 
         // TODO: This has been moved out of _moveCarriers, see comment in there.
-        // this._sanitiseDarkModeCarrierWaypoints(game);
-        // logTime('Sanitise dark mode carrier waypoints');
-        this._sanitiseDarkModeCarrierWaypointsNEW(game);
-        logTime('NEW Sanitise dark mode carrier waypoints');
+        this._sanitiseDarkModeCarrierWaypoints(game);
+        logTime('Sanitise dark mode carrier waypoints');
 
         this.playerReadyService.resetReadyStatuses(game, hasProductionTicked);
 
@@ -703,12 +701,6 @@ export default class GameTickService extends EventEmitter {
     _sanitiseDarkModeCarrierWaypoints(game: Game) {
         if (this.gameTypeService.isDarkMode(game)) {
             this.waypointService.sanitiseAllCarrierWaypointsByScanningRange(game);
-        }
-    }
-
-    _sanitiseDarkModeCarrierWaypointsNEW(game: Game) {
-        if (this.gameTypeService.isDarkMode(game)) {
-            this.waypointService.NewSanitiseAllCarrierWaypointsByScanningRange(game);
         }
     }
 

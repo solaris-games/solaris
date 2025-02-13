@@ -639,8 +639,8 @@ export default class WaypointService {
             this.performWaypointAction(actionWaypoint.carrier, actionWaypoint.star, actionWaypoint.waypoint);
         }
     }
-    //==========================================================================================================================
-    NewSanitiseAllCarrierWaypointsByScanningRange(game: Game) {
+
+    sanitiseAllCarrierWaypointsByScanningRange(game: Game) {
         const players = this._getPlayersWithOwnedOrInOrbitStars(game);
         game.galaxy.carriers
             .filter(c => c.waypoints.length)
@@ -695,61 +695,4 @@ export default class WaypointService {
             });
         return results;
     }
-
-    //==========================================================================================================================
-
-    sanitiseAllCarrierWaypointsByScanningRange(game: Game) {
-        const scanningRanges = new Map<string, { player: Player, stars: Star[] }>();
-
-        game.galaxy.players
-            .forEach(p => {
-                scanningRanges.set(p._id.toString(), {
-                    player: p,
-                    stars: this.starService.filterStarsByScanningRange(game, [p]).sort((a, b) => a._id.toString() < b._id.toString() ? -1 : 1)
-                });
-            });
-        
-        game.galaxy.carriers
-            .filter(c => c.waypoints.length)
-            .map(c => {
-                let scanningRangePlayer = scanningRanges.get(c.ownedByPlayerId!.toString())!;
-
-                return {
-                    carrier: c,
-                    owner: scanningRangePlayer.player,
-                    ownerScannedStars: scanningRangePlayer.stars
-                }
-            })
-            .forEach(x => this.sanitiseCarrierWaypointsByScanningRange(game, x.carrier, x.owner, x.ownerScannedStars));
-    }
-
-    sanitiseCarrierWaypointsByScanningRange(game: Game, carrier: Carrier, owner: Player, ownerScannedStars: Star[]) {
-        // Verify that waypoints are still valid.
-        // For example, if a star is captured then it may no longer be in scanning range
-        // so any waypoints to it should be removed unless already in transit.
-
-        if (!carrier.waypoints.length) {
-            return;
-        }
-
-        let startIndex = this.carrierMovementService.isInTransit(carrier) ? 1 : 0;
-
-        for (let i = startIndex; i < carrier.waypoints.length; i++) {
-            let waypoint = carrier.waypoints[i];
-
-            // If the destination is not within scanning range of the player, remove it and all subsequent waypoints.
-            let inRange = this.starService.binarySearchStars(ownerScannedStars, waypoint.destination) != null
-
-            if (!inRange) {
-                carrier.waypoints.splice(i);
-
-                if (carrier.waypointsLooped) {
-                    carrier.waypointsLooped = this.canLoop(game, owner, carrier);
-                }
-
-                break;
-            }
-        }
-    }
-
 };
