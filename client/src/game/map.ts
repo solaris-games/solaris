@@ -484,7 +484,7 @@ export class Map extends EventEmitter {
       let existing = this.carriers.find(x => x.data!._id === carrierData._id)
 
       if (existing) {
-        let player = gameHelper.getPlayerById(game, carrierData.ownedByPlayerId)
+        let player = gameHelper.getPlayerById(game, carrierData.ownedByPlayerId!)
 
         existing.setup(carrierData, userSettings, this.context, this.stars, player, game.constants.distances.lightYear)
       } else {
