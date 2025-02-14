@@ -36,14 +36,15 @@ class Waypoints extends EventEmitter {
     this.container.removeChildren()
   }
 
-  draw (carrier) {
+  draw (carrier, plotting=true) {
     this.clear()
 
     this.carrier = carrier
-
-    this.drawHyperspaceRange()
-    this.drawLastWaypoint()
-    this.drawNextWaypoints()
+    if (plotting) {
+      this.drawHyperspaceRange()
+      this.drawLastWaypoint()
+      this.drawNextWaypoints()
+    }
     this.drawPaths()
   }
 
