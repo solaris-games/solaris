@@ -382,7 +382,7 @@ export default class LeaderboardService {
             }
             
             // Apply any additional rank multiplier at the end. Rank losses are not as steep as rank gains.
-            const rankRewardMultiplier = rankIncrease < 0 ? Math.max(1, game.constants.player.rankRewardMultiplier) : game.constants.player.rankRewardMultiplier;
+            const rankRewardMultiplier = rankIncrease < 0 ? Math.min(1, game.constants.player.rankRewardMultiplier) : game.constants.player.rankRewardMultiplier;
 
             rankIncrease *= rankRewardMultiplier;
 
