@@ -18,9 +18,9 @@ export const convertDates = (obj: unknown) => {
 };
 
 export const createHttpClient = () => {
-  axios.create();
+  const client = axios.create();
 
-  axios.interceptors.response.use((response) => {
+  client.interceptors.response.use((response) => {
     if (response.data) {
       response.data = convertDates(response.data);
     }
@@ -29,5 +29,5 @@ export const createHttpClient = () => {
     return Promise.reject(error);
   });
 
-  return axios
+  return client
 }
