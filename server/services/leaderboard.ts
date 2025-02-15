@@ -381,8 +381,10 @@ export default class LeaderboardService {
                 rankIncrease *= 2;
             }
             
-            // Apply any additional rank multiplier at the end.
-            rankIncrease *= game.constants.player.rankRewardMultiplier;
+            // Apply any additional rank multiplier at the end. Rank losses are not as steep as rank gains.
+            const rankRewardMultiplier = rankIncrease < 0 ? Math.max(1, game.constants.player.rankRewardMultiplier) : game.constants.player.rankRewardMultiplier;
+
+            rankIncrease *= rankRewardMultiplier;
 
             let currentRank = user.achievements.rank;
             let newRank = Math.max(user.achievements.rank + rankIncrease, 0); // Cannot go less than 0.

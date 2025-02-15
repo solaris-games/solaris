@@ -45,6 +45,31 @@ const game = {
     }
 };
 
+const fakeStarList = [
+    { _id: 'aabbcc'},
+    { _id: 'bbccdd'},
+    { _id: 'ccddee'},
+]
+
+
+
+let fakeMapObjects = [
+    {
+        _id: 'aabbcc',
+        location: {
+            x: 0,
+            y: 0
+        }
+    },
+    {
+        _id: 'bbccdd',
+        location: {
+            x: 0,
+            y: 0
+        }
+    }
+]
+
 describe('star', () => {
 
     let starService;
@@ -142,5 +167,34 @@ describe('star', () => {
         expect(homeStar.infrastructure.industry).toEqual(gameSettings.player.startingInfrastructure.industry);
         expect(homeStar.infrastructure.science).toEqual(gameSettings.player.startingInfrastructure.science);
     });
+
+    it('should find the index of a star in a sorted array', () => {
+        expect(starService._binarySearchIndex(fakeStarList, 'aabbcc')).toEqual(0);
+        expect(starService._binarySearchIndex(fakeStarList, 'bbccdd')).toEqual(1);
+        expect(starService._binarySearchIndex(fakeStarList, 'ccddee')).toEqual(2);
+        expect(starService._binarySearchIndex(fakeStarList, 'dddeee')).toEqual(3);
+    });
+
+    it('should find the index where a star should be in but not in the array', () => {
+        expect(starService._binarySearchIndex(fakeStarList, 'eeeeee')).toEqual(3);
+        expect(starService._binarySearchIndex(fakeStarList, 'abcs')).toEqual(1);
+    });
     
+    it('should find the star in a array', () => {
+        expect(starService.binarySearchStars(fakeStarList, 'aabbcc')).toEqual(fakeStarList[0]);
+        expect(starService.binarySearchStars(fakeStarList, 'ccddee')).toEqual(fakeStarList[2]);
+        expect(starService.binarySearchStars(fakeStarList, 'eeeeee')).toEqual(undefined);
+    })
+
+    it('should insert new map object into a sorted array', () => {
+        const mapObject = {
+            _id: 'abcd',
+            location: {
+                x: 0,
+                y: 0
+            }
+        };
+        starService._insertIntoSortedMapObjectsArray(fakeMapObjects, mapObject);
+        expect(starService._binarySearchIndex(fakeMapObjects, 'abcd')).toEqual(1);
+    });
 });
