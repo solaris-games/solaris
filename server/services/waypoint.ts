@@ -641,52 +641,27 @@ export default class WaypointService {
     }
 
     sanitiseAllCarrierWaypointsByScanningRange(game: Game) {
-        const scanningRanges = new Map<string, { player: Player, stars: Star[] }>();
-
-        game.galaxy.players
-            .forEach(p => {
-                scanningRanges.set(p._id.toString(), {
-                    player: p,
-                    stars: this.starService.filterStarsByScanningRange(game, [p]).sort((a, b) => a._id.toString() < b._id.toString() ? -1 : 1)
-                });
-            });
-        
+        const players = this._getPlayersWithOwnedOrInOrbitStars(game);
         game.galaxy.carriers
-            .filter(c => c.waypoints.length)
-            .map(c => {
-                let scanningRangePlayer = scanningRanges.get(c.ownedByPlayerId!.toString())!;
-
-                return {
-                    carrier: c,
-                    owner: scanningRangePlayer.player,
-                    ownerScannedStars: scanningRangePlayer.stars
-                }
-            })
-            .forEach(x => this.sanitiseCarrierWaypointsByScanningRange(game, x.carrier, x.owner, x.ownerScannedStars));
+            .filter(c => c.waypoints.length && c.ownedByPlayerId)
+            .forEach(c => {
+                this._checkCarrierRoute(game, c, players.get(c.ownedByPlayerId!.toString())!);
+            });
     }
 
-    sanitiseCarrierWaypointsByScanningRange(game: Game, carrier: Carrier, owner: Player, ownerScannedStars: Star[]) {
-        // Verify that waypoints are still valid.
-        // For example, if a star is captured then it may no longer be in scanning range
-        // so any waypoints to it should be removed unless already in transit.
-
-        if (!carrier.waypoints.length) {
-            return;
-        }
-
+    _checkCarrierRoute(game: Game, carrier: Carrier, player: { player: Player, stars: Star[], inRange: string[] }) {
         let startIndex = this.carrierMovementService.isInTransit(carrier) ? 1 : 0;
-
-        for (let i = startIndex; i < carrier.waypoints.length; i++) {
-            let waypoint = carrier.waypoints[i];
-
-            // If the destination is not within scanning range of the player, remove it and all subsequent waypoints.
-            let inRange = this.starService.binarySearchStars(ownerScannedStars, waypoint.destination) != null
-
-            if (!inRange) {
-                carrier.waypoints.splice(i);
+        for (let index = startIndex; index < carrier.waypoints.length; index++) {
+            const waypoint = carrier.waypoints[index];
+            if(waypoint.destination.toString() in player.inRange) continue;
+            const waypointStar = this.starService.getById(game, waypoint.destination);
+            if(this._checkWaypointStarInRange(game, waypointStar, player)){
+                player.inRange.push(waypoint.destination.toString());
+            }else{
+                carrier.waypoints.splice(index);
 
                 if (carrier.waypointsLooped) {
-                    carrier.waypointsLooped = this.canLoop(game, owner, carrier);
+                    carrier.waypointsLooped = this.canLoop(game, player.player, carrier);
                 }
 
                 break;
@@ -694,4 +669,30 @@ export default class WaypointService {
         }
     }
 
+    _checkWaypointStarInRange(game: Game, waypoint: Star, player: { player: Player, stars: Star[], inRange: string[] }) {
+        for (let index = 0; index < player.stars.length; index++) {
+            const star = player.stars[index];
+            if(this.starService.getStarsWithinScanningRangeOfStarByStarIds(game, star, [waypoint]).length) return true;
+        }
+        return false;
+    }
+
+    _getPlayersWithOwnedOrInOrbitStars(game: Game) {
+        const results = new Map<string, { player: Player, stars: Star[], inRange: string[] }>();
+        game.galaxy.players
+            .forEach(p => {
+                const starsOwnedOrInOrbit = this.starService.listStarsOwnedOrInOrbitByPlayers(game, [p._id]);
+                const starsWithScanning = starsOwnedOrInOrbit.filter(s => !this.starService.isDeadStar(s));
+                let wormHoleStars = starsOwnedOrInOrbit.filter(s => s.wormHoleToStarId)
+                wormHoleStars.forEach(s => {
+                    starsOwnedOrInOrbit.push(s, this.starService.getById(game, s.wormHoleToStarId!))
+                });
+                results.set(p._id.toString(), {
+                    player: p,
+                    stars: starsWithScanning,
+                    inRange: starsOwnedOrInOrbit.map(s => s._id.toString())
+                });
+            });
+        return results;
+    }
 };

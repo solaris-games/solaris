@@ -464,6 +464,13 @@
       </div>
     </div>
 
+    <div class="row pt-1 pb-1">
+      <label for="fpsLimit" class="col-12 col-sm-6 col-form-label">FPS Limit</label>
+      <div class="col-12 col-sm-6">
+        <input class="form-control" min="0" max="240" type="number" id="fpsLimit" v-model="settings.technical.fpsLimit" :disabled="isSavingSettings">
+      </div>
+    </div>
+
     <form-error-list v-bind:errors="errors"/>
 
     <div class="row mt-2">

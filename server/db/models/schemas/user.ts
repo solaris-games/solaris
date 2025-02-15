@@ -215,6 +215,7 @@ const schema = new Schema({
                 enum: ['enabled', 'disabled'],
                 default: 'disabled'
             },
+            fpsLimit: { type: Types.Number, required: false, default: 60, min: 0, max: 240 },
         }
     },
     avatars: [{type: Types.Number, required: false}],

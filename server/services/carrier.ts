@@ -14,6 +14,8 @@ import StarService from './star';
 import TechnologyService from './technology';
 const EventEmitter = require('events');
 
+const CARRIER_LIMIT_MIN = 50;
+
 export default class CarrierService extends EventEmitter {
     gameRepo: Repository<Game>;
     distanceService: DistanceService;
@@ -68,6 +70,12 @@ export default class CarrierService extends EventEmitter {
 
     getCarriersAtStar(game: Game, starId: DBObjectId) {
       return game.galaxy.carriers.filter(carrier => carrier.orbiting && carrier.orbiting.toString() === starId.toString())
+    }
+
+    getCarrierLimit(game: Game, player: Player) {
+        const starCount = game.galaxy.stars.filter((star) => star.ownedByPlayerId && star.ownedByPlayerId.toString() === player._id.toString()).length;
+
+        return Math.max(CARRIER_LIMIT_MIN, starCount * 10);
     }
 
     createAtStar(star: Star, carriers: Carrier[], ships: number = 1): Carrier {
