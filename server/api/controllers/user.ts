@@ -115,7 +115,17 @@ export default (container: DependencyContainer) => {
         detailMe: async (req, res, next) => {
             try {
                 let user = await container.userService.getMe(req.session.userId);
-    
+
+                if (!user) {
+                    res.sendStatus(404);
+                    return next();
+                }
+
+                req.session.userId = user._id;
+                req.session.username = user.username;
+                req.session.roles = user.roles;
+                req.session.userCredits = user.credits;
+
                 res.status(200).json(user);
                 return next();
             } catch (err) {
