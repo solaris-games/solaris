@@ -1,26 +1,30 @@
 <template>
-    <div class="badge-container" @click="onOpenPurchasePlayerBadgeRequested">
-        <img :src="badgeSrc" :title="badge.name" :alt="badge.name"/>
-        <span class="badge-label" :title="badge.name">{{badge.awarded}}</span>
+    <div v-if="badgeName" class="badge-container" @click="onOpenPurchasePlayerBadgeRequested">
+        <img :src="badgeSrc" :title="badge.badge" :alt="badgeName"/>
+        <span class="badge-label" :title="badgeName">{{badgeName}}</span>
     </div>
 </template>
 
-<script>
-export default {
-  props: {
-    badge: Object
-  },
-  methods: {
-    onOpenPurchasePlayerBadgeRequested () {
-        this.$emit('onOpenPurchasePlayerBadgeRequested')
-    }
-  },
-  computed: {
-    badgeSrc () {
-      return new URL(`../../../../assets/badges/${this.badge.key}.png`, import.meta.url);
-    }
-  }
+<script setup lang="ts">
+import { computed } from 'vue';
+import type {AwardedBadge, Badge} from "@solaris-common";
+
+const props = defineProps<{
+  badge: AwardedBadge<string>,
+  allBadges: Badge[],
+}>();
+
+const emit = defineEmits<{
+  onOpenPurchasePlayerBadgeRequested: []
+}>();
+
+const onOpenPurchasePlayerBadgeRequested = () => {
+  emit('onOpenPurchasePlayerBadgeRequested');
 }
+
+const badgeName = computed(() => props.allBadges.find(b => b.key === props.badge.badge)?.name);
+
+const badgeSrc = computed(() => new URL(`../../../../assets/badges/${props.badge.badge}.png`, import.meta.url).href)
 </script>
 
 <style scoped>

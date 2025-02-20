@@ -31,10 +31,12 @@ export type ResponseResult<T> = ResponseResultOk<T> | ResponseResultRequestError
 
 export const isError = <T>(result: ResponseResult<T>) => result.kind !== ResponseResultKind.Ok;
 
-const PATH_VARIABLE_PATTERN = /:(.\w+)/;
+const PATH_VARIABLE_PATTERN = /:(.\w+)/g;
+
+const BASE_URL = import.meta.env.VUE_APP_API_HOST;
 
 const pathReplacement = <PP extends Object, T1, T2>(route: Route<PP, T1, T2>, params: PP) => {
-  return route.path.replaceAll(PATH_VARIABLE_PATTERN, (_match, g1) => {
+  const relPath = route.path.replaceAll(PATH_VARIABLE_PATTERN, (_match, g1) => {
     const param = params[g1];
 
     if (param === undefined) {
@@ -43,6 +45,8 @@ const pathReplacement = <PP extends Object, T1, T2>(route: Route<PP, T1, T2>, pa
 
     return param;
   });
+
+  return BASE_URL + relPath;
 }
 
 const mapError = <T>(e: unknown, path: string): ResponseResult<T> => {

@@ -1,4 +1,5 @@
 import { createStore } from 'vuex';
+import { type Axios } from 'axios';
 import { type EventBus } from './eventBus';
 import MenuEventBusEventNames from './eventBusEventNames/menu';
 import GameContainer from './game/container.js';
@@ -10,6 +11,9 @@ import SpecialistService from './services/api/specialist.js';
 import GameHelper from './services/gameHelper.js';
 import type { Game, Player, Star } from "./types/game";
 import type { Store } from 'vuex/types/index.js';
+import type {Badge} from "@solaris-common";
+import {getBadges} from "./services/typedapi/badge";
+import {isError} from "./services/typedapi";
 
 export type MentionCallbacks = {
   player: (p: Player) => void;
@@ -43,9 +47,10 @@ export type State = {
   userIsEstablishedPlayer: boolean | null;
   productionTick: number | null;
   unreadMessages: number | null;
+  badges: Badge[];
 }
 
-export function createSolarisStore(eventBus: EventBus): Store<State> {
+export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store<State> {
   return createStore<State>({
   state: {
     userId: null,
@@ -74,6 +79,7 @@ export function createSolarisStore(eventBus: EventBus): Store<State> {
     userIsEstablishedPlayer: null,
     productionTick: null,
     unreadMessages: null,
+    badges: [],
   },
   mutations: {
     // Menu
@@ -528,6 +534,9 @@ export function createSolarisStore(eventBus: EventBus): Store<State> {
     },
     setColoursConfig (state: State, data) {
       state.coloursConfig = data;
+    },
+    setBadges(state: State, badges: Badge[]) {
+      state.badges = badges;
     }
   },
   actions: {
@@ -604,6 +613,17 @@ export function createSolarisStore(eventBus: EventBus): Store<State> {
       } catch (err) {
         console.error(err);
         return false;
+      }
+    },
+    async getBadges({ commit, state }) {
+      if (state.badges?.length) {
+        return state.badges;
+      }
+
+      const response = await getBadges(httpClient)();
+      if (!isError(response)) {
+        commit('setBadges', response.data);
+        return response.data;
       }
     }
   },
