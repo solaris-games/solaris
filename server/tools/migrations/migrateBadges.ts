@@ -106,5 +106,5 @@ export const migrateBadges = async (ctx: JobParameters) => {
         log.info(`Page ${page}/${totalPages}`);
 
         page++;
-    } while (totalPages)
+    } while (page <= totalPages)
 }
