@@ -63,7 +63,8 @@ const migrateBadgesForUser = (log: Logger, user: User) => {
     const badgesO = user.achievements.badges;
 
     if (typeof badgesO !== 'object') {
-        log.error(`User ${user._id} has invalid badges: ${badgesO}`);
+        log.error(`User ${user._id} has invalid badges: ${badgesO}. Migration already applied?`);
+        return null;
     }
 
     const badges = badgesO as unknown as LegacyBadges; // this is fine because the model has changed
@@ -100,6 +101,8 @@ export const migrateBadges = async (ctx: JobParameters) => {
         }, { _id: 1 }, pageSize, page * pageSize);
 
         const writes = users.map((user) => migrateBadgesForUser(log, user)).filter(Boolean);
+
+        console.log(JSON.stringify(writes));
 
         await userRepository.bulkWrite(writes);
 
