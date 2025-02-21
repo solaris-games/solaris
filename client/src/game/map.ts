@@ -58,7 +58,6 @@ export class Map extends EventEmitter {
   orbitalContainer: PIXI.Container | undefined;
   wormHoleContainer: PIXI.Container | undefined;
   starContainer: PIXI.Container | undefined;
-  carrierContainer: PIXI.Container | undefined;
   waypointContainer: PIXI.Container | undefined;
   rulerPointContainer: PIXI.Container | undefined;
   highlightLocationsContainer: PIXI.Container | undefined;
@@ -124,8 +123,6 @@ export class Map extends EventEmitter {
     this.wormHoleContainer.zIndex = 5;
     this.starContainer = new PIXI.Container()
     this.starContainer.zIndex = 3;
-    this.carrierContainer = new PIXI.Container()
-    this.carrierContainer.zIndex = 5;
     this.waypointContainer = new PIXI.Container()
     this.waypointContainer.zIndex = 8;
     this.waypointContainer.eventMode = 'none';
@@ -145,7 +142,6 @@ export class Map extends EventEmitter {
     this.container.addChild(this.chunksContainer)
     this.container.addChild(this.orbitalContainer)
     this.container.addChild(this.starContainer)
-    this.container.addChild(this.carrierContainer)
     this.container.addChild(this.highlightLocationsContainer)
     this.container.addChild(this.playerNamesContainer)
     this.container.addChild(this.tooltipContainer)
@@ -287,8 +283,6 @@ export class Map extends EventEmitter {
     if (!carrier) {
       carrier = new Carrier( this.pathManager! )
       this.carriers.push(carrier)
-
-      this.carrierContainer!.addChild(carrier.fixedContainer)
 
       carrier.on('onCarrierClicked', this.onCarrierClicked.bind(this))
       carrier.on('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
@@ -598,7 +592,6 @@ export class Map extends EventEmitter {
     carrier.cleanupEventHandlers()
     carrier.clearPaths()
 
-    this.carrierContainer!.removeChild(carrier.fixedContainer)
 
     this.removeMapObjectFromChunks(carrier, this.chunks)
 

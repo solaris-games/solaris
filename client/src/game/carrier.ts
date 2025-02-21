@@ -12,7 +12,6 @@ export class Carrier extends EventEmitter {
   static zoomLevel = 140
 
   container: Container;
-  fixedContainer: Container;
   graphics_colour: Sprite | null;
   graphics_selected: Graphics;
   graphics_ship: Sprite;
@@ -39,7 +38,6 @@ export class Carrier extends EventEmitter {
   constructor ( pathManager: PathManager ) {
     super()
 
-    this.fixedContainer = new Container() // this container isnt affected by culling or user setting scalling
     this.container = new Container()
     this.container.zIndex = 1
     this.container.eventMode = 'static'
@@ -400,7 +398,6 @@ export class Carrier extends EventEmitter {
 
   destroy () {
     this.container.destroy()
-    this.fixedContainer.destroy()
   }
 
   select () {
