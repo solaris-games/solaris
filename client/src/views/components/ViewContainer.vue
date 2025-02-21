@@ -28,8 +28,6 @@
                 <router-link :to="{ name: 'galactic-credits-shop'}" class="text-success"><i class="fas fa-shopping-basket me-1"></i>Shop</router-link>
                 |
                 <a href="https://www.redbubble.com/shop/ap/82527983" target="_blank" class="text-info"><i class="fas fa-tshirt me-1"></i>Swag</a>
-                |
-                <a href="https://www.buymeacoffee.com/limitingfactor" target="_blank" class="text-warning"><i class="fas fa-coffee me-1"></i>Donate</a>
             </div>
           </div>
         </footer>
