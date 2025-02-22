@@ -186,6 +186,15 @@ export default class StarUpgradeService extends EventEmitter {
             throw new ValidationError(`The star does not have enough ships garrisoned (${ships}) to build the carrier.`);
         }
 
+        // check if player has allowed carrier count
+
+        const carrierCount = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id).length;
+        const carrierLimit = this.carrierService.getCarrierLimit(game, player);
+
+        if (!player.defeated && carrierCount + 1 > carrierLimit) {
+            throw new ValidationError(`The player has reached the carrier limit: ${carrierLimit}.`);
+        }
+
         // Create a carrier at the star.
         let carrier = this.carrierService.createAtStar(star, game.galaxy.carriers, ships);
 

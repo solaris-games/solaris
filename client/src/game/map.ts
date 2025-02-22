@@ -132,6 +132,8 @@ export class Map extends EventEmitter {
     this.userSettings = userSettings
     this.game = game
 
+    this.app.ticker.maxFPS = userSettings.technical.fpsLimit || 60;
+
     this.pathManager = new PathManager( game, userSettings, this )
 
 
@@ -329,7 +331,9 @@ export class Map extends EventEmitter {
       || this.game!.galaxy.stars.find(s => s.wormHoleToStarId)
   }
 
-  reloadGame (game, userSettings) {
+  reloadGame (game: Game, userSettings: UserGameSettings) {
+    this.app.ticker.maxFPS = userSettings.technical.fpsLimit;
+
     this.game = game
 
     this.pathManager!.setup(game, userSettings)
@@ -377,7 +381,7 @@ export class Map extends EventEmitter {
       let existing = this.carriers.find(x => x.data!._id === carrierData._id)
 
       if (existing) {
-        let player = gameHelper.getPlayerById(game, carrierData.ownedByPlayerId)
+        let player = gameHelper.getPlayerById(game, carrierData.ownedByPlayerId!)
 
         existing.setup(carrierData, userSettings, this.context, this.stars, player, game.constants.distances.lightYear)
       } else {
@@ -617,6 +621,7 @@ export class Map extends EventEmitter {
 
       c.unselect()
     }
+    this.clearCarrierHighlights();
   }
 
   unselectAllStarsExcept (star) {
@@ -639,6 +644,11 @@ export class Map extends EventEmitter {
           c.unselect()
         }
       })
+      this.clearCarrierHighlights();
+  }
+
+  clearCarrierHighlights() {
+    this.waypoints!.clear();
   }
 
   onTick(deltaTime) {
@@ -776,6 +786,14 @@ export class Map extends EventEmitter {
       this.unselectAllCarriersExcept(selectedCarrier)
 
       selectedCarrier!.toggleSelected()
+
+      //highlight carrier path if selected
+      if (selectedCarrier?.isSelected) {
+        this.waypoints!.draw(selectedCarrier!.data, false);
+      }
+      else {
+        this.waypoints!.clear();
+      }
 
       if (!dic.tryMultiSelect || !this.tryMultiSelect(e.location)) {
         this.emit('onCarrierClicked', e)
