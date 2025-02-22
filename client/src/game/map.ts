@@ -18,8 +18,7 @@ import type {DrawingContext, GameContainer} from "./container";
 import type {Game} from "../types/game";
 import type {Location, UserGameSettings} from "@solaris-common";
 import Carrier from './carrier'
-
-const CHUNK_SIZE = 256
+import { Chunks } from './chunks'
 
 enum Mode {
   Galaxy = 'galaxy',
@@ -27,10 +26,7 @@ enum Mode {
   Ruler = 'ruler',
 }
 
-interface Chunk extends PIXI.Container {
-  mapObjects: any[],
-  visualizer?: PIXI.Graphics,
-}
+
 
 export class Map extends EventEmitter {
   // Represents the current game mode, these are as follows:
@@ -47,11 +43,6 @@ export class Map extends EventEmitter {
   pathManager: PathManager | undefined;
   zoomPercent: number;
   lastZoomPercent: number;
-  minMouseChunkX: number;
-  maxMouseChunkX: number;
-  minMouseChunkY: number;
-  maxMouseChunkY: number;
-  chunksContainer: PIXI.Container | undefined;
   backgroundContainer: PIXI.Container | undefined;
   territoryContainer: PIXI.Container | undefined;
   playerNamesContainer: PIXI.Container | undefined;
@@ -72,17 +63,11 @@ export class Map extends EventEmitter {
   wormHoleLayer: WormHoleLayer | undefined;
   tooltipLayer: TooltipLayer | undefined;
   orbitalLayer: OrbitalLocationLayer | undefined;
-  firstChunkX: number = 0;
-  firstChunkY: number = 0;
-  lastChunkX: number = 0;
-  lastChunkY: number = 0;
   modeArgs: any;
   lastViewportCenter: PIXI.Point | undefined;
   currentViewportCenter: PIXI.Point | undefined;
-  numof_chunkX: number = 0;
-  numof_chunkY: number = 0;
-  chunks: Chunk[][] = [];
   lastPointerDownPosition: PIXI.Point | undefined;
+  chunks: Chunks | undefined;
 
   constructor (app, store: Store<State>, gameContainer, context: DrawingContext) {
     super()
@@ -99,18 +84,12 @@ export class Map extends EventEmitter {
     this.carriers = []
 
     this.zoomPercent = 0
-    this.minMouseChunkX = 0
-    this.maxMouseChunkX = 0
-    this.minMouseChunkY = 0
-    this.maxMouseChunkY = 0
 
     this.zoomPercent = 100
     this.lastZoomPercent = 100
   }
 
   _setupContainers () {
-    this.chunksContainer = new PIXI.Container()
-    this.chunksContainer.zIndex = 7;
     this.backgroundContainer = new PIXI.Container()
     this.backgroundContainer.zIndex = 0;
     this.territoryContainer = new PIXI.Container()
@@ -139,7 +118,7 @@ export class Map extends EventEmitter {
     this.container.addChild(this.wormHoleContainer)
     this.container.addChild(this.pathManager!.container)
     this.container.addChild(this.rulerPointContainer)
-    this.container.addChild(this.chunksContainer)
+    this.container.addChild(this.chunks!.chunksContainer)
     this.container.addChild(this.orbitalContainer)
     this.container.addChild(this.starContainer)
     this.container.addChild(this.highlightLocationsContainer)
@@ -161,6 +140,9 @@ export class Map extends EventEmitter {
     this.carriers.forEach(s => s.removeAllListeners())
 
     this.container.removeChildren()
+
+    this.chunks = new Chunks();
+
     this._setupContainers()
 
     // Reset the canvas
@@ -247,7 +229,7 @@ export class Map extends EventEmitter {
     }
 
     // Setup Chunks
-    this._setupChunks()
+    this.chunks.setup(game, this.stars, this.carriers);
 
     this.tooltipLayer = new TooltipLayer()
     this.tooltipLayer.setup(this.game, this.context)
@@ -347,85 +329,6 @@ export class Map extends EventEmitter {
       || this.game!.galaxy.stars.find(s => s.wormHoleToStarId)
   }
 
-  _setupChunks() {
-    if(this.chunksContainer) {
-      this.chunksContainer.removeChildren()
-    }
-
-    let carrierMinX = gameHelper.calculateMinCarrierX(this.game!)
-    let carrierMinY = gameHelper.calculateMinCarrierY(this.game!)
-    let carrierMaxX = gameHelper.calculateMaxCarrierX(this.game!)
-    let carrierMaxY = gameHelper.calculateMaxCarrierY(this.game!)
-
-    let starMinX = gameHelper.calculateMinStarX(this.game!)
-    let starMinY = gameHelper.calculateMinStarY(this.game!)
-    let starMaxX = gameHelper.calculateMaxStarX(this.game!)
-    let starMaxY = gameHelper.calculateMaxStarY(this.game!)
-
-    let minX = Math.min(carrierMinX, starMinX)
-    let minY = Math.min(carrierMinY, starMinY)
-    let maxX = Math.max(carrierMaxX, starMaxX)
-    let maxY = Math.max(carrierMaxY, starMaxY)
-
-    this.firstChunkX = Math.floor(minX/CHUNK_SIZE)
-    this.firstChunkY = Math.floor(minY/CHUNK_SIZE)
-
-    this.lastChunkX = Math.floor(maxX/CHUNK_SIZE)
-    this.lastChunkY = Math.floor(maxY/CHUNK_SIZE)
-
-    this.numof_chunkX = this.lastChunkX-this.firstChunkX+1
-    this.numof_chunkY = this.lastChunkY-this.firstChunkY+1
-
-    let chunkColumns = Array(this.numof_chunkX)
-    for(let i = 0; i<this.numof_chunkX; i++) { chunkColumns[i] = Array(this.numof_chunkY) }
-
-    this.chunks = chunkColumns
-
-    for(let ix=0; ix<this.numof_chunkX; ix++) {
-      for(let iy=0; iy<this.numof_chunkY; iy++) {
-        this.chunks[ix][iy] = new PIXI.Container() as Chunk;
-        this.chunks[ix][iy].sortableChildren = true;
-        this.chunksContainer!.addChild(this.chunks[ix][iy])
-        this.chunks[ix][iy].mapObjects = Array()
-      }
-    }
-
-    this.stars.forEach( s => this.addContainerToChunk(s, this.chunks, this.firstChunkX, this.firstChunkY ) )
-    this.carriers.forEach( c => this.addContainerToChunk(c, this.chunks, this.firstChunkX, this.firstChunkY) )
-  }
-
-  addContainerToChunk (mapObject, chunks: Chunk[][], firstX: number, firstY: number) { // Star or carrier
-    let chunkX = Math.floor(mapObject.data.location.x/CHUNK_SIZE)
-    let chunkY = Math.floor(mapObject.data.location.y/CHUNK_SIZE)
-    let ix = chunkX-firstX
-    let iy = chunkY-firstY
-
-    chunks[ix][iy].addChild(mapObject.container)
-    chunks[ix][iy].mapObjects.push(mapObject)
-  }
-
-  removeContainerFromChunk (mapObject, chunks, firstX, firstY) {
-    let chunkX = Math.floor(mapObject.data.location.x/CHUNK_SIZE)
-    let chunkY = Math.floor(mapObject.data.location.y/CHUNK_SIZE)
-    let ix = chunkX-firstX
-    let iy = chunkY-firstY
-
-    chunks[ix][iy].removeChild(mapObject.container)
-    let index = chunks[ix][iy].mapObjects.indexOf(mapObject)
-    if (index > -1) { chunks[ix][iy].mapObjects.splice(index, 1) }
-  }
-
-  removeMapObjectFromChunks (mapObject, chunks) {
-    for (let chunkX of chunks) {
-      for (let chunkY of chunkX) {
-        if (chunkY.mapObjects.indexOf(mapObject) > -1) {
-          chunkY.mapObjects.splice(chunkY.mapObjects.indexOf(mapObject), 1)
-          chunkY.removeChild(mapObject.container)
-        }
-      }
-    }
-  }
-
   reloadGame (game, userSettings) {
     this.game = game
 
@@ -494,7 +397,7 @@ export class Map extends EventEmitter {
     this.waypoints!.setup(game, this.context)
     this.tooltipLayer!.setup(game, this.context)
 
-    this._setupChunks()
+    this.chunks!.setup(game, this.stars, this.carriers);
   }
 
 
@@ -567,7 +470,7 @@ export class Map extends EventEmitter {
 
     this.starContainer!.removeChild(star.fixedContainer)
 
-    this.removeMapObjectFromChunks(star, this.chunks)
+    this.chunks!.removeMapObjectFromChunks(star)
 
     this.stars.splice(this.stars.indexOf(star), 1)
 
@@ -593,7 +496,7 @@ export class Map extends EventEmitter {
     carrier.clearPaths()
 
 
-    this.removeMapObjectFromChunks(carrier, this.chunks)
+    this.chunks!.removeMapObjectFromChunks(carrier);
 
     this.carriers.splice(this.carriers.indexOf(carrier), 1)
 
@@ -739,20 +642,20 @@ export class Map extends EventEmitter {
   }
 
   onTick(deltaTime) {
-    let viewportWidth = this.gameContainer.viewport!.right - this.gameContainer.viewport!.left
-    let viewportHeight = this.gameContainer.viewport!.bottom - this.gameContainer.viewport!.top
+    const viewportWidth = this.gameContainer.viewport!.right - this.gameContainer.viewport!.left
+    const viewportHeight = this.gameContainer.viewport!.bottom - this.gameContainer.viewport!.top
 
-    let viewportXRadius = viewportWidth / 2.0
-    let viewportYRadius = viewportHeight / 2.0
+    const viewportXRadius = viewportWidth / 2.0
+    const viewportYRadius = viewportHeight / 2.0
 
-    let viewportCenter = this.gameContainer.viewport!.center
+    const viewportCenter = this.gameContainer.viewport!.center
 
     this.lastViewportCenter = this.currentViewportCenter || undefined;
     this.currentViewportCenter = this.gameContainer.viewport!.center
 
     this.zoomPercent = (this.gameContainer.viewport!.screenWidth/viewportWidth) * 100
 
-    let viewportData = {
+    const viewportData = {
       center: viewportCenter,
       xradius: viewportXRadius,
       yradius: viewportYRadius
@@ -762,49 +665,15 @@ export class Map extends EventEmitter {
 
     //chunk culling
 
-    let firstX = Math.floor(this.gameContainer.viewport!.left/CHUNK_SIZE)
-    let firstY = Math.floor(this.gameContainer.viewport!.top/CHUNK_SIZE)
+    const positionChanging = this.lastViewportCenter == null || this.currentViewportCenter.x !== this.lastViewportCenter.x || this.currentViewportCenter.y !== this.lastViewportCenter.y
+    const zoomChanging = Math.abs(this.zoomPercent-this.lastZoomPercent) > (1.0/128.0)
 
-    let lastX = Math.floor(this.gameContainer.viewport!.right/CHUNK_SIZE)
-    let lastY = Math.floor(this.gameContainer.viewport!.bottom/CHUNK_SIZE)
-
-    let positionChanging = this.lastViewportCenter == null || this.currentViewportCenter.x !== this.lastViewportCenter.x || this.currentViewportCenter.y !== this.lastViewportCenter.y
-    let zoomChanging = Math.abs(this.zoomPercent-this.lastZoomPercent) > (1.0/128.0)
-
-    if (!positionChanging && !zoomChanging) {
-      return
-    }
-
-    for(let ix=0; ix<this.numof_chunkX; ix++) {
-      for(let iy=0; iy<this.numof_chunkY; iy++) {
-        if(
-        (ix>=(firstX-this.firstChunkX))&&(ix<=(lastX-this.firstChunkX)) &&
-        (iy>=(firstY-this.firstChunkY))&&(iy<=(lastY-this.firstChunkY))
-        )
-        {
-          if( !this.chunks[ix][iy].visible ) {
-            this.chunks[ix][iy].visible = true
-            this.chunks[ix][iy].interactiveChildren = true
-            //this.chunks[ix][iy].visualizer.visible = true
-            for( let mapObject of this.chunks[ix][iy].mapObjects ) {
-              mapObject.onZoomChanging(this.zoomPercent)
-            }
-          }
-          else {
-            if( zoomChanging ) {
-              for( let mapObject of this.chunks[ix][iy].mapObjects ) {
-                mapObject.onZoomChanging(this.zoomPercent)
-              }
-            }
-          }
-        }
-        else {
-          this.chunks[ix][iy].visible = false
-          this.chunks[ix][iy].interactiveChildren = false
-          //this.chunks[ix][iy].visualizer.visible = false
-        }
-      }
-    }
+    this.chunks!.onTick(positionChanging, zoomChanging, this.zoomPercent, {
+      left: this.gameContainer.viewport!.left,
+      right: this.gameContainer.viewport!.right,
+      top: this.gameContainer.viewport!.top,
+      bottom: this.gameContainer.viewport!.bottom,
+    });
 
     this.pathManager!.onTick(this.zoomPercent, this.gameContainer.viewport, zoomChanging)
     this.playerNames!.onTick(this.zoomPercent, zoomChanging)
