@@ -30,15 +30,17 @@
 </template>
 
 <script setup lang="ts">
-import {ref, onMounted, computed, type Ref} from 'vue';
+import {ref, onMounted, computed, type Ref, inject} from 'vue';
+import type {Axios} from 'axios';
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import Badge from './Badge.vue'
-import BadgeApiService from '../../../../services/api/badge'
 import GameHelper from '../../../../services/gameHelper'
 import type {State} from "../../../../store";
 import {useStore} from 'vuex';
 import type {Store} from 'vuex/types/index.js';
 import type {AwardedBadge, Badge as TBadge} from "@solaris-common";
+import {getBadgesForPlayer} from "../../../../services/typedapi/badge";
+import {httpInjectionKey, isError} from "../../../../services/typedapi";
 
 const props = defineProps<{ playerId: string }>();
 
@@ -66,18 +68,21 @@ const isNormalAnonymity = computed(() => GameHelper.isNormalAnonymity(game.value
 
 const isExtraAnonymity = computed(() => GameHelper.isExtraAnonymity(game.value));
 
+const httpClient: Axios = inject(httpInjectionKey)!;
+
 onMounted(async () => {
   isLoading.value = true
 
   allBadges.value = await store.dispatch('getBadges');
 
   try {
-    const response = await BadgeApiService.listBadgesByPlayer(game.value._id, props.playerId)
+    const response = await getBadgesForPlayer(httpClient)(game.value._id, props.playerId)
 
-    if (response.status === 200) {
-      badges.value = response.data;
-    } else {
+    if (isError(response)) {
       badges.value = [];
+      console.error(response.error);
+    } else {
+      badges.value = response.data;
     }
   } catch (err) {
     console.error(err)
