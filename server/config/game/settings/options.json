@@ -414,31 +414,31 @@
     "carrierSpeed": [
       {
         "value": 1,
-        "text": "Crazy Slow"
+        "text": "Crazy Slow (0.02 ly/tick)"
       },
       {
         "value": 2.5,
-        "text": "Very Slow"
+        "text": "Very Slow (0.05 ly/tick)"
       },
       {
         "value": 5,
-        "text": "Slow"
+        "text": "Slow (0.1 ly/tick)"
       },
       {
         "value": 10,
-        "text": "Standard"
+        "text": "Standard (0.2 ly/tick)"
       },
       {
         "value": 15,
-        "text": "Fast"
+        "text": "Fast (0.3 ly/tick)"
       },
       {
         "value": 20,
-        "text": "Very Fast"
+        "text": "Very Fast (0.4 ly/tick)"
       },
       {
         "value": 25,
-        "text": "Crazy Fast"
+        "text": "Crazy Fast (0.5 ly/tick)"
       }
     ],
     "starCaptureReward": [
