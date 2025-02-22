@@ -348,12 +348,14 @@ export default class GameService extends EventEmitter {
             // are separate from the game afk logic.
             await this.gameRepo.updateOne({
                 _id: game._id,
-                'galaxy.players.$.afk': false,
-                'galaxy.players.$.defeated': false
             }, {
                 $set: {
-                    'galaxy.players.$.lastSeen': moment().utc(),
+                    'galaxy.players.$[].lastSeen': moment().utc(),
                 }
+            }, {
+                arrayFilters: [
+                    { 'player.defeated': false }
+                ]
             });
         }
         
