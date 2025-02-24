@@ -44,30 +44,19 @@ const job = makeJob('Recalculate rankings', async ({ log, container, mongo }: Jo
             'achievements.defeated': 0,
             'achievements.defeated1v1': 0,
             'achievements.joined': 0,
-            'achievements.badges.victor32': 0,
-            'achievements.badges.special_dark': 0,
-            'achievements.badges.special_fog': 0,
-            'achievements.badges.special_ultraDark': 0,
-            'achievements.badges.special_orbital': 0,
-            'achievements.badges.special_battleRoyale': 0,
-            'achievements.badges.special_homeStar': 0,
-            'achievements.badges.special_homeStarElimination': 0,
-            'achievements.badges.special_anonymous': 0,
-            'achievements.badges.special_kingOfTheHill': 0,
-            'achievements.badges.special_tinyGalaxy': 0,
-            'achievements.badges.special_freeForAll': 0,
-            'achievements.badges.special_arcade': 0,
         }
     });
     log.info(`Done.`);
 
-    let users = await container.userService.userRepo.find({}, {
+    let users: User[] = await container.userService.userRepo.findAsModels({}, {
         _id: 1,
         achievements: 1
     },
     { _id: 1 });
 
     log.info(`Total users: ${users.length}`);
+
+    // todo: filter user badges because we will re-award them
 
     let dbQuery = {
         'state.endDate': { $ne: null },
@@ -180,44 +169,13 @@ const job = makeJob('Recalculate rankings', async ({ log, container, mongo }: Jo
 
     log.info(`Done.`);
 
-    let dbWrites = users.map(user => {
-        return {
-            updateOne: {
-                filter: {
-                    _id: user._id
-                },
-                update: {
-                    'achievements.level': user.achievements.level,
-                    'achievements.rank': user.achievements.rank,
-                    'achievements.eloRating': user.achievements.eloRating,
-                    'achievements.victories': user.achievements.victories,
-                    'achievements.victories1v1': user.achievements.victories1v1,
-                    'achievements.completed': user.achievements.completed,
-                    'achievements.quit': user.achievements.quit,
-                    'achievements.afk': user.achievements.afk,
-                    'achievements.defeated': user.achievements.defeated,
-                    'achievements.defeated1v1': user.achievements.defeated1v1,
-                    'achievements.joined': user.achievements.joined,
-                    'achievements.badges.victor32': user.achievements.badges.victor32,
-                    'achievements.badges.special_dark': user.achievements.badges.special_dark,
-                    'achievements.badges.special_fog': user.achievements.badges.special_fog,
-                    'achievements.badges.special_ultraDark': user.achievements.badges.special_ultraDark,
-                    'achievements.badges.special_orbital': user.achievements.badges.special_orbital,
-                    'achievements.badges.special_battleRoyale': user.achievements.badges.special_battleRoyale,
-                    'achievements.badges.special_homeStar': user.achievements.badges.special_homeStar,
-                    'achievements.badges.special_homeStarElimination': user.achievements.badges.special_homeStarElimination,
-                    'achievements.badges.special_anonymous': user.achievements.badges.special_anonymous,
-                    'achievements.badges.special_kingOfTheHill': user.achievements.badges.special_kingOfTheHill,
-                    'achievements.badges.special_tinyGalaxy': user.achievements.badges.special_tinyGalaxy,
-                    'achievements.badges.special_freeForAll': user.achievements.badges.special_freeForAll,
-                    'achievements.badges.special_arcade': user.achievements.badges.special_arcade,
-                }
-            }
-        }
-    });
-
     log.info(`Updating users...`);
-    await container.userService.userRepo.bulkWrite(dbWrites);
+
+    for (let user of users) {
+        // @ts-ignore
+        await user.save();
+    }
+
     log.info(`Users updated.`);
 });
 
