@@ -1,14 +1,14 @@
 import { Container, Sprite, Graphics, BitmapText, Circle, TextStyle, Text } from 'pixi.js'
 import TextureService from './texture'
 import Helpers from './helpers'
-import {EventEmitter} from "./eventEmitter.js";
 import type PathManager from "./PathManager";
-import type {UserGameSettings} from "@solaris-common";
+import type {UserGameSettings, Location} from "@solaris-common";
 import type {Carrier as CarrierData, Player as PlayerData} from "../types/game";
 import type Star from "./star";
 import type {DrawingContext} from "./container";
+import { MapObject } from './mapObject';
 
-export class Carrier extends EventEmitter {
+export class Carrier extends MapObject {
   static zoomLevel = 140
 
   container: Container;
@@ -63,6 +63,14 @@ export class Carrier extends EventEmitter {
     this.isMouseOver = false
     this.zoomPercent = 100
   }
+
+    getContainer(): Container {
+      return this.container!;
+    }
+
+    getLocation(): Location {
+      return this.data!.location!;
+    }
 
   setup (data, userSettings, context: DrawingContext, stars, player, lightYearDistance) {
     this.data = data

@@ -3,12 +3,19 @@ import type { Game } from '../types/game';
 import gameHelper from '../services/gameHelper'
 import type Star from './star';
 import type Carrier from './carrier';
+import type { MapObject } from './mapObject';
 
 const CHUNK_SIZE = 256
 
-interface Chunk extends Container {
-  mapObjects: any[],
-  visualizer?: Graphics,
+class Chunk extends Container {
+  mapObjects: MapObject[] = [];
+  visualizer: Graphics | undefined = undefined;
+
+  constructor() {
+    super();
+
+    this.sortableChildren = true;
+  }
 }
 
 export class Chunks {
@@ -64,10 +71,8 @@ export class Chunks {
 
     for (let ix = 0; ix < this.numof_chunkX; ix++) {
       for (let iy = 0; iy < this.numof_chunkY; iy++) {
-        this.chunks[ix][iy] = new Container() as Chunk;
-        this.chunks[ix][iy].sortableChildren = true;
+        this.chunks[ix][iy] = new Chunk();
         this.chunksContainer!.addChild(this.chunks[ix][iy])
-        this.chunks[ix][iy].mapObjects = Array()
       }
     }
 
@@ -118,33 +123,33 @@ export class Chunks {
     }
   }
 
-  addContainerToChunk(mapObject, firstX: number, firstY: number) { // Star or carrier
-    const chunkX = Math.floor(mapObject.data.location.x / CHUNK_SIZE)
-    const chunkY = Math.floor(mapObject.data.location.y / CHUNK_SIZE)
+  addContainerToChunk(mapObject: MapObject, firstX: number, firstY: number) { // Star or carrier
+    const chunkX = Math.floor(mapObject.getLocation().x / CHUNK_SIZE)
+    const chunkY = Math.floor(mapObject.getLocation().y / CHUNK_SIZE)
     const ix = chunkX - firstX
     const iy = chunkY - firstY
 
-    this.chunks[ix][iy].addChild(mapObject.container)
+    this.chunks[ix][iy].addChild(mapObject.getContainer())
     this.chunks[ix][iy].mapObjects.push(mapObject)
   }
 
-  removeContainerFromChunk(mapObject, chunks, firstX, firstY) {
-    const chunkX = Math.floor(mapObject.data.location.x / CHUNK_SIZE)
-    const chunkY = Math.floor(mapObject.data.location.y / CHUNK_SIZE)
+  removeContainerFromChunk(mapObject: MapObject, chunks: Chunk[][], firstX: number, firstY: number) {
+    const chunkX = Math.floor(mapObject.getLocation().x / CHUNK_SIZE)
+    const chunkY = Math.floor(mapObject.getLocation().y / CHUNK_SIZE)
     const ix = chunkX - firstX
     const iy = chunkY - firstY
 
-    chunks[ix][iy].removeChild(mapObject.container)
+    chunks[ix][iy].removeChild(mapObject.getContainer())
     const index = chunks[ix][iy].mapObjects.indexOf(mapObject)
     if (index > -1) { chunks[ix][iy].mapObjects.splice(index, 1) }
   }
 
-  removeMapObjectFromChunks(mapObject) {
+  removeMapObjectFromChunks(mapObject: MapObject) {
     for (let chunkX of this.chunks) {
       for (let chunkY of chunkX) {
         if (chunkY.mapObjects.indexOf(mapObject) > -1) {
           chunkY.mapObjects.splice(chunkY.mapObjects.indexOf(mapObject), 1)
-          chunkY.removeChild(mapObject.container)
+          chunkY.removeChild(mapObject.getContainer())
         }
       }
     }
