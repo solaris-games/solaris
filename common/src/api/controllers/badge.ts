@@ -1,5 +1,5 @@
 import {GetRoute, PostRoute} from "./index";
-import {Badge} from "../types/common/badge";
+import { type Badge} from "../types/common/badge";
 import { type AwardedBadge } from "../types/common/user";
 
 export type PurchaseForPlayerReq = {

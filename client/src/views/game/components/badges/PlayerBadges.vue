@@ -80,7 +80,7 @@ onMounted(async () => {
 
     if (isError(response)) {
       badges.value = [];
-      console.error(response.error);
+      console.error(response.cause);
     } else {
       badges.value = response.data;
     }
