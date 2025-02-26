@@ -8,7 +8,7 @@
       </div>
     </div>
 
-    <div class="row bg-dark" v-if="!isLoading && userPlayer && playerId !== userPlayer._id">
+    <div class="row bg-dark" v-if="!isLoading && userPlayer && playerId !== userPlayer._id && canPurchaseBadges">
       <div class="col text-center pt-3">
         <p class="mb-3">Buy this player a <a href="javascript:;" @click="onOpenPurchasePlayerBadgeRequested">Badge of
           Honor<i class="fas fa-medal ms-1"></i></a></p>
@@ -17,8 +17,7 @@
 
     <div class="row" v-if="isExtraAnonymity && (!isLoading || !badges.length)">
       <div v-if="!badges.length" class="col text-center pt-3">
-        <p class="mb-3"><small>Badges are hidden in anonymous games but you can still award a badge to this
-          player.</small></p>
+        <p class="mb-3"><small>Badges are hidden in anonymous games.</small></p>
       </div>
     </div>
 
@@ -48,10 +47,6 @@ const emit = defineEmits<{
   onOpenPurchasePlayerBadgeRequested: [playerId: string]
 }>();
 
-const onOpenPurchasePlayerBadgeRequested = () => {
-  emit('onOpenPurchasePlayerBadgeRequested', props.playerId);
-}
-
 const isLoading = ref(true);
 
 const allBadges: Ref<TBadge[]> = ref([]);
@@ -67,6 +62,16 @@ const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 const isNormalAnonymity = computed(() => GameHelper.isNormalAnonymity(game.value));
 
 const isExtraAnonymity = computed(() => GameHelper.isExtraAnonymity(game.value));
+
+const isFinished = computed(() => GameHelper.isGameFinished(game.value));
+
+const canPurchaseBadges = computed(() => !isExtraAnonymity.value || isFinished.value);
+
+const onOpenPurchasePlayerBadgeRequested = () => {
+  if (canPurchaseBadges.value) {
+    emit('onOpenPurchasePlayerBadgeRequested', props.playerId);
+  }
+}
 
 const httpClient: Axios = inject(httpInjectionKey)!;
 
