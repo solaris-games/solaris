@@ -59,7 +59,7 @@ export default {
   },
   methods: {
     onCloseRequested (e) {
-      GameContainer.map.unselectAllCarriers()
+      GameContainer.unselectAllCarriers()
 
       this.$emit('onCloseRequested', e)
     },
@@ -67,7 +67,7 @@ export default {
       this.$emit('onOpenCarrierDetailRequested', this.carrierId)
     },
     viewOnMap (e) {
-      GameContainer.map.panToCarrier(this.carrier)
+      GameContainer.panToCarrier(this.carrier)
     },
     async doRename (e) {
       e.preventDefault()

@@ -144,8 +144,8 @@ export default {
   },
   methods: {
     onCloseRequested (e) {
-      GameContainer.map.unselectAllStars()
-      GameContainer.map.unselectAllCarriers()
+      GameContainer.unselectAllStars()
+      GameContainer.unselectAllCarriers()
 
       this.$emit('onCloseRequested', e)
     },

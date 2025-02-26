@@ -4,20 +4,20 @@ import gameHelper from '../services/gameHelper.js'
 import textureService from './texture'
 import type {Store} from "vuex";
 import type {State} from "../store";
-import {Application, BitmapText, isWebGLSupported} from "pixi.js";
+import {Application, isWebGLSupported} from "pixi.js";
 import type {UserGameSettings} from "@solaris-common";
-import type {Game, Player, Star} from "../types/game";
+import type {Game, Player, Star, Carrier} from "../types/game";
 import { screenshot } from './screenshot';
 import { DebugTools } from './debugTools';
 
 export class DrawingContext {
   store: Store<State>;
 
-  constructor (store) {
+  constructor (store: Store<State>) {
     this.store = store;
   }
 
-  getPlayerColour (playerId) {
+  getPlayerColour (playerId: string) {
     return this.store.getters.getColourForPlayer(playerId).value
   }
 }
@@ -135,6 +135,14 @@ export class GameContainer {
     this.map!.clearRulerPoints()
 
     screenshot(this, this.game!, this.reportGameError!);
+  }
+
+  unselectAllCarriers () {
+    this.map!.unselectAllCarriers()
+  }
+
+  unselectAllStars () {
+    this.map!.unselectAllStars()
   }
 
   zoomIn () {
@@ -288,6 +296,10 @@ export class GameContainer {
 
   panToStar(star: Star) {
     this.map!.panToStar(star);
+  }
+
+  panToCarrier(carrier: Carrier) {
+    this.map!.panToCarrier(carrier);
   }
 }
 
