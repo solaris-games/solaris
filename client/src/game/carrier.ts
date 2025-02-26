@@ -1,18 +1,17 @@
 import { Container, Sprite, Graphics, BitmapText, Circle, TextStyle, Text } from 'pixi.js'
 import TextureService from './texture'
 import Helpers from './helpers'
-import {EventEmitter} from "./eventEmitter.js";
 import type PathManager from "./PathManager";
-import type {UserGameSettings} from "@solaris-common";
+import type {UserGameSettings, Location} from "@solaris-common";
 import type {Carrier as CarrierData, Player as PlayerData} from "../types/game";
 import type Star from "./star";
 import type {DrawingContext} from "./container";
+import { MapObject } from './mapObject';
 
-export class Carrier extends EventEmitter {
+export class Carrier extends MapObject {
   static zoomLevel = 140
 
   container: Container;
-  fixedContainer: Container;
   graphics_colour: Sprite | null;
   graphics_selected: Graphics;
   graphics_ship: Sprite;
@@ -39,7 +38,6 @@ export class Carrier extends EventEmitter {
   constructor ( pathManager: PathManager ) {
     super()
 
-    this.fixedContainer = new Container() // this container isnt affected by culling or user setting scalling
     this.container = new Container()
     this.container.zIndex = 1
     this.container.eventMode = 'static'
@@ -65,6 +63,14 @@ export class Carrier extends EventEmitter {
     this.isMouseOver = false
     this.zoomPercent = 100
   }
+
+    getContainer(): Container {
+      return this.container!;
+    }
+
+    getLocation(): Location {
+      return this.data!.location!;
+    }
 
   setup (data, userSettings, context: DrawingContext, stars, player, lightYearDistance) {
     this.data = data
@@ -400,7 +406,6 @@ export class Carrier extends EventEmitter {
 
   destroy () {
     this.container.destroy()
-    this.fixedContainer.destroy()
   }
 
   select () {

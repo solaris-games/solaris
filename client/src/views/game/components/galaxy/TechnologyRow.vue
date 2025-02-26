@@ -33,7 +33,7 @@ export default {
       this.$emit('onOpenPlayerDetailRequested', this.technology._id)
     },
     goToEmpire (e) {
-      GameContainer.map.panToPlayer(this.$store.state.game, this.technology)
+      GameContainer.panToPlayer(this.$store.state.game, this.technology)
     },
     displayStyle(research) {
       if (this.technology._id == this.userPlayer?._id) {

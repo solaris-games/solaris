@@ -213,7 +213,7 @@ export default {
 
       let star = this.$store.state.game.galaxy.stars.find(x => x._id === this.currentWaypoint.destination)
 
-      GameContainer.map.panToStar(star)
+      GameContainer.panToStar(star)
       GameContainer.map.highlightLocation(star.location)
     },
     toggleLooped () {

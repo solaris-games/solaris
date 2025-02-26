@@ -203,7 +203,9 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store
     setColourOverride (state: State, value) {
       state.colourOverride = value
 
-      GameContainer.reloadGame(state.game, state.settings);
+      if (state.game) {
+        GameContainer.reloadGame(state.game, state.settings);
+      }
     },
 
     setSettings (state: State, settings) {

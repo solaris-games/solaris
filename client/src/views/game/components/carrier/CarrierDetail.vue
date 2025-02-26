@@ -285,7 +285,7 @@ export default {
   methods: {
     formatLocation,
     onCloseRequested (e) {
-      GameContainer.map.unselectAllCarriers()
+      GameContainer.unselectAllCarriers()
 
       this.$emit('onCloseRequested', e)
     },
@@ -320,7 +320,7 @@ export default {
       this.$emit('onViewCarrierCombatCalculatorRequested', this.carrier._id)
     },
     viewOnMap (e) {
-      GameContainer.map.panToCarrier(this.carrier)
+      GameContainer.panToCarrier(this.carrier)
     },
     getFirstWaypointSource () {
       if (!this.carrier.waypoints.length) {

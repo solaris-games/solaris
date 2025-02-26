@@ -4,36 +4,26 @@ import gameHelper from '../services/gameHelper.js'
 import textureService from './texture'
 import type {Store} from "vuex";
 import type {State} from "../store";
-import {Application, BitmapText, isWebGLSupported} from "pixi.js";
+import {Application, isWebGLSupported} from "pixi.js";
 import type {UserGameSettings} from "@solaris-common";
-import type {Game} from "../types/game";
+import type {Game, Player, Star, Carrier} from "../types/game";
 import { screenshot } from './screenshot';
+import { DebugTools } from './debugTools';
 
 export class DrawingContext {
   store: Store<State>;
 
-  constructor (store) {
+  constructor (store: Store<State>) {
     this.store = store;
   }
 
-  getPlayerColour (playerId) {
+  getPlayerColour (playerId: string) {
     return this.store.getters.getColourForPlayer(playerId).value
   }
 }
 
 export class GameContainer {
-  frames: number;
-  dtAccum: number;
-  lowest: number;
-  previousDTs: number[];
-  ma32accum: number;
   app: Application | null = null;
-  fpsNowText: BitmapText | undefined;
-  fpsMAText: BitmapText | undefined;
-  fpsMA32Text: BitmapText | undefined;
-  jitterText: BitmapText | undefined;
-  lowestText: BitmapText | undefined;
-  zoomText: BitmapText | undefined;
   map: Map | undefined;
   store: Store<State> | undefined;
   context: DrawingContext | undefined;
@@ -44,62 +34,12 @@ export class GameContainer {
   starFieldBottom: number = 0;
   userSettings: UserGameSettings | undefined;
   game: Game | undefined;
+  debugTools: DebugTools | undefined;
+
   reportGameError: ((err: string) => void) | undefined;
 
   constructor () {
-    this.frames = 0
-    this.dtAccum = 33.0*16
-    this.lowest = 1000
-    this.previousDTs = [ 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0, 33.0 ]
-    this.ma32accum = 0
-  }
 
-  calcFPS(deltaTime) {
-    let elapsed = this.app!.ticker.elapsedMS
-    this.frames+=1
-    this.previousDTs.pop()
-    this.previousDTs.unshift(elapsed)
-
-    this.dtAccum = this.previousDTs.reduce( (total, current) => { return total+current } )
-    this.ma32accum += elapsed
-
-    let movingAverageDT = this.dtAccum/16.0
-    let movingAverageFPS = 1000.0/movingAverageDT
-    let ma32DT = this.ma32accum/32.0
-
-    let fps = 1000.0/elapsed
-    if( fps < this.lowest ) { this.lowest = fps }
-    if (this.fpsNowText) {
-      this.fpsNowText.text = ( 'fps: ' + fps.toFixed(0) )
-    }
-
-    if(this.frames==31) {
-      let ma32FPS = 1000.0/ma32DT
-
-      if (this.fpsMAText) {
-        this.fpsMAText.text =  ( 'fpsMA: ' + movingAverageFPS.toFixed(0) )
-      }
-
-      if (this.fpsMA32Text) {
-        this.fpsMA32Text.text = ( 'fpsMA32: ' + ma32FPS.toFixed(0) )
-      }
-
-      if (this.jitterText) {
-        this.jitterText.text = ( 'jitter: ' + (movingAverageFPS-this.lowest).toFixed(0) )
-      }
-
-      if (this.lowestText) {
-        this.lowestText.text = ( 'lowest: '+ this.lowest.toFixed(0) )
-      }
-
-      if (this.zoomText) {
-        this.zoomText.text = ( 'zoom%: '+ this.map!.zoomPercent.toFixed(0) )
-      }
-
-      this.frames = 0
-      this.lowest = 1000
-      this.ma32accum = 0
-    }
   }
 
   checkPerformance(): { webgl: boolean, performance: boolean } {
@@ -144,10 +84,6 @@ export class GameContainer {
     await this.app!.init(options);
     this.app!.ticker.add(this.onTick.bind(this))
     this.app!.ticker.maxFPS = 0
-
-    if (import.meta.env.DEV || userSettings?.technical?.performanceMonitor === 'enabled') {
-      this.app!.ticker.add(this.calcFPS.bind(this))
-    }
 
     await textureService.loadAssets();
     textureService.initialize()
@@ -201,6 +137,14 @@ export class GameContainer {
     screenshot(this, this.game!, this.reportGameError!);
   }
 
+  unselectAllCarriers () {
+    this.map!.unselectAllCarriers()
+  }
+
+  unselectAllStars () {
+    this.map!.unselectAllStars()
+  }
+
   zoomIn () {
     this.viewport!.zoomPercent(0.5, true)
   }
@@ -247,6 +191,11 @@ export class GameContainer {
     this.userSettings = userSettings
 
     this.map!.setup(this.game!, userSettings)
+
+
+    if (userSettings?.technical?.performanceMonitor === 'enabled') {
+      this.debugTools = new DebugTools(this.app!, this.map!);
+    }
   }
 
   draw () {
@@ -256,41 +205,8 @@ export class GameContainer {
 
     this.map!.refreshZoom(zoomPercent)
 
-    if ( import.meta.env.DEV || this.userSettings?.technical?.performanceMonitor === 'enabled') {
-      let bitmapFont = {fontFamily: "chakrapetch", fontSize: 16}
-      let left = 64
-      let top = 32
-
-      this.fpsNowText = new BitmapText({ text: "", style: bitmapFont })
-      this.fpsNowText.zIndex = 1000
-      this.fpsMAText = new BitmapText({ text: "", style: bitmapFont })
-      this.fpsMAText.zIndex = 1000
-      this.fpsMA32Text = new BitmapText({ text: "", style: bitmapFont })
-      this.fpsMA32Text.zIndex = 1000
-      this.jitterText = new BitmapText({ text: "", style: bitmapFont })
-      this.jitterText.zIndex = 1000
-      this.lowestText = new BitmapText({ text: "", style: bitmapFont })
-      this.lowestText.zIndex = 1000
-      this.zoomText = new BitmapText({ text: "", style: bitmapFont })
-      this.zoomText.zIndex = 1000
-      this.fpsNowText.x = left
-      this.fpsNowText.y = 128+16
-      this.fpsMAText.x = left
-      this.fpsMAText.y = this.fpsNowText.y + top+2
-      this.fpsMA32Text.x = left
-      this.fpsMA32Text.y = this.fpsMAText.y +top+2
-      this.jitterText.x = left
-      this.jitterText.y = this.fpsMA32Text.y + top+2
-      this.lowestText.x = left
-      this.lowestText.y = this.jitterText.y +top+2
-      this.zoomText.x = left
-      this.zoomText.y = this.lowestText.y +top+2
-      this.app!.stage.addChild(this.fpsNowText)
-      this.app!.stage.addChild(this.jitterText)
-      this.app!.stage.addChild(this.lowestText)
-      this.app!.stage.addChild(this.fpsMAText)
-      this.app!.stage.addChild(this.fpsMA32Text)
-      this.app!.stage.addChild(this.zoomText)
+    if (this.debugTools) {
+      this.debugTools.draw();
     }
   }
 
@@ -298,9 +214,18 @@ export class GameContainer {
     this.map!.drawWaypoints()
   }
 
-  reloadGame (game, userSettings) {
+  reloadGame (game: Game, userSettings: UserGameSettings) {
     this.game = game
     this.userSettings = userSettings
+
+    if (userSettings?.technical?.performanceMonitor === 'enabled' && !this.debugTools) {
+      this.debugTools = new DebugTools(this.app!, this.map!);
+      this.debugTools.draw();
+    } else if (this.debugTools) {
+      this.debugTools.destroy();
+      this.debugTools = undefined;
+    }
+
     this.map!.reloadGame(game, userSettings)
   }
 
@@ -311,13 +236,11 @@ export class GameContainer {
   reloadStar (star) {
     let starObject = this.map!.setupStar(this.game, this.userSettings, star)
     this.map!.drawStar(starObject)
-    this.map!.addContainerToChunk(starObject, this.map!.chunks, this.map!.firstChunkX, this.map!.firstChunkY)
   }
 
   reloadCarrier (carrier) {
     let carrierObject = this.map!.setupCarrier(this.game, this.userSettings, carrier)
     this.map!.drawCarrier(carrierObject)
-    this.map!.addContainerToChunk(carrierObject, this.map!.chunks, this.map!.firstChunkX, this.map!.firstChunkY)
   }
 
   undrawCarrier (carrier) {
@@ -367,6 +290,17 @@ export class GameContainer {
     )
   }
 
+  panToPlayer(game: Game, player: Player) {
+    this.map!.panToPlayer(game, player);
+  }
+
+  panToStar(star: Star) {
+    this.map!.panToStar(star);
+  }
+
+  panToCarrier(carrier: Carrier) {
+    this.map!.panToCarrier(carrier);
+  }
 }
 
 export default new GameContainer()
