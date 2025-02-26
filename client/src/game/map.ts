@@ -15,10 +15,10 @@ import {EventEmitter} from "./eventEmitter.js";
 import type {Store} from "vuex";
 import type {State} from "../store";
 import type {DrawingContext, GameContainer} from "./container";
-import type {Game} from "../types/game";
+import type {Game, Player, Star as StarData, Carrier as CarrierData} from "../types/game";
 import type {Location, UserGameSettings} from "@solaris-common";
-import Carrier from './carrier'
 import { Chunks } from './chunks'
+import Carrier from "./carrier";
 
 enum Mode {
   Galaxy = 'galaxy',
@@ -554,7 +554,7 @@ export class Map extends EventEmitter {
     this.playerNames!.draw()
   }
 
-  panToPlayer (game, player) {
+  panToPlayer (game: Game, player: Player) {
     const empireCenter = gameHelper.getPlayerEmpireCenter(game, player)
 
     if (empireCenter) {
@@ -567,7 +567,7 @@ export class Map extends EventEmitter {
     }
   }
 
-  panToUser (game) {
+  panToUser (game: Game) {
     let player = gameHelper.getUserPlayer(game)
 
     if (!player) {
@@ -581,26 +581,26 @@ export class Map extends EventEmitter {
     this.panToPlayer(game, player)
   }
 
-  panToStar (star) {
+  panToStar (star: StarData) {
     this.panToLocation(star.location)
   }
 
-  panToCarrier (carrier) {
+  panToCarrier (carrier: CarrierData) {
     this.panToLocation(carrier.location)
   }
 
-  panToLocation (location) {
+  panToLocation (location: Location) {
     this.gameContainer.viewport!.moveCenter(location.x, location.y)
   }
 
-  clickStar (starId) {
+  clickStar (starId: string) {
     let star = this.stars.find(s => s.data._id === starId)
 
     star!.onClicked(null, false)
     star!.select()
   }
 
-  clickCarrier (carrierId) {
+  clickCarrier (carrierId: string) {
     let carrier = this.carriers.find(s => s.data!._id === carrierId)
 
     carrier!.onClicked(null, false)

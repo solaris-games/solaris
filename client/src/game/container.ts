@@ -6,7 +6,7 @@ import type {Store} from "vuex";
 import type {State} from "../store";
 import {Application, BitmapText, isWebGLSupported} from "pixi.js";
 import type {UserGameSettings} from "@solaris-common";
-import type {Game} from "../types/game";
+import type {Game, Player, Star} from "../types/game";
 import { screenshot } from './screenshot';
 import { DebugTools } from './debugTools';
 
@@ -282,6 +282,13 @@ export class GameContainer {
     )
   }
 
+  panToPlayer(game: Game, player: Player) {
+    this.map!.panToPlayer(game, player);
+  }
+
+  panToStar(star: Star) {
+    this.map!.panToStar(star);
+  }
 }
 
 export default new GameContainer()
