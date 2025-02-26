@@ -1,60 +1,57 @@
 <template>
-<div>
-    <loading-spinner :loading="isLoading" />
+  <div>
+    <loading-spinner :loading="isLoading"/>
 
-    <div class="pt-3 pb-3 text-center" v-if="!isLoading && userHasBadges">
-        <badge v-for="badge in badges" :key="badge.key" :badge="badge" />
+    <div class="pt-3 pb-3" v-if="!isLoading && badges.length">
+      <badge v-for="badge in badges" :key="badge.badge" :badge="badge" :allBadges="allBadges" />
     </div>
-</div>
+  </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import {ref, onMounted, type Ref, inject} from 'vue';
+import type {Axios} from 'axios';
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import Badge from './Badge.vue'
-import BadgeApiService from '../../../../services/api/badge'
+import type {State} from "../../../../store";
+import {useStore} from 'vuex';
+import type {Store} from 'vuex/types/index.js';
+import type {AwardedBadge, Badge as TBadge} from "@solaris-common";
+import {getBadgesForUser} from "../../../../services/typedapi/badge";
+import {httpInjectionKey, isError} from "../../../../services/typedapi";
 
-export default {
-    components: {
-        'loading-spinner': LoadingSpinner,
-        'badge': Badge
-    },
-  props: {
-    userId: String
-  },
-  data () {
-    return {
-        isLoading: false,
-        badges: []
+const props = defineProps<{ userId: string }>();
+
+const isLoading = ref(true);
+
+const allBadges: Ref<TBadge[]> = ref([]);
+
+const badges: Ref<AwardedBadge<string>[]> = ref([]);
+
+const store = useStore() as Store<State>;
+
+const httpClient: Axios = inject(httpInjectionKey)!;
+
+onMounted(async () => {
+  isLoading.value = true
+
+  allBadges.value = await store.dispatch('getBadges');
+
+  try {
+    const response = await getBadgesForUser(httpClient)(props.userId)
+
+    if (isError(response)) {
+      badges.value = [];
+      console.error(response.cause);
+    } else {
+      badges.value = response.data;
     }
-  },
-  async mounted () {
-    await this.loadUserBadges()
-  },
-  methods: {
-    async loadUserBadges () {
-        this.isLoading = true
-
-        try {
-            let response = await BadgeApiService.listBadgesByUser(this.userId)
-
-            if (response.status === 200) {
-                this.badges = response.data
-            } else {
-                this.badges = null
-            }
-        } catch (err) {
-            console.error(err)
-        }
-
-        this.isLoading = false
-    }
-  },
-  computed: {
-    userHasBadges () {
-        return this.badges.filter(b => b.awarded).length
-    }
+  } catch (err) {
+    console.error(err)
   }
-}
+
+  isLoading.value = false;
+});
 </script>
 
 <style scoped>

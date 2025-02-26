@@ -22,7 +22,7 @@
       </div>
     </div>
 
-    <div class="pt-3 pb-3" v-if="!isLoading && !badges.length">
+    <div class="pt-3 pb-3" v-if="!isLoading && badges.length">
       <badge v-for="badge in badges" :key="badge.badge" :badge="badge" :allBadges="allBadges"
              @onOpenPurchasePlayerBadgeRequested="onOpenPurchasePlayerBadgeRequested"/>
     </div>
