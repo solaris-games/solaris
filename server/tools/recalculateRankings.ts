@@ -1,6 +1,6 @@
-import { GameWinnerKind } from "../services/leaderboard";
-import { User } from '../services/types/User';
-import { JobParameters, makeJob } from './tool';
+import {GameWinnerKind} from "../services/leaderboard";
+import {User} from '../services/types/User';
+import {JobParameters, makeJob} from './tool';
 
 const binarySearchUsers = (users: User[], id: string) => {
     let start = 0;
@@ -27,7 +27,23 @@ const binarySearchUsers = (users: User[], id: string) => {
     return users.find(s => s._id.toString() === id.toString())!;
 }
 
-const job = makeJob('Recalculate rankings', async ({ log, container, mongo }: JobParameters) => {
+const AUTOMATIC_BADGE_TYPES = [
+    'victor32',
+    'special_dark',
+    'special_fog',
+    'special_ultraDark',
+    'special_orbital',
+    'special_battleRoyale',
+    'special_homeStar',
+    'special_homeStarElimination',
+    'special_anonymous',
+    'special_kingOfTheHill',
+    'special_tinyGalaxy',
+    'special_freeForAll',
+    'special_arcade',
+];
+
+const job = makeJob('Recalculate rankings', async ({log, container, mongo}: JobParameters) => {
     log.info('Recalculating all player ranks...');
 
     log.info(`Resetting users...`);
@@ -44,40 +60,29 @@ const job = makeJob('Recalculate rankings', async ({ log, container, mongo }: Jo
             'achievements.defeated': 0,
             'achievements.defeated1v1': 0,
             'achievements.joined': 0,
-            'achievements.badges.victor32': 0,
-            'achievements.badges.special_dark': 0,
-            'achievements.badges.special_fog': 0,
-            'achievements.badges.special_ultraDark': 0,
-            'achievements.badges.special_orbital': 0,
-            'achievements.badges.special_battleRoyale': 0,
-            'achievements.badges.special_homeStar': 0,
-            'achievements.badges.special_homeStarElimination': 0,
-            'achievements.badges.special_anonymous': 0,
-            'achievements.badges.special_kingOfTheHill': 0,
-            'achievements.badges.special_tinyGalaxy': 0,
-            'achievements.badges.special_freeForAll': 0,
-            'achievements.badges.special_arcade': 0,
         }
     });
     log.info(`Done.`);
 
-    let users = await container.userService.userRepo.find({}, {
+    let users: User[] = await container.userService.userRepo.findAsModels({}, {
         _id: 1,
         achievements: 1
     },
     { _id: 1 });
 
-    log.info(`Total users: ${users.length}`);
+    for (let user of users) {
+        user.achievements.badges = user.achievements.badges.filter(b => !AUTOMATIC_BADGE_TYPES.includes(b.badge));
+    }
 
     let dbQuery = {
-        'state.endDate': { $ne: null },
-        'settings.general.type': { $ne: 'tutorial' }
+        'state.endDate': {$ne: null},
+        'settings.general.type': {$ne: 'tutorial'}
     };
 
     let total = (await container.gameService.gameRepo.count(dbQuery));
 
     log.info(`Recalculating rank for ${total} games...`);
-    
+
     let page = 0;
     let pageSize = 10;
     let totalPages = Math.ceil(total / pageSize);
@@ -94,9 +99,9 @@ const job = makeJob('Recalculate rankings', async ({ log, container, mongo }: Jo
 
     do {
         let games = await container.gameService.gameRepo.find(dbQuery, {},
-        { 'state.endDate': 1 },
-        pageSize,
-        pageSize * page);
+            {'state.endDate': 1},
+            pageSize,
+            pageSize * page);
 
         for (let game of games) {
             // All players
@@ -147,7 +152,7 @@ const job = makeJob('Recalculate rankings', async ({ log, container, mongo }: Jo
             const gameEndEvent = await eventRepo.findOne({ gameId: game._id, type: container.eventService.EVENT_TYPES.GAME_ENDED });
 
             if (gameEndEvent) {
-                await eventRepo.updateOne({ _id: gameEndEvent!._id }, {
+                await eventRepo.updateOne({_id: gameEndEvent!._id}, {
                     $set: {
                         data: rankingResult
                     }
@@ -180,47 +185,16 @@ const job = makeJob('Recalculate rankings', async ({ log, container, mongo }: Jo
 
     log.info(`Done.`);
 
-    let dbWrites = users.map(user => {
-        return {
-            updateOne: {
-                filter: {
-                    _id: user._id
-                },
-                update: {
-                    'achievements.level': user.achievements.level,
-                    'achievements.rank': user.achievements.rank,
-                    'achievements.eloRating': user.achievements.eloRating,
-                    'achievements.victories': user.achievements.victories,
-                    'achievements.victories1v1': user.achievements.victories1v1,
-                    'achievements.completed': user.achievements.completed,
-                    'achievements.quit': user.achievements.quit,
-                    'achievements.afk': user.achievements.afk,
-                    'achievements.defeated': user.achievements.defeated,
-                    'achievements.defeated1v1': user.achievements.defeated1v1,
-                    'achievements.joined': user.achievements.joined,
-                    'achievements.badges.victor32': user.achievements.badges.victor32,
-                    'achievements.badges.special_dark': user.achievements.badges.special_dark,
-                    'achievements.badges.special_fog': user.achievements.badges.special_fog,
-                    'achievements.badges.special_ultraDark': user.achievements.badges.special_ultraDark,
-                    'achievements.badges.special_orbital': user.achievements.badges.special_orbital,
-                    'achievements.badges.special_battleRoyale': user.achievements.badges.special_battleRoyale,
-                    'achievements.badges.special_homeStar': user.achievements.badges.special_homeStar,
-                    'achievements.badges.special_homeStarElimination': user.achievements.badges.special_homeStarElimination,
-                    'achievements.badges.special_anonymous': user.achievements.badges.special_anonymous,
-                    'achievements.badges.special_kingOfTheHill': user.achievements.badges.special_kingOfTheHill,
-                    'achievements.badges.special_tinyGalaxy': user.achievements.badges.special_tinyGalaxy,
-                    'achievements.badges.special_freeForAll': user.achievements.badges.special_freeForAll,
-                    'achievements.badges.special_arcade': user.achievements.badges.special_arcade,
-                }
-            }
-        }
-    });
-
     log.info(`Updating users...`);
-    await container.userService.userRepo.bulkWrite(dbWrites);
+
+    for (let user of users) {
+        // @ts-ignore
+        await user.save();
+    }
+
     log.info(`Users updated.`);
 });
 
 job();
 
-export { };
+export {};

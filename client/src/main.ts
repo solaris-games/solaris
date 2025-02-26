@@ -61,13 +61,15 @@ window.addEventListener("unhandledrejection", (event) => {
 
 const eventBus: EventBus = new ClientEventBus();
 
-let store: Store<State> = createSolarisStore(eventBus);
+const httpClient = createHttpClient();
+
+const store: Store<State> = createSolarisStore(eventBus, httpClient);
 
 app.use(store);
 
 app.use(ToastPlugin);
 
-let socket: Socket = io(socketUrl, { withCredentials: true });
+const socket: Socket = io(socketUrl, { withCredentials: true });
 
 const diplomacyClientSocketHandler: DiplomacyClientSocketHandler = new DiplomacyClientSocketHandler(socket, eventBus);
 const gameClientSocketHandler: GameClientSocketHandler = new GameClientSocketHandler(socket, store, app.config.globalProperties.$toast, eventBus);
@@ -76,8 +78,6 @@ const playerClientSocketEmitter: PlayerClientSocketEmitter = new PlayerClientSoc
 
 app.provide(playerClientSocketEmitterInjectionKey, playerClientSocketEmitter);
 app.provide(eventBusInjectionKey, eventBus);
-
-const httpClient = createHttpClient();
 
 app.provide(httpInjectionKey, httpClient);
 

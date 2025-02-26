@@ -10,3 +10,13 @@ export type UserRoles = {
     communityManager: boolean;
     gameMaster: boolean;
 };
+
+export type AwardedBadge<ID> = {
+    badge: string;
+    awardedBy: ID | null;
+    awardedByName: string | null;
+    awardedInGame: ID | null;
+    awardedInGameName: string | null;
+    playerAwarded: boolean;
+    time: Date | null;
+}

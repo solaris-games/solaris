@@ -18,12 +18,6 @@ class BadgeApiService extends BaseApiService {
       { withCredentials: true })
   }
 
-  purchaseBadgeForUser (userId, badgeKey) {
-    return axios.post(this.BASE_URL + 'badges/user/' + userId,
-      { badgeKey },
-      { withCredentials: true })
-  }
-
   purchaseBadgeForPlayer (gameId, playerId, badgeKey) {
     return axios.post(this.BASE_URL + 'badges/game/' + gameId + '/player/' + playerId,
       { badgeKey },

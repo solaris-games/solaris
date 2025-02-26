@@ -417,7 +417,7 @@ export default class LeaderboardService {
         
         // Note: We don't really care if its official or not, award a badge for any 32p games.
         if (this.gameTypeService.is32PlayerGame(game)) {
-            this.badgeService.awardBadgeForUserVictor32PlayerGame(user);
+            this.badgeService.awardBadgeForUserVictor32PlayerGame(user, game);
         }
 
         if (this.gameTypeService.isSpecialGameMode(game)) {
