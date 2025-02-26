@@ -7,6 +7,8 @@ import {AwardedBadge, User} from './types/User';
 import PlayerService from './player';
 import UserService from './user';
 import GamePlayerBadgePurchasedEvent from './types/events/GamePlayerBadgePurchased';
+import GameTypeService from "./gameType";
+import GameStateService from "./gameState";
 const EventEmitter = require('events');
 
 export const BadgeServiceEvents = {
@@ -17,17 +19,23 @@ export default class BadgeService extends EventEmitter {
     userRepo: Repository<User>;
     userService: UserService;
     playerService: PlayerService;
+    gameTypeService: GameTypeService;
+    gameStateService: GameStateService;
 
     constructor(
         userRepo: Repository<User>,
         userService: UserService,
-        playerService: PlayerService
+        playerService: PlayerService,
+        gameTypeService: GameTypeService,
+        gameStateService: GameStateService,
     ) {
         super();
 
         this.userRepo = userRepo;
         this.userService = userService;
         this.playerService = playerService;
+        this.gameTypeService = gameTypeService;
+        this.gameStateService = gameStateService;
     }
 
     listBadges(): Badge[] {
@@ -79,6 +87,10 @@ export default class BadgeService extends EventEmitter {
 
         if (!recipient.userId) {
             throw new ValidationError(`The player slot has not been filled by a user.`);
+        }
+
+        if (this.gameTypeService.isAnonymousGame(game) && !this.gameStateService.isFinished(game)) {
+            throw new ValidationError(`Cannot purchase a badge in an anonymous game before it finishes.`);
         }
 
         const purchasedForUserId = recipient.userId;

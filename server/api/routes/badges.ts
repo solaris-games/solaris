@@ -24,6 +24,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.game.loadGame({
                 lean: true,
                 state: true,
+                settings: true,
                 'galaxy.players': true
             }),
             controller.purchaseForPlayer
