@@ -336,6 +336,7 @@ export interface Game {
 				crazyExpensive: number;
 			},
 			captureRewardMultiplier: number;
+            captureRewardLimitMultiplier: number;
 			homeStarDefenderBonusMultiplier: number;
 		},
 		diplomacy: {

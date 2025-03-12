@@ -171,7 +171,8 @@ export default class StarCaptureService {
 
             const effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
 
-            const rewardLimit = this._calculateEconomyCostSum(game, starEconomy, this.starService.calculateTerraformedResource(star.naturalResources.economy, effectiveTechs.terraforming));
+            const starEconCost = this._calculateEconomyCostSum(game, starEconomy, this.starService.calculateTerraformedResource(star.naturalResources.economy, effectiveTechs.terraforming));
+            const rewardLimit = starEconCost * game.constants.star.captureRewardLimitMultiplier;
 
             return Math.min(finalReward, rewardLimit);
         }
