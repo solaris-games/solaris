@@ -582,6 +582,12 @@
             :valueText="getFriendlyText(game.settings.technology.bankingReward)"
             :value="game.settings.technology.bankingReward"
             :compareValue="compareSettings.technology.bankingReward"/>
+          <game-setting-value v-if="game.settings.technology.startingTechnologyLevel.experimentation > 0"
+            title="Experimentation Distribution"
+            tooltip="Determines to what technologies the experimentation reward gets distributed"
+            :valueText="getFriendlyText(game.settings.technology.experimentationDistribution)"
+            :value="game.settings.technology.experimentationDistribution"
+            :compareValue="compareSettings.technology.experimentationDistribution"/>
           <game-setting-value v-if="game.settings.technology.researchCostProgression"
             title="Research Cost Progression"
             tooltip="Determines the growth of research points needed for the next level of technology"
@@ -699,6 +705,8 @@ export default {
         'exponential': 'Exponential',
         'winner': 'Winner',
         'top_n': 'Top N',
+        'random': 'Random',
+        'current_research': 'Current Research',
       }[option]
 
       return text || option
