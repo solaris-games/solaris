@@ -19,6 +19,7 @@ import { PlayerClientSocketHandler } from "./sockets/socketHandlers/player"
 import { createSolarisStore, type State } from './store'
 import { httpInjectionKey } from "./services/typedapi"
 import {createHttpClient} from "./util/http";
+import {toastInjectionKey} from "./util/keys";
 
 // Note: This was done to get around an issue where the Steam client
 // had bootstrap as undefined. This also affects the UI template we're using,
@@ -80,6 +81,8 @@ app.provide(playerClientSocketEmitterInjectionKey, playerClientSocketEmitter);
 app.provide(eventBusInjectionKey, eventBus);
 
 app.provide(httpInjectionKey, httpClient);
+
+app.provide(toastInjectionKey, app.config.globalProperties.$toast);
 
 const clientHandler: ClientHandler = new ClientHandler(socket, store, playerClientSocketEmitter);
 
