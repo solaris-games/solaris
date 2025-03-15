@@ -6,7 +6,7 @@
     />
 
     <p>
-      <a :href="import.meta.env.VUE_APP_PROVIDER_INFORMATION_URL" target="_blank">Provider information</a>
+      <a :href="providerInfoUrl" target="_blank">Provider information</a>
     </p>
 
     <p>Last updated: March 14, 2025</p>
@@ -383,16 +383,11 @@
   </view-container>
 </template>
 
-<script>
+<script setup lang="ts">
 import ViewContainer from "./components/ViewContainer.vue"
 import ViewTitle from "./components/ViewTitle.vue"
 
-export default {
-  components: {
-    "view-container": ViewContainer,
-    "view-title": ViewTitle,
-  }
-}
+const providerInfoUrl = import.meta.env.VUE_APP_PROVIDER_INFORMATION_URL;
 </script>
 
 <style scoped>
