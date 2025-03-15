@@ -1,6 +1,6 @@
 <template>
     <div v-if="badgeName" class="badge-container" @click="onOpenPurchasePlayerBadgeRequested">
-        <img :src="badgeSrc" :title="badge.badge" :alt="badgeName"/>
+        <img class="badge-img" :src="badgeSrc" :title="badge.badge" :alt="badgeName"/>
         <span class="badge-label" :title="badgeName">{{badgeName}}</span>
     </div>
 </template>
@@ -28,31 +28,22 @@ const badgeSrc = computed(() => new URL(`../../../../assets/badges/${props.badge
 </script>
 
 <style scoped>
-img {
-    width: 110px;
-    height: 110px;
-}
-
-@media screen and (max-width: 576px) {
-    img {
-        width: 95px;
-        height: 95px;
-    }
-}
-
 .badge-container {
-    display: inline-block;
-    position: relative;
-    cursor: pointer;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.badge-img {
+  width: 70px;
+  height: 70px;
 }
 
 .badge-label {
-    position: absolute;
-    right: 8px;
-    top: 8px;
-    font-size: 20px;
-    background: #e74c3c;
-    padding: 0px 8px;
-    border-radius: 5px;
+  font-size: 14px;
+  padding: 4px;
+  color: white;
+  background-color: #333333;
+  border-radius: 4px;
 }
 </style>
