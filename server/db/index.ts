@@ -66,7 +66,12 @@ export default async (config, options) => {
         useNewUrlParser: true,
         useCreateIndex: true,
         keepAlive: true,
-        poolSize: options.poolSize
+        poolSize: options.poolSize,
+        socketTimeoutMS: 120000,
+    });
+
+    db.connection.on('error', err => {
+        log.error(err, 'MongoDB connection error:');
     });
 
     if (options.syncIndexes) {
