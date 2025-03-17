@@ -419,7 +419,7 @@ export default (container: DependencyContainer) => {
         },
         forceStart: async (req, res, next) => {
             try {
-                await container.gameService.forceStart(req.game, req.session.userId);
+                await container.gameService.forceStart(req.game, req.session.userId, Boolean(req.query.withOpenSlots));
 
                 res.sendStatus(200);
                 return next();

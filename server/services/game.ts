@@ -303,7 +303,7 @@ export default class GameService extends EventEmitter {
         }
     }
 
-    async forceStart(game: Game, forceStartingUserId: DBObjectId) {
+    async forceStart(game: Game, forceStartingUserId: DBObjectId, withOpenSlots: boolean) {
         if (!await this.gameAuthService.isGameAdmin(game, forceStartingUserId)) {
             throw new ValidationError('You do not have permission to force start this game.');
         }
@@ -324,7 +324,7 @@ export default class GameService extends EventEmitter {
             throw new ValidationError('Cannot force start game: only 3 AI players are allowed');
         }
 
-        this.gameJoinService.assignNonUserPlayersToAI(game, false);
+        this.gameJoinService.assignNonUserPlayersToAI(game, withOpenSlots);
 
         this.gameJoinService.startGame(game);
 
