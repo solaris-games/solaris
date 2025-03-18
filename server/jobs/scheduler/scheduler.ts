@@ -77,9 +77,9 @@ export class Scheduler {
                 log.info('Shutdown requested...');
 
                 if (this.pending) {
-                    this.pending.then(() => {
-                        log.info("Shutdown after awaiting pending job");
+                    log.info("Shutdown after awaiting pending job");
 
+                    this.pending.then(() => {
                         finish();
                     });
                 } else {
