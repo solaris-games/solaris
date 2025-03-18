@@ -2,16 +2,17 @@ import {logger} from "../../utils/logging";
 
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const Types = Schema.Types;
 const mongooseLeanDefaults = require('mongoose-lean-defaults');
 
 export type JobExecuted = {
     jobName: string,
-    date: Date,
+    timestamp: number,
 }
 
 const schema = new Schema({
-    jobName: { type: String, required: true },
-    date: { type: Date, required: true, default: () => new Date() }
+    jobName: { type: Types.String, required: true },
+    timestamp: { type: Types.Number, required: true }
 });
 
 schema.plugin(mongooseLeanDefaults);
@@ -22,14 +23,14 @@ const loadJob = async (jobName: string): Promise<JobExecuted | null> => {
     return await model.findOne({ jobName }).lean();
 }
 
-const saveJob = async (jobName: string): Promise<void> => {
-    await model.updateOne({ jobName }, { jobName, date: new Date() }, { upsert: true });
+const saveJob = async (jobName: string, timestamp: number): Promise<void> => {
+    await model.updateOne({ jobName }, { jobName, timestamp }, { upsert: true });
 }
 
 const log = logger("Jobs persistence");
 
 export class Persistence {
-    cache: Map<string, Date> = new Map();
+    cache: Map<string, number> = new Map();
 
     constructor() {
     }
@@ -43,7 +44,7 @@ export class Persistence {
             const executions = await model.find({ jobName: { $in: jobs } }).lean();
 
             for (const execution of executions) {
-                this.cache.set(execution.jobName, execution.date);
+                this.cache.set(execution.jobName, execution.timestamp);
             }
         } catch (e) {
             log.error(e, "Failed to load job executions");
@@ -52,13 +53,13 @@ export class Persistence {
         }
     }
 
-    async getLastExecution(jobName: string): Promise<Date | null> {
-        let result: Date | null = null;
+    async getLastExecution(jobName: string): Promise<number | null> {
+        let result: number | null = null;
 
         try {
             const stored = await loadJob(jobName);
             if (stored) {
-                result = stored.date;
+                result = stored.timestamp;
                 this.cache.set(jobName, result);
             }
         } catch (e) {
@@ -68,11 +69,11 @@ export class Persistence {
         return result || this.cache.get(jobName) || null;
     }
 
-    async saveExecution(jobName: string, date: Date): Promise<void> {
-        this.cache.set(jobName, date);
+    async saveExecution(jobName: string, timestamp: number): Promise<void> {
+        this.cache.set(jobName, timestamp);
 
         try {
-            await saveJob(jobName);
+            await saveJob(jobName, timestamp);
         } catch (e) {
             log.error(e, "Failed to save job execution for " + jobName);
         }
