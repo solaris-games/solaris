@@ -17,7 +17,7 @@ const schema = new Schema({
 
 schema.plugin(mongooseLeanDefaults);
 
-const model = mongoose.model('jobs_executed', schema);
+const model = mongoose.model('executedJob', schema);
 
 const loadJob = async (jobName: string): Promise<JobExecuted | null> => {
     return await model.findOne({ jobName }).lean();
