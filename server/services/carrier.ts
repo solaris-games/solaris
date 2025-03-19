@@ -373,7 +373,7 @@ export default class CarrierService extends EventEmitter {
         if (carrier.orbiting) {
             const orbitStar = this.starService.getById(game, carrier.orbiting);
 
-            return orbitStar.isNebula;
+            return Boolean(orbitStar?.isNebula);
         }
 
         return false;

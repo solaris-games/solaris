@@ -19,6 +19,7 @@ import { PlayerClientSocketHandler } from "./sockets/socketHandlers/player"
 import { createSolarisStore, type State } from './store'
 import { httpInjectionKey } from "./services/typedapi"
 import {createHttpClient} from "./util/http";
+import {toastInjectionKey} from "./util/keys";
 
 // Note: This was done to get around an issue where the Steam client
 // had bootstrap as undefined. This also affects the UI template we're using,
@@ -61,13 +62,15 @@ window.addEventListener("unhandledrejection", (event) => {
 
 const eventBus: EventBus = new ClientEventBus();
 
-let store: Store<State> = createSolarisStore(eventBus);
+const httpClient = createHttpClient();
+
+const store: Store<State> = createSolarisStore(eventBus, httpClient);
 
 app.use(store);
 
 app.use(ToastPlugin);
 
-let socket: Socket = io(socketUrl, { withCredentials: true });
+const socket: Socket = io(socketUrl, { withCredentials: true });
 
 const diplomacyClientSocketHandler: DiplomacyClientSocketHandler = new DiplomacyClientSocketHandler(socket, eventBus);
 const gameClientSocketHandler: GameClientSocketHandler = new GameClientSocketHandler(socket, store, app.config.globalProperties.$toast, eventBus);
@@ -77,9 +80,9 @@ const playerClientSocketEmitter: PlayerClientSocketEmitter = new PlayerClientSoc
 app.provide(playerClientSocketEmitterInjectionKey, playerClientSocketEmitter);
 app.provide(eventBusInjectionKey, eventBus);
 
-const httpClient = createHttpClient();
-
 app.provide(httpInjectionKey, httpClient);
+
+app.provide(toastInjectionKey, app.config.globalProperties.$toast);
 
 const clientHandler: ClientHandler = new ClientHandler(socket, store, playerClientSocketEmitter);
 

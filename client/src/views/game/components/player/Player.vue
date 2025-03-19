@@ -141,7 +141,7 @@ export default {
       this.$emit('onOpenReportPlayerRequested', e)
     },
     panToPlayer (e) {
-      GameContainer.map.panToPlayer(this.$store.state.game, this.player)
+      GameContainer.panToPlayer(this.$store.state.game, this.player)
     },
     onOpenPrevPlayerDetailRequested (e) {
       let prevLeaderboardIndex = this.leaderboard.indexOf(this.player) - 1;

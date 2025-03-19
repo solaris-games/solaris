@@ -22,7 +22,6 @@ import GamePlayerDefeatedEvent from './types/events/GamePlayerDefeated';
 import {LeaderboardPlayer} from "./types/Leaderboard";
 import GameJoinService from "./gameJoin";
 import GameAuthService from "./gameAuth";
-import cluster from "cluster";
 import PlayerAfkService from "./playerAfk";
 
 export const GameServiceEvents = {
@@ -303,7 +302,7 @@ export default class GameService extends EventEmitter {
         }
     }
 
-    async forceStart(game: Game, forceStartingUserId: DBObjectId) {
+    async forceStart(game: Game, forceStartingUserId: DBObjectId, withOpenSlots: boolean) {
         if (!await this.gameAuthService.isGameAdmin(game, forceStartingUserId)) {
             throw new ValidationError('You do not have permission to force start this game.');
         }
@@ -324,7 +323,7 @@ export default class GameService extends EventEmitter {
             throw new ValidationError('Cannot force start game: only 3 AI players are allowed');
         }
 
-        this.gameJoinService.assignNonUserPlayersToAI(game, false);
+        this.gameJoinService.assignNonUserPlayersToAI(game, withOpenSlots);
 
         this.gameJoinService.startGame(game);
 
@@ -348,12 +347,14 @@ export default class GameService extends EventEmitter {
             // are separate from the game afk logic.
             await this.gameRepo.updateOne({
                 _id: game._id,
-                'galaxy.players.$.afk': false,
-                'galaxy.players.$.defeated': false
             }, {
                 $set: {
-                    'galaxy.players.$.lastSeen': moment().utc(),
+                    'galaxy.players.$[].lastSeen': moment().utc(),
                 }
+            }, {
+                arrayFilters: [
+                    { 'player.defeated': false }
+                ]
             });
         }
         

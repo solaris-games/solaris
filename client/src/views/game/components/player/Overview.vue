@@ -12,7 +12,16 @@
       </div>
   </div>
 
-  <div class="row pt-2 pb-2 bg-dark" v-if="!(!userPlayer || !gameHasStarted || player.userId)">
+  <div class="row pt-2 pb-2 bg-dark" v-if="userPlayer && (!gameHasStarted || player.userId)">
+    <div class="col-auto">
+      <button class="btn btn-primary me-1" @click="onViewColourOverrideRequested">
+        <i class="fas fa-paint-brush" />
+        <span v-if="!isCompactUIStyle" class="d-none d-md-inline-block ms-1">Customise colour</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="row pt-2 pb-2 bg-dark" v-if="gameHasStarted && !player.userId && userPlayer">
     <div class="col">
       <button class="btn btn-outline-secondary me-1" @click="onOpenDiplomacyRequested" title="Open Diplomacy" v-if="isFormalAlliancesEnabled">
         <i class="fas fa-globe-americas"></i>

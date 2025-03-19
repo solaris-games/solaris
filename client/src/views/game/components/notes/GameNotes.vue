@@ -124,7 +124,7 @@ export default {
       const star = GameHelper.getStarById(this.$store.state.game, id)
 
       if (star) {
-        GameContainer.map.panToStar(star)
+        GameContainer.panToStar(star)
       } else {
         this.$toast.error(`The location of the star is unknown.`)
       }

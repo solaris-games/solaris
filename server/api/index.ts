@@ -26,8 +26,9 @@ async function startServer() {
     cors: {
       origin: config.corsUrls,
       methods: ['POST', 'PUT', 'PATCH', 'GET', 'DELETE', 'OPTIONS'],
-      credentials: true
-    }
+      credentials: true,
+    },
+    transports: ["websocket", "polling"]
   });
 
   log.info('Sockets initialized.');

@@ -24,15 +24,10 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.game.loadGame({
                 lean: true,
                 state: true,
+                settings: true,
                 'galaxy.players': true
             }),
             controller.purchaseForPlayer
-    );
-
-    router.post('/api/badges/user/:userId',
-            mw.auth.authenticate(),
-            validator.body(badgesPurchaseBadgeRequestSchema),
-            controller.purchaseForUser
     );
 
     router.get('/api/badges/game/:gameId/player/:playerId',

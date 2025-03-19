@@ -210,7 +210,7 @@ export default (config: Config,
     const playerService = new PlayerService(gameRepository, randomService, mapService, starService, carrierService, starDistanceService, technologyService, specialistService, gameTypeService, playerReadyService, teamService, playerColourService);
     const spectatorService = new SpectatorService(gameRepository, playerService, userService);
     const playerAfkService = new PlayerAfkService(gameRepository, playerService, starService, carrierService, gameTypeService, gameStateService);
-    const badgeService = new BadgeService(userRepository, userService, playerService);
+    const badgeService = new BadgeService(userRepository, userService, playerService, gameTypeService, gameStateService);
     const ledgerService = new LedgerService(gameRepository, playerService, playerCreditsService);
     const reputationService = new ReputationService(gameRepository, playerStatisticsService, diplomacyService, playerAfkService);
     const tradeService = new TradeService(gameRepository, eventRepository, userService, playerService, diplomacyService, ledgerService, achievementService, reputationService, gameTypeService, randomService, playerCreditsService, playerAfkService);

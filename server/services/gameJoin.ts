@@ -140,34 +140,34 @@ export default class GameJoinService extends EventEmitter {
 
         // If the user was an afk-er then they are only allowed to join
         // their slot.
-        let isAfker = game.afkers.find(x => x.toString() === userId.toString());
-        let isRejoiningAfkSlot = isAfker && player.afk && userId && player.userId && player.userId.toString() === userId.toString();
+        const isAfker = game.afkers.find(x => x.toString() === userId.toString());
+        const isRejoiningAfkSlot = isAfker && player.afk && userId && player.userId && player.userId.toString() === userId.toString();
 
         // If they have been afk'd then they are only allowed to join their slot again.
         if (player.afk && isAfker && userId && player.userId && player.userId.toString() !== userId.toString()) {
             throw new ValidationError('You can only rejoin this game in your own slot.');
         }
 
-        let stars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+        const stars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
         if (!stars.length) {
             throw new ValidationError('Cannot fill this slot, the player does not own any stars.');
         }
 
-        let aliasCheckPlayer = game.galaxy.players.find(x => x.userId && x.alias.toLowerCase() === alias.toLowerCase());
+        const aliasCheckPlayer = game.galaxy.players.find(x => x.userId && x.alias.toLowerCase() === alias.toLowerCase());
 
         if (aliasCheckPlayer && !isRejoiningAfkSlot) {
             throw new ValidationError(`The alias '${alias}' has already been taken by another player.`);
         }
 
         // Disallow if they have the same alias as a user.
-        let aliasCheckUser = await this.userService.otherUsernameExists(alias, userId);
+        const aliasCheckUser = await this.userService.otherUsernameExists(alias, userId);
 
         if (aliasCheckUser) {
             throw new ValidationError(`The alias '${alias}' is the username of another player.`);
         }
 
-        let gameIsFull = this.assignPlayerToUser(game, player, userId, alias, avatar);
+        const gameIsFull = this.assignPlayerToUser(game, player, userId, alias, avatar);
 
         if (gameIsFull) {
             this.assignNonUserPlayersToAI(game);
@@ -226,6 +226,7 @@ export default class GameJoinService extends EventEmitter {
         player.missedTurns = 0;
         player.afk = false;
         player.hasSentTurnReminder = false;
+        player.colourMapping = new Map();
 
         if (!player.userId) {
             player.ready = true;

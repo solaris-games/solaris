@@ -3,11 +3,12 @@ import TextureService from './texture'
 import gameHelper from '../services/gameHelper.js'
 import seededRandom from 'random-seed'
 import Helpers from './helpers'
-import {EventEmitter} from "./eventEmitter.js";
+import { MapObject } from './mapObject';
+import type { Location } from '@solaris-common';
 
 const NAME_SIZE = 4
 
-export class Star extends EventEmitter {
+export class Star extends MapObject {
 
   static culling_margin = 16
   static shipsSmallSize = 6
@@ -129,6 +130,14 @@ export class Star extends EventEmitter {
       can be read from static property "zoomLevelDefinitions"
     */
     this.zoomDepth = 1
+  }
+
+  getContainer(): Container {
+    return this.container!;
+  }
+
+  getLocation(): Location {
+    return this.data!.location!;
   }
 
   _getStarPlayer () {

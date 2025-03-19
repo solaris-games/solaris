@@ -11,7 +11,10 @@
         Game
       </button>
       <button class="btn btn-danger ms-1" v-if="!game.state.startDate"
-              @click="forceStartGame">Force start Game
+              @click="forceStartGame(false)">Force start Game
+      </button>
+      <button class="btn btn-danger ms-1" v-if="!game.state.startDate"
+              @click="forceStartGame(true)">Force start Game (keep slots open)
       </button>
       <button class="btn btn-warning ms-1"
               v-if="game.state.startDate && !game.state.endDate && !game.state.forceTick"
@@ -102,12 +105,12 @@ export default {
         this.isLoading = false
       }
     },
-    async forceStartGame() {
+    async forceStartGame(withOpenSlots) {
       if (await this.$confirm('Force start game', 'All open slots will be filled with bots. Are you sure you want to force start this game?')) {
         this.isLoading = true
 
         try {
-          await gameService.forceStart(this.game._id)
+          await gameService.forceStart(this.game._id, withOpenSlots)
 
           this.$toast.success(`The game has been force started. Please notify the players.`)
 

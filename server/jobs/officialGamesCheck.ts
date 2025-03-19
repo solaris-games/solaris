@@ -24,51 +24,43 @@ const findExistingGame = (setting: OfficialGameCategory, games: Game[]) => {
     }
 }
 
-export default (container: DependencyContainer) => {
-    return {
-        async handler(job, done) {
-            try {
-                // Check if there is an official game with the settings game name which
-                // is currently waiting for players.
-                const openGames = await container.gameListService.listOfficialGames();
-                const runningGames = await container.gameListService.listInProgressGames();
+export const officialGamesCheckJob = (container: DependencyContainer) => async () => {
+    try {
+        // Check if there is an official game with the settings game name which
+        // is currently waiting for players.
+        const openGames = await container.gameListService.listOfficialGames();
+        const runningGames = await container.gameListService.listInProgressGames();
 
-                const settings = container.gameTypeService.getOfficialGameSettings();
+        const settings = container.gameTypeService.getOfficialGameSettings();
 
-                for (const category of settings) {
-                    const existingOpen = findExistingGame(category, openGames);
+        for (const category of settings) {
+            const existingOpen = findExistingGame(category, openGames);
 
-                    if (!existingOpen) {
-                        log.info(`Could not find game [${container.gameTypeService.getOfficialGameCategoryName(category)}], creating it now...`);
+            if (!existingOpen) {
+                log.info(`Could not find game [${container.gameTypeService.getOfficialGameCategoryName(category)}], creating it now...`);
 
-                        const existingRunning = findExistingGame(category, runningGames);
-                        const existingTemplate = existingRunning?.settings.general.createdFromTemplate;
+                const existingRunning = findExistingGame(category, runningGames);
+                const existingTemplate = existingRunning?.settings.general.createdFromTemplate;
 
-                        let newSetting;
-                        if (existingRunning && existingTemplate && category.kind === OfficialGameKind.Carousel && category.distribution === 'sequential') {
-                            const index = category.rotation.findIndex(x => x.general.createdFromTemplate && x.general.createdFromTemplate === existingTemplate);
-                            const nextIndex = (index + 1) % category.rotation.length;
-                            newSetting = category.rotation[nextIndex];
-                        } else {
-                            newSetting = chooseSetting(container, category);
-                        }
-
-                        try {
-                            const newGame = await container.gameCreateService.create(newSetting);
-
-                            log.info(`${newGame.settings.general.type} game created: ${newGame.settings.general.name}`);
-                        } catch (e) {
-                            log.error(e);
-                        }
-                    }
+                let newSetting: GameSettings;
+                if (existingRunning && existingTemplate && category.kind === OfficialGameKind.Carousel && category.distribution === 'sequential') {
+                    const index = category.rotation.findIndex(x => x.general.createdFromTemplate && x.general.createdFromTemplate === existingTemplate);
+                    const nextIndex = (index + 1) % category.rotation.length;
+                    newSetting = category.rotation[nextIndex];
+                } else {
+                    newSetting = chooseSetting(container, category);
                 }
 
-                done();
-            } catch (e) {
-                log.error(e, "OfficialGamesCheck job threw unhandled: " + e);
+                try {
+                    const newGame = await container.gameCreateService.create(newSetting);
+
+                    log.info(`${newGame.settings.general.type} game created: ${newGame.settings.general.name}`);
+                } catch (e) {
+                    log.error(e);
+                }
             }
         }
-
-    };
-
-};
+    } catch (e) {
+        log.error(e, "OfficialGamesCheck job threw unhandled: " + e);
+    }
+}

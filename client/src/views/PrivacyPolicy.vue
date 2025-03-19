@@ -5,7 +5,11 @@
       :showSocialLinks="false"
     />
 
-    <p>Last updated: January 31, 2022</p>
+    <p>
+      <a :href="providerInfoUrl" target="_blank">Provider information</a>
+    </p>
+
+    <p>Last updated: March 14, 2025</p>
     <p>
       This Privacy Policy describes Our policies and procedures on the
       collection, use and disclosure of Your information when You use the
@@ -49,7 +53,7 @@
         </p>
       </li>
       <li>
-        <p><strong>Country</strong> refers to: United Kingdom</p>
+        <p><strong>Country</strong> refers to: Germany</p>
       </li>
       <li>
         <p>
@@ -116,6 +120,9 @@
         <p>Email address</p>
       </li>
       <li>
+        <p>IP Address</p>
+      </li>
+      <li>
         <p>Usage Data</p>
       </li>
     </ul>
@@ -139,47 +146,6 @@
       We may also collect information that Your browser sends whenever You visit
       our Service or when You access the Service by or through a mobile device.
     </p>
-    <h5>Tracking Technologies and Cookies</h5>
-    <p>
-      We use Cookies and similar tracking technologies to track the activity on
-      Our Service and store certain information. Tracking technologies used are
-      beacons, tags, and scripts to collect and track information and to improve
-      and analyze Our Service. The technologies We use may include:
-    </p>
-    <ul>
-      <li>
-        <strong>Cookies or Browser Cookies.</strong> A cookie is a small file
-        placed on Your Device. You can instruct Your browser to refuse all
-        Cookies or to indicate when a Cookie is being sent. However, if You do
-        not accept Cookies, You may not be able to use some parts of our
-        Service. Unless you have adjusted Your browser setting so that it will
-        refuse Cookies, our Service may use Cookies.
-      </li>
-      <li>
-        <strong>Flash Cookies.</strong> Certain features of our Service may use
-        local stored objects (or Flash Cookies) to collect and store information
-        about Your preferences or Your activity on our Service. Flash Cookies
-        are not managed by the same browser settings as those used for Browser
-        Cookies. For more information on how You can delete Flash Cookies,
-        please read &quot;Where can I change the settings for disabling, or
-        deleting local shared objects?&quot; available at
-        <a
-          href="https://helpx.adobe.com/flash-player/kb/disable-local-shared-objects-flash.html#main_Where_can_I_change_the_settings_for_disabling__or_deleting_local_shared_objects_"
-          rel="external nofollow noopener"
-          target="_blank"
-          >https://helpx.adobe.com/flash-player/kb/disable-local-shared-objects-flash.html#main_Where_can_I_change_the_settings_for_disabling__or_deleting_local_shared_objects_</a
-        >
-      </li>
-      <li>
-        <strong>Web Beacons.</strong> Certain sections of our Service and our
-        emails may contain small electronic files known as web beacons (also
-        referred to as clear gifs, pixel tags, and single-pixel gifs) that
-        permit the Company, for example, to count users who have visited those
-        pages or opened an email and for other related website statistics (for
-        example, recording the popularity of a certain section and verifying
-        system and server integrity).
-      </li>
-    </ul>
     <p>
       Cookies can be &quot;Persistent&quot; or &quot;Session&quot; Cookies.
       Persistent Cookies remain on Your personal computer or mobile device when
@@ -204,15 +170,6 @@
         </p>
       </li>
       <li>
-        <p><strong>Cookies Policy / Notice Acceptance Cookies</strong></p>
-        <p>Type: Persistent Cookies</p>
-        <p>Administered by: Us</p>
-        <p>
-          Purpose: These Cookies identify if users have accepted the use of
-          cookies on the Website.
-        </p>
-      </li>
-      <li>
         <p><strong>Functionality Cookies</strong></p>
         <p>Type: Persistent Cookies</p>
         <p>Administered by: Us</p>
@@ -225,11 +182,6 @@
         </p>
       </li>
     </ul>
-    <p>
-      For more information about the cookies we use and your choices regarding
-      cookies, please visit our Cookies Policy or the Cookies section of our
-      Privacy Policy.
-    </p>
     <h4>Use of Your Personal Data</h4>
     <p>The Company may use Personal Data for the following purposes:</p>
     <ul>
@@ -263,14 +215,6 @@
           informative communications related to the functionalities, products or
           contracted services, including the security updates, when necessary or
           reasonable for their implementation.
-        </p>
-      </li>
-      <li>
-        <p>
-          <strong>To provide You</strong> with news, special offers and general
-          information about other goods, services and events which we offer that
-          are similar to those that you have already purchased or enquired about
-          unless You have opted not to receive such information.
         </p>
       </li>
       <li>
@@ -311,18 +255,6 @@
         personal information in connection with, or during negotiations of, any
         merger, sale of Company assets, financing, or acquisition of all or a
         portion of Our business to another company.
-      </li>
-      <li>
-        <strong>With Affiliates:</strong> We may share Your information with Our
-        affiliates, in which case we will require those affiliates to honor this
-        Privacy Policy. Affiliates include Our parent company and any other
-        subsidiaries, joint venture partners or other companies that We control
-        or that are under common control with Us.
-      </li>
-      <li>
-        <strong>With business partners:</strong> We may share Your information
-        with Our business partners to offer You certain products, services or
-        promotions.
       </li>
       <li>
         <strong>With other users:</strong> when You share personal information
@@ -440,11 +372,6 @@
       any changes by posting the new Privacy Policy on this page.
     </p>
     <p>
-      We will let You know via email and/or a prominent notice on Our Service,
-      prior to the change becoming effective and update the &quot;Last
-      updated&quot; date at the top of this Privacy Policy.
-    </p>
-    <p>
       You are advised to review this Privacy Policy periodically for any
       changes. Changes to this Privacy Policy are effective when they are posted
       on this page.
@@ -456,16 +383,11 @@
   </view-container>
 </template>
 
-<script>
+<script setup lang="ts">
 import ViewContainer from "./components/ViewContainer.vue"
 import ViewTitle from "./components/ViewTitle.vue"
 
-export default {
-  components: {
-    "view-container": ViewContainer,
-    "view-title": ViewTitle,
-  }
-}
+const providerInfoUrl = import.meta.env.VUE_APP_PROVIDER_INFORMATION_URL;
 </script>
 
 <style scoped>

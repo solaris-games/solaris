@@ -1,4 +1,4 @@
-export interface Badge {
+export type Badge = {
     key: string;
     name: string;
     description: string;
