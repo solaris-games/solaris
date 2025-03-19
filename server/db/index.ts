@@ -52,6 +52,27 @@ export default async (config, options) => {
     dbConnection.on('error', (e) => {
         log.error(e, 'connection error:')
     });
+    dbConnection.on('connected', () => {
+        log.info(`Successfully connected to MongoDB`);
+    });
+    dbConnection.on('reconnected', () => {
+        log.info(`Successfully reconnected to MongoDB`);
+    });
+    dbConnection.on('connecting', () => {
+        log.info('MongoDB connecting...');
+    });
+    dbConnection.once('open', () => {
+        log.info('MongoDB dbConnection opened');
+    });
+    dbConnection.on('disconnecting', () => {
+        log.info('MongoDB disconnecting...');
+    });
+    dbConnection.on('disconnected', () => {
+        log.error('MongoDB disconnected');
+    });
+    dbConnection.on('close', () => {
+        log.info('MongoDB dbConnection closed');
+    });
 
     options = options || {};
     options.connectionString = options.connectionString || config.connectionString;
