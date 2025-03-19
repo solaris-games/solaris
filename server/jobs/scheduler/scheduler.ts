@@ -46,7 +46,7 @@ export class Scheduler {
                 log.debug(`Running job: ${job.name}`);
 
                 try {
-                    await job.job();
+                    await job.job(this.abort!.signal);
                 } catch (e) {
                     log.error(e, `Failed to run job: ${job.name}`);
                 }
@@ -59,9 +59,6 @@ export class Scheduler {
             this.lastExecution = now;
         }
 
-        this.abort = new AbortController();
-        this.pending = runJobs();
-
         const finishJob = () => {
             this.pending = null;
 
@@ -70,13 +67,15 @@ export class Scheduler {
             }, this.options.checkInterval);
         };
 
-        this.pending.then(finishJob);
-
+        this.abort = new AbortController();
         this.abort.signal.addEventListener('abort', () => {
             log.warn('Aborting pending job');
 
             finishJob();
-        })
+        });
+
+        this.pending = runJobs();
+        this.pending.then(finishJob);
     }
 
     async startup() {
