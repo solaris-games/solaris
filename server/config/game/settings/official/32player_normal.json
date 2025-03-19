@@ -12,7 +12,7 @@
     "playerOnlineStatus": "hidden",
     "playerIPWarning": "enabled",
     "timeMachine": "enabled",
-    "fluxEnabled": "enabled",
+    "fluxEnabled": "disabled",
     "advancedAI": "enabled",
     "spectators": "enabled",
     "afkSlotsOpen": "enabled",
@@ -44,7 +44,7 @@
     "giftCarriers": "enabled",
     "defenderBonus": "enabled",
     "carrierToCarrierCombat": "enabled",
-    "splitResources": "disabled",
+    "splitResources": "enabled",
     "resourceDistribution": "random",
     "playerDistribution": "circular",
     "carrierSpeed": 20,
@@ -59,7 +59,7 @@
   "conquest": {
     "victoryCondition": "starPercentage",
     "victoryPercentage": 33,
-    "capitalStarElimination": "enabled"
+    "capitalStarElimination": "disabled"
   },
   "orbitalMechanics": {
     "enabled": "disabled",
