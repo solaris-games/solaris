@@ -153,7 +153,7 @@ export default class BadgeService extends EventEmitter {
         this.emit(BadgeServiceEvents.onGamePlayerBadgePurchased, e);
     }
 
-    awardBadgeForUser(user: User, badgeKey: string, game: Game): void {
+    awardBadgeForUser(user: User, badgeKey: string, game: Game, date: Date): void {
         const badge = this.listBadges().find(b => b.key === badgeKey);
 
         if (!badge) {
@@ -167,17 +167,17 @@ export default class BadgeService extends EventEmitter {
             awardedInGame: game._id,
             awardedInGameName: game.settings.general.name,
             playerAwarded: false,
-            time: new Date()
+            time: date
         }
 
         user.achievements.badges.push(awardedBadge);
     }
 
     awardBadgeForUserVictor32PlayerGame(user: User, game: Game): void {
-        this.awardBadgeForUser(user, 'victor32', game);
+        this.awardBadgeForUser(user, 'victor32', game, game.state.endDate!);
     }
 
     awardBadgeForUserVictorySpecialGame(user: User, game: Game): void {
-        this.awardBadgeForUser(user, game.settings.general.type, game);
+        this.awardBadgeForUser(user, game.settings.general.type, game, game.state.endDate!);
     }
 };
