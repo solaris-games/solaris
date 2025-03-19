@@ -19,7 +19,7 @@
   },
   "galaxy": {
     "galaxyType": "circular-balanced",
-    "starsPerPlayer": 30,
+    "starsPerPlayer": 40,
     "productionTicks": 20
   },
   "specialGalaxy": {
@@ -35,7 +35,7 @@
     "randomBinaryStars": 0,
     "randomBlackHoles": 0,
     "randomPulsars": 0,
-    "darkGalaxy": "disabled",
+    "darkGalaxy": "fog",
     "giftCarriers": "disabled",
     "defenderBonus": "enabled",
     "carrierToCarrierCombat": "enabled",
@@ -52,7 +52,7 @@
   "conquest": {
     "victoryCondition": "starPercentage",
     "victoryPercentage": 66,
-    "capitalStarElimination": "disabled"
+    "capitalStarElimination": "enabled"
   },
   "orbitalMechanics": {
     "enabled": "disabled",
@@ -60,13 +60,13 @@
   },
   "player": {
     "startingStars": 6,
-    "startingCredits": 2000,
-    "startingCreditsSpecialists": 10,
-    "startingShips": 100,
+    "startingCredits": 1000,
+    "startingCreditsSpecialists": 5,
+    "startingShips": 10,
     "startingInfrastructure": {
-      "economy": 20,
-      "industry": 20,
-      "science": 4
+      "economy": 10,
+      "industry": 10,
+      "science": 2
     },
     "developmentCost": {
       "economy": "standard",
@@ -119,7 +119,8 @@
   "gameTime": {
     "gameType": "realTime",
     "speed": 3600,
-    "isTickLimited": "disabled",
+    "isTickLimited": "enabled",
+    "tickLimit": 400,
     "startDelay": 240,
     "afk": {
       "lastSeenTimeout": 2,
