@@ -5,11 +5,10 @@ import mongooseLoader from '../db';
 import containerLoader from '../services';
 
 import { gameTickJob } from './gameTick';
-import {officialGamesCheckJob} from './officialGamesCheck';
-import CleanupGamesTimedOutJob from './cleanupGamesTimedOut';
-import CleanupOldGameHistoryJob from './cleanupOldGameHistory';
-import CleanupOldTutorialsJob from './cleanupOldTutorials';
-import SendReviewRemindersJob from './sendReviewReminders';
+import { officialGamesCheckJob } from './officialGamesCheck';
+import { cleanupGamesTimedOutJob } from './cleanupGamesTimedOut';
+import { cleanupOldGameHistoryJob } from './cleanupOldGameHistory';
+import { cleanupOldTutorialsJob } from './cleanupOldTutorials';
 import { serverStub } from "../sockets/serverStub";
 import {Scheduler, SchedulerOptions} from "./scheduler/scheduler";
 
@@ -17,6 +16,14 @@ let mongo;
 Error.stackTraceLimit = 1000;
 
 setupLogging();
+
+const TEN_SECONDS = 10000;
+
+const ONE_MINUTE = 60000;
+
+const ONE_HOUR = ONE_MINUTE * 60;
+
+const ONE_DAY = 3600000 * 24;
 
 const log = logger();
 
@@ -39,13 +46,6 @@ async function startup() {
     await container.gameService.lockAll(false);
     log.info('All games unlocked');
 
-    // ------------------------------
-
-    const cleanupGamesTimedOutJob = CleanupGamesTimedOutJob(container);
-    const cleanupOldGameHistory = CleanupOldGameHistoryJob(container);
-    const cleanupOldTutorials = CleanupOldTutorialsJob(container);
-    const sendReviewReminders = SendReviewRemindersJob(container);
-
     const schedulerOptions: SchedulerOptions = {
         checkInterval: 5000
     };
@@ -54,50 +54,29 @@ async function startup() {
         {
             name: 'game-tick',
             job: gameTickJob(container),
-            interval: 10000
+            interval: TEN_SECONDS
         },
         {
             name: 'new-player-game-check',
             job: officialGamesCheckJob(container),
-            interval: 60000
+            interval: ONE_MINUTE
+        },
+        {
+            name: 'cleanup-games-timed-out',
+            job: cleanupGamesTimedOutJob(container),
+            interval: ONE_HOUR
+        },
+        {
+            name: 'cleanup-old-game-history',
+            job: cleanupOldGameHistoryJob(container),
+            interval: ONE_DAY
+        },
+        {
+            name: 'cleanup-old-tutorials',
+            job: cleanupOldTutorialsJob(container),
+            interval: ONE_DAY
         }
     ], schedulerOptions);
-
-    // TODO: Migrate other jobs too
-
-    //// Cleanup old games that reached timeout
-    //agendajs.define('cleanup-games-timed-out', {
-    //    priority: 'high', concurrency: 1
-    //},
-    //cleanupGamesTimedOutJob.handler);
-//
-    //// Cleanup old game history
-    //agendajs.define('cleanup-old-game-history', {
-    //    priority: 'high', concurrency: 1
-    //},
-    //cleanupOldGameHistory.handler);
-//
-    //// Cleanup old tutorials
-    //agendajs.define('cleanup-old-tutorials', {
-    //    priority: 'high', concurrency: 1
-    //},
-    //cleanupOldTutorials.handler);
-//
-    //// Send review reminders
-    //agendajs.define('send-review-reminders', {
-    //    priority: 'high', concurrency: 1
-    //},
-    //sendReviewReminders.handler);
-
-    // ...
-
-    // ------------------------------
-
-    // Start server jobs
-    //agendajs.every('1 hour', 'cleanup-games-timed-out');
-    //agendajs.every('1 day', 'cleanup-old-game-history');
-    //agendajs.every('1 day', 'cleanup-old-tutorials');
-    //agendajs.every('10 seconds', 'send-review-reminders'); // TODO: Every 10 seconds until we've gone through all backlogged users.
 
     await scheduler.startup();
 
