@@ -47,7 +47,7 @@ async function startup() {
     log.info('All games unlocked');
 
     const schedulerOptions: SchedulerOptions = {
-        checkInterval: 5000
+        checkInterval: 5000,
     };
 
     const scheduler = new Scheduler([

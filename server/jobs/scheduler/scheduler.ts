@@ -3,7 +3,7 @@ import {logger} from "../../utils/logging";
 
 export type JobSpec = {
     name: string;
-    job: () => Promise<void>,
+    job: (signal: AbortSignal) => Promise<void>,
     interval: number;
 }
 
@@ -20,6 +20,7 @@ export class Scheduler {
     persistence: Persistence;
     pending: Promise<void> | null =  null;
     lastExecution: number = 0;
+    abort: AbortController | null = null;
 
     constructor(jobs: JobSpec[], options: SchedulerOptions) {
         this.jobs = jobs;
@@ -51,19 +52,30 @@ export class Scheduler {
                 }
 
                 await this.persistence.saveExecution(job.name, now);
+
+                log.debug(`Job completed: ${job.name}`);
             }
 
             this.lastExecution = now;
         }
 
+        this.abort = new AbortController();
         this.pending = runJobs();
 
-        this.pending.then(() => {
+        const finishJob = () => {
             this.pending = null;
 
             setTimeout(() => {
                 this._process();
             }, this.options.checkInterval);
+        };
+
+        this.pending.then(finishJob);
+
+        this.abort.signal.addEventListener('abort', () => {
+            log.warn('Aborting pending job');
+
+            finishJob();
         })
     }
 
@@ -73,6 +85,12 @@ export class Scheduler {
 
     run(): Promise<void> {
         return new Promise(((finish, reject) => {
+            process.on('uncaughtException', (e) => {
+                log.error(e, 'Uncaught exception');
+
+                this.abort && this.abort.abort();
+            });
+
             process.on('SIGINT', () => {
                 log.info('Shutdown requested...');
 
