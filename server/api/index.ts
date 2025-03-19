@@ -28,7 +28,7 @@ async function startServer() {
       methods: ['POST', 'PUT', 'PATCH', 'GET', 'DELETE', 'OPTIONS'],
       credentials: true,
     },
-    transports: ["websocket"]
+    transports: ["websocket", "polling"]
   });
 
   log.info('Sockets initialized.');
