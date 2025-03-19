@@ -42,7 +42,7 @@ export class Scheduler {
             }
 
             for (const job of jobsToProcess) {
-                log.info(`Running job: ${job.name}`);
+                log.debug(`Running job: ${job.name}`);
 
                 try {
                     await job.job();

@@ -1,27 +1,29 @@
-import {Logger} from "pino";
+import {Logger, default as pino } from "pino";
 import config from '../config';
 
-const pino = require('pino');
-let transport;
 let baseLogger;
 
 export const setupLogging = () => {
     const loggingT = config.logging || 'stdout';
+    let logDestination;
 
     if (loggingT === 'pretty') {
-        transport = pino.transport({
+        logDestination = {
             target: 'pino-pretty'
-        });
+        };
     } else if (loggingT === 'stdout') {
-        transport = pino.transport({
+        logDestination = {
             target: 'pino/file',
             options: {destination: 1}
-        });
+        };
     } else {
         throw new Error(`Invalid logging type: ${loggingT}`);
     }
 
-    baseLogger = pino(transport);
+    baseLogger = pino({
+        level: config.logLevel || 'info',
+        transport: logDestination,
+    });
 }
 
 export const logger = (name?: string): Logger => {

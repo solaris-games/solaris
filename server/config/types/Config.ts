@@ -10,6 +10,7 @@ export interface Config {
     corsUrls: string[];
     cacheEnabled: boolean;
     logging?: LoggingType;
+    logLevel?: string;
     smtp: {
         enabled: boolean;
         host?: string;
