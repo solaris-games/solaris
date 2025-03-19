@@ -22,7 +22,6 @@ import GamePlayerDefeatedEvent from './types/events/GamePlayerDefeated';
 import {LeaderboardPlayer} from "./types/Leaderboard";
 import GameJoinService from "./gameJoin";
 import GameAuthService from "./gameAuth";
-import cluster from "cluster";
 import PlayerAfkService from "./playerAfk";
 
 export const GameServiceEvents = {

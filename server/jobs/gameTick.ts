@@ -1,4 +1,3 @@
-import GameMutexService from "../services/gameMutex";
 import { DBObjectId } from "../services/types/DBObjectId";
 import { DependencyContainer } from "../services/types/DependencyContainer";
 import { Game } from "../services/types/Game";
@@ -7,63 +6,48 @@ import {logger} from "../utils/logging";
 
 const log = logger("Game Tick Job");
 
-export default (container: DependencyContainer) => {
+const tryTickGame = async (container: DependencyContainer, gameId: DBObjectId) => {
+    let gameMutexLock: GameMutexLock | null = null;
 
-    const gameMutexService: GameMutexService = container.gameMutexService;
+    try {
+        //console.log(`tryGameTick()!`);
+        gameMutexLock = await container.gameMutexService.acquireMutexLock(gameId.toString());
+        //console.log(`Mutex lock acquired: ${gameMutexLock}`);
 
-    async function tryTickGame(gameId: DBObjectId) {
-        let gameMutexLock: GameMutexLock | null = null;
+        let game: Game | null = await container.gameService.getByIdLean(gameId, {
+            _id: 1,
+            state: 1,
+            settings: 1,
+            'galaxy.players': 1
+        });
 
-        try {
-            //console.log(`tryGameTick()!`);
-            gameMutexLock = await gameMutexService.acquireMutexLock(gameId.toString());
-            //console.log(`Mutex lock acquired: ${gameMutexLock}`);
-
-            let game: Game | null = await container.gameService.getByIdLean(gameId, {
-                _id: 1,
-                state: 1,
-                settings: 1,
-                'galaxy.players': 1
-            });
-
-            if (game != null && container.gameTickService.canTick(game)) {
-                try {
-                    await container.gameLockService.lock(gameId, true);
-                    await container.gameTickService.tick(gameId);
-                }
-                catch (e) {
-                    log.error(e, `Error in game ${game.settings.general.name} (${game._id})`);
-                }
-                finally {
-                    await container.gameLockService.lock(gameId, false);
-                }
+        if (game != null && container.gameTickService.canTick(game)) {
+            try {
+                await container.gameLockService.lock(gameId, true);
+                await container.gameTickService.tick(gameId);
+            } catch (e) {
+                log.error(e, `Error in game ${game.settings.general.name} (${game._id})`);
+            } finally {
+                await container.gameLockService.lock(gameId, false);
             }
         }
-        catch (e) {
-            log.error(e);
-        }
-        finally {
-            //console.log(`tryTickGame() finished!`);
-            //console.log(`Mutex lock: ${gameMutexLock}`);
-            if (gameMutexLock != null) {
-                await gameMutexService.releaseMutexLock(gameMutexLock);
-            }
+    } catch (e) {
+        log.error(e);
+    } finally {
+        //console.log(`tryTickGame() finished!`);
+        //console.log(`Mutex lock: ${gameMutexLock}`);
+        if (gameMutexLock != null) {
+            await container.gameMutexService.releaseMutexLock(gameMutexLock);
         }
     }
+}
 
-    return {
-        async handler(job, done) {
-            try {
-                let gameIds: DBObjectId[] = (await container.gameListService.listInProgressGamesGameTick()).map(g => g._id);
+export const gameTickJob = (container: DependencyContainer) => async () => {
+    try {
+        const gameIds: DBObjectId[] = (await container.gameListService.listInProgressGamesGameTick()).map(g => g._id);
 
-                await Promise.all(gameIds.map(gameId => tryTickGame(gameId)));
-
-                done();
-            } catch (e) {
-                log.error(e, "GameTick job threw unhandled: " + e);
-            }
-        }
-
-    };
-    
+        await Promise.all(gameIds.map(gameId => tryTickGame(container, gameId)));
+    } catch (e) {
+        log.error(e, "GameTick job threw unhandled: " + e);
+    }
 };

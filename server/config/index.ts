@@ -12,6 +12,7 @@ const config: Config = {
     corsUrls: process.env.CORS_URLS?.split(",") || [ process.env.CLIENT_URL || "https://solaris.games" ],
     cacheEnabled: process.env.CACHE_ENABLED == "true",
     logging: process.env.LOGGING_TYPE as LoggingType,
+    logLevel: process.env.LOGGING_LEVEL,
     smtp: {
         enabled: process.env.SMTP_ENABLED == "true",
         host: process.env.SMTP_HOST,
