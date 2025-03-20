@@ -117,7 +117,7 @@
         "experimentationDistribution": "random",
         "bankingReward": "standard",
         "experimentationReward": "standard",
-        "specialistTokenReward": "experimental"
+        "specialistTokenReward": "standard"
     },
     "gameTime": {
         "speed": 3600,
