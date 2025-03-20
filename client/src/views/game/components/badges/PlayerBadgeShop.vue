@@ -82,7 +82,8 @@ const loadGalacticCredits = async () => {
 onMounted(async () => {
   recipientPlayer.value = GameHelper.getPlayerById(store.state.game!, props.recipientPlayerId)
 
-  badges.value = await store.dispatch('getBadges');
+  const allBadges = await store.dispatch('getBadges');
+  badges.value = allBadges.filter(b => b.price);
   await loadGalacticCredits()
 });
 

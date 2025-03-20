@@ -4,7 +4,7 @@ export default (container: DependencyContainer) => {
     return {
         listAll: async (req, res, next) => {
             try {
-                const result = container.badgeService.listPurchasableBadges();
+                const result = container.badgeService.listBadges();
                 
                 res.status(200).json(result);
                 return next();
