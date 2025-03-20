@@ -87,7 +87,15 @@ onMounted(async () => {
       badges.value = [];
       console.error(response.cause);
     } else {
-      badges.value = response.data;
+      badges.value = response.data.sort((a, b) => {
+        if (!a.time) {
+          return 1;
+        } else if (!b.time) {
+          return -1;
+        } else {
+          return a.time.getTime() - b.time.getTime();
+        }
+      });
     }
   } catch (err) {
     console.error(err)

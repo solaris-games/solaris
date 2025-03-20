@@ -114,7 +114,7 @@
     "experimentationDistribution": "random",
     "bankingReward": "standard",
     "experimentationReward": "standard",
-    "specialistTokenReward": "experimental"
+    "specialistTokenReward": "standard"
   },
   "gameTime": {
     "gameType": "realTime",

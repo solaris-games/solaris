@@ -11,9 +11,12 @@ import { cleanupOldGameHistoryJob } from './cleanupOldGameHistory';
 import { cleanupOldTutorialsJob } from './cleanupOldTutorials';
 import { serverStub } from "../sockets/serverStub";
 import {Scheduler, SchedulerOptions} from "./scheduler/scheduler";
+import events from "node:events";
 
 let mongo;
 Error.stackTraceLimit = 1000;
+
+events.setMaxListeners(20);
 
 setupLogging();
 
