@@ -27,7 +27,6 @@ export class PlayerSocketEventNames {
     public static readonly GamePlayerReadyToQuit: PlayerSocketEventName<{ playerId?: string }> = toEventName('gamePlayerReadyToQuit');
     public static readonly GamePlayerNotReadyToQuit: PlayerSocketEventName<{ playerId?: string }> = toEventName('gamePlayerNotReadyToQuit');
 
-    public static readonly GameMessageSent: PlayerSocketEventName<ConversationMessageSentResult<string>> = toEventName('gameMessageSent');
     public static readonly GameConversationRead: PlayerSocketEventName<{ conversationId: string, readByPlayerId: string }> = toEventName('gameConversationRead');
 
     public static readonly GameConversationLeft: PlayerSocketEventName<{ conversationId: string, playerId: string }> = toEventName('gameConversationLeft');

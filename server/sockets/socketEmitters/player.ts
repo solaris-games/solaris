@@ -34,10 +34,6 @@ export class PlayerServerSocketEmitter extends ServerSocketEmitter<PlayerSocketE
         this.emit(room, PlayerSocketEventNames.GamePlayerNotReadyToQuit, data);
     }
 
-    public emitGameMessageSent(room: string | string[], data: ConversationMessageSentResult<string>) {
-        this.emit(room, PlayerSocketEventNames.GameMessageSent, data);
-    }
-
     public emitGameConversationRead(room: string | string[], data: { conversationId: string, readByPlayerId: string }) {
         this.emit(room, PlayerSocketEventNames.GameConversationRead, data);
     }

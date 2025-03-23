@@ -89,6 +89,7 @@ import UserLeaderboardService from "../userLeaderboard";
 import UserLevelService from "../userLevel";
 import WaypointService from "../waypoint";
 import StarCaptureService from "../starCapture";
+import {UserServerSocketEmitter} from "../../sockets/socketEmitters/user";
 
 export interface DependencyContainer {
     config: Config,
@@ -101,6 +102,7 @@ export interface DependencyContainer {
     gameServerSocketEmitter: GameServerSocketEmitter,
     playerServerSocketEmitter: PlayerServerSocketEmitter,
     diplomacyServerSocketEmitter: DiplomacyServerSocketEmitter,
+    userServerSocketEmitter: UserServerSocketEmitter,
     carrierService: CarrierService,
     combatService: CombatService,
     distanceService: DistanceService,

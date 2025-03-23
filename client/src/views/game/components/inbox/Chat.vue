@@ -31,6 +31,7 @@ import AudioService from '../../../../game/audio'
 import { inject } from 'vue'
 import MenuEventBusEventNames from '../../../../eventBusEventNames/menu'
 import PlayerEventBusEventNames from '../../../../eventBusEventNames/player'
+import UserEventBusEventNames from "@/eventBusEventNames/user.js";
 
 export default {
   components: {
@@ -59,7 +60,7 @@ export default {
       args: null
     })
 
-    this.eventBus.on(PlayerEventBusEventNames.GameMessageSent, this.onMessageReceived);
+    this.eventBus.on(UserEventBusEventNames.GameMessageSent, this.onMessageReceived);
     this.eventBus.on(MenuEventBusEventNames.OnMenuChatSidebarRequested, this.toggle);
     this.eventBus.on(MenuEventBusEventNames.OnCreateNewConversationRequested, this.onCreateNewConversationRequested);
     this.eventBus.on(MenuEventBusEventNames.OnViewConversationRequested, this.onViewConversationRequested);
@@ -69,7 +70,7 @@ export default {
     document.removeEventListener('keydown', this.handleKeyDown)
     window.removeEventListener('resize', this.handleResize)
 
-    this.eventBus.off(PlayerEventBusEventNames.GameMessageSent, this.onMessageReceived);
+    this.eventBus.off(UserEventBusEventNames.GameMessageSent, this.onMessageReceived);
     this.eventBus.off(MenuEventBusEventNames.OnMenuChatSidebarRequested, this.toggle);
     this.eventBus.off(MenuEventBusEventNames.OnCreateNewConversationRequested, this.onCreateNewConversationRequested);
     this.eventBus.off(MenuEventBusEventNames.OnViewConversationRequested, this.onViewConversationRequested);

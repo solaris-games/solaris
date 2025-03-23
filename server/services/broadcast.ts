@@ -12,6 +12,7 @@ import { DBObjectId } from "./types/DBObjectId";
 import { Game } from "./types/Game";
 import { Player } from "./types/Player";
 import { TradeEventTechnology } from "./types/Trade";
+import {UserServerSocketEmitter} from "../sockets/socketEmitters/user";
 
 
 export default class BroadcastService {
@@ -19,6 +20,7 @@ export default class BroadcastService {
     constructor(private gameServerSocketEmitter: GameServerSocketEmitter,
                 private playerServerSocketEmitter: PlayerServerSocketEmitter,
                 private diplomacyServerSocketEmitter: DiplomacyServerSocketEmitter,
+                private userServerSocketEmitter: UserServerSocketEmitter,
                 private avatarService: AvatarService) {
     }
 
@@ -77,7 +79,7 @@ export default class BroadcastService {
             .filter(p => p.userId != null)
             .map(p => p.userId!);
 
-        toUserIds.forEach(p => this.playerServerSocketEmitter.emitGameMessageSent(p.toString(), this.mapConversationMessageSentResultObjectIds(message)));
+        toUserIds.forEach(u => this.userServerSocketEmitter.emitGameMessageSent(u.toString(), this.mapConversationMessageSentResultObjectIds(message)));
     }
 
     gameConversationRead(game: Game, conversation: Conversation, readByPlayerId: DBObjectId) {

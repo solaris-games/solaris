@@ -45,6 +45,7 @@ import { playerClientSocketEmitterInjectionKey } from '../../sockets/socketEmitt
 import PlayerEventBusEventNames from '../../eventBusEventNames/player'
 import GameEventBusEventNames from '../../eventBusEventNames/game'
 import router from '../../router'
+import UserEventBusEventNames from "@/eventBusEventNames/user.js";
 
 export default {
   components: {
@@ -259,10 +260,10 @@ export default {
     // --------------------
     // events
     subscribeToEvents () {
-      this.eventBus.on(PlayerEventBusEventNames.GameMessageSent, (data) => this.onMessageReceived(data))
+      this.eventBus.on(UserEventBusEventNames.GameMessageSent, (data) => this.onMessageReceived(data))
     },
     unsubscribeFromEvents () {
-      this.eventBus.off(PlayerEventBusEventNames.GameMessageSent);
+      this.eventBus.off(UserEventBusEventNames.GameMessageSent);
     },
     onMessageReceived (e) {
       if (window.innerWidth >= 992) { // Don't do this if the window is too large as it gets handled elsewhere

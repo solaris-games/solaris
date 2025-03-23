@@ -124,6 +124,7 @@ import { PlayerServerSocketHandler } from "../sockets/socketHandlers/player";
 import { Logger } from "pino";
 import SocketService from "./socket";
 import StarCaptureService from "./starCapture";
+import {UserServerSocketEmitter} from "../sockets/socketEmitters/user";
 
 const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
@@ -178,7 +179,8 @@ export default (config: Config,
     const gameServerSocketEmitter = new GameServerSocketEmitter(socketServer);
     const playerServerSocketEmitter = new PlayerServerSocketEmitter(socketServer);
     const diplomacyServerSocketEmitter = new DiplomacyServerSocketEmitter(socketServer);
-    const broadcastService = new BroadcastService(gameServerSocketEmitter, playerServerSocketEmitter, diplomacyServerSocketEmitter, avatarService);
+    const userServerSocketEmitter = new UserServerSocketEmitter(socketServer);
+    const broadcastService = new BroadcastService(gameServerSocketEmitter, playerServerSocketEmitter, diplomacyServerSocketEmitter, userServerSocketEmitter, avatarService);
     const achievementService = new AchievementService(userRepository, guildService, userLevelService);
     const ratingService = new RatingService(userRepository, gameRepository, userService);
     const nameService = new NameService(gameNames, starNames, randomService);
@@ -266,6 +268,7 @@ export default (config: Config,
         gameServerSocketEmitter,
         playerServerSocketEmitter,
         diplomacyServerSocketEmitter,
+        userServerSocketEmitter,
         broadcastService,
         carrierService,
         combatService,
