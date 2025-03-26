@@ -8,6 +8,7 @@ import {useToast} from 'vue-toast-notification';
 import {eventBusInjectionKey} from "../eventBus";
 import MENU_STATES from '../services/data/menuStates.js';
 import router from "../router.js";
+import AudioService from '../game/audio'
 
 export const withMessages = () => {
   const $toast = useToast();
@@ -35,6 +36,8 @@ export const withMessages = () => {
         }
       });
     }
+
+    AudioService.join();
   }
 
   onMounted(() => {

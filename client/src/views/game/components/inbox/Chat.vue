@@ -27,11 +27,8 @@ import GameHelper from '../../../../services/gameHelper'
 import ConversationListVue from '../inbox/conversations/ConversationList.vue'
 import ConversationCreateVue from './conversations/ConversationCreate.vue'
 import ConversationDetailVue from './conversations/ConversationDetail.vue'
-import AudioService from '../../../../game/audio'
 import { inject } from 'vue'
 import MenuEventBusEventNames from '../../../../eventBusEventNames/menu'
-import PlayerEventBusEventNames from '../../../../eventBusEventNames/player'
-import UserEventBusEventNames from "@/eventBusEventNames/user.js";
 
 export default {
   components: {

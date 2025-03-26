@@ -15,7 +15,7 @@ import ConversationApiService from '../../../../services/api/conversation'
 import PlayerEventBusEventNames from '../../../../eventBusEventNames/player'
 import { inject } from 'vue'
 import { eventBusInjectionKey } from '../../../../eventBus'
-import UserEventBusEventNames from "@/eventBusEventNames/user.js";
+import UserEventBusEventNames from "@/eventBusEventNames/user";
 
 export default {
   components: {

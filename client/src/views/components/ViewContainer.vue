@@ -39,7 +39,7 @@
 <script>
 import LogoVue from './Logo.vue'
 import ViewContainerTopBarVue from './ViewContainerTopBar.vue'
-import {withMessages} from "@/util/messages.js";
+import {withMessages} from "../../util/messages";
 
 export default {
   props: {

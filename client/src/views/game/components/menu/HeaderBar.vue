@@ -72,7 +72,6 @@ import KEYBOARD_SHORTCUTS from '../../../../services/data/keyboardShortcuts'
 import GameContainer from '../../../../game/container'
 import ServerConnectionStatusVue from './ServerConnectionStatus.vue'
 import ResearchProgressVue from './ResearchProgress.vue'
-import AudioService from '../../../../game/audio'
 import ConversationApiService from '../../../../services/api/conversation'
 import EventApiService from '../../../../services/api/event'
 import HamburgerMenuVue from './HamburgerMenu.vue'
@@ -83,7 +82,7 @@ import { eventBusInjectionKey } from '../../../../eventBus'
 import { inject } from 'vue'
 import GameEventBusEventNames from '../../../../eventBusEventNames/game'
 import PlayerEventBusEventNames from '../../../../eventBusEventNames/player'
-import UserEventBusEventNames from "@/eventBusEventNames/user.js";
+import UserEventBusEventNames from "../../../../eventBusEventNames/user";
 
 export default {
   components: {

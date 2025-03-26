@@ -59,7 +59,7 @@ import { inject } from 'vue'
 import { eventBusInjectionKey } from '../../../../../eventBus'
 import PlayerEventBusEventNames from '../../../../../eventBusEventNames/player'
 import MenuEventBusEventNames from '../../../../../eventBusEventNames/menu'
-import UserEventBusEventNames from "@/eventBusEventNames/user.js";
+import UserEventBusEventNames from "../../../../../eventBusEventNames/user";
 
 export default {
   components: {
