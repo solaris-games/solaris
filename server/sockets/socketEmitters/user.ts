@@ -3,7 +3,7 @@ import {
     ConversationMessageSentResult,
     UserSocketEventNames,
     UserSocketEventType
-} from "@solaris-common";
+} from "solaris-common";
 
 export class UserServerSocketEmitter extends ServerSocketEmitter<UserSocketEventType> {
     public emitGameMessageSent(room: string | string[], data: ConversationMessageSentResult<string>) {
