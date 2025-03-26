@@ -42,6 +42,8 @@ export class Scheduler {
                 }
             }
 
+            jobsToProcess.sort((a, b) => a.interval - b.interval);
+
             for (const job of jobsToProcess) {
                 log.debug(`Running job: ${job.name}`);
 
