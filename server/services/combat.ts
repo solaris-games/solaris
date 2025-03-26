@@ -1,9 +1,17 @@
-import { Carrier } from "./types/Carrier";
-import { Attacker, CombatCarrier, CombatPart, CombatResult, CombatResultShips, CombatStar, Defender } from "./types/Combat";
-import { Game } from "./types/Game";
-import { Player } from "./types/Player";
-import { Star, StarCaptureResult } from "./types/Star";
-import { User } from "./types/User";
+import {Carrier} from "./types/Carrier";
+import {
+    Attacker,
+    CombatCarrier,
+    CombatPart,
+    CombatResult,
+    CombatResultShips,
+    CombatStar,
+    Defender
+} from "./types/Combat";
+import {Game} from "./types/Game";
+import {Player} from "./types/Player";
+import {Star, StarCaptureResult} from "./types/Star";
+import {User} from "./types/User";
 import DiplomacyService from "./diplomacy";
 import GameTypeService from "./gameType";
 import PlayerService from "./player";
@@ -164,7 +172,7 @@ export default class CombatService extends EventEmitter {
     }
 
     _calculateEffectiveWeaponsLevels(game: Game, star: Star | null, defenders: Player[], attackers: Player[], defenderCarriers: Carrier[], attackerCarriers: Carrier[]) {
-        let isCarrierToStarCombat = star != null;
+        const isCarrierToStarCombat = star != null;
 
         // Calculate the total number of defending ships
         let totalDefenders = defenderCarriers.reduce((sum, c) => sum + c.ships!, 0);
@@ -174,7 +182,7 @@ export default class CombatService extends EventEmitter {
         }
         
         // Calculate the total number of attacking ships
-        let totalAttackers = attackerCarriers.reduce((sum, c) => sum + c.ships!, 0);
+        const totalAttackers = attackerCarriers.reduce((sum, c) => sum + c.ships!, 0);
 
         // Calculate the defender weapons tech level based on any specialists present at stars or carriers.
         let defenderWeaponsTechLevel: number;
@@ -189,25 +197,23 @@ export default class CombatService extends EventEmitter {
         let attackerWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, attackers, attackerCarriers, isCarrierToStarCombat, true);
 
         // Check for deductions to weapons to either side
-        let defenderWeaponsDeduction = this.technologyService.getCarriersWeaponsDebuff(attackerCarriers);
-        let attackerWeaponsDeduction = this.technologyService.getCarriersWeaponsDebuff(defenderCarriers);
+        const defenderWeaponsDeduction = this.technologyService.getCarriersWeaponsDebuff(attackerCarriers);
+        const attackerWeaponsDeduction = this.technologyService.getCarriersWeaponsDebuff(defenderCarriers);
 
         // Ensure that both sides fight with AT LEAST level 1 weapons
         defenderWeaponsTechLevel = Math.max(defenderWeaponsTechLevel - defenderWeaponsDeduction, 1);
         attackerWeaponsTechLevel = Math.max(attackerWeaponsTechLevel - attackerWeaponsDeduction, 1);
 
         // Check to see if weapons tech should be swapped (joker specialist)
-        let defenderSwapWeapons = this._shouldSwapWeaponsTech(defenderCarriers);
-        let attackerSwapWeapons = this._shouldSwapWeaponsTech(attackerCarriers);
+        const defenderSwapWeapons = this._shouldSwapWeaponsTech(defenderCarriers);
+        const attackerSwapWeapons = this._shouldSwapWeaponsTech(attackerCarriers);
 
-        let shouldSwapWeaponsTech = (isCarrierToStarCombat && attackerSwapWeapons && !defenderSwapWeapons) ||   // Attacker controls controls the weapon swap in c2s combat unless both have jokers
+        const shouldSwapWeaponsTech = (isCarrierToStarCombat && attackerSwapWeapons && !defenderSwapWeapons) ||   // Attacker controls controls the weapon swap in c2s combat unless both have jokers
                                     (!isCarrierToStarCombat && attackerSwapWeapons !== defenderSwapWeapons);    // In c2c combat, swap weapons unless both have jokers
 
         if (shouldSwapWeaponsTech) {
             let oldDefenderWeaponsTechLevel = defenderWeaponsTechLevel;
-            let oldAttackerWeaponsTechLevel = attackerWeaponsTechLevel;
-
-            defenderWeaponsTechLevel = oldAttackerWeaponsTechLevel;
+            defenderWeaponsTechLevel = attackerWeaponsTechLevel;
             attackerWeaponsTechLevel = oldDefenderWeaponsTechLevel;
         }
 
