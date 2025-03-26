@@ -1,5 +1,5 @@
 import { makeCastFunc } from "@solaris-common";
-import MENU_STATES from '../services/data/menuStates';
+import MENU_STATES from '../services/data/menuStates.js';
 import type { EventBusEventName } from "./eventBusEventName";
 
 export type MenuEventBusEventType = { menuEventBusEventType: 'menuEventBusEventType' };

@@ -239,17 +239,17 @@ export default class BroadcastService {
     }
 
     mapConversationMessageSentResultObjectIds(conversationMessageSentResult: ConversationMessageSentResult<DBObjectId>): ConversationMessageSentResult<string> {
-        const { _id, fromPlayerId, readBy, conversationId, toPlayerIds, ...cmsr } = conversationMessageSentResult;
+        const { _id, fromPlayerId, readBy, conversationId, toPlayerIds, gameId, ...cmsr } = conversationMessageSentResult;
 
-        const newConversationMessageSentResult = cmsr as ConversationMessageSentResult<string>;
-
-        newConversationMessageSentResult._id = _id?.toString();
-        newConversationMessageSentResult.fromPlayerId = fromPlayerId?.toString() ?? null;
-        newConversationMessageSentResult.readBy = readBy.map(id => id.toString());
-        newConversationMessageSentResult.conversationId = conversationId.toString();
-        newConversationMessageSentResult.toPlayerIds = toPlayerIds.map(id => id.toString());
-
-        return newConversationMessageSentResult;
+        return {
+            _id: _id?.toString(),
+            fromPlayerId: fromPlayerId?.toString() ?? null,
+            readBy: readBy.map(id => id.toString()),
+            conversationId: conversationId.toString(),
+            toPlayerIds: toPlayerIds.map(id => id.toString()),
+            gameId: gameId.toString(),
+            ...cmsr
+        }
     }
 
     mapDiplomaticStatusObjectIds(diplomaticStatus: DiplomaticStatus<DBObjectId>): DiplomaticStatus<string> {

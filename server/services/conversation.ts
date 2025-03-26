@@ -323,7 +323,8 @@ export default class ConversationService extends EventEmitter {
             ...newMessage,
             conversationId: conversation._id,
             type: 'message',
-            toPlayerIds
+            toPlayerIds,
+            gameId: game._id,
         }
 
         let e: ConversationMessageSentEvent = {

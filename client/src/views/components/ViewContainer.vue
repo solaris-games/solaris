@@ -39,6 +39,7 @@
 <script>
 import LogoVue from './Logo.vue'
 import ViewContainerTopBarVue from './ViewContainerTopBar.vue'
+import {withMessages} from "@/util/messages.js";
 
 export default {
   props: {
@@ -48,6 +49,11 @@ export default {
   components: {
     'logo': LogoVue,
     'view-container-top-bar': ViewContainerTopBarVue
+  },
+  setup () {
+    if (this.isAuthPage) {
+      withMessages()
+    }
   },
   async mounted() {
     if (this.isAuthPage && !this.$store.state.userId) {

@@ -60,7 +60,6 @@ export default {
       args: null
     })
 
-    this.eventBus.on(UserEventBusEventNames.GameMessageSent, this.onMessageReceived);
     this.eventBus.on(MenuEventBusEventNames.OnMenuChatSidebarRequested, this.toggle);
     this.eventBus.on(MenuEventBusEventNames.OnCreateNewConversationRequested, this.onCreateNewConversationRequested);
     this.eventBus.on(MenuEventBusEventNames.OnViewConversationRequested, this.onViewConversationRequested);
@@ -70,7 +69,6 @@ export default {
     document.removeEventListener('keydown', this.handleKeyDown)
     window.removeEventListener('resize', this.handleResize)
 
-    this.eventBus.off(UserEventBusEventNames.GameMessageSent, this.onMessageReceived);
     this.eventBus.off(MenuEventBusEventNames.OnMenuChatSidebarRequested, this.toggle);
     this.eventBus.off(MenuEventBusEventNames.OnCreateNewConversationRequested, this.onCreateNewConversationRequested);
     this.eventBus.off(MenuEventBusEventNames.OnViewConversationRequested, this.onViewConversationRequested);
@@ -133,33 +131,6 @@ export default {
       })
 
       this.isExpanded = true
-    },
-    onMessageReceived (e) {
-      if (!this.canHandleConversationEvents()) { // Don't do this if the window is too small as this component won't be displayed
-        return
-      }
-
-      // TODO: Copied from Game.vue, any way to share this?
-      let conversationId = e.conversationId
-
-      // Show a toast only if the user isn't already in the conversation.
-      if (this.menuState === MENU_STATES.CONVERSATION && this.menuArguments === conversationId) {
-        return
-      }
-
-      this.$toast.info(`New message from ${e.fromPlayerAlias}.`, {
-        duration: 10000,
-        onClick: () => {
-          this.$store.commit('setMenuStateChat', {
-            state: MENU_STATES.CONVERSATION,
-            args: conversationId
-          })
-
-          this.isExpanded = true
-        }
-      })
-
-      AudioService.join()
     },
     handleKeyDown (e) {
       // Note: We only care about the INBOX key here.
