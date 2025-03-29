@@ -19,7 +19,7 @@ export default class Repository<T> {
         return await this.model.findById(id, select).exec();
     }
 
-    async find(query, select?: any | null, sort?: any | null, limit?: number | null, skip?: number | null): Promise<T[]> {
+    async find(query, select?: any | null, sort?: any | null, limit?: number | null, skip?: number | null, defaults: boolean = true): Promise<T[]> {
         // TODO: The allowDiskUse() method was added to Mongoose in 5.12.8 (https://github.com/Automattic/mongoose/issues/10177), but
         // the Typescript type definition for the method was only added in 6.0.9 (https://github.com/Automattic/mongoose/pull/10791).
         // This horrible bodge ensures that this all works with Typescript, and can be removed once we update Mongoose to version 6.0.9 or above.
@@ -29,7 +29,7 @@ export default class Repository<T> {
         .sort(sort)
         .skip(skip!) // We lie and say skip won't be null.  The reality is that skip() can accept null values just fine.
         .limit(limit!) // We lie and say limit won't be null.  The reality is that limit() can accept null values just fine.
-        .lean({ defaults: true }) as T1)
+        .lean({ defaults }) as T1)
         .allowDiskUse(true)
         .exec() as T[];
     }

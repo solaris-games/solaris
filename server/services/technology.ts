@@ -1,9 +1,10 @@
 import { Carrier } from "./types/Carrier";
-import { Game } from "./types/Game";
+import {CombatResolutionMalusStrategy, Game} from "./types/Game";
 import { Player, PlayerTechnologyLevels, ResearchTypeNotRandom } from "./types/Player";
 import { Star } from "./types/Star";
 import SpecialistService from "./specialist";
 import GameTypeService from "./gameType";
+import {maxBy, maxOf} from "./utils";
 
 const DEFAULT_TECHNOLOGIES: ResearchTypeNotRandom[] = [
     'terraforming',
@@ -160,7 +161,7 @@ export default class TechnologyService {
         return 0;
     }
 
-    getCarrierWeaponsBuff(carrier: Carrier, isCarrierToStarCombat: boolean, isAttacker: boolean, allyCount: number) {
+    getCarrierWeaponsBuff(carrier: Carrier, isCarrierToStarCombat: boolean, isAttacker: boolean, allyCount: number,  strategy: CombatResolutionMalusStrategy, isLargestCarrier: boolean) {
         const buffs: number[] = [];
 
         if (carrier.specialistId) {
@@ -191,7 +192,12 @@ export default class TechnologyService {
                 }
                 
                 if (specialist.modifiers.local.weapons) {
-                    buffs.push(specialist.modifiers.local.weapons);
+                    const isDebuff = specialist.modifiers.local.weapons < 0;
+                    const isMalusCarrier = (strategy === 'anyCarrier') || (strategy === 'largestCarrier' && isLargestCarrier);
+
+                    if (!isDebuff || isMalusCarrier) {
+                        buffs.push(specialist.modifiers.local.weapons);
+                    }
                 }
             }
         }
@@ -235,7 +241,7 @@ export default class TechnologyService {
         let buffs: number[] = [];
 
         if (carriersInOrbit.length) {
-            buffs = carriersInOrbit.map(c => this.getCarrierWeaponsBuff(c, true, false, defenders.length));
+            buffs = carriersInOrbit.map(c => this.getCarrierWeaponsBuff(c, true, false, defenders.length, 'anyCarrier', false));
         }
 
         buffs.push(this.getStarWeaponsBuff(star));
@@ -243,14 +249,20 @@ export default class TechnologyService {
         return this._calculateActualWeaponsBuff(weapons, buffs, defenderBonus);
     }
 
-    getCarriersEffectiveWeaponsLevel(game: Game, players: Player[], carriers: Carrier[], isCarrierToStarCombat: boolean, isAttacker: boolean) {
-        let weapons = players.sort((a, b) => b.research.weapons.level - a.research.weapons.level)[0].research.weapons.level;
+    getCarriersEffectiveWeaponsLevel(game: Game, players: Player[], carriers: Carrier[], isCarrierToStarCombat: boolean, isAttacker: boolean,  strategy: CombatResolutionMalusStrategy) {
+        const weapons = players.sort((a, b) => b.research.weapons.level - a.research.weapons.level)[0].research.weapons.level;
 
         if (!carriers.length) {
             return weapons;
         }
 
-        let buffs = carriers.map(c => this.getCarrierWeaponsBuff(c, isCarrierToStarCombat, isAttacker, players.length));
+        const largestCarrierShips = maxBy(c => c.ships || 0, carriers);
+
+        const buffs = carriers.map(c => {
+            const isLargest = (c.ships || 0) === (largestCarrierShips || 0);
+
+            return this.getCarrierWeaponsBuff(c, isCarrierToStarCombat, isAttacker, players.length, strategy, isLargest)
+        });
 
         return this._calculateActualWeaponsBuff(weapons, buffs, 0);
     }

@@ -8,7 +8,7 @@ import {
     CombatStar,
     Defender
 } from "./types/Combat";
-import {Game} from "./types/Game";
+import {CombatResolutionMalusStrategy, Game} from "./types/Game";
 import {Player} from "./types/Player";
 import {Star, StarCaptureResult} from "./types/Star";
 import {User} from "./types/User";
@@ -190,11 +190,12 @@ export default class CombatService extends EventEmitter {
         if (isCarrierToStarCombat) {
             defenderWeaponsTechLevel = this.technologyService.getStarEffectiveWeaponsLevel(game, defenders, star!, defenderCarriers);
         } else {
-            defenderWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, defenders, defenderCarriers, isCarrierToStarCombat, false);
+            defenderWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, defenders, defenderCarriers, isCarrierToStarCombat, false, 'anyCarrier');
         }
-        
+
+        const attackerMalusStrategy = isCarrierToStarCombat ? game.settings.specialGalaxy.combatResolutionMalusStrategy : 'anyCarrier';
         // Calculate the weapons tech level for the attacker
-        let attackerWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, attackers, attackerCarriers, isCarrierToStarCombat, true);
+        let attackerWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, attackers, attackerCarriers, isCarrierToStarCombat, true, attackerMalusStrategy);
 
         // Check for deductions to weapons to either side
         const defenderWeaponsDeduction = this.technologyService.getCarriersWeaponsDebuff(attackerCarriers);
