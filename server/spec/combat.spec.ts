@@ -124,7 +124,13 @@ describe('combat', () => {
     // --------------------------
 
     it('should calculate carrier to star combat - carriers vs. star garrison - defender wins', async () => {
-        const game = { };
+        const game = {
+            settings: {
+                specialGalaxy: {
+                    combatResolutionMalusStrategy: 'anyCarrier'
+                }
+            }
+        };
 
         const star = {
             shipsActual: 10
@@ -161,7 +167,13 @@ describe('combat', () => {
     });
 
     it('should calculate carrier to star combat - carriers vs. star garrison - attacker wins', async () => {
-        const game = { };
+        const game = {
+            settings: {
+                specialGalaxy: {
+                    combatResolutionMalusStrategy: 'anyCarrier'
+                }
+            }
+        };
 
         const star = {
             shipsActual: 10
@@ -198,7 +210,13 @@ describe('combat', () => {
     });
 
     it('should calculate carrier to star combat - carriers vs. carriers - defender wins', async () => {
-        const game = { };
+        const game = {
+            settings: {
+                specialGalaxy: {
+                    combatResolutionMalusStrategy: 'anyCarrier'
+                }
+            }
+        };
 
         const star = {
             shipsActual: 0
@@ -239,7 +257,13 @@ describe('combat', () => {
     });
 
     it('should calculate carrier to star combat - carriers vs. carriers - attacker wins', async () => {
-        const game = { };
+        const game = {
+            settings: {
+                specialGalaxy: {
+                    combatResolutionMalusStrategy: 'anyCarrier'
+                }
+            }
+        };
 
         const star = {
             shipsActual: 0
@@ -282,7 +306,13 @@ describe('combat', () => {
     // --------------------------
 
     it('should calculate carrier to carrier combat - mutual destruction', async () => {
-        const game = { };
+        const game = {
+            settings: {
+                specialGalaxy: {
+                    combatResolutionMalusStrategy: 'anyCarrier'
+                }
+            }
+        };
 
         const defenders = [];
 
@@ -319,7 +349,13 @@ describe('combat', () => {
     });
 
     it('should calculate carrier to carrier combat - defender wins', async () => {
-        const game = { };
+        const game = {
+            settings: {
+                specialGalaxy: {
+                    combatResolutionMalusStrategy: 'anyCarrier'
+                }
+            }
+        };
 
         const defenders = [];
 
@@ -356,7 +392,13 @@ describe('combat', () => {
     });
 
     it('should calculate carrier to carrier combat - attacker wins', async () => {
-        const game = { };
+        const game = {
+            settings: {
+                specialGalaxy: {
+                    combatResolutionMalusStrategy: 'anyCarrier'
+                }
+            }
+        };
 
         const defenders = [];
 
@@ -393,7 +435,13 @@ describe('combat', () => {
     });
 
     it('should destroy carriers in carrier to carrier combat if they cannot withstand a single blow - defender wins', async () => {
-        const game = { };
+        const game = {
+            settings: {
+                specialGalaxy: {
+                    combatResolutionMalusStrategy: 'anyCarrier'
+                }
+            }
+        };
 
         const defenders = [];
 
@@ -427,7 +475,13 @@ describe('combat', () => {
     });
 
     it('should destroy carriers in carrier to carrier combat if they cannot withstand a single blow - attacker wins', async () => {
-        const game = { };
+        const game = {
+            settings: {
+                specialGalaxy: {
+                    combatResolutionMalusStrategy: 'anyCarrier'
+                }
+            }
+        };
 
         const defenders = [];
 

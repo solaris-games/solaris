@@ -1,7 +1,5 @@
 import {JobParameters} from "../tool";
-import Repository from "../../services/repository";
 import {AwardedBadge, User} from "../../services/types/User";
-import UserModel from "../../db/models/User";
 import { Logger } from "pino";
 
 interface LegacyBadges {
