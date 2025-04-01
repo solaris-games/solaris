@@ -9,6 +9,7 @@ import type {UserGameSettings} from "@solaris-common";
 import type {Game, Player, Star, Carrier} from "../types/game";
 import { screenshot } from './screenshot';
 import { DebugTools } from './debugTools';
+import type { EventBus } from '../eventBus';
 
 export class DrawingContext {
   store: Store<State>;
@@ -35,6 +36,7 @@ export class GameContainer {
   userSettings: UserGameSettings | undefined;
   game: Game | undefined;
   debugTools: DebugTools | undefined;
+  eventBus: EventBus | undefined;
 
   reportGameError: ((err: string) => void) | undefined;
 
@@ -59,8 +61,9 @@ export class GameContainer {
     }
   }
 
-  async setupApp (store, userSettings, reportGameError) {
+  async setupApp (store, userSettings, reportGameError, eventBus: EventBus) {
     this.store = store
+    this.eventBus = eventBus;
     this.reportGameError = reportGameError;
 
     this.context = new DrawingContext(store)
@@ -108,7 +111,7 @@ export class GameContainer {
     this.app!.stage.addChild(this.viewport)
 
     // Add a new map to the viewport
-    this.map = new Map(this.app, this.store, this, this.context!)
+    this.map = new Map(this.app, this.store, this, this.context!, eventBus);
     this.viewport.addChild(this.map.container)
   }
 

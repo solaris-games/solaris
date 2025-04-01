@@ -20,7 +20,11 @@ export default {
       polling: null
     }
   },
-
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
+  },
   created () {
     window.addEventListener('resize', this.handleResize)
   },
@@ -41,7 +45,7 @@ export default {
       this.$toast.info('Low-performance mode detected. You may consider lowering your graphics settings.', { duration: 10000 });
     }
 
-    await this.gameContainer.setupApp(this.$store, this.$store.state.settings, this.reportGameError)
+    await this.gameContainer.setupApp(this.$store, this.$store.state.settings, this.reportGameError, this.eventBus);
     this.loadGame(this.$store.state.game)
 
     // Add the game canvas to the screen.

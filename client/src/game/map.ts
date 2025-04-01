@@ -19,6 +19,8 @@ import type {Game, Player, Star as StarData, Carrier as CarrierData} from "../ty
 import type {Location, UserGameSettings} from "@solaris-common";
 import { Chunks } from './chunks'
 import Carrier from "./carrier";
+import type { EventBus } from '../eventBus'
+import MapEventBusEventNames from '../eventBusEventNames/map'
 
 enum Mode {
   Galaxy = 'galaxy',
@@ -28,11 +30,12 @@ enum Mode {
 
 
 
-export class Map extends EventEmitter {
+export class Map {
   // Represents the current game mode, these are as follows:
   // galaxy - Normal galaxy view
   // waypoints - Displays waypoints overlay for a given carrier
   mode = Mode.Galaxy;
+  eventBus: EventBus;
   app: PIXI.Application;
   store: Store<State>;
   context: DrawingContext;
@@ -69,15 +72,14 @@ export class Map extends EventEmitter {
   lastPointerDownPosition: PIXI.Point | undefined;
   chunks: Chunks | undefined;
 
-  constructor (app, store: Store<State>, gameContainer, context: DrawingContext) {
-    super()
-
+  constructor (app: PIXI.Application, store: Store<State>, gameContainer, context: DrawingContext, eventBus: EventBus) {
     this.app = app
     this.store = store
     this.context = context
     this.gameContainer = gameContainer;
     this.container = new PIXI.Container()
     this.container.sortableChildren = true
+    this.eventBus = eventBus;
 
     this.stars = []
 
@@ -732,7 +734,7 @@ export class Map extends EventEmitter {
 
       if (!dic.tryMultiSelect || !this.tryMultiSelect(e.location)) {
         selectedStar!.toggleSelected()
-        this.emit('onStarClicked', e)
+        this.eventBus.emit(MapEventBusEventNames.MapOnStarClicked, { star: e })
       }
     } else if (this.mode === 'waypoints') {
       this.waypoints!.onStarClicked(e)
@@ -766,7 +768,7 @@ export class Map extends EventEmitter {
         dic.permitCallback && dic.permitCallback()
 
         if (this.mode === 'galaxy') {
-          this.emit('onStarRightClicked', e)
+          this.eventBus.emit(MapEventBusEventNames.MapOnStarRightClicked, { star: e })
         }
       }
     })
@@ -796,7 +798,7 @@ export class Map extends EventEmitter {
       }
 
       if (!dic.tryMultiSelect || !this.tryMultiSelect(e.location)) {
-        this.emit('onCarrierClicked', e)
+        this.eventBus.emit(MapEventBusEventNames.MapOnCarrierClicked, { carrier: e })
       } else {
         selectedCarrier!.unselect()
       }
@@ -809,7 +811,7 @@ export class Map extends EventEmitter {
 
   onCarrierRightClicked (e) {
     if (this.mode === 'galaxy') {
-      this.emit('onCarrierRightClicked', e)
+      this.eventBus.emit(MapEventBusEventNames.MapOnCarrierRightClicked, { carrier: e });
     }
   }
 
@@ -844,23 +846,23 @@ export class Map extends EventEmitter {
   }
 
   onWaypointCreated (e) {
-    this.emit('onWaypointCreated', e)
+    this.eventBus.emit(MapEventBusEventNames.MapOnWaypointCreated, { waypoint: e })
   }
 
   onWaypointOutOfRange (e) {
-    this.emit('onWaypointOutOfRange', e)
+    this.eventBus.emit(MapEventBusEventNames.MapOnWaypointOutOfRange)
   }
 
   onRulerPointCreated (e) {
-    this.emit('onRulerPointCreated', e)
+    this.eventBus.emit(MapEventBusEventNames.MapOnRulerPointCreated);
   }
 
   onRulerPointRemoved (e) {
-    this.emit('onRulerPointRemoved', e)
+    this.eventBus.emit(MapEventBusEventNames.MapOnRulerPointRemoved);
   }
 
   onRulerPointsCleared (e) {
-    this.emit('onRulerPointsCleared', e)
+    this.eventBus.emit(MapEventBusEventNames.MapOnRulerPointsCleared);
   }
 
   tryMultiSelect (location) {
@@ -925,7 +927,9 @@ export class Map extends EventEmitter {
         }
       })
 
-      this.emit('onObjectsClicked', eventObj)
+      this.eventBus.emit(MapEventBusEventNames.MapOnObjectsClicked, {
+        objects: eventObj
+      })
 
       return true
     }
