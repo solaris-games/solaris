@@ -189,7 +189,7 @@ export class GameContainer {
     this.viewport!.on('pointerdown', this.map!.onViewportPointerDown.bind(this.map))
   }
 
-  setup (game: Game, userSettings: UserGameSettings, context: DrawingContext) {
+  setup (game: Game, userSettings: UserGameSettings) {
     this.game = game;
     this.userSettings = userSettings
 

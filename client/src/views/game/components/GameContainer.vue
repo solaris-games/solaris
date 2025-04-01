@@ -1,155 +1,152 @@
 <template>
-  <div id="gameContainer"></div>
+  <div id="gameContainer" ref="el"></div>
 </template>
 
-<script>
-import { mapState } from 'vuex'
-import GameContainer from '../../../game/container'
+<script setup lang="ts">
+import { ref, inject, onMounted, onBeforeUnmount, type Ref, watch, computed } from 'vue';
+import { useStore } from 'vuex';
+import type { Store } from 'vuex/types/index.js';
+import { eventBusInjectionKey, type EventBus } from '../../../eventBus'
+import type { TempWaypoint } from "../../../types/waypoint";
+import MapEventBusEventNames, { type ObjectClicked } from '../../../eventBusEventNames/map';
+import type { Carrier, Game, Star } from '../../../types/game';
+import type { ToastPluginApi } from 'vue-toast-notification';
+import type { State } from '../../../store';
+import { toastInjectionKey } from '../../../util/keys';
 import GameApiService from '../../../services/api/game'
-import GameHelper from "@/services/gameHelper";
-import {attachEventDeduplication} from "../../../util/eventDeduplication";
+import { GameContainer } from '../../../game/container';
+import { attachEventDeduplication } from "../../../util/eventDeduplication";
 
-export default {
-  data () {
-    return {
-      onStarClickedHandler: null,
-      onStarRightClickedHandler: null,
-      onCarrierClickedHandler: null,
-      onWaypointCreatedHandler: null,
-      onObjectsClickedHandler: null,
-      polling: null
-    }
-  },
-  setup () {
-    return {
-      eventBus: inject(eventBusInjectionKey)
-    }
-  },
-  created () {
-    window.addEventListener('resize', this.handleResize)
-  },
+const store = useStore() as Store<State>;
 
-  async mounted () {
-    const game = this.$store.state.game;
+const eventBus = inject(eventBusInjectionKey)!;
+const toast: ToastPluginApi = inject(toastInjectionKey)!;
 
-    this.gameContainer = GameContainer
-    const webGLSupport = this.gameContainer.checkPerformance();
+const emit = defineEmits<{
+  onStarClicked: [starId: string],
+  onStarRightClicked: [starId: string],
+  onCarrierClicked: [carrierId: string],
+  onCarrierRightClicked: [carrierId: string],
+  onWaypointCreated: [waypoint: TempWaypoint],
+  onObjectsClicked: [objects: ObjectClicked[]]
+}>();
+
+const polling = ref(0);
+const el: Ref<HTMLElement | null> = ref(null);
+
+onMounted(() => {
+  const game = store.state.game!;
+
+  const gameContainer = new GameContainer();
+
+  const checkPerformance = () => {
+    const webGLSupport = gameContainer.checkPerformance();
 
     console.log("WebGL Support", webGLSupport);
 
     if (!webGLSupport.webgl) {
-      this.$toast.error('WebGL is not supported on your device', { duration: 10000 });
+      toast.error('WebGL is not supported on your device', { duration: 10000 });
     }
 
     if (webGLSupport.webgl && !webGLSupport.performance) {
-      this.$toast.info('Low-performance mode detected. You may consider lowering your graphics settings.', { duration: 10000 });
+      toast.info('Low-performance mode detected. You may consider lowering your graphics settings.', { duration: 10000 });
     }
+  };
 
-    await this.gameContainer.setupApp(this.$store, this.$store.state.settings, this.reportGameError, this.eventBus);
-    this.loadGame(this.$store.state.game)
+  const handleResize = (e) => {
+    gameContainer.resize();
+  };
 
-    // Add the game canvas to the screen.
-    this.$el.appendChild(this.gameContainer.app.canvas) // Add the pixi canvas to the element.
+  const loadGame = (game: Game) => {
+    gameContainer.setupViewport(game)
+    gameContainer.setup(game, store.state.settings)
 
-    this.drawGame(game)
+  };
 
-    const gameRoot = document.getElementById("gameRoot") // Defined in Game component
-    attachEventDeduplication(gameRoot, this.gameContainer.app.canvas)
+  const drawGame = (game: Game, panToUser = true) => {
+    gameContainer.draw()
 
-    // Bind to game events.
-    this.onStarClickedHandler = this.onStarClicked.bind(this)
-    this.onStarRightClickedHandler = this.onStarRightClicked.bind(this)
-    this.onCarrierClickedHandler = this.onCarrierClicked.bind(this)
-    this.onCarrierRightClickedHandler = this.onCarrierRightClicked.bind(this)
-    this.onWaypointCreatedHandler = this.onWaypointCreated.bind(this)
-    this.onObjectsClickedHandler = this.onObjectsClicked.bind(this)
-
-    this.gameContainer.map.on('onStarClicked', this.onStarClickedHandler)
-    this.gameContainer.map.on('onStarRightClicked', this.onStarRightClickedHandler)
-    this.gameContainer.map.on('onCarrierClicked', this.onCarrierClickedHandler)
-    this.gameContainer.map.on('onCarrierRightClicked', this.onCarrierRightClickedHandler)
-    this.gameContainer.map.on('onWaypointCreated', this.onWaypointCreatedHandler)
-    this.gameContainer.map.on('onObjectsClicked', this.onObjectsClickedHandler)
-
-    if (this.$store.state.userId) {
-      this.polling = setInterval(this.touchPlayer, 60000)
-      this.touchPlayer()
+    if (panToUser) {
+      gameContainer.map!.panToUser(game)
     }
-  },
+  };
 
-  beforeUnmount () {
-    window.removeEventListener('resize', this.handleResize)
-
-    this.gameContainer.map.off('onStarClicked', this.onStarClickedHandler)
-    this.gameContainer.map.off('onStarRightClicked', this.onStarRightClickedHandler)
-    this.gameContainer.map.off('onCarrierClicked', this.onCarrierClickedHandler)
-    this.gameContainer.map.off('onCarrierRightClicked', this.onCarrierRightClickedHandler)
-    this.gameContainer.map.off('onWaypointCreated', this.onWaypointCreatedHandler)
-    this.gameContainer.map.off('onObjectsClicked', this.onObjectsClickedHandler)
-
-    this.gameContainer.destroy()
-
-    clearInterval(this.polling)
-  },
-
-  methods: {
-    loadGame (game) {
-      this.gameContainer.setupViewport(game)
-      this.gameContainer.setup(game, this.$store.state.settings)
-    },
-    updateGame (game) {
-      this.gameContainer.reloadGame(game, this.$store.state.settings)
-    },
-    drawGame (game, panToUser = true) {
-      this.gameContainer.draw()
-
-      if (panToUser) {
-        this.gameContainer.map.panToUser(game)
-      }
-    },
-    reportGameError (msg) {
-      this.$toast.error(msg);
-    },
-    async touchPlayer () {
-      try {
-        await GameApiService.touchPlayer(this.$store.state.game._id)
-      } catch (e) {
-        console.error(e)
-      }
-    },
-    handleResize (e) {
-      this.gameContainer.resize()
-    },
-    onStarClicked (e) {
-      this.$emit('onStarClicked', e._id)
-    },
-    onStarRightClicked (e) {
-      this.$emit('onStarRightClicked', e._id)
-    },
-    onCarrierClicked (e) {
-      this.$emit('onCarrierClicked', e._id)
-    },
-    onCarrierRightClicked (e) {
-      this.$emit('onCarrierRightClicked', e._id)
-    },
-    onWaypointCreated (e) {
-      this.$emit('onWaypointCreated', e)
-    },
-    onObjectsClicked (e) {
-      this.$emit('onObjectsClicked', e)
-    },
-  },
-
-  computed: mapState(['game']),
-
-  watch: {
-    game (newGame, oldGame) {
-      this.updateGame(newGame)
+  const touchPlayer = async () => {
+    try {
+      await GameApiService.touchPlayer(store.state.game!._id)
+    } catch (e) {
+      console.error(e)
     }
-  }
-}
+  };
+
+  const updateGame = (game: Game) => {
+    gameContainer.reloadGame(game, store.state.settings);
+
+  };
+
+  const onStarClickedHandler = ({ star }: { star: Star }) => {
+    emit("onStarClicked", star._id);
+  };
+
+  const onStarRightClickedHandler = ({ star }: { star: Star }) => {
+    emit("onStarRightClicked", star._id);
+  };
+
+  const onCarrierClickedHandler = ({ carrier }: { carrier: Carrier }) => {
+    emit("onCarrierClicked", carrier._id);
+  };
+
+  const onCarrierRightClickedHandler = ({ carrier }: { carrier: Carrier }) => {
+    emit("onCarrierRightClicked", carrier._id);
+  };
+
+  const onWaypointCreatedHandler = ({ waypoint }: { waypoint: TempWaypoint }) => {
+    emit("onWaypointCreated", waypoint);
+  };
+
+  const onObjectsClickedHandler = ({ objects }: { objects: ObjectClicked[] }) => {
+    emit("onObjectsClicked", objects);
+  };
+
+  watch(computed(() => store.state.game!), (newGame) => updateGame(newGame));
+
+  window.addEventListener('resize', handleResize)
+
+  checkPerformance();
+
+  gameContainer.setupApp(store, store.state.settings, (msg) => toast.error(msg), eventBus).then(() => {
+    loadGame(game);
+
+    const canvas = gameContainer.app!.canvas;
+    el.value?.appendChild(canvas);
+    drawGame(game);
+
+    const gameRoot = document.getElementById("gameRoot"); // Defined in Game component
+    attachEventDeduplication(gameRoot, canvas);
+
+    eventBus.on(MapEventBusEventNames.MapOnStarClicked, onStarClickedHandler);
+    eventBus.on(MapEventBusEventNames.MapOnStarRightClicked, onStarRightClickedHandler);
+    eventBus.on(MapEventBusEventNames.MapOnCarrierClicked, onCarrierClickedHandler);
+    eventBus.on(MapEventBusEventNames.MapOnCarrierRightClicked, onCarrierRightClickedHandler);
+    eventBus.on(MapEventBusEventNames.MapOnWaypointCreated, onWaypointCreatedHandler);
+    eventBus.on(MapEventBusEventNames.MapOnObjectsClicked, onObjectsClickedHandler);
+
+    if (store.state.userId) {
+      polling.value = setInterval(touchPlayer, 60000);
+      touchPlayer();
+    }
+  });
+
+  onBeforeUnmount(() => {
+    eventBus.off(MapEventBusEventNames.MapOnStarClicked, onStarClickedHandler);
+    eventBus.off(MapEventBusEventNames.MapOnStarRightClicked, onStarRightClickedHandler);
+    eventBus.off(MapEventBusEventNames.MapOnCarrierClicked, onCarrierClickedHandler);
+    eventBus.off(MapEventBusEventNames.MapOnCarrierRightClicked, onCarrierRightClickedHandler);
+    eventBus.off(MapEventBusEventNames.MapOnWaypointCreated, onWaypointCreatedHandler);
+    eventBus.off(MapEventBusEventNames.MapOnObjectsClicked, onObjectsClickedHandler);
+  });
+});
 </script>
-
 <style scoped>
 #gameContainer {
   position: absolute;
