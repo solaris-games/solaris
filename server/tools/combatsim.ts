@@ -7,6 +7,7 @@ import {DependencyContainer} from "../services/types/DependencyContainer";
 import {maxBy} from "../services/utils";
 import {Game} from "../services/types/Game";
 import {Player} from "../services/types/Player";
+import TechnologyService from "../services/technology";
 
 type ReducedPlayer = {
     _id: string,
@@ -20,13 +21,19 @@ type CombatGroup = {
     players: ReducedPlayer[],
 }
 
-type ResolvedCombatGroup = CombatGroup & {
-    effectiveWeaponsLevels: Map<string, number>
+type PartiallyResolvedCombatGroup = CombatGroup & {
+    ships: number,
+    isDefender: boolean,
+    isLargest: boolean,
+}
+
+type ResolvedCombatGroup = PartiallyResolvedCombatGroup & {
+    effectiveWeaponsLevels: Map<string, number>,
 }
 
 type Scenario = {
     name: string,
-    groups: CombatGroup[],
+    groups: ResolvedCombatGroup[],
     combatType: 'c2c' | 'c2s'
 }
 
@@ -74,49 +81,11 @@ const printCombatResults = (results: CombatGroupResult[]) => {
     }
 }
 
-const runScenario = (phase2: WeaponsLevelsResolver, phase3: CombatResolver) => (scenario: Scenario) => {
-    const resolvedGroups = phase2(scenario);
-    printGroupsBeforeCombat(resolvedGroups);
-    const afterCombat = phase3(resolvedGroups, scenario.combatType);
+const runScenario = (phase3: CombatResolver) => (scenario: Scenario) => {
+    printGroupsBeforeCombat(scenario.groups);
+    const afterCombat = phase3(scenario.groups, scenario.combatType);
     printCombatResults(afterCombat);
 }
-
-const weaponsLevelsResolver = ({ combatService, technologyService }: DependencyContainer): WeaponsLevelsResolver => (scenario) => {
-    const groupsWithShipCounts = scenario.groups.map(group => {
-        const ships = group.carriers.reduce((acc, carrier) => acc + (carrier.ships || 0), 0) + (group.star?.ships ?? 0);
-
-        return {
-            group,
-            ships
-        }
-    });
-
-    const largestGroupShipsCount = maxBy(({ ships }) => ships, groupsWithShipCounts) || 0;
-
-    const groups = groupsWithShipCounts.map(({ group, ships }) => {
-        const isDefender = Boolean(group.star);
-        const isLargest = ships === largestGroupShipsCount;
-        return {
-            group,
-            ships,
-            isDefender,
-            isLargest
-        }
-    });
-
-    return groups.map(({ group, ships, isDefender }) => {
-        const baseWeaponsLevel = maxBy((p) => p.research.weapons, group.players) ?? 0;
-
-        const effectiveWeaponsLevels = new Map(groups.map(other => {
-            return [other.group.identifier, baseWeaponsLevel]
-        }))
-
-        return {
-            ...group,
-            effectiveWeaponsLevels
-        }
-    });
-};
 
 const combatResolver = (container: DependencyContainer): CombatResolver => (groups, combatType) => {
     return groups.map(group => ({
@@ -135,7 +104,7 @@ const main = () => {
 
     for (let scenario of scenarios) {
         console.log(`Running scenario: ${scenario.name}`);
-        runScenario(weaponsLevelsResolver(container), combatResolver(container))(scenario);
+        runScenario(combatResolver(container))(scenario);
     }
 }
 
