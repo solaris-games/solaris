@@ -1,4 +1,12 @@
 import {Carrier, PlayerResearch, Star} from "@solaris-common";
+import containerLoader from "../services";
+import config from "../config";
+import {serverStub} from "../sockets/serverStub";
+import {logger} from "../utils/logging";
+import {DependencyContainer} from "../services/types/DependencyContainer";
+import {maxBy} from "../services/utils";
+import {Game} from "../services/types/Game";
+import {Player} from "../services/types/Player";
 
 type ReducedPlayer = {
     _id: string,
@@ -17,6 +25,7 @@ type ResolvedCombatGroup = CombatGroup & {
 }
 
 type Scenario = {
+    name: string,
     groups: CombatGroup[],
     combatType: 'c2c' | 'c2s'
 }
@@ -72,8 +81,62 @@ const runScenario = (phase2: WeaponsLevelsResolver, phase3: CombatResolver) => (
     printCombatResults(afterCombat);
 }
 
-const main = () => {
+const weaponsLevelsResolver = ({ combatService, technologyService }: DependencyContainer): WeaponsLevelsResolver => (scenario) => {
+    const groupsWithShipCounts = scenario.groups.map(group => {
+        const ships = group.carriers.reduce((acc, carrier) => acc + (carrier.ships || 0), 0) + (group.star?.ships ?? 0);
 
+        return {
+            group,
+            ships
+        }
+    });
+
+    const largestGroupShipsCount = maxBy(({ ships }) => ships, groupsWithShipCounts) || 0;
+
+    const groups = groupsWithShipCounts.map(({ group, ships }) => {
+        const isDefender = Boolean(group.star);
+        const isLargest = ships === largestGroupShipsCount;
+        return {
+            group,
+            ships,
+            isDefender,
+            isLargest
+        }
+    });
+
+    return groups.map(({ group, ships, isDefender }) => {
+        const baseWeaponsLevel = maxBy((p) => p.research.weapons, group.players) ?? 0;
+
+        const effectiveWeaponsLevels = new Map(groups.map(other => {
+            return [other.group.identifier, baseWeaponsLevel]
+        }))
+
+        return {
+            ...group,
+            effectiveWeaponsLevels
+        }
+    });
+};
+
+const combatResolver = (container: DependencyContainer): CombatResolver => (groups, combatType) => {
+    return groups.map(group => ({
+        ...group,
+        resultShips: computeTotalShips(group)
+    }));
+}
+
+const scenarios: Scenario[] = [
+
+];
+
+const main = () => {
+    const log = logger('combat-sim');
+    const container = containerLoader(config, serverStub, log);
+
+    for (let scenario of scenarios) {
+        console.log(`Running scenario: ${scenario.name}`);
+        runScenario(weaponsLevelsResolver(container), combatResolver(container))(scenario);
+    }
 }
 
 main();
