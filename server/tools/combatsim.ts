@@ -1,23 +1,32 @@
-import {Carrier, PlayerResearch, Star} from "@solaris-common";
+import {PlayerResearch} from "@solaris-common";
 import containerLoader from "../services";
 import config from "../config";
 import {serverStub} from "../sockets/serverStub";
 import {logger} from "../utils/logging";
 import {DependencyContainer} from "../services/types/DependencyContainer";
-import {maxBy} from "../services/utils";
-import {Game} from "../services/types/Game";
-import {Player} from "../services/types/Player";
-import TechnologyService from "../services/technology";
 
 type ReducedPlayer = {
     _id: string,
     research: Pick<PlayerResearch, 'weapons'>
 }
 
+type Carrier = {
+    _id: string,
+    specialistId: number;
+    ships: number;
+}
+
+type Star = {
+    _id: string,
+    ships: number,
+    playerId: string,
+    specialistId: number,
+}
+
 type CombatGroup = {
     identifier: string,
-    carriers: Carrier<string>[],
-    star: Star<string> | undefined,
+    carriers: Carrier[],
+    star: Star | undefined,
     players: ReducedPlayer[],
 }
 
@@ -29,6 +38,7 @@ type PartiallyResolvedCombatGroup = CombatGroup & {
 
 type ResolvedCombatGroup = PartiallyResolvedCombatGroup & {
     effectiveWeaponsLevels: Map<string, number>,
+    baseWeapons: number,
 }
 
 type Scenario = {
@@ -88,14 +98,83 @@ const runScenario = (phase3: CombatResolver) => (scenario: Scenario) => {
 }
 
 const combatResolver = (container: DependencyContainer): CombatResolver => (groups, combatType) => {
-    return groups.map(group => ({
-        ...group,
-        resultShips: computeTotalShips(group)
-    }));
+    const sides = groups.length;
+
+    return groups.map(group => {
+        const ownWeapons = group.baseWeapons;
+        let ships = group.ships;
+
+        for (const otherGroup of groups) {
+            if (otherGroup.identifier === group.identifier) {
+                continue;
+            }
+
+            const shipWeight = otherGroup.ships / sides;
+            const effectiveWeapons = otherGroup.effectiveWeaponsLevels.get(group.identifier)!;
+            const combatPower = effectiveWeapons * shipWeight;
+            const shipDamage = combatPower / ownWeapons;
+            ships -= shipDamage;
+        }
+
+        ships = Math.max(0, ships);
+
+        return {
+            ...group,
+            resultShips: ships
+        }
+    });
+}
+
+const player = (id: string, weaponsLevel: number): ReducedPlayer => {
+    return {
+        _id: id,
+        research: {
+            weapons: {
+                level: weaponsLevel,
+                progress: 0
+            },
+        }
+    }
 }
 
 const scenarios: Scenario[] = [
-
+    {
+        name: "C2S Basic 1",
+        combatType: 'c2s',
+        groups: [
+            {
+                identifier: 'A',
+                carriers: [],
+                star: {
+                    _id: '1',
+                    ships: 100,
+                    playerId: 'A',
+                    specialistId: 1,
+                },
+                players: [
+                    player('A', 1)
+                ],
+                ships: 100,
+                isDefender: false,
+                isLargest: true,
+                effectiveWeaponsLevels: new Map([['B', 1]]),
+                baseWeapons: 1
+            },
+            {
+                identifier: 'B',
+                carriers: [],
+                star: undefined,
+                players: [
+                    player('B', 1)
+                ],
+                ships: 50,
+                isDefender: true,
+                isLargest: false,
+                effectiveWeaponsLevels: new Map([['A', 1]]),
+                baseWeapons: 1
+            }
+        ]
+    }
 ];
 
 const main = () => {

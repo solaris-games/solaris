@@ -13,7 +13,7 @@
     "start-db-recalc-ranks:dev": "ts-node-dev --transpile-only --respawn --inspect=9234 tools/recalculateRankings.ts",
     "start-db-recalc-ranks:prod": "node dist/server/tools/recalculateRankings.js",
     "restore-game": "ts-node-dev --transpile-only tools/restoreGame.ts",
-    "combat-sim": "ts-node-dev --transpile-only tools/combatsim.ts",
+    "combat-sim": "ts-node --transpile-only tools/combatsim.ts",
     "prebuild": "rm -rf ./dist",
     "build": "tsc",
     "postbuild": "cp -r services/emailTemplates ./dist/server/services/emailTemplates && cp .env ./dist | true",
