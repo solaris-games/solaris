@@ -128,9 +128,7 @@ const weaponsLevelsResolver = ({ combatService, technologyService }: DependencyC
         const effectiveWeaponsLevels = new Map();
         groups.forEach(other => {
             effectiveWeaponsLevels.set(other.group.identifier, baseWeaponsLevel);
-        })
-
-        console.log(effectiveWeaponsLevels);
+        });
 
         const res: ResolvedCombatGroup = {
             ...group,
@@ -157,7 +155,7 @@ const combatResolver = (container: DependencyContainer): CombatResolver => (grou
                 continue;
             }
 
-            const shipWeight = otherGroup.ships / sides;
+            const shipWeight = otherGroup.ships / (sides - 1);
             const effectiveWeapons = otherGroup.effectiveWeaponsLevels.get(group.identifier)!;
             const combatPower = effectiveWeapons * shipWeight;
             const shipDamage = combatPower / ownWeapons;
