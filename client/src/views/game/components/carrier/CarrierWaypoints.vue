@@ -83,6 +83,7 @@ import GameContainer from '../../../../game/container'
 import CarrierApiService from '../../../../services/api/carrier'
 import AudioService from '../../../../game/audio'
 import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning.vue'
+import {eventBusInjectionKey} from "../../../../eventBus";
 
 export default {
   components: {
@@ -92,6 +93,11 @@ export default {
   },
   props: {
     carrierId: String
+  },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
   },
   data () {
     return {
@@ -119,14 +125,14 @@ export default {
 
     GameContainer.setMode('waypoints', this.carrier)
 
-    this.waypointCreatedHandler = this.onWaypointCreated.bind(this)
-    	GameContainer.map.on('onWaypointCreated', this.waypointCreatedHandler)
+    this.waypointCreatedHandler = this.onWaypointCreated.bind(this);
+    this.eventBus.on('onWaypointCreated', this.waypointCreatedHandler);
 
-    this.waypointOutOfRangeHandler = this.onWaypointOutOfRange.bind(this)
-    	GameContainer.map.on('onWaypointOutOfRange', this.waypointOutOfRangeHandler)
+    this.waypointOutOfRangeHandler = this.onWaypointOutOfRange.bind(this);
+    this.eventBus.on('onWaypointOutOfRange', this.waypointOutOfRangeHandler);
 
-    this.oldWaypoints = this.carrier.waypoints.slice(0)
-    this.oldWaypointsLooped = this.carrier.waypointsLooped
+    this.oldWaypoints = this.carrier.waypoints.slice(0);
+    this.oldWaypointsLooped = this.carrier.waypointsLooped;
 
     this.recalculateTotalEta()
   },
@@ -137,8 +143,8 @@ export default {
 
     GameContainer.resetMode()
 
-    GameContainer.map.off('onWaypointCreated', this.waypointCreatedHandler)
-    GameContainer.map.off('onWaypointOutOfRange', this.waypointOutOfRangeHandler)
+    this.eventBus.off('onWaypointCreated', this.waypointCreatedHandler)
+    this.eventBus.off('onWaypointOutOfRange', this.waypointOutOfRangeHandler)
   },
   methods: {
     toggleCarrierWaypointsDisplay () {

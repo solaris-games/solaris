@@ -178,11 +178,17 @@ import MenuTitleVue from '../MenuTitle.vue'
 import GameContainer from '../../../../game/container'
 import GameHelper from '../../../../services/gameHelper'
 import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning.vue'
+import {eventBusInjectionKey} from "../../../../eventBus";
 
 export default {
   components: {
     'menu-title': MenuTitleVue,
     'orbital-mechanics-eta-warning': OrbitalMechanicsETAWarningVue
+  },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
   },
   data () {
     return {
@@ -202,13 +208,23 @@ export default {
     this.isStandardUIStyle = this.$store.state.settings.interface.uiStyle === 'standard'
     this.isCompactUIStyle = this.$store.state.settings.interface.uiStyle === 'compact'
 
+    this.onRulerPointCreated = this.onRulerPointCreated.bind(this);
+    this.eventBus.on('onRulerPointCreated', this.onRulerPointCreated);
+
+    this.onRulerPointRemoved = this.onRulerPointRemoved.bind(this);
+    this.eventBus.on('onRulerPointRemoved', this.onRulerPointRemoved);
+
+    this.onRulerPointsCleared = this.onRulerPointsCleared.bind(this);
+    this.eventBus.on('onRulerPointsCleared', this.onRulerPointsCleared);
+
     // Set map to ruler mode
     GameContainer.setMode('ruler')
-    GameContainer.map.on('onRulerPointCreated', this.onRulerPointCreated.bind(this))
-    GameContainer.map.on('onRulerPointRemoved', this.onRulerPointRemoved.bind(this))
-    GameContainer.map.on('onRulerPointsCleared', this.onRulerPointsCleared.bind(this))
   },
   unmounted () {
+    this.eventBus.off('onRulerPointCreated', this.onRulerPointCreated);
+    this.eventBus.off('onRulerPointRemoved', this.onRulerPointRemoved);
+    this.eventBus.off('onRulerPointsCleared', this.onRulerPointsCleared);
+
     // Set map to galaxy mode
     GameContainer.resetMode()
   },
