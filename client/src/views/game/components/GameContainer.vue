@@ -16,6 +16,7 @@ import { toastInjectionKey } from '../../../util/keys';
 import GameApiService from '../../../services/api/game'
 import { GameContainer } from '../../../game/container';
 import { attachEventDeduplication } from "../../../util/eventDeduplication";
+import MapCommandEventBusEventNames from "../../../eventBusEventNames/mapCommand";
 
 const store = useStore() as Store<State>;
 
@@ -67,7 +68,7 @@ onMounted(() => {
     gameContainer.draw()
 
     if (panToUser) {
-      gameContainer.map!.panToUser(game)
+      eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToUser, {});
     }
   };
 

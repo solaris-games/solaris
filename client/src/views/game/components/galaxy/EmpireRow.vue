@@ -15,8 +15,9 @@
 </template>
 
 <script>
-import gameContainer from '../../../../game/container'
 import PlayerIconVue from '../player/PlayerIcon.vue'
+import {eventBusInjectionKey} from "../../../../eventBus";
+import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 
 export default {
   components: {
@@ -25,12 +26,17 @@ export default {
   props: {
     empire: Object
   },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
+  },
   methods: {
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', this.empire._id)
     },
     goToEmpire (e) {
-      gameContainer.map.panToPlayer(this.$store.state.game, this.empire)
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, { player: this.empire });
     }
   }
 }

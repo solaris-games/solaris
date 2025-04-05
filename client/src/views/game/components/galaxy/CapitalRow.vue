@@ -17,9 +17,9 @@
 </template>
 
 <script>
-import gameContainer from '../../../../game/container'
 import PlayerIconVue from '../player/PlayerIcon.vue'
 import SpecialistIcon from '../specialist/SpecialistIcon.vue'
+import {eventBusInjectionKey} from "../../../../eventBus";
 
 export default {
   components: {
@@ -29,12 +29,17 @@ export default {
   props: {
     star: Object
   },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
+  },
   methods: {
     clickStar (e) {
       this.$emit('onOpenStarDetailRequested', this.star._id)
     },
     goToStar (e) {
-      gameContainer.map.panToStar(this.star)
+      this.eventBus.emit('MapCommandPanToObject', { object: this.star });
     }
   }
 }

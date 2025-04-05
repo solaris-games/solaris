@@ -3,13 +3,19 @@
 </template>
 
 <script>
-import gameContainer from '../../../../game/container'
 import gameHelper from '../../../../services/gameHelper'
+import {eventBusInjectionKey} from "../../../../eventBus";
+import MapCommandEventBusEventNames from "../../../../eventBusEventNames/mapCommand";
 
 export default {
   props: {
     carrierId: String,
     carrierName: String
+  },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
   },
   data () {
     return {
@@ -20,17 +26,17 @@ export default {
     if (this.carrierName) {
       this.actualCarrierName = this.carrierName
     } else {
-      let carrier = gameHelper.getCarrierById(this.$store.state.game, this.carrierId)
+      const carrier = gameHelper.getCarrierById(this.$store.state.game, this.carrierId)
 
       this.actualCarrierName = carrier ? carrier.name : 'Unknown'
     }
   },
   methods: {
     pan (e) {
-      let carrier = gameHelper.getCarrierById(this.$store.state.game, this.carrierId)
+      const carrier = gameHelper.getCarrierById(this.$store.state.game, this.carrierId)
 
       if (carrier) {
-        gameContainer.map.panToStar(carrier)
+        this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: carrier });
       }
     }
   }
