@@ -31,6 +31,9 @@ import MenuTitle from '../MenuTitle.vue'
 import CarrierApiService from '../../../../services/api/carrier'
 import gameHelper from '../../../../services/gameHelper'
 import GameContainer from '../../../../game/container'
+import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
+import {eventBusInjectionKey} from "@/eventBus";
+import { inject } from 'vue';
 
 export default {
   components: {
@@ -38,6 +41,11 @@ export default {
   },
   props: {
     carrierId: String
+  },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
   },
   data () {
     return {
@@ -67,7 +75,7 @@ export default {
       this.$emit('onOpenCarrierDetailRequested', this.carrierId)
     },
     viewOnMap (e) {
-      GameContainer.panToCarrier(this.carrier)
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: this.carrier });
     },
     async doRename (e) {
       e.preventDefault()

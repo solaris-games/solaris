@@ -229,6 +229,7 @@ import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning.
 import HelpTooltip from '../../../components/HelpTooltip.vue'
 import {formatLocation} from "client/src/util/format";
 import {eventBusInjectionKey} from "../../../../eventBus";
+import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 
 export default {
   components: {
@@ -327,7 +328,7 @@ export default {
       this.$emit('onViewCarrierCombatCalculatorRequested', this.carrier._id)
     },
     viewOnMap (e) {
-      GameContainer.panToCarrier(this.carrier)
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: this.carrier });
     },
     getFirstWaypointSource () {
       if (!this.carrier.waypoints.length) {
