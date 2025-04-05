@@ -14,7 +14,7 @@ import type { ToastPluginApi } from 'vue-toast-notification';
 import type { State } from '../../../store';
 import { toastInjectionKey } from '../../../util/keys';
 import GameApiService from '../../../services/api/game'
-import * as globalGameContainer from '../../../game/container';
+import globalGameContainer from '../../../game/container';
 import { attachEventDeduplication } from "../../../util/eventDeduplication";
 import MapCommandEventBusEventNames from "../../../eventBusEventNames/mapCommand";
 
