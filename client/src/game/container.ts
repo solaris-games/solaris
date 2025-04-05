@@ -41,7 +41,6 @@ export class GameContainer {
   reportGameError: ((err: string) => void) | undefined;
 
   constructor () {
-
   }
 
   checkPerformance(): { webgl: boolean, performance: boolean } {
@@ -116,6 +115,8 @@ export class GameContainer {
   }
 
   destroy () {
+    console.warn('Destroying game container')
+
     if (this.viewport) {
       this.viewport.destroy()
       this.viewport = undefined
@@ -303,6 +304,14 @@ export class GameContainer {
 
   panToCarrier(carrier: Carrier) {
     this.map!.panToCarrier(carrier);
+  }
+
+  fitGalaxy(x, y) {
+    console.log(this)
+
+    this.viewport!.moveCenter(x, y)
+    this.viewport!.fitWorld()
+    this.viewport!.zoom(this.starFieldRight, true)
   }
 }
 

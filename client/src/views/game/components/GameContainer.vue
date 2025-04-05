@@ -14,7 +14,7 @@ import type { ToastPluginApi } from 'vue-toast-notification';
 import type { State } from '../../../store';
 import { toastInjectionKey } from '../../../util/keys';
 import GameApiService from '../../../services/api/game'
-import { GameContainer } from '../../../game/container';
+import * as globalGameContainer from '../../../game/container';
 import { attachEventDeduplication } from "../../../util/eventDeduplication";
 import MapCommandEventBusEventNames from "../../../eventBusEventNames/mapCommand";
 
@@ -38,7 +38,7 @@ const el: Ref<HTMLElement | null> = ref(null);
 onMounted(() => {
   const game = store.state.game!;
 
-  const gameContainer = new GameContainer();
+  const gameContainer = globalGameContainer;
 
   const checkPerformance = () => {
     const webGLSupport = gameContainer.checkPerformance();

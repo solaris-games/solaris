@@ -55,7 +55,7 @@ import GameHelper from '../../../../services/gameHelper'
 import DiplomacyHelper from '../../../../services/diplomacyHelper'
 import router from '../../../../router'
 import MENU_STATES from '../../../../services/data/menuStates'
-import GameContainer from '../../../../game/container'
+import gameContainer from '../../../../game/container'
 import gameHelper from "../../../../services/gameHelper";
 import MenuEventBusEventNames from '../../../../eventBusEventNames/menu'
 import { inject } from 'vue'
@@ -97,15 +97,13 @@ export default {
       const galaxyCenterX = gameHelper.calculateGalaxyCenterX(this.$store.state.game)
       const galaxyCenterY = gameHelper.calculateGalaxyCenterY(this.$store.state.game)
 
-      GameContainer.viewport.moveCenter(galaxyCenterX, galaxyCenterY)
-      GameContainer.viewport.fitWorld()
-      GameContainer.viewport.zoom(GameContainer.starFieldRight, true)
+      gameContainer.fitGalaxy(galaxyCenterX, galaxyCenterY);
     },
     zoomIn () {
-      GameContainer.zoomIn()
+      gameContainer.zoomIn()
     },
     zoomOut () {
-      GameContainer.zoomOut()
+      gameContainer.zoomOut()
     },
     panToHomeStar () {
       this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToUser, {});
@@ -121,7 +119,7 @@ export default {
       this.$store.commit('setColourOverride', !this.isCustomColoursEnabled)
     },
     downloadMap() {
-      GameContainer.downloadMap();
+      gameContainer.downloadMap();
     }
   },
   computed: {
