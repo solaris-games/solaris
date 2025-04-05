@@ -213,6 +213,7 @@
 </template>
 
 <script>
+import { inject } from 'vue';
 import GameHelper from '../../../../services/gameHelper'
 import CarrierApiService from '../../../../services/api/carrier'
 import MenuTitle from '../MenuTitle.vue'

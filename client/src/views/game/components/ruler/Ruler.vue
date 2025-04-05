@@ -174,6 +174,7 @@
 </template>
 
 <script>
+import { inject } from 'vue';
 import MenuTitleVue from '../MenuTitle.vue'
 import GameContainer from '../../../../game/container'
 import GameHelper from '../../../../services/gameHelper'

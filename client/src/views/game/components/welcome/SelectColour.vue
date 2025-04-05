@@ -49,6 +49,7 @@ import PlayerAvatarVue from '../menu/PlayerAvatar.vue'
 import TeamName from '../shared/TeamName.vue';
 import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
+import { inject } from 'vue';
 
 export default {
   components: {

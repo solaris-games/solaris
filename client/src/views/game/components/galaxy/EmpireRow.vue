@@ -18,6 +18,7 @@
 import PlayerIconVue from '../player/PlayerIcon.vue'
 import {eventBusInjectionKey} from "../../../../eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
+import { inject } from 'vue';
 
 export default {
   components: {

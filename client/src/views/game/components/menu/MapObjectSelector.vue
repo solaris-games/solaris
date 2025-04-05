@@ -52,6 +52,7 @@ import SpecialistIconVue from '../specialist/SpecialistIcon.vue'
 import starService from '../../../../services/api/star'
 import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
+import { inject } from 'vue';
 
 export default {
   components: {

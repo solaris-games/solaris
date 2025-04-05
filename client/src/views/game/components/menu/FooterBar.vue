@@ -39,6 +39,7 @@ import MENU_STATES from '../../../../services/data/menuStates'
 import HamburgerMenuVue from './HamburgerMenu.vue'
 import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
+import { inject } from 'vue';
 
 export default {
   components: {

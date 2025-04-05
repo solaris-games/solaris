@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import gameContainer from '../../../../game/container'
+import { inject } from 'vue';
 import PlayerIconVue from '../player/PlayerIcon.vue'
 import SpecialistIcon from '../specialist/SpecialistIcon.vue'
 import {eventBusInjectionKey} from "@/eventBus";

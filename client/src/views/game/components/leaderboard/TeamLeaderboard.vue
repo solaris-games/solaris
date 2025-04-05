@@ -37,6 +37,7 @@
 <script>
 import GameHelper from '@/services/gameHelper';
 import LeaderboardRow from '@/views/game/components/leaderboard/LeaderboardRow.vue';
+import { inject } from 'vue';
 import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 

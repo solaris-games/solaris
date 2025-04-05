@@ -3,6 +3,7 @@
 </template>
 
 <script>
+import { inject } from 'vue';
 import gameHelper from '../../../../services/gameHelper'
 import {eventBusInjectionKey} from "../../../../eventBus";
 import MapCommandEventBusEventNames from "../../../../eventBusEventNames/mapCommand";

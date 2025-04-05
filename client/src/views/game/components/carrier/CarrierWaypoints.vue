@@ -76,6 +76,7 @@
 </template>
 
 <script>
+import { inject } from 'vue';
 import MenuTitle from '../MenuTitle.vue'
 import FormErrorList from '../../../components/FormErrorList.vue'
 import GameHelper from '../../../../services/gameHelper'

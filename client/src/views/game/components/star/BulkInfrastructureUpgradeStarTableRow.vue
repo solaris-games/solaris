@@ -24,6 +24,7 @@ import SpecialistIcon from '../specialist/SpecialistIcon.vue'
 import IgnoreBulkUpgradeVue from './IgnoreBulkUpgrade.vue'
 import StarResourcesVue from './StarResources.vue'
 import {eventBusInjectionKey} from "@/eventBus";
+import { inject } from 'vue';
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 
 export default {

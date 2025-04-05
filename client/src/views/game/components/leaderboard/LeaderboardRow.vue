@@ -61,6 +61,7 @@ import ReadyStatusButtonVue from '@/views/game/components/menu/ReadyStatusButton
 import GameHelper from '@/services/gameHelper';
 import gameService from '@/services/api/game';
 import {eventBusInjectionKey} from "@/eventBus";
+import { inject } from 'vue';
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 
 export default {
