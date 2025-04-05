@@ -60,6 +60,7 @@ import gameHelper from "../../../../services/gameHelper";
 import MenuEventBusEventNames from '../../../../eventBusEventNames/menu'
 import { inject } from 'vue'
 import { eventBusInjectionKey } from '../../../../eventBus'
+import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 
 export default {
   components: {
@@ -107,7 +108,7 @@ export default {
       GameContainer.zoomOut()
     },
     panToHomeStar () {
-      GameContainer.map.panToUser(this.$store.state.game)
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToUser, {});
 
       if (this.userPlayer) {
         this.$emit('onOpenPlayerDetailRequested', this.userPlayer._id)

@@ -20,10 +20,11 @@
 </template>
 
 <script>
-import gameContainer from '../../../../game/container'
 import SpecialistIcon from '../specialist/SpecialistIcon.vue'
 import IgnoreBulkUpgradeVue from './IgnoreBulkUpgrade.vue'
 import StarResourcesVue from './StarResources.vue'
+import {eventBusInjectionKey} from "@/eventBus";
+import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 
 export default {
   components: {
@@ -34,6 +35,11 @@ export default {
   props: {
     star: Object,
     highlightIgnoredInfrastructure: String
+  },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
   },
   data () {
     return {
@@ -48,7 +54,7 @@ export default {
       this.$emit('onOpenStarDetailRequested', this.star._id)
     },
     goToStar (e) {
-      gameContainer.map.panToStar(this.star)
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: this.star });
     }
   }
 }

@@ -39,6 +39,8 @@ import gameHelper from '../../../../services/gameHelper'
 import PlayerIconVue from '../player/PlayerIcon.vue'
 import starService from '../../../../services/api/star'
 import SpecialistIcon from '../specialist/SpecialistIcon.vue'
+import MapCommandEventBusEventNames from "../../../../eventBusEventNames/mapCommand";
+import {eventBusInjectionKey} from "../../../../eventBus";
 
 export default {
   components: {
@@ -48,6 +50,11 @@ export default {
   props: {
     star: Object,
     allowUpgrades: Boolean
+  },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
   },
   data () {
     return {
@@ -62,7 +69,7 @@ export default {
       this.$emit('onOpenStarDetailRequested', this.star._id)
     },
     goToStar (e) {
-      gameContainer.map.panToStar(this.star)
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: this.star });
     },
     async upgradeEconomy (e) {
       if (this.$store.state.settings.star.confirmBuildEconomy === 'enabled'

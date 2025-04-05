@@ -430,13 +430,14 @@ import ModalButton from '../../../components/modal/ModalButton.vue'
 import DialogModal from '../../../components/modal/DialogModal.vue'
 import StarSpecialistVue from './StarSpecialist.vue'
 import SpecialistIconVue from '../specialist/SpecialistIcon.vue'
-import GameContainer from '../../../../game/container'
 import gameHelper from '../../../../services/gameHelper'
 import IgnoreBulkUpgradeVue from './IgnoreBulkUpgrade.vue'
 import StarResourcesVue from './StarResources.vue'
 import StarIconVue from './../star/StarIcon.vue'
 import HelpTooltip from '../../../components/HelpTooltip.vue'
 import {formatLocation} from "client/src/util/format";
+import {eventBusInjectionKey} from "@/eventBus";
+import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 
 export default {
   components: {
@@ -455,6 +456,11 @@ export default {
   },
   props: {
     starId: String
+  },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
   },
   data () {
     return {
@@ -524,11 +530,11 @@ export default {
       this.$emit('onBuildCarrierRequested', this.star._id)
     },
     viewOnMap (e) {
-      GameContainer.map.panToStar(e)
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: e });
     },
     async confirmAbandonStar (e) {
       try {
-        let response = await starService.abandonStar(this.$store.state.game._id, this.star._id)
+        const response = await starService.abandonStar(this.$store.state.game._id, this.star._id)
 
         if (response.status === 200) {
           this.$toast.default(`${this.star.name} has been abandoned.`)

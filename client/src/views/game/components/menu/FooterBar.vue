@@ -37,19 +37,22 @@
 import GameHelper from '../../../../services/gameHelper'
 import MENU_STATES from '../../../../services/data/menuStates'
 import HamburgerMenuVue from './HamburgerMenu.vue'
-import GameContainer from '../../../../game/container'
+import {eventBusInjectionKey} from "@/eventBus";
+import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 
 export default {
   components: {
     'hamburger-menu': HamburgerMenuVue
   },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
+  },
   data () {
     return {
       MENU_STATES: MENU_STATES
     }
-  },
-  mounted () {
-    
   },
   methods: {
     setMenuState (state, args) {
@@ -59,7 +62,7 @@ export default {
       })
     },
     panToHomeStar () {
-      GameContainer.map.panToUser(this.$store.state.game)
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToUser, {});
 
       if (this.userPlayer) {
         this.$emit('onOpenPlayerDetailRequested', this.userPlayer._id)

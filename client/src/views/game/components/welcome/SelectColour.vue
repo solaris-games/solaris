@@ -44,15 +44,21 @@
 </template>
 
 <script>
-import gameContainer from '../../../../game/container'
 import gameHelper from '../../../../services/gameHelper'
 import PlayerAvatarVue from '../menu/PlayerAvatar.vue'
 import TeamName from '../shared/TeamName.vue';
+import {eventBusInjectionKey} from "@/eventBus";
+import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 
 export default {
   components: {
     'team-name': TeamName,
     'player-avatar': PlayerAvatarVue
+  },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
   },
   data () {
     return {
@@ -78,16 +84,7 @@ export default {
       this.$emit('onOpenPlayerDetailRequested', e._id)
     },
     panToPlayer (player) {
-      gameContainer.map.panToPlayer(this.$store.state.game, player)
-    },
-    getAvatarImage (player) {
-      try {
-        return new URL(`../../../../assets/avatars/${player.avatar.file}`, import.meta.url).href
-      } catch (err) {
-        console.error(err)
-
-        return null
-      }
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, { player: player });
     },
     getPlayerStatus (player) {
       return gameHelper.getPlayerStatus(player)

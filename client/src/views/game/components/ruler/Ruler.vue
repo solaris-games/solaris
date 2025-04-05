@@ -179,6 +179,7 @@ import GameContainer from '../../../../game/container'
 import GameHelper from '../../../../services/gameHelper'
 import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning.vue'
 import {eventBusInjectionKey} from "../../../../eventBus";
+import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 
 export default {
   components: {
@@ -233,7 +234,7 @@ export default {
       this.$emit('onCloseRequested', e)
     },
     popRulerPoint () {
-      GameContainer.map.removeLastRulerPoint()
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandRemoveLastRulerPoint, {});
     },
     resetRulerPoints () {
       // Bit hacky but it works.

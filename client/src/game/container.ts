@@ -237,12 +237,12 @@ export class GameContainer {
   }
 
   reloadStar (star) {
-    let starObject = this.map!.setupStar(this.game, this.userSettings, star)
+    const starObject = this.map!.setupStar(this.game!, this.userSettings!, star)
     this.map!.drawStar(starObject)
   }
 
   reloadCarrier (carrier) {
-    let carrierObject = this.map!.setupCarrier(this.game, this.userSettings, carrier)
+    const carrierObject = this.map!.setupCarrier(this.game, this.userSettings, carrier)
     this.map!.drawCarrier(carrierObject)
   }
 
@@ -251,7 +251,7 @@ export class GameContainer {
   }
 
   getViewportZoomPercentage () {
-    let viewportWidth = this.viewport!.right - this.viewport!.left
+    const viewportWidth = this.viewport!.right - this.viewport!.left
     return (this.viewport!.screenWidth / viewportWidth) * 100
   }
 
