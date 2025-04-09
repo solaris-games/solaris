@@ -5,6 +5,8 @@ import {serverStub} from "../sockets/serverStub";
 import {logger} from "../utils/logging";
 import {DependencyContainer} from "../services/types/DependencyContainer";
 import {maxBy} from "../services/utils";
+import {Game} from "../services/types/Game";
+import {Attacker, Defender} from "../services/types/Combat";
 
 type ReducedPlayer = {
     _id: string,
@@ -92,11 +94,13 @@ const printCombatResults = (results: CombatGroupResult[]) => {
     }
 }
 
-const runScenario = (phase2: WeaponsLevelsResolver, phase3: CombatResolver) => (scenario: Scenario) => {
+const runScenario = (phase2: WeaponsLevelsResolver, phase3: CombatResolver, name: string) => (scenario: Scenario) => {
     const resolvedGroups = phase2(scenario);
+    console.log(`Runner ${name}`);
     printGroupsBeforeCombat(resolvedGroups);
     const afterCombat = phase3(resolvedGroups, scenario.combatType);
     printCombatResults(afterCombat);
+    console.log('-----------------------------------');
 }
 
 const weaponsLevelsResolver = ({ combatService, technologyService }: DependencyContainer): WeaponsLevelsResolver => (scenario) => {
@@ -143,7 +147,7 @@ const weaponsLevelsResolver = ({ combatService, technologyService }: DependencyC
     });
 };
 
-const combatResolver = (container: DependencyContainer): CombatResolver => (groups, combatType) => {
+const combatPowerCombatResolver = (container: DependencyContainer): CombatResolver => (groups, combatType) => {
     const sides = groups.length;
 
     return groups.map(group => {
@@ -169,6 +173,36 @@ const combatResolver = (container: DependencyContainer): CombatResolver => (grou
             resultShips: ships
         }
     });
+}
+
+const legacyCombatResolver = (container: DependencyContainer): CombatResolver => (groups, combatType) => {
+    const combatService = container.combatService;
+
+    const attackerGroup = groups.find(g => !g.isDefender)!;
+    const defenderGroup = groups.find(g => g.isDefender)!;
+
+    const defender: Defender = {
+        ships: defenderGroup.ships,
+        weaponsLevel: defenderGroup.effectiveWeaponsLevels.get(attackerGroup.identifier)!
+    };
+
+    const attacker: Attacker = {
+        ships: attackerGroup.ships,
+        weaponsLevel: attackerGroup.effectiveWeaponsLevels.get(defenderGroup.identifier)!
+    };
+
+    const result = combatService.calculate(defender, attacker, combatType === 'c2s');
+
+    return [
+        {
+            ...attackerGroup,
+            resultShips: result.after.attacker,
+        },
+        {
+            ...defenderGroup,
+            resultShips: result.after.defender,
+        }
+    ]
 }
 
 const player = (id: string, weaponsLevel: number): ReducedPlayer => {
@@ -225,7 +259,8 @@ const main = () => {
 
     for (let scenario of scenarios) {
         console.log(`Running scenario: ${scenario.name}`);
-        runScenario(weaponsLevelsResolver(container), combatResolver(container))(scenario);
+        runScenario(weaponsLevelsResolver(container), legacyCombatResolver(container), "legacy")(scenario);
+        runScenario(weaponsLevelsResolver(container), combatPowerCombatResolver(container), "combatpower")(scenario);
     }
 }
 
