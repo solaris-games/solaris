@@ -45,7 +45,7 @@ export function notNull<T>(val: T | null): val is T {
     return val !== null;
 }
 
-export function sorterByProperty<T>(prop: string): (a: T, b: T) => number {
+export function sorterByProperty<T>(prop: keyof T): (a: T, b: T) => number {
     return (a, b) => {
         if (a[prop] < b[prop]) {
             return -1;

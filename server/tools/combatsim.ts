@@ -4,8 +4,7 @@ import config from "../config";
 import {serverStub} from "../sockets/serverStub";
 import {logger} from "../utils/logging";
 import {DependencyContainer} from "../services/types/DependencyContainer";
-import {maxBy} from "../services/utils";
-import {Game} from "../services/types/Game";
+import {maxBy, sorterByProperty} from "../services/utils";
 import {Attacker, Defender} from "../services/types/Combat";
 
 type ReducedPlayer = {
@@ -175,6 +174,56 @@ const combatPowerCombatResolver = (container: DependencyContainer): CombatResolv
     });
 }
 
+const turnBasedCombatResolver = (container: DependencyContainer): CombatResolver => (groups, combatType) => {
+    const sides = groups.length;
+
+    const groupsWithIncomingDamage = groups.map(g => {
+        let incomingDamage = 0;
+
+        for (let other of groups) {
+            if (other.identifier === g.identifier) {
+                continue;
+            }
+
+            const otherAttack = other.effectiveWeaponsLevels.get(g.identifier)!;
+            incomingDamage += (otherAttack / (sides - 1));
+        }
+
+        return {
+            ...g,
+            incomingDamage,
+        }
+    });
+
+    const groupsWithLasting = groupsWithIncomingDamage.map(g => {
+        return {
+            ...g,
+            lastsRounds: g.ships / g.incomingDamage,
+            damageTaken: 0
+        }
+    });
+
+    groupsWithLasting.sort(sorterByProperty('lastsRounds'));
+
+    for (const group of groupsWithLasting) {
+        for (const other of groupsWithLasting) {
+            if (other.identifier === group.identifier) {
+                continue;
+            }
+
+            const attackOnOther = group.effectiveWeaponsLevels.get(other.identifier)! / (sides - 1);
+            other.damageTaken += attackOnOther * group.lastsRounds;
+        }
+    }
+
+    return groupsWithLasting.map(g => {
+        return {
+            ...g,
+            resultShips: Math.max(0, g.ships - g.damageTaken)
+        }
+    });
+}
+
 const legacyCombatResolver = (container: DependencyContainer): CombatResolver => (groups, combatType) => {
     const combatService = container.combatService;
 
@@ -261,6 +310,7 @@ const main = () => {
         console.log(`Running scenario: ${scenario.name}`);
         runScenario(weaponsLevelsResolver(container), legacyCombatResolver(container), "legacy")(scenario);
         runScenario(weaponsLevelsResolver(container), combatPowerCombatResolver(container), "combatpower")(scenario);
+        runScenario(weaponsLevelsResolver(container), turnBasedCombatResolver(container), "turnbased")(scenario);
     }
 }
 
