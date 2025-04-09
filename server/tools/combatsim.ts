@@ -165,7 +165,7 @@ const combatPowerCombatResolver = (container: DependencyContainer): CombatResolv
             ships -= shipDamage;
         }
 
-        ships = Math.max(0, ships);
+        ships = Math.floor(Math.max(0, ships));
 
         return {
             ...group,
@@ -223,7 +223,7 @@ const turnBasedCombatResolver = (container: DependencyContainer): CombatResolver
     return groupsWithLasting.map(g => {
         return {
             ...g,
-            resultShips: Math.max(0, g.ships - g.damageTaken)
+            resultShips: Math.floor(Math.max(0, g.ships - g.damageTaken))
         }
     });
 }
@@ -312,6 +312,7 @@ const scenarios: Scenario[] = [
     twoPlayerC2S("C2S equal ships, higher weapons", 100, 3, 100, 3),
     twoPlayerC2S("C2S low ships, high weapons", 10, 5, 20, 5),
     twoPlayerC2S("C2S equal ships, very high weapons", 100, 7, 100, 8),
+    twoPlayerC2S("C2S one ship, attacker", 1, 5, 10, 4),
 ];
 
 const main = () => {
