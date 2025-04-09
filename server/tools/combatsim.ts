@@ -306,6 +306,12 @@ const twoPlayerC2S = (name: string, player1Ships: number, player1Weapons: number
 
 const scenarios: Scenario[] = [
     twoPlayerC2S("C2S Basic 1", 100, 1, 50, 1),
+    twoPlayerC2S("C2S low ships", 10, 1, 5, 2),
+    twoPlayerC2S("C2S equal ships", 100, 1, 100, 1),
+    twoPlayerC2S("C2S equal ships, different weapons", 100, 1, 100, 2),
+    twoPlayerC2S("C2S equal ships, higher weapons", 100, 3, 100, 3),
+    twoPlayerC2S("C2S low ships, high weapons", 10, 5, 20, 5),
+    twoPlayerC2S("C2S equal ships, very high weapons", 100, 7, 100, 8),
 ];
 
 const main = () => {
@@ -317,6 +323,7 @@ const main = () => {
         runScenario(weaponsLevelsResolver(container), legacyCombatResolver(container), "legacy")(scenario);
         runScenario(weaponsLevelsResolver(container), combatPowerCombatResolver(container), "combatpower")(scenario);
         runScenario(weaponsLevelsResolver(container), turnBasedCombatResolver(container), "turnbased")(scenario);
+        console.log("");
     }
 }
 
