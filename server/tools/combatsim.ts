@@ -149,7 +149,7 @@ const weaponsLevelsResolver = ({ combatService, technologyService }: DependencyC
 const combatPowerCombatResolver = (container: DependencyContainer): CombatResolver => (groups, combatType) => {
     const sides = groups.length;
 
-    return groups.map(group => {
+    const results = groups.map(group => {
         const ownWeapons = group.baseWeapons;
         let ships = group.ships;
 
@@ -172,6 +172,10 @@ const combatPowerCombatResolver = (container: DependencyContainer): CombatResolv
             resultShips: ships
         }
     });
+
+    results.sort(sorterByProperty('resultShips'));
+
+    return results;
 }
 
 const turnBasedCombatResolver = (container: DependencyContainer): CombatResolver => (groups, combatType) => {
@@ -266,9 +270,9 @@ const player = (id: string, weaponsLevel: number): ReducedPlayer => {
     }
 }
 
-const scenarios: Scenario[] = [
-    {
-        name: "C2S Basic 1",
+const twoPlayerC2S = (name: string, player1Ships: number, player1Weapons: number, player2Ships: number, player2Weapons: number): Scenario => {
+    return {
+        name,
         combatType: 'c2s',
         groups: [
             {
@@ -276,30 +280,32 @@ const scenarios: Scenario[] = [
                 carriers: [],
                 star: {
                     _id: '1',
-                    ships: 100,
+                    ships: player1Ships,
                     playerId: 'A',
                     specialistId: undefined,
                 },
                 players: [
-                    player('A', 1)
+                    player('A', player1Weapons)
                 ],
             },
             {
                 identifier: 'B',
-                carriers: [
-                    {
-                        _id: '2',
-                        specialistId: undefined,
-                        ships: 50,
-                    }
-                ],
+                carriers: [{
+                    _id: '2',
+                    ships: player2Ships,
+                    specialistId: undefined,
+                }],
                 star: undefined,
                 players: [
-                    player('B', 1)
+                    player('B', player2Weapons)
                 ],
             }
         ]
     }
+}
+
+const scenarios: Scenario[] = [
+    twoPlayerC2S("C2S Basic 1", 100, 1, 50, 1),
 ];
 
 const main = () => {
