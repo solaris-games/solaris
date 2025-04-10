@@ -67,20 +67,21 @@ const eventBus: EventBus = new ClientEventBus();
 
 const httpClient = createHttpClient();
 
-const store: Store<State> = createSolarisStore(eventBus, httpClient);
+const socket: Socket = io(socketUrl, { withCredentials: true });
+
+const playerClientSocketEmitter: PlayerClientSocketEmitter = new PlayerClientSocketEmitter(socket);
+const userClientSocketEmitter: UserClientSocketEmitter = new UserClientSocketEmitter(socket);
+
+const store: Store<State> = createSolarisStore(eventBus, httpClient, userClientSocketEmitter);
 
 app.use(store);
 
 app.use(ToastPlugin);
 
-const socket: Socket = io(socketUrl, { withCredentials: true });
-
 const diplomacyClientSocketHandler: DiplomacyClientSocketHandler = new DiplomacyClientSocketHandler(socket, eventBus);
 const gameClientSocketHandler: GameClientSocketHandler = new GameClientSocketHandler(socket, store, app.config.globalProperties.$toast, eventBus);
 const playerClientSocketHandler: PlayerClientSocketHandler = new PlayerClientSocketHandler(socket, store, eventBus);
 const userClientSocketHandler: UserClientSocketHandler = new UserClientSocketHandler(socket, store, eventBus);
-const playerClientSocketEmitter: PlayerClientSocketEmitter = new PlayerClientSocketEmitter(socket);
-const userClientSocketEmitter: UserClientSocketEmitter = new UserClientSocketEmitter(socket);
 
 app.provide(userClientSocketEmitterInjectionKey, userClientSocketEmitter);
 app.provide(playerClientSocketEmitterInjectionKey, playerClientSocketEmitter);

@@ -90,6 +90,7 @@ import UserLevelService from "../userLevel";
 import WaypointService from "../waypoint";
 import StarCaptureService from "../starCapture";
 import {UserServerSocketEmitter} from "../../sockets/socketEmitters/user";
+import {UserServerSocketHandler} from "../../sockets/socketHandlers/user";
 
 export interface DependencyContainer {
     config: Config,
@@ -113,6 +114,7 @@ export interface DependencyContainer {
     gameService: GameService,
     serverHandler: ServerHandler,
     playerServerSocketHandler: PlayerServerSocketHandler,
+    userServerSocketHandler: UserServerSocketHandler,
     gameAuthService: GameAuthService,
     gameLockService: GameLockService,
     gameJoinService: GameJoinService,

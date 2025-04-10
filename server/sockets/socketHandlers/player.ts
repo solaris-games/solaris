@@ -16,7 +16,6 @@ export class PlayerServerSocketHandler extends ServerSocketHandler<PlayerSocketE
         // When the user opens a game, they will be put
         // into that room to receive web sockets scoped to the game room.
         this.on(PlayerSocketEventNames.GameRoomJoined, async (e: { socket?: Socket, gameId: string, playerId?: string }) => {
-
             if (e.socket == null) {
                 return;
             }
@@ -42,7 +41,6 @@ export class PlayerServerSocketHandler extends ServerSocketHandler<PlayerSocketE
         });
 
         this.on(PlayerSocketEventNames.GameRoomLeft, async (e: { socket?: Socket, gameId: string, playerId?: string }) => {
-
             if (e.socket == null) {
                 return;
             }
