@@ -180,6 +180,7 @@ import GameContainer from '../../../../game/container'
 import GameHelper from '../../../../services/gameHelper'
 import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning.vue'
 import {eventBusInjectionKey} from "../../../../eventBus";
+import MapEventBusEventNames from "@/eventBusEventNames/map";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 
 export default {
@@ -211,21 +212,21 @@ export default {
     this.isCompactUIStyle = this.$store.state.settings.interface.uiStyle === 'compact'
 
     this.onRulerPointCreated = this.onRulerPointCreated.bind(this);
-    this.eventBus.on('onRulerPointCreated', this.onRulerPointCreated);
+    this.eventBus.on(MapEventBusEventNames.MapOnRulerPointCreated, this.onRulerPointCreated);
 
     this.onRulerPointRemoved = this.onRulerPointRemoved.bind(this);
-    this.eventBus.on('onRulerPointRemoved', this.onRulerPointRemoved);
+    this.eventBus.on(MapEventBusEventNames.MapOnRulerPointRemoved, this.onRulerPointRemoved);
 
     this.onRulerPointsCleared = this.onRulerPointsCleared.bind(this);
-    this.eventBus.on('onRulerPointsCleared', this.onRulerPointsCleared);
+    this.eventBus.on(MapEventBusEventNames.MapOnRulerPointsCleared, this.onRulerPointsCleared);
 
     // Set map to ruler mode
     GameContainer.setMode('ruler')
   },
   unmounted () {
-    this.eventBus.off('onRulerPointCreated', this.onRulerPointCreated);
-    this.eventBus.off('onRulerPointRemoved', this.onRulerPointRemoved);
-    this.eventBus.off('onRulerPointsCleared', this.onRulerPointsCleared);
+    this.eventBus.off(MapEventBusEventNames.MapOnRulerPointCreated, this.onRulerPointCreated);
+    this.eventBus.off(MapEventBusEventNames.MapOnRulerPointRemoved, this.onRulerPointRemoved);
+    this.eventBus.off(MapEventBusEventNames.MapOnRulerPointsCleared, this.onRulerPointsCleared);
 
     // Set map to galaxy mode
     GameContainer.resetMode()
@@ -242,7 +243,7 @@ export default {
       GameContainer.resetMode()
       GameContainer.setMode('ruler')
     },
-    onRulerPointCreated (e) {
+    onRulerPointCreated ({ rulerPoint: e }) {
       this.points.push(e)
       if (e.type == 'carrier' && this.points.length == 1) {
         this.speedModifier = 1;
@@ -252,7 +253,7 @@ export default {
       }
       this.recalculateAll()
     },
-    onRulerPointRemoved (e) {
+    onRulerPointRemoved ({ rulerPoint: e }) {
       this.points.splice(this.points.indexOf(e), 1)
 
       this.recalculateAll()

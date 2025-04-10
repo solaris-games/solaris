@@ -11,7 +11,6 @@ import PathManager from './PathManager'
 import OrbitalLocationLayer from './orbital'
 import WormHoleLayer from './wormHole'
 import TooltipLayer from './tooltip'
-import {EventEmitter} from "./eventEmitter.js";
 import type {Store} from "vuex";
 import type {State} from "../store";
 import type {DrawingContext, GameContainer} from "./container";
@@ -28,8 +27,6 @@ enum Mode {
   Waypoints = 'waypoints',
   Ruler = 'ruler',
 }
-
-
 
 export class Map {
   // Represents the current game mode, these are as follows:
@@ -907,11 +904,13 @@ export class Map {
   }
 
   onRulerPointCreated (e) {
-    this.eventBus.emit(MapEventBusEventNames.MapOnRulerPointCreated);
+    console.log(e);
+
+    this.eventBus.emit(MapEventBusEventNames.MapOnRulerPointCreated, { rulerPoint: e });
   }
 
   onRulerPointRemoved (e) {
-    this.eventBus.emit(MapEventBusEventNames.MapOnRulerPointRemoved);
+    this.eventBus.emit(MapEventBusEventNames.MapOnRulerPointRemoved, { rulerPoint: e });
   }
 
   onRulerPointsCleared (e) {
