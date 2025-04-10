@@ -23,12 +23,6 @@ export class PlayerServerSocketHandler extends ServerSocketHandler<PlayerSocketE
 
             let socket: Socket = e.socket;
 
-            const userId = await this.socketService.getUserId(socket);
-
-            if (userId) {
-                socket.join(userId); // Join a private room to receive user/player specific messages.
-            }
-
             socket.join(e.gameId); // Join the game room to receive game-wide messages.
 
             if (e.playerId) {

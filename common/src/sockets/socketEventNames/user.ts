@@ -8,5 +8,7 @@ export type UserSocketEventName<TData> = SocketEventName<UserSocketEventType, TD
 const toEventName: <TData>(value: string) => UserSocketEventName<TData> = makeCastFunc();
 
 export class UserSocketEventNames {
+    public static readonly UserJoined: UserSocketEventName<{}> = toEventName("userJoined");
     public static readonly GameMessageSent: UserSocketEventName<ConversationMessageSentResult<string>> = toEventName('gameMessageSent');
+    public static readonly UserLeft: UserSocketEventName<{}> = toEventName("userLeft");
 }

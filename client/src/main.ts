@@ -21,6 +21,8 @@ import { httpInjectionKey } from "./services/typedapi"
 import {createHttpClient} from "./util/http";
 import {toastInjectionKey} from "./util/keys";
 import {UserClientSocketHandler} from "./sockets/socketHandlers/user";
+import {UserClientSocketEmitter} from "@/sockets/socketEmitters/user";
+import {userClientSocketEmitterInjectionKey} from "@/sockets/socketEmitters/user";
 
 // Note: This was done to get around an issue where the Steam client
 // had bootstrap as undefined. This also affects the UI template we're using,
@@ -78,7 +80,9 @@ const gameClientSocketHandler: GameClientSocketHandler = new GameClientSocketHan
 const playerClientSocketHandler: PlayerClientSocketHandler = new PlayerClientSocketHandler(socket, store, eventBus);
 const userClientSocketHandler: UserClientSocketHandler = new UserClientSocketHandler(socket, store, eventBus);
 const playerClientSocketEmitter: PlayerClientSocketEmitter = new PlayerClientSocketEmitter(socket);
+const userClientSocketEmitter: UserClientSocketEmitter = new UserClientSocketEmitter(socket);
 
+app.provide(userClientSocketEmitterInjectionKey, userClientSocketEmitter);
 app.provide(playerClientSocketEmitterInjectionKey, playerClientSocketEmitter);
 app.provide(eventBusInjectionKey, eventBus);
 
@@ -86,7 +90,7 @@ app.provide(httpInjectionKey, httpClient);
 
 app.provide(toastInjectionKey, app.config.globalProperties.$toast);
 
-const clientHandler: ClientHandler = new ClientHandler(socket, store, playerClientSocketEmitter);
+const clientHandler: ClientHandler = new ClientHandler(socket, store, playerClientSocketEmitter, userClientSocketEmitter);
 
 app.config.globalProperties.$confirm = async function(title, text, confirmText = 'Yes', cancelText = 'No', hideCancelButton = false, cover = false) {
   return this.$store.dispatch('confirm', {

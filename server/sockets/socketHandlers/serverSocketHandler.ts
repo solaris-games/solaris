@@ -12,7 +12,6 @@ export abstract class ServerSocketHandler<TSocketEventType> extends SocketHandle
         this.socketEventType;
 
         serverHandler.on(ServerHandlerEvents.onConnection, (socket: Socket) => {
-
             for (let registeredHandler of this.registeredHandlers) {
                 let newHandler: (e: unknown) => void = (e: unknown) => {
 
