@@ -35,7 +35,9 @@ import GameApiService from '../../../../services/api/game'
 import MentionBox from '../shared/MentionBox.vue'
 import MentionHelper from '@/services/mentionHelper';
 import GameHelper from "@/services/gameHelper";
-import GameContainer from "@/game/container";
+import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
+import {eventBusInjectionKey} from "@/eventBus";
+import { inject } from 'vue';
 
 export default {
   components: {
@@ -50,6 +52,11 @@ export default {
       isEditing: false,
       readonlyNotes: '',
       notes: ''
+    }
+  },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
     }
   },
   mounted() {
@@ -124,7 +131,7 @@ export default {
       const star = GameHelper.getStarById(this.$store.state.game, id)
 
       if (star) {
-        GameContainer.panToStar(star)
+        this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: star });
       } else {
         this.$toast.error(`The location of the star is unknown.`)
       }

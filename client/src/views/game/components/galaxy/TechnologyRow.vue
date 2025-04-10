@@ -15,9 +15,11 @@
 </template>
 
 <script>
-import GameContainer from '../../../../game/container'
 import GameHelper from '../../../../services/gameHelper'
 import PlayerIconVue from '../player/PlayerIcon.vue'
+import {eventBusInjectionKey} from "@/eventBus";
+import { inject } from 'vue';
+import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 
 export default {
   components: {
@@ -28,12 +30,17 @@ export default {
     userPlayer: Object,
     technology: Object
   },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
+  },
   methods: {
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', this.technology._id)
     },
     goToEmpire (e) {
-      GameContainer.panToPlayer(this.$store.state.game, this.technology)
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, { player: this.technology });
     },
     displayStyle(research) {
       if (this.technology._id == this.userPlayer?._id) {

@@ -174,15 +174,24 @@
 </template>
 
 <script>
+import { inject } from 'vue';
 import MenuTitleVue from '../MenuTitle.vue'
 import GameContainer from '../../../../game/container'
 import GameHelper from '../../../../services/gameHelper'
 import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning.vue'
+import {eventBusInjectionKey} from "../../../../eventBus";
+import MapEventBusEventNames from "@/eventBusEventNames/map";
+import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 
 export default {
   components: {
     'menu-title': MenuTitleVue,
     'orbital-mechanics-eta-warning': OrbitalMechanicsETAWarningVue
+  },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
   },
   data () {
     return {
@@ -202,13 +211,23 @@ export default {
     this.isStandardUIStyle = this.$store.state.settings.interface.uiStyle === 'standard'
     this.isCompactUIStyle = this.$store.state.settings.interface.uiStyle === 'compact'
 
+    this.onRulerPointCreated = this.onRulerPointCreated.bind(this);
+    this.eventBus.on(MapEventBusEventNames.MapOnRulerPointCreated, this.onRulerPointCreated);
+
+    this.onRulerPointRemoved = this.onRulerPointRemoved.bind(this);
+    this.eventBus.on(MapEventBusEventNames.MapOnRulerPointRemoved, this.onRulerPointRemoved);
+
+    this.onRulerPointsCleared = this.onRulerPointsCleared.bind(this);
+    this.eventBus.on(MapEventBusEventNames.MapOnRulerPointsCleared, this.onRulerPointsCleared);
+
     // Set map to ruler mode
     GameContainer.setMode('ruler')
-    GameContainer.map.on('onRulerPointCreated', this.onRulerPointCreated.bind(this))
-    GameContainer.map.on('onRulerPointRemoved', this.onRulerPointRemoved.bind(this))
-    GameContainer.map.on('onRulerPointsCleared', this.onRulerPointsCleared.bind(this))
   },
   unmounted () {
+    this.eventBus.off(MapEventBusEventNames.MapOnRulerPointCreated, this.onRulerPointCreated);
+    this.eventBus.off(MapEventBusEventNames.MapOnRulerPointRemoved, this.onRulerPointRemoved);
+    this.eventBus.off(MapEventBusEventNames.MapOnRulerPointsCleared, this.onRulerPointsCleared);
+
     // Set map to galaxy mode
     GameContainer.resetMode()
   },
@@ -217,14 +236,14 @@ export default {
       this.$emit('onCloseRequested', e)
     },
     popRulerPoint () {
-      GameContainer.map.removeLastRulerPoint()
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandRemoveLastRulerPoint, {});
     },
     resetRulerPoints () {
       // Bit hacky but it works.
       GameContainer.resetMode()
       GameContainer.setMode('ruler')
     },
-    onRulerPointCreated (e) {
+    onRulerPointCreated ({ rulerPoint: e }) {
       this.points.push(e)
       if (e.type == 'carrier' && this.points.length == 1) {
         this.speedModifier = 1;
@@ -234,7 +253,7 @@ export default {
       }
       this.recalculateAll()
     },
-    onRulerPointRemoved (e) {
+    onRulerPointRemoved ({ rulerPoint: e }) {
       this.points.splice(this.points.indexOf(e), 1)
 
       this.recalculateAll()

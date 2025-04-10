@@ -3,13 +3,20 @@
 </template>
 
 <script>
-import gameContainer from '../../../../game/container'
 import gameHelper from '../../../../services/gameHelper'
+import {eventBusInjectionKey} from "@/eventBus";
+import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
+import { inject } from 'vue';
 
 export default {
   props: {
     starId: String,
     starName: String
+  },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
   },
   data () {
     return {
@@ -20,17 +27,19 @@ export default {
     if (this.starName != null) {
       this.actualStarName = this.starName
     } else {
-      let star = gameHelper.getStarById(this.$store.state.game, this.starId)
+      const star = gameHelper.getStarById(this.$store.state.game, this.starId)
 
       this.actualStarName = star ? star.name : 'Unknown'
     }
   },
   methods: {
     pan (e) {
-      let star = gameHelper.getStarById(this.$store.state.game, this.starId)
+      const star = gameHelper.getStarById(this.$store.state.game, this.starId)
 
       if (star) {
-        gameContainer.map.panToStar(star)
+        this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, {
+          object: star
+        });
       }
     }
   }

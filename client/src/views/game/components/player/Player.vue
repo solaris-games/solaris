@@ -71,7 +71,9 @@ import EloRating from './EloRating.vue'
 import PlayerReport from './PlayerReport.vue'
 import gameService from '../../../../services/api/game'
 import GameHelper from '../../../../services/gameHelper'
-import GameContainer from '../../../../game/container'
+import {eventBusInjectionKey} from "@/eventBus";
+import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
+import { inject } from 'vue';
 
 export default {
   components: {
@@ -91,6 +93,11 @@ export default {
   props: {
     playerId: String
   },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
+  },
   data () {
     return {
       player: null,
@@ -109,7 +116,7 @@ export default {
     // user info so we can show more info like achievements.
     if (this.$store.state.userId && !this.player.isOpenSlot && GameHelper.isNormalAnonymity(this.$store.state.game)) {
       try {
-        let response = await gameService.getPlayerUserInfo(this.$store.state.game._id, this.player._id)
+        const response = await gameService.getPlayerUserInfo(this.$store.state.game._id, this.player._id)
 
         this.user = response.data
       } catch (err) {
@@ -141,7 +148,7 @@ export default {
       this.$emit('onOpenReportPlayerRequested', e)
     },
     panToPlayer (e) {
-      GameContainer.panToPlayer(this.$store.state.game, this.player)
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, { player: this.player });
     },
     onOpenPrevPlayerDetailRequested (e) {
       let prevLeaderboardIndex = this.leaderboard.indexOf(this.player) - 1;

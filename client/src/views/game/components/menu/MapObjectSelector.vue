@@ -47,10 +47,12 @@
 
 <script>
 import gameHelper from '../../../../services/gameHelper'
-import gameContainer from '../../../../game/container'
 import MenuTitleVue from '../MenuTitle.vue'
 import SpecialistIconVue from '../specialist/SpecialistIcon.vue'
 import starService from '../../../../services/api/star'
+import {eventBusInjectionKey} from "@/eventBus";
+import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
+import { inject } from 'vue';
 
 export default {
   components: {
@@ -59,6 +61,11 @@ export default {
   },
   props: {
     mapObjects: Array
+  },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
   },
   data () {
     return {
@@ -170,10 +177,10 @@ export default {
     onViewObjectRequested (mapObject) {
       switch (mapObject.type) {
         case 'star':
-          gameContainer.map.clickStar(mapObject.data._id);
+          this.eventBus.emit(MapCommandEventBusEventNames.MapCommandClickStar, { starId: mapObject.data._id });
           break
         case 'carrier':
-          gameContainer.map.clickCarrier(mapObject.data._id);
+          this.eventBus.emit(MapCommandEventBusEventNames.MapCommandClickCarrier, { carrierId: mapObject.data._id });
           break
       }
     },
