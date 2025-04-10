@@ -36,19 +36,26 @@
 
 <script>
 import GameHelper from '@/services/gameHelper';
-import gameContainer from '@/game/container';
 import LeaderboardRow from '@/views/game/components/leaderboard/LeaderboardRow.vue';
+import { inject } from 'vue';
+import {eventBusInjectionKey} from "@/eventBus";
+import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 
 export default {
   components: {
     'leaderboard-row': LeaderboardRow
+  },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
   },
   methods: {
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', e)
     },
     panToPlayer (player) {
-      gameContainer.map.panToPlayer(this.$store.state.game, player)
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, { player: player });
       this.onOpenPlayerDetailRequested(player)
     },
     isPlayerTeam (team) {

@@ -60,7 +60,9 @@ import PlayerAvatarVue from '@/views/game/components/menu/PlayerAvatar.vue';
 import ReadyStatusButtonVue from '@/views/game/components/menu/ReadyStatusButton.vue';
 import GameHelper from '@/services/gameHelper';
 import gameService from '@/services/api/game';
-import gameContainer from '@/game/container';
+import {eventBusInjectionKey} from "@/eventBus";
+import { inject } from 'vue';
+import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 
 export default {
   components: {
@@ -71,6 +73,11 @@ export default {
   props: {
     player: Object,
     showTeamNames: Boolean,
+  },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
   },
   methods: {
     getFriendlyColour(colour) {
@@ -106,7 +113,7 @@ export default {
       return userPlayer && userPlayer._id === player._id
     },
     panToPlayer(player) {
-      gameContainer.map.panToPlayer(this.$store.state.game, player)
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, { player: player });
       this.onOpenPlayerDetailRequested(player)
     }
   },

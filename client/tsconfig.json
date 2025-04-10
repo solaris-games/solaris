@@ -2,7 +2,8 @@
     "compilerOptions": {
         "noImplicitAny": false,
         "paths": {
-            "@solaris-common": [ "../common/src/index.ts" ]
+            "@solaris-common": [ "../common/src/index.ts" ],
+            "@/*": ["./src/*"]
         },
         "lib": [
             "es2022",

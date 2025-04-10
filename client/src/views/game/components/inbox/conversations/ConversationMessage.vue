@@ -31,11 +31,13 @@
 
 <script>
 import GameHelper from '../../../../../services/gameHelper'
-import GameContainer from '../../../../../game/container'
 import PlayerIconVue from '../../player/PlayerIcon.vue'
 import ConversationMessagePinVue from './ConversationMessagePin.vue'
 import mentionHelper from '../../../../../services/mentionHelper'
 import ConversationMessageContextMenu from "./ConversationMessageContextMenu.vue";
+import {eventBusInjectionKey} from "@/eventBus";
+import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
+import { inject } from 'vue';
 
 export default {
   components: {
@@ -47,8 +49,13 @@ export default {
     conversation: Object,
     message: Object
   },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
+  },
   mounted () {
-    let onStarClicked = (id) => {
+    const onStarClicked = (id) => {
       this.panToStar(id)
 
       if (this.$isMobile()) {
@@ -56,7 +63,7 @@ export default {
       }
     }
 
-    let onPlayerClicked = (id) => this.$emit('onOpenPlayerDetailRequested', id)
+    const onPlayerClicked = (id) => this.$emit('onOpenPlayerDetailRequested', id)
 
     mentionHelper.renderMessageWithMentionsAndLinks(this.$refs.messageElement, this.message.message, onStarClicked, onPlayerClicked)
   },
@@ -83,7 +90,7 @@ export default {
       const star = GameHelper.getStarById(this.$store.state.game, id)
 
       if (star) {
-        GameContainer.panToStar(star)
+        this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: star });
       } else {
         this.$toast.error(`The location of the star is unknown.`)
       }

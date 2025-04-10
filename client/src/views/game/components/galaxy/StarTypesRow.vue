@@ -17,9 +17,11 @@
 </template>
 
 <script>
-import gameContainer from '../../../../game/container'
 import PlayerIconVue from '../player/PlayerIcon.vue'
 import SpecialistIcon from '../specialist/SpecialistIcon.vue'
+import {eventBusInjectionKey} from "../../../../eventBus";
+import { inject } from 'vue';
+import MapCommandEventBusEventNames from "../../../../eventBusEventNames/mapCommand";
 
 export default {
   components: {
@@ -29,20 +31,22 @@ export default {
   props: {
     star: null
   },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
+  },
   data () {
     return {
     }
   },
   methods: {
     clickStar (e, starId) {
-      //this.$emit('onOpenStarDetailRequested', this.star._id)
       this.$emit('onOpenStarDetailRequested', starId);
     },
     goToStar (e, star) {
-      gameContainer.map.panToStar(star)
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: star });
     }
-  },
-  computed: {
   }
 }
 </script>
