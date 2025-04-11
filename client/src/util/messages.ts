@@ -21,10 +21,10 @@ export const withMessages = () => {
       $toast.info(`New message from ${e.fromPlayerAlias}.`, {
         duration: 10000,
         onClick: () => {
-          store.commit('setMenuState', {
+          store.commit('setMenuStateChat', {
             state: MENU_STATES.CONVERSATION,
             args: e.conversationId
-          });
+          })
         }
       });
     } else {

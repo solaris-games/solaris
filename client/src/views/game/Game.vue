@@ -45,6 +45,7 @@ import { playerClientSocketEmitterInjectionKey } from '../../sockets/socketEmitt
 import GameEventBusEventNames from '../../eventBusEventNames/game'
 import router from '../../router'
 import {withMessages} from "../../util/messages";
+import {userClientSocketEmitterInjectionKey} from "@/sockets/socketEmitters/user";
 
 export default {
   components: {
@@ -60,7 +61,8 @@ export default {
 
     return {
       eventBus: inject(eventBusInjectionKey),
-      playerClientSocketEmitter: inject(playerClientSocketEmitterInjectionKey)
+      playerClientSocketEmitter: inject(playerClientSocketEmitterInjectionKey),
+      userClientSockerEmitter: inject(userClientSocketEmitterInjectionKey),
     }
   },
   data () {
@@ -85,7 +87,9 @@ export default {
 
     // AudioService.download()
 
-    let player = GameHelper.getUserPlayer(this.$store.state.game)
+    const player = GameHelper.getUserPlayer(this.$store.state.game)
+
+    this.userClientSockerEmitter.emitJoined();
 
     this.playerClientSocketEmitter.emitGameRoomJoined({
       gameId: this.$store.state.game._id,

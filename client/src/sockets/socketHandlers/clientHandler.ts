@@ -17,6 +17,7 @@ export class ClientHandler {
 
     this.socketOn(socket, ClientSocketEventNames.Connect, async () => {
       console.log('Socket connection established.');
+      userClientSocketEmitter.emitJoined();
     });
 
     this.socketOn(socket.io, ClientSocketEventNames.Error, (err: Error) => {
