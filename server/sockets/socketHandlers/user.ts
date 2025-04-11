@@ -10,8 +10,6 @@ export class UserServerSocketHandler extends ServerSocketHandler<UserSocketEvent
         super(serverHandler);
 
         this.on(UserSocketEventNames.UserJoined, async (e: { socket?: Socket }) => {
-            console.log("User joined");
-
             if (e.socket == null) {
                 return;
             }
@@ -27,8 +25,6 @@ export class UserServerSocketHandler extends ServerSocketHandler<UserSocketEvent
         });
 
         this.on(UserSocketEventNames.UserLeft, async (e: { socket?: Socket }) => {
-            console.log("User left");
-
             if (e.socket == null) {
                 return;
             }

@@ -6,8 +6,8 @@ import type {ConversationMessageSentResult} from "@solaris-common";
 import UserEventBusEventNames from "../eventBusEventNames/user";
 import {useToast} from 'vue-toast-notification';
 import {eventBusInjectionKey} from "../eventBus";
-import MENU_STATES from '../services/data/menuStates.js';
-import router from "../router.js";
+import MENU_STATES from '../services/data/menuStates';
+import router from "../router";
 import AudioService from '../game/audio'
 
 export const withMessages = () => {
@@ -36,8 +36,6 @@ export const withMessages = () => {
         }
       });
     }
-
-    AudioService.join();
   }
 
   onMounted(() => {
