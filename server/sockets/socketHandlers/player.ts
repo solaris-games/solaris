@@ -45,20 +45,14 @@ export class PlayerServerSocketHandler extends ServerSocketHandler<PlayerSocketE
                 return;
             }
 
-            let socket: Socket = e.socket;
-
-            const userId = await this.socketService.getUserId(socket);
-
-            if (userId) {
-                socket.leave(userId)
-            }
+            const socket: Socket = e.socket;
 
             socket.leave(e.gameId)
 
             if (e.playerId) {
                 socket.leave(e.playerId)
 
-                let game: Game | null = await this.gameService.getByIdLean(objectIdFromString(e.gameId), {
+                const game: Game | null = await this.gameService.getByIdLean(objectIdFromString(e.gameId), {
                     'settings.general.playerOnlineStatus': 1
                 });
 
