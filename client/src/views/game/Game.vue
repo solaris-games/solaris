@@ -125,12 +125,14 @@ export default {
     clearInterval(this.polling)
   },
   unmounted () {
-    let player = GameHelper.getUserPlayer(this.$store.state.game)
+    const player = GameHelper.getUserPlayer(this.$store.state.game)
 
     this.playerClientSocketEmitter.emitGameRoomLeft({
       gameId: this.$store.state.game._id,
       playerId: player?._id
     });
+
+    this.$store.commit('clearGame');
 
     document.title = 'Solaris'
   },
