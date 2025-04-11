@@ -8,7 +8,6 @@ import {useToast} from 'vue-toast-notification';
 import {eventBusInjectionKey} from "../eventBus";
 import MENU_STATES from '../services/data/menuStates';
 import router from "../router";
-import AudioService from '../game/audio'
 
 export const withMessages = () => {
   const $toast = useToast();
@@ -32,7 +31,7 @@ export const withMessages = () => {
       $toast.info(`In another game, you have received a message from ${e.fromPlayerAlias}.`, {
         duration: 10000,
         onClick: () => {
-          router.push({ name: 'game', query: { id: e.gameId } })
+          router.replace({ name: 'game', query: { id: e.gameId } })
         }
       });
     }
