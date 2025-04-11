@@ -28,7 +28,10 @@ export const withMessages = () => {
         }
       });
     } else {
-      $toast.info(`In another game, you have received a message from ${e.fromPlayerAlias}.`, {
+      const gameName = e.gameName;
+      const text = gameName ? `In ${gameName}, you have received a message from ${e.fromPlayerAlias}.` : `In another game, you have received a message from ${e.fromPlayerAlias}.`;
+
+      $toast.info(text, {
         duration: 10000,
         onClick: () => {
           router.replace({ name: 'game', query: { id: e.gameId } })

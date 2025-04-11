@@ -86,6 +86,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.game.loadGame({
                 lean: true,
                 state: true,
+                settings: true,
                 conversations: true,
                 'galaxy.players': true
             }),

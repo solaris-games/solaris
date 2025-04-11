@@ -14,4 +14,5 @@ export interface ConversationMessageSentResult<ID> extends ConversationMessage<I
     conversationId: ID;
     toPlayerIds: ID[];
     gameId: ID;
+    gameName: string;
 };
