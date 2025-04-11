@@ -222,7 +222,7 @@ export default (config: Config,
     const gameService = new GameService(gameRepository, userService, starService, carrierService, playerService, passwordService, achievementService, avatarService, gameTypeService, gameStateService, conversationService, playerReadyService, gameJoinService, gameAuthService, playerAfkService);
     const serverHandler = new ServerHandler(socketServer, logger);
     const playerServerSocketHandler = new PlayerServerSocketHandler(socketService, gameService, serverHandler);
-    const userServerSocketHandler = new UserServerSocketHandler(socketService, gameService, serverHandler);
+    const userServerSocketHandler = new UserServerSocketHandler(socketService, serverHandler);
     const leaderboardService = new LeaderboardService(playerService, playerAfkService, userLevelService, ratingService, gameService, gameTypeService, gameStateService, badgeService, playerStatisticsService, teamService);
     const userLeaderboardService = new UserLeaderboardService(userRepository, guildUserService);
     const combatService = new CombatService(technologyService, specialistService, playerService, starService, reputationService, diplomacyService, gameTypeService, starCaptureService);
