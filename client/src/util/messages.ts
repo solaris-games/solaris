@@ -15,6 +15,13 @@ export const withMessages = () => {
   const store: Store<State> = useStore();
 
   const handler = (e: ConversationMessageSentResult<string>) => {
+    window?.solaris?.messages?.onConversationMessageReceived({
+      gameID: e.gameId,
+      gameName: e.gameName,
+      fromPlayerId: e.fromPlayerId,
+      fromPlayerAlias: e.fromPlayerAlias
+    });
+
     const isInGame = store.state.game?._id === e.gameId;
 
     if (isInGame) {
