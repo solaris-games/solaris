@@ -1172,7 +1172,7 @@ class GameHelper {
 
     let creditsPerTickByScience = stars[0]?.specialist?.modifiers?.special?.creditsPerTickByScience ?? 0;
 
-    return (stars.reduce((totalScience, star) => totalScience + (star.infrastructure?.science ?? 0), 0) * game.constants.research.sciencePointMultiplier) * creditsPerTickByScience;
+    return (stars.reduce((totalScience, star) => totalScience + (star.infrastructure?.science ?? 0), 0)) * creditsPerTickByScience;
   }
 
   isStarHasMultiplePlayersInOrbit (game, star) {
