@@ -381,14 +381,14 @@ export default {
   position:fixed;
   top: 0;
   height: 45px;
-  z-index: 1;
+  z-index: 1000;
 }
 
 .footer-bar {
   position: fixed;
   height: 52px;
   bottom: 0px;
-  z-index: 1;
+  z-index: 1000;
 }
 
 .menu {
