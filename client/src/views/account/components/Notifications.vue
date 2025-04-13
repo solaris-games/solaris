@@ -146,7 +146,7 @@
             <div class="row mt-2">
                 <div class="col"></div>
                 <div class="col-auto">
-                    <button type="submit" class="btn btn-success" :disabled="isSaving"><i class="fas fa-save"></i> Save Subscriptions</button>
+                    <button type="submit" class="btn btn-success" :disabled="isSaving"><i class="fas fa-save"></i> Save Notifications</button>
                 </div>
             </div>
         </form>
