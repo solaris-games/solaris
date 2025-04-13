@@ -4,21 +4,26 @@ import BadgeController from '../controllers/badges';
 import { MiddlewareContainer } from "../middleware";
 import { badgesPurchaseBadgeRequestSchema } from "../requests/badges";
 import {SingleRouter} from "../singleRoute";
+import {createBadgeRoutes} from "solaris-common";
+import {createRoutes} from "../typedapi/routes";
 
 export default (router: SingleRouter, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
     const controller = BadgeController(container);
+    const routes = createBadgeRoutes();
 
-    router.get('/api/badges',
+    const answer = createRoutes(router, mw);
+
+    answer(routes.listAll,
             mw.auth.authenticate(),
             controller.listAll
     );
 
-    router.get('/api/badges/user/:userId',
+    answer(routes.listForUser,
             mw.auth.authenticate(),
             controller.listForUser
     );
 
-    router.post('/api/badges/game/:gameId/player/:playerId',
+    answer(routes.purchaseForPlayer,
             mw.auth.authenticate(),
             validator.body(badgesPurchaseBadgeRequestSchema),
             mw.game.loadGame({
@@ -30,7 +35,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             controller.purchaseForPlayer
     );
 
-    router.get('/api/badges/game/:gameId/player/:playerId',
+    answer(routes.listForPlayer,
             mw.auth.authenticate(),
             mw.game.loadGame({
                 lean: true,
