@@ -1,7 +1,6 @@
 import moment from "moment";
 import type { Socket } from "socket.io-client";
 import type { Player } from "@solaris-common";
-import type { ConversationMessageSentResult } from "@solaris-common";
 import type { LedgerType } from "@solaris-common";
 import type { TradeEventTechnology } from "@solaris-common";
 import { PlayerSocketEventNames, type PlayerSocketEventType } from '@solaris-common';
@@ -49,7 +48,6 @@ export class PlayerClientSocketHandler extends ClientSocketHandler<PlayerSocketE
     this.on(PlayerSocketEventNames.GamePlayerReadyToQuit, (e: { playerId?: string }) => store.commit(PlayerMutationNames.GamePlayerReadyToQuit, e));
     this.on(PlayerSocketEventNames.GamePlayerNotReadyToQuit, (e: { playerId?: string }) => store.commit(PlayerMutationNames.GamePlayerNotReadyToQuit, e));
 
-    this.on(PlayerSocketEventNames.GameMessageSent, (e: ConversationMessageSentResult<string>) => eventBus.emit(PlayerEventBusEventNames.GameMessageSent, e));
     this.on(PlayerSocketEventNames.GameConversationRead, (e: { conversationId: string, readByPlayerId: string }) => eventBus.emit(PlayerEventBusEventNames.GameConversationRead, e));
 
     this.on(PlayerSocketEventNames.GameConversationLeft, (e: { conversationId: string, playerId: string }) => eventBus.emit(PlayerEventBusEventNames.GameConversationLeft, e));

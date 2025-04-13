@@ -82,6 +82,7 @@ import { eventBusInjectionKey } from '../../../../eventBus'
 import { inject } from 'vue'
 import GameEventBusEventNames from '../../../../eventBusEventNames/game'
 import PlayerEventBusEventNames from '../../../../eventBusEventNames/player'
+import UserEventBusEventNames from "../../../../eventBusEventNames/user";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 
 export default {
@@ -118,7 +119,7 @@ export default {
     await this.checkForUnreadEvents()
 
     this.eventBus.on(GameEventBusEventNames.GameStarted, this.gameStarted);
-    this.eventBus.on(PlayerEventBusEventNames.GameMessageSent, this.checkForUnreadMessages);
+    this.eventBus.on(UserEventBusEventNames.GameMessageSent, this.checkForUnreadMessages);
     this.eventBus.on(PlayerEventBusEventNames.GameConversationRead, this.checkForUnreadMessages);
     this.eventBus.on(PlayerEventBusEventNames.PlayerEventRead, this.checkForUnreadEvents);
     this.eventBus.on(PlayerEventBusEventNames.PlayerAllEventsRead, this.checkForUnreadEvents);
@@ -132,7 +133,7 @@ export default {
     clearInterval(this.intervalFunction)
 
     this.eventBus.off(GameEventBusEventNames.GameStarted, this.gameStarted);
-    this.eventBus.off(PlayerEventBusEventNames.GameMessageSent, this.checkForUnreadMessages);
+    this.eventBus.off(UserEventBusEventNames.GameMessageSent, this.checkForUnreadMessages);
     this.eventBus.off(PlayerEventBusEventNames.GameConversationRead, this.checkForUnreadMessages);
     this.eventBus.off(PlayerEventBusEventNames.PlayerEventRead, this.checkForUnreadEvents);
     this.eventBus.off(PlayerEventBusEventNames.PlayerAllEventsRead, this.checkForUnreadEvents);

@@ -12,6 +12,7 @@ import { DBObjectId } from "./types/DBObjectId";
 import { Game } from "./types/Game";
 import { Player } from "./types/Player";
 import { TradeEventTechnology } from "./types/Trade";
+import {UserServerSocketEmitter} from "../sockets/socketEmitters/user";
 
 
 export default class BroadcastService {
@@ -19,6 +20,7 @@ export default class BroadcastService {
     constructor(private gameServerSocketEmitter: GameServerSocketEmitter,
                 private playerServerSocketEmitter: PlayerServerSocketEmitter,
                 private diplomacyServerSocketEmitter: DiplomacyServerSocketEmitter,
+                private userServerSocketEmitter: UserServerSocketEmitter,
                 private avatarService: AvatarService) {
     }
 
@@ -77,7 +79,7 @@ export default class BroadcastService {
             .filter(p => p.userId != null)
             .map(p => p.userId!);
 
-        toUserIds.forEach(p => this.playerServerSocketEmitter.emitGameMessageSent(p.toString(), this.mapConversationMessageSentResultObjectIds(message)));
+        toUserIds.forEach(u => this.userServerSocketEmitter.emitGameMessageSent(u.toString(), this.mapConversationMessageSentResultObjectIds(message)));
     }
 
     gameConversationRead(game: Game, conversation: Conversation, readByPlayerId: DBObjectId) {
@@ -237,17 +239,17 @@ export default class BroadcastService {
     }
 
     mapConversationMessageSentResultObjectIds(conversationMessageSentResult: ConversationMessageSentResult<DBObjectId>): ConversationMessageSentResult<string> {
-        const { _id, fromPlayerId, readBy, conversationId, toPlayerIds, ...cmsr } = conversationMessageSentResult;
+        const { _id, fromPlayerId, readBy, conversationId, toPlayerIds, gameId, ...cmsr } = conversationMessageSentResult;
 
-        const newConversationMessageSentResult = cmsr as ConversationMessageSentResult<string>;
-
-        newConversationMessageSentResult._id = _id?.toString();
-        newConversationMessageSentResult.fromPlayerId = fromPlayerId?.toString() ?? null;
-        newConversationMessageSentResult.readBy = readBy.map(id => id.toString());
-        newConversationMessageSentResult.conversationId = conversationId.toString();
-        newConversationMessageSentResult.toPlayerIds = toPlayerIds.map(id => id.toString());
-
-        return newConversationMessageSentResult;
+        return {
+            _id: _id?.toString(),
+            fromPlayerId: fromPlayerId?.toString() ?? null,
+            readBy: readBy.map(id => id.toString()),
+            conversationId: conversationId.toString(),
+            toPlayerIds: toPlayerIds.map(id => id.toString()),
+            gameId: gameId.toString(),
+            ...cmsr
+        }
     }
 
     mapDiplomaticStatusObjectIds(diplomaticStatus: DiplomaticStatus<DBObjectId>): DiplomaticStatus<string> {

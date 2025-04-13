@@ -44,6 +44,8 @@ import LoadingSpinnerVue from '../../components/LoadingSpinner.vue'
 import router from '../../../router'
 import FormErrorList from '../../components/FormErrorList.vue'
 import authService from '../../../services/api/auth'
+import {userClientSocketEmitterInjectionKey} from "@/sockets/socketEmitters/user";
+import {inject} from 'vue';
 
 export default {
   components: {
@@ -56,6 +58,11 @@ export default {
       errors: [],
       email: null,
       password: null
+    }
+  },
+  setup () {
+    return {
+      userClientSocketEmitter: inject(userClientSocketEmitterInjectionKey),
     }
   },
   methods: {
@@ -95,6 +102,8 @@ export default {
           this.$store.commit('setUsername', response.data.username)
           this.$store.commit('setRoles', response.data.roles)
           this.$store.commit('setUserCredits', response.data.credits)
+
+          this.userClientSocketEmitter.emitJoined();
 
           router.push({ name: 'main-menu' })
         }

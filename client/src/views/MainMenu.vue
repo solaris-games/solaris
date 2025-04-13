@@ -141,6 +141,8 @@ import TutorialGame from './game/components/menu/TutorialGame.vue'
 import Poll from "./components/Poll.vue";
 import Warnings from "./account/Warnings.vue";
 import AnnouncementsButton from "./components/AnnouncementsButton.vue";
+import { inject } from 'vue';
+import {userClientSocketEmitterInjectionKey} from "@/sockets/socketEmitters/user";
 
 export default {
   components: {
@@ -153,6 +155,11 @@ export default {
     'poll': Poll,
     'warnings': Warnings,
     'announcements-button': AnnouncementsButton
+  },
+  setup () {
+    return {
+      userClientSocketEmitter: inject(userClientSocketEmitterInjectionKey),
+    }
   },
   data () {
     return {
@@ -178,6 +185,8 @@ export default {
       this.$store.commit('clearIsImpersonating')
 
       this.isLoggingOut = false
+
+      this.userClientSocketEmitter.emitLeft();
 
       router.push({ name: 'home' })
     },

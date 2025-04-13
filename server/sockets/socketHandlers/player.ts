@@ -16,18 +16,11 @@ export class PlayerServerSocketHandler extends ServerSocketHandler<PlayerSocketE
         // When the user opens a game, they will be put
         // into that room to receive web sockets scoped to the game room.
         this.on(PlayerSocketEventNames.GameRoomJoined, async (e: { socket?: Socket, gameId: string, playerId?: string }) => {
-
             if (e.socket == null) {
                 return;
             }
 
             let socket: Socket = e.socket;
-
-            const userId = await this.socketService.getUserId(socket);
-
-            if (userId) {
-                socket.join(userId); // Join a private room to receive user/player specific messages.
-            }
 
             socket.join(e.gameId); // Join the game room to receive game-wide messages.
 
@@ -48,25 +41,18 @@ export class PlayerServerSocketHandler extends ServerSocketHandler<PlayerSocketE
         });
 
         this.on(PlayerSocketEventNames.GameRoomLeft, async (e: { socket?: Socket, gameId: string, playerId?: string }) => {
-
             if (e.socket == null) {
                 return;
             }
 
-            let socket: Socket = e.socket;
-
-            const userId = await this.socketService.getUserId(socket);
-
-            if (userId) {
-                socket.leave(userId)
-            }
+            const socket: Socket = e.socket;
 
             socket.leave(e.gameId)
 
             if (e.playerId) {
                 socket.leave(e.playerId)
 
-                let game: Game | null = await this.gameService.getByIdLean(objectIdFromString(e.gameId), {
+                const game: Game | null = await this.gameService.getByIdLean(objectIdFromString(e.gameId), {
                     'settings.general.playerOnlineStatus': 1
                 });
 

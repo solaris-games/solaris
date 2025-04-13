@@ -21,6 +21,7 @@ export * from "./sockets/socketEventNames/socketEventName";
 export * from "./sockets/socketEventNames/player";
 export * from "./sockets/socketEventNames/game";
 export * from "./sockets/socketEventNames/diplomacy";
+export * from "./sockets/socketEventNames/user";
 export * from "./sockets/socketHandler";
 export * from "./sockets/socketEmitter";
 export * from "./api/controllers";

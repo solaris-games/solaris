@@ -15,6 +15,7 @@ import ConversationApiService from '../../../../services/api/conversation'
 import PlayerEventBusEventNames from '../../../../eventBusEventNames/player'
 import { inject } from 'vue'
 import { eventBusInjectionKey } from '../../../../eventBus'
+import UserEventBusEventNames from "@/eventBusEventNames/user";
 
 export default {
   components: {
@@ -35,11 +36,11 @@ export default {
     await this.checkForUnreadMessages();
     // TODO: This is duplicated on the menu header, is it possible to share this logic
     // to save API calls?
-    this.eventBus.on(PlayerEventBusEventNames.GameMessageSent, this.checkForUnreadMessages);
+    this.eventBus.on(UserEventBusEventNames.GameMessageSent, this.checkForUnreadMessages);
     this.eventBus.on(PlayerEventBusEventNames.GameConversationRead, this.checkForUnreadMessages);
   },
   unmounted () {
-    this.eventBus.off(PlayerEventBusEventNames.GameMessageSent, this.checkForUnreadMessages);
+    this.eventBus.off(UserEventBusEventNames.GameMessageSent, this.checkForUnreadMessages);
     this.eventBus.off(PlayerEventBusEventNames.GameConversationRead, this.checkForUnreadMessages);
   },
   methods: {

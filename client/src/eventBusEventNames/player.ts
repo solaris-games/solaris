@@ -12,7 +12,6 @@ const toEventName: <TData>(value: string) => PlayerEventBusEventName<TData> = ma
 export default class PlayerEventBusEventNames {
   private constructor() { };
 
-  public static readonly GameMessageSent: PlayerEventBusEventName<ConversationMessageSentResult<string>> = toEventName('gameMessageSent');
   public static readonly GameConversationRead: PlayerEventBusEventName<{ conversationId: string, readByPlayerId: string }> = toEventName('gameConversationRead');
 
   public static readonly GameConversationLeft: PlayerEventBusEventName<{ conversationId: string, playerId: string }> = toEventName('gameConversationLeft');

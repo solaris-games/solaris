@@ -40,8 +40,8 @@ import ConversationApiService from '../../../../../services/api/conversation'
 import ConversationPreviewVue from './ConversationPreview.vue'
 import gameHelper from '../../../../../services/gameHelper'
 import { inject } from 'vue'
-import PlayerEventBusEventNames from '../../../../../eventBusEventNames/player'
 import MenuEventBusEventNames from '../../../../../eventBusEventNames/menu'
+import UserEventBusEventNames from "../../../../../eventBusEventNames/user";
 
 export default {
   components: {
@@ -82,10 +82,10 @@ export default {
   },
   mounted () {
     this.refreshList()
-    this.eventBus.on(PlayerEventBusEventNames.GameMessageSent, this.onMessageReceived);
+    this.eventBus.on(UserEventBusEventNames.GameMessageSent, this.onMessageReceived);
   },
   unmounted () {
-    this.eventBus.off(PlayerEventBusEventNames.GameMessageSent, this.onMessageReceived);
+    this.eventBus.off(UserEventBusEventNames.GameMessageSent, this.onMessageReceived);
   },
   methods: {
     async refreshList () {

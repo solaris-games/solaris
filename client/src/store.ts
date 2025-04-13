@@ -14,6 +14,7 @@ import type { Store } from 'vuex/types/index.js';
 import type {Badge} from "@solaris-common";
 import {getBadges} from "./services/typedapi/badge";
 import {isError} from "./services/typedapi";
+import type {UserClientSocketEmitter} from "@/sockets/socketEmitters/user";
 
 export type MentionCallbacks = {
   player: (p: Player) => void;
@@ -50,7 +51,7 @@ export type State = {
   badges: Badge[];
 }
 
-export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store<State> {
+export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userClientSocketEmitter: UserClientSocketEmitter): Store<State> {
   return createStore<State>({
   state: {
     userId: null,
@@ -599,7 +600,7 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store
     },
     async verify({ commit }) {
       try {
-        const response = await ApiAuthService.verify()
+        const response = await ApiAuthService.verify();
 
         if (response.status === 200) {
           if (response.data._id) {
@@ -607,6 +608,8 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store
             commit('setUsername', response.data.username)
             commit('setRoles', response.data.roles)
             commit('setUserCredits', response.data.credits)
+
+            userClientSocketEmitter.emitJoined();
             return true;
           }
         }
