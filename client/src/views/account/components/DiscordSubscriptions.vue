@@ -10,7 +10,7 @@
 
         <form @submit.prevent="handleSubmit" v-if="subscriptions" class="pb-2">
             <div>
-                <h5 class="pt-2">Settings</h5>
+                <h6 class="pt-2">Settings</h6>
 
                 <div class="row pt-1 pb-1">
                     <label for="notifyActiveGamesOnly" class="col-12 col-sm-6 col-form-label">Notify Active Games Only <help-tooltip tooltip="If enabled, you will receive notifications for games where you are not defeated."/></label>
@@ -24,7 +24,7 @@
             </div>
 
             <div v-if="subscriptions.discord">
-                <h5 class="pt-2">Discord</h5>
+                <h6 class="pt-2">Discord</h6>
 
                 <div class="row pt-1 pb-1">
                     <label for="gameStarted" class="col-12 col-sm-6 col-form-label">Game - Started</label>
