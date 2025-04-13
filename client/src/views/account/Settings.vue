@@ -110,7 +110,7 @@
       </div>
     </div>
 
-    <discord-subscriptions v-if="isAuthenticatedWithDiscord"/>
+    <notifications v-if="isAuthenticatedWithDiscord"/>
 
     <view-subtitle title="Game Options" class="mt-3"/>
 
@@ -123,20 +123,21 @@ import LoadingSpinner from '../components/LoadingSpinner.vue'
 import ViewContainer from '../components/ViewContainer.vue'
 import ViewTitle from '../components/ViewTitle.vue'
 import ViewSubtitle from '../components/ViewSubtitle.vue'
-import DiscordSubscriptions from './components/DiscordSubscriptions.vue'
 import OptionsForm from '../game/components/menu/OptionsForm.vue'
 import userService from '../../services/api/user'
 import authService from '../../services/api/auth'
 import router from '../../router'
 import Roles from '../game/components/player/Roles.vue'
+import Notifications from "./components/Notifications.vue";
 
 export default {
   components: {
+    Notifications,
     'loading-spinner': LoadingSpinner,
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'view-subtitle': ViewSubtitle,
-    'discord-subscriptions': DiscordSubscriptions,
+    'notifications': Notifications,
     'options-form': OptionsForm,
     'roles': Roles
   },

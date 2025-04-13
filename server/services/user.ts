@@ -454,6 +454,12 @@ export default class UserService extends EventEmitter {
             }
         };
 
+        if (subscriptions.inapp) {
+            obj.inapp = {
+                notificationsForOtherGames: Boolean(subscriptions.inapp?.notificationsForOtherGames),
+            }
+        }
+
         if (subscriptions.discord) {
             obj.discord = {
                 gameEnded: subscriptions.discord.gameEnded || false,
