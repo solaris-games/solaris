@@ -23,6 +23,7 @@ export type MentionCallbacks = {
 
 export type State = {
   userId: string | null;
+  user: any;
   game: Game | null;
   tick: number;
   cachedConversationComposeMessages: Record<string, string>;
@@ -141,8 +142,9 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
     setUserId (state: State, userId) {
       state.userId = userId
     },
-    clearUserId (state) {
-      state.userId = null
+    clearUser (state) {
+      state.userId = null;
+      state.user = null;
     },
 
     setUsername (state: State, username) {
@@ -150,6 +152,10 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
     },
     clearUsername (state) {
       state.username = null
+    },
+
+    setUser (state: State, user) {
+      state.user = user;
     },
 
     setRoles (state: State, roles) {

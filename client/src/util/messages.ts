@@ -1,5 +1,5 @@
 import type {EventBus} from "../eventBus";
-import { onMounted, onUnmounted, inject } from "vue";
+import { onMounted, onUnmounted, inject, computed } from "vue";
 import type {State} from "../store";
 import { useStore, type Store } from 'vuex';
 import type {ConversationMessageSentResult} from "@solaris-common";
@@ -14,15 +14,21 @@ export const withMessages = () => {
   const eventBus: EventBus = inject(eventBusInjectionKey)!;
   const store: Store<State> = useStore();
 
+  const sendForAllGames = computed(() => store.state.user.subscriptions.inapp.notificationsForOtherGames);
+
   const handler = (e: ConversationMessageSentResult<string>) => {
+    const isInGame = store.state.game?._id === e.gameId;
+
+    if (!sendForAllGames.value && !isInGame) {
+      return;
+    }
+
     window?.solaris?.messages?.onConversationMessageReceived({
       gameID: e.gameId,
       gameName: e.gameName,
       fromPlayerId: e.fromPlayerId,
       fromPlayerAlias: e.fromPlayerAlias
     });
-
-    const isInGame = store.state.game?._id === e.gameId;
 
     if (isInGame) {
       $toast.info(`New message from ${e.fromPlayerAlias}.`, {
