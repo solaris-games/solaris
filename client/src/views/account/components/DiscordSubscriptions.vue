@@ -1,6 +1,6 @@
 <template>
     <div>
-        <view-subtitle title="Subscriptions" class="mt-3"/>
+        <view-subtitle title="Discord notifications" class="mt-3" level="h5" />
 
         <p>
             Configure your subscriptions for in-game notifications below. Whenever the subscribed event triggers you will receive a notification.

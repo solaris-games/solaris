@@ -27,10 +27,10 @@ export interface UserSubscriptions {
     settings: {
         notifyActiveGamesOnly: boolean;
     },
-    inapp: {
+    inapp?: {
         notificationsForOtherGames: boolean;
     },
-    discord: {
+    discord?: {
         gameStarted: boolean;
         gameEnded: boolean;
         gameTurnEnded: boolean;
