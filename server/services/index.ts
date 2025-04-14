@@ -112,7 +112,6 @@ import {Announcement} from "./types/Announcement";
 import PlayerColourService from "./playerColour";
 import GameMaskingService from "./gameMaskingService";
 import SessionService from "./session";
-import starMovementService from "./starMovement";
 import {logger} from "../utils/logging";
 import { Config } from "../config/types/Config";
 import { Server } from "socket.io";
@@ -121,9 +120,11 @@ import { PlayerServerSocketEmitter } from "../sockets/socketEmitters/player";
 import { DiplomacyServerSocketEmitter } from "../sockets/socketEmitters/diplomacy";
 import { ServerHandler } from "../sockets/socketHandlers/serverHandler";
 import { PlayerServerSocketHandler } from "../sockets/socketHandlers/player";
+import { UserServerSocketHandler } from "../sockets/socketHandlers/user";
 import { Logger } from "pino";
 import SocketService from "./socket";
 import StarCaptureService from "./starCapture";
+import {UserServerSocketEmitter} from "../sockets/socketEmitters/user";
 
 const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
@@ -178,7 +179,8 @@ export default (config: Config,
     const gameServerSocketEmitter = new GameServerSocketEmitter(socketServer);
     const playerServerSocketEmitter = new PlayerServerSocketEmitter(socketServer);
     const diplomacyServerSocketEmitter = new DiplomacyServerSocketEmitter(socketServer);
-    const broadcastService = new BroadcastService(gameServerSocketEmitter, playerServerSocketEmitter, diplomacyServerSocketEmitter, avatarService);
+    const userServerSocketEmitter = new UserServerSocketEmitter(socketServer);
+    const broadcastService = new BroadcastService(gameServerSocketEmitter, playerServerSocketEmitter, diplomacyServerSocketEmitter, userServerSocketEmitter, avatarService);
     const achievementService = new AchievementService(userRepository, guildService, userLevelService);
     const ratingService = new RatingService(userRepository, gameRepository, userService);
     const nameService = new NameService(gameNames, starNames, randomService);
@@ -220,6 +222,7 @@ export default (config: Config,
     const gameService = new GameService(gameRepository, userService, starService, carrierService, playerService, passwordService, achievementService, avatarService, gameTypeService, gameStateService, conversationService, playerReadyService, gameJoinService, gameAuthService, playerAfkService);
     const serverHandler = new ServerHandler(socketServer, logger);
     const playerServerSocketHandler = new PlayerServerSocketHandler(socketService, gameService, serverHandler);
+    const userServerSocketHandler = new UserServerSocketHandler(socketService, serverHandler);
     const leaderboardService = new LeaderboardService(playerService, playerAfkService, userLevelService, ratingService, gameService, gameTypeService, gameStateService, badgeService, playerStatisticsService, teamService);
     const userLeaderboardService = new UserLeaderboardService(userRepository, guildUserService);
     const combatService = new CombatService(technologyService, specialistService, playerService, starService, reputationService, diplomacyService, gameTypeService, starCaptureService);
@@ -266,6 +269,7 @@ export default (config: Config,
         gameServerSocketEmitter,
         playerServerSocketEmitter,
         diplomacyServerSocketEmitter,
+        userServerSocketEmitter,
         broadcastService,
         carrierService,
         combatService,
@@ -277,6 +281,7 @@ export default (config: Config,
         gameService,
         serverHandler,
         playerServerSocketHandler,
+        userServerSocketHandler,
         gameAuthService,
         gameLockService,
         gameJoinService,

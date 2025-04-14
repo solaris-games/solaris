@@ -8,11 +8,11 @@
         "password": null,
         "playerLimit": 10,
         "playerType": "all",
-        "anonymity": "normal",
+        "anonymity": "extra",
         "playerOnlineStatus": "hidden",
         "playerIPWarning": "enabled",
         "timeMachine": "enabled",
-        "fluxEnabled": "enabled",
+        "fluxEnabled": "disabled",
         "advancedAI": "enabled",
         "spectators": "enabled",
         "afkSlotsOpen": "enabled",
@@ -20,8 +20,8 @@
         "readyToQuitFraction": 0.9
     },
     "galaxy": {
-        "galaxyType": "irregular",
-        "starsPerPlayer": 5,
+        "galaxyType": "circular",
+        "starsPerPlayer": 8,
         "productionTicks": 20
     },
     "specialGalaxy": {
@@ -30,14 +30,14 @@
         "warpgateCost": "standard",
         "specialistCost": "standard",
         "specialistsCurrency": "creditsSpecialists",
-        "randomWarpGates": 10,
+        "randomWarpGates": 5,
         "randomWormHoles": 5,
         "randomNebulas": 15,
         "randomAsteroidFields": 10,
-        "randomBinaryStars": 5,
-        "randomBlackHoles": 0,
-        "randomPulsars": 1,
-        "darkGalaxy": "standard",
+        "randomBinaryStars": 0,
+        "randomBlackHoles": 5,
+        "randomPulsars": 0,
+        "darkGalaxy": "fog",
         "giftCarriers": "enabled",
         "defenderBonus": "enabled",
         "carrierToCarrierCombat": "enabled",
@@ -103,7 +103,7 @@
             "hyperspace": 2,
             "manufacturing": 1,
             "banking": 1,
-            "weapons": 1,
+            "weapons": 5,
             "specialists": 1
         },
         "researchCosts": {
@@ -113,7 +113,7 @@
             "hyperspace": "standard",
             "manufacturing": "standard",
             "banking": "standard",
-            "weapons": "standard",
+            "weapons": "none",
             "specialists": "standard"
         },
         "experimentationDistribution": "random",

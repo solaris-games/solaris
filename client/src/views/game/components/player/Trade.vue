@@ -27,7 +27,9 @@ import Research from './Research.vue'
 import PlayerTradeVue from './PlayerTrade.vue'
 import TradeHistoryVue from './TradeHistory.vue'
 import GameHelper from '../../../../services/gameHelper'
-import GameContainer from '../../../../game/container'
+import {eventBusInjectionKey} from "@/eventBus";
+import { inject } from 'vue';
+import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 
 export default {
   components: {
@@ -40,6 +42,11 @@ export default {
   },
   props: {
     playerId: String
+  },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
   },
   data () {
     return {
@@ -60,7 +67,7 @@ export default {
       this.$emit('onCloseRequested', e)
     },
     panToPlayer (e) {
-      GameContainer.panToPlayer(this.$store.state.game, this.player)
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, { player: this.player });
     },
     onOpenPrevPlayerDetailRequested (e) {
       let prevLeaderboardIndex = this.leaderboard.indexOf(this.player) - 1;
@@ -69,7 +76,7 @@ export default {
         prevLeaderboardIndex = this.leaderboard.length - 1;
       }
 
-      let prevPlayer = this.leaderboard[prevLeaderboardIndex];
+      const prevPlayer = this.leaderboard[prevLeaderboardIndex];
 
       this.onOpenTradeRequested(prevPlayer);
     },

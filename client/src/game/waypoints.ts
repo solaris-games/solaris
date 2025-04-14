@@ -4,14 +4,7 @@ import WaypointHelper from '../services/waypointHelper'
 import {EventEmitter} from "./eventEmitter.js";
 import type { Game, Carrier as CarrierData } from '../types/game';
 import type { DrawingContext } from './container';
-
-type TempWaypoint = {
-  destination: string;
-  action: string;
-  actionShips: number;
-  delayTicks: number;
-  source: string | undefined | null;
-}
+import type { TempWaypoint } from '../types/waypoint';
 
 class Waypoints extends EventEmitter {
   container: PIXI.Container;
@@ -181,7 +174,7 @@ class Waypoints extends EventEmitter {
     }
   }
 
-  _createWaypoint (destinationStarId) {
+  _createWaypoint (destinationStarId: string) {
     let newWaypoint: TempWaypoint = {
       destination: destinationStarId,
       action: 'collectAll',
@@ -211,7 +204,7 @@ class Waypoints extends EventEmitter {
     this.emit('onWaypointCreated', newWaypoint)
   }
 
-  _createWaypointRoute (sourceStarId, destinStarId) {
+  _createWaypointRoute (sourceStarId: string, destinStarId: string) {
     const route = WaypointHelper.calculateShortestRoute(this.game, this.carrier, sourceStarId, destinStarId)
 
     if (route.length > 1) {

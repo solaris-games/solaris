@@ -1,6 +1,6 @@
 <template>
-  <view-container>
-    <view-title title="Account" :is-auth-page="true" />
+  <view-container :is-auth-page="true">
+    <view-title title="Account" />
 
     <loading-spinner :loading="!info"/>
 
@@ -20,6 +20,8 @@
           </p>
         </div>
       </div>
+
+      <view-subtitle title="Account settings" class="mt-3"/>
 
       <div class="row pt-2 pb-2">
         <div class="col">
@@ -44,6 +46,15 @@
           </p>
         </div>
       </div>
+
+      <div class="mt-3 text-end">
+        <button :disabled="isClosingAccount" class="btn btn-outline-danger" @click="closeAccount"><i class="fas fa-trash"></i> Delete Account</button>
+        <router-link to="/account/reset-password" tag="button" class="btn btn-primary ms-1"><i class="fas fa-lock"></i> Change Password</router-link>
+      </div>
+
+      <view-subtitle title="Notifications" class="mt-3"/>
+
+      <view-subtitle title="Email notifications" class="mt-3" level="h5" />
 
       <div class="row pt-2 pb-2">
         <div class="col">
@@ -99,39 +110,35 @@
       </div>
     </div>
 
-    <div class="mt-3 text-end">
-      <button :disabled="isClosingAccount" class="btn btn-outline-danger" @click="closeAccount"><i class="fas fa-trash"></i> Delete Account</button>
-      <router-link to="/account/reset-password" tag="button" class="btn btn-primary ms-1"><i class="fas fa-lock"></i> Change Password</router-link>
-    </div>
+    <notifications v-if="isAuthenticatedWithDiscord"/>
 
-    <subscriptions v-if="isAuthenticatedWithDiscord"/>
-
-    <view-subtitle title="Options" class="mt-3"/>
+    <view-subtitle title="Game Options" class="mt-3"/>
 
     <options-form />
   </view-container>
 </template>
 
 <script>
-import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
+import LoadingSpinner from '../components/LoadingSpinner.vue'
 import ViewContainer from '../components/ViewContainer.vue'
 import ViewTitle from '../components/ViewTitle.vue'
-import ViewSubtitleVue from '../components/ViewSubtitle.vue'
-import SubscriptionsVue from './components/Subscriptions.vue'
-import OptionsFormVue from '../game/components/menu/OptionsForm.vue'
+import ViewSubtitle from '../components/ViewSubtitle.vue'
+import OptionsForm from '../game/components/menu/OptionsForm.vue'
 import userService from '../../services/api/user'
 import authService from '../../services/api/auth'
 import router from '../../router'
 import Roles from '../game/components/player/Roles.vue'
+import Notifications from "./components/Notifications.vue";
 
 export default {
   components: {
-    'loading-spinner': LoadingSpinnerVue,
+    Notifications,
+    'loading-spinner': LoadingSpinner,
     'view-container': ViewContainer,
     'view-title': ViewTitle,
-    'view-subtitle': ViewSubtitleVue,
-    'subscriptions': SubscriptionsVue,
-    'options-form': OptionsFormVue,
+    'view-subtitle': ViewSubtitle,
+    'notifications': Notifications,
+    'options-form': OptionsForm,
     'roles': Roles
   },
   data () {

@@ -213,6 +213,7 @@
 </template>
 
 <script>
+import { inject } from 'vue';
 import GameHelper from '../../../../services/gameHelper'
 import CarrierApiService from '../../../../services/api/carrier'
 import MenuTitle from '../MenuTitle.vue'
@@ -227,6 +228,8 @@ import AudioService from '../../../../game/audio'
 import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning.vue'
 import HelpTooltip from '../../../components/HelpTooltip.vue'
 import {formatLocation} from "client/src/util/format";
+import {eventBusInjectionKey} from "../../../../eventBus";
+import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 
 export default {
   components: {
@@ -242,6 +245,11 @@ export default {
   },
   props: {
     carrierId: String
+  },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
   },
   data () {
     return {
@@ -268,7 +276,7 @@ export default {
 
     this.onWaypointCreatedHandler = this.onWaypointCreated.bind(this)
 
-    GameContainer.map.on('onWaypointCreated', this.onWaypointCreatedHandler)
+    this.eventBus.on('onWaypointCreated', this.onWaypointCreatedHandler)
 
     this.recalculateTimeRemaining()
 
@@ -278,7 +286,7 @@ export default {
     }
   },
   unmounted () {
-    GameContainer.map.off('onWaypointCreated', this.onWaypointCreatedHandler)
+    this.eventBus.off('onWaypointCreated', this.onWaypointCreatedHandler)
 
     clearInterval(this.intervalFunction)
   },
@@ -320,7 +328,7 @@ export default {
       this.$emit('onViewCarrierCombatCalculatorRequested', this.carrier._id)
     },
     viewOnMap (e) {
-      GameContainer.panToCarrier(this.carrier)
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: this.carrier });
     },
     getFirstWaypointSource () {
       if (!this.carrier.waypoints.length) {

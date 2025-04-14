@@ -17,10 +17,12 @@
 </template>
 
 <script>
-import gameContainer from '../../../../game/container'
 import GameHelper from '../../../../services/gameHelper'
 import PlayerIconVue from '../player/PlayerIcon.vue'
 import SpecialistIcon from '../specialist/SpecialistIcon.vue'
+import {eventBusInjectionKey} from "../../../../eventBus";
+import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
+import { inject } from 'vue';
 
 export default {
   components: {
@@ -29,6 +31,11 @@ export default {
   },
   props: {
     carrier: Object
+  },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
   },
   data () {
     return {
@@ -52,7 +59,7 @@ export default {
       this.$emit('onOpenCarrierDetailRequested', this.carrier._id)
     },
     goToCarrier (e) {
-      gameContainer.map.panToLocation(this.carrier.location)
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: this.carrier });
     },
     recalculateTimeRemaining () {
       this.timeRemainingEta = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.carrier.ticksEta, false, true)

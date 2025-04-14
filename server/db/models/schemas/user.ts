@@ -232,6 +232,9 @@ const schema = new Schema({
         }
     },
     subscriptions: {
+        inapp: {
+            notificationsForOtherGames: { type: Types.Boolean, required: false, default: true },
+        },
         settings: {
             notifyActiveGamesOnly: {type: Types.Boolean, required: false, default: false} // Send notifications only if the user isn't defeated
         },

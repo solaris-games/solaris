@@ -11,14 +11,16 @@ import PathManager from './PathManager'
 import OrbitalLocationLayer from './orbital'
 import WormHoleLayer from './wormHole'
 import TooltipLayer from './tooltip'
-import {EventEmitter} from "./eventEmitter.js";
 import type {Store} from "vuex";
 import type {State} from "../store";
 import type {DrawingContext, GameContainer} from "./container";
 import type {Game, Player, Star as StarData, Carrier as CarrierData} from "../types/game";
-import type {Location, UserGameSettings} from "@solaris-common";
+import type {Location, MapObject, UserGameSettings} from "@solaris-common";
 import { Chunks } from './chunks'
 import Carrier from "./carrier";
+import type { EventBus } from '../eventBus'
+import MapEventBusEventNames from '../eventBusEventNames/map'
+import MapCommandEventBusEventNames from "../eventBusEventNames/mapCommand";
 
 enum Mode {
   Galaxy = 'galaxy',
@@ -26,13 +28,12 @@ enum Mode {
   Ruler = 'ruler',
 }
 
-
-
-export class Map extends EventEmitter {
+export class Map {
   // Represents the current game mode, these are as follows:
   // galaxy - Normal galaxy view
   // waypoints - Displays waypoints overlay for a given carrier
   mode = Mode.Galaxy;
+  eventBus: EventBus;
   app: PIXI.Application;
   store: Store<State>;
   context: DrawingContext;
@@ -68,16 +69,16 @@ export class Map extends EventEmitter {
   currentViewportCenter: PIXI.Point | undefined;
   lastPointerDownPosition: PIXI.Point | undefined;
   chunks: Chunks | undefined;
+  unsubscribe: (() => void) | undefined;
 
-  constructor (app, store: Store<State>, gameContainer, context: DrawingContext) {
-    super()
-
+  constructor (app: PIXI.Application, store: Store<State>, gameContainer, context: DrawingContext, eventBus: EventBus) {
     this.app = app
     this.store = store
     this.context = context
     this.gameContainer = gameContainer;
     this.container = new PIXI.Container()
     this.container.sortableChildren = true
+    this.eventBus = eventBus;
 
     this.stars = []
 
@@ -131,6 +132,11 @@ export class Map extends EventEmitter {
   setup (game: Game, userSettings: UserGameSettings) {
     this.userSettings = userSettings
     this.game = game
+
+    if (this.unsubscribe) {
+      this.unsubscribe();
+      this.unsubscribe = undefined;
+    }
 
     this.app.ticker.maxFPS = userSettings.technical.fpsLimit || 60;
 
@@ -236,9 +242,51 @@ export class Map extends EventEmitter {
     this.tooltipLayer = new TooltipLayer()
     this.tooltipLayer.setup(this.game, this.context)
     this.tooltipContainer!.addChild(this.tooltipLayer.container)
+
+    this.unsubscribe = this.subscribe();
   }
 
-  setupStar (game, userSettings, starData) {
+  subscribe() {
+    const panToLocation = ({ location }: { location: Location }) => this.panToLocation(location);
+    const panToObject = ({ object }: { object: MapObject<string> }) => this.panToObject(object);
+    const panToUser = () => this.panToUser(this.game!);
+    const panToPlayer = ({ player }: { player: Player }) => this.panToPlayer(this.game!, player);
+    const clearHighlightedLocations = () => this.clearCarrierHighlights();
+    const highlightLocation = ({ object, opacity }: { object: MapObject<string>, opacity: number }) => this.highlightLocation(object, opacity);
+    const clickStar = ({ starId }: { starId: string }) => this.clickStar(starId);
+    const clickCarrier = ({ carrierId }: { carrierId: string }) => this.clickCarrier(carrierId);
+    const removeLastRulerWaypoint = () => this.removeLastRulerPoint();
+    const showIgnoreBulkUpgrade = () => this.showIgnoreBulkUpgrade();
+    const hideIgnoreBulkUpgrade = () => this.hideIgnoreBulkUpgrade();
+
+    this.eventBus.on(MapCommandEventBusEventNames.MapCommandPanToLocation, panToLocation);
+    this.eventBus.on(MapCommandEventBusEventNames.MapCommandPanToObject, panToObject);
+    this.eventBus.on(MapCommandEventBusEventNames.MapCommandPanToUser, panToUser);
+    this.eventBus.on(MapCommandEventBusEventNames.MapCommandPanToPlayer, panToPlayer);
+    this.eventBus.on(MapCommandEventBusEventNames.MapCommandClearHighlightedLocations, clearHighlightedLocations);
+    this.eventBus.on(MapCommandEventBusEventNames.MapCommandHighlightLocation, highlightLocation);
+    this.eventBus.on(MapCommandEventBusEventNames.MapCommandClickStar, clickStar);
+    this.eventBus.on(MapCommandEventBusEventNames.MapCommandClickCarrier, clickCarrier);
+    this.eventBus.on(MapCommandEventBusEventNames.MapCommandRemoveLastRulerPoint, removeLastRulerWaypoint);
+    this.eventBus.on(MapCommandEventBusEventNames.MapCommandShowIgnoreBulkUpgrade, showIgnoreBulkUpgrade);
+    this.eventBus.on(MapCommandEventBusEventNames.MapCommandHideIgnoreBulkUpgrade, hideIgnoreBulkUpgrade);
+
+    return () => {
+      this.eventBus.off(MapCommandEventBusEventNames.MapCommandPanToLocation, panToLocation);
+      this.eventBus.off(MapCommandEventBusEventNames.MapCommandPanToObject, panToObject);
+      this.eventBus.off(MapCommandEventBusEventNames.MapCommandPanToUser, panToUser);
+      this.eventBus.off(MapCommandEventBusEventNames.MapCommandPanToPlayer, panToPlayer);
+      this.eventBus.off(MapCommandEventBusEventNames.MapCommandClearHighlightedLocations, clearHighlightedLocations);
+      this.eventBus.off(MapCommandEventBusEventNames.MapCommandHighlightLocation, highlightLocation);
+      this.eventBus.off(MapCommandEventBusEventNames.MapCommandClickStar, clickStar);
+      this.eventBus.off(MapCommandEventBusEventNames.MapCommandClickCarrier, clickCarrier);
+      this.eventBus.off(MapCommandEventBusEventNames.MapCommandRemoveLastRulerPoint, removeLastRulerWaypoint);
+      this.eventBus.off(MapCommandEventBusEventNames.MapCommandShowIgnoreBulkUpgrade, showIgnoreBulkUpgrade);
+      this.eventBus.off(MapCommandEventBusEventNames.MapCommandHideIgnoreBulkUpgrade, hideIgnoreBulkUpgrade);
+    }
+  }
+
+  setupStar (game: Game, userSettings: UserGameSettings, starData: StarData) {
     let star = this.stars.find(x => x.data._id === starData._id)
 
     if (!star) {
@@ -581,6 +629,10 @@ export class Map extends EventEmitter {
     this.panToPlayer(game, player)
   }
 
+  panToObject(object: { location: Location }) {
+    this.panToLocation(object.location)
+  }
+
   panToStar (star: StarData) {
     this.panToLocation(star.location)
   }
@@ -732,7 +784,7 @@ export class Map extends EventEmitter {
 
       if (!dic.tryMultiSelect || !this.tryMultiSelect(e.location)) {
         selectedStar!.toggleSelected()
-        this.emit('onStarClicked', e)
+        this.eventBus.emit(MapEventBusEventNames.MapOnStarClicked, { star: e })
       }
     } else if (this.mode === 'waypoints') {
       this.waypoints!.onStarClicked(e)
@@ -766,7 +818,7 @@ export class Map extends EventEmitter {
         dic.permitCallback && dic.permitCallback()
 
         if (this.mode === 'galaxy') {
-          this.emit('onStarRightClicked', e)
+          this.eventBus.emit(MapEventBusEventNames.MapOnStarRightClicked, { star: e })
         }
       }
     })
@@ -796,7 +848,7 @@ export class Map extends EventEmitter {
       }
 
       if (!dic.tryMultiSelect || !this.tryMultiSelect(e.location)) {
-        this.emit('onCarrierClicked', e)
+        this.eventBus.emit(MapEventBusEventNames.MapOnCarrierClicked, { carrier: e })
       } else {
         selectedCarrier!.unselect()
       }
@@ -809,7 +861,7 @@ export class Map extends EventEmitter {
 
   onCarrierRightClicked (e) {
     if (this.mode === 'galaxy') {
-      this.emit('onCarrierRightClicked', e)
+      this.eventBus.emit(MapEventBusEventNames.MapOnCarrierRightClicked, { carrier: e });
     }
   }
 
@@ -844,23 +896,25 @@ export class Map extends EventEmitter {
   }
 
   onWaypointCreated (e) {
-    this.emit('onWaypointCreated', e)
+    this.eventBus.emit(MapEventBusEventNames.MapOnWaypointCreated, { waypoint: e })
   }
 
   onWaypointOutOfRange (e) {
-    this.emit('onWaypointOutOfRange', e)
+    this.eventBus.emit(MapEventBusEventNames.MapOnWaypointOutOfRange)
   }
 
   onRulerPointCreated (e) {
-    this.emit('onRulerPointCreated', e)
+    console.log(e);
+
+    this.eventBus.emit(MapEventBusEventNames.MapOnRulerPointCreated, { rulerPoint: e });
   }
 
   onRulerPointRemoved (e) {
-    this.emit('onRulerPointRemoved', e)
+    this.eventBus.emit(MapEventBusEventNames.MapOnRulerPointRemoved, { rulerPoint: e });
   }
 
   onRulerPointsCleared (e) {
-    this.emit('onRulerPointsCleared', e)
+    this.eventBus.emit(MapEventBusEventNames.MapOnRulerPointsCleared);
   }
 
   tryMultiSelect (location) {
@@ -925,7 +979,9 @@ export class Map extends EventEmitter {
         }
       })
 
-      this.emit('onObjectsClicked', eventObj)
+      this.eventBus.emit(MapEventBusEventNames.MapOnObjectsClicked, {
+        objects: eventObj
+      })
 
       return true
     }

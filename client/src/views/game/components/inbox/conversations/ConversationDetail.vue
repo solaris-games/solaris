@@ -59,6 +59,7 @@ import { inject } from 'vue'
 import { eventBusInjectionKey } from '../../../../../eventBus'
 import PlayerEventBusEventNames from '../../../../../eventBusEventNames/player'
 import MenuEventBusEventNames from '../../../../../eventBusEventNames/menu'
+import UserEventBusEventNames from "../../../../../eventBusEventNames/user";
 
 export default {
   components: {
@@ -89,7 +90,7 @@ export default {
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game);
     await this.loadConversation();
 
-    this.eventBus.on(PlayerEventBusEventNames.GameMessageSent, this.onMessageReceived);
+    this.eventBus.on(UserEventBusEventNames.GameMessageSent, this.onMessageReceived);
     this.eventBus.on(PlayerEventBusEventNames.GameConversationRead, this.onConversationRead);
     this.eventBus.on(PlayerEventBusEventNames.GameConversationLeft, this.onConversationLeft);
     this.eventBus.on(PlayerEventBusEventNames.GameConversationMessagePinned, this.onConversationMessagePinned);
@@ -100,7 +101,7 @@ export default {
     this.eventBus.on(PlayerEventBusEventNames.PlayerTechnologyReceived, this.onTradeEventReceived);
   },
   unmounted () {
-    this.eventBus.off(PlayerEventBusEventNames.GameMessageSent, this.onMessageReceived);
+    this.eventBus.off(UserEventBusEventNames.GameMessageSent, this.onMessageReceived);
     this.eventBus.off(PlayerEventBusEventNames.GameConversationRead, this.onConversationRead);
     this.eventBus.off(PlayerEventBusEventNames.GameConversationLeft, this.onConversationLeft);
     this.eventBus.off(PlayerEventBusEventNames.GameConversationMessagePinned, this.onConversationMessagePinned);

@@ -6,15 +6,18 @@ import GameHelper from '../../services/gameHelper';
 import type { PlayerClientSocketEmitter } from '../socketEmitters/player';
 import ClientSocketEventNames, { type ClientSocketEventType } from "../socketEventNames/client";
 import type { State } from '../../store';
+import type {UserClientSocketEmitter} from "@/sockets/socketEmitters/user";
 
 export class ClientHandler {
 
   constructor(socket: Socket,
               store: Store<State>,
-              playerClientSocketEmitter: PlayerClientSocketEmitter) {
+              playerClientSocketEmitter: PlayerClientSocketEmitter,
+              userClientSocketEmitter: UserClientSocketEmitter) {
 
     this.socketOn(socket, ClientSocketEventNames.Connect, async () => {
       console.log('Socket connection established.');
+      userClientSocketEmitter.emitJoined();
     });
 
     this.socketOn(socket.io, ClientSocketEventNames.Error, (err: Error) => {
@@ -23,10 +26,12 @@ export class ClientHandler {
     });
 
     this.socketOn(socket.io, ClientSocketEventNames.Reconnect, (attemptCount: number) => {
-      let gameId = store.state.game?._id;
+      userClientSocketEmitter.emitJoined();
+
+      const gameId = store.state.game?._id;
 
       if (gameId != null) {
-        let player = GameHelper.getUserPlayer(store.state.game)
+        const player = GameHelper.getUserPlayer(store.state.game)
 
         console.log('Rejoining game room.');
 

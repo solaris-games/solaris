@@ -141,6 +141,8 @@ import TutorialGame from './game/components/menu/TutorialGame.vue'
 import Poll from "./components/Poll.vue";
 import Warnings from "./account/Warnings.vue";
 import AnnouncementsButton from "./components/AnnouncementsButton.vue";
+import { inject } from 'vue';
+import {userClientSocketEmitterInjectionKey} from "@/sockets/socketEmitters/user";
 
 export default {
   components: {
@@ -153,6 +155,11 @@ export default {
     'poll': Poll,
     'warnings': Warnings,
     'announcements-button': AnnouncementsButton
+  },
+  setup () {
+    return {
+      userClientSocketEmitter: inject(userClientSocketEmitterInjectionKey),
+    }
   },
   data () {
     return {
@@ -170,7 +177,7 @@ export default {
 
       await authService.logout()
 
-      this.$store.commit('clearUserId')
+      this.$store.commit('clearUser')
       this.$store.commit('clearUsername')
       this.$store.commit('clearRoles')
       this.$store.commit('clearUserCredits')
@@ -178,6 +185,8 @@ export default {
       this.$store.commit('clearIsImpersonating')
 
       this.isLoggingOut = false
+
+      this.userClientSocketEmitter.emitLeft();
 
       router.push({ name: 'home' })
     },
@@ -188,6 +197,7 @@ export default {
         this.user = response.data
         this.achievements = response.data.achievements
 
+        this.$store.commit('setUser', response.data)
         this.$store.commit('setRoles', response.data.roles)
         this.$store.commit('setUserCredits', response.data.credits)
         this.$store.commit('setUserIsEstablishedPlayer', response.data.isEstablishedPlayer)
