@@ -7,6 +7,11 @@ const failed = (expected: string, value: any) => {
     return new ValidationError(`Expected ${expected}, but got: ${value.toString().substring(1000)} ${typeof value}`);
 }
 
+
+export const ok = <T>(value: T): Validator<T> => {
+    return (_) => value;
+}
+
 const primitive = (t: string) => (value: any) => {
     if (value === null || value === undefined || typeof value !== t) {
         throw failed(t, value);
