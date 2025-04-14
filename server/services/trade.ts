@@ -457,6 +457,14 @@ export default class TradeService extends EventEmitter {
         return tradeTechs;
     }
 
+    _canPlayersTradeInRange(game: Game, fromPlayer: Player, toPlayer: Player) {
+        if (game.settings.player.tradeScanning === 'scanned') {
+            return this.playerService.isInScanningRangeOfPlayer(game, fromPlayer, toPlayer);
+        }
+
+        return true;
+    }
+
     _tradeScanningCheck(game: Game, fromPlayer: Player, toPlayer: Player) {
         if (game.settings.player.tradeScanning === 'scanned') {
             let isInRange = this.playerService.isInScanningRangeOfPlayer(game, fromPlayer, toPlayer);
@@ -522,6 +530,10 @@ export default class TradeService extends EventEmitter {
         const TRADE_CHANCE_MIN_REPUTATION = 1;
 
         if (reputation.score < TRADE_CHANCE_MIN_REPUTATION) {
+            return;
+        }
+
+        if (!this._canPlayersTradeInRange(game, fromPlayer, toPlayer)) {
             return;
         }
 
