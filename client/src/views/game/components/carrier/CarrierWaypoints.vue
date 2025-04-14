@@ -85,6 +85,7 @@ import CarrierApiService from '../../../../services/api/carrier'
 import AudioService from '../../../../game/audio'
 import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning.vue'
 import {eventBusInjectionKey} from "../../../../eventBus";
+import MapEventBusEventNames from "@/eventBusEventNames/map";
 
 export default {
   components: {
@@ -127,10 +128,10 @@ export default {
     GameContainer.setMode('waypoints', this.carrier)
 
     this.waypointCreatedHandler = this.onWaypointCreated.bind(this);
-    this.eventBus.on('onWaypointCreated', this.waypointCreatedHandler);
+    this.eventBus.on(MapEventBusEventNames.MapOnWaypointCreated, this.waypointCreatedHandler);
 
     this.waypointOutOfRangeHandler = this.onWaypointOutOfRange.bind(this);
-    this.eventBus.on('onWaypointOutOfRange', this.waypointOutOfRangeHandler);
+    this.eventBus.on(MapEventBusEventNames.MapOnWaypointOutOfRange, this.waypointOutOfRangeHandler);
 
     this.oldWaypoints = this.carrier.waypoints.slice(0);
     this.oldWaypointsLooped = this.carrier.waypointsLooped;
@@ -200,17 +201,17 @@ export default {
       this.recalculateTotalEta()
       this.recalculateLooped()
     },
-    onWaypointCreated (e) {
+    onWaypointCreated ({ waypoint }) {
       // Overwrite the default action and default action ships
-      e.action = this.$store.state.settings.carrier.defaultAction
-      e.actionShips = this.$store.state.settings.carrier.defaultAmount
+      waypoint.action = this.$store.state.settings.carrier.defaultAction
+      waypoint.actionShips = this.$store.state.settings.carrier.defaultAmount
 
       AudioService.type()
 
       this.recalculateTotalEta()
       this.recalculateLooped()
     },
-    onWaypointOutOfRange (e) {
+    onWaypointOutOfRange ({ waypoint }) {
       this.$toast.error(`This waypoint is out of hyperspace range.`)
     },
     recalculateTotalEta () {
