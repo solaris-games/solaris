@@ -252,7 +252,7 @@ export class Map {
     const panToUser = () => this.panToUser(this.game!);
     const panToPlayer = ({ player }: { player: Player }) => this.panToPlayer(this.game!, player);
     const clearHighlightedLocations = () => this.clearCarrierHighlights();
-    const highlightLocation = ({ object, opacity }: { object: MapObject<string>, opacity: number }) => this.highlightLocation(object, opacity);
+    const highlightLocation = ({ location }: { location: Location }) => this.highlightLocation(location);
     const clickStar = ({ starId }: { starId: string }) => this.clickStar(starId);
     const clickCarrier = ({ carrierId }: { carrierId: string }) => this.clickCarrier(carrierId);
     const removeLastRulerWaypoint = () => this.removeLastRulerPoint();
@@ -1000,7 +1000,7 @@ export class Map {
     if (this.background) this.background.refreshZoom(zoomPercent)
   }
 
-  highlightLocation (location, opacity = 1) {
+  highlightLocation (location: Location, opacity = 1) {
     let graphics = new PIXI.Graphics()
     let radius = 12
 
