@@ -15,7 +15,7 @@ export default class MapCommandEventBusEventNames {
   public static readonly MapCommandPanToLocation: MapCommandEventBusEventName<{ location: Location }> = toEventName('panToLocation');
   public static readonly MapCommandPanToPlayer: MapCommandEventBusEventName<{ player: Player }> = toEventName('panToPlayer');
   public static readonly MapCommandClearHighlightedLocations: MapCommandEventBusEventName<{}> = toEventName('clearHighlightedLocations');
-  public static readonly MapCommandHighlightLocation: MapCommandEventBusEventName<{ object: MapObject<string>, opacity: number }> = toEventName('highlightLocation');
+  public static readonly MapCommandHighlightLocation: MapCommandEventBusEventName<{ location: Location }> = toEventName('highlightLocation');
   public static readonly MapCommandClickStar: MapCommandEventBusEventName<{ starId: string }> = toEventName('clickStar');
   public static readonly MapCommandClickCarrier: MapCommandEventBusEventName<{ carrierId: string }> = toEventName('clickCarrier');
   public static readonly MapCommandRemoveLastRulerPoint: MapCommandEventBusEventName<{}> = toEventName('removeLastRulerPoint');
