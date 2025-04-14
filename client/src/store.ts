@@ -6,6 +6,7 @@ import GameContainer from './game/container.js';
 import GameMutationNames from './mutationNames/gameMutationNames';
 import PlayerMutationNames from './mutationNames/playerMutationNames';
 import ApiAuthService from "./services/api/auth.js";
+import ApiUserService from "./services/api/user.js";
 import ColourService from './services/api/colour.js';
 import SpecialistService from './services/api/specialist.js';
 import GameHelper from './services/gameHelper.js';
@@ -23,6 +24,7 @@ export type MentionCallbacks = {
 
 export type State = {
   userId: string | null;
+  user: any;
   game: Game | null;
   tick: number;
   cachedConversationComposeMessages: Record<string, string>;
@@ -141,8 +143,9 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
     setUserId (state: State, userId) {
       state.userId = userId
     },
-    clearUserId (state) {
-      state.userId = null
+    clearUser (state) {
+      state.userId = null;
+      state.user = null;
     },
 
     setUsername (state: State, username) {
@@ -150,6 +153,10 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
     },
     clearUsername (state) {
       state.username = null
+    },
+
+    setUser (state: State, user) {
+      state.user = user;
     },
 
     setRoles (state: State, roles) {
@@ -598,7 +605,7 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
 
       GameContainer.reloadGame(state.game, state.settings);
     },
-    async verify({ commit }) {
+    async verify({ commit, state }) {
       try {
         const response = await ApiAuthService.verify();
 
@@ -608,6 +615,15 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
             commit('setUsername', response.data.username)
             commit('setRoles', response.data.roles)
             commit('setUserCredits', response.data.credits)
+
+            if (!state.user || state.user?._id !== response.data._id) {
+              const resp2 = await ApiUserService.getMyUserInfo();
+              if (resp2.status === 200) {
+                commit('setUser', resp2.data);
+              } else {
+                console.error('Failed to get user info', resp2);
+              }
+            }
 
             userClientSocketEmitter.emitJoined();
             return true;

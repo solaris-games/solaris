@@ -1,6 +1,6 @@
 <template>
     <div>
-        <view-subtitle title="Discord notifications" class="mt-3" level="h5" />
+        <view-subtitle title="Notifications" class="mt-3" level="h5" />
 
         <p>
             Configure your subscriptions for in-game notifications below. Whenever the subscribed event triggers you will receive a notification.
@@ -23,8 +23,22 @@
                 </div>
             </div>
 
+            <div>
+              <h6 class="pt-2">In-app notifications</h6>
+
+              <div class="row pt-1 pb-1">
+                <label for="notifyForOtherGames" class="col-12 col-sm-6 col-form-label">Receive notifications about other games within the game <help-tooltip tooltip="If enabled, you will receive message notifications for all games while you are in Solaris, not only for the currently open game"/></label>
+                <div class="col-12 col-sm-6">
+                  <select class="form-control" id="notifyForOtherGames" v-model="subscriptions.inapp.notificationsForOtherGames" :disabled="isSaving">
+                    <option :value="true">Enabled</option>
+                    <option :value="false">Disabled</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
             <div v-if="subscriptions.discord">
-                <h6 class="pt-2">Discord</h6>
+                <h6 class="pt-2">Discord notifications</h6>
 
                 <div class="row pt-1 pb-1">
                     <label for="gameStarted" class="col-12 col-sm-6 col-form-label">Game - Started</label>
@@ -132,7 +146,7 @@
             <div class="row mt-2">
                 <div class="col"></div>
                 <div class="col-auto">
-                    <button type="submit" class="btn btn-success" :disabled="isSaving"><i class="fas fa-save"></i> Save Subscriptions</button>
+                    <button type="submit" class="btn btn-success" :disabled="isSaving"><i class="fas fa-save"></i> Save Notifications</button>
                 </div>
             </div>
         </form>
