@@ -14,7 +14,7 @@ export const withMessages = () => {
   const eventBus: EventBus = inject(eventBusInjectionKey)!;
   const store: Store<State> = useStore();
 
-  const sendForAllGames = computed(() => store.state.user.subscriptions.inapp.notificationsForOtherGames);
+  const sendForAllGames = computed(() => store.state.user?.subscriptions?.inapp?.notificationsForOtherGames);
 
   const handler = (e: ConversationMessageSentResult<string>) => {
     const isInGame = store.state.game?._id === e.gameId;
