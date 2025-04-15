@@ -27,7 +27,7 @@ class AnimationService {
       })
     }
 
-    app.ticker.add(animation)
+    app?.ticker.add(animation)
 
     setTimeout(() => {
       container.removeChild(graphics)
