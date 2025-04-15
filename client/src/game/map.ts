@@ -251,7 +251,7 @@ export class Map {
     const panToObject = ({ object }: { object: MapObject<string> }) => this.panToObject(object);
     const panToUser = () => this.panToUser(this.game!);
     const panToPlayer = ({ player }: { player: Player }) => this.panToPlayer(this.game!, player);
-    const clearHighlightedLocations = () => this.clearCarrierHighlights();
+    const clearHighlightedLocations = () => this.clearHighlightedLocations();
     const highlightLocation = ({ location }: { location: Location }) => this.highlightLocation(location);
     const clickStar = ({ starId }: { starId: string }) => this.clickStar(starId);
     const clickCarrier = ({ carrierId }: { carrierId: string }) => this.clickCarrier(carrierId);
