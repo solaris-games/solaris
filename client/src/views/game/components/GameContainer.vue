@@ -139,6 +139,8 @@ onMounted(() => {
   });
 
   onBeforeUnmount(() => {
+    gameContainer.destroy();
+
     eventBus.off(MapEventBusEventNames.MapOnStarClicked, onStarClickedHandler);
     eventBus.off(MapEventBusEventNames.MapOnStarRightClicked, onStarRightClickedHandler);
     eventBus.off(MapEventBusEventNames.MapOnCarrierClicked, onCarrierClickedHandler);
