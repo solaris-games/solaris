@@ -13,7 +13,7 @@ import WormHoleLayer from './wormHole'
 import TooltipLayer from './tooltip'
 import type {Store} from "vuex";
 import type {State} from "../store";
-import type {DrawingContext, GameContainer} from "./container";
+import { type DrawingContext, type GameContainer} from "./container";
 import type {Game, Player, Star as StarData, Carrier as CarrierData} from "../types/game";
 import type {Location, MapObject, UserGameSettings} from "@solaris-common";
 import { Chunks } from './chunks'
@@ -21,6 +21,7 @@ import Carrier from "./carrier";
 import type { EventBus } from '../eventBus'
 import MapEventBusEventNames from '../eventBusEventNames/map'
 import MapCommandEventBusEventNames from "../eventBusEventNames/mapCommand";
+import globalGameContainer from './container';
 
 enum Mode {
   Galaxy = 'galaxy',
@@ -284,6 +285,14 @@ export class Map {
       this.eventBus.off(MapCommandEventBusEventNames.MapCommandShowIgnoreBulkUpgrade, showIgnoreBulkUpgrade);
       this.eventBus.off(MapCommandEventBusEventNames.MapCommandHideIgnoreBulkUpgrade, hideIgnoreBulkUpgrade);
     }
+  }
+
+  destroy () {
+    if (this.unsubscribe) {
+      this.unsubscribe();
+    }
+
+    this.unsubscribe = undefined;
   }
 
   setupStar (game: Game, userSettings: UserGameSettings, starData: StarData) {
@@ -791,7 +800,7 @@ export class Map {
     } else if (this.mode === 'ruler') {
       this.rulerPoints!.onStarClicked(e)
     }
-    AnimationService.drawSelectedCircle(this.app, this.container, e.location)
+    AnimationService.drawSelectedCircle(globalGameContainer.app!, this.container, e.location)
   }
 
   onStarDefaultClicked (dic) {
@@ -856,7 +865,7 @@ export class Map {
       this.rulerPoints!.onCarrierClicked(e)
     }
 
-    AnimationService.drawSelectedCircle(this.app, this.container, e.location)
+    AnimationService.drawSelectedCircle(globalGameContainer.app!, this.container, e.location)
   }
 
   onCarrierRightClicked (e) {
