@@ -139,6 +139,8 @@ onMounted(() => {
   });
 
   onBeforeUnmount(() => {
+    clearInterval(polling.value);
+
     gameContainer.destroy();
 
     eventBus.off(MapEventBusEventNames.MapOnStarClicked, onStarClickedHandler);

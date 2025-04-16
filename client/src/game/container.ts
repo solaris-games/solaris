@@ -117,6 +117,11 @@ export class GameContainer {
   destroy () {
     console.warn('Destroying game container')
 
+    if (this.map) {
+      this.map.destroy();
+      this.map = undefined;
+    }
+
     if (this.viewport) {
       this.viewport.destroy()
       this.viewport = undefined
