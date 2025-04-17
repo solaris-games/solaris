@@ -3,7 +3,7 @@ import {type MapObject, makeCastFunc, type Location} from "@solaris-common";
 import type {Player} from "../types/game";
 
 export type MapCommandEventBusEventType = { mapCommandEventBusEventType: 'mapCommandEventBusEventType' };
-export type MapCommandEventBusEventName<TData> = EventBusEventName<MapCommandEventBusEventType, TData> & { mapEventBusEventType: 'mapEventBusEventType' };
+export type MapCommandEventBusEventName<TData> = EventBusEventName<MapCommandEventBusEventType, TData> & { mapCommandEventBusEventType: 'mapCommandEventBusEventType' };
 
 const toEventName: <TData>(value: string) => MapCommandEventBusEventName<TData> = makeCastFunc();
 

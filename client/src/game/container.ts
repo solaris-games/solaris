@@ -37,6 +37,7 @@ export class GameContainer {
   game: Game | undefined;
   debugTools: DebugTools | undefined;
   eventBus: EventBus | undefined;
+  unsubscribe: (() => void) | undefined;
 
   reportGameError: ((err: string) => void) | undefined;
 
