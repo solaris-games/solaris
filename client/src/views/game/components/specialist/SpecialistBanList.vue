@@ -42,7 +42,8 @@ export default {
             carrierSpecialists: []
         }
     },
-    mounted () {
+    async mounted () {
+        await this.$store.dispatch('loadSpecialistData', this.game._id);
         this.starSpecialists = this.$store.state.starSpecialists
         this.carrierSpecialists = this.$store.state.carrierSpecialists
     }

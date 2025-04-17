@@ -550,10 +550,8 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
     }
   },
   actions: {
-    async loadSpecialistData ({ commit, state }) {
-      const gameId = state.game._id;
-
-      let requests = [
+    async loadSpecialistData ({ commit, state }, gameId: string) {
+      const requests = [
         SpecialistService.getCarrierSpecialists(gameId),
         SpecialistService.getStarSpecialists(gameId)
       ]
