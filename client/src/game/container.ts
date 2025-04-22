@@ -10,6 +10,7 @@ import type {Game, Player, Star, Carrier} from "../types/game";
 import { screenshot } from './screenshot';
 import { DebugTools } from './debugTools';
 import type { EventBus } from '../eventBus';
+import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 
 export class DrawingContext {
   store: Store<State>;
@@ -113,10 +114,36 @@ export class GameContainer {
     // Add a new map to the viewport
     this.map = new Map(this.app, this.store, this, this.context!, eventBus);
     this.viewport.addChild(this.map.container)
+
+    this.subscribe();
+  }
+
+  subscribe () {
+    const onGameReload = () => this._reloadGame();
+    const onStarReload = ({ star }: { star: Star }) => this.reloadStar(star);
+    const onCarrierReload = ({ carrier }: { carrier: Carrier }) => this.reloadCarrier(carrier);
+    const onCarrierRemove = ({ carrier }: { carrier: Carrier }) => this.undrawCarrier(carrier);
+
+    this.eventBus!.on(GameCommandEventBusEventNames.GameCommandReloadGame, onGameReload);
+    this.eventBus!.on(GameCommandEventBusEventNames.GameCommandReloadStar, onStarReload);
+    this.eventBus!.on(GameCommandEventBusEventNames.GameCommandReloadCarrier, onCarrierReload);
+    this.eventBus!.on(GameCommandEventBusEventNames.GameCommandRemoveCarrier, onCarrierRemove);
+
+    this.unsubscribe = () => {
+      this.eventBus!.off(GameCommandEventBusEventNames.GameCommandReloadGame, onGameReload);
+      this.eventBus!.off(GameCommandEventBusEventNames.GameCommandReloadStar, onStarReload);
+      this.eventBus!.off(GameCommandEventBusEventNames.GameCommandReloadCarrier, onCarrierReload);
+      this.eventBus!.off(GameCommandEventBusEventNames.GameCommandRemoveCarrier, onCarrierRemove);
+    }
   }
 
   destroy () {
     console.warn('Destroying game container')
+
+    if (this.unsubscribe) {
+      this.unsubscribe();
+      this.unsubscribe = undefined;
+    }
 
     if (this.map) {
       this.map.destroy();
@@ -222,6 +249,10 @@ export class GameContainer {
 
   drawWaypoints () {
     this.map!.drawWaypoints()
+  }
+
+  _reloadGame() {
+    this.reloadGame(this.store!.state.game, this.store!.state.userSettings);
   }
 
   reloadGame (game: Game, userSettings: UserGameSettings) {
