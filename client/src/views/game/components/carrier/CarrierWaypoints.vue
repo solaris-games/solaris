@@ -87,6 +87,8 @@ import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning.
 import {eventBusInjectionKey} from "../../../../eventBus";
 import MapEventBusEventNames from "@/eventBusEventNames/map";
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
+import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
+import {ModeKind} from "@/game/map";
 
 export default {
   components: {
@@ -126,7 +128,10 @@ export default {
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
     this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
 
-    GameContainer.setMode('waypoints', this.carrier)
+    this.eventBus.emit(MapCommandEventBusEventNames.MapCommandSetMode, {
+      mode: ModeKind.Waypoints,
+      carrier: this.carrier,
+    });
 
     this.waypointCreatedHandler = this.onWaypointCreated.bind(this);
     this.eventBus.on(MapEventBusEventNames.MapOnWaypointCreated, this.waypointCreatedHandler);
@@ -144,7 +149,7 @@ export default {
     this.carrier.waypointsLooped = this.oldWaypointsLooped
     GameContainer.drawWaypoints()
 
-    GameContainer.resetMode()
+    this.eventBus.emit(MapCommandEventBusEventNames.MapCommandResetMode, {});
 
     this.eventBus.off('onWaypointCreated', this.waypointCreatedHandler)
     this.eventBus.off('onWaypointOutOfRange', this.waypointOutOfRangeHandler)

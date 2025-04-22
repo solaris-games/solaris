@@ -1,6 +1,7 @@
 import type {EventBusEventName} from "./eventBusEventName";
 import {type MapObject, makeCastFunc, type Location} from "@solaris-common";
 import type {Player} from "../types/game";
+import type {Mode} from "@/game/map";
 
 export type MapCommandEventBusEventType = { mapCommandEventBusEventType: 'mapCommandEventBusEventType' };
 export type MapCommandEventBusEventName<TData> = EventBusEventName<MapCommandEventBusEventType, TData> & { mapCommandEventBusEventType: 'mapCommandEventBusEventType' };
@@ -24,4 +25,6 @@ export default class MapCommandEventBusEventNames {
   public static readonly MapCommandFitGalaxy: MapCommandEventBusEventName<{ location?: Location }> = toEventName('fitGalaxy');
   public static readonly MapCommandUnselectAllCarriers: MapCommandEventBusEventName<{}> = toEventName('unselectAllCarriers');
   public static readonly MapCommandUnselectAllStars: MapCommandEventBusEventName<{}> = toEventName('unselectAllStars');
+  public static readonly MapCommandResetMode: MapCommandEventBusEventName<{}> = toEventName('resetMode');
+  public static readonly MapCommandSetMode: MapCommandEventBusEventName<Mode> = toEventName('setMode');
 }

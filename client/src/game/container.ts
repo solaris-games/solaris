@@ -309,14 +309,6 @@ export class GameContainer {
     this.map!.refreshZoom(zoomPercent)
   }
 
-  setMode (mode, args) {
-    this.map!.setMode(mode, args)
-  }
-
-  resetMode () {
-    this.map!.resetMode()
-  }
-
   resize () {
     if (!this.app) {
       return;

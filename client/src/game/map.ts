@@ -23,17 +23,34 @@ import MapEventBusEventNames from '../eventBusEventNames/map'
 import MapCommandEventBusEventNames from "../eventBusEventNames/mapCommand";
 import globalGameContainer from './container';
 
-enum Mode {
+export enum ModeKind {
   Galaxy = 'galaxy',
   Waypoints = 'waypoints',
   Ruler = 'ruler',
 }
 
+type ModeGalaxy = {
+  mode: ModeKind.Galaxy,
+}
+
+type ModeRuler = {
+  mode: ModeKind.Ruler,
+}
+
+type ModeWaypoints = {
+  mode: ModeKind.Waypoints,
+  carrier: CarrierData,
+}
+
+export type Mode = ModeGalaxy | ModeRuler | ModeWaypoints;
+
 export class Map {
   // Represents the current game mode, these are as follows:
   // galaxy - Normal galaxy view
   // waypoints - Displays waypoints overlay for a given carrier
-  mode = Mode.Galaxy;
+  mode: Mode = {
+    mode: ModeKind.Galaxy,
+  };
   eventBus: EventBus;
   app: PIXI.Application;
   store: Store<State>;
@@ -65,7 +82,6 @@ export class Map {
   wormHoleLayer: WormHoleLayer | undefined;
   tooltipLayer: TooltipLayer | undefined;
   orbitalLayer: OrbitalLocationLayer | undefined;
-  modeArgs: any;
   lastViewportCenter: PIXI.Point | undefined;
   currentViewportCenter: PIXI.Point | undefined;
   lastPointerDownPosition: PIXI.Point | undefined;
@@ -261,6 +277,8 @@ export class Map {
     const hideIgnoreBulkUpgrade = () => this.hideIgnoreBulkUpgrade();
     const unselectAllCarriers = () => this.unselectAllCarriers();
     const unselectAllStars = () => this.unselectAllStars();
+    const resetMode = () => this.resetMode();
+    const setMode = (mode: Mode) => this.setMode(mode);
 
     this.eventBus.on(MapCommandEventBusEventNames.MapCommandPanToLocation, panToLocation);
     this.eventBus.on(MapCommandEventBusEventNames.MapCommandPanToObject, panToObject);
@@ -275,6 +293,8 @@ export class Map {
     this.eventBus.on(MapCommandEventBusEventNames.MapCommandHideIgnoreBulkUpgrade, hideIgnoreBulkUpgrade);
     this.eventBus.on(MapCommandEventBusEventNames.MapCommandUnselectAllCarriers, unselectAllCarriers);
     this.eventBus.on(MapCommandEventBusEventNames.MapCommandUnselectAllStars, unselectAllStars);
+    this.eventBus.on(MapCommandEventBusEventNames.MapCommandResetMode, resetMode);
+    this.eventBus.on(MapCommandEventBusEventNames.MapCommandSetMode, setMode);
 
     return () => {
       this.eventBus.off(MapCommandEventBusEventNames.MapCommandPanToLocation, panToLocation);
@@ -290,6 +310,8 @@ export class Map {
       this.eventBus.off(MapCommandEventBusEventNames.MapCommandHideIgnoreBulkUpgrade, hideIgnoreBulkUpgrade);
       this.eventBus.off(MapCommandEventBusEventNames.MapCommandUnselectAllCarriers, unselectAllCarriers);
       this.eventBus.off(MapCommandEventBusEventNames.MapCommandUnselectAllStars, unselectAllStars);
+      this.eventBus.off(MapCommandEventBusEventNames.MapCommandResetMode, resetMode);
+      this.eventBus.off(MapCommandEventBusEventNames.MapCommandSetMode, setMode);
     }
   }
 
@@ -349,7 +371,7 @@ export class Map {
   draw () {
     this.drawGalaxyCenter()
 
-    if (this.mode === 'waypoints') {
+    if (this.mode.mode === 'waypoints') {
       this.drawWaypoints()
     } else {
       this.drawStars()
@@ -357,7 +379,7 @@ export class Map {
       this.clearWaypoints()
     }
 
-    if (this.mode === 'ruler') {
+    if (this.mode.mode === 'ruler') {
       this.drawRulerPoints()
     } else {
       this.clearRulerPoints()
@@ -485,33 +507,34 @@ export class Map {
   }
 
 
-  setMode (mode, args) {
-    let wasWaypoints = this.mode === 'waypoints'
+  setMode (mode: Mode) {
+    let wasWaypoints = this.mode.mode === ModeKind.Waypoints;
 
-    this.mode = mode
-    this.modeArgs = args
+    this.mode = mode;
 
     this.unselectAllCarriers()
     this.unselectAllStars()
     this.clearWaypoints()
     this.clearRulerPoints()
 
-    if (this.mode === 'waypoints') {
+    if (this.mode.mode === ModeKind.Waypoints) {
       this._disableCarriersInteractivity()
-      this.drawWaypoints()
+      this.drawWaypoints();
     }
 
     if (wasWaypoints) {
       this._enableCarriersInteractivity()
     }
 
-    if (this.mode === 'ruler') {
+    if (this.mode.mode === ModeKind.Ruler) {
       this.drawRulerPoints()
     }
   }
 
   resetMode () {
-    this.setMode('galaxy', this.modeArgs)
+    this.setMode({
+      mode: ModeKind.Galaxy
+    });
   }
 
   removeLastRulerPoint () {
@@ -579,7 +602,9 @@ export class Map {
   }
 
   drawWaypoints () {
-    this.waypoints!.draw(this.modeArgs)
+    if (this.mode.mode === ModeKind.Waypoints) {
+      this.waypoints!.draw(this.mode.carrier)
+    }
 
     for (let i = 0; i < this.carriers.length; i++) {
       let c = this.carriers[i]
@@ -791,7 +816,7 @@ export class Map {
 
   selectStar (e, dic) {
     // Clicking stars should only raise events to the UI if in galaxy mode.
-    if (this.mode === 'galaxy') {
+    if (this.mode.mode === ModeKind.Galaxy) {
       let selectedStar = this.stars.find(x => x.data._id === e._id)
 
       this.unselectAllCarriers()
@@ -801,9 +826,9 @@ export class Map {
         selectedStar!.toggleSelected()
         this.eventBus.emit(MapEventBusEventNames.MapOnStarClicked, { star: e })
       }
-    } else if (this.mode === 'waypoints') {
+    } else if (this.mode.mode === ModeKind.Waypoints) {
       this.waypoints!.onStarClicked(e)
-    } else if (this.mode === 'ruler') {
+    } else if (this.mode.mode === ModeKind.Ruler) {
       this.rulerPoints!.onStarClicked(e)
     }
     AnimationService.drawSelectedCircle(globalGameContainer.app!, this.container, e.location)
@@ -832,7 +857,7 @@ export class Map {
       permitCallback: () => {
         dic.permitCallback && dic.permitCallback()
 
-        if (this.mode === 'galaxy') {
+        if (this.mode.mode === ModeKind.Galaxy) {
           this.eventBus.emit(MapEventBusEventNames.MapOnStarRightClicked, { star: e })
         }
       }
@@ -845,7 +870,7 @@ export class Map {
 
     let e = dic.carrierData
     // Clicking carriers should only raise events to the UI if in galaxy mode.
-    if (this.mode === 'galaxy') {
+    if (this.mode.mode === ModeKind.Galaxy) {
 
       let selectedCarrier = this.carriers.find(x => x.data!._id === e._id)
 
@@ -856,7 +881,7 @@ export class Map {
 
       //highlight carrier path if selected
       if (selectedCarrier?.isSelected) {
-        this.waypoints!.draw(selectedCarrier!.data, false);
+        this.waypoints!.draw(selectedCarrier!.data!, false);
       }
       else {
         this.waypoints!.clear();
@@ -867,7 +892,7 @@ export class Map {
       } else {
         selectedCarrier!.unselect()
       }
-    } else if (this.mode === 'ruler') {
+    } else if (this.mode.mode === ModeKind.Ruler) {
       this.rulerPoints!.onCarrierClicked(e)
     }
 
@@ -875,7 +900,7 @@ export class Map {
   }
 
   onCarrierRightClicked (e) {
-    if (this.mode === 'galaxy') {
+    if (this.mode.mode === ModeKind.Galaxy) {
       this.eventBus.emit(MapEventBusEventNames.MapOnCarrierRightClicked, { carrier: e });
     }
   }
