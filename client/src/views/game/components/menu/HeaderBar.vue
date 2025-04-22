@@ -207,10 +207,10 @@ export default {
       GameContainer.viewport.zoom(GameContainer.starFieldRight, true)
     },
     zoomIn () {
-      GameContainer.zoomIn()
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandZoomIn, {});
     },
     zoomOut () {
-      GameContainer.zoomOut()
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandZoomOut, {});
     },
     panToHomeStar () {
       this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToUser, {});
@@ -321,10 +321,10 @@ export default {
           this.fitGalaxy()
           break
         case 'ZOOM_IN':
-          GameContainer.zoomIn()
+          this.eventBus.emit(MapCommandEventBusEventNames.MapCommandZoomIn, {});
           break
         case 'ZOOM_OUT':
-          GameContainer.zoomOut()
+          this.eventBus.emit(MapCommandEventBusEventNames.MapCommandZoomOut, {});
           break
         default:
           this.setMenuState(menuState, menuArguments || null)

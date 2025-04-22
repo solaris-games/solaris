@@ -82,7 +82,6 @@ onMounted(() => {
 
   const updateGame = (game: Game) => {
     gameContainer.reloadGame(game, store.state.settings);
-
   };
 
   const onStarClickedHandler = ({ star }: { star: Star }) => {

@@ -147,8 +147,8 @@ export default {
   unmounted () {
     this.carrier.waypoints = this.oldWaypoints
     this.carrier.waypointsLooped = this.oldWaypointsLooped
-    GameContainer.drawWaypoints()
 
+    this.eventBus.emit(MapCommandEventBusEventNames.MapCommandUpdateWaypoints, {});
     this.eventBus.emit(MapCommandEventBusEventNames.MapCommandResetMode, {});
 
     this.eventBus.off('onWaypointCreated', this.waypointCreatedHandler)
@@ -182,7 +182,7 @@ export default {
       if (!GameHelper.isCarrierInTransitToWaypoint(this.carrier, lastWaypoint)) {
         this.carrier.waypoints.splice(this.carrier.waypoints.indexOf(lastWaypoint), 1)
 
-        GameContainer.drawWaypoints()
+        this.eventBus.emit(MapCommandEventBusEventNames.MapCommandUpdateWaypoints, {});
       }
 
       if (!this.carrier.waypoints.length) {
@@ -198,7 +198,7 @@ export default {
       // Remove all waypoints up to the last waypoint (if in transit)
       this.carrier.waypoints = this.carrier.waypoints.filter(w => GameHelper.isCarrierInTransitToWaypoint(this.carrier, w))
 
-      GameContainer.draw()
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandUpdateWaypoints, {});
 
       this.totalEtaTimeString = null
 

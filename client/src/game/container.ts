@@ -6,8 +6,7 @@ import type {Store} from "vuex";
 import type {State} from "../store";
 import {Application, isWebGLSupported} from "pixi.js";
 import type {Location, UserGameSettings} from "@solaris-common";
-import type {Game, Player, Star, Carrier} from "../types/game";
-import { screenshot } from './screenshot';
+import type {Game, Star, Carrier} from "../types/game";
 import { DebugTools } from './debugTools';
 import type { EventBus } from '../eventBus';
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
@@ -125,12 +124,16 @@ export class GameContainer {
     const onCarrierReload = ({ carrier }: { carrier: Carrier }) => this._reloadCarrier(carrier);
     const onCarrierRemove = ({ carrier }: { carrier: Carrier }) => this._undrawCarrier(carrier);
     const onFitGalaxy = ({ location }: { location?: Location }) => this._fitGalaxy(location?.x, location?.y);
+    const zoomIn = () => this.zoomIn();
+    const zoomOut = () => this.zoomOut();
 
     this.eventBus!.on(GameCommandEventBusEventNames.GameCommandReloadGame, onGameReload);
     this.eventBus!.on(GameCommandEventBusEventNames.GameCommandReloadStar, onStarReload);
     this.eventBus!.on(GameCommandEventBusEventNames.GameCommandReloadCarrier, onCarrierReload);
     this.eventBus!.on(GameCommandEventBusEventNames.GameCommandRemoveCarrier, onCarrierRemove);
     this.eventBus!.on(MapCommandEventBusEventNames.MapCommandFitGalaxy, onFitGalaxy);
+    this.eventBus!.on(MapCommandEventBusEventNames.MapCommandZoomIn, zoomIn);
+    this.eventBus!.on(MapCommandEventBusEventNames.MapCommandZoomOut, zoomOut);
 
     this.unsubscribe = () => {
       this.eventBus!.off(GameCommandEventBusEventNames.GameCommandReloadGame, onGameReload);
@@ -138,6 +141,8 @@ export class GameContainer {
       this.eventBus!.off(GameCommandEventBusEventNames.GameCommandReloadCarrier, onCarrierReload);
       this.eventBus!.off(GameCommandEventBusEventNames.GameCommandRemoveCarrier, onCarrierRemove);
       this.eventBus!.off(MapCommandEventBusEventNames.MapCommandFitGalaxy, onFitGalaxy);
+      this.eventBus!.off(MapCommandEventBusEventNames.MapCommandZoomIn, zoomIn);
+      this.eventBus!.off(MapCommandEventBusEventNames.MapCommandZoomOut, zoomOut);
     }
   }
 
@@ -232,10 +237,6 @@ export class GameContainer {
     if (this.debugTools) {
       this.debugTools.draw();
     }
-  }
-
-  drawWaypoints () {
-    this.map!.drawWaypoints()
   }
 
   _reloadGame() {

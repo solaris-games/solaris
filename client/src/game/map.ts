@@ -279,6 +279,7 @@ export class Map {
     const unselectAllStars = () => this.unselectAllStars();
     const resetMode = () => this.resetMode();
     const setMode = (mode: Mode) => this.setMode(mode);
+    const updateWaypoints = () => this.drawWaypoints();
 
     this.eventBus.on(MapCommandEventBusEventNames.MapCommandPanToLocation, panToLocation);
     this.eventBus.on(MapCommandEventBusEventNames.MapCommandPanToObject, panToObject);
@@ -295,6 +296,7 @@ export class Map {
     this.eventBus.on(MapCommandEventBusEventNames.MapCommandUnselectAllStars, unselectAllStars);
     this.eventBus.on(MapCommandEventBusEventNames.MapCommandResetMode, resetMode);
     this.eventBus.on(MapCommandEventBusEventNames.MapCommandSetMode, setMode);
+    this.eventBus.on(MapCommandEventBusEventNames.MapCommandUpdateWaypoints, updateWaypoints);
 
     return () => {
       this.eventBus.off(MapCommandEventBusEventNames.MapCommandPanToLocation, panToLocation);
@@ -312,6 +314,7 @@ export class Map {
       this.eventBus.off(MapCommandEventBusEventNames.MapCommandUnselectAllStars, unselectAllStars);
       this.eventBus.off(MapCommandEventBusEventNames.MapCommandResetMode, resetMode);
       this.eventBus.off(MapCommandEventBusEventNames.MapCommandSetMode, setMode);
+      this.eventBus.off(MapCommandEventBusEventNames.MapCommandUpdateWaypoints, updateWaypoints);
     }
   }
 

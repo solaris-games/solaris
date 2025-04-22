@@ -134,10 +134,10 @@ export default {
       });
     },
     zoomIn() {
-      gameContainer.zoomIn()
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandZoomIn, {});
     },
     zoomOut() {
-      gameContainer.zoomOut()
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandZoomOut, {});
     },
     panToHomeStar() {
       this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToUser, {});

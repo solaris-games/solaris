@@ -27,4 +27,7 @@ export default class MapCommandEventBusEventNames {
   public static readonly MapCommandUnselectAllStars: MapCommandEventBusEventName<{}> = toEventName('unselectAllStars');
   public static readonly MapCommandResetMode: MapCommandEventBusEventName<{}> = toEventName('resetMode');
   public static readonly MapCommandSetMode: MapCommandEventBusEventName<Mode> = toEventName('setMode');
+  public static readonly MapCommandUpdateWaypoints: MapCommandEventBusEventName<{}> = toEventName('updateWaypoints');
+  public static readonly MapCommandZoomIn: MapCommandEventBusEventName<{}> = toEventName('zoomIn');
+  public static readonly MapCommandZoomOut: MapCommandEventBusEventName<{}> = toEventName('zoomOut');
 }
