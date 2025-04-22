@@ -230,6 +230,7 @@ import HelpTooltip from '../../../components/HelpTooltip.vue'
 import {formatLocation} from "client/src/util/format";
 import {eventBusInjectionKey} from "../../../../eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
+import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 
 export default {
   components: {
@@ -365,7 +366,7 @@ export default {
 
           this.carrier.waypointsLooped = !this.carrier.waypointsLooped
 
-          GameContainer.reloadCarrier(this.carrier)
+          this.eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, { carrier: this.carrier });
         }
       } catch (err) {
         console.error(err)
@@ -397,7 +398,7 @@ export default {
 
           this.carrier.waypoints = [firstWaypoint];
 
-          GameContainer.reloadCarrier(this.carrier)
+          this.eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, { carrier: this.carrier });
 
           this.$toast.default(`${this.carrier.name} has been converted into a gift.`)
         }

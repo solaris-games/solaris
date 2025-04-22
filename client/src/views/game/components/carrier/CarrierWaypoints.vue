@@ -86,6 +86,7 @@ import AudioService from '../../../../game/audio'
 import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning.vue'
 import {eventBusInjectionKey} from "../../../../eventBus";
 import MapEventBusEventNames from "@/eventBusEventNames/map";
+import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 
 export default {
   components: {
@@ -253,7 +254,7 @@ export default {
 
           this.$toast.default(`${this.carrier.name} waypoints updated.`)
 
-          GameContainer.reloadCarrier(this.carrier)
+          this.eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, { carrier: this.carrier });
 
           if (saveAndEdit) {
             if (this.carrier.waypoints.length) {
