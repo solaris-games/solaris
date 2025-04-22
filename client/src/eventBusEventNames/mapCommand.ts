@@ -21,4 +21,7 @@ export default class MapCommandEventBusEventNames {
   public static readonly MapCommandRemoveLastRulerPoint: MapCommandEventBusEventName<{}> = toEventName('removeLastRulerPoint');
   public static readonly MapCommandShowIgnoreBulkUpgrade: MapCommandEventBusEventName<{}> = toEventName('showIgnoreBulkUpgrade');
   public static readonly MapCommandHideIgnoreBulkUpgrade: MapCommandEventBusEventName<{}> = toEventName('hideIgnoreBulkUpgrade');
+  public static readonly MapCommandFitGalaxy: MapCommandEventBusEventName<{ location?: Location }> = toEventName('fitGalaxy');
+  public static readonly MapCommandUnselectAllCarriers: MapCommandEventBusEventName<{}> = toEventName('unselectAllCarriers');
+  public static readonly MapCommandUnselectAllStars: MapCommandEventBusEventName<{}> = toEventName('unselectAllStars');
 }

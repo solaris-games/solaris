@@ -259,6 +259,8 @@ export class Map {
     const removeLastRulerWaypoint = () => this.removeLastRulerPoint();
     const showIgnoreBulkUpgrade = () => this.showIgnoreBulkUpgrade();
     const hideIgnoreBulkUpgrade = () => this.hideIgnoreBulkUpgrade();
+    const unselectAllCarriers = () => this.unselectAllCarriers();
+    const unselectAllStars = () => this.unselectAllStars();
 
     this.eventBus.on(MapCommandEventBusEventNames.MapCommandPanToLocation, panToLocation);
     this.eventBus.on(MapCommandEventBusEventNames.MapCommandPanToObject, panToObject);
@@ -271,6 +273,8 @@ export class Map {
     this.eventBus.on(MapCommandEventBusEventNames.MapCommandRemoveLastRulerPoint, removeLastRulerWaypoint);
     this.eventBus.on(MapCommandEventBusEventNames.MapCommandShowIgnoreBulkUpgrade, showIgnoreBulkUpgrade);
     this.eventBus.on(MapCommandEventBusEventNames.MapCommandHideIgnoreBulkUpgrade, hideIgnoreBulkUpgrade);
+    this.eventBus.on(MapCommandEventBusEventNames.MapCommandUnselectAllCarriers, unselectAllCarriers);
+    this.eventBus.on(MapCommandEventBusEventNames.MapCommandUnselectAllStars, unselectAllStars);
 
     return () => {
       this.eventBus.off(MapCommandEventBusEventNames.MapCommandPanToLocation, panToLocation);
@@ -284,6 +288,8 @@ export class Map {
       this.eventBus.off(MapCommandEventBusEventNames.MapCommandRemoveLastRulerPoint, removeLastRulerWaypoint);
       this.eventBus.off(MapCommandEventBusEventNames.MapCommandShowIgnoreBulkUpgrade, showIgnoreBulkUpgrade);
       this.eventBus.off(MapCommandEventBusEventNames.MapCommandHideIgnoreBulkUpgrade, hideIgnoreBulkUpgrade);
+      this.eventBus.off(MapCommandEventBusEventNames.MapCommandUnselectAllCarriers, unselectAllCarriers);
+      this.eventBus.off(MapCommandEventBusEventNames.MapCommandUnselectAllStars, unselectAllStars);
     }
   }
 

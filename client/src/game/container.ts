@@ -5,12 +5,13 @@ import textureService from './texture'
 import type {Store} from "vuex";
 import type {State} from "../store";
 import {Application, isWebGLSupported} from "pixi.js";
-import type {UserGameSettings} from "@solaris-common";
+import type {Location, UserGameSettings} from "@solaris-common";
 import type {Game, Player, Star, Carrier} from "../types/game";
 import { screenshot } from './screenshot';
 import { DebugTools } from './debugTools';
 import type { EventBus } from '../eventBus';
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
+import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 
 export class DrawingContext {
   store: Store<State>;
@@ -123,17 +124,20 @@ export class GameContainer {
     const onStarReload = ({ star }: { star: Star }) => this.reloadStar(star);
     const onCarrierReload = ({ carrier }: { carrier: Carrier }) => this.reloadCarrier(carrier);
     const onCarrierRemove = ({ carrier }: { carrier: Carrier }) => this.undrawCarrier(carrier);
+    const onFitGalaxy = ({ location }: { location?: Location }) => this.fitGalaxy(location?.x, location?.y);
 
     this.eventBus!.on(GameCommandEventBusEventNames.GameCommandReloadGame, onGameReload);
     this.eventBus!.on(GameCommandEventBusEventNames.GameCommandReloadStar, onStarReload);
     this.eventBus!.on(GameCommandEventBusEventNames.GameCommandReloadCarrier, onCarrierReload);
     this.eventBus!.on(GameCommandEventBusEventNames.GameCommandRemoveCarrier, onCarrierRemove);
+    this.eventBus!.on(MapCommandEventBusEventNames.MapCommandFitGalaxy, onFitGalaxy);
 
     this.unsubscribe = () => {
       this.eventBus!.off(GameCommandEventBusEventNames.GameCommandReloadGame, onGameReload);
       this.eventBus!.off(GameCommandEventBusEventNames.GameCommandReloadStar, onStarReload);
       this.eventBus!.off(GameCommandEventBusEventNames.GameCommandReloadCarrier, onCarrierReload);
       this.eventBus!.off(GameCommandEventBusEventNames.GameCommandRemoveCarrier, onCarrierRemove);
+      this.eventBus!.off(MapCommandEventBusEventNames.MapCommandFitGalaxy, onFitGalaxy);
     }
   }
 
@@ -344,7 +348,8 @@ export class GameContainer {
   }
 
   fitGalaxy(x, y) {
-    console.log(this)
+    x = x || 0;
+    y = y || 0;
 
     this.viewport!.moveCenter(x, y)
     this.viewport!.fitWorld()

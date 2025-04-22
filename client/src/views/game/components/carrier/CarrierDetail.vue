@@ -217,7 +217,6 @@ import { inject } from 'vue';
 import GameHelper from '../../../../services/gameHelper'
 import CarrierApiService from '../../../../services/api/carrier'
 import MenuTitle from '../MenuTitle.vue'
-import GameContainer from '../../../../game/container'
 import WaypointTable from './WaypointTable.vue'
 import CarrierSpecialistVue from './CarrierSpecialist.vue'
 import GiftCarrierVue from './GiftCarrier.vue'
@@ -294,8 +293,7 @@ export default {
   methods: {
     formatLocation,
     onCloseRequested (e) {
-      GameContainer.unselectAllCarriers()
-
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandUnselectAllCarriers, {});
       this.$emit('onCloseRequested', e)
     },
     onViewCompareIntelRequested (e) {
