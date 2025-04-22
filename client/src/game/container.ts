@@ -121,10 +121,10 @@ export class GameContainer {
 
   subscribe () {
     const onGameReload = () => this._reloadGame();
-    const onStarReload = ({ star }: { star: Star }) => this.reloadStar(star);
-    const onCarrierReload = ({ carrier }: { carrier: Carrier }) => this.reloadCarrier(carrier);
-    const onCarrierRemove = ({ carrier }: { carrier: Carrier }) => this.undrawCarrier(carrier);
-    const onFitGalaxy = ({ location }: { location?: Location }) => this.fitGalaxy(location?.x, location?.y);
+    const onStarReload = ({ star }: { star: Star }) => this._reloadStar(star);
+    const onCarrierReload = ({ carrier }: { carrier: Carrier }) => this._reloadCarrier(carrier);
+    const onCarrierRemove = ({ carrier }: { carrier: Carrier }) => this._undrawCarrier(carrier);
+    const onFitGalaxy = ({ location }: { location?: Location }) => this._fitGalaxy(location?.x, location?.y);
 
     this.eventBus!.on(GameCommandEventBusEventNames.GameCommandReloadGame, onGameReload);
     this.eventBus!.on(GameCommandEventBusEventNames.GameCommandReloadStar, onStarReload);
@@ -167,23 +167,6 @@ export class GameContainer {
 
       this.app = null
     }
-  }
-
-  downloadMap () {
-    this.map!.unselectAllCarriers()
-    this.map!.unselectAllStars()
-    this.map!.clearWaypoints()
-    this.map!.clearRulerPoints()
-
-    screenshot(this, this.game!, this.reportGameError!);
-  }
-
-  unselectAllCarriers () {
-    this.map!.unselectAllCarriers()
-  }
-
-  unselectAllStars () {
-    this.map!.unselectAllStars()
   }
 
   zoomIn () {
@@ -274,21 +257,17 @@ export class GameContainer {
     this.map!.reloadGame(game, userSettings)
   }
 
-  reloadTerritories () {
-    this.map!.drawTerritories(this.userSettings!)
-  }
-
-  reloadStar (star) {
+  _reloadStar (star: Star) {
     const starObject = this.map!.setupStar(this.game!, this.userSettings!, star)
     this.map!.drawStar(starObject)
   }
 
-  reloadCarrier (carrier) {
+  _reloadCarrier (carrier: Carrier) {
     const carrierObject = this.map!.setupCarrier(this.game, this.userSettings, carrier)
     this.map!.drawCarrier(carrierObject)
   }
 
-  undrawCarrier (carrier) {
+  _undrawCarrier (carrier: Carrier) {
     this.map!.undrawCarrier(carrier)
   }
 
@@ -327,19 +306,7 @@ export class GameContainer {
     )
   }
 
-  panToPlayer(game: Game, player: Player) {
-    this.map!.panToPlayer(game, player);
-  }
-
-  panToStar(star: Star) {
-    this.map!.panToStar(star);
-  }
-
-  panToCarrier(carrier: Carrier) {
-    this.map!.panToCarrier(carrier);
-  }
-
-  fitGalaxy(x, y) {
+  _fitGalaxy(x: number | undefined, y: number | undefined) {
     x = x || 0;
     y = y || 0;
 
