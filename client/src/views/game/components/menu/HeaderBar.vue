@@ -199,12 +199,7 @@ export default {
       this.setMenuState(this.MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)
     },
     fitGalaxy () {
-      const galaxyCenterX = gameHelper.calculateGalaxyCenterX(this.$store.state.game)
-      const galaxyCenterY = gameHelper.calculateGalaxyCenterY(this.$store.state.game)
-
-      GameContainer.viewport.moveCenter(galaxyCenterX, galaxyCenterY)
-      GameContainer.viewport.fitWorld()
-      GameContainer.viewport.zoom(GameContainer.starFieldRight, true)
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandFitGalaxy, {});
     },
     zoomIn () {
       this.eventBus.emit(MapCommandEventBusEventNames.MapCommandZoomIn, {});
@@ -227,7 +222,7 @@ export default {
       if (GameHelper.isGamePendingStart(this.$store.state.game)) {
         this.timeRemaining = GameHelper.getCountdownTimeString(this.$store.state.game, this.$store.state.game.state.startDate)
       } else {
-        let ticksToProduction = GameHelper.getTicksToProduction(this.$store.state.game, this.$store.state.tick, this.$store.state.productionTick)
+        const ticksToProduction = GameHelper.getTicksToProduction(this.$store.state.game, this.$store.state.tick, this.$store.state.productionTick)
 
         this.timeRemaining = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, ticksToProduction)
       }

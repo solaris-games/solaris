@@ -124,8 +124,8 @@ export class GameContainer {
     const onCarrierReload = ({ carrier }: { carrier: Carrier }) => this._reloadCarrier(carrier);
     const onCarrierRemove = ({ carrier }: { carrier: Carrier }) => this._undrawCarrier(carrier);
     const onFitGalaxy = ({ location }: { location?: Location }) => this._fitGalaxy(location?.x, location?.y);
-    const zoomIn = () => this.zoomIn();
-    const zoomOut = () => this.zoomOut();
+    const zoomIn = () => this._zoomIn();
+    const zoomOut = () => this._zoomOut();
 
     this.eventBus!.on(GameCommandEventBusEventNames.GameCommandReloadGame, onGameReload);
     this.eventBus!.on(GameCommandEventBusEventNames.GameCommandReloadStar, onStarReload);
@@ -134,6 +134,7 @@ export class GameContainer {
     this.eventBus!.on(MapCommandEventBusEventNames.MapCommandFitGalaxy, onFitGalaxy);
     this.eventBus!.on(MapCommandEventBusEventNames.MapCommandZoomIn, zoomIn);
     this.eventBus!.on(MapCommandEventBusEventNames.MapCommandZoomOut, zoomOut);
+
 
     this.unsubscribe = () => {
       this.eventBus!.off(GameCommandEventBusEventNames.GameCommandReloadGame, onGameReload);
@@ -174,11 +175,11 @@ export class GameContainer {
     }
   }
 
-  zoomIn () {
+  _zoomIn () {
     this.viewport!.zoomPercent(0.5, true)
   }
 
-  zoomOut () {
+  _zoomOut () {
     this.viewport!.zoomPercent(-0.3, true)
   }
 
