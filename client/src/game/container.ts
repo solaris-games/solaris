@@ -210,7 +210,6 @@ export class GameContainer {
 
     this.map!.setup(this.game!, userSettings)
 
-
     if (userSettings?.technical?.performanceMonitor === 'enabled') {
       this.debugTools = new DebugTools(this.app!, this.map!);
     }

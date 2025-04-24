@@ -77,8 +77,10 @@ onMounted(() => {
       }
     };
 
-    const updateGame = (game: Game) => {
-      gameContainer.reloadGame(game, store.state.settings);
+    const updateGame = (game: Game | null) => {
+      if (game) {
+        gameContainer.reloadGame(game, store.state.settings);
+      }
     };
 
     const onStarClickedHandler = ({ star }: { star: Star }) => {
@@ -105,7 +107,7 @@ onMounted(() => {
       emit("onObjectsClicked", objects);
     };
 
-    watch(computed(() => store.state.game!), (newGame) => updateGame(newGame));
+    watch(computed(() => store.state.game), (newGame) => updateGame(newGame));
 
     window.addEventListener('resize', handleResize)
 
