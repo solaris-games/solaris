@@ -24,73 +24,55 @@ export class DrawingContext {
   }
 }
 
+export const createGameContainer = async (store: Store<State>, userSettings: UserGameSettings, reportGameError: ((err: string) => void), eventBus: EventBus) => {
+  const antialiasing = userSettings.map.antiAliasing === 'enabled';
+
+  const options = {
+    width: window.innerWidth, // window.innerWidth,
+    height: window.innerHeight - 45, // window.innerHeight,
+    backgroundColor: 0x000000, // black hexadecimal
+    resolution: window.devicePixelRatio || 1,
+    antialias: antialiasing,
+    autoDensity: true,
+  };
+
+  const app = new Application();
+
+  await app!.init(options);
+
+  await textureService.loadAssets();
+  textureService.initialize();
+
+  return new GameContainer(store, userSettings, reportGameError, eventBus, app);
+}
+
 export class GameContainer {
-  app: Application | null = null;
-  map: Map | undefined;
-  store: Store<State> | undefined;
-  context: DrawingContext | undefined;
-  viewport: Viewport | undefined;
+  app: Application;
+  map: Map;
+  store: Store<State>;
+  context: DrawingContext;
+  viewport: Viewport;
   starFieldLeft: number = 0;
   starFieldRight: number = 0;
   starFieldTop: number = 0;
   starFieldBottom: number = 0;
-  userSettings: UserGameSettings | undefined;
+  userSettings: UserGameSettings;
   game: Game | undefined;
   debugTools: DebugTools | undefined;
-  eventBus: EventBus | undefined;
+  eventBus: EventBus;
   unsubscribe: (() => void) | undefined;
+  reportGameError: ((err: string) => void);
 
-  reportGameError: ((err: string) => void) | undefined;
-
-  constructor () {
-  }
-
-  checkPerformance(): { webgl: boolean, performance: boolean } {
-    const webgl = isWebGLSupported(false);
-    const performance = isWebGLSupported(true);
-
-    if (!webgl) {
-      return {
-        webgl,
-        performance: false
-      };
-    } else {
-      return {
-        webgl,
-        performance
-      };
-    }
-  }
-
-  async setupApp (store, userSettings, reportGameError, eventBus: EventBus) {
-    this.store = store
+  constructor (store: Store<State>, userSettings: UserGameSettings, reportGameError: ((err: string) => void), eventBus: EventBus, app: Application) {
+    this.store = store;
     this.eventBus = eventBus;
     this.reportGameError = reportGameError;
+    this.context = new DrawingContext(store);
+    this.app = app;
+    this.userSettings = userSettings;
 
-    this.context = new DrawingContext(store)
-
-    // Cleanup if the app already exists.
-    this.destroy()
-
-    let antialiasing = userSettings.map.antiAliasing === 'enabled';
-
-    this.app = new Application();
-
-    const options = {
-      width: window.innerWidth, // window.innerWidth,
-      height: window.innerHeight - 45, // window.innerHeight,
-      backgroundColor: 0x000000, // black hexadecimal
-      resolution: window.devicePixelRatio || 1,
-      antialias: antialiasing,
-      autoDensity: true,
-    };
-
-    await this.app!.init(options);
     this.app!.ticker.add(this.onTick.bind(this))
     this.app!.ticker.maxFPS = 0
-
-    await textureService.loadAssets();
-    textureService.initialize()
 
     // create viewport
     this.viewport = new Viewport({
@@ -116,6 +98,23 @@ export class GameContainer {
     this.viewport.addChild(this.map.container)
 
     this.subscribe();
+  }
+
+  checkPerformance(): { webgl: boolean, performance: boolean } {
+    const webgl = isWebGLSupported(false);
+    const performance = isWebGLSupported(true);
+
+    if (!webgl) {
+      return {
+        webgl,
+        performance: false
+      };
+    } else {
+      return {
+        webgl,
+        performance
+      };
+    }
   }
 
   subscribe () {
@@ -155,24 +154,11 @@ export class GameContainer {
       this.unsubscribe = undefined;
     }
 
-    if (this.map) {
-      this.map.destroy();
-      this.map = undefined;
-    }
-
-    if (this.viewport) {
-      this.viewport.destroy()
-      this.viewport = undefined
-    }
-
-    // Cleanup if the app already exists.
-    if (this.app) {
-      this.app.destroy(false, {
-        children: true
-      })
-
-      this.app = null
-    }
+    this.map.destroy();
+    this.viewport.destroy();
+    this.app.destroy(false, {
+      children: true
+    });
   }
 
   _zoomIn () {
@@ -218,7 +204,9 @@ export class GameContainer {
 
   setup (game: Game, userSettings: UserGameSettings) {
     this.game = game;
-    this.userSettings = userSettings
+    this.userSettings = userSettings;
+
+    this.setupViewport(game);
 
     this.map!.setup(this.game!, userSettings)
 
@@ -317,5 +305,3 @@ export class GameContainer {
     this.viewport!.zoom(this.starFieldRight, true)
   }
 }
-
-export default new GameContainer()

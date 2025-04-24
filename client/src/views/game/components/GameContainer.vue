@@ -14,9 +14,9 @@ import type { ToastPluginApi } from 'vue-toast-notification';
 import type { State } from '../../../store';
 import { toastInjectionKey } from '../../../util/keys';
 import GameApiService from '../../../services/api/game'
-import globalGameContainer from '../../../game/container';
 import { attachEventDeduplication } from "../../../util/eventDeduplication";
 import MapCommandEventBusEventNames from "../../../eventBusEventNames/mapCommand";
+import {createGameContainer} from "@/game/container";
 
 const store = useStore() as Store<State>;
 
@@ -38,83 +38,79 @@ const el: Ref<HTMLElement | null> = ref(null);
 onMounted(() => {
   const game = store.state.game!;
 
-  const gameContainer = globalGameContainer;
+  createGameContainer(store, store.state.settings, (msg) => toast.error(msg), eventBus).then((gameContainer) => {
+    const checkPerformance = () => {
+      const webGLSupport = gameContainer.checkPerformance();
 
-  const checkPerformance = () => {
-    const webGLSupport = gameContainer.checkPerformance();
+      console.log("WebGL Support", webGLSupport);
 
-    console.log("WebGL Support", webGLSupport);
+      if (!webGLSupport.webgl) {
+        toast.error('WebGL is not supported on your device', { duration: 10000 });
+      }
 
-    if (!webGLSupport.webgl) {
-      toast.error('WebGL is not supported on your device', { duration: 10000 });
-    }
+      if (webGLSupport.webgl && !webGLSupport.performance) {
+        toast.info('Low-performance mode detected. You may consider lowering your graphics settings.', { duration: 10000 });
+      }
+    };
 
-    if (webGLSupport.webgl && !webGLSupport.performance) {
-      toast.info('Low-performance mode detected. You may consider lowering your graphics settings.', { duration: 10000 });
-    }
-  };
+    const handleResize = (e) => {
+      gameContainer.resize();
+    };
 
-  const handleResize = (e) => {
-    gameContainer.resize();
-  };
+    const loadGame = (game: Game) => {
+      gameContainer.setup(game, store.state.settings)
+    };
 
-  const loadGame = (game: Game) => {
-    gameContainer.setupViewport(game)
-    gameContainer.setup(game, store.state.settings)
+    const drawGame = (game: Game, panToUser = true) => {
+      gameContainer.draw()
 
-  };
+      if (panToUser) {
+        eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToUser, {});
+      }
+    };
 
-  const drawGame = (game: Game, panToUser = true) => {
-    gameContainer.draw()
+    const touchPlayer = async () => {
+      try {
+        await GameApiService.touchPlayer(store.state.game!._id)
+      } catch (e) {
+        console.error(e)
+      }
+    };
 
-    if (panToUser) {
-      eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToUser, {});
-    }
-  };
+    const updateGame = (game: Game) => {
+      gameContainer.reloadGame(game, store.state.settings);
+    };
 
-  const touchPlayer = async () => {
-    try {
-      await GameApiService.touchPlayer(store.state.game!._id)
-    } catch (e) {
-      console.error(e)
-    }
-  };
+    const onStarClickedHandler = ({ star }: { star: Star }) => {
+      emit("onStarClicked", star._id);
+    };
 
-  const updateGame = (game: Game) => {
-    gameContainer.reloadGame(game, store.state.settings);
-  };
+    const onStarRightClickedHandler = ({ star }: { star: Star }) => {
+      emit("onStarRightClicked", star._id);
+    };
 
-  const onStarClickedHandler = ({ star }: { star: Star }) => {
-    emit("onStarClicked", star._id);
-  };
+    const onCarrierClickedHandler = ({ carrier }: { carrier: Carrier }) => {
+      emit("onCarrierClicked", carrier._id);
+    };
 
-  const onStarRightClickedHandler = ({ star }: { star: Star }) => {
-    emit("onStarRightClicked", star._id);
-  };
+    const onCarrierRightClickedHandler = ({ carrier }: { carrier: Carrier }) => {
+      emit("onCarrierRightClicked", carrier._id);
+    };
 
-  const onCarrierClickedHandler = ({ carrier }: { carrier: Carrier }) => {
-    emit("onCarrierClicked", carrier._id);
-  };
+    const onWaypointCreatedHandler = ({ waypoint }: { waypoint: TempWaypoint }) => {
+      emit("onWaypointCreated", waypoint);
+    };
 
-  const onCarrierRightClickedHandler = ({ carrier }: { carrier: Carrier }) => {
-    emit("onCarrierRightClicked", carrier._id);
-  };
+    const onObjectsClickedHandler = ({ objects }: { objects: ObjectClicked[] }) => {
+      emit("onObjectsClicked", objects);
+    };
 
-  const onWaypointCreatedHandler = ({ waypoint }: { waypoint: TempWaypoint }) => {
-    emit("onWaypointCreated", waypoint);
-  };
+    watch(computed(() => store.state.game!), (newGame) => updateGame(newGame));
 
-  const onObjectsClickedHandler = ({ objects }: { objects: ObjectClicked[] }) => {
-    emit("onObjectsClicked", objects);
-  };
+    window.addEventListener('resize', handleResize)
 
-  watch(computed(() => store.state.game!), (newGame) => updateGame(newGame));
+    checkPerformance();
 
-  window.addEventListener('resize', handleResize)
-
-  checkPerformance();
-
-  gameContainer.setupApp(store, store.state.settings, (msg) => toast.error(msg), eventBus).then(() => {
     loadGame(game);
 
     const canvas = gameContainer.app!.canvas;
@@ -135,19 +131,19 @@ onMounted(() => {
       polling.value = setInterval(touchPlayer, 60000);
       touchPlayer();
     }
-  });
 
-  onBeforeUnmount(() => {
-    clearInterval(polling.value);
+    onBeforeUnmount(() => {
+      clearInterval(polling.value);
 
-    gameContainer.destroy();
+      gameContainer.destroy();
 
-    eventBus.off(MapEventBusEventNames.MapOnStarClicked, onStarClickedHandler);
-    eventBus.off(MapEventBusEventNames.MapOnStarRightClicked, onStarRightClickedHandler);
-    eventBus.off(MapEventBusEventNames.MapOnCarrierClicked, onCarrierClickedHandler);
-    eventBus.off(MapEventBusEventNames.MapOnCarrierRightClicked, onCarrierRightClickedHandler);
-    eventBus.off(MapEventBusEventNames.MapOnWaypointCreated, onWaypointCreatedHandler);
-    eventBus.off(MapEventBusEventNames.MapOnObjectsClicked, onObjectsClickedHandler);
+      eventBus.off(MapEventBusEventNames.MapOnStarClicked, onStarClickedHandler);
+      eventBus.off(MapEventBusEventNames.MapOnStarRightClicked, onStarRightClickedHandler);
+      eventBus.off(MapEventBusEventNames.MapOnCarrierClicked, onCarrierClickedHandler);
+      eventBus.off(MapEventBusEventNames.MapOnCarrierRightClicked, onCarrierRightClickedHandler);
+      eventBus.off(MapEventBusEventNames.MapOnWaypointCreated, onWaypointCreatedHandler);
+      eventBus.off(MapEventBusEventNames.MapOnObjectsClicked, onObjectsClickedHandler);
+    });
   });
 });
 </script>

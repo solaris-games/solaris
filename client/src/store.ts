@@ -2,7 +2,6 @@ import { createStore } from 'vuex';
 import { type Axios } from 'axios';
 import { type EventBus } from './eventBus';
 import MenuEventBusEventNames from './eventBusEventNames/menu';
-import GameContainer from './game/container.js';
 import GameMutationNames from './mutationNames/gameMutationNames';
 import PlayerMutationNames from './mutationNames/playerMutationNames';
 import ApiAuthService from "./services/api/auth.js";

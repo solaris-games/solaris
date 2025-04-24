@@ -9,8 +9,6 @@
 
 <script>
 import starService from '../../../../services/api/star'
-import GameHelper from '../../../../services/gameHelper'
-//import GameContainer from '../../../../game/container'
 
 export default {
   components: {

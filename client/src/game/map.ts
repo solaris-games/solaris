@@ -21,7 +21,6 @@ import Carrier from "./carrier";
 import type { EventBus } from '../eventBus'
 import MapEventBusEventNames from '../eventBusEventNames/map'
 import MapCommandEventBusEventNames from "../eventBusEventNames/mapCommand";
-import globalGameContainer from './container';
 
 export enum ModeKind {
   Galaxy = 'galaxy',
@@ -834,7 +833,7 @@ export class Map {
     } else if (this.mode.mode === ModeKind.Ruler) {
       this.rulerPoints!.onStarClicked(e)
     }
-    AnimationService.drawSelectedCircle(globalGameContainer.app!, this.container, e.location)
+    AnimationService.drawSelectedCircle(this.gameContainer.app!, this.container, e.location)
   }
 
   onStarDefaultClicked (dic) {
@@ -899,7 +898,7 @@ export class Map {
       this.rulerPoints!.onCarrierClicked(e)
     }
 
-    AnimationService.drawSelectedCircle(globalGameContainer.app!, this.container, e.location)
+    AnimationService.drawSelectedCircle(this.gameContainer.app!, this.container, e.location)
   }
 
   onCarrierRightClicked (e) {

@@ -80,7 +80,6 @@ import { inject } from 'vue';
 import MenuTitle from '../MenuTitle.vue'
 import FormErrorList from '../../../components/FormErrorList.vue'
 import GameHelper from '../../../../services/gameHelper'
-import GameContainer from '../../../../game/container'
 import CarrierApiService from '../../../../services/api/carrier'
 import AudioService from '../../../../game/audio'
 import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning.vue'

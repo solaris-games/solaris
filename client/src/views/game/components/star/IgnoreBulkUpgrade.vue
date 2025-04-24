@@ -36,7 +36,6 @@
 <script>
 import starService from '../../../../services/api/star'
 import GameHelper from '../../../../services/gameHelper'
-import GameContainer from '../../../../game/container'
 import { inject } from 'vue';
 import {eventBusInjectionKey} from "@/eventBus";
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
