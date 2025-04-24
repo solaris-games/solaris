@@ -4,7 +4,7 @@ import gameHelper from '../services/gameHelper.js'
 import textureService from './texture'
 import type {Store} from "vuex";
 import type {State} from "../store";
-import {Application, isWebGLSupported} from "pixi.js";
+import {Application, isWebGLSupported, Ticker} from "pixi.js";
 import type {Location, UserGameSettings} from "@solaris-common";
 import type {Game, Star, Carrier} from "../types/game";
 import { DebugTools } from './debugTools';
@@ -265,13 +265,13 @@ export class GameContainer {
     return (this.viewport!.screenWidth / viewportWidth) * 100
   }
 
-  onTick (ticker) {
+  onTick (ticker: Ticker) {
     if (this.map) {
       this.map.onTick(ticker.deltaTime)
     }
   }
 
-  onViewportZoomed (e) {
+  onViewportZoomed () {
     const zoomPercent = this.getViewportZoomPercentage()
 
     this.map!.refreshZoom(zoomPercent)
