@@ -24,7 +24,8 @@ export class DrawingContext {
   }
 }
 
-export const createGameContainer = async (store: Store<State>, userSettings: UserGameSettings, reportGameError: ((err: string) => void), eventBus: EventBus) => {
+export const createGameContainer = async (store: Store<State>, reportGameError: ((err: string) => void), eventBus: EventBus) => {
+  const userSettings = store.state.userSettings;
   const antialiasing = userSettings.map.antiAliasing === 'enabled';
 
   const options = {
@@ -57,7 +58,7 @@ export class GameContainer {
   starFieldTop: number = 0;
   starFieldBottom: number = 0;
   userSettings: UserGameSettings;
-  game: Game | undefined;
+  game: Game;
   debugTools: DebugTools | undefined;
   eventBus: EventBus;
   unsubscribe: (() => void) | undefined;
@@ -98,6 +99,14 @@ export class GameContainer {
     this.viewport.addChild(this.map.container)
 
     this.subscribe();
+
+    this.game = store.state.game!;
+    this._setupViewport();
+    this.map!.setup(this.game!, userSettings)
+
+    if (userSettings?.technical?.performanceMonitor === 'enabled') {
+      this.debugTools = new DebugTools(this.app!, this.map!);
+    }
   }
 
   checkPerformance(): { webgl: boolean, performance: boolean } {
@@ -169,9 +178,8 @@ export class GameContainer {
     this.viewport!.zoomPercent(-0.3, true)
   }
 
-  setupViewport (game: Game) {
-    this.game = game
-
+  _setupViewport () {
+    const game = this.game;
     this.starFieldLeft = gameHelper.calculateMinStarX(game) - 1500
     this.starFieldRight = gameHelper.calculateMaxStarX(game) + 1500
     this.starFieldTop = gameHelper.calculateMinStarY(game) - 750
@@ -200,19 +208,6 @@ export class GameContainer {
 
     this.viewport!.on('zoomed-end', this.onViewportZoomed.bind(this))
     this.viewport!.on('pointerdown', this.map!.onViewportPointerDown.bind(this.map))
-  }
-
-  setup (game: Game, userSettings: UserGameSettings) {
-    this.game = game;
-    this.userSettings = userSettings;
-
-    this.setupViewport(game);
-
-    this.map!.setup(this.game!, userSettings)
-
-    if (userSettings?.technical?.performanceMonitor === 'enabled') {
-      this.debugTools = new DebugTools(this.app!, this.map!);
-    }
   }
 
   draw () {

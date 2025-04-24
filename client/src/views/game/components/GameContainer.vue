@@ -36,9 +36,7 @@ const polling = ref(0);
 const el: Ref<HTMLElement | null> = ref(null);
 
 onMounted(() => {
-  const game = store.state.game!;
-
-  createGameContainer(store, store.state.settings, (msg) => toast.error(msg), eventBus).then((gameContainer) => {
+  createGameContainer(store, (msg) => toast.error(msg), eventBus).then((gameContainer) => {
     const checkPerformance = () => {
       const webGLSupport = gameContainer.checkPerformance();
 
@@ -57,16 +55,9 @@ onMounted(() => {
       gameContainer.resize();
     };
 
-    const loadGame = (game: Game) => {
-      gameContainer.setup(game, store.state.settings)
-    };
-
-    const drawGame = (game: Game, panToUser = true) => {
+    const drawGame = () => {
       gameContainer.draw()
-
-      if (panToUser) {
-        eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToUser, {});
-      }
+      eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToUser, {});
     };
 
     const touchPlayer = async () => {
@@ -113,11 +104,9 @@ onMounted(() => {
 
     checkPerformance();
 
-    loadGame(game);
-
     const canvas = gameContainer.app!.canvas;
     el.value?.appendChild(canvas);
-    drawGame(game);
+    drawGame();
 
     const gameRoot = document.getElementById("gameRoot"); // Defined in Game component
     attachEventDeduplication(gameRoot, canvas);
