@@ -25,7 +25,7 @@ export class DrawingContext {
 }
 
 export const createGameContainer = async (store: Store<State>, reportGameError: ((err: string) => void), eventBus: EventBus) => {
-  const userSettings = store.state.userSettings;
+  const userSettings = store.state.settings;
   const antialiasing = userSettings.map.antiAliasing === 'enabled';
 
   const options = {
