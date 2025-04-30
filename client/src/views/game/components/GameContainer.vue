@@ -62,7 +62,9 @@ onMounted(() => {
 
     const touchPlayer = async () => {
       try {
-        await GameApiService.touchPlayer(store.state.game!._id)
+        if (store.state.game && store.state.userId) {
+          await GameApiService.touchPlayer(store.state.game!._id);
+        }
       } catch (e) {
         console.error(e)
       }
