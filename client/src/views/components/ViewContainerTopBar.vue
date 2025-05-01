@@ -71,7 +71,7 @@ export default {
 
       await authService.logout()
 
-      this.$store.commit('clearUserId')
+      this.$store.commit('clearUser')
       this.$store.commit('clearUsername')
       this.$store.commit('clearRoles')
       this.$store.commit('clearUserCredits')

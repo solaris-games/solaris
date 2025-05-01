@@ -13,9 +13,11 @@
 </template>
 
 <script>
-import gameContainer from '../../../../game/container'
+import { inject } from 'vue';
 import PlayerIconVue from '../player/PlayerIcon.vue'
 import SpecialistIcon from '../specialist/SpecialistIcon.vue'
+import {eventBusInjectionKey} from "@/eventBus";
+import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 
 export default {
   components: {
@@ -24,6 +26,11 @@ export default {
   },
   props: {
     ship: Object
+  },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
   },
   methods: {
     clickShip (e) {
@@ -34,7 +41,7 @@ export default {
       }
     },
     goToShip (e) {
-      gameContainer.map.panToLocation(this.ship.location)
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToLocation, { location: this.ship.location });
     }
   }
 }

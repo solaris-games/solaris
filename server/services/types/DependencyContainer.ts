@@ -61,7 +61,6 @@ import PlayerReadyService from "../playerReady";
 import PlayerStatisticsService from "../playerStatistics";
 import RandomService from "../random";
 import RatingService from "../rating";
-import RecaptchaService from "../recaptcha";
 import ReportService from "../report";
 import ReputationService from "../reputation";
 import ResearchService from "../research";
@@ -89,6 +88,8 @@ import UserLeaderboardService from "../userLeaderboard";
 import UserLevelService from "../userLevel";
 import WaypointService from "../waypoint";
 import StarCaptureService from "../starCapture";
+import {UserServerSocketEmitter} from "../../sockets/socketEmitters/user";
+import {UserServerSocketHandler} from "../../sockets/socketHandlers/user";
 
 export interface DependencyContainer {
     config: Config,
@@ -101,6 +102,7 @@ export interface DependencyContainer {
     gameServerSocketEmitter: GameServerSocketEmitter,
     playerServerSocketEmitter: PlayerServerSocketEmitter,
     diplomacyServerSocketEmitter: DiplomacyServerSocketEmitter,
+    userServerSocketEmitter: UserServerSocketEmitter,
     carrierService: CarrierService,
     combatService: CombatService,
     distanceService: DistanceService,
@@ -111,6 +113,7 @@ export interface DependencyContainer {
     gameService: GameService,
     serverHandler: ServerHandler,
     playerServerSocketHandler: PlayerServerSocketHandler,
+    userServerSocketHandler: UserServerSocketHandler,
     gameAuthService: GameAuthService,
     gameLockService: GameLockService,
     gameJoinService: GameJoinService,
@@ -153,7 +156,6 @@ export interface DependencyContainer {
     battleRoyaleService: BattleRoyaleService,
     starMovementService: StarMovementService,
     cacheService: CacheService,
-    recaptchaService: RecaptchaService,
     ratingService: RatingService,
     diplomacyService: DiplomacyService,
     avatarService: AvatarService,

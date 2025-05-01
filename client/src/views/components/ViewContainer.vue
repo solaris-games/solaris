@@ -1,8 +1,6 @@
 <template>
-<!--  id="content" class="app-content" -->
 <div id="content">
-    <view-container-top-bar v-if="!hideTopBar"/>
-    <!-- <logo></logo> -->
+    <view-container-top-bar v-if="!props.hideTopBar"/>
     <div class="container pb-3 col-xs-12 col-sm-10 col-md-10 col-lg-6">
         <slot></slot>
         <footer class="mt-3">
@@ -36,25 +34,29 @@
 </div>
 </template>
 
-<script>
-import LogoVue from './Logo.vue'
-import ViewContainerTopBarVue from './ViewContainerTopBar.vue'
+<script setup lang="ts">
+import ViewContainerTopBar from './ViewContainerTopBar.vue'
+import {withMessages} from "../../util/messages";
+import { useStore, type Store } from 'vuex';
+import { onMounted } from 'vue';
+import type {State} from "@/store";
 
-export default {
-  props: {
-    isAuthPage: Boolean,
-    hideTopBar: Boolean
-  },
-  components: {
-    'logo': LogoVue,
-    'view-container-top-bar': ViewContainerTopBarVue
-  },
-  async mounted() {
-    if (this.isAuthPage && !this.$store.state.userId) {
-      await this.$store.dispatch('verify')
-    }
-  }
+const props = defineProps<{
+  isAuthPage: boolean,
+  hideTopBar?: boolean
+}>();
+
+const store: Store<State> = useStore();
+
+if (props.isAuthPage) {
+  withMessages();
 }
+
+onMounted(() => {
+  if (props.isAuthPage && !store.state.userId) {
+    store.dispatch('verify');
+  }
+});
 </script>
 
 <style scoped>

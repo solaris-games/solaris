@@ -20,6 +20,9 @@ import { createSolarisStore, type State } from './store'
 import { httpInjectionKey } from "./services/typedapi"
 import {createHttpClient} from "./util/http";
 import {toastInjectionKey} from "./util/keys";
+import {UserClientSocketHandler} from "./sockets/socketHandlers/user";
+import {UserClientSocketEmitter} from "@/sockets/socketEmitters/user";
+import {userClientSocketEmitterInjectionKey} from "@/sockets/socketEmitters/user";
 
 // Note: This was done to get around an issue where the Steam client
 // had bootstrap as undefined. This also affects the UI template we're using,
@@ -64,19 +67,23 @@ const eventBus: EventBus = new ClientEventBus();
 
 const httpClient = createHttpClient();
 
-const store: Store<State> = createSolarisStore(eventBus, httpClient);
+const socket: Socket = io(socketUrl, { withCredentials: true });
+
+const playerClientSocketEmitter: PlayerClientSocketEmitter = new PlayerClientSocketEmitter(socket);
+const userClientSocketEmitter: UserClientSocketEmitter = new UserClientSocketEmitter(socket);
+
+const store: Store<State> = createSolarisStore(eventBus, httpClient, userClientSocketEmitter);
 
 app.use(store);
 
 app.use(ToastPlugin);
 
-const socket: Socket = io(socketUrl, { withCredentials: true });
-
 const diplomacyClientSocketHandler: DiplomacyClientSocketHandler = new DiplomacyClientSocketHandler(socket, eventBus);
 const gameClientSocketHandler: GameClientSocketHandler = new GameClientSocketHandler(socket, store, app.config.globalProperties.$toast, eventBus);
 const playerClientSocketHandler: PlayerClientSocketHandler = new PlayerClientSocketHandler(socket, store, eventBus);
-const playerClientSocketEmitter: PlayerClientSocketEmitter = new PlayerClientSocketEmitter(socket);
+const userClientSocketHandler: UserClientSocketHandler = new UserClientSocketHandler(socket, store, eventBus);
 
+app.provide(userClientSocketEmitterInjectionKey, userClientSocketEmitter);
 app.provide(playerClientSocketEmitterInjectionKey, playerClientSocketEmitter);
 app.provide(eventBusInjectionKey, eventBus);
 
@@ -84,7 +91,7 @@ app.provide(httpInjectionKey, httpClient);
 
 app.provide(toastInjectionKey, app.config.globalProperties.$toast);
 
-const clientHandler: ClientHandler = new ClientHandler(socket, store, playerClientSocketEmitter);
+const clientHandler: ClientHandler = new ClientHandler(socket, store, playerClientSocketEmitter, userClientSocketEmitter);
 
 app.config.globalProperties.$confirm = async function(title, text, confirmText = 'Yes', cancelText = 'No', hideCancelButton = false, cover = false) {
   return this.$store.dispatch('confirm', {

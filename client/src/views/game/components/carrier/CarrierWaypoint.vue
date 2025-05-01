@@ -83,12 +83,16 @@
 </template>
 
 <script>
+import { inject } from 'vue';
 import MenuTitle from '../MenuTitle.vue'
 import GameHelper from '../../../../services/gameHelper'
 import GameContainer from '../../../../game/container'
-  import CarrierApiService from '../../../../services/api/carrier'
-  import AudioService from '../../../../game/audio'
+import CarrierApiService from '../../../../services/api/carrier'
+import AudioService from '../../../../game/audio'
 import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning.vue'
+import {eventBusInjectionKey} from "../../../../eventBus";
+import MapCommandEventBusEventNames from "../../../../eventBusEventNames/mapCommand";
+import gameHelper from "../../../../services/gameHelper";
 
 export default {
   components: {
@@ -98,6 +102,11 @@ export default {
   props: {
     carrierId: String,
     waypoint: Object
+  },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
   },
   data () {
     return {
@@ -127,7 +136,7 @@ export default {
     }
   },
   unmounted () {
-    GameContainer.map.clearHighlightedLocations()
+    this.eventBus.emit(MapCommandEventBusEventNames.MapCommandClearHighlightedLocations, {});
   },
   methods: {
     onCloseRequested (e) {
@@ -209,12 +218,12 @@ export default {
       this.panToWaypoint()
     },
     panToWaypoint () {
-      GameContainer.map.clearHighlightedLocations()
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandClearHighlightedLocations, {});
 
-      let star = this.$store.state.game.galaxy.stars.find(x => x._id === this.currentWaypoint.destination)
+      const star = gameHelper.getStarById(this.$store.state.game, this.currentWaypoint.destination);
 
-      GameContainer.panToStar(star)
-      GameContainer.map.highlightLocation(star.location)
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: star });
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandHighlightLocation, { location: star.location });
     },
     toggleLooped () {
       this.carrier.waypointsLooped = !this.carrier.waypointsLooped
@@ -223,7 +232,7 @@ export default {
       // Push the waypoints to the API.
       try {
         this.isSavingWaypoints = true
-        let response = await CarrierApiService.saveWaypoints(this.$store.state.game._id, this.carrier._id, this.waypoints, this.carrier.waypointsLooped)
+        const response = await CarrierApiService.saveWaypoints(this.$store.state.game._id, this.carrier._id, this.waypoints, this.carrier.waypointsLooped)
 
         if (response.status === 200) {
           AudioService.join()
@@ -250,7 +259,7 @@ export default {
     },
     recalculateWaypointDuration () {
       if (this.currentWaypoint) {
-        let timeRemainingEtaDate = GameHelper.calculateTimeByTicks(this.currentWaypoint.ticks + +this.currentWaypoint.delayTicks, this.$store.state.game.settings.gameTime.speed, null)
+        const timeRemainingEtaDate = GameHelper.calculateTimeByTicks(this.currentWaypoint.ticks + +this.currentWaypoint.delayTicks, this.$store.state.game.settings.gameTime.speed, null)
         this.waypointDuration = GameHelper.getCountdownTimeString(this.$store.state.game, timeRemainingEtaDate, true)
       }
 

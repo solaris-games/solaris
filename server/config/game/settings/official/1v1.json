@@ -64,8 +64,8 @@
     "startingCreditsSpecialists": 5,
     "startingShips": 10,
     "startingInfrastructure": {
-      "economy": 10,
-      "industry": 10,
+      "economy": 5,
+      "industry": 5,
       "science": 2
     },
     "developmentCost": {
@@ -94,7 +94,7 @@
     "startingTechnologyLevel": {
       "terraforming": 1,
       "experimentation": 0,
-      "scanning": 1,
+      "scanning": 2,
       "hyperspace": 1,
       "manufacturing": 1,
       "banking": 1,

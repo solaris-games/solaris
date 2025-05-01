@@ -42,9 +42,10 @@ import ColourOverrideDialog from "./components/player/ColourOverrideDialog.vue";
 import { eventBusInjectionKey } from '../../eventBus'
 import { inject } from 'vue';
 import { playerClientSocketEmitterInjectionKey } from '../../sockets/socketEmitters/player'
-import PlayerEventBusEventNames from '../../eventBusEventNames/player'
 import GameEventBusEventNames from '../../eventBusEventNames/game'
 import router from '../../router'
+import {withMessages} from "../../util/messages";
+import {userClientSocketEmitterInjectionKey} from "@/sockets/socketEmitters/user";
 
 export default {
   components: {
@@ -56,9 +57,12 @@ export default {
     'colour-override-dialog': ColourOverrideDialog,
   },
   setup() {
+    withMessages();
+
     return {
       eventBus: inject(eventBusInjectionKey),
-      playerClientSocketEmitter: inject(playerClientSocketEmitterInjectionKey)
+      playerClientSocketEmitter: inject(playerClientSocketEmitterInjectionKey),
+      userClientSockerEmitter: inject(userClientSocketEmitterInjectionKey),
     }
   },
   data () {
@@ -83,7 +87,9 @@ export default {
 
     // AudioService.download()
 
-    let player = GameHelper.getUserPlayer(this.$store.state.game)
+    const player = GameHelper.getUserPlayer(this.$store.state.game)
+
+    this.userClientSockerEmitter.emitJoined();
 
     this.playerClientSocketEmitter.emitGameRoomJoined({
       gameId: this.$store.state.game._id,
@@ -118,18 +124,15 @@ export default {
   beforeUnmount () {
     clearInterval(this.polling)
   },
-  mounted () {
-    this.subscribeToEvents();
-  },
   unmounted () {
-    this.unsubscribeFromEvents()
-
-    let player = GameHelper.getUserPlayer(this.$store.state.game)
+    const player = GameHelper.getUserPlayer(this.$store.state.game)
 
     this.playerClientSocketEmitter.emitGameRoomLeft({
       gameId: this.$store.state.game._id,
       playerId: player?._id
     });
+
+    this.$store.commit('clearGame');
 
     document.title = 'Solaris'
   },
@@ -256,39 +259,6 @@ export default {
       AudioService.open()
     },
 
-    // --------------------
-    // events
-    subscribeToEvents () {
-      this.eventBus.on(PlayerEventBusEventNames.GameMessageSent, (data) => this.onMessageReceived(data))
-    },
-    unsubscribeFromEvents () {
-      this.eventBus.off(PlayerEventBusEventNames.GameMessageSent);
-    },
-    onMessageReceived (e) {
-      if (window.innerWidth >= 992) { // Don't do this if the window is too large as it gets handled elsewhere
-        return
-      }
-
-      let conversationId = e.conversationId
-
-      // Show a toast only if the user isn't already in the conversation.
-      if (this.menuState === MENU_STATES.CONVERSATION && this.menuArguments === conversationId) {
-        return
-      }
-
-
-      this.$toast.info(`New message from ${e.fromPlayerAlias}.`, {
-        duration: 10000,
-        onClick: () => {
-          this.$store.commit('setMenuState', {
-            state: MENU_STATES.CONVERSATION,
-            args: conversationId
-          })
-        }
-      })
-
-      AudioService.join()
-    },
     async reloadGameCheck () {
       if (!this.isLoggedIn || this.ticking) {
         return

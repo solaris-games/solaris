@@ -19,13 +19,6 @@ const config: Config = {
         port: process.env.SMTP_PORT,
         from: process.env.SMTP_FROM
     },
-    google: {
-        recaptcha: {
-            enabled: process.env.GOOGLE_RECAPTCHA_ENABLED == "true",
-            siteKey: process.env.GOOGLE_RECAPTCHA_SITE_KEY,
-            secretKey: process.env.GOOGLE_RECAPTCHA_SECRET_KEY
-        }
-    },
     paypal: {
         environment: process.env.PAYPAL_ENVIRONMENT || 'sandbox',
         clientId: process.env.PAYPAL_CLIENT_ID,

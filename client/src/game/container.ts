@@ -9,6 +9,7 @@ import type {UserGameSettings} from "@solaris-common";
 import type {Game, Player, Star, Carrier} from "../types/game";
 import { screenshot } from './screenshot';
 import { DebugTools } from './debugTools';
+import type { EventBus } from '../eventBus';
 
 export class DrawingContext {
   store: Store<State>;
@@ -35,11 +36,11 @@ export class GameContainer {
   userSettings: UserGameSettings | undefined;
   game: Game | undefined;
   debugTools: DebugTools | undefined;
+  eventBus: EventBus | undefined;
 
   reportGameError: ((err: string) => void) | undefined;
 
   constructor () {
-
   }
 
   checkPerformance(): { webgl: boolean, performance: boolean } {
@@ -59,8 +60,9 @@ export class GameContainer {
     }
   }
 
-  async setupApp (store, userSettings, reportGameError) {
+  async setupApp (store, userSettings, reportGameError, eventBus: EventBus) {
     this.store = store
+    this.eventBus = eventBus;
     this.reportGameError = reportGameError;
 
     this.context = new DrawingContext(store)
@@ -108,11 +110,18 @@ export class GameContainer {
     this.app!.stage.addChild(this.viewport)
 
     // Add a new map to the viewport
-    this.map = new Map(this.app, this.store, this, this.context!)
+    this.map = new Map(this.app, this.store, this, this.context!, eventBus);
     this.viewport.addChild(this.map.container)
   }
 
   destroy () {
+    console.warn('Destroying game container')
+
+    if (this.map) {
+      this.map.destroy();
+      this.map = undefined;
+    }
+
     if (this.viewport) {
       this.viewport.destroy()
       this.viewport = undefined
@@ -186,7 +195,7 @@ export class GameContainer {
     this.viewport!.on('pointerdown', this.map!.onViewportPointerDown.bind(this.map))
   }
 
-  setup (game: Game, userSettings: UserGameSettings, context: DrawingContext) {
+  setup (game: Game, userSettings: UserGameSettings) {
     this.game = game;
     this.userSettings = userSettings
 
@@ -234,12 +243,12 @@ export class GameContainer {
   }
 
   reloadStar (star) {
-    let starObject = this.map!.setupStar(this.game, this.userSettings, star)
+    const starObject = this.map!.setupStar(this.game!, this.userSettings!, star)
     this.map!.drawStar(starObject)
   }
 
   reloadCarrier (carrier) {
-    let carrierObject = this.map!.setupCarrier(this.game, this.userSettings, carrier)
+    const carrierObject = this.map!.setupCarrier(this.game, this.userSettings, carrier)
     this.map!.drawCarrier(carrierObject)
   }
 
@@ -248,7 +257,7 @@ export class GameContainer {
   }
 
   getViewportZoomPercentage () {
-    let viewportWidth = this.viewport!.right - this.viewport!.left
+    const viewportWidth = this.viewport!.right - this.viewport!.left
     return (this.viewport!.screenWidth / viewportWidth) * 100
   }
 
@@ -300,6 +309,14 @@ export class GameContainer {
 
   panToCarrier(carrier: Carrier) {
     this.map!.panToCarrier(carrier);
+  }
+
+  fitGalaxy(x, y) {
+    console.log(this)
+
+    this.viewport!.moveCenter(x, y)
+    this.viewport!.fitWorld()
+    this.viewport!.zoom(this.starFieldRight, true)
   }
 }
 

@@ -179,10 +179,12 @@ import FormErrorList from '../../../components/FormErrorList.vue'
 import starService from '../../../../services/api/star'
 import GameHelper from '../../../../services/gameHelper'
 import AudioService from '../../../../game/audio'
-import GameContainer from '../../../../game/container'
+import { inject } from 'vue';
 import BulkInfrastructureUpgradeScheduleTable from './BulkInfrastructureUpgradeScheduleTable.vue'
 import BulkInfrastructureUpgradeStarTableVue from './BulkInfrastructureUpgradeStarTable.vue'
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
+import {eventBusInjectionKey} from "@/eventBus";
+import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 
 export default {
   components: {
@@ -191,6 +193,11 @@ export default {
     'scheduled-table': BulkInfrastructureUpgradeScheduleTable,
     'star-table': BulkInfrastructureUpgradeStarTableVue,
     'loading-spinner': LoadingSpinner
+  },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
   },
   data() {
     return {
@@ -215,7 +222,7 @@ export default {
     }
   },
   mounted() {
-    GameContainer.map.showIgnoreBulkUpgrade()
+    this.eventBus.emit(MapCommandEventBusEventNames.MapCommandShowIgnoreBulkUpgrade, {});
 
     this.amount = GameHelper.getUserPlayer(this.$store.state.game).credits
 
@@ -224,7 +231,7 @@ export default {
     this.setupInfrastructureTypes()
   },
   unmounted() {
-    GameContainer.map.hideIgnoreBulkUpgrade()
+    this.eventBus.emit(MapCommandEventBusEventNames.MapCommandHideIgnoreBulkUpgrade, {});
   },
   computed: {
     checkText() {
@@ -276,9 +283,9 @@ export default {
       this.actionCount = GameHelper.getUserPlayer(this.$store.state.game)?.scheduledActions?.length || 0;
     },
     panToStar(starId) {
-      let star = this.getStar(starId)
+      const star = this.getStar(starId)
 
-      GameContainer.map.panToStar(star)
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: star });
     },
     gameIsFinished() {
       return GameHelper.isGameFinished(this.$store.state.game)

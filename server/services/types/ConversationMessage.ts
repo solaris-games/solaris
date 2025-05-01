@@ -16,4 +16,6 @@ export interface ConversationMessage {
 export interface ConversationMessageSentResult extends ConversationMessage {
     conversationId: DBObjectId;
     toPlayerIds: DBObjectId[];
+    gameId: DBObjectId;
+    gameName: string;
 };

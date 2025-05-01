@@ -1,7 +1,7 @@
 <template>
 <div class="menu-page">
   <div class="container">
-    <menu-title title="Options" @onCloseRequested="onCloseRequested" @onTitleClicked="onTitleClicked"/>
+    <menu-title title="Game Options" @onCloseRequested="onCloseRequested" @onTitleClicked="onTitleClicked"/>
 
     <options-form v-if="showErrorsCounter < 3" @onOptionsSaved="onCloseRequested" :isInGame="true"/>
 

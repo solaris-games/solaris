@@ -72,7 +72,6 @@ import KEYBOARD_SHORTCUTS from '../../../../services/data/keyboardShortcuts'
 import GameContainer from '../../../../game/container'
 import ServerConnectionStatusVue from './ServerConnectionStatus.vue'
 import ResearchProgressVue from './ResearchProgress.vue'
-import AudioService from '../../../../game/audio'
 import ConversationApiService from '../../../../services/api/conversation'
 import EventApiService from '../../../../services/api/event'
 import HamburgerMenuVue from './HamburgerMenu.vue'
@@ -83,6 +82,8 @@ import { eventBusInjectionKey } from '../../../../eventBus'
 import { inject } from 'vue'
 import GameEventBusEventNames from '../../../../eventBusEventNames/game'
 import PlayerEventBusEventNames from '../../../../eventBusEventNames/player'
+import UserEventBusEventNames from "../../../../eventBusEventNames/user";
+import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 
 export default {
   components: {
@@ -118,7 +119,7 @@ export default {
     await this.checkForUnreadEvents()
 
     this.eventBus.on(GameEventBusEventNames.GameStarted, this.gameStarted);
-    this.eventBus.on(PlayerEventBusEventNames.GameMessageSent, this.checkForUnreadMessages);
+    this.eventBus.on(UserEventBusEventNames.GameMessageSent, this.checkForUnreadMessages);
     this.eventBus.on(PlayerEventBusEventNames.GameConversationRead, this.checkForUnreadMessages);
     this.eventBus.on(PlayerEventBusEventNames.PlayerEventRead, this.checkForUnreadEvents);
     this.eventBus.on(PlayerEventBusEventNames.PlayerAllEventsRead, this.checkForUnreadEvents);
@@ -132,7 +133,7 @@ export default {
     clearInterval(this.intervalFunction)
 
     this.eventBus.off(GameEventBusEventNames.GameStarted, this.gameStarted);
-    this.eventBus.off(PlayerEventBusEventNames.GameMessageSent, this.checkForUnreadMessages);
+    this.eventBus.off(UserEventBusEventNames.GameMessageSent, this.checkForUnreadMessages);
     this.eventBus.off(PlayerEventBusEventNames.GameConversationRead, this.checkForUnreadMessages);
     this.eventBus.off(PlayerEventBusEventNames.PlayerEventRead, this.checkForUnreadEvents);
     this.eventBus.off(PlayerEventBusEventNames.PlayerAllEventsRead, this.checkForUnreadEvents);
@@ -212,7 +213,7 @@ export default {
       GameContainer.zoomOut()
     },
     panToHomeStar () {
-      GameContainer.map.panToUser(this.$store.state.game)
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToUser, {});
 
       if (this.userPlayer) {
         this.$emit('onOpenPlayerDetailRequested', this.userPlayer._id)

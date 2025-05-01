@@ -6,6 +6,7 @@ import GameContainer from './game/container.js';
 import GameMutationNames from './mutationNames/gameMutationNames';
 import PlayerMutationNames from './mutationNames/playerMutationNames';
 import ApiAuthService from "./services/api/auth.js";
+import ApiUserService from "./services/api/user.js";
 import ColourService from './services/api/colour.js';
 import SpecialistService from './services/api/specialist.js';
 import GameHelper from './services/gameHelper.js';
@@ -14,6 +15,7 @@ import type { Store } from 'vuex/types/index.js';
 import type {Badge} from "@solaris-common";
 import {getBadges} from "./services/typedapi/badge";
 import {isError} from "./services/typedapi";
+import type {UserClientSocketEmitter} from "@/sockets/socketEmitters/user";
 
 export type MentionCallbacks = {
   player: (p: Player) => void;
@@ -22,6 +24,7 @@ export type MentionCallbacks = {
 
 export type State = {
   userId: string | null;
+  user: any;
   game: Game | null;
   tick: number;
   cachedConversationComposeMessages: Record<string, string>;
@@ -50,7 +53,7 @@ export type State = {
   badges: Badge[];
 }
 
-export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store<State> {
+export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userClientSocketEmitter: UserClientSocketEmitter): Store<State> {
   return createStore<State>({
   state: {
     userId: null,
@@ -140,8 +143,9 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store
     setUserId (state: State, userId) {
       state.userId = userId
     },
-    clearUserId (state) {
-      state.userId = null
+    clearUser (state) {
+      state.userId = null;
+      state.user = null;
     },
 
     setUsername (state: State, username) {
@@ -149,6 +153,10 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store
     },
     clearUsername (state) {
       state.username = null
+    },
+
+    setUser (state: State, user) {
+      state.user = user;
     },
 
     setRoles (state: State, roles) {
@@ -597,9 +605,9 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store
 
       GameContainer.reloadGame(state.game, state.settings);
     },
-    async verify({ commit }) {
+    async verify({ commit, state }) {
       try {
-        const response = await ApiAuthService.verify()
+        const response = await ApiAuthService.verify();
 
         if (response.status === 200) {
           if (response.data._id) {
@@ -607,6 +615,17 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store
             commit('setUsername', response.data.username)
             commit('setRoles', response.data.roles)
             commit('setUserCredits', response.data.credits)
+
+            if (!state.user || state.user?._id !== response.data._id) {
+              const resp2 = await ApiUserService.getMyUserInfo();
+              if (resp2.status === 200) {
+                commit('setUser', resp2.data);
+              } else {
+                console.error('Failed to get user info', resp2);
+              }
+            }
+
+            userClientSocketEmitter.emitJoined();
             return true;
           }
         }
