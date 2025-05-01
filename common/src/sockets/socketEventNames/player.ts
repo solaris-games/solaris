@@ -1,11 +1,10 @@
-import { type ConversationMessageSentResult } from "../../api/types/common/conversationMessage";
 import { LedgerType } from "../../api/types/common/ledger";
 import { makeCastFunc } from "../../utilities/cast";
 import { type TradeEventTechnology } from "../../api/types/common/trade";
-import { type SocketEventName } from "./socketEventName";
+import { type EventName } from "../../events";
 
 export type PlayerSocketEventType = { playerSocketEventType: 'playerSocketEventType' };
-export type PlayerSocketEventName<TData> = SocketEventName<PlayerSocketEventType, TData> & { playerSocketEventName: 'playerSocketEventName' }
+export type PlayerSocketEventName<TData> = EventName<PlayerSocketEventType, TData> & { playerSocketEventName: 'playerSocketEventName' }
 
 const toEventName: <TData>(value: string) => PlayerSocketEventName<TData> = makeCastFunc();
 

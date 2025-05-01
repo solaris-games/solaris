@@ -1,14 +1,13 @@
-import { type SocketEventName } from "solaris-common";
-import { SocketHandler } from "solaris-common";
+import {type EventName, Handler} from "solaris-common";
 import { ServerHandler } from "./serverHandler";
 
-export abstract class ServerSocketHandler<TSocketEventType> extends SocketHandler<TSocketEventType> {
+export abstract class ServerSocketHandler<TEventType> extends Handler<TEventType> {
     constructor(private serverHandler: ServerHandler) {
         super();
-        this.socketEventType;
+        this.eventType;
     }
 
-    protected override on<TSocketEventName extends SocketEventName<TSocketEventType, TData>, TData>(event: TSocketEventName, listener: (e: TData) => void) {
+    protected override on<TEventName extends EventName<TEventType, TData>, TData>(event: TEventName, listener: (e: TData) => void) {
         const eventName = event as string;
 
         this.serverHandler.register(eventName, listener);
