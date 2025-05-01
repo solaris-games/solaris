@@ -19,11 +19,10 @@ export default (container: DependencyContainer) => {
             }
         },
         create: async (req, res, next) => {
-            let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-            let recaptchaEnabled = container.recaptchaService.isEnabled();
-    
+            const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
             try {
-                const reqObj = mapToUserCreateUserRequest(req.body, recaptchaEnabled);
+                const reqObj = mapToUserCreateUserRequest(req.body);
 
                 const email = reqObj.email.toLowerCase();
     
@@ -41,18 +40,7 @@ export default (container: DependencyContainer) => {
                     throw new ValidationError('An account with this username already exists');
                 }
     
-                // Before we create a new account, verify that the user is not a robot.
-                if (recaptchaEnabled) {
-                    try {
-                        let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-    
-                        await container.recaptchaService.verify(ip, reqObj.recaptchaToken!);
-                    } catch (err) {
-                        throw new ValidationError(['Recaptcha is invalid']);
-                    }
-                }
-    
-                let userId = await container.userService.create(email, username, reqObj.password, ip);
+                const userId = await container.userService.create(email, username, reqObj.password, ip);
     
                 res.status(201).json({ id: userId });
                 return next();
@@ -62,7 +50,7 @@ export default (container: DependencyContainer) => {
         },
         getSettings: async (req, res, next) => {
             try {
-                let settings = await container.userService.getGameSettings(req.session.userId);
+                const settings = await container.userService.getGameSettings(req.session.userId);
     
                 res.status(200).json(settings);
                 return next();
