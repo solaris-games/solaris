@@ -27,3 +27,6 @@ export * from "./sockets/socketEmitter";
 export * from "./api/controllers";
 export * from "./api/controllers/admin";
 export * from "./api/controllers/badge";
+export * from "./events/index";
+export * from "./events/handler";
+export * from "./events/emitter";
