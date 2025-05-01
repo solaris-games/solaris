@@ -62,7 +62,6 @@ import GuildService from './guild';
 import GuildUserService from './guildUser';
 import StarMovementService from './starMovement';
 import CacheService from './cache';
-import RecaptchaService from './recaptcha';
 import RatingService from './rating';
 import DiplomacyService from './diplomacy';
 import AvatarService from './avatar';
@@ -154,7 +153,6 @@ export default (config: Config,
     const sessionService = new SessionService(userRepository);
     const userService = new UserService(UserModel, userRepository, passwordService, sessionService);
     const adminService = new AdminService(userRepository, gameRepository, sessionService);
-    const recaptchaService = new RecaptchaService(config);
     const specialStarBanService = new SpecialStarBanService();
 
     const guildService = new GuildService(GuildModel, guildRepository, userRepository, userService, sessionService);
@@ -324,7 +322,6 @@ export default (config: Config,
         battleRoyaleService,
         starMovementService,
         cacheService,
-        recaptchaService,
         ratingService,
         diplomacyService,
         avatarService,

@@ -49,7 +49,6 @@
     "pino-pretty": "^11.3.0",
     "qheap": "^1.4.0",
     "random-seed": "^0.3.0",
-    "recaptcha-v2": "^0.1.3",
     "simplex-noise": "^4.0.1",
     "socket.io": "4.8.1"
   },
