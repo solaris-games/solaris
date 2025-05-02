@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js'
 import GameHelper from '../services/gameHelper'
 import WaypointHelper from '../services/waypointHelper'
 import {EventEmitter} from "./eventEmitter.js";
-import type { Game, Carrier as CarrierData } from '../types/game';
+import type {Game, Carrier as CarrierData} from '../types/game';
 import type { DrawingContext } from './container';
 import type { TempWaypoint } from '../types/waypoint';
 
@@ -29,7 +29,7 @@ class Waypoints extends EventEmitter {
     this.container.removeChildren()
   }
 
-  draw (carrier, plotting=true) {
+  draw (carrier: CarrierData, plotting=true) {
     this.clear()
 
     this.carrier = carrier
@@ -199,7 +199,7 @@ class Waypoints extends EventEmitter {
 
     this.carrier!.waypoints.push(newWaypoint as any)
 
-    this.draw(this.carrier)
+    this.draw(this.carrier!)
 
     this.emit('onWaypointCreated', newWaypoint)
   }

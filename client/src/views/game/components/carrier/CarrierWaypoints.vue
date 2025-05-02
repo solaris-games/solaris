@@ -80,12 +80,14 @@ import { inject } from 'vue';
 import MenuTitle from '../MenuTitle.vue'
 import FormErrorList from '../../../components/FormErrorList.vue'
 import GameHelper from '../../../../services/gameHelper'
-import GameContainer from '../../../../game/container'
 import CarrierApiService from '../../../../services/api/carrier'
 import AudioService from '../../../../game/audio'
 import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning.vue'
 import {eventBusInjectionKey} from "../../../../eventBus";
 import MapEventBusEventNames from "@/eventBusEventNames/map";
+import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
+import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
+import {ModeKind} from "@/game/map";
 
 export default {
   components: {
@@ -125,7 +127,10 @@ export default {
     this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
     this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
 
-    GameContainer.setMode('waypoints', this.carrier)
+    this.eventBus.emit(MapCommandEventBusEventNames.MapCommandSetMode, {
+      mode: ModeKind.Waypoints,
+      carrier: this.carrier,
+    });
 
     this.waypointCreatedHandler = this.onWaypointCreated.bind(this);
     this.eventBus.on(MapEventBusEventNames.MapOnWaypointCreated, this.waypointCreatedHandler);
@@ -141,9 +146,9 @@ export default {
   unmounted () {
     this.carrier.waypoints = this.oldWaypoints
     this.carrier.waypointsLooped = this.oldWaypointsLooped
-    GameContainer.drawWaypoints()
 
-    GameContainer.resetMode()
+    this.eventBus.emit(MapCommandEventBusEventNames.MapCommandUpdateWaypoints, {});
+    this.eventBus.emit(MapCommandEventBusEventNames.MapCommandResetMode, {});
 
     this.eventBus.off('onWaypointCreated', this.waypointCreatedHandler)
     this.eventBus.off('onWaypointOutOfRange', this.waypointOutOfRangeHandler)
@@ -176,7 +181,7 @@ export default {
       if (!GameHelper.isCarrierInTransitToWaypoint(this.carrier, lastWaypoint)) {
         this.carrier.waypoints.splice(this.carrier.waypoints.indexOf(lastWaypoint), 1)
 
-        GameContainer.drawWaypoints()
+        this.eventBus.emit(MapCommandEventBusEventNames.MapCommandUpdateWaypoints, {});
       }
 
       if (!this.carrier.waypoints.length) {
@@ -192,7 +197,7 @@ export default {
       // Remove all waypoints up to the last waypoint (if in transit)
       this.carrier.waypoints = this.carrier.waypoints.filter(w => GameHelper.isCarrierInTransitToWaypoint(this.carrier, w))
 
-      GameContainer.draw()
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandUpdateWaypoints, {});
 
       this.totalEtaTimeString = null
 
@@ -253,7 +258,7 @@ export default {
 
           this.$toast.default(`${this.carrier.name} waypoints updated.`)
 
-          GameContainer.reloadCarrier(this.carrier)
+          this.eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, { carrier: this.carrier });
 
           if (saveAndEdit) {
             if (this.carrier.waypoints.length) {

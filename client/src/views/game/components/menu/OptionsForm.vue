@@ -487,7 +487,9 @@
 import LoadingSpinnerVue from '../../../components/LoadingSpinner.vue'
 import FormErrorList from '../../../components/FormErrorList.vue'
 import UserApiService from '../../../../services/api/user'
-import GameContainer from '../../../../game/container'
+import { inject } from 'vue';
+import {eventBusInjectionKey} from "@/eventBus";
+import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 
 export default {
   components: {
@@ -496,6 +498,11 @@ export default {
   },
   props: {
     isInGame: Boolean
+  },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
   },
   data () {
     return {
@@ -543,7 +550,7 @@ export default {
           this.$store.commit('setSettings', this.settings)
 
           if (this.isInGame) {
-            GameContainer.reloadGame(this.$store.state.game, this.$store.state.settings)
+            this.eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadGame, {});
           }
 
           this.onOptionsSaved()

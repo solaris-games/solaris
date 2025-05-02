@@ -1,9 +1,10 @@
 import type {EventBusEventName} from "./eventBusEventName";
 import {type MapObject, makeCastFunc, type Location} from "@solaris-common";
 import type {Player} from "../types/game";
+import type {Mode} from "@/game/map";
 
 export type MapCommandEventBusEventType = { mapCommandEventBusEventType: 'mapCommandEventBusEventType' };
-export type MapCommandEventBusEventName<TData> = EventBusEventName<MapCommandEventBusEventType, TData> & { mapEventBusEventType: 'mapEventBusEventType' };
+export type MapCommandEventBusEventName<TData> = EventBusEventName<MapCommandEventBusEventType, TData> & { mapCommandEventBusEventType: 'mapCommandEventBusEventType' };
 
 const toEventName: <TData>(value: string) => MapCommandEventBusEventName<TData> = makeCastFunc();
 
@@ -21,4 +22,12 @@ export default class MapCommandEventBusEventNames {
   public static readonly MapCommandRemoveLastRulerPoint: MapCommandEventBusEventName<{}> = toEventName('removeLastRulerPoint');
   public static readonly MapCommandShowIgnoreBulkUpgrade: MapCommandEventBusEventName<{}> = toEventName('showIgnoreBulkUpgrade');
   public static readonly MapCommandHideIgnoreBulkUpgrade: MapCommandEventBusEventName<{}> = toEventName('hideIgnoreBulkUpgrade');
+  public static readonly MapCommandFitGalaxy: MapCommandEventBusEventName<{ location?: Location }> = toEventName('fitGalaxy');
+  public static readonly MapCommandUnselectAllCarriers: MapCommandEventBusEventName<{}> = toEventName('unselectAllCarriers');
+  public static readonly MapCommandUnselectAllStars: MapCommandEventBusEventName<{}> = toEventName('unselectAllStars');
+  public static readonly MapCommandResetMode: MapCommandEventBusEventName<{}> = toEventName('resetMode');
+  public static readonly MapCommandSetMode: MapCommandEventBusEventName<Mode> = toEventName('setMode');
+  public static readonly MapCommandUpdateWaypoints: MapCommandEventBusEventName<{}> = toEventName('updateWaypoints');
+  public static readonly MapCommandZoomIn: MapCommandEventBusEventName<{}> = toEventName('zoomIn');
+  public static readonly MapCommandZoomOut: MapCommandEventBusEventName<{}> = toEventName('zoomOut');
 }

@@ -1,6 +1,6 @@
 import { Logger } from "pino";
 import type { Server, Socket } from "socket.io";
-import { SocketEventName } from "solaris-common";
+import { EventName } from "solaris-common";
 import { EventEmitter } from "stream";
 import ServerSocketEventNames, { ServerSocketEventType } from "../socketEventNames/server";
 
@@ -41,7 +41,7 @@ export class ServerHandler extends EventEmitter {
         this.registeredHandlers.set(event, handler);
     }
 
-    protected socketOn<TSocketEventName extends SocketEventName<ServerSocketEventType, TData>, TData extends unknown>(emitter: EventEmitter, event: TSocketEventName, listener: (e: TData) => void): void {
+    protected socketOn<TSocketEventName extends EventName<ServerSocketEventType, TData>, TData extends unknown>(emitter: EventEmitter, event: TSocketEventName, listener: (e: TData) => void): void {
         emitter.on(event as string, listener);
     }
 }

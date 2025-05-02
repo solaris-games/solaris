@@ -1,15 +1,13 @@
 import type { Socket } from "socket.io-client";
-import { type SocketEventName } from "@solaris-common";
-import { SocketHandler } from "@solaris-common";
+import {type EventName, Handler} from "@solaris-common";
 
-export abstract class ClientSocketHandler<TSocketEventType> extends SocketHandler<TSocketEventType> {
-
+export abstract class ClientSocketHandler<TEventType> extends Handler<TEventType> {
   constructor(private socket: Socket) {
     super();
-    this.socketEventType;
+    this.eventType;
   }
 
-  protected override on<TSocketEventName extends SocketEventName<TSocketEventType, TData>, TData>(event: TSocketEventName, listener: (e: TData) => void) {
+  protected override on<TEventName extends EventName<TEventType, TData>, TData>(event: TEventName, listener: (e: TData) => void) {
     this.socket.on(event as string, listener);
   }
 }

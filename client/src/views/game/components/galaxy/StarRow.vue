@@ -33,7 +33,6 @@
 </template>
 
 <script>
-import gameContainer from '../../../../game/container'
 import AudioService from '../../../../game/audio'
 import gameHelper from '../../../../services/gameHelper'
 import PlayerIconVue from '../player/PlayerIcon.vue'
@@ -42,6 +41,7 @@ import SpecialistIcon from '../specialist/SpecialistIcon.vue'
 import MapCommandEventBusEventNames from "../../../../eventBusEventNames/mapCommand";
 import {eventBusInjectionKey} from "../../../../eventBus";
 import { inject } from 'vue';
+import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 
 export default {
   components: {
@@ -137,7 +137,8 @@ export default {
           this.$toast.default(`Science upgraded at ${this.star.name}.`)
 
           AudioService.hover()
-          gameContainer.reloadStar(this.star)
+
+          this.eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star: this.star });
         }
       } catch (err) {
         console.error(err)
