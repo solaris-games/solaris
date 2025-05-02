@@ -223,7 +223,7 @@ export class GameContainer {
   }
 
   _reloadGame() {
-    this.reloadGame(this.store!.state.game, this.store!.state.userSettings);
+    this.reloadGame(this.store!.state.game, this.store!.state.settings);
   }
 
   reloadGame (game: Game, userSettings: UserGameSettings) {
