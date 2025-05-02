@@ -81,6 +81,8 @@ const printGroupsBeforeCombat = (groups: ResolvedCombatGroup[]) => {
 }
 
 const printCombatResults = (results: CombatGroupResult[]) => {
+    results.sort(sorterByProperty('resultShips'));
+
     for (let result of results) {
         console.log(`Group ${result.identifier} has ${result.resultShips} ships remaining`);
     }
@@ -200,9 +202,11 @@ const turnBasedCombatResolver = (container: DependencyContainer): CombatResolver
     });
 
     const groupsWithLasting = groupsWithIncomingDamage.map(g => {
+        const rounding = g.isDefender ? Math.ceil : Math.floor;
+
         return {
             ...g,
-            lastsRounds: g.ships / g.incomingDamage,
+            lastsRounds: rounding(g.ships / g.incomingDamage),
             damageTaken: 0
         }
     });
