@@ -317,11 +317,7 @@ export default class GameCreateService {
 
         if (this.gameTypeService.isFluxGame(game)) {
             this.gameFluxService.applyCurrentFlux(game);
-        }
 
-        const canApplyBans = isOfficialGame && !isNewPlayerGame && !isTutorial;
-
-        if (canApplyBans) {
             // Apply spec bans if applicable.
             if (game.settings.specialGalaxy.specialistCost !== 'none') {
                 const banAmount = game.constants.specialists.monthlyBanAmount; // Random X specs of each type.
