@@ -5,7 +5,7 @@
     <loading-spinner :loading="isLoading"/>
 
     <div v-if="!isLoading">
-      <view-subtitle v-bind:title="game.settings.general.name" class="mt-2"/>
+      <view-subtitle :title="game.settings.general.name" class="mt-2"/>
 
       <p class="description" v-if="game.settings.general.description">{{game.settings.general.description}}</p>
 
