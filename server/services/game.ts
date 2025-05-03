@@ -284,11 +284,6 @@ export default class GameService extends EventEmitter {
             throw new ValidationError('You do not have permission to force start this game.');
         }
 
-        console.log({
-            kickingUser,
-            playerToKick
-        })
-
         const player = game.galaxy.players.find(p => p._id.toString() === playerToKick.toString());
 
         if (!player) {
@@ -296,7 +291,13 @@ export default class GameService extends EventEmitter {
         }
 
         if (game.state.startDate) {
-            await this.concedeDefeat(game, player, true);
+            // if the player is already defeated, we just want to open the slot
+            if (player.defeated) {
+                player.isOpenSlot = true;
+                await game.save();
+            } else {
+                await this.concedeDefeat(game, player, true);
+            }
         } else {
             await this.quit(game, player);
         }
