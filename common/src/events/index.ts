@@ -1,0 +1,1 @@
+export type EventName<TEventType, TData> = string & { eventType?: TEventType, data?: TData, eventName?: 'eventName' }

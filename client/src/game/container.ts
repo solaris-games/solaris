@@ -4,12 +4,13 @@ import gameHelper from '../services/gameHelper.js'
 import textureService from './texture'
 import type {Store} from "vuex";
 import type {State} from "../store";
-import {Application, isWebGLSupported} from "pixi.js";
-import type {UserGameSettings} from "@solaris-common";
-import type {Game, Player, Star, Carrier} from "../types/game";
-import { screenshot } from './screenshot';
+import {Application, isWebGLSupported, Ticker} from "pixi.js";
+import type {Location, UserGameSettings} from "@solaris-common";
+import type {Game, Star, Carrier} from "../types/game";
 import { DebugTools } from './debugTools';
 import type { EventBus } from '../eventBus';
+import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
+import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 
 export class DrawingContext {
   store: Store<State>;
@@ -23,72 +24,56 @@ export class DrawingContext {
   }
 }
 
+export const createGameContainer = async (store: Store<State>, reportGameError: ((err: string) => void), eventBus: EventBus) => {
+  const userSettings = store.state.settings;
+  const antialiasing = userSettings.map.antiAliasing === 'enabled';
+
+  const options = {
+    width: window.innerWidth, // window.innerWidth,
+    height: window.innerHeight - 45, // window.innerHeight,
+    backgroundColor: 0x000000, // black hexadecimal
+    resolution: window.devicePixelRatio || 1,
+    antialias: antialiasing,
+    autoDensity: true,
+  };
+
+  const app = new Application();
+
+  await app!.init(options);
+
+  await textureService.loadAssets();
+  textureService.initialize();
+
+  return new GameContainer(store, userSettings, reportGameError, eventBus, app);
+}
+
 export class GameContainer {
-  app: Application | null = null;
-  map: Map | undefined;
-  store: Store<State> | undefined;
-  context: DrawingContext | undefined;
-  viewport: Viewport | undefined;
+  app: Application;
+  map: Map;
+  store: Store<State>;
+  context: DrawingContext;
+  viewport: Viewport;
   starFieldLeft: number = 0;
   starFieldRight: number = 0;
   starFieldTop: number = 0;
   starFieldBottom: number = 0;
-  userSettings: UserGameSettings | undefined;
-  game: Game | undefined;
+  userSettings: UserGameSettings;
+  game: Game;
   debugTools: DebugTools | undefined;
-  eventBus: EventBus | undefined;
+  eventBus: EventBus;
+  unsubscribe: (() => void) | undefined;
+  reportGameError: ((err: string) => void);
 
-  reportGameError: ((err: string) => void) | undefined;
-
-  constructor () {
-  }
-
-  checkPerformance(): { webgl: boolean, performance: boolean } {
-    const webgl = isWebGLSupported(false);
-    const performance = isWebGLSupported(true);
-
-    if (!webgl) {
-      return {
-        webgl,
-        performance: false
-      };
-    } else {
-      return {
-        webgl,
-        performance
-      };
-    }
-  }
-
-  async setupApp (store, userSettings, reportGameError, eventBus: EventBus) {
-    this.store = store
+  constructor (store: Store<State>, userSettings: UserGameSettings, reportGameError: ((err: string) => void), eventBus: EventBus, app: Application) {
+    this.store = store;
     this.eventBus = eventBus;
     this.reportGameError = reportGameError;
+    this.context = new DrawingContext(store);
+    this.app = app;
+    this.userSettings = userSettings;
 
-    this.context = new DrawingContext(store)
-
-    // Cleanup if the app already exists.
-    this.destroy()
-
-    let antialiasing = userSettings.map.antiAliasing === 'enabled';
-
-    this.app = new Application();
-
-    const options = {
-      width: window.innerWidth, // window.innerWidth,
-      height: window.innerHeight - 45, // window.innerHeight,
-      backgroundColor: 0x000000, // black hexadecimal
-      resolution: window.devicePixelRatio || 1,
-      antialias: antialiasing,
-      autoDensity: true,
-    };
-
-    await this.app!.init(options);
     this.app!.ticker.add(this.onTick.bind(this))
     this.app!.ticker.maxFPS = 0
-
-    await textureService.loadAssets();
-    textureService.initialize()
 
     // create viewport
     this.viewport = new Viewport({
@@ -112,54 +97,89 @@ export class GameContainer {
     // Add a new map to the viewport
     this.map = new Map(this.app, this.store, this, this.context!, eventBus);
     this.viewport.addChild(this.map.container)
+
+    this.subscribe();
+
+    this.game = store.state.game!;
+    this._setupViewport();
+    this.map!.setup(this.game!, userSettings)
+
+    if (userSettings?.technical?.performanceMonitor === 'enabled') {
+      this.debugTools = new DebugTools(this.app!, this.map!);
+    }
+  }
+
+  checkPerformance(): { webgl: boolean, performance: boolean } {
+    const webgl = isWebGLSupported(false);
+    const performance = isWebGLSupported(true);
+
+    if (!webgl) {
+      return {
+        webgl,
+        performance: false
+      };
+    } else {
+      return {
+        webgl,
+        performance
+      };
+    }
+  }
+
+  subscribe () {
+    const onGameReload = () => this._reloadGame();
+    const onStarReload = ({ star }: { star: Star }) => this._reloadStar(star);
+    const onCarrierReload = ({ carrier }: { carrier: Carrier }) => this._reloadCarrier(carrier);
+    const onCarrierRemove = ({ carrier }: { carrier: Carrier }) => this._undrawCarrier(carrier);
+    const onFitGalaxy = ({ location }: { location?: Location }) => this._fitGalaxy(location?.x, location?.y);
+    const zoomIn = () => this._zoomIn();
+    const zoomOut = () => this._zoomOut();
+
+    this.eventBus!.on(GameCommandEventBusEventNames.GameCommandReloadGame, onGameReload);
+    this.eventBus!.on(GameCommandEventBusEventNames.GameCommandReloadStar, onStarReload);
+    this.eventBus!.on(GameCommandEventBusEventNames.GameCommandReloadCarrier, onCarrierReload);
+    this.eventBus!.on(GameCommandEventBusEventNames.GameCommandRemoveCarrier, onCarrierRemove);
+    this.eventBus!.on(MapCommandEventBusEventNames.MapCommandFitGalaxy, onFitGalaxy);
+    this.eventBus!.on(MapCommandEventBusEventNames.MapCommandZoomIn, zoomIn);
+    this.eventBus!.on(MapCommandEventBusEventNames.MapCommandZoomOut, zoomOut);
+
+
+    this.unsubscribe = () => {
+      this.eventBus!.off(GameCommandEventBusEventNames.GameCommandReloadGame, onGameReload);
+      this.eventBus!.off(GameCommandEventBusEventNames.GameCommandReloadStar, onStarReload);
+      this.eventBus!.off(GameCommandEventBusEventNames.GameCommandReloadCarrier, onCarrierReload);
+      this.eventBus!.off(GameCommandEventBusEventNames.GameCommandRemoveCarrier, onCarrierRemove);
+      this.eventBus!.off(MapCommandEventBusEventNames.MapCommandFitGalaxy, onFitGalaxy);
+      this.eventBus!.off(MapCommandEventBusEventNames.MapCommandZoomIn, zoomIn);
+      this.eventBus!.off(MapCommandEventBusEventNames.MapCommandZoomOut, zoomOut);
+    }
   }
 
   destroy () {
     console.warn('Destroying game container')
 
-    if (this.viewport) {
-      this.viewport.destroy()
-      this.viewport = undefined
+    if (this.unsubscribe) {
+      this.unsubscribe();
+      this.unsubscribe = undefined;
     }
 
-    // Cleanup if the app already exists.
-    if (this.app) {
-      this.app.destroy(false, {
-        children: true
-      })
-
-      this.app = null
-    }
+    this.map.destroy();
+    this.viewport.destroy();
+    this.app.destroy(false, {
+      children: true
+    });
   }
 
-  downloadMap () {
-    this.map!.unselectAllCarriers()
-    this.map!.unselectAllStars()
-    this.map!.clearWaypoints()
-    this.map!.clearRulerPoints()
-
-    screenshot(this, this.game!, this.reportGameError!);
-  }
-
-  unselectAllCarriers () {
-    this.map!.unselectAllCarriers()
-  }
-
-  unselectAllStars () {
-    this.map!.unselectAllStars()
-  }
-
-  zoomIn () {
+  _zoomIn () {
     this.viewport!.zoomPercent(0.5, true)
   }
 
-  zoomOut () {
+  _zoomOut () {
     this.viewport!.zoomPercent(-0.3, true)
   }
 
-  setupViewport (game: Game) {
-    this.game = game
-
+  _setupViewport () {
+    const game = this.game;
     this.starFieldLeft = gameHelper.calculateMinStarX(game) - 1500
     this.starFieldRight = gameHelper.calculateMaxStarX(game) + 1500
     this.starFieldTop = gameHelper.calculateMinStarY(game) - 750
@@ -190,18 +210,6 @@ export class GameContainer {
     this.viewport!.on('pointerdown', this.map!.onViewportPointerDown.bind(this.map))
   }
 
-  setup (game: Game, userSettings: UserGameSettings) {
-    this.game = game;
-    this.userSettings = userSettings
-
-    this.map!.setup(this.game!, userSettings)
-
-
-    if (userSettings?.technical?.performanceMonitor === 'enabled') {
-      this.debugTools = new DebugTools(this.app!, this.map!);
-    }
-  }
-
   draw () {
     this.map!.draw()
 
@@ -214,8 +222,8 @@ export class GameContainer {
     }
   }
 
-  drawWaypoints () {
-    this.map!.drawWaypoints()
+  _reloadGame() {
+    this.reloadGame(this.store!.state.game, this.store!.state.settings);
   }
 
   reloadGame (game: Game, userSettings: UserGameSettings) {
@@ -233,21 +241,17 @@ export class GameContainer {
     this.map!.reloadGame(game, userSettings)
   }
 
-  reloadTerritories () {
-    this.map!.drawTerritories(this.userSettings!)
-  }
-
-  reloadStar (star) {
+  _reloadStar (star: Star) {
     const starObject = this.map!.setupStar(this.game!, this.userSettings!, star)
     this.map!.drawStar(starObject)
   }
 
-  reloadCarrier (carrier) {
+  _reloadCarrier (carrier: Carrier) {
     const carrierObject = this.map!.setupCarrier(this.game, this.userSettings, carrier)
     this.map!.drawCarrier(carrierObject)
   }
 
-  undrawCarrier (carrier) {
+  _undrawCarrier (carrier: Carrier) {
     this.map!.undrawCarrier(carrier)
   }
 
@@ -256,24 +260,16 @@ export class GameContainer {
     return (this.viewport!.screenWidth / viewportWidth) * 100
   }
 
-  onTick (ticker) {
+  onTick (ticker: Ticker) {
     if (this.map) {
       this.map.onTick(ticker.deltaTime)
     }
   }
 
-  onViewportZoomed (e) {
+  onViewportZoomed () {
     const zoomPercent = this.getViewportZoomPercentage()
 
     this.map!.refreshZoom(zoomPercent)
-  }
-
-  setMode (mode, args) {
-    this.map!.setMode(mode, args)
-  }
-
-  resetMode () {
-    this.map!.resetMode()
   }
 
   resize () {
@@ -294,25 +290,12 @@ export class GameContainer {
     )
   }
 
-  panToPlayer(game: Game, player: Player) {
-    this.map!.panToPlayer(game, player);
-  }
-
-  panToStar(star: Star) {
-    this.map!.panToStar(star);
-  }
-
-  panToCarrier(carrier: Carrier) {
-    this.map!.panToCarrier(carrier);
-  }
-
-  fitGalaxy(x, y) {
-    console.log(this)
+  _fitGalaxy(x: number | undefined, y: number | undefined) {
+    x = x || 0;
+    y = y || 0;
 
     this.viewport!.moveCenter(x, y)
     this.viewport!.fitWorld()
     this.viewport!.zoom(this.starFieldRight, true)
   }
 }
-
-export default new GameContainer()

@@ -69,7 +69,6 @@ import GameHelper from '../../../../services/gameHelper'
 import router from '../../../../router'
 import MENU_STATES from '../../../../services/data/menuStates'
 import KEYBOARD_SHORTCUTS from '../../../../services/data/keyboardShortcuts'
-import GameContainer from '../../../../game/container'
 import ServerConnectionStatusVue from './ServerConnectionStatus.vue'
 import ResearchProgressVue from './ResearchProgress.vue'
 import ConversationApiService from '../../../../services/api/conversation'
@@ -199,18 +198,13 @@ export default {
       this.setMenuState(this.MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)
     },
     fitGalaxy () {
-      const galaxyCenterX = gameHelper.calculateGalaxyCenterX(this.$store.state.game)
-      const galaxyCenterY = gameHelper.calculateGalaxyCenterY(this.$store.state.game)
-
-      GameContainer.viewport.moveCenter(galaxyCenterX, galaxyCenterY)
-      GameContainer.viewport.fitWorld()
-      GameContainer.viewport.zoom(GameContainer.starFieldRight, true)
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandFitGalaxy, {});
     },
     zoomIn () {
-      GameContainer.zoomIn()
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandZoomIn, {});
     },
     zoomOut () {
-      GameContainer.zoomOut()
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandZoomOut, {});
     },
     panToHomeStar () {
       this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToUser, {});
@@ -227,7 +221,7 @@ export default {
       if (GameHelper.isGamePendingStart(this.$store.state.game)) {
         this.timeRemaining = GameHelper.getCountdownTimeString(this.$store.state.game, this.$store.state.game.state.startDate)
       } else {
-        let ticksToProduction = GameHelper.getTicksToProduction(this.$store.state.game, this.$store.state.tick, this.$store.state.productionTick)
+        const ticksToProduction = GameHelper.getTicksToProduction(this.$store.state.game, this.$store.state.tick, this.$store.state.productionTick)
 
         this.timeRemaining = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, ticksToProduction)
       }
@@ -321,10 +315,10 @@ export default {
           this.fitGalaxy()
           break
         case 'ZOOM_IN':
-          GameContainer.zoomIn()
+          this.eventBus.emit(MapCommandEventBusEventNames.MapCommandZoomIn, {});
           break
         case 'ZOOM_OUT':
-          GameContainer.zoomOut()
+          this.eventBus.emit(MapCommandEventBusEventNames.MapCommandZoomOut, {});
           break
         default:
           this.setMenuState(menuState, menuArguments || null)

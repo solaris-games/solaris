@@ -30,7 +30,6 @@
 import MenuTitle from '../MenuTitle.vue'
 import CarrierApiService from '../../../../services/api/carrier'
 import gameHelper from '../../../../services/gameHelper'
-import GameContainer from '../../../../game/container'
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {eventBusInjectionKey} from "@/eventBus";
 import { inject } from 'vue';
@@ -67,7 +66,7 @@ export default {
   },
   methods: {
     onCloseRequested (e) {
-      GameContainer.unselectAllCarriers()
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandUnselectAllCarriers, {});
 
       this.$emit('onCloseRequested', e)
     },

@@ -36,7 +36,9 @@
 <script>
 import starService from '../../../../services/api/star'
 import GameHelper from '../../../../services/gameHelper'
-import GameContainer from '../../../../game/container'
+import { inject } from 'vue';
+import {eventBusInjectionKey} from "@/eventBus";
+import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 
 export default {
   components: {
@@ -46,13 +48,18 @@ export default {
     starId: String,
     highlightIgnoredInfrastructure: String
   },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
+  },
   methods: {
     triggerChanged () {
       this.$emit("bulkIgnoreChanged", {
         starId: this.starId
       });
       const star = GameHelper.getStarById(this.$store.state.game, this.starId);
-      GameContainer.reloadStar(star);
+      this.eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
     },
     async toggleBulkIgnore (infrastructureType) {
       try {

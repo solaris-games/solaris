@@ -176,12 +176,12 @@
 <script>
 import { inject } from 'vue';
 import MenuTitleVue from '../MenuTitle.vue'
-import GameContainer from '../../../../game/container'
 import GameHelper from '../../../../services/gameHelper'
 import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning.vue'
 import {eventBusInjectionKey} from "../../../../eventBus";
 import MapEventBusEventNames from "@/eventBusEventNames/map";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
+import {ModeKind} from "@/game/map";
 
 export default {
   components: {
@@ -221,7 +221,9 @@ export default {
     this.eventBus.on(MapEventBusEventNames.MapOnRulerPointsCleared, this.onRulerPointsCleared);
 
     // Set map to ruler mode
-    GameContainer.setMode('ruler')
+    this.eventBus.emit(MapCommandEventBusEventNames.MapCommandSetMode, {
+      mode: ModeKind.Ruler,
+    });
   },
   unmounted () {
     this.eventBus.off(MapEventBusEventNames.MapOnRulerPointCreated, this.onRulerPointCreated);
@@ -229,7 +231,7 @@ export default {
     this.eventBus.off(MapEventBusEventNames.MapOnRulerPointsCleared, this.onRulerPointsCleared);
 
     // Set map to galaxy mode
-    GameContainer.resetMode()
+    this.eventBus.emit(MapCommandEventBusEventNames.MapCommandResetMode, {});
   },
   methods: {
     onCloseRequested (e) {
@@ -240,8 +242,10 @@ export default {
     },
     resetRulerPoints () {
       // Bit hacky but it works.
-      GameContainer.resetMode()
-      GameContainer.setMode('ruler')
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandResetMode, {});
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandSetMode, {
+        mode: ModeKind.Ruler,
+      });
     },
     onRulerPointCreated ({ rulerPoint: e }) {
       this.points.push(e)

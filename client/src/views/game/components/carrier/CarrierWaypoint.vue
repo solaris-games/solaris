@@ -86,13 +86,13 @@
 import { inject } from 'vue';
 import MenuTitle from '../MenuTitle.vue'
 import GameHelper from '../../../../services/gameHelper'
-import GameContainer from '../../../../game/container'
 import CarrierApiService from '../../../../services/api/carrier'
 import AudioService from '../../../../game/audio'
 import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning.vue'
 import {eventBusInjectionKey} from "../../../../eventBus";
 import MapCommandEventBusEventNames from "../../../../eventBusEventNames/mapCommand";
 import gameHelper from "../../../../services/gameHelper";
+import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 
 export default {
   components: {
@@ -243,7 +243,7 @@ export default {
 
           this.$toast.default(`${this.carrier.name} waypoints updated.`)
 
-          GameContainer.reloadCarrier(this.carrier);
+          this.eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, { carrier: this.carrier });
 
           if (saveAndEdit) {
             this.$emit('onOpenCarrierDetailRequested', this.carrier._id)

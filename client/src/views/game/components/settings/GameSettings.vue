@@ -705,7 +705,6 @@ export default {
         'exponential': 'Exponential',
         'winner': 'Winner',
         'top_n': 'Top N',
-        'random': 'Random',
         'current_research': 'Current Research',
       }[option]
 

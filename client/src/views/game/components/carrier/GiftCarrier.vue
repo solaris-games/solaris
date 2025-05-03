@@ -19,11 +19,18 @@
 <script>
 import GameHelper from '../../../../services/gameHelper'
 import CarrierApiService from '../../../../services/api/carrier'
-import GameContainer from '../../../../game/container'
+import { inject } from 'vue';
+import {eventBusInjectionKey} from "@/eventBus";
+import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 
 export default {
   props: {
     carrierId: String
+  },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
   },
   data () {
     return {
@@ -64,7 +71,7 @@ export default {
             this.carrier.waypoints = [firstWaypoint];
           }
 
-          GameContainer.reloadCarrier(this.carrier)
+          this.eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, { carrier: this.carrier });
 
           this.$toast.default(`${this.carrier.name} has been converted into a gift.`)
         }

@@ -65,14 +65,6 @@
               </label>
             </div>
 
-            <div class="mb-2" v-if="recaptchaEnabled">
-              <recaptcha
-                :sitekey="recaptchaSiteKey"
-                @verify="onRecaptchaVerify"
-                @expired="onRecaptchaExpired">
-              </recaptcha>
-            </div>
-
             <div class="mb-2">
               <div class="row">
                 <div class="col-6">
@@ -102,7 +94,6 @@
 </template>
 
 <script>
-import { VueRecaptcha } from 'vue-recaptcha'
 import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
 import ViewContainer from '../components/ViewContainer.vue'
 import router from '../../router'
@@ -117,7 +108,6 @@ export default {
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'form-error-list': FormErrorList,
-    'recaptcha': VueRecaptcha,
     'parallax': ParallaxVue
   },
   data() {
@@ -128,17 +118,10 @@ export default {
       username: null,
       password: null,
       passwordConfirm: null,
-      recaptchaToken: null,
       privacyPolicyAccepted: false
     }
   },
   methods: {
-    onRecaptchaVerify(e) {
-      this.recaptchaToken = e
-    },
-    onRecaptchaExpired(e) {
-      this.recaptchaToken = null
-    },
     async handleSubmit(e) {
       this.errors = []
 
@@ -162,10 +145,6 @@ export default {
         this.errors.push('Passwords must match.')
       }
 
-      if (this.recaptchaEnabled && !this.recaptchaToken) {
-        this.errors.push('Please complete the Recaptcha')
-      }
-
       if (!this.privacyPolicyAccepted) {
         this.errors.push('Privacy policy must be accepted.')
       }
@@ -178,7 +157,7 @@ export default {
         this.isLoading = true
 
         // Call the account create API endpoint
-        let response = await userService.createUser(this.email, this.username, this.password, this.recaptchaToken)
+        const response = await userService.createUser(this.email, this.username, this.password)
 
         if (response.status === 201) {
           this.$toast.success(`Welcome ${this.username}! You can now log in and play Solaris.`)
@@ -190,14 +169,6 @@ export default {
       }
 
       this.isLoading = false
-    }
-  },
-  computed: {
-    recaptchaEnabled() {
-      return import.meta.env.VUE_APP_GOOGLE_RECAPTCHA_ENABLED === 'true'
-    },
-    recaptchaSiteKey() {
-      return import.meta.env.VUE_APP_GOOGLE_RECAPTCHA_SITE_KEY
     }
   }
 }

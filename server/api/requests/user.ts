@@ -5,10 +5,9 @@ export interface UserCreateUserRequest {
     email: string;
     username: string;
     password: string;
-    recaptchaToken?: string | null;
 };
 
-export const mapToUserCreateUserRequest = (body: any, recaptchaEnabled: boolean): UserCreateUserRequest => {
+export const mapToUserCreateUserRequest = (body: any): UserCreateUserRequest => {
     let errors: string[] = [];
 
     if (!keyHasStringValue(body, 'email')) {
@@ -23,10 +22,6 @@ export const mapToUserCreateUserRequest = (body: any, recaptchaEnabled: boolean)
         errors.push('Password is required.');
     }
 
-    if (recaptchaEnabled && !keyHasStringValue(body, 'recaptchaToken')) {
-        errors.push('Recaptcha Token is required');
-    }
-
     if (errors.length) {
         throw new ValidationError(errors);
     }
@@ -35,7 +30,6 @@ export const mapToUserCreateUserRequest = (body: any, recaptchaEnabled: boolean)
         email: body.email,
         username: body.username,
         password: body.password,
-        recaptchaToken: body.recaptchaToken
     }
 };
 

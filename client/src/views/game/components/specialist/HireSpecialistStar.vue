@@ -48,10 +48,12 @@
 
 <script>
 import MenuTitleVue from '../MenuTitle.vue'
-import GameContainer from '../../../../game/container'
 import GameHelper from '../../../../services/gameHelper'
 import SpecialistApiService from '../../../../services/api/specialist'
 import SpecialistIconVue from '../specialist/SpecialistIcon.vue'
+import { inject } from 'vue';
+import {eventBusInjectionKey} from "@/eventBus";
+import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 
 export default {
   components: {
@@ -60,6 +62,11 @@ export default {
   },
   props: {
       starId: String
+  },
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
   },
   data () {
     return {
@@ -111,7 +118,7 @@ export default {
                 this.userPlayer.stats.totalStarSpecialists++
                 this.userPlayer.stats.totalSpecialists++
 
-                GameContainer.reloadStar(this.star)
+                this.eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star: this.star });
               }
 
               this.$toast.default(`${specialist.name} has been hired for the star ${this.star.name}.`)
