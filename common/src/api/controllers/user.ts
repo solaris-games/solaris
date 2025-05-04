@@ -2,6 +2,8 @@ import {GetRoute, PostRoute} from "./index";
 import {LeaderboardUser} from "../types/common/leaderboard";
 import {UserGameSettings} from "../types/common/settings";
 import {UserSubscriptions} from "../types/common/subscriptions";
+import {UserSelf} from "../types/common/user";
+import {UserAvatar} from "../types/common/avatar";
 
 export type UserLeaderboard = {
     totalPlayers: number,
@@ -22,4 +24,8 @@ export const createUserRoutes = <ID>() => ({
     getSubscriptions: new GetRoute<{}, UserSubscriptions>("/api/user/subscriptions"),
     saveSubscriptions: new PostRoute<{}, UserSubscriptions, {}>("/api/user/subscriptions"),
     getCredits: new GetRoute<{}, { credits: number }>("/api/user/credits"),
+    detailMe: new GetRoute<{}, UserSelf<ID>>("/api/user/"),
+    listMyAvatars: new GetRoute<{}, { avatars: UserAvatar[] }>("/api/user/avatars"),
+    purchaseAvatar: new PostRoute<{ avatarId: number }, {}, {}>("/api/user/avatars/:avatarId/purchase"),
+    detail: new GetRoute<{}, UserSelf<ID>>("/api/user/:id"),
 })
