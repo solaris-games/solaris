@@ -54,10 +54,6 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             controller.purchaseAvatar
     );
 
-    router.get('/api/user/:id',
-            controller.detail
-    );
-
     router.get('/api/user/achievements/:id',
             controller.getAchievements
     );

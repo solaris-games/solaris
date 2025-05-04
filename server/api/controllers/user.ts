@@ -140,16 +140,6 @@ export default (container: DependencyContainer) => {
                 return next(err);
             }
         },
-        detail: async (req, res, next) => {
-            try {
-                let user = await container.userService.getInfoByIdLean(req.params.id);
-    
-                res.status(200).json(user);
-                return next();
-            } catch (err) {
-                return next(err);
-            }
-        },
         getAchievements: async (req, res, next) => {
             try {
                 let achievements = await container.achievementService.getAchievements(req.params.id);
