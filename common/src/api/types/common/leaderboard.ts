@@ -1,5 +1,6 @@
 import type { Player } from "./player";
 import type { Team } from "./game";
+import {UserRoles} from "./user";
 
 export interface PlayerStatistics {
     totalStars: number;
@@ -37,3 +38,24 @@ export interface LeaderboardTeam<ID> {
     starCount: number;
     capitalCount: number;
 }
+
+export interface LeaderboardUser<ID> {
+    _id: ID,
+    username: string;
+    position: number;
+    guildId: ID;
+    roles: UserRoles;
+    achievements: {
+        victories: number,
+        rank: number,
+        renown: number,
+        eloRating: number,
+        level: number,
+        victories1v1: number,
+    };
+    guild: {
+        _id: ID;
+        name: string;
+        tag: string;
+    }
+};
