@@ -1,6 +1,6 @@
 import type { Player } from "./player";
 import type { Team } from "./game";
-import {UserRoles} from "./user";
+import type {UserRoles} from "./user";
 
 export interface PlayerStatistics {
     totalStars: number;

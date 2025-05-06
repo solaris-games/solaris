@@ -1,5 +1,5 @@
-import {UserGameSettings} from "./settings";
-import {UserSubscriptions} from "./subscriptions";
+import {type UserGameSettings} from "./settings";
+import {type UserSubscriptions} from "./subscriptions";
 
 export type UserWarning = {
     text: string,

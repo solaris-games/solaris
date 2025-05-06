@@ -1,4 +1,4 @@
-import {GetRoute, PostRoute} from "./index";
+import {GetRoute, PostRoute, DeleteRoute} from "./index";
 import {LeaderboardUser} from "../types/common/leaderboard";
 import {UserGameSettings} from "../types/common/settings";
 import {UserSubscriptions} from "../types/common/subscriptions";
@@ -33,4 +33,13 @@ export const createUserRoutes = <ID>() => ({
     listMyAvatars: new GetRoute<{}, { avatars: UserAvatar[] }>("/api/user/avatars"),
     purchaseAvatar: new PostRoute<{ avatarId: number }, {}, {}>("/api/user/avatars/:avatarId/purchase"),
     getAchievements: new GetRoute<{ id: string }, UserPublic<ID>>("/api/user/achievements/:id"),
+    updateEmailPreference: new PostRoute<{}, { enabled: boolean }, {}>("/api/user/changeEmailPreference"),
+    updateEmailOtherPreference: new PostRoute<{}, { enabled: boolean }, {}>("/api/user/changeEmailOtherPreference"),
+    updateUsername: new PostRoute<{}, { username: string }, {}>("/api/user/changeUsername"),
+    updateEmailAddress: new PostRoute<{}, { email: string }, {}>("/api/user/changeEmailAddress"),
+    updatePassword: new PostRoute<{}, { currentPassword: string, newPassword: string }, {}>("/api/user/changePassword"),
+    requestPasswordReset: new PostRoute<{}, { email: string }, {}>("/api/user/requestResetPassword"),
+    resetPassword: new PostRoute<{}, { token: string, newPassword: string }, {}>("/api/user/resetPassword"),
+    requestUsernameReset: new PostRoute<{}, { email: string }, {}>("/api/user/requestUsername"),
+    deleteUser: new DeleteRoute<{}, {}>("/api/user/closeaccount"),
 })
