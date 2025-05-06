@@ -31,6 +31,8 @@ export type ResponseResult<T> = ResponseResultOk<T> | ResponseResultRequestError
 
 export const isError = <T>(result: ResponseResult<T>) => result.kind !== ResponseResultKind.Ok;
 
+export const isOk = <T>(result: ResponseResult<T>): result is ResponseResultOk<T> => result.kind === ResponseResultKind.Ok;
+
 const PATH_VARIABLE_PATTERN = /:(.\w+)/g;
 
 const BASE_URL = import.meta.env.VUE_APP_API_HOST;

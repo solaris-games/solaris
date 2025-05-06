@@ -5,7 +5,6 @@ import MenuEventBusEventNames from './eventBusEventNames/menu';
 import GameMutationNames from './mutationNames/gameMutationNames';
 import PlayerMutationNames from './mutationNames/playerMutationNames';
 import ApiAuthService from "./services/api/auth.js";
-import ApiUserService from "./services/api/user.js";
 import ColourService from './services/api/colour.js';
 import SpecialistService from './services/api/specialist.js';
 import GameHelper from './services/gameHelper.js';
@@ -13,9 +12,10 @@ import type { Game, Player, Star } from "./types/game";
 import type { Store } from 'vuex/types/index.js';
 import type {Badge} from "@solaris-common";
 import {getBadges} from "./services/typedapi/badge";
-import {isError} from "./services/typedapi";
+import {isOk} from "./services/typedapi";
 import type {UserClientSocketEmitter} from "@/sockets/socketEmitters/user";
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
+import {detailMe} from "@/services/typedapi/user";
 
 export type MentionCallbacks = {
   player: (p: Player) => void;
@@ -617,8 +617,8 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
             commit('setUserCredits', response.data.credits)
 
             if (!state.user || state.user?._id !== response.data._id) {
-              const resp2 = await ApiUserService.getMyUserInfo();
-              if (resp2.status === 200) {
+              const resp2 = await detailMe(httpClient)();
+              if (isOk(resp2)) {
                 commit('setUser', resp2.data);
               } else {
                 console.error('Failed to get user info', resp2);
@@ -642,7 +642,7 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
       }
 
       const response = await getBadges(httpClient)();
-      if (!isError(response)) {
+      if (isOk(response)) {
         commit('setBadges', response.data);
         return response.data;
       }

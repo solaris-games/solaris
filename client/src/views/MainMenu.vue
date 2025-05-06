@@ -1,11 +1,3 @@
-<script setup>
-import home1 from '../assets/screenshots/home-1.png'
-import home2 from '../assets/screenshots/home-2.png'
-import home3 from '../assets/screenshots/home-3.png'
-import home4 from '../assets/screenshots/home-4.png'
-import home5 from '../assets/screenshots/home-5.png'
-</script>
-
 <template>
   <view-container :is-auth-page="true">
     <view-title title="Main Menu" :hideHomeButton="true" :showSocialLinks="true"/>
@@ -129,11 +121,15 @@ import home5 from '../assets/screenshots/home-5.png'
   </view-container>
 </template>
 
-<script>
-import LoadingSpinnerVue from './components/LoadingSpinner.vue'
+<script setup lang="ts">
+import home1 from '../assets/screenshots/home-1.png'
+import home2 from '../assets/screenshots/home-2.png'
+import home3 from '../assets/screenshots/home-3.png'
+import home4 from '../assets/screenshots/home-4.png'
+import home5 from '../assets/screenshots/home-5.png'
+import {ref, onMounted, type Ref, inject} from 'vue';
+import LoadingSpinner from './components/LoadingSpinner.vue'
 import router from '../router'
-import authService from '../services/api/auth'
-import userService from '../services/api/user'
 import ViewContainer from './components/ViewContainer.vue'
 import ViewTitle from './components/ViewTitle.vue'
 import Achievements from './game/components/player/Achievements.vue'
@@ -141,80 +137,44 @@ import TutorialGame from './game/components/menu/TutorialGame.vue'
 import Poll from "./components/Poll.vue";
 import Warnings from "./account/Warnings.vue";
 import AnnouncementsButton from "./components/AnnouncementsButton.vue";
-import { inject } from 'vue';
-import {userClientSocketEmitterInjectionKey} from "@/sockets/socketEmitters/user";
+import {detailMe} from "@/services/typedapi/user";
+import {httpInjectionKey, isOk} from "@/services/typedapi/index";
+import { useStore, type Store } from 'vuex';
+import type {State} from "@/store";
+import type { UserPrivate, UserAchievements } from "@solaris-common";
 
-export default {
-  components: {
-    Warnings,
-    'loading-spinner': LoadingSpinnerVue,
-    'view-container': ViewContainer,
-    'view-title': ViewTitle,
-    'achievements': Achievements,
-    'tutorial-game': TutorialGame,
-    'poll': Poll,
-    'warnings': Warnings,
-    'announcements-button': AnnouncementsButton
-  },
-  setup () {
-    return {
-      userClientSocketEmitter: inject(userClientSocketEmitterInjectionKey),
+const store: Store<State>  = useStore();
+
+const httpClient = inject(httpInjectionKey)!;
+
+const user: Ref<UserPrivate<string> | null> = ref(null);
+const achievements: Ref<UserAchievements<string> | null> = ref(null);
+
+const loadData = async () => {
+  try {
+    const response = await detailMe(httpClient)();
+
+    if (isOk(response)) {
+      user.value = response.data
+      achievements.value = response.data.achievements
+
+      store.commit('setUser', response.data)
+      store.commit('setRoles', response.data.roles)
+      store.commit('setUserCredits', response.data.credits)
+      store.commit('setUserIsEstablishedPlayer', response.data.isEstablishedPlayer)
     }
-  },
-  data () {
-    return {
-      user: null,
-      achievements: null,
-      isLoggingOut: false
-    }
-  },
-  mounted () {
-    this.loadData()
-  },
-  methods: {
-    async logout () {
-      this.isLoggingOut = true
-
-      await authService.logout()
-
-      this.$store.commit('clearUser')
-      this.$store.commit('clearUsername')
-      this.$store.commit('clearRoles')
-      this.$store.commit('clearUserCredits')
-      this.$store.commit('clearUserIsEstablishedPlayer')
-      this.$store.commit('clearIsImpersonating')
-
-      this.isLoggingOut = false
-
-      this.userClientSocketEmitter.emitLeft();
-
-      router.push({ name: 'home' })
-    },
-    async loadData () {
-      try {
-        let response = await userService.getMyUserInfo()
-
-        this.user = response.data
-        this.achievements = response.data.achievements
-
-        this.$store.commit('setUser', response.data)
-        this.$store.commit('setRoles', response.data.roles)
-        this.$store.commit('setUserCredits', response.data.credits)
-        this.$store.commit('setUserIsEstablishedPlayer', response.data.isEstablishedPlayer)
-      } catch (err) {
-        console.error(err)
-      }
-    },
-    routeToPath(path) {
-      router.push(path)
-    }
-  },
-  computed: {
-    documentationUrl () {
-      return import.meta.env.VUE_APP_DOCUMENTATION_URL
-    }
+  } catch (err) {
+    console.error(err)
   }
 }
+
+const routeToPath = (path: string) => {
+  router.push(path)
+}
+
+onMounted(async () => {
+  await loadData();
+});
 </script>
 
 <style scoped>
