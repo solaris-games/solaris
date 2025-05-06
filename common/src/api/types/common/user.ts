@@ -98,10 +98,16 @@ export type UserAchievements<ID> = {
     badges: AwardedBadge<ID>[];
 }
 
-export type UserSelf<ID> = {
+export type UserPublic<ID> = {
     _id: ID,
     username: string;
     guildId: ID | null;
+    roles: UserRoles,
+    level?: UserLevel,
+    achievements: UserAchievements<ID>;
+}
+
+export type UserPrivate<ID> = UserPublic<ID> & {
     email: string;
     emailEnabled: boolean;
     emailOtherEnabled: boolean;
@@ -112,11 +118,8 @@ export type UserSelf<ID> = {
     lastSeenIP: string | null;
     isEstablishedPlayer: boolean;
     hasSentReviewReminder: boolean;
-    roles: UserRoles,
-    level?: UserLevel,
     warnings: UserWarning[];
     lastReadAnnouncement: ID | null;
-    achievements: UserAchievements<ID>;
     gameSettings: UserGameSettings,
     avatars: number[];
     oauth: {
