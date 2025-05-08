@@ -155,13 +155,20 @@ import ViewTitle from '../components/ViewTitle.vue'
 import ViewContainer from '../components/ViewContainer.vue'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
 import ShopApiService from '../../services/api/shop'
-import UserApiService from '../../services/api/user'
+import { getCredits } from '@/services/typedapi/user'
+import { httpInjectionKey, isOk } from '@/services/typedapi'
+import { inject } from 'vue'
 
 export default {
   components: {
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'loading-spinner': LoadingSpinner,
+  },
+  setup () {
+    return {
+      httpClient: inject(httpInjectionKey),
+    };
   },
   data () {
     return {
@@ -177,9 +184,9 @@ export default {
   methods: {
     async loadGalacticCredits () {
       try {
-        let response = await UserApiService.getUserCredits()
+        const response = await getCredits(this.httpClient)();
 
-        if (response.status === 200) {
+        if (isOk(response)) {
             this.userCredits = response.data
 
             this.$store.commit('setUserCredits', response.data.credits)
