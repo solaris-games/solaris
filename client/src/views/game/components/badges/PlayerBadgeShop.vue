@@ -30,11 +30,10 @@ import {ref, onMounted, type Ref, inject} from 'vue';
 import type {Axios} from 'axios';
 import MenuTitle from '../../components/MenuTitle.vue'
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
-import UserApiService from '../../../../services/api/user'
 import GameHelper from '../../../../services/gameHelper'
 import BadgeShopList from './BadgeShopList.vue'
 import type {State} from "../../../../store";
-import {httpInjectionKey, isError} from "../../../../services/typedapi";
+import {httpInjectionKey, isError, isOk} from "../../../../services/typedapi";
 import type {ToastPluginApi} from "vue-toast-notification";
 import {toastInjectionKey} from "../../../../util/keys";
 import type {Badge} from "@solaris-common";
@@ -42,6 +41,8 @@ import type {Player} from "../../../../types/game";
 import {useStore} from 'vuex';
 import type {Store} from 'vuex/types/index.js';
 import {purchaseBadgeForPlayer} from "../../../../services/typedapi/badge";
+import {getCredits} from "../../../../services/typedapi/user";
+
 
 const props = defineProps<{ recipientPlayerId: string }>();
 
@@ -65,9 +66,9 @@ const loadGalacticCredits = async () => {
   isLoading.value = true
 
   try {
-    const response = await UserApiService.getUserCredits()
+    const response = await getCredits(httpClient)();
 
-    if (response.status === 200) {
+    if (isOk(response)) {
       userCredits.value = response.data.credits
 
       store.commit('setUserCredits', response.data)
