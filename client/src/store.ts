@@ -569,34 +569,6 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
         commit('setColoursConfig', resp.data);
       }
     },
-    async confirm ({ commit, state }, data) {
-      // @ts-ignore
-      const modal = new bootstrap.Modal(window.$('#confirmModal'), {})
-      const close = async () => {
-        modal.toggle()
-        await new Promise((resolve, reject) => setTimeout(resolve, 400));
-      }
-      return new Promise((resolve, reject) => {
-        const settings = {
-          confirmText: data.confirmText || 'Yes',
-          cancelText: data.cancelText || 'No',
-          hideCancelButton: Boolean(data.hideCancelButton),
-          cover: Boolean(data.cover),
-          titleText: data.titleText,
-          text: data.text,
-          onConfirm: async () => {
-            await close()
-            resolve(true)
-          },
-          onCancel: async () => {
-            await close()
-            resolve(false)
-          }
-        }
-        commit('setConfirmationDialogSettings', settings)
-        modal.toggle()
-      })
-    },
     async addColourMapping ({ commit, state }, data) {
       console.warn('Adding colour mapping', data);
 
