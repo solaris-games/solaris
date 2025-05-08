@@ -34,7 +34,6 @@ import MENU_STATES from '../../services/data/menuStates'
 import MainBar from './components/menu/MainBar.vue'
 import Chat from './components/inbox/Chat.vue'
 import GameApiService from '../../services/api/game'
-import UserApiService from '../../services/api/user'
 import GameHelper from '../../services/gameHelper'
 import AudioService from '../../game/audio'
 import gameHelper from '../../services/gameHelper'
@@ -46,6 +45,7 @@ import GameEventBusEventNames from '../../eventBusEventNames/game'
 import router from '../../router'
 import {withMessages} from "../../util/messages";
 import {userClientSocketEmitterInjectionKey} from "@/sockets/socketEmitters/user";
+import { httpInjectionKey, isOk } from '@/services/typedapi'
 
 export default {
   components: {
@@ -63,6 +63,7 @@ export default {
       eventBus: inject(eventBusInjectionKey),
       playerClientSocketEmitter: inject(playerClientSocketEmitterInjectionKey),
       userClientSockerEmitter: inject(userClientSocketEmitterInjectionKey),
+      httpClient: inject(httpInjectionKey),
     }
   },
   data () {
@@ -182,9 +183,9 @@ export default {
     },
     async reloadSettings () {
       try {
-        let response = await UserApiService.getGameSettings()
+        const response = await getSettings(this.httpClient)();
 
-        if (response.status === 200) {
+        if (isOk(response)) {
           this.$store.commit('setSettings', response.data) // Persist to storage
         }
       } catch (err) {
