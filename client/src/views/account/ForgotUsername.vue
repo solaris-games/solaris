@@ -28,7 +28,9 @@ import ViewContainer from '../components/ViewContainer.vue'
 import router from '../../router'
 import ViewTitle from '../components/ViewTitle.vue'
 import FormErrorList from '../components/FormErrorList.vue'
-import userService from '../../services/api/user'
+import { inject } from 'vue'
+import { httpInjectionKey, isOk } from '@/services/typedapi'
+import { requestUsernameReset } from '@/services/typedapi/user'
 
 export default {
   components: {
@@ -36,6 +38,11 @@ export default {
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'form-error-list': FormErrorList
+  },
+  setup () {
+    return {
+      httpClient: inject(httpInjectionKey),
+    };
   },
   data () {
     return {
@@ -59,9 +66,9 @@ export default {
       try {
         this.isLoading = true
 
-        let response = await userService.requestUsername(this.email)
+        const response = await requestUsernameReset(this.httpClient)(this.email);
 
-        if (response.status === 200) {
+        if (isOk(response)) {
           this.$toast.success(`Your username has been sent to your email address, please check your email inbox.`)
         } else {
           this.$toast.error(`There was a problem requesting your username, please check that you entered your email address correctly.`)

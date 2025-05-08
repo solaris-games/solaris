@@ -99,8 +99,10 @@ import ViewContainer from '../components/ViewContainer.vue'
 import router from '../../router'
 import ViewTitle from '../components/ViewTitle.vue'
 import FormErrorList from '../components/FormErrorList.vue'
-import userService from '../../services/api/user'
 import ParallaxVue from '../components/Parallax.vue'
+import { inject } from 'vue';
+import { httpInjectionKey, isOk } from '@/services/typedapi';
+import { createUser } from '@/services/typedapi/user';
 
 export default {
   components: {
@@ -109,6 +111,11 @@ export default {
     'view-title': ViewTitle,
     'form-error-list': FormErrorList,
     'parallax': ParallaxVue
+  },
+  setup () {
+    return {
+      httpClient: inject(httpInjectionKey),
+    };
   },
   data() {
     return {
@@ -157,9 +164,9 @@ export default {
         this.isLoading = true
 
         // Call the account create API endpoint
-        const response = await userService.createUser(this.email, this.username, this.password)
+        const response = await createUser(this.httpClient)(this.email, this.username, this.password);
 
-        if (response.status === 201) {
+        if (isOk(response)) {
           this.$toast.success(`Welcome ${this.username}! You can now log in and play Solaris.`)
 
           router.push({name: 'home'})

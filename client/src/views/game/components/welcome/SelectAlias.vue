@@ -35,15 +35,22 @@
 </template>
 
 <script>
-import UserService from '../../../../services/api/user'
-import SelectAvatarVue from './SelectAvatar.vue'
+import { inject } from 'vue';
+import SelectAvatar from './SelectAvatar.vue'
+import { httpInjectionKey, isOk } from '@/services/typedapi';
+import { detailMe } from '@/services/typedapi/user';
 
 export default {
   components: {
-    'select-avatar': SelectAvatarVue
+    'select-avatar': SelectAvatar
   },
   props: {
     isAnonymousGame: Boolean,
+  },
+  setup () {
+    return {
+      httpClient: inject(httpInjectionKey),
+    };
   },
   data () {
     return {
@@ -53,9 +60,9 @@ export default {
   },
   async mounted () {
     try {
-      let response = await UserService.getMyUserInfo()
+      const response = await detailMe(this.httpClient)();
 
-      if (response.status === 200) {
+      if (isOk(response)) {
         this.alias = response.data.username
         this.onAliasChanged(this.alias)
       }

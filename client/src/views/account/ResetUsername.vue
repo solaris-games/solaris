@@ -26,7 +26,9 @@ import ViewContainer from '../components/ViewContainer.vue'
 import router from '../../router'
 import ViewTitle from '../components/ViewTitle.vue'
 import FormErrorList from '../components/FormErrorList.vue'
-import userService from '../../services/api/user'
+import { inject } from 'vue'
+import { httpInjectionKey, isOk } from '@/services/typedapi'
+import { updateUsername } from '@/services/typedapi/user'
 
 export default {
   components: {
@@ -34,6 +36,11 @@ export default {
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'form-error-list': FormErrorList
+  },
+  setup () {
+    return {
+      httpClient: inject(httpInjectionKey),
+    }
   },
   data () {
     return {
@@ -55,11 +62,11 @@ export default {
       if (this.errors.length) return
 
       try {
-        this.isLoading = true
+        this.isLoading = true;
 
-        let response = await userService.updateUsername(this.username)
+        const response = updateUsername(this.httpClient)(this.username);
 
-        if (response.status === 200) {
+        if (isOk(response)) {
           this.$store.commit('setUsername', this.username);
           this.$toast.success(`Username updated.`)
           router.push({ name: 'account-settings' })

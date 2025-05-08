@@ -33,6 +33,14 @@ export const isError = <T>(result: ResponseResult<T>) => result.kind !== Respons
 
 export const isOk = <T>(result: ResponseResult<T>): result is ResponseResultOk<T> => result.kind === ResponseResultKind.Ok;
 
+export const unwrapOk = <T>(result: ResponseResult<T>) => {
+  if (isOk(result)) {
+    return result.data;
+  } else {
+    throw new Error("HTTP call failed: " + result.cause);
+  }
+}
+
 const PATH_VARIABLE_PATTERN = /:(.\w+)/g;
 
 const BASE_URL = import.meta.env.VUE_APP_API_HOST;

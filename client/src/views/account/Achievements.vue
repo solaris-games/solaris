@@ -288,10 +288,12 @@ import ViewSubtitle from '../components/ViewSubtitle.vue'
 import Achievements from '../game/components/player/Achievements.vue'
 import PieChart from '../game/components/intel/PieChart.vue'
 import PolarArea from '../game/components/intel/PolarAreaChart.vue'
-import userService from '../../services/api/user'
 import UserGuildInfoVue from '../guild/components/UserGuildInfo.vue'
 import Roles from '../game/components/player/Roles.vue'
 import UserBadges from '../game/components/badges/UserBadges.vue'
+import { inject } from 'vue';
+import { httpInjectionKey, isOk } from '@/services/typedapi';
+import { getAchievements } from '@/services/typedapi/user'
 
 export default {
   components: {
@@ -305,6 +307,11 @@ export default {
     'user-guild-info': UserGuildInfoVue,
     'roles': Roles,
     'user-badges': UserBadges
+  },
+  setup () {
+    return {
+      httpClient: inject(httpInjectionKey)
+    }
   },
   data () {
     return {
@@ -360,15 +367,17 @@ export default {
   },
   async mounted () {
     try {
-      let response = await userService.getUserAchievements(this.userId)
+      const response = await getAchievements(this.httpClient)(this.userId);
 
-      this.user = response.data
+      if (isOk(response)) {
+        this.user = response.data
 
-      this.loadGamesChart()
-      this.loadMilitaryChart()
-      this.loadInfrastructureChart()
-      this.loadResearchChart()
-      this.loadTradeChart()
+        this.loadGamesChart()
+        this.loadMilitaryChart()
+        this.loadInfrastructureChart()
+        this.loadResearchChart()
+        this.loadTradeChart()
+      }
     } catch (err) {
       console.error(err)
     }

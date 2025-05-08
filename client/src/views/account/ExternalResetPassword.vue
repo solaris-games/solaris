@@ -31,7 +31,9 @@ import ViewContainer from '../components/ViewContainer.vue'
 import router from '../../router'
 import ViewTitle from '../components/ViewTitle.vue'
 import FormErrorList from '../components/FormErrorList.vue'
-import userService from '../../services/api/user'
+import { inject } from 'vue'
+import { httpInjectionKey, isOk } from '@/services/typedapi'
+import { resetPassword } from '@/services/typedapi/user'
 
 export default {
   components: {
@@ -39,6 +41,11 @@ export default {
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'form-error-list': FormErrorList
+  },
+  setup () {
+    return {
+      httpClient: inject(httpInjectionKey)
+    };
   },
   data () {
     return {
@@ -75,9 +82,9 @@ export default {
       try {
         this.isLoading = true
 
-        let response = await userService.resetPassword(this.token, this.newPassword)
+        const response = await resetPassword(this.httpClient)(this.token, this.newPassword);
 
-        if (response.status === 200) {
+        if (isOk(response)) {
           this.$toast.success(`Your password has been reset.`)
           router.push({ name: 'home' })
         } else {
