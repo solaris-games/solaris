@@ -22,7 +22,7 @@ export type AchievementsUser<ID> = UserPublic<ID> & {
 }
 
 export const createUserRoutes = <ID>() => ({
-    listLeaderboard: new SimpleGetRoute<UserLeaderboard>("/api/user/leaderboard"),
+    listLeaderboard: new GetRoute<{}, { limit: number, sortingKey: string }, UserLeaderboard>("/api/user/leaderboard"),
     createUser: new SimplePostRoute<CreateUserReq, { id: string }>("/api/user/"),
     getSettings: new SimpleGetRoute<UserGameSettings>("/api/user/settings"),
     saveSettings: new SimplePostRoute<UserGameSettings, {}>("/api/user/settings"),
