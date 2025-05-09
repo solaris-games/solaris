@@ -1,4 +1,4 @@
-import {GetRoute, PostRoute, DeleteRoute} from "./index";
+import {GetRoute, PostRoute, DeleteRoute, SimpleGetRoute, SimplePostRoute, SimpleDeleteRoute} from "./index";
 import type {LeaderboardUser} from "../types/common/leaderboard";
 import type {UserGameSettings} from "../types/common/settings";
 import type {UserSubscriptions} from "../types/common/subscriptions";
@@ -22,24 +22,24 @@ export type AchievementsUser<ID> = UserPublic<ID> & {
 }
 
 export const createUserRoutes = <ID>() => ({
-    listLeaderboard: new GetRoute<{}, UserLeaderboard>("/api/user/leaderboard"),
-    createUser: new PostRoute<{}, CreateUserReq, { id: string }>("/api/user/"),
-    getSettings: new GetRoute<{}, UserGameSettings>("/api/user/settings"),
-    saveSettings: new PostRoute<{}, UserGameSettings, {}>("/api/user/settings"),
-    getSubscriptions: new GetRoute<{}, UserSubscriptions>("/api/user/subscriptions"),
-    saveSubscriptions: new PostRoute<{}, UserSubscriptions, {}>("/api/user/subscriptions"),
-    getCredits: new GetRoute<{}, { credits: number }>("/api/user/credits"),
-    detailMe: new GetRoute<{}, UserPrivate<ID>>("/api/user/"),
-    listMyAvatars: new GetRoute<{}, { avatars: UserAvatar[] }>("/api/user/avatars"),
-    purchaseAvatar: new PostRoute<{ avatarId: number }, {}, {}>("/api/user/avatars/:avatarId/purchase"),
-    getAchievements: new GetRoute<{ id: string }, AchievementsUser<ID>>("/api/user/achievements/:id"),
-    updateEmailPreference: new PostRoute<{}, { enabled: boolean }, {}>("/api/user/changeEmailPreference"),
-    updateEmailOtherPreference: new PostRoute<{}, { enabled: boolean }, {}>("/api/user/changeEmailOtherPreference"),
-    updateUsername: new PostRoute<{}, { username: string }, {}>("/api/user/changeUsername"),
-    updateEmailAddress: new PostRoute<{}, { email: string }, {}>("/api/user/changeEmailAddress"),
-    updatePassword: new PostRoute<{}, { currentPassword: string, newPassword: string }, {}>("/api/user/changePassword"),
-    requestPasswordReset: new PostRoute<{}, { email: string }, {}>("/api/user/requestResetPassword"),
-    resetPassword: new PostRoute<{}, { token: string, newPassword: string }, {}>("/api/user/resetPassword"),
-    requestUsernameReset: new PostRoute<{}, { email: string }, {}>("/api/user/requestUsername"),
-    deleteUser: new DeleteRoute<{}, {}>("/api/user/closeaccount"),
+    listLeaderboard: new SimpleGetRoute<UserLeaderboard>("/api/user/leaderboard"),
+    createUser: new SimplePostRoute<CreateUserReq, { id: string }>("/api/user/"),
+    getSettings: new SimpleGetRoute<UserGameSettings>("/api/user/settings"),
+    saveSettings: new SimplePostRoute<UserGameSettings, {}>("/api/user/settings"),
+    getSubscriptions: new SimpleGetRoute<UserSubscriptions>("/api/user/subscriptions"),
+    saveSubscriptions: new SimplePostRoute<UserSubscriptions, {}>("/api/user/subscriptions"),
+    getCredits: new SimpleGetRoute<{ credits: number }>("/api/user/credits"),
+    detailMe: new SimpleGetRoute<UserPrivate<ID>>("/api/user/"),
+    listMyAvatars: new SimpleGetRoute<{ avatars: UserAvatar[] }>("/api/user/avatars"),
+    purchaseAvatar: new PostRoute<{ avatarId: number }, {}, {}, {}>("/api/user/avatars/:avatarId/purchase"),
+    getAchievements: new GetRoute<{ id: string }, {}, AchievementsUser<ID>>("/api/user/achievements/:id"),
+    updateEmailPreference: new SimplePostRoute<{ enabled: boolean }, {}>("/api/user/changeEmailPreference"),
+    updateEmailOtherPreference: new SimplePostRoute<{ enabled: boolean }, {}>("/api/user/changeEmailOtherPreference"),
+    updateUsername: new SimplePostRoute<{ username: string }, {}>("/api/user/changeUsername"),
+    updateEmailAddress: new SimplePostRoute<{ email: string }, {}>("/api/user/changeEmailAddress"),
+    updatePassword: new SimplePostRoute<{ currentPassword: string, newPassword: string }, {}>("/api/user/changePassword"),
+    requestPasswordReset: new SimplePostRoute<{ email: string }, {}>("/api/user/requestResetPassword"),
+    resetPassword: new SimplePostRoute<{ token: string, newPassword: string }, {}>("/api/user/resetPassword"),
+    requestUsernameReset: new SimplePostRoute<{ email: string }, {}>("/api/user/requestUsername"),
+    deleteUser: new SimpleDeleteRoute<{}>("/api/user/closeaccount"),
 })

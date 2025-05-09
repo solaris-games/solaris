@@ -45,7 +45,7 @@ const PATH_VARIABLE_PATTERN = /:(.\w+)/g;
 
 const BASE_URL = import.meta.env.VUE_APP_API_HOST;
 
-const pathReplacement = <PP extends Object, T1, T2>(route: Route<PP, T1, T2>, params: PP) => {
+const pathReplacement = <PP extends Object, QP extends Object, T1, T2>(route: Route<PP, QP, T1, T2>, params: PP) => {
   const relPath = route.path.replaceAll(PATH_VARIABLE_PATTERN, (_match, g1) => {
     const param = params[g1];
 
@@ -79,11 +79,14 @@ const mapError = <T>(e: unknown, path: string): ResponseResult<T> => {
   }
 }
 
-export const doGet = (axios: Axios) => async <PathParams extends Object, Resp>(route: GetRoute<PathParams, Resp>, args: PathParams, options?: ReqOptions): Promise<ResponseResult<Resp>> => {
+export const doGet = (axios: Axios) => async <PathParams extends Object, QueryParams extends Object, Resp>(route: GetRoute<PathParams, QueryParams, Resp>, args: PathParams, queryParams: QueryParams, options?: ReqOptions): Promise<ResponseResult<Resp>> => {
   const path = pathReplacement(route, args);
 
   try {
-    const response = await axios.get<Resp>(path, options);
+    const response = await axios.get<Resp>(path, {
+      params: queryParams,
+      ...options
+    });
 
     return {
       kind: ResponseResultKind.Ok,
@@ -94,12 +97,14 @@ export const doGet = (axios: Axios) => async <PathParams extends Object, Resp>(r
   }
 }
 
-
-export const doPost = (axios: Axios) => async <PathParams extends Object, Req, Resp>(route: PostRoute<PathParams, Req, Resp>, args: PathParams, req: Req, options?: ReqOptions): Promise<ResponseResult<Resp>> => {
+export const doPost = (axios: Axios) => async <PathParams extends Object, QueryParams extends Object, Req, Resp>(route: PostRoute<PathParams, QueryParams, Req, Resp>, args: PathParams, queryParams: QueryParams, req: Req, options?: ReqOptions): Promise<ResponseResult<Resp>> => {
   const path = pathReplacement(route, args);
 
   try {
-    const response = await axios.post<Resp>(path, req, options);
+    const response = await axios.post<Resp>(path, req, {
+      params: queryParams,
+      ...options
+    });
 
     return {
       kind: ResponseResultKind.Ok,
@@ -110,11 +115,14 @@ export const doPost = (axios: Axios) => async <PathParams extends Object, Req, R
   }
 }
 
-export const doPatch = (axios: Axios) => async <PathParams extends Object, Req, Resp>(route: PatchRoute<PathParams, Req, Resp>, args: PathParams, req: Req, options?: ReqOptions): Promise<ResponseResult<Resp>> => {
+export const doPatch = (axios: Axios) => async <PathParams extends Object, QueryParams extends Object, Req, Resp>(route: PatchRoute<PathParams, QueryParams, Req, Resp>, args: PathParams, queryParams: QueryParams, req: Req, options?: ReqOptions): Promise<ResponseResult<Resp>> => {
   const path = pathReplacement(route, args);
 
   try {
-    const response = await axios.patch<Resp>(path, req, options);
+    const response = await axios.patch<Resp>(path, req, {
+      params: queryParams,
+      ...options
+    });
 
     return {
       kind: ResponseResultKind.Ok,
@@ -125,11 +133,14 @@ export const doPatch = (axios: Axios) => async <PathParams extends Object, Req, 
   }
 }
 
-export const doDelete = (axios: Axios) => async <PathParams extends Object, Req, Resp>(route: DeleteRoute<PathParams, Resp>, args: PathParams, req: Req, options?: ReqOptions): Promise<ResponseResult<Resp>> => {
+export const doDelete = (axios: Axios) => async <PathParams extends Object, QueryParams extends Object, Req, Resp>(route: DeleteRoute<PathParams, QueryParams, Resp>, args: PathParams, queryParams: QueryParams, req: Req, options?: ReqOptions): Promise<ResponseResult<Resp>> => {
   const path = pathReplacement(route, args);
 
   try {
-    const response = await axios.delete<Resp>(path, options);
+    const response = await axios.delete<Resp>(path, {
+      params: queryParams,
+      ...options
+    });
 
     return {
       kind: ResponseResultKind.Ok,
@@ -140,11 +151,14 @@ export const doDelete = (axios: Axios) => async <PathParams extends Object, Req,
   }
 }
 
-export const doPut = (axios: Axios) => async <PathParams extends Object, Req, Resp>(route: PutRoute<PathParams, Req, Resp>, args: PathParams, req: Req, options?: ReqOptions): Promise<ResponseResult<Resp>> => {
+export const doPut = (axios: Axios) => async <PathParams extends Object, QueryParams extends Object, Req, Resp>(route: PutRoute<PathParams, QueryParams, Req, Resp>, args: PathParams, queryParams: QueryParams, req: Req, options?: ReqOptions): Promise<ResponseResult<Resp>> => {
   const path = pathReplacement(route, args);
 
   try {
-    const response = await axios.put<Resp>(path, req, options);
+    const response = await axios.put<Resp>(path, req, {
+      params: queryParams,
+      ...options
+    });
 
     return {
       kind: ResponseResultKind.Ok,
