@@ -15,7 +15,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="player of leaderboard" :key="player._id" :class="{'bg-primary':$store.state.userId === player._id}">
+        <tr v-for="player of leaderboard" :key="player._id" :class="{'bg-primary':store.state.userId === player._id}">
           <td>{{player.position}}</td>
           <td>
               <router-link :to="{ name: 'account-achievements', params: { userId: player._id }}">
@@ -40,58 +40,49 @@
 </div>
 </template>
 
-<script>
-import SortableLeaderboard from './SortableLeaderboard.vue';
-import UserApiService from '../../../../services/api/user';
+<script setup lang="ts">
 import LoadingSpinner from '../../../components/LoadingSpinner.vue';
+import { computed, inject, onMounted, ref } from 'vue';
+import { httpInjectionKey, isOk } from '@/services/typedapi';
+import { getLeaderboard } from '@/services/typedapi/user';
+import { useStore, type Store } from 'vuex';
+import type { State } from '../../../../store';
 
-export default {
-  components: {
-    'sortable-leaderboard': SortableLeaderboard,
-    'loading-spinner': LoadingSpinner
-  },
-  props: {
-    limit: Number
-  },
-  data () {
-    return {
-      isLoading: false,
-      sortingKey: 'elo-rating',
-      leaderboards: {},
-      totalPlayers: 0
-    }
-  },
-  async mounted () {
-    await this.loadLeaderboard(this.sortingKey);
-  },
-  methods: {
-    async sortLeaderboard (key) {
-      this.sortingKey = key;
-      await this.loadLeaderboard(key);
-    },
-    async loadLeaderboard (key) {
-      if (this.leaderboards[key]) {
+const httpClient = inject(httpInjectionKey)!;
+const store: Store<State> = useStore();
+
+const props = defineProps<{
+  limit: number
+}>();
+
+const isLoading = ref(false);
+const sortingKey = ref('elo-rating');
+const leaderboards = ref({});
+const totalPlayers = ref(0);
+
+const leaderboard = computed(() => leaderboards.value[sortingKey.value]);
+
+const loadLeaderboard = async (key: string) => {
+      if (leaderboards.value[key]) {
         return;
       }
-      this.isLoading = true;
+      isLoading.value = true;
       try {
-        const response = await UserApiService.getLeaderboard(this.limit, key, 0);
-        if (response.status === 200) {
-          this.leaderboards[key] = response.data.leaderboard;
-          this.totalPlayers = response.data.totalPlayers;
+        const response = await getLeaderboard(httpClient)(props.limit, key);
+
+        if (isOk(response)) {
+          leaderboards.value[key] = response.data.leaderboard;
+          totalPlayers.value = response.data.totalPlayers;
         }
       } catch (err) {
         console.error(err);
       }
-      this.isLoading = false;
+      isLoading.value = false;
     }
-  },
-  computed: {
-    leaderboard () {
-      return this.leaderboards[this.sortingKey];
-    }
-  }
-}
+
+onMounted(async () => {
+  await loadLeaderboard(sortingKey.value);
+});
 </script>
 
 <style scoped>
