@@ -5,15 +5,17 @@
     <form @submit.prevent="handleSubmit">
       <div class="mb-2">
         <label for="newPassword">New Password</label>
-        <input type="password" required="required" name="newPassword" class="form-control" v-model="newPassword" :disabled="isLoading">
+        <input type="password" required="required" name="newPassword" class="form-control" v-model="newPassword"
+          :disabled="isLoading">
       </div>
 
       <div class="mb-2">
         <label for="newPasswordConfirm">Confirm New Password</label>
-        <input type="password" required="required" name="newPasswordConfirm" class="form-control" v-model="newPasswordConfirm" :disabled="isLoading">
+        <input type="password" required="required" name="newPasswordConfirm" class="form-control"
+          v-model="newPasswordConfirm" :disabled="isLoading">
       </div>
 
-      <form-error-list v-bind:errors="errors"/>
+      <form-error-list v-bind:errors="errors" />
 
       <div>
         <button type="submit" class="btn btn-success" :disabled="isLoading">Change Password</button>
@@ -21,7 +23,7 @@
       </div>
     </form>
 
-    <loading-spinner :loading="isLoading"/>
+    <loading-spinner :loading="isLoading" />
   </view-container>
 </template>
 
@@ -32,7 +34,7 @@ import router from '../../router'
 import ViewTitle from '../components/ViewTitle.vue'
 import FormErrorList from '../components/FormErrorList.vue'
 import { inject } from 'vue'
-import { httpInjectionKey, isOk } from '@/services/typedapi'
+import { extractErrors, formatError, httpInjectionKey, isOk } from '@/services/typedapi'
 import { resetPassword } from '@/services/typedapi/user'
 
 export default {
@@ -42,12 +44,12 @@ export default {
     'view-title': ViewTitle,
     'form-error-list': FormErrorList
   },
-  setup () {
+  setup() {
     return {
       httpClient: inject(httpInjectionKey)
     };
   },
-  data () {
+  data() {
     return {
       isLoading: false,
       errors: [],
@@ -56,11 +58,11 @@ export default {
       newPasswordConfirm: null
     }
   },
-  mounted () {
+  mounted() {
     this.token = this.$route.query.token
   },
   methods: {
-    async handleSubmit (e) {
+    async handleSubmit(e) {
       this.errors = []
 
       if (!this.newPassword) {
@@ -77,22 +79,21 @@ export default {
 
       e.preventDefault()
 
-      if (this.errors.length) return
+      if (this.errors.length) {
+        return;
+      }
 
-      try {
-        this.isLoading = true
+      this.isLoading = true
 
-        const response = await resetPassword(this.httpClient)(this.token, this.newPassword);
+      const response = await resetPassword(this.httpClient)(this.token, this.newPassword);
 
-        if (isOk(response)) {
-          this.$toast.success(`Your password has been reset.`)
-          router.push({ name: 'home' })
-        } else {
-          this.$toast.error(`There was a problem resetting your password, please try again.`)
-        }
-      } catch (err) {
-        console.log(err)
-        this.errors = err.response.data.errors || []
+      if (isOk(response)) {
+        this.$toast.success(`Your password has been reset.`)
+        router.push({ name: 'home' })
+      } else {
+        console.error(formatError(response));
+        this.errors = extractErrors(response);
+        this.$toast.error(`There was a problem resetting your password, please try again.`)
       }
 
       this.isLoading = false
@@ -101,5 +102,4 @@ export default {
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
