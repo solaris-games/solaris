@@ -5,7 +5,8 @@
     <p>Unlock new races to play with <strong class="text-warning">Galactic Credits</strong>. <router-link
         :to="{ name: 'galactic-credits-shop' }"><i class="fas fa-shopping-basket"></i> Purchase Galactic
         Credits</router-link> or earn credits by winning official games.</p>
-    <h5 v-if="userCredits">You have <span class="text-warning"><strong>{{ userCredits }}</strong> Galactic Credits</span>.
+    <h5 v-if="userCredits">You have <span class="text-warning"><strong>{{ userCredits }}</strong> Galactic
+        Credits</span>.
     </h5>
 
     <hr />
@@ -53,7 +54,7 @@ import { computed, inject, onMounted, ref, type Ref } from 'vue'
 import type { UserAvatar } from '@solaris-common'
 import { useStore, type Store } from 'vuex'
 import type { State } from '@/store'
-import { httpInjectionKey, isOk } from '@/services/typedapi'
+import { formatError, httpInjectionKey, isOk } from '@/services/typedapi'
 import { getCredits, listMyAvatars, purchaseAvatar as reqPurchaseAvatar } from '@/services/typedapi/user'
 import { makeConfirm } from '@/util/confirm';
 
@@ -70,27 +71,23 @@ const sortedAvatars = computed(() => {
 });
 
 const loadGalacticCredits = async () => {
-  try {
-    const response = await getCredits(httpClient)();
+  const response = await getCredits(httpClient)();
 
-    if (isOk(response)) {
-      userCredits.value = response.data.credits;
-      store.commit('setUserCredits', response.data.credits);
-    }
-  } catch (err) {
-    console.error(err)
+  if (isOk(response)) {
+    userCredits.value = response.data.credits;
+    store.commit('setUserCredits', response.data.credits);
+  } else {
+    console.error(formatError(response));
   }
 };
 
 const loadAvatars = async () => {
-  try {
-    const response = await listMyAvatars(httpClient)();
+  const response = await listMyAvatars(httpClient)();
 
-    if (isOk(response)) {
-      avatars.value = response.data.avatars;
-    }
-  } catch (err) {
-    console.error(err);
+  if (isOk(response)) {
+    avatars.value = response.data.avatars;
+  } else {
+    console.error(formatError(response));
   }
 }
 
@@ -105,17 +102,15 @@ const purchaseAvatar = async (avatar: UserAvatar) => {
 
   isLoading.value = true;
 
-  try {
-    const response = await reqPurchaseAvatar(httpClient)(avatar.id);
+  const response = await reqPurchaseAvatar(httpClient)(avatar.id);
 
-    if (isOk(response)) {
-      avatar.purchased = true;
-      userCredits.value! -= avatar.price;
+  if (isOk(response)) {
+    avatar.purchased = true;
+    userCredits.value! -= avatar.price;
 
-      store.commit('setUserCredits', userCredits.value!);
-    }
-  } catch (err) {
-    console.error(err)
+    store.commit('setUserCredits', userCredits.value!);
+  } else {
+    console.error(formatError(response));
   }
 
   isLoading.value = false;

@@ -136,7 +136,7 @@ import router from '../../router'
 import Roles from '../game/components/player/Roles.vue'
 import Notifications from "./components/Notifications.vue";
 import { inject, onMounted, ref, computed, type Ref } from 'vue'
-import { httpInjectionKey, isOk, unwrapOk } from '@/services/typedapi'
+import { formatError, httpInjectionKey, isOk, unwrapOk } from '@/services/typedapi'
 import { deleteUser, detailMe, updateEmailOtherPreference, updateEmailPreference } from '@/services/typedapi/user'
 import type { UserPrivate } from '@solaris-common'
 import { useRoute } from 'vue-router'
@@ -210,17 +210,16 @@ const closeAccount = async () => {
     return
   }
 
-  try {
-    isClosingAccount.value = true
+  isClosingAccount.value = true
 
-    const response = await deleteUser(httpClient)();
+  const response = await deleteUser(httpClient)();
 
-    if (isOk(response)) {
-      router.push({ name: 'home' })
-    }
-  } catch (err) {
+  if (isOk(response)) {
+    router.push({ name: 'home' })
+  } else {
+    console.error(formatError(response));
+
     toast.error("Failed to close account, please contact a developer");
-    console.error(err);
   }
 
   isClosingAccount.value = false
@@ -255,6 +254,9 @@ onMounted(async () => {
 
   if (isOk(response)) {
     info.value = response.data
+  } else {
+    console.error(formatError(response));
+    toast.error("Failed to load account settings");
   }
 
   const discordSuccess = route.query.discordSuccess;

@@ -181,7 +181,7 @@ import HelpTooltip from '../../components/HelpTooltip.vue'
 import { onMounted, ref, type Ref, inject } from 'vue'
 import type { UserSubscriptions } from '@solaris-common'
 import { getSubscriptions, saveSubscriptions } from '@/services/typedapi/user'
-import { httpInjectionKey, isOk, ResponseResultKind } from '@/services/typedapi'
+import { extractErrors, httpInjectionKey, isOk, ResponseResultKind } from '@/services/typedapi'
 import { toastInjectionKey } from '@/util/keys'
 
 const httpClient = inject(httpInjectionKey)!
@@ -213,11 +213,8 @@ const handleSubmit = async (e: Event) => {
   } else {
     console.error(response.cause);
 
-    if (response.kind === ResponseResultKind.ResponseError) {
-      errors.value = JSON.parse(response.data)?.errors || [];
-    } else {
-      toast.error('Failed to save subcriptions');
-    }
+    toast.error('Failed to save subcriptions');
+    errors.value = extractErrors(response);
   }
 
   isSaving.value = false;

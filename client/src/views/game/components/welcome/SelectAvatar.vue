@@ -30,7 +30,7 @@
 <script setup lang="ts">
 import { ref, type Ref, inject, onMounted } from 'vue';
 import { type UserAvatar } from '@solaris-common';
-import { httpInjectionKey, isOk } from '@/services/typedapi';
+import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { listMyAvatars } from '@/services/typedapi/user';
 
 const httpClient = inject(httpInjectionKey)!;
@@ -46,14 +46,12 @@ const avatars: Ref<UserAvatar[]> = ref([]);
 const reloadAvatars = async () => {
   isLoading.value = true
 
-  try {
-    const response = await listMyAvatars(httpClient)();
+  const response = await listMyAvatars(httpClient)();
 
-    if (isOk(response)) {
-      avatars.value = response.data.avatars;
-    }
-  } catch (err) {
-    console.error(err)
+  if (isOk(response)) {
+    avatars.value = response.data.avatars;
+  } else {
+    console.error(formatError(response));
   }
 
   isLoading.value = false

@@ -64,7 +64,7 @@
 import SortableLeaderboard from './SortableLeaderboard.vue';
 import LoadingSpinner from '../../../components/LoadingSpinner.vue';
 import { computed, inject, onMounted, ref } from 'vue';
-import { httpInjectionKey, isOk } from '@/services/typedapi';
+import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { getLeaderboard } from '@/services/typedapi/user';
 import { useStore, type Store } from 'vuex';
 import type { State } from '../../../../store';
@@ -72,9 +72,9 @@ import type { State } from '../../../../store';
 const httpClient = inject(httpInjectionKey)!;
 const store: Store<State> = useStore();
 
-const props = defineProps < {
+const props = defineProps<{
   limit: number,
-} > ();
+}>();
 
 const isLoading = ref(false);
 const sortingKey = ref('rank');
@@ -88,15 +88,15 @@ const loadLeaderboard = async (key: string) => {
     return;
   }
   isLoading.value = true;
-  try {
-    const response = await getLeaderboard(httpClient)(props.limit, key);
-    if (isOk(response)) {
-      leaderboards.value[key] = response.data.leaderboard;
-      totalPlayers.value = response.data.totalPlayers;
-    }
-  } catch (err) {
-    console.error(err);
+
+  const response = await getLeaderboard(httpClient)(props.limit, key);
+  if (isOk(response)) {
+    leaderboards.value[key] = response.data.leaderboard;
+    totalPlayers.value = response.data.totalPlayers;
+  } else {
+    console.error(formatError(response));
   }
+
   isLoading.value = false;
 };
 

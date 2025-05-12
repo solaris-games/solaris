@@ -538,7 +538,7 @@ import FormErrorList from '../../../components/FormErrorList.vue'
 import { inject, onMounted, ref, type Ref } from 'vue';
 import { eventBusInjectionKey } from "@/eventBus";
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
-import { httpInjectionKey, isOk, ResponseResultKind } from '@/services/typedapi';
+import { extractErrors, formatError, httpInjectionKey, isOk, ResponseResultKind } from '@/services/typedapi';
 import type { UserGameSettings } from '@solaris-common';
 import { getSettings, saveSettings } from '@/services/typedapi/user';
 import { toastInjectionKey } from '@/util/keys';
@@ -600,9 +600,7 @@ const handleSubmit = async (e: Event) => {
     onOptionsSaved()
   } else {
     console.error(response.cause);
-    if (response.kind === ResponseResultKind.ResponseError) {
-      errors.value = JSON.parse(response?.data)?.errors || [];
-    }
+    errors.value = extractErrors(response) || [];
   }
 
   isSavingSettings.value = false
@@ -611,14 +609,12 @@ const handleSubmit = async (e: Event) => {
 onMounted(async () => {
   settings.value = null
 
-  try {
-    let response = await getSettings(httpClient)();
+  const response = await getSettings(httpClient)();
 
-    if (isOk(response)) {
-      settings.value = response.data;
-    }
-  } catch (err) {
-    console.error(err)
+  if (isOk(response)) {
+    settings.value = response.data;
+  } else {
+    console.error(formatError(response));
   }
 })
 </script>
