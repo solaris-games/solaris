@@ -31,7 +31,7 @@ import ViewTitle from '../components/ViewTitle.vue'
 import FormErrorList from '../components/FormErrorList.vue'
 import { inject } from 'vue'
 import { extractErrors, formatError, httpInjectionKey, isOk } from '@/services/typedapi'
-import { requestUsernameReset } from '@/services/typedapi/user'
+import { requestUsername } from '@/services/typedapi/user'
 
 export default {
   components: {
@@ -68,7 +68,7 @@ export default {
 
       this.isLoading = true
 
-      const response = await requestUsernameReset(this.httpClient)(this.email);
+      const response = await requestUsername(this.httpClient)(this.email);
 
       if (isOk(response)) {
         this.$toast.success(`Your username has been sent to your email address, please check your email inbox.`)

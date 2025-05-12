@@ -85,8 +85,8 @@ export const resetPassword = (axios: Axios) => async (token: string, newPassword
   return doPost(axios)(routes.resetPassword, {}, {}, { token, newPassword }, { withCredentials: true });
 }
 
-export const requestUsernameReset = (axios: Axios) => async (email: string): Promise<ResponseResult<{}>> => {
-  return doPost(axios)(routes.requestUsernameReset, {}, {}, { email }, { withCredentials: true });
+export const requestUsername = (axios: Axios) => async (email: string): Promise<ResponseResult<{}>> => {
+  return doPost(axios)(routes.requestUsername, {}, {}, { email }, { withCredentials: true });
 }
 
 export const deleteUser = (axios: Axios) => async (): Promise<ResponseResult<{}>> => {
