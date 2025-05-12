@@ -1,9 +1,9 @@
 <template>
-<div>
+  <div>
     <div class="row avatar-container text-center">
-        <img v-if="avatar != null" :src="getAvatarImage()" width="128" height="128">
-        <p v-if="avatar == null" class="select-avatar-warning text-warning">Select an avatar</p>
-        <p v-if="avatar && !avatar.purchased" class="select-avatar-locked"><i class="fas fa-lock"></i></p>
+      <img v-if="avatar != null" :src="getAvatarImage()" width="128" height="128">
+      <p v-if="avatar == null" class="select-avatar-warning text-warning">Select an avatar</p>
+      <p v-if="avatar && !avatar.purchased" class="select-avatar-locked"><i class="fas fa-lock"></i></p>
     </div>
 
     <div class="row mt-1 mb-1">
@@ -18,93 +18,100 @@
     <div class="row">
       <div class="col-12 pe-0 ps-0 mt-1 mb-1">
         <div class="d-grid gap-2">
-          <router-link :to="{ name: 'avatars'}" class="btn btn-sm btn-success">
+          <router-link :to="{ name: 'avatars' }" class="btn btn-sm btn-success">
             <i class="fas fa-shopping-cart"></i> Shop
           </router-link>
         </div>
       </div>
     </div>
-</div>
+  </div>
 </template>
 
-<script>
-import UserApiService from '../../../../services/api/user'
+<script setup lang="ts">
+import { ref, type Ref, inject, onMounted } from 'vue';
+import { type UserAvatar } from '@solaris-common';
+import { httpInjectionKey, isOk } from '@/services/typedapi';
+import { listMyAvatars } from '@/services/typedapi/user';
 
-export default {
-  data () {
-    return {
-      isLoading: false,
-      avatar: null,
-      avatars: []
+const httpClient = inject(httpInjectionKey)!;
+
+const emit = defineEmits<{
+  onAvatarChanged: [avatar: UserAvatar],
+}>();
+
+const isLoading = ref(false);
+const avatar: Ref<UserAvatar | null> = ref(null);
+const avatars: Ref<UserAvatar[]> = ref([]);
+
+const reloadAvatars = async () => {
+  isLoading.value = true
+
+  try {
+    const response = await listMyAvatars(httpClient)();
+
+    if (isOk(response)) {
+      avatars.value = response.data.avatars;
     }
-  },
-  async mounted () {
-    await this.reloadAvatars()
-  },
-  methods: {
-    onAvatarChanged (e) {
-      this.$emit('onAvatarChanged', this.avatar)
-    },
-    async reloadAvatars () {
-      this.isLoading = true
+  } catch (err) {
+    console.error(err)
+  }
 
-      try {
-        let response = await UserApiService.getUserAvatars()
+  isLoading.value = false
+};
 
-        if (response.status === 200) {
-          this.avatars = response.data
-        }
-      } catch (err) {
-        console.error(err)
-      }
+const onAvatarChanged = () => {
+  emit('onAvatarChanged', avatar.value!);
+}
 
-      this.isLoading = false
-    },
-    nextAvatar (e) {
-      if (this.avatar == null) {
-        this.avatar = this.avatars.find(a => a.id === 21)
-      } else {
-        let currentIndex = this.avatars.indexOf(this.avatar)
+const getAvatarImage = () => {
+  try {
+    return new URL(`../../../../assets/avatars/${avatar.value!.file}`, import.meta.url).href;
+  } catch (err) {
+    console.error(err);
 
-        currentIndex++
-
-        if (currentIndex > this.avatars.length - 1) {
-            currentIndex = 0
-        }
-
-        this.avatar = this.avatars[currentIndex]
-      }
-
-      this.onAvatarChanged(this.avatar)
-    },
-    prevAvatar (e) {
-      if (this.avatar == null) {
-        this.avatar = this.avatars.find(a => a.id === 21)
-      } else {
-        let currentIndex = this.avatars.indexOf(this.avatar)
-
-        currentIndex--
-
-        if (currentIndex < 0) {
-            currentIndex = this.avatars.length - 1
-        }
-
-        this.avatar = this.avatars[currentIndex]
-      }
-
-      this.onAvatarChanged(this.avatar)
-    },
-    getAvatarImage () {
-      try {
-        return new URL(`../../../../assets/avatars/${this.avatar.file}`, import.meta.url).href
-      } catch (err) {
-        console.error(err)
-
-        return null
-      }
-    }
+    return undefined;
   }
 }
+
+const nextAvatar = () => {
+  if (avatar.value == null) {
+    avatar.value = avatars.value.find(a => a.id === 21)!;
+  } else {
+    let currentIndex = avatars.value.indexOf(avatar.value);
+
+    currentIndex++;
+
+    if (currentIndex > avatars.value.length - 1) {
+      currentIndex = 0;
+    }
+
+    avatar.value = avatars.value[currentIndex];
+  }
+
+  onAvatarChanged();
+};
+
+const prevAvatar = () => {
+  if (avatar.value == null) {
+    avatar.value = avatars.value.find(a => a.id === 21)!;
+  } else {
+    let currentIndex = avatars.value.indexOf(avatar.value);
+
+    currentIndex--;
+
+    if (currentIndex < 0) {
+      currentIndex = avatars.value.length - 1;
+    }
+
+    avatar.value = avatars.value[currentIndex];
+  }
+
+  onAvatarChanged();
+}
+
+onMounted(async () => {
+  await reloadAvatars();
+});
 </script>
 
 <style scoped>
