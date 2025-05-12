@@ -121,7 +121,7 @@
 
     <view-subtitle title="Game Options" class="mt-3" />
 
-    <options-form />
+    <options-form :is-in-game="false" />
   </view-container>
 </template>
 
