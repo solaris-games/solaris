@@ -7,12 +7,10 @@
       </div>
 </template>
 
-<script>
-export default {
-  props: {
-    errors: Array
-  }
-}
+<script setup lang="ts">
+const props = defineProps<{
+  errors: string[] | null,
+}>();
 </script>
 
 <style scoped>

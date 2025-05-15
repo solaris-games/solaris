@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
+import LoadingSpinner from '../components/LoadingSpinner.vue'
 import ViewContainer from '../components/ViewContainer.vue'
 import router from '../../router'
 import ViewTitle from '../components/ViewTitle.vue'
@@ -33,7 +33,7 @@ import { updateUsername } from '@/services/typedapi/user'
 
 export default {
   components: {
-    'loading-spinner': LoadingSpinnerVue,
+    'loading-spinner': LoadingSpinner,
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'form-error-list': FormErrorList
@@ -66,7 +66,7 @@ export default {
 
       this.isLoading = true;
 
-      const response = updateUsername(this.httpClient)(this.username);
+      const response = await updateUsername(this.httpClient)(this.username);
 
       if (isOk(response)) {
         this.$store.commit('setUsername', this.username);
