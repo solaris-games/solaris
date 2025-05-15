@@ -7,7 +7,7 @@ import {
   type UserAvatar,
   type AchievementsUser
 } from "@solaris-common";
-import {doGet, doPost, type ResponseResult} from "@/services/typedapi/index";
+import {doGet, doPost, doPut, doDelete, type ResponseResult} from "@/services/typedapi/index";
 import { type Axios } from "axios";
 
 const routes = createUserRoutes<string>();
@@ -26,7 +26,7 @@ export const getSettings = (axios: Axios) => async (): Promise<ResponseResult<Us
 }
 
 export const saveSettings = (axios: Axios) => async (settings: UserGameSettings): Promise<ResponseResult<{}>> => {
-  return doPost(axios)(routes.saveSettings, {}, {}, settings, { withCredentials: true });
+  return doPut(axios)(routes.saveSettings, {}, {}, settings, { withCredentials: true });
 }
 
 export const getSubscriptions = (axios: Axios) => async (): Promise<ResponseResult<UserSubscriptions>> => {
@@ -34,7 +34,7 @@ export const getSubscriptions = (axios: Axios) => async (): Promise<ResponseResu
 }
 
 export const saveSubscriptions = (axios: Axios) => async (subscriptions: UserSubscriptions): Promise<ResponseResult<{}>> => {
-  return doPost(axios)(routes.saveSubscriptions, {}, {}, subscriptions, { withCredentials: true });
+  return doPut(axios)(routes.saveSubscriptions, {}, {}, subscriptions, { withCredentials: true });
 }
 
 export const getCredits = (axios: Axios) => async (): Promise<ResponseResult<{ credits: number }>> => {
@@ -58,23 +58,23 @@ export const getAchievements = (axios: Axios) => async (id: string): Promise<Res
 }
 
 export const updateEmailPreference = (axios: Axios) => async (enabled: boolean): Promise<ResponseResult<{}>> => {
-  return doPost(axios)(routes.updateEmailPreference, {}, {}, { enabled }, { withCredentials: true });
+  return doPut(axios)(routes.updateEmailPreference, {}, {}, { enabled }, { withCredentials: true });
 }
 
 export const updateEmailOtherPreference = (axios: Axios) => async (enabled: boolean): Promise<ResponseResult<{}>> => {
-  return doPost(axios)(routes.updateEmailOtherPreference, {}, {}, { enabled }, { withCredentials: true });
+  return doPut(axios)(routes.updateEmailOtherPreference, {}, {}, { enabled }, { withCredentials: true });
 }
 
 export const updateUsername = (axios: Axios) => async (username: string): Promise<ResponseResult<{}>> => {
-  return doPost(axios)(routes.updateUsername, {}, {}, { username }, { withCredentials: true });
+  return doPut(axios)(routes.updateUsername, {}, {}, { username }, { withCredentials: true });
 }
 
 export const updateEmailAddress = (axios: Axios) => async (email: string): Promise<ResponseResult<{}>> => {
-  return doPost(axios)(routes.updateEmailAddress, {}, {}, { email }, { withCredentials: true });
+  return doPut(axios)(routes.updateEmailAddress, {}, {}, { email }, { withCredentials: true });
 }
 
 export const updatePassword = (axios: Axios) => async (currentPassword: string, newPassword: string): Promise<ResponseResult<{}>> => {
-  return doPost(axios)(routes.updatePassword, {}, {}, { currentPassword, newPassword }, { withCredentials: true });
+  return doPut(axios)(routes.updatePassword, {}, {}, { currentPassword, newPassword }, { withCredentials: true });
 }
 
 export const requestPasswordReset = (axios: Axios) => async (email: string): Promise<ResponseResult<{}>> => {
@@ -90,5 +90,5 @@ export const requestUsername = (axios: Axios) => async (email: string): Promise<
 }
 
 export const deleteUser = (axios: Axios) => async (): Promise<ResponseResult<{}>> => {
-  return doPost(axios)(routes.deleteUser, {}, {}, {}, { withCredentials: true });
+  return doDelete(axios)(routes.deleteUser, {}, {}, {}, { withCredentials: true });
 }
