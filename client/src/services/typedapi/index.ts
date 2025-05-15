@@ -41,6 +41,26 @@ export const unwrapOk = <T>(result: ResponseResult<T>) => {
   }
 }
 
+export const formatError = (response: ResponseResultRequestError | ResponseResultResponseError) => {
+  if (response.kind === ResponseResultKind.ResponseError) {
+    return `Error: ${response.cause}, response data: ${response.data}`;
+  } else {
+    return `Error: ${response.cause}`;
+  }
+}
+
+export const extractErrors = (response: ResponseResultRequestError | ResponseResultResponseError) => {
+  if (response.kind === ResponseResultKind.ResponseError) {
+    try {
+      return JSON.parse(response.data)?.errors || [];
+    } catch (e) {
+      return null;
+    }
+  } else {
+    return null;
+  }
+}
+
 const PATH_VARIABLE_PATTERN = /:(.\w+)/g;
 
 const BASE_URL = import.meta.env.VUE_APP_API_HOST;

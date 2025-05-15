@@ -48,6 +48,6 @@ export const createUserRoutes = <ID>() => ({
     updatePassword: new SimplePostRoute<{ currentPassword: string, newPassword: string }, {}>("/api/user/changePassword"),
     requestPasswordReset: new SimplePostRoute<{ email: string }, {}>("/api/user/requestResetPassword"),
     resetPassword: new SimplePostRoute<{ token: string, newPassword: string }, {}>("/api/user/resetPassword"),
-    requestUsernameReset: new SimplePostRoute<{ email: string }, {}>("/api/user/requestUsername"),
+    requestUsername: new SimplePostRoute<{ email: string }, {}>("/api/user/requestUsername"),
     deleteUser: new SimpleDeleteRoute<{}>("/api/user/closeaccount"),
 })

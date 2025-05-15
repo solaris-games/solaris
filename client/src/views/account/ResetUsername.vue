@@ -5,10 +5,11 @@
     <form @submit.prevent="handleSubmit">
       <div class="mb-2">
         <label for="username">New Username</label>
-        <input type="text" required="required" class="form-control" minlength="3" maxlength="24" v-model="username" :disabled="isLoading"/>
+        <input type="text" required="required" class="form-control" minlength="3" maxlength="24" v-model="username"
+          :disabled="isLoading" />
       </div>
 
-      <form-error-list v-bind:errors="errors"/>
+      <form-error-list v-bind:errors="errors" />
 
       <div>
         <button type="submit" class="btn btn-success" :disabled="isLoading">Change Username</button>
@@ -16,7 +17,7 @@
       </div>
     </form>
 
-    <loading-spinner :loading="isLoading"/>
+    <loading-spinner :loading="isLoading" />
   </view-container>
 </template>
 
@@ -27,7 +28,7 @@ import router from '../../router'
 import ViewTitle from '../components/ViewTitle.vue'
 import FormErrorList from '../components/FormErrorList.vue'
 import { inject } from 'vue'
-import { httpInjectionKey, isOk } from '@/services/typedapi'
+import { extractErrors, formatError, httpInjectionKey, isOk } from '@/services/typedapi'
 import { updateUsername } from '@/services/typedapi/user'
 
 export default {
@@ -37,12 +38,12 @@ export default {
     'view-title': ViewTitle,
     'form-error-list': FormErrorList
   },
-  setup () {
+  setup() {
     return {
       httpClient: inject(httpInjectionKey),
     }
   },
-  data () {
+  data() {
     return {
       isLoading: false,
       errors: [],
@@ -50,7 +51,7 @@ export default {
     }
   },
   methods: {
-    async handleSubmit (e) {
+    async handleSubmit(e) {
       this.errors = []
 
       if (!this.username) {
@@ -59,22 +60,22 @@ export default {
 
       e.preventDefault()
 
-      if (this.errors.length) return
+      if (this.errors.length) {
+        return;
+      }
 
-      try {
-        this.isLoading = true;
+      this.isLoading = true;
 
-        const response = updateUsername(this.httpClient)(this.username);
+      const response = updateUsername(this.httpClient)(this.username);
 
-        if (isOk(response)) {
-          this.$store.commit('setUsername', this.username);
-          this.$toast.success(`Username updated.`)
-          router.push({ name: 'account-settings' })
-        } else {
-          this.$toast.error(`There was a problem updating your username, please try again.`)
-        }
-      } catch (err) {
-        this.errors = err.response.data.errors || []
+      if (isOk(response)) {
+        this.$store.commit('setUsername', this.username);
+        this.$toast.success(`Username updated.`)
+        router.push({ name: 'account-settings' })
+      } else {
+        console.error(formatError(response));
+        this.errors = extractErrors(response);
+        this.$toast.error(`There was a problem updating your username, please try again.`)
       }
 
       this.isLoading = false
@@ -83,5 +84,4 @@ export default {
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

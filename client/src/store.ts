@@ -12,7 +12,7 @@ import type { Game, Player, Star } from "./types/game";
 import type { Store } from 'vuex/types/index.js';
 import type {Badge} from "@solaris-common";
 import {getBadges} from "./services/typedapi/badge";
-import {isOk} from "./services/typedapi";
+import {formatError, isOk} from "./services/typedapi";
 import type {UserClientSocketEmitter} from "@/sockets/socketEmitters/user";
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import {detailMe} from "@/services/typedapi/user";
@@ -617,6 +617,8 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
       if (isOk(response)) {
         commit('setBadges', response.data);
         return response.data;
+      } else {
+        console.error(formatError(response));
       }
     }
   },
