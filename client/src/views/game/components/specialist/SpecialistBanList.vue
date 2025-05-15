@@ -30,7 +30,7 @@
 <script>
 import SpecialistIconVue from '../specialist/SpecialistIcon.vue'
 import SpecialistBanListTable from './SpecialistBanListTable.vue'
-import SpecialistService from "@/services/api/specialist.js";
+import SpecialistService from "@/services/api/specialist";
 
 export default {
   components: {

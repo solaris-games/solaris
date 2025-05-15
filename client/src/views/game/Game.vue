@@ -118,7 +118,7 @@ export default {
 
     this.polling = setInterval(this.reloadGameCheck, reloadGameCheckInterval)
 
-    await this.$store.dispatch('loadSpecialistData');
+    await this.$store.dispatch('loadSpecialistData', this.$store.state.game._id);
     await this.$store.dispatch('loadColourData');
   },
   beforeUnmount() {
