@@ -1,4 +1,12 @@
-import {GetRoute, PostRoute, DeleteRoute, SimpleGetRoute, SimplePostRoute, SimpleDeleteRoute} from "./index";
+import {
+    GetRoute,
+    PostRoute,
+    DeleteRoute,
+    SimpleGetRoute,
+    SimplePostRoute,
+    SimpleDeleteRoute,
+    SimplePutRoute
+} from "./index";
 import type {LeaderboardUser} from "../types/common/leaderboard";
 import type {UserGameSettings} from "../types/common/settings";
 import type {UserSubscriptions} from "../types/common/subscriptions";
@@ -36,7 +44,7 @@ export const createUserRoutes = <ID>() => ({
     updateEmailPreference: new SimplePostRoute<{ enabled: boolean }, {}>("/api/user/changeEmailPreference"),
     updateEmailOtherPreference: new SimplePostRoute<{ enabled: boolean }, {}>("/api/user/changeEmailOtherPreference"),
     updateUsername: new SimplePostRoute<{ username: string }, {}>("/api/user/changeUsername"),
-    updateEmailAddress: new SimplePostRoute<{ email: string }, {}>("/api/user/changeEmailAddress"),
+    updateEmailAddress: new SimplePutRoute<{ email: string }, {}>("/api/user/changeEmailAddress"),
     updatePassword: new SimplePostRoute<{ currentPassword: string, newPassword: string }, {}>("/api/user/changePassword"),
     requestPasswordReset: new SimplePostRoute<{ email: string }, {}>("/api/user/requestResetPassword"),
     resetPassword: new SimplePostRoute<{ token: string, newPassword: string }, {}>("/api/user/resetPassword"),
