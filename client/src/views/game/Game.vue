@@ -46,6 +46,7 @@ import router from '../../router'
 import {withMessages} from "../../util/messages";
 import {userClientSocketEmitterInjectionKey} from "@/sockets/socketEmitters/user";
 import { httpInjectionKey, isOk } from '@/services/typedapi'
+import {getSettings} from "@/services/typedapi/user";
 
 export default {
   components: {
