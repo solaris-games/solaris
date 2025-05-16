@@ -1,8 +1,8 @@
 <template>
   <view-container>
-    <view-title title="Forgot Password" navigation="home"/>
+    <view-title title="Forgot Password" navigation="home" />
 
-    <form-error-list v-bind:errors="errors"/>
+    <form-error-list v-bind:errors="errors" />
 
     <form @submit.prevent="handleSubmit">
       <div class="mb-2">
@@ -16,9 +16,10 @@
       </div>
     </form>
 
-    <p class="mt-3">Not receiving emails? Contact a developer on <a href="https://discord.com/invite/v7PD33d">Discord</a>.</p>
+    <p class="mt-3">Not receiving emails? Contact a developer on <a
+        href="https://discord.com/invite/v7PD33d">Discord</a>.</p>
 
-    <loading-spinner :loading="isLoading"/>
+    <loading-spinner :loading="isLoading" />
   </view-container>
 </template>
 
@@ -28,7 +29,8 @@ import ViewContainer from '../components/ViewContainer.vue'
 import router from '../../router'
 import ViewTitle from '../components/ViewTitle.vue'
 import FormErrorList from '../components/FormErrorList.vue'
-import userService from '../../services/api/user'
+import { inject } from 'vue'
+import { extractErrors, formatError, httpInjectionKey, isOk } from '@/services/typedapi'
 
 export default {
   components: {
@@ -37,7 +39,12 @@ export default {
     'view-title': ViewTitle,
     'form-error-list': FormErrorList
   },
-  data () {
+  setup() {
+    return {
+      httpClient: inject(httpInjectionKey),
+    };
+  },
+  data() {
     return {
       isLoading: false,
       errors: [],
@@ -45,7 +52,7 @@ export default {
     }
   },
   methods: {
-    async handleSubmit (e) {
+    async handleSubmit(e) {
       this.errors = []
 
       if (!this.email) {
@@ -54,23 +61,23 @@ export default {
 
       e.preventDefault()
 
-      if (this.errors.length) return
-
-      try {
-        this.isLoading = true
-
-        let response = await userService.requestResetPassword(this.email)
-
-        if (response.status === 200) {
-          this.$toast.success(`A password reset email has been sent to the email address, please check your email inbox.`)
-        } else {
-          this.$toast.error(`There was a problem resetting your password, please check that you entered your email address correctly.`)
-        }
-
-        router.push({ name: 'home' })
-      } catch (err) {
-        this.errors = err.response.data.errors || []
+      if (this.errors.length) {
+        return;
       }
+
+      this.isLoading = true
+
+      const response = await requestResetPassword(this.httpClient)(this.email);
+
+      if (isOk(response)) {
+        this.$toast.success(`A password reset email has been sent to the email address, please check your email inbox.`)
+      } else {
+        console.error(formatError(response));
+        this.errors = extractErrors(response);
+        this.$toast.error(`There was a problem resetting your password, please check that you entered your email address correctly.`)
+      }
+
+      router.push({ name: 'home' })
 
       this.isLoading = false
     }
@@ -78,5 +85,4 @@ export default {
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

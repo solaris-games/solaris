@@ -17,13 +17,6 @@ export interface Config {
         port?: string;
         from?: string;
     },
-    google: {
-        recaptcha: {
-            enabled: boolean;
-            siteKey?: string;
-            secretKey?: string;
-        }
-    },
     paypal: {
         environment: string;
         clientId?: string;

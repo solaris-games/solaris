@@ -2,95 +2,92 @@
   <view-container>
     <view-title :title="user ? user.username : 'Achievements'" />
 
-    <roles :user="user" :displayText="true"/>
+    <roles :user="user" :displayText="true" />
 
-    <loading-spinner :loading="!user"/>
+    <loading-spinner :loading="!user" />
 
     <user-guild-info :user="user" />
 
-    <achievements v-if="user"
-          :level="user.achievements.level"
-          :victories="user.achievements.victories"
-          :rank="user.achievements.rank"
-          :renown="user.achievements.renown"/>
+    <achievements v-if="user" :level="user.achievements.level" :victories="user.achievements.victories"
+      :rank="user.achievements.rank" :renown="user.achievements.renown" />
 
-    <user-badges :userId="userId"/>
+    <user-badges :userId="userId" />
 
-    <view-subtitle title="Rank" class="mt-2"/>
+    <view-subtitle title="Rank" class="mt-2" />
     <div class="row" v-if="user">
       <div class="col-12 table-responsive">
-      <table class="table table-striped table-hover">
-        <tbody>
-          <tr>
-            <td>Rank</td>
-            <td class="text-end">
-              <img class="user-level-icon" :src="levelSrc">
-              {{ user.level.name }}
-            </td>
-          </tr>
-          <tr>
-            <td>Rank Points</td>
-            <td class="text-end">{{ user.achievements.rank }}</td>
-          </tr>
-          <tr v-if="user.level.rankPointsNext != null">
-            <td>Next Rank Points</td>
-            <td class="text-end">{{ user.level.rankPointsNext }}</td>
-          </tr>
-          <tr>
-            <td>ELO <i class="fas fa-question-circle" title="Improve your ELO by participating in 1v1's"></i></td>
-            <td class="text-end">{{ user.achievements.eloRating || 1200 }}</td>
-          </tr>
-          <tr>
-            <td>Victories</td>
-            <td class="text-end">{{ user.achievements.victories }}</td>
-          </tr>
-          <tr>
-            <td>Victories (1 vs. 1)</td>
-            <td class="text-end">{{ user.achievements.victories1v1 }}</td>
-          </tr>
-        </tbody>
-      </table>
+        <table class="table table-striped table-hover">
+          <tbody>
+            <tr>
+              <td>Rank</td>
+              <td class="text-end">
+                <img class="user-level-icon" :src="levelSrc">
+                {{ user.level.name }}
+              </td>
+            </tr>
+            <tr>
+              <td>Rank Points</td>
+              <td class="text-end">{{ user.achievements.rank }}</td>
+            </tr>
+            <tr v-if="user.level.rankPointsNext != null">
+              <td>Next Rank Points</td>
+              <td class="text-end">{{ user.level.rankPointsNext }}</td>
+            </tr>
+            <tr>
+              <td>ELO <i class="fas fa-question-circle" title="Improve your ELO by participating in 1v1's"></i></td>
+              <td class="text-end">{{ user.achievements.eloRating || 1200 }}</td>
+            </tr>
+            <tr>
+              <td>Victories</td>
+              <td class="text-end">{{ user.achievements.victories }}</td>
+            </tr>
+            <tr>
+              <td>Victories (1 vs. 1)</td>
+              <td class="text-end">{{ user.achievements.victories1v1 }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
-    <view-subtitle title="Games" class="mt-2"/>
+    <view-subtitle title="Games" class="mt-2" />
     <div class="row" v-if="user">
       <div class="col-sm-12 col-md-8 table-responsive">
-      <table class="table table-striped table-hover">
-        <tbody>
-          <tr>
-            <td>Joined</td>
-            <td class="text-end">{{ user.achievements.joined }}</td>
-          </tr>
-          <tr>
-            <td>Completed</td>
-            <td class="text-end">{{ user.achievements.completed }}</td>
-          </tr>
-          <tr>
-            <td>Defeated</td>
-            <td class="text-end">{{ user.achievements.defeated }}</td>
-          </tr>
-          <tr>
-            <td>Defeated (1 vs. 1)</td>
-            <td class="text-end">{{ user.achievements.defeated1v1 }}</td>
-          </tr>
-          <tr>
-            <td>Quit</td>
-            <td class="text-end">{{ user.achievements.quit }}</td>
-          </tr>
-          <tr>
-            <td>AFK</td>
-            <td class="text-end">{{ user.achievements.afk }}</td>
-          </tr>
-        </tbody>
-      </table>
+        <table class="table table-striped table-hover">
+          <tbody>
+            <tr>
+              <td>Joined</td>
+              <td class="text-end">{{ user.achievements.joined }}</td>
+            </tr>
+            <tr>
+              <td>Completed</td>
+              <td class="text-end">{{ user.achievements.completed }}</td>
+            </tr>
+            <tr>
+              <td>Defeated</td>
+              <td class="text-end">{{ user.achievements.defeated }}</td>
+            </tr>
+            <tr>
+              <td>Defeated (1 vs. 1)</td>
+              <td class="text-end">{{ user.achievements.defeated1v1 }}</td>
+            </tr>
+            <tr>
+              <td>Quit</td>
+              <td class="text-end">{{ user.achievements.quit }}</td>
+            </tr>
+            <tr>
+              <td>AFK</td>
+              <td class="text-end">{{ user.achievements.afk }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
       <div class="d-none d-md-block col-4">
         <polar-area-chart v-if="gamesChartData" :chart-data="gamesChartData" :options="pieChartOptions" />
       </div>
     </div>
 
-    <view-subtitle title="Military"/>
+    <view-subtitle title="Military" />
     <div class="row" v-if="user">
       <div class="col-sm-12 col-md-8 table-responsive">
         <table class="table table-striped table-hover">
@@ -143,7 +140,7 @@
       </div>
     </div>
 
-    <view-subtitle title="Infrastructure"/>
+    <view-subtitle title="Infrastructure" />
     <div class="row" v-if="user">
       <div class="col-sm-12 col-md-8 table-responsive">
         <table class="table table-striped table-hover">
@@ -180,7 +177,7 @@
       </div>
     </div>
 
-    <view-subtitle title="Research"/>
+    <view-subtitle title="Research" />
     <div class="row" v-if="user">
       <div class="col-sm-12 col-md-8 table-responsive">
         <table class="table table-striped table-hover">
@@ -225,7 +222,7 @@
       </div>
     </div>
 
-    <view-subtitle title="Trade"/>
+    <view-subtitle title="Trade" />
     <div class="row" v-if="user">
       <div class="col-sm-12 col-md-8 table-responsive">
         <table class="table table-striped table-hover">
@@ -288,10 +285,12 @@ import ViewSubtitle from '../components/ViewSubtitle.vue'
 import Achievements from '../game/components/player/Achievements.vue'
 import PieChart from '../game/components/intel/PieChart.vue'
 import PolarArea from '../game/components/intel/PolarAreaChart.vue'
-import userService from '../../services/api/user'
 import UserGuildInfoVue from '../guild/components/UserGuildInfo.vue'
 import Roles from '../game/components/player/Roles.vue'
 import UserBadges from '../game/components/badges/UserBadges.vue'
+import { inject } from 'vue';
+import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
+import { getAchievements } from '@/services/typedapi/user'
 
 export default {
   components: {
@@ -306,7 +305,12 @@ export default {
     'roles': Roles,
     'user-badges': UserBadges
   },
-  data () {
+  setup() {
+    return {
+      httpClient: inject(httpInjectionKey)
+    }
+  },
+  data() {
     return {
       user: null,
       gamesChartData: null,
@@ -358,10 +362,10 @@ export default {
       }
     }
   },
-  async mounted () {
-    try {
-      let response = await userService.getUserAchievements(this.userId)
+  async mounted() {
+    const response = await getAchievements(this.httpClient)(this.userId);
 
+    if (isOk(response)) {
       this.user = response.data
 
       this.loadGamesChart()
@@ -369,12 +373,12 @@ export default {
       this.loadInfrastructureChart()
       this.loadResearchChart()
       this.loadTradeChart()
-    } catch (err) {
-      console.error(err)
+    } else {
+      console.error(formatError(response));
     }
   },
   methods: {
-    loadGamesChart () {
+    loadGamesChart() {
       this.gamesChartData = null
 
       let chartData = {
@@ -410,7 +414,7 @@ export default {
 
       this.gamesChartData = chartData
     },
-    loadMilitaryChart () {
+    loadMilitaryChart() {
       this.militaryChartData = null
 
       let chartData = {
@@ -457,7 +461,7 @@ export default {
 
       this.militaryChartData = chartData
     },
-    loadInfrastructureChart () {
+    loadInfrastructureChart() {
       this.infrastructureChartData = null
 
       let chartData = {
@@ -482,7 +486,7 @@ export default {
 
       this.infrastructureChartData = chartData
     },
-    loadResearchChart () {
+    loadResearchChart() {
       this.researchChartData = null
 
       let chartData = {
@@ -522,7 +526,7 @@ export default {
 
       this.researchChartData = chartData
     },
-    loadTradeChart () {
+    loadTradeChart() {
       this.tradeChartData = null
 
       let chartData = {
@@ -596,7 +600,7 @@ export default {
     userId: function () {
       return this.$route.params.userId
     },
-    levelSrc () {
+    levelSrc() {
       return new URL(`../../assets/levels/${this.user.achievements.level}.png`, import.meta.url).href
     },
   }

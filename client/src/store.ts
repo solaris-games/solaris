@@ -2,11 +2,9 @@ import { createStore } from 'vuex';
 import { type Axios } from 'axios';
 import { type EventBus } from './eventBus';
 import MenuEventBusEventNames from './eventBusEventNames/menu';
-import GameContainer from './game/container.js';
 import GameMutationNames from './mutationNames/gameMutationNames';
 import PlayerMutationNames from './mutationNames/playerMutationNames';
 import ApiAuthService from "./services/api/auth.js";
-import ApiUserService from "./services/api/user.js";
 import ColourService from './services/api/colour.js';
 import SpecialistService from './services/api/specialist.js';
 import GameHelper from './services/gameHelper.js';
@@ -14,8 +12,10 @@ import type { Game, Player, Star } from "./types/game";
 import type { Store } from 'vuex/types/index.js';
 import type {Badge} from "@solaris-common";
 import {getBadges} from "./services/typedapi/badge";
-import {isError} from "./services/typedapi";
+import {formatError, isOk} from "./services/typedapi";
 import type {UserClientSocketEmitter} from "@/sockets/socketEmitters/user";
+import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
+import {detailMe} from "@/services/typedapi/user";
 
 export type MentionCallbacks = {
   player: (p: Player) => void;
@@ -212,7 +212,7 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
       state.colourOverride = value
 
       if (state.game) {
-        GameContainer.reloadGame(state.game, state.settings);
+        eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadGame, {});
       }
     },
 
@@ -364,7 +364,7 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
           player.stats.newShips += s.manufacturing // Add the new value
         }
 
-        GameContainer.reloadStar(star)
+        eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
       })
 
       player.credits -= data.cost
@@ -406,14 +406,14 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
 
       GameHelper.getUserPlayer(state.game).credits -= data.cost
 
-      GameContainer.reloadStar(star)
+      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
     },
     gameStarWarpGateDestroyed (state: State, data) {
       let star = GameHelper.getStarById(state.game, data.starId)
 
       star.warpGate = false
 
-      GameContainer.reloadStar(star)
+      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
     },
     gameStarCarrierBuilt (state: State, data) {
       let carrier = GameHelper.getCarrierById(state.game, data.carrier._id)
@@ -429,8 +429,8 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
       userPlayer.credits -= star.upgradeCosts.carriers
       userPlayer.stats.totalCarriers++
 
-      GameContainer.reloadStar(star)
-      GameContainer.reloadCarrier(data.carrier)
+      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
+      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, { carrier: data.carrier });
     },
     gameStarCarrierShipTransferred (state: State, data) {
       let star = GameHelper.getStarById(state.game, data.starId)
@@ -439,8 +439,8 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
       star.ships = data.starShips
       carrier.ships = data.carrierShips
 
-      GameContainer.reloadStar(star)
-      GameContainer.reloadCarrier(carrier)
+      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
+      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, { carrier });
     },
     gameStarAllShipsTransferred (state: State, data) {
       let star = GameHelper.getStarById(state.game, data.star._id)
@@ -466,12 +466,12 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
       let carriers = state.game!.galaxy.carriers.filter(x => x.orbiting && x.orbiting === star._id && x.ownedByPlayerId === player._id)
 
       carriers.forEach(c => {
-        GameContainer.undrawCarrier(c)
+        eventBus.emit(GameCommandEventBusEventNames.GameCommandRemoveCarrier, { carrier: c });
         state.game!.galaxy.carriers.splice(state.game!.galaxy.carriers.indexOf(c), 1)
       })
 
       // Redraw the star
-      GameContainer.reloadStar(star)
+      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
     },
     gameCarrierScuttled (state: State, data) {
       let carrier = GameHelper.getCarrierById(state.game, data.carrierId)
@@ -484,12 +484,12 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
         player.stats!.totalSpecialists--
       }
 
-      GameContainer.undrawCarrier(carrier)
+      eventBus.emit(GameCommandEventBusEventNames.GameCommandRemoveCarrier, { carrier });
 
       state.game!.galaxy.carriers.splice(state.game!.galaxy.carriers.indexOf(carrier), 1)
 
       if (star) {
-        GameContainer.reloadStar(star)
+        eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
       }
     },
     [PlayerMutationNames.PlayerDebtSettled] (state: State, data) {
@@ -509,7 +509,7 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
       star.specialistId = data.specialist.id
       star.specialist = data.specialist
 
-      GameContainer.reloadStar(star)
+      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
     },
     carrierSpecialistHired (state: State, data) {
       let carrier = GameHelper.getCarrierById(state.game, data.carrierId)
@@ -517,23 +517,23 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
       carrier.specialistId = data.specialist.id
       carrier.specialist = data.specialist
 
-      GameContainer.reloadCarrier(carrier)
+      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, { carrier });
     },
 
     gameStarEconomyUpgraded (state: State, data) {
       data.type = 'economy'
-      let star = GameHelper.starInfrastructureUpgraded(state.game, data)
-      GameContainer.reloadStar(star)
+      const star = GameHelper.starInfrastructureUpgraded(state.game, data)
+      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
     },
     gameStarIndustryUpgraded (state: State, data) {
       data.type = 'industry'
-      let star = GameHelper.starInfrastructureUpgraded(state.game, data)
-      GameContainer.reloadStar(star)
+      const star = GameHelper.starInfrastructureUpgraded(state.game, data)
+      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
     },
     gameStarScienceUpgraded (state: State, data) {
       data.type = 'science'
-      let star = GameHelper.starInfrastructureUpgraded(state.game, data)
-      GameContainer.reloadStar(star)
+      const star = GameHelper.starInfrastructureUpgraded(state.game, data)
+      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
     },
 
     internalAddColourMapping (state: State, data) {
@@ -567,41 +567,13 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
         commit('setColoursConfig', resp.data);
       }
     },
-    async confirm ({ commit, state }, data) {
-      // @ts-ignore
-      const modal = new bootstrap.Modal(window.$('#confirmModal'), {})
-      const close = async () => {
-        modal.toggle()
-        await new Promise((resolve, reject) => setTimeout(resolve, 400));
-      }
-      return new Promise((resolve, reject) => {
-        const settings = {
-          confirmText: data.confirmText || 'Yes',
-          cancelText: data.cancelText || 'No',
-          hideCancelButton: Boolean(data.hideCancelButton),
-          cover: Boolean(data.cover),
-          titleText: data.titleText,
-          text: data.text,
-          onConfirm: async () => {
-            await close()
-            resolve(true)
-          },
-          onCancel: async () => {
-            await close()
-            resolve(false)
-          }
-        }
-        commit('setConfirmationDialogSettings', settings)
-        modal.toggle()
-      })
-    },
     async addColourMapping ({ commit, state }, data) {
       console.warn('Adding colour mapping', data);
 
       await ColourService.addColour(state.game._id, data);
       commit('internalAddColourMapping', data);
 
-      GameContainer.reloadGame(state.game, state.settings);
+      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadGame, {});
     },
     async verify({ commit, state }) {
       try {
@@ -615,8 +587,8 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
             commit('setUserCredits', response.data.credits)
 
             if (!state.user || state.user?._id !== response.data._id) {
-              const resp2 = await ApiUserService.getMyUserInfo();
-              if (resp2.status === 200) {
+              const resp2 = await detailMe(httpClient)();
+              if (isOk(resp2)) {
                 commit('setUser', resp2.data);
               } else {
                 console.error('Failed to get user info', resp2);
@@ -640,9 +612,11 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
       }
 
       const response = await getBadges(httpClient)();
-      if (!isError(response)) {
+      if (isOk(response)) {
         commit('setBadges', response.data);
         return response.data;
+      } else {
+        console.error(formatError(response));
       }
     }
   },

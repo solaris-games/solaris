@@ -1,9 +1,9 @@
 import { type GameState } from "../../api/types/common/game";
 import { makeCastFunc } from "../../utilities/cast";
-import { type SocketEventName } from "./socketEventName";
+import { type EventName} from "../../events";
 
 export type GameSocketEventType = { gameSocketEventType: 'gameSocketEventType' };
-export type GameSocketEventName<TData> = SocketEventName<GameSocketEventType, TData> & { gameSocketEventName: 'gameSocketEventName' };
+export type GameSocketEventName<TData> = EventName<GameSocketEventType, TData> & { gameSocketEventName: 'gameSocketEventName' };
 
 const toEventName: <TData>(value: string) => GameSocketEventName<TData> = makeCastFunc();
 

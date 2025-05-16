@@ -2,25 +2,23 @@
   <div id="gameRoot">
     <logo v-if="!hasGame"></logo>
 
-    <loading-spinner :loading="!hasGame"/>
+    <loading-spinner :loading="!hasGame" />
 
     <div v-if="hasGame">
-        <span class="d-none">{{ gameId }}</span>
+      <span class="d-none">{{ gameId }}</span>
 
-      <colour-override-dialog v-if="colourOverride" :playerId="colourOverride.playerId" @onColourOverrideCancelled="onColourOverrideCancelled" @onColourOverrideConfirmed="onColourOverrideConfirmed" />
+      <colour-override-dialog v-if="colourOverride" :playerId="colourOverride.playerId"
+        @onColourOverrideCancelled="onColourOverrideCancelled" @onColourOverrideConfirmed="onColourOverrideConfirmed" />
 
-      <game-container @onStarClicked="onStarClicked"
-                    @onStarRightClicked="onStarRightClicked"
-                    @onCarrierClicked="onCarrierClicked"
-                    @onCarrierRightClicked="onCarrierRightClicked"
-                    @onObjectsClicked="onObjectsClicked"/>
+      <game-container @onStarClicked="onStarClicked" @onStarRightClicked="onStarRightClicked"
+        @onCarrierClicked="onCarrierClicked" @onCarrierRightClicked="onCarrierRightClicked"
+        @onObjectsClicked="onObjectsClicked" />
 
-        <main-bar @onPlayerSelected="onPlayerSelected"
-                  @onReloadGameRequested="reloadGame"
-                  @onViewColourOverrideRequested="onViewColourOverrideRequested" />
+      <main-bar @onPlayerSelected="onPlayerSelected" @onReloadGameRequested="reloadGame"
+        @onViewColourOverrideRequested="onViewColourOverrideRequested" />
 
-        <chat @onOpenPlayerDetailRequested="onPlayerSelected"
-              @onOpenReportPlayerRequested="onOpenReportPlayerRequested"/>
+      <chat @onOpenPlayerDetailRequested="onPlayerSelected"
+        @onOpenReportPlayerRequested="onOpenReportPlayerRequested" />
 
     </div>
   </div>
@@ -34,7 +32,6 @@ import MENU_STATES from '../../services/data/menuStates'
 import MainBar from './components/menu/MainBar.vue'
 import Chat from './components/inbox/Chat.vue'
 import GameApiService from '../../services/api/game'
-import UserApiService from '../../services/api/user'
 import GameHelper from '../../services/gameHelper'
 import AudioService from '../../game/audio'
 import gameHelper from '../../services/gameHelper'
@@ -44,8 +41,10 @@ import { inject } from 'vue';
 import { playerClientSocketEmitterInjectionKey } from '../../sockets/socketEmitters/player'
 import GameEventBusEventNames from '../../eventBusEventNames/game'
 import router from '../../router'
-import {withMessages} from "../../util/messages";
-import {userClientSocketEmitterInjectionKey} from "@/sockets/socketEmitters/user";
+import { withMessages } from "../../util/messages";
+import { userClientSocketEmitterInjectionKey } from "@/sockets/socketEmitters/user";
+import { formatError, httpInjectionKey, isOk } from '@/services/typedapi'
+import {getSettings} from "@/services/typedapi/user";
 
 export default {
   components: {
@@ -63,9 +62,10 @@ export default {
       eventBus: inject(eventBusInjectionKey),
       playerClientSocketEmitter: inject(playerClientSocketEmitterInjectionKey),
       userClientSockerEmitter: inject(userClientSocketEmitterInjectionKey),
+      httpClient: inject(httpInjectionKey),
     }
   },
-  data () {
+  data() {
     return {
       audio: null,
       MENU_STATES: MENU_STATES,
@@ -76,7 +76,7 @@ export default {
       colourOverride: null
     }
   },
-  async created () {
+  async created() {
     AudioService.loadStore(this.$store)
 
     this.$store.commit('clearGame')
@@ -121,10 +121,10 @@ export default {
     await this.$store.dispatch('loadSpecialistData', this.$store.state.game._id);
     await this.$store.dispatch('loadColourData');
   },
-  beforeUnmount () {
+  beforeUnmount() {
     clearInterval(this.polling)
   },
-  unmounted () {
+  unmounted() {
     const player = GameHelper.getUserPlayer(this.$store.state.game)
 
     this.playerClientSocketEmitter.emitGameRoomLeft({
@@ -137,25 +137,25 @@ export default {
     document.title = 'Solaris'
   },
   methods: {
-    onColourOverrideConfirmed (e) {
+    onColourOverrideConfirmed(e) {
       this.colourOverride = null;
     },
-    onColourOverrideCancelled (e) {
+    onColourOverrideCancelled(e) {
       this.colourOverride = null;
     },
-    onViewColourOverrideRequested (e) {
+    onViewColourOverrideRequested(e) {
       this.colourOverride = {
         playerId: e
       };
     },
-    async attemptLogin () {
+    async attemptLogin() {
       if (this.$store.state.userId) {
         return;
       }
 
       this.$store.dispatch('verify')
     },
-    async reloadGame () {
+    async reloadGame() {
       // if (this.$isHistoricalMode()) { // Do not reload if in historical mode
       //   return
       // }
@@ -180,27 +180,25 @@ export default {
         await router.push({ name: 'main-menu' })
       }
     },
-    async reloadSettings () {
-      try {
-        let response = await UserApiService.getGameSettings()
+    async reloadSettings() {
+      const response = await getSettings(this.httpClient)();
 
-        if (response.status === 200) {
-          this.$store.commit('setSettings', response.data) // Persist to storage
-        }
-      } catch (err) {
-        console.error(err)
+      if (isOk(response)) {
+        this.$store.commit('setSettings', response.data) // Persist to storage
+      } else {
+        console.error(formatError(response));
       }
     },
-    getUserPlayer () {
+    getUserPlayer() {
       return GameHelper.getUserPlayer(this.$store.state.game)
     },
 
     // MENU
 
-    resetMenuState () {
+    resetMenuState() {
       this.$store.commit('clearMenuState')
     },
-    onPlayerSelected (e) {
+    onPlayerSelected(e) {
       this.$store.commit('setMenuState', {
         state: MENU_STATES.PLAYER,
         args: e
@@ -208,13 +206,13 @@ export default {
 
       this.$emit('onPlayerSelected', e)
     },
-    onOpenReportPlayerRequested (e) {
+    onOpenReportPlayerRequested(e) {
       this.$store.commit('setMenuState', {
         state: MENU_STATES.REPORT_PLAYER,
         args: e
       });
     },
-    onStarClicked (e) {
+    onStarClicked(e) {
       this.$store.commit('setMenuState', {
         state: MENU_STATES.STAR_DETAIL,
         args: e
@@ -222,7 +220,7 @@ export default {
 
       AudioService.click()
     },
-    onStarRightClicked (e) {
+    onStarRightClicked(e) {
       let star = GameHelper.getStarById(this.$store.state.game, e)
       let owningPlayer = GameHelper.getStarOwningPlayer(this.$store.state.game, star)
 
@@ -232,7 +230,7 @@ export default {
 
       AudioService.click()
     },
-    onCarrierClicked (e) {
+    onCarrierClicked(e) {
       this.$store.commit('setMenuState', {
         state: MENU_STATES.CARRIER_DETAIL,
         args: e
@@ -240,7 +238,7 @@ export default {
 
       AudioService.click()
     },
-    onCarrierRightClicked (e) {
+    onCarrierRightClicked(e) {
       let carrier = GameHelper.getCarrierById(this.$store.state.game, e)
       let owningPlayer = GameHelper.getCarrierOwningPlayer(this.$store.state.game, carrier)
 
@@ -250,7 +248,7 @@ export default {
 
       AudioService.click()
     },
-    onObjectsClicked (e) {
+    onObjectsClicked(e) {
       this.$store.commit('setMenuState', {
         state: MENU_STATES.MAP_OBJECT_SELECTOR,
         args: e
@@ -259,7 +257,7 @@ export default {
       AudioService.open()
     },
 
-    async reloadGameCheck () {
+    async reloadGameCheck() {
       if (!this.isLoggedIn || this.ticking) {
         return
       }
@@ -301,24 +299,23 @@ export default {
     }
   },
   computed: {
-    menuState () {
+    menuState() {
       return this.$store.state.menuState
     },
-    menuArguments () {
+    menuArguments() {
       return this.$store.state.menuArguments
     },
-    gameId () {
+    gameId() {
       return this.$store.state.game._id
     },
-    hasGame () {
+    hasGame() {
       return this.$store.state.game
     },
-    isLoggedIn () {
+    isLoggedIn() {
       return this.$store.state.userId != null
     }
   }
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
