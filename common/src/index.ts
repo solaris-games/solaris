@@ -28,6 +28,7 @@ export * from "./api/controllers";
 export * from "./api/controllers/admin";
 export * from "./api/controllers/badge";
 export * from "./api/controllers/user";
+export * from "./api/controllers/spectator";
 export * from "./events/index";
 export * from "./events/handler";
 export * from "./events/emitter";
