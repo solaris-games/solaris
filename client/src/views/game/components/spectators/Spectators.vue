@@ -15,7 +15,7 @@
 
     <p class="text-info"><i>Spectators will view the game from the perspective of the players they are spectating. For more information, see the wiki.</i></p>
 
-    <invite-spectator @onSpectatorInvited="loadSpectators" class="pb-2"/>
+    <invite-spectator @onSpectatorsInvited="loadSpectators" class="pb-2"/>
 </div>
 </template>
 
