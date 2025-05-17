@@ -2,7 +2,6 @@ import { ExpressJoiInstance } from "express-joi-validation";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import SpectatorController from '../controllers/spectator';
 import { MiddlewareContainer } from "../middleware";
-import { spectatorInviteSpectatorRequestSchema } from "../requests/spectator";
 import { SingleRouter } from "../singleRoute";
 import {createSpectatorRoutes} from "solaris-common/dist/api/controllers/spectator";
 import {DBObjectId} from "../../services/types/DBObjectId";
@@ -33,7 +32,6 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
 
     answer(routes.inviteSpectators,
             mw.auth.authenticate(),
-            validator.body(spectatorInviteSpectatorRequestSchema),
             mw.playerMutex.wait(),
             mw.game.loadGame({
                 lean: true,
