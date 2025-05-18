@@ -82,6 +82,13 @@ export default {
     guildFullName () {
       return `${this.guild.name} [${this.guild.tag}]`
     },
+  },
+  watch: {
+    '$route.params.guildId': {
+      handler: (_oldVal, newVal) => {
+        this.loadGuild(newVal);
+      }
+    }
   }
 }
 
