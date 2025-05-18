@@ -139,11 +139,11 @@ import { inject, onMounted, ref, computed, type Ref } from 'vue'
 import { formatError, httpInjectionKey, isOk, unwrapOk } from '@/services/typedapi'
 import { deleteUser, detailMe, updateEmailOtherPreference, updateEmailPreference } from '@/services/typedapi/user'
 import type { UserPrivate } from '@solaris-common'
-import { useRoute } from 'vue-router'
 import { toastInjectionKey } from '@/util/keys'
 import type { State } from "@/store";
 import { useStore, type Store } from 'vuex';
 import { makeConfirm } from '@/util/confirm'
+import { useRoute } from 'vue-router';
 
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
