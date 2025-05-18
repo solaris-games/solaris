@@ -251,8 +251,8 @@ export const stringValue = (props: StringValidationProps) => (v: any) => {
     return s
 }
 
-export const UNICODE_PRINTABLE_CHARACTERS_NON_WHITESPACE =  /^[\p{L}\p{N}\p{M}\p{S}\p{P}]+$/u;
+export const UNICODE_PRINTABLE_CHARACTERS_NON_WHITESPACE =  /^[\p{L}\p{N}\p{M}\p{Cf}\p{S}\p{P}]+$/u;
 
-export const UNICODE_PRINTABLE_CHARACTERS_WITH_WHITESPACE = /^[\p{L}\p{N}\p{M}\p{S}\p{P}\p{Z}]+$/u;
+export const UNICODE_PRINTABLE_CHARACTERS_WITH_WHITESPACE = /^[\p{L}\p{N}\p{M}\p{Cf}\p{S}\p{P}\p{Z}]+$/u;
 
 export const UNICODE_INVISIBLE_CHARACTERS = /[\p{C}\p{Mn}\p{Me}]+/u;
