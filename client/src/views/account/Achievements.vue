@@ -25,7 +25,7 @@ import Achievements from '../game/components/player/Achievements.vue'
 import UserGuildInfo from '../guild/components/UserGuildInfo.vue'
 import Roles from '../game/components/player/Roles.vue'
 import UserBadges from '../game/components/badges/UserBadges.vue'
-import { ref, inject, onMounted, computed, type Ref } from 'vue';
+import { ref, inject, onMounted, computed, watch, type Ref } from 'vue';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { getAchievements } from '@/services/typedapi/user'
 import type {AchievementsUser} from "@solaris-common";
@@ -39,7 +39,7 @@ const userId = computed(() => route.params.userId as string);
 
 const user: Ref<AchievementsUser<string> | null> = ref(null);
 
-onMounted(async () => {
+const loadAchievements = async () => {
   const response = await getAchievements(httpClient)(userId.value);
 
   if (isOk(response)) {
@@ -47,6 +47,17 @@ onMounted(async () => {
   } else {
     console.error(formatError(response));
   }
+};
+
+watch(
+  userId,
+  (_newId, _oldId) => {
+    loadAchievements();
+  }
+)
+
+onMounted(async () => {
+  await loadAchievements();
 });
 </script>
 
