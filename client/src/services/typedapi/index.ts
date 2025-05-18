@@ -52,7 +52,7 @@ export const formatError = (response: ResponseResultRequestError | ResponseResul
 export const extractErrors = (response: ResponseResultRequestError | ResponseResultResponseError) => {
   if (response.kind === ResponseResultKind.ResponseError) {
     try {
-      return JSON.parse(response.data)?.errors || [];
+      return response.data['errors'] || [];
     } catch (e) {
       return null;
     }
