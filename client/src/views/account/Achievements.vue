@@ -51,7 +51,4 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.user-level-icon {
-  height: 28px;
-}
 </style>

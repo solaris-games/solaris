@@ -539,5 +539,7 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-
+.user-level-icon {
+  height: 28px;
+}
 </style>
