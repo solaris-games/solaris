@@ -11,7 +11,7 @@
 
     <hr />
 
-    <loading-spinner v-if="isLoading" />
+    <loading-spinner :loading="isLoading" />
 
     <div v-if="avatars">
       <div class="row mb-4" v-for="avatar in sortedAvatars" :key="avatar.id">
