@@ -61,7 +61,7 @@ const handleSubmit = async e => {
     return;
   }
 
-  const actualUsernames = usernames.value.split(',').map(username => username.trim()).filter(username => username.length > 0);
+  const actualUsernames = usernames.value.split('\n').map(username => username.trim()).filter(username => username.length > 0);
   const usernamesText = actualUsernames.join(", ");
 
   if (!(await confirm('Invite Spectator', `Are you sure you want to invite ${usernamesText} to spectate? They will be able to view the galaxy from your perspective.`))) {
