@@ -1,5 +1,6 @@
 import ValidationError from "../../errors/validation";
 import { keyHasBooleanValue, keyHasStringValue } from "./helpers";
+import {email, object, password, string, stringValue, username, Validator} from "../validate";
 
 export interface UserCreateUserRequest {
     email: string;
@@ -7,31 +8,11 @@ export interface UserCreateUserRequest {
     password: string;
 };
 
-export const mapToUserCreateUserRequest = (body: any): UserCreateUserRequest => {
-    let errors: string[] = [];
-
-    if (!keyHasStringValue(body, 'email')) {
-        errors.push('Email is required.');
-    }
-
-    if (!keyHasStringValue(body, 'username')) {
-        errors.push('Username is required.');
-    }
-
-    if (!keyHasStringValue(body, 'password')) {
-        errors.push('Password is required.');
-    }
-
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    return {
-        email: body.email,
-        username: body.username,
-        password: body.password,
-    }
-};
+export const parseCreateUserRequest: Validator<UserCreateUserRequest> = object({
+    email: email,
+    username: username,
+    password: password,
+});
 
 export interface UserUpdateEmailPreferenceRequest {
     enabled: boolean;

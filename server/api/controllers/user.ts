@@ -1,6 +1,15 @@
 import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
-import { mapToUserCreateUserRequest, mapToUserRequestPasswordResetRequest, mapToUserRequestUsernameRequest, mapToUserResetPasswordResetRequest, mapToUserUpdateEmailPreferenceRequest, mapToUserUpdateEmailRequest, mapToUserUpdatePasswordRequest, mapToUserUpdateUsernameRequest } from '../requests/user';
+import {
+    mapToUserRequestPasswordResetRequest,
+    mapToUserRequestUsernameRequest,
+    mapToUserResetPasswordResetRequest,
+    mapToUserUpdateEmailPreferenceRequest,
+    mapToUserUpdateEmailRequest,
+    mapToUserUpdatePasswordRequest,
+    mapToUserUpdateUsernameRequest,
+    parseCreateUserRequest
+} from '../requests/user';
 import {logger} from "../../utils/logging";
 
 const log = logger("User Controller");
@@ -22,7 +31,7 @@ export default (container: DependencyContainer) => {
             const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
             try {
-                const reqObj = mapToUserCreateUserRequest(req.body);
+                const reqObj = parseCreateUserRequest(req.body);
 
                 const email = reqObj.email.toLowerCase();
     
