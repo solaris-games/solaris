@@ -45,7 +45,7 @@ export const detailMe = (axios: Axios) => async (): Promise<ResponseResult<UserP
   return doGet(axios)(routes.detailMe, {}, {}, { withCredentials: true });
 }
 
-export const listMyAvatars = (axios: Axios) => async (): Promise<ResponseResult<{ avatars: UserAvatar[] }>> => {
+export const listMyAvatars = (axios: Axios) => async (): Promise<ResponseResult<UserAvatar[]>> => {
   return doGet(axios)(routes.listMyAvatars, {}, {}, { withCredentials: true });
 }
 
