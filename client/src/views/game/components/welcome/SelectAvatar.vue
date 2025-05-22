@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="!isLoading">
     <div class="row avatar-container text-center">
       <img v-if="avatar != null" :src="getAvatarImage()" width="128" height="128">
       <p v-if="avatar == null" class="select-avatar-warning text-warning">Select an avatar</p>
@@ -49,7 +49,7 @@ const reloadAvatars = async () => {
   const response = await listMyAvatars(httpClient)();
 
   if (isOk(response)) {
-    avatars.value = response.data.avatars;
+    avatars.value = response.data;
   } else {
     console.error(formatError(response));
   }
@@ -72,7 +72,7 @@ const getAvatarImage = () => {
 }
 
 const nextAvatar = () => {
-  if (avatar.value == null) {
+  if (!avatar.value) {
     avatar.value = avatars.value.find(a => a.id === 21)!;
   } else {
     let currentIndex = avatars.value.indexOf(avatar.value);
@@ -90,7 +90,7 @@ const nextAvatar = () => {
 };
 
 const prevAvatar = () => {
-  if (avatar.value == null) {
+  if (!avatar.value) {
     avatar.value = avatars.value.find(a => a.id === 21)!;
   } else {
     let currentIndex = avatars.value.indexOf(avatar.value);
