@@ -8,7 +8,7 @@ const log = logger("Player Mutex Middleware");
 
 export interface PlayerMutexMiddleware {
     wait: () => (req: Request<{ gameId?: DBObjectId }>, res: Response, next: NextFunction) => Promise<any>;
-    release: () => (req: Request<{ gameId?: DBObjectId }>, res: Response, next: NextFunction) => Promise<any>;
+    release: (ignoreCheckUserInGame?: boolean) => (req: Request<{ gameId?: DBObjectId }>, res: Response, next: NextFunction) => Promise<any>;
 }
 
 export const middleware = (container: DependencyContainer): PlayerMutexMiddleware => {
@@ -91,7 +91,7 @@ export const middleware = (container: DependencyContainer): PlayerMutexMiddlewar
                 }
             }
         },
-        release: () => {
+        release: (ignoreCheckUserInGame?: boolean) => {
             return async (req: Request<{ gameId?: DBObjectId }>, res: Response, next: NextFunction) => {
                 try {
                     if (req.params.gameId == null) {
@@ -110,10 +110,12 @@ export const middleware = (container: DependencyContainer): PlayerMutexMiddlewar
                         throw new ValidationError('User ID is required.');
                     }
 
-                    let userPlayerId: DBObjectId | undefined = gamePlayers.find(p => p.userId?.toString() === req.session.userId?.toString())?._id;
+                    if (!ignoreCheckUserInGame) {
+                        const userPlayerId: DBObjectId | undefined = gamePlayers.find(p => p.userId?.toString() === req.session.userId?.toString())?._id;
 
-                    if (userPlayerId == null) {
-                        throw new ValidationError('You are not participating in this game.');
+                        if (userPlayerId == null) {
+                            throw new ValidationError('You are not participating in this game.');
+                        }
                     }
 
                     if (req.playerMutexLocks != null) {
