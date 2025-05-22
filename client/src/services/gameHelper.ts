@@ -1,6 +1,7 @@
 import moment, {type Moment} from 'moment'
 import DiplomacyHelper from './diplomacyHelper.js'
 import type {Game, Player, Star} from "../types/game";
+import type { Location } from '@solaris-common';
 
 class GameHelper {
   getUserPlayer (game) {
@@ -854,19 +855,19 @@ class GameHelper {
     }
   }
 
-  calculateGalaxyCenterX (game) {
-    let starFieldLeft = this.calculateMinStarX(game)
-    let starFieldRight = this.calculateMaxStarX(game)
+  calculateGalaxyCenterX (game: Game): number {
+    const starFieldLeft = this.calculateMinStarX(game)
+    const starFieldRight = this.calculateMaxStarX(game)
     return starFieldLeft + ((starFieldRight - starFieldLeft) / 2.0)
   }
 
-  calculateGalaxyCenterY (game) {
-    let starFieldTop = this.calculateMinStarY(game)
-    let starFieldBottom = this.calculateMaxStarY(game)
+  calculateGalaxyCenterY (game: Game): number {
+    const starFieldTop = this.calculateMinStarY(game)
+    const starFieldBottom = this.calculateMaxStarY(game)
     return starFieldTop + ((starFieldBottom - starFieldTop) / 2.0)
   }
 
-  calculateMinStarX (game: Game) {
+  calculateMinStarX (game: Game): number {
     if (!game.galaxy.stars.length) { return 0 }
 
     return game.galaxy.stars.sort((a, b) => a.location.x - b.location.x)[0].location.x
@@ -914,19 +915,19 @@ class GameHelper {
     return game.galaxy.carriers.sort((a, b) => b.location.y - a.location.y)[0].location.y
   }
 
-  isSpecialistsEnabled (game) {
+  isSpecialistsEnabled (game: Game) {
     return game.settings.specialGalaxy.specialistCost !== 'none'
   }
 
-  isSpecialistsTechnologyEnabled (game) {
+  isSpecialistsTechnologyEnabled (game: Game) {
     return game.settings.technology.researchCosts.specialists !== 'none'
   }
 
-  isSpecialistsCurrencyCredits (game) {
+  isSpecialistsCurrencyCredits (game: Game) {
     return this.isSpecialistsEnabled(game) && game.settings.specialGalaxy.specialistsCurrency === 'credits'
   }
 
-  isSpecialistsCurrencyCreditsSpecialists (game) {
+  isSpecialistsCurrencyCreditsSpecialists (game: Game) {
     return this.isSpecialistsEnabled(game) && game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'
   }
 
@@ -939,6 +940,7 @@ class GameHelper {
     return `${dayOfWeek[date.getDay()]} ${date.getDate()} ${monthOfYear[date.getMonth()]} ${date.getHours() < 10 ? '0' + date.getHours() : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}`
   }
 
+  // For placing items on a player territory (e.g. their name). Will return null if player has no territory
   getPlayerTerritoryCenter(game: Game, player: Player) {
     const playerStars = this.getStarsOwnedByPlayer(player, game.galaxy.stars)
 
@@ -946,7 +948,7 @@ class GameHelper {
       return null
     }
 
-    // Work out the center point of all stars
+    // Work out the center point of player stars
     const centerX = playerStars.reduce((sum, s) => sum + s.location.x, 0) / playerStars.length
     const centerY = playerStars.reduce((sum, s) => sum + s.location.y, 0) / playerStars.length
 
@@ -955,7 +957,8 @@ class GameHelper {
     return closestStar.location
   }
 
-  getPlayerEmpireCenter (game: Game, player: Player) {
+  // For centering the player viewport. Will default to some useful value if player has no territory
+  getPlayerEmpireCenter (game: Game, player: Player): Location {
     // Get all of the player's stars.
     const playerStars = this.getStarsOwnedByPlayer(player, game.galaxy.stars)
 
@@ -963,7 +966,10 @@ class GameHelper {
       const playerCarriers = game.galaxy.carriers.filter(car => car.ownedByPlayerId === player._id);
 
       if (playerCarriers.length === 0) {
-        return null;
+        return {
+          x: this.calculateGalaxyCenterX(game),
+          y: this.calculateGalaxyCenterY(game),
+        };
       }
 
       const centerX = playerCarriers.reduce((sum, c) => sum + c.location.x, 0) / playerCarriers.length
@@ -976,7 +982,7 @@ class GameHelper {
     const centerX = playerStars.reduce((sum, s) => sum + s.location.x, 0) / playerStars.length
     const centerY = playerStars.reduce((sum, s) => sum + s.location.y, 0) / playerStars.length
 
-    let closestStar = this.getClosestPlayerStar(game.galaxy.stars, { x: centerX, y: centerY }, player)
+    const closestStar = this.getClosestPlayerStar(game.galaxy.stars, { x: centerX, y: centerY }, player)
 
     return closestStar.location
   }
