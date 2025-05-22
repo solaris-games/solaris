@@ -835,11 +835,7 @@ export default class GameGalaxyService {
             3. Continue to run through current logic as we do today.
         */
 
-        if (!this.gameStateService.isStarted(game) || tick === 0) {
-            return;
-        }
-
-        let history = await this.historyService.getHistoryByTick(game._id, tick);
+        const history = await this.historyService.getHistoryByTick(game._id, tick);
 
         if (!history) {
             return;

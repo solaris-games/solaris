@@ -399,14 +399,10 @@ export default class GameCreateService {
 
         this.gameCreateValidationService.validate(game);
 
-        let gameObject = await game.save();
+        const gameObject = await game.save();
 
-        // TODO: This is a bit more complicated as we need to update the history
-        // for the very first tick when players join the game. The galaxy masking
-        // should only be applied for stars and carriers if its the very first tick.
-        // await this.historyService.log(gameObject);
-        // ^ Maybe fire an event for the historyService to capture?
-        
+        await this.historyService.log(gameObject);
+
         return gameObject;
     }
 
