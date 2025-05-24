@@ -21,6 +21,7 @@ import Carrier from "./carrier";
 import type { EventBus } from '../eventBus'
 import MapEventBusEventNames from '../eventBusEventNames/map'
 import MapCommandEventBusEventNames from "../eventBusEventNames/mapCommand";
+import { createStarHighlight } from './highlight'
 
 export enum ModeKind {
   Galaxy = 'galaxy',
@@ -120,7 +121,7 @@ export class Map {
     this.starContainer = new PIXI.Container()
     this.starContainer.zIndex = 3;
     this.waypointContainer = new PIXI.Container()
-    this.waypointContainer.zIndex = 8;
+    this.waypointContainer.zIndex = 2;
     this.waypointContainer.eventMode = 'none';
     this.rulerPointContainer = new PIXI.Container()
     this.rulerPointContainer.zIndex = 7;
@@ -1031,7 +1032,7 @@ export class Map {
     return false
   }
 
-  refreshZoom (zoomPercent) {
+  refreshZoom (zoomPercent: number) {
     this.zoomPercent = zoomPercent
 
     this.stars.forEach(s => s.refreshZoom(zoomPercent))
@@ -1043,17 +1044,8 @@ export class Map {
   }
 
   highlightLocation (location: Location, opacity = 1) {
-    let graphics = new PIXI.Graphics()
-    let radius = 12
-
-    graphics.star(location.x, location.y, radius, radius, radius - 3)
-    graphics.stroke({
-      width: 1,
-      color: 0xFFFFFF,
-      alpha: opacity,
-    });
-
-    this.highlightLocationsContainer!.addChild(graphics)
+    const graphics = createStarHighlight(location, opacity);
+    this.highlightLocationsContainer!.addChild(graphics);
   }
 
   clearHighlightedLocations () {
