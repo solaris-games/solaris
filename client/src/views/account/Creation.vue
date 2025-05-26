@@ -1,18 +1,19 @@
 <template>
   <div class="full-container">
     <view-container :hideTopBar="true">
-      <view-title title="Create Account" navigation="home"/>
+      <view-title title="Create Account" navigation="home" />
 
       <div class="row">
         <div class="col-sm-12 col-md-6">
           <h4>Sign up to play <span class="text-warning">Solaris</span>!</h4>
           <p>Discover a space strategy game filled with conquest, betrayal and subterfuge.</p>
-          <p>Build alliances, make enemies and fight your way to victory to <span class="text-danger">galactic domination.</span>
+          <p>Build alliances, make enemies and fight your way to victory to <span class="text-danger">galactic
+              domination.</span>
           </p>
           <p><span class="text-info">Research and improve technologies</span> to gain an edge over your opponents. Trade
             with allies and build up huge fleets of ships.</p>
           <p>Will you conquer the galaxy?</p>
-          <hr/>
+          <hr />
           <p>You can play <span class="text-warning">Solaris</span> on any of the following platforms:</p>
           <p>
             <a href="https://solaris.games" target="_blank" title="Web" class="me-2">
@@ -22,55 +23,47 @@
               <i class="fab fa-steam"></i> Steam
             </a>
             <a href="https://play.google.com/store/apps/details?id=com.voxel.solaris_android" target="_blank"
-               title="Android">
+              title="Android">
               <i class="fab fa-google-play"></i> Android
             </a>
           </p>
         </div>
         <div class="col-sm-12 col-md-6">
-          <form-error-list v-bind:errors="errors"/>
+          <form-error-list v-bind:errors="errors" />
 
           <form @submit="handleSubmit">
             <div class="mb-2">
               <label for="email">Email Address</label>
               <input type="email" required="required" class="form-control" name="email" v-model="email"
-                     :disabled="isLoading">
+                :disabled="isLoading">
             </div>
 
             <div class="mb-2">
               <label for="username">Username</label>
               <input type="text" required="required" class="form-control" name="username" minlength="3" maxlength="24"
-                     v-model="username" :disabled="isLoading">
+                v-model="username" :disabled="isLoading">
             </div>
 
             <div class="mb-2">
               <label for="password">Password</label>
               <input type="password" required="required" class="form-control" name="password" v-model="password"
-                     :disabled="isLoading">
+                :disabled="isLoading">
             </div>
 
             <div class="mb-2">
               <label for="passwordConfirm">Re-enter Password</label>
               <input type="password" required="required" class="form-control" name="passwordConfirm"
-                     v-model="passwordConfirm" :disabled="isLoading">
+                v-model="passwordConfirm" :disabled="isLoading">
             </div>
 
             <div class="checkbox mb-2">
               <input id="privacyPolicy" type="checkbox" required="required" name="privacyPolicy"
-                     v-model="privacyPolicyAccepted" :disabled="isLoading" class="me-2">
+                v-model="privacyPolicyAccepted" :disabled="isLoading" class="me-2">
               <label for="privacyPolicy">Accept
-                <router-link :to="{ name: 'privacy-policy'}" class="me-2" title="Privacy Policy">
+                <router-link :to="{ name: 'privacy-policy' }" class="me-2" title="Privacy Policy">
                   Privacy Policy
                 </router-link>
               </label>
-            </div>
-
-            <div class="mb-2" v-if="recaptchaEnabled">
-              <recaptcha
-                :sitekey="recaptchaSiteKey"
-                @verify="onRecaptchaVerify"
-                @expired="onRecaptchaExpired">
-              </recaptcha>
             </div>
 
             <div class="mb-2">
@@ -92,24 +85,25 @@
             </div>
           </form>
 
-          <loading-spinner :loading="isLoading"/>
+          <loading-spinner :loading="isLoading" />
         </div>
       </div>
     </view-container>
 
-    <parallax/>
+    <parallax />
   </div>
 </template>
 
 <script>
-import { VueRecaptcha } from 'vue-recaptcha'
 import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
 import ViewContainer from '../components/ViewContainer.vue'
 import router from '../../router'
 import ViewTitle from '../components/ViewTitle.vue'
 import FormErrorList from '../components/FormErrorList.vue'
-import userService from '../../services/api/user'
 import ParallaxVue from '../components/Parallax.vue'
+import { inject } from 'vue';
+import { extractErrors, formatError, httpInjectionKey, isOk } from '@/services/typedapi';
+import { createUser } from '@/services/typedapi/user';
 
 export default {
   components: {
@@ -117,8 +111,12 @@ export default {
     'view-container': ViewContainer,
     'view-title': ViewTitle,
     'form-error-list': FormErrorList,
-    'recaptcha': VueRecaptcha,
     'parallax': ParallaxVue
+  },
+  setup() {
+    return {
+      httpClient: inject(httpInjectionKey),
+    };
   },
   data() {
     return {
@@ -128,17 +126,10 @@ export default {
       username: null,
       password: null,
       passwordConfirm: null,
-      recaptchaToken: null,
       privacyPolicyAccepted: false
     }
   },
   methods: {
-    onRecaptchaVerify(e) {
-      this.recaptchaToken = e
-    },
-    onRecaptchaExpired(e) {
-      this.recaptchaToken = null
-    },
     async handleSubmit(e) {
       this.errors = []
 
@@ -162,10 +153,6 @@ export default {
         this.errors.push('Passwords must match.')
       }
 
-      if (this.recaptchaEnabled && !this.recaptchaToken) {
-        this.errors.push('Please complete the Recaptcha')
-      }
-
       if (!this.privacyPolicyAccepted) {
         this.errors.push('Privacy policy must be accepted.')
       }
@@ -174,30 +161,21 @@ export default {
 
       if (this.errors.length) return
 
-      try {
-        this.isLoading = true
+      this.isLoading = true
 
-        // Call the account create API endpoint
-        let response = await userService.createUser(this.email, this.username, this.password, this.recaptchaToken)
+      // Call the account create API endpoint
+      const response = await createUser(this.httpClient)(this.email, this.username, this.password);
 
-        if (response.status === 201) {
-          this.$toast.success(`Welcome ${this.username}! You can now log in and play Solaris.`)
+      if (isOk(response)) {
+        this.$toast.success(`Welcome ${this.username}! You can now log in and play Solaris.`)
 
-          router.push({name: 'home'})
-        }
-      } catch (err) {
-        this.errors = err.response.data.errors || []
+        router.push({ name: 'home' })
+      } else {
+        console.error(formatError(response));
+        this.errors = extractErrors(response);
       }
 
       this.isLoading = false
-    }
-  },
-  computed: {
-    recaptchaEnabled() {
-      return import.meta.env.VUE_APP_GOOGLE_RECAPTCHA_ENABLED === 'true'
-    },
-    recaptchaSiteKey() {
-      return import.meta.env.VUE_APP_GOOGLE_RECAPTCHA_SITE_KEY
     }
   }
 }

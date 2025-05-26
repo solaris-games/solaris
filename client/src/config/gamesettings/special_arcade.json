@@ -1,0 +1,140 @@
+{
+    "general": {
+        "name": "[[[RANDOM]]]",
+        "description": "Stars in this galaxy cannot be upgraded and ship population is limited, this mode requires cunning tactics to win.",
+        "type": "special_arcade",
+        "createdFromTemplate": "special_arcade",
+        "mode": "conquest",
+        "password": null,
+        "playerLimit": 10,
+        "playerType": "all",
+        "anonymity": "normal",
+        "playerOnlineStatus": "hidden",
+        "playerIPWarning": "enabled",
+        "timeMachine": "enabled",
+        "fluxEnabled": "enabled",
+        "advancedAI": "enabled",
+        "spectators": "enabled",
+        "afkSlotsOpen": "enabled",
+        "readyToQuit": "enabled",
+        "readyToQuitFraction": 0.9
+    },
+    "galaxy": {
+        "galaxyType": "irregular",
+        "starsPerPlayer": 10,
+        "productionTicks": 20
+    },
+    "specialGalaxy": {
+        "carrierCost": "standard",
+        "carrierUpkeepCost": "none",
+        "warpgateCost": "standard",
+        "specialistCost": "standard",
+        "specialistsCurrency": "credits",
+        "randomWarpGates": 10,
+        "randomWormHoles": 5,
+        "randomNebulas": 15,
+        "randomAsteroidFields": 10,
+        "randomBinaryStars": 10,
+        "randomBlackHoles": 5,
+        "randomPulsars": 1,
+        "darkGalaxy": "start",
+        "giftCarriers": "enabled",
+        "defenderBonus": "enabled",
+        "carrierToCarrierCombat": "enabled",
+        "splitResources": "disabled",
+        "resourceDistribution": "random",
+        "playerDistribution": "circular",
+        "carrierSpeed": 20,
+        "starCaptureReward": "disabled",
+        "specialistBans": {
+            "star": [
+                9
+            ],
+            "carrier": []
+        }
+    },
+    "conquest": {
+        "victoryCondition": "starPercentage",
+        "victoryPercentage": 50,
+        "capitalStarElimination": "disabled"
+    },
+    "kingOfTheHill": {
+        "productionCycles": 10
+    },
+    "orbitalMechanics": {
+        "enabled": "disabled",
+        "orbitSpeed": 3
+    },
+    "player": {
+        "startingStars": 4,
+        "startingCredits": 100,
+        "startingCreditsSpecialists": 0,
+        "startingShips": 10,
+        "startingInfrastructure": {
+            "economy": 4,
+            "industry": 2,
+            "science": 1
+        },
+        "developmentCost": {
+            "economy": "none",
+            "industry": "none",
+            "science": "none"
+        },
+        "tradeCredits": true,
+        "tradeCreditsSpecialists": false,
+        "tradeCost": 15,
+        "tradeScanning": "scanned",
+        "populationCap": {
+            "enabled": "enabled",
+            "shipsPerStar": 100
+        },
+        "allowAbandonStars": "disabled"
+    },
+    "diplomacy": {
+        "enabled": "enabled",
+        "upkeepCost": "standard",
+        "tradeRestricted": "disabled",
+        "maxAlliances": 9,
+        "globalEvents": "disabled"
+    },
+    "technology": {
+        "startingTechnologyLevel": {
+            "terraforming": 1,
+            "experimentation": 1,
+            "scanning": 1,
+            "hyperspace": 1,
+            "manufacturing": 1,
+            "banking": 1,
+            "weapons": 1,
+            "specialists": 1
+        },
+        "researchCosts": {
+            "terraforming": "standard",
+            "experimentation": "standard",
+            "scanning": "standard",
+            "hyperspace": "standard",
+            "manufacturing": "standard",
+            "banking": "standard",
+            "weapons": "standard",
+            "specialists": "none"
+        },
+        "experimentationDistribution": "random",
+        "bankingReward": "standard",
+        "experimentationReward": "standard",
+        "specialistTokenReward": "experimental"
+    },
+    "gameTime": {
+        "gameType": "realTime",
+        "speed": 3600,
+        "isTickLimited": "disabled",
+        "tickLimit": 1000,
+        "startDelay": 240,
+        "turnJumps": 6,
+        "maxTurnWait": 1440,
+        "afk": {
+            "lastSeenTimeout": 2,
+            "cycleTimeout": 3,
+            "turnTimeout": 3
+        }
+    }
+}

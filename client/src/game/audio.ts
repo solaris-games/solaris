@@ -1,4 +1,4 @@
-import type { Store } from 'vuex/types/index.js'
+import type {Store} from "vuex";
 import backspaceFile from '../assets/audio/backspace.mp3'
 import clickFile from '../assets/audio/click.mp3'
 import closeFile from '../assets/audio/close.mp3'
@@ -29,15 +29,25 @@ class AudioService {
   quitAudio: HTMLAudioElement | undefined;
   typeAudio: HTMLAudioElement | undefined;
 
-  _play (audio) {
-    if (this.store && this.store.state.settings.interface.audio === 'disabled') {
+  _play (audio: HTMLAudioElement) {
+    const audioEnabled = this.store?.state?.settings?.interface?.audio === 'disabled';
+
+    if (audioEnabled) {
+      this._preload();
+    }
+
+    if (!this.store || this.store?.state?.settings?.interface?.audio === 'disabled') {
       return
     }
     audio.volume = 0.5
     audio.play()
   }
 
-  preload() {
+  _preload () {
+    if (this.backspaceAudio) {
+      return
+    }
+
     this.backspaceAudio = new Audio(backspaceFile)
     this.clickAudio = new Audio(clickFile)
     this.closeAudio = new Audio(closeFile)
@@ -52,57 +62,62 @@ class AudioService {
     this.typeAudio = new Audio(typeFile)
   }
 
-  loadStore (store) {
-    this.store = store
-    this.preload()
+  loadStore (store: Store<State>) {
+    this.store = store;
+
+    const audioEnabled = this.store?.state?.settings?.interface?.audio === 'disabled';
+
+    if (audioEnabled) {
+      this._preload();
+    }
   }
 
   backspace () {
-    this._play(this.backspaceAudio)
+    this._play(this.backspaceAudio!)
   }
 
   click () {
-    this._play(this.clickAudio)
+    this._play(this.clickAudio!)
   }
 
   close () {
-    this._play(this.closeAudio)
+    this._play(this.closeAudio!)
   }
 
   dialogOpen () {
-    this._play(this.dialogOpenAudio)
+    this._play(this.dialogOpenAudio!)
   }
 
   download () {
-    this._play(this.downloadAudio)
+    this._play(this.downloadAudio!)
   }
 
   hover () {
-    this._play(this.hoverAudio)
+    this._play(this.hoverAudio!)
   }
 
   join () {
-    this._play(this.joinAudio)
+    this._play(this.joinAudio!)
   }
 
   leave () {
-    this._play(this.leaveAudio)
+    this._play(this.leaveAudio!)
   }
 
   loading () {
-    this._play(this.loadingAudio)
+    this._play(this.loadingAudio!)
   }
 
   open () {
-    this._play(this.openAudio)
+    this._play(this.openAudio!)
   }
 
   quit () {
-    this._play(this.quitAudio)
+    this._play(this.quitAudio!)
   }
 
   type () {
-    this._play(this.typeAudio)
+    this._play(this.typeAudio!)
   }
 }
 

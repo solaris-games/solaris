@@ -15,6 +15,13 @@ import relaxed16Img from '../../assets/screenshots/16_player_relaxed.png';
 
     <community-guidelines-bar />
 
+    <div class="row bg-warning p-2 mb-4" title="Email notifications deprecation notice">
+      <span>
+      Email notifications will be deprecated in the upcoming months for technical reasons.
+      Please review your notification settings in your <router-link :to="{ name: 'account-settings' }" tag="a">Account Settings</router-link>.
+      </span>
+    </div>
+
     <flux-bar class="mb-2"/>
 
     <ul class="nav nav-tabs">
@@ -504,7 +511,7 @@ export default {
     'tutorial-game': TutorialGame,
     'help-tooltip': HelpTooltip,
     'flux-bar': FluxBar,
-    'locked-game-overlay': LockedGameOverlay
+    'locked-game-overlay': LockedGameOverlay,
   },
   data () {
     return {

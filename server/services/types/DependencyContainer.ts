@@ -61,7 +61,6 @@ import PlayerReadyService from "../playerReady";
 import PlayerStatisticsService from "../playerStatistics";
 import RandomService from "../random";
 import RatingService from "../rating";
-import RecaptchaService from "../recaptcha";
 import ReportService from "../report";
 import ReputationService from "../reputation";
 import ResearchService from "../research";
@@ -157,7 +156,6 @@ export interface DependencyContainer {
     battleRoyaleService: BattleRoyaleService,
     starMovementService: StarMovementService,
     cacheService: CacheService,
-    recaptchaService: RecaptchaService,
     ratingService: RatingService,
     diplomacyService: DiplomacyService,
     avatarService: AvatarService,

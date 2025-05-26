@@ -1,0 +1,131 @@
+{
+  "general": {
+    "name": "[[[RANDOM]]]",
+    "description": "Go head to head against a single opponent, this game will be down to pure skill.",
+    "type": "1v1_rt",
+    "mode": "conquest",
+    "password": null,
+    "playerLimit": 2,
+    "playerType": "all",
+    "anonymity": "normal",
+    "playerOnlineStatus": "hidden",
+    "playerIPWarning": "enabled",
+    "timeMachine": "enabled",
+    "fluxEnabled": "disabled",
+    "advancedAI": "disabled",
+    "spectators": "enabled",
+    "afkSlotsOpen": "enabled",
+    "readyToQuit": "enabled"
+  },
+  "galaxy": {
+    "galaxyType": "circular-balanced",
+    "starsPerPlayer": 40,
+    "productionTicks": 20
+  },
+  "specialGalaxy": {
+    "carrierCost": "standard",
+    "carrierUpkeepCost": "none",
+    "warpgateCost": "standard",
+    "specialistCost": "standard",
+    "specialistsCurrency": "creditsSpecialists",
+    "randomWarpGates": 0,
+    "randomWormHoles": 0,
+    "randomNebulas": 0,
+    "randomAsteroidFields": 0,
+    "randomBinaryStars": 0,
+    "randomBlackHoles": 0,
+    "randomPulsars": 0,
+    "darkGalaxy": "fog",
+    "giftCarriers": "disabled",
+    "defenderBonus": "enabled",
+    "carrierToCarrierCombat": "enabled",
+    "splitResources": "disabled",
+    "resourceDistribution": "random",
+    "playerDistribution": "circular",
+    "carrierSpeed": 10,
+    "starCaptureReward": "enabled",
+    "specialistBans": {
+      "star": [16, 17],
+      "carrier": []
+    }
+  },
+  "conquest": {
+    "victoryCondition": "starPercentage",
+    "victoryPercentage": 66,
+    "capitalStarElimination": "enabled"
+  },
+  "orbitalMechanics": {
+    "enabled": "disabled",
+    "orbitSpeed": 3
+  },
+  "player": {
+    "startingStars": 6,
+    "startingCredits": 1000,
+    "startingCreditsSpecialists": 5,
+    "startingShips": 10,
+    "startingInfrastructure": {
+      "economy": 5,
+      "industry": 5,
+      "science": 2
+    },
+    "developmentCost": {
+      "economy": "standard",
+      "industry": "standard",
+      "science": "cheap"
+    },
+    "tradeCredits": false,
+    "tradeCreditsSpecialists": false,
+    "tradeCost": 0,
+    "tradeScanning": "all",
+    "populationCap": {
+      "enabled": "disabled",
+      "shipsPerStar": 100
+    },
+    "allowAbandonStars": "disabled"
+  },
+  "diplomacy": {
+    "enabled": "disabled",
+    "upkeepCost": "none",
+    "maxAlliances": 1, 
+    "tradeRestricted": "disabled", 
+    "globalEvents": "disabled"
+  },
+  "technology": {
+    "startingTechnologyLevel": {
+      "terraforming": 1,
+      "experimentation": 0,
+      "scanning": 2,
+      "hyperspace": 1,
+      "manufacturing": 1,
+      "banking": 1,
+      "weapons": 5,
+      "specialists": 3
+    },
+    "researchCosts": {
+      "terraforming": "standard",
+      "experimentation": "none",
+      "scanning": "standard",
+      "hyperspace": "standard",
+      "manufacturing": "expensive",
+      "banking": "cheap",
+      "weapons": "none",
+      "specialists": "standard"
+    },
+    "experimentationDistribution": "random",
+    "bankingReward": "standard",
+    "experimentationReward": "standard",
+    "specialistTokenReward": "standard"
+  },
+  "gameTime": {
+    "gameType": "realTime",
+    "speed": 3600,
+    "isTickLimited": "enabled",
+    "tickLimit": 400,
+    "startDelay": 240,
+    "afk": {
+      "lastSeenTimeout": 2,
+      "cycleTimeout": 3,
+      "turnTimeout": 3
+    }
+  }
+}

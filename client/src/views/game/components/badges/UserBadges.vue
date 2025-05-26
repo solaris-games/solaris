@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import {ref, onMounted, type Ref, inject} from 'vue';
+import {ref, onMounted, type Ref, inject, watch} from 'vue';
 import type {Axios} from 'axios';
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import Badge from './Badge.vue'
@@ -18,7 +18,7 @@ import {useStore} from 'vuex';
 import type {Store} from 'vuex/types/index.js';
 import type {AwardedBadge, Badge as TBadge} from "@solaris-common";
 import {getBadgesForUser} from "../../../../services/typedapi/badge";
-import {httpInjectionKey, isError} from "../../../../services/typedapi";
+import {httpInjectionKey, isError, isOk} from "../../../../services/typedapi";
 
 const props = defineProps<{ userId: string }>();
 
@@ -32,31 +32,37 @@ const store = useStore() as Store<State>;
 
 const httpClient: Axios = inject(httpInjectionKey)!;
 
+const loadBadges = async () => {
+  const response = await getBadgesForUser(httpClient)(props.userId)
+
+  if (isOk(response)) {
+    badges.value = response.data.sort((a, b) => {
+      if (!a.time) {
+        return 1;
+      } else if (!b.time) {
+        return -1;
+      } else {
+        return a.time.getTime() - b.time.getTime();
+      }
+    });
+  } else {
+    badges.value = [];
+    console.error(response.cause);
+  }
+};
+
+watch(
+  () => props.userId,
+  (_newId, _oldId) => {
+    loadBadges();
+  });
+
 onMounted(async () => {
   isLoading.value = true
 
   allBadges.value = await store.dispatch('getBadges');
 
-  try {
-    const response = await getBadgesForUser(httpClient)(props.userId)
-
-    if (isError(response)) {
-      badges.value = [];
-      console.error(response.cause);
-    } else {
-      badges.value = response.data.sort((a, b) => {
-        if (!a.time) {
-          return 1;
-        } else if (!b.time) {
-          return -1;
-        } else {
-          return a.time.getTime() - b.time.getTime();
-        }
-      });
-    }
-  } catch (err) {
-    console.error(err)
-  }
+  await loadBadges();
 
   isLoading.value = false;
 });

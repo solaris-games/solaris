@@ -1,6 +1,6 @@
 import { Emitter, type DefaultEventsMap } from '@socket.io/component-emitter';
 import { Socket } from 'socket.io-client';
-import type { SocketEventName } from 'solaris-common';
+import type {EventName} from 'solaris-common';
 import type { Store } from 'vuex/types/index.js';
 import GameHelper from '../../services/gameHelper';
 import type { PlayerClientSocketEmitter } from '../socketEmitters/player';
@@ -43,7 +43,7 @@ export class ClientHandler {
     });
   }
 
-  protected socketOn<TSocketEventName extends SocketEventName<ClientSocketEventType, TData>, TData extends unknown>(emitter: Emitter<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap>, event: TSocketEventName, listener: (e: TData) => void): void {
+  protected socketOn<TSocketEventName extends EventName<ClientSocketEventType, TData>, TData extends unknown>(emitter: Emitter<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap>, event: TSocketEventName, listener: (e: TData) => void): void {
     emitter.on(event as string, listener);
   }
 }

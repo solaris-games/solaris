@@ -70,7 +70,7 @@ export default {
             return GameHelper.isTutorialGame(this.$store.state.game)
         },
         isGameInProgress () {
-            return GameHelper.isGameInProgress(this.$store.state.game)
+            return GameHelper.isGameStarted(this.$store.state.game) && !GameHelper.isGameFinished(this.$store.state.game);
         }
     }
 }

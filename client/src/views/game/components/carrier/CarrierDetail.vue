@@ -166,9 +166,12 @@
           @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
       </div>
 
-      <div class="row pt-2 pb-0 mb-0" v-if="hasWaypoints">
+      <div class="row pt-2 pb-2" v-if="hasWaypoints">
         <div class="col">
-          <p class="mb-2">ETA<orbital-mechanics-eta-warning />: {{timeRemainingEta}} <span v-if="carrier.waypoints.length > 1">({{timeRemainingEtaTotal}})</span></p>
+          <span>ETA<orbital-mechanics-eta-warning />: {{timeRemainingEta}} <span v-if="carrier.waypoints.length > 1">({{timeRemainingEtaTotal}})</span></span>
+        </div>
+        <div class="col">
+          <span>Speed: {{carrierSpeed}}</span>
         </div>
       </div>
 
@@ -217,7 +220,6 @@ import { inject } from 'vue';
 import GameHelper from '../../../../services/gameHelper'
 import CarrierApiService from '../../../../services/api/carrier'
 import MenuTitle from '../MenuTitle.vue'
-import GameContainer from '../../../../game/container'
 import WaypointTable from './WaypointTable.vue'
 import CarrierSpecialistVue from './CarrierSpecialist.vue'
 import GiftCarrierVue from './GiftCarrier.vue'
@@ -230,6 +232,7 @@ import HelpTooltip from '../../../components/HelpTooltip.vue'
 import {formatLocation} from "client/src/util/format";
 import {eventBusInjectionKey} from "../../../../eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
+import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 
 export default {
   components: {
@@ -293,8 +296,7 @@ export default {
   methods: {
     formatLocation,
     onCloseRequested (e) {
-      GameContainer.unselectAllCarriers()
-
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandUnselectAllCarriers, {});
       this.$emit('onCloseRequested', e)
     },
     onViewCompareIntelRequested (e) {
@@ -338,7 +340,7 @@ export default {
       return GameHelper.getStarById(this.$store.state.game, this.carrier.waypoints[0].source)
     },
     getFirstWaypointSourceName () {
-      let source = this.getFirstWaypointSource()
+      const source = this.getFirstWaypointSource()
 
       return source ? source.name : 'Unknown'
     },
@@ -350,7 +352,7 @@ export default {
       return GameHelper.getStarById(this.$store.state.game, this.carrier.waypoints[0].destination)
     },
     getFirstWaypointDestinationName () {
-      let destination = this.getFirstWaypointDestination()
+      const destination = this.getFirstWaypointDestination()
 
       return destination ? destination.name : 'Unknown'
     },
@@ -365,7 +367,7 @@ export default {
 
           this.carrier.waypointsLooped = !this.carrier.waypointsLooped
 
-          GameContainer.reloadCarrier(this.carrier)
+          this.eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, { carrier: this.carrier });
         }
       } catch (err) {
         console.error(err)
@@ -397,7 +399,7 @@ export default {
 
           this.carrier.waypoints = [firstWaypoint];
 
-          GameContainer.reloadCarrier(this.carrier)
+          this.eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, { carrier: this.carrier });
 
           this.$toast.default(`${this.carrier.name} has been converted into a gift.`)
         }
@@ -525,6 +527,9 @@ export default {
     },
     isGameDarkMode () {
       return GameHelper.isDarkMode(this.$store.state.game)
+    },
+    carrierSpeed () {
+      return GameHelper.getCarrierSpeed(this.$store.state.game, this.carrierOwningPlayer, this.carrier, this.getFirstWaypointSource(), this.getFirstWaypointDestination());
     }
   }
 }

@@ -1,5 +1,7 @@
 import type { Player } from "./player";
 import type { Team } from "./game";
+import type {UserRoles} from "./user";
+import type {GuildDataForUser} from "./guild";
 
 export interface PlayerStatistics {
     totalStars: number;
@@ -15,18 +17,18 @@ export interface PlayerStatistics {
     totalStarSpecialists: number;
     totalCarrierSpecialists: number;
     totalSpecialists: number;
-};
+}
 
 export interface LeaderboardPlayer<ID> {
     player: Player<ID>;
     stats: PlayerStatistics;
     isKingOfTheHill?: boolean;
-};
+}
 
 export interface PlayerLeaderboard<ID>{
     leaderboard: LeaderboardPlayer<ID>[];
     fullKey: string;
-};
+}
 
 export interface TeamLeaderboard<ID> {
     leaderboard: LeaderboardTeam<ID>[];
@@ -36,4 +38,21 @@ export interface LeaderboardTeam<ID> {
     team: Team<ID>;
     starCount: number;
     capitalCount: number;
+}
+
+export interface LeaderboardUser<ID> {
+    _id: ID,
+    username: string;
+    position: number;
+    guildId: ID;
+    roles: UserRoles;
+    achievements: {
+        victories: number,
+        rank: number,
+        renown: number,
+        eloRating: number,
+        level: number,
+        victories1v1: number,
+    };
+    guild: GuildDataForUser<ID>
 }

@@ -2,9 +2,11 @@ import * as PIXI from 'pixi.js'
 import GameHelper from '../services/gameHelper'
 import WaypointHelper from '../services/waypointHelper'
 import {EventEmitter} from "./eventEmitter.js";
-import type { Game, Carrier as CarrierData } from '../types/game';
+import type {Game, Carrier as CarrierData} from '../types/game';
 import type { DrawingContext } from './container';
 import type { TempWaypoint } from '../types/waypoint';
+import { createStarHighlight } from './highlight';
+import type { Location } from "@solaris-common";
 
 class Waypoints extends EventEmitter {
   container: PIXI.Container;
@@ -19,17 +21,17 @@ class Waypoints extends EventEmitter {
     this.container = new PIXI.Container()
   }
 
-  setup (game, context) {
-    this.game = game
-    this.context = context
-    this.lightYearDistance = game.constants.distances.lightYear
+  setup (game: Game, context: DrawingContext) {
+    this.game = game;
+    this.context = context;
+    this.lightYearDistance = game.constants.distances.lightYear;
   }
 
   clear () {
-    this.container.removeChildren()
+    this.container.removeChildren();
   }
 
-  draw (carrier, plotting=true) {
+  draw (carrier: CarrierData, plotting=true) {
     this.clear()
 
     this.carrier = carrier
@@ -44,7 +46,11 @@ class Waypoints extends EventEmitter {
   drawLastWaypoint () {
     // If there are no waypoints at all
     // then deem the current location as the waypoint.
-    let lastLocation = this._getLastLocation()
+    const lastLocation = this._getLastLocation();
+
+    if (!lastLocation) {
+      return;
+    }
 
     // Draw a big selected highlight around the last waypoint.
     this._highlightLocation(lastLocation, 0.8)
@@ -130,18 +136,9 @@ class Waypoints extends EventEmitter {
     this.container.addChild(graphics)
   }
 
-  _highlightLocation (location, opacity) {
-    let graphics = new PIXI.Graphics()
-    let radius = 12
-
-    graphics.star(location.x, location.y, radius, radius, radius - 3)
-    graphics.stroke({
-      width: 1,
-      color: 0xFFFFFF,
-      alpha: opacity,
-    })
-
-    this.container.addChild(graphics)
+  _highlightLocation (location: Location, alpha = 1) {
+    const graphics = createStarHighlight(location, alpha);
+    this.container.addChild(graphics);
   }
 
   onStarClicked (e) {
@@ -181,7 +178,7 @@ class Waypoints extends EventEmitter {
       actionShips: 0,
       delayTicks: 0,
       source: undefined,
-    }
+    };
 
     // If the carrier has waypoints, create a new waypoint from the last destination.
     if (this.carrier!.waypoints.length) {
@@ -199,7 +196,7 @@ class Waypoints extends EventEmitter {
 
     this.carrier!.waypoints.push(newWaypoint as any)
 
-    this.draw(this.carrier)
+    this.draw(this.carrier!)
 
     this.emit('onWaypointCreated', newWaypoint)
   }
@@ -223,22 +220,22 @@ class Waypoints extends EventEmitter {
   }
 
   _getLastLocation () {
-    let lastLocationStar = this._getLastLocationStar()
+    const lastLocationStar = this._getLastLocationStar();
 
     if (lastLocationStar) {
-      return lastLocationStar.location
+      return lastLocationStar.location;
     }
 
-    return null
+    return null;
   }
 
   _getLastLocationStar () {
     if (this.carrier!.waypoints.length) {
-      let lastWaypointStarId = this.carrier!.waypoints[this.carrier!.waypoints.length - 1].destination
+      const lastWaypointStarId = this.carrier!.waypoints[this.carrier!.waypoints.length - 1].destination;
 
-      return this.game!.galaxy.stars.find(s => s._id === lastWaypointStarId)
+      return this.game!.galaxy.stars.find(s => s._id === lastWaypointStarId);
     } else {
-      return this.game!.galaxy.stars.find(s => s._id === this.carrier!.orbiting)
+      return this.game!.galaxy.stars.find(s => s._id === this.carrier!.orbiting);
     }
   }
 }

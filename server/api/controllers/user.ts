@@ -1,6 +1,15 @@
 import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
-import { mapToUserCreateUserRequest, mapToUserRequestPasswordResetRequest, mapToUserRequestUsernameRequest, mapToUserResetPasswordResetRequest, mapToUserUpdateEmailPreferenceRequest, mapToUserUpdateEmailRequest, mapToUserUpdatePasswordRequest, mapToUserUpdateUsernameRequest } from '../requests/user';
+import {
+    mapToUserRequestPasswordResetRequest,
+    mapToUserRequestUsernameRequest,
+    mapToUserResetPasswordResetRequest,
+    mapToUserUpdateEmailPreferenceRequest,
+    parseUserUpdateEmailRequest,
+    parseUserUpdatePasswordRequest,
+    parseUserUpdateUserNameRequest,
+    parseCreateUserRequest
+} from '../requests/user';
 import {logger} from "../../utils/logging";
 
 const log = logger("User Controller");
@@ -19,11 +28,10 @@ export default (container: DependencyContainer) => {
             }
         },
         create: async (req, res, next) => {
-            let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-            let recaptchaEnabled = container.recaptchaService.isEnabled();
-    
+            const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
             try {
-                const reqObj = mapToUserCreateUserRequest(req.body, recaptchaEnabled);
+                const reqObj = parseCreateUserRequest(req.body);
 
                 const email = reqObj.email.toLowerCase();
     
@@ -41,18 +49,7 @@ export default (container: DependencyContainer) => {
                     throw new ValidationError('An account with this username already exists');
                 }
     
-                // Before we create a new account, verify that the user is not a robot.
-                if (recaptchaEnabled) {
-                    try {
-                        let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-    
-                        await container.recaptchaService.verify(ip, reqObj.recaptchaToken!);
-                    } catch (err) {
-                        throw new ValidationError(['Recaptcha is invalid']);
-                    }
-                }
-    
-                let userId = await container.userService.create(email, username, reqObj.password, ip);
+                const userId = await container.userService.create(email, username, reqObj.password, ip);
     
                 res.status(201).json({ id: userId });
                 return next();
@@ -62,7 +59,7 @@ export default (container: DependencyContainer) => {
         },
         getSettings: async (req, res, next) => {
             try {
-                let settings = await container.userService.getGameSettings(req.session.userId);
+                const settings = await container.userService.getGameSettings(req.session.userId);
     
                 res.status(200).json(settings);
                 return next();
@@ -152,16 +149,6 @@ export default (container: DependencyContainer) => {
                 return next(err);
             }
         },
-        detail: async (req, res, next) => {
-            try {
-                let user = await container.userService.getInfoByIdLean(req.params.id);
-    
-                res.status(200).json(user);
-                return next();
-            } catch (err) {
-                return next(err);
-            }
-        },
         getAchievements: async (req, res, next) => {
             try {
                 let achievements = await container.achievementService.getAchievements(req.params.id);
@@ -198,7 +185,7 @@ export default (container: DependencyContainer) => {
         },
         updateUsername: async (req, res, next) => {
             try {
-                const reqObj = mapToUserUpdateUsernameRequest(req.body);
+                const reqObj = parseUserUpdateUserNameRequest(req.body);
                 
                 await container.userService.updateUsername(req.session.userId, reqObj.username);
     
@@ -210,7 +197,7 @@ export default (container: DependencyContainer) => {
         },
         updateEmailAddress: async (req, res, next) => {
             try {
-                const reqObj = mapToUserUpdateEmailRequest(req.body);
+                const reqObj = parseUserUpdateEmailRequest(req.body);
                 
                 await container.userService.updateEmailAddress(req.session.userId, reqObj.email);
     
@@ -222,7 +209,7 @@ export default (container: DependencyContainer) => {
         },
         updatePassword: async (req, res, next) => {
             try {
-                const reqObj = mapToUserUpdatePasswordRequest(req.body);
+                const reqObj = parseUserUpdatePasswordRequest(req.body);
                 
                 await container.userService.updatePassword(
                     req.session.userId,

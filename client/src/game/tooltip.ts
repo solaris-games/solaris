@@ -20,6 +20,11 @@ export default class {
     this.context = context
   }
 
+  destroy() {
+    this.clear();
+    this.game = undefined;
+  }
+
   clear() {
     if (this.intervalDraw) {
       clearInterval(this.intervalDraw)
@@ -93,6 +98,10 @@ export default class {
     // Note: We have to do this in order to account
     // for carrier ETAs in real time.
     const redraw = () => {
+      if (!this.game) {
+        return;
+      }
+
       const isOwnedByUserPlayer = GameHelper.isOwnedByUserPlayer(this.game, carrier)
 
       const detail = [

@@ -101,7 +101,9 @@ import MenuTitle from '../MenuTitle.vue'
 import FormErrorList from '../../../components/FormErrorList.vue'
 import GameHelper from '../../../../services/gameHelper'
 import CarrierApiService from '../../../../services/api/carrier'
-import GameContainer from '../../../../game/container'
+import { inject } from 'vue';
+import {eventBusInjectionKey} from "@/eventBus";
+import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 
 export default {
   components: {
@@ -111,6 +113,12 @@ export default {
   },
   props: {
     carrierId: String
+  },
+
+  setup () {
+    return {
+      eventBus: inject(eventBusInjectionKey)
+    }
   },
   data () {
     return {
@@ -144,8 +152,8 @@ export default {
   },
   methods: {
     onCloseRequested (e) {
-      GameContainer.unselectAllStars()
-      GameContainer.unselectAllCarriers()
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandUnselectAllStars);
+      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandUnselectAllCarriers);
 
       this.$emit('onCloseRequested', e)
     },

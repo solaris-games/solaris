@@ -23,6 +23,7 @@ import {toastInjectionKey} from "./util/keys";
 import {UserClientSocketHandler} from "./sockets/socketHandlers/user";
 import {UserClientSocketEmitter} from "@/sockets/socketEmitters/user";
 import {userClientSocketEmitterInjectionKey} from "@/sockets/socketEmitters/user";
+import { makeConfirm } from "./util/confirm"
 
 // Note: This was done to get around an issue where the Steam client
 // had bootstrap as undefined. This also affects the UI template we're using,
@@ -93,16 +94,9 @@ app.provide(toastInjectionKey, app.config.globalProperties.$toast);
 
 const clientHandler: ClientHandler = new ClientHandler(socket, store, playerClientSocketEmitter, userClientSocketEmitter);
 
-app.config.globalProperties.$confirm = async function(title, text, confirmText = 'Yes', cancelText = 'No', hideCancelButton = false, cover = false) {
-  return this.$store.dispatch('confirm', {
-    titleText: title,
-    text,
-    confirmText,
-    cancelText,
-    hideCancelButton,
-    cover
-  })
-}
+const confirm = makeConfirm(store);
+
+app.config.globalProperties.$confirm = confirm;
 
 app.config.globalProperties.$isHistoricalMode = function() {
   return this.$store.state.tick !== this.$store.state.game.state.tick

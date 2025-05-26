@@ -1,43 +1,18 @@
 import ValidationError from "../../errors/validation";
 import { keyHasBooleanValue, keyHasStringValue } from "./helpers";
+import {email, object, password, string, stringValue, username, Validator} from "../validate";
 
 export interface UserCreateUserRequest {
     email: string;
     username: string;
     password: string;
-    recaptchaToken?: string | null;
 };
 
-export const mapToUserCreateUserRequest = (body: any, recaptchaEnabled: boolean): UserCreateUserRequest => {
-    let errors: string[] = [];
-
-    if (!keyHasStringValue(body, 'email')) {
-        errors.push('Email is required.');
-    }
-
-    if (!keyHasStringValue(body, 'username')) {
-        errors.push('Username is required.');
-    }
-
-    if (!keyHasStringValue(body, 'password')) {
-        errors.push('Password is required.');
-    }
-
-    if (recaptchaEnabled && !keyHasStringValue(body, 'recaptchaToken')) {
-        errors.push('Recaptcha Token is required');
-    }
-
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    return {
-        email: body.email,
-        username: body.username,
-        password: body.password,
-        recaptchaToken: body.recaptchaToken
-    }
-};
+export const parseCreateUserRequest: Validator<UserCreateUserRequest> = object({
+    email: email,
+    username: username,
+    password: password,
+});
 
 export interface UserUpdateEmailPreferenceRequest {
     enabled: boolean;
@@ -63,67 +38,27 @@ export interface UserUpdateUsernameRequest {
     username: string;
 };
 
-export const mapToUserUpdateUsernameRequest = (body: any): UserUpdateUsernameRequest => {
-    let errors: string[] = [];
-
-    if (!keyHasStringValue(body, 'username')) {
-        errors.push('Username is required.');
-    }
-
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    return {
-        username: body.username
-    }
-};
+export const parseUserUpdateUserNameRequest: Validator<UserUpdateUsernameRequest> = object({
+    username: username,
+});
 
 export interface UserUpdateEmailRequest {
     email: string;
 };
 
-export const mapToUserUpdateEmailRequest = (body: any): UserUpdateEmailRequest => {
-    let errors: string[] = [];
-
-    if (!keyHasStringValue(body, 'email')) {
-        errors.push('Email is required.');
-    }
-
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    return {
-        email: body.email
-    }
-};
+export const parseUserUpdateEmailRequest: Validator<UserUpdateEmailRequest> = object({
+    email: email,
+});
 
 export interface UserUpdatePasswordRequest {
     currentPassword: string;
     newPassword: string;
 };
 
-export const mapToUserUpdatePasswordRequest = (body: any): UserUpdatePasswordRequest => {
-    let errors: string[] = [];
-
-    if (!keyHasStringValue(body, 'currentPassword')) {
-        errors.push('Current Password is required.');
-    }
-
-    if (!keyHasStringValue(body, 'newPassword')) {
-        errors.push('New Password is required.');
-    }
-
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    return {
-        currentPassword: body.currentPassword,
-        newPassword: body.newPassword
-    }
-};
+export const parseUserUpdatePasswordRequest: Validator<UserUpdatePasswordRequest> = object({
+    currentPassword: string,
+    newPassword: password,
+});
 
 export interface UserRequestPasswordResetRequest {
     email: string;

@@ -148,7 +148,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.player.loadPlayer,
             mw.player.validatePlayerState({ isPlayerUndefeated: true }),
             controller.quit,
-            mw.playerMutex.release()
+            mw.playerMutex.release(true),
     );
 
     router.put('/api/game/:gameId/concedeDefeat',
@@ -169,7 +169,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.player.loadPlayer,
             mw.player.validatePlayerState({ isPlayerUndefeated: true }),
             controller.concede,
-            mw.playerMutex.release()
+            mw.playerMutex.release(true)
     );
 
     router.put('/api/game/:gameId/ready',

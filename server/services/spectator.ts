@@ -5,6 +5,7 @@ import { DBObjectId } from "./types/DBObjectId";
 import { Game, GameSpectator } from "./types/Game";
 import { Player } from "./types/Player";
 import UserService from "./user";
+import {notNull} from "./utils";
 
 export default class SpectatorService {
     gameRepo: Repository<Game>;
@@ -25,17 +26,16 @@ export default class SpectatorService {
         return game.settings.general.spectators === 'enabled';
     }
 
-    async invite(game: Game, player: Player, username: string) {
+    async invite(game: Game, player: Player, usernames: string[]) {
         if (!this.isSpectatingEnabled(game)) {
             throw new ValidationError(`Spectating is not enabled in this game.`);
         }
 
-        let user = await this.userService.getByUsername(username, {
-            _id: 1
-        });
-        
-        if (!user) {
-            throw new ValidationError(`A player with the username ${username} does not exist.`);
+        const users = (await Promise.all(usernames.map(username => this.userService.getByUsername(username, { _id: 1 })))).filter(notNull);
+
+        if (users.length !== usernames.length) {
+            const missingUsernames = usernames.filter(username => !users.find(user => user.username === username));
+            throw new ValidationError(`The following users do not exist: ${missingUsernames.join(', ')}`);
         }
 
         await this.gameRepo.updateOne({
@@ -43,7 +43,9 @@ export default class SpectatorService {
             'galaxy.players._id': player._id
         }, {
             $addToSet: {
-                'galaxy.players.$.spectators': user._id
+                'galaxy.players.$.spectators': {
+                    $each: users.map(user => user._id),
+                }
             }
         });
     }
