@@ -111,14 +111,15 @@ export default class GameCreateService {
             settings.general.featured = false // Stop any tricksters.
 
             // Prevent players from being able to create more than 1 game.
-            let openGames = await this.gameListService.listOpenGamesCreatedByUser(settings.general.createdByUserId);
-            let userIsGameMaster = await this.userService.getUserIsGameMaster(settings.general.createdByUserId);
+            const openGames = await this.gameListService.listOpenGamesCreatedByUser(settings.general.createdByUserId);
+            const userIsGameMaster = await this.userService.getUserIsGameMaster(settings.general.createdByUserId);
+            const userIsAdmin = await this.userService.getUserIsAdmin(settings.general.createdByUserId);
 
             if (openGames.length && !userIsGameMaster) {
                 throw new ValidationError('Cannot create game, you already have another game waiting for players.');
             }
 
-            if (userIsGameMaster && openGames.length > 5) {
+            if (userIsGameMaster && !userIsAdmin && openGames.length > 5) {
                 throw new ValidationError('Game Masters are limited to 5 games waiting for players.');
             }
 
@@ -127,7 +128,7 @@ export default class GameCreateService {
                 throw new ValidationError(`Games larger than 16 players are reserved for official games or can be created by GMs.`);
             }
 
-            let isEstablishedPlayer = await this.userService.isEstablishedPlayer(settings.general.createdByUserId);
+            const isEstablishedPlayer = await this.userService.isEstablishedPlayer(settings.general.createdByUserId);
 
             // Disallow new players from creating games if they haven't completed a game yet.
             if (!isEstablishedPlayer) {
