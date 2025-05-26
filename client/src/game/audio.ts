@@ -30,7 +30,7 @@ class AudioService {
   typeAudio: HTMLAudioElement | undefined;
 
   _play (audio: HTMLAudioElement) {
-    const audioEnabled = this.store?.state?.settings?.interface?.audio === 'disabled';
+    const audioEnabled = this.store?.state?.settings?.interface?.audio !== 'disabled';
 
     if (!this.store || !audioEnabled) {
       return
@@ -60,7 +60,7 @@ class AudioService {
   }
 
   _checkLoad() {
-    const audioEnabled = this.store?.state?.settings?.interface?.audio === 'disabled';
+    const audioEnabled = this.store?.state?.settings?.interface?.audio !== 'disabled';
 
     if (audioEnabled) {
       this._preload();
