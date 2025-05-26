@@ -3,6 +3,34 @@
     <view-title title="Create Game" />
     <loading-spinner :loading="!settings || isCreatingGame"/>
 
+    <div class="mb-2">
+      <label for="settingsTemplate" class="col-form-label">Settings template</label>
+      <select name="settingsTemplate" class="form-control form-inline" v-model="settingsTemplateName">
+        <option value="standard">Standard</option>
+        <option value="turnBased">Standard TB</option>
+        <option value="1v1">1v1 RT</option>
+        <option value="1v1turnBased">1v1 TB</option>
+        <option value="16player_realTime">16 Player RT</option>
+        <option value="16player_turnBased">16 Player TB</option>
+        <option value="32player_normal">32 Player experimental</option>
+        <option value="32player_ultradark">32 Player classic</option>
+        <option value="newPlayer">New Player</option>
+        <option value="special_anonymous">Special Anonymous</option>
+        <option value="special_arcade">Special Arcade</option>
+        <option value="special_battleRoyale">Special Battle Royale</option>
+        <option value="special_dark">Special Dark</option>
+        <option value="special_fog">Special Fog</option>
+        <option value="special_freeForAll">Special Free For All</option>
+        <option value="special_homeStar">Special Capital Stars</option>
+        <option value="special_homeStarElimination">Special Capital Star Elimination</option>
+        <option value="special_kingOfTheHill">Special King of the Hill</option>
+        <option value="special_orbital">Special Orbital Rotation</option>
+        <option value="special_tinyGalaxy">Special Tiny Galaxy</option>
+        <option value="special_ultraDark">Special Ultra Dark</option>
+      </select>
+      <button class="btn btn-default mt-2" @click="loadSettingsFromTemplate">Load settings</button>
+    </div>
+
     <form @submit.prevent="handleSubmit" v-if="settings">
       <view-collapse-panel title="Game Settings" :startsOpened="true">
         <div class="mb-2">
@@ -942,12 +970,13 @@ export default {
       errors: [],
       settings: null,
       options: null,
-      possibleTeamCounts: []
+      possibleTeamCounts: [],
+      settingsTemplateName: 'standard'
     }
   },
   async mounted () {
     try {
-      let response = await gameService.getDefaultGameSettings()
+      const response = await gameService.getDefaultGameSettings()
 
       this.settings = response.data.settings
       this.options = response.data.options
@@ -956,8 +985,14 @@ export default {
     }
   },
   methods: {
+    async loadSettingsFromTemplate (e) {
+      e.preventDefault();
+
+      const template = await import(`../../config/gamesettings/${this.settingsTemplateName}.json`);
+      this.settings = template;
+    },
     async handleSubmit (e) {
-      e.preventDefault()
+      e.preventDefault();
 
       this.errors = []
 

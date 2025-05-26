@@ -1,0 +1,135 @@
+{
+    "general": {
+        "name": "[[[RANDOM]]]",
+        "description": "Stars in this galaxy are in orbit, embrace the chaos and use it to your advantage!",
+        "type": "special_orbital",
+        "createdFromTemplate": "special_orbital",
+        "mode": "conquest",
+        "password": null,
+        "playerLimit": 10,
+        "playerType": "all",
+        "anonymity": "normal",
+        "playerOnlineStatus": "hidden",
+        "playerIPWarning": "enabled",
+        "timeMachine": "enabled",
+        "fluxEnabled": "enabled",
+        "advancedAI": "enabled",
+        "spectators": "enabled",
+        "afkSlotsOpen": "enabled",
+        "readyToQuit": "enabled",
+        "readyToQuitFraction": 0.9
+    },
+    "galaxy": {
+        "galaxyType": "circular",
+        "starsPerPlayer": 20,
+        "productionTicks": 20
+    },
+    "specialGalaxy": {
+        "carrierCost": "standard",
+        "carrierUpkeepCost": "none",
+        "warpgateCost": "standard",
+        "specialistCost": "standard",
+        "specialistsCurrency": "creditsSpecialists",
+        "randomWarpGates": 10,
+        "randomWormHoles": 5,
+        "randomNebulas": 15,
+        "randomAsteroidFields": 10,
+        "randomBinaryStars": 10,
+        "randomBlackHoles": 5,
+        "randomPulsars": 1,
+        "darkGalaxy": "start",
+        "giftCarriers": "enabled",
+        "defenderBonus": "enabled",
+        "carrierToCarrierCombat": "disabled",
+        "splitResources": "disabled",
+        "resourceDistribution": "random",
+        "playerDistribution": "circular",
+        "carrierSpeed": 15,
+        "starCaptureReward": "enabled",
+        "specialistBans": {
+            "star": [
+                16,
+                17
+            ],
+            "carrier": []
+        }
+    },
+    "conquest": {
+        "victoryCondition": "starPercentage",
+        "victoryPercentage": 50,
+        "capitalStarElimination": "disabled"
+    },
+    "orbitalMechanics": {
+        "enabled": "enabled",
+        "orbitSpeed": 3
+    },
+    "player": {
+        "startingStars": 6,
+        "startingCredits": 500,
+        "startingCreditsSpecialists": 5,
+        "startingShips": 10,
+        "startingInfrastructure": {
+            "economy": 5,
+            "industry": 5,
+            "science": 1
+        },
+        "developmentCost": {
+            "economy": "standard",
+            "industry": "standard",
+            "science": "standard"
+        },
+        "tradeCredits": true,
+        "tradeCreditsSpecialists": true,
+        "tradeCost": 15,
+        "tradeScanning": "scanned",
+        "populationCap": {
+            "enabled": "disabled",
+            "shipsPerStar": 100
+        },
+        "allowAbandonStars": "disabled"
+    },
+    "diplomacy": {
+        "enabled": "enabled",
+        "upkeepCost": "none",
+        "tradeRestricted": "disabled",
+        "maxAlliances": 9,
+        "globalEvents": "disabled"
+    },
+    "technology": {
+        "startingTechnologyLevel": {
+            "terraforming": 1,
+            "experimentation": 1,
+            "scanning": 1,
+            "hyperspace": 1,
+            "manufacturing": 1,
+            "banking": 1,
+            "weapons": 1,
+            "specialists": 1
+        },
+        "researchCosts": {
+            "terraforming": "standard",
+            "experimentation": "standard",
+            "scanning": "standard",
+            "hyperspace": "standard",
+            "manufacturing": "standard",
+            "banking": "standard",
+            "weapons": "standard",
+            "specialists": "standard"
+        },
+        "experimentationDistribution": "random",
+        "bankingReward": "standard",
+        "experimentationReward": "standard",
+        "specialistTokenReward": "experimental"
+    },
+    "gameTime": {
+        "gameType": "realTime",
+        "speed": 3600,
+        "isTickLimited": "disabled",
+        "startDelay": 240,
+        "afk": {
+            "lastSeenTimeout": 2,
+            "cycleTimeout": 3,
+            "turnTimeout": 3
+        }
+    }
+}
