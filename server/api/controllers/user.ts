@@ -5,9 +5,9 @@ import {
     mapToUserRequestUsernameRequest,
     mapToUserResetPasswordResetRequest,
     mapToUserUpdateEmailPreferenceRequest,
-    mapToUserUpdateEmailRequest,
-    mapToUserUpdatePasswordRequest,
-    mapToUserUpdateUsernameRequest,
+    parseUserUpdateEmailRequest,
+    parseUserUpdatePasswordRequest,
+    parseUserUpdateUserNameRequest,
     parseCreateUserRequest
 } from '../requests/user';
 import {logger} from "../../utils/logging";
@@ -185,7 +185,7 @@ export default (container: DependencyContainer) => {
         },
         updateUsername: async (req, res, next) => {
             try {
-                const reqObj = mapToUserUpdateUsernameRequest(req.body);
+                const reqObj = parseUserUpdateUserNameRequest(req.body);
                 
                 await container.userService.updateUsername(req.session.userId, reqObj.username);
     
@@ -197,7 +197,7 @@ export default (container: DependencyContainer) => {
         },
         updateEmailAddress: async (req, res, next) => {
             try {
-                const reqObj = mapToUserUpdateEmailRequest(req.body);
+                const reqObj = parseUserUpdateEmailRequest(req.body);
                 
                 await container.userService.updateEmailAddress(req.session.userId, reqObj.email);
     
@@ -209,7 +209,7 @@ export default (container: DependencyContainer) => {
         },
         updatePassword: async (req, res, next) => {
             try {
-                const reqObj = mapToUserUpdatePasswordRequest(req.body);
+                const reqObj = parseUserUpdatePasswordRequest(req.body);
                 
                 await container.userService.updatePassword(
                     req.session.userId,
