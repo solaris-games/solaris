@@ -30,15 +30,12 @@ class AudioService {
   typeAudio: HTMLAudioElement | undefined;
 
   _play (audio: HTMLAudioElement) {
-    const audioEnabled = this.store?.state?.settings?.interface?.audio === 'disabled';
+    const audioEnabled = this.store?.state?.settings?.interface?.audio !== 'disabled';
 
-    if (audioEnabled) {
-      this._preload();
-    }
-
-    if (!this.store || this.store?.state?.settings?.interface?.audio === 'disabled') {
+    if (!this.store || !audioEnabled) {
       return
     }
+
     audio.volume = 0.5
     audio.play()
   }
@@ -62,17 +59,21 @@ class AudioService {
     this.typeAudio = new Audio(typeFile)
   }
 
-  loadStore (store: Store<State>) {
-    this.store = store;
-
-    const audioEnabled = this.store?.state?.settings?.interface?.audio === 'disabled';
+  _checkLoad() {
+    const audioEnabled = this.store?.state?.settings?.interface?.audio !== 'disabled';
 
     if (audioEnabled) {
       this._preload();
     }
   }
 
+  loadStore (store: Store<State>) {
+    this.store = store;
+    this._checkLoad();
+  }
+
   backspace () {
+    this._checkLoad();
     this._play(this.backspaceAudio!)
   }
 
@@ -81,42 +82,52 @@ class AudioService {
   }
 
   close () {
+    this._checkLoad();
     this._play(this.closeAudio!)
   }
 
   dialogOpen () {
+    this._checkLoad();
     this._play(this.dialogOpenAudio!)
   }
 
   download () {
+    this._checkLoad();
     this._play(this.downloadAudio!)
   }
 
   hover () {
+    this._checkLoad();
     this._play(this.hoverAudio!)
   }
 
   join () {
+    this._checkLoad();
     this._play(this.joinAudio!)
   }
 
   leave () {
+    this._checkLoad();
     this._play(this.leaveAudio!)
   }
 
   loading () {
+    this._checkLoad();
     this._play(this.loadingAudio!)
   }
 
   open () {
+    this._checkLoad();
     this._play(this.openAudio!)
   }
 
   quit () {
+    this._checkLoad();
     this._play(this.quitAudio!)
   }
 
   type () {
+    this._checkLoad();
     this._play(this.typeAudio!)
   }
 }
