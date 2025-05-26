@@ -59,6 +59,27 @@
 
       <view-subtitle title="Email notifications" class="mt-3" level="h5" />
 
+      <div class="row bg-warning p-2 mb-4" title="Email notifications deprecation notice">
+        Email notifications will be deprecated in the upcoming months for technical reasons.
+
+        Currently, Solaris sends out email notifications for the following events:
+
+        <ul>
+          <li>Welcome emails</li>
+          <li>Password/username reset mails</li>
+          <li>Game start/finish notifications</li>
+          <li>Game cycle notifications</li>
+          <li>Reminders for turn-based games</li>
+          <li>Game time outs</li>
+          <li>AFK notifications</li>
+        </ul>
+
+        Technical emails (signups, password resets etc.) will continue to work, but notifications for game events will
+        be deprecated.
+
+        Please set up a subscription via Discord if you want to receive these notifications.
+      </div>
+
       <div class="row pt-2 pb-2">
         <div class="col">
           <p>Email Game Notifications</p>
