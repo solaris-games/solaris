@@ -85,7 +85,7 @@ const loadAvatars = async () => {
   const response = await listMyAvatars(httpClient)();
 
   if (isOk(response)) {
-    avatars.value = response.data.avatars;
+    avatars.value = response.data;
   } else {
     console.error(formatError(response));
   }
