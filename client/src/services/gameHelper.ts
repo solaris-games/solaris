@@ -143,14 +143,14 @@ class GameHelper {
     }
   }
 
-  getClosestPlayerStar(stars, point, player) {
-    let closestStar = stars[0]
-    let smallerDistance = Number.MAX_VALUE
+  getClosestPlayerStar(stars: Star[], point: Location, player: Player) {
+    let closestStar = stars[0];
+    let smallerDistance = Number.MAX_VALUE;
 
-    let playerStars = this.getStarsOwnedByPlayer(player, stars)
+    const playerStars = this.getStarsOwnedByPlayer(player, stars);
 
     for (let star of playerStars) {
-      let distance = this.getDistanceBetweenLocations(star.location, point)
+      const distance = this.getDistanceBetweenLocations(star.location, point);
 
       if (distance < smallerDistance) {
         smallerDistance = distance
@@ -161,11 +161,11 @@ class GameHelper {
     return closestStar
   }
 
-  getAngleBetweenLocations(loc1, loc2) {
+  getAngleBetweenLocations(loc1: Location, loc2: Location) {
     return Math.atan2(loc2.y - loc1.y, loc2.x - loc1.x)
   }
 
-  getPointFromLocation(loc, angle, distance) {
+  getPointFromLocation(loc: Location, angle: number, distance: number) {
     return {
       x: loc.x + (Math.cos(angle) * distance),
       y: loc.y + (Math.sin(angle) * distance)
@@ -192,6 +192,30 @@ class GameHelper {
     }
 
     return tickDistance;
+  }
+
+  getCarrierSpeed(game: Game, player: Player, carrier: Carrier, source: Star | null, destination: Star | null) {
+    const ly = game.constants.distances.lightYear;
+
+    if (carrier.waypoints.length === 0) {
+      return 'not moving';
+    }
+
+    const instantSpeed = this.isStarPairWormHole(source, destination);
+
+    if (instantSpeed) {
+      return 'instant';
+    }
+
+    if (!source || !destination) {
+      return 'unknown';
+    }
+
+    const canWarpSpeed = this.canTravelAtWarpSpeed(game, player, carrier, source, destination);
+    const speed = this.getTickDistance(game, carrier, canWarpSpeed ? game.constants.distances.warpSpeedMultiplier : 1);
+    const speedLy = speed / ly;
+
+    return `${speedLy}LY/tick`;
   }
 
   getTicksBetweenLocations(game: Game, carrier: Carrier, locs: RulerPoint[], tickDistanceModifier = 1) {
@@ -356,10 +380,10 @@ class GameHelper {
 
   // TODO: This has all been copy/pasted from the API services
   // is there a way to share these functions in a core library?
-  calculateWaypointTicks(game, carrier, waypoint) {
+  calculateWaypointTicks(game: Game, carrier: Carrier, waypoint) {
     const delayTicks = waypoint.delayTicks || 0
 
-    let carrierOwner = this.getPlayerById(game, carrier.ownedByPlayerId)
+    const carrierOwner = this.getPlayerById(game, carrier.ownedByPlayerId!)!;
 
     // if the waypoint is going to the same star then it is at least 1
     // tick, plus any delay ticks.
@@ -428,7 +452,7 @@ class GameHelper {
     return relativeTo.add(ticks * speedInSeconds, 'seconds')
   }
 
-  canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar) {
+  canTravelAtWarpSpeed(game: Game, player: Player, carrier: Carrier, sourceStar: Star | null, destinationStar: Star | null) {
     // Double check for destroyed stars.
     if (sourceStar == null || destinationStar == null) {
       return false
@@ -530,7 +554,7 @@ class GameHelper {
     return distanceBetweenStars <= hyperspaceDistance
   }
 
-  isStarPairWormHole(sourceStar, destinationStar) {
+  isStarPairWormHole(sourceStar: Star | null, destinationStar: Star | null) {
     return sourceStar
       && destinationStar
       && sourceStar.wormHoleToStarId
