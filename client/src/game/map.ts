@@ -324,7 +324,7 @@ export class Map {
     }
 
     this.unsubscribe = undefined;
-    this.tooltipLayer?.clear();
+    this.tooltipLayer?.destroy();
   }
 
   setupStar (game: Game, userSettings: UserGameSettings, starData: StarData) {
