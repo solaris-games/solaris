@@ -1,15 +1,16 @@
-import moment, {type Moment} from 'moment'
+import moment, { type Moment } from 'moment'
 import DiplomacyHelper from './diplomacyHelper.js'
-import type {Game, Player, Star} from "../types/game";
+import type { Game, Player, Star, Carrier } from "../types/game";
 import type { Location } from '@solaris-common';
+import type { RulerPoint } from '@/types/ruler';
 
 class GameHelper {
-  getUserPlayer (game) {
+  getUserPlayer(game) {
     // The user's player will be the only player that has a user ID on the player object.
     return game.galaxy.players.find(p => p.userId)
   }
 
-  getColourMapping (game) {
+  getColourMapping(game) {
     const userPlayer = this.getUserPlayer(game);
 
     // spectating
@@ -25,36 +26,36 @@ class GameHelper {
     }
   }
 
-  getPlayerByAlias (game, playerName) {
+  getPlayerByAlias(game, playerName) {
     return game.galaxy.players.find(p => p.alias === playerName)
   }
 
-  getPlayerById (game: Game, playerId: string) {
+  getPlayerById(game: Game, playerId: string) {
     return game.galaxy.players.find(x => x._id === playerId)
   }
 
-  getFriendlyColour (colour) {
+  getFriendlyColour(colour) {
     return colour.replace('0x', '#').toLowerCase();
   }
 
-  getStarByName (game, starName) {
+  getStarByName(game, starName) {
     return game.galaxy.stars.find(s => s.name === starName)
   }
 
-  getStarById (game, starId) {
+  getStarById(game, starId) {
     return game.galaxy.stars.find(x => x._id === starId)
   }
 
-  getCarrierById (game, carrierId) {
+  getCarrierById(game, carrierId) {
     return game.galaxy.carriers.find(x => x._id === carrierId)
   }
 
-  getActionById (game, actionId) {
+  getActionById(game, actionId) {
     let player = this.getUserPlayer(game)
     return player.scheduledActions.find(a => a._id === actionId);
   }
 
-  getStarOwningPlayer (game, star) {
+  getStarOwningPlayer(game, star) {
     return game.galaxy.players.find(x => x._id === star.ownedByPlayerId)
   }
 
@@ -66,68 +67,68 @@ class GameHelper {
     return stars.filter(s => s.ownedByPlayerId && s.ownedByPlayerId === player._id)
   }
 
-  getPlayerHomeStar (player, stars) {
+  getPlayerHomeStar(player, stars) {
     return stars.find(s => s._id === player.homeStarId)
   }
 
-  getCarrierOwningPlayer (game, carrier) {
+  getCarrierOwningPlayer(game, carrier) {
     return game.galaxy.players.find(x => x._id === carrier.ownedByPlayerId)
   }
 
-  isOwnedByUserPlayer (game, carrierOrStar) {
+  isOwnedByUserPlayer(game, carrierOrStar) {
     const userPlayer = this.getUserPlayer(game)
 
     return userPlayer && carrierOrStar.ownedByPlayerId === userPlayer._id
   }
 
-  getCarrierOrbitingStar (game, carrier) {
+  getCarrierOrbitingStar(game, carrier) {
     return game.galaxy.stars.find(x => x._id === carrier.orbiting) || null
   }
 
-  getCarriersOrbitingStar (game, star) {
+  getCarriersOrbitingStar(game, star) {
     return game.galaxy.carriers
       .filter(x => x.orbiting === star._id)
       .sort((a, b) => (a.ticksEta || 0) - (b.ticksEta || 0))
   }
 
-  isCarrierInTransit (carrier) {
+  isCarrierInTransit(carrier) {
     return carrier.orbiting == null
   }
 
-  isCarrierInTransitToWaypoint (carrier, waypoint) {
+  isCarrierInTransitToWaypoint(carrier, waypoint) {
     return carrier.waypoints.indexOf(waypoint) === 0 && this.isCarrierInTransit(carrier)
   }
 
-  getStarTotalKnownShips (game, star) {
+  getStarTotalKnownShips(game, star) {
     let carriers = this.getCarriersOrbitingStar(game, star)
 
     return (star.ships || 0) + carriers.reduce((sum, c) => sum + (c.ships || 0), 0)
   }
 
-  getHyperspaceDistance (game, player, carrier) {
+  getHyperspaceDistance(game, player, carrier) {
     return ((carrier.effectiveTechs.hyperspace || 1) + 1.5) * game.constants.distances.lightYear
   }
 
-  getScanningLevelByDistance (game, distance) {
+  getScanningLevelByDistance(game, distance) {
     let distancePerLevel = Math.ceil(distance / game.constants.distances.lightYear - 1)
     return distancePerLevel || 1
   }
 
-  getHyperspaceLevelByDistance (game, distance) {
+  getHyperspaceLevelByDistance(game, distance) {
     let distancePerLevel = Math.ceil(distance / game.constants.distances.lightYear - 1.5)
 
     return distancePerLevel || 1
   }
 
-  getDistanceBetweenLocations (loc1, loc2) {
+  getDistanceBetweenLocations(loc1, loc2) {
     return Math.hypot(loc2.x - loc1.x, loc2.y - loc1.y);
   }
 
-  getClosestStar (stars, point) {
+  getClosestStar(stars, point) {
     let closestStar = stars[0]
     let smallerDistance = Number.MAX_VALUE
 
-    for(let star of stars) {
+    for (let star of stars) {
       let distance = this.getDistanceBetweenLocations(star.location, point)
 
       if (distance < smallerDistance) {
@@ -142,16 +143,16 @@ class GameHelper {
     }
   }
 
-  getClosestPlayerStar (stars, point, player) {
+  getClosestPlayerStar(stars, point, player) {
     let closestStar = stars[0]
     let smallerDistance = Number.MAX_VALUE
 
     let playerStars = this.getStarsOwnedByPlayer(player, stars)
 
-    for(let star of playerStars) {
+    for (let star of playerStars) {
       let distance = this.getDistanceBetweenLocations(star.location, point)
 
-      if (distance < smallerDistance ) {
+      if (distance < smallerDistance) {
         smallerDistance = distance
         closestStar = star
       }
@@ -160,19 +161,29 @@ class GameHelper {
     return closestStar
   }
 
-  getAngleBetweenLocations (loc1, loc2) {
+  getAngleBetweenLocations(loc1, loc2) {
     return Math.atan2(loc2.y - loc1.y, loc2.x - loc1.x)
   }
 
-  getPointFromLocation (loc, angle, distance) {
+  getPointFromLocation(loc, angle, distance) {
     return {
       x: loc.x + (Math.cos(angle) * distance),
       y: loc.y + (Math.sin(angle) * distance)
     }
   }
 
-  getTicksBetweenLocations (game, carrier, locs, tickDistanceModifier = 1) {
-    let totalTicks = 0
+  isInstantTravel(prev: RulerPoint, curr: RulerPoint) {
+    if (prev.type === 'star' && curr.type === 'star') {
+      const prevObj = prev.object as Star;
+      const currObj = curr.object as Star;
+
+      return prevObj.wormHoleToStarId === currObj._id && currObj.wormHoleToStarId === prevObj._id;
+    }
+
+    return false;
+  }
+
+  getTickDistance(game: Game, carrier: Carrier, tickDistanceModifier = 1) {
     let tickDistance = game.settings.specialGalaxy.carrierSpeed * tickDistanceModifier
 
     // Factor in any local speed modifers
@@ -180,16 +191,22 @@ class GameHelper {
       tickDistance *= carrier.specialist.modifiers.local.speed || 1
     }
 
-    for (let i = 1; i < locs.length; i++) {
-      let prevLoc = locs[i - 1]
-      let currLoc = locs[i]
-      let distance = this.getDistanceBetweenLocations(prevLoc.location, currLoc.location)
+    return tickDistance;
+  }
 
-      let ticks
+  getTicksBetweenLocations(game: Game, carrier: Carrier, locs: RulerPoint[], tickDistanceModifier = 1) {
+    let totalTicks = 0
+    const tickDistance = this.getTickDistance(game, carrier, tickDistanceModifier);
+
+    for (let i = 1; i < locs.length; i++) {
+      const prevLoc = locs[i - 1]
+      const currLoc = locs[i]
+      const distance = this.getDistanceBetweenLocations(prevLoc.location, currLoc.location)
+
+      let ticks: number;
 
       // Check for worm holes
-      if (prevLoc.type === 'star' && currLoc.type === 'star' &&
-        prevLoc.object.wormHoleToStarId === currLoc.object._id && currLoc.object.wormHoleToStarId === prevLoc.object._id) {
+      if (this.isInstantTravel(prevLoc, currLoc)) {
         ticks = 1
       } else {
         ticks = Math.ceil(distance / tickDistance)
@@ -201,7 +218,7 @@ class GameHelper {
     return totalTicks
   }
 
-  getActualTicksBetweenLocations (game, player, carrier, sourceStar, destinationStar, hyperspaceDistance) {
+  getActualTicksBetweenLocations(game, player, carrier, sourceStar, destinationStar, hyperspaceDistance) {
     const instantSpeed = this.isStarPairWormHole(sourceStar, destinationStar)
 
     if (instantSpeed) {
@@ -222,23 +239,23 @@ class GameHelper {
     return this.getTicksBetweenLocations(game, carrier, [sourceStar, destinationStar])
   }
 
-  getTicksToProduction (game: Game, currentTick, currentProductionTick) {
+  getTicksToProduction(game: Game, currentTick, currentProductionTick) {
     let productionTicks = game.settings.galaxy.productionTicks
 
     return ((currentProductionTick + 1) * productionTicks) - currentTick
   }
 
-  getCountdownTime (game: Game, date) {
+  getCountdownTime(game: Game, date) {
     if (date == null) {
       return 'Unknown'
     }
 
     let relativeTo = moment().utc()
-     // Deduct the future date from now.
+    // Deduct the future date from now.
     return moment(date).utc().clone().diff(relativeTo)
   }
 
-  getCountdownTimeString (game: Game, date, largestUnitOnly = false) {
+  getCountdownTimeString(game: Game, date, largestUnitOnly = false) {
     if (date == null) {
       return 'Unknown'
     }
@@ -252,7 +269,7 @@ class GameHelper {
     return this.getDateToString(t, largestUnitOnly)
   }
 
-  getCountdownTimeStringByTicksWithTickETA (game: Game, ticks: number, useNowDate = false, largestUnitOnly = false) {
+  getCountdownTimeStringByTicksWithTickETA(game: Game, ticks: number, useNowDate = false, largestUnitOnly = false) {
     const str = this.getCountdownTimeStringByTicks(game, ticks, useNowDate, largestUnitOnly);
 
     if (game.settings.gameTime.gameType === 'realTime') {
@@ -262,7 +279,7 @@ class GameHelper {
     return str
   }
 
-  getCountdownTimeStringByTicks (game, ticks, useNowDate = false, largestUnitOnly = false) {
+  getCountdownTimeStringByTicks(game, ticks, useNowDate = false, largestUnitOnly = false) {
     if (game == null) {
       return ''
     }
@@ -278,7 +295,7 @@ class GameHelper {
     return `${ticks} ticks`
   }
 
-  getDateToString (date, largestUnitOnly = false) {
+  getDateToString(date, largestUnitOnly = false) {
     let days = Math.floor(date / (1000 * 60 * 60 * 24))
     let hours = Math.floor((date % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
     let mins = Math.floor((date % (1000 * 60 * 60)) / (1000 * 60))
@@ -323,17 +340,17 @@ class GameHelper {
     return str
   }
 
-  getCountdownTimeForProductionCycle (game) {
+  getCountdownTimeForProductionCycle(game) {
     const ticksToProduction = this.getTicksToProduction(game, game.state.tick, game.state.productionTick);
 
     return this.calculateTimeByTicks(ticksToProduction, game.settings.gameTime.speed, game.state.lastTickDate);
   }
 
-  getCountdownTimeForTurnTimeout (game) {
+  getCountdownTimeForTurnTimeout(game) {
     return moment(game.state.lastTickDate).utc().add('minutes', game.settings.gameTime.maxTurnWait)
   }
 
-  getCountdownTimeStringForTurnTimeout (game) {
+  getCountdownTimeStringForTurnTimeout(game) {
     return this.getCountdownTimeString(game, this.getCountdownTimeForTurnTimeout(game))
   }
 
@@ -401,7 +418,7 @@ class GameHelper {
     return totalTicks
   }
 
-  calculateTimeByTicks (ticks, speedInSeconds, relativeTo: Moment | null = null) {
+  calculateTimeByTicks(ticks, speedInSeconds, relativeTo: Moment | null = null) {
     if (relativeTo == null) {
       relativeTo = moment().utc()
     } else {
@@ -484,7 +501,7 @@ class GameHelper {
     return game.settings.specialGalaxy.carrierSpeed * distanceModifier;
   }
 
-  canLoop (game, player, carrier) {
+  canLoop(game, player, carrier) {
     if (carrier.waypoints.length < 2 || carrier.isGift) {
       return false
     }
@@ -513,7 +530,7 @@ class GameHelper {
     return distanceBetweenStars <= hyperspaceDistance
   }
 
-  isStarPairWormHole (sourceStar, destinationStar) {
+  isStarPairWormHole(sourceStar, destinationStar) {
     return sourceStar
       && destinationStar
       && sourceStar.wormHoleToStarId
@@ -522,91 +539,91 @@ class GameHelper {
       && destinationStar.wormHoleToStarId === sourceStar._id
   }
 
-  isGameWaitingForPlayers (game) {
+  isGameWaitingForPlayers(game) {
     return game.state.startDate == null
   }
 
-  isGamePaused (game) {
+  isGamePaused(game) {
     return game.state.paused
   }
 
-  isGameNotStarted (game) {
+  isGameNotStarted(game) {
     return !game.state.startDate
   }
 
-  isGameStarted (game) {
+  isGameStarted(game) {
     return game.state.startDate != null
   }
 
-  isGameInProgress (game) {
+  isGameInProgress(game) {
     return !this.isGameWaitingForPlayers(game) && !this.isGamePaused(game) && game.state.startDate != null && moment().utc().diff(game.state.startDate) >= 0 && !game.state.endDate
   }
 
-  isGamePendingStart (game) {
+  isGamePendingStart(game) {
     return !this.isGameWaitingForPlayers(game) && !this.isGamePaused(game) && game.state.startDate != null && moment().utc().diff(game.state.startDate) < 0
   }
 
-  isGameFinished (game) {
+  isGameFinished(game) {
     return game.state.endDate != null
   }
 
-  isDarkModeExtra (game) {
+  isDarkModeExtra(game) {
     return game.settings.specialGalaxy.darkGalaxy === 'extra'
   }
 
-  isDarkMode (game) {
+  isDarkMode(game) {
     return (game.settings.specialGalaxy.darkGalaxy === 'standard' || game.settings.specialGalaxy.darkGalaxy === 'extra') ||
-          (game.settings.specialGalaxy.darkGalaxy === 'start' && game.state.startDate == null)
+      (game.settings.specialGalaxy.darkGalaxy === 'start' && game.state.startDate == null)
   }
 
-  isDarkFogged (game) {
+  isDarkFogged(game) {
     return game.settings.specialGalaxy.darkGalaxy === 'fog'
   }
 
-  isTradeEnabled (game) {
+  isTradeEnabled(game) {
     return game.settings.player.tradeCredits || game.settings.player.tradeCreditsSpecialists || game.settings.player.tradeCost
   }
 
-  isOrbitalMechanicsEnabled (game) {
+  isOrbitalMechanicsEnabled(game) {
     return game.settings.orbitalMechanics.enabled === 'enabled'
   }
 
-  isConquestAllStars (game) {
+  isConquestAllStars(game) {
     return game.settings.general.mode === 'conquest' && game.settings.conquest.victoryCondition === 'starPercentage'
   }
 
-  isWinConditionHomeStars (game) {
+  isWinConditionHomeStars(game) {
     return game.settings.conquest.victoryCondition === 'homeStarPercentage';
   }
 
-  isWinConditionStarCount (game) {
+  isWinConditionStarCount(game) {
     return game.settings.conquest.victoryCondition === 'starPercentage';
   }
 
-  isConquestHomeStars (game) {
+  isConquestHomeStars(game) {
     return game.settings.general.mode === 'conquest' && game.settings.conquest.victoryCondition === 'homeStarPercentage'
   }
 
-  isCapitalElimination (game) {
+  isCapitalElimination(game) {
     return game.settings.conquest.capitalStarElimination === 'enabled';
   }
 
-  isKingOfTheHillMode (game) {
+  isKingOfTheHillMode(game) {
     return game.settings.general.mode === 'kingOfTheHill'
   }
 
-  isTutorialGame (game) {
+  isTutorialGame(game) {
     return game.settings.general.type === 'tutorial'
   }
 
-  isSpectatingEnabled (game) {
+  isSpectatingEnabled(game) {
     return game.settings.general.spectators === 'enabled'
   }
 
-  isTeamConquest (game) {
+  isTeamConquest(game) {
     return Boolean(game.settings.general.mode === 'teamConquest')
   }
-  getGameStatusText (game) {
+  getGameStatusText(game) {
     if (this.isGamePendingStart(game)) {
       return 'Waiting to start'
     }
@@ -626,7 +643,7 @@ class GameHelper {
     return 'Unknown'
   }
 
-  isOwnerCapital (game, star) {
+  isOwnerCapital(game, star) {
     if (!star.homeStar || !star.ownedByPlayerId) {
       return false;
     }
@@ -636,7 +653,7 @@ class GameHelper {
     return ownersHomeStarId && ownersHomeStarId === star._id;
   }
 
-  getOriginalOwner (game, star) {
+  getOriginalOwner(game, star) {
     return game.galaxy.players.find(player => player.homeStarId == star._id);
   }
 
@@ -657,7 +674,7 @@ class GameHelper {
     return false;
   }
 
-  playerHasLowestTechLevel (game: Game, techKey, player) {
+  playerHasLowestTechLevel(game: Game, techKey, player) {
     const levels: number[] = [...new Set(game.galaxy.players
       .filter(p => p.research != null)
       .map(p => {
@@ -674,7 +691,7 @@ class GameHelper {
     return minLevel === player.research[techKey].level
   }
 
-  playerHasHighestTechLevel (game: Game, techKey, player) {
+  playerHasHighestTechLevel(game: Game, techKey, player) {
     const levels: number[] = [...new Set(game.galaxy.players
       .filter(p => p.research != null)
       .map(p => {
@@ -691,19 +708,19 @@ class GameHelper {
     return maxLevel === player.research[techKey].level
   }
 
-  userPlayerHasHighestTechLevel (game: Game, techKey) {
+  userPlayerHasHighestTechLevel(game: Game, techKey) {
     const userPlayer = this.getUserPlayer(game)
 
     return this.playerHasHighestTechLevel(game, techKey, userPlayer)
   }
 
-  userPlayerHasLowestTechLevel (game: Game, techKey) {
+  userPlayerHasLowestTechLevel(game: Game, techKey) {
     const userPlayer = this.getUserPlayer(game)
 
     return this.playerHasLowestTechLevel(game, techKey, userPlayer)
   }
 
-  getPlayerStatus (player) {
+  getPlayerStatus(player) {
     if (player.defeated && !player.afk) {
       return 'Defeated'
     } else if (player.defeated && player.afk) {
@@ -713,7 +730,7 @@ class GameHelper {
     return 'Unknown'
   }
 
-  getSortedLeaderboardTeamList (game) {
+  getSortedLeaderboardTeamList(game) {
     const sortingKey = game.settings.conquest.victoryCondition === 'starPercentage' ? 'totalStars' : 'totalHomeStars';
 
     const teamsWithData = game.galaxy.teams.map(team => {
@@ -758,7 +775,7 @@ class GameHelper {
     return teamsWithData;
   }
 
-  getSortedLeaderboardPlayerList (game) {
+  getSortedLeaderboardPlayerList(game) {
     // Sort by total number of stars, then by total ships, then by total carriers.
     // Note that this sorting is different from the server side sorting as
     // on the UI we want to preserve defeated player positions relative to how many
@@ -819,19 +836,19 @@ class GameHelper {
     }
   }
 
-  isNormalAnonymity (game) {
+  isNormalAnonymity(game) {
     return game.settings.general.anonymity === 'normal'
   }
 
-  isExtraAnonymity (game) {
+  isExtraAnonymity(game) {
     return game.settings.general.anonymity === 'extra'
   }
 
-  isHiddenPlayerOnlineStatus (game) {
+  isHiddenPlayerOnlineStatus(game) {
     return game.settings.general.playerOnlineStatus === 'hidden'
   }
 
-  isPlayerOnline (player) {
+  isPlayerOnline(player) {
     if (player.isOnline == null) {
       return false;
     }
@@ -843,7 +860,7 @@ class GameHelper {
     }
   }
 
-  getOnlineStatus (player) {
+  getOnlineStatus(player) {
     if (player.isOnline == null || player.lastSeen == null) {
       return ''
     }
@@ -855,83 +872,83 @@ class GameHelper {
     }
   }
 
-  calculateGalaxyCenterX (game: Game): number {
+  calculateGalaxyCenterX(game: Game): number {
     const starFieldLeft = this.calculateMinStarX(game)
     const starFieldRight = this.calculateMaxStarX(game)
     return starFieldLeft + ((starFieldRight - starFieldLeft) / 2.0)
   }
 
-  calculateGalaxyCenterY (game: Game): number {
+  calculateGalaxyCenterY(game: Game): number {
     const starFieldTop = this.calculateMinStarY(game)
     const starFieldBottom = this.calculateMaxStarY(game)
     return starFieldTop + ((starFieldBottom - starFieldTop) / 2.0)
   }
 
-  calculateMinStarX (game: Game): number {
+  calculateMinStarX(game: Game): number {
     if (!game.galaxy.stars.length) { return 0 }
 
     return game.galaxy.stars.sort((a, b) => a.location.x - b.location.x)[0].location.x
   }
 
-  calculateMinStarY (game: Game) {
+  calculateMinStarY(game: Game) {
     if (!game.galaxy.stars.length) { return 0 }
 
     return game.galaxy.stars.sort((a, b) => a.location.y - b.location.y)[0].location.y
   }
 
-  calculateMaxStarX (game: Game) {
+  calculateMaxStarX(game: Game) {
     if (!game.galaxy.stars.length) { return 0 }
 
     return game.galaxy.stars.sort((a, b) => b.location.x - a.location.x)[0].location.x
   }
 
-  calculateMaxStarY (game: Game) {
+  calculateMaxStarY(game: Game) {
     if (!game.galaxy.stars.length) { return 0 }
 
     return game.galaxy.stars.sort((a, b) => b.location.y - a.location.y)[0].location.y
   }
 
-  calculateMinCarrierX (game: Game) {
+  calculateMinCarrierX(game: Game) {
     if (!game.galaxy.carriers.length) { return 0 }
 
     return game.galaxy.carriers.sort((a, b) => a.location.x - b.location.x)[0].location.x
   }
 
-  calculateMinCarrierY (game: Game) {
+  calculateMinCarrierY(game: Game) {
     if (!game.galaxy.carriers.length) { return 0 }
 
     return game.galaxy.carriers.sort((a, b) => a.location.y - b.location.y)[0].location.y
   }
 
-  calculateMaxCarrierX (game: Game) {
+  calculateMaxCarrierX(game: Game) {
     if (!game.galaxy.carriers.length) { return 0 }
 
     return game.galaxy.carriers.sort((a, b) => b.location.x - a.location.x)[0].location.x
   }
 
-  calculateMaxCarrierY (game: Game) {
+  calculateMaxCarrierY(game: Game) {
     if (!game.galaxy.carriers.length) { return 0 }
 
     return game.galaxy.carriers.sort((a, b) => b.location.y - a.location.y)[0].location.y
   }
 
-  isSpecialistsEnabled (game: Game) {
+  isSpecialistsEnabled(game: Game) {
     return game.settings.specialGalaxy.specialistCost !== 'none'
   }
 
-  isSpecialistsTechnologyEnabled (game: Game) {
+  isSpecialistsTechnologyEnabled(game: Game) {
     return game.settings.technology.researchCosts.specialists !== 'none'
   }
 
-  isSpecialistsCurrencyCredits (game: Game) {
+  isSpecialistsCurrencyCredits(game: Game) {
     return this.isSpecialistsEnabled(game) && game.settings.specialGalaxy.specialistsCurrency === 'credits'
   }
 
-  isSpecialistsCurrencyCreditsSpecialists (game: Game) {
+  isSpecialistsCurrencyCreditsSpecialists(game: Game) {
     return this.isSpecialistsEnabled(game) && game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'
   }
 
-  getDateString (date) {
+  getDateString(date) {
     date = moment(date).utc().toDate()
 
     let dayOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -958,7 +975,7 @@ class GameHelper {
   }
 
   // For centering the player viewport. Will default to some useful value if player has no territory
-  getPlayerEmpireCenter (game: Game, player: Player): Location {
+  getPlayerEmpireCenter(game: Game, player: Player): Location {
     // Get all of the player's stars.
     const playerStars = this.getStarsOwnedByPlayer(player, game.galaxy.stars)
 
@@ -987,7 +1004,7 @@ class GameHelper {
     return closestStar.location
   }
 
-  getGamePlayerShapesCount (game) {
+  getGamePlayerShapesCount(game) {
     return new Set([...game.galaxy.players.map(p => p.shape)]).size
   }
 
@@ -999,11 +1016,11 @@ class GameHelper {
     return game.settings.gameTime.gameType === 'turnBased';
   }
 
-  is1v1Game (game) {
+  is1v1Game(game) {
     return ['1v1_rt', '1v1_tb'].includes(game.settings.general.type)
   }
 
-  listAllUndefeatedPlayers (game) {
+  listAllUndefeatedPlayers(game) {
     let undefeatedPlayers
 
     if (this.isTutorialGame(game)) {
@@ -1027,7 +1044,7 @@ class GameHelper {
     return undefeatedPlayers.filter(x => x.readyToQuit).length === undefeatedPlayers.length
   }
 
-  gameHasOpenSlots (game) {
+  gameHasOpenSlots(game) {
     if (this.isGameFinished(game)) {
       return false
     }
@@ -1117,17 +1134,17 @@ class GameHelper {
     return game.settings.specialGalaxy.splitResources === 'enabled';
   }
 
-  isInGuild (guild, userId) {
+  isInGuild(guild, userId) {
     return guild.members.find(m => m._id === userId)
       || guild.officers.find(m => m._id === userId)
       || (guild.leader && guild.leader._id === userId)
   }
 
-  isUserSpectatingGame (game) {
+  isUserSpectatingGame(game) {
     return !this.getUserPlayer(game) // If the user isn't in the game then they are spectating
   }
 
-  _getBankingCredits (game: Game, player: Player) {
+  _getBankingCredits(game: Game, player: Player) {
     const bankingEnabled = game.settings.technology.startingTechnologyLevel['banking'] > 0
 
     if (!bankingEnabled || !player.stats!.totalStars || !player.research || !player.research.banking) {
@@ -1139,9 +1156,9 @@ class GameHelper {
 
     switch (game.settings.technology.bankingReward) {
       case 'standard':
-          return Math.round((bankingLevel * multiplier) + (0.15 * bankingLevel * player.stats!.totalEconomy))
+        return Math.round((bankingLevel * multiplier) + (0.15 * bankingLevel * player.stats!.totalEconomy))
       case 'legacy':
-          return bankingLevel * multiplier
+        return bankingLevel * multiplier
     }
   }
 
@@ -1162,15 +1179,15 @@ class GameHelper {
     return player.stats.totalCarriers * costPerCarrier;
   }
 
-  calculateIncomeMinusUpkeep (game, player) {
+  calculateIncomeMinusUpkeep(game, player) {
     const fromEconomy = player.stats.totalEconomy * 10
     return fromEconomy + this._getBankingCredits(game, player)
   }
 
-  calculateIncome (game, player) {
+  calculateIncome(game, player) {
     const fromEconomy = player.stats.totalEconomy * 10
     const upkeep = this._getUpkeepCosts(game, player);
-    return fromEconomy - upkeep  + this._getBankingCredits(game, player);
+    return fromEconomy - upkeep + this._getBankingCredits(game, player);
   }
 
   calculateTickIncome(game, player) {
@@ -1181,7 +1198,7 @@ class GameHelper {
     return (stars.reduce((totalScience, star) => totalScience + (star.infrastructure?.science ?? 0), 0)) * creditsPerTickByScience;
   }
 
-  isStarHasMultiplePlayersInOrbit (game, star) {
+  isStarHasMultiplePlayersInOrbit(game, star) {
     let carriersInOrbit = this.getCarriersOrbitingStar(game, star)
     let playerIds = [...new Set(carriersInOrbit.map(c => c.ownedByPlayerId))]
 
@@ -1192,7 +1209,7 @@ class GameHelper {
     return playerIds.length
   }
 
-  getGameTypeFriendlyText (game) {
+  getGameTypeFriendlyText(game) {
     return {
       'tutorial': 'Tutorial',
       'new_player_rt': 'New Players',
@@ -1218,23 +1235,23 @@ class GameHelper {
     }[game.settings.general.type]
   }
 
-  isNewPlayerGame (game) {
+  isNewPlayerGame(game) {
     return ['new_player_rt', 'new_player_tb'].includes(game.settings.general.type)
   }
 
-  isCustomGame (game) {
+  isCustomGame(game) {
     return game.settings.general.type === 'custom'
   }
 
-  isFluxGame (game) {
+  isFluxGame(game) {
     return game.settings.general.fluxEnabled === 'enabled'
   }
 
-  isFeaturedGame (game) {
+  isFeaturedGame(game) {
     return game.settings.general.featured === true
   }
 
-  getLedgerGameEventPlayerSummary (game, gameEvent) {
+  getLedgerGameEventPlayerSummary(game, gameEvent) {
     const debtor = this.getPlayerById(game, gameEvent.data.debtorPlayerId)
     const creditor = this.getPlayerById(game, gameEvent.data.creditorPlayerId)
     const isCreditor = this.getUserPlayer(game) == creditor
