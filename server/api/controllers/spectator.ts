@@ -1,13 +1,16 @@
 import { DependencyContainer } from '../../services/types/DependencyContainer';
+import {parseSpectatorInviteRequest} from "../requests/spectator";
 
 export default (container: DependencyContainer) => {
     return {
         invite: async (req, res, next) => {
             try {
+                const body = parseSpectatorInviteRequest(req.body);
+
                 await container.spectatorService.invite(
                     req.game,
                     req.player,
-                    req.body.username);
+                    body.usernames);
                 
                 res.sendStatus(200);
                 return next();

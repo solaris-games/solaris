@@ -5,7 +5,6 @@ import MenuEventBusEventNames from './eventBusEventNames/menu';
 import GameMutationNames from './mutationNames/gameMutationNames';
 import PlayerMutationNames from './mutationNames/playerMutationNames';
 import ApiAuthService from "./services/api/auth.js";
-import ApiUserService from "./services/api/user.js";
 import ColourService from './services/api/colour.js';
 import SpecialistService from './services/api/specialist.js';
 import GameHelper from './services/gameHelper.js';
@@ -13,9 +12,10 @@ import type { Game, Player, Star } from "./types/game";
 import type { Store } from 'vuex/types/index.js';
 import type {Badge} from "@solaris-common";
 import {getBadges} from "./services/typedapi/badge";
-import {isError} from "./services/typedapi";
+import {formatError, isOk} from "./services/typedapi";
 import type {UserClientSocketEmitter} from "@/sockets/socketEmitters/user";
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
+import {detailMe} from "@/services/typedapi/user";
 
 export type MentionCallbacks = {
   player: (p: Player) => void;
@@ -550,10 +550,8 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
     }
   },
   actions: {
-    async loadSpecialistData ({ commit, state }) {
-      const gameId = state.game._id;
-
-      let requests = [
+    async loadSpecialistData ({ commit, state }, gameId: string) {
+      const requests = [
         SpecialistService.getCarrierSpecialists(gameId),
         SpecialistService.getStarSpecialists(gameId)
       ]
@@ -568,34 +566,6 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
         const resp = await ColourService.listColours();
         commit('setColoursConfig', resp.data);
       }
-    },
-    async confirm ({ commit, state }, data) {
-      // @ts-ignore
-      const modal = new bootstrap.Modal(window.$('#confirmModal'), {})
-      const close = async () => {
-        modal.toggle()
-        await new Promise((resolve, reject) => setTimeout(resolve, 400));
-      }
-      return new Promise((resolve, reject) => {
-        const settings = {
-          confirmText: data.confirmText || 'Yes',
-          cancelText: data.cancelText || 'No',
-          hideCancelButton: Boolean(data.hideCancelButton),
-          cover: Boolean(data.cover),
-          titleText: data.titleText,
-          text: data.text,
-          onConfirm: async () => {
-            await close()
-            resolve(true)
-          },
-          onCancel: async () => {
-            await close()
-            resolve(false)
-          }
-        }
-        commit('setConfirmationDialogSettings', settings)
-        modal.toggle()
-      })
     },
     async addColourMapping ({ commit, state }, data) {
       console.warn('Adding colour mapping', data);
@@ -617,8 +587,8 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
             commit('setUserCredits', response.data.credits)
 
             if (!state.user || state.user?._id !== response.data._id) {
-              const resp2 = await ApiUserService.getMyUserInfo();
-              if (resp2.status === 200) {
+              const resp2 = await detailMe(httpClient)();
+              if (isOk(resp2)) {
                 commit('setUser', resp2.data);
               } else {
                 console.error('Failed to get user info', resp2);
@@ -642,9 +612,11 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
       }
 
       const response = await getBadges(httpClient)();
-      if (!isError(response)) {
+      if (isOk(response)) {
         commit('setBadges', response.data);
         return response.data;
+      } else {
+        console.error(formatError(response));
       }
     }
   },

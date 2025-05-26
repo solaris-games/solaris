@@ -5,20 +5,23 @@
     <form @submit.prevent="handleSubmit">
       <div class="mb-2">
         <label for="currentPassword">Current Password</label>
-        <input type="password" required="required" name="currentPassword" class="form-control" v-model="currentPassword" :disabled="isLoading">
+        <input type="password" required="required" name="currentPassword" class="form-control" v-model="currentPassword"
+          :disabled="isLoading">
       </div>
 
       <div class="mb-2">
         <label for="newPassword">New Password</label>
-        <input type="password" required="required" name="newPassword" class="form-control" v-model="newPassword" :disabled="isLoading">
+        <input type="password" required="required" name="newPassword" class="form-control" v-model="newPassword"
+          :disabled="isLoading">
       </div>
 
       <div class="mb-2">
         <label for="newPasswordConfirm">Confirm New Password</label>
-        <input type="password" required="required" name="newPasswordConfirm" class="form-control" v-model="newPasswordConfirm" :disabled="isLoading">
+        <input type="password" required="required" name="newPasswordConfirm" class="form-control"
+          v-model="newPasswordConfirm" :disabled="isLoading">
       </div>
 
-      <form-error-list v-bind:errors="errors"/>
+      <form-error-list v-bind:errors="errors" />
 
       <div>
         <button type="submit" class="btn btn-success" :disabled="isLoading">Change Password</button>
@@ -26,7 +29,7 @@
       </div>
     </form>
 
-    <loading-spinner :loading="isLoading"/>
+    <loading-spinner :loading="isLoading" />
   </view-container>
 </template>
 
@@ -36,7 +39,9 @@ import ViewContainer from '../components/ViewContainer.vue'
 import router from '../../router'
 import ViewTitle from '../components/ViewTitle.vue'
 import FormErrorList from '../components/FormErrorList.vue'
-import userService from '../../services/api/user'
+import { inject } from 'vue'
+import { extractErrors, formatError, httpInjectionKey, isOk } from '@/services/typedapi'
+import { updatePassword } from '@/services/typedapi/user'
 
 export default {
   components: {
@@ -45,7 +50,12 @@ export default {
     'view-title': ViewTitle,
     'form-error-list': FormErrorList
   },
-  data () {
+  setup() {
+    return {
+      httpClient: inject(httpInjectionKey),
+    };
+  },
+  data() {
     return {
       isLoading: false,
       errors: [],
@@ -55,7 +65,7 @@ export default {
     }
   },
   methods: {
-    async handleSubmit (e) {
+    async handleSubmit(e) {
       this.errors = []
 
       if (!this.currentPassword) {
@@ -78,19 +88,17 @@ export default {
 
       if (this.errors.length) return
 
-      try {
-        this.isLoading = true
+      this.isLoading = true
 
-        let response = await userService.updatePassword(this.currentPassword, this.newPassword)
+      const response = await updatePassword(this.httpClient)(this.currentPassword, this.newPassword)
 
-        if (response.status === 200) {
-          this.$toast.success(`Password updated.`)
-          router.push({ name: 'account-settings' })
-        } else {
-          this.$toast.error(`There was a problem updating your password, please try again.`)
-        }
-      } catch (err) {
-        this.errors = err.response.data.errors || []
+      if (isOk(response)) {
+        this.$toast.success(`Password updated.`)
+        router.push({ name: 'account-settings' })
+      } else {
+        console.error(formatError(response));
+        this.errors = extractErrors(response);
+        this.$toast.error(`There was a problem updating your password, please try again.`)
       }
 
       this.isLoading = false
@@ -99,5 +107,4 @@ export default {
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

@@ -2,7 +2,7 @@ import type { Announcement } from '../types/common/announcement';
 import type { GameSettingsGeneral, GameState } from '../types/common/game';
 import type { SettingEnabledDisabled } from '../types/common/settings';
 import type { UserRoles, UserWarning } from '../types/common/user';
-import { GetRoute, PatchRoute, PostRoute, DeleteRoute } from './index';
+import { GetRoute, PatchRoute, PostRoute, DeleteRoute, SimpleGetRoute, SimplePatchRoute, SimplePostRoute } from './index';
 
 export type GetInsight = {
     name: string,
@@ -73,27 +73,27 @@ export type CreateAnnouncementReq = {
 };
 
 export const createAdminRoutes = <ID>() => ({
-    getInsights: new GetRoute<{}, GetInsight[]>('/api/admin/insights'),
-    listUsers: new GetRoute<{}, ListUser<ID>[]>('/api/admin/user'),
-    listPasswordResets: new GetRoute<{}, ListPasswordReset<ID>[]>('/api/admin/passwordresets'),
-    addWarning: new PostRoute<{ userId: string }, AddWarningReq, null>('/api/admin/user/:userId/warning'),
-    setRoleContributor: new PatchRoute<{ userId: string }, SetRoleReq, null>('/api/admin/user/:userId/contributor'),
-    setRoleDeveloper: new PatchRoute<{ userId: string }, SetRoleReq, null>('/api/admin/user/:userId/developer'),
-    setRoleCommunityManager: new PatchRoute<{ userId: string }, SetRoleReq, null>('/api/admin/user/:userId/communityManager'),
-    setRoleGameMaster: new PatchRoute<{ userId: string }, SetRoleReq, null>('/api/admin/user/:userId/gameMaster'),
-    setCredits: new PatchRoute<{ userId: string }, SetCreditsReq, null>('/api/admin/user/:userId/credits'),
-    ban: new PatchRoute<{ userId: string }, null, null>('/api/admin/user/:userId/ban'),
-    unban: new PatchRoute<{ userId: string }, null, null>('/api/admin/user/:userId/unban'),
-    resetAchievements: new PatchRoute<{ userId: string }, null, null>('/api/admin/user/:userId/resetAchievements'),
-    promoteToEstablishedPlayer: new PatchRoute<{ userId: string }, null, null>('/api/admin/user/:userId/promoteToEstablishedPlayer'),
-    impersonate: new PatchRoute<{ userId: string }, null, null>('/api/admin/user/:userId/impersonate'),
-    endImpersonate: new PatchRoute<{}, null, null>('/api/admin/endImpersonate'),
-    listGames: new GetRoute<{}, ListGame<ID>[]>('/api/admin/game'),
-    setGameFeatured: new PatchRoute<{ gameId: string }, SetFeaturedReq, null>('/api/admin/game/:gameId/featured'),
-    setGameTimeMachine: new PatchRoute<{ gameId: string }, SetTimeMachineReq, null>('/api/admin/game/:gameId/timeMachine'),
-    finishGame: new PatchRoute<{ gameId: string }, null, null>('/api/admin/game/:gameId/finish'),
-    resetQuitters: new DeleteRoute<{ gameId: string }, null>('/api/admin/game/:gameId/quitters'),
-    createAnnouncement: new PostRoute<{}, CreateAnnouncementReq, null>('/api/admin/announcements/'),
-    deleteAnnouncement: new DeleteRoute<{ id: string }, null>('/api/admin/announcements/:id'),
-    getAllAnnouncements: new GetRoute<{}, Announcement<ID>[]>('/api/admin/announcements/'),
+    getInsights: new SimpleGetRoute<GetInsight[]>('/api/admin/insights'),
+    listUsers: new SimpleGetRoute<ListUser<ID>[]>('/api/admin/user'),
+    listPasswordResets: new SimpleGetRoute<ListPasswordReset<ID>[]>('/api/admin/passwordresets'),
+    addWarning: new PostRoute<{ userId: string }, {}, AddWarningReq, null>('/api/admin/user/:userId/warning'),
+    setRoleContributor: new PatchRoute<{ userId: string }, {}, SetRoleReq, null>('/api/admin/user/:userId/contributor'),
+    setRoleDeveloper: new PatchRoute<{ userId: string }, {}, SetRoleReq, null>('/api/admin/user/:userId/developer'),
+    setRoleCommunityManager: new PatchRoute<{ userId: string }, {}, SetRoleReq, null>('/api/admin/user/:userId/communityManager'),
+    setRoleGameMaster: new PatchRoute<{ userId: string }, {}, SetRoleReq, null>('/api/admin/user/:userId/gameMaster'),
+    setCredits: new PatchRoute<{ userId: string }, {}, SetCreditsReq, null>('/api/admin/user/:userId/credits'),
+    ban: new PatchRoute<{ userId: string }, {}, null, null>('/api/admin/user/:userId/ban'),
+    unban: new PatchRoute<{ userId: string }, {}, null, null>('/api/admin/user/:userId/unban'),
+    resetAchievements: new PatchRoute<{ userId: string }, {}, null, null>('/api/admin/user/:userId/resetAchievements'),
+    promoteToEstablishedPlayer: new PatchRoute<{ userId: string }, {}, null, null>('/api/admin/user/:userId/promoteToEstablishedPlayer'),
+    impersonate: new PatchRoute<{ userId: string }, {}, null, null>('/api/admin/user/:userId/impersonate'),
+    endImpersonate: new SimplePatchRoute<null, null>('/api/admin/endImpersonate'),
+    listGames: new SimpleGetRoute<ListGame<ID>[]>('/api/admin/game'),
+    setGameFeatured: new PatchRoute<{ gameId: string }, {}, SetFeaturedReq, null>('/api/admin/game/:gameId/featured'),
+    setGameTimeMachine: new PatchRoute<{ gameId: string }, {}, SetTimeMachineReq, null>('/api/admin/game/:gameId/timeMachine'),
+    finishGame: new PatchRoute<{ gameId: string }, {}, null, null>('/api/admin/game/:gameId/finish'),
+    resetQuitters: new DeleteRoute<{ gameId: string }, {}, null>('/api/admin/game/:gameId/quitters'),
+    createAnnouncement: new SimplePostRoute<CreateAnnouncementReq, null>('/api/admin/announcements/'),
+    deleteAnnouncement: new DeleteRoute<{ id: string }, {}, null>('/api/admin/announcements/:id'),
+    getAllAnnouncements: new SimpleGetRoute<Announcement<ID>[]>('/api/admin/announcements/'),
 });

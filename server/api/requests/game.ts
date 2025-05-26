@@ -10,7 +10,6 @@ import {
     or,
     just,
     UNICODE_INVISIBLE_CHARACTERS,
-    UNICODE_PRINTABLE_CHARACTERS_NON_WHITESPACE,
     UNICODE_PRINTABLE_CHARACTERS_WITH_WHITESPACE
 } from "../validate";
 import { keyHasBooleanValue, keyHasNumberValue, keyHasStringValue } from "./helpers";

@@ -1,6 +1,15 @@
 import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
-import { mapToUserCreateUserRequest, mapToUserRequestPasswordResetRequest, mapToUserRequestUsernameRequest, mapToUserResetPasswordResetRequest, mapToUserUpdateEmailPreferenceRequest, mapToUserUpdateEmailRequest, mapToUserUpdatePasswordRequest, mapToUserUpdateUsernameRequest } from '../requests/user';
+import {
+    mapToUserRequestPasswordResetRequest,
+    mapToUserRequestUsernameRequest,
+    mapToUserResetPasswordResetRequest,
+    mapToUserUpdateEmailPreferenceRequest,
+    parseUserUpdateEmailRequest,
+    parseUserUpdatePasswordRequest,
+    parseUserUpdateUserNameRequest,
+    parseCreateUserRequest
+} from '../requests/user';
 import {logger} from "../../utils/logging";
 
 const log = logger("User Controller");
@@ -22,7 +31,7 @@ export default (container: DependencyContainer) => {
             const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
             try {
-                const reqObj = mapToUserCreateUserRequest(req.body);
+                const reqObj = parseCreateUserRequest(req.body);
 
                 const email = reqObj.email.toLowerCase();
     
@@ -140,16 +149,6 @@ export default (container: DependencyContainer) => {
                 return next(err);
             }
         },
-        detail: async (req, res, next) => {
-            try {
-                let user = await container.userService.getInfoByIdLean(req.params.id);
-    
-                res.status(200).json(user);
-                return next();
-            } catch (err) {
-                return next(err);
-            }
-        },
         getAchievements: async (req, res, next) => {
             try {
                 let achievements = await container.achievementService.getAchievements(req.params.id);
@@ -186,7 +185,7 @@ export default (container: DependencyContainer) => {
         },
         updateUsername: async (req, res, next) => {
             try {
-                const reqObj = mapToUserUpdateUsernameRequest(req.body);
+                const reqObj = parseUserUpdateUserNameRequest(req.body);
                 
                 await container.userService.updateUsername(req.session.userId, reqObj.username);
     
@@ -198,7 +197,7 @@ export default (container: DependencyContainer) => {
         },
         updateEmailAddress: async (req, res, next) => {
             try {
-                const reqObj = mapToUserUpdateEmailRequest(req.body);
+                const reqObj = parseUserUpdateEmailRequest(req.body);
                 
                 await container.userService.updateEmailAddress(req.session.userId, reqObj.email);
     
@@ -210,7 +209,7 @@ export default (container: DependencyContainer) => {
         },
         updatePassword: async (req, res, next) => {
             try {
-                const reqObj = mapToUserUpdatePasswordRequest(req.body);
+                const reqObj = parseUserUpdatePasswordRequest(req.body);
                 
                 await container.userService.updatePassword(
                     req.session.userId,

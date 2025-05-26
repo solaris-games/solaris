@@ -166,9 +166,12 @@
           @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
       </div>
 
-      <div class="row pt-2 pb-0 mb-0" v-if="hasWaypoints">
+      <div class="row pt-2 pb-2" v-if="hasWaypoints">
         <div class="col">
-          <p class="mb-2">ETA<orbital-mechanics-eta-warning />: {{timeRemainingEta}} <span v-if="carrier.waypoints.length > 1">({{timeRemainingEtaTotal}})</span></p>
+          <span>ETA<orbital-mechanics-eta-warning />: {{timeRemainingEta}} <span v-if="carrier.waypoints.length > 1">({{timeRemainingEtaTotal}})</span></span>
+        </div>
+        <div class="col">
+          <span>Speed: {{carrierSpeed}}</span>
         </div>
       </div>
 
@@ -337,7 +340,7 @@ export default {
       return GameHelper.getStarById(this.$store.state.game, this.carrier.waypoints[0].source)
     },
     getFirstWaypointSourceName () {
-      let source = this.getFirstWaypointSource()
+      const source = this.getFirstWaypointSource()
 
       return source ? source.name : 'Unknown'
     },
@@ -349,7 +352,7 @@ export default {
       return GameHelper.getStarById(this.$store.state.game, this.carrier.waypoints[0].destination)
     },
     getFirstWaypointDestinationName () {
-      let destination = this.getFirstWaypointDestination()
+      const destination = this.getFirstWaypointDestination()
 
       return destination ? destination.name : 'Unknown'
     },
@@ -524,6 +527,9 @@ export default {
     },
     isGameDarkMode () {
       return GameHelper.isDarkMode(this.$store.state.game)
+    },
+    carrierSpeed () {
+      return GameHelper.getCarrierSpeed(this.$store.state.game, this.carrierOwningPlayer, this.carrier, this.getFirstWaypointSource(), this.getFirstWaypointDestination());
     }
   }
 }

@@ -3,106 +3,52 @@ import { DependencyContainer } from "../../services/types/DependencyContainer";
 import UserController from '../controllers/user';
 import { MiddlewareContainer } from "../middleware";
 import {SingleRouter} from "../singleRoute";
+import { createUserRoutes } from "solaris-common";
+import { createRoutes } from "../typedapi/routes";
 
 export default (router: SingleRouter, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
     const controller = UserController(container);
+    const routes = createUserRoutes();
 
-    router.get('/api/user/leaderboard',
-            controller.listLeaderboard
-    );
+    const answer = createRoutes(router, mw);
 
-    router.post('/api/user/',
-            controller.create
-    );
+    answer(routes.listLeaderboard, controller.listLeaderboard);
 
-    router.get('/api/user/settings',
-            controller.getSettings
-    );
+    answer(routes.createUser, controller.create);
 
-    router.put('/api/user/settings',
-            mw.auth.authenticate(),
-            controller.saveSettings
-    );
+    answer(routes.getSettings, mw.auth.authenticate(), controller.getSettings);
 
-    router.get('/api/user/subscriptions',
-            mw.auth.authenticate(),
-            controller.getSubscriptions
-    );
+    answer(routes.saveSettings, mw.auth.authenticate(), controller.saveSettings);
 
-    router.put('/api/user/subscriptions',
-            mw.auth.authenticate(),
-            controller.saveSubscriptions
-    );
+    answer(routes.getSubscriptions, mw.auth.authenticate(), controller.getSubscriptions);
+    
+    answer(routes.getCredits, mw.auth.authenticate(), controller.getCredits);
 
-    router.get('/api/user/credits',
-            mw.auth.authenticate(),
-            controller.getCredits
-    );
+    answer(routes.detailMe, mw.auth.authenticate(), controller.detailMe);
+    
+    answer(routes.listMyAvatars, mw.auth.authenticate(), controller.listMyAvatars);
 
-    router.get('/api/user/',
-            mw.auth.authenticate(),
-            controller.detailMe
-    );
+    answer(routes.purchaseAvatar, mw.auth.authenticate(), controller.purchaseAvatar);
 
-    router.get('/api/user/avatars',
-            mw.auth.authenticate(),
-            controller.listMyAvatars
-    );
+    answer(routes.getAchievements, controller.getAchievements);
 
-    router.post('/api/user/avatars/:avatarId/purchase',
-            mw.auth.authenticate(),
-            controller.purchaseAvatar
-    );
+    answer(routes.updateEmailPreference, mw.auth.authenticate(), controller.updateEmailPreference);
 
-    router.get('/api/user/:id',
-            controller.detail
-    );
+    answer(routes.updateEmailOtherPreference, mw.auth.authenticate(), controller.updateEmailOtherPreference);
 
-    router.get('/api/user/achievements/:id',
-            controller.getAchievements
-    );
+    answer(routes.updateUsername, mw.auth.authenticate(), controller.updateUsername);
 
-    router.put('/api/user/changeEmailPreference',
-            mw.auth.authenticate(),
-            controller.updateEmailPreference
-    );
+    answer(routes.updateEmailAddress, mw.auth.authenticate(), controller.updateEmailAddress);
 
-    router.put('/api/user/changeEmailOtherPreference',
-            mw.auth.authenticate(),
-            controller.updateEmailOtherPreference
-    );
+    answer(routes.updatePassword, mw.auth.authenticate(), controller.updatePassword);
 
-    router.put('/api/user/changeUsername',
-            mw.auth.authenticate(),
-            controller.updateUsername
-    );
+    answer(routes.requestPasswordReset, controller.requestPasswordReset);
 
-    router.put('/api/user/changeEmailAddress',
-            mw.auth.authenticate(),
-            controller.updateEmailAddress
-    );
+    answer(routes.resetPassword, controller.resetPassword);
 
-    router.put('/api/user/changePassword',
-            mw.auth.authenticate(),
-            controller.updatePassword
-    );
+    answer(routes.requestUsername, controller.requestUsername);
 
-    router.post('/api/user/requestResetPassword',
-            controller.requestPasswordReset
-    );
-
-    router.post('/api/user/resetPassword',
-            controller.resetPassword
-    );
-
-    router.post('/api/user/requestUsername',
-            controller.requestUsername
-    );
-
-    router.delete('/api/user/closeaccount',
-            mw.auth.authenticate(),
-            controller.delete
-    );
+    answer(routes.deleteUser, mw.auth.authenticate(), controller.delete);
 
     return router;
 }

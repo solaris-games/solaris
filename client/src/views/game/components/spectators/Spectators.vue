@@ -15,54 +15,54 @@
 
     <p class="text-info"><i>Spectators will view the game from the perspective of the players they are spectating. For more information, see the wiki.</i></p>
 
-    <invite-spectator @onSpectatorInvited="loadSpectators" class="pb-2"/>
+    <invite-spectator @onSpectatorsInvited="loadSpectators" class="pb-2"/>
 </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import MenuTitle from '../MenuTitle.vue'
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import InviteSpectator from './InviteSpectator.vue'
 import Spectator from './Spectator.vue'
-import SpectatorApiService from '../../../../services/api/spectator'
+import {httpInjectionKey, isOk} from "@/services/typedapi";
+import {inject, ref, onMounted, type Ref} from 'vue';
+import {listSpectators} from "@/services/typedapi/spectator";
+import type {State} from "@/store";
+import {useStore, type Store} from 'vuex';
+import type {GameSpectator} from "@solaris-common";
 
-export default {
-  components: {
-    'menu-title': MenuTitle,
-    'loading-spinner': LoadingSpinner,
-    'invite-spectator': InviteSpectator,
-    'spectator': Spectator
-  },
-  data () {
-    return {
-      isLoading: false,
-      spectators: []
-    }
-  },
-  mounted () {
-    this.loadSpectators()
-  },
-  methods: {
-    onCloseRequested (e) {
-      this.$emit('onCloseRequested', e)
-    },
-    async loadSpectators () {
-      try {
-        this.isLoading = true
+const store: Store<State> = useStore();
+const httpClient = inject(httpInjectionKey)!;
 
-        let response = await SpectatorApiService.list(this.$store.state.game._id)
+const emit = defineEmits<{
+  (e: 'onCloseRequested'): void
+}>();
 
-        if (response.status === 200) {
-          this.spectators = response.data
-        }
-      } catch (err) {
-        console.error(err)
-      }
+const isLoading = ref(false);
+const spectators: Ref<GameSpectator<string>[]> = ref([]);
 
-      this.isLoading = false
-    }
+const onCloseRequested = e => {
+  emit('onCloseRequested');
+};
+
+const loadSpectators = async () => {
+  isLoading.value = true;
+
+  const response = await listSpectators(httpClient)(store.state.game._id);
+
+  if (isOk(response)) {
+    spectators.value = response.data || [];
+  } else {
+    console.error('Failed to load spectators:', response);
   }
-}
+
+  isLoading.value = false;
+};
+
+onMounted(() => {
+  loadSpectators();
+});
+
 </script>
 
 <style scoped>

@@ -7,6 +7,11 @@ const failed = (expected: string, value: any) => {
     return new ValidationError(`Expected ${expected}, but got: ${value.toString().substring(1000)} ${typeof value}`);
 }
 
+
+export const ok = <T>(value: T): Validator<T> => {
+    return (_) => value;
+}
+
 const primitive = (t: string) => (value: any) => {
     if (value === null || value === undefined || typeof value !== t) {
         throw failed(t, value);
@@ -246,8 +251,30 @@ export const stringValue = (props: StringValidationProps) => (v: any) => {
     return s
 }
 
-export const UNICODE_PRINTABLE_CHARACTERS_NON_WHITESPACE =  /^[\p{L}\p{N}\p{M}\p{S}\p{P}]+$/u;
+export const UNICODE_PRINTABLE_CHARACTERS_NON_WHITESPACE =  /^[\p{L}\p{N}\p{M}\p{Cf}\p{S}\p{P}]+$/u;
 
-export const UNICODE_PRINTABLE_CHARACTERS_WITH_WHITESPACE = /^[\p{L}\p{N}\p{M}\p{S}\p{P}\p{Z}]+$/u;
+export const UNICODE_PRINTABLE_CHARACTERS_WITH_WHITESPACE = /^[\p{L}\p{N}\p{M}\p{Cf}\p{S}\p{P}\p{Z}]+$/u;
 
 export const UNICODE_INVISIBLE_CHARACTERS = /[\p{C}\p{Mn}\p{Me}]+/u;
+
+export const UNICODE_LETTERS_NUMBERS_PUNCTUATION = /^[\p{L}\p{N}\p{P}]+$/u;
+
+export const username = stringValue({
+    minLength: 3,
+    maxLength: 30,
+    trim: true,
+    matches: UNICODE_LETTERS_NUMBERS_PUNCTUATION,
+});
+
+export const email = stringValue({
+    minLength: 3,
+    maxLength: 100,
+    trim: true,
+    matches: /^.+@.+$/u,
+});
+
+export const password = stringValue({
+    minLength: 8,
+    maxLength: 100,
+    matches: UNICODE_PRINTABLE_CHARACTERS_NON_WHITESPACE,
+});
