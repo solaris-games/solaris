@@ -21,8 +21,8 @@ export default class {
   }
 
   destroy() {
-    this.clear();
     this.game = undefined;
+    this.clear();
   }
 
   clear() {
@@ -36,6 +36,10 @@ export default class {
 
   _drawTooltip(tooltipData) {
     this.container.removeChildren()
+
+    if (!this.game) {
+      return;
+    }
 
     const player = GameHelper.getPlayerById(this.game!, tooltipData.playerId)!
 

@@ -636,6 +636,10 @@ export class Map {
 
   drawWormHoles () {
     if (this._isWormHolesEnabled()) {
+      if (!this.wormHoleLayer) {
+        this.wormHoleLayer = new WormHoleLayer();
+      }
+
       this.wormHoleLayer!.setup(this.game)
       this.wormHoleLayer!.draw()
     }
@@ -948,8 +952,6 @@ export class Map {
   }
 
   onRulerPointCreated (e) {
-    console.log(e);
-
     this.eventBus.emit(MapEventBusEventNames.MapOnRulerPointCreated, { rulerPoint: e });
   }
 

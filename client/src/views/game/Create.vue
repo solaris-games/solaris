@@ -989,7 +989,7 @@ export default {
       e.preventDefault();
 
       const template = await import(`../../config/gamesettings/${this.settingsTemplateName}.json`);
-      this.settings = template;
+      this.settings = JSON.parse(JSON.stringify(template)); // deep clone
     },
     async handleSubmit (e) {
       e.preventDefault();

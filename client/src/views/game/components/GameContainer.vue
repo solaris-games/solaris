@@ -36,6 +36,8 @@ const polling = ref(0);
 const el: Ref<HTMLElement | null> = ref(null);
 
 onMounted(() => {
+  let unsubscribe;
+
   createGameContainer(store, (msg) => toast.error(msg), eventBus).then((gameContainer) => {
     const checkPerformance = () => {
       const webGLSupport = gameContainer.checkPerformance();
@@ -100,7 +102,9 @@ onMounted(() => {
       emit("onObjectsClicked", objects);
     };
 
-    watch(computed(() => store.state.game), (newGame) => updateGame(newGame));
+    const unwatch = watch(computed(() => store.state.game), (newGame) => {
+      updateGame(newGame)
+    }); // watcher is created async, so we have to do the cleanup ourselves
 
     window.addEventListener('resize', handleResize)
 
@@ -125,7 +129,11 @@ onMounted(() => {
       touchPlayer();
     }
 
-    onBeforeUnmount(() => {
+    unsubscribe = () => {
+      unwatch();
+
+      window.removeEventListener('resize', handleResize);
+
       clearInterval(polling.value);
 
       gameContainer.destroy();
@@ -136,7 +144,13 @@ onMounted(() => {
       eventBus.off(MapEventBusEventNames.MapOnCarrierRightClicked, onCarrierRightClickedHandler);
       eventBus.off(MapEventBusEventNames.MapOnWaypointCreated, onWaypointCreatedHandler);
       eventBus.off(MapEventBusEventNames.MapOnObjectsClicked, onObjectsClickedHandler);
-    });
+    };
+  });
+
+  onBeforeUnmount(() => {
+    if (unsubscribe) {
+      unsubscribe();
+    }
   });
 });
 </script>

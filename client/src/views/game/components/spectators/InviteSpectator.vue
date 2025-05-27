@@ -74,14 +74,13 @@ const handleSubmit = async e => {
 
   if (isOk(response)) {
     toast.success(`You invited ${usernamesText} to spectate you in this game.`);
-
-    emit('onSpectatorsInvited');
-
-    usernames.value = '';
   } else {
     console.log(formatError(response));
     errors.value = extractErrors(response)
   }
+
+  usernames.value = '';
+  emit('onSpectatorsInvited');
 
   isLoading.value = false;
 }
