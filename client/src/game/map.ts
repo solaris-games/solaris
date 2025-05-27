@@ -952,8 +952,6 @@ export class Map {
   }
 
   onRulerPointCreated (e) {
-    console.log(e);
-
     this.eventBus.emit(MapEventBusEventNames.MapOnRulerPointCreated, { rulerPoint: e });
   }
 
