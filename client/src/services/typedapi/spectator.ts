@@ -13,7 +13,7 @@ export const inviteSpectators = (axios: Axios) => async (gameId: string, usernam
 }
 
 export const uninviteSpectator = (axios: Axios) => async (gameId: string, userId: string): Promise<ResponseResult<{}>> => {
-  return doPut(axios)(routes.uninviteSpectator, { gameId }, {}, {}, { withCredentials: true });
+  return doPut(axios)(routes.uninviteSpectator, { gameId, userId }, {}, {}, { withCredentials: true });
 }
 
 export const clearSpectators = (axios: Axios) => async (gameId: string): Promise<ResponseResult<{}>> => {
