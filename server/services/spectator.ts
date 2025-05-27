@@ -6,6 +6,7 @@ import { Game, GameSpectator } from "./types/Game";
 import { Player } from "./types/Player";
 import UserService from "./user";
 import {notNull} from "./utils";
+import {User} from "./types/User";
 
 export default class SpectatorService {
     gameRepo: Repository<Game>;
@@ -31,11 +32,29 @@ export default class SpectatorService {
             throw new ValidationError(`Spectating is not enabled in this game.`);
         }
 
-        const users = (await Promise.all(usernames.map(username => this.userService.getByUsername(username, { _id: 1 })))).filter(notNull);
+        const requestUser = async (username: string): Promise<{ username: string, user: User | null }> => {
+            const user = await this.userService.getByUsername(username, { _id: 1 });
+            return {
+                username,
+                user
+            };
+        };
 
-        if (users.length !== usernames.length) {
-            const missingUsernames = usernames.filter(username => !users.find(user => user.username === username));
-            throw new ValidationError(`The following users do not exist: ${missingUsernames.join(', ')}`);
+        const attemptedUsers: { username: string, user: User | null }[] = await Promise.all(usernames.map((username) => requestUser(username)));
+
+        const users: User[] = [];
+        const missingUsernames: string[] = [];
+
+        for (const { username, user } of attemptedUsers) {
+            if (user) {
+                users.push(user);
+            } else {
+                missingUsernames.push(username);
+            }
+        }
+
+        if (!users.length) {
+            throw new ValidationError(`No users found for the provided usernames: ${missingUsernames.join(', ')}`);
         }
 
         await this.gameRepo.updateOne({
@@ -48,6 +67,10 @@ export default class SpectatorService {
                 }
             }
         });
+
+        if (missingUsernames.length !== 0) {
+            throw new ValidationError(`The following usernames were not found: ${missingUsernames.join(', ')}`);
+        }
     }
 
     async uninvite(game: Game, player: Player, userId: DBObjectId) {
