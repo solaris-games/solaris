@@ -216,7 +216,7 @@ export default {
       this.recalculateTotalEta()
       this.recalculateLooped()
     },
-    onWaypointOutOfRange ({ waypoint }) {
+    onWaypointOutOfRange () {
       this.$toast.error(`This waypoint is out of hyperspace range.`)
     },
     recalculateTotalEta () {
