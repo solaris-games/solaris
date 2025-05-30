@@ -31,6 +31,7 @@ import ViewTitle from '../components/ViewTitle.vue'
 import FormErrorList from '../components/FormErrorList.vue'
 import { inject } from 'vue'
 import { extractErrors, formatError, httpInjectionKey, isOk } from '@/services/typedapi'
+import {requestPasswordReset} from "@/services/typedapi/user";
 
 export default {
   components: {
@@ -67,7 +68,7 @@ export default {
 
       this.isLoading = true
 
-      const response = await requestResetPassword(this.httpClient)(this.email);
+      const response = await requestPasswordReset(this.httpClient)(this.email);
 
       if (isOk(response)) {
         this.$toast.success(`A password reset email has been sent to the email address, please check your email inbox.`)
