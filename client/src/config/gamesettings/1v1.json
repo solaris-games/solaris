@@ -91,30 +91,34 @@
     "globalEvents": "disabled"
   },
   "technology": {
-    "startingTechnologyLevel": {
-      "terraforming": 1,
-      "experimentation": 0,
-      "scanning": 2,
-      "hyperspace": 1,
-      "manufacturing": 1,
-      "banking": 1,
-      "weapons": 5,
-      "specialists": 3
-    },
-    "researchCosts": {
-      "terraforming": "standard",
-      "experimentation": "none",
-      "scanning": "standard",
-      "hyperspace": "standard",
-      "manufacturing": "expensive",
-      "banking": "cheap",
-      "weapons": "none",
-      "specialists": "standard"
-    },
-    "experimentationDistribution": "random",
-    "bankingReward": "standard",
-    "experimentationReward": "standard",
-    "specialistTokenReward": "standard"
+      "startingTechnologyLevel": {
+          "terraforming": 1,
+          "experimentation": 0,
+          "scanning": 2,
+          "hyperspace": 1,
+          "manufacturing": 1,
+          "banking": 1,
+          "weapons": 5,
+          "specialists": 3
+      },
+      "researchCosts": {
+          "terraforming": "standard",
+          "experimentation": "none",
+          "scanning": "standard",
+          "hyperspace": "standard",
+          "manufacturing": "expensive",
+          "banking": "cheap",
+          "weapons": "none",
+          "specialists": "standard"
+      },
+      "researchCostProgression": {
+          "progression": "standard",
+          "growthFactor": "medium"
+      },
+      "experimentationDistribution": "random",
+      "bankingReward": "standard",
+      "experimentationReward": "standard",
+      "specialistTokenReward": "standard"
   },
   "gameTime": {
     "gameType": "realTime",
