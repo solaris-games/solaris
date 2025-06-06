@@ -13,6 +13,7 @@ export * from "./api/types/common/conversation";
 export * from "./api/types/common/diplomacy";
 export * from "./api/types/common/ledger";
 export * from "./api/types/common/trade";
+export * from "./api/types/common/infrastructureUpgrade";
 export * from "./api/types/common/announcement";
 export * from "./api/types/common/badge";
 export * from "./api/types/common/user";
