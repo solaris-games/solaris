@@ -45,10 +45,7 @@
         "carrierSpeed": 10,
         "starCaptureReward": "enabled",
         "specialistBans": {
-            "star": [
-                16,
-                17
-            ],
+            "star": [16, 17],
             "carrier": []
         }
     },
@@ -113,6 +110,10 @@
             "banking": "cheap",
             "weapons": "none",
             "specialists": "standard"
+        },
+        "researchCostProgression": {
+            "progression": "standard",
+            "growthFactor": "medium"
         },
         "experimentationDistribution": "random",
         "bankingReward": "standard",

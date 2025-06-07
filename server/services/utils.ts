@@ -13,7 +13,7 @@ export function intersectionOfSets<T>(a: Set<T>, b: Set<T>): Set<T> {
     return new Set(Array.from(a).filter(x => b.has(x)));
 }
 
-export function maxBy<T>(max: (arg0: T) => number, list: T[]): number {
+export const maxBy = <T>(max: (a: T) => number, list: T[]): number => {
     let lastScore = Number.MIN_SAFE_INTEGER;
     for (let el of list) {
         const elScore = max(el);
@@ -40,7 +40,7 @@ export function maxOf<T>(max: (arg0: T) => number, list: T[]): T | undefined {
     return largest;
 }
 
-export function minBy<T>(min: (T) => number, list: T[]): number {
+export const minBy = <T>(min: (a: T) => number, list: T[]): number => {
     let lastScore = Number.MAX_SAFE_INTEGER;
     for (let el of list) {
         const elScore = min(el);

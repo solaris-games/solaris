@@ -5,7 +5,7 @@ import textureService from './texture'
 import type {Store} from "vuex";
 import type {State} from "../store";
 import {Application, isWebGLSupported, Ticker} from "pixi.js";
-import type {Location, UserGameSettings} from "@solaris-common";
+import {DEFAULT_SETTINGS, type Location, type UserGameSettings} from "@solaris-common";
 import type {Game, Star, Carrier} from "../types/game";
 import { DebugTools } from './debugTools';
 import type { EventBus } from '../eventBus';
@@ -25,7 +25,7 @@ export class DrawingContext {
 }
 
 export const createGameContainer = async (store: Store<State>, reportGameError: ((err: string) => void), eventBus: EventBus) => {
-  const userSettings = store.state.settings;
+  const userSettings: UserGameSettings = store.state.settings || DEFAULT_SETTINGS;
   const antialiasing = userSettings.map.antiAliasing === 'enabled';
 
   const options = {

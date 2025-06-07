@@ -129,35 +129,7 @@
       </div>
 
       <div v-if="hasChecked && upgradePreview && upgradePreview.stars.length" class="row mt-2">
-        <!-- TODO: This should be a component -->
-        <table class="table table-striped table-hover">
-          <thead class="table-dark">
-          <tr>
-            <td>Star</td>
-            <td class="text-end">Upgrade</td>
-            <td class="text-end"><i class="fas fa-dollar-sign"></i></td>
-          </tr>
-          </thead>
-          <tbody>
-          <!-- TODO: This should be a component -->
-          <tr v-for="previewStar in upgradePreview.stars" :key="previewStar.starId">
-            <td>
-              <a href="javascript:;" @click="panToStar(previewStar.starId)">
-                <i class="fas fa-eye"></i>
-                {{ getStar(previewStar.starId).name }}
-              </a>
-            </td>
-            <td class="text-end">
-              <span class="text-danger">{{ previewStar.infrastructureCurrent }}</span>
-              <i class="fas fa-arrow-right ms-2 me-2"></i>
-              <span class="text-success">{{ previewStar.infrastructure }}</span>
-            </td>
-            <td class="text-end">
-              {{ previewStar.infrastructureCostTotal }}
-            </td>
-          </tr>
-          </tbody>
-        </table>
+        <bulk-infrastructure-upgrade-report :upgrade-report="upgradePreview"></bulk-infrastructure-upgrade-report>
       </div>
 
       <div v-if="actionCount > 0">
@@ -185,9 +157,11 @@ import BulkInfrastructureUpgradeStarTableVue from './BulkInfrastructureUpgradeSt
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
+import BulkInfrastructureUpgradeReport from "@/views/game/components/star/BulkInfrastructureUpgradeReport.vue";
 
 export default {
   components: {
+    BulkInfrastructureUpgradeReport,
     'menu-title': MenuTitle,
     'form-error-list': FormErrorList,
     'scheduled-table': BulkInfrastructureUpgradeScheduleTable,

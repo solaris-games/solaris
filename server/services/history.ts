@@ -193,7 +193,10 @@ export default class HistoryService {
 
         await this.historyRepo.insertOne(history);
 
-        await this.cleanupTimeMachineHistory(game);
+        // We don't want to clean the first (0th) tick directly after saving it
+        if (game.state.tick !== 0) {
+            await this.cleanupTimeMachineHistory(game);
+        }
     }
 
     async cleanupTimeMachineHistory(game: Game) {
