@@ -36,13 +36,14 @@ The client uses the following tech:
     - [MongoDB](https://www.mongodb.com/) v5.0
 2. Clone the repository.
 3. Checkout `master`.
-4. `npm install` in both `client/` and `server/` directories.
-5. Create a `.env` file in `server/` (See `.env.example`).
-6. Create a `.env` file in `client/` (See `.env.example`).
-7. `npm run start-jobs:dev` in `server/` to start the automated jobs and setup new games.
-8. `npm run start-api:dev` in `server/` to start the API.
-9. `npm run dev` in `client/` to start the client application.
-10. Browse to the site locally (default [http://localhost:8080](http://localhost:8080)).
+4. `npm install` in the root directory
+5. `npm run build` in the root directory (do not skip this even when running the dev server)
+6. Create a `.env` file in `server/` (See `.env.example`).
+7. Create a `.env` file in `client/` (See `.env.example`).
+8. `npm run start-jobs:dev` in `server/` to start the automated jobs and setup new games.
+9. `npm run start-api:dev` in `server/` to start the API.
+10. `npm run dev` in `client/` to start the client application.
+11. Browse to the site locally (default [http://localhost:8080](http://localhost:8080)).
 
 *Note: Development work is to be based on the `dev` branch, for a new feature or bug fix, create a branch from `dev`.*
 

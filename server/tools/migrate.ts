@@ -1,8 +1,10 @@
 import {makeJob} from "./tool";
 import {migrateBadges} from "./migrations/migrateBadges";
+import {migrateCombatResolution} from "./migrations/migrateCombatResolution";
 
 const MIGRATIONS = {
     "2025-02-05-badges": migrateBadges,
+    "2025-03-29-combat-resolution": migrateCombatResolution
 }
 
 const job = makeJob('Migration', async (ctx) => {

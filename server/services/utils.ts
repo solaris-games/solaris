@@ -26,6 +26,22 @@ export const maxBy = <T>(max: (a: T) => number, list: T[]): number => {
 }
 
 export const minBy = <T>(min: (a: T) => number, list: T[]): number => {
+export function maxOf<T>(max: (arg0: T) => number, list: T[]): T | undefined {
+    let lastScore = Number.MIN_SAFE_INTEGER;
+    let largest: T | undefined = undefined;
+
+    for (let el of list) {
+        const elScore = max(el);
+        if (elScore > lastScore) {
+            lastScore = elScore;
+            largest = el;
+        }
+    }
+
+    return largest;
+}
+
+export function minBy<T>(min: (T) => number, list: T[]): number {
     let lastScore = Number.MAX_SAFE_INTEGER;
     for (let el of list) {
         const elScore = min(el);
