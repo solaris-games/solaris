@@ -1,5 +1,6 @@
 import type { StarCaptureResult } from "../star";
 import type { CombatResult } from "../combat";
+import type {BulkUpgradeReport} from "../infrastructureUpgrade";
 
 export interface BaseGameEvent<ID> {
     gameId: ID;
@@ -22,3 +23,11 @@ export interface PlayerCombatStarEvent<ID> extends BaseGameEvent<ID> {
         combatResult: CombatResult<ID>;
     };
 }
+
+export interface PlayerBulkInfrastructureUpgradedEvent<ID> extends BaseGameEvent<ID> {
+    type: 'playerBulkInfrastructureUpgraded',
+    data: {
+        upgradeReport: BulkUpgradeReport<ID>,
+    }
+}
+
