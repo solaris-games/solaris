@@ -33,3 +33,4 @@ export * from "./api/controllers/spectator";
 export * from "./events/index";
 export * from "./events/handler";
 export * from "./events/emitter";
+export * from "./data/settings";
