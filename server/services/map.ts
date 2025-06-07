@@ -337,25 +337,6 @@ export default class MapService {
         }
     }
 
-    getGalaxyCenter(starLocations: Location[]) {
-        if (!starLocations.length) {
-            return {
-                x: 0,
-                y: 0
-            };
-        }
-
-        let maxX = starLocations.sort((a, b) => b.x - a.x)[0].x;
-        let maxY = starLocations.sort((a, b) => b.y - a.y)[0].y;
-        let minX = starLocations.sort((a, b) => a.x - b.x)[0].x;
-        let minY = starLocations.sort((a, b) => a.y - b.y)[0].y;
-
-        return {
-            x: (minX + maxX) / 2,
-            y: (minY + maxY) / 2
-        };
-    }
-
     getGalaxyCenterOfMass(starLocations: Location[]) {
         if (!starLocations.length) {
             return {
