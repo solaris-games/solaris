@@ -65,7 +65,7 @@ export default class SpiralMapService {
         const locations: Location[] = [];
 
         if (this.gameTypeService.isKingOfTheHillMode(game)) {
-            locations.push({ x: 0, y: 0 });
+            locations.push(this.starDistanceService.getGalacticCenter());
         }
 
         let BRANCHES = branchCount;

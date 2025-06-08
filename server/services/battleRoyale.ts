@@ -56,7 +56,7 @@ export default class BattleRoyaleService {
         }
 
         // Calculate which stars need to be destroyed.
-        const galaxyCenter = this.starDistanceService.getGalaxyCenter(game.galaxy.stars.map(s => s.location));
+        let galaxyCenter = this.mapService.getGalaxyCenter(game.galaxy.stars.map(s => s.location));
         let starCountToDestroy = game.settings.general.playerLimit; // TODO: This needs to be a game setting?
 
         // There must be at least 1 star left in the galaxy.
@@ -64,7 +64,7 @@ export default class BattleRoyaleService {
             starCountToDestroy = game.galaxy.stars.length - 1;
         }
         
-        const starsToDestroy = this.starDistanceService.getFurthestStarsFromLocation(galaxyCenter, game.galaxy.stars, starCountToDestroy);
+        let starsToDestroy = this.starDistanceService.getFurthestStarsFromLocation(galaxyCenter, game.galaxy.stars, starCountToDestroy);
 
         return starsToDestroy
             .sort((a, b) => a._id.toString().localeCompare(b._id.toString()));
