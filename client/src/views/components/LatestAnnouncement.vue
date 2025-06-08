@@ -1,6 +1,6 @@
 <template>
-  <loading-spinner v-if="!announcement" />
-  <div class="mt-4" v-else>
+  <loading-spinner :loading="!announcement" />
+  <div class="mt-4" v-if="announcement">
     <h5 class="latest-update-title">Latest Update: {{date}}</h5>
 
     <details>
