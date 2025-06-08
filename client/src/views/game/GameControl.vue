@@ -98,7 +98,7 @@ export default {
 
           await this.loadGame()
         } catch (err) {
-          this.errors = err.response.data.errors;
+          this.errors = err?.response?.data.errors;
           console.error(err)
         }
 
@@ -116,7 +116,7 @@ export default {
 
           await this.loadGame()
         } catch (err) {
-          this.errors = err.response.data.errors;
+          this.errors = err?.response?.data.errors;
           console.error(this.error);
           console.error(err)
         }
@@ -135,7 +135,7 @@ export default {
 
           await this.loadGame()
         } catch (err) {
-          this.errors = err.response.data.errors;
+          this.errors = err?.response?.data.errors;
           console.error(err)
         }
 
@@ -153,7 +153,7 @@ export default {
             router.push({name: 'main-menu'})
           }
         } catch (err) {
-          this.errors = err.response.data.errors;
+          this.errors = err?.response?.data.errors;
           console.error(err)
         }
 
