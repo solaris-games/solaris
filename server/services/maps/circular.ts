@@ -1,4 +1,4 @@
-import {Game, GameResourceDistribution} from "../types/Game";
+import { GameResourceDistribution } from "../types/Game";
 import { Location } from "../types/Location";
 import DistanceService from "../distance";
 import GameTypeService from "../gameType";
@@ -31,7 +31,7 @@ export default class CircularMapService {
         this.gameTypeService = gameTypeService;
     }
 
-    generateLocations(game: Game, starCount: number, resourceDistribution: GameResourceDistribution): Location[] {
+    generateLocations(game, starCount: number, resourceDistribution: GameResourceDistribution): Location[] {
         // These two values should probably be ingame constants but they can for now just be plugged in here
         const starDensity = 1.3 * 10**-4
         const offset = 0.5
@@ -43,7 +43,7 @@ export default class CircularMapService {
         const locations: Location[] = [];
 
         if (this.gameTypeService.isKingOfTheHillMode(game)) {
-            locations.push({ x: 0, y: 0 });
+            locations.push(this.starDistanceService.getGalacticCenter());
         }
 
         do {
