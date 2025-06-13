@@ -1,11 +1,11 @@
 <template>
   <form @submit.prevent="handleSubmit">
     <div class="mb-2" v-if="!isLoading">
-        <input id="email" ref="email" type="text" required class="form-control" placeholder="Email" v-model="email" :disabled="isLoading"/>
+        <input id="email" type="text" required class="form-control" placeholder="Email" v-model="email" :disabled="isLoading"/>
     </div>
 
     <div class="mb-2" v-if="!isLoading">
-        <input id="password" ref="password" type="password" required class="form-control" placeholder="Password" v-model="password"  :disabled="isLoading"/>
+        <input id="password" type="password" required class="form-control" placeholder="Password" v-model="password"  :disabled="isLoading"/>
     </div>
 
     <loading-spinner :loading="isLoading"/>
@@ -40,8 +40,8 @@
 </template>
 
 <script setup lang="ts">
-import LoadingSpinner from '../../components/LoadingSpinner.vue'
-import router from '../../../router'
+import LoadingSpinner from '../../components/LoadingSpinner.vue';
+import router from '../../../router';
 import FormErrorList from '../../components/FormErrorList.vue';
 import authService from '../../../services/api/auth';
 import {userClientSocketEmitterInjectionKey} from "@/sockets/socketEmitters/user";
