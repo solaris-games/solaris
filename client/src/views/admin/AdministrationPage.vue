@@ -1,6 +1,6 @@
 <template>
   <view-container :is-auth-page="true">
-    <view-title :title="title" />
+    <view-title :title="props.title" />
 
     <nav>
       <ul class="nav nav-tabs" role="tablist">
@@ -29,30 +29,24 @@
   </view-container>
 </template>
 
-<script>
+<script setup lang="ts">
 import ViewContainer from '../components/ViewContainer.vue'
 import ViewTitle from '../components/ViewTitle.vue'
-import LoadingSpinner from '../components/LoadingSpinner.vue'
+import { computed } from 'vue';
+import type {State} from "@/store";
+import { useStore, type Store } from 'vuex';
 
-export default {
-  components: {
-    'view-container': ViewContainer,
-    'view-title': ViewTitle,
-    'loading-spinner': LoadingSpinner
-  },
-  props: {
-    name: String,
-    title: String
-  },
-  computed: {
-    isAdministrator () {
-      return this.$store.state.roles.administrator
-    },
-    isCommunityManager () {
-      return this.isAdministrator || this.$store.state.roles.communityManager
-    }
-  }
-}
+const store: Store<State> = useStore();
+
+const props = defineProps<{
+  name: string,
+  title: string
+}>();
+
+const name = computed(() => props.name);
+
+const isAdministrator = computed(() => store.state.roles.administrator);
+const isCommunityManager = computed(() => isAdministrator.value || store.state.roles.communityManager);
 </script>
 
 <style scoped>
