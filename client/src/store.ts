@@ -10,7 +10,7 @@ import SpecialistService from './services/api/specialist.js';
 import GameHelper from './services/gameHelper.js';
 import type { Game, Player, Star } from "./types/game";
 import type { Store } from 'vuex/types/index.js';
-import type {Badge} from "@solaris-common";
+import type {Badge, UserRoles} from "@solaris-common";
 import {getBadges} from "./services/typedapi/badge";
 import {formatError, isOk} from "./services/typedapi";
 import type {UserClientSocketEmitter} from "@/sockets/socketEmitters/user";
@@ -44,7 +44,7 @@ export type State = {
   menuStateChat: string | null;
   menuArgumentsChat: any;
   username: string | null;
-  roles: string[] | null;
+  roles: UserRoles | null;
   userCredits: number | null;
   isImpersonating: boolean | null;
   userIsEstablishedPlayer: boolean | null;
