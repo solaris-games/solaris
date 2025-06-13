@@ -391,8 +391,9 @@ export class Map {
   }
 
   drawGalaxyCenter () {
-    // TODO: Is there any need to display the galaxy center for non orbital games?
-    if (this.game!.constants.distances.galaxyCenterLocation) {
+    const userWantsToSeeCenter = this._isOrbitalMapEnabled() || this.userSettings?.map.galaxyCenterAlwaysVisible === 'enabled';
+
+    if (this.game!.constants.distances.galaxyCenterLocation && userWantsToSeeCenter) {
         let galaxyCenterGraphics = new PIXI.Graphics()
         let location : Location = this.game!.constants.distances.galaxyCenterLocation
         let size = 10

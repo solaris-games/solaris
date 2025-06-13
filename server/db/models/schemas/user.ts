@@ -166,6 +166,7 @@ const schema = new Schema({
                 }
             },
             naturalResourcesRingOpacity: {type: Types.Number, required: false, default: 0.1, min: 0.0, max: 1.0},
+            galaxyCenterAlwaysVisible: {type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'disabled'},
         },
         carrier: {
             defaultAction: {
