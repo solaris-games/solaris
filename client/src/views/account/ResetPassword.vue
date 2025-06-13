@@ -5,19 +5,19 @@
     <form @submit.prevent="handleSubmit">
       <div class="mb-2">
         <label for="currentPassword">Current Password</label>
-        <input type="password" required="required" name="currentPassword" class="form-control" v-model="currentPassword"
+        <input type="password" required name="currentPassword" class="form-control" v-model="currentPassword"
           :disabled="isLoading">
       </div>
 
       <div class="mb-2">
         <label for="newPassword">New Password</label>
-        <input type="password" required="required" name="newPassword" class="form-control" v-model="newPassword"
+        <input type="password" required name="newPassword" class="form-control" v-model="newPassword"
           :disabled="isLoading">
       </div>
 
       <div class="mb-2">
         <label for="newPasswordConfirm">Confirm New Password</label>
-        <input type="password" required="required" name="newPasswordConfirm" class="form-control"
+        <input type="password" required name="newPasswordConfirm" class="form-control"
           v-model="newPasswordConfirm" :disabled="isLoading">
       </div>
 
@@ -39,7 +39,7 @@ import ViewContainer from '../components/ViewContainer.vue'
 import router from '../../router'
 import ViewTitle from '../components/ViewTitle.vue'
 import FormErrorList from '../components/FormErrorList.vue'
-import { ref, inject } from 'vue'
+import { ref, inject, type Ref } from 'vue'
 import { extractErrors, formatError, httpInjectionKey, isOk } from '@/services/typedapi'
 import { updatePassword } from '@/services/typedapi/user'
 import {toastInjectionKey} from "@/util/keys";

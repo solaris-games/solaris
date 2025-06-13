@@ -25,7 +25,7 @@
       </ul>
     </nav>
 
-    <slot />
+    <slot></slot>
   </view-container>
 </template>
 
