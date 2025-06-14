@@ -2,38 +2,46 @@
   <div class="add-warning form-inline">
     <label for="warning-text">Warning text</label>
     <input class="form-control" type="text" id="warning-text" v-model="warningText" />
-    <button class="btn btn-success btn-sm" type="button" @click="addWarning" :disabled="!this.warningText">Add Warning</button>
+    <button class="btn btn-success btn-sm" type="button" @click="submitWarning" :disabled="!warningText">Add Warning</button>
   </div>
 </template>
 
-<script>
-import AdminApiService from "../../../services/api/admin";
+<script setup lang="ts">
+import { ref, inject } from 'vue';
+import { addWarning } from '@/services/typedapi/admin';
+import { httpInjectionKey, isOk } from "@/services/typedapi";
+import { toastInjectionKey } from "@/util/keys";
 
-export default {
-  name: "AddWarning",
-  props: {
-    userId: String,
-  },
-  data () {
-    return {
-      warningText: null
-    }
-  },
-  methods: {
-    async addWarning(e) {
-      e.preventDefault()
+const props = defineProps<{
+  userId: string
+}>();
 
-      if (!this.warningText) {
-        return;
-      }
+const emit = defineEmits<{
+  onUserChanged: [],
+}>();
 
-      await AdminApiService.addWarning(this.userId, this.warningText);
+const httpClient = inject(httpInjectionKey)!;
+const toast = inject(toastInjectionKey)!;
 
-      this.$emit("onUserChanged");
+const warningText = ref('');
 
-      this.warningText = null;
-    }
+const submitWarning = async (e: Event) => {
+  e.preventDefault();
+
+  if (!warningText.value) {
+    return;
   }
+
+  const response = await addWarning(httpClient)(props.userId, warningText.value);
+
+  if (isOk(response)) {
+    toast.success('Warning added successfully');
+  } else {
+    toast.error('An error occured while adding the warning');
+  }
+
+  emit('onUserChanged');
+  warningText.value = '';
 }
 </script>
 
