@@ -1,4 +1,4 @@
-import {type Announcement, createAdminRoutes, type CreateAnnouncementReq, type GetInsight, type ListGame, type ListPasswordReset, type ListUser, type SettingEnabledDisabled} from "@solaris-common";
+import {type Announcement, createAdminRoutes, type CreateAnnouncementReq, type GetInsight, type ListGame, type ListPasswordReset, type ListUser, type SettingEnabledDisabled, type Conversation, type ConversationMessage, type Report } from "@solaris-common";
 import type { Axios } from "axios";
 import {doGet, doPost, doPatch, type ResponseResult, doDelete} from ".";
 
@@ -82,6 +82,18 @@ export const finishGame = (axios: Axios) => async (gameId: string): Promise<Resp
 
 export const resetQuitters = (axios: Axios) => async (gameId: string): Promise<ResponseResult<null>> => {
   return doDelete(axios)(routes.resetQuitters, { gameId }, {}, {});
+}
+
+export const getConversationForReport = (axios: Axios) => async (reportId: string): Promise<ResponseResult<Conversation<string>>> => {
+  return doGet(axios)(routes.getConversationForReport, { reportId }, {});
+}
+
+export const listReports = (axios: Axios) => async (): Promise<ResponseResult<Report<string>[]>> => {
+  return doGet(axios)(routes.listReports, {}, {});
+}
+
+export const actionReport = (axios: Axios) => async (reportId: string): Promise<ResponseResult<null>> => {
+  return doPatch(axios)(routes.actionReport, { reportId }, {}, {});
 }
 
 export const createAnnouncement = (axios: Axios) => async (announcement: CreateAnnouncementReq): Promise<ResponseResult<null>> => {

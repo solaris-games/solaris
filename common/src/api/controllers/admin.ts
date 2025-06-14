@@ -2,6 +2,8 @@ import type { Announcement } from '../types/common/announcement';
 import type { GameSettingsGeneral, GameState } from '../types/common/game';
 import type { SettingEnabledDisabled } from '../types/common/settings';
 import type { UserRoles, UserWarning } from '../types/common/user';
+import type { Report } from '../types/common/report';
+import type { Conversation } from '../types/common/conversation';
 import { GetRoute, PatchRoute, PostRoute, DeleteRoute, SimpleGetRoute, SimplePatchRoute, SimplePostRoute } from './index';
 
 export type GetInsight = {
@@ -93,6 +95,9 @@ export const createAdminRoutes = <ID>() => ({
     setGameTimeMachine: new PatchRoute<{ gameId: string }, {}, SetTimeMachineReq, null>('/api/admin/game/:gameId/timeMachine'),
     finishGame: new PatchRoute<{ gameId: string }, {}, null, null>('/api/admin/game/:gameId/finish'),
     resetQuitters: new DeleteRoute<{ gameId: string }, {}, null>('/api/admin/game/:gameId/quitters'),
+    getConversationForReport: new GetRoute<{ reportId: string }, {}, Conversation<ID>>('/api/admin/reports/:reportId/conversation'),
+    listReports: new SimpleGetRoute<Report<ID>[]>('/api/admin/reports'),
+    actionReport: new PatchRoute<{ reportId: string }, {}, {}, null>('/api/admin/reports/:reportId/action'),
     createAnnouncement: new SimplePostRoute<CreateAnnouncementReq, null>('/api/admin/announcements/'),
     deleteAnnouncement: new DeleteRoute<{ id: string }, {}, null>('/api/admin/announcements/:id'),
     getAllAnnouncements: new SimpleGetRoute<Announcement<ID>[]>('/api/admin/announcements/'),
