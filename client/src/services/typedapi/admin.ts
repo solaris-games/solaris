@@ -64,7 +64,7 @@ export const endImpersonate = (axios: Axios) => async (): Promise<ResponseResult
   return doPost(axios)(routes.endImpersonate, {}, {}, {});
 }
 
-export const listGames = (axios: Axios) => async (): Promise<ResponseResult<ListGame<string>>> => {
+export const listGames = (axios: Axios) => async (): Promise<ResponseResult<ListGame<string>[]>> => {
   return doGet(axios)(routes.listGames, {}, {}, {});
 }
 

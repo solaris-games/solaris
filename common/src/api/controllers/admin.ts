@@ -54,6 +54,7 @@ export type SetCreditsReq = {
 }
 
 export type ListGame<ID> = {
+    _id: ID,
     settings: {
         general: GameSettingsGeneral<ID>,
     },
