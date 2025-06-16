@@ -1,4 +1,4 @@
-import {type Announcement, createAdminRoutes, type CreateAnnouncementReq, type GetInsight, type ListGame, type ListPasswordReset, type ListUser, type SettingEnabledDisabled, type Conversation, type ConversationMessage, type Report } from "@solaris-common";
+import {type Announcement, createAdminRoutes, type CreateAnnouncementReq, type GetInsight, type ListGame, type ListPasswordReset, type ListUser, type SettingEnabledDisabled, type Conversation, type ConversationMessage, type Report, type ImpersonateResp } from "@solaris-common";
 import type { Axios } from "axios";
 import {doGet, doPost, doPatch, type ResponseResult, doDelete} from ".";
 
@@ -36,7 +36,7 @@ export const setRoleGameMaster = (axios: Axios) => async (userId: string, enable
   return doPatch(axios)(routes.setRoleGameMaster, { userId }, {}, { enabled });
 }
 
-export const setCredits = (axios: Axios) => async (userId: string, credits: number): Promise<ResponseResult<null>> => {
+export const setCredits = (axios: Axios) => async (userId: string, credits: number): Promise<ResponseResult<{ credits: number }>> => {
   return doPatch(axios)(routes.setCredits, { userId }, {}, { credits });
 }
 
@@ -56,7 +56,7 @@ export const promoteToEstablishedPlayer = (axios: Axios) => async (userId: strin
   return doPatch(axios)(routes.promoteToEstablishedPlayer, { userId }, {}, {});
 }
 
-export const impersonate = (axios: Axios) => async (userId: string): Promise<ResponseResult<null>> => {
+export const impersonate = (axios: Axios) => async (userId: string): Promise<ResponseResult<ImpersonateResp<string>>> => {
   return doPost(axios)(routes.impersonate, { userId }, {}, {});
 }
 

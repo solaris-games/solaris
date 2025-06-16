@@ -14,17 +14,19 @@ export type GetInsight = {
     d14: number,
 }
 
+export type AdminSpecificUserInfo = { 
+    adminRole: 'admin',
+    email: string,
+    credits: number,
+    roles: UserRoles,
+    emailEnabled: boolean,
+    lastSeen: Date,
+    lastSeenIP: string,
+};
+
 export type RoleSpecificUserInfo =
     | { adminRole: 'communityManager' }
-    | { 
-        adminRole: 'admin',
-        email: string,
-        credits: number,
-        roles: UserRoles,
-        emailEnabled: boolean,
-        lastSeen: Date,
-        lastSeenIP: string,
-    };
+    | AdminSpecificUserInfo;
 
 export type ListUser<ID> = {
     _id: ID,
@@ -75,6 +77,15 @@ export type CreateAnnouncementReq = {
     date: Date,
 };
 
+export type ImpersonateResp<ID> = {
+    _id: ID,
+    _originalUserId: ID,
+    username: string,
+    roles: UserRoles,
+    credits: number,
+    isImpersonating: boolean,
+};
+
 export const createAdminRoutes = <ID>() => ({
     getInsights: new SimpleGetRoute<GetInsight[]>('/api/admin/insights'),
     listUsers: new SimpleGetRoute<ListUser<ID>[]>('/api/admin/user'),
@@ -84,12 +95,12 @@ export const createAdminRoutes = <ID>() => ({
     setRoleDeveloper: new PatchRoute<{ userId: string }, {}, SetRoleReq, null>('/api/admin/user/:userId/developer'),
     setRoleCommunityManager: new PatchRoute<{ userId: string }, {}, SetRoleReq, null>('/api/admin/user/:userId/communityManager'),
     setRoleGameMaster: new PatchRoute<{ userId: string }, {}, SetRoleReq, null>('/api/admin/user/:userId/gameMaster'),
-    setCredits: new PatchRoute<{ userId: string }, {}, SetCreditsReq, null>('/api/admin/user/:userId/credits'),
+    setCredits: new PatchRoute<{ userId: string }, {}, SetCreditsReq, { credits: number }>('/api/admin/user/:userId/credits'),
     ban: new PatchRoute<{ userId: string }, {}, null, null>('/api/admin/user/:userId/ban'),
     unban: new PatchRoute<{ userId: string }, {}, null, null>('/api/admin/user/:userId/unban'),
     resetAchievements: new PatchRoute<{ userId: string }, {}, null, null>('/api/admin/user/:userId/resetAchievements'),
     promoteToEstablishedPlayer: new PatchRoute<{ userId: string }, {}, null, null>('/api/admin/user/:userId/promoteToEstablishedPlayer'),
-    impersonate: new PostRoute<{ userId: string }, {}, null, null>('/api/admin/user/:userId/impersonate'),
+    impersonate: new PostRoute<{ userId: string }, {}, null, ImpersonateResp<ID>>('/api/admin/user/:userId/impersonate'),
     endImpersonate: new SimplePostRoute<null, null>('/api/admin/endImpersonate'),
     listGames: new SimpleGetRoute<ListGame<ID>[]>('/api/admin/game'),
     setGameFeatured: new PatchRoute<{ gameId: string }, {}, SetFeaturedReq, null>('/api/admin/game/:gameId/featured'),
