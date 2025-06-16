@@ -54,7 +54,6 @@
 <script setup lang="ts">
 import router from '../../router'
 import authService from '../../services/api/auth'
-import AdminApiService from '../../services/api/admin'
 import { ref, computed, inject } from 'vue';
 import { useStore, type Store } from 'vuex';
 import type {State} from "@/store";

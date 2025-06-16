@@ -7,11 +7,9 @@
         <slot></slot>
         <a v-if="showSocialLinks" class="btn btn-outline-secondary ms-1" href="https://discord.com/invite/v7PD33d" target="_blank" title="Discord">
           <i class="fab fa-discord"></i>
-          <!-- <span class="d-none d-md-inline-block ms-1">Discord</span> -->
         </a>
         <a v-if="showSocialLinks" class="btn btn-outline-secondary ms-1" href="https://steamcommunity.com/app/1623930/discussions/" target="_blank" title="Forum">
           <i class="far fa-comments"></i>
-          <!-- <span class="d-none d-md-inline-block ms-1">Forum</span> -->
         </a>
         <a class="btn btn-outline-info ms-1" :href="documentationUrl" target="_blank" title="How to Play">
           <i class="far fa-question-circle"></i>
@@ -22,35 +20,36 @@
 </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import router from '../../router'
+import { useStore, type Store } from 'vuex';
+import type {State} from "@/store";
+import { computed } from 'vue';
 
-export default {
-  props: {
-    title: String,
-    navigation: { type: String, default: 'main-menu' },
-    icon: { type: String, default: 'home' },
-    hideHomeButton: Boolean,
-    showSocialLinks: Boolean
-  },
-  methods: {
-    navigate () {
-      if (this.isLoggedIn) {
-        router.push({ name: this.navigation })
-      } else {
-        router.push({name: 'home'})
-      }
-    }
-  },
-  computed: {
-    isLoggedIn () {
-      return this.$store.state.userId != null
-    },
-    documentationUrl () {
-      return import.meta.env.VUE_APP_DOCUMENTATION_URL
-    }
+type Props = {
+  title: string,
+  navigation?: string,
+  icon?: string,
+  hideHomeButton?: boolean,
+  showSocialLinks?: boolean,
+};
+
+const { title, navigation  = "main-menu", icon = "home", hideHomeButton, showSocialLinks } = defineProps<Props>();
+
+const store: Store<State> = useStore();
+
+const isLoggedIn = computed(() => Boolean(store.state.userId));
+
+const documentationUrl = import.meta.env.VUE_APP_DOCUMENTATION_URL;
+
+const navigate = () => {
+  if (isLoggedIn.value) {
+    router.push({ name: navigation });
+  } else {
+    router.push({ name: 'home' })
   }
 }
+;
 </script>
 
 <style scoped>
