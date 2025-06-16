@@ -23,7 +23,6 @@ import AdministrationPage from "./AdministrationPage.vue";
 import LoadingSpinner from "../components/LoadingSpinner.vue";
 import CreateAnnouncement from "./components/CreateAnnouncement.vue";
 import AnnouncementTile from "../components/Announcement.vue";
-import AdminApiService from "../../services/api/admin";
 import { ref, inject, type Ref, onMounted } from 'vue';
 import type { Announcement } from "@solaris-common";
 import { getAllAnnouncements, deleteAnnouncement } from "@/services/typedapi/admin";
