@@ -101,7 +101,7 @@ export const createAdminRoutes = <ID>() => ({
     resetAchievements: new PatchRoute<{ userId: string }, {}, null, null>('/api/admin/user/:userId/resetAchievements'),
     promoteToEstablishedPlayer: new PatchRoute<{ userId: string }, {}, null, null>('/api/admin/user/:userId/promoteToEstablishedPlayer'),
     impersonate: new PostRoute<{ userId: string }, {}, null, ImpersonateResp<ID>>('/api/admin/user/:userId/impersonate'),
-    endImpersonate: new SimplePostRoute<null, null>('/api/admin/endImpersonate'),
+    endImpersonate: new SimplePostRoute<null, ImpersonateResp<ID>>('/api/admin/endImpersonate'),
     listGames: new SimpleGetRoute<ListGame<ID>[]>('/api/admin/game'),
     setGameFeatured: new PatchRoute<{ gameId: string }, {}, SetFeaturedReq, null>('/api/admin/game/:gameId/featured'),
     setGameTimeMachine: new PatchRoute<{ gameId: string }, {}, SetTimeMachineReq, null>('/api/admin/game/:gameId/timeMachine'),

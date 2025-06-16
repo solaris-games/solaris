@@ -60,7 +60,7 @@ export const impersonate = (axios: Axios) => async (userId: string): Promise<Res
   return doPost(axios)(routes.impersonate, { userId }, {}, {});
 }
 
-export const endImpersonate = (axios: Axios) => async (): Promise<ResponseResult<null>> => {
+export const endImpersonate = (axios: Axios) => async (): Promise<ResponseResult<ImpersonateResp<string>>> => {
   return doPost(axios)(routes.endImpersonate, {}, {}, {});
 }
 
