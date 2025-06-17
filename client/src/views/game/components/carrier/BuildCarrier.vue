@@ -99,7 +99,7 @@
 import AudioService from '../../../../game/audio';
 import GameHelper from '../../../../services/gameHelper';
 import MenuTitle from '../MenuTitle.vue';
-import { ref, computed, inject, type Ref, onMounted } from 'vue';
+import { ref, computed, inject } from 'vue';
 import { useStore, type Store } from 'vuex';
 import type { State } from '@/store';
 import { makeConfirm } from '@/util/confirm';
