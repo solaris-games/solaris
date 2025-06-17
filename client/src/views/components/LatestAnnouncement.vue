@@ -6,42 +6,33 @@
     <details>
       <summary>More...</summary>
 
-      <announcement :announcement="announcement" />
+      <announcement-panel :announcement="announcement" />
     </details>
   </div>
 </template>
 
-<script>
-import Announcement from "./Announcement.vue";
-import AnnouncementsApiService from "../../services/api/announcements";
+<script setup lang="ts">
+import AnnouncementPanel from "./Announcement.vue";
 import LoadingSpinner from "./LoadingSpinner.vue";
+import type {Announcement} from "@solaris-common";
+import { ref, onMounted, computed, inject, type Ref } from 'vue';
+import {getLatestAnnouncement} from "@/services/typedapi/announcement";
+import {isOk, formatError, httpInjectionKey} from "@/services/typedapi";
 
-export default {
-  name: "LatestAnnouncement",
-  components: {
-    'loading-spinner': LoadingSpinner,
-    'announcement': Announcement
-  },
-  data () {
-    return {
-      announcement: null,
-    }
-  },
-  async mounted () {
-    const resp = await AnnouncementsApiService.getLatestAnnouncement();
+const httpClient = inject(httpInjectionKey)!;
 
-    if (resp.status === 200) {
-      this.announcement = resp.data;
-    } else {
-      console.error(resp);
-    }
-  },
-  computed: {
-    date () {
-      return new Date(this.announcement.date).toLocaleString()
-    }
+const announcement: Ref<Announcement<string> | null> = ref(null);
+const date = computed(() => announcement.value && new Date(announcement.value.date).toLocaleString());
+
+onMounted(async () => {
+  const response = await getLatestAnnouncement(httpClient)();
+
+  if (isOk(response)) {
+    announcement.value = response.data;
+  } else {
+    console.error(formatError(response));
   }
-}
+});
 </script>
 
 <style scoped>
