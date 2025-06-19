@@ -59,6 +59,7 @@ import type {ObjectClicked} from "@/eventBusEventNames/map";
 import type {Player} from "@/types/game";
 import MenuTitle from "@/views/game/components/MenuTitle.vue";
 import SpecialistIcon from "@/views/game/components/specialist/SpecialistIcon.vue";
+import {makeShipTransferActions} from "@/views/game/components/star/shipTransfer";
 
 const props = defineProps<{
   mapObjects: ObjectClicked[],
@@ -96,27 +97,10 @@ const hasEnoughCredits = (mo: ObjectClicked) => {
   return userPlayer.credits >= star.upgradeCosts!.carriers!;
 };
 
-const transferAllToStar = async (star: ObjectClicked) => {
-  const response = await garrisonAllShips(httpClient)(store.state.game._id, star.data._id);
+const { transferAllToStar: tats, distributeShips: ds } = makeShipTransferActions(store, httpClient, toast);
 
-  if (isOk(response)) {
-    toast.default(`All ships transfered to ${star.data.name}.`);
-
-    store.commit('gameStarAllShipsTransferred', response.data);
-  } else {
-    console.error(formatError(response));
-  }
-};
-
-const distributeShips = async (star: ObjectClicked) => {
-  const response = await distributeAllShips(httpClient)(store.state.game._id, star.data._id);
-
-  if (isOk(response)) {
-    toast.default(`All ships at ${star.data.name} distributed to carriers in orbit.`);
-
-    store.commit('gameStarAllShipsTransferred', response.data);
-  }
-};
+const transferAllToStar = (mo: ObjectClicked) => mo.type === 'star' && tats(mo.data);
+const distributeShips = (mo: ObjectClicked) => mo.type === 'star' && ds(mo.data);
 
 const userOwnsObject = (mapObject: ObjectClicked) => {
   const userPlayer = gameHelper.getUserPlayer(store.state.game);
