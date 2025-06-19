@@ -42,9 +42,9 @@ import {makeUpgrade} from "@/views/game/components/star/upgrade";
 const props = defineProps<{
   star: Star,
   availableCredits: number,
-  economy: number,
-  industry: number,
-  science: number,
+  economy: number | null,
+  industry: number | null,
+  science: number | null,
 }>();
 
 const httpClient = inject(httpInjectionKey)!;
@@ -61,9 +61,9 @@ const isHistoricalMode = useIsHistoricalMode(store);
 
 const upgrade = makeUpgrade(store, toast, props.star);
 
-const upgradeEconomy = upgrade('economy', store.state.settings.star.confirmBuildEconomy, isUpgradingEconomy, 'gameStarEconomyUpgraded', upgradeEconomyReq(httpClient));
-const upgradeIndustry = upgrade('industry', store.state.settings.star.confirmBuildIndustry, isUpgradingIndustry, 'gameStarIndustryUpgraded', upgradeIndustryReq(httpClient));
-const upgradeScience = upgrade('science', store.state.settings.star.confirmBuildScience, isUpgradingScience, 'gameStarScienceUpgraded', upgradeScienceReq(httpClient));
+const upgradeEconomy = upgrade('economy', store.state.settings.star.confirmBuildEconomy === 'enabled', isUpgradingEconomy, 'gameStarEconomyUpgraded', upgradeEconomyReq(httpClient));
+const upgradeIndustry = upgrade('industry', store.state.settings.star.confirmBuildIndustry === 'enabled', isUpgradingIndustry, 'gameStarIndustryUpgraded', upgradeIndustryReq(httpClient));
+const upgradeScience = upgrade('science', store.state.settings.star.confirmBuildScience === 'enabled', isUpgradingScience, 'gameStarScienceUpgraded', upgradeScienceReq(httpClient));
 </script>
 
 <style scoped>
