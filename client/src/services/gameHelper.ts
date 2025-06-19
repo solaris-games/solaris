@@ -5,7 +5,7 @@ import type { Location } from '@solaris-common';
 import type { RulerPoint } from '@/types/ruler';
 
 class GameHelper {
-  getUserPlayer(game) {
+  getUserPlayer(game: Game): Player | undefined {
     // The user's player will be the only player that has a user ID on the player object.
     return game.galaxy.players.find(p => p.userId)
   }
@@ -42,16 +42,16 @@ class GameHelper {
     return game.galaxy.stars.find(s => s.name === starName)
   }
 
-  getStarById(game, starId) {
+  getStarById(game: Game, starId: string): Star | undefined {
     return game.galaxy.stars.find(x => x._id === starId)
   }
 
-  getCarrierById(game, carrierId) {
+  getCarrierById(game: Game, carrierId: string): Carrier | undefined {
     return game.galaxy.carriers.find(x => x._id === carrierId)
   }
 
   getActionById(game, actionId) {
-    let player = this.getUserPlayer(game)
+    const player = this.getUserPlayer(game)!;
     return player.scheduledActions.find(a => a._id === actionId);
   }
 
