@@ -7,37 +7,38 @@
   </div>
 </template>
 
-<script>
-import starService from '../../../../services/api/star'
+<script setup lang="ts">
+import type {PlayerScheduledActions} from "@solaris-common";
+import {toggleScheduledBulk} from "@/services/typedapi/star";
+import { inject } from 'vue';
+import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
+import {toastInjectionKey} from "@/util/keys";
+import type {State} from "@/store";
+import { useStore, type Store } from 'vuex';
 
-export default {
-  components: {
+const props = defineProps<{
+  action: PlayerScheduledActions<string>,
+}>();
 
-  },
-  props: {
-    action: Object,
-  },
-  methods: {
-    async toggleRepeat () {
-      try {
-        let response = await starService.bulkScheduleRepeatChanged(this.$store.state.game._id, this.action._id)
+const httpClient = inject(httpInjectionKey)!;
+const toast = inject(toastInjectionKey)!;
 
-        if (response.status === 200) {
-          this.action.repeat = !this.action.repeat
+const store: Store<State> = useStore();
 
-          if (this.action.repeat) {
-            this.$toast.default(`Your Bulk Upgrade will be repeated every cycle.`)
-          } else {
-            this.$toast.default(`Your Bulk Upgrade will only be executed on tick ${this.action.tick}.`)
-          }
-        }
-      } catch (err) {
-        console.log(err)
-      }
+const toggleRepeat = async () => {
+  const response = await toggleScheduledBulk(httpClient)(store.state.game._id, props.action._id);
+
+  if (isOk(response)) {
+    props.action.repeat = !props.action.repeat;
+
+    if (props.action.repeat) {
+      toast.default(`Your Bulk Upgrade will be repeated every cycle.`)
+    } else {
+      toast.default(`Your Bulk Upgrade will only be executed on tick ${props.action.tick}.`)
     }
-  },
-  computed: {
-
+  } else {
+    console.error(formatError(response));
+    toast.error("Failed to repeat bulk upgrade");
   }
 }
 </script>
