@@ -38,15 +38,13 @@
 </template>
 
 <script setup lang="ts">
-import starService from '../../../../services/api/star'
-import AudioService from '../../../../game/audio'
 import GameHelper from '../../../../services/gameHelper'
 import type {Star} from "@/types/game";
-import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
+import {httpInjectionKey} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
 import type {State} from "@/store";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
-import {makeUpgrade} from "@/views/game/components/star/upgrade";
+import {makeUpgrade, makeWarpgateActions} from "@/views/game/components/star/upgrade";
 import {
   upgradeEconomy as upgradeEconomyReq,
   upgradeIndustry as upgradeIndustryReq,
@@ -54,8 +52,6 @@ import {
 } from "@/services/typedapi/star";
 import { ref, computed, inject } from 'vue';
 import { useStore, type Store } from 'vuex';
-import {makeConfirm} from "@/util/confirm";
-import { buildWarpGate as buildWarpGateReq, destroyWarpGate as destroyWarpGateReq } from "@/services/typedapi/star";
 
 const props = defineProps<{
   star: Star,
@@ -73,7 +69,6 @@ const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
 const store: Store<State> = useStore();
-const confirm = makeConfirm(store);
 
 const isUpgradingEconomy = ref(false);
 const isUpgradingIndustry = ref(false);
@@ -93,45 +88,7 @@ const upgradeEconomy = upgrade('economy', store.state.settings.star.confirmBuild
 const upgradeIndustry = upgrade('industry', store.state.settings.star.confirmBuildIndustry === 'enabled', isUpgradingIndustry, 'gameStarIndustryUpgraded', upgradeIndustryReq(httpClient));
 const upgradeScience = upgrade('science', store.state.settings.star.confirmBuildScience === 'enabled', isUpgradingScience, 'gameStarScienceUpgraded', upgradeScienceReq(httpClient));
 
-const buildWarpGate = async () => {
-  if (store.state.settings.star.confirmBuildWarpGate === 'enabled' && !await confirm('Build Warp Gate', `Are you sure you want build a Warp Gate at ${props.star.name}? The upgrade will cost $${props.star.upgradeCosts!.warpGate}.`)) {
-    return;
-  }
-
-  const response = await buildWarpGateReq(httpClient)(store.state.game._id, props.star._id);
-
-  if (isOk(response)) {
-    toast.default(`Warp Gate built at ${props.star.name}.`)
-
-    store.commit('gameStarWarpGateBuilt', response.data);
-
-    AudioService.join();
-  } else {
-    console.error(formatError(response));
-    toast.error("Error building warp gate");
-  }
-};
-
-const destroyWarpGate = async () => {
-  if (store.state.settings.star.confirmDestroyWarpGate === 'enabled' && !await confirm('Destroy Warp Gate', `Are you sure you want destroy a Warp Gate at ${props.star.name}? The upgrade will cost $${props.star.upgradeCosts!.warpGate}.`)) {
-    return;
-  }
-
-  const response = await destroyWarpGateReq(httpClient)(store.state.game._id, props.star._id);
-
-  if (isOk(response)) {
-    toast.default(`Warp Gate destroyed at ${props.star.name}.`)
-
-    store.commit('gameStarWarpGateDestroyed', {
-      starId: props.star._id
-    });
-
-    AudioService.join();
-  } else {
-    console.error(formatError(response));
-    toast.error("Error destroying warp gate");
-  }
-};
+const { buildWarpGate, destroyWarpGate } = makeWarpgateActions(store, toast, httpClient, props.star);
 </script>
 
 <style scoped>
