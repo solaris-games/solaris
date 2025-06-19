@@ -341,12 +341,12 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
     },
 
     gameStarBulkUpgraded (state: State, data) {
-      let player = GameHelper.getUserPlayer(state.game);
+      const player = GameHelper.getUserPlayer(state.game!)!;
 
       let newScience = 0;
 
       data.stars.forEach(s => {
-        let star = GameHelper.getStarById(state.game, s.starId);
+        const star = GameHelper.getStarById(state.game!, s.starId)!;
 
         if (data.infrastructureType === 'science') {
           newScience += (s.infrastructure - s.infrastructureCurrent) * (star.specialistId === 11 ? 2 : 1); // Research Station
@@ -359,16 +359,16 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
         }
 
         if (s.manufacturing != null) {
-          player.stats.newShips -= star.manufacturing // Deduct old value
+          player.stats!.newShips -= (star.manufacturing || 0) // Deduct old value
           star.manufacturing = s.manufacturing
-          player.stats.newShips += s.manufacturing // Add the new value
+          player.stats!.newShips += s.manufacturing // Add the new value
         }
 
         eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
       })
 
       player.credits -= data.cost
-      player.stats.newShips = Math.round((player.stats.newShips + Number.EPSILON) * 100) / 100
+      player.stats!.newShips = Math.round((player.stats!.newShips + Number.EPSILON) * 100) / 100
 
       if (data.currentResearchTicksEta) {
         player.currentResearchTicksEta = data.currentResearchTicksEta
@@ -381,60 +381,60 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
       // Update player total stats.
       switch (data.infrastructureType) {
         case 'economy':
-          player.stats.totalEconomy += data.upgraded
+          player.stats!.totalEconomy += data.upgraded
           break;
         case 'industry':
-          player.stats.totalIndustry += data.upgraded
+          player.stats!.totalIndustry += data.upgraded
           break;
         case 'science':
-          player.stats.totalScience += (newScience * state.game!.constants.research.sciencePointMultiplier)
+          player.stats!.totalScience += (newScience * state.game!.constants.research.sciencePointMultiplier)
           break;
       }
     },
     gameBulkActionAdded(state: State, data) {
-      let player = GameHelper.getUserPlayer(state.game)
+      const player = GameHelper.getUserPlayer(state.game!)!;
       player.scheduledActions.push(data);
     },
     gameBulkActionTrashed(state: State, data) {
-      let player = GameHelper.getUserPlayer(state.game)
+      const player = GameHelper.getUserPlayer(state.game!)!;
       player.scheduledActions = player.scheduledActions.filter(a => a._id != data._id)
     },
     gameStarWarpGateBuilt (state: State, data) {
-      let star = GameHelper.getStarById(state.game, data.starId)
+      const star = GameHelper.getStarById(state.game!, data.starId)!;
 
       star.warpGate = true
 
-      GameHelper.getUserPlayer(state.game).credits -= data.cost
+      GameHelper.getUserPlayer(state.game!)!.credits -= data.cost;
 
       eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
     },
     gameStarWarpGateDestroyed (state: State, data) {
-      let star = GameHelper.getStarById(state.game, data.starId)
+      let star = GameHelper.getStarById(state.game!, data.starId)!;
 
       star.warpGate = false
 
       eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
     },
     gameStarCarrierBuilt (state: State, data) {
-      let carrier = GameHelper.getCarrierById(state.game, data.carrier._id)
+      let carrier = GameHelper.getCarrierById(state.game!, data.carrier._id);
 
       if (!carrier) {
         state.game!.galaxy.carriers.push(data.carrier)
       }
 
-      let star = GameHelper.getStarById(state.game, data.carrier.orbiting)
+      let star = GameHelper.getStarById(state.game!, data.carrier.orbiting)!;
       star.ships = data.starShips
 
-      let userPlayer = GameHelper.getUserPlayer(state.game)
-      userPlayer.credits -= star.upgradeCosts.carriers
-      userPlayer.stats.totalCarriers++
+      let userPlayer = GameHelper.getUserPlayer(state.game!)!;
+      userPlayer.credits -= star.upgradeCosts!.carriers || 0;
+      userPlayer.stats!.totalCarriers++
 
       eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
       eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, { carrier: data.carrier });
     },
     gameStarCarrierShipTransferred (state: State, data) {
-      let star = GameHelper.getStarById(state.game, data.starId)
-      let carrier = GameHelper.getCarrierById(state.game, data.carrierId)
+      let star = GameHelper.getStarById(state.game!, data.starId)!;
+      let carrier = GameHelper.getCarrierById(state.game!, data.carrierId)!;
 
       star.ships = data.starShips
       carrier.ships = data.carrierShips
@@ -443,20 +443,20 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
       eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, { carrier });
     },
     gameStarAllShipsTransferred (state: State, data) {
-      let star = GameHelper.getStarById(state.game, data.star._id)
+      let star = GameHelper.getStarById(state.game!, data.star._id)!
 
       star.ships = data.star.ships
 
       data.carriers.forEach(carrier => {
-        let mapObjectCarrier = GameHelper.getCarrierById(state.game, carrier._id)
+        let mapObjectCarrier = GameHelper.getCarrierById(state.game!, carrier._id)!
 
         mapObjectCarrier.ships = carrier.ships
       })
     },
     gameStarAbandoned (state: State, data) {
-      let star = GameHelper.getStarById(state.game, data.starId)
+      let star = GameHelper.getStarById(state.game!, data.starId)!
 
-      let player = GameHelper.getPlayerById(state.game!, star.ownedByPlayerId)!
+      let player = GameHelper.getPlayerById(state.game!, star.ownedByPlayerId!)!
       player.stats!.totalStars--
 
       star.ownedByPlayerId = null
@@ -474,9 +474,9 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
       eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
     },
     gameCarrierScuttled (state: State, data) {
-      let carrier = GameHelper.getCarrierById(state.game, data.carrierId)
-      let star = GameHelper.getStarById(state.game, carrier.orbiting)
-      let player = GameHelper.getPlayerById(state.game!, carrier.ownedByPlayerId)!
+      let carrier = GameHelper.getCarrierById(state.game!, data.carrierId)!
+      let star = GameHelper.getStarById(state.game!, carrier.orbiting!)!
+      let player = GameHelper.getPlayerById(state.game!, carrier.ownedByPlayerId!)!
 
       player.stats!.totalCarriers--
 
@@ -493,7 +493,7 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
       }
     },
     [PlayerMutationNames.PlayerDebtSettled] (state: State, data) {
-      let player = GameHelper.getUserPlayer(state.game)
+      let player = GameHelper.getUserPlayer(state.game!)!
 
       if (data.creditorPlayerId === player._id) {
         if (data.ledgerType === 'credits') {
@@ -504,7 +504,7 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
       }
     },
     starSpecialistHired (state: State, data) {
-      let star = GameHelper.getStarById(state.game, data.starId)
+      let star = GameHelper.getStarById(state.game!, data.starId)!
 
       star.specialistId = data.specialist.id
       star.specialist = data.specialist
@@ -512,7 +512,7 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
       eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
     },
     carrierSpecialistHired (state: State, data) {
-      let carrier = GameHelper.getCarrierById(state.game, data.carrierId)
+      let carrier = GameHelper.getCarrierById(state.game!, data.carrierId)!
 
       carrier.specialistId = data.specialist.id
       carrier.specialist = data.specialist
@@ -522,17 +522,17 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
 
     gameStarEconomyUpgraded (state: State, data) {
       data.type = 'economy'
-      const star = GameHelper.starInfrastructureUpgraded(state.game, data)
+      const star = GameHelper.starInfrastructureUpgraded(state.game!, data)
       eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
     },
     gameStarIndustryUpgraded (state: State, data) {
       data.type = 'industry'
-      const star = GameHelper.starInfrastructureUpgraded(state.game, data)
+      const star = GameHelper.starInfrastructureUpgraded(state.game!, data)
       eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
     },
     gameStarScienceUpgraded (state: State, data) {
       data.type = 'science'
-      const star = GameHelper.starInfrastructureUpgraded(state.game, data)
+      const star = GameHelper.starInfrastructureUpgraded(state.game!, data)
       eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
     },
 

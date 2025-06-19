@@ -1,8 +1,8 @@
-import moment, { type Moment } from 'moment'
+import moment, {type Moment} from 'moment'
 import DiplomacyHelper from './diplomacyHelper.js'
-import type { Game, Player, Star, Carrier } from "../types/game";
-import type { Location } from '@solaris-common';
-import type { RulerPoint } from '@/types/ruler';
+import type {Carrier, Game, Player, Star} from "../types/game";
+import type {Location, MapObject} from '@solaris-common';
+import type {RulerPoint} from '@/types/ruler';
 
 class GameHelper {
   getUserPlayer(game: Game): Player | undefined {
@@ -10,7 +10,7 @@ class GameHelper {
     return game.galaxy.players.find(p => p.userId)
   }
 
-  getColourMapping(game) {
+  getColourMapping(game: Game) {
     const userPlayer = this.getUserPlayer(game);
 
     // spectating
@@ -21,12 +21,12 @@ class GameHelper {
     if (userPlayer.colourMapping) {
       return userPlayer.colourMapping;
     } else {
-      userPlayer.colourMapping = {};
+      userPlayer.colourMapping = new Map();
       return userPlayer.colourMapping;
     }
   }
 
-  getPlayerByAlias(game, playerName) {
+  getPlayerByAlias(game: Game, playerName: string) {
     return game.galaxy.players.find(p => p.alias === playerName)
   }
 
@@ -34,11 +34,11 @@ class GameHelper {
     return game.galaxy.players.find(x => x._id === playerId)
   }
 
-  getFriendlyColour(colour) {
+  getFriendlyColour(colour: string) {
     return colour.replace('0x', '#').toLowerCase();
   }
 
-  getStarByName(game, starName) {
+  getStarByName(game: Game, starName: string) {
     return game.galaxy.stars.find(s => s.name === starName)
   }
 
@@ -50,12 +50,12 @@ class GameHelper {
     return game.galaxy.carriers.find(x => x._id === carrierId)
   }
 
-  getActionById(game, actionId) {
+  getActionById(game: Game, actionId: string) {
     const player = this.getUserPlayer(game)!;
     return player.scheduledActions.find(a => a._id === actionId);
   }
 
-  getStarOwningPlayer(game, star) {
+  getStarOwningPlayer(game: Game, star: Star) {
     return game.galaxy.players.find(x => x._id === star.ownedByPlayerId)
   }
 
@@ -67,35 +67,35 @@ class GameHelper {
     return stars.filter(s => s.ownedByPlayerId && s.ownedByPlayerId === player._id)
   }
 
-  getPlayerHomeStar(player, stars) {
+  getPlayerHomeStar(player: Player, stars: Star[]) {
     return stars.find(s => s._id === player.homeStarId)
   }
 
-  getCarrierOwningPlayer(game, carrier) {
+  getCarrierOwningPlayer(game: Game, carrier: Carrier) {
     return game.galaxy.players.find(x => x._id === carrier.ownedByPlayerId)
   }
 
-  isOwnedByUserPlayer(game, carrierOrStar) {
-    const userPlayer = this.getUserPlayer(game)
+  isOwnedByUserPlayer(game: Game, carrierOrStar: MapObject<string>) {
+    const userPlayer = this.getUserPlayer(game)!;
 
-    return userPlayer && carrierOrStar.ownedByPlayerId === userPlayer._id
+    return userPlayer && carrierOrStar.ownedByPlayerId === userPlayer._id;
   }
 
-  getCarrierOrbitingStar(game, carrier) {
+  getCarrierOrbitingStar(game: Game, carrier: Carrier) {
     return game.galaxy.stars.find(x => x._id === carrier.orbiting) || null
   }
 
-  getCarriersOrbitingStar(game, star) {
+  getCarriersOrbitingStar(game: Game, star: Star) {
     return game.galaxy.carriers
       .filter(x => x.orbiting === star._id)
       .sort((a, b) => (a.ticksEta || 0) - (b.ticksEta || 0))
   }
 
-  isCarrierInTransit(carrier) {
-    return carrier.orbiting == null
+  isCarrierInTransit(carrier: Carrier) {
+    return carrier.orbiting == null;
   }
 
-  isCarrierInTransitToWaypoint(carrier, waypoint) {
+  isCarrierInTransitToWaypoint(carrier: Carrier, waypoint) {
     return carrier.waypoints.indexOf(waypoint) === 0 && this.isCarrierInTransit(carrier)
   }
 
@@ -391,11 +391,11 @@ class GameHelper {
       return 1 + delayTicks
     }
 
-    let sourceStar = this.getStarById(game, waypoint.source)
-    let destinationStar = this.getStarById(game, waypoint.destination)
+    const sourceStar = this.getStarById(game, waypoint.source)!;
+    const destinationStar = this.getStarById(game, waypoint.destination)!;
 
     // If the carrier can travel instantly then it'll take 1 tick + any delay.
-    let instantSpeed = sourceStar && this.isStarPairWormHole(sourceStar, destinationStar)
+    const instantSpeed = Boolean(sourceStar && this.isStarPairWormHole(sourceStar, destinationStar));
 
     if (instantSpeed) {
       return 1 + delayTicks
@@ -799,7 +799,7 @@ class GameHelper {
     return teamsWithData;
   }
 
-  getSortedLeaderboardPlayerList(game) {
+  getSortedLeaderboardPlayerList(game: Game) {
     // Sort by total number of stars, then by total ships, then by total carriers.
     // Note that this sorting is different from the server side sorting as
     // on the UI we want to preserve defeated player positions relative to how many
@@ -852,9 +852,7 @@ class GameHelper {
         .sort(sortPlayers);
 
       // Join both sorted arrays together to produce the leaderboard.
-      let leaderboard = undefeatedLeaderboard.concat(defeatedLeaderboard)
-
-      return leaderboard
+      return undefeatedLeaderboard.concat(defeatedLeaderboard);
     } else {
       return playerStats.sort(sortPlayers)
     }
@@ -1106,8 +1104,8 @@ class GameHelper {
     return nextTick.diff(moment().utc(), 'seconds') <= 0;
   }
 
-  starInfrastructureUpgraded(game, data) {
-    let userPlayer = this.getUserPlayer(game)
+  starInfrastructureUpgraded(game: Game, data) {
+    let userPlayer = this.getUserPlayer(game)!;
 
     userPlayer.credits -= data.cost
 
@@ -1119,7 +1117,7 @@ class GameHelper {
       userPlayer.nextResearchTicksEta = data.nextResearchTicksEta
     }
 
-    let star = this.getStarById(game, data.starId)
+    const star = this.getStarById(game, data.starId)!;
 
     if (star.upgradeCosts) {
       star.upgradeCosts[data.type] = data.nextCost
@@ -1128,22 +1126,22 @@ class GameHelper {
     star.infrastructure[data.type] = data.infrastructure
 
     if (data.manufacturing) {
-      let manufacturingDifference = +data.manufacturing - star.manufacturing
+      let manufacturingDifference = +data.manufacturing - (star.manufacturing || 0);
 
       star.manufacturing = +data.manufacturing.toFixed(2)
 
-      userPlayer.stats.newShips = +(userPlayer.stats.newShips + manufacturingDifference).toFixed(2)
+      userPlayer.stats!.newShips = +(userPlayer.stats!.newShips + manufacturingDifference).toFixed(2)
     }
 
     switch (data.type) {
       case 'economy':
-        userPlayer.stats.totalEconomy++
+        userPlayer.stats!.totalEconomy++
         break;
       case 'industry':
-        userPlayer.stats.totalIndustry++
+        userPlayer.stats!.totalIndustry++
         break;
       case 'science':
-        userPlayer.stats.totalScience += game.constants.research.sciencePointMultiplier * (star.specialistId === 11 ? 2 : 1); // Research Station
+        userPlayer.stats!.totalScience += game.constants.research.sciencePointMultiplier * (star.specialistId === 11 ? 2 : 1); // Research Station
         break;
     }
 

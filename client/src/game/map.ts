@@ -857,7 +857,7 @@ export class Map {
     let e = dic.starData
     if (dic.eventData && this.isDragMotion(dic.eventData.global)) { return }
 
-    let owningPlayer = gameHelper.getStarOwningPlayer(this.game, dic.starData)
+    let owningPlayer = gameHelper.getStarOwningPlayer(this.game!, dic.starData);
 
     // dispatch click event to the store, so it can be intercepted for adding star/player name to open message
     this.store.commit('starRightClicked', {

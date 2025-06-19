@@ -99,7 +99,7 @@ const onStarClicked = (starId: string) => {
 };
 
 const onStarRightClicked = (starId: string) => {
-  const star = GameHelper.getStarById(store.state.game, starId);
+  const star = GameHelper.getStarById(store.state.game, starId)!;
   const owningPlayer = GameHelper.getStarOwningPlayer(store.state.game, star);
 
   if (owningPlayer) {
@@ -119,7 +119,7 @@ const onCarrierClicked = (carrierId: string) => {
 };
 
 const onCarrierRightClicked = (carrierId: string) => {
-  const carrier = GameHelper.getCarrierById(store.state.game, carrierId);
+  const carrier = GameHelper.getCarrierById(store.state.game, carrierId)!;
   const owningPlayer = GameHelper.getCarrierOwningPlayer(store.state.game, carrier);
 
   if (owningPlayer) {

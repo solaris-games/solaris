@@ -1,4 +1,4 @@
-import {doGet, doPost, doPut, doDelete, type ResponseResult} from "@/services/typedapi/index";
+import { doPut, type ResponseResult} from "@/services/typedapi/index";
 import { type Axios } from "axios";
 import { createStarRoutes, type BulkUpgradeReport, type BulkUpgradeReq, type CarrierBuildReport, type InfrastructureType, type InfrastructureUpgradeReport, type PlayerScheduledActions, type ShipTransferReport, type WarpgateBuildReport } from "@solaris-common";
 

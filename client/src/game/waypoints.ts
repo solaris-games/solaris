@@ -159,9 +159,9 @@ class Waypoints extends EventEmitter {
     let canCreateWaypoint = distance <= hyperspaceDistance
 
     if (!canCreateWaypoint && lastLocationStar && lastLocationStar.wormHoleToStarId) {
-      const wormHolePairStar = GameHelper.getStarById(this.game, lastLocationStar.wormHoleToStarId)
+      const wormHolePairStar = GameHelper.getStarById(this.game!, lastLocationStar.wormHoleToStarId)
 
-      canCreateWaypoint = wormHolePairStar && wormHolePairStar._id === e._id
+      canCreateWaypoint = Boolean(wormHolePairStar && wormHolePairStar._id === e._id)
     }
 
     if (canCreateWaypoint) {
