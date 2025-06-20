@@ -13,9 +13,13 @@ export const getCurrentAnnouncements = (axios: Axios) => async (): Promise<Respo
 }
 
 export const getAnnouncementState = (axios: Axios) => async (): Promise<ResponseResult<AnnouncementState<string>>> => {
-  return doGet(axios)(routes.getAnnouncementState, {}, {});
+  return doGet(axios)(routes.getAnnouncementState, {}, {}, {
+    withCredentials: true,
+  });
 }
 
 export const markAsRead = (axios: Axios) => async (): Promise<ResponseResult<null>> => {
-  return doPatch(axios)(routes.markAsRead, {}, {}, {});
+  return doPatch(axios)(routes.markAsRead, {}, {}, {}, {
+    withCredentials: true,
+  });
 }
