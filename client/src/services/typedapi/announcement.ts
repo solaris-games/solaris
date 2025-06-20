@@ -1,4 +1,4 @@
-import {type Announcement, type AnnouncementState, createAnnouncementRoutes} from "solaris-common";
+import {type Announcement, type AnnouncementState, createAnnouncementRoutes} from "@solaris-common";
 import type { Axios } from "axios";
 import {doGet, doPatch, type ResponseResult} from "@/services/typedapi/index";
 
