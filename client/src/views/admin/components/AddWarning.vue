@@ -17,7 +17,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  onUserChanged: [],
+  onWarningAdded: [warning: string],
 }>();
 
 const httpClient = inject(httpInjectionKey)!;
@@ -35,12 +35,13 @@ const submitWarning = async (e: Event) => {
   const response = await addWarning(httpClient)(props.userId, warningText.value);
 
   if (isOk(response)) {
+    emit('onWarningAdded', warningText.value);
+
     toast.success('Warning added successfully');
   } else {
     toast.error('An error occured while adding the warning');
   }
 
-  emit('onUserChanged');
   warningText.value = '';
 }
 </script>

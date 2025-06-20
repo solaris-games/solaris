@@ -57,7 +57,7 @@
         <i v-if="isAdministrator && user._id !== store.state.userId && !store.state.isImpersonating" class="fas fa-user clickable text-info ms-1" @click="doImpersonate(user._id)"
            title="Impersonate User"></i>
 
-        <add-warning v-if="isCommunityManager" :user-id="user._id" />
+        <add-warning v-if="isCommunityManager" :user-id="user._id" @onWarningAdded="onWarningAdded" />
       </div>
     </div>
   </div>
@@ -103,6 +103,13 @@ const getLastSeenString = (lastSeen: Date) => {
   }
 
   return moment(lastSeen).utc().fromNow();
+};
+
+const onWarningAdded = (warning: string) => {
+  props.user.warnings.push({
+    text: warning,
+    date: new Date(),
+  });
 };
 
 const doPromoteToEstablishedPlayer = async (user: ListUser<string>) => {
