@@ -37,7 +37,7 @@ import AudioService from '../../game/audio'
 import gameHelper from '../../services/gameHelper'
 import ColourOverrideDialog from "./components/player/ColourOverrideDialog.vue";
 import { eventBusInjectionKey } from '../../eventBus'
-import { inject, ref, computed, onUnmounted, onBeforeUnmount, type Ref } from 'vue';
+import { inject, ref, computed, onMounted, onUnmounted, onBeforeUnmount, type Ref } from 'vue';
 import { playerClientSocketEmitterInjectionKey } from '../../sockets/socketEmitters/player'
 import GameEventBusEventNames from '../../eventBusEventNames/game'
 import router from '../../router'
@@ -241,41 +241,43 @@ AudioService.loadStore(store);
 
 store.commit('clearGame');
 
-attemptLogin();
-await reloadSettings();
-await reloadGame();
+onMounted(async () => {
+  attemptLogin();
+  await reloadSettings();
+  await reloadGame();
 
-const userPlayer = GameHelper.getUserPlayer(store.state.game);
+  const userPlayer = GameHelper.getUserPlayer(store.state.game);
 
-userClientSockerEmitter.emitJoined();
+  userClientSockerEmitter.emitJoined();
 
-playerClientSocketEmitter.emitGameRoomJoined({
-  gameId: store.state.game._id,
-  playerId: userPlayer?._id
-});
+  playerClientSocketEmitter.emitGameRoomJoined({
+    gameId: store.state.game._id,
+    playerId: userPlayer?._id
+  });
 
 // If the user is in the game then display the leaderboard.
 // Otherwise show the welcome screen if there are empty slots.
 
-if (userPlayer && !userPlayer.defeated) {
-  if (GameHelper.isTutorialGame(store.state.game)) {
-    store.commit('setMenuState', { state: MENU_STATES.TUTORIAL })
+  if (userPlayer && !userPlayer.defeated) {
+    if (GameHelper.isTutorialGame(store.state.game)) {
+      store.commit('setMenuState', { state: MENU_STATES.TUTORIAL })
+    } else {
+      store.commit('setMenuState', { state: MENU_STATES.LEADERBOARD })
+    }
   } else {
-    store.commit('setMenuState', { state: MENU_STATES.LEADERBOARD })
+    if (store.state.userId && GameHelper.gameHasOpenSlots(store.state.game)) {
+      store.commit('setMenuState', { state: MENU_STATES.WELCOME })
+    } else {
+      store.commit('setMenuState', { state: MENU_STATES.LEADERBOARD }) // Assume the user is spectating.
+    }
   }
-} else {
-  if (store.state.userId && GameHelper.gameHasOpenSlots(store.state.game)) {
-    store.commit('setMenuState', { state: MENU_STATES.WELCOME })
-  } else {
-    store.commit('setMenuState', { state: MENU_STATES.LEADERBOARD }) // Assume the user is spectating.
-  }
-}
 
-const reloadGameCheckInterval = 1000;
-polling.value = setInterval(reloadGameCheck, reloadGameCheckInterval);
+  const reloadGameCheckInterval = 1000;
+  polling.value = setInterval(reloadGameCheck, reloadGameCheckInterval);
 
-await store.dispatch('loadSpecialistData', store.state.game._id);
-await store.dispatch('loadColourData');
+  await store.dispatch('loadSpecialistData', store.state.game._id);
+  await store.dispatch('loadColourData');
+});
 
 onBeforeUnmount(() => {
   polling.value && clearInterval(polling.value);
