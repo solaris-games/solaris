@@ -284,6 +284,8 @@ onBeforeUnmount(() => {
 });
 
 onUnmounted(() => {
+  const userPlayer = GameHelper.getUserPlayer(store.state.game);
+
   playerClientSocketEmitter.emitGameRoomLeft({
     gameId: store.state.game._id,
     playerId: userPlayer?._id
