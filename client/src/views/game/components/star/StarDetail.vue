@@ -475,7 +475,7 @@ const starOwningPlayer = computed(() => star.value.ownedByPlayerId && GameHelper
 const originalCapitalOwner = computed(() => GameHelper.getOriginalOwner(store.state.game, star.value));
 const userPlayer = computed(() => GameHelper.getUserPlayer(store.state.game));
 const canBuildWarpGates = computed(() => store.state.game.settings.specialGalaxy.warpgateCost !== 'none');
-const canDestroyWarpGates = computed(() => store.state.game.state.startDate != null);
+const canDestroyWarpGates = computed(() => Boolean(store.state.game.state.startDate));
 const warpSpeedMultiplier = computed(() => store.state.game.constants.distances.warpSpeedMultiplier);
 const isSpecialistsEnabled = computed(() => store.state.game.settings.specialGalaxy.specialistCost !== 'none');
 const isStandardUIStyle = computed(() => store.state.settings.interface.uiStyle === 'standard');
