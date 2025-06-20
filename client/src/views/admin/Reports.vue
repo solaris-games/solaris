@@ -9,7 +9,7 @@
             <router-link :to="{ path: '/administration/users/', query: { userId: report.reportedByUserId } }">{{ report.reportedByPlayerAlias }}</router-link>
             reported
             <router-link :to="{ path: '/administration/users/', query: { userId: report.reportedUserId } }">{{ report.reportedPlayerAlias }}</router-link>
-            ({{ report.date }})
+            ({{ report.date.toISOString() }})
           </h5>
         </div>
         <div class="panel-body">
