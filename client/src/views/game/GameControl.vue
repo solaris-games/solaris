@@ -78,7 +78,7 @@ export default {
 
           this.$toast.success(`The game has been paused. Please notify the players.`)
 
-          await this.loadGame()
+          await this.loadFullGame()
         } catch (err) {
           this.errors = err.response.data.errors;
           console.error(err)
@@ -96,7 +96,7 @@ export default {
 
           this.$toast.success(`The game has been fast forwarded. Please notify the players.`)
 
-          await this.loadGame()
+          await this.loadFullGame()
         } catch (err) {
           this.errors = err?.response?.data.errors;
           console.error(err)
@@ -114,7 +114,7 @@ export default {
 
           this.$toast.success(`The game has been force started. Please notify the players.`)
 
-          await this.loadGame()
+          await this.loadFullGame()
         } catch (err) {
           this.errors = err?.response?.data.errors;
           console.error(this.error);
@@ -133,7 +133,7 @@ export default {
 
           this.$toast.success(`The game has been resumed. Please notify the players.`)
 
-          await this.loadGame()
+          await this.loadFullGame()
         } catch (err) {
           this.errors = err?.response?.data.errors;
           console.error(err)
