@@ -122,7 +122,7 @@ const upgradeIndustry = async () => {
   const response = await upgradeIndustryReq(httpClient)(store.state.game._id, props.star._id);
 
   if (isOk(response)) {
-    store.commit('gameStarindustryUpgraded', response.data);
+    store.commit('gameStarIndustryUpgraded', response.data);
 
     toast.default(`industry upgraded at ${props.star.name}.`);
 
@@ -145,7 +145,7 @@ const upgradeScience = async () => {
   const response = await upgradeScienceReq(httpClient)(store.state.game._id, props.star._id);
 
   if (isOk(response)) {
-    store.commit('gameStarscienceUpgraded', response.data);
+    store.commit('gameStarScienceUpgraded', response.data);
 
     toast.default(`science upgraded at ${props.star.name}.`);
 
