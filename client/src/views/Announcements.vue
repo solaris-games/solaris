@@ -31,8 +31,8 @@ import LoadingSpinner from "./components/LoadingSpinner.vue";
 import AnnouncementPanel from "./components/Announcement.vue";
 import { ref, onMounted, inject, type Ref } from 'vue';
 import type {Announcement, AnnouncementState} from "@solaris-common";
-import {getAnnouncementState, getCurrentAnnouncements} from "@/services/typedapi/announcement";
-import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
+import {getAnnouncementState, getCurrentAnnouncements, markAsRead} from "@/services/typedapi/announcement";
+import {formatError, httpInjectionKey, isError, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
 
 const httpClient = inject(httpInjectionKey)!;
@@ -59,6 +59,12 @@ onMounted(async () => {
 
     if (isOk(resp2)) {
       announcementState.value = resp2.data;
+
+      const resp3 = await markAsRead(httpClient)();
+
+      if (isError(resp3)) {
+        console.error(formatError(resp3));
+      }
     } else {
       console.error(formatError(resp2));
       toast.error("Failed to load announcement state");
