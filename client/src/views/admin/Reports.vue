@@ -24,10 +24,10 @@
         </div>
         <div class="panel-footer">
           <router-link tag="button" class="btn btn-small btn-info me-2" :to="{ path: '/game/detail', query: { id: report.gameId } }">View Game</router-link>
-          <button class="btn btn-small" :class="report.actioned ? 'btn-success' : 'btn-danger'">
-            <i class="fas clickable"
+          <button class="btn btn-small clickable" :class="report.actioned ? 'btn-success' : 'btn-danger'" @click="doActionReport(report)">
+            <i class="fas"
                :class="{'fa-check':report.actioned,'fa-times':!report.actioned}"
-               @click="doActionReport(report)" title="Action Report"></i>
+                title="Action Report"></i>
           </button>
         </div>
       </div>
