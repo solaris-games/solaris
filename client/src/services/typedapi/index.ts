@@ -43,7 +43,7 @@ export const unwrapOk = <T>(result: ResponseResult<T>) => {
 
 export const formatError = (response: ResponseResultRequestError | ResponseResultResponseError) => {
   if (response.kind === ResponseResultKind.ResponseError) {
-    return `Error: ${response.cause}, response data: ${response.data}`;
+    return `Error: ${response.cause}, response data: ${JSON.stringify(response.data)}`;
   } else {
     return `Error: ${response.cause}`;
   }
