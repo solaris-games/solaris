@@ -1,6 +1,17 @@
 import { doPut, type ResponseResult} from "@/services/typedapi/index";
 import { type Axios } from "axios";
-import { createStarRoutes, type BulkUpgradeReport, type BulkUpgradeReq, type CarrierBuildReport, type InfrastructureType, type InfrastructureUpgradeReport, type PlayerScheduledActions, type ShipTransferReport, type WarpgateBuildReport } from "@solaris-common";
+import {
+  createStarRoutes,
+  type BulkUpgradeReport,
+  type BulkUpgradeReq,
+  type CarrierBuildReport,
+  type InfrastructureType,
+  type InfrastructureUpgradeReport,
+  type PlayerScheduledActions,
+  type ShipTransferReport,
+  type WarpgateBuildReport,
+  type ScheduleBulkUpgradeReq
+} from "@solaris-common";
 
 type PRR<A> = Promise<ResponseResult<A>>;
 
@@ -26,7 +37,7 @@ export const upgradeBulkCheck = (axios: Axios) => async (gameId: string, bulkUpr
   return doPut(axios)(routes.upgradeBulkCheck, { gameId }, {}, bulkUprade, { withCredentials: true});
 };
 
-export const scheduleBulk = (axios: Axios) => async (gameId: string, bulkUprade: BulkUpgradeReq): PRR<PlayerScheduledActions<string>> => {
+export const scheduleBulk = (axios: Axios) => async (gameId: string, bulkUprade: ScheduleBulkUpgradeReq): PRR<PlayerScheduledActions<string>> => {
   return doPut(axios)(routes.scheduleBulk, { gameId }, {}, bulkUprade, { withCredentials: true});
 };
 

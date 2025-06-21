@@ -311,10 +311,8 @@ const check = async () => {
     cost.value = 0;
 
     const response = await upgradeBulkCheck(httpClient)(store.state.game._id, {
-      infrastructureType: selectedType.value!,
-      repeat: false,
-      buyType: selectedUpgradeStrategy.value,
-      tick: 0,
+      infrastructure: selectedType.value!,
+      upgradeStrategy: selectedUpgradeStrategy.value,
       amount: amount.value,
     });
 
@@ -350,10 +348,8 @@ const upgrade = async () => {
   isUpgrading.value = true;
 
   const response = await upgradeBulk(httpClient)(store.state.game._id, {
-    infrastructureType: selectedType.value!,
-    repeat: false,
-    buyType: selectedUpgradeStrategy.value,
-    tick: 0,
+    infrastructure: selectedType.value!,
+    upgradeStrategy: selectedUpgradeStrategy.value,
     amount: amount.value,
   });
 

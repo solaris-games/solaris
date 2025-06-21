@@ -13,11 +13,17 @@ export type BuildCarrierReq<ID> = StarUpgradeReq<ID> & {
 };
 
 export type BulkUpgradeReq = {
-    infrastructureType: InfrastructureType,
-    buyType: string,
-    amount: number,
-    repeat: boolean,
-    tick: number,
+    upgradeStrategy: string;
+    infrastructure: InfrastructureType;
+    amount: number;
+};
+
+export type ScheduleBulkUpgradeReq = {
+    infrastructureType: InfrastructureType;
+    buyType: string;
+    amount: number;
+    repeat: boolean;
+    tick: number;
 };
 
 export type WarpgateBuildReport<ID> = {
@@ -57,7 +63,7 @@ export const createStarRoutes = <ID>() => ({
     upgradeScience: new PutRoute<{ gameId: ID }, {}, StarUpgradeReq<ID>, InfrastructureUpgradeReport<ID>>("/api/game/:gameId/star/upgrade/science"),
     upgradeBulk: new PutRoute<{ gameId: ID }, {}, BulkUpgradeReq, BulkUpgradeReport<ID>>("/api/game/:gameId/star/upgrade/bulk"),
     upgradeBulkCheck: new PutRoute<{ gameId: ID }, {}, BulkUpgradeReq, BulkUpgradeReport<ID>>('/api/game/:gameId/star/upgrade/bulkCheck'),
-    scheduleBulk: new PutRoute<{ gameId: ID }, {}, BulkUpgradeReq, PlayerScheduledActions<ID>>('/api/game/:gameId/star/upgrade/scheduleBulk'),
+    scheduleBulk: new PutRoute<{ gameId: ID }, {}, ScheduleBulkUpgradeReq, PlayerScheduledActions<ID>>('/api/game/:gameId/star/upgrade/scheduleBulk'),
     toggleScheduledBulk: new PutRoute<{ gameId: ID }, {}, { actionId: ID }, PlayerScheduledActions<ID>>('/api/game/:gameId/star/upgrade/toggleBulkRepeat'),
     trashBulk: new PutRoute<{ gameId: ID }, {}, { actionId: ID }, null>('/api/game/:gameId/star/upgrade/trashBulk'),
     buildWarpGate: new PutRoute<{ gameId: ID }, {}, StarUpgradeReq<ID>, WarpgateBuildReport<ID>>('/api/game/:gameId/star/build/warpgate'),
