@@ -30,8 +30,8 @@ export class ClientHandler {
 
       const gameId = store.state.game?._id;
 
-      if (gameId != null) {
-        const player = GameHelper.getUserPlayer(store.state.game)
+      if (gameId) {
+        const player = GameHelper.getUserPlayer(store.state.game!)
 
         console.log('Rejoining game room.');
 

@@ -14,6 +14,8 @@ export type UserRoles = {
     gameMaster: boolean;
 };
 
+export type UserRoleKinds = keyof UserRoles;
+
 export type AwardedBadge<ID> = {
     badge: string;
     awardedBy: ID | null;

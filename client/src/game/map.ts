@@ -391,8 +391,9 @@ export class Map {
   }
 
   drawGalaxyCenter () {
-    // TODO: Is there any need to display the galaxy center for non orbital games?
-    if (this._isOrbitalMapEnabled() && this.game!.constants.distances.galaxyCenterLocation) {
+    const userWantsToSeeCenter = this._isOrbitalMapEnabled() || this.userSettings?.map.galaxyCenterAlwaysVisible === 'enabled';
+
+    if (this.game!.constants.distances.galaxyCenterLocation && userWantsToSeeCenter) {
         let galaxyCenterGraphics = new PIXI.Graphics()
         let location : Location = this.game!.constants.distances.galaxyCenterLocation
         let size = 10
@@ -856,7 +857,7 @@ export class Map {
     let e = dic.starData
     if (dic.eventData && this.isDragMotion(dic.eventData.global)) { return }
 
-    let owningPlayer = gameHelper.getStarOwningPlayer(this.game, dic.starData)
+    let owningPlayer = gameHelper.getStarOwningPlayer(this.game!, dic.starData);
 
     // dispatch click event to the store, so it can be intercepted for adding star/player name to open message
     this.store.commit('starRightClicked', {

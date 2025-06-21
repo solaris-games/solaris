@@ -135,7 +135,7 @@ export default class {
   drawTooltipStar(star) {
     this.clear()
 
-    const carriers = GameHelper.getCarriersOrbitingStar(this.game, star)
+    const carriers = GameHelper.getCarriersOrbitingStar(this.game!, star);
 
     if (!carriers.length) {
       return
@@ -150,7 +150,7 @@ export default class {
     }
 
     const carrierStrings = carriers.map(carrier => {
-      const isOwnedByUserPlayer = GameHelper.isOwnedByUserPlayer(this.game, carrier)
+      const isOwnedByUserPlayer = GameHelper.isOwnedByUserPlayer(this.game!, carrier)
 
       let result = `\n${carrier.name}` +
         `\n 🚀 ${carrier.ships || '???'} ship${carrier.ships !== 1 ? 's' : ''}`

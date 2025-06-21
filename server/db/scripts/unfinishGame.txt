@@ -1,0 +1,13 @@
+use solaris;
+
+let gameId = ObjectId('GAME ID');
+
+db.games.updateOne({
+    _id: gameId
+}, {
+    $set: {
+        'state.endDate': null,
+        'state.winner': null,
+        'state.winningTeam': null,
+    }
+});

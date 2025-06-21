@@ -327,6 +327,10 @@
             :valueText="getFriendlyText(game.settings.specialGalaxy.starCaptureReward)"
             :value="game.settings.specialGalaxy.starCaptureReward"
             :compareValue="compareSettings.specialGalaxy.starCaptureReward"/>
+          <game-setting-value title="Combat resolution: weapons malus"
+                              tooltip="Determines on which carrier a specialist must be present for its weapons debuff to affect a group of carriers"
+                              :valueText="getFriendlyText(game.settings.specialGalaxy.combatResolutionMalusStrategy)"
+                              :value="game.settings.specialGalaxy.combatResolutionMalusStrategy" />
         </tbody>
       </table>
     </div>
@@ -706,6 +710,8 @@ export default {
         'winner': 'Winner',
         'top_n': 'Top N',
         'current_research': 'Current Research',
+        'largestCarrier': "Largest carrier",
+        'anyCarrier': "Any carrier",
       }[option]
 
       return text || option

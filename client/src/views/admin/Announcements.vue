@@ -8,67 +8,68 @@
       <h4>Announcements</h4>
 
       <div class="announcement-list" v-for="announcement in announcements" :key="announcement._id">
-        <announcement :announcement="announcement">
+        <announcement-tile :announcement="announcement">
           <template v-slot:context-actions>
-            <button class="btn btn-outline-danger btn-sm" @click="deleteAnnouncement(announcement)">Delete</button>
+            <button class="btn btn-outline-danger btn-sm" @click="removeAnnouncement(announcement)">Delete</button>
           </template>
-        </announcement>
+        </announcement-tile>
       </div>
     </div>
   </administration-page>
 </template>
 
-<script>
+<script setup lang="ts">
 import AdministrationPage from "./AdministrationPage.vue";
 import LoadingSpinner from "../components/LoadingSpinner.vue";
 import CreateAnnouncement from "./components/CreateAnnouncement.vue";
-import Announcement from "../components/Announcement.vue";
-import AdminApiService from "../../services/api/admin";
+import AnnouncementTile from "../components/Announcement.vue";
+import { ref, inject, type Ref, onMounted } from 'vue';
+import type { Announcement } from "@solaris-common";
+import { getAllAnnouncements, deleteAnnouncement } from "@/services/typedapi/admin";
+import { isOk, formatError, httpInjectionKey } from "@/services/typedapi";
+import { toastInjectionKey } from "@/util/keys";
+import { useStore, type Store } from 'vuex';
+import type { State } from '@/store';
+import { makeConfirm } from "@/util/confirm";
 
-export default {
-  name: "Announcements",
-  components: {
-    'administration-page': AdministrationPage,
-    'loading-spinner': LoadingSpinner,
-    'create-announcement': CreateAnnouncement,
-    'announcement': Announcement
-  },
-  data: () => {
-    return {
-      announcements: null
+const httpClient = inject(httpInjectionKey)!;
+const toast = inject(toastInjectionKey)!;
+
+const store: Store<State> = useStore();
+const confirm = makeConfirm(store);
+
+const announcements: Ref<Announcement<string>[] | null> = ref(null);
+
+const updateAnnouncements = async () => {
+  const response = await getAllAnnouncements(httpClient)();
+
+  if (isOk(response)) {
+    announcements.value = response.data;
+  } else {
+    const err = formatError(response);
+    toast.error(`Error loading announcements: ${err}`);
+    console.error(err);
+  }
+};
+
+const removeAnnouncement = async (announcement: Announcement<string>) => {
+  if (await confirm("Delete announcement", `Are you sure you want to delete the announcement "${announcement.title}"?`)) {
+    const response = await deleteAnnouncement(httpClient)(announcement._id);
+
+    if (isOk(response)) {
+      toast.success('Announcement deleted');
+    } else {
+      console.error(formatError(response));
+      toast.error('Failed to delete announcement');
     }
-  },
-  async mounted () {
-    await this.updateAnnouncements();
-  },
-  methods: {
-    async updateAnnouncements () {
-      this.announcements = await this.getAnnouncements();
-    },
-    async getAnnouncements () {
-      const resp = await AdminApiService.getAllAnnouncements();
 
-      if (resp.status !== 200) {
-        this.$toast.error(resp.data.message)
-        return
-      }
+    await updateAnnouncements();
+  }
+};
 
-      return resp.data
-    },
-    async deleteAnnouncement (announcement) {
-      if (await this.$confirm("Delete announcement", `Are you sure you want to delete the announcement "${announcement.title}"?`)) {
-        const resp = await AdminApiService.deleteAnnouncement(announcement._id);
-
-        if (resp.status !== 204) {
-          this.$toast.error(resp.data.message)
-          return
-        }
-
-        await this.updateAnnouncements();
-      }
-    }
-  },
-}
+onMounted(async () => {
+  await updateAnnouncements();
+});
 </script>
 
 <style scoped>

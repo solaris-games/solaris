@@ -3,192 +3,92 @@
     <div class="col pe-0">
       <button class="btn btn-sm me-1" v-if="economy != null"
               :class="{'btn-success': availableCredits >= economy, 'btn-primary': availableCredits < economy}"
-              :disabled="$isHistoricalMode() || isUpgradingEconomy || availableCredits < economy || isGameFinished"
+              :disabled="isHistoricalMode || isUpgradingEconomy || availableCredits < economy || isGameFinished"
               @click="upgradeEconomy"
               title="Upgrade economic infrastructure">
         <i class="fas fa-money-bill-wave me-1"></i>${{economy}}
       </button>
       <button class="btn btn-sm me-1" v-if="industry != null"
               :class="{'btn-success': availableCredits >= industry, 'btn-primary': availableCredits < industry}"
-              :disabled="$isHistoricalMode() || isUpgradingIndustry || availableCredits < industry || isGameFinished"
+              :disabled="isHistoricalMode || isUpgradingIndustry || availableCredits < industry || isGameFinished"
               @click="upgradeIndustry"
               title="Upgrade industrial infrastructure">
         <i class="fas fa-tools me-1"></i>${{industry}}
       </button>
       <button class="btn btn-sm" v-if="science != null"
               :class="{'btn-success': availableCredits >= science, 'btn-primary': availableCredits < science}"
-              :disabled="$isHistoricalMode() || isUpgradingScience || availableCredits < science || isGameFinished"
+              :disabled="isHistoricalMode || isUpgradingScience || availableCredits < science || isGameFinished"
               @click="upgradeScience"
               title="Upgrade scientific infrastructure">
         <i class="fas fa-flask me-1"></i>${{science}}
       </button>
     </div>
     <div class="col-auto ps-0" v-if="userPlayer">
-      <button v-if="canBuildWarpGates && !star.warpGate" :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished" class="btn btn-sm btn-primary me-1" title="Build a warp gate - Grants x3 speed between warp gates" @click="buildWarpGate">
-        <i class="fas fa-dungeon me-1"></i>${{star.upgradeCosts.warpGate}}
+      <button v-if="canBuildWarpGates && !star.warpGate" :disabled="isHistoricalMode || userPlayer.credits < (star.upgradeCosts?.warpGate || 0) || isGameFinished" class="btn btn-sm btn-primary me-1" title="Build a warp gate - Grants x3 speed between warp gates" @click="buildWarpGate">
+        <i class="fas fa-dungeon me-1"></i>${{star.upgradeCosts!.warpGate}}
       </button>
-      <button v-if="canDestroyWarpGates && star.warpGate" :disabled="$isHistoricalMode() || isGameFinished" class="btn btn-sm btn-outline-danger me-1" @click="destroyWarpGate" title="Destroy the warp gate">
+      <button v-if="canDestroyWarpGates && star.warpGate" :disabled="isHistoricalMode || isGameFinished" class="btn btn-sm btn-outline-danger me-1" @click="destroyWarpGate" title="Destroy the warp gate">
         <i class="fas fa-dungeon"></i> <i class="fas fa-trash ms-1"></i>
       </button>
-      <button :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.carriers || star.ships < 1 || isGameFinished" class="btn btn-sm btn-info" @click="onBuildCarrierRequested">
-        <i class="fas fa-rocket me-1"></i>${{star.upgradeCosts.carriers}}
+      <button :disabled="isHistoricalMode || userPlayer.credits < (star.upgradeCosts?.carriers || 0) || star.ships! < 1 || isGameFinished" class="btn btn-sm btn-info" @click="onBuildCarrierRequested">
+        <i class="fas fa-rocket me-1"></i>${{star.upgradeCosts!.carriers}}
       </button>
     </div>
   </div>
 </template>
 
-<script>
-import starService from '../../../../services/api/star'
-import AudioService from '../../../../game/audio'
+<script setup lang="ts">
 import GameHelper from '../../../../services/gameHelper'
+import type {Star} from "@/types/game";
+import {httpInjectionKey} from "@/services/typedapi";
+import {toastInjectionKey} from "@/util/keys";
+import type {State} from "@/store";
+import {useIsHistoricalMode} from "@/util/reactiveHooks";
+import {makeUpgrade, makeWarpgateActions} from "@/views/game/components/star/upgrade";
+import {
+  upgradeEconomy as upgradeEconomyReq,
+  upgradeIndustry as upgradeIndustryReq,
+  upgradeScience as upgradeScienceReq
+} from "@/services/typedapi/star";
+import { ref, computed, inject } from 'vue';
+import { useStore, type Store } from 'vuex';
 
-export default {
-  props: {
-    star: Object,
-    availableCredits: Number,
-    economy: Number,
-    industry: Number,
-    science: Number
-  },
-  data () {
-    return {
-      data: null,
-      userPlayer: null,
-      isUpgradingEconomy: false,
-      isUpgradingIndustry: false,
-      isUpgradingScience: false,
-      canBuildWarpGates: false,
-      canDestroyWarpGates: false
-    }
-  },
-  mounted () {
-    this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
-    this.canBuildWarpGates = this.$store.state.game.settings.specialGalaxy.warpgateCost !== 'none'
-    this.canDestroyWarpGates = this.$store.state.game.state.startDate != null
-  },
-  methods: {
-    onBuildCarrierRequested () {
-      this.$emit('onBuildCarrierRequested', this.star._id)
-    },
-    async upgradeEconomy (e) {
-      if (this.$store.state.settings.star.confirmBuildEconomy === 'enabled'
-        && !await this.$confirm('Upgrade Economy', `Are you sure you want to upgrade Economy at ${this.star.name} for $${this.star.upgradeCosts.economy} credits?`)) {
-        return
-      }
+const props = defineProps<{
+  star: Star,
+  availableCredits: number,
+  economy: number | null,
+  industry: number | null,
+  science: number | null,
+}>();
 
-      try {
-        this.isUpgradingEconomy = true
+const emit = defineEmits<{
+  onBuildCarrierRequested: [starId: string],
+}>();
 
-        let response = await starService.upgradeEconomy(this.$store.state.game._id, this.star._id)
+const httpClient = inject(httpInjectionKey)!;
+const toast = inject(toastInjectionKey)!;
 
-        if (response.status === 200) {
-          this.$toast.default(`Economy upgraded at ${this.star.name}.`)
+const store: Store<State> = useStore();
 
-          this.$store.commit('gameStarEconomyUpgraded', response.data)
+const isUpgradingEconomy = ref(false);
+const isUpgradingIndustry = ref(false);
+const isUpgradingScience = ref(false);
 
-          AudioService.hover()
-        }
-      } catch (err) {
-        console.error(err)
-      }
+const isGameFinished = computed(() => GameHelper.isGameFinished(store.state.game));
+const isHistoricalMode = useIsHistoricalMode(store);
+const userPlayer = computed(() => GameHelper.getUserPlayer(store.state.game));
+const canBuildWarpGates = computed(() => store.state.game.settings.specialGalaxy.warpgateCost !== 'none');
+const canDestroyWarpGates = computed(() => store.state.game.state.startDate != null);
 
-      this.isUpgradingEconomy = false
-    },
-    async upgradeIndustry (e) {
-      if (this.$store.state.settings.star.confirmBuildIndustry === 'enabled'
-        && !await this.$confirm('Upgrade Industry', `Are you sure you want to upgrade Industry at ${this.star.name} for $${this.star.upgradeCosts.industry} credits?`)) {
-        return
-      }
+const onBuildCarrierRequested = () => emit('onBuildCarrierRequested', props.star._id);
 
-      try {
-        this.isUpgradingIndustry = true
+const upgrade = makeUpgrade(store, toast, props.star);
 
-        let response = await starService.upgradeIndustry(this.$store.state.game._id, this.star._id)
+const upgradeEconomy = upgrade('economy', store.state.settings.star.confirmBuildEconomy === 'enabled', isUpgradingEconomy, 'gameStarEconomyUpgraded', upgradeEconomyReq(httpClient));
+const upgradeIndustry = upgrade('industry', store.state.settings.star.confirmBuildIndustry === 'enabled', isUpgradingIndustry, 'gameStarIndustryUpgraded', upgradeIndustryReq(httpClient));
+const upgradeScience = upgrade('science', store.state.settings.star.confirmBuildScience === 'enabled', isUpgradingScience, 'gameStarScienceUpgraded', upgradeScienceReq(httpClient));
 
-        if (response.status === 200) {
-          this.$toast.default(`Industry upgraded at ${this.star.name}.`)
-
-          this.$store.commit('gameStarIndustryUpgraded', response.data)
-
-          AudioService.hover()
-        }
-      } catch (err) {
-        console.error(err)
-      }
-
-      this.isUpgradingIndustry = false
-    },
-    async upgradeScience (e) {
-      if (this.$store.state.settings.star.confirmBuildScience === 'enabled'
-        && !await this.$confirm('Upgrade Science', `Are you sure you want to upgrade Science at ${this.star.name} for $${this.star.upgradeCosts.science} credits?`)) {
-        return
-      }
-
-      try {
-        this.isUpgradingScience = true
-
-        const response = await starService.upgradeScience(this.$store.state.game._id, this.star._id)
-
-        if (response.status === 200) {
-          this.$toast.default(`Science upgraded at ${this.star.name}.`)
-
-          this.$store.commit('gameStarScienceUpgraded', response.data)
-
-          AudioService.hover()
-        }
-      } catch (err) {
-        console.error(err)
-      }
-
-      this.isUpgradingScience = false
-    },
-    async buildWarpGate (e) {
-      if (this.$store.state.settings.star.confirmBuildWarpGate === 'enabled' && !await this.$confirm('Build Warp Gate', `Are you sure you want build a Warp Gate at ${this.star.name}? The upgrade will cost $${this.star.upgradeCosts.warpGate}.`)) {
-        return
-      }
-
-      try {
-        const response = await starService.buildWarpGate(this.$store.state.game._id, this.star._id)
-
-        if (response.status === 200) {
-          this.$toast.default(`Warp Gate built at ${this.star.name}.`)
-
-          this.$store.commit('gameStarWarpGateBuilt', response.data)
-
-          AudioService.join()
-        }
-      } catch (err) {
-        console.error(err)
-      }
-    },
-    async destroyWarpGate (e) {
-      if (!await this.$confirm('Destroy Warp Gate', `Are you sure you want destroy Warp Gate at ${this.star.name}?`)) {
-        return
-      }
-
-      try {
-        let response = await starService.destroyWarpGate(this.$store.state.game._id, this.star._id)
-
-        if (response.status === 200) {
-          this.$toast.default(`Warp Gate destroyed at ${this.star.name}.`)
-
-          this.$store.commit('gameStarWarpGateDestroyed', {
-            starId: this.star._id
-          })
-
-          AudioService.leave()
-        }
-      } catch (err) {
-        console.error(err)
-      }
-    }
-  },
-  computed: {
-    isGameFinished: function () {
-      return GameHelper.isGameFinished(this.$store.state.game)
-    }
-  }
-}
+const { buildWarpGate, destroyWarpGate } = makeWarpgateActions(store, toast, httpClient, props.star);
 </script>
 
 <style scoped>
