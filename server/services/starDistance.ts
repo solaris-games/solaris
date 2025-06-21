@@ -5,7 +5,6 @@ import { MapObject } from "./types/Map";
 import { Player } from "./types/Player";
 import { Star } from "./types/Star";
 import DistanceService from "./distance";
-import {maxBy} from "./utils";
 
 export default class StarDistanceService {
     distanceService: DistanceService;
@@ -165,28 +164,32 @@ export default class StarDistanceService {
     }
 
     getMaxGalaxyDiameter(locations: Location[]) {
-        const center = this.getGalaxyCenter(locations);
+        const diameter = this.getGalaxyDiameter(locations);
 
-        const maxRadius = maxBy((loc) => this.distanceService.getDistanceBetweenLocations(center, loc), locations);
-        return maxRadius * 2;
+        return diameter.x > diameter.y ? diameter.x : diameter.y;
     }
 
-    getGalaxyCenter(starLocations: Location[]) {
-        if (!starLocations.length) {
-            return {
-                x: 0,
-                y: 0
-            };
-        }
+    getGalaxyDiameter(locations: Location[]) {
+        let xArray = locations.map((location) => { return location.x; });
+        let yArray = locations.map((location) => { return location.y; });
 
-        const maxX = starLocations.sort((a, b) => b.x - a.x)[0].x;
-        const maxY = starLocations.sort((a, b) => b.y - a.y)[0].y;
-        const minX = starLocations.sort((a, b) => a.x - b.x)[0].x;
-        const minY = starLocations.sort((a, b) => a.y - b.y)[0].y;
+        let maxX = Math.max(...xArray);
+        let maxY = Math.max(...yArray);
+
+        let minX = Math.min(...xArray);
+        let minY = Math.min(...yArray);
 
         return {
-            x: (minX + maxX) / 2,
-            y: (minY + maxY) / 2
+            x: maxX - minX,
+            y: maxY - minY
         };
     }
+
+    getGalacticCenter(): Location {
+        return {
+            x: 0,
+            y: 0
+        };
+    }
+    
 };

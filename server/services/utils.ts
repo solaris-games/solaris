@@ -25,6 +25,18 @@ export const maxBy = <T>(max: (a: T) => number, list: T[]): number => {
     return lastScore;
 }
 
+export const minBy = <T>(min: (a: T) => number, list: T[]): number => {
+    let lastScore = Number.MAX_SAFE_INTEGER;
+    for (let el of list) {
+        const elScore = min(el);
+        if (elScore < lastScore) {
+            lastScore = elScore;
+        }
+    }
+
+    return lastScore;
+}
+
 export function maxOf<T>(max: (arg0: T) => number, list: T[]): T | undefined {
     let lastScore = Number.MIN_SAFE_INTEGER;
     let largest: T | undefined = undefined;
@@ -40,17 +52,6 @@ export function maxOf<T>(max: (arg0: T) => number, list: T[]): T | undefined {
     return largest;
 }
 
-export const minBy = <T>(min: (a: T) => number, list: T[]): number => {
-    let lastScore = Number.MAX_SAFE_INTEGER;
-    for (let el of list) {
-        const elScore = min(el);
-        if (elScore < lastScore) {
-            lastScore = elScore;
-        }
-    }
-
-    return lastScore;
-}
 
 export function reverseSort<A>(sorter: (a: A, b: A) => number): (a: A, b: A) => number {
     return (a, b) => sorter(b, a);

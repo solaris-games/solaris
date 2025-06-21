@@ -731,7 +731,7 @@ export default class StarService extends EventEmitter {
     }
 
     getKingOfTheHillStar(game: Game) {
-        const center = this.starDistanceService.getGalaxyCenter(game.galaxy.stars.map(s => s.location));
+        const center = this.starDistanceService.getGalacticCenter();
 
         // Note: We have to get the closest one to the center as its possible
         // to move the center star by using a stellar engine so we can't assume
