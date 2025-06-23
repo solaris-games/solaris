@@ -1,35 +1,31 @@
-import { ObjectId } from "mongoose";
-import ValidationError from "../../errors/validation";
 import { DBObjectId } from "../../services/types/DBObjectId";
 import { InfrastructureType } from "../../services/types/Star";
-import { keyHasBooleanValue, keyHasNumberValue, keyHasStringValue } from "./helpers";
-import { object, objectId, Validator } from "../validate";
+import {boolean, numberAdv, object, objectId, string, stringEnumeration, Validator} from "../validate";
 
 export interface StarUpgradeInfrastructureRequest {
     starId: DBObjectId;
-};
+}
 
-export const mapToStarUpgradeInfrastructureRequest = (body: any): StarUpgradeInfrastructureRequest => {
-    let errors: string[] = [];
-
-    if (!keyHasStringValue(body, 'starId')) {
-        errors.push('Star ID is required.');
-    }
-
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    return {
-        starId: body.starId
-    }
-};
+export const parseStarUpgradeInfrastructureRequest = object({
+   starId: objectId,
+});
 
 export interface StarUpgradeInfrastructureBulkRequest {
     upgradeStrategy: string;
     infrastructure: InfrastructureType;
     amount: number;
 };
+
+const infrastructureValidator = stringEnumeration<InfrastructureType, InfrastructureType[]>(['economy', 'industry', 'science']);
+
+export const parseStarUpgradeInfrastructureBulkRequest: Validator<StarUpgradeInfrastructureBulkRequest> = object({
+    infrastructure: infrastructureValidator,
+    upgradeStrategy: string,
+    amount: numberAdv({
+        integer: true,
+        sign: 'positive',
+    }),
+});
 
 export interface ScheduledStarUpgradeInfrastructureBulkRequest {
     infrastructureType: InfrastructureType;
@@ -39,94 +35,33 @@ export interface ScheduledStarUpgradeInfrastructureBulkRequest {
     tick: number;
 };
 
+export const parseScheduledStarUpgradeInfrastructureBulkRequest: Validator<ScheduledStarUpgradeInfrastructureBulkRequest> = object({
+    infrastructureType: infrastructureValidator,
+    buyType: string,
+    amount: numberAdv({
+        integer: true,
+        sign: 'positive',
+    }),
+    repeat: boolean,
+    tick: numberAdv({
+        integer: true,
+        sign: 'positive',
+    }),
+});
+
 export type ScheduledStarUpgradeToggleRepeat = {
     actionId: DBObjectId;
-};
-
-export interface ScheduledStarUpgradeTrash {
-    actionId: DBObjectId;
-}
-
-export const mapToStarUpgradeInfrastructureBulkRequest = (body: any): StarUpgradeInfrastructureBulkRequest => {
-    let errors: string[] = [];
-
-    if (!keyHasStringValue(body, 'upgradeStrategy')) {
-        errors.push('Upgrade Strategy is required.');
-    }
-
-    if (!keyHasStringValue(body, 'infrastructure')) {
-        errors.push('Infrastructure is required.');
-    }
-
-    if (!keyHasNumberValue(body, 'amount')) {
-        errors.push('Amount is required.');
-    }
-
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    body.amount = +body.amount;
-
-    return {
-        upgradeStrategy: body.upgradeStrategy,
-        infrastructure: body.infrastructure,
-        amount: body.amount
-    }
-};
-
-export const mapToScheduledStarUpgradeInfrastructureBulkRequest = (body: any): ScheduledStarUpgradeInfrastructureBulkRequest => {
-    let errors: string[] = [];
-
-    if (!keyHasStringValue(body, 'infrastructureType')) {
-        errors.push('Infrastructure is required.');
-    }
-
-    if (!keyHasStringValue(body, 'buyType')) {
-        errors.push('Upgrade Strategy is required.');
-    }
-
-    if (!keyHasNumberValue(body, 'amount')) {
-        errors.push('Amount is required.');
-    }
-
-    if (!keyHasBooleanValue(body, 'repeat')) {
-        errors.push('Repeat is required.');
-    }
-
-    if (!keyHasNumberValue(body, 'tick')) {
-        errors.push('Tick is required.');
-    }
-
-    body.amount = +body.amount;
-    body.tick = +body.tick;
-
-    if (body.amount < 0) {
-        errors.push('Amount must be greater than 0.');
-    }
-
-    if (body.tick < 0) {
-        errors.push('Tick must be greater than 0.');
-    }
-
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    return {
-        infrastructureType: body.infrastructureType,
-        buyType: body.buyType,
-        amount: body.amount,
-        repeat: body.repeat,
-        tick: body.tick
-    }
 };
 
 export const parseScheduledStarUpgradeToggleRepeat: Validator<ScheduledStarUpgradeToggleRepeat> = object({
     actionId: objectId
 });
 
-export const parseScheduledStarUpgradeTrashRepeat: Validator<ScheduledStarUpgradeToggleRepeat> = object({
+export interface ScheduledStarUpgradeTrash {
+    actionId: DBObjectId;
+}
+
+export const parseScheduledStarUpgradeTrashRepeat: Validator<ScheduledStarUpgradeTrash> = object({
     actionId: objectId
 });
 
@@ -134,122 +69,51 @@ export interface StarDestroyInfrastructureRequest {
     starId: DBObjectId;
 };
 
-export const mapToStarDestroyInfrastructureRequest = (body: any): StarDestroyInfrastructureRequest => {
-    let errors: string[] = [];
-
-    if (!keyHasStringValue(body, 'starId')) {
-        errors.push('Star ID is required.');
-    }
-
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    return {
-        starId: body.starId
-    }
-};
+export const parseStarDestroyInfrastructureRequest: Validator<StarDestroyInfrastructureRequest> = object({
+    starId: objectId,
+});
 
 export interface StarBuildCarrierRequest {
     starId: DBObjectId;
     ships: number;
 };
 
-export const mapToStarBuildCarrierRequest = (body: any): StarBuildCarrierRequest => {
-    let errors: string[] = [];
-
-    if (!keyHasStringValue(body, 'starId')) {
-        errors.push('Star ID is required.');
-    }
-
-    if (!keyHasNumberValue(body, 'ships')) {
-        errors.push('Ships is required.');
-    }
-
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    let ships = 1;
-                
-    if (body.ships) {
-        ships = +body.ships;
-    }
-
-    return {
-        starId: body.starId,
-        ships
-    }
-};
+export const parseStarBuildCarrierRequest: Validator<StarBuildCarrierRequest> = object({
+    starId: objectId,
+    ships: numberAdv({
+        integer: true,
+        sign: 'positive',
+        range: {
+            from: 1,
+        },
+    }),
+});
 
 export interface StarAbandonStarRequest {
     starId: DBObjectId;
 };
 
-export const mapToStarAbandonStarRequest = (body: any): StarAbandonStarRequest => {
-    let errors: string[] = [];
-
-    if (!keyHasStringValue(body, 'starId')) {
-        errors.push('Star ID is required.');
-    }
-
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    return {
-        starId: body.starId
-    }
-};
+export const parseStarAbandonStarRequest: Validator<StarAbandonStarRequest> = object({
+    starId: objectId,
+});
 
 export interface StarToggleBulkIgnoreStatusRequest {
     starId: DBObjectId;
     infrastructureType: InfrastructureType;
 };
 
-export const mapToStarToggleBulkIgnoreStatusRequest = (body: any): StarToggleBulkIgnoreStatusRequest => {
-    let errors: string[] = [];
-
-    if (!keyHasStringValue(body, 'starId')) {
-        errors.push('Star ID is required.');
-    }
-
-    if (!keyHasStringValue(body, 'infrastructureType')) {
-        errors.push('Infrastructure Type is required.');
-    }
-
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    return {
-        starId: body.starId,
-        infrastructureType: body.infrastructureType
-    }
-};
+export const parseStarToggleBulkIgnoreStatusRequest: Validator<StarToggleBulkIgnoreStatusRequest> = object({
+    starId: objectId,
+    infrastructureType: infrastructureValidator,
+});
 
 export interface StarSetBulkIgnoreAllStatusRequest {
     starId: DBObjectId;
     ignoreStatus: boolean;
 };
 
-export const mapToStarSetBulkIgnoreAllStatusRequest = (body: any): StarSetBulkIgnoreAllStatusRequest => {
-    let errors: string[] = [];
+export const parseStarSetBulkIgnoreAllStatusRequest: Validator<StarSetBulkIgnoreAllStatusRequest> = object({
+    starId: objectId,
+    ignoreStatus: boolean,
+});
 
-    if (!keyHasStringValue(body, 'starId')) {
-        errors.push('Star ID is required.');
-    }
-
-    if (!keyHasBooleanValue(body, 'ignoreStatus')) {
-        errors.push('Ignore Status is required.');
-    }
-
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    return {
-        starId: body.starId,
-        ignoreStatus: body.ignoreStatus
-    }
-};

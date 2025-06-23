@@ -164,8 +164,8 @@ type NumberValidationProps = {
     sign?: 'positive' | 'negative',
     integer?: boolean,
     range?: {
-        from: number,
-        to: number
+        from?: number,
+        to?: number
     },
 }
 
@@ -192,8 +192,16 @@ export const numberAdv = (props: NumberValidationProps) => (v: any) => {
     }
 
     if (props.range) {
-        if (n < props.range.from || n > props.range.to) {
-            throw failed(`number between ${props.range.from} and ${props.range.to}`, v);
+        if (props.range.from !== undefined) {
+            if (n < props.range.from) {
+                throw failed(`number over ${props.range.from}`, v);
+            }
+        }
+
+        if (props.range.to !== undefined) {
+            if (n > props.range.to) {
+                throw failed(`number below ${props.range.to}`, v);
+            }
         }
     }
 

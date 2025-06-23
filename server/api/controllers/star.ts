@@ -1,11 +1,22 @@
 import { DependencyContainer } from '../../services/types/DependencyContainer';
-import { mapToStarAbandonStarRequest, mapToStarBuildCarrierRequest, mapToStarDestroyInfrastructureRequest, mapToStarSetBulkIgnoreAllStatusRequest, mapToStarToggleBulkIgnoreStatusRequest, mapToStarUpgradeInfrastructureBulkRequest, mapToScheduledStarUpgradeInfrastructureBulkRequest, mapToStarUpgradeInfrastructureRequest, StarUpgradeInfrastructureRequest, parseScheduledStarUpgradeToggleRepeat, parseScheduledStarUpgradeTrashRepeat } from '../requests/star';
+import {
+    parseStarUpgradeInfrastructureRequest,
+    StarUpgradeInfrastructureRequest,
+    parseScheduledStarUpgradeToggleRepeat,
+    parseScheduledStarUpgradeTrashRepeat,
+    parseStarUpgradeInfrastructureBulkRequest,
+    parseScheduledStarUpgradeInfrastructureBulkRequest,
+    parseStarDestroyInfrastructureRequest,
+    parseStarBuildCarrierRequest,
+    parseStarAbandonStarRequest,
+    parseStarToggleBulkIgnoreStatusRequest, parseStarSetBulkIgnoreAllStatusRequest
+} from '../requests/star';
 
 export default (container: DependencyContainer) => {
     return {
         upgradeEconomy: async (req, res, next) => {
             try {
-                const reqObj = mapToStarUpgradeInfrastructureRequest(req.body);
+                const reqObj = parseStarUpgradeInfrastructureRequest(req.body);
 
                 let report = await container.starUpgradeService.upgradeEconomy(
                     req.game,
@@ -20,7 +31,7 @@ export default (container: DependencyContainer) => {
         },
         upgradeIndustry: async (req, res, next) => {
             try {
-                const reqObj = mapToStarUpgradeInfrastructureRequest(req.body);
+                const reqObj = parseStarUpgradeInfrastructureRequest(req.body);
 
                 let report = await container.starUpgradeService.upgradeIndustry(
                     req.game,
@@ -35,7 +46,7 @@ export default (container: DependencyContainer) => {
         },
         upgradeScience: async (req, res, next) => {
             try {
-                const reqObj = mapToStarUpgradeInfrastructureRequest(req.body);
+                const reqObj = parseStarUpgradeInfrastructureRequest(req.body);
 
                 let report = await container.starUpgradeService.upgradeScience(
                     req.game,
@@ -50,7 +61,7 @@ export default (container: DependencyContainer) => {
         },
         upgradeBulk: async (req, res, next) => {
             try {
-                const reqObj = mapToStarUpgradeInfrastructureBulkRequest(req.body);
+                const reqObj = parseStarUpgradeInfrastructureBulkRequest(req.body);
                 
                 let summary = await container.starUpgradeService.upgradeBulk(
                     req.game,
@@ -67,9 +78,9 @@ export default (container: DependencyContainer) => {
         },
         upgradeBulkCheck: async (req, res, next) => {
             try {
-                const reqObj = mapToStarUpgradeInfrastructureBulkRequest(req.body);
+                const reqObj = parseStarUpgradeInfrastructureBulkRequest(req.body);
                 
-                let summary = await container.starUpgradeService.generateUpgradeBulkReport(
+                const summary = await container.starUpgradeService.generateUpgradeBulkReport(
                     req.game,
                     req.player,
                     reqObj.upgradeStrategy,
@@ -84,7 +95,7 @@ export default (container: DependencyContainer) => {
         },
         scheduleBulk: async (req, res, next) => {
             try {
-                const reqObj = mapToScheduledStarUpgradeInfrastructureBulkRequest(req.body);
+                const reqObj = parseScheduledStarUpgradeInfrastructureBulkRequest(req.body);
 
                 let summary = await container.scheduleBuyService.addScheduledBuy(
                     req.game,
@@ -148,7 +159,7 @@ export default (container: DependencyContainer) => {
         },
         destroyWarpGate: async (req, res, next) => {
             try {
-                const reqObj = mapToStarDestroyInfrastructureRequest(req.body);
+                const reqObj = parseStarDestroyInfrastructureRequest(req.body);
                 
                 await container.starUpgradeService.destroyWarpGate(
                     req.game,
@@ -163,7 +174,7 @@ export default (container: DependencyContainer) => {
         },
         buildCarrier: async (req, res, next) => {
             try {
-                const reqObj = mapToStarBuildCarrierRequest(req.body);
+                const reqObj = parseStarBuildCarrierRequest(req.body);
         
                 let report = await container.starUpgradeService.buildCarrier(
                     req.game,
@@ -205,7 +216,7 @@ export default (container: DependencyContainer) => {
         },
         abandon: async (req, res, next) => {
             try {
-                const reqObj = mapToStarAbandonStarRequest(req.body);
+                const reqObj = parseStarAbandonStarRequest(req.body);
                 
                 await container.starService.abandonStar(
                     req.game,
@@ -220,7 +231,7 @@ export default (container: DependencyContainer) => {
         },
         toggleBulkIgnore: async (req, res, next) => {
             try {
-                const reqObj = mapToStarToggleBulkIgnoreStatusRequest(req.body);
+                const reqObj = parseStarToggleBulkIgnoreStatusRequest(req.body);
 
                 await container.starService.toggleIgnoreBulkUpgrade(
                     req.game,
@@ -236,7 +247,7 @@ export default (container: DependencyContainer) => {
         },
         toggleBulkIgnoreAll: async (req, res, next) => {
             try {
-                const reqObj = mapToStarSetBulkIgnoreAllStatusRequest(req.body);
+                const reqObj = parseStarSetBulkIgnoreAllStatusRequest(req.body);
                 
                 await container.starService.toggleIgnoreBulkUpgradeAll(
                     req.game,
