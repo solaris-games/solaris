@@ -124,6 +124,10 @@ import { Logger } from "pino";
 import SocketService from "./socket";
 import StarCaptureService from "./starCapture";
 import {UserServerSocketEmitter} from "../sockets/socketEmitters/user";
+import StatsSliceModel from "../db/models/StatsSlice";
+import type {StatsSlice} from "solaris-common";
+import {DBObjectId} from "./types/DBObjectId";
+import StatisticsService from "./statistics";
 
 const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
@@ -138,6 +142,7 @@ const guildRepository = new Repository<Guild>(GuildModel);
 const paymentRepository = new Repository<Payment>(PaymentModel);
 const reportRepository = new Repository<Report>(ReportModel);
 const announcementRepository = new Repository<Announcement>(AnnouncementModel);
+const statsSliceRepository = new Repository<StatsSlice<DBObjectId>>(StatsSliceModel);
 
 export default (config: Config,
                 socketServer: Server,
@@ -159,6 +164,8 @@ export default (config: Config,
     const guildUserService = new GuildUserService(userRepository, guildService);
 
     const announcementService = new AnnouncementService(AnnouncementModel, announcementRepository, userService);
+
+    const statisticsService = new StatisticsService(statsSliceRepository);
 
     const gameMaskingService = new GameMaskingService();
     const gameLockService = new GameLockService(gameRepository);
@@ -349,5 +356,6 @@ export default (config: Config,
         playerColourService,
         sessionService,
         starCaptureService,
+        statisticsService,
     };
 };
