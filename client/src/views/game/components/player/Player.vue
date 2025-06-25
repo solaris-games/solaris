@@ -44,7 +44,7 @@
 
     <h4 class="mt-2" v-if="canAwardBadge">Badges</h4>
 
-    <player-badges v-if="player && canAwardBadge"
+    <player-badges v-if="player"
       :playerId="player._id"
       @onOpenPurchasePlayerBadgeRequested="onOpenPurchasePlayerBadgeRequested"/>
 
