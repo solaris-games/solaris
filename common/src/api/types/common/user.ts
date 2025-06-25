@@ -1,5 +1,6 @@
 import {type UserGameSettings} from "./settings";
 import {type UserSubscriptions} from "./subscriptions";
+import {Statistics} from "./stats";
 
 export type UserWarning = {
     text: string,
@@ -47,56 +48,7 @@ export type UserAchievements<ID> = {
     defeated: number;
     defeated1v1: number;
     afk: number;
-    combat: {
-        kills: {
-            ships: number;
-            carriers: number;
-            specialists: number;
-        },
-        losses: {
-            ships: number;
-            carriers: number;
-            specialists: number;
-        },
-        stars: {
-            captured: number;
-            lost: number;
-        },
-        homeStars: {
-            captured: number;
-            lost: number;
-        }
-    },
-    infrastructure: {
-        economy: number;
-        industry: number;
-        science: number;
-        warpGates: number;
-        warpGatesDestroyed: number;
-        carriers: number;
-        specialistsHired: number;
-    },
-    research: {
-        scanning: number;
-        hyperspace: number;
-        terraforming: number;
-        experimentation: number;
-        weapons: number;
-        banking: number;
-        manufacturing: number;
-        specialists: number;
-    },
-    trade: {
-        creditsSent: number;
-        creditsReceived: number;
-        creditsSpecialistsSent: number;
-        creditsSpecialistsReceived: number;
-        technologySent: number;
-        technologyReceived: number;
-        giftsSent: number;
-        giftsReceived: number;
-        renownSent: number;
-    },
+    stats: Statistics,
     badges: AwardedBadge<ID>[];
 }
 
