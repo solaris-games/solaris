@@ -49,6 +49,7 @@ export type UserAchievements<ID> = {
     defeated1v1: number;
     afk: number;
     stats: Statistics,
+    legacyStats: Statistics,
     badges: AwardedBadge<ID>[];
 }
 

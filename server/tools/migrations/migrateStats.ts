@@ -83,6 +83,7 @@ const moveStats = (user: User) => {
 
     const newAchievements: UserAchievements<DBObjectId> = {
         stats,
+        legacyStats: { ... stats },
         victories: oldAchievements.victories,
         victories1v1: oldAchievements.victories1v1,
         level: oldAchievements.level,
@@ -112,21 +113,7 @@ const moveStats = (user: User) => {
     };
 };
 
-const createStatsSlice = (user: User) => {
-    const stats: Statistics = user.achievements.stats;
-
-    return {
-        stats,
-        userId: user._id,
-        processed: false,
-        gameId: undefined,
-        closed: true,
-    };
-};
-
 export const migrateStats = async (ctx: JobParameters) => {
-    const statsSliceRepo = ctx.container.statisticsService.statsSliceRepository;
-
     const log = ctx.log;
 
     const userRepository = ctx.container.userService.userRepo;
@@ -146,25 +133,6 @@ export const migrateStats = async (ctx: JobParameters) => {
         const writes = users.map(moveStats);
 
         await userRepository.bulkWrite(writes);
-
-        log.info(`Page ${page}/${totalPages}`);
-
-        page++;
-    } while (page <= totalPages)
-
-    log.info("Finished migrating stats in user data");
-
-    page = 0;
-
-    do {
-        const users = await userRepository.find({}, {
-            '_id': 1,
-            'achievements': 1,
-        }, { _id: 1 }, pageSize, page * pageSize);
-
-        const statsSlices = users.map(createStatsSlice);
-
-        await statsSliceRepo.model.insertMany(statsSlices);
 
         log.info(`Page ${page}/${totalPages}`);
 
