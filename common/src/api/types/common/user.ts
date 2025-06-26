@@ -1,6 +1,6 @@
 import {type UserGameSettings} from "./settings";
 import {type UserSubscriptions} from "./subscriptions";
-import {Statistics} from "./stats";
+import {type Statistics} from "./stats";
 
 export type UserWarning = {
     text: string,
