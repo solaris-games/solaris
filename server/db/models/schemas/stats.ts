@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const Types = Schema.Types;
 
-const schema = new Schema({
+const schema = {
     combat: {
         kills: {
             ships: {type: Types.Number, default: 0},
@@ -53,6 +53,6 @@ const schema = new Schema({
         giftsReceived: {type: Types.Number, default: 0},
         renownSent: {type: Types.Number, default: 0},
     },
-});
+};
 
 export default schema;

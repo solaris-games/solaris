@@ -11,4 +11,6 @@ const schema = new Schema({
     stats: StatsSchema,
 });
 
+schema.index({gameId: 1, userId: 1}, {unique: false});
+
 export default schema;
