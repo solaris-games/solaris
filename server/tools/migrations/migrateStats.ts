@@ -112,7 +112,7 @@ const moveStats = (user: User) => {
     };
 };
 
-const createStatsSlice = (user: User): StatsSlice<DBObjectId> => {
+const createStatsSlice = (user: User) => {
     const stats: Statistics = user.achievements.stats;
 
     return {
@@ -138,6 +138,7 @@ export const migrateStats = async (ctx: JobParameters) => {
 
     do {
         const users = await userRepository.find({}, {
+            '_id': 1,
             'achievements': 1,
         }, { _id: 1 }, pageSize, page * pageSize);
 
@@ -152,14 +153,17 @@ export const migrateStats = async (ctx: JobParameters) => {
 
     log.info("Finished migrating stats in user data");
 
+    page = 0;
+
     do {
         const users = await userRepository.find({}, {
+            '_id': 1,
             'achievements': 1,
         }, { _id: 1 }, pageSize, page * pageSize);
 
-        const statsWrites = users.map(createStatsSlice);
+        const statsSlices = users.map(createStatsSlice);
 
-        await statsSliceRepo.bulkWrite(statsWrites);
+        await statsSliceRepo.model.insertMany(statsSlices);
 
         log.info(`Page ${page}/${totalPages}`);
 
