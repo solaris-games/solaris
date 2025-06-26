@@ -120,6 +120,7 @@ const createStatsSlice = (user: User) => {
         userId: user._id,
         processed: false,
         gameId: undefined,
+        closed: true,
     };
 };
 

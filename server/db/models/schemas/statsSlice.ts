@@ -8,6 +8,7 @@ const schema = new Schema({
     userId: { type: Types.ObjectId, required: true },
     gameId: { type: Types.ObjectId, required: false },
     processed: { type: Types.Boolean, required: true, default: false },
+    closed: { type: Types.Boolean, required: true, default: false },
     stats: StatsSchema,
 });
 
