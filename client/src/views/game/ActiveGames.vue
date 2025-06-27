@@ -22,34 +22,18 @@
   </view-container>
 </template>
 
-<script>
+<script setup lang="ts">
 import ViewContainer from '../components/ViewContainer.vue'
 import ViewTitle from '../components/ViewTitle.vue'
-import ActiveGamesVue from './components/gameList/ActiveGames.vue'
-import CompletedGamesVue from './components/gameList/CompletedGames.vue'
-import SpectatingGamesVue from './components/gameList/SpectatingGames.vue'
+import ActiveGames from './components/gameList/ActiveGames.vue'
+import CompletedGames from './components/gameList/CompletedGames.vue'
+import SpectatingGames from './components/gameList/SpectatingGames.vue'
 import OpenGames from "@/views/game/components/gameList/OpenGames.vue";
+import { ref } from 'vue';
 
-export default {
-  components: {
-    OpenGames,
-    'view-container': ViewContainer,
-    'view-title': ViewTitle,
-    'active-games': ActiveGamesVue,
-    'completed-games': CompletedGamesVue,
-    'spectating-games': SpectatingGamesVue
-  },
-  data () {
-    return {
-      showDonationBanner: Math.random() < 0.05
-    }
-  },
-  methods: {
-    closeDonationBanner () {
-      this.showDonationBanner = false
-    }
-  }
-}
+const showDonationBanner = ref(Math.random() < 0.05);
+
+const closeDonationBanner = () => showDonationBanner.value = false;
 </script>
 
 <style scoped>
