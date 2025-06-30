@@ -4,7 +4,7 @@ import { GameServerSocketEmitter } from "../../sockets/socketEmitters/game";
 import { PlayerServerSocketEmitter } from "../../sockets/socketEmitters/player";
 import { PlayerServerSocketHandler } from "../../sockets/socketHandlers/player";
 import { ServerHandler } from "../../sockets/socketHandlers/serverHandler";
-import AchievementService from "../achievement";
+import UserAchievementService from "../userAchievement";
 import AdminService from "../admin";
 import AIService from "../ai";
 import AnnouncementService from "../announcement";
@@ -149,7 +149,7 @@ export interface DependencyContainer {
     specialistBanService: SpecialistBanService,
     specialistHireService: SpecialistHireService,
     specialStarBanService: SpecialStarBanService;
-    achievementService: AchievementService,
+    userAchievementService: UserAchievementService,
     conversationService: ConversationService,
     reputationService: ReputationService,
     aiService: AIService,

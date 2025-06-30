@@ -1,7 +1,6 @@
 import Repository from "./repository";
-import {StatsSlice} from "solaris-common";
+import {StatsSlice, Statistics} from "solaris-common";
 import {DBObjectId} from "./types/DBObjectId";
-import {Statistics} from "solaris-common/dist/api/types/common/stats";
 
 const EMPTY_STATS: Statistics = {
     combat: {
@@ -82,5 +81,14 @@ export default class StatisticsService {
 
     async getSlice(gameId: DBObjectId, playerId: DBObjectId) {
         return this.statsSliceRepository.findOne({ gameId, playerId });
+    }
+
+    async modifyStats(gameId: DBObjectId, playerId: DBObjectId, modif: (stats: StatsSlice<DBObjectId>) => void) {
+        const statsSlice = await this.getOrCreateSliceActive(gameId, playerId);
+
+        modif(statsSlice);
+
+        // @ts-ignore
+        statsSlice.save();
     }
 }

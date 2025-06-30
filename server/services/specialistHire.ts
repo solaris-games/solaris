@@ -3,7 +3,7 @@ import Repository from "./repository";
 import { Game } from "./types/Game";
 import { Player } from "./types/Player";
 import { Specialist } from "./types/Specialist";
-import AchievementService from "./achievement";
+import UserAchievementService from "./userAchievement";
 import GameTypeService from "./gameType";
 import SpecialistService from "./specialist";
 import StarService from "./star";
@@ -17,7 +17,7 @@ import TechnologyService from "./technology";
 export default class SpecialistHireService {
     gameRepo: Repository<Game>;
     specialistService: SpecialistService;
-    achievementService: AchievementService;
+    achievementService: UserAchievementService;
     waypointService: WaypointService;
     playerCreditsService: PlayerCreditsService;
     starService: StarService;
@@ -28,7 +28,7 @@ export default class SpecialistHireService {
     constructor(
         gameRepo: Repository<Game>,
         specialistService: SpecialistService,
-        achievementService: AchievementService,
+        achievementService: UserAchievementService,
         waypointService: WaypointService,
         playerCreditsService: PlayerCreditsService,
         starService: StarService,

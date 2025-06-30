@@ -53,7 +53,7 @@ import SpecialistService from './specialist';
 import SpecialistBanService from './specialistBan';
 import SpecialistHireService from './specialistHire';
 import SpecialStarBanService from './specialStarBan';
-import AchievementService from './achievement';
+import UserAchievementService from './userAchievement';
 import ConversationService from './conversation';
 import ReputationService from './reputation';
 import BasicAIService from "./basicAi";
@@ -186,7 +186,7 @@ export default (config: Config,
     const diplomacyServerSocketEmitter = new DiplomacyServerSocketEmitter(socketServer);
     const userServerSocketEmitter = new UserServerSocketEmitter(socketServer);
     const broadcastService = new BroadcastService(gameServerSocketEmitter, playerServerSocketEmitter, diplomacyServerSocketEmitter, userServerSocketEmitter, avatarService);
-    const achievementService = new AchievementService(userRepository, guildService, userLevelService);
+    const userAchievementService = new UserAchievementService(userRepository, guildService, userLevelService);
     const ratingService = new RatingService(userRepository, gameRepository, userService);
     const nameService = new NameService(gameNames, starNames, randomService);
     const starDistanceService = new StarDistanceService(distanceService);
@@ -199,7 +199,7 @@ export default (config: Config,
     const diplomacyUpkeepService = new DiplomacyUpkeepService(playerCreditsService, playerCycleRewardsService);
     const diplomacyService = new DiplomacyService(gameRepository, eventRepository, diplomacyUpkeepService)
     const researchService = new ResearchService(gameRepository, technologyService, randomService, playerStatisticsService, starService, userService, gameTypeService);
-    const starUpgradeService = new StarUpgradeService(gameRepository, starService, carrierService, achievementService, researchService, technologyService, playerCreditsService, gameTypeService, shipService);
+    const starUpgradeService = new StarUpgradeService(gameRepository, starService, carrierService, userAchievementService, researchService, technologyService, playerCreditsService, gameTypeService, shipService);
     const starCaptureService = new StarCaptureService(specialistService, starService, gameTypeService, gameStateService, diplomacyService, technologyService, starUpgradeService);
     const starContestedService = new StarContestedService(diplomacyService);
     const carrierGiftService = new CarrierGiftService(gameRepository, diplomacyService);
@@ -220,11 +220,11 @@ export default (config: Config,
     const badgeService = new BadgeService(userRepository, userService, playerService, gameTypeService, gameStateService);
     const ledgerService = new LedgerService(gameRepository, playerService, playerCreditsService);
     const reputationService = new ReputationService(gameRepository, playerStatisticsService, diplomacyService, playerAfkService);
-    const tradeService = new TradeService(gameRepository, eventRepository, userService, playerService, diplomacyService, ledgerService, achievementService, reputationService, gameTypeService, randomService, playerCreditsService, playerAfkService);
+    const tradeService = new TradeService(gameRepository, eventRepository, userService, playerService, diplomacyService, ledgerService, userAchievementService, reputationService, gameTypeService, randomService, playerCreditsService, playerAfkService);
     const conversationService = new ConversationService(gameRepository, tradeService, diplomacyService, broadcastService);
     const gameAuthService = new GameAuthService(userService);
-    const gameJoinService = new GameJoinService(userService, starService, playerService, passwordService, achievementService, avatarService, gameTypeService, gameStateService, conversationService, randomService, spectatorService);
-    const gameService = new GameService(gameRepository, userService, starService, carrierService, playerService, passwordService, achievementService, avatarService, gameTypeService, gameStateService, conversationService, playerReadyService, gameJoinService, gameAuthService, playerAfkService);
+    const gameJoinService = new GameJoinService(userService, starService, playerService, passwordService, userAchievementService, avatarService, gameTypeService, gameStateService, conversationService, randomService, spectatorService);
+    const gameService = new GameService(gameRepository, userService, starService, carrierService, playerService, passwordService, userAchievementService, avatarService, gameTypeService, gameStateService, conversationService, playerReadyService, gameJoinService, gameAuthService, playerAfkService);
     const serverHandler = new ServerHandler(socketServer, logger);
     const playerServerSocketHandler = new PlayerServerSocketHandler(socketService, gameService, serverHandler);
     const userServerSocketHandler = new UserServerSocketHandler(socketService, serverHandler);
@@ -234,7 +234,7 @@ export default (config: Config,
     const historyService = new HistoryService(historyRepository, playerService, gameService, playerStatisticsService, gameStateService);
     const waypointService = new WaypointService(gameRepository, carrierService, starService, distanceService, starDistanceService, technologyService, gameService, playerService, carrierMovementService, gameMaskingService, historyService);
     const specialistBanService = new SpecialistBanService(specialistService);
-    const specialistHireService = new SpecialistHireService(gameRepository, specialistService, achievementService, waypointService, playerCreditsService, starService, gameTypeService, specialistBanService, technologyService);
+    const specialistHireService = new SpecialistHireService(gameRepository, specialistService, userAchievementService, waypointService, playerCreditsService, starService, gameTypeService, specialistBanService, technologyService);
     const shipTransferService = new ShipTransferService(gameRepository, carrierService, starService);
     const pathfindingService = new PathfindingService(distanceService, starService, waypointService);
     const basicAIService = new BasicAIService(starUpgradeService);
@@ -250,7 +250,7 @@ export default (config: Config,
 
     const gameListService = new GameListService(gameRepository, gameService, conversationService, eventService, gameTypeService, leaderboardService);
     const gameCreateValidationService = new GameCreateValidationService(playerService, starService, carrierService, specialistService, gameTypeService);
-    const gameCreateService = new GameCreateService(GameModel, gameJoinService, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, achievementService, userService, gameCreateValidationService, gameFluxService, specialistBanService, specialStarBanService, gameTypeService, starService, diplomacyService, teamService, carrierService, customMapService);
+    const gameCreateService = new GameCreateService(GameModel, gameJoinService, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, userAchievementService, userService, gameCreateValidationService, gameFluxService, specialistBanService, specialStarBanService, gameTypeService, starService, diplomacyService, teamService, carrierService, customMapService);
 
     const reportService = new ReportService(ReportModel, reportRepository, playerService, conversationService, userService, gameListService, gameService);
 
@@ -321,7 +321,7 @@ export default (config: Config,
         specialistBanService,
         specialistHireService,
         specialStarBanService,
-        achievementService,
+        userAchievementService,
         conversationService,
         reputationService,
         basicAIService,

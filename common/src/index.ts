@@ -22,6 +22,7 @@ export * from "./api/types/common/subscriptions";
 export * from "./api/types/common/avatar";
 export * from "./api/types/common/report";
 export * from "./api/types/common/statsSlice";
+export * from "./api/types/common/stats";
 export * from "./utilities/cast";
 export * from "./sockets/socketEventNames/player";
 export * from "./sockets/socketEventNames/game";

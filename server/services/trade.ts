@@ -2,7 +2,7 @@ const EventEmitter = require('events');
 const moment = require('moment');
 import { LedgerType } from 'solaris-common';
 import ValidationError from '../errors/validation';
-import AchievementService from './achievement';
+import UserAchievementService from './userAchievement';
 import DiplomacyService from './diplomacy';
 import GameTypeService from './gameType';
 import LedgerService from './ledger';
@@ -38,7 +38,7 @@ export default class TradeService extends EventEmitter {
     playerService: PlayerService;
     diplomacyService: DiplomacyService;
     ledgerService: LedgerService;
-    achievementService: AchievementService;
+    achievementService: UserAchievementService;
     reputationService: ReputationService;
     gameTypeService: GameTypeService;
     randomService: RandomService;
@@ -52,7 +52,7 @@ export default class TradeService extends EventEmitter {
         playerService: PlayerService,
         diplomacyService: DiplomacyService,
         ledgerService: LedgerService,
-        achievementService: AchievementService,
+        achievementService: UserAchievementService,
         reputationService: ReputationService,
         gameTypeService: GameTypeService,
         randomService: RandomService,

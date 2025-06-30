@@ -13,7 +13,7 @@ import {
 import {Game, GameInfrastructureExpenseMultiplier} from './types/Game';
 import {Player} from './types/Player';
 import {InfrastructureType, NaturalResources, Star, TerraformedResources} from './types/Star';
-import AchievementService from './achievement';
+import UserAchievementService from './userAchievement';
 import CarrierService from './carrier';
 import GameTypeService from './gameType';
 import ResearchService from './research';
@@ -44,7 +44,7 @@ export default class StarUpgradeService extends EventEmitter {
     gameRepo: Repository<Game>;
     starService: StarService;
     carrierService: CarrierService;
-    achievementService: AchievementService;
+    achievementService: UserAchievementService;
     researchService: ResearchService;
     technologyService: TechnologyService;
     playerCreditsService: PlayerCreditsService;
@@ -55,7 +55,7 @@ export default class StarUpgradeService extends EventEmitter {
         gameRepo: Repository<Game>,
         starService: StarService,
         carrierService: CarrierService,
-        achievementService: AchievementService,
+        achievementService: UserAchievementService,
         researchService: ResearchService,
         technologyService: TechnologyService,
         playerCreditsService: PlayerCreditsService,
