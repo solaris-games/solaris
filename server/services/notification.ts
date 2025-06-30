@@ -17,6 +17,9 @@ import GameTurnEndedEvent from './types/events/GameTurnEnded';
 import ConversationMessageSentEvent from './types/events/ConversationMessageSent';
 import GameJoinService, { GameJoinServiceEvents } from './gameJoin';
 import {logger} from "../utils/logging";
+import PlayerReadyService, { PlayerReadyServiceEvents } from './playerReady';
+import GameTypeService from './gameType';
+import GameStateService from './gameState';
 
 const log = logger("Notification Service");
 
@@ -45,6 +48,9 @@ export default class NotificationService {
     gameTickService: GameTickService;
     researchService: ResearchService;
     tradeService: TradeService;
+    playerReadyService: PlayerReadyService;
+    gameTypeService: GameTypeService;
+    gameStateService: GameStateService;
 
     constructor(
         config: Config,
@@ -56,7 +62,10 @@ export default class NotificationService {
         gameJoinService: GameJoinService,
         gameTickService: GameTickService,
         researchService: ResearchService,
-        tradeService: TradeService
+        tradeService: TradeService,
+        playerReadyService: PlayerReadyService,
+        gameTypeService: GameTypeService,
+        gameStateService: GameStateService,
     ) {
         this.config = config;
         this.userRepo = userRepo;
@@ -68,6 +77,9 @@ export default class NotificationService {
         this.gameTickService = gameTickService;
         this.researchService = researchService;
         this.tradeService = tradeService;
+        this.playerReadyService = playerReadyService;
+        this.gameTypeService = gameTypeService;
+        this.gameStateService = gameStateService;
     }
 
     initialize() {
@@ -83,6 +95,8 @@ export default class NotificationService {
             this.tradeService.on(TradeServiceEvents.onPlayerCreditsSpecialistsReceived, (args) => this.onPlayerCreditsSpecialistsReceived(args.gameId, args.fromPlayer, args.toPlayer, args.amount));
             this.tradeService.on(TradeServiceEvents.onPlayerRenownReceived, (args) => this.onPlayerRenownReceived(args.gameId, args.fromPlayer, args.toPlayer, args.amount));
             this.tradeService.on(TradeServiceEvents.onPlayerTechnologyReceived, (args) => this.onPlayerTechnologyReceived(args.gameId, args.fromPlayer, args.toPlayer, args.technology));
+
+            this.playerReadyService.on(PlayerReadyServiceEvents.onGamePlayerReady, (data) => this.trySendLastPlayerTurnReminder(data.gameId));
 
             log.info('Notifications initialized.')
         }
@@ -189,6 +203,40 @@ export default class NotificationService {
 
                 await this.discordService.sendMessageOAuth(user, template);
             });
+    }
+
+    async trySendLastPlayerTurnReminder(gameId: DBObjectId) {
+        // TODO: Partially duplicate with email functionality, refactor!
+        let game = (await this.gameService.getById(gameId))!;
+
+        if (!this.gameTypeService.isTurnBasedGame(game)) {
+            throw new Error('Cannot send a last turn reminder for non turn based games.');
+        }
+
+        if (!this.gameStateService.isInProgress(game)) {
+            return;
+        }
+
+        const undefeatedPlayers = game.galaxy.players.filter((p: Player) => !p.defeated && p.userId);
+
+        if (undefeatedPlayers.length <= 2) { // No need to send a turn reminder in a 2-player game
+            return;
+        }
+
+        const undefeatedUnreadyPlayers = undefeatedPlayers.filter(p => !p.ready);
+
+        if (undefeatedUnreadyPlayers.length === 1) {
+            const player = undefeatedUnreadyPlayers[0];
+
+            const gameName = game.settings.general.name;
+
+            await this._trySendNotifications(gameId, [player._id.toString()], 'discord', 'gameTurnEnded', 
+                async (game: Game, user: User) => {
+                    const template = this._generateBaseDiscordMessageTemplate(game, 'It\'s your turn', `The players in ${gameName} are waiting for you to make your move!`);
+
+                    await this.discordService.sendMessageOAuth(user, template);
+            });
+        }
     }
 
     async onPlayerGalacticCycleCompleted(args: PlayerGalacticCycleCompletedEvent) {

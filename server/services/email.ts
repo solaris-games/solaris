@@ -326,10 +326,16 @@ export default class EmailService {
             return;
         }
 
-        let undefeatedPlayers = game.galaxy.players.filter((p: Player) => !p.defeated && !p.ready && p.userId);
+        const undefeatedPlayers = game.galaxy.players.filter((p: Player) => !p.defeated && p.userId);
 
-        if (undefeatedPlayers.length === 1) {
-            let player = undefeatedPlayers[0];
+        if (undefeatedPlayers.length <= 2) { // No need to send a turn reminder in a 2-player game
+            return;
+        }
+
+        const undefeatedUnreadyPlayers = undefeatedPlayers.filter(p => !p.ready);
+
+        if (undefeatedUnreadyPlayers.length === 1) {
+            let player = undefeatedUnreadyPlayers[0];
 
             // If we have already sent a last turn reminder to this player then do not
             // send one again, this prevents players from spamming ready/unready and sending

@@ -2,7 +2,7 @@
   <div class="menu-page container pb-2">
     <menu-title title="Leaderboard" @onCloseRequested="onCloseRequested">
       <button title="View Settings" tag="button" class="btn btn-sm btn-outline-primary"
-              @click="onViewSettingsRequested"><i class="fas fa-cog"></i></button>
+        @click="onViewSettingsRequested"><i class="fas fa-cog"></i></button>
     </menu-title>
 
     <div class="row">
@@ -11,12 +11,18 @@
       </div>
     </div>
 
+    <div class="row" v-if="almostAfkReminder">
+      <div class="col text-center">
+        <p class="mt-2 mb-2 text-danger">You have missed the last {{ userPlayer?.missedTurns }} turn(s). Please
+          mark your turn as completed or you will be marked afk.</p>
+      </div>
+    </div>
+
     <div class="row bg-info" v-if="game.settings.general.flux" title="This Game's Flux">
       <div class="col text-center">
-        <!-- <p class="mt-2 mb-2"><small><i class="fas fa-dice-d20 me-1"></i><strong>{{game.settings.general.flux.name}}</strong> - {{game.settings.general.flux.description}} <help-tooltip v-if="game.settings.general.flux.tooltip" :tooltip="game.settings.general.flux.tooltip"/></small></p> -->
         <p class="mt-2 mb-2"><small><i class="fas fa-dice-d20 me-1"></i>{{ game.settings.general.flux.description }}
-          <help-tooltip v-if="game.settings.general.flux.tooltip" :tooltip="game.settings.general.flux.tooltip"/>
-        </small></p>
+            <help-tooltip v-if="game.settings.general.flux?.description" :tooltip="game.settings.general.flux.description" />
+          </small></p>
       </div>
     </div>
 
@@ -34,20 +40,20 @@
         <p class="mb-0" v-if="game.settings.general.mode === 'battleRoyale'">Battle Royale - {{ game.state.stars }}
           Stars Remaining</p>
         <p class="mb-0" v-if="isKingOfTheHillMode && game.state.ticksToEnd == null"><small>The countdown begins when the
-          center star is captured</small></p>
+            center star is captured</small></p>
         <p class="mb-0 text-danger" v-if="game.state.ticksToEnd != null">Countdown - {{ game.state.ticksToEnd }}
           Tick<span v-if="game.state.ticksToEnd !== 1">s</span> Remaining
           <help-tooltip v-if="isKingOfTheHillMode"
-                        tooltip="The countdown will reset to 1 cycle if the center star is captured with less than 1 cycle left"/>
+            tooltip="The countdown will reset to 1 cycle if the center star is captured with less than 1 cycle left" />
         </p>
       </div>
     </div>
 
     <div class="row bg-dark" v-if="!game.state.endDate">
       <div class="col text-center pt-2">
-        <p class="mb-2">Galactic Cycle {{ $store.state.productionTick }} - Tick {{ $store.state.tick }}</p>
-        <p class="text-warning" v-if="isDarkModeExtra && getUserPlayer() != null"><small>The leaderboard is based on
-          your scanning range.</small></p>
+        <p class="mb-2">Galactic Cycle {{ game.state.productionTick }} - Tick {{ game.state.tick }}</p>
+        <p class="text-warning" v-if="isDarkModeExtra && userPlayer != null"><small>The leaderboard is based on
+            your scanning range.</small></p>
       </div>
     </div>
 
@@ -59,75 +65,76 @@
 
     <div class="row" v-if="game.state.readyToQuitCount">
       <div class="col text-center pt-2">
-        <p>{{game.state.readyToQuitCount}} of {{game.state.players}} active players are ready to quit.</p>
+        <p>{{ game.state.readyToQuitCount }} of {{ game.state.players }} active players are ready to quit.</p>
       </div>
     </div>
 
     <div class="row bg-success" v-if="game.state.endDate">
       <div class="col text-center pt-2">
         <h3>Game Over</h3>
-        <p v-if="!isTeamGame">The winner is <b>{{ getWinnerAlias() }}</b>!</p>
-        <p v-if="isTeamGame">The winning team is <b>{{ getWinningTeamName() }}</b></p>
+        <p v-if="!isTeamConquest">The winner is <b>{{ getWinnerAlias() }}</b>!</p>
+        <p v-if="isTeamConquest">The winning team is <b>{{ getWinningTeam() }}</b></p>
       </div>
     </div>
 
     <div v-if="isTeamConquest">
       <ul class="nav nav-tabs">
         <li class="nav-item">
-          <a class="nav-link" :class="{'active':activeTab=== 'team'}" data-bs-toggle="tab" href="#team">Team</a>
+          <a class="nav-link" :class="{ 'active': activeTab === 'team' }" data-bs-toggle="tab" href="#team">Team</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" :class="{'active':activeTab=== 'player'}" data-bs-toggle="tab" href="#player">Player</a>
+          <a class="nav-link" :class="{ 'active': activeTab === 'player' }" data-bs-toggle="tab"
+            href="#player">Player</a>
         </li>
       </ul>
 
       <div class="tab-content pt-2 pb-2">
-        <div class="tab-pane fade" :class="{'show active':activeTab=== 'team'}" id="team">
-          <team-leaderboard @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        <div class="tab-pane fade" :class="{ 'show active': activeTab === 'team' }" id="team">
+          <team-leaderboard @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested" />
         </div>
-        <div class="tab-pane fade" :class="{'show active':activeTab=== 'player'}" id="player">
-          <player-leaderboard @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        <div class="tab-pane fade" :class="{ 'show active': activeTab === 'player' }" id="player">
+          <player-leaderboard @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested" />
         </div>
       </div>
     </div>
 
-    <player-leaderboard v-if="!isTeamConquest" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+    <player-leaderboard v-if="!isTeamConquest" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested" />
 
-    <new-player-message/>
+    <new-player-message />
 
-    <share-link v-if="!game.state.startDate" message="Invite your friends and take on the Galaxy together!"/>
+    <share-link v-if="!game.state.startDate" message="Invite your friends and take on the Galaxy together!" />
     <share-link v-if="game.state.startDate && !game.state.endDate"
-                message="Share this game with your friends to spectate, no sign-up required!"/>
-    <share-link v-if="game.state.endDate" message="Share this game with your friends, no sign-up required!"/>
+      message="Share this game with your friends to spectate, no sign-up required!" />
+    <share-link v-if="game.state.endDate" message="Share this game with your friends, no sign-up required!" />
 
-    <div class="row" v-if="getUserPlayer() != null && !game.state.endDate">
+    <div class="row" v-if="userPlayer != null && !game.state.endDate">
       <div class="col text-end pe-2">
         <modalButton v-if="!game.state.startDate" :disabled="isQuittingGame" modalName="quitGameModal"
-                     classText="btn btn-sm btn-danger">
+          classText="btn btn-sm btn-danger">
           <i class="fas fa-sign-out-alt"></i> Quit Game
         </modalButton>
-        <button v-if="canReadyToQuit && !getUserPlayer().defeated && !getUserPlayer().readyToQuit"
-                @click="confirmReadyToQuit(getUserPlayer())" class="btn btn-sm btn-outline-warning me-1">
+        <button v-if="canReadyToQuit && !userPlayer.defeated && !userPlayer.readyToQuit"
+          @click="confirmReadyToQuit(userPlayer)" class="btn btn-sm btn-outline-warning me-1">
           <i class="fas fa-times"></i> Declare Ready to Quit
         </button>
-        <button v-if="canReadyToQuit && !getUserPlayer().defeated && getUserPlayer().readyToQuit"
-                @click="unconfirmReadyToQuit(getUserPlayer())" class="btn btn-sm btn-success me-1">
+        <button v-if="canReadyToQuit && !userPlayer.defeated && userPlayer.readyToQuit"
+          @click="unconfirmReadyToQuit(userPlayer)" class="btn btn-sm btn-success me-1">
           <i class="fas fa-check"></i> Ready to Quit
         </button>
-        <concede-defeat-button/>
+        <concede-defeat-button />
       </div>
     </div>
 
     <!-- Modals -->
     <dialogModal modalName="quitGameModal" titleText="Quit Game" cancelText="No" confirmText="Yes"
-                 @onConfirm="quitGame">
+      @onConfirm="quitGame">
       <p>Are you sure you want to quit this game? Your position will be opened again and you will <b>not</b> be able to
         rejoin.</p>
     </dialogModal>
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import router from '../../../../router'
 import gameService from '../../../../services/api/game'
 import ModalButton from '../../../components/modal/ModalButton.vue'
@@ -135,254 +142,210 @@ import DialogModal from '../../../components/modal/DialogModal.vue'
 import GameHelper from '../../../../services/gameHelper'
 import MenuTitle from '../MenuTitle.vue'
 import AudioService from '../../../../game/audio'
-import NewPlayerMessageVue from '../welcome/NewPlayerMessage.vue'
-import ShareLinkVue from '../welcome/ShareLink.vue'
+import NewPlayerMessage from '../welcome/NewPlayerMessage.vue'
+import ShareLink from '../welcome/ShareLink.vue'
 import HelpTooltip from '../../../components/HelpTooltip.vue'
 import ConcedeDefeatButton from './ConcedeDefeatButton.vue'
 import PlayerLeaderboard from './PlayerLeaderboard.vue';
 import TeamLeaderboard from './TeamLeaderboard.vue';
+import { inject, ref, computed, onMounted, type Ref, onUnmounted } from 'vue';
+import { type Game, type Player } from '@solaris-common';
+import { useStore, type Store } from 'vuex';
+import type { State } from "@/store";
+import { toastInjectionKey } from '@/util/keys'
+import { makeConfirm } from '@/util/confirm'
+import { useIsHistoricalMode } from '@/util/reactiveHooks'
 
-export default {
-  components: {
-    'team-leaderboard': TeamLeaderboard,
-    'player-leaderboard': PlayerLeaderboard,
-    'menu-title': MenuTitle,
-    'modalButton': ModalButton,
-    'dialogModal': DialogModal,
-    'new-player-message': NewPlayerMessageVue,
-    'share-link': ShareLinkVue,
-    'help-tooltip': HelpTooltip,
-    'concede-defeat-button': ConcedeDefeatButton
-  },
+const emit = defineEmits<{
+  onCloseRequested: [],
+  onOpenPlayerDetailRequested: [playerId: string],
+  onViewSettingsRequested: [],
+}>();
 
-  data() {
-    return {
-      activeTab: null,
-      audio: null,
-      players: [],
-      timeRemaining: null,
-      isQuittingGame: false
-    }
-  },
-  mounted() {
-    this.activeTab = this.isTeamConquest ? 'team' : 'player'
+const store: Store<State> = useStore();
+const confirm = makeConfirm(store);
 
-    this.players = this.$store.state.game.galaxy.players
+const toast = inject(toastInjectionKey)!;
 
-    this.recalculateTimeRemaining()
+const activeTab: Ref<string | null> = ref(null);
+const players: Ref<Player<string>[] | null> = ref(null);
+const timeRemaining: Ref<null | string> = ref(null);
+const isQuittingGame = ref(false);
 
-    if (GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)) {
-      this.intervalFunction = setInterval(this.recalculateTimeRemaining, 250)
-      this.recalculateTimeRemaining()
-    }
-  },
-  unmounted() {
-    clearInterval(this.intervalFunction)
-  },
-  methods: {
-    onCloseRequested(e) {
-      this.$emit('onCloseRequested', e)
-    },
-    onOpenPlayerDetailRequested(e) {
-      this.$emit('onOpenPlayerDetailRequested', e)
-    },
-    onViewSettingsRequested(e) {
-      this.$emit('onViewSettingsRequested', e)
-    },
-    getUserPlayer() {
-      return GameHelper.getUserPlayer(this.$store.state.game)
-    },
-    isUserPlayer(player) {
-      let userPlayer = this.getUserPlayer()
+const intervalFunction = ref(0);
 
-      return userPlayer && userPlayer._id === player._id
-    },
-    recalculateTimeRemaining() {
-      if (GameHelper.isRealTimeGame(this.$store.state.game)) {
-        this.timeRemaining = `Next tick: ${GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, 1)}`
-      } else if (GameHelper.isTurnBasedGame(this.$store.state.game)) {
-        this.timeRemaining = `Next turn: ${GameHelper.getCountdownTimeStringForTurnTimeout(this.$store.state.game)}`
-      }
-    },
-    async quitGame() {
-      this.isQuittingGame = true
+const isHistoricalMode = useIsHistoricalMode(store);
 
-      try {
-        let response = await gameService.quitGame(this.$store.state.game._id)
+const game = computed<Game<string>>(() => store.state.game);
+const isTurnBasedGame = computed(() => game.value.settings.gameTime.gameType === 'turnBased');
+const isDarkModeExtra = computed(() => GameHelper.isDarkModeExtra(game.value));
+const isConquestAllStars = computed(() => GameHelper.isConquestAllStars(game.value));
+const isConquestHomeStars = computed(() => GameHelper.isConquestHomeStars(game.value));
+const isKingOfTheHillMode = computed(() => GameHelper.isKingOfTheHillMode(game.value));
+const isTeamConquest = computed(() => GameHelper.isTeamConquest(game.value));
+const isStarCountWin = computed(() => GameHelper.isWinConditionStarCount(game.value));
+const isHomeStarCountWinCondition = computed(() => GameHelper.isWinConditionHomeStars(game.value));
+const canReadyToQuit = computed(() => game.value.settings.general.readyToQuit === 'enabled' && GameHelper.isGameStarted(game.value) && game.value.state.productionTick > 0);
+const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
+const almostAfkReminder = computed(() => Boolean(userPlayer.value && userPlayer.value.missedTurns && userPlayer.value.missedTurns === game.value.settings.gameTime.afk.turnTimeout - 1));
 
-        if (response.status === 200) {
-          AudioService.quit()
-          this.$toast.error(`You have quit ${this.$store.state.game.settings.general.name}.`)
-          router.push({name: 'main-menu'})
-        }
-      } catch (err) {
-        console.error(err)
-      }
+const isUserPlayer = (player: Player<string>) => userPlayer.value?._id === player._id;
 
-      this.isQuittingGame = false
-    },
-    async confirmReady (player) {
-      if (!await this.$confirm('End Turn', 'Are you sure you want to end your turn?')) {
-        return
-      }
-
-      try {
-        let response = await gameService.confirmReady(this.$store.state.game._id)
-
-        if (response.status === 200) {
-          if (this.isTutorialGame) {
-            this.$toast.success(`You have confirmed your move, please wait while the game processes the tick.`)
-          } else {
-            this.$toast.success(`You have confirmed your move, once all players are ready the game will progress automatically.`)
-          }
-
-          player.ready = true
-        }
-      } catch (err) {
-        console.error(err)
-      }
-    },
-    async confirmReadyToCycle (player) {
-      if (!await this.$confirm('End Cycle', 'Are you sure you want to end your turn up to the end of the current galactic cycle?')) {
-        return
-      }
-
-      try {
-        let response = await gameService.confirmReadyToCycle(this.$store.state.game._id)
-
-        if (response.status === 200) {
-          if (this.isTutorialGame) {
-            this.$toast.success(`You have confirmed your move, please wait while the game processes the tick.`)
-          } else {
-            this.$toast.success(`You have confirmed your move, once all players are ready the game will progress automatically.`)
-          }
-
-          player.ready = true
-          player.readyToCycle = true
-        }
-      } catch (err) {
-        console.error(err)
-      }
-    },
-    async unconfirmReady (player) {
-      if (!this.isUserPlayer(player)) {
-        return
-      }
-
-      try {
-        let response = await gameService.unconfirmReady(this.$store.state.game._id)
-
-        if (response.status === 200) {
-          player.ready = false
-          player.readyToCycle = false
-        }
-      } catch (err) {
-        console.error(err)
-      }
-    },
-    async confirmReadyToQuit (player) {
-      if (!this.isUserPlayer(player) || this.$isHistoricalMode()) {
-        return
-      }
-
-      let rtqFractionMessage = '';
-      if (this.$store.state.game.settings.general.readyToQuitFraction) {
-        const percent = this.$store.state.game.settings.general.readyToQuitFraction * 100;
-        rtqFractionMessage = ` (or ${percent}% by star count out of all stars)`;
-      }
-
-      if (!await this.$confirm('Ready to Quit?', `Are you sure you want declare that you are ready to quit? If all active players${rtqFractionMessage} declare ready to quit then the game will end early.`)) {
-        return
-      }
-
-      try {
-        let response = await gameService.confirmReadyToQuit(this.$store.state.game._id)
-
-        if (response.status === 200) {
-          this.$toast.success(`You have confirmed that you are ready to quit.`)
-
-          player.readyToQuit = true
-        }
-      } catch (err) {
-        console.error(err)
-      }
-    },
-    async unconfirmReadyToQuit(player) {
-      if (!this.isUserPlayer(player) || this.$isHistoricalMode()) {
-        return
-      }
-
-      try {
-        let response = await gameService.unconfirmReadyToQuit(this.$store.state.game._id)
-
-        if (response.status === 200) {
-          player.readyToQuit = false
-        }
-      } catch (err) {
-        console.error(err)
-      }
-    },
-    getWinnerAlias() {
-      let winnerPlayer = GameHelper.getPlayerById(this.$store.state.game, this.$store.state.game.state.winner)
-
-      return winnerPlayer.alias
-    },
-    getWinningTeam () {
-      return GameHelper.getTeamById(this.$store.state.game, this.$store.state.game.state.winningTeam)
-    },
-    getWinningTeamName () {
-      return this.getWinningTeam().name
-    },
-    getAvatarImage (player) {
-      try {
-      return new URL(`../../../../assets/avatars/${player.avatar}`, import.meta.url).href
-      } catch (err) {
-        console.error(err)
-
-        return null
-      }
-    }
-  },
-
-  computed: {
-    game() {
-      return this.$store.state.game
-    },
-    isTurnBasedGame() {
-      return this.$store.state.game.settings.gameTime.gameType === 'turnBased'
-    },
-    isDarkModeExtra() {
-      return GameHelper.isDarkModeExtra(this.$store.state.game)
-    },
-    isConquestAllStars() {
-      return GameHelper.isConquestAllStars(this.$store.state.game)
-    },
-    isConquestHomeStars() {
-      return GameHelper.isConquestHomeStars(this.$store.state.game)
-    },
-    isKingOfTheHillMode() {
-      return GameHelper.isKingOfTheHillMode(this.$store.state.game)
-    },
-    isTeamConquest() {
-      return GameHelper.isTeamConquest(this.$store.state.game)
-    },
-    isStarCountWin() {
-      return GameHelper.isWinConditionStarCount(this.$store.state.game)
-    },
-    isHomeStarCountWinCondition() {
-      return GameHelper.isWinConditionHomeStars(this.$store.state.game)
-    },
-    canReadyToQuit() {
-      return this.$store.state.game.settings.general.readyToQuit === 'enabled'
-        && this.$store.state.game.state.startDate
-        && this.$store.state.game.state.productionTick
-    },
-    isTeamGame () {
-      return GameHelper.isTeamConquest(this.$store.state.game)
-    },
+const recalculateTimeRemaining = () => {
+  if (GameHelper.isRealTimeGame(game.value)) {
+    timeRemaining.value = `Next tick: ${GameHelper.getCountdownTimeStringByTicks(game.value, 1)}`;
+  } else if (GameHelper.isTurnBasedGame(game.value)) {
+    timeRemaining.value = `Next turn: ${GameHelper.getCountdownTimeStringForTurnTimeout(game.value)}`;
   }
-}
+};
+
+const getWinnerAlias = () => game.value.state.winner && GameHelper.getPlayerById(game.value, game.value.state.winner)?.alias;
+const getWinningTeam = () => game.value.state.winningTeam && GameHelper.getTeamById(game.value, game.value.state.winningTeam)?.name;
+
+const getAvatarImage = (player: Player<string>) => {
+  try {
+    return new URL(`../../../../assets/avatars/${player.avatar}`, import.meta.url).href;
+  } catch (err) {
+    console.error(err);
+    return null
+  }
+};
+
+const onCloseRequested = () => emit('onCloseRequested');
+const onViewSettingsRequested = () => emit('onViewSettingsRequested');
+const onOpenPlayerDetailRequested = (playerId: string) => emit('onOpenPlayerDetailRequested', playerId);
+
+const quitGame = async () => {
+  isQuittingGame.value = true
+
+  try {
+    const response = await gameService.quitGame(game.value._id);
+
+    if (response.status === 200) {
+      AudioService.quit()
+      toast.error(`You have quit ${game.value.settings.general.name}.`)
+      router.push({ name: 'main-menu' })
+    }
+  } catch (err) {
+    console.error(err);
+  }
+
+  isQuittingGame.value = false;
+};
+
+const confirmReady = async (player: Player<string>) => {
+  if (!await confirm('End Turn', 'Are you sure you want to end your turn?')) {
+    return
+  }
+
+  try {
+    const response = await gameService.confirmReady(game.value._id)
+
+    if (response.status === 200) {
+      toast.success(`You have confirmed your move, once all players are ready the game will progress automatically.`)
+
+      player.ready = true
+    }
+  } catch (err) {
+    console.error(err)
+  }
+};
+
+const confirmReadyToCycle = async (player: Player<string>) => {
+  if (!await confirm('End Cycle', 'Are you sure you want to end your turn up to the end of the current galactic cycle?')) {
+    return;
+  }
+
+  try {
+    const response = await gameService.confirmReadyToCycle(game.value._id);
+
+    if (response.status === 200) {
+      toast.success(`You have confirmed your move, once all players are ready the game will progress automatically.`)
+
+      player.ready = true
+      player.readyToCycle = true
+    }
+  } catch (err) {
+    console.error(err)
+  }
+};
+
+const unconfirmReady = async (player: Player<string>) => {
+  if (!isUserPlayer(player)) {
+    return;
+  }
+
+  try {
+    const response = await gameService.unconfirmReady(game.value._id);
+
+    if (response.status === 200) {
+      player.ready = false;
+      player.readyToCycle = false;
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const confirmReadyToQuit = async (player: Player<string>) => {
+  if (!isUserPlayer(player) || isHistoricalMode.value) {
+    return;
+  }
+
+  let rtqFractionMessage = '';
+  if (game.value.settings.general.readyToQuitFraction) {
+    const percent = game.value.settings.general.readyToQuitFraction * 100;
+    rtqFractionMessage = ` (or ${percent}% by star count out of all stars)`;
+  }
+
+  if (!await confirm('Ready to Quit?', `Are you sure you want declare that you are ready to quit? If all active players${rtqFractionMessage} declare ready to quit then the game will end early.`)) {
+    return
+  }
+
+  try {
+    const response = await gameService.confirmReadyToQuit(game.value._id);
+
+    if (response.status === 200) {
+      toast.success(`You have confirmed that you are ready to quit.`);
+
+      player.readyToQuit = true;
+    }
+  } catch (err) {
+    console.error(err)
+  }
+};
+
+const unconfirmReadyToQuit = async (player: Player<string>) => {
+  if (!isUserPlayer(player) || isHistoricalMode.value) {
+    return;
+  }
+
+  try {
+    const response = await gameService.unconfirmReadyToQuit(game.value._id);
+
+    if (response.status === 200) {
+      player.readyToQuit = false;
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+onMounted(() => {
+  activeTab.value = isTeamConquest.value ? 'team': 'player';
+
+  players.value = game.value.galaxy.players;
+
+  recalculateTimeRemaining();
+
+  if (GameHelper.isGameInProgress(game.value) || GameHelper.isGamePendingStart(game.value)) {
+    intervalFunction.value = setInterval(recalculateTimeRemaining, 250);
+  }
+});
+
+onUnmounted(() => {
+  clearInterval(intervalFunction.value);
+});
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
