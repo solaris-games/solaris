@@ -46,10 +46,12 @@
 import LoadingSpinnerVue from '../../../components/LoadingSpinner.vue'
 import gameService from '../../../../services/api/game'
 import GameHelper from '../../../../services/gameHelper'
+import CountdownTimer from '../CountdownTimer.vue';
 
 export default {
   components: {
-    'loading-spinner': LoadingSpinnerVue
+    'loading-spinner': LoadingSpinnerVue,
+    'countdown-timer': CountdownTimer,
   },
   data() {
     return {
