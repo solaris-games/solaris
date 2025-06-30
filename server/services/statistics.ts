@@ -83,10 +83,10 @@ export default class StatisticsService {
         return this.statsSliceRepository.findOne({ gameId, playerId });
     }
 
-    async modifyStats(gameId: DBObjectId, playerId: DBObjectId, modif: (stats: StatsSlice<DBObjectId>) => void) {
+    async modifyStats(gameId: DBObjectId, playerId: DBObjectId, modif: (stats: Statistics) => void) {
         const statsSlice = await this.getOrCreateSliceActive(gameId, playerId);
 
-        modif(statsSlice);
+        modif(statsSlice.stats);
 
         // @ts-ignore
         statsSlice.save();

@@ -19,6 +19,7 @@ import { Player, PlayerReputation, ResearchTypeNotRandom } from './types/Player'
 import { TradeEvent, TradeEventTechnology, TradeTechnology } from './types/Trade';
 import { User } from './types/User';
 import UserService from './user';
+import StatisticsService from './statistics';
 
 export const TradeServiceEvents = {
     onPlayerCreditsReceived: 'onPlayerCreditsReceived',
@@ -44,6 +45,7 @@ export default class TradeService extends EventEmitter {
     randomService: RandomService;
     playerCreditsService: PlayerCreditsService;
     playerAfkService: PlayerAfkService;
+    statisticsService: StatisticsService;
 
     constructor(
         gameRepo: Repository<Game>,
@@ -57,7 +59,8 @@ export default class TradeService extends EventEmitter {
         gameTypeService: GameTypeService,
         randomService: RandomService,
         playerCreditsService: PlayerCreditsService,
-        playerAfkService: PlayerAfkService
+        playerAfkService: PlayerAfkService,
+        statisticsService: StatisticsService,
     ) {
         super();
 
@@ -73,6 +76,7 @@ export default class TradeService extends EventEmitter {
         this.randomService = randomService;
         this.playerCreditsService = playerCreditsService;
         this.playerAfkService = playerAfkService;
+        this.statisticsService = statisticsService;
     }
 
     isTradingCreditsDisabled(game: Game) {
