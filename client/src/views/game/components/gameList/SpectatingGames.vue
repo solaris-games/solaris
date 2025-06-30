@@ -6,8 +6,8 @@
       <thead class="table-dark">
         <tr>
           <td>Name</td>
-          <td class="d-none d-sm-table-cell text-end">Players</td>
           <td>Cycle/Turn</td>
+          <td class="d-none d-sm-table-cell text-end">Players</td>
           <td></td>
         </tr>
       </thead>
