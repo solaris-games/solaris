@@ -199,8 +199,8 @@ const recalculateTimeRemaining = () => {
   }
 };
 
-const getWinnerAlias = () => game.value.state.winner && GameHelper.getPlayerById(game.value, game.value.state.winner);
-const getWinningTeam = () => game.value.state.winningTeam && GameHelper.getTeamById(game.value, game.value.state.winningTeam);
+const getWinnerAlias = () => game.value.state.winner && GameHelper.getPlayerById(game.value, game.value.state.winner)?.alias;
+const getWinningTeam = () => game.value.state.winningTeam && GameHelper.getTeamById(game.value, game.value.state.winningTeam)?.name;
 
 const getAvatarImage = (player: Player<string>) => {
   try {

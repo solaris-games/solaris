@@ -1,7 +1,7 @@
 import moment, {type Moment} from 'moment'
 import DiplomacyHelper from './diplomacyHelper.js'
 import type {Carrier, Game, Player, Star} from "../types/game";
-import type {Location, MapObject} from '@solaris-common';
+import type {Location, MapObject, Team} from '@solaris-common';
 import type {RulerPoint} from '@/types/ruler';
 
 class GameHelper {
@@ -1318,9 +1318,9 @@ class GameHelper {
     return game.galaxy.teams.find(t => t.players.includes(player._id));
   }
 
-  getTeamById(game, teamId) {
+  getTeamById(game: Game, teamId: string): Team<string> | undefined {
     if (!game.galaxy.teams) {
-      return null;
+      return undefined;
     }
 
     return game.galaxy.teams.find(t => t._id === teamId);
