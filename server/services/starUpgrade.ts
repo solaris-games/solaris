@@ -21,6 +21,7 @@ import StarService from './star';
 import TechnologyService from './technology';
 import PlayerCreditsService from './playerCredits';
 import ShipService from "./ship";
+import StatisticsService from "./statistics";
 
 const Heap = require('qheap');
 
@@ -50,6 +51,7 @@ export default class StarUpgradeService extends EventEmitter {
     playerCreditsService: PlayerCreditsService;
     gameTypeService: GameTypeService;
     shipService: ShipService;
+    statisticsService: StatisticsService;
 
     constructor(
         gameRepo: Repository<Game>,
@@ -60,7 +62,8 @@ export default class StarUpgradeService extends EventEmitter {
         technologyService: TechnologyService,
         playerCreditsService: PlayerCreditsService,
         gameTypeService: GameTypeService,
-        shipService: ShipService
+        shipService: ShipService,
+        statisticsService: StatisticsService,
     ) {
         super();
 
@@ -73,6 +76,7 @@ export default class StarUpgradeService extends EventEmitter {
         this.playerCreditsService = playerCreditsService;
         this.gameTypeService = gameTypeService;
         this.shipService = shipService;
+        this.statisticsService = statisticsService;
     }
 
     async buildWarpGate(game: Game, player: Player, starId: DBObjectId) {
@@ -117,7 +121,9 @@ export default class StarUpgradeService extends EventEmitter {
         ]);
 
         if (player.userId && !player.defeated && !this.gameTypeService.isTutorialGame(game)) {
-            await this.achievementService.incrementWarpGatesBuilt(player.userId);
+            await this.statisticsService.modifyStats(game._id, player._id, (stats) => {
+                stats.infrastructure.warpGates += 1;
+            });
         }
 
         return {
@@ -145,7 +151,9 @@ export default class StarUpgradeService extends EventEmitter {
         ]);
 
         if (player.userId && !player.defeated && !this.gameTypeService.isTutorialGame(game)) {
-            await this.achievementService.incrementWarpGatesDestroyed(player.userId);
+            await this.statisticsService.modifyStats(game._id, player._id, (stats) => {
+                stats.infrastructure.warpGatesDestroyed += 1;
+            });
         }
     }
 
@@ -235,7 +243,9 @@ export default class StarUpgradeService extends EventEmitter {
         }
 
         if (player.userId && !player.defeated && !this.gameTypeService.isTutorialGame(game)) {
-            await this.achievementService.incrementCarriersBuilt(player.userId);
+            await this.statisticsService.modifyStats(game._id, player._id, (stats) => {
+                stats.infrastructure.carriers += 1;
+            });
         }
 
         carrier.effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, true);
@@ -319,7 +329,9 @@ export default class StarUpgradeService extends EventEmitter {
         await this.gameRepo.bulkWrite(dbWrites);
 
         if (player.userId && !player.defeated && !this.gameTypeService.isTutorialGame(game)) {
-            await this.achievementService.incrementInfrastructureBuilt(economyType, player.userId);
+            await this.statisticsService.modifyStats(game._id, player._id, (stats) => {
+                stats.infrastructure[economyType] += 1;
+            });
         }
     }
 
@@ -546,7 +558,9 @@ export default class StarUpgradeService extends EventEmitter {
 
         // Check for AI control.
         if (player.userId && !player.defeated && !this.gameTypeService.isTutorialGame(game)) {
-            await this.achievementService.incrementInfrastructureBuilt(infrastructureType, player.userId, upgradeSummary.upgraded);
+            await this.statisticsService.modifyStats(game._id, player._id, (stats) => {
+                stats.infrastructure[infrastructureType] += upgradeSummary.upgraded;
+            });
         }
 
         if (infrastructureType === 'science') {
@@ -578,7 +592,9 @@ export default class StarUpgradeService extends EventEmitter {
 
         // Check for AI control.
         if (player.userId && !player.defeated && !this.gameTypeService.isTutorialGame(game)) {
-            await this.achievementService.incrementInfrastructureBuilt(upgradeSummary.infrastructureType, player.userId, upgradeSummary.upgraded);
+            await this.statisticsService.modifyStats(game._id, player._id, (stats) => {
+                stats.infrastructure[upgradeSummary.infrastructureType] += upgradeSummary.upgraded;
+            });
         }
 
         this.emit(StarUpgradeServiceEvents.onPlayerInfrastructureBulkUpgraded, {

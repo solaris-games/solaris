@@ -65,4 +65,8 @@ export default class UserAchievementService {
     async incrementQuit(userId: DBObjectId, amount: number = 1) {
         return await this._incrementAchievement(userId, 'achievements.quit', amount);
     }
+
+    async incrementRenown(userId: DBObjectId, amount: number = 1) {
+        return await this._incrementAchievement(userId, 'achievements.renown', amount);
+    }
 };

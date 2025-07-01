@@ -138,12 +138,15 @@ export default class TradeService extends EventEmitter {
 
         if (!this.gameTypeService.isTutorialGame(game)) {
             if (fromPlayer.userId && !fromPlayer.defeated) {
-                await this.achievementService.incrementTradeCreditsSent(fromPlayer.userId, amount);
+                await this.statisticsService.modifyStats(game._id, fromPlayer._id, (stats) => {
+                    stats.trade.creditsSent += amount;
+                });
             }
 
             if (toPlayer.userId && !toPlayer.defeated) {
-                await this.achievementService.incrementTradeCreditsReceived(toPlayer.userId, amount);
-            }
+                await this.statisticsService.modifyStats(game._id, toPlayer._id, (stats) => {
+                    stats.trade.creditsReceived += amount;
+                });}
         }
 
         let reputationResult = await this.reputationService.tryIncreaseReputationCredits(game, toPlayer, fromPlayer, amount);
@@ -211,11 +214,15 @@ export default class TradeService extends EventEmitter {
 
         if (!this.gameTypeService.isTutorialGame(game)) {
             if (fromPlayer.userId && !fromPlayer.defeated) {
-                await this.achievementService.incrementTradeCreditsSpecialistsSent(fromPlayer.userId, amount);
+                await this.statisticsService.modifyStats(game._id, fromPlayer._id, (stats) => {
+                    stats.trade.creditsSpecialistsSent += amount;
+                });
             }
 
             if (toPlayer.userId && !toPlayer.defeated && toPlayer.userId) {
-                await this.achievementService.incrementTradeCreditsSpecialistsReceived(toPlayer.userId, amount);
+                await this.statisticsService.modifyStats(game._id, toPlayer._id, (stats) => {
+                    stats.trade.creditsSpecialistsReceived += amount;
+                });
             }
         }
 
@@ -292,11 +299,13 @@ export default class TradeService extends EventEmitter {
 
         if (!this.gameTypeService.isTutorialGame(game)) {
             if (fromPlayer.userId) {
-                await this.achievementService.incrementRenownSent(fromPlayer.userId, amount);
+                await this.statisticsService.modifyStats(game._id, fromPlayer._id, (stats) => {
+                    stats.trade.renownSent += amount;
+                });
             }
 
             if (toPlayer.userId) {
-                await this.achievementService.incrementRenownReceived(toPlayer.userId, amount);
+                await this.achievementService.incrementRenown(toPlayer.userId, amount);
             }
         }
 
@@ -358,11 +367,11 @@ export default class TradeService extends EventEmitter {
         // toPlayerTech.progress = 0;
         // fromPlayer.credits -= tradeTech.cost;
 
-        let updateResearchQuery = {};
+        const updateResearchQuery = {};
         updateResearchQuery['galaxy.players.$.research.' + tradeTech.name + '.level'] = tradeTech.level;
         updateResearchQuery['galaxy.players.$.research.' + tradeTech.name + '.progress'] = 0;
 
-        let dbWrites = [
+        const dbWrites = [
             await this.playerCreditsService.addCredits(game, fromPlayer, -tradeTech.cost, false),
             {
                 updateOne: {
@@ -382,28 +391,33 @@ export default class TradeService extends EventEmitter {
         if (!this.gameTypeService.isTutorialGame(game)) {
             // Need to assert that the trading players aren't controlled by AI
             // and the player user has an account.
+
             if (toPlayer.userId && !toPlayer.defeated) {
-                await this.achievementService.incrementTradeTechnologyReceived(toPlayer.userId, 1);
+                await this.statisticsService.modifyStats(game._id, toPlayer._id, (stats) => {
+                    stats.trade.technologyReceived += 1;
+                });
             }
 
             if (fromPlayer.userId && !fromPlayer.defeated) {
-                await this.achievementService.incrementTradeTechnologySent(fromPlayer.userId, 1);
+                await this.statisticsService.modifyStats(game._id, fromPlayer._id, (stats) => {
+                    stats.trade.technologySent += 1;
+                });
             }
         }
 
-        let eventTechnology: TradeEventTechnology = {
+        const eventTechnology: TradeEventTechnology = {
             name: tradeTech.name,
             level: tradeTech.level,
             difference: levelDifference
         };
 
-        let reputationResult = await this.reputationService.tryIncreaseReputationTechnology(game, toPlayer, fromPlayer, eventTechnology);
+        const reputationResult = await this.reputationService.tryIncreaseReputationTechnology(game, toPlayer, fromPlayer, eventTechnology);
 
         if (reputationResult.increased) {
             await this.tryTradeBack(game, toPlayer, fromPlayer, reputationResult.rep.reputation);
         }
 
-        let eventObject = {
+        const eventObject = {
             gameId: game._id,
             gameTick: game.state.tick,
             fromPlayer,
