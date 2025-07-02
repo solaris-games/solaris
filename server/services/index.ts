@@ -230,7 +230,7 @@ export default (config: Config,
     const userServerSocketHandler = new UserServerSocketHandler(socketService, serverHandler);
     const leaderboardService = new LeaderboardService(playerService, playerAfkService, userLevelService, ratingService, gameService, gameTypeService, gameStateService, badgeService, playerStatisticsService, teamService);
     const userLeaderboardService = new UserLeaderboardService(userRepository, guildUserService);
-    const combatService = new CombatService(technologyService, specialistService, playerService, starService, reputationService, diplomacyService, gameTypeService, starCaptureService);
+    const combatService = new CombatService(technologyService, specialistService, playerService, starService, reputationService, diplomacyService, gameTypeService, starCaptureService, statisticsService);
     const historyService = new HistoryService(historyRepository, playerService, gameService, playerStatisticsService, gameStateService);
     const waypointService = new WaypointService(gameRepository, carrierService, starService, distanceService, starDistanceService, technologyService, gameService, playerService, carrierMovementService, gameMaskingService, historyService);
     const specialistBanService = new SpecialistBanService(specialistService);
