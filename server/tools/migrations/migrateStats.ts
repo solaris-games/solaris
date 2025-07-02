@@ -140,5 +140,5 @@ export const migrateStats = async (ctx: JobParameters) => {
         page++;
     } while (page <= totalPages)
 
-    log.info("Finished migrating stats slices");
+    log.info("Finished migrating user achievements");
 };
