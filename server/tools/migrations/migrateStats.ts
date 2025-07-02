@@ -90,6 +90,7 @@ const moveStats = (user: User) => {
         rank: oldAchievements.rank,
         eloRating: oldAchievements.eloRating,
         renown: oldAchievements.renown,
+        renownSent: oldAchievements.trade.renownSent,
         joined: oldAchievements.joined,
         completed: oldAchievements.completed,
         quit: oldAchievements.quit,

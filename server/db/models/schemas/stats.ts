@@ -51,7 +51,6 @@ const schema = {
         technologyReceived: {type: Types.Number, default: 0},
         giftsSent: {type: Types.Number, default: 0},
         giftsReceived: {type: Types.Number, default: 0},
-        renownSent: {type: Types.Number, default: 0},
     },
 };
 

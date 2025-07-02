@@ -299,9 +299,7 @@ export default class TradeService extends EventEmitter {
 
         if (!this.gameTypeService.isTutorialGame(game)) {
             if (fromPlayer.userId) {
-                await this.statisticsService.modifyStats(game._id, fromPlayer._id, (stats) => {
-                    stats.trade.renownSent += amount;
-                });
+                await this.achievementService.incrementRenownSent(fromPlayer.userId, amount);
             }
 
             if (toPlayer.userId) {

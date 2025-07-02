@@ -45,6 +45,7 @@ const schema = new Schema({
         defeated: {type: Types.Number, default: 0},
         defeated1v1: {type: Types.Number, default: 0},
         afk: {type: Types.Number, default: 0},
+        renownSent: {type: Types.Number, default: 0},
         stats: StatsSchema,
         legacyStats: StatsSchema,
         badges: [BadgeSchema],

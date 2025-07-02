@@ -47,6 +47,5 @@ export type Statistics = {
         technologyReceived: number;
         giftsSent: number;
         giftsReceived: number;
-        renownSent: number;
     },
 }

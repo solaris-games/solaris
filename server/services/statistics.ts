@@ -51,7 +51,6 @@ const EMPTY_STATS: Statistics = {
         technologySent: 0,
         giftsReceived: 0,
         giftsSent: 0,
-        renownSent: 0,
     },
 };
 
