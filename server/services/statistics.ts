@@ -1,5 +1,5 @@
 import Repository from "./repository";
-import {StatsSlice, Statistics} from "solaris-common";
+import {StatsSlice, Statistics, UserAchievements} from "solaris-common";
 import {DBObjectId} from "./types/DBObjectId";
 import {Game} from "./types/Game";
 import {logger} from "../utils/logging";
@@ -131,6 +131,60 @@ export default class StatisticsService {
         });
     }
 
+    _sumStats(stats: Statistics, newStats: Statistics): Statistics {
+        return {
+            combat: {
+                kills: {
+                    ships: stats.combat.kills.ships + newStats.combat.kills.ships,
+                    carriers: stats.combat.kills.carriers + newStats.combat.kills.carriers,
+                    specialists: stats.combat.kills.specialists + newStats.combat.kills.specialists,
+                },
+                losses: {
+                    ships: stats.combat.losses.ships + newStats.combat.losses.ships,
+                    carriers: stats.combat.losses.carriers + newStats.combat.losses.carriers,
+                    specialists: stats.combat.losses.specialists + newStats.combat.losses.specialists,
+                },
+                stars: {
+                    captured: stats.combat.stars.captured + newStats.combat.stars.captured,
+                    lost: stats.combat.stars.lost + newStats.combat.stars.lost,
+                },
+                homeStars: {
+                    captured: stats.combat.homeStars.captured + newStats.combat.homeStars.captured,
+                    lost: stats.combat.homeStars.lost + newStats.combat.homeStars.lost,
+                },
+            },
+            infrastructure: {
+                economy: stats.infrastructure.economy + newStats.infrastructure.economy,
+                industry: stats.infrastructure.industry + newStats.infrastructure.industry,
+                science: stats.infrastructure.science + newStats.infrastructure.science,
+                warpGates: stats.infrastructure.warpGates + newStats.infrastructure.warpGates,
+                warpGatesDestroyed: stats.infrastructure.warpGatesDestroyed + newStats.infrastructure.warpGatesDestroyed,
+                carriers: stats.infrastructure.carriers + newStats.infrastructure.carriers,
+                specialistsHired: stats.infrastructure.specialistsHired + newStats.infrastructure.specialistsHired,
+            },
+            research: {
+                scanning: stats.research.scanning + newStats.research.scanning,
+                hyperspace: stats.research.hyperspace + newStats.research.hyperspace,
+                banking: stats.research.banking + newStats.research.banking,
+                experimentation: stats.research.experimentation + newStats.research.experimentation,
+                weapons: stats.research.weapons + newStats.research.weapons,
+                manufacturing: stats.research.manufacturing + newStats.research.manufacturing,
+                specialists: stats.research.specialists + newStats.research.specialists,
+                terraforming: stats.research.terraforming + newStats.research.terraforming,
+            },
+            trade: {
+                creditsSent: stats.trade.creditsSent + newStats.trade.creditsSent,
+                creditsReceived: stats.trade.creditsReceived + newStats.trade.creditsReceived,
+                creditsSpecialistsReceived: stats.trade.creditsSpecialistsReceived + newStats.trade.creditsSpecialistsReceived,
+                creditsSpecialistsSent: stats.trade.creditsSpecialistsSent + newStats.trade.creditsSpecialistsSent,
+                technologyReceived: stats.trade.technologyReceived + newStats.trade.technologyReceived,
+                technologySent: stats.trade.technologySent + newStats.trade.technologySent,
+                giftsReceived: stats.trade.giftsReceived + newStats.trade.giftsReceived,
+                giftsSent: stats.trade.giftsSent + newStats.trade.giftsSent,
+            },
+        }
+    }
+
     async processSlice(game: Game, slice: StatsSlice<DBObjectId>) {
         const player = game.galaxy.players.find(p => p._id.toString() === slice.playerId.toString());
 
@@ -149,13 +203,25 @@ export default class StatisticsService {
             return;
         }
 
-        const user = await this.userService.getByIdActive(player.userId!);
+        const user = await this.userService.getById(player.userId!);
 
         if (!user) {
             log.warn(`User with ID ${player.userId} not found, skipping slice processing for player ${slice.playerId}.`);
             return;
         }
 
+        try {
+            const newStats = this._sumStats(user.achievements.stats, slice.stats);
 
+            await this.userService.userRepo.updateOne({
+                _id: user._id
+            }, {
+                $set: {
+                    "achievements.stats": newStats,
+                }
+            });
+        } catch (e: any) {
+            log.error(e, `Error processing slice for player ${slice.playerId} in game ${game._id}: ${e['message']}`);
+        }
     }
 }
