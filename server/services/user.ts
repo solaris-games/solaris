@@ -56,6 +56,10 @@ export default class UserService extends EventEmitter {
         return await this.userRepo.findById(id, select);
     }
 
+    async getByIdActive(id: DBObjectId, select: any | null = null): Promise<User | null> {
+        return await this.userRepo.findByIdAsModel(id, select);
+    }
+
     async getByUsername(username: string, select: any | null = null) {
         return await this.userRepo.findOne({
             username

@@ -12,6 +12,7 @@ import { cleanupOldTutorialsJob } from './jobs/cleanupOldTutorials';
 import { serverStub } from "../sockets/serverStub";
 import {Scheduler, SchedulerOptions} from "./scheduler/scheduler";
 import events from "node:events";
+import {sumGameStatisticsJob} from "./jobs/sumGameStatistics";
 
 let mongo;
 Error.stackTraceLimit = 1000;
@@ -78,7 +79,12 @@ async function startup() {
             name: 'cleanup-old-tutorials',
             job: cleanupOldTutorialsJob(container),
             interval: ONE_DAY
-        }
+        },
+        {
+            name: 'sum-game-statistics',
+            job: sumGameStatisticsJob(container),
+            interval: ONE_HOUR,
+        },
     ], schedulerOptions);
 
     await scheduler.startup();

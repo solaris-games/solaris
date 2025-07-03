@@ -165,7 +165,7 @@ export default (config: Config,
 
     const announcementService = new AnnouncementService(AnnouncementModel, announcementRepository, userService);
 
-    const statisticsService = new StatisticsService(statsSliceRepository);
+    const statisticsService = new StatisticsService(statsSliceRepository, userService);
 
     const gameMaskingService = new GameMaskingService();
     const gameLockService = new GameLockService(gameRepository);

@@ -2,6 +2,8 @@ import Repository from "./repository";
 import {StatsSlice, Statistics} from "solaris-common";
 import {DBObjectId} from "./types/DBObjectId";
 import {Game} from "./types/Game";
+import {logger} from "../utils/logging";
+import UserService from "./user";
 
 const EMPTY_STATS: Statistics = {
     combat: {
@@ -55,11 +57,15 @@ const EMPTY_STATS: Statistics = {
     },
 };
 
+const log = logger("Statistics Service");
+
 export default class StatisticsService {
     statsSliceRepository: Repository<StatsSlice<DBObjectId>>;
+    userService: UserService;
 
-    constructor(statsSliceRepository: Repository<StatsSlice<DBObjectId>>) {
+    constructor(statsSliceRepository: Repository<StatsSlice<DBObjectId>>, userService: UserService) {
         this.statsSliceRepository = statsSliceRepository;
+        this.userService = userService;
     }
 
     async getSliceActive(gameId: DBObjectId, playerId: DBObjectId): Promise<StatsSlice<DBObjectId> | null> {
@@ -116,5 +122,40 @@ export default class StatisticsService {
         if (bulkOps.length > 0) {
             await this.statsSliceRepository.bulkWrite(bulkOps);
         }
+    }
+
+    async getClosedUnprocessedSlicesActive(): Promise<StatsSlice<DBObjectId>[]> {
+        return this.statsSliceRepository.findAsModels({
+            closed: true,
+            processed: false,
+        });
+    }
+
+    async processSlice(game: Game, slice: StatsSlice<DBObjectId>) {
+        const player = game.galaxy.players.find(p => p._id.toString() === slice.playerId.toString());
+
+        if (!player) {
+            log.warn(`Player with ID ${slice.playerId} not found in game ${game._id}, skipping slice processing.`);
+            return;
+        }
+
+        if (slice.processed) {
+            log.warn(`Slice for player ${slice.playerId} in game ${game._id} is already processed, skipping.`);
+            return;
+        }
+
+        if (!slice.closed) {
+            log.warn(`Slice for player ${slice.playerId} in game ${game._id} is not closed, skipping.`);
+            return;
+        }
+
+        const user = await this.userService.getByIdActive(player.userId!);
+
+        if (!user) {
+            log.warn(`User with ID ${player.userId} not found, skipping slice processing for player ${slice.playerId}.`);
+            return;
+        }
+
+
     }
 }
