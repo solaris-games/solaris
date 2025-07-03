@@ -4,11 +4,11 @@ import config from '../config';
 import mongooseLoader from '../db';
 import containerLoader from '../services';
 
-import { gameTickJob } from './gameTick';
-import { officialGamesCheckJob } from './officialGamesCheck';
-import { cleanupGamesTimedOutJob } from './cleanupGamesTimedOut';
-import { cleanupOldGameHistoryJob } from './cleanupOldGameHistory';
-import { cleanupOldTutorialsJob } from './cleanupOldTutorials';
+import { gameTickJob } from './jobs/gameTick';
+import { officialGamesCheckJob } from './jobs/officialGamesCheck';
+import { cleanupGamesTimedOutJob } from './jobs/cleanupGamesTimedOut';
+import { cleanupOldGameHistoryJob } from './jobs/cleanupOldGameHistory';
+import { cleanupOldTutorialsJob } from './jobs/cleanupOldTutorials';
 import { serverStub } from "../sockets/serverStub";
 import {Scheduler, SchedulerOptions} from "./scheduler/scheduler";
 import events from "node:events";
