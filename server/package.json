@@ -12,6 +12,8 @@
     "start-db-migrate:prod": "node dist/server/tools/migrate.js",
     "start-db-recalc-ranks:dev": "ts-node-dev --transpile-only --respawn --inspect=9234 tools/recalculateRankings.ts",
     "start-db-recalc-ranks:prod": "node dist/server/tools/recalculateRankings.js",
+    "start-db-recalc-stats:dev": "ts-node-dev --transpile-only --respawn --inspect=9234 tools/recalculateStats.ts",
+    "start-db-recalc-stats:prod": "node dist/server/tools/recalculateStats.js",
     "restore-game": "ts-node-dev --transpile-only tools/restoreGame.ts",
     "prebuild": "rm -rf ./dist",
     "build": "tsc",
