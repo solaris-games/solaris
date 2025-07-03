@@ -1,6 +1,7 @@
 import Repository from "./repository";
 import {StatsSlice, Statistics} from "solaris-common";
 import {DBObjectId} from "./types/DBObjectId";
+import {Game} from "./types/Game";
 
 const EMPTY_STATS: Statistics = {
     combat: {
@@ -78,6 +79,13 @@ export default class StatisticsService {
         });
     }
 
+    async _getSlicesForGame(gameId: DBObjectId): Promise<StatsSlice<DBObjectId>[]> {
+        return this.statsSliceRepository.find({
+            gameId,
+            closed: false,
+        });
+    }
+
     async getSlice(gameId: DBObjectId, playerId: DBObjectId) {
         return this.statsSliceRepository.findOne({ gameId, playerId });
     }
@@ -89,5 +97,24 @@ export default class StatisticsService {
 
         // @ts-ignore
         statsSlice.save();
+    }
+
+    async closeStatsSlicesForGame(game: Game) {
+        const slices = await this._getSlicesForGame(game._id);
+
+        const bulkOps = slices.map(slice => ({
+            updateOne: {
+                filter: { _id: slice._id },
+                update: {
+                    $set: {
+                        closed: true,
+                    }
+                }
+            }
+        }));
+
+        if (bulkOps.length > 0) {
+            await this.statsSliceRepository.bulkWrite(bulkOps);
+        }
     }
 }
