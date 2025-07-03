@@ -2,6 +2,7 @@ import {logger} from "../../utils/logging";
 import {DependencyContainer} from "../../services/types/DependencyContainer";
 import {StatsSlice} from "solaris-common";
 import {DBObjectId, objectIdFromString} from "../../services/types/DBObjectId";
+import {groupBy} from "../../services/utils";
 
 const log = logger("Sum game statistics Job");
 
@@ -12,17 +13,7 @@ export const sumGameStatisticsJob = (container: DependencyContainer) => async ()
 
         const slices = await statisticsService.getClosedUnprocessedSlicesActive();
 
-        const gamesToSlices = new Map<string, StatsSlice<DBObjectId>[]>();
-
-        for (let slice of slices) {
-            const gameId = slice.gameId.toString();
-
-            if (!gamesToSlices.has(gameId)) {
-                gamesToSlices.set(gameId, []);
-            }
-
-            gamesToSlices.get(gameId)!.push(slice);
-        }
+        const gamesToSlices = groupBy(slices, (slice: StatsSlice<DBObjectId>) => slice.gameId.toString());
 
         for (let [gameId, slicesForGame] of gamesToSlices) {
             const game = await gameService.getByIdLean(objectIdFromString(gameId), {
