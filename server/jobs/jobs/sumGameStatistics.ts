@@ -34,6 +34,9 @@ export const sumGameStatisticsJob = (container: DependencyContainer) => async ()
 
             for (let slice of slicesForGame) {
                 await statisticsService.processSlice(game, slice);
+
+                // @ts-ignore
+                await slice.save();
             }
         }
     } catch (e) {

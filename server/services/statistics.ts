@@ -220,6 +220,8 @@ export default class StatisticsService {
                     "achievements.stats": newStats,
                 }
             });
+
+            slice.processed = true;
         } catch (e: any) {
             log.error(e, `Error processing slice for player ${slice.playerId} in game ${game._id}: ${e['message']}`);
         }
