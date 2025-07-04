@@ -119,12 +119,6 @@ export class Map {
 
     this.pathManager = new PathManager( game, userSettings, this )
 
-    // Cleanup events
-    this.stars.forEach(s => s.removeAllListeners())
-    this.carriers.forEach(s => s.removeAllListeners())
-
-    this.chunks = new Chunks();
-
     this.backgroundContainer = new PIXI.Container()
     this.backgroundContainer.zIndex = 0;
     this.territoryContainer = new PIXI.Container()
@@ -148,20 +142,6 @@ export class Map {
     this.tooltipContainer.zIndex = 8;
     this.pathManager!.container.zIndex = 7;
 
-    this.container.addChild(this.backgroundContainer)
-    this.container.addChild(this.territoryContainer)
-    this.container.addChild(this.wormHoleContainer)
-    this.container.addChild(this.pathManager!.container)
-    this.container.addChild(this.rulerPointContainer)
-    this.container.addChild(this.chunks!.chunksContainer)
-    this.container.addChild(this.orbitalContainer)
-    this.container.addChild(this.starContainer)
-    this.container.addChild(this.highlightLocationsContainer)
-    this.container.addChild(this.playerNamesContainer)
-    this.container.addChild(this.tooltipContainer)
-    this.container.addChild(this.waypointContainer)
-    this.container.sortChildren();
-
     // Reset the canvas
     this.stars = []
     this.carriers = []
@@ -175,6 +155,8 @@ export class Map {
     for (let i = 0; i < game.galaxy.carriers.length; i++) {
       this.setupCarrier(game, userSettings, game.galaxy.carriers[i])
     }
+
+    this.chunks = new Chunks(game, this.stars, this.carriers);
 
     this.waypoints = new Waypoints()
     this.waypoints.setup(game, this.context)
@@ -232,12 +214,23 @@ export class Map {
       this.orbitalContainer!.addChild(this.orbitalLayer.container)
     }
 
-    // Setup Chunks
-    this.chunks.setup(game, this.stars, this.carriers);
-
     this.tooltipLayer = new TooltipLayer()
     this.tooltipLayer.setup(this.game, this.context)
     this.tooltipContainer!.addChild(this.tooltipLayer.container)
+
+    this.container.addChild(this.backgroundContainer)
+    this.container.addChild(this.territoryContainer)
+    this.container.addChild(this.wormHoleContainer)
+    this.container.addChild(this.pathManager!.container)
+    this.container.addChild(this.rulerPointContainer)
+    this.container.addChild(this.chunks.chunksContainer)
+    this.container.addChild(this.orbitalContainer)
+    this.container.addChild(this.starContainer)
+    this.container.addChild(this.highlightLocationsContainer)
+    this.container.addChild(this.playerNamesContainer)
+    this.container.addChild(this.tooltipContainer)
+    this.container.addChild(this.waypointContainer)
+    this.container.sortChildren();
 
     this.unsubscribe = this.subscribe();
   }
@@ -470,7 +463,7 @@ export class Map {
     this.waypoints!.setup(game, this.context)
     this.tooltipLayer!.setup(game, this.context)
 
-    this.chunks!.setup(game, this.stars, this.carriers);
+    this.chunks.update(game, this.stars, this.carriers);
   }
 
 

@@ -221,7 +221,7 @@ export class Background {
     }
   }
 
-  onTick (deltaTime, viewportData) {
+  onTick (deltaTime: number, viewportData) {
     this.time += deltaTime*1000
     let compressedTime = this.time*this.timeScale
     for (let i = 0; i < this.container.children.length; i++) {
