@@ -1,13 +1,15 @@
 import * as PIXI from 'pixi.js'
 import {EventEmitter} from "./eventEmitter";
 import type { Game } from '../types/game';
-import type { Location } from '@solaris-common';
+import type { RulerPoint } from '@/types/ruler';
 
-type RulerPoint = {
-  location: Location,
+type Events = {
+  onRulerPointsCleared: undefined,
+  onRulerPointRemoved: RulerPoint,
+  onRulerPointCreated: RulerPoint,
 }
 
-export class RulerPoints extends EventEmitter {
+export class RulerPoints extends EventEmitter<keyof Events, Events> {
   container: PIXI.Container;
   game: Game | undefined;
   rulerPoints: RulerPoint[] = [];
@@ -78,15 +80,15 @@ export class RulerPoints extends EventEmitter {
   }
 
   drawHyperspaceRange () {
-    let lastPoint = this.rulerPoints[this.rulerPoints.length - 1]
+    const lastPoint = this.rulerPoints[this.rulerPoints.length - 1];
 
     if (!lastPoint) {
-      return
+      return;
     }
 
-    let graphics = new PIXI.Graphics()
+    const graphics = new PIXI.Graphics();
 
-    let radius = ((this.techLevel || 1) + 1.5) * this.lightYearDistance
+    const radius = ((this.techLevel || 1) + 1.5) * this.lightYearDistance;
 
     graphics.star(lastPoint.location.x, lastPoint.location.y, radius, radius, radius - 3)
 
@@ -125,12 +127,12 @@ export class RulerPoints extends EventEmitter {
   removeLastRulerPoint () {
     const old = this.rulerPoints.pop()
 
-    this.draw()
+    this.draw();
 
-    this.emit('onRulerPointRemoved', old)
+    this.emit('onRulerPointRemoved', old);
   }
 
-  _createRulerPoint (desiredPoint) {
+  _createRulerPoint (desiredPoint: Omit<RulerPoint, 'distance'>) {
     let lastPoint = this.rulerPoints[this.rulerPoints.length - 1]
 
     if (lastPoint &&
@@ -139,11 +141,16 @@ export class RulerPoints extends EventEmitter {
       return
     }
 
-    desiredPoint.distance = this.rulerPoints.push(desiredPoint)
+    const newPoint = {
+      ...desiredPoint,
+      distance: this.rulerPoints.length + 1,
+    };
+
+    this.rulerPoints.push(newPoint);
 
     this.draw()
 
-    this.emit('onRulerPointCreated', desiredPoint)
+    this.emit('onRulerPointCreated', newPoint);
   }
 }
 

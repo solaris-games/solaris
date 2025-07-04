@@ -303,8 +303,8 @@ export class Map {
     let star = this.stars.find(x => x.data._id === starData._id)
 
     if (!star) {
-      star = new Star(this.app)
-      this.stars.push(star)
+      star = new Star(this.app, this.game, starData, userSettings, this.context);
+      this.stars.push(star);
 
       this.starContainer!.addChild(star.fixedContainer)
 
@@ -315,9 +315,9 @@ export class Map {
       star.on('onStarMouseOut', this.onStarMouseOut.bind(this))
       star.on('onSelected', this.onStarSelected.bind(this))
       star.on('onUnselected', this.onStarUnselected.bind(this))
+    } else {
+      star.update(this.game, starData, userSettings);
     }
-
-    star.setup(this.game, starData, userSettings, this.context, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
 
     return star
   }
@@ -428,7 +428,7 @@ export class Map {
       let existing = this.stars.find(x => x.data._id === starData._id)
 
       if (existing) {
-        existing.setup(this.game, starData, userSettings, this.context, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
+        existing.update(this.game, starData, userSettings);
       } else {
         existing = this.setupStar(game, userSettings, starData)
       }

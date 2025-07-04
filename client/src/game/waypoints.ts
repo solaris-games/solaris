@@ -8,7 +8,12 @@ import type { TempWaypoint } from '../types/waypoint';
 import { createStarHighlight } from './highlight';
 import type { Location } from "@solaris-common";
 
-class Waypoints extends EventEmitter {
+type Events = {
+  onWaypointCreated: TempWaypoint,
+  onWaypointOutOfRange: null,
+}
+
+class Waypoints extends EventEmitter<keyof Events, Events> {
   container: PIXI.Container;
   game: Game | undefined;
   context: DrawingContext | undefined;

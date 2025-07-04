@@ -6,9 +6,25 @@ import type {UserGameSettings, Location} from "@solaris-common";
 import type {Carrier as CarrierData, Player as PlayerData} from "../types/game";
 import type Star from "./star";
 import type {DrawingContext} from "./container";
-import { MapObject } from './mapObject';
+import type { MapObject } from './mapObject';
+import { EventEmitter } from './eventEmitter';
 
-export class Carrier extends MapObject {
+type CarrierClickEvent = {
+  carrierData: CarrierData,
+  tryMultiSelect: boolean,
+  eventData: any,
+}
+
+type Events = {
+  onSelected: CarrierData,
+  onUnselected: CarrierData,
+  onCarrierMouseOver: Carrier,
+  onCarrierMouseOut: Carrier,
+  onCarrierRightClicked: CarrierData,
+  onCarrierClicked: CarrierClickEvent,
+}
+
+export class Carrier extends EventEmitter<keyof Events, Events> implements MapObject {
   static zoomLevel = 140
 
   container: Container;
@@ -355,12 +371,12 @@ export class Carrier extends MapObject {
 
   onClicked(e, tryMultiSelect = true) {
     if (e && e.data && e.data.originalEvent && e.data.originalEvent.button === 2) {
-      this.emit('onCarrierRightClicked', this.data)
+      this.emit('onCarrierRightClicked', this.data!)
     } else {
       let eventData = e ? e.data : null
 
       this.emit('onCarrierClicked', {
-        carrierData: this.data,
+        carrierData: this.data!,
         eventData,
         tryMultiSelect
       })
@@ -411,14 +427,14 @@ export class Carrier extends MapObject {
   select () {
     this.isSelected = true
     this.drawSelectedCircle()
-    this.emit('onSelected', this.data)
+    this.emit('onSelected', this.data!)
     this.updateVisibility()
   }
 
   unselect () {
     this.isSelected = false
     this.drawSelectedCircle()
-    this.emit('onUnselected', this.data)
+    this.emit('onUnselected', this.data!)
     this.updateVisibility()
   }
 
