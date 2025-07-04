@@ -59,36 +59,36 @@ export class Map {
   container: PIXI.Container;
   stars: Star[];
   carriers: Carrier[];
-  pathManager: PathManager | undefined;
+  pathManager: PathManager;
   zoomPercent: number;
   lastZoomPercent: number;
-  backgroundContainer: PIXI.Container | undefined;
-  territoryContainer: PIXI.Container | undefined;
-  playerNamesContainer: PIXI.Container | undefined;
-  orbitalContainer: PIXI.Container | undefined;
-  wormHoleContainer: PIXI.Container | undefined;
-  starContainer: PIXI.Container | undefined;
-  waypointContainer: PIXI.Container | undefined;
-  rulerPointContainer: PIXI.Container | undefined;
-  highlightLocationsContainer: PIXI.Container | undefined;
-  tooltipContainer: PIXI.Container | undefined;
-  game: Game | undefined;
-  userSettings: UserGameSettings | undefined;
-  waypoints: Waypoints | undefined;
-  rulerPoints: RulerPoints | undefined;
-  territories: Territories | undefined;
-  playerNames: PlayerNames | undefined;
-  background: Background | undefined;
+  backgroundContainer: PIXI.Container;
+  territoryContainer: PIXI.Container;
+  playerNamesContainer: PIXI.Container;
+  orbitalContainer: PIXI.Container ;
+  wormHoleContainer: PIXI.Container;
+  starContainer: PIXI.Container ;
+  waypointContainer: PIXI.Container ;
+  rulerPointContainer: PIXI.Container ;
+  highlightLocationsContainer: PIXI.Container ;
+  tooltipContainer: PIXI.Container ;
+  game: Game ;
+  userSettings: UserGameSettings ;
+  waypoints: Waypoints ;
+  rulerPoints: RulerPoints ;
+  territories: Territories ;
+  playerNames: PlayerNames ;
+  background: Background ;
   wormHoleLayer: WormHoleLayer | undefined;
   tooltipLayer: TooltipLayer | undefined;
   orbitalLayer: OrbitalLocationLayer | undefined;
   lastViewportCenter: PIXI.Point | undefined;
   currentViewportCenter: PIXI.Point | undefined;
   lastPointerDownPosition: PIXI.Point | undefined;
-  chunks: Chunks | undefined;
+  chunks: Chunks;
   unsubscribe: (() => void) | undefined;
 
-  constructor (app: PIXI.Application, store: Store<State>, gameContainer, context: DrawingContext, eventBus: EventBus) {
+  constructor (app: PIXI.Application, store: Store<State>, gameContainer, context: DrawingContext, eventBus: EventBus, game: Game, userSettings: UserGameSettings) {
     this.app = app
     this.store = store
     this.context = context
@@ -105,9 +105,26 @@ export class Map {
 
     this.zoomPercent = 100
     this.lastZoomPercent = 100
-  }
 
-  _setupContainers () {
+
+    this.userSettings = userSettings
+    this.game = game
+
+    if (this.unsubscribe) {
+      this.unsubscribe();
+      this.unsubscribe = undefined;
+    }
+
+    this.app.ticker.maxFPS = userSettings.technical.fpsLimit || 60;
+
+    this.pathManager = new PathManager( game, userSettings, this )
+
+    // Cleanup events
+    this.stars.forEach(s => s.removeAllListeners())
+    this.carriers.forEach(s => s.removeAllListeners())
+
+    this.chunks = new Chunks();
+
     this.backgroundContainer = new PIXI.Container()
     this.backgroundContainer.zIndex = 0;
     this.territoryContainer = new PIXI.Container()
@@ -144,31 +161,6 @@ export class Map {
     this.container.addChild(this.tooltipContainer)
     this.container.addChild(this.waypointContainer)
     this.container.sortChildren();
-  }
-
-  setup (game: Game, userSettings: UserGameSettings) {
-    this.userSettings = userSettings
-    this.game = game
-
-    if (this.unsubscribe) {
-      this.unsubscribe();
-      this.unsubscribe = undefined;
-    }
-
-    this.app.ticker.maxFPS = userSettings.technical.fpsLimit || 60;
-
-    this.pathManager = new PathManager( game, userSettings, this )
-
-
-    // Cleanup events
-    this.stars.forEach(s => s.removeAllListeners())
-    this.carriers.forEach(s => s.removeAllListeners())
-
-    this.container.removeChildren()
-
-    this.chunks = new Chunks();
-
-    this._setupContainers()
 
     // Reset the canvas
     this.stars = []
@@ -184,24 +176,12 @@ export class Map {
       this.setupCarrier(game, userSettings, game.galaxy.carriers[i])
     }
 
-    // -----------
-    // Setup Waypoints
-    if (this.waypoints) {
-      this.waypoints.removeAllListeners()
-    }
-
     this.waypoints = new Waypoints()
     this.waypoints.setup(game, this.context)
     this.waypoints.on('onWaypointCreated', this.onWaypointCreated.bind(this))
     this.waypoints.on('onWaypointOutOfRange', this.onWaypointOutOfRange.bind(this))
 
     this.waypointContainer!.addChild(this.waypoints.container)
-
-    // -----------
-    // Setup Ruler Points
-    if (this.rulerPoints) {
-      this.rulerPoints.removeAllListeners()
-    }
 
     this.rulerPoints = new RulerPoints()
     this.rulerPoints.setup(game)
