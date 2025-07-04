@@ -209,8 +209,7 @@ export class Map {
 
     // -----------
     // Setup Background
-    this.background = new Background()
-    this.background.setup(game, userSettings, this.context)
+    this.background = new Background(game, userSettings, this.context);
 
     this.backgroundContainer!.addChild(this.background.container)
     this.backgroundContainer!.addChild(this.background.starContainer)
@@ -465,7 +464,7 @@ export class Map {
     this.drawWormHoles()
     this.drawPlayerNames()
 
-    this.background!.setup(game, userSettings, this.context)
+    this.background = new Background(game, userSettings, this.context);
     this.background!.draw()
 
     this.waypoints!.setup(game, this.context)

@@ -16,7 +16,6 @@ interface BackgroundSprite extends Sprite {
 }
 
 export class Background {
-
   static MAX_PARALLAX = 0.333
   static STAR_DENSITY = 10 // maybe make this into a user setting?
   static STAR_SCALE = 1.0/8.0
@@ -33,9 +32,9 @@ export class Background {
   starContainer: Container;
   zoomPercent: number;
   time: number;
-  game: Game | undefined;
-  context: DrawingContext | undefined;
-  userSettings: UserGameSettings | undefined;
+  game: Game;
+  context: DrawingContext;
+  userSettings: UserGameSettings;
   rng: any;
   galaxyCenterX: number = 0;
   galaxyCenterY: number = 0;
@@ -43,24 +42,21 @@ export class Background {
   timeScale = 0;
   blendMode = 'normal';
 
-  constructor () {
+  constructor (game: Game, userSettings: UserGameSettings, context: DrawingContext) {
     this.container = new Container()
     this.starContainer = new Container()
     this.zoomPercent = 0
     this.container.interactiveChildren = false
     this.starContainer.interactiveChildren = false
     this.time = 0
-  }
 
-  setup (game, userSettings, context) {
     this.game = game
     this.context = context
     this.userSettings = userSettings
     this.rng = rng.create(game._id)
-    // TODO: This should use the constant?
-    this.galaxyCenterX = gameHelper.calculateGalaxyCenterX(game)
-    this.galaxyCenterY = gameHelper.calculateGalaxyCenterY(game)
-    this.clear()
+
+    this.galaxyCenterX = gameHelper.calculateGalaxyCenterX(game);
+    this.galaxyCenterY = gameHelper.calculateGalaxyCenterY(game);
 
     Background.zoomLevelDefinitions = userSettings.map.zoomLevels.background
     this.container.alpha = userSettings.map.background.nebulaOpacity
@@ -83,9 +79,8 @@ export class Background {
   }
 
   drawNebulas () {
-
-    let NEBULA_FREQUENCY = this.userSettings!.map.background.nebulaFrequency
-    let NEBULA_DENSITY = this.userSettings!.map.background.nebulaDensity
+    const NEBULA_FREQUENCY = this.userSettings.map.background.nebulaFrequency
+    const NEBULA_DENSITY = this.userSettings.map.background.nebulaDensity
 
     const FALLBACK_NEBULA_COLOR = 0xffffff
 
@@ -97,8 +92,7 @@ export class Background {
       NEBULA_COLOUR1 = this._getNumberFromHexString(this.userSettings!.map.background.nebulaColour1)
       NEBULA_COLOUR2 = this._getNumberFromHexString(this.userSettings!.map.background.nebulaColour2)
       NEBULA_COLOUR3 = this._getNumberFromHexString(this.userSettings!.map.background.nebulaColour3)
-    }
-    catch(err) {
+    } catch(err) {
       NEBULA_COLOUR1 = FALLBACK_NEBULA_COLOR
       NEBULA_COLOUR2 = FALLBACK_NEBULA_COLOR
       NEBULA_COLOUR3 = FALLBACK_NEBULA_COLOR
@@ -111,18 +105,18 @@ export class Background {
     const MINIMUM_STARS = 2 //chunks must have these many stars to be elegible to host a nebula
     const NEBULA_MAX_OFFSET = CHUNK_SIZE/4.0
 
-    let minX = gameHelper.calculateMinStarX(this.game!)
-    let minY = gameHelper.calculateMinStarY(this.game!)
-    let maxX = gameHelper.calculateMaxStarX(this.game!)
-    let maxY = gameHelper.calculateMaxStarY(this.game!)
+    const minX = gameHelper.calculateMinStarX(this.game!)
+    const minY = gameHelper.calculateMinStarY(this.game!)
+    const maxX = gameHelper.calculateMaxStarX(this.game!)
+    const maxY = gameHelper.calculateMaxStarY(this.game!)
 
-    let firstChunkX = Math.floor(minX/CHUNK_SIZE)
-    let firstChunkY = Math.floor(minY/CHUNK_SIZE)
-    let lastChunkX = Math.floor(maxX/CHUNK_SIZE)
-    let lastChunkY = Math.floor(maxY/CHUNK_SIZE)
+    const firstChunkX = Math.floor(minX/CHUNK_SIZE)
+    const firstChunkY = Math.floor(minY/CHUNK_SIZE)
+    const lastChunkX = Math.floor(maxX/CHUNK_SIZE)
+    const lastChunkY = Math.floor(maxY/CHUNK_SIZE)
 
-    let chunksXlen = (lastChunkX-firstChunkX)+1
-    let chunksYlen = (lastChunkY-firstChunkY)+1
+    const chunksXlen = (lastChunkX-firstChunkX)+1
+    const chunksYlen = (lastChunkY-firstChunkY)+1
 
     let chunks = Array(chunksXlen)
     for(let x=0; x<chunksXlen; x+=1) {
@@ -216,7 +210,7 @@ export class Background {
     }
   }
 
-  refreshZoom (zoomPercent) {
+  refreshZoom (zoomPercent: number) {
     this.zoomPercent = zoomPercent
 
     if (this.container) {

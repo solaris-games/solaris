@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js'
 import GameHelper from '../services/gameHelper'
 import WaypointHelper from '../services/waypointHelper'
-import {EventEmitter} from "./eventEmitter.js";
+import {EventEmitter} from "./eventEmitter";
 import type {Game, Carrier as CarrierData} from '../types/game';
 import type { DrawingContext } from './container';
 import type { TempWaypoint } from '../types/waypoint';

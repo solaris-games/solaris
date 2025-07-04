@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js'
-import {EventEmitter} from "./eventEmitter.js";
+import {EventEmitter} from "./eventEmitter";
 import type { Game } from '../types/game';
 import type { Location } from '@solaris-common';
 
