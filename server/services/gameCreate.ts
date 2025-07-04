@@ -25,6 +25,10 @@ import CarrierService from './carrier';
 import CustomMapService from "./maps/custom";
 import {logger} from "../utils/logging";
 
+const GAME_MASTER_LIMIT = 5;
+
+const ESTABLISHED_PLAYER_LIMIT = 2;
+
 const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
 const log = logger("GameCreateService");
@@ -115,12 +119,12 @@ export default class GameCreateService {
             const userIsGameMaster = await this.userService.getUserIsGameMaster(settings.general.createdByUserId);
             const userIsAdmin = await this.userService.getUserIsAdmin(settings.general.createdByUserId);
 
-            if (openGames.length && !userIsGameMaster) {
-                throw new ValidationError('Cannot create game, you already have another game waiting for players.');
+            if (openGames.length > ESTABLISHED_PLAYER_LIMIT && !userIsGameMaster) {
+                throw new ValidationError(`Cannot create game, you already have ${openGames.length} game(s) waiting for players.`);
             }
 
-            if (userIsGameMaster && !userIsAdmin && openGames.length > 5) {
-                throw new ValidationError('Game Masters are limited to 5 games waiting for players.');
+            if (userIsGameMaster && !userIsAdmin && openGames.length > GAME_MASTER_LIMIT) {
+                throw new ValidationError(`Game Masters are limited to ${GAME_MASTER_LIMIT} games waiting for players.`);
             }
 
             // Validate that the player cannot create large games.
