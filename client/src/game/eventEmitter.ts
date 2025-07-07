@@ -1,22 +1,21 @@
-import mitt, { type Emitter } from 'mitt';
+import mitt, { type Emitter, type Handler } from 'mitt';
 
-// longer term, we want to rework rendering code anyways
-export class EventEmitter {
-  ev: Emitter<any>;
+export class EventEmitter<EventType extends string, Ev extends Record<EventType, unknown>> {
+  ev: Emitter<Ev>;
 
   constructor() {
     this.ev = mitt();
   }
 
-  on(event, handler) {
+  on(event: EventType, handler: Handler<Ev[EventType]>) {
     this.ev.on(event, handler);
   }
 
-  off(event, handler) {
+  off(event: EventType, handler: Handler<Ev[EventType]>) {
     this.ev.off(event, handler);
   }
 
-  emit(event, data) {
+  emit(event: EventType, data: Ev[EventType]) {
     this.ev.emit(event, data);
   }
 

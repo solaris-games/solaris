@@ -2,13 +2,28 @@ import { Container, Sprite, Graphics, BitmapText, Circle, TextStyle, Text } from
 import TextureService from './texture'
 import Helpers from './helpers'
 import type PathManager from "./PathManager";
-import type {UserGameSettings, Location} from "@solaris-common";
-import type {Carrier as CarrierData, Player as PlayerData} from "../types/game";
-import type Star from "./star";
+import type {UserGameSettings, Location, MapObject as MapObjectData} from "@solaris-common";
+import type {Carrier as CarrierData, Game, Player as PlayerData} from "../types/game";
 import type {DrawingContext} from "./container";
-import { MapObject } from './mapObject';
+import type { MapObject } from './mapObject';
+import { EventEmitter } from './eventEmitter';
 
-export class Carrier extends MapObject {
+type CarrierClickEvent = {
+  carrierData: CarrierData,
+  tryMultiSelect: boolean,
+  eventData: any,
+}
+
+type Events = {
+  onSelected: CarrierData,
+  onUnselected: CarrierData,
+  onCarrierMouseOver: Carrier,
+  onCarrierMouseOut: Carrier,
+  onCarrierRightClicked: CarrierData,
+  onCarrierClicked: CarrierClickEvent,
+}
+
+export class Carrier extends EventEmitter<keyof Events, Events> implements MapObject {
   static zoomLevel = 140
 
   container: Container;
@@ -21,13 +36,12 @@ export class Carrier extends MapObject {
   uniquePaths: Array<string>;
   isMouseOver: boolean;
   zoomPercent: number;
-  userSettings: UserGameSettings | undefined;
-  data: CarrierData | undefined;
-  stars: Star[] | undefined;
-  player: PlayerData | undefined;
-  context: DrawingContext | undefined;
+  userSettings: UserGameSettings;
+  game: Game;
+  data: CarrierData;
+  context: DrawingContext;
   colour: string | undefined;
-  lightYearDistance: number | undefined;
+  lightYearDistance: number;
   clampedScaling: boolean | undefined;
   baseScale: number = 0;
   minScale: number = 0;
@@ -35,8 +49,14 @@ export class Carrier extends MapObject {
   specialistSprite: Sprite | null = null;
   isSelected: boolean = false;
 
-  constructor ( pathManager: PathManager ) {
+  constructor (game: Game, data: CarrierData, userSettings: UserGameSettings, context: DrawingContext, pathManager: PathManager) {
     super()
+
+    this.game = game;
+    this.data = data;
+    this.userSettings = userSettings;
+    this.context = context;
+    this.lightYearDistance = game.constants.distances.lightYear;
 
     this.container = new Container()
     this.container.zIndex = 1
@@ -64,21 +84,21 @@ export class Carrier extends MapObject {
     this.zoomPercent = 100
   }
 
-    getContainer(): Container {
-      return this.container!;
-    }
+  getContainer(): Container {
+    return this.container!;
+  }
 
-    getLocation(): Location {
-      return this.data!.location!;
-    }
+  getLocation(): Location {
+    return this.data!.location!;
+  }
 
-  setup (data, userSettings, context: DrawingContext, stars, player, lightYearDistance) {
-    this.data = data
-    this.stars = stars
-    this.player = player
-    this.context = context
-    this.colour = context.getPlayerColour(player._id)
-    this.lightYearDistance = lightYearDistance
+  _getPlayer(): PlayerData {
+    return this.game.galaxy.players.find(p => p._id === this.data.ownedByPlayerId!)!;
+  }
+
+  update (data: CarrierData, userSettings: UserGameSettings) {
+    this.data = data;
+    this.colour = this.context.getPlayerColour(this.data.ownedByPlayerId!);
 
     this.container.position.x = data.location.x
     this.container.position.y = data.location.y
@@ -118,8 +138,10 @@ export class Carrier extends MapObject {
       this.graphics_colour = null
     }
 
-    if (Object.keys(TextureService.PLAYER_SYMBOLS).includes(this.player!.shape)) {
-      this.graphics_colour = new Sprite(TextureService.PLAYER_SYMBOLS[this.player!.shape][4])
+    const player = this._getPlayer();
+
+    if (Object.keys(TextureService.PLAYER_SYMBOLS).includes(player.shape)) {
+      this.graphics_colour = new Sprite(TextureService.PLAYER_SYMBOLS[player.shape][4])
 
     }
 
@@ -153,7 +175,7 @@ export class Carrier extends MapObject {
     this.graphics_ship.height = 10
     this.container.addChild(this.graphics_ship)
 
-    Helpers.rotateCarrierTowardsWaypoint(this.data!, this.stars!.map(s => s.data), this.graphics_ship)
+    Helpers.rotateCarrierTowardsWaypoint(this.data!, this.game.galaxy.stars, this.graphics_ship)
   }
 
   drawShips () {
@@ -223,7 +245,7 @@ export class Carrier extends MapObject {
       this.pathManager.removeUniquePath(path)
     }
     for(let pathID of this.sharedPathsIDs) {
-      this.pathManager.removeSharedPath(pathID, this)
+      this.pathManager.removeSharedPath(pathID, this.data)
     }
     this.uniquePaths = Array()
     this.sharedPathsIDs = Array()
@@ -243,32 +265,32 @@ export class Carrier extends MapObject {
 
     let lineWidth = this.data!.waypointsLooped ? PATH_WIDTH : PATH_WIDTH
     let lineAlpha = this.data!.waypointsLooped ? 0.3 : 0.5
-    let lastPoint: Carrier | Star = this
+    let lastPoint: MapObjectData<string> = this.data;
     let sourceIsLastDestination = false
     sourceIsLastDestination = this._isSourceLastDestination()
     // if looping and source is last destination, begin drawing path from the star instead of carrier
     if ( this.data!.waypointsLooped ) {
       if (sourceIsLastDestination)  {
-        lastPoint = this.stars!.find(s => s.data._id === this.data!.waypoints[0].source)!
+        lastPoint = this.game.galaxy.stars.find(s => s._id === this.data!.waypoints[0].source)!
       }
     }
     let star
     for (let i = 0; i < this.data!.waypoints.length; i++) {
       let waypoint = this.data!.waypoints[i]
       // Draw a line to each destination along the waypoints.
-      star = this.stars!.find(s => s.data._id === waypoint.destination)
+      star = this.game.galaxy.stars.find(s => s._id === waypoint.destination)
       if (!star) { break; }
 
       if ( this.data!.waypointsLooped ) {
-        if (lastPoint === this) {
-          this.uniquePaths.push( this.pathManager.addUniquePath( lastPoint, star, true, this.colour ) )
+        if (lastPoint === this.data) {
+          this.uniquePaths.push( this.pathManager.addUniquePath( lastPoint, star, true, this.colour! ) )
         }
         else {
           this.sharedPathsIDs.push( this.pathManager.addSharedPath( lastPoint, star, this ) )
         }
       }
       else {
-        this.uniquePaths.push( this.pathManager.addUniquePath( lastPoint, star, false, this.colour ) )
+        this.uniquePaths.push( this.pathManager.addUniquePath( lastPoint, star, false, this.colour! ) )
       }
 
       lastPoint = star
@@ -276,7 +298,7 @@ export class Carrier extends MapObject {
     //draw path back to the first destination
     if ( this.data!.waypointsLooped ) {
       if (!sourceIsLastDestination && this.data!.waypoints && this.data!.waypoints.length) {
-        let firstPoint = this.stars!.find(s => s.data._id === this.data!.waypoints[0].destination)
+        let firstPoint = this.game.galaxy.stars.find(s => s._id === this.data!.waypoints[0].destination)
         if( firstPoint && lastPoint && firstPoint !== lastPoint ) {
           this.sharedPathsIDs.push( this.pathManager.addSharedPath( star, firstPoint, this ) )
         }
@@ -355,12 +377,12 @@ export class Carrier extends MapObject {
 
   onClicked(e, tryMultiSelect = true) {
     if (e && e.data && e.data.originalEvent && e.data.originalEvent.button === 2) {
-      this.emit('onCarrierRightClicked', this.data)
+      this.emit('onCarrierRightClicked', this.data!)
     } else {
       let eventData = e ? e.data : null
 
       this.emit('onCarrierClicked', {
-        carrierData: this.data,
+        carrierData: this.data!,
         eventData,
         tryMultiSelect
       })
@@ -411,14 +433,14 @@ export class Carrier extends MapObject {
   select () {
     this.isSelected = true
     this.drawSelectedCircle()
-    this.emit('onSelected', this.data)
+    this.emit('onSelected', this.data!)
     this.updateVisibility()
   }
 
   unselect () {
     this.isSelected = false
     this.drawSelectedCircle()
-    this.emit('onUnselected', this.data)
+    this.emit('onUnselected', this.data!)
     this.updateVisibility()
   }
 

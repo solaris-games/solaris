@@ -94,15 +94,15 @@ export class GameContainer {
     // add the viewport to the stage
     this.app!.stage.addChild(this.viewport)
 
+    this.game = store.state.game!;
+
     // Add a new map to the viewport
-    this.map = new Map(this.app, this.store, this, this.context!, eventBus);
+    this.map = new Map(this.app, this.store, this, this.context!, eventBus, this.game!, userSettings);
     this.viewport.addChild(this.map.container)
 
     this.subscribe();
 
-    this.game = store.state.game!;
     this._setupViewport();
-    this.map!.setup(this.game!, userSettings)
 
     if (userSettings?.technical?.performanceMonitor === 'enabled') {
       this.debugTools = new DebugTools(this.app!, this.map!);

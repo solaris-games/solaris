@@ -1,14 +1,19 @@
 import * as PIXI from 'pixi.js'
 import GameHelper from '../services/gameHelper'
 import WaypointHelper from '../services/waypointHelper'
-import {EventEmitter} from "./eventEmitter.js";
+import {EventEmitter} from "./eventEmitter";
 import type {Game, Carrier as CarrierData} from '../types/game';
 import type { DrawingContext } from './container';
 import type { TempWaypoint } from '../types/waypoint';
 import { createStarHighlight } from './highlight';
 import type { Location } from "@solaris-common";
 
-class Waypoints extends EventEmitter {
+type Events = {
+  onWaypointCreated: TempWaypoint,
+  onWaypointOutOfRange: null,
+}
+
+class Waypoints extends EventEmitter<keyof Events, Events> {
   container: PIXI.Container;
   game: Game | undefined;
   context: DrawingContext | undefined;
