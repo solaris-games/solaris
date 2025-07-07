@@ -3,9 +3,14 @@ import { DependencyContainer } from "../../services/types/DependencyContainer";
 import GameController from '../controllers/game';
 import { MiddlewareContainer } from "../middleware";
 import {SingleRouter} from "../singleRoute";
+import {createGameRoutes} from "@solaris-common";
+import {DBObjectId} from "../../services/types/DBObjectId";
+import {createRoutes} from "../typedapi/routes";
 
 export default (router: SingleRouter, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
+    const routes = createGameRoutes<DBObjectId>();
     const controller = GameController(container);
+    const answer = createRoutes(router, mw);
 
     router.get('/api/game/defaultSettings',
             mw.auth.authenticate(),
@@ -379,6 +384,10 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.auth.authenticate(),
             controller.touch
     );
+
+    answer(routes.getStatistics,
+        mw.auth.authenticate(),
+        controller.getStatistics);
 
     return router;
 }

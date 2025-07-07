@@ -226,4 +226,14 @@ export default class StatisticsService {
             log.error(e, `Error processing slice for player ${slice.playerId} in game ${game._id}: ${e['message']}`);
         }
     }
+
+    async getStatisticsForGame(gameId: DBObjectId, playerId: DBObjectId) {
+        const slice = await this.getSlice(gameId, playerId)
+
+        if (!slice) {
+            return undefined;
+        }
+
+        return slice.stats;
+    }
 }

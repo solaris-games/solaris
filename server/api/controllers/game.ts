@@ -475,6 +475,20 @@ export default (container: DependencyContainer) => {
             } catch (err) {
                 return next(err);
             }
+        },
+        getStatistics: async (req, res, next) => {
+            try {
+                const statistics = await container.statisticsService.getStatisticsForGame(req.params.gameId, req.params.playerId);
+
+                if (!statistics) {
+                    throw new ValidationError("Statistics not found for this game or player.", 404);
+                }
+
+                res.status(200).json(statistics);
+                return next();
+            } catch (err) {
+                return next(err);
+            }
         }
     }
 };
