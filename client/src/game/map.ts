@@ -326,8 +326,8 @@ export class Map {
     let carrier = this.carriers.find(x => x.data!._id === carrierData._id)
 
     if (!carrier) {
-      carrier = new Carrier( this.pathManager! )
-      this.carriers.push(carrier)
+      carrier = new Carrier(game, carrierData, userSettings, this.context, this.pathManager);
+      this.carriers.push(carrier);
 
       carrier.on('onCarrierClicked', this.onCarrierClicked.bind(this))
       carrier.on('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
@@ -337,9 +337,7 @@ export class Map {
       carrier.on('onUnselected', this.onCarrierUnselected.bind(this))
     }
 
-    let player = gameHelper.getPlayerById(game, carrierData.ownedByPlayerId)
-
-    carrier.setup(carrierData, userSettings, this.context, this.stars, player, game.constants.distances.lightYear)
+    carrier.update(carrierData, userSettings);
 
     return carrier
   }
@@ -398,7 +396,7 @@ export class Map {
 
     this.game = game
 
-    this.pathManager!.setup(game, userSettings)
+    this.pathManager.update(game, userSettings)
 
     // Check for stars that are no longer in scanning range.
     for (let i = 0; i < this.stars.length; i++) {
@@ -443,9 +441,7 @@ export class Map {
       let existing = this.carriers.find(x => x.data!._id === carrierData._id)
 
       if (existing) {
-        let player = gameHelper.getPlayerById(game, carrierData.ownedByPlayerId!)
-
-        existing.setup(carrierData, userSettings, this.context, this.stars, player, game.constants.distances.lightYear)
+        existing.update(carrierData, userSettings);
       } else {
         existing = this.setupCarrier(game, userSettings, carrierData)
       }
