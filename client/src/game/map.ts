@@ -80,12 +80,13 @@ export class Map {
   playerNames: PlayerNames ;
   background: Background ;
   wormHoleLayer: WormHoleLayer | undefined;
-  tooltipLayer: TooltipLayer | undefined;
+  tooltipLayer: TooltipLayer;
   orbitalLayer: OrbitalLocationLayer | undefined;
   lastViewportCenter: PIXI.Point | undefined;
   currentViewportCenter: PIXI.Point | undefined;
   lastPointerDownPosition: PIXI.Point | undefined;
   chunks: Chunks;
+  galaxyCenterGraphics: PIXI.Graphics | undefined;
   unsubscribe: (() => void) | undefined;
 
   constructor (app: PIXI.Application, store: Store<State>, gameContainer, context: DrawingContext, eventBus: EventBus, game: Game, userSettings: UserGameSettings) {
@@ -165,8 +166,7 @@ export class Map {
 
     this.waypointContainer!.addChild(this.waypoints.container)
 
-    this.rulerPoints = new RulerPoints()
-    this.rulerPoints.setup(game)
+    this.rulerPoints = new RulerPoints(game);
     this.rulerPoints.on('onRulerPointCreated', this.onRulerPointCreated.bind(this))
     this.rulerPoints.on('onRulerPointsCleared', this.onRulerPointsCleared.bind(this))
     this.rulerPoints.on('onRulerPointRemoved', this.onRulerPointRemoved.bind(this))
@@ -175,11 +175,10 @@ export class Map {
 
     // -----------
     // Setup Territories
-    this.territories = new Territories()
-    this.territories.setup(game, userSettings, this.context)
+    this.territories = new Territories(this.context, game, userSettings);
 
-    this.territoryContainer!.addChild(this.territories.container)
-    this.territories.draw(userSettings)
+    this.territoryContainer!.addChild(this.territories.container);
+    this.territories.draw();
 
     // -----------
     // Setup Player Names
@@ -322,7 +321,7 @@ export class Map {
     return star
   }
 
-  setupCarrier (game, userSettings, carrierData) {
+  setupCarrier (game: Game, userSettings: UserGameSettings, carrierData: CarrierData) {
     let carrier = this.carriers.find(x => x.data!._id === carrierData._id)
 
     if (!carrier) {
@@ -361,24 +360,28 @@ export class Map {
   }
 
   drawGalaxyCenter () {
+    if (this.galaxyCenterGraphics) {
+      this.starContainer.removeChild(this.galaxyCenterGraphics);
+    }
+
     const userWantsToSeeCenter = this._isOrbitalMapEnabled() || this.userSettings?.map.galaxyCenterAlwaysVisible === 'enabled';
 
-    if (this.game!.constants.distances.galaxyCenterLocation && userWantsToSeeCenter) {
-        let galaxyCenterGraphics = new PIXI.Graphics()
-        let location : Location = this.game!.constants.distances.galaxyCenterLocation
+    if (this.game.constants.distances.galaxyCenterLocation && userWantsToSeeCenter) {
+        this.galaxyCenterGraphics = new PIXI.Graphics()
+        const location : Location = this.game!.constants.distances.galaxyCenterLocation
         let size = 10
 
-        galaxyCenterGraphics.moveTo(location.x, location.y - size)
-        galaxyCenterGraphics.lineTo(location.x, location.y + size)
-        galaxyCenterGraphics.moveTo(location.x - size, location.y)
-        galaxyCenterGraphics.lineTo(location.x + size, location.y)
-        galaxyCenterGraphics.stroke({
+        this.galaxyCenterGraphics.moveTo(location.x, location.y - size)
+        this.galaxyCenterGraphics.lineTo(location.x, location.y + size)
+        this.galaxyCenterGraphics.moveTo(location.x - size, location.y)
+        this.galaxyCenterGraphics.lineTo(location.x + size, location.y)
+        this.galaxyCenterGraphics.stroke({
           width: 2,
           color: 0xFFFFFF,
           alpha: 0.75,
         });
 
-        this.starContainer!.addChild(galaxyCenterGraphics)
+        this.starContainer!.addChild(this.galaxyCenterGraphics);
     }
   }
 
@@ -456,7 +459,7 @@ export class Map {
     this.background = new Background(game, userSettings, this.context);
     this.background!.draw()
 
-    this.waypoints!.setup(game, this.context)
+    this.waypoints.setup(game, this.context)
     this.tooltipLayer!.setup(game, this.context)
 
     this.chunks.update(game, this.stars, this.carriers);
@@ -478,7 +481,6 @@ export class Map {
       c.enableInteractivity()
     }
   }
-
 
   setMode (mode: Mode) {
     let wasWaypoints = this.mode.mode === ModeKind.Waypoints;
@@ -548,26 +550,20 @@ export class Map {
     }
   }
 
-  drawCarrier (carrier) {
+  drawCarrier (carrier: Carrier) {
     carrier.draw()
     carrier.onZoomChanging(this.zoomPercent)
   }
 
-  _undrawCarrier (carrier) {
-    carrier.removeAllListeners()
-    carrier.cleanupEventHandlers()
-    carrier.clearPaths()
-
-
+  _undrawCarrier (carrier: Carrier) {
     this.chunks!.removeMapObjectFromChunks(carrier);
-
     this.carriers.splice(this.carriers.indexOf(carrier), 1)
 
     carrier.destroy()
   }
 
-  undrawCarrier (carrierData) {
-    let existing = this.carriers.find(x => x.data!._id === carrierData._id)
+  undrawCarrier (carrierData: CarrierData) {
+    const existing = this.carriers.find(x => x.data!._id === carrierData._id)
 
     if (existing) {
       this._undrawCarrier(existing)
@@ -595,12 +591,12 @@ export class Map {
   }
 
   clearRulerPoints () {
-    this.rulerPoints!.setup(this.game!)
+    this.rulerPoints!.update(this.game);
   }
 
   drawTerritories (userSettings: UserGameSettings) {
-    this.territories!.setup(this.game!, userSettings, this.context)
-    this.territories!.draw(userSettings)
+    this.territories.update(this.game, userSettings);
+    this.territories.draw();
   }
 
   drawWormHoles () {
@@ -806,7 +802,7 @@ export class Map {
     } else if (this.mode.mode === ModeKind.Waypoints) {
       this.waypoints!.onStarClicked(e)
     } else if (this.mode.mode === ModeKind.Ruler) {
-      this.rulerPoints!.onStarClicked(e)
+      this.rulerPoints.onStarClicked(e)
     }
     AnimationService.drawSelectedCircle(this.gameContainer.app!, this.container, e.location)
   }
@@ -870,7 +866,7 @@ export class Map {
         selectedCarrier!.unselect()
       }
     } else if (this.mode.mode === ModeKind.Ruler) {
-      this.rulerPoints!.onCarrierClicked(e)
+      this.rulerPoints.onCarrierClicked(e)
     }
 
     AnimationService.drawSelectedCircle(this.gameContainer.app!, this.container, e.location)

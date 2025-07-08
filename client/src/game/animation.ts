@@ -4,7 +4,7 @@ import {Application, Ticker, Container, Graphics} from 'pixi.js';
 class AnimationService {
   drawSelectedCircle (app: Application, container: Container, location: Location) {
     // It ain't pretty, but it works.
-    let graphics = new Graphics()
+    const graphics = new Graphics();
 
     let radius = 1
 

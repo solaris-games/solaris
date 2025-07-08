@@ -11,18 +11,19 @@ type Events = {
 
 export class RulerPoints extends EventEmitter<keyof Events, Events> {
   container: PIXI.Container;
-  game: Game | undefined;
+  game: Game;
   rulerPoints: RulerPoint[] = [];
   lightYearDistance: number = 0;
   techLevel: number = 0;
 
-  constructor () {
+  constructor (game: Game) {
     super()
 
     this.container = new PIXI.Container()
+    this.game = game
   }
 
-  setup (game: Game) {
+  update (game: Game) {
     this.game = game
 
     this.rulerPoints = []
@@ -125,7 +126,7 @@ export class RulerPoints extends EventEmitter<keyof Events, Events> {
   }
 
   removeLastRulerPoint () {
-    const old = this.rulerPoints.pop()
+    const old = this.rulerPoints.pop();
 
     this.draw();
 

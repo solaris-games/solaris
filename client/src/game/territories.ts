@@ -1,9 +1,9 @@
 import { Container, Graphics } from 'pixi.js'
 import Voronoi from '../voronoi/Javascript-Voronoi/rhill-voronoi-core.js';
 import gameHelper from '../services/gameHelper'
-import type {Game, Player} from '../types/game.js';
-import type { DrawingContext } from './container.js';
-import type {UserGameSettings} from "@solaris-common";
+import type {Game, Player} from '../types/game';
+import type { DrawingContext } from './container';
+import type {UserGameSettings, Location} from "@solaris-common";
 
 type SamplePoint = {
   distance: number;
@@ -33,42 +33,41 @@ type Position = {
 
 type VertexSpec = [VertexAction, Position[], Position[]];
 
+const MAX_VORONOI_DISTANCE = 200
+
 export class Territories {
-
-  static zoomLevel = 100
-  static maxVoronoiDistance = 200
-
   container: Container;
-  game: Game | undefined;
+  game: Game;
   zoomPercent: number;
-  context: DrawingContext | undefined;
+  context: DrawingContext;
+  userSettings: UserGameSettings;
 
-  constructor() {
-    this.container = new Container()
-
-    this.zoomPercent = 0
+  constructor(context: DrawingContext, game: Game, userSettings: UserGameSettings) {
+    this.container = new Container();
+    this.game = game;
+    this.context = context;
+    this.zoomPercent = 0;
+    this.userSettings = userSettings;
   }
 
-  setup(game: Game, userSettings: UserGameSettings, context: DrawingContext) {
-    this.game = game
-    this.context = context
-
-    Territories.zoomLevel = userSettings.map.zoomLevels.territories
+  update(game: Game, userSettings: UserGameSettings) {
+    this.game = game;
+    this.userSettings = userSettings;
   }
 
-  draw(userSettings: UserGameSettings) {
+  draw() {
     this.container.removeChildren()
 
-    if (!this.game!.galaxy.stars || !this.game!.galaxy.stars.length) {
-      return; //No territories if we have no stars
+    if (!this.game.galaxy.stars?.length) {
+      return;
     }
 
-    switch (userSettings.map.territoryStyle) {
+    switch (this.userSettings.map.territoryStyle) {
       case 'marching-square':
-        this._drawTerritoriesMarchingCube(userSettings)
+        this._drawTerritoriesMarchingCube(this.userSettings)
         break;
       case 'voronoi':
-        this._drawTerritoriesVoronoi(userSettings)
+        this._drawTerritoriesVoronoi(this.userSettings)
         break;
     }
 
@@ -297,18 +296,18 @@ export class Territories {
   _drawTerritoriesVoronoi(userSettings: UserGameSettings) {
     this.container.alpha = 1
 
-    let voronoi = new Voronoi.Voronoi()
+    const voronoi = new Voronoi.Voronoi()
 
-    let minX = gameHelper.calculateMinStarX(this.game!)
-    let minY = gameHelper.calculateMinStarY(this.game!)
-    let maxX = gameHelper.calculateMaxStarX(this.game!)
-    let maxY = gameHelper.calculateMaxStarY(this.game!)
+    const minX = gameHelper.calculateMinStarX(this.game!)
+    const minY = gameHelper.calculateMinStarY(this.game!)
+    const maxX = gameHelper.calculateMaxStarX(this.game!)
+    const maxY = gameHelper.calculateMaxStarY(this.game!)
 
-    let boundingBox = {
-      xl: minX - Territories.maxVoronoiDistance,
-      xr: maxX + Territories.maxVoronoiDistance,
-      yt: minY - Territories.maxVoronoiDistance,
-      yb: maxY + Territories.maxVoronoiDistance
+    const boundingBox = {
+      xl: minX - MAX_VORONOI_DISTANCE,
+      xr: maxX + MAX_VORONOI_DISTANCE,
+      yt: minY - MAX_VORONOI_DISTANCE,
+      yb: maxY + MAX_VORONOI_DISTANCE
     }
 
     let sites: Site[] = []
@@ -454,22 +453,22 @@ export class Territories {
     this.container.addChild(borderGraphics)
   }
 
-  _sanitizeVoronoiPoint(site, point) {
-    let distance = gameHelper.getDistanceBetweenLocations(site, point)
-    let angle = gameHelper.getAngleBetweenLocations(site, point)
+  _sanitizeVoronoiPoint(site: Location, point: Location) {
+    const distance = gameHelper.getDistanceBetweenLocations(site, point)
+    const angle = gameHelper.getAngleBetweenLocations(site, point)
 
-    if (distance > Territories.maxVoronoiDistance) {
-      return gameHelper.getPointFromLocation(site, angle, Territories.maxVoronoiDistance)
+    if (distance > MAX_VORONOI_DISTANCE) {
+      return gameHelper.getPointFromLocation(site, angle, MAX_VORONOI_DISTANCE)
     }
 
     return point;
   }
 
-  refreshZoom(zoomPercent) {
+  refreshZoom(zoomPercent: number) {
     this.zoomPercent = zoomPercent
 
     if (this.container) {
-      this.container.visible = zoomPercent <= Territories.zoomLevel
+      this.container.visible = zoomPercent <= this.userSettings.map.zoomLevels.territories;
     }
   }
 
