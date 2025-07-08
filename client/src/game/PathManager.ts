@@ -7,11 +7,11 @@ import type {Game, Carrier as CarrierData, Star} from "../types/game";
 import type Carrier from "./carrier";
 import type { MapObject } from './mapObject';
 
-interface GraphicsWithChunk extends PIXI.Graphics {
+export interface GraphicsWithChunk extends PIXI.Graphics {
   chunk: PIXI.Container,
 }
 
-type Path = {
+export type Path = {
   id: string,
   carriers: CarrierData[],
   graphics: GraphicsWithChunk,
@@ -154,10 +154,10 @@ export class PathManager {
 
   addUniquePath( mapObject: MapObjectData<string>, star: Star, looped: boolean, colour: string) {
     const PATH_WIDTH = 0.5*this.userSettings!.map.carrierPathWidth
-    let objectAlpha = helpers.calculateDepthModifier(this.userSettings, mapObject._id)/2
-    let lineAlpha = looped ? objectAlpha / 2 : objectAlpha
-    let lineWidth = PATH_WIDTH
-    let path
+    const objectAlpha = helpers.calculateDepthModifier(this.userSettings, mapObject._id)/2
+    const lineAlpha = looped ? objectAlpha / 2 : objectAlpha
+    const lineWidth = PATH_WIDTH
+    let path: GraphicsWithChunk;
     if(looped) {
       path = this._createLoopedPathGraphics( mapObject, star, colour )
     }
@@ -168,7 +168,7 @@ export class PathManager {
     return path
   }
 
-  removeUniquePath( path ) {
+  removeUniquePath( path: GraphicsWithChunk ) {
     if(path.chunk) {
       path.chunk.removeChild(path)
     }
@@ -268,17 +268,14 @@ export class PathManager {
 
   _createLoopedPathGraphics(objectA: MapObjectData<string>, objectB: MapObjectData<string>, pathColour: string) {
     const PATH_WIDTH = 0.5*this.userSettings!.map.carrierPathWidth
-    let lineAlpha = 0.3
-    let lineWidth = PATH_WIDTH
+    const lineAlpha = 0.3
+    const lineWidth = PATH_WIDTH
 
-    let pathGraphics
     if( this.userSettings!.map.carrierLoopStyle == 'solid' ) {
-      pathGraphics = this._createSolidPathGraphics( lineAlpha, lineWidth/3.0, objectA, objectB, pathColour )
+      return this._createSolidPathGraphics( lineAlpha, lineWidth/3.0, objectA, objectB, pathColour )
+    } else {
+      return this._createDashedPathGraphics( lineAlpha, lineWidth, objectA, objectB, pathColour )
     }
-    else {
-      pathGraphics = this._createDashedPathGraphics( lineAlpha, lineWidth, objectA, objectB, pathColour )
-    }
-    return pathGraphics
   }
 
   _createDashedPathGraphics( lineAlpha: number, lineWidth: number, objectA: MapObjectData<string>, objectB: MapObjectData<string>, pathColour: string ) {

@@ -80,12 +80,13 @@ export class Map {
   playerNames: PlayerNames ;
   background: Background ;
   wormHoleLayer: WormHoleLayer | undefined;
-  tooltipLayer: TooltipLayer | undefined;
+  tooltipLayer: TooltipLayer;
   orbitalLayer: OrbitalLocationLayer | undefined;
   lastViewportCenter: PIXI.Point | undefined;
   currentViewportCenter: PIXI.Point | undefined;
   lastPointerDownPosition: PIXI.Point | undefined;
   chunks: Chunks;
+  galaxyCenterGraphics: PIXI.Graphics | undefined;
   unsubscribe: (() => void) | undefined;
 
   constructor (app: PIXI.Application, store: Store<State>, gameContainer, context: DrawingContext, eventBus: EventBus, game: Game, userSettings: UserGameSettings) {
@@ -322,7 +323,7 @@ export class Map {
     return star
   }
 
-  setupCarrier (game, userSettings, carrierData) {
+  setupCarrier (game: Game, userSettings: UserGameSettings, carrierData: CarrierData) {
     let carrier = this.carriers.find(x => x.data!._id === carrierData._id)
 
     if (!carrier) {
@@ -361,24 +362,28 @@ export class Map {
   }
 
   drawGalaxyCenter () {
+    if (this.galaxyCenterGraphics) {
+      this.starContainer.removeChild(this.galaxyCenterGraphics);
+    }
+
     const userWantsToSeeCenter = this._isOrbitalMapEnabled() || this.userSettings?.map.galaxyCenterAlwaysVisible === 'enabled';
 
-    if (this.game!.constants.distances.galaxyCenterLocation && userWantsToSeeCenter) {
-        let galaxyCenterGraphics = new PIXI.Graphics()
-        let location : Location = this.game!.constants.distances.galaxyCenterLocation
+    if (this.game.constants.distances.galaxyCenterLocation && userWantsToSeeCenter) {
+        this.galaxyCenterGraphics = new PIXI.Graphics()
+        const location : Location = this.game!.constants.distances.galaxyCenterLocation
         let size = 10
 
-        galaxyCenterGraphics.moveTo(location.x, location.y - size)
-        galaxyCenterGraphics.lineTo(location.x, location.y + size)
-        galaxyCenterGraphics.moveTo(location.x - size, location.y)
-        galaxyCenterGraphics.lineTo(location.x + size, location.y)
-        galaxyCenterGraphics.stroke({
+        this.galaxyCenterGraphics.moveTo(location.x, location.y - size)
+        this.galaxyCenterGraphics.lineTo(location.x, location.y + size)
+        this.galaxyCenterGraphics.moveTo(location.x - size, location.y)
+        this.galaxyCenterGraphics.lineTo(location.x + size, location.y)
+        this.galaxyCenterGraphics.stroke({
           width: 2,
           color: 0xFFFFFF,
           alpha: 0.75,
         });
 
-        this.starContainer!.addChild(galaxyCenterGraphics)
+        this.starContainer!.addChild(this.galaxyCenterGraphics);
     }
   }
 
@@ -456,7 +461,7 @@ export class Map {
     this.background = new Background(game, userSettings, this.context);
     this.background!.draw()
 
-    this.waypoints!.setup(game, this.context)
+    this.waypoints.setup(game, this.context)
     this.tooltipLayer!.setup(game, this.context)
 
     this.chunks.update(game, this.stars, this.carriers);
