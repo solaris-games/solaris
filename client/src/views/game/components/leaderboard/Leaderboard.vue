@@ -11,14 +11,14 @@
       </div>
     </div>
 
-    <div class="row" v-if="almostAfkReminder">
+    <div class="row" v-if="!game.state.endDate && almostAfkReminder">
       <div class="col text-center">
         <p class="mt-2 mb-2 text-danger">You have missed the last {{ userPlayer?.missedTurns }} turn(s). Please
           mark your turn as completed or you will be marked afk.</p>
       </div>
     </div>
 
-    <div class="row bg-info" v-if="game.settings.general.flux" title="This Game's Flux">
+    <div class="row bg-info" v-if="!game.state.endDate && game.settings.general.flux" title="This Game's Flux">
       <div class="col text-center">
         <p class="mt-2 mb-2"><small><i class="fas fa-dice-d20 me-1"></i>{{ game.settings.general.flux.description }}
             <help-tooltip v-if="game.settings.general.flux?.description" :tooltip="game.settings.general.flux.description" />
@@ -26,28 +26,7 @@
       </div>
     </div>
 
-    <div class="row mb-2" v-if="!game.state.endDate">
-      <div class="col text-center pt-2">
-        <p class="mb-0 text-warning" v-if="isConquestAllStars">Be the first to capture {{ game.state.starsForVictory }}
-          of {{ game.state.stars }} stars</p>
-        <p class="mb-0 text-warning" v-if="isConquestHomeStars">Be the first to capture {{ game.state.starsForVictory }}
-          of {{ game.settings.general.playerLimit }} capital stars</p>
-        <p class="mb-0 text-warning" v-if="isTeamConquest && isStarCountWin">Be the first team to capture
-          {{ game.state.starsForVictory }} of {{ game.state.stars }} stars</p>
-        <p class="mb-0 text-warning" v-if="isTeamConquest && isHomeStarCountWinCondition">Be the first team to capture
-          {{ game.state.starsForVictory }} of {{ game.settings.general.playerLimit }} capital stars</p>
-        <p class="mb-0 text-warning" v-if="isKingOfTheHillMode">Capture and hold the center star to win</p>
-        <p class="mb-0" v-if="game.settings.general.mode === 'battleRoyale'">Battle Royale - {{ game.state.stars }}
-          Stars Remaining</p>
-        <p class="mb-0" v-if="isKingOfTheHillMode && game.state.ticksToEnd == null"><small>The countdown begins when the
-            center star is captured</small></p>
-        <p class="mb-0 text-danger" v-if="game.state.ticksToEnd != null">Countdown - {{ game.state.ticksToEnd }}
-          Tick<span v-if="game.state.ticksToEnd !== 1">s</span> Remaining
-          <help-tooltip v-if="isKingOfTheHillMode"
-            tooltip="The countdown will reset to 1 cycle if the center star is captured with less than 1 cycle left" />
-        </p>
-      </div>
-    </div>
+    <win-condition :game="game" v-if="!game.state.endDate" />
 
     <div class="row bg-dark" v-if="!game.state.endDate">
       <div class="col text-center pt-2">
@@ -63,7 +42,7 @@
       </div>
     </div>
 
-    <div class="row" v-if="game.state.readyToQuitCount">
+    <div class="row" v-if="!game.state.endDate && game.state.readyToQuitCount">
       <div class="col text-center pt-2">
         <p>{{ game.state.readyToQuitCount }} of {{ game.state.players }} active players are ready to quit.</p>
       </div>
@@ -155,6 +134,7 @@ import type { State } from "@/store";
 import { toastInjectionKey } from '@/util/keys'
 import { makeConfirm } from '@/util/confirm'
 import { useIsHistoricalMode } from '@/util/reactiveHooks'
+import WinCondition from "@/views/game/components/leaderboard/WinCondition.vue";
 
 const emit = defineEmits<{
   onCloseRequested: [],
@@ -177,14 +157,8 @@ const intervalFunction = ref(0);
 const isHistoricalMode = useIsHistoricalMode(store);
 
 const game = computed<Game<string>>(() => store.state.game);
-const isTurnBasedGame = computed(() => game.value.settings.gameTime.gameType === 'turnBased');
 const isDarkModeExtra = computed(() => GameHelper.isDarkModeExtra(game.value));
-const isConquestAllStars = computed(() => GameHelper.isConquestAllStars(game.value));
-const isConquestHomeStars = computed(() => GameHelper.isConquestHomeStars(game.value));
-const isKingOfTheHillMode = computed(() => GameHelper.isKingOfTheHillMode(game.value));
 const isTeamConquest = computed(() => GameHelper.isTeamConquest(game.value));
-const isStarCountWin = computed(() => GameHelper.isWinConditionStarCount(game.value));
-const isHomeStarCountWinCondition = computed(() => GameHelper.isWinConditionHomeStars(game.value));
 const canReadyToQuit = computed(() => game.value.settings.general.readyToQuit === 'enabled' && GameHelper.isGameStarted(game.value) && game.value.state.productionTick > 0);
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 const almostAfkReminder = computed(() => Boolean(userPlayer.value && userPlayer.value.missedTurns && userPlayer.value.missedTurns === game.value.settings.gameTime.afk.turnTimeout - 1));
@@ -201,15 +175,6 @@ const recalculateTimeRemaining = () => {
 
 const getWinnerAlias = () => game.value.state.winner && GameHelper.getPlayerById(game.value, game.value.state.winner)?.alias;
 const getWinningTeam = () => game.value.state.winningTeam && GameHelper.getTeamById(game.value, game.value.state.winningTeam)?.name;
-
-const getAvatarImage = (player: Player<string>) => {
-  try {
-    return new URL(`../../../../assets/avatars/${player.avatar}`, import.meta.url).href;
-  } catch (err) {
-    console.error(err);
-    return null
-  }
-};
 
 const onCloseRequested = () => emit('onCloseRequested');
 const onViewSettingsRequested = () => emit('onViewSettingsRequested');
@@ -231,60 +196,6 @@ const quitGame = async () => {
   }
 
   isQuittingGame.value = false;
-};
-
-const confirmReady = async (player: Player<string>) => {
-  if (!await confirm('End Turn', 'Are you sure you want to end your turn?')) {
-    return
-  }
-
-  try {
-    const response = await gameService.confirmReady(game.value._id)
-
-    if (response.status === 200) {
-      toast.success(`You have confirmed your move, once all players are ready the game will progress automatically.`)
-
-      player.ready = true
-    }
-  } catch (err) {
-    console.error(err)
-  }
-};
-
-const confirmReadyToCycle = async (player: Player<string>) => {
-  if (!await confirm('End Cycle', 'Are you sure you want to end your turn up to the end of the current galactic cycle?')) {
-    return;
-  }
-
-  try {
-    const response = await gameService.confirmReadyToCycle(game.value._id);
-
-    if (response.status === 200) {
-      toast.success(`You have confirmed your move, once all players are ready the game will progress automatically.`)
-
-      player.ready = true
-      player.readyToCycle = true
-    }
-  } catch (err) {
-    console.error(err)
-  }
-};
-
-const unconfirmReady = async (player: Player<string>) => {
-  if (!isUserPlayer(player)) {
-    return;
-  }
-
-  try {
-    const response = await gameService.unconfirmReady(game.value._id);
-
-    if (response.status === 200) {
-      player.ready = false;
-      player.readyToCycle = false;
-    }
-  } catch (err) {
-    console.error(err);
-  }
 };
 
 const confirmReadyToQuit = async (player: Player<string>) => {
