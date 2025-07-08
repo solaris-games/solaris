@@ -414,8 +414,8 @@ export class Carrier extends EventEmitter<keyof Events, Events> implements MapOb
     this.emit('onCarrierMouseOut', this)
   }
 
-  refreshZoom(zoomPercent) {
-    this.zoomPercent = zoomPercent
+  refreshZoom(zoomPercent: number) {
+    this.zoomPercent = zoomPercent;
   }
 
   cleanupEventHandlers() {
@@ -425,6 +425,10 @@ export class Carrier extends EventEmitter<keyof Events, Events> implements MapOb
   }
 
   destroy() {
+    this.removeAllListeners();
+    this.cleanupEventHandlers();
+    this.clearPaths();
+
     this.container.destroy()
   }
 

@@ -166,8 +166,7 @@ export class Map {
 
     this.waypointContainer!.addChild(this.waypoints.container)
 
-    this.rulerPoints = new RulerPoints()
-    this.rulerPoints.setup(game)
+    this.rulerPoints = new RulerPoints(game);
     this.rulerPoints.on('onRulerPointCreated', this.onRulerPointCreated.bind(this))
     this.rulerPoints.on('onRulerPointsCleared', this.onRulerPointsCleared.bind(this))
     this.rulerPoints.on('onRulerPointRemoved', this.onRulerPointRemoved.bind(this))
@@ -176,11 +175,10 @@ export class Map {
 
     // -----------
     // Setup Territories
-    this.territories = new Territories()
-    this.territories.setup(game, userSettings, this.context)
+    this.territories = new Territories(this.context, game, userSettings);
 
-    this.territoryContainer!.addChild(this.territories.container)
-    this.territories.draw(userSettings)
+    this.territoryContainer!.addChild(this.territories.container);
+    this.territories.draw();
 
     // -----------
     // Setup Player Names
@@ -484,7 +482,6 @@ export class Map {
     }
   }
 
-
   setMode (mode: Mode) {
     let wasWaypoints = this.mode.mode === ModeKind.Waypoints;
 
@@ -553,26 +550,20 @@ export class Map {
     }
   }
 
-  drawCarrier (carrier) {
+  drawCarrier (carrier: Carrier) {
     carrier.draw()
     carrier.onZoomChanging(this.zoomPercent)
   }
 
-  _undrawCarrier (carrier) {
-    carrier.removeAllListeners()
-    carrier.cleanupEventHandlers()
-    carrier.clearPaths()
-
-
+  _undrawCarrier (carrier: Carrier) {
     this.chunks!.removeMapObjectFromChunks(carrier);
-
     this.carriers.splice(this.carriers.indexOf(carrier), 1)
 
     carrier.destroy()
   }
 
-  undrawCarrier (carrierData) {
-    let existing = this.carriers.find(x => x.data!._id === carrierData._id)
+  undrawCarrier (carrierData: CarrierData) {
+    const existing = this.carriers.find(x => x.data!._id === carrierData._id)
 
     if (existing) {
       this._undrawCarrier(existing)
@@ -600,12 +591,12 @@ export class Map {
   }
 
   clearRulerPoints () {
-    this.rulerPoints!.setup(this.game!)
+    this.rulerPoints!.update(this.game);
   }
 
   drawTerritories (userSettings: UserGameSettings) {
-    this.territories!.setup(this.game!, userSettings, this.context)
-    this.territories!.draw(userSettings)
+    this.territories.update(this.game, userSettings);
+    this.territories.draw();
   }
 
   drawWormHoles () {
@@ -811,7 +802,7 @@ export class Map {
     } else if (this.mode.mode === ModeKind.Waypoints) {
       this.waypoints!.onStarClicked(e)
     } else if (this.mode.mode === ModeKind.Ruler) {
-      this.rulerPoints!.onStarClicked(e)
+      this.rulerPoints.onStarClicked(e)
     }
     AnimationService.drawSelectedCircle(this.gameContainer.app!, this.container, e.location)
   }
@@ -875,7 +866,7 @@ export class Map {
         selectedCarrier!.unselect()
       }
     } else if (this.mode.mode === ModeKind.Ruler) {
-      this.rulerPoints!.onCarrierClicked(e)
+      this.rulerPoints.onCarrierClicked(e)
     }
 
     AnimationService.drawSelectedCircle(this.gameContainer.app!, this.container, e.location)
