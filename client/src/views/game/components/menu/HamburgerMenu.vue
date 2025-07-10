@@ -55,6 +55,7 @@
            v-if="isFormalAlliancesEnabled"><i class="fas fa-globe-americas me-2"></i>Diplomacy</a>
         <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEDGER)" title="Ledger (L)" v-if="isTradeEnabled"><i
           class="fas fa-file-invoice-dollar me-2"></i>Ledger</a>
+        <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.STATISTICS)" title="Statistics"><i class="fas fa-chart-bar me-2"></i>Statistics</a>
         <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GAME_NOTES)" title="Notes (N)"><i
           class="fas fa-book-open me-2"></i>Notes</a>
         <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.SPECTATORS)" title="Spectators"

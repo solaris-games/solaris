@@ -20,6 +20,7 @@
         <sidebar-menu-item :menuState="MENU_STATES.COMBAT_CALCULATOR" tooltip="Calculator (C)" iconClass="fas fa-calculator" />
         <sidebar-menu-item :menuState="MENU_STATES.RULER" tooltip="Ruler (V)" iconClass="fas fa-ruler" />
         <sidebar-menu-item v-if="!isDarkModeExtra && !isDataCleaned && (gameIsInProgress || gameIsFinished)" :menuState="MENU_STATES.INTEL" tooltip="Intel (I)" iconClass="fas fa-chart-line" />
+        <sidebar-menu-item :menuState="MENU_STATES.STATISTICS" tooltip="Statistics" iconClass="fas fa-chart-bar" />
       </div>
     </div>
 
