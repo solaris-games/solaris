@@ -387,6 +387,11 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
 
     answer(routes.getStatistics,
         mw.auth.authenticate(),
+        mw.game.loadGame({
+            lean: true,
+            'galaxy.players': true
+        }),
+        mw.player.loadPlayer,
         controller.getStatistics);
 
     return router;

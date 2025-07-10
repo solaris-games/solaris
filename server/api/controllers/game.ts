@@ -485,7 +485,7 @@ export default (container: DependencyContainer) => {
                     throw new ValidationError("Player not found in the game.");
                 }
 
-                if (player._id !== req.params.playerId) {
+                if (player._id.toString() !== req.params.playerId) {
                     throw new ValidationError("You can only access your own statistics.", 403);
                 }
 
