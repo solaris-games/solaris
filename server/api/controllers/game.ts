@@ -8,6 +8,7 @@ import {
     parseGameJoinGameRequest,
     parseKickPlayerRequest
 } from '../requests/game';
+import {Player} from "../../services/types/Player";
 
 const log = logger("Game Controller");
 
@@ -478,6 +479,16 @@ export default (container: DependencyContainer) => {
         },
         getStatistics: async (req, res, next) => {
             try {
+                const player: Player = req.player;
+
+                if (!player) {
+                    throw new ValidationError("Player not found in the game.");
+                }
+
+                if (player._id !== req.params.playerId) {
+                    throw new ValidationError("You can only access your own statistics.", 403);
+                }
+
                 const statistics = await container.statisticsService.getStatisticsForGame(req.params.gameId, req.params.playerId);
 
                 if (!statistics) {
