@@ -132,7 +132,7 @@ const upgradeIndustry = async () => {
     toast.error("Failed to upgrade industry");
   }
 
-  isUpgradingEconomy.value = false;
+  isUpgradingIndustry.value = false;
 };
 
 const upgradeScience = async () => {
@@ -155,7 +155,7 @@ const upgradeScience = async () => {
     toast.error("Failed to upgrade science");
   }
 
-  isUpgradingEconomy.value = false;
+  isUpgradingScience.value = false;
 };
 
 </script>
