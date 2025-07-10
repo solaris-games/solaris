@@ -48,36 +48,9 @@
       </div>
     </div>
 
-    <div class="row bg-success" v-if="game.state.endDate">
-      <div class="col text-center pt-2">
-        <h3>Game Over</h3>
-        <p v-if="!isTeamConquest">The winner is <b>{{ getWinnerAlias() }}</b>!</p>
-        <p v-if="isTeamConquest">The winning team is <b>{{ getWinningTeam() }}</b></p>
-      </div>
-    </div>
+    <winner :game="game" v-if="game.state.endDate" />
 
-    <div v-if="isTeamConquest">
-      <ul class="nav nav-tabs">
-        <li class="nav-item">
-          <a class="nav-link" :class="{ 'active': activeTab === 'team' }" data-bs-toggle="tab" href="#team">Team</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" :class="{ 'active': activeTab === 'player' }" data-bs-toggle="tab"
-            href="#player">Player</a>
-        </li>
-      </ul>
-
-      <div class="tab-content pt-2 pb-2">
-        <div class="tab-pane fade" :class="{ 'show active': activeTab === 'team' }" id="team">
-          <team-leaderboard @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested" />
-        </div>
-        <div class="tab-pane fade" :class="{ 'show active': activeTab === 'player' }" id="player">
-          <player-leaderboard @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested" />
-        </div>
-      </div>
-    </div>
-
-    <player-leaderboard v-if="!isTeamConquest" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested" />
+    <leaderboards :isTeamConquest="isTeamConquest"></leaderboards>
 
     <new-player-message />
 
@@ -135,6 +108,8 @@ import { toastInjectionKey } from '@/util/keys'
 import { makeConfirm } from '@/util/confirm'
 import { useIsHistoricalMode } from '@/util/reactiveHooks'
 import WinCondition from "@/views/game/components/leaderboard/WinCondition.vue";
+import Winner from "@/views/game/components/leaderboard/Winner.vue";
+import Leaderboards from "@/views/game/components/leaderboard/Leaderboards.vue";
 
 const emit = defineEmits<{
   onCloseRequested: [],
@@ -172,9 +147,6 @@ const recalculateTimeRemaining = () => {
     timeRemaining.value = `Next turn: ${GameHelper.getCountdownTimeStringForTurnTimeout(game.value)}`;
   }
 };
-
-const getWinnerAlias = () => game.value.state.winner && GameHelper.getPlayerById(game.value, game.value.state.winner)?.alias;
-const getWinningTeam = () => game.value.state.winningTeam && GameHelper.getTeamById(game.value, game.value.state.winningTeam)?.name;
 
 const onCloseRequested = () => emit('onCloseRequested');
 const onViewSettingsRequested = () => emit('onViewSettingsRequested');
