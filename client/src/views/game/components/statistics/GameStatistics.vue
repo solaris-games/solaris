@@ -5,7 +5,11 @@
 
       <loading-spinner :loading="!statistics"/>
 
-      <div v-if="statistics">
+      <div v-if="statistics === 'not-available'" class="alert alert-info">
+        <p class="mb-0">Statistics are not available for this game.</p>
+      </div>
+
+      <div v-if="statistics && statistics !== 'not-available'">
         <div class="row table-responsive">
           <h5 class="mb-4">Combat</h5>
 
@@ -176,7 +180,7 @@
 
 <script setup lang="ts">
 import { ref, inject, computed, onMounted, type Ref } from 'vue';
-import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
+import {formatError, httpInjectionKey, isOk, ResponseResultKind} from "@/services/typedapi";
 import type {Statistics} from "@solaris-common";
 import LoadingSpinner from "@/views/components/LoadingSpinner.vue";
 import MenuTitle from "@/views/game/components/MenuTitle.vue";
@@ -193,7 +197,7 @@ const emit = defineEmits<{
   onCloseRequested: [];
 }>();
 
-const statistics: Ref<Statistics | null> = ref(null);
+const statistics: Ref<Statistics | 'not-available' | null> = ref(null);
 
 const userPlayer = computed(() => GameHelper.getUserPlayer(store.state.game));
 
@@ -211,6 +215,13 @@ onMounted(async () => {
   if (isOk(response)) {
     statistics.value = response.data;
   } else {
+    if (response.kind === ResponseResultKind.ResponseError) {
+      if (response.status === 404) {
+        statistics.value = 'not-available';
+        return;
+      }
+    }
+
     console.error(formatError(response));
   }
 });
