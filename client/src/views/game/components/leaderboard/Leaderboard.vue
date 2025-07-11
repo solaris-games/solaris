@@ -11,6 +11,8 @@
       </div>
     </div>
 
+    <hr />
+
     <div class="row" v-if="!game.state.endDate && almostAfkReminder">
       <div class="col text-center">
         <p class="mt-2 mb-2 text-danger">You have missed the last {{ userPlayer?.missedTurns }} turn(s). Please
@@ -98,8 +100,6 @@ import NewPlayerMessage from '../welcome/NewPlayerMessage.vue'
 import ShareLink from '../welcome/ShareLink.vue'
 import HelpTooltip from '../../../components/HelpTooltip.vue'
 import ConcedeDefeatButton from './ConcedeDefeatButton.vue'
-import PlayerLeaderboard from './PlayerLeaderboard.vue';
-import TeamLeaderboard from './TeamLeaderboard.vue';
 import { inject, ref, computed, onMounted, type Ref, onUnmounted } from 'vue';
 import { type Game, type Player } from '@solaris-common';
 import { useStore, type Store } from 'vuex';

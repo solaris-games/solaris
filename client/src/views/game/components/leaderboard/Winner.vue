@@ -1,16 +1,18 @@
 <template>
-  <div class="row">
+  <div class="row victoryBox">
     <div class="col text-center pt-2">
-
-
-      <h3>Game Over</h3>
-      <p v-if="!isTeamConquest">The winner is <b>{{ getWinnerAlias() }}</b>!</p>
-      <p v-if="isTeamConquest">The winning team is <b>{{ getWinningTeam() }}</b></p>
+      <h3 class="text-info victoryHeading">Game Complete</h3>
+      <img :src="victory" alt="Victory" class="victoryImg mb-4" />
+      <p class="text-info victoryWinner" v-if="!isTeamConquest"><span class="victoryEmphasis">{{ getWinnerAlias() }}</span> has conquered the galaxy!</p>
+      <p class="text-info victoryWinner" v-if="isTeamConquest"><span class="victoryEmphasis">{{ getWinningTeam() }}</span> has conquered the galaxy!</p>
     </div>
   </div>
+
+  <hr />
 </template>
 
 <script setup lang="ts">
+import victory from '@/assets/general/laurel_wreath.svg'
 import GameHelper from "@/services/gameHelper";
 import type {Game} from "@/types/game";
 import {computed} from "vue";
@@ -26,5 +28,26 @@ const getWinningTeam = () => props.game.state.winningTeam && GameHelper.getTeamB
 </script>
 
 <style scoped>
+.victoryImg {
+  width: 150px;
+  height: 150px;
+}
 
+.victoryBox {
+  border: 2px solid #EFBF04;
+  margin: 4px;
+  border-radius: 4px;
+}
+
+.victoryHeading {
+  font-size: 28px;
+}
+
+.victoryWinner {
+  font-size: 22px;
+}
+
+.victoryEmphasis {
+  font-weight: bold;
+}
 </style>
