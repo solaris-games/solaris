@@ -8,6 +8,8 @@ const log = logger("Sum game statistics Job");
 
 export const sumGameStatisticsJob = (container: DependencyContainer) => async () => {
     try {
+        log.info("Starting sumGameStatistics job...");
+
         const statisticsService = container.statisticsService;
         const gameService = container.gameService;
 
@@ -38,7 +40,11 @@ export const sumGameStatisticsJob = (container: DependencyContainer) => async ()
                 // @ts-ignore
                 await slice.save();
             }
+
+            log.info(`Processed ${slicesForGame.length} slices for game ${gameId}`);
         }
+
+        log.info("Finished sumGameStatistics job.");
     } catch (e) {
         log.error(e, "SumGameStatistics job threw unhandled: " + e);
     }
