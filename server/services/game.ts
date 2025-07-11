@@ -6,7 +6,7 @@ import ValidationError from '../errors/validation';
 import Repository from './repository';
 import { Game } from './types/Game';
 import { Player } from './types/Player';
-import AchievementService from './achievement';
+import UserAchievementService from './userAchievement';
 import AvatarService from './avatar';
 import CarrierService from './carrier';
 import GameStateService from './gameState';
@@ -37,7 +37,7 @@ export default class GameService extends EventEmitter {
     carrierService: CarrierService;
     playerService: PlayerService;
     passwordService: PasswordService;
-    achievementService: AchievementService;
+    achievementService: UserAchievementService;
     avatarService: AvatarService;
     gameTypeService: GameTypeService;
     gameStateService: GameStateService;
@@ -54,7 +54,7 @@ export default class GameService extends EventEmitter {
         carrierService: CarrierService,
         playerService: PlayerService,
         passwordService: PasswordService,
-        achievementService: AchievementService,
+        achievementService: UserAchievementService,
         avatarService: AvatarService,
         gameTypeService: GameTypeService,
         gameStateService: GameStateService,

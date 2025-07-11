@@ -22,6 +22,7 @@ import StarDistanceService from './starDistance';
 import TechnologyService from './technology';
 import UserService from './user';
 import {MathRandomGen} from "../utils/randomGen";
+import StatisticsService from "./statistics";
 
 const RNG = require('random-seed');
 
@@ -43,6 +44,7 @@ export default class StarService extends EventEmitter {
     userService: UserService;
     gameTypeService: GameTypeService;
     gameStateService: GameStateService;
+    statisticsService: StatisticsService;
 
     constructor(
         gameRepo: Repository<Game>,
@@ -54,7 +56,8 @@ export default class StarService extends EventEmitter {
         specialistService: SpecialistService,
         userService: UserService,
         gameTypeService: GameTypeService,
-        gameStateService: GameStateService
+        gameStateService: GameStateService,
+        statisticsService: StatisticsService,
     ) {
         super();
 
@@ -68,6 +71,7 @@ export default class StarService extends EventEmitter {
         this.userService = userService;
         this.gameTypeService = gameTypeService;
         this.gameStateService = gameStateService;
+        this.statisticsService = statisticsService;
     }
 
     generateUnownedStar(name: string, location: Location, naturalResources: NaturalResources) {
@@ -534,11 +538,13 @@ export default class StarService extends EventEmitter {
         let carrierUser = gameUsers.find(u => carrierPlayer.userId && u._id.toString() === carrierPlayer.userId.toString()) || null;
 
         if (carrierUser && !carrierPlayer.defeated && !this.gameTypeService.isTutorialGame(game)) {
-            carrierUser.achievements.combat.stars.captured++;
+            this.statisticsService.modifyStats(game._id, carrierPlayer._id, (stats) => {
+                stats.combat.stars.captured++;
 
-            if (star.homeStar) {
-                carrierUser.achievements.combat.homeStars.captured++;
-            }
+                if (star.homeStar) {
+                    stats.combat.homeStars.captured++;
+                }
+            });
         }
     }
 

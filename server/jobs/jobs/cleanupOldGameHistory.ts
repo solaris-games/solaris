@@ -1,5 +1,5 @@
-import { DependencyContainer } from "../services/types/DependencyContainer";
-import {logger} from "../utils/logging";
+import { DependencyContainer } from "../../services/types/DependencyContainer";
+import {logger} from "../../utils/logging";
 
 const log = logger("Cleanup Old Game History Job");
 const months = 6;

@@ -3,7 +3,7 @@ import {MathRandomGen, RandomGen, SeededRandomGen} from "../utils/randomGen";
 const mongoose = require('mongoose');
 import ValidationError from '../errors/validation';
 import {Game, GameSettings, Team} from './types/Game';
-import AchievementService from './achievement';
+import UserAchievementService from './userAchievement';
 import ConversationService from './conversation';
 import GameCreateValidationService from './gameCreateValidation';
 import GameFluxService from './gameFlux';
@@ -43,7 +43,7 @@ export default class GameCreateService {
     passwordService: PasswordService;
     conversationService: ConversationService;
     historyService: HistoryService;
-    achievementService: AchievementService;
+    achievementService: UserAchievementService;
     userService: UserService;
     gameCreateValidationService: GameCreateValidationService;
     gameFluxService: GameFluxService;
@@ -66,7 +66,7 @@ export default class GameCreateService {
         passwordService: PasswordService,
         conversationService: ConversationService, 
         historyService: HistoryService,
-        achievementService: AchievementService,
+        achievementService: UserAchievementService,
         userService: UserService,
         gameCreateValidationService: GameCreateValidationService,
         gameFluxService: GameFluxService,

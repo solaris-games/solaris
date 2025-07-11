@@ -1,8 +1,8 @@
-import { DBObjectId } from "../services/types/DBObjectId";
-import { DependencyContainer } from "../services/types/DependencyContainer";
-import { Game } from "../services/types/Game";
-import { GameMutexLock } from "../services/types/GameMutexLock";
-import {logger} from "../utils/logging";
+import { DBObjectId } from "../../services/types/DBObjectId";
+import { DependencyContainer } from "../../services/types/DependencyContainer";
+import { Game } from "../../services/types/Game";
+import { GameMutexLock } from "../../services/types/GameMutexLock";
+import {logger} from "../../utils/logging";
 
 const log = logger("Game Tick Job");
 

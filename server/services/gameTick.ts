@@ -42,6 +42,7 @@ import ScheduleBuyService from "./scheduleBuy";
 import {Moment} from "moment";
 import GameLockService from "./gameLock";
 import {logger} from "../utils/logging";
+import StatisticsService from "./statistics";
 
 const EventEmitter = require('events');
 const moment = require('moment');
@@ -89,6 +90,7 @@ export default class GameTickService extends EventEmitter {
     shipService: ShipService;
     scheduleBuyService: ScheduleBuyService;
     gameLockService: GameLockService;
+    statisticsService: StatisticsService;
 
     constructor(
         distanceService: DistanceService,
@@ -122,6 +124,7 @@ export default class GameTickService extends EventEmitter {
         shipService: ShipService,
         scheduleBuyService: ScheduleBuyService,
         gameLockService: GameLockService,
+        statisticsService: StatisticsService,
     ) {
         super();
             
@@ -156,6 +159,7 @@ export default class GameTickService extends EventEmitter {
         this.shipService = shipService;
         this.gameLockService = gameLockService;
         this.scheduleBuyService = scheduleBuyService;
+        this.statisticsService = statisticsService;
     }
 
     async tick(gameId: DBObjectId) {
@@ -217,7 +221,7 @@ export default class GameTickService extends EventEmitter {
         }
 
         // Check if win condition was reached before the tick (for example due to RTQ)
-        let hasWinnerBeforeTick = this._gameWinCheck(game, gameUsers);
+        let hasWinnerBeforeTick = await this._gameWinCheck(game, gameUsers);
         if (hasWinnerBeforeTick) {
             log.info({
                 gameId: game._id,
@@ -287,7 +291,7 @@ export default class GameTickService extends EventEmitter {
             this._countdownToEndCheck(game);
             logTime('Countdown to end check');
 
-            let hasWinner = this._gameWinCheck(game, gameUsers);
+            let hasWinner = await this._gameWinCheck(game, gameUsers);
             logTime('Game win check');
 
             await this._logHistory(game);
@@ -837,7 +841,7 @@ export default class GameTickService extends EventEmitter {
         this.gameStateService.updateStatePlayerCount(game);
     }
 
-    _gameWinCheck(game: Game, gameUsers: User[]) {
+    async _gameWinCheck(game: Game, gameUsers: User[]) {
         const isTutorialGame = this.gameTypeService.isTutorialGame(game);
 
 
@@ -870,6 +874,8 @@ export default class GameTickService extends EventEmitter {
 
         if (winner) {
             this.gameStateService.finishGame(game, winner);
+
+            await this.statisticsService.closeStatsSlicesForGame(game);
 
             for (const player of game.galaxy.players) {
                 if (this.playerAfkService.isAIControlled(game, player, true)) {

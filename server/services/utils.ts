@@ -86,3 +86,17 @@ export const nullObject = (obj: Object) => {
         obj[key] = 0;
     }
 }
+
+export const groupBy = <T, K>(list: T[], keyFunc: (item: T) => K): Map<K, T[]> => {
+    const map = new Map<K, T[]>();
+
+    for (const item of list) {
+        const key = keyFunc(item);
+        if (!map.has(key)) {
+            map.set(key, []);
+        }
+        map.get(key)!.push(item);
+    }
+
+    return map;
+}

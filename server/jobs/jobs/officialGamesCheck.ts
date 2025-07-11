@@ -1,7 +1,7 @@
-import {DependencyContainer} from "../services/types/DependencyContainer";
-import {Game, GameSettings} from "../services/types/Game";
-import {OfficialGameCategory, OfficialGameKind} from "../config/officialGames";
-import {logger} from "../utils/logging";
+import {DependencyContainer} from "../../services/types/DependencyContainer";
+import {Game, GameSettings} from "../../services/types/Game";
+import {OfficialGameCategory, OfficialGameKind} from "../../config/officialGames";
+import {logger} from "../../utils/logging";
 
 const log = logger("Official Games Check Job");
 
