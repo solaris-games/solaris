@@ -62,6 +62,12 @@ const submit = async (e: Event) => {
     console.error(formatError(response));
     toast.error("Error creating announcement");
     errors.value = extractErrors(response);
+  } else {
+    toast.success("Announcement created successfully");
+    title.value = '';
+    date.value = '';
+    content.value = '';
+    errors.value = [];
   }
 
   emit('onAnnouncementCreated');
