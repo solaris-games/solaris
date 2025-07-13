@@ -8,19 +8,16 @@
     </div>
 </template>
 
-<script>
-export default {
-    props: {
-        playerId: String
-    },
-    methods: {
-        onOpenReportPlayerRequested (e) {
-            this.$emit('onOpenReportPlayerRequested', {
-              playerId: this.playerId
-            })
-        }
-    }
-}
+<script setup lang="ts">
+const props = defineProps<{
+  playerId: string,
+}>();
+
+const emit = defineEmits<{
+  onOpenReportPlayerRequested: [],
+}>();
+
+const onOpenReportPlayerRequested = () => emit('onOpenReportPlayerRequested');
 </script>
 
 <style scoped>

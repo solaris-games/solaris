@@ -18,30 +18,34 @@
   </div>
 </template>
 
-<script>
-import AdminApiService from "../../../services/api/admin";
+<script setup lang="ts">
+import { ref, inject, type Ref } from 'vue';
+import { httpInjectionKey, isError, formatError, extractErrors, isOk } from "@/services/typedapi";
+import { getConversationForReport } from "@/services/typedapi/admin";
+import type { Report, Conversation, ConversationMessage } from '@solaris-common';
 
-export default {
-  name: "MessageReport",
-  props: {
-    report: Object
-  },
-  data () {
-    return {
-      conversation: null,
-      messages: null
-    }
-  },
-  methods: {
-    isReportedMessage (msg) {
-      return msg._id === this.report.reportedMessageId;
-    },
-    async showMessages () {
-      const resp = await AdminApiService.getConversationForReport(this.report._id);
+const props = defineProps<{
+  report: Report<string>,
+}>();
 
-      this.conversation = resp.data;
-      this.messages = this.conversation.messages.filter(msg => msg.type === 'message');
-    }
+const httpClient = inject(httpInjectionKey)!;
+
+const conversation: Ref<Conversation<string> | null> = ref(null);
+const messages: Ref<ConversationMessage<string>[] | null> = ref(null);
+
+const isReportedMessage = (msg: ConversationMessage<string>) => {
+  return msg._id === props.report.reportedMessageId;
+};
+
+const showMessages = async () => {
+  const resp = await getConversationForReport(httpClient)(props.report._id);
+
+  if (isOk(resp)) {
+    const conv = resp.data;
+    conversation.value = conv;
+    messages.value = conv.messages.filter(msg => msg.type === 'message') as ConversationMessage<string>[];
+  } else {
+    console.error(formatError(resp));
   }
 }
 </script>

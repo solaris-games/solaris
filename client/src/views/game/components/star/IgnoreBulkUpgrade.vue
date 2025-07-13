@@ -33,103 +33,100 @@
     </div>
 </template>
 
-<script>
-import starService from '../../../../services/api/star'
+<script setup lang="ts">
 import GameHelper from '../../../../services/gameHelper'
-import { inject } from 'vue';
+import { inject, computed } from 'vue';
 import {eventBusInjectionKey} from "@/eventBus";
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
+import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
+import {toastInjectionKey} from "@/util/keys";
+import type {State} from "@/store";
+import { useStore, type Store } from 'vuex';
+import type {InfrastructureType} from "@solaris-common";
+import { toggleBulkIgnore as toggleBulkIgnoreReq, toggleBulkIgnoreAll as toggleBulkIgnoreAllReq } from '@/services/typedapi/star';
 
-export default {
-  components: {
+const props = defineProps<{
+  starId: string,
+  highlightIgnoredInfrastructure?: InfrastructureType
+}>();
 
-  },
-  props: {
-    starId: String,
-    highlightIgnoredInfrastructure: String
-  },
-  setup () {
-    return {
-      eventBus: inject(eventBusInjectionKey)
+const emit = defineEmits<{
+  bulkIgnoreChanged: [{ starId: string }],
+}>();
+
+const eventBus = inject(eventBusInjectionKey)!;
+const httpClient = inject(httpInjectionKey)!;
+const toast = inject(toastInjectionKey)!;
+
+const store: Store<State> = useStore();
+
+const star = computed(() => GameHelper.getStarById(store.state.game, props.starId)!);
+
+const canIgnoreEconomy = computed(() => store.state.game.settings.player.developmentCost.economy !== 'none');
+const canIgnoreIndustry = computed(() => store.state.game.settings.player.developmentCost.industry !== 'none');
+const canIgnoreScience = computed(() => store.state.game.settings.player.developmentCost.science !== 'none');
+
+const isAllIgnored = computed(() => (!canIgnoreEconomy.value || getInfrastructureIgnoreStatus('economy'))
+  && (!canIgnoreIndustry.value || getInfrastructureIgnoreStatus('industry'))
+  && (!canIgnoreScience.value || getInfrastructureIgnoreStatus('science'))
+);
+
+const isAllIncluded = computed(() => (!canIgnoreEconomy.value || !getInfrastructureIgnoreStatus('economy'))
+  && (!canIgnoreIndustry.value || !getInfrastructureIgnoreStatus('industry'))
+  && (!canIgnoreScience.value || !getInfrastructureIgnoreStatus('science'))
+);
+
+const triggerChanged = () => {
+  emit("bulkIgnoreChanged", {
+    starId: props.starId
+  });
+  const star = GameHelper.getStarById(store.state.game, props.starId);
+  eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
+};
+
+const getInfrastructureIgnoreStatus = (infrastructureType: InfrastructureType) => star.value.ignoreBulkUpgrade![infrastructureType];
+
+const toggleBulkIgnore = async (infrastructureType: InfrastructureType) => {
+  const response = await toggleBulkIgnoreReq(httpClient)(store.state.game._id, props.starId, infrastructureType);
+
+  if (isOk(response)) {
+    const newVal = !star.value.ignoreBulkUpgrade![infrastructureType];
+
+    star.value.ignoreBulkUpgrade![infrastructureType] = newVal;
+
+    if (newVal) {
+      toast.default(`${star.value.name} ${infrastructureType} is now ignored by Bulk Upgrade.`)
+    } else {
+      toast.default(`${star.value.name} ${infrastructureType} is now included in Bulk Upgrade.`)
     }
-  },
-  methods: {
-    triggerChanged () {
-      this.$emit("bulkIgnoreChanged", {
-        starId: this.starId
-      });
-      const star = GameHelper.getStarById(this.$store.state.game, this.starId);
-      this.eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
-    },
-    async toggleBulkIgnore (infrastructureType) {
-      try {
-        let response = await starService.toggleIgnoreBulkUpgrade(this.$store.state.game._id, this.star._id, infrastructureType)
 
-        if (response.status === 200) {
-          this.star.ignoreBulkUpgrade[infrastructureType] = !this.star.ignoreBulkUpgrade[infrastructureType]
-
-          if (this.star.ignoreBulkUpgrade[infrastructureType]) {
-            this.$toast.default(`${this.star.name} ${infrastructureType} is now ignored by Bulk Upgrade.`)
-          } else {
-            this.$toast.default(`${this.star.name} ${infrastructureType} is now included in Bulk Upgrade.`)
-          }
-
-          this.triggerChanged();
-        }
-      } catch (err) {
-        console.log(err)
-      }
-    },
-    async toggleBulkIgnoreAll (ignoreStatus) {
-      try {
-        let response = await starService.toggleIgnoreBulkUpgradeAll(this.$store.state.game._id, this.star._id, ignoreStatus)
-
-        if (response.status === 200) {
-          this.star.ignoreBulkUpgrade['economy'] = ignoreStatus
-          this.star.ignoreBulkUpgrade['industry'] = ignoreStatus
-          this.star.ignoreBulkUpgrade['science'] = ignoreStatus
-
-          if (ignoreStatus) {
-            this.$toast.default(`${this.star.name} is now ignored by Bulk Upgrade.`)
-          } else {
-            this.$toast.default(`${this.star.name} is now included in Bulk Upgrade.`)
-          }
-
-          this.triggerChanged();
-        }
-      } catch (err) {
-        console.log(err)
-      }
-    },
-    getInfrastructureIgnoreStatus(infrastructureType) {
-        return this.star.ignoreBulkUpgrade[infrastructureType]
-    }
-  },
-  computed: {
-    star: function () {
-      return GameHelper.getStarById(this.$store.state.game, this.starId)
-    },
-    canIgnoreEconomy: function () {
-      return this.$store.state.game.settings.player.developmentCost.economy !== 'none'
-    },
-    canIgnoreIndustry: function () {
-      return this.$store.state.game.settings.player.developmentCost.industry !== 'none'
-    },
-    canIgnoreScience: function () {
-      return this.$store.state.game.settings.player.developmentCost.science !== 'none'
-    },
-    isAllIgnored: function () {
-        return (!this.canIgnoreEconomy || this.getInfrastructureIgnoreStatus('economy'))
-            && (!this.canIgnoreIndustry || this.getInfrastructureIgnoreStatus('industry'))
-            && (!this.canIgnoreScience || this.getInfrastructureIgnoreStatus('science'))
-    },
-    isAllIncluded: function () {
-        return (!this.canIgnoreEconomy || !this.getInfrastructureIgnoreStatus('economy'))
-            && (!this.canIgnoreIndustry || !this.getInfrastructureIgnoreStatus('industry'))
-            && (!this.canIgnoreScience || !this.getInfrastructureIgnoreStatus('science'))
-    }
+    triggerChanged();
+  } else {
+    console.error(formatError(response));
+    toast.error("Failed to set bulk upgrade ignore");
   }
-}
+};
+
+const toggleBulkIgnoreAll = async (ignoreStatus: boolean) => {
+  const response = await toggleBulkIgnoreAllReq(httpClient)(store.state.game._id, star.value._id, ignoreStatus);
+
+  if (isOk(response)) {
+    star.value.ignoreBulkUpgrade!.economy = ignoreStatus;
+    star.value.ignoreBulkUpgrade!.industry = ignoreStatus;
+    star.value.ignoreBulkUpgrade!.science = ignoreStatus;
+
+    if (ignoreStatus) {
+      toast.default(`${star.value.name} is now ignored by Bulk Upgrade.`);
+    } else {
+      toast.default(`${star.value.name} is now included in Bulk Upgrade.`);
+    }
+
+    triggerChanged();
+  } else {
+    console.error(formatError(response));
+    toast.error("Failed to set bulk upgrade ignore");
+  }
+};
 </script>
 
 <style scoped>

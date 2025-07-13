@@ -32,19 +32,19 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             controller.listPasswordResets
     );
 
-    router.get('/api/admin/reports/:reportId/conversation',
+    answer(routes.getConversationForReport, 
             mw.auth.authenticate({ communityManager: true }),
             controller.conversationForReport
     );
 
-    router.get('/api/admin/reports',
-            mw.auth.authenticate({ communityManager: true }),
-            controller.listReports
+    answer(routes.listReports,
+        mw.auth.authenticate({ communityManager: true }),
+        controller.listReports
     );
 
-    router.patch('/api/admin/reports/:reportId/action',
-            mw.auth.authenticate({ communityManager: true }),
-            controller.actionReport
+    answer(routes.actionReport, 
+        mw.auth.authenticate({ communityManager: true }),
+        controller.actionReport
     );
 
     answer(routes.addWarning, mw.auth.authenticate({ communityManager: true }),

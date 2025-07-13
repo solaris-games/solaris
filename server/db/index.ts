@@ -8,6 +8,8 @@ import GuildModel from './models/Guild';
 import HistoryModel from './models/History';
 import UserModel from './models/User';
 import PaymentModel from './models/Payment';
+import ReportModel from './models/Report';
+import StatsSliceModel from './models/StatsSlice';
 
 const log = logger("Database");
 
@@ -43,7 +45,8 @@ export default async (config, options) => {
         await HistoryModel.syncIndexes();
         await UserModel.syncIndexes();
         await PaymentModel.syncIndexes();
-        // TODO ReportModel?
+        await ReportModel.syncIndexes();
+        await StatsSliceModel.syncIndexes();
         log.info('Indexes synced.');
     }
     

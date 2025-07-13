@@ -41,7 +41,7 @@
                    id="amount"
                    v-model="amount"
                    type="number"
-                   required="required"
+                   required
                    :disabled="isChecking || isUpgrading"
             />
           </div>
@@ -81,7 +81,7 @@
                    id="tick"
                    v-model="tick"
                    type="number"
-                   required="required"
+                   required
                    :disabled="isChecking || isUpgrading"
             />
           </div>
@@ -100,7 +100,7 @@
           <div class="mb-2 col">
             <div class="d-grid">
               <button class="btn btn-outline-info" v-on:click="check"
-                      :disabled="$isHistoricalMode() || isUpgrading || isChecking || gameIsFinished()"><i
+                      :disabled="isHistoricalMode || isUpgrading || isChecking || gameIsFinished()"><i
                 class="fas fa-hammer me-1"></i>{{checkText}}
               </button>
             </div>
@@ -118,7 +118,7 @@
         <div class="col-4 pt-2 ps-1">
           <div class="d-grid gap-2">
             <button class="btn btn-success" v-on:click="upgrade"
-                    :disabled="$isHistoricalMode() || isUpgrading || isChecking || gameIsFinished()"><i
+                    :disabled="isHistoricalMode || isUpgrading || isChecking || gameIsFinished()"><i
               class="fas fa-check me-1"></i>Confirm
             </button>
           </div>
@@ -135,256 +135,257 @@
       <div v-if="actionCount > 0">
         <h4 class="mt-2">Scheduled Buy Actions</h4>
 
-        <scheduled-table @bulkScheduleTrashed="onTrashed"/>
+        <bulk-infrastructure-upgrade-schedule-table @bulkScheduleTrashed="updateActionCount"/>
       </div>
       <h4 class="mt-2">Bulk Ignore Stars</h4>
 
-      <star-table @onOpenStarDetailRequested="onOpenStarDetailRequested" @bulkIgnoreChanged="resetPreview"
-                  :highlightIgnoredInfrastructure="selectedType"/>
+      <bulk-infrastructure-upgrade-star-table @onOpenStarDetailRequested="onOpenStarDetailRequested" @bulkIgnoreChanged="resetPreview"
+                  :highlightIgnoredInfrastructure="selectedType || undefined"/>
     </div>
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import MenuTitle from '../MenuTitle.vue'
 import FormErrorList from '../../../components/FormErrorList.vue'
-import starService from '../../../../services/api/star'
 import GameHelper from '../../../../services/gameHelper'
 import AudioService from '../../../../game/audio'
-import { inject } from 'vue';
+import { inject, ref, computed, onUnmounted, onMounted, type Ref } from 'vue';
 import BulkInfrastructureUpgradeScheduleTable from './BulkInfrastructureUpgradeScheduleTable.vue'
-import BulkInfrastructureUpgradeStarTableVue from './BulkInfrastructureUpgradeStarTable.vue'
+import BulkInfrastructureUpgradeStarTable from './BulkInfrastructureUpgradeStarTable.vue'
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import BulkInfrastructureUpgradeReport from "@/views/game/components/star/BulkInfrastructureUpgradeReport.vue";
+import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";
+import {toastInjectionKey} from "@/util/keys";
+import type {BulkUpgradeReport, InfrastructureType, MapObject} from "@solaris-common";
+import { useStore, type Store } from 'vuex';
+import type { State } from "@/store";
+import {scheduleBulk, upgradeBulk, upgradeBulkCheck} from "@/services/typedapi/star";
+import {makeConfirm} from "@/util/confirm";
+import {useIsHistoricalMode} from "@/util/reactiveHooks";
 
-export default {
-  components: {
-    BulkInfrastructureUpgradeReport,
-    'menu-title': MenuTitle,
-    'form-error-list': FormErrorList,
-    'scheduled-table': BulkInfrastructureUpgradeScheduleTable,
-    'star-table': BulkInfrastructureUpgradeStarTableVue,
-    'loading-spinner': LoadingSpinner
-  },
-  setup () {
-    return {
-      eventBus: inject(eventBusInjectionKey)
+type ScheduleStrategy =  'future' | 'cycle-start' | 'cycle-end' | 'now';
+
+const emit = defineEmits<{
+  onCloseRequested: [],
+  onOpenStarDetailRequested: [starId: string],
+}>();
+
+const httpClient = inject(httpInjectionKey)!;
+const toast = inject(toastInjectionKey)!;
+const eventBus = inject(eventBusInjectionKey)!;
+
+const store: Store<State> = useStore();
+const confirm = makeConfirm(store);
+
+const errors: Ref<string[]> = ref([]);
+const isUpgrading = ref(false);
+const isChecking = ref(false);
+const hasChecked = ref(false);
+const upgradePreview: Ref<BulkUpgradeReport<string> | null> = ref(null);
+const amount = ref(0);
+const previewAmount = ref(0);
+const upgradeAvailable = ref(0);
+const cost = ref(0);
+const ignoredCount = ref(0);
+const selectedType: Ref<InfrastructureType | null> = ref("economy");
+const selectedUpgradeStrategy = ref("totalCredits");
+const selectedScheduleStrategy: Ref<ScheduleStrategy> = ref('now');
+const repeat = ref("false");
+const tick: Ref<number> = ref(store.state.game.state.tick);
+const types: Ref<{ key: InfrastructureType, name: string }[]> = ref([]);
+const actionCount = ref(0);
+
+const isHistoricalMode = useIsHistoricalMode(store);
+
+const checkText = computed(() => {
+  if (selectedScheduleStrategy.value === 'future' || selectedScheduleStrategy.value === 'cycle-end' || selectedScheduleStrategy.value === 'cycle-start') {
+    return "Schedule"
+  } else {
+    return "Check"
+  }
+});
+
+const setupInfrastructureTypes = () => {
+  types.value = [];
+
+  if (store.state.game.settings.player.developmentCost.economy !== 'none') {
+    types.value.push({
+      key: 'economy',
+      name: 'Economy'
+    })
+  }
+
+  if (store.state.game.settings.player.developmentCost.industry !== 'none') {
+    types.value.push({
+      key: 'industry',
+      name: 'Industry'
+    })
+  }
+
+  if (store.state.game.settings.player.developmentCost.science !== 'none') {
+    types.value.push({
+      key: 'science',
+      name: 'Science'
+    })
+  }
+
+  selectedType.value = types.value.length ? types.value[0].key : null;
+};
+
+const onCloseRequested = () => emit('onCloseRequested');
+
+const onOpenStarDetailRequested = (e: string) => emit('onOpenStarDetailRequested', e);
+
+const resetPreview = () => {
+  hasChecked.value = false;
+  upgradePreview.value = null;
+};
+
+const updateActionCount = () => actionCount.value = GameHelper.getUserPlayer(store.state.game)?.scheduledActions?.length || 0;
+
+const getStar = (starId: string) => GameHelper.getStarById(store.state.game, starId)!;
+
+const panToStar = (starId: string) => {
+  const star: MapObject<string> = getStar(starId)!;
+  eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: star });
+};
+
+const gameIsFinished = () => GameHelper.isGameFinished(store.state.game);
+
+const resetHasChecked = () => !hasChecked.value;
+
+const isFutureStrategy = (strategy: ScheduleStrategy) => strategy === 'future' || strategy === 'cycle-end' || strategy === 'cycle-start';
+
+const check = async () => {
+  errors.value = [];
+  upgradePreview.value = null;
+
+  if (!selectedType.value || amount.value <= 0 || (selectedUpgradeStrategy.value === 'percentageOfCredits' && amount.value > 100)) {
+    return;
+  }
+
+  if (selectedScheduleStrategy.value === 'future' && tick.value < store.state.game.state.tick) {
+    return;
+  }
+
+  isChecking.value = true;
+
+  if (isFutureStrategy(selectedScheduleStrategy.value)) {
+    if (selectedScheduleStrategy.value === 'cycle-end') {
+      const cycleTicks = store.state.game.settings.galaxy.productionTicks;
+      const currentTick = store.state.game.state.tick;
+      const cycle = Math.floor(currentTick / cycleTicks) + 1;
+      tick.value = cycle * cycleTicks - 1;
+    } else if (selectedScheduleStrategy.value === 'cycle-start') {
+      const cycleTicks = store.state.game.settings.galaxy.productionTicks;
+      const currentTick = store.state.game.state.tick;
+      const cycle = Math.floor(currentTick / cycleTicks) + 1;
+      tick.value = cycle * cycleTicks;
     }
-  },
-  data() {
-    return {
-      errors: [],
-      audio: null,
-      isUpgrading: false,
-      isChecking: false,
-      hasChecked: false,
-      upgradePreview: null,
-      amount: 0,
-      previewAmount: 0,
-      upgradeAvailable: 0,
-      cost: 0,
-      ignoredCount: 0,
-      selectedType: 'economy',
-      selectedUpgradeStrategy: 'totalCredits',
-      selectedScheduleStrategy: 'now',
-      repeat: 'false',
-      tick: this.$store.state.game.state.tick,
-      types: [],
-      actionCount: 0,
+
+    const response = await scheduleBulk(httpClient)(store.state.game._id, {
+      infrastructureType: selectedType.value!,
+      buyType: selectedUpgradeStrategy.value,
+      tick: tick.value,
+      amount: amount.value,
+      repeat: repeat.value === 'true',
+    });
+
+    if (isOk(response)) {
+      AudioService.join();
+
+      store.commit('gameBulkActionAdded', response.data);
+
+      updateActionCount();
+
+      toast.success(`Action scheduled. Action will be executed on tick ${response.data.tick}.`)
+    } else {
+      console.error(formatError(response));
+      errors.value = extractErrors(response);
     }
-  },
-  mounted() {
-    this.eventBus.emit(MapCommandEventBusEventNames.MapCommandShowIgnoreBulkUpgrade, {});
+  } else { // execute immediately
+    upgradeAvailable.value = 0;
+    cost.value = 0;
 
-    this.amount = GameHelper.getUserPlayer(this.$store.state.game).credits
+    const response = await upgradeBulkCheck(httpClient)(store.state.game._id, {
+      infrastructure: selectedType.value!,
+      upgradeStrategy: selectedUpgradeStrategy.value,
+      amount: amount.value,
+    });
 
-    this.actionCount = GameHelper.getUserPlayer(this.$store.state.game)?.scheduledActions?.length || 0;
+    if (isOk(response)) {
+      AudioService.join();
 
-    this.setupInfrastructureTypes()
-  },
-  unmounted() {
-    this.eventBus.emit(MapCommandEventBusEventNames.MapCommandHideIgnoreBulkUpgrade, {});
-  },
-  computed: {
-    checkText() {
-      if (this.selectedScheduleStrategy === 'future' || this.selectedScheduleStrategy === 'cycle-end' || this.selectedScheduleStrategy === 'cycle-start') {
-        return "Schedule"
-      } else {
-        return "Check"
-      }
-    }
-  },
-  methods: {
-    onCloseRequested(e) {
-      this.$emit('onCloseRequested', e)
-    },
-    onOpenStarDetailRequested(e) {
-      this.$emit('onOpenStarDetailRequested', e)
-    },
-    setupInfrastructureTypes() {
-      this.types = []
-
-      if (this.$store.state.game.settings.player.developmentCost.economy !== 'none') {
-        this.types.push({
-          key: 'economy',
-          name: 'Economy'
-        })
-      }
-
-      if (this.$store.state.game.settings.player.developmentCost.industry !== 'none') {
-        this.types.push({
-          key: 'industry',
-          name: 'Industry'
-        })
-      }
-
-      if (this.$store.state.game.settings.player.developmentCost.science !== 'none') {
-        this.types.push({
-          key: 'science',
-          name: 'Science'
-        })
-      }
-
-      this.selectedType = this.types.length ? this.types[0].key : null
-    },
-    resetPreview(e) {
-      this.hasChecked = false
-      this.upgradePreview = null
-    },
-    onTrashed() {
-      this.actionCount = GameHelper.getUserPlayer(this.$store.state.game)?.scheduledActions?.length || 0;
-    },
-    panToStar(starId) {
-      const star = this.getStar(starId)
-
-      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: star });
-    },
-    gameIsFinished() {
-      return GameHelper.isGameFinished(this.$store.state.game)
-    },
-    resetHasChecked() {
-      this.hasChecked = false
-    },
-    async check() {
-      this.errors = []
-      this.upgradePreview = null
-      if (this.amount <= 0 || (this.selectedUpgradeStrategy === 'percentageOfCredits' && this.amount > 100)) {
-        // We cannot spend 0 or fewer credits and we cannot spend more than 100 percent of what we have.
-        return
-      }
-
-      if (this.selectedScheduleStrategy === 'future' && this.tick < this.$store.state.game.state.tick) {
-        // We cannot schedule actions to happen in the past.
-        return
-      }
-
-      this.isChecking = true
-      if (this.selectedScheduleStrategy === 'future' || this.selectedScheduleStrategy === 'cycle-end' || this.selectedScheduleStrategy === 'cycle-start') {
-        if (this.selectedScheduleStrategy === 'cycle-end') {
-          const cycleTicks = this.$store.state.game.settings.galaxy.productionTicks;
-          const currentTick = this.$store.state.game.state.tick;
-          const cycle = Math.floor(currentTick / cycleTicks) + 1;
-          this.tick = cycle * cycleTicks - 1;
-        } else if (this.selectedScheduleStrategy === 'cycle-start') {
-          const cycleTicks = this.$store.state.game.settings.galaxy.productionTicks;
-          const currentTick = this.$store.state.game.state.tick;
-          const cycle = Math.floor(currentTick / cycleTicks) + 1;
-          this.tick = cycle * cycleTicks;
-        }
-
-        // When actions are scheduled in the future, they get added to the scheduled list.
-        try {
-          let response = await starService.scheduleBulkInfrastructureUpgrade(
-            this.$store.state.game._id,
-            this.selectedUpgradeStrategy,
-            this.selectedType,
-            this.amount,
-            (this.repeat === 'true'),
-            this.tick
-          )
-          if (response.status === 200) {
-            AudioService.join()
-
-            this.$store.commit('gameBulkActionAdded', response.data);
-
-            this.actionCount = GameHelper.getUserPlayer(this.$store.state.game)?.scheduledActions?.length || 0;
-
-            this.$toast.success(`Action scheduled. Action will be executed on tick ${response.data.tick}.`)
-          }
-        } catch (err) {
-          this.errors = err.response.data.errors || []
-        }
-      } else {
-        try {
-          this.upgradeAvailable = 0
-          this.cost = 0
-          let response = await starService.checkBulkUpgradedAmount(
-            this.$store.state.game._id,
-            this.selectedUpgradeStrategy,
-            this.selectedType,
-            this.amount
-          )
-          if (response.status === 200) {
-            AudioService.join()
-            this.upgradePreview = response.data
-            this.upgradeAvailable = response.data.upgraded
-            this.cost = response.data.cost
-            this.previewAmount = response.data.budget
-            this.ignoredCount = response.data.ignoredCount
-            this.hasChecked = true
-          }
-        } catch (err) {
-          this.errors = err.response.data.errors || []
-        }
-      }
-      this.isChecking = false
-    },
-    async upgrade() {
-      this.errors = []
-
-      if (this.cost <= 0 || this.amount <= 0) {
-        return
-      }
-
-      if (!await this.$confirm('Bulk upgrade', `Are you sure you want to spend $${this.cost} credits to upgrade ${this.selectedType} across all of your stars?`)) {
-        return
-      }
-
-      try {
-        this.isUpgrading = true
-
-        let response = await starService.bulkInfrastructureUpgrade(
-          this.$store.state.game._id,
-          this.selectedUpgradeStrategy,
-          this.selectedType,
-          this.amount
-        )
-
-        if (response.status === 200) {
-          AudioService.join()
-
-          this.$store.commit('gameStarBulkUpgraded', response.data)
-
-          this.$toast.success(`Upgrade complete. Purchased ${response.data.upgraded} ${this.selectedType} for ${response.data.cost} credits.`)
-
-          if (this.selectedUpgradeStrategy === 'totalCredits') {
-            this.amount = GameHelper.getUserPlayer(this.$store.state.game).credits
-          }
-        }
-      } catch (err) {
-        this.errors = err.response.data.errors || []
-      }
-
-      this.hasChecked = false
-      this.isUpgrading = false
-    },
-    getStar(starId) {
-      return GameHelper.getStarById(this.$store.state.game, starId)
+      upgradePreview.value = response.data;
+      upgradeAvailable.value = response.data.upgraded;
+      cost.value = response.data.cost;
+      previewAmount.value = response.data.budget;
+      ignoredCount.value = response.data.ignoredCount;
+      hasChecked.value = true;
+    } else {
+      console.error(formatError(response));
+      errors.value = extractErrors(response);
     }
   }
-}
+
+  isChecking.value = false;
+};
+
+const upgrade = async () => {
+  errors.value = [];
+
+  if (cost.value <= 0 || amount.value <= 0) {
+    return;
+  }
+
+  if (!await confirm('Bulk upgrade', `Are you sure you want to spend $${cost.value} credits to upgrade ${selectedType.value} across all of your stars?`)) {
+    return;
+  }
+
+  isUpgrading.value = true;
+
+  const response = await upgradeBulk(httpClient)(store.state.game._id, {
+    infrastructure: selectedType.value!,
+    upgradeStrategy: selectedUpgradeStrategy.value,
+    amount: amount.value,
+  });
+
+  if (isOk(response)) {
+    AudioService.join();
+
+    store.commit('gameStarBulkUpgraded', response.data);
+
+    toast.success(`Upgrade complete. Purchased ${response.data.upgraded} ${selectedType.value} for ${response.data.cost} credits.`);
+
+    if (selectedUpgradeStrategy.value === 'totalCredits') {
+      const userPlayer = GameHelper.getUserPlayer(store.state.game)!;
+      amount.value = userPlayer.credits;
+    }
+  } else {
+    console.error(formatError(response));
+    errors.value = extractErrors(response);
+  }
+
+  hasChecked.value = false;
+  isUpgrading.value = false;
+};
+
+onMounted(() => {
+  eventBus.emit(MapCommandEventBusEventNames.MapCommandShowIgnoreBulkUpgrade, {});
+
+  const userPlayer = GameHelper.getUserPlayer(store.state.game)!;
+  amount.value = userPlayer.credits;
+  actionCount.value = userPlayer?.scheduledActions?.length || 0;
+
+  setupInfrastructureTypes();
+});
+
+onUnmounted(() => {
+  eventBus.emit(MapCommandEventBusEventNames.MapCommandHideIgnoreBulkUpgrade, {});
+});
 </script>
 
 <style scoped>

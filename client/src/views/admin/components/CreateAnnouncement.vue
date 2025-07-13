@@ -26,49 +26,45 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import FormErrorList from "../../components/FormErrorList.vue";
-import AdminApiService from "../../../services/api/admin";
+import { ref, computed, inject, type Ref } from 'vue';
+import { httpInjectionKey, isError, formatError, extractErrors } from "@/services/typedapi";
+import { createAnnouncement } from "@/services/typedapi/admin";
+import { toastInjectionKey } from "@/util/keys";
 
-export default {
-  name: "CreateAnnouncement",
-  components: {
-    'form-error-list': FormErrorList
-  },
-  data () {
-    return {
-      title: '',
-      date: '',
-      content: '',
-      errors: [],
-    }
-  },
-  methods: {
-    async submit () {
-      const announcement = {
-        title: this.title,
-        date: this.date,
-        content: this.content
-      };
+const httpClient = inject(httpInjectionKey)!;
+const toast = inject(toastInjectionKey)!;
 
-      this.title = '';
-      this.date = '';
-      this.content = '';
+const emit = defineEmits<{
+  onAnnouncementCreated: [],
+}>();
 
-      const resp = await AdminApiService.createAnnouncement(announcement);
+const title = ref('');
+const date = ref('');
+const content = ref('');
+const errors = ref<string[]>([]);
 
-      if (resp.status !== 201) {
-        this.errors = resp.data.errors;
-      }
+const canSubmit = computed(() => title.value && date.value && content.value);
 
-      this.$emit('onAnnouncementCreated')
-    },
-  },
-  computed: {
-    canSubmit () {
-      return Boolean(this.title && this.date && this.content);
-    },
+const submit = async (e: Event) => {
+  e.preventDefault();
+
+  const announcement = {
+    title: title.value,
+    date: new Date(date.value),
+    content: content.value,
+  };
+
+  const response = await createAnnouncement(httpClient)(announcement);
+
+  if (isError(response)) {
+    console.error(formatError(response));
+    toast.error("Error creating announcement");
+    errors.value = extractErrors(response);
   }
+
+  emit('onAnnouncementCreated');
 }
 </script>
 

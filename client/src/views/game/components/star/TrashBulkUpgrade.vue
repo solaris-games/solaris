@@ -7,42 +7,43 @@
   </div>
 </template>
 
-<script>
-import starService from '../../../../services/api/star'
+<script setup lang="ts">
+import type {PlayerScheduledActions} from "@solaris-common";
+import {trashBulk} from "@/services/typedapi/star";
+import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
+import { inject } from 'vue';
+import type {State} from "@/store";
+import { useStore, type Store } from 'vuex';
+import {toastInjectionKey} from "@/util/keys";
 
-export default {
-  components: {
+const props = defineProps<{
+  action: PlayerScheduledActions<string>,
+}>();
 
-  },
-  props: {
-    action: Object,
-  },
-  methods: {
-    onTrashed () {
-      this.$emit("bulkScheduleTrashed", {
-        actionId: this.action._id
-      });
-    },
-    async trash () {
-      try {
-        let response = await starService.trashScheduledUpgrade(this.$store.state.game._id, this.action._id)
+const emit = defineEmits<{
+  bulkScheduleTrashed: [actionId: string],
+}>();
 
-        if (response.status === 200) {
-          this.$store.commit('gameBulkActionTrashed', this.action)
+const httpClient = inject(httpInjectionKey)!;
+const toast = inject(toastInjectionKey)!;
 
-          this.$toast.default(`You scheduled Bulk Upgrade has been deleted.`)
+const store: Store<State> = useStore();
 
-          this.onTrashed();
-        }
-      } catch (err) {
-        console.log(err)
-      }
-    }
-  },
-  computed: {
+const trash = async () => {
+  const response = await trashBulk(httpClient)(store.state.game._id, props.action._id);
 
+  if (isOk(response)) {
+    store.commit('gameBulkActionTrashed', props.action);
+
+    toast.default('Your scheduled bulk upgrade has been deleted.');
+
+    emit('bulkScheduleTrashed', props.action._id);
+  } else {
+    console.error(formatError(response));
+
+    toast.error("Failed to delete scheduled bulk upgrade due to an error.");
   }
-}
+};
 </script>
 
 <style scoped>

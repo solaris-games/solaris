@@ -4,13 +4,7 @@ import {DBObjectId, objectId} from "./types/DBObjectId";
 import UserService from "./user";
 import ValidationError from "../errors/validation";
 import {Model} from "mongoose";
-
-export type AnnouncementState = {
-    lastReadAnnouncement: DBObjectId | null,
-    unreadAnnouncements: DBObjectId[],
-    unreadCount: number,
-    totalAnnouncements: number
-}
+import {AnnouncementState} from "solaris-common";
 
 export default class AnnouncementService {
     announcementModel: Model<Announcement>;
@@ -27,7 +21,7 @@ export default class AnnouncementService {
         return this.announcementModel.findOne({ date: { $lte: new Date() } }).sort({ date: -1 }).exec();
     }
 
-    async getAnnouncementState(userId: DBObjectId): Promise<AnnouncementState> {
+    async getAnnouncementState(userId: DBObjectId): Promise<AnnouncementState<DBObjectId>> {
         const user = await this.userService.getById(userId);
 
         if (!user) {
@@ -50,8 +44,8 @@ export default class AnnouncementService {
             lastReadAnnouncement: user.lastReadAnnouncement,
             unreadCount,
             unreadAnnouncements,
-            totalAnnouncements: announcementIds.length
-        }
+            totalAnnouncements: announcementIds.length,
+        };
     }
 
     async markAsRead(userId: DBObjectId) {

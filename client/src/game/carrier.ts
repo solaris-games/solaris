@@ -2,13 +2,29 @@ import { Container, Sprite, Graphics, BitmapText, Circle, TextStyle, Text } from
 import TextureService from './texture'
 import Helpers from './helpers'
 import type PathManager from "./PathManager";
-import type {UserGameSettings, Location} from "@solaris-common";
-import type {Carrier as CarrierData, Player as PlayerData} from "../types/game";
-import type Star from "./star";
-import type {DrawingContext} from "./container";
-import { MapObject } from './mapObject';
+import type { UserGameSettings, Location, MapObject as MapObjectData } from "@solaris-common";
+import type { Carrier as CarrierData, Game, Player as PlayerData } from "../types/game";
+import type { DrawingContext } from "./container";
+import type { MapObject } from './mapObject';
+import { EventEmitter } from './eventEmitter';
+import type { GraphicsWithChunk } from './PathManager';
 
-export class Carrier extends MapObject {
+type CarrierClickEvent = {
+  carrierData: CarrierData,
+  tryMultiSelect: boolean,
+  eventData: any,
+}
+
+type Events = {
+  onSelected: CarrierData,
+  onUnselected: CarrierData,
+  onCarrierMouseOver: Carrier,
+  onCarrierMouseOut: Carrier,
+  onCarrierRightClicked: CarrierData,
+  onCarrierClicked: CarrierClickEvent,
+}
+
+export class Carrier extends EventEmitter<keyof Events, Events> implements MapObject {
   static zoomLevel = 140
 
   container: Container;
@@ -18,16 +34,15 @@ export class Carrier extends MapObject {
   text_ships: BitmapText | null = null;
   pathManager: PathManager;
   sharedPathsIDs: Array<string>;
-  uniquePaths: Array<string>;
+  uniquePaths: Array<GraphicsWithChunk>;
   isMouseOver: boolean;
   zoomPercent: number;
-  userSettings: UserGameSettings | undefined;
-  data: CarrierData | undefined;
-  stars: Star[] | undefined;
-  player: PlayerData | undefined;
-  context: DrawingContext | undefined;
+  userSettings: UserGameSettings;
+  game: Game;
+  data: CarrierData;
+  context: DrawingContext;
   colour: string | undefined;
-  lightYearDistance: number | undefined;
+  lightYearDistance: number;
   clampedScaling: boolean | undefined;
   baseScale: number = 0;
   minScale: number = 0;
@@ -35,8 +50,14 @@ export class Carrier extends MapObject {
   specialistSprite: Sprite | null = null;
   isSelected: boolean = false;
 
-  constructor ( pathManager: PathManager ) {
+  constructor(game: Game, data: CarrierData, userSettings: UserGameSettings, context: DrawingContext, pathManager: PathManager) {
     super()
+
+    this.game = game;
+    this.data = data;
+    this.userSettings = userSettings;
+    this.context = context;
+    this.lightYearDistance = game.constants.distances.lightYear;
 
     this.container = new Container()
     this.container.zIndex = 1
@@ -64,21 +85,21 @@ export class Carrier extends MapObject {
     this.zoomPercent = 100
   }
 
-    getContainer(): Container {
-      return this.container!;
-    }
+  getContainer(): Container {
+    return this.container!;
+  }
 
-    getLocation(): Location {
-      return this.data!.location!;
-    }
+  getLocation(): Location {
+    return this.data!.location!;
+  }
 
-  setup (data, userSettings, context: DrawingContext, stars, player, lightYearDistance) {
-    this.data = data
-    this.stars = stars
-    this.player = player
-    this.context = context
-    this.colour = context.getPlayerColour(player._id)
-    this.lightYearDistance = lightYearDistance
+  _getPlayer(): PlayerData {
+    return this.game.galaxy.players.find(p => p._id === this.data.ownedByPlayerId!)!;
+  }
+
+  update(data: CarrierData, userSettings: UserGameSettings) {
+    this.data = data;
+    this.colour = this.context.getPlayerColour(this.data.ownedByPlayerId!);
 
     this.container.position.x = data.location.x
     this.container.position.y = data.location.y
@@ -89,8 +110,8 @@ export class Carrier extends MapObject {
 
     this.clampedScaling = this.userSettings!.map.objectsScaling == 'clamped'
     this.baseScale = 1
-    this.minScale = this.userSettings!.map.objectsMinimumScale/4.0
-    this.maxScale = this.userSettings!.map.objectsMaximumScale/4.0
+    this.minScale = this.userSettings!.map.objectsMinimumScale / 4.0
+    this.maxScale = this.userSettings!.map.objectsMaximumScale / 4.0
 
     Carrier.zoomLevel = userSettings.map.zoomLevels.carrierShips
 
@@ -98,7 +119,7 @@ export class Carrier extends MapObject {
     this.enableInteractivity()
   }
 
-  draw () {
+  draw() {
     this.drawColour()
     this.drawSelectedCircle()
     this.drawCarrier()
@@ -108,7 +129,7 @@ export class Carrier extends MapObject {
     this.drawDepth()
   }
 
-  drawActive () {
+  drawActive() {
     this.drawShips()
   }
 
@@ -118,8 +139,10 @@ export class Carrier extends MapObject {
       this.graphics_colour = null
     }
 
-    if (Object.keys(TextureService.PLAYER_SYMBOLS).includes(this.player!.shape)) {
-      this.graphics_colour = new Sprite(TextureService.PLAYER_SYMBOLS[this.player!.shape][4])
+    const player = this._getPlayer();
+
+    if (Object.keys(TextureService.PLAYER_SYMBOLS).includes(player.shape)) {
+      this.graphics_colour = new Sprite(TextureService.PLAYER_SYMBOLS[player.shape][4])
 
     }
 
@@ -131,7 +154,7 @@ export class Carrier extends MapObject {
     this.container.addChild(this.graphics_colour!)
   }
 
-  drawColour () {
+  drawColour() {
     if (this.graphics_colour) {
       this.container.removeChild(this.graphics_colour)
       this.graphics_colour = null
@@ -142,7 +165,7 @@ export class Carrier extends MapObject {
     }
   }
 
-  drawCarrier () {
+  drawCarrier() {
     if (this.graphics_ship) {
       this.container.removeChild(this.graphics_ship)
     }
@@ -153,10 +176,10 @@ export class Carrier extends MapObject {
     this.graphics_ship.height = 10
     this.container.addChild(this.graphics_ship)
 
-    Helpers.rotateCarrierTowardsWaypoint(this.data!, this.stars!.map(s => s.data), this.graphics_ship)
+    Helpers.rotateCarrierTowardsWaypoint(this.data!, this.game.galaxy.stars, this.graphics_ship)
   }
 
-  drawShips () {
+  drawShips() {
     if (this.text_ships) {
       this.container.removeChild(this.text_ships)
       this.text_ships = null
@@ -167,14 +190,14 @@ export class Carrier extends MapObject {
 
       let shipsText = totalShips.toString()
 
-      let bitmapFont = {fontFamily: "chakrapetch", fontSize: 4}
+      let bitmapFont = { fontFamily: "chakrapetch", fontSize: 4 }
       this.text_ships = new BitmapText({ text: shipsText, style: bitmapFont })
 
       this.text_ships.x = -(this.text_ships.width / 2.0)
       this.text_ships.y = 5
 
       this.container.addChild(this.text_ships)
-      if( this.data!.isGift ) {
+      if (this.data!.isGift) {
         let style = new TextStyle({
           fontFamily: `Chakra Petch,sans-serif;`,
           fill: 0xFFFFFF,
@@ -194,7 +217,7 @@ export class Carrier extends MapObject {
     }
   }
 
-  drawSpecialist () {
+  drawSpecialist() {
     if (this.specialistSprite) {
       this.container.removeChild(this.specialistSprite)
       this.specialistSprite = null
@@ -204,7 +227,7 @@ export class Carrier extends MapObject {
       return
     }
 
-    let specialistTexture = TextureService.getSpecialistTexture(this.data!.specialist!.key)
+    const specialistTexture = TextureService.getSpecialistTexture(this.data!.specialist!.key);
     this.specialistSprite = new Sprite(specialistTexture)
     this.specialistSprite.width = 6
     this.specialistSprite.height = 6
@@ -214,77 +237,74 @@ export class Carrier extends MapObject {
     this.container.addChild(this.specialistSprite)
   }
 
-  hasSpecialist () {
+  hasSpecialist() {
     return this.data!.specialistId && this.data!.specialistId > 0 && this.data!.specialist
   }
 
   clearPaths() {
-    for(let path of this.uniquePaths) {
+    for (let path of this.uniquePaths) {
       this.pathManager.removeUniquePath(path)
     }
-    for(let pathID of this.sharedPathsIDs) {
-      this.pathManager.removeSharedPath(pathID, this)
+    for (let pathID of this.sharedPathsIDs) {
+      this.pathManager.removeSharedPath(pathID, this.data)
     }
     this.uniquePaths = Array()
     this.sharedPathsIDs = Array()
   }
 
   _isSourceLastDestination() {
-    let numof_waypoints = this.data!.waypoints.length
-    let lastWaypoint = this.data!.waypoints[numof_waypoints-1]
-    if (numof_waypoints<2) return false;
-    return (this.data!.waypoints[0].source === lastWaypoint.destination)
+    const waypointCount = this.data!.waypoints.length
+    const lastWaypoint = this.data!.waypoints[waypointCount - 1]
+    if (waypointCount < 2) return false;
+    return (this.data.waypoints[0].source === lastWaypoint.destination)
   }
 
-  drawCarrierWaypoints () {
+  drawCarrierWaypoints() {
     this.clearPaths()
 
-    const PATH_WIDTH = 0.5 * this.userSettings!.map.carrierPathWidth
-
-    let lineWidth = this.data!.waypointsLooped ? PATH_WIDTH : PATH_WIDTH
-    let lineAlpha = this.data!.waypointsLooped ? 0.3 : 0.5
-    let lastPoint: Carrier | Star = this
+    let lastPoint: MapObjectData<string> = this.data;
     let sourceIsLastDestination = false
     sourceIsLastDestination = this._isSourceLastDestination()
     // if looping and source is last destination, begin drawing path from the star instead of carrier
-    if ( this.data!.waypointsLooped ) {
-      if (sourceIsLastDestination)  {
-        lastPoint = this.stars!.find(s => s.data._id === this.data!.waypoints[0].source)!
+    if (this.data!.waypointsLooped) {
+      if (sourceIsLastDestination) {
+        lastPoint = this.game.galaxy.stars.find(s => s._id === this.data!.waypoints[0].source)!
       }
     }
     let star
     for (let i = 0; i < this.data!.waypoints.length; i++) {
       let waypoint = this.data!.waypoints[i]
       // Draw a line to each destination along the waypoints.
-      star = this.stars!.find(s => s.data._id === waypoint.destination)
+      star = this.game.galaxy.stars.find(s => s._id === waypoint.destination)
       if (!star) { break; }
 
-      if ( this.data!.waypointsLooped ) {
-        if (lastPoint === this) {
-          this.uniquePaths.push( this.pathManager.addUniquePath( lastPoint, star, true, this.colour ) )
+      if (this.data!.waypointsLooped) {
+        if (lastPoint === this.data) {
+          this.uniquePaths.push(this.pathManager.addUniquePath(lastPoint, star, true, this.colour!))
         }
         else {
-          this.sharedPathsIDs.push( this.pathManager.addSharedPath( lastPoint, star, this ) )
+          this.sharedPathsIDs.push(this.pathManager.addSharedPath(lastPoint, star, this))
         }
       }
       else {
-        this.uniquePaths.push( this.pathManager.addUniquePath( lastPoint, star, false, this.colour ) )
+        this.uniquePaths.push(this.pathManager.addUniquePath(lastPoint, star, false, this.colour!))
       }
 
-      lastPoint = star
+      lastPoint = star;
     }
+
     //draw path back to the first destination
-    if ( this.data!.waypointsLooped ) {
+    if (this.data.waypointsLooped) {
       if (!sourceIsLastDestination && this.data!.waypoints && this.data!.waypoints.length) {
-        let firstPoint = this.stars!.find(s => s.data._id === this.data!.waypoints[0].destination)
-        if( firstPoint && lastPoint && firstPoint !== lastPoint ) {
-          this.sharedPathsIDs.push( this.pathManager.addSharedPath( star, firstPoint, this ) )
+        const firstPoint = this.game.galaxy.stars.find(s => s._id === this.data!.waypoints[0].destination)
+        if (firstPoint && lastPoint && firstPoint !== lastPoint) {
+          this.sharedPathsIDs.push(this.pathManager.addSharedPath(star, firstPoint, this))
         }
       }
     }
   }
 
-  drawSelectedCircle () {
+  drawSelectedCircle() {
     this.graphics_selected.clear()
 
     if (this.isSelected) {
@@ -297,11 +317,11 @@ export class Carrier extends MapObject {
     }
   }
 
-  drawDepth () {
-    if (!this.data!.orbiting) {
-      const waypoint = this.data!.waypoints[0]
-      const seeds = [waypoint.source, waypoint.destination]
-      const depth = Helpers.calculateDepthModifiers(this.userSettings, seeds)
+  drawDepth() {
+    if (!this.data.orbiting) {
+      const waypoint = this.data.waypoints[0]
+      const seeds = [waypoint.source, waypoint.destination];
+      const depth = Helpers.calculateDepthModifiers(this.userSettings, seeds);
 
       this.container.alpha = depth
       this.baseScale = depth * (this.userSettings!.map.objectsDepth === 'disabled' ? 1 : 1.5)
@@ -326,21 +346,21 @@ export class Carrier extends MapObject {
     this.container.cursor = 'default'
   }
 
-  onZoomChanging(zoomPercent) {
-   this.zoomPercent = zoomPercent
-   this.setScale(zoomPercent)
-   this.updateVisibility()//TODO see how this behaves on mobile - does it updated when pinching or only when pinching stops?
+  onZoomChanging(zoomPercent: number) {
+    this.zoomPercent = zoomPercent
+    this.setScale(zoomPercent)
+    this.updateVisibility()
   }
 
-  setScale( zoomPercent ) {
-    if(this.clampedScaling) {
-      let currentScale = zoomPercent/100
+  setScale(zoomPercent: number) {
+    if (this.clampedScaling) {
+      let currentScale = zoomPercent / 100
       if (currentScale < this.minScale) {
-        this.container.scale.x = (1/currentScale)*this.minScale
-        this.container.scale.y = (1/currentScale)*this.minScale
+        this.container.scale.x = (1 / currentScale) * this.minScale
+        this.container.scale.y = (1 / currentScale) * this.minScale
       } else if (currentScale > this.maxScale) {
-        this.container.scale.x = (1/currentScale)*this.maxScale
-        this.container.scale.y = (1/currentScale)*this.maxScale
+        this.container.scale.x = (1 / currentScale) * this.maxScale
+        this.container.scale.y = (1 / currentScale) * this.maxScale
       }
       else {
         this.container.scale.x = this.baseScale
@@ -355,12 +375,12 @@ export class Carrier extends MapObject {
 
   onClicked(e, tryMultiSelect = true) {
     if (e && e.data && e.data.originalEvent && e.data.originalEvent.button === 2) {
-      this.emit('onCarrierRightClicked', this.data)
+      this.emit('onCarrierRightClicked', this.data!)
     } else {
       let eventData = e ? e.data : null
 
       this.emit('onCarrierClicked', {
-        carrierData: this.data,
+        carrierData: this.data!,
         eventData,
         tryMultiSelect
       })
@@ -372,57 +392,61 @@ export class Carrier extends MapObject {
 
   updateVisibility() {
     if (this.graphics_ship) this.graphics_ship.visible = !this.data!.orbiting && !this.hasSpecialist()
-    if (this.text_ships) this.text_ships.visible = !this.data!.orbiting && (this.zoomPercent >= Carrier.zoomLevel || (this.isSelected && this.zoomPercent > Carrier.zoomLevel ) || (this.isMouseOver && this.zoomPercent > Carrier.zoomLevel))
+    if (this.text_ships) this.text_ships.visible = !this.data!.orbiting && (this.zoomPercent >= Carrier.zoomLevel || (this.isSelected && this.zoomPercent > Carrier.zoomLevel) || (this.isMouseOver && this.zoomPercent > Carrier.zoomLevel))
   }
 
-  deselectAllText () {
+  deselectAllText() {
     // @ts-ignore
-    if (window.getSelection) {window.getSelection().removeAllRanges();}
+    if (window.getSelection) { window.getSelection().removeAllRanges(); }
     // @ts-ignore
-    else if (document.selection) {document.selection.empty();}
+    else if (document.selection) { document.selection.empty(); }
   }
 
-  onMouseOver (e) {
+  onMouseOver() {
     this.isMouseOver = true
 
     this.emit('onCarrierMouseOver', this)
   }
 
-  onMouseOut (e) {
+  onMouseOut() {
     this.isMouseOver = false
 
     this.emit('onCarrierMouseOut', this)
   }
 
-  refreshZoom (zoomPercent) {
-    this.zoomPercent = zoomPercent
+  refreshZoom(zoomPercent: number) {
+    this.zoomPercent = zoomPercent;
   }
 
-  cleanupEventHandlers () {
+  cleanupEventHandlers() {
     this.container.off('pointerup', this.onClicked.bind(this))
     this.container.off('mouseover', this.onMouseOver.bind(this))
     this.container.off('mouseout', this.onMouseOut.bind(this))
   }
 
-  destroy () {
+  destroy() {
+    this.removeAllListeners();
+    this.cleanupEventHandlers();
+    this.clearPaths();
+
     this.container.destroy()
   }
 
-  select () {
-    this.isSelected = true
+  select() {
+    this.isSelected = true;
     this.drawSelectedCircle()
-    this.emit('onSelected', this.data)
+    this.emit('onSelected', this.data!)
     this.updateVisibility()
   }
 
-  unselect () {
+  unselect() {
     this.isSelected = false
     this.drawSelectedCircle()
-    this.emit('onUnselected', this.data)
+    this.emit('onUnselected', this.data);
     this.updateVisibility()
   }
 
-  toggleSelected () {
+  toggleSelected() {
     if (this.isSelected) {
       this.unselect()
     } else {
@@ -431,4 +455,4 @@ export class Carrier extends MapObject {
   }
 }
 
-export default Carrier
+export default Carrier;

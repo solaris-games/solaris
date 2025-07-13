@@ -3,7 +3,7 @@ import Repository from "./repository";
 import { Game } from "./types/Game";
 import { Player } from "./types/Player";
 import { Specialist } from "./types/Specialist";
-import AchievementService from "./achievement";
+import UserAchievementService from "./userAchievement";
 import GameTypeService from "./gameType";
 import SpecialistService from "./specialist";
 import StarService from "./star";
@@ -13,28 +13,31 @@ import ValidationError from "../errors/validation";
 import SpecialistBanService from "./specialistBan";
 import PlayerCreditsService from "./playerCredits";
 import TechnologyService from "./technology";
+import StatisticsService from "./statistics";
 
 export default class SpecialistHireService {
     gameRepo: Repository<Game>;
     specialistService: SpecialistService;
-    achievementService: AchievementService;
+    achievementService: UserAchievementService;
     waypointService: WaypointService;
     playerCreditsService: PlayerCreditsService;
     starService: StarService;
     gameTypeService: GameTypeService;
     specialistBanService: SpecialistBanService;
     technologyService: TechnologyService;
+    statisticsService: StatisticsService;
 
     constructor(
         gameRepo: Repository<Game>,
         specialistService: SpecialistService,
-        achievementService: AchievementService,
+        achievementService: UserAchievementService,
         waypointService: WaypointService,
         playerCreditsService: PlayerCreditsService,
         starService: StarService,
         gameTypeService: GameTypeService,
         specialistBanService: SpecialistBanService,
-        technologyService: TechnologyService
+        technologyService: TechnologyService,
+        statisticsService: StatisticsService,
     ) {
         this.gameRepo = gameRepo;
         this.specialistService = specialistService;
@@ -45,6 +48,7 @@ export default class SpecialistHireService {
         this.gameTypeService = gameTypeService;
         this.specialistBanService = specialistBanService;
         this.technologyService = technologyService;
+        this.statisticsService = statisticsService;
     }
 
     async hireCarrierSpecialist(game: Game, player: Player, carrierId: DBObjectId, specialistId: number) {
@@ -122,7 +126,9 @@ export default class SpecialistHireService {
         ]);
 
         if (player.userId && !player.defeated && !this.gameTypeService.isTutorialGame(game)) {
-            await this.achievementService.incrementSpecialistsHired(player.userId);
+            await this.statisticsService.modifyStats(game._id, player._id, (stats) => {
+                stats.infrastructure.specialistsHired += 1;
+            });
         }
 
         // TODO: Need to consider local and global effects and update the UI accordingly.
@@ -220,7 +226,9 @@ export default class SpecialistHireService {
         ]);
 
         if (player.userId && !player.defeated && !this.gameTypeService.isTutorialGame(game)) {
-            await this.achievementService.incrementSpecialistsHired(player.userId);
+            await this.statisticsService.modifyStats(game._id, player._id, (stats) => {
+                stats.infrastructure.specialistsHired += 1;
+            });
         }
 
         // TODO: The star may have its manufacturing changed so return back the new manufacturing.

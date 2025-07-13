@@ -104,8 +104,8 @@ const loadMilitaryChart = () => {
     datasets: [
       {
         data: [
-          user.value.achievements.combat.kills.ships,
-          user.value.achievements.combat.losses.ships
+          user.value.achievements.stats.combat.kills.ships,
+          user.value.achievements.stats.combat.losses.ships
         ],
         backgroundColor: [
           '#00bc8c',
@@ -115,8 +115,8 @@ const loadMilitaryChart = () => {
       },
       {
         data: [
-          user.value.achievements.combat.kills.carriers,
-          user.value.achievements.combat.losses.carriers
+          user.value.achievements.stats.combat.kills.carriers,
+          user.value.achievements.stats.combat.losses.carriers
         ],
         backgroundColor: [
           '#00bc8c',
@@ -126,8 +126,8 @@ const loadMilitaryChart = () => {
       },
       {
         data: [
-          user.value.achievements.combat.stars.captured,
-          user.value.achievements.combat.stars.lost
+          user.value.achievements.stats.combat.stars.captured,
+          user.value.achievements.stats.combat.stars.lost
         ],
         backgroundColor: [
           '#00bc8c',
@@ -148,9 +148,9 @@ const loadInfrastructureChart = () => {
     ],
     datasets: [{
       data: [
-        user.value.achievements.infrastructure.economy,
-        user.value.achievements.infrastructure.industry,
-        user.value.achievements.infrastructure.science
+        user.value.achievements.stats.infrastructure.economy,
+        user.value.achievements.stats.infrastructure.industry,
+        user.value.achievements.stats.infrastructure.science
       ],
       backgroundColor: [
         '#00bc8c',
@@ -175,14 +175,14 @@ const loadResearchChart = () => {
     ],
     datasets: [{
       data: [
-        user.value.achievements.research.scanning,
-        user.value.achievements.research.hyperspace,
-        user.value.achievements.research.terraforming,
-        user.value.achievements.research.weapons,
-        user.value.achievements.research.banking,
-        user.value.achievements.research.manufacturing,
-        user.value.achievements.research.experimentation,
-        user.value.achievements.research.specialists
+        user.value.achievements.stats.research.scanning,
+        user.value.achievements.stats.research.hyperspace,
+        user.value.achievements.stats.research.terraforming,
+        user.value.achievements.stats.research.weapons,
+        user.value.achievements.stats.research.banking,
+        user.value.achievements.stats.research.manufacturing,
+        user.value.achievements.stats.research.experimentation,
+        user.value.achievements.stats.research.specialists
       ],
       backgroundColor: [
         '#888',
@@ -207,8 +207,8 @@ const loadTradeChart = () => {
     datasets: [
       {
         data: [
-          user.value.achievements.trade.creditsSent,
-          user.value.achievements.trade.creditsReceived
+          user.value.achievements.stats.trade.creditsSent,
+          user.value.achievements.stats.trade.creditsReceived
         ],
         backgroundColor: [
           '#00bc8c',
@@ -218,8 +218,8 @@ const loadTradeChart = () => {
       },
       {
         data: [
-          user.value.achievements.trade.creditsSpecialistsSent,
-          user.value.achievements.trade.creditsSpecialistsReceived
+          user.value.achievements.stats.trade.creditsSpecialistsSent,
+          user.value.achievements.stats.trade.creditsSpecialistsReceived
         ],
         backgroundColor: [
           '#00bc8c',
@@ -229,8 +229,8 @@ const loadTradeChart = () => {
       },
       {
         data: [
-          user.value.achievements.trade.technologySent,
-          user.value.achievements.trade.technologyReceived
+          user.value.achievements.stats.trade.technologySent,
+          user.value.achievements.stats.trade.technologyReceived
         ],
         backgroundColor: [
           '#00bc8c',
@@ -240,7 +240,7 @@ const loadTradeChart = () => {
       },
       {
         data: [
-          user.value.achievements.trade.renownSent,
+          user.value.achievements.renownSent,
           user.value.achievements.renown
         ],
         backgroundColor: [
@@ -251,8 +251,8 @@ const loadTradeChart = () => {
       },
       {
         data: [
-          user.value.achievements.trade.giftsSent,
-          user.value.achievements.trade.giftsReceived
+          user.value.achievements.stats.trade.giftsSent,
+          user.value.achievements.stats.trade.giftsReceived
         ],
         backgroundColor: [
           '#00bc8c',
@@ -356,43 +356,43 @@ onMounted(async () => {
         <tbody>
         <tr>
           <td>Ship Kills</td>
-          <td class="text-end">{{ user.achievements.combat.kills.ships }}</td>
+          <td class="text-end">{{ user.achievements.stats.combat.kills.ships }}</td>
         </tr>
         <tr>
           <td>Ship Losses</td>
-          <td class="text-end">{{ user.achievements.combat.losses.ships }}</td>
+          <td class="text-end">{{ user.achievements.stats.combat.losses.ships }}</td>
         </tr>
         <tr>
           <td>Carrier Kills</td>
-          <td class="text-end">{{ user.achievements.combat.kills.carriers }}</td>
+          <td class="text-end">{{ user.achievements.stats.combat.kills.carriers }}</td>
         </tr>
         <tr>
           <td>Carrier Losses</td>
-          <td class="text-end">{{ user.achievements.combat.losses.carriers }}</td>
+          <td class="text-end">{{ user.achievements.stats.combat.losses.carriers }}</td>
         </tr>
         <tr>
           <td>Specialist Kills</td>
-          <td class="text-end">{{ user.achievements.combat.kills.specialists }}</td>
+          <td class="text-end">{{ user.achievements.stats.combat.kills.specialists }}</td>
         </tr>
         <tr>
           <td>Specialist Losses</td>
-          <td class="text-end">{{ user.achievements.combat.losses.specialists }}</td>
+          <td class="text-end">{{ user.achievements.stats.combat.losses.specialists }}</td>
         </tr>
         <tr>
           <td>Stars Captured</td>
-          <td class="text-end">{{ user.achievements.combat.stars.captured }}</td>
+          <td class="text-end">{{ user.achievements.stats.combat.stars.captured }}</td>
         </tr>
         <tr>
           <td>Stars Lost</td>
-          <td class="text-end">{{ user.achievements.combat.stars.lost }}</td>
+          <td class="text-end">{{ user.achievements.stats.combat.stars.lost }}</td>
         </tr>
         <tr>
           <td>Capital Stars Captured</td>
-          <td class="text-end">{{ user.achievements.combat.homeStars.captured }}</td>
+          <td class="text-end">{{ user.achievements.stats.combat.homeStars.captured }}</td>
         </tr>
         <tr>
           <td>Capital Stars Lost</td>
-          <td class="text-end">{{ user.achievements.combat.homeStars.lost }}</td>
+          <td class="text-end">{{ user.achievements.stats.combat.homeStars.lost }}</td>
         </tr>
         </tbody>
       </table>
@@ -409,27 +409,27 @@ onMounted(async () => {
         <tbody>
         <tr>
           <td>Economy</td>
-          <td class="text-end">{{ user.achievements.infrastructure.economy }}</td>
+          <td class="text-end">{{ user.achievements.stats.infrastructure.economy }}</td>
         </tr>
         <tr>
           <td>Industry</td>
-          <td class="text-end">{{ user.achievements.infrastructure.industry }}</td>
+          <td class="text-end">{{ user.achievements.stats.infrastructure.industry }}</td>
         </tr>
         <tr>
           <td>Science</td>
-          <td class="text-end">{{ user.achievements.infrastructure.science }}</td>
+          <td class="text-end">{{ user.achievements.stats.infrastructure.science }}</td>
         </tr>
         <tr>
           <td>Warp Gates Built</td>
-          <td class="text-end">{{ user.achievements.infrastructure.warpGates }}</td>
+          <td class="text-end">{{ user.achievements.stats.infrastructure.warpGates }}</td>
         </tr>
         <tr>
           <td>Warp Gates Destroyed</td>
-          <td class="text-end">{{ user.achievements.infrastructure.warpGatesDestroyed }}</td>
+          <td class="text-end">{{ user.achievements.stats.infrastructure.warpGatesDestroyed }}</td>
         </tr>
         <tr>
           <td>Specialists Hired</td>
-          <td class="text-end">{{ user.achievements.infrastructure.specialistsHired }}</td>
+          <td class="text-end">{{ user.achievements.stats.infrastructure.specialistsHired }}</td>
         </tr>
         </tbody>
       </table>
@@ -446,35 +446,35 @@ onMounted(async () => {
         <tbody>
         <tr>
           <td>Scanning</td>
-          <td class="text-end">{{ user.achievements.research.scanning }}</td>
+          <td class="text-end">{{ user.achievements.stats.research.scanning }}</td>
         </tr>
         <tr>
           <td>Hyperspace</td>
-          <td class="text-end">{{ user.achievements.research.hyperspace }}</td>
+          <td class="text-end">{{ user.achievements.stats.research.hyperspace }}</td>
         </tr>
         <tr>
           <td>Terraforming</td>
-          <td class="text-end">{{ user.achievements.research.terraforming }}</td>
+          <td class="text-end">{{ user.achievements.stats.research.terraforming }}</td>
         </tr>
         <tr>
           <td>Weapons</td>
-          <td class="text-end">{{ user.achievements.research.weapons }}</td>
+          <td class="text-end">{{ user.achievements.stats.research.weapons }}</td>
         </tr>
         <tr>
           <td>Banking</td>
-          <td class="text-end">{{ user.achievements.research.banking }}</td>
+          <td class="text-end">{{ user.achievements.stats.research.banking }}</td>
         </tr>
         <tr>
           <td>Manufacturing</td>
-          <td class="text-end">{{ user.achievements.research.manufacturing }}</td>
+          <td class="text-end">{{ user.achievements.stats.research.manufacturing }}</td>
         </tr>
         <tr>
           <td>Experimentation</td>
-          <td class="text-end">{{ user.achievements.research.experimentation }}</td>
+          <td class="text-end">{{ user.achievements.stats.research.experimentation }}</td>
         </tr>
         <tr>
           <td>Specialists</td>
-          <td class="text-end">{{ user.achievements.research.specialists }}</td>
+          <td class="text-end">{{ user.achievements.stats.research.specialists }}</td>
         </tr>
         </tbody>
       </table>
@@ -491,39 +491,39 @@ onMounted(async () => {
         <tbody>
         <tr>
           <td>Credits Sent</td>
-          <td class="text-end">{{ user.achievements.trade.creditsSent }}</td>
+          <td class="text-end">{{ user.achievements.stats.trade.creditsSent }}</td>
         </tr>
         <tr>
           <td>Credits Received</td>
-          <td class="text-end">{{ user.achievements.trade.creditsReceived }}</td>
+          <td class="text-end">{{ user.achievements.stats.trade.creditsReceived }}</td>
         </tr>
         <tr>
           <td>Specialist Tokens Sent</td>
-          <td class="text-end">{{ user.achievements.trade.creditsSpecialistsSent }}</td>
+          <td class="text-end">{{ user.achievements.stats.trade.creditsSpecialistsSent }}</td>
         </tr>
         <tr>
           <td>Specialist Tokens Received</td>
-          <td class="text-end">{{ user.achievements.trade.creditsSpecialistsReceived }}</td>
+          <td class="text-end">{{ user.achievements.stats.trade.creditsSpecialistsReceived }}</td>
         </tr>
         <tr>
           <td>Technology Sent</td>
-          <td class="text-end">{{ user.achievements.trade.technologySent }}</td>
+          <td class="text-end">{{ user.achievements.stats.trade.technologySent }}</td>
         </tr>
         <tr>
           <td>Technology Received</td>
-          <td class="text-end">{{ user.achievements.trade.technologyReceived }}</td>
+          <td class="text-end">{{ user.achievements.stats.trade.technologyReceived }}</td>
         </tr>
         <tr>
           <td>Gifts Sent</td>
-          <td class="text-end">{{ user.achievements.trade.giftsSent }}</td>
+          <td class="text-end">{{ user.achievements.stats.trade.giftsSent }}</td>
         </tr>
         <tr>
           <td>Gifts Received</td>
-          <td class="text-end">{{ user.achievements.trade.giftsReceived }}</td>
+          <td class="text-end">{{ user.achievements.stats.trade.giftsReceived }}</td>
         </tr>
         <tr>
           <td>Renown Sent</td>
-          <td class="text-end">{{ user.achievements.trade.renownSent }}</td>
+          <td class="text-end">{{ user.achievements.renownSent }}</td>
         </tr>
         <tr>
           <td>Renown Received</td>

@@ -3,21 +3,24 @@ import {ExpressJoiInstance} from "express-joi-validation";
 import {DependencyContainer} from "../../services/types/DependencyContainer";
 import AnnouncementController from "../controllers/announcement";
 import {SingleRouter} from "../singleRoute";
+import {createAnnouncementRoutes} from "solaris-common/dist/api/controllers/announcement";
+import {createRoutes} from "../typedapi/routes";
 
 export default (router: SingleRouter, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
     const controller =  AnnouncementController(container);
+    const routes = createAnnouncementRoutes();
 
-    router.get("/api/announcements/latest",
-            controller.getLatestAnnouncement);
+    const answer = createRoutes(router, mw);
 
-    router.get("/api/announcements/",
-            controller.getCurrentAnnouncements);
+    answer(routes.getLatestAnnouncement, controller.getLatestAnnouncement);
 
-    router.get("/api/announcements/state",
+    answer(routes.getCurrentAnnouncements, controller.getCurrentAnnouncements);
+
+    answer(routes.getAnnouncementState,
             mw.auth.authenticate(),
             controller.getAnnouncementState);
 
-    router.patch("/api/announcements/state/markAsRead",
+    answer(routes.markAsRead,
             mw.auth.authenticate(),
-            controller.markAsRead)
+            controller.markAsRead);
 }

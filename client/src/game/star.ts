@@ -1,15 +1,32 @@
-import {Application, BitmapText, Circle, Container, Graphics, Sprite} from 'pixi.js';
+import {Application, BitmapText, Circle, Container, EventEmitter, Graphics, Sprite} from 'pixi.js';
 import TextureService from './texture'
 import gameHelper from '../services/gameHelper.js'
 import seededRandom from 'random-seed'
 import Helpers from './helpers'
-import { MapObject } from './mapObject';
-import type { Location } from '@solaris-common';
+import { type MapObject } from './mapObject';
+import type {Game, Star as StarData} from "../types/game";
+import type { Location, UserGameSettings } from '@solaris-common';
+import type { DrawingContext } from './container';
 
 const NAME_SIZE = 4
 
-export class Star extends MapObject {
+type StarClickEvent = {
+  starData: StarData,
+  tryMultiSelect: boolean,
+  permitCallback: () => void,
+}
 
+type Events = {
+  onSelected: StarData,
+  onUnselected: StarData,
+  onStarMouseOver: Star,
+  onStarMouseOut: Star,
+  onStarRightClicked: { starData: StarData },
+  onStarDefaultClicked: { starData: StarData },
+  onStarClicked: StarClickEvent,
+}
+
+export class Star extends EventEmitter<keyof Events, Events> implements MapObject {
   static culling_margin = 16
   static shipsSmallSize = 6
   static shipsBigSize = 10
@@ -49,10 +66,8 @@ export class Star extends MapObject {
   showIgnoreBulkUpgradeInfrastructure: boolean;
   zoomDepth: number;
   game: any;
-  data: any;
-  players: any[] = [];
-  carriers: any[] = [];
-  context: any;
+  data: StarData;
+  context: DrawingContext;
   lightYearDistance: number = 0;
   userSettings: any;
   clampedScaling: boolean = false;
@@ -71,8 +86,14 @@ export class Star extends MapObject {
   text_infrastructure: BitmapText | null = null;
   text_infrastructureBulkIgnored: BitmapText | null = null;
 
-  constructor (app) {
+  constructor (app: Application, game: Game, data: StarData, userSettings: UserGameSettings, context: DrawingContext) {
     super()
+
+    this.game = game
+    this.data = data
+    this.context = context
+    this.lightYearDistance = game.constants.distances.lightYear;
+    this.userSettings = userSettings;
 
     this.app = app
     this.fixedContainer = new Container() // this container isnt affected by culling or user setting scalling
@@ -130,6 +151,8 @@ export class Star extends MapObject {
       can be read from static property "zoomLevelDefinitions"
     */
     this.zoomDepth = 1
+
+    this.update(game, data, userSettings);
   }
 
   getContainer(): Container {
@@ -141,24 +164,21 @@ export class Star extends MapObject {
   }
 
   _getStarPlayer () {
-    return this.players.find(x => x._id === this.data.ownedByPlayerId)
+    return this.game.galaxy.players.find(x => x._id === this.data.ownedByPlayerId)
   }
 
   _getStarCarriers () {
-    return this.carriers.filter(x => x.orbiting === this.data._id)
+    return this.game.galaxy.carriers.filter(x => x.orbiting === this.data._id)
   }
 
   _getStarCarrierShips () {
     return this._getStarCarriers().reduce((sum, c) => sum + (c.ships || 0), 0)
   }
 
-  setup (game, data, userSettings, context, players, carriers, lightYearDistance) {
+  update (game: Game, data: StarData, userSettings: UserGameSettings) {
     this.game = game
     this.data = data
-    this.players = players
-    this.carriers = carriers
-    this.context = context
-    this.lightYearDistance = lightYearDistance
+    this.lightYearDistance = game.constants.distances.lightYear;
     this.container.position.x = this.data.location.x
     this.container.position.y = this.data.location.y
     this.fixedContainer.position.x = this.data.location.x
@@ -379,7 +399,7 @@ export class Star extends MapObject {
     }
 
     //FIXME potential resource leak, should not create a new sprite every time
-    let specialistTexture = TextureService.getSpecialistTexture(this.data.specialist.key)
+    let specialistTexture = TextureService.getSpecialistTexture(this.data.specialist!.key)
     this.specialistSprite = new Sprite(specialistTexture)
 
     this.specialistSprite.width = 10
@@ -576,14 +596,17 @@ export class Star extends MapObject {
     }
 
     // Get the player who owns the star.
-    let player = this._getStarPlayer()
+    const player = this._getStarPlayer()
 
     if (!player) {
       return
     }
+
     if (Object.keys(TextureService.PLAYER_SYMBOLS).includes(player.shape)) {
-      this.graphics_shape_part = new Sprite(TextureService.PLAYER_SYMBOLS[player.shape][2+this.data.warpGate])
-      this.graphics_shape_full = new Sprite(TextureService.PLAYER_SYMBOLS[player.shape][0+this.data.warpGate])
+      const wgFlag = this.data.warpGate ? 1 : 0;
+
+      this.graphics_shape_part = new Sprite(TextureService.PLAYER_SYMBOLS[player.shape][2 + wgFlag]);
+      this.graphics_shape_full = new Sprite(TextureService.PLAYER_SYMBOLS[player.shape][0 + wgFlag]);
     }
 
     const playerColour = this.context.getPlayerColour(player._id)
@@ -750,7 +773,7 @@ export class Star extends MapObject {
     // Dead stars do not have scanning range
     if (!player || this._isDeadStar()) { return }
 
-    let radius = ((this.data.effectiveTechs.scanning || 1) + 1) * this.lightYearDistance
+    let radius = ((this.data.effectiveTechs?.scanning || 1) + 1) * this.lightYearDistance
 
     this.graphics_scanningRange.circle(0, 0, radius)
     this.graphics_scanningRange.fill({
@@ -780,7 +803,7 @@ export class Star extends MapObject {
 
     if (!player) { return }
 
-    let radius = ((this.data.effectiveTechs.hyperspace || 1) + 1.5) * this.lightYearDistance
+    let radius = ((this.data.effectiveTechs?.hyperspace || 1) + 1.5) * this.lightYearDistance
 
     this.graphics_hyperspaceRange.star(0, 0, radius, radius, radius - 3)
     this.graphics_hyperspaceRange.fill({
@@ -933,12 +956,18 @@ export class Star extends MapObject {
 
     if (this.userSettings.map.naturalResources !== 'planets') {
       if (this.graphics_natural_resources_ring[lod]) {
-        this.graphics_natural_resources_ring[lod].visible = this.data.isInScanningRange && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources
+        this.graphics_natural_resources_ring[lod].visible = Boolean(this.data.isInScanningRange && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources);
       }
     }
 
-    if (this.text_name) this.text_name.visible = this.isSelected || this.zoomPercent >= Star.zoomLevelDefinitions.name
-    if (this.container_planets) this.container_planets.visible = this.data.isInScanningRange && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources
+    if (this.text_name) {
+      this.text_name.visible = this.isSelected || this.zoomPercent >= Star.zoomLevelDefinitions.name;
+    }
+
+    if (this.container_planets) {
+      this.container_planets.visible = Boolean(this.data.isInScanningRange && this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources);
+    }
+
     if (this.text_infrastructure) this.text_infrastructure.visible = this.isSelected || this.zoomPercent >= Star.zoomLevelDefinitions.infrastructure
 
     let small_ships = this.zoomPercent >= Star.zoomLevelDefinitions.name || this.isSelected

@@ -1,22 +1,23 @@
 <template>
-<div>
-  <p>
+  <div>
+    <p>
       Your stars have been upgraded.
-      You purchased <span class="text-warning">{{props.event.data.upgradeReport.upgraded}} {{props.event.data.upgradeReport.infrastructureType}}</span> for
-      <span class="text-success">${{props.event.data.upgradeReport.cost}}</span> credits.
-
+      You purchased <span class="text-warning">{{ props.event.data.upgradeReport.upgraded }}
+        {{ props.event.data.upgradeReport.infrastructureType }}</span> for
+      <span class="text-success">${{ props.event.data.upgradeReport.cost }}</span> credits.
+    </p>
     <details>
       <summary class="upgrade-report-collapsible-summary">Upgrade report</summary>
 
-      <bulk-infrastructure-upgrade-report :upgrade-report="props.event.data.upgradeReport"></bulk-infrastructure-upgrade-report>
+      <bulk-infrastructure-upgrade-report
+        :upgrade-report="props.event.data.upgradeReport"></bulk-infrastructure-upgrade-report>
     </details>
-  </p>
-</div>
+  </div>
 </template>
 
 <script setup lang="ts">
 
-import type {PlayerBulkInfrastructureUpgradedEvent} from "@solaris-common";
+import type { PlayerBulkInfrastructureUpgradedEvent } from "@solaris-common";
 import BulkInfrastructureUpgradeReport from "@/views/game/components/star/BulkInfrastructureUpgradeReport.vue";
 
 const props = defineProps<{

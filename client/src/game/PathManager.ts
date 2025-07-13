@@ -2,17 +2,18 @@ import * as PIXI from 'pixi.js'
 import gameHelper from '../services/gameHelper'
 import helpers from './helpers'
 import type {Map} from './map';
-import type {UserGameSettings} from "@solaris-common";
-import type {Game} from "../types/game";
+import type {UserGameSettings, MapObject as MapObjectData, Location} from "@solaris-common";
+import type {Game, Carrier as CarrierData, Star} from "../types/game";
 import type Carrier from "./carrier";
+import type { MapObject } from './mapObject';
 
-interface GraphicsWithChunk extends PIXI.Graphics {
+export interface GraphicsWithChunk extends PIXI.Graphics {
   chunk: PIXI.Container,
 }
 
-type Path = {
+export type Path = {
   id: string,
-  carriers: Carrier[],
+  carriers: CarrierData[],
   graphics: GraphicsWithChunk,
 }
 
@@ -21,11 +22,11 @@ export class PathManager {
   zoomPercent: number;
   container: PIXI.Container;
   chunkSize: number;
-  game: Game | undefined;
-  userSettings: UserGameSettings | undefined;
+  game: Game;
+  userSettings: UserGameSettings;
   paths: Path[] = [];
-  chunklessContainer: PIXI.Container | undefined;
-  chunksContainer: PIXI.Container | undefined;
+  chunklessContainer: PIXI.Container;
+  chunksContainer: PIXI.Container;
   firstChunkX: number = 0;
   firstChunkY: number = 0;
   lastChunkX: number = 0;
@@ -40,6 +41,8 @@ export class PathManager {
 
   constructor ( game: Game, userSettings: UserGameSettings,  map: Map) {
     this.map = map
+    this.game = game;
+    this.userSettings = userSettings;
 
     this.zoomPercent = 100
 
@@ -47,11 +50,15 @@ export class PathManager {
 
     this.chunkSize = 512.0
 
-    this.setup(game, userSettings)
+    this.chunksContainer = new PIXI.Container()
+    this.chunklessContainer = new PIXI.Container()
+    this.container.addChild(this.chunklessContainer)
+    this.container.addChild(this.chunksContainer)
+
+    this.update(game, userSettings);
   }
 
-  setup(game: Game, userSettings: UserGameSettings) {
-
+  update(game: Game, userSettings: UserGameSettings) {
     this.game = game
     this.userSettings = userSettings
     this._loadSettings()
@@ -66,22 +73,13 @@ export class PathManager {
      * }
      *
     */
-    if( this.chunklessContainer ) {
-      this.container.removeChild(this.chunklessContainer)
-    }
-    if( this.chunksContainer ) {
-      this.container.removeChild(this.chunksContainer)
-    }
+    this.chunksContainer.removeChildren();
+    this.chunklessContainer.removeChildren();
 
-    this.chunksContainer = new PIXI.Container()
-    this.chunklessContainer = new PIXI.Container()
-    this.container.addChild(this.chunklessContainer)
-    this.container.addChild(this.chunksContainer)
-
-    let minX = gameHelper.calculateMinStarX(this.game)
-    let minY = gameHelper.calculateMinStarY(this.game)
-    let maxX = gameHelper.calculateMaxStarX(this.game)
-    let maxY = gameHelper.calculateMaxStarY(this.game)
+    const minX = gameHelper.calculateMinStarX(this.game)
+    const minY = gameHelper.calculateMinStarY(this.game)
+    const maxX = gameHelper.calculateMaxStarX(this.game)
+    const maxY = gameHelper.calculateMaxStarY(this.game)
 
     this.firstChunkX = Math.floor(minX/this.chunkSize)
     this.firstChunkY = Math.floor(minY/this.chunkSize)
@@ -109,31 +107,31 @@ export class PathManager {
     this.maxScale = this.userSettings!.map.objectsMaximumScale/4.0
   }
 
-  addSharedPath( objectA, objectB, carrierMapObject ) {
-    let mapObjects = [ objectA, objectB ]
+  addSharedPath(objectA: MapObjectData<string>, objectB: MapObjectData<string>, carrierMapObject: Carrier) {
+    const mapObjects = [ objectA, objectB ]
     let objectAlpha = helpers.calculateDepthModifiers(this.userSettings, [objectA._id, objectB._id])/2
 
     this._orderObjects(mapObjects)
 
-    let pathID = mapObjects[0].data._id + mapObjects[1].data._id
+    let pathID = mapObjects[0]._id + mapObjects[1]._id
     let path = this._findPath(pathID)
     if(!path) {
       path = {
         id: pathID,
         carriers: Array(),
-        graphics: this._createLoopedPathGraphics( mapObjects[0], mapObjects[1], carrierMapObject.colour )
+        graphics: this._createLoopedPathGraphics( mapObjects[0], mapObjects[1], carrierMapObject.colour!),
       }
       this.paths.push(path)
     }
     if( !this._pathContainsCarrier(carrierMapObject, path) ) {
-      path.carriers.push(carrierMapObject)
+      path.carriers.push(carrierMapObject.data)
     }
 
     path.graphics.alpha = objectAlpha+path.carriers.length*0.1
     return pathID
   }
 
-  removeSharedPath( pathID, carrier ) {
+  removeSharedPath( pathID: string, carrier: CarrierData) {
     let path = this._findPath(pathID)
     if(path) {
       let pathGraphics = path.graphics
@@ -154,12 +152,12 @@ export class PathManager {
     }
   }
 
-  addUniquePath( mapObject, star, looped, colour ) {
+  addUniquePath( mapObject: MapObjectData<string>, star: Star, looped: boolean, colour: string) {
     const PATH_WIDTH = 0.5*this.userSettings!.map.carrierPathWidth
-    let objectAlpha = helpers.calculateDepthModifier(this.userSettings, mapObject._id)/2
-    let lineAlpha = looped ? objectAlpha / 2 : objectAlpha
-    let lineWidth = PATH_WIDTH
-    let path
+    const objectAlpha = helpers.calculateDepthModifier(this.userSettings, mapObject._id)/2
+    const lineAlpha = looped ? objectAlpha / 2 : objectAlpha
+    const lineWidth = PATH_WIDTH
+    let path: GraphicsWithChunk;
     if(looped) {
       path = this._createLoopedPathGraphics( mapObject, star, colour )
     }
@@ -170,7 +168,7 @@ export class PathManager {
     return path
   }
 
-  removeUniquePath( path ) {
+  removeUniquePath( path: GraphicsWithChunk ) {
     if(path.chunk) {
       path.chunk.removeChild(path)
     }
@@ -179,15 +177,15 @@ export class PathManager {
     }
   }
 
-  addPathToChunk(pathGraphics, locA, locB) {
-    let chunkXA = Math.floor(locA.x/this.chunkSize)
-    let chunkYA = Math.floor(locA.y/this.chunkSize)
-    let chunkXB = Math.floor(locB.x/this.chunkSize)
-    let chunkYB = Math.floor(locB.y/this.chunkSize)
+  addPathToChunk(pathGraphics: GraphicsWithChunk, locA: Location, locB: Location) {
+    const chunkXA = Math.floor(locA.x/this.chunkSize)
+    const chunkYA = Math.floor(locA.y/this.chunkSize)
+    const chunkXB = Math.floor(locB.x/this.chunkSize)
+    const chunkYB = Math.floor(locB.y/this.chunkSize)
 
     if( (chunkXA === chunkXB) && (chunkYA === chunkYB) ) {
-      let ix = chunkXA-this.firstChunkX
-      let iy = chunkYA-this.firstChunkY
+      const ix = chunkXA-this.firstChunkX
+      const iy = chunkYA-this.firstChunkY
 
       this.chunks[ix][iy].addChild(pathGraphics)
       pathGraphics.chunk = this.chunks[ix][iy]
@@ -268,35 +266,32 @@ export class PathManager {
     path.scale.y = yscale
   }
 
-  _createLoopedPathGraphics( objectA, objectB, pathColour ) {
+  _createLoopedPathGraphics(objectA: MapObjectData<string>, objectB: MapObjectData<string>, pathColour: string) {
     const PATH_WIDTH = 0.5*this.userSettings!.map.carrierPathWidth
-    let lineAlpha = 0.3
-    let lineWidth = PATH_WIDTH
+    const lineAlpha = 0.3
+    const lineWidth = PATH_WIDTH
 
-    let pathGraphics
     if( this.userSettings!.map.carrierLoopStyle == 'solid' ) {
-      pathGraphics = this._createSolidPathGraphics( lineAlpha, lineWidth/3.0, objectA, objectB, pathColour )
+      return this._createSolidPathGraphics( lineAlpha, lineWidth/3.0, objectA, objectB, pathColour )
+    } else {
+      return this._createDashedPathGraphics( lineAlpha, lineWidth, objectA, objectB, pathColour )
     }
-    else {
-      pathGraphics = this._createDashedPathGraphics( lineAlpha, lineWidth, objectA, objectB, pathColour )
-    }
-    return pathGraphics
   }
 
-  _createDashedPathGraphics( lineAlpha, lineWidth, objectA, objectB, pathColour ) {
-    let pointA = objectA.data.location
-    let pointB = objectB.data.location
+  _createDashedPathGraphics( lineAlpha: number, lineWidth: number, objectA: MapObjectData<string>, objectB: MapObjectData<string>, pathColour: string ) {
+    const pointA = objectA.location;
+    const pointB = objectB.location;
     const DASH_LENGTH = Math.min( Math.max(1, this.userSettings!.map.carrierPathDashLength), 16 )
     const VOID_LENGTH = DASH_LENGTH/2.0
     const COMBINED_LENGTH = DASH_LENGTH+VOID_LENGTH
 
-    let pathLength = gameHelper.getDistanceBetweenLocations(pointA,pointB)
+    const pathLength = gameHelper.getDistanceBetweenLocations(pointA,pointB)
 
-    let dashCount = Math.floor( pathLength/(DASH_LENGTH+VOID_LENGTH) )
-    let endpointsLength =  pathLength - (dashCount*(DASH_LENGTH+VOID_LENGTH))
+    const dashCount = Math.floor( pathLength/(DASH_LENGTH+VOID_LENGTH) )
+    const endpointsLength =  pathLength - (dashCount*(DASH_LENGTH+VOID_LENGTH))
 
-    let initialX = (endpointsLength/2.0)+(VOID_LENGTH/2.0)
-    let path = new PIXI.Graphics()
+    const initialX = (endpointsLength/2.0)+(VOID_LENGTH/2.0)
+    const path = new PIXI.Graphics() as GraphicsWithChunk;
 
     path.moveTo(0, lineWidth)
     path.lineTo(0, -lineWidth)
@@ -331,12 +326,12 @@ export class PathManager {
     return path
   }
 
-  _createSolidPathGraphics( lineAlpha, lineWidth, objectA, objectB, pathColour ) {
-    let pointA = objectA.data.location
-    let pointB = objectB.data.location
-    let pathLength = gameHelper.getDistanceBetweenLocations(pointA,pointB)
+  _createSolidPathGraphics( lineAlpha: number, lineWidth: number, objectA: MapObjectData<string>, objectB: MapObjectData<string>, pathColour: string) {
+    const pointA = objectA.location
+    const pointB = objectB.location
+    const pathLength = gameHelper.getDistanceBetweenLocations(pointA,pointB)
 
-    let path = new PIXI.Graphics()
+    const path = new PIXI.Graphics() as GraphicsWithChunk;
     path.moveTo(0, lineWidth)
     path.lineTo(0, -lineWidth)
     path.lineTo(pathLength, -lineWidth)
@@ -351,19 +346,19 @@ export class PathManager {
     return path
   }
 
-  _orderObjects(mapObjects) {
-    if( mapObjects[1].data._id > mapObjects[0].data._id ) {
+  _orderObjects(mapObjects: MapObjectData<string>[]) {
+    if( mapObjects[1]._id > mapObjects[0]._id ) {
       let firstMapObject = mapObjects[0]
       mapObjects[0] = mapObjects[1]
       mapObjects[1] = firstMapObject
     }
   }
 
-  _pathContainsCarrier(carrierMapObject, path) {
-    return path.carriers.find(c => c.data._id === carrierMapObject.data._id)
+  _pathContainsCarrier(carrierMapObject: MapObject, path: Path) {
+    return path.carriers.find(c => c._id === carrierMapObject.data._id)
   }
 
-  _findPath( pathID ) {
+  _findPath( pathID: string ) {
     return this.paths.find(p => p.id === pathID)
   }
 

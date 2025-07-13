@@ -2,7 +2,7 @@
 <div class="menu-page container" v-if="star">
     <menu-title :title="title" @onCloseRequested="onCloseRequested">
       <ignore-bulk-upgrade v-if="star.ignoreBulkUpgrade && isOwnedByUserPlayer" :starId="star._id" class="me-1"/>
-      <modalButton modalName="abandonStarModal" v-if="!$isHistoricalMode() && isOwnedByUserPlayer && !userPlayer.defeated && isGameInProgress() && isGameAllowAbandonStars()" classText="btn btn-sm btn-outline-danger">
+      <modalButton modalName="abandonStarModal" v-if="!isHistoricalMode && isOwnedByUserPlayer && !userPlayer?.defeated && isGameInProgress && isGameAllowAbandonStars" classText="btn btn-sm btn-outline-danger">
         <i class="fas fa-star"></i> <i class="fas fa-trash ms-1"></i>
       </modalButton>
       <button @click="viewOnMap(star)" class="btn btn-sm btn-outline-info ms-1"><i class="fas fa-eye"></i></button>
@@ -15,7 +15,7 @@
           <help-tooltip v-if="isGameDarkMode" tooltip="Coordinates are scrambled because this is a dark mode game."/>
         </p>
         <p class="mb-2" v-if="isOwnedByUserPlayer">A star under your command.</p>
-        <p class="mb-2" v-if="star.ownedByPlayerId != null && (!userPlayer || star.ownedByPlayerId != userPlayer._id)">This star is controlled by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{starOwningPlayer.alias}}</a>.</p>
+        <p class="mb-2" v-if="star.ownedByPlayerId != null && (!userPlayer || star.ownedByPlayerId != userPlayer._id) && starOwningPlayer">This star is controlled by <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{starOwningPlayer.alias}}</a>.</p>
         <p class="mb-2" v-if="star.ownedByPlayerId == null">This star has not been claimed by any faction.<br/>Send a carrier here to claim it for yourself!</p>
         <div v-if="star.ownedByPlayerId != null && star.homeStar ">
           <p class="mb-2 text-info" v-if="userPlayer && isOwnedByUserPlayer && star.ownedByPlayerId == originalCapitalOwner._id"><small>This is your capital.</small></p>
@@ -117,12 +117,12 @@
         </div>
         <div class="col-auto">
           <span title="Scanning range" v-if="star.ownedByPlayerId">
-            {{star.effectiveTechs.scanning}} <i class="fas fa-binoculars ms-1"></i>
+            {{star.effectiveTechs!.scanning}} <i class="fas fa-binoculars ms-1"></i>
           </span>
         </div>
         <div class="col-auto">
           <span title="Terraforming" v-if="star.ownedByPlayerId">
-            {{star.effectiveTechs.terraforming}} <i class="fas fa-globe-europe ms-1"></i>
+            {{star.effectiveTechs!.terraforming}} <i class="fas fa-globe-europe ms-1"></i>
           </span>
         </div>
         <div class="col-auto">
@@ -137,7 +137,7 @@
           <span v-if="canShowSpecialist && isOwnedByUserPlayer && canHireSpecialist">
             <specialist-icon :type="'star'" :defaultIcon="'user-astronaut'" :specialist="star.specialist"></specialist-icon>
             <a href="javascript:;" @click="onViewHireStarSpecialistRequested">
-              <span class="ms-1" v-if="star.specialistId" :title="star.specialist.description">{{star.specialist.name}}</span>
+              <span class="ms-1" v-if="star.specialistId && star.specialist" :title="star.specialist.description">{{star.specialist.name}}</span>
               <span v-if="!star.specialistId">No Specialist</span>
             </a>
             <span v-if="star.specialistId && star.specialistExpireTick" class="badge bg-warning ms-1"><i class="fas fa-stopwatch"></i> Expires Tick {{star.specialistExpireTick}}</span>
@@ -151,12 +151,12 @@
         </div>
         <div class="col-auto">
           <span title="Weapons" v-if="star.ownedByPlayerId">
-            {{star.effectiveTechs.weapons}} <i class="fas fa-gun ms-1"></i>
+            {{star.effectiveTechs!.weapons}} <i class="fas fa-gun ms-1"></i>
           </span>
         </div>
         <div class="col-auto">
           <span v-if="star.ownedByPlayerId && !isDeadStar" title="Manufacturing">
-            {{star.effectiveTechs.manufacturing}} <i class="fas fa-industry ms-1"></i>
+            {{star.effectiveTechs!.manufacturing}} <i class="fas fa-industry ms-1"></i>
           </span>
         </div>
         <div class="col-auto">
@@ -166,7 +166,7 @@
         </div>
 
         <div class="col-auto">
-          <span v-if="star.ownedByPlayerId && !isDeadStar && ticksToBonusShip" :title="`Ticks to ${(star.manufacturing > 1 ? 'bonus' : 'next')} ship`">
+          <span v-if="star.ownedByPlayerId && !isDeadStar && ticksToBonusShip" :title="`Ticks to ${(star.manufacturing! > 1 ? 'bonus' : 'next')} ship`">
             {{ticksToBonusShip}} <i class="fas fa-spinner ms-1"></i>
           </span>
         </div>
@@ -180,7 +180,7 @@
 
       <div class="mb-0" v-if="!isDeadStar">
         <infrastructureUpgradeCompact
-          v-if="isOwnedByUserPlayer && !userPlayer.defeated && star.upgradeCosts != null"
+          v-if="isOwnedByUserPlayer && userPlayer && !userPlayer.defeated && star.upgradeCosts != null"
           :star="star"
           :availableCredits="userPlayer.credits"
           :economy="star.upgradeCosts.economy"
@@ -237,7 +237,7 @@
               Weapons
           </div>
           <div class="col text-end" title="Weapons">
-            <span>{{star.effectiveTechs.weapons}}</span>
+            <span>{{star.effectiveTechs!.weapons}}</span>
             <i class="fas fa-gun ms-2"></i>
           </div>
       </div>
@@ -247,7 +247,7 @@
               Scanning
           </div>
           <div class="col text-end" title="Scanning">
-            <span>{{star.effectiveTechs.scanning}}</span>
+            <span>{{star.effectiveTechs!.scanning}}</span>
             <i class="fas fa-binoculars ms-2"></i>
           </div>
       </div>
@@ -257,7 +257,7 @@
               Terraforming
           </div>
           <div class="col text-end" title="Terraforming">
-            <span>{{star.effectiveTechs.terraforming}}</span>
+            <span>{{star.effectiveTechs!.terraforming}}</span>
             <i class="fas fa-globe-europe ms-2"></i>
           </div>
       </div>
@@ -267,7 +267,7 @@
               Manufacturing
           </div>
           <div class="col text-end" title="Manufacturing">
-            <span>{{star.effectiveTechs.manufacturing}}</span>
+            <span>{{star.effectiveTechs!.manufacturing}}</span>
             <i class="fas fa-industry ms-2"></i>
           </div>
       </div>
@@ -285,9 +285,9 @@
 
       <div v-if="star.ownedByPlayerId && !isDeadStar && ticksToBonusShip" class="row pt-1 pb-1 bg-dark">
         <div class="col">
-          Ticks to {{(star.manufacturing > 1 ? 'bonus' : 'next')}} ship
+          Ticks to {{(star.manufacturing! > 1 ? 'bonus' : 'next')}} ship
         </div>
-        <div class="col text-end" :title="`Ticks to ${(star.manufacturing > 1 ? 'bonus' : 'next')} ship`">
+        <div class="col text-end" :title="`Ticks to ${(star.manufacturing! > 1 ? 'bonus' : 'next')} ship`">
           <span>{{ticksToBonusShip}}</span>
           <i class="fas fa-spinner ms-1"></i>
         </div>
@@ -300,11 +300,11 @@
           <h4>Carriers</h4>
         </div>
         <div class="col-auto">
-          <button title="Distribute ships evenly to carriers" v-if="isOwnedByUserPlayer" type="button" class="btn btn-sm btn-outline-secondary" @click="distributeAllShips()">
+          <button title="Distribute ships evenly to carriers" v-if="isOwnedByUserPlayer" type="button" class="btn btn-sm btn-outline-secondary" @click="distributeShips(star)">
             <i class="fas fa-arrow-down-wide-short"></i>
             Distribute
           </button>
-          <button title="Transfer all ships to the star" v-if="isOwnedByUserPlayer" type="button" class="btn btn-sm btn-outline-primary ms-1" @click="transferAllToStar()">
+          <button title="Transfer all ships to the star" v-if="isOwnedByUserPlayer" type="button" class="btn btn-sm btn-outline-primary ms-1" @click="transferAllToStar(star)">
             <i class="fas fa-arrow-up-wide-short"></i>
             Garrison
           </button>
@@ -326,7 +326,7 @@
           <i class="fas fa-rocket"></i> {{carrier.ships == null ? '???' : carrier.ships}}
         </div>
         <div class="col-auto ps-0">
-          <a href="javascript:;" v-if="!$isHistoricalMode() && isOwnedByUserPlayer && !isGameFinished" title="Transfer ships between the star and carrier" @click="onShipTransferRequested(carrier)"><i class="fas fa-exchange-alt"></i></a>
+          <a href="javascript:;" v-if="!isHistoricalMode && isOwnedByUserPlayer && !isGameFinished" title="Transfer ships between the star and carrier" @click="onShipTransferRequested(carrier._id)"><i class="fas fa-exchange-alt"></i></a>
         </div>
       </div>
     </div>
@@ -337,7 +337,7 @@
 
         <infrastructure :starId="star._id"/>
 
-        <infrastructureUpgrade v-if="isOwnedByUserPlayer && !userPlayer.defeated && star.upgradeCosts != null"
+        <infrastructureUpgrade v-if="isOwnedByUserPlayer && userPlayer && !userPlayer.defeated && star.upgradeCosts != null"
           :star="star"
           :availableCredits="userPlayer.credits"
           :economy="star.upgradeCosts.economy"
@@ -346,14 +346,14 @@
       </div>
 
       <!-- TODO: Turn these into components -->
-      <div v-if="isOwnedByUserPlayer && !userPlayer.defeated && star.upgradeCosts != null">
+      <div v-if="isOwnedByUserPlayer && userPlayer && !userPlayer.defeated && star.upgradeCosts != null">
         <div class="row bg-dark pt-2 pb-0 mb-1">
           <div class="col-8">
             <p class="mt-1 mb-2">Build a <strong>Carrier</strong> to transport ships through hyperspace.</p>
           </div>
           <div class="col-4">
             <div class="d-grid gap-2">
-              <button :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.carriers || star.ships < 1 || isGameFinished"
+              <button :disabled="isHistoricalMode || userPlayer.credits < star.upgradeCosts?.carriers! || (star.ships || 0) < 1 || isGameFinished"
                 class="btn btn-info mb-2"
                 @click="onBuildCarrierRequested">
                 <i class="fas fa-rocket"></i>
@@ -370,7 +370,7 @@
           <div class="col-4">
             <div class="d-grid gap-2">
               <button v-if="canBuildWarpGates && !star.warpGate"
-                :disabled="$isHistoricalMode() || userPlayer.credits < star.upgradeCosts.warpGate || isGameFinished"
+                :disabled="isHistoricalMode || userPlayer.credits < star.upgradeCosts?.warpGate! || isGameFinished"
                 @click="buildWarpGate"
                 class="btn btn-success mb-2">
                 <i class="fas fa-dungeon"></i>
@@ -379,7 +379,7 @@
             </div>
             <div class="d-grid gap-2">
               <button v-if="canDestroyWarpGates && star.warpGate"
-                :disabled="$isHistoricalMode() || isGameFinished"
+                :disabled="isHistoricalMode || isGameFinished"
                 @click="destroyWarpGate"
                 class="btn btn-outline-danger mb-2">
                 <i class="fas fa-trash"></i>
@@ -389,13 +389,13 @@
           </div>
         </div>
 
-        <div class="row bg-dark pt-2 pb-0 mb-1" v-if="isGameInProgress() && isGameAllowAbandonStars()">
+        <div class="row bg-dark pt-2 pb-0 mb-1" v-if="isGameInProgress && isGameAllowAbandonStars">
           <div class="col-8">
             <p class="mb-2">Abandon this star for another player to claim.</p>
           </div>
           <div class="col-4">
             <div class="d-grid gap-2">
-              <modalButton modalName="abandonStarModal" classText="btn btn-outline-danger mb-2" :disabled="$isHistoricalMode()">
+              <modalButton modalName="abandonStarModal" classText="btn btn-outline-danger mb-2" :disabled="isHistoricalMode">
                 <i class="fas fa-trash"></i>
                 Abandon Star
               </modalButton>
@@ -418,8 +418,7 @@
 </div>
 </template>
 
-<script>
-import starService from '../../../../services/api/star'
+<script setup lang="ts">
 import AudioService from '../../../../game/audio'
 import GameHelper from '../../../../services/gameHelper'
 import MenuTitle from '../MenuTitle.vue'
@@ -428,261 +427,115 @@ import InfrastructureUpgrade from './InfrastructureUpgrade.vue'
 import InfrastructureUpgradeCompact from './InfrastructureUpgradeCompact.vue'
 import ModalButton from '../../../components/modal/ModalButton.vue'
 import DialogModal from '../../../components/modal/DialogModal.vue'
-import StarSpecialistVue from './StarSpecialist.vue'
-import SpecialistIconVue from '../specialist/SpecialistIcon.vue'
-import gameHelper from '../../../../services/gameHelper'
-import IgnoreBulkUpgradeVue from './IgnoreBulkUpgrade.vue'
-import StarResourcesVue from './StarResources.vue'
-import StarIconVue from './../star/StarIcon.vue'
+import StarSpecialist from './StarSpecialist.vue'
+import SpecialistIcon from '../specialist/SpecialistIcon.vue'
+import IgnoreBulkUpgrade from './IgnoreBulkUpgrade.vue'
+import StarResources from './StarResources.vue'
+import StarIcon from './../star/StarIcon.vue'
 import HelpTooltip from '../../../components/HelpTooltip.vue'
 import {formatLocation} from "client/src/util/format";
 import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
-import { inject } from 'vue';
+import { inject, ref, computed, type Ref } from 'vue';
+import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
+import {toastInjectionKey} from "@/util/keys";
+import type {State} from "@/store";
+import { useStore, type Store } from 'vuex';
+import type {Carrier} from "@/types/game";
+import type {MapObject} from "@solaris-common";
+import {abandon} from "@/services/typedapi/star";
+import {makeWarpgateActions} from "@/views/game/components/star/upgrade";
+import {makeShipTransferActions} from "@/views/game/components/star/shipTransfer";
+import {useIsHistoricalMode} from "@/util/reactiveHooks";
 
-export default {
-  components: {
-    'menu-title': MenuTitle,
-    'infrastructure': Infrastructure,
-    'infrastructureUpgrade': InfrastructureUpgrade,
-    'infrastructureUpgradeCompact': InfrastructureUpgradeCompact,
-    'modalButton': ModalButton,
-    'dialogModal': DialogModal,
-    'star-specialist': StarSpecialistVue,
-    'specialist-icon': SpecialistIconVue,
-    'ignore-bulk-upgrade': IgnoreBulkUpgradeVue,
-    'star-resources': StarResourcesVue,
-    'star-icon': StarIconVue,
-    'help-tooltip': HelpTooltip,
-  },
-  props: {
-    starId: String
-  },
-  setup () {
-    return {
-      eventBus: inject(eventBusInjectionKey)
-    }
-  },
-  data () {
-    return {
-      audio: null,
-      userPlayer: null,
-      currentPlayerId: null,
-      canBuildWarpGates: false,
-      canDestroyWarpGates: false,
-      isSpecialistsEnabled: false,
-      isStandardUIStyle: false,
-      isCompactUIStyle: false,
-      warpSpeedMultiplier: '',
-    }
-  },
-  mounted () {
-    this.isStandardUIStyle = this.$store.state.settings.interface.uiStyle === 'standard'
-    this.isCompactUIStyle = this.$store.state.settings.interface.uiStyle === 'compact'
+const props = defineProps<{
+  starId: string,
+}>();
 
-    this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
+const emit = defineEmits<{
+  onCloseRequested: [],
+  onViewHireStarSpecialistRequested: [starId: string],
+  onShipTransferRequested: [carrierId: string],
+  onOpenPlayerDetailRequested: [playerId: string],
+  onOpenCarrierDetailRequested: [carrierId: string],
+  onEditWaypointsRequested: [carrierId: string],
+  onBuildCarrierRequested: [starId: string],
+}>();
 
-    this.canBuildWarpGates = this.$store.state.game.settings.specialGalaxy.warpgateCost !== 'none'
-    this.canDestroyWarpGates = this.$store.state.game.state.startDate != null
-    this.warpSpeedMultiplier = this.$store.state.game.constants.distances.warpSpeedMultiplier
+const eventBus = inject(eventBusInjectionKey)!;
+const httpClient = inject(httpInjectionKey)!;
+const toast = inject(toastInjectionKey)!;
 
-    // Can display specialist section if sepcialists are enabled and the star is owned by a player.
-    // Otherwise if the star is unowned then display only if the star is within scanning range and it has a specialist on it.
-    this.isSpecialistsEnabled = this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none'
-  },
-  methods: {
-    formatLocation,
-    onCloseRequested (e) {
-      this.$emit('onCloseRequested', e)
-    },
-    onViewCompareIntelRequested (e) {
-      this.$emit('onViewCompareIntelRequested', e)
-    },
-    onViewHireStarSpecialistRequested (e) {
-      this.$emit('onViewHireStarSpecialistRequested', this.starId)
-    },
-    onShipTransferRequested (e) {
-      if (e.orbiting) {
-        this.$emit('onShipTransferRequested', e._id)
-      }
-    },
-    getCarriersInOrbit () {
-      return GameHelper.getCarriersOrbitingStar(this.$store.state.game, this.star)
-    },
-    isGameInProgress () {
-      return GameHelper.isGameInProgress(this.$store.state.game)
-    },
-    isGameAllowAbandonStars () {
-      return GameHelper.isGameAllowAbandonStars(this.$store.state.game)
-    },
-    onOpenPlayerDetailRequested (e) {
-      this.$emit('onOpenPlayerDetailRequested', this.star.ownedByPlayerId)
-    },
-    onOpenOriginalCapitalOwner (e) {
-      this.$emit('onOpenPlayerDetailRequested', this.originalCapitalOwner._id)
-    },
-    onOpenCarrierDetailRequested (carrier) {
-      this.$emit('onOpenCarrierDetailRequested', carrier._id)
-    },
-    onEditWaypointsRequested (carrierId) {
-      this.$emit('onEditWaypointsRequested', carrierId)
-    },
-    onBuildCarrierRequested () {
-      this.$emit('onBuildCarrierRequested', this.star._id)
-    },
-    viewOnMap (e) {
-      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: e });
-    },
-    async confirmAbandonStar (e) {
-      try {
-        const response = await starService.abandonStar(this.$store.state.game._id, this.star._id)
+const store: Store<State> = useStore();
 
-        if (response.status === 200) {
-          this.$toast.default(`${this.star.name} has been abandoned.`)
+const isHistoricalMode = useIsHistoricalMode(store);
 
-          this.$store.commit('gameStarAbandoned', {
-            starId: this.star._id
-          })
-
-          AudioService.leave()
-        }
-      } catch (err) {
-        console.error(err)
-      }
-    },
-    async buildWarpGate (e) {
-      if (this.$store.state.settings.star.confirmBuildWarpGate === 'enabled' && !await this.$confirm('Build Warp Gate', `Are you sure you want build a Warp Gate at ${this.star.name}? The upgrade will cost $${this.star.upgradeCosts.warpGate}.`)) {
-        return
-      }
-
-      try {
-        const response = await starService.buildWarpGate(this.$store.state.game._id, this.star._id)
-
-        if (response.status === 200) {
-          this.$toast.default(`Warp Gate built at ${this.star.name}.`)
-
-          this.$store.commit('gameStarWarpGateBuilt', response.data)
-
-          AudioService.join()
-        }
-      } catch (err) {
-        console.error(err)
-      }
-    },
-    async destroyWarpGate (e) {
-      if (!await this.$confirm('Destroy Warp Gate', `Are you sure you want destroy Warp Gate at ${this.star.name}?`)) {
-        return
-      }
-
-      try {
-        const response = await starService.destroyWarpGate(this.$store.state.game._id, this.star._id)
-
-        if (response.status === 200) {
-          this.$toast.default(`Warp Gate destroyed at ${this.star.name}.`)
-
-          this.$store.commit('gameStarWarpGateDestroyed', {
-            starId: this.star._id
-          })
-
-          AudioService.leave()
-        }
-      } catch (err) {
-        console.error(err)
-      }
-    },
-    async transferAllToStar() {
-      try {
-        let response = await starService.transferAllToStar(this.$store.state.game._id, this.star._id)
-
-        if (response.status === 200) {
-          let carriers = response.data.carriers
-
-          carriers.forEach(responseCarrier => {
-            let mapObjectCarrier = gameHelper.getCarrierById(this.$store.state.game, responseCarrier._id)
-            mapObjectCarrier.ships = responseCarrier.ships
-          })
-
-          this.star.ships = response.data.star.ships
-
-          this.$toast.default(`All ships transfered to ${this.star.name}.`)
-        }
-      } catch (err) {
-        console.log(err)
-      }
-    },
-    async distributeAllShips() {
-      try {
-        let response = await starService.distributeAllShips(this.$store.state.game._id, this.star._id)
-
-        if (response.status === 200) {
-          let carriers = response.data.carriers
-
-          carriers.forEach(responseCarrier => {
-            let mapObjectCarrier = gameHelper.getCarrierById(this.$store.state.game, responseCarrier._id)
-            mapObjectCarrier.ships = responseCarrier.ships
-          })
-
-          this.star.ships = response.data.star.ships
-
-          this.$toast.default(`All ships at ${this.star.name} distributed to carriers in orbit.`)
-        }
-      } catch (err) {
-        console.log(err)
-      }
-    }
-  },
-  computed: {
-    title: function () {
-      if (this.star.homeStar) {
-        return `${this.star.name} - Capital`;
-      }
-
-      return this.star.name;
-    },
-    star: function () {
-      return GameHelper.getStarById(this.$store.state.game, this.starId)
-    },
-    starOwningPlayer: function () {
-      return GameHelper.getStarOwningPlayer(this.$store.state.game, this.star)
-    },
-    originalCapitalOwner: function() {
-      return GameHelper.getOriginalOwner(this.$store.state.game, this.star)
-    },
-    canShowSpecialist: function () {
-      return this.isSpecialistsEnabled && (this.star.specialistId || this.isOwnedByUserPlayer) && !this.isDeadStar
-    },
-    canHireSpecialist: function () {
-      return this.canShowSpecialist
-        && !GameHelper.isGameFinished(this.$store.state.game)
-        && !this.isDeadStar
-        && (!this.star.specialistId || !this.star.specialist.oneShot)
-    },
-    isOwnedByUserPlayer: function() {
-      let owner = GameHelper.getStarOwningPlayer(this.$store.state.game, this.star)
-
-      return owner && this.userPlayer && owner._id === this.userPlayer._id
-    },
-    isGameFinished: function () {
-      return GameHelper.isGameFinished(this.$store.state.game)
-    },
-    isDeadStar: function () {
-      return GameHelper.isDeadStar(this.star)
-    },
-    wormHolePairStar: function () {
-      if (!this.star.wormHoleToStarId) {
-        return null
-      }
-
-      return GameHelper.getStarById(this.$store.state.game, this.star.wormHoleToStarId)
-    },
-    ticksToBonusShip: function () {
-      return GameHelper.calculateTicksToBonusShip(this.star.shipsActual, this.star.manufacturing)
-    },
-    isGameDarkMode () {
-      return GameHelper.isDarkMode(this.$store.state.game)
-    }
+const star = computed(() => GameHelper.getStarById(store.state.game, props.starId)!);
+const starOwningPlayer = computed(() => star.value.ownedByPlayerId && GameHelper.getPlayerById(store.state.game, star.value.ownedByPlayerId));
+const originalCapitalOwner = computed(() => GameHelper.getOriginalOwner(store.state.game, star.value));
+const userPlayer = computed(() => GameHelper.getUserPlayer(store.state.game));
+const canBuildWarpGates = computed(() => store.state.game.settings.specialGalaxy.warpgateCost !== 'none');
+const canDestroyWarpGates = computed(() => Boolean(store.state.game.state.startDate));
+const warpSpeedMultiplier = computed(() => store.state.game.constants.distances.warpSpeedMultiplier);
+const isSpecialistsEnabled = computed(() => store.state.game.settings.specialGalaxy.specialistCost !== 'none');
+const isStandardUIStyle = computed(() => store.state.settings.interface.uiStyle === 'standard');
+const isCompactUIStyle = computed(() => !isStandardUIStyle.value);
+const isGameFinished = computed(() => GameHelper.isGameFinished(store.state.game));
+const isGameInProgress = computed(() => GameHelper.isGameInProgress(store.state.game));
+const isGameAllowAbandonStars = computed(() => GameHelper.isGameAllowAbandonStars(store.state.game));
+const isOwnedByUserPlayer = computed(() => starOwningPlayer.value && userPlayer.value && starOwningPlayer.value._id === userPlayer.value._id);
+const isDeadStar = computed(() => GameHelper.isDeadStar(star.value));
+const wormHolePairStar = computed(() => {
+  if (!star.value.wormHoleToStarId) {
+    return null;
   }
-}
+
+  return GameHelper.getStarById(store.state.game, star.value.wormHoleToStarId)!;
+});
+const canShowSpecialist = computed(() => isSpecialistsEnabled.value && (star.value.specialistId || isOwnedByUserPlayer.value) && !isDeadStar.value);
+const canHireSpecialist = computed(() => canShowSpecialist.value && !isGameFinished.value && (!star.value.specialistId || !star.value.specialist?.oneShot));
+const ticksToBonusShip = computed(() => GameHelper.calculateTicksToBonusShip(star.value.shipsActual, star.value.manufacturing));
+const title = computed(() => {
+  if (star.value.homeStar) {
+    return `${star.value.name} - Capital`;
+  }
+
+  return star.value.name;
+});
+const isGameDarkMode = computed(() => GameHelper.isDarkMode(store.state.game));
+
+const onCloseRequested = () => emit('onCloseRequested');
+const onViewHireStarSpecialistRequested = () => emit('onViewHireStarSpecialistRequested', star.value._id);
+const onShipTransferRequested = (carrierId: string) => emit('onShipTransferRequested', carrierId);
+
+const getCarriersInOrbit = () => GameHelper.getCarriersOrbitingStar(store.state.game, star.value);
+
+const onOpenPlayerDetailRequested = () => star.value.ownedByPlayerId && emit('onOpenPlayerDetailRequested', star.value.ownedByPlayerId);
+const onOpenOriginalCapitalOwner = () => originalCapitalOwner.value && emit('onOpenPlayerDetailRequested', originalCapitalOwner.value._id);
+const onOpenCarrierDetailRequested = (carrier: Carrier) => emit('onOpenCarrierDetailRequested', carrier._id);
+const onEditWaypointsRequested = (carrierId: string) => emit('onEditWaypointsRequested', carrierId);
+const onBuildCarrierRequested = () => emit('onBuildCarrierRequested', star.value._id);
+const viewOnMap = (e: MapObject<string>) => eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: e });
+
+const confirmAbandonStar = async (e) => {
+  const response = await abandon(httpClient)(store.state.game._id, star.value._id);
+
+  if (isOk(response)) {
+    toast.default(`${star.value.name} has been abandoned.`);
+
+    store.commit('gameStarAbandoned', {
+      starId: star.value._id,
+    });
+
+    AudioService.leave();
+  } else {
+    console.error(formatError(response));
+    toast.error('Failed to abandon star');
+  }
+};
+
+const { buildWarpGate, destroyWarpGate } = makeWarpgateActions(store, toast, httpClient, star.value);
+const { transferAllToStar, distributeShips } = makeShipTransferActions(store, httpClient, toast);
 </script>
 
 <style scoped>

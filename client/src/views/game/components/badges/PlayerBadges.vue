@@ -57,6 +57,8 @@ const store = useStore() as Store<State>;
 
 const game = computed(() => store.state.game!);
 
+const player = computed(() => GameHelper.getPlayerById(game.value, props.playerId));
+
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 
 const isNormalAnonymity = computed(() => GameHelper.isNormalAnonymity(game.value));
@@ -65,7 +67,7 @@ const isExtraAnonymity = computed(() => GameHelper.isExtraAnonymity(game.value))
 
 const isFinished = computed(() => GameHelper.isGameFinished(game.value));
 
-const canPurchaseBadges = computed(() => !isExtraAnonymity.value || isFinished.value);
+const canPurchaseBadges = computed(() => (!isExtraAnonymity.value || isFinished.value) && userPlayer.value && userPlayer.value._id !== player.value!._id);
 
 const onOpenPurchasePlayerBadgeRequested = () => {
   if (canPurchaseBadges.value) {

@@ -1,4 +1,4 @@
-import { Document, EnforceDocument, LeanDocument, Model, Query, QueryOptions } from "mongoose";
+import { Document, EnforceDocument, LeanDocument, Model, Query, QueryOptions, UpdateQuery } from "mongoose";
 import { DBObjectId } from "./types/DBObjectId";
 
 export default class Repository<T> {
@@ -40,6 +40,17 @@ export default class Repository<T> {
         .skip(skip!) // We lie and say skip won't be null.  The reality is that skip() can accept null values just fine.
         .limit(limit!) // We lie and say limit won't be null.  The reality is that limit() can accept null values just fine.
         .exec();
+    }
+
+    async findOrCreateAsModel(query, createValue: Omit<T, '_id'>): Promise<T> {
+        const update: UpdateQuery<T> = {
+            $setOnInsert: createValue,
+        } as UpdateQuery<T>;
+
+        return await this.model.findOneAndUpdate(query, update, {
+            upsert: true,
+            new: true,
+        }).exec() as T;
     }
 
     async findOne(query, select?, options?: QueryOptions): Promise<T | null> {

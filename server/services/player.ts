@@ -262,11 +262,11 @@ export default class PlayerService extends EventEmitter {
         const starLocations = game.galaxy.stars.map(s => s.location);
 
         // Calculate the center point of the galaxy as we need to add it onto the starting location.
-        let galaxyCenter = this.mapService.getGalaxyCenterOfMass(starLocations);
+        const galaxyCenter = this.starDistanceService.getGalaxyCenterOfMass(starLocations);
 
         const distanceFromCenter = this._getDesiredPlayerDistanceFromCenter(game);
 
-        let radians = this._getPlayerStartingLocationRadians(game.settings.general.playerLimit);
+        const radians = this._getPlayerStartingLocationRadians(game.settings.general.playerLimit);
 
         // Create each player starting at angle 0 at a distance of half the galaxy radius
 

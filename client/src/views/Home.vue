@@ -1,6 +1,6 @@
 <template>
 <div class="full-container">
-  <view-container :hideTopBar="true">
+  <view-container :hideTopBar="true" :isAuthPage="false">
     <view-title title="Welcome to Solaris" :hideHomeButton="true" :showSocialLinks="true" />
 
     <div class="row">
@@ -32,45 +32,33 @@
 </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import ViewContainer from './components/ViewContainer.vue'
 import ViewTitle from './components/ViewTitle.vue'
-import AccountLoginVue from './account/components/Login.vue'
-import ApiAuthService from '../services/api/auth'
+import AccountLogin from './account/components/Login.vue'
 import router from '../router'
-import LoadingSpinnerVue from './components/LoadingSpinner.vue'
-import ParallaxVue from './components/Parallax.vue'
+import LoadingSpinner from './components/LoadingSpinner.vue'
+import Parallax from './components/Parallax.vue'
 import LatestAnnouncement from "./components/LatestAnnouncement.vue";
+import { ref, onMounted } from 'vue';
+import { useStore, type Store } from 'vuex';
+import type {State} from "@/store";
 
-export default {
-  components: {
-    'view-container': ViewContainer,
-    'view-title': ViewTitle,
-    'account-login': AccountLoginVue,
-    'loading-spinner': LoadingSpinnerVue,
-    'parallax': ParallaxVue,
-    'latest-announcement': LatestAnnouncement
-  },
-  data () {
-    return {
-      isAutoLoggingIn: false
-    }
-  },
-  async mounted () {
-    this.isAutoLoggingIn = true
+const documentationUrl = import.meta.env.VUE_APP_DOCUMENTATION_URL;
 
-    if (await this.$store.dispatch('verify')) {
-      await router.push({ name: 'main-menu' })
-    }
+const store: Store<State> = useStore();
 
-    this.isAutoLoggingIn = false
-  },
-  computed: {
-    documentationUrl () {
-      return import.meta.env.VUE_APP_DOCUMENTATION_URL
-    }
+const isAutoLoggingIn = ref(false);
+
+onMounted(async () => {
+  isAutoLoggingIn.value = true;
+
+  if (await store.dispatch('verify')) {
+    router.push({ name: 'main-menu' });
   }
-}
+
+  isAutoLoggingIn.value = false;
+});
 </script>
 
 <style scoped>

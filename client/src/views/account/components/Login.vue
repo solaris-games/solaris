@@ -1,11 +1,11 @@
 <template>
   <form @submit.prevent="handleSubmit">
     <div class="mb-2" v-if="!isLoading">
-        <input id="email" ref="email" type="text" required="required" class="form-control" placeholder="Email" v-model="email" :disabled="isLoading"/>
+        <input id="email" type="text" required class="form-control" placeholder="Email" v-model="email" :disabled="isLoading"/>
     </div>
 
     <div class="mb-2" v-if="!isLoading">
-        <input id="password" ref="password" type="password" required="required" class="form-control" placeholder="Password" v-model="password"  :disabled="isLoading"/>
+        <input id="password" type="password" required class="form-control" placeholder="Password" v-model="password"  :disabled="isLoading"/>
     </div>
 
     <loading-spinner :loading="isLoading"/>
@@ -39,81 +39,65 @@
   </form>
 </template>
 
-<script>
-import LoadingSpinnerVue from '../../components/LoadingSpinner.vue'
-import router from '../../../router'
-import FormErrorList from '../../components/FormErrorList.vue'
-import authService from '../../../services/api/auth'
+<script setup lang="ts">
+import LoadingSpinner from '../../components/LoadingSpinner.vue';
+import router from '../../../router';
+import FormErrorList from '../../components/FormErrorList.vue';
+import authService from '../../../services/api/auth';
 import {userClientSocketEmitterInjectionKey} from "@/sockets/socketEmitters/user";
-import {inject} from 'vue';
+import {inject, ref, type Ref} from 'vue';
+import type {State} from "@/store";
+import { useStore, type Store } from 'vuex';
 
-export default {
-  components: {
-    'loading-spinner': LoadingSpinnerVue,
-    'form-error-list': FormErrorList
-  },
-  data () {
-    return {
-      isLoading: false,
-      errors: [],
-      email: null,
-      password: null
-    }
-  },
-  setup () {
-    return {
-      userClientSocketEmitter: inject(userClientSocketEmitterInjectionKey),
-    }
-  },
-  methods: {
-    async handleSubmit (e) {
-      this.errors = []
+const userClientSocketEmitter = inject(userClientSocketEmitterInjectionKey)!;
 
-      if (!this.email) {
-        this.errors.push('Email required.')
-      }
+const store: Store<State> = useStore();
 
-      if (!this.password) {
-        this.errors.push('Password required.')
-      }
+const isLoading = ref(false);
+const errors: Ref<string[]> = ref([]);
+const email = ref<string>('');
+const password = ref<string>('');
 
-      e && e.preventDefault()
+const handleSubmit = async (e: Event) => {
+  errors.value = [];
 
-      if (this.errors.length) return
-
-      try {
-        this.isLoading = true
-
-        // NOTE: This is a bodge to get around reported issues
-        // of the login form not working correctly, where the server
-        // responds with "Email address is required". Suspicion is that
-        // the v-model bindings aren't working correctly so falling back to $refs
-        const emailElem = this.$refs.email
-        const passwElem = this.$refs.password
-
-        let emailAddress = this.email || emailElem.value
-        let password = this.password || passwElem.value
-
-        // Call the login API endpoint
-        let response = await authService.login(emailAddress, password)
-
-        if (response.status === 200) {
-          this.$store.commit('setUserId', response.data._id)
-          this.$store.commit('setUsername', response.data.username)
-          this.$store.commit('setRoles', response.data.roles)
-          this.$store.commit('setUserCredits', response.data.credits)
-
-          this.userClientSocketEmitter.emitJoined();
-
-          router.push({ name: 'main-menu' })
-        }
-      } catch (err) {
-        this.errors = err.response.data.errors || []
-      }
-
-      this.isLoading = false
-    }
+  if (!email.value) {
+    errors.value.push('Email required.');
   }
+
+  if (!password) {
+    errors.value.push('Password required.');
+  }
+
+  e && e.preventDefault();
+
+  if (errors.value.length) {
+    return;
+  }
+
+  try {
+    isLoading.value = true;
+
+    const emailAddress = email.value;
+
+    // Call the login API endpoint
+    const response = await authService.login(emailAddress, password.value);
+
+    if (response.status === 200) {
+      store.commit('setUserId', response.data._id)
+      store.commit('setUsername', response.data.username)
+      store.commit('setRoles', response.data.roles)
+      store.commit('setUserCredits', response.data.credits)
+
+      userClientSocketEmitter.emitJoined();
+
+      router.push({name: 'main-menu'})
+    }
+  } catch (err: any) {
+    errors.value = err.response.data.errors || [];
+  }
+
+  isLoading.value = false
 }
 </script>
 

@@ -8,6 +8,7 @@ import { Player } from './types/Player';
 import { Star } from './types/Star';
 import { User } from './types/User';
 import DiplomacyService from './diplomacy';
+import StatisticsService from './statistics';
 const EventEmitter = require('events');
 
 export const CarrierGiftServiceEvents = {
@@ -18,15 +19,18 @@ export const CarrierGiftServiceEvents = {
 export default class CarrierGiftService extends EventEmitter {
     gameRepo: Repository<Game>;
     diplomacyService: DiplomacyService;
+    statisticsService: StatisticsService;
 
     constructor(
         gameRepo: Repository<Game>,
-        diplomacyService: DiplomacyService
+        diplomacyService: DiplomacyService,
+        statisticsService: StatisticsService,
     ) {
         super();
 
         this.gameRepo = gameRepo;
         this.diplomacyService = diplomacyService;
+        this.statisticsService = statisticsService;
     }
 
     async convertToGift(game: Game, player: Player, carrierId: DBObjectId) {
@@ -86,11 +90,15 @@ export default class CarrierGiftService extends EventEmitter {
         if (!isSamePlayer) {
             // If the star is not owned by the same player then increment player achievements.
             if (starUser && !starPlayer.defeated) {
-                starUser.achievements.trade.giftsReceived += carrier.ships!;
+                this.statisticsService.modifyStats(game._id, starPlayer._id, (stats) => {
+                    stats.trade.giftsReceived += carrier.ships!;
+                });
             }
     
             if (carrierUser && !carrierPlayer.defeated) {
-                carrierUser.achievements.trade.giftsSent += carrier.ships!;
+                this.statisticsService.modifyStats(game._id, carrierPlayer._id, (stats) => {
+                    stats.trade.giftsSent += carrier.ships!;
+                });
             }
 
             carrier.ownedByPlayerId = star.ownedByPlayerId; // Transfer ownership

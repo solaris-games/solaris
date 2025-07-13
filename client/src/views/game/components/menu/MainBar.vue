@@ -138,6 +138,8 @@
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
       <spectators v-if="menuState == MENU_STATES.SPECTATORS"
         @onCloseRequested="onCloseRequested"/>
+      <game-statistics v-if="menuState == MENU_STATES.STATISTICS"
+        @onCloseRequested="onCloseRequested" />
     </div>
 
     <div class="spacing-footer d-block d-sm-none"></div>
@@ -192,9 +194,11 @@ import SpectatorVue from '../spectators/Spectators.vue'
 import { inject } from 'vue'
 import { eventBusInjectionKey } from '../../../../eventBus'
 import MenuEventBusEventNames from '../../../../eventBusEventNames/menu'
+import GameStatistics from "@/views/game/components/statistics/GameStatistics.vue";
 
 export default {
   components: {
+    GameStatistics,
     'header-bar': HeaderBarVue,
     'footer-bar': FooterBarVue,
     'sidebar-menu': SidebarMenuVue,

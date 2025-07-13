@@ -1,6 +1,6 @@
 <template>
     <div>
-      <loading-spinner v-if="isLoadingGuild"/>
+      <loading-spinner :loading="isLoadingGuild" />
 
       <div class="row bg-dark mb-2 pt-2 pb-2" v-if="!isLoadingGuild && user">
         <div class="col">
