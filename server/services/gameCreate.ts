@@ -24,6 +24,7 @@ import TeamService from "./team";
 import CarrierService from './carrier';
 import CustomMapService from "./maps/custom";
 import {logger} from "../utils/logging";
+import StarDistanceService from "./starDistance";
 
 const GAME_MASTER_LIMIT = 5;
 
@@ -55,6 +56,7 @@ export default class GameCreateService {
     teamService: TeamService;
     carrierService: CarrierService;
     customMapService: CustomMapService;
+    starDistanceService: StarDistanceService;
 
     constructor(
         gameModel,
@@ -78,6 +80,7 @@ export default class GameCreateService {
         teamService: TeamService,
         carrierService: CarrierService,
         customMapService: CustomMapService,
+        starDistanceService: StarDistanceService,
     ) {
         this.gameModel = gameModel;
         this.gameJoinService = gameJoinService;
@@ -100,6 +103,7 @@ export default class GameCreateService {
         this.teamService = teamService;
         this.carrierService = carrierService;
         this.customMapService = customMapService;
+        this.starDistanceService = starDistanceService;
     }
 
     async create(settings: GameSettings) {
@@ -425,7 +429,7 @@ export default class GameCreateService {
     _setGalaxyCenter(game: Game) {
         const starLocations = game.galaxy.stars.map(s => s.location);
 
-        game.constants.distances.galaxyCenterLocation = this.mapService.getGalaxyCenter(starLocations);
+        game.constants.distances.galaxyCenterLocation = this.starDistanceService.getGalaxyCenter(starLocations);
     }
 
     _calculateStarsForVictory(game: Game) {

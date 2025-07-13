@@ -43,7 +43,7 @@ export default class CircularMapService {
         const locations: Location[] = [];
 
         if (this.gameTypeService.isKingOfTheHillMode(game)) {
-            locations.push(this.starDistanceService.getGalacticCenter());
+            locations.push({ x: 0, y: 0 });
         }
 
         do {
