@@ -4,7 +4,7 @@ import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
 import { Game } from './types/Game';
 import { Player } from './types/Player';
-import AchievementService from './achievement';
+import UserAchievementService from './userAchievement';
 import AvatarService from './avatar';
 import GameStateService from './gameState';
 import GameTypeService from './gameType';
@@ -28,7 +28,7 @@ export default class GameJoinService extends EventEmitter {
     starService: StarService;
     playerService: PlayerService;
     passwordService: PasswordService;
-    achievementService: AchievementService;
+    achievementService: UserAchievementService;
     avatarService: AvatarService;
     gameTypeService: GameTypeService;
     gameStateService: GameStateService;
@@ -41,7 +41,7 @@ export default class GameJoinService extends EventEmitter {
         starService: StarService,
         playerService: PlayerService,
         passwordService: PasswordService,
-        achievementService: AchievementService,
+        achievementService: UserAchievementService,
         avatarService: AvatarService,
         gameTypeService: GameTypeService,
         gameStateService: GameStateService,

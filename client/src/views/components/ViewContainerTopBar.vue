@@ -8,7 +8,7 @@
   </div>
 
   <div class="menu" v-if="userId">
-    <button v-if="userIsImpersonated" @click="endImpersonate()" class="btn btn-success">
+    <button v-if="userIsImpersonated" @click="doEndImpersonate()" class="btn btn-success">
       End Impersonation
     </button>
     <div class="menu-item dropdown dropdown-mobile-full">
@@ -31,9 +31,6 @@
     </div>
     <div class="menu-item dropdown dropdown-mobile-full">
       <a href="#" data-bs-toggle="dropdown" data-bs-display="static" class="menu-link">
-        <!-- <div class="menu-img online">
-          <img src="assets/img/user/profile.jpg" alt="Profile" height="60">
-        </div> -->
         <div class="menu-icon"><i class="fas fa-user"></i></div>
         <div class="menu-text d-sm-block d-none ms-1">{{username}}</div>
       </a>
@@ -54,76 +51,74 @@
 </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import router from '../../router'
 import authService from '../../services/api/auth'
-import AdminApiService from '../../services/api/admin'
+import { ref, computed, inject } from 'vue';
+import { useStore, type Store } from 'vuex';
+import type {State} from "@/store";
+import type { UserRoles } from '@solaris-common';
+import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
+import { endImpersonate } from '@/services/typedapi/admin';
+import { toastInjectionKey } from '@/util/keys';
 
-export default {
-  data () {
-    return {
-      isLoggingOut: false
-    }
-  },
-  methods: {
-    async logout () {
-      this.isLoggingOut = true
+const store: Store<State> = useStore();
 
-      await authService.logout()
+const httpClient = inject(httpInjectionKey)!;
+const toast = inject(toastInjectionKey)!;
 
-      this.$store.commit('clearUser')
-      this.$store.commit('clearUsername')
-      this.$store.commit('clearRoles')
-      this.$store.commit('clearUserCredits')
-      this.$store.commit('clearUserIsEstablishedPlayer')
-      this.$store.commit('clearIsImpersonating')
+const userId = computed(() => store.state.userId);
+const username = computed(() => store.state.username);
+const userCredits = computed(() => store.state.userCredits);
 
-      this.isLoggingOut = false
+const userHasAdminRole = computed(() => {
+  const roles: UserRoles = store.state.roles;
 
-      router.push({ name: 'home' })
-    },
-    routeToPath(path) {
-      router.push(path)
-    },
-    goHome () {
-      router.push({name: 'home'})
-    },
-    async endImpersonate() {
-      try {
-        let response = await AdminApiService.endImpersonate()
+  return roles?.administrator || roles?.communityManager || roles?.gameMaster;
+});
 
-        if (response.status === 200) {
-          this.$store.commit('setUserId', response.data._id)
-          this.$store.commit('setUsername', response.data.username)
-          this.$store.commit('setRoles', response.data.roles)
-          this.$store.commit('setUserCredits', response.data.credits)
-          this.$store.commit('setIsImpersonating', undefined)
-        }
+const userIsImpersonated = computed(() => store.state.isImpersonating);
 
-        router.push({name: 'home'})
-      } catch (err) {
-        console.error(err)
-      }
-    }
-  },
-  computed: {
-    userId () {
-      return this.$store.state.userId
-    },
-    username () {
-      return this.$store.state.username
-    },
-    userCredits () {
-      return this.$store.state.userCredits || 0
-    },
-    userHasAdminRole () {
-      return this.$store.state.roles && (this.$store.state.roles.administrator || this.$store.state.roles.communityManager || this.$store.state.roles.gameMaster)
-    },
-    userIsImpersonated() {
-      return this.$store.state.isImpersonating;
-    }
+
+const isLoggingOut = ref(false);
+
+const doEndImpersonate = async () => {
+  const response = await endImpersonate(httpClient)();
+
+  if (isOk(response)) {
+    store.commit('setUserId', response.data._id);
+    store.commit('setUsername', response.data.username);
+    store.commit('setRoles', response.data.roles);
+    store.commit('setUserCredits', response.data.credits);
+    store.commit('setIsImpersonating', undefined);
+
+    router.push({name: 'home'})
+  } else {
+    console.error(formatError(response));
+    toast.error("Failed to end impersonation");
   }
-}
+};
+
+const goHome = () => {
+  router.push({name: 'home'})
+};
+
+const logout = async () => {
+  isLoggingOut.value = true;
+
+  await authService.logout();
+
+  store.commit('clearUser');
+  store.commit('clearUsername');
+  store.commit('clearRoles');
+  store.commit('clearUserCredits');
+  store.commit('clearUserIsEstablishedPlayer');
+  store.commit('clearIsImpersonating');
+
+  isLoggingOut.value = false;
+
+  router.push({ name: 'home' });
+};
 </script>
 
 <style scoped>

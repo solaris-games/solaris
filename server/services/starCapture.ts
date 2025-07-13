@@ -11,6 +11,7 @@ import GameStateService from "./gameState";
 import DiplomacyService from "./diplomacy";
 import TechnologyService from "./technology";
 import StarUpgradeService from "./starUpgrade";
+import StatisticsService from "./statistics";
 
 export default class StarCaptureService {
     specialistService: SpecialistService;
@@ -20,6 +21,7 @@ export default class StarCaptureService {
     diplomacyService: DiplomacyService;
     technologyService: TechnologyService;
     starUpgradeService: StarUpgradeService;
+    statisticsService: StatisticsService;
 
     constructor(
         specialistService: SpecialistService,
@@ -29,6 +31,7 @@ export default class StarCaptureService {
         diplomacyService: DiplomacyService,
         technologyService: TechnologyService,
         starUpgradeService: StarUpgradeService,
+        statisticsService: StatisticsService,
     ) {
         this.specialistService = specialistService;
         this.starService = starService;
@@ -37,6 +40,7 @@ export default class StarCaptureService {
         this.diplomacyService = diplomacyService;
         this.technologyService = technologyService;
         this.starUpgradeService = starUpgradeService;
+        this.statisticsService = statisticsService;
     }
 
     captureStar(game: Game, star: Star, owner: Player, defenders: Player[], defenderUsers: User[], attackers: Player[], attackerUsers: User[], attackerCarriers: Carrier[]): StarCaptureResult {
@@ -113,19 +117,23 @@ export default class StarCaptureService {
 
         if (!isTutorialGame) {
             if (oldStarUser && !owner.defeated) {
-                oldStarUser.achievements.combat.stars.lost++;
+                this.statisticsService.modifyStats(game._id, owner._id, (stats) => {
+                    stats.combat.stars.lost += 1;
 
-                if (star.homeStar) {
-                    oldStarUser.achievements.combat.homeStars.lost++;
-                }
+                    if (star.homeStar) {
+                        stats.combat.homeStars.lost += 1;
+                    }
+                });
             }
 
             if (newStarUser && !newStarPlayer.defeated) {
-                newStarUser.achievements.combat.stars.captured++;
+                this.statisticsService.modifyStats(game._id, newStarPlayer._id, (stats) => {
+                    stats.combat.stars.captured++;
 
-                if (star.homeStar) {
-                    newStarUser.achievements.combat.homeStars.captured++;
-                }
+                    if (star.homeStar) {
+                        stats.combat.homeStars.captured++;
+                    }
+                });
             }
         }
 

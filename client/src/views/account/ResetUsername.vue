@@ -1,11 +1,11 @@
 <template>
-  <view-container>
+  <view-container :isAuthPage="false">
     <view-title title="Reset Username" />
 
     <form @submit.prevent="handleSubmit">
       <div class="mb-2">
         <label for="username">New Username</label>
-        <input type="text" required="required" class="form-control" minlength="3" maxlength="24" v-model="username"
+        <input type="text" :required="true" class="form-control" minlength="3" maxlength="24" v-model="username"
           :disabled="isLoading" />
       </div>
 
@@ -21,66 +21,55 @@
   </view-container>
 </template>
 
-<script>
+<script setup lang="ts">
 import LoadingSpinner from '../components/LoadingSpinner.vue'
 import ViewContainer from '../components/ViewContainer.vue'
 import router from '../../router'
 import ViewTitle from '../components/ViewTitle.vue'
 import FormErrorList from '../components/FormErrorList.vue'
-import { inject } from 'vue'
 import { extractErrors, formatError, httpInjectionKey, isOk } from '@/services/typedapi'
 import { updateUsername } from '@/services/typedapi/user'
+import { ref, inject } from 'vue';
+import { useStore, type Store } from 'vuex';
+import type {State} from "@/store";
+import {toastInjectionKey} from "@/util/keys";
 
-export default {
-  components: {
-    'loading-spinner': LoadingSpinner,
-    'view-container': ViewContainer,
-    'view-title': ViewTitle,
-    'form-error-list': FormErrorList
-  },
-  setup() {
-    return {
-      httpClient: inject(httpInjectionKey),
-    }
-  },
-  data() {
-    return {
-      isLoading: false,
-      errors: [],
-      username: null
-    }
-  },
-  methods: {
-    async handleSubmit(e) {
-      this.errors = []
+const httpClient = inject(httpInjectionKey)!;
+const toast = inject(toastInjectionKey)!;
 
-      if (!this.username) {
-        this.errors.push('Username required.')
-      }
+const store: Store<State> = useStore();
 
-      e.preventDefault()
+const isLoading = ref(false);
+const errors = ref<string[]>([]);
+const username = ref<string>('');
 
-      if (this.errors.length) {
-        return;
-      }
+const handleSubmit = async (e) => {
+  errors.value = []
 
-      this.isLoading = true;
-
-      const response = await updateUsername(this.httpClient)(this.username);
-
-      if (isOk(response)) {
-        this.$store.commit('setUsername', this.username);
-        this.$toast.success(`Username updated.`)
-        router.push({ name: 'account-settings' })
-      } else {
-        console.error(formatError(response));
-        this.errors = extractErrors(response);
-        this.$toast.error(`There was a problem updating your username, please try again.`)
-      }
-
-      this.isLoading = false
-    }
+  if (!username.value) {
+    errors.value.push('Username required.')
   }
+
+  e.preventDefault()
+
+  if (errors.value.length) {
+    return;
+  }
+
+  isLoading.value = true;
+
+  const response = await updateUsername(httpClient)(username.value);
+
+  if (isOk(response)) {store.commit('setUsername', username.value);
+    toast.success(`Username updated.`)
+    router.push({ name: 'account-settings' })
+  } else {
+    console.error(formatError(response));
+    errors.value = extractErrors(response);
+    toast.error(`There was a problem updating your username, please try again.`);
+  }
+
+  isLoading.value = false;
 }
 </script>
 

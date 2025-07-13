@@ -1,3 +1,4 @@
+
 <template>
   <administration-page title="Recent Password Resets" name="passwordresets">
     <loading-spinner :loading="!passwordResets"/>
@@ -26,38 +27,32 @@
   </administration-page>
 </template>
 
-<script>
+<script setup lang="ts">
+import { inject, onMounted, ref, type Ref } from "vue";
 import LoadingSpinner from "../components/LoadingSpinner.vue";
-import AdminApiService from "../../services/api/admin";
 import AdministrationPage from "./AdministrationPage.vue";
+import type { ListPasswordReset } from "@solaris-common";
+import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { getPasswordResets } from "@/services/typedapi/admin";
+import { toastInjectionKey } from "@/util/keys";
 
-export default {
-  name: "PasswordResets",
-  components: {
-    'administration-page': AdministrationPage,
-    'loading-spinner': LoadingSpinner
-  },
-  data() {
-    return {
-      passwordResets: null
-    }
-  },
-  async mounted() {
-    this.passwordResets = await this.getPasswordResets()
-  },
-  methods: {
-    async getPasswordResets() {
-      const resp = await AdminApiService.getPasswordResets()
+const httpClient = inject(httpInjectionKey)!;
+const toast = inject(toastInjectionKey)!;
 
-      if (resp.status !== 200) {
-        this.$toast.error(resp.data.message)
-        return null
-      }
+const passwordResets: Ref<ListPasswordReset<string>[] | null> = ref(null);
 
-      return resp.data
-    }
+const loadPasswordResets = async () => {
+  const response = await getPasswordResets(httpClient)();
+
+  if (isOk(response)) {
+    passwordResets.value = response.data;
+  } else {
+    console.error(formatError(response));
+    toast.error("Error loading password resets");
   }
 }
+
+onMounted(async () => await loadPasswordResets());
 </script>
 
 <style scoped>

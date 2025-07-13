@@ -10,6 +10,7 @@ import RandomService from './random';
 import StarService from './star';
 import TechnologyService from './technology';
 import UserService from './user';
+import StatisticsService from './statistics';
 
 export const ResearchServiceEvents = {
     onPlayerResearchCompleted: 'onPlayerResearchCompleted'
@@ -23,6 +24,7 @@ export default class ResearchService extends EventEmitter {
     starService: StarService;
     userService: UserService;
     gameTypeService: GameTypeService;
+    statisticsService: StatisticsService;
 
     constructor(
         gameRepo: Repository<Game>,
@@ -31,7 +33,8 @@ export default class ResearchService extends EventEmitter {
         playerStatisticsService: PlayerStatisticsService,
         starService: StarService,
         userService: UserService,
-        gameTypeService: GameTypeService
+        gameTypeService: GameTypeService,
+        statisticsService: StatisticsService,
     ) {
         super();
         
@@ -42,6 +45,7 @@ export default class ResearchService extends EventEmitter {
         this.starService = starService;
         this.userService = userService;
         this.gameTypeService = gameTypeService;
+        this.statisticsService = statisticsService;
     }
 
     async updateResearchNow(game: Game, player: Player, preference: ResearchTypeNotRandom) {
@@ -112,7 +116,9 @@ export default class ResearchService extends EventEmitter {
 
         // If the player isn't being controlled by AI then increment achievements.
         if (user && !player.defeated && !this.gameTypeService.isTutorialGame(game)) {
-            user.achievements.research[techKey] += progressIncrease;
+            this.statisticsService.modifyStats(game._id, player._id, (stats) => {
+                stats.research[techKey] += progressIncrease;
+            });
         }
 
         // If the current progress is greater than the required progress

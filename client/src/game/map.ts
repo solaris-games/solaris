@@ -59,36 +59,37 @@ export class Map {
   container: PIXI.Container;
   stars: Star[];
   carriers: Carrier[];
-  pathManager: PathManager | undefined;
+  pathManager: PathManager;
   zoomPercent: number;
   lastZoomPercent: number;
-  backgroundContainer: PIXI.Container | undefined;
-  territoryContainer: PIXI.Container | undefined;
-  playerNamesContainer: PIXI.Container | undefined;
-  orbitalContainer: PIXI.Container | undefined;
-  wormHoleContainer: PIXI.Container | undefined;
-  starContainer: PIXI.Container | undefined;
-  waypointContainer: PIXI.Container | undefined;
-  rulerPointContainer: PIXI.Container | undefined;
-  highlightLocationsContainer: PIXI.Container | undefined;
-  tooltipContainer: PIXI.Container | undefined;
-  game: Game | undefined;
-  userSettings: UserGameSettings | undefined;
-  waypoints: Waypoints | undefined;
-  rulerPoints: RulerPoints | undefined;
-  territories: Territories | undefined;
-  playerNames: PlayerNames | undefined;
-  background: Background | undefined;
+  backgroundContainer: PIXI.Container;
+  territoryContainer: PIXI.Container;
+  playerNamesContainer: PIXI.Container;
+  orbitalContainer: PIXI.Container ;
+  wormHoleContainer: PIXI.Container;
+  starContainer: PIXI.Container ;
+  waypointContainer: PIXI.Container ;
+  rulerPointContainer: PIXI.Container ;
+  highlightLocationsContainer: PIXI.Container ;
+  tooltipContainer: PIXI.Container ;
+  game: Game ;
+  userSettings: UserGameSettings ;
+  waypoints: Waypoints ;
+  rulerPoints: RulerPoints ;
+  territories: Territories ;
+  playerNames: PlayerNames ;
+  background: Background ;
   wormHoleLayer: WormHoleLayer | undefined;
-  tooltipLayer: TooltipLayer | undefined;
+  tooltipLayer: TooltipLayer;
   orbitalLayer: OrbitalLocationLayer | undefined;
   lastViewportCenter: PIXI.Point | undefined;
   currentViewportCenter: PIXI.Point | undefined;
   lastPointerDownPosition: PIXI.Point | undefined;
-  chunks: Chunks | undefined;
+  chunks: Chunks;
+  galaxyCenterGraphics: PIXI.Graphics | undefined;
   unsubscribe: (() => void) | undefined;
 
-  constructor (app: PIXI.Application, store: Store<State>, gameContainer, context: DrawingContext, eventBus: EventBus) {
+  constructor (app: PIXI.Application, store: Store<State>, gameContainer, context: DrawingContext, eventBus: EventBus, game: Game, userSettings: UserGameSettings) {
     this.app = app
     this.store = store
     this.context = context
@@ -105,9 +106,20 @@ export class Map {
 
     this.zoomPercent = 100
     this.lastZoomPercent = 100
-  }
 
-  _setupContainers () {
+
+    this.userSettings = userSettings
+    this.game = game
+
+    if (this.unsubscribe) {
+      this.unsubscribe();
+      this.unsubscribe = undefined;
+    }
+
+    this.app.ticker.maxFPS = userSettings.technical.fpsLimit || 60;
+
+    this.pathManager = new PathManager( game, userSettings, this )
+
     this.backgroundContainer = new PIXI.Container()
     this.backgroundContainer.zIndex = 0;
     this.territoryContainer = new PIXI.Container()
@@ -131,45 +143,6 @@ export class Map {
     this.tooltipContainer.zIndex = 8;
     this.pathManager!.container.zIndex = 7;
 
-    this.container.addChild(this.backgroundContainer)
-    this.container.addChild(this.territoryContainer)
-    this.container.addChild(this.wormHoleContainer)
-    this.container.addChild(this.pathManager!.container)
-    this.container.addChild(this.rulerPointContainer)
-    this.container.addChild(this.chunks!.chunksContainer)
-    this.container.addChild(this.orbitalContainer)
-    this.container.addChild(this.starContainer)
-    this.container.addChild(this.highlightLocationsContainer)
-    this.container.addChild(this.playerNamesContainer)
-    this.container.addChild(this.tooltipContainer)
-    this.container.addChild(this.waypointContainer)
-    this.container.sortChildren();
-  }
-
-  setup (game: Game, userSettings: UserGameSettings) {
-    this.userSettings = userSettings
-    this.game = game
-
-    if (this.unsubscribe) {
-      this.unsubscribe();
-      this.unsubscribe = undefined;
-    }
-
-    this.app.ticker.maxFPS = userSettings.technical.fpsLimit || 60;
-
-    this.pathManager = new PathManager( game, userSettings, this )
-
-
-    // Cleanup events
-    this.stars.forEach(s => s.removeAllListeners())
-    this.carriers.forEach(s => s.removeAllListeners())
-
-    this.container.removeChildren()
-
-    this.chunks = new Chunks();
-
-    this._setupContainers()
-
     // Reset the canvas
     this.stars = []
     this.carriers = []
@@ -184,11 +157,7 @@ export class Map {
       this.setupCarrier(game, userSettings, game.galaxy.carriers[i])
     }
 
-    // -----------
-    // Setup Waypoints
-    if (this.waypoints) {
-      this.waypoints.removeAllListeners()
-    }
+    this.chunks = new Chunks(game, this.stars, this.carriers);
 
     this.waypoints = new Waypoints()
     this.waypoints.setup(game, this.context)
@@ -197,14 +166,7 @@ export class Map {
 
     this.waypointContainer!.addChild(this.waypoints.container)
 
-    // -----------
-    // Setup Ruler Points
-    if (this.rulerPoints) {
-      this.rulerPoints.removeAllListeners()
-    }
-
-    this.rulerPoints = new RulerPoints()
-    this.rulerPoints.setup(game)
+    this.rulerPoints = new RulerPoints(game);
     this.rulerPoints.on('onRulerPointCreated', this.onRulerPointCreated.bind(this))
     this.rulerPoints.on('onRulerPointsCleared', this.onRulerPointsCleared.bind(this))
     this.rulerPoints.on('onRulerPointRemoved', this.onRulerPointRemoved.bind(this))
@@ -213,11 +175,10 @@ export class Map {
 
     // -----------
     // Setup Territories
-    this.territories = new Territories()
-    this.territories.setup(game, userSettings, this.context)
+    this.territories = new Territories(this.context, game, userSettings);
 
-    this.territoryContainer!.addChild(this.territories.container)
-    this.territories.draw(userSettings)
+    this.territoryContainer!.addChild(this.territories.container);
+    this.territories.draw();
 
     // -----------
     // Setup Player Names
@@ -229,8 +190,7 @@ export class Map {
 
     // -----------
     // Setup Background
-    this.background = new Background()
-    this.background.setup(game, userSettings, this.context)
+    this.background = new Background(game, userSettings, this.context);
 
     this.backgroundContainer!.addChild(this.background.container)
     this.backgroundContainer!.addChild(this.background.starContainer)
@@ -253,12 +213,23 @@ export class Map {
       this.orbitalContainer!.addChild(this.orbitalLayer.container)
     }
 
-    // Setup Chunks
-    this.chunks.setup(game, this.stars, this.carriers);
-
     this.tooltipLayer = new TooltipLayer()
     this.tooltipLayer.setup(this.game, this.context)
     this.tooltipContainer!.addChild(this.tooltipLayer.container)
+
+    this.container.addChild(this.backgroundContainer)
+    this.container.addChild(this.territoryContainer)
+    this.container.addChild(this.wormHoleContainer)
+    this.container.addChild(this.pathManager!.container)
+    this.container.addChild(this.rulerPointContainer)
+    this.container.addChild(this.chunks.chunksContainer)
+    this.container.addChild(this.orbitalContainer)
+    this.container.addChild(this.starContainer)
+    this.container.addChild(this.highlightLocationsContainer)
+    this.container.addChild(this.playerNamesContainer)
+    this.container.addChild(this.tooltipContainer)
+    this.container.addChild(this.waypointContainer)
+    this.container.sortChildren();
 
     this.unsubscribe = this.subscribe();
   }
@@ -331,8 +302,8 @@ export class Map {
     let star = this.stars.find(x => x.data._id === starData._id)
 
     if (!star) {
-      star = new Star(this.app)
-      this.stars.push(star)
+      star = new Star(this.app, this.game, starData, userSettings, this.context);
+      this.stars.push(star);
 
       this.starContainer!.addChild(star.fixedContainer)
 
@@ -343,19 +314,19 @@ export class Map {
       star.on('onStarMouseOut', this.onStarMouseOut.bind(this))
       star.on('onSelected', this.onStarSelected.bind(this))
       star.on('onUnselected', this.onStarUnselected.bind(this))
+    } else {
+      star.update(this.game, starData, userSettings);
     }
-
-    star.setup(this.game, starData, userSettings, this.context, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
 
     return star
   }
 
-  setupCarrier (game, userSettings, carrierData) {
+  setupCarrier (game: Game, userSettings: UserGameSettings, carrierData: CarrierData) {
     let carrier = this.carriers.find(x => x.data!._id === carrierData._id)
 
     if (!carrier) {
-      carrier = new Carrier( this.pathManager! )
-      this.carriers.push(carrier)
+      carrier = new Carrier(game, carrierData, userSettings, this.context, this.pathManager);
+      this.carriers.push(carrier);
 
       carrier.on('onCarrierClicked', this.onCarrierClicked.bind(this))
       carrier.on('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
@@ -365,9 +336,7 @@ export class Map {
       carrier.on('onUnselected', this.onCarrierUnselected.bind(this))
     }
 
-    let player = gameHelper.getPlayerById(game, carrierData.ownedByPlayerId)
-
-    carrier.setup(carrierData, userSettings, this.context, this.stars, player, game.constants.distances.lightYear)
+    carrier.update(carrierData, userSettings);
 
     return carrier
   }
@@ -391,23 +360,28 @@ export class Map {
   }
 
   drawGalaxyCenter () {
-    // TODO: Is there any need to display the galaxy center for non orbital games?
-    if (this._isOrbitalMapEnabled() && this.game!.constants.distances.galaxyCenterLocation) {
-        let galaxyCenterGraphics = new PIXI.Graphics()
-        let location : Location = this.game!.constants.distances.galaxyCenterLocation
+    if (this.galaxyCenterGraphics) {
+      this.starContainer.removeChild(this.galaxyCenterGraphics);
+    }
+
+    const userWantsToSeeCenter = this._isOrbitalMapEnabled() || this.userSettings?.map.galaxyCenterAlwaysVisible === 'enabled';
+
+    if (this.game.constants.distances.galaxyCenterLocation && userWantsToSeeCenter) {
+        this.galaxyCenterGraphics = new PIXI.Graphics()
+        const location : Location = this.game!.constants.distances.galaxyCenterLocation
         let size = 10
 
-        galaxyCenterGraphics.moveTo(location.x, location.y - size)
-        galaxyCenterGraphics.lineTo(location.x, location.y + size)
-        galaxyCenterGraphics.moveTo(location.x - size, location.y)
-        galaxyCenterGraphics.lineTo(location.x + size, location.y)
-        galaxyCenterGraphics.stroke({
+        this.galaxyCenterGraphics.moveTo(location.x, location.y - size)
+        this.galaxyCenterGraphics.lineTo(location.x, location.y + size)
+        this.galaxyCenterGraphics.moveTo(location.x - size, location.y)
+        this.galaxyCenterGraphics.lineTo(location.x + size, location.y)
+        this.galaxyCenterGraphics.stroke({
           width: 2,
           color: 0xFFFFFF,
           alpha: 0.75,
         });
 
-        this.starContainer!.addChild(galaxyCenterGraphics)
+        this.starContainer!.addChild(this.galaxyCenterGraphics);
     }
   }
 
@@ -425,7 +399,7 @@ export class Map {
 
     this.game = game
 
-    this.pathManager!.setup(game, userSettings)
+    this.pathManager.update(game, userSettings)
 
     // Check for stars that are no longer in scanning range.
     for (let i = 0; i < this.stars.length; i++) {
@@ -455,7 +429,7 @@ export class Map {
       let existing = this.stars.find(x => x.data._id === starData._id)
 
       if (existing) {
-        existing.setup(this.game, starData, userSettings, this.context, game.galaxy.players, game.galaxy.carriers, game.constants.distances.lightYear)
+        existing.update(this.game, starData, userSettings);
       } else {
         existing = this.setupStar(game, userSettings, starData)
       }
@@ -470,9 +444,7 @@ export class Map {
       let existing = this.carriers.find(x => x.data!._id === carrierData._id)
 
       if (existing) {
-        let player = gameHelper.getPlayerById(game, carrierData.ownedByPlayerId!)
-
-        existing.setup(carrierData, userSettings, this.context, this.stars, player, game.constants.distances.lightYear)
+        existing.update(carrierData, userSettings);
       } else {
         existing = this.setupCarrier(game, userSettings, carrierData)
       }
@@ -484,13 +456,13 @@ export class Map {
     this.drawWormHoles()
     this.drawPlayerNames()
 
-    this.background!.setup(game, userSettings, this.context)
+    this.background = new Background(game, userSettings, this.context);
     this.background!.draw()
 
-    this.waypoints!.setup(game, this.context)
+    this.waypoints.setup(game, this.context)
     this.tooltipLayer!.setup(game, this.context)
 
-    this.chunks!.setup(game, this.stars, this.carriers);
+    this.chunks.update(game, this.stars, this.carriers);
   }
 
 
@@ -509,7 +481,6 @@ export class Map {
       c.enableInteractivity()
     }
   }
-
 
   setMode (mode: Mode) {
     let wasWaypoints = this.mode.mode === ModeKind.Waypoints;
@@ -579,26 +550,20 @@ export class Map {
     }
   }
 
-  drawCarrier (carrier) {
+  drawCarrier (carrier: Carrier) {
     carrier.draw()
     carrier.onZoomChanging(this.zoomPercent)
   }
 
-  _undrawCarrier (carrier) {
-    carrier.removeAllListeners()
-    carrier.cleanupEventHandlers()
-    carrier.clearPaths()
-
-
+  _undrawCarrier (carrier: Carrier) {
     this.chunks!.removeMapObjectFromChunks(carrier);
-
     this.carriers.splice(this.carriers.indexOf(carrier), 1)
 
     carrier.destroy()
   }
 
-  undrawCarrier (carrierData) {
-    let existing = this.carriers.find(x => x.data!._id === carrierData._id)
+  undrawCarrier (carrierData: CarrierData) {
+    const existing = this.carriers.find(x => x.data!._id === carrierData._id)
 
     if (existing) {
       this._undrawCarrier(existing)
@@ -626,12 +591,12 @@ export class Map {
   }
 
   clearRulerPoints () {
-    this.rulerPoints!.setup(this.game!)
+    this.rulerPoints!.update(this.game);
   }
 
   drawTerritories (userSettings: UserGameSettings) {
-    this.territories!.setup(this.game!, userSettings, this.context)
-    this.territories!.draw(userSettings)
+    this.territories.update(this.game, userSettings);
+    this.territories.draw();
   }
 
   drawWormHoles () {
@@ -837,7 +802,7 @@ export class Map {
     } else if (this.mode.mode === ModeKind.Waypoints) {
       this.waypoints!.onStarClicked(e)
     } else if (this.mode.mode === ModeKind.Ruler) {
-      this.rulerPoints!.onStarClicked(e)
+      this.rulerPoints.onStarClicked(e)
     }
     AnimationService.drawSelectedCircle(this.gameContainer.app!, this.container, e.location)
   }
@@ -856,7 +821,7 @@ export class Map {
     let e = dic.starData
     if (dic.eventData && this.isDragMotion(dic.eventData.global)) { return }
 
-    let owningPlayer = gameHelper.getStarOwningPlayer(this.game, dic.starData)
+    let owningPlayer = gameHelper.getStarOwningPlayer(this.game!, dic.starData);
 
     // dispatch click event to the store, so it can be intercepted for adding star/player name to open message
     this.store.commit('starRightClicked', {
@@ -901,7 +866,7 @@ export class Map {
         selectedCarrier!.unselect()
       }
     } else if (this.mode.mode === ModeKind.Ruler) {
-      this.rulerPoints!.onCarrierClicked(e)
+      this.rulerPoints.onCarrierClicked(e)
     }
 
     AnimationService.drawSelectedCircle(this.gameContainer.app!, this.container, e.location)

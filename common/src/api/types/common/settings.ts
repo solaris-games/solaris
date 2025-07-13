@@ -64,6 +64,7 @@ export type UserGameSettings = {
         },
         naturalResourcesRingOpacity: number;
         objectsDepth: SettingEnabledDisabled;
+        galaxyCenterAlwaysVisible: SettingEnabledDisabled;
     },
     carrier: {
         defaultAction: CarrierWaypointActionType;

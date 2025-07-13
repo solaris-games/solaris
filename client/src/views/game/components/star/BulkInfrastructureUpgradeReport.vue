@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import type {BulkUpgradeReport} from "@solaris-common";
+import type {BulkUpgradeReport, MapObject} from "@solaris-common";
 import GameHelper from "@/services/gameHelper";
 import type {State} from "@/store";
 import { useStore, type Store } from 'vuex';
@@ -46,13 +46,13 @@ const props = defineProps<{
 }>();
 
 const getStar = (starId: string) => {
-  return GameHelper.getStarById(store.state.game, starId);
+  return GameHelper.getStarById(store.state.game, starId)!;
 };
 
 const panToStar = (starId: string) => {
   const star = getStar(starId);
 
-  eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: star });
+  eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: star as MapObject<string> });
 };
 </script>
 

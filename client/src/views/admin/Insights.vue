@@ -25,38 +25,32 @@
   </administration-page>
 </template>
 
-<script>
-import AdminApiService from '../../services/api/admin'
+<script setup lang="ts">
+import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
 import LoadingSpinner from "../components/LoadingSpinner.vue";
 import AdministrationPage from "./AdministrationPage.vue";
+import { inject, ref, onMounted, type Ref } from 'vue';
+import type { GetInsight } from "@solaris-common";
+import { getInsights } from "@/services/typedapi/admin";
+import { toastInjectionKey } from "@/util/keys";
 
-export default {
-  components: {
-    'administration-page': AdministrationPage,
-    'loading-spinner': LoadingSpinner
-  },
-  data() {
-    return {
-      insights: null
-    }
-  },
-  mounted() {
-    this.load()
-  },
-  methods: {
-    async load() {
-      try {
-        let response = await AdminApiService.getInsights()
+const httpClient = inject(httpInjectionKey)!;
+const toast = inject(toastInjectionKey)!;
 
-        if (response.status === 200) {
-          this.insights = response.data
-        }
-      } catch (err) {
-        console.error(err)
-      }
-    }
+const insights: Ref<GetInsight[] | null> = ref(null);
+
+const load = async () => {
+  const response = await getInsights(httpClient)();
+
+  if (isOk(response)) {
+    insights.value = response.data;
+  } else {
+    console.error(formatError(response));
+    toast.error("Error loading insights");
   }
-}
+};
+
+onMounted(async () => await load());
 </script>
 
 <style scoped>

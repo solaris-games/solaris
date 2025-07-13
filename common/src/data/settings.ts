@@ -59,6 +59,7 @@ export const DEFAULT_SETTINGS: UserGameSettings = {
             },
         },
         naturalResourcesRingOpacity: 0.1,
+        galaxyCenterAlwaysVisible: 'disabled',
     },
     carrier: {
         defaultAction: "collectAll",

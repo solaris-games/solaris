@@ -1,6 +1,6 @@
 import { DBObjectId } from "./DBObjectId";
 import { UserLevel } from "./UserLevel";
-import type { UserGameSettings } from "solaris-common";
+import type {UserAchievements, UserGameSettings} from "solaris-common";
 
 export interface UserRoles {
     administrator: boolean;
@@ -79,71 +79,7 @@ export interface User {
     level?: UserLevel,
     warnings: UserWarning[];
     lastReadAnnouncement: DBObjectId | null;
-    achievements: {
-        victories: number;
-        victories1v1: number;
-        level: number;
-        rank: number;
-        eloRating: number | null;
-        renown: number;
-        joined: number;
-        completed: number;
-        quit: number;
-        defeated: number;
-        defeated1v1: number;
-        afk: number;
-        combat: {
-            kills: {
-                ships: number;
-                carriers: number;
-                specialists: number;
-            },
-            losses: {
-                ships: number;
-                carriers: number;
-                specialists: number;
-            },
-            stars: {
-                captured: number;
-                lost: number;
-            },
-            homeStars: {
-                captured: number;
-                lost: number;
-            }
-        },
-        infrastructure: {
-            economy: number;
-            industry: number;
-            science: number;
-            warpGates: number;
-            warpGatesDestroyed: number;
-            carriers: number;
-            specialistsHired: number;
-        },
-        research: {
-            scanning: number;
-            hyperspace: number;
-            terraforming: number;
-            experimentation: number;
-            weapons: number;
-            banking: number;
-            manufacturing: number;
-            specialists: number;
-        },
-        trade: {
-            creditsSent: number;
-            creditsReceived: number;
-            creditsSpecialistsSent: number;
-            creditsSpecialistsReceived: number;
-            technologySent: number;
-            technologyReceived: number;
-            giftsSent: number;
-            giftsReceived: number;
-            renownSent: number;
-        },
-        badges: AwardedBadge[];
-    },
+    achievements: UserAchievements<DBObjectId>,
     gameSettings: UserGameSettings,
     avatars: number[];
     oauth: UserOAuth;

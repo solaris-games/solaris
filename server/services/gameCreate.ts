@@ -3,7 +3,7 @@ import {MathRandomGen, RandomGen, SeededRandomGen} from "../utils/randomGen";
 const mongoose = require('mongoose');
 import ValidationError from '../errors/validation';
 import {Game, GameSettings, Team} from './types/Game';
-import AchievementService from './achievement';
+import UserAchievementService from './userAchievement';
 import ConversationService from './conversation';
 import GameCreateValidationService from './gameCreateValidation';
 import GameFluxService from './gameFlux';
@@ -24,6 +24,11 @@ import TeamService from "./team";
 import CarrierService from './carrier';
 import CustomMapService from "./maps/custom";
 import {logger} from "../utils/logging";
+import StarDistanceService from "./starDistance";
+
+const GAME_MASTER_LIMIT = 5;
+
+const ESTABLISHED_PLAYER_LIMIT = 2;
 
 const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
@@ -39,7 +44,7 @@ export default class GameCreateService {
     passwordService: PasswordService;
     conversationService: ConversationService;
     historyService: HistoryService;
-    achievementService: AchievementService;
+    achievementService: UserAchievementService;
     userService: UserService;
     gameCreateValidationService: GameCreateValidationService;
     gameFluxService: GameFluxService;
@@ -51,6 +56,7 @@ export default class GameCreateService {
     teamService: TeamService;
     carrierService: CarrierService;
     customMapService: CustomMapService;
+    starDistanceService: StarDistanceService;
 
     constructor(
         gameModel,
@@ -62,7 +68,7 @@ export default class GameCreateService {
         passwordService: PasswordService,
         conversationService: ConversationService, 
         historyService: HistoryService,
-        achievementService: AchievementService,
+        achievementService: UserAchievementService,
         userService: UserService,
         gameCreateValidationService: GameCreateValidationService,
         gameFluxService: GameFluxService,
@@ -74,6 +80,7 @@ export default class GameCreateService {
         teamService: TeamService,
         carrierService: CarrierService,
         customMapService: CustomMapService,
+        starDistanceService: StarDistanceService,
     ) {
         this.gameModel = gameModel;
         this.gameJoinService = gameJoinService;
@@ -96,6 +103,7 @@ export default class GameCreateService {
         this.teamService = teamService;
         this.carrierService = carrierService;
         this.customMapService = customMapService;
+        this.starDistanceService = starDistanceService;
     }
 
     async create(settings: GameSettings) {
@@ -115,12 +123,12 @@ export default class GameCreateService {
             const userIsGameMaster = await this.userService.getUserIsGameMaster(settings.general.createdByUserId);
             const userIsAdmin = await this.userService.getUserIsAdmin(settings.general.createdByUserId);
 
-            if (openGames.length && !userIsGameMaster) {
-                throw new ValidationError('Cannot create game, you already have another game waiting for players.');
+            if (openGames.length > ESTABLISHED_PLAYER_LIMIT && !userIsGameMaster) {
+                throw new ValidationError(`Cannot create game, you already have ${openGames.length} game(s) waiting for players.`);
             }
 
-            if (userIsGameMaster && !userIsAdmin && openGames.length > 5) {
-                throw new ValidationError('Game Masters are limited to 5 games waiting for players.');
+            if (userIsGameMaster && !userIsAdmin && openGames.length > GAME_MASTER_LIMIT) {
+                throw new ValidationError(`Game Masters are limited to ${GAME_MASTER_LIMIT} games waiting for players.`);
             }
 
             // Validate that the player cannot create large games.
@@ -421,7 +429,7 @@ export default class GameCreateService {
     _setGalaxyCenter(game: Game) {
         const starLocations = game.galaxy.stars.map(s => s.location);
 
-        game.constants.distances.galaxyCenterLocation = this.mapService.getGalaxyCenter(starLocations);
+        game.constants.distances.galaxyCenterLocation = this.starDistanceService.getGalaxyCenter(starLocations);
     }
 
     _calculateStarsForVictory(game: Game) {

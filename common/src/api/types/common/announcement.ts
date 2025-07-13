@@ -6,6 +6,8 @@ export type Announcement<ID> = {
 }
 
 export type AnnouncementState<ID> = {
-    unreadAnnouncements: number;
-    lastReadAnnouncement: ID;
+    lastReadAnnouncement: ID | null,
+    unreadAnnouncements: ID[],
+    unreadCount: number,
+    totalAnnouncements: number
 }

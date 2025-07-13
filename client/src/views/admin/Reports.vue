@@ -9,7 +9,7 @@
             <router-link :to="{ path: '/administration/users/', query: { userId: report.reportedByUserId } }">{{ report.reportedByPlayerAlias }}</router-link>
             reported
             <router-link :to="{ path: '/administration/users/', query: { userId: report.reportedUserId } }">{{ report.reportedPlayerAlias }}</router-link>
-            ({{ report.date }})
+            ({{ report.date.toISOString() }})
           </h5>
         </div>
         <div class="panel-body">
@@ -24,10 +24,10 @@
         </div>
         <div class="panel-footer">
           <router-link tag="button" class="btn btn-small btn-info me-2" :to="{ path: '/game/detail', query: { id: report.gameId } }">View Game</router-link>
-          <button class="btn btn-small" :class="report.actioned ? 'btn-success' : 'btn-danger'">
-            <i class="fas clickable"
+          <button class="btn btn-small clickable" :class="report.actioned ? 'btn-success' : 'btn-danger'" @click="doActionReport(report)">
+            <i class="fas"
                :class="{'fa-check':report.actioned,'fa-times':!report.actioned}"
-               @click="actionReport(report)" title="Action Report"></i>
+                title="Action Report"></i>
           </button>
         </div>
       </div>
@@ -35,68 +35,54 @@
   </administration-page>
 </template>
 
-<script>
-import AdminApiService from "../../services/api/admin";
-import router from "../../router";
+<script setup lang="ts">
+import { inject, onMounted, ref, type Ref } from "vue";
 import LoadingSpinner from "../components/LoadingSpinner.vue";
 import AdministrationPage from "./AdministrationPage.vue";
 import MessageReport from "./components/MessageReport.vue";
+import { type Report } from "@solaris-common";
+import { httpInjectionKey, isOk, formatError } from "@/services/typedapi";
+import { actionReport, listReports } from "@/services/typedapi/admin";
+import { toastInjectionKey } from "@/util/keys";
+import { useStore, type Store } from 'vuex';
+import type {State} from "@/store";
+import { makeConfirm } from "@/util/confirm";
 
-export default {
-  name: "Reports",
-  components: {
-    'administration-page': AdministrationPage,
-    'loading-spinner': LoadingSpinner,
-    'message-report': MessageReport
-  },
-  data() {
-    return {
-      reports: null
-    }
-  },
-  async mounted() {
-    this.reports = await this.getReports();
-  },
-  methods: {
-    async getReports() {
-      const reports = await AdminApiService.getReports()
-      if (reports.status !== 200) {
-        this.$toast.error(reports.data.message);
-        return null
-      }
-      return reports.data;
-    },
-    async impersonate(userId) {
-      try {
-        let response = await AdminApiService.impersonate(userId)
+const httpClient = inject(httpInjectionKey)!;
+const toast = inject(toastInjectionKey)!;
 
-        if (response.status === 200) {
-          this.$store.commit('setUserId', response.data._id)
-          this.$store.commit('setUsername', response.data.username)
-          this.$store.commit('setRoles', response.data.roles)
-          this.$store.commit('setUserCredits', response.data.credits)
-        }
+const store: Store<State> = useStore();
+const confirm = makeConfirm(store);
 
-        router.push({name: 'home'})
-      } catch (err) {
-        console.error(err)
-      }
-    },
-    async actionReport(report) {
-      if (!await this.$confirm('Action Report', 'Are you sure you want to action this report?')) {
-        return
-      }
+const reports: Ref<Report<string>[] | null> = ref(null);
 
-      try {
-        report.actioned = true
+const doActionReport = async (report: Report<string>) => {
+  if (!await confirm('Action Report', 'Are you sure you want to action this report?')) {
+    return
+  }
 
-        await AdminApiService.actionReport(report._id)
-      } catch (err) {
-        console.error(err)
-      }
-    },
-  },
-}
+  const response =  await actionReport(httpClient)(report._id);
+
+  if (isOk(response)) {
+    report.actioned = true;
+  } else {
+    console.error(formatError(response));
+    toast.error("Failed to action report");
+  }
+};
+
+const getReports = async () => {
+  const response = await listReports(httpClient)();
+
+  if (isOk(response)) {
+    reports.value = response.data;
+  } else {
+    console.error(formatError(response));
+    toast.error("Failed to load reports");
+  }
+};
+
+onMounted(async () => await getReports());
 </script>
 
 <style scoped>

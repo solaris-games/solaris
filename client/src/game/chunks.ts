@@ -32,12 +32,14 @@ export class Chunks {
   maxMouseChunkY: number = 0;
   chunksContainer: Container;
 
-  constructor() {
+  constructor(game: Game, stars: Star[], carriers: Carrier[]) {
     this.chunksContainer = new Container()
     this.chunksContainer.zIndex = 7;
+
+    this.update(game, stars, carriers);
   }
 
-  setup(game: Game, stars: Star[], carriers: Carrier[]) {
+  update(game: Game, stars: Star[], carriers: Carrier[]) {
     this.chunksContainer.removeChildren();
 
     const carrierMinX = gameHelper.calculateMinCarrierX(game)

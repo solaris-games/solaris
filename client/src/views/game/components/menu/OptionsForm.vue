@@ -414,6 +414,19 @@
         </div>
       </div>
 
+      <div class="mb-1 pb-1">
+        <div class="row pt-1 pb-1">
+          <label for="galaxyCenterVisible" class="col-12 col-sm-6 col-form-label">Always show galaxy center indicator</label>
+          <div class="col-12 col-sm-6">
+            <select class="form-control" id="galaxyCenterVisible" v-model="settings.map.galaxyCenterAlwaysVisible"
+              :disabled="isSavingSettings">
+              <option value="enabled">Enabled</option>
+              <option value="disabled">Disabled</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
       <h5 class="pt-2">Carriers</h5>
 
       <div class="row pt-1 pb-1">

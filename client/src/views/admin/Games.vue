@@ -36,11 +36,11 @@
           </td>
           <td><i class="fas"
                  :class="{'fa-check text-success':game.state.startDate,'fa-times text-danger':!game.state.startDate}"
-                 :title="game.state.startDate"></i></td>
+                 :title="game.state.startDate?.toString()"></i></td>
           <td>
             <i class="clickable fas"
                :class="{'fa-check text-success':game.state.endDate,'fa-times text-danger':!game.state.endDate}"
-               :title="game.state.endDate"
+               :title="game.state.endDate?.toString()"
                @click="forceGameFinish(game)"></i>
           </td>
           <td :class="{'text-warning':gameNeedsAttention(game)}">{{ game.state.tick }}</td>
@@ -61,99 +61,101 @@
   </administration-page>
 </template>
 
-<script>
+<script setup lang="ts">
 import LoadingSpinner from "../components/LoadingSpinner.vue";
-import AdminApiService from "../../services/api/admin";
-import moment from "moment/moment";
 import AdministrationPage from "./AdministrationPage.vue";
+import { ref, inject, onMounted, computed, type Ref } from 'vue';
+import type { ListGame } from '@solaris-common';
+import { httpInjectionKey, isOk, isError, formatError } from '@/services/typedapi';
+import { listGames, resetQuitters as requestResetQuitters, setGameFeatured, finishGame, setGameTimeMachine } from '@/services/typedapi/admin';
+import { toastInjectionKey } from '@/util/keys';
+import { useStore, type Store } from 'vuex';
+import type { State } from '@/store';
+import { makeConfirm } from "@/util/confirm";
 
-export default {
-  name: "Games",
-  components: {
-    'administration-page': AdministrationPage,
-    'loading-spinner': LoadingSpinner
-  },
-  data() {
-    return {
-      games: null
-    }
-  },
-  async mounted() {
-    this.games = await this.getGames();
-  },
-  methods: {
-    async getGames() {
-      const resp = await AdminApiService.getGames()
+const httpClient = inject(httpInjectionKey)!;
+const toast = inject(toastInjectionKey)!;
 
-      if (resp.status !== 200) {
-        this.$toast.error(resp.data.message)
-        return null
-      }
+const store: Store<State> = useStore();
+const confirm = makeConfirm(store);
 
-      return resp.data
-    },
-    async resetQuitters (game) {
-      try {
-        await AdminApiService.resetQuitters(game._id);
-      } catch (err) {
-        console.error(err)
-      }
-    },
-    async toggleFeaturedGame (game) {
-      try {
-        game.settings.general.featured = !game.settings.general.featured
+const games: Ref<ListGame<string>[] | null> = ref(null);
 
-        await AdminApiService.setGameFeatured(game._id, game.settings.general.featured)
-      } catch (err) {
-        console.error(err)
-      }
-    },
-    async forceGameFinish (game) {
-      if (!this.isAdministrator || !game.state.startDate || game.state.endDate) {
-        return
-      }
+const isAdministrator = computed(() => store.state.roles.administrator);
+const isCommunityManager = computed(() => isAdministrator.value || store.state.roles.communityManager);
+const isGameMaster = computed(() => isAdministrator.value || store.state.roles.gameMaster);
 
-      if (!await this.$confirm('Force Game Finish', 'Are you sure you want to force this game to finish?')) {
-        return
-      }
+const gameNeedsAttention = (game: ListGame<string>) => game.state.endDate && game.state.tick <= 12;
 
-      try {
-        game.state.endDate = moment().utc()
+const resetQuitters = async (game: ListGame<string>) => {
+  const response = await requestResetQuitters(httpClient)(game._id);
 
-        await AdminApiService.forceGameFinish(game._id)
-      } catch (err) {
-        console.error(err)
-      }
-    },
-    async toggleTimeMachineGame (game) {
-      try {
-        if (game.settings.general.timeMachine === 'enabled') {
-          game.settings.general.timeMachine = 'disabled'
-        } else {
-          game.settings.general.timeMachine = 'enabled'
-        }
+  if (isError(response)) {
+    console.error(formatError(response));
+  }
+};
 
-        await AdminApiService.setGameTimeMachine(game._id, game.settings.general.timeMachine)
-      } catch (err) {
-        console.error(err)
-      }
-    },
-    gameNeedsAttention (game) {
-      return game.state.endDate && game.state.tick <= 12
-    }
-  },
-  computed: {
-    isAdministrator() {
-      return this.$store.state.roles.administrator
-    },
-    isCommunityManager() {
-      return this.isAdministrator || this.$store.state.roles.communityManager
-    },
-    isGameMaster() {
-      return this.isAdministrator || this.$store.state.roles.gameMaster
+const toggleFeaturedGame = async (game: ListGame<string>) => {
+  const newState = !game.settings.general.featured;
+  const response = await setGameFeatured(httpClient)(game._id, newState);
+
+  if (isError(response)) {
+    console.error(formatError(response));
+  } else {
+    game.settings.general.featured = newState;
+  }
+};
+
+const forceGameFinish = async (game: ListGame<string>) => {
+  if (!isAdministrator.value || !game.state.startDate || game.state.endDate) {
+    return;
+  }
+
+  if (await confirm('Force Game Finish', 'Are you sure you want to force this game to finish?')) {
+    const response = await finishGame(httpClient)(game._id);
+
+    if (isError(response)) {
+      console.error(formatError(response));
+      toast.error('Error forcing finish');
+    } else {
+      game.state.endDate = new Date();
     }
   }
-}
+};
+
+const toggleTimeMachineGame = async (game: ListGame<string>) => {
+  let newState;
+
+  if (game.settings.general.timeMachine === 'enabled') {
+    newState = 'disabled'
+  } else {
+    newState = 'enabled'
+  }
+
+  const response = await setGameTimeMachine(httpClient)(game._id, newState);
+
+  if (isError(response)) {
+    console.error(formatError(response));
+    toast.error('Error toggling Time Machine');
+  } else {
+    game.settings.general.timeMachine = newState;
+  }
+};
+
+const updateGames = async () => {
+  const response = await listGames(httpClient)();
+
+  if (isOk(response)) {
+    games.value = response.data;
+  } else {
+    console.error(formatError(response));
+    toast.error('Error loading games');
+  }
+};
+
+onMounted(async () => {
+  await updateGames();
+});
 </script>
 
 <style scoped>

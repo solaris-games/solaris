@@ -7,31 +7,30 @@
   </div>
 </template>
 
-<script>
-import AnnouncementsApiService from "../../services/api/announcements";
+<script setup lang="ts">
+import {httpInjectionKey, isOk, formatError} from "@/services/typedapi";
+import type {AnnouncementState} from "@solaris-common";
+import { ref, inject, onMounted, type Ref } from 'vue';
+import {getAnnouncementState} from "@/services/typedapi/announcement";
+import router from '@/router';
 
-export default {
-  name: "AnnouncementsButton",
-  data () {
-    return {
-      announcementState: null
-    }
-  },
-  async mounted () {
-    const resp = await AnnouncementsApiService.getAnnouncementState();
+const httpClient = inject(httpInjectionKey)!;
 
-    if (resp.status === 200) {
-      this.announcementState = resp.data;
-    } else {
-      console.error(resp);
-    }
-  },
-  methods: {
-    openAnnouncements () {
-      this.$router.push({ name: 'announcements' })
-    }
+const announcementState: Ref<AnnouncementState<string> | null> = ref(null);
+
+const openAnnouncements = () => {
+  router.push({ name: 'announcements' })
+};
+
+onMounted(async () => {
+  const resp = await getAnnouncementState(httpClient)();
+
+  if (isOk(resp)) {
+    announcementState.value = resp.data;
+  } else {
+    console.error(formatError(resp));
   }
-}
+});
 </script>
 
 <style scoped>

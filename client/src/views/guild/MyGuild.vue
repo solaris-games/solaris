@@ -139,7 +139,7 @@ export default {
       this.isLoading = false
     },
     onUserInvited (e) {
-      this.guild.invitees.push(e)
+      this.loadGuild();
     },
     onInvitationAccepted (e) {
       this.invites = []

@@ -151,7 +151,7 @@ export default (container: DependencyContainer) => {
         },
         getAchievements: async (req, res, next) => {
             try {
-                let achievements = await container.achievementService.getAchievements(req.params.id);
+                let achievements = await container.userAchievementService.getAchievements(req.params.id);
     
                 res.status(200).json(achievements);
                 return next();
