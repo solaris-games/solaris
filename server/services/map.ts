@@ -1,10 +1,8 @@
 import { Game } from "./types/Game";
-import { Location } from "./types/Location";
 import { Star } from "./types/Star";
 import GameTypeService from "./gameType";
 import CircularMapService from "./maps/circular";
 import CircularBalancedMapService from "./maps/circularBalanced";
-import CustomMapService from "./maps/custom";
 import DoughnutMapService from "./maps/doughnut";
 import IrregularMapService from "./maps/irregular";
 import SpiralMapService from "./maps/spiral";
@@ -13,8 +11,9 @@ import RandomService from "./random";
 import StarService from "./star";
 import StarDistanceService from "./starDistance";
 import ValidationError from "../errors/validation";
-import {RandomGen} from "../utils/randomGen";
-import {shuffle} from "./utils";
+import { RandomGen } from "../utils/randomGen";
+import { shuffle } from "./utils";
+import { DBObjectId } from "./types/DBObjectId";
 
 const OFFSET = 20000;
 
@@ -29,7 +28,6 @@ export default class MapService {
     circularBalancedMapService: CircularBalancedMapService;
     irregularMapService: IrregularMapService;
     gameTypeService: GameTypeService;
-    customMapService: CustomMapService;
 
     constructor(
         randomService: RandomService,
@@ -41,8 +39,7 @@ export default class MapService {
         doughnutMapService: DoughnutMapService,
         circularBalancedMapService: CircularBalancedMapService,
         irregularMapService: IrregularMapService,
-        gameTypeService: GameTypeService,
-        customMapService: CustomMapService
+        gameTypeService: GameTypeService
     ) {
         this.randomService = randomService;
         this.starService = starService;
@@ -54,13 +51,12 @@ export default class MapService {
         this.circularBalancedMapService = circularBalancedMapService;
         this.irregularMapService = irregularMapService;
         this.gameTypeService = gameTypeService;
-        this.customMapService = customMapService;
     }
 
-    generateStars(rand: RandomGen, game: Game, starCount: number, playerLimit: number, customJSON?: string | null, customSeed?: string | null) {
-        let stars: Star[] = [];
-        let homeStars: any[] = [];
-        let linkedStars: any[] = [];
+    generateStars(rand: RandomGen, game: Game, starCount: number, playerLimit: number, customSeed?: string | null) {
+        const stars: Star[] = [];
+        const homeStarIds: DBObjectId[] = [];
+        const linkedStarIds: DBObjectId[][] = [];
 
         // Get an array of random star names for however many stars we want.
         const starNames = this.nameService.getRandomStarNames(starCount);
@@ -86,14 +82,10 @@ export default class MapService {
             case 'irregular':
                 starLocations = this.irregularMapService.generateLocations(rand, game, starCount, game.settings.specialGalaxy.resourceDistribution, playerLimit, customSeed);
                 break;
-            case 'custom':
-                starLocations = this.customMapService.generateLocations(customJSON!, playerLimit);
-                break;
             default:
                 throw new ValidationError(`Galaxy type ${game.settings.galaxy.galaxyType} is not supported or has been disabled.`);
         }
 
-        let isCustomGalaxy = game.settings.galaxy.galaxyType === 'custom';
         let starNamesIndex = 0;
 
         let unlinkedStars = starLocations.filter(l => !l.linked);
@@ -101,59 +93,41 @@ export default class MapService {
         // Create a star for all locations returned by the map generator
         for (let i = 0; i < unlinkedStars.length; i++) {
             let starLocation: any = unlinkedStars[i];
-            
+
             let star;
             let starName = starNames[starNamesIndex++];
 
-            (starLocation as any).name = starName; // For naming carriers
+            star = this.starService.generateUnownedStar(starName, starLocation, starLocation.resources);
 
-            if (isCustomGalaxy) {
-                star = this.starService.generateCustomGalaxyStar(starName, starLocation);
-            }
-            else {
-                star = this.starService.generateUnownedStar(starName, starLocation, starLocation.resources);
-            }
-            
             stars.push(star);
 
             if (starLocation.homeStar) {
-                let locLinkedStars: any[] = [];
+                let locLinkedStars: DBObjectId[] = [];
 
                 for (let linkedLocation of starLocation.linkedLocations) {
-                  let linkedStar;
-                  let linkedStarName = starNames[starNamesIndex++];
+                    let linkedStar;
+                    let linkedStarName = starNames[starNamesIndex++];
 
-                  (linkedLocation as any).name = linkedStarName; // For naming carriers
-
-                  if (isCustomGalaxy) {
-                    linkedStar = this.starService.generateCustomGalaxyStar(linkedStarName, linkedLocation)
-                  }
-                  else {
                     linkedStar = this.starService.generateUnownedStar(linkedStarName, linkedLocation, linkedLocation.resources);
-                  }
 
-                  stars.push(linkedStar);
-                  locLinkedStars.push(linkedStar._id);
+                    stars.push(linkedStar);
+                    locLinkedStars.push(linkedStar._id);
                 }
 
-                homeStars.push(star._id)
-                linkedStars.push(locLinkedStars);
+                homeStarIds.push(star._id)
+                linkedStarIds.push(locLinkedStars);
             }
         }
 
         return {
             stars,
-            homeStars,
-            linkedStars,
+            homeStarIds,
+            linkedStarIds,
             starLocations
         };
     }
 
     translateCoordinates(game: Game) {
-        if (game.settings.galaxy.galaxyType === 'custom') {
-            return;
-        }
-
         if (!this.gameTypeService.isDarkMode(game)) {
             return;
         }

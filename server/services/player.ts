@@ -182,7 +182,7 @@ export default class PlayerService extends EventEmitter {
             }
 
             const playersPerTeam = game.settings.general.playerLimit / teamsNumber;
-            const teamColourShapeList = this.playerColourService.generateTeamColourShapeList(teamsNumber, playersPerTeam);
+            const teamColourShapeList = this.playerColourService.generateTeamColourShapeList(teamsNumber, new Array<number>(teamsNumber).fill(playersPerTeam));
 
             for (let ti = 0; ti < teamsNumber; ti++) {
                 const team: Team = {

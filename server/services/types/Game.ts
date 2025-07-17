@@ -1,5 +1,6 @@
 import { Carrier } from "./Carrier";
 import { Conversation } from "./Conversation";
+import { CustomGalaxy } from "./CustomGalaxy";
 import { DBObjectId } from "./DBObjectId";
 import { Location } from "./Location";
 import { Player } from "./Player";
@@ -118,6 +119,7 @@ export interface GameSettings {
 		starsPerPlayer: number;
 		productionTicks: number;
 		customJSON?: string;
+		customGalaxy?: CustomGalaxy;
 		advancedCustomGalaxyEnabled?: GameSettingEnabledDisabled;
         customSeed?: string;
 	},
