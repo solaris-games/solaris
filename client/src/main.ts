@@ -49,7 +49,7 @@ app.config.errorHandler = (err, vm, info) => {
     window._solaris.errors.push(`Vue error: ${err.message}\n ${err.cause} ${info}\n ${err.stack}`);
   }
   else {
-    window._solaris.errors.push(`Unknown error: ${err}`);
+    window._solaris.errors.push(`Unknown error: ${JSON.stringify(err)}`);
   }
 
   console.error(err);
