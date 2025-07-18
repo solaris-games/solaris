@@ -87,15 +87,18 @@ export default class CustomGalaxyService {
                 throw new ValidationError(`Multiple players cannot have the same ID.`);
             }
 
+            const homeStarPlayerIdMap = new Map<string, string>();
+
             for (const player of customGalaxy.players) {
                 if (!starIdSet.has(player.homeStarId)) {
                     throw new ValidationError(`A star with ID '${player.homeStarId}' does not exist.`);
                 }
+
+                homeStarPlayerIdMap.set(player.homeStarId, player.id);
             }
 
-            const filteredPlayerHomeStarIds = customGalaxy.players.map(p => p.homeStarId).filter(id => id != null);
-            const playerHomeStarIdSet = new Set<string>(filteredPlayerHomeStarIds);
-            if (filteredPlayerHomeStarIds.length !== playerHomeStarIdSet.size) {
+            const playerHomeStarIds = customGalaxy.players.map(p => p.homeStarId);
+            if (playerHomeStarIds.length !== homeStarPlayerIdMap.size) {
                 throw new ValidationError(`Multiple players cannot have the same capital star.`);
             }
 
@@ -124,6 +127,14 @@ export default class CustomGalaxyService {
             for (const star of customGalaxy.stars) {
                 if (star.playerId != null && !playerIdSet.has(star.playerId)) {
                     throw new ValidationError(`A player with ID '${star.playerId}' does not exist.`);
+                }
+
+                if (star.homeStar && homeStarPlayerIdMap.get(star.id) !== star.playerId) {
+                    throw new ValidationError(`All capital stars must belong to a player and be controlled by that player.`);
+                }
+
+                if (!star.homeStar && homeStarPlayerIdMap.get(star.id)) {
+                    throw new ValidationError(`A player's capital star must have the 'homeStar' field set to true.`);
                 }
             }
 
