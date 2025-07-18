@@ -1,11 +1,10 @@
-import {MathRandomGen, RandomGen, SeededRandomGen} from "../utils/randomGen";
+import { MathRandomGen, RandomGen, SeededRandomGen } from "../utils/randomGen";
 
 const mongoose = require('mongoose');
 import ValidationError from '../errors/validation';
-import {Game, GameSettings, Team} from './types/Game';
+import { Game, GameSettings, Team } from './types/Game';
 import UserAchievementService from './userAchievement';
 import ConversationService from './conversation';
-import GameCreateValidationService from './gameCreateValidation';
 import GameFluxService from './gameFlux';
 import GameListService from './gameList';
 import GameTypeService from './gameType';
@@ -22,9 +21,12 @@ import StarService from './star';
 import DiplomacyService from "./diplomacy";
 import TeamService from "./team";
 import CarrierService from './carrier';
-import CustomMapService from "./maps/custom";
-import {logger} from "../utils/logging";
+import { logger } from "../utils/logging";
 import StarDistanceService from "./starDistance";
+import { Star } from "./types/Star";
+import { DBObjectId } from "./types/DBObjectId";
+import { Player } from "./types/Player";
+import CustomGalaxyService from "./customGalaxy";
 
 const GAME_MASTER_LIMIT = 5;
 
@@ -46,7 +48,6 @@ export default class GameCreateService {
     historyService: HistoryService;
     achievementService: UserAchievementService;
     userService: UserService;
-    gameCreateValidationService: GameCreateValidationService;
     gameFluxService: GameFluxService;
     specialistBanService: SpecialistBanService;
     specialStarBanService: SpecialStarBanService;
@@ -55,22 +56,21 @@ export default class GameCreateService {
     diplomacyService: DiplomacyService;
     teamService: TeamService;
     carrierService: CarrierService;
-    customMapService: CustomMapService;
     starDistanceService: StarDistanceService;
+    customGalaxyService: CustomGalaxyService;
 
     constructor(
         gameModel,
         gameJoinService: GameJoinService,
         gameListService: GameListService,
-        nameService: NameService, 
+        nameService: NameService,
         mapService: MapService,
         playerService: PlayerService,
         passwordService: PasswordService,
-        conversationService: ConversationService, 
+        conversationService: ConversationService,
         historyService: HistoryService,
         achievementService: UserAchievementService,
         userService: UserService,
-        gameCreateValidationService: GameCreateValidationService,
         gameFluxService: GameFluxService,
         specialistBanService: SpecialistBanService,
         specialStarBanService: SpecialStarBanService,
@@ -79,8 +79,8 @@ export default class GameCreateService {
         diplomacyService: DiplomacyService,
         teamService: TeamService,
         carrierService: CarrierService,
-        customMapService: CustomMapService,
         starDistanceService: StarDistanceService,
+        customGalaxyService: CustomGalaxyService
     ) {
         this.gameModel = gameModel;
         this.gameJoinService = gameJoinService;
@@ -93,7 +93,6 @@ export default class GameCreateService {
         this.historyService = historyService;
         this.achievementService = achievementService;
         this.userService = userService;
-        this.gameCreateValidationService = gameCreateValidationService;
         this.gameFluxService = gameFluxService;
         this.specialistBanService = specialistBanService;
         this.specialStarBanService = specialStarBanService;
@@ -102,14 +101,39 @@ export default class GameCreateService {
         this.diplomacyService = diplomacyService;
         this.teamService = teamService;
         this.carrierService = carrierService;
-        this.customMapService = customMapService;
         this.starDistanceService = starDistanceService;
+        this.customGalaxyService = customGalaxyService;
     }
 
     async create(settings: GameSettings) {
         const isTutorial = settings.general.type === 'tutorial';
         const isNewPlayerGame = settings.general.type === 'new_player_rt' || settings.general.type === 'new_player_tb';
         const isOfficialGame = settings.general.createdByUserId == null;
+        const isCustomGalaxy = settings.galaxy.galaxyType === 'custom';
+        const isAdvancedCustomGalaxy = isCustomGalaxy && settings.galaxy.advancedCustomGalaxyEnabled === 'enabled';
+
+        if (isCustomGalaxy) {
+            // Validate it here so that we can assume it is valid later.
+            this.customGalaxyService.validateCustomGalaxy(settings, isAdvancedCustomGalaxy);
+
+            settings.general.playerLimit = settings.galaxy.customGalaxy!.stars.filter(s => s.homeStar).length;
+
+            if (settings.galaxy.customGalaxy!.stars.find((s) =>
+                s.naturalResources.economy != s.naturalResources.industry || s.naturalResources.economy != s.naturalResources.science) != null
+            ) {
+                settings.specialGalaxy.splitResources === 'enabled';
+            } else {
+                settings.specialGalaxy.splitResources === 'disabled';
+            }
+
+            if (isAdvancedCustomGalaxy) {
+                if (settings.general.mode = 'teamConquest') {
+                    settings.conquest.teamsCount = settings.galaxy.customGalaxy!.teams!.length;
+                    // TODO: This should just be set by the client; we no longer need to use maxAlliances in team games.
+                    settings.diplomacy.maxAlliances = settings.galaxy.customGalaxy!.players!.length - 1;
+                }
+            }
+        }
 
         // If a legit user (not the system) created the game and it isn't a tutorial
         // then that game must be set as a custom game.
@@ -144,10 +168,14 @@ export default class GameCreateService {
             }
         }
 
+        if (settings.general.playerLimit < 2) {
+            throw new ValidationError(`Games must have at least 2 players.`);
+        }
+
         if (settings.general.playerLimit > 64) {
             throw new ValidationError(`Games larger than 64 players are not supported.`);
         }
-        
+
         if (settings.general.name.trim().length < 3 || settings.general.name.trim().length > 24) {
             throw new ValidationError('Game name must be between 3 and 24 characters.');
         }
@@ -165,12 +193,22 @@ export default class GameCreateService {
                 throw new ValidationError("Team count not provided");
             }
 
-            const valid = Boolean(teamsCount &&
-                settings.general.playerLimit >= 4 &&
-                settings.general.playerLimit % teamsCount === 0);
+            if (teamsCount < 2) {
+                throw new ValidationError(`The number of teams must be larger than 2.`);
+            }
 
-            if (!valid) {
-                throw new ValidationError(`The number of players must be larger than 3 and divisible by the number of teams.`);
+            if (isAdvancedCustomGalaxy) {
+                if (settings.general.playerLimit <= 2) {
+                    throw new ValidationError(`The number of players in a team game must be larger than 2.`);
+                }
+            } else {
+                const valid = Boolean(teamsCount &&
+                    settings.general.playerLimit >= 4 &&
+                    settings.general.playerLimit % teamsCount === 0);
+
+                if (!valid) {
+                    throw new ValidationError(`The number of players must be larger than 3 and divisible by the number of teams.`);
+                }
             }
 
             if (settings.diplomacy?.enabled !== 'enabled') {
@@ -181,7 +219,7 @@ export default class GameCreateService {
                 throw new ValidationError('Locked alliances needs to be enabled for a team game.');
             }
 
-            if (settings.diplomacy?.maxAlliances !== (settings.general.playerLimit / teamsCount) - 1) {
+            if (settings.diplomacy?.maxAlliances !== (settings.general.playerLimit / teamsCount) - 1 && !isAdvancedCustomGalaxy) {
                 throw new ValidationError('Alliance limit too low for team size.');
             }
         }
@@ -195,29 +233,15 @@ export default class GameCreateService {
         // For non-custom galaxies we need to check that the player has actually provided
         // enough stars for each player.
         let desiredStarCount = 0;
-        if (game.settings.galaxy.galaxyType !== 'custom') {
+        if (!isCustomGalaxy) {
             desiredStarCount = game.settings.galaxy.starsPerPlayer * game.settings.general.playerLimit;
-            let desiredPlayerStarCount = game.settings.player.startingStars * game.settings.general.playerLimit;
+            const desiredPlayerStarCount = game.settings.player.startingStars * game.settings.general.playerLimit;
 
             if (desiredPlayerStarCount > desiredStarCount) {
                 throw new ValidationError(`Cannot create a galaxy of ${desiredStarCount} stars with ${game.settings.player.startingStars} stars per player.`);
             }
         } else {
-            // TODO: Validation needs to be better and in one place. Also, we should provide a schema
-
-            let json;
-
-            try {
-                json = JSON.parse(settings.galaxy.customJSON!);
-            } catch (e) {
-                throw new ValidationError(`Failed to parse custom JSON.`);
-            }
-
-            if (!json?.stars?.length) {
-                throw new ValidationError(`No stars provided in custom JSON.`);
-            }
-
-            const starCount = json.stars.length;
+            const starCount = settings.galaxy.customGalaxy!.stars.length;
 
             game.settings.galaxy.starsPerPlayer = starCount / game.settings.general.playerLimit;
             desiredStarCount = starCount;
@@ -276,7 +300,7 @@ export default class GameCreateService {
             game.state.ticksToEnd = null;
         }
 
-        if (game.settings.galaxy.galaxyType === 'custom') {
+        if (isCustomGalaxy) {
             game.settings.specialGalaxy.randomWarpGates = 0;
             game.settings.specialGalaxy.randomWormHoles = 0;
             game.settings.specialGalaxy.randomNebulas = 0;
@@ -351,46 +375,52 @@ export default class GameCreateService {
             }
         }
 
-        // Create all of the stars required.
-        game.galaxy.homeStars = [];
-        game.galaxy.linkedStars = [];
+        // Create the galaxy.
+        if (isCustomGalaxy) {
+            if (isAdvancedCustomGalaxy) {
+                const generatedPlayers = this.customGalaxyService.generatePlayers(game);
 
-        const starGeneration = this.mapService.generateStars(
-            rand,
-            game, 
-            desiredStarCount,
-            game.settings.general.playerLimit,
-            settings.galaxy.customJSON,
-            settings.galaxy.customSeed,
-        );
+                const generatedStars = this.customGalaxyService.generateStarsAdvanced(game, generatedPlayers);
 
-        game.galaxy.stars = starGeneration.stars;
-        game.galaxy.homeStars = starGeneration.homeStars;
-        game.galaxy.linkedStars = starGeneration.linkedStars;
+                game.galaxy.players = Array.from(generatedPlayers.values());
+                game.galaxy.stars = Array.from(generatedStars.values());
+                game.galaxy.carriers = this.customGalaxyService.generateCarriers(game, generatedPlayers, generatedStars);
 
-        if (game.galaxy.stars.length % game.settings.general.playerLimit !== 0) {
-            throw new ValidationError(`Cannot create a galaxy with a non-whole number of stars per player.`);
+            } else {
+                const starGeneration = this.customGalaxyService.generateStars(game);
+
+                game.galaxy.stars = starGeneration.stars;
+                game.galaxy.homeStars = starGeneration.homeStarIds;
+                game.galaxy.linkedStars = starGeneration.linkedStarIds;
+
+                this.playerService.setupEmptyPlayers(game);
+
+                game.galaxy.carriers = this.playerService.createHomeStarCarriers(game);
+            }
         } else {
-            game.settings.galaxy.starsPerPlayer = game.galaxy.stars.length / game.settings.general.playerLimit;
-        }
+            const starGeneration = this.mapService.generateStars(
+                rand,
+                game,
+                desiredStarCount,
+                game.settings.general.playerLimit,
+                settings.galaxy.customSeed
+            );
 
-        this.mapService.translateCoordinates(game);
+            game.galaxy.stars = starGeneration.stars;
+            game.galaxy.homeStars = starGeneration.homeStarIds;
+            game.galaxy.linkedStars = starGeneration.linkedStarIds;
 
-        this.starService.setupStarsForGameStart(game);
-        
-        // Setup players and assign to their starting positions.
-        this.playerService.setupEmptyPlayers(game);
+            this.starService.setupStarsForGameStart(game);
 
-        // Create carriers in custom galaxies with the advanced mode enabled.
-        let advancedCustomGalaxyEnabled = game.settings.galaxy?.advancedCustomGalaxyEnabled === 'enabled';
-        
-        if (advancedCustomGalaxyEnabled) {
-            game.galaxy.carriers = this.customMapService.generateCarriers(game, settings.galaxy.customJSON!, starGeneration.starLocations);
-        } else {
+            this.mapService.translateCoordinates(game);
+
+            // Setup players and assign to their starting positions.
+            this.playerService.setupEmptyPlayers(game);
+
             game.galaxy.carriers = this.playerService.createHomeStarCarriers(game);
-        }
 
-        this.mapService.generateTerrain(rand, game);
+            this.mapService.generateTerrain(rand, game);
+        }
 
         // Calculate how many stars we have and how many are required for victory.
         game.state.stars = game.galaxy.stars.length;
@@ -405,8 +435,6 @@ export default class GameCreateService {
         }
 
         await this.teamService.setDiplomacyStates(game);
-
-        this.gameCreateValidationService.validate(game);
 
         const gameObject = await game.save();
 

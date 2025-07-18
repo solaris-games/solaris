@@ -29,7 +29,6 @@ import EventService from "../event";
 import GameService from "../game";
 import GameAuthService from "../gameAuth";
 import GameCreateService from "../gameCreate";
-import GameCreateValidationService from "../gameCreateValidation";
 import GameFluxService from "../gameFlux";
 import GameGalaxyService from "../gameGalaxy";
 import GameJoinService from "../gameJoin";
@@ -118,7 +117,6 @@ export interface DependencyContainer {
     gameAuthService: GameAuthService,
     gameLockService: GameLockService,
     gameJoinService: GameJoinService,
-    gameCreateValidationService: GameCreateValidationService,
     gameCreateService: GameCreateService,
     gameGalaxyService: GameGalaxyService,
     gameListService: GameListService,

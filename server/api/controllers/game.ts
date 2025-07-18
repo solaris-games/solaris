@@ -3,6 +3,7 @@ import ValidationError from '../../errors/validation';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
 import { logger } from "../../utils/logging";
 import {
+    customGalaxyValidator,
     mapToGameConcedeDefeatRequest,
     mapToGameSaveNotesRequest,
     parseGameJoinGameRequest,
@@ -37,6 +38,13 @@ export default (container: DependencyContainer) => {
             req.body.general.createdByUserId = req.session.userId;
     
             try {
+                // If this is a custom galaxy, validate the JSON.
+                // TODO: This should probably be moved to the game create request validation once it is implemented.
+                if (req.body.galaxy.galaxyType === 'custom') {
+                    const customGalaxy = JSON.parse(req.body.galaxy.customJSON!);
+                    req.body.galaxy.customGalaxy = customGalaxyValidator(customGalaxy);
+                }
+                
                 let game = await container.gameCreateService.create(req.body);
     
                 res.status(201).json(game._id);

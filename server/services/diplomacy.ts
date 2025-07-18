@@ -262,7 +262,14 @@ export default class DiplomacyService extends EventEmitter {
             throw new ValidationError(`The player has already been declared as allies`);
         }
 
-        if (this.isMaxAlliancesEnabled(game)) {
+        if (this.isTeamGame(game)) {
+            const playerTeam = game.galaxy.teams!.find(t => t.players.map(pid => pid.toString()).includes(playerId.toString()))!;
+            const targetPlayerTeam = game.galaxy.teams!.find(t => t.players.map(pid => pid.toString()).includes(playerIdTarget.toString()))!;
+
+            if (playerTeam !== targetPlayerTeam) {
+                throw new ValidationError(`You cannot ally a player who is not on your team.`);
+            }
+        } else if (this.isMaxAlliancesEnabled(game)) {
             let player = game.galaxy.players.find(p => p._id.toString() === playerId.toString())!;
     
             let allianceCount = this.getAlliesOrOffersOfPlayer(game, player).length;

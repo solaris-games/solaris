@@ -1,17 +1,17 @@
-import {shuffle} from "./utils";
+import { shuffle } from "./utils";
 
 const EventEmitter = require('events');
 const mongoose = require('mongoose');
-import {DBObjectId} from './types/DBObjectId';
+import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
 import Repository from './repository';
-import {Carrier} from './types/Carrier';
-import {Game, GameSettings} from './types/Game';
-import {Location} from './types/Location';
-import {MapObjectWithVisibility} from './types/Map';
-import {Player} from './types/Player';
-import {InfrastructureType, NaturalResources, Star, StarCaptureResult, TerraformedResources} from './types/Star';
-import {User} from './types/User';
+import { Carrier } from './types/Carrier';
+import { Game, GameSettings } from './types/Game';
+import { Location } from './types/Location';
+import { MapObjectWithVisibility } from './types/Map';
+import { Player } from './types/Player';
+import { InfrastructureType, NaturalResources, Star, StarCaptureResult, TerraformedResources } from './types/Star';
+import { User } from './types/User';
 import DistanceService from './distance';
 import GameStateService from './gameState';
 import GameTypeService from './gameType';
@@ -21,7 +21,7 @@ import SpecialistService from './specialist';
 import StarDistanceService from './starDistance';
 import TechnologyService from './technology';
 import UserService from './user';
-import {MathRandomGen} from "../utils/randomGen";
+import { MathRandomGen } from "../utils/randomGen";
 import StatisticsService from "./statistics";
 
 const RNG = require('random-seed');
@@ -94,28 +94,6 @@ export default class StarService extends EventEmitter {
         };
     }
 
-    generateCustomGalaxyStar(name: string, star: Star) {
-      return {
-        _id: star._id,
-        name: name,
-        naturalResources: star.naturalResources,
-        location: star.location,
-        infrastructure: star.infrastructure,
-        homeStar: star.homeStar,
-        warpGate: star.warpGate,
-        isNebula: star.isNebula,
-        isAsteroidField: star.isAsteroidField,
-        isBinaryStar: star.isBinaryStar,
-        isBlackHole: star.isBlackHole,
-        isPulsar: star.isPulsar,
-        wormHoleToStarId: star.wormHoleToStarId,
-        specialistId: star.specialistId,
-        shipsActual: star.shipsActual,
-        ships: star.ships,
-        ...(star.infrastructure ? {infrastructure: star.infrastructure} : undefined)
-      }
-    }
-
     generateStarPosition(game: Game, originX: number, originY: number, radius: number) {
         if (radius == null) {
             radius = game.constants.distances.maxDistanceBetweenStars;
@@ -134,7 +112,7 @@ export default class StarService extends EventEmitter {
 
     _binarySearchIndex<T extends { _id: DBObjectId | string }>(stars: T[], id: DBObjectId | string) {
         let low = 0,
-        high = stars.length;
+            high = stars.length;
 
         while (low < high) {
             // the midpoint is both the lower and upper bounds of the search area bit shifted one bit to the right to divide by 2
@@ -148,16 +126,16 @@ export default class StarService extends EventEmitter {
         return low;
     }
 
-    binarySearchStars<T extends { _id: DBObjectId | string }>(stars: T[], id: DBObjectId | string): T | undefined  {
+    binarySearchStars<T extends { _id: DBObjectId | string }>(stars: T[], id: DBObjectId | string): T | undefined {
         const index = this._binarySearchIndex(stars, id.toString());
-        if(stars[index] && stars[index]._id.toString() === id.toString()) {
+        if (stars[index] && stars[index]._id.toString() === id.toString()) {
             return stars[index];
         }
         // id wasn't found, return undefined to match how array.find handles not finding an item
         return undefined;
     }
 
-    getByIdBSForStars<T extends { _id: DBObjectId | string }>(stars: T[], id: DBObjectId | string): T  {
+    getByIdBSForStars<T extends { _id: DBObjectId | string }>(stars: T[], id: DBObjectId | string): T {
         let star = this.binarySearchStars(stars, id);
         if (star) {
             return star;
@@ -175,23 +153,21 @@ export default class StarService extends EventEmitter {
         this.resetIgnoreBulkUpgradeStatuses(homeStar);
 
         homeStar.homeStar = true;
-        if (gameSettings.galaxy.galaxyType !== 'custom') { 
-            homeStar.warpGate = false;
-            homeStar.specialistId = null;
+        homeStar.warpGate = false;
+        homeStar.specialistId = null;
 
-            homeStar.naturalResources.economy = game.constants.star.resources.maxNaturalResources;
-            homeStar.naturalResources.industry = game.constants.star.resources.maxNaturalResources;
-            homeStar.naturalResources.science = game.constants.star.resources.maxNaturalResources;
-        }
-        if (gameSettings.galaxy?.advancedCustomGalaxyEnabled !== 'enabled') {
-            // Seed the home star with the starting infrastructure.
-            homeStar.infrastructure.economy = gameSettings.player.startingInfrastructure.economy;
-            homeStar.infrastructure.industry = gameSettings.player.startingInfrastructure.industry;
-            homeStar.infrastructure.science = gameSettings.player.startingInfrastructure.science;
+        homeStar.naturalResources.economy = game.constants.star.resources.maxNaturalResources;
+        homeStar.naturalResources.industry = game.constants.star.resources.maxNaturalResources;
+        homeStar.naturalResources.science = game.constants.star.resources.maxNaturalResources;
 
-            homeStar.shipsActual = Math.max(gameSettings.player.startingShips, 1); // Must be at least 1 ship at the home star so that a carrier can be built there.
-            homeStar.ships = homeStar.shipsActual;
-        }
+        // Seed the home star with the starting infrastructure.
+        homeStar.infrastructure.economy = gameSettings.player.startingInfrastructure.economy;
+        homeStar.infrastructure.industry = gameSettings.player.startingInfrastructure.industry;
+        homeStar.infrastructure.science = gameSettings.player.startingInfrastructure.science;
+
+        homeStar.shipsActual = Math.max(gameSettings.player.startingShips, 1); // Must be at least 1 ship at the home star so that a carrier can be built there.
+        homeStar.ships = homeStar.shipsActual;
+
     }
 
     getPlayerHomeStar(stars: Star[], player: Player) {
@@ -328,7 +304,7 @@ export default class StarService extends EventEmitter {
                 ownedByPlayerId: s.ownedByPlayerId,
             }
         })
-        .sort((a, b) => a._id.toString() < b._id.toString() ? -1 : 1);
+            .sort((a, b) => a._id.toString() < b._id.toString() ? -1 : 1);
 
         // Calculate which stars need to be checked excluding the ones that the player can definitely see.
         let starsToCheck: MapObjectWithVisibility[] = game.galaxy.stars
@@ -361,24 +337,24 @@ export default class StarService extends EventEmitter {
         // If worm holes are present, then ensure that any owned star OR star in orbit
         // also has its paired star visible.
         //if (game.settings.specialGalaxy.randomWormHoles) {
-            let wormHoleStars = starsOwnedOrInOrbit
-                .filter(s => s.wormHoleToStarId)
-                .map(s => {
-                    return {
-                        source: s,
-                        destination: this.getById(game, s.wormHoleToStarId!)
-                    };
+        let wormHoleStars = starsOwnedOrInOrbit
+            .filter(s => s.wormHoleToStarId)
+            .map(s => {
+                return {
+                    source: s,
+                    destination: this.getById(game, s.wormHoleToStarId!)
+                };
+            });
+
+        for (let wormHoleStar of wormHoleStars) {
+            if (this.binarySearchStars(starsInRange, wormHoleStar.destination._id) == null) {
+                this._insertIntoSortedMapObjectsArray(starsInRange, {
+                    _id: wormHoleStar.destination._id,
+                    location: wormHoleStar.destination.location,
+                    ownedByPlayerId: wormHoleStar.destination.ownedByPlayerId
                 });
-                
-            for (let wormHoleStar of wormHoleStars) {
-                if (this.binarySearchStars(starsInRange, wormHoleStar.destination._id) == null) {
-                    this._insertIntoSortedMapObjectsArray(starsInRange, {
-                        _id: wormHoleStar.destination._id,
-                        location: wormHoleStar.destination.location,
-                        ownedByPlayerId: wormHoleStar.destination.ownedByPlayerId
-                    });
-                }
             }
+        }
         //}
         return starsInRange.map(s => this.getById(game, s._id));
     }
@@ -439,7 +415,7 @@ export default class StarService extends EventEmitter {
         }
     }
 
-    calculateTerraformedResource(naturalResource: number, terraforming: number) {        
+    calculateTerraformedResource(naturalResource: number, terraforming: number) {
         return Math.floor(naturalResource + (5 * terraforming));
     }
 
@@ -461,7 +437,7 @@ export default class StarService extends EventEmitter {
         // Destroy the carriers owned by the player who abandoned the star.
         // Note: If an ally is currently in orbit then they will capture the star on the next tick.
         let playerCarriers = game.galaxy.carriers
-            .filter(x => 
+            .filter(x =>
                 x.orbiting
                 && x.orbiting.toString() === star._id.toString()
                 && x.ownedByPlayerId!.toString() === player._id.toString()
@@ -572,7 +548,7 @@ export default class StarService extends EventEmitter {
         if (!star.naturalResources) {
             return true;
         }
-        
+
         return star.naturalResources.economy <= 0 && star.naturalResources.industry <= 0 && star.naturalResources.science <= 0;
     }
 
@@ -603,9 +579,9 @@ export default class StarService extends EventEmitter {
         if (Math.floor(star.naturalResources.science) <= 0) {
             star.naturalResources.science = 0;
         }
-        
+
         // if the star reaches 0 of all resources then reduce the star to a dead hunk.
-        if(this.isDeadStar(star)) {
+        if (this.isDeadStar(star)) {
             star.specialistId = null;
             star.warpGate = false;
             star.infrastructure.economy = 0;
@@ -763,62 +739,58 @@ export default class StarService extends EventEmitter {
             this.setupHomeStar(game, star, player, game.settings);
         } else {
             star.ownedByPlayerId = player._id;
-            if (game.settings.galaxy?.advancedCustomGalaxyEnabled !== 'enabled') {
-                star.shipsActual = game.settings.player.startingShips;
-                star.ships = star.shipsActual;
+            star.shipsActual = game.settings.player.startingShips;
+            star.ships = star.shipsActual;
+
+            star.warpGate = false; // TODO: BUG - This resets warp gates generated by map terrain.
+            star.specialistId = null;
+
+            if (game.settings.player.developmentCost.economy !== 'none') {
+                star.infrastructure.economy = 0;
             }
-            if (game.settings.galaxy.galaxyType !== 'custom') {
-                star.warpGate = false; // TODO: BUG - This resets warp gates generated by map terrain.
-                star.specialistId = null;
 
-                if (game.settings.player.developmentCost.economy !== 'none') {
-                    star.infrastructure.economy = 0;
-                }
-
-                if (game.settings.player.developmentCost.industry !== 'none') {
-                    star.infrastructure.industry = 0;
-                }
-
-                if (game.settings.player.developmentCost.science !== 'none') {
-                    star.infrastructure.science = 0;
-                }
+            if (game.settings.player.developmentCost.industry !== 'none') {
+                star.infrastructure.industry = 0;
             }
+
+            if (game.settings.player.developmentCost.science !== 'none') {
+                star.infrastructure.science = 0;
+            }
+
             this.resetIgnoreBulkUpgradeStatuses(star);
         }
     }
 
     setupStarsForGameStart(game: Game) {
-        if (game.settings.galaxy.galaxyType !== 'custom') {
-            // If any of the development costs are set to null then we need to randomly
-            // assign a portion of stars for each type to be seeded with the starting infrastructure.
-            // For example, if eco is disabled then each star in the galaxy will have a 1 in 3 chance of being seeded with eco.
-            // Note that we will not allow a mix of seeds, a star can only be seeded with one infrastructure type.
-            if (game.settings.player.developmentCost.economy !== 'none' &&
+        // If any of the development costs are set to null then we need to randomly
+        // assign a portion of stars for each type to be seeded with the starting infrastructure.
+        // For example, if eco is disabled then each star in the galaxy will have a 1 in 3 chance of being seeded with eco.
+        // Note that we will not allow a mix of seeds, a star can only be seeded with one infrastructure type.
+        if (game.settings.player.developmentCost.economy !== 'none' &&
             game.settings.player.developmentCost.industry !== 'none' &&
             game.settings.player.developmentCost.science !== 'none') {
-                return
+            return;
+        }
+
+        // Note: Because each setting is independent, we only want to seed the
+        // ones where the development cost is set to none.
+        const types: (InfrastructureType | null)[] = [
+            game.settings.player.developmentCost.economy === 'none' ? 'economy' : null,
+            game.settings.player.developmentCost.industry === 'none' ? 'industry' : null,
+            game.settings.player.developmentCost.science === 'none' ? 'science' : null,
+        ]
+
+        const rng = RNG.create(game._id.toString());
+
+        for (let star of game.galaxy.stars) {
+            const i = rng(types.length);
+            const type = types[i];
+
+            if (type == null) {
+                continue;
             }
-        
-            // Note: Because each setting is independent, we only want to seed the
-            // ones where the development cost is set to none.
-            const types: (InfrastructureType | null)[] = [
-                game.settings.player.developmentCost.economy === 'none' ? 'economy' : null,
-                game.settings.player.developmentCost.industry === 'none' ? 'industry' : null,
-                game.settings.player.developmentCost.science === 'none' ? 'science' : null,
-            ]
 
-            const rng = RNG.create(game._id.toString());
-
-            for (let star of game.galaxy.stars) {
-                const i = rng(types.length);
-                const type = types[i];
-
-                if (type == null) {
-                    continue;
-                }
-
-                star.infrastructure[type] = game.settings.player.startingInfrastructure[type];
-            }
+            star.infrastructure[type] = game.settings.player.startingInfrastructure[type];
         }
     }
 
