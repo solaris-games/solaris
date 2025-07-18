@@ -54,10 +54,6 @@ export default {
     onOpenPlayerDetailRequested (e) {
       this.$emit('onOpenPlayerDetailRequested', e)
     },
-    panToPlayer (player) {
-      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, { player: player });
-      this.onOpenPlayerDetailRequested(player)
-    },
     isPlayerTeam (team) {
       const userPlayer = GameHelper.getUserPlayer(this.$store.state.game);
 

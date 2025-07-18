@@ -114,7 +114,7 @@ export default {
     },
     panToPlayer(player) {
       this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, { player: player });
-      this.onOpenPlayerDetailRequested(player)
+      this.onOpenPlayerDetailRequested(player._id);
     }
   },
   computed: {
