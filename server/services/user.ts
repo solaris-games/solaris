@@ -120,14 +120,7 @@ export default class UserService extends EventEmitter {
             tutorialsCompleted: 0,
         };
 
-        // TODO: Fix this properly
-        const user = await this.userRepo.findById(id, select);
-
-        if (user?.achievements) {
-            user.achievements.renown = 0;
-        }
-
-        return user;
+        return await this.userRepo.findById(id, select);
     }
     
     async getEmailById(id: DBObjectId) {
