@@ -47,7 +47,7 @@ const emit = defineEmits<{
   onOpenPurchasePlayerBadgeRequested: [playerId: string]
 }>();
 
-const isLoading = ref(true);
+const isLoading = ref(false);
 
 const allBadges: Ref<TBadge[]> = ref([]);
 

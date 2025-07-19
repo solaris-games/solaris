@@ -30,7 +30,9 @@
 
     <research v-if="player && player.research" :playerId="player._id"/>
 
-    <player-user-info v-if="player" :game="game" :player="player" :user="user" />
+    <loading-spinner :loading="isLoading" />
+
+    <player-user-info v-if="player && !isLoading" :game="game" :player="player" :user="user" :userPlayer="userPlayer" @onOpenPurchasePlayerBadgeRequested="onOpenPurchasePlayerBadgeRequested" />
 
     <player-report
       v-if="player && player.isRealUser && userPlayer && player !== userPlayer"
@@ -56,6 +58,7 @@ import type { Player, UserPublic } from '@solaris-common'
 import { useStore, type Store } from 'vuex';
 import type { State } from "@/store";
 import PlayerUserInfo from "@/views/game/components/player/PlayerUserInfo.vue";
+import LoadingSpinner from "@/views/components/LoadingSpinner.vue";
 
 const props = defineProps<{
   playerId: string,
@@ -75,6 +78,7 @@ const eventBus = inject(eventBusInjectionKey)!;
 
 const store: Store<State> = useStore();
 
+const isLoading = ref(false);
 const player: Ref<Player<string> | null> = ref(null);
 const user: Ref<UserPublic<string> | null> = ref(null);
 const userPlayer: Ref<Player<string> | null> = ref(null);
@@ -84,6 +88,8 @@ const playerIndex = ref(0);
 const game = computed(() => store.state.game!);
 
 onMounted(async () => {
+  isLoading.value = true;
+
   player.value = GameHelper.getPlayerById(store.state.game, props.playerId) || null;
   userPlayer.value = GameHelper.getUserPlayer(store.state.game) || null;
   playerIndex.value = store.state.game.galaxy.players.indexOf(player.value);
@@ -100,6 +106,8 @@ onMounted(async () => {
         console.error(err)
       }
     }
+
+  isLoading.value = false;
 });
 
 const is1v1Game = computed(() =>GameHelper.is1v1Game(store.state.game));
@@ -110,6 +118,7 @@ const onOpenTradeRequested = () => emit('onOpenTradeRequested', props.playerId);
 const onOpenReportPlayerRequested = () => emit('onOpenReportPlayerRequested', props.playerId);
 const panToPlayer = () => eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, { player: player.value! });
 const onOpenPlayerDetailRequested = (player: Player<string>) => emit('onOpenPlayerDetailRequested', player._id);
+const onOpenPurchasePlayerBadgeRequested = () => emit('onOpenPurchasePlayerBadgeRequested', props.playerId);
 
 const onOpenPrevPlayerDetailRequested = () => {
   let prevLeaderboardIndex = leaderboard.value!.indexOf(player.value!) - 1;
