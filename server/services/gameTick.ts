@@ -282,8 +282,8 @@ export default class GameTickService extends EventEmitter {
             this.waypointService.cullAllWaypointsByHyperspaceRange(game);
             logTime('Sanitise all carrier waypoints');
 
-            this._oneTickSpecialists(game);
-            logTime('Apply effects of onetick specialists');
+            this._applyTickBasedSpecialistEffects(game);
+            logTime('Apply tick effects of specialists');
 
             this._clearExpiredSpecialists(game);
             logTime('Clear expired specialists')
@@ -649,7 +649,6 @@ export default class GameTickService extends EventEmitter {
         this.waypointService.performWaypointActionsDrops(game, actionWaypoints);
 
         // 4b. Build ships at star.
-        this.starService.applyStarSpecialistSpecialModifiers(game);
         this.shipService.produceShips(game);
 
         // 4c. Do the rest of the waypoint actions.
@@ -958,7 +957,8 @@ export default class GameTickService extends EventEmitter {
         }
     }
 
-    _oneTickSpecialists(game: Game) {
+    _applyTickBasedSpecialistEffects(game: Game) {
+        this.starService.applyStarSpecialistSpecialModifiers(game);
         this.playerCycleRewardsService.giveFinancialAnalystCredits(game);
         this.starMovementService.moveStellarEngines(game);
         this.starService.pairWormHoleConstructors(game);
