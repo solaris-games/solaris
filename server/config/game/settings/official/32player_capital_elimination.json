@@ -1,8 +1,8 @@
 {
     "general": {
         "name": "[[[RANDOM]]]",
-        "description": "This game has 32 players, expect big alliances and epic battles in this huge galaxy!",
-        "createdFromTemplate": "32_player_ultradark",
+        "description": "32 players fight for dominance in this huge galaxy! Epic battles and diplomacy await, but be careful: if you lose your capital star, it is the end of your empire!",
+        "createdFromTemplate": "32_player_capital_elimination",
         "type": "32_player_rt",
         "mode": "conquest",
         "password": null,
@@ -31,7 +31,7 @@
         "specialistCost": "standard",
         "specialistsCurrency": "creditsSpecialists",
         "randomWarpGates": 10,
-        "randomWormHoles": 5,
+        "randomWormHoles": 3,
         "randomNebulas": 15,
         "randomAsteroidFields": 10,
         "randomBinaryStars": 10,
@@ -48,8 +48,7 @@
         "starCaptureReward": "enabled",
         "specialistBans": {
             "star": [
-                16,
-                17
+                15
             ],
             "carrier": []
         }
@@ -57,7 +56,7 @@
     "conquest": {
         "victoryCondition": "starPercentage",
         "victoryPercentage": 33,
-        "capitalStarElimination": "disabled"
+        "capitalStarElimination": "enabled"
     },
     "orbitalMechanics": {
         "enabled": "disabled",
@@ -69,9 +68,9 @@
         "startingCreditsSpecialists": 10,
         "startingShips": 10,
         "startingInfrastructure": {
-            "economy": 10,
-            "industry": 10,
-            "science": 3
+            "economy": 5,
+            "industry": 5,
+            "science": 2
         },
         "developmentCost": {
             "economy": "standard",
@@ -79,8 +78,8 @@
             "science": "standard"
         },
         "tradeCredits": true,
-        "tradeCreditsSpecialists": true,
-        "tradeCost": 15,
+        "tradeCreditsSpecialists": false,
+        "tradeCost": 50,
         "tradeScanning": "scanned",
         "populationCap": {
             "enabled": "disabled",
@@ -108,18 +107,22 @@
         },
         "researchCosts": {
             "terraforming": "standard",
-            "experimentation": "standard",
-            "scanning": "standard",
-            "hyperspace": "standard",
+            "experimentation": "cheap",
+            "scanning": "cheap",
+            "hyperspace": "cheap",
             "manufacturing": "standard",
-            "banking": "standard",
-            "weapons": "standard",
-            "specialists": "standard"
+            "banking": "cheap",
+            "weapons": "expensive",
+            "specialists": "expensive"
         },
         "experimentationDistribution": "random",
         "bankingReward": "standard",
-        "experimentationReward": "standard",
-        "specialistTokenReward": "experimental"
+        "experimentationReward": "experimental",
+        "specialistTokenReward": "experimental",
+        "researchCostProgression": {
+            "progression": "exponential",
+            "growthFactor": "medium"
+        }
     },
     "gameTime": {
         "gameType": "realTime",
