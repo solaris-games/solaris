@@ -230,27 +230,25 @@ export class GameContainer {
       this.debugTools = undefined;
     }
 
-    this.map!.reloadGame(game, userSettings);
+    this.map.reloadGame(game, userSettings);
   }
 
   _reloadStar (star: Star) {
     const starObject = this.map!.setupStar(this.game!, this.userSettings!, star)
-    this.map!.drawStar(starObject)
+    this.map.drawStar(starObject)
   }
 
   _reloadCarrier (carrier: Carrier) {
     const carrierObject = this.map!.setupCarrier(this.game, this.userSettings, carrier)
-    this.map!.drawCarrier(carrierObject)
+    this.map.drawCarrier(carrierObject)
   }
 
   _undrawCarrier (carrier: Carrier) {
-    this.map!.undrawCarrier(carrier)
+    this.map.undrawCarrier(carrier)
   }
 
   onTick (ticker: Ticker) {
-    if (this.map) {
-      this.map.onTick(ticker.deltaTime)
-    }
+    this.map.onTick(ticker.deltaTime);
   }
 
   resize () {

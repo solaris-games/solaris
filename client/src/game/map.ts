@@ -396,8 +396,6 @@ export class Map {
   }
 
   reloadGame (game: Game, userSettings: UserGameSettings) {
-    // todo: refresh zoom
-
     this.app.ticker.maxFPS = userSettings.technical.fpsLimit;
 
     this.game = game;
@@ -455,17 +453,19 @@ export class Map {
       this.drawCarrier(existing)
     }
 
-    this.drawTerritories(userSettings)
-    this.drawWormHoles()
-    this.drawPlayerNames()
+    this.drawTerritories(userSettings);
+    this.drawWormHoles();
+    this.drawPlayerNames();
 
     this.background = new Background(game, userSettings, this.context);
-    this.background!.draw()
+    this.background!.draw();
 
-    this.waypoints.setup(game, this.context)
-    this.tooltipLayer!.setup(game, this.context)
+    this.waypoints.setup(game, this.context);
+    this.tooltipLayer!.setup(game, this.context);
 
     this.chunks.update(game, this.stars, this.carriers);
+
+    this.refreshZoom();
   }
 
 
@@ -624,10 +624,7 @@ export class Map {
     if (empireCenter) {
       this.viewport.moveCenter(empireCenter.x, empireCenter.y)
 
-
-      const zoomPercent = this.getViewportZoomPercentage();
-
-      this.refreshZoom(zoomPercent)
+      this.refreshZoom()
     }
   }
 
@@ -731,7 +728,7 @@ export class Map {
     this.lastViewportCenter = this.currentViewportCenter || undefined;
     this.currentViewportCenter = this.viewport.center
 
-    this.zoomPercent = (this.viewport.screenWidth/viewportWidth) * 100
+    this.zoomPercent = this.getViewportZoomPercentage();
 
     const viewportData = {
       center: viewportCenter,
@@ -756,11 +753,11 @@ export class Map {
     this.pathManager!.onTick(this.zoomPercent, this.viewport, zoomChanging)
     this.playerNames!.onTick(this.zoomPercent, zoomChanging)
 
-    this.lastZoomPercent = this.zoomPercent
+    this.lastZoomPercent = this.zoomPercent;
   }
 
   onZoomed () {
-
+    this.refreshZoom();
   }
 
   onViewportPointerDown(e) {
@@ -1012,15 +1009,23 @@ export class Map {
     return (this.viewport.screenWidth / viewportWidth) * 100;
   }
 
-  refreshZoom (zoomPercent: number) {
-    this.zoomPercent = zoomPercent
+  refreshZoom () {
+    const zoomPercent = this.getViewportZoomPercentage();
 
-    this.stars.forEach(s => s.refreshZoom(zoomPercent))
-    this.carriers.forEach(c => c.refreshZoom(zoomPercent))
+    this.stars.forEach(s => s.refreshZoom(zoomPercent));
+    this.carriers.forEach(c => c.refreshZoom(zoomPercent));
 
-    if (this.territories) this.territories.refreshZoom(zoomPercent)
-    if (this.playerNames) this.playerNames.refreshZoom(zoomPercent)
-    if (this.background) this.background.refreshZoom(zoomPercent)
+    if (this.territories) {
+      this.territories.refreshZoom(zoomPercent);
+    }
+
+    if (this.playerNames) {
+      this.playerNames.refreshZoom(zoomPercent);
+    }
+
+    if (this.background) {
+      this.background.refreshZoom(zoomPercent);
+    }
   }
 
   highlightLocation (location: Location, opacity = 1) {
