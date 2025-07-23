@@ -52,7 +52,7 @@
 
     <winner :game="game" v-if="game.state.endDate" />
 
-    <leaderboards :isTeamConquest="isTeamConquest"></leaderboards>
+    <leaderboards :isTeamConquest="isTeamConquest" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"></leaderboards>
 
     <new-player-message />
 

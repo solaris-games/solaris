@@ -50,8 +50,8 @@ const officialGameSettings = [
 ];
 
 const largeGameSettings = carouselGames("32 Player", "sequential", [
-    './game/settings/official/32player_normal',
-    './game/settings/official/32player_ultradark'
+    './game/settings/official/32player_experimental',
+    './game/settings/official/32player_capital_elimination'
 ]);
 
 const relaxedGameSettings = carouselGames("16 Player", "sequential", [

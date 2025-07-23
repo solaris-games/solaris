@@ -13,7 +13,7 @@ import WormHoleLayer from './wormHole'
 import TooltipLayer from './tooltip'
 import type {Store} from "vuex";
 import type {State} from "../store";
-import { type DrawingContext, type GameContainer} from "./container";
+import { type DrawingContext } from "./container";
 import type {Game, Player, Star as StarData, Carrier as CarrierData} from "../types/game";
 import type {Location, MapObject, UserGameSettings} from "@solaris-common";
 import { Chunks } from './chunks'
@@ -22,6 +22,7 @@ import type { EventBus } from '../eventBus'
 import MapEventBusEventNames from '../eventBusEventNames/map'
 import MapCommandEventBusEventNames from "../eventBusEventNames/mapCommand";
 import { createStarHighlight } from './highlight'
+import {Viewport} from 'pixi-viewport'
 
 export enum ModeKind {
   Galaxy = 'galaxy',
@@ -55,8 +56,8 @@ export class Map {
   app: PIXI.Application;
   store: Store<State>;
   context: DrawingContext;
-  gameContainer: GameContainer;
   container: PIXI.Container;
+  viewport: Viewport;
   stars: Star[];
   carriers: Carrier[];
   pathManager: PathManager;
@@ -72,7 +73,7 @@ export class Map {
   rulerPointContainer: PIXI.Container ;
   highlightLocationsContainer: PIXI.Container ;
   tooltipContainer: PIXI.Container ;
-  game: Game ;
+  game: Game;
   userSettings: UserGameSettings ;
   waypoints: Waypoints ;
   rulerPoints: RulerPoints ;
@@ -89,11 +90,11 @@ export class Map {
   galaxyCenterGraphics: PIXI.Graphics | undefined;
   unsubscribe: (() => void) | undefined;
 
-  constructor (app: PIXI.Application, store: Store<State>, gameContainer, context: DrawingContext, eventBus: EventBus, game: Game, userSettings: UserGameSettings) {
+  constructor (app: PIXI.Application, store: Store<State>, viewport: Viewport, context: DrawingContext, eventBus: EventBus, game: Game, userSettings: UserGameSettings) {
     this.app = app
     this.store = store
     this.context = context
-    this.gameContainer = gameContainer;
+    this.viewport = viewport;
     this.container = new PIXI.Container()
     this.container.sortableChildren = true
     this.eventBus = eventBus;
@@ -397,14 +398,14 @@ export class Map {
   reloadGame (game: Game, userSettings: UserGameSettings) {
     this.app.ticker.maxFPS = userSettings.technical.fpsLimit;
 
-    this.game = game
+    this.game = game;
 
-    this.pathManager.update(game, userSettings)
+    this.pathManager.update(game, userSettings);
 
     // Check for stars that are no longer in scanning range.
     for (let i = 0; i < this.stars.length; i++) {
-      let star = this.stars[i]
-      let gameStar = gameHelper.getStarById(game, star.data._id)
+      const star = this.stars[i]
+      const gameStar = gameHelper.getStarById(game, star.data._id)
 
       if (!gameStar) {
         this._undrawStar(star)
@@ -414,8 +415,8 @@ export class Map {
 
     // Check for carriers that are no longer in scanning range or have been destroyed.
     for (let i = 0; i < this.carriers.length; i++) {
-      let carrier = this.carriers[i]
-      let gameCarrier = gameHelper.getCarrierById(game, carrier.data!._id)
+      const carrier = this.carriers[i]
+      const gameCarrier = gameHelper.getCarrierById(game, carrier.data!._id)
 
       if (!gameCarrier) {
         this._undrawCarrier(carrier)
@@ -425,7 +426,7 @@ export class Map {
 
     // Update all of the stars and add any newly discovered ones.
     for (let i = 0; i < game.galaxy.stars.length; i++) {
-      let starData = game.galaxy.stars[i]
+      const starData = game.galaxy.stars[i]
       let existing = this.stars.find(x => x.data._id === starData._id)
 
       if (existing) {
@@ -439,7 +440,7 @@ export class Map {
 
     // Update all of the carriers and add new ones that have been built.
     for (let i = 0; i < game.galaxy.carriers.length; i++) {
-      let carrierData = game.galaxy.carriers[i]
+      const carrierData = game.galaxy.carriers[i]
 
       let existing = this.carriers.find(x => x.data!._id === carrierData._id)
 
@@ -452,17 +453,19 @@ export class Map {
       this.drawCarrier(existing)
     }
 
-    this.drawTerritories(userSettings)
-    this.drawWormHoles()
-    this.drawPlayerNames()
+    this.drawTerritories(userSettings);
+    this.drawWormHoles();
+    this.drawPlayerNames();
 
     this.background = new Background(game, userSettings, this.context);
-    this.background!.draw()
+    this.background!.draw();
 
-    this.waypoints.setup(game, this.context)
-    this.tooltipLayer!.setup(game, this.context)
+    this.waypoints.setup(game, this.context);
+    this.tooltipLayer!.setup(game, this.context);
 
     this.chunks.update(game, this.stars, this.carriers);
+
+    this.refreshZoom();
   }
 
 
@@ -619,12 +622,9 @@ export class Map {
     const empireCenter = gameHelper.getPlayerEmpireCenter(game, player)
 
     if (empireCenter) {
-      this.gameContainer.viewport!.moveCenter(empireCenter.x, empireCenter.y)
+      this.viewport.moveCenter(empireCenter.x, empireCenter.y)
 
-
-      const zoomPercent = this.gameContainer.getViewportZoomPercentage()
-
-      this.refreshZoom(zoomPercent)
+      this.refreshZoom()
     }
   }
 
@@ -655,7 +655,7 @@ export class Map {
   }
 
   panToLocation (location: Location) {
-    this.gameContainer.viewport!.moveCenter(location.x, location.y)
+    this.viewport.moveCenter(location.x, location.y)
   }
 
   clickStar (starId: string) {
@@ -716,19 +716,19 @@ export class Map {
     this.waypoints!.clear();
   }
 
-  onTick(deltaTime) {
-    const viewportWidth = this.gameContainer.viewport!.right - this.gameContainer.viewport!.left
-    const viewportHeight = this.gameContainer.viewport!.bottom - this.gameContainer.viewport!.top
+  onTick(deltaTime: number) {
+    const viewportWidth = this.viewport.right - this.viewport.left;
+    const viewportHeight = this.viewport.bottom - this.viewport.top;
 
     const viewportXRadius = viewportWidth / 2.0
     const viewportYRadius = viewportHeight / 2.0
 
-    const viewportCenter = this.gameContainer.viewport!.center
+    const viewportCenter = this.viewport.center
 
     this.lastViewportCenter = this.currentViewportCenter || undefined;
-    this.currentViewportCenter = this.gameContainer.viewport!.center
+    this.currentViewportCenter = this.viewport.center
 
-    this.zoomPercent = (this.gameContainer.viewport!.screenWidth/viewportWidth) * 100
+    this.zoomPercent = this.getViewportZoomPercentage();
 
     const viewportData = {
       center: viewportCenter,
@@ -736,7 +736,7 @@ export class Map {
       yradius: viewportYRadius
     }
 
-    this.background!.onTick(deltaTime, viewportData)
+    this.background!.onTick(deltaTime, viewportData);
 
     //chunk culling
 
@@ -744,16 +744,20 @@ export class Map {
     const zoomChanging = Math.abs(this.zoomPercent-this.lastZoomPercent) > (1.0/128.0)
 
     this.chunks!.onTick(positionChanging, zoomChanging, this.zoomPercent, {
-      left: this.gameContainer.viewport!.left,
-      right: this.gameContainer.viewport!.right,
-      top: this.gameContainer.viewport!.top,
-      bottom: this.gameContainer.viewport!.bottom,
+      left: this.viewport.left,
+      right: this.viewport.right,
+      top: this.viewport.top,
+      bottom: this.viewport.bottom,
     });
 
-    this.pathManager!.onTick(this.zoomPercent, this.gameContainer.viewport, zoomChanging)
+    this.pathManager!.onTick(this.zoomPercent, this.viewport, zoomChanging)
     this.playerNames!.onTick(this.zoomPercent, zoomChanging)
 
-    this.lastZoomPercent = this.zoomPercent
+    this.lastZoomPercent = this.zoomPercent;
+  }
+
+  onZoomed () {
+    this.refreshZoom();
   }
 
   onViewportPointerDown(e) {
@@ -804,7 +808,7 @@ export class Map {
     } else if (this.mode.mode === ModeKind.Ruler) {
       this.rulerPoints.onStarClicked(e)
     }
-    AnimationService.drawSelectedCircle(this.gameContainer.app!, this.container, e.location)
+    AnimationService.drawSelectedCircle(this.app, this.container, e.location)
   }
 
   onStarDefaultClicked (dic) {
@@ -869,7 +873,7 @@ export class Map {
       this.rulerPoints.onCarrierClicked(e)
     }
 
-    AnimationService.drawSelectedCircle(this.gameContainer.app!, this.container, e.location)
+    AnimationService.drawSelectedCircle(this.app, this.container, e.location)
   }
 
   onCarrierRightClicked (e) {
@@ -1000,15 +1004,28 @@ export class Map {
     return false
   }
 
-  refreshZoom (zoomPercent: number) {
-    this.zoomPercent = zoomPercent
+  getViewportZoomPercentage () {
+    const viewportWidth = this.viewport.right - this.viewport.left;
+    return (this.viewport.screenWidth / viewportWidth) * 100;
+  }
 
-    this.stars.forEach(s => s.refreshZoom(zoomPercent))
-    this.carriers.forEach(c => c.refreshZoom(zoomPercent))
+  refreshZoom () {
+    const zoomPercent = this.getViewportZoomPercentage();
 
-    if (this.territories) this.territories.refreshZoom(zoomPercent)
-    if (this.playerNames) this.playerNames.refreshZoom(zoomPercent)
-    if (this.background) this.background.refreshZoom(zoomPercent)
+    this.stars.forEach(s => s.refreshZoom(zoomPercent));
+    this.carriers.forEach(c => c.refreshZoom(zoomPercent));
+
+    if (this.territories) {
+      this.territories.refreshZoom(zoomPercent);
+    }
+
+    if (this.playerNames) {
+      this.playerNames.refreshZoom(zoomPercent);
+    }
+
+    if (this.background) {
+      this.background.refreshZoom(zoomPercent);
+    }
   }
 
   highlightLocation (location: Location, opacity = 1) {

@@ -48,6 +48,7 @@ import { useStore, type Store } from 'vuex';
 import {makeConfirm} from "@/util/confirm";
 import { upgradeEconomy as upgradeEconomyReq, upgradeIndustry as upgradeIndustryReq, upgradeScience as upgradeScienceReq } from '@/services/typedapi/star';
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
+import {makeUpgrade} from "@/views/game/components/star/upgrade";
 
 const props = defineProps<{
   star: Star<string>,
@@ -89,75 +90,11 @@ const clickStar = () => emit('onOpenStarDetailRequested', props.star._id);
 
 const goToStar = () => eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToLocation, { location: props.star.location });
 
-const upgradeEconomy = async () => {
-  if (store.state.settings.star.confirmBuildEconomy === 'enabled' && !await confirm('Upgrade Economy', `Are you sure you want to upgrade Economy at ${props.star.name} for $${props.star.upgradeCosts!.economy} credits?`)) {
-    return;
-  }
+const upgrade = makeUpgrade(store, toast, props.star);
 
-  isUpgradingEconomy.value = true;
-
-  const response = await upgradeEconomyReq(httpClient)(store.state.game._id, props.star._id);
-
-  if (isOk(response)) {
-    store.commit('gameStarEconomyUpgraded', response.data);
-
-    toast.default(`Economy upgraded at ${props.star.name}.`);
-
-    AudioService.hover();
-  } else {
-    console.error(formatError(response));
-    toast.error("Failed to upgrade economy");
-  }
-
-  isUpgradingEconomy.value = false;
-};
-
-const upgradeIndustry = async () => {
-  if (store.state.settings.star.confirmBuildindustry === 'enabled' && !await confirm('Upgrade industry', `Are you sure you want to upgrade industry at ${props.star.name} for $${props.star.upgradeCosts!.industry} credits?`)) {
-    return;
-  }
-
-  isUpgradingIndustry.value = true;
-
-  const response = await upgradeIndustryReq(httpClient)(store.state.game._id, props.star._id);
-
-  if (isOk(response)) {
-    store.commit('gameStarIndustryUpgraded', response.data);
-
-    toast.default(`industry upgraded at ${props.star.name}.`);
-
-    AudioService.hover();
-  } else {
-    console.error(formatError(response));
-    toast.error("Failed to upgrade industry");
-  }
-
-  isUpgradingIndustry.value = false;
-};
-
-const upgradeScience = async () => {
-  if (store.state.settings.star.confirmBuildscience === 'enabled' && !await confirm('Upgrade science', `Are you sure you want to upgrade science at ${props.star.name} for $${props.star.upgradeCosts!.science} credits?`)) {
-    return;
-  }
-
-  isUpgradingScience.value = true;
-
-  const response = await upgradeScienceReq(httpClient)(store.state.game._id, props.star._id);
-
-  if (isOk(response)) {
-    store.commit('gameStarScienceUpgraded', response.data);
-
-    toast.default(`science upgraded at ${props.star.name}.`);
-
-    AudioService.hover();
-  } else {
-    console.error(formatError(response));
-    toast.error("Failed to upgrade science");
-  }
-
-  isUpgradingScience.value = false;
-};
-
+const upgradeEconomy = upgrade('economy', store.state.settings.star.confirmBuildEconomy === 'enabled', isUpgradingEconomy, 'gameStarEconomyUpgraded', upgradeEconomyReq(httpClient));
+const upgradeIndustry = upgrade('industry', store.state.settings.star.confirmBuildIndustry === 'enabled', isUpgradingIndustry, 'gameStarIndustryUpgraded', upgradeIndustryReq(httpClient));
+const upgradeScience = upgrade('science', store.state.settings.star.confirmBuildScience === 'enabled', isUpgradingScience, 'gameStarScienceUpgraded', upgradeScienceReq(httpClient));
 </script>
 
 <style scoped>

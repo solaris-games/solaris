@@ -47,7 +47,7 @@ const emit = defineEmits<{
   onOpenPurchasePlayerBadgeRequested: [playerId: string]
 }>();
 
-const isLoading = ref(true);
+const isLoading = ref(false);
 
 const allBadges: Ref<TBadge[]> = ref([]);
 
@@ -69,6 +69,8 @@ const isFinished = computed(() => GameHelper.isGameFinished(game.value));
 
 const canPurchaseBadges = computed(() => (!isExtraAnonymity.value || isFinished.value) && userPlayer.value && userPlayer.value._id !== player.value!._id);
 
+const canViewBadges = computed(() => player.value && (!isExtraAnonymity.value));
+
 const onOpenPurchasePlayerBadgeRequested = () => {
   if (canPurchaseBadges.value) {
     emit('onOpenPurchasePlayerBadgeRequested', props.playerId);
@@ -78,9 +80,13 @@ const onOpenPurchasePlayerBadgeRequested = () => {
 const httpClient: Axios = inject(httpInjectionKey)!;
 
 onMounted(async () => {
-  isLoading.value = true
-
   allBadges.value = await store.dispatch('getBadges');
+
+  if (!canViewBadges.value) {
+    return;
+  }
+
+  isLoading.value = true
 
   try {
     const response = await getBadgesForPlayer(httpClient)(game.value._id, props.playerId)

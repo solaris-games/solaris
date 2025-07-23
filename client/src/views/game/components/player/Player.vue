@@ -30,23 +30,9 @@
 
     <research v-if="player && player.research" :playerId="player._id"/>
 
-    <loading-spinner :loading="Boolean(player && !player.isOpenSlot && !user)"/>
+    <loading-spinner :loading="isLoading" />
 
-    <h4 class="mt-2" v-if="canViewAchievements">Achievements</h4>
-
-    <achievements v-if="canViewAchievements && user"
-                    :level="user.achievements.level"
-                    :victories="user.achievements.victories"
-                    :rank="user.achievements.rank"
-                    :renown="user.achievements.renown"/>
-
-    <sendRenown v-if="userPlayer && player && canSendRenown" :player="player" :userPlayer="userPlayer" />
-
-    <h4 class="mt-2" v-if="canAwardBadge">Badges</h4>
-
-    <player-badges v-if="player"
-      :playerId="player._id"
-      @onOpenPurchasePlayerBadgeRequested="onOpenPurchasePlayerBadgeRequested"/>
+    <player-user-info v-if="player && !isLoading" :game="game" :player="player" :user="user" :userPlayer="userPlayer" @onOpenPurchasePlayerBadgeRequested="onOpenPurchasePlayerBadgeRequested" />
 
     <player-report
       v-if="player && player.isRealUser && userPlayer && player !== userPlayer"
@@ -56,15 +42,11 @@
 </template>
 
 <script setup lang="ts">
-import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import MenuTitle from '../MenuTitle.vue'
 import Overview from './Overview.vue'
 import Infrastructure from '../shared/Infrastructure.vue'
 import YourInfrastructure from './YourInfrastructure.vue'
 import Research from './Research.vue'
-import Achievements from './Achievements.vue'
-import SendRenown from './SendRenown.vue'
-import PlayerBadges from '../badges/PlayerBadges.vue'
 import EloRating from './EloRating.vue'
 import PlayerReport from './PlayerReport.vue'
 import gameService from '../../../../services/api/game'
@@ -75,6 +57,8 @@ import { inject, ref, computed, type Ref, onMounted } from 'vue';
 import type { Player, UserPublic } from '@solaris-common'
 import { useStore, type Store } from 'vuex';
 import type { State } from "@/store";
+import PlayerUserInfo from "@/views/game/components/player/PlayerUserInfo.vue";
+import LoadingSpinner from "@/views/components/LoadingSpinner.vue";
 
 const props = defineProps<{
   playerId: string,
@@ -94,13 +78,18 @@ const eventBus = inject(eventBusInjectionKey)!;
 
 const store: Store<State> = useStore();
 
+const isLoading = ref(false);
 const player: Ref<Player<string> | null> = ref(null);
 const user: Ref<UserPublic<string> | null> = ref(null);
 const userPlayer: Ref<Player<string> | null> = ref(null);
 const leaderboard: Ref<Player<string>[] | null> = ref(null);
 const playerIndex = ref(0);
 
+const game = computed(() => store.state.game!);
+
 onMounted(async () => {
+  isLoading.value = true;
+
   player.value = GameHelper.getPlayerById(store.state.game, props.playerId) || null;
   userPlayer.value = GameHelper.getUserPlayer(store.state.game) || null;
   playerIndex.value = store.state.game.galaxy.players.indexOf(player.value);
@@ -117,25 +106,19 @@ onMounted(async () => {
         console.error(err)
       }
     }
+
+  isLoading.value = false;
 });
 
-const isGameFinished = computed(() => GameHelper.isGameFinished(store.state.game));
-const isGameStarted = computed(() => GameHelper.isGameStarted(store.state.game));
-const isAnonymousGame = computed(() => store.state.game.settings.general.anonymity === 'extra');
 const is1v1Game = computed(() =>GameHelper.is1v1Game(store.state.game));
-const canViewAchievements = computed(() => player.value && player.value.isRealUser && user.value && user.value.achievements);
-const playerIsUser = computed(() => player.value && userPlayer.value && userPlayer.value._id !== player.value._id);
-const canSendRenown = computed(() => player.value && isGameStarted.value && player.value.isRealUser && userPlayer.value && !playerIsUser.value && (!isAnonymousGame.value || isGameFinished.value));
-const canAwardBadge = computed(() => player.value && player.value.isRealUser && userPlayer.value && !playerIsUser.value);
-
 const onCloseRequested = () => emit('onCloseRequested');
 const onViewCompareIntelRequested = (playerId: string) => emit('onViewCompareIntelRequested', playerId);
 const onViewColourOverrideRequested = (playerId: string) => emit('onViewColourOverrideRequested', playerId);
 const onOpenTradeRequested = () => emit('onOpenTradeRequested', props.playerId);
-const onOpenPurchasePlayerBadgeRequested = () => emit('onOpenPurchasePlayerBadgeRequested', props.playerId);
 const onOpenReportPlayerRequested = () => emit('onOpenReportPlayerRequested', props.playerId);
 const panToPlayer = () => eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, { player: player.value! });
 const onOpenPlayerDetailRequested = (player: Player<string>) => emit('onOpenPlayerDetailRequested', player._id);
+const onOpenPurchasePlayerBadgeRequested = () => emit('onOpenPurchasePlayerBadgeRequested', props.playerId);
 
 const onOpenPrevPlayerDetailRequested = () => {
   let prevLeaderboardIndex = leaderboard.value!.indexOf(player.value!) - 1;

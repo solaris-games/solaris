@@ -92,12 +92,12 @@ export class GameContainer {
     })
 
     // add the viewport to the stage
-    this.app!.stage.addChild(this.viewport)
+    this.app!.stage.addChild(this.viewport);
 
     this.game = store.state.game!;
 
     // Add a new map to the viewport
-    this.map = new Map(this.app, this.store, this, this.context!, eventBus, this.game!, userSettings);
+    this.map = new Map(this.app, this.store, this.viewport, this.context, eventBus, this.game!, userSettings);
     this.viewport.addChild(this.map.container)
 
     this.subscribe();
@@ -127,7 +127,7 @@ export class GameContainer {
   }
 
   subscribe () {
-    const onGameReload = () => this._reloadGame();
+    const onGameReload = () => this.reloadGame(this.store.state.game!, this.store.state.settings!);
     const onStarReload = ({ star }: { star: Star }) => this._reloadStar(star);
     const onCarrierReload = ({ carrier }: { carrier: Carrier }) => this._reloadCarrier(carrier);
     const onCarrierRemove = ({ carrier }: { carrier: Carrier }) => this._undrawCarrier(carrier);
@@ -206,24 +206,16 @@ export class GameContainer {
         maxHeight,
       })
 
-    this.viewport!.on('zoomed-end', this.onViewportZoomed.bind(this))
-    this.viewport!.on('pointerdown', this.map!.onViewportPointerDown.bind(this.map))
+    this.viewport!.on('zoomed-end', this.map.onZoomed.bind(this.map))
+    this.viewport!.on('pointerdown', this.map.onViewportPointerDown.bind(this.map))
   }
 
   draw () {
     this.map!.draw()
 
-    const zoomPercent = this.getViewportZoomPercentage()
-
-    this.map!.refreshZoom(zoomPercent)
-
     if (this.debugTools) {
       this.debugTools.draw();
     }
-  }
-
-  _reloadGame() {
-    this.reloadGame(this.store!.state.game, this.store!.state.settings);
   }
 
   reloadGame (game: Game, userSettings: UserGameSettings) {
@@ -238,38 +230,25 @@ export class GameContainer {
       this.debugTools = undefined;
     }
 
-    this.map!.reloadGame(game, userSettings)
+    this.map.reloadGame(game, userSettings);
   }
 
   _reloadStar (star: Star) {
     const starObject = this.map!.setupStar(this.game!, this.userSettings!, star)
-    this.map!.drawStar(starObject)
+    this.map.drawStar(starObject)
   }
 
   _reloadCarrier (carrier: Carrier) {
     const carrierObject = this.map!.setupCarrier(this.game, this.userSettings, carrier)
-    this.map!.drawCarrier(carrierObject)
+    this.map.drawCarrier(carrierObject)
   }
 
   _undrawCarrier (carrier: Carrier) {
-    this.map!.undrawCarrier(carrier)
-  }
-
-  getViewportZoomPercentage () {
-    const viewportWidth = this.viewport!.right - this.viewport!.left
-    return (this.viewport!.screenWidth / viewportWidth) * 100
+    this.map.undrawCarrier(carrier)
   }
 
   onTick (ticker: Ticker) {
-    if (this.map) {
-      this.map.onTick(ticker.deltaTime)
-    }
-  }
-
-  onViewportZoomed () {
-    const zoomPercent = this.getViewportZoomPercentage()
-
-    this.map!.refreshZoom(zoomPercent)
+    this.map.onTick(ticker.deltaTime);
   }
 
   resize () {
