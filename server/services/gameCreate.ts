@@ -127,7 +127,7 @@ export default class GameCreateService {
             }
 
             if (isAdvancedCustomGalaxy) {
-                if (settings.general.mode = 'teamConquest') {
+                if (settings.general.mode === 'teamConquest') {
                     settings.conquest.teamsCount = settings.galaxy.customGalaxy!.teams!.length;
                     // TODO: This should just be set by the client; we no longer need to use maxAlliances in team games.
                     settings.diplomacy.maxAlliances = settings.galaxy.customGalaxy!.players!.length - 1;
@@ -378,16 +378,16 @@ export default class GameCreateService {
         // Create the galaxy.
         if (isCustomGalaxy) {
             if (isAdvancedCustomGalaxy) {
-                const generatedPlayers = this.customGalaxyService.generatePlayers(game);
+                const generatedPlayers = this.customGalaxyService.generatePlayers(game, settings.galaxy.customGalaxy!);
 
-                const generatedStars = this.customGalaxyService.generateStarsAdvanced(game, generatedPlayers);
+                const generatedStars = this.customGalaxyService.generateStarsAdvanced(game, generatedPlayers, settings.galaxy.customGalaxy!);
 
                 game.galaxy.players = Array.from(generatedPlayers.values());
                 game.galaxy.stars = Array.from(generatedStars.values());
-                game.galaxy.carriers = this.customGalaxyService.generateCarriers(game, generatedPlayers, generatedStars);
+                game.galaxy.carriers = this.customGalaxyService.generateCarriers(game, generatedPlayers, generatedStars, settings.galaxy.customGalaxy!);
 
             } else {
-                const starGeneration = this.customGalaxyService.generateStars(game);
+                const starGeneration = this.customGalaxyService.generateStars(game, settings.galaxy.customGalaxy!);
 
                 game.galaxy.stars = starGeneration.stars;
                 game.galaxy.homeStars = starGeneration.homeStarIds;

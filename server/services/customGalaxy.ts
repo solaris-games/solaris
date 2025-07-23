@@ -7,7 +7,7 @@ import SpecialistService from "./specialist";
 import TeamService from "./team";
 import { Carrier } from "./types/Carrier";
 import { CarrierWaypoint } from "./types/CarrierWaypoint";
-import { CustomGalaxyCarrier, CustomGalaxyStar } from "./types/CustomGalaxy";
+import {CustomGalaxy, CustomGalaxyCarrier, CustomGalaxyStar} from "./types/CustomGalaxy";
 import { DBObjectId } from "./types/DBObjectId";
 import { Game, GameSettings, Team } from "./types/Game";
 import { Location } from "./types/Location";
@@ -222,8 +222,7 @@ export default class CustomGalaxyService {
         }
     }
 
-    generatePlayers(game: Game) {
-        const customGalaxy = game.settings.galaxy.customGalaxy!;
+    generatePlayers(game: Game, customGalaxy: CustomGalaxy) {
         const generatedPlayers = new Map<string, Player>();
 
         if (game.settings.general.mode === 'teamConquest') {
@@ -300,8 +299,7 @@ export default class CustomGalaxyService {
         return generatedPlayers;
     }
 
-    generateStarsAdvanced(game: Game, generatedPlayers: Map<string, Player>) {
-        const customGalaxy = game.settings.galaxy.customGalaxy!;
+    generateStarsAdvanced(game: Game, generatedPlayers: Map<string, Player>, customGalaxy: CustomGalaxy) {
         const generatedStars = new Map<string, Star>();
 
         const starNames = this.nameService.getRandomStarNames(customGalaxy.stars.length);
@@ -312,6 +310,10 @@ export default class CustomGalaxyService {
 
             if (customStar.playerId != null) {
                 star.ownedByPlayerId = generatedPlayers.get(customStar.playerId)!._id;
+
+                if (customStar.homeStar) {
+                    generatedPlayers.get(customStar.playerId)!.homeStarId = star._id;
+                }
             }
 
             generatedStars.set(customStar.id, star);
@@ -329,8 +331,7 @@ export default class CustomGalaxyService {
         return generatedStars;
     }
 
-    generateCarriers(game: Game, generatedPlayers: Map<string, Player>, generatedStars: Map<string, Star>) {
-        const customGalaxy = game.settings.galaxy.customGalaxy!;
+    generateCarriers(game: Game, generatedPlayers: Map<string, Player>, generatedStars: Map<string, Star>, customGalaxy: CustomGalaxy) {
         const carriers: Carrier[] = [];
 
         if (!customGalaxy.carriers) return carriers;
@@ -372,8 +373,7 @@ export default class CustomGalaxyService {
         return carriers;
     }
 
-    generateStars(game: Game) {
-        const customGalaxy = game.settings.galaxy.customGalaxy!;
+    generateStars(game: Game, customGalaxy: CustomGalaxy) {
         const generatedStars = new Map<string, Star>();
         const homeStarIds: any[] = [];
         const linkedStarIds: any[] = [];
