@@ -310,6 +310,10 @@ export default class CustomGalaxyService {
 
             if (customStar.playerId != null) {
                 star.ownedByPlayerId = generatedPlayers.get(customStar.playerId)!._id;
+
+                if (customStar.homeStar) {
+                    generatedPlayers.get(customStar.playerId)!.homeStarId = star._id;
+                }
             }
 
             generatedStars.set(customStar.id, star);
