@@ -127,7 +127,7 @@ export default class GameCreateService {
             }
 
             if (isAdvancedCustomGalaxy) {
-                if (settings.general.mode = 'teamConquest') {
+                if (settings.general.mode === 'teamConquest') {
                     settings.conquest.teamsCount = settings.galaxy.customGalaxy!.teams!.length;
                     // TODO: This should just be set by the client; we no longer need to use maxAlliances in team games.
                     settings.diplomacy.maxAlliances = settings.galaxy.customGalaxy!.players!.length - 1;
