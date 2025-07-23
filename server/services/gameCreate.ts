@@ -378,16 +378,16 @@ export default class GameCreateService {
         // Create the galaxy.
         if (isCustomGalaxy) {
             if (isAdvancedCustomGalaxy) {
-                const generatedPlayers = this.customGalaxyService.generatePlayers(game);
+                const generatedPlayers = this.customGalaxyService.generatePlayers(game, settings.galaxy.customGalaxy!);
 
-                const generatedStars = this.customGalaxyService.generateStarsAdvanced(game, generatedPlayers);
+                const generatedStars = this.customGalaxyService.generateStarsAdvanced(game, generatedPlayers, settings.galaxy.customGalaxy!);
 
                 game.galaxy.players = Array.from(generatedPlayers.values());
                 game.galaxy.stars = Array.from(generatedStars.values());
-                game.galaxy.carriers = this.customGalaxyService.generateCarriers(game, generatedPlayers, generatedStars);
+                game.galaxy.carriers = this.customGalaxyService.generateCarriers(game, generatedPlayers, generatedStars, settings.galaxy.customGalaxy!);
 
             } else {
-                const starGeneration = this.customGalaxyService.generateStars(game);
+                const starGeneration = this.customGalaxyService.generateStars(game, settings.galaxy.customGalaxy!);
 
                 game.galaxy.stars = starGeneration.stars;
                 game.galaxy.homeStars = starGeneration.homeStarIds;
