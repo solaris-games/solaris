@@ -72,8 +72,8 @@ export class GameContainer {
     this.app = app;
     this.userSettings = userSettings;
 
-    this.app!.ticker.add(this.onTick.bind(this))
-    this.app!.ticker.maxFPS = 0
+    this.app.ticker.add(this.onTick.bind(this));
+    this.app.ticker.maxFPS = 0;
 
     // create viewport
     this.viewport = new Viewport({
@@ -97,7 +97,7 @@ export class GameContainer {
     this.game = store.state.game!;
 
     // Add a new map to the viewport
-    this.map = new Map(this.app, this.viewport, this.context, eventBus, this.game!, userSettings);
+    this.map = new Map(this.app, this.viewport, this.context, eventBus, this.game, userSettings);
     this.viewport.addChild(this.map.container);
 
     this.subscribe();
@@ -130,33 +130,33 @@ export class GameContainer {
     const onGameReload = () => this.reloadGame(this.store.state.game!, this.store.state.settings!);
     const onStarReload = ({ star }: { star: Star }) => this._reloadStar(star);
     const onCarrierReload = ({ carrier }: { carrier: Carrier }) => this._reloadCarrier(carrier);
-    const onCarrierRemove = ({ carrier }: { carrier: Carrier }) => this._undrawCarrier(carrier);
+    const onCarrierRemove = ({ carrier }: { carrier: Carrier }) => this.map.undrawCarrier(carrier);
     const onFitGalaxy = ({ location }: { location?: Location }) => this._fitGalaxy(location?.x, location?.y);
     const zoomIn = () => this._zoomIn();
     const zoomOut = () => this._zoomOut();
 
-    this.eventBus!.on(GameCommandEventBusEventNames.GameCommandReloadGame, onGameReload);
-    this.eventBus!.on(GameCommandEventBusEventNames.GameCommandReloadStar, onStarReload);
-    this.eventBus!.on(GameCommandEventBusEventNames.GameCommandReloadCarrier, onCarrierReload);
-    this.eventBus!.on(GameCommandEventBusEventNames.GameCommandRemoveCarrier, onCarrierRemove);
-    this.eventBus!.on(MapCommandEventBusEventNames.MapCommandFitGalaxy, onFitGalaxy);
-    this.eventBus!.on(MapCommandEventBusEventNames.MapCommandZoomIn, zoomIn);
-    this.eventBus!.on(MapCommandEventBusEventNames.MapCommandZoomOut, zoomOut);
+    this.eventBus.on(GameCommandEventBusEventNames.GameCommandReloadGame, onGameReload);
+    this.eventBus.on(GameCommandEventBusEventNames.GameCommandReloadStar, onStarReload);
+    this.eventBus.on(GameCommandEventBusEventNames.GameCommandReloadCarrier, onCarrierReload);
+    this.eventBus.on(GameCommandEventBusEventNames.GameCommandRemoveCarrier, onCarrierRemove);
+    this.eventBus.on(MapCommandEventBusEventNames.MapCommandFitGalaxy, onFitGalaxy);
+    this.eventBus.on(MapCommandEventBusEventNames.MapCommandZoomIn, zoomIn);
+    this.eventBus.on(MapCommandEventBusEventNames.MapCommandZoomOut, zoomOut);
 
 
     this.unsubscribe = () => {
-      this.eventBus!.off(GameCommandEventBusEventNames.GameCommandReloadGame, onGameReload);
-      this.eventBus!.off(GameCommandEventBusEventNames.GameCommandReloadStar, onStarReload);
-      this.eventBus!.off(GameCommandEventBusEventNames.GameCommandReloadCarrier, onCarrierReload);
-      this.eventBus!.off(GameCommandEventBusEventNames.GameCommandRemoveCarrier, onCarrierRemove);
-      this.eventBus!.off(MapCommandEventBusEventNames.MapCommandFitGalaxy, onFitGalaxy);
-      this.eventBus!.off(MapCommandEventBusEventNames.MapCommandZoomIn, zoomIn);
-      this.eventBus!.off(MapCommandEventBusEventNames.MapCommandZoomOut, zoomOut);
+      this.eventBus.off(GameCommandEventBusEventNames.GameCommandReloadGame, onGameReload);
+      this.eventBus.off(GameCommandEventBusEventNames.GameCommandReloadStar, onStarReload);
+      this.eventBus.off(GameCommandEventBusEventNames.GameCommandReloadCarrier, onCarrierReload);
+      this.eventBus.off(GameCommandEventBusEventNames.GameCommandRemoveCarrier, onCarrierRemove);
+      this.eventBus.off(MapCommandEventBusEventNames.MapCommandFitGalaxy, onFitGalaxy);
+      this.eventBus.off(MapCommandEventBusEventNames.MapCommandZoomIn, zoomIn);
+      this.eventBus.off(MapCommandEventBusEventNames.MapCommandZoomOut, zoomOut);
     }
   }
 
   destroy () {
-    console.warn('Destroying game container')
+    console.warn('Destroying game container');
 
     if (this.unsubscribe) {
       this.unsubscribe();
@@ -171,11 +171,11 @@ export class GameContainer {
   }
 
   _zoomIn () {
-    this.viewport!.zoomPercent(0.5, true)
+    this.viewport.zoomPercent(0.5, true)
   }
 
   _zoomOut () {
-    this.viewport!.zoomPercent(-0.3, true)
+    this.viewport.zoomPercent(-0.3, true)
   }
 
   _setupViewport () {
@@ -188,10 +188,10 @@ export class GameContainer {
     const maxWidth = 2 * Math.abs(this.starFieldLeft) + Math.abs(this.starFieldRight);
     const maxHeight = 2 * Math.abs(this.starFieldBottom) + Math.abs(this.starFieldTop);
 
-    this.viewport!.resize(window.innerWidth, window.innerHeight, maxWidth, maxHeight)
+    this.viewport.resize(window.innerWidth, window.innerHeight, maxWidth, maxHeight)
 
     // activate plugins
-    this.viewport!
+    this.viewport
       .drag()
       .pinch()
       .wheel({
@@ -211,7 +211,7 @@ export class GameContainer {
   }
 
   draw () {
-    this.map!.draw()
+    this.map.draw()
 
     if (this.debugTools) {
       this.debugTools.draw();
@@ -234,17 +234,13 @@ export class GameContainer {
   }
 
   _reloadStar (star: Star) {
-    const starObject = this.map!.setupStar(this.game!, this.userSettings!, star)
-    this.map.drawStar(starObject)
+    const starObject = this.map.setupStar(this.game, this.userSettings, star);
+    this.map.drawStar(starObject);
   }
 
   _reloadCarrier (carrier: Carrier) {
-    const carrierObject = this.map!.setupCarrier(this.game, this.userSettings, carrier)
-    this.map.drawCarrier(carrierObject)
-  }
-
-  _undrawCarrier (carrier: Carrier) {
-    this.map.undrawCarrier(carrier)
+    const carrierObject = this.map.setupCarrier(this.game, this.userSettings, carrier);
+    this.map.drawCarrier(carrierObject);
   }
 
   onTick (ticker: Ticker) {
@@ -252,16 +248,12 @@ export class GameContainer {
   }
 
   resize () {
-    if (!this.app) {
-      return;
-    }
-
     this.app.renderer.resize(
       window.innerWidth,
       window.innerHeight
     )
 
-    this.viewport!.resize(
+    this.viewport.resize(
       window.innerWidth,
       window.innerHeight,
       Number.MAX_VALUE,
@@ -273,8 +265,8 @@ export class GameContainer {
     x = x || 0;
     y = y || 0;
 
-    this.viewport!.moveCenter(x, y)
-    this.viewport!.fitWorld()
-    this.viewport!.zoom(this.starFieldRight, true)
+    this.viewport.moveCenter(x, y)
+    this.viewport.fitWorld()
+    this.viewport.zoom(this.starFieldRight, true)
   }
 }
