@@ -11,8 +11,6 @@ import PathManager from './PathManager'
 import OrbitalLocationLayer from './orbital'
 import WormHoleLayer from './wormHole'
 import TooltipLayer from './tooltip'
-import type {Store} from "vuex";
-import type {State} from "../store";
 import { type DrawingContext } from "./container";
 import type {Game, Player, Star as StarData, Carrier as CarrierData} from "../types/game";
 import type {Location, MapObject, UserGameSettings} from "@solaris-common";
@@ -45,6 +43,8 @@ type ModeWaypoints = {
 
 export type Mode = ModeGalaxy | ModeRuler | ModeWaypoints;
 
+export type PreStarClickedCallback = () => void;
+
 export class Map {
   // Represents the current game mode, these are as follows:
   // galaxy - Normal galaxy view
@@ -54,7 +54,6 @@ export class Map {
   };
   eventBus: EventBus;
   app: PIXI.Application;
-  store: Store<State>;
   context: DrawingContext;
   container: PIXI.Container;
   viewport: Viewport;
@@ -90,9 +89,8 @@ export class Map {
   galaxyCenterGraphics: PIXI.Graphics | undefined;
   unsubscribe: (() => void) | undefined;
 
-  constructor (app: PIXI.Application, store: Store<State>, viewport: Viewport, context: DrawingContext, eventBus: EventBus, game: Game, userSettings: UserGameSettings) {
+  constructor (app: PIXI.Application, viewport: Viewport, context: DrawingContext, eventBus: EventBus, game: Game, userSettings: UserGameSettings) {
     this.app = app
-    this.store = store
     this.context = context
     this.viewport = viewport;
     this.container = new PIXI.Container()
@@ -777,18 +775,20 @@ export class Map {
 
   onStarClicked (dic) {
     // ignore clicks if its a drag motion
-    let e = dic.starData
+    const e = dic.starData
     if (dic.eventData && this.isDragMotion(dic.eventData.global)) { return }
 
-    // dispatch click event to the store, so it can be intercepted for adding star name to open message
-    this.store.commit('starClicked', {
+    const owningPlayer = gameHelper.getStarOwningPlayer(this.game, dic.starData);
+
+    this.eventBus.emit(MapEventBusEventNames.MapOnPreStarClicked, {
       star: dic.starData,
-      permitCallback: () => {
-        dic.permitCallback && dic.permitCallback()
+      owningPlayer,
+      defaultCallback: () => {
+        dic.permitCallback && dic.permitCallback();
 
         this.selectStar(e, dic);
       }
-    })
+    });
   }
 
   selectStar (e, dic) {
@@ -822,23 +822,22 @@ export class Map {
 
   onStarRightClicked (dic) {
     // ignore clicks if its a drag motion
-    let e = dic.starData
+    const e = dic.starData
     if (dic.eventData && this.isDragMotion(dic.eventData.global)) { return }
 
-    let owningPlayer = gameHelper.getStarOwningPlayer(this.game!, dic.starData);
+    const owningPlayer = gameHelper.getStarOwningPlayer(this.game!, dic.starData);
 
-    // dispatch click event to the store, so it can be intercepted for adding star/player name to open message
-    this.store.commit('starRightClicked', {
+    this.eventBus.emit(MapEventBusEventNames.MapOnPreStarRightClicked, {
       star: dic.starData,
-      player: owningPlayer,
-      permitCallback: () => {
+      owningPlayer,
+      defaultCallback: () => {
         dic.permitCallback && dic.permitCallback()
 
         if (this.mode.mode === ModeKind.Galaxy) {
           this.eventBus.emit(MapEventBusEventNames.MapOnStarRightClicked, { star: e })
         }
       }
-    })
+    });
   }
 
   onCarrierClicked (dic) {

@@ -88,24 +88,24 @@ export class GameContainer {
       passiveWheel: true,
 
       disableOnContextMenu: true,
-      events: this.app!.renderer.events
+      events: this.app.renderer.events
     })
 
     // add the viewport to the stage
-    this.app!.stage.addChild(this.viewport);
+    this.app.stage.addChild(this.viewport);
 
     this.game = store.state.game!;
 
     // Add a new map to the viewport
-    this.map = new Map(this.app, this.store, this.viewport, this.context, eventBus, this.game!, userSettings);
-    this.viewport.addChild(this.map.container)
+    this.map = new Map(this.app, this.viewport, this.context, eventBus, this.game!, userSettings);
+    this.viewport.addChild(this.map.container);
 
     this.subscribe();
 
     this._setupViewport();
 
     if (userSettings?.technical?.performanceMonitor === 'enabled') {
-      this.debugTools = new DebugTools(this.app!, this.map!);
+      this.debugTools = new DebugTools(this.app, this.map);
     }
   }
 
@@ -206,8 +206,8 @@ export class GameContainer {
         maxHeight,
       })
 
-    this.viewport!.on('zoomed-end', this.map.onZoomed.bind(this.map))
-    this.viewport!.on('pointerdown', this.map.onViewportPointerDown.bind(this.map))
+    this.viewport.on('zoomed-end', this.map.onZoomed.bind(this.map))
+    this.viewport.on('pointerdown', this.map.onViewportPointerDown.bind(this.map))
   }
 
   draw () {

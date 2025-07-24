@@ -1,6 +1,6 @@
 import { makeCastFunc } from "@solaris-common";
 import type { EventBusEventName } from "./eventBusEventName";
-import type { Star, Carrier } from "../types/game";
+import type { Star, Carrier, Player } from "../types/game";
 import type { TempWaypoint } from "../types/waypoint";
 import type {RulerPoint} from "@/types/ruler";
 
@@ -25,11 +25,19 @@ export type ObjectClicked = {
   distance: number,
 } & ObjectClickedData;
 
+export type OnPreStarParams = {
+  star: Star,
+  owningPlayer: Player | undefined,
+  defaultCallback: () => void,
+}
+
 export default class MapEventBusEventNames {
   private constructor() {};
 
   public static readonly MapOnStarClicked: MapEventBusEventName<{ star: Star }> = toEventName('onStarClicked');
   public static readonly MapOnStarRightClicked: MapEventBusEventName<{ star: Star }> = toEventName("onStarRightClicked");
+  public static readonly MapOnPreStarClicked: MapEventBusEventName<OnPreStarParams> = toEventName("onPreStarClicked");
+  public static readonly MapOnPreStarRightClicked: MapEventBusEventName<OnPreStarParams> = toEventName("onPreStarRightClicked");
   public static readonly MapOnCarrierClicked: MapEventBusEventName<{ carrier: Carrier }> = toEventName('onCarrierClicked');
   public static readonly MapOnCarrierRightClicked: MapEventBusEventName<{ carrier: Carrier }> = toEventName("onCarrierRightClicked");
   public static readonly MapOnWaypointCreated: MapEventBusEventName<{ waypoint: TempWaypoint }> = toEventName("onWaypointCreated");
