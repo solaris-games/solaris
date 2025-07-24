@@ -39,7 +39,7 @@ export const createGameContainer = async (store: Store<State>, reportGameError: 
 
   const app = new Application();
 
-  await app!.init(options);
+  await app.init(options);
 
   await textureService.loadAssets();
   textureService.initialize();

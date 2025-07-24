@@ -8,7 +8,7 @@ import { useStore } from 'vuex';
 import type { Store } from 'vuex/types/index.js';
 import { eventBusInjectionKey, type EventBus } from '../../../eventBus'
 import type { TempWaypoint } from "../../../types/waypoint";
-import MapEventBusEventNames, { type ObjectClicked } from '../../../eventBusEventNames/map';
+import MapEventBusEventNames, { type ObjectClicked, type OnPreStarParams } from '../../../eventBusEventNames/map';
 import type { Carrier, Game, Star } from '../../../types/game';
 import type { ToastPluginApi } from 'vue-toast-notification';
 import type { State } from '../../../store';
@@ -82,6 +82,14 @@ onMounted(() => {
       emit("onStarClicked", star._id);
     };
 
+    const onPreStarClickedHandler = (params: OnPreStarParams) => {
+      store.commit('starClicked', {});
+    };
+
+    const onPreStarRightClickedHandler = (params: OnPreStarParams) => {
+      store.commit('starRightClicked', {});
+    };
+
     const onStarRightClickedHandler = ({ star }: { star: Star }) => {
       emit("onStarRightClicked", star._id);
     };
@@ -117,7 +125,9 @@ onMounted(() => {
     const gameRoot = document.getElementById("gameRoot"); // Defined in Game component
     attachEventDeduplication(gameRoot, canvas);
 
+    eventBus.on(MapEventBusEventNames.MapOnPreStarClicked, onPreStarClickedHandler);
     eventBus.on(MapEventBusEventNames.MapOnStarClicked, onStarClickedHandler);
+    eventBus.on(MapEventBusEventNames.MapOnPreStarRightClicked, onPreStarRightClickedHandler);
     eventBus.on(MapEventBusEventNames.MapOnStarRightClicked, onStarRightClickedHandler);
     eventBus.on(MapEventBusEventNames.MapOnCarrierClicked, onCarrierClickedHandler);
     eventBus.on(MapEventBusEventNames.MapOnCarrierRightClicked, onCarrierRightClickedHandler);
@@ -138,7 +148,9 @@ onMounted(() => {
 
       gameContainer.destroy();
 
+      eventBus.off(MapEventBusEventNames.MapOnPreStarClicked, onPreStarClickedHandler);
       eventBus.off(MapEventBusEventNames.MapOnStarClicked, onStarClickedHandler);
+      eventBus.off(MapEventBusEventNames.MapOnPreStarRightClicked, onPreStarRightClickedHandler);
       eventBus.off(MapEventBusEventNames.MapOnStarRightClicked, onStarRightClickedHandler);
       eventBus.off(MapEventBusEventNames.MapOnCarrierClicked, onCarrierClickedHandler);
       eventBus.off(MapEventBusEventNames.MapOnCarrierRightClicked, onCarrierRightClickedHandler);

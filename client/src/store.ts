@@ -16,6 +16,7 @@ import {formatError, isOk} from "./services/typedapi";
 import type {UserClientSocketEmitter} from "@/sockets/socketEmitters/user";
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import {detailMe} from "@/services/typedapi/user";
+import type { OnPreStarParams } from './eventBusEventNames/map';
 
 export type MentionCallbacks = {
   player: (p: Player) => void;
@@ -256,7 +257,7 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
       state.mentionReceivingElement = data.element;
       state.mentionCallbacks = data.callbacks;
     },
-    resetMentions (state) {
+    resetMentions (state: State) {
       state.mentionReceivingElement = null;
       state.mentionCallbacks = null;
     },
@@ -267,18 +268,18 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
         data.permitCallback(data.player)
       }
     },
-    starClicked (state: State, data) {
+    starClicked (state: State, data: OnPreStarParams) {
       if (state.mentionCallbacks && state.mentionCallbacks.star) {
         state.mentionCallbacks.star(data.star)
       } else {
-        data.permitCallback(data.star)
+        data.defaultCallback();
       }
     },
-    starRightClicked (state: State, data) {
-      if (state.mentionCallbacks && state.mentionCallbacks.player) {
-        state.mentionCallbacks.player(data.player)
+    starRightClicked (state: State, data: OnPreStarParams) {
+      if (state.mentionCallbacks && state.mentionCallbacks.player && data.owningPlayer) {
+        state.mentionCallbacks.player(data.owningPlayer);
       } else {
-        data.permitCallback(data.star)
+        data.defaultCallback();
       }
     },
 
