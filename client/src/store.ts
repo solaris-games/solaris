@@ -10,7 +10,7 @@ import SpecialistService from './services/api/specialist.js';
 import GameHelper from './services/gameHelper.js';
 import type { Game, Player, Star } from "./types/game";
 import type { Store } from 'vuex/types/index.js';
-import type {Badge, UserRoles} from "@solaris-common";
+import type {Badge, UserGameSettings, UserRoles} from "@solaris-common";
 import {getBadges} from "./services/typedapi/badge";
 import {formatError, isOk} from "./services/typedapi";
 import type {UserClientSocketEmitter} from "@/sockets/socketEmitters/user";
@@ -34,7 +34,7 @@ export type State = {
   mentionCallbacks: MentionCallbacks | null;
   starSpecialists: any;
   carrierSpecialists: any;
-  settings: any;
+  settings: UserGameSettings | null;
   confirmationDialog: any;
   colourOverride: boolean;
   coloursConfig: any;
@@ -213,7 +213,7 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
       state.colourOverride = value
 
       if (state.game) {
-        eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadGame, {});
+        eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadGame, { game: state.game, settings: state.settings });
       }
     },
 
@@ -574,7 +574,7 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
       await ColourService.addColour(state.game._id, data);
       commit('internalAddColourMapping', data);
 
-      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadGame, {});
+      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadGame, { game: state.game, settings: state.settings });
     },
     async verify({ commit, state }) {
       try {

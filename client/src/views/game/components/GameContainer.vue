@@ -17,6 +17,7 @@ import GameApiService from '../../../services/api/game'
 import { attachEventDeduplication } from "../../../util/eventDeduplication";
 import MapCommandEventBusEventNames from "../../../eventBusEventNames/mapCommand";
 import {createGameContainer} from "@/game/container";
+import { StoreDrawingContext } from './StoreDrawingContext';
 
 const store = useStore() as Store<State>;
 
@@ -38,7 +39,7 @@ const el: Ref<HTMLElement | null> = ref(null);
 onMounted(() => {
   let unsubscribe;
 
-  createGameContainer(store, (msg) => toast.error(msg), eventBus).then((gameContainer) => {
+  createGameContainer(new StoreDrawingContext(store), store.state.game!, store.state.settings!, (msg) => toast.error(msg), eventBus).then((gameContainer) => {
     const checkPerformance = () => {
       const webGLSupport = gameContainer.checkPerformance();
 
@@ -74,7 +75,7 @@ onMounted(() => {
 
     const updateGame = (game: Game | null) => {
       if (game) {
-        gameContainer.reloadGame(game, store.state.settings);
+        gameContainer.reloadGame(game, store.state.settings!);
       }
     };
 

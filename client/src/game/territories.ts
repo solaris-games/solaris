@@ -371,7 +371,7 @@ export class Territories {
       let colour = 0x000000
 
       if (star.ownedByPlayerId) {
-        colour = this.context!.getPlayerColour(star.ownedByPlayerId)
+        colour = Number.parseInt(this.context!.getPlayerColour(star.ownedByPlayerId));
       }
 
       let points: Position[] = []
@@ -426,7 +426,7 @@ export class Territories {
       let colour = 0x000000
 
       if (border.lSite.playerID) {
-        colour = this.context!.getPlayerColour(border.lSite.playerID);
+        colour = Number.parseInt(this.context!.getPlayerColour(border.lSite.playerID));
       }
 
       borderGraphics.moveTo(rightVA.x, rightVA.y)
@@ -439,7 +439,7 @@ export class Territories {
       colour = 0x000000
 
       if (border.rSite.playerID) {
-        colour = this.context!.getPlayerColour(border.rSite.playerID)
+        colour = Number.parseInt(this.context!.getPlayerColour(border.rSite.playerID));
       }
 
       borderGraphics.moveTo(leftVA.x, leftVA.y)

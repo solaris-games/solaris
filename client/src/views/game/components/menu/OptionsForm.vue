@@ -607,7 +607,7 @@ const handleSubmit = async (e: Event) => {
     store.commit('setSettings', settings.value);
 
     if (props.isInGame) {
-      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadGame, {});
+      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadGame, { game: store.state.game, settings: store.state.settings });
     }
 
     onOptionsSaved()

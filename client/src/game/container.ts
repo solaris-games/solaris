@@ -1,9 +1,7 @@
-import {Viewport} from 'pixi-viewport'
-import Map from './map'
-import gameHelper from '../services/gameHelper.js'
-import textureService from './texture'
-import type {Store} from "vuex";
-import type {State} from "../store";
+import {Viewport} from 'pixi-viewport';
+import Map from './map';
+import gameHelper from '../services/gameHelper';
+import textureService from './texture';
 import {Application, isWebGLSupported, Ticker} from "pixi.js";
 import {DEFAULT_SETTINGS, type Location, type UserGameSettings} from "@solaris-common";
 import type {Game, Star, Carrier} from "../types/game";
@@ -12,21 +10,13 @@ import type { EventBus } from '../eventBus';
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 
-export class DrawingContext {
-  store: Store<State>;
-
-  constructor (store: Store<State>) {
-    this.store = store;
-  }
-
-  getPlayerColour (playerId: string) {
-    return this.store.getters.getColourForPlayer(playerId).value
-  }
+export interface DrawingContext {
+  getPlayerColour: (playerId: string) => string;
 }
 
-export const createGameContainer = async (store: Store<State>, reportGameError: ((err: string) => void), eventBus: EventBus) => {
-  const userSettings: UserGameSettings = store.state.settings || DEFAULT_SETTINGS;
-  const antialiasing = userSettings.map.antiAliasing === 'enabled';
+export const createGameContainer = async (drawingContext: DrawingContext, game: Game, userSettings: UserGameSettings | null, reportGameError: ((err: string) => void), eventBus: EventBus) => {
+  const settings: UserGameSettings = userSettings || DEFAULT_SETTINGS;
+  const antialiasing = settings.map.antiAliasing === 'enabled';
 
   const options = {
     width: window.innerWidth, // window.innerWidth,
@@ -44,13 +34,12 @@ export const createGameContainer = async (store: Store<State>, reportGameError: 
   await textureService.loadAssets();
   textureService.initialize();
 
-  return new GameContainer(store, userSettings, reportGameError, eventBus, app);
+  return new GameContainer(drawingContext, game, settings, reportGameError, eventBus, app);
 }
 
 export class GameContainer {
   app: Application;
   map: Map;
-  store: Store<State>;
   context: DrawingContext;
   viewport: Viewport;
   starFieldLeft: number = 0;
@@ -64,11 +53,10 @@ export class GameContainer {
   unsubscribe: (() => void) | undefined;
   reportGameError: ((err: string) => void);
 
-  constructor (store: Store<State>, userSettings: UserGameSettings, reportGameError: ((err: string) => void), eventBus: EventBus, app: Application) {
-    this.store = store;
+  constructor (drawingContext: DrawingContext, game: Game, userSettings: UserGameSettings, reportGameError: ((err: string) => void), eventBus: EventBus, app: Application) {
     this.eventBus = eventBus;
     this.reportGameError = reportGameError;
-    this.context = new DrawingContext(store);
+    this.context = drawingContext;
     this.app = app;
     this.userSettings = userSettings;
 
@@ -93,8 +81,7 @@ export class GameContainer {
 
     // add the viewport to the stage
     this.app.stage.addChild(this.viewport);
-
-    this.game = store.state.game!;
+    this.game = game;
 
     // Add a new map to the viewport
     this.map = new Map(this.app, this.viewport, this.context, eventBus, this.game, userSettings);
@@ -127,7 +114,7 @@ export class GameContainer {
   }
 
   subscribe () {
-    const onGameReload = () => this.reloadGame(this.store.state.game!, this.store.state.settings!);
+    const onGameReload = ({ game, settings }: { game: Game, settings: UserGameSettings }) => this.reloadGame(game, settings);
     const onStarReload = ({ star }: { star: Star }) => this._reloadStar(star);
     const onCarrierReload = ({ carrier }: { carrier: Carrier }) => this._reloadCarrier(carrier);
     const onCarrierRemove = ({ carrier }: { carrier: Carrier }) => this.map.undrawCarrier(carrier);
