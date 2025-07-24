@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js'
 import Background from './background'
-import Star from './star'
+import Star, { type BasicStarClickEvent, type StarClickEvent } from './star'
 import Waypoints from './waypoints'
 import RulerPoints from './rulerPoints'
 import Territories from './territories'
@@ -380,17 +380,17 @@ export class Map {
           alpha: 0.75,
         });
 
-        this.starContainer!.addChild(this.galaxyCenterGraphics);
+        this.starContainer.addChild(this.galaxyCenterGraphics);
     }
   }
 
   _isOrbitalMapEnabled () {
-    return this.game!.constants.distances.galaxyCenterLocation && this.game!.settings.orbitalMechanics.enabled === 'enabled'
+    return this.game.constants.distances.galaxyCenterLocation && this.game.settings.orbitalMechanics.enabled === 'enabled'
   }
 
   _isWormHolesEnabled () {
-    return this.game!.settings.specialGalaxy.randomWormHoles
-      || this.game!.galaxy.stars.find(s => s.wormHoleToStarId)
+    return this.game.settings.specialGalaxy.randomWormHoles
+      || this.game.galaxy.stars.find(s => s.wormHoleToStarId)
   }
 
   reloadGame (game: Game, userSettings: UserGameSettings) {
@@ -456,10 +456,10 @@ export class Map {
     this.drawPlayerNames();
 
     this.background = new Background(game, userSettings, this.context);
-    this.background!.draw();
+    this.background.draw();
 
     this.waypoints.setup(game, this.context);
-    this.tooltipLayer!.setup(game, this.context);
+    this.tooltipLayer.setup(game, this.context);
 
     this.chunks.update(game, this.stars, this.carriers);
 
@@ -514,14 +514,12 @@ export class Map {
   }
 
   removeLastRulerPoint () {
-    this.rulerPoints!.removeLastRulerPoint()
+    this.rulerPoints.removeLastRulerPoint()
   }
 
   drawStars () {
-    for (let i = 0; i < this.stars.length; i++) {
-      let star = this.stars[i]
-
-      this.drawStar(star)
+    for (let star of this.stars) {
+      this.drawStar(star);
     }
   }
 
@@ -564,35 +562,35 @@ export class Map {
   }
 
   undrawCarrier (carrierData: CarrierData) {
-    const existing = this.carriers.find(x => x.data!._id === carrierData._id)
+    const existing = this.carriers.find(x => x.data!._id === carrierData._id);
 
     if (existing) {
-      this._undrawCarrier(existing)
+      this._undrawCarrier(existing);
     }
   }
 
   drawWaypoints () {
     if (this.mode.mode === ModeKind.Waypoints) {
-      this.waypoints!.draw(this.mode.carrier)
+      this.waypoints.draw(this.mode.carrier);
     }
 
     for (let i = 0; i < this.carriers.length; i++) {
-      let c = this.carriers[i]
+      let c = this.carriers[i];
 
-      c.drawCarrierWaypoints()
+      c.drawCarrierWaypoints();
     }
   }
 
   clearWaypoints () {
-    this.waypoints!.clear()
+    this.waypoints.clear();
   }
 
   drawRulerPoints () {
-    this.rulerPoints!.draw()
+    this.rulerPoints.draw();
   }
 
   clearRulerPoints () {
-    this.rulerPoints!.update(this.game);
+    this.rulerPoints.update(this.game);
   }
 
   drawTerritories (userSettings: UserGameSettings) {
@@ -612,8 +610,8 @@ export class Map {
   }
 
   drawPlayerNames () {
-    this.playerNames!.setup(this.game!, this.userSettings!, this.context)
-    this.playerNames!.draw()
+    this.playerNames.setup(this.game, this.userSettings, this.context)
+    this.playerNames.draw()
   }
 
   panToPlayer (game: Game, player: Player) {
@@ -627,11 +625,11 @@ export class Map {
   }
 
   panToUser (game: Game) {
-    let player = gameHelper.getUserPlayer(game)
+    const player = gameHelper.getUserPlayer(game);
 
     if (!player) {
-      const galaxyCenterX = gameHelper.calculateGalaxyCenterX(game)
-      const galaxyCenterY = gameHelper.calculateGalaxyCenterY(game)
+      const galaxyCenterX = gameHelper.calculateGalaxyCenterX(game);
+      const galaxyCenterY = gameHelper.calculateGalaxyCenterY(game);
 
       this.panToLocation({ x: galaxyCenterX, y: galaxyCenterY })
       return
@@ -657,17 +655,17 @@ export class Map {
   }
 
   clickStar (starId: string) {
-    let star = this.stars.find(s => s.data._id === starId)
+    const star = this.stars.find(s => s.data._id === starId)!;
 
-    star!.onClicked(null, false)
-    star!.select()
+    star.onClicked(null, false);
+    star.select();
   }
 
   clickCarrier (carrierId: string) {
-    let carrier = this.carriers.find(s => s.data!._id === carrierId)
+    const carrier = this.carriers.find(s => s.data!._id === carrierId)!;
 
-    carrier!.onClicked(null, false)
-    carrier!.select()
+    carrier.onClicked(null, false);
+    carrier.select();
   }
 
   unselectAllStars () {
@@ -687,7 +685,7 @@ export class Map {
     this.clearCarrierHighlights();
   }
 
-  unselectAllStarsExcept (star) {
+  unselectAllStarsExcept (star: Star) {
     this.stars
       .filter(s => s.isSelected || s.data._id === star.data._id) // Get only stars that are selected or the e star.
       .forEach(s => {
@@ -698,7 +696,7 @@ export class Map {
       })
   }
 
-  unselectAllCarriersExcept (carrier) {
+  unselectAllCarriersExcept (carrier: Carrier) {
     this.carriers
       .filter(c => c.isSelected || c.data!._id === carrier.data._id) // Get only stars that are selected or the e star.
       .forEach(c => {
@@ -764,16 +762,16 @@ export class Map {
   }
 
   //not sure where to put this func
-  isDragMotion(position) {
-    let DRAG_THRESHOLD = 8 //max distance in pixels
-    let dxSquared = Math.pow(Math.abs(this.lastPointerDownPosition!.x - position.x),2)
-    let dySquared = Math.pow(Math.abs(this.lastPointerDownPosition!.y - position.y),2)
-    let distance = Math.sqrt(dxSquared+dySquared)
+  isDragMotion(position: Location) {
+    const DRAG_THRESHOLD = 8 //max distance in pixels
+    const dxSquared = Math.pow(Math.abs(this.lastPointerDownPosition!.x - position.x),2)
+    const dySquared = Math.pow(Math.abs(this.lastPointerDownPosition!.y - position.y),2)
+    const distance = Math.sqrt(dxSquared+dySquared)
 
     return (distance > DRAG_THRESHOLD)
   }
 
-  onStarClicked (dic) {
+  onStarClicked (dic: StarClickEvent) {
     // ignore clicks if its a drag motion
     const e = dic.starData
     if (dic.eventData && this.isDragMotion(dic.eventData.global)) { return }
@@ -791,16 +789,16 @@ export class Map {
     });
   }
 
-  selectStar (e, dic) {
+  selectStar (e: StarData, dic: BasicStarClickEvent) {
     // Clicking stars should only raise events to the UI if in galaxy mode.
     if (this.mode.mode === ModeKind.Galaxy) {
       let selectedStar = this.stars.find(x => x.data._id === e._id)
 
       this.unselectAllCarriers()
-      this.unselectAllStarsExcept(selectedStar)
+      selectedStar && this.unselectAllStarsExcept(selectedStar);
 
       if (!dic.tryMultiSelect || !this.tryMultiSelect(e.location)) {
-        selectedStar!.toggleSelected()
+        selectedStar?.toggleSelected()
         this.eventBus.emit(MapEventBusEventNames.MapOnStarClicked, { star: e })
       }
     } else if (this.mode.mode === ModeKind.Waypoints) {
@@ -811,16 +809,15 @@ export class Map {
     AnimationService.drawSelectedCircle(this.app, this.container, e.location)
   }
 
-  onStarDefaultClicked (dic) {
+  onStarDefaultClicked (dic: BasicStarClickEvent) {
     // ignore clicks if its a drag motion
     let e = dic.starData
     if (dic.eventData && this.isDragMotion(dic.eventData.global)) { return }
 
-    dic.permitCallback && dic.permitCallback()
     this.selectStar(e, dic);
   }
 
-  onStarRightClicked (dic) {
+  onStarRightClicked (dic: BasicStarClickEvent) {
     // ignore clicks if its a drag motion
     const e = dic.starData
     if (dic.eventData && this.isDragMotion(dic.eventData.global)) { return }
@@ -831,8 +828,6 @@ export class Map {
       star: dic.starData,
       owningPlayer,
       defaultCallback: () => {
-        dic.permitCallback && dic.permitCallback()
-
         if (this.mode.mode === ModeKind.Galaxy) {
           this.eventBus.emit(MapEventBusEventNames.MapOnStarRightClicked, { star: e })
         }
@@ -844,14 +839,14 @@ export class Map {
     // ignore clicks if its a drag motion
     if (dic.eventData && this.isDragMotion(dic.eventData.global)) { return }
 
-    let e = dic.carrierData
+    const e = dic.carrierData
     // Clicking carriers should only raise events to the UI if in galaxy mode.
     if (this.mode.mode === ModeKind.Galaxy) {
 
-      let selectedCarrier = this.carriers.find(x => x.data!._id === e._id)
+      const selectedCarrier = this.carriers.find(x => x.data!._id === e._id)
 
       this.unselectAllStars()
-      this.unselectAllCarriersExcept(selectedCarrier)
+      selectedCarrier && this.unselectAllCarriersExcept(selectedCarrier)
 
       selectedCarrier!.toggleSelected()
 

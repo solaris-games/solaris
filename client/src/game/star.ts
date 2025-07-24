@@ -1,4 +1,4 @@
-import {Application, BitmapText, Circle, Container, EventEmitter, Graphics, Sprite} from 'pixi.js';
+import {Application, BitmapText, Circle, Container, EventEmitter, Graphics, Sprite, FederatedPointerEvent} from 'pixi.js';
 import TextureService from './texture'
 import gameHelper from '../services/gameHelper.js'
 import seededRandom from 'random-seed'
@@ -10,9 +10,13 @@ import type { DrawingContext } from './container';
 
 const NAME_SIZE = 4
 
-type StarClickEvent = {
+export type BasicStarClickEvent = {
+  eventData: FederatedPointerEvent,
   starData: StarData,
   tryMultiSelect: boolean,
+}
+
+export type StarClickEvent = BasicStarClickEvent & {
   permitCallback: () => void,
 }
 
@@ -21,8 +25,8 @@ type Events = {
   onUnselected: StarData,
   onStarMouseOver: Star,
   onStarMouseOut: Star,
-  onStarRightClicked: { starData: StarData },
-  onStarDefaultClicked: { starData: StarData },
+  onStarRightClicked: BasicStarClickEvent,
+  onStarDefaultClicked: BasicStarClickEvent,
   onStarClicked: StarClickEvent,
 }
 
@@ -897,14 +901,12 @@ export class Star extends EventEmitter<keyof Events, Events> implements MapObjec
      }
   }
 
-  onClicked(e, tryMultiSelect = true) {
-    const eventData = e ? e.data : null
-
+  onClicked(e: FederatedPointerEvent | null, tryMultiSelect = true) {
     const click = () => {
       this.emit('onStarClicked', {
         starData: this.data,
         tryMultiSelect,
-        eventData,
+        eventData: e,
         permitCallback: () => {
           // Need to do this otherwise sometimes text gets highlighted.
           this.deselectAllText()
@@ -917,18 +919,20 @@ export class Star extends EventEmitter<keyof Events, Events> implements MapObjec
       })
     };
 
-    if (e?.data?.originalEvent) {
-      const button = e.data.originalEvent.button;
+    if (e) {
+      const button = e.button;
 
       if (button === 2) {
         this.emit('onStarRightClicked', {
           starData: this.data,
-          eventData
+          eventData: e,
+          tryMultiSelect: false,
         });
       } else if (button === 1) {
         this.emit('onStarDefaultClicked', {
           starData: this.data,
-          eventData
+          eventData: e,
+          tryMultiSelect: false,
         });
       } else {
         click();
