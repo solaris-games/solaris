@@ -22,6 +22,7 @@ import MapCommandEventBusEventNames from "../eventBusEventNames/mapCommand";
 import { createStarHighlight } from './highlight'
 import {Viewport} from 'pixi-viewport'
 import type {TempWaypoint} from "@/types/waypoint";
+import type {RulerPoint} from "@/types/ruler";
 
 export enum ModeKind {
   Galaxy = 'galaxy',
@@ -161,23 +162,23 @@ export class Map {
 
     this.waypoints = new Waypoints()
     this.waypoints.setup(game, this.context)
-    this.waypoints.on('onWaypointCreated', (wp) => this.onWaypointCreated(wp));
-    this.waypoints.on('onWaypointOutOfRange', () => this.onWaypointOutOfRange());
+    this.waypoints.on('onWaypointCreated', this.onWaypointCreated.bind(this));
+    this.waypoints.on('onWaypointOutOfRange', this.onWaypointOutOfRange.bind(this));
 
-    this.waypointContainer!.addChild(this.waypoints.container)
+    this.waypointContainer.addChild(this.waypoints.container)
 
     this.rulerPoints = new RulerPoints(game);
     this.rulerPoints.on('onRulerPointCreated', this.onRulerPointCreated.bind(this))
     this.rulerPoints.on('onRulerPointsCleared', this.onRulerPointsCleared.bind(this))
     this.rulerPoints.on('onRulerPointRemoved', this.onRulerPointRemoved.bind(this))
 
-    this.rulerPointContainer!.addChild(this.rulerPoints.container)
+    this.rulerPointContainer.addChild(this.rulerPoints.container);
 
     // -----------
     // Setup Territories
     this.territories = new Territories(this.context, game, userSettings);
 
-    this.territoryContainer!.addChild(this.territories.container);
+    this.territoryContainer.addChild(this.territories.container);
     this.territories.draw();
 
     // -----------
@@ -915,19 +916,19 @@ export class Map {
     this.eventBus.emit(MapEventBusEventNames.MapOnWaypointOutOfRange)
   }
 
-  onRulerPointCreated (e) {
-    this.eventBus.emit(MapEventBusEventNames.MapOnRulerPointCreated, { rulerPoint: e });
+  onRulerPointCreated (rulerPoint: RulerPoint) {
+    this.eventBus.emit(MapEventBusEventNames.MapOnRulerPointCreated, { rulerPoint });
   }
 
-  onRulerPointRemoved (e) {
-    this.eventBus.emit(MapEventBusEventNames.MapOnRulerPointRemoved, { rulerPoint: e });
+  onRulerPointRemoved (rulerPoint: RulerPoint) {
+    this.eventBus.emit(MapEventBusEventNames.MapOnRulerPointRemoved, { rulerPoint });
   }
 
-  onRulerPointsCleared (e) {
+  onRulerPointsCleared () {
     this.eventBus.emit(MapEventBusEventNames.MapOnRulerPointsCleared);
   }
 
-  tryMultiSelect (location) {
+  tryMultiSelect (location: Location) {
     // See if there are any other objects close by, if so then
     // we want to allow the user to select which one they want as there might be
     // objects on the map that are on top of eachother or very close together.
