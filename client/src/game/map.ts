@@ -21,6 +21,7 @@ import MapEventBusEventNames from '../eventBusEventNames/map'
 import MapCommandEventBusEventNames from "../eventBusEventNames/mapCommand";
 import { createStarHighlight } from './highlight'
 import {Viewport} from 'pixi-viewport'
+import type {TempWaypoint} from "@/types/waypoint";
 
 export enum ModeKind {
   Galaxy = 'galaxy',
@@ -160,8 +161,8 @@ export class Map {
 
     this.waypoints = new Waypoints()
     this.waypoints.setup(game, this.context)
-    this.waypoints.on('onWaypointCreated', this.onWaypointCreated.bind(this))
-    this.waypoints.on('onWaypointOutOfRange', this.onWaypointOutOfRange.bind(this))
+    this.waypoints.on('onWaypointCreated', (wp) => this.onWaypointCreated(wp));
+    this.waypoints.on('onWaypointOutOfRange', () => this.onWaypointOutOfRange());
 
     this.waypointContainer!.addChild(this.waypoints.container)
 
@@ -906,11 +907,11 @@ export class Map {
     this.tooltipLayer!.clear()
   }
 
-  onWaypointCreated (e) {
-    this.eventBus.emit(MapEventBusEventNames.MapOnWaypointCreated, { waypoint: e })
+  onWaypointCreated (waypoint: TempWaypoint) {
+    this.eventBus.emit(MapEventBusEventNames.MapOnWaypointCreated, { waypoint })
   }
 
-  onWaypointOutOfRange (e) {
+  onWaypointOutOfRange () {
     this.eventBus.emit(MapEventBusEventNames.MapOnWaypointOutOfRange)
   }
 
