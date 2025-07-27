@@ -306,20 +306,20 @@ export class Map {
       star = new Star(this.app, this.game, starData, userSettings, this.context);
       this.stars.push(star);
 
-      this.starContainer!.addChild(star.fixedContainer)
+      this.starContainer!.addChild(star.fixedContainer);
 
-      star.on('onStarClicked', this.onStarClicked.bind(this))
-      star.on('onStarRightClicked', this.onStarRightClicked.bind(this))
-      star.on('onStarDefaultClicked', this.onStarDefaultClicked.bind(this))
-      star.on('onStarMouseOver', this.onStarMouseOver.bind(this))
-      star.on('onStarMouseOut', this.onStarMouseOut.bind(this))
-      star.on('onSelected', this.onStarSelected.bind(this))
-      star.on('onUnselected', this.onStarUnselected.bind(this))
+      star.on('onStarClicked', this.onStarClicked.bind(this));
+      star.on('onStarRightClicked', this.onStarRightClicked.bind(this));
+      star.on('onStarDefaultClicked', this.onStarDefaultClicked.bind(this));
+      star.on('onStarMouseOver', this.onStarMouseOver.bind(this));
+      star.on('onStarMouseOut', this.onStarMouseOut.bind(this));
+      star.on('onSelected', this.onStarSelected.bind(this));
+      star.on('onUnselected', this.onStarUnselected.bind(this));
     } else {
       star.update(this.game, starData, userSettings);
     }
 
-    return star
+    return star;
   }
 
   setupCarrier (game: Game, userSettings: UserGameSettings, carrierData: CarrierData) {
@@ -531,16 +531,15 @@ export class Map {
   }
 
   _undrawStar (star: Star) {
-    star.off('onStarClicked', this.onStarClicked.bind(this))
-    star.off('onStarRightClicked', this.onStarRightClicked.bind(this))
+    star.removeAllListeners();
 
-    this.starContainer!.removeChild(star.fixedContainer)
+    this.starContainer.removeChild(star.fixedContainer);
 
-    this.chunks!.removeMapObjectFromChunks(star)
+    this.chunks.removeMapObjectFromChunks(star);
 
-    this.stars.splice(this.stars.indexOf(star), 1)
+    this.stars.splice(this.stars.indexOf(star), 1);
 
-    star.destroy()
+    star.destroy();
   }
 
   drawCarriers () {
@@ -557,6 +556,8 @@ export class Map {
   }
 
   _undrawCarrier (carrier: Carrier) {
+    carrier.removeAllListeners();
+
     this.chunks!.removeMapObjectFromChunks(carrier);
     this.carriers.splice(this.carriers.indexOf(carrier), 1)
 
@@ -642,14 +643,6 @@ export class Map {
 
   panToObject(object: { location: Location }) {
     this.panToLocation(object.location)
-  }
-
-  panToStar (star: StarData) {
-    this.panToLocation(star.location)
-  }
-
-  panToCarrier (carrier: CarrierData) {
-    this.panToLocation(carrier.location)
   }
 
   panToLocation (location: Location) {
@@ -883,7 +876,7 @@ export class Map {
     // to the star.
     if (e.data.orbiting) {
       let star = this.stars.find(s => s.data._id === e.data.orbiting)
-      star!.onMouseOver(undefined)
+      star!.onMouseOver()
     }
 
     this.tooltipLayer!.drawTooltipCarrier(e.data)
@@ -894,17 +887,17 @@ export class Map {
     // to the star.
     if (e.data.orbiting) {
       let star = this.stars.find(s => s.data._id === e.data.orbiting)
-      star!.onMouseOut(undefined)
+      star!.onMouseOut()
     }
 
     this.tooltipLayer!.clear()
   }
 
-  onStarMouseOver (e) {
-    this.tooltipLayer!.drawTooltipStar(e.data)
+  onStarMouseOver (star: StarData) {
+    this.tooltipLayer!.drawTooltipStar(star);
   }
 
-  onStarMouseOut (e) {
+  onStarMouseOut (star: StarData) {
     this.tooltipLayer!.clear()
   }
 
@@ -1045,15 +1038,15 @@ export class Map {
     }
   }
 
-  onStarSelected (e) {
+  onStarSelected (star: StarData) {
     if (this._isOrbitalMapEnabled()) {
-      this.orbitalLayer!.drawStar(e)
+      this.orbitalLayer!.drawStar(star);
     }
   }
 
-  onStarUnselected (e) {
+  onStarUnselected (_star: StarData) {
     if (this._isOrbitalMapEnabled()) {
-      this.orbitalLayer!.clear()
+      this.orbitalLayer!.clear();
     }
   }
 

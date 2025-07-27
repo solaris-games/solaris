@@ -1,4 +1,4 @@
-import {Application, BitmapText, Circle, Container, EventEmitter, Graphics, Sprite, FederatedPointerEvent} from 'pixi.js';
+import {Application, BitmapText, Circle, Container, Graphics, Sprite, FederatedPointerEvent} from 'pixi.js';
 import TextureService from './texture'
 import gameHelper from '../services/gameHelper.js'
 import seededRandom from 'random-seed'
@@ -7,11 +7,12 @@ import { type MapObject } from './mapObject';
 import type {Game, Star as StarData} from "../types/game";
 import type { Location, UserGameSettings } from '@solaris-common';
 import type { DrawingContext } from './container';
+import {EventEmitter} from "./eventEmitter";
 
 const NAME_SIZE = 4
 
 export type BasicStarClickEvent = {
-  eventData: FederatedPointerEvent,
+  eventData?: FederatedPointerEvent,
   starData: StarData,
   tryMultiSelect: boolean,
 }
@@ -23,8 +24,8 @@ export type StarClickEvent = BasicStarClickEvent & {
 type Events = {
   onSelected: StarData,
   onUnselected: StarData,
-  onStarMouseOver: Star,
-  onStarMouseOut: Star,
+  onStarMouseOver: StarData,
+  onStarMouseOut: StarData,
   onStarRightClicked: BasicStarClickEvent,
   onStarDefaultClicked: BasicStarClickEvent,
   onStarClicked: StarClickEvent,
@@ -906,7 +907,7 @@ export class Star extends EventEmitter<keyof Events, Events> implements MapObjec
       this.emit('onStarClicked', {
         starData: this.data,
         tryMultiSelect,
-        eventData: e,
+        eventData: e!,
         permitCallback: () => {
           // Need to do this otherwise sometimes text gets highlighted.
           this.deselectAllText()
@@ -1010,20 +1011,20 @@ export class Star extends EventEmitter<keyof Events, Events> implements MapObjec
     else if (document.selection) {document.selection.empty();}
   }
 
-  onMouseOver (e) {
-    this.isMouseOver = true
+  onMouseOver () {
+    this.isMouseOver = true;
 
-    this.emit('onStarMouseOver', this)
+    this.emit('onStarMouseOver', this.data)
   }
 
-  onMouseOut (e) {
-    this.isMouseOver = false
+  onMouseOut () {
+    this.isMouseOver = false;
 
-    this.emit('onStarMouseOut', this)
+    this.emit('onStarMouseOut', this.data)
   }
 
   //This could in the future be a setter function on ZoomPercent
-  refreshZoom (zoomPercent) {
+  refreshZoom (zoomPercent: number) {
     this.zoomPercent = zoomPercent
     this._updateDepthLevel()
   }
