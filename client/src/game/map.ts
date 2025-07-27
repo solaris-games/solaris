@@ -15,7 +15,7 @@ import { type DrawingContext } from "./container";
 import type {Game, Player, Star as StarData, Carrier as CarrierData} from "../types/game";
 import type {Location, MapObject, UserGameSettings} from "@solaris-common";
 import { Chunks } from './chunks'
-import Carrier from "./carrier";
+import Carrier, {type CarrierClickEvent} from "./carrier";
 import type { EventBus } from '../eventBus'
 import MapEventBusEventNames from '../eventBusEventNames/map'
 import MapCommandEventBusEventNames from "../eventBusEventNames/mapCommand";
@@ -830,11 +830,11 @@ export class Map {
     });
   }
 
-  onCarrierClicked (dic) {
+  onCarrierClicked (ev: CarrierClickEvent) {
     // ignore clicks if its a drag motion
-    if (dic.eventData && this.isDragMotion(dic.eventData.global)) { return }
+    if (ev.eventData && this.isDragMotion(ev.eventData.global)) { return }
 
-    const e = dic.carrierData
+    const e = ev.carrierData
     // Clicking carriers should only raise events to the UI if in galaxy mode.
     if (this.mode.mode === ModeKind.Galaxy) {
 
@@ -853,7 +853,7 @@ export class Map {
         this.waypoints!.clear();
       }
 
-      if (!dic.tryMultiSelect || !this.tryMultiSelect(e.location)) {
+      if (!ev.tryMultiSelect || !this.tryMultiSelect(e.location)) {
         this.eventBus.emit(MapEventBusEventNames.MapOnCarrierClicked, { carrier: e })
       } else {
         selectedCarrier!.unselect()
@@ -865,32 +865,32 @@ export class Map {
     AnimationService.drawSelectedCircle(this.app, this.container, e.location)
   }
 
-  onCarrierRightClicked (e) {
+  onCarrierRightClicked (carrier: CarrierData) {
     if (this.mode.mode === ModeKind.Galaxy) {
-      this.eventBus.emit(MapEventBusEventNames.MapOnCarrierRightClicked, { carrier: e });
+      this.eventBus.emit(MapEventBusEventNames.MapOnCarrierRightClicked, { carrier });
     }
   }
 
-  onCarrierMouseOver (e) {
+  onCarrierMouseOver (carrier: CarrierData) {
     // If the carrier is orbiting something then send the mouse over event
     // to the star.
-    if (e.data.orbiting) {
-      let star = this.stars.find(s => s.data._id === e.data.orbiting)
-      star!.onMouseOver()
+    if (carrier.orbiting) {
+      const star = this.stars.find(s => s.data._id === carrier.orbiting);
+      star!.onMouseOver();
     }
 
-    this.tooltipLayer!.drawTooltipCarrier(e.data)
+    this.tooltipLayer!.drawTooltipCarrier(carrier);
   }
 
-  onCarrierMouseOut (e) {
+  onCarrierMouseOut (carrier: CarrierData) {
     // If the carrier is orbiting something then send the mouse over event
     // to the star.
-    if (e.data.orbiting) {
-      let star = this.stars.find(s => s.data._id === e.data.orbiting)
-      star!.onMouseOut()
+    if (carrier.orbiting) {
+      const star = this.stars.find(s => s.data._id === carrier.orbiting);
+      star!.onMouseOut();
     }
 
-    this.tooltipLayer!.clear()
+    this.tooltipLayer!.clear();
   }
 
   onStarMouseOver (star: StarData) {
@@ -1050,13 +1050,13 @@ export class Map {
     }
   }
 
-  onCarrierSelected (e) {
+  onCarrierSelected (carrier: CarrierData) {
     if (this._isOrbitalMapEnabled()) {
-      this.orbitalLayer!.drawCarrier(e)
+      this.orbitalLayer!.drawCarrier(carrier);
     }
   }
 
-  onCarrierUnselected (e) {
+  onCarrierUnselected (_carrier: CarrierData) {
     if (this._isOrbitalMapEnabled()) {
       this.orbitalLayer!.clear()
     }
