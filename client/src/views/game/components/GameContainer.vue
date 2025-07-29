@@ -84,11 +84,11 @@ onMounted(() => {
     };
 
     const onPreStarClickedHandler = (params: OnPreStarParams) => {
-      store.commit('starClicked', {});
+      store.commit('starClicked', params);
     };
 
     const onPreStarRightClickedHandler = (params: OnPreStarParams) => {
-      store.commit('starRightClicked', {});
+      store.commit('starRightClicked', params);
     };
 
     const onStarRightClickedHandler = ({ star }: { star: Star }) => {
