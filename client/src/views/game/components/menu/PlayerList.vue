@@ -1,6 +1,6 @@
 <template>
     <ul class="list-group list-group-horizontal">
-        <li class="list-group-item grow" v-for="p in sortedPlayers" v-bind:key="p._id" v-on:click="onPlayerClicked(p)"
+        <li class="list-group-item grow" v-for="p in sortedPlayers" v-bind:key="p._id" v-on:click="(e) => onPlayerClicked(p, e)"
           :title="p.colour.alias + ' ' + p.shape + ' - ' + p.alias">
           <player-avatar :player="p"/>
 
@@ -10,34 +10,38 @@
     </ul>
 </template>
 
-<script>
-import gameHelper from '../../../../services/gameHelper'
-import PlayerAvatarVue from './PlayerAvatar.vue'
+<script setup lang="ts">
+import gameHelper from '../../../../services/gameHelper';
+import PlayerAvatar from './PlayerAvatar.vue';
+import type {State} from "@/store";
+import { useStore, type Store } from 'vuex';
+import { computed } from 'vue';
+import type { Player } from '@/types/game';
 
-export default {
-  components: {
-    'player-avatar': PlayerAvatarVue
-  },
-  methods: {
-    getFriendlyColour (colour) {
-      return gameHelper.getFriendlyColour(colour)
-    },
-    onPlayerClicked (player) {
-      // dispatch click to the store to intercept it when adding the player name to a message
-      this.$store.commit('playerClicked', {
-        player,
-        permitCallback: () => this.$emit('onOpenPlayerDetailRequested', player._id)
-      })
-    },
-    getPlayerColour (player) {
-      return this.$store.getters.getColourForPlayer(player._id).value
-    }
-  },
-  computed: {
-    sortedPlayers: function () {
-      return gameHelper.getSortedLeaderboardPlayerList(this.$store.state.game)
-    }
+const emit = defineEmits<{
+  'onOpenPlayerDetailRequested': [playerId: string],
+}>();
+
+const store: Store<State> = useStore();
+
+const sortedPlayers = computed(() => gameHelper.getSortedLeaderboardPlayerList(store.state.game));
+
+const onPlayerClicked = (player: Player, e: MouseEvent) => {
+  const click = () => emit('onOpenPlayerDetailRequested', player._id);
+
+  const doNormalClick = store.state.settings.interface.shiftKeyMentions === 'enabled' && e.shiftKey;
+  if (doNormalClick) {
+    click();
   }
+
+  store.commit('playerClicked', {
+    player,
+    permitCallback: click,
+  });
+};
+
+const getPlayerColour = (player: Player) => {
+  return store.getters.getColourForPlayer(player._id).value;
 }
 </script>
 
