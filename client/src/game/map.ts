@@ -769,18 +769,28 @@ export class Map {
   onStarClicked (dic: StarClickEvent) {
     // ignore clicks if its a drag motion
     const e = dic.starData
-    if (dic.eventData && this.isDragMotion(dic.eventData.global)) { return }
+    if (dic.eventData && this.isDragMotion(dic.eventData.global)) {
+      return;
+    }
+
+    const click = () => {
+      dic.permitCallback && dic.permitCallback();
+
+      this.selectStar(e, dic);
+    };
+
+    const doNormalClick = this.userSettings.interface.shiftKeyMentions === 'enabled' && dic.eventData?.shiftKey;
+
+    if (doNormalClick) {
+      click();
+    }
 
     const owningPlayer = gameHelper.getStarOwningPlayer(this.game, dic.starData);
 
     this.eventBus.emit(MapEventBusEventNames.MapOnPreStarClicked, {
       star: dic.starData,
       owningPlayer,
-      defaultCallback: () => {
-        dic.permitCallback && dic.permitCallback();
-
-        this.selectStar(e, dic);
-      }
+      defaultCallback: click,
     });
   }
 
@@ -819,14 +829,21 @@ export class Map {
 
     const owningPlayer = gameHelper.getStarOwningPlayer(this.game!, dic.starData);
 
+    const click = () =>  {
+      if (this.mode.mode === ModeKind.Galaxy) {
+        this.eventBus.emit(MapEventBusEventNames.MapOnStarRightClicked, { star: e })
+      }
+    };
+
+    const doNormalClick = this.userSettings.interface.shiftKeyMentions === 'enabled' && dic.eventData?.shiftKey;
+    if (doNormalClick) {
+      click();
+    }
+
     this.eventBus.emit(MapEventBusEventNames.MapOnPreStarRightClicked, {
       star: dic.starData,
       owningPlayer,
-      defaultCallback: () => {
-        if (this.mode.mode === ModeKind.Galaxy) {
-          this.eventBus.emit(MapEventBusEventNames.MapOnStarRightClicked, { star: e })
-        }
-      }
+      defaultCallback: click,
     });
   }
 
