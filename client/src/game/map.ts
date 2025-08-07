@@ -402,6 +402,8 @@ export class Map {
 
     this.pathManager.update(game, userSettings);
 
+    this.drawGalaxyCenter();
+
     // Check for stars that are no longer in scanning range.
     for (let i = 0; i < this.stars.length; i++) {
       const star = this.stars[i]
