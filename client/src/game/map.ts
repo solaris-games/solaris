@@ -398,6 +398,7 @@ export class Map {
   reloadGame (game: Game, userSettings: UserGameSettings) {
     this.app.ticker.maxFPS = userSettings.technical.fpsLimit;
 
+    this.userSettings = userSettings;
     this.game = game;
 
     this.pathManager.update(game, userSettings);
