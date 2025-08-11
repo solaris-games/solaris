@@ -4,6 +4,7 @@ import type {Game} from "@/types/game";
 import type {DrawingContext} from "@/game/container";
 import { Container, Graphics } from 'pixi.js';
 import Voronoi from '../../voronoi/Javascript-Voronoi/rhill-voronoi-core.js';
+import {colorFromString} from "@/util/colour";
 
 const MAX_VORONOI_DISTANCE = 200
 
@@ -108,7 +109,7 @@ export const drawTerritoriesVoronoi = (game: Game, userSettings: UserGameSetting
     let colour = 0x000000
 
     if (star.ownedByPlayerId) {
-      colour = Number.parseInt(context.getPlayerColour(star.ownedByPlayerId));
+      colour = colorFromString(context.getPlayerColour(star.ownedByPlayerId));
     }
 
     let points: Position[] = []
@@ -134,6 +135,10 @@ export const drawTerritoriesVoronoi = (game: Game, userSettings: UserGameSetting
       // Draw another line back to the origin.
       territoryGraphic.lineTo(sanitizedPoints[0].x, sanitizedPoints[0].y)
 
+      console.log({
+        parsedColour: colour,
+        str: star.ownedByPlayerId && context.getPlayerColour(star.ownedByPlayerId),
+      })
       territoryGraphic.fill({
         color: colour,
         alpha: 0.3,
@@ -162,7 +167,7 @@ export const drawTerritoriesVoronoi = (game: Game, userSettings: UserGameSetting
     let colour = 0x000000
 
     if (border.lSite.playerID) {
-      colour = Number.parseInt(context.getPlayerColour(border.lSite.playerID));
+      colour = colorFromString(context.getPlayerColour(border.lSite.playerID));
     }
 
     borderGraphics.moveTo(rightVA.x, rightVA.y)
@@ -175,7 +180,7 @@ export const drawTerritoriesVoronoi = (game: Game, userSettings: UserGameSetting
     colour = 0x000000
 
     if (border.rSite.playerID) {
-      colour = Number.parseInt(context.getPlayerColour(border.rSite.playerID));
+      colour = colorFromString(context.getPlayerColour(border.rSite.playerID));
     }
 
     borderGraphics.moveTo(leftVA.x, leftVA.y)
