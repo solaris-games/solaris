@@ -29,9 +29,10 @@ const sortedPlayers = computed(() => gameHelper.getSortedLeaderboardPlayerList(s
 const onPlayerClicked = (player: Player, e: MouseEvent) => {
   const click = () => emit('onOpenPlayerDetailRequested', player._id);
 
-  const doNormalClick = store.state.settings.interface.shiftKeyMentions === 'enabled' && e.shiftKey;
+  const doNormalClick = store.state.settings.interface.shiftKeyMentions === 'enabled' && !e.shiftKey;
   if (doNormalClick) {
     click();
+    return;
   }
 
   store.commit('playerClicked', {

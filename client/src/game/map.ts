@@ -782,10 +782,16 @@ export class Map {
       this.selectStar(e, dic);
     };
 
-    const doNormalClick = this.userSettings.interface.shiftKeyMentions === 'enabled' && dic.eventData?.shiftKey;
+    const doNormalClick = this.userSettings.interface.shiftKeyMentions === 'enabled' && !dic.eventData?.shiftKey;
+
+    console.log({
+      shiftKeyMentions: this.userSettings.interface.shiftKeyMentions,
+      shiftKey: dic.eventData?.shiftKey,
+    });
 
     if (doNormalClick) {
       click();
+      return;
     }
 
     const owningPlayer = gameHelper.getStarOwningPlayer(this.game, dic.starData);
@@ -838,9 +844,10 @@ export class Map {
       }
     };
 
-    const doNormalClick = this.userSettings.interface.shiftKeyMentions === 'enabled' && dic.eventData?.shiftKey;
+    const doNormalClick = this.userSettings.interface.shiftKeyMentions === 'enabled' && !dic.eventData?.shiftKey;
     if (doNormalClick) {
       click();
+      return;
     }
 
     this.eventBus.emit(MapEventBusEventNames.MapOnPreStarRightClicked, {
