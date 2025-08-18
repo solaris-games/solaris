@@ -135,10 +135,6 @@ export const drawTerritoriesVoronoi = (game: Game, userSettings: UserGameSetting
       // Draw another line back to the origin.
       territoryGraphic.lineTo(sanitizedPoints[0].x, sanitizedPoints[0].y)
 
-      console.log({
-        parsedColour: colour,
-        str: star.ownedByPlayerId && context.getPlayerColour(star.ownedByPlayerId),
-      })
       territoryGraphic.fill({
         color: colour,
         alpha: 0.3,

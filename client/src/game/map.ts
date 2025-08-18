@@ -784,11 +784,6 @@ export class Map {
 
     const doNormalClick = this.userSettings.interface.shiftKeyMentions === 'enabled' && !dic.eventData?.shiftKey;
 
-    console.log({
-      shiftKeyMentions: this.userSettings.interface.shiftKeyMentions,
-      shiftKey: dic.eventData?.shiftKey,
-    });
-
     if (doNormalClick) {
       click();
       return;
