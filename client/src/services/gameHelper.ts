@@ -233,7 +233,15 @@ class GameHelper {
       if (this.isInstantTravel(prevLoc, currLoc)) {
         ticks = 1
       } else {
-        ticks = Math.ceil(distance / tickDistance)
+        // fix here
+
+        ticks = 1;
+        let remainingDistance = distance;
+
+        while (remainingDistance > tickDistance) {
+          remainingDistance -= tickDistance;
+          ticks++;
+        }
       }
 
       totalTicks += ticks

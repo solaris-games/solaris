@@ -620,7 +620,7 @@
 
     <div v-if="game && game.settings.specialGalaxy.specialistCost !== 'none'">
       <view-subtitle title="Specialist Bans"/>
-      <specialist-ban-list :game="game"/>
+      <specialist-ban-list :game="game" />
     </div>
   </div>
 </div>

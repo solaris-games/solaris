@@ -15,6 +15,7 @@ export type UserGameSettings = {
         galaxyScreenUpgrades: SettingEnabledDisabled;
         uiStyle: SettingUIType;
         suggestMentions: SettingEnabledDisabled;
+        shiftKeyMentions: SettingEnabledDisabled;
     },
     guild: {
         displayGuildTag: SettingVisibility;

@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js'
 import Background from './background'
-import Star from './star'
+import Star, { type BasicStarClickEvent, type StarClickEvent } from './star'
 import Waypoints from './waypoints'
 import RulerPoints from './rulerPoints'
 import Territories from './territories'
@@ -11,18 +11,18 @@ import PathManager from './PathManager'
 import OrbitalLocationLayer from './orbital'
 import WormHoleLayer from './wormHole'
 import TooltipLayer from './tooltip'
-import type {Store} from "vuex";
-import type {State} from "../store";
 import { type DrawingContext } from "./container";
 import type {Game, Player, Star as StarData, Carrier as CarrierData} from "../types/game";
 import type {Location, MapObject, UserGameSettings} from "@solaris-common";
 import { Chunks } from './chunks'
-import Carrier from "./carrier";
+import Carrier, {type CarrierClickEvent} from "./carrier";
 import type { EventBus } from '../eventBus'
 import MapEventBusEventNames from '../eventBusEventNames/map'
 import MapCommandEventBusEventNames from "../eventBusEventNames/mapCommand";
 import { createStarHighlight } from './highlight'
 import {Viewport} from 'pixi-viewport'
+import type {TempWaypoint} from "@/types/waypoint";
+import type {RulerPoint} from "@/types/ruler";
 
 export enum ModeKind {
   Galaxy = 'galaxy',
@@ -45,6 +45,8 @@ type ModeWaypoints = {
 
 export type Mode = ModeGalaxy | ModeRuler | ModeWaypoints;
 
+export type PreStarClickedCallback = () => void;
+
 export class Map {
   // Represents the current game mode, these are as follows:
   // galaxy - Normal galaxy view
@@ -54,7 +56,6 @@ export class Map {
   };
   eventBus: EventBus;
   app: PIXI.Application;
-  store: Store<State>;
   context: DrawingContext;
   container: PIXI.Container;
   viewport: Viewport;
@@ -90,9 +91,8 @@ export class Map {
   galaxyCenterGraphics: PIXI.Graphics | undefined;
   unsubscribe: (() => void) | undefined;
 
-  constructor (app: PIXI.Application, store: Store<State>, viewport: Viewport, context: DrawingContext, eventBus: EventBus, game: Game, userSettings: UserGameSettings) {
+  constructor (app: PIXI.Application, viewport: Viewport, context: DrawingContext, eventBus: EventBus, game: Game, userSettings: UserGameSettings) {
     this.app = app
-    this.store = store
     this.context = context
     this.viewport = viewport;
     this.container = new PIXI.Container()
@@ -162,23 +162,23 @@ export class Map {
 
     this.waypoints = new Waypoints()
     this.waypoints.setup(game, this.context)
-    this.waypoints.on('onWaypointCreated', this.onWaypointCreated.bind(this))
-    this.waypoints.on('onWaypointOutOfRange', this.onWaypointOutOfRange.bind(this))
+    this.waypoints.on('onWaypointCreated', this.onWaypointCreated.bind(this));
+    this.waypoints.on('onWaypointOutOfRange', this.onWaypointOutOfRange.bind(this));
 
-    this.waypointContainer!.addChild(this.waypoints.container)
+    this.waypointContainer.addChild(this.waypoints.container)
 
     this.rulerPoints = new RulerPoints(game);
     this.rulerPoints.on('onRulerPointCreated', this.onRulerPointCreated.bind(this))
     this.rulerPoints.on('onRulerPointsCleared', this.onRulerPointsCleared.bind(this))
     this.rulerPoints.on('onRulerPointRemoved', this.onRulerPointRemoved.bind(this))
 
-    this.rulerPointContainer!.addChild(this.rulerPoints.container)
+    this.rulerPointContainer.addChild(this.rulerPoints.container);
 
     // -----------
     // Setup Territories
     this.territories = new Territories(this.context, game, userSettings);
 
-    this.territoryContainer!.addChild(this.territories.container);
+    this.territoryContainer.addChild(this.territories.container);
     this.territories.draw();
 
     // -----------
@@ -306,20 +306,20 @@ export class Map {
       star = new Star(this.app, this.game, starData, userSettings, this.context);
       this.stars.push(star);
 
-      this.starContainer!.addChild(star.fixedContainer)
+      this.starContainer!.addChild(star.fixedContainer);
 
-      star.on('onStarClicked', this.onStarClicked.bind(this))
-      star.on('onStarRightClicked', this.onStarRightClicked.bind(this))
-      star.on('onStarDefaultClicked', this.onStarDefaultClicked.bind(this))
-      star.on('onStarMouseOver', this.onStarMouseOver.bind(this))
-      star.on('onStarMouseOut', this.onStarMouseOut.bind(this))
-      star.on('onSelected', this.onStarSelected.bind(this))
-      star.on('onUnselected', this.onStarUnselected.bind(this))
+      star.on('onStarClicked', this.onStarClicked.bind(this));
+      star.on('onStarRightClicked', this.onStarRightClicked.bind(this));
+      star.on('onStarDefaultClicked', this.onStarDefaultClicked.bind(this));
+      star.on('onStarMouseOver', this.onStarMouseOver.bind(this));
+      star.on('onStarMouseOut', this.onStarMouseOut.bind(this));
+      star.on('onSelected', this.onStarSelected.bind(this));
+      star.on('onUnselected', this.onStarUnselected.bind(this));
     } else {
       star.update(this.game, starData, userSettings);
     }
 
-    return star
+    return star;
   }
 
   setupCarrier (game: Game, userSettings: UserGameSettings, carrierData: CarrierData) {
@@ -358,6 +358,8 @@ export class Map {
     } else {
       this.clearRulerPoints()
     }
+
+    this.refreshZoom();
   }
 
   drawGalaxyCenter () {
@@ -382,25 +384,28 @@ export class Map {
           alpha: 0.75,
         });
 
-        this.starContainer!.addChild(this.galaxyCenterGraphics);
+        this.starContainer.addChild(this.galaxyCenterGraphics);
     }
   }
 
   _isOrbitalMapEnabled () {
-    return this.game!.constants.distances.galaxyCenterLocation && this.game!.settings.orbitalMechanics.enabled === 'enabled'
+    return this.game.constants.distances.galaxyCenterLocation && this.game.settings.orbitalMechanics.enabled === 'enabled'
   }
 
   _isWormHolesEnabled () {
-    return this.game!.settings.specialGalaxy.randomWormHoles
-      || this.game!.galaxy.stars.find(s => s.wormHoleToStarId)
+    return this.game.settings.specialGalaxy.randomWormHoles
+      || this.game.galaxy.stars.find(s => s.wormHoleToStarId)
   }
 
   reloadGame (game: Game, userSettings: UserGameSettings) {
     this.app.ticker.maxFPS = userSettings.technical.fpsLimit;
 
+    this.userSettings = userSettings;
     this.game = game;
 
     this.pathManager.update(game, userSettings);
+
+    this.drawGalaxyCenter();
 
     // Check for stars that are no longer in scanning range.
     for (let i = 0; i < this.stars.length; i++) {
@@ -458,10 +463,10 @@ export class Map {
     this.drawPlayerNames();
 
     this.background = new Background(game, userSettings, this.context);
-    this.background!.draw();
+    this.background.draw();
 
     this.waypoints.setup(game, this.context);
-    this.tooltipLayer!.setup(game, this.context);
+    this.tooltipLayer.setup(game, this.context);
 
     this.chunks.update(game, this.stars, this.carriers);
 
@@ -516,14 +521,12 @@ export class Map {
   }
 
   removeLastRulerPoint () {
-    this.rulerPoints!.removeLastRulerPoint()
+    this.rulerPoints.removeLastRulerPoint()
   }
 
   drawStars () {
-    for (let i = 0; i < this.stars.length; i++) {
-      let star = this.stars[i]
-
-      this.drawStar(star)
+    for (let star of this.stars) {
+      this.drawStar(star);
     }
   }
 
@@ -533,16 +536,15 @@ export class Map {
   }
 
   _undrawStar (star: Star) {
-    star.off('onStarClicked', this.onStarClicked.bind(this))
-    star.off('onStarRightClicked', this.onStarRightClicked.bind(this))
+    star.removeAllListeners();
 
-    this.starContainer!.removeChild(star.fixedContainer)
+    this.starContainer.removeChild(star.fixedContainer);
 
-    this.chunks!.removeMapObjectFromChunks(star)
+    this.chunks.removeMapObjectFromChunks(star);
 
-    this.stars.splice(this.stars.indexOf(star), 1)
+    this.stars.splice(this.stars.indexOf(star), 1);
 
-    star.destroy()
+    star.destroy();
   }
 
   drawCarriers () {
@@ -559,6 +561,8 @@ export class Map {
   }
 
   _undrawCarrier (carrier: Carrier) {
+    carrier.removeAllListeners();
+
     this.chunks!.removeMapObjectFromChunks(carrier);
     this.carriers.splice(this.carriers.indexOf(carrier), 1)
 
@@ -566,35 +570,35 @@ export class Map {
   }
 
   undrawCarrier (carrierData: CarrierData) {
-    const existing = this.carriers.find(x => x.data!._id === carrierData._id)
+    const existing = this.carriers.find(x => x.data!._id === carrierData._id);
 
     if (existing) {
-      this._undrawCarrier(existing)
+      this._undrawCarrier(existing);
     }
   }
 
   drawWaypoints () {
     if (this.mode.mode === ModeKind.Waypoints) {
-      this.waypoints!.draw(this.mode.carrier)
+      this.waypoints.draw(this.mode.carrier);
     }
 
     for (let i = 0; i < this.carriers.length; i++) {
-      let c = this.carriers[i]
+      let c = this.carriers[i];
 
-      c.drawCarrierWaypoints()
+      c.drawCarrierWaypoints();
     }
   }
 
   clearWaypoints () {
-    this.waypoints!.clear()
+    this.waypoints.clear();
   }
 
   drawRulerPoints () {
-    this.rulerPoints!.draw()
+    this.rulerPoints.draw();
   }
 
   clearRulerPoints () {
-    this.rulerPoints!.update(this.game);
+    this.rulerPoints.update(this.game);
   }
 
   drawTerritories (userSettings: UserGameSettings) {
@@ -614,8 +618,8 @@ export class Map {
   }
 
   drawPlayerNames () {
-    this.playerNames!.setup(this.game!, this.userSettings!, this.context)
-    this.playerNames!.draw()
+    this.playerNames.setup(this.game, this.userSettings, this.context)
+    this.playerNames.draw()
   }
 
   panToPlayer (game: Game, player: Player) {
@@ -629,11 +633,11 @@ export class Map {
   }
 
   panToUser (game: Game) {
-    let player = gameHelper.getUserPlayer(game)
+    const player = gameHelper.getUserPlayer(game);
 
     if (!player) {
-      const galaxyCenterX = gameHelper.calculateGalaxyCenterX(game)
-      const galaxyCenterY = gameHelper.calculateGalaxyCenterY(game)
+      const galaxyCenterX = gameHelper.calculateGalaxyCenterX(game);
+      const galaxyCenterY = gameHelper.calculateGalaxyCenterY(game);
 
       this.panToLocation({ x: galaxyCenterX, y: galaxyCenterY })
       return
@@ -643,15 +647,9 @@ export class Map {
   }
 
   panToObject(object: { location: Location }) {
-    this.panToLocation(object.location)
-  }
+    this.panToLocation(object.location);
 
-  panToStar (star: StarData) {
-    this.panToLocation(star.location)
-  }
-
-  panToCarrier (carrier: CarrierData) {
-    this.panToLocation(carrier.location)
+    this.refreshZoom();
   }
 
   panToLocation (location: Location) {
@@ -659,17 +657,17 @@ export class Map {
   }
 
   clickStar (starId: string) {
-    let star = this.stars.find(s => s.data._id === starId)
+    const star = this.stars.find(s => s.data._id === starId)!;
 
-    star!.onClicked(null, false)
-    star!.select()
+    star.onClicked(null, false);
+    star.select();
   }
 
   clickCarrier (carrierId: string) {
-    let carrier = this.carriers.find(s => s.data!._id === carrierId)
+    const carrier = this.carriers.find(s => s.data!._id === carrierId)!;
 
-    carrier!.onClicked(null, false)
-    carrier!.select()
+    carrier.onClicked(null, false);
+    carrier.select();
   }
 
   unselectAllStars () {
@@ -689,7 +687,7 @@ export class Map {
     this.clearCarrierHighlights();
   }
 
-  unselectAllStarsExcept (star) {
+  unselectAllStarsExcept (star: Star) {
     this.stars
       .filter(s => s.isSelected || s.data._id === star.data._id) // Get only stars that are selected or the e star.
       .forEach(s => {
@@ -700,7 +698,7 @@ export class Map {
       })
   }
 
-  unselectAllCarriersExcept (carrier) {
+  unselectAllCarriersExcept (carrier: Carrier) {
     this.carriers
       .filter(c => c.isSelected || c.data!._id === carrier.data._id) // Get only stars that are selected or the e star.
       .forEach(c => {
@@ -766,41 +764,54 @@ export class Map {
   }
 
   //not sure where to put this func
-  isDragMotion(position) {
-    let DRAG_THRESHOLD = 8 //max distance in pixels
-    let dxSquared = Math.pow(Math.abs(this.lastPointerDownPosition!.x - position.x),2)
-    let dySquared = Math.pow(Math.abs(this.lastPointerDownPosition!.y - position.y),2)
-    let distance = Math.sqrt(dxSquared+dySquared)
+  isDragMotion(position: Location) {
+    const DRAG_THRESHOLD = 8 //max distance in pixels
+    const dxSquared = Math.pow(Math.abs(this.lastPointerDownPosition!.x - position.x),2)
+    const dySquared = Math.pow(Math.abs(this.lastPointerDownPosition!.y - position.y),2)
+    const distance = Math.sqrt(dxSquared+dySquared)
 
     return (distance > DRAG_THRESHOLD)
   }
 
-  onStarClicked (dic) {
+  onStarClicked (dic: StarClickEvent) {
     // ignore clicks if its a drag motion
-    let e = dic.starData
-    if (dic.eventData && this.isDragMotion(dic.eventData.global)) { return }
+    const e = dic.starData
+    if (dic.eventData && this.isDragMotion(dic.eventData.global)) {
+      return;
+    }
 
-    // dispatch click event to the store, so it can be intercepted for adding star name to open message
-    this.store.commit('starClicked', {
+    const click = () => {
+      dic.permitCallback && dic.permitCallback();
+
+      this.selectStar(e, dic);
+    };
+
+    const doNormalClick = this.userSettings.interface.shiftKeyMentions === 'enabled' && !dic.eventData?.shiftKey;
+
+    if (doNormalClick) {
+      click();
+      return;
+    }
+
+    const owningPlayer = gameHelper.getStarOwningPlayer(this.game, dic.starData);
+
+    this.eventBus.emit(MapEventBusEventNames.MapOnPreStarClicked, {
       star: dic.starData,
-      permitCallback: () => {
-        dic.permitCallback && dic.permitCallback()
-
-        this.selectStar(e, dic);
-      }
-    })
+      owningPlayer,
+      defaultCallback: click,
+    });
   }
 
-  selectStar (e, dic) {
+  selectStar (e: StarData, dic: BasicStarClickEvent) {
     // Clicking stars should only raise events to the UI if in galaxy mode.
     if (this.mode.mode === ModeKind.Galaxy) {
       let selectedStar = this.stars.find(x => x.data._id === e._id)
 
       this.unselectAllCarriers()
-      this.unselectAllStarsExcept(selectedStar)
+      selectedStar && this.unselectAllStarsExcept(selectedStar);
 
       if (!dic.tryMultiSelect || !this.tryMultiSelect(e.location)) {
-        selectedStar!.toggleSelected()
+        selectedStar?.toggleSelected()
         this.eventBus.emit(MapEventBusEventNames.MapOnStarClicked, { star: e })
       }
     } else if (this.mode.mode === ModeKind.Waypoints) {
@@ -811,48 +822,52 @@ export class Map {
     AnimationService.drawSelectedCircle(this.app, this.container, e.location)
   }
 
-  onStarDefaultClicked (dic) {
+  onStarDefaultClicked (dic: BasicStarClickEvent) {
     // ignore clicks if its a drag motion
     let e = dic.starData
     if (dic.eventData && this.isDragMotion(dic.eventData.global)) { return }
 
-    dic.permitCallback && dic.permitCallback()
     this.selectStar(e, dic);
   }
 
-  onStarRightClicked (dic) {
+  onStarRightClicked (dic: BasicStarClickEvent) {
     // ignore clicks if its a drag motion
-    let e = dic.starData
+    const e = dic.starData
     if (dic.eventData && this.isDragMotion(dic.eventData.global)) { return }
 
-    let owningPlayer = gameHelper.getStarOwningPlayer(this.game!, dic.starData);
+    const owningPlayer = gameHelper.getStarOwningPlayer(this.game!, dic.starData);
 
-    // dispatch click event to the store, so it can be intercepted for adding star/player name to open message
-    this.store.commit('starRightClicked', {
-      star: dic.starData,
-      player: owningPlayer,
-      permitCallback: () => {
-        dic.permitCallback && dic.permitCallback()
-
-        if (this.mode.mode === ModeKind.Galaxy) {
-          this.eventBus.emit(MapEventBusEventNames.MapOnStarRightClicked, { star: e })
-        }
+    const click = () =>  {
+      if (this.mode.mode === ModeKind.Galaxy) {
+        this.eventBus.emit(MapEventBusEventNames.MapOnStarRightClicked, { star: e })
       }
-    })
+    };
+
+    const doNormalClick = this.userSettings.interface.shiftKeyMentions === 'enabled' && !dic.eventData?.shiftKey;
+    if (doNormalClick) {
+      click();
+      return;
+    }
+
+    this.eventBus.emit(MapEventBusEventNames.MapOnPreStarRightClicked, {
+      star: dic.starData,
+      owningPlayer,
+      defaultCallback: click,
+    });
   }
 
-  onCarrierClicked (dic) {
+  onCarrierClicked (ev: CarrierClickEvent) {
     // ignore clicks if its a drag motion
-    if (dic.eventData && this.isDragMotion(dic.eventData.global)) { return }
+    if (ev.eventData && this.isDragMotion(ev.eventData.global)) { return }
 
-    let e = dic.carrierData
+    const e = ev.carrierData
     // Clicking carriers should only raise events to the UI if in galaxy mode.
     if (this.mode.mode === ModeKind.Galaxy) {
 
-      let selectedCarrier = this.carriers.find(x => x.data!._id === e._id)
+      const selectedCarrier = this.carriers.find(x => x.data!._id === e._id)
 
       this.unselectAllStars()
-      this.unselectAllCarriersExcept(selectedCarrier)
+      selectedCarrier && this.unselectAllCarriersExcept(selectedCarrier)
 
       selectedCarrier!.toggleSelected()
 
@@ -864,7 +879,7 @@ export class Map {
         this.waypoints!.clear();
       }
 
-      if (!dic.tryMultiSelect || !this.tryMultiSelect(e.location)) {
+      if (!ev.tryMultiSelect || !this.tryMultiSelect(e.location)) {
         this.eventBus.emit(MapEventBusEventNames.MapOnCarrierClicked, { carrier: e })
       } else {
         selectedCarrier!.unselect()
@@ -876,63 +891,63 @@ export class Map {
     AnimationService.drawSelectedCircle(this.app, this.container, e.location)
   }
 
-  onCarrierRightClicked (e) {
+  onCarrierRightClicked (carrier: CarrierData) {
     if (this.mode.mode === ModeKind.Galaxy) {
-      this.eventBus.emit(MapEventBusEventNames.MapOnCarrierRightClicked, { carrier: e });
+      this.eventBus.emit(MapEventBusEventNames.MapOnCarrierRightClicked, { carrier });
     }
   }
 
-  onCarrierMouseOver (e) {
+  onCarrierMouseOver (carrier: CarrierData) {
     // If the carrier is orbiting something then send the mouse over event
     // to the star.
-    if (e.data.orbiting) {
-      let star = this.stars.find(s => s.data._id === e.data.orbiting)
-      star!.onMouseOver(undefined)
+    if (carrier.orbiting) {
+      const star = this.stars.find(s => s.data._id === carrier.orbiting);
+      star!.onMouseOver();
     }
 
-    this.tooltipLayer!.drawTooltipCarrier(e.data)
+    this.tooltipLayer!.drawTooltipCarrier(carrier);
   }
 
-  onCarrierMouseOut (e) {
+  onCarrierMouseOut (carrier: CarrierData) {
     // If the carrier is orbiting something then send the mouse over event
     // to the star.
-    if (e.data.orbiting) {
-      let star = this.stars.find(s => s.data._id === e.data.orbiting)
-      star!.onMouseOut(undefined)
+    if (carrier.orbiting) {
+      const star = this.stars.find(s => s.data._id === carrier.orbiting);
+      star!.onMouseOut();
     }
 
+    this.tooltipLayer!.clear();
+  }
+
+  onStarMouseOver (star: StarData) {
+    this.tooltipLayer!.drawTooltipStar(star);
+  }
+
+  onStarMouseOut (star: StarData) {
     this.tooltipLayer!.clear()
   }
 
-  onStarMouseOver (e) {
-    this.tooltipLayer!.drawTooltipStar(e.data)
+  onWaypointCreated (waypoint: TempWaypoint) {
+    this.eventBus.emit(MapEventBusEventNames.MapOnWaypointCreated, { waypoint })
   }
 
-  onStarMouseOut (e) {
-    this.tooltipLayer!.clear()
-  }
-
-  onWaypointCreated (e) {
-    this.eventBus.emit(MapEventBusEventNames.MapOnWaypointCreated, { waypoint: e })
-  }
-
-  onWaypointOutOfRange (e) {
+  onWaypointOutOfRange () {
     this.eventBus.emit(MapEventBusEventNames.MapOnWaypointOutOfRange)
   }
 
-  onRulerPointCreated (e) {
-    this.eventBus.emit(MapEventBusEventNames.MapOnRulerPointCreated, { rulerPoint: e });
+  onRulerPointCreated (rulerPoint: RulerPoint) {
+    this.eventBus.emit(MapEventBusEventNames.MapOnRulerPointCreated, { rulerPoint });
   }
 
-  onRulerPointRemoved (e) {
-    this.eventBus.emit(MapEventBusEventNames.MapOnRulerPointRemoved, { rulerPoint: e });
+  onRulerPointRemoved (rulerPoint: RulerPoint) {
+    this.eventBus.emit(MapEventBusEventNames.MapOnRulerPointRemoved, { rulerPoint });
   }
 
-  onRulerPointsCleared (e) {
+  onRulerPointsCleared () {
     this.eventBus.emit(MapEventBusEventNames.MapOnRulerPointsCleared);
   }
 
-  tryMultiSelect (location) {
+  tryMultiSelect (location: Location) {
     // See if there are any other objects close by, if so then
     // we want to allow the user to select which one they want as there might be
     // objects on the map that are on top of eachother or very close together.
@@ -1049,25 +1064,25 @@ export class Map {
     }
   }
 
-  onStarSelected (e) {
+  onStarSelected (star: StarData) {
     if (this._isOrbitalMapEnabled()) {
-      this.orbitalLayer!.drawStar(e)
+      this.orbitalLayer!.drawStar(star);
     }
   }
 
-  onStarUnselected (e) {
+  onStarUnselected (_star: StarData) {
     if (this._isOrbitalMapEnabled()) {
-      this.orbitalLayer!.clear()
+      this.orbitalLayer!.clear();
     }
   }
 
-  onCarrierSelected (e) {
+  onCarrierSelected (carrier: CarrierData) {
     if (this._isOrbitalMapEnabled()) {
-      this.orbitalLayer!.drawCarrier(e)
+      this.orbitalLayer!.drawCarrier(carrier);
     }
   }
 
-  onCarrierUnselected (e) {
+  onCarrierUnselected (_carrier: CarrierData) {
     if (this._isOrbitalMapEnabled()) {
       this.orbitalLayer!.clear()
     }

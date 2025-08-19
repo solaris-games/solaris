@@ -53,8 +53,6 @@
 </template>
 
 <script>
-
-
 import TeamName from '@/views/game/components/shared/TeamName.vue';
 import PlayerAvatarVue from '@/views/game/components/menu/PlayerAvatar.vue';
 import ReadyStatusButtonVue from '@/views/game/components/menu/ReadyStatusButton.vue';
@@ -84,7 +82,7 @@ export default {
       return GameHelper.getFriendlyColour(colour)
     },
     onOpenPlayerDetailRequested(e) {
-      this.$emit('onOpenPlayerDetailRequested', e._id)
+      this.$emit('onOpenPlayerDetailRequested', e)
     },
     getPlayerStatus(player) {
       return GameHelper.getPlayerStatus(player)

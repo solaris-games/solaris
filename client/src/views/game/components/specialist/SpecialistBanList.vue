@@ -8,7 +8,9 @@
         :specialists="starSpecialists"
         :specialistType="'star'"
         :specialistDefaultIcon="'star'"
-        :game="game"/>
+        :readonly="true"
+        :bans="game.settings.specialGalaxy.specialistBans.star"
+      />
 
       <h5>Carrier Specialists</h5>
 
@@ -17,7 +19,9 @@
         :specialists="carrierSpecialists"
         :specialistType="'carrier'"
         :specialistDefaultIcon="'rocket'"
-        :game="game"/>
+        :readonly="true"
+        :bans="game.settings.specialGalaxy.specialistBans.carrier"
+      />
     </div>
 
     <button class="btn btn-primary mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePanel"
@@ -27,30 +31,39 @@
   </div>
 </template>
 
-<script>
-import SpecialistIconVue from '../specialist/SpecialistIcon.vue'
+<script setup lang="ts">
 import SpecialistBanListTable from './SpecialistBanListTable.vue'
 import SpecialistService from "@/services/api/specialist";
+import { ref, onMounted } from 'vue';
+import type {Game} from "@/types/game";
 
-export default {
-  components: {
-    'specialist-icon': SpecialistIconVue,
-    'specialist-ban-list-table': SpecialistBanListTable
-  },
-  props: {
-    game: Object
-  },
-  data() {
-    return {
-      starSpecialists: [],
-      carrierSpecialists: []
-    }
-  },
-  async mounted() {
-    this.starSpecialists = (await SpecialistService.getStarSpecialists()).data;
-    this.carrierSpecialists = (await SpecialistService.getCarrierSpecialists()).data;
-  }
+const props = defineProps<{
+  game: Game,
+}>();
+
+const isLoading = ref(false);
+const starSpecialists = ref([]);
+const carrierSpecialists = ref([]);
+
+const loadSpecialists = async () => {
+  isLoading.value = true;
+
+  const requests = [
+    SpecialistService.getCarrierSpecialists(),
+    SpecialistService.getStarSpecialists()
+  ];
+
+  const responses = await Promise.all(requests);
+
+  carrierSpecialists.value = responses[0].data;
+  starSpecialists.value = responses[1].data;
+
+  isLoading.value = false;
 }
+
+onMounted(async () => {
+  await loadSpecialists();
+});
 </script>
 
 <style scoped>
