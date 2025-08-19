@@ -358,6 +358,8 @@ export class Map {
     } else {
       this.clearRulerPoints()
     }
+
+    this.refreshZoom();
   }
 
   drawGalaxyCenter () {
@@ -645,7 +647,9 @@ export class Map {
   }
 
   panToObject(object: { location: Location }) {
-    this.panToLocation(object.location)
+    this.panToLocation(object.location);
+
+    this.refreshZoom();
   }
 
   panToLocation (location: Location) {
