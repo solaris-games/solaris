@@ -60,7 +60,8 @@ const schema = new Schema({
                 default: 'disabled'
             },
             uiStyle: {type: Types.String, required: false, enum: ['standard', 'compact'], default: 'standard'},
-            suggestMentions: {type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'enabled'}
+            suggestMentions: {type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'enabled'},
+            shiftKeyMentions: { type: Types.String, required: false, enum: ['enabled', 'disabled'], default: 'disabled' },
         },
         guild: {
             displayGuildTag: {type: Types.String, required: false, enum: ['visible', 'hidden'], default: 'visible'},

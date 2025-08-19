@@ -130,6 +130,10 @@ export class RulerPoints extends EventEmitter<keyof Events, Events> {
 
     this.draw();
 
+    if (!old) {
+      return;
+    }
+
     this.emit('onRulerPointRemoved', old);
   }
 

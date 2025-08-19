@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js'
 import Helpers from './helpers'
-import type {Game} from "../types/game";
+import type {Carrier, Game} from "../types/game";
 
 class OrbitalLocationLayer {
   container: PIXI.Container;
@@ -52,7 +52,7 @@ class OrbitalLocationLayer {
         this.container.addChild(graphics)
     }
 
-    drawCarrier (carrier) {
+    drawCarrier (carrier: Carrier) {
         if (!carrier.locationNext || carrier.orbiting) {
             return
         }
