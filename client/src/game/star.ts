@@ -636,7 +636,7 @@ export class Star extends EventEmitter<keyof Events, Events> implements MapObjec
 
   _hasUnknownShips() {
       let carriersOrbiting = this._getStarCarriers()
-      let scramblers = carriersOrbiting.reduce( (sum, c ) => sum + (c.ships === null ? 0 : 1), 0 )
+      let scramblers = carriersOrbiting.reduce( (sum, c ) => sum + (c.ships === null ? 1 : 0), 0 )
       let scrambler = this.data.ships == null
       return ((scramblers || scrambler) && this.data.isInScanningRange)
   }
@@ -677,11 +677,11 @@ export class Star extends EventEmitter<keyof Events, Events> implements MapObjec
 
     let shipsText = ''
 
-    if (this.data.ownedByPlayerId || carriersOrbiting) {
+    if (this.data.ownedByPlayerId || carriersOrbiting.length) {
       let scramblers = 0
 
       if (carriersOrbiting) {
-        scramblers = carriersOrbiting.reduce( (sum, c ) => sum + (c.ships === null ? 0 : 1), 0 )
+        scramblers = carriersOrbiting.reduce( (sum, c ) => sum + (c.ships === null ? 1 : 0), 0 )
       }
 
       if (scramblers == carrierCount && this.data.ships == null) {
