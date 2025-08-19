@@ -241,6 +241,8 @@ AudioService.loadStore(store);
 
 store.commit('clearGame');
 
+//A CSS class that will load only on the game screen to prevent drag-bounce behavior
+const GAME_BODY_CLASS = 'game-body'; 
 onMounted(async () => {
   attemptLogin();
   await reloadSettings();
@@ -254,6 +256,9 @@ onMounted(async () => {
     gameId: store.state.game._id,
     playerId: userPlayer?._id
   });
+
+  //Remove scroll-bounce effect from the game screen
+  document.body.classList.add(GAME_BODY_CLASS);
 
 // If the user is in the game then display the leaderboard.
 // Otherwise show the welcome screen if there are empty slots.
@@ -298,3 +303,4 @@ onUnmounted(() => {
 </script>
 
 <style scoped></style>
+<style> .game-body { overscroll-behavior: none;} </style> 
