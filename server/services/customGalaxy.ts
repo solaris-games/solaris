@@ -237,13 +237,15 @@ export default class CustomGalaxyService {
             const teamColourShapeList = this.playerColourService.generateTeamColourShapeList(numTeams, teamPlayerCounts);
 
             for (let ti = 0; ti < numTeams; ti++) {
+                const customTeam = customGalaxy.teams![ti];
+
                 const team: Team = {
                     _id: new mongoose.Types.ObjectId(),
-                    name: `Team ${ti + 1}`,
+                    name: customTeam.name ? customTeam.name : `Team ${ti + 1}`,
                     players: []
                 };
 
-                const customTeamPlayerIds = customGalaxy.teams![ti].players;
+                const customTeamPlayerIds = customTeam.players;
                 for (let pi = 0; pi < customTeamPlayerIds.length; pi++) {
                     const customPlayer = customGalaxy.players!.find(p => p.id === customTeamPlayerIds[pi])!;
                     const shapeColour = teamColourShapeList[ti][pi];
@@ -306,7 +308,8 @@ export default class CustomGalaxyService {
 
         for (let i = 0; i < customGalaxy.stars.length; i++) {
             const customStar = customGalaxy.stars[i];
-            const star = this._createUnownedCustomGalaxyStar(starNames[i], customGalaxy.stars[i]);
+            const starName = customStar.name ? customStar.name : starNames[i];
+            const star = this._createUnownedCustomGalaxyStar(starName, customStar);
 
             if (customStar.playerId != null) {
                 star.ownedByPlayerId = generatedPlayers.get(customStar.playerId)!._id;
@@ -357,13 +360,13 @@ export default class CustomGalaxyService {
 
             if (customCarrier.orbiting != null) {
                 const carrierStar = generatedStars.get(customCarrier.orbiting)!;
-                const name = this.carrierService.generateCarrierName(carrierStar, carriers);
+                const name = customCarrier.name ? customCarrier.name : this.carrierService.generateCarrierName(carrierStar, carriers);
 
                 carriers.push(this._createCustomGalaxyCarrier(name, ownerId, carrierStar.location, carrierStar._id, waypoints, customCarrier));
             } else {
                 const carrierOriginStar = generatedStars.get(customCarrier.waypoints[0].source)!;
                 const carrierDestinationStar = generatedStars.get(customCarrier.waypoints[0].destination)!;
-                const name = this.carrierService.generateCarrierName(carrierOriginStar, carriers);
+                const name = customCarrier.name ? customCarrier.name : this.carrierService.generateCarrierName(carrierOriginStar, carriers);
                 const location = this._progressAlongPathToLocation(customCarrier.progress!, carrierOriginStar.location, carrierDestinationStar.location);
 
                 carriers.push(this._createCustomGalaxyCarrier(name, ownerId, location, null, waypoints, customCarrier));
@@ -382,7 +385,8 @@ export default class CustomGalaxyService {
 
         for (let i = 0; i < customGalaxy.stars.length; i++) {
             const customStar = customGalaxy.stars[i];
-            const star = this._createUnownedCustomGalaxyStar(starNames[i], customGalaxy.stars[i]);
+            const starName = customStar.name ? customStar.name : starNames[i];
+            const star = this._createUnownedCustomGalaxyStar(starName, customStar);
 
             generatedStars.set(customStar.id, star);
         }

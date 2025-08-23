@@ -20,6 +20,7 @@ import {
     withDefault,
     numberAdv
 } from "../validate";
+import { parseCarrierRenameCarrierRequest } from "./carrier";
 import { keyHasBooleanValue, keyHasNumberValue, keyHasStringValue } from "./helpers";
 
 export interface GameCreateGameRequest {
@@ -28,18 +29,18 @@ export interface GameCreateGameRequest {
 
 export const customGalaxyValidator: Validator<CustomGalaxy> = object({
     stars: array(object({
-        id: stringValue({minLength: 1}),
+        id: stringValue({ minLength: 1 }),
         location: object({
             x: number,
             y: number
         }),
-        playerId: or(stringValue({minLength: 1}), just(null)),
+        playerId: or(stringValue({ minLength: 1 }), just(null)),
         naturalResources: object({
             economy: positiveInteger,
             industry: positiveInteger,
             science: positiveInteger
         }),
-        shipsActual: or(numberAdv({sign: 'positive'}), just(undefined)),
+        shipsActual: or(numberAdv({ sign: 'positive' }), just(undefined)),
         specialistId: or(positiveInteger, just(null)),
         specialistExpireTick: or(positiveInteger, just(null)),
         homeStar: boolean,
@@ -49,17 +50,24 @@ export const customGalaxyValidator: Validator<CustomGalaxy> = object({
         isBinaryStar: boolean,
         isBlackHole: boolean,
         isPulsar: boolean,
-        wormHoleToStarId: or(stringValue({minLength: 1}), just(null)),
+        wormHoleToStarId: or(stringValue({ minLength: 1 }), just(null)),
         infrastructure: object({
             economy: positiveInteger,
             industry: positiveInteger,
             science: positiveInteger
         }),
-        isKingOfTheHillStar: or(boolean, just(undefined))
+        isKingOfTheHillStar: or(boolean, just(undefined)),
+        name: or(stringValue({
+            minLength: 3,
+            maxLength: 30,
+            trim: true,
+            matches: UNICODE_PRINTABLE_CHARACTERS_WITH_WHITESPACE,
+            ignoreForLengthCheck: UNICODE_INVISIBLE_CHARACTERS,
+        }), just(undefined))
     })),
     players: or(array(object({
-        id: stringValue({minLength: 1}),
-        homeStarId: stringValue({minLength: 1}),
+        id: stringValue({ minLength: 1 }),
+        homeStarId: stringValue({ minLength: 1 }),
         credits: positiveInteger,
         creditsSpecialists: positiveInteger,
         technologies: object({
@@ -74,26 +82,40 @@ export const customGalaxyValidator: Validator<CustomGalaxy> = object({
         })
     })), just(undefined)),
     carriers: or(array(object({
-        id: stringValue({minLength: 1}),
-        playerId: stringValue({minLength: 1}),
-        orbiting: or(stringValue({minLength: 1}), just(null)),
+        id: stringValue({ minLength: 1 }),
+        playerId: stringValue({ minLength: 1 }),
+        orbiting: or(stringValue({ minLength: 1 }), just(null)),
         waypointsLooped: boolean,
-        ships: numberAdv({integer: true, sign: 'positive', range: {from: 1}}),
+        ships: numberAdv({ integer: true, sign: 'positive', range: { from: 1 } }),
         specialistId: or(positiveInteger, just(null)),
         specialistExpireTick: or(positiveInteger, just(null)),
         isGift: boolean,
         waypoints: array(object({
-            source: stringValue({minLength: 1}),
-            destination: stringValue({minLength: 1}),
+            source: stringValue({ minLength: 1 }),
+            destination: stringValue({ minLength: 1 }),
             action: stringEnumeration<CarrierWaypointActionType, CarrierWaypointActionType[]>(CarrierWaypointActionTypes),
             actionShips: withDefault(0, positiveInteger),
             delayTicks: withDefault(0, positiveInteger)
         })),
-        progress: or(numberAdv({sign: 'positive', range: {from: 0, to: 1}}), just(undefined))
+        progress: or(numberAdv({ sign: 'positive', range: { from: 0, to: 1 } }), just(undefined)),
+        name: or(stringValue({
+            minLength: 1,
+            maxLength: 30,
+            trim: true,
+            matches: UNICODE_PRINTABLE_CHARACTERS_WITH_WHITESPACE,
+            ignoreForLengthCheck: UNICODE_INVISIBLE_CHARACTERS,
+        }), just(undefined))
     })), just(undefined)),
     teams: or(array(object({
-        id: stringValue({minLength: 1}),
-        players: array(stringValue({minLength: 1}))
+        id: stringValue({ minLength: 1 }),
+        players: array(stringValue({ minLength: 1 })),
+        name: or(stringValue({
+            minLength: 1,
+            maxLength: 30,
+            trim: true,
+            matches: UNICODE_PRINTABLE_CHARACTERS_WITH_WHITESPACE,
+            ignoreForLengthCheck: UNICODE_INVISIBLE_CHARACTERS,
+        }), just(undefined))
     })), just(undefined))
 });
 

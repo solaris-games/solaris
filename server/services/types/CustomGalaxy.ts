@@ -36,6 +36,7 @@ export interface CustomGalaxyStar {
     wormHoleToStarId: string | null;
     infrastructure: Infrastructure;
     isKingOfTheHillStar?: boolean;
+    name?: string;
 }
 
 export interface CustomGalaxyCarrier {
@@ -49,11 +50,13 @@ export interface CustomGalaxyCarrier {
     isGift: boolean;
     waypoints: CustomGalaxyCarrierWaypoint[];
     progress?: number;
+    name?: string;
 }
 
 export interface CustomGalaxyTeam {
     id: string;
     players: string[];
+    name?: string;
 }
 
 export interface CustomGalaxyCarrierWaypoint {
