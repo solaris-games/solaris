@@ -176,5 +176,6 @@ onMounted(() => {
   height: calc(100% - 52px);
   width: 100%;
   overflow: hidden;
+  user-select: none;
 }
 </style>
