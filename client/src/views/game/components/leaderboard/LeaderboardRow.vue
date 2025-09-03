@@ -24,18 +24,18 @@
     </td>
     <td class="fit pt-3 pe-2" v-if="isStarCountWinCondition || isKingOfTheHillMode">
       <span class="d-xs-block d-sm-none">
-        <i class="fas fa-star me-0"></i> {{ player.stats.totalStars }}
+        <i class="fas fa-star me-0"></i> {{ player.stats!.totalStars }}
       </span>
       <span class="d-none d-sm-block">
-        {{ player.stats.totalStars }} Star<span v-if="player.stats.totalStars !== 1">s</span>
+        {{ player.stats!.totalStars }} Star<span v-if="player.stats!.totalStars !== 1">s</span>
       </span>
     </td>
     <td class="fit pt-3 pe-2" v-if="isHomeStarsWinCondition">
       <span class="d-xs-block d-sm-none">
-        <i class="fas fa-star me-0"></i> {{ player.stats.totalHomeStars }}({{ player.stats.totalStars }})
+        <i class="fas fa-star me-0"></i> {{ player.stats!.totalHomeStars }}({{ player.stats!.totalStars }})
       </span>
       <span class="d-none d-sm-block">
-        {{ player.stats.totalHomeStars }}({{ player.stats.totalStars }}) Star<span v-if="player.stats.totalStars !== 1">s</span>
+        {{ player.stats!.totalHomeStars }}({{ player.stats!.totalStars }}) Star<span v-if="player.stats!.totalStars !== 1">s</span>
       </span>
     </td>
     <td class="pt-2 pb-2 pe-1 text-center turn-status" v-if="isTurnBasedGame && canEndTurn">
@@ -44,7 +44,7 @@
       </h5>
 
       <ready-status-button
-        v-if="!$isHistoricalMode() && getUserPlayer() && isUserPlayer(player) && !getUserPlayer().defeated"/>
+        v-if="!isHistoricalMode && getUserPlayer() && isUserPlayer(player) && !getUserPlayer()?.defeated"/>
     </td>
     <td class="fit pt-2 pb-2 pe-2">
       <button class="btn btn-outline-info" @click="panToPlayer(player)"><i class="fas fa-eye"></i></button>
@@ -52,98 +52,107 @@
   </tr>
 </template>
 
-<script>
+<script setup lang="ts">
 import TeamName from '@/views/game/components/shared/TeamName.vue';
-import PlayerAvatarVue from '@/views/game/components/menu/PlayerAvatar.vue';
-import ReadyStatusButtonVue from '@/views/game/components/menu/ReadyStatusButton.vue';
+import PlayerAvatar from '@/views/game/components/menu/PlayerAvatar.vue';
+import ReadyStatusButton from '@/views/game/components/menu/ReadyStatusButton.vue';
 import GameHelper from '@/services/gameHelper';
 import gameService from '@/services/api/game';
 import {eventBusInjectionKey} from "@/eventBus";
-import { inject } from 'vue';
+import { inject, computed } from 'vue';
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
+import type { Player } from '@/types/game';
+import type {State} from "@/store";
+import { useStore, type Store } from 'vuex';
+import {useIsHistoricalMode} from "@/util/reactiveHooks";
 
-export default {
-  components: {
-    'team-name': TeamName,
-    'player-avatar': PlayerAvatarVue,
-    'ready-status-button': ReadyStatusButtonVue,
-  },
-  props: {
-    player: Object,
-    showTeamNames: Boolean,
-  },
-  setup () {
-    return {
-      eventBus: inject(eventBusInjectionKey)
-    }
-  },
-  methods: {
-    getFriendlyColour(colour) {
-      return GameHelper.getFriendlyColour(colour)
-    },
-    onOpenPlayerDetailRequested(e) {
-      this.$emit('onOpenPlayerDetailRequested', e)
-    },
-    getPlayerStatus(player) {
-      return GameHelper.getPlayerStatus(player)
-    },
-    async unconfirmReadyToQuit(player) {
-      if (!this.isUserPlayer(player) || this.$isHistoricalMode()) {
-        return
-      }
+const props = defineProps<{
+  player: Player,
+  showTeamNames: boolean,
+}>();
 
-      try {
-        let response = await gameService.unconfirmReadyToQuit(this.$store.state.game._id)
+const emit = defineEmits<{
+  onOpenPlayerDetailRequested: [playerId: string],
+}>();
 
-        if (response.status === 200) {
-          player.readyToQuit = false
-        }
-      } catch (err) {
-        console.error(err)
-      }
-    },
-    getUserPlayer() {
-      return GameHelper.getUserPlayer(this.$store.state.game)
-    },
-    isUserPlayer(player) {
-      let userPlayer = this.getUserPlayer()
+const eventBus = inject(eventBusInjectionKey)!;
 
-      return userPlayer && userPlayer._id === player._id
-    },
-    panToPlayer(player) {
-      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, { player: player });
-      this.onOpenPlayerDetailRequested(player._id);
-    }
-  },
-  computed: {
-    isKingOfTheHillMode() {
-      return GameHelper.isKingOfTheHillMode(this.$store.state.game)
-    },
-    canReadyToQuit() {
-      return this.$store.state.game.settings.general.readyToQuit === 'enabled'
-        && this.$store.state.game.state.startDate
-        && this.$store.state.game.state.productionTick
-    },
-    isHomeStarsWinCondition() {
-      return GameHelper.isWinConditionHomeStars(this.$store.state.game)
-    },
-    isStarCountWinCondition() {
-      return GameHelper.isWinConditionStarCount(this.$store.state.game)
-    },
-    isTurnBasedGame() {
-      return this.$store.state.game.settings.gameTime.gameType === 'turnBased'
-    },
-    canEndTurn() {
-      return !GameHelper.isGameFinished(this.$store.state.game)
-    },
-    shouldShowTeamNames () {
-      return this.showTeamNames && GameHelper.isTeamConquest(this.$store.state.game)
-    },
-    playerColourSpec () {
-      return this.$store.getters.getColourForPlayer(this.player._id)
-    }
+const store: Store<State> = useStore();
+
+const isHistoricalMode = useIsHistoricalMode(store);
+
+const playerColourSpec = computed(() => {
+  return store.getters.getColourForPlayer(props.player._id);
+});
+
+const shouldShowTeamNames = computed(() => {
+  return props.showTeamNames && GameHelper.isTeamConquest(store.state.game);
+});
+
+const isTurnBasedGame = computed(() => {
+  return store.state.game.settings.gameTime.gameType === 'turnBased';
+});
+
+const isKingOfTheHillMode = computed(() => {
+  return GameHelper.isKingOfTheHillMode(store.state.game);
+});
+
+const canEndTurn = computed(() => {
+  return !GameHelper.isGameFinished(store.state.game);
+});
+
+const canReadyToQuit = computed(() => {
+  return store.state.game.settings.general.readyToQuit === 'enabled'
+    && store.state.game.state.startDate
+    && store.state.game.state.productionTick;
+});
+
+const isStarCountWinCondition = computed(() => {
+  return GameHelper.isWinConditionStarCount(store.state.game);
+});
+
+const isHomeStarsWinCondition = computed(() => {
+  return GameHelper.isWinConditionHomeStars(store.state.game);
+});
+
+const getUserPlayer = () => {
+  return GameHelper.getUserPlayer(store.state.game);
+};
+
+const isUserPlayer = (player: Player) => {
+  const userPlayer = getUserPlayer();
+
+  return userPlayer && userPlayer._id === player._id;
+};
+
+const getPlayerStatus = (player: Player) => {
+  return GameHelper.getPlayerStatus(player);
+};
+
+const onOpenPlayerDetailRequested = (e: Player) => {
+  emit('onOpenPlayerDetailRequested', e._id);
+};
+
+const unconfirmReadyToQuit = async (player: Player) => {
+  if (!isUserPlayer(player) || isHistoricalMode.value) {
+    return;
   }
-}
+
+  try {
+    const response = await gameService.unconfirmReadyToQuit(store.state.game._id);
+
+    if (response.status === 200) {
+      player.readyToQuit = false;
+    }
+  } catch (err) {
+    console.error(err)
+  }
+};
+
+const panToPlayer = (player: Player) => {
+  eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, { player: player });
+  onOpenPlayerDetailRequested(player);
+};
 </script>
 
 
