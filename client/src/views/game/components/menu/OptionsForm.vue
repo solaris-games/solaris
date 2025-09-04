@@ -37,6 +37,17 @@
       </div>
 
       <div class="row pt-1 pb-1">
+        <label for="shiftKeyMentions" class="col-12 col-sm-6 col-form-label">Only add mentions by clicking on objects when the shift key is pressed</label>
+        <div class="col-12 col-sm-6">
+          <select class="form-control" id="shiftKeyMentions" v-model="settings.interface.shiftKeyMentions"
+            :disabled="isSavingSettings">
+            <option value="disabled">Disabled</option>
+            <option value="enabled">Enabled</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row pt-1 pb-1">
         <label for="galaxyScreenUpgrades" class="col-12 col-sm-6 col-form-label">Galaxy Screen</label>
         <div class="col-12 col-sm-6">
           <select class="form-control" id="galaxyScreenUpgrades" v-model="settings.interface.galaxyScreenUpgrades"
@@ -607,7 +618,7 @@ const handleSubmit = async (e: Event) => {
     store.commit('setSettings', settings.value);
 
     if (props.isInGame) {
-      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadGame, {});
+      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadGame, { game: store.state.game, settings: store.state.settings });
     }
 
     onOptionsSaved()

@@ -10,12 +10,13 @@ import SpecialistService from './services/api/specialist.js';
 import GameHelper from './services/gameHelper.js';
 import type { Game, Player, Star } from "./types/game";
 import type { Store } from 'vuex/types/index.js';
-import type {Badge, UserRoles} from "@solaris-common";
+import type {Badge, UserGameSettings, UserRoles} from "@solaris-common";
 import {getBadges} from "./services/typedapi/badge";
 import {formatError, isOk} from "./services/typedapi";
 import type {UserClientSocketEmitter} from "@/sockets/socketEmitters/user";
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import {detailMe} from "@/services/typedapi/user";
+import type { OnPreStarParams } from './eventBusEventNames/map';
 
 export type MentionCallbacks = {
   player: (p: Player) => void;
@@ -33,7 +34,7 @@ export type State = {
   mentionCallbacks: MentionCallbacks | null;
   starSpecialists: any;
   carrierSpecialists: any;
-  settings: any;
+  settings: UserGameSettings | null;
   confirmationDialog: any;
   colourOverride: boolean;
   coloursConfig: any;
@@ -212,7 +213,7 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
       state.colourOverride = value
 
       if (state.game) {
-        eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadGame, {});
+        eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadGame, { game: state.game, settings: state.settings });
       }
     },
 
@@ -256,7 +257,7 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
       state.mentionReceivingElement = data.element;
       state.mentionCallbacks = data.callbacks;
     },
-    resetMentions (state) {
+    resetMentions (state: State) {
       state.mentionReceivingElement = null;
       state.mentionCallbacks = null;
     },
@@ -267,18 +268,18 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
         data.permitCallback(data.player)
       }
     },
-    starClicked (state: State, data) {
+    starClicked (state: State, data: OnPreStarParams) {
       if (state.mentionCallbacks && state.mentionCallbacks.star) {
         state.mentionCallbacks.star(data.star)
       } else {
-        data.permitCallback(data.star)
+        data.defaultCallback();
       }
     },
-    starRightClicked (state: State, data) {
-      if (state.mentionCallbacks && state.mentionCallbacks.player) {
-        state.mentionCallbacks.player(data.player)
+    starRightClicked (state: State, data: OnPreStarParams) {
+      if (state.mentionCallbacks && state.mentionCallbacks.player && data.owningPlayer) {
+        state.mentionCallbacks.player(data.owningPlayer);
       } else {
-        data.permitCallback(data.star)
+        data.defaultCallback();
       }
     },
 
@@ -573,7 +574,7 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
       await ColourService.addColour(state.game._id, data);
       commit('internalAddColourMapping', data);
 
-      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadGame, {});
+      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadGame, { game: state.game, settings: state.settings });
     },
     async verify({ commit, state }) {
       try {

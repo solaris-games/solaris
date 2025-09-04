@@ -1,29 +1,41 @@
-import {Application, BitmapText, Circle, Container, EventEmitter, Graphics, Sprite} from 'pixi.js';
+import {Application, BitmapText, Circle, Container, Graphics, Sprite, FederatedPointerEvent} from 'pixi.js';
 import TextureService from './texture'
 import gameHelper from '../services/gameHelper.js'
 import seededRandom from 'random-seed'
 import Helpers from './helpers'
 import { type MapObject } from './mapObject';
 import type {Game, Star as StarData} from "../types/game";
-import type { Location, UserGameSettings } from '@solaris-common';
+import type { Location, NaturalResources, UserGameSettings } from '@solaris-common';
 import type { DrawingContext } from './container';
+import {EventEmitter} from "./eventEmitter";
 
 const NAME_SIZE = 4
 
-type StarClickEvent = {
+export type BasicStarClickEvent = {
+  eventData?: FederatedPointerEvent,
   starData: StarData,
   tryMultiSelect: boolean,
+}
+
+export type StarClickEvent = BasicStarClickEvent & {
   permitCallback: () => void,
 }
 
 type Events = {
   onSelected: StarData,
   onUnselected: StarData,
-  onStarMouseOver: Star,
-  onStarMouseOut: Star,
-  onStarRightClicked: { starData: StarData },
-  onStarDefaultClicked: { starData: StarData },
+  onStarMouseOver: StarData,
+  onStarMouseOut: StarData,
+  onStarRightClicked: BasicStarClickEvent,
+  onStarDefaultClicked: BasicStarClickEvent,
   onStarClicked: StarClickEvent,
+}
+
+type Planet = {
+  index: number;
+  container: Container;
+  rotationSpeed: number;
+  rotationDirection: boolean;
 }
 
 export class Star extends EventEmitter<keyof Events, Events> implements MapObject {
@@ -58,18 +70,17 @@ export class Star extends EventEmitter<keyof Events, Events> implements MapObjec
   graphics_targeted: Graphics;
   graphics_selected: Graphics;
   graphics_kingOfTheHill: Graphics;
-  planets: any;
-  handleOrbitPlanetsStep: any;
+  planets: Planet[] | null;
   isSelected: boolean;
   isMouseOver: boolean;
   zoomPercent: number;
   showIgnoreBulkUpgradeInfrastructure: boolean;
   zoomDepth: number;
-  game: any;
+  game: Game;
   data: StarData;
   context: DrawingContext;
   lightYearDistance: number = 0;
-  userSettings: any;
+  userSettings: UserGameSettings;
   clampedScaling: boolean = false;
   baseScale: number = 0;
   minScale: number = 0;
@@ -130,7 +141,6 @@ export class Star extends EventEmitter<keyof Events, Events> implements MapObjec
     this.container.on('mouseout', this.onMouseOut.bind(this))
 
     this.planets = null
-    this.handleOrbitPlanetsStep = null
 
     this.isSelected = false
     this.isMouseOver = false
@@ -569,7 +579,7 @@ export class Star extends EventEmitter<keyof Events, Events> implements MapObjec
     }
   }
 
-  _calculateAverageNaturalResources(naturalResources) {
+  _calculateAverageNaturalResources(naturalResources: NaturalResources) {
     return Math.floor((naturalResources.economy + naturalResources.industry + naturalResources.science) / 3);
   }
 
@@ -626,7 +636,7 @@ export class Star extends EventEmitter<keyof Events, Events> implements MapObjec
 
   _hasUnknownShips() {
       let carriersOrbiting = this._getStarCarriers()
-      let scramblers = carriersOrbiting.reduce( (sum, c ) => sum + (c.ships==null), 0 )
+      let scramblers = carriersOrbiting.reduce( (sum, c ) => sum + (c.ships === null ? 1 : 0), 0 )
       let scrambler = this.data.ships == null
       return ((scramblers || scrambler) && this.data.isInScanningRange)
   }
@@ -667,18 +677,18 @@ export class Star extends EventEmitter<keyof Events, Events> implements MapObjec
 
     let shipsText = ''
 
-    if (this.data.ownedByPlayerId || carriersOrbiting) {
+    if (this.data.ownedByPlayerId || carriersOrbiting.length) {
       let scramblers = 0
 
       if (carriersOrbiting) {
-        scramblers = carriersOrbiting.reduce( (sum, c ) => sum + (c.ships==null), 0 )
+        scramblers = carriersOrbiting.reduce( (sum, c ) => sum + (c.ships === null ? 1 : 0), 0 )
       }
 
       if (scramblers == carrierCount && this.data.ships == null) {
         shipsText = '???'
       }
       else {
-        shipsText = totalKnownShips
+        shipsText = totalKnownShips.toString();
 
         if (scramblers > 0 || this.data.ships == null) {
           shipsText += '*'
@@ -897,14 +907,12 @@ export class Star extends EventEmitter<keyof Events, Events> implements MapObjec
      }
   }
 
-  onClicked(e, tryMultiSelect = true) {
-    const eventData = e ? e.data : null
-
+  onClicked(e: FederatedPointerEvent | null, tryMultiSelect = true) {
     const click = () => {
       this.emit('onStarClicked', {
         starData: this.data,
         tryMultiSelect,
-        eventData,
+        eventData: e!,
         permitCallback: () => {
           // Need to do this otherwise sometimes text gets highlighted.
           this.deselectAllText()
@@ -917,18 +925,20 @@ export class Star extends EventEmitter<keyof Events, Events> implements MapObjec
       })
     };
 
-    if (e?.data?.originalEvent) {
-      const button = e.data.originalEvent.button;
+    if (e) {
+      const button = e.button;
 
       if (button === 2) {
         this.emit('onStarRightClicked', {
           starData: this.data,
-          eventData
+          eventData: e,
+          tryMultiSelect: false,
         });
       } else if (button === 1) {
         this.emit('onStarDefaultClicked', {
           starData: this.data,
-          eventData
+          eventData: e,
+          tryMultiSelect: false,
         });
       } else {
         click();
@@ -987,15 +997,13 @@ export class Star extends EventEmitter<keyof Events, Events> implements MapObjec
 
   subscribeToEvents () {
     if (this.container_planets) {
-      this.handleOrbitPlanetsStep = this.orbitPlanetsStep.bind(this)
-      this.app.ticker.add(this.handleOrbitPlanetsStep)
+      this.app.ticker.add(this.orbitPlanetsStep.bind(this))
     }
   }
 
   unsubscribeToEvents () {
     if (this.container_planets) {
-      this.app.ticker.remove(this.handleOrbitPlanetsStep)
-      this.handleOrbitPlanetsStep = null
+      this.app.ticker.remove(this.orbitPlanetsStep.bind(this))
     }
   }
 
@@ -1006,20 +1014,20 @@ export class Star extends EventEmitter<keyof Events, Events> implements MapObjec
     else if (document.selection) {document.selection.empty();}
   }
 
-  onMouseOver (e) {
-    this.isMouseOver = true
+  onMouseOver () {
+    this.isMouseOver = true;
 
-    this.emit('onStarMouseOver', this)
+    this.emit('onStarMouseOver', this.data)
   }
 
-  onMouseOut (e) {
-    this.isMouseOver = false
+  onMouseOut () {
+    this.isMouseOver = false;
 
-    this.emit('onStarMouseOut', this)
+    this.emit('onStarMouseOut', this.data)
   }
 
   //This could in the future be a setter function on ZoomPercent
-  refreshZoom (zoomPercent) {
+  refreshZoom (zoomPercent: number) {
     this.zoomPercent = zoomPercent
     this._updateDepthLevel()
   }

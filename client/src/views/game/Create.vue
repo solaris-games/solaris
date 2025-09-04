@@ -926,7 +926,7 @@
       <view-collapse-panel title="Specialist Bans" v-if="settings.specialGalaxy.specialistCost !== 'none'">
         <div class="mb-2" v-if="settings.specialGalaxy.specialistCost !== 'none'">
           <p><small>Choose to ban certain specialists from the game, they cannot be hired by any player.</small></p>
-          <specialist-ban-list-selection @onSpecialistBanSelectionChanged="onSpecialistBanSelectionChanged" />
+          <specialist-ban-list-selection :specialist-bans="settings.specialGalaxy.specialistBans" @updateSpecialistBans="bans => settings.specialGalaxy.specialistBans = bans" />
         </div>
       </view-collapse-panel>
 

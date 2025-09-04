@@ -6,6 +6,7 @@ export const DEFAULT_SETTINGS: UserGameSettings = {
         galaxyScreenUpgrades: 'disabled',
         uiStyle: 'standard',
         suggestMentions: 'disabled',
+        shiftKeyMentions: 'disabled',
     },
     guild: {
         displayGuildTag: 'hidden',

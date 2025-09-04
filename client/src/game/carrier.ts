@@ -1,4 +1,4 @@
-import { Container, Sprite, Graphics, BitmapText, Circle, TextStyle, Text } from 'pixi.js'
+import { Container, Sprite, Graphics, BitmapText, Circle, TextStyle, Text, FederatedPointerEvent } from 'pixi.js';
 import TextureService from './texture'
 import Helpers from './helpers'
 import type PathManager from "./PathManager";
@@ -9,17 +9,17 @@ import type { MapObject } from './mapObject';
 import { EventEmitter } from './eventEmitter';
 import type { GraphicsWithChunk } from './PathManager';
 
-type CarrierClickEvent = {
+export type CarrierClickEvent = {
   carrierData: CarrierData,
   tryMultiSelect: boolean,
-  eventData: any,
+  eventData?: FederatedPointerEvent,
 }
 
 type Events = {
   onSelected: CarrierData,
   onUnselected: CarrierData,
-  onCarrierMouseOver: Carrier,
-  onCarrierMouseOut: Carrier,
+  onCarrierMouseOver: CarrierData,
+  onCarrierMouseOut: CarrierData,
   onCarrierRightClicked: CarrierData,
   onCarrierClicked: CarrierClickEvent,
 }
@@ -405,13 +405,13 @@ export class Carrier extends EventEmitter<keyof Events, Events> implements MapOb
   onMouseOver() {
     this.isMouseOver = true
 
-    this.emit('onCarrierMouseOver', this)
+    this.emit('onCarrierMouseOver', this.data);
   }
 
   onMouseOut() {
     this.isMouseOver = false
 
-    this.emit('onCarrierMouseOut', this)
+    this.emit('onCarrierMouseOut', this.data);
   }
 
   refreshZoom(zoomPercent: number) {

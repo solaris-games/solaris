@@ -120,6 +120,11 @@ export type GameSettingsGalaxy = {
     advancedCustomGalaxyEnabled?: GameSettingEnabledDisabled;
 }
 
+export type SpecialistBans = {
+    star: number[];
+    carrier: number[];
+}
+
 export type GameSettingsSpecialGalaxy = {
     carrierCost: GameCarrierCost;
     carrierUpkeepCost: GameCarrierUpkeepCost;
@@ -143,10 +148,7 @@ export type GameSettingsSpecialGalaxy = {
     carrierSpeed: number;
     starCaptureReward: GameSettingEnabledDisabled;
     combatResolutionMalusStrategy: CombatResolutionMalusStrategy;
-    specialistBans: {
-        star: number[];
-        carrier: number[];
-    },
+    specialistBans: SpecialistBans,
 }
 
 export type GameSettingsPlayer = {

@@ -7,15 +7,15 @@ export class EventEmitter<EventType extends string, Ev extends Record<EventType,
     this.ev = mitt();
   }
 
-  on(event: EventType, handler: Handler<Ev[EventType]>) {
+  on<K extends EventType>(event: K, handler: Handler<Ev[K]>) {
     this.ev.on(event, handler);
   }
 
-  off(event: EventType, handler: Handler<Ev[EventType]>) {
+  off<K extends EventType>(event: K, handler: Handler<Ev[K]>) {
     this.ev.off(event, handler);
   }
 
-  emit(event: EventType, data: Ev[EventType]) {
+  emit<K extends EventType>(event: K, data: Ev[K]) {
     this.ev.emit(event, data);
   }
 
