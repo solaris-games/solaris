@@ -3,6 +3,7 @@ import type {Player} from "./player";
 import type {Conversation} from "./conversation";
 import type {Carrier} from "./carrier";
 import type {Location} from "./location";
+import type {CustomGalaxy} from "./customGalaxy";
 
 export type GameType = 'tutorial'|
 'custom'|
@@ -81,16 +82,11 @@ export type GameFlux = {
 	description: string;
 };
 
-export type GameSettingsGeneral<ID> = {
-    fluxId: number | null;
-    createdByUserId?: ID | null;
-    createdFromTemplate?: string | null;
+export type GameSettingsGeneralSpec = {
     name: string;
     description: string | null;
     type: GameType;
     mode: GameMode;
-    featured: boolean;
-    password?: string | null;
     passwordRequired: boolean;
     playerLimit: number;
     playerType: GamePlayerType;
@@ -101,23 +97,34 @@ export type GameSettingsGeneral<ID> = {
     awardRankTo: GameAwardRankTo;
     awardRankToTopN?: number;
     fluxEnabled: GameSettingEnabledDisabled;
-    isGameAdmin?: boolean;
     advancedAI: GameSettingEnabledDisabled;
     afkSlotsOpen: GameSettingEnabledDisabled;
     spectators: GameSettingEnabledDisabled;
-    flux?: GameFlux | null;
     readyToQuit: GameSettingEnabledDisabled;
     readyToQuitFraction?: ReadyToQuitFraction;
     readyToQuitTimerCycles?: ReadyToQuitTimerCycles;
     readyToQuitVisibility: ReadyToQuitVisibility;
 }
 
+export type GameSettingsGeneral<ID> = GameSettingsGeneralSpec & {
+    fluxId: number | null;
+    createdByUserId?: ID | null;
+    createdFromTemplate?: string | null;
+    password?: string | null;
+    featured: boolean;
+    flux?: GameFlux | null;
+    isGameAdmin?: boolean;
+}
+
 export type GameSettingsGalaxy = {
     galaxyType: GameGalaxyType;
     starsPerPlayer: number;
     productionTicks: number;
-    customJSON?: string;
     advancedCustomGalaxyEnabled?: GameSettingEnabledDisabled;
+}
+
+export type GameSettingsGalaxySpec = GameSettingsGalaxy & {
+    customGalaxy?: CustomGalaxy;
 }
 
 export type SpecialistBans = {

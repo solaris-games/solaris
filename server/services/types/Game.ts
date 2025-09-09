@@ -1,6 +1,6 @@
 import { Carrier } from "./Carrier";
 import { Conversation } from "./Conversation";
-import { CustomGalaxy } from "./CustomGalaxy";
+import { CustomGalaxy } from "../../../common/src/api/types/common/customGalaxy";
 import { DBObjectId } from "./DBObjectId";
 import { Location } from "./Location";
 import { Player } from "./Player";

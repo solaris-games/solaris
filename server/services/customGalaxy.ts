@@ -7,7 +7,7 @@ import SpecialistService from "./specialist";
 import TeamService from "./team";
 import { Carrier } from "./types/Carrier";
 import { CarrierWaypoint } from "./types/CarrierWaypoint";
-import {CustomGalaxy, CustomGalaxyCarrier, CustomGalaxyStar} from "./types/CustomGalaxy";
+import {CustomGalaxy, CustomGalaxyCarrier, CustomGalaxyStar} from "../../common/src/api/types/common/customGalaxy";
 import { DBObjectId } from "./types/DBObjectId";
 import { Game, GameSettings, Team } from "./types/Game";
 import { Location } from "./types/Location";

@@ -1,7 +1,7 @@
-import { CarrierWaypointActionType } from "./CarrierWaypoint";
-import { Location } from "./Location";
-import { PlayerTechnologyLevels } from "./Player";
-import { Infrastructure, NaturalResources } from "./Star";
+import type {Location} from "./location";
+import type {PlayerTechnologyLevels} from "./player";
+import type {Infrastructure, NaturalResources} from "./star";
+import type {CarrierWaypointActionType} from "./carrierWaypoint";
 
 export interface CustomGalaxy {
     players?: CustomGalaxyPlayer[];

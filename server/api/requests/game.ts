@@ -1,6 +1,6 @@
 import ValidationError from "../../errors/validation";
 import { CarrierWaypointActionType, CarrierWaypointActionTypes } from "../../services/types/CarrierWaypoint";
-import { CustomGalaxy } from "../../services/types/CustomGalaxy";
+import { CustomGalaxy } from "../../../common/src/api/types/common/customGalaxy";
 import { DBObjectId } from "../../services/types/DBObjectId";
 import {
     object,
