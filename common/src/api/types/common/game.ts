@@ -65,30 +65,181 @@ export const GAME_GALAXY_TYPE = [
 
 export type GameGalaxyType = typeof GAME_GALAXY_TYPE[number];
 
-export type GameCarrierCost = 'cheap'|'standard'|'expensive';
-export type GameCarrierUpkeepCost = 'none'|'cheap'|'standard'|'expensive';
-export type GameAllianceUpkeepCost = 'none'|'cheap'|'standard'|'expensive'; 
-export type GameWarpgateCost = 'none'|'cheap'|'standard'|'expensive';
-export type GameSpecialistCost = 'none'|'standard'|'expensive'|'veryExpensive'|'crazyExpensive';
-export type GameSpecialistCurrency = 'credits'|'creditsSpecialists';
-export type GameDarkGalaxyMode = 'disabled'|'fog'|'standard'|'extra'|'start';
-export type GameResourceDistribution = 'random'|'weightedCenter';
-export type GamePlayerDistribution = 'circular'|'random'|'circularSequential';
-export type GameVictoryCondition = 'starPercentage'|'homeStarPercentage';
-export type GameVictoryPercentage = 25|33|50|66|75|90|100;
-export type GameInfrastructureCost = 'none'|'cheap'|'standard'|'expensive';
-export type GameInfrastructureExpenseMultiplier = 'none'|'cheap'|'standard'|'expensive'|'crazyExpensive';
-export type GameTradeCost = 0|5|15|25|50|100;
-export type GameTradeScanning = 'all'|'scanned';
-export type GameResearchCost = 'none'|'cheap'|'standard'|'expensive'|'veryExpensive'|'crazyExpensive';
-export type GameBankingReward = 'standard'|'legacy';
-export type GameExperimentationDistribution = 'random'|'current_research';
-export type GameExperimentationReward = 'standard'|'experimental';
-export type GameSpecialistTokenReward = 'standard'|'experimental';
-export type GameTimeType = 'realTime'|'turnBased';
-export type GameTimeSpeed = 30|60|300|600|1800|3600|7200;
-export type GameTimeStartDelay = 0|1|5|10|30|60|120|240|360|480|600|720|1440;
-export type GameTimeMaxTurnWait = 1|5|10|30|60|120|240|360|480|600|720|1080|1440|2880;
+export const GAME_CARRIER_COST = [
+    'cheap',
+    'standard',
+    'expensive'
+] as const;
+
+export type GameCarrierCost = typeof GAME_CARRIER_COST[number];
+
+export const GAME_CARRIER_UPKEEP_COST = [
+    'none',
+    'cheap',
+    'standard',
+    'expensive'
+] as const;
+
+export type GameCarrierUpkeepCost = typeof GAME_CARRIER_UPKEEP_COST[number];
+
+export const GAME_ALLIANCE_UPKEEP_COST = [
+    'none',
+    'cheap',
+    'standard',
+    'expensive'
+] as const;
+
+export type GameAllianceUpkeepCost = typeof GAME_ALLIANCE_UPKEEP_COST[number];
+
+export const GAME_WARPGATE_COST = [
+    'none',
+    'cheap',
+    'standard',
+    'expensive'
+] as const;
+
+export type GameWarpgateCost = typeof GAME_WARPGATE_COST[number];
+
+export const GAME_SPECIALIST_COST = [
+    'none',
+    'standard',
+    'expensive',
+    'veryExpensive',
+    'crazyExpensive'
+] as const;
+
+export type GameSpecialistCost = typeof GAME_SPECIALIST_COST[number];
+
+export const GAME_SPECIALIST_CURRENCY = [
+    'credits',
+    'creditsSpecialists'
+] as const;
+
+export type GameSpecialistCurrency = typeof GAME_SPECIALIST_CURRENCY[number];
+
+export const GAME_DARK_GALAXY_MODES = [
+    'disabled',
+    'fog',
+    'standard',
+    'extra',
+    'start'
+] as const;
+
+export type GameDarkGalaxyMode = typeof GAME_DARK_GALAXY_MODES[number];
+
+export const GAME_RESOURCE_DISTRIBUTIONS = [
+    'random',
+    'weightedCenter'
+] as const;
+
+export type GameResourceDistribution = typeof GAME_RESOURCE_DISTRIBUTIONS[number];
+
+export const GAME_PLAYER_DISTRIBUTIONS = [
+    'circular',
+    'random',
+    'circularSequential'
+] as const;
+
+export type GamePlayerDistribution = typeof GAME_PLAYER_DISTRIBUTIONS[number];
+
+export const GAME_VICTORY_CONDITIONS = [
+    'starPercentage',
+    'homeStarPercentage'
+];
+
+export type GameVictoryCondition = typeof GAME_VICTORY_CONDITIONS[number];
+
+export const GAME_VICTORY_PERCENTAGES = [25, 33, 50, 66, 75, 90, 100] as const;
+
+export type GameVictoryPercentage = typeof GAME_VICTORY_PERCENTAGES[number];
+
+export const GAME_INFRUSTRUCTURE_COSTS = [
+    'none',
+    'cheap',
+    'standard',
+    'expensive'
+] as const;
+
+export type GameInfrastructureCost = typeof GAME_INFRUSTRUCTURE_COSTS[number];
+
+export const GAME_INFRASTRUCTURE_EXPENSE_MULTIPLIERS = [
+    'none',
+    'cheap',
+    'standard',
+    'expensive',
+    'crazyExpensive'
+] as const;
+
+export type GameInfrastructureExpenseMultiplier = typeof GAME_INFRASTRUCTURE_EXPENSE_MULTIPLIERS[number];
+
+export const GAME_TRADE_COSTS = [0, 5, 15, 25, 50, 100] as const;
+
+export type GameTradeCost = typeof GAME_TRADE_COSTS[number];
+
+export const GAME_TRADE_SCANNING = [
+    'all',
+    'scanned'
+] as const;
+
+export type GameTradeScanning = typeof GAME_TRADE_SCANNING[number];
+
+export const GAME_RESEARCH_COSTS = [
+    'none',
+    'cheap',
+    'standard',
+    'expensive',
+    'veryExpensive',
+    'crazyExpensive'
+] as const;
+
+export type GameResearchCost = typeof GAME_RESEARCH_COSTS[number];
+
+export const GAME_BANKING_REWARDS = [
+    'standard',
+    'legacy'
+] as const;
+
+export type GameBankingReward = typeof GAME_BANKING_REWARDS[number];
+
+export const GAME_EXPERIMENTATION_DISTRIBUTIONS = [
+    'random',
+    'current_research'
+] as const;
+
+export type GameExperimentationDistribution = typeof GAME_EXPERIMENTATION_DISTRIBUTIONS[number];
+
+export const GAME_EXPERIMENTATION_REWARDS = [
+    'standard',
+    'experimental'
+] as const;
+
+export type GameExperimentationReward = typeof GAME_EXPERIMENTATION_REWARDS[number];
+
+export const GAME_SPECIALIST_TOKEN_REWARDS = [
+    'standard',
+    'experimental'
+] as const;
+
+export type GameSpecialistTokenReward = typeof GAME_SPECIALIST_TOKEN_REWARDS[number];
+
+export const GAME_TIME_TYPES = [
+    'realTime',
+    'turnBased'
+] as const;
+
+export type GameTimeType = typeof GAME_TIME_TYPES[number];
+
+export const GAME_TIME_SPEEDS = [30, 60, 300, 600, 1800, 3600, 7200] as const;
+
+export type GameTimeSpeed = typeof GAME_TIME_SPEEDS[number];
+
+export const GAME_TIME_START_DELAYS = [0, 1, 5, 10, 30, 60, 120, 240, 360, 480, 600, 720, 1440] as const;
+
+export type GameTimeStartDelay = typeof GAME_TIME_START_DELAYS[number];
+
+export const GAME_TIME_MAX_TURN_WAITS = [1,5,10,30,60,120,240,360,480,600,720,1080,1440,2880] as const;
+
+export type GameTimeMaxTurnWait = typeof GAME_TIME_MAX_TURN_WAITS[number];
 
 export const READY_TO_QUIT_FRACTIONS = [
     0.5, 0.66, 0.75, 0.9, 1.0
@@ -177,7 +328,7 @@ export type SpecialistBans = {
     carrier: number[];
 }
 
-export type GameSettingsSpecialGalaxy = {
+export type GameSettingsSpecialGalaxyBase = {
     carrierCost: GameCarrierCost;
     carrierUpkeepCost: GameCarrierUpkeepCost;
     warpgateCost: GameWarpgateCost;
@@ -199,8 +350,11 @@ export type GameSettingsSpecialGalaxy = {
     playerDistribution: GamePlayerDistribution;
     carrierSpeed: number;
     starCaptureReward: GameSettingEnabledDisabled;
-    combatResolutionMalusStrategy: CombatResolutionMalusStrategy;
     specialistBans: SpecialistBans,
+}
+
+export type GameSettingsSpecialGalaxy = GameSettingsSpecialGalaxyBase & {
+    combatResolutionMalusStrategy: CombatResolutionMalusStrategy;
 }
 
 export type GameSettingsPlayer = {

@@ -27,7 +27,12 @@ import { Star } from "./types/Star";
 import { DBObjectId } from "./types/DBObjectId";
 import { Player } from "./types/Player";
 import CustomGalaxyService from "./customGalaxy";
-import type {GameSettings, GameSettingsGalaxy, GameSettingsGeneralSpec} from "@solaris-common";
+import {
+    GameSettings,
+    GameSettingsGalaxy,
+    GameSettingsGeneralSpec,
+    GameSettingsSpecialGalaxyBase
+} from "@solaris-common";
 
 const GAME_MASTER_LIMIT = 5;
 
@@ -39,6 +44,7 @@ const log = logger("GameCreateService");
 
 export type GameSettingsReq = GameSettings<string> & {
     general: GameSettingsGeneralSpec,
+    specialGalaxy: GameSettingsSpecialGalaxyBase,
 }
 
 export default class GameCreateService {

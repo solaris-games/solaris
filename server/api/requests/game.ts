@@ -22,14 +22,16 @@ import {
 } from "../validate";
 import { keyHasBooleanValue, keyHasStringValue } from "./helpers";
 import {
-    GAME_AWARD_RANK_TO, GAME_GALAXY_TYPE,
-    GAME_MODES,
-    GAME_TYPES,
-    GameAwardRankTo,
-    GameGalaxyType, GameMode, GamePlayerAnonymity, GamePlayerOnlineStatus, GamePlayerType, GameSettingEnabledDisabled,
+    GAME_AWARD_RANK_TO, GAME_CARRIER_COST, GAME_CARRIER_UPKEEP_COST, GAME_DARK_GALAXY_MODES, GAME_GALAXY_TYPE,
+    GAME_MODES, GAME_PLAYER_DISTRIBUTIONS, GAME_RESOURCE_DISTRIBUTIONS, GAME_SPECIALIST_COST, GAME_SPECIALIST_CURRENCY,
+    GAME_TYPES, GAME_WARPGATE_COST,
+    GameAwardRankTo, GameCarrierCost, GameCarrierUpkeepCost, GameDarkGalaxyMode,
+    GameGalaxyType, GameMode, GamePlayerAnonymity, GamePlayerDistribution, GamePlayerOnlineStatus, GamePlayerType,
+    GameResourceDistribution, GameSettingEnabledDisabled,
     GameSettingsGalaxy,
     GameSettingsGeneralSpec, GameSettingsSpecialGalaxy,
-    GameType, READY_TO_QUIT_FRACTIONS,
+    GameSettingsSpecialGalaxyBase, GameSpecialistCost, GameSpecialistCurrency,
+    GameType, GameWarpgateCost, READY_TO_QUIT_FRACTIONS,
     READY_TO_QUIT_TIMER_CYCLES, READY_TO_QUIT_VISIBILITY, ReadyToQuitFraction,
     ReadyToQuitTimerCycles, ReadyToQuitVisibility
 } from "@solaris-common";
@@ -187,14 +189,53 @@ const parseGameSettingsGalaxy: Validator<GameSettingsGalaxy> = object({
     customGalaxy: maybeUndefined(str => customGalaxyValidator(JSON.parse(str))),
 });
 
-const parseGameSettingsSpecialGalaxy: Validator<GameSettingsSpecialGalaxy> = object({
+const specialStarNumber = numberAdv({
+    integer: true,
+    range: {
+        from: 0,
+        to: 50,
+    }
+});
 
+const parseGameSettingsSpecialGalaxy: Validator<GameSettingsSpecialGalaxyBase> = object({
+    carrierCost: stringEnumeration<GameCarrierCost, GameCarrierCost[]>(GAME_CARRIER_COST),
+    carrierUpkeepCost: stringEnumeration<GameCarrierUpkeepCost, GameCarrierUpkeepCost[]>(GAME_CARRIER_UPKEEP_COST),
+    warpgateCost: stringEnumeration<GameWarpgateCost, GameWarpgateCost[]>(GAME_WARPGATE_COST),
+    specialistCost: stringEnumeration<GameSpecialistCost, GameSpecialistCost[]>(GAME_SPECIALIST_COST),
+    specialistsCurrency: stringEnumeration<GameSpecialistCurrency, GameSpecialistCurrency[]>(GAME_SPECIALIST_CURRENCY),
+    randomWarpGates: specialStarNumber,
+    randomWormHoles: specialStarNumber,
+    randomNebulas: specialStarNumber,
+    randomAsteroidFields: specialStarNumber,
+    randomBlackHoles: specialStarNumber,
+    randomBinaryStars: specialStarNumber,
+    randomPulsars: specialStarNumber,
+    darkGalaxy: stringEnumeration<GameDarkGalaxyMode, GameDarkGalaxyMode[]>(GAME_DARK_GALAXY_MODES),
+    giftCarriers: enabledDisabled,
+    defenderBonus: enabledDisabled,
+    carrierToCarrierCombat: enabledDisabled,
+    splitResources: enabledDisabled,
+    resourceDistribution: stringEnumeration<GameResourceDistribution, GameResourceDistribution[]>(GAME_RESOURCE_DISTRIBUTIONS),
+    playerDistribution: stringEnumeration<GamePlayerDistribution, GamePlayerDistribution[]>(GAME_PLAYER_DISTRIBUTIONS),
+    carrierSpeed: numberAdv({
+        integer: true,
+        range: {
+            from: 1,
+            to: 25,
+        },
+    }),
+    starCaptureReward: enabledDisabled,
+    specialistBans: object({
+        star: array(number),
+        carrier: array(number),
+    }),
 });
 
 export const parseGameSettingsReq: Validator<GameSettingsReq> = object({
     general: parseGameSettingsGeneral,
     galaxy: parseGameSettingsGalaxy,
     specialGalaxy: parseGameSettingsSpecialGalaxy,
+
 });
 
 export interface GameJoinGameRequest {
