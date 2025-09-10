@@ -85,6 +85,10 @@ export const or = <A, B>(a: Validator<A>, b: Validator<B>): Validator<A | B> => 
     }
 }
 
+export const maybeNull = <A>(validator: Validator<A>): Validator<A | null> => or(validator, just(null));
+
+export const maybeUndefined = <A>(validator: Validator<A>): Validator<A | undefined> => or(validator, just(undefined));
+
 export const just = <A>(value: A): Validator<A> => {
     return v => {
         if (v !== value) {
@@ -155,6 +159,17 @@ export const stringEnumeration = <A extends string, M extends A[]>(members: read
         } else {
             throw failed(members.join(", "), v)
         }
+    }
+}
+
+export const numberEnumeration = <A extends number, M extends A[]>(members: readonly [any, ...M]): Validator<A> => {
+    return v => {
+        const n = number(v);
+        if (members.includes(n as A)) {
+            return n as A;
+        }
+
+        throw failed(members.join(", "), v)
     }
 }
 

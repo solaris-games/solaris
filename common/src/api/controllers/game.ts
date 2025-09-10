@@ -3,7 +3,7 @@ import type {Statistics} from "../types/common/stats";
 import type {GameSettings, GameSettingsGalaxy, GameSettingsGeneralSpec} from "../types/common/game";
 
 type GameSettingsGalaxySpec = GameSettingsGalaxy & {
-    customJSON?: string,
+    customGalaxy?: string,
 }
 
 type GameSettingsSpec = GameSettings<string> & {

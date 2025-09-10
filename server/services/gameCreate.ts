@@ -2,7 +2,7 @@ import { MathRandomGen, RandomGen, SeededRandomGen } from "../utils/randomGen";
 
 const mongoose = require('mongoose');
 import ValidationError from '../errors/validation';
-import { Game, GameSettings, Team } from './types/Game';
+import { Game, Team } from './types/Game';
 import UserAchievementService from './userAchievement';
 import ConversationService from './conversation';
 import GameFluxService from './gameFlux';
@@ -27,6 +27,7 @@ import { Star } from "./types/Star";
 import { DBObjectId } from "./types/DBObjectId";
 import { Player } from "./types/Player";
 import CustomGalaxyService from "./customGalaxy";
+import type {GameSettings, GameSettingsGalaxy, GameSettingsGeneralSpec} from "@solaris-common";
 
 const GAME_MASTER_LIMIT = 5;
 
@@ -35,6 +36,10 @@ const ESTABLISHED_PLAYER_LIMIT = 2;
 const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
 const log = logger("GameCreateService");
+
+export type GameSettingsReq = GameSettings<string> & {
+    general: GameSettingsGeneralSpec,
+}
 
 export default class GameCreateService {
     gameModel;
@@ -105,7 +110,7 @@ export default class GameCreateService {
         this.customGalaxyService = customGalaxyService;
     }
 
-    async create(settings: GameSettings) {
+    async create(settings: GameSettingsReq, userId: DBObjectId) {
         const isTutorial = settings.general.type === 'tutorial';
         const isNewPlayerGame = settings.general.type === 'new_player_rt' || settings.general.type === 'new_player_tb';
         const isOfficialGame = settings.general.createdByUserId == null;

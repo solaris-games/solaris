@@ -5,36 +5,66 @@ import type {Carrier} from "./carrier";
 import type {Location} from "./location";
 import type {CustomGalaxy} from "./customGalaxy";
 
-export type GameType = 'tutorial'|
-'custom'|
-'standard_rt'| 
-'standard_tb'| 
-'1v1_rt'|
-'1v1_tb'| 
-'new_player_rt'|
-'new_player_tb'|
-'32_player_rt'|
-'16_player_relaxed'|
-'special_dark'|
-'special_fog'|
-'special_ultraDark'|
-'special_orbital'|
-'special_battleRoyale'|
-'special_homeStar'|
-'special_homeStarElimination' |
-'special_anonymous'|
-'special_kingOfTheHill'|
-'special_tinyGalaxy'|
-'special_freeForAll'|
-'special_arcade';
+export const GAME_TYPES  = [
+    'tutorial',
+    'custom',
+    'standard_rt',
+    'standard_tb',
+    '1v1_rt',
+    '1v1_tb',
+    'new_player_rt',
+    'new_player_tb',
+    '32_player_rt',
+    '16_player_relaxed',
+    'special_dark',
+    'special_fog',
+    'special_ultraDark',
+    'special_orbital',
+    'special_battleRoyale',
+    'special_homeStar',
+    'special_homeStarElimination' ,
+    'special_anonymous',
+    'special_kingOfTheHill',
+    'special_tinyGalaxy',
+    'special_freeForAll',
+    'special_arcade'
+] as const;
 
-export type GameMode = 'conquest'|'battleRoyale'|'kingOfTheHill'|'teamConquest';
+export type GameType = typeof GAME_TYPES[number];
+
+export const GAME_MODES = [
+    'conquest',
+    'battleRoyale',
+    'kingOfTheHill',
+    'teamConquest'
+] as const;
+
+export type GameMode = typeof GAME_MODES[number];
 export type GamePlayerType = 'all'|'establishedPlayers';
 export type GamePlayerAnonymity = 'normal'|'extra';
 export type GamePlayerOnlineStatus = 'hidden'|'visible';
 export type GameSettingEnabledDisabled = 'disabled'|'enabled';
-export type GameAwardRankTo = 'all'|'winner'|'top_n'|'teams';
-export type GameGalaxyType = 'circular'|'spiral'|'doughnut'|'circular-balanced'|'irregular'|'custom';
+
+export const GAME_AWARD_RANK_TO = [
+    'all',
+    'winner',
+    'top_n',
+    'teams'
+] as const;
+
+export type GameAwardRankTo = typeof GAME_AWARD_RANK_TO[number];
+
+export const GAME_GALAXY_TYPE = [
+    'circular',
+    'spiral',
+    'doughnut',
+    'circular-balanced',
+    'irregular',
+    'custom',
+] as const;
+
+export type GameGalaxyType = typeof GAME_GALAXY_TYPE[number];
+
 export type GameCarrierCost = 'cheap'|'standard'|'expensive';
 export type GameCarrierUpkeepCost = 'none'|'cheap'|'standard'|'expensive';
 export type GameAllianceUpkeepCost = 'none'|'cheap'|'standard'|'expensive'; 
@@ -59,9 +89,24 @@ export type GameTimeType = 'realTime'|'turnBased';
 export type GameTimeSpeed = 30|60|300|600|1800|3600|7200;
 export type GameTimeStartDelay = 0|1|5|10|30|60|120|240|360|480|600|720|1440;
 export type GameTimeMaxTurnWait = 1|5|10|30|60|120|240|360|480|600|720|1080|1440|2880;
-export type ReadyToQuitFraction = 0.5|0.66|0.75|0.9|1.0;
-export type ReadyToQuitTimerCycles = 0|1|2|3;
-export type ReadyToQuitVisibility = 'visible'|'anonymous'|'hidden';
+
+export const READY_TO_QUIT_FRACTIONS = [
+    0.5, 0.66, 0.75, 0.9, 1.0
+] as const;
+
+export type ReadyToQuitFraction = typeof READY_TO_QUIT_FRACTIONS[number];
+
+export const READY_TO_QUIT_TIMER_CYCLES = [0, 1, 2, 3] as const;
+
+export type ReadyToQuitTimerCycles = typeof READY_TO_QUIT_TIMER_CYCLES[number];
+
+export const READY_TO_QUIT_VISIBILITY = [
+    'visible',
+    'anonymous',
+    'hidden'
+] as const;
+
+export type ReadyToQuitVisibility = typeof READY_TO_QUIT_VISIBILITY[number];
 export type CombatResolutionMalusStrategy = 'largestCarrier' | 'anyCarrier';
 
 export type GameResearchProgressionStandard = {
@@ -87,13 +132,12 @@ export type GameSettingsGeneralSpec = {
     description: string | null;
     type: GameType;
     mode: GameMode;
-    passwordRequired: boolean;
+    password?: string | null;
     playerLimit: number;
     playerType: GamePlayerType;
     anonymity: GamePlayerAnonymity;
     playerOnlineStatus: GamePlayerOnlineStatus;
     playerIPWarning: GameSettingEnabledDisabled;
-    timeMachine: GameSettingEnabledDisabled;
     awardRankTo: GameAwardRankTo;
     awardRankToTopN?: number;
     fluxEnabled: GameSettingEnabledDisabled;
@@ -108,22 +152,23 @@ export type GameSettingsGeneralSpec = {
 
 export type GameSettingsGeneral<ID> = GameSettingsGeneralSpec & {
     fluxId: number | null;
+    passwordRequired: boolean;
     createdByUserId?: ID | null;
     createdFromTemplate?: string | null;
-    password?: string | null;
     featured: boolean;
     flux?: GameFlux | null;
     isGameAdmin?: boolean;
+    timeMachine: GameSettingEnabledDisabled;
 }
 
-export type GameSettingsGalaxy = {
+export type GameSettingsGalaxyBase = {
     galaxyType: GameGalaxyType;
     starsPerPlayer: number;
     productionTicks: number;
     advancedCustomGalaxyEnabled?: GameSettingEnabledDisabled;
 }
 
-export type GameSettingsGalaxySpec = GameSettingsGalaxy & {
+export type GameSettingsGalaxy = GameSettingsGalaxyBase & {
     customGalaxy?: CustomGalaxy;
 }
 

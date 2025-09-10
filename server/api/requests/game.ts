@@ -1,6 +1,6 @@
 import ValidationError from "../../errors/validation";
 import { CarrierWaypointActionType, CarrierWaypointActionTypes } from "../../services/types/CarrierWaypoint";
-import { CustomGalaxy } from "../../../common/src/api/types/common/customGalaxy";
+import {CustomGalaxy, CustomGalaxyCarrier} from "../../../common/src/api/types/common/customGalaxy";
 import { DBObjectId } from "../../services/types/DBObjectId";
 import {
     object,
@@ -18,14 +18,22 @@ import {
     stringEnumeration,
     positiveInteger,
     withDefault,
-    numberAdv
+    numberAdv, maybeNull, maybeUndefined, numberEnumeration, map
 } from "../validate";
-import { parseCarrierRenameCarrierRequest } from "./carrier";
-import { keyHasBooleanValue, keyHasNumberValue, keyHasStringValue } from "./helpers";
-
-export interface GameCreateGameRequest {
-    // TODO
-};
+import { keyHasBooleanValue, keyHasStringValue } from "./helpers";
+import {
+    GAME_AWARD_RANK_TO, GAME_GALAXY_TYPE,
+    GAME_MODES,
+    GAME_TYPES,
+    GameAwardRankTo,
+    GameGalaxyType, GameMode, GamePlayerAnonymity, GamePlayerOnlineStatus, GamePlayerType, GameSettingEnabledDisabled,
+    GameSettingsGalaxy,
+    GameSettingsGeneralSpec, GameSettingsSpecialGalaxy,
+    GameType, READY_TO_QUIT_FRACTIONS,
+    READY_TO_QUIT_TIMER_CYCLES, READY_TO_QUIT_VISIBILITY, ReadyToQuitFraction,
+    ReadyToQuitTimerCycles, ReadyToQuitVisibility
+} from "@solaris-common";
+import type {GameSettingsReq} from "../../services/gameCreate";
 
 export const customGalaxyValidator: Validator<CustomGalaxy> = object({
     stars: array(object({
@@ -117,6 +125,76 @@ export const customGalaxyValidator: Validator<CustomGalaxy> = object({
             ignoreForLengthCheck: UNICODE_INVISIBLE_CHARACTERS,
         }), just(undefined))
     })), just(undefined))
+});
+
+const enabledDisabled = stringEnumeration<GameSettingEnabledDisabled, GameSettingEnabledDisabled[]>(['enabled', 'disabled']);
+
+const parseGameSettingsGeneral: Validator<GameSettingsGeneralSpec> = object({
+    name: stringValue({
+        trim: true,
+        minLength: 3,
+        matches: UNICODE_PRINTABLE_CHARACTERS_WITH_WHITESPACE,
+    }),
+    description: maybeNull(string),
+    password: maybeNull(string),
+    type: stringEnumeration<GameType, GameType[]>(GAME_TYPES),
+    mode: stringEnumeration<GameMode, GameMode[]>(GAME_MODES),
+    playerLimit: numberAdv({
+        range: {
+            from: 2,
+            to: 64,
+        },
+        integer: true,
+    }),
+    playerType: stringEnumeration<GamePlayerType, GamePlayerType[]>(['all', 'establishedPlayers']),
+    anonymity: stringEnumeration<GamePlayerAnonymity, GamePlayerAnonymity[]>(['normal', 'extra']),
+    playerOnlineStatus: stringEnumeration<GamePlayerOnlineStatus, GamePlayerOnlineStatus[]>(['hidden', 'visible']),
+    playerIPWarning: enabledDisabled,
+    awardRankTo: stringEnumeration<GameAwardRankTo, GameAwardRankTo[]>(GAME_AWARD_RANK_TO),
+    awardRankToTopN: maybeUndefined(numberAdv({
+        integer: true,
+        range: {
+            from: 1,
+        }
+    })),
+    fluxEnabled: enabledDisabled,
+    advancedAI: enabledDisabled,
+    afkSlotsOpen: enabledDisabled,
+    spectators: enabledDisabled,
+    readyToQuit: enabledDisabled,
+    readyToQuitFraction: maybeUndefined(numberEnumeration<ReadyToQuitFraction, ReadyToQuitFraction[]>(READY_TO_QUIT_FRACTIONS)),
+    readyToQuitTimerCycles: maybeUndefined(numberEnumeration<ReadyToQuitTimerCycles, ReadyToQuitTimerCycles[]>(READY_TO_QUIT_TIMER_CYCLES)),
+    readyToQuitVisibility: stringEnumeration<ReadyToQuitVisibility, ReadyToQuitVisibility[]>(READY_TO_QUIT_VISIBILITY),
+});
+
+const parseGameSettingsGalaxy: Validator<GameSettingsGalaxy> = object({
+    galaxyType: stringEnumeration<GameGalaxyType, GameGalaxyType[]>(GAME_GALAXY_TYPE),
+    starsPerPlayer: numberAdv({
+        integer: true,
+        range: {
+            from: 1,
+            to: 50,
+        },
+    }),
+    productionTicks: numberAdv({
+        integer: true,
+        range: {
+            from: 6,
+            to: 36,
+        },
+    }),
+    advancedCustomGalaxyEnabled: maybeUndefined(enabledDisabled),
+    customGalaxy: maybeUndefined(str => customGalaxyValidator(JSON.parse(str))),
+});
+
+const parseGameSettingsSpecialGalaxy: Validator<GameSettingsSpecialGalaxy> = object({
+
+});
+
+export const parseGameSettingsReq: Validator<GameSettingsReq> = object({
+    general: parseGameSettingsGeneral,
+    galaxy: parseGameSettingsGalaxy,
+    specialGalaxy: parseGameSettingsSpecialGalaxy,
 });
 
 export interface GameJoinGameRequest {

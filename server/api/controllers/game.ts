@@ -6,7 +6,7 @@ import {
     customGalaxyValidator,
     mapToGameConcedeDefeatRequest,
     mapToGameSaveNotesRequest,
-    parseGameJoinGameRequest,
+    parseGameJoinGameRequest, parseGameSettingsReq,
     parseKickPlayerRequest
 } from '../requests/game';
 import {Player} from "../../services/types/Player";
@@ -34,18 +34,17 @@ export default (container: DependencyContainer) => {
             }
         },
         create: async (req, res, next) => {
-            // TODO: This needs a request interface.
-            req.body.general.createdByUserId = req.session.userId;
-    
+            const settings = parseGameSettingsReq(req.body);
+
             try {
                 // If this is a custom galaxy, validate the JSON.
                 // TODO: This should probably be moved to the game create request validation once it is implemented.
-                if (req.body.galaxy.galaxyType === 'custom') {
-                    const customGalaxy = JSON.parse(req.body.galaxy.customJSON!);
-                    req.body.galaxy.customGalaxy = customGalaxyValidator(customGalaxy);
-                }
+                // if (req.body.galaxy.galaxyType === 'custom') {
+                //     const customGalaxy = JSON.parse(req.body.galaxy.customJSON!);
+                //     req.body.galaxy.customGalaxy = customGalaxyValidator(customGalaxy);
+                // }
                 
-                let game = await container.gameCreateService.create(req.body);
+                let game = await container.gameCreateService.create(settings, req.session.userId);
     
                 res.status(201).json(game._id);
                 return next();
@@ -61,11 +60,8 @@ export default (container: DependencyContainer) => {
                 if (!game) {
                     const path = '../../config/game/settings/user/' + tutorial.file;
                     const settings = require(path);
-                    
-                    settings.general.createdByUserId = req.session.userId;
-                    settings.general.createdFromTemplate = tutorial.key;
-    
-                    game = await container.gameCreateService.create(settings);
+
+                    game = await container.gameCreateService.create(settings, req.session.userId);
                 }
     
                 res.status(201).json(game._id);
