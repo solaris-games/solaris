@@ -10,9 +10,9 @@ import {
     InfrastructureUpgradeReport,
     StarUpgradeReport
 } from './types/InfrastructureUpgrade';
-import {Game, GameInfrastructureExpenseMultiplier} from './types/Game';
+import {Game} from './types/Game';
 import {Player} from './types/Player';
-import {InfrastructureType, NaturalResources, Star, TerraformedResources} from './types/Star';
+import {InfrastructureType, Star, TerraformedResources} from './types/Star';
 import UserAchievementService from './userAchievement';
 import CarrierService from './carrier';
 import GameTypeService from './gameType';
@@ -22,6 +22,7 @@ import TechnologyService from './technology';
 import PlayerCreditsService from './playerCredits';
 import ShipService from "./ship";
 import StatisticsService from "./statistics";
+import {GameInfrastructureExpenseMultiplier} from "@solaris-common";
 
 const Heap = require('qheap');
 

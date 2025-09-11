@@ -6,11 +6,11 @@ import { DBObjectId } from './types/DBObjectId';
 import ValidationError from '../errors/validation';
 import Repository from './repository';
 import { Carrier } from './types/Carrier';
-import { Game, GameSettings } from './types/Game';
+import { Game } from './types/Game';
 import { Location } from './types/Location';
 import { MapObjectWithVisibility } from './types/Map';
 import { Player } from './types/Player';
-import { InfrastructureType, NaturalResources, Star, StarCaptureResult, TerraformedResources } from './types/Star';
+import { InfrastructureType, NaturalResources, Star, TerraformedResources } from './types/Star';
 import { User } from './types/User';
 import DistanceService from './distance';
 import GameStateService from './gameState';
@@ -23,6 +23,7 @@ import TechnologyService from './technology';
 import UserService from './user';
 import { MathRandomGen } from "../utils/randomGen";
 import StatisticsService from "./statistics";
+import {GameSettings} from "@solaris-common";
 
 const RNG = require('random-seed');
 
@@ -145,7 +146,7 @@ export default class StarService extends EventEmitter {
         return stars.find(s => s._id.toString() === id.toString())!;
     }
 
-    setupHomeStar(game: Game, homeStar: Star, player: Player, gameSettings: GameSettings) {
+    setupHomeStar(game: Game, homeStar: Star, player: Player, gameSettings: GameSettings<DBObjectId>) {
         // Set up the home star
         player.homeStarId = homeStar._id;
         homeStar.ownedByPlayerId = player._id;

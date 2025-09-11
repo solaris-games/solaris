@@ -9,7 +9,7 @@ import { Carrier } from "./types/Carrier";
 import { CarrierWaypoint } from "./types/CarrierWaypoint";
 import {CustomGalaxy, CustomGalaxyCarrier, CustomGalaxyStar} from "../../common/src/api/types/common/customGalaxy";
 import { DBObjectId } from "./types/DBObjectId";
-import { Game, GameSettings, Team } from "./types/Game";
+import { Game, Team } from "./types/Game";
 import { Location } from "./types/Location";
 import { Player } from "./types/Player";
 import { Star } from "./types/Star";

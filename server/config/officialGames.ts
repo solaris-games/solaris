@@ -1,4 +1,7 @@
-import {GameSettings} from "../services/types/Game";
+import {GameSettings} from "@solaris-common";
+import {DBObjectId} from "../services/types/DBObjectId";
+
+// TODO: Convert to use GameSettingSpec or something
 
 export enum OfficialGameKind {
     Standard = 'Standard',
@@ -7,12 +10,12 @@ export enum OfficialGameKind {
 
 export type StandardGame = {
     kind: OfficialGameKind.Standard;
-    settings: GameSettings;
+    settings: GameSettings<DBObjectId>;
 }
 
 export type CarouselGame = {
     kind: OfficialGameKind.Carousel;
-    rotation: GameSettings[];
+    rotation: GameSettings<DBObjectId>[];
     distribution: 'random' | 'sequential';
     name: string;
 }
@@ -22,7 +25,7 @@ export type OfficialGameCategory =
     | CarouselGame
 
 const standardGame = (configPath: string): StandardGame => {
-    const settings = require(configPath) as GameSettings;
+    const settings = require(configPath) as GameSettings<DBObjectId>;
 
     return {
         kind: OfficialGameKind.Standard,
@@ -31,7 +34,7 @@ const standardGame = (configPath: string): StandardGame => {
 }
 
 const carouselGames = (name: string, distribution: 'random' | 'sequential', configPaths: string[]): CarouselGame => {
-    const rotation = configPaths.map(path => require(path) as GameSettings);
+    const rotation = configPaths.map(path => require(path) as GameSettings<DBObjectId>);
 
     return {
         kind: OfficialGameKind.Carousel,
