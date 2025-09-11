@@ -1,8 +1,7 @@
-import { MathRandomGen, RandomGen, SeededRandomGen } from "../utils/randomGen";
+import { MathRandomGen, SeededRandomGen } from "../utils/randomGen";
 
-const mongoose = require('mongoose');
 import ValidationError from '../errors/validation';
-import { Game, Team } from './types/Game';
+import { Game } from './types/Game';
 import UserAchievementService from './userAchievement';
 import ConversationService from './conversation';
 import GameFluxService from './gameFlux';
@@ -23,13 +22,11 @@ import TeamService from "./team";
 import CarrierService from './carrier';
 import { logger } from "../utils/logging";
 import StarDistanceService from "./starDistance";
-import { Star } from "./types/Star";
 import { DBObjectId } from "./types/DBObjectId";
-import { Player } from "./types/Player";
 import CustomGalaxyService from "./customGalaxy";
 import {
     GameSettings,
-    GameSettingsGalaxy, GameSettingsGalaxyBase,
+    GameSettingsGalaxy,
     GameSettingsGeneralBase, GameSettingsInvariable,
     GameSettingsSpecialGalaxyBase
 } from "@solaris-common";

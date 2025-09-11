@@ -7,7 +7,13 @@ import SpecialistService from "./specialist";
 import TeamService from "./team";
 import { Carrier } from "./types/Carrier";
 import { CarrierWaypoint } from "./types/CarrierWaypoint";
-import {CustomGalaxy, CustomGalaxyCarrier, CustomGalaxyStar} from "../../common/src/api/types/common/customGalaxy";
+import {
+    CustomGalaxy,
+    CustomGalaxyCarrier,
+    CustomGalaxyPlayer,
+    CustomGalaxyStar,
+    PlayerColourShapeCombination
+} from "@solaris-common";
 import { DBObjectId } from "./types/DBObjectId";
 import { Game, Team } from "./types/Game";
 import { Location } from "./types/Location";
@@ -271,22 +277,9 @@ export default class CustomGalaxyService {
                 for (let pi = 0; pi < customTeamPlayerIds.length; pi++) {
                     const customPlayer = customGalaxy.players!.find(p => p.id === customTeamPlayerIds[pi])!;
                     const shapeColour = teamColourShapeList[ti][pi];
-                    const player = this.playerService.createEmptyPlayer(game, shapeColour.colour, shapeColour.shape);
 
-                    player.credits = customPlayer.credits;
-                    player.creditsSpecialists = customPlayer.creditsSpecialists;
-                    player.research = {
-                        terraforming: { level: customPlayer.technologies.terraforming },
-                        experimentation: { level: customPlayer.technologies.experimentation },
-                        scanning: { level: customPlayer.technologies.scanning },
-                        hyperspace: { level: customPlayer.technologies.hyperspace },
-                        manufacturing: { level: customPlayer.technologies.manufacturing },
-                        banking: { level: customPlayer.technologies.banking },
-                        weapons: { level: customPlayer.technologies.weapons },
-                        specialists: { level: customPlayer.technologies.specialists }
-                    };
+                    const player = this._createPlayer(game, shapeColour, customPlayer, generatedPlayers);
 
-                    generatedPlayers.set(customPlayer.id, player);
                     team.players.push(player._id);
                 }
 
@@ -301,26 +294,31 @@ export default class CustomGalaxyService {
             for (let i = 0; i < numPlayers; i++) {
                 const customPlayer = customGalaxy.players![i];
                 const shapeColour = shapeColours[i];
-                const player = this.playerService.createEmptyPlayer(game, shapeColour.colour, shapeColour.shape);
-
-                player.credits = customPlayer.credits;
-                player.creditsSpecialists = customPlayer.creditsSpecialists;
-                player.research = {
-                    terraforming: { level: customPlayer.technologies.terraforming },
-                    experimentation: { level: customPlayer.technologies.experimentation },
-                    scanning: { level: customPlayer.technologies.scanning },
-                    hyperspace: { level: customPlayer.technologies.hyperspace },
-                    manufacturing: { level: customPlayer.technologies.manufacturing },
-                    banking: { level: customPlayer.technologies.banking },
-                    weapons: { level: customPlayer.technologies.weapons },
-                    specialists: { level: customPlayer.technologies.specialists }
-                };
-
-                generatedPlayers.set(customPlayer.id, player);
+                this._createPlayer(game, shapeColour, customPlayer, generatedPlayers);
             }
         }
 
         return generatedPlayers;
+    }
+
+    private _createPlayer(game: Game, shapeColour: PlayerColourShapeCombination, customPlayer: CustomGalaxyPlayer, generatedPlayers: Map<string, Player>) {
+        const player = this.playerService.createEmptyPlayer(game, shapeColour.colour, shapeColour.shape);
+
+        player.credits = customPlayer.credits;
+        player.creditsSpecialists = customPlayer.creditsSpecialists;
+        player.research = {
+            terraforming: {level: customPlayer.technologies.terraforming},
+            experimentation: {level: customPlayer.technologies.experimentation},
+            scanning: {level: customPlayer.technologies.scanning},
+            hyperspace: {level: customPlayer.technologies.hyperspace},
+            manufacturing: {level: customPlayer.technologies.manufacturing},
+            banking: {level: customPlayer.technologies.banking},
+            weapons: {level: customPlayer.technologies.weapons},
+            specialists: {level: customPlayer.technologies.specialists}
+        };
+
+        generatedPlayers.set(customPlayer.id, player);
+        return player;
     }
 
     generateStarsAdvanced(game: Game, generatedPlayers: Map<string, Player>, customGalaxy: CustomGalaxy) {
