@@ -1,4 +1,4 @@
-import ValidationError from '../../errors/validation';
+import { ValidationError } from "@solaris-common";
 import { Location } from '../types/Location';
 import DistanceService from '../distance';
 import GameTypeService from '../gameType';

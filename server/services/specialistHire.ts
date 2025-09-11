@@ -9,7 +9,7 @@ import SpecialistService from "./specialist";
 import StarService from "./star";
 import WaypointService from "./waypoint";
 
-import ValidationError from "../errors/validation";
+import { ValidationError } from "@solaris-common";
 import SpecialistBanService from "./specialistBan";
 import PlayerCreditsService from "./playerCredits";
 import TechnologyService from "./technology";

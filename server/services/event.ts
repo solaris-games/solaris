@@ -1,5 +1,5 @@
 import { LedgerType } from 'solaris-common';
-import ValidationError from "../errors/validation";
+import { ValidationError } from "@solaris-common";
 import BadgeService, { BadgeServiceEvents } from "./badge";
 import BroadcastService from "./broadcast";
 import CarrierGiftService, { CarrierGiftServiceEvents } from "./carrierGift";

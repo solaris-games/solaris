@@ -1,12 +1,10 @@
-import ValidationError from "../errors/validation";
-import { DBObjectId, objectIdFromString } from "../services/types/DBObjectId";
+import { ValidationError } from "./error";
 
 export type Validator<T> = (value: any) => T;
 
 const failed = (expected: string, value: any) => {
     return new ValidationError(`Expected ${expected}, but got: ${value.toString().substring(1000)} ${typeof value}`);
 }
-
 
 export const ok = <T>(value: T): Validator<T> => {
     return (_) => value;
@@ -52,7 +50,7 @@ export const bind = <A, B>(binder: (a: A) => Validator<B>, validator: Validator<
 }
 
 export const named = <A>(name: string, validator: Validator<A>) => {
-    return v => {
+    return (v: any) => {
         try {
             return validator(v);
         } catch (e) {
@@ -139,7 +137,7 @@ export const object = <T>(objValidator: ObjectValidator<T>): Validator<T> => {
 
         for (const key of Object.keys(objValidator)) {
             try {
-                const validator: Validator<any> = objValidator[key];
+                const validator: Validator<any> = objValidator[key as keyof T];
                 n[key] = validator(v[key]);
             } catch (e) {
                 const err = e as ValidationError;
@@ -172,8 +170,6 @@ export const numberEnumeration = <A extends number, M extends A[]>(members: read
         throw failed(members.join(", "), v)
     }
 }
-
-export const objectId: Validator<DBObjectId> = map(objectIdFromString, string);
 
 type NumberValidationProps = {
     sign?: 'positive' | 'negative',

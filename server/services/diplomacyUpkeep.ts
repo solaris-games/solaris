@@ -1,4 +1,4 @@
-import ValidationError from "../errors/validation";
+import { ValidationError } from "@solaris-common";
 import { Game } from "./types/Game";
 import { Player } from "./types/Player";
 import PlayerCreditsService from "./playerCredits";

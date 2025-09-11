@@ -1,4 +1,4 @@
-import {date, object, string, Validator} from "../validate";
+import {date, object, string, Validator} from "@solaris-common";
 
 export type AnnouncementRequest = {
     title: string;

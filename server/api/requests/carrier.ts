@@ -1,22 +1,17 @@
-import ValidationError from "../../errors/validation";
+import {ValidationError} from "@solaris-common";
 import { CarrierWaypointActionType, CarrierWaypointActionTypes } from "../../services/types/CarrierWaypoint";
 import { DBObjectId } from "../../services/types/DBObjectId";
 import {
     array,
     boolean,
-    map,
-    number,
-    numberAdv,
     object,
-    objectId,
-    or,
     positiveInteger,
-    string,
     stringEnumeration, stringValue, UNICODE_INVISIBLE_CHARACTERS, UNICODE_PRINTABLE_CHARACTERS_WITH_WHITESPACE,
     Validator,
     withDefault
-} from "../validate";
-import { keyHasArrayValue, keyHasBooleanValue, keyHasNumberValue, keyHasObjectValue, keyHasStringValue } from "./helpers";
+} from "@solaris-common";
+import { keyHasBooleanValue, keyHasNumberValue, keyHasObjectValue, keyHasStringValue } from "./helpers";
+import {objectId} from "../../utils/validation";
 
 type CarrierSaveWaypoint = {
     source: DBObjectId;

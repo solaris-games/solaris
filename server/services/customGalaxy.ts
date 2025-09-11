@@ -1,4 +1,4 @@
-import ValidationError from "../errors/validation";
+import { ValidationError } from "@solaris-common";
 import CarrierService from "./carrier";
 import NameService from "./name";
 import PlayerService from "./player";

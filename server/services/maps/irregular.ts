@@ -1,5 +1,5 @@
 import { createNoise2D } from 'simplex-noise';
-import ValidationError from '../../errors/validation';
+import { ValidationError } from "@solaris-common";
 import {Game} from '../types/Game';
 import { Location } from '../types/Location';
 import DistanceService from '../distance';

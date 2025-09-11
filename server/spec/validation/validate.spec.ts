@@ -1,4 +1,4 @@
-import {anyObject, array, bigInt, just, number, object, or, record, string} from "../../api/validate";
+import {anyObject, array, bigInt, just, number, object, or, record, string} from "../../../common/src/validation/validate";
 
 describe("validate", () => {
     it("validates strings correctly", () => {

@@ -1,4 +1,4 @@
-export default class ValidationError extends Error {
+export class ValidationError extends Error {
     statusCode: number;
 
     constructor(err: string | string[], statusCode?: number) {

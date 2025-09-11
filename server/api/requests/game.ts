@@ -1,11 +1,10 @@
-import ValidationError from "../../errors/validation";
+import { ValidationError } from "@solaris-common";
 import { CarrierWaypointActionType, CarrierWaypointActionTypes } from "../../services/types/CarrierWaypoint";
-import {CustomGalaxy, CustomGalaxyCarrier} from "../../../common/src/api/types/common/customGalaxy";
+import {CustomGalaxy} from "../../../common/src/api/types/common/customGalaxy";
 import { DBObjectId } from "../../services/types/DBObjectId";
 import {
     object,
     Validator,
-    objectId,
     stringValue,
     number,
     string,
@@ -19,7 +18,7 @@ import {
     positiveInteger,
     withDefault,
     numberAdv, maybeNull, maybeUndefined, numberEnumeration, map
-} from "../validate";
+} from "../../../common/src/validation/validate";
 import { keyHasBooleanValue, keyHasStringValue } from "./helpers";
 import {
     GAME_ALLIANCE_UPKEEP_COST,
@@ -52,10 +51,9 @@ import {
     GamePlayerType, GameResearchCost, GameResearchProgression,
     GameResourceDistribution,
     GameSettingEnabledDisabled,
-    GameSettingsGalaxy, GameSettingsGalaxyBase, GameSettingsGameTime, GameSettingsGeneral,
+    GameSettingsGalaxyBase, GameSettingsGameTime,
     GameSettingsGeneralBase,
     GameSettingsPlayer,
-    GameSettingsSpecialGalaxy,
     GameSettingsSpecialGalaxyBase, GameSettingsTechnology,
     GameSpecialistCost,
     GameSpecialistCurrency, GameSpecialistTokenReward, GameTimeMaxTurnWait, GameTimeSpeed,
@@ -72,6 +70,7 @@ import {
     ReadyToQuitVisibility
 } from "@solaris-common";
 import type {GameSettingsReq} from "../../services/gameCreate";
+import {objectId} from "../../utils/validation";
 
 export const customGalaxyValidator: Validator<CustomGalaxy> = object({
     stars: array(object({
@@ -585,7 +584,7 @@ export const mapToGameConcedeDefeatRequest = (body: any): GameConcedeDefeatReque
     }
 
     return {
-        openSlot: body.openSlot
+        openSlot: body.openSlot,
     }
 }
 
@@ -594,5 +593,5 @@ export type KickPlayerRequest = {
 }
 
 export const parseKickPlayerRequest: Validator<KickPlayerRequest> = object({
-    playerId: objectId
+    playerId: objectId,
 });

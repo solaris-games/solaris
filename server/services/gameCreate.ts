@@ -1,6 +1,6 @@
 import { MathRandomGen, SeededRandomGen } from "../utils/randomGen";
 
-import ValidationError from '../errors/validation';
+import { ValidationError } from "@solaris-common";
 import { Game } from './types/Game';
 import UserAchievementService from './userAchievement';
 import ConversationService from './conversation';

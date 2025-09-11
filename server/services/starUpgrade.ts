@@ -2,7 +2,7 @@ import {Carrier} from "./types/Carrier";
 
 const EventEmitter = require('events');
 import {DBObjectId} from './types/DBObjectId';
-import ValidationError from '../errors/validation';
+import { ValidationError } from "@solaris-common";
 import Repository from './repository';
 import {
     BulkUpgradeReport,

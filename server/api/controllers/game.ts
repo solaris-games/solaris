@@ -1,9 +1,8 @@
 import { Request } from 'express';
-import ValidationError from '../../errors/validation';
+import { ValidationError } from "@solaris-common";
 import { DependencyContainer } from '../../services/types/DependencyContainer';
 import { logger } from "../../utils/logging";
 import {
-    customGalaxyValidator,
     mapToGameConcedeDefeatRequest,
     mapToGameSaveNotesRequest,
     parseGameJoinGameRequest, parseGameSettingsReq,

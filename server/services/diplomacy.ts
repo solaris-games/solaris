@@ -1,7 +1,7 @@
 const EventEmitter = require('events');
 const moment = require('moment')
 import { DBObjectId } from "./types/DBObjectId";
-import ValidationError from '../errors/validation';
+import { ValidationError } from "@solaris-common";
 import Repository from "./repository";
 import { DiplomacyEvent, DiplomaticState, DiplomaticStatus } from "./types/Diplomacy";
 import { Game } from "./types/Game";

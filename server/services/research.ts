@@ -1,5 +1,5 @@
 const EventEmitter = require('events');
-import ValidationError from '../errors/validation';
+import { ValidationError } from "@solaris-common";
 import Repository from './repository';
 import { Game } from './types/Game';
 import {Player, ResearchProgress, ResearchType, ResearchTypeNotRandom} from './types/Player';

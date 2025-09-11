@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import ValidationError from "../../errors/validation";
+import { ValidationError } from "@solaris-common";
 import { DBObjectId } from "../../services/types/DBObjectId";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import {logger} from "../../utils/logging";
