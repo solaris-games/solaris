@@ -1,13 +1,13 @@
 import {GetRoute, PostRoute} from "./index";
 import type {Statistics} from "../types/common/stats";
-import type {GameSettings, GameSettingsGalaxy, GameSettingsGeneralSpec} from "../types/common/game";
+import type {GameSettings, GameSettingsGalaxy, GameSettingsGeneralBase} from "../types/common/game";
 
 type GameSettingsGalaxySpec = GameSettingsGalaxy & {
     customGalaxy?: string,
 }
 
 type GameSettingsSpec = GameSettings<string> & {
-    general: GameSettingsGeneralSpec,
+    general: GameSettingsGeneralBase,
     galaxy: GameSettingsGalaxySpec,
 }
 

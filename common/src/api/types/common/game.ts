@@ -145,7 +145,7 @@ export type GamePlayerDistribution = typeof GAME_PLAYER_DISTRIBUTIONS[number];
 export const GAME_VICTORY_CONDITIONS = [
     'starPercentage',
     'homeStarPercentage'
-];
+] as const;
 
 export type GameVictoryCondition = typeof GAME_VICTORY_CONDITIONS[number];
 
@@ -278,7 +278,7 @@ export type GameFlux = {
 	description: string;
 };
 
-export type GameSettingsGeneralSpec = {
+export type GameSettingsGeneralBase = {
     name: string;
     description: string | null;
     type: GameType;
@@ -301,7 +301,7 @@ export type GameSettingsGeneralSpec = {
     readyToQuitVisibility: ReadyToQuitVisibility;
 }
 
-export type GameSettingsGeneral<ID> = GameSettingsGeneralSpec & {
+export type GameSettingsGeneral<ID> = GameSettingsGeneralBase & {
     fluxId: number | null;
     passwordRequired: boolean;
     createdByUserId?: ID | null;
@@ -411,47 +411,52 @@ export type GameSettingsTechnology = {
     specialistTokenReward: GameSpecialistTokenReward;
 };
 
-export type GameSettings<ID> = {
+export type GameSettingsGameTime = {
+    gameType: GameTimeType;
+    speed: GameTimeSpeed;
+    isTickLimited: GameSettingEnabledDisabled;
+    tickLimit: number | null;
+    startDelay: GameTimeStartDelay;
+    turnJumps: number;
+    maxTurnWait: GameTimeMaxTurnWait;
+    afk: {
+        lastSeenTimeout: number;
+        cycleTimeout: number;
+        turnTimeout: number;
+    }
+};
+
+export type GameSettingsInvariable = {
+    conquest: {
+        victoryCondition: GameVictoryCondition;
+        victoryPercentage: GameVictoryPercentage;
+        capitalStarElimination: GameSettingEnabledDisabled;
+        teamsCount?: number;
+    },
+    kingOfTheHill: {
+        productionCycles: number;
+    },
+    orbitalMechanics: {
+        enabled: GameSettingEnabledDisabled;
+        orbitSpeed: number;
+    },
+    player: GameSettingsPlayer;
+    diplomacy: {
+        enabled: GameSettingEnabledDisabled;
+        tradeRestricted: GameSettingEnabledDisabled;
+        maxAlliances: number;
+        upkeepCost: GameAllianceUpkeepCost;
+        globalEvents: GameSettingEnabledDisabled;
+        lockedAlliances: GameSettingEnabledDisabled;
+    },
+    technology: GameSettingsTechnology,
+    gameTime: GameSettingsGameTime,
+}
+
+export type GameSettings<ID> = GameSettingsInvariable & {
 	general: GameSettingsGeneral<ID>,
 	galaxy: GameSettingsGalaxy,
-	specialGalaxy: GameSettingsSpecialGalaxy,
-	conquest: {
-		victoryCondition: GameVictoryCondition;
-		victoryPercentage: GameVictoryPercentage;
-		capitalStarElimination: GameSettingEnabledDisabled;
-		teamsCount?: number;
-	},
-	kingOfTheHill: {
-		productionCycles: number;
-	},
-	orbitalMechanics: {
-		enabled: GameSettingEnabledDisabled;
-		orbitSpeed: number;
-	},
-	player: GameSettingsPlayer;
-	diplomacy: {
-		enabled: GameSettingEnabledDisabled;
-		tradeRestricted: GameSettingEnabledDisabled;
-		maxAlliances: number;
-		upkeepCost: GameAllianceUpkeepCost;
-		globalEvents: GameSettingEnabledDisabled;
-		lockedAlliances: GameSettingEnabledDisabled;
-	},
-	technology: GameSettingsTechnology,
-	gameTime: {
-		gameType: GameTimeType;
-		speed: GameTimeSpeed;
-		isTickLimited: GameSettingEnabledDisabled;
-		tickLimit: number | null;
-		startDelay: GameTimeStartDelay;
-		turnJumps: number;
-		maxTurnWait: GameTimeMaxTurnWait;
-		afk: {
-			lastSeenTimeout: number;
-			cycleTimeout: number;
-			turnTimeout: number;
-		}
-	}
+    specialGalaxy: GameSettingsSpecialGalaxy,
 };
 
 export type GameUserNotification = {

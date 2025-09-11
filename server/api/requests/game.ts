@@ -22,18 +22,54 @@ import {
 } from "../validate";
 import { keyHasBooleanValue, keyHasStringValue } from "./helpers";
 import {
-    GAME_AWARD_RANK_TO, GAME_CARRIER_COST, GAME_CARRIER_UPKEEP_COST, GAME_DARK_GALAXY_MODES, GAME_GALAXY_TYPE,
-    GAME_MODES, GAME_PLAYER_DISTRIBUTIONS, GAME_RESOURCE_DISTRIBUTIONS, GAME_SPECIALIST_COST, GAME_SPECIALIST_CURRENCY,
-    GAME_TYPES, GAME_WARPGATE_COST,
-    GameAwardRankTo, GameCarrierCost, GameCarrierUpkeepCost, GameDarkGalaxyMode,
-    GameGalaxyType, GameMode, GamePlayerAnonymity, GamePlayerDistribution, GamePlayerOnlineStatus, GamePlayerType,
-    GameResourceDistribution, GameSettingEnabledDisabled,
-    GameSettingsGalaxy,
-    GameSettingsGeneralSpec, GameSettingsSpecialGalaxy,
-    GameSettingsSpecialGalaxyBase, GameSpecialistCost, GameSpecialistCurrency,
-    GameType, GameWarpgateCost, READY_TO_QUIT_FRACTIONS,
-    READY_TO_QUIT_TIMER_CYCLES, READY_TO_QUIT_VISIBILITY, ReadyToQuitFraction,
-    ReadyToQuitTimerCycles, ReadyToQuitVisibility
+    GAME_ALLIANCE_UPKEEP_COST,
+    GAME_AWARD_RANK_TO, GAME_BANKING_REWARDS,
+    GAME_CARRIER_COST,
+    GAME_CARRIER_UPKEEP_COST,
+    GAME_DARK_GALAXY_MODES, GAME_EXPERIMENTATION_DISTRIBUTIONS, GAME_EXPERIMENTATION_REWARDS,
+    GAME_GALAXY_TYPE,
+    GAME_INFRUSTRUCTURE_COSTS,
+    GAME_MODES,
+    GAME_PLAYER_DISTRIBUTIONS, GAME_RESEARCH_COSTS,
+    GAME_RESOURCE_DISTRIBUTIONS,
+    GAME_SPECIALIST_COST,
+    GAME_SPECIALIST_CURRENCY, GAME_SPECIALIST_TOKEN_REWARDS, GAME_TIME_MAX_TURN_WAITS,
+    GAME_TIME_SPEEDS, GAME_TIME_START_DELAYS, GAME_TIME_TYPES, GAME_TRADE_COSTS, GAME_TRADE_SCANNING,
+    GAME_TYPES,
+    GAME_VICTORY_CONDITIONS,
+    GAME_VICTORY_PERCENTAGES,
+    GAME_WARPGATE_COST, GameAllianceUpkeepCost,
+    GameAwardRankTo, GameBankingReward,
+    GameCarrierCost,
+    GameCarrierUpkeepCost,
+    GameDarkGalaxyMode, GameExperimentationDistribution, GameExperimentationReward,
+    GameGalaxyType,
+    GameInfrastructureCost,
+    GameMode,
+    GamePlayerAnonymity,
+    GamePlayerDistribution,
+    GamePlayerOnlineStatus,
+    GamePlayerType, GameResearchCost, GameResearchProgression,
+    GameResourceDistribution,
+    GameSettingEnabledDisabled,
+    GameSettingsGalaxy, GameSettingsGalaxyBase, GameSettingsGameTime, GameSettingsGeneral,
+    GameSettingsGeneralBase,
+    GameSettingsPlayer,
+    GameSettingsSpecialGalaxy,
+    GameSettingsSpecialGalaxyBase, GameSettingsTechnology,
+    GameSpecialistCost,
+    GameSpecialistCurrency, GameSpecialistTokenReward, GameTimeMaxTurnWait, GameTimeSpeed,
+    GameTimeStartDelay, GameTimeType, GameTradeCost, GameTradeScanning,
+    GameType,
+    GameVictoryCondition,
+    GameVictoryPercentage,
+    GameWarpgateCost,
+    READY_TO_QUIT_FRACTIONS,
+    READY_TO_QUIT_TIMER_CYCLES,
+    READY_TO_QUIT_VISIBILITY,
+    ReadyToQuitFraction,
+    ReadyToQuitTimerCycles,
+    ReadyToQuitVisibility
 } from "@solaris-common";
 import type {GameSettingsReq} from "../../services/gameCreate";
 
@@ -131,7 +167,7 @@ export const customGalaxyValidator: Validator<CustomGalaxy> = object({
 
 const enabledDisabled = stringEnumeration<GameSettingEnabledDisabled, GameSettingEnabledDisabled[]>(['enabled', 'disabled']);
 
-const parseGameSettingsGeneral: Validator<GameSettingsGeneralSpec> = object({
+const parseGameSettingsGeneral: Validator<GameSettingsGeneralBase> = object({
     name: stringValue({
         trim: true,
         minLength: 3,
@@ -169,7 +205,7 @@ const parseGameSettingsGeneral: Validator<GameSettingsGeneralSpec> = object({
     readyToQuitVisibility: stringEnumeration<ReadyToQuitVisibility, ReadyToQuitVisibility[]>(READY_TO_QUIT_VISIBILITY),
 });
 
-const parseGameSettingsGalaxy: Validator<GameSettingsGalaxy> = object({
+const parseGameSettingsGalaxy: Validator<GameSettingsGalaxyBase> = object({
     galaxyType: stringEnumeration<GameGalaxyType, GameGalaxyType[]>(GAME_GALAXY_TYPE),
     starsPerPlayer: numberAdv({
         integer: true,
@@ -231,11 +267,266 @@ const parseGameSettingsSpecialGalaxy: Validator<GameSettingsSpecialGalaxyBase> =
     }),
 });
 
+const parseGameSettingsConquest = object({
+    victoryCondition: stringEnumeration<GameVictoryCondition, GameVictoryCondition[]>(GAME_VICTORY_CONDITIONS),
+    victoryPercentage: numberEnumeration<GameVictoryPercentage, GameVictoryPercentage[]>(GAME_VICTORY_PERCENTAGES),
+    capitalStarElimination: enabledDisabled,
+    teamsCount: maybeUndefined(numberAdv({
+        integer: true,
+        range: {
+            from: 2,
+            to: 32,
+        },
+    })),
+});
+
+const parseDevelopmentCost: Validator<GameInfrastructureCost> = stringEnumeration<GameInfrastructureCost, GameInfrastructureCost[]>(GAME_INFRUSTRUCTURE_COSTS)
+
+const parseGameSettingsPlayer: Validator<GameSettingsPlayer> = object({
+    startingStars: numberAdv({
+        integer: true,
+        range: {
+            from: 1,
+            to: 30,
+        },
+    }),
+    startingCredits: numberAdv({
+        integer: true,
+        range: {
+            from: 25,
+            to: 3000,
+        },
+    }),
+    startingCreditsSpecialists: numberAdv({
+        integer: true,
+        range: {
+            from: 0,
+            to: 100,
+        },
+    }),
+    startingShips: numberAdv({
+        integer: true,
+        range: {
+            from: 0,
+            to: 100,
+        },
+    }),
+    startingInfrastructure: object({
+        economy: numberAdv({
+            integer: true,
+            range: {
+                from: 0,
+                to: 30,
+            },
+        }),
+        industry: numberAdv({
+            integer: true,
+            range: {
+                from: 0,
+                to: 30,
+            },
+        }),
+        science: numberAdv({
+            integer: true,
+            range: {
+                from: 0,
+                to: 5,
+            },
+        }),
+    }),
+    developmentCost: object({
+        economy: parseDevelopmentCost,
+        industry: parseDevelopmentCost,
+        science: parseDevelopmentCost,
+    }),
+    tradeCredits: boolean,
+    tradeCreditsSpecialists: boolean,
+    tradeCost: numberEnumeration<GameTradeCost, GameTradeCost[]>(GAME_TRADE_COSTS),
+    tradeScanning: stringEnumeration<GameTradeScanning, GameTradeScanning[]>(GAME_TRADE_SCANNING),
+    populationCap: object({
+        enabled: enabledDisabled,
+        shipsPerStar: numberAdv({
+            integer: true,
+            range: {
+                from: 50,
+                to: 1000,
+            },
+        }),
+    }),
+    allowAbandonStars: enabledDisabled,
+});
+
+const researchCosts: Validator<GameResearchCost> = stringEnumeration<GameResearchCost, GameResearchCost[]>(GAME_RESEARCH_COSTS);
+
+const researchCostProgression: Validator<GameResearchProgression> = or(object({
+    progression: just('standard'),
+}), object({
+    progression: just('exponential'),
+    growthFactor: stringEnumeration<'soft'|'medium'|'hard', ('soft'|'medium'|'hard')[]>(['soft', 'medium', 'hard']),
+}));
+
+const parseGameSettingsTechnology: Validator<GameSettingsTechnology> = object({
+    startingTechnologyLevel: object({
+        terraforming: numberAdv({
+            integer: true,
+            range: {
+                from: 1,
+                to: 16,
+            },
+        }),
+        experimentation: numberAdv({
+            integer: true,
+            range: {
+                from: 0,
+                to: 16,
+            },
+        }),
+        scanning: numberAdv({
+            integer: true,
+            range: {
+                from: 1,
+                to: 16,
+            }
+        }),
+        hyperspace: numberAdv({
+            integer: true,
+            range: {
+                from: 1,
+                to: 16,
+            }
+        }),
+        manufacturing: numberAdv({
+            integer: true,
+            range: {
+                from: 1,
+                to: 16,
+            }
+        }),
+        banking: numberAdv({
+            integer: true,
+            range: {
+                from: 0,
+                to: 16,
+            },
+        }),
+        weapons: numberAdv({
+            integer: true,
+            range: {
+                from: 1,
+                to: 16,
+            }
+        }),
+        specialists: numberAdv({
+            integer: true,
+            range: {
+                from: 0,
+                to: 16,
+            },
+        }),
+    }),
+    researchCosts: object({
+        terraforming: researchCosts,
+        experimentation: researchCosts,
+        scanning: researchCosts,
+        hyperspace: researchCosts,
+        manufacturing: researchCosts,
+        banking: researchCosts,
+        weapons: researchCosts,
+        specialists: researchCosts,
+    }),
+    researchCostProgression: researchCostProgression,
+    bankingReward: stringEnumeration<GameBankingReward, GameBankingReward[]>(GAME_BANKING_REWARDS),
+    experimentationDistribution: stringEnumeration<GameExperimentationDistribution, GameExperimentationDistribution[]>(GAME_EXPERIMENTATION_DISTRIBUTIONS),
+    experimentationReward: stringEnumeration<GameExperimentationReward, GameExperimentationReward[]>(GAME_EXPERIMENTATION_REWARDS),
+    specialistTokenReward: stringEnumeration<GameSpecialistTokenReward, GameSpecialistTokenReward[]>(GAME_SPECIALIST_TOKEN_REWARDS),
+});
+
+const parseGameSettingsGameTime: Validator<GameSettingsGameTime> = object({
+    gameType: stringEnumeration<GameTimeType, GameTimeType[]>(GAME_TIME_TYPES),
+    speed: numberEnumeration<GameTimeSpeed, GameTimeSpeed[]>(GAME_TIME_SPEEDS),
+    isTickLimited: enabledDisabled,
+    tickLimit: maybeNull(numberAdv({
+        integer: true,
+        range: {
+            from: 100,
+            to: 2000,
+        },
+    })),
+    startDelay: numberEnumeration<GameTimeStartDelay, GameTimeStartDelay[]>(GAME_TIME_START_DELAYS),
+    turnJumps: numberAdv({
+        integer: true,
+        range: {
+            from: 1,
+            to: 24,
+        },
+    }),
+    maxTurnWait: numberEnumeration<GameTimeMaxTurnWait, GameTimeMaxTurnWait[]>(GAME_TIME_MAX_TURN_WAITS),
+    afk: object({
+        lastSeenTimeout: numberAdv({
+            integer: true,
+            range: {
+                from: 1,
+                to: 7,
+            },
+        }),
+        cycleTimeout: numberAdv({
+            integer: true,
+            range: {
+                from: 3,
+                to: 25,
+            },
+        }),
+        turnTimeout: numberAdv({
+            integer: true,
+            range: {
+                from: 1,
+                to: 60,
+            },
+        }),
+    }),
+});
+
 export const parseGameSettingsReq: Validator<GameSettingsReq> = object({
     general: parseGameSettingsGeneral,
     galaxy: parseGameSettingsGalaxy,
     specialGalaxy: parseGameSettingsSpecialGalaxy,
-
+    conquest: parseGameSettingsConquest,
+    kingOfTheHill: object({
+        productionCycles: numberAdv({
+            integer: true,
+            range: {
+                from: 1,
+                to: 25,
+            },
+        }),
+    }),
+    orbitalMechanics: object({
+        enabled: enabledDisabled,
+        orbitSpeed: numberAdv({
+            integer: true,
+            range: {
+                from: 1,
+                to: 5,
+            },
+        }),
+    }),
+    player: parseGameSettingsPlayer,
+    diplomacy: object({
+        enabled: enabledDisabled,
+        tradeRestricted: enabledDisabled,
+        maxAlliances: numberAdv({
+            integer: true,
+            range: {
+                from: 1,
+                to: 63,
+            },
+        }),
+        upkeepCost: stringEnumeration<GameAllianceUpkeepCost, GameAllianceUpkeepCost[]>(GAME_ALLIANCE_UPKEEP_COST),
+        globalEvents: enabledDisabled,
+        lockedAlliances: enabledDisabled,
+    }),
+    technology: parseGameSettingsTechnology,
+    gameTime: parseGameSettingsGameTime,
 });
 
 export interface GameJoinGameRequest {

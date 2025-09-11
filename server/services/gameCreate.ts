@@ -29,8 +29,8 @@ import { Player } from "./types/Player";
 import CustomGalaxyService from "./customGalaxy";
 import {
     GameSettings,
-    GameSettingsGalaxy,
-    GameSettingsGeneralSpec,
+    GameSettingsGalaxy, GameSettingsGalaxyBase,
+    GameSettingsGeneralBase, GameSettingsInvariable,
     GameSettingsSpecialGalaxyBase
 } from "@solaris-common";
 
@@ -42,8 +42,9 @@ const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
 const log = logger("GameCreateService");
 
-export type GameSettingsReq = GameSettings<string> & {
-    general: GameSettingsGeneralSpec,
+export type GameSettingsReq = GameSettingsInvariable & {
+    general: GameSettingsGeneralBase,
+    galaxy: GameSettingsGalaxyBase,
     specialGalaxy: GameSettingsSpecialGalaxyBase,
 }
 
