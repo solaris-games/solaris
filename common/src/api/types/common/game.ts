@@ -284,6 +284,7 @@ export type GameSettingsGeneralBase = {
     type: GameType;
     mode: GameMode;
     password?: string | null;
+    createdFromTemplate?: string | null;
     playerLimit: number;
     playerType: GamePlayerType;
     anonymity: GamePlayerAnonymity;
@@ -305,7 +306,6 @@ export type GameSettingsGeneral<ID> = GameSettingsGeneralBase & {
     fluxId: number | null;
     passwordRequired: boolean;
     createdByUserId?: ID | null;
-    createdFromTemplate?: string | null;
     featured: boolean;
     flux?: GameFlux | null;
     isGameAdmin?: boolean;
