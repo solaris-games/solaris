@@ -1,17 +1,20 @@
 import {GetRoute, PostRoute} from "./index";
 import type {Statistics} from "../types/common/stats";
-import type {GameSettings, GameSettingsGalaxy, GameSettingsGeneralBase} from "../types/common/game";
+import type {GameSettingsGalaxyBase, GameSettingsGeneralBase, GameSettingsInvariable,
+    GameSettingsSpecialGalaxyBase
+} from "../types/common/game";
 
-type GameSettingsGalaxySpec = GameSettingsGalaxy & {
+type GameSettingsGalaxyUnparsed = GameSettingsGalaxyBase & {
     customGalaxy?: string,
 }
 
-type GameSettingsSpec = GameSettings<string> & {
+export type GameSettingsSpec = GameSettingsInvariable & {
     general: GameSettingsGeneralBase,
-    galaxy: GameSettingsGalaxySpec,
+    galaxy: GameSettingsGalaxyUnparsed,
+    specialGalaxy: GameSettingsSpecialGalaxyBase,
 }
 
 export const createGameRoutes = <ID>() => ({
-    getStatistics: new GetRoute<{ gameId: string, playerId: string }, {}, Statistics>("/api/game/:gameId/statistics/:playerId"),
-    create: new PostRoute<{}, {}, GameSettingsSpec, null>("/api/game/"),
+    getStatistics: new GetRoute<{ gameId: ID, playerId: ID }, {}, Statistics>("/api/game/:gameId/statistics/:playerId"),
+    create: new PostRoute<{}, {}, GameSettingsSpec, { gameId: ID }>("/api/game/"),
 });

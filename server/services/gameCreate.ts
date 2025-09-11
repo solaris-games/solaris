@@ -117,7 +117,7 @@ export default class GameCreateService {
         this.customGalaxyService = customGalaxyService;
     }
 
-    async create(settings: GameSettingsReq, userId: DBObjectId) {
+    async create(settings: GameSettingsReq, userId: DBObjectId | null) {
         const isTutorial = settings.general.type === 'tutorial';
         const isNewPlayerGame = settings.general.type === 'new_player_rt' || settings.general.type === 'new_player_tb';
         const isOfficialGame = settings.general.createdByUserId == null;

@@ -37,16 +37,11 @@ export default (container: DependencyContainer) => {
             const settings = parseGameSettingsReq(req.body);
 
             try {
-                // If this is a custom galaxy, validate the JSON.
-                // TODO: This should probably be moved to the game create request validation once it is implemented.
-                // if (req.body.galaxy.galaxyType === 'custom') {
-                //     const customGalaxy = JSON.parse(req.body.galaxy.customJSON!);
-                //     req.body.galaxy.customGalaxy = customGalaxyValidator(customGalaxy);
-                // }
-                
-                let game = await container.gameCreateService.create(settings, req.session.userId);
+                const game = await container.gameCreateService.create(settings, req.session.userId);
     
-                res.status(201).json(game._id);
+                res.status(201).json({
+                    gameId: game._id,
+                });
                 return next();
             } catch (err) {
                 return next(err);
