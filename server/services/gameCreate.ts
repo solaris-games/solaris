@@ -42,9 +42,13 @@ const RANDOM_NAME_STRING = '[[[RANDOM]]]';
 
 const log = logger("GameCreateService");
 
+export type GameSettingsGalaxyReq = GameSettingsGalaxy & {
+    customSeed?: string;
+}
+
 export type GameSettingsReq = GameSettingsInvariable & {
     general: GameSettingsGeneralBase,
-    galaxy: GameSettingsGalaxyBase,
+    galaxy: GameSettingsGalaxyReq,
     specialGalaxy: GameSettingsSpecialGalaxyBase,
 }
 
@@ -120,64 +124,22 @@ export default class GameCreateService {
     async create(settings: GameSettingsReq, userId: DBObjectId | null) {
         const isTutorial = settings.general.type === 'tutorial';
         const isNewPlayerGame = settings.general.type === 'new_player_rt' || settings.general.type === 'new_player_tb';
-        const isOfficialGame = settings.general.createdByUserId == null;
+        const isOfficialGame = !userId;
         const isCustomGalaxy = settings.galaxy.galaxyType === 'custom';
         const isAdvancedCustomGalaxy = isCustomGalaxy && settings.galaxy.advancedCustomGalaxyEnabled === 'enabled';
 
         if (isCustomGalaxy) {
             // Validate it here so that we can assume it is valid later.
-            this.customGalaxyService.validateCustomGalaxy(settings, isAdvancedCustomGalaxy);
-
-            settings.general.playerLimit = settings.galaxy.customGalaxy!.stars.filter(s => s.homeStar).length;
-
-            if (settings.galaxy.customGalaxy!.stars.find((s) =>
-                s.naturalResources.economy != s.naturalResources.industry || s.naturalResources.economy != s.naturalResources.science) != null
-            ) {
-                settings.specialGalaxy.splitResources === 'enabled';
-            } else {
-                settings.specialGalaxy.splitResources === 'disabled';
-            }
-
-            if (isAdvancedCustomGalaxy) {
-                if (settings.general.mode === 'teamConquest') {
-                    settings.conquest.teamsCount = settings.galaxy.customGalaxy!.teams!.length;
-                    // TODO: This should just be set by the client; we no longer need to use maxAlliances in team games.
-                    settings.diplomacy.maxAlliances = settings.galaxy.customGalaxy!.players!.length - 1;
-                }
-            }
+            this.customGalaxyService.validateAndCompleteCustomGalaxy(settings, isAdvancedCustomGalaxy);
         }
 
-        // If a legit user (not the system) created the game and it isn't a tutorial
-        // then that game must be set as a custom game.
-        if (settings.general.createdByUserId && !isTutorial) {
-            settings.general.type = 'custom'; // All user games MUST be custom type.
-            settings.general.timeMachine = 'disabled'; // Time machine is disabled for user created games.
-            settings.general.featured = false // Stop any tricksters.
-
-            // Prevent players from being able to create more than 1 game.
-            const openGames = await this.gameListService.listOpenGamesCreatedByUser(settings.general.createdByUserId);
-            const userIsGameMaster = await this.userService.getUserIsGameMaster(settings.general.createdByUserId);
-            const userIsAdmin = await this.userService.getUserIsAdmin(settings.general.createdByUserId);
-
-            if (openGames.length > ESTABLISHED_PLAYER_LIMIT && !userIsGameMaster) {
-                throw new ValidationError(`Cannot create game, you already have ${openGames.length} game(s) waiting for players.`);
+        // If a legit user (not the system) created the game then that game must be set as a custom game.
+        if (!isOfficialGame) {
+            if (!isTutorial) {
+                await this._validateUserCanCreateGame(userId!, settings);
             }
 
-            if (userIsGameMaster && !userIsAdmin && openGames.length > GAME_MASTER_LIMIT) {
-                throw new ValidationError(`Game Masters are limited to ${GAME_MASTER_LIMIT} games waiting for players.`);
-            }
-
-            // Validate that the player cannot create large games.
-            if (settings.general.playerLimit > 16 && !userIsGameMaster) {
-                throw new ValidationError(`Games larger than 16 players are reserved for official games or can be created by GMs.`);
-            }
-
-            const isEstablishedPlayer = await this.userService.isEstablishedPlayer(settings.general.createdByUserId);
-
-            // Disallow new players from creating games if they haven't completed a game yet.
-            if (!isEstablishedPlayer) {
-                throw new ValidationError(`You must complete at least one game in order to create a custom game.`);
-            }
+            settings.general.type = 'custom';
         }
 
         if (settings.general.playerLimit < 2) {
@@ -194,49 +156,19 @@ export default class GameCreateService {
 
         if (settings.general.password) {
             settings.general.password = await this.passwordService.hash(settings.general.password);
-            settings.general.passwordRequired = true;
         }
 
         // Validate team conquest settings
         if (settings.general.mode === 'teamConquest') {
-            const teamsCount = settings.conquest?.teamsCount;
-
-            if (!teamsCount) {
-                throw new ValidationError("Team count not provided");
-            }
-
-            if (teamsCount < 2) {
-                throw new ValidationError(`The number of teams must be larger than 2.`);
-            }
-
-            if (isAdvancedCustomGalaxy) {
-                if (settings.general.playerLimit <= 2) {
-                    throw new ValidationError(`The number of players in a team game must be larger than 2.`);
-                }
-            } else {
-                const valid = Boolean(teamsCount &&
-                    settings.general.playerLimit >= 4 &&
-                    settings.general.playerLimit % teamsCount === 0);
-
-                if (!valid) {
-                    throw new ValidationError(`The number of players must be larger than 3 and divisible by the number of teams.`);
-                }
-            }
-
-            if (settings.diplomacy?.enabled !== 'enabled') {
-                throw new ValidationError('Diplomacy needs to be enabled for a team game.');
-            }
-
-            if (settings.diplomacy?.lockedAlliances !== 'enabled') {
-                throw new ValidationError('Locked alliances needs to be enabled for a team game.');
-            }
-
-            if (settings.diplomacy?.maxAlliances !== (settings.general.playerLimit / teamsCount) - 1 && !isAdvancedCustomGalaxy) {
-                throw new ValidationError('Alliance limit too low for team size.');
-            }
+            this._validateTeamConquest(settings, isAdvancedCustomGalaxy);
         }
 
         const rand = this._createRandomGenerator(settings);
+
+        // todo settings.general.timeMachine = 'disabled'; // Time machine is disabled for user created games.
+        // settings.general.featured = false // Stop any tricksters.
+
+        //             settings.general.passwordRequired = true;
 
         let game = new this.gameModel({
             settings
@@ -455,7 +387,72 @@ export default class GameCreateService {
         return gameObject;
     }
 
-    _createRandomGenerator(settings: GameSettings) {
+    private _validateTeamConquest(settings: GameSettingsReq, isAdvancedCustomGalaxy: boolean) {
+        const teamsCount = settings.conquest?.teamsCount;
+
+        if (!teamsCount) {
+            throw new ValidationError("Team count not provided");
+        }
+
+        if (teamsCount < 2) {
+            throw new ValidationError(`The number of teams must be larger than 2.`);
+        }
+
+        if (!isAdvancedCustomGalaxy) {
+            const valid = Boolean(teamsCount &&
+                settings.general.playerLimit >= 4 &&
+                settings.general.playerLimit % teamsCount === 0);
+
+            if (!valid) {
+                throw new ValidationError(`The number of players must be larger than 3 and divisible by the number of teams.`);
+            }
+        } else {
+            if (settings.general.playerLimit <= 2) {
+                throw new ValidationError(`The number of players must be larger than 2.`);
+            }
+        }
+
+        if (settings.diplomacy?.enabled !== 'enabled') {
+            throw new ValidationError('Diplomacy needs to be enabled for a team game.');
+        }
+
+        if (settings.diplomacy?.lockedAlliances !== 'enabled') {
+            throw new ValidationError('Locked alliances needs to be enabled for a team game.');
+        }
+
+        if (settings.diplomacy?.maxAlliances !== (settings.general.playerLimit / teamsCount) - 1 && !isAdvancedCustomGalaxy) {
+            throw new ValidationError('Alliance limit too low for team size.');
+        }
+    }
+
+    async _validateUserCanCreateGame(userId: DBObjectId, settings: GameSettingsReq) {
+        // Prevent players from being able to create more than 1 game.
+        const openGames = await this.gameListService.listOpenGamesCreatedByUser(userId);
+        const userIsGameMaster = await this.userService.getUserIsGameMaster(userId);
+        const userIsAdmin = await this.userService.getUserIsAdmin(userId);
+
+        if (openGames.length > ESTABLISHED_PLAYER_LIMIT && !userIsGameMaster) {
+            throw new ValidationError(`Cannot create game, you already have ${openGames.length} game(s) waiting for players.`);
+        }
+
+        if (userIsGameMaster && !userIsAdmin && openGames.length > GAME_MASTER_LIMIT) {
+            throw new ValidationError(`Game Masters are limited to ${GAME_MASTER_LIMIT} games waiting for players.`);
+        }
+
+        // Validate that the player cannot create large games.
+        if (settings.general.playerLimit > 16 && !userIsGameMaster) {
+            throw new ValidationError(`Games larger than 16 players are reserved for official games or can be created by GMs.`);
+        }
+
+        const isEstablishedPlayer = await this.userService.isEstablishedPlayer(userId);
+
+        // Disallow new players from creating games if they haven't completed a game yet.
+        if (!isEstablishedPlayer) {
+            throw new ValidationError(`You must complete at least one game in order to create a custom game.`);
+        }
+    }
+
+    _createRandomGenerator(settings: GameSettingsReq) {
         if (settings.galaxy.galaxyType === 'irregular') {
             const seed = settings.galaxy.customSeed || (Math.random() * Number.MAX_SAFE_INTEGER).toFixed(0);
             log.info(`Generating irregular map for ${settings.general.name}: ${settings.general.playerLimit} players (${settings.galaxy.starsPerPlayer} SPP) with seed ${seed}`);

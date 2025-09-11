@@ -52,7 +52,7 @@ export const officialGamesCheckJob = (container: DependencyContainer) => async (
                 }
 
                 try {
-                    const newGame = await container.gameCreateService.create(newSetting);
+                    const newGame = await container.gameCreateService.create(newSetting, null);
 
                     log.info(`${newGame.settings.general.type} game created: ${newGame.settings.general.name}`);
                 } catch (e) {
