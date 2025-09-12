@@ -4,8 +4,9 @@ import type {GameSettingsGalaxyBase, GameSettingsGeneralBase, GameSettingsInvari
     GameSettingsSpecialGalaxyBase
 } from "../types/common/game";
 
-type GameSettingsGalaxyUnparsed = GameSettingsGalaxyBase & {
+export type GameSettingsGalaxyUnparsed = GameSettingsGalaxyBase & {
     customGalaxy?: string,
+    customSeed?: string;
 }
 
 export type GameSettingsSpec = GameSettingsInvariable & {

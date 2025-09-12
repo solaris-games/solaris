@@ -41,5 +41,6 @@ export * from "./events/index";
 export * from "./events/handler";
 export * from "./events/emitter";
 export * from "./data/settings";
+export * from "./data/options";
 export * from "./validation/error";
 export * from "./validation/validate";

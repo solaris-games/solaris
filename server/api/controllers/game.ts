@@ -17,7 +17,6 @@ export default (container: DependencyContainer) => {
         getDefaultSettings: (req, res, next) => {
             res.status(200).json({
                 settings: require('../../config/game/settings/user/standard.json'),
-                options: require('../../config/game/settings/options.json')
             });
 
             return next();
