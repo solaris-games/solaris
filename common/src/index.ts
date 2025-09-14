@@ -44,3 +44,4 @@ export * from "./data/settings";
 export * from "./data/options";
 export * from "./validation/error";
 export * from "./validation/validate";
+export * from "./validation/customGalaxy";
