@@ -2,7 +2,7 @@ import {DependencyContainer} from "../../services/types/DependencyContainer";
 import {Game} from "../../services/types/Game";
 import {OfficialGameCategory, OfficialGameKind} from "../../config/officialGames";
 import {logger} from "../../utils/logging";
-import {GameSettings} from "@solaris-common";
+import {GameSettings} from "solaris-common";
 import {DBObjectId} from "../../services/types/DBObjectId";
 
 const log = logger("Official Games Check Job");

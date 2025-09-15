@@ -1,4 +1,4 @@
-import {ValidationError} from "@solaris-common";
+import {ValidationError} from "solaris-common";
 import { CarrierWaypointActionType, CarrierWaypointActionTypes } from "../../services/types/CarrierWaypoint";
 import { DBObjectId } from "../../services/types/DBObjectId";
 import {
@@ -9,7 +9,7 @@ import {
     stringEnumeration, stringValue, UNICODE_INVISIBLE_CHARACTERS, UNICODE_PRINTABLE_CHARACTERS_WITH_WHITESPACE,
     Validator,
     withDefault
-} from "@solaris-common";
+} from "solaris-common";
 import { keyHasBooleanValue, keyHasNumberValue, keyHasObjectValue, keyHasStringValue } from "./helpers";
 import {objectId} from "../../utils/validation";
 

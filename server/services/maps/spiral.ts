@@ -9,7 +9,7 @@ import { GalaxyDimensions } from '../types/Dimensions';
 const randomSeeded = require('random-seed');
 
 import { createNoise2D } from 'simplex-noise';
-import {GameResourceDistribution} from "@solaris-common";
+import {GameResourceDistribution} from "solaris-common";
 
 export default class SpiralMapService {
 

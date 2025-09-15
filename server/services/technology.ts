@@ -5,7 +5,7 @@ import { Star } from "./types/Star";
 import SpecialistService from "./specialist";
 import GameTypeService from "./gameType";
 import {maxBy} from "./utils";
-import {CombatResolutionMalusStrategy} from "@solaris-common";
+import {CombatResolutionMalusStrategy} from "solaris-common";
 
 const DEFAULT_TECHNOLOGIES: ResearchTypeNotRandom[] = [
     'terraforming',

@@ -18,7 +18,7 @@ import StarService from './star';
 import StarDistanceService from './starDistance';
 import TechnologyService from './technology';
 import TeamService from "./team";
-import { ValidationError } from "@solaris-common";
+import { ValidationError } from "solaris-common";
 import {shuffle} from "./utils";
 import { Carrier } from "./types/Carrier";
 import { Star } from "./types/Star";

@@ -2,7 +2,7 @@ import { Carrier } from "./types/Carrier";
 import { Game } from "./types/Game";
 import { Specialist, SpecialistType } from "./types/Specialist";
 import { Star } from "./types/Star";
-import { ValidationError } from "@solaris-common";
+import { ValidationError } from "solaris-common";
 import GameTypeService from "./gameType";
 
 const specialists = require('../config/game/specialists.json') as Specialist[];

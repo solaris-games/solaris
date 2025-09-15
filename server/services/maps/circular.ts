@@ -5,7 +5,7 @@ import RandomService from "../random";
 import ResourceService from "../resource";
 import StarService from "../star";
 import StarDistanceService from "../starDistance";
-import {GameResourceDistribution} from "@solaris-common";
+import {GameResourceDistribution} from "solaris-common";
 
 export default class CircularMapService {
 

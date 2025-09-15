@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import { ValidationError } from '@solaris-common';
+import { ValidationError } from 'solaris-common';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
 
 export interface AuthMiddleware {

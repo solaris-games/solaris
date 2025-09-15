@@ -2,7 +2,7 @@ import BroadcastService from "./broadcast";
 
 const moment = require('moment');
 import { DBObjectId } from './types/DBObjectId';
-import { ValidationError } from "@solaris-common";
+import { ValidationError } from "solaris-common";
 import Repository from './repository';
 import { Conversation } from './types/Conversation';
 import { ConversationMessage, ConversationMessageSentResult } from './types/ConversationMessage';

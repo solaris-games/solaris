@@ -1,4 +1,4 @@
-import { ValidationError } from "@solaris-common";
+import { ValidationError } from "solaris-common";
 import AvatarService from './avatar';
 import BattleRoyaleService from './battleRoyale';
 import CacheService from './cache';

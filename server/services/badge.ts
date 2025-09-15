@@ -1,5 +1,5 @@
 import { DBObjectId } from './types/DBObjectId';
-import { ValidationError } from "@solaris-common";
+import { ValidationError } from "solaris-common";
 import Repository from './repository';
 import { Badge } from './types/Badge';
 import { Game } from './types/Game';

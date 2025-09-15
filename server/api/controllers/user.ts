@@ -1,4 +1,4 @@
-import { ValidationError } from '@solaris-common';
+import { ValidationError } from 'solaris-common';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
 import {
     mapToUserRequestPasswordResetRequest,

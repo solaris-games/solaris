@@ -1,5 +1,5 @@
 import {JobParameters} from "../tool";
-import {AwardedBadge, UserAchievements} from "@solaris-common";
+import {AwardedBadge, UserAchievements} from "solaris-common";
 import {User} from "../../services/types/User";
 import {DBObjectId} from "../../services/types/DBObjectId";
 import {Statistics} from "solaris-common";

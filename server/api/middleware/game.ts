@@ -1,5 +1,5 @@
 import { DependencyContainer } from "../../services/types/DependencyContainer";
-import { ValidationError } from "@solaris-common";
+import { ValidationError } from "solaris-common";
 
 export interface GameMiddleware {
     loadGame: (options: GameLoadOptions) => (req: any, res: any, next: any) => Promise<any>;

@@ -1,4 +1,4 @@
-import { ValidationError } from "@solaris-common";
+import { ValidationError } from "solaris-common";
 import PlayerService from "./player";
 import Repository from "./repository";
 import { DBObjectId } from "./types/DBObjectId";

@@ -1,7 +1,7 @@
-import {GameResourceDistribution} from "@solaris-common";
+import {GameResourceDistribution} from "solaris-common";
 
 const RNG = require('random-seed');
-import { ValidationError } from "@solaris-common";
+import { ValidationError } from "solaris-common";
 import { Location } from "../types/Location";
 import DistanceService from "../distance";
 import GameTypeService from "../gameType";

@@ -1,6 +1,6 @@
 import { MathRandomGen, SeededRandomGen } from "../utils/randomGen";
 
-import { ValidationError } from "@solaris-common";
+import { ValidationError } from "solaris-common";
 import { Game } from './types/Game';
 import UserAchievementService from './userAchievement';
 import ConversationService from './conversation';
@@ -29,7 +29,7 @@ import {
     GameSettingsGalaxy,
     GameSettingsGeneralBase, GameSettingsInvariable,
     GameSettingsSpecialGalaxyBase
-} from "@solaris-common";
+} from "solaris-common";
 
 const GAME_MASTER_LIMIT = 5;
 

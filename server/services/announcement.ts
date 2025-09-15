@@ -2,7 +2,7 @@ import Repository from "./repository";
 import {Announcement} from "./types/Announcement";
 import {DBObjectId, objectId} from "./types/DBObjectId";
 import UserService from "./user";
-import { ValidationError } from "@solaris-common";
+import { ValidationError } from "solaris-common";
 import {Model} from "mongoose";
 import {AnnouncementState} from "solaris-common";
 

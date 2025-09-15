@@ -2,7 +2,7 @@ import {Carrier} from "./types/Carrier";
 
 const EventEmitter = require('events');
 import {DBObjectId} from './types/DBObjectId';
-import { ValidationError } from "@solaris-common";
+import { ValidationError } from "solaris-common";
 import Repository from './repository';
 import {
     BulkUpgradeReport,
@@ -22,7 +22,7 @@ import TechnologyService from './technology';
 import PlayerCreditsService from './playerCredits';
 import ShipService from "./ship";
 import StatisticsService from "./statistics";
-import {GameInfrastructureExpenseMultiplier} from "@solaris-common";
+import {GameInfrastructureExpenseMultiplier} from "solaris-common";
 
 const Heap = require('qheap');
 

@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-import { ValidationError } from "@solaris-common";
+import { ValidationError } from "solaris-common";
 import Repository from './repository';
 import SessionService from './session';
 import { DBObjectId } from './types/DBObjectId';

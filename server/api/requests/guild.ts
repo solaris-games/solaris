@@ -1,4 +1,4 @@
-import { ValidationError } from "@solaris-common";
+import { ValidationError } from "solaris-common";
 import { keyHasStringValue } from "./helpers";
 
 export interface GuildCreateGuildRequest {

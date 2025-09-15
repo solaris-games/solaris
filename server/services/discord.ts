@@ -1,4 +1,4 @@
-import { ValidationError } from "@solaris-common";
+import { ValidationError } from "solaris-common";
 import Repository from './repository';
 import { Config } from '../config/types/Config';
 import { User } from './types/User';

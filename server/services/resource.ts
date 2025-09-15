@@ -5,7 +5,7 @@ import DistanceService from "./distance";
 import GameTypeService from "./gameType";
 import RandomService from "./random";
 import StarDistanceService from "./starDistance";
-import {GameResourceDistribution} from "@solaris-common";
+import {GameResourceDistribution} from "solaris-common";
 
 export default class ResourceService {
     randomService: RandomService;

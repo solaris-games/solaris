@@ -1,7 +1,7 @@
 const EventEmitter = require('events');
 const moment = require('moment');
 import { LedgerType } from 'solaris-common';
-import { ValidationError } from "@solaris-common";
+import { ValidationError } from "solaris-common";
 import UserAchievementService from './userAchievement';
 import DiplomacyService from './diplomacy';
 import GameTypeService from './gameType';

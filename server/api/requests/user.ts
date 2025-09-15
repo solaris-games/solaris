@@ -1,4 +1,4 @@
-import { ValidationError } from "@solaris-common";
+import { ValidationError } from "solaris-common";
 import { keyHasBooleanValue, keyHasStringValue } from "./helpers";
 import {email, object, password, string, stringValue, username, Validator} from "../../../common/src/validation/validate";
 

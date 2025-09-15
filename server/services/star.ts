@@ -3,7 +3,7 @@ import { shuffle } from "./utils";
 const EventEmitter = require('events');
 const mongoose = require('mongoose');
 import { DBObjectId } from './types/DBObjectId';
-import { ValidationError } from "@solaris-common";
+import { ValidationError } from "solaris-common";
 import Repository from './repository';
 import { Carrier } from './types/Carrier';
 import { Game } from './types/Game';
@@ -23,7 +23,7 @@ import TechnologyService from './technology';
 import UserService from './user';
 import { MathRandomGen } from "../utils/randomGen";
 import StatisticsService from "./statistics";
-import {GameSettings} from "@solaris-common";
+import {GameSettings} from "solaris-common";
 
 const RNG = require('random-seed');
 

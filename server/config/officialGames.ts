@@ -1,4 +1,4 @@
-import {GameSettings} from "@solaris-common";
+import {GameSettings} from "solaris-common";
 import {DBObjectId} from "../services/types/DBObjectId";
 
 // TODO: Convert to use GameSettingSpec or something

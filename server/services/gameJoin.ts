@@ -1,7 +1,7 @@
 const EventEmitter = require('events');
 const moment = require('moment');
 import { DBObjectId } from './types/DBObjectId';
-import { ValidationError } from "@solaris-common";
+import { ValidationError } from "solaris-common";
 import { Game } from './types/Game';
 import { Player } from './types/Player';
 import UserAchievementService from './userAchievement';

@@ -1,4 +1,4 @@
-import {customGalaxyValidator, ValidationError} from "@solaris-common";
+import {customGalaxyValidator, ValidationError} from "solaris-common";
 import { CarrierWaypointActionType, CarrierWaypointActionTypes } from "../../services/types/CarrierWaypoint";
 import {CustomGalaxy} from "../../../common/src/api/types/common/customGalaxy";
 import { DBObjectId } from "../../services/types/DBObjectId";
@@ -68,7 +68,7 @@ import {
     ReadyToQuitFraction,
     ReadyToQuitTimerCycles,
     ReadyToQuitVisibility
-} from "@solaris-common";
+} from "solaris-common";
 import type {GameSettingsReq} from "../../services/gameCreate";
 import {objectId} from "../../utils/validation";
 

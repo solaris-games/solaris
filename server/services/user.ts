@@ -1,5 +1,5 @@
 const EventEmitter = require('events');
-import { ValidationError } from "@solaris-common";
+import { ValidationError } from "solaris-common";
 import PasswordService from './password';
 import Repository from './repository';
 import SessionService from './session';

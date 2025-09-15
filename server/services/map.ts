@@ -10,7 +10,7 @@ import NameService from "./name";
 import RandomService from "./random";
 import StarService from "./star";
 import StarDistanceService from "./starDistance";
-import { ValidationError } from "@solaris-common";
+import { ValidationError } from "solaris-common";
 import { RandomGen } from "../utils/randomGen";
 import { shuffle } from "./utils";
 import { DBObjectId } from "./types/DBObjectId";
