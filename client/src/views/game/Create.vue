@@ -332,9 +332,7 @@
         </div>
 
         <div class="mb-2" v-if="settings.galaxy.galaxyType === 'custom'">
-          <p class="mb-1">It is recommended to use the community galaxy generation tool which can be found here: <a href="https://kurtzmusch.github.io/solaris-galaxy-editor/" target="_blank">https://kurtzmusch.github.io/solaris-galaxy-editor/</a></p>
-          <label for="customJSON" class="col-form-label">Galaxy JSON <help-tooltip tooltip="The JSON document for which represents the galaxy to create"/></label>
-          <textarea id='customJSON' class='col' v-model='settings.galaxy.customGalaxy' rows="10"></textarea>
+          <custom-galaxy :advanced="settings.galaxy.advancedCustomGalaxyEnabled === 'enabled'" :model-value="settings.galaxy.customGalaxy!" />
         </div>
 
         <div class="mb-2" v-if="settings.galaxy.galaxyType === 'custom'">
@@ -931,6 +929,7 @@ import {GAME_CREATION_OPTIONS, type GameSettingsSpec, type SpecialistBans} from 
 import {createGame} from "@/services/typedapi/game";
 import {httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
+import CustomGalaxy from "@/views/game/gameCreation/CustomGalaxy.vue";
 
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;

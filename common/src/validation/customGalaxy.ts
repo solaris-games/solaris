@@ -11,10 +11,11 @@ import {
     number,
     withDefault,
     UNICODE_PRINTABLE_CHARACTERS_WITH_WHITESPACE,
-    Validator, UNICODE_INVISIBLE_CHARACTERS
+    UNICODE_INVISIBLE_CHARACTERS,
+    type Validator
 } from "./validate";
-import {CustomGalaxy} from "../api/types/common/customGalaxy";
-import {CarrierWaypointActionType, CarrierWaypointActionTypes} from "../api/types/common/carrierWaypoint";
+import type {CustomGalaxy} from "../api/types/common/customGalaxy";
+import { type CarrierWaypointActionType, CarrierWaypointActionTypes} from "../api/types/common/carrierWaypoint";
 
 export const customGalaxyValidator: Validator<CustomGalaxy> = object({
     stars: array(object({
