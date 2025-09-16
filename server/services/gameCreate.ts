@@ -30,6 +30,7 @@ import {
     GameSettingsGeneralBase, GameSettingsInvariable,
     GameSettingsSpecialGalaxyBase
 } from "solaris-common";
+import InitialGameStateService from "./initialGameState";
 
 const GAME_MASTER_LIMIT = 5;
 
@@ -71,6 +72,7 @@ export default class GameCreateService {
     carrierService: CarrierService;
     starDistanceService: StarDistanceService;
     customGalaxyService: CustomGalaxyService;
+    initialGameStateService: InitialGameStateService;
 
     constructor(
         gameModel,
@@ -93,7 +95,8 @@ export default class GameCreateService {
         teamService: TeamService,
         carrierService: CarrierService,
         starDistanceService: StarDistanceService,
-        customGalaxyService: CustomGalaxyService
+        customGalaxyService: CustomGalaxyService,
+        initialGameStateService: InitialGameStateService,
     ) {
         this.gameModel = gameModel;
         this.gameJoinService = gameJoinService;
@@ -116,6 +119,7 @@ export default class GameCreateService {
         this.carrierService = carrierService;
         this.starDistanceService = starDistanceService;
         this.customGalaxyService = customGalaxyService;
+        this.initialGameStateService = initialGameStateService;
     }
 
     async create(settingsReq: GameSettingsReq, userId: DBObjectId | null) {
@@ -230,6 +234,7 @@ export default class GameCreateService {
 
         const gameObject = await game.save();
 
+        await this.initialGameStateService.storeStateFor(gameObject);
         await this.historyService.log(gameObject);
 
         return gameObject;

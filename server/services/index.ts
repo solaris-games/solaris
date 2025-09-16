@@ -10,6 +10,7 @@ import GuildModel from '../db/models/Guild';
 import PaymentModel from '../db/models/Payment';
 import ReportModel from '../db/models/Report';
 import AnnouncementModel from '../db/models/Announcement';
+import InitialGameStateModel from '../db/models/InitialGameState';
 
 import AdminService from './admin';
 import PasswordService from './password';
@@ -127,6 +128,8 @@ import type {StatsSlice} from "solaris-common";
 import {DBObjectId} from "./types/DBObjectId";
 import StatisticsService from "./statistics";
 import CustomGalaxyService from "./customGalaxy";
+import {InitialGameState} from "./types/InitialGameState";
+import InitialGameStateService from "./initialGameState";
 
 const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
@@ -142,6 +145,7 @@ const paymentRepository = new Repository<Payment>(PaymentModel);
 const reportRepository = new Repository<Report>(ReportModel);
 const announcementRepository = new Repository<Announcement>(AnnouncementModel);
 const statsSliceRepository = new Repository<StatsSlice<DBObjectId>>(StatsSliceModel);
+const initialGameStateRepository = new Repository<InitialGameState>(InitialGameStateModel);
 
 export default (config: Config,
                 socketServer: Server,
@@ -165,6 +169,8 @@ export default (config: Config,
     const announcementService = new AnnouncementService(AnnouncementModel, announcementRepository, userService);
 
     const statisticsService = new StatisticsService(statsSliceRepository, userService);
+
+    const initialGameStateService = new InitialGameStateService(initialGameStateRepository);
 
     const gameMaskingService = new GameMaskingService();
     const gameLockService = new GameLockService(gameRepository);
@@ -248,7 +254,7 @@ export default (config: Config,
 
     const gameListService = new GameListService(gameRepository, gameService, conversationService, eventService, gameTypeService, leaderboardService);
     const customGalaxyService = new CustomGalaxyService(nameService, specialistService, playerService, playerColourService, teamService, carrierService);
-    const gameCreateService = new GameCreateService(GameModel, gameJoinService, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, userAchievementService, userService, gameFluxService, specialistBanService, specialStarBanService, gameTypeService, starService, diplomacyService, teamService, carrierService, starDistanceService, customGalaxyService);
+    const gameCreateService = new GameCreateService(GameModel, gameJoinService, gameListService, nameService, mapService, playerService, passwordService, conversationService, historyService, userAchievementService, userService, gameFluxService, specialistBanService, specialStarBanService, gameTypeService, starService, diplomacyService, teamService, carrierService, starDistanceService, customGalaxyService, initialGameStateService);
 
     const reportService = new ReportService(ReportModel, reportRepository, playerService, conversationService, userService, gameListService, gameService);
 
@@ -354,5 +360,6 @@ export default (config: Config,
         sessionService,
         starCaptureService,
         statisticsService,
+        initialGameStateService,
     };
 };

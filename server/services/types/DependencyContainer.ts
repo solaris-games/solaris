@@ -90,6 +90,7 @@ import StarCaptureService from "../starCapture";
 import {UserServerSocketEmitter} from "../../sockets/socketEmitters/user";
 import {UserServerSocketHandler} from "../../sockets/socketHandlers/user";
 import StatisticsService from "../statistics";
+import InitialGameStateService from "../initialGameState";
 
 export interface DependencyContainer {
     config: Config,
@@ -184,4 +185,5 @@ export interface DependencyContainer {
     sessionService: SessionService,
     starCaptureService: StarCaptureService,
     statisticsService: StatisticsService,
+    initialGameStateService: InitialGameStateService,
 };
