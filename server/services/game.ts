@@ -277,7 +277,7 @@ export default class GameService extends EventEmitter {
 
     async kickPlayer(game: Game, kickingUser: DBObjectId, playerToKick: DBObjectId) {
         if (!await this.gameAuthService.isGameAdmin(game, kickingUser)) {
-            throw new ValidationError('You do not have permission to force start this game.');
+            throw new ValidationError('You do not have permission to kick a player in this game.');
         }
 
         const player = game.galaxy.players.find(p => p._id.toString() === playerToKick.toString());
