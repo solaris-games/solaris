@@ -93,7 +93,6 @@ const moveStats = (user: User) => {
         renownSent: oldAchievements.trade.renownSent,
         joined: oldAchievements.joined,
         completed: oldAchievements.completed,
-        quit: oldAchievements.quit,
         defeated: oldAchievements.defeated,
         defeated1v1: oldAchievements.defeated1v1,
         afk: oldAchievements.afk,

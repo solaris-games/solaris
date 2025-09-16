@@ -69,7 +69,6 @@ const loadGamesChart = () => {
       // 'Joined',
       'Completed',
       'Defeated',
-      // 'Quit',
       // 'AFK'
     ],
     datasets: [
@@ -332,10 +331,6 @@ onMounted(async () => {
         <tr>
           <td>Defeated (1 vs. 1)</td>
           <td class="text-end">{{ user.achievements.defeated1v1 }}</td>
-        </tr>
-        <tr>
-          <td>Quit</td>
-          <td class="text-end">{{ user.achievements.quit }}</td>
         </tr>
         <tr>
           <td>AFK</td>

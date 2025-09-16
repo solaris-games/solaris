@@ -172,14 +172,10 @@ export default class GameService extends EventEmitter {
             return null;
         }
         
-        let alias = player.alias;
+        const alias = player.alias;
 
         if (player.userId && !this.gameTypeService.isNewPlayerGame(game)) {
             game.quitters.push(player.userId); // Keep a log of players who have quit the game early so they cannot rejoin later.
-        }
-
-        if (player.userId && !this.gameTypeService.isTutorialGame(game)) {
-            await this.achievementService.incrementQuit(player.userId);
         }
 
         // Reset everything the player may have done to their empire.
