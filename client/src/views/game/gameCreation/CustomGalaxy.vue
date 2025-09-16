@@ -2,7 +2,8 @@
   <p class="mb-1">It is recommended to use the community galaxy generation tool which can be found here: <a href="https://ihateattackmaps.github.io/solaris-custom-galaxy-editor/" target="_blank">https://ihateattackmaps.github.io/solaris-custom-galaxy-editor/</a></p>
 
   <label for="customGalaxy" class="col-form-label">Galaxy JSON <help-tooltip tooltip="The JSON document for which represents the galaxy to create"/></label>
-  <textarea id='customGalaxy' class='col' v-model='customGalaxy' rows="10" @change="resetValidationState"></textarea>
+
+  <textarea id='customGalaxy' class="customGalaxyJson" v-model='customGalaxy' rows="10" @change="resetValidationState"></textarea>
 
   <button class="btn btn-primary mt-2" @click="validate">Validate</button>
 
@@ -56,5 +57,8 @@ const validate = () => {
 </script>
 
 <style scoped>
-
+.customGalaxyJson {
+  resize: both;
+  display: block;
+}
 </style>
