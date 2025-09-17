@@ -25,6 +25,9 @@ import { Star } from "./types/Star";
 import PlayerColourService from "./playerColour";
 import {MathRandomGen} from "../utils/randomGen";
 import InitialGameStateService from "./initialGameState";
+import { logger } from "../utils/logging";
+
+const log = logger("Player Service");
 
 export default class PlayerService extends EventEmitter {
     gameRepo: Repository<Game>;
@@ -350,7 +353,13 @@ export default class PlayerService extends EventEmitter {
         player.lastSeen = null;
         player.lastSeenIP = null;
 
-        const initialGameState = (await this.initialGameStateService.getByGameId(game._id))!;
+        const initialGameState = (await this.initialGameStateService.getByGameId(game._id));
+
+        if (!initialGameState) {
+            log.error(`Fatal: Player ${player._id} cannot quit game ${game.settings.general.name} (${game._id}) because no initial game state exists`);
+
+            throw new ValidationError("Failed to quit game", 500);
+        }
 
         const initialPlayer = initialGameState.galaxy.players.find(p => p._id.toString() === playerId)!;
 
