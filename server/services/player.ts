@@ -347,6 +347,8 @@ export default class PlayerService extends EventEmitter {
         player.isOpenSlot = true;
         player.spectators = [];
         player.scheduledActions = [];
+        player.lastSeen = null;
+        player.lastSeenIP = null;
 
         const initialGameState = (await this.initialGameStateService.getByGameId(game._id))!;
 
