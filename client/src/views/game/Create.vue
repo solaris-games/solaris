@@ -54,7 +54,7 @@
           </select>
         </div>
 
-        <div class="mb-2" v-if="settings.general.mode === 'teamConquest' && settings.galaxy.advancedCustomGalaxyEnabled !== 'enabled'">
+        <div class="mb-2" v-if="settings.general.mode === 'teamConquest' && !isAdvancedCustomGalaxy">
           <label for="teamConquestTeamCount" class="col-form-label">Number of teams <help-tooltip tooltip="Determines how many teams the players will be split into" /></label>
 
           <p class="mb-1 text-warning" v-if="!(possibleTeamCounts.length || 0)">Warning: It's not possible to form equally sized teams with your current number of player slots.</p>
@@ -81,7 +81,7 @@
       </view-collapse-panel>
 
       <view-collapse-panel title="Player Settings" :startsOpened="true">
-        <div class="mb-2">
+        <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="players" class="col-form-label">Players <help-tooltip tooltip="Total number of player slots"/></label>
           <select class="form-control" id="players" v-model="settings.general.playerLimit" :disabled="isCreatingGame" @change="onPlayerLimitChanged">
             <option v-for="opt in options.general.playerLimit" v-bind:key="opt" v-bind:value="opt">
@@ -562,28 +562,28 @@
       </view-collapse-panel>
 
       <view-collapse-panel title="Player Start Settings">
-        <div class="mb-2" v-if="!(settings.galaxy.galaxyType === 'custom' && settings.galaxy.advancedCustomGalaxyEnabled === 'enabled')">
+        <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="startingStars" class="col-form-label">Starting Stars (<span class="text-warning">{{settings.player.startingStars}} stars</span>) <help-tooltip tooltip="Determines how many stars each player is allocated at the start of the game"/></label>
           <div class="col">
             <input type="range" min="1" max="30" step="1" class="form-range w-100" id="startingStars" v-model="settings.player.startingStars" :disabled="isCreatingGame">
           </div>
         </div>
 
-        <div class="mb-2" v-if="settings.galaxy.advancedCustomGalaxyEnabled !== 'enabled'">
+        <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="startingCredits" class="col-form-label">Starting Credits (<span class="text-warning">{{settings.player.startingCredits}} credits</span>) <help-tooltip tooltip="Determines how many credits each player is allocated at the start of the game"/></label>
           <div class="col">
             <input type="range" min="25" max="3000" step="25" class="form-range w-100" id="startingCredits" v-model="settings.player.startingCredits" :disabled="isCreatingGame">
           </div>
         </div>
 
-        <div class="mb-2" v-if="settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists' && settings.galaxy.advancedCustomGalaxyEnabled !== 'enabled'">
+        <div class="mb-2" v-if="settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists' && !isAdvancedCustomGalaxy">
           <label for="startingCreditsSpecialists" class="col-form-label">Starting Specialist Tokens (<span class="text-warning">{{settings.player.startingCreditsSpecialists}} tokens</span>) <help-tooltip tooltip="Determines how many specialist tokens each player is allocated at the start of the game"/></label>
           <div class="col">
             <input type="range" min="0" max="100" step="1" class="form-range w-100" id="startingCreditsSpecialists" v-model="settings.player.startingCreditsSpecialists" :disabled="isCreatingGame">
           </div>
         </div>
 
-        <div class="mb-2" v-if="settings.galaxy.advancedCustomGalaxyEnabled !== 'enabled'">
+        <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="startingShips" class="col-form-label">Starting Ships (<span class="text-warning">{{settings.player.startingShips}} ships at each star</span>) <help-tooltip tooltip="Determines how many ships the home star of each player is allocated at the start of the game"/></label>
           <div class="col">
             <input type="range" min="0" max="100" step="1" class="form-range w-100" id="startingShips" v-model="settings.player.startingShips" :disabled="isCreatingGame">
@@ -697,21 +697,21 @@
       </view-collapse-panel>
 
       <view-collapse-panel title="Infrastructure Settings">
-        <div class="mb-2" v-if="settings.galaxy.advancedCustomGalaxyEnabled !== 'enabled'">
+        <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="startingInfrastructureEconomy" class="col-form-label">Starting Economic Infrastructure (<span class="text-warning">{{settings.player.startingInfrastructure.economy}} Economy</span>) <help-tooltip tooltip="Determines the infrastructure of the home star of each player at the start of the game"/></label>
           <div class="col">
             <input type="range" min="0" max="30" step="1" class="form-range w-100" id="startingInfrastructureEconomy" v-model="settings.player.startingInfrastructure.economy" :disabled="isCreatingGame">
           </div>
         </div>
 
-        <div class="mb-2" v-if="settings.galaxy.advancedCustomGalaxyEnabled !== 'enabled'">
+        <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="startingInfrastructureIndustry" class="col-form-label">Starting Industrial Infrastructure (<span class="text-warning">{{settings.player.startingInfrastructure.industry}} Industry</span>) <help-tooltip tooltip="Determines the infrastructure of the home star of each player at the start of the game"/></label>
           <div class="col">
             <input type="range" min="0" max="30" step="1" class="form-range w-100" id="startingInfrastructureIndustry" v-model="settings.player.startingInfrastructure.industry" :disabled="isCreatingGame">
           </div>
         </div>
 
-        <div class="mb-2" v-if="settings.galaxy.advancedCustomGalaxyEnabled !== 'enabled'">
+        <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="startingInfrastructureScience" class="col-form-label">Starting Scientific Infrastructure (<span class="text-warning">{{settings.player.startingInfrastructure.science}} Science</span>) <help-tooltip tooltip="Determines the infrastructure of the home star of each player at the start of the game"/></label>
           <div class="col">
             <input type="range" min="0" max="5" step="1" class="form-range w-100" id="startingInfrastructureScience" v-model="settings.player.startingInfrastructure.science" :disabled="isCreatingGame">
@@ -739,56 +739,56 @@
       </view-collapse-panel>
 
       <view-collapse-panel title="Technology Settings">
-        <div class="mb-2" v-if="settings.galaxy.advancedCustomGalaxyEnabled !== 'enabled'">
+        <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="startingTechLevelTerraforming" class="col-form-label">Starting Terraforming Technology (<span class="text-warning">{{settings.technology.startingTechnologyLevel.terraforming}} Terraforming</span>) <help-tooltip tooltip="Determines the starting technology levels for all players"/></label>
           <div class="col">
             <input type="range" min="1" max="16" step="1" class="form-range w-100" id="startingTechLevelTerraforming" v-model="settings.technology.startingTechnologyLevel.terraforming" :disabled="isCreatingGame">
           </div>
         </div>
 
-        <div class="mb-2" v-if="settings.galaxy.advancedCustomGalaxyEnabled !== 'enabled'">
+        <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="startingTechLevelExperimentation" class="col-form-label">Starting Experimentation Technology (<span class="text-warning">{{settings.technology.startingTechnologyLevel.experimentation > 0 ? settings.technology.startingTechnologyLevel.experimentation : 'Disabled'}} Experimentation</span>) <help-tooltip tooltip="Determines the starting technology levels for all players"/></label>
           <div class="col">
             <input type="range" min="0" max="16" step="1" class="form-range w-100" id="startingTechLevelExperimentation" v-model="settings.technology.startingTechnologyLevel.experimentation" :disabled="isCreatingGame">
           </div>
         </div>
 
-        <div class="mb-2" v-if="settings.galaxy.advancedCustomGalaxyEnabled !== 'enabled'">
+        <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="startingTechLevelScanning" class="col-form-label">Starting Scanning Technology (<span class="text-warning">{{settings.technology.startingTechnologyLevel.scanning}} Scanning</span>) <help-tooltip tooltip="Determines the starting technology levels for all players"/></label>
           <div class="col">
             <input type="range" min="1" max="16" step="1" class="form-range w-100" id="startingTechLevelScanning" v-model="settings.technology.startingTechnologyLevel.scanning" :disabled="isCreatingGame">
           </div>
         </div>
 
-        <div class="mb-2" v-if="settings.galaxy.advancedCustomGalaxyEnabled !== 'enabled'">
+        <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="startingTechLevelHyperspace" class="col-form-label">Starting Hyperspace Technology (<span class="text-warning">{{settings.technology.startingTechnologyLevel.hyperspace}} Hyperspace</span>) <help-tooltip tooltip="Determines the starting technology levels for all players"/></label>
           <div class="col">
             <input type="range" min="1" max="16" step="1" class="form-range w-100" id="startingTechLevelHyperspace" v-model="settings.technology.startingTechnologyLevel.hyperspace" :disabled="isCreatingGame">
           </div>
         </div>
 
-        <div class="mb-2" v-if="settings.galaxy.advancedCustomGalaxyEnabled !== 'enabled'">
+        <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="startingTechLevelManufacturing" class="col-form-label">Starting Manufacturing Technology (<span class="text-warning">{{settings.technology.startingTechnologyLevel.manufacturing}} Manufacturing</span>) <help-tooltip tooltip="Determines the starting technology levels for all players"/></label>
           <div class="col">
             <input type="range" min="1" max="16" step="1" class="form-range w-100" id="startingTechLevelManufacturing" v-model="settings.technology.startingTechnologyLevel.manufacturing" :disabled="isCreatingGame">
           </div>
         </div>
 
-        <div class="mb-2" v-if="settings.galaxy.advancedCustomGalaxyEnabled !== 'enabled'">
+        <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="startingTechLevelSpecialists" class="col-form-label">Starting Specialists Technology (<span class="text-warning">{{settings.technology.startingTechnologyLevel.specialists}} Specialists</span>) <help-tooltip tooltip="Determines the starting technology levels for all players"/></label>
           <div class="col">
             <input type="range" min="1" max="16" step="1" class="form-range w-100" id="startingTechLevelSpecialists" v-model="settings.technology.startingTechnologyLevel.specialists" :disabled="isCreatingGame">
           </div>
         </div>
 
-        <div class="mb-2" v-if="settings.galaxy.advancedCustomGalaxyEnabled !== 'enabled'">
+        <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="startingTechLevelBanking" class="col-form-label">Starting Banking Technology (<span class="text-warning">{{settings.technology.startingTechnologyLevel.banking > 0 ? settings.technology.startingTechnologyLevel.banking : 'Disabled'}} Banking</span>) <help-tooltip tooltip="Determines the starting technology levels for all players"/></label>
           <div class="col">
             <input type="range" min="0" max="16" step="1" class="form-range w-100" id="startingTechLevelBanking" v-model="settings.technology.startingTechnologyLevel.banking" :disabled="isCreatingGame">
           </div>
         </div>
 
-        <div class="mb-2" v-if="settings.galaxy.advancedCustomGalaxyEnabled !== 'enabled'">
+        <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="startingTechLevelWeapons" class="col-form-label">Starting Weapons Technology (<span class="text-warning">{{settings.technology.startingTechnologyLevel.weapons}} Weapons</span>) <help-tooltip tooltip="Determines the starting technology levels for all players"/></label>
           <div class="col">
             <input type="range" min="1" max="16" step="1" class="form-range w-100" id="startingTechLevelWeapons" v-model="settings.technology.startingTechnologyLevel.weapons" :disabled="isCreatingGame">
@@ -924,7 +924,7 @@ import FluxBar from './components/menu/FluxBar.vue'
 import gameService from '../../services/api/game'
 import router from '../../router'
 import SelectTemplate from "@/views/game/gameCreation/SelectTemplate.vue";
-import { ref, onMounted, inject, type Ref } from 'vue';
+import { ref, onMounted, inject, type Ref, computed } from 'vue';
 import {GAME_CREATION_OPTIONS, type GameSettingsSpec, type SpecialistBans} from "@solaris-common";
 import {createGame} from "@/services/typedapi/game";
 import {httpInjectionKey, isOk} from "@/services/typedapi";
@@ -937,6 +937,8 @@ const toast = inject(toastInjectionKey)!;
 const isCreatingGame = ref(false);
 const errors: Ref<string[]> = ref([]);
 const settings: Ref<GameSettingsSpec | null> = ref(null);
+
+const isAdvancedCustomGalaxy = computed(() => settings.value && settings.value.galaxy.galaxyType === 'custom' && settings.value.galaxy.advancedCustomGalaxyEnabled === 'enabled');
 
 const options = GAME_CREATION_OPTIONS;
 
