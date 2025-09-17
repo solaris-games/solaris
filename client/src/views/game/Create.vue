@@ -3,39 +3,13 @@
     <view-title title="Create Game" />
     <loading-spinner :loading="!settings || isCreatingGame"/>
 
-    <div class="mb-2">
-      <label for="settingsTemplate" class="col-form-label">Settings template</label>
-      <select name="settingsTemplate" class="form-control form-inline" v-model="settingsTemplateName">
-        <option value="standard">Standard</option>
-        <option value="turnBased">Standard TB</option>
-        <option value="1v1">1v1 RT</option>
-        <option value="1v1turnBased">1v1 TB</option>
-        <option value="16player_realTime">16 Player RT</option>
-        <option value="16player_turnBased">16 Player TB</option>
-        <option value="32player_normal">32 Player experimental</option>
-        <option value="32player_ultradark">32 Player classic</option>
-        <option value="newPlayer">New Player</option>
-        <option value="special_anonymous">Special Anonymous</option>
-        <option value="special_arcade">Special Arcade</option>
-        <option value="special_battleRoyale">Special Battle Royale</option>
-        <option value="special_dark">Special Dark</option>
-        <option value="special_fog">Special Fog</option>
-        <option value="special_freeForAll">Special Free For All</option>
-        <option value="special_homeStar">Special Capital Stars</option>
-        <option value="special_homeStarElimination">Special Capital Star Elimination</option>
-        <option value="special_kingOfTheHill">Special King of the Hill</option>
-        <option value="special_orbital">Special Orbital Rotation</option>
-        <option value="special_tinyGalaxy">Special Tiny Galaxy</option>
-        <option value="special_ultraDark">Special Ultra Dark</option>
-      </select>
-      <button class="btn btn-default mt-2" @click="loadSettingsFromTemplate">Load settings</button>
-    </div>
+    <select-template @onSelectTemplate="loadSettingsFromTemplate" />
 
     <form @submit.prevent="handleSubmit" v-if="settings">
       <view-collapse-panel title="Game Settings" :startsOpened="true">
         <div class="mb-2">
           <label for="name" class="col-form-label">Name <help-tooltip tooltip="The name of the game, make it short and sweet"/></label>
-          <input type="text" required="required" class="form-control" id="name" minlength="3" maxlength="24" v-model="settings.general.name" :disabled="isCreatingGame">
+          <input type="text" :required="true" class="form-control" id="name" minlength="3" maxlength="24" v-model="settings.general.name" :disabled="isCreatingGame">
         </div>
         <div class="mb-2">
           <label for="description" class="col-form-label">Description <help-tooltip tooltip="Give your game a long description detailing some key settings and entice players to join your custom game"/></label>
@@ -358,9 +332,7 @@
         </div>
 
         <div class="mb-2" v-if="settings.galaxy.galaxyType === 'custom'">
-          <p class="mb-1">It is recommended to use the community galaxy generation tool which can be found here: <a href="https://kurtzmusch.github.io/solaris-galaxy-editor/" target="_blank">https://kurtzmusch.github.io/solaris-galaxy-editor/</a></p>
-          <label for="customJSON" class="col-form-label">Galaxy JSON <help-tooltip tooltip="The JSON document for which represents the galaxy to create"/></label>
-          <textarea id='customJSON' class='col' v-model='settings.galaxy.customJSON' rows="10"></textarea>
+          <custom-galaxy :advanced="settings.galaxy.advancedCustomGalaxyEnabled === 'enabled'" :model-value="settings.galaxy.customGalaxy!" />
         </div>
 
         <div class="mb-2" v-if="settings.galaxy.galaxyType === 'custom'">
@@ -621,7 +593,7 @@
         <div class="mb-2">
           <label for="tradeCredits" class="col-form-label">Trade Credits <help-tooltip tooltip="Determines whether players can trade credits"/></label>
           <select class="form-control" id="tradeCredits" v-model="settings.player.tradeCredits" :disabled="isCreatingGame">
-            <option v-for="opt in options.player.tradeCredits" v-bind:key="opt.value" v-bind:value="opt.value">
+            <option v-for="opt in options.player.tradeCredits" v-bind:key="opt.value.toString()" v-bind:value="opt.value">
               {{ opt.text }}
             </option>
           </select>
@@ -630,7 +602,7 @@
         <div class="mb-2" v-if="settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'">
           <label for="tradeCreditsSpecialists" class="col-form-label">Trade Specialist Tokens <help-tooltip tooltip="Determines whether players can trade specialist tokens"/></label>
           <select class="form-control" id="tradeCreditsSpecialists" v-model="settings.player.tradeCreditsSpecialists" :disabled="isCreatingGame">
-            <option v-for="opt in options.player.tradeCreditsSpecialists" v-bind:key="opt.value" v-bind:value="opt.value">
+            <option v-for="opt in options.player.tradeCreditsSpecialists" v-bind:key="opt.value.toString()" v-bind:value="opt.value">
               {{ opt.text }}
             </option>
           </select>
@@ -687,7 +659,7 @@
         <div class="mb-2" v-if="settings.diplomacy.enabled === 'enabled' && settings.general.mode !== 'teamConquest'">
           <label for="alliancesLocked" class="col-form-label">Locked Alliances<help-tooltip tooltip="If enabled, alliances cannot be canceled."/></label>
            <select class="form-control" id="alliancesLocked" v-model="settings.diplomacy.lockedAlliances" :disabled="isCreatingGame"  @change="onMaxAllianceTriggerChanged">
-             <option v-for="opt in options.diplomacy.lockedAlliances.filter(o => !(o.value === 'enabled' && settings.general.playerLimit <= 2))" v-bind:key="opt.value" v-bind:value="opt.value">
+             <option v-for="opt in options.diplomacy.lockedAlliances.filter(o => !(o.value === 'enabled' && settings!.general.playerLimit <= 2))" v-bind:key="opt.value" v-bind:value="opt.value">
               {{ opt.text }}
             </option>
           </select>
@@ -924,9 +896,9 @@
       </view-collapse-panel>
 
       <view-collapse-panel title="Specialist Bans" v-if="settings.specialGalaxy.specialistCost !== 'none'">
-        <div class="mb-2" v-if="settings.specialGalaxy.specialistCost !== 'none'">
+        <div class="mb-2">
           <p><small>Choose to ban certain specialists from the game, they cannot be hired by any player.</small></p>
-          <specialist-ban-list-selection @onSpecialistBanSelectionChanged="onSpecialistBanSelectionChanged" />
+          <specialist-ban-list-selection :specialist-bans="settings.specialGalaxy.specialistBans" @updateSpecialistBans="bans => settings!.specialGalaxy.specialistBans = bans" />
         </div>
       </view-collapse-panel>
 
@@ -939,8 +911,8 @@
   </view-container>
 </template>
 
-<script>
-import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
+<script setup lang="ts">
+import LoadingSpinner from '../components/LoadingSpinner.vue'
 import ViewContainer from '../components/ViewContainer.vue'
 import ViewCollapsePanel from '../components/ViewCollapsePanel.vue'
 import ViewTitle from '../components/ViewTitle.vue'
@@ -951,151 +923,149 @@ import SpecialistBanListSelection from './components/specialist/SpecialistBanLis
 import FluxBar from './components/menu/FluxBar.vue'
 import gameService from '../../services/api/game'
 import router from '../../router'
+import SelectTemplate from "@/views/game/gameCreation/SelectTemplate.vue";
+import { ref, onMounted, inject, type Ref } from 'vue';
+import {GAME_CREATION_OPTIONS, type GameSettingsSpec, type SpecialistBans} from "@solaris-common";
+import {createGame} from "@/services/typedapi/game";
+import {httpInjectionKey, isOk} from "@/services/typedapi";
+import {toastInjectionKey} from "@/util/keys";
+import CustomGalaxy from "@/views/game/gameCreation/CustomGalaxy.vue";
 
-export default {
-  components: {
-    'loading-spinner': LoadingSpinnerVue,
-    'view-container': ViewContainer,
-    'view-collapse-panel': ViewCollapsePanel,
-    'view-title': ViewTitle,
-    'view-subtitle': ViewSubtitle,
-    'form-error-list': FormErrorList,
-    'help-tooltip': HelpTooltip,
-    'specialist-ban-list-selection': SpecialistBanListSelection,
-    'flux-bar': FluxBar
-  },
-  data () {
-    return {
-      isCreatingGame: false,
-      errors: [],
-      settings: null,
-      options: null,
-      possibleTeamCounts: [],
-      settingsTemplateName: 'standard'
+const httpClient = inject(httpInjectionKey)!;
+const toast = inject(toastInjectionKey)!;
+
+const isCreatingGame = ref(false);
+const errors: Ref<string[]> = ref([]);
+const settings: Ref<GameSettingsSpec | null> = ref(null);
+
+const options = GAME_CREATION_OPTIONS;
+
+const possibleTeamCounts: Ref<number[]> = ref([]);
+
+const loadSettingsFromTemplate = async (templateName: string) => {
+  const template = await import(`../../config/gamesettings/${templateName}.json`);
+  settings.value = JSON.parse(JSON.stringify(template)); // deep clone
+};
+
+const validateTeamSettings = () => {
+  if (settings.value!.general.mode !== 'teamConquest') {
+    return;
+  }
+
+  const players = settings.value!.general.playerLimit;
+  const teams = settings.value!.conquest.teamsCount;
+
+  const numberValid = players && teams && players >= 4 && players % teams === 0;
+
+  if (!numberValid) {
+    errors.value.push('The number of players must be larger than 3 and divisible by the number of teams.');
+  }
+};
+
+const updatePossibleTeamCounts = () => {
+  if (settings.value!.general.mode !== 'teamConquest') {
+    return;
+  }
+
+  const players = settings.value!.general.playerLimit;
+
+  if (players < 4) {
+    return [];
+  }
+
+  const upperBound = Math.ceil(players / 2);
+  const teams: number[] = [];
+
+  for (let i = 2; i <= upperBound; i++) {
+    if (players % i === 0) {
+      teams.push(i);
     }
-  },
-  async mounted () {
-    try {
-      const response = await gameService.getDefaultGameSettings()
+  }
 
-      this.settings = response.data.settings
-      this.options = response.data.options
-    } catch (err) {
-      console.error(err)
-    }
-  },
-  methods: {
-    async loadSettingsFromTemplate (e) {
-      e.preventDefault();
+  if (teams.length) {
+    settings.value!.conquest.teamsCount = teams[0];
+  }
 
-      const template = await import(`../../config/gamesettings/${this.settingsTemplateName}.json`);
-      this.settings = JSON.parse(JSON.stringify(template)); // deep clone
-    },
-    async handleSubmit (e) {
-      e.preventDefault();
-
-      this.errors = []
-
-      if (!this.settings.general.name) {
-        this.errors.push('Game name required.')
-      }
-
-      this.validateTeamSettings(this.errors);
-
-      if (this.errors.length) return
-
-      try {
-        this.isCreatingGame = true
-
-        // Call the login API endpoint
-        let response = await gameService.createGame(this.settings)
-
-        if (response.status === 201) {
-          this.$toast.success(`The game ${this.settings.general.name} has been created.`)
-
-          router.push({ name: 'game-detail', query: { id: response.data } })
-        }
-      } catch (err) {
-        this.errors = err.response.data.errors || []
-      }
-
-      this.isCreatingGame = false
-    },
-    onSpecialistBanSelectionChanged (e) {
-      this.settings.specialGalaxy.specialistBans = e
-    },
-    onMaxAllianceTriggerChanged (e) {
-      this.updatePossibleTeamCounts();
-      this.settings.diplomacy.maxAlliances = this.calcMaxAllianceLimit();
-      console.warn("Max alliances changed to: " + this.settings.diplomacy.maxAlliances);
-    },
-    onTeamCountChanged (e) {
-      this.settings.diplomacy.maxAlliances = this.calcMaxAllianceLimit();
-    },
-    calcMaxAllianceLimit () {
-      if (this.settings.general.mode === 'teamConquest') {
-        const playersPerTeam = this.settings.general.playerLimit / this.settings.conquest.teamsCount;
-        return playersPerTeam - 1;
-      }
-
-      return this.settings.general.playerLimit - 1 - (this.settings.diplomacy.lockedAlliances === 'enabled' ? 1 : 0)
-    },
-    onPlayerLimitChanged (e) {
-      if (this.settings.general.playerLimit <= 2) {
-        this.settings.diplomacy.lockedAlliances = 'disabled';
-      }
-      this.onMaxAllianceTriggerChanged(e);
-    },
-    onModeChanged (e) {
-      if (this.settings.general.mode === 'teamConquest') {
-        this.settings.diplomacy.enabled = 'enabled';
-        this.settings.diplomacy.lockedAlliances = 'enabled';
-        console.warn("Mode changed to team conquest, enabling diplomacy and locked alliances.")
-        this.onMaxAllianceTriggerChanged(e);
-      }
-    },
-    validateTeamSettings (errors) {
-      if (this.settings.general.mode !== 'teamConquest') {
-        return;
-      }
-
-      const players = this.settings.general.playerLimit;
-      const teams = this.settings.conquest.teamsCount;
-
-      const numberValid = players && teams && players >= 4 && players % teams === 0;
-
-      if (!numberValid) {
-        errors.push('The number of players must be larger than 3 and divisible by the number of teams.');
-      }
-    },
-    updatePossibleTeamCounts () {
-      if (this.settings.general.mode !== 'teamConquest') {
-        return;
-      }
-
-      const players = this.settings.general.playerLimit;
-
-      if (players < 4) {
-        return [];
-      }
-
-      const upperBound = Math.ceil(players / 2);
-      const teams = [];
-
-      for (let i = 2; i <= upperBound; i++) {
-        if (players % i === 0) {
-          teams.push(i);
-        }
-      }
-
-      if (teams.length) {
-        this.settings.conquest.teamsCount = teams[0];
-      }
-
-      this.possibleTeamCounts = teams;
-    }
-  },
+  possibleTeamCounts.value = teams;
 }
+
+const handleSubmit = async (e: Event) => {
+  e.preventDefault();
+
+  errors.value = [];
+
+  if (!settings.value!.general.name) {
+    errors.value.push('Game name required.')
+  }
+
+  validateTeamSettings();
+
+  if (errors.value.length) {
+    return;
+  }
+
+  isCreatingGame.value = true
+
+  const response = await createGame(httpClient)(settings.value!);
+
+  if (isOk(response)) {
+    toast.success(`The game ${settings.value!.general.name} has been created.`)
+
+    router.push({ name: 'game-detail', query: { id: response.data } })
+  }
+
+  isCreatingGame.value = false;
+};
+
+const calcMaxAllianceLimit = () => {
+  if (settings.value!.general.mode === 'teamConquest') {
+    const playersPerTeam = settings.value!.general.playerLimit / settings.value!.conquest.teamsCount!;
+    return playersPerTeam - 1;
+  }
+
+  return settings.value!.general.playerLimit - 1 - (settings.value!.diplomacy.lockedAlliances === 'enabled' ? 1 : 0)
+};
+
+const onMaxAllianceTriggerChanged = () => {
+  updatePossibleTeamCounts();
+  settings.value!.diplomacy.maxAlliances = calcMaxAllianceLimit();
+  console.warn("Max alliances changed to: " + settings.value!.diplomacy.maxAlliances);
+};
+
+const onModeChanged = () => {
+  if (settings.value!.general.mode === 'teamConquest') {
+    settings.value!.diplomacy.enabled = 'enabled';
+    settings.value!.diplomacy.lockedAlliances = 'enabled';
+    console.warn("Mode changed to team conquest, enabling diplomacy and locked alliances.")
+    onMaxAllianceTriggerChanged();
+  }
+};
+
+const onSpecialistBanSelectionChanged = (e: SpecialistBans) => {
+  settings.value!.specialGalaxy.specialistBans = e;
+};
+
+const onPlayerLimitChanged = () => {
+  if (settings.value!.general.playerLimit <= 2) {
+    settings.value!.diplomacy.lockedAlliances = 'disabled';
+  }
+
+  onMaxAllianceTriggerChanged();
+};
+
+const onTeamCountChanged = () => {
+  settings.value!.diplomacy.maxAlliances = calcMaxAllianceLimit();
+};
+
+onMounted(async () => {
+  try {
+    const response = await gameService.getDefaultGameSettings();
+
+    settings.value = response.data.settings;
+  } catch (err) {
+    console.error(err)
+  }
+});
 </script>
 
 <style scoped>

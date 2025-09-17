@@ -1,5 +1,5 @@
 import EventEmitter from 'events';
-import ValidationError from '../errors/validation';
+import { ValidationError } from "solaris-common";
 import Repository from './repository';
 import { User } from './types/User';
 import PasswordService from './password';

@@ -6,10 +6,10 @@ import ResourceService from "../resource";
 import StarService from "../star";
 import StarDistanceService from "../starDistance";
 import { GalaxyDimensions } from '../types/Dimensions';
-import { GameResourceDistribution } from '../types/Game';
 const randomSeeded = require('random-seed');
 
 import { createNoise2D } from 'simplex-noise';
+import {GameResourceDistribution} from "solaris-common";
 
 export default class SpiralMapService {
 

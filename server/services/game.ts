@@ -2,7 +2,7 @@ import moment from "moment/moment";
 
 const EventEmitter = require('events');
 import { DBObjectId } from './types/DBObjectId';
-import ValidationError from '../errors/validation';
+import { ValidationError } from "solaris-common";
 import Repository from './repository';
 import { Game } from './types/Game';
 import { Player } from './types/Player';
@@ -172,14 +172,10 @@ export default class GameService extends EventEmitter {
             return null;
         }
         
-        let alias = player.alias;
+        const alias = player.alias;
 
         if (player.userId && !this.gameTypeService.isNewPlayerGame(game)) {
             game.quitters.push(player.userId); // Keep a log of players who have quit the game early so they cannot rejoin later.
-        }
-
-        if (player.userId && !this.gameTypeService.isTutorialGame(game)) {
-            await this.achievementService.incrementQuit(player.userId);
         }
 
         // Reset everything the player may have done to their empire.
@@ -281,7 +277,7 @@ export default class GameService extends EventEmitter {
 
     async kickPlayer(game: Game, kickingUser: DBObjectId, playerToKick: DBObjectId) {
         if (!await this.gameAuthService.isGameAdmin(game, kickingUser)) {
-            throw new ValidationError('You do not have permission to force start this game.');
+            throw new ValidationError('You do not have permission to kick a player in this game.');
         }
 
         const player = game.galaxy.players.find(p => p._id.toString() === playerToKick.toString());

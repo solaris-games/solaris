@@ -1,10 +1,11 @@
-import { Game, GameResourceDistribution } from "./types/Game";
+import { Game } from "./types/Game";
 import { Location } from "./types/Location";
 import { NaturalResources } from "./types/Star";
 import DistanceService from "./distance";
 import GameTypeService from "./gameType";
 import RandomService from "./random";
 import StarDistanceService from "./starDistance";
+import {GameResourceDistribution} from "solaris-common";
 
 export default class ResourceService {
     randomService: RandomService;

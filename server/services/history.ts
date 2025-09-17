@@ -2,7 +2,7 @@ import GameStateService from "./gameState";
 
 const cache = require('memory-cache');
 import { DBObjectId } from './types/DBObjectId';
-import ValidationError from '../errors/validation';
+import { ValidationError } from "solaris-common";
 import Repository from './repository';
 import { Game } from './types/Game';
 import { GameHistory, GameHistoryCarrier } from './types/GameHistory';

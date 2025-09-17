@@ -13,7 +13,10 @@
                 :specialists="starSpecialists"
                 :specialistType="'star'"
                 :specialistDefaultIcon="'star'"
-                @onSpecialistBanSelectionChanged="onSpecialistBanSelectionChanged"/>
+                :readonly="false"
+                :bans="specialistBans.star"
+                @onBansChanged="updateStarBans"
+            />
 
             <h5>Carrier Specialists</h5>
 
@@ -23,60 +26,60 @@
                 :specialists="carrierSpecialists"
                 :specialistType="'carrier'"
                 :specialistDefaultIcon="'rocket'"
-                @onSpecialistBanSelectionChanged="onSpecialistBanSelectionChanged"/>
+                :readonly="false"
+                :bans="specialistBans.carrier"
+                @onBansChanged="updateCarrierBans"
+                />
         </div>
     </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import SpecialistService from '../../../../services/api/specialist'
-import SpecialistIconVue from '../specialist/SpecialistIcon.vue'
 import SpecialistBanListTable from './SpecialistBanListTable.vue'
+import { ref, onMounted } from 'vue';
+import type {SpecialistBans} from "@solaris-common";
 
-export default {
-    components: {
-        'loading-spinner': LoadingSpinner,
-        'specialist-icon': SpecialistIconVue,
-        'specialist-ban-list-table': SpecialistBanListTable
-    },
-    data () {
-        return {
-            isLoading: false,
-            starSpecialists: [],
-            carrierSpecialists: []
-        }
-    },
-    async mounted () {
-        await this.loadSpecialists()
-    },
-    methods: {
-        onSpecialistBanSelectionChanged () {
-            let bannedStarSpecs = this.starSpecialists.filter(x => x.banned).map(x => x.id)
-            let bannedCarrierSpecs = this.carrierSpecialists.filter(x => x.banned).map(x => x.id)
+const props = defineProps<{
+  specialistBans: SpecialistBans
+}>();
 
-            this.$emit('onSpecialistBanSelectionChanged', {
-                star: bannedStarSpecs,
-                carrier: bannedCarrierSpecs
-            })
-        },
-        async loadSpecialists () {
-            this.isLoading = true
+const emit = defineEmits<{
+  updateSpecialistBans: [bans: SpecialistBans],
+}>();
 
-            let requests = [
-                SpecialistService.getCarrierSpecialists(),
-                SpecialistService.getStarSpecialists()
-            ]
+const isLoading = ref(false);
+const starSpecialists = ref([]);
+const carrierSpecialists = ref([]);
 
-            const responses = await Promise.all(requests)
+const updateStarBans = (bans: number[]) => {
+  emit('updateSpecialistBans', { ...props.specialistBans, star: bans });
+};
 
-            this.carrierSpecialists = responses[0].data
-            this.starSpecialists = responses[1].data
+const updateCarrierBans = (bans: number[]) => {
+  emit('updateSpecialistBans', { ...props.specialistBans, carrier: bans });
+};
 
-            this.isLoading = false
-        }
-    }
+const loadSpecialists = async () => {
+  isLoading.value = true;
+
+  const requests = [
+    SpecialistService.getCarrierSpecialists(),
+    SpecialistService.getStarSpecialists()
+  ];
+
+  const responses = await Promise.all(requests);
+
+  carrierSpecialists.value = responses[0].data;
+  starSpecialists.value = responses[1].data;
+
+  isLoading.value = false;
 }
+
+onMounted(async () => {
+  await loadSpecialists();
+});
 </script>
 
 <style scoped>

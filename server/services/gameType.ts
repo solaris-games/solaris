@@ -1,6 +1,5 @@
-import {Game, GameType} from "./types/Game";
+import {Game} from "./types/Game";
 
-import {GameSettings} from "./types/Game";
 import {gameSettings, OfficialGameCategory, OfficialGameKind, specialGameTypes} from "../config/officialGames";
 
 export default class GameTypeService {

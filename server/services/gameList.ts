@@ -221,6 +221,7 @@ export default class GameListService {
             'settings.general.featured': 1,
             'settings.general.name': 1,
             'settings.general.playerLimit': 1,
+            'settings.galaxy.productionTicks': 1,
             'settings.gameTime': 1,
             state: 1
         },

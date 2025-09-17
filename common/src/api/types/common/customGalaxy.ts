@@ -1,7 +1,7 @@
-import { CarrierWaypointActionType } from "./CarrierWaypoint";
-import { Location } from "./Location";
-import { PlayerTechnologyLevels } from "./Player";
-import { Infrastructure, NaturalResources } from "./Star";
+import type {Location} from "./location";
+import type {PlayerTechnologyLevels} from "./player";
+import type {Infrastructure, NaturalResources} from "./star";
+import type {CarrierWaypointActionType} from "./carrierWaypoint";
 
 export interface CustomGalaxy {
     players?: CustomGalaxyPlayer[];
@@ -36,6 +36,7 @@ export interface CustomGalaxyStar {
     wormHoleToStarId: string | null;
     infrastructure: Infrastructure;
     isKingOfTheHillStar?: boolean;
+    name?: string;
 }
 
 export interface CustomGalaxyCarrier {
@@ -49,11 +50,13 @@ export interface CustomGalaxyCarrier {
     isGift: boolean;
     waypoints: CustomGalaxyCarrierWaypoint[];
     progress?: number;
+    name?: string;
 }
 
 export interface CustomGalaxyTeam {
     id: string;
     players: string[];
+    name?: string;
 }
 
 export interface CustomGalaxyCarrierWaypoint {

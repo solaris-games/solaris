@@ -1,4 +1,4 @@
-import ValidationError from "../errors/validation";
+import { ValidationError } from "solaris-common";
 import Repository from './repository';
 import SessionService from './session';
 import { DBObjectId } from './types/DBObjectId';

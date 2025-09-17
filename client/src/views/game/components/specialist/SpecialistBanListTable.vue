@@ -20,42 +20,45 @@
                     <help-tooltip :tooltip="specialist.description"/>
                 </td>
                 <td class="text-end">
-                    <div class="form-check float-end" v-if="!game">
-                        <input class="form-check-input" type="checkbox" v-model="specialist.banned" v-on:change="onSpecialistBanSelectionChanged">
+                    <div class="form-check float-end" v-if="!readonly">
+                        <input class="form-check-input" type="checkbox" :checked="isBanned(specialist)" @change="(e) => changeBanned(specialist, e)">
                     </div>
-                    <i class="fas fa-check text-danger" v-if="game && isBanned(specialist)"></i>
+                    <i class="fas fa-check text-danger" v-if="readonly && isBanned(specialist)"></i>
                 </td>
             </tr>
         </tbody>
     </table>
 </template>
 
-<script>
-import SpecialistIconVue from '../specialist/SpecialistIcon.vue'
+<script setup lang="ts">
+import SpecialistIcon from '../specialist/SpecialistIcon.vue'
 import HelpTooltip from '../../../components/HelpTooltip.vue'
+import type {Specialist} from "@solaris-common";
 
-export default {
-    components: {
-        'specialist-icon': SpecialistIconVue,
-        'help-tooltip': HelpTooltip,
-    },
-    props: {
-        specialists: Array,
-        specialistType: String,
-        specialistDefaultIcon: String,
-        game: Object
-    },
-    methods: {
-        onSpecialistBanSelectionChanged () {
-            this.$emit('onSpecialistBanSelectionChanged')
-        },
-        isBanned (specialist) {
-            const banList = this.game.settings.specialGalaxy.specialistBans[this.specialistType]
+const props = defineProps<{
+  specialists: Specialist[],
+  specialistType: 'star' | 'carrier',
+  specialistDefaultIcon: string,
+  readonly: boolean,
+  bans: number[],
+}>();
 
-            return banList.indexOf(specialist.id) > -1
-        }
-    }
+const emit = defineEmits<{
+  onBansChanged: [bans: number[]]
+}>();
+
+const changeBanned = (specialist: Specialist, e: Event) => {
+  const checked = (e.target as HTMLInputElement).checked;
+  const newBans = checked
+    ? [...props.bans, specialist.id]
+    : props.bans.filter(id => id !== specialist.id);
+
+  emit('onBansChanged', newBans);
 }
+
+const isBanned = (specialist: Specialist) => {
+  return props.bans.indexOf(specialist.id) > -1;
+};
 </script>
 
 <style scoped>

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { ExpressJoiError } from 'express-joi-validation';
-import ValidationError from '../../errors/validation';
+import { ValidationError } from 'solaris-common';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
 import {logger} from "../../utils/logging";
 
