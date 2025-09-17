@@ -180,7 +180,7 @@ export default class GameService extends EventEmitter {
 
         // Reset everything the player may have done to their empire.
         // This is to prevent the next player joining this slot from being screwed over.
-        this.playerService.resetPlayerForGameStart(game, player);
+        await this.playerService.resetPlayerForGameStart(game, player);
 
         this.gameStateService.updateStatePlayerCount(game);
         
