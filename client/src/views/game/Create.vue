@@ -1013,7 +1013,7 @@ const handleSubmit = async (e: Event) => {
   if (isOk(response)) {
     toast.success(`The game ${settings.value!.general.name} has been created.`)
 
-    router.push({ name: 'game-detail', query: { id: response.data } })
+    router.push({ name: 'game-detail', query: { id: response.data.gameId } })
   }
 
   isCreatingGame.value = false;
