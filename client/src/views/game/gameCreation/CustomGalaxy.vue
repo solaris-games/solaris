@@ -3,7 +3,7 @@
 
   <label for="customGalaxy" class="col-form-label">Galaxy JSON <help-tooltip tooltip="The JSON document for which represents the galaxy to create"/></label>
 
-  <textarea id='customGalaxy' class="customGalaxyJson" v-model='customGalaxy' rows="10" @change="resetValidationState"></textarea>
+  <textarea id='customGalaxy' class="customGalaxyJson" v-model='customGalaxy' rows="10" @input="resetValidationState"></textarea>
 
   <button v-if="customGalaxy" class="btn btn-primary mt-2" @click="validate">Validate</button>
 
@@ -13,6 +13,7 @@
       <li v-for="(error, index) in state.errors" :key="index">{{ error }}</li>
     </ul>
   </div>
+
   <div v-else-if="state && state.state === 'ok'" class="alert alert-success mt-2">
     Valid galaxy JSON!
   </div>
