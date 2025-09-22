@@ -332,7 +332,7 @@
         </div>
 
         <div class="mb-2" v-if="settings.galaxy.galaxyType === 'custom'">
-          <custom-galaxy :advanced="settings.galaxy.advancedCustomGalaxyEnabled === 'enabled'" :model-value="settings.galaxy.customGalaxy!" />
+          <custom-galaxy :advanced="settings.galaxy.advancedCustomGalaxyEnabled === 'enabled'" :model-value="settings.galaxy.customGalaxy" />
         </div>
 
         <div class="mb-2" v-if="settings.galaxy.galaxyType === 'custom'">

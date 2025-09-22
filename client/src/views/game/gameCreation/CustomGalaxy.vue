@@ -5,7 +5,7 @@
 
   <textarea id='customGalaxy' class="customGalaxyJson" v-model='customGalaxy' rows="10" @change="resetValidationState"></textarea>
 
-  <button class="btn btn-primary mt-2" @click="validate">Validate</button>
+  <button v-if="customGalaxy" class="btn btn-primary mt-2" @click="validate">Validate</button>
 
   <div v-if="state && state.state === 'error'" class="alert alert-danger mt-2">
     <p>Invalid galaxy JSON:</p>
@@ -32,7 +32,7 @@ const props = defineProps<{
   advanced: boolean,
 }>();
 
-const customGalaxy = defineModel<string>({ default: '', required: true });
+const customGalaxy = defineModel<string | undefined>({ default: undefined, required: true });
 
 const state = ref<ValidationState>(null);
 
@@ -40,8 +40,14 @@ const resetValidationState = () => {
   state.value = null;
 };
 
-const validate = () => {
+const validate = (e: Event) => {
+  e.preventDefault();
+
   const text = customGalaxy.value;
+
+  if (!text) {
+    return;
+  }
 
   try {
     const galaxy = JSON.parse(text);
