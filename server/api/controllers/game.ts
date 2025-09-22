@@ -32,9 +32,9 @@ export default (container: DependencyContainer) => {
             }
         },
         create: async (req, res, next) => {
-            const settings = parseGameSettingsReq(req.body);
-
             try {
+                const settings = parseGameSettingsReq(req.body);
+
                 const game = await container.gameCreateService.create(settings, req.session.userId);
     
                 res.status(201).json({
