@@ -359,7 +359,7 @@ const parseGameSettingsGameTime: Validator<GameSettingsGameTime> = object({
             to: 2000,
         },
     })),
-    startDelay: numberEnumeration<GameTimeStartDelay, GameTimeStartDelay[]>(GAME_TIME_START_DELAYS),
+    startDelay: withDefault(240, numberEnumeration<GameTimeStartDelay, GameTimeStartDelay[]>(GAME_TIME_START_DELAYS)),
     turnJumps: withDefault(8, numberAdv({
         integer: true,
         range: {
