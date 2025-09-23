@@ -14,29 +14,6 @@ import StatsSliceModel from './models/StatsSlice';
 const log = logger("Database");
 
 export default async (config, options) => {
-
-    async function unlockAgendaJobs(db) {
-        try {
-            const collection = await db.connection.db.collection('agendaJobs');
-    
-            const numUnlocked = await collection.updateMany({
-                lockedAt: { $exists: true }
-                // lastFinishedAt:{$exists:false} 
-            }, {
-                $unset: { 
-                lockedAt : undefined,
-                lastModifiedBy:undefined,
-                    lastRunAt:undefined
-                },
-                $set: { nextRunAt:new Date() }
-            });
-    
-            log.info(`Unlocked #${numUnlocked.modifiedCount} jobs.`);
-        } catch (e) {
-            log.error(e);
-        }
-    }
-    
     async function syncIndexes() {
         log.info('Syncing indexes...');
         await EventModel.syncIndexes();
@@ -100,10 +77,6 @@ export default async (config, options) => {
 
     if (options.syncIndexes) {
         await syncIndexes();
-    }
-
-    if (options.unlockJobs) {
-        await unlockAgendaJobs(db);
     }
 
     log.info('MongoDB intialized.');

@@ -34,7 +34,6 @@ db.games.updateMany({}, {
 });
 
 // Remove all other unnecessary data.
-db.agendaJobs.deleteMany({});
 db.guilds.deleteMany({});
 db.payments.deleteMany({});
 db.reports.deleteMany({});
