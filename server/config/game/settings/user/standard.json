@@ -16,7 +16,7 @@
        "spectators": "enabled",
        "afkSlotsOpen": "enabled",
        "readyToQuit": "enabled",
-       "readyToQuitFraction": 1.0,
+       "readyToQuitFraction": 0.9,
        "readyToQuitTimerCycles": 0,
        "readyToQuitVisibility": "visible",
        "awardRankTo": "all",
