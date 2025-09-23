@@ -419,18 +419,18 @@ export const parseGameSettingsReq: Validator<GameSettingsReq> = object({
     }),
     player: parseGameSettingsPlayer,
     diplomacy: object({
-        enabled: enabledDisabled,
-        tradeRestricted: enabledDisabled,
-        maxAlliances: numberAdv({
+        enabled: withDefault('enabled', enabledDisabled),
+        tradeRestricted: withDefault('disabled', enabledDisabled),
+        maxAlliances: withDefault(63, numberAdv({
             integer: true,
             range: {
                 from: 1,
                 to: 63,
             },
-        }),
-        upkeepCost: stringEnumeration<GameAllianceUpkeepCost, GameAllianceUpkeepCost[]>(GAME_ALLIANCE_UPKEEP_COST),
-        globalEvents: enabledDisabled,
-        lockedAlliances: enabledDisabled,
+        })),
+        upkeepCost: withDefault('none', stringEnumeration<GameAllianceUpkeepCost, GameAllianceUpkeepCost[]>(GAME_ALLIANCE_UPKEEP_COST)),
+        globalEvents: withDefault('disabled', enabledDisabled),
+        lockedAlliances: withDefault('disabled', enabledDisabled),
     }),
     technology: parseGameSettingsTechnology,
     gameTime: parseGameSettingsGameTime,
