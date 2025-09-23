@@ -12,27 +12,31 @@ import {
     withDefault,
     UNICODE_PRINTABLE_CHARACTERS_WITH_WHITESPACE,
     UNICODE_INVISIBLE_CHARACTERS,
-    type Validator
+    type Validator, named, maybeNull, maybeUndefined
 } from "./validate";
 import type {CustomGalaxy} from "../api/types/common/customGalaxy";
 import { type CarrierWaypointActionType, CarrierWaypointActionTypes} from "../api/types/common/carrierWaypoint";
 
+const starId = named("Star ID", stringValue({ minLength: 1 }));
+const carrierId = named("Carrier ID", stringValue({ minLength: 1 }));
+const playerId = named("Player ID", stringValue({ minLength: 1 }));
+
 export const customGalaxyValidator: Validator<CustomGalaxy> = object({
     stars: array(object({
-        id: stringValue({ minLength: 1 }),
+        id: starId,
         location: object({
             x: number,
             y: number
         }),
-        playerId: or(stringValue({ minLength: 1 }), just(null)),
+        playerId: maybeNull(playerId),
         naturalResources: object({
             economy: positiveInteger,
             industry: positiveInteger,
             science: positiveInteger
         }),
         shipsActual: or(numberAdv({ sign: 'positive' }), just(undefined)),
-        specialistId: or(positiveInteger, just(null)),
-        specialistExpireTick: or(positiveInteger, just(null)),
+        specialistId: maybeNull(positiveInteger),
+        specialistExpireTick: maybeNull(positiveInteger),
         homeStar: boolean,
         warpGate: boolean,
         isNebula: boolean,
@@ -40,13 +44,13 @@ export const customGalaxyValidator: Validator<CustomGalaxy> = object({
         isBinaryStar: boolean,
         isBlackHole: boolean,
         isPulsar: boolean,
-        wormHoleToStarId: or(stringValue({ minLength: 1 }), just(null)),
+        wormHoleToStarId: maybeNull(starId),
         infrastructure: object({
             economy: positiveInteger,
             industry: positiveInteger,
             science: positiveInteger
         }),
-        isKingOfTheHillStar: or(boolean, just(undefined)),
+        isKingOfTheHillStar: maybeUndefined(boolean),
         name: or(stringValue({
             minLength: 3,
             maxLength: 30,
@@ -56,8 +60,8 @@ export const customGalaxyValidator: Validator<CustomGalaxy> = object({
         }), just(undefined))
     })),
     players: or(array(object({
-        id: stringValue({ minLength: 1 }),
-        homeStarId: stringValue({ minLength: 1 }),
+        id: playerId,
+        homeStarId: starId,
         credits: positiveInteger,
         creditsSpecialists: positiveInteger,
         technologies: object({
@@ -72,17 +76,17 @@ export const customGalaxyValidator: Validator<CustomGalaxy> = object({
         })
     })), just(undefined)),
     carriers: or(array(object({
-        id: stringValue({ minLength: 1 }),
-        playerId: stringValue({ minLength: 1 }),
-        orbiting: or(stringValue({ minLength: 1 }), just(null)),
+        id: carrierId,
+        playerId: playerId,
+        orbiting: or(starId, just(null)),
         waypointsLooped: boolean,
         ships: numberAdv({ integer: true, sign: 'positive', range: { from: 1 } }),
-        specialistId: or(positiveInteger, just(null)),
-        specialistExpireTick: or(positiveInteger, just(null)),
+        specialistId: maybeNull(positiveInteger),
+        specialistExpireTick: maybeNull(positiveInteger),
         isGift: boolean,
         waypoints: array(object({
-            source: stringValue({ minLength: 1 }),
-            destination: stringValue({ minLength: 1 }),
+            source: starId,
+            destination: starId,
             action: stringEnumeration<CarrierWaypointActionType, CarrierWaypointActionType[]>(CarrierWaypointActionTypes),
             actionShips: withDefault(0, positiveInteger),
             delayTicks: withDefault(0, positiveInteger)
@@ -98,7 +102,7 @@ export const customGalaxyValidator: Validator<CustomGalaxy> = object({
     })), just(undefined)),
     teams: or(array(object({
         id: stringValue({ minLength: 1 }),
-        players: array(stringValue({ minLength: 1 })),
+        players: array(playerId),
         name: or(stringValue({
             minLength: 1,
             maxLength: 30,
