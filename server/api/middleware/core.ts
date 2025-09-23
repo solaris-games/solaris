@@ -17,7 +17,8 @@ export const middleware = (container: DependencyContainer): CoreMiddleware => {
                 // If there is an error in the pipeline
                 // then test to see what type of error it is. If it's a validation
                 // error then return it with its status code.
-                if (err instanceof ValidationError) {
+                // we double check here because due to transpilation stuff you cannot trust Javascript.
+                if (err.name === 'ValidationError' || err instanceof ValidationError) {
                     let errors: string | string[] = err.message;
 
                     if (!Array.isArray(errors)) {

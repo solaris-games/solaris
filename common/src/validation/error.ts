@@ -5,5 +5,11 @@ export class ValidationError extends Error {
         super(err as any);
 
         this.statusCode = statusCode || 400;
+
+        // necessary because JS is weird.
+
+        Object.setPrototypeOf(this, ValidationError.prototype);
+
+        this.name = "ValidationError";
     }
 };
