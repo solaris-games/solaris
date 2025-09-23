@@ -54,9 +54,9 @@ export default class GameStateService {
         // Otherwise, try to start the countdown.
         if (this.isCountingDownToEnd(game)) {
             game.state.ticksToEnd!--;
-        } else {
+        } else if (game.settings.general.mode === 'kingOfTheHill') {
             // Note: This should only occur if in KotH mode.
-            game.state.ticksToEnd = game.settings.kingOfTheHill.productionCycles * game.settings.galaxy.productionTicks;
+            game.state.ticksToEnd = game.settings.kingOfTheHill!.productionCycles * game.settings.galaxy.productionTicks;
         }
     }
 

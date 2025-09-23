@@ -35,7 +35,7 @@ export interface UserLevel {
     rankPointsProgress?: number | null;
 }
 
-export type UserAchievements<ID> = {
+export type  UserAchievements<ID> = {
     victories: number;
     victories1v1: number;
     level: number;
@@ -44,7 +44,6 @@ export type UserAchievements<ID> = {
     renown: number;
     joined: number;
     completed: number;
-    quit: number;
     defeated: number;
     defeated1v1: number;
     afk: number;

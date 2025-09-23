@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 import { DBObjectId } from './types/DBObjectId';
-import ValidationError from '../errors/validation';
+import { ValidationError } from "solaris-common";
 import Repository from './repository';
 import { Carrier } from './types/Carrier';
 import { CarrierWaypoint } from './types/CarrierWaypoint';

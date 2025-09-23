@@ -479,7 +479,7 @@ export default class UserLeaderboardService {
     async getUserLeaderboard(limit: number | null, sortingKey: string, skip: number = 0) {
         const sorter = UserLeaderboardService.GLOBALSORTERS[sortingKey] || UserLeaderboardService.GLOBALSORTERS['rank'];
 
-        let leaderboard = await this.userRepo
+        const leaderboard = await this.userRepo
             .find(
                 sorter.query || {},
                 sorter.select,
@@ -488,23 +488,16 @@ export default class UserLeaderboardService {
                 skip
             );
 
-        // TODO: Fix this properly
-        for (let user of leaderboard) {
-            if (user.achievements) {
-                user.achievements.renown = 0;
-            }
-        }
+        const userIds = leaderboard.map(x => x._id);
+        const guildUsers = await this.guildUserService.listUsersWithGuildTags(userIds);
 
-        let userIds = leaderboard.map(x => x._id);
-        let guildUsers = await this.guildUserService.listUsersWithGuildTags(userIds);
-
-        let guildUserPositions: LeaderboardUser[] = [];
+        const guildUserPositions: LeaderboardUser[] = [];
 
         for (let i = 0; i < leaderboard.length; i++) {
-            let user = leaderboard[i];
+            const user = leaderboard[i];
 
-            let position = i + 1;
-            let guild = guildUsers.find(x => x._id.toString() === user._id.toString())?.guild || null;
+            const position = i + 1;
+            const guild = guildUsers.find(x => x._id.toString() === user._id.toString())?.guild || null;
 
             guildUserPositions.push({
                 ...user,
@@ -513,7 +506,7 @@ export default class UserLeaderboardService {
             });
         }
 
-        let totalPlayers = await this.userRepo.countAll();
+        const totalPlayers = await this.userRepo.countAll();
 
         return {
             totalPlayers,

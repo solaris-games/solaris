@@ -31,7 +31,7 @@ export default class PlayerColourService {
         await game.save();
     }
 
-    generateTeamColourShapeList(teamCount: number, playersPerTeam: number): Record<number, PlayerColourShapeCombination[]> {
+    generateTeamColourShapeList(teamCount: number, teamPlayerCounts: number[]): Record<number, PlayerColourShapeCombination[]> {
         const coloursCount = COLOURS.length;
 
         const available: Record<string, { shape: PlayerShape, colour: PlayerColour }[]> = {};
@@ -50,7 +50,7 @@ export default class PlayerColourService {
             let fulfilled = 0;
             const combinations: PlayerColourShapeCombination[] = [];
 
-            while (fulfilled < playersPerTeam) {
+            while (fulfilled < teamPlayerCounts[ti]) {
                 const teamColourSpec = COLOURS[colourIdx % coloursCount];
 
                 const availableShapesAndColours = available[teamColourSpec.group];

@@ -1,10 +1,11 @@
 import { Carrier } from "./types/Carrier";
-import {CombatResolutionMalusStrategy, Game} from "./types/Game";
+import { Game } from "./types/Game";
 import { Player, PlayerTechnologyLevels, ResearchTypeNotRandom } from "./types/Player";
 import { Star } from "./types/Star";
 import SpecialistService from "./specialist";
 import GameTypeService from "./gameType";
-import {maxBy, maxOf} from "./utils";
+import {maxBy} from "./utils";
+import {CombatResolutionMalusStrategy} from "solaris-common";
 
 const DEFAULT_TECHNOLOGIES: ResearchTypeNotRandom[] = [
     'terraforming',
@@ -161,7 +162,7 @@ export default class TechnologyService {
         return 0;
     }
 
-    getCarrierWeaponsBuff(carrier: Carrier, isCarrierToStarCombat: boolean, isAttacker: boolean, allyCount: number,  strategy: CombatResolutionMalusStrategy, isLargestCarrier: boolean) {
+    getCarrierWeaponsBuff(carrier: Carrier, isCarrierToStarCombat: boolean, isAttacker: boolean, allyCount: number, strategy: CombatResolutionMalusStrategy, isLargestCarrier: boolean) {
         const buffs: number[] = [];
 
         if (carrier.specialistId) {

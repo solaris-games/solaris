@@ -8,7 +8,7 @@ import {
     CombatStar,
     Defender
 } from "./types/Combat";
-import {CombatResolutionMalusStrategy, Game} from "./types/Game";
+import {Game} from "./types/Game";
 import {Player} from "./types/Player";
 import {Star, StarCaptureResult} from "./types/Star";
 import {User} from "./types/User";

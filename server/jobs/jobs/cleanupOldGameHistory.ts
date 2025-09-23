@@ -22,6 +22,7 @@ export const cleanupOldGameHistoryJob = (container: DependencyContainer) => asyn
             try {
                 await container.historyService.deleteByGameId(game._id);
                 await container.eventService.deleteByGameId(game._id);
+                await container.initialGameStateService.deleteByGameId(game._id);
                 await container.gameService.markAsCleaned(game._id);
             } catch (e) {
                 log.error(e);

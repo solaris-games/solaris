@@ -29,7 +29,6 @@ import EventService from "../event";
 import GameService from "../game";
 import GameAuthService from "../gameAuth";
 import GameCreateService from "../gameCreate";
-import GameCreateValidationService from "../gameCreateValidation";
 import GameFluxService from "../gameFlux";
 import GameGalaxyService from "../gameGalaxy";
 import GameJoinService from "../gameJoin";
@@ -91,6 +90,7 @@ import StarCaptureService from "../starCapture";
 import {UserServerSocketEmitter} from "../../sockets/socketEmitters/user";
 import {UserServerSocketHandler} from "../../sockets/socketHandlers/user";
 import StatisticsService from "../statistics";
+import InitialGameStateService from "../initialGameState";
 
 export interface DependencyContainer {
     config: Config,
@@ -118,7 +118,6 @@ export interface DependencyContainer {
     gameAuthService: GameAuthService,
     gameLockService: GameLockService,
     gameJoinService: GameJoinService,
-    gameCreateValidationService: GameCreateValidationService,
     gameCreateService: GameCreateService,
     gameGalaxyService: GameGalaxyService,
     gameListService: GameListService,
@@ -186,4 +185,5 @@ export interface DependencyContainer {
     sessionService: SessionService,
     starCaptureService: StarCaptureService,
     statisticsService: StatisticsService,
+    initialGameStateService: InitialGameStateService,
 };

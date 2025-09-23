@@ -21,7 +21,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             controller.getFlux
     );
 
-    router.post('/api/game/',
+    answer(routes.create,
             mw.auth.authenticate(),
             controller.create
     );
