@@ -95,7 +95,7 @@ const parseGameSettingsGeneral: Validator<GameSettingsGeneralBase> = object({
     anonymity: stringEnumeration<GamePlayerAnonymity, GamePlayerAnonymity[]>(['normal', 'extra']),
     playerOnlineStatus: stringEnumeration<GamePlayerOnlineStatus, GamePlayerOnlineStatus[]>(['hidden', 'visible']),
     playerIPWarning: enabledDisabled,
-    awardRankTo: stringEnumeration<GameAwardRankTo, GameAwardRankTo[]>(GAME_AWARD_RANK_TO),
+    awardRankTo: withDefault('all', stringEnumeration<GameAwardRankTo, GameAwardRankTo[]>(GAME_AWARD_RANK_TO)),
     awardRankToTopN: maybeUndefined(numberAdv({
         integer: true,
         range: {
@@ -109,7 +109,7 @@ const parseGameSettingsGeneral: Validator<GameSettingsGeneralBase> = object({
     readyToQuit: enabledDisabled,
     readyToQuitFraction: maybeUndefined(numberEnumeration<ReadyToQuitFraction, ReadyToQuitFraction[]>(READY_TO_QUIT_FRACTIONS)),
     readyToQuitTimerCycles: maybeUndefined(numberEnumeration<ReadyToQuitTimerCycles, ReadyToQuitTimerCycles[]>(READY_TO_QUIT_TIMER_CYCLES)),
-    readyToQuitVisibility: stringEnumeration<ReadyToQuitVisibility, ReadyToQuitVisibility[]>(READY_TO_QUIT_VISIBILITY),
+    readyToQuitVisibility: withDefault('visible', stringEnumeration<ReadyToQuitVisibility, ReadyToQuitVisibility[]>(READY_TO_QUIT_VISIBILITY)),
 });
 
 const parseGameSettingsGalaxy: Validator<GameSettingsGalaxyBase> = object({
@@ -398,7 +398,7 @@ export const parseGameSettingsReq: Validator<GameSettingsReq> = object({
     galaxy: parseGameSettingsGalaxy,
     specialGalaxy: parseGameSettingsSpecialGalaxy,
     conquest: parseGameSettingsConquest,
-    kingOfTheHill: object({
+    kingOfTheHill: maybeUndefined(object({
         productionCycles: numberAdv({
             integer: true,
             range: {
@@ -406,7 +406,7 @@ export const parseGameSettingsReq: Validator<GameSettingsReq> = object({
                 to: 25,
             },
         }),
-    }),
+    })),
     orbitalMechanics: object({
         enabled: enabledDisabled,
         orbitSpeed: numberAdv({

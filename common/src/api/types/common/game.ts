@@ -433,7 +433,7 @@ export type GameSettingsInvariable = {
         capitalStarElimination: GameSettingEnabledDisabled;
         teamsCount?: number;
     },
-    kingOfTheHill: {
+    kingOfTheHill?: {
         productionCycles: number;
     },
     orbitalMechanics: {
