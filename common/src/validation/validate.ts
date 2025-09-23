@@ -80,7 +80,11 @@ export const or = <A, B>(a: Validator<A>, b: Validator<B>): Validator<A | B> => 
         try {
             return a(v);
         } catch (e) {
-            return b(v);
+            try {
+                return b(v);
+            } catch (e2) {
+                throw new ValidationError(`Both alternatives failed:\n  - ${e}\n  - ${e2}`);
+            }
         }
     }
 }
