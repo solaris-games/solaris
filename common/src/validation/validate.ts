@@ -3,7 +3,9 @@ import { ValidationError } from "./error";
 export type Validator<T> = (value: any) => T;
 
 const failed = (expected: string, value: any) => {
-    return new ValidationError(`Expected ${expected}, but got: ${value.toString().substring(1000)} ${typeof value}`);
+    const got = value === null ? "null" : value === undefined ? "undefined" : value.toString().substring(1000);
+
+    return new ValidationError(`Expected ${expected}, but got: ${got} ${typeof value}`);
 }
 
 export const ok = <T>(value: T): Validator<T> => {
