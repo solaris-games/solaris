@@ -98,6 +98,14 @@ export default class CustomGalaxyService {
             settings.specialGalaxy.splitResources = 'disabled';
         }
 
+        settings.specialGalaxy.randomWarpGates = 0;
+        settings.specialGalaxy.randomWormHoles = 0;
+        settings.specialGalaxy.randomNebulas = 0;
+        settings.specialGalaxy.randomAsteroidFields = 0;
+        settings.specialGalaxy.randomBinaryStars = 0;
+        settings.specialGalaxy.randomBlackHoles = 0;
+        settings.specialGalaxy.randomPulsars = 0;
+
         if (isAdvancedCustomGalaxy) {
             if (settings.general.mode === 'teamConquest') {
                 settings.conquest.teamsCount = settings.galaxy.customGalaxy!.teams!.length;

@@ -343,16 +343,6 @@ export default class GameCreateService {
             throw new ValidationError('Invalid research cost progression.');
         }
 
-        if (isCustomGalaxy) {
-            settings.specialGalaxy.randomWarpGates = 0;
-            settings.specialGalaxy.randomWormHoles = 0;
-            settings.specialGalaxy.randomNebulas = 0;
-            settings.specialGalaxy.randomAsteroidFields = 0;
-            settings.specialGalaxy.randomBinaryStars = 0;
-            settings.specialGalaxy.randomBlackHoles = 0;
-            settings.specialGalaxy.randomPulsars = 0;
-        }
-
         if (settings.general.readyToQuit === "enabled") {
             settings.general.readyToQuitFraction = settings.general.readyToQuitFraction || 1.0;
             settings.general.readyToQuitTimerCycles = settings.general.readyToQuitTimerCycles || 0;
