@@ -2,12 +2,11 @@ import {DependencyContainer} from "../../services/types/DependencyContainer";
 import {Game} from "../../services/types/Game";
 import {OfficialGameCategory, OfficialGameKind} from "../../config/officialGames";
 import {logger} from "../../utils/logging";
-import {GameSettings} from "solaris-common";
-import {DBObjectId} from "../../services/types/DBObjectId";
+import {GameSettingsReq} from "../../services/gameCreate";
 
 const log = logger("Official Games Check Job");
 
-const chooseSetting = (container: DependencyContainer, category: OfficialGameCategory): GameSettings<DBObjectId> => {
+const chooseSetting = (container: DependencyContainer, category: OfficialGameCategory): GameSettingsReq => {
     if (category.kind === OfficialGameKind.Standard) {
         return category.settings;
     } else if (category.kind === OfficialGameKind.Carousel) {
@@ -44,7 +43,7 @@ export const officialGamesCheckJob = (container: DependencyContainer) => async (
                 const existingRunning = findExistingGame(category, runningGames);
                 const existingTemplate = existingRunning?.settings.general.createdFromTemplate;
 
-                let newSetting: GameSettings<DBObjectId>;
+                let newSetting: GameSettingsReq;
                 if (existingRunning && existingTemplate && category.kind === OfficialGameKind.Carousel && category.distribution === 'sequential') {
                     const index = category.rotation.findIndex(x => x.general.createdFromTemplate && x.general.createdFromTemplate === existingTemplate);
                     const nextIndex = (index + 1) % category.rotation.length;
