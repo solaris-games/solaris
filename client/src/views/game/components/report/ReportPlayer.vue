@@ -62,63 +62,77 @@
   </div>
 </template>
 
-<script>
-import MenuTitle from '../MenuTitle.vue'
-import GameHelper from '../../../../services/gameHelper'
-import ReportApiService from '../../../../services/api/report'
+<script setup lang="ts">
+import MenuTitle from '../MenuTitle.vue';
+import GameHelper from '../../../../services/gameHelper';
+import ReportApiService from '../../../../services/api/report';
+import { ref, computed, inject } from 'vue';
+import { useStore, type Store } from 'vuex';
+import type {State} from "@/store";
+import {toastInjectionKey} from "@/util/keys";
+import {makeConfirm} from "@/util/confirm";
 
-export default {
-  components: {
-    'menu-title': MenuTitle
-  },
-  props: {
-    args: Object,
-  },
-  data() {
-    return {
-      optionAbuse: false,
-      optionSpamming: false,
-      optionMultiboxing: false,
-      optionInappropriateAlias: false
-    }
-  },
-  methods: {
-    onCloseRequested(e) {
-      this.$emit('onCloseRequested', e)
-    },
-    onOpenPlayerDetailRequested(e) {
-      this.$emit('onOpenPlayerDetailRequested', this.args.playerId)
-    },
-    async confirmReportPlayer() {
-      if (!await this.$confirm(this.menuTitle, `Are you sure you want to report ${this.player.alias}?`)) {
-        return
-      }
+export type Args = {
+  playerId: string,
+  messageId?: string,
+  conversationId?: string,
+};
 
-      try {
-        await ReportApiService.reportPlayer(this.$store.state.game._id, this.args.playerId, this.args.messageId, this.args.conversationId, this.optionAbuse, this.optionSpamming, this.optionMultiboxing, this.optionInappropriateAlias)
+const props = defineProps<{
+  args: Args,
+}>();
 
-        this.$toast.success(`You have reported ${this.player.alias}. We will investigate and take action if necessary.`)
+const emit = defineEmits<{
+  onCloseRequested: [],
+  onOpenPlayerDetailRequested: [playerId: string],
+}>();
 
-        this.onOpenPlayerDetailRequested()
-      } catch (err) {
-        console.error(err)
-      }
-    }
-  },
-  computed: {
-    player() {
-      return GameHelper.getPlayerById(this.$store.state.game, this.args.playerId)
-    }
-    ,
-    menuTitle() {
-      if (this.args.messageId) {
-        return 'Report Message'
-      } else {
-        return 'Report Player'
-      }
-    }
+const toast = inject(toastInjectionKey)!;
+
+const store: Store<State> = useStore();
+
+const confirm = makeConfirm(store);
+
+const optionAbuse = ref(false);
+const optionSpamming = ref(false);
+const optionMultiboxing = ref(false);
+const optionInappropriateAlias = ref(false);
+
+const player = computed(() => {
+  return GameHelper.getPlayerById(store.state.game, props.args.playerId)!;
+});
+
+const menuTitle = computed(() => {
+  if (props.args.messageId) {
+    return 'Report Message';
+  } else {
+    return 'Report Player';
   }
-}
+});
+
+const onCloseRequested = (e: Event) => {
+  emit('onCloseRequested');
+};
+
+const onOpenPlayerDetailRequested = () => {
+  emit('onOpenPlayerDetailRequested', props.args.playerId);
+};
+
+const confirmReportPlayer = async () => {
+  if (!await confirm(menuTitle.value, `Are you sure you want to report ${player.value?.alias}?`)) {
+    return;
+  }
+
+  try {
+    await ReportApiService.reportPlayer(store.state.game!._id, props.args.playerId, props.args.messageId, props.args.conversationId, optionAbuse.value, optionSpamming.value, optionMultiboxing.value, optionInappropriateAlias.value);
+
+    toast.success(`You have reported ${player.value?.alias}. We will investigate and take action if necessary.`);
+
+    onOpenPlayerDetailRequested();
+  } catch (err) {
+    console.error(err);
+  }
+};
 </script>
 
 <style scoped>

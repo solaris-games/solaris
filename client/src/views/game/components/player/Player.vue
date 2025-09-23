@@ -70,7 +70,7 @@ const emit = defineEmits<{
   onViewColourOverrideRequested: [playerId: string],
   onOpenTradeRequested: [playerId: string],
   onOpenPurchasePlayerBadgeRequested: [playerId: string],
-  onOpenReportPlayerRequested: [playerId: string],
+  onOpenReportPlayerRequested: [{ playerId: string }],
   onOpenPlayerDetailRequested: [playerId: string],
 }>();
 
@@ -115,7 +115,7 @@ const onCloseRequested = () => emit('onCloseRequested');
 const onViewCompareIntelRequested = (playerId: string) => emit('onViewCompareIntelRequested', playerId);
 const onViewColourOverrideRequested = (playerId: string) => emit('onViewColourOverrideRequested', playerId);
 const onOpenTradeRequested = () => emit('onOpenTradeRequested', props.playerId);
-const onOpenReportPlayerRequested = () => emit('onOpenReportPlayerRequested', props.playerId);
+const onOpenReportPlayerRequested = () => emit('onOpenReportPlayerRequested', { playerId: props.playerId });
 const panToPlayer = () => eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, { player: player.value! });
 const onOpenPlayerDetailRequested = (player: Player<string>) => emit('onOpenPlayerDetailRequested', player._id);
 const onOpenPurchasePlayerBadgeRequested = () => emit('onOpenPurchasePlayerBadgeRequested', props.playerId);
