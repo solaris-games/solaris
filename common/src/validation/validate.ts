@@ -5,7 +5,7 @@ export type Validator<T> = (value: any) => T;
 const failed = (expected: string, value: any) => {
     const got = value === null ? "null" : value === undefined ? "undefined" : value.toString().substring(1000);
 
-    return new ValidationError(`Expected ${expected}, but got: ${got} ${typeof value}`);
+    return new ValidationError(`Expected ${expected}, but got: ${got} (type ${typeof value})`);
 }
 
 export const ok = <T>(value: T): Validator<T> => {
@@ -85,9 +85,25 @@ export const or = <A, B>(a: Validator<A>, b: Validator<B>): Validator<A | B> => 
     }
 }
 
-export const maybeNull = <A>(validator: Validator<A>): Validator<A | null> => or(validator, just(null));
+export const nullish: Validator<null> = v => {
+    if (v === null || v === undefined) {
+        return null;
+    }
 
-export const maybeUndefined = <A>(validator: Validator<A>): Validator<A | undefined> => or(validator, just(undefined));
+    throw failed("null or undefined", v);
+}
+
+export const undefinedish: Validator<undefined> = v => {
+    if (v === undefined || v === null) {
+        return undefined;
+    }
+
+    throw failed("null or undefined", v);
+}
+
+export const maybeNull = <A>(validator: Validator<A>): Validator<A | null> => or(validator, nullish);
+
+export const maybeUndefined = <A>(validator: Validator<A>): Validator<A | undefined> => or(validator, undefinedish);
 
 export const just = <A>(value: A): Validator<A> => {
     return v => {

@@ -350,8 +350,8 @@ const parseGameSettingsTechnology: Validator<GameSettingsTechnology> = object({
 
 const parseGameSettingsGameTime: Validator<GameSettingsGameTime> = object({
     gameType: stringEnumeration<GameTimeType, GameTimeType[]>(GAME_TIME_TYPES),
-    speed: numberEnumeration<GameTimeSpeed, GameTimeSpeed[]>(GAME_TIME_SPEEDS),
-    isTickLimited: enabledDisabled,
+    speed: withDefault(1800, numberEnumeration<GameTimeSpeed, GameTimeSpeed[]>(GAME_TIME_SPEEDS)),
+    isTickLimited: withDefault('disabled', enabledDisabled),
     tickLimit: maybeNull(numberAdv({
         integer: true,
         range: {
@@ -360,36 +360,36 @@ const parseGameSettingsGameTime: Validator<GameSettingsGameTime> = object({
         },
     })),
     startDelay: numberEnumeration<GameTimeStartDelay, GameTimeStartDelay[]>(GAME_TIME_START_DELAYS),
-    turnJumps: numberAdv({
+    turnJumps: withDefault(8, numberAdv({
         integer: true,
         range: {
             from: 1,
             to: 24,
         },
-    }),
-    maxTurnWait: numberEnumeration<GameTimeMaxTurnWait, GameTimeMaxTurnWait[]>(GAME_TIME_MAX_TURN_WAITS),
+    })),
+    maxTurnWait: withDefault(1440, numberEnumeration<GameTimeMaxTurnWait, GameTimeMaxTurnWait[]>(GAME_TIME_MAX_TURN_WAITS)),
     afk: object({
-        lastSeenTimeout: numberAdv({
+        lastSeenTimeout: withDefault(2, numberAdv({
             integer: true,
             range: {
                 from: 1,
                 to: 7,
             },
-        }),
-        cycleTimeout: numberAdv({
+        })),
+        cycleTimeout: withDefault(3, numberAdv({
             integer: true,
             range: {
                 from: 3,
                 to: 25,
             },
-        }),
-        turnTimeout: numberAdv({
+        })),
+        turnTimeout: withDefault(3, numberAdv({
             integer: true,
             range: {
                 from: 1,
                 to: 60,
             },
-        }),
+        })),
     }),
 });
 
