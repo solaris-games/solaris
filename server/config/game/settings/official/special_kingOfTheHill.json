@@ -25,6 +25,9 @@
         "starsPerPlayer": 10,
         "productionTicks": 20
     },
+    "kingOfTheHill": {
+        "productionCycles": 10
+    },
     "specialGalaxy": {
         "carrierCost": "standard",
         "carrierUpkeepCost": "none",
