@@ -902,8 +902,6 @@
         </div>
       </view-collapse-panel>
 
-      <form-error-list v-bind:errors="errors"/>
-
       <div class="d-grid gap-2 mb-3 mt-3">
         <button type="submit" class="btn btn-success btn-lg" :disabled="isCreatingGame"><i class="fas fa-gamepad"></i> Create Game</button>
       </div>
@@ -927,7 +925,7 @@ import SelectTemplate from "@/views/game/gameCreation/SelectTemplate.vue";
 import { ref, onMounted, inject, type Ref, computed } from 'vue';
 import {GAME_CREATION_OPTIONS, type GameSettingsSpec, type SpecialistBans} from "@solaris-common";
 import {createGame} from "@/services/typedapi/game";
-import {httpInjectionKey, isOk} from "@/services/typedapi";
+import {extractErrors, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
 import CustomGalaxy from "@/views/game/gameCreation/CustomGalaxy.vue";
 
@@ -1014,6 +1012,11 @@ const handleSubmit = async (e: Event) => {
     toast.success(`The game ${settings.value!.general.name} has been created.`)
 
     router.push({ name: 'game-detail', query: { id: response.data.gameId } })
+  } else {
+    console.error(response.cause);
+
+    toast.error('Failed to create game');
+    errors.value = extractErrors(response);
   }
 
   isCreatingGame.value = false;
