@@ -8,8 +8,8 @@
       <option value="1v1turnBased">1v1 TB</option>
       <option value="16player_realTime">16 Player RT</option>
       <option value="16player_turnBased">16 Player TB</option>
-      <option value="32player_normal">32 Player experimental</option>
-      <option value="32player_ultradark">32 Player classic</option>
+      <option value="32player_experimental">32 Player experimental</option>
+      <option value="32player_capital_elimination">32 Player capital elimination</option>
       <option value="newPlayer">New Player</option>
       <option value="special_anonymous">Special Anonymous</option>
       <option value="special_arcade">Special Arcade</option>

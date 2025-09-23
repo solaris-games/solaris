@@ -15,7 +15,8 @@
         "advancedAI": "disabled",
         "spectators": "enabled",
         "afkSlotsOpen": "enabled",
-        "readyToQuit": "enabled"
+        "readyToQuit": "enabled",
+        "awardRankTo": "all"
     },
     "galaxy": {
         "galaxyType": "circular-balanced",
@@ -117,7 +118,10 @@
         "experimentationDistribution": "random",
         "bankingReward": "standard",
         "experimentationReward": "standard",
-        "specialistTokenReward": "standard"
+        "specialistTokenReward": "standard",
+        "researchCostProgression": {
+            "progression": "standard"
+        }
     },
     "gameTime": {
         "speed": 3600,
