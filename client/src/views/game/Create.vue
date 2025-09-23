@@ -69,7 +69,7 @@
         <div class="mb-2" v-if="settings.general.mode === 'kingOfTheHill'">
           <label for="kingOfTheHillProductionCycles" class="col-form-label">Countdown Cycles (<span class="text-warning">{{settings.kingOfTheHill!.productionCycles}} production cycles</span>) <help-tooltip tooltip="How long the countdown is to the end of the game in production cycles when the center star is captured"/></label>
           <div class="col">
-            <input type="range" min="1" max="25" step="1" class="form-range w-100" id="kingOfTheHillproductionCycles" v-model="settings.kingOfTheHill!.productionCycles" :disabled="isCreatingGame">
+            <input type="range" min="1" max="25" step="1" class="form-range w-100" id="kingOfTheHillproductionCycles" v-model.number="settings.kingOfTheHill!.productionCycles" :disabled="isCreatingGame">
           </div>
         </div>
 
@@ -202,7 +202,7 @@
         <div class="mb-2" v-if="settings.general.awardRankTo === 'top_n'">
           <label for="awardRankToTopN" class="col-form-label">Top/bottom <span class="text-warning">{{settings.general.awardRankToTopN}} players</span> will receive/lose rank <help-tooltip tooltip="Top N players will receive rank, and bottom N players will lose rank"/></label>
           <div class="col">
-            <input type="range" min="1" :max="Math.floor(settings.general.playerLimit / 2)" step="1" class="form-range w-50" id="awardRankToTopN" v-model="settings.general.awardRankToTopN" :disabled="isCreatingGame">
+            <input type="range" min="1" :max="Math.floor(settings.general.playerLimit / 2)" step="1" class="form-range w-50" id="awardRankToTopN" v-model.number="settings.general.awardRankToTopN" :disabled="isCreatingGame">
           </div>
         </div>
 
@@ -247,7 +247,7 @@
         <div class="mb-2" v-if="settings.gameTime.isTickLimited === 'enabled'">
           <label for="tickLimit" class="col-form-label">Time Limit (<span class="text-warning">{{settings.gameTime.tickLimit}} ticks</span>) <help-tooltip tooltip="Determines the maximum number of ticks before the game is automatically concluded"/></label>
           <div class="col">
-            <input type="range" min="100" max="2000" step="100" class="form-range w-100" id="tickLimit" v-model="settings.gameTime.tickLimit" :disabled="isCreatingGame">
+            <input type="range" min="100" max="2000" step="100" class="form-range w-100" id="tickLimit" v-model.number="settings.gameTime.tickLimit" :disabled="isCreatingGame">
           </div>
         </div>
 
@@ -281,21 +281,21 @@
         <div class="mb-2">
           <label for="lastSeenTimeout" class="col-form-label">AFK Last Seen Limit (<span class="text-warning">{{settings.gameTime.afk.lastSeenTimeout}} day(s)</span>) <help-tooltip tooltip="Determines how long before a player is kicked for being AFK - This is paired with the AFK Galactic Cycle Limit setting, the timeout is whichever comes first"/></label>
           <div class="col">
-            <input type="range" min="1" max="7" step="1" class="form-range w-100" id="lastSeenTimeout" v-model="settings.gameTime.afk.lastSeenTimeout" :disabled="isCreatingGame">
+            <input type="range" min="1" max="7" step="1" class="form-range w-100" id="lastSeenTimeout" v-model.number="settings.gameTime.afk.lastSeenTimeout" :disabled="isCreatingGame">
           </div>
         </div>
 
         <div class="mb-2" v-if="settings.gameTime.gameType === 'realTime'">
           <label for="cycleTimeout" class="col-form-label">AFK Galactic Cycle Limit (<span class="text-warning">{{settings.gameTime.afk.cycleTimeout}} cycles</span>) <help-tooltip tooltip="Determines how many cycles before a player is kicked before being AFK - This is paired with the AFK Last Seen Limit setting, the timeout is whichever comes first"/></label>
           <div class="col">
-            <input type="range" min="3" max="25" step="1" class="form-range w-100" id="cycleTimeout" v-model="settings.gameTime.afk.cycleTimeout" :disabled="isCreatingGame">
+            <input type="range" min="3" max="25" step="1" class="form-range w-100" id="cycleTimeout" v-model.number="settings.gameTime.afk.cycleTimeout" :disabled="isCreatingGame">
           </div>
         </div>
 
         <div class="mb-2" v-if="settings.gameTime.gameType === 'turnBased'">
           <label for="turnTimeout" class="col-form-label">AFK Missed Turn Limit (<span class="text-warning">{{settings.gameTime.afk.turnTimeout}} missed turn(s)</span>) <help-tooltip tooltip="Determines how many missed turns before a player is kicked before being AFK - This is paired with the AFK Last Seen Limit setting, the timeout is whichever comes first"/></label>
           <div class="col">
-            <input type="range" min="1" max="60" step="1" class="form-range w-100" id="turnTimeout" v-model="settings.gameTime.afk.turnTimeout" :disabled="isCreatingGame">
+            <input type="range" min="1" max="60" step="1" class="form-range w-100" id="turnTimeout" v-model.number="settings.gameTime.afk.turnTimeout" :disabled="isCreatingGame">
           </div>
         </div>
 
@@ -347,14 +347,14 @@
         <div class="mb-2" v-if="settings.galaxy.galaxyType !== 'custom'">
           <label for="starsPerPlayer" class="col-form-label">Stars per Player (<span class="text-warning">{{settings.galaxy.starsPerPlayer}} stars</span>) <help-tooltip tooltip="How many stars will be generated per player in the galaxy"/></label>
           <div class="col">
-            <input type="range" min="3" max="50" step="1" class="form-range w-100" id="starsPerPlayer" v-model="settings.galaxy.starsPerPlayer" :disabled="isCreatingGame">
+            <input type="range" min="3" max="50" step="1" class="form-range w-100" id="starsPerPlayer" v-model.number="settings.galaxy.starsPerPlayer" :disabled="isCreatingGame">
           </div>
         </div>
 
         <div class="mb-2">
           <label for="productionTicks" class="col-form-label">Production Ticks (<span class="text-warning">{{settings.galaxy.productionTicks}} ticks</span>) <help-tooltip tooltip="How many ticks are in a galactic cycle"/></label>
           <div class="col">
-            <input type="range" min="10" max="36" step="2" class="form-range w-100" id="productionTicks" v-model="settings.galaxy.productionTicks" :disabled="isCreatingGame">
+            <input type="range" min="10" max="36" step="2" class="form-range w-100" id="productionTicks" v-model.number="settings.galaxy.productionTicks" :disabled="isCreatingGame">
           </div>
         </div>
       </view-collapse-panel>
@@ -408,49 +408,49 @@
         <div class="mb-2" v-if="settings.galaxy.galaxyType !== 'custom'">
           <label for="randomWarpGates" class="col-form-label">Random Warp Gates (<span class="text-warning">{{settings.specialGalaxy.randomWarpGates}}%</span>) <help-tooltip tooltip="The percentage of random warp gates are seeded at the start of the game - Warp gates increase carrier movement speed"/></label>
           <div class="col">
-            <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomWarpGates" v-model="settings.specialGalaxy.randomWarpGates" :disabled="isCreatingGame">
+            <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomWarpGates" v-model.number="settings.specialGalaxy.randomWarpGates" :disabled="isCreatingGame">
           </div>
         </div>
 
         <div class="mb-2" v-if="settings.galaxy.galaxyType !== 'custom'">
           <label for="randomWormHoles" class="col-form-label">Random Worm Holes (<span class="text-warning">{{settings.specialGalaxy.randomWormHoles}}%</span>) <help-tooltip tooltip="The percentage of random worm holes are generated in the galaxy - Worm holes provide instant travel between paired worm hole stars"/></label>
           <div class="col">
-            <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomWormHoles" v-model="settings.specialGalaxy.randomWormHoles" :disabled="isCreatingGame">
+            <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomWormHoles" v-model.number="settings.specialGalaxy.randomWormHoles" :disabled="isCreatingGame">
           </div>
         </div>
 
         <div class="mb-2" v-if="settings.galaxy.galaxyType !== 'custom'">
           <label for="randomNebulas" class="col-form-label">Random Nebulas (<span class="text-warning">{{settings.specialGalaxy.randomNebulas}}%</span>) <help-tooltip tooltip="The percentage of random nebulas are generated in the galaxy - Nebulas conceal the infrastructure and ship counts at the star from all other players"/></label>
           <div class="col">
-            <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomNebulas" v-model="settings.specialGalaxy.randomNebulas" :disabled="isCreatingGame">
+            <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomNebulas" v-model.number="settings.specialGalaxy.randomNebulas" :disabled="isCreatingGame">
           </div>
         </div>
 
         <div class="mb-2" v-if="settings.galaxy.galaxyType !== 'custom'">
           <label for="randomAsteroidFields" class="col-form-label">Random Asteroid Fields (<span class="text-warning">{{settings.specialGalaxy.randomAsteroidFields}}%</span>) <help-tooltip tooltip="The percentage of random asteroid fields are generated in the galaxy - Asteroid fields have +1 defender bonus (net +2 weapons) in combat"/></label>
           <div class="col">
-            <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomAsteroidFields" v-model="settings.specialGalaxy.randomAsteroidFields" :disabled="isCreatingGame">
+            <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomAsteroidFields" v-model.number="settings.specialGalaxy.randomAsteroidFields" :disabled="isCreatingGame">
           </div>
         </div>
 
         <div class="mb-2" v-if="settings.galaxy.galaxyType !== 'custom'">
           <label for="randomBinaryStars" class="col-form-label">Random Binary Stars (<span class="text-warning">{{settings.specialGalaxy.randomBinaryStars}}%</span>) <help-tooltip tooltip="The percentage of random binary stars are generated in the galaxy - Binary stars start with additional resources"/></label>
           <div class="col">
-            <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomBinaryStars" v-model="settings.specialGalaxy.randomBinaryStars" :disabled="isCreatingGame">
+            <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomBinaryStars" v-model.number="settings.specialGalaxy.randomBinaryStars" :disabled="isCreatingGame">
           </div>
         </div>
 
         <div class="mb-2" v-if="settings.galaxy.galaxyType !== 'custom'">
           <label for="randomBlackHoles" class="col-form-label">Random Black Holes (<span class="text-warning">{{settings.specialGalaxy.randomBlackHoles}}%</span>) <help-tooltip tooltip="The percentage of random black holes are generated in the galaxy - Black holes cannot have infrastructure but have +3 scanning range"/></label>
           <div class="col">
-            <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomBlackHoles" v-model="settings.specialGalaxy.randomBlackHoles" :disabled="isCreatingGame">
+            <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomBlackHoles" v-model.number="settings.specialGalaxy.randomBlackHoles" :disabled="isCreatingGame">
           </div>
         </div>
 
         <div class="mb-2" v-if="settings.galaxy.galaxyType !== 'custom'">
           <label for="randomPulsars" class="col-form-label">Random Pulsars (<span class="text-warning">{{settings.specialGalaxy.randomPulsars}}%</span>) <help-tooltip tooltip="The percentage of random pulsars are generated in the galaxy - Pulsars are always visible to all players in the game"/></label>
           <div class="col">
-            <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomPulsars" v-model="settings.specialGalaxy.randomPulsars" :disabled="isCreatingGame">
+            <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomPulsars" v-model.number="settings.specialGalaxy.randomPulsars" :disabled="isCreatingGame">
           </div>
         </div>
 
@@ -565,28 +565,28 @@
         <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="startingStars" class="col-form-label">Starting Stars (<span class="text-warning">{{settings.player.startingStars}} stars</span>) <help-tooltip tooltip="Determines how many stars each player is allocated at the start of the game"/></label>
           <div class="col">
-            <input type="range" min="1" max="30" step="1" class="form-range w-100" id="startingStars" v-model="settings.player.startingStars" :disabled="isCreatingGame">
+            <input type="range" min="1" max="30" step="1" class="form-range w-100" id="startingStars" v-model.number="settings.player.startingStars" :disabled="isCreatingGame">
           </div>
         </div>
 
         <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="startingCredits" class="col-form-label">Starting Credits (<span class="text-warning">{{settings.player.startingCredits}} credits</span>) <help-tooltip tooltip="Determines how many credits each player is allocated at the start of the game"/></label>
           <div class="col">
-            <input type="range" min="25" max="3000" step="25" class="form-range w-100" id="startingCredits" v-model="settings.player.startingCredits" :disabled="isCreatingGame">
+            <input type="range" min="25" max="3000" step="25" class="form-range w-100" id="startingCredits" v-model.number="settings.player.startingCredits" :disabled="isCreatingGame">
           </div>
         </div>
 
         <div class="mb-2" v-if="settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists' && !isAdvancedCustomGalaxy">
           <label for="startingCreditsSpecialists" class="col-form-label">Starting Specialist Tokens (<span class="text-warning">{{settings.player.startingCreditsSpecialists}} tokens</span>) <help-tooltip tooltip="Determines how many specialist tokens each player is allocated at the start of the game"/></label>
           <div class="col">
-            <input type="range" min="0" max="100" step="1" class="form-range w-100" id="startingCreditsSpecialists" v-model="settings.player.startingCreditsSpecialists" :disabled="isCreatingGame">
+            <input type="range" min="0" max="100" step="1" class="form-range w-100" id="startingCreditsSpecialists" v-model.number="settings.player.startingCreditsSpecialists" :disabled="isCreatingGame">
           </div>
         </div>
 
         <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="startingShips" class="col-form-label">Starting Ships (<span class="text-warning">{{settings.player.startingShips}} ships at each star</span>) <help-tooltip tooltip="Determines how many ships the home star of each player is allocated at the start of the game"/></label>
           <div class="col">
-            <input type="range" min="0" max="100" step="1" class="form-range w-100" id="startingShips" v-model="settings.player.startingShips" :disabled="isCreatingGame">
+            <input type="range" min="0" max="100" step="1" class="form-range w-100" id="startingShips" v-model.number="settings.player.startingShips" :disabled="isCreatingGame">
           </div>
         </div>
 
@@ -641,7 +641,7 @@
         <div class="mb-2" v-if="settings.player.populationCap.enabled === 'enabled'">
           <label for="populationCapShipsPerStar" class="col-form-label">Ships Per Star (<span class="text-warning">{{settings.player.populationCap.shipsPerStar}} Ships</span>) <help-tooltip tooltip="Determines the max population of ships per star"/></label>
           <div class="col">
-            <input type="range" min="50" max="1000" step="50" class="form-range w-100" id="startingTechLevelSpecialists" v-model="settings.player.populationCap.shipsPerStar" :disabled="isCreatingGame">
+            <input type="range" min="50" max="1000" step="50" class="form-range w-100" id="startingTechLevelSpecialists" v-model.number="settings.player.populationCap.shipsPerStar" :disabled="isCreatingGame">
           </div>
         </div>
       </view-collapse-panel>
@@ -667,7 +667,7 @@
         <div class="mb-2" v-if="settings.diplomacy.enabled === 'enabled' && settings.general.mode !== 'teamConquest'">
           <label for="maxAlliances" class="col-form-label">Max Number of Alliances (<span class="text-warning">{{settings.diplomacy.maxAlliances}} Allies</span>) <help-tooltip tooltip="Determines how many formal alliance each player may have at once."/></label>
           <div class="col">
-            <input type="range" min="1" :max="calcMaxAllianceLimit()" step="1" class="form-range w-100" id="maxAlliances" v-model="settings.diplomacy.maxAlliances" :disabled="isCreatingGame">
+            <input type="range" min="1" :max="calcMaxAllianceLimit()" step="1" class="form-range w-100" id="maxAlliances" v-model.number="settings.diplomacy.maxAlliances" :disabled="isCreatingGame">
           </div>
         </div>
         <div class="mb-2" v-if="settings.diplomacy.enabled === 'enabled'">
@@ -700,21 +700,21 @@
         <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="startingInfrastructureEconomy" class="col-form-label">Starting Economic Infrastructure (<span class="text-warning">{{settings.player.startingInfrastructure.economy}} Economy</span>) <help-tooltip tooltip="Determines the infrastructure of the home star of each player at the start of the game"/></label>
           <div class="col">
-            <input type="range" min="0" max="30" step="1" class="form-range w-100" id="startingInfrastructureEconomy" v-model="settings.player.startingInfrastructure.economy" :disabled="isCreatingGame">
+            <input type="range" min="0" max="30" step="1" class="form-range w-100" id="startingInfrastructureEconomy" v-model.number="settings.player.startingInfrastructure.economy" :disabled="isCreatingGame">
           </div>
         </div>
 
         <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="startingInfrastructureIndustry" class="col-form-label">Starting Industrial Infrastructure (<span class="text-warning">{{settings.player.startingInfrastructure.industry}} Industry</span>) <help-tooltip tooltip="Determines the infrastructure of the home star of each player at the start of the game"/></label>
           <div class="col">
-            <input type="range" min="0" max="30" step="1" class="form-range w-100" id="startingInfrastructureIndustry" v-model="settings.player.startingInfrastructure.industry" :disabled="isCreatingGame">
+            <input type="range" min="0" max="30" step="1" class="form-range w-100" id="startingInfrastructureIndustry" v-model.number="settings.player.startingInfrastructure.industry" :disabled="isCreatingGame">
           </div>
         </div>
 
         <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="startingInfrastructureScience" class="col-form-label">Starting Scientific Infrastructure (<span class="text-warning">{{settings.player.startingInfrastructure.science}} Science</span>) <help-tooltip tooltip="Determines the infrastructure of the home star of each player at the start of the game"/></label>
           <div class="col">
-            <input type="range" min="0" max="5" step="1" class="form-range w-100" id="startingInfrastructureScience" v-model="settings.player.startingInfrastructure.science" :disabled="isCreatingGame">
+            <input type="range" min="0" max="5" step="1" class="form-range w-100" id="startingInfrastructureScience" v-model.number="settings.player.startingInfrastructure.science" :disabled="isCreatingGame">
           </div>
         </div>
 
@@ -742,56 +742,56 @@
         <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="startingTechLevelTerraforming" class="col-form-label">Starting Terraforming Technology (<span class="text-warning">{{settings.technology.startingTechnologyLevel.terraforming}} Terraforming</span>) <help-tooltip tooltip="Determines the starting technology levels for all players"/></label>
           <div class="col">
-            <input type="range" min="1" max="16" step="1" class="form-range w-100" id="startingTechLevelTerraforming" v-model="settings.technology.startingTechnologyLevel.terraforming" :disabled="isCreatingGame">
+            <input type="range" min="1" max="16" step="1" class="form-range w-100" id="startingTechLevelTerraforming" v-model.number="settings.technology.startingTechnologyLevel.terraforming" :disabled="isCreatingGame">
           </div>
         </div>
 
         <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="startingTechLevelExperimentation" class="col-form-label">Starting Experimentation Technology (<span class="text-warning">{{settings.technology.startingTechnologyLevel.experimentation > 0 ? settings.technology.startingTechnologyLevel.experimentation : 'Disabled'}} Experimentation</span>) <help-tooltip tooltip="Determines the starting technology levels for all players"/></label>
           <div class="col">
-            <input type="range" min="0" max="16" step="1" class="form-range w-100" id="startingTechLevelExperimentation" v-model="settings.technology.startingTechnologyLevel.experimentation" :disabled="isCreatingGame">
+            <input type="range" min="0" max="16" step="1" class="form-range w-100" id="startingTechLevelExperimentation" v-model.number="settings.technology.startingTechnologyLevel.experimentation" :disabled="isCreatingGame">
           </div>
         </div>
 
         <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="startingTechLevelScanning" class="col-form-label">Starting Scanning Technology (<span class="text-warning">{{settings.technology.startingTechnologyLevel.scanning}} Scanning</span>) <help-tooltip tooltip="Determines the starting technology levels for all players"/></label>
           <div class="col">
-            <input type="range" min="1" max="16" step="1" class="form-range w-100" id="startingTechLevelScanning" v-model="settings.technology.startingTechnologyLevel.scanning" :disabled="isCreatingGame">
+            <input type="range" min="1" max="16" step="1" class="form-range w-100" id="startingTechLevelScanning" v-model.number="settings.technology.startingTechnologyLevel.scanning" :disabled="isCreatingGame">
           </div>
         </div>
 
         <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="startingTechLevelHyperspace" class="col-form-label">Starting Hyperspace Technology (<span class="text-warning">{{settings.technology.startingTechnologyLevel.hyperspace}} Hyperspace</span>) <help-tooltip tooltip="Determines the starting technology levels for all players"/></label>
           <div class="col">
-            <input type="range" min="1" max="16" step="1" class="form-range w-100" id="startingTechLevelHyperspace" v-model="settings.technology.startingTechnologyLevel.hyperspace" :disabled="isCreatingGame">
+            <input type="range" min="1" max="16" step="1" class="form-range w-100" id="startingTechLevelHyperspace" v-model.number="settings.technology.startingTechnologyLevel.hyperspace" :disabled="isCreatingGame">
           </div>
         </div>
 
         <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="startingTechLevelManufacturing" class="col-form-label">Starting Manufacturing Technology (<span class="text-warning">{{settings.technology.startingTechnologyLevel.manufacturing}} Manufacturing</span>) <help-tooltip tooltip="Determines the starting technology levels for all players"/></label>
           <div class="col">
-            <input type="range" min="1" max="16" step="1" class="form-range w-100" id="startingTechLevelManufacturing" v-model="settings.technology.startingTechnologyLevel.manufacturing" :disabled="isCreatingGame">
+            <input type="range" min="1" max="16" step="1" class="form-range w-100" id="startingTechLevelManufacturing" v-model.number="settings.technology.startingTechnologyLevel.manufacturing" :disabled="isCreatingGame">
           </div>
         </div>
 
         <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="startingTechLevelSpecialists" class="col-form-label">Starting Specialists Technology (<span class="text-warning">{{settings.technology.startingTechnologyLevel.specialists}} Specialists</span>) <help-tooltip tooltip="Determines the starting technology levels for all players"/></label>
           <div class="col">
-            <input type="range" min="1" max="16" step="1" class="form-range w-100" id="startingTechLevelSpecialists" v-model="settings.technology.startingTechnologyLevel.specialists" :disabled="isCreatingGame">
+            <input type="range" min="1" max="16" step="1" class="form-range w-100" id="startingTechLevelSpecialists" v-model.number="settings.technology.startingTechnologyLevel.specialists" :disabled="isCreatingGame">
           </div>
         </div>
 
         <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="startingTechLevelBanking" class="col-form-label">Starting Banking Technology (<span class="text-warning">{{settings.technology.startingTechnologyLevel.banking > 0 ? settings.technology.startingTechnologyLevel.banking : 'Disabled'}} Banking</span>) <help-tooltip tooltip="Determines the starting technology levels for all players"/></label>
           <div class="col">
-            <input type="range" min="0" max="16" step="1" class="form-range w-100" id="startingTechLevelBanking" v-model="settings.technology.startingTechnologyLevel.banking" :disabled="isCreatingGame">
+            <input type="range" min="0" max="16" step="1" class="form-range w-100" id="startingTechLevelBanking" v-model.number="settings.technology.startingTechnologyLevel.banking" :disabled="isCreatingGame">
           </div>
         </div>
 
         <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="startingTechLevelWeapons" class="col-form-label">Starting Weapons Technology (<span class="text-warning">{{settings.technology.startingTechnologyLevel.weapons}} Weapons</span>) <help-tooltip tooltip="Determines the starting technology levels for all players"/></label>
           <div class="col">
-            <input type="range" min="1" max="16" step="1" class="form-range w-100" id="startingTechLevelWeapons" v-model="settings.technology.startingTechnologyLevel.weapons" :disabled="isCreatingGame">
+            <input type="range" min="1" max="16" step="1" class="form-range w-100" id="startingTechLevelWeapons" v-model.number="settings.technology.startingTechnologyLevel.weapons" :disabled="isCreatingGame">
           </div>
         </div>
 
