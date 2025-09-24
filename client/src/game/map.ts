@@ -337,7 +337,7 @@ export class Map {
       carrier.on('onUnselected', this.onCarrierUnselected.bind(this))
     }
 
-    carrier.update(carrierData, userSettings);
+    carrier.update(game, carrierData, userSettings);
 
     return carrier
   }
@@ -445,17 +445,17 @@ export class Map {
 
     // Update all of the carriers and add new ones that have been built.
     for (let i = 0; i < game.galaxy.carriers.length; i++) {
-      const carrierData = game.galaxy.carriers[i]
+      const carrierData = game.galaxy.carriers[i];
 
-      let existing = this.carriers.find(x => x.data!._id === carrierData._id)
+      let existing = this.carriers.find(x => x.data!._id === carrierData._id);
 
       if (existing) {
-        existing.update(carrierData, userSettings);
+        existing.update(game, carrierData, userSettings);
       } else {
-        existing = this.setupCarrier(game, userSettings, carrierData)
+        existing = this.setupCarrier(game, userSettings, carrierData);
       }
 
-      this.drawCarrier(existing)
+      this.drawCarrier(existing);
     }
 
     this.drawTerritories(userSettings);

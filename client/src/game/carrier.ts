@@ -86,51 +86,47 @@ export class Carrier extends EventEmitter<keyof Events, Events> implements MapOb
   }
 
   getContainer(): Container {
-    return this.container!;
+    return this.container;
   }
 
   getLocation(): Location {
-    return this.data!.location!;
+    return this.data.location;
   }
 
   _getPlayer(): PlayerData {
     return this.game.galaxy.players.find(p => p._id === this.data.ownedByPlayerId!)!;
   }
 
-  update(data: CarrierData, userSettings: UserGameSettings) {
+  update(game: Game, data: CarrierData, userSettings: UserGameSettings) {
+    this.game = game;
     this.data = data;
+    this.userSettings = userSettings;
     this.colour = this.context.getPlayerColour(this.data.ownedByPlayerId!);
 
-    this.container.position.x = data.location.x
+    this.container.position.x = data.location.x;
     this.container.position.y = data.location.y
     // Add a larger hit radius so that the star is easily clickable
-    this.container.hitArea = new Circle(0, 0, 10)
+    this.container.hitArea = new Circle(0, 0, 10);
 
-    this.userSettings = userSettings
-
-    this.clampedScaling = this.userSettings!.map.objectsScaling == 'clamped'
-    this.baseScale = 1
-    this.minScale = this.userSettings!.map.objectsMinimumScale / 4.0
-    this.maxScale = this.userSettings!.map.objectsMaximumScale / 4.0
+    this.clampedScaling = this.userSettings!.map.objectsScaling == 'clamped';
+    this.baseScale = 1;
+    this.minScale = this.userSettings!.map.objectsMinimumScale / 4.0;
+    this.maxScale = this.userSettings!.map.objectsMaximumScale / 4.0;
 
     Carrier.zoomLevel = userSettings.map.zoomLevels.carrierShips
 
-    this.clearPaths() // clear on setup since this is used to reset waypoints
-    this.enableInteractivity()
+    this.clearPaths(); // clear on setup since this is used to reset waypoints
+    this.enableInteractivity();
   }
 
   draw() {
-    this.drawColour()
-    this.drawSelectedCircle()
-    this.drawCarrier()
-    this.drawShips()
-    this.drawSpecialist()
-    this.drawCarrierWaypoints()
-    this.drawDepth()
-  }
-
-  drawActive() {
-    this.drawShips()
+    this.drawColour();
+    this.drawSelectedCircle();
+    this.drawCarrier();
+    this.drawShips();
+    this.drawSpecialist();
+    this.drawCarrierWaypoints();
+    this.drawDepth();
   }
 
   drawShape() {
