@@ -633,7 +633,7 @@ export class Map {
   panToUser (game: Game) {
     const player = gameHelper.getUserPlayer(game);
 
-    if (!player) {
+    if (!player || gameHelper.getStarsOwnedByPlayer(player, game.galaxy.stars).length === 0) {
       const galaxyCenterX = gameHelper.calculateGalaxyCenterX(game);
       const galaxyCenterY = gameHelper.calculateGalaxyCenterY(game);
 
