@@ -623,12 +623,10 @@ export class Map {
   }
 
   panToPlayer (game: Game, player: Player) {
-    const empireCenter = gameHelper.getPlayerEmpireCenter(game, player)
+    const empireCenter = gameHelper.getPlayerTerritoryCenter(game, player);
 
     if (empireCenter) {
-      this.viewport.moveCenter(empireCenter.x, empireCenter.y)
-
-      this.refreshZoom()
+      this.panToLocation(empireCenter);
     }
   }
 
@@ -639,21 +637,21 @@ export class Map {
       const galaxyCenterX = gameHelper.calculateGalaxyCenterX(game);
       const galaxyCenterY = gameHelper.calculateGalaxyCenterY(game);
 
-      this.panToLocation({ x: galaxyCenterX, y: galaxyCenterY })
-      return
+      this.panToLocation({ x: galaxyCenterX, y: galaxyCenterY });
+      return;
     }
 
-    this.panToPlayer(game, player)
+    this.panToPlayer(game, player);
   }
 
   panToObject(object: { location: Location }) {
     this.panToLocation(object.location);
-
-    this.refreshZoom();
   }
 
   panToLocation (location: Location) {
-    this.viewport.moveCenter(location.x, location.y)
+    this.viewport.moveCenter(location.x, location.y);
+
+    this.refreshZoom();
   }
 
   clickStar (starId: string) {
