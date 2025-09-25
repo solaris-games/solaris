@@ -242,7 +242,8 @@ AudioService.loadStore(store);
 store.commit('clearGame');
 
 //A CSS class that will load only on the game screen to prevent drag-bounce behavior
-const GAME_BODY_CLASS = 'game-body'; 
+const GAME_BODY_CLASS = 'game-body';
+
 onMounted(async () => {
   attemptLogin();
   await reloadSettings();
@@ -298,9 +299,11 @@ onUnmounted(() => {
 
   store.commit('clearGame');
 
-  document.title = 'Solaris'
+  document.title = 'Solaris';
+
+  document.body.classList.remove(GAME_BODY_CLASS);
 });
 </script>
 
 <style scoped></style>
-<style> .game-body { overscroll-behavior: none;} </style> 
+<style> .game-body { overscroll-behavior: none;} </style>
