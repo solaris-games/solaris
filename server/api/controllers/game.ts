@@ -55,7 +55,9 @@ export default (container: DependencyContainer) => {
                     game = await container.gameCreateService.create(settings, req.session.userId);
                 }
     
-                res.status(201).json(game._id);
+                res.status(201).json({
+                    gameId: game._id,
+                });
                 return next();
             } catch (err) {
                 log.error(err);

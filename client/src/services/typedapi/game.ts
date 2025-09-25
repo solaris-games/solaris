@@ -1,4 +1,4 @@
-import {createGameRoutes, type Statistics, type GameSettingsSpec, type Flux} from "@solaris-common";
+import {createGameRoutes, type Statistics, type GameSettingsSpec, type Flux, type GameDetailInfo } from "@solaris-common";
 import {doGet, doPost, type ResponseResult} from "./index";
 import { type Axios } from "axios";
 
@@ -18,4 +18,12 @@ export const getCurrentFlux = (axios: Axios) => async (): Promise<ResponseResult
 
 export const getDefaultSettings = (axios: Axios) => async (): Promise<ResponseResult<GameSettingsSpec>> => {
   return doGet(axios)(routes.getDefaultSettings, {}, {});
-};
+}
+
+export const createTutorial = (axios: Axios) => async (tutorialKey?: string): Promise<ResponseResult<{ gameId: string }>> => {
+  return doPost(axios)(routes.createTutorial, { tutorialKey }, {}, {});
+}
+
+export const detailInfo = (axios: Axios) => async (gameId: string): Promise<ResponseResult<GameDetailInfo<string>>> => {
+  return doGet(axios)(routes.detailInfo, { gameId }, {}, {});
+}

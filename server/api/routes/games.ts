@@ -25,15 +25,15 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             controller.create
     );
 
-    router.post('/api/game/tutorial/:tutorialKey?',
+    answer(routes.createTutorial,
             mw.auth.authenticate(),
             controller.createTutorial
     );
 
     router.get('/api/game/tutorial/list',
         controller.listTutorials);
-
-    router.get('/api/game/:gameId/info',
+    
+    answer(routes.detailInfo, 
             mw.game.loadGame({
                 lean: true,
                 settings: true,
