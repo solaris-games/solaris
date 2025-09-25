@@ -15,9 +15,7 @@ const log = logger("Game Controller");
 export default (container: DependencyContainer) => {
     return {
         getDefaultSettings: (req, res, next) => {
-            res.status(200).json({
-                settings: require('../../config/game/settings/user/standard.json'),
-            });
+            res.status(200).json(require('../../config/game/settings/user/standard.json'));
 
             return next();
         },

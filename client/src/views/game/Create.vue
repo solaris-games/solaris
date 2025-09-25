@@ -924,8 +924,8 @@ import router from '../../router'
 import SelectTemplate from "@/views/game/gameCreation/SelectTemplate.vue";
 import { ref, onMounted, inject, type Ref, computed } from 'vue';
 import {GAME_CREATION_OPTIONS, type GameSettingsSpec, type SpecialistBans} from "@solaris-common";
-import {createGame} from "@/services/typedapi/game";
-import {extractErrors, httpInjectionKey, isOk} from "@/services/typedapi";
+import {createGame, getDefaultSettings} from "@/services/typedapi/game";
+import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
 import CustomGalaxy from "@/views/game/gameCreation/CustomGalaxy.vue";
 
@@ -1013,7 +1013,7 @@ const handleSubmit = async (e: Event) => {
 
     router.push({ name: 'game-detail', query: { id: response.data.gameId } })
   } else {
-    console.error(response.cause);
+    console.error(formatError(response));
 
     toast.error('Failed to create game');
     errors.value = extractErrors(response);
@@ -1063,12 +1063,12 @@ const onTeamCountChanged = () => {
 };
 
 onMounted(async () => {
-  try {
-    const response = await gameService.getDefaultGameSettings();
+  const response = await getDefaultSettings(httpClient)();
 
-    settings.value = response.data.settings;
-  } catch (err) {
-    console.error(err)
+  if (isOk(response)) {
+    settings.value = response.data;
+  } else {
+    console.error(formatError(response));
   }
 });
 </script>

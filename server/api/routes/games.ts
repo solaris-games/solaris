@@ -12,12 +12,11 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
     const controller = GameController(container);
     const answer = createRoutes(router, mw);
 
-    router.get('/api/game/defaultSettings',
-            mw.auth.authenticate(),
+    answer(routes.getDefaultSettings,
             controller.getDefaultSettings
     );
 
-    router.get('/api/game/flux',
+    answer(routes.getCurrentFlux,
             controller.getFlux
     );
 
