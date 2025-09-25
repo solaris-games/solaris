@@ -1046,10 +1046,6 @@ const onModeChanged = () => {
   }
 };
 
-const onSpecialistBanSelectionChanged = (e: SpecialistBans) => {
-  settings.value!.specialGalaxy.specialistBans = e;
-};
-
 const onPlayerLimitChanged = () => {
   if (settings.value!.general.playerLimit <= 2) {
     settings.value!.diplomacy.lockedAlliances = 'disabled';
