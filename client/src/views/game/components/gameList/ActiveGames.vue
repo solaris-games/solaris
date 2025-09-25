@@ -92,6 +92,9 @@ import LoadingSpinnerVue from '../../../components/LoadingSpinner.vue'
 import gameService from '../../../../services/api/game'
 import GameHelper from '../../../../services/gameHelper'
 import CountdownTimer from '../CountdownTimer.vue'
+import { loadLocalPreference, storeLocalPreference } from '@/util/localPreference';
+
+const INCLUDE_DEFEATED_PREF_KEY = 'activeGamesIncludeDefeated';
 
 export default {
   components: {
@@ -102,7 +105,7 @@ export default {
     return {
       activeGames: [],
       isLoadingActiveGames: true,
-      includeDefeated: true
+      includeDefeated: loadLocalPreference('INCLUDE_DEFEATED_PREF_KEY', true),
     }
   },
   mounted () {
@@ -157,6 +160,11 @@ export default {
       }
 
       return this.activeGames.filter(g => !g.userNotifications.defeated)
+    }
+  },
+  watch: {
+    includeDefeated: (oldVal, newVal) => {
+      storeLocalPreference(INCLUDE_DEFEATED_PREF_KEY, newVal);
     }
   }
 }
