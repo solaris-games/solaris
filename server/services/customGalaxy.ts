@@ -57,8 +57,14 @@ export default class CustomGalaxyService {
         const validStarSpecialistIdSet = new Set<number>(this.specialistService.listStar(null).filter(s => s.active.custom).map(s => s.id));
 
         for (const star of customGalaxy.stars) {
-            if (star.wormHoleToStarId != null && !starIdSet.has(star.wormHoleToStarId)) {
-                throw new ValidationError(`A star with ID '${star.wormHoleToStarId}' does not exist.`);
+            if (star.wormHoleToStarId != null) {
+                if (star.wormHoleToStarId === star.id) {
+                    throw new ValidationError(`A star cannot have a worm hole to itself.`);
+                }
+            
+                if (!starIdSet.has(star.wormHoleToStarId)) {
+                    throw new ValidationError(`A star with ID '${star.wormHoleToStarId}' does not exist.`);
+                }
             }
 
             if (star.specialistId != null && !validStarSpecialistIdSet.has(star.specialistId)) {
