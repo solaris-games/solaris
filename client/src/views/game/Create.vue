@@ -408,49 +408,49 @@
         <div class="mb-2" v-if="settings.galaxy.galaxyType !== 'custom'">
           <label for="randomWarpGates" class="col-form-label">Random Warp Gates (<span class="text-warning">{{settings.specialGalaxy.randomWarpGates}}%</span>) <help-tooltip tooltip="The percentage of random warp gates are seeded at the start of the game - Warp gates increase carrier movement speed"/></label>
           <div class="col">
-            <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomWarpGates" v-model.number="settings.specialGalaxy.randomWarpGates" :disabled="isCreatingGame">
+            <input type="range" min="0" max="100" step="1" class="form-range w-100" id="randomWarpGates" v-model.number="settings.specialGalaxy.randomWarpGates" :disabled="isCreatingGame">
           </div>
         </div>
 
         <div class="mb-2" v-if="settings.galaxy.galaxyType !== 'custom'">
           <label for="randomWormHoles" class="col-form-label">Random Worm Holes (<span class="text-warning">{{settings.specialGalaxy.randomWormHoles}}%</span>) <help-tooltip tooltip="The percentage of random worm holes are generated in the galaxy - Worm holes provide instant travel between paired worm hole stars"/></label>
           <div class="col">
-            <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomWormHoles" v-model.number="settings.specialGalaxy.randomWormHoles" :disabled="isCreatingGame">
+            <input type="range" min="0" max="100" step="1" class="form-range w-100" id="randomWormHoles" v-model.number="settings.specialGalaxy.randomWormHoles" :disabled="isCreatingGame">
           </div>
         </div>
 
         <div class="mb-2" v-if="settings.galaxy.galaxyType !== 'custom'">
           <label for="randomNebulas" class="col-form-label">Random Nebulas (<span class="text-warning">{{settings.specialGalaxy.randomNebulas}}%</span>) <help-tooltip tooltip="The percentage of random nebulas are generated in the galaxy - Nebulas conceal the infrastructure and ship counts at the star from all other players"/></label>
           <div class="col">
-            <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomNebulas" v-model.number="settings.specialGalaxy.randomNebulas" :disabled="isCreatingGame">
+            <input type="range" min="0" max="100" step="1" class="form-range w-100" id="randomNebulas" v-model.number="settings.specialGalaxy.randomNebulas" :disabled="isCreatingGame">
           </div>
         </div>
 
         <div class="mb-2" v-if="settings.galaxy.galaxyType !== 'custom'">
           <label for="randomAsteroidFields" class="col-form-label">Random Asteroid Fields (<span class="text-warning">{{settings.specialGalaxy.randomAsteroidFields}}%</span>) <help-tooltip tooltip="The percentage of random asteroid fields are generated in the galaxy - Asteroid fields have +1 defender bonus (net +2 weapons) in combat"/></label>
           <div class="col">
-            <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomAsteroidFields" v-model.number="settings.specialGalaxy.randomAsteroidFields" :disabled="isCreatingGame">
+            <input type="range" min="0" max="100" step="1" class="form-range w-100" id="randomAsteroidFields" v-model.number="settings.specialGalaxy.randomAsteroidFields" :disabled="isCreatingGame">
           </div>
         </div>
 
         <div class="mb-2" v-if="settings.galaxy.galaxyType !== 'custom'">
           <label for="randomBinaryStars" class="col-form-label">Random Binary Stars (<span class="text-warning">{{settings.specialGalaxy.randomBinaryStars}}%</span>) <help-tooltip tooltip="The percentage of random binary stars are generated in the galaxy - Binary stars start with additional resources"/></label>
           <div class="col">
-            <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomBinaryStars" v-model.number="settings.specialGalaxy.randomBinaryStars" :disabled="isCreatingGame">
+            <input type="range" min="0" max="100" step="1" class="form-range w-100" id="randomBinaryStars" v-model.number="settings.specialGalaxy.randomBinaryStars" :disabled="isCreatingGame">
           </div>
         </div>
 
         <div class="mb-2" v-if="settings.galaxy.galaxyType !== 'custom'">
           <label for="randomBlackHoles" class="col-form-label">Random Black Holes (<span class="text-warning">{{settings.specialGalaxy.randomBlackHoles}}%</span>) <help-tooltip tooltip="The percentage of random black holes are generated in the galaxy - Black holes cannot have infrastructure but have +3 scanning range"/></label>
           <div class="col">
-            <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomBlackHoles" v-model.number="settings.specialGalaxy.randomBlackHoles" :disabled="isCreatingGame">
+            <input type="range" min="0" max="100" step="1" class="form-range w-100" id="randomBlackHoles" v-model.number="settings.specialGalaxy.randomBlackHoles" :disabled="isCreatingGame">
           </div>
         </div>
 
         <div class="mb-2" v-if="settings.galaxy.galaxyType !== 'custom'">
           <label for="randomPulsars" class="col-form-label">Random Pulsars (<span class="text-warning">{{settings.specialGalaxy.randomPulsars}}%</span>) <help-tooltip tooltip="The percentage of random pulsars are generated in the galaxy - Pulsars are always visible to all players in the game"/></label>
           <div class="col">
-            <input type="range" min="0" max="50" step="1" class="form-range w-100" id="randomPulsars" v-model.number="settings.specialGalaxy.randomPulsars" :disabled="isCreatingGame">
+            <input type="range" min="0" max="100" step="1" class="form-range w-100" id="randomPulsars" v-model.number="settings.specialGalaxy.randomPulsars" :disabled="isCreatingGame">
           </div>
         </div>
 
