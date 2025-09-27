@@ -136,7 +136,7 @@ const specialStarNumber = numberAdv({
     integer: true,
     range: {
         from: 0,
-        to: 50,
+        to: 100,
     }
 });
 
