@@ -5,6 +5,7 @@ import type {GameConstants, GameSettings, GameSettingsGalaxyBase, GameSettingsGe
     GameSettingsSpecialGalaxyBase,
     GameState
 } from "../types/common/game";
+import { type Tutorial } from "../types/common/tutorial";
 
 export type GameSettingsGalaxyUnparsed = GameSettingsGalaxyBase & {
     customGalaxy?: string,
@@ -31,5 +32,7 @@ export const createGameRoutes = <ID>() => ({
     getCurrentFlux: new GetRoute<{}, {}, Flux | null>("/api/game/flux"),
     create: new PostRoute<{}, {}, GameSettingsSpec, { gameId: ID }>("/api/game/"),
     createTutorial: new PostRoute<{ tutorialKey?: string }, {}, {}, { gameId: ID }>("/api/game/tutorial/:tutorialKey?"),
-    detailInfo: new GetRoute<{ gameId: string }, {}, GameDetailInfo<ID>>("/api/game/:gameId/info"),
+    listTutorials: new SimpleGetRoute<Tutorial[]>("/api/game/tutorial/list"),
+    detailInfo: new GetRoute<{ gameId: ID }, {}, GameDetailInfo<ID>>("/api/game/:gameId/info"),
+    detailState: new GetRoute<{ gameId: ID }, {}, GameInfoState<ID>>("/api/game/:gameId/state"),
 });

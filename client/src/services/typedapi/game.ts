@@ -1,4 +1,4 @@
-import {createGameRoutes, type Statistics, type GameSettingsSpec, type Flux, type GameDetailInfo } from "@solaris-common";
+import {createGameRoutes, type Statistics, type GameSettingsSpec, type Flux, type GameDetailInfo, type Tutorial, type GameInfoState } from "@solaris-common";
 import {doGet, doPost, type ResponseResult} from "./index";
 import { type Axios } from "axios";
 
@@ -21,9 +21,17 @@ export const getDefaultSettings = (axios: Axios) => async (): Promise<ResponseRe
 }
 
 export const createTutorial = (axios: Axios) => async (tutorialKey?: string): Promise<ResponseResult<{ gameId: string }>> => {
-  return doPost(axios)(routes.createTutorial, { tutorialKey }, {}, {});
+  return doPost(axios)(routes.createTutorial, { tutorialKey }, {}, { withCredentials: true });
+}
+
+export const listTutorials = (axios: Axios) => async (): Promise<ResponseResult<Tutorial>> => {
+  return doGet(axios)(routes.listTutorials, {}, {}, { withCredentials: true });
 }
 
 export const detailInfo = (axios: Axios) => async (gameId: string): Promise<ResponseResult<GameDetailInfo<string>>> => {
-  return doGet(axios)(routes.detailInfo, { gameId }, {}, {});
+  return doGet(axios)(routes.detailInfo, { gameId }, {}, { withCredentials: true });
+}
+
+export const detailState = (axios: Axios) => async (gameId: string): Promise<ResponseResult<GameInfoState<string>>> => {
+  return doGet(axios)(routes.detailState, { gameId }, {}, { withCredentials: true });
 }

@@ -30,7 +30,8 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             controller.createTutorial
     );
 
-    router.get('/api/game/tutorial/list',
+    answer(routes.listTutorials,
+        mw.auth.authenticate(),
         controller.listTutorials);
     
     answer(routes.detailInfo, 
@@ -57,7 +58,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             controller.detailInfo
     );
 
-    router.get('/api/game/:gameId/state',
+    answer(routes.detailState,
             mw.game.loadGame({
                 lean: true,
                 state: true

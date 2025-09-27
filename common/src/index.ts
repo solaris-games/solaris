@@ -25,6 +25,7 @@ export * from "./api/types/common/statsSlice";
 export * from "./api/types/common/stats";
 export * from './api/types/common/flux';
 export * from "./api/types/common/customGalaxy";
+export * from "./api/types/common/tutorial";
 export * from "./utilities/cast";
 export * from "./sockets/socketEventNames/player";
 export * from "./sockets/socketEventNames/game";
