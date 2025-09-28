@@ -49,6 +49,9 @@ export default class GameListService {
         const official = games.filter(g => g.settings.general.type !== 'custom');
         const custom = games.filter(g => g.settings.general.type === 'custom');
 
+        official.forEach(g => this.gameService.maskState(g));
+        custom.forEach(g => this.gameService.maskState(g));
+
         return {
             official,
             custom
@@ -56,7 +59,7 @@ export default class GameListService {
     }
 
     async listOfficialGames() {
-        return await this.gameRepo.find({
+        const official = await this.gameRepo.find({
             'settings.general.type': { $nin: ['custom', 'tutorial'] },
             'state.startDate': { $eq: null }
         }, {
@@ -66,10 +69,14 @@ export default class GameListService {
             'settings.general.playerLimit': 1,
             state: 1
         });
+
+        official.forEach(g => this.gameService.maskState(g));
+
+        return official;
     }
 
     async listCustomGames() {
-        return await this.gameRepo.find({
+        const custom = await this.gameRepo.find({
             'settings.general.type': { $eq: 'custom' },
             'state.startDate': { $eq: null }
         }, {
@@ -79,6 +86,10 @@ export default class GameListService {
             'settings.general.playerLimit': 1,
             state: 1
         });
+
+        custom.forEach(g => this.gameService.maskState(g));
+
+        return custom;
     }
 
     async listOpenGames(userId: DBObjectId) {
@@ -132,6 +143,7 @@ export default class GameListService {
         return await Promise.all(games.map(async game => {
             game.userNotifications = await this.getUserPlayerNotifications(game, userId, true, true, true, false);
 
+            this.gameService.maskState(game);
             delete (game as any).conversations;
             delete (game as any).galaxy;
 
@@ -198,7 +210,7 @@ export default class GameListService {
     }
 
     async listSpectating(userId: DBObjectId) {
-        return await this.gameRepo.find({
+        const games = await this.gameRepo.find({
             'state.endDate': { $eq: null }, // Game is in progress
             $and: [{
                     'galaxy.players.spectators': { // User is spectating at least one player.
@@ -226,6 +238,10 @@ export default class GameListService {
             state: 1
         },
         { 'state.endDate': -1 });
+
+        games.forEach(game => this.gameService.maskState(game));
+
+        return games;
     }
 
     async getUserPlayerNotifications(game: Game, userId: DBObjectId, 
@@ -346,6 +362,7 @@ export default class GameListService {
             game.state.openSlots = game.galaxy.players.filter(p => p.isOpenSlot).length;
 
             delete (game as any).galaxy;
+            this.gameService.maskState(game);
         }
 
         return games;

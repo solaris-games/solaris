@@ -156,6 +156,12 @@ export default class GameService extends EventEmitter {
         return game?.settings;
     }
 
+    maskState(game: Game) {
+        game.state.leaderboard = null;
+        game.state.teamLeaderboard = null;
+        game.state.readyToQuitCount = undefined;
+    }
+
     async quit(game: Game, player: Player) {    
         if (game.state.startDate) {
             throw new ValidationError('Cannot quit a game that has started.');
