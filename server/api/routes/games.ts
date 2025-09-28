@@ -70,43 +70,43 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             controller.detailGalaxy
     );
 
-    router.get('',
+    answer(routes.listSummary,
             controller.listSummary
     );
 
-    router.get('/api/game/list/official',
+    answer(routes.listOfficial,
             controller.listOfficial
     );
 
-    router.get('/api/game/list/custom',
+    answer(routes.listCustom,
             controller.listCustom
     );
 
-    router.get('/api/game/list/inprogress',
+    answer(routes.listInProgress,
             controller.listInProgress
     );
 
-    router.get('/api/game/list/completed',
+    answer(routes.listRecentlyCompleted,
             mw.auth.authenticate(),
             controller.listRecentlyCompleted
     );
 
-    router.get('/api/game/list/completed/user',
+    answer(routes.listMyCompleted,
             mw.auth.authenticate(),
             controller.listMyCompleted
     );
 
-    router.get('/api/game/list/active',
+    answer(routes.listActive,
             mw.auth.authenticate(),
             controller.listMyActiveGames
     );
 
-    router.get('/api/game/list/open',
+    answer(routes.listMyOpen,
         mw.auth.authenticate(),
         controller.listMyOpenGames
     );
 
-    router.get('/api/game/list/spectating',
+    answer(routes.listSpectating,
             mw.auth.authenticate(),
             controller.listSpectating
     );

@@ -59,4 +59,12 @@ export const createGameRoutes = <ID>() => ({
     detailState: new GetRoute<{ gameId: ID }, {}, GameInfoState<ID>>("/api/game/:gameId/state"),
     detailGalaxy: new GetRoute<{ gameId: ID }, {}, GameGalaxy<ID>>("/api/game/:gameId/galaxy"),
     listSummary: new GetRoute<{}, {}, GameListSummary<ID>>("/api/game/list/summary"),
+    listOfficial: new GetRoute<{}, {}, ListGame<ID>[]>("/api/game/list/official"),
+    listCustom: new GetRoute<{}, {}, ListGame<ID>[]>("/api/game/list/custom"),
+    listInProgress: new GetRoute<{}, {}, ListGame<ID>[]>("/api/game/list/inprogress"),
+    listRecentlyCompleted: new GetRoute<{}, {}, ListGame<ID>[]>("/api/game/list/completed"),
+    listMyCompleted: new GetRoute<{}, {}, ListGame<ID>[]>("/api/game/list/completed/user"),
+    listActive: new GetRoute<{}, {}, ListGame<ID>[]>("/api/game/list/active"),
+    listMyOpen: new GetRoute<{}, {}, ListGame<ID>[]>("/api/game/list/open"),
+    listSpectating: new GetRoute<{}, {}, ListGame<ID>[]>("/api/game/list/spectating"),
 });

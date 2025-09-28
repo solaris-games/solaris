@@ -1,4 +1,4 @@
-import {createGameRoutes, type Statistics, type GameSettingsSpec, type Flux, type GameDetailInfo, type Tutorial, type GameInfoState, type GameGalaxy } from "@solaris-common";
+import {createGameRoutes, type Statistics, type GameSettingsSpec, type Flux, type GameDetailInfo, type Tutorial, type GameInfoState, type GameGalaxy, type GameListSummary, type ListGame } from "@solaris-common";
 import {doGet, doPost, type ResponseResult} from "./index";
 import { type Axios } from "axios";
 
@@ -40,3 +40,38 @@ export const detailGalaxy = (axios: Axios) => async (gameId: string): Promise<Re
   return doGet(axios)(routes.detailGalaxy, { gameId }, {}, { withCredentials: true });
 }
 
+export const listSummary = (axios: Axios) => async (): Promise<ResponseResult<GameListSummary<string>>> => {
+  return doGet(axios)(routes.listSummary, {}, {}, { withCredentials: true });
+}
+
+export const listOfficial = (axios: Axios) => async (): Promise<ResponseResult<ListGame<string>[]>> => {
+  return doGet(axios)(routes.listOfficial, {}, {}, { withCredentials: true });
+}
+
+export const listCustom = (axios: Axios) => async (): Promise<ResponseResult<ListGame<string>[]>> => {
+  return doGet(axios)(routes.listCustom, {}, {}, { withCredentials: true });
+}
+
+export const listInProgress = (axios: Axios) => async (): Promise<ResponseResult<ListGame<string>[]>> => {
+  return doGet(axios)(routes.listInProgress, {}, {}, { withCredentials: true });
+}
+
+export const listRecentlyCompleted = (axios: Axios) => async (): Promise<ResponseResult<ListGame<string>[]>> => {
+  return doGet(axios)(routes.listRecentlyCompleted, {}, {}, { withCredentials: true });
+}
+
+export const listMyCompleted = (axios: Axios) => async (): Promise<ResponseResult<ListGame<string>[]>> => {
+  return doGet(axios)(routes.listMyCompleted, {}, {}, { withCredentials: true });
+}
+
+export const listActive = (axios: Axios) => async (): Promise<ResponseResult<ListGame<string>[]>> => {
+  return doGet(axios)(routes.listActive, {}, {}, { withCredentials: true });
+}
+
+export const listMyOpen = (axios: Axios) => async (): Promise<ResponseResult<ListGame<string>[]>> => {
+  return doGet(axios)(routes.listMyOpen, {}, {}, { withCredentials: true });
+}
+
+export const listSpectating = (axios: Axios) => async (): Promise<ResponseResult<ListGame<string>[]>> => {
+  return doGet(axios)(routes.listSpectating, {}, {}, { withCredentials: true });
+}
