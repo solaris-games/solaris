@@ -4,8 +4,7 @@ import { Payment } from "./types/Payment";
 import CacheService from "./cache";
 import UserService from "./user";
 import { Config } from "../config/types/Config";
-
-const axios = require('axios');
+import axios from 'axios';
 
 const CURRENCY = 'GBP';
 const CACHE_KEY_TOKEN = 'paypalToken';
@@ -63,8 +62,8 @@ export default class PaypalService {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             auth: {
-                username: this.config.paypal.clientId,
-                password: this.config.paypal.clientSecret
+                username: this.config.paypal.clientId!,
+                password: this.config.paypal.clientSecret!
             }
         });
 

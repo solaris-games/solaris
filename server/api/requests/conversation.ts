@@ -1,4 +1,4 @@
-import ValidationError from "../../errors/validation";
+import { ValidationError } from "solaris-common";
 import { DBObjectId } from "../../services/types/DBObjectId";
 import { keyHasArrayValue, keyHasStringValue } from "./helpers";
 

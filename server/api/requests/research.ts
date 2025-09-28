@@ -1,4 +1,4 @@
-import ValidationError from "../../errors/validation";
+import { ValidationError } from "solaris-common";
 import { ResearchType, ResearchTypeNotRandom } from "../../services/types/Player";
 import { keyHasStringValue } from "./helpers";
 

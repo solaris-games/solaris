@@ -41,7 +41,6 @@ const schema = new Schema({
         renown: {type: Types.Number, default: 0},
         joined: {type: Types.Number, default: 0},
         completed: {type: Types.Number, default: 0},
-        quit: {type: Types.Number, default: 0},
         defeated: {type: Types.Number, default: 0},
         defeated1v1: {type: Types.Number, default: 0},
         afk: {type: Types.Number, default: 0},

@@ -18,7 +18,8 @@
         "afkSlotsOpen": "enabled",
         "readyToQuit": "enabled",
         "readyToQuitFraction": 0.9,
-        "readyToQuitVisibility": "anonymous"
+        "readyToQuitVisibility": "anonymous",
+        "awardRankTo": "all"
     },
     "galaxy": {
         "galaxyType": "irregular",
@@ -120,7 +121,10 @@
         "experimentationDistribution": "random",
         "bankingReward": "standard",
         "experimentationReward": "standard",
-        "specialistTokenReward": "experimental"
+        "specialistTokenReward": "experimental",
+        "researchCostProgression": {
+            "progression": "standard"
+        }
     },
     "gameTime": {
         "gameType": "realTime",

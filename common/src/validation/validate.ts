@@ -1,12 +1,12 @@
-import ValidationError from "../errors/validation";
-import { DBObjectId, objectIdFromString } from "../services/types/DBObjectId";
+import { ValidationError } from "./error";
 
 export type Validator<T> = (value: any) => T;
 
 const failed = (expected: string, value: any) => {
-    return new ValidationError(`Expected ${expected}, but got: ${value.toString().substring(1000)} ${typeof value}`);
-}
+    const got = value === null ? "null" : value === undefined ? "undefined" : value.toString().substring(1000);
 
+    return new ValidationError(`Expected ${expected}, but got: ${got} (type ${typeof value})`);
+}
 
 export const ok = <T>(value: T): Validator<T> => {
     return (_) => value;
@@ -52,7 +52,7 @@ export const bind = <A, B>(binder: (a: A) => Validator<B>, validator: Validator<
 }
 
 export const named = <A>(name: string, validator: Validator<A>) => {
-    return v => {
+    return (v: any) => {
         try {
             return validator(v);
         } catch (e) {
@@ -80,10 +80,34 @@ export const or = <A, B>(a: Validator<A>, b: Validator<B>): Validator<A | B> => 
         try {
             return a(v);
         } catch (e) {
-            return b(v);
+            try {
+                return b(v);
+            } catch (e2) {
+                throw new ValidationError(`Both alternatives failed:\n  - ${e}\n  - ${e2}`);
+            }
         }
     }
 }
+
+export const nullish: Validator<null> = v => {
+    if (v === null || v === undefined) {
+        return null;
+    }
+
+    throw failed("null or undefined", v);
+}
+
+export const undefinedish: Validator<undefined> = v => {
+    if (v === undefined || v === null) {
+        return undefined;
+    }
+
+    throw failed("null or undefined", v);
+}
+
+export const maybeNull = <A>(validator: Validator<A>): Validator<A | null> => or(validator, nullish);
+
+export const maybeUndefined = <A>(validator: Validator<A>): Validator<A | undefined> => or(validator, undefinedish);
 
 export const just = <A>(value: A): Validator<A> => {
     return v => {
@@ -135,7 +159,7 @@ export const object = <T>(objValidator: ObjectValidator<T>): Validator<T> => {
 
         for (const key of Object.keys(objValidator)) {
             try {
-                const validator: Validator<any> = objValidator[key];
+                const validator: Validator<any> = objValidator[key as keyof T];
                 n[key] = validator(v[key]);
             } catch (e) {
                 const err = e as ValidationError;
@@ -158,7 +182,16 @@ export const stringEnumeration = <A extends string, M extends A[]>(members: read
     }
 }
 
-export const objectId: Validator<DBObjectId> = map(objectIdFromString, string);
+export const numberEnumeration = <A extends number, M extends A[]>(members: readonly [any, ...M]): Validator<A> => {
+    return v => {
+        const n = number(v);
+        if (members.includes(n as A)) {
+            return n as A;
+        }
+
+        throw failed(members.join(", "), v)
+    }
+}
 
 type NumberValidationProps = {
     sign?: 'positive' | 'negative',

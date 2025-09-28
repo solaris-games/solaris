@@ -15,7 +15,8 @@
         "advancedAI": "disabled",
         "spectators": "enabled",
         "afkSlotsOpen": "enabled",
-        "readyToQuit": "enabled"
+        "readyToQuit": "enabled",
+        "awardRankTo": "all"
     },
     "galaxy": {
         "galaxyType": "circular-balanced",
@@ -45,7 +46,10 @@
         "carrierSpeed": 10,
         "starCaptureReward": "enabled",
         "specialistBans": {
-            "star": [16, 17],
+            "star": [
+                16,
+                17
+            ],
             "carrier": []
         }
     },
@@ -111,14 +115,13 @@
             "weapons": "none",
             "specialists": "standard"
         },
-        "researchCostProgression": {
-            "progression": "standard",
-            "growthFactor": "medium"
-        },
         "experimentationDistribution": "random",
         "bankingReward": "standard",
         "experimentationReward": "standard",
-        "specialistTokenReward": "standard"
+        "specialistTokenReward": "standard",
+        "researchCostProgression": {
+            "progression": "standard"
+        }
     },
     "gameTime": {
         "speed": 3600,

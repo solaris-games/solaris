@@ -1,5 +1,5 @@
 import { LedgerType } from "solaris-common";
-import ValidationError from "../errors/validation";
+import { ValidationError } from "solaris-common";
 import PlayerService from "./player";
 import PlayerCreditsService from "./playerCredits";
 import Repository from "./repository";

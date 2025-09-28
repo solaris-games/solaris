@@ -1,4 +1,4 @@
-import { Flux } from "./types/Flux";
+import { Flux } from "solaris-common";
 import { Game } from "./types/Game";
 
 const moment = require('moment');

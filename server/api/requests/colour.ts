@@ -1,4 +1,4 @@
-import {object, string, Validator} from "../validate";
+import {object, string, Validator} from "../../../common/src/validation/validate";
 
 export type ColourOverrideRequest = {
     playerId: string;

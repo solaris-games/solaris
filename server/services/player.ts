@@ -18,12 +18,16 @@ import StarService from './star';
 import StarDistanceService from './starDistance';
 import TechnologyService from './technology';
 import TeamService from "./team";
-import ValidationError from '../errors/validation';
+import { ValidationError } from "solaris-common";
 import {shuffle} from "./utils";
 import { Carrier } from "./types/Carrier";
 import { Star } from "./types/Star";
 import PlayerColourService from "./playerColour";
 import {MathRandomGen} from "../utils/randomGen";
+import InitialGameStateService from "./initialGameState";
+import { logger } from "../utils/logging";
+
+const log = logger("Player Service");
 
 export default class PlayerService extends EventEmitter {
     gameRepo: Repository<Game>;
@@ -38,6 +42,7 @@ export default class PlayerService extends EventEmitter {
     playerReadyService: PlayerReadyService;
     teamService: TeamService;
     playerColourService: PlayerColourService;
+    initialGameStateService: InitialGameStateService;
 
     constructor(
         gameRepo: Repository<Game>,
@@ -52,6 +57,7 @@ export default class PlayerService extends EventEmitter {
         playerReadyService: PlayerReadyService,
         teamService: TeamService,
         playerColourService: PlayerColourService,
+        initialGameStateService: InitialGameStateService,
     ) {
         super();
 
@@ -67,6 +73,7 @@ export default class PlayerService extends EventEmitter {
         this.playerReadyService = playerReadyService;
         this.teamService = teamService;
         this.playerColourService = playerColourService;
+        this.initialGameStateService = initialGameStateService;
     }
 
     getById(game: Game, playerId: DBObjectId) {
@@ -182,7 +189,7 @@ export default class PlayerService extends EventEmitter {
             }
 
             const playersPerTeam = game.settings.general.playerLimit / teamsNumber;
-            const teamColourShapeList = this.playerColourService.generateTeamColourShapeList(teamsNumber, playersPerTeam);
+            const teamColourShapeList = this.playerColourService.generateTeamColourShapeList(teamsNumber, new Array<number>(teamsNumber).fill(playersPerTeam));
 
             for (let ti = 0; ti < teamsNumber; ti++) {
                 const team: Team = {
@@ -329,7 +336,9 @@ export default class PlayerService extends EventEmitter {
         }
     }
 
-    resetPlayerForGameStart(game: Game, player: Player) {
+    async resetPlayerForGameStart(game: Game, player: Player) {
+        const playerId = player._id.toString();
+
         player.userId = null;
         player.alias = "Empty Slot";
         player.avatar = null;
@@ -340,27 +349,56 @@ export default class PlayerService extends EventEmitter {
         player.readyToQuit = false;
         player.isOpenSlot = true;
         player.spectators = [];
+        player.scheduledActions = [];
+        player.lastSeen = null;
+        player.lastSeenIP = null;
 
-        // TODO: What to do with custom galaxies?
+        const initialGameState = (await this.initialGameStateService.getByGameId(game._id));
 
-        // Reset the player's research
-        const defaultTech = this.technologyService.getDefaultTechnology(game);
-        player.researchingNow = defaultTech;
-        player.researchingNext = defaultTech;
+        if (!initialGameState) {
+            log.error(`Fatal: Player ${player._id} cannot quit game ${game.settings.general.name} (${game._id}) because no initial game state exists`);
+
+            throw new ValidationError("Failed to quit game", 500);
+        }
+
+        const initialPlayer = initialGameState.galaxy.players.find(p => p._id.toString() === playerId)!;
+
+        player.researchingNow = initialPlayer.researchingNow;
+        player.researchingNext = initialPlayer.researchingNext;
+        player.research = initialPlayer.research;
+        player.diplomacy = initialPlayer.diplomacy;
 
         // Reset the player's stars.
         const playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
         for (let star of playerStars) {
-            this.starService.setupPlayerStarForGameStart(game, star, player);
+            const initialStar = initialGameState?.galaxy.stars.find(s => s._id.toString() === star._id.toString())!;
+
+            star.homeStar = initialStar.homeStar;
+            star.ignoreBulkUpgrade = undefined;
+            star.infrastructure = initialStar.infrastructure;
+            star.isAsteroidField = initialStar.isAsteroidField;
+            star.isNebula = initialStar.isNebula;
+            star.isBinaryStar = initialStar.isBinaryStar;
+            star.isBlackHole = initialStar.isBlackHole;
+            star.isPulsar = initialStar.isPulsar;
+            star.isKingOfTheHillStar = initialStar.isKingOfTheHillStar;
+            star.name = initialStar.name;
+            star.naturalResources = initialStar.naturalResources;
+            star.ownedByPlayerId = initialStar.ownedByPlayerId;
+            star.ships = initialStar.ships;
+            star.specialistId = initialStar.specialistId;
+            star.specialistExpireTick = initialStar.specialistExpireTick;
+            star.warpGate = initialStar.warpGate;
+            star.wormHoleToStarId = star.wormHoleToStarId;
         }
 
         // Reset the player's carriers
         this.carrierService.clearPlayerCarriers(game, player);
 
-        let homeCarrier = this.createHomeStarCarrier(game, player);
+        const initialCarriers = initialGameState.galaxy.carriers.filter(c => c.ownedByPlayerId?.toString() === playerId);
 
-        game.galaxy.carriers.push(homeCarrier as any);
+        game.galaxy.carriers.push(...initialCarriers);
     }
 
     _getNewPlayerHomeStar(game: Game, starLocations: Location[], galaxyCenter: Location, distanceFromCenter: number, radians: number[]) {

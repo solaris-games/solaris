@@ -16,7 +16,8 @@
         "spectators": "enabled",
         "afkSlotsOpen": "enabled",
         "readyToQuit": "enabled",
-        "readyToQuitFraction": 0.9
+        "readyToQuitFraction": 0.9,
+        "awardRankTo": "all"
     },
     "galaxy": {
         "galaxyType": "irregular",
@@ -118,7 +119,10 @@
         "experimentationDistribution": "random",
         "bankingReward": "standard",
         "experimentationReward": "standard",
-        "specialistTokenReward": "experimental"
+        "specialistTokenReward": "experimental",
+        "researchCostProgression": {
+            "progression": "standard"
+        }
     },
     "gameTime": {
         "gameType": "turnBased",

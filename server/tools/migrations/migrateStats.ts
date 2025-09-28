@@ -1,5 +1,5 @@
 import {JobParameters} from "../tool";
-import {AwardedBadge, UserAchievements} from "@solaris-common";
+import {AwardedBadge, UserAchievements} from "solaris-common";
 import {User} from "../../services/types/User";
 import {DBObjectId} from "../../services/types/DBObjectId";
 import {Statistics} from "solaris-common";
@@ -93,7 +93,6 @@ const moveStats = (user: User) => {
         renownSent: oldAchievements.trade.renownSent,
         joined: oldAchievements.joined,
         completed: oldAchievements.completed,
-        quit: oldAchievements.quit,
         defeated: oldAchievements.defeated,
         defeated1v1: oldAchievements.defeated1v1,
         afk: oldAchievements.afk,

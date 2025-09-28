@@ -1,6 +1,7 @@
 import { DBObjectId } from "../../services/types/DBObjectId";
 import { InfrastructureType } from "../../services/types/Star";
-import {boolean, numberAdv, object, objectId, string, stringEnumeration, Validator} from "../validate";
+import {boolean, numberAdv, object, string, stringEnumeration, Validator} from "../../../common/src/validation/validate";
+import {objectId} from "../../utils/validation";
 
 export interface StarUpgradeInfrastructureRequest {
     starId: DBObjectId;

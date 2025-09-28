@@ -1,11 +1,12 @@
 import {DependencyContainer} from "../../services/types/DependencyContainer";
-import {Game, GameSettings} from "../../services/types/Game";
+import {Game} from "../../services/types/Game";
 import {OfficialGameCategory, OfficialGameKind} from "../../config/officialGames";
 import {logger} from "../../utils/logging";
+import {GameSettingsReq} from "../../services/gameCreate";
 
 const log = logger("Official Games Check Job");
 
-const chooseSetting = (container: DependencyContainer, category: OfficialGameCategory): GameSettings => {
+const chooseSetting = (container: DependencyContainer, category: OfficialGameCategory): GameSettingsReq => {
     if (category.kind === OfficialGameKind.Standard) {
         return category.settings;
     } else if (category.kind === OfficialGameKind.Carousel) {
@@ -42,7 +43,7 @@ export const officialGamesCheckJob = (container: DependencyContainer) => async (
                 const existingRunning = findExistingGame(category, runningGames);
                 const existingTemplate = existingRunning?.settings.general.createdFromTemplate;
 
-                let newSetting: GameSettings;
+                let newSetting: GameSettingsReq;
                 if (existingRunning && existingTemplate && category.kind === OfficialGameKind.Carousel && category.distribution === 'sequential') {
                     const index = category.rotation.findIndex(x => x.general.createdFromTemplate && x.general.createdFromTemplate === existingTemplate);
                     const nextIndex = (index + 1) % category.rotation.length;
@@ -52,7 +53,7 @@ export const officialGamesCheckJob = (container: DependencyContainer) => async (
                 }
 
                 try {
-                    const newGame = await container.gameCreateService.create(newSetting);
+                    const newGame = await container.gameCreateService.create(newSetting, null);
 
                     log.info(`${newGame.settings.general.type} game created: ${newGame.settings.general.name}`);
                 } catch (e) {

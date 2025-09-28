@@ -5,7 +5,7 @@ import { Game } from "../services/types/Game";
 import { GameHistory, GameHistoryCarrier } from "../services/types/GameHistory";
 import { JobParameters, makeJob } from "./tool";
 import { DependencyContainer } from "../services/types/DependencyContainer";
-import {Specialist} from "@solaris-common";
+import {Specialist} from "solaris-common";
 
 const loadHistory = async (container: DependencyContainer, gameId: DBObjectId, tick: number) => {
     const history = await container.historyService.getHistoryByTick(gameId, tick);

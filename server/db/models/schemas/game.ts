@@ -80,13 +80,13 @@ const schema = new Schema({
 			warpgateCost: { type: Types.String, required: true, enum: ['none', 'cheap', 'standard', 'expensive'], default: 'standard' },
 			specialistCost: { type: Types.String, required: true, enum: ['none', 'standard', 'expensive', 'veryExpensive', 'crazyExpensive'], default: 'standard' },
 			specialistsCurrency: { type: Types.String, required: true, enum: ['credits', 'creditsSpecialists'], default: 'credits' },
-			randomWarpGates: { type: Types.Number, min: 0, max: 50, default: 0 },
-			randomWormHoles: { type: Types.Number, min: 0, max: 50, default: 0 },
-			randomNebulas: { type: Types.Number, min: 0, max: 50, default: 0 },
-			randomAsteroidFields: { type: Types.Number, min: 0, max: 50, default: 0 },
-			randomBinaryStars: { type: Types.Number, min: 0, max: 50, default: 0 },
-			randomBlackHoles: { type: Types.Number, min: 0, max: 50, default: 0 },
-			randomPulsars: { type: Types.Number, min: 0, max: 50, default: 0 },
+			randomWarpGates: { type: Types.Number, min: 0, max: 100, default: 0 },
+			randomWormHoles: { type: Types.Number, min: 0, max: 100, default: 0 },
+			randomNebulas: { type: Types.Number, min: 0, max: 100, default: 0 },
+			randomAsteroidFields: { type: Types.Number, min: 0, max: 100, default: 0 },
+			randomBinaryStars: { type: Types.Number, min: 0, max: 100, default: 0 },
+			randomBlackHoles: { type: Types.Number, min: 0, max: 100, default: 0 },
+			randomPulsars: { type: Types.Number, min: 0, max: 100, default: 0 },
 			darkGalaxy: { type: Types.String, required: true, enum: ['disabled', 'fog', 'standard', 'extra', 'start'], default: 'start' },
 			giftCarriers: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },
 			defenderBonus: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },
@@ -106,7 +106,7 @@ const schema = new Schema({
 			victoryCondition: { type: Types.String, required: true, enum: ['starPercentage', 'homeStarPercentage'], default: 'starPercentage' },
 			victoryPercentage: { type: Types.Number, required: true, enum: [25, 33, 50, 66, 75, 90, 100], default: 50 },
 			capitalStarElimination: { type: Types.String, required: true, enum: ['enabled', 'disabled'], default: 'disabled' },
-			teamsCount: { type: Types.Number, required: false, default: null }
+			teamsCount: { type: Types.Number, required: false, default: null, min: 2, max: 32 }
 		},
 		kingOfTheHill: {
 			productionCycles: { type: Types.Number, required: false, min: 1, max: 25, default: 10 }

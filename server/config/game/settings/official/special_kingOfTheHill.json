@@ -17,12 +17,16 @@
         "spectators": "enabled",
         "afkSlotsOpen": "enabled",
         "readyToQuit": "enabled",
-        "readyToQuitFraction": 0.9
+        "readyToQuitFraction": 0.9,
+        "awardRankTo": "all"
     },
     "galaxy": {
         "galaxyType": "circular",
         "starsPerPlayer": 10,
         "productionTicks": 20
+    },
+    "kingOfTheHill": {
+        "productionCycles": 10
     },
     "specialGalaxy": {
         "carrierCost": "standard",
@@ -119,7 +123,10 @@
         "experimentationDistribution": "random",
         "bankingReward": "standard",
         "experimentationReward": "standard",
-        "specialistTokenReward": "experimental"
+        "specialistTokenReward": "experimental",
+        "researchCostProgression": {
+            "progression": "standard"
+        }
     },
     "gameTime": {
         "gameType": "realTime",

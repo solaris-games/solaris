@@ -1004,36 +1004,6 @@ class GameHelper {
     return closestStar.location
   }
 
-  // For centering the player viewport. Will default to some useful value if player has no territory
-  getPlayerEmpireCenter(game: Game, player: Player): Location {
-    // Get all of the player's stars.
-    const playerStars = this.getStarsOwnedByPlayer(player, game.galaxy.stars)
-
-    if (!playerStars.length) {
-      const playerCarriers = game.galaxy.carriers.filter(car => car.ownedByPlayerId === player._id);
-
-      if (playerCarriers.length === 0) {
-        return {
-          x: this.calculateGalaxyCenterX(game),
-          y: this.calculateGalaxyCenterY(game),
-        };
-      }
-
-      const centerX = playerCarriers.reduce((sum, c) => sum + c.location.x, 0) / playerCarriers.length
-      const centerY = playerCarriers.reduce((sum, c) => sum + c.location.y, 0) / playerCarriers.length
-
-      return { x: centerX, y: centerY };
-    }
-
-    // Work out the center point of all stars
-    const centerX = playerStars.reduce((sum, s) => sum + s.location.x, 0) / playerStars.length
-    const centerY = playerStars.reduce((sum, s) => sum + s.location.y, 0) / playerStars.length
-
-    const closestStar = this.getClosestPlayerStar(game.galaxy.stars, { x: centerX, y: centerY }, player)
-
-    return closestStar.location
-  }
-
   getGamePlayerShapesCount(game) {
     return new Set([...game.galaxy.players.map(p => p.shape)]).size
   }
