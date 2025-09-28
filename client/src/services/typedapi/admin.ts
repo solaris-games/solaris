@@ -1,4 +1,4 @@
-import {type Announcement, createAdminRoutes, type CreateAnnouncementReq, type GetInsight, type ListGame, type ListPasswordReset, type ListUser, type SettingEnabledDisabled, type Conversation, type ConversationMessage, type Report, type ImpersonateResp } from "@solaris-common";
+import {type Announcement, createAdminRoutes, type CreateAnnouncementReq, type GetInsight, type AdminListGame, type ListPasswordReset, type ListUser, type SettingEnabledDisabled, type Conversation, type ConversationMessage, type Report, type ImpersonateResp } from "@solaris-common";
 import type { Axios } from "axios";
 import {doGet, doPost, doPatch, type ResponseResult, doDelete} from ".";
 
@@ -64,7 +64,7 @@ export const endImpersonate = (axios: Axios) => async (): Promise<ResponseResult
   return doPost(axios)(routes.endImpersonate, {}, {}, {}, { withCredentials: true});
 }
 
-export const listGames = (axios: Axios) => async (): Promise<ResponseResult<ListGame<string>[]>> => {
+export const listGames = (axios: Axios) => async (): Promise<ResponseResult<AdminListGame<string>[]>> => {
   return doGet(axios)(routes.listGames, {}, {}, { withCredentials: true});
 }
 

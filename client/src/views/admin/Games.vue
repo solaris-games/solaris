@@ -65,7 +65,7 @@
 import LoadingSpinner from "../components/LoadingSpinner.vue";
 import AdministrationPage from "./AdministrationPage.vue";
 import { ref, inject, onMounted, computed, type Ref } from 'vue';
-import type { ListGame } from '@solaris-common';
+import type { AdminListGame } from '@solaris-common';
 import { httpInjectionKey, isOk, isError, formatError } from '@/services/typedapi';
 import { listGames, resetQuitters as requestResetQuitters, setGameFeatured, finishGame, setGameTimeMachine } from '@/services/typedapi/admin';
 import { toastInjectionKey } from '@/util/keys';
@@ -79,15 +79,15 @@ const toast = inject(toastInjectionKey)!;
 const store: Store<State> = useStore();
 const confirm = makeConfirm(store);
 
-const games: Ref<ListGame<string>[] | null> = ref(null);
+const games: Ref<AdminListGame<string>[] | null> = ref(null);
 
 const isAdministrator = computed(() => store.state.roles.administrator);
 const isCommunityManager = computed(() => isAdministrator.value || store.state.roles.communityManager);
 const isGameMaster = computed(() => isAdministrator.value || store.state.roles.gameMaster);
 
-const gameNeedsAttention = (game: ListGame<string>) => game.state.endDate && game.state.tick <= 12;
+const gameNeedsAttention = (game: AdminListGame<string>) => game.state.endDate && game.state.tick <= 12;
 
-const resetQuitters = async (game: ListGame<string>) => {
+const resetQuitters = async (game: AdminListGame<string>) => {
   const response = await requestResetQuitters(httpClient)(game._id);
 
   if (isError(response)) {
@@ -95,7 +95,7 @@ const resetQuitters = async (game: ListGame<string>) => {
   }
 };
 
-const toggleFeaturedGame = async (game: ListGame<string>) => {
+const toggleFeaturedGame = async (game: AdminListGame<string>) => {
   const newState = !game.settings.general.featured;
   const response = await setGameFeatured(httpClient)(game._id, newState);
 
@@ -106,7 +106,7 @@ const toggleFeaturedGame = async (game: ListGame<string>) => {
   }
 };
 
-const forceGameFinish = async (game: ListGame<string>) => {
+const forceGameFinish = async (game: AdminListGame<string>) => {
   if (!isAdministrator.value || !game.state.startDate || game.state.endDate) {
     return;
   }
@@ -123,7 +123,7 @@ const forceGameFinish = async (game: ListGame<string>) => {
   }
 };
 
-const toggleTimeMachineGame = async (game: ListGame<string>) => {
+const toggleTimeMachineGame = async (game: AdminListGame<string>) => {
   let newState;
 
   if (game.settings.general.timeMachine === 'enabled') {

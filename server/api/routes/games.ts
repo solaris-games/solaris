@@ -66,11 +66,11 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             controller.detailState
     );
 
-    router.get('/api/game/:gameId/galaxy',
+    answer(routes.detailGalaxy,
             controller.detailGalaxy
     );
 
-    router.get('/api/game/list/summary',
+    router.get('',
             controller.listSummary
     );
 
