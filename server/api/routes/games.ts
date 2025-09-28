@@ -111,12 +111,12 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             controller.listSpectating
     );
 
-    router.get('/api/game/:gameId/intel',
+    answer(routes.getIntel,
             mw.auth.authenticate(),
             controller.getIntel
     );
 
-    router.put('/api/game/:gameId/join',
+    answer(routes.join,
             mw.auth.authenticate(),
             mw.game.loadGame({
                 lean: false,
@@ -134,7 +134,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             controller.join
     );
 
-    router.put('/api/game/:gameId/quit',
+    answer(routes.quit,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -156,7 +156,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release(true),
     );
 
-    router.put('/api/game/:gameId/concedeDefeat',
+    answer(routes.concedeDefeat,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -177,7 +177,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release(true)
     );
 
-    router.put('/api/game/:gameId/ready',
+    answer(routes.ready, 
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -196,7 +196,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.put('/api/game/:gameId/readytocycle',
+    answer(routes.readyToCycle,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -215,7 +215,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.put('/api/game/:gameId/notready',
+    answer(routes.notReady,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -234,7 +234,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.put('/api/game/:gameId/readyToQuit',
+    answer(routes.readyToQuit,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -253,7 +253,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.put('/api/game/:gameId/notReadyToQuit',
+    answer(routes.notReadyToQuit,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({

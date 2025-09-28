@@ -1,12 +1,13 @@
-import {GetRoute, PostRoute, SimpleGetRoute} from "./index";
+import {GetRoute, PostRoute, PutRoute, SimpleGetRoute} from "./index";
 import type {Statistics} from "../types/common/stats";
 import { type Flux } from "../types/common/flux";
 import type {GameConstants, GameSettings, GameSettingsGalaxyBase, GameSettingsGeneral, GameSettingsGeneralBase, GameSettingsInvariable,
     GameSettingsSpecialGalaxyBase,
     GameState,
-    GameType
 } from "../types/common/game";
 import { type Tutorial } from "../types/common/tutorial";
+import { type PlayerResearch } from "../types/common/player";
+import { type PlayerStatistics } from "../types/common/leaderboard";
 
 export type GameSettingsGalaxyUnparsed = GameSettingsGalaxyBase & {
     customGalaxy?: string,
@@ -48,6 +49,25 @@ export type GameListSummary<ID> = {
     completed: ListGame<ID>[],
 }
 
+export type IntelPlayer<ID> = {
+    playerId: ID,
+    statistics: PlayerStatistics,
+    research: PlayerResearch,
+}
+
+export type Intel<ID> = {
+    gameId: ID,
+    tick: number,
+    players: IntelPlayer<ID>[],
+}
+
+export interface GameJoinGameRequest<ID> {
+    playerId: ID;
+    alias: string;
+    avatar: number;
+    password: string | undefined;
+};
+
 export const createGameRoutes = <ID>() => ({
     getDefaultSettings: new SimpleGetRoute<GameSettingsSpec>("/api/game/defaultSettings"),
     getStatistics: new GetRoute<{ gameId: ID, playerId: ID }, {}, Statistics>("/api/game/:gameId/statistics/:playerId"),
@@ -67,4 +87,14 @@ export const createGameRoutes = <ID>() => ({
     listActive: new GetRoute<{}, {}, ListGame<ID>[]>("/api/game/list/active"),
     listMyOpen: new GetRoute<{}, {}, ListGame<ID>[]>("/api/game/list/open"),
     listSpectating: new GetRoute<{}, {}, ListGame<ID>[]>("/api/game/list/spectating"),
+    getIntel: new GetRoute<{ gameId: ID }, {}, Intel<ID>>("/api/game/:gameId/intel"),
+    join: new PutRoute<{ gameId: ID }, {}, GameJoinGameRequest<ID>, {}>("/api/game/:gameId/join"),
+    quit: new PutRoute<{ gameId: ID }, {}, {}, {}>("/api/game/:gameId/quit"), 
+    concedeDefeat: new PutRoute<{ gameId: ID }, {}, {}, {}>("/api/game/:gameId/concedeDefeat"), 
+    ready: new PutRoute<{ gameId: ID }, {}, {}, {}>("/api/game/:gameId/ready"), 
+    readyToCycle: new PutRoute<{ gameId: ID }, {}, {}, {}>("/api/game/:gameId/readytocycle"), 
+    notReady:  new PutRoute<{ gameId: ID }, {}, {}, {}>("/api/game/:gameId/notready"), 
+    readyToQuit:  new PutRoute<{ gameId: ID }, {}, {}, {}>("/api/game/:gameId/readyToQuit"),    
+    notReadyToQuit:  new PutRoute<{ gameId: ID }, {}, {}, {}>("/api/game/:gameId/notReadyToQuit"), 
+    
 });

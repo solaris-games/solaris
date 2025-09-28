@@ -1,6 +1,4 @@
 import {customGalaxyValidator, ValidationError} from "solaris-common";
-import { CarrierWaypointActionType, CarrierWaypointActionTypes } from "../../services/types/CarrierWaypoint";
-import {CustomGalaxy} from "../../../common/src/api/types/common/customGalaxy";
 import { DBObjectId } from "../../services/types/DBObjectId";
 import {
     object,
@@ -15,7 +13,6 @@ import {
     array,
     boolean,
     stringEnumeration,
-    positiveInteger,
     withDefault,
     numberAdv, maybeNull, maybeUndefined, numberEnumeration, map
 } from "../../../common/src/validation/validate";
@@ -67,7 +64,8 @@ import {
     READY_TO_QUIT_VISIBILITY,
     ReadyToQuitFraction,
     ReadyToQuitTimerCycles,
-    ReadyToQuitVisibility
+    ReadyToQuitVisibility,
+    GameJoinGameRequest,
 } from "solaris-common";
 import type {GameSettingsReq} from "../../services/gameCreate";
 import {objectId} from "../../utils/validation";
@@ -436,14 +434,7 @@ export const parseGameSettingsReq: Validator<GameSettingsReq> = object({
     gameTime: parseGameSettingsGameTime,
 });
 
-export interface GameJoinGameRequest {
-    playerId: DBObjectId;
-    alias: string;
-    avatar: number;
-    password: string | undefined;
-};
-
-export const parseGameJoinGameRequest: Validator<GameJoinGameRequest> = object({
+export const parseGameJoinGameRequest: Validator<GameJoinGameRequest<DBObjectId>> = object({
     playerId: objectId,
     alias: stringValue({
         trim: true,

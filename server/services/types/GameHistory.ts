@@ -1,6 +1,6 @@
 import { DBObjectId } from "./DBObjectId";
 import { Location } from "./Location";
-import { ResearchProgress, ResearchType, ResearchTypeNotRandom } from "./Player";
+import { PlayerResearch, ResearchType, ResearchTypeNotRandom } from "./Player";
 import { IgnoreBulkUpgrade, Infrastructure, NaturalResources } from "./Star";
 
 export interface GameHistoryPlayer {
@@ -32,16 +32,7 @@ export interface GameHistoryPlayer {
     afk: boolean;
     ready: boolean;
     readyToQuit: boolean;
-    research: {
-        scanning: ResearchProgress,
-        hyperspace: ResearchProgress,
-        terraforming: ResearchProgress,
-        experimentation: ResearchProgress,
-        weapons: ResearchProgress,
-        banking: ResearchProgress,
-        manufacturing: ResearchProgress,
-        specialists: ResearchProgress
-    }
+    research: PlayerResearch,
 };
 
 export interface GameHistoryStar {

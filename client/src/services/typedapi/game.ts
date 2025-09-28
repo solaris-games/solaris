@@ -1,5 +1,5 @@
-import {createGameRoutes, type Statistics, type GameSettingsSpec, type Flux, type GameDetailInfo, type Tutorial, type GameInfoState, type GameGalaxy, type GameListSummary, type ListGame } from "@solaris-common";
-import {doGet, doPost, type ResponseResult} from "./index";
+import {createGameRoutes, type Statistics, type GameSettingsSpec, type Flux, type GameDetailInfo, type Tutorial, type GameInfoState, type GameGalaxy, type GameListSummary, type ListGame, type Intel } from "@solaris-common";
+import {doGet, doPost, doPut, type ResponseResult} from "./index";
 import { type Axios } from "axios";
 
 const routes = createGameRoutes<string>();
@@ -74,4 +74,40 @@ export const listMyOpen = (axios: Axios) => async (): Promise<ResponseResult<Lis
 
 export const listSpectating = (axios: Axios) => async (): Promise<ResponseResult<ListGame<string>[]>> => {
   return doGet(axios)(routes.listSpectating, {}, {}, { withCredentials: true });
+}
+
+export const getIntel = (axios: Axios) => async (gameId: string): Promise<ResponseResult<Intel<string>>> => {
+  return doGet(axios)(routes.getIntel, { gameId }, {}, { withCredentials: true });
+}
+
+export const join = (axios: Axios) => async (gameId: string, playerId: string, alias: string, avatar: number, password: string | undefined): Promise<ResponseResult<{}>> => {
+  return doPut(axios)(routes.join, { gameId }, {}, { playerId, alias, avatar, password }, { withCredentials: true });
+}
+
+export const quit = (axios: Axios) => async (gameId: string): Promise<ResponseResult<{}>> => {
+  return doPut(axios)(routes.quit, { gameId }, {}, {}, { withCredentials: true });
+}
+
+export const concedeDefeat = (axios: Axios) => async (gameId: string): Promise<ResponseResult<{}>> => {
+  return doPut(axios)(routes.concedeDefeat, { gameId }, {}, {}, { withCredentials: true });
+}
+
+export const ready = (axios: Axios) => async (gameId: string): Promise<ResponseResult<{}>> => {
+  return doPut(axios)(routes.ready, { gameId }, {}, {}, { withCredentials: true });
+}
+
+export const notReady = (axios: Axios) => async (gameId: string): Promise<ResponseResult<{}>> => {
+  return doPut(axios)(routes.notReady, { gameId }, {}, {}, { withCredentials: true });
+}
+
+export const readyToCycle = (axios: Axios) => async (gameId: string): Promise<ResponseResult<{}>> => {
+  return doPut(axios)(routes.readyToCycle, { gameId }, {}, {}, { withCredentials: true });
+}
+
+export const readyToQuit = (axios: Axios) => async (gameId: string): Promise<ResponseResult<{}>> => {
+  return doPut(axios)(routes.readyToQuit, { gameId }, {}, {}, { withCredentials: true });
+}
+
+export const notReadyToQuit = (axios: Axios) => async (gameId: string): Promise<ResponseResult<{}>> => {
+  return doPut(axios)(routes.notReadyToQuit, { gameId }, {}, {}, { withCredentials: true });
 }
