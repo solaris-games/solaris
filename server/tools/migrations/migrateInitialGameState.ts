@@ -6,26 +6,73 @@ import { JobParameters } from "../tool";
 
 const mapPlayer = (player: Player): Player => {
     return {
-        ...player,
         alias: 'Empty Slot',
         lastSeen: null,
         lastSeenIP: null,
         spectators: [],
         scheduledActions: [],
         isOpenSlot: true,
-    };
+        userId: null,
+        avatar: null,
+        colour: player.colour,
+        shape: player.shape,
+        researchingNow: player.researchingNow,
+        researchingNext: player.researchingNext,
+        defeated: false,
+        credits: player.credits,
+        creditsSpecialists: player.creditsSpecialists,
+        defeatedDate: null,
+        afk: false,
+        renownToGive: player.renownToGive,
+        ready: false,
+        readyToCycle: false,
+        missedTurns: 0,
+        hasSentTurnReminder: false,
+        hasFilledAfkSlot: false,
+        research: player.research,
+        ledger: player.ledger,
+        reputations: player.reputations,
+        diplomacy: player.diplomacy,
+        homeStarId: player.homeStarId,
+    } as any as Player;
 };
 
-const mapStar = (star: Star) => {
+const mapStar = (star: Star): Star => {
     return {
-        ...star,
-    };
+        name: star.name,
+        naturalResources: star.naturalResources,
+        ships: star.ships,
+        specialistId: null,
+        specialistExpireTick: null,
+        homeStar: star.homeStar,
+        warpGate: star.warpGate,
+        isNebula: star.isNebula,
+        isAsteroidField: star.isAsteroidField,
+        isBinaryStar: star.isBinaryStar,
+        isBlackHole: star.isBlackHole,
+        isPulsar: star.isPulsar,
+        wormHoleToStarId: star.wormHoleToStarId,
+        infrastructure: star.infrastructure,
+        ownedByPlayerId: star.ownedByPlayerId,
+        location: star.location,
+    } as any as Star;
 };
 
-const mapCarrier = (carrier: Carrier) => {
+const mapCarrier = (carrier: Carrier): Carrier => {
     return {
-        ...carrier,
-    };
+        name: carrier.name,
+        location: carrier.location,
+        waypoints: [],
+        waypointsLooped: false,
+        orbiting: carrier.orbiting,
+        ships: carrier.ships,
+        specialistId: null,
+        specialistExpireTick: null,
+        specialist: null,
+        isGift: false,
+        locationNext: null,
+        ownedByPlayerId: carrier.ownedByPlayerId,
+    } as any as Carrier;
 };
 
 export const migrateInitialGameState = async (ctx: JobParameters) => {
@@ -42,6 +89,8 @@ export const migrateInitialGameState = async (ctx: JobParameters) => {
     log.info(`${games.length} open games found...`);
 
     for (let slimGame of games) {
+        log.info(`Processing game ${slimGame._id}...`)
+
         const prevInitState = await ctx.container.initialGameStateService.getByGameId(slimGame._id);
 
         if (prevInitState) {
