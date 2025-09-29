@@ -14,8 +14,8 @@ import {
     UNICODE_INVISIBLE_CHARACTERS,
     type Validator, named, maybeNull, maybeUndefined
 } from "./validate";
-import type {CustomGalaxy} from "../api/types/common/customGalaxy";
-import { type CarrierWaypointActionType, CarrierWaypointActionTypes} from "../api/types/common/carrierWaypoint";
+import type { CustomGalaxy } from "../api/types/common/customGalaxy";
+import { type CarrierWaypointActionType, CarrierWaypointActionTypes } from "../api/types/common/carrierWaypoint";
 
 const starId = named("Star ID", stringValue({ minLength: 1 }));
 const carrierId = named("Carrier ID", stringValue({ minLength: 1 }));
@@ -73,7 +73,14 @@ export const customGalaxyValidator: Validator<CustomGalaxy> = object({
             banking: positiveInteger,
             manufacturing: positiveInteger,
             specialists: positiveInteger
-        })
+        }),
+        alias: or(stringValue({
+            minLength: 1,
+            maxLength: 30,
+            trim: true,
+            matches: UNICODE_PRINTABLE_CHARACTERS_WITH_WHITESPACE,
+            ignoreForLengthCheck: UNICODE_INVISIBLE_CHARACTERS,
+        }), just(undefined))
     })), just(undefined)),
     carriers: or(array(object({
         id: carrierId,
