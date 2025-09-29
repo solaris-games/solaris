@@ -331,6 +331,10 @@ export default class CustomGalaxyService {
             specialists: {level: customPlayer.technologies.specialists}
         };
 
+        if (customPlayer.alias) {
+            player.alias = customPlayer.alias;
+        }
+
         generatedPlayers.set(customPlayer.id, player);
         return player;
     }
