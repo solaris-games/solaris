@@ -1,5 +1,5 @@
-import {createGameRoutes, type Statistics, type GameSettingsSpec, type Flux, type GameDetailInfo, type Tutorial, type GameInfoState, type GameGalaxy, type GameListSummary, type ListGame, type Intel } from "@solaris-common";
-import {doGet, doPost, doPut, type ResponseResult} from "./index";
+import {createGameRoutes, type Statistics, type GameSettingsSpec, type Flux, type GameDetailInfo, type Tutorial, type GameInfoState, type GameGalaxy, type GameListSummary, type ListGame, type Intel, type InGameUser } from "@solaris-common";
+import {doGet, doPatch, doPost, doPut, type ResponseResult} from "./index";
 import { type Axios } from "axios";
 
 const routes = createGameRoutes<string>();
@@ -110,4 +110,36 @@ export const readyToQuit = (axios: Axios) => async (gameId: string): Promise<Res
 
 export const notReadyToQuit = (axios: Axios) => async (gameId: string): Promise<ResponseResult<{}>> => {
   return doPut(axios)(routes.notReadyToQuit, { gameId }, {}, {}, { withCredentials: true });
+}
+
+export const getNotes = (axios: Axios) => async (gameId: string): Promise<ResponseResult<{ notes: string | undefined }>> => {
+  return doGet(axios)(routes.getNotes, { gameId }, {}, { withCredentials: true });
+}
+
+export const writeNotes = (axios: Axios) => async (gameId: string, notes: string): Promise<ResponseResult<{}>> => {
+  return doPut(axios)(routes.writeNotes, { gameId }, {}, { notes }, { withCredentials: true });
+}
+
+export const pause = (axios: Axios) => async (gameId: string, pause: boolean): Promise<ResponseResult<{}>> => {
+  return doPut(axios)(routes.pause, { gameId }, {}, { pause }, { withCredentials: true });
+}
+
+export const forceStart = (axios: Axios) => async (gameId: string, withOpenSlots: boolean): Promise<ResponseResult<{}>> => {
+  return doPost(axios)(routes.forceStart, { gameId }, { withOpenSlots }, {}, { withCredentials: true });
+}
+
+export const fastForward = (axios: Axios) => async (gameId: string): Promise<ResponseResult<{}>> => {
+  return doPost(axios)(routes.fastForward, { gameId }, {}, {}, { withCredentials: true });
+}
+
+export const kick = (axios: Axios) => async (gameId: string, playerId: string): Promise<ResponseResult<{}>> => {
+  return doPost(axios)(routes.kick, { gameId }, {}, { playerId }, { withCredentials: true });
+}
+
+export const getPlayerUser = (axios: Axios) => async (gameId: string, playerId: string): Promise<ResponseResult<InGameUser<string> | null>> => {
+  return doGet(axios)(routes.getPlayerUser, { gameId, playerId }, {}, { withCredentials: true });
+}
+
+export const touch = (axios: Axios) => async (gameId: string): Promise<ResponseResult<{}>> => {
+  return doPatch(axios)(routes.touch, { gameId }, {}, {}, { withCredentials: true });
 }

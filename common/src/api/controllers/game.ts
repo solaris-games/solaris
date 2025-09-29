@@ -1,4 +1,4 @@
-import {GetRoute, PostRoute, PutRoute, SimpleGetRoute} from "./index";
+import {GetRoute, PatchRoute, PostRoute, PutRoute, SimpleGetRoute} from "./index";
 import type {Statistics} from "../types/common/stats";
 import { type Flux } from "../types/common/flux";
 import type {GameConstants, GameSettings, GameSettingsGalaxyBase, GameSettingsGeneral, GameSettingsGeneralBase, GameSettingsInvariable,
@@ -8,6 +8,7 @@ import type {GameConstants, GameSettings, GameSettingsGalaxyBase, GameSettingsGe
 import { type Tutorial } from "../types/common/tutorial";
 import { type PlayerResearch } from "../types/common/player";
 import { type PlayerStatistics } from "../types/common/leaderboard";
+import { type UserRoles } from "../types/common/user";
 
 export type GameSettingsGalaxyUnparsed = GameSettingsGalaxyBase & {
     customGalaxy?: string,
@@ -61,16 +62,27 @@ export type Intel<ID> = {
     players: IntelPlayer<ID>[],
 }
 
-export interface GameJoinGameRequest<ID> {
-    playerId: ID;
-    alias: string;
-    avatar: number;
-    password: string | undefined;
+export type GameJoinGameRequest<ID> = {
+    playerId: ID,
+    alias: string,
+    avatar: number,
+    password: string | undefined,
 };
+
+export type InGameUser<ID> = {
+    _id: ID,
+    achievements: {
+        level: number,
+        rank: number,
+        renown: number,
+        victories: number,
+        eloRating: number,
+    },
+    roles: UserRoles,
+}
 
 export const createGameRoutes = <ID>() => ({
     getDefaultSettings: new SimpleGetRoute<GameSettingsSpec>("/api/game/defaultSettings"),
-    getStatistics: new GetRoute<{ gameId: ID, playerId: ID }, {}, Statistics>("/api/game/:gameId/statistics/:playerId"),
     getCurrentFlux: new GetRoute<{}, {}, Flux | null>("/api/game/flux"),
     create: new PostRoute<{}, {}, GameSettingsSpec, { gameId: ID }>("/api/game/"),
     createTutorial: new PostRoute<{ tutorialKey?: string }, {}, {}, { gameId: ID }>("/api/game/tutorial/:tutorialKey?"),
@@ -96,5 +108,13 @@ export const createGameRoutes = <ID>() => ({
     notReady:  new PutRoute<{ gameId: ID }, {}, {}, {}>("/api/game/:gameId/notready"), 
     readyToQuit:  new PutRoute<{ gameId: ID }, {}, {}, {}>("/api/game/:gameId/readyToQuit"),    
     notReadyToQuit:  new PutRoute<{ gameId: ID }, {}, {}, {}>("/api/game/:gameId/notReadyToQuit"), 
-    
+    getNotes: new GetRoute<{ gameId: ID }, {}, { notes: string | undefined }>("/api/game/:gameId/notes"),
+    writeNotes: new PutRoute<{ gameId: ID }, {}, { notes: string }, {}>("/api/game/:gameId/notes"),
+    pause: new PutRoute<{ gameId: ID }, {}, { pause: boolean }, {}>("/api/game/:gameId/pause"),
+    forceStart: new PostRoute<{ gameId: ID }, { withOpenSlots: boolean }, {}, {}>("/api/game/:gameId/forcestart"),
+    fastForward: new PostRoute<{ gameId: ID }, {}, {}, {}>("/api/game/:gameId/fastforward"),
+    kick: new PostRoute<{ gameId: ID}, {}, { playerId: ID }, {}>("/api/game/:gameId/kick"),
+    getPlayerUser: new GetRoute<{ gameId: ID, playerId: ID }, {}, InGameUser<ID> | null>("/api/game/:gameId/player/:playerId"),
+    touch: new PatchRoute<{ gameId: ID }, {}, {}, {}>("/api/game/:gameId/player/touch"),
+    getStatistics: new GetRoute<{ gameId: ID, playerId: ID }, {}, Statistics>("/api/game/:gameId/statistics/:playerId"),
 });

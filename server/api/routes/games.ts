@@ -272,7 +272,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.get('/api/game/:gameId/notes',
+    answer(routes.getNotes,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -287,7 +287,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.put('/api/game/:gameId/notes',
+    answer(routes.writeNotes,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -320,7 +320,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             controller.delete
     );
 
-    router.put('/api/game/:gameId/pause',
+    answer(routes.pause,
             mw.auth.authenticate(),
             mw.game.loadGame({
                 lean: true,
@@ -336,7 +336,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             controller.togglePaused
     );
 
-    router.post('/api/game/:gameId/forcestart',
+    answer(routes.forceStart,
             mw.auth.authenticate(),
             mw.game.loadGame({
                 lean: false,
@@ -348,7 +348,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             controller.forceStart
     );
 
-    router.post('/api/game/:gameId/fastforward',
+    answer(routes.fastForward,
         mw.auth.authenticate(),
         mw.game.loadGame({
             lean: false,
@@ -360,7 +360,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
         controller.fastForward
     );
 
-    router.post('/api/game/:gameId/kick',
+    answer(routes.kick,
         mw.auth.authenticate(),
         mw.game.loadGame({
             lean: false,
@@ -371,7 +371,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
         controller.kickPlayer
     );
 
-    router.get('/api/game/:gameId/player/:playerId',
+    answer(routes.getPlayerUser,
             mw.game.loadGame({
                 lean: true,
                 settings: true,
@@ -380,7 +380,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             controller.getPlayerUser
     );
 
-    router.patch('/api/game/:gameId/player/touch',
+    answer(routes.touch,
             mw.auth.authenticate(),
             controller.touch
     );
