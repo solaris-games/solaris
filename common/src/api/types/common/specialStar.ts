@@ -6,7 +6,7 @@ export type SpecialStarType =
     'randomBinaryStars' | 
     'randomPulsars';
 
-export interface SpecialStar {
+export type SpecialStar = {
     id: SpecialStarType,
-    name: string;
+    name: string,
 };

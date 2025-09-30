@@ -1,74 +1,67 @@
 <template>
-    <div class="row bg-info" title="This Month's Flux" v-if="flux">
-        <div class="col">
-            <p class="mt-2 mb-2"><strong><small><i class="fas fa-dice-d20 me-1"></i>{{flux.month}} Flux</small></strong></p>
-        </div>
-        <div class="col-auto pe-1">
-            <!-- <p class="mt-1 mb-1"><small><strong>{{flux.name}}</strong> - {{flux.description}} <help-tooltip v-if="flux.tooltip" :tooltip="flux.tooltip"/></small></p> -->
-            <p class="mt-2 mb-2"><small>{{flux.description}} <help-tooltip v-if="flux.tooltip" :tooltip="flux.tooltip"/></small></p>
-        </div>
-        <div class="col-auto ps-0 mt-1 mb-1">
-            <button class="btn btn-sm btn-outline-dark pt-1 pb-1" @click="showSpecBans">
-                <i class="fas fa-hammer"></i>
-            </button>
-        </div>
+    <div class="row bg-primary" title="This Month's Flux" v-if="flux">
+        <p class="mt-2"><strong><i class="fas fa-dice-d20 me-1"></i>{{flux.month}} Flux</strong></p>
+
+        <p>{{flux.description}} <help-tooltip v-if="flux.tooltip" :tooltip="flux.tooltip"/></p>
+
+        <details v-if="monthlyBans">
+          <summary>Specialist Bans</summary>
+
+          <div class="m-2">
+            <h6>Star specialist bans:</h6>
+
+            <ul>
+              <li v-for="specialist of monthlyBans.star">{{ specialist.name }}</li>
+            </ul>
+
+            <h6>Carrier specialist bans:</h6>
+
+            <ul>
+              <li v-for="specialist of monthlyBans.carrier">{{ specialist.name }}</li>
+            </ul>
+
+            <h6>Special star bans:</h6>
+
+            <ul>
+              <li v-for="star of monthlyBans.specialStar">{{ star.name }}</li>
+            </ul>
+
+            <p>The ban list affects official games only and changes on the 1st of every month, for information see the wiki</p>
+          </div>
+        </details>
     </div>
 </template>
 
-<script>
-import GameApiService from '../../../../services/api/game'
-import SpecialistApiService from '../../../../services/api/specialist'
+<script setup lang="ts">
+import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import HelpTooltip from '../../../components/HelpTooltip.vue'
+import { ref, inject, type Ref, onMounted } from 'vue';
+import { getCurrentFlux } from '@/services/typedapi/game';
+import type { Flux, MonthlyBans } from '@solaris-common';
+import { listBans } from '@/services/typedapi/specialist';
 
-export default {
-    components: {
-        'help-tooltip': HelpTooltip
-    },
-    data () {
-        return {
-            flux: null
-        }
-    },
-    async mounted () {
-        this.flux = null
+const httpClient = inject(httpInjectionKey)!;
 
-        try {
-            const response = await GameApiService.getCurrentFlux()
+const flux: Ref<Flux | null> = ref(null);
+const monthlyBans: Ref<MonthlyBans | null> = ref(null);
 
-            if (response.status === 200) {
-                this.flux = response.data
-            }
-        } catch (err) {
-            console.error(err)
-        }
-    },
-    methods: {
-        async showSpecBans () {
-            try {
-                const response = await SpecialistApiService.listBans()
+onMounted(async () => {
+  const response = await getCurrentFlux(httpClient)();
 
-                if (response.status === 200) {
-                    const bans = response.data
+  if (isOk(response)) {
+    flux.value = response.data;
+  } else {
+    console.error(formatError(response));
+  }
 
-                    await this.$confirm(`Ban List`, `This month's bans are as follows.
+  const response2 = await listBans(httpClient)();
 
-Star specialists:
-${bans.star.map(s => s.name).join(', ')}
-
-Carrier specialists:
-${bans.carrier.map(s => s.name).join(', ')}
-
-Special stars:
-${bans.specialStar.map(s => s.name).join(', ')}
-
-The ban list affects official games only and changes on the 1st of every month, for information see the wiki.`, 'OK', null, true, false)
-                }
-            } catch (err) {
-                console.error(err)
-            }
-        }
-    }
-}
+  if (isOk(response2)) {
+    monthlyBans.value = response2.data;
+  } else {
+    console.error(formatError(response2));
+  }
+});
 </script>
 
 <style scoped>

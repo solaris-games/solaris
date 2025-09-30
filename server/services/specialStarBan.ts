@@ -1,4 +1,5 @@
-import { SpecialStar } from "./types/SpecialStar";
+import { SpecialStar } from "solaris-common";
+
 const RNG = require('random-seed');
 const moment = require('moment');
 
