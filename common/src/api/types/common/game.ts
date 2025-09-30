@@ -568,17 +568,19 @@ export type GameState<ID> = {
     openSlots?: number;
 };
 
+export type GameGalaxy<ID> = {
+    players: Player<ID>[],
+	stars: Star<ID>[],
+	carriers: Carrier<ID>[],
+	homeStars?: ID[],
+	linkedStars: ID[][],
+	teams?: Team<ID>[],
+};
+
 export type Game<ID> = {
     _id: ID;
     settings: GameSettings<ID>;
-    galaxy: {
-        players: Player<ID>[],
-		stars: Star<ID>[],
-		carriers: Carrier<ID>[],
-		homeStars?: ID[],
-		linkedStars: ID[][],
-		teams?: Team<ID>[],
-	},
+    galaxy: GameGalaxy<ID>,
 	conversations: Conversation<ID>[]
 	state: GameState<ID>,
 	constants: GameConstants,

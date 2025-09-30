@@ -1,5 +1,5 @@
-import {createGameRoutes, type Statistics, type GameSettingsSpec, type Flux, type GameDetailInfo, type Tutorial, type GameInfoState, type GameGalaxy, type GameListSummary, type ListGame, type Intel, type InGameUser } from "@solaris-common";
-import {doGet, doPatch, doPost, doPut, type ResponseResult} from "./index";
+import {createGameRoutes, type Statistics, type GameSettingsSpec, type Flux, type Tutorial, type GameInfoState, type GameGalaxy, type GameListSummary, type ListGame, type Intel, type InGameUser, type GameInfoDetail, type GameStateDetail, type GameGalaxyDetail } from "@solaris-common";
+import {doDelete, doGet, doPatch, doPost, doPut, type ResponseResult} from "./index";
 import { type Axios } from "axios";
 
 const routes = createGameRoutes<string>();
@@ -28,15 +28,15 @@ export const listTutorials = (axios: Axios) => async (): Promise<ResponseResult<
   return doGet(axios)(routes.listTutorials, {}, {}, { withCredentials: true });
 }
 
-export const detailInfo = (axios: Axios) => async (gameId: string): Promise<ResponseResult<GameDetailInfo<string>>> => {
+export const detailInfo = (axios: Axios) => async (gameId: string): Promise<ResponseResult<GameInfoDetail<string>>> => {
   return doGet(axios)(routes.detailInfo, { gameId }, {}, { withCredentials: true });
 }
 
-export const detailState = (axios: Axios) => async (gameId: string): Promise<ResponseResult<GameInfoState<string>>> => {
+export const detailState = (axios: Axios) => async (gameId: string): Promise<ResponseResult<GameStateDetail<string>>> => {
   return doGet(axios)(routes.detailState, { gameId }, {}, { withCredentials: true });
 }
 
-export const detailGalaxy = (axios: Axios) => async (gameId: string): Promise<ResponseResult<GameGalaxy<string>>> => {
+export const detailGalaxy = (axios: Axios) => async (gameId: string): Promise<ResponseResult<GameGalaxyDetail<string>>> => {
   return doGet(axios)(routes.detailGalaxy, { gameId }, {}, { withCredentials: true });
 }
 
@@ -142,4 +142,8 @@ export const getPlayerUser = (axios: Axios) => async (gameId: string, playerId: 
 
 export const touch = (axios: Axios) => async (gameId: string): Promise<ResponseResult<{}>> => {
   return doPatch(axios)(routes.touch, { gameId }, {}, {}, { withCredentials: true });
+}
+
+export const deleteGame = (axios: Axios) => async (gameId: string): Promise<ResponseResult<{}>> => {
+  return doDelete(axios)(routes.delete, { gameId }, {}, {}, { withCredentials: true });
 }

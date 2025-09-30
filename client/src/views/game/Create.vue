@@ -919,7 +919,6 @@ import FormErrorList from '../components/FormErrorList.vue'
 import HelpTooltip from '../components/HelpTooltip.vue'
 import SpecialistBanListSelection from './components/specialist/SpecialistBanListSelection.vue'
 import FluxBar from './components/menu/FluxBar.vue'
-import gameService from '../../services/api/game'
 import router from '../../router'
 import SelectTemplate from "@/views/game/gameCreation/SelectTemplate.vue";
 import { ref, onMounted, inject, type Ref, computed } from 'vue';

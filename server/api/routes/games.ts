@@ -305,7 +305,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.delete('/api/game/:gameId',
+    answer(routes.delete,
             mw.auth.authenticate(),
             mw.game.loadGame({
                 lean: true,

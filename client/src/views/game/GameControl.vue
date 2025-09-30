@@ -1,13 +1,15 @@
 <template>
   <div class="row mb-1 bg-dark pt-2 pb-2" v-if="game.settings.general.isGameAdmin">
+    <loading-spinner :loading="isLoading"/>
+
     <div class="col">
       <button class="btn btn-danger" v-if="!game.state.startDate"
               @click="deleteGame">Delete Game
       </button>
-      <button class="btn btn-warning" v-if="canModifyPauseState() && !game.state.paused" @click="pauseGame">Pause
+      <button class="btn btn-warning" v-if="canModifyPauseState && !game.state.paused" @click="pauseGame">Pause
         Game
       </button>
-      <button class="btn btn-warning" v-if="canModifyPauseState() && game.state.paused" @click="resumeGame">Resume
+      <button class="btn btn-warning" v-if="canModifyPauseState && game.state.paused" @click="resumeGame">Resume
         Game
       </button>
       <button class="btn btn-danger ms-1" v-if="!game.state.startDate"
@@ -22,7 +24,7 @@
       </button>
 
       <view-collapse-panel @onToggle="togglePlayerControl" title="Player Control">
-        <game-player-control :game="fullGame" @onGameModified="loadFullGame"/>
+        <game-player-control v-if="fullGame" :game="fullGame" @onGameModified="loadFullGame"/>
       </view-collapse-panel>
 
       <div v-if="errors" class="alert alert-danger mt-2" role="alert">
@@ -31,136 +33,133 @@
     </div>
   </div>
 </template>
-<script>
+
+<script setup lang="ts">
+import LoadingSpinner from '../components/LoadingSpinner.vue'
 import GameHelper from '../../services/gameHelper'
 import ViewCollapsePanel from '../components/ViewCollapsePanel.vue'
 import GamePlayerControl from './GamePlayerControl.vue';
-import gameService from '../../services/api/game'
-import router from "../../router.js";
+import router from "../../router";
+import { ref, inject, computed, type Ref } from 'vue';
+import type { GameInfoDetail, GameGalaxy, GameGalaxyDetail } from '@solaris-common';
+import { extractErrors, formatError, httpInjectionKey, isOk } from '@/services/typedapi';
+import { toastInjectionKey } from '@/util/keys';
+import { detailGalaxy, fastForward, forceStart, pause, deleteGame as delGame } from '@/services/typedapi/game';
+import { useStore } from 'vuex';
+import { makeConfirm } from '@/util/confirm';
 
-export default {
-  components: {
-    'view-collapse-panel': ViewCollapsePanel,
-    'game-player-control': GamePlayerControl,
-  },
-  props: {
-    game: Object,
-  },
-  data() {
-    return {
-      fullGame: null,
-      errors: null,
-    }
-  },
-  methods: {
-    canModifyPauseState() {
-      return this.game.settings.general.isGameAdmin
-        && GameHelper.isGameStarted(this.game)
-        && !GameHelper.isGamePendingStart(this.game)
-        && !GameHelper.isGameFinished(this.game);
-    },
-    async togglePlayerControl(collapsed) {
-      if (!collapsed && !this.fullGame) {
-        await this.loadFullGame();
-      }
-    },
-    async loadFullGame() {
-      const resp = await gameService.getGameGalaxy(this.game._id);
+const props = defineProps<{
+  game: GameInfoDetail<string>,
+}>();
 
-      this.fullGame = resp.data;
-    },
-    async pauseGame() {
-      if (await this.$confirm('Pause game', 'Are you sure you want to pause this game?')) {
-        this.isLoading = true
+const httpClient = inject(httpInjectionKey)!;
+const toast = inject(toastInjectionKey)!;
 
-        try {
-          await gameService.pause(this.game._id)
+const store = useStore();
+const confirm = makeConfirm(store);
 
-          this.$toast.success(`The game has been paused. Please notify the players.`)
+const isLoading = ref(false);
+const errors: Ref<string[]> = ref([]);
+const fullGame: Ref<GameGalaxyDetail<string> | null> = ref(null);
 
-          await this.loadFullGame()
-        } catch (err) {
-          this.errors = err.response.data.errors;
-          console.error(err)
-        }
+const canModifyPauseState = computed(() => {
+  return props.game.settings.general.isGameAdmin
+        && GameHelper.isGameStarted(props.game)
+        && !GameHelper.isGamePendingStart(props.game)
+        && !GameHelper.isGameFinished(props.game);
+});
 
-        this.isLoading = false
-      }
-    },
-    async fastForwardGame() {
-      if (await this.$confirm('Fast forward game', 'Are you sure you want to fast forward this game?')) {
-        this.isLoading = true
+const loadFullGame = async () => {
+  const response = await detailGalaxy(httpClient)(props.game._id);
 
-        try {
-          await gameService.fastForward(this.game._id)
+  if (isOk(response)) {
+    fullGame.value = response.data;
+  } else {
+    console.error(formatError(response));
+  }
+};
 
-          this.$toast.success(`The game has been fast forwarded. Please notify the players.`)
+const togglePlayerControl = async (collapsed: boolean) => {
+  if (!collapsed && !fullGame.value) {
+    await loadFullGame();
+  }
+};
 
-          await this.loadFullGame()
-        } catch (err) {
-          this.errors = err?.response?.data.errors;
-          console.error(err)
-        }
+const pauseGame = async () => {
+  if (await confirm('Pause game', 'Are you sure you want to pause this game?')) {
+    isLoading.value = true;
 
-        this.isLoading = false
-      }
-    },
-    async forceStartGame(withOpenSlots) {
-      if (await this.$confirm('Force start game', 'All open slots will be filled with bots. Are you sure you want to force start this game?')) {
-        this.isLoading = true
+    const response = await pause(httpClient)(props.game._id, true);
 
-        try {
-          await gameService.forceStart(this.game._id, withOpenSlots)
-
-          this.$toast.success(`The game has been force started. Please notify the players.`)
-
-          await this.loadFullGame()
-        } catch (err) {
-          this.errors = err?.response?.data.errors;
-          console.error(this.error);
-          console.error(err)
-        }
-
-        this.isLoading = false
-      }
-    },
-    async resumeGame() {
-      if (await this.$confirm('Resume game', 'Are you sure you want to resume this game?')) {
-        this.isLoading = true
-
-        try {
-          await gameService.resume(this.game._id)
-
-          this.$toast.success(`The game has been resumed. Please notify the players.`)
-
-          await this.loadFullGame()
-        } catch (err) {
-          this.errors = err?.response?.data.errors;
-          console.error(err)
-        }
-
-        this.isLoading = false
-      }
-    },
-    async deleteGame() {
-      if (await this.$confirm('Delete game', 'Are you sure you want to delete this game?')) {
-        this.isLoading = true
-
-        try {
-          let response = await gameService.delete(this.game._id)
-
-          if (response.status === 200) {
-            router.push({name: 'main-menu'})
-          }
-        } catch (err) {
-          this.errors = err?.response?.data.errors;
-          console.error(err)
-        }
-
-        this.isLoading = false
-      }
+    if (isOk(response)) {
+      toast.success(`The game has been paused.`);
+    } else {
+      console.error(formatError(response));
+      errors.value = extractErrors(response);
     }
   }
-}
+};
+
+const resumeGame = async () => {
+  if (await confirm('Resume game', 'Are you sure you want to resume this game?')) {
+    isLoading.value = true;
+
+    const response = await pause(httpClient)(props.game._id, false);
+
+    if (isOk(response)) {
+      toast.success(`The game has been resumed.`);
+    } else {
+      console.error(formatError(response));
+      errors.value = extractErrors(response);
+    }
+  }
+};
+
+const fastForwardGame = async () => {
+  if (await confirm('Fast forward game', 'Are you sure you want to fast-forward this game?')) {
+    isLoading.value = true;
+
+    const response = await fastForward(httpClient)(props.game._id);
+
+    if (isOk(response)) {
+      toast.success(`The game has been fast-forwarded.`);
+    } else {
+      console.error(formatError(response));
+      errors.value = extractErrors(response);
+    }
+  }
+};
+
+const forceStartGame = async (withOpenSlots: boolean) => {
+  if (await confirm('Force start game', 'Are you sure you want to force-start this game?')) {
+    isLoading.value = true;
+
+    const response = await forceStart(httpClient)(props.game._id, withOpenSlots);
+
+    if (isOk(response)) {
+      toast.success(`The game has been force-started.`);
+    } else {
+      console.error(formatError(response));
+      errors.value = extractErrors(response);
+    }
+  }
+};
+
+const deleteGame = async () => {
+    if (await confirm('Delete game', 'Are you sure you want to delete this game?')) {
+    isLoading.value = true;
+
+    const response = await delGame(httpClient)(props.game._id);
+
+    if (isOk(response)) {
+      toast.success(`The game has been deleted.`);
+
+      router.push({name: 'main-menu'})
+    } else {
+      console.error(formatError(response));
+      errors.value = extractErrors(response);
+    }
+  }
+};
 </script>
 <style scoped></style>

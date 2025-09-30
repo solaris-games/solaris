@@ -1,7 +1,7 @@
-import {GetRoute, PatchRoute, PostRoute, PutRoute, SimpleGetRoute} from "./index";
+import {DeleteRoute, GetRoute, PatchRoute, PostRoute, PutRoute, SimpleGetRoute} from "./index";
 import type {Statistics} from "../types/common/stats";
 import { type Flux } from "../types/common/flux";
-import type {GameConstants, GameSettings, GameSettingsGalaxyBase, GameSettingsGeneral, GameSettingsGeneralBase, GameSettingsInvariable,
+import type {GameConstants, GameGalaxy, GameSettings, GameSettingsGalaxyBase, GameSettingsGeneral, GameSettingsGeneralBase, GameSettingsInvariable,
     GameSettingsSpecialGalaxyBase,
     GameState,
 } from "../types/common/game";
@@ -23,13 +23,17 @@ export type GameSettingsSpec = GameSettingsInvariable & {
 
 export type GameInfoState<ID> = Omit<GameState<ID>, 'leaderboard' | 'teamLeaderboard'>
 
-export type GameDetailInfo<ID> = {
-    settings: GameSettings<ID>,
+export type GameStateDetail<ID> = {
+    _id: ID,
     state: GameInfoState<ID>,
+}
+
+export type GameInfoDetail<ID> = GameStateDetail<ID> & {
+    settings: GameSettings<ID>,
     constants: GameConstants,
 }
 
-export type GameGalaxy<ID> = GameDetailInfo<ID> & {
+export type GameGalaxyDetail<ID> = GameInfoDetail<ID> & {
     galaxy: GameGalaxy<ID>,
 }
 
@@ -87,9 +91,9 @@ export const createGameRoutes = <ID>() => ({
     create: new PostRoute<{}, {}, GameSettingsSpec, { gameId: ID }>("/api/game/"),
     createTutorial: new PostRoute<{ tutorialKey?: string }, {}, {}, { gameId: ID }>("/api/game/tutorial/:tutorialKey?"),
     listTutorials: new SimpleGetRoute<Tutorial[]>("/api/game/tutorial/list"),
-    detailInfo: new GetRoute<{ gameId: ID }, {}, GameDetailInfo<ID>>("/api/game/:gameId/info"),
-    detailState: new GetRoute<{ gameId: ID }, {}, GameInfoState<ID>>("/api/game/:gameId/state"),
-    detailGalaxy: new GetRoute<{ gameId: ID }, {}, GameGalaxy<ID>>("/api/game/:gameId/galaxy"),
+    detailInfo: new GetRoute<{ gameId: ID }, {}, GameInfoDetail<ID>>("/api/game/:gameId/info"),
+    detailState: new GetRoute<{ gameId: ID }, {}, GameStateDetail<ID>>("/api/game/:gameId/state"),
+    detailGalaxy: new GetRoute<{ gameId: ID }, {}, GameGalaxyDetail<ID>>("/api/game/:gameId/galaxy"),
     listSummary: new GetRoute<{}, {}, GameListSummary<ID>>("/api/game/list/summary"),
     listOfficial: new GetRoute<{}, {}, ListGame<ID>[]>("/api/game/list/official"),
     listCustom: new GetRoute<{}, {}, ListGame<ID>[]>("/api/game/list/custom"),
@@ -117,4 +121,5 @@ export const createGameRoutes = <ID>() => ({
     getPlayerUser: new GetRoute<{ gameId: ID, playerId: ID }, {}, InGameUser<ID> | null>("/api/game/:gameId/player/:playerId"),
     touch: new PatchRoute<{ gameId: ID }, {}, {}, {}>("/api/game/:gameId/player/touch"),
     getStatistics: new GetRoute<{ gameId: ID, playerId: ID }, {}, Statistics>("/api/game/:gameId/statistics/:playerId"),
+    delete: new DeleteRoute<{ gameId: ID }, {}, {}>("/api/game/:gameId"),
 });

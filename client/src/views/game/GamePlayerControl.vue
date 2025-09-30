@@ -14,38 +14,45 @@
     </table>
   </div>
 </template>
-<script>
+
+<script setup lang="ts">
 import LoadingSpinner from '../components/LoadingSpinner.vue'
-import gameService from '../../services/api/game'
+import type { GameGalaxyDetail, Player } from '@solaris-common';
+import { computed, inject } from 'vue';
+import { extractErrors, formatError, httpInjectionKey, isOk } from '@/services/typedapi';
+import { toastInjectionKey } from '@/util/keys';
+import { useStore } from 'vuex';
+import { makeConfirm } from '@/util/confirm';
+import { kick } from '@/services/typedapi/game';
 
-export default {
-  components: {
-    'loading-spinner': LoadingSpinner,
-  },
-  props: {
-    game: Object,
-  },
-  methods: {
-    async kickPlayer(player) {
-      if (await this.$confirm(`Kick Player`, `Do you really want to kick player ${player.alias}?`)) {
-        try {
-          await gameService.kickPlayer(this.game._id, player._id);
+const props = defineProps<{
+  game: GameGalaxyDetail<string>,
+}>();
 
-          this.$toast.info('Player kicked');
-        } catch (e) {
-          this.$toast.error(e?.response?.data?.errors?.join(", "));
-        }
+const emit = defineEmits<{
+  onGameModified: [],
+}>();
 
-        this.$emit('onGameModified')
-      }
-    }
-  },
-  computed: {
-    filledSlots() {
-      return this.game.galaxy.players.filter(p => !p.isOpenSlot);
+const store = useStore();
+const confirm = makeConfirm(store);
+
+const httpClient = inject(httpInjectionKey)!;
+const toast = inject(toastInjectionKey)!;
+
+const filledSlots = computed(() => props.game.galaxy.players.filter(p => !p.isOpenSlot));
+
+const kickPlayer = async (player: Player<string>) => {
+  if (await confirm(`Kick Player`, `Do you really want to kick player ${player.alias}?`)) {
+    const response = await kick(httpClient)(props.game._id, player._id);
+
+    if (isOk(response)) {
+      toast.info('Player kicked');
+    } else {
+      console.error(formatError(response));
+      toast.error(`Failed to kick player: ${extractErrors(response).join(", ")}`);
     }
   }
-}
+};
 </script>
 <style scoped>
 </style>
