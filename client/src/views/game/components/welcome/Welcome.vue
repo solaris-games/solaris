@@ -1,7 +1,6 @@
 <template>
 <div class="menu-page container">
-    <menu-title title="Welcome" @onCloseRequested="onCloseRequested">
-      <button title="View Settings" tag="button" class="btn btn-sm btn-outline-primary" @click="onViewSettingsRequested"><i class="fas fa-cog"></i></button>
+    <menu-title :title="'Welcome to ' + game.settings.general.name" @onCloseRequested="onCloseRequested">
     </menu-title>
 
     <div class="row bg-info" v-if="game.settings.general.flux" title="This Game's Flux">
