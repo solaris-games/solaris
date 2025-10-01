@@ -1,4 +1,4 @@
-import {createGameRoutes, type Statistics, type GameSettingsSpec, type Flux, type Tutorial, type GameInfoState, type GameGalaxy, type GameListSummary, type ListGame, type Intel, type InGameUser, type GameInfoDetail, type GameStateDetail, type GameGalaxyDetail } from "@solaris-common";
+import {createGameRoutes, type Statistics, type GameSettingsSpec, type Flux, type Tutorial, type UserActiveListGame, type GameListSummary, type ListGame, type Intel, type InGameUser, type GameInfoDetail, type GameStateDetail, type GameGalaxyDetail } from "@solaris-common";
 import {doDelete, doGet, doPatch, doPost, doPut, type ResponseResult} from "./index";
 import { type Axios } from "axios";
 
@@ -60,11 +60,11 @@ export const listRecentlyCompleted = (axios: Axios) => async (): Promise<Respons
   return doGet(axios)(routes.listRecentlyCompleted, {}, {}, { withCredentials: true });
 }
 
-export const listMyCompleted = (axios: Axios) => async (): Promise<ResponseResult<ListGame<string>[]>> => {
+export const listMyCompleted = (axios: Axios) => async (): Promise<ResponseResult<UserActiveListGame<string>[]>> => {
   return doGet(axios)(routes.listMyCompleted, {}, {}, { withCredentials: true });
 }
 
-export const listActive = (axios: Axios) => async (): Promise<ResponseResult<ListGame<string>[]>> => {
+export const listActive = (axios: Axios) => async (): Promise<ResponseResult<UserActiveListGame<string>[]>> => {
   return doGet(axios)(routes.listActive, {}, {}, { withCredentials: true });
 }
 

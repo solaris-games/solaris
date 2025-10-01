@@ -4,6 +4,7 @@ import { type Flux } from "../types/common/flux";
 import type {GameConstants, GameGalaxy, GameSettings, GameSettingsGalaxyBase, GameSettingsGeneral, GameSettingsGeneralBase, GameSettingsInvariable,
     GameSettingsSpecialGalaxyBase,
     GameState,
+    GameUserNotification,
 } from "../types/common/game";
 import { type Tutorial } from "../types/common/tutorial";
 import { type PlayerResearch } from "../types/common/player";
@@ -46,6 +47,10 @@ export type ListGame<ID> = {
     },
     state: GameInfoState<ID>,
 }
+
+export type UserActiveListGame<ID> = ListGame<ID> & {
+    userNotifications: GameUserNotification,
+};
 
 export type GameListSummary<ID> = {
     official: ListGame<ID>[],
@@ -99,8 +104,8 @@ export const createGameRoutes = <ID>() => ({
     listCustom: new GetRoute<{}, {}, ListGame<ID>[]>("/api/game/list/custom"),
     listInProgress: new GetRoute<{}, {}, ListGame<ID>[]>("/api/game/list/inprogress"),
     listRecentlyCompleted: new GetRoute<{}, {}, ListGame<ID>[]>("/api/game/list/completed"),
-    listMyCompleted: new GetRoute<{}, {}, ListGame<ID>[]>("/api/game/list/completed/user"),
-    listActive: new GetRoute<{}, {}, ListGame<ID>[]>("/api/game/list/active"),
+    listMyCompleted: new GetRoute<{}, {}, UserActiveListGame<ID>[]>("/api/game/list/completed/user"),
+    listActive: new GetRoute<{}, {}, UserActiveListGame<ID>[]>("/api/game/list/active"),
     listMyOpen: new GetRoute<{}, {}, ListGame<ID>[]>("/api/game/list/open"),
     listSpectating: new GetRoute<{}, {}, ListGame<ID>[]>("/api/game/list/spectating"),
     getIntel: new GetRoute<{ gameId: ID }, {}, Intel<ID>>("/api/game/:gameId/intel"),

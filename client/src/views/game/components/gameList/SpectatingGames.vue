@@ -17,16 +17,16 @@
             <router-link :to="{ path: '/game/detail', query: { id: game._id } }"
               class="me-1">{{ game.settings.general.name }}</router-link>
             <br />
-            <small>{{ getGameTypeFriendlyText(game) }}</small>
+            <small>{{ GameHelper.getGameTypeFriendlyText(game) }}</small>
           </td>
           <td class="col-3 d-none d-md-table-cell">
-            <span v-if="isGameWaitingForPlayers(game)">
+            <span v-if="GameHelper.isGameWaitingForPlayers(game)">
               Waiting for Players
             </span>
-            <span v-if="isGamePendingStart(game)">
+            <span v-if="GameHelper.isGamePendingStart(game)">
               Starting Soon
             </span>
-            <span v-if="isGameInProgress(game)">
+            <span v-if="GameHelper.isGameInProgress(game)">
               <countdown-timer :endDate="getNextCycleDate(game)" :active="true"
                 afterEndText="Pending..."></countdown-timer>
             </span>
@@ -42,60 +42,35 @@
   </div>
 </template>
 
-<script>
-import LoadingSpinnerVue from '../../../components/LoadingSpinner.vue'
-import gameService from '../../../../services/api/game'
+<script setup lang="ts">
 import GameHelper from '../../../../services/gameHelper'
 import CountdownTimer from '../CountdownTimer.vue';
+import { type Ref, ref, onMounted, inject } from 'vue';
+import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
+import { listSpectating } from '@/services/typedapi/game';
+import type { ListGame } from '@solaris-common';
 
-export default {
-  components: {
-    'loading-spinner': LoadingSpinnerVue,
-    'countdown-timer': CountdownTimer,
-  },
-  data() {
-    return {
-      games: []
-    }
-  },
-  mounted() {
-    this.loadGames()
-  },
-  methods: {
-    async loadGames() {
-      try {
-        let response = await gameService.listSpectatingGames()
+const httpClient = inject(httpInjectionKey)!;
 
-        this.games = response.data
-      } catch (err) {
-        console.error(err)
-      }
-    },
-    getGameTypeFriendlyText(game) {
-      return GameHelper.getGameTypeFriendlyText(game)
-    },
-    isGameWaitingForPlayers (game) {
-      return GameHelper.isGameWaitingForPlayers(game)
-    },
-    isGamePendingStart (game) {
-      return GameHelper.isGamePendingStart(game)
-    },
-    isGameInProgress (game) {
-      return GameHelper.isGameInProgress(game)
-    },
-    getNextCycleDate (game) {
-      // TODO: This doesn't work, for some reason getCountdownTime returns a number wtf
-      // if (GameHelper.isGamePendingStart(game)) {
-      //   return GameHelper.getCountdownTime(game, game.state.startDate)
-      // } else
-      if (GameHelper.isRealTimeGame(game)) {
-        return GameHelper.getCountdownTimeForProductionCycle(game)
-      } else if (GameHelper.isTurnBasedGame(game)) {
-        return GameHelper.getCountdownTimeForTurnTimeout(game)
-      }
-    },
+const games: Ref<ListGame<string>[]> = ref([]);
+
+const getNextCycleDate = (game: ListGame<string>) => {
+  if (GameHelper.isRealTimeGame(game)) {
+    return GameHelper.getCountdownTimeForProductionCycle(game)
+  } else if (GameHelper.isTurnBasedGame(game)) {
+    return GameHelper.getCountdownTimeForTurnTimeout(game)
   }
-}
+};
+
+onMounted(async () => {
+  const response = await listSpectating(httpClient)();
+
+  if (isOk(response)) {
+    games.value = response.data;
+  } else {
+    console.error(formatError(response));
+  }
+});
 </script>
 
 <style scoped></style>

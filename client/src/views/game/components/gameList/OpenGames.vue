@@ -33,29 +33,30 @@
 </template>
 
 <script setup lang="ts">
-import { type Ref, ref, onMounted } from 'vue';
+import { type Ref, ref, onMounted, inject } from 'vue';
 import LoadingSpinner from "../../../components/LoadingSpinner.vue";
-import type { Game } from "../../../../types/game";
 import GameHelper from "../../../../services/gameHelper";
-import gameService from '../../../../services/api/game'
 import HelpTooltip from "../../../components/HelpTooltip.vue";
+import { listMyOpen } from '@/services/typedapi/game';
+import { httpInjectionKey, isOk } from '@/services/typedapi';
+import type { ListGame } from '@solaris-common';
 
-const isLoading = ref(true);
+const httpClient = inject(httpInjectionKey)!;
 
-const games: Ref<Game[]> = ref([]);
+const isLoading = ref(false);
+
+const games: Ref<ListGame<string>[]> = ref([]);
 
 onMounted(async () => {
-  try {
-    let response = await gameService.listOpenGames()
+  isLoading.value = true;
 
+  const response = await listMyOpen(httpClient)();
+  if (isOk(response)) {
     games.value = response.data;
-  } catch (err) {
-    console.error(err)
-  } finally {
-    isLoading.value = false;
   }
-})
 
+  isLoading.value = false;
+});
 </script>
 
 <style scoped>
