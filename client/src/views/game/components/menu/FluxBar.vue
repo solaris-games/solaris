@@ -1,6 +1,6 @@
 <template>
-    <div class="row bg-primary" title="This Month's Flux" v-if="flux">
-        <p class="mt-2"><strong><i class="fas fa-dice-d20 me-1"></i>{{flux.month}} Flux</strong></p>
+    <div class="row bg-primary pt-2 pb-2" title="This Month's Flux" v-if="flux">
+        <p><strong><i class="fas fa-dice-d20 me-1"></i>{{flux.month}} Flux</strong></p>
 
         <p>{{flux.description}} <help-tooltip v-if="flux.tooltip" :tooltip="flux.tooltip"/></p>
 
