@@ -24,7 +24,7 @@ export const createTutorial = (axios: Axios) => async (tutorialKey?: string): Pr
   return doPost(axios)(routes.createTutorial, { tutorialKey }, {}, { withCredentials: true });
 }
 
-export const listTutorials = (axios: Axios) => async (): Promise<ResponseResult<Tutorial>> => {
+export const listTutorials = (axios: Axios) => async (): Promise<ResponseResult<Tutorial[]>> => {
   return doGet(axios)(routes.listTutorials, {}, {}, { withCredentials: true });
 }
 

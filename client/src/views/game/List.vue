@@ -1,14 +1,3 @@
-<script setup>
-import featuredImg from '../../assets/screenshots/featured.png';
-import newPlayerRtImg from '../../assets/screenshots/new_player_rt.png';
-import standardRtImg from '../../assets/screenshots/standard_rt.png';
-import standardTbImg from '../../assets/screenshots/standard_tb.png';
-import duelRtImg from '../../assets/screenshots/1v1_rt.png';
-import duelTbImg from '../../assets/screenshots/1v1_tb.png';
-import large32Img from '../../assets/screenshots/32_player.png';
-import relaxed16Img from '../../assets/screenshots/16_player_relaxed.png';
-</script>
-
 <template>
   <view-container :is-auth-page="true">
     <view-title title="Join Game" />
@@ -39,7 +28,7 @@ import relaxed16Img from '../../assets/screenshots/16_player_relaxed.png';
       </li>
     </ul>
 
-    <div class="tab-content pt-2">
+    <div class="tab-content pt-2" v-if="games">
         <div class="tab-pane fade show active" id="newGames">
           <h4 v-if="games.featured">Featured Game</h4>
 
@@ -71,7 +60,7 @@ import relaxed16Img from '../../assets/screenshots/16_player_relaxed.png';
             </div>
           </div>
 
-          <hr v-if="games.featured"/>
+          <hr v-if="games?.featured"/>
 
           <h4>Standard Games</h4>
 
@@ -114,17 +103,14 @@ import relaxed16Img from '../../assets/screenshots/16_player_relaxed.png';
                 <div class="card-img-overlay">
                   <h5 class="card-title special-card-title">
                     <i class="fas" :class="{
-                      'fa-moon': games.special.settings.general.type === 'special_dark',
-                      'fa-moon': games.special.settings.general.type === 'special_fog',
-                      'fa-moon': games.special.settings.general.type === 'special_ultraDark',
+                      'fa-moon': (games.special.settings.general.type === 'special_dark' || games.special.settings.general.type === 'special_fog' || games.special.settings.general.type === 'special_ultraDark'),
                       'fa-drumstick-bite': games.special.settings.general.type === 'special_battleRoyale',
                       'fa-satellite': games.special.settings.general.type === 'special_orbital',
                       'fa-home': games.special.settings.general.type === 'special_homeStar',
                       'fa-gun': games.special.settings.general.type === 'special_homeStarElimination',
-                      'fa-user-secret': games.special.settings.general.type === 'special_anonymous',
+                      'fa-user-secret': (games.special.settings.general.type === 'special_anonymous' || games.special.settings.general.type === 'special_freeForAll'),
                       'fa-crown': games.special.settings.general.type === 'special_kingOfTheHill',
                       'fa-search': games.special.settings.general.type === 'special_tinyGalaxy',
-                      'fa-user-secret': games.special.settings.general.type === 'special_freeForAll',
                       'fa-gamepad': games.special.settings.general.type === 'special_arcade'
                     }"></i>
                     <span class="ms-2">{{games.special.settings.general.name}}</span>
@@ -467,7 +453,7 @@ import relaxed16Img from '../../assets/screenshots/16_player_relaxed.png';
                         <br/>
                         <small>{{getGameTypeFriendlyText(game)}}</small>
                       </td>
-                      <td class="d-none d-md-table-cell text-center">{{getFriendlyDate(game.state.endDate)}}</td>
+                      <td class="d-none d-md-table-cell text-center">{{getFriendlyDate(game.state.endDate!)}}</td>
                       <td class="d-none d-sm-table-cell text-center">{{game.state.productionTick}}</td>
                       <td>
                           <router-link :to="{ path: '/game', query: { id: game._id } }" tag="button" class="btn btn-outline-success float-end">
@@ -487,150 +473,146 @@ import relaxed16Img from '../../assets/screenshots/16_player_relaxed.png';
   </view-container>
 </template>
 
-<script>
+<script setup lang="ts">
+import featuredImg from '../../assets/screenshots/featured.png';
+import newPlayerRtImg from '../../assets/screenshots/new_player_rt.png';
+import standardRtImg from '../../assets/screenshots/standard_rt.png';
+import standardTbImg from '../../assets/screenshots/standard_tb.png';
+import duelRtImg from '../../assets/screenshots/1v1_rt.png';
+import duelTbImg from '../../assets/screenshots/1v1_tb.png';
+import large32Img from '../../assets/screenshots/32_player.png';
+import relaxed16Img from '../../assets/screenshots/16_player_relaxed.png';
 import router from '../../router'
-import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
+import LoadingSpinner from '../components/LoadingSpinner.vue'
 import ViewTitle from '../components/ViewTitle.vue'
 import ViewContainer from '../components/ViewContainer.vue'
 import TutorialGame from './components/menu/TutorialGame.vue'
-import gameService from '../../services/api/game'
-import GameHelper from '../../services/gameHelper'
 import RandomHelper from '../../services/randomHelper'
 import HelpTooltip from '../components/HelpTooltip.vue'
 import FluxBar from './components/menu/FluxBar.vue'
 import LockedGameOverlay from './components/menu/LockedGameOverlay.vue'
 import moment from 'moment'
 import CommunityGuidelinesBar from "./components/menu/CommunityGuidelinesBar.vue";
+import { type ListGame, type Tutorial } from "@solaris-common";
+import { ref, computed, inject, onMounted, type Ref } from 'vue';
+import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
+import { createTutorial, listSummary, listTutorials } from '@/services/typedapi/game';
+import { useStore } from 'vuex';
+import gameHelper from '@/services/gameHelper';
 
-export default {
-  components: {
-    'community-guidelines-bar': CommunityGuidelinesBar,
-    'loading-spinner': LoadingSpinnerVue,
-    'view-container': ViewContainer,
-    'view-title': ViewTitle,
-    'tutorial-game': TutorialGame,
-    'help-tooltip': HelpTooltip,
-    'flux-bar': FluxBar,
-    'locked-game-overlay': LockedGameOverlay,
-  },
-  data () {
-    return {
-      serverGames: [],
-      userGames: [],
-      inProgressGames: [],
-      recentlyCompletedGames: [],
-      tutorialGames: [],
-      isLoading: true,
-      games: {
-        featured: null,
-        newPlayerRT: null,
-        standardRT: null,
-        standardTB: null,
-        oneVsOneRT: null,
-        oneVsOneTB: null,
-        thirtyTwoPlayerRT: null,
-        sixteenPlayerRelaxed: null,
-        special: null
-      }
-    }
-  },
-  async mounted () {
-    this.isLoading = true
+type Games = {
+  featured: ListGame<string> | undefined,
+  newPlayerRT: ListGame<string> | undefined,
+  standardRT: ListGame<string> | undefined,
+  standardTB: ListGame<string> | undefined,
+  oneVsOneRT: ListGame<string> | undefined,
+  oneVsOneTB: ListGame<string> | undefined,
+  thirtyTwoPlayerRT: ListGame<string> | undefined,
+  sixteenPlayerRelaxed: ListGame<string> | undefined,
+  special: ListGame<string> | undefined,
+};
 
-    try {
-      let response = await gameService.listJoinGamesSummary()
+const httpClient = inject(httpInjectionKey)!;
 
-      if (response.status === 200) {
-        this.serverGames = response.data.official
-        this.userGames = response.data.user
-        this.inProgressGames = response.data.inProgress
-        this.recentlyCompletedGames = response.data.completed
+const store = useStore();
 
-        this.games.featured = this.getFeaturedGame()
-        this.games.newPlayerRT = this.getOfficialGame('new_player_rt')
-        this.games.standardRT = this.getOfficialGame('standard_rt')
-        this.games.standardTB = this.getOfficialGame('standard_tb')
-        this.games.oneVsOneRT = this.getOfficialGame('1v1_rt')
-        this.games.oneVsOneTB = this.getOfficialGame('1v1_tb')
-        this.games.thirtyTwoPlayerRT = this.getOfficialGame('32_player_rt')
-        this.games.sixteenPlayerRelaxed = this.getOfficialGame('16_player_relaxed')
-        this.games.special = this.getSpecialGame()
-      }
-    } catch (err) {
-      console.error(err)
-    }
+const isLoading = ref(false);
 
-    try {
-      let response = await gameService.listTutorialGames()
+const serverGames: Ref<ListGame<string>[]> = ref([]);
+const userGames: Ref<ListGame<string>[]> = ref([]);
+const inProgressGames: Ref<ListGame<string>[]> = ref([]);
+const recentlyCompletedGames: Ref<ListGame<string>[]> = ref([]);
+const tutorialGames: Ref<Tutorial[]> = ref([]);
+const games: Ref<Games | null> = ref(null);
 
-      if (response.status === 200) {
-        this.tutorialGames = response.data
-      }
-    } catch (err) {
-      console.error(err)
-    }
+const specialGameSrc = computed(() => games.value?.special && new URL(`../../assets/screenshots/${games.value.special.settings.general.type}.png`, import.meta.url).href);
 
-    this.isLoading = false
-  },
-  computed: {
-    specialGameSrc () {
-      return new URL(`../../assets/screenshots/${this.games.special.settings.general.type}.png`, import.meta.url).href;
-    }
-  },
-  methods: {
-    routeToPath (path, query) {
-      router.push({path, query})
-    },
-    getOfficialGame (type) {
-      return this.serverGames.find(x => x.settings.general.type === type)
-    },
-    getSpecialGame () {
-      const types = [
-        'special_dark',
-        'special_fog',
-        'special_ultraDark',
-        'special_orbital',
-        'special_battleRoyale',
-        'special_homeStar',
-        'special_homeStarElimination',
-        'special_anonymous',
-        'special_kingOfTheHill',
-        'special_tinyGalaxy',
-        'special_freeForAll',
-        'special_arcade'
-      ]
+const getGameTypeFriendlyText = (tp) => gameHelper.getGameTypeFriendlyText(tp);
 
-      return this.serverGames.find(x => types.includes(x.settings.general.type))
-    },
-    getFeaturedGame () {
-      let featuredGames = this.serverGames.filter(x => x.settings.general.featured).concat(this.userGames.filter(x => x.settings.general.featured))
+const getFeaturedGame = () => {
+  const featuredGames = serverGames.value.filter(x => x.settings.general.featured).concat(userGames.value.filter(x => x.settings.general.featured))
 
-      if (featuredGames.length) {
-        return featuredGames[RandomHelper.getRandomNumberBetween(0, featuredGames.length - 1)]
-      }
-
-      return null
-    },
-    getGameTypeFriendlyText (game) {
-      return GameHelper.getGameTypeFriendlyText(game)
-    },
-    getFriendlyDate(date) {
-      return moment(date).utc().fromNow()
-    },
-    async startTutorial (tutorialKey) {
-      try {
-          let response = await gameService.createTutorialGame(tutorialKey)
-
-          if (response.status === 201) {
-              this.$store.commit('clearTutorialPage')
-              router.push({ name: 'game', query: { id: response.data } })
-          }
-      } catch (err) {
-          console.error(err)
-      }
-    }
+  if (featuredGames.length) {
+    return featuredGames[RandomHelper.getRandomNumberBetween(0, featuredGames.length - 1)];
   }
-}
+
+  return undefined;
+};
+
+const getOfficialGame = (type: string) => {
+  return serverGames.value.find(x => x.settings.general.type === type);
+};
+
+const routeToPath = (path: string, query: Record<string, string>) => {
+  router.push({ path, query });
+};
+
+const getSpecialGame = () => {
+  const types = [
+    'special_dark',
+    'special_fog',
+    'special_ultraDark',
+    'special_orbital',
+    'special_battleRoyale',
+    'special_homeStar',
+    'special_homeStarElimination',
+    'special_anonymous',
+    'special_kingOfTheHill',
+    'special_tinyGalaxy',
+    'special_freeForAll',
+    'special_arcade'
+  ];
+
+  return serverGames.value.find(x => types.includes(x.settings.general.type));
+};
+
+const getFriendlyDate = (date: Date) => {
+  return moment(date).utc().fromNow();
+};
+
+const startTutorial = async (tutorialKey: string) => {
+  const response = await createTutorial(httpClient)(tutorialKey)!;
+
+  if (isOk(response)) {
+    store.commit('clearTutorialPage')
+    router.push({ name: 'game', query: { id: response.data } })
+  } else {
+    console.error(formatError(response));
+  }
+};
+
+onMounted(async () => {
+  const response = await listSummary(httpClient)();
+
+  if (isOk(response)) {
+    serverGames.value = response.data.official
+    userGames.value = response.data.user
+    inProgressGames.value = response.data.inProgress
+    recentlyCompletedGames.value = response.data.completed
+
+    games.value = {
+      featured: getFeaturedGame(),
+      newPlayerRT: getOfficialGame('new_player_rt'),
+      standardRT: getOfficialGame('standard_rt'),
+      standardTB: getOfficialGame('standard_tb'),
+      oneVsOneRT: getOfficialGame('1v1_rt'),
+      oneVsOneTB: getOfficialGame('1v1_tb'),
+      thirtyTwoPlayerRT: getOfficialGame('32_player_rt'),
+      sixteenPlayerRelaxed: getOfficialGame('16_player_relaxed'),
+      special: getSpecialGame(),
+    }
+  } else {
+    console.error(formatError(response));
+  }
+
+  const response2 = await listTutorials(httpClient)();
+
+  if (isOk(response2)) {
+    tutorialGames.value = response2.data;
+  } else {
+    console.error(formatError(response2));
+  }
+});
 </script>
 
 <style scoped>

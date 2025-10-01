@@ -304,7 +304,7 @@ export const username = stringValue({
     minLength: 3,
     maxLength: 30,
     trim: true,
-    matches: UNICODE_LETTERS_NUMBERS_PUNCTUATION,
+    matches: /^[\p{L}\p{N}\p{M}\p{Cf}\p{S}\p{P}]+[\p{L}\p{N}\p{M}\p{Cf}\p{S}\p{P}\p{Z}]*$/u,
 });
 
 export const email = stringValue({
