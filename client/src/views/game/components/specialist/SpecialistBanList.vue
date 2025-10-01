@@ -35,10 +35,12 @@
 import SpecialistBanListTable from './SpecialistBanListTable.vue'
 import SpecialistService from "@/services/api/specialist";
 import { ref, onMounted } from 'vue';
-import type {Game} from "@/types/game";
+import type { GameSettings } from '@solaris-common';
 
 const props = defineProps<{
-  game: Game,
+  game: {
+    settings: GameSettings<string>,
+  },
 }>();
 
 const isLoading = ref(false);
