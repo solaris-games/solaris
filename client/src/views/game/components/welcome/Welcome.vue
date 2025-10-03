@@ -34,7 +34,6 @@ import EnterPassword from './EnterPassword.vue'
 import SelectColour from './SelectColour.vue'
 import NewPlayerMessage from './NewPlayerMessage.vue'
 import ShareLink from './ShareLink.vue'
-import HelpTooltip from "../../../components/HelpTooltip.vue"
 import gameHelper from "@/services/gameHelper";
 import { ref, computed, inject, type Ref } from 'vue';
 import { useStore } from 'vuex';

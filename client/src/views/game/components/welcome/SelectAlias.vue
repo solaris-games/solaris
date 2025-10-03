@@ -20,8 +20,8 @@
               <p v-if="avatar"><small class="linebreaks">{{ avatar.description }}</small></p>
 
               <div class="mb-2">
-                <input name="alias" class="form-control" required="required" placeholder="Enter your alias here"
-                  type="text" minlength="1" maxlength="24" v-model="alias" @change="onAliasChanged">
+                <input name="alias" class="form-control" :required="true" placeholder="Enter your alias here"
+                  type="text" minlength="1" maxlength="24" v-model="alias">
               </div>
 
               <div v-if="isAnonymousGame" class="alert alert-warning">
@@ -36,10 +36,11 @@
 </template>
 
 <script setup lang="ts">
-import { inject, ref, onMounted } from 'vue';
+import { inject, ref, onMounted, watch } from 'vue';
 import SelectAvatar from './SelectAvatar.vue'
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { detailMe } from '@/services/typedapi/user';
+import type {UserAvatar} from "@solaris-common";
 
 const props = defineProps<{
   isAnonymousGame: boolean,
@@ -53,15 +54,17 @@ const emit = defineEmits<{
 const httpClient = inject(httpInjectionKey)!;
 
 const alias = ref<string>("");
-const avatar = ref<number | null>(null);
+const avatar = ref<UserAvatar | null>(null);
 
-const onAliasChanged = (value) => {
+const onAliasChanged = (value: string) => {
   emit('onAliasChanged', value);
 };
 
-const onAvatarChanged = (e: number) => {
+watch(alias, onAliasChanged);
+
+const onAvatarChanged = (e: UserAvatar) => {
   avatar.value = e;
-  emit('onAvatarChanged', e);
+  emit('onAvatarChanged', e.id);
 };
 
 onMounted(async () => {

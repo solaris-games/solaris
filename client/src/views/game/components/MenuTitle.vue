@@ -16,12 +16,12 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  onCloseRequested: [],
+  onCloseRequested: [e: Event],
   onTitleClicked: []
 }>();
 
-const close = () => {
-  emit('onCloseRequested');
+const close = (e: Event) => {
+  emit('onCloseRequested', e);
 };
 
 const titleClicked = () => {
