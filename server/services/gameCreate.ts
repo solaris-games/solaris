@@ -375,16 +375,19 @@ export default class GameCreateService {
         }
 
         // If the game name contains a special string, then replace it with a random name.
-        if (settings.general.name.indexOf(RANDOM_NAME_STRING) > -1) {
+        let name = settings.general.name.trim();
+
+        if (name.indexOf(RANDOM_NAME_STRING) > -1) {
             let randomGameName = this.nameService.getRandomGameName();
 
-            settings.general.name = settings.general.name.replace(RANDOM_NAME_STRING, randomGameName);
+            name = name.replace(RANDOM_NAME_STRING, randomGameName);
         }
 
         const newSettings: GameSettings<DBObjectId> = {
             ...settings,
             general: {
                 ...settings.general,
+                name,
                 createdByUserId: userId,
                 fluxId: null, // will be applied later
                 featured: isOfficialGame,

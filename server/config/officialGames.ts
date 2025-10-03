@@ -1,9 +1,5 @@
-import {GameSettings} from "solaris-common";
-import {DBObjectId} from "../services/types/DBObjectId";
 import {GameSettingsReq} from "../services/gameCreate";
 import {parseGameSettingsReq} from "../api/requests/game";
-
-// TODO: Convert to use GameSettingSpec or something
 
 export enum OfficialGameKind {
     Standard = 'Standard',
