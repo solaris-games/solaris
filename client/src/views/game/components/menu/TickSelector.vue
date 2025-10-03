@@ -54,13 +54,15 @@
 <script setup lang="ts">
 import {eventBusInjectionKey} from '../../../../eventBus'
 import GameEventBusEventNames from '../../../../eventBusEventNames/game'
-import GameApiService from '../../../../services/api/game'
 import {inject, ref, onMounted, onUnmounted, computed} from 'vue'
 import { useStore, type Store } from 'vuex';
 import type {State} from "@/store";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
+import {detailGalaxy} from "@/services/typedapi/game";
+import {formatError, isOk, httpInjectionKey} from "@/services/typedapi";
 
 const eventBus = inject(eventBusInjectionKey)!;
+const httpClient = inject(httpInjectionKey)!;
 
 const store: Store<State> = useStore();
 
@@ -98,25 +100,23 @@ const toggleDisplay = () => {
 
 const onRequestedTickChanged = async () => {
   if (isLoading.value || tick.value < 1 || tick.value > stateTick.value || tick.value === gameTick.value) {
-    return
+    return;
   }
 
-  isLoading.value = true
+  isLoading.value = true;
 
-  let game = store.state.game
+  const game = store.state.game;
 
-  try {
-    const response = await GameApiService.getGameGalaxy(game._id, tick.value);
+  const response = await detailGalaxy(httpClient)(game._id, tick.value);
 
-    if (response.status === 200) {
-      store.commit('setGame', response.data)
-      tick.value = response.data.state.tick
-    }
-  } catch (err) {
-    console.error(err)
+  if (isOk(response)) {
+    store.commit('setGame', response.data);
+    tick.value = response.data.state.tick;
+  } else {
+    console.error(formatError(response));
   }
 
-  isLoading.value = false
+  isLoading.value = false;
 };
 
 const loadPreviousTick = async (ticks: number) => {

@@ -98,7 +98,7 @@ export const createGameRoutes = <ID>() => ({
     listTutorials: new SimpleGetRoute<Tutorial[]>("/api/game/tutorial/list"),
     detailInfo: new GetRoute<{ gameId: ID }, {}, GameInfoDetail<ID>>("/api/game/:gameId/info"),
     detailState: new GetRoute<{ gameId: ID }, {}, GameStateDetail<ID>>("/api/game/:gameId/state"),
-    detailGalaxy: new GetRoute<{ gameId: ID }, {}, GameGalaxyDetail<ID>>("/api/game/:gameId/galaxy"),
+    detailGalaxy: new GetRoute<{ gameId: ID }, { tick?: number }, GameGalaxyDetail<ID>>("/api/game/:gameId/galaxy"),
     listSummary: new GetRoute<{}, {}, GameListSummary<ID>>("/api/game/list/summary"),
     listOfficial: new GetRoute<{}, {}, ListGame<ID>[]>("/api/game/list/official"),
     listCustom: new GetRoute<{}, {}, ListGame<ID>[]>("/api/game/list/custom"),

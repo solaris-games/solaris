@@ -86,22 +86,28 @@
 </template>
 
 <script>
-import LoadingSpinnerVue from '../../../components/LoadingSpinner.vue'
+import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import MenuTitle from '../MenuTitle.vue'
 import LineChart from './LineChart.vue'
-import PlayerIconVue from '../player/PlayerIcon.vue'
+import PlayerIcon from '../player/PlayerIcon.vue'
 import GameHelper from '../../../../services/gameHelper'
-import GameApiService from '../../../../services/api/game'
+import {getIntel} from "@/services/typedapi/game.js";
+import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 
 export default {
   components: {
-    'loading-spinner': LoadingSpinnerVue,
+    'loading-spinner': LoadingSpinner,
     'menu-title': MenuTitle,
     'line-chart': LineChart,
-    'player-icon': PlayerIconVue
+    'player-icon': PlayerIcon
   },
   props: {
     compareWithPlayerId: String
+  },
+  setup() {
+    return {
+      httpClient: inject(httpInjectionKey),
+    };
   },
   data () {
     return {
@@ -189,15 +195,13 @@ export default {
     async reloadData () {
       this.history = null
 
-      try {
-        const response = await GameApiService.getGameIntel(this.$store.state.game._id, this.startTick, this.$store.state.tick)
+      const response = getIntel(this.httpClient)(this.$store.state.game._id, this.startTick, this.$store.state.tick);
 
-        if (response.status === 200) {
-          this.history = response.data
-          this.fillData()
-        }
-      } catch (err) {
-        console.error(err)
+      if (isOk(response)) {
+        this.history = response.data;
+        this.fillData();
+      } else {
+        console.error(formatError(response));
       }
     },
     togglePlayerFilter (playerFilter) {

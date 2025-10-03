@@ -82,7 +82,7 @@ export default (container: DependencyContainer) => {
         },
         detailGalaxy: async (req, res, next) => {
             try {
-                let tick = +req.query.tick || null;
+                let tick = Number(req.query.tick) || null;
         
                 if (tick != null && tick < 0) {
                     throw new ValidationError(`Tick must be greater or equal to 0.`);

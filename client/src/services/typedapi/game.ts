@@ -36,8 +36,8 @@ export const detailState = (axios: Axios) => async (gameId: string): Promise<Res
   return doGet(axios)(routes.detailState, { gameId }, {}, { withCredentials: true });
 }
 
-export const detailGalaxy = (axios: Axios) => async (gameId: string): Promise<ResponseResult<GameGalaxyDetail<string>>> => {
-  return doGet(axios)(routes.detailGalaxy, { gameId }, {}, { withCredentials: true });
+export const detailGalaxy = (axios: Axios) => async (gameId: string, tick?: number): Promise<ResponseResult<GameGalaxyDetail<string>>> => {
+  return doGet(axios)(routes.detailGalaxy, { gameId }, { tick }, { withCredentials: true });
 }
 
 export const listSummary = (axios: Axios) => async (): Promise<ResponseResult<GameListSummary<string>>> => {
