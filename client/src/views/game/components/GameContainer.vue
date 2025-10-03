@@ -6,23 +6,25 @@
 import { ref, inject, onMounted, onBeforeUnmount, type Ref, watch, computed } from 'vue';
 import { useStore } from 'vuex';
 import type { Store } from 'vuex/types/index.js';
-import { eventBusInjectionKey, type EventBus } from '../../../eventBus'
+import { eventBusInjectionKey } from '../../../eventBus'
 import type { TempWaypoint } from "../../../types/waypoint";
 import MapEventBusEventNames, { type ObjectClicked, type OnPreStarParams } from '../../../eventBusEventNames/map';
 import type { Carrier, Game, Star } from '../../../types/game';
 import type { ToastPluginApi } from 'vue-toast-notification';
 import type { State } from '../../../store';
 import { toastInjectionKey } from '../../../util/keys';
-import GameApiService from '../../../services/api/game'
 import { attachEventDeduplication } from "../../../util/eventDeduplication";
 import MapCommandEventBusEventNames from "../../../eventBusEventNames/mapCommand";
 import {createGameContainer} from "@/game/container";
 import { StoreDrawingContext } from './StoreDrawingContext';
+import {touch} from "@/services/typedapi/game";
+import {httpInjectionKey, isError} from "@/services/typedapi";
 
 const store = useStore() as Store<State>;
 
 const eventBus = inject(eventBusInjectionKey)!;
 const toast: ToastPluginApi = inject(toastInjectionKey)!;
+const httpClient = inject(httpInjectionKey)!;
 
 const emit = defineEmits<{
   onStarClicked: [starId: string],
@@ -66,7 +68,11 @@ onMounted(() => {
     const touchPlayer = async () => {
       try {
         if (store.state.game && store.state.userId) {
-          await GameApiService.touchPlayer(store.state.game!._id);
+          const response = await touch(httpClient)(store.state.game._id);
+
+          if (isError(response)) {
+            console.error(response);
+          }
         }
       } catch (e) {
         console.error(e)

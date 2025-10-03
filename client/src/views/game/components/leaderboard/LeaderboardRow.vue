@@ -43,7 +43,7 @@
         <i class="fas fa-check text-success" title="This player has completed their turn"></i>
       </h5>
 
-      <ready-status-button
+      <ready-status-button :smallButtons="false"
         v-if="!isHistoricalMode && getUserPlayer() && isUserPlayer(player) && !getUserPlayer()?.defeated"/>
     </td>
     <td class="fit pt-2 pb-2 pe-2">
