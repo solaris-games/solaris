@@ -35,51 +35,45 @@
   </div>
 </template>
 
-<script>
-import { inject } from 'vue';
+<script setup lang="ts">
+import { inject, ref, onMounted } from 'vue';
 import SelectAvatar from './SelectAvatar.vue'
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { detailMe } from '@/services/typedapi/user';
 
-export default {
-  components: {
-    'select-avatar': SelectAvatar
-  },
-  props: {
-    isAnonymousGame: Boolean,
-  },
-  setup() {
-    return {
-      httpClient: inject(httpInjectionKey),
-    };
-  },
-  data() {
-    return {
-      alias: null,
-      avatar: null,
-    }
-  },
-  async mounted() {
-    const response = await detailMe(this.httpClient)();
+const props = defineProps<{
+  isAnonymousGame: boolean,
+}>();
 
-    if (isOk(response)) {
-      this.alias = response.data.username
-      this.onAliasChanged(this.alias)
-    } else {
-      console.error(formatError(response));
-    }
-  },
-  methods: {
-    onAliasChanged(e) {
-      this.$emit('onAliasChanged', this.alias)
-    },
-    onAvatarChanged(e) {
-      this.avatar = e
+const emit = defineEmits<{
+  onAliasChanged: [alias: string],
+  onAvatarChanged: [avatar: number],
+}>();
 
-      this.$emit('onAvatarChanged', e)
-    }
+const httpClient = inject(httpInjectionKey)!;
+
+const alias = ref<string>("");
+const avatar = ref<number | null>(null);
+
+const onAliasChanged = (value) => {
+  emit('onAliasChanged', value);
+};
+
+const onAvatarChanged = (e: number) => {
+  avatar.value = e;
+  emit('onAvatarChanged', e);
+};
+
+onMounted(async () => {
+  const response = await detailMe(httpClient)();
+
+  if (isOk(response)) {
+    alias.value = response.data.username;
+    onAliasChanged(alias.value);
+  } else {
+    console.error(formatError(response));
   }
-}
+});
 </script>
 
 <style scoped>

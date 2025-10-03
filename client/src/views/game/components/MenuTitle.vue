@@ -10,20 +10,24 @@
 </div>
 </template>
 
-<script>
-export default {
-  props: {
-    title: String
-  },
-  methods: {
-    close () {
-      this.$emit('onCloseRequested')
-    },
-    titleClicked () {
-      this.$emit('onTitleClicked')
-    }
-  }
-}
+<script setup lang="ts">
+const props = defineProps<{
+  title: string
+}>();
+
+const emit = defineEmits<{
+  onCloseRequested: [],
+  onTitleClicked: []
+}>();
+
+const close = () => {
+  emit('onCloseRequested');
+};
+
+const titleClicked = () => {
+  emit('onTitleClicked');
+};
+
 </script>
 
 <style scoped>
