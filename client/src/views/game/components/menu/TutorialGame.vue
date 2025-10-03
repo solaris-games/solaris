@@ -1,7 +1,3 @@
-<script setup>
-import tutorial from '../../../../assets/screenshots/tutorial.png';
-</script>
-
 <template>
     <div>
         <div class="row">
@@ -56,29 +52,33 @@ import tutorial from '../../../../assets/screenshots/tutorial.png';
     </div>
 </template>
 
-<script>
-import router from '../../../../router'
-import gameService from '../../../../services/api/game'
+<script setup lang="ts">
+import router from '../../../../router';
+import { inject } from 'vue';
+import { useStore, type Store } from 'vuex';
+import tutorial from '../../../../assets/screenshots/tutorial.png';
+import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
+import { makeConfirm } from '@/util/confirm';
+import { createTutorial } from '@/services/typedapi/game';
 
-export default {
-    methods: {
-        async viewTutorial () {
-            if (!await this.$confirm(`Start Tutorial`, `You are about to start the tutorial, are you sure you want to continue?`)) {
-                return
-            }
+const httpClient = inject(httpInjectionKey)!;
 
-            try {
-                let response = await gameService.createTutorialGame()
+const store = useStore();
+const confirm = makeConfirm(store);
 
-                if (response.status === 201) {
-                    router.push({ name: 'game', query: { id: response.data } })
-                }
-            } catch (err) {
-                console.error(err)
-            }
-        }
-    }
-}
+const viewTutorial = async () => {
+  if (!await confirm(`Start Tutorial`, `You are about to start the tutorial, are you sure you want to continue?`)) {
+    return;
+  }
+
+  const response = await createTutorial(httpClient)();
+
+  if (isOk(response)) {
+    router.push({ name: 'game', query: { id: response.data.gameId } })
+  } else {
+    console.error(formatError(response));
+  }
+};
 </script>
 
 <style scoped>

@@ -57,7 +57,6 @@ import TeamName from '@/views/game/components/shared/TeamName.vue';
 import PlayerAvatar from '@/views/game/components/menu/PlayerAvatar.vue';
 import ReadyStatusButton from '@/views/game/components/menu/ReadyStatusButton.vue';
 import GameHelper from '@/services/gameHelper';
-import gameService from '@/services/api/game';
 import {eventBusInjectionKey} from "@/eventBus";
 import { inject, computed } from 'vue';
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
@@ -65,6 +64,8 @@ import type { Player } from '@/types/game';
 import type {State} from "@/store";
 import { useStore, type Store } from 'vuex';
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
+import { notReadyToQuit } from '@/services/typedapi/game';
+import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 
 const props = defineProps<{
   player: Player,
@@ -76,6 +77,7 @@ const emit = defineEmits<{
 }>();
 
 const eventBus = inject(eventBusInjectionKey)!;
+const httpClient = inject(httpInjectionKey)!;
 
 const store: Store<State> = useStore();
 
@@ -138,14 +140,11 @@ const unconfirmReadyToQuit = async (player: Player) => {
     return;
   }
 
-  try {
-    const response = await gameService.unconfirmReadyToQuit(store.state.game._id);
-
-    if (response.status === 200) {
-      player.readyToQuit = false;
-    }
-  } catch (err) {
-    console.error(err)
+  const response = await notReadyToQuit(httpClient)(store.state.game._id);
+  if (isOk(response)) {
+    player.readyToQuit = false;
+  } else {
+    console.error(formatError(response));
   }
 };
 

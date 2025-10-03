@@ -90,7 +90,6 @@
 
 <script setup lang="ts">
 import router from '../../../../router'
-import gameService from '../../../../services/api/game'
 import ModalButton from '../../../components/modal/ModalButton.vue'
 import DialogModal from '../../../components/modal/DialogModal.vue'
 import GameHelper from '../../../../services/gameHelper'
@@ -110,6 +109,8 @@ import { useIsHistoricalMode } from '@/util/reactiveHooks'
 import WinCondition from "@/views/game/components/leaderboard/WinCondition.vue";
 import Winner from "@/views/game/components/leaderboard/Winner.vue";
 import Leaderboards from "@/views/game/components/leaderboard/Leaderboards.vue";
+import { notReadyToQuit, quit, readyToQuit } from '@/services/typedapi/game'
+import { formatError, httpInjectionKey, isOk } from '@/services/typedapi'
 
 const emit = defineEmits<{
   onCloseRequested: [],
@@ -120,6 +121,7 @@ const emit = defineEmits<{
 const store: Store<State> = useStore();
 const confirm = makeConfirm(store);
 
+const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
 const activeTab: Ref<string | null> = ref(null);
@@ -153,18 +155,15 @@ const onViewSettingsRequested = () => emit('onViewSettingsRequested');
 const onOpenPlayerDetailRequested = (playerId: string) => emit('onOpenPlayerDetailRequested', playerId);
 
 const quitGame = async () => {
-  isQuittingGame.value = true
+  isQuittingGame.value = true;
 
-  try {
-    const response = await gameService.quitGame(game.value._id);
-
-    if (response.status === 200) {
-      AudioService.quit()
-      toast.error(`You have quit ${game.value.settings.general.name}.`)
-      router.push({ name: 'main-menu' })
-    }
-  } catch (err) {
-    console.error(err);
+  const response = await quit(httpClient)(game.value._id);
+  if (isOk(response)) {
+    AudioService.quit();
+    toast.error(`You have quit ${game.value.settings.general.name}.`);
+    router.push({ name: 'main-menu' });
+  } else {
+    console.error(formatError(response));
   }
 
   isQuittingGame.value = false;
@@ -185,16 +184,13 @@ const confirmReadyToQuit = async (player: Player<string>) => {
     return
   }
 
-  try {
-    const response = await gameService.confirmReadyToQuit(game.value._id);
+  const response = await readyToQuit(httpClient)(game.value._id);
 
-    if (response.status === 200) {
-      toast.success(`You have confirmed that you are ready to quit.`);
-
-      player.readyToQuit = true;
-    }
-  } catch (err) {
-    console.error(err)
+  if (isOk(response)) {
+    toast.success(`You have confirmed that you are ready to quit.`);
+    player.readyToQuit = true;
+  } else {
+    console.error(formatError(response));
   }
 };
 
@@ -203,14 +199,11 @@ const unconfirmReadyToQuit = async (player: Player<string>) => {
     return;
   }
 
-  try {
-    const response = await gameService.unconfirmReadyToQuit(game.value._id);
-
-    if (response.status === 200) {
-      player.readyToQuit = false;
-    }
-  } catch (err) {
-    console.error(err);
+  const response = await notReadyToQuit(httpClient)(game.value._id);
+  if (isOk(response)) {
+    player.readyToQuit = false;
+  } else {
+    console.error(formatError(response));
   }
 };
 
