@@ -1,79 +1,81 @@
 <template>
-    <div class="btn-group" v-if="isGameInProgress && !userPlayer.defeated">
-        <button class="btn btn-danger btn-sm" @click="concedeDefeat(false)" title="Concede Defeat">
-            <i class="fas fa-skull-crossbones"></i> {{isTutorialGame ? 'Quit Tutorial' : 'Concede Defeat'}}
-        </button>
-        <button type="button" class="btn btn-sm btn-danger dropdown-toggle dropdown-toggle-split pulse" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-if="!isTutorialGame">
-            <span class="sr-only">Toggle Dropdown</span>
-        </button>
-        <div class="dropdown-menu" v-if="!isTutorialGame">
-            <a class="dropdown-item" href="javascript:;" @click="concedeDefeat(false)">Concede Defeat</a>
-            <a class="dropdown-item" href="javascript:;" @click="concedeDefeat(true)">Concede Defeat + Open Slot</a>
-        </div>
+  <div class="btn-group" v-if="isGameInProgress && !userPlayer.defeated">
+    <button class="btn btn-danger btn-sm" @click="doConcedeDefeat(false)" title="Concede Defeat">
+      <i class="fas fa-skull-crossbones"></i> {{ isTutorialGame ? 'Quit Tutorial' : 'Concede Defeat' }}
+    </button>
+    <button type="button" class="btn btn-sm btn-danger dropdown-toggle dropdown-toggle-split pulse"
+            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-if="!isTutorialGame">
+      <span class="sr-only">Toggle Dropdown</span>
+    </button>
+    <div class="dropdown-menu" v-if="!isTutorialGame">
+      <a class="dropdown-item" href="javascript:;" @click="doConcedeDefeat(false)">Concede Defeat</a>
+      <a class="dropdown-item" href="javascript:;" @click="doConcedeDefeat(true)">Concede Defeat + Open Slot</a>
     </div>
+  </div>
 </template>
 
-<script>
-import router from '../../../../router'
-import GameHelper from '../../../../services/gameHelper'
-import GameApiService from '../../../../services/api/game'
-import AudioService from '../../../../game/audio'
+<script setup lang="ts">
+import router from '../../../../router';
+import GameHelper from '../../../../services/gameHelper';
+import AudioService from '../../../../game/audio';
+import { ref, computed, inject } from 'vue';
+import { useStore } from 'vuex';
+import type { Store } from 'vuex';
+import type { State } from '../../../../store';
+import { toastInjectionKey } from '../../../../util/keys';
+import { makeConfirm } from "@/util/confirm";
+import {httpInjectionKey, isOk} from "@/services/typedapi";
+import type { Game } from '../../../../types/game';
+import { concedeDefeat } from '@/services/typedapi/game';
 
-export default {
-    data () {
-        return {
-            isConcedingDefeat: false
-        }
-    },
-    methods: {
-        async concedeDefeat (openSlot) {
-            let message = 'Are you sure you want to concede defeat in this game?'
+const httpClient = inject(httpInjectionKey)!;
+const toast = inject(toastInjectionKey)!;
 
-            if (this.isTutorialGame) {
-                message = 'Are you sure you want to exit the tutorial? All progress will be lost.'
-            }
+const store: Store<State> = useStore();
+const confirm = makeConfirm(store);
+const game = computed<Game>(() => store.state.game);
 
-            if (openSlot) {
-                message += ' Your slot will be open for another player to fill.'
-            }
+const isConcedingDefeat = ref(false);
 
-            if (!await this.$confirm('Concede Defeat', message)) {
-                return
-            }
+const userPlayer = computed(() => GameHelper.getUserPlayer(store.state.game)!);
+const isTutorialGame = computed(() => GameHelper.isTutorialGame(store.state.game));
+const isGameInProgress = computed(() => GameHelper.isGameStarted(store.state.game) && !GameHelper.isGameFinished(store.state.game));
 
-            this.isConcedingDefeat = true
+const doConcedeDefeat = async (openSlot: boolean) => {
+  let message = 'Are you sure you want to concede defeat in this game?';
 
-            try {
-                let response = await GameApiService.concedeDefeat(this.$store.state.game._id, openSlot)
+  if (isTutorialGame.value) {
+    message = 'Are you sure you want to exit the tutorial? All progress will be lost.';
+  }
 
-                if (response.status === 200) {
-                    AudioService.quit()
+  if (openSlot) {
+    message += ' Your slot will be open for another player to fill.';
+  }
 
-                    if (!this.isTutorialGame) {
-                        this.$toast.error(`You have conceded defeat, better luck next time.`)
-                    }
+  if (!await confirm('Concede Defeat', message)) {
+    return;
+  }
 
-                    router.push({ name: 'main-menu' })
-                }
-            } catch (err) {
-                console.error(err)
-            }
+  isConcedingDefeat.value = true;
 
-            this.isConcedingDefeat = false
-        }
-    },
-    computed: {
-        userPlayer () {
-            return GameHelper.getUserPlayer(this.$store.state.game)
-        },
-        isTutorialGame () {
-            return GameHelper.isTutorialGame(this.$store.state.game)
-        },
-        isGameInProgress () {
-            return GameHelper.isGameStarted(this.$store.state.game) && !GameHelper.isGameFinished(this.$store.state.game);
-        }
+  try {
+    const response = await concedeDefeat(httpClient)(game.value._id, openSlot);
+
+    if (isOk(response)) {
+      AudioService.quit();
+
+      if (!isTutorialGame.value) {
+        toast.error(`You have conceded defeat, better luck next time.`);
+      }
+
+      router.push({name: 'main-menu'});
     }
-}
+  } catch (err) {
+    console.error(err);
+  }
+
+  isConcedingDefeat.value = false;
+};
 </script>
 
 <style scoped>

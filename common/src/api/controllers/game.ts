@@ -111,7 +111,7 @@ export const createGameRoutes = <ID>() => ({
     getIntel: new GetRoute<{ gameId: ID }, {}, Intel<ID>>("/api/game/:gameId/intel"),
     join: new PutRoute<{ gameId: ID }, {}, GameJoinGameRequest<ID>, {}>("/api/game/:gameId/join"),
     quit: new PutRoute<{ gameId: ID }, {}, {}, {}>("/api/game/:gameId/quit"), 
-    concedeDefeat: new PutRoute<{ gameId: ID }, {}, {}, {}>("/api/game/:gameId/concedeDefeat"), 
+    concedeDefeat: new PutRoute<{ gameId: ID }, {}, { openSlot: boolean }, {}>("/api/game/:gameId/concedeDefeat"),
     ready: new PutRoute<{ gameId: ID }, {}, {}, {}>("/api/game/:gameId/ready"), 
     readyToCycle: new PutRoute<{ gameId: ID }, {}, {}, {}>("/api/game/:gameId/readytocycle"), 
     notReady:  new PutRoute<{ gameId: ID }, {}, {}, {}>("/api/game/:gameId/notready"), 

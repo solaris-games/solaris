@@ -88,8 +88,8 @@ export const quit = (axios: Axios) => async (gameId: string): Promise<ResponseRe
   return doPut(axios)(routes.quit, { gameId }, {}, {}, { withCredentials: true });
 }
 
-export const concedeDefeat = (axios: Axios) => async (gameId: string): Promise<ResponseResult<{}>> => {
-  return doPut(axios)(routes.concedeDefeat, { gameId }, {}, {}, { withCredentials: true });
+export const concedeDefeat = (axios: Axios) => async (gameId: string, openSlot: boolean): Promise<ResponseResult<{}>> => {
+  return doPut(axios)(routes.concedeDefeat, { gameId }, {}, { openSlot }, { withCredentials: true });
 }
 
 export const ready = (axios: Axios) => async (gameId: string): Promise<ResponseResult<{}>> => {
