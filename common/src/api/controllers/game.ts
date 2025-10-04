@@ -108,7 +108,7 @@ export const createGameRoutes = <ID>() => ({
     listActive: new GetRoute<{}, {}, UserActiveListGame<ID>[]>("/api/game/list/active"),
     listMyOpen: new GetRoute<{}, {}, ListGame<ID>[]>("/api/game/list/open"),
     listSpectating: new GetRoute<{}, {}, ListGame<ID>[]>("/api/game/list/spectating"),
-    getIntel: new GetRoute<{ gameId: ID }, {}, Intel<ID>>("/api/game/:gameId/intel"),
+    getIntel: new GetRoute<{ gameId: ID }, {}, Intel<ID>[]>("/api/game/:gameId/intel"),
     join: new PutRoute<{ gameId: ID }, {}, GameJoinGameRequest<ID>, {}>("/api/game/:gameId/join"),
     quit: new PutRoute<{ gameId: ID }, {}, {}, {}>("/api/game/:gameId/quit"), 
     concedeDefeat: new PutRoute<{ gameId: ID }, {}, { openSlot: boolean }, {}>("/api/game/:gameId/concedeDefeat"),

@@ -76,7 +76,7 @@ export const listSpectating = (axios: Axios) => async (): Promise<ResponseResult
   return doGet(axios)(routes.listSpectating, {}, {}, { withCredentials: true });
 }
 
-export const getIntel = (axios: Axios) => async (gameId: string): Promise<ResponseResult<Intel<string>>> => {
+export const getIntel = (axios: Axios) => async (gameId: string): Promise<ResponseResult<Intel<string>[]>> => {
   return doGet(axios)(routes.getIntel, { gameId }, {}, { withCredentials: true });
 }
 
