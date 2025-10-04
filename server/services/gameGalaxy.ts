@@ -178,7 +178,7 @@ export default class GameGalaxyService {
         }
 
         // Check if the user is playing in this game.
-        let userPlayer = this._getUserPlayer(game, userId);
+        const userPlayer = this._getUserPlayer(game, userId);
 
         // Remove who created the game.
         delete game.settings.general.createdByUserId;
@@ -197,7 +197,7 @@ export default class GameGalaxyService {
         }
 
         // Calculate what perspectives the user can see, i.e which players the user is spectating.
-        const viewpoint = this._getViewpoint(game, userId);
+        const viewpoint = this._getViewpoint(game, userId, userPlayer);
 
         this._setReadyToQuitCount(game);
 
@@ -737,7 +737,7 @@ export default class GameGalaxyService {
         }) as any;
     }
 
-    _getViewpoint(game: Game, userId: DBObjectId | null): Viewpoint {
+    _getViewpoint(game: Game, userId: DBObjectId | null, userPlayer: Player | null): Viewpoint {
         if (this.gameStateService.isFinished(game)) {
             return {
                 kind: ViewpointKind.Finished
@@ -746,7 +746,6 @@ export default class GameGalaxyService {
 
         // Check if the user is playing in this game, if so they can only see from
         // their own perspective.
-        let userPlayer = this._getUserPlayer(game, userId);
 
         if (userPlayer) {
             return {
