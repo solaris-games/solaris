@@ -1,10 +1,10 @@
 import {logger} from "../../utils/logging";
 
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
+import mongooseLeanDefaults from "mongoose-lean-defaults";
+
 const Schema = mongoose.Schema;
 const Types = Schema.Types;
-const mongooseLeanDefaults = require('mongoose-lean-defaults');
-
 export type JobExecuted = {
     jobName: string,
     timestamp: number,
