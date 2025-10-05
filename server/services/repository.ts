@@ -1,8 +1,7 @@
-import { Document, EnforceDocument, LeanDocument, Model, Query, QueryOptions, UpdateQuery } from "mongoose";
+import { Model, QueryOptions, UpdateQuery } from "mongoose";
 import { DBObjectId } from "./types/DBObjectId";
 
 export default class Repository<T> {
-
     model: Model<T>;
     
     constructor(model) {
@@ -20,18 +19,15 @@ export default class Repository<T> {
     }
 
     async find(query, select?: any | null, sort?: any | null, limit?: number | null, skip?: number | null, defaults: boolean = true): Promise<T[]> {
-        // TODO: The allowDiskUse() method was added to Mongoose in 5.12.8 (https://github.com/Automattic/mongoose/issues/10177), but
-        // the Typescript type definition for the method was only added in 6.0.9 (https://github.com/Automattic/mongoose/pull/10791).
-        // This horrible bodge ensures that this all works with Typescript, and can be removed once we update Mongoose to version 6.0.9 or above.
-        type T1 = Query<T extends Document<any, any, any> ? LeanDocument<EnforceDocument<T, {}>>[] : T[], EnforceDocument<T, {}>, {}, T> & { allowDiskUse(value: boolean): Query<T extends Document<any, any, any> ? LeanDocument<EnforceDocument<T, {}>>[] : T[], EnforceDocument<T, {}>, {}, T> } ;
+        const q = this.model.find(query, select)
+            .sort(sort)
+            .skip(skip!) // We lie and say skip won't be null.  The reality is that skip() can accept null values just fine.
+            .limit(limit!) // We lie and say limit won't be null.  The reality is that limit() can accept null values just fine.
+            .lean({ defaults });
 
-        return await (this.model.find(query, select)
-        .sort(sort)
-        .skip(skip!) // We lie and say skip won't be null.  The reality is that skip() can accept null values just fine.
-        .limit(limit!) // We lie and say limit won't be null.  The reality is that limit() can accept null values just fine.
-        .lean({ defaults }) as T1)
-        .allowDiskUse(true)
-        .exec() as T[];
+        const result = await q.allowDiskUse(true).exec();
+
+        return result as T[];
     }
 
     async findAsModels(query, select?, sort?, limit?: number, skip?: number): Promise<any[]> {
