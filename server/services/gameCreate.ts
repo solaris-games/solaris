@@ -485,7 +485,7 @@ export default class GameCreateService {
     _setGalaxyCenter(game: Game) {
         const starLocations = game.galaxy.stars.map(s => s.location);
 
-        game.constants.distances.galaxyCenterLocation = this.starDistanceService.getGalaxyCenter(starLocations);
+        game.constants.distances.galaxyCenterLocation = this.starDistanceService.getGalaxyCenterOfMass(starLocations);
     }
 
     _calculateStarsForVictory(game: Game) {

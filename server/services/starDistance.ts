@@ -185,25 +185,6 @@ export default class StarDistanceService {
         };
     }
 
-    getGalaxyCenter(starLocations: Location[]) {
-        if (!starLocations.length) {
-            return {
-                x: 0,
-                y: 0
-            };
-        }
-
-        let maxX = starLocations.sort((a, b) => b.x - a.x)[0].x;
-        let maxY = starLocations.sort((a, b) => b.y - a.y)[0].y;
-        let minX = starLocations.sort((a, b) => a.x - b.x)[0].x;
-        let minY = starLocations.sort((a, b) => a.y - b.y)[0].y;
-
-        return {
-            x: (minX + maxX) / 2,
-            y: (minY + maxY) / 2
-        };
-    }
-
     getGalaxyCenterOfMass(starLocations: Location[]) {
         if (!starLocations.length) {
             return {
@@ -212,12 +193,15 @@ export default class StarDistanceService {
             };
         }
 
-        let totalX = starLocations.reduce((total, s) => total += s.x, 0);
-        let totalY = starLocations.reduce((total, s) => total += s.y, 0);
+        const totalX = starLocations.reduce((total, s) => total + s.x, 0);
+        const totalY = starLocations.reduce((total, s) => total + s.y, 0);
+
+        const x = totalX / starLocations.length;
+        const y = totalY / starLocations.length;
 
         return {
-            x: totalX / starLocations.length,
-            y: totalY / starLocations.length,
+            x,
+            y,
         };
     }
 };
