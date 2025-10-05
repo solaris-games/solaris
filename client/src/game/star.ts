@@ -675,7 +675,7 @@ export class Star extends EventEmitter<keyof Events, Events> implements MapObjec
     let carriersOrbiting = this._getStarCarriers()
     let carrierCount = carriersOrbiting.length
 
-    let shipsText = ''
+    let shipsText: string | undefined = undefined;
 
     if (this.data.ownedByPlayerId || carriersOrbiting.length) {
       let scramblers = 0
@@ -686,8 +686,7 @@ export class Star extends EventEmitter<keyof Events, Events> implements MapObjec
 
       if (scramblers == carrierCount && this.data.ships == null) {
         shipsText = '???'
-      }
-      else {
+      } else if (totalKnownShips > 0 || scramblers > 0) {
         shipsText = totalKnownShips.toString();
 
         if (scramblers > 0 || this.data.ships == null) {
