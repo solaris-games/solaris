@@ -3,9 +3,15 @@ import { DependencyContainer } from "../../services/types/DependencyContainer";
 import SpecialistController from '../controllers/specialist';
 import { MiddlewareContainer } from "../middleware";
 import {SingleRouter} from "../singleRoute";
+import {createSpecialistRoutes} from "@solaris-common";
+import {DBObjectId} from "../../services/types/DBObjectId";
+import {createRoutes} from "../typedapi/routes";
 
 export default (router: SingleRouter, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
     const controller = SpecialistController(container);
+    const routes = createSpecialistRoutes<DBObjectId>();
+
+    const answer = createRoutes(router, mw);
 
     router.get('/api/game/specialists/bans',
             controller.listBans

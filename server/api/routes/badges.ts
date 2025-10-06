@@ -6,10 +6,11 @@ import { badgesPurchaseBadgeRequestSchema } from "../requests/badges";
 import {SingleRouter} from "../singleRoute";
 import {createBadgeRoutes} from "solaris-common";
 import {createRoutes} from "../typedapi/routes";
+import {DBObjectId} from "../../services/types/DBObjectId";
 
 export default (router: SingleRouter, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
     const controller = BadgeController(container);
-    const routes = createBadgeRoutes();
+    const routes = createBadgeRoutes<DBObjectId>();
 
     const answer = createRoutes(router, mw);
 
