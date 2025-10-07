@@ -1,5 +1,5 @@
 import { Location } from "./Location";
-import { CarrierWaypoint } from "./CarrierWaypoint";
+import { CarrierWaypoint } from "solaris-common";
 import { MapObject } from "./Map";
 import { DBObjectId } from "./DBObjectId";
 import { Specialist } from "./Specialist";
@@ -14,7 +14,7 @@ export interface Carrier extends MapObject {
     specialistExpireTick: number | null;
     specialist: Specialist | null;
     isGift: boolean;
-    waypoints: CarrierWaypoint[];
+    waypoints: CarrierWaypoint<DBObjectId>[];
     ticksEta?: number | null;
     ticksEtaTotal?: number | null;
     locationNext: Location | null;

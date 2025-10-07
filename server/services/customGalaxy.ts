@@ -6,7 +6,7 @@ import PlayerColourService from "./playerColour";
 import SpecialistService from "./specialist";
 import TeamService from "./team";
 import { Carrier } from "./types/Carrier";
-import { CarrierWaypoint } from "./types/CarrierWaypoint";
+import { CarrierWaypoint } from "solaris-common";
 import {
     CustomGalaxy,
     CustomGalaxyCarrier,
@@ -377,7 +377,7 @@ export default class CustomGalaxyService {
             const ownerId = generatedPlayers.get(customCarrier.playerId)!._id;
 
             // Convert waypoints
-            const waypoints: CarrierWaypoint[] = [];
+            const waypoints: CarrierWaypoint<DBObjectId>[] = [];
             for (const customWaypoint of customCarrier.waypoints) {
                 const source = generatedStars.get(customWaypoint.source)!._id;
                 const destination = generatedStars.get(customWaypoint.destination)!._id;
@@ -480,7 +480,7 @@ export default class CustomGalaxyService {
         return linkedStarIds;
     }
 
-    _createCustomGalaxyCarrier(name: string, ownerId: DBObjectId, location: Location, orbiting: DBObjectId | null, waypoints: CarrierWaypoint[], customCarrier: CustomGalaxyCarrier) {
+    _createCustomGalaxyCarrier(name: string, ownerId: DBObjectId, location: Location, orbiting: DBObjectId | null, waypoints: CarrierWaypoint<DBObjectId>[], customCarrier: CustomGalaxyCarrier) {
         return {
             _id: mongoose.Types.ObjectId(),
             ownedByPlayerId: ownerId,

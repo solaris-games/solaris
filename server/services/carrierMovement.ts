@@ -1,6 +1,6 @@
 import Repository from './repository';
 import { Carrier } from './types/Carrier';
-import { CarrierWaypoint } from './types/CarrierWaypoint';
+import { CarrierWaypoint } from 'solaris-common';
 import { Game } from './types/Game';
 import { Player } from './types/Player';
 import { Star } from './types/Star';
@@ -10,10 +10,10 @@ import DiplomacyService from './diplomacy';
 import DistanceService from './distance';
 import SpecialistService from './specialist';
 import StarService from './star';
-import WaypointService from "./waypoint";
 import TechnologyService from "./technology";
 import StarDistanceService from "./starDistance";
 import {logger} from "../utils/logging";
+import {DBObjectId} from "./types/DBObjectId";
 
 type CarrierMovementReport = {
     carrier: Carrier;
@@ -23,7 +23,7 @@ type CarrierMovementReport = {
     warpSpeed: boolean;
     instantSpeed: boolean | null;
     distancePerTick: number | null;
-    waypoint: CarrierWaypoint;
+    waypoint: CarrierWaypoint<DBObjectId>;
     combatRequiredStar: boolean;
     arrivedAtStar: boolean;
 }
@@ -149,7 +149,7 @@ export default class CarrierMovementService {
     }
 
     moveCarrier(game: Game, gameUsers: User[], carrierInTransit: Carrier): CarrierMovementReport | null {
-        let waypoint: CarrierWaypoint = carrierInTransit.waypoints[0];
+        let waypoint: CarrierWaypoint<DBObjectId> = carrierInTransit.waypoints[0];
 
         if (waypoint.delayTicks) {
             throw new Error(`Cannot move carrier, the waypoint has a delay.`);

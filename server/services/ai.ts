@@ -12,8 +12,8 @@ import TechnologyService from "./technology";
 import WaypointService from "./waypoint";
 import {Star} from "./types/Star";
 import {Carrier} from "./types/Carrier";
-import {getOrInsert, maxBy, minBy, notNull, reverseSort} from "./utils";
-import {CarrierWaypoint, CarrierWaypointActionType} from "./types/CarrierWaypoint";
+import {getOrInsert, maxBy, notNull, reverseSort} from "./utils";
+import {CarrierWaypoint, CarrierWaypointActionType} from "solaris-common";
 import ReputationService from "./reputation";
 import DiplomacyService from "./diplomacy";
 import PlayerStatisticsService from "./playerStatistics";
@@ -23,9 +23,9 @@ import PlayerAfkService from "./playerAfk";
 import ShipService from "./ship";
 import PathfindingService from "./pathfinding";
 import {logger} from "../utils/logging";
+import mongoose from 'mongoose';
 
 const Heap = require('qheap');
-const mongoose = require("mongoose");
 
 const FIRST_TICK_BULK_UPGRADE_SCI_PERCENTAGE = 20;
 const FIRST_TICK_BULK_UPGRADE_IND_PERCENTAGE = 30;
@@ -690,7 +690,7 @@ export default class AIService {
         player.aiState!.startedClaims = claimsInProgress;
     }
 
-    async _useAssignment(context: Context, game: Game, player: Player, assignments: Map<string, Assignment>, assignment: Assignment, waypoints: CarrierWaypoint[], ships: number, onCarrierUsed: ((Carrier) => void) | null = null) {
+    async _useAssignment(context: Context, game: Game, player: Player, assignments: Map<string, Assignment>, assignment: Assignment, waypoints: CarrierWaypoint<DBObjectId>[], ships: number, onCarrierUsed: ((Carrier) => void) | null = null) {
         let shipsToTransfer = ships;
         const starId = assignment.star._id;
         let carrier: Carrier = assignment.carriers && assignment.carriers[0];
@@ -726,7 +726,7 @@ export default class AIService {
         return carrierResult;
     }
 
-    _createWaypointsDropAndReturn(trace: TracePoint[], baseAction: CarrierWaypointActionType = "nothing"): CarrierWaypoint[] {
+    _createWaypointsDropAndReturn(trace: TracePoint[], baseAction: CarrierWaypointActionType = "nothing"): CarrierWaypoint<DBObjectId>[] {
         const newTrace: TracePoint[] = trace.slice(0, trace.length - 1);
 
         newTrace.push({
@@ -744,8 +744,8 @@ export default class AIService {
         return this._createWaypointsFromTrace(newTrace.concat(backTrace));
     }
 
-    _createWaypointsFromTrace(trace: TracePoint[]): CarrierWaypoint[] {
-        const waypoints: CarrierWaypoint[] = [];
+    _createWaypointsFromTrace(trace: TracePoint[]): CarrierWaypoint<DBObjectId>[] {
+        const waypoints: CarrierWaypoint<DBObjectId>[] = [];
         let last = trace[0].starId;
 
         for (let i = 1; i < trace.length; i++) {

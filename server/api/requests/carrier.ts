@@ -1,5 +1,5 @@
 import {ValidationError} from "solaris-common";
-import { CarrierWaypointActionType, CarrierWaypointActionTypes } from "../../services/types/CarrierWaypoint";
+import { CarrierWaypointActionType, CarrierWaypointActionTypes } from "solaris-common";
 import { DBObjectId } from "../../services/types/DBObjectId";
 import {
     array,

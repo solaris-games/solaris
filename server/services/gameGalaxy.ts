@@ -28,7 +28,7 @@ import StarMovementService from './starMovement';
 import StarUpgradeService from './starUpgrade';
 import TechnologyService from './technology';
 import { Carrier } from './types/Carrier';
-import { CarrierWaypoint } from './types/CarrierWaypoint';
+import { CarrierWaypoint } from 'solaris-common';
 import { DBObjectId } from './types/DBObjectId';
 import { Game } from './types/Game';
 import { GameHistoryCarrier } from "./types/GameHistory";
@@ -906,7 +906,7 @@ export default class GameGalaxyService {
             gameCarrier.specialistId = historyCarrier.specialistId;
             gameCarrier.isGift = historyCarrier.isGift;
             gameCarrier.location = historyCarrier.location;
-            gameCarrier.waypoints = historyCarrier.waypoints as CarrierWaypoint[];
+            gameCarrier.waypoints = historyCarrier.waypoints as CarrierWaypoint<DBObjectId>[];
         }
 
         // Add any carriers that were in the previous tick that do not exist in the current tick

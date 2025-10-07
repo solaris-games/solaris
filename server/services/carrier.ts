@@ -1,9 +1,9 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 import { DBObjectId } from './types/DBObjectId';
 import { ValidationError } from "solaris-common";
 import Repository from './repository';
 import { Carrier } from './types/Carrier';
-import { CarrierWaypoint } from './types/CarrierWaypoint';
+import { CarrierWaypoint } from 'solaris-common';
 import { Game } from './types/Game';
 import { MapObject } from './types/Map';
 import { Player } from './types/Player';
@@ -88,7 +88,7 @@ export default class CarrierService extends EventEmitter {
         let name = this.generateCarrierName(star, carriers);
 
         let carrier: Carrier = {
-            _id: mongoose.Types.ObjectId(),
+            _id: new mongoose.Types.ObjectId(),
             ownedByPlayerId: star.ownedByPlayerId,
             ships: ships,
             orbiting: star._id,
@@ -247,7 +247,7 @@ export default class CarrierService extends EventEmitter {
     }
 
     clearCarrierWaypointsNonTransit(carrier: Carrier, obfuscateFirstWaypoint: boolean = false) {
-        let waypoints: CarrierWaypoint[] = [];
+        let waypoints: CarrierWaypoint<DBObjectId>[] = [];
 
         if (!carrier.orbiting) {
             waypoints = carrier.waypoints.slice(0, 1);
