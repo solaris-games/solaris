@@ -33,9 +33,10 @@
 
 <script setup lang="ts">
 import SpecialistBanListTable from './SpecialistBanListTable.vue'
-import SpecialistService from "@/services/api/specialist";
-import { ref, onMounted } from 'vue';
-import type { GameSettings } from '@solaris-common';
+import { ref, onMounted, inject } from 'vue';
+import type {GameSettings, Specialist} from '@solaris-common';
+import {listCarrier, listStar} from "@/services/typedapi/specialist";
+import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 
 const props = defineProps<{
   game: {
@@ -43,22 +44,33 @@ const props = defineProps<{
   },
 }>();
 
+const httpClient = inject(httpInjectionKey)!;
+
 const isLoading = ref(false);
-const starSpecialists = ref([]);
-const carrierSpecialists = ref([]);
+const starSpecialists = ref<Specialist[]>([]);
+const carrierSpecialists = ref<Specialist[]>([]);
 
 const loadSpecialists = async () => {
   isLoading.value = true;
 
   const requests = [
-    SpecialistService.getCarrierSpecialists(),
-    SpecialistService.getStarSpecialists()
+    listCarrier(httpClient)(),
+    listStar(httpClient)(),
   ];
 
-  const responses = await Promise.all(requests);
+  const [carrierResponse, starResponse] = await Promise.all(requests);
 
-  carrierSpecialists.value = responses[0].data;
-  starSpecialists.value = responses[1].data;
+  if (isOk(carrierResponse)) {
+    carrierSpecialists.value = carrierResponse.data;
+  } else {
+    console.error(formatError(carrierResponse));
+  }
+
+  if (isOk(starResponse)) {
+    starSpecialists.value = starResponse.data;
+  } else {
+    console.error(formatError(starResponse));
+  }
 
   isLoading.value = false;
 }

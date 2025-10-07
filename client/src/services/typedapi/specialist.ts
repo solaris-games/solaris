@@ -1,6 +1,6 @@
-import {createSpecialistRoutes, type MonthlyBans, type Specialist} from "@solaris-common";
+import {createSpecialistRoutes, type MonthlyBans, type Specialist, type StarSpecialistHireResult, type CarrierSpecialistHireResult} from "@solaris-common";
 import type { Axios } from "axios";
-import { doGet, type ResponseResult } from ".";
+import {doGet, doPut, type ResponseResult} from ".";
 
 const routes = createSpecialistRoutes<string>();
 
@@ -24,10 +24,10 @@ export const listStarForGame = (axios: Axios) => async (gameId: string): Promise
   return doGet(axios)(routes.listStarForGame, { gameId }, {}, {});
 }
 
-export const hireStar = (axios: Axios) => async (gameId: string, starId: string, specialistId: number): Promise<ResponseResult<{}>> => {
-  return doGet(axios)(routes.hireStar, { gameId, starId, specialistId }, {}, {});
+export const hireStar = (axios: Axios) => async (gameId: string, starId: string, specialistId: number): Promise<ResponseResult<StarSpecialistHireResult>> => {
+  return doPut(axios)(routes.hireStar, { gameId, starId, specialistId }, {}, {}, { withCredentials: true });
 }
 
-export const hireCarrier = (axios: Axios) => async (gameId: string, carrierId: string, specialistId: number): Promise<ResponseResult<{}>> => {
-  return doGet(axios)(routes.hireCarrier, { gameId, carrierId, specialistId }, {}, {});
+export const hireCarrier = (axios: Axios) => async (gameId: string, carrierId: string, specialistId: number): Promise<ResponseResult<CarrierSpecialistHireResult<string>>> => {
+  return doPut(axios)(routes.hireCarrier, { gameId, carrierId, specialistId }, {}, {}, { withCredentials: true });
 }
