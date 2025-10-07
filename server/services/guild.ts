@@ -1,10 +1,10 @@
-const mongoose = require('mongoose');
-import { ValidationError } from "solaris-common";
+import mongoose from 'mongoose';
+import {ValidationError} from "solaris-common";
 import Repository from './repository';
 import SessionService from './session';
-import { DBObjectId } from './types/DBObjectId';
-import { Guild, GuildLeaderboard, GuildRank, GuildUserApplication, GuildWithUsers } from './types/Guild';
-import { User } from './types/User';
+import {DBObjectId} from './types/DBObjectId';
+import {Guild, GuildLeaderboard, GuildRank, GuildUserApplication, GuildWithUsers} from './types/Guild';
+import {User} from './types/User';
 import UserService from './user';
 
 function toProperCase(string: string) {
@@ -71,16 +71,14 @@ export default class GuildService {
     }
 
     async listInvitations(userId: DBObjectId) {
-        let guilds = await this.guildRepo.find({
+        return await this.guildRepo.find({
             invitees: {
-                $in: [mongoose.Types.ObjectId(userId)]
+                $in: [new mongoose.Types.ObjectId(userId)]
             }
         }, {
             name: 1,
             tag: 1
         });
-
-        return guilds;
     }
 
     async listApplications(userId: DBObjectId): Promise<GuildUserApplication[]> {

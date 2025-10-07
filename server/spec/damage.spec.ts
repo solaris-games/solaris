@@ -1,5 +1,5 @@
 import CombatService from '../services/combat';
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 describe('damage distribution', () => {
 

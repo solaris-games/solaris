@@ -19,7 +19,7 @@ import {GameHistoryCarrierWaypoint} from "./types/GameHistory";
 import GameMaskingService from "./gameMaskingService";
 import HistoryService from "./history";
 
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 export default class WaypointService {
     gameRepo: Repository<Game>;

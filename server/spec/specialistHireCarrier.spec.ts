@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 import SpecialistHireService from '../services/specialistHire';
 
 describe('specialistHire - Carrier', () => {
@@ -53,7 +53,7 @@ describe('specialistHire - Carrier', () => {
             },
             playerId: new mongoose.Types.ObjectId(),
             player: {
-                _id: null,
+                _id: new mongoose.Types.ObjectId(),
                 credits: 0,
                 creditsSpecialists: 0
             },

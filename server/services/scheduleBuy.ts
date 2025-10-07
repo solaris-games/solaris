@@ -1,6 +1,6 @@
 import {logger} from "../utils/logging";
 
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 import { ValidationError } from "solaris-common";
 import Repository from './repository';
@@ -125,7 +125,7 @@ export default class ScheduleBuyService extends EventEmitter {
 
     async addScheduledBuy(game: Game, player: Player, buyType: string, infrastructureType: InfrastructureType, amount: number, repeat: boolean, tick: number) {
         const action: PlayerScheduledActions = {
-            _id: mongoose.Types.ObjectId(),
+            _id: new mongoose.Types.ObjectId(),
             infrastructureType,
             buyType,
             amount,

@@ -1,6 +1,6 @@
 import CarrierMovementService from '../services/carrierMovement';
 import StarService from '../services/star';
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 let playerId,
     carrierId,

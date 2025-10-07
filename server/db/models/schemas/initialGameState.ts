@@ -2,7 +2,7 @@ import PlayerSchema from "./player";
 import StarSchema from "./star";
 import CarrierSchema from "./carrier";
 
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 const Types = Schema.Types;
 

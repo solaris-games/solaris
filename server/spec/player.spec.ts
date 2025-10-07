@@ -1,6 +1,6 @@
 import {Player} from "../services/types/Player";
 
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 import DistanceService from '../services/distance';
 import StarDistanceService from '../services/starDistance';

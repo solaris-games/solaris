@@ -63,7 +63,7 @@ export interface PlayerDiplomaticState {
 };
 
 export interface PlayerScheduledActions {
-    _id: ObjectId;
+    _id: DBObjectId;
     infrastructureType: InfrastructureType;
     buyType: string;
     amount: number;

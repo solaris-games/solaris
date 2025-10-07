@@ -1,6 +1,6 @@
 import DiplomacyService from "./diplomacy";
 
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const moment = require('moment');
 const EventEmitter = require('events');
 import Repository from './repository';
@@ -127,7 +127,7 @@ export default class PlayerService extends EventEmitter {
         const researchingNext: ResearchTypeNotRandom = defaultTech;
 
         let player: Player = {
-            _id: mongoose.Types.ObjectId(),
+            _id: new mongoose.Types.ObjectId(),
             userId: null,
             homeStarId: null,
             alias: 'Empty Slot',

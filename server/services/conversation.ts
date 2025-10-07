@@ -11,7 +11,7 @@ import { Player } from './types/Player';
 import TradeService from './trade';
 import ConversationMessageSentEvent from './types/events/ConversationMessageSent';
 import DiplomacyService from './diplomacy';
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const EventEmitter = require('events');
 
 function arrayIsEqual(a, b): boolean {
@@ -288,7 +288,7 @@ export default class ConversationService extends EventEmitter {
         }
 
         let newMessage: ConversationMessage = {
-            _id: mongoose.Types.ObjectId(),
+            _id: new mongoose.Types.ObjectId(),
             fromPlayerId: player._id,
             fromPlayerAlias: player.alias!,
             message,

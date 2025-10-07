@@ -1,7 +1,7 @@
 import { shuffle } from "./utils";
 
 const EventEmitter = require('events');
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 import { DBObjectId } from './types/DBObjectId';
 import { ValidationError } from "solaris-common";
 import Repository from './repository';
@@ -34,7 +34,6 @@ export const StarServiceEvents = {
 }
 
 export default class StarService extends EventEmitter {
-
     gameRepo: Repository<Game>;
     randomService: RandomService;
     nameService: NameService;
@@ -83,7 +82,7 @@ export default class StarService extends EventEmitter {
         };
 
         return {
-            _id: mongoose.Types.ObjectId(),
+            _id: new mongoose.Types.ObjectId(),
             name,
             location,
             naturalResources,

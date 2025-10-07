@@ -1,7 +1,6 @@
 import { DependencyContainer } from '../../services/types/DependencyContainer';
 import { mapToTradeSendTechnologyToPlayerRequest, mapToTradeSendToPlayerRequest } from '../requests/trade';
-
-const mongoose = require('mongoose');
+import {objectIdFromString} from "../../services/types/DBObjectId";
 
 export default (container: DependencyContainer) => {
     return {
@@ -107,7 +106,7 @@ export default (container: DependencyContainer) => {
                     req.player._id, 
                     [
                         req.player._id, 
-                        mongoose.Types.ObjectId(req.params.toPlayerId)
+                        objectIdFromString(req.params.toPlayerId),
                     ]);
     
                 res.status(200).json(events);
