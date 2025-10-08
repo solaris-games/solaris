@@ -108,6 +108,7 @@ const parseGameSettingsGeneral: Validator<GameSettingsGeneralBase> = object({
     readyToQuitFraction: maybeUndefined(numberEnumeration<ReadyToQuitFraction, ReadyToQuitFraction[]>(READY_TO_QUIT_FRACTIONS)),
     readyToQuitTimerCycles: maybeUndefined(numberEnumeration<ReadyToQuitTimerCycles, ReadyToQuitTimerCycles[]>(READY_TO_QUIT_TIMER_CYCLES)),
     readyToQuitVisibility: withDefault('visible', stringEnumeration<ReadyToQuitVisibility, ReadyToQuitVisibility[]>(READY_TO_QUIT_VISIBILITY)),
+    joinRandomSlot: withDefault('disabled', enabledDisabled),
 });
 
 const parseGameSettingsGalaxy: Validator<GameSettingsGalaxyBase> = object({

@@ -127,6 +127,15 @@
         </div>
 
         <div class="mb-2">
+          <label for="joinRandomSlot" class="col-form-label">Random Player slots <help-tooltip tooltip="Players will only be able to join a random slot instead of choosing a specific one" /></label>
+          <select class="form-control" id="joinRandomSlot" v-model="settings.general.joinRandomSlot" :disabled="isCreatingGame">
+            <option v-for="opt in options.general.joinRandomSlot" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-2">
           <label for="advancedAI" class="col-form-label">Advanced AI <help-tooltip tooltip="Use the advanced AI to replace defeated players"></help-tooltip></label>
           <select class="form-control" id="advancedAI" v-model="settings.general.advancedAI" :disabled="isCreatingGame">
             <option v-for="opt in options.general.advancedAI" v-bind:key="opt.value" v-bind:value="opt.value">

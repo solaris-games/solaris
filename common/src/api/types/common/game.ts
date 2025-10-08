@@ -300,6 +300,7 @@ export type GameSettingsGeneralBase = {
     readyToQuitFraction?: ReadyToQuitFraction;
     readyToQuitTimerCycles?: ReadyToQuitTimerCycles;
     readyToQuitVisibility: ReadyToQuitVisibility;
+    joinRandomSlot: GameSettingEnabledDisabled;
 }
 
 export type GameSettingsGeneral<ID> = GameSettingsGeneralBase & {
