@@ -13,6 +13,14 @@
 
     <enter-password v-if="isPasswordRequired" v-on:onPasswordChanged="onPasswordChanged"/>
 
+    <div class="row bg-dark" v-if="isJoinRandomSlot && !isJoiningGame">
+      <div class="col text-center">
+        <span>You will be placed in a random slot</span>
+
+        <button class="btn btn-success m-4 btn-lg" @click="joinRandomSlot()">Join</button>
+      </div>
+    </div>
+
     <form-error-list v-bind:errors="errors" class="mt-2"/>
 
     <loading-spinner :loading="isJoiningGame"/>
@@ -42,6 +50,7 @@ import { useStore } from 'vuex';
 import type {Game} from "@/types/game";
 import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {join} from "@/services/typedapi/game";
+import PlayerLeaderboard from "@/views/game/components/leaderboard/PlayerLeaderboard.vue";
 
 const httpClient = inject(httpInjectionKey)!;
 
@@ -60,7 +69,7 @@ const store = useStore();
 const game = computed(() => store.state.game as Game);
 const isAnonymousGame = computed(() => gameHelper.isExtraAnonymity(game.value));
 const isPasswordRequired = computed(() => game.value.settings.general.passwordRequired);
-const isJoinRandomSlot = computed(() => game.value.settings.general.joinRandomSlot);
+const isJoinRandomSlot = computed(() => game.value.settings.general.joinRandomSlot === 'enabled');
 
 const onAliasChanged = (newAlias: string) => {
   alias.value = newAlias;
@@ -74,7 +83,7 @@ const onPasswordChanged = (newPassword: string) => {
   password.value = newPassword;
 };
 
-const onJoinRequested = async (playerId: string) => {
+const onJoinRequested = async (playerId: string | undefined) => {
   errors.value = [];
 
   if (!alias.value) {
@@ -101,6 +110,11 @@ const onJoinRequested = async (playerId: string) => {
   }
 
   isJoiningGame.value = false;
+};
+
+
+const joinRandomSlot = async () => {
+  await onJoinRequested(undefined);
 };
 </script>
 
