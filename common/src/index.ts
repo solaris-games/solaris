@@ -42,6 +42,7 @@ export * from "./api/controllers/star";
 export * from "./api/controllers/announcement";
 export * from "./api/controllers/game";
 export * from "./api/controllers/specialist";
+export * from "./api/controllers/carrier";
 export * from "./events/index";
 export * from "./events/handler";
 export * from "./events/emitter";

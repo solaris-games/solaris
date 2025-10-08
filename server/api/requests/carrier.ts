@@ -1,4 +1,4 @@
-import {ValidationError} from "solaris-common";
+import {CarrierSaveWaypointsRequest, ValidationError} from "solaris-common";
 import { CarrierWaypointActionType, CarrierWaypointActionTypes } from "solaris-common";
 import { DBObjectId } from "../../services/types/DBObjectId";
 import {
@@ -13,20 +13,7 @@ import {
 import { keyHasBooleanValue, keyHasNumberValue, keyHasObjectValue, keyHasStringValue } from "./helpers";
 import {objectId} from "../../utils/validation";
 
-type CarrierSaveWaypoint = {
-    source: DBObjectId;
-    destination: DBObjectId;
-    action: CarrierWaypointActionType;
-    actionShips: number;
-    delayTicks: number;
-};
-
-export type CarrierSaveWaypointsRequest = {
-    waypoints: CarrierSaveWaypoint[];
-    looped: boolean;
-};
-
-export const parseCarrierSaveWaypointsRequest: Validator<CarrierSaveWaypointsRequest> = object({
+export const parseCarrierSaveWaypointsRequest: Validator<CarrierSaveWaypointsRequest<DBObjectId>> = object({
     waypoints: array(object({
         source: objectId,
         destination: objectId,

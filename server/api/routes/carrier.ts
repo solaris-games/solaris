@@ -8,7 +8,6 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
     const controller = CarrierController(container);
 
     router.put('/api/game/:gameId/carrier/:carrierId/waypoints',
-        
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
