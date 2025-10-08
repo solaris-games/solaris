@@ -17,7 +17,9 @@
 
     <loading-spinner :loading="isJoiningGame"/>
 
-    <select-colour v-if="!isJoiningGame" v-on:onJoinRequested="onJoinRequested" @onOpenPlayerDetailRequested="(e) => emit('onOpenPlayerDetailRequested', e)"/>
+    <player-leaderboard v-if="isJoinRandomSlot" @onOpenPlayerDetailRequested="(e) => emit('onOpenPlayerDetailRequested', e)" />
+
+    <select-colour v-if="!isJoinRandomSlot && !isJoiningGame" v-on:onJoinRequested="onJoinRequested" @onOpenPlayerDetailRequested="(e) => emit('onOpenPlayerDetailRequested', e)"/>
 
     <new-player-message />
 
@@ -58,6 +60,7 @@ const store = useStore();
 const game = computed(() => store.state.game as Game);
 const isAnonymousGame = computed(() => gameHelper.isExtraAnonymity(game.value));
 const isPasswordRequired = computed(() => game.value.settings.general.passwordRequired);
+const isJoinRandomSlot = computed(() => game.value.settings.general.joinRandomSlot);
 
 const onAliasChanged = (newAlias: string) => {
   alias.value = newAlias;
