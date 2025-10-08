@@ -226,7 +226,7 @@ export default (container: DependencyContainer) => {
             try {
                 const reqObj = parseGameJoinGameRequest(req.body);
                 
-                let gameIsFull = await container.gameJoinService.join(
+                let joinResult = await container.gameJoinService.join(
                     req.game,
                     req.session.userId,
                     reqObj.playerId,
@@ -236,9 +236,9 @@ export default (container: DependencyContainer) => {
     
                 res.sendStatus(200);
     
-                container.broadcastService.gamePlayerJoined(req.game, reqObj.playerId, reqObj.alias, reqObj.avatar);
+                container.broadcastService.gamePlayerJoined(req.game, joinResult.playerId, reqObj.alias, reqObj.avatar);
     
-                if (gameIsFull) {
+                if (joinResult.gameIsFull) {
                     container.broadcastService.gameStarted(req.game);
                 }
 

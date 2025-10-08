@@ -64,7 +64,7 @@ export default class GameJoinService extends EventEmitter {
         this.spectatorService = spectatorService;
     }
 
-    async join(game: Game, userId: DBObjectId, playerId: DBObjectId, alias: string, avatar: number, password: string | undefined) {
+    async join(game: Game, userId: DBObjectId, playerId: DBObjectId | undefined, alias: string, avatar: number, password: string | undefined): Promise<{ gameIsFull: boolean, playerId: DBObjectId }> {
         // The player cannot join the game if:
         // 1. The game has finished.
         // 2. They quit the game before the game started or they conceded defeat.
@@ -91,6 +91,18 @@ export default class GameJoinService extends EventEmitter {
             if (!passwordMatch) {
                 throw new ValidationError('The password is invalid.');
             }
+        }
+
+        // Check whether a player ID was passed if it is required to join (not random-slot)
+
+        const isJoinRandomSlot = game.settings.general.joinRandomSlot === 'enabled';
+
+        if (isJoinRandomSlot && playerId) {
+            throw new ValidationError("This game is in random-slot mode.");
+        }
+
+        if (game.settings.general.joinRandomSlot === 'disabled' && !playerId) {
+            throw new ValidationError("You need to choose a player slot to join this game.");
         }
 
         // Perform a new player check if the game is for established players only.
@@ -128,10 +140,19 @@ export default class GameJoinService extends EventEmitter {
         }
 
         // Get the player and update it to assign the user to the player.
-        let player = game.galaxy.players.find(x => x._id.toString() === playerId.toString());
+        let player;
+        
+        if (isJoinRandomSlot) {
+            const openSlots = game.galaxy.players.filter(p => p.isOpenSlot);
 
-        if (!player) {
-            throw new ValidationError('The player is not participating in this game.');
+            const idx = this.randomService.getRandomNumber(openSlots.length - 1);
+            player = openSlots[idx];
+        } else {
+            player = game.galaxy.players.find(x => x._id.toString() === playerId!.toString());
+
+            if (!player) {
+                throw new ValidationError('The player is not participating in this game.');
+            }
         }
 
         if (!player.isOpenSlot) {
@@ -197,7 +218,10 @@ export default class GameJoinService extends EventEmitter {
             this.emit(GameJoinServiceEvents.onGameStarted, e);
         }
 
-        return gameIsFull; // Return whether the game is now full, the calling API endpoint can broadcast it.
+        return {
+            playerId: player._id,
+            gameIsFull,
+        };
     }
     
     assignPlayerToUser(game: Game, player: Player, userId: DBObjectId | null, alias: string, avatar: number) {

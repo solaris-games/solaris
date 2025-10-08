@@ -80,7 +80,7 @@ export const getIntel = (axios: Axios) => async (gameId: string): Promise<Respon
   return doGet(axios)(routes.getIntel, { gameId }, {}, { withCredentials: true });
 }
 
-export const join = (axios: Axios) => async (gameId: string, playerId: string, alias: string, avatar: number, password: string | undefined): Promise<ResponseResult<{}>> => {
+export const join = (axios: Axios) => async (gameId: string, playerId: string | undefined, alias: string, avatar: number, password: string | undefined): Promise<ResponseResult<{}>> => {
   return doPut(axios)(routes.join, { gameId }, {}, { playerId, alias, avatar, password }, { withCredentials: true });
 }
 

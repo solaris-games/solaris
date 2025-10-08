@@ -436,7 +436,7 @@ export const parseGameSettingsReq: Validator<GameSettingsReq> = object({
 });
 
 export const parseGameJoinGameRequest: Validator<GameJoinGameRequest<DBObjectId>> = object({
-    playerId: objectId,
+    playerId: maybeUndefined(objectId),
     alias: stringValue({
         trim: true,
         minLength: 1,
@@ -445,7 +445,7 @@ export const parseGameJoinGameRequest: Validator<GameJoinGameRequest<DBObjectId>
         ignoreForLengthCheck: UNICODE_INVISIBLE_CHARACTERS,
     }),
     avatar: number,
-    password: or(string, just(undefined)),
+    password: maybeUndefined(string),
 });
 
 export interface GameSaveNotesRequest {

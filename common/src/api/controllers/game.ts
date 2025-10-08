@@ -72,7 +72,7 @@ export type Intel<ID> = {
 }
 
 export type GameJoinGameRequest<ID> = {
-    playerId: ID,
+    playerId?: ID,
     alias: string,
     avatar: number,
     password: string | undefined,
