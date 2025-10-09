@@ -3,11 +3,16 @@ import { DependencyContainer } from "../../services/types/DependencyContainer";
 import CarrierController from '../controllers/carrier';
 import { MiddlewareContainer } from "../middleware";
 import {SingleRouter} from "../singleRoute";
+import {createCarrierRoutes} from "@solaris-common";
+import {DBObjectId} from "../../services/types/DBObjectId";
+import {createRoutes} from "../typedapi/routes";
 
 export default (router: SingleRouter, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
     const controller = CarrierController(container);
+    const routes = createCarrierRoutes<DBObjectId>();
+    const answer = createRoutes(router, mw);
 
-    router.put('/api/game/:gameId/carrier/:carrierId/waypoints',
+    answer(routes.saveWaypoints,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -27,8 +32,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.put('/api/game/:gameId/carrier/:carrierId/waypoints/loop',
-        
+    answer(routes.loop,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -48,8 +52,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.put('/api/game/:gameId/carrier/:carrierId/transfer',
-        
+    answer(routes.transferShips,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -69,8 +72,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.put('/api/game/:gameId/carrier/:carrierId/gift',
-        
+    answer(routes.gift,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -90,8 +92,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.patch('/api/game/:gameId/carrier/:carrierId/rename',
-        
+    answer(routes.rename,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -111,8 +112,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.delete('/api/game/:gameId/carrier/:carrierId/scuttle',
-        
+    answer(routes.scuttle,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -132,8 +132,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.post('/api/game/:gameId/carrier/calculateCombat',
-        
+    answer(routes.calculateCombat,
             mw.auth.authenticate(),
             controller.calculateCombat
     );

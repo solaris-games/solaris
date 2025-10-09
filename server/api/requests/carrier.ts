@@ -1,4 +1,9 @@
-import {CarrierSaveWaypointsRequest, ValidationError} from "solaris-common";
+import {
+    CarrierCalculateCombatRequest,
+    CarrierSaveWaypointsRequest,
+    TransferShipsReq,
+    ValidationError
+} from "solaris-common";
 import { CarrierWaypointActionType, CarrierWaypointActionTypes } from "solaris-common";
 import { DBObjectId } from "../../services/types/DBObjectId";
 import {
@@ -32,13 +37,7 @@ export const parseCarrierLoopWaypointsRequest: Validator<CarrierLoopWaypointsReq
     loop: boolean,
 });
 
-export type CarrierTransferShipsRequest = {
-    carrierShips: number;
-    starShips: number;
-    starId: DBObjectId;
-};
-
-export const parseCarrierTransferShipsRequest = object({
+export const parseCarrierTransferShipsRequest: Validator<TransferShipsReq<DBObjectId>> = object({
     carrierShips: positiveInteger,
     starShips: positiveInteger,
     starId: objectId,
@@ -57,18 +56,6 @@ export const parseCarrierRenameCarrierRequest: Validator<CarrierRenameCarrierReq
         ignoreForLengthCheck: UNICODE_INVISIBLE_CHARACTERS,
     }),
 });
-
-export interface CarrierCalculateCombatRequest {
-    defender: {
-        ships: number;
-        weaponsLevel: number;
-    },
-    attacker: {
-        ships: number;
-        weaponsLevel: number;
-    },
-    isTurnBased: boolean;
-};
 
 export const mapToCarrierCalculateCombatRequest = (body: any): CarrierCalculateCombatRequest => {
     let errors: string[] = [];
