@@ -1,4 +1,4 @@
-import { type GameState } from "../../api/types/common/game";
+import { type GameState } from "../../types/common/game";
 import { makeCastFunc } from "../../utilities/cast";
 import { type EventName} from "../../events";
 

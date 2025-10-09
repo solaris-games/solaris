@@ -1,8 +1,8 @@
 import { GetRoute, PutRoute, SimpleGetRoute } from ".";
-import { type Specialist } from "../types/common/specialist"
-import { type SpecialStar } from "../types/common/specialStar"
-import { type PlayerTechnologyLevels } from "../types/common/player";
-import { type CarrierWaypoint } from "../types/common/carrierWaypoint";
+import { type Specialist } from "../../types/common/specialist"
+import { type SpecialStar } from "../../types/common/specialStar"
+import { type PlayerTechnologyLevels } from "../../types/common/player";
+import { type CarrierWaypoint } from "../../types/common/carrierWaypoint";
 
 export type MonthlyBans = {
     carrier: Specialist[],

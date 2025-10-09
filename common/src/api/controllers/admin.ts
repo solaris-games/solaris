@@ -1,9 +1,9 @@
-import type { Announcement } from '../types/common/announcement';
-import type { GameSettingsGeneral, GameState } from '../types/common/game';
-import type { SettingEnabledDisabled } from '../types/common/settings';
-import type { UserRoles, UserWarning } from '../types/common/user';
-import type { Report } from '../types/common/report';
-import type { Conversation } from '../types/common/conversation';
+import type { Announcement } from '../../types/common/announcement';
+import type { GameSettingsGeneral, GameState } from '../../types/common/game';
+import type { SettingEnabledDisabled } from '../../types/common/settings';
+import type { UserRoles, UserWarning } from '../../types/common/user';
+import type { Report } from '../../types/common/report';
+import type { Conversation } from '../../types/common/conversation';
 import { GetRoute, PatchRoute, PostRoute, DeleteRoute, SimpleGetRoute, SimplePatchRoute, SimplePostRoute } from './index';
 
 export type GetInsight = {

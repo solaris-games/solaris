@@ -1,4 +1,4 @@
-import type {UserGameSettings} from "../api/types/common/settings";
+import type {UserGameSettings} from "../types/common/settings";
 
 export const DEFAULT_SETTINGS: UserGameSettings = {
     interface: {

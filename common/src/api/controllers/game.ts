@@ -1,15 +1,15 @@
 import {DeleteRoute, GetRoute, PatchRoute, PostRoute, PutRoute, SimpleGetRoute} from "./index";
-import type {Statistics} from "../types/common/stats";
-import { type Flux } from "../types/common/flux";
+import type {Statistics} from "../../types/common/stats";
+import { type Flux } from "../../types/common/flux";
 import type {GameConstants, GameGalaxy, GameSettings, GameSettingsGalaxyBase, GameSettingsGeneral, GameSettingsGeneralBase, GameSettingsInvariable,
     GameSettingsSpecialGalaxyBase,
     GameState,
     GameUserNotification,
-} from "../types/common/game";
-import { type Tutorial } from "../types/common/tutorial";
-import { type PlayerResearch } from "../types/common/player";
-import { type PlayerStatistics } from "../types/common/leaderboard";
-import { type UserRoles } from "../types/common/user";
+} from "../../types/common/game";
+import { type Tutorial } from "../../types/common/tutorial";
+import { type PlayerResearch } from "../../types/common/player";
+import { type PlayerStatistics } from "../../types/common/leaderboard";
+import { type UserRoles } from "../../types/common/user";
 
 export type GameSettingsGalaxyUnparsed = GameSettingsGalaxyBase & {
     customGalaxy?: string,

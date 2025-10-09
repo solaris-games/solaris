@@ -14,8 +14,8 @@ import {
     UNICODE_INVISIBLE_CHARACTERS,
     type Validator, named, maybeNull, maybeUndefined
 } from "./validate";
-import type {CustomGalaxy} from "../api/types/common/customGalaxy";
-import { type CarrierWaypointActionType, CarrierWaypointActionTypes} from "../api/types/common/carrierWaypoint";
+import type {CustomGalaxy} from "../types/common/customGalaxy";
+import { type CarrierWaypointActionType, CarrierWaypointActionTypes} from "../types/common/carrierWaypoint";
 
 const starId = named("Star ID", stringValue({ minLength: 1 }));
 const carrierId = named("Carrier ID", stringValue({ minLength: 1 }));

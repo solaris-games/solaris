@@ -1,6 +1,6 @@
 import type { EventName } from "../../events";
 import {makeCastFunc} from "../../utilities/cast";
-import type {ConversationMessageSentResult} from "../../api/types/common/conversationMessage";
+import type {ConversationMessageSentResult} from "../../types/common/conversationMessage";
 
 export type UserSocketEventType = { UserSocketEventType: 'userSocketEventType' };
 export type UserSocketEventName<TData> = EventName<UserSocketEventType, TData> & { userSocketEventName: 'userSocketEventName' }

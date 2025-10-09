@@ -1,8 +1,8 @@
 import { PutRoute } from "."
-import type { InfrastructureUpgradeReport, BulkUpgradeReport } from '../types/common/infrastructureUpgrade';
-import type { InfrastructureType } from '../types/common/star';
-import type { PlayerScheduledActions } from '../types/common/player';
-import type { Carrier } from '../types/common/carrier';
+import type { InfrastructureUpgradeReport, BulkUpgradeReport } from '../../types/common/infrastructureUpgrade';
+import type { InfrastructureType } from '../../types/common/star';
+import type { PlayerScheduledActions } from '../../types/common/player';
+import type { Carrier } from '../../types/common/carrier';
 
 export type StarUpgradeReq<ID> = {
     starId: ID,

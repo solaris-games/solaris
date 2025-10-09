@@ -1,6 +1,6 @@
-import { LedgerType } from "../../api/types/common/ledger";
+import { LedgerType } from "../../types/common/ledger";
 import { makeCastFunc } from "../../utilities/cast";
-import { type TradeEventTechnology } from "../../api/types/common/trade";
+import { type TradeEventTechnology } from "../../types/common/trade";
 import { type EventName } from "../../events";
 
 export type PlayerSocketEventType = { playerSocketEventType: 'playerSocketEventType' };
