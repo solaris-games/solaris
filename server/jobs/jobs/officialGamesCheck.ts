@@ -3,6 +3,7 @@ import {Game} from "../../services/types/Game";
 import {OfficialGameCategory, OfficialGameKind} from "../../config/officialGames";
 import {logger} from "../../utils/logging";
 import {GameSettingsReq} from "../../services/gameCreate";
+import {getOfficialGameCategoryName, getOfficialGameSettings} from "../../services/officialGames";
 
 const log = logger("Official Games Check Job");
 
@@ -32,13 +33,13 @@ export const officialGamesCheckJob = (container: DependencyContainer) => async (
         const openGames = await container.gameListService.listOfficialGames();
         const runningGames = await container.gameListService.listInProgressGames();
 
-        const settings = container.gameTypeService.getOfficialGameSettings();
+        const settings = getOfficialGameSettings();
 
         for (const category of settings) {
             const existingOpen = findExistingGame(category, openGames);
 
             if (!existingOpen) {
-                log.info(`Could not find game [${container.gameTypeService.getOfficialGameCategoryName(category)}], creating it now...`);
+                log.info(`Could not find game [${getOfficialGameCategoryName(category)}], creating it now...`);
 
                 const existingRunning = findExistingGame(category, runningGames);
                 const existingTemplate = existingRunning?.settings.general.createdFromTemplate;

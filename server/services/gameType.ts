@@ -1,21 +1,8 @@
 import {Game} from "./types/Game";
 
-import {gameSettings, OfficialGameCategory, OfficialGameKind, specialGameTypes} from "../config/officialGames";
-
 export default class GameTypeService {
     isTeamConquestGame(game: Game) {
         return game.settings.general.mode === 'teamConquest';
-    }
-    getOfficialGameCategoryName(officialGame: OfficialGameCategory) {
-        if (officialGame.kind === OfficialGameKind.Standard) {
-            return officialGame.settings.general.type;
-        } else if (officialGame.kind === OfficialGameKind.Carousel) {
-            return officialGame.name;
-        }
-    }
-
-    getOfficialGameSettings(): OfficialGameCategory[] {
-        return gameSettings;
     }
 
     isNewPlayerGame(game: Game) {
@@ -36,10 +23,6 @@ export default class GameTypeService {
 
     isFeaturedGame(game: Game) {
         return game.settings.general.featured;
-    }
-
-    isSpecialGameMode(game: Game) {
-        return Boolean(specialGameTypes.includes(game.settings.general.type));
     }
 
     is32PlayerGame(game: Game) {

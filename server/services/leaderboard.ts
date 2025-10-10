@@ -15,6 +15,7 @@ import UserLevelService from "./userLevel";
 import {maxBy, reverseSort, sorterByProperty} from "./utils";
 import TeamService from "./team";
 import {DBObjectId} from "./types/DBObjectId";
+import {isSpecialGameMode} from "./officialGames";
 
 const moment = require('moment');
 
@@ -385,7 +386,7 @@ export default class LeaderboardService {
             }
 
             // For special game modes, award x2 positive rank.
-            if (rankIncrease > 0 && this.gameTypeService.isSpecialGameMode(game)) {
+            if (rankIncrease > 0 && isSpecialGameMode(game)) {
                 rankIncrease *= 2;
             }
             
@@ -428,7 +429,7 @@ export default class LeaderboardService {
             this.badgeService.awardBadgeForUserVictor32PlayerGame(user, game);
         }
 
-        if (this.gameTypeService.isSpecialGameMode(game)) {
+        if (isSpecialGameMode(game)) {
             this.badgeService.awardBadgeForUserVictorySpecialGame(user, game);
         }
 
