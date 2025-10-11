@@ -1,14 +1,11 @@
 import { Carrier } from "./types/Carrier";
 import { Game } from "./types/Game";
-import { Specialist, SpecialistType } from "./types/Specialist";
+import { Specialist, SpecialistType, ValidationError, GameTypeService } from "solaris-common";
 import { Star } from "./types/Star";
-import { ValidationError } from "solaris-common";
-import { GameTypeService } from 'solaris-common'
 
 const specialists = require('../config/game/specialists.json') as Specialist[];
 
 export default class SpecialistService {
-
     gameTypeService: GameTypeService
 
     constructor(gameTypeService: GameTypeService) {

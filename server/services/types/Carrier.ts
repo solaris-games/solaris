@@ -2,7 +2,7 @@ import { Location } from "./Location";
 import { CarrierWaypoint } from "solaris-common";
 import { MapObject } from "./Map";
 import { DBObjectId } from "./DBObjectId";
-import { Specialist } from "./Specialist";
+import { Specialist } from 'solaris-common';
 import { PlayerTechnologyLevels } from "./Player";
 
 export interface Carrier extends MapObject {

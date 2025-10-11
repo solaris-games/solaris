@@ -2,7 +2,7 @@ import { DBObjectId } from "./types/DBObjectId";
 import Repository from "./repository";
 import { Game } from "./types/Game";
 import { Player } from "./types/Player";
-import { Specialist } from "./types/Specialist";
+import { Specialist } from 'solaris-common';
 import UserAchievementService from "./userAchievement";
 import { GameTypeService } from 'solaris-common'
 import SpecialistService from "./specialist";

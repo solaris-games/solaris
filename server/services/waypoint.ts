@@ -1,12 +1,10 @@
 import { DBObjectId } from './types/DBObjectId';
 import { Carrier } from './types/Carrier';
-import { CarrierWaypoint, CarrierWaypointActionType, CarrierWaypointBase } from 'solaris-common';
+import { CarrierWaypoint, CarrierWaypointActionType, DistanceService, StarDistanceService } from 'solaris-common';
 import { Game } from './types/Game';
 import { Player } from './types/Player';
 import { Star } from './types/Star';
-import { DistanceService } from 'solaris-common';
 import StarService from './star';
-import { StarDistanceService } from 'solaris-common';
 import TechnologyService from './technology';
 import CarrierMovementService from './carrierMovement';
 

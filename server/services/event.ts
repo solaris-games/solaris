@@ -25,7 +25,7 @@ import { Game } from "./types/Game";
 import { GameEvent } from "./types/GameEvent";
 import { BulkUpgradeReport } from "./types/InfrastructureUpgrade";
 import { Player } from "./types/Player";
-import { Specialist } from "./types/Specialist";
+import { Specialist } from 'solaris-common';
 import { Star, StarCaptureResult } from "./types/Star";
 import { BaseGameEvent } from "./types/events/BaseGameEvent";
 import GameDiplomacyPeaceDeclaredEvent from "./types/events/GameDiplomacyPeaceDeclared";

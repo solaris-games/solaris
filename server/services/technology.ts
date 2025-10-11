@@ -5,7 +5,7 @@ import { Star } from "./types/Star";
 import SpecialistService from "./specialist";
 import { GameTypeService } from 'solaris-common'
 import {maxBy} from "./utils";
-import {CombatResolutionMalusStrategy} from "solaris-common";
+import {CombatResolutionMalusStrategy, Specialist} from "solaris-common";
 
 const DEFAULT_TECHNOLOGIES: ResearchTypeNotRandom[] = [
     'terraforming',
@@ -17,6 +17,11 @@ const DEFAULT_TECHNOLOGIES: ResearchTypeNotRandom[] = [
     'scanning',
     'hyperspace'
 ];
+
+interface ISpecialistService {
+    getByIdStar(id: number): Specialist | null;
+    getByIdCarrier(id: number): Specialist | null;
+}
 
 export default class TechnologyService {
     specialistService: SpecialistService;

@@ -3,7 +3,7 @@ import { InfrastructureUpgradeCosts } from "./InfrastructureUpgrade";
 import { Location } from "./Location";
 import { MapObject } from "./Map";
 import { PlayerTechnologyLevels } from "./Player";
-import { Specialist } from "./Specialist";
+import { Specialist } from 'solaris-common';
 
 export interface NaturalResources {
     economy: number;
