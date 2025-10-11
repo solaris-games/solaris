@@ -8,7 +8,7 @@ import { Game } from './types/Game';
 import { MapObject } from './types/Map';
 import { Player } from './types/Player';
 import { Star } from './types/Star';
-import DistanceService from './distance';
+import { DistanceService } from 'solaris-common';
 import SpecialistService from './specialist';
 import StarService from './star';
 import TechnologyService from './technology';

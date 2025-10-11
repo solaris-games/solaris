@@ -4,7 +4,7 @@ import BattleRoyaleService from './battleRoyale';
 import CacheService from './cache';
 import CarrierService from './carrier';
 import DiplomacyService from './diplomacy';
-import DistanceService from './distance';
+import { DistanceService } from 'solaris-common';
 import GameService from './game';
 import GameFluxService from './gameFlux';
 import GameMaskingService from "./gameMaskingService";

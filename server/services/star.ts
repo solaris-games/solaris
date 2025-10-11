@@ -12,7 +12,7 @@ import { MapObjectWithVisibility } from './types/Map';
 import { Player } from './types/Player';
 import { InfrastructureType, NaturalResources, Star, TerraformedResources } from './types/Star';
 import { User } from './types/User';
-import DistanceService from './distance';
+import { DistanceService } from 'solaris-common';
 import GameStateService from './gameState';
 import { GameTypeService } from 'solaris-common'
 import NameService from './name';

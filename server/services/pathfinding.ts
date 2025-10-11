@@ -2,7 +2,7 @@ import {Game} from "./types/Game";
 import {Player} from "./types/Player";
 import {Carrier} from "./types/Carrier";
 import {DBObjectId} from "./types/DBObjectId";
-import DistanceService from "./distance";
+import { DistanceService } from 'solaris-common';
 import StarService from "./star";
 import { Star } from "./types/Star";
 import WaypointService from "./waypoint";

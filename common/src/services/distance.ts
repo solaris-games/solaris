@@ -1,7 +1,7 @@
-import { Game } from "./types/Game";
-import { Location } from "./types/Location";
+import type { Location } from "../types/common/location";
+import type {Game} from "../types/common/game";
 
-export default class DistanceService {  
+export class DistanceService {
 
     getDistanceBetweenLocations(loc1: Location, loc2: Location) {
         return Math.hypot(loc2.x - loc1.x, loc2.y - loc1.y);
@@ -64,11 +64,11 @@ export default class DistanceService {
         return this.getFurthestLocations(loc, locs, 1)[0];
     }
 
-    getScanningDistance(game: Game, scanning: number): number {
+    getScanningDistance<ID>(game: Game<ID>, scanning: number): number {
         return ((scanning || 1) + 1) * game.constants.distances.lightYear;
     }
     
-    getHyperspaceDistance(game: Game, hyperspace: number): number {
+    getHyperspaceDistance<ID>(game: Game<ID>, hyperspace: number): number {
         return ((hyperspace || 1) + 1.5) * game.constants.distances.lightYear;
     }
 

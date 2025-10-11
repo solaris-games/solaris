@@ -4,7 +4,7 @@ import { CarrierWaypoint, CarrierWaypointActionType, CarrierWaypointBase } from 
 import { Game } from './types/Game';
 import { Player } from './types/Player';
 import { Star } from './types/Star';
-import DistanceService from './distance';
+import { DistanceService } from 'solaris-common';
 import StarService from './star';
 import StarDistanceService from './starDistance';
 import TechnologyService from './technology';

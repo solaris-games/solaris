@@ -4,7 +4,7 @@ import { Location } from "./types/Location";
 import { MapObject } from "./types/Map";
 import { Player } from "./types/Player";
 import { Star } from "./types/Star";
-import DistanceService from "./distance";
+import { DistanceService } from 'solaris-common';
 
 export default class StarDistanceService {
     distanceService: DistanceService;

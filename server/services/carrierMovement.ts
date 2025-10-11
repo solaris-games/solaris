@@ -7,7 +7,7 @@ import { Star } from './types/Star';
 import { User } from './types/User';
 import CarrierGiftService from './carrierGift';
 import DiplomacyService from './diplomacy';
-import DistanceService from './distance';
+import { DistanceService } from 'solaris-common';
 import SpecialistService from './specialist';
 import StarService from './star';
 import TechnologyService from "./technology";

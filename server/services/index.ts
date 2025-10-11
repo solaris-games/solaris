@@ -18,7 +18,7 @@ import AuthService from './auth';
 import BroadcastService from './broadcast';
 import CarrierService from './carrier';
 import CombatService from './combat';
-import DistanceService from './distance';
+import { DistanceService } from 'solaris-common';
 import EmailService from './email';
 import EventService from './event';
 import LeaderboardService from './leaderboard';

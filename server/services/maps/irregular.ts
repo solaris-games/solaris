@@ -2,7 +2,7 @@ import { createNoise2D } from 'simplex-noise';
 import { ValidationError } from "solaris-common";
 import {Game} from '../types/Game';
 import { Location } from '../types/Location';
-import DistanceService from '../distance';
+import { DistanceService } from 'solaris-common';
 import { GameTypeService } from 'solaris-common'
 import ResourceService from '../resource';
 import StarService from '../star';

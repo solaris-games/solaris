@@ -7,7 +7,7 @@ import BattleRoyaleService from "./battleRoyale";
 import CarrierService from "./carrier";
 import CombatService from "./combat";
 import DiplomacyService from "./diplomacy";
-import DistanceService from "./distance";
+import { DistanceService } from 'solaris-common';
 import GameService from "./game";
 import GameStateService from "./gameState";
 import { GameTypeService } from 'solaris-common'

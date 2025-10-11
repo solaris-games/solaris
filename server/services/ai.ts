@@ -3,12 +3,11 @@ import {Player} from "./types/Player";
 import {KnownAttack} from "./types/Ai";
 import CarrierService from "./carrier";
 import CombatService from "./combat";
-import DistanceService from "./distance";
+import { DistanceService } from 'solaris-common';
 import PlayerService from "./player";
 import ShipTransferService from "./shipTransfer";
 import StarService from "./star";
 import StarUpgradeService from "./starUpgrade";
-import TechnologyService from "./technology";
 import WaypointService from "./waypoint";
 import {Star} from "./types/Star";
 import {Carrier} from "./types/Carrier";
@@ -25,6 +24,7 @@ import PathfindingService from "./pathfinding";
 import {logger} from "../utils/logging";
 import mongoose from 'mongoose';
 import SaveWaypointsService from "./saveWaypoints";
+import TechnologyService from "./technology";
 
 const Heap = require('qheap');
 
