@@ -9,7 +9,7 @@ import GameService from './game';
 import GameFluxService from './gameFlux';
 import GameMaskingService from "./gameMaskingService";
 import GameStateService from './gameState';
-import GameTypeService from './gameType';
+import { GameTypeService } from 'solaris-common'
 import UserGuildService from './guildUser';
 import HistoryService from './history';
 import MapService from './map';

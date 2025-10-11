@@ -15,7 +15,7 @@ import {Player} from './types/Player';
 import {InfrastructureType, Star, TerraformedResources} from './types/Star';
 import UserAchievementService from './userAchievement';
 import CarrierService from './carrier';
-import GameTypeService from './gameType';
+import { GameTypeService } from 'solaris-common'
 import ResearchService from './research';
 import StarService from './star';
 import TechnologyService from './technology';

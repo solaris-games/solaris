@@ -18,7 +18,7 @@ import ConversationMessageSentEvent from './types/events/ConversationMessageSent
 import GameJoinService, { GameJoinServiceEvents } from './gameJoin';
 import {logger} from "../utils/logging";
 import PlayerReadyService, { PlayerReadyServiceEvents } from './playerReady';
-import GameTypeService from './gameType';
+import { GameTypeService } from 'solaris-common'
 import GameStateService from './gameState';
 
 const log = logger("Notification Service");

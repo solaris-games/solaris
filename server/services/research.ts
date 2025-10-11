@@ -4,7 +4,7 @@ import Repository from './repository';
 import { Game } from './types/Game';
 import {Player, ResearchProgress, ResearchType, ResearchTypeNotRandom} from './types/Player';
 import { User } from './types/User';
-import GameTypeService from './gameType';
+import { GameTypeService } from 'solaris-common'
 import PlayerStatisticsService from './playerStatistics';
 import RandomService from './random';
 import StarService from './star';

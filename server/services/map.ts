@@ -1,6 +1,6 @@
 import { Game } from "./types/Game";
 import { Star } from "./types/Star";
-import GameTypeService from "./gameType";
+import { GameTypeService } from 'solaris-common'
 import CircularMapService from "./maps/circular";
 import CircularBalancedMapService from "./maps/circularBalanced";
 import DoughnutMapService from "./maps/doughnut";

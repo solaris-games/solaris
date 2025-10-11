@@ -13,7 +13,7 @@ import {Player} from "./types/Player";
 import {Star, StarCaptureResult} from "./types/Star";
 import {User} from "./types/User";
 import DiplomacyService from "./diplomacy";
-import GameTypeService from "./gameType";
+import { GameTypeService } from 'solaris-common'
 import PlayerService from "./player";
 import ReputationService from "./reputation";
 import SpecialistService from "./specialist";

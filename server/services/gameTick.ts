@@ -10,7 +10,7 @@ import DiplomacyService from "./diplomacy";
 import DistanceService from "./distance";
 import GameService from "./game";
 import GameStateService from "./gameState";
-import GameTypeService from "./gameType";
+import { GameTypeService } from 'solaris-common'
 import HistoryService from "./history";
 import LeaderboardService, {GameWinner} from "./leaderboard";
 import StarMovementService from "./starMovement";

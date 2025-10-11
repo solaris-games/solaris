@@ -1,5 +1,5 @@
 import TechnologyService from '../services/technology';
-import GameTypeService from "../services/gameType";
+import { GameTypeService } from 'solaris-common'
 import mongoose from 'mongoose';
 
 let service,

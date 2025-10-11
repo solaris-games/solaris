@@ -3,7 +3,7 @@ import { Game } from "./types/Game";
 import { Player, PlayerTechnologyLevels, ResearchTypeNotRandom } from "./types/Player";
 import { Star } from "./types/Star";
 import SpecialistService from "./specialist";
-import GameTypeService from "./gameType";
+import { GameTypeService } from 'solaris-common'
 import {maxBy} from "./utils";
 import {CombatResolutionMalusStrategy} from "solaris-common";
 

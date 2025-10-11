@@ -14,7 +14,7 @@ import { InfrastructureType, NaturalResources, Star, TerraformedResources } from
 import { User } from './types/User';
 import DistanceService from './distance';
 import GameStateService from './gameState';
-import GameTypeService from './gameType';
+import { GameTypeService } from 'solaris-common'
 import NameService from './name';
 import RandomService from './random';
 import SpecialistService from './specialist';

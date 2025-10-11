@@ -1,7 +1,7 @@
 import moment from "moment";
 import CarrierService from "../services/carrier";
 import GameStateService from "../services/gameState";
-import GameTypeService from "../services/gameType";
+import { GameTypeService } from 'solaris-common'
 import PlayerService from "../services/player";
 import PlayerAfkService from "../services/playerAfk"
 import Repository from "../services/repository";
@@ -172,7 +172,7 @@ describe('Player AFK Service', () => {
         });
 
         it('should return true if the player has missed too many turns', () => {
-            gameTypeService.isTurnBasedGame = (game: Game) => { return true; };
+            gameTypeService.isTurnBasedGame = ((game: Game) => { return true; }) as any;
 
             player.lastSeen = moment().utc().toDate();
             player.missedTurns = game.settings.gameTime.afk.turnTimeout;

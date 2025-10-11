@@ -1,104 +1,107 @@
-import {Game} from "./types/Game";
+import type {Game as FGame} from "../types/common/game";
 
-export default class GameTypeService {
-    isTeamConquestGame(game: Game) {
+// override to handle incomplete games in frontend
+type Game<ID> = Pick<FGame<ID>, 'settings'>;
+
+export class GameTypeService {
+    isTeamConquestGame<ID>(game: Game<ID>) {
         return game.settings.general.mode === 'teamConquest';
     }
 
-    isNewPlayerGame(game: Game) {
+    isNewPlayerGame<ID>(game: Game<ID>) {
         return ['new_player_rt', 'new_player_tb'].includes(game.settings.general.type);
     }
 
-    isTutorialGame(game: Game) {
+    isTutorialGame<ID>(game: Game<ID>) {
         return game.settings.general.type === 'tutorial';
     }
 
-    isOfficialGame(game: Game) {
+    isOfficialGame<ID>(game: Game<ID>) {
         return game.settings.general.createdByUserId == null;
     }
 
-    isCustomGame(game: Game) {
+    isCustomGame<ID>(game: Game<ID>) {
         return game.settings.general.type === 'custom';
     }
 
-    isFeaturedGame(game: Game) {
+    isFeaturedGame<ID>(game: Game<ID>) {
         return game.settings.general.featured;
     }
 
-    is32PlayerGame(game: Game) {
+    is32PlayerGame<ID>(game: Game<ID>) {
         return game.settings.general.playerLimit === 32;
     }
 
-    isConquestMode(game: Game) {
+    isConquestMode<ID>(game: Game<ID>) {
         return game.settings.general.mode === 'conquest';
     }
 
-    isKingOfTheHillMode(game: Game) {
+    isKingOfTheHillMode<ID>(game: Game<ID>) {
         return game.settings.general.mode === 'kingOfTheHill';
     }
 
-    isAnonymousGame(game: Game) {
+    isAnonymousGame<ID>(game: Game<ID>) {
         return game.settings.general.anonymity === 'extra';
     }
 
-    isForEstablishedPlayersOnly(game: Game) {
+    isForEstablishedPlayersOnly<ID>(game: Game<ID>) {
         return game.settings.general.playerType === 'establishedPlayers'
     }
 
-    isOrbitalMode(game: Game) {
+    isOrbitalMode<ID>(game: Game<ID>) {
         return game.settings.orbitalMechanics.enabled === 'enabled';
     }
 
-    isBattleRoyaleMode(game: Game) {
+    isBattleRoyaleMode<ID>(game: Game<ID>) {
         return game.settings.general.mode === 'battleRoyale';
     }
 
-    isDarkModeExtra(game: Game) {
+    isDarkModeExtra<ID>(game: Game<ID>) {
         return game.settings.specialGalaxy.darkGalaxy === 'extra';
     }
 
-    isDarkMode(game: Game) {
+    isDarkMode<ID>(game: Game<ID>) {
         return game.settings.specialGalaxy.darkGalaxy === 'standard'
             || game.settings.specialGalaxy.darkGalaxy === 'extra';
     }
 
-    isDarkFogged(game: Game) {
+    isDarkFogged<ID>(game: Game<ID>) {
         return game.settings.specialGalaxy.darkGalaxy === 'fog';
     }
 
-    isDarkStart(game: Game) {
+    isDarkStart<ID>(game: Game<ID>) {
         return game.settings.specialGalaxy.darkGalaxy === 'start'
             || this.isDarkFogged(game);
     }
 
-    isTurnBasedGame(game: Game) {
+    isTurnBasedGame<ID>(game: Game<ID>) {
         return game.settings.gameTime.gameType === 'turnBased';
     }
 
-    isRealTimeGame(game: Game) {
+    isRealTimeGame<ID>(game: Game<ID>) {
         return game.settings.gameTime.gameType === 'realTime';
     }
 
-    isSplitResources(game: Game) {
+    isSplitResources<ID>(game: Game<ID>) {
         return game.settings.specialGalaxy.splitResources === 'enabled';
     }
 
-    is1v1Game(game: Game) {
+    is1v1Game<ID>(game: Game<ID>) {
         return ['1v1_rt', '1v1_tb'].includes(game.settings.general.type);
     }
 
-    isFluxGame(game: Game) {
+    isFluxGame<ID>(game: Game<ID>) {
         return game.settings.general.fluxEnabled === 'enabled'
     }
 
-    isRankedGame(game: Game) {
+    isRankedGame<ID>(game: Game<ID>) {
         // Official games are either not user created or featured (featured games can be user created)
         return !this.isTutorialGame(game) &&
                 !this.isNewPlayerGame(game) &&
                 (!this.isCustomGame(game) || this.isFeaturedGame(game));
     }
 
-    isCapitalStarEliminationMode(game: Game) {
+    isCapitalStarEliminationMode<ID>(game: Game<ID>) {
         return game.settings.conquest.capitalStarElimination === 'enabled';
     }
 }

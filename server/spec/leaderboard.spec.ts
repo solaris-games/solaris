@@ -7,7 +7,7 @@ import PlayerService from '../services/player';
 import UserGuildService from '../services/guildUser';
 import RatingService from '../services/rating';
 import GameService from '../services/game';
-import GameTypeService from '../services/gameType';
+import { GameTypeService } from 'solaris-common'
 import GameStateService from '../services/gameState';
 import BadgeService from '../services/badge';
 import PlayerStatisticsService from '../services/playerStatistics';

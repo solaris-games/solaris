@@ -6,7 +6,7 @@ import { User } from "./types/User";
 import BadgeService from "./badge";
 import GameService from "./game";
 import GameStateService from "./gameState";
-import GameTypeService from "./gameType";
+import { GameTypeService } from 'solaris-common'
 import PlayerService from "./player";
 import PlayerStatisticsService from "./playerStatistics";
 import RatingService from "./rating";

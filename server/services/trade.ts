@@ -4,7 +4,7 @@ import { LedgerType } from 'solaris-common';
 import { ValidationError } from "solaris-common";
 import UserAchievementService from './userAchievement';
 import DiplomacyService from './diplomacy';
-import GameTypeService from './gameType';
+import { GameTypeService } from 'solaris-common'
 import LedgerService from './ledger';
 import PlayerService from './player';
 import PlayerAfkService from './playerAfk';

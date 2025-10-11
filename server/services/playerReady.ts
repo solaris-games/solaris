@@ -3,7 +3,7 @@ import { ValidationError } from "solaris-common";
 import Repository from './repository';
 import { Game } from './types/Game';
 import { Player } from './types/Player';
-import GameTypeService from './gameType';
+import { GameTypeService } from 'solaris-common'
 
 export const PlayerReadyServiceEvents = {
     onGamePlayerReady: 'onGamePlayerReady'

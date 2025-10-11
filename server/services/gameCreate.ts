@@ -6,7 +6,7 @@ import UserAchievementService from './userAchievement';
 import ConversationService from './conversation';
 import GameFluxService from './gameFlux';
 import GameListService from './gameList';
-import GameTypeService from './gameType';
+import { GameTypeService } from 'solaris-common'
 import HistoryService from './history';
 import MapService from './map';
 import NameService from './name';

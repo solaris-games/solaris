@@ -39,7 +39,7 @@ import GameMutexService from "../gameMutex";
 import GamePlayerMutexService from "../gamePlayerMutex";
 import GameStateService from "../gameState";
 import GameTickService from "../gameTick";
-import GameTypeService from "../gameType";
+import { GameTypeService } from 'solaris-common'
 import GuildService from "../guild";
 import UserGuildService from "../guildUser";
 import HistoryService from "../history";

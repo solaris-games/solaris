@@ -6,7 +6,7 @@ import Repository from './repository';
 import { Game } from './types/Game';
 import { Player } from './types/Player';
 import CarrierService from './carrier';
-import GameTypeService from './gameType';
+import { GameTypeService } from 'solaris-common'
 import StarService from './star';
 import GameStateService from './gameState';
 import PlayerService from './player';

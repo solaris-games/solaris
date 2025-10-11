@@ -4,7 +4,7 @@ import { Game } from "./types/Game";
 import { Player } from "./types/Player";
 import { Specialist } from "./types/Specialist";
 import UserAchievementService from "./userAchievement";
-import GameTypeService from "./gameType";
+import { GameTypeService } from 'solaris-common'
 import SpecialistService from "./specialist";
 import StarService from "./star";
 import WaypointService from "./waypoint";

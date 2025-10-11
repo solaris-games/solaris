@@ -1,6 +1,6 @@
 import { Location } from "../types/Location";
 import DistanceService from "../distance";
-import GameTypeService from "../gameType";
+import { GameTypeService } from 'solaris-common'
 import RandomService from "../random";
 import ResourceService from "../resource";
 import StarService from "../star";

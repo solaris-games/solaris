@@ -3,7 +3,7 @@ import {Star, StarCaptureResult} from "./types/Star";
 import {Player} from "./types/Player";
 import {User} from "./types/User";
 import {Carrier} from "./types/Carrier";
-import GameTypeService from "./gameType";
+import { GameTypeService } from 'solaris-common'
 import PlayerService from "./player";
 import StarService from "./star";
 import SpecialistService from "./specialist";

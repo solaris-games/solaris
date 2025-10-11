@@ -28,7 +28,7 @@ import GameCreateService from './gameCreate';
 import GameGalaxyService from './gameGalaxy';
 import GameListService from './gameList';
 import GameTickService from './gameTick';
-import GameTypeService from './gameType';
+import { GameTypeService } from 'solaris-common'
 import GameStateService from './gameState';
 import BattleRoyaleService from './battleRoyale';
 import MapService from './map';

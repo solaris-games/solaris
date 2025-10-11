@@ -7,7 +7,7 @@ import { Player } from './types/Player';
 import UserAchievementService from './userAchievement';
 import AvatarService from './avatar';
 import GameStateService from './gameState';
-import GameTypeService from './gameType';
+import { GameTypeService } from 'solaris-common'
 import PasswordService from './password';
 import PlayerService from './player';
 import StarService from './star';

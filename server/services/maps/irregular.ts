@@ -3,7 +3,7 @@ import { ValidationError } from "solaris-common";
 import {Game} from '../types/Game';
 import { Location } from '../types/Location';
 import DistanceService from '../distance';
-import GameTypeService from '../gameType';
+import { GameTypeService } from 'solaris-common'
 import ResourceService from '../resource';
 import StarService from '../star';
 import StarDistanceService from '../starDistance';

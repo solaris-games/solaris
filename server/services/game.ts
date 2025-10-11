@@ -10,7 +10,7 @@ import UserAchievementService from './userAchievement';
 import AvatarService from './avatar';
 import CarrierService from './carrier';
 import GameStateService from './gameState';
-import GameTypeService from './gameType';
+import { GameTypeService } from 'solaris-common'
 import PasswordService from './password';
 import PlayerService from './player';
 import StarService from './star';

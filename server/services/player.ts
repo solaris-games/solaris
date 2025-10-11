@@ -9,7 +9,7 @@ import {Game, Team} from './types/Game';
 import { Location } from './types/Location';
 import { Player, PlayerColour, PlayerColourShapeCombination, PlayerShape, ResearchTypeNotRandom } from './types/Player';
 import CarrierService from './carrier';
-import GameTypeService from './gameType';
+import { GameTypeService } from 'solaris-common'
 import MapService from './map';
 import PlayerReadyService from './playerReady';
 import RandomService from './random';
