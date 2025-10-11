@@ -2,9 +2,8 @@ import { Carrier } from "./types/Carrier";
 import { Game } from "./types/Game";
 import { Player, PlayerTechnologyLevels, ResearchTypeNotRandom } from "./types/Player";
 import { Star } from "./types/Star";
-import SpecialistService from "./specialist";
 import { GameTypeService } from 'solaris-common'
-import {maxBy} from "./utils";
+import {maxBy} from "solaris-common";
 import {CombatResolutionMalusStrategy, Specialist} from "solaris-common";
 
 const DEFAULT_TECHNOLOGIES: ResearchTypeNotRandom[] = [
@@ -24,11 +23,11 @@ interface ISpecialistService {
 }
 
 export default class TechnologyService {
-    specialistService: SpecialistService;
+    specialistService: ISpecialistService;
     gameTypeService: GameTypeService;
 
     constructor(
-        specialistService: SpecialistService,
+        specialistService: ISpecialistService,
         gameTypeService: GameTypeService
     ) {
         this.specialistService = specialistService;

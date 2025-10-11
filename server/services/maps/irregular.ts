@@ -1,14 +1,9 @@
 import { createNoise2D } from 'simplex-noise';
-import { ValidationError } from "solaris-common";
 import {Game} from '../types/Game';
 import { Location } from '../types/Location';
-import { DistanceService } from 'solaris-common';
-import { GameTypeService } from 'solaris-common'
 import ResourceService from '../resource';
 import StarService from '../star';
-import { StarDistanceService } from 'solaris-common';
-import {RandomGen} from "../../utils/randomGen";
-import {GameResourceDistribution} from "solaris-common";
+import { StarDistanceService, GameResourceDistribution, RandomGen, GameTypeService, DistanceService, ValidationError } from 'solaris-common';
 
 export default class IrregularMapService {
     starService: StarService;

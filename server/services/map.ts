@@ -11,8 +11,7 @@ import RandomService from "./random";
 import StarService from "./star";
 import { StarDistanceService } from 'solaris-common';
 import { ValidationError } from "solaris-common";
-import { RandomGen } from "../utils/randomGen";
-import { shuffle } from "./utils";
+import { shuffle, RandomGen } from "solaris-common";
 import { DBObjectId } from "./types/DBObjectId";
 
 const OFFSET = 20000;

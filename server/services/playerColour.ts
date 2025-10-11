@@ -1,6 +1,6 @@
 import {Player, PlayerColour, PlayerColourShapeCombination, PlayerShape} from "./types/Player";
 import RandomService from "./random";
-import {shuffle} from "./utils";
+import {shuffle} from "solaris-common";
 import {Game} from "./types/Game";
 import {DBObjectId} from "./types/DBObjectId";
 import {MathRandomGen} from "../utils/randomGen";

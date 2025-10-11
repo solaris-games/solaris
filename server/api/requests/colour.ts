@@ -1,4 +1,4 @@
-import {object, string, Validator} from "../../../common/src/validation/validate";
+import {object, string, Validator} from "solaris-common";
 
 export type ColourOverrideRequest = {
     playerId: string;

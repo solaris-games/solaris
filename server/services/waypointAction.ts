@@ -1,7 +1,7 @@
 import {Game} from "./types/Game";
 import {Carrier} from "./types/Carrier";
 import {Star} from "./types/Star";
-import {CarrierWaypoint, CarrierWaypointActionType} from "@solaris-common";
+import {CarrierWaypoint, CarrierWaypointActionType} from "solaris-common";
 import {DBObjectId} from "./types/DBObjectId";
 import {CarrierActionWaypoint} from "./types/GameTick";
 

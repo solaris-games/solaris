@@ -1,10 +1,6 @@
-const randomSeeded = require('random-seed');
+import {RandomGen} from "solaris-common";
 
-export interface RandomGen {
-    getRandomNumber(max: number): number;
-    getRandomNumberBetween(min: number, max: number): number;
-    random(): number;
-}
+const randomSeeded = require('random-seed');
 
 export class MathRandomGen implements RandomGen {
     getRandomNumber(max: number): number {

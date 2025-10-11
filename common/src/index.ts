@@ -29,6 +29,8 @@ export * from "./types/common/customGalaxy";
 export * from "./types/common/tutorial";
 export * from "./types/common/specialStar";
 export * from "./utilities/cast";
+export * from "./utilities/random";
+export * from "./utilities/utils";
 export * from "./sockets/socketEventNames/player";
 export * from "./sockets/socketEventNames/game";
 export * from "./sockets/socketEventNames/diplomacy";

@@ -19,7 +19,7 @@ import { StarDistanceService } from 'solaris-common';
 import TechnologyService from './technology';
 import TeamService from "./team";
 import { ValidationError } from "solaris-common";
-import {shuffle} from "./utils";
+import {shuffle} from "solaris-common";
 import { Carrier } from "./types/Carrier";
 import { Star } from "./types/Star";
 import PlayerColourService from "./playerColour";

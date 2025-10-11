@@ -1,4 +1,4 @@
-import { shuffle } from "./utils";
+import { shuffle } from "solaris-common";
 
 const EventEmitter = require('events');
 import mongoose from 'mongoose';

@@ -15,7 +15,7 @@ import {
     stringEnumeration,
     withDefault,
     numberAdv, maybeNull, maybeUndefined, numberEnumeration, map
-} from "../../../common/src/validation/validate";
+} from "solaris-common";
 import { keyHasBooleanValue, keyHasStringValue } from "./helpers";
 import {
     GAME_ALLIANCE_UPKEEP_COST,

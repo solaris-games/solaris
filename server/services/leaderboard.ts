@@ -12,7 +12,7 @@ import PlayerStatisticsService from "./playerStatistics";
 import RatingService from "./rating";
 import PlayerAfkService from "./playerAfk";
 import UserLevelService from "./userLevel";
-import {maxBy, reverseSort, sorterByProperty} from "./utils";
+import {maxBy, reverseSort, sorterByProperty} from "solaris-common";
 import TeamService from "./team";
 import {DBObjectId} from "./types/DBObjectId";
 import {isSpecialGameMode} from "./officialGames";
@@ -484,7 +484,7 @@ export default class LeaderboardService {
     getGameWinnerTeam(game: Game, leaderboard: LeaderboardTeam[]): GameWinner | null {
         let isAllUndefeatedPlayersReadyToQuit = this.gameService.isReadyToQuitImmediateEnd(game);
 
-        let key = game.settings.conquest.victoryCondition === 'starPercentage' ? 'starCount' : 'capitalCount';
+        const key = game.settings.conquest.victoryCondition === 'starPercentage' ? 'starCount' : 'capitalCount';
         leaderboard.sort(reverseSort(sorterByProperty(key)));
 
         if (isAllUndefeatedPlayersReadyToQuit) {

@@ -1,6 +1,6 @@
-import {RandomGen} from "../utils/randomGen";
+import type {RandomGen} from "./random";
 
-export function getOrInsert<K, V>(map: Map<K, V>, key: K, defaultFunc: (K) => V): V {
+export function getOrInsert<K, V>(map: Map<K, V>, key: K, defaultFunc: (arg0: K) => V): V {
     let value = map.get(key);
     if (!value) {
         value = defaultFunc(key);
@@ -61,7 +61,7 @@ export function notNull<T>(val: T | null): val is T {
     return val !== null;
 }
 
-export function sorterByProperty<T>(prop: string): (a: T, b: T) => number {
+export function sorterByProperty<T>(prop: keyof T): (a: T, b: T) => number {
     return (a, b) => {
         if (a[prop] < b[prop]) {
             return -1;
@@ -79,12 +79,6 @@ export function shuffle<T>(rand: RandomGen, a: Array<T>) {
         [a[i], a[j]] = [a[j], a[i]];
     }
     return a;
-}
-
-export const nullObject = (obj: Object) => {
-    for (let key of Object.keys(obj)) {
-        obj[key] = 0;
-    }
 }
 
 export const groupBy = <T, K>(list: T[], keyFunc: (item: T) => K): Map<K, T[]> => {

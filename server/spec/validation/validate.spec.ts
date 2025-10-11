@@ -1,4 +1,4 @@
-import {anyObject, array, bigInt, just, number, object, or, record, string} from "../../../common/src/validation/validate";
+import {anyObject, array, bigInt, just, number, object, or, record, string} from "solaris-common";
 
 describe("validate", () => {
     it("validates strings correctly", () => {

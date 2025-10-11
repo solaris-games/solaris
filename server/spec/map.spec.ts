@@ -3,7 +3,8 @@ import CircularMapService from '../services/maps/circular';
 import RandomService from '../services/random';
 import { Game } from '../services/types/Game';
 import { Star } from '../services/types/Star';
-import { RandomGen, SeededRandomGen } from '../utils/randomGen';
+import { SeededRandomGen } from '../utils/randomGen';
+import { RandomGen } from 'solaris-common';
 
 const game: Game = {
     settings: {

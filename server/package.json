@@ -17,7 +17,7 @@
     "restore-game": "ts-node-dev --transpile-only tools/restoreGame.ts",
     "prebuild": "rm -rf ./dist",
     "build": "tsc",
-    "postbuild": "cp -r services/emailTemplates ./dist/server/services/emailTemplates && cp .env ./dist | true",
+    "postbuild": "mkdir -p ./dist/server/services/emailTemplates && cp -r services/emailTemplates ./dist/server/services/emailTemplates && cp .env ./dist | true",
     "ts-node": "ts-node",
     "check": "tsc --noEmit"
   },

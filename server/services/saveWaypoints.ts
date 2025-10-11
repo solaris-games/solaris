@@ -3,7 +3,7 @@ import {Carrier} from "./types/Carrier";
 import {Player} from "./types/Player";
 import {Star} from "./types/Star";
 import {DBObjectId} from "./types/DBObjectId";
-import {CarrierWaypointBase, ValidationError} from "@solaris-common";
+import {CarrierWaypointBase, ValidationError} from "solaris-common";
 import CarrierMovementService from "./carrierMovement";
 import StarService from "./star";
 import Repository from "./repository";

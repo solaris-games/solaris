@@ -3,7 +3,6 @@ import Repository from "./repository";
 import { User } from "./types/User";
 import GuildService from "./guild";
 import UserLevelService from "./userLevel";
-import {nullObject} from "./utils";
 
 export default class UserAchievementService {
     userRepo: Repository<User>;

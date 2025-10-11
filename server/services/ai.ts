@@ -11,7 +11,7 @@ import StarUpgradeService from "./starUpgrade";
 import WaypointService from "./waypoint";
 import {Star} from "./types/Star";
 import {Carrier} from "./types/Carrier";
-import {getOrInsert, maxBy, notNull, reverseSort} from "./utils";
+import {getOrInsert, maxBy, notNull, reverseSort} from "solaris-common";
 import {CarrierWaypoint, CarrierWaypointActionType} from "solaris-common";
 import ReputationService from "./reputation";
 import DiplomacyService from "./diplomacy";
