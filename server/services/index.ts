@@ -39,7 +39,7 @@ import PlayerReadyService from './playerReady';
 import RandomService from './random';
 import ResearchService from './research';
 import StarService from './star';
-import StarDistanceService from './starDistance';
+import { StarDistanceService } from 'solaris-common';
 import NameService from './name';
 import StarUpgradeService from './starUpgrade';
 import TechnologyService from './technology';

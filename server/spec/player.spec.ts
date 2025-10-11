@@ -3,7 +3,7 @@ import {Player} from "../services/types/Player";
 import mongoose from 'mongoose';
 
 import { DistanceService } from 'solaris-common';
-import StarDistanceService from '../services/starDistance';
+import { StarDistanceService } from 'solaris-common';
 import MapService from '../services/map';
 import RandomService from '../services/random';
 import StarService from '../services/star';

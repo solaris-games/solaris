@@ -23,7 +23,7 @@ import SocketService from './socket';
 import SpecialistService from './specialist';
 import SpectatorService from './spectator';
 import StarService from './star';
-import StarDistanceService from './starDistance';
+import { StarDistanceService } from 'solaris-common';
 import StarMovementService from './starMovement';
 import StarUpgradeService from './starUpgrade';
 import TechnologyService from './technology';

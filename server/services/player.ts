@@ -15,7 +15,7 @@ import PlayerReadyService from './playerReady';
 import RandomService from './random';
 import SpecialistService from './specialist';
 import StarService from './star';
-import StarDistanceService from './starDistance';
+import { StarDistanceService } from 'solaris-common';
 import TechnologyService from './technology';
 import TeamService from "./team";
 import { ValidationError } from "solaris-common";

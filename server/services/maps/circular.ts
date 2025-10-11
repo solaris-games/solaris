@@ -4,7 +4,7 @@ import { GameTypeService } from 'solaris-common'
 import RandomService from "../random";
 import ResourceService from "../resource";
 import StarService from "../star";
-import StarDistanceService from "../starDistance";
+import { StarDistanceService } from 'solaris-common';
 import {GameResourceDistribution} from "solaris-common";
 
 export default class CircularMapService {

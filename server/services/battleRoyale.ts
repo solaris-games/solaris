@@ -4,7 +4,7 @@ import CarrierService from "./carrier";
 import CarrierMovementService from "./carrierMovement";
 import MapService from "./map";
 import StarService from "./star";
-import StarDistanceService from "./starDistance";
+import { StarDistanceService } from 'solaris-common';
 import CullWaypointsService from "./cullWaypoints";
 
 const PEACE_CYCLES = 3;

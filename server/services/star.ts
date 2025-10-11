@@ -18,7 +18,7 @@ import { GameTypeService } from 'solaris-common'
 import NameService from './name';
 import RandomService from './random';
 import SpecialistService from './specialist';
-import StarDistanceService from './starDistance';
+import { StarDistanceService } from 'solaris-common';
 import TechnologyService from './technology';
 import UserService from './user';
 import { MathRandomGen } from "../utils/randomGen";

@@ -4,7 +4,7 @@ import { GameTypeService } from 'solaris-common'
 import RandomService from "../random";
 import ResourceService from "../resource";
 import StarService from "../star";
-import StarDistanceService from "../starDistance";
+import { StarDistanceService } from 'solaris-common';
 import { GalaxyDimensions } from '../types/Dimensions';
 const randomSeeded = require('random-seed');
 

@@ -6,7 +6,7 @@ import { Player } from './types/Player';
 import { Star } from './types/Star';
 import { DistanceService } from 'solaris-common';
 import StarService from './star';
-import StarDistanceService from './starDistance';
+import { StarDistanceService } from 'solaris-common';
 import TechnologyService from './technology';
 import CarrierMovementService from './carrierMovement';
 

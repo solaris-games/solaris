@@ -4,7 +4,7 @@ import { NaturalResources } from "./types/Star";
 import { DistanceService } from 'solaris-common';
 import { GameTypeService } from 'solaris-common'
 import RandomService from "./random";
-import StarDistanceService from "./starDistance";
+import { StarDistanceService } from 'solaris-common';
 import {GameResourceDistribution} from "solaris-common";
 
 export default class ResourceService {

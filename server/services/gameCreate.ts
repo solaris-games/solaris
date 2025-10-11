@@ -21,7 +21,7 @@ import DiplomacyService from "./diplomacy";
 import TeamService from "./team";
 import CarrierService from './carrier';
 import { logger } from "../utils/logging";
-import StarDistanceService from "./starDistance";
+import { StarDistanceService } from 'solaris-common';
 import { DBObjectId } from "./types/DBObjectId";
 import CustomGalaxyService from "./customGalaxy";
 import {

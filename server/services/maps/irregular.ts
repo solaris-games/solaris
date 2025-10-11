@@ -6,7 +6,7 @@ import { DistanceService } from 'solaris-common';
 import { GameTypeService } from 'solaris-common'
 import ResourceService from '../resource';
 import StarService from '../star';
-import StarDistanceService from '../starDistance';
+import { StarDistanceService } from 'solaris-common';
 import {RandomGen} from "../../utils/randomGen";
 import {GameResourceDistribution} from "solaris-common";
 

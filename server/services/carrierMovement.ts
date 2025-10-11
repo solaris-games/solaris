@@ -11,7 +11,7 @@ import { DistanceService } from 'solaris-common';
 import SpecialistService from './specialist';
 import StarService from './star';
 import TechnologyService from "./technology";
-import StarDistanceService from "./starDistance";
+import { StarDistanceService } from 'solaris-common';
 import {logger} from "../utils/logging";
 import {DBObjectId} from "./types/DBObjectId";
 
