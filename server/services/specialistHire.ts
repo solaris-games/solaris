@@ -7,19 +7,19 @@ import UserAchievementService from "./userAchievement";
 import { GameTypeService } from 'solaris-common'
 import SpecialistService from "./specialist";
 import StarService from "./star";
-import WaypointService from "./waypoint";
 
 import { ValidationError } from "solaris-common";
 import SpecialistBanService from "./specialistBan";
 import PlayerCreditsService from "./playerCredits";
 import TechnologyService from "./technology";
 import StatisticsService from "./statistics";
+import CullWaypointsService from "./cullWaypoints";
 
 export default class SpecialistHireService {
     gameRepo: Repository<Game>;
     specialistService: SpecialistService;
     achievementService: UserAchievementService;
-    waypointService: WaypointService;
+    cullWaypointsService: CullWaypointsService;
     playerCreditsService: PlayerCreditsService;
     starService: StarService;
     gameTypeService: GameTypeService;
@@ -31,7 +31,7 @@ export default class SpecialistHireService {
         gameRepo: Repository<Game>,
         specialistService: SpecialistService,
         achievementService: UserAchievementService,
-        waypointService: WaypointService,
+        cullWaypointsService: CullWaypointsService,
         playerCreditsService: PlayerCreditsService,
         starService: StarService,
         gameTypeService: GameTypeService,
@@ -42,7 +42,7 @@ export default class SpecialistHireService {
         this.gameRepo = gameRepo;
         this.specialistService = specialistService;
         this.achievementService = achievementService;
-        this.waypointService = waypointService;
+        this.cullWaypointsService = cullWaypointsService;
         this.playerCreditsService = playerCreditsService;
         this.starService = starService;
         this.gameTypeService = gameTypeService;
@@ -135,7 +135,7 @@ export default class SpecialistHireService {
 
         carrier.effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, true);
 
-        let waypoints = await this.waypointService.cullWaypointsByHyperspaceRangeDB(game, carrier);
+        let waypoints = await this.cullWaypointsService.cullWaypointsByHyperspaceRangeDB(game, carrier);
 
         let result = {
             game,

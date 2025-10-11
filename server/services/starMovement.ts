@@ -6,23 +6,24 @@ import MapService from "./map";
 import StarDistanceService from "./starDistance";
 import SpecialistService from "./specialist";
 import WaypointService from "./waypoint";
+import CullWaypointsService from "./cullWaypoints";
 
 export default class starMovementService {
     mapService: MapService;
     starDistanceService: StarDistanceService;
     specialistService: SpecialistService;
-    waypointService: WaypointService;
+    cullWaypointsService: CullWaypointsService;
 
     constructor(
         mapService: MapService,
         starDistanceService: StarDistanceService,
         specialistService: SpecialistService,
-        waypointService: WaypointService
+        cullWaypointsService: CullWaypointsService,
     ) {
         this.mapService = mapService;
         this.starDistanceService = starDistanceService;
         this.specialistService = specialistService;
-        this.waypointService = waypointService;
+        this.cullWaypointsService = cullWaypointsService;
     }
 
     orbitGalaxy(game: Game) {
@@ -35,7 +36,7 @@ export default class starMovementService {
         }
 
         for (let carrier of game.galaxy.carriers) {
-            this.waypointService.cullWaypointsByHyperspaceRange(game, carrier);
+            this.cullWaypointsService.cullWaypointsByHyperspaceRange(game, carrier);
         }
     }
 

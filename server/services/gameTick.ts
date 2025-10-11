@@ -22,7 +22,6 @@ import StarService from "./star";
 import StarUpgradeService from "./starUpgrade";
 import TechnologyService from "./technology";
 import UserService from "./user";
-import WaypointService from "./waypoint";
 import { CarrierActionWaypoint } from "./types/GameTick";
 import { Star } from "./types/Star";
 import { GameRankingResult } from "./types/Rating";
@@ -44,6 +43,7 @@ import GameLockService from "./gameLock";
 import {logger} from "../utils/logging";
 import StatisticsService from "./statistics";
 import WaypointActionService from "./waypointAction";
+import CullWaypointsService from "./cullWaypoints";
 
 const EventEmitter = require('events');
 const moment = require('moment');
@@ -67,7 +67,6 @@ export default class GameTickService extends EventEmitter {
     playerService: PlayerService;
     playerAfkService: PlayerAfkService;
     historyService: HistoryService;
-    waypointService: WaypointService;
     combatService: CombatService;
     leaderboardService: LeaderboardService;
     userService: UserService;
@@ -93,6 +92,7 @@ export default class GameTickService extends EventEmitter {
     gameLockService: GameLockService;
     statisticsService: StatisticsService;
     waypointActionService: WaypointActionService;
+    cullWaypointsService: CullWaypointsService;
 
     constructor(
         distanceService: DistanceService,
@@ -102,7 +102,6 @@ export default class GameTickService extends EventEmitter {
         playerService: PlayerService,
         playerAfkService: PlayerAfkService,
         historyService: HistoryService,
-        waypointService: WaypointService,
         combatService: CombatService,
         leaderboardService: LeaderboardService,
         userService: UserService,
@@ -128,6 +127,7 @@ export default class GameTickService extends EventEmitter {
         gameLockService: GameLockService,
         statisticsService: StatisticsService,
         waypointActionService: WaypointActionService,
+        cullWaypointsService: CullWaypointsService,
     ) {
         super();
             
@@ -138,7 +138,6 @@ export default class GameTickService extends EventEmitter {
         this.playerService = playerService;
         this.playerAfkService = playerAfkService;
         this.historyService = historyService;
-        this.waypointService = waypointService;
         this.combatService = combatService;
         this.leaderboardService = leaderboardService;
         this.userService = userService;
@@ -164,6 +163,7 @@ export default class GameTickService extends EventEmitter {
         this.scheduleBuyService = scheduleBuyService;
         this.statisticsService = statisticsService;
         this.waypointActionService = waypointActionService;
+        this.cullWaypointsService = cullWaypointsService;
     }
 
     async tick(gameId: DBObjectId) {
@@ -283,7 +283,7 @@ export default class GameTickService extends EventEmitter {
             this._orbitGalaxy(game);
             logTime('Orbital mechanics');
 
-            this.waypointService.cullAllWaypointsByHyperspaceRange(game);
+            this.cullWaypointsService.cullAllWaypointsByHyperspaceRange(game);
             logTime('Sanitise all carrier waypoints');
 
             this._applyTickBasedSpecialistEffects(game);
@@ -707,7 +707,7 @@ export default class GameTickService extends EventEmitter {
 
     _sanitiseDarkModeCarrierWaypoints(game: Game) {
         if (this.gameTypeService.isDarkMode(game)) {
-            this.waypointService.sanitiseAllCarrierWaypointsByScanningRange(game);
+            this.cullWaypointsService.sanitiseAllCarrierWaypointsByScanningRange(game);
         }
     }
 

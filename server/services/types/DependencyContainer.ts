@@ -92,6 +92,8 @@ import {UserServerSocketHandler} from "../../sockets/socketHandlers/user";
 import StatisticsService from "../statistics";
 import InitialGameStateService from "../initialGameState";
 import WaypointActionService from "../waypointAction";
+import SaveWaypointsService from "../saveWaypoints";
+import CullWaypointsService from "../cullWaypoints";
 
 export interface DependencyContainer {
     config: Config,
@@ -188,4 +190,6 @@ export interface DependencyContainer {
     statisticsService: StatisticsService,
     initialGameStateService: InitialGameStateService,
     waypointActionService: WaypointActionService,
+    saveWaypointsService: SaveWaypointsService,
+    cullWaypointsService: CullWaypointsService,
 };
