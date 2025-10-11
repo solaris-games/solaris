@@ -10,6 +10,7 @@ import Repository from "./repository";
 import WaypointService from "./waypoint";
 import mongoose from 'mongoose';
 import CarrierService from "./carrier";
+import {GameHistoryCarrierWaypoint} from "./types/GameHistory";
 
 export default class SaveWaypointsService {
     gameRepo: Repository<Game>;
@@ -83,7 +84,7 @@ export default class SaveWaypointsService {
             waypoint.actionShips = waypoint.actionShips || 0;
             waypoint.action = waypoint.action || 'nothing';
 
-            if (waypoint.actionShips == null || (waypoint.actionShips as any) == '' || +waypoint.actionShips < 0 || !this.waypointService._supportsActionShips(waypoint.action)) {
+            if (waypoint.actionShips == null || (waypoint.actionShips as any) == '' || +waypoint.actionShips < 0 || !this.waypointService.supportsActionShips(waypoint.action)) {
                 waypoint.actionShips = 0;
             }
 
@@ -116,7 +117,7 @@ export default class SaveWaypointsService {
             // The waypoint is not the first waypoint in the array.
             // The carrier isn't in transit to the first waypoint.
             if (i > 0 || (i === 0 && Boolean(carrier.orbiting))) { // Is one of the next waypoints OR is the first waypoint and isn't in transit
-                if (sourceStar && (!this.waypointService._waypointRouteIsBetweenWormHoles(game, waypoint) && !this.waypointService._starRouteIsWithinHyperspaceRange(game, carrier, sourceStar, destinationStar))) {// Validation of whether the waypoint is within hyperspace range
+                if (sourceStar && (!this._waypointRouteIsBetweenWormHoles(game, waypoint) && !this.waypointService.starRouteIsWithinHyperspaceRange(game, carrier, sourceStar, destinationStar))) {// Validation of whether the waypoint is within hyperspace range
                     throw new ValidationError(`The waypoint ${sourceStarName} -> ${destinationStar.name} exceeds hyperspace range.`);
                 }
             }
@@ -134,7 +135,7 @@ export default class SaveWaypointsService {
         });
 
         // If the waypoints are not a valid loop then throw an error.
-        if (looped && !this.waypointService.canLoop(game, player, carrier)) {
+        if (looped && !this.waypointService.canLoop(game, carrier)) {
             throw new ValidationError(`The carrier waypoints cannot be looped.`);
         }
 
@@ -188,7 +189,7 @@ export default class SaveWaypointsService {
                 throw new ValidationError('The carrier must have 2 or more waypoints to loop');
             }
 
-            if (!this.waypointService.canLoop(game, player, carrier)) {
+            if (!this.waypointService.canLoop(game, carrier)) {
                 throw new ValidationError('The last waypoint star is out of hyperspace range of the first waypoint star.');
             }
         }
@@ -202,5 +203,17 @@ export default class SaveWaypointsService {
                 'galaxy.carriers.$.waypointsLooped': loop,
             }
         })
+    }
+
+    _waypointRouteIsBetweenWormHoles(game: Game, waypoint: CarrierWaypointBase<DBObjectId>) {
+        const sourceStar = this.starService.getById(game, waypoint.source);
+        const destinationStar = this.starService.getById(game, waypoint.destination);
+
+        // Stars may have been destroyed.
+        if (sourceStar == null || destinationStar == null) {
+            return false;
+        }
+
+        return this.starService.isStarPairWormHole(sourceStar, destinationStar);
     }
 }

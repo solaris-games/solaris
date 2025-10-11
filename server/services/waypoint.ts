@@ -1,5 +1,4 @@
 import { DBObjectId } from './types/DBObjectId';
-import Repository from './repository';
 import { Carrier } from './types/Carrier';
 import { CarrierWaypoint, CarrierWaypointActionType, CarrierWaypointBase } from 'solaris-common';
 import { Game } from './types/Game';
@@ -10,8 +9,6 @@ import StarService from './star';
 import StarDistanceService from './starDistance';
 import TechnologyService from './technology';
 import CarrierMovementService from './carrierMovement';
-import {GameHistoryCarrierWaypoint} from "./types/GameHistory";
-import mongoose from 'mongoose';
 
 export default class WaypointService {
     starService: StarService;
@@ -34,23 +31,12 @@ export default class WaypointService {
         this.carrierMovementService = carrierMovementService;
     }
 
-    fromHistory(wp: GameHistoryCarrierWaypoint) {
-        return {
-            _id: new mongoose.Types.ObjectId(),
-            source: wp.source,
-            destination: wp.destination,
-            action: 'nothing',
-            actionShips: 0,
-            delayTicks: 0
-        } as CarrierWaypointBase<DBObjectId>;
-    }
-
-    _supportsActionShips(action: CarrierWaypointActionType) {
+    supportsActionShips(action: CarrierWaypointActionType) {
         const actions: CarrierWaypointActionType[] = ['drop', 'collect', 'dropPercentage', 'collectPercentage', 'dropAllBut', 'collectAllBut', 'garrison'];
         return actions.includes(action);
     }
 
-    _starRouteIsWithinHyperspaceRange(game: Game, carrier: Carrier, sourceStar: Star, destinationStar: Star) {
+    starRouteIsWithinHyperspaceRange(game: Game, carrier: Carrier, sourceStar: Star, destinationStar: Star) {
         // Stars may have been destroyed.
         if (!sourceStar || !destinationStar) {
             return false;
@@ -59,31 +45,19 @@ export default class WaypointService {
         return this.carrierMovementService.isWithinHyperspaceRange(game, carrier, sourceStar, destinationStar);
     }
 
-    _waypointRouteIsBetweenWormHoles(game: Game, waypoint: CarrierWaypointBase<DBObjectId>) {
-        let sourceStar = this.starService.getById(game, waypoint.source);
-        let destinationStar = this.starService.getById(game, waypoint.destination);
-
-        // Stars may have been destroyed.
-        if (sourceStar == null || destinationStar == null) {
-            return false;
-        }
-
-        return this.starService.isStarPairWormHole(sourceStar, destinationStar);
-    }
-
-    canLoop(game: Game, player: Player, carrier: Carrier) {
+    canLoop(game: Game, carrier: Carrier) {
         if (carrier.waypoints.length < 2 || carrier.isGift) {
             return false;
         }
 
-        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, true);
+        const effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, true);
 
         // Check whether the last waypoint is in range of the first waypoint.
-        let firstWaypoint = carrier.waypoints[0];
-        let lastWaypoint = carrier.waypoints[carrier.waypoints.length - 1];
+        const firstWaypoint = carrier.waypoints[0];
+        const lastWaypoint = carrier.waypoints[carrier.waypoints.length - 1];
 
-        let firstWaypointStar = this.starService.getById(game, firstWaypoint.destination);
-        let lastWaypointStar = this.starService.getById(game, lastWaypoint.destination);
+        const firstWaypointStar = this.starService.getById(game, firstWaypoint.destination);
+        const lastWaypointStar = this.starService.getById(game, lastWaypoint.destination);
 
         if (firstWaypointStar == null || lastWaypointStar == null) {
             return false;
@@ -93,8 +67,8 @@ export default class WaypointService {
             return true;
         }
 
-        let distanceBetweenStars = this.starDistanceService.getDistanceBetweenStars(firstWaypointStar, lastWaypointStar);
-        let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, effectiveTechs.hyperspace);
+        const distanceBetweenStars = this.starDistanceService.getDistanceBetweenStars(firstWaypointStar, lastWaypointStar);
+        const hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, effectiveTechs.hyperspace);
 
         return distanceBetweenStars <= hyperspaceDistance
     }
@@ -103,7 +77,7 @@ export default class WaypointService {
         const distance = this.distanceService.getDistanceBetweenLocations(sourceStar.location, destinationStar.location);
         const warpSpeed = this.carrierMovementService.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar);
 
-        let tickDistance = this.carrierMovementService.getCarrierDistancePerTick(game, carrier, warpSpeed, false);
+        const tickDistance = this.carrierMovementService.getCarrierDistancePerTick(game, carrier, warpSpeed, false);
 
         if (tickDistance) {
             return Math.ceil(distance / tickDistance);
@@ -115,7 +89,7 @@ export default class WaypointService {
     calculateWaypointTicks(game: Game, carrier: Carrier, waypoint: CarrierWaypoint<DBObjectId>) {
         const delayTicks = waypoint.delayTicks || 0;
 
-        let carrierOwner = game.galaxy.players.find(p => p._id.toString() === carrier.ownedByPlayerId!.toString())!;
+        const carrierOwner = game.galaxy.players.find(p => p._id.toString() === carrier.ownedByPlayerId!.toString())!;
 
         // if the waypoint is going to the same star then it is at least 1
         // tick, plus any delay ticks.
@@ -123,8 +97,8 @@ export default class WaypointService {
             return 1 + delayTicks;
         }
 
-        let sourceStar = this.starService.getById(game, waypoint.source);
-        let destinationStar = this.starService.getById(game, waypoint.destination);
+        const sourceStar = this.starService.getById(game, waypoint.source);
+        const destinationStar = this.starService.getById(game, waypoint.destination);
 
         // If the carrier can travel instantly then it'll take 1 tick + any delay.
         let instantSpeed = sourceStar && this.starService.isStarPairWormHole(sourceStar, destinationStar);
@@ -134,7 +108,7 @@ export default class WaypointService {
         }
 
         let source = sourceStar == null ? carrier.location : sourceStar.location;
-        let destination = destinationStar.location;
+        const destination = destinationStar.location;
 
         // If the carrier is already en-route, then the number of ticks will be relative
         // to where the carrier is currently positioned.
@@ -142,11 +116,11 @@ export default class WaypointService {
             source = carrier.location;
         }
 
-        let distance = this.distanceService.getDistanceBetweenLocations(source, destination);
-        let warpSpeed = this.carrierMovementService.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar);
+        const distance = this.distanceService.getDistanceBetweenLocations(source, destination);
+        const warpSpeed = this.carrierMovementService.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar);
 
         // Calculate how far the carrier will move per tick.
-        let tickDistance = this.carrierMovementService.getCarrierDistancePerTick(game, carrier, warpSpeed, instantSpeed);
+        const tickDistance = this.carrierMovementService.getCarrierDistancePerTick(game, carrier, warpSpeed, instantSpeed);
         let ticks = 1;
 
         if (tickDistance) {
@@ -162,7 +136,7 @@ export default class WaypointService {
         let totalTicks = 0;
 
         for (let i = 0; i < carrier.waypoints.length; i++) {
-            let cwaypoint = carrier.waypoints[i];
+            const cwaypoint = carrier.waypoints[i];
 
             totalTicks += this.calculateWaypointTicks(game, carrier, cwaypoint);
 
@@ -187,13 +161,5 @@ export default class WaypointService {
             carrier.ticksEta = null;
             carrier.ticksEtaTotal = null;
         }
-    }
-
-    _checkWaypointStarInRange(game: Game, waypoint: Star, player: { player: Player, stars: Star[], inRange: string[] }) {
-        for (let index = 0; index < player.stars.length; index++) {
-            const star = player.stars[index];
-            if(this.starService.getStarsWithinScanningRangeOfStarByStarIds(game, star, [waypoint]).length) return true;
-        }
-        return false;
     }
 };

@@ -1,4 +1,4 @@
-import { ValidationError } from "solaris-common";
+import {CarrierWaypointBase, ValidationError} from "solaris-common";
 import AvatarService from './avatar';
 import BattleRoyaleService from './battleRoyale';
 import CacheService from './cache';
@@ -31,11 +31,12 @@ import { Carrier } from './types/Carrier';
 import { CarrierWaypoint } from 'solaris-common';
 import { DBObjectId } from './types/DBObjectId';
 import { Game } from './types/Game';
-import { GameHistoryCarrier } from "./types/GameHistory";
+import {GameHistoryCarrier, GameHistoryCarrierWaypoint} from "./types/GameHistory";
 import { Guild, GuildUserWithTag } from './types/Guild';
 import { Player, PlayerDiplomaticState, PlayerReputation, PlayerResearch } from './types/Player';
 import { Star } from './types/Star';
 import WaypointService from './waypoint';
+import mongoose from 'mongoose';
 
 enum ViewpointKind {
     Basic,
@@ -812,7 +813,7 @@ export default class GameGalaxyService {
             specialist: historyCarrier.specialistId && this.specialistService.getById(historyCarrier.specialistId, 'carrier'),
             specialistExpireTick: null,
             specialistId: historyCarrier.specialistId,
-            waypoints: historyCarrier.waypoints.map(w => this.waypointService.fromHistory(w)),
+            waypoints: historyCarrier.waypoints.map(w => this._waypointFromHistory(w)),
             waypointsLooped: false,
         } as any as Carrier;
     }
@@ -949,6 +950,17 @@ export default class GameGalaxyService {
         for (let pendingStar of pendingStars) {
             pendingStar.targeted = true;
         }
+    }
+
+    _waypointFromHistory(wp: GameHistoryCarrierWaypoint) {
+        return {
+            _id: new mongoose.Types.ObjectId(),
+            source: wp.source,
+            destination: wp.destination,
+            action: 'nothing',
+            actionShips: 0,
+            delayTicks: 0
+        } as CarrierWaypointBase<DBObjectId>;
     }
 
 };

@@ -80,13 +80,13 @@ export default class CullWaypointsService {
             let waypoint = carrier.waypoints[i];
             destinationStar = this.starService.getByIdBS(game, waypoint.destination);
 
-            if (!this.waypointService._starRouteIsWithinHyperspaceRange(game, carrier, sourceStar, destinationStar)) {
+            if (!this.waypointService.starRouteIsWithinHyperspaceRange(game, carrier, sourceStar, destinationStar)) {
                 waypointsCulled = true;
 
                 carrier.waypoints.splice(i);
 
                 if (carrier.waypointsLooped) {
-                    carrier.waypointsLooped = this.waypointService.canLoop(game, player, carrier);
+                    carrier.waypointsLooped = this.waypointService.canLoop(game, carrier);
                 }
 
                 break;
@@ -117,18 +117,26 @@ export default class CullWaypointsService {
             const waypoint = carrier.waypoints[index];
             if(waypoint.destination.toString() in player.inRange) continue;
             const waypointStar = this.starService.getById(game, waypoint.destination);
-            if(this.waypointService._checkWaypointStarInRange(game, waypointStar, player)){
+            if(this._checkWaypointStarInRange(game, waypointStar, player)){
                 player.inRange.push(waypoint.destination.toString());
             }else{
                 carrier.waypoints.splice(index);
 
                 if (carrier.waypointsLooped) {
-                    carrier.waypointsLooped = this.waypointService.canLoop(game, player.player, carrier);
+                    carrier.waypointsLooped = this.waypointService.canLoop(game, carrier);
                 }
 
                 break;
             }
         }
+    }
+
+    _checkWaypointStarInRange(game: Game, waypoint: Star, player: { player: Player, stars: Star[], inRange: string[] }) {
+        for (let index = 0; index < player.stars.length; index++) {
+            const star = player.stars[index];
+            if(this.starService.getStarsWithinScanningRangeOfStarByStarIds(game, star, [waypoint]).length) return true;
+        }
+        return false;
     }
 
     _getPlayersWithOwnedOrInOrbitStars(game: Game) {
