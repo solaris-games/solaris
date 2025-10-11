@@ -43,6 +43,7 @@ import {Moment} from "moment";
 import GameLockService from "./gameLock";
 import {logger} from "../utils/logging";
 import StatisticsService from "./statistics";
+import WaypointActionService from "./waypointAction";
 
 const EventEmitter = require('events');
 const moment = require('moment');
@@ -91,6 +92,7 @@ export default class GameTickService extends EventEmitter {
     scheduleBuyService: ScheduleBuyService;
     gameLockService: GameLockService;
     statisticsService: StatisticsService;
+    waypointActionService: WaypointActionService;
 
     constructor(
         distanceService: DistanceService,
@@ -125,6 +127,7 @@ export default class GameTickService extends EventEmitter {
         scheduleBuyService: ScheduleBuyService,
         gameLockService: GameLockService,
         statisticsService: StatisticsService,
+        waypointActionService: WaypointActionService,
     ) {
         super();
             
@@ -160,6 +163,7 @@ export default class GameTickService extends EventEmitter {
         this.gameLockService = gameLockService;
         this.scheduleBuyService = scheduleBuyService;
         this.statisticsService = statisticsService;
+        this.waypointActionService = waypointActionService;
     }
 
     async tick(gameId: DBObjectId) {
@@ -646,14 +650,14 @@ export default class GameTickService extends EventEmitter {
 
         // 4a. Now that combat is done, perform any carrier waypoint actions.
         // Do the drops first
-        this.waypointService.performWaypointActionsDrops(game, actionWaypoints);
+        this.waypointActionService.performWaypointActionsDrops(game, actionWaypoints);
 
         // 4b. Build ships at star.
         this.shipService.produceShips(game);
 
         // 4c. Do the rest of the waypoint actions.
-        this.waypointService.performWaypointActionsCollects(game, actionWaypoints);
-        this.waypointService.performWaypointActionsGarrisons(game, actionWaypoints);
+        this.waypointActionService.performWaypointActionsCollects(game, actionWaypoints);
+        this.waypointActionService.performWaypointActionsGarrisons(game, actionWaypoints);
 
         // TODO: This is incredibly inefficient in large turn based games; moved it outside the main tick loop
         // for performance reasons because it needs to calculate the scanning ranges of all players.

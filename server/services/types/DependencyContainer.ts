@@ -91,6 +91,7 @@ import {UserServerSocketEmitter} from "../../sockets/socketEmitters/user";
 import {UserServerSocketHandler} from "../../sockets/socketHandlers/user";
 import StatisticsService from "../statistics";
 import InitialGameStateService from "../initialGameState";
+import WaypointActionService from "../waypointAction";
 
 export interface DependencyContainer {
     config: Config,
@@ -186,4 +187,5 @@ export interface DependencyContainer {
     starCaptureService: StarCaptureService,
     statisticsService: StatisticsService,
     initialGameStateService: InitialGameStateService,
+    waypointActionService: WaypointActionService,
 };
