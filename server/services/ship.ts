@@ -1,6 +1,6 @@
 import CarrierService from "./carrier";
 import StarService from "./star";
-import TechnologyService from "./technology";
+import { TechnologyService } from 'solaris-common';
 import {Carrier} from "./types/Carrier";
 import {DBObjectId} from "./types/DBObjectId";
 import {Game} from "./types/Game";

@@ -5,7 +5,7 @@ import { Game } from './types/Game';
 import { Player } from './types/Player';
 import { Star } from './types/Star';
 import StarService from './star';
-import TechnologyService from './technology';
+import { TechnologyService } from 'solaris-common';
 import CarrierMovementService from './carrierMovement';
 
 export default class WaypointService {

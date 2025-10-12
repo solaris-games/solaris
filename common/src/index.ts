@@ -56,3 +56,4 @@ export * from "./validation/customGalaxy";
 export * from "./services/gameType";
 export * from "./services/distance";
 export * from "./services/starDistance";
+export * from "./services/technology";

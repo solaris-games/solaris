@@ -8,7 +8,7 @@ import { GameTypeService } from 'solaris-common'
 import PlayerStatisticsService from './playerStatistics';
 import RandomService from './random';
 import StarService from './star';
-import TechnologyService from './technology';
+import { TechnologyService } from 'solaris-common';
 import UserService from './user';
 import StatisticsService from './statistics';
 

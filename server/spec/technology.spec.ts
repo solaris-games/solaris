@@ -1,4 +1,4 @@
-import TechnologyService from '../services/technology';
+import { TechnologyService } from 'solaris-common';
 import { GameTypeService } from 'solaris-common'
 import mongoose from 'mongoose';
 

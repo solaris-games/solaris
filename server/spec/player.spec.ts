@@ -10,7 +10,7 @@ import StarService from '../services/star';
 import CarrierService from '../services/carrier';
 import PlayerService from '../services/player';
 import NameService from '../services/name';
-import TechnologyService from '../services/technology';
+import { TechnologyService } from 'solaris-common';
 import PlayerColourService from "../services/playerColour";
 
 const gameNames = require('../config/game/gameNames');

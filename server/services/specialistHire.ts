@@ -11,7 +11,7 @@ import StarService from "./star";
 import { ValidationError } from "solaris-common";
 import SpecialistBanService from "./specialistBan";
 import PlayerCreditsService from "./playerCredits";
-import TechnologyService from "./technology";
+import { TechnologyService } from 'solaris-common';
 import StatisticsService from "./statistics";
 import CullWaypointsService from "./cullWaypoints";
 

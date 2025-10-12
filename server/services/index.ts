@@ -42,7 +42,7 @@ import StarService from './star';
 import { StarDistanceService } from 'solaris-common';
 import NameService from './name';
 import StarUpgradeService from './starUpgrade';
-import TechnologyService from './technology';
+import { TechnologyService } from 'solaris-common';
 import TradeService from './trade';
 import WaypointService from './waypoint';
 import ShipTransferService from './shipTransfer';

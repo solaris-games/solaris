@@ -18,7 +18,7 @@ import PlayerService from "./player";
 import ReputationService from "./reputation";
 import SpecialistService from "./specialist";
 import StarService from "./star";
-import TechnologyService from "./technology";
+import { TechnologyService } from 'solaris-common';
 import StarCaptureService from "./starCapture";
 import StatisticsService from "./statistics";
 

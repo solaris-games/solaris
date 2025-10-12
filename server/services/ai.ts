@@ -24,7 +24,7 @@ import PathfindingService from "./pathfinding";
 import {logger} from "../utils/logging";
 import mongoose from 'mongoose';
 import SaveWaypointsService from "./saveWaypoints";
-import TechnologyService from "./technology";
+import { TechnologyService } from 'solaris-common';
 
 const Heap = require('qheap');
 

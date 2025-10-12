@@ -26,7 +26,7 @@ import StarService from './star';
 import { StarDistanceService } from 'solaris-common';
 import StarMovementService from './starMovement';
 import StarUpgradeService from './starUpgrade';
-import TechnologyService from './technology';
+import { TechnologyService } from 'solaris-common';
 import { Carrier } from './types/Carrier';
 import { CarrierWaypoint } from 'solaris-common';
 import { DBObjectId } from './types/DBObjectId';

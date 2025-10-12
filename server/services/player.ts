@@ -16,7 +16,7 @@ import RandomService from './random';
 import SpecialistService from './specialist';
 import StarService from './star';
 import { StarDistanceService } from 'solaris-common';
-import TechnologyService from './technology';
+import { TechnologyService } from 'solaris-common';
 import TeamService from "./team";
 import { ValidationError } from "solaris-common";
 import {shuffle} from "solaris-common";

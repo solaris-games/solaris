@@ -9,7 +9,7 @@ import StarService from "./star";
 import SpecialistService from "./specialist";
 import GameStateService from "./gameState";
 import DiplomacyService from "./diplomacy";
-import TechnologyService from "./technology";
+import { TechnologyService } from 'solaris-common';
 import StarUpgradeService from "./starUpgrade";
 import StatisticsService from "./statistics";
 

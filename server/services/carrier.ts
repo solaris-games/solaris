@@ -11,7 +11,7 @@ import { Star } from './types/Star';
 import { DistanceService } from 'solaris-common';
 import SpecialistService from './specialist';
 import StarService from './star';
-import TechnologyService from './technology';
+import { TechnologyService } from 'solaris-common';
 const EventEmitter = require('events');
 
 const CARRIER_LIMIT_MIN = 50;

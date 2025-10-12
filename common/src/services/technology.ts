@@ -1,10 +1,11 @@
-import { Carrier } from "./types/Carrier";
-import { Game } from "./types/Game";
-import { Player, PlayerTechnologyLevels, ResearchTypeNotRandom } from "./types/Player";
-import { Star } from "./types/Star";
-import { GameTypeService } from 'solaris-common'
-import {maxBy} from "solaris-common";
-import {CombatResolutionMalusStrategy, Specialist} from "solaris-common";
+import type {Player, PlayerTechnologyLevels, ResearchTypeNotRandom} from "../types/common/player";
+import type {Specialist} from "../types/common/specialist";
+import type {GameTypeService} from "./gameType";
+import type {CombatResolutionMalusStrategy, Game} from "../types/common/game";
+import type {Star} from "../types/common/star";
+import type {Id} from "../types/id";
+import type {Carrier} from "../types/common/carrier";
+import {maxBy} from "../utilities/utils";
 
 const DEFAULT_TECHNOLOGIES: ResearchTypeNotRandom[] = [
     'terraforming',
@@ -22,7 +23,7 @@ interface ISpecialistService {
     getByIdCarrier(id: number): Specialist | null;
 }
 
-export default class TechnologyService {
+export class TechnologyService {
     specialistService: ISpecialistService;
     gameTypeService: GameTypeService;
 
@@ -34,7 +35,7 @@ export default class TechnologyService {
         this.gameTypeService = gameTypeService;
     }
 
-    getResearchableTechnologies(game: Game) {
+    getResearchableTechnologies<ID>(game: Game<ID>) {
         let techs: ResearchTypeNotRandom[] = Object.keys(game.settings.technology.researchCosts).filter(k => {
             return k.match(/^[^_\$]/) != null;
         }) as ResearchTypeNotRandom[];
@@ -43,21 +44,21 @@ export default class TechnologyService {
     }
 
     // Enabled means: will this technology be in effect? It can be enabled, but not researchable (thereby fixed).
-    isTechnologyEnabled(game: Game, techKey: ResearchTypeNotRandom) {
+    isTechnologyEnabled<ID>(game: Game<ID>, techKey: ResearchTypeNotRandom) {
         return game.settings.technology.startingTechnologyLevel[techKey] > 0;
     }
 
-    isTechnologyResearchable(game: Game, technologyKey: ResearchTypeNotRandom) {
+    isTechnologyResearchable<ID>(game: Game<ID>, technologyKey: ResearchTypeNotRandom) {
       return this.isTechnologyEnabled(game, technologyKey) && game.settings.technology.researchCosts[technologyKey] !== 'none'
     }
 
-    getDefaultTechnology(game: Game): ResearchTypeNotRandom {
+    getDefaultTechnology<ID>(game: Game<ID>): ResearchTypeNotRandom {
         const researchableTechnologies = this.getResearchableTechnologies(game);
 
         return DEFAULT_TECHNOLOGIES.find(t => researchableTechnologies.includes(t)) || 'weapons';
     }
 
-    _applyTechModifiers(techs: PlayerTechnologyLevels, modifiers, sanitize: boolean = true) { // TODO: types
+    _applyTechModifiers(techs: PlayerTechnologyLevels, modifiers: Partial<PlayerTechnologyLevels>, sanitize: boolean = true) { // TODO: types
         techs.scanning += modifiers.scanning || 0;
         techs.hyperspace += modifiers.hyperspace || 0;
         techs.terraforming += modifiers.terraforming || 0;
@@ -81,7 +82,7 @@ export default class TechnologyService {
         return techs;
     }
 
-    getPlayerEffectiveTechnologyLevels(game: Game, player: Player | null, sanitize: boolean = true): PlayerTechnologyLevels {
+    getPlayerEffectiveTechnologyLevels<ID>(game: Game<ID>, player: Player<ID> | null, sanitize: boolean = true): PlayerTechnologyLevels {
         // TODO: This is a plaster over a bug where in the gameGalaxy service
         // it sets research to null if its in extra dark galaxy but somehow
         // this function is still being called by getStats. Needs investigating...
@@ -119,7 +120,7 @@ export default class TechnologyService {
         return techs;
     }
 
-    getStarEffectiveTechnologyLevels(game: Game, star: Star, sanitize: boolean = true): PlayerTechnologyLevels {
+    getStarEffectiveTechnologyLevels<ID extends Id>(game: Game<ID>, star: Star<ID>, sanitize: boolean = true): PlayerTechnologyLevels {
         let player = star.ownedByPlayerId ? game.galaxy.players.find(x => x._id.toString() === star.ownedByPlayerId!.toString()) || null : null;
         let techs = this.getPlayerEffectiveTechnologyLevels(game, player, false);
 
@@ -138,7 +139,7 @@ export default class TechnologyService {
         return techs;
     }
 
-    getCarrierEffectiveTechnologyLevels(game: Game, carrier: Carrier, sanitize: boolean = true) {
+    getCarrierEffectiveTechnologyLevels<ID extends Id>(game: Game<ID>, carrier: Carrier<ID>, sanitize: boolean = true) {
         let player = game.galaxy.players.find(x => x._id.toString() === carrier.ownedByPlayerId!.toString()) || null;
         let techs = this.getPlayerEffectiveTechnologyLevels(game, player, false);
 
@@ -154,7 +155,7 @@ export default class TechnologyService {
         return techs;
     }
 
-    getStarWeaponsBuff(star: Star) {
+    getStarWeaponsBuff<ID>(star: Star<ID>) {
         if (star.specialistId) {
             let specialist = this.specialistService.getByIdStar(star.specialistId);
 
@@ -166,7 +167,7 @@ export default class TechnologyService {
         return 0;
     }
 
-    getCarrierWeaponsBuff(carrier: Carrier, isCarrierToStarCombat: boolean, isAttacker: boolean, allyCount: number, strategy: CombatResolutionMalusStrategy, isLargestCarrier: boolean) {
+    getCarrierWeaponsBuff<ID>(carrier: Carrier<ID>, isCarrierToStarCombat: boolean, isAttacker: boolean, allyCount: number, strategy: CombatResolutionMalusStrategy, isLargestCarrier: boolean) {
         const buffs: number[] = [];
 
         if (carrier.specialistId) {
@@ -214,7 +215,7 @@ export default class TechnologyService {
         return buffs.sort((a, b) => b - a)[0];
     }
 
-    getCarriersWeaponsDebuff(carriersToCheck: Carrier[]) {
+    getCarriersWeaponsDebuff<ID>(carriersToCheck: Carrier<ID>[]) {
         let deduction = 0;
         
         if (!carriersToCheck.length) {
@@ -239,7 +240,7 @@ export default class TechnologyService {
         return deduction || 0;
     }
 
-    getStarEffectiveWeaponsLevel(game: Game, defenders: Player[], star: Star, carriersInOrbit: Carrier[]) {
+    getStarEffectiveWeaponsLevel<ID>(game: Game<ID>, defenders: Player<ID>[], star: Star<ID>, carriersInOrbit: Carrier<ID>[]) {
         let weapons = defenders.sort((a, b) => b.research.weapons.level - a.research.weapons.level)[0].research.weapons.level;
         let defenderBonus = this.getDefenderBonus(game, star);
 
@@ -254,7 +255,7 @@ export default class TechnologyService {
         return this._calculateActualWeaponsBuff(weapons, buffs, defenderBonus);
     }
 
-    getCarriersEffectiveWeaponsLevel(game: Game, players: Player[], carriers: Carrier[], isCarrierToStarCombat: boolean, isAttacker: boolean,  strategy: CombatResolutionMalusStrategy) {
+    getCarriersEffectiveWeaponsLevel<ID>(game: Game<ID>, players: Player<ID>[], carriers: Carrier<ID>[], isCarrierToStarCombat: boolean, isAttacker: boolean,  strategy: CombatResolutionMalusStrategy) {
         const weapons = players.sort((a, b) => b.research.weapons.level - a.research.weapons.level)[0].research.weapons.level;
 
         if (!carriers.length) {
@@ -281,7 +282,7 @@ export default class TechnologyService {
         return Math.max(1, weapons + actualBuff + additionalBuff);
     }   
 
-    getDefenderBonus(game: Game, star: Star) {
+    getDefenderBonus<ID>(game: Game<ID>, star: Star<ID>) {
         let bonus = game.settings.specialGalaxy.defenderBonus === 'enabled' ? 1 : 0;
 
         if (star.isAsteroidField) {

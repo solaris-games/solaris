@@ -20,7 +20,7 @@ import ResearchService from "./research";
 import SpecialistService from "./specialist";
 import StarService from "./star";
 import StarUpgradeService from "./starUpgrade";
-import TechnologyService from "./technology";
+import { TechnologyService } from 'solaris-common';
 import UserService from "./user";
 import { CarrierActionWaypoint } from "./types/GameTick";
 import { Star } from "./types/Star";

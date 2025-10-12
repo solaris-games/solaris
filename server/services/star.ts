@@ -19,7 +19,7 @@ import NameService from './name';
 import RandomService from './random';
 import SpecialistService from './specialist';
 import { StarDistanceService } from 'solaris-common';
-import TechnologyService from './technology';
+import { TechnologyService } from 'solaris-common';
 import UserService from './user';
 import { MathRandomGen } from "../utils/randomGen";
 import StatisticsService from "./statistics";

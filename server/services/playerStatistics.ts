@@ -5,7 +5,7 @@ import { Star } from './types/Star';
 import CarrierService from './carrier';
 import SpecialistService from './specialist';
 import StarService from './star';
-import TechnologyService from './technology';
+import { TechnologyService } from 'solaris-common';
 import { PlayerStatistics } from './types/Leaderboard';
 import ShipService from './ship';
 

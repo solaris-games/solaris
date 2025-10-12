@@ -79,7 +79,7 @@ import { StarDistanceService } from 'solaris-common';
 import StarMovementService from "../starMovement";
 import StarUpgradeService from "../starUpgrade";
 import TeamService from "../team";
-import TechnologyService from "../technology";
+import { TechnologyService } from 'solaris-common';
 import TradeService from "../trade";
 import TutorialService from "../tutorial";
 import UserService from "../user";
