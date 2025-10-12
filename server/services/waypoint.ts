@@ -6,27 +6,27 @@ import { Player } from './types/Player';
 import { Star } from './types/Star';
 import StarService from './star';
 import { TechnologyService } from 'solaris-common';
-import CarrierMovementService from './carrierMovement';
+import CarrierTravelService from "./carrierTravel";
 
 export default class WaypointService {
     starService: StarService;
     distanceService: DistanceService;
     starDistanceService: StarDistanceService;
     technologyService: TechnologyService;
-    carrierMovementService: CarrierMovementService;
+    carrierTravelService: CarrierTravelService;
 
     constructor(
         starService: StarService,
         distanceService: DistanceService,
         starDistanceService: StarDistanceService,
         technologyService: TechnologyService,
-        carrierMovementService: CarrierMovementService,
+        carrierTravelService: CarrierTravelService,
     ) {
         this.starService = starService;
         this.distanceService = distanceService;
         this.starDistanceService = starDistanceService;
         this.technologyService = technologyService;
-        this.carrierMovementService = carrierMovementService;
+        this.carrierTravelService = carrierTravelService;
     }
 
     supportsActionShips(action: CarrierWaypointActionType) {
@@ -40,7 +40,7 @@ export default class WaypointService {
             return false;
         }
 
-        return this.carrierMovementService.isWithinHyperspaceRange(game, carrier, sourceStar, destinationStar);
+        return this.carrierTravelService.isWithinHyperspaceRange(game, carrier, sourceStar, destinationStar);
     }
 
     canLoop(game: Game, carrier: Carrier) {
@@ -73,9 +73,9 @@ export default class WaypointService {
 
     calculateTicksForDistance(game: Game, player: Player, carrier: Carrier, sourceStar: Star, destinationStar: Star): number {
         const distance = this.distanceService.getDistanceBetweenLocations(sourceStar.location, destinationStar.location);
-        const warpSpeed = this.carrierMovementService.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar);
+        const warpSpeed = this.carrierTravelService.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar);
 
-        const tickDistance = this.carrierMovementService.getCarrierDistancePerTick(game, carrier, warpSpeed, false);
+        const tickDistance = this.carrierTravelService.getCarrierDistancePerTick(game, carrier, warpSpeed, false);
 
         if (tickDistance) {
             return Math.ceil(distance / tickDistance);
@@ -115,10 +115,10 @@ export default class WaypointService {
         }
 
         const distance = this.distanceService.getDistanceBetweenLocations(source, destination);
-        const warpSpeed = this.carrierMovementService.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar);
+        const warpSpeed = this.carrierTravelService.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar);
 
         // Calculate how far the carrier will move per tick.
-        const tickDistance = this.carrierMovementService.getCarrierDistancePerTick(game, carrier, warpSpeed, instantSpeed);
+        const tickDistance = this.carrierTravelService.getCarrierDistancePerTick(game, carrier, warpSpeed, instantSpeed);
         let ticks = 1;
 
         if (tickDistance) {

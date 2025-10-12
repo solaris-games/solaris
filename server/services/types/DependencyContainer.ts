@@ -94,6 +94,7 @@ import InitialGameStateService from "../initialGameState";
 import WaypointActionService from "../waypointAction";
 import SaveWaypointsService from "../saveWaypoints";
 import CullWaypointsService from "../cullWaypoints";
+import CarrierTravelService from "../carrierTravel";
 
 export interface DependencyContainer {
     config: Config,
@@ -192,4 +193,5 @@ export interface DependencyContainer {
     waypointActionService: WaypointActionService,
     saveWaypointsService: SaveWaypointsService,
     cullWaypointsService: CullWaypointsService,
+    carrierTravelService: CarrierTravelService,
 };

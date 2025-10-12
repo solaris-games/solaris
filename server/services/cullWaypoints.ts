@@ -2,31 +2,31 @@ import {Game} from "./types/Game";
 import {Carrier} from "./types/Carrier";
 import {Star} from "./types/Star";
 import Repository from "./repository";
-import CarrierMovementService from "./carrierMovement";
 import StarService from "./star";
 import PlayerService from "./player";
 import WaypointService from "./waypoint";
 import {Player} from "./types/Player";
+import CarrierTravelService from "./carrierTravel";
 
 export default class CullWaypointsService {
     gameRepo: Repository<Game>;
-    carrierMovementService: CarrierMovementService;
     starService: StarService;
     playerService: PlayerService;
     waypointService: WaypointService;
+    carrierTravelService: CarrierTravelService;
 
     constructor(
         gameRepo: Repository<Game>,
-        carrierMovementService: CarrierMovementService,
         starService: StarService,
         playerService: PlayerService,
         waypointService: WaypointService,
+        carrierTravelService: CarrierTravelService,
     ) {
         this.gameRepo = gameRepo;
-        this.carrierMovementService = carrierMovementService;
         this.starService = starService;
         this.playerService = playerService;
         this.waypointService = waypointService;
+        this.carrierTravelService = carrierTravelService;
     }
 
     sanitiseAllCarrierWaypointsByScanningRange(game: Game) {
@@ -68,7 +68,7 @@ export default class CullWaypointsService {
         let waypointsCulled = false;
 
         // If in transit, then cull starting from the 2nd waypoint.
-        let startingWaypointIndex = this.carrierMovementService.isInTransit(carrier) ? 1 : 0;
+        let startingWaypointIndex = this.carrierTravelService.isInTransit(carrier) ? 1 : 0;
         if(startingWaypointIndex >= carrier.waypoints.length) return null;
 
         let startingWaypoint = carrier.waypoints[startingWaypointIndex];
@@ -112,7 +112,7 @@ export default class CullWaypointsService {
     }
 
     _checkCarrierRoute(game: Game, carrier: Carrier, player: { player: Player, stars: Star[], inRange: string[] }) {
-        let startIndex = this.carrierMovementService.isInTransit(carrier) ? 1 : 0;
+        let startIndex = this.carrierTravelService.isInTransit(carrier) ? 1 : 0;
         for (let index = startIndex; index < carrier.waypoints.length; index++) {
             const waypoint = carrier.waypoints[index];
             if(waypoint.destination.toString() in player.inRange) continue;

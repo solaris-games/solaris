@@ -1,6 +1,5 @@
-import CarrierMovementService from '../services/carrierMovement';
-import StarService from '../services/star';
 import mongoose from 'mongoose';
+import CarrierTravelService from "../services/carrierTravel";
 
 let playerId,
     carrierId,
@@ -22,6 +21,8 @@ let gameRepo,
     specialistService,
     diplomacyService,
     starService,
+    starDistanceService,
+    technologyService,
     carrierGiftService;
 
 specialistService = {
@@ -43,9 +44,7 @@ diplomacyService = {
 }
 
 describe('warp speed', () => {
-
-    // @ts-ignore
-    const service = new CarrierMovementService(gameRepo, distanceService, starService, specialistService, diplomacyService, carrierGiftService);
+    const service = new CarrierTravelService(specialistService, starService, technologyService, distanceService, starDistanceService, diplomacyService);
 
     beforeEach(() => {
         // Default values:

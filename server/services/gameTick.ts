@@ -44,6 +44,7 @@ import {logger} from "../utils/logging";
 import StatisticsService from "./statistics";
 import WaypointActionService from "./waypointAction";
 import CullWaypointsService from "./cullWaypoints";
+import CarrierTravelService from "./carrierTravel";
 
 const EventEmitter = require('events');
 const moment = require('moment');
@@ -93,6 +94,7 @@ export default class GameTickService extends EventEmitter {
     statisticsService: StatisticsService;
     waypointActionService: WaypointActionService;
     cullWaypointsService: CullWaypointsService;
+    carrierTravelService: CarrierTravelService;
 
     constructor(
         distanceService: DistanceService,
@@ -128,6 +130,7 @@ export default class GameTickService extends EventEmitter {
         statisticsService: StatisticsService,
         waypointActionService: WaypointActionService,
         cullWaypointsService: CullWaypointsService,
+        carrierTravelService: CarrierTravelService,
     ) {
         super();
             
@@ -164,6 +167,7 @@ export default class GameTickService extends EventEmitter {
         this.statisticsService = statisticsService;
         this.waypointActionService = waypointActionService;
         this.cullWaypointsService = cullWaypointsService;
+        this.carrierTravelService = carrierTravelService;
     }
 
     async tick(gameId: DBObjectId) {
@@ -391,8 +395,8 @@ export default class GameTickService extends EventEmitter {
         // and where they will be moving to.
         const carrierPositions: CarrierPosition[] = game.galaxy.carriers
             .filter(x => 
-                this.carrierMovementService.isInTransit(x)           // Carrier is already in transit
-                || this.carrierMovementService.isLaunching(x)        // Or the carrier is just about to launch (this prevent carrier from hopping over attackers)
+                this.carrierTravelService.isInTransit(x)           // Carrier is already in transit
+                || this.carrierTravelService.isLaunching(x)        // Or the carrier is just about to launch (this prevent carrier from hopping over attackers)
             )
             .map(c => {
                 let waypoint = c.waypoints[0];
