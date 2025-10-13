@@ -7,6 +7,7 @@ import PlayerService from "./player";
 import WaypointService from "./waypoint";
 import {Player} from "./types/Player";
 import CarrierTravelService from "./carrierTravel";
+import { StarDataService } from "solaris-common";
 
 export default class CullWaypointsService {
     gameRepo: Repository<Game>;
@@ -14,6 +15,7 @@ export default class CullWaypointsService {
     playerService: PlayerService;
     waypointService: WaypointService;
     carrierTravelService: CarrierTravelService;
+    starDataService: StarDataService;
 
     constructor(
         gameRepo: Repository<Game>,
@@ -21,12 +23,14 @@ export default class CullWaypointsService {
         playerService: PlayerService,
         waypointService: WaypointService,
         carrierTravelService: CarrierTravelService,
+        starDataService: StarDataService,
     ) {
         this.gameRepo = gameRepo;
         this.starService = starService;
         this.playerService = playerService;
         this.waypointService = waypointService;
         this.carrierTravelService = carrierTravelService;
+        this.starDataService = starDataService;
     }
 
     sanitiseAllCarrierWaypointsByScanningRange(game: Game) {
@@ -144,7 +148,7 @@ export default class CullWaypointsService {
         game.galaxy.players
             .forEach(p => {
                 const starsOwnedOrInOrbit = this.starService.listStarsOwnedOrInOrbitByPlayers(game, [p._id]);
-                const starsWithScanning = starsOwnedOrInOrbit.filter(s => !this.starService.isDeadStar(s));
+                const starsWithScanning = starsOwnedOrInOrbit.filter(s => !this.starDataService.isDeadStar(s));
                 let wormHoleStars = starsOwnedOrInOrbit.filter(s => s.wormHoleToStarId)
                 wormHoleStars.forEach(s => {
                     starsOwnedOrInOrbit.push(s, this.starService.getById(game, s.wormHoleToStarId!))

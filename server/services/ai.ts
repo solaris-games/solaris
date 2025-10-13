@@ -25,6 +25,7 @@ import {logger} from "../utils/logging";
 import mongoose from 'mongoose';
 import SaveWaypointsService from "./saveWaypoints";
 import { TechnologyService } from 'solaris-common';
+import { StarDataService } from "solaris-common";
 
 const Heap = require('qheap');
 
@@ -150,6 +151,7 @@ export default class AIService {
     basicAIService: BasicAIService;
     pathfindingService: PathfindingService;
     saveWaypointService: SaveWaypointsService;
+    starDataService: StarDataService;
 
     constructor(
         starUpgradeService: StarUpgradeService,
@@ -169,6 +171,7 @@ export default class AIService {
         basicAIService: BasicAIService,
         pathfindingService: PathfindingService,
         saveWaypointService: SaveWaypointsService,
+        starDataService: StarDataService,
     ) {
         this.starUpgradeService = starUpgradeService;
         this.carrierService = carrierService;
@@ -187,6 +190,7 @@ export default class AIService {
         this.basicAIService = basicAIService;
         this.pathfindingService = pathfindingService;
         this.saveWaypointService = saveWaypointService;
+        this.starDataService = starDataService;
     }
 
     isAIControlled(player: Player) {
@@ -703,7 +707,7 @@ export default class AIService {
 
         if (carrier) {
             assignment.carriers.shift();
-        } else if (this.starService.isDeadStar(assignment.star)) {
+        } else if (this.starDataService.isDeadStar(assignment.star)) {
             return;
         } else {
             const buildResult = await this.starUpgradeService.buildCarrier(game, player, starId, 1, false);
@@ -852,7 +856,7 @@ export default class AIService {
     }
 
     _calculateTravelDistance(star1: Star, star2: Star): number {
-        if (this.starService.isStarPairWormHole(star1, star2)) {
+        if (this.starDataService.isStarPairWormHole(star1, star2)) {
             return 0;
         } else {
             return this.distanceService.getDistanceBetweenLocations(star1.location, star2.location);

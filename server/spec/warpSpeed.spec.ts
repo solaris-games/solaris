@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import CarrierTravelService from "../services/carrierTravel";
+import {StarDataService} from "solaris-common";
 
 let playerId,
     carrierId,
@@ -23,7 +24,8 @@ let gameRepo,
     starService,
     starDistanceService,
     technologyService,
-    carrierGiftService;
+    carrierGiftService,
+    starDataService;
 
 specialistService = {
     getByIdStar() {
@@ -43,8 +45,10 @@ diplomacyService = {
     }
 }
 
+starDataService = new StarDataService();
+
 describe('warp speed', () => {
-    const service = new CarrierTravelService(specialistService, starService, technologyService, distanceService, starDistanceService, diplomacyService);
+    const service = new CarrierTravelService(specialistService, starService, technologyService, distanceService, starDistanceService, diplomacyService, starDataService);
 
     beforeEach(() => {
         // Default values:

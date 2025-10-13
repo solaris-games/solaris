@@ -1,7 +1,6 @@
 import {Game} from "./types/Game";
 import {Carrier} from "./types/Carrier";
 import {Player} from "./types/Player";
-import {Star} from "./types/Star";
 import {DBObjectId} from "./types/DBObjectId";
 import {CarrierWaypointBase, ValidationError} from "solaris-common";
 import CarrierMovementService from "./carrierMovement";
@@ -10,7 +9,7 @@ import Repository from "./repository";
 import WaypointService from "./waypoint";
 import mongoose from 'mongoose';
 import CarrierService from "./carrier";
-import {GameHistoryCarrierWaypoint} from "./types/GameHistory";
+import { StarDataService } from "solaris-common";
 
 export default class SaveWaypointsService {
     gameRepo: Repository<Game>;
@@ -18,6 +17,7 @@ export default class SaveWaypointsService {
     starService: StarService;
     waypointService: WaypointService;
     carrierService: CarrierService;
+    starDataService: StarDataService;
 
     constructor(
         gameRepo: Repository<Game>,
@@ -25,12 +25,14 @@ export default class SaveWaypointsService {
         starService: StarService,
         waypointService: WaypointService,
         carrierService: CarrierService,
+        starDataService: StarDataService,
     ) {
         this.gameRepo = gameRepo;
         this.carrierMovementService = carrierMovementService;
         this.starService = starService;
         this.waypointService = waypointService;
         this.carrierService = carrierService;
+        this.starDataService = starDataService;
     }
 
     async saveWaypointsForCarrier(game: Game, player: Player, carrier: Carrier, waypoints: CarrierWaypointBase<DBObjectId>[], looped: boolean | null, writeToDB: boolean = true) {
@@ -214,6 +216,6 @@ export default class SaveWaypointsService {
             return false;
         }
 
-        return this.starService.isStarPairWormHole(sourceStar, destinationStar);
+        return this.starDataService.isStarPairWormHole(sourceStar, destinationStar);
     }
 }

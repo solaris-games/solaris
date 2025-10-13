@@ -1,6 +1,12 @@
 import Repository from './repository';
 import {Carrier} from './types/Carrier';
-import {CarrierWaypoint, DistanceService, StarDistanceService, TechnologyService} from 'solaris-common';
+import {
+    CarrierWaypoint,
+    DistanceService,
+    StarDataService,
+    StarDistanceService,
+    TechnologyService
+} from 'solaris-common';
 import {Game} from './types/Game';
 import {Player} from './types/Player';
 import {Star} from './types/Star';
@@ -38,6 +44,7 @@ export default class CarrierMovementService {
     technologyService: TechnologyService;
     starDistanceService: StarDistanceService;
     carrierTravelService: CarrierTravelService;
+    starDataService: StarDataService;
 
     constructor(
         gameRepo: Repository<Game>,
@@ -49,6 +56,7 @@ export default class CarrierMovementService {
         technologyService: TechnologyService,
         starDistanceService: StarDistanceService,
         carrierTravelService: CarrierTravelService,
+        starDataService: StarDataService,
     ) {
         this.gameRepo = gameRepo;
         this.distanceService = distanceService;
@@ -59,6 +67,7 @@ export default class CarrierMovementService {
         this.technologyService = technologyService;
         this.starDistanceService = starDistanceService;
         this.carrierTravelService = carrierTravelService;
+        this.starDataService = starDataService;
     }
 
     moveCarrierToCurrentWaypoint(carrier: Carrier, destinationStar: Star, distancePerTick: number) {
@@ -92,7 +101,7 @@ export default class CarrierMovementService {
 
         // Reignite dead stars if applicable
         // Note: Black holes cannot be reignited.
-        if (!carrier.isGift && this.starService.isDeadStar(destinationStar) && this.specialistService.getReigniteDeadStar(carrier)) {
+        if (!carrier.isGift && this.starDataService.isDeadStar(destinationStar) && this.specialistService.getReigniteDeadStar(carrier)) {
             let reigniteSpecialistNaturalResources = this.specialistService.getReigniteDeadStarNaturalResources(carrier);
 
             // Double resources for binary stars.
@@ -170,7 +179,7 @@ export default class CarrierMovementService {
         const destinationStar = this.starService.getByIdBS(game, waypoint.destination);
         const carrierOwner = game.galaxy.players.find(p => p._id.toString() === carrierInTransit.ownedByPlayerId!.toString())!;
         const warpSpeed = this.carrierTravelService.canTravelAtWarpSpeed(game, carrierOwner, carrierInTransit, sourceStar, destinationStar);
-        const instantSpeed = this.starService.isStarPairWormHole(sourceStar, destinationStar);
+        const instantSpeed = this.starDataService.isStarPairWormHole(sourceStar, destinationStar);
         const distancePerTick = this.carrierTravelService.getCarrierDistancePerTick(game, carrierInTransit, warpSpeed, instantSpeed); // Null signifies instant travel
 
         const carrierMovementReport = {
@@ -212,7 +221,7 @@ export default class CarrierMovementService {
         
         if (sourceStar) {
             warpSpeed = this.carrierTravelService.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar);
-            instantSpeed = this.starService.isStarPairWormHole(sourceStar, destinationStar);
+            instantSpeed = this.starDataService.isStarPairWormHole(sourceStar, destinationStar);
         }
 
         let nextLocation;

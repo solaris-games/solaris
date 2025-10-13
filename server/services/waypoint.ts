@@ -6,6 +6,7 @@ import { Player } from './types/Player';
 import { Star } from './types/Star';
 import StarService from './star';
 import { TechnologyService } from 'solaris-common';
+import { StarDataService } from "solaris-common";
 import CarrierTravelService from "./carrierTravel";
 
 export default class WaypointService {
@@ -14,6 +15,7 @@ export default class WaypointService {
     starDistanceService: StarDistanceService;
     technologyService: TechnologyService;
     carrierTravelService: CarrierTravelService;
+    starDataService: StarDataService;
 
     constructor(
         starService: StarService,
@@ -21,12 +23,14 @@ export default class WaypointService {
         starDistanceService: StarDistanceService,
         technologyService: TechnologyService,
         carrierTravelService: CarrierTravelService,
+        starDataService: StarDataService,
     ) {
         this.starService = starService;
         this.distanceService = distanceService;
         this.starDistanceService = starDistanceService;
         this.technologyService = technologyService;
         this.carrierTravelService = carrierTravelService;
+        this.starDataService = starDataService;
     }
 
     supportsActionShips(action: CarrierWaypointActionType) {
@@ -61,7 +65,7 @@ export default class WaypointService {
             return false;
         }
 
-        if (this.starService.isStarPairWormHole(firstWaypointStar, lastWaypointStar)) {
+        if (this.starDataService.isStarPairWormHole(firstWaypointStar, lastWaypointStar)) {
             return true;
         }
 
@@ -99,7 +103,7 @@ export default class WaypointService {
         const destinationStar = this.starService.getById(game, waypoint.destination);
 
         // If the carrier can travel instantly then it'll take 1 tick + any delay.
-        let instantSpeed = sourceStar && this.starService.isStarPairWormHole(sourceStar, destinationStar);
+        let instantSpeed = sourceStar && this.starDataService.isStarPairWormHole(sourceStar, destinationStar);
 
         if (instantSpeed) {
             return 1 + delayTicks;

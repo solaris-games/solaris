@@ -13,6 +13,7 @@ import { StarDistanceService } from 'solaris-common';
 import { ValidationError } from "solaris-common";
 import { shuffle, RandomGen } from "solaris-common";
 import { DBObjectId } from "./types/DBObjectId";
+import { StarDataService } from "solaris-common";
 
 const OFFSET = 20000;
 
@@ -27,6 +28,7 @@ export default class MapService {
     circularBalancedMapService: CircularBalancedMapService;
     irregularMapService: IrregularMapService;
     gameTypeService: GameTypeService;
+    starDataService: StarDataService;
 
     constructor(
         randomService: RandomService,
@@ -38,7 +40,8 @@ export default class MapService {
         doughnutMapService: DoughnutMapService,
         circularBalancedMapService: CircularBalancedMapService,
         irregularMapService: IrregularMapService,
-        gameTypeService: GameTypeService
+        gameTypeService: GameTypeService,
+        starDataService: StarDataService,
     ) {
         this.randomService = randomService;
         this.starService = starService;
@@ -50,6 +53,7 @@ export default class MapService {
         this.circularBalancedMapService = circularBalancedMapService;
         this.irregularMapService = irregularMapService;
         this.gameTypeService = gameTypeService;
+        this.starDataService = starDataService;
     }
 
     generateStars(rand: RandomGen, game: Game, starCount: number, playerLimit: number, customSeed?: string | null) {
@@ -182,7 +186,7 @@ export default class MapService {
     _generateGates(rand: RandomGen, stars: Star[], playerCount: number, percentage: number) {
         const gateCount = Math.floor((stars.length - playerCount) / 100 * percentage);
 
-        const applicableStars = stars.filter(s => !s.homeStar && !s.warpGate && !this.starService.isDeadStar(s));
+        const applicableStars = stars.filter(s => !s.homeStar && !s.warpGate && !this.starDataService.isDeadStar(s));
         shuffle(rand, applicableStars);
 
         const warpGateStars = applicableStars.slice(0, gateCount);
@@ -195,7 +199,7 @@ export default class MapService {
     _generateWormHoles(rand: RandomGen, game: Game, stars: Star[], playerCount: number, percentage: number) {
         const wormHoleCount = Math.floor((stars.length - playerCount) / 2 / 100 * percentage); // Wormholes come in pairs so its half of stars
 
-        const applicableStars = stars.filter(s => !s.homeStar && !s.wormHoleToStarId && !this.starService.isDeadStar(s));
+        const applicableStars = stars.filter(s => !s.homeStar && !s.wormHoleToStarId && !this.starDataService.isDeadStar(s));
         shuffle(rand, applicableStars);
 
         const wormHoleStars = applicableStars.slice(0, wormHoleCount * 2);
@@ -211,7 +215,7 @@ export default class MapService {
     _generateNebulas(rand: RandomGen, game: Game, stars: Star[], playerCount: number, percentage: number) {
         const count = Math.floor((stars.length - playerCount) / 100 * percentage);
 
-        const applicableStars = stars.filter(s => !s.homeStar && !s.isNebula && !this.starService.isDeadStar(s));
+        const applicableStars = stars.filter(s => !s.homeStar && !s.isNebula && !this.starDataService.isDeadStar(s));
         shuffle(rand, applicableStars);
 
         const nebulaStars = applicableStars.slice(0, count);
@@ -232,7 +236,7 @@ export default class MapService {
     _generateAsteroidFields(rand: RandomGen, game: Game, stars: Star[], playerCount: number, percentage: number) {
         const count = Math.floor((stars.length - playerCount) / 100 * percentage);
 
-        const applicableStars = stars.filter(s => !s.homeStar && !s.isAsteroidField && !this.starService.isDeadStar(s));
+        const applicableStars = stars.filter(s => !s.homeStar && !s.isAsteroidField && !this.starDataService.isDeadStar(s));
         shuffle(rand, applicableStars);
 
         const asteroidFieldStars = applicableStars.slice(0, count);
@@ -256,7 +260,7 @@ export default class MapService {
 
         const count = Math.floor((stars.length - playerCount) / 100 * percentage);
 
-        const applicableStars = stars.filter(s => !s.homeStar && !s.isBinaryStar && !this.starService.isDeadStar(s));
+        const applicableStars = stars.filter(s => !s.homeStar && !s.isBinaryStar && !this.starDataService.isDeadStar(s));
         shuffle(rand, applicableStars);
 
         const binaryStars = applicableStars.slice(0, count);
@@ -282,7 +286,7 @@ export default class MapService {
     _generateBlackHoles(rand: RandomGen, game: Game, stars: Star[], playerCount: number, percentage: number) {
         const count = Math.floor((stars.length - playerCount) / 100 * percentage);
 
-        const applicableStars = stars.filter(s => !s.homeStar && !s.isBlackHole && !this.starService.isDeadStar(s));
+        const applicableStars = stars.filter(s => !s.homeStar && !s.isBlackHole && !this.starDataService.isDeadStar(s));
         shuffle(rand, applicableStars);
 
         const blackHoleStars = applicableStars.slice(0, count);
@@ -300,7 +304,7 @@ export default class MapService {
     _generatePulsars(rand: RandomGen, game: Game, stars: Star[], playerCount: number, percentage: number) {
         const count = Math.floor((stars.length - playerCount) / 100 * percentage);
 
-        const applicableStars = stars.filter(s => !s.homeStar && !s.isPulsar && !this.starService.isDeadStar(s));
+        const applicableStars = stars.filter(s => !s.homeStar && !s.isPulsar && !this.starDataService.isDeadStar(s));
         shuffle(rand, applicableStars);
 
         const pulsarStars = applicableStars.slice(0, count);

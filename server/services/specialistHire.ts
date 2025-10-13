@@ -7,7 +7,7 @@ import UserAchievementService from "./userAchievement";
 import { GameTypeService } from 'solaris-common'
 import SpecialistService from "./specialist";
 import StarService from "./star";
-
+import { StarDataService } from "solaris-common";
 import { ValidationError } from "solaris-common";
 import SpecialistBanService from "./specialistBan";
 import PlayerCreditsService from "./playerCredits";
@@ -26,6 +26,7 @@ export default class SpecialistHireService {
     specialistBanService: SpecialistBanService;
     technologyService: TechnologyService;
     statisticsService: StatisticsService;
+    starDataService: StarDataService;
 
     constructor(
         gameRepo: Repository<Game>,
@@ -38,6 +39,7 @@ export default class SpecialistHireService {
         specialistBanService: SpecialistBanService,
         technologyService: TechnologyService,
         statisticsService: StatisticsService,
+        starDataService: StarDataService,
     ) {
         this.gameRepo = gameRepo;
         this.specialistService = specialistService;
@@ -49,6 +51,7 @@ export default class SpecialistHireService {
         this.specialistBanService = specialistBanService;
         this.technologyService = technologyService;
         this.statisticsService = statisticsService;
+        this.starDataService = starDataService;
     }
 
     async hireCarrierSpecialist(game: Game, player: Player, carrierId: DBObjectId, specialistId: number) {
@@ -72,11 +75,11 @@ export default class SpecialistHireService {
 
         let star = this.starService.getById(game, carrier.orbiting);
 
-        if (this.starService.isDeadStar(star)) {
+        if (this.starDataService.isDeadStar(star)) {
             throw new ValidationError('Cannot hire a specialist while in orbit of a dead star.');
         }
 
-        if (!this.starService.isOwnedByPlayer(star, player)) {
+        if (!this.starDataService.isOwnedByPlayer(star, player)) {
             throw new ValidationError('Cannot hire a specialist while in orbit of a star that you do not own.');
         }
 
@@ -163,7 +166,7 @@ export default class SpecialistHireService {
             throw new ValidationError(`Cannot assign a specialist to a star that you do not own.`);
         }
 
-        if (this.starService.isDeadStar(star)) {
+        if (this.starDataService.isDeadStar(star)) {
             throw new ValidationError('Cannot hire a specialist on a dead star.');
         }
 

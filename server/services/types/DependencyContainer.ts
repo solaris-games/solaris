@@ -95,6 +95,7 @@ import WaypointActionService from "../waypointAction";
 import SaveWaypointsService from "../saveWaypoints";
 import CullWaypointsService from "../cullWaypoints";
 import CarrierTravelService from "../carrierTravel";
+import { StarDataService } from "solaris-common";
 
 export interface DependencyContainer {
     config: Config,
@@ -194,4 +195,5 @@ export interface DependencyContainer {
     saveWaypointsService: SaveWaypointsService,
     cullWaypointsService: CullWaypointsService,
     carrierTravelService: CarrierTravelService,
+    starDataService: StarDataService,
 };

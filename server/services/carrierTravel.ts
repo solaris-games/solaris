@@ -5,6 +5,7 @@ import {DistanceService, Specialist, StarDistanceService, TechnologyService} fro
 import StarService from "./star";
 import DiplomacyService from "./diplomacy";
 import {Player} from "./types/Player";
+import { StarDataService } from "solaris-common";
 
 interface ISpecialistService {
     getByIdStar(id: number): Specialist | null;
@@ -18,14 +19,16 @@ export default class CarrierTravelService {
     distanceService: DistanceService;
     starDistanceService: StarDistanceService;
     diplomacyService: DiplomacyService;
+    starDataService: StarDataService;
 
-    constructor(specialistService: ISpecialistService, starService: StarService, technologyService: TechnologyService, distanceService: DistanceService, starDistanceService: StarDistanceService, diplomacyService: DiplomacyService) {
+    constructor(specialistService: ISpecialistService, starService: StarService, technologyService: TechnologyService, distanceService: DistanceService, starDistanceService: StarDistanceService, diplomacyService: DiplomacyService, starDataService: StarDataService) {
         this.specialistService = specialistService;
         this.starService = starService;
         this.technologyService = technologyService;
         this.distanceService = distanceService;
         this.starDistanceService = starDistanceService;
         this.diplomacyService = diplomacyService;
+        this.starDataService = starDataService;
     }
 
     getCarrierDistancePerTick(game: Game, carrier: Carrier, warpSpeed: boolean = false, instantSpeed: boolean | null = false) {
@@ -48,7 +51,7 @@ export default class CarrierTravelService {
 
     isWithinHyperspaceRange(game: Game, carrier: Carrier, sourceStar: Star, destinationStar: Star) {
         // If the stars are a wormhole pair then they are always considered to be in hyperspace range.
-        if (this.starService.isStarPairWormHole(sourceStar, destinationStar)) {
+        if (this.starDataService.isStarPairWormHole(sourceStar, destinationStar)) {
             return true;
         }
 

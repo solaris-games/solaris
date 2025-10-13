@@ -36,6 +36,7 @@ import { Guild, GuildUserWithTag } from './types/Guild';
 import { Player, PlayerDiplomaticState, PlayerReputation, PlayerResearch } from './types/Player';
 import { Star } from './types/Star';
 import WaypointService from './waypoint';
+import { StarDataService } from "solaris-common";
 import mongoose from 'mongoose';
 
 enum ViewpointKind {
@@ -80,6 +81,7 @@ export default class GameGalaxyService {
     gameFluxService: GameFluxService;
     spectatorService: SpectatorService;
     gameMaskingService: GameMaskingService;
+    starDataService: StarDataService;
 
     constructor(
         cacheService: CacheService,
@@ -111,6 +113,7 @@ export default class GameGalaxyService {
         gameFluxService: GameFluxService,
         spectatorService: SpectatorService,
         gameMaskingService: GameMaskingService,
+        starDataService: StarDataService,
     ) {
         this.cacheService = cacheService;
         this.socketService = socketService;
@@ -141,6 +144,7 @@ export default class GameGalaxyService {
         this.gameFluxService = gameFluxService;
         this.spectatorService = spectatorService;
         this.gameMaskingService = gameMaskingService;
+        this.starDataService = starDataService;
     }
 
     async getGalaxy(gameId: DBObjectId, userId: DBObjectId | null, tick: number | null) {
@@ -425,7 +429,7 @@ export default class GameGalaxyService {
                 }
 
                 // If the star is dead then it has no infrastructure.
-                if (this.starService.isDeadStar(s)) {
+                if (this.starDataService.isDeadStar(s)) {
                     delete s.infrastructure;
                 }
 
