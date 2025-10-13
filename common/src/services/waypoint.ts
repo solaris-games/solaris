@@ -1,16 +1,21 @@
-import { DBObjectId } from './types/DBObjectId';
-import { Carrier } from './types/Carrier';
-import { CarrierWaypoint, CarrierWaypointActionType, DistanceService, StarDistanceService } from 'solaris-common';
-import { Game } from './types/Game';
-import { Player } from './types/Player';
-import { Star } from './types/Star';
-import StarService from './star';
-import { TechnologyService } from 'solaris-common';
-import { StarDataService } from "solaris-common";
-import { CarrierTravelService } from 'solaris-common';
+import type {Star} from "../types/common/star";
+import type {Game} from "../types/common/game";
+import type {DistanceService} from "./distance";
+import type {StarDistanceService} from "./starDistance";
+import type {TechnologyService} from "./technology";
+import type {CarrierTravelService} from "./carrierTravel";
+import type {StarDataService} from "./starData";
+import type {CarrierWaypoint, CarrierWaypointActionType} from "../types/common/carrierWaypoint";
+import type {Carrier} from "../types/common/carrier";
+import type {Id} from "../types/id";
+import type {Player} from "../types/common/player";
 
-export default class WaypointService {
-    starService: StarService;
+interface IStarService {
+    getById<ID>(game: Game<ID>, id: ID): Star<ID>;
+}
+
+export class WaypointService {
+    starService: IStarService;
     distanceService: DistanceService;
     starDistanceService: StarDistanceService;
     technologyService: TechnologyService;
@@ -18,7 +23,7 @@ export default class WaypointService {
     starDataService: StarDataService;
 
     constructor(
-        starService: StarService,
+        starService: IStarService,
         distanceService: DistanceService,
         starDistanceService: StarDistanceService,
         technologyService: TechnologyService,
@@ -38,7 +43,7 @@ export default class WaypointService {
         return actions.includes(action);
     }
 
-    starRouteIsWithinHyperspaceRange(game: Game, carrier: Carrier, sourceStar: Star, destinationStar: Star) {
+    starRouteIsWithinHyperspaceRange<ID extends Id>(game: Game<ID>, carrier: Carrier<ID>, sourceStar: Star<ID>, destinationStar: Star<ID>) {
         // Stars may have been destroyed.
         if (!sourceStar || !destinationStar) {
             return false;
@@ -47,7 +52,7 @@ export default class WaypointService {
         return this.carrierTravelService.isWithinHyperspaceRange(game, carrier, sourceStar, destinationStar);
     }
 
-    canLoop(game: Game, carrier: Carrier) {
+    canLoop<ID extends Id>(game: Game<ID>, carrier: Carrier<ID>) {
         if (carrier.waypoints.length < 2 || carrier.isGift) {
             return false;
         }
@@ -75,7 +80,7 @@ export default class WaypointService {
         return distanceBetweenStars <= hyperspaceDistance
     }
 
-    calculateTicksForDistance(game: Game, player: Player, carrier: Carrier, sourceStar: Star, destinationStar: Star): number {
+    calculateTicksForDistance<ID extends Id>(game: Game<ID>, player: Player<ID>, carrier: Carrier<ID>, sourceStar: Star<ID>, destinationStar: Star<ID>): number {
         const distance = this.distanceService.getDistanceBetweenLocations(sourceStar.location, destinationStar.location);
         const warpSpeed = this.carrierTravelService.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar);
 
@@ -88,7 +93,7 @@ export default class WaypointService {
         return 1;
     }
 
-    calculateWaypointTicks(game: Game, carrier: Carrier, waypoint: CarrierWaypoint<DBObjectId>) {
+    calculateWaypointTicks<ID extends Id>(game: Game<ID>, carrier: Carrier<ID>, waypoint: CarrierWaypoint<ID>) {
         const delayTicks = waypoint.delayTicks || 0;
 
         const carrierOwner = game.galaxy.players.find(p => p._id.toString() === carrier.ownedByPlayerId!.toString())!;
@@ -134,7 +139,7 @@ export default class WaypointService {
         return ticks;
     }
 
-    calculateWaypointTicksEta(game: Game, carrier: Carrier, waypoint: CarrierWaypoint<DBObjectId>) {
+    calculateWaypointTicksEta<ID extends Id>(game: Game<ID>, carrier: Carrier<ID>, waypoint: CarrierWaypoint<ID>) {
         let totalTicks = 0;
 
         for (let i = 0; i < carrier.waypoints.length; i++) {
@@ -150,7 +155,7 @@ export default class WaypointService {
         return totalTicks;
     }
 
-    populateCarrierWaypointEta(game: Game, carrier: Carrier) {
+    populateCarrierWaypointEta<ID extends Id>(game: Game<ID>, carrier: Carrier<ID>) {
         carrier.waypoints.forEach(w => {
             w.ticks = this.calculateWaypointTicks(game, carrier, w);
             w.ticksEta = this.calculateWaypointTicksEta(game, carrier, w);

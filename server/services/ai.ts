@@ -8,7 +8,7 @@ import PlayerService from "./player";
 import ShipTransferService from "./shipTransfer";
 import StarService from "./star";
 import StarUpgradeService from "./starUpgrade";
-import WaypointService from "./waypoint";
+import { WaypointService } from 'solaris-common';
 import {Star} from "./types/Star";
 import {Carrier} from "./types/Carrier";
 import {getOrInsert, maxBy, notNull, reverseSort} from "solaris-common";

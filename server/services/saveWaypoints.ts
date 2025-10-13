@@ -6,7 +6,7 @@ import {CarrierWaypointBase, ValidationError} from "solaris-common";
 import CarrierMovementService from "./carrierMovement";
 import StarService from "./star";
 import Repository from "./repository";
-import WaypointService from "./waypoint";
+import { WaypointService } from 'solaris-common';
 import mongoose from 'mongoose';
 import CarrierService from "./carrier";
 import { StarDataService } from "solaris-common";

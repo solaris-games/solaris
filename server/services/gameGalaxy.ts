@@ -35,7 +35,7 @@ import {GameHistoryCarrier, GameHistoryCarrierWaypoint} from "./types/GameHistor
 import { Guild, GuildUserWithTag } from './types/Guild';
 import { Player, PlayerDiplomaticState, PlayerReputation, PlayerResearch } from './types/Player';
 import { Star } from './types/Star';
-import WaypointService from './waypoint';
+import { WaypointService } from 'solaris-common';
 import { StarDataService } from "solaris-common";
 import mongoose from 'mongoose';
 

@@ -4,7 +4,7 @@ import {Carrier} from "./types/Carrier";
 import { DistanceService } from 'solaris-common';
 import StarService from "./star";
 import { Star } from "./types/Star";
-import WaypointService from "./waypoint";
+import { WaypointService } from 'solaris-common';
 import { StarDataService } from "solaris-common";
 
 // Copied and adapted from WaypointHelper in the frontend

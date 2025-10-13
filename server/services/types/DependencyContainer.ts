@@ -85,7 +85,7 @@ import TutorialService from "../tutorial";
 import UserService from "../user";
 import UserLeaderboardService from "../userLeaderboard";
 import UserLevelService from "../userLevel";
-import WaypointService from "../waypoint";
+import { WaypointService } from 'solaris-common';
 import StarCaptureService from "../starCapture";
 import {UserServerSocketEmitter} from "../../sockets/socketEmitters/user";
 import {UserServerSocketHandler} from "../../sockets/socketHandlers/user";

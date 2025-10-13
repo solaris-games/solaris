@@ -4,7 +4,7 @@ import {Star} from "./types/Star";
 import Repository from "./repository";
 import StarService from "./star";
 import PlayerService from "./player";
-import WaypointService from "./waypoint";
+import { WaypointService } from 'solaris-common';
 import {Player} from "./types/Player";
 import { CarrierTravelService } from 'solaris-common';
 import { StarDataService } from "solaris-common";
