@@ -1,7 +1,7 @@
 import {User} from "./types/User";
 
 const moment = require('moment');
-const EventEmitter = require('events');
+import EventEmitter from "events";
 import Repository from './repository';
 import { Game } from './types/Game';
 import { Player } from './types/Player';

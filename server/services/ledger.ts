@@ -7,7 +7,7 @@ import { DBObjectId } from "./types/DBObjectId";
 import { Game } from "./types/Game";
 import { Player, PlayerLedgerDebt } from "./types/Player";
 
-const EventEmitter = require('events');
+import EventEmitter from "events";
 
 export const LedgerServiceEvents = {
     onDebtAdded: 'onDebtAdded',

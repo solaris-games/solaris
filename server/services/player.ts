@@ -2,7 +2,7 @@ import DiplomacyService from "./diplomacy";
 
 import mongoose from 'mongoose';
 const moment = require('moment');
-const EventEmitter = require('events');
+import EventEmitter from "events";
 import Repository from './repository';
 import { DBObjectId } from './types/DBObjectId';
 import {Game, Team} from './types/Game';

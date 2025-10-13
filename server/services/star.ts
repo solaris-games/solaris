@@ -1,6 +1,4 @@
 import { shuffle } from "solaris-common";
-
-const EventEmitter = require('events');
 import mongoose from 'mongoose';
 import { DBObjectId } from './types/DBObjectId';
 import { ValidationError } from "solaris-common";
@@ -24,6 +22,7 @@ import UserService from './user';
 import { MathRandomGen } from "../utils/randomGen";
 import StatisticsService from "./statistics";
 import {GameSettings} from "solaris-common";
+import EventEmitter from "events";
 
 const RNG = require('random-seed');
 

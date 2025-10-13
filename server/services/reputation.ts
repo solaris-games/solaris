@@ -5,7 +5,7 @@ import DiplomacyService from "./diplomacy";
 import PlayerStatisticsService from "./playerStatistics";
 import PlayerAfkService from "./playerAfk";
 
-const EventEmitter = require('events');
+import EventEmitter from "events";
 
 const MAX_REPUTATION = 8;
 const MIN_REPUTATION = -8;

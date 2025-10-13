@@ -12,7 +12,7 @@ import TradeService from './trade';
 import ConversationMessageSentEvent from './types/events/ConversationMessageSent';
 import DiplomacyService from './diplomacy';
 import mongoose from 'mongoose';
-const EventEmitter = require('events');
+import EventEmitter from "events";
 
 function arrayIsEqual(a, b): boolean {
     if (a.length !== b.length) return false;

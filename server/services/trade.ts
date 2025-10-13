@@ -1,4 +1,4 @@
-const EventEmitter = require('events');
+import EventEmitter from "events";
 const moment = require('moment');
 import { LedgerType } from 'solaris-common';
 import { ValidationError } from "solaris-common";

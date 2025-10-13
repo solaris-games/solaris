@@ -46,7 +46,7 @@ import WaypointActionService from "./waypointAction";
 import CullWaypointsService from "./cullWaypoints";
 import CarrierTravelService from "./carrierTravel";
 
-const EventEmitter = require('events');
+import EventEmitter from "events";
 const moment = require('moment');
 
 const log = logger("Game Tick Service");

@@ -1,4 +1,4 @@
-const EventEmitter = require('events');
+import EventEmitter from "events";
 import { ValidationError } from "solaris-common";
 import PasswordService from './password';
 import Repository from './repository';

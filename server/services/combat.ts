@@ -22,7 +22,7 @@ import { TechnologyService } from 'solaris-common';
 import StarCaptureService from "./starCapture";
 import StatisticsService from "./statistics";
 
-const EventEmitter = require('events');
+import EventEmitter from "events";
 
 export const CombatServiceEvents = {
     onPlayerCombatStar: 'onPlayerCombatStar',

@@ -20,7 +20,7 @@ const buyTypeToPriority = {
     percentageOfCredits: 3
 }
 
-const EventEmitter = require('events');
+import EventEmitter from "events";
 
 const log = logger("Schedule Buy Service");
 

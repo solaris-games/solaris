@@ -9,7 +9,7 @@ import { Star } from './types/Star';
 import { User } from './types/User';
 import DiplomacyService from './diplomacy';
 import StatisticsService from './statistics';
-const EventEmitter = require('events');
+import EventEmitter from "events";
 
 export const CarrierGiftServiceEvents = {
     onPlayerGiftReceived: 'onPlayerGiftReceived',

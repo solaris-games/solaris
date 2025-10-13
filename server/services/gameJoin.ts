@@ -1,4 +1,4 @@
-const EventEmitter = require('events');
+import EventEmitter from "events";
 const moment = require('moment');
 import { DBObjectId } from './types/DBObjectId';
 import { ValidationError } from "solaris-common";
