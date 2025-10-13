@@ -94,7 +94,7 @@ import InitialGameStateService from "../initialGameState";
 import WaypointActionService from "../waypointAction";
 import SaveWaypointsService from "../saveWaypoints";
 import CullWaypointsService from "../cullWaypoints";
-import CarrierTravelService from "../carrierTravel";
+import { CarrierTravelService } from 'solaris-common';
 import { StarDataService } from "solaris-common";
 
 export interface DependencyContainer {

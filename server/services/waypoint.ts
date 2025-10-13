@@ -7,7 +7,7 @@ import { Star } from './types/Star';
 import StarService from './star';
 import { TechnologyService } from 'solaris-common';
 import { StarDataService } from "solaris-common";
-import CarrierTravelService from "./carrierTravel";
+import { CarrierTravelService } from 'solaris-common';
 
 export default class WaypointService {
     starService: StarService;

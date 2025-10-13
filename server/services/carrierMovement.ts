@@ -17,7 +17,7 @@ import SpecialistService from './specialist';
 import StarService from './star';
 import {logger} from "../utils/logging";
 import {DBObjectId} from "./types/DBObjectId";
-import CarrierTravelService from "./carrierTravel";
+import { CarrierTravelService } from 'solaris-common';
 
 type CarrierMovementReport = {
     carrier: Carrier;

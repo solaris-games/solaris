@@ -1,29 +1,34 @@
-import {Carrier} from "./types/Carrier";
-import {Star} from "./types/Star";
-import {Game} from "./types/Game";
-import {DistanceService, Specialist, StarDistanceService, TechnologyService} from "@solaris-common";
-import StarService from "./star";
-import DiplomacyService from "./diplomacy";
-import {Player} from "./types/Player";
-import { StarDataService } from "solaris-common";
+import type {Specialist} from "../types/common/specialist";
+import type {Game} from "../types/common/game";
+import type {Id} from "../types/id";
+import type {TechnologyService} from "./technology";
+import type {DistanceService} from "./distance";
+import type {StarDistanceService} from "./starDistance";
+import type {StarDataService} from "./starData";
+import type {Carrier} from "../types/common/carrier";
+import type {Player} from "../types/common/player";
+import type {Star} from "../types/common/star";
 
 interface ISpecialistService {
     getByIdStar(id: number): Specialist | null;
     getByIdCarrier(id: number): Specialist | null;
 }
 
-export default class CarrierTravelService {
+interface IDiplomacyService {
+    isFormalAlliancesEnabled<ID>(game: Game<ID>): boolean;
+    isDiplomaticStatusToPlayersAllied<ID extends Id>(game: Game<ID>, playerId: ID, otherPlayerIds: ID[]): boolean;
+}
+
+export class CarrierTravelService {
     specialistService: ISpecialistService;
-    starService: StarService;
     technologyService: TechnologyService;
     distanceService: DistanceService;
     starDistanceService: StarDistanceService;
-    diplomacyService: DiplomacyService;
+    diplomacyService: IDiplomacyService;
     starDataService: StarDataService;
 
-    constructor(specialistService: ISpecialistService, starService: StarService, technologyService: TechnologyService, distanceService: DistanceService, starDistanceService: StarDistanceService, diplomacyService: DiplomacyService, starDataService: StarDataService) {
+    constructor(specialistService: ISpecialistService, technologyService: TechnologyService, distanceService: DistanceService, starDistanceService: StarDistanceService, diplomacyService: IDiplomacyService, starDataService: StarDataService) {
         this.specialistService = specialistService;
-        this.starService = starService;
         this.technologyService = technologyService;
         this.distanceService = distanceService;
         this.starDistanceService = starDistanceService;
@@ -31,7 +36,7 @@ export default class CarrierTravelService {
         this.starDataService = starDataService;
     }
 
-    getCarrierDistancePerTick(game: Game, carrier: Carrier, warpSpeed: boolean = false, instantSpeed: boolean | null = false) {
+    getCarrierDistancePerTick<ID extends Id>(game: Game<ID>, carrier: Carrier<ID>, warpSpeed: boolean = false, instantSpeed: boolean | null = false) {
         if (instantSpeed) {
             return null;
         }
@@ -49,7 +54,7 @@ export default class CarrierTravelService {
         return game.settings.specialGalaxy.carrierSpeed * distanceModifier;
     }
 
-    isWithinHyperspaceRange(game: Game, carrier: Carrier, sourceStar: Star, destinationStar: Star) {
+    isWithinHyperspaceRange<ID extends Id>(game: Game<ID>, carrier: Carrier<ID>, sourceStar: Star<ID>, destinationStar: Star<ID>) {
         // If the stars are a wormhole pair then they are always considered to be in hyperspace range.
         if (this.starDataService.isStarPairWormHole(sourceStar, destinationStar)) {
             return true;
@@ -63,7 +68,7 @@ export default class CarrierTravelService {
         return distanceBetweenStars <= hyperspaceDistance;
     }
 
-    canTravelAtWarpSpeed(game: Game, player: Player, carrier: Carrier, sourceStar: Star, destinationStar: Star) {
+    canTravelAtWarpSpeed<ID extends Id>(game: Game<ID>, player: Player<ID>, carrier: Carrier<ID>, sourceStar: Star<ID>, destinationStar: Star<ID>) {
         // Double check for destroyed stars.
         if (sourceStar == null || destinationStar == null) {
             return false;
@@ -118,15 +123,15 @@ export default class CarrierTravelService {
         return false;
     }
 
-    isInTransit(carrier: Carrier) {
+    isInTransit<ID>(carrier: Carrier<ID>) {
         return !carrier.orbiting;
     }
 
-    isInTransitTo(carrier: Carrier, star: Star) {
+    isInTransitTo<ID extends Id>(carrier: Carrier<ID>, star: Star<ID>) {
         return this.isInTransit(carrier) && carrier.waypoints[0].destination.toString() === star._id.toString();
     }
 
-    isLaunching(carrier: Carrier) {
+    isLaunching<ID extends Id>(carrier: Carrier<ID>) {
         return carrier.orbiting && carrier.waypoints.length && carrier.waypoints[0].delayTicks === 0;
     }
 }

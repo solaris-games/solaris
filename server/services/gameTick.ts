@@ -44,7 +44,7 @@ import {logger} from "../utils/logging";
 import StatisticsService from "./statistics";
 import WaypointActionService from "./waypointAction";
 import CullWaypointsService from "./cullWaypoints";
-import CarrierTravelService from "./carrierTravel";
+import { CarrierTravelService } from 'solaris-common';
 
 import EventEmitter from "events";
 import moment from "moment";

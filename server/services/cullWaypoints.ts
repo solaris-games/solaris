@@ -6,7 +6,7 @@ import StarService from "./star";
 import PlayerService from "./player";
 import WaypointService from "./waypoint";
 import {Player} from "./types/Player";
-import CarrierTravelService from "./carrierTravel";
+import { CarrierTravelService } from 'solaris-common';
 import { StarDataService } from "solaris-common";
 
 export default class CullWaypointsService {

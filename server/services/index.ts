@@ -133,7 +133,7 @@ import InitialGameStateService from "./initialGameState";
 import WaypointActionService from "./waypointAction";
 import CullWaypointsService from "./cullWaypoints";
 import SaveWaypointsService from "./saveWaypoints";
-import CarrierTravelService from "./carrierTravel";
+import { CarrierTravelService } from 'solaris-common';
 import { StarDataService } from "solaris-common";
 
 const gameNames = require('../config/game/gameNames');
@@ -214,7 +214,7 @@ export default (config: Config,
     const starCaptureService = new StarCaptureService(specialistService, starService, gameTypeService, gameStateService, diplomacyService, technologyService, starUpgradeService, statisticsService);
     const starContestedService = new StarContestedService(diplomacyService);
     const carrierGiftService = new CarrierGiftService(gameRepository, diplomacyService, statisticsService);
-    const carrierTravelService = new CarrierTravelService(specialistService, starService, technologyService, distanceService, starDistanceService, diplomacyService, starDataService);
+    const carrierTravelService = new CarrierTravelService(specialistService, technologyService, distanceService, starDistanceService, diplomacyService as any, starDataService); // todo: fix any once we consolidate common lib and server types
     const carrierMovementService = new CarrierMovementService(gameRepository, distanceService, starService, specialistService, diplomacyService, carrierGiftService, technologyService, starDistanceService, carrierTravelService, starDataService);
     const resourceService = new ResourceService(randomService, distanceService, starDistanceService, gameTypeService);
     const circularMapService = new CircularMapService(randomService, starService, starDistanceService, distanceService, resourceService, gameTypeService);

@@ -58,3 +58,4 @@ export * from "./services/distance";
 export * from "./services/starDistance";
 export * from "./services/technology";
 export * from "./services/starData";
+export * from "./services/carrierTravel";
