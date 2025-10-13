@@ -1,5 +1,5 @@
 import EventEmitter from "events";
-const moment = require('moment');
+import moment from "moment";
 import { LedgerType } from 'solaris-common';
 import { ValidationError } from "solaris-common";
 import UserAchievementService from './userAchievement';
@@ -529,7 +529,7 @@ export default class TradeService extends EventEmitter {
                 playerId: e.playerId!,
                 type: e.type,
                 data: e.data,
-                sentDate: moment(e._id.getTimestamp()) as Date,
+                sentDate: moment(e._id.getTimestamp()).toDate(),
                 sentTick: e.tick
             }
         });

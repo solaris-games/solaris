@@ -47,7 +47,7 @@ import CullWaypointsService from "./cullWaypoints";
 import CarrierTravelService from "./carrierTravel";
 
 import EventEmitter from "events";
-const moment = require('moment');
+import moment from "moment";
 
 const log = logger("Game Tick Service");
 
@@ -199,7 +199,7 @@ export default class GameTickService extends EventEmitter {
             gameName: game.settings.general.name
         }, `[${game.settings.general.name}] - Game tick started at ${new Date().toISOString()}`);
 
-        game.state.lastTickDate = moment().utc();
+        game.state.lastTickDate = moment().utc().toDate();
         game.state.forceTick = false;
 
         let taskTime = process.hrtime();

@@ -6,7 +6,7 @@ import SessionService from './session';
 import { DBObjectId } from './types/DBObjectId';
 import { Game } from './types/Game';
 import { User, UserSubscriptions } from './types/User';
-const moment = require('moment');
+import moment from "moment";
 
 function uuidv4(): string {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {

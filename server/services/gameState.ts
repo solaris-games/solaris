@@ -2,7 +2,7 @@ import { Game } from "./types/Game";
 import { Player } from "./types/Player";
 import {GameWinner} from "./leaderboard";
 
-const moment = require('moment');
+import moment from "moment";
 
 export default class GameStateService {
 
@@ -32,7 +32,7 @@ export default class GameStateService {
 
     finishGame(game: Game, winner: GameWinner) {
         game.state.paused = true;
-        game.state.endDate = moment().utc();
+        game.state.endDate = moment().utc().toDate();
 
         if (winner.kind === 'player') {
             game.state.winner = winner.player._id;

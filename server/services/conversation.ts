@@ -1,6 +1,6 @@
 import BroadcastService from "./broadcast";
 
-const moment = require('moment');
+import moment from "moment";
 import { DBObjectId } from './types/DBObjectId';
 import { ValidationError } from "solaris-common";
 import Repository from './repository';
@@ -136,7 +136,7 @@ export default class ConversationService extends EventEmitter {
             fromPlayerId: null,
             fromPlayerAlias: "Solaris",
             message: "Welcome to " + name + "!\n\nThis is the global chat. Any messages sent here will be delivered to all players in the game!\nPlease take a moment to familiarise yourself with our community guidelines.\n\nGood Luck, Commanders!",
-            sentDate: moment().utc(),
+            sentDate: moment().utc().toDate(),
             sentTick: game.state.tick,
             pinned: false,
             readBy: [],
@@ -258,7 +258,7 @@ export default class ConversationService extends EventEmitter {
             fromPlayerId: null,
             fromPlayerAlias: "Solaris",
             message: message,
-            sentDate: moment().utc(),
+            sentDate: moment().utc().toDate(),
             sentTick: game.state.tick,
             pinned: false,
             readBy: [],
@@ -292,7 +292,7 @@ export default class ConversationService extends EventEmitter {
             fromPlayerId: player._id,
             fromPlayerAlias: player.alias!,
             message,
-            sentDate: moment().utc(),
+            sentDate: moment().utc().toDate(),
             sentTick: game.state.tick,
             pinned: false,
             readBy: convo.mutedBy!

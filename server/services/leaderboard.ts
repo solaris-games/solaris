@@ -17,7 +17,7 @@ import TeamService from "./team";
 import {DBObjectId} from "./types/DBObjectId";
 import {isSpecialGameMode} from "./officialGames";
 
-const moment = require('moment');
+import moment from "moment";
 
 export enum GameWinnerKind {
     Player = 'player',

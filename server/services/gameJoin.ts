@@ -1,5 +1,5 @@
 import EventEmitter from "events";
-const moment = require('moment');
+import moment from "moment";
 import { DBObjectId } from './types/DBObjectId';
 import { ValidationError } from "solaris-common";
 import { Game } from './types/Game';
@@ -292,19 +292,21 @@ export default class GameJoinService extends EventEmitter {
     }
 
     startGame(game: Game) {
-        let startDate = moment().utc();
+        const startDate = moment().utc();
 
         if (this.gameTypeService.isRealTimeGame(game)) {
             // Add the start delay to the start date.
             startDate.add(game.settings.gameTime.startDelay, 'minute');
         }
 
+        const startDateD = startDate.toDate();
+
         game.state.paused = false;
-        game.state.startDate = startDate;
-        game.state.lastTickDate = startDate;
+        game.state.startDate = startDateD;
+        game.state.lastTickDate = startDateD;
 
         for (let player of game.galaxy.players) {
-            this.playerService.updateLastSeen(game, player, startDate);
+            this.playerService.updateLastSeen(game, player, startDateD);
         }
     }
 

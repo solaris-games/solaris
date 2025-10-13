@@ -38,7 +38,7 @@ import GamePlayerJoinedEvent from "./types/events/GamePlayerJoined";
 import GamePlayerQuitEvent from "./types/events/GamePlayerQuit";
 import PlayerGalacticCycleCompletedEvent from './types/events/PlayerGalacticCycleComplete';
 
-const moment = require('moment');
+import moment from "moment";
 
 export default class EventService {
 

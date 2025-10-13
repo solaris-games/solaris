@@ -18,7 +18,7 @@ export default (container: DependencyContainer) => {
                     reputation: trade.reputation
                 });
     
-                container.broadcastService.gamePlayerCreditsReceived(req.game, trade.fromPlayer._id, trade.toPlayer._id, trade.amount, trade.date);
+                container.broadcastService.gamePlayerCreditsReceived(req.game, trade.fromPlayer._id, trade.toPlayer._id, trade.amount, trade.date.toDate());
                 return next();
             } catch (err) {
                 return next(err);
@@ -38,7 +38,7 @@ export default (container: DependencyContainer) => {
                     reputation: trade.reputation
                 });
     
-                container.broadcastService.gamePlayerCreditsSpecialistsReceived(req.game, trade.fromPlayer._id, trade.toPlayer._id, trade.amount, trade.date);
+                container.broadcastService.gamePlayerCreditsSpecialistsReceived(req.game, trade.fromPlayer._id, trade.toPlayer._id, trade.amount, trade.date.toDate());
                 return next();
             } catch (err) {
                 return next(err);
@@ -47,7 +47,7 @@ export default (container: DependencyContainer) => {
         sendRenown: async (req, res, next) => {    
             try {
                 const reqObj = mapToTradeSendToPlayerRequest(req.body, req.session.userId);
-    
+
                 let trade = await container.tradeService.sendRenown(
                     req.game,
                     req.player,
@@ -59,7 +59,7 @@ export default (container: DependencyContainer) => {
     
                 res.sendStatus(200);
     
-                container.broadcastService.gamePlayerRenownReceived(req.game, trade.fromPlayer._id, trade.toPlayer._id, trade.amount, trade.date);
+                container.broadcastService.gamePlayerRenownReceived(req.game, trade.fromPlayer._id, trade.toPlayer._id, trade.amount, trade.date.toDate());
                 return next();
             } catch (err) {
                 return next(err);
@@ -80,7 +80,7 @@ export default (container: DependencyContainer) => {
                     reputation: trade.reputation
                 });
                 
-                container.broadcastService.gamePlayerTechnologyReceived(req.game, trade.fromPlayer._id, trade.toPlayer._id, trade.technology, trade.date);
+                container.broadcastService.gamePlayerTechnologyReceived(req.game, trade.fromPlayer._id, trade.toPlayer._id, trade.technology, trade.date.toDate());
                 return next();
             } catch (err) {
                 return next(err);
