@@ -18,7 +18,7 @@ export default async (config: Config, app, container: DependencyContainer) => {
     const idempotencyKeyCache: Map<string, number> = new Map<string, number>();
 
     app.use(require('body-parser').json({
-        limit: '1000kb' // Note: This allows large custom galaxies to be uploaded.
+        limit: '1500kb' // Note: This allows large custom galaxies to be uploaded.
     }));
 
     // ---------------
