@@ -28,7 +28,6 @@
 
 <script setup lang="ts">
 import MenuTitle from '../MenuTitle.vue'
-import gameHelper from '../../../../services/gameHelper'
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {eventBusInjectionKey} from "@/eventBus";
 import { inject, ref, computed } from 'vue';

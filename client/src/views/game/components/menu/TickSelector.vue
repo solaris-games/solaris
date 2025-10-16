@@ -99,7 +99,7 @@ const toggleDisplay = () => {
 };
 
 const onRequestedTickChanged = async () => {
-  if (isLoading.value || tick.value < 1 || tick.value > stateTick.value || tick.value === gameTick.value) {
+  if (isLoading.value || tick.value < minimumTick.value || tick.value > stateTick.value || tick.value === gameTick.value) {
     return;
   }
 
@@ -120,13 +120,13 @@ const onRequestedTickChanged = async () => {
 };
 
 const loadPreviousTick = async (ticks: number) => {
-  tick.value = Math.max(minimumTick.value, tick.value - ticks)
-  await onRequestedTickChanged()
+  tick.value = Math.max(minimumTick.value, tick.value - ticks);
+  await onRequestedTickChanged();
 };
 
 const loadNextTick = async (ticks: number) => {
-  tick.value = Math.min(stateTick.value, tick.value + ticks)
-  await onRequestedTickChanged()
+  tick.value = Math.min(stateTick.value, tick.value + ticks);
+  await onRequestedTickChanged();
 };
 
 onMounted(() => {
