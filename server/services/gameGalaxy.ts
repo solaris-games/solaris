@@ -845,9 +845,9 @@ export default class GameGalaxyService {
             return;
         }
 
-        // Support for legacy games, not all history for players/stars/carriers have been logged so
+        // Support for legacy games, not all history for players/stars have been logged so
         // bomb out if we're missing any of those.
-        if (!history.players.length || !history.stars.length || !history.carriers.length) {
+        if (!history.players.length || !history.stars.length) {
             return;
         }
 
