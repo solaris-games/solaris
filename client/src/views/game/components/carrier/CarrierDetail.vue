@@ -2,10 +2,10 @@
 <div class="menu-page container" v-if="carrier">
     <menu-title :title="carrier.name" @onCloseRequested="onCloseRequested">
       <button v-if="hasWaypoints" @click="onViewCombatCalculatorRequested" class="btn btn-sm btn-outline-warning"><i class="fas fa-calculator"></i></button>
-      <modalButton modalName="scuttleCarrierModal" v-if="!$isHistoricalMode() && canScuttleCarrier" classText="btn btn-sm btn-outline-danger ms-1">
+      <modalButton modalName="scuttleCarrierModal" v-if="!isHistoricalMode && canScuttleCarrier" classText="btn btn-sm btn-outline-danger ms-1">
         <i class="fas fa-rocket"></i> <i class="fas fa-trash ms-1"></i>
       </modalButton>
-      <button v-if="!$isHistoricalMode() && isOwnedByUserPlayer" @click="onCarrierRenameRequested" class="btn btn-sm btn-outline-success ms-1"><i class="fas fa-pencil-alt"></i></button>
+      <button v-if="!isHistoricalMode && isOwnedByUserPlayer" @click="onCarrierRenameRequested" class="btn btn-sm btn-outline-success ms-1"><i class="fas fa-pencil-alt"></i></button>
       <button @click="viewOnMap" class="btn btn-sm btn-outline-info ms-1"><i class="fas fa-eye"></i></button>
     </menu-title>
 
@@ -25,18 +25,18 @@
     <div v-if="isCompactUIStyle">
       <div class="row mt-2">
         <div class="col">
-          <span title="The carrier is in orbit" v-if="carrier.orbiting">
+          <span title="The carrier is in orbit" v-if="carrier.orbiting && carrierOrbitingStar">
             <i class="fas fa-star me-2"></i>
-            <a href="javascript:;" @click="onOpenOrbitingStarDetailRequested">{{getCarrierOrbitingStar().name}}</a>
+            <a href="javascript:;" @click="onOpenOrbitingStarDetailRequested">{{carrierOrbitingStar.name}}</a>
           </span>
           <span title="The carrier is in transit" v-if="!carrier.orbiting">
             <i class="fas fa-star me-2"></i>
-            <a title="The carrier is in transit from this star" href="javascript:;" @click="onOpenSourceStarDetailRequested">{{getFirstWaypointSourceName()}}</a>
+            <a title="The carrier is in transit from this star" v-if="firstWaypointSource" href="javascript:;" @click="onOpenSourceStarDetailRequested">{{firstWaypointSource.name}}</a>
             <i class="fas fa-arrow-right me-2 ms-2"></i>
-            <a title="The carrier is in transit to star" href="javascript:;" @click="onOpenDestinationStarDetailRequested">{{getFirstWaypointDestinationName()}}</a>
+            <a title="The carrier is in transit to star" v-if="firstWaypointDestination" href="javascript:;" @click="onOpenDestinationStarDetailRequested">{{firstWaypointDestination.name}}</a>
           </span>
         </div>
-        <div class="col-auto">
+        <div class="col-auto" v-if="carrier.effectiveTechs">
           <span title="The weapons level of this carrier">
             {{carrier.effectiveTechs.weapons}} <i class="fas fa-gun ms-1"></i>
           </span>
@@ -53,8 +53,8 @@
           <span v-if="canShowSpecialist && isOwnedByUserPlayer && canHireSpecialist">
             <specialist-icon :type="'carrier'" :defaultIcon="'user-astronaut'" :specialist="carrier.specialist"></specialist-icon>
             <a href="javascript:;" @click="onViewHireCarrierSpecialistRequested">
-              <span class="ms-1" v-if="carrier.specialistId" :title="carrier.specialist.description">{{carrier.specialist.name}}</span>
-              <span v-if="!carrier.specialistId">No Specialist</span>
+              <span class="ms-1" v-if="carrier.specialist" :title="carrier.specialist.description">{{carrier.specialist.name}}</span>
+              <span v-if="!carrier.specialist">No Specialist</span>
             </a>
             <span v-if="carrier.specialistId && carrier.specialistExpireTick" class="badge bg-warning ms-1"><i class="fas fa-stopwatch"></i> Expires Tick {{carrier.specialistExpireTick}}</span>
           </span>
@@ -65,7 +65,7 @@
             <span v-if="!carrier.specialist">No Specialist</span>
           </span>
         </div>
-        <div class="col-auto">
+        <div class="col-auto" v-if="carrier.effectiveTechs">
           <span title="The hyperspace range of this carrier">
             {{carrier.effectiveTechs.hyperspace}} <i class="fas fa-gas-pump ms-1"></i>
           </span>
@@ -85,7 +85,7 @@
         </div>
       </div>
 
-      <div class="row pb-2 pt-2 " v-if="!$isHistoricalMode() && (canGiftCarrier || canTransferShips || canEditWaypoints)">
+      <div class="row pb-2 pt-2 " v-if="!isHistoricalMode && (canGiftCarrier || canTransferShips || canEditWaypoints)">
         <div class="col">
           <button class="btn btn-sm btn-primary me-1" @click="onShipTransferRequested" v-if="canTransferShips">
             Transfer <i class="fas fa-exchange-alt"></i>
@@ -121,7 +121,7 @@
               {{carrier.ships == null ? '???' : carrier.ships}} <i class="fas fa-rocket ms-1"></i>
           </div>
       </div>
-      <div class="row mb-0 pt-1 pb-1">
+      <div class="row mb-0 pt-1 pb-1" v-if="carrier.effectiveTechs">
           <div class="col">
               Weapons
           </div>
@@ -129,7 +129,7 @@
               {{carrier.effectiveTechs.weapons}} <i class="fas fa-gun ms-1"></i>
           </div>
       </div>
-      <div class="row mb-0 pt-1 pb-1 bg-dark">
+      <div class="row mb-0 pt-1 pb-1 bg-dark" v-if="carrier.effectiveTechs">
           <div class="col">
               Hyperspace Range
           </div>
@@ -142,11 +142,11 @@
     <h4 class="pt-0" v-if="isStandardUIStyle">Navigation</h4>
 
     <div>
-      <div v-if="carrier.orbiting && isStandardUIStyle" class="row bg-dark pt-2 pb-0 mb-1">
+      <div v-if="carrier.orbiting && carrierOrbitingStar && isStandardUIStyle" class="row bg-dark pt-2 pb-0 mb-1">
         <div class="col">
-          <p class="mb-2 align-middle">Orbiting: <a href="javascript:;" @click="onOpenOrbitingStarDetailRequested">{{getCarrierOrbitingStar().name}}</a></p>
+          <p class="mb-2 align-middle">Orbiting: <a href="javascript:;" @click="onOpenOrbitingStarDetailRequested">{{carrierOrbitingStar.name}}</a></p>
         </div>
-        <div class="col-auto" v-if="!$isHistoricalMode() && isStarOwnedByUserPlayer">
+        <div class="col-auto" v-if="!isHistoricalMode && isStarOwnedByUserPlayer">
           <button class="btn btn-sm btn-outline-primary mb-2" @click="onShipTransferRequested" v-if="canTransferShips">
             <i class="fas fa-exchange-alt"></i> Ship Transfer
           </button>
@@ -168,14 +168,14 @@
 
       <div class="row pt-2 pb-2" v-if="hasWaypoints">
         <div class="col">
-          <span>ETA<orbital-mechanics-eta-warning />: {{timeRemainingEta}} <span v-if="carrier.waypoints.length > 1">({{timeRemainingEtaTotal}})</span></span>
+          <span>ETA<orbital-mechanics-e-t-a-warning />: {{timeRemainingEta}} <span v-if="carrier.waypoints.length > 1">({{timeRemainingEtaTotal}})</span></span>
         </div>
         <div class="col">
           <span>Speed: {{carrierSpeed}}</span>
         </div>
       </div>
 
-      <div v-if="!$isHistoricalMode() && canEditWaypoints && isStandardUIStyle" class="row bg-dark pt-2 pb-2 mb-0">
+      <div v-if="!isHistoricalMode && canEditWaypoints && isStandardUIStyle" class="row bg-dark pt-2 pb-2 mb-0">
         <div class="col">
           <button class="btn btn-sm btn-outline-success" v-if="carrier.waypoints.length > 1 && !carrier.waypointsLooped" @click="toggleWaypointsLooped()" :disabled="isLoopingWaypoints">
             Loop
@@ -185,7 +185,6 @@
             Unloop
             <i class="fas fa-map-marker-alt"></i>
           </button>
-          <!-- <p class="mb-2">Looping: {{carrier.waypointsLooped ? 'Enabled' : 'Disabled'}}</p> -->
         </div>
         <div class="col-auto">
           <button class="btn btn-sm btn-success" @click="editWaypoints()">
@@ -215,324 +214,319 @@
 </div>
 </template>
 
-<script>
-import { inject } from 'vue';
+<script setup lang="ts">
+import { inject, computed, ref, onMounted, onUnmounted } from 'vue';
 import GameHelper from '../../../../services/gameHelper'
-import CarrierApiService from '../../../../services/api/carrier'
 import MenuTitle from '../MenuTitle.vue'
 import WaypointTable from './WaypointTable.vue'
-import CarrierSpecialistVue from './CarrierSpecialist.vue'
-import GiftCarrierVue from './GiftCarrier.vue'
-import SpecialistIconVue from '../specialist/SpecialistIcon.vue'
+import CarrierSpecialist from './CarrierSpecialist.vue'
+import GiftCarrier from './GiftCarrier.vue'
+import SpecialistIcon from '../specialist/SpecialistIcon.vue'
 import ModalButton from '../../../components/modal/ModalButton.vue'
 import DialogModal from '../../../components/modal/DialogModal.vue'
 import AudioService from '../../../../game/audio'
-import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning.vue'
+import OrbitalMechanicsETAWarning from '../shared/OrbitalMechanicsETAWarning.vue'
 import HelpTooltip from '../../../components/HelpTooltip.vue'
 import {formatLocation} from "client/src/util/format";
 import {eventBusInjectionKey} from "../../../../eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
+import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
+import {toastInjectionKey} from "@/util/keys";
+import type {Carrier, Game, Player} from "@/types/game";
+import {useIsHistoricalMode} from "@/util/reactiveHooks";
+import { useStore } from 'vuex';
+import MapEventBusEventNames from "@/eventBusEventNames/map";
+import type {CarrierWaypoint, MapObject} from "@solaris-common";
+import {gift, loop, scuttle} from "@/services/typedapi/carrier";
+import {makeConfirm} from "@/util/confirm";
 
-export default {
-  components: {
-    'menu-title': MenuTitle,
-    'waypointTable': WaypointTable,
-    'carrier-specialist': CarrierSpecialistVue,
-    'gift-carrier': GiftCarrierVue,
-    'specialist-icon': SpecialistIconVue,
-    'modalButton': ModalButton,
-    'dialogModal': DialogModal,
-    'orbital-mechanics-eta-warning': OrbitalMechanicsETAWarningVue,
-    'help-tooltip': HelpTooltip,
-  },
-  props: {
-    carrierId: String
-  },
-  setup () {
-    return {
-      eventBus: inject(eventBusInjectionKey)
-    }
-  },
-  data () {
-    return {
-      carrier: null,
-      carrierOwningPlayer: null,
-      userPlayer: null,
-      isLoopingWaypoints: false,
-      isGiftingCarrier: false,
-      timeRemainingEta: null,
-      timeRemainingEtaTotal: null,
-      intervalFunction: null,
-      onWaypointCreatedHandler: null,
-      isStandardUIStyle: false,
-      isCompactUIStyle: false
-    }
-  },
-  mounted () {
-    this.isStandardUIStyle = this.$store.state.settings.interface.uiStyle === 'standard'
-    this.isCompactUIStyle = this.$store.state.settings.interface.uiStyle === 'compact'
+const props = defineProps<{
+  carrierId: string,
+}>();
 
-    this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
-    this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
-    this.carrierOwningPlayer = GameHelper.getCarrierOwningPlayer(this.$store.state.game, this.carrier)
+const emit = defineEmits<{
+  onCloseRequested: [event: Event],
+  onCarrierRenameRequested: [carrierId: string],
+  onViewHireCarrierSpecialistRequested: [carrierId: string],
+  onViewCarrierCombatCalculatorRequested: [carrierId: string],
+  onOpenPlayerDetailRequested: [playerId: string],
+  onOpenStarDetailRequested: [starId: string],
+  onEditWaypointsRequested: [carrierId: string],
+  onShipTransferRequested: [carrierId: string],
+  onEditWaypointRequested: [{carrierId: string, waypoint: CarrierWaypoint<string>}],
+}>();
 
-    this.onWaypointCreatedHandler = this.onWaypointCreated.bind(this)
+const store = useStore();
+const confirm = makeConfirm(store);
 
-    this.eventBus.on('onWaypointCreated', this.onWaypointCreatedHandler)
+const eventBus = inject(eventBusInjectionKey)!;
+const httpClient = inject(httpInjectionKey)!;
+const toast = inject(toastInjectionKey)!;
 
-    this.recalculateTimeRemaining()
+const isLoopingWaypoints = ref(false);
+const isGiftingCarrier = ref(false);
 
-    if (GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)) {
-      this.intervalFunction = setInterval(this.recalculateTimeRemaining, 250)
-      this.recalculateTimeRemaining()
-    }
-  },
-  unmounted () {
-    this.eventBus.off('onWaypointCreated', this.onWaypointCreatedHandler)
+const game = computed<Game>(() => store.state.game);
+const userPlayer = computed<Player | undefined>(() => GameHelper.getUserPlayer(game.value));
+const carrier = computed<Carrier>(() => GameHelper.getCarrierById(game.value, props.carrierId)!);
+const carrierOwningPlayer = computed<Player>(() => GameHelper.getPlayerById(game.value, carrier.value.ownedByPlayerId!)!);
 
-    clearInterval(this.intervalFunction)
-  },
-  methods: {
-    formatLocation,
-    onCloseRequested (e) {
-      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandUnselectAllCarriers, {});
-      this.$emit('onCloseRequested', e)
-    },
-    onViewCompareIntelRequested (e) {
-      this.$emit('onViewCompareIntelRequested', e)
-    },
-    onCarrierRenameRequested (e) {
-      this.$emit('onCarrierRenameRequested', this.carrier._id)
-    },
-    onViewHireCarrierSpecialistRequested (e) {
-      this.$emit('onViewHireCarrierSpecialistRequested', this.carrier._id)
-    },
-    getCarrierOrbitingStar () {
-      return GameHelper.getCarrierOrbitingStar(this.$store.state.game, this.carrier)
-    },
-    getCarrierSourceStar () {
-      return this.getFirstWaypointSource()
-    },
-    getCarrierDestinationStar () {
-      return this.getFirstWaypointDestination()
-    },
-    onOpenPlayerDetailRequested (e) {
-      this.$emit('onOpenPlayerDetailRequested', this.carrierOwningPlayer._id)
-    },
-    onOpenStarDetailRequested (e) {
-      this.$emit('onOpenStarDetailRequested', e)
-    },
-    onOpenFirstWaypointStarDetailRequested (e) {
-      this.onOpenStarDetailRequested(this.getFirstWaypointDestination()._id)
-    },
-    onViewCombatCalculatorRequested (e) {
-      this.$emit('onViewCarrierCombatCalculatorRequested', this.carrier._id)
-    },
-    viewOnMap (e) {
-      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: this.carrier });
-    },
-    getFirstWaypointSource () {
-      if (!this.carrier.waypoints.length) {
-        return null
-      }
+const firstWaypoint = computed(() => carrier.value.waypoints.length ? carrier.value.waypoints[0] : null);
+const firstWaypointSource = computed(() => firstWaypoint.value ? GameHelper.getStarById(game.value, firstWaypoint.value.source) || null : null);
+const carrierOrbitingStar = computed(() => carrier.value.orbiting ? GameHelper.getStarById(game.value, carrier.value.orbiting) : null);
+const firstWaypointDestination = computed(() => firstWaypoint.value ? GameHelper.getStarById(game.value, firstWaypoint.value.destination) || null : null);
 
-      return GameHelper.getStarById(this.$store.state.game, this.carrier.waypoints[0].source)
-    },
-    getFirstWaypointSourceName () {
-      const source = this.getFirstWaypointSource()
+const canGiftCarrier = computed<boolean>(() => Boolean(settings.value.specialGalaxy.giftCarriers === 'enabled'
+  && carrier.value
+  && userPlayer.value
+  && carrierOwningPlayer.value._id === userPlayer.value._id
+  && !carrier.value.isGift
+  && !userPlayer.value.defeated
+  && !GameHelper.isGameFinished(store.state.game)
+));
 
-      return source ? source.name : 'Unknown'
-    },
-    getFirstWaypointDestination () {
-      if (!this.carrier.waypoints.length) {
-        return null
-      }
+const isOwnedByUserPlayer = computed(() => {
+  return carrierOwningPlayer.value && userPlayer.value && carrierOwningPlayer.value._id === userPlayer.value._id;
+});
 
-      return GameHelper.getStarById(this.$store.state.game, this.carrier.waypoints[0].destination)
-    },
-    getFirstWaypointDestinationName () {
-      const destination = this.getFirstWaypointDestination()
+const isGameInProgress = computed(() => GameHelper.isGameInProgress(game.value));
 
-      return destination ? destination.name : 'Unknown'
-    },
-    async toggleWaypointsLooped () {
-      // TODO: Verify that the last waypoint is within hyperspace range of the first waypoint.
-      try {
-        this.isLoopingWaypoints = true
-        const response = await CarrierApiService.loopWaypoints(this.$store.state.game._id, this.carrier._id, !this.carrier.waypointsLooped)
+const canScuttleCarrier = computed(() => {
+  return isOwnedByUserPlayer.value && !userPlayer.value!.defeated && isGameInProgress.value && !carrier.value.isGift;
+});
 
-        if (response.status === 200) {
-          this.$toast.default(`${this.carrier.name} waypoints updated.`)
+const isUserPlayerCarrier = computed(() => {
+  return carrier.value && userPlayer.value && carrier.value.ownedByPlayerId == userPlayer.value._id;
+});
 
-          this.carrier.waypointsLooped = !this.carrier.waypointsLooped
+const isNotUserPlayerCarrier = computed(() => !isUserPlayerCarrier.value);
 
-          this.eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, { carrier: this.carrier });
-        }
-      } catch (err) {
-        console.error(err)
-      }
+const hasWaypoints = computed(() => carrier.value.waypoints && carrier.value.waypoints.length > 0);
 
-      this.isLoopingWaypoints = false
-    },
-    async onConfirmGiftCarrier (e) {
-      if (!await this.$confirm('Gift a carrier', `Are you sure you want to convert ${this.carrier.name} into a gift? If the carrier has a specialist, and the destination star does not belong to an ally, then it will be retired when it arrives at the destination.`)) {
-        return
-      }
+const canEditWaypoints = computed(() => {
+  return userPlayer.value
+    && carrierOwningPlayer.value._id === userPlayer.value._id
+    && carrier.value
+    && !userPlayer.value.defeated
+    && !carrier.value.isGift
+    && !GameHelper.isGameFinished(game.value);
+});
 
-      this.isGiftingCarrier = true
+const canTransferShips = computed(() => {
+  return isUserPlayerCarrier.value
+    && carrier.value.orbiting
+    && userPlayer.value
+    && !userPlayer.value.defeated
+    && !GameHelper.isGameFinished(game.value);
+});
 
-      try {
-        const response = await CarrierApiService.convertToGift(this.$store.state.game._id, this.carrierId)
+const canShowSpecialist = computed(() => {
+  return settings.value.specialGalaxy.specialistCost !== 'none' && (carrier.value.specialistId || isUserPlayerCarrier.value);
+});
 
-        if (response.status === 200) {
-          // TODO: Maybe better to come from the server instead of repeating
-          // server side logic and client side logic?
-          this.carrier.isGift = true
-          this.carrier.waypointsLooped = false;
+const isDeadStar = computed(() => {
+  return GameHelper.isDeadStar(carrierOrbitingStar.value);
+});
 
-          const firstWaypoint = this.carrier.waypoints[0];
-
-          firstWaypoint.action = 'nothing';
-          firstWaypoint.actionShips = 0;
-          firstWaypoint.delayTicks = 0;
-
-          this.carrier.waypoints = [firstWaypoint];
-
-          this.eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, { carrier: this.carrier });
-
-          this.$toast.default(`${this.carrier.name} has been converted into a gift.`)
-        }
-      } catch (err) {
-        console.error(err)
-      }
-
-      this.isGiftingCarrier = false
-    },
-    editWaypoints () {
-      this.$emit('onEditWaypointsRequested', this.carrier._id)
-    },
-    onWaypointCreated (e) {
-      // this.carrier.waypoints.push(e)
-    },
-    onShipTransferRequested (e) {
-      if (this.carrier.orbiting) {
-        this.$emit('onShipTransferRequested', this.carrier._id)
-      }
-    },
-    onEditWaypointRequested (e) {
-      this.$emit('onEditWaypointRequested', {
-        carrierId: this.carrier._id,
-        waypoint: e
-      })
-    },
-    onOpenOrbitingStarDetailRequested (e) {
-      this.onOpenStarDetailRequested(this.getCarrierOrbitingStar()._id)
-    },
-    onOpenSourceStarDetailRequested (e) {
-      const star = this.getFirstWaypointSource()
-
-      if (star) {
-        this.onOpenStarDetailRequested(this.carrier.waypoints[0].source)
-      }
-    },
-    onOpenDestinationStarDetailRequested (e) {
-      const star = this.getFirstWaypointDestination()
-
-      if (star) {
-        this.onOpenStarDetailRequested(this.carrier.waypoints[0].destination)
-      }
-    },
-    recalculateTimeRemaining () {
-      if (this.carrier.ticksEta) {
-        this.timeRemainingEta = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.carrier.ticksEta)
-      }
-
-      if (this.carrier.ticksEtaTotal) {
-        this.timeRemainingEtaTotal = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.carrier.ticksEtaTotal)
-      }
-    },
-    async confirmScuttleCarrier (e) {
-      try {
-        const response = await CarrierApiService.scuttle(this.$store.state.game._id, this.carrier._id)
-
-        if (response.status === 200) {
-          this.$toast.default(`${this.carrier.name} has been scuttled. All ships will be destroyed.`)
-
-          this.$store.commit('gameCarrierScuttled', {
-            carrierId: this.carrier._id
-          })
-
-          AudioService.leave()
-
-          this.onCloseRequested()
-        }
-      } catch (err) {
-        console.error(err)
-      }
-    }
-  },
-  computed: {
-    canGiftCarrier: function () {
-      return this.$store.state.game.settings.specialGalaxy.giftCarriers === 'enabled'
-        && this.isUserPlayerCarrier
-        && !this.carrier.isGift
-        && !this.userPlayer.defeated
-        && !GameHelper.isGameFinished(this.$store.state.game)
-    },
-    canScuttleCarrier: function () {
-      return this.isOwnedByUserPlayer && !this.userPlayer.defeated && this.isGameInProgress && !this.carrier.isGift
-    },
-    isUserPlayerCarrier: function () {
-      return this.carrier && this.userPlayer && this.carrier.ownedByPlayerId == this.userPlayer._id
-    },
-    isNotUserPlayerCarrier: function () {
-      return (this.carrier && !this.userPlayer) || (this.carrier.ownedByPlayerId != this.userPlayer._id)
-    },
-    hasWaypoints: function () {
-      return this.carrier.waypoints && this.carrier.waypoints.length
-    },
-    canEditWaypoints: function () {
-      return this.userPlayer && this.carrierOwningPlayer == this.userPlayer && this.carrier && !this.userPlayer.defeated && !this.carrier.isGift && !GameHelper.isGameFinished(this.$store.state.game)
-    },
-    canTransferShips: function () {
-      return this.isUserPlayerCarrier && this.carrier.orbiting && !this.userPlayer.defeated && !GameHelper.isGameFinished(this.$store.state.game)
-    },
-    canShowSpecialist: function () {
-      return this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none' && (this.carrier.specialistId || this.isUserPlayerCarrier)
-    },
-    canHireSpecialist: function () {
-      return this.canShowSpecialist
-        && this.carrier.orbiting
-        && this.isStarOwnedByUserPlayer
-        && !GameHelper.isGameFinished(this.$store.state.game)
-        && !this.isDeadStar
-        && (!this.carrier.specialistId || !this.carrier.specialist.oneShot)
-    },
-    isOwnedByUserPlayer: function () {
-      const owner = GameHelper.getCarrierOwningPlayer(this.$store.state.game, this.carrier)
-
-      return owner && this.userPlayer && owner._id === this.userPlayer._id
-    },
-    isStarOwnedByUserPlayer: function () {
-      const owner = GameHelper.getStarOwningPlayer(this.$store.state.game, this.getCarrierOrbitingStar())
-
-      return owner && this.userPlayer && owner._id === this.userPlayer._id
-    },
-    isDeadStar: function () {
-      return GameHelper.isDeadStar(this.getCarrierOrbitingStar())
-    },
-    isGameInProgress () {
-      return GameHelper.isGameInProgress(this.$store.state.game)
-    },
-    isGameDarkMode () {
-      return GameHelper.isDarkMode(this.$store.state.game)
-    },
-    carrierSpeed () {
-      return GameHelper.getCarrierSpeed(this.$store.state.game, this.carrierOwningPlayer, this.carrier, this.getFirstWaypointSource(), this.getFirstWaypointDestination());
-    }
+const isStarOwnedByUserPlayer = computed(() => {
+  if (!carrierOrbitingStar.value) {
+    return false;
   }
-}
+
+  const owner = GameHelper.getStarOwningPlayer(game.value, carrierOrbitingStar.value);
+
+  return owner && userPlayer.value && owner._id === userPlayer.value._id;
+});
+
+const isGameDarkMode = computed(() => GameHelper.isDarkMode(game.value));
+
+const carrierSpeed = computed(() => {
+  return GameHelper.getCarrierSpeed(game.value, carrierOwningPlayer.value, carrier.value, firstWaypointSource.value, firstWaypointDestination.value);
+});
+
+const canHireSpecialist = computed(() => {
+  return canShowSpecialist.value
+    && carrier.value.orbiting
+    && isStarOwnedByUserPlayer.value
+    && !GameHelper.isGameFinished(game.value)
+    && !isDeadStar.value
+    && (!carrier.value.specialistId || !carrier.value.specialist!.oneShot);
+});
+
+const settings = computed(() => store.state.settings);
+const isStandardUIStyle = computed(() => settings.value.interface.uiStyle === 'standard');
+const isCompactUIStyle = computed(() => settings.value.interface.uiStyle === 'compact');
+
+const timeRemainingEta = ref('');
+const timeRemainingEtaTotal = ref('');
+
+const intervalFunction = ref(0);
+
+const isHistoricalMode = useIsHistoricalMode(store);
+
+const onOpenPlayerDetailRequested = (e: Event) => {
+  e.preventDefault();
+  emit('onOpenPlayerDetailRequested', carrierOwningPlayer.value._id);
+};
+
+const onOpenStarDetailRequested = (starId: string) => {
+  emit('onOpenStarDetailRequested', starId);
+};
+
+const onViewCombatCalculatorRequested = () => {
+  emit('onViewCarrierCombatCalculatorRequested', carrier.value._id);
+};
+
+const onWaypointCreated = () => {
+
+};
+
+const onShipTransferRequested = (e: Event) => {
+  e.preventDefault();
+  emit('onShipTransferRequested', carrier.value._id);
+};
+
+const recalculateTimeRemaining = () => {
+  if (carrier.value.ticksEta) {
+    timeRemainingEta.value = GameHelper.getCountdownTimeStringByTicks(game.value, carrier.value.ticksEta);
+  }
+
+  if (carrier.value.ticksEtaTotal) {
+    timeRemainingEtaTotal.value = GameHelper.getCountdownTimeStringByTicks(game.value, carrier.value.ticksEtaTotal);
+  }
+};
+
+const onCloseRequested = (e: Event) => {
+  eventBus.emit(MapCommandEventBusEventNames.MapCommandUnselectAllCarriers, {});
+  emit('onCloseRequested', e);
+};
+
+const onCarrierRenameRequested = () => {
+  emit('onCarrierRenameRequested', carrier.value._id);
+};
+
+const onViewHireCarrierSpecialistRequested = () => {
+  emit('onViewHireCarrierSpecialistRequested', carrier.value._id);
+};
+
+const viewOnMap = (e: Event) => {
+  e.preventDefault();
+  eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: carrier.value as MapObject<string> });
+};
+
+const editWaypoints = () => {
+  emit('onEditWaypointsRequested', carrier.value._id);
+};
+
+const onEditWaypointRequested = (e: CarrierWaypoint<string>) => {
+  emit('onEditWaypointRequested', { carrierId: carrier.value._id, waypoint: e });
+};
+
+const onOpenOrbitingStarDetailRequested = (e: Event) => {
+  e.preventDefault();
+
+  if (carrierOrbitingStar.value) {
+    emit('onOpenStarDetailRequested', carrierOrbitingStar.value._id);
+  }
+};
+
+const onOpenSourceStarDetailRequested = (e: Event) => {
+  e.preventDefault();
+
+  if (firstWaypointSource.value) {
+    emit('onOpenStarDetailRequested', firstWaypointSource.value._id);
+  }
+};
+
+const onOpenDestinationStarDetailRequested = (e: Event) => {
+  e.preventDefault();
+
+  if (firstWaypointDestination.value) {
+    emit('onOpenStarDetailRequested', firstWaypointDestination.value._id);
+  }
+};
+
+const confirmScuttleCarrier = async () => {
+  const response = await scuttle(httpClient)(game.value._id, carrier.value._id);
+
+  if (isOk(response)) {
+    toast.default(`${carrier.value.name} has been scuttled. All ships will be destroyed.`);
+
+    store.commit('gameCarrierScuttled', {
+      carrierId: carrier.value._id
+    });
+
+    AudioService.leave();
+
+    onCloseRequested(new Event('scuttle'));
+  } else {
+    console.error(formatError(response));
+  }
+};
+
+const toggleWaypointsLooped = async () => {
+  isLoopingWaypoints.value = true;
+
+  const newLooped = !carrier.value.waypointsLooped;
+
+  const response = await loop(httpClient)(game.value._id, carrier.value._id, newLooped);
+
+  if (isOk(response)) {
+    toast.default(`${carrier.value.name} waypoints updated.`);
+
+    carrier.value.waypointsLooped = newLooped;
+
+    eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, { carrier: carrier.value });
+  } else {
+    console.error(formatError(response));
+  }
+
+  isLoopingWaypoints.value = false;
+};
+
+const onConfirmGiftCarrier = async () => {
+  if (!await confirm('Gift a carrier', `Are you sure you want to convert ${carrier.value.name} into a gift? If the carrier has a specialist, and the destination star does not belong to an ally, then it will be retired when it arrives at the destination.`)) {
+    return;
+  }
+
+  isGiftingCarrier.value = true;
+
+  const response = await gift(httpClient)(game.value._id, carrier.value._id);
+
+  if (isOk(response)) {
+    carrier.value.isGift = true;
+    carrier.value.waypointsLooped = false;
+
+    const firstWaypoint = carrier.value.waypoints[0];
+    firstWaypoint.action = 'nothing';
+    firstWaypoint.actionShips = 0;
+    firstWaypoint.delayTicks = 0;
+    carrier.value.waypoints = [firstWaypoint];
+
+    eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, { carrier: carrier.value });
+
+    toast.default(`${carrier.value.name} has been converted into a gift.`);
+  } else {
+    formatError(response);
+  }
+
+  isGiftingCarrier.value = false;
+};
+
+onMounted(() => {
+  eventBus.on(MapEventBusEventNames.MapOnWaypointCreated, onWaypointCreated);
+
+  if (GameHelper.isGameInProgress(game.value) || GameHelper.isGamePendingStart(game.value)) {
+    intervalFunction.value = setInterval(recalculateTimeRemaining, 250)
+    recalculateTimeRemaining();
+  }
+
+  onUnmounted(() => {
+    eventBus.off(MapEventBusEventNames.MapOnWaypointCreated, onWaypointCreated);
+    clearInterval(intervalFunction.value);
+  });
+});
 </script>
 
 <style scoped>

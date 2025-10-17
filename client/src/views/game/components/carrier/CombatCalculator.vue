@@ -13,7 +13,7 @@
                       <span class="text-success ms-2">{{defender.player ? defender.player.alias : 'Defender'}}</span> Weapons
                     </label>
                     <div class="col-4">
-                        <input type="number" class="form-control" id="defenderWeaponTech" placeholder="Tech Level" v-model="defender.weaponsLevel" required="required">
+                        <input type="number" class="form-control" id="defenderWeaponTech" placeholder="Tech Level" v-model="defender.weaponsLevel" :required="true">
                     </div>
                 </div>
                 <div class="mb-2 row">
@@ -22,7 +22,7 @@
                       <span class="text-success ms-2">{{defender.star ? defender.star.name : 'Defender'}}</span> Ships
                     </label>
                     <div class="col-4">
-                        <input type="number" class="form-control" id="defenderShips" placeholder="Ships" v-model="defender.ships" required="required">
+                        <input type="number" class="form-control" id="defenderShips" placeholder="Ships" v-model="defender.ships" :required="true">
                     </div>
                 </div>
                 <div class="mb-2 row">
@@ -56,7 +56,7 @@
                       <span class="text-danger ms-2">{{attacker.player ? attacker.player.alias : 'Attacker'}}</span> Weapons
                     </label>
                     <div class="col-4">
-                        <input type="number" class="form-control" id="attackerWeaponTech" placeholder="Tech Level" v-model="attacker.weaponsLevel" required="required">
+                        <input type="number" class="form-control" id="attackerWeaponTech" placeholder="Tech Level" v-model="attacker.weaponsLevel" :required="true">
                     </div>
                 </div>
                 <div class="mb-2 row">
@@ -65,7 +65,7 @@
                       <span class="text-danger ms-2">{{attacker.carrier ? attacker.carrier.name : 'Attacker'}}</span> Ships
                     </label>
                     <div class="col-4">
-                        <input type="number" class="form-control" id="attackerShips" placeholder="Ships" v-model="attacker.ships" required="required">
+                        <input type="number" class="form-control" id="attackerShips" placeholder="Ships" v-model="attacker.ships" :required="true">
                     </div>
                 </div>
 
@@ -88,162 +88,183 @@
           <p class="col text-center mb-0" v-if="result.after.defender >= result.after.attacker"><span class="text-success">Defender</span> wins with <span class="text-success">{{result.after.defender}}</span> ship(s) remaining.</p>
           <p class="col text-center mb-0" v-if="result.after.attacker > result.after.defender"><span class="text-danger">Attacker</span> wins with <span class="text-danger">{{result.after.attacker}}</span> ship(s) remaining.</p>
         </div>
-        <div class="row bg-dark pb-2" v-if="result">
+        <div class="row bg-dark pb-2" v-if="result?.needed">
           <p class="col text-center mb-0" v-if="result.needed.defender"><small><span class="text-success">Defender</span> would need <span class="text-success">{{result.needed.defender}}</span> ship(s) to win.</small></p>
           <p class="col text-center mb-0" v-if="result.needed.attacker"><small><span class="text-danger">Attacker</span> would need <span class="text-danger">{{result.needed.attacker}}</span> ship(s) to win.</small></p>
         </div>
     </div>
 </template>
 
-<script>
-import LoadingSpinnerVue from '../../../components/LoadingSpinner.vue'
-import MenuTitle from '../MenuTitle.vue'
-import FormErrorList from '../../../components/FormErrorList.vue'
-import GameHelper from '../../../../services/gameHelper'
-import CarrierApiService from '../../../../services/api/carrier'
-import { inject } from 'vue';
+<script setup lang="ts">
+import LoadingSpinner from '../../../components/LoadingSpinner.vue';
+import MenuTitle from '../MenuTitle.vue';
+import FormErrorList from '../../../components/FormErrorList.vue';
+import GameHelper from '../../../../services/gameHelper';
+import {inject} from 'vue';
 import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
+import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";
+import type {Carrier, Game, Player, Star} from "@/types/game";
+import type {CombatResultShips} from "@solaris-common";
+import {calculateCombat} from "@/services/typedapi/carrier";
+import {onMounted, ref, computed} from 'vue';
+import {useStore} from 'vuex';
 
-export default {
-  components: {
-    'loading-spinner': LoadingSpinnerVue,
-    'menu-title': MenuTitle,
-    'form-error-list': FormErrorList
-  },
-  props: {
-    carrierId: String
-  },
+type CombatSide = {
+  ships: number,
+  weaponsLevel: number,
+  player: Player | null,
+  star: Star | null,
+  carrier: Carrier | null,
+}
 
-  setup () {
-    return {
-      eventBus: inject(eventBusInjectionKey)
+const props = defineProps<{
+  carrierId?: string,
+}>();
+
+const emit = defineEmits<{
+  onCloseRequested: [e: Event],
+}>();
+
+const store = useStore();
+
+const eventBus = inject(eventBusInjectionKey)!;
+const httpClient = inject(httpInjectionKey)!;
+
+const isLoading = ref(false);
+const errors = ref<string[]>([]);
+const isTurnBased = ref(true);
+const result = ref<CombatResultShips | null>(null);
+
+const game = computed<Game>(() => store.state.game);
+const hasDefenderBonus = computed(() => game.value.settings.specialGalaxy.defenderBonus === 'enabled');
+
+const includeDefenderBonus = ref(hasDefenderBonus.value);
+
+const defender = ref<CombatSide>({
+  ships: 0,
+  weaponsLevel: 1,
+  player: null,
+  star: null,
+  carrier: null,
+});
+
+const attacker = ref<CombatSide>({
+  ships: 0,
+  weaponsLevel: 1,
+  player: null,
+  star: null,
+  carrier: null,
+});
+
+const swapValues = () => {
+  let dS = defender.value.ships,
+      dW = defender.value.weaponsLevel,
+      aS = attacker.value.ships,
+      aW = attacker.value.weaponsLevel
+
+  defender.value.ships = aS
+  defender.value.weaponsLevel = aW
+  attacker.value.ships = dS
+  attacker.value.weaponsLevel = dW
+};
+
+const onCloseRequested = (e: Event) => {
+  eventBus.emit(MapCommandEventBusEventNames.MapCommandUnselectAllStars);
+  eventBus.emit(MapCommandEventBusEventNames.MapCommandUnselectAllCarriers);
+
+  emit('onCloseRequested', e);
+};
+
+const tryAutoCalculate = () => {
+  if (props.carrierId) {
+    // Work out where the carrier is travelling to and add the ships and weapons level
+    // of the destination star.
+    const attackerCarrier = GameHelper.getCarrierById(game.value, props.carrierId);
+    const attackerPlayer = attackerCarrier && GameHelper.getCarrierOwningPlayer(game.value, attackerCarrier);
+
+    if (!attackerCarrier || !attackerPlayer) {
+      return;
     }
-  },
-  data () {
-    return {
-      isLoading: false,
-      errors: [],
-      hasDefenderBonus: false,
-      includeDefenderBonus: true,
-      isTurnBased: true,
-      defender: {
-        ships: 0,
-        weaponsLevel: 1,
-        player: null,
-        star: null
-      },
-      attacker: {
-        ships: 0,
-        weaponsLevel: 1,
-        player: null,
-        carrier: null
-      },
-      result: null
-    }
-  },
-  async mounted () {
-    this.hasDefenderBonus = this.$store.state.game.settings.specialGalaxy.defenderBonus === 'enabled'
-    this.includeDefenderBonus = this.hasDefenderBonus
 
-    if (this.carrierId) {
-      await this.tryAutoCalculate()
-    }
-  },
-  methods: {
-    onCloseRequested (e) {
-      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandUnselectAllStars);
-      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandUnselectAllCarriers);
+    attacker.value.carrier = attackerCarrier;
+    attacker.value.player = attackerPlayer;
 
-      this.$emit('onCloseRequested', e)
-    },
-    swapValues () {
-      let dS = this.defender.ships,
-          dW = this.defender.weaponsLevel,
-          aS = this.attacker.ships,
-          aW = this.attacker.weaponsLevel
+    if (attacker.value.carrier?.waypoints && attacker.value.carrier?.waypoints.length) {
+      const defenderStar = GameHelper.getStarById(game.value, attacker.value.carrier.waypoints[0].destination);
 
-      this.defender.ships = aS
-      this.defender.weaponsLevel = aW
-      this.attacker.ships = dS
-      this.attacker.weaponsLevel = dW
-    },
-    async tryAutoCalculate () {
-      let game = this.$store.state.game
+      if (!defenderStar) {
+        return;
+      }
 
-      if (this.carrierId) {
-        // Work out where the carrier is travelling to and add the ships and weapons level
-        // of the destination star.
-        this.attacker.carrier = GameHelper.getCarrierById(game, this.carrierId)
-        this.attacker.player = GameHelper.getCarrierOwningPlayer(game, this.attacker.carrier)
+      defender.value.star = defenderStar;
 
-        if (this.attacker.carrier.waypoints && this.attacker.carrier.waypoints.length) {
-          this.defender.star = GameHelper.getStarById(game, this.attacker.carrier.waypoints[0].destination)
+      attacker.value.ships = attackerCarrier.ships || 0;
+      attacker.value.weaponsLevel = attackerPlayer.research.weapons.level;
 
-          this.attacker.ships = this.attacker.carrier.ships
-          this.attacker.weaponsLevel = this.attacker.player.research.weapons.level
+      if (defenderStar) { // May be out of scanning range.
+        const defenderPlayer = GameHelper.getStarOwningPlayer(game.value, defenderStar);
+        const defenderShips = GameHelper.getStarTotalKnownShips(game.value, defenderStar);
 
-          if (this.defender.star) { // May be out of scanning range.
-            this.defender.player = GameHelper.getStarOwningPlayer(game, this.defender.star)
-            let defenderShips = GameHelper.getStarTotalKnownShips(game, this.defender.star)
-
-            this.defender.ships = defenderShips
-
-            if (this.defender.player) {
-              this.defender.weaponsLevel = this.defender.player.research.weapons.level
-            }
-          }
+        if (defenderShips === null || !defenderPlayer) {
+          return;
         }
+
+        defender.value.player = defenderPlayer;
+        defender.value.ships = defenderShips;
+
+        defender.value.weaponsLevel = defender.value.player.research.weapons.level;
       }
-    },
-    async calculate (e) {
-      this.errors = []
-
-      if (this.defender.weaponsLevel <= 0) {
-        this.errors.push('Defender weapons level must be greater than 0.')
-      }
-
-      if (this.defender.ships < 0) {
-        this.errors.push('Defender ships must be greater than or equal to 0.')
-      }
-
-      if (this.attacker.weaponsLevel <= 0) {
-        this.errors.push('Attacker weapons level must be greater than 0.')
-      }
-
-      if (this.attacker.ships < 0) {
-        this.errors.push('Attacker ships must be greater than or equal to 0.')
-      }
-
-      if (e) {
-        e.preventDefault()
-      }
-
-      if (this.errors.length) return
-
-      this.isLoading = true
-      this.result = null
-
-      try {
-        let response = await CarrierApiService.calculateCombat(this.$store.state.game._id, {
-          weaponsLevel: +this.defender.weaponsLevel + (this.includeDefenderBonus ? 1 : 0),
-          ships: +this.defender.ships
-        }, {
-          weaponsLevel: +this.attacker.weaponsLevel,
-          ships: +this.attacker.ships
-        }, this.isTurnBased)
-
-        if (response.status === 200) {
-          this.result = response.data
-        }
-      } catch (err) {
-        console.error(err)
-      }
-
-      this.isLoading = false
     }
   }
+};
+
+const calculate = async (e: Event) => {
+  errors.value = [];
+
+  if (defender.value.weaponsLevel <= 0) {
+    errors.value.push('Defender weapons level must be greater than 0.');
+  }
+
+  if (defender.value.ships < 0) {
+    errors.value.push('Defender ships must be greater than or equal to 0.');
+  }
+
+  if (attacker.value.weaponsLevel <= 0) {
+    errors.value.push('Attacker weapons level must be greater than 0.');
+  }
+
+  if (attacker.value.ships < 0) {
+    errors.value.push('Attacker ships must be greater than or equal to 0.');
+  }
+
+  if (e) {
+    e.preventDefault();
+  }
+
+  if (errors.value.length) {
+    return;
+  }
+
+  isLoading.value = true;
+
+  const response = await calculateCombat(httpClient)(game.value._id, { ships: defender.value.ships, weaponsLevel: defender.value.weaponsLevel }, { ships: attacker.value.ships, weaponsLevel: attacker.value.weaponsLevel }, isTurnBased.value);
+
+  if (isOk(response)) {
+    result.value = response.data;
+  } else {
+    console.error(formatError(response));
+    errors.value = extractErrors(response);
+  }
+
+  isLoading.value = false;
 }
+
+onMounted(async () => {
+  if (props.carrierId) {
+    await tryAutoCalculate();
+  }
+});
 </script>
 
 <style scoped>
