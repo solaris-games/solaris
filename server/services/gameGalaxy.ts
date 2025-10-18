@@ -64,7 +64,7 @@ export default class GameGalaxyService {
     starDistanceService: StarDistanceService;
     starUpgradeService: StarUpgradeService;
     carrierService: CarrierService;
-    waypointService: WaypointService;
+    waypointService: WaypointService<DBObjectId>;
     researchService: ResearchService;
     specialistService: SpecialistService;
     technologyService: TechnologyService;
@@ -96,7 +96,7 @@ export default class GameGalaxyService {
         starDistanceService: StarDistanceService,
         starUpgradeService: StarUpgradeService,
         carrierService: CarrierService, 
-        waypointService: WaypointService,
+        waypointService: WaypointService<DBObjectId>,
         researchService: ResearchService,
         specialistService: SpecialistService,
         technologyService: TechnologyService,

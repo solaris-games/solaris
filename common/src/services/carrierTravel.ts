@@ -14,20 +14,20 @@ interface ISpecialistService {
     getByIdCarrier(id: number): Specialist | null;
 }
 
-interface IDiplomacyService {
-    isFormalAlliancesEnabled<ID>(game: Game<ID>): boolean;
-    isDiplomaticStatusToPlayersAllied<ID extends Id>(game: Game<ID>, playerId: ID, otherPlayerIds: ID[]): boolean;
+interface IDiplomacyService<ID extends Id> {
+    isFormalAlliancesEnabled(game: Game<ID>): boolean;
+    isDiplomaticStatusToPlayersAllied(game: Game<ID>, playerId: ID, otherPlayerIds: ID[]): boolean;
 }
 
-export class CarrierTravelService {
+export class CarrierTravelService<ID extends Id> {
     specialistService: ISpecialistService;
     technologyService: TechnologyService;
     distanceService: DistanceService;
     starDistanceService: StarDistanceService;
-    diplomacyService: IDiplomacyService;
+    diplomacyService: IDiplomacyService<ID>;
     starDataService: StarDataService;
 
-    constructor(specialistService: ISpecialistService, technologyService: TechnologyService, distanceService: DistanceService, starDistanceService: StarDistanceService, diplomacyService: IDiplomacyService, starDataService: StarDataService) {
+    constructor(specialistService: ISpecialistService, technologyService: TechnologyService, distanceService: DistanceService, starDistanceService: StarDistanceService, diplomacyService: IDiplomacyService<ID>, starDataService: StarDataService) {
         this.specialistService = specialistService;
         this.technologyService = technologyService;
         this.distanceService = distanceService;
@@ -36,7 +36,7 @@ export class CarrierTravelService {
         this.starDataService = starDataService;
     }
 
-    getCarrierDistancePerTick<ID extends Id>(game: Game<ID>, carrier: Carrier<ID>, warpSpeed: boolean = false, instantSpeed: boolean | null = false) {
+    getCarrierDistancePerTick(game: Game<ID>, carrier: Carrier<ID>, warpSpeed: boolean = false, instantSpeed: boolean | null = false) {
         if (instantSpeed) {
             return null;
         }
@@ -54,7 +54,7 @@ export class CarrierTravelService {
         return game.settings.specialGalaxy.carrierSpeed * distanceModifier;
     }
 
-    isWithinHyperspaceRange<ID extends Id>(game: Game<ID>, carrier: Carrier<ID>, sourceStar: Star<ID>, destinationStar: Star<ID>) {
+    isWithinHyperspaceRange(game: Game<ID>, carrier: Carrier<ID>, sourceStar: Star<ID>, destinationStar: Star<ID>) {
         // If the stars are a wormhole pair then they are always considered to be in hyperspace range.
         if (this.starDataService.isStarPairWormHole(sourceStar, destinationStar)) {
             return true;
@@ -68,7 +68,7 @@ export class CarrierTravelService {
         return distanceBetweenStars <= hyperspaceDistance;
     }
 
-    canTravelAtWarpSpeed<ID extends Id>(game: Game<ID>, player: Player<ID>, carrier: Carrier<ID>, sourceStar: Star<ID>, destinationStar: Star<ID>) {
+    canTravelAtWarpSpeed(game: Game<ID>, player: Player<ID>, carrier: Carrier<ID>, sourceStar: Star<ID>, destinationStar: Star<ID>) {
         // Double check for destroyed stars.
         if (sourceStar == null || destinationStar == null) {
             return false;
@@ -123,15 +123,15 @@ export class CarrierTravelService {
         return false;
     }
 
-    isInTransit<ID>(carrier: Carrier<ID>) {
+    isInTransit(carrier: Carrier<ID>) {
         return !carrier.orbiting;
     }
 
-    isInTransitTo<ID extends Id>(carrier: Carrier<ID>, star: Star<ID>) {
+    isInTransitTo(carrier: Carrier<ID>, star: Star<ID>) {
         return this.isInTransit(carrier) && carrier.waypoints[0].destination.toString() === star._id.toString();
     }
 
-    isLaunching<ID extends Id>(carrier: Carrier<ID>) {
+    isLaunching(carrier: Carrier<ID>) {
         return carrier.orbiting && carrier.waypoints.length && carrier.waypoints[0].delayTicks === 0;
     }
 }

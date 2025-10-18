@@ -10,24 +10,24 @@ import type {Carrier} from "../types/common/carrier";
 import type {Id} from "../types/id";
 import type {Player} from "../types/common/player";
 
-interface IStarService {
-    getById<ID>(game: Game<ID>, id: ID): Star<ID>;
+interface IStarService<ID> {
+    getById(game: Game<ID>, id: ID): Star<ID>;
 }
 
-export class WaypointService {
-    starService: IStarService;
+export class WaypointService<ID extends Id> {
+    starService: IStarService<ID>;
     distanceService: DistanceService;
     starDistanceService: StarDistanceService;
     technologyService: TechnologyService;
-    carrierTravelService: CarrierTravelService;
+    carrierTravelService: CarrierTravelService<ID>;
     starDataService: StarDataService;
 
     constructor(
-        starService: IStarService,
+        starService: IStarService<ID>,
         distanceService: DistanceService,
         starDistanceService: StarDistanceService,
         technologyService: TechnologyService,
-        carrierTravelService: CarrierTravelService,
+        carrierTravelService: CarrierTravelService<ID>,
         starDataService: StarDataService,
     ) {
         this.starService = starService;
@@ -43,7 +43,7 @@ export class WaypointService {
         return actions.includes(action);
     }
 
-    starRouteIsWithinHyperspaceRange<ID extends Id>(game: Game<ID>, carrier: Carrier<ID>, sourceStar: Star<ID>, destinationStar: Star<ID>) {
+    starRouteIsWithinHyperspaceRange(game: Game<ID>, carrier: Carrier<ID>, sourceStar: Star<ID>, destinationStar: Star<ID>) {
         // Stars may have been destroyed.
         if (!sourceStar || !destinationStar) {
             return false;
@@ -52,7 +52,7 @@ export class WaypointService {
         return this.carrierTravelService.isWithinHyperspaceRange(game, carrier, sourceStar, destinationStar);
     }
 
-    canLoop<ID extends Id>(game: Game<ID>, carrier: Carrier<ID>) {
+    canLoop(game: Game<ID>, carrier: Carrier<ID>) {
         if (carrier.waypoints.length < 2 || carrier.isGift) {
             return false;
         }
@@ -80,7 +80,7 @@ export class WaypointService {
         return distanceBetweenStars <= hyperspaceDistance
     }
 
-    calculateTicksForDistance<ID extends Id>(game: Game<ID>, player: Player<ID>, carrier: Carrier<ID>, sourceStar: Star<ID>, destinationStar: Star<ID>): number {
+    calculateTicksForDistance(game: Game<ID>, player: Player<ID>, carrier: Carrier<ID>, sourceStar: Star<ID>, destinationStar: Star<ID>): number {
         const distance = this.distanceService.getDistanceBetweenLocations(sourceStar.location, destinationStar.location);
         const warpSpeed = this.carrierTravelService.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar);
 
@@ -93,7 +93,7 @@ export class WaypointService {
         return 1;
     }
 
-    calculateWaypointTicks<ID extends Id>(game: Game<ID>, carrier: Carrier<ID>, waypoint: CarrierWaypoint<ID>) {
+    calculateWaypointTicks(game: Game<ID>, carrier: Carrier<ID>, waypoint: CarrierWaypoint<ID>) {
         const delayTicks = waypoint.delayTicks || 0;
 
         const carrierOwner = game.galaxy.players.find(p => p._id.toString() === carrier.ownedByPlayerId!.toString())!;
@@ -139,7 +139,7 @@ export class WaypointService {
         return ticks;
     }
 
-    calculateWaypointTicksEta<ID extends Id>(game: Game<ID>, carrier: Carrier<ID>, waypoint: CarrierWaypoint<ID>) {
+    calculateWaypointTicksEta(game: Game<ID>, carrier: Carrier<ID>, waypoint: CarrierWaypoint<ID>) {
         let totalTicks = 0;
 
         for (let i = 0; i < carrier.waypoints.length; i++) {
@@ -155,7 +155,7 @@ export class WaypointService {
         return totalTicks;
     }
 
-    populateCarrierWaypointEta<ID extends Id>(game: Game<ID>, carrier: Carrier<ID>) {
+    populateCarrierWaypointEta(game: Game<ID>, carrier: Carrier<ID>) {
         carrier.waypoints.forEach(w => {
             w.ticks = this.calculateWaypointTicks(game, carrier, w);
             w.ticksEta = this.calculateWaypointTicksEta(game, carrier, w);

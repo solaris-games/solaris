@@ -96,6 +96,7 @@ import SaveWaypointsService from "../saveWaypoints";
 import CullWaypointsService from "../cullWaypoints";
 import { CarrierTravelService } from 'solaris-common';
 import { StarDataService } from "solaris-common";
+import {DBObjectId} from "./DBObjectId";
 
 export interface DependencyContainer {
     config: Config,
@@ -145,7 +146,7 @@ export interface DependencyContainer {
     technologyService: TechnologyService,
     tradeService: TradeService,
     userService: UserService,
-    waypointService: WaypointService,
+    waypointService: WaypointService<DBObjectId>,
     shipTransferService: ShipTransferService,
     historyService: HistoryService,
     ledgerService: LedgerService,
@@ -194,6 +195,6 @@ export interface DependencyContainer {
     waypointActionService: WaypointActionService,
     saveWaypointsService: SaveWaypointsService,
     cullWaypointsService: CullWaypointsService,
-    carrierTravelService: CarrierTravelService,
+    carrierTravelService: CarrierTravelService<DBObjectId>,
     starDataService: StarDataService,
 };

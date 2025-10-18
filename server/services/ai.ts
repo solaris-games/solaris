@@ -138,7 +138,7 @@ export default class AIService {
     carrierService: CarrierService;
     starService: StarService;
     distanceService: DistanceService;
-    waypointService: WaypointService;
+    waypointService: WaypointService<DBObjectId>;
     combatService: CombatService;
     shipTransferService: ShipTransferService;
     technologyService: TechnologyService;
@@ -158,7 +158,7 @@ export default class AIService {
         carrierService: CarrierService,
         starService: StarService,
         distanceService: DistanceService,
-        waypointService: WaypointService,
+        waypointService: WaypointService<DBObjectId>,
         combatService: CombatService,
         shipTransferService: ShipTransferService,
         technologyService: TechnologyService,

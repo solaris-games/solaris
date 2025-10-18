@@ -94,7 +94,7 @@ export default class GameTickService extends EventEmitter {
     statisticsService: StatisticsService;
     waypointActionService: WaypointActionService;
     cullWaypointsService: CullWaypointsService;
-    carrierTravelService: CarrierTravelService;
+    carrierTravelService: CarrierTravelService<DBObjectId>;
 
     constructor(
         distanceService: DistanceService,
@@ -130,7 +130,7 @@ export default class GameTickService extends EventEmitter {
         statisticsService: StatisticsService,
         waypointActionService: WaypointActionService,
         cullWaypointsService: CullWaypointsService,
-        carrierTravelService: CarrierTravelService,
+        carrierTravelService: CarrierTravelService<DBObjectId>,
     ) {
         super();
             

@@ -15,7 +15,7 @@ export default class SaveWaypointsService {
     gameRepo: Repository<Game>;
     carrierMovementService: CarrierMovementService;
     starService: StarService;
-    waypointService: WaypointService;
+    waypointService: WaypointService<DBObjectId>;
     carrierService: CarrierService;
     starDataService: StarDataService;
 
@@ -23,7 +23,7 @@ export default class SaveWaypointsService {
         gameRepo: Repository<Game>,
         carrierMovementService: CarrierMovementService,
         starService: StarService,
-        waypointService: WaypointService,
+        waypointService: WaypointService<DBObjectId>,
         carrierService: CarrierService,
         starDataService: StarDataService,
     ) {

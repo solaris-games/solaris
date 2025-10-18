@@ -43,7 +43,7 @@ export default class CarrierMovementService {
     carrierGiftService: CarrierGiftService;
     technologyService: TechnologyService;
     starDistanceService: StarDistanceService;
-    carrierTravelService: CarrierTravelService;
+    carrierTravelService: CarrierTravelService<DBObjectId>;
     starDataService: StarDataService;
 
     constructor(
@@ -55,7 +55,7 @@ export default class CarrierMovementService {
         carrierGiftService: CarrierGiftService,
         technologyService: TechnologyService,
         starDistanceService: StarDistanceService,
-        carrierTravelService: CarrierTravelService,
+        carrierTravelService: CarrierTravelService<DBObjectId>,
         starDataService: StarDataService,
     ) {
         this.gameRepo = gameRepo;

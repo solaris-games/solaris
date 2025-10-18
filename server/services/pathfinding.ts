@@ -6,6 +6,7 @@ import StarService from "./star";
 import { Star } from "./types/Star";
 import { WaypointService } from 'solaris-common';
 import { StarDataService } from "solaris-common";
+import {DBObjectId} from "./types/DBObjectId";
 
 // Copied and adapted from WaypointHelper in the frontend
 // Should probably be put into a shared library at some point
@@ -21,10 +22,10 @@ interface Node {
 export default class PathfindingService {
     distanceService: DistanceService;
     starService: StarService;
-    waypointService: WaypointService;
+    waypointService: WaypointService<DBObjectId>;
     starDataService: StarDataService;
 
-    constructor(distanceService: DistanceService, starService: StarService, waypointService: WaypointService, starDataService: StarDataService) {
+    constructor(distanceService: DistanceService, starService: StarService, waypointService: WaypointService<DBObjectId>, starDataService: StarDataService) {
         this.distanceService = distanceService;
         this.starService = starService;
         this.waypointService = waypointService;

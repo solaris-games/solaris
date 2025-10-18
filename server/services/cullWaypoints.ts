@@ -8,21 +8,22 @@ import { WaypointService } from 'solaris-common';
 import {Player} from "./types/Player";
 import { CarrierTravelService } from 'solaris-common';
 import { StarDataService } from "solaris-common";
+import {DBObjectId} from "./types/DBObjectId";
 
 export default class CullWaypointsService {
     gameRepo: Repository<Game>;
     starService: StarService;
     playerService: PlayerService;
-    waypointService: WaypointService;
-    carrierTravelService: CarrierTravelService;
+    waypointService: WaypointService<DBObjectId>;
+    carrierTravelService: CarrierTravelService<DBObjectId>;
     starDataService: StarDataService;
 
     constructor(
         gameRepo: Repository<Game>,
         starService: StarService,
         playerService: PlayerService,
-        waypointService: WaypointService,
-        carrierTravelService: CarrierTravelService,
+        waypointService: WaypointService<DBObjectId>,
+        carrierTravelService: CarrierTravelService<DBObjectId>,
         starDataService: StarDataService,
     ) {
         this.gameRepo = gameRepo;

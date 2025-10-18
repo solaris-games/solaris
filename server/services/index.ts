@@ -244,7 +244,7 @@ export default (config: Config,
     const combatService = new CombatService(technologyService, specialistService, playerService, starService, reputationService, diplomacyService, gameTypeService, starCaptureService, statisticsService);
     const historyService = new HistoryService(historyRepository, playerService, gameService, playerStatisticsService, gameStateService);
     const waypointActionService = new WaypointActionService();
-    const waypointService = new WaypointService(starService as any, distanceService, starDistanceService, technologyService, carrierTravelService, starDataService); // todo: fix any once we consolidate common lib and server types
+    const waypointService = new WaypointService<DBObjectId>(starService as any, distanceService, starDistanceService, technologyService, carrierTravelService, starDataService); // todo: fix any once we consolidate common lib and server types
     const cullWaypointsService = new CullWaypointsService(gameRepository, starService, playerService, waypointService, carrierTravelService, starDataService);
     const saveWaypointsService = new SaveWaypointsService(gameRepository, carrierMovementService, starService, waypointService, carrierService, starDataService);
     const specialistBanService = new SpecialistBanService(specialistService);
