@@ -2,7 +2,6 @@ import {DBObjectId} from "./DBObjectId";
 import {Infrastructure, NaturalResources} from "./Star";
 import {PlayerDiplomaticState, PlayerResearch, ResearchType, ResearchTypeNotRandom} from "./Player";
 import {Location} from "./Location";
-import {Specialist} from "./Specialist";
 import {CarrierWaypoint} from "./CarrierWaypoint";
 
 export type InitialStar = {
@@ -20,6 +19,7 @@ export type InitialStar = {
     isPulsar: boolean;
     wormHoleToStarId: DBObjectId | null;
     specialistId: number | null;
+    specialistExpireTick: number | null;
 }
 
 export type InitialPlayer = {
