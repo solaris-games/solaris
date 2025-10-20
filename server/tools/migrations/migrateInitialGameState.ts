@@ -5,15 +5,50 @@ import { Star } from "../../services/types/Star";
 import { JobParameters } from "../tool";
 
 const mapPlayer = (player: Player): InitialPlayer => {
-    return {} as any as InitialPlayer;
+    return {
+        playerId: player._id,
+        researchingNow: player.researchingNow,
+        researchingNext: player.researchingNext,
+        credits: player.credits,
+        creditsSpecialists: player.creditsSpecialists,
+        research: player.research,
+        diplomacy: player.diplomacy,
+    };
 };
 
 const mapStar = (star: Star): InitialStar => {
-    return {} as any as InitialStar;
+    return {
+        starId: star._id,
+        name: star.name,
+        naturalResources: star.naturalResources,
+        infrastructure: star.infrastructure,
+        ships: star.ships,
+        ownedByPlayerId: star.ownedByPlayerId,
+        warpGate: star.warpGate,
+        isNebula: star.isNebula,
+        isAsteroidField: star.isAsteroidField,
+        isBinaryStar: star.isBinaryStar,
+        isBlackHole: star.isBlackHole,
+        isPulsar: star.isPulsar,
+        wormHoleToStarId: star.wormHoleToStarId,
+        specialistId: star.specialistId,
+        specialistExpireTick: star.specialistExpireTick,
+    };
 };
 
 const mapCarrier = (carrier: Carrier): InitialCarrier => {
-    return {} as any as InitialCarrier;
+    return {
+        carrierId: carrier._id,
+        orbiting: carrier.orbiting,
+        name: carrier.name,
+        ownedByPlayerId: carrier.ownedByPlayerId!,
+        ships: carrier.ships || 1,
+        specialistId: carrier.specialistId,
+        specialistExpireTick: carrier.specialistExpireTick,
+        isGift: carrier.isGift,
+        location: carrier.location,
+        waypoints: carrier.waypoints,
+    };
 };
 
 export const migrateInitialGameState = async (ctx: JobParameters) => {
