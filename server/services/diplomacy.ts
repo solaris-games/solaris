@@ -286,12 +286,12 @@ export default class DiplomacyService extends EventEmitter {
             await this.diplomacyUpkeepService.deductUpkeep(game, player, 1, saveToDB);
         }
         
-        let wasAtWar = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget).actualStatus === 'enemies';
+        const oldState = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget).actualStatus;
 
-        let newStatus = await this._declareStatus(game, playerId, playerIdTarget, 'allies', saveToDB);
+        const newStatus = await this._declareStatus(game, playerId, playerIdTarget, 'allies', saveToDB);
 
-        let isAllied = newStatus.actualStatus === 'allies';
-        let isFriendly = isAllied || newStatus.actualStatus === 'neutral';
+        const isAllied = newStatus.actualStatus === 'allies';
+        const isFriendly = isAllied || newStatus.actualStatus === 'neutral';
 
         this.emit(DiplomacyServiceEvents.onDiplomacyStatusChanged, {
             gameId: game._id,
@@ -299,8 +299,8 @@ export default class DiplomacyService extends EventEmitter {
             status: newStatus
         });
 
-        // Create a global event for peace reached if both players were at war and are now either neutral or allied.
-        if (this.isGlobalEventsEnabled(game) && wasAtWar && isFriendly) {
+        // Create a global event for peace reached
+        if (this.isGlobalEventsEnabled(game) && isFriendly && newStatus.actualStatus !== oldState) {
             let e: GameDiplomacyPeaceDeclaredEvent = {
                 gameId: game._id,
                 gameTick: game.state.tick,
