@@ -1,50 +1,29 @@
 import { Carrier } from "../../services/types/Carrier";
-import { InitialGameState } from "../../services/types/InitialGameState";
+import {InitialCarrier, InitialGameState, InitialPlayer, InitialStar} from "../../services/types/InitialGameState";
 import { Player } from "../../services/types/Player";
 import { Star } from "../../services/types/Star";
 import { JobParameters } from "../tool";
 
-const mapPlayer = (player: Player): Player => {
+const mapPlayer = (player: Player): InitialPlayer => {
     return {
-        alias: 'Empty Slot',
-        lastSeen: null,
-        lastSeenIP: null,
-        spectators: [],
-        scheduledActions: [],
-        isOpenSlot: true,
-        userId: null,
-        avatar: null,
-        colour: player.colour,
-        shape: player.shape,
+        playerId: player._id,
         researchingNow: player.researchingNow,
         researchingNext: player.researchingNext,
-        defeated: false,
         credits: player.credits,
         creditsSpecialists: player.creditsSpecialists,
-        defeatedDate: null,
-        afk: false,
-        renownToGive: player.renownToGive,
-        ready: false,
-        readyToCycle: false,
-        missedTurns: 0,
-        hasSentTurnReminder: false,
-        hasFilledAfkSlot: false,
         research: player.research,
-        ledger: player.ledger,
-        reputations: player.reputations,
         diplomacy: player.diplomacy,
-        homeStarId: player.homeStarId,
-    } as any as Player;
+    };
 };
 
-const mapStar = (star: Star): Star => {
+const mapStar = (star: Star): InitialStar => {
     return {
+        starId: star._id,
         name: star.name,
         naturalResources: star.naturalResources,
+        infrastructure: star.infrastructure,
         ships: star.ships,
-        specialistId: null,
-        specialistExpireTick: null,
-        homeStar: star.homeStar,
+        ownedByPlayerId: star.ownedByPlayerId,
         warpGate: star.warpGate,
         isNebula: star.isNebula,
         isAsteroidField: star.isAsteroidField,
@@ -52,27 +31,24 @@ const mapStar = (star: Star): Star => {
         isBlackHole: star.isBlackHole,
         isPulsar: star.isPulsar,
         wormHoleToStarId: star.wormHoleToStarId,
-        infrastructure: star.infrastructure,
-        ownedByPlayerId: star.ownedByPlayerId,
-        location: star.location,
-    } as any as Star;
+        specialistId: star.specialistId,
+        specialistExpireTick: star.specialistExpireTick,
+    };
 };
 
-const mapCarrier = (carrier: Carrier): Carrier => {
+const mapCarrier = (carrier: Carrier): InitialCarrier => {
     return {
-        name: carrier.name,
-        location: carrier.location,
-        waypoints: [],
-        waypointsLooped: false,
+        carrierId: carrier._id,
         orbiting: carrier.orbiting,
-        ships: carrier.ships,
-        specialistId: null,
-        specialistExpireTick: null,
-        specialist: null,
-        isGift: false,
-        locationNext: null,
-        ownedByPlayerId: carrier.ownedByPlayerId,
-    } as any as Carrier;
+        name: carrier.name,
+        ownedByPlayerId: carrier.ownedByPlayerId!,
+        ships: carrier.ships || 1,
+        specialistId: carrier.specialistId,
+        specialistExpireTick: carrier.specialistExpireTick,
+        isGift: carrier.isGift,
+        location: carrier.location,
+        waypoints: carrier.waypoints,
+    };
 };
 
 export const migrateInitialGameState = async (ctx: JobParameters) => {
@@ -85,6 +61,8 @@ export const migrateInitialGameState = async (ctx: JobParameters) => {
     }, {
         _id: 1,
     });
+
+    await ctx.container.initialGameStateService.initialGameStateRepo.deleteMany({});
 
     log.info(`${games.length} open games found...`);
 

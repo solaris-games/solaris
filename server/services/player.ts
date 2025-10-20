@@ -361,8 +361,10 @@ export default class PlayerService extends EventEmitter {
             throw new ValidationError("Failed to quit game", 500);
         }
 
-        const initialPlayer = initialGameState.galaxy.players.find(p => p._id.toString() === playerId)!;
+        const initialPlayer = initialGameState.galaxy.players.find(p => p.playerId.toString() === playerId)!;
 
+        player.credits = initialPlayer.credits;
+        player.creditsSpecialists = initialPlayer.creditsSpecialists;
         player.researchingNow = initialPlayer.researchingNow;
         player.researchingNext = initialPlayer.researchingNext;
         player.research = initialPlayer.research;
@@ -372,25 +374,28 @@ export default class PlayerService extends EventEmitter {
         const playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
         for (let star of playerStars) {
-            const initialStar = initialGameState?.galaxy.stars.find(s => s._id.toString() === star._id.toString())!;
+            const initialStar = initialGameState?.galaxy.stars.find(s => s.starId.toString() === star._id.toString())!;
 
-            star.homeStar = initialStar.homeStar;
-            star.ignoreBulkUpgrade = undefined;
+            star.ignoreBulkUpgrade = {
+                economy: false,
+                industry: false,
+                science: false,
+            };
+            star.name = initialStar.name;
             star.infrastructure = initialStar.infrastructure;
+            star.naturalResources = initialStar.naturalResources;
             star.isAsteroidField = initialStar.isAsteroidField;
             star.isNebula = initialStar.isNebula;
             star.isBinaryStar = initialStar.isBinaryStar;
             star.isBlackHole = initialStar.isBlackHole;
             star.isPulsar = initialStar.isPulsar;
-            star.isKingOfTheHillStar = initialStar.isKingOfTheHillStar;
             star.name = initialStar.name;
-            star.naturalResources = initialStar.naturalResources;
             star.ownedByPlayerId = initialStar.ownedByPlayerId;
             star.ships = initialStar.ships;
             star.specialistId = initialStar.specialistId;
             star.specialistExpireTick = initialStar.specialistExpireTick;
             star.warpGate = initialStar.warpGate;
-            star.wormHoleToStarId = star.wormHoleToStarId;
+            star.wormHoleToStarId = initialStar.wormHoleToStarId;
         }
 
         // Reset the player's carriers
@@ -398,7 +403,28 @@ export default class PlayerService extends EventEmitter {
 
         const initialCarriers = initialGameState.galaxy.carriers.filter(c => c.ownedByPlayerId?.toString() === playerId);
 
-        game.galaxy.carriers.push(...initialCarriers);
+        for (let savedCarrier of initialCarriers) {
+            const newCarrier: Carrier = {
+                orbiting: savedCarrier.orbiting,
+                name: savedCarrier.name,
+                ownedByPlayerId: player._id,
+                ships: savedCarrier.ships,
+                specialistId: savedCarrier.specialistId,
+                specialistExpireTick: savedCarrier.specialistExpireTick,
+                isGift: savedCarrier.isGift,
+                location: savedCarrier.location,
+                waypoints: savedCarrier.waypoints,
+                waypointsLooped: false,
+                _id: mongoose.Types.ObjectId(),
+                specialist: null,
+                locationNext: null,
+                toObject(): Carrier {
+                    return this;
+                }
+            }
+
+            game.galaxy.carriers.push(newCarrier);
+        }
     }
 
     _getNewPlayerHomeStar(game: Game, starLocations: Location[], galaxyCenter: Location, distanceFromCenter: number, radians: number[]) {
