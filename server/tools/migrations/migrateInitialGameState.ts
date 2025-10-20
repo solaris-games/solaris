@@ -62,6 +62,8 @@ export const migrateInitialGameState = async (ctx: JobParameters) => {
         _id: 1,
     });
 
+    await ctx.container.initialGameStateService.initialGameStateRepo.deleteMany({});
+
     log.info(`${games.length} open games found...`);
 
     for (let slimGame of games) {
