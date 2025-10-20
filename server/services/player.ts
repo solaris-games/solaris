@@ -415,7 +415,7 @@ export default class PlayerService extends EventEmitter {
                 location: savedCarrier.location,
                 waypoints: savedCarrier.waypoints,
                 waypointsLooped: false,
-                _id: mongoose.Types.ObjectId(),
+                _id: new mongoose.Types.ObjectId(),
                 specialist: null,
                 locationNext: null,
                 toObject(): Carrier {
