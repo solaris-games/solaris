@@ -92,6 +92,8 @@ app.provide(httpInjectionKey, httpClient);
 
 app.provide(toastInjectionKey, app.config.globalProperties.$toast);
 
+
+
 const clientHandler: ClientHandler = new ClientHandler(socket, store, playerClientSocketEmitter, userClientSocketEmitter);
 
 const confirm = makeConfirm(store);

@@ -36,7 +36,7 @@ import AudioService from '../../game/audio'
 import gameHelper from '../../services/gameHelper'
 import ColourOverrideDialog from "./components/player/ColourOverrideDialog.vue";
 import { eventBusInjectionKey } from '../../eventBus'
-import { inject, ref, computed, onMounted, onUnmounted, onBeforeUnmount, type Ref } from 'vue';
+import { inject, ref, computed, onMounted, onUnmounted, onBeforeUnmount, provide, type Ref } from 'vue';
 import { playerClientSocketEmitterInjectionKey } from '../../sockets/socketEmitters/player'
 import GameEventBusEventNames from '../../eventBusEventNames/game'
 import router from '../../router'
@@ -50,6 +50,7 @@ import {toastInjectionKey} from "@/util/keys";
 import { useRoute } from 'vue-router';
 import type {ObjectClicked} from "@/eventBusEventNames/map";
 import {detailGalaxy, detailState} from "@/services/typedapi/game";
+import {createGameServices, gameServicesKey} from "@/util/gameServices";
 
 const store: Store<State> = useStore();
 
@@ -76,6 +77,9 @@ const hasGame = computed(() => Boolean(store.state.game));
 const isLoggedIn = computed(() => Boolean(store.state.userId));
 
 const isHistorical = computed(() => store.state.tick !== store.state.game.state.tick);
+
+const gameServices = createGameServices(store);
+provide(gameServicesKey, gameServices);
 
 const onColourOverrideConfirmed = () => {
   colourOverride.value = null;
