@@ -68,7 +68,7 @@
         <div class="col-6"></div>
         <div class="col pe-0">
           <div class="d-grid gap-2">
-            <button type="button" class="btn btn-success me-1" :disabled="$isHistoricalMode() || isTransferringShips || starShips < 0 || carrierShips < 1" @click="saveTransfer">
+            <button type="button" class="btn btn-success me-1" :disabled="isHistoricalMode || isTransferringShips || starShips < 0 || carrierShips < 1" @click="saveTransfer">
               <i class="fas fa-check"></i>
               Transfer
             </button>
@@ -81,175 +81,183 @@
 </div>
 </template>
 
-<script>
-import { mapState } from 'vuex'
-import GameHelper from '../../../../services/gameHelper'
-import CarrierApiService from '../../../../services/api/carrier'
-import MenuTitle from '../MenuTitle.vue'
-import StarLabelVue from '../star/StarLabel.vue'
+<script setup lang="ts">
+import { useStore } from 'vuex';
+import GameHelper from '../../../../services/gameHelper';
+import MenuTitle from '../MenuTitle.vue';
+import StarLabel from '../star/StarLabel.vue';
+import { ref, computed, inject, watch } from 'vue';
+import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
+import {toastInjectionKey} from "@/util/keys";
+import type {Game, Star, Carrier} from "@/types/game";
+import {transferShips} from "@/services/typedapi/carrier";
+import {useIsHistoricalMode} from "@/util/reactiveHooks";
 
-export default {
-  components: {
-    'menu-title': MenuTitle,
-    'star-label': StarLabelVue
-  },
-  props: {
-    carrierId: String
-  },
-  data () {
-    return {
-      userPlayer: null,
-      carrierOwningPlayer: null,
-      carrier: null,
-      star: null,
-      starShips: 0,
-      carrierShips: 0,
-      isTransferringShips: false,
-      carrierWaypointDestination: null,
-      canEditWaypoints: false
-    }
-  },
-  mounted () {
-    this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
-    this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
-    this.star = GameHelper.getStarById(this.$store.state.game, this.carrier.orbiting)
-    this.carrierOwningPlayer = GameHelper.getCarrierOwningPlayer(this.$store.state.game, this.carrier)
+const props = defineProps<{
+  carrierId: string,
+}>();
 
-    this.starShips = this.star.ships
-    this.carrierShips = this.carrier.ships
+const emit = defineEmits<{
+  onCloseRequested: [e: Event],
+  onShipsTransferred: [carrierId: string],
+  onEditWaypointsRequested: [carrierId: string],
+}>();
 
-    if (this.carrier.waypoints && this.carrier.waypoints.length) {
-      this.carrierWaypointDestination = this.carrier.waypoints[0].destination
-    }
+const httpClient = inject(httpInjectionKey)!;
+const toast = inject(toastInjectionKey)!;
 
-    this.canEditWaypoints = this.userPlayer && this.carrierOwningPlayer == this.userPlayer && this.carrier && !this.userPlayer.defeated && !this.carrier.isGift && !GameHelper.isGameFinished(this.$store.state.game)
-  },
-  methods: {
-    onCloseRequested (e) {
-      this.$emit('onCloseRequested', e)
-    },
-    onGameReloaded (data) {
-      // When the game ticks there may have been ships built at the star.
-      // Find the star in the tick report and compare the ships, then add
-      // the difference to the star ships side on the transfer.
+const store = useStore();
+const isHistoricalMode = useIsHistoricalMode(store);
 
-      // NOTE: At this stage the star will have the latest data for its ships
-      // as the store deals with updating the star.
-      this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
-      this.star = GameHelper.getStarById(this.$store.state.game, this.carrier.orbiting)
+const game = computed<Game>(() => store.state.game);
+const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
+const carrier = ref<Carrier | undefined>(GameHelper.getCarrierById(game.value, props.carrierId));
+const carrierOwningPlayer = computed(() => carrier.value && GameHelper.getCarrierOwningPlayer(game.value, carrier.value));
+const star = ref<Star | undefined>(carrier.value?.orbiting && GameHelper.getStarById(game.value, carrier.value.orbiting) || undefined);
+const canEditWaypoints = computed(() => {
+  return userPlayer.value &&
+         carrierOwningPlayer.value == userPlayer.value &&
+         carrier.value &&
+         !userPlayer.value.defeated &&
+         !carrier.value.isGift &&
+         !GameHelper.isGameFinished(game.value);
+});
+const carrierWaypointDestination = computed(() => carrier.value?.waypoints?.length && carrier.value.waypoints[0].destination || undefined);
 
-      // If the game ticks then check to see if any ships have been built at the star.
-      let totalInTransfer = this.starShips + this.carrierShips
-      let totalOriginal = this.star.ships + this.carrier.ships
-      let difference = totalOriginal - totalInTransfer
+const isTransferringShips = ref(false);
+const starShips = ref(0);
+const carrierShips = ref(0);
 
-      // If there is a difference then this means that ship(s) have been built at the star
-      // while the user has been on this screen, in that case, add the new ships to the star total
-      if (difference) {
-        this.starShips += difference
-        this.onStarShipsChanged()
-      }
-    },
-    onStarShipsChanged(e) {
-      let difference = this.ensureInt(this.starShips) - this.star.ships;
-      this.carrierShips = this.carrier.ships - difference;
-    },
-    onStarShipsBlur(e) {
-      this.starShips = this.ensureInt(this.starShips);
-    },
-    onCarrierShipsChanged(e) {
-      let difference = this.ensureInt(this.carrierShips) - this.carrier.ships;
-      this.starShips = this.star.ships - difference;
-    },
-    onCarrierShipsBlur(e) {
-      this.carrierShips = this.ensureInt(this.carrierShips);
-    },
-    onMinShipsClicked (e) {
-      this.carrierShips = 1
-      this.starShips = this.carrier.ships + this.star.ships - 1
-    },
-    onMaxShipsClicked (e) {
-      this.starShips = 0
-      this.carrierShips = this.carrier.ships + this.star.ships
-    },
-    onTransferLeftClicked(e) {
-      this.starShips+=e
-      this.carrierShips-=e
-    },
-    onTransferRightClicked(e) {
-      this.carrierShips+=e
-      this.starShips-=e
-    },
-    ensureInt(v) {
-      v = parseInt(v);
+const onCloseRequested = (e: Event) => emit('onCloseRequested', e);
 
-      if (isNaN(v)) {
-        v = 0;
-      }
+const ensureInt = (v: any): number => {
+  v = parseInt(v);
 
-      return v;
-    },
-    async saveTransfer (e) {
-      let result = await this.performSaveTransfer()
-
-      if (result) {
-        this.$emit('onShipsTransferred', this.carrier._id)
-      }
-    },
-    async onEditWaypointsRequested (e) {
-      let result = await this.performSaveTransfer()
-
-      if (result) {
-        this.$emit('onEditWaypointsRequested', this.carrier._id)
-      }
-    },
-    async performSaveTransfer() {
-      let transferred = false
-
-      try {
-        this.isTransferringShips = true
-
-        let cShips = this.carrierShips;
-        let sShips = this.starShips;
-
-        let response = await CarrierApiService.transferShips(
-          this.$store.state.game._id,
-          this.carrier._id,
-          cShips,
-          this.star._id,
-          sShips)
-
-        if (response.status === 200) {
-          this.$toast.default(`Ships transferred between ${this.star.name} and ${this.carrier.name}.`)
-
-          this.$store.commit('gameStarCarrierShipTransferred', {
-            starId: this.star._id,
-            carrierId: this.carrier._id,
-            starShips: sShips,
-            carrierShips: cShips
-          })
-
-          this.star.ships = sShips
-          this.carrier.ships = cShips
-
-          transferred = true
-        }
-      } catch (err) {
-        console.log(err)
-      }
-
-      this.isTransferringShips = false
-
-      return transferred
-    }
-  },
-  computed: mapState(['game']),
-  watch: {
-    game (newGame, oldGame) {
-      this.onGameReloaded(newGame)
-    }
+  if (isNaN(v)) {
+    v = 0;
   }
+
+  return v;
+};
+
+const onMinShipsClicked = () => {
+  carrierShips.value = 1;
+  starShips.value = (carrier.value?.ships || 0) + (star.value?.ships || 0) - 1;
+};
+
+const onMaxShipsClicked = () => {
+  starShips.value = 0;
+  carrierShips.value = (carrier.value?.ships || 0) + (star.value?.ships || 0);
 }
+
+const onCarrierShipsChanged = () =>{
+  const difference = ensureInt(carrierShips.value) - (carrier.value?.ships || 0);
+  starShips.value = (star.value?.ships || 0) - difference;
+};
+
+const onStarShipsChanged = () => {
+  const difference = ensureInt(starShips.value) - (star.value?.ships || 0);
+  carrierShips.value = (carrier.value?.ships || 0) - difference;
+};
+
+const onStarShipsBlur = () => {
+  starShips.value = ensureInt(starShips.value);
+};
+
+const onCarrierShipsBlur = () => {
+  carrierShips.value = ensureInt(carrierShips.value);
+};
+
+const onTransferLeftClicked = (v: number) => {
+  starShips.value += v;
+  carrierShips.value -= v;
+};
+
+const onTransferRightClicked = (v: number) => {
+  carrierShips.value += v;
+  starShips.value -= v;
+};
+
+const onGameReloaded = (data) => {
+  // When the game ticks there may have been ships built at the star.
+  // Find the star in the tick report and compare the ships, then add
+  // the difference to the star ships side on the transfer.
+
+  // NOTE: At this stage the star will have the latest data for its ships
+  // as the store deals with updating the star.
+  carrier.value = GameHelper.getCarrierById(game.value, props.carrierId);
+  star.value = carrier.value?.orbiting && GameHelper.getStarById(game.value, carrier.value.orbiting) || undefined;
+
+  // If the game ticks then check to see if any ships have been built at the star.
+  const totalInTransfer = starShips.value + carrierShips.value;
+  const totalOriginal = (star.value?.ships || 0) + (carrier.value?.ships || 0);
+  const difference = totalOriginal - totalInTransfer;
+
+  // If there is a difference then this means that ship(s) have been built at the star
+  // while the user has been on this screen, in that case, add the new ships to the star total
+  if (difference) {
+    starShips.value += difference;
+    onStarShipsChanged();
+  }
+};
+
+watch(game, (newGame, oldGame) => {
+  onGameReloaded(newGame);
+});
+
+const performSaveTransfer = async () => {
+  let transferred = false;
+
+  if (!star.value || !carrier.value) {
+    return transferred;
+  }
+
+  isTransferringShips.value = true;
+
+  const cShips = carrierShips.value;
+  const sShips = starShips.value;
+
+  const response = await transferShips(httpClient)(game.value._id, props.carrierId, cShips, star.value!._id, sShips);
+  if (isOk(response)) {
+    toast.default(`Ships transferred between ${star.value.name} and ${carrier.value.name}.`);
+
+    store.commit('gameStarCarrierShipTransferred', {
+      starId: star.value._id,
+      carrierId: carrier.value._id,
+      starShips: sShips,
+      carrierShips: cShips
+    })
+
+    star.value.ships = sShips
+    carrier.value.ships = cShips
+
+    transferred = true
+  } else {
+    toast.error('Failed to transfer ships.');
+    console.error(formatError(response));
+  }
+
+  isTransferringShips.value = false;
+
+  return transferred;
+};
+
+const saveTransfer = async () => {
+  const result = await performSaveTransfer();
+
+  if (result) {
+    emit('onShipsTransferred', carrier.value!._id);
+  }
+};
+
+const onEditWaypointsRequested = async () => {
+  const result = await performSaveTransfer();
+
+  if (result) {
+    emit('onEditWaypointsRequested', carrier.value!._id);
+  }
+};
+
 </script>
 
 <style scoped>
