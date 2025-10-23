@@ -30,15 +30,15 @@ export enum ModeKind {
   Ruler = 'ruler',
 }
 
-type ModeGalaxy = {
+export type ModeGalaxy = {
   mode: ModeKind.Galaxy,
 }
 
-type ModeRuler = {
+export type ModeRuler = {
   mode: ModeKind.Ruler,
 }
 
-type ModeWaypoints = {
+export type ModeWaypoints = {
   mode: ModeKind.Waypoints,
   carrier: CarrierData,
 }
