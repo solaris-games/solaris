@@ -47,10 +47,10 @@
 
         <div class="row pt-2 pb-0 mb-0">
           <div class="col">
-            <p class="mb-2">ETA<orbital-mechanics-eta-warning />: {{waypointEta}}</p>
+            <p class="mb-2">ETA<orbital-mechanics-e-t-a-warning />: {{waypointEta}}</p>
           </div>
           <div class="col-auto" v-if="isRealTimeGame">
-            <p class="mb-2">Duration<orbital-mechanics-eta-warning />: {{waypointDuration}}</p>
+            <p class="mb-2">Duration<orbital-mechanics-e-t-a-warning />: {{waypointDuration}}</p>
           </div>
         </div>
 
@@ -64,16 +64,16 @@
           <span class="me-1">Next</span>
           <i class="fas fa-chevron-right"></i>
         </button>
-				<button class="btn btn-sm ms-1" :class="{'btn-success':carrier.waypointsLooped,'btn-outline-primary':!carrier.waypointsLooped}" @click="toggleLooped()" :disabled="$isHistoricalMode() || !canLoop" title="Loop/Unloop the carrier's waypoints">
+				<button class="btn btn-sm ms-1" :class="{'btn-success':carrier.waypointsLooped,'btn-outline-primary':!carrier.waypointsLooped}" @click="toggleLooped()" :disabled="isHistoricalMode || !canLoop" title="Loop/Unloop the carrier's waypoints">
           <i class="fas fa-sync"></i>
         </button>
 			</div>
-			<div class="col-auto" v-if="!$isHistoricalMode()">
-				<button class="btn btn-sm btn-outline-success" @click="saveWaypoints()" :disabled="isSavingWaypoints">
+			<div class="col-auto" v-if="!isHistoricalMode">
+				<button class="btn btn-sm btn-outline-success" @click="doSaveWaypoints()" :disabled="isSavingWaypoints">
           <i class="fas fa-save"></i>
           <span class="ms-1">Save</span>
         </button>
-				<button class="btn btn-sm btn-success ms-1" @click="saveWaypoints(true)" :disabled="isSavingWaypoints">
+				<button class="btn btn-sm btn-success ms-1" @click="doSaveWaypoints(true)" :disabled="isSavingWaypoints">
           <i class="fas fa-check"></i>
           <span class="ms-1 d-none d-sm-inline-block">Save &amp; Edit</span>
         </button>
@@ -82,219 +82,233 @@
 	</div>
 </template>
 
-<script>
-import { inject } from 'vue';
-import MenuTitle from '../MenuTitle.vue'
-import GameHelper from '../../../../services/gameHelper'
-import CarrierApiService from '../../../../services/api/carrier'
-import AudioService from '../../../../game/audio'
-import OrbitalMechanicsETAWarningVue from '../shared/OrbitalMechanicsETAWarning.vue'
+<script setup lang="ts">
+import { inject, ref, computed, onMounted, onUnmounted } from 'vue';
+import MenuTitle from '../MenuTitle.vue';
+import GameHelper from '../../../../services/gameHelper';
+import AudioService from '../../../../game/audio';
+import OrbitalMechanicsETAWarning from '../shared/OrbitalMechanicsETAWarning.vue';
 import {eventBusInjectionKey} from "../../../../eventBus";
 import MapCommandEventBusEventNames from "../../../../eventBusEventNames/mapCommand";
 import gameHelper from "../../../../services/gameHelper";
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
+import type {CarrierWaypoint, CarrierWaypointActionType, MapObject} from "@solaris-common"
+import { useStore } from 'vuex';
+import {saveWaypoints} from "@/services/typedapi/carrier";
+import {httpInjectionKey, isOk} from "@/services/typedapi";
+import {toastInjectionKey} from "@/util/keys";
+import {useIsHistoricalMode} from "@/util/reactiveHooks";
 
-export default {
-  components: {
-    'menu-title': MenuTitle,
-    'orbital-mechanics-eta-warning': OrbitalMechanicsETAWarningVue
-  },
-  props: {
-    carrierId: String,
-    waypoint: Object
-  },
-  setup () {
-    return {
-      eventBus: inject(eventBusInjectionKey)
-    }
-  },
-  data () {
-    return {
-      userPlayer: null,
-      carrier: null,
-      isSavingWaypoints: false,
-      currentWaypoint: null,
-      waypoints: [],
-      waypointDuration: null,
-      waypointEta: null
-    }
-  },
-  mounted () {
-    this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
-    this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
+const props = defineProps<{
+  carrierId: string,
+  waypoint: CarrierWaypoint<string>,
+}>();
 
-    // Make a copy of the carriers waypoints.
-    this.waypoints = JSON.parse(JSON.stringify(this.carrier.waypoints))
-    this.currentWaypoint = this.waypoints.find(x => x._id === this.waypoint._id)
-    this.recalculateWaypointDuration()
-    this.recalculateWaypointEta()
-    this.panToWaypoint()
+const emit = defineEmits<{
+  onCloseRequested: [],
+  onOpenStarDetailRequested: [starId: string],
+  onOpenCarrierDetailRequested: [carrierId: string],
+}>();
 
-    if (GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)) {
-      this.intervalFunction = setInterval(this.recalculateWaypointEta, 250)
-      this.recalculateWaypointEta()
-    }
-  },
-  unmounted () {
-    this.eventBus.emit(MapCommandEventBusEventNames.MapCommandClearHighlightedLocations, {});
-  },
-  methods: {
-    onCloseRequested (e) {
-      this.$emit('onCloseRequested', e)
-    },
-    onOpenStarDetailRequested (e) {
-      this.$emit('onOpenStarDetailRequested', this.currentWaypoint.destination)
-    },
-    getStarName (starId) {
-      return this.$store.state.game.galaxy.stars.find(s => s._id === starId).name
-    },
-    getWaypointActionFriendlyText (waypoint, action) {
-      action = action || waypoint.action
+const eventBus = inject(eventBusInjectionKey)!;
+const httpClient = inject(httpInjectionKey)!;
+const toast = inject(toastInjectionKey)!;
 
-      switch (action) {
-        case 'nothing':
-          return 'Do Nothing'
-        case 'collectAll':
-          return 'Collect All'
-        case 'dropAll':
-          return 'Drop All'
-        case 'collect':
-          return `Collect ${waypoint.actionShips}`
-        case 'drop':
-          return `Drop ${waypoint.actionShips}`
-        case 'collectAllBut':
-          return `Collect All But ${waypoint.actionShips}`
-        case 'dropAllBut':
-          return `Drop All But ${waypoint.actionShips}`
-        case 'garrison':
-          return `Garrison ${waypoint.actionShips}`
-        case 'dropPercentage':
-          return `Drop ${waypoint.actionShips}%`
-        case 'collectPercentage':
-          return `Collect ${waypoint.actionShips}%`
-      }
-    },
-    isActionRequiresShips (action) {
-      switch (action) {
-        case 'collect':
-        case 'drop':
-        case 'collectAllBut':
-        case 'dropAllBut':
-        case 'collectPercentage':
-        case 'dropPercentage':
-        case 'garrison':
-          return true
-      }
+const store = useStore();
+const isHistoricalMode = useIsHistoricalMode(store);
 
-      return false
-    },
-    isActionRequiresPercentage (action) {
-      return action === 'dropPercentage' || action === 'collectPercentage';
-    },
-    previousWaypoint () {
-      let index = this.waypoints.indexOf(this.currentWaypoint)
+const game = computed(() => store.state.game);
+const carrier = computed(() => GameHelper.getCarrierById(game.value, props.carrierId)!);
+const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
+const isInTransit = computed(() => !carrier.value.orbiting);
+const canLoop = computed(() => GameHelper.canLoop(game.value, userPlayer.value, carrier.value));
+const isRealTimeGame = computed(() => GameHelper.isRealTimeGame(game.value));
 
-      index--
+const waypoints = ref<CarrierWaypoint<string>[]>(JSON.parse(JSON.stringify(carrier.value.waypoints)));
+const currentWaypoint = ref<CarrierWaypoint<string>>(waypoints.value.find(x => x._id === props.waypoint._id)!);
 
-      if (index < 0) {
-        index = this.waypoints.length - 1
-      }
+const isSavingWaypoints = ref(false);
+const waypointDuration = ref<string | null>(null);
+const waypointEta = ref<string | null>(null);
+const intervalFunction = ref<number | null>(null);
 
-      this.currentWaypoint = this.waypoints[index]
-      this.recalculateWaypointDuration()
-      this.panToWaypoint()
-    },
-    nextWaypoint () {
-      let index = this.waypoints.indexOf(this.currentWaypoint)
+const onCloseRequested = () => {
+  emit('onCloseRequested');
+};
 
-      index++
+const onOpenStarDetailRequested = () => {
+  if (currentWaypoint.value) {
+    emit('onOpenStarDetailRequested', currentWaypoint.value.destination);
+  }
+};
 
-      if (index > this.waypoints.length - 1) {
-        index = 0
-      }
+const getStarName = (starId: string) => {
+  const star = GameHelper.getStarById(game.value, starId);
+  return star ? star.name : 'Unknown Star';
+};
 
-      this.currentWaypoint = this.waypoints[index]
-      this.recalculateWaypointDuration()
-      this.panToWaypoint()
-    },
-    panToWaypoint () {
-      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandClearHighlightedLocations, {});
+const panToWaypoint = () => {
+  eventBus.emit(MapCommandEventBusEventNames.MapCommandClearHighlightedLocations, {});
 
-      const star = gameHelper.getStarById(this.$store.state.game, this.currentWaypoint.destination);
+  if (!currentWaypoint.value) {
+    return;
+  }
 
-      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: star });
-      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandHighlightLocation, { location: star.location });
-    },
-    toggleLooped () {
-      this.carrier.waypointsLooped = !this.carrier.waypointsLooped
-    },
-    async saveWaypoints (saveAndEdit = false) {
-      // Push the waypoints to the API.
-      try {
-        this.isSavingWaypoints = true
-        const response = await CarrierApiService.saveWaypoints(this.$store.state.game._id, this.carrier._id, this.waypoints, this.carrier.waypointsLooped)
+  const star = gameHelper.getStarById(game.value, currentWaypoint.value!.destination);
 
-        if (response.status === 200) {
-          AudioService.join()
+  eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: star as MapObject<string> });
+  eventBus.emit(MapCommandEventBusEventNames.MapCommandHighlightLocation, { location: star!.location });
+};
 
-          this.carrier.ticksEta = response.data.ticksEta
-          this.carrier.ticksEtaTotal = response.data.ticksEtaTotal
-          this.carrier.waypoints = response.data.waypoints
+const isActionRequiresShips = (action: CarrierWaypointActionType) => {
+  switch (action) {
+    case 'collect':
+    case 'drop':
+    case 'collectAllBut':
+    case 'dropAllBut':
+    case 'collectPercentage':
+    case 'dropPercentage':
+    case 'garrison':
+      return true;
+  }
 
-          this.$toast.default(`${this.carrier.name} waypoints updated.`)
+  return false;
+};
 
-          this.eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, { carrier: this.carrier });
+const isActionRequiresPercentage = (action: CarrierWaypointActionType) => {
+  return action === 'dropPercentage' || action === 'collectPercentage';
+};
 
-          if (saveAndEdit) {
-            this.$emit('onOpenCarrierDetailRequested', this.carrier._id)
-          } else {
-            this.onCloseRequested()
-          }
-        }
-      } catch (e) {
-        console.error(e)
-      }
+const getWaypointActionFriendlyText = (waypoint: CarrierWaypoint<string>, action: CarrierWaypointActionType) => {
+  action = action || waypoint.action;
 
-      this.isSavingWaypoints = false
-    },
-    recalculateWaypointDuration () {
-      if (this.currentWaypoint) {
-        const timeRemainingEtaDate = GameHelper.calculateTimeByTicks(this.currentWaypoint.ticks + +this.currentWaypoint.delayTicks, this.$store.state.game.settings.gameTime.speed, null)
-        this.waypointDuration = GameHelper.getCountdownTimeString(this.$store.state.game, timeRemainingEtaDate, true)
-      }
+  switch (action) {
+    case 'nothing':
+      return 'Do Nothing'
+    case 'collectAll':
+      return 'Collect All'
+    case 'dropAll':
+      return 'Drop All'
+    case 'collect':
+      return `Collect ${waypoint.actionShips}`
+    case 'drop':
+      return `Drop ${waypoint.actionShips}`
+    case 'collectAllBut':
+      return `Collect All But ${waypoint.actionShips}`
+    case 'dropAllBut':
+      return `Drop All But ${waypoint.actionShips}`
+    case 'garrison':
+      return `Garrison ${waypoint.actionShips}`
+    case 'dropPercentage':
+      return `Drop ${waypoint.actionShips}%`
+    case 'collectPercentage':
+      return `Collect ${waypoint.actionShips}%`
+  }
+};
 
-      this.recalculateWaypointEta()
-    },
-    recalculateWaypointEta () {
-      // Calculate the ticks + delay up to and including the current waypoint.
-      let index = this.waypoints.indexOf(this.currentWaypoint)
-      let totalTicks = 0;
+const recalculateWaypointEta = () => {
+  // Calculate the ticks + delay up to and including the current waypoint.
+  let index = waypoints.value.indexOf(currentWaypoint.value);
+  let totalTicks = 0;
 
-      for (let i = 0; i <= index; i++) {
-        let wp = this.waypoints[i]
+  for (let i = 0; i <= index; i++) {
+    const wp = waypoints[i];
 
-        // wp.ticks includes delayTicks
-        totalTicks += wp.ticks
-      }
+    // wp.ticks includes delayTicks
+    totalTicks += wp.ticks;
+  }
 
-      this.waypointEta = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, totalTicks)
-    },
-    isFirstWaypoint (waypoint) {
-      return this.waypoints.indexOf(waypoint) === 0
-    }
-  },
-  computed: {
-    canLoop () {
-      return GameHelper.canLoop(this.$store.state.game, this.userPlayer, this.carrier)
-    },
-    isInTransit () {
-      return !this.carrier.orbiting
-    },
-    isRealTimeGame () {
-      return GameHelper.isRealTimeGame(this.$store.state.game)
+  waypointEta.value = GameHelper.getCountdownTimeStringByTicks(game.value, totalTicks);
+};
+
+const recalculateWaypointDuration = () => {
+  if (currentWaypoint.value) {
+    const timeRemainingEtaDate = GameHelper.calculateTimeByTicks((currentWaypoint.value.ticks || 0) + currentWaypoint.value.delayTicks, game.value.settings.gameTime.speed, null);
+    waypointDuration.value = GameHelper.getCountdownTimeString(game.value, timeRemainingEtaDate, true);
+  }
+
+  recalculateWaypointEta();
+};
+
+const nextWaypoint = () => {
+  let index = waypoints.value.indexOf(currentWaypoint.value);
+
+  index++
+
+  if (index > waypoints.value.length - 1) {
+    index = 0
+  }
+
+  currentWaypoint.value = waypoints.value[index];
+  recalculateWaypointDuration();
+  panToWaypoint();
+};
+
+const previousWaypoint = () => {
+  let index = waypoints.value.indexOf(currentWaypoint.value);
+
+  index--;
+
+  if (index < 0) {
+    index = waypoints.value.length - 1;
+  }
+
+  currentWaypoint.value = waypoints.value[index];
+  recalculateWaypointDuration();
+  panToWaypoint();
+};
+
+const toggleLooped = () => {
+  carrier.value.waypointsLooped = !carrier.value.waypointsLooped;
+};
+
+const isFirstWaypoint = (waypoint: CarrierWaypoint<string>) => {
+  return waypoints.value.indexOf(waypoint) === 0;
+}
+
+const doSaveWaypoints = async (saveAndEdit = false) => {
+  isSavingWaypoints.value = true
+  const response = await saveWaypoints(httpClient)(game.value, carrier.value._id, waypoints.value, carrier.value.waypointsLooped)
+
+  if (isOk(response)) {
+    AudioService.join()
+
+    const newWaypoints = response.data.waypoints;
+
+    // todo: recalculate waypoints
+
+    toast.default(`${carrier.value.name} waypoints updated.`)
+
+    eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, {carrier: carrier.value});
+
+    if (saveAndEdit) {
+      emit('onOpenCarrierDetailRequested', carrier.value._id);
+    } else {
+      onCloseRequested();
     }
   }
-}
+
+  isSavingWaypoints.value = false;
+};
+
+onMounted(() => {
+  recalculateWaypointDuration();
+  recalculateWaypointEta();
+  panToWaypoint();
+
+  if (GameHelper.isGameInProgress(game.value) || GameHelper.isGamePendingStart(game.value)) {
+    intervalFunction.value = setInterval(recalculateWaypointEta, 250);
+    recalculateWaypointEta();
+  }
+
+  onUnmounted(() => {
+    if (intervalFunction.value) {
+      clearInterval(intervalFunction.value);
+    }
+
+    eventBus.emit(MapCommandEventBusEventNames.MapCommandClearHighlightedLocations, {});
+  });
+});
 </script>
 
 <style scoped>

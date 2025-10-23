@@ -8,7 +8,7 @@ export type CarrierSaveWaypointsRequest<ID> = {
 };
 
 export type SaveWaypointsResp<ID> = {
-    waypoints: CarrierWaypointBase<ID>,
+    waypoints: CarrierWaypointBase<ID>[],
 }
 
 export type TransferShipsReq<ID> = {
